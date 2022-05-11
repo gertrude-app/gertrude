@@ -1,0 +1,10 @@
+{
+  "files.exclude": {
+    "**/.next/": true,
+    "**/package-lock.json": true,
+    "*/tailwind-preset.js": true,
+    "dashboard/src/components/shared/": true,
+    "marketing/components/shared/": true,
+    "**/node_modules/": true
+  }
+}

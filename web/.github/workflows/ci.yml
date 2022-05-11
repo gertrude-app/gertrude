@@ -1,0 +1,55 @@
+name: ci
+
+on: push
+# on:
+#   push:
+#     branches:
+#       - master
+#   pull_request:
+#     types: [opened, synchronize]
+
+jobs:
+  storybook:
+    name: storybook
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: sync
+        run: make sync
+      - name: npm install components
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: components
+      - name: build storybook
+        run: cd components && npm run build-storybook
+
+  dashboard:
+    name: dashboard
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: sync
+        run: make sync
+      - name: npm install dashboard
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: dashboard
+      - name: build dashboard
+        run: cd dashboard && npm run build
+
+  marketing:
+    name: marketing
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: sync
+        run: make sync
+      - name: npm install marketing
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: marketing
+      - name: build marketing
+        run: cd marketing && npm run build
