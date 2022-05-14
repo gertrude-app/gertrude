@@ -3,5 +3,5 @@
 node_modules/
 .env
 dashboard/src/components/shared
-marketing/src/components/shared
+marketing/components/shared
 marketing/.next
