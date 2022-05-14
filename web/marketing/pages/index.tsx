@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import Button from '../components/shared/Button';
+import Button from '@shared/Button';
 
 const Home: NextPage = () => {
   return (

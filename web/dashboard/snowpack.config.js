@@ -18,4 +18,7 @@ module.exports = {
     tailwindConfig: `./tailwind.config.js`,
   },
   buildOptions: {},
+  alias: {
+    '@shared': `./src/components/shared`,
+  },
 };

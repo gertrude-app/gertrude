@@ -2,6 +2,7 @@
 *.swp
 node_modules/
 .env
+dashboard/build
 dashboard/src/components/shared
 marketing/components/shared
 marketing/.next

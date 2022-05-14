@@ -4,12 +4,15 @@ help:
 # local dev
 
 storybook:
+	make sync-clean
 	$(CONCURRENTLY) -n rs,sb -c cyan.dim,magenta.dim "make watchsync" "make start-storybook"
 
 marketing:
+	make sync-clean
 	$(CONCURRENTLY) -n rs,nx -c cyan.dim,magenta.dim "make watchsync" "make start-marketing"
 
 dashboard:
+	make sync-clean
 	$(CONCURRENTLY) -n rs,sp -c cyan.dim,magenta.dim "make watchsync" "make start-dashboard"
 
 # scaffold
@@ -20,8 +23,12 @@ component:
 # utility
 
 sync:
-	rsync -r ./components/src/shared ./dashboard/src/components
-	rsync -r ./components/src/shared ./marketing/components
+	rsync -r --exclude '*.stories.tsx' ./components/src/shared ./dashboard/src/components
+	rsync -r --exclude '*.stories.tsx' ./components/src/shared ./marketing/components
+
+sync-clean:
+	rm -rf ./dashboard/src/components/shared
+	rm -rf ./marketing/components/shared
 
 watchsync:
 	watchexec --restart --watch ./components/src/shared --exts tsx make sync
@@ -47,6 +54,7 @@ CONCURRENTLY = node_modules/.bin/concurrently
 CLI_ARGS = $(filter-out $@, $(MAKECMDGOALS))
 ALL_CMDS = \
   sync \
+  sync-clean \
   watchsync \
   storybook \
   start-storybook \
