@@ -50,15 +50,14 @@ npm-install:
 
 # build & deploy
 
-build-marketing:
-	make sync
-	cd marketing && npm install && cd ../
-	cd marketing && npx next build && npx next export
+build-marketing: sync
+	cd marketing && npm install && npx next build && npx next export
 
-build-storybook:
-	make sync
-	cd components && npm install && cd ../
-	cd components && npm run build-storybook
+build-dashboard: sync
+	cd dashboard && npm install && npm run build
+
+build-storybook: sync
+	cd components && npm install && npm run build-storybook
 
 # helpers
 
@@ -76,7 +75,10 @@ ALL_CMDS = \
   dashboard \
   start-dashboard \
   help \
-  component
+  component \
+  build-marketing \
+  build-dashboard \
+  build-storybook
 
 .PHONY: $(ALL_CMDS)
 .SILENT: $(ALL_CMDS)
