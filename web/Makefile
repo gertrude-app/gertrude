@@ -48,12 +48,17 @@ npm-install:
 	-c magenta.dim,yellow.dim,green.dim,cyan.dim \
 	"npm i" "cd components && npm i" "cd marketing && npm i" "cd dashboard && npm i"
 
-# deploy
+# build & deploy
 
 build-marketing:
 	make sync
 	cd marketing && npm install && cd ../
 	cd marketing && npx next build && npx next export
+
+build-storybook:
+	make sync
+	cd components && npm install && cd ../
+	cd components && npm run build-storybook
 
 # helpers
 

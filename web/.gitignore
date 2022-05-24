@@ -2,6 +2,7 @@
 *.swp
 node_modules/
 .env
+components/storybook-static/
 dashboard/build
 dashboard/src/components/shared
 marketing/components/shared
