@@ -22,7 +22,7 @@ const CTABlock: React.FC<Props> = ({}) => {
       </section>
       <footer className="p-7 border-t-2 border-white border-opacity-20 flex justify-center items-center bg-fuchsia-500">
         <p className="text-white text-opacity-50 text-xl">
-          © 2022 NetRivet Inc.
+          © {new Date().getFullYear()} NetRivet Inc.
         </p>
       </footer>
     </>
