@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface Props {
   children: string;
@@ -13,9 +13,7 @@ const Feature: React.FC<Props> = ({ children, icon }) => {
           className={`fa fa-${icon} text-2xl text-violet-800 absolute bottom-12 mb-1 right-12 h-0 w-0`}
         />
       </div>
-      <p className="text-xl text-gray-500 leading-8 mt-12 relative">
-        {children}
-      </p>
+      <p className="text-xl text-gray-500 leading-8 mt-12 relative">{children}</p>
     </div>
   );
 };

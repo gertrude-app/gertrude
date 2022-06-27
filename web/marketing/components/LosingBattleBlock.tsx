@@ -1,14 +1,13 @@
-import React from "react";
-import ExampleWebsiteGraphic from "./ExampleWebsiteGraphic";
+import React from 'react';
+import ExampleWebsiteGraphic from './ExampleWebsiteGraphic';
 
-const LosingBattleBlock: React.FC = ({}) => {
+const LosingBattleBlock: React.FC = () => {
   return (
     <>
       <section
         className="lg:h-32 h-24 flex border-l-2 border-none relative"
         style={{
-          background:
-            "linear-gradient(to bottom right, transparent 50%, #111827 50%)",
+          background: `linear-gradient(to bottom right, transparent 50%, #111827 50%)`,
         }}
       >
         <div className="h-full w-20 ml-0.5 border-r-2 border-dashed border-gray-400 border-opacity-50 z-20 hidden lg:block"></div>
@@ -30,10 +29,9 @@ const LosingBattleBlock: React.FC = ({}) => {
               </span>
             </h1>
             <p className="text-xl text-gray-500 mt-8 leading-8">
-              Most internet safety tools try to block categories of the
-              internet. With 1.7 billion websites, and hundreds of thousands
-              more being added every day, taking this approach only gives you
-              the illusion of safety...
+              Most internet safety tools try to block categories of the internet. With 1.7
+              billion websites, and hundreds of thousands more being added every day,
+              taking this approach only gives you the illusion of safety...
             </p>
           </div>
         </div>
@@ -41,8 +39,7 @@ const LosingBattleBlock: React.FC = ({}) => {
       <section
         className="h-32 flex border-l-2 border-none relative z-10"
         style={{
-          background:
-            "linear-gradient(to bottom right, #111827 50%,  #f3f4f6 50%)",
+          background: `linear-gradient(to bottom right, #111827 50%,  #f3f4f6 50%)`,
         }}
       >
         <div className="hidden lg:block h-full w-20 ml-0.5 border-r-2 border-dashed border-gray-400 border-opacity-50 z-20"></div>

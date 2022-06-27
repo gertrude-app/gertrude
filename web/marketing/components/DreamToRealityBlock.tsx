@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-const DreamToRealityBlock: React.FC = ({}) => {
+const DreamToRealityBlock: React.FC = () => {
   return (
     <section
       style={{
-        background: "linear-gradient(to bottom right, #f3f4f6 50%, white 50%)",
+        background: `linear-gradient(to bottom right, #f3f4f6 50%, white 50%)`,
       }}
       className="relative"
     >
@@ -17,21 +17,20 @@ const DreamToRealityBlock: React.FC = ({}) => {
           </div>
           <h1 className="text-5xl font-extrabold font-inter mt-4">
             <span className="text-black">
-              From dream to{" "}
+              From dream to{` `}
               <span className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent">
                 reality
               </span>
             </span>
           </h1>
           <p className="text-xl text-gray-500 my-5 leading-8">
-            Protect your loved ones with aggressive network filtering, plus
-            screen and keystroke monitering. Remotely supervise and control
-            access from your own computer or phone. Available for macOS starting
-            November 1.
+            Protect your loved ones with aggressive network filtering, plus screen and
+            keystroke monitering. Remotely supervise and control access from your own
+            computer or phone. Available for macOS starting November 1.
           </p>
           <button
             className="text-white font-extrabold text-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-8 py-3 rounded-xl shadow-xl mt-8 hover:from-violet-600 hover:to-fuchsia-600 flex items-center"
-            onClick={() => alert("April fools")}
+            onClick={() => alert(`April fools`)}
           >
             <i className="fas fa-rocket mr-5" />
             <h2>Join the waitlist</h2>

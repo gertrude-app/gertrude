@@ -1,9 +1,7 @@
-import React from "react";
-import ButtonPrimary from "./ButtonPrimary";
+import React from 'react';
+import ButtonPrimary from './ButtonPrimary';
 
-interface Props {}
-
-const MainHeader: React.FC<Props> = ({}) => {
+const MainHeader: React.FC = () => {
   return (
     <header className="flex justify-between items-center px-5 sm:px-8 py-6 border-b-2 border-white border-opacity-20 bg-violet-500">
       <svg
@@ -55,11 +53,11 @@ const MainHeader: React.FC<Props> = ({}) => {
       </svg>
       <div>
         <ButtonPrimary
-          bgColor={"bg-white"}
-          borderColor={"border-white"}
-          textColor={"text-violet-500"}
+          bgColor={`bg-white`}
+          borderColor={`border-white`}
+          textColor={`text-violet-500`}
           hoverChanges="hover:bg-violet-50 hover:border-violet-50"
-          onClick={() => alert("April fools")}
+          onClick={() => alert(`April fools`)}
         >
           Sign up
         </ButtonPrimary>

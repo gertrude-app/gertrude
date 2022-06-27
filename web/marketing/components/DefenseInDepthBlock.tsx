@@ -1,8 +1,6 @@
-import React from "react";
+import React from 'react';
 
-interface Props {}
-
-const DefenseInDepthBlock: React.FC<Props> = ({}) => {
+const DefenseInDepthBlock: React.FC = () => {
   return (
     <section className="bg-gradient-to-b from-gray-900 to-gray-800 px-10 md:px-16 pt-16 md:pt-24 flex items-center flex-col relative overflow-hidden">
       <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -right-128 -top-72 z-20" />
@@ -23,25 +21,22 @@ const DefenseInDepthBlock: React.FC<Props> = ({}) => {
         Defense in depth.
       </h1>
       <p className="text-xl text-gray-500 mt-8 leading-8 md:text-center text-left max-w-5xl sm:mb-20 mb-12">
-        In addition to internet filtering, Gertrude allows you to collect
-        screenshots of your protected users' screens, as well as their
-        keystrokes, for an unprecedented level of safety, redundancy, and
-        oversight. You get to review screenshots and keystrokes on your own
-        time, on your own device.
+        In addition to internet filtering, Gertrude allows you to collect screenshots of
+        your protected users' screens, as well as their keystrokes, for an unprecedented
+        level of safety, redundancy, and oversight. You get to review screenshots and
+        keystrokes on your own time, on your own device.
       </p>
       <section className="flex justify-center w-screen">
         <div
           className="md:h-32 h-12 flex-grow relative z-30"
           style={{
-            background:
-              "linear-gradient(to bottom left, transparent 50%, #8b5cf6 50%)",
+            background: `linear-gradient(to bottom left, transparent 50%, #8b5cf6 50%)`,
           }}
         />
         <div
           className="md:h-32 h-12 flex-grow bg-pink-500 z-30"
           style={{
-            background:
-              "linear-gradient(to bottom right, transparent 50%, #8b5cf6 50%)",
+            background: `linear-gradient(to bottom right, transparent 50%, #8b5cf6 50%)`,
           }}
         />
       </section>
