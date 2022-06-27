@@ -67,6 +67,16 @@ format:
 format-check:
 	npx prettier --config ./.prettierrc.json --loglevel warn --check .
 
+lint:
+	npx eslint .
+
+lint-fix:
+	npx eslint . --fix
+
+check:
+	make lint
+	make format-check
+
 # helpers
 
 CONCURRENTLY = node_modules/.bin/concurrently
@@ -81,7 +91,7 @@ ALL_CMDS = \
   storybook marketing dashboard \
   start-storybook start-marketing start-dashboard \
   build-storybook build-marketing build-dashboard \
-	format format-check
+  lint lint-fix format format-check check
 
 .PHONY: $(ALL_CMDS)
 .SILENT: $(ALL_CMDS)
