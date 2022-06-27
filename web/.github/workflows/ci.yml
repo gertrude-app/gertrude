@@ -8,6 +8,19 @@ on:
     types: [opened, synchronize]
 
 jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: npm install
+        uses: bahmutov/npm-install@v1
+      - name: lint
+        run: make lint
+      - name: format
+        run: make format-check
+
   storybook:
     name: storybook
     runs-on: ubuntu-latest
