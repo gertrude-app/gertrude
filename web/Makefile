@@ -59,6 +59,14 @@ build-dashboard: sync
 build-storybook: sync
 	cd components && npm install && npm run build-storybook
 
+# ci type things
+
+format:
+	npx prettier --config ./.prettierrc.json --loglevel warn --write .
+
+format-check:
+	npx prettier --config ./.prettierrc.json --loglevel warn --check .
+
 # helpers
 
 CONCURRENTLY = node_modules/.bin/concurrently
@@ -67,18 +75,13 @@ ALL_CMDS = \
   sync \
   sync-clean \
   watchsync \
-  storybook \
-  start-storybook \
-  marketing \
-  start-marketing \
   npm-install \
-  dashboard \
-  start-dashboard \
   help \
   component \
-  build-marketing \
-  build-dashboard \
-  build-storybook
+  storybook marketing dashboard \
+  start-storybook start-marketing start-dashboard \
+  build-storybook build-marketing build-dashboard \
+	format format-check
 
 .PHONY: $(ALL_CMDS)
 .SILENT: $(ALL_CMDS)
