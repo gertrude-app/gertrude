@@ -4,14 +4,16 @@ import Feature from './Feature';
 const SafeIsNowPossibleBlock: React.FC = () => {
   return (
     <section className="bg-gray-100 bg-topo">
-      <section className="relative lg:ml-20 lg:border-gray-400 lg:border-opacity-50 lg:border-l-2 lg:border-dashed">
+      <section className="relative">
         <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -right-96 top-0 z-10" />
         <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-96 top-128 z-10" />
         <div className="lg:p-20 p-10 py-20">
           <h1 className="font-inter text-5xl">
             Safe is now{` `}
-            <span className="relative">
-              <div className="absolute w-full h-2 bg-black left-0 top-7" />
+            <span
+              className="relative line-through [text-decoration-thickness:6px]"
+              aria-hidden="true"
+            >
               easy
             </span>
             {` `}

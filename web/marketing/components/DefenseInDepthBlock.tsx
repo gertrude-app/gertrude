@@ -6,16 +6,10 @@ const DefenseInDepthBlock: React.FC = () => {
       <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -right-128 -top-72 z-20" />
       <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-20 -bottom-128 z-20" />
       <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-72 -bottom-96 z-20" />
-      <div className="flex sm:flex-row flex-col md:justify-center items-center mb-16 relative">
-        <div className="md:w-32 w-24 md:h-32 h-24 rounded-full bg-gray-800 flex items-center justify-center my-5 sm:my-0 sm:mx-10 shadow-2xl relative">
-          <i className="fa fa-filter text-4xl md:text-5xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent" />
-        </div>
-        <div className="md:w-32 w-24 md:h-32 h-24 rounded-full bg-gray-800 flex items-center justify-center my-5 sm:my-0 sm:mx-10 shadow-2xl relative">
-          <i className="fa fa-binoculars text-4xl md:text-5xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent" />
-        </div>
-        <div className="md:w-32 w-24 md:h-32 h-24 rounded-full bg-gray-800 flex items-center justify-center my-5 sm:my-0 sm:mx-10 shadow-2xl relative">
-          <i className="fa fa-keyboard text-4xl md:text-5xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent" />
-        </div>
+      <div className="flex flex-row flex-wrap justify-center md:justify-center items-center mb-8 sm:mb-16 relative">
+        <IconCircle icon="filter" />
+        <IconCircle icon="binoculars" />
+        <IconCircle icon="keyboard" />
       </div>
       <h1 className="font-inter text-6xl md:text-7xl text-left md:text-center text-white">
         Defense in depth.
@@ -27,20 +21,39 @@ const DefenseInDepthBlock: React.FC = () => {
         keystrokes on your own time, on your own device.
       </p>
       <section className="flex justify-center w-screen">
-        <div
-          className="md:h-32 h-12 flex-grow relative z-30"
-          style={{
-            background: `linear-gradient(to bottom left, transparent 50%, #8b5cf6 50%)`,
-          }}
-        />
-        <div
-          className="md:h-32 h-12 flex-grow bg-pink-500 z-30"
-          style={{
-            background: `linear-gradient(to bottom right, transparent 50%, #8b5cf6 50%)`,
-          }}
-        />
+        <GradientRectangle direction="left" />
+        <GradientRectangle direction="right" />
       </section>
     </section>
+  );
+};
+
+interface GradientRectangleProps {
+  direction: 'right' | 'left';
+}
+
+const GradientRectangle: React.FC<GradientRectangleProps> = ({ direction }) => {
+  return (
+    <div
+      className="md:h-32 h-12 flex-grow z-30"
+      style={{
+        background: `linear-gradient(to bottom ${direction}, transparent 50%, #8b5cf6 50%)`,
+      }}
+    />
+  );
+};
+
+interface IconCircleProps {
+  icon: string;
+}
+
+const IconCircle: React.FC<IconCircleProps> = ({ icon }) => {
+  return (
+    <div className="md:w-32 w-24 md:h-32 h-24 rounded-full bg-gray-800 flex items-center justify-center my-5 sm:my-0 mx-5 sm:mx-10 shadow-2xl relative">
+      <i
+        className={`fa fa-${icon} text-4xl md:text-5xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent`}
+      />
+    </div>
   );
 };
 

@@ -7,15 +7,6 @@
 @tailwind utilities;
 
 @layer utilities {
-  .text-gradient-violet-fuchsia {
-    background: -webkit-linear-gradient(-70deg, #8b5cf6 0%, #d846ef 100%);
-    background-clip: border-box;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    -webkit-box-decoration-break: clone;
-  }
-
   .bg-fuchsia-radial-gradient {
     background: radial-gradient(closest-side, rgb(200, 88, 231, 0.6), transparent);
   }

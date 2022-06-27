@@ -1,27 +1,21 @@
 import React from 'react';
 
 interface Props {
-  bgColor: string;
-  borderColor: string;
-  textColor: string;
   className?: string;
-  hoverChanges: string;
   children: React.ReactNode;
+  // add more as needed
+  type: 'primary';
   onClick(): void;
 }
 
-const ButtonPrimary: React.FC<Props> = ({
-  bgColor,
-  borderColor,
-  textColor,
-  className,
-  children,
-  hoverChanges,
-  onClick,
-}) => {
+const ButtonPrimary: React.FC<Props> = ({ className, children, onClick, type }) => {
   return (
     <button
-      className={`${className} ${bgColor} ${borderColor} ${textColor} border-2 px-5 py-2 font-bold rounded-lg transition duration-100 ${hoverChanges}`}
+      className={`${className} ${
+        type === `primary`
+          ? `bg-white border-white text-violet-500 hover:bg-violet-50 hover:border-violet-50`
+          : ``
+      } border-2 px-5 py-2 font-bold rounded-lg transition duration-100`}
       onClick={onClick}
     >
       {children}

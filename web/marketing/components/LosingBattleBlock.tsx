@@ -10,11 +10,11 @@ const LosingBattleBlock: React.FC = () => {
           background: `linear-gradient(to bottom right, transparent 50%, #111827 50%)`,
         }}
       >
-        <div className="h-full w-20 ml-0.5 border-r-2 border-dashed border-gray-400 border-opacity-50 z-20 hidden lg:block"></div>
+        <div className="h-full w-20 ml-0.5 z-20 hidden lg:block"></div>
       </section>
       <section className="bg-gray-900 relative lg:flex-row flex flex-col py-16">
         <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-128 -bottom-52 z-20" />
-        <div className="lg:border-l-2 lg:border-gray-400 lg:border-opacity-50 lg:border-dashed lg:w-1/2 h-128 lg:ml-20 -my-36 lg:-my-16 flex justify-center items-center lg:block scale-75 lg:scale-100">
+        <div className="lg:w-1/2 h-128 lg:ml-10 -my-36 lg:-my-16 flex justify-center items-center lg:block scale-75 lg:scale-100">
           <div className="relative bottom-72 left-96 lg:bottom-0 lg:left-0">
             <ExampleWebsiteGraphic className="right-80 top-48 scale-125 z-50 -rotate-6" />
             <ExampleWebsiteGraphic className="right-52 top-20 scale-90 z-40 -rotate-12" />
@@ -42,7 +42,7 @@ const LosingBattleBlock: React.FC = () => {
           background: `linear-gradient(to bottom right, #111827 50%,  #f3f4f6 50%)`,
         }}
       >
-        <div className="hidden lg:block h-full w-20 ml-0.5 border-r-2 border-dashed border-gray-400 border-opacity-50 z-20"></div>
+        <div className="hidden lg:block h-full w-20 ml-0.5  z-20"></div>
       </section>
     </>
   );
