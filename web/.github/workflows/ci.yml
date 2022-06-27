@@ -33,6 +33,7 @@ jobs:
         uses: bahmutov/npm-install@v1
         with:
           working-directory: components
+          install-command: npm install --legacy-peer-deps
       - name: build storybook
         run: cd components && npm run build-storybook
 
