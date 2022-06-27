@@ -1,11 +1,23 @@
+import CTABlock from 'components/CTABlock';
+import DefenseInDepthBlock from 'components/DefenseInDepthBlock';
+import DreamToRealityBlock from 'components/DreamToRealityBlock';
+import HeroBlock from 'components/HeroBlock';
+import LosingBattleBlock from 'components/LosingBattleBlock';
+import MainHeader from 'components/MainHeader';
+import SafeIsNowPossibleBlock from 'components/SafeIsNowPossibleBlock';
 import type { NextPage } from 'next';
-import Button from '@shared/Button';
 
 const Home: NextPage = () => {
   return (
-    <div>
-      Home <Button />
-    </div>
+    <main className="overflow-hidden">
+      <MainHeader />
+      <HeroBlock />
+      <DreamToRealityBlock />
+      <LosingBattleBlock />
+      <SafeIsNowPossibleBlock />
+      <DefenseInDepthBlock />
+      <CTABlock />
+    </main>
   );
 };
 
