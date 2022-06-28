@@ -31,7 +31,10 @@ const LosingBattleBlock: React.FC = () => {
             <p className="text-xl text-gray-500 mt-8 leading-8">
               Most internet safety tools try to block categories of the internet. With 1.7
               billion websites, and hundreds of thousands more being added every day,
-              taking this approach only gives you the illusion of safety...
+              taking this approach only gives you the{` `}
+              <span className="text-gray-400 font-bold antialiased">
+                illusion of safety...
+              </span>
             </p>
           </div>
         </div>
