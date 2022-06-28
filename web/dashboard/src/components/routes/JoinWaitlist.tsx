@@ -3,36 +3,21 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const JoinWaitlist: React.FC = () => {
-  const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
   const navigate = useNavigate();
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-violet-500 to-fuchsia-500">
-      {arr.map(() => {
+      {new Array(15).fill(0).map(() => {
         const s = Math.random() * 150 + 50;
         return (
-          <div
-            style={{
-              width: s,
-              height: s,
-              left: `${Math.random() * 150 - 25}%`,
-              top: `${Math.random() * 150 - 25}%`,
-              borderRadius: s / 5,
-              transform: `rotate(${Math.random() * 360}deg)`,
-            }}
-            className="border-2 absolute border-dashed flex justify-center items-center border-white border-opacity-40"
-          >
-            <div
-              className="border-2 border-dashed rotate-12 border-white border-opacity-40"
-              style={{
-                width: s / 1.7,
-                height: s / 1.7,
-                borderRadius: s / 7,
-              }}
-            />
-          </div>
+          <SubtleLogo
+            size={s}
+            angle={Math.random() * 36}
+            x={Math.random() * 150 - 2}
+            y={Math.random() * 150 - 25}
+          />
         );
       })}
-      <div className="p-12 rounded-2xl shadow-lg flex justify-center items-center flex-col border bg-white relative z-10 mx-10">
+      <div className="py-12 px-8 sm:px-12 rounded-2xl shadow-lg flex justify-center items-center flex-col border bg-white relative z-10 mx-10">
         <svg
           width="75"
           viewBox="0 0 35 35"
@@ -76,17 +61,50 @@ const JoinWaitlist: React.FC = () => {
             className="h-10 border ring-0 ring-gray-200 rounded-lg shadow-sm outline-none py-6 px-4 focus:shadow-md transition duration-150 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 text-gray-600"
           />
         </div>
-        <Button onClick={() => {}} type="primary-violet" className="self-stretch">
+        <Button
+          onClick={() => {}}
+          type="primary-violet"
+          className="self-stretch"
+          use="button"
+        >
           Join the waitlist
         </Button>
-        <Button
-          onClick={() => navigate(`/`)}
-          type="secondary-white"
-          className="self-stretch mt-4"
-        >
+        <Button use="link" to="/" type="secondary-white" className="self-stretch mt-4">
           Cancel
         </Button>
       </div>
+    </div>
+  );
+};
+
+interface SubtleLogoProps {
+  size: number;
+  angle: number;
+  x: number;
+  y: number;
+}
+
+const SubtleLogo: React.FC<SubtleLogoProps> = ({ size, x, y, angle }) => {
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        left: `${x}%`,
+        top: `${y}%`,
+        borderRadius: size / 5,
+        transform: `rotate(${angle}deg)`,
+      }}
+      className="border-2 absolute border-dashed justify-center items-center border-white border-opacity-40 hidden sm:flex"
+    >
+      <div
+        className="border-2 border-dashed rotate-12 border-white border-opacity-40"
+        style={{
+          width: size / 1.7,
+          height: size / 1.7,
+          borderRadius: size / 7,
+        }}
+      />
     </div>
   );
 };

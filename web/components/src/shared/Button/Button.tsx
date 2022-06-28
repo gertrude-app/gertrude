@@ -1,15 +1,19 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-interface Props {
+interface CommonProps {
   className?: string;
-  onClick(): void;
   type: 'primary-violet' | 'primary-white' | 'secondary-violet' | 'secondary-white';
   children: string;
 }
 
-const Button: React.FC<Props> = ({ className, onClick, type, children }) => {
+type Props =
+  | ({ use: 'button'; onClick(): void } & CommonProps)
+  | ({ use: 'link'; to: string } & CommonProps);
+
+const Button: React.FC<Props> = (props) => {
   let colors = ``;
-  switch (type) {
+  switch (props.type) {
     case `primary-violet`:
       colors = `bg-violet-500 text-white hover:bg-violet-600 border-2 border-violet-500 hover:border-violet-600 ring ring-white ring-offset-0 focus:ring-offset-4 focus:ring-violet-500`;
       break;
@@ -24,13 +28,23 @@ const Button: React.FC<Props> = ({ className, onClick, type, children }) => {
       break;
   }
 
+  if (props.use === 'button') {
+    return (
+      <button
+        className={`${colors} py-2.5 px-10 shadow-sm rounded-lg text-lg font-bold [transition:100ms] outline-none block ${props.className}`}
+        onClick={props.onClick}
+      >
+        {props.children}
+      </button>
+    );
+  }
   return (
-    <button
-      className={`${colors} py-2.5 px-10 shadow-sm rounded-lg text-lg font-bold [transition:100ms] outline-none ${className}`}
-      onClick={onClick}
+    <Link
+      className={`${colors} py-2.5 px-10 shadow-sm rounded-lg text-lg font-bold [transition:100ms] outline-none block w-fit text-center ${props.className}`}
+      to={props.to}
     >
-      {children}
-    </button>
+      {props.children}
+    </Link>
   );
 };
 
