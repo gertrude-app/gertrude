@@ -15,7 +15,7 @@ const JoinWaitlist: React.FC = () => {
           />
         );
       })}
-      <div className="py-12 px-8 sm:px-12 rounded-2xl shadow-lg flex justify-center items-center flex-col border bg-white relative z-10 mx-10">
+      <div className="py-8 sm:py-12 px-5 sm:px-12 rounded-2xl shadow-lg flex justify-center items-center flex-col border bg-white relative z-10 mx-3 sm:mx-10">
         <svg
           width="75"
           viewBox="0 0 35 35"
