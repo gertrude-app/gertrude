@@ -4,6 +4,14 @@ local dev commands:
   > `make marketing` -- run local dev for marketing site
   > `make dashboard` -- run local dev for dashboard site
 
+quality/ci commands:
+
+  > `make format`   -- run prettier on all files
+  > `make lint`     -- run eslint
+  > `make lint-fix` -- run eslint, auto-fixing where possible
+  > `make ts-check` -- typescript check all subdirs
+  > `make check`    -- test for prettier, lint, typescript errors
+
 scaffold commands:
 
   > `make component [name]` -- scaffold files for a new shared react component

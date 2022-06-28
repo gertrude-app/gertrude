@@ -73,9 +73,15 @@ lint:
 lint-fix:
 	npx eslint . --fix
 
+ts-check:
+	npx tsc --noEmit --project ./dashboard
+	npx tsc --noEmit --project ./marketing
+	npx tsc --noEmit --project ./components
+
 check:
 	make lint
 	make format-check
+	make ts-check
 
 # helpers
 
@@ -91,7 +97,7 @@ ALL_CMDS = \
   storybook marketing dashboard \
   start-storybook start-marketing start-dashboard \
   build-storybook build-marketing build-dashboard \
-  lint lint-fix format format-check check
+  ts-check lint lint-fix format format-check check
 
 .PHONY: $(ALL_CMDS)
 .SILENT: $(ALL_CMDS)
