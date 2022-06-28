@@ -85,6 +85,14 @@ ts-check:
 	npx tsc --noEmit --project ./marketing
 	npx tsc --noEmit --project ./components
 
+ts-watch:
+	$(CONCURRENTLY) \
+	  -n ds,mk,sb \
+		-c cyan.dim,magenta.dim,yellow.dim \
+	  "npx tsc --noEmit --project ./dashboard --watch --preserveWatchOutput" \
+	  "npx tsc --noEmit --project ./marketing --watch --preserveWatchOutput" \
+	  "npx tsc --noEmit --project ./components --watch --preserveWatchOutput"
+
 check:
 	make lint
 	make format-check

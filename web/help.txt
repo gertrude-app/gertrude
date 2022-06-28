@@ -5,12 +5,13 @@ local dev commands:
   > `make dashboard` -- run local dev for dashboard site
   > `make all`       -- run local dev for all 3 simultaneously
 
-quality/ci commands:
+quality/ci commands:      
 
   > `make format`   -- run prettier on all files
   > `make lint`     -- run eslint
   > `make lint-fix` -- run eslint, auto-fixing where possible
   > `make ts-check` -- typescript check all subdirs
+  > `make ts-watch` -- typescript check all subdirs, watch mode
   > `make check`    -- test for prettier, lint, typescript errors
 
 scaffold commands:
