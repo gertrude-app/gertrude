@@ -1,10 +1,11 @@
-import Button from '@shared/Button';
 import React from 'react';
+import cx from 'classnames';
+import Button from '@shared/Button';
 
 const JoinWaitlist: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-violet-500 to-fuchsia-500">
-      {new Array(15).fill(0).map(() => {
+      {new Array(15).fill(0).map((_, index) => {
         const s = Math.random() * 150 + 50;
         return (
           <SubtleLogo
@@ -12,6 +13,7 @@ const JoinWaitlist: React.FC = () => {
             angle={Math.random() * 36}
             x={Math.random() * 150 - 2}
             y={Math.random() * 150 - 25}
+            index={index}
           />
         );
       })}
@@ -75,9 +77,10 @@ interface SubtleLogoProps {
   angle: number;
   x: number;
   y: number;
+  index: number;
 }
 
-const SubtleLogo: React.FC<SubtleLogoProps> = ({ size, x, y, angle }) => {
+const SubtleLogo: React.FC<SubtleLogoProps> = ({ size, x, y, angle, index }) => {
   return (
     <div
       style={{
@@ -88,7 +91,10 @@ const SubtleLogo: React.FC<SubtleLogoProps> = ({ size, x, y, angle }) => {
         borderRadius: size / 5,
         transform: `rotate(${angle}deg)`,
       }}
-      className="border-2 absolute border-dashed justify-center items-center border-white border-opacity-40 hidden sm:flex"
+      className={cx(
+        index % 3 !== 0 ? `hidden sm:flex` : `flex`,
+        `border-2 absolute border-dashed justify-center items-center border-white border-opacity-40`,
+      )}
     >
       <div
         className="border-2 border-dashed rotate-12 border-white border-opacity-40"
