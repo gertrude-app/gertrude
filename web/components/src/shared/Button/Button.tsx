@@ -28,7 +28,7 @@ const Button: React.FC<Props> = (props) => {
       break;
   }
 
-  if (props.use === 'button') {
+  if (props.use === `button`) {
     return (
       <button
         className={`${colors} py-2.5 px-10 shadow-sm rounded-lg text-lg font-bold [transition:100ms] outline-none block ${props.className}`}

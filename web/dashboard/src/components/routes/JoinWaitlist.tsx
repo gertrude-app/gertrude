@@ -1,9 +1,7 @@
 import Button from '@shared/Button';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const JoinWaitlist: React.FC = () => {
-  const navigate = useNavigate();
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-violet-500 to-fuchsia-500">
       {new Array(15).fill(0).map(() => {
