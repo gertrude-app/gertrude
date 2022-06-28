@@ -61,13 +61,13 @@ const JoinWaitlist: React.FC = () => {
         </div>
         <Button
           onClick={() => {}}
-          type="primary-violet"
+          color="primary-violet"
           className="self-stretch"
-          use="button"
+          type="button"
         >
           Join the waitlist
         </Button>
-        <Button use="link" to="/" type="secondary-white" className="self-stretch mt-4">
+        <Button type="link" to="/" color="secondary-white" className="self-stretch mt-4">
           Cancel
         </Button>
       </div>
