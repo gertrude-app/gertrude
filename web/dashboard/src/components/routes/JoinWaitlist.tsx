@@ -1,11 +1,13 @@
 import Button from '@shared/Button';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const App: React.FC = () => {
-  const nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const JoinWaitlist: React.FC = () => {
+  const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-violet-500 to-fuchsia-500">
-      {nums.map((num) => {
+      {arr.map(() => {
         const s = Math.random() * 150 + 50;
         return (
           <div
@@ -77,7 +79,11 @@ const App: React.FC = () => {
         <Button onClick={() => {}} type="primary-violet" className="self-stretch">
           Join the waitlist
         </Button>
-        <Button onClick={() => {}} type="secondary-white" className="self-stretch mt-4">
+        <Button
+          onClick={() => navigate(`/`)}
+          type="secondary-white"
+          className="self-stretch mt-4"
+        >
           Cancel
         </Button>
       </div>
@@ -85,4 +91,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default JoinWaitlist;
