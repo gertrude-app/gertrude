@@ -60,11 +60,11 @@ npm-install:
 build-marketing: sync
 	cd marketing && npm install && npx next build && npx next export
 
-build-dashboard: sync
-	cd dashboard && npm install && npm run build
-
 build-storybook: sync
 	cd components && npm install && npm run build-storybook
+
+build-dashboard: sync
+	cd dashboard && npm install && npm run build
 
 # ci type things
 

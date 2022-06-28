@@ -18,6 +18,13 @@ module.exports = {
     tailwindConfig: `./tailwind.config.js`,
   },
   buildOptions: {},
+  routes: [
+    {
+      match: `routes`,
+      src: `.*`,
+      dest: `/index.html`,
+    },
+  ],
   alias: {
     '@shared': `./src/components/shared`,
   },
