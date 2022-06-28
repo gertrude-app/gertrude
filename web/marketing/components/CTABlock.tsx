@@ -15,7 +15,7 @@ const CTABlock: React.FC = () => {
           onClick={() => alert(`April fools`)}
         >
           <i className="fas fa-rocket mr-5" />
-          <h2>Join the waitlist</h2>
+          <h2 className="leading-[90%]">Join the waitlist</h2>
         </button>
       </section>
       <footer className="p-7 border-t-2 border-white border-opacity-20 flex justify-center items-center bg-fuchsia-500">
