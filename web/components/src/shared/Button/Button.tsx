@@ -6,13 +6,14 @@ interface CommonProps {
   className?: string;
   color: 'primary-violet' | 'primary-white' | 'secondary-violet' | 'secondary-white';
   children: React.ReactNode;
+  small?: boolean;
 }
 
 type Props =
   | ({ type: 'button'; onClick(): void } & CommonProps)
   | ({ type: 'link'; to: string } & CommonProps);
 
-const Button: React.FC<Props> = ({ color, className, ...props }) => {
+const Button: React.FC<Props> = ({ small = false, color, className, ...props }) => {
   let colors = ``;
   switch (color) {
     case `primary-violet`:
@@ -30,7 +31,8 @@ const Button: React.FC<Props> = ({ color, className, ...props }) => {
   }
   const classes = cx(
     colors,
-    `ring ring-offset-0 focus:ring-offset-4 py-2.5 px-10 shadow-sm rounded-lg text-lg font-bold [transition:100ms] outline-none block`,
+    `ring ring-offset-0 focus:ring-offset-4 shadow-sm rounded-lg font-bold [transition:100ms] outline-none block`,
+    small ? `text-md px-5 py-2` : `text-lg px-10 py-2.5`,
     className,
     props.type !== `button` && `text-center w-fit`,
   );
