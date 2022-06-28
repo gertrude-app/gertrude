@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "storybook": "start-storybook -p 4777 --ci",
+    "storybook": "start-storybook -p 4777 --ci --quiet",
     "build-storybook": "build-storybook"
   },
   "dependencies": {
