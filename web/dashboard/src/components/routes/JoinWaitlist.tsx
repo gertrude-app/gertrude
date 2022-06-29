@@ -1,10 +1,11 @@
-import Button from '@shared/Button';
 import React from 'react';
+import cx from 'classnames';
+import Button from '@shared/Button';
 
 const JoinWaitlist: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-violet-500 to-fuchsia-500">
-      {new Array(15).fill(0).map(() => {
+      {new Array(15).fill(0).map((_, index) => {
         const s = Math.random() * 150 + 50;
         return (
           <SubtleLogo
@@ -12,10 +13,11 @@ const JoinWaitlist: React.FC = () => {
             angle={Math.random() * 36}
             x={Math.random() * 150 - 2}
             y={Math.random() * 150 - 25}
+            index={index}
           />
         );
       })}
-      <div className="py-12 px-8 sm:px-12 rounded-2xl shadow-lg flex justify-center items-center flex-col border bg-white relative z-10 mx-10">
+      <div className="py-8 sm:py-12 px-5 sm:px-12 rounded-2xl shadow-lg flex justify-center items-center flex-col border bg-white relative z-10 mx-3 sm:mx-10">
         <svg
           width="75"
           viewBox="0 0 35 35"
@@ -59,15 +61,10 @@ const JoinWaitlist: React.FC = () => {
             className="h-10 border ring-0 ring-gray-200 rounded-lg shadow-sm outline-none py-6 px-4 focus:shadow-md transition duration-150 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 text-gray-600"
           />
         </div>
-        <Button
-          onClick={() => {}}
-          type="primary-violet"
-          className="self-stretch"
-          use="button"
-        >
+        <Button onClick={() => {}} color="primary-violet" type="button" fullWidth>
           Join the waitlist
         </Button>
-        <Button use="link" to="/" type="secondary-white" className="self-stretch mt-4">
+        <Button type="link" to="/" color="secondary-white" className="mt-3" fullWidth>
           Cancel
         </Button>
       </div>
@@ -80,9 +77,10 @@ interface SubtleLogoProps {
   angle: number;
   x: number;
   y: number;
+  index: number;
 }
 
-const SubtleLogo: React.FC<SubtleLogoProps> = ({ size, x, y, angle }) => {
+const SubtleLogo: React.FC<SubtleLogoProps> = ({ size, x, y, angle, index }) => {
   return (
     <div
       style={{
@@ -93,7 +91,10 @@ const SubtleLogo: React.FC<SubtleLogoProps> = ({ size, x, y, angle }) => {
         borderRadius: size / 5,
         transform: `rotate(${angle}deg)`,
       }}
-      className="border-2 absolute border-dashed justify-center items-center border-white border-opacity-40 hidden sm:flex"
+      className={cx(
+        index % 3 !== 0 ? `hidden sm:flex` : `flex`,
+        `border-2 absolute border-dashed justify-center items-center border-white border-opacity-40`,
+      )}
     >
       <div
         className="border-2 border-dashed rotate-12 border-white border-opacity-40"

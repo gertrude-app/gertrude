@@ -15,6 +15,13 @@ dashboard:
 	make sync-clean
 	$(CONCURRENTLY) -n rs,sp -c cyan.dim,magenta.dim "make watchsync" "make start-dashboard"
 
+all:
+	make sync-clean
+	$(CONCURRENTLY) \
+	  -n rs,sb,mk,ds \
+	  -c cyan.dim,magenta.dim,yellow.dim,green.dim \
+	  "make watchsync" "make start-storybook" "make start-marketing" "make start-dashboard"
+
 # scaffold
 
 component:
@@ -44,20 +51,20 @@ start-dashboard:
 
 npm-install:
 	$(CONCURRENTLY) \
-	-n root,comp,mark,dash \
-	-c magenta.dim,yellow.dim,green.dim,cyan.dim \
-	"npm i" "cd components && npm i" "cd marketing && npm i" "cd dashboard && npm i"
+	  -n root,comp,mark,dash \
+	  -c magenta.dim,yellow.dim,green.dim,cyan.dim \
+	  "npm i" "cd components && npm i" "cd marketing && npm i" "cd dashboard && npm i"
 
 # build & deploy
 
 build-marketing: sync
 	cd marketing && npm install && npx next build && npx next export
 
-build-dashboard: sync
-	cd dashboard && npm install && npm run build
-
 build-storybook: sync
 	cd components && npm install && npm run build-storybook
+
+build-dashboard: sync
+	cd dashboard && npm install && npm run build
 
 # ci type things
 
@@ -73,9 +80,23 @@ lint:
 lint-fix:
 	npx eslint . --fix
 
+ts-check:
+	npx tsc --noEmit --project ./dashboard
+	npx tsc --noEmit --project ./marketing
+	npx tsc --noEmit --project ./components
+
+ts-watch:
+	$(CONCURRENTLY) \
+	  -n ds,mk,sb \
+		-c cyan.dim,magenta.dim,yellow.dim \
+	  "npx tsc --noEmit --project ./dashboard --watch --preserveWatchOutput" \
+	  "npx tsc --noEmit --project ./marketing --watch --preserveWatchOutput" \
+	  "npx tsc --noEmit --project ./components --watch --preserveWatchOutput"
+
 check:
 	make lint
 	make format-check
+	make ts-check
 
 # helpers
 
@@ -88,10 +109,10 @@ ALL_CMDS = \
   npm-install \
   help \
   component \
-  storybook marketing dashboard \
+  storybook marketing dashboard all \
   start-storybook start-marketing start-dashboard \
   build-storybook build-marketing build-dashboard \
-  lint lint-fix format format-check check
+  ts-check lint lint-fix format format-check check
 
 .PHONY: $(ALL_CMDS)
 .SILENT: $(ALL_CMDS)

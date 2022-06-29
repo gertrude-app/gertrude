@@ -14,12 +14,29 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
-      - name: npm install
+      - name: npm install root
         uses: bahmutov/npm-install@v1
+      - name: npm install components
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: components
+          install-command: npm install --legacy-peer-deps
+      - name: npm install dashboard
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: dashboard
+      - name: npm install marketing
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: marketing
+      - name: sync
+        run: make sync
       - name: lint
         run: make lint
       - name: format
         run: make format-check
+      - name: typecheck
+        run: make ts-check
 
   storybook:
     name: storybook

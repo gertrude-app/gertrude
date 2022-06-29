@@ -1,69 +1,63 @@
 import { ComponentMeta } from '@storybook/react';
-import { BrowserRouter } from 'react-router-dom';
 
 import Button from './Button';
 
 export default {
   title: `Button`,
   component: Button,
+  parameters: {
+    layout: `fullscreen`,
+  },
 } as ComponentMeta<typeof Button>;
 
-export const PrimaryViolet = () => (
-  <BrowserRouter>
-    <div className="p-20">
+type ButtonColor = React.ComponentProps<typeof Button>['color'];
+
+const ButtonStory: React.FC<{ color: ButtonColor }> = ({ color }) => (
+  <div className={`${bgColor(color)} p-10 space-y-5`}>
+    <div className="space-y-2">
       <h2>As a button:</h2>
-      <Button use="button" type="primary-violet" onClick={() => {}}>
-        Join the waitlist
-      </Button>
-      <h2 className="mt-2">As a link:</h2>
-      <Button use="link" type="primary-violet" to="">
+      <Button type="button" color={color} onClick={() => {}}>
         Join the waitlist
       </Button>
     </div>
-  </BrowserRouter>
+    <div className="space-y-2">
+      <h2>As a link:</h2>
+      <Button type="link" color={color} to="">
+        Join the waitlist
+      </Button>
+    </div>
+    <div className="space-y-2">
+      <h2>Full width:</h2>
+      <Button type="button" fullWidth color={color} onClick={() => {}}>
+        Join the waitlist
+      </Button>
+    </div>
+    <div className="space-y-2">
+      <h2>Small:</h2>
+      <Button type="button" small color={color} onClick={() => {}}>
+        Join the waitlist
+      </Button>
+    </div>
+    <div className="space-y-2">
+      <h2>Small & Full width:</h2>
+      <Button type="button" fullWidth small color={color} onClick={() => {}}>
+        Join the waitlist
+      </Button>
+    </div>
+  </div>
 );
 
-export const PrimaryWhite = () => (
-  <BrowserRouter>
-    <div className="p-20 bg-violet-500">
-      <h2>As a button:</h2>
-      <Button use="button" type="primary-white" onClick={() => {}}>
-        Join the waitlist
-      </Button>
-      <h2 className="mt-2">As a link:</h2>
-      <Button use="link" type="primary-white" to="">
-        Join the waitlist
-      </Button>
-    </div>
-  </BrowserRouter>
-);
+export const PrimaryViolet = () => <ButtonStory color="primary-violet" />;
+export const PrimaryWhite = () => <ButtonStory color="primary-white" />;
+export const SecondaryWhite = () => <ButtonStory color="secondary-white" />;
+export const SecondaryViolet = () => <ButtonStory color="secondary-violet" />;
 
-export const SecondaryWhite = () => (
-  <BrowserRouter>
-    <div className="p-20">
-      <h2>As a button:</h2>
-      <Button use="button" type="secondary-white" onClick={() => {}}>
-        Join the waitlist
-      </Button>
-      <h2 className="mt-2">As a link:</h2>
-      <Button use="link" type="secondary-white" to="">
-        Join the waitlist
-      </Button>
-    </div>
-  </BrowserRouter>
-);
-
-export const SecondaryViolet = () => (
-  <BrowserRouter>
-    <div className="p-20 bg-violet-500">
-      <h2>As a button:</h2>
-      <Button use="button" type="secondary-violet" onClick={() => {}}>
-        Join the waitlist
-      </Button>
-      <h2 className="mt-2">As a link:</h2>
-      <Button use="link" type="secondary-violet" to="">
-        Join the waitlist
-      </Button>
-    </div>
-  </BrowserRouter>
-);
+function bgColor(color: ButtonColor) {
+  switch (color) {
+    case `primary-white`:
+    case `secondary-violet`:
+      return `bg-violet-500`;
+    default:
+      return ``;
+  }
+}

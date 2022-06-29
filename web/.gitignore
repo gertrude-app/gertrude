@@ -8,3 +8,4 @@ dashboard/src/components/shared
 marketing/components/shared
 marketing/.next
 marketing/out
+**/tsconfig.tsbuildinfo

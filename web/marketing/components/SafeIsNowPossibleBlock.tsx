@@ -11,7 +11,7 @@ const SafeIsNowPossibleBlock: React.FC = () => {
           <h1 className="font-inter text-5xl">
             Safe is now{` `}
             <span
-              className="relative line-through [text-decoration-thickness:6px]"
+              className="relative line-through [text-decoration-thickness:5px] [text-decoration-color:#d946ef]"
               aria-hidden="true"
             >
               easy

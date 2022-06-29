@@ -25,7 +25,7 @@ const DreamToRealityBlock: React.FC = () => {
           </h1>
           <p className="text-xl text-gray-500 my-5 leading-8">
             Protect your loved ones with aggressive network filtering, plus screen and
-            keystroke monitering. Remotely supervise and control access from your own
+            keystroke monitoring. Remotely supervise and control access from your own
             computer or phone. Available for macOS starting November 1.
           </p>
           <button
