@@ -4,9 +4,10 @@ import React from 'react';
 
 interface Props {
   className?: string;
+  noText?: boolean;
 }
 
-const Logo: React.FC<Props> = ({ className }) => {
+const Logo: React.FC<Props> = ({ className, noText }) => {
   return (
     <div className={`flex items-center justify-start ${className}`}>
       <svg height="40" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -19,7 +20,9 @@ const Logo: React.FC<Props> = ({ className }) => {
           fill="#8B5CF6"
         />
       </svg>
-      <h1 className="text-white text-4xl font-lato ml-2">Gertrude</h1>
+      <h1 className={`text-white text-4xl font-lato ml-2 ${noText ? 'hidden' : 'block'}`}>
+        Gertrude
+      </h1>
     </div>
   );
 };
