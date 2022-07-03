@@ -20,7 +20,7 @@ const Logo: React.FC<Props> = ({ className, noText }) => {
           fill="#8B5CF6"
         />
       </svg>
-      <h1 className={`text-white text-4xl font-lato ml-2 ${noText ? 'hidden' : 'block'}`}>
+      <h1 className={`text-white text-4xl font-lato ml-2 ${noText ? `hidden` : `block`}`}>
         Gertrude
       </h1>
     </div>

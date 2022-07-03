@@ -12,10 +12,10 @@ interface Props {
 const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) => {
   return (
     <nav
-      className={`bg-gradient-to-b from-violet-500 to-violet-700 -ml-80 relative z-30 ${
-        open ? 'left-80' : 'left-0'
+      className={`bg-gradient-to-b from-violet-500 to-violet-700 -ml-80 relative z-40 ${
+        open ? (expanded ? `left-80` : `left-20`) : `left-0`
       } lg:-ml-0 flex flex-col justify-between items-start overflow-hidden [transition:200ms] ${
-        expanded ? 'w-80' : 'w-20'
+        expanded ? `w-80` : `w-20`
       }`}
     >
       <div
@@ -24,9 +24,9 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
       >
         <i className="fa fa-times text-2xl transition duration-100" />
       </div>
-      <div className={`${expanded ? 'p-4' : 'py-4'}`}>
+      <div className={`${expanded ? `p-4` : `py-4`}`}>
         <Logo
-          className={`m-2 mb-10 mt-8 ${expanded ? 'ml-4' : 'ml-[1.2em]'}`}
+          className={`m-2 mb-10 mt-8 ${expanded ? `ml-4` : `ml-[1.2em]`}`}
           noText={!expanded}
         />
         <div className="mt-5 pb-4">
@@ -54,18 +54,18 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
       </div>
       <div
         className={`items-center justify-start px-6 w-80 ${
-          expanded ? 'py-5 px-6' : 'h-16 pl-8'
+          expanded ? `py-5 px-6` : `h-16 pl-8`
         } self-stretch bg-black bg-opacity-0 hover:bg-opacity-10 cursor-pointer transition duration-100 hidden lg:flex`}
         onClick={() => setExpanded(!expanded)}
       >
         <i
           className={`fas fa-chevron-${
-            expanded ? 'left mr-3' : 'right'
+            expanded ? `left mr-3` : `right`
           } text-2xl text-white text-opacity-60`}
         />
         <h2
           className={`font-bold text-xl text-white text-opacity-80 min-w-40 ${
-            expanded ? 'block' : 'hidden'
+            expanded ? `block` : `hidden`
           }`}
         >
           Collapse sidebar
