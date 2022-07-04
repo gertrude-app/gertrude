@@ -112,7 +112,7 @@ ALL_CMDS = \
   storybook marketing dashboard all \
   start-storybook start-marketing start-dashboard \
   build-storybook build-marketing build-dashboard \
-  ts-check lint lint-fix format format-check check
+  ts-watch ts-check lint lint-fix format format-check check
 
 .PHONY: $(ALL_CMDS)
 .SILENT: $(ALL_CMDS)
