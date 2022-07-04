@@ -3,9 +3,12 @@
     "**/.next/": true,
     "**/package-lock.json": true,
     "*/tailwind-preset.js": true,
+    "**/node_modules/": true,
+    "**/tsconfig.tsbuildinfo": true,
     "dashboard/build/": true,
     "dashboard/src/components/shared/": true,
     "marketing/components/shared/": true,
-    "**/node_modules/": true
+    "marketing/out/": true,
+    "components/storybook-static/": true
   }
 }
