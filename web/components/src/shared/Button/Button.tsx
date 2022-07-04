@@ -13,6 +13,7 @@ interface CommonProps {
 type Props =
   | ({ type: 'submit' } & CommonProps)
   | ({ type: 'button'; onClick(): void } & CommonProps)
+  | ({ type: 'external'; href: string } & CommonProps)
   | ({ type: 'link'; to: string } & CommonProps);
 
 const Button: React.FC<Props> = ({
@@ -37,16 +38,17 @@ const Button: React.FC<Props> = ({
       colors = `bg-gray-50 text-gray-500 border hover:bg-gray-100 ring-white focus:ring-indigo-400 focus:border-indigo-500`;
       break;
   }
+  const rendersAsButton = props.type === `button` || props.type === `submit`;
   const classes = cx(
     colors,
     `ring ring-offset-0 focus:ring-offset-4 shadow-sm rounded-lg font-bold [transition:100ms] outline-none block`,
     small ? `text-md px-5 py-2` : `text-lg px-10 py-2.5`,
     className,
     fullWidth ? `w-full` : `w-fit`,
-    props.type === `link` && `text-center`,
+    !rendersAsButton && `text-center`,
   );
 
-  if (props.type !== `link`) {
+  if (rendersAsButton) {
     return (
       <button
         type={props.type}
@@ -57,6 +59,15 @@ const Button: React.FC<Props> = ({
       </button>
     );
   }
+
+  if (props.type === `external`) {
+    return (
+      <a className={classes} href={props.href}>
+        {props.children}
+      </a>
+    );
+  }
+
   return (
     <Link className={classes} to={props.to}>
       {props.children}

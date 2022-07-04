@@ -1,7 +1,7 @@
 .DS_Store
 *.swp
 node_modules/
-.env
+**/.env*
 components/storybook-static/
 dashboard/build
 dashboard/src/components/shared
