@@ -93,6 +93,10 @@ ts-watch:
 	  "npx tsc --noEmit --project ./marketing --watch --preserveWatchOutput" \
 	  "npx tsc --noEmit --project ./components --watch --preserveWatchOutput"
 
+fix:
+	make format
+	make lint-fix
+
 check:
 	make lint
 	make format-check
@@ -112,7 +116,7 @@ ALL_CMDS = \
   storybook marketing dashboard all \
   start-storybook start-marketing start-dashboard \
   build-storybook build-marketing build-dashboard \
-  ts-watch ts-check lint lint-fix format format-check check
+  fix ts-watch ts-check lint lint-fix format format-check check
 
 .PHONY: $(ALL_CMDS)
 .SILENT: $(ALL_CMDS)

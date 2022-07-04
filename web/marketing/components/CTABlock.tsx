@@ -10,13 +10,14 @@ const CTABlock: React.FC = () => {
             November 1, 2022
           </span>
         </h2>
-        <button
+        <a
           className="text-white font-extrabold text-3xl bg-gray-800 px-10 py-4 rounded-xl shadow-xl mt-8 hover:bg-gray-900 transition duration-150 flex items-center"
           onClick={() => alert(`April fools`)}
+          href={process.env.NEXT_PUBLIC_JOIN_WAITLIST_URL ?? ``}
         >
           <i className="fas fa-rocket mr-5" />
           <h2 className="leading-[90%]">Join the waitlist</h2>
-        </button>
+        </a>
       </section>
       <footer className="p-7 border-t-2 border-white border-opacity-20 flex justify-center items-center bg-fuchsia-500">
         <p className="text-white text-opacity-50 text-xl">

@@ -28,13 +28,13 @@ const DreamToRealityBlock: React.FC = () => {
             keystroke monitoring. Remotely supervise and control access from your own
             computer or phone. Available for macOS starting November 1.
           </p>
-          <button
-            className="text-white font-extrabold text-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-8 py-3 rounded-xl shadow-xl mt-8 hover:from-violet-600 hover:to-fuchsia-600 flex items-center"
-            onClick={() => alert(`April fools`)}
+          <a
+            className="text-white font-extrabold text-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center"
+            href={process.env.NEXT_PUBLIC_JOIN_WAITLIST_URL ?? ``}
           >
             <i className="fas fa-rocket mr-5" />
             <h2>Join the waitlist</h2>
-          </button>
+          </a>
         </div>
         <div className="w-1/2 h-112 bg-fuchsia-radial-gradient z-10 p-8 justify-center items-center lg:flex hidden">
           <div className="w-96 h-96 bg-white rounded-full shadow-xl overflow-hidden flex justify-center items-center">

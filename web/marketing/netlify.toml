@@ -5,3 +5,5 @@
 [build.environment]
   NODE_VERSION = "14.19.3"
   NPM_VERSION = "8.13.1"
+  NEXT_PUBLIC_JOIN_WAITLIST_URL = "https://dash.gertrude.app/join-waitlist"
+
