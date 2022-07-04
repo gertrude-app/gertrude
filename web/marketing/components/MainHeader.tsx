@@ -1,6 +1,6 @@
 import Button from '@shared/Button';
+import Logo from '@shared/Logo';
 import React from 'react';
-import Logo from './Logo';
 
 const MainHeader: React.FC = () => {
   return (
