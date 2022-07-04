@@ -11,6 +11,7 @@
     "skipLibCheck": true,
     "jsx": "preserve",
     "forceConsistentCasingInFileNames": true,
+    "target": "ESNext",
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["./src/components/shared/*"]
