@@ -11,6 +11,7 @@ interface CommonProps {
 }
 
 type Props =
+  | ({ type: 'submit' } & CommonProps)
   | ({ type: 'button'; onClick(): void } & CommonProps)
   | ({ type: 'link'; to: string } & CommonProps);
 
@@ -42,12 +43,16 @@ const Button: React.FC<Props> = ({
     small ? `text-md px-5 py-2` : `text-lg px-10 py-2.5`,
     className,
     fullWidth ? `w-full` : `w-fit`,
-    props.type !== `button` && `text-center`,
+    props.type === `link` && `text-center`,
   );
 
-  if (props.type === `button`) {
+  if (props.type !== `link`) {
     return (
-      <button className={classes} onClick={props.onClick}>
+      <button
+        type={props.type}
+        className={classes}
+        {...(props.type === `button` ? { onClick: props.onClick } : {})}
+      >
         {props.children}
       </button>
     );
