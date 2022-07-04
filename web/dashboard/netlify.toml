@@ -6,3 +6,10 @@
   from = "/*"
   to = "/index.html"
   status = 200 
+
+[context.production]
+  SNOWPACK_PUBLIC_GRAPHQL_ENDPOINT = 'https://api.gertrude-app.com/graphql/dashboard'
+
+[context.deploy-preview.environment]
+  SNOWPACK_PUBLIC_GRAPHQL_ENDPOINT = 'https://api--staging.gertrude-app.com/graphql/dashboard'
+

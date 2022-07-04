@@ -13,10 +13,10 @@ const Component = args[0];
 const componentFile = `import React from 'react';
 
 type Props = {
-  classNames?: string;
+  className?: string;
 };
 
-const ${Component}: React.FC<Props> = () => <h1>${Component} placeholder</h1>;
+const ${Component}: React.FC<Props> = ({ className }) => <h1>${Component} placeholder</h1>;
 
 export default ${Component};
 `;
