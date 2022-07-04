@@ -1,15 +1,18 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 interface Props {
-  selected: boolean;
   icon: string;
   children: string;
   expanded: boolean;
+  to: string;
 }
 
-const SidebarOption: React.FC<Props> = ({ selected, icon, children, expanded }) => {
+const SidebarOption: React.FC<Props> = ({ icon, children, expanded, to }) => {
+  const selected = location.pathname === to;
   return (
-    <div
+    <Link
+      to={to}
       className={`flex justify-start items-center bg-black bg-opacity-0 cursor-pointer transition duration-75 select-none w-80 ${
         selected ? `bg-opacity-20` : `hover:bg-opacity-10`
       } ${expanded ? `rounded-xl py-3 px-5 my-3 ` : `py-[1.4em] pl-[1.65em]`}`}
@@ -22,7 +25,7 @@ const SidebarOption: React.FC<Props> = ({ selected, icon, children, expanded }) 
       >
         {children}
       </h2>
-    </div>
+    </Link>
   );
 };
 

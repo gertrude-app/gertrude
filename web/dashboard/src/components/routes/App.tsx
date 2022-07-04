@@ -2,9 +2,11 @@ import React from 'react';
 import DashboardChrome from '../DashboardChrome';
 
 const App: React.FC = () => {
+  const page = location.pathname.split('/')[1];
+  console.log(page);
   return (
     <DashboardChrome>
-      <h1 className="p-10">hello world</h1>
+      <h1>hello world</h1>
     </DashboardChrome>
   );
 };

@@ -37,27 +37,27 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
         Log out <i className="ml-1 fa fa-sign-out" />
       </a>
       <div className="mt-5 pb-4">
-        <SidebarOption icon="home" selected={false} expanded={expanded}>
+        <SidebarOption icon="home" expanded={expanded} to="/">
           Dashboard
         </SidebarOption>
-        <SidebarOption icon="shield" selected={false} expanded={expanded}>
+        <SidebarOption icon="shield" expanded={expanded} to="/digital-guardians">
           Digital guardians
         </SidebarOption>
-        <SidebarOption icon="users" selected={true} expanded={expanded}>
+        <SidebarOption icon="users" expanded={expanded} to="/guarded-users">
           Guarded users
         </SidebarOption>
-        <SidebarOption icon="key" selected={false} expanded={expanded}>
+        <SidebarOption icon="key" expanded={expanded} to="/keychains">
           Keychains
         </SidebarOption>
-        <SidebarOption icon="user" selected={false} expanded={expanded}>
+        <SidebarOption icon="user" expanded={expanded} to="/profile">
           Profile
         </SidebarOption>
       </div>
       <div className="border-t-4 border-white border-opacity-10 pt-4 -ml-4 pl-4">
-        <SidebarOption icon="life-ring" selected={false} expanded={expanded}>
+        <SidebarOption icon="life-ring" expanded={expanded} to="/support">
           Support
         </SidebarOption>
-        <SidebarOption icon="cog" selected={false} expanded={expanded}>
+        <SidebarOption icon="cog" expanded={expanded} to="/settings">
           Settings
         </SidebarOption>
       </div>
