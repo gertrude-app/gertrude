@@ -56,7 +56,7 @@ const EmailFormScreen: React.FC<Props> = (props) => {
           props.onSubmit();
         }}
       >
-        <Logo />
+        <Logo size={75} iconOnly />
         <h2 className="text-center mt-4 text-3xl font-inter">{props.title}</h2>
         <h3 className="text-center text-gray-500 mt-2">{props.subTitle}</h3>
         <TextInput
