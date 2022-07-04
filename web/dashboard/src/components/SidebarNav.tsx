@@ -29,6 +29,13 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
         className={`m-2 mb-10 mt-8 ${expanded ? `ml-4` : `ml-[1.2em]`}`}
         iconOnly={!expanded}
       />
+      <a
+        className={`text-white text-opacity-50 text-right absolute bottom-0 left-52 -ml-1 py-5 hover:text-opacity-60 transition duration-100 w-32 justify-center items-center cursor-pointer ${
+          expanded ? 'flex' : 'hidden'
+        }`}
+      >
+        Log out <i className="ml-1 fa fa-sign-out" />
+      </a>
       <div className="mt-5 pb-4">
         <SidebarOption icon="home" selected={false} expanded={expanded}>
           Dashboard
@@ -42,10 +49,13 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
         <SidebarOption icon="key" selected={false} expanded={expanded}>
           Keychains
         </SidebarOption>
-      </div>
-      <div className="border-t-4 border-white border-opacity-10 pt-4">
         <SidebarOption icon="user" selected={false} expanded={expanded}>
           Profile
+        </SidebarOption>
+      </div>
+      <div className="border-t-4 border-white border-opacity-10 pt-4 -ml-4 pl-4">
+        <SidebarOption icon="life-ring" selected={false} expanded={expanded}>
+          Support
         </SidebarOption>
         <SidebarOption icon="cog" selected={false} expanded={expanded}>
           Settings
@@ -63,13 +73,6 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
           expanded ? `left mr-3` : `right`
         } text-2xl text-white text-opacity-60`}
       />
-      <h2
-        className={`font-bold text-xl text-white text-opacity-80 min-w-40 ${
-          expanded ? `block` : `hidden`
-        }`}
-      >
-        Collapse sidebar
-      </h2>
     </div>
   </nav>
 );
