@@ -1,9 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import DashboardChrome from './components/DashboardChrome';
 import App from './components/routes/App';
 import JoinWaitlist from './components/routes/JoinWaitlist';
 import Profile from './components/routes/Profile';
+
+// isn't there some way to nest routes within a chrome component or something?
 
 ReactDOM.createRoot(document.getElementById(`root`)!).render(
   <React.StrictMode>
