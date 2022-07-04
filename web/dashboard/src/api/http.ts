@@ -34,7 +34,8 @@ async function send<Data, Vars>(
   variables: Vars,
 ): Promise<Result<Data, GQLError>> {
   try {
-    const response = await window.fetch(`http://localhost:8080/graphql/dashboard`, {
+    const endpoint = import.meta.env.SNOWPACK_PUBLIC_GRAPHQL_ENDPOINT;
+    const response = await window.fetch(endpoint, {
       method: `POST`,
       headers: { 'Content-Type': `application/json` },
       body: JSON.stringify({
