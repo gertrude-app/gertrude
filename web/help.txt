@@ -13,6 +13,7 @@ quality/ci commands:
   > `make ts-check` -- typescript check all subdirs
   > `make ts-watch` -- typescript check all subdirs, watch mode
   > `make check`    -- test for prettier, lint, typescript errors
+  > `make fix`      -- run lint fix and prettier format
 
 scaffold commands:
 
