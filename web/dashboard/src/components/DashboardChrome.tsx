@@ -16,7 +16,11 @@ const DashboardChrome: React.FC<Props> = ({ children }) => {
         open={sidebarOpen}
         setOpen={setSidebarOpen}
       />
-      <div className="flex-grow flex flex-col">
+      <div
+        className={`flex-grow flex flex-col ${
+          sidebarExpanded ? 'lg:ml-80' : 'lg:ml-20'
+        } [transition:200ms]`}
+      >
         <div
           className={`absolute left-0 top-0 z-30 [transition:700ms] bg-opacity-0 h-screen bg-black w-screen ${
             sidebarOpen ? `block bg-opacity-70` : `hidden`

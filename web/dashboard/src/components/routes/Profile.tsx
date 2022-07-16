@@ -1,15 +1,18 @@
+import Button from '@shared/Button';
 import DashboardPageHeading from '@shared/DashboardPageHeading';
 import TextInput from '@shared/TextInput';
 import React from 'react';
+import SelectMenu from '../SelectMenu';
 import DashboardChrome from '../DashboardChrome';
+import NotificationCard from '../NotificationCard';
 
 const Profile: React.FC = () => {
   return (
     <DashboardChrome>
       <div className="py-10 px-20">
         <DashboardPageHeading icon="user">Profile</DashboardPageHeading>
-        <div className="flex mt-8">
-          <div className="p-8 bg-gray-100 rounded-xl flex-grow mr-2 border">
+        <div className="flex flex-col md:flex-row mt-8">
+          <div className="p-8 bg-gray-100 rounded-xl flex-grow lg:mr-2 border">
             <h2 className="text-lg text-gray-900 mb-2">Email address:</h2>
             <TextInput
               type={'email'}
@@ -18,7 +21,7 @@ const Profile: React.FC = () => {
               setValue={() => {}}
             />
           </div>
-          <div className="px-8 py-4 bg-gray-100 rounded-xl ml-2 flex justify-between relative border">
+          <div className="px-8 py-4 bg-gray-100 rounded-xl lg:ml-2 flex justify-between relative border">
             <div className="flex justify-end items-start flex-col mr-8">
               <h2 className="font-bold text-gray-700">Basic plan</h2>
               <h3>
@@ -37,8 +40,19 @@ const Profile: React.FC = () => {
         </div>
         <div className="mt-12">
           <h1 className="text-2xl font-bold">Notifications</h1>
-          <div>
-            <div className=""></div>
+          <div className="flex flex-col">
+            <NotificationCard />
+            <NotificationCard />
+            <NotificationCard />
+            <Button
+              color="primary-violet"
+              type="button"
+              onClick={() => {}}
+              className="self-center mt-8"
+            >
+              <i className="fa fa-plus mr-4" />
+              New notification
+            </Button>
           </div>
         </div>
       </div>

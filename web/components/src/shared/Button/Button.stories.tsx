@@ -51,6 +51,7 @@ export const PrimaryViolet = () => <ButtonStory color="primary-violet" />;
 export const PrimaryWhite = () => <ButtonStory color="primary-white" />;
 export const SecondaryWhite = () => <ButtonStory color="secondary-white" />;
 export const SecondaryViolet = () => <ButtonStory color="secondary-violet" />;
+export const SecondarySevere = () => <ButtonStory color="secondary-severe" />;
 
 function bgColor(color: ButtonColor) {
   switch (color) {

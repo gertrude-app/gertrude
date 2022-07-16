@@ -11,7 +11,7 @@ interface Props {
 
 const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) => (
   <nav
-    className={`bg-gradient-to-b from-violet-500 to-violet-700 -ml-80 relative z-40 ${
+    className={`h-screen fixed bg-gradient-to-b from-violet-500 to-violet-700 -ml-80 z-40 ${
       open ? (expanded ? `left-80` : `left-20`) : `left-0`
     } lg:-ml-0 flex flex-col justify-between items-start overflow-hidden [transition:200ms] ${
       expanded ? `w-80` : `w-20`
@@ -34,7 +34,7 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
           expanded ? 'flex' : 'hidden'
         }`}
       >
-        Log out <i className="ml-1 fa fa-sign-out" />
+        Log out <i className="ml-1.5 fa fa-sign-out" />
       </a>
       <div className="mt-5 pb-4">
         <SidebarOption icon="home" expanded={expanded} to="/">
