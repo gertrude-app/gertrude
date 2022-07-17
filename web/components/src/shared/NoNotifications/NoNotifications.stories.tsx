@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import NoNotifications from './NoNotifications';
 
 export default {
-  title: 'NoNotifications',
+  title: `NoNotifications`,
   component: NoNotifications,
 } as ComponentMeta<typeof NoNotifications>;
 

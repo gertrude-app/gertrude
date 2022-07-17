@@ -4,18 +4,12 @@ import { Listbox, Transition } from '@headlessui/react';
 import cx from 'classnames';
 
 interface Props {
-  className?: string;
   options: string[];
   selectedOption: string;
   setSelected(value: string): void;
 }
 
-const SelectMenu: React.FC<Props> = ({
-  className,
-  options,
-  selectedOption,
-  setSelected,
-}) => {
+const SelectMenu: React.FC<Props> = ({ options, selectedOption, setSelected }) => {
   return (
     <Listbox value={selectedOption} onChange={setSelected}>
       {({ open }) => (
@@ -31,7 +25,7 @@ const SelectMenu: React.FC<Props> = ({
                   <span className="sr-only">Change published status</span>
                   <i
                     className={`fa fa-chevron-down text-xl text-white transition duration-100 ${
-                      open ? '-rotate-180' : 'rotate-0'
+                      open ? `-rotate-180` : `rotate-0`
                     }`}
                     aria-hidden="true"
                   />
@@ -53,9 +47,9 @@ const SelectMenu: React.FC<Props> = ({
                     className={({ active }) =>
                       cx(
                         active
-                          ? 'text-white bg-indigo-500'
-                          : 'text-gray-900 even:bg-gray-50',
-                        'cursor-pointer select-none relative p-4 text-sm',
+                          ? `text-white bg-indigo-500`
+                          : `text-gray-900 even:bg-gray-50`,
+                        `cursor-pointer select-none relative p-4 text-sm`,
                       )
                     }
                     value={option}
@@ -63,11 +57,11 @@ const SelectMenu: React.FC<Props> = ({
                     {({ selected, active }) => (
                       <div className="flex flex-col">
                         <div className="flex justify-between">
-                          <p className={selected ? 'font-semibold' : 'font-normal'}>
+                          <p className={selected ? `font-semibold` : `font-normal`}>
                             {option}
                           </p>
                           {selected ? (
-                            <span className={active ? 'text-white' : 'text-indigo-500'}>
+                            <span className={active ? `text-white` : `text-indigo-500`}>
                               <i className="fa fa-check h-5 w-5" aria-hidden="true" />
                             </span>
                           ) : null}

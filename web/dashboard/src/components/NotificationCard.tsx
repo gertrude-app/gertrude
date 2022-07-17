@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 
 const NotificationCard: React.FC = () => {
   // TEMP
-  const [whenToNotify, setWhenToNotify] = useState('Unlock requests');
-  const [howToNotify, setHowToNotify] = useState('Send a Slack');
+  const [whenToNotify, setWhenToNotify] = useState(`Unlock requests`);
+  const [howToNotify, setHowToNotify] = useState(`Send a Slack`);
 
   let notificationInputs: {
     label: string;
@@ -16,38 +16,38 @@ const NotificationCard: React.FC = () => {
   }[] = [];
 
   switch (howToNotify) {
-    case 'Send a Slack':
+    case `Send a Slack`:
       notificationInputs = [
         {
-          type: 'text',
-          label: 'Channel ID:',
-          value: 'CE07D6SDX89201',
+          type: `text`,
+          label: `Channel ID:`,
+          value: `CE07D6SDX89201`,
           setValue: () => {},
         },
         {
-          type: 'text',
-          label: 'Bot token:',
-          value: 'abc-1234567890-xc123231231231',
-          setValue: () => {},
-        },
-      ];
-      break;
-    case 'Send an email':
-      notificationInputs = [
-        {
-          type: 'email',
-          label: 'Email address:',
-          value: 'foo@example.com',
+          type: `text`,
+          label: `Bot token:`,
+          value: `abc-1234567890-xc123231231231`,
           setValue: () => {},
         },
       ];
       break;
-    case 'Send a text message':
+    case `Send an email`:
       notificationInputs = [
         {
-          type: 'text',
-          label: 'Phone number:',
-          value: '(123) 456-7890',
+          type: `email`,
+          label: `Email address:`,
+          value: `foo@example.com`,
+          setValue: () => {},
+        },
+      ];
+      break;
+    case `Send a text message`:
+      notificationInputs = [
+        {
+          type: `text`,
+          label: `Phone number:`,
+          value: `(123) 456-7890`,
           setValue: () => {},
         },
       ];
@@ -59,13 +59,13 @@ const NotificationCard: React.FC = () => {
       <div className="flex flex-col items-stretch relative z-20">
         <h3 className="mb-1 text-gray-700">Notify me upon:</h3>
         <SelectMenu
-          options={['Unlock requests', 'Filter suspension requests']}
+          options={[`Unlock requests`, `Filter suspension requests`]}
           selectedOption={whenToNotify}
           setSelected={setWhenToNotify}
         />
         <h3 className="mt-3 mb-1 text-gray-700">Via:</h3>
         <SelectMenu
-          options={['Send a Slack', 'Send an email', 'Send a text message']}
+          options={[`Send a Slack`, `Send an email`, `Send a text message`]}
           selectedOption={howToNotify}
           setSelected={setHowToNotify}
         />
@@ -76,7 +76,7 @@ const NotificationCard: React.FC = () => {
             <h3 className="mb-1 text-gray-700">{input.label}</h3>
             <TextInput
               type={input.type}
-              label={''}
+              label={``}
               value={input.value}
               setValue={input.setValue}
             />

@@ -18,7 +18,7 @@ const DashboardChrome: React.FC<Props> = ({ children }) => {
       />
       <div
         className={`flex-grow flex flex-col ${
-          sidebarExpanded ? 'lg:ml-80' : 'lg:ml-20'
+          sidebarExpanded ? `lg:ml-80` : `lg:ml-20`
         } [transition:200ms]`}
       >
         <div

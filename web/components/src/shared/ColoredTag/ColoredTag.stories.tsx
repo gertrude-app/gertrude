@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import ColoredTag from './ColoredTag';
 
 export default {
-  title: 'ColoredTag',
+  title: `ColoredTag`,
   component: ColoredTag,
 } as ComponentMeta<typeof ColoredTag>;
 
@@ -22,6 +22,6 @@ const All: React.FC = () => (
   </div>
 );
 
-const Template: ComponentStory<typeof ColoredTag> = (args) => <All />;
+const Template: ComponentStory<typeof ColoredTag> = () => <All />;
 
 export const List = Template.bind({});

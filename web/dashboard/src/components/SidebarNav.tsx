@@ -31,8 +31,9 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
       />
       <a
         className={`text-white text-opacity-50 text-right absolute bottom-0 left-52 -ml-1 py-5 hover:text-opacity-60 transition duration-100 w-32 justify-center items-center cursor-pointer ${
-          expanded ? 'flex' : 'hidden'
+          expanded ? `flex` : `hidden`
         }`}
+        href="https://friendslibrary.com"
       >
         Log out <i className="ml-1.5 fa fa-sign-out" />
       </a>

@@ -1,9 +1,9 @@
 import Button from '@shared/Button';
 import ColoredTag from '@shared/ColoredTag';
 import DashboardPageHeading from '@shared/DashboardPageHeading';
-import NoNotifications from '@shared/NoNotifications';
 import TextInput from '@shared/TextInput';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import DashboardChrome from '../DashboardChrome';
 import NotificationCard from '../NotificationCard';
 
@@ -16,9 +16,9 @@ const Profile: React.FC = () => {
           <div className="p-8 bg-gray-100 rounded-xl flex-grow md:mr-2 border">
             <h2 className="text-lg text-gray-900 mb-2">Email address:</h2>
             <TextInput
-              type={'email'}
-              label={''}
-              value={'johndoe@example.com'}
+              type={`email`}
+              label={``}
+              value={`johndoe@example.com`}
               setValue={() => {}}
             />
           </div>
@@ -30,15 +30,17 @@ const Profile: React.FC = () => {
                 <span className="text-gray-700 text-3xl font-bold">10</span>
                 <span className="text-gray-600 text-lg">/month</span>
               </h3>
-              <a className="mt-1 text-sm text-blue-700 hover:text-blue-800 cursor-pointer transition duration-100">
+              <Link
+                className="mt-1 text-sm text-blue-700 hover:text-blue-800 cursor-pointer transition duration-100"
+                to="/profile"
+              >
                 Manage subscription
-              </a>
+              </Link>
             </div>
             <ColoredTag type="active" className="absolute right-2 top-2" />
           </div>
         </div>
         <div className="mt-12">
-          {/* <NoNotifications /> */}
           <h1 className="text-2xl font-bold">Notifications</h1>
           <div className="flex flex-col">
             <NotificationCard />
