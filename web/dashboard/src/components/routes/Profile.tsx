@@ -1,4 +1,5 @@
 import Button from '@shared/Button';
+import ColoredTag from '@shared/ColoredTag';
 import DashboardPageHeading from '@shared/DashboardPageHeading';
 import TextInput from '@shared/TextInput';
 import React from 'react';
@@ -32,9 +33,7 @@ const Profile: React.FC = () => {
                 Manage subscription
               </a>
             </div>
-            <h3 className="px-6 py-0.5 bg-green-200 rounded-full text-green-800 absolute right-2 top-2">
-              active
-            </h3>
+            <ColoredTag type="active" className="absolute right-2 top-2" />
           </div>
         </div>
         <div className="mt-12">
