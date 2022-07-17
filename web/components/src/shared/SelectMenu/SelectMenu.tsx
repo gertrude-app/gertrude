@@ -23,14 +23,16 @@ const SelectMenu: React.FC<Props> = ({
           <Listbox.Label className="sr-only">Change published status</Listbox.Label>
           <div className="relative">
             <div className="rounded-md w-full shadow-sm">
-              <div className="relative z-0 inline-flex rounded-md w-full border divide-x-2">
+              <div className="relative z-0 inline-flex rounded-md w-full border">
                 <div className="relative flex flex-grow items-center bg-white py-2 pl-3 pr-4 border border-transparent rounded-l-md text-gray-700">
                   <p className="ml-2.5 font-medium">{selectedOption}</p>
                 </div>
-                <Listbox.Button className="relative inline-flex items-center p-4 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-gray-100 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms] ">
+                <Listbox.Button className="relative inline-flex items-center p-4 bg-indigo-500 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-indigo-600 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms] ">
                   <span className="sr-only">Change published status</span>
                   <i
-                    className="fa fa-chevron-down text-xl text-gray-400"
+                    className={`fa fa-chevron-down text-xl text-white transition duration-100 ${
+                      open ? '-rotate-180' : 'rotate-0'
+                    }`}
                     aria-hidden="true"
                   />
                 </Listbox.Button>
@@ -44,13 +46,15 @@ const SelectMenu: React.FC<Props> = ({
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Listbox.Options className="origin-top-right absolute z-10 right-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white divide-y divide-gray-200 ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Listbox.Options className="origin-top-right absolute z-10 right-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                 {options.map((option) => (
                   <Listbox.Option
                     key={option}
                     className={({ active }) =>
                       cx(
-                        active ? 'text-white bg-indigo-500' : 'text-gray-900',
+                        active
+                          ? 'text-white bg-indigo-500'
+                          : 'text-gray-900 even:bg-gray-50',
                         'cursor-pointer select-none relative p-4 text-sm',
                       )
                     }
