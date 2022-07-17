@@ -1,7 +1,7 @@
 import Button from '@shared/Button';
+import SelectMenu from '@shared/SelectMenu';
 import TextInput from '@shared/TextInput';
 import React, { useState } from 'react';
-import SelectMenu from './SelectMenu';
 
 const NotificationCard: React.FC = () => {
   // TEMP
@@ -60,13 +60,13 @@ const NotificationCard: React.FC = () => {
         <h3 className="mb-1 text-gray-700">Notify me upon:</h3>
         <SelectMenu
           options={['Unlock requests', 'Filter suspension requests']}
-          selected={whenToNotify}
+          selectedOption={whenToNotify}
           setSelected={setWhenToNotify}
         />
         <h3 className="mt-3 mb-1 text-gray-700">Via:</h3>
         <SelectMenu
           options={['Send a Slack', 'Send an email', 'Send a text message']}
-          selected={howToNotify}
+          selectedOption={howToNotify}
           setSelected={setHowToNotify}
         />
       </div>

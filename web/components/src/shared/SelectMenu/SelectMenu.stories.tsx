@@ -13,5 +13,5 @@ export const Default = Template.bind({});
 
 Default.args = {
   options: ['Do this', 'Do that', 'Do the other thing'],
-  selected: 'Do this',
+  whichSelected: 'Do this',
 };
