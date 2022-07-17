@@ -2,17 +2,16 @@ import Button from '@shared/Button';
 import DashboardPageHeading from '@shared/DashboardPageHeading';
 import TextInput from '@shared/TextInput';
 import React from 'react';
-import SelectMenu from '../SelectMenu';
 import DashboardChrome from '../DashboardChrome';
 import NotificationCard from '../NotificationCard';
 
 const Profile: React.FC = () => {
   return (
     <DashboardChrome>
-      <div className="py-10 px-20">
+      <div className="py-10 px-7 sm:px-10 lg:px-12 xl:px-16">
         <DashboardPageHeading icon="user">Profile</DashboardPageHeading>
         <div className="flex flex-col md:flex-row mt-8">
-          <div className="p-8 bg-gray-100 rounded-xl flex-grow lg:mr-2 border">
+          <div className="p-8 bg-gray-100 rounded-xl flex-grow md:mr-2 border">
             <h2 className="text-lg text-gray-900 mb-2">Email address:</h2>
             <TextInput
               type={'email'}
@@ -21,7 +20,7 @@ const Profile: React.FC = () => {
               setValue={() => {}}
             />
           </div>
-          <div className="px-8 py-4 bg-gray-100 rounded-xl lg:ml-2 flex justify-between relative border">
+          <div className="px-8 py-4 bg-gray-100 rounded-xl md:ml-2 flex justify-between relative border mt-4 md:mt-0">
             <div className="flex justify-end items-start flex-col mr-8">
               <h2 className="font-bold text-gray-700">Basic plan</h2>
               <h3>

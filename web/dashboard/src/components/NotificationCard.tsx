@@ -70,7 +70,7 @@ const NotificationCard: React.FC = () => {
           setSelected={setHowToNotify}
         />
       </div>
-      <div className="flex mt-8 relative z-10 space-x-4">
+      <div className="flex flex-col sm:flex-row mt-8 relative z-10 space-y-4 sm:space-y-0 sm:space-x-4">
         {notificationInputs.map((input) => (
           <div className="flex-grow">
             <h3 className="mb-1 text-gray-700">{input.label}</h3>

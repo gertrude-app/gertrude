@@ -14,7 +14,7 @@ const SelectMenu: React.FC<Props> = ({ className, options, selected, setSelected
     <div
       className={`flex justify-between items-stretch shadow-sm relative rounded-md bg-white ${className}`}
     >
-      <h2 className="pl-4 border rounded-l-md flex-grow border-r-0 flex justify-start items-center">
+      <h2 className="pl-4 border rounded-l-md flex-grow border-r-0 flex justify-start items-center leading-5">
         {selected}
       </h2>
       <button
@@ -45,7 +45,9 @@ const SelectMenu: React.FC<Props> = ({ className, options, selected, setSelected
                 option === selected ? 'text-gray-300 fa-check' : 'text-gray-200'
               }`}
             />
-            <h2 className={`${option === selected ? 'font-bold' : 'font-normal'}`}>
+            <h2
+              className={`leading-5 ${option === selected ? 'font-bold' : 'font-normal'}`}
+            >
               {option}
             </h2>
           </div>
