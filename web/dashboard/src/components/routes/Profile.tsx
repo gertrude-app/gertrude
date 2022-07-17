@@ -1,6 +1,7 @@
 import Button from '@shared/Button';
 import ColoredTag from '@shared/ColoredTag';
 import DashboardPageHeading from '@shared/DashboardPageHeading';
+import NoNotifications from '@shared/NoNotifications';
 import TextInput from '@shared/TextInput';
 import React from 'react';
 import DashboardChrome from '../DashboardChrome';
@@ -37,6 +38,7 @@ const Profile: React.FC = () => {
           </div>
         </div>
         <div className="mt-12">
+          {/* <NoNotifications /> */}
           <h1 className="text-2xl font-bold">Notifications</h1>
           <div className="flex flex-col">
             <NotificationCard />
