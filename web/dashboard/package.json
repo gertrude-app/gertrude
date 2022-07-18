@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@friends-library/dev": "^4.5.2",
-    "@headlessui/react": "^0.0.0-insiders.5af3bd4",
+    "@headlessui/react": "^1.6.6",
     "@snowpack/plugin-dotenv": "^2.2.0",
     "@snowpack/plugin-postcss": "^1.4.3",
     "@snowpack/plugin-react-refresh": "^2.5.0",
