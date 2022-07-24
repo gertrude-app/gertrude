@@ -13,7 +13,7 @@ const Profile: React.FC = () => {
       <div className="py-10 px-7 sm:px-10 lg:px-12 xl:px-16">
         <DashboardPageHeading icon="user">Profile</DashboardPageHeading>
         <div className="flex flex-col md:flex-row mt-8">
-          <div className="p-8 bg-gray-100 rounded-xl flex-grow md:mr-2 border">
+          <div className="p-8 bg-gray-100 rounded-xl flex-grow md:mr-2 border max-w-3xl">
             <h2 className="text-lg text-gray-900 mb-2">Email address:</h2>
             <TextInput
               type={`email`}

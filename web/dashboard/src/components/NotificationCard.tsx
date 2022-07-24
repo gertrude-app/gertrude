@@ -55,7 +55,7 @@ const NotificationCard: React.FC = () => {
   }
 
   return (
-    <div className="bg-white p-8 rounded-xl shadow-md border my-4 relative overflow-hidden border-t-4 border-t-violet-500">
+    <div className="bg-white p-8 rounded-xl shadow-md border my-4 relative overflow-hidden border-t-4 border-t-violet-500 max-w-5xl">
       <div className="flex flex-col items-stretch relative z-20">
         <h3 className="mb-1 text-gray-700">Notify me upon:</h3>
         <SelectMenu
