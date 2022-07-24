@@ -29,9 +29,9 @@ const PillBadge: React.FC<Props> = ({ type, className, children }) => {
   }
 
   return (
-    <h3 className={`px-6 py-0.5 rounded-full max-w-fit ${colors} ${className}`}>
+    <div className={`px-6 py-0.5 rounded-full max-w-fit ${colors} ${className}`}>
       {children}
-    </h3>
+    </div>
   );
 };
 
