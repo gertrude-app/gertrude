@@ -1,5 +1,5 @@
 import Button from '@shared/Button';
-import ColoredTag from '@shared/ColoredTag';
+import PillBadge from '@shared/ColoredTag';
 import DashboardPageHeading from '@shared/DashboardPageHeading';
 import TextInput from '@shared/TextInput';
 import React from 'react';
@@ -37,7 +37,9 @@ const Profile: React.FC = () => {
                 Manage subscription
               </Link>
             </div>
-            <ColoredTag type="active" className="absolute right-2 top-2" />
+            <PillBadge type="ok" className="absolute right-2 top-2">
+              active
+            </PillBadge>
           </div>
         </div>
         <div className="mt-12">
