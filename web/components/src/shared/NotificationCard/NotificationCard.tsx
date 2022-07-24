@@ -3,11 +3,19 @@ import Button from '../Button';
 import SelectMenu from '../SelectMenu';
 import TextInput from '../TextInput';
 
-const NotificationCard: React.FC = () => {
-  // TEMP
-  const [whenToNotify, setWhenToNotify] = useState(`Unlock requests`);
-  const [howToNotify, setHowToNotify] = useState(`Send a Slack`);
+interface Props {
+  whenToNotify: string;
+  setWhenToNotify: (whenToNotify: string) => void;
+  howToNotify: string;
+  setHowToNotify: (howToNotify: string) => void;
+}
 
+const NotificationCard: React.FC<Props> = ({
+  whenToNotify,
+  setWhenToNotify,
+  howToNotify,
+  setHowToNotify,
+}) => {
   let notificationInputs: {
     label: string;
     value: string;
@@ -101,4 +109,17 @@ const NotificationCard: React.FC = () => {
   );
 };
 
-export default NotificationCard;
+const NotificationCardContainer: React.FC = () => {
+  const [whenToNotify, setWhenToNotify] = useState(`Unlock requests`);
+  const [howToNotify, setHowToNotify] = useState(`Send a Slack`);
+  return (
+    <NotificationCard
+      whenToNotify={whenToNotify}
+      setWhenToNotify={setWhenToNotify}
+      howToNotify={howToNotify}
+      setHowToNotify={setHowToNotify}
+    />
+  );
+};
+
+export default NotificationCardContainer;

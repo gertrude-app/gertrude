@@ -1,11 +1,11 @@
 import Button from '@shared/Button';
 import PillBadge from '@shared/ColoredTag';
 import DashboardPageHeading from '@shared/DashboardPageHeading';
+import NotificationCard from '@shared/NotificationCard';
 import TextInput from '@shared/TextInput';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import DashboardChrome from '../DashboardChrome';
-import NotificationCard from '../NotificationCard';
 
 const Profile: React.FC = () => {
   return (
