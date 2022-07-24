@@ -13,7 +13,7 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
   <nav
     className={`h-screen fixed bg-gradient-to-b from-violet-500 to-violet-700 -ml-80 z-40 ${
       open ? (expanded ? `left-80` : `left-20`) : `left-0`
-    } lg:-ml-0 flex flex-col justify-between items-start overflow-hidden [transition:200ms] ${
+    } lg:-ml-0 flex flex-col justify-between items-start overflow-hidden [transition:200ms] [transition-property:width] ${
       expanded ? `w-80` : `w-20`
     }`}
   >
