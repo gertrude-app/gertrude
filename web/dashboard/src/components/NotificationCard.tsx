@@ -57,13 +57,13 @@ const NotificationCard: React.FC = () => {
   return (
     <div className="bg-white p-8 rounded-xl shadow-md border my-4 relative overflow-hidden border-t-4 border-t-violet-500 max-w-5xl">
       <div className="flex flex-col items-stretch relative z-20">
-        <h3 className="mb-1 text-gray-700">Notify me upon:</h3>
+        <h3 className="mb-2 text-gray-600 text-sm">Notify me upon:</h3>
         <SelectMenu
           options={[`Unlock requests`, `Filter suspension requests`]}
           selectedOption={whenToNotify}
           setSelected={setWhenToNotify}
         />
-        <h3 className="mt-3 mb-1 text-gray-700">Via:</h3>
+        <h3 className="mt-4 mb-2 text-gray-600 text-sm">Via:</h3>
         <SelectMenu
           options={[`Send a Slack`, `Send an email`, `Send a text message`]}
           selectedOption={howToNotify}
@@ -73,7 +73,7 @@ const NotificationCard: React.FC = () => {
       <div className="flex flex-col sm:flex-row mt-8 relative z-10 space-y-4 sm:space-y-0 sm:space-x-4">
         {notificationInputs.map((input) => (
           <div className="flex-grow">
-            <h3 className="mb-1 text-gray-700">{input.label}</h3>
+            <h3 className="mb-1 text-gray-600 text-sm">{input.label}</h3>
             <TextInput
               type={input.type}
               label={``}

@@ -10,7 +10,7 @@ import NotificationCard from '../NotificationCard';
 const Profile: React.FC = () => {
   return (
     <DashboardChrome>
-      <div className="py-10 px-7 sm:px-10 lg:px-12 xl:px-16">
+      <div className="py-10 px-5 sm:px-10 lg:px-12 xl:px-16">
         <DashboardPageHeading icon="user">Profile</DashboardPageHeading>
         <div className="flex flex-col md:flex-row mt-8">
           <div className="p-8 bg-gray-100 rounded-xl flex-grow md:mr-2 border max-w-3xl">
