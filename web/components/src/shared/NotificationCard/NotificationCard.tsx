@@ -1,7 +1,7 @@
-import Button from '@shared/Button';
-import SelectMenu from '@shared/SelectMenu';
-import TextInput from '@shared/TextInput';
 import React, { useState } from 'react';
+import Button from '../Button';
+import SelectMenu from '../SelectMenu';
+import TextInput from '../TextInput';
 
 const NotificationCard: React.FC = () => {
   // TEMP
