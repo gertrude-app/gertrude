@@ -93,7 +93,7 @@ const NotificationCard: React.FC = () => {
         >
           Duplicate
         </Button>
-        <Button color="secondary-severe" type="button" onClick={() => {}} small>
+        <Button color="secondary-warning" type="button" onClick={() => {}} small>
           Delete
         </Button>
       </div>
