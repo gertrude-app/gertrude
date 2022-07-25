@@ -4,7 +4,7 @@ import DashboardChrome from '../DashboardChrome';
 const App: React.FC = () => {
   return (
     <DashboardChrome>
-      <h1 className="p-10">hello world</h1>
+      <h1>hello world</h1>
     </DashboardChrome>
   );
 };

@@ -11,9 +11,9 @@ interface Props {
 
 const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) => (
   <nav
-    className={`bg-gradient-to-b from-violet-500 to-violet-700 -ml-80 relative z-40 ${
+    className={`h-screen fixed bg-gradient-to-b from-violet-500 to-violet-700 -ml-80 z-40 ${
       open ? (expanded ? `left-80` : `left-20`) : `left-0`
-    } lg:-ml-0 flex flex-col justify-between items-start overflow-hidden [transition:200ms] ${
+    } lg:-ml-0 flex flex-col justify-between items-start overflow-hidden [transition:200ms] [transition-property:width] ${
       expanded ? `w-80` : `w-20`
     }`}
   >
@@ -29,25 +29,36 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
         className={`m-2 mb-10 mt-8 ${expanded ? `ml-4` : `ml-[1.2em]`}`}
         iconOnly={!expanded}
       />
+      <a
+        className={`text-white text-opacity-50 text-right absolute bottom-0 left-52 -ml-1 py-5 hover:text-opacity-60 transition duration-100 w-32 justify-center items-center cursor-pointer ${
+          expanded ? `flex` : `hidden`
+        }`}
+        href="https://friendslibrary.com"
+      >
+        Log out <i className="ml-1.5 fa fa-sign-out" />
+      </a>
       <div className="mt-5 pb-4">
-        <SidebarOption icon="home" selected={false} expanded={expanded}>
+        <SidebarOption icon="home" expanded={expanded} to="/">
           Dashboard
         </SidebarOption>
-        <SidebarOption icon="shield" selected={false} expanded={expanded}>
+        <SidebarOption icon="shield" expanded={expanded} to="/digital-guardians">
           Digital guardians
         </SidebarOption>
-        <SidebarOption icon="users" selected={true} expanded={expanded}>
+        <SidebarOption icon="users" expanded={expanded} to="/guarded-users">
           Guarded users
         </SidebarOption>
-        <SidebarOption icon="key" selected={false} expanded={expanded}>
+        <SidebarOption icon="key" expanded={expanded} to="/keychains">
           Keychains
         </SidebarOption>
-      </div>
-      <div className="border-t-4 border-white border-opacity-10 pt-4">
-        <SidebarOption icon="user" selected={false} expanded={expanded}>
+        <SidebarOption icon="user" expanded={expanded} to="/profile">
           Profile
         </SidebarOption>
-        <SidebarOption icon="cog" selected={false} expanded={expanded}>
+      </div>
+      <div className="border-t-4 border-white border-opacity-10 pt-4 -ml-4 pl-4">
+        <SidebarOption icon="life-ring" expanded={expanded} to="/support">
+          Support
+        </SidebarOption>
+        <SidebarOption icon="cog" expanded={expanded} to="/settings">
           Settings
         </SidebarOption>
       </div>
@@ -63,13 +74,6 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
           expanded ? `left mr-3` : `right`
         } text-2xl text-white text-opacity-60`}
       />
-      <h2
-        className={`font-bold text-xl text-white text-opacity-80 min-w-40 ${
-          expanded ? `block` : `hidden`
-        }`}
-      >
-        Collapse sidebar
-      </h2>
     </div>
   </nav>
 );

@@ -12,6 +12,9 @@ jobs:
     name: check
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: checkout
         uses: actions/checkout@v2
       - name: npm install root
@@ -42,6 +45,9 @@ jobs:
     name: storybook
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: checkout
         uses: actions/checkout@v2
       - name: sync
@@ -58,6 +64,9 @@ jobs:
     name: dashboard
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: checkout
         uses: actions/checkout@v2
       - name: sync
@@ -73,6 +82,9 @@ jobs:
     name: marketing
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: checkout
         uses: actions/checkout@v2
       - name: sync

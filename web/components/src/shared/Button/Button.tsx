@@ -4,7 +4,12 @@ import cx from 'classnames';
 
 interface CommonProps {
   className?: string;
-  color: 'primary-violet' | 'primary-white' | 'secondary-violet' | 'secondary-white';
+  color:
+    | 'primary-violet'
+    | 'primary-white'
+    | 'secondary-violet'
+    | 'secondary-white'
+    | 'secondary-warning';
   children: React.ReactNode;
   fullWidth?: boolean;
   small?: boolean;
@@ -36,6 +41,9 @@ const Button: React.FC<Props> = ({
       break;
     case `secondary-white`:
       colors = `bg-gray-50 text-gray-500 border hover:bg-gray-100 ring-white focus:ring-indigo-400 focus:border-indigo-500`;
+      break;
+    case `secondary-warning`:
+      colors = `bg-red-50 text-red-600 border-red-100 border hover:text-red-700 hover:bg-red-100 ring-white focus:ring-red-500 focus:border-red-500`;
       break;
   }
   const rendersAsButton = props.type === `button` || props.type === `submit`;

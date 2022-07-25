@@ -30,8 +30,8 @@ component:
 # utility
 
 sync:
-	rsync -r --exclude '*.stories.tsx' ./components/src/shared ./dashboard/src/components
-	rsync -r --exclude '*.stories.tsx' ./components/src/shared ./marketing/components
+	rsync --recursive --delete --exclude '*.stories.tsx' ./components/src/shared ./dashboard/src/components
+	rsync --recursive --delete --exclude '*.stories.tsx' ./components/src/shared ./marketing/components
 
 sync-clean:
 	rm -rf ./dashboard/src/components/shared
