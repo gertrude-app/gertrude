@@ -1,5 +1,5 @@
 import Button from '@shared/Button';
-import PillBadge from '@shared/ColoredTag';
+import PillBadge from '@shared/PillBadge';
 import DashboardPageHeading from '@shared/DashboardPageHeading';
 import NotificationCard from '@shared/NotificationCard';
 import TextInput from '@shared/TextInput';
