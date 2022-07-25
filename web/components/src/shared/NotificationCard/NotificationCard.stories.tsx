@@ -7,6 +7,8 @@ export default {
   component: NotificationCard,
 } as ComponentMeta<typeof NotificationCard>;
 
-const Template: ComponentStory<typeof NotificationCard> = (args) => <NotificationCard {...args} />;
+const Template: ComponentStory<typeof NotificationCard> = (args) => (
+  <NotificationCard {...args} />
+);
 
 export const Default = Template.bind({});
