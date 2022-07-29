@@ -9,21 +9,21 @@ interface Props {
 }
 
 const Logo: React.FC<Props> = ({ size = 40, className, iconOnly, type = `default` }) => {
-  let outerColor = '';
-  let innerColor = '';
+  let outerColor = ``;
+  let innerColor = ``;
 
   switch (type) {
-    case 'inverted':
-      outerColor = 'white';
-      innerColor = '#8b5cf6';
+    case `inverted`:
+      outerColor = `white`;
+      innerColor = `#8b5cf6`;
       break;
-    case 'on-dark':
-      outerColor = 'white';
-      innerColor = '#13182b';
+    case `on-dark`:
+      outerColor = `white`;
+      innerColor = `#13182b`;
       break;
     default:
-      outerColor = 'url(#inner_gradient)';
-      innerColor = 'white';
+      outerColor = `url(#inner_gradient)`;
+      innerColor = `white`;
   }
 
   return (
@@ -62,7 +62,7 @@ const Logo: React.FC<Props> = ({ size = 40, className, iconOnly, type = `default
         <h1
           className={cx(
             `text-4xl font-lato ml-2`,
-            type === `inverted` || type === 'on-dark' ? `text-white` : `text-gray-700`,
+            type === `inverted` || type === `on-dark` ? `text-white` : `text-gray-700`,
           )}
         >
           Gertrude
