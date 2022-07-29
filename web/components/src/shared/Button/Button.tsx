@@ -31,7 +31,7 @@ const Button: React.FC<Props> = ({
   let colors = ``;
   switch (color) {
     case `primary-violet`:
-      colors = `bg-violet-500 text-white hover:bg-violet-600 border-2 border-violet-500 hover:border-violet-600 ring-white focus:ring-violet-500`;
+      colors = `bg-violet-800 text-white hover:bg-violet-900 ring-white focus:ring-violet-800`;
       break;
     case `primary-white`:
       colors = `bg-white text-violet-500 hover:bg-violet-50 border-2 border-white hover:border-violet-50 ring-violet-500 ring-offset-violet-500 focus:ring-white`;

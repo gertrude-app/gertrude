@@ -20,7 +20,7 @@ const SelectMenu: React.FC<Props> = ({ options, selectedOption, setSelected }) =
               <div className="relative flex flex-grow items-center bg-white py-2 pl-3 pr-4 border border-transparent rounded-l-md text-gray-700">
                 <p className="ml-2.5 font-medium">{selectedOption}</p>
               </div>
-              <Listbox.Button className="relative inline-flex items-center p-4 bg-indigo-500 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-indigo-600 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms] ">
+              <Listbox.Button className="relative inline-flex items-center p-4 bg-violet-800 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-violet-900 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms] ">
                 <span className="sr-only">Change published status</span>
                 <i
                   className={`fa fa-chevron-down text-xl text-white transition duration-100 ${
@@ -46,7 +46,7 @@ const SelectMenu: React.FC<Props> = ({ options, selectedOption, setSelected }) =
                   className={({ active }) =>
                     cx(
                       active
-                        ? `text-white bg-indigo-500`
+                        ? `text-white bg-violet-800`
                         : `text-gray-900 even:bg-gray-50`,
                       `cursor-pointer select-none relative p-4 text-sm`,
                     )
@@ -60,7 +60,7 @@ const SelectMenu: React.FC<Props> = ({ options, selectedOption, setSelected }) =
                           {option}
                         </p>
                         {selected ? (
-                          <span className={active ? `text-white` : `text-indigo-500`}>
+                          <span className={active ? `text-white` : `text-violet-700`}>
                             <i className="fa fa-check h-5 w-5" aria-hidden="true" />
                           </span>
                         ) : null}
