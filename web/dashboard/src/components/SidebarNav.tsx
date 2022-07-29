@@ -11,10 +11,10 @@ interface Props {
 
 const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) => (
   <nav
-    className={`h-screen fixed bg-gradient-to-b from-violet-500 to-violet-700 -ml-80 z-40 ${
+    className={`h-screen fixed bg-gray-900 bg-gradient-to-br from-transparent to-violet-900/40 -ml-80 z-40 ${
       open ? (expanded ? `left-80` : `left-20`) : `left-0`
-    } lg:-ml-0 flex flex-col justify-between items-start overflow-hidden [transition:200ms] [transition-property:width] ${
-      expanded ? `w-80` : `w-20`
+    } lg:-ml-0 flex flex-col justify-between items-start overflow-hidden [transition:200ms] ${
+      expanded ? `w-72` : `w-20`
     }`}
   >
     <div
@@ -25,12 +25,12 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
     </div>
     <div className={`${expanded ? `p-4` : `py-4`}`}>
       <Logo
-        type="inverted"
+        type="on-dark"
         className={`m-2 mb-10 mt-8 ${expanded ? `ml-4` : `ml-[1.2em]`}`}
         iconOnly={!expanded}
       />
       <a
-        className={`text-white text-opacity-50 text-right absolute bottom-0 left-52 -ml-1 py-5 hover:text-opacity-60 transition duration-100 w-32 justify-center items-center cursor-pointer ${
+        className={`text-white text-opacity-50 text-right absolute bottom-0 left-44 -ml-1 py-5 hover:text-opacity-60 transition duration-100 w-32 justify-center items-center cursor-pointer ${
           expanded ? `flex` : `hidden`
         }`}
         href="https://friendslibrary.com"
