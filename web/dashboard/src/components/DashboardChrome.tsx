@@ -26,7 +26,7 @@ const DashboardChrome: React.FC<Props> = ({ children }) => {
             sidebarOpen ? `block bg-opacity-70` : `hidden`
           }`}
         />
-        <header className="justify-start items-center px-5 py-4 fixed w-full shadow z-20 bg-violet-500 lg:hidden flex">
+        <header className="justify-start items-center px-5 py-4 fixed w-full shadow z-20 bg-gray-900 bg-gradient-to-br from-transparent via-transparent to-violet-900/50 lg:hidden flex">
           <div
             className="block lg:hidden"
             onClick={() => {
@@ -34,7 +34,7 @@ const DashboardChrome: React.FC<Props> = ({ children }) => {
               setSidebarExpanded(true);
             }}
           >
-            <i className="fa fa-bars text-3xl text-white text-opacity-50 hover:text-opacity-60 transition duration-100 cursor-pointer" />
+            <i className="fa fa-bars text-3xl text-white text-opacity-40 hover:text-opacity-60 transition duration-100 cursor-pointer" />
           </div>
         </header>
         <div className="flex-grow bg-gray-50 z-10 mt-16 lg:mt-0">{children}</div>

@@ -3,9 +3,7 @@ import MonitoredDay from '@shared/MonitoredDay';
 import React from 'react';
 import DashboardChrome from '../DashboardChrome';
 
-interface Props {}
-
-const Monitoring: React.FC<Props> = ({}) => {
+const Monitoring: React.FC = () => {
   return (
     <DashboardChrome>
       <main className="px-2 sm:px-4 md:px-6 lg:py-10 py-10 bg-gray-50">
