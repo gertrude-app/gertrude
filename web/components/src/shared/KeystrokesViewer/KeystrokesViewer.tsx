@@ -16,7 +16,11 @@ const KeystrokesViewer: React.FC<Props> = ({ className, strokes, date, applicati
       </h2>
       <h2 className="text-gray-600 font-medium">{formatTime(date)}</h2>
     </div>
-    <pre className="bg-gray-900 text-gray-400 p-6 m-4 rounded-lg">{strokes}</pre>
+    <p className="bg-gray-900 text-gray-400 p-6 m-4 rounded-lg font-mono">
+      {strokes.split('\n').map((line) => (
+        <p>{line}</p>
+      ))}
+    </p>
     <div className="p-4 pt-0 flex justify-end">
       <Button color="secondary-white" small type="button" onClick={() => {}}>
         Approve
