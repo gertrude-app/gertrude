@@ -1,3 +1,4 @@
+import Button from '@shared/Button';
 import KeystrokesViewer from '@shared/KeystrokesViewer';
 import ScreenshotViewer from '@shared/ScreenshotViewer';
 import React from 'react';
@@ -23,7 +24,7 @@ const MonitoringDayView: React.FC = () => {
             <span className="font-bold text-lg">36</span> items reviewed
           </h3>
         </header>
-        <div className="px-0 md:px-5 lg:px-10 py-5 md:py-10 bg-gray-200 md:bg-gray-50 flex-gow space-y-8">
+        <div className="px-0 md:px-5 lg:px-10 py-5 md:py-10 bg-gray-200 md:bg-gray-50 flex-grow space-y-8 flex flex-col">
           <KeystrokesViewer
             strokes={
               "Dearest diggital diiary,\nsSorry it's been so long. I'll try to right more.\nUntil tomorrow."
@@ -52,6 +53,14 @@ const MonitoringDayView: React.FC = () => {
             date={new Date()}
             application="Safari"
           />
+          <Button
+            className="self-center"
+            type="button"
+            onClick={() => {}}
+            color="primary-violet"
+          >
+            Approve all
+          </Button>
         </div>
       </main>
     </DashboardChrome>

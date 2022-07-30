@@ -10,7 +10,7 @@ type Props = {
 };
 
 const KeystrokesViewer: React.FC<Props> = ({ className, strokes, date, application }) => (
-  <div className="border-y md:border-x2 md:rounded-xl md:shadow-lg bg-white">
+  <div className="border-y md:border-x2 md:rounded-xl md:shadow-lg bg-white max-w-7xl">
     <div className="flex justify-between pt-3 px-5 rounded-t-xl">
       <h2 className="text-gray-600 font-medium">
         Application: <span className="font-bold">{application}</span>

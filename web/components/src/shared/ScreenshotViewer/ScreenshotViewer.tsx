@@ -9,7 +9,7 @@ type Props = {
 };
 
 const ScreenshotViewer: React.FC<Props> = ({ image, className, date }) => (
-  <div className="border-y md:border-x md:rounded-xl md:shadow-lg bg-white">
+  <div className="border-y md:border-x md:rounded-xl md:shadow-lg bg-white max-w-7xl">
     <div className="md:mx-4 my-4 flex justify-center">
       <img className="md:rounded-lg w-full max-w-4xl shadow-inner" src={image} />
     </div>
