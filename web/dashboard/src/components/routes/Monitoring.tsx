@@ -1,4 +1,5 @@
 import DashboardPageHeading from '@shared/DashboardPageHeading';
+import MonitoredDay from '@shared/MonitoredDay';
 import React from 'react';
 import DashboardChrome from '../DashboardChrome';
 
@@ -7,7 +8,18 @@ interface Props {}
 const Monitoring: React.FC<Props> = ({}) => {
   return (
     <DashboardChrome>
-      <main className="p-4"></main>
+      <main className="px-2 sm:px-4 md:px-6 lg:py-10 py-10 bg-gray-50">
+        <h1 className="font-lato mb-4 sm:mb-7 ml-3 lg:ml-1 text-2xl sm:text-3xl text-gray-700">
+          Little Jimmy's activity:
+        </h1>
+        <div className="space-y-10 p-2">
+          <MonitoredDay date={new Date()} numItems={233} numCompleted={0} />
+          <MonitoredDay date={new Date()} numItems={156} numCompleted={67} />
+          <MonitoredDay date={new Date()} numItems={253} numCompleted={253} />
+          <MonitoredDay date={new Date()} numItems={311} numCompleted={311} />
+          <MonitoredDay date={new Date()} numItems={70} numCompleted={70} />
+        </div>
+      </main>
     </DashboardChrome>
   );
 };
