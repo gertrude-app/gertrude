@@ -1,4 +1,5 @@
 import KeystrokesViewer from '@shared/KeystrokesViewer';
+import ScreenshotViewer from '@shared/ScreenshotViewer';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import DashboardChrome from '../DashboardChrome';
@@ -37,6 +38,15 @@ const MonitoringDayView: React.FC = () => {
             date={new Date()}
             application="Notes"
           />
+          <ScreenshotViewer
+            image={'https://placekitten.com/1200/600'}
+            date={new Date()}
+          />
+          <ScreenshotViewer
+            image={'https://placekitten.com/1400/700'}
+            date={new Date()}
+          />
+          <ScreenshotViewer image={'https://placekitten.com/800/600'} date={new Date()} />
           <KeystrokesViewer
             strokes={'cute cat pictures'}
             date={new Date()}

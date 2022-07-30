@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../Button';
+import { formatTime } from '../lib/dates';
 
 type Props = {
   className?: string;
@@ -30,11 +31,3 @@ const KeystrokesViewer: React.FC<Props> = ({ className, strokes, date, applicati
 );
 
 export default KeystrokesViewer;
-
-function formatTime(date: Date) {
-  const hours = date.getHours();
-  const legibleHours = hours > 12 ? hours - 12 : hours;
-  const minutes = date.getMinutes();
-  const seconds = date.getSeconds();
-  return `${legibleHours}:${minutes}:${seconds} ${hours > 12 ? 'PM' : 'AM'}`;
-}
