@@ -1,3 +1,4 @@
+import KeystrokesViewer from '@shared/KeystrokesViewer';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import DashboardChrome from '../DashboardChrome';
@@ -21,7 +22,27 @@ const MonitoringDayView: React.FC = () => {
             <span className="font-bold text-lg">36</span> items reviewed
           </h3>
         </header>
-        <div className="p-10 bg-gray-50 flex-gow"></div>
+        <div className="p-10 bg-gray-50 flex-gow space-y-8">
+          <KeystrokesViewer
+            strokes={
+              "Dearest diggital diiary,\nsSorry it's been so long. I'll try to right more.\nUntil tomorrow."
+            }
+            date={new Date()}
+            application="Notes"
+          />
+          <KeystrokesViewer
+            strokes={
+              "Dear digital diary,\nhow have you been? I've beeeen alright. More later."
+            }
+            date={new Date()}
+            application="Notes"
+          />
+          <KeystrokesViewer
+            strokes={'cute cat pictures'}
+            date={new Date()}
+            application="Safari"
+          />
+        </div>
       </main>
     </DashboardChrome>
   );
