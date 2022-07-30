@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Button from '../Button';
 import PillBadge from '../PillBadge';
 
 type Props = {
@@ -12,27 +11,27 @@ type Props = {
 };
 
 const days = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
+  `Sunday`,
+  `Monday`,
+  `Tuesday`,
+  `Wednesday`,
+  `Thursday`,
+  `Friday`,
+  `Saturday`,
 ];
 const months = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
+  `Jan`,
+  `Feb`,
+  `Mar`,
+  `Apr`,
+  `May`,
+  `Jun`,
+  `Jul`,
+  `Aug`,
+  `Sep`,
+  `Oct`,
+  `Nov`,
+  `Dec`,
 ];
 
 const MonitoredDay: React.FC<Props> = ({
@@ -56,7 +55,7 @@ const MonitoredDay: React.FC<Props> = ({
       />
     </div>
     <p className="mt-2 text-gray-600">
-      <span className="text-lg font-bold">{numCompleted}</span> out of{' '}
+      <span className="text-lg font-bold">{numCompleted}</span> out of{` `}
       <span className="text-lg font-bold">{numItems}</span> items reviewed
     </p>
     {numCompleted === numItems && (

@@ -9,9 +9,15 @@ type Props = {
 };
 
 const ScreenshotViewer: React.FC<Props> = ({ image, className, date }) => (
-  <div className="border-y md:border-x md:rounded-xl md:shadow-lg bg-white max-w-7xl">
+  <div
+    className={`border-y md:border-x md:rounded-xl md:shadow-lg bg-white max-w-7xl ${className}`}
+  >
     <div className="md:mx-4 my-4 flex justify-center">
-      <img className="md:rounded-lg w-full max-w-4xl shadow-inner" src={image} />
+      <img
+        className="md:rounded-lg w-full max-w-4xl shadow-inner"
+        src={image}
+        alt="protected user screenshot"
+      />
     </div>
     <div className="p-4 pt-0 flex justify-between items-end">
       <h2 className="text-gray-600 font-medium">{formatTime(date)}</h2>

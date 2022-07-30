@@ -20,36 +20,32 @@ const MonitoringDayView: React.FC = () => {
             <h1 className="text-xl font-medium text-gray-800">Friday July 29, 2022</h1>
           </div>
           <h3 className="text-gray-700 self-end sm:self-center mt-2 sm:mt-0">
-            <span className="font-bold text-lg">19</span> out of{' '}
+            <span className="font-bold text-lg">19</span> out of{` `}
             <span className="font-bold text-lg">36</span> items reviewed
           </h3>
         </header>
         <div className="px-0 md:px-5 lg:px-10 py-5 md:py-10 bg-gray-200 md:bg-gray-50 flex-grow space-y-8 flex flex-col">
           <KeystrokesViewer
-            strokes={
-              "Dearest diggital diiary,\nsSorry it's been so long. I'll try to right more.\nUntil tomorrow."
-            }
+            strokes={`Dearest diggital diiary,\nsSorry it's been so long. I'll try to right more.\nUntil tomorrow.`}
             date={new Date()}
             application="Notes"
           />
           <KeystrokesViewer
-            strokes={
-              "Dear digital diary,\nhow have you been? I've beeeen alright. More later."
-            }
+            strokes={`Dear digital diary,\nhow have you been? I've beeeen alright. More later.`}
             date={new Date()}
             application="Notes"
           />
           <ScreenshotViewer
-            image={'https://placekitten.com/1200/600'}
+            image={`https://placekitten.com/1200/600`}
             date={new Date()}
           />
           <ScreenshotViewer
-            image={'https://placekitten.com/1400/700'}
+            image={`https://placekitten.com/1400/700`}
             date={new Date()}
           />
-          <ScreenshotViewer image={'https://placekitten.com/800/600'} date={new Date()} />
+          <ScreenshotViewer image={`https://placekitten.com/800/600`} date={new Date()} />
           <KeystrokesViewer
-            strokes={'cute cat pictures'}
+            strokes={`cute cat pictures`}
             date={new Date()}
             application="Safari"
           />

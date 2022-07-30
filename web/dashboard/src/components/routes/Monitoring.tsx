@@ -1,4 +1,3 @@
-import DashboardPageHeading from '@shared/DashboardPageHeading';
 import MonitoredDay from '@shared/MonitoredDay';
 import React from 'react';
 import DashboardChrome from '../DashboardChrome';
