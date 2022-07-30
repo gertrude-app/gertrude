@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Button from '../Button';
 import PillBadge from '../PillBadge';
 
@@ -7,6 +8,7 @@ type Props = {
   date: Date;
   numItems: number;
   numCompleted: number;
+  to: string;
 };
 
 const days = [
@@ -33,8 +35,17 @@ const months = [
   'Dec',
 ];
 
-const MonitoredDay: React.FC<Props> = ({ className, date, numCompleted, numItems }) => (
-  <div className="p-6 rounded-xl shadow-lg border bg-white relative hover:border-violet-400 transition cursor-pointer duration-100">
+const MonitoredDay: React.FC<Props> = ({
+  className,
+  date,
+  numCompleted,
+  numItems,
+  to,
+}) => (
+  <Link
+    to={to}
+    className={`block p-6 rounded-xl shadow-lg border bg-white relative hover:border-violet-400 transition cursor-pointer duration-100 ${className}`}
+  >
     <h2 className="text-gray-700 text-lg mb-6 font-medium">{`${days[date.getDay()]} ${
       months[date.getMonth()]
     } ${date.getDate()}, ${date.getFullYear()}`}</h2>
@@ -53,7 +64,7 @@ const MonitoredDay: React.FC<Props> = ({ className, date, numCompleted, numItems
         <i className="fa fa-check mr-1" /> Completed
       </PillBadge>
     )}
-  </div>
+  </Link>
 );
 
 export default MonitoredDay;
