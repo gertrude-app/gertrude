@@ -6,6 +6,7 @@ import JoinWaitlist from './components/routes/JoinWaitlist';
 import Monitoring from './components/routes/Monitoring';
 import MonitoringDayView from './components/routes/MonitoringDayView';
 import Profile from './components/routes/Profile';
+import ProtectedUsers from './components/routes/ProtectedUsers';
 
 ReactDOM.createRoot(document.getElementById(`root`)!).render(
   <React.StrictMode>
@@ -13,6 +14,7 @@ ReactDOM.createRoot(document.getElementById(`root`)!).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/protected-users" element={<ProtectedUsers />} />
         <Route path="/join-waitlist" element={<JoinWaitlist />} />
         <Route path="/monitoring" element={<Monitoring />} />
         <Route path="/day-view" element={<MonitoringDayView />} />
