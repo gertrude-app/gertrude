@@ -22,7 +22,7 @@ const DashboardChrome: React.FC<Props> = ({ children }) => {
         } [transition:200ms]`}
       >
         <div
-          className={`absolute left-0 top-0 z-30 [transition:700ms] bg-opacity-0 h-screen bg-black w-screen ${
+          className={`fixed left-0 top-0 z-30 [transition:700ms] bg-opacity-0 h-screen bg-black w-screen ${
             sidebarOpen ? `block bg-opacity-70` : `hidden`
           }`}
         />
