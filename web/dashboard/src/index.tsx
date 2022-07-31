@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import App from './components/routes/App';
 import JoinWaitlist from './components/routes/JoinWaitlist';
+import Monitoring from './components/routes/Monitoring';
+import MonitoringDayView from './components/routes/MonitoringDayView';
 import Profile from './components/routes/Profile';
 
 ReactDOM.createRoot(document.getElementById(`root`)!).render(
@@ -12,6 +14,8 @@ ReactDOM.createRoot(document.getElementById(`root`)!).render(
         <Route path="/" element={<App />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/join-waitlist" element={<JoinWaitlist />} />
+        <Route path="/monitoring" element={<Monitoring />} />
+        <Route path="/day-view" element={<MonitoringDayView />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
