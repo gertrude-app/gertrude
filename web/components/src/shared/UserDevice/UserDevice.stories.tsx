@@ -9,4 +9,8 @@ export default {
 
 const Template: ComponentStory<typeof UserDevice> = (args) => <UserDevice {...args} />;
 
-export const Default = Template.bind({});
+export const Online = Template.bind({});
+Online.args = { type: `14" Macbook Pro`, status: `online` };
+
+export const Offline = Template.bind({});
+Offline.args = { type: `14" Macbook Pro`, status: `offline` };
