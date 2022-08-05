@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import UserDevice from './UserDevice';
 
 export default {
-  title: 'UserDevice',
+  title: `UserDevice`,
   component: UserDevice,
 } as ComponentMeta<typeof UserDevice>;
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import Button from '../Button';
 import UserDevice from '../UserDevice';
 
 type Props = {
@@ -26,33 +25,34 @@ const ProtectedUserCard: React.FC<Props> = ({
         <i className="fa fa-key text-gray-400 text-lg" />
         <h3 className="ml-3 text-gray-600">
           <span className="text-lg font-bold">{keychains}</span> keychain
-          {keychains === 1 ? '' : 's'}, <span className="text-lg font-bold">{keys}</span>{' '}
-          key{keys === 1 ? '' : 's'}
+          {keychains === 1 ? `` : `s`}, <span className="text-lg font-bold">{keys}</span>
+          {` `}
+          key{keys === 1 ? `` : `s`}
         </h3>
       </div>
       <div className="flex items-center mt-1 ml-2">
         <i className="fa fa-camera text-gray-400" />
         <h3 className="text-gray-600 ml-3">
-          Screenshots:{' '}
+          Screenshots:{` `}
           <span
             className={`text-lg font-bold ${
-              screenshots ? 'text-violet-600' : 'text-gray-600'
+              screenshots ? `text-violet-600` : `text-gray-600`
             }`}
           >
-            {screenshots ? 'enabled' : 'disabled'}
+            {screenshots ? `enabled` : `disabled`}
           </span>
         </h3>
       </div>
       <div className="flex items-center mt-1 ml-2">
         <i className="fa fa-keyboard text-gray-400" />
         <h3 className="text-gray-600 ml-3">
-          Keystrokes:{' '}
+          Keystrokes:{` `}
           <span
             className={`text-lg font-bold  ${
-              keystrokes ? 'text-violet-600' : 'text-gray-600'
+              keystrokes ? `text-violet-600` : `text-gray-600`
             }`}
           >
-            {keystrokes ? 'monitored' : 'not monitored'}
+            {keystrokes ? `monitored` : `not monitored`}
           </span>
         </h3>
       </div>
@@ -62,7 +62,7 @@ const ProtectedUserCard: React.FC<Props> = ({
           <div className="text-lg mt-4 -mb-4">
             <p>
               <span className="text-xl font-bold">{devices.length}</span> device
-              {devices.length === 1 ? '' : 's'}:
+              {devices.length === 1 ? `` : `s`}:
             </p>
           </div>
           <div className="flex flex-col mt-3">

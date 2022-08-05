@@ -7,9 +7,9 @@ type Props = {
 };
 
 const UserDevice: React.FC<Props> = ({ type, status }) => {
-  let icon = 'desktop';
-  if (type.includes('MacBook')) {
-    icon = 'laptop';
+  let icon = `desktop`;
+  if (type.includes(`MacBook`)) {
+    icon = `laptop`;
   }
 
   return (
@@ -21,7 +21,7 @@ const UserDevice: React.FC<Props> = ({ type, status }) => {
           </div>
           <h3 className="text-gray-500 text-lg font-medium">{type}</h3>
         </div>
-        {status === 'online' && (
+        {status === `online` && (
           <>
             <PillBadge type="green" className="items-center hidden sm:flex">
               <li className="fa fa-circle mr-2 text-xs text-green-500" />

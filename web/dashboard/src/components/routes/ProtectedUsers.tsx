@@ -14,8 +14,8 @@ const ProtectedUsers: React.FC = () => {
             keys={213}
             keychains={3}
             devices={[
-              { title: '14" MacBook Pro', status: 'online' },
-              { title: 'Mac Studio', status: 'offline' },
+              { title: `14" MacBook Pro`, status: `online` },
+              { title: `Mac Studio`, status: `offline` },
             ]}
             screenshots={true}
             keystrokes={true}
@@ -25,9 +25,9 @@ const ProtectedUsers: React.FC = () => {
             keys={10344}
             keychains={37}
             devices={[
-              { title: '16" Macbook Pro', status: 'offline' },
-              { title: '14" MacBook Air', status: 'offline' },
-              { title: 'iMac', status: 'online' },
+              { title: `16" Macbook Pro`, status: `offline` },
+              { title: `14" MacBook Air`, status: `offline` },
+              { title: `iMac`, status: `online` },
             ]}
             screenshots={true}
             keystrokes={false}
@@ -44,7 +44,7 @@ const ProtectedUsers: React.FC = () => {
             title="Willow"
             keys={2}
             keychains={1}
-            devices={[{ title: 'Mac Pro', status: 'online' }]}
+            devices={[{ title: `Mac Pro`, status: `online` }]}
             screenshots={true}
             keystrokes={true}
           />
