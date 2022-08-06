@@ -20,7 +20,7 @@ const SidebarOption: React.FC<Props> = ({ icon, children, expanded, to }) => {
       <i
         className={`fa fa-${icon} mr-4 text-2xl  ${
           selected
-            ? `bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent`
+            ? `bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-transparent bg-clip-text [-webkit-background-clip:text;]`
             : `text-violet-300 text-opacity-40`
         }`}
       />
