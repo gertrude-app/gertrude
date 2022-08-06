@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import NoUsers from './NoUsers';
 
 export default {
-  title: 'NoUsers',
+  title: `NoUsers`,
   component: NoUsers,
 } as ComponentMeta<typeof NoUsers>;
 

@@ -28,11 +28,12 @@ const UserCard: React.FC<Props> = ({
       <div className="flex items-center mt-3 ml-2">
         <i className="fa fa-key text-gray-400 text-lg" />
         <h3 className="ml-3 text-gray-600">
-          <span className="text-lg font-bold">{keychains}</span>{' '}
-          {inflect('keychain', keychains)},{' '}
+          <span className="text-lg font-bold">{keychains}</span>
+          {` `}
+          {inflect(`keychain`, keychains)},{` `}
           <span className="text-lg font-bold">{keys}</span>
           {` `}
-          {inflect('key', keys)}
+          {inflect(`key`, keys)}
         </h3>
       </div>
       <div className="flex items-center mt-1 ml-2">
