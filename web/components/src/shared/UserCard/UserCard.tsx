@@ -22,7 +22,9 @@ const UserCard: React.FC<Props> = ({
 }) => (
   <div className="rounded-xl border shadow-lg w-full xl:w-112 my-4 mx-0 md:mx-4 bg-white">
     <div className="p-5">
-      <h1 className="text-2xl font-bold text-gray-700">{title}</h1>
+      <h1 className="text-3xl font-black text-gray-700 m-2 pb-4 mb-6 border-b">
+        {title}
+      </h1>
       <div className="flex items-center mt-3 ml-2">
         <i className="fa fa-key text-gray-400 text-lg" />
         <h3 className="ml-3 text-gray-600">
@@ -61,7 +63,6 @@ const UserCard: React.FC<Props> = ({
           </span>
         </h3>
       </div>
-
       {devices.length ? (
         <div>
           <div className="text-lg mt-4 -mb-4">
