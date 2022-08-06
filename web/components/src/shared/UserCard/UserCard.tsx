@@ -10,7 +10,7 @@ type Props = {
   keystrokes: boolean;
 };
 
-const ProtectedUserCard: React.FC<Props> = ({
+const UserCard: React.FC<Props> = ({
   title,
   keys,
   keychains,
@@ -100,4 +100,4 @@ const ProtectedUserCard: React.FC<Props> = ({
   </div>
 );
 
-export default ProtectedUserCard;
+export default UserCard;

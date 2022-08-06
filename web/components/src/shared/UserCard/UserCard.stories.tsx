@@ -1,15 +1,13 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import ProtectedUserCard from './ProtectedUserCard';
+import UserCard from './UserCard';
 
 export default {
-  title: `ProtectedUserCard`,
-  component: ProtectedUserCard,
-} as ComponentMeta<typeof ProtectedUserCard>;
+  title: `UserCard`,
+  component: UserCard,
+} as ComponentMeta<typeof UserCard>;
 
-const Template: ComponentStory<typeof ProtectedUserCard> = (args) => (
-  <ProtectedUserCard {...args} />
-);
+const Template: ComponentStory<typeof UserCard> = (args) => <UserCard {...args} />;
 
 export const Standard = Template.bind({});
 Standard.args = {

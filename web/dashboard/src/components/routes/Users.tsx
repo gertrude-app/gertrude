@@ -1,15 +1,15 @@
 import DashboardPageHeading from '@shared/DashboardPageHeading';
-import ProtectedUserCard from '@shared/ProtectedUserCard';
+import UserCard from '@shared/UserCard';
 import React from 'react';
 import DashboardChrome from '../DashboardChrome';
 
-const ProtectedUsers: React.FC = () => {
+const Users: React.FC = () => {
   return (
     <DashboardChrome>
       <div className="py-10 px-5 sm:px-10 lg:px-12 xl:px-16">
-        <DashboardPageHeading icon="users">Protected users</DashboardPageHeading>
+        <DashboardPageHeading icon="users">Users</DashboardPageHeading>
         <div className="py-10 flex flex-wrap items-start">
-          <ProtectedUserCard
+          <UserCard
             title="Winfield"
             keys={213}
             keychains={3}
@@ -20,7 +20,7 @@ const ProtectedUsers: React.FC = () => {
             screenshots={true}
             keystrokes={true}
           />
-          <ProtectedUserCard
+          <UserCard
             title="Ezra"
             keys={10344}
             keychains={37}
@@ -32,7 +32,7 @@ const ProtectedUsers: React.FC = () => {
             screenshots={true}
             keystrokes={false}
           />
-          <ProtectedUserCard
+          <UserCard
             title="Rachel"
             keys={0}
             keychains={0}
@@ -40,7 +40,7 @@ const ProtectedUsers: React.FC = () => {
             screenshots={false}
             keystrokes={false}
           />
-          <ProtectedUserCard
+          <UserCard
             title="Willow"
             keys={2}
             keychains={1}
@@ -54,4 +54,4 @@ const ProtectedUsers: React.FC = () => {
   );
 };
 
-export default ProtectedUsers;
+export default Users;

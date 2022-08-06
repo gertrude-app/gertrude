@@ -14,7 +14,7 @@ const App: React.FC = () => {
         <br />
         <Link to="/day-view">Monitoring day view</Link>
         <br />
-        <Link to="/protected-users">Protected users</Link>
+        <Link to="/users">Users</Link>
       </div>
     </DashboardChrome>
   );
