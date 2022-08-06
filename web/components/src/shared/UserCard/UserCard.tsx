@@ -1,4 +1,5 @@
 import React from 'react';
+import cx from 'classnames';
 import inflect from '../lib/inflect';
 import UserDevice from '../UserDevice';
 
@@ -37,9 +38,10 @@ const UserCard: React.FC<Props> = ({
         <h3 className="text-gray-600 ml-3">
           Screenshots:{` `}
           <span
-            className={`text-lg font-bold ${
-              screenshots ? `text-violet-600` : `text-gray-600`
-            }`}
+            className={cx(
+              `text-lg font-bold`,
+              screenshots ? `text-violet-600` : `text-gray-600`,
+            )}
           >
             {screenshots ? `enabled` : `disabled`}
           </span>
@@ -50,9 +52,10 @@ const UserCard: React.FC<Props> = ({
         <h3 className="text-gray-600 ml-3">
           Keystrokes:{` `}
           <span
-            className={`text-lg font-bold  ${
-              keystrokes ? `text-violet-600` : `text-gray-600`
-            }`}
+            className={cx(
+              `text-lg font-bold`,
+              keystrokes ? `text-violet-600` : `text-gray-600`,
+            )}
           >
             {keystrokes ? `monitored` : `not monitored`}
           </span>
