@@ -1,3 +1,4 @@
+import Button from '@shared/Button';
 import DashboardPageHeading from '@shared/DashboardPageHeading';
 import UserCard from '@shared/UserCard';
 import React from 'react';
@@ -6,7 +7,7 @@ import DashboardChrome from '../DashboardChrome';
 const Users: React.FC = () => {
   return (
     <DashboardChrome>
-      <div className="py-10 px-5 sm:px-10 lg:px-12 xl:px-16">
+      <div className="py-10 px-5 sm:px-10 lg:px-12 xl:px-16 flex flex-col">
         <DashboardPageHeading icon="users">Users</DashboardPageHeading>
         <div className="py-10 flex flex-wrap items-start">
           <UserCard
@@ -49,6 +50,15 @@ const Users: React.FC = () => {
             keystrokes={true}
           />
         </div>
+        <Button
+          type="button"
+          onClick={() => {}}
+          color="primary-violet"
+          className="self-center"
+        >
+          <i className="fa fa-plus mr-4" />
+          Add a user
+        </Button>
       </div>
     </DashboardChrome>
   );
