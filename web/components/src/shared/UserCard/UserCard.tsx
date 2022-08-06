@@ -68,8 +68,9 @@ const UserCard: React.FC<Props> = ({
         <div>
           <div className="text-lg mt-4 -mb-4">
             <p>
-              <span className="text-xl font-bold">{devices.length}</span>{' '}
-              {inflect('device', devices.length)}:
+              <span className="text-xl font-bold">{devices.length}</span>
+              {` `}
+              {inflect(`device`, devices.length)}:
             </p>
           </div>
           <div className="flex flex-col mt-3">
