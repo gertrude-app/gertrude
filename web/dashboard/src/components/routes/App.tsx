@@ -13,6 +13,8 @@ const App: React.FC = () => {
         <Link to="/monitoring">Monitoring</Link>
         <br />
         <Link to="/day-view">Monitoring day view</Link>
+        <br />
+        <Link to="/users">Users</Link>
       </div>
     </DashboardChrome>
   );

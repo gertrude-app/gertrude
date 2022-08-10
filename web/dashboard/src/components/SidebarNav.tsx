@@ -41,11 +41,8 @@ const SidebarNav: React.FC<Props> = ({ expanded, setExpanded, open, setOpen }) =
         <SidebarOption icon="home" expanded={expanded} to="/">
           Dashboard
         </SidebarOption>
-        <SidebarOption icon="shield" expanded={expanded} to="/digital-guardians">
-          Digital guardians
-        </SidebarOption>
-        <SidebarOption icon="users" expanded={expanded} to="/guarded-users">
-          Guarded users
+        <SidebarOption icon="users" expanded={expanded} to="/users">
+          Users
         </SidebarOption>
         <SidebarOption icon="key" expanded={expanded} to="/keychains">
           Keychains

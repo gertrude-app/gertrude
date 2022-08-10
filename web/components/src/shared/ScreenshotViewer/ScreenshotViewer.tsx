@@ -16,7 +16,7 @@ const ScreenshotViewer: React.FC<Props> = ({ image, className, date }) => (
       <img
         className="md:rounded-lg w-full max-w-4xl shadow-inner"
         src={image}
-        alt="protected user screenshot"
+        alt="user screenshot"
       />
     </div>
     <div className="p-4 pt-0 flex justify-between items-end">
