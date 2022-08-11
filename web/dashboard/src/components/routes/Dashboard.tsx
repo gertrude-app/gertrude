@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Chrome from '../Chrome';
 
-const App: React.FC = () => {
+const Dashboard: React.FC = () => {
   return (
     <Chrome>
       <div className="p-8">
@@ -20,4 +20,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default Dashboard;
