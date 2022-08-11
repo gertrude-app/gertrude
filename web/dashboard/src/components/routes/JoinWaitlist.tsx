@@ -38,8 +38,8 @@ const JoinWaitlist: React.FC = () => {
           setEmail={setEmail}
           onSubmit={async () => {
             setState(`fetching`);
-            const mutation = await api.signup.createWaitlistedUser(email);
-            setState(mutation.result.type);
+            const result = await api.signup.createWaitlistedUser(email);
+            setState(result.value === true ? `success` : `error`);
           }}
         />
       );
