@@ -1,4 +1,4 @@
-import MonitoredDay from '@shared/MonitoredDay';
+import MonitoredDay from '@shared/dashboard/MonitoredDay';
 import React from 'react';
 import Chrome from '../Chrome';
 

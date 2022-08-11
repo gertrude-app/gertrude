@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Button from '../Button';
-import SelectMenu from '../SelectMenu';
-import TextInput from '../TextInput';
+import Button from '../../Button';
+import SelectMenu from '../../SelectMenu';
+import TextInput from '../../TextInput';
 
 interface Props {
   whenToNotify: string;

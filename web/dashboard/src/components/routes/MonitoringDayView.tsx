@@ -1,6 +1,6 @@
 import Button from '@shared/Button';
-import KeystrokesViewer from '@shared/KeystrokesViewer';
-import ScreenshotViewer from '@shared/ScreenshotViewer';
+import KeystrokesViewer from '@shared/dashboard/KeystrokesViewer';
+import ScreenshotViewer from '@shared/dashboard/ScreenshotViewer';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Chrome from '../Chrome';

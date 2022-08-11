@@ -1,6 +1,6 @@
 import Button from '@shared/Button';
-import DashboardPageHeading from '@shared/DashboardPageHeading';
-import UserCard from '@shared/UserCard';
+import DashboardPageHeading from '@shared/dashboard/DashboardPageHeading';
+import UserCard from '@shared/dashboard/UserCard';
 import React from 'react';
 import Chrome from '../Chrome';
 

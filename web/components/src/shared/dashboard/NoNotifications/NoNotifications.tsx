@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '../Button';
+import Button from '../../Button';
 
 const NoNotifications: React.FC = () => (
   <div className="flex flex-col justify-center items-center p-10 bg-gray-100 rounded-2xl shadow-inner">

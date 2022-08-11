@@ -1,5 +1,5 @@
 import React from 'react';
-import EmailFormScreen from '@shared/EmailFormScreen';
+import EmailFormScreen from '@shared/dashboard/EmailFormScreen';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { emailUpdated, joinWaitlist } from '../../redux/waitlist-slice';
 

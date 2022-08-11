@@ -1,7 +1,7 @@
 import Button from '@shared/Button';
-import PillBadge from '@shared/PillBadge';
-import DashboardPageHeading from '@shared/DashboardPageHeading';
-import NotificationCard from '@shared/NotificationCard';
+import PillBadge from '@shared/dashboard/PillBadge';
+import DashboardPageHeading from '@shared/dashboard/DashboardPageHeading';
+import NotificationCard from '@shared/dashboard/NotificationCard';
 import TextInput from '@shared/TextInput';
 import React from 'react';
 import { Link } from 'react-router-dom';
