@@ -1,6 +1,6 @@
 import Button from '@shared/Button';
 import PillBadge from '@shared/dashboard/PillBadge';
-import DashboardPageHeading from '@shared/dashboard/DashboardPageHeading';
+import PageHeading from '@shared/dashboard/PageHeading';
 import NotificationCard from '@shared/dashboard/NotificationCard';
 import TextInput from '@shared/TextInput';
 import React from 'react';
@@ -11,7 +11,7 @@ const Profile: React.FC = () => {
   return (
     <Chrome>
       <div className="py-10 px-5 sm:px-10 lg:px-12 xl:px-16">
-        <DashboardPageHeading icon="user">Profile</DashboardPageHeading>
+        <PageHeading icon="user">Profile</PageHeading>
         <div className="flex flex-col md:flex-row mt-8">
           <div className="p-8 bg-gray-100 rounded-xl flex-grow md:mr-2 border max-w-3xl">
             <h2 className="text-lg text-gray-900 mb-2">Email address:</h2>

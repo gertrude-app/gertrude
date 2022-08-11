@@ -1,5 +1,5 @@
 import Button from '@shared/Button';
-import DashboardPageHeading from '@shared/dashboard/DashboardPageHeading';
+import PageHeading from '@shared/dashboard/PageHeading';
 import UserCard from '@shared/dashboard/UserCard';
 import React from 'react';
 import Chrome from '../Chrome';
@@ -8,7 +8,7 @@ const Users: React.FC = () => {
   return (
     <Chrome>
       <div className="py-10 px-5 sm:px-10 lg:px-12 xl:px-16 flex flex-col">
-        <DashboardPageHeading icon="users">Users</DashboardPageHeading>
+        <PageHeading icon="users">Users</PageHeading>
         <div className="py-10 flex flex-wrap items-start">
           <UserCard
             title="Winfield"
