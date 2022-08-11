@@ -5,11 +5,11 @@ import NotificationCard from '@shared/NotificationCard';
 import TextInput from '@shared/TextInput';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import DashboardChrome from '../DashboardChrome';
+import Chrome from '../Chrome';
 
 const Profile: React.FC = () => {
   return (
-    <DashboardChrome>
+    <Chrome>
       <div className="py-10 px-5 sm:px-10 lg:px-12 xl:px-16">
         <DashboardPageHeading icon="user">Profile</DashboardPageHeading>
         <div className="flex flex-col md:flex-row mt-8">
@@ -60,7 +60,7 @@ const Profile: React.FC = () => {
           </div>
         </div>
       </div>
-    </DashboardChrome>
+    </Chrome>
   );
 };
 

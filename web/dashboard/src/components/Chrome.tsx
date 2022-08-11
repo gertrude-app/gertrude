@@ -5,7 +5,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-const DashboardChrome: React.FC<Props> = ({ children }) => {
+const Chrome: React.FC<Props> = ({ children }) => {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
@@ -43,4 +43,4 @@ const DashboardChrome: React.FC<Props> = ({ children }) => {
   );
 };
 
-export default DashboardChrome;
+export default Chrome;

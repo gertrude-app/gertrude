@@ -1,10 +1,10 @@
 import MonitoredDay from '@shared/MonitoredDay';
 import React from 'react';
-import DashboardChrome from '../DashboardChrome';
+import Chrome from '../Chrome';
 
 const Monitoring: React.FC = () => {
   return (
-    <DashboardChrome>
+    <Chrome>
       <main className="px-2 sm:px-4 md:px-6 lg:py-10 py-10 bg-gray-50">
         <h1 className="font-lato mb-4 sm:mb-7 ml-3 lg:ml-1 text-2xl sm:text-3xl text-gray-700">
           Little Jimmy's activity:
@@ -42,7 +42,7 @@ const Monitoring: React.FC = () => {
           />
         </div>
       </main>
-    </DashboardChrome>
+    </Chrome>
   );
 };
 

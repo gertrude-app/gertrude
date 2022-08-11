@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import DashboardChrome from '../DashboardChrome';
+import Chrome from '../Chrome';
 
 const App: React.FC = () => {
   return (
-    <DashboardChrome>
+    <Chrome>
       <div className="p-8">
         <h1>Pages:</h1>
         <br />
@@ -16,7 +16,7 @@ const App: React.FC = () => {
         <br />
         <Link to="/users">Users</Link>
       </div>
-    </DashboardChrome>
+    </Chrome>
   );
 };
 

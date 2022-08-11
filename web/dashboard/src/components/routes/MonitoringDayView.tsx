@@ -3,11 +3,11 @@ import KeystrokesViewer from '@shared/KeystrokesViewer';
 import ScreenshotViewer from '@shared/ScreenshotViewer';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import DashboardChrome from '../DashboardChrome';
+import Chrome from '../Chrome';
 
 const MonitoringDayView: React.FC = () => {
   return (
-    <DashboardChrome>
+    <Chrome>
       <main className="flex flex-col min-h-screen">
         <header className="flex flex-col sm:flex-row itesm-center justify-between py-4 px-6 border-b-2 bg-gray-50">
           <div className="flex items-center">
@@ -59,7 +59,7 @@ const MonitoringDayView: React.FC = () => {
           </Button>
         </div>
       </main>
-    </DashboardChrome>
+    </Chrome>
   );
 };
 
