@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import Chrome from './components/Chrome';
 import Dashboard from './components/routes/Dashboard';
 import JoinWaitlist from './components/routes/JoinWaitlist';
 import Monitoring from './components/routes/Monitoring';
@@ -23,14 +24,18 @@ const App: React.FC = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/users" element={<Users />} />
       <Route path="/join-waitlist" element={<JoinWaitlist />} />
-      <Route path="/monitoring" element={<Monitoring />} />
-      <Route path="/day-view" element={<MonitoringDayView />} />
+      <Route path="/" element={withChrome(<Dashboard />)} />
+      <Route path="/profile" element={withChrome(<Profile />)} />
+      <Route path="/users" element={withChrome(<Users />)} />
+      <Route path="/monitoring" element={withChrome(<Monitoring />)} />
+      <Route path="/day-view" element={withChrome(<MonitoringDayView />)} />
     </Routes>
   );
 };
 
 export default App;
+
+function withChrome(component: JSX.Element): JSX.Element {
+  return <Chrome>{component}</Chrome>;
+}
