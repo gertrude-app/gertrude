@@ -5,14 +5,14 @@ import SidebarOption from './SidebarOption';
 
 interface Props {
   collapsed?: boolean;
-  setCollapsed?: (expanded: boolean) => void;
+  toggleCollapsed?: () => unknown;
   onLogout(): unknown;
   urlPath: string;
 }
 
 const SidebarNav: React.FC<Props> = ({
   collapsed = false,
-  setCollapsed,
+  toggleCollapsed,
   onLogout,
   urlPath,
 }) => (
@@ -84,7 +84,7 @@ const SidebarNav: React.FC<Props> = ({
         className={cx(
           `items-center justify-start bg-black bg-opacity-0 hover:bg-opacity-10 cursor-pointer transition duration-100 hidden md:flex`,
         )}
-        onClick={() => setCollapsed && setCollapsed(!collapsed)}
+        onClick={toggleCollapsed}
       >
         <i
           className={cx(

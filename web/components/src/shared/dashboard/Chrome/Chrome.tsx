@@ -6,29 +6,31 @@ import MobileStickyHeader from './MobileStickyHeader';
 
 interface Props {
   children: React.ReactNode;
-  mobileSidebarOpen: boolean;
-  setMobileSidebarOpen(open: boolean): unknown;
   urlPath: string;
+  mobileSidebarOpen: boolean;
+  onMobileHamburgerClick(): unknown;
+  onMobileSidebarClose(): unknown;
   onLogout(): unknown;
   sidebarCollapsed: boolean;
-  setSidebarCollapsed(collapsed: boolean): unknown;
+  onToggleSidebarCollapsed(): unknown;
   usingMobileView?: boolean;
 }
 
 const Chrome: React.FC<Props> = ({
   children,
   mobileSidebarOpen,
-  setMobileSidebarOpen,
+  onMobileHamburgerClick,
+  onMobileSidebarClose,
   urlPath,
   onLogout,
   sidebarCollapsed,
-  setSidebarCollapsed,
+  onToggleSidebarCollapsed,
   usingMobileView = false,
 }) => (
   <div className="Chrome">
     {/* mark: begin mobile menu */}
     <Transition.Root show={mobileSidebarOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-40 md:hidden" onClose={setMobileSidebarOpen}>
+      <Dialog as="div" className="relative z-40 md:hidden" onClose={onMobileSidebarClose}>
         <Transition.Child
           as={Fragment}
           enter="transition-opacity ease-linear duration-300"
@@ -68,7 +70,7 @@ const Chrome: React.FC<Props> = ({
                   <button
                     type="button"
                     className="ml-1 flex items-center justify-center h-10 w-10 opacity-80 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                    onClick={() => setMobileSidebarOpen(false)}
+                    onClick={onMobileSidebarClose}
                   >
                     <span className="sr-only">Close sidebar</span>
                     <i className="fa fa-times text-2xl leading-none text-white" />
@@ -98,7 +100,7 @@ const Chrome: React.FC<Props> = ({
     >
       <SidebarNav
         collapsed={sidebarCollapsed}
-        setCollapsed={setSidebarCollapsed}
+        toggleCollapsed={onToggleSidebarCollapsed}
         onLogout={onLogout}
         urlPath={urlPath}
       />
@@ -112,7 +114,7 @@ const Chrome: React.FC<Props> = ({
     >
       <MobileStickyHeader
         sidebarShown={mobileSidebarOpen}
-        onHamburgerClick={() => setMobileSidebarOpen(true)}
+        onHamburgerClick={onMobileHamburgerClick}
       />
       <main
         // simplify this when react supports `inert` properly

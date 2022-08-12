@@ -1,8 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import waitlistReducer from './waitlist-slice';
+import menuReducer from './menu-slice';
 
 export const store = configureStore({
   reducer: {
+    menu: menuReducer,
     waitlist: waitlistReducer,
   },
 });

@@ -1,22 +1,31 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Chrome from '@shared/dashboard/Chrome';
+import { useDispatch, useSelector } from '../redux/hooks';
+import {
+  hamburgerMenuClicked,
+  mobileSidebarClosed,
+  desktopSidebarCollapsedToggled,
+} from '../redux/menu-slice';
 
 interface Props {
   children: React.ReactNode;
 }
 
 const ChromeContainer: React.FC<Props> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const dispatch = useDispatch();
+  const mobileSidebarOpen = useSelector((state) => state.menu.mobileSidebarOpen);
+  const sidebarCollapsed = useSelector((state) => state.menu.desktopSidebarCollapsed);
+
   return (
     <Chrome
       children={children}
-      mobileSidebarOpen={sidebarOpen}
-      setMobileSidebarOpen={setSidebarOpen}
+      mobileSidebarOpen={mobileSidebarOpen}
       urlPath={location.pathname}
       onLogout={() => {}}
-      sidebarCollapsed={collapsed}
-      setSidebarCollapsed={setCollapsed}
+      sidebarCollapsed={sidebarCollapsed}
+      onMobileHamburgerClick={() => dispatch(hamburgerMenuClicked())}
+      onMobileSidebarClose={() => dispatch(mobileSidebarClosed())}
+      onToggleSidebarCollapsed={() => dispatch(desktopSidebarCollapsedToggled())}
     />
   );
 };

@@ -19,10 +19,11 @@ const Template: ComponentStory<typeof Chrome> = (args) => (
 export const Open = Template.bind({});
 Open.args = {
   mobileSidebarOpen: true,
-  setMobileSidebarOpen: () => {},
+  onMobileHamburgerClick: () => {},
+  onMobileSidebarClose: () => {},
   onLogout: () => alert(`you're logged out!`),
   sidebarCollapsed: false,
-  setSidebarCollapsed: () => {},
+  onToggleSidebarCollapsed: () => {},
   urlPath: `/`,
 };
 
