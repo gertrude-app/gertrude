@@ -55,6 +55,9 @@ npm-install:
 	  -c magenta.dim,yellow.dim,green.dim,cyan.dim \
 	  "npm i" "cd components && npm i" "cd marketing && npm i" "cd dashboard && npm i"
 
+codegen:
+	cd dashboard && node ./scripts/codegen.js
+
 # build & deploy
 
 build-marketing: sync
@@ -116,7 +119,8 @@ ALL_CMDS = \
   storybook marketing dashboard all \
   start-storybook start-marketing start-dashboard \
   build-storybook build-marketing build-dashboard \
-  fix ts-watch ts-check lint lint-fix format format-check check
+  fix ts-watch ts-check lint lint-fix format format-check check \
+  codegen
 
 .PHONY: $(ALL_CMDS)
 .SILENT: $(ALL_CMDS)

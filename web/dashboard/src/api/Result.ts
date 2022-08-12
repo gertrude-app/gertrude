@@ -1,6 +1,6 @@
 import { DashboardError } from './errors';
 
-export type ResultData<T, E = DashboardError> /*  */ =
+export type ResultData<T, E = DashboardError> /* */ =
   | { type: 'success'; value: T }
   | { type: 'error'; error: E };
 
@@ -17,6 +17,28 @@ export default class Result<T, E = DashboardError> {
 
   public get result(): ResultData<T, E> {
     return this.data;
+  }
+
+  public get value(): T | undefined {
+    if (this.data.type === `success`) {
+      return this.data.value;
+    }
+    return undefined;
+  }
+
+  public get error(): E | undefined {
+    if (this.data.type === `error`) {
+      return this.data.error;
+    }
+    return undefined;
+  }
+
+  public get isSuccess(): boolean {
+    return this.data.type === `success`;
+  }
+
+  public get isError(): boolean {
+    return this.data.type === `error`;
   }
 
   public mapError<NewError>(transform: (error: E) => NewError): Result<T, NewError> {

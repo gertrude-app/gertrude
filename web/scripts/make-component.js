@@ -35,7 +35,7 @@ const Template: ComponentStory<typeof ${Component}> = (args) => <${Component} {.
 export const Default = Template.bind({});
 `;
 
-const dir = `./components/src/shared/${Component}`;
+const dir = `./components/src/shared/dashboard/${Component}`;
 fs.mkdirSync(dir, { recursive: true });
 fs.writeFileSync(`${dir}/${Component}.tsx`, componentFile);
 fs.writeFileSync(`${dir}/${Component}.stories.tsx`, storyFile);

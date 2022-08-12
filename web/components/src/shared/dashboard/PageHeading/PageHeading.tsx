@@ -5,7 +5,7 @@ type Props = {
   icon: string;
 };
 
-const DashboardPageHeading: React.FC<Props> = ({ children, icon }) => (
+const PageHeading: React.FC<Props> = ({ children, icon }) => (
   <header>
     <div className="flex justify-start items-center mb-3">
       <div className="flex justify-center items-center w-12 h-12 bg-gradient-to-br from-indigo-500 to-fuchsia-500 rounded-full mr-3">
@@ -19,4 +19,4 @@ const DashboardPageHeading: React.FC<Props> = ({ children, icon }) => (
   </header>
 );
 
-export default DashboardPageHeading;
+export default PageHeading;

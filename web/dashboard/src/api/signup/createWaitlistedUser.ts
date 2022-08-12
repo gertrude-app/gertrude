@@ -1,29 +1,24 @@
 import Result from '../Result';
-import { mutate } from '../http';
-import gql from '../gql';
-
-export namespace CreateWaitlistedUser {
-  export type Vars = { input: { email: string } };
-  export type Data = { id: string };
-}
+import * as T from './__generated__/CreateWaitlistedUser';
+import { gql, mutate } from '../apollo';
 
 export async function createWaitlistedUser(
   email: string,
-): Promise<Result<CreateWaitlistedUser.Data, void>> {
-  const result = await mutate<CreateWaitlistedUser.Data, CreateWaitlistedUser.Vars>(
+): Promise<Result<boolean, never>> {
+  const mutation = await mutate<T.CreateWaitlistedUser, T.CreateWaitlistedUserVariables>(
     MUTATION,
     { input: { email } },
   );
 
-  return result.mapErrorToVoid();
+  return Result.success(mutation.isSuccess);
 }
 
 // mutation
 
 const MUTATION = gql`
   mutation CreateWaitlistedUser($input: CreateWaitlistedUserInput!) {
-    createWaitlistedUser(input: $input) {
-      email
+    user: createWaitlistedUser(input: $input) {
+      id
     }
   }
 `;

@@ -1,18 +1,26 @@
-import React, { useState } from 'react';
-import EmailFormScreen from '@shared/EmailFormScreen';
-import * as api from '../../api';
+import React from 'react';
+import EmailFormScreen from '@shared/dashboard/EmailFormScreen';
+import { useDispatch, useSelector } from '../../redux/hooks';
+import { emailUpdated, joinWaitlist } from '../../redux/waitlist-slice';
 
-type State = React.ComponentProps<typeof EmailFormScreen>['state'];
+interface Props {
+  requestState: RequestState;
+  email: string;
+  setEmail(email: string): unknown;
+  submit(): unknown;
+}
 
-const JoinWaitlist: React.FC = () => {
-  const [state, setState] = useState<State>(`default`);
-  const [email, setEmail] = useState(``);
-
-  switch (state) {
-    case `fetching`:
+export const JoinWaitlist: React.FC<Props> = ({
+  email,
+  setEmail,
+  requestState,
+  submit,
+}) => {
+  switch (requestState) {
+    case `ongoing`:
       return <EmailFormScreen state="fetching" />;
 
-    case `success`:
+    case `succeeded`:
       return (
         <EmailFormScreen
           state="success"
@@ -20,7 +28,7 @@ const JoinWaitlist: React.FC = () => {
         />
       );
 
-    case `error`:
+    case `failed`:
       return (
         <EmailFormScreen
           state="error"
@@ -36,14 +44,26 @@ const JoinWaitlist: React.FC = () => {
           subTitle="We'll notify you when you can begin trying out Gertrude"
           email={email}
           setEmail={setEmail}
-          onSubmit={async () => {
-            setState(`fetching`);
-            const mutation = await api.signup.createWaitlistedUser(email);
-            setState(mutation.result.type);
-          }}
+          onSubmit={submit}
         />
       );
   }
 };
 
-export default JoinWaitlist;
+// container
+
+const JoinWaitlistContainer: React.FC = () => {
+  const dispatch = useDispatch();
+  const email = useSelector((state) => state.waitlist.email);
+  const requestState = useSelector((state) => state.waitlist.requestState);
+  return (
+    <JoinWaitlist
+      requestState={requestState}
+      email={email}
+      setEmail={(email) => dispatch(emailUpdated(email))}
+      submit={() => dispatch(joinWaitlist(email))}
+    />
+  );
+};
+
+export default JoinWaitlistContainer;

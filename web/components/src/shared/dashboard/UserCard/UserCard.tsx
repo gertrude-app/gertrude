@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import inflect from '../lib/inflect';
+import inflect from '../../lib/inflect';
 import UserDevice from '../UserDevice';
 
 type Props = {

@@ -1,10 +1,10 @@
 import React from 'react';
 import cx from 'classnames';
 import FullscreenGradientBg from '../FullscreenGradientBg';
-import Button from '../Button';
-import TextInput from '../TextInput';
-import Logo from '../Logo';
-import Loading from '../Loading';
+import Button from '../../Button';
+import TextInput from '../../TextInput';
+import Logo from '../../Logo';
+import Loading from '../../Loading';
 
 type Props =
   | {

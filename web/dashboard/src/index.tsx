@@ -1,25 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import App from './components/routes/App';
-import JoinWaitlist from './components/routes/JoinWaitlist';
-import Monitoring from './components/routes/Monitoring';
-import MonitoringDayView from './components/routes/MonitoringDayView';
-import Profile from './components/routes/Profile';
-import Users from './components/routes/Users';
+import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
+import App from './App';
 
 ReactDOM.createRoot(document.getElementById(`root`)!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/join-waitlist" element={<JoinWaitlist />} />
-        <Route path="/monitoring" element={<Monitoring />} />
-        <Route path="/day-view" element={<MonitoringDayView />} />
-      </Routes>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Provider>
   </React.StrictMode>,
 );
 
