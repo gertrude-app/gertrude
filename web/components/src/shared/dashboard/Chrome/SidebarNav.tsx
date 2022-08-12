@@ -90,7 +90,11 @@ const SidebarNav: React.FC<Props> = ({
         )}
         onClick={toggleCollapsed}
       >
+        <span className="sr-only">
+          {collapsed ? `Maximize sidebar` : `Minimize sidebar`}
+        </span>
         <i
+          aria-hidden="true"
           className={cx(
             `fas text-2xl text-white text-opacity-60`,
             collapsed ? `fa-chevron-right` : `fa-chevron-left mr-3`,
@@ -108,7 +112,7 @@ const SidebarNav: React.FC<Props> = ({
         )}
         onClick={onLogout}
       >
-        Log out <i className="ml-1.5 fa fa-sign-out" />
+        Log out <i aria-hidden="true" className="ml-1.5 fa fa-sign-out" />
       </button>
     </div>
   </div>

@@ -31,6 +31,7 @@ const SidebarOption: React.FC<Props> = ({
     )}
   >
     <i
+      aria-hidden="true"
       className={cx(
         `fa fa-${icon} mr-2.5 sm:mr-4 text-xl sm:text-2xl leading-none w-7`,
         isSelected
