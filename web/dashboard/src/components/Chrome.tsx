@@ -15,6 +15,7 @@ const ChromeContainer: React.FC<Props> = ({ children }) => {
   const dispatch = useDispatch();
   const mobileSidebarOpen = useSelector((state) => state.menu.mobileSidebarOpen);
   const sidebarCollapsed = useSelector((state) => state.menu.desktopSidebarCollapsed);
+  const windowWidth = useSelector((state) => state.menu.windowWidth);
 
   return (
     <Chrome
@@ -26,6 +27,7 @@ const ChromeContainer: React.FC<Props> = ({ children }) => {
       onMobileHamburgerClick={() => dispatch(hamburgerMenuClicked())}
       onMobileSidebarClose={() => dispatch(mobileSidebarClosed())}
       onToggleSidebarCollapsed={() => dispatch(desktopSidebarCollapsedToggled())}
+      usingMobileView={windowWidth < 768}
     />
   );
 };
