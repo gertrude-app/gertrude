@@ -1,7 +1,7 @@
 import React from 'react';
 import EmailFormScreen from '@shared/dashboard/EmailFormScreen';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import { emailUpdated, joinWaitlist } from '../../redux/waitlist-slice';
+import { emailUpdated, joinWaitlist } from '../../redux/slice-waitlist';
 
 interface Props {
   requestState: RequestState;

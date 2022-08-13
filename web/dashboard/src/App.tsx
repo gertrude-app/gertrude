@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { authed } from './components/Authed';
 import Dashboard from './components/routes/Dashboard';
+import Login from './components/routes/Login';
 import JoinWaitlist from './components/routes/JoinWaitlist';
 import Monitoring from './components/routes/Monitoring';
 import MonitoringDayView from './components/routes/MonitoringDayView';
@@ -8,7 +10,7 @@ import Profile from './components/routes/Profile';
 import Users from './components/routes/Users';
 import useWindowWidth from './hooks/window-width';
 import { useDispatch, useSelector } from './redux/hooks';
-import { windowWidthChanged } from './redux/menu-slice';
+import { windowWidthChanged } from './redux/slice-menu';
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
@@ -23,12 +25,13 @@ const App: React.FC = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/users" element={<Users />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/join-waitlist" element={<JoinWaitlist />} />
-      <Route path="/monitoring" element={<Monitoring />} />
-      <Route path="/day-view" element={<MonitoringDayView />} />
+      <Route path="/" element={authed(<Dashboard />)} />
+      <Route path="/profile" element={authed(<Profile />)} />
+      <Route path="/users" element={authed(<Users />)} />
+      <Route path="/monitoring" element={authed(<Monitoring />)} />
+      <Route path="/day-view" element={authed(<MonitoringDayView />)} />
     </Routes>
   );
 };

@@ -23,6 +23,7 @@ const SidebarOption: React.FC<Props> = ({
       `flex justify-start items-center`,
       `cursor-pointer transition duration-75 select-none`,
       `bg-violet-500 bg-opacity-0`,
+      `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50`,
       isSelected ? `bg-opacity-20` : `hover:bg-opacity-10`,
       collapsed
         ? `py-[1.4em] pl-[1.65em]`
@@ -30,6 +31,7 @@ const SidebarOption: React.FC<Props> = ({
     )}
   >
     <i
+      aria-hidden="true"
       className={cx(
         `fa fa-${icon} mr-2.5 sm:mr-4 text-xl sm:text-2xl leading-none w-7`,
         isSelected

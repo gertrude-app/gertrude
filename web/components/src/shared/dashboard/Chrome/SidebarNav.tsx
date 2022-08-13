@@ -60,9 +60,7 @@ const SidebarNav: React.FC<Props> = ({
           Profile
         </SidebarOption>
       </div>
-      <div
-        className={cx(`grow border-t-4 border-white border-opacity-10 pt-4 -mx-4 pl-4`)}
-      >
+      <div className={cx(`grow border-t-4 border-white border-opacity-10 pt-4`)}>
         <SidebarOption
           icon="life-ring"
           collapsed={collapsed}
@@ -77,16 +75,26 @@ const SidebarNav: React.FC<Props> = ({
       </div>
     </nav>
     <div
-      className={cx(`flex px-4 h-16`, collapsed ? `justify-center` : `justify-between`)}
+      className={cx(`flex h-16 pb-px`, {
+        'justify-center': collapsed,
+        'justify-between': !collapsed && toggleCollapsed !== undefined,
+        'justify-end': !collapsed && toggleCollapsed === undefined,
+      })}
     >
       <button
         type="button"
         className={cx(
-          `items-center justify-start bg-black bg-opacity-0 hover:bg-opacity-10 cursor-pointer transition duration-100 hidden md:flex`,
+          `px-4 ml-px items-center justify-start hidden md:flex`,
+          `bg-black bg-opacity-0 hover:bg-opacity-10 cursor-pointer transition duration-100`,
+          `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50 rounded-md`,
         )}
         onClick={toggleCollapsed}
       >
+        <span className="sr-only">
+          {collapsed ? `Maximize sidebar` : `Minimize sidebar`}
+        </span>
         <i
+          aria-hidden="true"
           className={cx(
             `fas text-2xl text-white text-opacity-60`,
             collapsed ? `fa-chevron-right` : `fa-chevron-left mr-3`,
@@ -97,13 +105,14 @@ const SidebarNav: React.FC<Props> = ({
         type="button"
         className={cx(
           collapsed ? `hidden` : `flex`,
-          `justify-end grow md:grow-0 items-center`,
+          `justify-end items-center px-4 mr-px`,
           `text-white text-opacity-50 text-right hover:text-opacity-60 whitespace-nowrap`,
           `transition duration-100 cursor-pointer`,
+          `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50 rounded-md`,
         )}
         onClick={onLogout}
       >
-        Log out <i className="ml-1.5 fa fa-sign-out" />
+        Log out <i aria-hidden="true" className="ml-1.5 fa fa-sign-out" />
       </button>
     </div>
   </div>
