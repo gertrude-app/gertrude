@@ -125,8 +125,10 @@ const Chrome: React.FC<Props> = ({
             : node.removeAttribute(`inert`))
         }
       >
-        <div className="py-6">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">{children}</div>
+        <div className="bg-gray-50 min-h-screen">
+          <div className="py-6 md:py-7 max-w-[1460px] px-4 sm:px-6 md:px-8">
+            {children}
+          </div>
         </div>
       </main>
     </div>
