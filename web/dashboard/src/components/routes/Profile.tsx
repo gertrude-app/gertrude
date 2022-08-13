@@ -60,21 +60,16 @@ const Profile: React.FC = () => {
                 method="email"
                 email="me@example.com"
                 when="suspension requests"
-                setSidebarOpen={setSidebarOpen}
               />
               <NotificationCard
                 method="slack"
-                botToken="abc123-def456-ghi789"
-                channelId="8xjd82-jkd8j2-lkd8j2"
                 channelName="#Gertrude"
                 when="unlock requests"
-                setSidebarOpen={setSidebarOpen}
               />
               <NotificationCard
                 method="text"
                 number="(123) 456-7890"
                 when="suspension requests"
-                setSidebarOpen={setSidebarOpen}
               />
             </div>
           </div>

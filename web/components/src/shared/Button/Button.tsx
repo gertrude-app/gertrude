@@ -31,7 +31,7 @@ const Button: React.FC<Props> = ({
   let colors = ``;
   switch (color) {
     case `primary-violet`:
-      colors = `bg-violet-800 text-white hover:bg-violet-900 ring-white focus:ring-violet-800`;
+      colors = `bg-violet-800 text-white hover:bg-violet-900 ring-transparent focus:ring-violet-800`;
       break;
     case `primary-white`:
       colors = `bg-white text-violet-500 hover:bg-violet-50 border-2 border-white hover:border-violet-50 ring-violet-500 ring-offset-violet-500 focus:ring-white`;
@@ -43,7 +43,7 @@ const Button: React.FC<Props> = ({
       colors = `bg-gray-50 text-gray-500 border hover:bg-gray-100 ring-transparent focus:ring-indigo-400 focus:border-indigo-500`;
       break;
     case `secondary-warning`:
-      colors = `bg-red-50 text-red-600 border-red-100 border hover:text-red-700 hover:bg-red-100 ring-white focus:ring-red-500 focus:border-red-500`;
+      colors = `bg-red-50 text-red-600 border-red-100 border hover:text-red-700 hover:bg-red-100 ring-transparent focus:ring-red-500 focus:border-red-500`;
       break;
   }
   const rendersAsButton = props.type === `button` || props.type === `submit`;

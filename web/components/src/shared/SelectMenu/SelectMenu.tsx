@@ -23,7 +23,7 @@ const SelectMenu: React.FC<Props> = ({ options, selectedOption, setSelected }) =
               <Listbox.Button className="relative inline-flex items-center p-4 bg-violet-800 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-violet-900 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms] ">
                 <span className="sr-only">Change published status</span>
                 <i
-                  className={`fa fa-chevron-down text-xl text-white transition duration-100 ${
+                  className={`fa fa-chevron-down text-xl text-white text-opacity-90 transition duration-100 ${
                     open ? `-rotate-180` : `rotate-0`
                   }`}
                   aria-hidden="true"
@@ -48,7 +48,7 @@ const SelectMenu: React.FC<Props> = ({ options, selectedOption, setSelected }) =
                       active
                         ? `text-white bg-violet-800`
                         : `text-gray-900 even:bg-gray-50`,
-                      `cursor-pointer select-none relative p-4 text-sm`,
+                      `cursor-pointer select-none relative p-4 text-md`,
                     )
                   }
                   value={option}
