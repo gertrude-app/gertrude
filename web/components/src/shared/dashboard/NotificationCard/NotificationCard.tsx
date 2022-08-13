@@ -12,6 +12,7 @@ type HowToSend =
 
 type Props = HowToSend & { when: WhenToSend };
 
+// will need more props for the select menu stuff to work
 const NotificationCard: React.FC<Props> = (props) => {
   const [open, setOpen] = useState(false);
 

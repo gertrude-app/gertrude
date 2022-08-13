@@ -53,9 +53,9 @@ const Profile: React.FC = () => {
           </div>
         </div>
         <div className="mt-12">
-          <div className="">
+          <div className="flex flex-col">
             <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
-            <div className="flex flex-wrap items-start pt-4 sm:pt-2">
+            <div className="flex flex-wrap items-start pt-4 sm:pt-2 mb-4">
               <NotificationCard
                 method="email"
                 email="me@example.com"
@@ -72,6 +72,15 @@ const Profile: React.FC = () => {
                 when="suspension requests"
               />
             </div>
+            <Button
+              type="button"
+              onClick={() => {}}
+              color="primary-violet"
+              className="self-center"
+            >
+              <i className="fa fa-plus mr-3" />
+              New notification
+            </Button>
           </div>
         </div>
       </div>
