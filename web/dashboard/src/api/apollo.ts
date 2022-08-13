@@ -9,15 +9,14 @@ import {
 import { setContext } from '@apollo/client/link/context';
 import { GraphQLError } from 'graphql';
 import Result from './Result';
+import Current from '../environment';
 
 export { gql } from '@apollo/client';
 
-const httpLink = createHttpLink({
-  uri: import.meta.env.SNOWPACK_PUBLIC_GRAPHQL_ENDPOINT,
-});
+const httpLink = createHttpLink({ uri: Current.env.graphQLEndpoint() });
 
 const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem(`token`);
+  const token = Current.localStorage.getItem(`admin_token`);
   return {
     headers: {
       ...headers,
