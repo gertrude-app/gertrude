@@ -8,6 +8,7 @@ import Chrome from '../Chrome';
 import PageHeading from '@shared/dashboard/PageHeading';
 import PillBadge from '@shared/dashboard/PillBadge';
 import NotificationCard from '@shared/dashboard/NotificationCard';
+import NotificationMethodsMenu from '@shared/dashboard/NotificationMethodsMenu';
 
 const Profile: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -54,23 +55,36 @@ const Profile: React.FC = () => {
         </div>
         <div className="mt-12">
           <div className="flex flex-col">
-            <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
-            <div className="flex flex-wrap items-start pt-4 sm:pt-2 mb-4">
-              <NotificationCard
-                method="email"
-                email="me@example.com"
-                when="suspension requests"
-              />
-              <NotificationCard
-                method="slack"
-                channelName="#Gertrude"
-                when="unlock requests"
-              />
-              <NotificationCard
-                method="text"
-                number="(123) 456-7890"
-                when="suspension requests"
-              />
+            <div className="mb-10">
+              <h2 className="text-2xl font-bold text-gray-800">Notification methods</h2>
+              <p className="text-gray-500 mt-1">
+                Verified ways that Gertrude can notify you for user requests
+              </p>
+              <NotificationMethodsMenu />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
+              <p className="text-gray-500 mt-1">
+                Custom notifications for different types of requests using one of your
+                verified methods
+              </p>
+              <div className="flex flex-wrap items-start pt-4 sm:pt-2 mb-4">
+                <NotificationCard
+                  method="email"
+                  email="me@example.com"
+                  when="suspension requests"
+                />
+                <NotificationCard
+                  method="slack"
+                  channelName="#Gertrude"
+                  when="unlock requests"
+                />
+                <NotificationCard
+                  method="text"
+                  number="(123) 456-7890"
+                  when="suspension requests"
+                />
+              </div>
             </div>
             <Button
               type="button"
