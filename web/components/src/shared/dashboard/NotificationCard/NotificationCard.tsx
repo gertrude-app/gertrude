@@ -8,7 +8,7 @@ type HowToSend =
   | { method: 'text'; number: string }
   | { method: 'slack'; botToken: string; channelId: string; channelName: string };
 
-type Props = HowToSend & { when: WhenToSend };
+type Props = HowToSend & { when: WhenToSend; setSidebarOpen: (open: boolean) => void };
 
 const NotificationCard: React.FC<Props> = (props) => {
   let icon = '';
@@ -52,7 +52,12 @@ const NotificationCard: React.FC<Props> = (props) => {
         {text}
       </div>
       <div className="bg-gray-100 rounded-b-xl flex justify-end items-center p-3">
-        <Button type="button" onClick={() => {}} color="secondary-white" small>
+        <Button
+          type="button"
+          onClick={() => props.setSidebarOpen(true)}
+          color="secondary-white"
+          small
+        >
           <i className="fa fa-pen mr-3" />
           Edit
         </Button>
