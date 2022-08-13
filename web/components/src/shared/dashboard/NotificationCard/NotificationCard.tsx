@@ -16,35 +16,35 @@ type Props = HowToSend & { when: WhenToSend };
 const NotificationCard: React.FC<Props> = (props) => {
   const [open, setOpen] = useState(false);
 
-  let icon = '';
-  let text = <h2></h2>;
+  let icon = ``;
+  let text = <h2> </h2>;
   switch (props.method) {
-    case 'email':
+    case `email`:
       text = (
         <h2 className="text-gray-700 text-lg">
-          Email <span className="font-bold">{props.email}</span> for{' '}
+          Email <span className="font-bold">{props.email}</span> for{` `}
           <span className="text-gray-900">{props.when}</span>
         </h2>
       );
-      icon = 'envelope';
+      icon = `envelope`;
       break;
-    case 'text':
+    case `text`:
       text = (
         <h2 className="text-gray-700 text-lg">
-          Text <span className="font-bold">{props.number}</span> for{' '}
+          Text <span className="font-bold">{props.number}</span> for{` `}
           <span className="text-gray-900">{props.when}</span>
         </h2>
       );
-      icon = 'mobile';
+      icon = `mobile`;
       break;
-    case 'slack':
+    case `slack`:
       text = (
         <h2 className="text-gray-700 text-lg">
-          Slack <span className="font-bold">{props.channelName}</span> for{' '}
+          Slack <span className="font-bold">{props.channelName}</span> for{` `}
           <span className="text-gray-900">{props.when}</span>
         </h2>
       );
-      icon = 'slack';
+      icon = `slack`;
       break;
   }
 
@@ -59,22 +59,22 @@ const NotificationCard: React.FC<Props> = (props) => {
       <div
         className={cx(
           `p-4 space-y-4 -mt-4 [transition:150ms]`,
-          open ? 'h-56' : 'h-0 opacity-0 overflow-hidden',
+          open ? `h-56` : `h-0 opacity-0 overflow-hidden`,
         )}
       >
         <div>
           <h3 className="mb-1 text-violet-800 font-medium text-md ml-1">Method:</h3>
           <SelectMenu
-            options={['Email me@example.com', 'Text (123) 456-7890', 'Slack #Gertrude']}
-            selectedOption={'Email me@example.com'}
+            options={[`Email me@example.com`, `Text (123) 456-7890`, `Slack #Gertrude`]}
+            selectedOption={`Email me@example.com`}
             setSelected={() => {}}
           />
         </div>
         <div>
           <h3 className="mb-1 text-violet-800 font-medium text-md ml-1">Upon:</h3>
           <SelectMenu
-            options={['Suspension requests', 'Unlock requests']}
-            selectedOption={'Suspension requests'}
+            options={[`Suspension requests`, `Unlock requests`]}
+            selectedOption={`Suspension requests`}
             setSelected={() => {}}
           />
         </div>
@@ -85,7 +85,7 @@ const NotificationCard: React.FC<Props> = (props) => {
           onClick={() => setOpen(true)}
           color="secondary-white"
           small
-          className={`${open ? 'hidden' : 'block'}`}
+          className={`${open ? `hidden` : `block`}`}
         >
           <i className="fa fa-pen mr-3" />
           Edit
@@ -95,7 +95,7 @@ const NotificationCard: React.FC<Props> = (props) => {
           onClick={() => {}}
           color="secondary-warning"
           small
-          className={`${open ? 'hidden' : 'block'} ml-3`}
+          className={`${open ? `hidden` : `block`} ml-3`}
         >
           <i className="fa fa-trash mr-3" />
           Delete
@@ -105,7 +105,7 @@ const NotificationCard: React.FC<Props> = (props) => {
           onClick={() => setOpen(false)}
           color="secondary-white"
           small
-          className={`${open ? 'block' : 'hidden'} mr-3`}
+          className={`${open ? `block` : `hidden`} mr-3`}
         >
           Cancel
         </Button>
@@ -114,7 +114,7 @@ const NotificationCard: React.FC<Props> = (props) => {
           onClick={() => {}}
           color="primary-violet"
           small
-          className={`${open ? 'block' : 'hidden'}`}
+          className={`${open ? `block` : `hidden`}`}
         >
           Save
         </Button>

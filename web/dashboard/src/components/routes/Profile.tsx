@@ -13,17 +13,17 @@ const Profile: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <Chrome>
-      <div className="py-10 px-5 sm:px-10 lg:px-12 xl:px-16 relative">
+      <div className="py-6 lg:px-4 relative">
         <div
           className={cx(
             `absolute left-0 top-0 w-full h-full z-20 bg-gray-100 bg-opacity-50`,
-            sidebarOpen ? 'block' : 'hidden',
+            sidebarOpen ? `block` : `hidden`,
           )}
         />
         <NewNotificationMethodSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
         <PageHeading icon="user">Profile</PageHeading>
-        <div className="flex flex-col md:flex-row mt-8">
-          <div className="p-8 bg-gray-100 rounded-xl flex-grow md:mr-2 border max-w-3xl">
+        <div className="flex flex-col lg:flex-row mt-8">
+          <div className="p-8 bg-gray-100 rounded-xl flex-grow lg:mr-2 border max-w-3xl">
             <h2 className="text-lg text-gray-900 mb-2">Email address:</h2>
             <TextInput
               type={`email`}
@@ -32,7 +32,7 @@ const Profile: React.FC = () => {
               setValue={() => {}}
             />
           </div>
-          <div className="px-8 py-4 bg-gray-100 rounded-xl md:ml-2 flex justify-between relative border mt-4 md:mt-0">
+          <div className="px-8 py-4 bg-gray-100 rounded-xl lg:ml-2 flex justify-between relative border mt-4 lg:mt-0">
             <div className="flex justify-end items-start flex-col mr-8">
               <h2 className="font-bold text-gray-700">Basic plan</h2>
               <h3>

@@ -11,7 +11,7 @@ const EditNotificationSidebar: React.FC<Props> = ({ open, setOpen }) => (
   <div
     className={cx(
       `fixed bg-white top-0 right-0 w-96 h-screen border-l shadow-xl [transition:150ms] z-30 flex flex-col justify-beween`,
-      open ? 'mr-0' : '-mr-112',
+      open ? `mr-0` : `-mr-112`,
     )}
   >
     <div className="p-8 flex-grow">

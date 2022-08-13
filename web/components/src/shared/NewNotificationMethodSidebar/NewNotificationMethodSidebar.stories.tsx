@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import NewNotificationMethodSidebar from './NewNotificationMethodSidebar';
 
 export default {
-  title: 'NewNotificationMethodSidebar',
+  title: `NewNotificationMethodSidebar`,
   component: NewNotificationMethodSidebar,
 } as ComponentMeta<typeof NewNotificationMethodSidebar>;
 
