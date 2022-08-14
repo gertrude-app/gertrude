@@ -1,5 +1,5 @@
 import React from 'react';
-import MonitoredDay from '@shared/dashboard/MonitoredDay';
+import MonitoredDay from '@shared/dashboard/Monitoring/MonitoredDay';
 
 const Monitoring: React.FC = () => (
   <main className="px-2 sm:px-4 md:px-6 lg:py-10 py-10 bg-gray-50">

@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import MonitoredDay from './MonitoredDay';
 
 export default {
-  title: `MonitoredDay`,
+  title: `Dashboard/Monitoring/MonitoredDay`,
   component: MonitoredDay,
 } as ComponentMeta<typeof MonitoredDay>;
 

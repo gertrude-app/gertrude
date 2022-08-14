@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
-import Button from '../../Button';
+import Button from '../../../Button';
 import SelectMenu from '../../SelectMenu';
 import TextInput from '../../TextInput';
 

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
 import Button from '@shared/Button';
-import TextInput from '@shared/TextInput';
 import { Link } from 'react-router-dom';
 import PageHeading from '@shared/dashboard/PageHeading';
 import PillBadge from '@shared/dashboard/PillBadge';
-import NotificationCard from '@shared/dashboard/NotificationCard';
-import NotificationMethodsMenu from '@shared/dashboard/NotificationMethodsMenu';
-import NewNotificationMethodSidebar from '@shared/dashboard/NewNotificationMethodSidebar';
+import NotificationMethodsMenu from '@shared/dashboard/Profile/NotificationMethodsMenu';
+import NewNotificationMethodSidebar from '@shared/dashboard/Profile/NewNotificationMethodSidebar';
+import NotificationCard from '@shared/dashboard/Profile/NotificationCard';
+import TextInput from '@shared/dashboard/TextInput';
 
 const Profile: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import ErrorMessage from './ErrorMessage';
 
 export default {
-  title: `ErrorMessage`,
+  title: `Dashboard/Core/ErrorMessage`,
   component: ErrorMessage,
 } as ComponentMeta<typeof ErrorMessage>;
 

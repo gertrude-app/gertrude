@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '@shared/Button';
-import KeystrokesViewer from '@shared/dashboard/KeystrokesViewer';
-import ScreenshotViewer from '@shared/dashboard/ScreenshotViewer';
+import KeystrokesViewer from '@shared/dashboard/Monitoring/KeystrokesViewer';
+import ScreenshotViewer from '@shared/dashboard/Monitoring/ScreenshotViewer';
 
 const MonitoringDayView: React.FC = () => (
   <main className="flex flex-col min-h-screen">
