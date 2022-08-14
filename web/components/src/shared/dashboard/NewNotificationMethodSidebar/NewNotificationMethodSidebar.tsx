@@ -10,19 +10,19 @@ type Props = {
 };
 
 const EditNotificationSidebar: React.FC<Props> = ({ open, setOpen }) => {
-  const [selectedMethod, setSelectedMethod] = useState('Email');
-  const [address, setAddress] = useState('');
-  const [code, setCode] = useState('');
-  const [channelName, setChannelName] = useState('');
-  const [channelId, setChannelId] = useState('');
-  const [botToken, setBotToken] = useState('');
-  let addressType = '';
+  const [selectedMethod, setSelectedMethod] = useState(`Email`);
+  const [address, setAddress] = useState(``);
+  const [code, setCode] = useState(``);
+  const [channelName, setChannelName] = useState(``);
+  const [channelId, setChannelId] = useState(``);
+  const [botToken, setBotToken] = useState(``);
+  let addressType = ``;
   switch (selectedMethod) {
-    case 'Email':
-      addressType = 'Email address';
+    case `Email`:
+      addressType = `Email address`;
       break;
-    case 'Text':
-      addressType = 'Phone number';
+    case `Text`:
+      addressType = `Phone number`;
       break;
   }
 
@@ -39,16 +39,16 @@ const EditNotificationSidebar: React.FC<Props> = ({ open, setOpen }) => {
         </h2>
         <label className="mb-1 text-gray-500 text-lg font-medium block">Method:</label>
         <SelectMenu
-          options={['Email', 'Text', 'Slack']}
+          options={[`Email`, `Text`, `Slack`]}
           selectedOption={selectedMethod}
           setSelected={setSelectedMethod}
         />
-        {selectedMethod !== 'Slack' ? (
+        {selectedMethod !== `Slack` ? (
           <>
             <label className="mb-1 text-gray-500 text-lg font-medium block mt-6">
               {addressType}:
             </label>
-            <TextInput type={'text'} value={address} setValue={setAddress} label={''} />
+            <TextInput type={`text`} value={address} setValue={setAddress} label={``} />
             <Button
               type="button"
               onClick={() => {}}
@@ -61,7 +61,7 @@ const EditNotificationSidebar: React.FC<Props> = ({ open, setOpen }) => {
             <label className="mb-1 text-gray-500 text-lg font-medium block mt-4">
               Enter 6-digit code:
             </label>
-            <TextInput type={'text'} value={code} setValue={setCode} label={''} />
+            <TextInput type={`text`} value={code} setValue={setCode} label={``} />
             <Button
               type="button"
               onClick={() => {}}
@@ -78,24 +78,24 @@ const EditNotificationSidebar: React.FC<Props> = ({ open, setOpen }) => {
               Channel name:
             </label>
             <TextInput
-              type={'text'}
+              type={`text`}
               value={channelName}
               setValue={setChannelName}
-              label={''}
+              label={``}
             />
             <label className="mb-1 text-gray-500 text-lg font-medium block mt-4">
               Channel ID:
             </label>
             <TextInput
-              type={'text'}
+              type={`text`}
               value={channelId}
               setValue={setChannelId}
-              label={''}
+              label={``}
             />
             <label className="mb-1 text-gray-500 text-lg font-medium block mt-4">
               Bot token:
             </label>
-            <TextInput type={'text'} value={botToken} setValue={setBotToken} label={''} />
+            <TextInput type={`text`} value={botToken} setValue={setBotToken} label={``} />
             <Button
               type="button"
               onClick={() => {}}

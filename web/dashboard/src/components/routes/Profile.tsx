@@ -3,7 +3,6 @@ import cx from 'classnames';
 import Button from '@shared/Button';
 import TextInput from '@shared/TextInput';
 import { Link } from 'react-router-dom';
-import Chrome from '../Chrome';
 import PageHeading from '@shared/dashboard/PageHeading';
 import PillBadge from '@shared/dashboard/PillBadge';
 import NotificationCard from '@shared/dashboard/NotificationCard';
