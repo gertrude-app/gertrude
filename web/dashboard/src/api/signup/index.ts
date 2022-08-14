@@ -1,1 +1,1 @@
-export { createWaitlistedUser } from './createWaitlistedUser';
+export { joinWaitlist } from './joinWaitlist';
