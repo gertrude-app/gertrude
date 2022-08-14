@@ -12,6 +12,10 @@ type Props = {
 const EditNotificationSidebar: React.FC<Props> = ({ open, setOpen }) => {
   const [selectedMethod, setSelectedMethod] = useState('Email');
   const [address, setAddress] = useState('');
+  const [code, setCode] = useState('');
+  const [channelName, setChannelName] = useState('');
+  const [channelId, setChannelId] = useState('');
+  const [botToken, setBotToken] = useState('');
   let addressType = '';
   switch (selectedMethod) {
     case 'Email':
@@ -25,7 +29,7 @@ const EditNotificationSidebar: React.FC<Props> = ({ open, setOpen }) => {
   return (
     <div
       className={cx(
-        `fixed bg-white top-0 right-0 w-96 h-screen border-l shadow-xl [transition:150ms] z-30 flex flex-col justify-beween`,
+        `fixed bg-white top-0 right-0 w-76 md:w-96 h-screen border-l shadow-xl [transition:150ms] z-30 flex flex-col justify-beween`,
         open ? `mr-0` : `-mr-112`,
       )}
     >
@@ -33,7 +37,7 @@ const EditNotificationSidebar: React.FC<Props> = ({ open, setOpen }) => {
         <h2 className="text-2xl font-black text-gray-700 mb-8">
           New notification method
         </h2>
-        <label className="mb-2 text-gray-500 text-lg font-medium block">Method:</label>
+        <label className="mb-1 text-gray-500 text-lg font-medium block">Method:</label>
         <SelectMenu
           options={['Email', 'Text', 'Slack']}
           selectedOption={selectedMethod}
@@ -41,22 +45,67 @@ const EditNotificationSidebar: React.FC<Props> = ({ open, setOpen }) => {
         />
         {selectedMethod !== 'Slack' ? (
           <>
-            <label className="mb-2 text-gray-500 text-lg font-medium block mt-6">
+            <label className="mb-1 text-gray-500 text-lg font-medium block mt-6">
               {addressType}:
             </label>
             <TextInput type={'text'} value={address} setValue={setAddress} label={''} />
             <Button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={() => {}}
               color="secondary-white"
               small
               className="self-end mt-4"
             >
               Send code
             </Button>
+            <label className="mb-1 text-gray-500 text-lg font-medium block mt-4">
+              Enter 6-digit code:
+            </label>
+            <TextInput type={'text'} value={code} setValue={setCode} label={''} />
+            <Button
+              type="button"
+              onClick={() => {}}
+              color="secondary-white"
+              small
+              className="self-end mt-4"
+            >
+              Verify code
+            </Button>
           </>
         ) : (
-          ''
+          <>
+            <label className="mb-1 text-gray-500 text-lg font-medium block mt-6">
+              Channel name:
+            </label>
+            <TextInput
+              type={'text'}
+              value={channelName}
+              setValue={setChannelName}
+              label={''}
+            />
+            <label className="mb-1 text-gray-500 text-lg font-medium block mt-4">
+              Channel ID:
+            </label>
+            <TextInput
+              type={'text'}
+              value={channelId}
+              setValue={setChannelId}
+              label={''}
+            />
+            <label className="mb-1 text-gray-500 text-lg font-medium block mt-4">
+              Bot token:
+            </label>
+            <TextInput type={'text'} value={botToken} setValue={setBotToken} label={''} />
+            <Button
+              type="button"
+              onClick={() => {}}
+              color="secondary-white"
+              small
+              className="self-end mt-4"
+            >
+              Send test message
+            </Button>
+          </>
         )}
       </div>
       <div className="px-6 py-4 flex justify-center space-x-4">

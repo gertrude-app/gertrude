@@ -17,10 +17,10 @@ const SelectMenu: React.FC<Props> = ({ options, selectedOption, setSelected }) =
         <div className="relative">
           <div className="rounded-md w-full shadow-sm">
             <div className="relative z-0 inline-flex rounded-md w-full border">
-              <div className="relative flex flex-grow items-center bg-white py-2 pl-3 pr-4 border border-transparent rounded-l-md text-gray-700">
+              <div className="relative flex flex-grow items-center bg-white pl-3 pr-4 border border-transparent rounded-l-md text-gray-700">
                 <p className="ml-2.5 font-medium">{selectedOption}</p>
               </div>
-              <Listbox.Button className="relative inline-flex items-center p-4 bg-violet-800 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-violet-900 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms] ">
+              <Listbox.Button className="relative inline-flex items-center px-4 py-3.5 bg-violet-800 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-violet-900 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms] ">
                 <span className="sr-only">Change published status</span>
                 <i
                   className={`fa fa-chevron-down text-xl text-white text-opacity-90 transition duration-100 ${

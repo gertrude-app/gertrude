@@ -12,3 +12,4 @@ const Template: ComponentStory<typeof NewNotificationMethodSidebar> = (args) => 
 );
 
 export const Default = Template.bind({});
+Default.args = { open: true };
