@@ -4,19 +4,14 @@ import { useDispatch, useSelector } from '../../redux/hooks';
 import { emailUpdated, joinWaitlist } from '../../redux/slice-waitlist';
 
 interface Props {
-  requestState: RequestState;
+  request: RequestState;
   email: string;
   setEmail(email: string): unknown;
   submit(): unknown;
 }
 
-export const JoinWaitlist: React.FC<Props> = ({
-  email,
-  setEmail,
-  requestState,
-  submit,
-}) => {
-  switch (requestState) {
+export const JoinWaitlist: React.FC<Props> = ({ email, setEmail, request, submit }) => {
+  switch (request.state) {
     case `ongoing`:
       return <EmailFormScreen state="fetching" />;
 
@@ -55,10 +50,10 @@ export const JoinWaitlist: React.FC<Props> = ({
 const JoinWaitlistContainer: React.FC = () => {
   const dispatch = useDispatch();
   const email = useSelector((state) => state.waitlist.email);
-  const requestState = useSelector((state) => state.waitlist.requestState);
+  const request = useSelector((state) => state.waitlist.joinReq);
   return (
     <JoinWaitlist
-      requestState={requestState}
+      request={request}
       email={email}
       setEmail={(email) => dispatch(emailUpdated(email))}
       submit={() => dispatch(joinWaitlist(email))}

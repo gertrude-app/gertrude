@@ -1,63 +1,51 @@
-import React from 'react';
-import Button from '@shared/Button';
-import PageHeading from '@shared/dashboard/PageHeading';
-import UserCard from '@shared/dashboard/UserCard';
+import React, { useEffect } from 'react';
+import Loading from '@shared/Loading';
+import UsersScreen from '@shared/dashboard/Users/UsersScreen';
+import { useDispatch, useSelector } from '../../redux/hooks';
+import { fetchUsers } from '../../redux/slice-users';
+import ApiErrorMessage from '../ApiErrorMessage';
 
 const Users: React.FC = () => {
-  return (
-    <div className="py-10 px-5 sm:px-10 lg:px-12 xl:px-16 flex flex-col">
-      <PageHeading icon="users">Users</PageHeading>
-      <div className="py-10 flex flex-wrap items-start">
-        <UserCard
-          title="Winfield"
-          keys={213}
-          keychains={3}
-          devices={[
-            { title: `14" MacBook Pro`, status: `online` },
-            { title: `Mac Studio`, status: `offline` },
-          ]}
-          screenshots={true}
-          keystrokes={true}
-        />
-        <UserCard
-          title="Ezra"
-          keys={10344}
-          keychains={37}
-          devices={[
-            { title: `16" Macbook Pro`, status: `offline` },
-            { title: `14" MacBook Air`, status: `offline` },
-            { title: `iMac`, status: `online` },
-          ]}
-          screenshots={true}
-          keystrokes={false}
-        />
-        <UserCard
-          title="Rachel"
-          keys={0}
-          keychains={0}
-          devices={[]}
-          screenshots={false}
-          keystrokes={false}
-        />
-        <UserCard
-          title="Willow"
-          keys={2}
-          keychains={1}
-          devices={[{ title: `Mac Pro`, status: `online` }]}
-          screenshots={true}
-          keystrokes={true}
-        />
+  const dispatch = useDispatch();
+  const request = useSelector((state) => state.users.listReq);
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
+
+  if (request.state === `failed`) {
+    return <ApiErrorMessage error={request.error} />;
+  }
+
+  if (request.state === `idle` || request.state === `ongoing`) {
+    return (
+      <div className="flex justify-center m-12">
+        <Loading />
       </div>
-      <Button
-        type="button"
-        onClick={() => {}}
-        color="primary-violet"
-        className="self-center"
-      >
-        <i className="fa fa-plus mr-4" />
-        Add a user
-      </Button>
-    </div>
+    );
+  }
+
+  return (
+    <UsersScreen
+      users={Object.values(request.payload ?? {}).map((resource) => ({
+        id: resource.id,
+        name: resource.name,
+        numKeychains: resource.keychains.length,
+        numKeys: resource.keychains.reduce(
+          (acc, keychain) => acc + keychain.keys.length,
+          0,
+        ),
+        devices: resource.devices.map((device) => ({
+          id: device.id,
+          // TODO: https://github.com/gertrude-app/project/issues/52
+          model: device.hostname ?? `Macbook Pro`,
+          status: `online`,
+          icon: device.hostname?.toLowerCase().includes(`mini`) ? `desktop` : `laptop`,
+        })),
+        screenshotsEnabled: resource.screenshotsEnabled,
+        keystrokesEnabled: resource.keystrokesEnabled,
+      }))}
+    />
   );
 };
 

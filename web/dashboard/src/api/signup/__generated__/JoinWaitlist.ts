@@ -6,18 +6,18 @@
 import { CreateWaitlistedUserInput } from './../../../../__generated__/globalTypes';
 
 // ====================================================
-// GraphQL mutation operation: CreateWaitlistedUser
+// GraphQL mutation operation: JoinWaitlist
 // ====================================================
 
-export interface CreateWaitlistedUser_user {
+export interface JoinWaitlist_user {
   __typename: 'WaitlistedUser';
   id: string;
 }
 
-export interface CreateWaitlistedUser {
-  user: CreateWaitlistedUser_user;
+export interface JoinWaitlist {
+  user: JoinWaitlist_user;
 }
 
-export interface CreateWaitlistedUserVariables {
+export interface JoinWaitlistVariables {
   input: CreateWaitlistedUserInput;
 }

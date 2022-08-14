@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import * as api from '../api';
+import Current from '../environment';
 
 export interface WaitlistState {
   email: string;
-  requestState: RequestState;
+  joinReq: RequestState;
 }
 
 const initialState: WaitlistState = {
   email: ``,
-  requestState: `idle`,
+  joinReq: { state: `idle` },
 };
 
 export const slice = createSlice({
@@ -18,19 +18,19 @@ export const slice = createSlice({
     emailUpdated: (state, action: PayloadAction<string>) => {
       state.email = action.payload;
     },
-    requestStateUpdated: (state, action: PayloadAction<RequestState>) => {
-      state.requestState = action.payload;
+    joinReqUpdated: (state, action: PayloadAction<RequestState>) => {
+      state.joinReq = action.payload;
     },
   },
   extraReducers(builder) {
     builder.addCase(joinWaitlist.pending, (state) => {
-      state.requestState = `ongoing`;
+      state.joinReq = { state: `ongoing` };
     });
     builder.addCase(joinWaitlist.fulfilled, (state, action) => {
-      state.requestState = action.payload ? `succeeded` : `failed`;
+      state.joinReq = { state: action.payload ? `succeeded` : `failed` };
     });
     builder.addCase(joinWaitlist.rejected, (state) => {
-      state.requestState = `failed`;
+      state.joinReq = { state: `failed` };
     });
   },
 });
@@ -38,11 +38,11 @@ export const slice = createSlice({
 export const joinWaitlist = createAsyncThunk(
   `${slice.name}/join`,
   async (email: string) => {
-    const result = await api.signup.createWaitlistedUser(email);
-    return result.value ?? false;
+    const result = await Current.api.signup.joinWaitlist(email);
+    return result.isSuccess;
   },
 );
 
-export const { emailUpdated, requestStateUpdated } = slice.actions;
+export const { emailUpdated, joinReqUpdated } = slice.actions;
 
 export default slice.reducer;
