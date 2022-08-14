@@ -3,12 +3,12 @@ import cx from 'classnames';
 import Button from '@shared/Button';
 import TextInput from '@shared/TextInput';
 import { Link } from 'react-router-dom';
-import NewNotificationMethodSidebar from '@shared/NewNotificationMethodSidebar';
 import Chrome from '../Chrome';
 import PageHeading from '@shared/dashboard/PageHeading';
 import PillBadge from '@shared/dashboard/PillBadge';
 import NotificationCard from '@shared/dashboard/NotificationCard';
 import NotificationMethodsMenu from '@shared/dashboard/NotificationMethodsMenu';
+import NewNotificationMethodSidebar from '@shared/dashboard/NewNotificationMethodSidebar';
 
 const Profile: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -61,6 +61,16 @@ const Profile: React.FC = () => {
                 Verified ways that Gertrude can notify you for user requests
               </p>
               <NotificationMethodsMenu />
+              <Button
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                color="secondary-white"
+                small
+                className="mt-4"
+              >
+                <i className="fa fa-plus mr-3" />
+                Add method
+              </Button>
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>

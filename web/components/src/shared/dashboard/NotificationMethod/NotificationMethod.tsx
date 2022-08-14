@@ -15,13 +15,8 @@ const NotificationMethod: React.FC<Props> = (props) => (
       {` `}
       <span className="text-violet-700 font-medium">me@example.com</span>
     </h2>
-    <div className="flex items-center">
-      <div className="w-8 h-8 rounded-full cursor-pointer transition duration-75 hover:bg-gray-100 flex justify-center items-center mr-2">
-        <i className="fa fa-pen text-gray-500" />
-      </div>
-      <div className="w-8 h-8 rounded-full cursor-pointer transition duration-75 hover:bg-gray-100 flex justify-center items-center">
-        <i className="fa fa-trash text-red-400" />
-      </div>
+    <div className="w-10 h-10 rounded-full cursor-pointer transition duration-75 bg-black bg-opacity-0 hover:bg-opacity-5 flex justify-center items-center mr-2">
+      <i className="fa fa-trash text-red-400" />
     </div>
   </li>
 );
