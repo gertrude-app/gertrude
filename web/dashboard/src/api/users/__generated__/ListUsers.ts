@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { Family } from './../../../graphqlTypes';
+
 // ====================================================
 // GraphQL query operation: ListUsers
 // ====================================================
@@ -17,10 +19,17 @@ export interface ListUsers_user_keychains {
   keys: ListUsers_user_keychains_keys[];
 }
 
+export interface ListUsers_user_devices_model {
+  __typename: 'Model';
+  family: Family;
+  title: string;
+}
+
 export interface ListUsers_user_devices {
   __typename: 'Device';
   id: string;
-  hostname: string | null;
+  isOnline: boolean;
+  model: ListUsers_user_devices_model;
 }
 
 export interface ListUsers_user {

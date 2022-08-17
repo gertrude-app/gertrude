@@ -7,6 +7,16 @@
 // START Enums and Input Objects
 //==============================================================
 
+export enum Family {
+  iMac = 'iMac',
+  macBookAir = 'macBookAir',
+  macBookPro = 'macBookPro',
+  mini = 'mini',
+  pro = 'pro',
+  studio = 'studio',
+  unknown = 'unknown',
+}
+
 export interface CreateWaitlistedUserInput {
   email: string;
   id?: UUID | null;
