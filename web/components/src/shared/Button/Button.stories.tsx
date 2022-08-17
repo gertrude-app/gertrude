@@ -3,7 +3,7 @@ import { ComponentMeta } from '@storybook/react';
 import Button from './Button';
 
 export default {
-  title: `Button`,
+  title: `Shared/Button`,
   component: Button,
   parameters: {
     layout: `fullscreen`,

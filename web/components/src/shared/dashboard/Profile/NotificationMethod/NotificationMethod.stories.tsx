@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import NotificationMethod from './NotificationMethod';
 
 export default {
-  title: `NotificationMethod`,
+  title: `Dashboard/Profile/NotificationMethod`,
   component: NotificationMethod,
 } as ComponentMeta<typeof NotificationMethod>;
 

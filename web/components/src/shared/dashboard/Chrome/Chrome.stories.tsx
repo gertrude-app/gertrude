@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import Chrome from './Chrome';
 
 export default {
-  title: `Chrome`,
+  title: `Dashboard/Core/Chrome`,
   component: Chrome,
   parameters: {
     layout: `fullscreen`,

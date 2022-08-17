@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import NotificationCard from './NotificationCard';
 
 export default {
-  title: `NotificationCard`,
+  title: `Dashboard/Profile/NotificationCard`,
   component: NotificationCard,
 } as ComponentMeta<typeof NotificationCard>;
 

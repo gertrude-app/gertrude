@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import PageHeading from './PageHeading';
 
 export default {
-  title: `PageHeading`,
+  title: `Dashboard/Core/PageHeading`,
   component: PageHeading,
 } as ComponentMeta<typeof PageHeading>;
 

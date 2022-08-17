@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
+import Button from '../../../Button';
 import SelectMenu from '../../SelectMenu';
-import Button from '../../Button';
 
 type WhenToSend = 'suspension requests' | 'unlock requests';
 

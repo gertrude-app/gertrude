@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import SelectMenu from './SelectMenu';
 
 export default {
-  title: `SelectMenu`,
+  title: `Dashboard/Core/SelectMenu`,
   component: SelectMenu,
 } as ComponentMeta<typeof SelectMenu>;
 

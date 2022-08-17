@@ -1,6 +1,6 @@
 import React from 'react';
-import { formatTime } from '../../lib/dates';
-import Button from '../../Button';
+import { formatTime } from '../../../lib/dates';
+import Button from '../../../Button';
 
 type Props = {
   className?: string;

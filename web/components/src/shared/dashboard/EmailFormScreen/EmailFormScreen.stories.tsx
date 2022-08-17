@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import EmailFormScreen from './EmailFormScreen';
 
 export default {
-  title: `EmailFormScreen`,
+  title: `Dashboard/Signup/EmailFormScreen`,
   component: EmailFormScreen,
   parameters: {
     layout: `fullscreen`,
