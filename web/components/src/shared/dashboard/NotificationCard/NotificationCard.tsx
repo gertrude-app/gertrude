@@ -1,125 +1,126 @@
 import React, { useState } from 'react';
-import Button from '../../Button';
+import cx from 'classnames';
 import SelectMenu from '../../SelectMenu';
-import TextInput from '../../TextInput';
+import Button from '../../Button';
 
-interface Props {
-  whenToNotify: string;
-  setWhenToNotify: (whenToNotify: string) => void;
-  howToNotify: string;
-  setHowToNotify: (howToNotify: string) => void;
-}
+type WhenToSend = 'suspension requests' | 'unlock requests';
 
-const NotificationCard: React.FC<Props> = ({
-  whenToNotify,
-  setWhenToNotify,
-  howToNotify,
-  setHowToNotify,
-}) => {
-  let notificationInputs: {
-    label: string;
-    value: string;
-    setValue(arg: string): void;
-    type: 'email' | 'text';
-  }[] = [];
+type HowToSend =
+  | { method: 'email'; email: string }
+  | { method: 'text'; number: string }
+  | { method: 'slack'; channelName: string };
 
-  switch (howToNotify) {
-    case `Send a Slack`:
-      notificationInputs = [
-        {
-          type: `text`,
-          label: `Channel ID:`,
-          value: `CE07D6SDX89201`,
-          setValue: () => {},
-        },
-        {
-          type: `text`,
-          label: `Bot token:`,
-          value: `abc-1234567890-xc123231231231`,
-          setValue: () => {},
-        },
-      ];
+type Props = HowToSend & { when: WhenToSend };
+
+// will need more props for the select menu stuff to work
+const NotificationCard: React.FC<Props> = (props) => {
+  const [open, setOpen] = useState(false);
+
+  let icon = ``;
+  let text = <h2> </h2>;
+  switch (props.method) {
+    case `email`:
+      text = (
+        <h2 className="text-gray-700 text-lg">
+          Email <span className="font-bold">{props.email}</span> for{` `}
+          <span className="text-gray-900">{props.when}</span>
+        </h2>
+      );
+      icon = `envelope`;
       break;
-    case `Send an email`:
-      notificationInputs = [
-        {
-          type: `email`,
-          label: `Email address:`,
-          value: `foo@example.com`,
-          setValue: () => {},
-        },
-      ];
+    case `text`:
+      text = (
+        <h2 className="text-gray-700 text-lg">
+          Text <span className="font-bold">{props.number}</span> for{` `}
+          <span className="text-gray-900">{props.when}</span>
+        </h2>
+      );
+      icon = `mobile`;
       break;
-    case `Send a text message`:
-      notificationInputs = [
-        {
-          type: `text`,
-          label: `Phone number:`,
-          value: `(123) 456-7890`,
-          setValue: () => {},
-        },
-      ];
+    case `slack`:
+      text = (
+        <h2 className="text-gray-700 text-lg">
+          Slack <span className="font-bold">{props.channelName}</span> for{` `}
+          <span className="text-gray-900">{props.when}</span>
+        </h2>
+      );
+      icon = `slack`;
       break;
   }
 
   return (
-    <div className="bg-white p-8 rounded-xl shadow-md border my-4 relative overflow-hidden border-t-4 border-t-violet-500 max-w-5xl">
-      <div className="flex flex-col items-stretch relative z-20">
-        <h3 className="mb-2 text-gray-600 text-sm">Notify me upon:</h3>
-        <SelectMenu
-          options={[`Unlock requests`, `Filter suspension requests`]}
-          selectedOption={whenToNotify}
-          setSelected={setWhenToNotify}
+    <div className="shadow-lg border rounded-xl w-full sm:w-128 flex flex-col bg-white m-2 sm:m-4">
+      <div className="p-5">
+        <i
+          className={`fa fa-${icon} text-2xl mb-4 bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent [-webkit-background-clip:text;] w-min`}
         />
-        <h3 className="mt-4 mb-2 text-gray-600 text-sm">Via:</h3>
-        <SelectMenu
-          options={[`Send a Slack`, `Send an email`, `Send a text message`]}
-          selectedOption={howToNotify}
-          setSelected={setHowToNotify}
-        />
+        {text}
       </div>
-      <div className="flex flex-col sm:flex-row mt-8 relative z-10 space-y-4 sm:space-y-0 sm:space-x-4">
-        {notificationInputs.map((input) => (
-          <div className="flex-grow">
-            <h3 className="mb-1 text-gray-600 text-sm">{input.label}</h3>
-            <TextInput
-              type={input.type}
-              label={``}
-              value={input.value}
-              setValue={input.setValue}
-            />
-          </div>
-        ))}
+      <div
+        className={cx(
+          `p-4 space-y-4 -mt-4 [transition:150ms]`,
+          open ? `h-56` : `h-0 opacity-0 overflow-hidden`,
+        )}
+      >
+        <div>
+          <h3 className="mb-1 text-violet-800 font-medium text-md ml-1">Method:</h3>
+          <SelectMenu
+            options={[`Email me@example.com`, `Text (123) 456-7890`, `Slack #Gertrude`]}
+            selectedOption={`Email me@example.com`}
+            setSelected={() => {}}
+          />
+        </div>
+        <div>
+          <h3 className="mb-1 text-violet-800 font-medium text-md ml-1">Upon:</h3>
+          <SelectMenu
+            options={[`Suspension requests`, `Unlock requests`]}
+            selectedOption={`Suspension requests`}
+            setSelected={() => {}}
+          />
+        </div>
       </div>
-      <div className="flex justify-end items-center mt-8 border-t-2 pt-7 relative z-10">
+      <div className="bg-gray-100 rounded-b-xl flex justify-end items-center p-3">
         <Button
+          type="button"
+          onClick={() => setOpen(true)}
           color="secondary-white"
+          small
+          className={`${open ? `hidden` : `block`}`}
+        >
+          <i className="fa fa-pen mr-3" />
+          Edit
+        </Button>
+        <Button
           type="button"
           onClick={() => {}}
+          color="secondary-warning"
           small
-          className="mr-4"
+          className={`${open ? `hidden` : `block`} ml-3`}
         >
-          Duplicate
-        </Button>
-        <Button color="secondary-warning" type="button" onClick={() => {}} small>
+          <i className="fa fa-trash mr-3" />
           Delete
+        </Button>
+        <Button
+          type="button"
+          onClick={() => setOpen(false)}
+          color="secondary-white"
+          small
+          className={`${open ? `block` : `hidden`} mr-3`}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="button"
+          onClick={() => {}}
+          color="primary-violet"
+          small
+          className={`${open ? `block` : `hidden`}`}
+        >
+          Save
         </Button>
       </div>
     </div>
   );
 };
 
-const NotificationCardContainer: React.FC = () => {
-  const [whenToNotify, setWhenToNotify] = useState(`Unlock requests`);
-  const [howToNotify, setHowToNotify] = useState(`Send a Slack`);
-  return (
-    <NotificationCard
-      whenToNotify={whenToNotify}
-      setWhenToNotify={setWhenToNotify}
-      howToNotify={howToNotify}
-      setHowToNotify={setHowToNotify}
-    />
-  );
-};
-
-export default NotificationCardContainer;
+export default NotificationCard;

@@ -12,7 +12,7 @@ const MobileStickyHeader: React.FC<MobileStickyHeaderProps> = ({
   onHamburgerClick,
   sidebarShown,
 }) => (
-  <header className="h-16 sticky top-0 justify-between items-center px-1 py-4 shadow z-20 bg-gray-900 bg-gradient-to-b from-transparent via-transparent to-violet-900/70 md:hidden flex">
+  <header className="h-16 sticky top-0 justify-between items-center px-1 py-4 shadow z-30 bg-gray-900 bg-gradient-to-b from-transparent via-transparent to-violet-900/70 md:hidden flex">
     <button
       type="button"
       className="px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/40 rounded-md"
