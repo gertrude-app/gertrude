@@ -16,6 +16,7 @@ if (endpointIndex !== -1) {
   endpoint = process.argv[endpointIndex + 1];
 }
 
+exec(`rm -f ${CWD}/graphqlTypes.ts`);
 glob(`${CWD}/**/__generated__/**/*`).forEach((path) => exec(`rm -f ${path}`));
 
 log(c`{gray ${step++}/${numSteps}} {magenta Downloading schema...}`);
@@ -31,7 +32,12 @@ if (!success) {
 
 log(c`{gray ${step++}/${numSteps}} {magenta Downloading types...}`);
 success = exec.out(
-  `npx apollo client:codegen --passthroughCustomScalars --localSchemaFile=schema.graphql --target=typescript --tagName=gql`,
+  `npx apollo client:codegen
+    --passthroughCustomScalars
+    --localSchemaFile=schema.graphql
+    --globalTypesFile=src/graphqlTypes.ts
+    --target=typescript
+    --tagName=gql`.replace(/\n {4}/g, ` `),
   CWD,
 );
 
@@ -43,11 +49,13 @@ if (!success) {
 log(c`{gray ${step++}/${numSteps}} {magenta Cleaning up...}`);
 exec(`rm -f schema.graphql`, CWD);
 
+exec(`rmdir __generated__`, CWD);
+
+// prettier the codegen'd files
+const PRETTIER_FORMAT = `${CWD}/../node_modules/.bin/prettier --config ${CWD}/../.prettierrc.json --write`;
+exec.exit(`${PRETTIER_FORMAT} src/graphqlTypes.ts`);
 const typeDirs = glob(`${CWD}/**/__generated__/`);
-typeDirs.forEach((path) => {
-  const NPM_BIN = `${CWD}/../node_modules/.bin`;
-  exec.exit(`${NPM_BIN}/prettier --config ${CWD}/../.prettierrc.json --write ${path}`);
-});
+typeDirs.forEach((path) => exec.exit(`${PRETTIER_FORMAT} ${path}`));
 
 log(c`{gray ${step++}/${numSteps}} {magenta Converting dates to string...}`);
 convertDatesToString();

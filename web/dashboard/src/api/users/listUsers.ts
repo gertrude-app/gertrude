@@ -20,7 +20,11 @@ const QUERY = gql`
       }
       devices {
         id
-        hostname
+        isOnline
+        model {
+          family
+          title: shortDescription
+        }
       }
     }
   }
