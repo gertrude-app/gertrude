@@ -10,8 +10,8 @@ type Props =
 
 const NotificationMethod: React.FC<Props> = (props) => (
   <li className="px-4 py-2 flex justify-between items-center odd:bg-gray-100 rounded-lg max-w-4xl">
-    <h2 className="text-gray-700">
-      {capitalize(props.method)}
+    <h2 className="text-gray-700 capitalize">
+      {props.method}
       {` `}
       <span className="text-violet-700 font-medium">me@example.com</span>
     </h2>
@@ -22,7 +22,3 @@ const NotificationMethod: React.FC<Props> = (props) => (
 );
 
 export default NotificationMethod;
-
-function capitalize(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
