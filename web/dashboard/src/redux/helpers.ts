@@ -1,15 +1,31 @@
 export class Req {
-  static succeed<T>(payload: T | undefined = undefined): RequestState<T> {
+  static succeed<T>(payload: T): RequestState<T> {
     return { state: `succeeded`, payload };
   }
+
   static fail<T, E>(error: E | undefined = undefined): RequestState<T, E> {
     return { state: `failed`, error };
   }
+
   static ongoing<T, E>(): RequestState<T, E> {
     return { state: `ongoing` };
   }
+
   static idle<T, E>(): RequestState<T, E> {
     return { state: `idle` };
+  }
+
+  static map<T, E, NewT>(
+    req: RequestState<T, E>,
+    transform: (payload: T) => NewT,
+  ): RequestState<NewT, E> {
+    if (req.state === `succeeded`) {
+      return {
+        state: `succeeded`,
+        payload: transform(req.payload),
+      };
+    }
+    return req;
   }
 }
 

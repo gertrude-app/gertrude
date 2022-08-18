@@ -106,15 +106,15 @@ const UserCard: React.FC<Props> = ({
           Edit
         </h2>
       </button>
-      <button className="w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-200 rounded-br-xl">
+      <Link
+        to={`${id}/activity`}
+        className="w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-200 rounded-br-xl"
+      >
         <i className="fa fa-binoculars text-lg mr-3 text-gray-600" aria-hidden="true" />
-        <Link
-          to={`${id}/activity`}
-          className="text-gray-500 text-[15px] antialiased uppercase tracking-wide"
-        >
+        <span className="text-gray-500 text-[15px] antialiased uppercase tracking-wide">
           Activity
-        </Link>
-      </button>
+        </span>
+      </Link>
     </div>
   </div>
 );

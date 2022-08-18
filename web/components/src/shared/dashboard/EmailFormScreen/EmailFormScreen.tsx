@@ -4,7 +4,7 @@ import FullscreenGradientBg from '../FullscreenGradientBg';
 import Button from '../../Button';
 import TextInput from '../TextInput';
 import Logo from '../../Logo';
-import Loading from '../../Loading';
+import LoadingSpinner from '../../LoadingSpinner';
 
 type Props =
   | {
@@ -24,7 +24,7 @@ const EmailFormScreen: React.FC<Props> = (props) => {
     case `fetching`:
       return (
         <FullscreenGradientBg>
-          <Loading />
+          <LoadingSpinner />
         </FullscreenGradientBg>
       );
 

@@ -10,7 +10,7 @@ type Props = {
 const UserActivityOverviewScreen: React.FC<Props> = ({ userName, days }) => (
   <>
     <h1 className="font-lato mb-4 sm:mb-7 text-2xl sm:text-3xl text-gray-700">
-      {posessive(userName)} Activity:
+      {posessive(userName)} Activity
     </h1>
     {days.length > 0 ? (
       <div className="space-y-10">

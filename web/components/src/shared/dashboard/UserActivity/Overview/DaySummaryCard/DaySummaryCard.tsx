@@ -11,21 +11,29 @@ type Props = {
 
 const DaySummaryCard: React.FC<Props> = ({ date, numCompleted, numItems }) => {
   const [completed, setCompleted] = useState(0);
-  useEffect(() => setCompleted(numCompleted), [numCompleted]);
+  useEffect(() => {
+    setTimeout(() => setCompleted(numCompleted), 50);
+  }, [numCompleted]);
+
   return (
     <Link
-      to="/temp"
-      className={`block p-6 rounded-xl shadow-lg border bg-white relative hover:border-violet-400 transition cursor-pointer duration-100`}
+      to={formatDate(date, `url`)}
+      className={`block p-6 rounded-xl shadow-lg border bg-white hover:border-violet-400 transition cursor-pointer duration-100`}
     >
-      <h2 className="text-gray-700 text-lg mb-6 font-medium relative">
-        <span className="sm:hidden">{formatDate(date, `short`)}</span>
-        <span className="hidden sm:inline">{formatDate(date, `medium`)}</span>
-        {numCompleted === numItems && (
-          <PillBadge type="green" className="absolute right-0 top-0">
-            <i className="fa fa-check mr-1" /> Completed
-          </PillBadge>
-        )}
-      </h2>
+      <div className="flex items-center space-x-2 mb-4">
+        <i
+          className={`fa fa-calendar text-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent [-webkit-background-clip:text;] w-min`}
+        />
+        <h2 className="text-gray-700 grow text-lg font-medium relative">
+          <span className="sm:hidden">{formatDate(date, `short`)}</span>
+          <span className="hidden sm:inline">{formatDate(date, `medium`)}</span>
+          {numCompleted === numItems && (
+            <PillBadge type="green" className="absolute right-0 top-0">
+              <i className="fa fa-check mr-1" /> Completed
+            </PillBadge>
+          )}
+        </h2>
+      </div>
       <div className="h-4 shadow-inner bg-gray-200 rounded-full">
         <div
           className={`h-4 bg-gradient-to-br from-indigo-500 to-fuchsia-500 rounded-full [transition-property:width] duration-200 ease-in-out`}

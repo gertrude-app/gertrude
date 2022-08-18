@@ -4,7 +4,7 @@ type RequestState<T = void, E = ApiError> =
   | { state: 'idle' }
   | { state: 'ongoing' }
   | { state: 'failed'; error?: E }
-  | { state: 'succeeded'; payload?: T };
+  | { state: 'succeeded'; payload: T };
 
 type ActionableApiError = {
   type: 'actionable';

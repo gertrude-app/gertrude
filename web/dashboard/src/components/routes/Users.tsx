@@ -19,11 +19,7 @@ const Users: React.FC = () => {
   }
 
   if (request.state === `idle` || request.state === `ongoing`) {
-    return (
-      <div className="flex justify-center m-12">
-        <Loading />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

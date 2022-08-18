@@ -38,7 +38,7 @@ sync-clean:
 	rm -rf ./marketing/components/shared
 
 watchsync:
-	watchexec --restart --watch ./components/src/shared --exts tsx make sync
+	watchexec --restart --watch ./components/src/shared --exts tsx,ts make sync
 
 start-storybook:
 	cd components && npm run storybook

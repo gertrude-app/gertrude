@@ -4,6 +4,8 @@ export type ResultData<T, E> /* */ =
   | { type: 'success'; value: T }
   | { type: 'error'; error: E };
 
+type ExtractActionableError = (errors: GraphQLError[]) => ActionableApiError | undefined;
+
 export default class Result<T, E> {
   private constructor(public data: ResultData<T, E>) {}
 
@@ -39,11 +41,11 @@ export default class Result<T, E> {
 
   public mapApi<NewT>(
     mapSuccess: (value: T) => NewT,
-    mapErrorToActionable?: (errors: GraphQLError[]) => ActionableApiError | undefined,
+    extractActionable?: ExtractActionableError,
   ): Result<NewT, ApiError> {
     return this.map({
       success: mapSuccess,
-      error: (error) => toApiError(error, mapErrorToActionable),
+      error: (error) => toApiError(error, extractActionable),
     });
   }
 
@@ -85,6 +87,10 @@ export default class Result<T, E> {
     }
   }
 
+  public mapErrorToApi(extractActionable?: ExtractActionableError): Result<T, ApiError> {
+    return this.mapApi((value) => value, extractActionable);
+  }
+
   public mapErrorToVoid(): Result<T, void> {
     return this.mapError(() => void 0);
   }
@@ -94,7 +100,7 @@ export default class Result<T, E> {
 
 function toApiError(
   error: unknown,
-  toActionable?: (errors: GraphQLError[]) => ActionableApiError | undefined,
+  extractActionable?: ExtractActionableError,
 ): ApiError {
   if (!isGraphQLErrorArray(error)) {
     return {
@@ -115,7 +121,7 @@ function toApiError(
 
   // we're done with well-known, common api errors, so now give the caller
   // a chance to apply special logic to extract a user-actionable error
-  const actionable = (toActionable ?? (() => {}))(error);
+  const actionable = (extractActionable ?? (() => {}))(error);
   if (actionable) {
     return actionable;
   }

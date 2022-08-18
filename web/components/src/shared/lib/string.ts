@@ -6,6 +6,10 @@ export function inflect(word: string, count: number): string {
 }
 
 export function posessive(name: string): string {
+  if (name.trim() === ``) {
+    return name;
+  }
+
   if (name.endsWith(`s`)) {
     return `${name}’`;
   }
