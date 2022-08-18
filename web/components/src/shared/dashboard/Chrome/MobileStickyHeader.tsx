@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Logo from '../../Logo';
 
 interface MobileStickyHeaderProps {
+  className?: string;
   sidebarShown: boolean;
   onHamburgerClick(): unknown;
 }
@@ -11,8 +12,14 @@ interface MobileStickyHeaderProps {
 const MobileStickyHeader: React.FC<MobileStickyHeaderProps> = ({
   onHamburgerClick,
   sidebarShown,
+  className,
 }) => (
-  <header className="h-16 sticky top-0 justify-between items-center px-1 py-4 shadow z-30 bg-gray-900 bg-gradient-to-r from-transparent via-transparent to-violet-900/40 md:hidden flex">
+  <header
+    className={cx(
+      `h-[64px] top-0 justify-between items-center px-1 py-4 shadow z-30 bg-gray-900 bg-gradient-to-r from-transparent via-transparent to-violet-900/40 flex`,
+      className,
+    )}
+  >
     <button
       type="button"
       className="px-3 py-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/40 rounded-md"
