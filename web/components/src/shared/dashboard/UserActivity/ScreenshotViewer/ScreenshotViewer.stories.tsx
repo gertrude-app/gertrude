@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import ScreenshotViewer from './ScreenshotViewer';
 
 export default {
-  title: `Dashboard/Monitoring/ScreenshotViewer`,
+  title: `Dashboard/UserActivity/ScreenshotViewer`,
   component: ScreenshotViewer,
 } as ComponentMeta<typeof ScreenshotViewer>;
 

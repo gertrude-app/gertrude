@@ -34,7 +34,7 @@ const months = [
   `Dec`,
 ];
 
-const MonitoredDay: React.FC<Props> = ({
+const ActivityDay: React.FC<Props> = ({
   className,
   date,
   numCompleted,
@@ -66,4 +66,4 @@ const MonitoredDay: React.FC<Props> = ({
   </Link>
 );
 
-export default MonitoredDay;
+export default ActivityDay;
