@@ -15,8 +15,8 @@ const Users: React.FC<Props> = ({ users }) => (
       {users.length > 0 ? (
         <>
           <div className="mb-16 grid grid-cols-1 lg+:grid-cols-2 gap-10 lg+:gap-8 xl:gap-10 2xl:grid-cols-3">
-            {users.map(({ id, ...user }) => (
-              <UserCard key={id} {...user} />
+            {users.map((user) => (
+              <UserCard key={user.id} {...user} />
             ))}
           </div>
           <Button

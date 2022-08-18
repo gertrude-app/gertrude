@@ -2,8 +2,10 @@ import React from 'react';
 import cx from 'classnames';
 import { inflect } from '../../../lib/string';
 import UserDevice, { Props as UserDeviceProps } from '../UserDevice';
+import { Link } from 'react-router-dom';
 
 export type Props = {
+  id: string;
   name: string;
   numKeys: number;
   numKeychains: number;
@@ -13,6 +15,7 @@ export type Props = {
 };
 
 const UserCard: React.FC<Props> = ({
+  id,
   name,
   numKeys,
   numKeychains,
@@ -105,9 +108,12 @@ const UserCard: React.FC<Props> = ({
       </button>
       <button className="w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-200 rounded-br-xl">
         <i className="fa fa-binoculars text-lg mr-3 text-gray-600" aria-hidden="true" />
-        <h2 className="text-gray-500 text-[15px] antialiased uppercase tracking-wide">
-          Monitor
-        </h2>
+        <Link
+          to={`${id}/activity`}
+          className="text-gray-500 text-[15px] antialiased uppercase tracking-wide"
+        >
+          Activity
+        </Link>
       </button>
     </div>
   </div>
