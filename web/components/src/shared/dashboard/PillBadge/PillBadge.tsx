@@ -1,12 +1,14 @@
 import React from 'react';
+import cx from 'classnames';
 
 type Props = {
   className?: string;
+  small?: boolean;
   type: 'green' | 'ok' | 'warning' | 'yellow' | 'red' | 'error' | 'blue' | 'info';
   children: React.ReactNode;
 };
 
-const PillBadge: React.FC<Props> = ({ type, className, children }) => {
+const PillBadge: React.FC<Props> = ({ type, className, children, small }) => {
   let colors = ``;
 
   switch (type) {
@@ -29,7 +31,14 @@ const PillBadge: React.FC<Props> = ({ type, className, children }) => {
   }
 
   return (
-    <div className={`px-6 py-0.5 rounded-full max-w-fit ${colors} ${className}`}>
+    <div
+      className={cx(
+        `rounded-full max-w-fit`,
+        small ? `text-sm px-[16px] pt-[3px] pb-[4px]` : `px-6 py-0.5`,
+        colors,
+        className,
+      )}
+    >
       {children}
     </div>
   );

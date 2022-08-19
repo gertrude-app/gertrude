@@ -12,8 +12,14 @@ const All: React.FC = () => (
     <PillBadge type="info">info</PillBadge>
     <PillBadge type="blue">blue</PillBadge>
     <PillBadge type="ok">ok</PillBadge>
-    <PillBadge type="green">green</PillBadge>
-    <PillBadge type="warning">warning</PillBadge>
+    <PillBadge type="green">green standard</PillBadge>
+    <PillBadge type="green" small>
+      green small
+    </PillBadge>
+    <PillBadge type="warning">warning standard</PillBadge>
+    <PillBadge type="warning" small>
+      warning small
+    </PillBadge>
     <PillBadge type="yellow">yellow</PillBadge>
     <PillBadge type="error">error</PillBadge>
     <PillBadge type="red">red</PillBadge>
