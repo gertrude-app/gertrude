@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { OverviewScreen } from '@shared/dashboard/UserActivity/Overview';
+import ActivityOverview from '@shared/dashboard/Users/Activity/Overview';
+import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
-import Loading from '@shared/Loading';
 import { fetchActivityOverview } from '../../redux/slice-users';
 
 const UserActivityOverview: React.FC = () => {
@@ -23,7 +23,7 @@ const UserActivityOverview: React.FC = () => {
   }
 
   return (
-    <OverviewScreen
+    <ActivityOverview
       userName={request.payload.user.name ?? ``}
       days={request.payload.counts.map((data) => ({
         date: new Date(data.dateRange.start),

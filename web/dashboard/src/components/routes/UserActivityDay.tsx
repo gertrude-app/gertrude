@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ReviewDayScreen } from '@shared/dashboard/UserActivity/ReviewDay';
+import ReviewDay from '@shared/dashboard/Users/Activity/ReviewDay';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import Loading from '@shared/Loading';
@@ -25,7 +25,7 @@ const UserActivityDay: React.FC = () => {
     return <ApiErrorMessage error={request.error} />;
   }
 
-  return <ReviewDayScreen date={day} numReviewedItems={0} items={request.payload} />;
+  return <ReviewDay date={day} numReviewedItems={0} items={request.payload} />;
 };
 
 export default UserActivityDay;

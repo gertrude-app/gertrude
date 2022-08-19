@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import PillBadge from '../../PillBadge';
+import PillBadge from '../../../../PillBadge';
 
 export type Props = {
   model: string;

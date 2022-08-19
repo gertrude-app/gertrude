@@ -1,9 +1,9 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../../decorators/StatefulChrome';
-import UsersScreen from './UsersScreen';
+import UsersScreen from './ListUsers';
 
 export default {
-  title: `Dashboard/Users/UsersScreen`,
+  title: `Dashboard/Users/List`,
   component: UsersScreen,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
@@ -11,8 +11,8 @@ export default {
 
 const Template: ComponentStory<typeof UsersScreen> = (args) => <UsersScreen {...args} />;
 
-export const NoUsers = Template.bind({});
-NoUsers.args = { users: [] };
+export const Empty = Template.bind({});
+Empty.args = { users: [] };
 
 export const Default = Template.bind({});
 Default.args = {

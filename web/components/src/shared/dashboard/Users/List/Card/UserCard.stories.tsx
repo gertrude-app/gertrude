@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import UserCard from './UserCard';
 
 export default {
-  title: `Dashboard/Users/UserCard`,
+  title: `Dashboard/Users/List/Card`,
   component: UserCard,
 } as ComponentMeta<typeof UserCard>;
 

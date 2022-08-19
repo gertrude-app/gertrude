@@ -1,8 +1,8 @@
 import React from 'react';
 import Button from '../../../Button';
-import NoUsers from '../NoUsers';
 import PageHeading from '../../PageHeading';
-import UserCard, { Props as UserCardProps } from '../UserCard';
+import NoUsers from './NoUsers';
+import UserCard, { Props as UserCardProps } from './Card';
 
 type Props = {
   users: Array<UserCardProps & { id: string }>;

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { formatDate } from '@shared/lib/dates';
-import { ActivityItem } from '@shared/dashboard/UserActivity/ReviewDay/Screen/UserActivityReviewDayScreen';
+import { ActivityItem } from '@shared/dashboard/Users/Activity/ReviewDay';
 import Current from '../environment';
 import { GetActivityDay } from '../api/users/__generated__/GetActivityDay';
 import { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';

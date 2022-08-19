@@ -2,7 +2,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import DaySummaryCard from './DaySummaryCard';
 
 export default {
-  title: `Dashboard/UserActivity/DaySummaryCard`,
+  title: `Dashboard/Users/Activity/Overview/DaySummaryCard`,
   component: DaySummaryCard,
 } as ComponentMeta<typeof DaySummaryCard>;
 

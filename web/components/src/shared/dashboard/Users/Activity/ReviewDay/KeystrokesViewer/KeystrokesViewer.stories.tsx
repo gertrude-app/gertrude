@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import KeystrokesViewer from './KeystrokesViewer';
 
 export default {
-  title: `Dashboard/UserActivity/KeystrokesViewer`,
+  title: `Dashboard/Users/Activity/ReviewDay/KeystrokesViewer`,
   component: KeystrokesViewer,
 } as ComponentMeta<typeof KeystrokesViewer>;
 

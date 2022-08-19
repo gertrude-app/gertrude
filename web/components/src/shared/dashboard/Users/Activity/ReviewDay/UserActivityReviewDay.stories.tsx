@@ -1,16 +1,16 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../../../decorators/StatefulChrome';
-import UserActivityReviewDayScreen, { ActivityItem } from './UserActivityReviewDayScreen';
+import UserActivityReviewDay, { ActivityItem } from './UserActivityReviewDay';
 
 export default {
-  title: `Dashboard/UserActivity/ReviewDayScreen`,
-  component: UserActivityReviewDayScreen,
+  title: `Dashboard/Users/Activity/ReviewDay`,
+  component: UserActivityReviewDay,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
-} as ComponentMeta<typeof UserActivityReviewDayScreen>;
+} as ComponentMeta<typeof UserActivityReviewDay>;
 
-const Template: ComponentStory<typeof UserActivityReviewDayScreen> = (args) => (
-  <UserActivityReviewDayScreen {...args} />
+const Template: ComponentStory<typeof UserActivityReviewDay> = (args) => (
+  <UserActivityReviewDay {...args} />
 );
 
 export const Default = Template.bind({});

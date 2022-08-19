@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import Button from '../../../../Button';
 import PartyMessage from '../../../../PartyMessage';
 import { UndoMainPadding } from '../../../Chrome/Chrome';
-import KeystrokesViewer from '../KeystrokesViewer';
-import ScreenshotViewer from '../ScreenshotViewer';
+import KeystrokesViewer from './KeystrokesViewer';
+import ScreenshotViewer from './ScreenshotViewer';
 
 interface Screenshot {
   type: 'Screenshot';
@@ -31,11 +31,7 @@ interface Props {
   items: ActivityItem[];
 }
 
-const UserActivityReviewDayScreen: React.FC<Props> = ({
-  date,
-  numReviewedItems,
-  items,
-}) => (
+const UserActivityReviewDay: React.FC<Props> = ({ date, numReviewedItems, items }) => (
   <UndoMainPadding>
     <header className="flex zflex-col zsm:flex-row items-center justify-between py-4 px-6 border-b-2 bg-white">
       <div className="flex items-center text-md sm:text-l">
@@ -77,7 +73,7 @@ const UserActivityReviewDayScreen: React.FC<Props> = ({
   </UndoMainPadding>
 );
 
-export default UserActivityReviewDayScreen;
+export default UserActivityReviewDay;
 
 function renderItem(item: ActivityItem): JSX.Element {
   if (item.type === `Screenshot`) {

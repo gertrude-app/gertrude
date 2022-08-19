@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import Loading from '@shared/Loading';
-import UsersScreen from '@shared/dashboard/Users/UsersScreen';
+import ListUsers from '@shared/dashboard/Users/List';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { fetchUsers } from '../../redux/slice-users';
 import ApiErrorMessage from '../ApiErrorMessage';
@@ -23,7 +23,7 @@ const Users: React.FC = () => {
   }
 
   return (
-    <UsersScreen
+    <ListUsers
       users={Object.values(request.payload ?? {}).map((resource) => ({
         id: resource.id,
         name: resource.name,

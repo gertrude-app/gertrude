@@ -1,7 +1,7 @@
 import React, { ComponentProps } from 'react';
 import { posessive } from '../../../../lib/string';
 import PartyMessage from '../../../../PartyMessage';
-import ReviewSummaryCard from '../DaySummaryCard';
+import ReviewSummaryCard from './DaySummaryCard';
 
 type Props = {
   userName: string;

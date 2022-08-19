@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
-import { inflect } from '../../../lib/string';
-import UserDevice, { Props as UserDeviceProps } from '../UserDevice';
+import { inflect } from '../../../../lib/string';
+import UserDevice, { Props as UserDeviceProps } from './Device';
 import { Link } from 'react-router-dom';
 
 export type Props = {
