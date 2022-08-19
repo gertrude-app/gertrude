@@ -12,10 +12,25 @@ const Template: ComponentStory<typeof ScreenshotViewer> = (args) => (
 );
 
 export const Default = Template.bind({});
-Default.args = { image: `https://placekitten.com/800/600`, date: new Date() };
+Default.args = {
+  url: `https://placekitten.com/800/600`,
+  width: 800,
+  height: 600,
+  date: new Date(),
+};
 
 export const Tall = Template.bind({});
-Tall.args = { image: `https://placekitten.com/800/900`, date: new Date() };
+Tall.args = {
+  url: `https://placekitten.com/800/900`,
+  width: 800,
+  height: 900,
+  date: new Date(),
+};
 
 export const Wide = Template.bind({});
-Wide.args = { image: `https://placekitten.com/1200/400`, date: new Date() };
+Wide.args = {
+  url: `https://placekitten.com/1200/400`,
+  width: 1200,
+  height: 400,
+  date: new Date(),
+};

@@ -10,6 +10,7 @@ export interface ApiClient {
       userId: string,
       ranges?: DateRangeInput[],
     ): ReturnType<typeof users.getActivityOverview>;
+    getActivityDay(userId: string, day: Date): ReturnType<typeof users.getActivityDay>;
   };
   signup: {
     joinWaitlist(email: string): ReturnType<typeof signup.joinWaitlist>;
@@ -26,6 +27,9 @@ export const liveApiClient: ApiClient = {
       ranges?: DateRangeInput[],
     ): ReturnType<typeof users.getActivityOverview> {
       return users.getActivityOverview(userId, ranges);
+    },
+    getActivityDay(userId: string, day: Date): ReturnType<typeof users.getActivityDay> {
+      return users.getActivityDay(userId, day);
     },
   },
   signup: {
@@ -45,6 +49,9 @@ export const throwingApiClient: ApiClient = {
       _ranges?: DateRangeInput[],
     ): ReturnType<typeof users.getActivityOverview> {
       throw new Error(`ApiClient.users.getActivityOverview() not implemented.`);
+    },
+    getActivityDay(_userId: string, _day: Date): ReturnType<typeof users.getActivityDay> {
+      throw new Error(`ApiClient.users.getActivityDay() not implemented.`);
     },
   },
   signup: {
@@ -66,6 +73,9 @@ export const noopApiClient: ApiClient = {
       return Promise.resolve(
         Result.success({ user: { __typename: `User`, name: `` }, counts: [] }),
       );
+    },
+    getActivityDay(_userId: string, _day: Date): ReturnType<typeof users.getActivityDay> {
+      return Promise.resolve(Result.success([]));
     },
   },
   signup: {

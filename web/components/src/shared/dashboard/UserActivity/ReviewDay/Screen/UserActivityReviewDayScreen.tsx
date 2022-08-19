@@ -1,29 +1,33 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../../../Button';
+import { UndoMainPadding } from '../../../Chrome/Chrome';
 import KeystrokesViewer from '../KeystrokesViewer';
 import ScreenshotViewer from '../ScreenshotViewer';
 
-// temp
 interface Screenshot {
-  __typename: 'Screenshot';
-  id: UUID;
+  type: 'Screenshot';
   width: number;
   height: number;
   url: string;
 }
 
 interface KeystrokeLine {
-  __typename: 'KeystrokeLine';
-  id: UUID;
+  type: 'KeystrokeLine';
   appName: string;
   line: string;
 }
 
+export type ActivityItem = (Screenshot | KeystrokeLine) & {
+  id: UUID;
+  ids: UUID[];
+  date: string;
+};
+
 interface Props {
   date: Date;
   numReviewedItems: number;
-  items: Array<KeystrokeLine | Screenshot>;
+  items: ActivityItem[];
 }
 
 const UserActivityReviewDayScreen: React.FC<Props> = ({
@@ -31,35 +35,44 @@ const UserActivityReviewDayScreen: React.FC<Props> = ({
   numReviewedItems,
   items,
 }) => (
-  <main className="flex flex-col min-h-screen">
-    <header className="flex flex-col sm:flex-row itesm-center justify-between py-4 px-6 border-b-2 bg-gray-50">
-      <div className="flex items-center">
+  <UndoMainPadding>
+    <header className="flex zflex-col zsm:flex-row items-center justify-between py-4 px-6 border-b-2 bg-white">
+      <div className="flex items-center text-md sm:text-l">
         <Link
           to="/monitoring"
-          className="flex items-center mr-6 text-gray-500 hover:text-gray-600 transition duration-75 text-lg"
+          className="flex items-center mr-4 text-gray-400 antialiased hover:text-gray-600 transition duration-75"
         >
-          <i className="fa fa-chevron-left text-lg mr-2" /> Back
+          <i className="fa fa-chevron-left mr-2" aria-hidden /> Back
         </Link>
-        <h1 className="text-xl font-medium text-gray-800">{date.toLocaleDateString()}</h1>
+        <h1 className="font-medium text-gray-800">{date.toLocaleDateString()}</h1>
       </div>
-      <h3 className="text-gray-700 self-end sm:self-center mt-2 sm:mt-0">
-        <span className="font-bold text-lg">{numReviewedItems}</span> out of{` `}
-        <span className="font-bold text-lg">{items.length}</span> items reviewed
-      </h3>
+      <div className="text-gray-700 self-end sm:self-center flex items-center space-x-0.5 sm:space-x-1">
+        <span className="font-bold sm:text-lg">{numReviewedItems}</span>
+        <span className="hidden sm:inline">out of</span>
+        <span className="sm:hidden">/</span>
+        <span className="font-bold sm:text-lg">{items.length}</span>
+        <span className="hidden sm:inline">items reviewed</span>
+      </div>
     </header>
-    <div className="px-0 md:px-5 lg:px-10 py-5 md:py-10 bg-gray-200 md:bg-gray-50 flex-grow space-y-8 flex flex-col">
+    <div className="px-0 md:px-8 lg:px-10 py-5 md:py-10 bg-gray-200 md:bg-transparent flex-grow space-y-8 flex flex-col">
       {items.map((item) => {
-        // @TEMP
-        if (item.__typename === `Screenshot`) {
-          return <ScreenshotViewer key={item.id} image={item.url} date={date} />;
+        if (item.type === `Screenshot`) {
+          return (
+            <ScreenshotViewer
+              key={item.id}
+              url={item.url}
+              width={item.width}
+              height={item.width}
+              date={new Date(item.date)}
+            />
+          );
         } else {
           return (
             <KeystrokesViewer
               key={item.id}
               strokes={item.line}
               application={item.appName}
-              {...item}
-              date={date}
+              date={new Date(item.date)}
             />
           );
         }
@@ -73,7 +86,7 @@ const UserActivityReviewDayScreen: React.FC<Props> = ({
         Approve all
       </Button>
     </div>
-  </main>
+  </UndoMainPadding>
 );
 
 export default UserActivityReviewDayScreen;
