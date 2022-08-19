@@ -25,6 +25,9 @@ Default.args = {
   ],
 };
 
+export const Empty = Template.bind({});
+Empty.args = { ...Default.args, items: [] };
+
 // helpers
 
 function common(): { id: string; ids: string[]; date: string } {

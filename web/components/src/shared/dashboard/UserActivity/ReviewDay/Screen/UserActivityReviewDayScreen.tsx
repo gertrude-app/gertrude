@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../../../Button';
+import PartyMessage from '../../../../PartyMessage';
 import { UndoMainPadding } from '../../../Chrome/Chrome';
 import KeystrokesViewer from '../KeystrokesViewer';
 import ScreenshotViewer from '../ScreenshotViewer';
@@ -46,47 +47,57 @@ const UserActivityReviewDayScreen: React.FC<Props> = ({
         </Link>
         <h1 className="font-medium text-gray-800">{date.toLocaleDateString()}</h1>
       </div>
-      <div className="text-gray-700 self-end sm:self-center flex items-center space-x-0.5 sm:space-x-1">
-        <span className="font-bold sm:text-lg">{numReviewedItems}</span>
-        <span className="hidden sm:inline">out of</span>
-        <span className="sm:hidden">/</span>
-        <span className="font-bold sm:text-lg">{items.length}</span>
-        <span className="hidden sm:inline">items reviewed</span>
-      </div>
+      {items.length > 0 && (
+        <div className="text-gray-700 self-end sm:self-center flex items-center space-x-0.5 sm:space-x-1">
+          <span className="font-bold sm:text-lg">{numReviewedItems}</span>
+          <span className="hidden sm:inline">out of</span>
+          <span className="sm:hidden">/</span>
+          <span className="font-bold sm:text-lg">{items.length}</span>
+          <span className="hidden sm:inline">items reviewed</span>
+        </div>
+      )}
     </header>
-    <div className="px-0 md:px-8 lg:px-10 py-5 md:py-10 bg-gray-200 md:bg-transparent flex-grow space-y-8 flex flex-col">
-      {items.map((item) => {
-        if (item.type === `Screenshot`) {
-          return (
-            <ScreenshotViewer
-              key={item.id}
-              url={item.url}
-              width={item.width}
-              height={item.width}
-              date={new Date(item.date)}
-            />
-          );
-        } else {
-          return (
-            <KeystrokesViewer
-              key={item.id}
-              strokes={item.line}
-              application={item.appName}
-              date={new Date(item.date)}
-            />
-          );
-        }
-      })}
-      <Button
-        className="self-center"
-        type="button"
-        onClick={() => {}}
-        color="primary-violet"
-      >
-        Approve all
-      </Button>
-    </div>
+    {items.length > 0 ? (
+      <div className="px-0 md:px-8 lg:px-10 py-5 md:py-10 bg-gray-200 md:bg-transparent flex-grow space-y-8 flex flex-col">
+        {items.map(renderItem)}
+        <Button
+          className="self-center"
+          type="button"
+          onClick={() => {}}
+          color="primary-violet"
+        >
+          Approve all
+        </Button>
+      </div>
+    ) : (
+      <div className="flex justify-center p-8">
+        <PartyMessage>Nothing to review for this day</PartyMessage>
+      </div>
+    )}
   </UndoMainPadding>
 );
 
 export default UserActivityReviewDayScreen;
+
+function renderItem(item: ActivityItem): JSX.Element {
+  if (item.type === `Screenshot`) {
+    return (
+      <ScreenshotViewer
+        key={item.id}
+        url={item.url}
+        width={item.width}
+        height={item.width}
+        date={new Date(item.date)}
+      />
+    );
+  } else {
+    return (
+      <KeystrokesViewer
+        key={item.id}
+        strokes={item.line}
+        application={item.appName}
+        date={new Date(item.date)}
+      />
+    );
+  }
+}
