@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 const EditUser: React.FC = () => {
   // temp state:
   const [title, setTitle] = useState('John Doe');
+  const [resolution, setResolution] = useState('1000');
+  const [frequency, setFrequency] = useState('60');
   const [keylogging, setKeylogging] = useState(false);
   const [screenshots, setScreenshots] = useState(false);
   const devices: Array<{
@@ -61,7 +63,11 @@ const EditUser: React.FC = () => {
             </div>
             <Toggle enabled={keylogging} setEnabled={setKeylogging} />
           </div>
-          <div className="bg-gray-100 my-3 p-6 rounded-xl">
+          <div
+            className={`bg-gray-100 my-3 p-6 rounded-xl overflow-hidden relative [transition:150ms] ${
+              screenshots ? 'h-[200px]' : 'h-[90px]'
+            }`}
+          >
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="font-medium text-gray-700">Enable screenshots</h3>
@@ -71,7 +77,28 @@ const EditUser: React.FC = () => {
               </div>
               <Toggle enabled={screenshots} setEnabled={setScreenshots} />
             </div>
-            <div className={``}></div>
+            <div
+              className={`flex mt-5 transition duration-150 ${
+                screenshots ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <TextInput
+                type={'number'}
+                label={'Resolution'}
+                value={resolution}
+                setValue={setResolution}
+                unit="pixels"
+                className="mr-3"
+              />
+              <TextInput
+                type={'number'}
+                label={'Frequency'}
+                value={frequency}
+                setValue={setFrequency}
+                unit="seconds"
+                className="ml-3"
+              />
+            </div>
           </div>
         </div>
       </div>
