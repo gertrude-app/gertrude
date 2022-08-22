@@ -1,10 +1,13 @@
 import TextInput from '@shared/dashboard/TextInput';
+import Toggle from '@shared/dashboard/Toggle';
 import UserDevice from '@shared/dashboard/Users/UserDevice';
 import React, { useState } from 'react';
 
 const EditUser: React.FC = () => {
   // temp state:
   const [title, setTitle] = useState('John Doe');
+  const [keylogging, setKeylogging] = useState(false);
+  const [screenshots, setScreenshots] = useState(false);
   const devices: Array<{
     id: string;
     model: string;
@@ -29,7 +32,7 @@ const EditUser: React.FC = () => {
         />
         <h2 className="mt-5 text-lg font-bold text-gray-700">3 devices:</h2>
         <div className="flex flex-col">
-          {devices.map((device, index) => (
+          {devices.map((device) => (
             <div key={device.id} className="flex items-center mt-3">
               <UserDevice
                 model={device.model}
@@ -37,7 +40,7 @@ const EditUser: React.FC = () => {
                 icon={device.icon}
                 className="flex-grow mr-3"
               />
-              <div className="flex justify-center items-center w-10 h-10 rounded-full hover:bg-gray-100 cursor-pointer text-gray-500 hover:text-red-500">
+              <div className="transition duration-100 flex justify-center items-center w-10 h-10 rounded-full hover:bg-gray-100 cursor-pointer text-gray-500 hover:text-red-500">
                 <i className="fa fa-trash" />
               </div>
             </div>
@@ -46,6 +49,30 @@ const EditUser: React.FC = () => {
             <i className="fa fa-plus mr-2" />
             Add device
           </button>
+        </div>
+        <div className="mt-4">
+          <h2 className="text-lg font-bold text-gray-700">Monitoring</h2>
+          <div className="flex justify-between items-center bg-gray-100 my-3 p-6 rounded-xl">
+            <div>
+              <h3 className="font-medium text-gray-700">Enable keylogging</h3>
+              <p className="text-gray-500 text-sm">
+                Sends reports of all keystrokes to your review
+              </p>
+            </div>
+            <Toggle enabled={keylogging} setEnabled={setKeylogging} />
+          </div>
+          <div className="bg-gray-100 my-3 p-6 rounded-xl">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="font-medium text-gray-700">Enable screenshots</h3>
+                <p className="text-gray-500 text-sm">
+                  Periodically take a screenshot and upload for your review
+                </p>
+              </div>
+              <Toggle enabled={screenshots} setEnabled={setScreenshots} />
+            </div>
+            <div className={``}></div>
+          </div>
         </div>
       </div>
     </div>
