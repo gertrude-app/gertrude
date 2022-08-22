@@ -25,5 +25,5 @@ export const WithUnit = Template.bind({});
 WithUnit.args = {
   type: `email`,
   label: `Interval`,
-  unit: 'seconds',
+  unit: `seconds`,
 };

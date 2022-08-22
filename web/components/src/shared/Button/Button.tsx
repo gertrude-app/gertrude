@@ -79,14 +79,14 @@ const Button: React.FC<Props> = ({
 
   if (props.type === `external`) {
     return (
-      <a className={classes} href={disabled ? '' : props.href}>
+      <a className={classes} href={disabled ? `.` : props.href}>
         {props.children}
       </a>
     );
   }
 
   return (
-    <Link className={classes} to={disabled ? '' : props.to}>
+    <Link className={classes} to={disabled ? `` : props.to}>
       {props.children}
     </Link>
   );
