@@ -78,6 +78,7 @@ const UserCard: React.FC<Props> = ({
                 model={device.model}
                 status={device.status}
                 icon={device.icon}
+                className="mt-3"
               />
             ))}
           </div>

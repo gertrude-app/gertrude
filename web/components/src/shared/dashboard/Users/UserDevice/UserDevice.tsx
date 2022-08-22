@@ -5,10 +5,13 @@ export type Props = {
   model: string;
   status: 'online' | 'offline';
   icon: 'desktop' | 'laptop';
+  className?: string;
 };
 
-const UserDevice: React.FC<Props> = ({ model, status, icon }) => (
-  <div className="border rounded-full p-2 pr-4 shadow bg-white hover:bg-gray-50 cursor-pointer duration-75 transition mt-3">
+const UserDevice: React.FC<Props> = ({ model, status, icon, className }) => (
+  <div
+    className={`border rounded-full p-2 pr-4 shadow bg-white hover:bg-gray-50 cursor-pointer duration-75 transition ${className}`}
+  >
     <div className="flex justify-between items-center">
       <div className="flex items-center">
         <div className="flex justify-center items-center w-10 h-10 mr-3 bg-gradient-to-br from-indigo-500 to-fuchsia-500 rounded-full">
