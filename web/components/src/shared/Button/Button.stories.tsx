@@ -12,35 +12,51 @@ export default {
 
 type ButtonColor = React.ComponentProps<typeof Button>['color'];
 
-const ButtonStory: React.FC<{ color: ButtonColor }> = ({ color }) => (
+const ButtonStory: React.FC<{ color: ButtonColor; disabled?: boolean }> = ({
+  color,
+  disabled = false,
+}) => (
   <div className={`${bgColor(color)} p-10 space-y-5`}>
     <div className="space-y-2">
       <h2>As a button:</h2>
-      <Button type="button" color={color} onClick={() => {}}>
+      <Button type="button" disabled={disabled} color={color} onClick={() => {}}>
         Join the waitlist
       </Button>
     </div>
     <div className="space-y-2">
       <h2>As a link:</h2>
-      <Button type="link" color={color} to="">
+      <Button type="link" disabled={disabled} color={color} to="">
         Join the waitlist
       </Button>
     </div>
     <div className="space-y-2">
       <h2>Full width:</h2>
-      <Button type="button" fullWidth color={color} onClick={() => {}}>
+      <Button
+        type="button"
+        disabled={disabled}
+        fullWidth
+        color={color}
+        onClick={() => {}}
+      >
         Join the waitlist
       </Button>
     </div>
     <div className="space-y-2">
       <h2>Small:</h2>
-      <Button type="button" small color={color} onClick={() => {}}>
+      <Button type="button" disabled={disabled} small color={color} onClick={() => {}}>
         Join the waitlist
       </Button>
     </div>
     <div className="space-y-2">
       <h2>Small & Full width:</h2>
-      <Button type="button" fullWidth small color={color} onClick={() => {}}>
+      <Button
+        type="button"
+        disabled={disabled}
+        fullWidth
+        small
+        color={color}
+        onClick={() => {}}
+      >
         Join the waitlist
       </Button>
     </div>
@@ -52,6 +68,7 @@ export const PrimaryWhite = () => <ButtonStory color="primary-white" />;
 export const SecondaryWhite = () => <ButtonStory color="secondary-white" />;
 export const SecondaryViolet = () => <ButtonStory color="secondary-violet" />;
 export const SecondaryWarning = () => <ButtonStory color="secondary-warning" />;
+export const Disabled = () => <ButtonStory color="secondary-warning" disabled />;
 
 function bgColor(color: ButtonColor) {
   switch (color) {
