@@ -71,6 +71,12 @@ build-dashboard: sync
 
 # ci type things
 
+test:
+	cd dashboard && npx vitest run
+
+test-watch:
+	cd dashboard && npx vitest watch
+
 format:
 	npx prettier --config ./.prettierrc.json --loglevel warn --write .
 
@@ -104,6 +110,7 @@ check:
 	make lint
 	make format-check
 	make ts-check
+	make test
 
 # helpers
 
@@ -120,6 +127,7 @@ ALL_CMDS = \
   start-storybook start-marketing start-dashboard \
   build-storybook build-marketing build-dashboard \
   fix ts-watch ts-check lint lint-fix format format-check check \
+  test test-watch \
   codegen
 
 .PHONY: $(ALL_CMDS)

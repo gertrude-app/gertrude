@@ -17,8 +17,14 @@ export interface Environment {
 export const live: Environment = {
   api: liveApiClient,
   env: new LiveEnvironment(),
-  localStorage: new LiveStorage(window.localStorage),
-  sessionStorage: new LiveStorage(window.sessionStorage),
+  localStorage:
+    typeof window !== `undefined`
+      ? new LiveStorage(window.localStorage)
+      : new ThrowingStorage(`local`),
+  sessionStorage:
+    typeof window !== `undefined`
+      ? new LiveStorage(window.sessionStorage)
+      : new ThrowingStorage(`session`),
 };
 
 export const throwing: Environment = {
@@ -35,6 +41,6 @@ export const noop: Environment = {
   sessionStorage: new NoopStorage(),
 };
 
-const Current = live;
+const Current = import.meta.env.VITEST ? throwing : live;
 
 export default Current;

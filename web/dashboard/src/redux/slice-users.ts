@@ -19,7 +19,7 @@ export interface UsersState {
   activityDays: Record<ActivityDayKey, RequestState<ActivityDay>>;
 }
 
-const initialState: UsersState = {
+export const initialState: UsersState = {
   listReq: Req.idle(),
   activityOverviews: {},
   activityDays: {},
@@ -161,6 +161,7 @@ export function deleteActivityItems(
       const item = day.items[id];
       return item?.ids.map((id) => ({ id, type: item?.type ?? `Screenshot` })) ?? [];
     });
+
     await Current.api.users.deleteActivityItems(userId, apiItems);
   };
 }
