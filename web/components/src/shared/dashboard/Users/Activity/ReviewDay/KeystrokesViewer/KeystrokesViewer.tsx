@@ -20,7 +20,7 @@ const KeystrokesViewer: React.FC<Props> = ({
   <div
     className={`border-y md:border-x2 md:rounded-xl md:shadow-lg bg-white max-w-7xl ${className}`}
   >
-    <div className="flex justify-between pt-3 px-5 rounded-t-xl bg-zred-400">
+    <div className="flex justify-between pt-3 px-5 rounded-t-xl">
       <h2 className="text-gray-600 font-medium -ml-0.5">
         Application: <span className="font-bold text-violet-700">{application}</span>
       </h2>

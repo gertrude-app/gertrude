@@ -42,7 +42,7 @@ const UserActivityReviewDay: React.FC<Props> = ({
   chunkSize = 100,
 }) => (
   <UndoMainPadding>
-    <header className="flex zflex-col zsm:flex-row items-center justify-between py-4 px-6 border-b-2 bg-white">
+    <header className="flex items-center justify-between py-4 px-6 border-b-2 bg-white">
       <div className="flex items-center text-md sm:text-l">
         <Link
           to="../"
