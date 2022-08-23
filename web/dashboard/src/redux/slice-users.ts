@@ -8,10 +8,15 @@ import { ListUsers_user } from '../api/users/__generated__/ListUsers';
 import { Req, toMap } from './helpers';
 import { ThunkAction } from './hooks';
 
+interface ActivityDay {
+  numDeleted: number;
+  items: Record<UUID, ActivityItem>;
+}
+
 export interface UsersState {
   listReq: RequestState<Record<UUID, ListUsers_user>>;
   activityOverviews: Record<UUID, RequestState<GetActivityOverview>>;
-  activityDays: Record<ActivityDayKey, RequestState<Record<UUID, ActivityItem>>>;
+  activityDays: Record<ActivityDayKey, RequestState<ActivityDay>>;
 }
 
 const initialState: UsersState = {
@@ -46,12 +51,14 @@ export const slice = createSlice({
       action: PayloadAction<{ key: ActivityDayKey; ids: UUID[] }>,
     ) => {
       const { key, ids } = action.payload;
-      const items = Req.payload(state.activityDays[key]);
-      if (!items) {
+      const day = Req.payload(state.activityDays[key]);
+      if (!day) {
         return;
       }
+
+      day.numDeleted += ids.length;
       for (const id of ids) {
-        const item = items[id];
+        const item = day.items[id];
         if (item) {
           item.deleted = true;
         }
@@ -62,35 +69,38 @@ export const slice = createSlice({
       state,
       action: PayloadAction<{
         key: ActivityDayKey;
-        req: RequestState<GetActivityDay['items']>;
+        req: RequestState<GetActivityDay>;
       }>,
     ) => {
-      state.activityDays[action.payload.key] = Req.map(action.payload.req, (items) =>
-        toMap(
-          items.map((item) => {
-            if (item.__typename === `CoalescedKeystrokeLine`) {
-              return {
-                type: `KeystrokeLine`,
-                id: item.id,
-                ids: item.ids,
-                appName: item.appName,
-                line: item.line,
-                date: item.createdAt,
-              };
-            } else {
-              return {
-                type: `Screenshot`,
-                id: item.id,
-                ids: item.ids,
-                url: item.url,
-                width: item.width,
-                height: item.height,
-                date: item.createdAt,
-              };
-            }
-          }),
-        ),
-      );
+      state.activityDays[action.payload.key] = Req.map(action.payload.req, (day) => {
+        return {
+          numDeleted: day.counts[0]?.numDeleted ?? 0,
+          items: toMap(
+            day.items.map((item) => {
+              if (item.__typename === `CoalescedKeystrokeLine`) {
+                return {
+                  type: `KeystrokeLine`,
+                  id: item.id,
+                  ids: item.ids,
+                  appName: item.appName,
+                  line: item.line,
+                  date: item.createdAt,
+                };
+              } else {
+                return {
+                  type: `Screenshot`,
+                  id: item.id,
+                  ids: item.ids,
+                  url: item.url,
+                  width: item.width,
+                  height: item.height,
+                  date: item.createdAt,
+                };
+              }
+            }),
+          ),
+        };
+      });
     },
   },
 });
@@ -141,14 +151,14 @@ export function deleteActivityItems(
 ): ThunkAction {
   return async (dispatch, getState) => {
     const key = activityDayKey(userId, date);
-    const items = Req.payload(getState().users.activityDays[key]);
-    if (!items) {
+    const day = Req.payload(getState().users.activityDays[key]);
+    if (!day) {
       return;
     }
 
     dispatch(activityItemsDeleted({ key, ids: itemRootIds }));
     const apiItems = itemRootIds.flatMap((id) => {
-      const item = items[id];
+      const item = day.items[id];
       return item?.ids.map((id) => ({ id, type: item?.type ?? `Screenshot` })) ?? [];
     });
     await Current.api.users.deleteActivityItems(userId, apiItems);

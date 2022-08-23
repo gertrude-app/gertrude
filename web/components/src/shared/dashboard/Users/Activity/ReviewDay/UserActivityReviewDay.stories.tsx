@@ -23,7 +23,7 @@ Default.args = {
     screenshot(),
     screenshot(),
   ],
-  numPreviouslyDeleted: 0,
+  numDeleted: 0,
   deleteItems: () => {},
 };
 

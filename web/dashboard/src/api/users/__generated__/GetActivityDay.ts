@@ -7,6 +7,11 @@
 // GraphQL query operation: GetActivityDay
 // ====================================================
 
+export interface GetActivityDay_counts {
+  __typename: 'MonitoringRangeCounts';
+  numDeleted: number;
+}
+
 export interface GetActivityDay_items_CoalescedKeystrokeLine {
   __typename: 'CoalescedKeystrokeLine';
   id: string;
@@ -31,6 +36,7 @@ export type GetActivityDay_items =
   | GetActivityDay_items_Screenshot;
 
 export interface GetActivityDay {
+  counts: GetActivityDay_counts[];
   items: GetActivityDay_items[];
 }
 

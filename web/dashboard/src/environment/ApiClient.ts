@@ -43,7 +43,7 @@ export const noopApiClient: ApiClient = {
       return Result.success({ user: { __typename: `User`, name: `` }, counts: [] });
     },
     getActivityDay: async () => {
-      return Result.success([]);
+      return Result.success({ counts: [], items: [] });
     },
     deleteActivityItems: async () => {
       return Result.success([]);

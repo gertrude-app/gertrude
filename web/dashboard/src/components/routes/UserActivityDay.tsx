@@ -4,6 +4,7 @@ import ReviewDay from '@shared/dashboard/Users/Activity/ReviewDay';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import Loading from '@shared/Loading';
+import * as typesafe from '../../lib/typesafe';
 import {
   deleteActivityItems,
   fetchActivityDay,
@@ -32,9 +33,9 @@ const UserActivityDay: React.FC = () => {
   return (
     <ReviewDay
       date={day}
-      numPreviouslyDeleted={0}
+      numDeleted={request.payload.numDeleted}
       deleteItems={(ids) => dispatch(deleteActivityItems(userId, day, ids))}
-      items={Object.values(request.payload)}
+      items={typesafe.objectValues(request.payload.items)}
     />
   );
 };
