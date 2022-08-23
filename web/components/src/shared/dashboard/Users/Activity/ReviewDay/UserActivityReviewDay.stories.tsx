@@ -30,6 +30,23 @@ Default.args = {
 export const Empty = Template.bind({});
 Empty.args = { ...Default.args, items: [] };
 
+export const Chunked = Template.bind({});
+Chunked.args = {
+  ...Default.args,
+  chunkSize: 3,
+  items: [
+    keystrokeLine(`Xcode`, `import Foundation`),
+    keystrokeLine(`Brave`, `Hello world`),
+    screenshot(600, 200),
+    keystrokeLine(`Xcode`, `import Foundation`),
+    screenshot(600, 200),
+    keystrokeLine(`Brave`, `Hello world`),
+    screenshot(600, 200),
+    screenshot(600, 200),
+    keystrokeLine(`Xcode`, `import Foundation`),
+  ],
+};
+
 // helpers
 
 function common(): { id: string; ids: string[]; date: string } {

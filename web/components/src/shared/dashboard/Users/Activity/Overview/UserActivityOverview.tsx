@@ -1,6 +1,7 @@
 import React, { ComponentProps } from 'react';
 import { posessive } from '../../../../lib/string';
 import PartyMessage from '../../../../PartyMessage';
+import PageHeading from '../../../PageHeading';
 import ReviewSummaryCard from './DaySummaryCard';
 
 type Props = {
@@ -10,9 +11,9 @@ type Props = {
 
 const UserActivityOverviewScreen: React.FC<Props> = ({ userName, days }) => (
   <>
-    <h1 className="font-lato mb-4 sm:mb-7 text-2xl sm:text-3xl text-gray-700">
+    <PageHeading icon="user" className="mb-4 sm:mb-7">
       {posessive(userName)} Activity
-    </h1>
+    </PageHeading>
     {days.length > 0 ? (
       <div className="space-y-10">
         {days.map((day) => (
