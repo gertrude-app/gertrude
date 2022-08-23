@@ -6,10 +6,17 @@ type Props = {
   className?: string;
   strokes: string;
   date: Date;
+  onApprove(): unknown;
   application: string;
 };
 
-const KeystrokesViewer: React.FC<Props> = ({ className, strokes, date, application }) => (
+const KeystrokesViewer: React.FC<Props> = ({
+  className,
+  strokes,
+  date,
+  application,
+  onApprove,
+}) => (
   <div
     className={`border-y md:border-x2 md:rounded-xl md:shadow-lg bg-white max-w-7xl ${className}`}
   >
@@ -25,7 +32,7 @@ const KeystrokesViewer: React.FC<Props> = ({ className, strokes, date, applicati
     </div>
     <div className="p-4 pt-0 flex justify-between">
       <ActivityItemTime date={date} />
-      <Button color="secondary-white" small type="button" onClick={() => {}}>
+      <Button color="secondary-white" small type="button" onClick={onApprove}>
         Approve
       </Button>
     </div>

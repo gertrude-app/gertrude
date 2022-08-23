@@ -4,7 +4,11 @@ import ReviewDay from '@shared/dashboard/Users/Activity/ReviewDay';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import Loading from '@shared/Loading';
-import { fetchActivityDay, activityDayKey } from '../../redux/slice-users';
+import {
+  deleteActivityItems,
+  fetchActivityDay,
+  activityDayKey,
+} from '../../redux/slice-users';
 
 const UserActivityDay: React.FC = () => {
   const { userId = ``, date = `` } = useParams<{ userId: string; date: string }>();
@@ -25,7 +29,14 @@ const UserActivityDay: React.FC = () => {
     return <ApiErrorMessage error={request.error} />;
   }
 
-  return <ReviewDay date={day} numReviewedItems={0} items={request.payload} />;
+  return (
+    <ReviewDay
+      date={day}
+      numPreviouslyDeleted={0}
+      deleteItems={(ids) => dispatch(deleteActivityItems(userId, day, ids))}
+      items={Object.values(request.payload)}
+    />
+  );
 };
 
 export default UserActivityDay;

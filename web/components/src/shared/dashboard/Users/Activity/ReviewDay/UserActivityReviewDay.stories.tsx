@@ -16,13 +16,15 @@ const Template: ComponentStory<typeof UserActivityReviewDay> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   date: new Date(),
-  numReviewedItems: 0,
   items: [
+    screenshot(400, 600, true),
     keystrokeLine(`Brave`, `Hello world`),
     keystrokeLine(`Xcode`, `import Foundation`),
     screenshot(),
     screenshot(),
   ],
+  numPreviouslyDeleted: 0,
+  deleteItems: () => {},
 };
 
 export const Empty = Template.bind({});
@@ -35,21 +37,23 @@ function common(): { id: string; ids: string[]; date: string } {
   return { id: `${current}`, ids: [`${current}`], date: new Date().toISOString() };
 }
 
-function keystrokeLine(appName: string, line: string): ActivityItem {
+function keystrokeLine(appName: string, line: string, deleted?: boolean): ActivityItem {
   return {
     ...common(),
     type: `KeystrokeLine`,
     appName,
     line,
+    deleted,
   };
 }
 
-function screenshot(width = 800, height = 270): ActivityItem {
+function screenshot(width = 800, height = 270, deleted?: boolean): ActivityItem {
   return {
     ...common(),
     type: `Screenshot`,
     url: `https://placekitten.com/${width}/${height}`,
     width,
     height,
+    deleted,
   };
 }

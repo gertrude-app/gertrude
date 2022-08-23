@@ -1,1 +1,2 @@
-export { default, type ActivityItem } from './UserActivityReviewDay';
+export { default } from './UserActivityReviewDay';
+export type { ActivityItem } from './UserActivityReviewDay';

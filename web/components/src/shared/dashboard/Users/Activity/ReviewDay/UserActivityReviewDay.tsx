@@ -23,15 +23,22 @@ export type ActivityItem = (Screenshot | KeystrokeLine) & {
   id: UUID;
   ids: UUID[];
   date: string;
+  deleted?: boolean;
 };
 
 interface Props {
   date: Date;
-  numReviewedItems: number;
   items: ActivityItem[];
+  numPreviouslyDeleted: number;
+  deleteItems(ids: UUID[]): unknown;
 }
 
-const UserActivityReviewDay: React.FC<Props> = ({ date, numReviewedItems, items }) => (
+const UserActivityReviewDay: React.FC<Props> = ({
+  date,
+  items,
+  numPreviouslyDeleted,
+  deleteItems,
+}) => (
   <UndoMainPadding>
     <header className="flex zflex-col zsm:flex-row items-center justify-between py-4 px-6 border-b-2 bg-white">
       <div className="flex items-center text-md sm:text-l">
@@ -45,17 +52,23 @@ const UserActivityReviewDay: React.FC<Props> = ({ date, numReviewedItems, items 
       </div>
       {items.length > 0 && (
         <div className="text-gray-700 self-end sm:self-center flex items-center space-x-0.5 sm:space-x-1">
-          <span className="font-bold sm:text-lg">{numReviewedItems}</span>
+          <span className="font-bold sm:text-lg">
+            {numPreviouslyDeleted + items.filter((item) => item.deleted).length}
+          </span>
           <span className="hidden sm:inline">out of</span>
           <span className="sm:hidden">/</span>
-          <span className="font-bold sm:text-lg">{items.length}</span>
+          <span className="font-bold sm:text-lg">
+            {numPreviouslyDeleted + items.length}
+          </span>
           <span className="hidden sm:inline">items reviewed</span>
         </div>
       )}
     </header>
     {items.length > 0 ? (
       <div className="px-0 md:px-8 lg:px-10 py-5 md:py-10 bg-gray-200 md:bg-transparent flex-grow space-y-8 flex flex-col">
-        {items.map(renderItem)}
+        {items
+          .filter((item) => !item.deleted)
+          .map((item) => renderItem(item, () => deleteItems([item.id])))}
         <Button
           className="self-center"
           type="button"
@@ -75,14 +88,15 @@ const UserActivityReviewDay: React.FC<Props> = ({ date, numReviewedItems, items 
 
 export default UserActivityReviewDay;
 
-function renderItem(item: ActivityItem): JSX.Element {
+function renderItem(item: ActivityItem, deleteItem: () => unknown): JSX.Element {
   if (item.type === `Screenshot`) {
     return (
       <ScreenshotViewer
         key={item.id}
         url={item.url}
         width={item.width}
-        height={item.width}
+        height={item.height}
+        onApprove={deleteItem}
         date={new Date(item.date)}
       />
     );
@@ -92,6 +106,7 @@ function renderItem(item: ActivityItem): JSX.Element {
         key={item.id}
         strokes={item.line}
         application={item.appName}
+        onApprove={deleteItem}
         date={new Date(item.date)}
       />
     );

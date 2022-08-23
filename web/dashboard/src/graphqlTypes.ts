@@ -28,6 +28,11 @@ export interface DateRangeInput {
   start: string;
 }
 
+export interface DeleteMonitoringItemInput {
+  id: UUID;
+  type: string;
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================

@@ -27,6 +27,22 @@ export class Req {
     }
     return req;
   }
+
+  static payload<T, E>(req: RequestState<T, E> | undefined): T | undefined {
+    if (req && req.state === `succeeded`) {
+      return req.payload;
+    }
+    return undefined;
+  }
+
+  static withPayload<T, E>(
+    req: RequestState<T, E> | undefined,
+    handler: (payload: T) => unknown,
+  ): void {
+    if (req && req.state === `succeeded`) {
+      handler(req.payload);
+    }
+  }
 }
 
 export function toMap<T extends { id: string }>(array: T[]): Record<string, T> {

@@ -6,11 +6,12 @@ import { GetActivityDay } from '../api/users/__generated__/GetActivityDay';
 import { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
 import { ListUsers_user } from '../api/users/__generated__/ListUsers';
 import { Req, toMap } from './helpers';
+import { ThunkAction } from './hooks';
 
 export interface UsersState {
   listReq: RequestState<Record<UUID, ListUsers_user>>;
   activityOverviews: Record<UUID, RequestState<GetActivityOverview>>;
-  activityDays: Record<ActivityDayKey, RequestState<ActivityItem[]>>;
+  activityDays: Record<ActivityDayKey, RequestState<Record<UUID, ActivityItem>>>;
 }
 
 const initialState: UsersState = {
@@ -26,6 +27,7 @@ export const slice = createSlice({
     listReqUpdated: (state, action: PayloadAction<UsersState['listReq']>) => {
       state.listReq = action.payload;
     },
+
     activityOverviewUpdated: (
       state,
       action: PayloadAction<{ userId: UUID; req: RequestState<GetActivityOverview> }>,
@@ -38,6 +40,24 @@ export const slice = createSlice({
           .filter((count) => count.numItems > 0),
       }));
     },
+
+    activityItemsDeleted: (
+      state,
+      action: PayloadAction<{ key: ActivityDayKey; ids: UUID[] }>,
+    ) => {
+      const { key, ids } = action.payload;
+      const items = Req.payload(state.activityDays[key]);
+      if (!items) {
+        return;
+      }
+      for (const id of ids) {
+        const item = items[id];
+        if (item) {
+          item.deleted = true;
+        }
+      }
+    },
+
     activityDayUpdated: (
       state,
       action: PayloadAction<{
@@ -45,30 +65,32 @@ export const slice = createSlice({
         req: RequestState<GetActivityDay['items']>;
       }>,
     ) => {
-      state.activityDays[action.payload.key] = Req.map(action.payload.req, (items) => {
-        return items.map((item) => {
-          if (item.__typename === `CoalescedKeystrokeLine`) {
-            return {
-              type: `KeystrokeLine`,
-              id: item.id,
-              ids: item.ids,
-              appName: item.appName,
-              line: item.line,
-              date: item.createdAt,
-            };
-          } else {
-            return {
-              type: `Screenshot`,
-              id: item.id,
-              ids: item.ids,
-              url: item.url,
-              width: item.width,
-              height: item.height,
-              date: item.createdAt,
-            };
-          }
-        });
-      });
+      state.activityDays[action.payload.key] = Req.map(action.payload.req, (items) =>
+        toMap(
+          items.map((item) => {
+            if (item.__typename === `CoalescedKeystrokeLine`) {
+              return {
+                type: `KeystrokeLine`,
+                id: item.id,
+                ids: item.ids,
+                appName: item.appName,
+                line: item.line,
+                date: item.createdAt,
+              };
+            } else {
+              return {
+                type: `Screenshot`,
+                id: item.id,
+                ids: item.ids,
+                url: item.url,
+                width: item.width,
+                height: item.height,
+                date: item.createdAt,
+              };
+            }
+          }),
+        ),
+      );
     },
   },
 });
@@ -112,8 +134,33 @@ export const fetchUsers = createAsyncThunk(
   },
 );
 
-export const { listReqUpdated, activityOverviewUpdated, activityDayUpdated } =
-  slice.actions;
+export function deleteActivityItems(
+  userId: UUID,
+  date: Date,
+  itemRootIds: UUID[],
+): ThunkAction {
+  return async (dispatch, getState) => {
+    const key = activityDayKey(userId, date);
+    const items = Req.payload(getState().users.activityDays[key]);
+    if (!items) {
+      return;
+    }
+
+    dispatch(activityItemsDeleted({ key, ids: itemRootIds }));
+    const apiItems = itemRootIds.flatMap((id) => {
+      const item = items[id];
+      return item?.ids.map((id) => ({ id, type: item?.type ?? `Screenshot` })) ?? [];
+    });
+    await Current.api.users.deleteActivityItems(userId, apiItems);
+  };
+}
+
+export const {
+  listReqUpdated,
+  activityOverviewUpdated,
+  activityDayUpdated,
+  activityItemsDeleted,
+} = slice.actions;
 
 export default slice.reducer;
 
