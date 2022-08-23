@@ -1,4 +1,5 @@
 import React from 'react';
+import cx from 'classnames';
 import PillBadge from '../../PillBadge';
 
 export type Props = {
@@ -10,7 +11,10 @@ export type Props = {
 
 const UserDevice: React.FC<Props> = ({ model, status, icon, className }) => (
   <div
-    className={`border rounded-full p-2 pr-4 shadow bg-white hover:bg-gray-50 cursor-pointer duration-75 transition ${className}`}
+    className={cx(
+      `border rounded-full p-2 pr-4 shadow bg-white hover:bg-gray-50 cursor-pointer duration-75 transition`,
+      className,
+    )}
   >
     <div className="flex justify-between items-center">
       <div className="flex items-center">

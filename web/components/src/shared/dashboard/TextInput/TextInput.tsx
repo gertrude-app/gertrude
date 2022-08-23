@@ -39,7 +39,7 @@ const TextInput: React.FC<Props> = ({
           autoFocus={autoFocus}
           placeholder={placeholder}
           onChange={(e) => setValue(e.target.value)}
-          className={`h-10 border ring-0 ring-gray-200 rounded-lg outline-none py-6 px-4 focus:shadow-md transition duration-150 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 text-gray-600 flex-grow z-10 ${
+          className={`h-10 border ring-0 ring-gray-200 rounded-lg outline-none py-6 px-4 focus:shadow-md transition duration-150 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 text-gray-600 flex-grow z-10 w-12 ${
             unit ? `rounded-r-none` : `rounded-r-lg`
           }`}
         />

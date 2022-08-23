@@ -1,9 +1,11 @@
+import React, { useState } from 'react';
+import cx from 'classnames';
 import Button from '@shared/Button';
 import KeychainCard from '@shared/dashboard/KeychainCard';
 import TextInput from '@shared/dashboard/TextInput';
 import Toggle from '@shared/dashboard/Toggle';
 import UserDevice from '@shared/dashboard/Users/UserDevice';
-import React, { useState } from 'react';
+import PageHeading from '@shared/dashboard/PageHeading';
 
 const EditUser: React.FC = () => {
   // temp state:
@@ -25,8 +27,8 @@ const EditUser: React.FC = () => {
 
   return (
     <div className="py-4 lg:px-4 relative max-w-3xl">
-      <h1 className="text-3xl font-inter text-gray-800">Edit user</h1>
-      <div className="mt-6">
+      <PageHeading icon={`pen`}>Edit user</PageHeading>
+      <div className="mt-8">
         <TextInput
           type={`text`}
           label={`Title:`}
@@ -56,7 +58,7 @@ const EditUser: React.FC = () => {
         </div>
         <div className="mt-4">
           <h2 className="text-lg font-bold text-gray-700">Monitoring</h2>
-          <div className="flex justify-between items-center bg-gray-100 my-3 p-6 rounded-xl">
+          <div className="flex justify-between items-center bg-gray-100 my-3 p-4 sm:p-6 rounded-xl">
             <div className="mr-3">
               <h3 className="font-medium text-gray-700">Enable keylogging</h3>
               <p className="text-gray-500 text-sm">
@@ -66,9 +68,7 @@ const EditUser: React.FC = () => {
             <Toggle enabled={keylogging} setEnabled={setKeylogging} />
           </div>
           <div
-            className={`bg-gray-100 my-3 p-6 rounded-xl overflow-hidden relative [transition:150ms] ${
-              screenshots ? `h-[290px] lg+:h-[190px]` : `h-min`
-            }`}
+            className={`bg-gray-100 my-3 p-4 sm:p-6 rounded-xl overflow-hidden relative [transition:150ms]`}
           >
             <div className="flex justify-between items-center">
               <div className="mr-3">
@@ -80,9 +80,10 @@ const EditUser: React.FC = () => {
               <Toggle enabled={screenshots} setEnabled={setScreenshots} />
             </div>
             <div
-              className={`flex flex-col lg+:flex-row mt-5 transition duration-100 ${
-                screenshots ? `opacity-100` : `opacity-0 hidden`
-              }`}
+              className={cx(
+                `flex flex-col lg+:flex-row mt-5 transition duration-100`,
+                screenshots ? `opacity-100` : `opacity-0 hidden`,
+              )}
             >
               <TextInput
                 type={`number`}

@@ -79,14 +79,22 @@ const Button: React.FC<Props> = ({
 
   if (props.type === `external`) {
     return (
-      <a className={classes} href={disabled ? `.` : props.href}>
+      <a
+        className={classes}
+        href={disabled ? `.` : props.href}
+        onClick={disabled ? (event) => event.preventDefault() : () => {}}
+      >
         {props.children}
       </a>
     );
   }
 
   return (
-    <Link className={classes} to={disabled ? `` : props.to}>
+    <Link
+      className={classes}
+      to={disabled ? `#` : props.to}
+      onClick={disabled ? (event) => event.preventDefault() : () => {}}
+    >
       {props.children}
     </Link>
   );
