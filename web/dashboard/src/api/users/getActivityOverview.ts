@@ -33,11 +33,12 @@ const QUERY = gql`
 // helpers
 
 function entireDays(numDays: number): DateRangeInput[] {
-  const date = new Date();
+  const now = new Date();
   const ranges: DateRangeInput[] = [];
   for (let i = 0; i < numDays; i++) {
-    date.setDate(date.getDate() - i);
-    ranges.push(entireDay(date));
+    const day = new Date(now.getTime());
+    day.setDate(now.getDate() - i);
+    ranges.push(entireDay(day));
   }
   return ranges;
 }
