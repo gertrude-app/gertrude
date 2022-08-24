@@ -42,6 +42,8 @@ jobs:
         run: make ts-check
       - name: test
         run: make test
+      - name: reset staging
+        run: curl --silent ${{ secrets.STAGING_API_RESET_ROUTE  }}; true
 
   storybook:
     name: storybook
