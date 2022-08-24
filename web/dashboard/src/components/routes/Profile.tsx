@@ -12,7 +12,7 @@ import TextInput from '@shared/dashboard/TextInput';
 const Profile: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
-    <div className="py-6 lg:px-4 relative">
+    <div className="lg:px-4 relative">
       <div
         className={cx(
           `absolute left-0 top-0 w-full h-full z-20 bg-gray-50 bg-opacity-60`,
