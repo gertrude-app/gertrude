@@ -1,4 +1,5 @@
 import React from 'react';
+import cx from 'classnames';
 import Button from '../../../../../Button';
 import ActivityItemTime from '../ActivityItemTime';
 
@@ -20,7 +21,10 @@ const ScreenshotViewer: React.FC<Props> = ({
   onApprove,
 }) => (
   <div
-    className={`border-y md:border-x md:rounded-xl md:shadow-lg bg-white max-w-7xl ${className}`}
+    className={cx(
+      `border-y md:border-x md:rounded-xl md:shadow-lg bg-white max-w-7xl`,
+      className,
+    )}
   >
     <div className="md:mx-4 mb-3 sm:mb-0 md:mt-4 flex justify-center bg-violet-100/50 rounded-lg">
       <img

@@ -1,4 +1,5 @@
 import React from 'react';
+import cx from 'classnames';
 import Button from '../../../../../Button';
 import ActivityItemTime from '../ActivityItemTime';
 
@@ -18,7 +19,10 @@ const KeystrokesViewer: React.FC<Props> = ({
   onApprove,
 }) => (
   <div
-    className={`border-y md:border-x2 md:rounded-xl md:shadow-lg bg-white max-w-7xl ${className}`}
+    className={cx(
+      `border-y md:border-x2 md:rounded-xl md:shadow-lg bg-white max-w-7xl`,
+      className,
+    )}
   >
     <div className="flex justify-between pt-3 px-5 rounded-t-xl">
       <h2 className="text-gray-600 font-medium -ml-0.5">
