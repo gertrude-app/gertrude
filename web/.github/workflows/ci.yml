@@ -40,6 +40,8 @@ jobs:
         run: make format-check
       - name: typecheck
         run: make ts-check
+      - name: test
+        run: make test
 
   storybook:
     name: storybook

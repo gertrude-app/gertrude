@@ -3,35 +3,32 @@ import * as users from '../api/users';
 import * as signup from '../api/signup';
 
 export interface ApiClient {
-  users: {
-    list(): ReturnType<typeof users.list>;
-  };
-  signup: {
-    joinWaitlist(email: string): ReturnType<typeof signup.joinWaitlist>;
-  };
+  users: typeof users;
+  signup: typeof signup;
 }
 
 export const liveApiClient: ApiClient = {
-  users: {
-    list(): ReturnType<typeof users.list> {
-      return users.list();
-    },
-  },
-  signup: {
-    joinWaitlist(email: string): ReturnType<typeof signup.joinWaitlist> {
-      return signup.joinWaitlist(email);
-    },
-  },
+  users,
+  signup,
 };
 
 export const throwingApiClient: ApiClient = {
   users: {
-    list(): ReturnType<typeof users.list> {
+    list: () => {
       throw new Error(`ApiClient.users.list() not implemented.`);
+    },
+    getActivityOverview: () => {
+      throw new Error(`ApiClient.users.getActivityOverview() not implemented.`);
+    },
+    getActivityDay: () => {
+      throw new Error(`ApiClient.users.getActivityDay() not implemented.`);
+    },
+    deleteActivityItems: () => {
+      throw new Error(`ApiClient.users.deleteActivityItems() not implemented.`);
     },
   },
   signup: {
-    joinWaitlist(_email: string): ReturnType<typeof signup.joinWaitlist> {
+    joinWaitlist: () => {
       throw new Error(`ApiClient.signup.joinWaitlist() not implemented.`);
     },
   },
@@ -39,13 +36,22 @@ export const throwingApiClient: ApiClient = {
 
 export const noopApiClient: ApiClient = {
   users: {
-    list(): ReturnType<typeof users.list> {
-      return Promise.resolve(Result.success([]));
+    list: async () => {
+      return Result.success([]);
+    },
+    getActivityOverview: async () => {
+      return Result.success({ user: { __typename: `User`, name: `` }, counts: [] });
+    },
+    getActivityDay: async () => {
+      return Result.success({ counts: [], items: [] });
+    },
+    deleteActivityItems: async () => {
+      return Result.success([]);
     },
   },
   signup: {
-    joinWaitlist(_email: string): ReturnType<typeof signup.joinWaitlist> {
-      return Promise.resolve(Result.success(true));
+    joinWaitlist: async () => {
+      return Result.success(true);
     },
   },
 };

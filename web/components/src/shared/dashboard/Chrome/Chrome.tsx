@@ -108,11 +108,12 @@ const Chrome: React.FC<Props> = ({
 
     <div
       className={cx(
-        `xmd:pl-64 flex flex-col flex-1 transition-[padding]`,
+        `flex flex-col flex-1 transition-[padding]`,
         sidebarCollapsed ? `md:pl-20` : `md:pl-72`,
       )}
     >
       <MobileStickyHeader
+        className="sticky md:hidden"
         sidebarShown={mobileSidebarOpen}
         onHamburgerClick={onMobileHamburgerClick}
       />
@@ -125,10 +126,8 @@ const Chrome: React.FC<Props> = ({
             : node.removeAttribute(`inert`))
         }
       >
-        <div className="bg-gray-50 min-h-screen">
-          <div className="py-6 md:py-7 max-w-[1460px] px-4 sm:px-6 md:px-8">
-            {children}
-          </div>
+        <div className={`bg-gray-50 [min-height:calc(100vh-64px)] md:min-h-screen`}>
+          <PaddedMain>{children}</PaddedMain>
         </div>
       </main>
     </div>
@@ -136,3 +135,12 @@ const Chrome: React.FC<Props> = ({
 );
 
 export default Chrome;
+
+const PaddedMain: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  // 👋 if you change this padding, you need to change the "Undo" below
+  <div className="py-6 md:py-7 max-w-[1460px] px-4 sm:px-6 md:px-8">{children}</div>
+);
+
+export const UndoMainPadding: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => <div className="-my-6 md:-my-7 -mx-4 sm:-mx-6 md:-mx-8">{children}</div>;

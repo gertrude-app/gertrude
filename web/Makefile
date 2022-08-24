@@ -38,7 +38,7 @@ sync-clean:
 	rm -rf ./marketing/components/shared
 
 watchsync:
-	watchexec --restart --watch ./components/src/shared --exts tsx make sync
+	watchexec --restart --watch ./components/src/shared --exts tsx,ts make sync
 
 start-storybook:
 	cd components && npm run storybook
@@ -70,6 +70,12 @@ build-dashboard: sync
 	cd dashboard && npm install && npm run build
 
 # ci type things
+
+test:
+	cd dashboard && npx vitest run
+
+test-watch:
+	cd dashboard && npx vitest watch
 
 format:
 	npx prettier --config ./.prettierrc.json --loglevel warn --write .
@@ -104,6 +110,7 @@ check:
 	make lint
 	make format-check
 	make ts-check
+	make test
 
 # helpers
 
@@ -120,6 +127,7 @@ ALL_CMDS = \
   start-storybook start-marketing start-dashboard \
   build-storybook build-marketing build-dashboard \
   fix ts-watch ts-check lint lint-fix format format-check check \
+  test test-watch \
   codegen
 
 .PHONY: $(ALL_CMDS)

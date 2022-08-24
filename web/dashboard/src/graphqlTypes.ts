@@ -23,6 +23,16 @@ export interface CreateWaitlistedUserInput {
   signupToken?: UUID | null;
 }
 
+export interface DateRangeInput {
+  end: string;
+  start: string;
+}
+
+export interface DeleteMonitoringItemInput {
+  id: UUID;
+  type: string;
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================

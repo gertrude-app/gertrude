@@ -1,4 +1,4 @@
-import { enumValues } from '../lib/enum';
+import { enumValues } from '../lib/typesafe';
 
 export enum Mode {
   Dev,

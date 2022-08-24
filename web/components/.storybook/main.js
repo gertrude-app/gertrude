@@ -2,8 +2,8 @@ module.exports = {
   stories: [`../src/**/*.stories.@(ts|tsx)`],
   addons: [
     `@storybook/addon-links`,
-    `@storybook/addon-interactions`,
     { name: `@storybook/addon-essentials`, options: { docs: false } },
+    `@storybook/addon-interactions`,
   ],
   framework: `@storybook/react`,
   core: {

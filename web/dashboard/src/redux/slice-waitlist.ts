@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
+import { Req } from './helpers';
 
 export interface WaitlistState {
   email: string;
@@ -8,7 +9,7 @@ export interface WaitlistState {
 
 const initialState: WaitlistState = {
   email: ``,
-  joinReq: { state: `idle` },
+  joinReq: Req.idle(),
 };
 
 export const slice = createSlice({
@@ -24,13 +25,13 @@ export const slice = createSlice({
   },
   extraReducers(builder) {
     builder.addCase(joinWaitlist.pending, (state) => {
-      state.joinReq = { state: `ongoing` };
+      state.joinReq = Req.ongoing();
     });
-    builder.addCase(joinWaitlist.fulfilled, (state, action) => {
-      state.joinReq = { state: action.payload ? `succeeded` : `failed` };
+    builder.addCase(joinWaitlist.fulfilled, (state, { payload }) => {
+      state.joinReq = payload ? Req.succeed(void 0) : Req.fail();
     });
     builder.addCase(joinWaitlist.rejected, (state) => {
-      state.joinReq = { state: `failed` };
+      state.joinReq = Req.fail();
     });
   },
 });

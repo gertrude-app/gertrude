@@ -1,6 +1,6 @@
 import { DecoratorFn } from '@storybook/react';
 import React, { useState } from 'react';
-import Chrome from '../shared/dashboard/Chrome/Chrome';
+import Chrome from '../shared/dashboard/Chrome';
 
 const StatefulChrome: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [open, setOpen] = useState(false);

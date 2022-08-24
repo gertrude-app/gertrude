@@ -56,12 +56,16 @@ export async function query<Data, Vars>(
   variables: Vars | undefined = undefined,
 ): Promise<Result<Data, readonly GraphQLError[]>> {
   try {
-    const { data, errors } = await getClient().query<Data, Vars>({ query, variables });
+    var { data, errors } = await getClient().query<Data, Vars>({ query, variables });
     if (errors) {
       return Result.error(errors);
     } else if (!data) {
       return Result.error([new GraphQLError(`No data returned`)]);
     } else {
+      // in dev mode, apollo freezes it's objects, so you can't sort or otherwise mutate
+      if (import.meta.env.MODE === `development`) {
+        data = JSON.parse(JSON.stringify(data));
+      }
       return Result.success(data);
     }
   } catch (error) {
@@ -90,7 +94,7 @@ export async function mutate<Data, Vars>(
   variables: Vars | undefined = undefined,
 ): Promise<Result<Data, readonly GraphQLError[]>> {
   try {
-    const { data, errors } = await getClient().mutate<Data, Vars>({
+    var { data, errors } = await getClient().mutate<Data, Vars>({
       mutation,
       variables,
     });
@@ -99,6 +103,10 @@ export async function mutate<Data, Vars>(
     } else if (!data) {
       return Result.error([new GraphQLError(`No data returned`)]);
     } else {
+      // in dev mode, apollo freezes it's objects, so you can't sort or otherwise mutate
+      if (import.meta.env.MODE === `development`) {
+        data = JSON.parse(JSON.stringify(data)) as Data;
+      }
       return Result.success(data);
     }
   } catch (error) {

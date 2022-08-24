@@ -4,7 +4,7 @@ import Button from '@shared/Button';
 import KeychainCard from '@shared/dashboard/KeychainCard';
 import TextInput from '@shared/dashboard/TextInput';
 import Toggle from '@shared/dashboard/Toggle';
-import UserDevice from '@shared/dashboard/Users/UserDevice';
+import UserDevice from '@shared/dashboard/Users/List/Card/Device';
 import PageHeading from '@shared/dashboard/PageHeading';
 
 const EditUser: React.FC = () => {

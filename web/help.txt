@@ -7,13 +7,15 @@ local dev commands:
 
 quality/ci commands:      
 
-  > `make format`   -- run prettier on all files
-  > `make lint`     -- run eslint
-  > `make lint-fix` -- run eslint, auto-fixing where possible
-  > `make ts-check` -- typescript check all subdirs
-  > `make ts-watch` -- typescript check all subdirs, watch mode
-  > `make check`    -- test for prettier, lint, typescript errors
-  > `make fix`      -- run lint fix and prettier format
+  > `make test`       -- run all unit tests
+  > `make test-watch` -- run all unit tests, watch mode
+  > `make format`     -- run prettier on all files
+  > `make lint`       -- run eslint
+  > `make lint-fix`   -- run eslint, auto-fixing where possible
+  > `make ts-check`   -- typescript check all subdirs
+  > `make ts-watch`   -- typescript check all subdirs, watch mode
+  > `make check`      -- test for prettier, lint, typescript errors
+  > `make fix`        -- run lint fix and prettier format
 
 scaffold commands:
 

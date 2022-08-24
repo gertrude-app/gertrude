@@ -22,7 +22,6 @@ export default ${Component};
 `;
 
 const storyFile = `import { ComponentStory, ComponentMeta } from '@storybook/react';
-
 import ${Component} from './${Component}';
 
 export default {
@@ -39,6 +38,6 @@ const dir = `./components/src/shared/dashboard/${Component}`;
 fs.mkdirSync(dir, { recursive: true });
 fs.writeFileSync(`${dir}/${Component}.tsx`, componentFile);
 fs.writeFileSync(`${dir}/${Component}.stories.tsx`, storyFile);
-fs.writeFileSync(`${dir}/index.tsx`, `export { default } from './${Component}';`);
+fs.writeFileSync(`${dir}/index.ts`, `export { default } from './${Component}';`);
 
 green(`Created component '${Component}`);
