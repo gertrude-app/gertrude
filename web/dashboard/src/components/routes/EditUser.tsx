@@ -105,13 +105,38 @@ const EditUser: React.FC = () => {
           </div>
         </div>
         <div className="mt-12">
-          <h2 className="text-lg font-bold text-gray-700">Keychains</h2>
+          <h2 className="text-lg font-bold text-gray-700 mb-2">Keychains</h2>
           <div className="p-3 flex flex-col space-y-4">
-            <KeychainCard shared={true} name={`UA Brightspace`} keys={74} />
-            <KeychainCard shared={true} name={`HTC`} keys={123} />
-            <KeychainCard shared={false} name={`Jason's blog`} keys={2} />
-            <KeychainCard shared={false} name={`John Doe's stuff`} keys={22} />
-            <KeychainCard shared={true} name={`Microsoft Word`} keys={1234} />
+            <KeychainCard
+              description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis."
+              shared={true}
+              name={`UA Brightspace`}
+              keys={74}
+            />
+            <KeychainCard
+              description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis."
+              shared={true}
+              name={`HTC`}
+              keys={123}
+            />
+            <KeychainCard
+              description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis."
+              shared={false}
+              name={`Jason's blog`}
+              keys={2}
+            />
+            <KeychainCard
+              description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis."
+              shared={false}
+              name={`John Doe's stuff`}
+              keys={22}
+            />
+            <KeychainCard
+              description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis."
+              shared={true}
+              name={`Microsoft Word`}
+              keys={1234}
+            />
             <button className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition duration-100">
               <i className="fa fa-plus mr-2" />
               Add keychain
