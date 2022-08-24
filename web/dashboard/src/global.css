@@ -6,6 +6,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.undefined::after {
+  content: 'Kiah you silly you forgot classnames again';
+}
+
 @layer utilities {
   .bg-fuchsia-radial-gradient {
     background: radial-gradient(closest-side, rgb(200, 88, 231, 0.6), transparent);

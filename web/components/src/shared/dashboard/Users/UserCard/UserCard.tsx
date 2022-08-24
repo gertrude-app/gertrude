@@ -71,7 +71,7 @@ const UserCard: React.FC<Props> = ({
               {inflect(`device`, devices.length)}:
             </p>
           </div>
-          <div className="flex flex-col mt-3">
+          <div className="flex flex-col mt-3 space-y-3 pt-3">
             {devices.map((device) => (
               <UserDevice
                 key={device.id}

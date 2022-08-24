@@ -11,6 +11,7 @@ import Users from './components/routes/Users';
 import useWindowWidth from './hooks/window-width';
 import { useDispatch, useSelector } from './redux/hooks';
 import { windowWidthChanged } from './redux/slice-menu';
+import EditUser from './components/routes/EditUser';
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
@@ -32,6 +33,7 @@ const App: React.FC = () => {
       <Route path="/users" element={authed(<Users />)} />
       <Route path="/monitoring" element={authed(<Monitoring />)} />
       <Route path="/day-view" element={authed(<MonitoringDayView />)} />
+      <Route path="/edit-user" element={authed(<EditUser />)} />
     </Routes>
   );
 };
