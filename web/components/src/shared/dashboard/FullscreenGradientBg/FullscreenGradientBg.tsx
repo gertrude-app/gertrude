@@ -7,16 +7,7 @@ interface Props {
 
 const FullscreenGradientBg: React.FC<Props> = ({ children }) => (
   <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-violet-500 to-fuchsia-500">
-    {new Array(15).fill(0).map((_, index) => (
-      <SubtleLogo
-        key={`subtle-logo-${index}`}
-        size={Math.random() * 150 + 50}
-        angle={Math.random() * 36}
-        x={Math.random() * 150 - 2}
-        y={Math.random() * 150 - 25}
-        index={index}
-      />
-    ))}
+    <ScatteredLogos />
     {children}
   </div>
 );
@@ -56,3 +47,18 @@ const SubtleLogo: React.FC<SubtleLogoProps> = ({ size, x, y, angle, index }) => 
     />
   </div>
 );
+
+const ScatteredLogos: React.FC = React.memo(() => (
+  <>
+    {new Array(15).fill(0).map((_, index) => (
+      <SubtleLogo
+        key={`subtle-logo-${index}`}
+        size={Math.random() * 150 + 50}
+        angle={Math.random() * 36}
+        x={Math.random() * 150 - 2}
+        y={Math.random() * 150 - 25}
+        index={index}
+      />
+    ))}
+  </>
+));
