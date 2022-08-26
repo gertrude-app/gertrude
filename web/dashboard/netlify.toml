@@ -12,6 +12,6 @@
 
 [context.deploy-preview.environment]
   SNOWPACK_PUBLIC_IS_STAGING = 'true'
-  SNOWPACK_PUBLIC_TEST_ADMIN_CREDS = 'tmp:tmp'
+  SNOWPACK_PUBLIC_TEST_ADMIN_CREDS = 'BE000000-0000-0000-0000-000000000000:BE000000-0000-0000-0000-000000000000'
   SNOWPACK_PUBLIC_GRAPHQL_ENDPOINT = 'https://api--staging.gertrude-app.com/graphql/dashboard'
 
