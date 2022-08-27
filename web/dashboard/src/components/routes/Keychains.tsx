@@ -1,3 +1,4 @@
+import Button from '@shared/Button';
 import KeychainCard from '@shared/dashboard/KeychainCard';
 import PageHeading from '@shared/dashboard/PageHeading';
 import React from 'react';
@@ -76,9 +77,15 @@ const Keychains: React.FC = () => {
   ];
 
   return (
-    <div className="px-4">
+    <div className="px-0 sm:px-4">
       <PageHeading icon="key">Keychains</PageHeading>
-      <div className="flex flex-wrap mt-10">
+      <p className="mt-4 text-sm text-gray-500">
+        Keychains are clusters of related individual "keys" for selectively unlocking
+        internet access. They can be organized however you like—per use, by application,
+        for a specific school class, etc. Or, you can put all of your keys in one keychain
+        if you prefer.
+      </p>
+      <div className="grid grid-cols-1 lg+:grid-cols-2 gap-10 lg+:gap-8 xl:gap-10 2xl:grid-cols-3 mt-10">
         {fakeData.map(({ shared, name, description, keys }) => (
           <KeychainCard
             shared={shared}
@@ -86,9 +93,14 @@ const Keychains: React.FC = () => {
             keys={keys}
             description={description}
             editable
-            className="m-4"
+            className=""
           />
         ))}
+      </div>
+      <div className="mt-8 flex justify-end border-t pt-6">
+        <Button type="button" onClick={() => {}} color="primary-violet">
+          <i className="fa fa-plus mr-2" /> Create keychain
+        </Button>
       </div>
     </div>
   );
