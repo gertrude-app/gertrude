@@ -1,11 +1,95 @@
+import KeychainCard from '@shared/dashboard/KeychainCard';
 import PageHeading from '@shared/dashboard/PageHeading';
 import React from 'react';
 
 const Keychains: React.FC = () => {
+  // TEMP
+  const fakeData: Array<{
+    shared: boolean;
+    name: string;
+    description: string;
+    keys: number;
+  }> = [
+    {
+      shared: true,
+      name: 'HTC',
+      description:
+        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      keys: 232,
+    },
+    {
+      shared: true,
+      name: 'Google Docs',
+      description:
+        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      keys: 7,
+    },
+    {
+      shared: false,
+      name: "Jason's blog",
+      description:
+        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      keys: 3,
+    },
+    {
+      shared: true,
+      name: 'MSF Verified Safe Sites',
+      description:
+        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      keys: 433,
+    },
+    {
+      shared: false,
+      name: "John's stuff",
+      description:
+        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      keys: 674,
+    },
+    {
+      shared: true,
+      name: 'Smith Family',
+      description:
+        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      keys: 112,
+    },
+    {
+      shared: true,
+      name: 'Meyer Hatchery',
+      description:
+        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      keys: 14,
+    },
+    {
+      shared: false,
+      name: 'Facebook',
+      description:
+        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      keys: 2390,
+    },
+    {
+      shared: false,
+      name: 'Friends Library',
+      description:
+        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      keys: 2,
+    },
+  ];
+
   return (
     <div className="px-4">
       <PageHeading icon="key">Keychains</PageHeading>
-      <div></div>
+      <div className="flex flex-wrap mt-10">
+        {fakeData.map(({ shared, name, description, keys }) => (
+          <KeychainCard
+            shared={shared}
+            name={name}
+            keys={keys}
+            description={description}
+            editable
+            className="m-4"
+          />
+        ))}
+      </div>
     </div>
   );
 };
