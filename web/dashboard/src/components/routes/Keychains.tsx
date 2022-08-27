@@ -13,65 +13,56 @@ const Keychains: React.FC = () => {
   }> = [
     {
       shared: true,
-      name: 'HTC',
-      description:
-        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      name: `HTC`,
+      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
       keys: 232,
     },
     {
       shared: true,
-      name: 'Google Docs',
-      description:
-        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      name: `Google Docs`,
+      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
       keys: 7,
     },
     {
       shared: false,
-      name: "Jason's blog",
-      description:
-        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      name: `Jason's blog`,
+      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
       keys: 3,
     },
     {
       shared: true,
-      name: 'MSF Verified Safe Sites',
-      description:
-        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      name: `MSF Verified Safe Sites`,
+      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
       keys: 433,
     },
     {
       shared: false,
-      name: "John's stuff",
-      description:
-        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      name: `John's stuff`,
+      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
       keys: 674,
     },
     {
       shared: true,
-      name: 'Smith Family',
-      description:
-        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      name: `Smith Family`,
+      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
       keys: 112,
     },
     {
       shared: true,
-      name: 'Meyer Hatchery',
-      description:
-        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      name: `Meyer Hatchery`,
+      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
       keys: 14,
     },
     {
       shared: false,
-      name: 'Facebook',
-      description:
-        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      name: `Facebook`,
+      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
       keys: 2390,
     },
     {
       shared: false,
-      name: 'Friends Library',
-      description:
-        'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.',
+      name: `Friends Library`,
+      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
       keys: 2,
     },
   ];

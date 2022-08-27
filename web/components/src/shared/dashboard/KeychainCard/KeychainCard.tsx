@@ -27,12 +27,14 @@ const KeychainCard: React.FC<Props> = ({
       </p>
     </div>
     <div className="flex flex-col justify-between flex-grow border border-l-0 rounded-r-xl bg-white">
-      <div className="relative p-3">
-        <p className="text-sm text-gray-500 mr-28">{description || `No description`}</p>
+      <div className="relative p-3 flex justify-end sm:justify-start">
+        <p className="text-sm text-gray-500 mr-28 hidden sm:block">
+          {description || `No description`}
+        </p>
         <PillBadge
           type={shared ? `green` : `yellow`}
           small
-          className="self-start absolute right-2 top-2"
+          className="sm:absolute sm:right-2 top-2"
         >
           <i
             className={cx(
@@ -43,7 +45,7 @@ const KeychainCard: React.FC<Props> = ({
           {shared ? `Public` : `Private`}
         </PillBadge>
       </div>
-      <div className="flex justify-end rounded-br-xl border-t bg-gray-50">
+      <div className="flex justify-end rounded-br-xl border-t bg-gray-50 pl-8 sm:pl-0">
         {editable && (
           <button className="px-5 py-2 text-gray-500 font-medium hover:bg-gray-100 transition duration-100">
             Edit
