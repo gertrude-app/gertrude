@@ -10,16 +10,17 @@ import {
   fetchActivityDay,
   activityDayKey,
 } from '../../redux/slice-users';
+import { dateFromUrl } from '../shared/lib/dates';
 
 const UserActivityDay: React.FC = () => {
   const { userId = ``, date = `` } = useParams<{ userId: string; date: string }>();
-  const day = new Date(date);
+  const day = dateFromUrl(date);
   const key = activityDayKey(userId, day);
   const dispatch = useDispatch();
   const request = useSelector((state) => state.users.activityDays[key]);
 
   useEffect(() => {
-    dispatch(fetchActivityDay({ userId, day: new Date(date) }));
+    dispatch(fetchActivityDay({ userId, day: dateFromUrl(date) }));
   }, [dispatch, userId, date]);
 
   if (!request || request.state === `idle` || request.state === `ongoing`) {
