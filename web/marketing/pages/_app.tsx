@@ -7,7 +7,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <>
       <Script
-        src="https://kit.fontawesome.com/667d25f59d.js"
+        src="https://kit.fontawesome.com/2f8568b58b.js"
         strategy="beforeInteractive"
       ></Script>
       <Component {...pageProps} />
