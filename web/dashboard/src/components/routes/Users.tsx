@@ -47,7 +47,7 @@ const Users: React.FC = () => {
 
 export default Users;
 
-function familyToIcon(family: Family): `laptop` | `desktop` {
+export function familyToIcon(family: Family): `laptop` | `desktop` {
   switch (family) {
     case Family.iMac:
     case Family.pro:

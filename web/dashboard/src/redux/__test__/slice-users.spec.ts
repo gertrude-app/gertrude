@@ -51,6 +51,7 @@ describe(`activityItemsDeleted`, () => {
     const state = reducer(
       {
         listReq: Req.idle(),
+        users: {},
         activityOverviews: {},
         activityDays: {
           'user123--01-01-2022': Req.succeed({

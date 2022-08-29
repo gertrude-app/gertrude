@@ -1,12 +1,13 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { formatDate } from '@shared/lib/dates';
 import { ActivityItem } from '@shared/dashboard/Users/Activity/ReviewDay';
 import Current from '../environment';
 import { GetActivityDay } from '../api/users/__generated__/GetActivityDay';
 import { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
 import { ListUsers_user } from '../api/users/__generated__/ListUsers';
+import { GetUser_user } from '../api/users/__generated__/GetUser';
 import { Req, toMap } from './helpers';
-import { ThunkAction } from './hooks';
+import { ThunkAction, createAsyncThunk } from './hooks';
 
 interface ActivityDay {
   numDeleted: number;
@@ -15,12 +16,14 @@ interface ActivityDay {
 
 export interface UsersState {
   listReq: RequestState<Record<UUID, ListUsers_user>>;
+  users: Record<UUID, RequestState<GetUser_user>>;
   activityOverviews: Record<UUID, RequestState<GetActivityOverview>>;
   activityDays: Record<ActivityDayKey, RequestState<ActivityDay>>;
 }
 
 export const initialState: UsersState = {
   listReq: Req.idle(),
+  users: {},
   activityOverviews: {},
   activityDays: {},
 };
@@ -29,6 +32,18 @@ export const slice = createSlice({
   name: `users`,
   initialState,
   reducers: {
+    fetchUserStarted: (state, action: PayloadAction<UUID>) => {
+      state.users[action.payload] = Req.ongoing();
+    },
+
+    fetchUserSucceeded: (state, action: PayloadAction<GetUser_user>) => {
+      state.users[action.payload.id] = Req.succeed(action.payload);
+    },
+
+    fetchUserFailed: (state, action: PayloadAction<{ id: UUID; error: ApiError }>) => {
+      state.users[action.payload.id] = Req.fail(action.payload.error);
+    },
+
     listReqUpdated: (state, action: PayloadAction<UsersState['listReq']>) => {
       state.listReq = action.payload;
     },
@@ -144,6 +159,18 @@ export const fetchUsers = createAsyncThunk(
   },
 );
 
+export const fetchUser = createAsyncThunk(
+  `${slice.name}/fetchUser`,
+  async (userId: UUID, { dispatch }) => {
+    dispatch(fetchUserStarted(userId));
+    const result = await Current.api.users.getUser(userId);
+    result.with({
+      success: (user) => dispatch(fetchUserSucceeded(user)),
+      error: (error) => dispatch(fetchUserFailed({ id: userId, error })),
+    });
+  },
+);
+
 export function deleteActivityItems(
   userId: UUID,
   date: Date,
@@ -171,6 +198,9 @@ export const {
   activityOverviewUpdated,
   activityDayUpdated,
   activityItemsDeleted,
+  fetchUserFailed,
+  fetchUserStarted,
+  fetchUserSucceeded,
 } = slice.actions;
 
 export default slice.reducer;

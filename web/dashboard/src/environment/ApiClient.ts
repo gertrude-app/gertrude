@@ -31,6 +31,9 @@ export const throwingApiClient: ApiClient = {
     list: () => {
       throw new Error(`ApiClient.users.list() not implemented.`);
     },
+    getUser: () => {
+      throw new Error(`ApiClient.users.getUser() not implemented.`);
+    },
     getActivityOverview: () => {
       throw new Error(`ApiClient.users.getActivityOverview() not implemented.`);
     },
@@ -63,6 +66,19 @@ export const noopApiClient: ApiClient = {
   users: {
     list: async () => {
       return Result.success([]);
+    },
+    getUser: async () => {
+      return Result.success({
+        __typename: `User`,
+        id: ``,
+        name: ``,
+        screenshotsEnabled: false,
+        screenshotsResolution: 0,
+        screenshotsFrequency: 0,
+        keyloggingEnabled: false,
+        keychains: [],
+        devices: [],
+      });
     },
     getActivityOverview: async () => {
       return Result.success({ user: { __typename: `User`, name: `` }, counts: [] });
