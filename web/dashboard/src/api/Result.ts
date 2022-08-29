@@ -21,7 +21,7 @@ export default class Result<T, E> {
     return this.data;
   }
 
-  public on(config: {
+  public with(config: {
     success: (value: T) => unknown;
     error: (error: E) => unknown;
   }): void {

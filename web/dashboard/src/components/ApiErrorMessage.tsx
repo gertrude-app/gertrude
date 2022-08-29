@@ -6,21 +6,23 @@ import { logoutClicked } from '../redux/slice-auth';
 
 interface Props {
   error?: ApiError;
+  wrapped?: boolean;
 }
 
-const ApiErrorMessage: React.FC<Props> = ({ error }) => {
+const ApiErrorMessage: React.FC<Props> = ({ error, wrapped = true }) => {
+  const Wrap = wrapped ? ErrorMessage : React.Fragment;
   const dispatch = useDispatch();
   switch (error?.type) {
     case `no_internet`:
-      return <ErrorMessage>No internet connection</ErrorMessage>;
+      return <Wrap>No internet connection</Wrap>;
     case `actionable`:
-      return <ErrorMessage>{error.message}</ErrorMessage>;
+      return <Wrap>{error.message}</Wrap>;
     case undefined: /* fallthrough */
     case `non_actionable`:
-      return <ErrorMessage>Something went wrong! Please try again.</ErrorMessage>;
+      return <Wrap>Something went wrong! Please try again.</Wrap>;
     case `auth_failed`:
       return (
-        <ErrorMessage>
+        <Wrap>
           Your session expired. Please{` `}
           <Link
             to="/login"
@@ -29,7 +31,7 @@ const ApiErrorMessage: React.FC<Props> = ({ error }) => {
           >
             login again.
           </Link>
-        </ErrorMessage>
+        </Wrap>
       );
   }
 };
