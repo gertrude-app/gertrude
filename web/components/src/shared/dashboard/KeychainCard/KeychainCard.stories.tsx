@@ -16,6 +16,7 @@ Shared.args = {
   name: `HTC`,
   keys: 43,
   shared: true,
+  description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
 };
 
 export const Private = Template.bind({});
@@ -23,4 +24,14 @@ Private.args = {
   name: `HTC`,
   keys: 43,
   shared: false,
+  description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
+};
+
+export const Editable = Template.bind({});
+Editable.args = {
+  name: `HTC`,
+  keys: 43,
+  shared: false,
+  description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
+  editable: true,
 };

@@ -14,19 +14,19 @@ const PillBadge: React.FC<Props> = ({ type, className, children, small }) => {
   switch (type) {
     case `green`:
     case `ok`:
-      colors = `bg-green-200 text-green-800`;
+      colors = `bg-green-100 text-green-700`;
       break;
     case `red`:
     case `error`:
-      colors = `bg-red-200 text-red-800`;
+      colors = `bg-red-100 text-red-700`;
       break;
     case `yellow`:
     case `warning`:
-      colors = `bg-yellow-200 text-yellow-800`;
+      colors = `bg-yellow-100 text-yellow-700`;
       break;
     case `blue`:
     case `info`:
-      colors = `bg-indigo-200 text-indigo-800`;
+      colors = `bg-indigo-100 text-indigo-700`;
       break;
   }
 

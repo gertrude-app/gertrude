@@ -12,6 +12,7 @@ import { windowWidthChanged } from './redux/slice-menu';
 import EditUser from './components/routes/EditUser';
 import UserActivityOverview from './components/routes/UserActivityOverview';
 import UserActivityDay from './components/routes/UserActivityDay';
+import Keychains from './components/routes/Keychains';
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
@@ -34,6 +35,7 @@ const App: React.FC = () => {
       <Route path="/" element={<AuthedChrome />}>
         <Route index element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="keychains" element={<Keychains />} />
         <Route path="users">
           <Route index element={<Users />} />
           <Route path=":userId">
