@@ -8,6 +8,7 @@ type Props = {
   currentStep: number;
   index: number; // starting from 1, to make it line up with the steps
   numSteps: number;
+  stepName: string;
 };
 
 const KeyCreationStep: React.FC<Props> = ({
@@ -17,9 +18,10 @@ const KeyCreationStep: React.FC<Props> = ({
   index,
   children,
   numSteps,
+  stepName,
 }) => (
-  <div className="flex items-stretch max-w-2xl">
-    <div className="w-12 flex justify-center items-center relative">
+  <div className={cx('flex items-stretch max-w-2xl', index > currentStep && 'h-16')}>
+    <div className={cx(`w-12 flex justify-center items-center relative`)}>
       <div
         className={cx(
           'h-full border-r-2 border-dashed border-gray-300 absolute',
@@ -36,7 +38,14 @@ const KeyCreationStep: React.FC<Props> = ({
         )}
       />
     </div>
-    <div className="rounded-2xl shadow-lg p-4 border flex-grow my-2">{title}</div>
+    {index > currentStep ? (
+      <h2 className="text-gray-500 text-lg flex items-center">{stepName}</h2>
+    ) : (
+      <div className="rounded-2xl shadow-lg p-4 flex-grow my-2 bg-white flex justify-between items-center border">
+        {title}
+        <i className="fa fa-chevron-down" />
+      </div>
+    )}
   </div>
 );
 

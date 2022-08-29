@@ -8,4 +8,7 @@ export default {
 
 const Template: ComponentStory<typeof KeyCreator> = (args) => <KeyCreator {...args} />;
 
-export const Default = Template.bind({});
+export const Create = Template.bind({});
+Create.args = {
+  mode: 'create',
+};

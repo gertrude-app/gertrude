@@ -9,7 +9,7 @@ const CreateKeyPage: React.FC<Props> = ({}) => {
     <div>
       <PageHeading icon="key">Create key</PageHeading>
       <div />
-      <KeyCreator />
+      <KeyCreator mode="create" />
     </div>
   );
 };
