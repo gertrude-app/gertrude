@@ -2,9 +2,7 @@ import KeyCreator from '@shared/dashboard/KeyCreator';
 import PageHeading from '@shared/dashboard/PageHeading';
 import React from 'react';
 
-interface Props {}
-
-const CreateKeyPage: React.FC<Props> = ({}) => {
+const CreateKeyPage: React.FC = () => {
   return (
     <div>
       <PageHeading icon="key">Create key</PageHeading>
