@@ -27,7 +27,7 @@ const KeychainCard: React.FC<Props> = ({
     <div className="flex flex-col justify-between flex-grow border border-l-0 rounded-r-xl bg-white">
       <div className="relative p-3 flex justify-end sm:justify-start">
         <p className="text-sm text-gray-500 mr-28 hidden sm:block">
-          {description || `No description`}
+          {description || <i className="text-gray-400 antialiased">No description</i>}
         </p>
         {isPublic && (
           <PillBadge type="green" small className="sm:absolute sm:right-2 top-2">
