@@ -33,8 +33,8 @@ export const Full = Template.bind({});
 Full.args = {
   devices: [
     { id: `1`, icon: `laptop`, model: `13" MacBook Air`, status: `online` },
-    { id: `2`, icon: `laptop`, model: `Mac Mini`, status: `offline` },
-    { id: `3`, icon: `laptop`, model: `iMac`, status: `offline` },
+    { id: `2`, icon: `desktop`, model: `Mac Mini`, status: `offline` },
+    { id: `3`, icon: `desktop`, model: `iMac`, status: `offline` },
   ],
   name: `John Doe`,
   numKeychains: 32,
