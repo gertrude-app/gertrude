@@ -6,11 +6,15 @@ import {
   loginEmailUpdated,
   loginPasswordUpdated,
   submitLoginForm,
+  requestMagicLink,
 } from '../../redux/slice-auth';
 import ApiErrorMessage from '../ApiErrorMessage';
 import { Navigate, useLocation } from 'react-router-dom';
 
-type Props = React.ComponentProps<typeof LoginForm> & { request: RequestState };
+type Props = React.ComponentProps<typeof LoginForm> & {
+  request: RequestState;
+  receivedAdmin: boolean;
+};
 
 export const Login: React.FC<Props> = ({
   email,
@@ -19,6 +23,7 @@ export const Login: React.FC<Props> = ({
   onSubmit,
   password,
   setPassword,
+  receivedAdmin,
   onSendMagicLink,
 }) => {
   const location = useLocation();
@@ -27,7 +32,16 @@ export const Login: React.FC<Props> = ({
       return <FullscreenModalForm request="ongoing" />;
 
     case `succeeded`:
-      return <Navigate to="/" replace state={{ from: location }} />;
+      if (receivedAdmin) {
+        return <Navigate to="/" replace state={{ from: location }} />;
+      } else {
+        return (
+          <FullscreenModalForm
+            request="succeeded"
+            message="Check your email for a magic link."
+          />
+        );
+      }
 
     case `failed`:
       return (
@@ -57,10 +71,11 @@ export const Login: React.FC<Props> = ({
 
 const LoginContainer: React.FC = () => {
   const dispatch = useDispatch();
-  const { email, password, request } = useSelector((state) => ({
+  const { email, password, request, receivedAdmin } = useSelector((state) => ({
     email: state.auth.loginEmail,
     password: state.auth.loginPassword,
     request: state.auth.loginRequest,
+    receivedAdmin: state.auth.admin != null,
   }));
   return (
     <Login
@@ -70,9 +85,8 @@ const LoginContainer: React.FC = () => {
       password={password}
       setPassword={(password) => dispatch(loginPasswordUpdated(password))}
       onSubmit={() => dispatch(submitLoginForm())}
-      onSendMagicLink={function (): unknown {
-        throw new Error(`Function not implemented.`);
-      }}
+      receivedAdmin={receivedAdmin}
+      onSendMagicLink={() => dispatch(requestMagicLink())}
     />
   );
 };

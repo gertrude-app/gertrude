@@ -19,7 +19,6 @@ export async function login(
       if (errors.some((e) => e.message.includes(`401: Unauthorized`))) {
         return { type: `actionable`, message: `Email or password incorrect.` };
       }
-      return undefined;
     },
   );
 }

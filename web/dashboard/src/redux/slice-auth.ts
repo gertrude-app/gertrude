@@ -37,10 +37,10 @@ export const slice = createSlice({
       state.loginEmail = ``;
       state.loginPassword = ``;
     },
-    loginFailed: (state, action: PayloadAction<ApiError>) => {
+    requestFailed: (state, action: PayloadAction<ApiError>) => {
       state.loginRequest = Req.fail(action.payload);
     },
-    loginErrorExpired: (state) => {
+    errorExpired: (state) => {
       state.loginRequest = Req.idle();
     },
     loginEmailUpdated: (state, action: PayloadAction<string>) => {
@@ -51,6 +51,13 @@ export const slice = createSlice({
     },
     logoutClicked: (state) => {
       state.admin = null;
+      state.loginRequest = Req.idle();
+    },
+    magicLinkRequested: (state) => {
+      state.loginRequest = Req.ongoing();
+    },
+    magicLinkSent: (state) => {
+      state.loginRequest = Req.succeed(void 0);
     },
   },
 });
@@ -64,14 +71,46 @@ export const submitLoginForm = createAsyncThunk(
     result.with({
       success: (admin) => dispatch(loginSucceeded(admin)),
       error: (error) => {
-        dispatch(loginFailed(error));
-        setTimeout(() => dispatch(loginErrorExpired()), 6000);
+        dispatch(requestFailed(error));
+        setTimeout(() => dispatch(errorExpired()), 6000);
       },
     });
   },
 );
 
-const { loginFormSubmitted, loginFailed, loginErrorExpired } = slice.actions;
+export const requestMagicLink = createAsyncThunk(
+  `${slice.name}/requestMagicLink`,
+  async (_, { dispatch, getState }) => {
+    dispatch(magicLinkRequested());
+    const result = await Current.api.admin.requestMagicLink(getState().auth.loginEmail);
+    result.with({
+      success: () => dispatch(magicLinkSent()),
+      error: (error) => {
+        dispatch(requestFailed(error));
+        setTimeout(() => dispatch(errorExpired()), 6000);
+      },
+    });
+  },
+);
+
+export const loginFromMagicLink = createAsyncThunk(
+  `${slice.name}/loginFromMagicLink`,
+  async (token: string, { dispatch }) => {
+    const result = await Current.api.admin.loginFromMagicLink(token);
+    result.with({
+      success: (admin) => dispatch(loginSucceeded(admin)),
+      error: (error) => dispatch(requestFailed(error)),
+    });
+  },
+);
+
+const {
+  loginFormSubmitted,
+  requestFailed,
+  errorExpired,
+  magicLinkRequested,
+  magicLinkSent,
+} = slice.actions;
 
 export const { logoutClicked, loginSucceeded, loginEmailUpdated, loginPasswordUpdated } =
   slice.actions;

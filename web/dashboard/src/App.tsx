@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import AuthedChrome from './components/Authed';
 import Dashboard from './components/routes/Dashboard';
 import Login from './components/routes/Login';
+import MagicLink from './components/routes/MagicLink';
 import JoinWaitlist from './components/routes/JoinWaitlist';
 import Profile from './components/routes/Profile';
 import Users from './components/routes/Users';
@@ -28,6 +29,7 @@ const App: React.FC = () => {
     <Routes>
       {/* unauthed routes */}
       <Route path="/login" element={<Login />} />
+      <Route path="/otp/:token" element={<MagicLink />} />
       <Route path="/join-waitlist" element={<JoinWaitlist />} />
 
       {/* authed routes */}

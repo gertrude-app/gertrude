@@ -18,6 +18,7 @@ const LoginForm: React.FC<Props> = ({
   onSubmit,
   setPassword,
   password,
+  onSendMagicLink,
 }) => (
   <form
     className="flex flex-col items-center max-w-sm"
@@ -54,7 +55,13 @@ const LoginForm: React.FC<Props> = ({
       <Button color="primary-violet" type="submit" fullWidth>
         Submit &rarr;
       </Button>
-      <Button color="secondary-white" type="submit" fullWidth>
+      <Button
+        disabled={email.match(/^.+@.+$/) === null}
+        onClick={onSendMagicLink}
+        color="secondary-white"
+        type="button"
+        fullWidth
+      >
         Send Magic Link
       </Button>
     </div>

@@ -20,6 +20,12 @@ export const throwingApiClient: ApiClient = {
     login: () => {
       throw new Error(`ApiClient.admin.login() not implemented.`);
     },
+    requestMagicLink: () => {
+      throw new Error(`ApiClient.admin.requestMagicLink() not implemented.`);
+    },
+    loginFromMagicLink: () => {
+      throw new Error(`ApiClient.admin.loginFromMagicLink() not implemented.`);
+    },
   },
   users: {
     list: () => {
@@ -45,6 +51,12 @@ export const throwingApiClient: ApiClient = {
 export const noopApiClient: ApiClient = {
   admin: {
     login: async () => {
+      return Result.success({ id: ``, token: `` });
+    },
+    requestMagicLink: async () => {
+      return Result.success(true);
+    },
+    loginFromMagicLink: async () => {
       return Result.success({ id: ``, token: `` });
     },
   },

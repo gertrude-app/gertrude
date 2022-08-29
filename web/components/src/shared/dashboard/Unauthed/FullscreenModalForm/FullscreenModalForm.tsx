@@ -6,7 +6,7 @@ import LoadingSpinner from '../../../LoadingSpinner';
 type Props =
   | { request: `idle`; children: React.ReactNode }
   | { request: `ongoing` }
-  | { request: `failed`; error: string }
+  | { request: `failed`; error: React.ReactNode }
   | { request: `succeeded`; message: string };
 
 const FullscreenModalForm: React.FC<Props> = (props) => {
