@@ -25,7 +25,7 @@ const storyFile = `import { ComponentStory, ComponentMeta } from '@storybook/rea
 import ${Component} from './${Component}';
 
 export default {
-  title: '${Component}',
+  title: \`${Component}\`,
   component: ${Component},
 } as ComponentMeta<typeof ${Component}>;
 

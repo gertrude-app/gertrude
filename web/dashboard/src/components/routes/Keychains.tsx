@@ -1,5 +1,5 @@
 import Button from '@shared/Button';
-import KeychainCard from '@shared/dashboard/KeychainCard';
+import KeychainCard from '@shared/dashboard/Users/KeychainCard';
 import PageHeading from '@shared/dashboard/PageHeading';
 import React from 'react';
 
@@ -79,12 +79,11 @@ const Keychains: React.FC = () => {
       <div className="grid grid-cols-1 lg+:grid-cols-2 gap-10 lg+:gap-8 xl:gap-10 2xl:grid-cols-3 mt-10">
         {fakeData.map(({ shared, name, description, keys }) => (
           <KeychainCard
-            shared={shared}
+            isPublic={shared}
             name={name}
             keys={keys}
             description={description}
             editable
-            className=""
           />
         ))}
       </div>
