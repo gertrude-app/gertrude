@@ -22,6 +22,7 @@ const viewports = {
 };
 
 export const parameters = {
+  options: { showPanel: false },
   actions: { argTypesRegex: '^on[A-Z].*' },
   viewport: { viewports },
   controls: {
