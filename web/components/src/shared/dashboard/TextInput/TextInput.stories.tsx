@@ -27,3 +27,18 @@ WithUnit.args = {
   label: `Interval`,
   unit: `seconds`,
 };
+
+export const WithPrefix = Template.bind({});
+WithPrefix.args = {
+  type: `text`,
+  label: `URL`,
+  prefix: `https://`,
+};
+
+export const WithUnitAndPrefix = Template.bind({});
+WithUnitAndPrefix.args = {
+  type: `text`,
+  label: `Web address`,
+  unit: `.com`,
+  prefix: `https://`,
+};

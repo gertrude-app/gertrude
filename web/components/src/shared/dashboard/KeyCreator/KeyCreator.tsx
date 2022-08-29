@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import KeyCreationStep from '../KeyCreationStep';
 import cx from 'classnames';
 import KeyTypeOption from '../KeyTypeOption';
+import TextInput from '../TextInput';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -71,9 +72,12 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
         currentStep={currentStep}
         index={2}
       >
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae quaerat
-        </p>
+        <TextInput
+          type={'text'}
+          label={'Web address:'}
+          value={address}
+          setValue={setAddress}
+        />
       </KeyCreationStep>
       <KeyCreationStep
         mode={mode}

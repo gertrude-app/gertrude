@@ -13,6 +13,7 @@ type Props = {
   className?: string;
   unit?: string;
   disabled?: boolean;
+  prefix?: string;
 };
 
 const TextInput: React.FC<Props> = ({
@@ -26,6 +27,7 @@ const TextInput: React.FC<Props> = ({
   className,
   disabled,
   unit,
+  prefix,
 }) => {
   const [localValue, setLocalValue] = useState(value);
   const id = useId();
@@ -33,6 +35,11 @@ const TextInput: React.FC<Props> = ({
     <div className={cx(`flex flex-col w-full`, className)}>
       {label && <Label htmlFor={id}>{label}</Label>}
       <div className="flex shadow-sm rounded-lg">
+        {prefix && (
+          <div className="flex justify-center items-center p-3 bg-gray-50 border border-r-0 rounded-l-lg">
+            <h3 className="text-gray-500">{prefix}</h3>
+          </div>
+        )}
         <input
           id={id}
           type={type === `positiveInteger` ? `number` : type}
@@ -48,9 +55,9 @@ const TextInput: React.FC<Props> = ({
               setValue(value);
             }
           }}
-          className={`h-10 border ring-0 ring-gray-200 rounded-lg outline-none py-6 px-4 focus:shadow-md transition duration-150 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 text-gray-600 flex-grow z-10 w-12 ${
+          className={`border ring-0 ring-gray-200 outline-none py-3 px-4 focus:shadow-md transition duration-150 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 text-gray-600 flex-grow z-10 w-12 ${
             unit ? `rounded-r-none` : `rounded-r-lg`
-          }`}
+          } ${prefix ? 'rounded-l-none' : 'rounded-l-lg'}`}
         />
         {unit && (
           <div className="flex justify-center items-center p-3 bg-gray-50 border border-l-0 rounded-r-lg">
