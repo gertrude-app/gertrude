@@ -92,7 +92,7 @@ const EditUser: React.FC<Props> = ({
           </div>
           <div
             className={cx(
-              `flex flex-col lg+:flex-row mt-5 transition duration-100`,
+              `flex flex-col space-y-3 md:flex-row md:space-x-3 md:space-y-0 mt-5 transition duration-100`,
               screenshotsEnabled ? `opacity-100` : `opacity-0 hidden`,
             )}
           >
@@ -102,7 +102,6 @@ const EditUser: React.FC<Props> = ({
               value={String(screenshotsResolution)}
               setValue={(num) => setScreenshotsResolution(Number(num))}
               unit="pixels"
-              className="lg+:mr-3"
             />
             <TextInput
               type={`number`}
@@ -110,7 +109,6 @@ const EditUser: React.FC<Props> = ({
               value={String(screenshotsFrequency)}
               setValue={(num) => setScreenshotsFrequency(Number(num))}
               unit="seconds"
-              className="mt-3 lg+:mt-0 lg+:ml-3"
             />
           </div>
         </div>
