@@ -1,5 +1,5 @@
 import { Middleware } from '@reduxjs/toolkit';
-import { loginSucceeded, logoutClicked } from './slice-auth';
+import { submitLoginForm, logoutClicked, loginFromMagicLink } from './slice-auth';
 import Current from '../environment';
 
 export const storageMiddleware: Middleware = (_store) => (next) => (action) => {
@@ -13,7 +13,10 @@ export const storageMiddleware: Middleware = (_store) => (next) => (action) => {
     }
   }
 
-  if (loginSucceeded.match(action)) {
+  if (
+    submitLoginForm.succeeded.match(action) ||
+    loginFromMagicLink.succeeded.match(action)
+  ) {
     const admin = action.payload;
     Current.localStorage.setItem(`admin_id`, admin.id);
     Current.localStorage.setItem(`admin_token`, admin.token);

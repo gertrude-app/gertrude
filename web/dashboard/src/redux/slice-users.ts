@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { formatDate } from '@shared/lib/dates';
 import { ActivityItem } from '@shared/dashboard/Users/Activity/ReviewDay';
-import Current from '../environment';
-import { GetActivityDay } from '../api/users/__generated__/GetActivityDay';
 import { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
 import { ListUsers_user } from '../api/users/__generated__/ListUsers';
 import { GetUser_user } from '../api/users/__generated__/GetUser';
 import { Req, toMap } from './helpers';
-import { ThunkAction, createAsyncThunk } from './hooks';
+import { ThunkAction, createResultThunk } from './thunk';
+import Current from '../environment';
+import { DateRangeInput } from '../graphqlTypes';
 
 interface ActivityDay {
   numDeleted: number;
@@ -31,36 +31,8 @@ export const initialState: UsersState = {
 export const slice = createSlice({
   name: `users`,
   initialState,
+
   reducers: {
-    fetchUserStarted: (state, action: PayloadAction<UUID>) => {
-      state.users[action.payload] = Req.ongoing();
-    },
-
-    fetchUserSucceeded: (state, action: PayloadAction<GetUser_user>) => {
-      state.users[action.payload.id] = Req.succeed(action.payload);
-    },
-
-    fetchUserFailed: (state, action: PayloadAction<{ id: UUID; error: ApiError }>) => {
-      state.users[action.payload.id] = Req.fail(action.payload.error);
-    },
-
-    listReqUpdated: (state, action: PayloadAction<UsersState['listReq']>) => {
-      state.listReq = action.payload;
-    },
-
-    activityOverviewUpdated: (
-      state,
-      action: PayloadAction<{ userId: UUID; req: RequestState<GetActivityOverview> }>,
-    ) => {
-      const { userId, req } = action.payload;
-      state.activityOverviews[userId] = Req.map(req, (payload) => ({
-        ...payload,
-        counts: payload.counts
-          .sort((a, b) => (a.dateRange.start < b.dateRange.start ? 1 : -1))
-          .filter((count) => count.numItems > 0),
-      }));
-    },
-
     activityItemsDeleted: (
       state,
       action: PayloadAction<{ key: ActivityDayKey; ids: UUID[] }>,
@@ -79,96 +51,97 @@ export const slice = createSlice({
         }
       }
     },
+  },
 
-    activityDayUpdated: (
-      state,
-      action: PayloadAction<{
-        key: ActivityDayKey;
-        req: RequestState<GetActivityDay>;
-      }>,
-    ) => {
-      state.activityDays[action.payload.key] = Req.map(action.payload.req, (day) => {
-        return {
-          numDeleted: day.counts[0]?.numDeleted ?? 0,
-          items: toMap(
-            day.items.map((item) => {
-              if (item.__typename === `CoalescedKeystrokeLine`) {
-                return {
-                  type: `KeystrokeLine`,
-                  id: item.id,
-                  ids: item.ids,
-                  appName: item.appName,
-                  line: item.line,
-                  date: item.createdAt,
-                };
-              } else {
-                return {
-                  type: `Screenshot`,
-                  id: item.id,
-                  ids: item.ids,
-                  url: item.url,
-                  width: item.width,
-                  height: item.height,
-                  date: item.createdAt,
-                };
-              }
-            }),
-          ),
-        };
+  extraReducers: (builder) => {
+    builder.addCase(fetchActivityDay.started, (state, { meta: { arg } }) => {
+      state.activityDays[activityDayKey(arg.userId, arg.day)] = Req.ongoing();
+    });
+
+    builder.addCase(fetchActivityDay.succeeded, (state, { payload, meta: { arg } }) => {
+      state.activityDays[activityDayKey(arg.userId, arg.day)] = Req.succeed({
+        numDeleted: payload.counts[0]?.numDeleted ?? 0,
+        items: toMap(
+          payload.items.map((item) => {
+            if (item.__typename === `CoalescedKeystrokeLine`) {
+              return { ...item, type: `KeystrokeLine`, date: item.createdAt };
+            } else {
+              return { ...item, type: `Screenshot`, date: item.createdAt };
+            }
+          }),
+        ),
       });
-    },
+    });
+
+    builder.addCase(fetchActivityDay.failed, (state, { error, meta: { arg } }) => {
+      state.activityDays[activityDayKey(arg.userId, arg.day)] = Req.fail(error);
+    });
+
+    builder.addCase(fetchUsers.started, (state) => {
+      state.listReq = Req.ongoing();
+    });
+
+    builder.addCase(fetchUsers.succeeded, (state, action) => {
+      state.listReq = Req.succeed(toMap(action.payload));
+    });
+
+    builder.addCase(fetchUsers.failed, (state, action) => {
+      state.listReq = Req.fail(action.error);
+    });
+
+    builder.addCase(fetchUser.succeeded, (state, action) => {
+      state.users[action.meta.arg] = Req.succeed(action.payload);
+    });
+
+    builder.addCase(fetchUser.failed, (state, action) => {
+      state.users[action.meta.arg] = Req.fail(action.error);
+    });
+
+    builder.addCase(fetchUser.started, (state, action) => {
+      state.users[action.meta.arg] = Req.ongoing();
+    });
+
+    builder.addCase(fetchActivityOverview.started, (state, action) => {
+      state.activityOverviews[action.meta.arg.userId] = Req.ongoing();
+    });
+
+    builder.addCase(fetchActivityOverview.succeeded, (state, action) => {
+      state.activityOverviews[action.meta.arg.userId] = Req.succeed({
+        ...action.payload,
+        counts: action.payload.counts
+          .sort((a, b) => (a.dateRange.start < b.dateRange.start ? 1 : -1))
+          .filter((count) => count.numItems > 0),
+      });
+    });
+
+    builder.addCase(fetchActivityOverview.failed, (state, action) => {
+      state.activityOverviews[action.meta.arg.userId] = Req.fail(action.error);
+    });
   },
 });
 
-export const fetchActivityDay = createAsyncThunk(
-  `${slice.name}/fetchActivityOverview`,
-  async ({ userId, day }: { userId: UUID; day: Date }, { dispatch }) => {
-    const key = activityDayKey(userId, day);
-    dispatch(activityDayUpdated({ key, req: Req.ongoing() }));
-    const result = await Current.api.users.getActivityDay(userId, day);
-    result.with({
-      success: (data) => dispatch(activityDayUpdated({ key, req: Req.succeed(data) })),
-      error: (error) => dispatch(activityDayUpdated({ key, req: Req.fail(error) })),
-    });
-  },
+// thunks
+
+export const fetchActivityDay = createResultThunk(
+  `${slice.name}/fetchActivityDay`,
+  (arg: { userId: UUID; day: Date }) =>
+    Current.api.users.getActivityDay(arg.userId, arg.day),
 );
 
-export const fetchActivityOverview = createAsyncThunk(
+export const fetchActivityOverview = createResultThunk(
   `${slice.name}/fetchActivityOverview`,
-  async (userId: UUID, { dispatch }) => {
-    dispatch(activityOverviewUpdated({ userId, req: Req.ongoing() }));
-    const result = await Current.api.users.getActivityOverview(userId);
-    result.with({
-      success: (data) =>
-        dispatch(activityOverviewUpdated({ userId, req: Req.succeed(data) })),
-      error: (error) =>
-        dispatch(activityOverviewUpdated({ userId, req: Req.fail(error) })),
-    });
-  },
+  (arg: { userId: UUID; ranges?: DateRangeInput[] }) =>
+    Current.api.users.getActivityOverview(arg.userId, arg.ranges),
 );
 
-export const fetchUsers = createAsyncThunk(
+export const fetchUsers = createResultThunk(
   `${slice.name}/fetchUsers`,
-  async (_, { dispatch }) => {
-    dispatch(listReqUpdated(Req.ongoing()));
-    const result = await Current.api.users.list();
-    result.with({
-      success: (users) => dispatch(listReqUpdated(Req.succeed(toMap(users)))),
-      error: (error) => dispatch(listReqUpdated(Req.fail(error))),
-    });
-  },
+  Current.api.users.list,
 );
 
-export const fetchUser = createAsyncThunk(
+export const fetchUser = createResultThunk(
   `${slice.name}/fetchUser`,
-  async (userId: UUID, { dispatch }) => {
-    dispatch(fetchUserStarted(userId));
-    const result = await Current.api.users.getUser(userId);
-    result.with({
-      success: (user) => dispatch(fetchUserSucceeded(user)),
-      error: (error) => dispatch(fetchUserFailed({ id: userId, error })),
-    });
-  },
+  Current.api.users.getUser,
 );
 
 export function deleteActivityItems(
@@ -193,15 +166,9 @@ export function deleteActivityItems(
   };
 }
 
-export const {
-  listReqUpdated,
-  activityOverviewUpdated,
-  activityDayUpdated,
-  activityItemsDeleted,
-  fetchUserFailed,
-  fetchUserStarted,
-  fetchUserSucceeded,
-} = slice.actions;
+// exports
+
+export const { activityItemsDeleted } = slice.actions;
 
 export default slice.reducer;
 

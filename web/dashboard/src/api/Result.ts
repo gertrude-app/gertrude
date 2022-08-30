@@ -22,10 +22,17 @@ export default class Result<T, E> {
   }
 
   public with(config: {
-    success: (value: T) => unknown;
-    error: (error: E) => unknown;
+    success?: (value: T) => unknown;
+    error?: (error: E) => unknown;
   }): void {
-    this.map(config);
+    this.map({
+      success: config.success ?? ((value) => value),
+      error: config.error ?? ((error) => error),
+    });
+  }
+
+  public withError(handler: (error: E) => void): void {
+    return this.with({ error: handler });
   }
 
   public map<NewT, NewE>(config: {

@@ -10,82 +10,88 @@ import {
 } from '../../redux/slice-auth';
 import ApiErrorMessage from '../ApiErrorMessage';
 import { Navigate, useLocation } from 'react-router-dom';
+import { Req } from '../../redux/helpers';
 
 type Props = React.ComponentProps<typeof LoginForm> & {
-  request: RequestState;
-  receivedAdmin: boolean;
+  passwordRequest: RequestState;
+  magicLinkRequest: RequestState;
 };
 
 export const Login: React.FC<Props> = ({
   email,
   setEmail,
-  request,
+  passwordRequest,
+  magicLinkRequest,
   onSubmit,
   password,
   setPassword,
-  receivedAdmin,
   onSendMagicLink,
 }) => {
   const location = useLocation();
-  switch (request.state) {
-    case `ongoing`:
-      return <FullscreenModalForm request="ongoing" />;
-
-    case `succeeded`:
-      if (receivedAdmin) {
-        return <Navigate to="/" replace state={{ from: location }} />;
-      } else {
-        return (
-          <FullscreenModalForm
-            request="succeeded"
-            message="Check your email for a magic link."
-          />
-        );
-      }
-
-    case `failed`:
-      return (
-        <FullscreenModalForm
-          request="failed"
-          error={<ApiErrorMessage wrapped={false} error={request.error} />}
-        />
-      );
-
-    default:
-      return (
-        <FullscreenModalForm request="idle">
-          <LoginForm
-            email={email}
-            setEmail={setEmail}
-            password={password}
-            setPassword={setPassword}
-            onSubmit={onSubmit}
-            onSendMagicLink={onSendMagicLink}
-          />
-        </FullscreenModalForm>
-      );
+  if (passwordRequest.state === `ongoing` || magicLinkRequest.state === `ongoing`) {
+    return <FullscreenModalForm request="ongoing" />;
   }
+
+  if (magicLinkRequest.state === `succeeded`) {
+    return (
+      <FullscreenModalForm
+        request="succeeded"
+        message="Check your email for a magic link."
+      />
+    );
+  }
+
+  if (passwordRequest.state === `succeeded`) {
+    return <Navigate to="/" replace state={{ from: location }} />;
+  }
+
+  if (passwordRequest.state === `failed` || magicLinkRequest.state === `failed`) {
+    return (
+      <FullscreenModalForm
+        request="failed"
+        error={
+          <ApiErrorMessage
+            wrapped={false}
+            error={Req.error(passwordRequest) ?? Req.error(magicLinkRequest)}
+          />
+        }
+      />
+    );
+  }
+
+  return (
+    <FullscreenModalForm request="idle">
+      <LoginForm
+        email={email}
+        setEmail={setEmail}
+        password={password}
+        setPassword={setPassword}
+        onSubmit={onSubmit}
+        onSendMagicLink={onSendMagicLink}
+      />
+    </FullscreenModalForm>
+  );
 };
 
 // container
 
 const LoginContainer: React.FC = () => {
   const dispatch = useDispatch();
-  const { email, password, request, receivedAdmin } = useSelector((state) => ({
+  const { email, password, passwordRequest, magicLinkRequest } = useSelector((state) => ({
     email: state.auth.loginEmail,
     password: state.auth.loginPassword,
-    request: state.auth.loginRequest,
-    receivedAdmin: state.auth.admin != null,
+    passwordRequest: state.auth.passwordLoginRequest,
+    magicLinkRequest: state.auth.requestMagicLinkRequest,
   }));
   return (
     <Login
-      request={request}
+      passwordRequest={passwordRequest}
+      magicLinkRequest={magicLinkRequest}
       email={email}
       setEmail={(email) => dispatch(loginEmailUpdated(email))}
       password={password}
       setPassword={(password) => dispatch(loginPasswordUpdated(password))}
       onSubmit={() => dispatch(submitLoginForm())}
-      receivedAdmin={receivedAdmin}
       onSendMagicLink={() => dispatch(requestMagicLink())}
     />
   );

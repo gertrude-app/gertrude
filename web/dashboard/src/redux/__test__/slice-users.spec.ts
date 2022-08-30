@@ -5,71 +5,41 @@ import { Req } from '../helpers';
 import Current from '../../environment';
 import { State } from '../store';
 import reducer, {
-  activityOverviewUpdated,
   activityItemsDeleted,
   deleteActivityItems,
   initialState,
+  fetchActivityOverview,
 } from '../slice-users';
 
-describe(`activityOverviewUpdated`, () => {
-  it(`filters out ranges with no items`, () => {
-    const state = reducer(
-      undefined,
-      activityOverviewUpdated({
-        userId: `123`,
-        req: Req.succeed({
-          user: { __typename: `User`, name: `Huck` },
-          counts: [overviewCount(0, 0)],
-        }),
-      }),
-    );
-    expect(Req.payload(state.activityOverviews[`123`])?.counts).toEqual([]);
-  });
+describe(`fetchActivityOverview`, () => {
+  it(`filters out ranges with no items, and orders most recent first`, async () => {
+    let state = reducer(void 0, fetchActivityOverview.started({ userId: `user123` }));
+    expect(state.activityOverviews).toEqual({ user123: Req.ongoing() });
 
-  it(`sorts by date, most recent first`, () => {
-    const state = reducer(
-      undefined,
-      activityOverviewUpdated({
-        userId: `123`,
-        req: Req.succeed({
+    state = reducer(
+      state,
+      fetchActivityOverview.succeeded(
+        {
           user: { __typename: `User`, name: `Huck` },
           counts: [
             overviewCount(5, 0, `01-01-2022`),
-            overviewCount(11, 0, `01-05-2022`), // <-- most recent
+            overviewCount(0, 0, `01-03-2022`), // <-- should be filtered out
+            overviewCount(11, 0, `01-05-2022`), // <-- most recent, should be first
           ],
-        }),
-      }),
-    );
-
-    const overview = Req.payload(state.activityOverviews[`123`]);
-    expect(overview?.counts[0]?.dateRange.start).toBe(`01-05-2022`);
-  });
-});
-
-describe(`activityItemsDeleted`, () => {
-  it(`increments numDeleted and sets item deleted bool`, () => {
-    const state = reducer(
-      {
-        listReq: Req.idle(),
-        users: {},
-        activityOverviews: {},
-        activityDays: {
-          'user123--01-01-2022': Req.succeed({
-            numDeleted: 0,
-            items: {
-              item1: keystrokeLine(`item1`),
-              item2: keystrokeLine(`item2`),
-            },
-          }),
         },
-      },
-      activityItemsDeleted({ key: `user123--01-01-2022`, ids: [`item2`] }),
+        { userId: `user123` },
+      ),
     );
 
-    const day = Req.payload(state.activityDays[`user123--01-01-2022`]);
-    expect(day?.numDeleted).toBe(1);
-    expect(day?.items.item2?.deleted).toBe(true);
-    expect(day?.items.item1?.deleted).not.toBe(true);
+    expect(state.activityOverviews).toEqual({
+      user123: Req.succeed({
+        user: { __typename: `User`, name: `Huck` },
+        counts: [
+          overviewCount(11, 0, `01-05-2022`), // <-- most recent
+          overviewCount(5, 0, `01-01-2022`),
+        ],
+      }),
+    });
   });
 });
 
@@ -104,6 +74,33 @@ describe(`deleteActivityItems`, () => {
   });
 });
 
+describe(`activityItemsDeleted`, () => {
+  it(`increments numDeleted and sets item deleted bool`, () => {
+    const state = reducer(
+      {
+        listReq: Req.idle(),
+        users: {},
+        activityOverviews: {},
+        activityDays: {
+          'user123--01-01-2022': Req.succeed({
+            numDeleted: 0,
+            items: {
+              item1: keystrokeLine(`item1`),
+              item2: keystrokeLine(`item2`),
+            },
+          }),
+        },
+      },
+      activityItemsDeleted({ key: `user123--01-01-2022`, ids: [`item2`] }),
+    );
+
+    const day = Req.payload(state.activityDays[`user123--01-01-2022`]);
+    expect(day?.numDeleted).toBe(1);
+    expect(day?.items.item2?.deleted).toBe(true);
+    expect(day?.items.item1?.deleted).not.toBe(true);
+  });
+});
+
 // helpers
 
 function makeGetState(state: Partial<State>): () => State {
@@ -112,7 +109,9 @@ function makeGetState(state: Partial<State>): () => State {
       admin: null,
       loginEmail: ``,
       loginPassword: ``,
-      loginRequest: Req.idle(),
+      passwordLoginRequest: Req.idle(),
+      requestMagicLinkRequest: Req.idle(),
+      loginFromMagicLinkRequest: Req.idle(),
     },
     menu: {
       mobileSidebarOpen: false,

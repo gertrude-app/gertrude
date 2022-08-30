@@ -43,6 +43,13 @@ export class Req {
       handler(req.payload);
     }
   }
+
+  static error<T, E>(req: RequestState<T, E> | undefined): E | undefined {
+    if (req && req.state === `failed`) {
+      return req.error;
+    }
+    return undefined;
+  }
 }
 
 export function toMap<T extends { id: string }>(array: T[]): Record<string, T> {
