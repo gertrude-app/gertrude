@@ -1,12 +1,12 @@
 import React from 'react';
 import cx from 'classnames';
+import { Subcomponents, SubcomponentsOmit } from '../../../types';
 import Button from '../../../Button';
 import KeychainCard from '../KeychainCard';
 import TextInput from '../../TextInput';
 import Toggle from '../../Toggle';
 import UserDevice from '../List/Card/Device';
 import PageHeading from '../../PageHeading';
-import { Subcomponents } from '../../../types';
 
 interface Props {
   name: string;
@@ -19,7 +19,8 @@ interface Props {
   setScreenshotsResolution(resolution: number): unknown;
   screenshotsFrequency: number;
   setScreenshotsFrequency(frequency: number): unknown;
-  keychains: Subcomponents<typeof KeychainCard>;
+  removeKeychain(id: UUID): unknown;
+  keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
   devices: Subcomponents<typeof UserDevice>;
   isDirty: boolean;
 }
@@ -35,6 +36,7 @@ const EditUser: React.FC<Props> = ({
   setScreenshotsResolution,
   screenshotsFrequency,
   setScreenshotsFrequency,
+  removeKeychain,
   keychains,
   devices,
   isDirty,
@@ -125,6 +127,7 @@ const EditUser: React.FC<Props> = ({
               description={keychain.description}
               keys={keychain.keys}
               isPublic={keychain.isPublic}
+              onRemove={() => removeKeychain(keychain.id)}
             />
           ))}
           <button className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition duration-100">

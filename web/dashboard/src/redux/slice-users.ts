@@ -19,6 +19,7 @@ export type UserUpdate = { id: UUID } & (
   | { type: 'screenshotsResolution'; value: number }
   | { type: 'screenshotsFrequency'; value: number }
   | { type: 'keyloggingEnabled'; value: boolean }
+  | { type: 'removeKeychain'; value: UUID }
 );
 
 export interface UsersState {
@@ -79,6 +80,9 @@ export const slice = createSlice({
           break;
         case `screenshotsFrequency`:
           draft.screenshotsFrequency = payload.value;
+          break;
+        case `removeKeychain`:
+          draft.keychains = draft.keychains.filter(({ id }) => id !== payload.value);
           break;
       }
     },

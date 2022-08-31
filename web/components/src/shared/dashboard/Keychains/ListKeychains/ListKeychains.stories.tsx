@@ -1,5 +1,6 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../../decorators/StatefulChrome';
+import KeychainCard from '../../Users/KeychainCard';
 import ListKeychains from './ListKeychains';
 
 export default {
@@ -16,68 +17,32 @@ const Template: ComponentStory<typeof ListKeychains> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   keychains: [
-    {
-      id: `1`,
-      isPublic: true,
-      name: `HTC`,
-      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
-      keys: 232,
-    },
-    {
-      id: `2`,
-      isPublic: true,
-      name: `Jimmy's Music Theory`,
-      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
-      keys: 7,
-    },
-    {
-      id: `3`,
-      isPublic: false,
-      name: `Jason's blog`,
-      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
-      keys: 3,
-    },
-    {
-      id: `4`,
-      isPublic: true,
-      name: `Misc McStandardishlong Keys`,
-      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
-      keys: 433,
-    },
-    {
-      id: `5`,
-      isPublic: false,
-      name: `John's stuff`,
-      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
-      keys: 674,
-    },
-    {
-      id: `6`,
-      isPublic: true,
-      name: `Smith Family`,
-      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
-      keys: 112,
-    },
-    {
-      id: `7`,
-      isPublic: true,
-      name: `Meyer Hatchery`,
-      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
-      keys: 14,
-    },
-    {
-      id: `8`,
-      isPublic: false,
-      name: `Facebook`,
-      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
-      keys: 2390,
-    },
-    {
-      id: `9`,
-      isPublic: false,
-      name: `Friends Library`,
-      description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
+    keychainProps({ name: `HTC`, keys: 232, isPublic: true }),
+    keychainProps({ name: `Jimmy's Music Theory`, keys: 7 }),
+    keychainProps({ name: `Jason's blog`, keys: 3, description: undefined }),
+    keychainProps({ name: `Misc McStrandardishlong Keys`, keys: 1027 }),
+    keychainProps({ name: `John's stuff`, keys: 674 }),
+    keychainProps({ name: `Smith family`, keys: 9, description: `A short description` }),
+    keychainProps({ name: `Meyer Hatchery`, keys: 14, isPublic: true }),
+    keychainProps({ name: `Facebook`, keys: 2390 }),
+    keychainProps({
+      name: `Friends Library Internationalization Remote Safety Keychain for MSF`,
       keys: 2,
-    },
+      description: `Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
+    }),
   ],
 };
+
+export function keychainProps(
+  override: Partial<React.ComponentProps<typeof KeychainCard>> = {},
+): React.ComponentProps<typeof KeychainCard> & { id: UUID } {
+  return {
+    id: `id-${Math.random()}`,
+    isPublic: false,
+    name: `HTC`,
+    description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
+    keys: 232,
+    onRemove: () => {},
+    ...override,
+  };
+}

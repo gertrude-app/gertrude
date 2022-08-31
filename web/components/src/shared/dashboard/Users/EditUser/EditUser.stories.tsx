@@ -1,5 +1,6 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../../decorators/StatefulChrome';
+import { keychainProps } from '../../Keychains/ListKeychains/ListKeychains.stories';
 import EditUser from './EditUser';
 
 export default {
@@ -24,20 +25,8 @@ Default.args = {
   screenshotsResolution: 1000,
   setScreenshotsResolution: () => {},
   keychains: [
-    {
-      id: `1`,
-      name: `HTC`,
-      keys: 43,
-      isPublic: true,
-      description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
-    },
-    {
-      id: `2`,
-      name: `Public Speaking`,
-      keys: 7,
-      isPublic: false,
-      description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
-    },
+    keychainProps({ name: `HTC`, keys: 43, isPublic: true }),
+    keychainProps({ name: `Public Speaking`, keys: 7, isPublic: false }),
   ],
   devices: [
     { id: `1`, model: `M1 MacbookAir (2021)`, status: `online`, icon: `laptop` },

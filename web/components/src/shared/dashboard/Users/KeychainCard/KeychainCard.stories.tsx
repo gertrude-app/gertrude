@@ -16,21 +16,18 @@ Shared.args = {
   keys: 43,
   isPublic: true,
   description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
+  onRemove: () => {},
 };
 
 export const Private = Template.bind({});
 Private.args = {
-  name: `HTC`,
-  keys: 43,
+  ...Shared.args,
   isPublic: false,
-  description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
 };
 
 export const Editable = Template.bind({});
 Editable.args = {
-  name: `HTC`,
-  keys: 43,
+  ...Shared.args,
   isPublic: false,
-  description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
   editable: true,
 };

@@ -6,9 +6,10 @@ import { Subcomponents } from '../../../types';
 
 type Props = {
   keychains: Subcomponents<typeof KeychainCard>;
+  removeKeychain(id: UUID): unknown;
 };
 
-const Keychains: React.FC<Props> = ({ keychains }) => (
+const Keychains: React.FC<Props> = ({ keychains, removeKeychain }) => (
   <div className="px-0 sm:px-4">
     <PageHeading icon="key">Keychains</PageHeading>
     <p className="mt-4 text-sm text-gray-500">
@@ -18,12 +19,14 @@ const Keychains: React.FC<Props> = ({ keychains }) => (
       you prefer.
     </p>
     <div className="grid grid-cols-1 lg+:grid-cols-2 gap-10 lg+:gap-8 xl:gap-10 2xl:grid-cols-3 mt-10">
-      {keychains.map(({ isPublic, name, description, keys }) => (
+      {keychains.map(({ id, isPublic, name, description, keys }) => (
         <KeychainCard
+          key={id}
           isPublic={isPublic}
           name={name}
           keys={keys}
           description={description}
+          onRemove={() => removeKeychain(id)}
           editable
         />
       ))}

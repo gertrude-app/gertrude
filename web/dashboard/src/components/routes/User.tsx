@@ -4,15 +4,15 @@ import { useParams } from 'react-router-dom';
 import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
+import { familyToIcon } from './Users';
+import { fetchUser, userUpdated, UserUpdate } from '../../redux/slice-users';
+import { isDirty } from '../../redux/helpers';
 import {
   GetUser_user_devices,
   GetUser_user_keychains,
 } from '../../api/users/__generated__/GetUser';
-import { familyToIcon } from './Users';
-import { fetchUser, userUpdated, UserUpdate } from '../../redux/slice-users';
-import { isDirty } from '../../redux/helpers';
 
-const EditUserContainer: React.FC = () => {
+const User: React.FC = () => {
   const dispatch = useDispatch();
   const { userId = `` } = useParams<{ userId: string }>();
   const { request, user } = useSelector((state) => ({
@@ -43,6 +43,9 @@ const EditUserContainer: React.FC = () => {
         }
         screenshotsFrequency={user.draft.screenshotsFrequency}
         setScreenshotsFrequency={(value) => set({ type: `screenshotsFrequency`, value })}
+        removeKeychain={(id) =>
+          dispatch(userUpdated({ id: userId, type: `removeKeychain`, value: id }))
+        }
         keychains={user.draft.keychains.map(keychainProps)}
         devices={user.draft.devices.map(deviceProps)}
         isDirty={isDirty(user)}
@@ -61,7 +64,7 @@ const EditUserContainer: React.FC = () => {
   return <ApiErrorMessage error={{ type: `actionable`, message: `User not found` }} />;
 };
 
-export default EditUserContainer;
+export default User;
 
 function keychainProps(
   apiKeychain: GetUser_user_keychains,
