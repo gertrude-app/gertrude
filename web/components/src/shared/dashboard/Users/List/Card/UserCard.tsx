@@ -1,15 +1,16 @@
 import React from 'react';
 import cx from 'classnames';
 import { inflect } from '../../../../lib/string';
-import UserDevice, { Props as UserDeviceProps } from './Device';
+import UserDevice from './Device';
 import { Link } from 'react-router-dom';
+import { Subcomponents } from '../../../../types';
 
-export type Props = {
+type Props = {
   id: string;
   name: string;
   numKeys: number;
   numKeychains: number;
-  devices: Array<UserDeviceProps & { id: string }>;
+  devices: Subcomponents<typeof UserDevice>;
   screenshotsEnabled: boolean;
   keystrokesEnabled: boolean;
 };

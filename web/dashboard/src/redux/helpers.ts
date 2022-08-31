@@ -58,3 +58,20 @@ export function toMap<T extends { id: string }>(array: T[]): Record<string, T> {
     return map;
   }, {});
 }
+
+export function toEditableMap<T extends { id: string }>(
+  array: T[],
+): Record<string, Editable<T>> {
+  return array.reduce<Record<string, Editable<T>>>((map, item) => {
+    map[item.id] = toEditable(item);
+    return map;
+  }, {});
+}
+
+export function toEditable<T extends { id: UUID }>(original: T): Editable<T> {
+  return { original, draft: JSON.parse(JSON.stringify(original)) };
+}
+
+export function isDirty<T extends { id: UUID }>(editable: Editable<T>): boolean {
+  return JSON.stringify(editable.original) !== JSON.stringify(editable.draft);
+}

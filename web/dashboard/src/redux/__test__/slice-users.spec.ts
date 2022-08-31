@@ -78,7 +78,8 @@ describe(`activityItemsDeleted`, () => {
   it(`increments numDeleted and sets item deleted bool`, () => {
     const state = reducer(
       {
-        listReq: Req.idle(),
+        listRequest: Req.idle(),
+        fetchUserRequest: {},
         users: {},
         activityOverviews: {},
         activityDays: {

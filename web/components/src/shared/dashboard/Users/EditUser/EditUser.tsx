@@ -21,6 +21,7 @@ interface Props {
   setScreenshotsFrequency(frequency: number): unknown;
   keychains: Subcomponents<typeof KeychainCard>;
   devices: Subcomponents<typeof UserDevice>;
+  isDirty: boolean;
 }
 
 const EditUser: React.FC<Props> = ({
@@ -36,6 +37,7 @@ const EditUser: React.FC<Props> = ({
   setScreenshotsFrequency,
   keychains,
   devices,
+  isDirty,
 }) => (
   <div className="relative max-w-3xl">
     <PageHeading icon="pen">Edit user</PageHeading>
@@ -97,15 +99,15 @@ const EditUser: React.FC<Props> = ({
             )}
           >
             <TextInput
-              type="number"
+              type="positiveInteger"
               label="Resolution"
               value={String(screenshotsResolution)}
               setValue={(num) => setScreenshotsResolution(Number(num))}
               unit="pixels"
             />
             <TextInput
-              type={`number`}
-              label={`Frequency`}
+              type="positiveInteger"
+              label="Frequency"
               value={String(screenshotsFrequency)}
               setValue={(num) => setScreenshotsFrequency(Number(num))}
               unit="seconds"
@@ -118,6 +120,7 @@ const EditUser: React.FC<Props> = ({
         <div className="p-3 flex flex-col space-y-4">
           {keychains.map((keychain) => (
             <KeychainCard
+              key={keychain.id}
               name={keychain.name}
               description={keychain.description}
               keys={keychain.keys}
@@ -142,6 +145,7 @@ const EditUser: React.FC<Props> = ({
           <Button
             small
             type="button"
+            disabled={!isDirty}
             onClick={() => {}}
             color="primary-violet"
             className=""

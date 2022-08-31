@@ -2,28 +2,37 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { formatDate } from '@shared/lib/dates';
 import { ActivityItem } from '@shared/dashboard/Users/Activity/ReviewDay';
 import { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
-import { ListUsers_user } from '../api/users/__generated__/ListUsers';
-import { GetUser_user } from '../api/users/__generated__/GetUser';
-import { Req, toMap } from './helpers';
+import { Req, toMap, toEditableMap, toEditable } from './helpers';
 import { ThunkAction, createResultThunk } from './thunk';
 import Current from '../environment';
 import { DateRangeInput } from '../graphqlTypes';
+import { User } from '../api/users';
 
 interface ActivityDay {
   numDeleted: number;
   items: Record<UUID, ActivityItem>;
 }
 
+export type UserUpdate = { id: UUID } & (
+  | { type: 'name'; value: string }
+  | { type: 'screenshotsEnabled'; value: boolean }
+  | { type: 'screenshotsResolution'; value: number }
+  | { type: 'screenshotsFrequency'; value: number }
+  | { type: 'keyloggingEnabled'; value: boolean }
+);
+
 export interface UsersState {
-  listReq: RequestState<Record<UUID, ListUsers_user>>;
-  users: Record<UUID, RequestState<GetUser_user>>;
+  listRequest: RequestState;
+  users: Record<UUID, Editable<User>>;
+  fetchUserRequest: Record<UUID, RequestState>;
   activityOverviews: Record<UUID, RequestState<GetActivityOverview>>;
   activityDays: Record<ActivityDayKey, RequestState<ActivityDay>>;
 }
 
 export const initialState: UsersState = {
-  listReq: Req.idle(),
+  listRequest: Req.idle(),
   users: {},
+  fetchUserRequest: {},
   activityOverviews: {},
   activityDays: {},
 };
@@ -49,6 +58,28 @@ export const slice = createSlice({
         if (item) {
           item.deleted = true;
         }
+      }
+    },
+
+    userUpdated: (state, { payload }: PayloadAction<UserUpdate>) => {
+      const draft = state.users[payload.id]?.draft;
+      if (!draft) return;
+      switch (payload.type) {
+        case `name`:
+          draft.name = payload.value;
+          break;
+        case `keyloggingEnabled`:
+          draft.keyloggingEnabled = payload.value;
+          break;
+        case `screenshotsEnabled`:
+          draft.screenshotsEnabled = payload.value;
+          break;
+        case `screenshotsResolution`:
+          draft.screenshotsResolution = payload.value;
+          break;
+        case `screenshotsFrequency`:
+          draft.screenshotsFrequency = payload.value;
+          break;
       }
     },
   },
@@ -78,27 +109,29 @@ export const slice = createSlice({
     });
 
     builder.addCase(fetchUsers.started, (state) => {
-      state.listReq = Req.ongoing();
+      state.listRequest = Req.ongoing();
     });
 
     builder.addCase(fetchUsers.succeeded, (state, action) => {
-      state.listReq = Req.succeed(toMap(action.payload));
+      state.listRequest = Req.succeed(void 0);
+      state.users = { ...state.users, ...toEditableMap(action.payload) };
     });
 
     builder.addCase(fetchUsers.failed, (state, action) => {
-      state.listReq = Req.fail(action.error);
+      state.listRequest = Req.fail(action.error);
     });
 
-    builder.addCase(fetchUser.succeeded, (state, action) => {
-      state.users[action.meta.arg] = Req.succeed(action.payload);
+    builder.addCase(fetchUser.succeeded, (state, { meta, payload }) => {
+      state.fetchUserRequest[meta.arg] = Req.succeed(void 0);
+      state.users[meta.arg] = toEditable(payload);
     });
 
     builder.addCase(fetchUser.failed, (state, action) => {
-      state.users[action.meta.arg] = Req.fail(action.error);
+      state.fetchUserRequest[action.meta.arg] = Req.fail(action.error);
     });
 
     builder.addCase(fetchUser.started, (state, action) => {
-      state.users[action.meta.arg] = Req.ongoing();
+      state.fetchUserRequest[action.meta.arg] = Req.ongoing();
     });
 
     builder.addCase(fetchActivityOverview.started, (state, action) => {
@@ -168,7 +201,7 @@ export function deleteActivityItems(
 
 // exports
 
-export const { activityItemsDeleted } = slice.actions;
+export const { activityItemsDeleted, userUpdated } = slice.actions;
 
 export default slice.reducer;
 

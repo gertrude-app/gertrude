@@ -9,16 +9,46 @@ import {
   GetUser_user_keychains,
 } from '../../api/users/__generated__/GetUser';
 import { familyToIcon } from './Users';
-import { fetchUser } from '../../redux/slice-users';
+import { fetchUser, userUpdated, UserUpdate } from '../../redux/slice-users';
+import { isDirty } from '../../redux/helpers';
 
 const EditUserContainer: React.FC = () => {
-  const { userId = `` } = useParams<{ userId: string }>();
-  const { request } = useSelector((state) => ({ request: state.users.users[userId] }));
   const dispatch = useDispatch();
+  const { userId = `` } = useParams<{ userId: string }>();
+  const { request, user } = useSelector((state) => ({
+    user: state.users.users[userId],
+    request: state.users.fetchUserRequest[userId],
+  }));
 
   useEffect(() => {
-    dispatch(fetchUser(userId));
-  }, [dispatch, userId]);
+    !user && dispatch(fetchUser(userId));
+  }, [dispatch, user, userId]);
+
+  function set(arg: Partial<UserUpdate>): void {
+    dispatch(userUpdated({ id: userId, ...arg } as UserUpdate));
+  }
+
+  if (user) {
+    return (
+      <EditUser
+        name={user.draft.name}
+        setName={(value) => set({ type: `name`, value })}
+        keyloggingEnabled={user.draft.keyloggingEnabled}
+        setKeyloggingEnabled={(value) => set({ type: `keyloggingEnabled`, value })}
+        screenshotsEnabled={user.draft.screenshotsEnabled}
+        setScreenshotsEnabled={(value) => set({ type: `screenshotsEnabled`, value })}
+        screenshotsResolution={user.draft.screenshotsResolution}
+        setScreenshotsResolution={(value) =>
+          set({ type: `screenshotsResolution`, value })
+        }
+        screenshotsFrequency={user.draft.screenshotsFrequency}
+        setScreenshotsFrequency={(value) => set({ type: `screenshotsFrequency`, value })}
+        keychains={user.draft.keychains.map(keychainProps)}
+        devices={user.draft.devices.map(deviceProps)}
+        isDirty={isDirty(user)}
+      />
+    );
+  }
 
   if (!request || request.state === `ongoing` || request.state === `idle`) {
     return <Loading />;
@@ -28,23 +58,7 @@ const EditUserContainer: React.FC = () => {
     return <ApiErrorMessage error={request.error} />;
   }
 
-  const user = request.payload;
-  return (
-    <EditUser
-      name={user.name}
-      setName={() => {}}
-      keyloggingEnabled={user.keyloggingEnabled}
-      setKeyloggingEnabled={() => {}}
-      screenshotsEnabled={user.screenshotsEnabled}
-      setScreenshotsEnabled={() => {}}
-      screenshotsResolution={user.screenshotsResolution}
-      setScreenshotsResolution={() => {}}
-      screenshotsFrequency={user.screenshotsFrequency}
-      setScreenshotsFrequency={() => {}}
-      keychains={user.keychains.map(keychainProps)}
-      devices={user.devices.map(deviceProps)}
-    />
-  );
+  return <ApiErrorMessage error={{ type: `actionable`, message: `User not found` }} />;
 };
 
 export default EditUserContainer;

@@ -2,10 +2,11 @@ import React from 'react';
 import Button from '../../../Button';
 import PageHeading from '../../PageHeading';
 import NoUsers from './NoUsers';
-import UserCard, { Props as UserCardProps } from './Card';
+import UserCard from './Card';
+import { Subcomponents } from '../../../types';
 
 type Props = {
-  users: Array<UserCardProps & { id: string }>;
+  users: Subcomponents<typeof UserCard>;
 };
 
 const Users: React.FC<Props> = ({ users }) => (
