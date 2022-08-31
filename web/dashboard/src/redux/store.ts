@@ -3,7 +3,8 @@ import waitlistReducer from './slice-waitlist';
 import menuReducer from './slice-menu';
 import authReducer from './slice-auth';
 import usersReducer from './slice-users';
-import { storageMiddleware } from './middleware-storage';
+import storageMiddleware from './middleware-storage';
+import toastMiddleware from './middleware-toast';
 
 export const store = configureStore({
   reducer: {
@@ -13,7 +14,7 @@ export const store = configureStore({
     users: usersReducer,
   },
   middleware: (getDefaultMiddleware) => {
-    return getDefaultMiddleware().concat(storageMiddleware);
+    return getDefaultMiddleware().concat([storageMiddleware, toastMiddleware]);
   },
 });
 

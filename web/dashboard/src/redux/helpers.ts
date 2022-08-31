@@ -75,3 +75,13 @@ export function toEditable<T extends { id: UUID }>(original: T): Editable<T> {
 export function isDirty<T extends { id: UUID }>(editable: Editable<T>): boolean {
   return JSON.stringify(editable.original) !== JSON.stringify(editable.draft);
 }
+
+export async function spinnerMin<T>(promise: Promise<T>, delayMs = 750): Promise<T> {
+  const start = Date.now();
+  const result = await promise;
+  const elapsed = Date.now() - start;
+  if (elapsed >= delayMs) {
+    return result;
+  }
+  return new Promise((res) => setTimeout(() => res(result), delayMs - elapsed));
+}

@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { formatDate } from '@shared/lib/dates';
 import { ActivityItem } from '@shared/dashboard/Users/Activity/ReviewDay';
 import { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
-import { Req, toMap, toEditableMap, toEditable } from './helpers';
+import { Req, toMap, toEditableMap, toEditable, spinnerMin } from './helpers';
 import { ThunkAction, createResultThunk } from './thunk';
 import Current from '../environment';
 import { DateRangeInput } from '../graphqlTypes';
@@ -209,13 +209,15 @@ export const updateUser = createResultThunk(
     if (!user || !auth.admin?.id) {
       return Result.error<[ApiError]>([{ type: `non_actionable` }]);
     }
-    const [updateUserResult, setKeychainsResult] = await Promise.all([
-      Current.api.users.updateUser({ ...user, adminId: auth.admin.id }),
-      Current.api.users.setUserKeychains(
-        userId,
-        user.keychains.map(({ id }) => id),
-      ),
-    ]);
+    const [updateUserResult, setKeychainsResult] = await spinnerMin(
+      Promise.all([
+        Current.api.users.updateUser({ ...user, adminId: auth.admin.id }),
+        Current.api.users.setUserKeychains(
+          userId,
+          user.keychains.map(({ id }) => id),
+        ),
+      ]),
+    );
     return Result.merge(updateUserResult, setKeychainsResult);
   },
 );
