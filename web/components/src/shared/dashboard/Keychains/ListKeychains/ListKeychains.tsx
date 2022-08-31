@@ -2,10 +2,10 @@ import React from 'react';
 import Button from '../../../Button';
 import KeychainCard from '../../Users/KeychainCard';
 import PageHeading from '../../PageHeading';
-import { Subcomponents } from '../../../types';
+import { SubcomponentsOmit } from '../../../types';
 
 type Props = {
-  keychains: Subcomponents<typeof KeychainCard>;
+  keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
   removeKeychain(id: UUID): unknown;
 };
 

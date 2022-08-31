@@ -26,6 +26,9 @@ export const throwingApiClient: ApiClient = {
     loginFromMagicLink: () => {
       throw new Error(`ApiClient.admin.loginFromMagicLink() not implemented.`);
     },
+    listKeychains: () => {
+      throw new Error(`ApiClient.admin.listKeychains() not implemented.`);
+    },
   },
   users: {
     list: () => {
@@ -67,6 +70,9 @@ export const noopApiClient: ApiClient = {
     },
     loginFromMagicLink: async () => {
       return Result.success({ id: ``, token: `` });
+    },
+    listKeychains: async () => {
+      return Result.success([]);
     },
   },
   users: {
