@@ -107,7 +107,12 @@ describe(`deleteActivityItems`, () => {
 
 function makeGetState(state: Partial<State>): () => State {
   return () => ({
-    auth: { admin: null },
+    auth: {
+      admin: null,
+      loginEmail: ``,
+      loginPassword: ``,
+      loginRequest: Req.idle(),
+    },
     menu: {
       mobileSidebarOpen: false,
       desktopSidebarCollapsed: false,

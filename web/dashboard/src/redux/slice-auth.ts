@@ -1,7 +1,9 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
 import { OptionalVar as Optional } from '../environment/Environment';
 import { StorageClient } from '../environment/Storage';
+import { Req } from './helpers';
+import { createAsyncThunk } from './hooks';
 
 export interface Admin {
   id: UUID;
@@ -10,23 +12,108 @@ export interface Admin {
 
 export interface AuthState {
   admin: Admin | null;
+  loginEmail: string;
+  loginPassword: string;
+  loginRequest: RequestState;
 }
 
 const initialState: AuthState = {
   admin: getInitialAdmin(),
+  loginEmail: ``,
+  loginPassword: ``,
+  loginRequest: Req.idle(),
 };
 
 export const slice = createSlice({
   name: `auth`,
   initialState,
   reducers: {
+    loginFormSubmitted: (state) => {
+      state.loginRequest = Req.ongoing();
+    },
+    loginSucceeded: (state, action: PayloadAction<Admin>) => {
+      state.admin = action.payload;
+      state.loginRequest = Req.succeed(void 0);
+      state.loginEmail = ``;
+      state.loginPassword = ``;
+    },
+    requestFailed: (state, action: PayloadAction<ApiError>) => {
+      state.loginRequest = Req.fail(action.payload);
+    },
+    errorExpired: (state) => {
+      state.loginRequest = Req.idle();
+    },
+    loginEmailUpdated: (state, action: PayloadAction<string>) => {
+      state.loginEmail = action.payload;
+    },
+    loginPasswordUpdated: (state, action: PayloadAction<string>) => {
+      state.loginPassword = action.payload;
+    },
     logoutClicked: (state) => {
       state.admin = null;
+      state.loginRequest = Req.idle();
+    },
+    magicLinkRequested: (state) => {
+      state.loginRequest = Req.ongoing();
+    },
+    magicLinkSent: (state) => {
+      state.loginRequest = Req.succeed(void 0);
     },
   },
 });
 
-export const { logoutClicked } = slice.actions;
+export const submitLoginForm = createAsyncThunk(
+  `${slice.name}/submitLoginForm`,
+  async (_, { dispatch, getState }) => {
+    dispatch(loginFormSubmitted());
+    const { loginEmail, loginPassword } = getState().auth;
+    const result = await Current.api.admin.login(loginEmail, loginPassword);
+    result.with({
+      success: (admin) => dispatch(loginSucceeded(admin)),
+      error: (error) => {
+        dispatch(requestFailed(error));
+        setTimeout(() => dispatch(errorExpired()), 6000);
+      },
+    });
+  },
+);
+
+export const requestMagicLink = createAsyncThunk(
+  `${slice.name}/requestMagicLink`,
+  async (_, { dispatch, getState }) => {
+    dispatch(magicLinkRequested());
+    const result = await Current.api.admin.requestMagicLink(getState().auth.loginEmail);
+    result.with({
+      success: () => dispatch(magicLinkSent()),
+      error: (error) => {
+        dispatch(requestFailed(error));
+        setTimeout(() => dispatch(errorExpired()), 6000);
+      },
+    });
+  },
+);
+
+export const loginFromMagicLink = createAsyncThunk(
+  `${slice.name}/loginFromMagicLink`,
+  async (token: string, { dispatch }) => {
+    const result = await Current.api.admin.loginFromMagicLink(token);
+    result.with({
+      success: (admin) => dispatch(loginSucceeded(admin)),
+      error: (error) => dispatch(requestFailed(error)),
+    });
+  },
+);
+
+const {
+  loginFormSubmitted,
+  requestFailed,
+  errorExpired,
+  magicLinkRequested,
+  magicLinkSent,
+} = slice.actions;
+
+export const { logoutClicked, loginSucceeded, loginEmailUpdated, loginPasswordUpdated } =
+  slice.actions;
 
 export default slice.reducer;
 

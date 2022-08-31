@@ -111,7 +111,7 @@ export const fetchActivityDay = createAsyncThunk(
     const key = activityDayKey(userId, day);
     dispatch(activityDayUpdated({ key, req: Req.ongoing() }));
     const result = await Current.api.users.getActivityDay(userId, day);
-    result.on({
+    result.with({
       success: (data) => dispatch(activityDayUpdated({ key, req: Req.succeed(data) })),
       error: (error) => dispatch(activityDayUpdated({ key, req: Req.fail(error) })),
     });
@@ -123,7 +123,7 @@ export const fetchActivityOverview = createAsyncThunk(
   async (userId: UUID, { dispatch }) => {
     dispatch(activityOverviewUpdated({ userId, req: Req.ongoing() }));
     const result = await Current.api.users.getActivityOverview(userId);
-    result.on({
+    result.with({
       success: (data) =>
         dispatch(activityOverviewUpdated({ userId, req: Req.succeed(data) })),
       error: (error) =>
@@ -137,7 +137,7 @@ export const fetchUsers = createAsyncThunk(
   async (_, { dispatch }) => {
     dispatch(listReqUpdated(Req.ongoing()));
     const result = await Current.api.users.list();
-    result.on({
+    result.with({
       success: (users) => dispatch(listReqUpdated(Req.succeed(toMap(users)))),
       error: (error) => dispatch(listReqUpdated(Req.fail(error))),
     });

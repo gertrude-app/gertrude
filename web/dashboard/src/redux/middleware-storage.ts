@@ -1,5 +1,5 @@
 import { Middleware } from '@reduxjs/toolkit';
-import { logoutClicked } from './slice-auth';
+import { loginSucceeded, logoutClicked } from './slice-auth';
 import Current from '../environment';
 
 export const storageMiddleware: Middleware = (_store) => (next) => (action) => {
@@ -12,5 +12,12 @@ export const storageMiddleware: Middleware = (_store) => (next) => (action) => {
       Current.sessionStorage.setItem(`dev_logged_out`, `true`);
     }
   }
+
+  if (loginSucceeded.match(action)) {
+    const admin = action.payload;
+    Current.localStorage.setItem(`admin_id`, admin.id);
+    Current.localStorage.setItem(`admin_token`, admin.token);
+  }
+
   return next(action);
 };

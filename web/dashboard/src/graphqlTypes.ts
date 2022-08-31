@@ -33,6 +33,11 @@ export interface DeleteMonitoringItemInput {
   type: string;
 }
 
+export interface LoginAdminInput {
+  email: string;
+  password: string;
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================

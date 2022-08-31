@@ -2,7 +2,7 @@ import React, { useId } from 'react';
 import cx from 'classnames';
 
 type Props = {
-  type: 'email' | 'text' | 'number';
+  type: 'email' | 'text' | 'number' | 'password';
   label: string;
   value: string;
   setValue(value: string): unknown;

@@ -30,3 +30,8 @@ export function formatDate(
     date.getFullYear(),
   ].join(``);
 }
+
+export function dateFromUrl(urlDate: string): Date {
+  const [month, days, year] = urlDate.split(`-`);
+  return new Date(Date.parse(`${year}-${month}-${days}T12:00:00.000Z`));
+}
