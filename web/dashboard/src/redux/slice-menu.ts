@@ -6,11 +6,13 @@ export interface MenuState {
   windowWidth: number;
 }
 
-const initialState: MenuState = {
-  mobileSidebarOpen: false,
-  desktopSidebarCollapsed: false,
-  windowWidth: window.innerWidth,
-};
+export function initialState(): MenuState {
+  return {
+    mobileSidebarOpen: false,
+    desktopSidebarCollapsed: false,
+    windowWidth: typeof window !== `undefined` ? window.innerWidth : 0,
+  };
+}
 
 export const slice = createSlice({
   name: `menu`,

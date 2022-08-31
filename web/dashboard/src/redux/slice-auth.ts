@@ -19,14 +19,16 @@ export interface AuthState {
   loginFromMagicLinkRequest: RequestState;
 }
 
-const initialState: AuthState = {
-  admin: getInitialAdmin(),
-  loginEmail: ``,
-  loginPassword: ``,
-  passwordLoginRequest: Req.idle(),
-  requestMagicLinkRequest: Req.idle(),
-  loginFromMagicLinkRequest: Req.idle(),
-};
+export function initialState(): AuthState {
+  return {
+    admin: getInitialAdmin(),
+    loginEmail: ``,
+    loginPassword: ``,
+    passwordLoginRequest: Req.idle(),
+    requestMagicLinkRequest: Req.idle(),
+    loginFromMagicLinkRequest: Req.idle(),
+  };
+}
 
 export const slice = createSlice({
   name: `auth`,
@@ -123,6 +125,10 @@ export default slice.reducer;
 // helpers
 
 export function getInitialAdmin(): Admin | null {
+  if (import.meta.env.VITEST) {
+    return null;
+  }
+
   if (Current.env.isProd() || Current.sessionStorage.getItem(`dev_logged_out`) !== null) {
     return adminFrom(Current.sessionStorage) ?? adminFrom(Current.localStorage);
   }

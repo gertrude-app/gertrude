@@ -7,6 +7,7 @@ import { ThunkAction, createResultThunk } from './thunk';
 import Current from '../environment';
 import { DateRangeInput } from '../graphqlTypes';
 import { User } from '../api/users';
+import Result from '../api/Result';
 
 interface ActivityDay {
   numDeleted: number;
@@ -26,22 +27,25 @@ export interface UsersState {
   listRequest: RequestState;
   users: Record<UUID, Editable<User>>;
   fetchUserRequest: Record<UUID, RequestState>;
+  updateUserRequest: Record<UUID, RequestState>;
   activityOverviews: Record<UUID, RequestState<GetActivityOverview>>;
   activityDays: Record<ActivityDayKey, RequestState<ActivityDay>>;
 }
 
-export const initialState: UsersState = {
-  listRequest: Req.idle(),
-  users: {},
-  fetchUserRequest: {},
-  activityOverviews: {},
-  activityDays: {},
-};
+export function initialState(): UsersState {
+  return {
+    listRequest: Req.idle(),
+    users: {},
+    fetchUserRequest: {},
+    updateUserRequest: {},
+    activityOverviews: {},
+    activityDays: {},
+  };
+}
 
 export const slice = createSlice({
   name: `users`,
   initialState,
-
   reducers: {
     activityItemsDeleted: (
       state,
@@ -154,6 +158,22 @@ export const slice = createSlice({
     builder.addCase(fetchActivityOverview.failed, (state, action) => {
       state.activityOverviews[action.meta.arg.userId] = Req.fail(action.error);
     });
+
+    builder.addCase(updateUser.started, (state, { meta }) => {
+      state.updateUserRequest[meta.arg] = Req.ongoing();
+    });
+
+    builder.addCase(updateUser.failed, (state, { meta, error: [error] }) => {
+      state.updateUserRequest[meta.arg] = Req.fail(error);
+    });
+
+    builder.addCase(updateUser.succeeded, (state, { meta }) => {
+      state.updateUserRequest[meta.arg] = Req.succeed(void 0);
+      const draft = state.users[meta.arg]?.draft;
+      if (draft) {
+        state.users[meta.arg] = toEditable(draft);
+      }
+    });
   },
 });
 
@@ -179,6 +199,25 @@ export const fetchUsers = createResultThunk(
 export const fetchUser = createResultThunk(
   `${slice.name}/fetchUser`,
   Current.api.users.getUser,
+);
+
+export const updateUser = createResultThunk(
+  `${slice.name}/updateUser`,
+  async (userId: UUID, { getState }) => {
+    const { users, auth } = getState();
+    const user = users.users[userId]?.draft;
+    if (!user || !auth.admin?.id) {
+      return Result.error<[ApiError]>([{ type: `non_actionable` }]);
+    }
+    const [updateUserResult, setKeychainsResult] = await Promise.all([
+      Current.api.users.updateUser({ ...user, adminId: auth.admin.id }),
+      Current.api.users.setUserKeychains(
+        userId,
+        user.keychains.map(({ id }) => id),
+      ),
+    ]);
+    return Result.merge(updateUserResult, setKeychainsResult);
+  },
 );
 
 export function deleteActivityItems(

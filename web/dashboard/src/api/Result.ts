@@ -9,6 +9,10 @@ type ExtractActionableError = (errors: GraphQLError[]) => ActionableApiError | u
 export default class Result<T, E> {
   private constructor(public data: ResultData<T, E>) {}
 
+  public static true(): Result<true, never> {
+    return Result.success(true);
+  }
+
   public static success<T>(value: T): Result<T, never> {
     return new Result<T, never>({ type: `success`, value });
   }
@@ -17,8 +21,17 @@ export default class Result<T, E> {
     return new Result<never, E>({ type: `error`, error });
   }
 
-  public get result(): ResultData<T, E> {
-    return this.data;
+  public static merge<TA, TB, E>(
+    a: Result<TA, E>,
+    b: Result<TB, E>,
+  ): Result<[TA, TB], [E, E?]> {
+    if (a.data.type === `error`) {
+      return Result.error([a.data.error, b.error]);
+    } else if (b.data.type === `error`) {
+      return Result.error([b.data.error, a.error]);
+    } else {
+      return Result.success([a.data.value, b.data.value]);
+    }
   }
 
   public with(config: {

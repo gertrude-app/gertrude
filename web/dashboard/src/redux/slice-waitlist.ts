@@ -8,10 +8,12 @@ export interface WaitlistState {
   joinReq: RequestState;
 }
 
-const initialState: WaitlistState = {
-  email: ``,
-  joinReq: Req.idle(),
-};
+export function initialState(): WaitlistState {
+  return {
+    email: ``,
+    joinReq: Req.idle(),
+  };
+}
 
 export const slice = createSlice({
   name: `waitlist`,

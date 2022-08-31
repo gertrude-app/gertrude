@@ -22,7 +22,8 @@ interface Props {
   removeKeychain(id: UUID): unknown;
   keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
   devices: Subcomponents<typeof UserDevice>;
-  isDirty: boolean;
+  saveButtonDisabled: boolean;
+  onSave(): unknown;
 }
 
 const EditUser: React.FC<Props> = ({
@@ -39,7 +40,8 @@ const EditUser: React.FC<Props> = ({
   removeKeychain,
   keychains,
   devices,
-  isDirty,
+  saveButtonDisabled,
+  onSave,
 }) => (
   <div className="relative max-w-3xl">
     <PageHeading icon="pen">Edit user</PageHeading>
@@ -135,23 +137,16 @@ const EditUser: React.FC<Props> = ({
             Add keychain
           </button>
         </div>
-        <div className="flex mt-5 justify-end border-t-2 pt-8">
-          <Button
-            type="button"
-            onClick={() => {}}
-            color="secondary-warning"
-            className="mr-5"
-            small
-          >
+        <div className="flex mt-5 justify-end border-t-2 pt-8 space-x-5">
+          <Button type="button" onClick={() => {}} color="secondary-warning" small>
             Delete user
           </Button>
           <Button
             small
             type="button"
-            disabled={!isDirty}
-            onClick={() => {}}
+            disabled={saveButtonDisabled}
+            onClick={onSave}
             color="primary-violet"
-            className=""
           >
             Save user
           </Button>

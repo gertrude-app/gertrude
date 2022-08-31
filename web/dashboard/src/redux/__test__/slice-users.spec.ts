@@ -1,15 +1,77 @@
-import { expect, it, describe, vi } from 'vitest';
-import { GetActivityOverview_counts } from '../../api/users/__generated__/GetActivityOverview';
-import { ActivityItem } from '@shared/dashboard/Users/Activity/ReviewDay';
-import { Req } from '../helpers';
+import { expect, test, it, describe, vi } from 'vitest';
+import { Req, toEditable } from '../helpers';
 import Current from '../../environment';
-import { State } from '../store';
 import reducer, {
   activityItemsDeleted,
   deleteActivityItems,
-  initialState,
   fetchActivityOverview,
+  updateUser,
 } from '../slice-users';
+import { makeGetState, makeState } from './test-helpers';
+import * as mock from './mocks';
+import Result from '../../api/Result';
+
+describe(`updateUser`, () => {
+  it(`passes correct arguments to API methods`, () => {
+    Current.api.users.setUserKeychains = vi.fn(() => Promise.resolve(Result.true()));
+    Current.api.users.updateUser = vi.fn(() => Promise.resolve(Result.true()));
+    const dispatch = vi.fn();
+
+    const user = toEditable(
+      mock.user({
+        id: `user123`,
+        keyloggingEnabled: true,
+        screenshotsEnabled: true,
+        keychains: [
+          mock.userKeychain({ id: `keychain1` }),
+          mock.userKeychain({ id: `keychain2` }),
+        ],
+      }),
+    );
+
+    // here are the "edits" made to the user
+    user.draft.name = `New Name`;
+    user.draft.keyloggingEnabled = false;
+    user.draft.screenshotsEnabled = false;
+    user.draft.screenshotsResolution = 55;
+    user.draft.screenshotsFrequency = 101;
+    user.draft.keychains = [user.draft.keychains[0]!]; // <-- removed one
+
+    const getState = makeGetState((state) => {
+      state.auth.admin = { id: `admin123`, token: `` };
+      state.users.users = { user123: user };
+    });
+
+    updateUser(`user123`)(dispatch, getState);
+
+    expect(Current.api.users.updateUser).toHaveBeenCalledWith({
+      ...user.draft,
+      adminId: `admin123`,
+    });
+
+    expect(Current.api.users.setUserKeychains).toHaveBeenCalledWith(`user123`, [
+      `keychain1`,
+    ]);
+  });
+
+  test(`update user happy path`, () => {
+    const user = toEditable(mock.user({ id: `user123` }));
+    user.draft.name = `Blob Jr.`; // <-- this is the edit
+
+    const initialState = makeState((state) => {
+      state.users.users = { user123: user };
+    });
+
+    let state = reducer(initialState.users, updateUser.started(`user123`));
+    expect(state.updateUserRequest.user123).toEqual(Req.ongoing());
+
+    state = reducer(initialState.users, updateUser.succeeded([true, true], `user123`));
+    expect(state.updateUserRequest.user123).toEqual(Req.succeed(void 0));
+
+    // successfully saving causes the draft state to be "committed"
+    expect(state.users.user123?.original.name).toBe(`Blob Jr.`);
+  });
+});
 
 describe(`fetchActivityOverview`, () => {
   it(`filters out ranges with no items, and orders most recent first`, async () => {
@@ -22,9 +84,9 @@ describe(`fetchActivityOverview`, () => {
         {
           user: { __typename: `User`, name: `Huck` },
           counts: [
-            overviewCount(5, 0, `01-01-2022`),
-            overviewCount(0, 0, `01-03-2022`), // <-- should be filtered out
-            overviewCount(11, 0, `01-05-2022`), // <-- most recent, should be first
+            mock.activityOverviewCounts(5, 0, `01-01-2022`),
+            mock.activityOverviewCounts(0, 0, `01-03-2022`), // <-- should be filtered out
+            mock.activityOverviewCounts(11, 0, `01-05-2022`), // <-- most recent, should be first
           ],
         },
         { userId: `user123` },
@@ -35,8 +97,8 @@ describe(`fetchActivityOverview`, () => {
       user123: Req.succeed({
         user: { __typename: `User`, name: `Huck` },
         counts: [
-          overviewCount(11, 0, `01-05-2022`), // <-- most recent
-          overviewCount(5, 0, `01-01-2022`),
+          mock.activityOverviewCounts(11, 0, `01-05-2022`), // <-- most recent
+          mock.activityOverviewCounts(5, 0, `01-01-2022`),
         ],
       }),
     });
@@ -45,24 +107,23 @@ describe(`fetchActivityOverview`, () => {
 
 describe(`deleteActivityItems`, () => {
   it(`dispatches correct action and invokes api`, () => {
-    const users = {
-      ...initialState,
-      activityDays: {
-        'user123--01-01-2022': Req.succeed({
-          numDeleted: 0,
-          items: {
-            item1: keystrokeLine(`item1`),
-            item2: keystrokeLine(`item2`),
-          },
-        }),
-      },
-    };
-
     Current.api.users.deleteActivityItems = vi.fn();
     const dispatch = vi.fn();
 
+    const getState = makeGetState((state) => {
+      state.users.activityDays = {
+        'user123--01-01-2022': Req.succeed({
+          numDeleted: 0,
+          items: {
+            item1: mock.keystrokeLine({ id: `item1` }),
+            item2: mock.keystrokeLine({ id: `item2` }),
+          },
+        }),
+      };
+    });
+
     const thunk = deleteActivityItems(`user123`, new Date(`01-01-2022`), [`item1`]);
-    thunk(dispatch, makeGetState({ users }), null);
+    thunk(dispatch, getState, null);
 
     expect(dispatch).toHaveBeenCalledWith(
       activityItemsDeleted({ key: `user123--01-01-2022`, ids: [`item1`] }),
@@ -76,80 +137,26 @@ describe(`deleteActivityItems`, () => {
 
 describe(`activityItemsDeleted`, () => {
   it(`increments numDeleted and sets item deleted bool`, () => {
-    const state = reducer(
-      {
-        listRequest: Req.idle(),
-        fetchUserRequest: {},
-        users: {},
-        activityOverviews: {},
-        activityDays: {
-          'user123--01-01-2022': Req.succeed({
-            numDeleted: 0,
-            items: {
-              item1: keystrokeLine(`item1`),
-              item2: keystrokeLine(`item2`),
-            },
-          }),
-        },
-      },
+    const { users: initialState } = makeState((state) => {
+      state.users.activityDays = {
+        'user123--01-01-2022': Req.succeed({
+          numDeleted: 0,
+          items: {
+            item1: mock.keystrokeLine({ id: `item1` }),
+            item2: mock.keystrokeLine({ id: `item2` }),
+          },
+        }),
+      };
+    });
+
+    const newState = reducer(
+      initialState,
       activityItemsDeleted({ key: `user123--01-01-2022`, ids: [`item2`] }),
     );
 
-    const day = Req.payload(state.activityDays[`user123--01-01-2022`]);
+    const day = Req.payload(newState.activityDays[`user123--01-01-2022`]);
     expect(day?.numDeleted).toBe(1);
     expect(day?.items.item2?.deleted).toBe(true);
     expect(day?.items.item1?.deleted).not.toBe(true);
   });
 });
-
-// helpers
-
-function makeGetState(state: Partial<State>): () => State {
-  return () => ({
-    auth: {
-      admin: null,
-      loginEmail: ``,
-      loginPassword: ``,
-      passwordLoginRequest: Req.idle(),
-      requestMagicLinkRequest: Req.idle(),
-      loginFromMagicLinkRequest: Req.idle(),
-    },
-    menu: {
-      mobileSidebarOpen: false,
-      desktopSidebarCollapsed: false,
-      windowWidth: 0,
-    },
-    users: { ...initialState },
-    waitlist: { email: ``, joinReq: Req.idle() },
-    ...state,
-  });
-}
-
-function overviewCount(
-  numItems = 0,
-  numCompleted = 0,
-  start = new Date().toISOString(),
-): GetActivityOverview_counts {
-  return {
-    __typename: `MonitoringRangeCounts`,
-    dateRange: { __typename: `DateRange`, start },
-    numItems,
-    numCompleted,
-  };
-}
-
-function keystrokeLine(
-  id = `id-${Math.random()}`,
-  appName = `appName-${Math.random()}`,
-  line = `line-${Math.random()}`,
-  date = new Date().toISOString(),
-): ActivityItem {
-  return {
-    id,
-    ids: [id],
-    type: `KeystrokeLine`,
-    appName,
-    line,
-    date,
-  };
-}

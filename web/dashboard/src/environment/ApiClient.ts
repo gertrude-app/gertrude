@@ -34,6 +34,12 @@ export const throwingApiClient: ApiClient = {
     getUser: () => {
       throw new Error(`ApiClient.users.getUser() not implemented.`);
     },
+    updateUser: () => {
+      throw new Error(`ApiClient.users.updateUser() not implemented.`);
+    },
+    setUserKeychains: () => {
+      throw new Error(`ApiClient.users.setUserKeychains() not implemented.`);
+    },
     getActivityOverview: () => {
       throw new Error(`ApiClient.users.getActivityOverview() not implemented.`);
     },
@@ -79,6 +85,12 @@ export const noopApiClient: ApiClient = {
         keychains: [],
         devices: [],
       });
+    },
+    updateUser: async () => {
+      return Result.success(true);
+    },
+    setUserKeychains: async () => {
+      return Result.success(true);
     },
     getActivityOverview: async () => {
       return Result.success({ user: { __typename: `User`, name: `` }, counts: [] });

@@ -5,7 +5,7 @@ import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import { familyToIcon } from './Users';
-import { fetchUser, userUpdated, UserUpdate } from '../../redux/slice-users';
+import { fetchUser, userUpdated, UserUpdate, updateUser } from '../../redux/slice-users';
 import { isDirty } from '../../redux/helpers';
 import {
   GetUser_user_devices,
@@ -15,9 +15,10 @@ import {
 const User: React.FC = () => {
   const dispatch = useDispatch();
   const { userId = `` } = useParams<{ userId: string }>();
-  const { request, user } = useSelector((state) => ({
+  const { fetch, update, user } = useSelector((state) => ({
     user: state.users.users[userId],
-    request: state.users.fetchUserRequest[userId],
+    fetch: state.users.fetchUserRequest[userId],
+    update: state.users.updateUserRequest[userId],
   }));
 
   useEffect(() => {
@@ -48,23 +49,26 @@ const User: React.FC = () => {
         }
         keychains={user.draft.keychains.map(keychainProps)}
         devices={user.draft.devices.map(deviceProps)}
-        isDirty={isDirty(user)}
+        saveButtonDisabled={!isDirty(user) || update?.state === `ongoing`}
+        onSave={() => dispatch(updateUser(userId))}
       />
     );
   }
 
-  if (!request || request.state === `ongoing` || request.state === `idle`) {
+  if (!fetch || fetch.state === `ongoing` || fetch.state === `idle`) {
     return <Loading />;
   }
 
-  if (request.state === `failed`) {
-    return <ApiErrorMessage error={request.error} />;
+  if (fetch.state === `failed`) {
+    return <ApiErrorMessage error={fetch.error} />;
   }
 
   return <ApiErrorMessage error={{ type: `actionable`, message: `User not found` }} />;
 };
 
 export default User;
+
+// helpers
 
 function keychainProps(
   apiKeychain: GetUser_user_keychains,
