@@ -38,6 +38,22 @@ export interface LoginAdminInput {
   password: string;
 }
 
+export interface SetUserKeychainsInput {
+  keychainIds: UUID[];
+  userId: UUID;
+}
+
+export interface UpdateUserInput {
+  adminId: UUID;
+  deletedAt?: string | null;
+  id: UUID;
+  keyloggingEnabled: boolean;
+  name: string;
+  screenshotsEnabled: boolean;
+  screenshotsFrequency: number;
+  screenshotsResolution: number;
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================

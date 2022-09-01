@@ -9,23 +9,43 @@ type ExtractActionableError = (errors: GraphQLError[]) => ActionableApiError | u
 export default class Result<T, E> {
   private constructor(public data: ResultData<T, E>) {}
 
-  public static success<T, E>(value: T): Result<T, E> {
-    return new Result<T, E>({ type: `success`, value });
+  public static true(): Result<true, never> {
+    return Result.success(true);
   }
 
-  public static error<T, E>(error: E): Result<T, E> {
-    return new Result<T, E>({ type: `error`, error });
+  public static success<T>(value: T): Result<T, never> {
+    return new Result<T, never>({ type: `success`, value });
   }
 
-  public get result(): ResultData<T, E> {
-    return this.data;
+  public static error<E>(error: E): Result<never, E> {
+    return new Result<never, E>({ type: `error`, error });
+  }
+
+  public static merge<TA, TB, E>(
+    a: Result<TA, E>,
+    b: Result<TB, E>,
+  ): Result<[TA, TB], [E, E?]> {
+    if (a.data.type === `error`) {
+      return Result.error([a.data.error, b.error]);
+    } else if (b.data.type === `error`) {
+      return Result.error([b.data.error, a.error]);
+    } else {
+      return Result.success([a.data.value, b.data.value]);
+    }
   }
 
   public with(config: {
-    success: (value: T) => unknown;
-    error: (error: E) => unknown;
+    success?: (value: T) => unknown;
+    error?: (error: E) => unknown;
   }): void {
-    this.map(config);
+    this.map({
+      success: config.success ?? ((value) => value),
+      error: config.error ?? ((error) => error),
+    });
+  }
+
+  public withError(handler: (error: E) => void): void {
+    return this.with({ error: handler });
   }
 
   public map<NewT, NewE>(config: {

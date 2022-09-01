@@ -1,51 +1,52 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { formatDate } from '@shared/lib/dates';
 import { ActivityItem } from '@shared/dashboard/Users/Activity/ReviewDay';
-import Current from '../environment';
-import { GetActivityDay } from '../api/users/__generated__/GetActivityDay';
 import { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
-import { ListUsers_user } from '../api/users/__generated__/ListUsers';
-import { Req, toMap } from './helpers';
-import { ThunkAction } from './hooks';
+import { Req, toMap, toEditableMap, toEditable, spinnerMin } from './helpers';
+import { ThunkAction, createResultThunk } from './thunk';
+import Current from '../environment';
+import { DateRangeInput } from '../graphqlTypes';
+import { User } from '../api/users';
+import Result from '../api/Result';
 
 interface ActivityDay {
   numDeleted: number;
   items: Record<UUID, ActivityItem>;
 }
 
+export type UserUpdate = { id: UUID } & (
+  | { type: 'name'; value: string }
+  | { type: 'screenshotsEnabled'; value: boolean }
+  | { type: 'screenshotsResolution'; value: number }
+  | { type: 'screenshotsFrequency'; value: number }
+  | { type: 'keyloggingEnabled'; value: boolean }
+  | { type: 'removeKeychain'; value: UUID }
+);
+
 export interface UsersState {
-  listReq: RequestState<Record<UUID, ListUsers_user>>;
+  listRequest: RequestState;
+  users: Record<UUID, Editable<User>>;
+  fetchUserRequest: Record<UUID, RequestState>;
+  updateUserRequest: Record<UUID, RequestState>;
   activityOverviews: Record<UUID, RequestState<GetActivityOverview>>;
   activityDays: Record<ActivityDayKey, RequestState<ActivityDay>>;
 }
 
-export const initialState: UsersState = {
-  listReq: Req.idle(),
-  activityOverviews: {},
-  activityDays: {},
-};
+export function initialState(): UsersState {
+  return {
+    listRequest: Req.idle(),
+    users: {},
+    fetchUserRequest: {},
+    updateUserRequest: {},
+    activityOverviews: {},
+    activityDays: {},
+  };
+}
 
 export const slice = createSlice({
   name: `users`,
   initialState,
   reducers: {
-    listReqUpdated: (state, action: PayloadAction<UsersState['listReq']>) => {
-      state.listReq = action.payload;
-    },
-
-    activityOverviewUpdated: (
-      state,
-      action: PayloadAction<{ userId: UUID; req: RequestState<GetActivityOverview> }>,
-    ) => {
-      const { userId, req } = action.payload;
-      state.activityOverviews[userId] = Req.map(req, (payload) => ({
-        ...payload,
-        counts: payload.counts
-          .sort((a, b) => (a.dateRange.start < b.dateRange.start ? 1 : -1))
-          .filter((count) => count.numItems > 0),
-      }));
-    },
-
     activityItemsDeleted: (
       state,
       action: PayloadAction<{ key: ActivityDayKey; ids: UUID[] }>,
@@ -65,82 +66,159 @@ export const slice = createSlice({
       }
     },
 
-    activityDayUpdated: (
-      state,
-      action: PayloadAction<{
-        key: ActivityDayKey;
-        req: RequestState<GetActivityDay>;
-      }>,
-    ) => {
-      state.activityDays[action.payload.key] = Req.map(action.payload.req, (day) => {
-        return {
-          numDeleted: day.counts[0]?.numDeleted ?? 0,
-          items: toMap(
-            day.items.map((item) => {
-              if (item.__typename === `CoalescedKeystrokeLine`) {
-                return {
-                  type: `KeystrokeLine`,
-                  id: item.id,
-                  ids: item.ids,
-                  appName: item.appName,
-                  line: item.line,
-                  date: item.createdAt,
-                };
-              } else {
-                return {
-                  type: `Screenshot`,
-                  id: item.id,
-                  ids: item.ids,
-                  url: item.url,
-                  width: item.width,
-                  height: item.height,
-                  date: item.createdAt,
-                };
-              }
-            }),
-          ),
-        };
-      });
+    userUpdated: (state, { payload }: PayloadAction<UserUpdate>) => {
+      const draft = state.users[payload.id]?.draft;
+      if (!draft) return;
+      switch (payload.type) {
+        case `name`:
+          draft.name = payload.value;
+          break;
+        case `keyloggingEnabled`:
+          draft.keyloggingEnabled = payload.value;
+          break;
+        case `screenshotsEnabled`:
+          draft.screenshotsEnabled = payload.value;
+          break;
+        case `screenshotsResolution`:
+          draft.screenshotsResolution = payload.value;
+          break;
+        case `screenshotsFrequency`:
+          draft.screenshotsFrequency = payload.value;
+          break;
+        case `removeKeychain`:
+          draft.keychains = draft.keychains.filter(({ id }) => id !== payload.value);
+          break;
+      }
     },
+  },
+
+  extraReducers: (builder) => {
+    builder.addCase(fetchActivityDay.started, (state, { meta: { arg } }) => {
+      state.activityDays[activityDayKey(arg.userId, arg.day)] = Req.ongoing();
+    });
+
+    builder.addCase(fetchActivityDay.succeeded, (state, { payload, meta: { arg } }) => {
+      state.activityDays[activityDayKey(arg.userId, arg.day)] = Req.succeed({
+        numDeleted: payload.counts[0]?.numDeleted ?? 0,
+        items: toMap(
+          payload.items.map((item) => {
+            if (item.__typename === `CoalescedKeystrokeLine`) {
+              return { ...item, type: `KeystrokeLine`, date: item.createdAt };
+            } else {
+              return { ...item, type: `Screenshot`, date: item.createdAt };
+            }
+          }),
+        ),
+      });
+    });
+
+    builder.addCase(fetchActivityDay.failed, (state, { error, meta: { arg } }) => {
+      state.activityDays[activityDayKey(arg.userId, arg.day)] = Req.fail(error);
+    });
+
+    builder.addCase(fetchUsers.started, (state) => {
+      state.listRequest = Req.ongoing();
+    });
+
+    builder.addCase(fetchUsers.succeeded, (state, action) => {
+      state.listRequest = Req.succeed(void 0);
+      state.users = { ...state.users, ...toEditableMap(action.payload) };
+    });
+
+    builder.addCase(fetchUsers.failed, (state, action) => {
+      state.listRequest = Req.fail(action.error);
+    });
+
+    builder.addCase(fetchUser.succeeded, (state, { meta, payload }) => {
+      state.fetchUserRequest[meta.arg] = Req.succeed(void 0);
+      state.users[meta.arg] = toEditable(payload);
+    });
+
+    builder.addCase(fetchUser.failed, (state, action) => {
+      state.fetchUserRequest[action.meta.arg] = Req.fail(action.error);
+    });
+
+    builder.addCase(fetchUser.started, (state, action) => {
+      state.fetchUserRequest[action.meta.arg] = Req.ongoing();
+    });
+
+    builder.addCase(fetchActivityOverview.started, (state, action) => {
+      state.activityOverviews[action.meta.arg.userId] = Req.ongoing();
+    });
+
+    builder.addCase(fetchActivityOverview.succeeded, (state, action) => {
+      state.activityOverviews[action.meta.arg.userId] = Req.succeed({
+        ...action.payload,
+        counts: action.payload.counts
+          .sort((a, b) => (a.dateRange.start < b.dateRange.start ? 1 : -1))
+          .filter((count) => count.numItems > 0),
+      });
+    });
+
+    builder.addCase(fetchActivityOverview.failed, (state, action) => {
+      state.activityOverviews[action.meta.arg.userId] = Req.fail(action.error);
+    });
+
+    builder.addCase(updateUser.started, (state, { meta }) => {
+      state.updateUserRequest[meta.arg] = Req.ongoing();
+    });
+
+    builder.addCase(updateUser.failed, (state, { meta, error: [error] }) => {
+      state.updateUserRequest[meta.arg] = Req.fail(error);
+    });
+
+    builder.addCase(updateUser.succeeded, (state, { meta }) => {
+      state.updateUserRequest[meta.arg] = Req.succeed(void 0);
+      const draft = state.users[meta.arg]?.draft;
+      if (draft) {
+        state.users[meta.arg] = toEditable(draft);
+      }
+    });
   },
 });
 
-export const fetchActivityDay = createAsyncThunk(
-  `${slice.name}/fetchActivityOverview`,
-  async ({ userId, day }: { userId: UUID; day: Date }, { dispatch }) => {
-    const key = activityDayKey(userId, day);
-    dispatch(activityDayUpdated({ key, req: Req.ongoing() }));
-    const result = await Current.api.users.getActivityDay(userId, day);
-    result.with({
-      success: (data) => dispatch(activityDayUpdated({ key, req: Req.succeed(data) })),
-      error: (error) => dispatch(activityDayUpdated({ key, req: Req.fail(error) })),
-    });
-  },
+// thunks
+
+export const fetchActivityDay = createResultThunk(
+  `${slice.name}/fetchActivityDay`,
+  (arg: { userId: UUID; day: Date }) =>
+    Current.api.users.getActivityDay(arg.userId, arg.day),
 );
 
-export const fetchActivityOverview = createAsyncThunk(
+export const fetchActivityOverview = createResultThunk(
   `${slice.name}/fetchActivityOverview`,
-  async (userId: UUID, { dispatch }) => {
-    dispatch(activityOverviewUpdated({ userId, req: Req.ongoing() }));
-    const result = await Current.api.users.getActivityOverview(userId);
-    result.with({
-      success: (data) =>
-        dispatch(activityOverviewUpdated({ userId, req: Req.succeed(data) })),
-      error: (error) =>
-        dispatch(activityOverviewUpdated({ userId, req: Req.fail(error) })),
-    });
-  },
+  (arg: { userId: UUID; ranges?: DateRangeInput[] }) =>
+    Current.api.users.getActivityOverview(arg.userId, arg.ranges),
 );
 
-export const fetchUsers = createAsyncThunk(
+export const fetchUsers = createResultThunk(
   `${slice.name}/fetchUsers`,
-  async (_, { dispatch }) => {
-    dispatch(listReqUpdated(Req.ongoing()));
-    const result = await Current.api.users.list();
-    result.with({
-      success: (users) => dispatch(listReqUpdated(Req.succeed(toMap(users)))),
-      error: (error) => dispatch(listReqUpdated(Req.fail(error))),
-    });
+  Current.api.users.list,
+);
+
+export const fetchUser = createResultThunk(
+  `${slice.name}/fetchUser`,
+  Current.api.users.getUser,
+);
+
+export const updateUser = createResultThunk(
+  `${slice.name}/updateUser`,
+  async (userId: UUID, { getState }) => {
+    const { users, auth } = getState();
+    const user = users.users[userId]?.draft;
+    if (!user || !auth.admin?.id) {
+      return Result.error<[ApiError]>([{ type: `non_actionable` }]);
+    }
+    const [updateUserResult, setKeychainsResult] = await spinnerMin(
+      Promise.all([
+        Current.api.users.updateUser({ ...user, adminId: auth.admin.id }),
+        Current.api.users.setUserKeychains(
+          userId,
+          user.keychains.map(({ id }) => id),
+        ),
+      ]),
+    );
+    return Result.merge(updateUserResult, setKeychainsResult);
   },
 );
 
@@ -166,12 +244,9 @@ export function deleteActivityItems(
   };
 }
 
-export const {
-  listReqUpdated,
-  activityOverviewUpdated,
-  activityDayUpdated,
-  activityItemsDeleted,
-} = slice.actions;
+// exports
+
+export const { activityItemsDeleted, userUpdated } = slice.actions;
 
 export default slice.reducer;
 

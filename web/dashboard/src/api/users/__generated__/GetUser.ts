@@ -6,38 +6,38 @@
 import { Family } from './../../../graphqlTypes';
 
 // ====================================================
-// GraphQL query operation: ListUsers
+// GraphQL query operation: GetUser
 // ====================================================
 
-export interface ListUsers_user_keychains_keys {
+export interface GetUser_user_keychains_keys {
   __typename: 'KeyRecord';
   id: string;
 }
 
-export interface ListUsers_user_keychains {
+export interface GetUser_user_keychains {
   __typename: 'Keychain';
   id: string;
   name: string;
   description: string | null;
   isPublic: boolean;
   authorId: string;
-  keys: ListUsers_user_keychains_keys[];
+  keys: GetUser_user_keychains_keys[];
 }
 
-export interface ListUsers_user_devices_model {
+export interface GetUser_user_devices_model {
   __typename: 'Model';
   family: Family;
   title: string;
 }
 
-export interface ListUsers_user_devices {
+export interface GetUser_user_devices {
   __typename: 'Device';
   id: string;
   isOnline: boolean;
-  model: ListUsers_user_devices_model;
+  model: GetUser_user_devices_model;
 }
 
-export interface ListUsers_user {
+export interface GetUser_user {
   __typename: 'User';
   id: string;
   name: string;
@@ -45,10 +45,14 @@ export interface ListUsers_user {
   screenshotsResolution: number;
   screenshotsFrequency: number;
   keyloggingEnabled: boolean;
-  keychains: ListUsers_user_keychains[];
-  devices: ListUsers_user_devices[];
+  keychains: GetUser_user_keychains[];
+  devices: GetUser_user_devices[];
 }
 
-export interface ListUsers {
-  user: ListUsers_user[];
+export interface GetUser {
+  user: GetUser_user;
+}
+
+export interface GetUserVariables {
+  id: UUID;
 }

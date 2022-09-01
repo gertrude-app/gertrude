@@ -1,5 +1,4 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-
 import KeychainCard from './KeychainCard';
 
 export default {
@@ -15,23 +14,20 @@ export const Shared = Template.bind({});
 Shared.args = {
   name: `HTC`,
   keys: 43,
-  shared: true,
+  isPublic: true,
   description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
+  onRemove: () => {},
 };
 
 export const Private = Template.bind({});
 Private.args = {
-  name: `HTC`,
-  keys: 43,
-  shared: false,
-  description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
+  ...Shared.args,
+  isPublic: false,
 };
 
 export const Editable = Template.bind({});
 Editable.args = {
-  name: `HTC`,
-  keys: 43,
-  shared: false,
-  description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
+  ...Shared.args,
+  isPublic: false,
   editable: true,
 };

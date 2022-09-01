@@ -6,38 +6,38 @@
 import { Family } from './../../../graphqlTypes';
 
 // ====================================================
-// GraphQL query operation: ListUsers
+// GraphQL fragment: UserFields
 // ====================================================
 
-export interface ListUsers_user_keychains_keys {
+export interface UserFields_keychains_keys {
   __typename: 'KeyRecord';
   id: string;
 }
 
-export interface ListUsers_user_keychains {
+export interface UserFields_keychains {
   __typename: 'Keychain';
   id: string;
   name: string;
   description: string | null;
   isPublic: boolean;
   authorId: string;
-  keys: ListUsers_user_keychains_keys[];
+  keys: UserFields_keychains_keys[];
 }
 
-export interface ListUsers_user_devices_model {
+export interface UserFields_devices_model {
   __typename: 'Model';
   family: Family;
   title: string;
 }
 
-export interface ListUsers_user_devices {
+export interface UserFields_devices {
   __typename: 'Device';
   id: string;
   isOnline: boolean;
-  model: ListUsers_user_devices_model;
+  model: UserFields_devices_model;
 }
 
-export interface ListUsers_user {
+export interface UserFields {
   __typename: 'User';
   id: string;
   name: string;
@@ -45,10 +45,6 @@ export interface ListUsers_user {
   screenshotsResolution: number;
   screenshotsFrequency: number;
   keyloggingEnabled: boolean;
-  keychains: ListUsers_user_keychains[];
-  devices: ListUsers_user_devices[];
-}
-
-export interface ListUsers {
-  user: ListUsers_user[];
+  keychains: UserFields_keychains[];
+  devices: UserFields_devices[];
 }

@@ -10,5 +10,6 @@
     "marketing/components/shared/": true,
     "marketing/out/": true,
     "components/storybook-static/": true
-  }
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

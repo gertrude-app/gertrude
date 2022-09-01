@@ -1,15 +1,16 @@
 import React from 'react';
 import cx from 'classnames';
 import { inflect } from '../../../../lib/string';
-import UserDevice, { Props as UserDeviceProps } from './Device';
+import UserDevice from './Device';
 import { Link } from 'react-router-dom';
+import { Subcomponents } from '../../../../types';
 
-export type Props = {
+type Props = {
   id: string;
   name: string;
   numKeys: number;
   numKeychains: number;
-  devices: Array<UserDeviceProps & { id: string }>;
+  devices: Subcomponents<typeof UserDevice>;
   screenshotsEnabled: boolean;
   keystrokesEnabled: boolean;
 };
@@ -100,12 +101,15 @@ const UserCard: React.FC<Props> = ({
       </div>
     </div>
     <div className="border-t flex bg-gray-100 rounded-b-xl divide-x divide-gray-200 hover:divide-gray-300/80">
-      <button className="w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-200 rounded-bl-xl">
+      <Link
+        to={id}
+        className="w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-200 rounded-bl-xl"
+      >
         <i className="fa fa-pen text-sm mr-3 text-gray-600" aria-hidden="true" />
         <h2 className="text-gray-500 text-[15px] antialiased uppercase tracking-wide">
           Edit
         </h2>
-      </button>
+      </Link>
       <Link
         to={`${id}/activity`}
         className="w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-200 rounded-br-xl"

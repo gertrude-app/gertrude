@@ -1,8 +1,8 @@
-import React, { useId } from 'react';
+import React, { useId, useState } from 'react';
 import cx from 'classnames';
 
 type Props = {
-  type: 'email' | 'text' | 'number' | 'password';
+  type: 'email' | 'text' | 'positiveInteger' | 'password';
   label: string;
   value: string;
   setValue(value: string): unknown;
@@ -24,6 +24,7 @@ const TextInput: React.FC<Props> = ({
   className,
   unit,
 }) => {
+  const [localValue, setLocalValue] = useState(value);
   const id = useId();
   return (
     <div className={cx(`flex flex-col space-y-1 w-full`, className)}>
@@ -33,12 +34,18 @@ const TextInput: React.FC<Props> = ({
       <div className="flex shadow-sm rounded-lg">
         <input
           id={id}
-          type={type}
-          value={value}
+          type={type === `positiveInteger` ? `number` : type}
+          value={localValue}
           required={!!required}
           autoFocus={autoFocus}
           placeholder={placeholder}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            setLocalValue(value);
+            if (type !== `positiveInteger` || isPositiveInteger(value)) {
+              setValue(value);
+            }
+          }}
           className={`h-10 border ring-0 ring-gray-200 rounded-lg outline-none py-6 px-4 focus:shadow-md transition duration-150 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 text-gray-600 flex-grow z-10 w-12 ${
             unit ? `rounded-r-none` : `rounded-r-lg`
           }`}
@@ -54,3 +61,11 @@ const TextInput: React.FC<Props> = ({
 };
 
 export default TextInput;
+
+function isPositiveInteger(value: string): boolean {
+  return (
+    value.match(/^[0-9]+$/) !== null &&
+    Number.isInteger(Number(value)) &&
+    Number(value) >= 0
+  );
+}

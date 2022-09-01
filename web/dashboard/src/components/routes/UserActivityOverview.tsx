@@ -12,7 +12,7 @@ const UserActivityOverview: React.FC = () => {
   const request = useSelector((state) => state.users.activityOverviews[userId]);
 
   useEffect(() => {
-    dispatch(fetchActivityOverview(userId));
+    dispatch(fetchActivityOverview({ userId }));
   }, [dispatch, userId]);
 
   if (!request || request.state === `idle` || request.state === `ongoing`) {

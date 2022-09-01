@@ -9,7 +9,7 @@ const MagicLink: React.FC = () => {
   const { token = `` } = useParams<{ token: string }>();
   const location = useLocation();
   const dispatch = useDispatch();
-  const request = useSelector((state) => state.auth.loginRequest);
+  const request = useSelector((state) => state.auth.loginFromMagicLinkRequest);
 
   useEffect(() => {
     dispatch(loginFromMagicLink(token));

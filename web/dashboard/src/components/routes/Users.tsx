@@ -5,14 +5,18 @@ import { useDispatch, useSelector } from '../../redux/hooks';
 import { fetchUsers } from '../../redux/slice-users';
 import ApiErrorMessage from '../ApiErrorMessage';
 import { Family } from '../../graphqlTypes';
+import * as typesafe from '../../lib/typesafe';
 
 const Users: React.FC = () => {
   const dispatch = useDispatch();
-  const request = useSelector((state) => state.users.listReq);
+  const { users, request } = useSelector((state) => ({
+    request: state.users.listRequest,
+    users: typesafe.objectValues(state.users.users).map((u) => u.original),
+  }));
 
   useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
+    request.state === `idle` && dispatch(fetchUsers());
+  }, [dispatch, request, request.state]);
 
   if (request.state === `failed`) {
     return <ApiErrorMessage error={request.error} />;
@@ -24,7 +28,7 @@ const Users: React.FC = () => {
 
   return (
     <ListUsers
-      users={Object.values(request.payload ?? {}).map((resource) => ({
+      users={users.map((resource) => ({
         id: resource.id,
         name: resource.name,
         numKeychains: resource.keychains.length,
@@ -39,7 +43,7 @@ const Users: React.FC = () => {
           icon: familyToIcon(device.model.family),
         })),
         screenshotsEnabled: resource.screenshotsEnabled,
-        keystrokesEnabled: resource.keystrokesEnabled,
+        keystrokesEnabled: resource.keyloggingEnabled,
       }))}
     />
   );
@@ -47,7 +51,7 @@ const Users: React.FC = () => {
 
 export default Users;
 
-function familyToIcon(family: Family): `laptop` | `desktop` {
+export function familyToIcon(family: Family): `laptop` | `desktop` {
   switch (family) {
     case Family.iMac:
     case Family.pro:

@@ -43,6 +43,13 @@ export class Req {
       handler(req.payload);
     }
   }
+
+  static error<T, E>(req: RequestState<T, E> | undefined): E | undefined {
+    if (req && req.state === `failed`) {
+      return req.error;
+    }
+    return undefined;
+  }
 }
 
 export function toMap<T extends { id: string }>(array: T[]): Record<string, T> {
@@ -50,4 +57,31 @@ export function toMap<T extends { id: string }>(array: T[]): Record<string, T> {
     map[item.id] = item;
     return map;
   }, {});
+}
+
+export function toEditableMap<T extends { id: string }>(
+  array: T[],
+): Record<string, Editable<T>> {
+  return array.reduce<Record<string, Editable<T>>>((map, item) => {
+    map[item.id] = toEditable(item);
+    return map;
+  }, {});
+}
+
+export function toEditable<T extends { id: UUID }>(original: T): Editable<T> {
+  return { original, draft: JSON.parse(JSON.stringify(original)) };
+}
+
+export function isDirty<T extends { id: UUID }>(editable: Editable<T>): boolean {
+  return JSON.stringify(editable.original) !== JSON.stringify(editable.draft);
+}
+
+export async function spinnerMin<T>(promise: Promise<T>, delayMs = 750): Promise<T> {
+  const start = Date.now();
+  const result = await promise;
+  const elapsed = Date.now() - start;
+  if (elapsed >= delayMs) {
+    return result;
+  }
+  return new Promise((res) => setTimeout(() => res(result), delayMs - elapsed));
 }

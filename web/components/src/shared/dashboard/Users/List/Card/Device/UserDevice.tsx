@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import PillBadge from '../../../../PillBadge';
 
-export type Props = {
+type Props = {
   model: string;
   status: 'online' | 'offline';
   icon: 'desktop' | 'laptop';

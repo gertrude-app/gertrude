@@ -10,7 +10,7 @@ import Users from './components/routes/Users';
 import useWindowWidth from './hooks/window-width';
 import { useDispatch, useSelector } from './redux/hooks';
 import { windowWidthChanged } from './redux/slice-menu';
-import EditUser from './components/routes/EditUser';
+import User from './components/routes/User';
 import UserActivityOverview from './components/routes/UserActivityOverview';
 import UserActivityDay from './components/routes/UserActivityDay';
 import Keychains from './components/routes/Keychains';
@@ -41,7 +41,7 @@ const App: React.FC = () => {
         <Route path="users">
           <Route index element={<Users />} />
           <Route path=":userId">
-            <Route index element={<EditUser />} />
+            <Route index element={<User />} />
             <Route path="activity">
               <Route index element={<UserActivityOverview />} />
               <Route path=":date" element={<UserActivityDay />} />

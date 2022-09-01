@@ -25,7 +25,7 @@ const storyFile = `import { ComponentStory, ComponentMeta } from '@storybook/rea
 import ${Component} from './${Component}';
 
 export default {
-  title: '${Component}',
+  title: \`${Component}\`,
   component: ${Component},
 } as ComponentMeta<typeof ${Component}>;
 
@@ -38,6 +38,6 @@ const dir = `./components/src/shared/dashboard/${Component}`;
 fs.mkdirSync(dir, { recursive: true });
 fs.writeFileSync(`${dir}/${Component}.tsx`, componentFile);
 fs.writeFileSync(`${dir}/${Component}.stories.tsx`, storyFile);
-fs.writeFileSync(`${dir}/index.ts`, `export { default } from './${Component}';`);
+fs.writeFileSync(`${dir}/index.ts`, `export { default } from './${Component}';\n`);
 
 green(`Created component '${Component}`);
