@@ -1,18 +1,19 @@
 import React from 'react';
+import { SubcomponentsOmit, ConfirmableEntityAction } from '../../../types';
 import Button from '../../../Button';
 import KeychainCard from '../../Users/KeychainCard';
 import PageHeading from '../../PageHeading';
-import { Subcomponents } from '../../../types';
+import { ConfirmDeleteEntity } from '../../Modal';
 
 type Props = {
-  keychains: Subcomponents<typeof KeychainCard>;
-  removeKeychain(id: UUID): unknown;
+  keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
+  remove: ConfirmableEntityAction;
 };
 
-const Keychains: React.FC<Props> = ({ keychains, removeKeychain }) => (
+const ListKeychains: React.FC<Props> = ({ keychains, remove }) => (
   <div className="px-0 sm:px-4">
     <PageHeading icon="key">Keychains</PageHeading>
-    <p className="mt-4 text-sm text-gray-500">
+    <p className="mt-6 text-base antialiased text-gray-600">
       Keychains are clusters of related individual "keys" for selectively unlocking
       internet access. They can be organized however you like—per use, by application, for
       a specific school class, etc. Or, you can put all of your keys in one keychain if
@@ -26,17 +27,19 @@ const Keychains: React.FC<Props> = ({ keychains, removeKeychain }) => (
           name={name}
           keys={keys}
           description={description}
-          onRemove={() => removeKeychain(id)}
+          removeText="Delete"
+          onRemove={() => remove.start(id)}
           editable
         />
       ))}
     </div>
-    <div className="mt-8 flex justify-end border-t pt-6">
+    <div className="mt-10 flex justify-end border-t pt-8">
       <Button type="button" onClick={() => {}} color="primary-violet">
         <i className="fa fa-plus mr-2" /> Create keychain
       </Button>
     </div>
+    <ConfirmDeleteEntity type="keychain" action={remove} />
   </div>
 );
 
-export default Keychains;
+export default ListKeychains;

@@ -1,0 +1,25 @@
+import React from 'react';
+import { capitalize } from '../../../lib/string';
+import { ConfirmableEntityAction } from '../../../types';
+import ConfirmDestructiveAction from '../ConfirmDestructiveAction';
+
+type Props = {
+  type: string;
+  action: ConfirmableEntityAction;
+};
+
+export const ConfirmDeleteEntity: React.FC<Props> = ({ action, type }) => {
+  return (
+    <ConfirmDestructiveAction
+      title={`Delete ${capitalize(type)}?`}
+      openWhenPresent={action.id}
+      onDismiss={action.cancel}
+      onConfirm={action.confirm}
+    >
+      Are you sure you want to delete this {type}? There is no undo, and you might regret
+      your decision in the morning.
+    </ConfirmDestructiveAction>
+  );
+};
+
+export default ConfirmDeleteEntity;

@@ -1,6 +1,6 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../../decorators/StatefulChrome';
-import KeychainCard from '../../Users/KeychainCard';
+import { keychainProps } from '../../story-helpers';
 import ListKeychains from './ListKeychains';
 
 export default {
@@ -17,7 +17,7 @@ const Template: ComponentStory<typeof ListKeychains> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   keychains: [
-    keychainProps({ name: `HTC`, keys: 232, isPublic: true }),
+    keychainProps({ id: `id-htc`, name: `HTC`, keys: 232, isPublic: true }),
     keychainProps({ name: `Jimmy's Music Theory`, keys: 7 }),
     keychainProps({ name: `Jason's blog`, keys: 3, description: undefined }),
     keychainProps({ name: `Misc McStrandardishlong Keys`, keys: 1027 }),
@@ -31,18 +31,18 @@ Default.args = {
       description: `Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
     }),
   ],
+  remove: {
+    start: () => {},
+    confirm: () => {},
+    cancel: () => {},
+  },
 };
 
-export function keychainProps(
-  override: Partial<React.ComponentProps<typeof KeychainCard>> = {},
-): React.ComponentProps<typeof KeychainCard> & { id: UUID } {
-  return {
-    id: `id-${Math.random()}`,
-    isPublic: false,
-    name: `HTC`,
-    description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
-    keys: 232,
-    onRemove: () => {},
-    ...override,
-  };
-}
+export const Deleting = Template.bind({});
+Deleting.args = {
+  ...Default.args,
+  remove: {
+    ...Default.args.remove!,
+    id: `id-htc`,
+  },
+};

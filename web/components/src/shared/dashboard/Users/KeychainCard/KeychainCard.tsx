@@ -8,6 +8,7 @@ type Props = {
   keys: number;
   isPublic: boolean;
   onRemove(): unknown;
+  removeText?: string;
   editable?: boolean;
 };
 
@@ -17,6 +18,7 @@ const KeychainCard: React.FC<Props> = ({
   keys,
   description,
   onRemove,
+  removeText = `Remove`,
   editable = false,
 }) => (
   <div className={cx(`rounded-xl shadow-lg flex`)}>
@@ -28,7 +30,7 @@ const KeychainCard: React.FC<Props> = ({
     </div>
     <div className="flex flex-col justify-between flex-grow border border-l-0 rounded-r-xl bg-white">
       <div className="relative p-3 flex justify-end sm:justify-start">
-        <p className="text-sm text-gray-500 mr-28 hidden sm:block">
+        <p className="text-sm text-gray-500 mr-28 hidden sm:block min-h-[40px]">
           {description || <i className="text-gray-400 antialiased">No description</i>}
         </p>
         {isPublic && (
@@ -48,7 +50,7 @@ const KeychainCard: React.FC<Props> = ({
           className="px-5 py-2 text-red-500 font-medium hover:bg-red-50 transition duration-100 rounded-br-xl"
           onClick={onRemove}
         >
-          Remove
+          {removeText}
         </button>
       </div>
     </div>

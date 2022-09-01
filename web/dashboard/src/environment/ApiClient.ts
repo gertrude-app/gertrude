@@ -2,17 +2,20 @@ import Result from '../api/Result';
 import * as admin from '../api/admin';
 import * as users from '../api/users';
 import * as signup from '../api/signup';
+import * as keychains from '../api/keychains';
 
 export interface ApiClient {
   admin: typeof admin;
   users: typeof users;
   signup: typeof signup;
+  keychains: typeof keychains;
 }
 
 export const liveApiClient: ApiClient = {
   admin,
   users,
   signup,
+  keychains,
 };
 
 export const throwingApiClient: ApiClient = {
@@ -25,6 +28,14 @@ export const throwingApiClient: ApiClient = {
     },
     loginFromMagicLink: () => {
       throw new Error(`ApiClient.admin.loginFromMagicLink() not implemented.`);
+    },
+    listKeychains: () => {
+      throw new Error(`ApiClient.admin.listKeychains() not implemented.`);
+    },
+  },
+  keychains: {
+    deleteKeychain: () => {
+      throw new Error(`ApiClient.keychains.deleteKeychain() not implemented.`);
     },
   },
   users: {
@@ -67,6 +78,14 @@ export const noopApiClient: ApiClient = {
     },
     loginFromMagicLink: async () => {
       return Result.success({ id: ``, token: `` });
+    },
+    listKeychains: async () => {
+      return Result.success([]);
+    },
+  },
+  keychains: {
+    deleteKeychain: async () => {
+      return Result.success(true);
     },
   },
   users: {
