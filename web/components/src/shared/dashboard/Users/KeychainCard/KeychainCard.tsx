@@ -8,6 +8,7 @@ type Props = {
   keys: number;
   isPublic: boolean;
   onRemove(): unknown;
+  removeText?: string;
   editable?: boolean;
 };
 
@@ -17,6 +18,7 @@ const KeychainCard: React.FC<Props> = ({
   keys,
   description,
   onRemove,
+  removeText = `Remove`,
   editable = false,
 }) => (
   <div className={cx(`rounded-xl shadow-lg flex`)}>
@@ -48,7 +50,7 @@ const KeychainCard: React.FC<Props> = ({
           className="px-5 py-2 text-red-500 font-medium hover:bg-red-50 transition duration-100 rounded-br-xl"
           onClick={onRemove}
         >
-          Remove
+          {removeText}
         </button>
       </div>
     </div>

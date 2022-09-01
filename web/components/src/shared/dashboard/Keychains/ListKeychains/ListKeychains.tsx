@@ -27,6 +27,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove }) => (
           name={name}
           keys={keys}
           description={description}
+          removeText="Delete"
           onRemove={() => remove.start(id)}
           editable
         />
