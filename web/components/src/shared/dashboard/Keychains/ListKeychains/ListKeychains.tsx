@@ -3,7 +3,7 @@ import { SubcomponentsOmit, ConfirmableEntityAction } from '../../../types';
 import Button from '../../../Button';
 import KeychainCard from '../../Users/KeychainCard';
 import PageHeading from '../../PageHeading';
-import Modal from '../../Modal';
+import { ConfirmDeleteEntity } from '../../Modal';
 
 type Props = {
   keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
@@ -37,11 +37,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove }) => (
         <i className="fa fa-plus mr-2" /> Create keychain
       </Button>
     </div>
-    <Modal
-      openWhenPresent={remove.id}
-      onDismiss={remove.cancel}
-      onConfirm={remove.confirm}
-    />
+    <ConfirmDeleteEntity type="keychain" action={remove} />
   </div>
 );
 

@@ -11,7 +11,15 @@ const Template: ComponentStory<typeof Modal> = (args) => <Modal {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  openWhenPresent: true,
+  type: `destructive`,
+  title: `Do you want to delete this widget?`,
+  isOpen: true,
+  onPrimaryClick: () => {},
   onDismiss: () => {},
-  onConfirm: () => {},
+  children: (
+    <>
+      Are you <b>sure?</b> There is no undo, and you might regret your decision in the
+      morning.
+    </>
+  ),
 };
