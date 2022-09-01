@@ -3,6 +3,7 @@ import * as admin from '../api/admin';
 import * as users from '../api/users';
 import * as signup from '../api/signup';
 import * as keychains from '../api/keychains';
+import { SubscriptionStatus } from '../graphqlTypes';
 
 export interface ApiClient {
   admin: typeof admin;
@@ -31,6 +32,9 @@ export const throwingApiClient: ApiClient = {
     },
     listKeychains: () => {
       throw new Error(`ApiClient.admin.listKeychains() not implemented.`);
+    },
+    getAdmin: () => {
+      throw new Error(`ApiClient.admin.getAdmin() not implemented.`);
     },
   },
   keychains: {
@@ -81,6 +85,15 @@ export const noopApiClient: ApiClient = {
     },
     listKeychains: async () => {
       return Result.success([]);
+    },
+    getAdmin: async () => {
+      return Result.success({
+        __typename: `Admin`,
+        email: ``,
+        subscriptionStatus: SubscriptionStatus.active,
+        notifications: [],
+        verifiedNotificationMethods: [],
+      });
     },
   },
   keychains: {

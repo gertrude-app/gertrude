@@ -17,6 +17,25 @@ export enum Family {
   unknown = 'unknown',
 }
 
+export enum SubscriptionStatus {
+  active = 'active',
+  canceled = 'canceled',
+  complimentary = 'complimentary',
+  emailVerified = 'emailVerified',
+  incomplete = 'incomplete',
+  incompleteExpired = 'incompleteExpired',
+  pastDue = 'pastDue',
+  pendingEmailVerification = 'pendingEmailVerification',
+  signupCanceled = 'signupCanceled',
+  trialing = 'trialing',
+  unpaid = 'unpaid',
+}
+
+export enum Trigger {
+  suspendFilterRequestSubmitted = 'suspendFilterRequestSubmitted',
+  unlockRequestSubmitted = 'unlockRequestSubmitted',
+}
+
 export interface CreateWaitlistedUserInput {
   email: string;
   id?: UUID | null;

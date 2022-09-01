@@ -3,16 +3,12 @@ import cx from 'classnames';
 import Button from '../../../Button';
 import SelectMenu from '../../SelectMenu';
 
-type WhenToSend = 'suspension requests' | 'unlock requests';
+type Props = {
+  when: 'suspension requests' | 'unlock requests';
+  method: 'email' | 'text' | 'slack';
+  value: string;
+};
 
-type HowToSend =
-  | { method: 'email'; email: string }
-  | { method: 'text'; number: string }
-  | { method: 'slack'; channelName: string };
-
-type Props = HowToSend & { when: WhenToSend };
-
-// will need more props for the select menu stuff to work
 const NotificationCard: React.FC<Props> = (props) => {
   const [open, setOpen] = useState(false);
 
@@ -22,7 +18,7 @@ const NotificationCard: React.FC<Props> = (props) => {
     case `email`:
       text = (
         <h2 className="text-gray-700 text-lg">
-          Email <span className="font-bold">{props.email}</span> for{` `}
+          Email <span className="font-bold">{props.value}</span> for{` `}
           <span className="text-gray-900">{props.when}</span>
         </h2>
       );
@@ -31,7 +27,7 @@ const NotificationCard: React.FC<Props> = (props) => {
     case `text`:
       text = (
         <h2 className="text-gray-700 text-lg">
-          Text <span className="font-bold">{props.number}</span> for{` `}
+          Text <span className="font-bold">{props.value}</span> for{` `}
           <span className="text-gray-900">{props.when}</span>
         </h2>
       );
@@ -40,7 +36,7 @@ const NotificationCard: React.FC<Props> = (props) => {
     case `slack`:
       text = (
         <h2 className="text-gray-700 text-lg">
-          Slack <span className="font-bold">{props.channelName}</span> for{` `}
+          Slack <span className="font-bold">{props.value}</span> for{` `}
           <span className="text-gray-900">{props.when}</span>
         </h2>
       );
