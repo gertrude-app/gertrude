@@ -8,6 +8,7 @@ import {
   ActionCreatorWithPreparedPayload,
 } from '@reduxjs/toolkit';
 import Result from '../api/Result';
+import { spinnerMin } from './helpers';
 import type { State, Dispatch } from './store';
 
 export function createResultThunk<T, E, ThunkArg = void>(
@@ -47,12 +48,14 @@ export function createResultThunk<T, E, ThunkArg = void>(
   const thunkCreator = (arg: ThunkArg): ThunkAction => {
     return (dispatch, getState) => {
       dispatch(started(arg));
-      resultCreator(arg, { dispatch: dispatch as Dispatch, getState }).then((result) => {
-        result.with({
-          success: (payload) => dispatch(succeeded(payload, arg)),
-          error: (error) => dispatch(failed(error, arg)),
-        });
-      });
+      spinnerMin(resultCreator(arg, { dispatch: dispatch as Dispatch, getState })).then(
+        (result) => {
+          result.with({
+            success: (payload) => dispatch(succeeded(payload, arg)),
+            error: (error) => dispatch(failed(error, arg)),
+          });
+        },
+      );
     };
   };
 
@@ -88,13 +91,13 @@ type AsyncResultThunkFailedActionCreator<E, ThunkArg> = ActionCreatorWithPrepare
   { arg: ThunkArg; requestId: string }
 >;
 
-type ResultThunk<T, E, ThunkArg = void> = ResultThunkActionCreator<ThunkArg> & {
+export type ResultThunk<T, E, ThunkArg = void> = ResultThunkActionCreator<ThunkArg> & {
   started: AsyncResultThunkStartedActionCreator<ThunkArg>;
   succeeded: AsyncResultThunkSucceededActionCreator<T, ThunkArg>;
   failed: AsyncResultThunkFailedActionCreator<E, ThunkArg>;
 };
 
-type ResultThunkActionCreator<ThunkArg> = (
+export type ResultThunkActionCreator<ThunkArg> = (
   arg: ThunkArg,
 ) => (
   dispatch: ThunkDispatch<State, void, Action>,

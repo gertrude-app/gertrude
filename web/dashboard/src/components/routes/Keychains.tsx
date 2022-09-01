@@ -1,13 +1,19 @@
 import React, { useEffect } from 'react';
+import ListKeychains from '@shared/dashboard/Keychains/ListKeychains';
 import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
-import { fetchAdminKeychains } from '../../redux/slice-admin';
-import ListKeychains from '@shared/dashboard/Keychains/ListKeychains';
+import {
+  cancelKeychainDelete,
+  deleteKeychain,
+  fetchAdminKeychains,
+  startKeychainDelete,
+} from '../../redux/slice-admin';
 
 const Keychains: React.FC = () => {
   const dispatch = useDispatch();
   const request = useSelector((state) => state.admin.listKeychainsRequest);
+  const deleteId = useSelector((state) => state.admin.pendingDeletionKeychainId);
 
   useEffect(() => {
     dispatch(fetchAdminKeychains());
@@ -28,7 +34,12 @@ const Keychains: React.FC = () => {
         description: keychain.description || undefined,
         keys: keychain.keys.length,
       }))}
-      removeKeychain={() => {}}
+      remove={{
+        id: deleteId,
+        start: (id) => dispatch(startKeychainDelete(id)),
+        confirm: () => deleteId && dispatch(deleteKeychain(deleteId)),
+        cancel: () => dispatch(cancelKeychainDelete()),
+      }}
     />
   );
 };

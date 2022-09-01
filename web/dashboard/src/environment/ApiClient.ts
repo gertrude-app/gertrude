@@ -2,17 +2,20 @@ import Result from '../api/Result';
 import * as admin from '../api/admin';
 import * as users from '../api/users';
 import * as signup from '../api/signup';
+import * as keychains from '../api/keychains';
 
 export interface ApiClient {
   admin: typeof admin;
   users: typeof users;
   signup: typeof signup;
+  keychains: typeof keychains;
 }
 
 export const liveApiClient: ApiClient = {
   admin,
   users,
   signup,
+  keychains,
 };
 
 export const throwingApiClient: ApiClient = {
@@ -28,6 +31,11 @@ export const throwingApiClient: ApiClient = {
     },
     listKeychains: () => {
       throw new Error(`ApiClient.admin.listKeychains() not implemented.`);
+    },
+  },
+  keychains: {
+    deleteKeychain: () => {
+      throw new Error(`ApiClient.keychains.deleteKeychain() not implemented.`);
     },
   },
   users: {
@@ -73,6 +81,11 @@ export const noopApiClient: ApiClient = {
     },
     listKeychains: async () => {
       return Result.success([]);
+    },
+  },
+  keychains: {
+    deleteKeychain: async () => {
+      return Result.success(true);
     },
   },
   users: {

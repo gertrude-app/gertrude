@@ -1,6 +1,6 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../../decorators/StatefulChrome';
-import { keychainProps } from '../../Keychains/ListKeychains/ListKeychains.stories';
+import { keychainProps } from '../../story-helpers';
 import EditUser from './EditUser';
 
 export default {
