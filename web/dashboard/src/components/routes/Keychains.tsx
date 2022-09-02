@@ -13,7 +13,7 @@ import {
 const Keychains: React.FC = () => {
   const dispatch = useDispatch();
   const request = useSelector((state) => state.admin.listKeychainsRequest);
-  const deleteId = useSelector((state) => state.admin.pendingDeletionKeychainId);
+  const deleteId = useSelector((state) => state.admin.deleting.keychain);
 
   useEffect(() => {
     dispatch(fetchAdminKeychains());
@@ -36,9 +36,9 @@ const Keychains: React.FC = () => {
       }))}
       remove={{
         id: deleteId,
-        start: (id) => dispatch(startEntityDelete({ type: `Keychain`, id })),
+        start: (id) => dispatch(startEntityDelete({ type: `keychain`, id })),
         confirm: () => deleteId && dispatch(deleteKeychain(deleteId)),
-        cancel: () => dispatch(cancelEntityDelete(`Keychain`)),
+        cancel: () => dispatch(cancelEntityDelete(`keychain`)),
       }}
     />
   );

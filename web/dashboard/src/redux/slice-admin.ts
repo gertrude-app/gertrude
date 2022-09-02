@@ -13,10 +13,11 @@ export interface AdminState {
   notifications: Record<UUID, Editable<Notification> & { editing: boolean }>;
   saveNotificationRequests: Record<UUID, RequestState>;
   listKeychainsRequest: RequestState<ListAdminKeychains['keychains']>;
-  // @TODO, sub object deleting: {...}
-  pendingDeletionKeychainId?: UUID;
-  pendingDeletionNotificationId?: UUID;
-  pendingDeletionVerifiedNotificationMethodId?: UUID;
+  deleting: {
+    keychain?: UUID;
+    notification?: UUID;
+    notificationMethod?: UUID;
+  };
 }
 
 export function initialState(): AdminState {
@@ -26,20 +27,21 @@ export function initialState(): AdminState {
     notifications: {},
     saveNotificationRequests: {},
     listKeychainsRequest: Req.idle(),
+    deleting: {},
   };
 }
 
-type DeletableEntity = 'Keychain' | 'Notification' | 'VerifiedNotificationMethod';
+type DeletableEntity = 'keychain' | 'notification' | 'notificationMethod';
 
 export const slice = createSlice({
   name: `admin`,
   initialState,
   reducers: {
     startEntityDelete(state, action: PayloadAction<{ type: DeletableEntity; id: UUID }>) {
-      state[`pendingDeletion${action.payload.type}Id`] = action.payload.id;
+      state.deleting[action.payload.type] = action.payload.id;
     },
     cancelEntityDelete(state, { payload: type }: PayloadAction<DeletableEntity>) {
-      delete state[`pendingDeletion${type}Id`];
+      delete state.deleting[type];
     },
     notificationChanged(state, { payload }: PayloadAction<NotificationUpdate>) {
       const notification = state.notifications[payload.id];
@@ -124,7 +126,7 @@ export const slice = createSlice({
     });
 
     builder.addCase(deleteKeychain.started, (state) => {
-      delete state.pendingDeletionKeychainId;
+      delete state.deleting.keychain;
     });
 
     builder.addCase(deleteKeychain.succeeded, (state, { meta }) => {
@@ -136,7 +138,7 @@ export const slice = createSlice({
     });
 
     builder.addCase(deleteNotification.started, (state) => {
-      delete state.pendingDeletionNotificationId;
+      delete state.deleting.notification;
     });
 
     builder.addCase(deleteNotification.succeeded, (state, { meta }) => {
@@ -144,7 +146,7 @@ export const slice = createSlice({
     });
 
     builder.addCase(deleteNotificationMethod.started, (state) => {
-      delete state.pendingDeletionVerifiedNotificationMethodId;
+      delete state.deleting.notificationMethod;
     });
 
     builder.addCase(deleteNotificationMethod.succeeded, (state, { meta }) => {

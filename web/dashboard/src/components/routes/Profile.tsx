@@ -50,8 +50,8 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
   }
 
   const methods = state.admin.verifiedNotificationMethods;
-  const deleteNotificationId = state.admin.pendingDeletionNotificationId;
-  const deleteMethodId = state.admin.pendingDeletionVerifiedNotificationMethodId;
+  const deleteNotificationId = state.admin.deleting.notification;
+  const deleteMethodId = state.admin.deleting.notificationMethod;
   const saveNotifications = state.admin.saveNotificationRequests;
 
   return Query.succeed({
@@ -93,17 +93,16 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
     saveNotification: (id) => dispatch(updateNotification(id)),
     deleteNotification: {
       id: deleteNotificationId,
-      start: (id) => dispatch(startEntityDelete({ type: `Notification`, id })),
+      start: (id) => dispatch(startEntityDelete({ type: `notification`, id })),
       confirm: () =>
         deleteNotificationId && dispatch(deleteNotification(deleteNotificationId)),
-      cancel: () => dispatch(cancelEntityDelete(`Notification`)),
+      cancel: () => dispatch(cancelEntityDelete(`notification`)),
     },
     deleteMethod: {
       id: deleteMethodId,
-      start: (id) =>
-        dispatch(startEntityDelete({ type: `VerifiedNotificationMethod`, id })),
+      start: (id) => dispatch(startEntityDelete({ type: `notificationMethod`, id })),
       confirm: () => deleteMethodId && dispatch(deleteNotificationMethod(deleteMethodId)),
-      cancel: () => dispatch(cancelEntityDelete(`VerifiedNotificationMethod`)),
+      cancel: () => dispatch(cancelEntityDelete(`notificationMethod`)),
     },
   });
 };
