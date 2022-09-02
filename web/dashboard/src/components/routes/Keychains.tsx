@@ -4,10 +4,10 @@ import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import {
-  cancelKeychainDelete,
+  cancelEntityDelete,
   deleteKeychain,
   fetchAdminKeychains,
-  startKeychainDelete,
+  startEntityDelete,
 } from '../../redux/slice-admin';
 
 const Keychains: React.FC = () => {
@@ -36,9 +36,9 @@ const Keychains: React.FC = () => {
       }))}
       remove={{
         id: deleteId,
-        start: (id) => dispatch(startKeychainDelete(id)),
+        start: (id) => dispatch(startEntityDelete({ type: `Keychain`, id })),
         confirm: () => deleteId && dispatch(deleteKeychain(deleteId)),
-        cancel: () => dispatch(cancelKeychainDelete()),
+        cancel: () => dispatch(cancelEntityDelete(`Keychain`)),
       }}
     />
   );

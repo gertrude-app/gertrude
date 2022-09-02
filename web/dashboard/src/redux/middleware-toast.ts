@@ -1,13 +1,14 @@
 import toast from 'react-hot-toast';
 import { Action, Middleware } from '@reduxjs/toolkit';
 import { updateUser } from './slice-users';
-import { deleteKeychain } from './slice-admin';
+import { deleteKeychain, deleteNotification } from './slice-admin';
 import { ResultThunk } from './thunk';
 import { capitalize } from '../components/shared/lib/string';
 
 const toastMiddleware: Middleware = (_store) => (next) => (action) => {
   toastCrud(`save`, `user`, updateUser, action);
   toastCrud(`delete`, `keychain`, deleteKeychain, action);
+  toastCrud(`delete`, `notification`, deleteNotification, action);
   return next(action);
 };
 

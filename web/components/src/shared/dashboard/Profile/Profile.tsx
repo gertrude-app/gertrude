@@ -8,19 +8,28 @@ import NewNotificationMethodSidebar from './NewNotificationMethodSidebar';
 import NotificationCard from './NotificationCard';
 import TextInput from '../../dashboard/TextInput';
 import NotificationMethod from './NotificationMethod';
-import { SubcomponentsOmit } from '../../types';
+import { ConfirmableEntityAction, SubcomponentsOmit } from '../../types';
+import { ConfirmDeleteEntity } from '../Modal';
 
 interface Props {
   email: string;
   status: string; // @TODO: enum
   methods: SubcomponentsOmit<typeof NotificationMethod, 'onDelete'>;
-  notifications: SubcomponentsOmit<typeof NotificationCard, never>;
+  notifications: SubcomponentsOmit<typeof NotificationCard, 'onDelete'>;
+  deleteNotification: ConfirmableEntityAction;
 }
 
-const Profile: React.FC<Props> = ({ email, status, methods, notifications }) => {
+const Profile: React.FC<Props> = ({
+  email,
+  status,
+  methods,
+  notifications,
+  deleteNotification,
+}) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div className="lg:px-4 relative">
+      <ConfirmDeleteEntity type="notification" action={deleteNotification} />
       <div
         className={cx(
           `absolute left-0 top-0 w-full h-full z-20 bg-gray-50 bg-opacity-60`,
@@ -85,7 +94,11 @@ const Profile: React.FC<Props> = ({ email, status, methods, notifications }) => 
             </p>
             <div className="flex flex-wrap items-start pt-4 sm:pt-2 mb-4">
               {notifications.map((notification) => (
-                <NotificationCard key={notification.id} {...notification} />
+                <NotificationCard
+                  key={notification.id}
+                  onDelete={() => deleteNotification.start(notification.id)}
+                  {...notification}
+                />
               ))}
             </div>
           </div>

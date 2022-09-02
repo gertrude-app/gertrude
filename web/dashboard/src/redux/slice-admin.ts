@@ -11,6 +11,7 @@ export interface AdminState {
   notifications: Record<UUID, Notification>;
   listKeychainsRequest: RequestState<ListAdminKeychains['keychains']>;
   pendingDeletionKeychainId?: UUID;
+  pendingDeletionNotificationId?: UUID;
 }
 
 export function initialState(): AdminState {
@@ -22,15 +23,17 @@ export function initialState(): AdminState {
   };
 }
 
+type DeletableEntity = 'Keychain' | 'Notification';
+
 export const slice = createSlice({
   name: `admin`,
   initialState,
   reducers: {
-    startKeychainDelete(state, action: PayloadAction<UUID>) {
-      state.pendingDeletionKeychainId = action.payload;
+    startEntityDelete(state, action: PayloadAction<{ type: DeletableEntity; id: UUID }>) {
+      state[`pendingDeletion${action.payload.type}Id`] = action.payload.id;
     },
-    cancelKeychainDelete(state) {
-      delete state.pendingDeletionKeychainId;
+    cancelEntityDelete(state, { payload: type }: PayloadAction<DeletableEntity>) {
+      delete state[`pendingDeletion${type}Id`];
     },
   },
   extraReducers: (builder) => {
@@ -104,12 +107,25 @@ export const slice = createSlice({
         );
       }
     });
+
+    builder.addCase(deleteNotification.started, (state) => {
+      delete state.pendingDeletionNotificationId;
+    });
+
+    builder.addCase(deleteNotification.succeeded, (state, { meta }) => {
+      delete state.notifications[meta.arg];
+    });
   },
 });
 
 export const fetchProfileData = createResultThunk(
   `${slice.name}/fetchProfileData`,
   Current.api.admin.getAdmin,
+);
+
+export const deleteNotification = createResultThunk(
+  `${slice.name}/deleteNotification`,
+  Current.api.admin.deleteNotification,
 );
 
 export const deleteKeychain = createResultThunk(
@@ -122,6 +138,6 @@ export const fetchAdminKeychains = createResultThunk(
   Current.api.admin.listKeychains,
 );
 
-export const { startKeychainDelete, cancelKeychainDelete } = slice.actions;
+export const { startEntityDelete, cancelEntityDelete } = slice.actions;
 
 export default slice.reducer;

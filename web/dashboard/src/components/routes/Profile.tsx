@@ -2,7 +2,12 @@ import React, { useEffect } from 'react';
 import Loading from '@shared/Loading';
 import Profile from '@shared/dashboard/Profile';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import { fetchProfileData } from '../../redux/slice-admin';
+import {
+  cancelEntityDelete,
+  fetchProfileData,
+  startEntityDelete,
+  deleteNotification,
+} from '../../redux/slice-admin';
 import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
 import { notNullish } from '../../redux/helpers';
@@ -11,10 +16,16 @@ import { VerifiedNotificationMethod } from '../../types/Admin';
 
 const ProfileContainer: React.FC = () => {
   const dispatch = useDispatch();
-  const adminId = useSelector((state) => state.auth.admin?.id ?? ``);
-  const request = useSelector((state) => state.admin.profileRequest);
-  const methods = useSelector((state) => state.admin.verifiedNotificationMethods);
-  const notifications = useSelector((state) => state.admin.notifications);
+  const { adminId, request, methods, notifications, deleteNotificationId } = useSelector(
+    (state) => ({
+      adminId: state.auth.admin?.id ?? ``,
+      request: state.admin.profileRequest,
+      methods: state.admin.verifiedNotificationMethods,
+      notifications: typesafe.objectValues(state.admin.notifications),
+      deleteNotificationId: state.admin.pendingDeletionNotificationId,
+    }),
+  );
+
   const reqState = request.state;
 
   useEffect(() => {
@@ -34,13 +45,12 @@ const ProfileContainer: React.FC = () => {
     <Profile
       email={admin.email}
       status={admin.subscriptionStatus}
-      methods={typesafe.objectValues(methods).map((m) => ({
-        id: m.id,
-        method: m.data.type,
-        value: verifiedMethodPrimaryValue(m),
+      methods={typesafe.objectValues(methods).map((method) => ({
+        id: method.id,
+        method: method.data.type,
+        value: verifiedMethodPrimaryValue(method),
       }))}
-      notifications={typesafe
-        .objectValues(notifications)
+      notifications={notifications
         .map((n) => {
           const method = methods[n.methodId];
           if (!method) return null;
@@ -55,6 +65,13 @@ const ProfileContainer: React.FC = () => {
           };
         })
         .filter(notNullish)}
+      deleteNotification={{
+        id: deleteNotificationId,
+        start: (id) => dispatch(startEntityDelete({ type: `Notification`, id })),
+        confirm: () =>
+          deleteNotificationId && dispatch(deleteNotification(deleteNotificationId)),
+        cancel: () => dispatch(cancelEntityDelete(`Notification`)),
+      }}
     />
   );
 };

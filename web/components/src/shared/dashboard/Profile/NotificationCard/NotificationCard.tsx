@@ -7,19 +7,20 @@ type Props = {
   when: 'suspension requests' | 'unlock requests';
   method: 'email' | 'text' | 'slack';
   value: string;
+  onDelete(): unknown;
 };
 
-const NotificationCard: React.FC<Props> = (props) => {
+const NotificationCard: React.FC<Props> = ({ when, method, value, onDelete }) => {
   const [open, setOpen] = useState(false);
 
   let icon = ``;
   let text = <h2> </h2>;
-  switch (props.method) {
+  switch (method) {
     case `email`:
       text = (
         <h2 className="text-gray-700 text-lg">
-          Email <span className="font-bold">{props.value}</span> for{` `}
-          <span className="text-gray-900">{props.when}</span>
+          Email <span className="font-bold">{value}</span> for{` `}
+          <span className="text-gray-900">{when}</span>
         </h2>
       );
       icon = `envelope`;
@@ -27,8 +28,8 @@ const NotificationCard: React.FC<Props> = (props) => {
     case `text`:
       text = (
         <h2 className="text-gray-700 text-lg">
-          Text <span className="font-bold">{props.value}</span> for{` `}
-          <span className="text-gray-900">{props.when}</span>
+          Text <span className="font-bold">{value}</span> for{` `}
+          <span className="text-gray-900">{when}</span>
         </h2>
       );
       icon = `mobile`;
@@ -36,8 +37,8 @@ const NotificationCard: React.FC<Props> = (props) => {
     case `slack`:
       text = (
         <h2 className="text-gray-700 text-lg">
-          Slack <span className="font-bold">{props.value}</span> for{` `}
-          <span className="text-gray-900">{props.when}</span>
+          Slack <span className="font-bold">{value}</span> for{` `}
+          <span className="text-gray-900">{when}</span>
         </h2>
       );
       icon = `slack`;
@@ -88,7 +89,7 @@ const NotificationCard: React.FC<Props> = (props) => {
         </Button>
         <Button
           type="button"
-          onClick={() => {}}
+          onClick={onDelete}
           color="secondary-warning"
           small
           className={`${open ? `hidden` : `block`} ml-3`}
