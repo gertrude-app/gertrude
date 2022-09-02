@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import FullscreenModalForm from '@shared/dashboard/Unauthed/FullscreenModalForm';
+import FullscreenModalForm from '@dashboard/Unauthed/FullscreenModalForm';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { Navigate, useLocation, useParams } from 'react-router-dom';
 import ApiErrorMessage from '../ApiErrorMessage';

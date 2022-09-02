@@ -62,6 +62,13 @@ export interface SetUserKeychainsInput {
   userId: UUID;
 }
 
+export interface UpdateAdminNotificationInput {
+  adminId: UUID;
+  id: UUID;
+  methodId: UUID;
+  trigger: Trigger;
+}
+
 export interface UpdateUserInput {
   adminId: UUID;
   deletedAt?: string | null;

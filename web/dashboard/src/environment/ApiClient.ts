@@ -3,7 +3,7 @@ import * as admin from '../api/admin';
 import * as users from '../api/users';
 import * as signup from '../api/signup';
 import * as keychains from '../api/keychains';
-import { SubscriptionStatus } from '../graphqlTypes';
+import { SubscriptionStatus } from '@dashboard/types/GraphQL';
 
 export interface ApiClient {
   admin: typeof admin;
@@ -41,6 +41,9 @@ export const throwingApiClient: ApiClient = {
     },
     deleteNotificationMethod: () => {
       throw new Error(`ApiClient.admin.deleteNotificationMethod() not implemented.`);
+    },
+    updateNotification: () => {
+      throw new Error(`ApiClient.admin.updateNotification() not implemented.`);
     },
   },
   keychains: {
@@ -105,6 +108,9 @@ export const noopApiClient: ApiClient = {
       return Result.success(true);
     },
     deleteNotificationMethod: async () => {
+      return Result.success(true);
+    },
+    updateNotification: async () => {
       return Result.success(true);
     },
   },

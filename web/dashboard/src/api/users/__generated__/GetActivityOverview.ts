@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { DateRangeInput } from './../../../graphqlTypes';
+import { DateRangeInput } from './../../../../../components/src/shared/dashboard/types/GraphQL';
 
 // ====================================================
 // GraphQL query operation: GetActivityOverview

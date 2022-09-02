@@ -39,7 +39,8 @@ const EditNotificationSidebar: React.FC<Props> = ({ open, setOpen }) => {
         </h2>
         <label className="mb-1 text-gray-500 text-lg font-medium block">Method:</label>
         <SelectMenu
-          options={[`Email`, `Text`, `Slack`]}
+          // options={[`Email`, `Text`, `Slack`]}
+          options={[]}
           selectedOption={selectedMethod}
           setSelected={setSelectedMethod}
         />

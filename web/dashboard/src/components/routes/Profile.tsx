@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Loading from '@shared/Loading';
-import Profile from '@shared/dashboard/Profile';
+import Profile from '@dashboard/Profile';
+import { AdminNotificationMethod } from '@dashboard/types/Admin';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   cancelEntityDelete,
@@ -8,13 +9,14 @@ import {
   startEntityDelete,
   deleteNotification,
   deleteNotificationMethod,
+  notificationChanged,
+  updateNotification,
 } from '../../redux/slice-admin';
 import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
-import { notNullish, Query } from '../../redux/helpers';
-import { Trigger } from '../../graphqlTypes';
-import { VerifiedNotificationMethod, Notification } from '../../types/Admin';
-import { QueryProps } from '../../redux/store';
+import { isDirty, notNullish, Query } from '../../redux/helpers';
+import { QueryProps, State } from '../../redux/store';
+import { capitalize } from '../shared/lib/string';
 
 const ProfileContainer: React.FC = () => {
   const dispatch = useDispatch();
@@ -50,16 +52,18 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
   const methods = state.admin.verifiedNotificationMethods;
   const deleteNotificationId = state.admin.pendingDeletionNotificationId;
   const deleteMethodId = state.admin.pendingDeletionVerifiedNotificationMethodId;
+  const saveNotifications = state.admin.saveNotificationRequests;
 
   return Query.succeed({
     email: request.payload.email,
     status: request.payload.subscriptionStatus,
+    updateNotification: (update) => dispatch(notificationChanged(update)),
     methods: typesafe
       .objectValues(state.admin.verifiedNotificationMethods)
       .map((method) => ({
         id: method.id,
         method: method.data.type,
-        value: verifiedMethodPrimaryValue(method),
+        value: methodPrimaryValue(method),
         deletable: methodDeletable(
           method,
           state.admin.notifications,
@@ -68,20 +72,25 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
       })),
     notifications: typesafe
       .objectValues(state.admin.notifications)
-      .map((n) => {
-        const method = methods[n.methodId];
+      .map((editable) => {
+        const { id, ...notification } = editable.draft;
+        const method = methods[notification.methodId];
         if (!method) return null;
         return {
-          id: n.id,
-          when:
-            n.trigger === Trigger.suspendFilterRequestSubmitted
-              ? (`suspension requests` as const)
-              : (`unlock requests` as const),
-          method: method.data.type,
-          value: verifiedMethodPrimaryValue(method),
+          id,
+          trigger: notification.trigger,
+          selectedMethod: method,
+          saveButtonDisabled:
+            !isDirty(editable) || saveNotifications[id]?.state === `ongoing`,
+          methodOptions: typesafe.objectValues(methods).map((method) => ({
+            display: `${capitalize(method.data.type)} ${methodPrimaryValue(method)}`,
+            value: method.id,
+          })),
+          editing: editable.editing,
         };
       })
       .filter(notNullish),
+    saveNotification: (id) => dispatch(updateNotification(id)),
     deleteNotification: {
       id: deleteNotificationId,
       start: (id) => dispatch(startEntityDelete({ type: `Notification`, id })),
@@ -99,7 +108,7 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
   });
 };
 
-function verifiedMethodPrimaryValue(method: VerifiedNotificationMethod): string {
+function methodPrimaryValue(method: AdminNotificationMethod): string {
   switch (method.data.type) {
     case `email`:
       return method.data.email;
@@ -109,14 +118,15 @@ function verifiedMethodPrimaryValue(method: VerifiedNotificationMethod): string 
       return method.data.phoneNumber;
   }
 }
+
 function methodDeletable(
-  method: VerifiedNotificationMethod,
-  notifications: Record<UUID, Notification>,
+  method: AdminNotificationMethod,
+  notifications: State['admin']['notifications'],
   adminEmail: EmailAddress,
 ): any {
   const methodBeingUsed = typesafe
     .objectValues(notifications)
-    .some((notification) => notification.methodId === method.id);
+    .some((notification) => notification.original.methodId === method.id);
 
   if (methodBeingUsed) {
     return false;

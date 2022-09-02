@@ -1,4 +1,4 @@
-import { DateRangeInput } from '../graphqlTypes';
+import { DateRangeInput } from '@dashboard/types/GraphQL';
 
 export function entireDay(date: Date): DateRangeInput {
   const start = new Date(date.getTime());

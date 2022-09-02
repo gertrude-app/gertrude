@@ -1,15 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { NotificationUpdate } from '@dashboard/Profile';
+import { Admin, Notification, AdminNotificationMethod } from '@dashboard/types/Admin';
 import { ListAdminKeychains } from '../api/admin/__generated__/ListAdminKeychains';
 import Current from '../environment';
-import { Admin, Notification, VerifiedNotificationMethod } from '../types/Admin';
-import { Req } from './helpers';
+import { Req, editable, revert, commit } from './helpers';
 import { createResultThunk } from './thunk';
+import Result from '../api/Result';
 
 export interface AdminState {
   profileRequest: RequestState<Admin>;
-  verifiedNotificationMethods: Record<UUID, VerifiedNotificationMethod>;
-  notifications: Record<UUID, Notification>;
+  verifiedNotificationMethods: Record<UUID, AdminNotificationMethod>;
+  notifications: Record<UUID, Editable<Notification> & { editing: boolean }>;
+  saveNotificationRequests: Record<UUID, RequestState>;
   listKeychainsRequest: RequestState<ListAdminKeychains['keychains']>;
+  // @TODO, sub object deleting: {...}
   pendingDeletionKeychainId?: UUID;
   pendingDeletionNotificationId?: UUID;
   pendingDeletionVerifiedNotificationMethodId?: UUID;
@@ -20,6 +24,7 @@ export function initialState(): AdminState {
     profileRequest: Req.idle(),
     verifiedNotificationMethods: {},
     notifications: {},
+    saveNotificationRequests: {},
     listKeychainsRequest: Req.idle(),
   };
 }
@@ -35,6 +40,27 @@ export const slice = createSlice({
     },
     cancelEntityDelete(state, { payload: type }: PayloadAction<DeletableEntity>) {
       delete state[`pendingDeletion${type}Id`];
+    },
+    notificationChanged(state, { payload }: PayloadAction<NotificationUpdate>) {
+      const notification = state.notifications[payload.id];
+      if (!notification) {
+        return;
+      }
+
+      switch (payload.type) {
+        case `startEditing`:
+          notification.editing = true;
+          break;
+        case `cancelEditing`:
+          state.notifications[payload.id] = { editing: false, ...revert(notification) };
+          break;
+        case `changeTrigger`:
+          notification.draft.trigger = payload.trigger;
+          break;
+        case `changeMethod`:
+          notification.draft.methodId = payload.methodId;
+          break;
+      }
     },
   },
   extraReducers: (builder) => {
@@ -62,9 +88,12 @@ export const slice = createSlice({
 
       for (const notification of payload.notifications) {
         state.notifications[notification.id] = {
-          id: notification.id,
-          trigger: notification.trigger,
-          methodId: notification.method.id,
+          editing: false,
+          ...editable({
+            id: notification.id,
+            trigger: notification.trigger,
+            methodId: notification.method.id,
+          }),
         };
       }
 
@@ -121,6 +150,22 @@ export const slice = createSlice({
     builder.addCase(deleteNotificationMethod.succeeded, (state, { meta }) => {
       delete state.verifiedNotificationMethods[meta.arg];
     });
+
+    builder.addCase(updateNotification.started, (state, { meta: { arg } }) => {
+      state.saveNotificationRequests[arg] = Req.ongoing();
+    });
+
+    builder.addCase(updateNotification.failed, (state, { error, meta: { arg } }) => {
+      state.saveNotificationRequests[arg] = Req.fail(error);
+    });
+
+    builder.addCase(updateNotification.succeeded, (state, { meta: { arg } }) => {
+      state.saveNotificationRequests[arg] = Req.succeed(void 0);
+      const notification = state.notifications[arg];
+      if (notification) {
+        state.notifications[arg] = { editing: false, ...commit(notification) };
+      }
+    });
   },
 });
 
@@ -139,6 +184,21 @@ export const deleteNotification = createResultThunk(
   Current.api.admin.deleteNotification,
 );
 
+export const updateNotification = createResultThunk(
+  `${slice.name}/updateNotification`,
+  async (id: UUID, { getState }) => {
+    const state = getState();
+    const notification = state.admin.notifications[id];
+    if (!notification) {
+      return Result.error<ApiError>({ type: `non_actionable` });
+    }
+    return Current.api.admin.updateNotification({
+      adminId: state.auth.admin?.id ?? ``,
+      ...notification.draft,
+    });
+  },
+);
+
 export const deleteKeychain = createResultThunk(
   `${slice.name}/deleteKeychain`,
   Current.api.keychains.deleteKeychain,
@@ -149,6 +209,7 @@ export const fetchAdminKeychains = createResultThunk(
   Current.api.admin.listKeychains,
 );
 
-export const { startEntityDelete, cancelEntityDelete } = slice.actions;
+export const { startEntityDelete, cancelEntityDelete, notificationChanged } =
+  slice.actions;
 
 export default slice.reducer;

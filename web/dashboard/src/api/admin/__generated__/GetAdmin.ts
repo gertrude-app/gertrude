@@ -3,7 +3,10 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { SubscriptionStatus, Trigger } from './../../../graphqlTypes';
+import {
+  SubscriptionStatus,
+  Trigger,
+} from './../../../../../components/src/shared/dashboard/types/GraphQL';
 
 // ====================================================
 // GraphQL query operation: GetAdmin

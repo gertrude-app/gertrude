@@ -10,14 +10,27 @@ import TextInput from '../../dashboard/TextInput';
 import NotificationMethod from './NotificationMethod';
 import { ConfirmableEntityAction, SubcomponentsOmit } from '../../types';
 import { ConfirmDeleteEntity } from '../Modal';
+import { Trigger } from '../types/GraphQL';
+
+export type NotificationUpdate = { id: UUID } & (
+  | { type: 'startEditing' }
+  | { type: 'cancelEditing' }
+  | { type: 'changeTrigger'; trigger: Trigger }
+  | { type: 'changeMethod'; methodId: UUID }
+);
 
 interface Props {
   email: string;
   status: string; // @TODO: enum
   methods: SubcomponentsOmit<typeof NotificationMethod, 'onDelete'>;
-  notifications: SubcomponentsOmit<typeof NotificationCard, 'onDelete'>;
+  notifications: SubcomponentsOmit<
+    typeof NotificationCard,
+    'onDelete' | 'cancelEdit' | 'startEdit' | 'updateMethod' | 'updateTrigger' | 'onSave'
+  >;
   deleteNotification: ConfirmableEntityAction;
   deleteMethod: ConfirmableEntityAction;
+  updateNotification(update: NotificationUpdate): unknown;
+  saveNotification(id: UUID): unknown;
 }
 
 const Profile: React.FC<Props> = ({
@@ -25,6 +38,8 @@ const Profile: React.FC<Props> = ({
   status,
   methods,
   notifications,
+  updateNotification,
+  saveNotification,
   deleteNotification,
   deleteMethod,
 }) => {
@@ -100,11 +115,20 @@ const Profile: React.FC<Props> = ({
               verified methods
             </p>
             <div className="flex flex-wrap items-start pt-4 sm:pt-2 mb-4">
-              {notifications.map((notification) => (
+              {notifications.map(({ id, ...props }) => (
                 <NotificationCard
-                  key={notification.id}
-                  onDelete={() => deleteNotification.start(notification.id)}
-                  {...notification}
+                  key={id}
+                  startEdit={() => updateNotification({ id, type: `startEditing` })}
+                  cancelEdit={() => updateNotification({ id, type: `cancelEditing` })}
+                  onDelete={() => deleteNotification.start(id)}
+                  updateMethod={(methodId) =>
+                    updateNotification({ id, methodId, type: `changeMethod` })
+                  }
+                  updateTrigger={(trigger) =>
+                    updateNotification({ id, trigger, type: `changeTrigger` })
+                  }
+                  onSave={() => saveNotification(id)}
+                  {...props}
                 />
               ))}
             </div>

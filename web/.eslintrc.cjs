@@ -211,6 +211,7 @@ module.exports = {
       rules: {
         '@typescript-eslint/explicit-module-boundary-types': `off`,
         '@typescript-eslint/explicit-function-return-type': `off`,
+        '@typescript-eslint/no-non-null-asserted-optional-chain': `off`,
       },
     },
     {
@@ -227,6 +228,7 @@ module.exports = {
         'no-throw-literal': `off`,
         '@typescript-eslint/consistent-type-assertions': `off`,
         '@typescript-eslint/explicit-function-return-type': `off`,
+        '@typescript-eslint/no-non-null-asserted-optional-chain': `off`,
       },
     },
   ],

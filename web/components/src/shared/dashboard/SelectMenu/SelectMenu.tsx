@@ -4,7 +4,7 @@ import { Listbox, Transition } from '@headlessui/react';
 import cx from 'classnames';
 
 interface Props {
-  options: string[];
+  options: Array<{ value: string; display: string }>;
   selectedOption: string;
   setSelected(value: string): void;
 }
@@ -18,7 +18,10 @@ const SelectMenu: React.FC<Props> = ({ options, selectedOption, setSelected }) =
           <div className="rounded-md w-full shadow-sm">
             <div className="relative z-0 inline-flex rounded-md w-full border">
               <div className="relative flex flex-grow items-center bg-white pl-3 pr-4 border border-transparent rounded-l-md text-gray-700">
-                <p className="ml-2.5 font-medium">{selectedOption}</p>
+                <p className="ml-2.5 font-medium">
+                  {(options.find((opt) => opt.value === selectedOption) ?? options[0])
+                    ?.display ?? `make a selection...`}
+                </p>
               </div>
               <Listbox.Button className="relative inline-flex items-center px-4 py-3.5 bg-violet-800 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-violet-900 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms] ">
                 <span className="sr-only">Change published status</span>
@@ -40,9 +43,9 @@ const SelectMenu: React.FC<Props> = ({ options, selectedOption, setSelected }) =
             leaveTo="opacity-0"
           >
             <Listbox.Options className="origin-top-right absolute z-10 right-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-              {options.map((option) => (
+              {options.map(({ value, display }) => (
                 <Listbox.Option
-                  key={option}
+                  key={value}
                   className={({ active }) =>
                     cx(
                       active
@@ -51,13 +54,13 @@ const SelectMenu: React.FC<Props> = ({ options, selectedOption, setSelected }) =
                       `cursor-pointer select-none relative p-4 text-md`,
                     )
                   }
-                  value={option}
+                  value={value}
                 >
                   {({ selected, active }) => (
                     <div className="flex flex-col">
                       <div className="flex justify-between">
                         <p className={selected ? `font-semibold` : `font-normal`}>
-                          {option}
+                          {display}
                         </p>
                         {selected ? (
                           <span className={active ? `text-white` : `text-violet-700`}>

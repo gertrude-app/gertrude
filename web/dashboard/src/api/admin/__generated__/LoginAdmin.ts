@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { LoginAdminInput } from './../../../graphqlTypes';
+import { LoginAdminInput } from './../../../../../components/src/shared/dashboard/types/GraphQL';
 
 // ====================================================
 // GraphQL mutation operation: LoginAdmin

@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { DeleteMonitoringItemInput } from './../../../graphqlTypes';
+import { DeleteMonitoringItemInput } from './../../../../../components/src/shared/dashboard/types/GraphQL';
 
 // ====================================================
 // GraphQL mutation operation: DeleteActivityItems

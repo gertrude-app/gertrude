@@ -1,5 +1,5 @@
 import { expect, test, it, describe, vi } from 'vitest';
-import { Req, toEditable } from '../helpers';
+import { Req, editable } from '../helpers';
 import Current from '../../environment';
 import reducer, {
   activityItemsDeleted,
@@ -17,7 +17,7 @@ describe(`updateUser`, () => {
     Current.api.users.updateUser = vi.fn(() => Promise.resolve(Result.true()));
     const dispatch = vi.fn();
 
-    const user = toEditable(
+    const user = editable(
       mock.user({
         id: `user123`,
         keyloggingEnabled: true,
@@ -55,7 +55,7 @@ describe(`updateUser`, () => {
   });
 
   test(`update user happy path`, () => {
-    const user = toEditable(mock.user({ id: `user123` }));
+    const user = editable(mock.user({ id: `user123` }));
     user.draft.name = `Blob Jr.`; // <-- this is the edit
 
     const initialState = makeState((state) => {

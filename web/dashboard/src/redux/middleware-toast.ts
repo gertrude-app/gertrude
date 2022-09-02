@@ -7,13 +7,16 @@ import {
   deleteKeychain,
   deleteNotification,
   deleteNotificationMethod,
+  updateNotification,
 } from './slice-admin';
 
 const toastMiddleware: Middleware = (_store) => (next) => (action) => {
   toastCrud(`save`, `user`, updateUser, action);
   toastCrud(`delete`, `keychain`, deleteKeychain, action);
+  toastCrud(`save`, `notification`, updateNotification, action);
   toastCrud(`delete`, `notification`, deleteNotification, action);
   toastCrud(`delete`, `notification method`, deleteNotificationMethod, action);
+
   return next(action);
 };
 

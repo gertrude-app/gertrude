@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import ReviewDay from '@shared/dashboard/Users/Activity/ReviewDay';
+import ReviewDay from '@dashboard/Users/Activity/ReviewDay';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import Loading from '@shared/Loading';

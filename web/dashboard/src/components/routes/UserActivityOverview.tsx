@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import ActivityOverview from '@shared/dashboard/Users/Activity/Overview';
+import ActivityOverview from '@dashboard/Users/Activity/Overview';
 import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';

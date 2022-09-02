@@ -5,3 +5,4 @@ export { listKeychains } from './listKeychains';
 export { getAdmin } from './getAdmin';
 export { deleteNotification } from './deleteNotification';
 export { deleteNotificationMethod } from './deleteNotificationMethod';
+export { updateNotification } from './updateNotification';

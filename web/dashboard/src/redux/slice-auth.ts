@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AdminIds } from '@dashboard/types/Admin';
 import Current from '../environment';
 import { OptionalVar as Optional } from '../environment/Environment';
 import { StorageClient } from '../environment/Storage';
-import { AdminIds } from '../types/Admin';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 

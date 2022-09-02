@@ -1,6 +1,6 @@
 import { expect, it, describe } from 'vitest';
-import { SubscriptionStatus, Trigger } from '../../../graphqlTypes';
-import { Query, Req } from '../../../redux/helpers';
+import { SubscriptionStatus, Trigger } from '@dashboard/types/GraphQL';
+import { editable, Query, Req } from '../../../redux/helpers';
 import { makeState } from '../../../redux/__test__/test-helpers';
 import { queryProps } from '../Profile';
 
@@ -28,9 +28,12 @@ describe(`Profile.queryProps`, () => {
       };
       state.admin.notifications = {
         notification1: {
-          id: `notification1`,
-          methodId: `verifiedMethod2`, // <-- makes method 2 not deletable
-          trigger: Trigger.unlockRequestSubmitted,
+          editing: false,
+          ...editable({
+            id: `notification1`,
+            methodId: `verifiedMethod2`, // <-- makes method 2 not deletable
+            trigger: Trigger.unlockRequestSubmitted,
+          }),
         },
       };
     });

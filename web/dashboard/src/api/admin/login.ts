@@ -1,7 +1,7 @@
+import { AdminIds } from '@dashboard/types/Admin';
 import Result from '../Result';
 import * as T from './__generated__/LoginAdmin';
 import { gql, mutate } from '../apollo';
-import { AdminIds } from '../../types/Admin';
 
 export async function login(
   email: string,

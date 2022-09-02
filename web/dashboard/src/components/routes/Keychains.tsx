@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import ListKeychains from '@shared/dashboard/Keychains/ListKeychains';
+import ListKeychains from '@dashboard/Keychains/ListKeychains';
 import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';

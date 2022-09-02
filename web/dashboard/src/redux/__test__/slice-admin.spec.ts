@@ -1,9 +1,9 @@
 import { expect, it, describe } from 'vitest';
+import { SubscriptionStatus, Trigger } from '@dashboard/types/GraphQL';
 import { Req } from '../helpers';
 import reducer, { fetchProfileData } from '../slice-admin';
 import { makeState } from './test-helpers';
 import * as mock from './mocks';
-import { SubscriptionStatus, Trigger } from '../../graphqlTypes';
 
 describe(`fetchProfileData`, () => {
   it(`.succeeded sets correctly massaged data on state slice`, () => {
@@ -61,9 +61,17 @@ describe(`fetchProfileData`, () => {
 
     expect(nextState.notifications).toEqual({
       notification1: {
-        id: `notification1`,
-        trigger: Trigger.unlockRequestSubmitted,
-        methodId: `verifiedMethod2`,
+        editing: false,
+        original: {
+          id: `notification1`,
+          trigger: Trigger.unlockRequestSubmitted,
+          methodId: `verifiedMethod2`,
+        },
+        draft: {
+          id: `notification1`,
+          trigger: Trigger.unlockRequestSubmitted,
+          methodId: `verifiedMethod2`,
+        },
       },
     });
   });

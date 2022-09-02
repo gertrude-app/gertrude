@@ -1,5 +1,5 @@
 import React from 'react';
-import ErrorMessage from '@shared/dashboard/ErrorMessage';
+import ErrorMessage from '@dashboard/ErrorMessage';
 import { Link } from 'react-router-dom';
 import { useDispatch } from '../redux/hooks';
 import { logoutClicked } from '../redux/slice-auth';

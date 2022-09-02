@@ -16,7 +16,7 @@ if (endpointIndex !== -1) {
   endpoint = process.argv[endpointIndex + 1];
 }
 
-exec(`rm -f ${CWD}/graphqlTypes.ts`);
+exec(`rm -f ${CWD}/../components/src/shared/dashboard/types/GraphQL.ts`);
 glob(`${CWD}/**/__generated__/**/*`).forEach((path) => exec(`rm -f ${path}`));
 
 log(c`{gray ${step++}/${numSteps}} {magenta Downloading schema...}`);
@@ -35,7 +35,7 @@ success = exec.out(
   `npx apollo client:codegen
     --passthroughCustomScalars
     --localSchemaFile=schema.graphql
-    --globalTypesFile=src/graphqlTypes.ts
+    --globalTypesFile=../components/src/shared/dashboard/types/GraphQL.ts
     --target=typescript
     --tagName=gql`.replace(/\n {4}/g, ` `),
   CWD,
@@ -53,7 +53,7 @@ exec(`rmdir __generated__`, CWD);
 
 // prettier the codegen'd files
 const PRETTIER_FORMAT = `${CWD}/../node_modules/.bin/prettier --config ${CWD}/../.prettierrc.json --write`;
-exec.exit(`${PRETTIER_FORMAT} src/graphqlTypes.ts`);
+exec.exit(`${PRETTIER_FORMAT} ../components/src/shared/dashboard/types/GraphQL.ts`);
 const typeDirs = glob(`${CWD}/**/__generated__/`);
 typeDirs.forEach((path) => exec.exit(`${PRETTIER_FORMAT} ${path}`));
 

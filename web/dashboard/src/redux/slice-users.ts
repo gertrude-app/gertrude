@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { formatDate } from '@shared/lib/dates';
-import { ActivityItem } from '@shared/dashboard/Users/Activity/ReviewDay';
+import { ActivityItem } from '@dashboard/Users/Activity/ReviewDay';
 import { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
-import { Req, toMap, toEditableMap, toEditable } from './helpers';
+import { Req, toMap, toEditableMap, editable, commit } from './helpers';
 import { ThunkAction, createResultThunk } from './thunk';
 import Current from '../environment';
-import { DateRangeInput } from '../graphqlTypes';
+import { DateRangeInput } from '@dashboard/types/GraphQL';
 import { User } from '../api/users';
 import Result from '../api/Result';
 
@@ -131,7 +131,7 @@ export const slice = createSlice({
 
     builder.addCase(fetchUser.succeeded, (state, { meta, payload }) => {
       state.fetchUserRequest[meta.arg] = Req.succeed(void 0);
-      state.users[meta.arg] = toEditable(payload);
+      state.users[meta.arg] = editable(payload);
     });
 
     builder.addCase(fetchUser.failed, (state, action) => {
@@ -169,10 +169,8 @@ export const slice = createSlice({
 
     builder.addCase(updateUser.succeeded, (state, { meta }) => {
       state.updateUserRequest[meta.arg] = Req.succeed(void 0);
-      const draft = state.users[meta.arg]?.draft;
-      if (draft) {
-        state.users[meta.arg] = toEditable(draft);
-      }
+      const user = state.users[meta.arg];
+      user && (state.users[meta.arg] = commit(user));
     });
   },
 });

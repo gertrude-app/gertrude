@@ -23,7 +23,7 @@ export class Req {
     return { state: `succeeded`, payload };
   }
 
-  static fail<T, E>(error: E | undefined = undefined): RequestState<T, E> {
+  static fail<E>(error: E | undefined = undefined): RequestState<never, E> {
     return { state: `failed`, error };
   }
 
@@ -64,7 +64,7 @@ export class Req {
     }
   }
 
-  static error<T, E>(req: RequestState<T, E> | undefined): E | undefined {
+  static error<E>(req: RequestState<never, E> | undefined): E | undefined {
     if (req && req.state === `failed`) {
       return req.error;
     }
@@ -83,12 +83,20 @@ export function toEditableMap<T extends { id: string }>(
   array: T[],
 ): Record<string, Editable<T>> {
   return array.reduce<Record<string, Editable<T>>>((map, item) => {
-    map[item.id] = toEditable(item);
+    map[item.id] = editable(item);
     return map;
   }, {});
 }
 
-export function toEditable<T extends { id: UUID }>(original: T): Editable<T> {
+export function revert<T extends { id: UUID }>({ original }: Editable<T>): Editable<T> {
+  return editable(original);
+}
+
+export function commit<T extends { id: UUID }>({ draft }: Editable<T>): Editable<T> {
+  return editable(draft);
+}
+
+export function editable<T extends { id: UUID }>(original: T): Editable<T> {
   return { original, draft: JSON.parse(JSON.stringify(original)) };
 }
 

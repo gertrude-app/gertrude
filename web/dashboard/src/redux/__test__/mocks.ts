@@ -1,5 +1,6 @@
+import { SubscriptionStatus, Trigger } from '@dashboard/types/GraphQL';
+import { ActivityItem } from '@dashboard/Users/Activity/ReviewDay';
 import type { User } from '../../api/users';
-import { ActivityItem } from '@shared/dashboard/Users/Activity/ReviewDay';
 import {
   GetAdmin_admin,
   GetAdmin_admin_notifications,
@@ -7,7 +8,6 @@ import {
   GetAdmin_admin_verifiedNotificationMethods_method,
 } from '../../api/admin/__generated__/GetAdmin';
 import { GetActivityOverview_counts } from '../../api/users/__generated__/GetActivityOverview';
-import { SubscriptionStatus, Trigger } from '../../graphqlTypes';
 
 export function adminProfile(override: Partial<GetAdmin_admin> = {}): GetAdmin_admin {
   return {

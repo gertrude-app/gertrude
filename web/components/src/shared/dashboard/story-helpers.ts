@@ -1,3 +1,4 @@
+import { ConfirmableEntityAction } from '../types';
 import KeychainCard from './Users/KeychainCard';
 
 export function keychainProps(
@@ -11,5 +12,33 @@ export function keychainProps(
     keys: 232,
     onRemove: () => {},
     ...override,
+  };
+}
+
+export function withIds<T extends Record<string, unknown>>(
+  items: T[],
+): Array<T & { id: UUID }> {
+  return items.map((item, index) => ({ ...item, id: `${index + 1}` }));
+}
+
+export function withIdsAnd<
+  T extends Record<string, unknown>,
+  K extends Record<string, unknown>,
+>(add: K, items: T[]): Array<T & K & { id: UUID }> {
+  return adding(add, withIds(items));
+}
+
+export function adding<
+  T extends Record<string, unknown>,
+  K extends Record<string, unknown>,
+>(add: K, items: T[]): Array<T & K> {
+  return items.map((item) => ({ ...add, ...item }));
+}
+
+export function confirmableEntityAction(): ConfirmableEntityAction {
+  return {
+    start: () => {},
+    confirm: () => {},
+    cancel: () => {},
   };
 }

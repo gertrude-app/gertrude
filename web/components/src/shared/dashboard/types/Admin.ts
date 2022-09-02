@@ -1,7 +1,7 @@
-import { SubscriptionStatus, Trigger } from '../graphqlTypes';
+import { SubscriptionStatus, Trigger } from './GraphQL';
 
 export interface Admin {
-  email: EmailAddress;
+  email: string;
   subscriptionStatus: SubscriptionStatus;
 }
 
@@ -10,10 +10,10 @@ export interface AdminIds {
   token: UUID;
 }
 
-export interface VerifiedNotificationMethod {
+export interface AdminNotificationMethod {
   id: UUID;
   data:
-    | { type: `email`; email: EmailAddress }
+    | { type: `email`; email: string }
     | { type: `text`; phoneNumber: string }
     | { type: `slack`; token: string; channelName: string; channelId: string };
 }
