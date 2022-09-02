@@ -12,7 +12,6 @@ export interface AdminIds {
 
 export interface VerifiedNotificationMethod {
   id: UUID;
-  deletable: boolean;
   data:
     | { type: `email`; email: EmailAddress }
     | { type: `text`; phoneNumber: string }

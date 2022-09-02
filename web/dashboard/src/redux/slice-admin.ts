@@ -12,6 +12,7 @@ export interface AdminState {
   listKeychainsRequest: RequestState<ListAdminKeychains['keychains']>;
   pendingDeletionKeychainId?: UUID;
   pendingDeletionNotificationId?: UUID;
+  pendingDeletionVerifiedNotificationMethodId?: UUID;
 }
 
 export function initialState(): AdminState {
@@ -23,7 +24,7 @@ export function initialState(): AdminState {
   };
 }
 
-type DeletableEntity = 'Keychain' | 'Notification';
+type DeletableEntity = 'Keychain' | 'Notification' | 'VerifiedNotificationMethod';
 
 export const slice = createSlice({
   name: `admin`,
@@ -59,12 +60,17 @@ export const slice = createSlice({
         subscriptionStatus: payload.subscriptionStatus,
       });
 
+      for (const notification of payload.notifications) {
+        state.notifications[notification.id] = {
+          id: notification.id,
+          trigger: notification.trigger,
+          methodId: notification.method.id,
+        };
+      }
+
       for (const method of payload.verifiedNotificationMethods) {
         state.verifiedNotificationMethods[method.id] = {
           id: method.id,
-          deletable:
-            method.method.data.__typename !== `EmailData` ||
-            method.method.data.email !== payload.email,
           data: (() => {
             switch (method.method.data.__typename) {
               case `EmailData`:
@@ -80,14 +86,6 @@ export const slice = createSlice({
                 };
             }
           })(),
-        };
-      }
-
-      for (const notification of payload.notifications) {
-        state.notifications[notification.id] = {
-          id: notification.id,
-          trigger: notification.trigger,
-          methodId: notification.method.id,
         };
       }
     });
@@ -115,12 +113,25 @@ export const slice = createSlice({
     builder.addCase(deleteNotification.succeeded, (state, { meta }) => {
       delete state.notifications[meta.arg];
     });
+
+    builder.addCase(deleteNotificationMethod.started, (state) => {
+      delete state.pendingDeletionVerifiedNotificationMethodId;
+    });
+
+    builder.addCase(deleteNotificationMethod.succeeded, (state, { meta }) => {
+      delete state.verifiedNotificationMethods[meta.arg];
+    });
   },
 });
 
 export const fetchProfileData = createResultThunk(
   `${slice.name}/fetchProfileData`,
   Current.api.admin.getAdmin,
+);
+
+export const deleteNotificationMethod = createResultThunk(
+  `${slice.name}/deleteNotificationMethod`,
+  Current.api.admin.deleteNotificationMethod,
 );
 
 export const deleteNotification = createResultThunk(

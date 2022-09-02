@@ -16,10 +16,10 @@ Default.args = {
   email: `johndoe@example.com`,
   status: `active`,
   methods: [
-    { id: `1`, method: `email`, value: `me@example.com` },
-    { id: `2`, method: `slack`, value: `#Gertrude` },
-    { id: `3`, method: `email`, value: `you@example.com` },
-    { id: `4`, method: `text`, value: `(123) 456-7890` },
+    { id: `1`, deletable: false, method: `email`, value: `me@example.com` },
+    { id: `2`, deletable: true, method: `slack`, value: `#Gertrude` },
+    { id: `3`, deletable: true, method: `email`, value: `you@example.com` },
+    { id: `4`, deletable: false, method: `text`, value: `(123) 456-7890` },
   ],
   notifications: [
     { id: `1`, method: `email`, value: `me@example.com`, when: `suspension requests` },

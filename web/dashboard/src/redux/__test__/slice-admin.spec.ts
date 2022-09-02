@@ -51,12 +51,10 @@ describe(`fetchProfileData`, () => {
     expect(nextState.verifiedNotificationMethods).toEqual({
       verifiedMethod1: {
         id: `verifiedMethod1`,
-        deletable: false,
         data: { type: `email`, email: `blob@blob.com` },
       },
       verifiedMethod2: {
         id: `verifiedMethod2`,
-        deletable: true,
         data: { type: `text`, phoneNumber: `7` },
       },
     });

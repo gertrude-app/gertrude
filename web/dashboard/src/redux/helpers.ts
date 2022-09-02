@@ -1,3 +1,23 @@
+import { JSXElementConstructor } from 'react';
+import { QueriedProps } from './store';
+
+export class Query {
+  static succeed<T extends JSXElementConstructor<any>>(
+    props: React.ComponentProps<T>,
+  ): QueriedProps<T> {
+    return { state: `succeeded`, props };
+  }
+
+  static props<T extends JSXElementConstructor<any>>(
+    query: QueriedProps<T>,
+  ): React.ComponentProps<T> | undefined {
+    if (query.state === `succeeded`) {
+      return query.props;
+    }
+    return undefined;
+  }
+}
+
 export class Req {
   static succeed<T>(payload: T): RequestState<T> {
     return { state: `succeeded`, payload };

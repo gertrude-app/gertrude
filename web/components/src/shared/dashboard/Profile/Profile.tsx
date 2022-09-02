@@ -17,6 +17,7 @@ interface Props {
   methods: SubcomponentsOmit<typeof NotificationMethod, 'onDelete'>;
   notifications: SubcomponentsOmit<typeof NotificationCard, 'onDelete'>;
   deleteNotification: ConfirmableEntityAction;
+  deleteMethod: ConfirmableEntityAction;
 }
 
 const Profile: React.FC<Props> = ({
@@ -25,11 +26,13 @@ const Profile: React.FC<Props> = ({
   methods,
   notifications,
   deleteNotification,
+  deleteMethod,
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div className="lg:px-4 relative">
       <ConfirmDeleteEntity type="notification" action={deleteNotification} />
+      <ConfirmDeleteEntity type="notification method" action={deleteMethod} />
       <div
         className={cx(
           `absolute left-0 top-0 w-full h-full z-20 bg-gray-50 bg-opacity-60`,
@@ -72,7 +75,11 @@ const Profile: React.FC<Props> = ({
             </p>
             <ul className="mt-5">
               {methods.map((method) => (
-                <NotificationMethod key={method.id} onDelete={() => {}} {...method} />
+                <NotificationMethod
+                  onDelete={() => deleteMethod.start(method.id)}
+                  key={method.id}
+                  {...method}
+                />
               ))}
             </ul>
             <Button

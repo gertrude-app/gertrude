@@ -39,6 +39,9 @@ export const throwingApiClient: ApiClient = {
     deleteNotification: () => {
       throw new Error(`ApiClient.admin.deleteNotification() not implemented.`);
     },
+    deleteNotificationMethod: () => {
+      throw new Error(`ApiClient.admin.deleteNotificationMethod() not implemented.`);
+    },
   },
   keychains: {
     deleteKeychain: () => {
@@ -99,6 +102,9 @@ export const noopApiClient: ApiClient = {
       });
     },
     deleteNotification: async () => {
+      return Result.success(true);
+    },
+    deleteNotificationMethod: async () => {
       return Result.success(true);
     },
   },

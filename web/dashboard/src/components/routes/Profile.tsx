@@ -7,86 +7,120 @@ import {
   fetchProfileData,
   startEntityDelete,
   deleteNotification,
+  deleteNotificationMethod,
 } from '../../redux/slice-admin';
 import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
-import { notNullish } from '../../redux/helpers';
+import { notNullish, Query } from '../../redux/helpers';
 import { Trigger } from '../../graphqlTypes';
-import { VerifiedNotificationMethod } from '../../types/Admin';
+import { VerifiedNotificationMethod, Notification } from '../../types/Admin';
+import { QueryProps } from '../../redux/store';
 
 const ProfileContainer: React.FC = () => {
   const dispatch = useDispatch();
-  const { adminId, request, methods, notifications, deleteNotificationId } = useSelector(
-    (state) => ({
-      adminId: state.auth.admin?.id ?? ``,
-      request: state.admin.profileRequest,
-      methods: state.admin.verifiedNotificationMethods,
-      notifications: typesafe.objectValues(state.admin.notifications),
-      deleteNotificationId: state.admin.pendingDeletionNotificationId,
-    }),
-  );
+  const adminId = useSelector((state) => state.auth.admin?.id ?? ``);
+  const query = useSelector(queryProps(dispatch));
 
-  const reqState = request.state;
-
+  const reqState = query.state;
   useEffect(() => {
     reqState === `idle` && dispatch(fetchProfileData(adminId));
   }, [dispatch, adminId, reqState]);
 
-  if (request.state === `idle` || request.state === `ongoing`) {
+  if (query.state === `idle` || query.state === `ongoing`) {
     return <Loading />;
   }
 
-  if (request.state === `failed`) {
-    return <ApiErrorMessage error={request.error} />;
+  if (query.state === `failed`) {
+    return <ApiErrorMessage error={query.error} />;
   }
 
-  const admin = request.payload;
-  return (
-    <Profile
-      email={admin.email}
-      status={admin.subscriptionStatus}
-      methods={typesafe.objectValues(methods).map((method) => ({
-        id: method.id,
-        method: method.data.type,
-        value: verifiedMethodPrimaryValue(method),
-      }))}
-      notifications={notifications
-        .map((n) => {
-          const method = methods[n.methodId];
-          if (!method) return null;
-          return {
-            id: n.id,
-            when:
-              n.trigger === Trigger.suspendFilterRequestSubmitted
-                ? (`suspension requests` as const)
-                : (`unlock requests` as const),
-            method: method.data.type,
-            value: verifiedMethodPrimaryValue(method),
-          };
-        })
-        .filter(notNullish)}
-      deleteNotification={{
-        id: deleteNotificationId,
-        start: (id) => dispatch(startEntityDelete({ type: `Notification`, id })),
-        confirm: () =>
-          deleteNotificationId && dispatch(deleteNotification(deleteNotificationId)),
-        cancel: () => dispatch(cancelEntityDelete(`Notification`)),
-      }}
-    />
-  );
+  return <Profile {...query.props} />;
 };
 
 export default ProfileContainer;
 
 // helpers
 
+export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
+  const request = state.admin.profileRequest;
+  if (request.state !== `succeeded`) {
+    return request;
+  }
+
+  const methods = state.admin.verifiedNotificationMethods;
+  const deleteNotificationId = state.admin.pendingDeletionNotificationId;
+  const deleteMethodId = state.admin.pendingDeletionVerifiedNotificationMethodId;
+
+  return Query.succeed({
+    email: request.payload.email,
+    status: request.payload.subscriptionStatus,
+    methods: typesafe
+      .objectValues(state.admin.verifiedNotificationMethods)
+      .map((method) => ({
+        id: method.id,
+        method: method.data.type,
+        value: verifiedMethodPrimaryValue(method),
+        deletable: methodDeletable(
+          method,
+          state.admin.notifications,
+          request.payload.email,
+        ),
+      })),
+    notifications: typesafe
+      .objectValues(state.admin.notifications)
+      .map((n) => {
+        const method = methods[n.methodId];
+        if (!method) return null;
+        return {
+          id: n.id,
+          when:
+            n.trigger === Trigger.suspendFilterRequestSubmitted
+              ? (`suspension requests` as const)
+              : (`unlock requests` as const),
+          method: method.data.type,
+          value: verifiedMethodPrimaryValue(method),
+        };
+      })
+      .filter(notNullish),
+    deleteNotification: {
+      id: deleteNotificationId,
+      start: (id) => dispatch(startEntityDelete({ type: `Notification`, id })),
+      confirm: () =>
+        deleteNotificationId && dispatch(deleteNotification(deleteNotificationId)),
+      cancel: () => dispatch(cancelEntityDelete(`Notification`)),
+    },
+    deleteMethod: {
+      id: deleteMethodId,
+      start: (id) =>
+        dispatch(startEntityDelete({ type: `VerifiedNotificationMethod`, id })),
+      confirm: () => deleteMethodId && dispatch(deleteNotificationMethod(deleteMethodId)),
+      cancel: () => dispatch(cancelEntityDelete(`VerifiedNotificationMethod`)),
+    },
+  });
+};
+
 function verifiedMethodPrimaryValue(method: VerifiedNotificationMethod): string {
   switch (method.data.type) {
     case `email`:
       return method.data.email;
     case `slack`:
-      return method.data.channelId;
+      return method.data.channelName;
     case `text`:
       return method.data.phoneNumber;
   }
+}
+function methodDeletable(
+  method: VerifiedNotificationMethod,
+  notifications: Record<UUID, Notification>,
+  adminEmail: EmailAddress,
+): any {
+  const methodBeingUsed = typesafe
+    .objectValues(notifications)
+    .some((notification) => notification.methodId === method.id);
+
+  if (methodBeingUsed) {
+    return false;
+  }
+
+  return method.data.type !== `email` || method.data.email !== adminEmail;
 }

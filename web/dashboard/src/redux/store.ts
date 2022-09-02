@@ -1,3 +1,4 @@
+import React, { JSXElementConstructor } from 'react';
 import { configureStore } from '@reduxjs/toolkit';
 import waitlistReducer from './slice-waitlist';
 import menuReducer from './slice-menu';
@@ -22,3 +23,13 @@ export const store = configureStore({
 
 export type State = ReturnType<typeof store.getState>;
 export type Dispatch = typeof store.dispatch;
+
+export type QueriedProps<Component extends JSXElementConstructor<any>> =
+  | { state: 'idle' }
+  | { state: 'ongoing' }
+  | { state: 'failed'; error?: ApiError }
+  | { state: 'succeeded'; props: React.ComponentProps<Component> };
+
+export type QueryProps<Component extends JSXElementConstructor<any>> = (
+  dispatch: Dispatch,
+) => (state: State) => QueriedProps<Component>;
