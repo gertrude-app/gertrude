@@ -9,13 +9,13 @@ import { UpdateAdminNotificationInput } from './../../../../../components/src/sh
 // GraphQL mutation operation: UpdateNotification
 // ====================================================
 
-export interface UpdateNotification_updateAdminNotification {
+export interface UpdateNotification_notification {
   __typename: 'AdminNotification';
   id: string;
 }
 
 export interface UpdateNotification {
-  updateAdminNotification: UpdateNotification_updateAdminNotification;
+  notification: UpdateNotification_notification;
 }
 
 export interface UpdateNotificationVariables {

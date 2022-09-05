@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import cx from 'classnames';
 import Button from '../../../Button';
 import SelectMenu from '../../SelectMenu';
@@ -17,6 +17,7 @@ type Props = {
   updateTrigger(trigger: Trigger): unknown;
   onSave(): unknown;
   saveButtonDisabled: boolean;
+  focus?: boolean;
 };
 
 const NotificationCard: React.FC<Props> = ({
@@ -31,84 +32,101 @@ const NotificationCard: React.FC<Props> = ({
   updateTrigger,
   onSave,
   saveButtonDisabled,
-}) => (
-  <div className="shadow-lg border rounded-xl w-full sm:w-128 flex flex-col bg-white m-2 sm:m-4">
-    <Summary {...selectedMethod.data} trigger={trigger} />
+  focus,
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (focus && ref.current) {
+      ref.current.focus();
+      ref.current.scrollIntoView({ behavior: `smooth` });
+    }
+  }, [focus]);
+
+  return (
     <div
+      ref={ref}
       className={cx(
-        `p-4 space-y-4 -mt-4 [transition:150ms]`,
-        editing ? `h-56` : `h-0 opacity-0 overflow-hidden`,
+        `shadow-lg border rounded-xl w-full sm:w-128 flex flex-col bg-white m-2 sm:m-4`,
+        focus && `ring-violet-500/90 ring-4 ring-offset-4`,
       )}
     >
-      <div>
-        <h3 className="mb-1 text-violet-800 font-medium text-md ml-1">Method:</h3>
-        <SelectMenu
-          options={methodOptions}
-          selectedOption={selectedMethod.id}
-          setSelected={updateMethod}
-        />
+      <Summary {...selectedMethod.data} trigger={trigger} />
+      <div
+        className={cx(
+          `p-4 space-y-4 -mt-4 [transition:150ms]`,
+          editing ? `h-56` : `h-0 opacity-0 overflow-hidden`,
+        )}
+      >
+        <div>
+          <h3 className="mb-1 text-violet-800 font-medium text-md ml-1">Method:</h3>
+          <SelectMenu
+            options={methodOptions}
+            selectedOption={selectedMethod.id}
+            setSelected={updateMethod}
+          />
+        </div>
+        <div>
+          <h3 className="mb-1 text-violet-800 font-medium text-md ml-1">Upon:</h3>
+          <SelectMenu
+            options={[
+              {
+                value: Trigger.suspendFilterRequestSubmitted,
+                display: `Suspension requests`,
+              },
+              {
+                value: Trigger.unlockRequestSubmitted,
+                display: `Unlock requests`,
+              },
+            ]}
+            selectedOption={trigger}
+            setSelected={updateTrigger}
+          />
+        </div>
       </div>
-      <div>
-        <h3 className="mb-1 text-violet-800 font-medium text-md ml-1">Upon:</h3>
-        <SelectMenu
-          options={[
-            {
-              value: Trigger.suspendFilterRequestSubmitted,
-              display: `Suspension requests`,
-            },
-            {
-              value: Trigger.unlockRequestSubmitted,
-              display: `Unlock requests`,
-            },
-          ]}
-          selectedOption={trigger}
-          setSelected={updateTrigger}
-        />
+      <div className="bg-gray-100 rounded-b-xl flex justify-end items-center p-3">
+        <Button
+          type="button"
+          onClick={startEdit}
+          color="secondary-white"
+          small
+          className={editing ? `hidden` : `block`}
+        >
+          <i className="fa fa-pen mr-3" />
+          Edit
+        </Button>
+        <Button
+          type="button"
+          onClick={onDelete}
+          color="secondary-warning"
+          small
+          className={`${editing ? `hidden` : `block`} ml-3`}
+        >
+          <i className="fa fa-trash mr-3" />
+          Delete
+        </Button>
+        <Button
+          type="button"
+          onClick={cancelEdit}
+          color="secondary-white"
+          small
+          className={`${editing ? `block` : `hidden`} mr-3`}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="button"
+          onClick={onSave}
+          color="primary-violet"
+          disabled={saveButtonDisabled}
+          small
+          className={editing ? `block` : `hidden`}
+        >
+          Save
+        </Button>
       </div>
     </div>
-    <div className="bg-gray-100 rounded-b-xl flex justify-end items-center p-3">
-      <Button
-        type="button"
-        onClick={startEdit}
-        color="secondary-white"
-        small
-        className={editing ? `hidden` : `block`}
-      >
-        <i className="fa fa-pen mr-3" />
-        Edit
-      </Button>
-      <Button
-        type="button"
-        onClick={onDelete}
-        color="secondary-warning"
-        small
-        className={`${editing ? `hidden` : `block`} ml-3`}
-      >
-        <i className="fa fa-trash mr-3" />
-        Delete
-      </Button>
-      <Button
-        type="button"
-        onClick={cancelEdit}
-        color="secondary-white"
-        small
-        className={`${editing ? `block` : `hidden`} mr-3`}
-      >
-        Cancel
-      </Button>
-      <Button
-        type="button"
-        onClick={onSave}
-        color="primary-violet"
-        disabled={saveButtonDisabled}
-        small
-        className={editing ? `block` : `hidden`}
-      >
-        Save
-      </Button>
-    </div>
-  </div>
-);
+  );
+};
 
 export default NotificationCard;
 

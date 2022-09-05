@@ -2,7 +2,7 @@ import { expect, it, describe } from 'vitest';
 import { SubscriptionStatus, Trigger } from '@dashboard/types/GraphQL';
 import { editable, Query, Req } from '../../../redux/helpers';
 import { makeState } from '../../../redux/__test__/test-helpers';
-import { queryProps } from '../Profile';
+import { queryProps } from '../AdminProfile';
 
 describe(`Profile.queryProps`, () => {
   it(`handles determining method deletability correctly`, () => {
@@ -12,7 +12,7 @@ describe(`Profile.queryProps`, () => {
         subscriptionStatus: SubscriptionStatus.trialing,
       });
 
-      state.admin.verifiedNotificationMethods = {
+      state.admin.notificationMethods = {
         verifiedMethod1: {
           id: `verifiedMethod1`,
           data: { type: `email`, email: `blob@blob.com` }, // <-- required email

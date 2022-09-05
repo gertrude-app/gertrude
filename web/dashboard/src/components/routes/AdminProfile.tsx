@@ -10,15 +10,17 @@ import {
   deleteNotification,
   deleteNotificationMethod,
   notificationChanged,
-  updateNotification,
+  upsertNotification,
+  notificationCreated,
 } from '../../redux/slice-admin';
 import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
 import { isDirty, notNullish, Query } from '../../redux/helpers';
 import { QueryProps, State } from '../../redux/store';
 import { capitalize } from '../shared/lib/string';
+import { isUnsaved } from '../shared/lib/id';
 
-const ProfileContainer: React.FC = () => {
+const AdminProfile: React.FC = () => {
   const dispatch = useDispatch();
   const adminId = useSelector((state) => state.auth.admin?.id ?? ``);
   const query = useSelector(queryProps(dispatch));
@@ -39,9 +41,7 @@ const ProfileContainer: React.FC = () => {
   return <Profile {...query.props} />;
 };
 
-export default ProfileContainer;
-
-// helpers
+export default AdminProfile;
 
 export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
   const request = state.admin.profileRequest;
@@ -49,48 +49,25 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
     return request;
   }
 
-  const methods = state.admin.verifiedNotificationMethods;
-  const deleteNotificationId = state.admin.deleting.notification;
-  const deleteMethodId = state.admin.deleting.notificationMethod;
-  const saveNotifications = state.admin.saveNotificationRequests;
+  const admin = state.admin;
+  const methods = admin.notificationMethods;
+  const deleteNotificationId = admin.deleting.notification;
+  const deleteMethodId = admin.deleting.notificationMethod;
+  const notificationProps = makeGetNotificationProps(admin);
 
   return Query.succeed({
     email: request.payload.email,
     status: request.payload.subscriptionStatus,
-    updateNotification: (update) => dispatch(notificationChanged(update)),
-    methods: typesafe
-      .objectValues(state.admin.verifiedNotificationMethods)
-      .map((method) => ({
-        id: method.id,
-        method: method.data.type,
-        value: methodPrimaryValue(method),
-        deletable: methodDeletable(
-          method,
-          state.admin.notifications,
-          request.payload.email,
-        ),
-      })),
+    methods: typesafe.objectValues(methods).map((method) => ({
+      id: method.id,
+      method: method.data.type,
+      value: methodPrimaryValue(method),
+      deletable: methodDeletable(method, admin.notifications, request.payload.email),
+    })),
     notifications: typesafe
-      .objectValues(state.admin.notifications)
-      .map((editable) => {
-        const { id, ...notification } = editable.draft;
-        const method = methods[notification.methodId];
-        if (!method) return null;
-        return {
-          id,
-          trigger: notification.trigger,
-          selectedMethod: method,
-          saveButtonDisabled:
-            !isDirty(editable) || saveNotifications[id]?.state === `ongoing`,
-          methodOptions: typesafe.objectValues(methods).map((method) => ({
-            display: `${capitalize(method.data.type)} ${methodPrimaryValue(method)}`,
-            value: method.id,
-          })),
-          editing: editable.editing,
-        };
-      })
+      .objectValues(admin.notifications)
+      .map(notificationProps)
       .filter(notNullish),
-    saveNotification: (id) => dispatch(updateNotification(id)),
     deleteNotification: {
       id: deleteNotificationId,
       start: (id) => dispatch(startEntityDelete({ type: `notification`, id })),
@@ -104,8 +81,13 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
       confirm: () => deleteMethodId && dispatch(deleteNotificationMethod(deleteMethodId)),
       cancel: () => dispatch(cancelEntityDelete(`notificationMethod`)),
     },
+    createNotification: () => dispatch(notificationCreated()),
+    saveNotification: (id) => dispatch(upsertNotification(id)),
+    updateNotification: (update) => dispatch(notificationChanged(update)),
   });
 };
+
+// helpers
 
 function methodPrimaryValue(method: AdminNotificationMethod): string {
   switch (method.data.type) {
@@ -132,4 +114,30 @@ function methodDeletable(
   }
 
   return method.data.type !== `email` || method.data.email !== adminEmail;
+}
+
+function makeGetNotificationProps(
+  state: State['admin'],
+): (
+  editable: State['admin']['notifications'][string],
+) => React.ComponentProps<typeof Profile>['notifications'][0] | null {
+  return (editable) => {
+    const { id, ...notification } = editable.draft;
+    const methods = state.notificationMethods;
+    const method = methods[notification.methodId];
+    if (!method) return null; // should never happen...
+    return {
+      id,
+      trigger: notification.trigger,
+      selectedMethod: method,
+      saveButtonDisabled: isUnsaved(id)
+        ? false
+        : !isDirty(editable) || state.saveNotificationRequests[id]?.state === `ongoing`,
+      methodOptions: typesafe.objectValues(methods).map((method) => ({
+        display: `${capitalize(method.data.type)} ${methodPrimaryValue(method)}`,
+        value: method.id,
+      })),
+      editing: editable.editing,
+    };
+  };
 }

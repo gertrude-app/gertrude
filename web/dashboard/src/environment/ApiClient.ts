@@ -42,8 +42,8 @@ export const throwingApiClient: ApiClient = {
     deleteNotificationMethod: () => {
       throw new Error(`ApiClient.admin.deleteNotificationMethod() not implemented.`);
     },
-    updateNotification: () => {
-      throw new Error(`ApiClient.admin.updateNotification() not implemented.`);
+    upsertNotification: () => {
+      throw new Error(`ApiClient.admin.upsertNotification() not implemented.`);
     },
   },
   keychains: {
@@ -110,8 +110,8 @@ export const noopApiClient: ApiClient = {
     deleteNotificationMethod: async () => {
       return Result.success(true);
     },
-    updateNotification: async () => {
-      return Result.success(true);
+    upsertNotification: async () => {
+      return Result.success(``);
     },
   },
   keychains: {

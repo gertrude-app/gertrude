@@ -15,9 +15,10 @@ const Keychains: React.FC = () => {
   const request = useSelector((state) => state.admin.listKeychainsRequest);
   const deleteId = useSelector((state) => state.admin.deleting.keychain);
 
+  const reqState = request.state;
   useEffect(() => {
-    dispatch(fetchAdminKeychains());
-  }, [dispatch]);
+    reqState === `idle` && dispatch(fetchAdminKeychains());
+  }, [dispatch, reqState]);
 
   if (request.state === `ongoing` || request.state === `idle`) {
     return <Loading />;

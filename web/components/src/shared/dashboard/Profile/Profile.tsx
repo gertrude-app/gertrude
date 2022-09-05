@@ -11,6 +11,7 @@ import NotificationMethod from './NotificationMethod';
 import { ConfirmableEntityAction, SubcomponentsOmit } from '../../types';
 import { ConfirmDeleteEntity } from '../Modal';
 import { Trigger } from '../types/GraphQL';
+import { isUnsaved } from '../../lib/id';
 
 export type NotificationUpdate = { id: UUID } & (
   | { type: 'startEditing' }
@@ -31,6 +32,7 @@ interface Props {
   deleteMethod: ConfirmableEntityAction;
   updateNotification(update: NotificationUpdate): unknown;
   saveNotification(id: UUID): unknown;
+  createNotification(): unknown;
 }
 
 const Profile: React.FC<Props> = ({
@@ -41,6 +43,7 @@ const Profile: React.FC<Props> = ({
   updateNotification,
   saveNotification,
   deleteNotification,
+  createNotification,
   deleteMethod,
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -118,6 +121,7 @@ const Profile: React.FC<Props> = ({
               {notifications.map(({ id, ...props }) => (
                 <NotificationCard
                   key={id}
+                  focus={isUnsaved(id)}
                   startEdit={() => updateNotification({ id, type: `startEditing` })}
                   cancelEdit={() => updateNotification({ id, type: `cancelEditing` })}
                   onDelete={() => deleteNotification.start(id)}
@@ -135,7 +139,7 @@ const Profile: React.FC<Props> = ({
           </div>
           <Button
             type="button"
-            onClick={() => {}}
+            onClick={createNotification}
             color="primary-violet"
             className="self-center"
           >

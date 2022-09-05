@@ -1,15 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { isUnsaved, unsavedId } from '@shared/lib/id';
 import { NotificationUpdate } from '@dashboard/Profile';
 import { Admin, Notification, AdminNotificationMethod } from '@dashboard/types/Admin';
+import { Trigger } from '@dashboard/types/GraphQL';
 import { ListAdminKeychains } from '../api/admin/__generated__/ListAdminKeychains';
 import Current from '../environment';
 import { Req, editable, revert, commit } from './helpers';
+import * as typesafe from '../lib/typesafe';
 import { createResultThunk } from './thunk';
 import Result from '../api/Result';
 
 export interface AdminState {
   profileRequest: RequestState<Admin>;
-  verifiedNotificationMethods: Record<UUID, AdminNotificationMethod>;
+  notificationMethods: Record<UUID, AdminNotificationMethod>;
   notifications: Record<UUID, Editable<Notification> & { editing: boolean }>;
   saveNotificationRequests: Record<UUID, RequestState>;
   listKeychainsRequest: RequestState<ListAdminKeychains['keychains']>;
@@ -23,7 +26,7 @@ export interface AdminState {
 export function initialState(): AdminState {
   return {
     profileRequest: Req.idle(),
-    verifiedNotificationMethods: {},
+    notificationMethods: {},
     notifications: {},
     saveNotificationRequests: {},
     listKeychainsRequest: Req.idle(),
@@ -42,6 +45,16 @@ export const slice = createSlice({
     },
     cancelEntityDelete(state, { payload: type }: PayloadAction<DeletableEntity>) {
       delete state.deleting[type];
+    },
+    notificationCreated(state) {
+      state.notifications[unsavedId()] = {
+        editing: true,
+        ...editable({
+          id: unsavedId(),
+          trigger: Trigger.suspendFilterRequestSubmitted,
+          methodId: typesafe.objectValues(state.notificationMethods)[0]?.id ?? ``,
+        }),
+      };
     },
     notificationChanged(state, { payload }: PayloadAction<NotificationUpdate>) {
       const notification = state.notifications[payload.id];
@@ -100,7 +113,7 @@ export const slice = createSlice({
       }
 
       for (const method of payload.verifiedNotificationMethods) {
-        state.verifiedNotificationMethods[method.id] = {
+        state.notificationMethods[method.id] = {
           id: method.id,
           data: (() => {
             switch (method.method.data.__typename) {
@@ -150,22 +163,27 @@ export const slice = createSlice({
     });
 
     builder.addCase(deleteNotificationMethod.succeeded, (state, { meta }) => {
-      delete state.verifiedNotificationMethods[meta.arg];
+      delete state.notificationMethods[meta.arg];
     });
 
-    builder.addCase(updateNotification.started, (state, { meta: { arg } }) => {
+    builder.addCase(upsertNotification.started, (state, { meta: { arg } }) => {
       state.saveNotificationRequests[arg] = Req.ongoing();
     });
 
-    builder.addCase(updateNotification.failed, (state, { error, meta: { arg } }) => {
+    builder.addCase(upsertNotification.failed, (state, { error, meta: { arg } }) => {
       state.saveNotificationRequests[arg] = Req.fail(error);
     });
 
-    builder.addCase(updateNotification.succeeded, (state, { meta: { arg } }) => {
+    builder.addCase(upsertNotification.succeeded, (state, { payload, meta: { arg } }) => {
       state.saveNotificationRequests[arg] = Req.succeed(void 0);
-      const notification = state.notifications[arg];
+      const notification = state.notifications[payload] ?? state.notifications[arg];
       if (notification) {
-        state.notifications[arg] = { editing: false, ...commit(notification) };
+        notification.original.id = payload;
+        notification.draft.id = payload;
+        state.notifications[payload] = { editing: false, ...commit(notification) };
+        if (isUnsaved(arg)) {
+          delete state.notifications[arg];
+        }
       }
     });
   },
@@ -186,15 +204,15 @@ export const deleteNotification = createResultThunk(
   Current.api.admin.deleteNotification,
 );
 
-export const updateNotification = createResultThunk(
-  `${slice.name}/updateNotification`,
+export const upsertNotification = createResultThunk(
+  `${slice.name}/upsertNotification`,
   async (id: UUID, { getState }) => {
     const state = getState();
     const notification = state.admin.notifications[id];
     if (!notification) {
       return Result.error<ApiError>({ type: `non_actionable` });
     }
-    return Current.api.admin.updateNotification({
+    return Current.api.admin.upsertNotification({
       adminId: state.auth.admin?.id ?? ``,
       ...notification.draft,
     });
@@ -211,7 +229,11 @@ export const fetchAdminKeychains = createResultThunk(
   Current.api.admin.listKeychains,
 );
 
-export const { startEntityDelete, cancelEntityDelete, notificationChanged } =
-  slice.actions;
+export const {
+  startEntityDelete,
+  cancelEntityDelete,
+  notificationChanged,
+  notificationCreated,
+} = slice.actions;
 
 export default slice.reducer;

@@ -36,6 +36,13 @@ export enum Trigger {
   unlockRequestSubmitted = 'unlockRequestSubmitted',
 }
 
+export interface CreateAdminNotificationInput {
+  adminId: UUID;
+  id?: UUID | null;
+  methodId: UUID;
+  trigger: Trigger;
+}
+
 export interface CreateWaitlistedUserInput {
   email: string;
   id?: UUID | null;

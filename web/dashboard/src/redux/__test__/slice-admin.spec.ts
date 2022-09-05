@@ -1,9 +1,26 @@
-import { expect, it, describe } from 'vitest';
+import { expect, it, test, describe } from 'vitest';
+import { unsavedId } from '@shared/lib/id';
 import { SubscriptionStatus, Trigger } from '@dashboard/types/GraphQL';
 import { Req } from '../helpers';
-import reducer, { fetchProfileData } from '../slice-admin';
+import reducer, {
+  fetchProfileData,
+  notificationCreated,
+  upsertNotification,
+} from '../slice-admin';
 import { makeState } from './test-helpers';
 import * as mock from './mocks';
+
+describe(`createNotification flow`, () => {
+  test(`happy path, replacing temporary client id`, () => {
+    const tempId = unsavedId();
+    let state = reducer(undefined, notificationCreated());
+    expect(state.notifications[tempId]).toBeDefined();
+
+    state = reducer(state, upsertNotification.succeeded(`apiId`, tempId));
+    expect(state.notifications[tempId]).toBeUndefined();
+    expect(state.notifications.apiId).toBeDefined();
+  });
+});
 
 describe(`fetchProfileData`, () => {
   it(`.succeeded sets correctly massaged data on state slice`, () => {
@@ -48,7 +65,7 @@ describe(`fetchProfileData`, () => {
       }),
     );
 
-    expect(nextState.verifiedNotificationMethods).toEqual({
+    expect(nextState.notificationMethods).toEqual({
       verifiedMethod1: {
         id: `verifiedMethod1`,
         data: { type: `email`, email: `blob@blob.com` },
