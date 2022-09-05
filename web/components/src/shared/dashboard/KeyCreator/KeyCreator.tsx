@@ -150,7 +150,9 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
         setCurrentStep={setCurrentStep}
         stepName="Select scope"
         numSteps={5}
-        title={<h1>Step 3</h1>}
+        title={
+          <h2 className="font-medium text-gray-900 text-lg">Key effects web browsers</h2>
+        }
         currentStep={currentStep}
         index={3}
       >

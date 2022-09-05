@@ -18,9 +18,9 @@ const KeyTypeOption: React.FC<Props> = ({
   title,
   description,
 }) => (
-  <div
+  <button
     className={cx(
-      `relative border-2 rounded-xl p-4 cursor-pointer transition duration-100`,
+      `relative flex flex-col justify-start text-left border-2 rounded-xl p-4 cursor-pointer transition duration-100 outline-none focus:ring-violet-300 ring-2 ring-transparent ring-offset-2`,
       selected ? `border-violet-400 bg-violet-50` : `hover:bg-violet-50/50`,
       className,
     )}
@@ -39,7 +39,7 @@ const KeyTypeOption: React.FC<Props> = ({
       {title}
     </h2>
     <p className="text-sm text-gray-500 mt-1">{description}</p>
-  </div>
+  </button>
 );
 
 export default KeyTypeOption;

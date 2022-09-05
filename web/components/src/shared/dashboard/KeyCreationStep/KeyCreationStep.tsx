@@ -55,8 +55,8 @@ const KeyCreationStep: React.FC<Props> = ({
         <h2 className="text-gray-500 text-lg flex items-center">{stepName}</h2>
       ) : (
         <div className="rounded-2xl shadow-lg flex-grow my-2 bg-white border">
-          <div
-            className="flex justify-between items-center cursor-pointer hover:bg-gray-50 transition duration-100 p-4 rounded-2xl"
+          <button
+            className="flex justify-between w-full items-center cursor-pointer hover:bg-gray-50 transition duration-100 p-4 rounded-2xl outline-none focus:ring-2 ring-violet-400 [transition:200ms]"
             onClick={() => setOpen(!open)}
           >
             {title}
@@ -66,7 +66,7 @@ const KeyCreationStep: React.FC<Props> = ({
                 open && `-rotate-180`,
               )}
             />
-          </div>
+          </button>
           {open && (
             <div className="p-4">
               {children}
