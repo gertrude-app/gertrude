@@ -9,6 +9,7 @@ interface Props<Value extends string> {
   selectedOption: Value;
   setSelected(value: Value): void;
   label?: string;
+  deemphasized?: boolean;
 }
 
 function SelectMenu<Value extends string = string>({
@@ -16,6 +17,7 @@ function SelectMenu<Value extends string = string>({
   selectedOption,
   setSelected,
   label,
+  deemphasized = false,
 }: Parameters<React.FC<Props<Value>>>[0]): ReturnType<React.FC<Props<Value>>> {
   return (
     <Listbox value={selectedOption} onChange={setSelected}>
@@ -31,10 +33,17 @@ function SelectMenu<Value extends string = string>({
                       ?.display ?? `make a selection...`}
                   </p>
                 </div>
-                <Listbox.Button className="relative z-50 inline-flex items-center px-4 py-2.5 bg-violet-800 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-violet-900 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms] ">
+                <Listbox.Button
+                  className={cx(
+                    `relative inline-flex items-center px-4 rounded-l-none rounded-r-md text-sm font-medium focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms]`,
+                    !deemphasized
+                      ? `py-3 bg-violet-800 text-white hover:bg-violet-900`
+                      : `py-2 bg-white text-gray-400 hover:bg-gray-100`,
+                  )}
+                >
                   <span className="sr-only">Change published status</span>
                   <i
-                    className={`fa fa-chevron-down text-xl text-white text-opacity-90 transition duration-100 ${
+                    className={`fa fa-chevron-down text-xl text-opacity-90 transition duration-100 ${
                       open ? `-rotate-180` : `rotate-0`
                     }`}
                     aria-hidden="true"

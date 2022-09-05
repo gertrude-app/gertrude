@@ -34,7 +34,8 @@ const KeyTypeOption: React.FC<Props> = ({
         className={cx(
           `fa-solid fa-${icon} mr-1 bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text;] text-transparent`,
         )}
-      />{` `}
+      />
+      {` `}
       {title}
     </h2>
     <p className="text-sm text-gray-500 mt-1">{description}</p>

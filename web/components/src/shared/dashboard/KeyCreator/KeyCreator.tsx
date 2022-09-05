@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import KeyCreationStep from '../KeyCreationStep';
 import cx from 'classnames';
 import KeyTypeOption from '../KeyTypeOption';
@@ -69,7 +69,7 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
           <h2 className="font-medium text-gray-900 text-lg">
             <span className="capitalize">{addressType}</span> address:{` `}
             <span className="font-mono bg-violet-100 py-1 px-3 rounded-lg border-b-2 border-violet-200 text-base font-medium">
-              {address || '______'}
+              {address || `______`}
             </span>
           </h2>
         }
@@ -85,11 +85,11 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
           />
         </div>
         <TextInput
-          type={'text'}
-          label={'Web address:'}
+          type={`text`}
+          label={`Web address:`}
           value={address}
           setValue={setAddress}
-          prefix={'https://'}
+          prefix={`https://`}
           className="mb-7"
         />
         <div className="bg-gray-50 px-2 py-4 rounded-lg">
@@ -98,12 +98,12 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
             <SelectMenu
               options={
                 [
-                  'standard',
-                  'strict',
-                  advancedAddressOptions && 'IP address',
-                  advancedAddressOptions && 'regular expression',
+                  `standard`,
+                  `strict`,
+                  advancedAddressOptions && `IP address`,
+                  advancedAddressOptions && `regular expression`,
                   // don't love this
-                ].filter((x) => typeof x === 'string') as string[]
+                ].filter((x) => typeof x === `string`) as string[]
               }
               selectedOption={capitalize(addressType)}
               setSelected={(option) => {
@@ -116,27 +116,29 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
             />
           </div>
           <div className="flex justify-end">
-            {addressType === 'standard' && (
+            {addressType === `standard` && (
               <p className="text-right max-w-lg text-sm text-gray-400 my-2">
-                Allows any subdomain of{' '}
-                <InlineURL domain={address || '____'} subdomains={['']} />, for example{' '}
+                Allows any subdomain of{` `}
+                <InlineURL domain={address || `____`} subdomains={[``]} />, for example
+                {` `}
                 <InlineURL
-                  domain={address || '____'}
+                  domain={address || `____`}
                   move
-                  subdomains={['images', 'cdn', 'static', 'api', 'docs']}
+                  subdomains={[`images`, `cdn`, `static`, `api`, `docs`]}
                 />
               </p>
             )}
-            {addressType === 'strict' && (
+            {addressType === `strict` && (
               <p className="text-right max-w-lg text-sm text-gray-400 my-2">
-                Only allows access to{' '}
-                <InlineURL domain={address || '____'} subdomains={['www']} />. Subdomains
-                like{' '}
+                Only allows access to{` `}
+                <InlineURL domain={address || `____`} subdomains={[`www`]} />. Subdomains
+                like{` `}
                 <InlineURL
-                  domain={address || '____'}
+                  domain={address || `____`}
                   move
-                  subdomains={['images', 'cdn', 'static', 'api', 'docs']}
-                />{' '}
+                  subdomains={[`images`, `cdn`, `static`, `api`, `docs`]}
+                />
+                {` `}
                 are blocked
               </p>
             )}
@@ -197,20 +199,20 @@ interface InlineURLProps {
 const InlineURL: React.FC<InlineURLProps> = ({ domain, move = false, subdomains }) => {
   const [curIndex, setCurIndex] = useState(0);
 
-  useEffect(() => {
-    const id = setTimeout(shift, 3000);
-    return () => {
-      clearTimeout(id);
-    };
-  }, [curIndex]);
-
-  function shift(): void {
+  const shift = useCallback(() => {
     if (curIndex === subdomains.length - 1) {
       setCurIndex(0);
     } else {
       setCurIndex(curIndex + 1);
     }
-  }
+  }, [curIndex, subdomains.length]);
+
+  useEffect(() => {
+    const id = setTimeout(shift, 3000);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [curIndex, shift]);
 
   return (
     <span className="font-mono text-gray-500 px-1 rounded">
@@ -221,10 +223,10 @@ const InlineURL: React.FC<InlineURLProps> = ({ domain, move = false, subdomains 
           ? subdomains.map((subd, index) => (
               <span
                 className={cx(
-                  'absolute right-0 [transition:200ms] opacity-0',
-                  index < curIndex && '-top-5',
-                  index === curIndex && '-top-0.5 opacity-100',
-                  index > curIndex && 'top-5',
+                  `absolute right-0 [transition:200ms] opacity-0`,
+                  index < curIndex && `-top-5`,
+                  index === curIndex && `-top-0.5 opacity-100`,
+                  index > curIndex && `top-5`,
                 )}
               >
                 {subd}
@@ -232,7 +234,7 @@ const InlineURL: React.FC<InlineURLProps> = ({ domain, move = false, subdomains 
             ))
           : subdomains[curIndex]}
       </span>
-      {subdomains[curIndex] && '.'}
+      {subdomains[curIndex] && `.`}
       {domain}
     </span>
   );
