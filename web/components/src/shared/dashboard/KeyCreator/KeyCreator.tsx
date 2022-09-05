@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import KeyCreationStep from '../KeyCreationStep';
 import cx from 'classnames';
 import KeyTypeOption from '../KeyTypeOption';
 import TextInput from '../TextInput';
+import Toggle from '../Toggle';
+import SelectMenu from '../SelectMenu';
+import { capitalize } from '../../lib/string';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -14,7 +17,8 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
   const [addressType, setAddressType] = useState<
     'standard' | 'strict' | 'regular expression' | 'IP address'
   >(`standard`);
-  const [address, setAddress] = useState(`khanacademy.org`);
+  const [address, setAddress] = useState(``);
+  const [advancedAddressOptions, setAdvancedAddressOptions] = useState(false);
 
   return (
     <div className="">
@@ -65,19 +69,79 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
           <h2 className="font-medium text-gray-900 text-lg">
             <span className="capitalize">{addressType}</span> address:{` `}
             <span className="font-mono bg-violet-100 py-1 px-3 rounded-lg border-b-2 border-violet-200 text-base font-medium">
-              {address}
+              {address || '______'}
             </span>
           </h2>
         }
         currentStep={currentStep}
         index={2}
       >
+        <div className="flex justify-end mr-2 items-center">
+          <label className="mr-2 text-gray-600">Advanced:</label>
+          <Toggle
+            enabled={advancedAddressOptions}
+            small
+            setEnabled={setAdvancedAddressOptions}
+          />
+        </div>
         <TextInput
           type={'text'}
           label={'Web address:'}
           value={address}
           setValue={setAddress}
+          prefix={'https://'}
+          className="mb-7"
         />
+        <div className="bg-gray-50 px-2 py-4 rounded-lg">
+          <div className="flex items-center justify-end">
+            <label className="mr-2 text-gray-600 font-medium">Address type:</label>
+            <SelectMenu
+              options={
+                [
+                  'standard',
+                  'strict',
+                  advancedAddressOptions && 'IP address',
+                  advancedAddressOptions && 'regular expression',
+                  // don't love this
+                ].filter((x) => typeof x === 'string') as string[]
+              }
+              selectedOption={capitalize(addressType)}
+              setSelected={(option) => {
+                setAddressType(
+                  // or this
+                  option as 'standard' | 'strict' | 'regular expression' | 'IP address',
+                );
+              }}
+              deemphasized
+            />
+          </div>
+          <div className="flex justify-end">
+            {addressType === 'standard' && (
+              <p className="text-right max-w-lg text-sm text-gray-400 my-2">
+                Allows any subdomain of{' '}
+                <InlineURL domain={address || '____'} subdomains={['']} />, for example{' '}
+                <InlineURL
+                  domain={address || '____'}
+                  move
+                  subdomains={['images', 'cdn', 'static', 'api', 'docs']}
+                />
+              </p>
+            )}
+            {addressType === 'strict' && (
+              <p className="text-right max-w-lg text-sm text-gray-400 my-2">
+                Only allows access to{' '}
+                <InlineURL domain={address || '____'} subdomains={['www']} />. Subdomains
+                like{' '}
+                <InlineURL
+                  domain={address || '____'}
+                  move
+                  subdomains={['images', 'cdn', 'static', 'api', 'docs']}
+                />{' '}
+                are blocked
+              </p>
+            )}
+          </div>
+        </div>
       </KeyCreationStep>
       <KeyCreationStep
         mode={mode}
@@ -123,3 +187,53 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
 };
 
 export default KeyCreator;
+
+interface InlineURLProps {
+  domain: string;
+  move?: boolean;
+  subdomains: string[];
+}
+
+const InlineURL: React.FC<InlineURLProps> = ({ domain, move = false, subdomains }) => {
+  const [curIndex, setCurIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setTimeout(shift, 3000);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [curIndex]);
+
+  function shift(): void {
+    if (curIndex === subdomains.length - 1) {
+      setCurIndex(0);
+    } else {
+      setCurIndex(curIndex + 1);
+    }
+  }
+
+  return (
+    <span className="font-mono text-gray-500 px-1 rounded">
+      <span
+        className={cx(`relative [transition:200ms] overflow-hidden`, move && `ml-12`)}
+      >
+        {move
+          ? subdomains.map((subd, index) => (
+              <span
+                className={cx(
+                  'absolute right-0 [transition:200ms] opacity-0',
+                  index < curIndex && '-top-5',
+                  index === curIndex && '-top-0.5 opacity-100',
+                  index > curIndex && 'top-5',
+                )}
+              >
+                {subd}
+              </span>
+            ))
+          : subdomains[curIndex]}
+      </span>
+      {subdomains[curIndex] && '.'}
+      {domain}
+    </span>
+  );
+};

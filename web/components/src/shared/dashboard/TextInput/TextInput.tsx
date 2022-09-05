@@ -32,7 +32,7 @@ const TextInput: React.FC<Props> = ({
   const [localValue, setLocalValue] = useState(value);
   const id = useId();
   return (
-    <div className={cx(`flex flex-col w-full`, className)}>
+    <div className={cx(`flex flex-col space-y-1 w-full`, className)}>
       {label && <Label htmlFor={id}>{label}</Label>}
       <div className="flex shadow-sm rounded-lg">
         {prefix && (
