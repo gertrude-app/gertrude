@@ -12,6 +12,9 @@ import {
   notificationChanged,
   upsertNotification,
   notificationCreated,
+  newNotificationMethodEvent,
+  createPendingNotificationMethod,
+  confirmPendingNotificationMethod,
 } from '../../redux/slice-admin';
 import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
@@ -81,9 +84,20 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
       confirm: () => deleteMethodId && dispatch(deleteNotificationMethod(deleteMethodId)),
       cancel: () => dispatch(cancelEntityDelete(`notificationMethod`)),
     },
+    pendingMethod: admin.pendingNotificationMethod,
     createNotification: () => dispatch(notificationCreated()),
     saveNotification: (id) => dispatch(upsertNotification(id)),
     updateNotification: (update) => dispatch(notificationChanged(update)),
+    newMethodEventHandler: (event) => {
+      switch (event.type) {
+        case `send_code_clicked`:
+          return dispatch(createPendingNotificationMethod());
+        case `verify_code_clicked`:
+          return dispatch(confirmPendingNotificationMethod());
+        default:
+          return dispatch(newNotificationMethodEvent(event));
+      }
+    },
   });
 };
 
@@ -92,11 +106,16 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
 function methodPrimaryValue(method: AdminNotificationMethod): string {
   switch (method.data.type) {
     case `email`:
-      return method.data.email;
+      return method.data.email.toLowerCase();
     case `slack`:
-      return method.data.channelName;
-    case `text`:
-      return method.data.phoneNumber;
+      return `#` + method.data.channelName.replace(/^#/, ``);
+    case `text`: {
+      const number = method.data.phoneNumber;
+      if (number.match(/^\d{10}$/)) {
+        return `(${number.slice(0, 3)}) ${number.slice(3, 6)}-${number.slice(6, 10)}`;
+      }
+      return number;
+    }
   }
 }
 

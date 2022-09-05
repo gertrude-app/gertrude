@@ -6,3 +6,5 @@ export { getAdmin } from './getAdmin';
 export { deleteNotification } from './deleteNotification';
 export { deleteNotificationMethod } from './deleteNotificationMethod';
 export { upsertNotification } from './upsertNotification';
+export { createPendingNotificationMethod } from './createPendingNotificationMethod';
+export { confirmPendingNotificationMethod } from './confirmPendingNotificationMethod';

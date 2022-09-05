@@ -3,7 +3,10 @@ import { unsavedId } from '@shared/lib/id';
 import { SubscriptionStatus, Trigger } from '@dashboard/types/GraphQL';
 import { Req } from '../helpers';
 import reducer, {
+  confirmPendingNotificationMethod,
+  createPendingNotificationMethod,
   fetchProfileData,
+  newNotificationMethodEvent,
   notificationCreated,
   upsertNotification,
 } from '../slice-admin';
@@ -19,6 +22,47 @@ describe(`createNotification flow`, () => {
     state = reducer(state, upsertNotification.succeeded(`apiId`, tempId));
     expect(state.notifications[tempId]).toBeUndefined();
     expect(state.notifications.apiId).toBeDefined();
+  });
+});
+
+describe(`create new notification method flow`, () => {
+  test(`happy path`, () => {
+    // step 1: create a new pending notification method
+    let state = reducer(
+      undefined,
+      newNotificationMethodEvent({ type: `create_clicked` }),
+    );
+    expect(state.pendingNotificationMethod).toEqual({
+      sendCodeRequest: Req.idle(),
+      confirmationRequest: Req.idle(),
+      confirmationCode: ``,
+      type: `email`,
+      email: ``,
+    });
+
+    // step 2: update the email address to a valid state
+    state = reducer(
+      state,
+      newNotificationMethodEvent({ type: `email_address_updated`, email: `foo@bar.com` }),
+    );
+    expect(state.pendingNotificationMethod).toMatchObject({ email: `foo@bar.com` });
+
+    // step 3: simulate a successfull request to generate a code
+    state = reducer(state, createPendingNotificationMethod.succeeded(`pendingId`));
+    expect(state.pendingNotificationMethod).toMatchObject({
+      sendCodeRequest: Req.succeed(`pendingId`),
+    });
+
+    // step 4: simulate a successful verification code submitted
+    state = reducer(state, confirmPendingNotificationMethod.succeeded(true));
+    expect(state.pendingNotificationMethod).toBeUndefined();
+    expect(state.notificationMethods.pendingId).toMatchObject({
+      id: `pendingId`,
+      data: {
+        type: `email`,
+        email: `foo@bar.com`,
+      },
+    });
   });
 });
 

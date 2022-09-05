@@ -1,9 +1,10 @@
 import React, { useId, useState } from 'react';
 import cx from 'classnames';
+import Label from './Label';
 
 type Props = {
   type: 'email' | 'text' | 'positiveInteger' | 'password';
-  label: string;
+  label?: string;
   value: string;
   setValue(value: string): unknown;
   autoFocus?: boolean;
@@ -11,6 +12,7 @@ type Props = {
   placeholder?: string;
   className?: string;
   unit?: string;
+  disabled?: boolean;
 };
 
 const TextInput: React.FC<Props> = ({
@@ -22,15 +24,14 @@ const TextInput: React.FC<Props> = ({
   autoFocus = false,
   placeholder,
   className,
+  disabled,
   unit,
 }) => {
   const [localValue, setLocalValue] = useState(value);
   const id = useId();
   return (
-    <div className={cx(`flex flex-col space-y-1 w-full`, className)}>
-      <label htmlFor={id} className="text-gray-500 font-semibold text-md">
-        {label}
-      </label>
+    <div className={cx(`flex flex-col w-full`, className)}>
+      {label && <Label htmlFor={id}>{label}</Label>}
       <div className="flex shadow-sm rounded-lg">
         <input
           id={id}
@@ -39,6 +40,7 @@ const TextInput: React.FC<Props> = ({
           required={!!required}
           autoFocus={autoFocus}
           placeholder={placeholder}
+          disabled={disabled}
           onChange={(e) => {
             const value = e.target.value;
             setLocalValue(value);

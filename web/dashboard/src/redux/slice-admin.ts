@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { isUnsaved, unsavedId } from '@shared/lib/id';
 import { NotificationUpdate } from '@dashboard/Profile';
-import { Admin, Notification, AdminNotificationMethod } from '@dashboard/types/Admin';
+import * as T from '@dashboard/types/Admin';
 import { Trigger } from '@dashboard/types/GraphQL';
 import { ListAdminKeychains } from '../api/admin/__generated__/ListAdminKeychains';
 import Current from '../environment';
@@ -11,11 +11,12 @@ import { createResultThunk } from './thunk';
 import Result from '../api/Result';
 
 export interface AdminState {
-  profileRequest: RequestState<Admin>;
-  notificationMethods: Record<UUID, AdminNotificationMethod>;
-  notifications: Record<UUID, Editable<Notification> & { editing: boolean }>;
+  profileRequest: RequestState<T.Admin>;
+  notificationMethods: Record<UUID, T.AdminNotificationMethod>;
+  notifications: Record<UUID, Editable<T.Notification> & { editing: boolean }>;
   saveNotificationRequests: Record<UUID, RequestState>;
   listKeychainsRequest: RequestState<ListAdminKeychains['keychains']>;
+  pendingNotificationMethod?: T.PendingNotificationMethod;
   deleting: {
     keychain?: UUID;
     notification?: UUID;
@@ -74,6 +75,60 @@ export const slice = createSlice({
           break;
         case `changeMethod`:
           notification.draft.methodId = payload.methodId;
+          break;
+      }
+    },
+    newNotificationMethodEvent(
+      state,
+      { payload }: PayloadAction<T.NewAdminNotificationMethodEvent>,
+    ) {
+      switch (payload.type) {
+        case `create_clicked`:
+          state.pendingNotificationMethod = {
+            sendCodeRequest: Req.idle(),
+            confirmationRequest: Req.idle(),
+            confirmationCode: ``,
+            type: `email`,
+            email: ``,
+          };
+          break;
+        case `cancel_clicked`:
+          delete state.pendingNotificationMethod;
+          break;
+        case `code_updated`:
+          if (state.pendingNotificationMethod) {
+            state.pendingNotificationMethod.confirmationCode = payload.code;
+          }
+          break;
+        case `email_address_updated`:
+          if (state.pendingNotificationMethod?.type === `email`) {
+            state.pendingNotificationMethod.email = payload.email;
+          }
+          break;
+        case `slack_channel_name_updated`:
+          if (state.pendingNotificationMethod?.type === `slack`) {
+            state.pendingNotificationMethod.channelName = payload.channelName;
+          }
+          break;
+        case `slack_channel_id_updated`:
+          if (state.pendingNotificationMethod?.type === `slack`) {
+            state.pendingNotificationMethod.channelId = payload.channelId;
+          }
+          break;
+        case `slack_token_updated`:
+          if (state.pendingNotificationMethod?.type === `slack`) {
+            state.pendingNotificationMethod.token = payload.token;
+          }
+          break;
+        case `text_phone_number_updated`:
+          if (state.pendingNotificationMethod?.type === `text`) {
+            state.pendingNotificationMethod.phoneNumber = payload.phoneNumber;
+          }
+          break;
+        case `method_type_updated`:
+          if (state.pendingNotificationMethod) {
+            state.pendingNotificationMethod.type = payload.methodType;
+          }
           break;
       }
     },
@@ -186,6 +241,47 @@ export const slice = createSlice({
         }
       }
     });
+
+    builder.addCase(createPendingNotificationMethod.started, (state) => {
+      if (state.pendingNotificationMethod) {
+        state.pendingNotificationMethod.sendCodeRequest = Req.ongoing();
+      }
+    });
+
+    builder.addCase(createPendingNotificationMethod.failed, (state, { error }) => {
+      if (state.pendingNotificationMethod) {
+        state.pendingNotificationMethod.sendCodeRequest = Req.fail(error);
+      }
+    });
+
+    builder.addCase(createPendingNotificationMethod.succeeded, (state, action) => {
+      if (state.pendingNotificationMethod) {
+        state.pendingNotificationMethod.sendCodeRequest = Req.succeed(action.payload);
+      }
+    });
+
+    builder.addCase(confirmPendingNotificationMethod.started, (state) => {
+      if (state.pendingNotificationMethod) {
+        state.pendingNotificationMethod.confirmationRequest = Req.ongoing();
+      }
+    });
+
+    builder.addCase(confirmPendingNotificationMethod.failed, (state, { error }) => {
+      if (state.pendingNotificationMethod) {
+        state.pendingNotificationMethod.confirmationRequest = Req.fail(error);
+      }
+    });
+
+    builder.addCase(confirmPendingNotificationMethod.succeeded, (state) => {
+      if (state.pendingNotificationMethod) {
+        const newId = Req.payload(state.pendingNotificationMethod.sendCodeRequest) ?? ``;
+        state.notificationMethods[newId] = {
+          id: newId,
+          data: state.pendingNotificationMethod,
+        };
+        delete state.pendingNotificationMethod;
+      }
+    });
   },
 });
 
@@ -229,11 +325,34 @@ export const fetchAdminKeychains = createResultThunk(
   Current.api.admin.listKeychains,
 );
 
+export const createPendingNotificationMethod = createResultThunk(
+  `${slice.name}/createPendingNotificationMethod`,
+  async (_: void, { getState }) => {
+    const pendingMethod = getState().admin.pendingNotificationMethod;
+    if (!pendingMethod) {
+      return Result.error<ApiError>({ type: `non_actionable` });
+    }
+    return Current.api.admin.createPendingNotificationMethod(pendingMethod);
+  },
+);
+
+export const confirmPendingNotificationMethod = createResultThunk(
+  `${slice.name}/confirmPendingNotificationMethod`,
+  (_: void, { getState }) => {
+    const pendingMethod = getState().admin.pendingNotificationMethod;
+    return Current.api.admin.confirmPendingNotificationMethod(
+      Req.payload(pendingMethod?.sendCodeRequest) ?? ``,
+      Number(pendingMethod?.confirmationCode),
+    );
+  },
+);
+
 export const {
   startEntityDelete,
   cancelEntityDelete,
   notificationChanged,
   notificationCreated,
+  newNotificationMethodEvent,
 } = slice.actions;
 
 export default slice.reducer;

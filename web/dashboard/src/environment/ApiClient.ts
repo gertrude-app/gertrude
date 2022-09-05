@@ -1,9 +1,9 @@
+import { SubscriptionStatus } from '@dashboard/types/GraphQL';
 import Result from '../api/Result';
 import * as admin from '../api/admin';
 import * as users from '../api/users';
 import * as signup from '../api/signup';
 import * as keychains from '../api/keychains';
-import { SubscriptionStatus } from '@dashboard/types/GraphQL';
 
 export interface ApiClient {
   admin: typeof admin;
@@ -44,6 +44,16 @@ export const throwingApiClient: ApiClient = {
     },
     upsertNotification: () => {
       throw new Error(`ApiClient.admin.upsertNotification() not implemented.`);
+    },
+    createPendingNotificationMethod: () => {
+      throw new Error(
+        `ApiClient.admin.createPendingNotificationMethod() not implemented.`,
+      );
+    },
+    confirmPendingNotificationMethod: () => {
+      throw new Error(
+        `ApiClient.admin.confirmPendingNotificationMethod() not implemented.`,
+      );
     },
   },
   keychains: {
@@ -112,6 +122,12 @@ export const noopApiClient: ApiClient = {
     },
     upsertNotification: async () => {
       return Result.success(``);
+    },
+    createPendingNotificationMethod: async () => {
+      return Result.success(``);
+    },
+    confirmPendingNotificationMethod: async () => {
+      return Result.success(true);
     },
   },
   keychains: {
