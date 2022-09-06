@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import { Action, Middleware } from '@reduxjs/toolkit';
-import { updateUser } from './slice-users';
+import { deleteActivityItems, updateUser } from './slice-users';
 import { ResultThunk } from './thunk';
 import { capitalize } from '../components/shared/lib/string';
 import {
@@ -20,6 +20,7 @@ const toastMiddleware: Middleware = (_store) => (next) => (action) => {
   toastCrud(`delete`, `notification method`, deleteNotificationMethod, action);
   toastCrud(`send`, `verification code`, createPendingNotificationMethod, action);
   toastCrud(`verify`, `confirmation code`, confirmPendingNotificationMethod, action);
+  toastCrud(`approve`, `activity items`, deleteActivityItems, action);
 
   return next(action);
 };
@@ -27,7 +28,7 @@ const toastMiddleware: Middleware = (_store) => (next) => (action) => {
 export default toastMiddleware;
 
 function toastCrud(
-  verb: 'save' | 'delete' | 'send' | 'verify',
+  verb: 'save' | 'delete' | 'send' | 'verify' | 'approve',
   type: string,
   thunk: ResultThunk<any, any, any>,
   action: Action<unknown>,
@@ -49,6 +50,8 @@ function toastCrud(
           return `sent`;
         case `verify`:
           return `verified`;
+        case `approve`:
+          return `approved`;
       }
     })();
     toast.success(`${capitalize(type)} ${pastTense}!`);

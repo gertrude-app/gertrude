@@ -165,7 +165,7 @@ export const noopApiClient: ApiClient = {
       return Result.success({ counts: [], items: [] });
     },
     deleteActivityItems: async () => {
-      return Result.success([]);
+      return Result.success(true);
     },
   },
   signup: {

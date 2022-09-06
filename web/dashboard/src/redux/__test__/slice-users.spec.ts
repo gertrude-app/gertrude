@@ -2,7 +2,6 @@ import { expect, test, it, describe, vi } from 'vitest';
 import { Req, editable } from '../helpers';
 import Current from '../../environment';
 import reducer, {
-  activityItemsDeleted,
   deleteActivityItems,
   fetchActivityOverview,
   updateUser,
@@ -108,7 +107,6 @@ describe(`fetchActivityOverview`, () => {
 describe(`deleteActivityItems`, () => {
   it(`dispatches correct action and invokes api`, () => {
     Current.api.users.deleteActivityItems = vi.fn();
-    const dispatch = vi.fn();
 
     const getState = makeGetState((state) => {
       state.users.activityDays = {
@@ -122,22 +120,19 @@ describe(`deleteActivityItems`, () => {
       };
     });
 
-    const thunk = deleteActivityItems(`user123`, new Date(`01-01-2022`), [`item1`]);
-    thunk(dispatch, getState, null);
-
-    expect(dispatch).toHaveBeenCalledWith(
-      activityItemsDeleted({ key: `user123--01-01-2022`, ids: [`item1`] }),
-    );
+    deleteActivityItems({
+      userId: `user123`,
+      date: new Date(`01-01-2022`),
+      itemRootIds: [`item1`],
+    })(vi.fn(), getState);
 
     expect(Current.api.users.deleteActivityItems).toHaveBeenCalledWith(`user123`, [
       { id: `item1`, type: `KeystrokeLine` },
     ]);
   });
-});
 
-describe(`activityItemsDeleted`, () => {
   it(`increments numDeleted and sets item deleted bool`, () => {
-    const { users: initialState } = makeState((state) => {
+    const state = makeState((state) => {
       state.users.activityDays = {
         'user123--01-01-2022': Req.succeed({
           numDeleted: 0,
@@ -149,14 +144,17 @@ describe(`activityItemsDeleted`, () => {
       };
     });
 
-    const newState = reducer(
-      initialState,
-      activityItemsDeleted({ key: `user123--01-01-2022`, ids: [`item2`] }),
+    const next = reducer(
+      state.users,
+      deleteActivityItems.succeeded(true, {
+        userId: `user123`,
+        date: new Date(`01-01-2022`),
+        itemRootIds: [`item1`],
+      }),
     );
 
-    const day = Req.payload(newState.activityDays[`user123--01-01-2022`]);
+    const day = Req.payload(next.activityDays[`user123--01-01-2022`]);
     expect(day?.numDeleted).toBe(1);
-    expect(day?.items.item2?.deleted).toBe(true);
-    expect(day?.items.item1?.deleted).not.toBe(true);
+    expect(day?.items.item1?.deleted).toBe(true);
   });
 });

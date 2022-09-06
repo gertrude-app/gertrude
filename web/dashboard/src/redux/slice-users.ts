@@ -3,7 +3,7 @@ import { formatDate } from '@shared/lib/dates';
 import { ActivityItem } from '@dashboard/Users/Activity/ReviewDay';
 import { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
 import { Req, toMap, toEditableMap, editable, commit } from './helpers';
-import { ThunkAction, createResultThunk } from './thunk';
+import { createResultThunk } from './thunk';
 import Current from '../environment';
 import { DateRangeInput } from '@dashboard/types/GraphQL';
 import { User } from '../api/users';
@@ -47,25 +47,6 @@ export const slice = createSlice({
   name: `users`,
   initialState,
   reducers: {
-    activityItemsDeleted: (
-      state,
-      action: PayloadAction<{ key: ActivityDayKey; ids: UUID[] }>,
-    ) => {
-      const { key, ids } = action.payload;
-      const day = Req.payload(state.activityDays[key]);
-      if (!day) {
-        return;
-      }
-
-      day.numDeleted += ids.length;
-      for (const id of ids) {
-        const item = day.items[id];
-        if (item) {
-          item.deleted = true;
-        }
-      }
-    },
-
     userUpdated: (state, { payload }: PayloadAction<UserUpdate>) => {
       const draft = state.users[payload.id]?.draft;
       if (!draft) return;
@@ -172,6 +153,22 @@ export const slice = createSlice({
       const user = state.users[meta.arg];
       user && (state.users[meta.arg] = commit(user));
     });
+
+    builder.addCase(deleteActivityItems.succeeded, (state, action) => {
+      const { userId, date, itemRootIds } = action.meta.arg;
+      const day = Req.payload(state.activityDays[activityDayKey(userId, date)]);
+      if (!day) {
+        return;
+      }
+
+      day.numDeleted += itemRootIds.length;
+      for (const id of itemRootIds) {
+        const item = day.items[id];
+        if (item) {
+          item.deleted = true;
+        }
+      }
+    });
   },
 });
 
@@ -218,31 +215,26 @@ export const updateUser = createResultThunk(
   },
 );
 
-export function deleteActivityItems(
-  userId: UUID,
-  date: Date,
-  itemRootIds: UUID[],
-): ThunkAction {
-  return async (dispatch, getState) => {
-    const key = activityDayKey(userId, date);
+export const deleteActivityItems = createResultThunk(
+  `${slice.name}/deleteActivityItems`,
+  async (arg: { userId: UUID; date: Date; itemRootIds: UUID[] }, { getState }) => {
+    const key = activityDayKey(arg.userId, arg.date);
     const day = Req.payload(getState().users.activityDays[key]);
     if (!day) {
-      return;
+      return Result.error<ApiError>({ type: `non_actionable` });
     }
-
-    dispatch(activityItemsDeleted({ key, ids: itemRootIds }));
-    const apiItems = itemRootIds.flatMap((id) => {
+    const apiItems = arg.itemRootIds.flatMap((id) => {
       const item = day.items[id];
       return item?.ids.map((id) => ({ id, type: item?.type ?? `Screenshot` })) ?? [];
     });
 
-    await Current.api.users.deleteActivityItems(userId, apiItems);
-  };
-}
+    return Current.api.users.deleteActivityItems(arg.userId, apiItems);
+  },
+);
 
 // exports
 
-export const { activityItemsDeleted, userUpdated } = slice.actions;
+export const { userUpdated } = slice.actions;
 
 export default slice.reducer;
 
