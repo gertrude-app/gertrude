@@ -29,7 +29,7 @@ const KeystrokesViewer: React.FC<Props> = ({
         Application: <span className="font-bold text-violet-700">{application}</span>
       </h2>
     </div>
-    <div className="bg-gray-900 bg-gradient-to-br from-transparent via-transparent to-violet-900/30 text-gray-400 p-6 mt-2 sm:mt-3 mb-4 mx-0 md:mx-4 md:rounded-lg font-mono">
+    <div className="bg-gray-900 bg-gradient-to-br from-transparent via-transparent to-violet-900/30 text-gray-400 p-6 mt-2 sm:mt-3 mb-4 mx-0 md:mx-4 md:rounded-lg font-mono overflow-x-auto">
       {strokes.split(`\n`).map((line, idx) => (
         <p key={`line-${idx}`}>{line}</p>
       ))}
