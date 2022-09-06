@@ -24,7 +24,7 @@ const UserCard: React.FC<Props> = ({
   screenshotsEnabled,
   keystrokesEnabled,
 }) => (
-  <div className="rounded-xl border flex flex-col justify-between shadow-lg w-full bg-white min-w-[400px]">
+  <div className="rounded-xl border flex flex-col justify-between shadow-lg w-full bg-white sm:min-w-[400px]">
     <div className="p-5">
       <h1 className="text-3xl font-black text-gray-700 m-2 pb-4 mb-6 border-b">{name}</h1>
       <div className="flex items-center mt-3 ml-2">
@@ -106,18 +106,14 @@ const UserCard: React.FC<Props> = ({
         className="w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-200 rounded-bl-xl"
       >
         <i className="fa fa-pen text-sm mr-3 text-gray-600" aria-hidden="true" />
-        <h2 className="text-gray-500 text-[15px] antialiased uppercase tracking-wide">
-          Edit
-        </h2>
+        <h2 className="text-gray-500 text-[16px] tracking-wide">Edit</h2>
       </Link>
       <Link
         to={`${id}/activity`}
         className="w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-200 rounded-br-xl"
       >
         <i className="fa fa-binoculars text-lg mr-3 text-gray-600" aria-hidden="true" />
-        <span className="text-gray-500 text-[15px] antialiased uppercase tracking-wide">
-          Activity
-        </span>
+        <span className="text-gray-500 text-[16px] tracking-wide">Activity</span>
       </Link>
     </div>
   </div>

@@ -24,7 +24,7 @@ const Users: React.FC<Props> = ({ users }) => (
             type="button"
             onClick={() => {}}
             color="primary-violet"
-            className="self-center"
+            className="self-center mb-16"
           >
             <i className="fa fa-plus mr-4" />
             Add a user
