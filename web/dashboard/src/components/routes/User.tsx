@@ -5,7 +5,15 @@ import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import { familyToIcon } from './Users';
-import { fetchUser, userUpdated, UserUpdate, updateUser } from '../../redux/slice-users';
+import {
+  fetchUser,
+  userUpdated,
+  UserUpdate,
+  updateUser,
+  startEntityDelete,
+  cancelEntityDelete,
+  deleteDevice,
+} from '../../redux/slice-users';
 import { isDirty } from '../../redux/helpers';
 import {
   GetUser_user_devices,
@@ -15,10 +23,11 @@ import {
 const User: React.FC = () => {
   const dispatch = useDispatch();
   const { userId = `` } = useParams<{ userId: string }>();
-  const { fetch, update, user } = useSelector((state) => ({
+  const { fetch, update, user, deleteDeviceId } = useSelector((state) => ({
     user: state.users.users[userId],
     fetch: state.users.fetchUserRequest[userId],
     update: state.users.updateUserRequest[userId],
+    deleteDeviceId: state.users.deleting.device,
   }));
 
   useEffect(() => {
@@ -51,6 +60,12 @@ const User: React.FC = () => {
         devices={user.draft.devices.map(deviceProps)}
         saveButtonDisabled={!isDirty(user) || update?.state === `ongoing`}
         onSave={() => dispatch(updateUser(userId))}
+        deleteDevice={{
+          id: deleteDeviceId,
+          start: (id) => dispatch(startEntityDelete({ type: `device`, id })),
+          confirm: () => dispatch(deleteDevice(deleteDeviceId ?? ``)),
+          cancel: () => dispatch(cancelEntityDelete(`device`)),
+        }}
       />
     );
   }

@@ -3,12 +3,36 @@ import { Req, editable } from '../helpers';
 import Current from '../../environment';
 import reducer, {
   deleteActivityItems,
+  deleteDevice,
   fetchActivityOverview,
   updateUser,
 } from '../slice-users';
 import { makeGetState, makeState } from './test-helpers';
 import * as mock from './mocks';
 import Result from '../../api/Result';
+
+describe(`deleteDevice`, () => {
+  it(`removes device from root users state on success`, () => {
+    let state = makeState((state) => {
+      state.users.deleting.device = `device123`;
+      state.users.users = {
+        user123: editable(
+          mock.user({
+            id: `user123`,
+            devices: [mock.userDevice({ id: `device123` })],
+          }),
+        ),
+      };
+    }).users;
+
+    state = reducer(state, deleteDevice.started(`device123`));
+    expect(state.deleting?.device).toBeUndefined();
+
+    state = reducer(state, deleteDevice.succeeded(true, `device123`));
+    expect(state.users.user123?.original.devices).toEqual([]);
+    expect(state.users.user123?.draft.devices).toEqual([]);
+  });
+});
 
 describe(`updateUser`, () => {
   it(`passes correct arguments to API methods`, () => {

@@ -1,12 +1,18 @@
 import React from 'react';
 import cx from 'classnames';
-import { Subcomponents, SubcomponentsOmit } from '../../../types';
+import {
+  ConfirmableEntityAction,
+  Subcomponents,
+  SubcomponentsOmit,
+} from '../../../types';
 import Button from '../../../Button';
 import KeychainCard from '../KeychainCard';
 import TextInput from '../../TextInput';
 import Toggle from '../../Toggle';
 import UserDevice from '../List/Card/Device';
 import PageHeading from '../../PageHeading';
+import { ConfirmDeleteEntity } from '../../Modal';
+import { inflect } from '../../../lib/string';
 
 interface Props {
   name: string;
@@ -22,6 +28,7 @@ interface Props {
   removeKeychain(id: UUID): unknown;
   keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
   devices: Subcomponents<typeof UserDevice>;
+  deleteDevice: ConfirmableEntityAction;
   saveButtonDisabled: boolean;
   onSave(): unknown;
 }
@@ -40,10 +47,12 @@ const EditUser: React.FC<Props> = ({
   removeKeychain,
   keychains,
   devices,
+  deleteDevice,
   saveButtonDisabled,
   onSave,
 }) => (
   <div className="relative max-w-3xl">
+    <ConfirmDeleteEntity type="device" action={deleteDevice} />
     <PageHeading icon="pen">Edit user</PageHeading>
     <div className="mt-8">
       <TextInput
@@ -53,7 +62,9 @@ const EditUser: React.FC<Props> = ({
         setValue={setName}
         className="max-w-xl"
       />
-      <h2 className="mt-5 text-lg font-bold text-gray-700">3 devices:</h2>
+      <h2 className="mt-5 text-lg font-bold text-gray-700">
+        {devices.length} {inflect(`device`, devices.length)}:
+      </h2>
       <div className="flex flex-col">
         {devices.map((device) => (
           <div key={device.id} className="flex items-center mt-3">
@@ -63,9 +74,12 @@ const EditUser: React.FC<Props> = ({
               icon={device.icon}
               className="flex-grow mr-3"
             />
-            <div className="transition duration-100 flex justify-center items-center w-10 h-10 rounded-full hover:bg-gray-100 cursor-pointer text-gray-500 hover:text-red-500">
+            <button
+              onClick={() => deleteDevice.start(device.id)}
+              className="transition duration-100 flex justify-center items-center w-10 h-10 rounded-full hover:bg-gray-100 cursor-pointer text-gray-500 hover:text-red-500"
+            >
               <i className="fa fa-trash" />
-            </div>
+            </button>
           </div>
         ))}
         <button className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition duration-100">

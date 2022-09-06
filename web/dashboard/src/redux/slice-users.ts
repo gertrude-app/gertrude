@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { formatDate } from '@shared/lib/dates';
 import { ActivityItem } from '@dashboard/Users/Activity/ReviewDay';
+import { DateRangeInput } from '@dashboard/types/GraphQL';
 import { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
 import { Req, toMap, toEditableMap, editable, commit } from './helpers';
 import { createResultThunk } from './thunk';
 import Current from '../environment';
-import { DateRangeInput } from '@dashboard/types/GraphQL';
 import { User } from '../api/users';
 import Result from '../api/Result';
 
@@ -23,6 +23,8 @@ export type UserUpdate = { id: UUID } & (
   | { type: 'removeKeychain'; value: UUID }
 );
 
+type DeletableEntity = 'device';
+
 export interface UsersState {
   listRequest: RequestState;
   users: Record<UUID, Editable<User>>;
@@ -30,6 +32,9 @@ export interface UsersState {
   updateUserRequest: Record<UUID, RequestState>;
   activityOverviews: Record<UUID, RequestState<GetActivityOverview>>;
   activityDays: Record<ActivityDayKey, RequestState<ActivityDay>>;
+  deleting: {
+    device?: UUID;
+  };
 }
 
 export function initialState(): UsersState {
@@ -40,6 +45,7 @@ export function initialState(): UsersState {
     updateUserRequest: {},
     activityOverviews: {},
     activityDays: {},
+    deleting: {},
   };
 }
 
@@ -47,6 +53,12 @@ export const slice = createSlice({
   name: `users`,
   initialState,
   reducers: {
+    startEntityDelete(state, action: PayloadAction<{ type: DeletableEntity; id: UUID }>) {
+      state.deleting[action.payload.type] = action.payload.id;
+    },
+    cancelEntityDelete(state, { payload: type }: PayloadAction<DeletableEntity>) {
+      delete state.deleting[type];
+    },
     userUpdated: (state, { payload }: PayloadAction<UserUpdate>) => {
       const draft = state.users[payload.id]?.draft;
       if (!draft) return;
@@ -169,6 +181,19 @@ export const slice = createSlice({
         }
       }
     });
+
+    builder.addCase(deleteDevice.started, (state) => {
+      delete state.deleting.device;
+    });
+
+    builder.addCase(deleteDevice.succeeded, (state, { meta: { arg } }) => {
+      for (const [userId, user] of Object.entries(state.users)) {
+        if (user.draft.devices.some(({ id }) => id === arg)) {
+          user.draft.devices = user.draft.devices.filter(({ id }) => id !== arg);
+          state.users[userId] = commit(user);
+        }
+      }
+    });
   },
 });
 
@@ -194,6 +219,11 @@ export const fetchUsers = createResultThunk(
 export const fetchUser = createResultThunk(
   `${slice.name}/fetchUser`,
   Current.api.users.getUser,
+);
+
+export const deleteDevice = createResultThunk(
+  `${slice.name}/deleteDevice`,
+  Current.api.users.deleteDevice,
 );
 
 export const updateUser = createResultThunk(
@@ -234,7 +264,7 @@ export const deleteActivityItems = createResultThunk(
 
 // exports
 
-export const { userUpdated } = slice.actions;
+export const { userUpdated, startEntityDelete, cancelEntityDelete } = slice.actions;
 
 export default slice.reducer;
 
