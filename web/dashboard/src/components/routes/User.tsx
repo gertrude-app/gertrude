@@ -13,6 +13,7 @@ import {
   startEntityDelete,
   cancelEntityDelete,
   deleteDevice,
+  deleteUser,
 } from '../../redux/slice-users';
 import { isDirty } from '../../redux/helpers';
 import {
@@ -23,16 +24,18 @@ import {
 const User: React.FC = () => {
   const dispatch = useDispatch();
   const { userId = `` } = useParams<{ userId: string }>();
-  const { fetch, update, user, deleteDeviceId } = useSelector((state) => ({
+  const { fetch, update, user, deleteDeviceId, deleteUserId } = useSelector((state) => ({
     user: state.users.users[userId],
     fetch: state.users.fetchUserRequest[userId],
     update: state.users.updateUserRequest[userId],
     deleteDeviceId: state.users.deleting.device,
+    deleteUserId: state.users.deleting.user,
   }));
 
+  const fetchState = fetch?.state;
   useEffect(() => {
-    !user && dispatch(fetchUser(userId));
-  }, [dispatch, user, userId]);
+    (!fetchState || fetchState === `idle`) && dispatch(fetchUser(userId));
+  }, [dispatch, userId, fetchState]);
 
   function set(arg: Partial<UserUpdate>): void {
     dispatch(userUpdated({ id: userId, ...arg } as UserUpdate));
@@ -60,6 +63,12 @@ const User: React.FC = () => {
         devices={user.draft.devices.map(deviceProps)}
         saveButtonDisabled={!isDirty(user) || update?.state === `ongoing`}
         onSave={() => dispatch(updateUser(userId))}
+        deleteUser={{
+          id: deleteUserId,
+          start: () => dispatch(startEntityDelete({ type: `user`, id: userId })),
+          confirm: () => dispatch(deleteUser(deleteUserId ?? ``)),
+          cancel: () => dispatch(cancelEntityDelete(`user`)),
+        }}
         deleteDevice={{
           id: deleteDeviceId,
           start: (id) => dispatch(startEntityDelete({ type: `device`, id })),
@@ -78,7 +87,9 @@ const User: React.FC = () => {
     return <ApiErrorMessage error={fetch.error} />;
   }
 
-  return <ApiErrorMessage error={{ type: `actionable`, message: `User not found` }} />;
+  // we get here briefly after a user is deleted
+  // before the middleware redirects to the users page
+  return null;
 };
 
 export default User;

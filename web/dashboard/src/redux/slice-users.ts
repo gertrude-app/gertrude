@@ -23,7 +23,7 @@ export type UserUpdate = { id: UUID } & (
   | { type: 'removeKeychain'; value: UUID }
 );
 
-type DeletableEntity = 'device';
+type DeletableEntity = 'device' | 'user';
 
 export interface UsersState {
   listRequest: RequestState;
@@ -34,6 +34,7 @@ export interface UsersState {
   activityDays: Record<ActivityDayKey, RequestState<ActivityDay>>;
   deleting: {
     device?: UUID;
+    user?: UUID;
   };
 }
 
@@ -182,6 +183,14 @@ export const slice = createSlice({
       }
     });
 
+    builder.addCase(deleteUser.started, (state) => {
+      delete state.deleting.user;
+    });
+
+    builder.addCase(deleteUser.succeeded, (state, action) => {
+      delete state.users[action.meta.arg];
+    });
+
     builder.addCase(deleteDevice.started, (state) => {
       delete state.deleting.device;
     });
@@ -219,6 +228,11 @@ export const fetchUsers = createResultThunk(
 export const fetchUser = createResultThunk(
   `${slice.name}/fetchUser`,
   Current.api.users.getUser,
+);
+
+export const deleteUser = createResultThunk(
+  `${slice.name}/deleteUser`,
+  Current.api.users.deleteUser,
 );
 
 export const deleteDevice = createResultThunk(

@@ -86,6 +86,9 @@ export const throwingApiClient: ApiClient = {
     deleteDevice: () => {
       throw new Error(`ApiClient.users.deleteDevice() not implemented.`);
     },
+    deleteUser: () => {
+      throw new Error(`ApiClient.users.deleteUser() not implemented.`);
+    },
   },
   signup: {
     joinWaitlist: () => {
@@ -171,6 +174,9 @@ export const noopApiClient: ApiClient = {
       return Result.success(true);
     },
     deleteDevice: async () => {
+      return Result.success(true);
+    },
+    deleteUser: async () => {
       return Result.success(true);
     },
   },

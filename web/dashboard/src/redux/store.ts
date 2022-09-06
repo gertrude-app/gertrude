@@ -7,6 +7,7 @@ import usersReducer from './slice-users';
 import adminReducer from './slice-admin';
 import storageMiddleware from './middleware-storage';
 import toastMiddleware from './middleware-toast';
+import redirectMiddleware from './middleware-redirect';
 
 export const store = configureStore({
   reducer: {
@@ -17,7 +18,11 @@ export const store = configureStore({
     users: usersReducer,
   },
   middleware: (getDefaultMiddleware) => {
-    return getDefaultMiddleware().concat([storageMiddleware, toastMiddleware]);
+    return getDefaultMiddleware().concat([
+      storageMiddleware,
+      toastMiddleware,
+      redirectMiddleware,
+    ]);
   },
 });
 

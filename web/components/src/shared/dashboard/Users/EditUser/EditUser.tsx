@@ -28,6 +28,7 @@ interface Props {
   removeKeychain(id: UUID): unknown;
   keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
   devices: Subcomponents<typeof UserDevice>;
+  deleteUser: ConfirmableEntityAction<void>;
   deleteDevice: ConfirmableEntityAction;
   saveButtonDisabled: boolean;
   onSave(): unknown;
@@ -48,11 +49,13 @@ const EditUser: React.FC<Props> = ({
   keychains,
   devices,
   deleteDevice,
+  deleteUser,
   saveButtonDisabled,
   onSave,
 }) => (
   <div className="relative max-w-3xl">
     <ConfirmDeleteEntity type="device" action={deleteDevice} />
+    <ConfirmDeleteEntity type="user" action={deleteUser} />
     <PageHeading icon="pen">Edit user</PageHeading>
     <div className="mt-8">
       <TextInput
@@ -152,7 +155,12 @@ const EditUser: React.FC<Props> = ({
           </button>
         </div>
         <div className="flex mt-5 justify-end border-t-2 pt-8 space-x-5">
-          <Button type="button" onClick={() => {}} color="secondary-warning" small>
+          <Button
+            type="button"
+            onClick={deleteUser.start}
+            color="secondary-warning"
+            small
+          >
             Delete user
           </Button>
           <Button

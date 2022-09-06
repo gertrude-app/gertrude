@@ -4,7 +4,7 @@ import ConfirmDestructiveAction from '../ConfirmDestructiveAction';
 
 type Props = {
   type: string;
-  action: ConfirmableEntityAction;
+  action: ConfirmableEntityAction<unknown>;
 };
 
 export const ConfirmDeleteEntity: React.FC<Props> = ({ action, type }) => {

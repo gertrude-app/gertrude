@@ -9,9 +9,9 @@ export type SubcomponentsOmit<
   K extends keyof ComponentProps<T>,
 > = Array<Omit<ComponentProps<T> & { id: string }, K>>;
 
-export interface ConfirmableEntityAction {
+export interface ConfirmableEntityAction<StartArg = UUID> {
   id?: UUID;
-  start(id: UUID): unknown;
+  start(id: StartArg): unknown;
   confirm(): unknown;
   cancel(): unknown;
 }
