@@ -8,6 +8,7 @@ import SelectMenu from '../SelectMenu';
 import { capitalize } from '../../lib/string';
 import KeyScopeRadioOption from '../KeyScopeRadioOption';
 import Combobox, { ComboboxOption } from '../Combobox/Combobox';
+import RadioGroup from '../RadioGroup';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -21,10 +22,15 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
   >(`standard`);
   const [address, setAddress] = useState(``);
   const [advancedAddressOptions, setAdvancedAddressOptions] = useState(false);
+  const [advancedKeyScope, setAdvancedKeyScope] = useState(false);
   const [keyScope, setKeyScope] = useState<'web browsers' | 'all apps' | 'single app'>(
     `web browsers`,
   );
   const [selectedApp, setSelectedApp] = useState<ComboboxOption>({ name: ``, id: `` });
+  const [appSelectionMethod, setAppSelectionMethod] = useState<
+    'choose from common apps' | 'by bundle id'
+  >(`choose from common apps`);
+  const [appBundleId, setAppBundleId] = useState(``);
 
   const commonApplications: ComboboxOption[] = [
     { name: `Slack`, id: `app-1` },
@@ -175,13 +181,34 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
         stepName="Select scope"
         numSteps={5}
         title={
-          <h2 className="font-medium text-gray-900 text-lg">Key effects {keyScope}</h2>
+          <h2 className="font-medium text-gray-900 text-lg">
+            Key effects {keyScope}
+            {keyScope === `single app` &&
+              appSelectionMethod === `choose from common apps` && (
+                <span>
+                  : <span className="font-bold">{selectedApp.name}</span>
+                </span>
+              )}
+          </h2>
         }
         currentStep={currentStep}
         index={3}
       >
         <div>
           <h2 className="font-medium">Unlocked for:</h2>
+          <div className="flex justify-end mr-2 items-center">
+            <label className="mr-2 text-gray-600">Advanced:</label>
+            <Toggle
+              enabled={advancedKeyScope}
+              small
+              setEnabled={(b) => {
+                if (!b && keyScope === `single app`) setKeyScope(`web browsers`);
+                setAppBundleId(``);
+                setSelectedApp({ name: ``, id: `` });
+                setAdvancedKeyScope(b);
+              }}
+            />
+          </div>
           <div className="mt-3 space-y-0.5">
             <KeyScopeRadioOption
               title={`Web browsers`}
@@ -195,20 +222,40 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
               selected={keyScope === `all apps`}
               onClick={() => setKeyScope(`all apps`)}
             />
-            <KeyScopeRadioOption
-              title={`Single app`}
-              description={`Unlock this site for one specific app you choose.`}
-              selected={keyScope === `single app`}
-              onClick={() => setKeyScope(`single app`)}
-            />
+            {advancedKeyScope && (
+              <KeyScopeRadioOption
+                title={`Single app`}
+                description={`Unlock this site for one specific app you choose.`}
+                selected={keyScope === `single app`}
+                onClick={() => setKeyScope(`single app`)}
+              />
+            )}
           </div>
           {keyScope === `single app` && (
             <div className="bg-gray-50 p-4 rounded-lg mt-4">
-              <Combobox
-                options={commonApplications}
-                selectedOption={selectedApp}
-                setSelectedOption={setSelectedApp}
+              <RadioGroup
+                options={[`choose from common apps`, `by bundle id`]}
+                selectedOption={appSelectionMethod}
+                setSelectedOption={setAppSelectionMethod as (s: string) => void}
+                className="mb-4"
               />
+              {appSelectionMethod === `choose from common apps` ? (
+                <div>
+                  <label className="text-gray-600 font-bold">Choose application:</label>
+                  <Combobox
+                    options={commonApplications}
+                    selectedOption={selectedApp}
+                    setSelectedOption={setSelectedApp}
+                  />
+                </div>
+              ) : (
+                <TextInput
+                  type={`text`}
+                  label={`App bundle ID:`}
+                  value={appBundleId}
+                  setValue={setAppBundleId}
+                />
+              )}
             </div>
           )}
         </div>

@@ -15,15 +15,13 @@ const KeyScopeRadioOption: React.FC<Props> = ({
   onClick,
 }) => (
   <button
-    className="flex w-full text-left hover:bg-gray-50 transition duration-100 rounded-xl outline-none focus:ring-2 focus:ring-violet-400"
+    className={cx(
+      `flex w-full text-left transition duration-100 rounded-xl outline-none focus:ring-2 focus:ring-violet-400`,
+      selected ? `bg-violet-50` : `hover:bg-gray-50`,
+    )}
     onClick={onClick}
   >
-    <div
-      className={cx(
-        `w-12 flex flex-shrink-0 justify-center items-center`,
-        selected ? `` : ``,
-      )}
-    >
+    <div className={cx(`w-12 flex flex-shrink-0 justify-center items-center`)}>
       <div
         className={cx(
           `rounded-full flex justify-center items-center text-white [transition:100ms]`,

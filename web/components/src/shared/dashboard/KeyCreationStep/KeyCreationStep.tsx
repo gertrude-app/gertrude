@@ -34,7 +34,7 @@ const KeyCreationStep: React.FC<Props> = ({
         className,
       )}
     >
-      <div className={cx(`w-12 flex justify-center items-center relative`)}>
+      <div className={cx(`w-12 flex justify-center items-center relative flex-shrink-0`)}>
         <div
           className={cx(
             `h-full border-r-2 border-dashed border-gray-300 absolute`,
@@ -56,7 +56,7 @@ const KeyCreationStep: React.FC<Props> = ({
       ) : (
         <div className="rounded-2xl shadow-lg flex-grow my-2 bg-white border">
           <button
-            className="flex justify-between w-full items-center cursor-pointer hover:bg-gray-50 transition duration-100 p-4 rounded-2xl outline-none focus:ring-2 ring-violet-400 [transition:200ms]"
+            className="flex justify-between w-full items-center cursor-pointer hover:bg-gray-50 transition duration-100 p-4 rounded-2xl outline-none focus:ring-2 ring-violet-400 [transition:200ms] text-left"
             onClick={() => setOpen(!open)}
           >
             {title}
