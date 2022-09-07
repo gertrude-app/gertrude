@@ -24,6 +24,9 @@ export const slice = createSlice({
     mobileSidebarClosed: (state) => {
       state.mobileSidebarOpen = false;
     },
+    menuInternalLinkClicked: (state) => {
+      state.mobileSidebarOpen = false;
+    },
     desktopSidebarCollapsedToggled: (state) => {
       state.desktopSidebarCollapsed = !state.desktopSidebarCollapsed;
     },
@@ -38,6 +41,7 @@ export const {
   mobileSidebarClosed,
   desktopSidebarCollapsedToggled,
   windowWidthChanged,
+  menuInternalLinkClicked,
 } = slice.actions;
 
 export default slice.reducer;

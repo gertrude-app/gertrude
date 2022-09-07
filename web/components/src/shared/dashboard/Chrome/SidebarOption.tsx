@@ -8,6 +8,7 @@ interface Props {
   collapsed: boolean;
   to: string;
   isSelected: boolean;
+  onClick?: () => unknown;
 }
 
 const SidebarOption: React.FC<Props> = ({
@@ -16,9 +17,11 @@ const SidebarOption: React.FC<Props> = ({
   collapsed,
   to,
   isSelected,
+  onClick,
 }) => (
   <Link
     to={to}
+    onClick={onClick}
     className={cx(
       `flex justify-start items-center`,
       `cursor-pointer transition duration-75 select-none`,
