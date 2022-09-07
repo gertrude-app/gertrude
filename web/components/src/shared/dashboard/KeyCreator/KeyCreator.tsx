@@ -6,6 +6,8 @@ import TextInput from '../TextInput';
 import Toggle from '../Toggle';
 import SelectMenu from '../SelectMenu';
 import { capitalize } from '../../lib/string';
+import KeyScopeRadioOption from '../KeyScopeRadioOption';
+import Combobox, { ComboboxOption } from '../Combobox/Combobox';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -19,6 +21,28 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
   >(`standard`);
   const [address, setAddress] = useState(``);
   const [advancedAddressOptions, setAdvancedAddressOptions] = useState(false);
+  const [keyScope, setKeyScope] = useState<'web browsers' | 'all apps' | 'single app'>(
+    `web browsers`,
+  );
+  const [selectedApp, setSelectedApp] = useState<ComboboxOption>({ name: ``, id: `` });
+
+  const commonApplications: ComboboxOption[] = [
+    { name: `Slack`, id: `app-1` },
+    { name: `Chrome`, id: `app-2` },
+    { name: `Figma`, id: `app-3` },
+    { name: `Notes`, id: `app-4` },
+    { name: `Firefox`, id: `app-5` },
+    { name: `VSCode`, id: `app-6` },
+    { name: `Skype`, id: `app-7` },
+    { name: `Sketch`, id: `app-8` },
+    { name: `Photoshop`, id: `app-9` },
+    { name: `Safari`, id: `app-10` },
+    { name: `Calendar`, id: `app-11` },
+    { name: `Brave`, id: `app-12` },
+    { name: `Edge`, id: `app-13` },
+    { name: `MatLab`, id: `app-14` },
+    { name: `Microsoft Teams`, id: `app-15` },
+  ];
 
   return (
     <div className="">
@@ -151,14 +175,43 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
         stepName="Select scope"
         numSteps={5}
         title={
-          <h2 className="font-medium text-gray-900 text-lg">Key effects web browsers</h2>
+          <h2 className="font-medium text-gray-900 text-lg">Key effects {keyScope}</h2>
         }
         currentStep={currentStep}
         index={3}
       >
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae quaerat
-        </p>
+        <div>
+          <h2 className="font-medium">Unlocked for:</h2>
+          <div className="mt-3 space-y-0.5">
+            <KeyScopeRadioOption
+              title={`Web browsers`}
+              description={`Applies to all browsers, like Chrome, Safari, Firefox, etc.`}
+              selected={keyScope === `web browsers`}
+              onClick={() => setKeyScope(`web browsers`)}
+            />
+            <KeyScopeRadioOption
+              title={`All apps`}
+              description={`Permits access for every app (including browsers). Use for sites you're sure you trust.`}
+              selected={keyScope === `all apps`}
+              onClick={() => setKeyScope(`all apps`)}
+            />
+            <KeyScopeRadioOption
+              title={`Single app`}
+              description={`Unlock this site for one specific app you choose.`}
+              selected={keyScope === `single app`}
+              onClick={() => setKeyScope(`single app`)}
+            />
+          </div>
+          {keyScope === `single app` && (
+            <div className="bg-gray-50 p-4 rounded-lg mt-4">
+              <Combobox
+                options={commonApplications}
+                selectedOption={selectedApp}
+                setSelectedOption={setSelectedApp}
+              />
+            </div>
+          )}
+        </div>
       </KeyCreationStep>
       <KeyCreationStep
         mode={mode}

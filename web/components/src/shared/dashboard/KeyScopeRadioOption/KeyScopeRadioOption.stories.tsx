@@ -6,6 +6,8 @@ export default {
   component: KeyScopeRadioOption,
 } as ComponentMeta<typeof KeyScopeRadioOption>;
 
-const Template: ComponentStory<typeof KeyScopeRadioOption> = (args) => <KeyScopeRadioOption {...args} />;
+const Template: ComponentStory<typeof KeyScopeRadioOption> = (args) => (
+  <KeyScopeRadioOption {...args} />
+);
 
 export const Default = Template.bind({});
