@@ -1,9 +1,29 @@
+import { JSXElementConstructor } from 'react';
+import { QueriedProps } from './store';
+
+export class Query {
+  static succeed<T extends JSXElementConstructor<any>>(
+    props: React.ComponentProps<T>,
+  ): QueriedProps<T> {
+    return { state: `succeeded`, props };
+  }
+
+  static props<T extends JSXElementConstructor<any>>(
+    query: QueriedProps<T>,
+  ): React.ComponentProps<T> | undefined {
+    if (query.state === `succeeded`) {
+      return query.props;
+    }
+    return undefined;
+  }
+}
+
 export class Req {
   static succeed<T>(payload: T): RequestState<T> {
     return { state: `succeeded`, payload };
   }
 
-  static fail<T, E>(error: E | undefined = undefined): RequestState<T, E> {
+  static fail<E>(error: E | undefined = undefined): RequestState<never, E> {
     return { state: `failed`, error };
   }
 
@@ -44,7 +64,7 @@ export class Req {
     }
   }
 
-  static error<T, E>(req: RequestState<T, E> | undefined): E | undefined {
+  static error<E>(req: RequestState<never, E> | undefined): E | undefined {
     if (req && req.state === `failed`) {
       return req.error;
     }
@@ -63,12 +83,20 @@ export function toEditableMap<T extends { id: string }>(
   array: T[],
 ): Record<string, Editable<T>> {
   return array.reduce<Record<string, Editable<T>>>((map, item) => {
-    map[item.id] = toEditable(item);
+    map[item.id] = editable(item);
     return map;
   }, {});
 }
 
-export function toEditable<T extends { id: UUID }>(original: T): Editable<T> {
+export function revert<T extends { id: UUID }>({ original }: Editable<T>): Editable<T> {
+  return editable(original);
+}
+
+export function commit<T extends { id: UUID }>({ draft }: Editable<T>): Editable<T> {
+  return editable(draft);
+}
+
+export function editable<T extends { id: UUID }>(original: T): Editable<T> {
   return { original, draft: JSON.parse(JSON.stringify(original)) };
 }
 
@@ -84,4 +112,8 @@ export async function spinnerMin<T>(promise: Promise<T>, delayMs = 750): Promise
     return result;
   }
   return new Promise((res) => setTimeout(() => res(result), delayMs - elapsed));
+}
+
+export function notNullish<T>(x: T | null | undefined): x is T {
+  return x !== null && x !== undefined;
 }

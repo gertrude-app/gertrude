@@ -1,23 +1,24 @@
 import React, { useEffect } from 'react';
-import ListKeychains from '@shared/dashboard/Keychains/ListKeychains';
+import ListKeychains from '@dashboard/Keychains/ListKeychains';
 import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import {
-  cancelKeychainDelete,
+  cancelEntityDelete,
   deleteKeychain,
   fetchAdminKeychains,
-  startKeychainDelete,
+  startEntityDelete,
 } from '../../redux/slice-admin';
 
 const Keychains: React.FC = () => {
   const dispatch = useDispatch();
   const request = useSelector((state) => state.admin.listKeychainsRequest);
-  const deleteId = useSelector((state) => state.admin.pendingDeletionKeychainId);
+  const deleteId = useSelector((state) => state.admin.deleting.keychain);
 
+  const reqState = request.state;
   useEffect(() => {
-    dispatch(fetchAdminKeychains());
-  }, [dispatch]);
+    reqState === `idle` && dispatch(fetchAdminKeychains());
+  }, [dispatch, reqState]);
 
   if (request.state === `ongoing` || request.state === `idle`) {
     return <Loading />;
@@ -36,9 +37,9 @@ const Keychains: React.FC = () => {
       }))}
       remove={{
         id: deleteId,
-        start: (id) => dispatch(startKeychainDelete(id)),
+        start: (id) => dispatch(startEntityDelete({ type: `keychain`, id })),
         confirm: () => deleteId && dispatch(deleteKeychain(deleteId)),
-        cancel: () => dispatch(cancelKeychainDelete()),
+        cancel: () => dispatch(cancelEntityDelete(`keychain`)),
       }}
     />
   );

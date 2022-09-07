@@ -1,17 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AdminIds } from '@dashboard/types/Admin';
 import Current from '../environment';
 import { OptionalVar as Optional } from '../environment/Environment';
 import { StorageClient } from '../environment/Storage';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 
-export interface Admin {
-  id: UUID;
-  token: UUID;
-}
-
 export interface AuthState {
-  admin: Admin | null;
+  admin: AdminIds | null;
   loginEmail: string;
   loginPassword: string;
   passwordLoginRequest: RequestState;
@@ -124,7 +120,7 @@ export default slice.reducer;
 
 // helpers
 
-export function getInitialAdmin(): Admin | null {
+export function getInitialAdmin(): AdminIds | null {
   if (import.meta.env.VITEST) {
     return null;
   }
@@ -144,7 +140,7 @@ export function getInitialAdmin(): Admin | null {
   return { id, token };
 }
 
-function adminFrom(storage: StorageClient): Admin | null {
+function adminFrom(storage: StorageClient): AdminIds | null {
   const id = storage.getItem(`admin_id`);
   const token = storage.getItem(`admin_token`);
   if (id && token) {

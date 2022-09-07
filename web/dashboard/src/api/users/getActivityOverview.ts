@@ -1,7 +1,7 @@
+import { DateRangeInput } from '@dashboard/types/GraphQL';
 import Result from '../Result';
 import { gql, query } from '../apollo';
 import * as T from './__generated__/GetActivityOverview';
-import { DateRangeInput } from '../../graphqlTypes';
 import { entireDay } from '../helpers';
 
 export async function getActivityOverview(

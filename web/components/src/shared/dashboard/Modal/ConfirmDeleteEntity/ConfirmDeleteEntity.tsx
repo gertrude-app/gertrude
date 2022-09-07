@@ -1,5 +1,4 @@
 import React from 'react';
-import { capitalize } from '../../../lib/string';
 import { ConfirmableEntityAction } from '../../../types';
 import ConfirmDestructiveAction from '../ConfirmDestructiveAction';
 
@@ -11,7 +10,7 @@ type Props = {
 export const ConfirmDeleteEntity: React.FC<Props> = ({ action, type }) => {
   return (
     <ConfirmDestructiveAction
-      title={`Delete ${capitalize(type)}?`}
+      title={`Delete ${type}?`}
       openWhenPresent={action.id}
       onDismiss={action.cancel}
       onConfirm={action.confirm}

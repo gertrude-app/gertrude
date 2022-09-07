@@ -1,6 +1,6 @@
 import React from 'react';
-import FullscreenModalForm from '@shared/dashboard/Unauthed/FullscreenModalForm';
-import LoginForm from '@shared/dashboard/Unauthed/LoginForm';
+import FullscreenModalForm from '@dashboard/Unauthed/FullscreenModalForm';
+import LoginForm from '@dashboard/Unauthed/LoginForm';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   loginEmailUpdated,

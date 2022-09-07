@@ -1,5 +1,5 @@
 import React from 'react';
-import Chrome from '@shared/dashboard/Chrome';
+import Chrome from '@dashboard/Chrome';
 import { useDispatch, useSelector } from '../redux/hooks';
 import { logoutClicked } from '../redux/slice-auth';
 import {

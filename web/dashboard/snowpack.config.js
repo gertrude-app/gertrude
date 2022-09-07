@@ -27,5 +27,6 @@ module.exports = {
   ],
   alias: {
     '@shared': `./src/components/shared`,
+    '@dashboard': `./src/components/shared/dashboard`,
   },
 };

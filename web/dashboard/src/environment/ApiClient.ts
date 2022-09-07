@@ -1,3 +1,4 @@
+import { SubscriptionStatus } from '@dashboard/types/GraphQL';
 import Result from '../api/Result';
 import * as admin from '../api/admin';
 import * as users from '../api/users';
@@ -31,6 +32,28 @@ export const throwingApiClient: ApiClient = {
     },
     listKeychains: () => {
       throw new Error(`ApiClient.admin.listKeychains() not implemented.`);
+    },
+    getAdmin: () => {
+      throw new Error(`ApiClient.admin.getAdmin() not implemented.`);
+    },
+    deleteNotification: () => {
+      throw new Error(`ApiClient.admin.deleteNotification() not implemented.`);
+    },
+    deleteNotificationMethod: () => {
+      throw new Error(`ApiClient.admin.deleteNotificationMethod() not implemented.`);
+    },
+    upsertNotification: () => {
+      throw new Error(`ApiClient.admin.upsertNotification() not implemented.`);
+    },
+    createPendingNotificationMethod: () => {
+      throw new Error(
+        `ApiClient.admin.createPendingNotificationMethod() not implemented.`,
+      );
+    },
+    confirmPendingNotificationMethod: () => {
+      throw new Error(
+        `ApiClient.admin.confirmPendingNotificationMethod() not implemented.`,
+      );
     },
   },
   keychains: {
@@ -81,6 +104,30 @@ export const noopApiClient: ApiClient = {
     },
     listKeychains: async () => {
       return Result.success([]);
+    },
+    getAdmin: async () => {
+      return Result.success({
+        __typename: `Admin`,
+        email: ``,
+        subscriptionStatus: SubscriptionStatus.active,
+        notifications: [],
+        verifiedNotificationMethods: [],
+      });
+    },
+    deleteNotification: async () => {
+      return Result.success(true);
+    },
+    deleteNotificationMethod: async () => {
+      return Result.success(true);
+    },
+    upsertNotification: async () => {
+      return Result.success(``);
+    },
+    createPendingNotificationMethod: async () => {
+      return Result.success(``);
+    },
+    confirmPendingNotificationMethod: async () => {
+      return Result.success(true);
     },
   },
   keychains: {

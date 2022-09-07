@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import Loading from '@shared/Loading';
-import ListUsers from '@shared/dashboard/Users/List';
+import ListUsers from '@dashboard/Users/List';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { fetchUsers } from '../../redux/slice-users';
 import ApiErrorMessage from '../ApiErrorMessage';
-import { Family } from '../../graphqlTypes';
+import { Family } from '@dashboard/types/GraphQL';
 import * as typesafe from '../../lib/typesafe';
 
 const Users: React.FC = () => {

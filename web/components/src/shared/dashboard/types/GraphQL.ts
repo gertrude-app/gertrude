@@ -17,6 +17,32 @@ export enum Family {
   unknown = 'unknown',
 }
 
+export enum SubscriptionStatus {
+  active = 'active',
+  canceled = 'canceled',
+  complimentary = 'complimentary',
+  emailVerified = 'emailVerified',
+  incomplete = 'incomplete',
+  incompleteExpired = 'incompleteExpired',
+  pastDue = 'pastDue',
+  pendingEmailVerification = 'pendingEmailVerification',
+  signupCanceled = 'signupCanceled',
+  trialing = 'trialing',
+  unpaid = 'unpaid',
+}
+
+export enum Trigger {
+  suspendFilterRequestSubmitted = 'suspendFilterRequestSubmitted',
+  unlockRequestSubmitted = 'unlockRequestSubmitted',
+}
+
+export interface CreateAdminNotificationInput {
+  adminId: UUID;
+  id?: UUID | null;
+  methodId: UUID;
+  trigger: Trigger;
+}
+
 export interface CreateWaitlistedUserInput {
   email: string;
   id?: UUID | null;
@@ -41,6 +67,13 @@ export interface LoginAdminInput {
 export interface SetUserKeychainsInput {
   keychainIds: UUID[];
   userId: UUID;
+}
+
+export interface UpdateAdminNotificationInput {
+  adminId: UUID;
+  id: UUID;
+  methodId: UUID;
+  trigger: Trigger;
 }
 
 export interface UpdateUserInput {

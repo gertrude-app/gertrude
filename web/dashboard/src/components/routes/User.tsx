@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import EditUser from '@shared/dashboard/Users/EditUser';
+import EditUser from '@dashboard/Users/EditUser';
 import { useParams } from 'react-router-dom';
 import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';

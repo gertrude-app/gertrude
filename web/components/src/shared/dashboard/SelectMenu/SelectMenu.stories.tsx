@@ -12,6 +12,10 @@ const Template: ComponentStory<typeof SelectMenu> = (args) => <SelectMenu {...ar
 export const Default = Template.bind({});
 
 Default.args = {
-  options: [`Do this`, `Do that`, `Do the other thing`],
+  options: [
+    { value: `1`, display: `Do this` },
+    { value: `2`, display: `Do that` },
+    { value: `3`, display: `Do the other thing` },
+  ],
   selectedOption: `Do this`,
 };

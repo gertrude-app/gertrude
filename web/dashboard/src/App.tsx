@@ -5,7 +5,7 @@ import Dashboard from './components/routes/Dashboard';
 import Login from './components/routes/Login';
 import MagicLink from './components/routes/MagicLink';
 import JoinWaitlist from './components/routes/JoinWaitlist';
-import Profile from './components/routes/Profile';
+import AdminProfile from './components/routes/AdminProfile';
 import Users from './components/routes/Users';
 import useWindowWidth from './hooks/window-width';
 import { useDispatch, useSelector } from './redux/hooks';
@@ -36,7 +36,7 @@ const App: React.FC = () => {
       {/* authed routes */}
       <Route path="/" element={<AuthedChrome />}>
         <Route index element={<Dashboard />} />
-        <Route path="profile" element={<Profile />} />
+        <Route path="profile" element={<AdminProfile />} />
         <Route path="keychains" element={<Keychains />} />
         <Route path="users">
           <Route index element={<Users />} />

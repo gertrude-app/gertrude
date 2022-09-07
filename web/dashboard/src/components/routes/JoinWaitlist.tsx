@@ -1,6 +1,6 @@
 import React from 'react';
-import FullscreenModalForm from '@shared/dashboard/Unauthed/FullscreenModalForm';
-import EmailInputForm from '@shared/dashboard/Unauthed/EmailInputForm';
+import FullscreenModalForm from '@dashboard/Unauthed/FullscreenModalForm';
+import EmailInputForm from '@dashboard/Unauthed/EmailInputForm';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { emailUpdated, joinWaitlist } from '../../redux/slice-waitlist';
 

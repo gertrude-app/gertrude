@@ -1,12 +1,12 @@
+import { AdminIds } from '@dashboard/types/Admin';
 import Result from '../Result';
 import * as T from './__generated__/LoginAdmin';
 import { gql, mutate } from '../apollo';
-import { Admin } from '../../redux/slice-auth';
 
 export async function login(
   email: string,
   password: string,
-): Promise<Result<Admin, ApiError>> {
+): Promise<Result<AdminIds, ApiError>> {
   const result = await mutate<T.LoginAdmin, T.LoginAdminVariables>(MUTATION, {
     input: { email, password },
   });

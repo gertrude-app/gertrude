@@ -14,7 +14,8 @@
     "target": "ESNext",
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["./src/components/shared/*"]
+      "@shared/*": ["./src/components/shared/*"],
+      "@dashboard/*": ["./src/components/shared/dashboard/*"]
     }
   }
 }

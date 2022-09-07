@@ -1,4 +1,5 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { Trigger } from '../../types/GraphQL';
 
 import NotificationCard from './NotificationCard';
 
@@ -13,21 +14,32 @@ const Template: ComponentStory<typeof NotificationCard> = (args) => (
 
 export const Email = Template.bind({});
 Email.args = {
-  method: `email`,
-  email: `me@example.com`,
-  when: `suspension requests`,
+  selectedMethod: { id: `1`, data: { type: `email`, email: `me@example.com` } },
+  trigger: Trigger.unlockRequestSubmitted,
+  editing: false,
+  onDelete: () => {},
+  startEdit: () => {},
+  cancelEdit: () => {},
+  updateMethod: () => {},
+  updateTrigger: () => {},
+  methodOptions: [
+    { display: `Email foo@bar.com`, value: `1` },
+    { display: `Text (555) 555-5555`, value: `2` },
+    { display: `Slack #Gertrude`, value: `3` },
+  ],
 };
 
 export const Text = Template.bind({});
 Text.args = {
-  method: `text`,
-  number: `(123) 456-7890`,
-  when: `suspension requests`,
+  selectedMethod: { id: `2`, data: { type: `text`, phoneNumber: `(123) 456-7890` } },
+  trigger: Trigger.unlockRequestSubmitted,
 };
 
 export const Slack = Template.bind({});
 Slack.args = {
-  method: `slack`,
-  channelName: `#Gertrude`,
-  when: `unlock requests`,
+  selectedMethod: {
+    id: `3`,
+    data: { type: `slack`, channelId: ``, channelName: `#Gertrude`, token: `` },
+  },
+  trigger: Trigger.suspendFilterRequestSubmitted,
 };
