@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import Current from '../environment';
 
 export interface MenuState {
   mobileSidebarOpen: boolean;
@@ -9,7 +10,9 @@ export interface MenuState {
 export function initialState(): MenuState {
   return {
     mobileSidebarOpen: false,
-    desktopSidebarCollapsed: false,
+    desktopSidebarCollapsed:
+      !import.meta.env.VITEST &&
+      Current.localStorage.getItem(`desktop_sidebar_collapsed`) === `true`,
     windowWidth: typeof window !== `undefined` ? window.innerWidth : 0,
   };
 }

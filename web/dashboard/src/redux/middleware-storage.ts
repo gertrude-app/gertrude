@@ -1,8 +1,10 @@
 import { Middleware } from '@reduxjs/toolkit';
 import { submitLoginForm, logoutClicked, loginFromMagicLink } from './slice-auth';
+import { desktopSidebarCollapsedToggled } from './slice-menu';
 import Current from '../environment';
+import { State } from './store';
 
-const storageMiddleware: Middleware = (_store) => (next) => (action) => {
+const storageMiddleware: Middleware = (store) => (next) => (action) => {
   if (logoutClicked.match(action)) {
     Current.sessionStorage.removeItem(`admin_id`);
     Current.sessionStorage.removeItem(`admin_token`);
@@ -20,6 +22,14 @@ const storageMiddleware: Middleware = (_store) => (next) => (action) => {
     const admin = action.payload;
     Current.localStorage.setItem(`admin_id`, admin.id);
     Current.localStorage.setItem(`admin_token`, admin.token);
+  }
+
+  if (desktopSidebarCollapsedToggled.match(action)) {
+    const { menu }: State = store.getState();
+    Current.localStorage.setItem(
+      `desktop_sidebar_collapsed`,
+      !menu.desktopSidebarCollapsed ? `true` : `false`,
+    );
   }
 
   return next(action);
