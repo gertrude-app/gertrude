@@ -60,13 +60,16 @@ codegen:
 
 # build & deploy
 
-build-marketing: sync
+npm-install-root:
+	npm install
+
+build-marketing: sync npm-install-root
 	cd marketing && npm install && npx next build && npx next export
 
-build-storybook: sync
+build-storybook: sync npm-install-root
 	cd components && npm install && npm run build-storybook
 
-build-dashboard: sync
+build-dashboard: sync npm-install-root
 	cd dashboard && npm install && npm run build
 
 # ci type things
