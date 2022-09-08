@@ -11,6 +11,7 @@ const StatefulChrome: React.FC<{ children: React.ReactNode }> = ({ children }) =
       mobileSidebarOpen={open}
       onMobileHamburgerClick={() => setOpen(true)}
       onMobileSidebarClose={() => setOpen(false)}
+      onInternalLinkClick={() => setOpen(false)}
       onLogout={() => {}}
       sidebarCollapsed={collapsed}
       onToggleSidebarCollapsed={() => setCollapsed(!collapsed)}

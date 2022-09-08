@@ -6,6 +6,7 @@ import {
   hamburgerMenuClicked,
   mobileSidebarClosed,
   desktopSidebarCollapsedToggled,
+  menuInternalLinkClicked,
 } from '../redux/slice-menu';
 
 interface Props {
@@ -28,6 +29,7 @@ const ChromeContainer: React.FC<Props> = ({ children }) => {
       onMobileHamburgerClick={() => dispatch(hamburgerMenuClicked())}
       onMobileSidebarClose={() => dispatch(mobileSidebarClosed())}
       onToggleSidebarCollapsed={() => dispatch(desktopSidebarCollapsedToggled())}
+      onInternalLinkClick={() => dispatch(menuInternalLinkClicked())}
       usingMobileView={windowWidth < 768}
     />
   );

@@ -65,7 +65,7 @@ const UserActivityReviewDay: React.FC<Props> = ({
     {items.length > 0 ? (
       <div
         id="delete-focus"
-        className="px-0 md:px-8 lg:px-10 py-5 md:py-10 bg-gray-200 md:bg-transparent flex-grow space-y-8 flex flex-col"
+        className="px-0 md:px-8 lg:px-10 py-5 md:py-10 pb-16 bg-gray-200 md:bg-transparent flex-grow space-y-8 flex flex-col"
       >
         {deleteableChunks(items, chunkSize, deleteItems)}
         <Button

@@ -1,4 +1,4 @@
-import { SubscriptionStatus, Trigger } from '@dashboard/types/GraphQL';
+import { SubscriptionStatus, Trigger, Family } from '@dashboard/types/GraphQL';
 import { ActivityItem } from '@dashboard/Users/Activity/ReviewDay';
 import type { User } from '../../api/users';
 import {
@@ -70,6 +70,22 @@ export function user(override: Partial<User> = {}): User {
     keyloggingEnabled: true,
     keychains: [],
     devices: [],
+    ...override,
+  };
+}
+
+export function userDevice(
+  override: Partial<User['devices'][0]> = {},
+): User['devices'][0] {
+  return {
+    __typename: `Device`,
+    id: `mock.Device--id--${Math.random()}`,
+    isOnline: false,
+    model: {
+      __typename: `Model`,
+      family: Family.macBookAir,
+      title: `MacBook Air`,
+    },
     ...override,
   };
 }

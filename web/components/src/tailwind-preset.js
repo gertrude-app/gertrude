@@ -1,3 +1,5 @@
+const defaultTheme = require(`tailwindcss/defaultTheme`);
+
 module.exports = {
   theme: {
     screens: {
@@ -22,9 +24,8 @@ module.exports = {
         176: `44rem`,
       },
       fontFamily: {
-        inter: [`Inter`],
-        'reem-kufi': [`Reem Kufi`],
-        lato: [`lato`],
+        inter: [`Inter`, ...defaultTheme.fontFamily.sans],
+        lato: [`lato`, ...defaultTheme.fontFamily.sans],
       },
     },
   },

@@ -1,6 +1,6 @@
 [build]
   publish = "build/"
-  command = "pushd ../ && make sync && popd && npm run build"
+  command = "cd ../ && make build-dashboard"
 
 [[redirects]]
   from = "/*"

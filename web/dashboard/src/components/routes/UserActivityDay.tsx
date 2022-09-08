@@ -18,10 +18,13 @@ const UserActivityDay: React.FC = () => {
   const key = activityDayKey(userId, day);
   const dispatch = useDispatch();
   const request = useSelector((state) => state.users.activityDays[key]);
+  const reqState = request?.state;
 
   useEffect(() => {
-    dispatch(fetchActivityDay({ userId, day: dateFromUrl(date) }));
-  }, [dispatch, userId, date]);
+    if (!reqState || reqState === `idle`) {
+      dispatch(fetchActivityDay({ userId, day: dateFromUrl(date) }));
+    }
+  }, [dispatch, userId, date, reqState]);
 
   if (!request || request.state === `idle` || request.state === `ongoing`) {
     return <Loading />;
@@ -35,7 +38,9 @@ const UserActivityDay: React.FC = () => {
     <ReviewDay
       date={day}
       numDeleted={request.payload.numDeleted}
-      deleteItems={(ids) => dispatch(deleteActivityItems(userId, day, ids))}
+      deleteItems={(itemRootIds) =>
+        dispatch(deleteActivityItems({ userId, date: day, itemRootIds }))
+      }
       items={typesafe.objectValues(request.payload.items).filter((item) => !item.deleted)}
     />
   );

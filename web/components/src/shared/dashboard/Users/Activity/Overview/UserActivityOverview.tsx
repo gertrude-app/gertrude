@@ -15,7 +15,7 @@ const UserActivityOverviewScreen: React.FC<Props> = ({ userName, days }) => (
       {posessive(userName)} Activity
     </PageHeading>
     {days.length > 0 ? (
-      <div className="space-y-10">
+      <div className="my-8 space-y-6 sm:space-y-10">
         {days.map((day) => (
           <ReviewSummaryCard key={`${day.date}`} {...day} />
         ))}

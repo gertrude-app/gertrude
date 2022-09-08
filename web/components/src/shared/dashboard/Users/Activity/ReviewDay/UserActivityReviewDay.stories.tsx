@@ -17,6 +17,10 @@ export const Default = Template.bind({});
 Default.args = {
   date: new Date(),
   items: [
+    keystrokeLine(
+      `Xcode`,
+      `importFoundationhereisareallylonglinethatwillcauseproblemspotentiallyblahblahblahlorem`,
+    ),
     screenshot(400, 600, true),
     keystrokeLine(`Brave`, `Hello world`),
     keystrokeLine(`Xcode`, `import Foundation`),

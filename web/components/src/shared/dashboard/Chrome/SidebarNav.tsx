@@ -7,6 +7,7 @@ interface Props {
   collapsed?: boolean;
   toggleCollapsed?: () => unknown;
   onLogout(): unknown;
+  onInternalLinkClick(): unknown;
   urlPath: string;
 }
 
@@ -15,6 +16,7 @@ const SidebarNav: React.FC<Props> = ({
   toggleCollapsed,
   onLogout,
   urlPath,
+  onInternalLinkClick,
 }) => (
   <div className="flex flex-col justify-between h-full">
     <nav className={cx(`flex flex-col`, collapsed ? `py-4` : `px-4`)}>
@@ -32,6 +34,7 @@ const SidebarNav: React.FC<Props> = ({
           collapsed={collapsed}
           to="/"
           isSelected={urlPath === `/`}
+          onClick={onInternalLinkClick}
         >
           Dashboard
         </SidebarOption>
@@ -40,6 +43,7 @@ const SidebarNav: React.FC<Props> = ({
           collapsed={collapsed}
           to="/users"
           isSelected={urlPath.startsWith(`/users`)}
+          onClick={onInternalLinkClick}
         >
           Users
         </SidebarOption>
@@ -47,6 +51,7 @@ const SidebarNav: React.FC<Props> = ({
           icon="key"
           collapsed={collapsed}
           to="/keychains"
+          onClick={onInternalLinkClick}
           isSelected={urlPath.startsWith(`/keychains`)}
         >
           Keychains
@@ -55,6 +60,7 @@ const SidebarNav: React.FC<Props> = ({
           icon="user"
           collapsed={collapsed}
           to="/profile"
+          onClick={onInternalLinkClick}
           isSelected={urlPath.startsWith(`/profile`)}
         >
           Profile
