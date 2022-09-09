@@ -12,3 +12,8 @@ export const Create = Template.bind({});
 Create.args = {
   mode: `create`,
 };
+
+export const Edit = Template.bind({});
+Edit.args = {
+  mode: `edit`,
+};

@@ -5,8 +5,7 @@ import KeyTypeOption from '../KeyTypeOption';
 import TextInput from '../TextInput';
 import Toggle from '../Toggle';
 import SelectMenu from '../SelectMenu';
-import { capitalize } from '../../lib/string';
-import KeyScopeRadioOption from '../KeyScopeRadioOption';
+import KeyScopeRadioOption from '../SelectableListItem';
 import Combobox, { ComboboxOption } from '../Combobox/Combobox';
 import RadioGroup from '../RadioGroup';
 import TextArea from '../TextArea';
@@ -59,6 +58,7 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
 
   return (
     <div className="">
+      {/* key type */}
       <KeyCreationStep
         mode={mode}
         setCurrentStep={setCurrentStep}
@@ -97,6 +97,8 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
           />
         </div>
       </KeyCreationStep>
+
+      {/* address type */}
       <KeyCreationStep
         mode={mode}
         setCurrentStep={setCurrentStep}
@@ -191,6 +193,8 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
           </div>
         </div>
       </KeyCreationStep>
+
+      {/* key scope */}
       <KeyCreationStep
         mode={mode}
         setCurrentStep={setCurrentStep}
@@ -231,6 +235,7 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
               description={`Applies to all browsers, like Chrome, Safari, Firefox, etc.`}
               selected={keyScope === `web browsers`}
               onClick={() => setKeyScope(`web browsers`)}
+              badges={[{ text: 'Most common', color: 'green' }]}
             />
             <KeyScopeRadioOption
               title={`All apps`}
@@ -276,6 +281,8 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
           )}
         </div>
       </KeyCreationStep>
+
+      {/* miscellaneous */}
       <KeyCreationStep
         mode={mode}
         setCurrentStep={setCurrentStep}
@@ -326,6 +333,8 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
           className="mt-6"
         />
       </KeyCreationStep>
+
+      {/* summary */}
       <KeyCreationStep
         mode={mode}
         setCurrentStep={setCurrentStep}

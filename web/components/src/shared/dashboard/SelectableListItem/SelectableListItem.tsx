@@ -1,18 +1,21 @@
 import React from 'react';
 import cx from 'classnames';
+import PillBadge from '../PillBadge';
 
 type Props = {
   title: string;
   description: string;
   selected: boolean;
+  badges?: { text: string; color: 'green' | 'red' | 'yellow' | 'blue' }[];
   onClick(): void;
 };
 
-const KeyScopeRadioOption: React.FC<Props> = ({
+const SelectableListItem: React.FC<Props> = ({
   title,
   description,
   selected,
   onClick,
+  badges,
 }) => (
   <button
     className={cx(
@@ -38,8 +41,17 @@ const KeyScopeRadioOption: React.FC<Props> = ({
     <div className="flex-grow p-3">
       <h3 className="font-bold">{title}</h3>
       <p className="w-fit text-gray-500">{description}</p>
+      {badges && (
+        <div className="flex mt-2 space-x-2">
+          {badges.map((badge) => (
+            <PillBadge small className="border" type={badge.color}>
+              {badge.text}
+            </PillBadge>
+          ))}
+        </div>
+      )}
     </div>
   </button>
 );
 
-export default KeyScopeRadioOption;
+export default SelectableListItem;
