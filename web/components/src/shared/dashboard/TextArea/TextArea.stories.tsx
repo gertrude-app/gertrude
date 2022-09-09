@@ -12,16 +12,16 @@ export const Default = Template.bind({});
 
 export const WithPlaceholder = Template.bind({});
 WithPlaceholder.args = {
-  placeholder: 'Write something nice',
+  placeholder: `Write something nice`,
 };
 
 export const WithLabel = Template.bind({});
 WithLabel.args = {
-  label: 'Something nice',
+  label: `Something nice`,
 };
 
 export const WithBoth = Template.bind({});
 WithBoth.args = {
-  placeholder: 'Write something nice',
-  label: 'Something nice',
+  placeholder: `Write something nice`,
+  label: `Something nice`,
 };

@@ -14,7 +14,6 @@ import User from './components/routes/User';
 import UserActivityOverview from './components/routes/UserActivityOverview';
 import UserActivityDay from './components/routes/UserActivityDay';
 import Keychains from './components/routes/Keychains';
-import CreateKeyPage from './components/routes/CreateKeyPage';
 
 const App: React.FC = () => {
   const dispatch = useDispatch();

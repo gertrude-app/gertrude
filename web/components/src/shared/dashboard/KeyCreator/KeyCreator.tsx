@@ -36,10 +36,10 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
   >(`choose from common apps`);
   const [appBundleId, setAppBundleId] = useState(``);
   const [expires, setExpires] = useState(false);
-  const [expiryDate, setExpiryDate] = useState('');
-  const [expiryTime, setExpiryTime] = useState('');
+  const [expiryDate, setExpiryDate] = useState(``);
+  const [expiryTime, setExpiryTime] = useState(``);
   const [comment, setComment] = useState(``);
-  const [keyPower, setKeyPower] = useState<'all' | 'one'>('all');
+  const [keyPower, setKeyPower] = useState<'all' | 'one'>(`all`);
 
   const commonApplications: ComboboxOption[] = [
     { name: `Slack`, id: `app-1` },
@@ -102,7 +102,7 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
       </KeyCreationStep>
 
       {/* address type */}
-      {keyType === 'website' && (
+      {keyType === `website` && (
         <KeyCreationStep
           mode={mode}
           setCurrentStep={setCurrentStep}
@@ -141,15 +141,15 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
               <SelectMenu
                 options={
                   [
-                    { value: `standard`, display: 'Standard' },
-                    { value: `strict`, display: 'Strict' },
+                    { value: `standard`, display: `Standard` },
+                    { value: `strict`, display: `Strict` },
                     {
                       value: advancedAddressOptions && `IP address`,
-                      display: 'IP address',
+                      display: `IP address`,
                     },
                     {
                       value: advancedAddressOptions && `regular expression`,
-                      display: 'Regular expression',
+                      display: `Regular expression`,
                     },
                     // don't love this
                   ].filter((x) => typeof x.value === `string`) as {
@@ -199,7 +199,7 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
         </KeyCreationStep>
       )}
       {/* key scope */}
-      {keyType === 'website' && (
+      {keyType === `website` && (
         <KeyCreationStep
           mode={mode}
           setCurrentStep={setCurrentStep}
@@ -240,7 +240,7 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
                 description={`Applies to all browsers, like Chrome, Safari, Firefox, etc.`}
                 selected={keyScope === `web browsers`}
                 onClick={() => setKeyScope(`web browsers`)}
-                badges={[{ text: 'Most common', color: 'green' }]}
+                badges={[{ text: `Most common`, color: `green` }]}
               />
               <KeyScopeRadioOption
                 title={`All apps`}
@@ -289,7 +289,7 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
       )}
 
       {/* app picker */}
-      {keyType === 'app' && (
+      {keyType === `app` && (
         <KeyCreationStep
           mode={mode}
           setCurrentStep={setCurrentStep}
@@ -297,13 +297,13 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
           numSteps={5}
           title={
             <h2 className="font-medium text-gray-900 text-lg">
-              Key for {appSelectionMethod === 'by bundle id' && 'app with bundle id '}
+              Key for {appSelectionMethod === `by bundle id` && `app with bundle id `}
               <span className="font-bold">
-                {appSelectionMethod === 'choose from common apps'
+                {appSelectionMethod === `choose from common apps`
                   ? selectedApp.name
                   : appBundleId
                   ? appBundleId
-                  : '________'}
+                  : `________`}
               </span>
             </h2>
           }
@@ -339,7 +339,7 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
       )}
 
       {/* key power */}
-      {keyType === 'app' && (
+      {keyType === `app` && (
         <KeyCreationStep
           mode={mode}
           setCurrentStep={setCurrentStep}
@@ -347,11 +347,11 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
           numSteps={5}
           title={
             <h2 className="font-medium text-gray-900 text-lg">
-              {keyPower === 'all' ? (
-                'App gets unrestricted network requests'
+              {keyPower === `all` ? (
+                `App gets unrestricted network requests`
               ) : (
                 <span>
-                  App can access{' '}
+                  App can access{` `}
                   <span className="font-mono bg-violet-100 py-1 px-3 rounded-lg border-b-2 border-violet-200 text-base font-medium">
                     {address}
                   </span>
@@ -365,26 +365,24 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
           <Label>Key grants application:</Label>
           <div className="space-y-0.5 mt-3">
             <SelectableListItem
-              title={'Unrestricted internet access'}
-              description={
-                'Allows this app unrestricted network requests. Only for narrowly-focused apps that you trust.'
-              }
-              selected={keyPower === 'all'}
-              onClick={() => setKeyPower('all')}
-              badges={[{ text: 'Most common', color: 'green' }]}
+              title={`Unrestricted internet access`}
+              description={`Allows this app unrestricted network requests. Only for narrowly-focused apps that you trust.`}
+              selected={keyPower === `all`}
+              onClick={() => setKeyPower(`all`)}
+              badges={[{ text: `Most common`, color: `green` }]}
             />
             <SelectableListItem
-              title={'Access to a specific address'}
-              description={'Allow this application to access a specific address.'}
-              selected={keyPower === 'one'}
-              onClick={() => setKeyPower('one')}
+              title={`Access to a specific address`}
+              description={`Allow this application to access a specific address.`}
+              selected={keyPower === `one`}
+              onClick={() => setKeyPower(`one`)}
               badges={[
-                { text: 'Most safe', color: 'green' },
-                { text: 'Advanced', color: 'yellow' },
+                { text: `Most safe`, color: `green` },
+                { text: `Advanced`, color: `yellow` },
               ]}
             />
           </div>
-          {keyPower === 'one' && (
+          {keyPower === `one` && (
             <div className="mt-4">
               <div className="flex justify-end mr-2 items-center">
                 <label className="mr-2 text-gray-600">Advanced:</label>
@@ -408,15 +406,15 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
                   <SelectMenu
                     options={
                       [
-                        { value: `standard`, display: 'Standard' },
-                        { value: `strict`, display: 'Strict' },
+                        { value: `standard`, display: `Standard` },
+                        { value: `strict`, display: `Strict` },
                         {
                           value: advancedAddressOptions && `IP address`,
-                          display: 'IP address',
+                          display: `IP address`,
                         },
                         {
                           value: advancedAddressOptions && `regular expression`,
-                          display: 'Regular expression',
+                          display: `Regular expression`,
                         },
                         // don't love this
                       ].filter((x) => typeof x.value === `string`) as {
@@ -487,8 +485,8 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
                     expiryDate,
                     expiryTime,
                   )}`
-                : 'Key expires'
-              : 'Key never expires'}
+                : `Key expires`
+              : `Key never expires`}
           </h2>
         }
         currentStep={currentStep}
@@ -501,14 +499,14 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
         {expires && (
           <div className="flex flex-col sm:flex-row mt-4">
             <TextInput
-              type={'date'}
+              type={`date`}
               value={expiryDate}
               setValue={setExpiryDate}
               label="Expiration date:"
               className="sm:mr-2 mb-4 sm:mb-0"
             />
             <TextInput
-              type={'time'}
+              type={`time`}
               value={expiryTime}
               setValue={setExpiryTime}
               label="Expiration time:"
@@ -536,45 +534,45 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
         index={5}
       >
         <ul className="">
-          <SummaryLi prefix={'Key type'} data={keyType} />
+          <SummaryLi prefix={`Key type`} data={keyType} />
           <SummaryLi
-            prefix={'Key grants'}
+            prefix={`Key grants`}
             data={
-              keyPower === 'all'
-                ? 'unrestricted network requests'
-                : 'access to one domain'
+              keyPower === `all`
+                ? `unrestricted network requests`
+                : `access to one domain`
             }
           />
-          {(keyType === 'website' || keyPower === 'one') && (
+          {(keyType === `website` || keyPower === `one`) && (
             <SummaryLi
-              prefix={'Address'}
-              data={address}
+              prefix={`Address`}
+              data={address || `_______`}
               dataFormat="font-mono font-medium bg-gray-50 px-2 rounded shadow"
             />
           )}
-          {(keyType === 'website' || keyPower === 'one') && (
-            <SummaryLi prefix={'Address type'} data={addressType} />
+          {(keyType === `website` || keyPower === `one`) && (
+            <SummaryLi prefix={`Address type`} data={addressType} />
           )}
-          {keyType === 'website' && <SummaryLi prefix={'Key scope'} data={keyScope} />}
-          {(keyScope === 'single app' || keyType === 'app') && (
+          {keyType === `website` && <SummaryLi prefix={`Key scope`} data={keyScope} />}
+          {(keyScope === `single app` || keyType === `app`) && (
             <SummaryLi
-              prefix={'App'}
+              prefix={`App`}
               data={
-                appSelectionMethod === 'by bundle id' ? appBundleId : selectedApp.name
+                appSelectionMethod === `by bundle id` ? appBundleId : selectedApp.name
               }
             />
           )}
           <SummaryLi
-            prefix={'Expiration'}
+            prefix={`Expiration`}
             data={
               expires
                 ? formatDateAndTimeFromInputElements(expiryDate, expiryTime)
-                : 'none'
+                : `none`
             }
           />
           <SummaryLi
-            prefix={'Comment'}
-            data={comment || 'none'}
+            prefix={`Comment`}
+            data={comment || `none`}
             dataFormat="font-normal text-gray-500 italic"
           />
         </ul>

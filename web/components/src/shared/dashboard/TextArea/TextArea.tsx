@@ -1,4 +1,4 @@
-import React, { useId, useState } from 'react';
+import React, { useId } from 'react';
 import cx from 'classnames';
 import Label from '../TextInput/Label';
 
@@ -63,10 +63,11 @@ const TextArea: React.FC<Props> = ({
 
 export default TextArea;
 
-function isPositiveInteger(value: string): boolean {
-  return (
-    value.match(/^[0-9]+$/) !== null &&
-    Number.isInteger(Number(value)) &&
-    Number(value) >= 0
-  );
-}
+// not sure if you needed this, it was making the linter mad because it wasn't being used
+// function isPositiveInteger(value: string): boolean {
+//   return (
+//     value.match(/^[0-9]+$/) !== null &&
+//     Number.isInteger(Number(value)) &&
+//     Number(value) >= 0
+//   );
+// }
