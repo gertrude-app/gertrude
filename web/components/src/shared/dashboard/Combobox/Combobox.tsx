@@ -22,9 +22,9 @@ const Combobox: React.FC<Props> = ({ options, selectedOption, setSelectedOption 
 
   return (
     <HeadlessCombobox as="div" value={selectedOption} onChange={setSelectedOption}>
-      <div className="relative mt-1 border rounded-lg">
+      <div className="relative mt-1 rounded-lg border">
         <HeadlessCombobox.Input
-          className="w-full rounded-lg bg-white py-3 pl-4 pr-10 shadow outline-none focus:ring-indigo-500 focus:ring-2 focus:ring-offset-1 sm:text-md transition duration-100"
+          className="w-full rounded-lg bg-white py-3 pl-4 pr-10 shadow border-none outline-none focus:ring-indigo-500 focus:ring-2 focus:ring-offset-1 sm:text-md transition duration-100"
           onChange={(event) => setQuery(event.target.value)}
           displayValue={(option: ComboboxOption) => option.name}
         />
