@@ -9,7 +9,12 @@ type Props = {
 };
 
 const SummaryLi: React.FC<Props> = ({ className, prefix, data, dataFormat }) => (
-  <li className={cx('odd:bg-violet-50 p-2 rounded-lg font-medium list-none', className)}>
+  <li
+    className={cx(
+      'odd:bg-violet-50 p-2.5 px-4 rounded-lg font-medium list-none',
+      className,
+    )}
+  >
     {prefix}: <span className={dataFormat || 'font-bold text-gray-700'}>{data}</span>
   </li>
 );

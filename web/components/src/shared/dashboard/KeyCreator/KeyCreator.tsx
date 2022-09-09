@@ -11,6 +11,8 @@ import RadioGroup from '../RadioGroup';
 import TextArea from '../TextArea';
 import { formatDateAndTimeFromInputElements } from '../../lib/dates';
 import SummaryLi from '../SummaryLi';
+import Label from '../TextInput/Label';
+import SelectableListItem from '../SelectableListItem';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -37,6 +39,7 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
   const [expiryDate, setExpiryDate] = useState('');
   const [expiryTime, setExpiryTime] = useState('');
   const [comment, setComment] = useState(``);
+  const [keyPower, setKeyPower] = useState<'all' | 'one'>('all');
 
   const commonApplications: ComboboxOption[] = [
     { name: `Slack`, id: `app-1` },
@@ -99,188 +102,376 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
       </KeyCreationStep>
 
       {/* address type */}
-      <KeyCreationStep
-        mode={mode}
-        setCurrentStep={setCurrentStep}
-        stepName="Select address type"
-        numSteps={5}
-        title={
-          <h2 className="font-medium text-gray-900 text-lg">
-            <span className="capitalize">{addressType}</span> address:{` `}
-            <span className="font-mono bg-violet-100 py-1 px-3 rounded-lg border-b-2 border-violet-200 text-base font-medium">
-              {address || `______`}
-            </span>
-          </h2>
-        }
-        currentStep={currentStep}
-        index={2}
-      >
-        <div className="flex justify-end mr-2 items-center">
-          <label className="mr-2 text-gray-600">Advanced:</label>
-          <Toggle
-            enabled={advancedAddressOptions}
-            small
-            setEnabled={setAdvancedAddressOptions}
-          />
-        </div>
-        <TextInput
-          type={`text`}
-          label={`Web address:`}
-          value={address}
-          setValue={setAddress}
-          prefix={`https://`}
-          className="mb-7"
-        />
-        <div className="bg-gray-50 px-2 py-4 rounded-lg">
-          <div className="flex items-center justify-end">
-            <label className="mr-2 text-gray-600 font-medium">Address type:</label>
-            <SelectMenu
-              options={
-                [
-                  { value: `standard`, display: 'Standard' },
-                  { value: `strict`, display: 'Strict' },
-                  {
-                    value: advancedAddressOptions && `IP address`,
-                    display: 'IP address',
-                  },
-                  {
-                    value: advancedAddressOptions && `regular expression`,
-                    display: 'Regular expression',
-                  },
-                  // don't love this
-                ].filter((x) => typeof x.value === `string`) as {
-                  value: string;
-                  display: string;
-                }[]
-              }
-              selectedOption={addressType}
-              setSelected={(option) => {
-                setAddressType(
-                  // or this
-                  option as 'standard' | 'strict' | 'regular expression' | 'IP address',
-                );
-              }}
-              deemphasized
-            />
-          </div>
-          <div className="flex justify-end">
-            {addressType === `standard` && (
-              <p className="text-right max-w-lg text-sm text-gray-400 my-2">
-                Allows any subdomain of{` `}
-                <InlineURL domain={address || `____`} subdomains={[``]} />, for example
-                {` `}
-                <InlineURL
-                  domain={address || `____`}
-                  move
-                  subdomains={[`images`, `cdn`, `static`, `api`, `docs`]}
-                />
-              </p>
-            )}
-            {addressType === `strict` && (
-              <p className="text-right max-w-lg text-sm text-gray-400 my-2">
-                Only allows access to{` `}
-                <InlineURL domain={address || `____`} subdomains={[`www`]} />. Subdomains
-                like{` `}
-                <InlineURL
-                  domain={address || `____`}
-                  move
-                  subdomains={[`images`, `cdn`, `static`, `api`, `docs`]}
-                />
-                {` `}
-                are blocked
-              </p>
-            )}
-          </div>
-        </div>
-      </KeyCreationStep>
-
-      {/* key scope */}
-      <KeyCreationStep
-        mode={mode}
-        setCurrentStep={setCurrentStep}
-        stepName="Select scope"
-        numSteps={5}
-        title={
-          <h2 className="font-medium text-gray-900 text-lg">
-            Key effects {keyScope}
-            {keyScope === `single app` &&
-              appSelectionMethod === `choose from common apps` && (
-                <span>
-                  : <span className="font-bold">{selectedApp.name}</span>
-                </span>
-              )}
-          </h2>
-        }
-        currentStep={currentStep}
-        index={3}
-      >
-        <div>
-          <h2 className="font-medium">Unlocked for:</h2>
+      {keyType === 'website' && (
+        <KeyCreationStep
+          mode={mode}
+          setCurrentStep={setCurrentStep}
+          stepName="Select address type"
+          numSteps={5}
+          title={
+            <h2 className="font-medium text-gray-900 text-lg">
+              <span className="capitalize">{addressType}</span> address:{` `}
+              <span className="font-mono bg-violet-100 py-1 px-3 rounded-lg border-b-2 border-violet-200 text-base font-medium">
+                {address || `______`}
+              </span>
+            </h2>
+          }
+          currentStep={currentStep}
+          index={2}
+        >
           <div className="flex justify-end mr-2 items-center">
             <label className="mr-2 text-gray-600">Advanced:</label>
             <Toggle
-              enabled={advancedKeyScope}
+              enabled={advancedAddressOptions}
               small
-              setEnabled={(b) => {
-                if (!b && keyScope === `single app`) setKeyScope(`web browsers`);
-                setAppBundleId(``);
-                setSelectedApp({ name: ``, id: `` });
-                setAdvancedKeyScope(b);
-              }}
+              setEnabled={setAdvancedAddressOptions}
             />
           </div>
-          <div className="mt-3 space-y-0.5">
-            <KeyScopeRadioOption
-              title={`Web browsers`}
-              description={`Applies to all browsers, like Chrome, Safari, Firefox, etc.`}
-              selected={keyScope === `web browsers`}
-              onClick={() => setKeyScope(`web browsers`)}
-              badges={[{ text: 'Most common', color: 'green' }]}
-            />
-            <KeyScopeRadioOption
-              title={`All apps`}
-              description={`Permits access for every app (including browsers). Use for sites you're sure you trust.`}
-              selected={keyScope === `all apps`}
-              onClick={() => setKeyScope(`all apps`)}
-            />
-            {advancedKeyScope && (
-              <KeyScopeRadioOption
-                title={`Single app`}
-                description={`Unlock this site for one specific app you choose.`}
-                selected={keyScope === `single app`}
-                onClick={() => setKeyScope(`single app`)}
+          <TextInput
+            type={`text`}
+            label={`Web address:`}
+            value={address}
+            setValue={setAddress}
+            prefix={`https://`}
+            className="mb-7"
+          />
+          <div className="bg-gray-50 px-2 py-4 rounded-lg">
+            <div className="flex items-center justify-end">
+              <label className="mr-2 text-gray-600 font-medium">Address type:</label>
+              <SelectMenu
+                options={
+                  [
+                    { value: `standard`, display: 'Standard' },
+                    { value: `strict`, display: 'Strict' },
+                    {
+                      value: advancedAddressOptions && `IP address`,
+                      display: 'IP address',
+                    },
+                    {
+                      value: advancedAddressOptions && `regular expression`,
+                      display: 'Regular expression',
+                    },
+                    // don't love this
+                  ].filter((x) => typeof x.value === `string`) as {
+                    value: string;
+                    display: string;
+                  }[]
+                }
+                selectedOption={addressType}
+                setSelected={(option) => {
+                  setAddressType(
+                    // or this
+                    option as 'standard' | 'strict' | 'regular expression' | 'IP address',
+                  );
+                }}
+                deemphasized
               />
-            )}
-          </div>
-          {keyScope === `single app` && (
-            <div className="bg-gray-50 p-4 rounded-lg mt-4">
-              <RadioGroup
-                options={[`choose from common apps`, `by bundle id`]}
-                selectedOption={appSelectionMethod}
-                setSelectedOption={setAppSelectionMethod as (s: string) => void}
-                className="mb-4"
-              />
-              {appSelectionMethod === `choose from common apps` ? (
-                <div>
-                  <label className="text-gray-600 font-bold">Choose application:</label>
-                  <Combobox
-                    options={commonApplications}
-                    selectedOption={selectedApp}
-                    setSelectedOption={setSelectedApp}
+            </div>
+            <div className="flex justify-end">
+              {addressType === `standard` && (
+                <p className="text-right max-w-lg text-sm text-gray-400 my-2">
+                  Allows any subdomain of{` `}
+                  <InlineURL domain={address || `____`} subdomains={[``]} />, for example
+                  {` `}
+                  <InlineURL
+                    domain={address || `____`}
+                    move
+                    subdomains={[`images`, `cdn`, `static`, `api`, `docs`]}
                   />
-                </div>
-              ) : (
-                <TextInput
-                  type={`text`}
-                  label={`App bundle ID:`}
-                  value={appBundleId}
-                  setValue={setAppBundleId}
+                </p>
+              )}
+              {addressType === `strict` && (
+                <p className="text-right max-w-lg text-sm text-gray-400 my-2">
+                  Only allows access to{` `}
+                  <InlineURL domain={address || `____`} subdomains={[`www`]} />.
+                  Subdomains like{` `}
+                  <InlineURL
+                    domain={address || `____`}
+                    move
+                    subdomains={[`images`, `cdn`, `static`, `api`, `docs`]}
+                  />
+                  {` `}
+                  are blocked
+                </p>
+              )}
+            </div>
+          </div>
+        </KeyCreationStep>
+      )}
+      {/* key scope */}
+      {keyType === 'website' && (
+        <KeyCreationStep
+          mode={mode}
+          setCurrentStep={setCurrentStep}
+          stepName="Select scope"
+          numSteps={5}
+          title={
+            <h2 className="font-medium text-gray-900 text-lg">
+              Key effects {keyScope}
+              {keyScope === `single app` &&
+                appSelectionMethod === `choose from common apps` && (
+                  <span>
+                    : <span className="font-bold">{selectedApp.name}</span>
+                  </span>
+                )}
+            </h2>
+          }
+          currentStep={currentStep}
+          index={3}
+        >
+          <div>
+            <h2 className="font-medium">Unlocked for:</h2>
+            <div className="flex justify-end mr-2 items-center">
+              <label className="mr-2 text-gray-600">Advanced:</label>
+              <Toggle
+                enabled={advancedKeyScope}
+                small
+                setEnabled={(b) => {
+                  if (!b && keyScope === `single app`) setKeyScope(`web browsers`);
+                  setAppBundleId(``);
+                  setSelectedApp({ name: ``, id: `` });
+                  setAdvancedKeyScope(b);
+                }}
+              />
+            </div>
+            <div className="mt-3 space-y-0.5">
+              <KeyScopeRadioOption
+                title={`Web browsers`}
+                description={`Applies to all browsers, like Chrome, Safari, Firefox, etc.`}
+                selected={keyScope === `web browsers`}
+                onClick={() => setKeyScope(`web browsers`)}
+                badges={[{ text: 'Most common', color: 'green' }]}
+              />
+              <KeyScopeRadioOption
+                title={`All apps`}
+                description={`Permits access for every app (including browsers). Use for sites you're sure you trust.`}
+                selected={keyScope === `all apps`}
+                onClick={() => setKeyScope(`all apps`)}
+              />
+              {advancedKeyScope && (
+                <KeyScopeRadioOption
+                  title={`Single app`}
+                  description={`Unlock this site for one specific app you choose.`}
+                  selected={keyScope === `single app`}
+                  onClick={() => setKeyScope(`single app`)}
                 />
               )}
             </div>
+            {keyScope === `single app` && (
+              <div className="bg-gray-50 p-4 rounded-lg mt-4">
+                <RadioGroup
+                  options={[`choose from common apps`, `by bundle id`]}
+                  selectedOption={appSelectionMethod}
+                  setSelectedOption={setAppSelectionMethod as (s: string) => void}
+                  className="mb-4"
+                />
+                {appSelectionMethod === `choose from common apps` ? (
+                  <div>
+                    <label className="text-gray-600 font-bold">Choose application:</label>
+                    <Combobox
+                      options={commonApplications}
+                      selectedOption={selectedApp}
+                      setSelectedOption={setSelectedApp}
+                    />
+                  </div>
+                ) : (
+                  <TextInput
+                    type={`text`}
+                    label={`App bundle ID:`}
+                    value={appBundleId}
+                    setValue={setAppBundleId}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        </KeyCreationStep>
+      )}
+
+      {/* app picker */}
+      {keyType === 'app' && (
+        <KeyCreationStep
+          mode={mode}
+          setCurrentStep={setCurrentStep}
+          stepName="Choose application"
+          numSteps={5}
+          title={
+            <h2 className="font-medium text-gray-900 text-lg">
+              Key for {appSelectionMethod === 'by bundle id' && 'app with bundle id '}
+              <span className="font-bold">
+                {appSelectionMethod === 'choose from common apps'
+                  ? selectedApp.name
+                  : appBundleId
+                  ? appBundleId
+                  : '________'}
+              </span>
+            </h2>
+          }
+          currentStep={currentStep}
+          index={2}
+        >
+          <div>
+            <RadioGroup
+              options={[`choose from common apps`, `by bundle id`]}
+              selectedOption={appSelectionMethod}
+              setSelectedOption={setAppSelectionMethod as (s: string) => void}
+              className="mb-4"
+            />
+            {appSelectionMethod === `choose from common apps` ? (
+              <div>
+                <label className="text-gray-600 font-bold">Choose application:</label>
+                <Combobox
+                  options={commonApplications}
+                  selectedOption={selectedApp}
+                  setSelectedOption={setSelectedApp}
+                />
+              </div>
+            ) : (
+              <TextInput
+                type={`text`}
+                label={`App bundle ID:`}
+                value={appBundleId}
+                setValue={setAppBundleId}
+              />
+            )}
+          </div>
+        </KeyCreationStep>
+      )}
+
+      {/* key power */}
+      {keyType === 'app' && (
+        <KeyCreationStep
+          mode={mode}
+          setCurrentStep={setCurrentStep}
+          stepName="Choose key power" // I don't know what to call this
+          numSteps={5}
+          title={
+            <h2 className="font-medium text-gray-900 text-lg">
+              {keyPower === 'all' ? (
+                'App gets unrestricted network requests'
+              ) : (
+                <span>
+                  App can access{' '}
+                  <span className="font-mono bg-violet-100 py-1 px-3 rounded-lg border-b-2 border-violet-200 text-base font-medium">
+                    {address}
+                  </span>
+                </span>
+              )}
+            </h2>
+          }
+          currentStep={currentStep}
+          index={3}
+        >
+          <Label>Key grants application:</Label>
+          <div className="space-y-0.5 mt-3">
+            <SelectableListItem
+              title={'Unrestricted internet access'}
+              description={
+                'Allows this app unrestricted network requests. Only for narrowly-focused apps that you trust.'
+              }
+              selected={keyPower === 'all'}
+              onClick={() => setKeyPower('all')}
+              badges={[{ text: 'Most common', color: 'green' }]}
+            />
+            <SelectableListItem
+              title={'Access to a specific address'}
+              description={'Allow this application to access a specific address.'}
+              selected={keyPower === 'one'}
+              onClick={() => setKeyPower('one')}
+              badges={[
+                { text: 'Most safe', color: 'green' },
+                { text: 'Advanced', color: 'yellow' },
+              ]}
+            />
+          </div>
+          {keyPower === 'one' && (
+            <div className="mt-4">
+              <div className="flex justify-end mr-2 items-center">
+                <label className="mr-2 text-gray-600">Advanced:</label>
+                <Toggle
+                  enabled={advancedAddressOptions}
+                  small
+                  setEnabled={setAdvancedAddressOptions}
+                />
+              </div>
+              <TextInput
+                type={`text`}
+                label={`Web address:`}
+                value={address}
+                setValue={setAddress}
+                prefix={`https://`}
+                className="mb-7"
+              />
+              <div className="bg-gray-50 px-2 py-4 rounded-lg">
+                <div className="flex items-center justify-end">
+                  <label className="mr-2 text-gray-600 font-medium">Address type:</label>
+                  <SelectMenu
+                    options={
+                      [
+                        { value: `standard`, display: 'Standard' },
+                        { value: `strict`, display: 'Strict' },
+                        {
+                          value: advancedAddressOptions && `IP address`,
+                          display: 'IP address',
+                        },
+                        {
+                          value: advancedAddressOptions && `regular expression`,
+                          display: 'Regular expression',
+                        },
+                        // don't love this
+                      ].filter((x) => typeof x.value === `string`) as {
+                        value: string;
+                        display: string;
+                      }[]
+                    }
+                    selectedOption={addressType}
+                    setSelected={(option) => {
+                      setAddressType(
+                        // or this
+                        option as
+                          | 'standard'
+                          | 'strict'
+                          | 'regular expression'
+                          | 'IP address',
+                      );
+                    }}
+                    deemphasized
+                  />
+                </div>
+                <div className="flex justify-end">
+                  {addressType === `standard` && (
+                    <p className="text-right max-w-lg text-sm text-gray-400 my-2">
+                      Allows any subdomain of{` `}
+                      <InlineURL domain={address || `____`} subdomains={[``]} />, for
+                      example
+                      {` `}
+                      <InlineURL
+                        domain={address || `____`}
+                        move
+                        subdomains={[`images`, `cdn`, `static`, `api`, `docs`]}
+                      />
+                    </p>
+                  )}
+                  {addressType === `strict` && (
+                    <p className="text-right max-w-lg text-sm text-gray-400 my-2">
+                      Only allows access to{` `}
+                      <InlineURL domain={address || `____`} subdomains={[`www`]} />.
+                      Subdomains like{` `}
+                      <InlineURL
+                        domain={address || `____`}
+                        move
+                        subdomains={[`images`, `cdn`, `static`, `api`, `docs`]}
+                      />
+                      {` `}
+                      are blocked
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
           )}
-        </div>
-      </KeyCreationStep>
+        </KeyCreationStep>
+      )}
 
       {/* miscellaneous */}
       <KeyCreationStep
@@ -347,14 +538,31 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
         <ul className="">
           <SummaryLi prefix={'Key type'} data={keyType} />
           <SummaryLi
-            prefix={'Address'}
-            data={address}
-            dataFormat="font-mono font-medium bg-gray-50 px-2 rounded shadow"
+            prefix={'Key grants'}
+            data={
+              keyPower === 'all'
+                ? 'unrestricted network requests'
+                : 'access to one domain'
+            }
           />
-          <SummaryLi prefix={'Address type'} data={addressType} />
-          <SummaryLi prefix={'Key scope'} data={keyScope} />
-          {keyScope === 'single app' && (
-            <SummaryLi prefix={'App'} data={selectedApp.name} />
+          {(keyType === 'website' || keyPower === 'one') && (
+            <SummaryLi
+              prefix={'Address'}
+              data={address}
+              dataFormat="font-mono font-medium bg-gray-50 px-2 rounded shadow"
+            />
+          )}
+          {(keyType === 'website' || keyPower === 'one') && (
+            <SummaryLi prefix={'Address type'} data={addressType} />
+          )}
+          {keyType === 'website' && <SummaryLi prefix={'Key scope'} data={keyScope} />}
+          {(keyScope === 'single app' || keyType === 'app') && (
+            <SummaryLi
+              prefix={'App'}
+              data={
+                appSelectionMethod === 'by bundle id' ? appBundleId : selectedApp.name
+              }
+            />
           )}
           <SummaryLi
             prefix={'Expiration'}
