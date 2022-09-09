@@ -93,14 +93,25 @@ const KeyCreationStep: React.FC<Props> = ({
                   )}
                   <Button
                     type="button"
-                    onClick={() => {
-                      setCurrentStep(currentStep + 1);
-                      setOpen(false);
-                    }}
+                    onClick={
+                      index !== numSteps
+                        ? () => {
+                            setCurrentStep(currentStep + 1);
+                            setOpen(false);
+                          }
+                        : () => alert('🎉 Key created!!')
+                    }
                     color="primary-violet"
                     small
                   >
-                    Next <i className="fa-solid fa-arrow-right ml-2" />
+                    {index === numSteps ? 'Looks good' : 'Next'}
+                    {
+                      <i
+                        className={`fa-solid fa-${
+                          index === numSteps ? 'check' : 'arrow-right'
+                        } ml-2`}
+                      />
+                    }
                   </Button>
                 </div>
               )}

@@ -21,7 +21,9 @@ const KeyScopeRadioOption: React.FC<Props> = ({
     )}
     onClick={onClick}
   >
-    <div className={cx(`w-12 flex flex-shrink-0 justify-center items-center`)}>
+    <div
+      className={cx(`w-12 self-stretch flex flex-shrink-0 justify-center items-center`)}
+    >
       <div
         className={cx(
           `rounded-full flex justify-center items-center text-white [transition:100ms]`,

@@ -9,6 +9,9 @@ import { capitalize } from '../../lib/string';
 import KeyScopeRadioOption from '../KeyScopeRadioOption';
 import Combobox, { ComboboxOption } from '../Combobox/Combobox';
 import RadioGroup from '../RadioGroup';
+import TextArea from '../TextArea';
+import { formatDateAndTimeFromInputElements } from '../../lib/dates';
+import SummaryLi from '../SummaryLi';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -31,6 +34,10 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
     'choose from common apps' | 'by bundle id'
   >(`choose from common apps`);
   const [appBundleId, setAppBundleId] = useState(``);
+  const [expires, setExpires] = useState(false);
+  const [expiryDate, setExpiryDate] = useState('');
+  const [expiryTime, setExpiryTime] = useState('');
+  const [comment, setComment] = useState(``);
 
   const commonApplications: ComboboxOption[] = [
     { name: `Slack`, id: `app-1` },
@@ -128,14 +135,23 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
             <SelectMenu
               options={
                 [
-                  `standard`,
-                  `strict`,
-                  advancedAddressOptions && `IP address`,
-                  advancedAddressOptions && `regular expression`,
+                  { value: `standard`, display: 'Standard' },
+                  { value: `strict`, display: 'Strict' },
+                  {
+                    value: advancedAddressOptions && `IP address`,
+                    display: 'IP address',
+                  },
+                  {
+                    value: advancedAddressOptions && `regular expression`,
+                    display: 'Regular expression',
+                  },
                   // don't love this
-                ].filter((x) => typeof x === `string`) as string[]
+                ].filter((x) => typeof x.value === `string`) as {
+                  value: string;
+                  display: string;
+                }[]
               }
-              selectedOption={capitalize(addressType)}
+              selectedOption={addressType}
               setSelected={(option) => {
                 setAddressType(
                   // or this
@@ -265,26 +281,86 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
         setCurrentStep={setCurrentStep}
         stepName="Miscellaneous"
         numSteps={5}
-        title={<h1>Step 4</h1>}
+        title={
+          <h2 className="font-medium text-gray-900 text-lg">
+            {expires
+              ? expiryDate && expiryTime
+                ? `Key expires ${formatDateAndTimeFromInputElements(
+                    expiryDate,
+                    expiryTime,
+                  )}`
+                : 'Key expires'
+              : 'Key never expires'}
+          </h2>
+        }
         currentStep={currentStep}
         index={4}
       >
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae quaerat
-        </p>
+        <div className="flex justify-end mr-2 items-center">
+          <label className="mr-2 text-gray-600">Expires:</label>
+          <Toggle enabled={expires} small setEnabled={setExpires} />
+        </div>
+        {expires && (
+          <div className="flex flex-col sm:flex-row mt-4">
+            <TextInput
+              type={'date'}
+              value={expiryDate}
+              setValue={setExpiryDate}
+              label="Expiration date:"
+              className="sm:mr-2 mb-4 sm:mb-0"
+            />
+            <TextInput
+              type={'time'}
+              value={expiryTime}
+              setValue={setExpiryTime}
+              label="Expiration time:"
+              className="sm:ml-2"
+            />
+          </div>
+        )}
+        <TextArea
+          value={comment}
+          setValue={setComment}
+          label="Comment:"
+          placeholder="Optional note to yourself about this key"
+          className="mt-6"
+        />
       </KeyCreationStep>
       <KeyCreationStep
         mode={mode}
         setCurrentStep={setCurrentStep}
         stepName="Summary"
         numSteps={5}
-        title={<h1>Step 5</h1>}
+        title={<h2 className="font-medium text-gray-900 text-lg">Summary:</h2>}
         currentStep={currentStep}
         index={5}
       >
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae quaerat
-        </p>
+        <ul className="">
+          <SummaryLi prefix={'Key type'} data={keyType} />
+          <SummaryLi
+            prefix={'Address'}
+            data={address}
+            dataFormat="font-mono font-medium bg-gray-50 px-2 rounded shadow"
+          />
+          <SummaryLi prefix={'Address type'} data={addressType} />
+          <SummaryLi prefix={'Key scope'} data={keyScope} />
+          {keyScope === 'single app' && (
+            <SummaryLi prefix={'App'} data={selectedApp.name} />
+          )}
+          <SummaryLi
+            prefix={'Expiration'}
+            data={
+              expires
+                ? formatDateAndTimeFromInputElements(expiryDate, expiryTime)
+                : 'none'
+            }
+          />
+          <SummaryLi
+            prefix={'Comment'}
+            data={comment || 'none'}
+            dataFormat="font-normal text-gray-500 italic"
+          />
+        </ul>
       </KeyCreationStep>
     </div>
   );
