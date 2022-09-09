@@ -34,7 +34,11 @@ const KeyCreationStep: React.FC<Props> = ({
         className,
       )}
     >
-      <div className={cx(`w-12 flex justify-center items-center relative flex-shrink-0`)}>
+      <div
+        className={cx(
+          `w-8 sm:w-12 flex justify-center items-center relative flex-shrink-0`,
+        )}
+      >
         <div
           className={cx(
             `h-full border-r-2 border-dashed border-gray-300 absolute`,
@@ -68,7 +72,7 @@ const KeyCreationStep: React.FC<Props> = ({
             />
           </button>
           {open && (
-            <div className="p-4">
+            <div className="p-2 sm:p-4">
               {children}
               {mode === `create` && currentStep === index && (
                 <div
