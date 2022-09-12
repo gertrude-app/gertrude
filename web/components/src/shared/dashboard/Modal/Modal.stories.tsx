@@ -11,15 +11,30 @@ const Template: ComponentStory<typeof Modal> = (args) => <Modal {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  type: `destructive`,
-  title: `Do you want to delete this widget?`,
+  type: `default`,
+  title: `Just fyi...`,
   isOpen: true,
   onPrimaryClick: () => {},
   onDismiss: () => {},
   children: (
     <>
-      Are you <b>sure?</b> There is no undo, and you might regret your decision in the
-      morning.
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem aliquam autem eius,
+      facere laudantium temporibus ea quasi.
+    </>
+  ),
+};
+
+export const Destructive = Template.bind({});
+Destructive.args = {
+  type: `destructive`,
+  title: `NOOOOOOOOO!!!`,
+  isOpen: true,
+  onPrimaryClick: () => {},
+  onDismiss: () => {},
+  children: (
+    <>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem aliquam autem eius,
+      facere laudantium temporibus ea quasi.
     </>
   ),
 };
