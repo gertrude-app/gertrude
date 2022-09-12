@@ -2,7 +2,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import KeyCreationStep from './KeyCreationStep';
 
 export default {
-  title: `Dashboard/Keys/KeyCreationStep`,
+  title: `Dashboard/Keychains/Keys/KeyCreationStep`,
   component: KeyCreationStep,
 } as ComponentMeta<typeof KeyCreationStep>;
 

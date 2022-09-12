@@ -4,7 +4,7 @@ import { keychainProps } from '../../story-helpers';
 import ListKeychains from './ListKeychains';
 
 export default {
-  title: `Dashboard/Keychains/ListKeychains`,
+  title: `Dashboard/Keychains/List`,
   component: ListKeychains,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],

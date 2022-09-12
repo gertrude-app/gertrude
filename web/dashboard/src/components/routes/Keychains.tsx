@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
-import ListKeychains from '@dashboard/Keychains/ListKeychains';
+import ListKeychains from '@dashboard/Keychains/List';
 import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';

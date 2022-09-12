@@ -1,5 +1,5 @@
-import KeyCreator from '@shared/dashboard/KeyCreator';
-import PageHeading from '@shared/dashboard/PageHeading';
+import KeyCreator from '@dashboard/Keychains/Keys/KeyCreator';
+import PageHeading from '@dashboard/PageHeading';
 import React from 'react';
 
 const CreateKeyPage: React.FC = () => {
