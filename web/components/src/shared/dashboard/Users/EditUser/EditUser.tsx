@@ -15,6 +15,7 @@ import { ConfirmDeleteEntity } from '../../Modal';
 import { inflect } from '../../../lib/string';
 
 interface Props {
+  isNew: boolean;
   name: string;
   setName(name: string): unknown;
   keyloggingEnabled: boolean;
@@ -35,6 +36,7 @@ interface Props {
 }
 
 const EditUser: React.FC<Props> = ({
+  isNew,
   name,
   setName,
   keyloggingEnabled,
@@ -56,7 +58,9 @@ const EditUser: React.FC<Props> = ({
   <div className="relative max-w-3xl">
     <ConfirmDeleteEntity type="device" action={deleteDevice} />
     <ConfirmDeleteEntity type="user" action={deleteUser} />
-    <PageHeading icon="pen">Edit user</PageHeading>
+    <PageHeading icon={isNew ? `user-plus` : `pen`}>
+      {isNew ? `Create` : `Edit`} user
+    </PageHeading>
     <div className="mt-8">
       <TextInput
         type="text"
@@ -155,14 +159,16 @@ const EditUser: React.FC<Props> = ({
           </button>
         </div>
         <div className="flex mt-5 justify-end border-t-2 pt-8 space-x-5">
-          <Button
-            type="button"
-            onClick={deleteUser.start}
-            color="secondary-warning"
-            small
-          >
-            Delete user
-          </Button>
+          {!isNew && (
+            <Button
+              type="button"
+              onClick={deleteUser.start}
+              color="secondary-warning"
+              small
+            >
+              Delete user
+            </Button>
+          )}
           <Button
             small
             type="button"

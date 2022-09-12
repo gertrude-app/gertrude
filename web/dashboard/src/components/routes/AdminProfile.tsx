@@ -18,7 +18,7 @@ import {
 } from '../../redux/slice-admin';
 import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
-import { isDirty, notNullish, Query } from '../../redux/helpers';
+import { isDirty, notNullish, Query, Req } from '../../redux/helpers';
 import { QueryProps, State } from '../../redux/store';
 import { capitalize } from '../shared/lib/string';
 import { isUnsaved } from '../shared/lib/id';
@@ -26,14 +26,13 @@ import { isUnsaved } from '../shared/lib/id';
 const AdminProfile: React.FC = () => {
   const dispatch = useDispatch();
   const adminId = useSelector((state) => state.auth.admin?.id ?? ``);
-  const query = useSelector(queryProps(dispatch));
+  const [query, shouldFetch] = useSelector(queryProps(dispatch));
 
-  const reqState = query.state;
   useEffect(() => {
-    reqState === `idle` && dispatch(fetchProfileData(adminId));
-  }, [dispatch, adminId, reqState]);
+    shouldFetch && dispatch(fetchProfileData(adminId));
+  }, [dispatch, adminId, shouldFetch]);
 
-  if (query.state === `idle` || query.state === `ongoing`) {
+  if (query.state === `shouldFetch` || query.state === `ongoing`) {
     return <Loading />;
   }
 
@@ -49,7 +48,7 @@ export default AdminProfile;
 export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
   const request = state.admin.profileRequest;
   if (request.state !== `succeeded`) {
-    return request;
+    return [Req.toUnresolvedQuery(request), request.state !== `failed`];
   }
 
   const admin = state.admin;
@@ -58,47 +57,49 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
   const deleteMethodId = admin.deleting.notificationMethod;
   const notificationProps = makeGetNotificationProps(admin);
 
-  return Query.succeed({
-    email: request.payload.email,
-    status: request.payload.subscriptionStatus,
-    methods: typesafe.objectValues(methods).map((method) => ({
-      id: method.id,
-      method: method.data.type,
-      value: methodPrimaryValue(method),
-      deletable: methodDeletable(method, admin.notifications, request.payload.email),
-    })),
-    notifications: typesafe
-      .objectValues(admin.notifications)
-      .map(notificationProps)
-      .filter(notNullish),
-    deleteNotification: {
-      id: deleteNotificationId,
-      start: (id) => dispatch(startEntityDelete({ type: `notification`, id })),
-      confirm: () =>
-        deleteNotificationId && dispatch(deleteNotification(deleteNotificationId)),
-      cancel: () => dispatch(cancelEntityDelete(`notification`)),
-    },
-    deleteMethod: {
-      id: deleteMethodId,
-      start: (id) => dispatch(startEntityDelete({ type: `notificationMethod`, id })),
-      confirm: () => deleteMethodId && dispatch(deleteNotificationMethod(deleteMethodId)),
-      cancel: () => dispatch(cancelEntityDelete(`notificationMethod`)),
-    },
-    pendingMethod: admin.pendingNotificationMethod,
-    createNotification: () => dispatch(notificationCreated()),
-    saveNotification: (id) => dispatch(upsertNotification(id)),
-    updateNotification: (update) => dispatch(notificationChanged(update)),
-    newMethodEventHandler: (event) => {
-      switch (event.type) {
-        case `send_code_clicked`:
-          return dispatch(createPendingNotificationMethod());
-        case `verify_code_clicked`:
-          return dispatch(confirmPendingNotificationMethod());
-        default:
-          return dispatch(newNotificationMethodEvent(event));
-      }
-    },
-  });
+  return [
+    Query.resolve({
+      email: request.payload.email,
+      status: request.payload.subscriptionStatus,
+      methods: typesafe.objectValues(methods).map((method) => ({
+        id: method.id,
+        method: method.data.type,
+        value: methodPrimaryValue(method),
+        deletable: methodDeletable(method, admin.notifications, request.payload.email),
+      })),
+      notifications: typesafe
+        .objectValues(admin.notifications)
+        .map(notificationProps)
+        .filter(notNullish),
+      deleteNotification: {
+        id: deleteNotificationId,
+        start: (id) => dispatch(startEntityDelete({ type: `notification`, id })),
+        confirm: () => dispatch(deleteNotification(deleteNotificationId ?? ``)),
+        cancel: () => dispatch(cancelEntityDelete(`notification`)),
+      },
+      deleteMethod: {
+        id: deleteMethodId,
+        start: (id) => dispatch(startEntityDelete({ type: `notificationMethod`, id })),
+        confirm: () => dispatch(deleteNotificationMethod(deleteMethodId ?? ``)),
+        cancel: () => dispatch(cancelEntityDelete(`notificationMethod`)),
+      },
+      pendingMethod: admin.pendingNotificationMethod,
+      createNotification: () => dispatch(notificationCreated()),
+      saveNotification: (id) => dispatch(upsertNotification(id)),
+      updateNotification: (update) => dispatch(notificationChanged(update)),
+      newMethodEventHandler: (event) => {
+        switch (event.type) {
+          case `send_code_clicked`:
+            return dispatch(createPendingNotificationMethod());
+          case `verify_code_clicked`:
+            return dispatch(confirmPendingNotificationMethod());
+          default:
+            return dispatch(newNotificationMethodEvent(event));
+        }
+      },
+    }),
+    false,
+  ];
 };
 
 // helpers

@@ -30,11 +30,11 @@ export type State = ReturnType<typeof store.getState>;
 export type Dispatch = typeof store.dispatch;
 
 export type QueriedProps<Component extends JSXElementConstructor<any>> =
-  | { state: 'idle' }
+  | { state: 'shouldFetch' }
   | { state: 'ongoing' }
   | { state: 'failed'; error?: ApiError }
-  | { state: 'succeeded'; props: React.ComponentProps<Component> };
+  | { state: 'resolved'; props: React.ComponentProps<Component> };
 
 export type QueryProps<Component extends JSXElementConstructor<any>> = (
   dispatch: Dispatch,
-) => (state: State) => QueriedProps<Component>;
+) => (state: State) => [query: QueriedProps<Component>, shouldFetch: boolean];

@@ -43,6 +43,17 @@ export interface CreateAdminNotificationInput {
   trigger: Trigger;
 }
 
+export interface CreateUserInput {
+  adminId: UUID;
+  deletedAt?: string | null;
+  id?: UUID | null;
+  keyloggingEnabled?: boolean | null;
+  name: string;
+  screenshotsEnabled?: boolean | null;
+  screenshotsFrequency?: number | null;
+  screenshotsResolution?: number | null;
+}
+
 export interface CreateWaitlistedUserInput {
   email: string;
   id?: UUID | null;

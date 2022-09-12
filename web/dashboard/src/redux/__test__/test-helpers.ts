@@ -20,3 +20,7 @@ export function makeState(mutator: (state: State) => unknown = () => {}): State 
 export function makeGetState(mutator: (state: State) => unknown = () => {}): () => State {
   return () => makeState(mutator);
 }
+
+export function nextTick(): Promise<unknown> {
+  return new Promise<unknown>(setImmediate);
+}

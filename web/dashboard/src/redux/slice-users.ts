@@ -1,12 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { formatDate } from '@shared/lib/dates';
+import { isUnsaved, unsavedId } from '@shared/lib/id';
 import { ActivityItem } from '@dashboard/Users/Activity/ReviewDay';
 import { DateRangeInput } from '@dashboard/types/GraphQL';
 import { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
-import { Req, toMap, toEditableMap, editable, commit } from './helpers';
+import { Req, toMap, toEditableMap, editable, commit, isDirty } from './helpers';
 import { createResultThunk } from './thunk';
 import Current from '../environment';
 import { User } from '../api/users';
+import * as empty from './empty';
 import Result from '../api/Result';
 
 interface ActivityDay {
@@ -41,7 +43,9 @@ export interface UsersState {
 export function initialState(): UsersState {
   return {
     listRequest: Req.idle(),
-    users: {},
+    users: {
+      [unsavedId()]: editable(empty.user()),
+    },
     fetchUserRequest: {},
     updateUserRequest: {},
     activityOverviews: {},
@@ -153,18 +157,23 @@ export const slice = createSlice({
       state.activityOverviews[action.meta.arg.userId] = Req.fail(action.error);
     });
 
-    builder.addCase(updateUser.started, (state, { meta }) => {
+    builder.addCase(upsertUser.started, (state, { meta }) => {
       state.updateUserRequest[meta.arg] = Req.ongoing();
     });
 
-    builder.addCase(updateUser.failed, (state, { meta, error: [error] }) => {
+    builder.addCase(upsertUser.failed, (state, { meta, error }) => {
       state.updateUserRequest[meta.arg] = Req.fail(error);
     });
 
-    builder.addCase(updateUser.succeeded, (state, { meta }) => {
+    builder.addCase(upsertUser.succeeded, (state, { meta, payload }) => {
       state.updateUserRequest[meta.arg] = Req.succeed(void 0);
       const user = state.users[meta.arg];
-      user && (state.users[meta.arg] = commit(user));
+      if (user && isUnsaved(meta.arg)) {
+        state.users[payload] = editable({ ...user.draft, id: payload });
+        state.users[unsavedId()] = editable(empty.user());
+      } else if (user) {
+        state.users[meta.arg] = commit(user);
+      }
     });
 
     builder.addCase(deleteActivityItems.succeeded, (state, action) => {
@@ -240,22 +249,32 @@ export const deleteDevice = createResultThunk(
   Current.api.users.deleteDevice,
 );
 
-export const updateUser = createResultThunk(
-  `${slice.name}/updateUser`,
+export const upsertUser = createResultThunk(
+  `${slice.name}/upsertUser`,
   async (userId: UUID, { getState }) => {
     const { users, auth } = getState();
-    const user = users.users[userId]?.draft;
-    if (!user || !auth.admin?.id) {
-      return Result.error<[ApiError]>([{ type: `non_actionable` }]);
+    const user = users.users[userId];
+    const adminId = auth.admin?.id;
+    if (!user || !adminId) {
+      return Result.unexpectedError();
     }
-    const [updateUserResult, setKeychainsResult] = await Promise.all([
-      Current.api.users.updateUser({ ...user, adminId: auth.admin.id }),
-      Current.api.users.setUserKeychains(
-        userId,
-        user.keychains.map(({ id }) => id),
-      ),
-    ]);
-    return Result.merge(updateUserResult, setKeychainsResult);
+
+    const saveResult = await Current.api.users.upsertUser({ ...user.draft, adminId });
+    if (saveResult.data.type === `error`) {
+      return saveResult;
+    }
+
+    if (!isDirty(user, `keychains`)) {
+      return saveResult;
+    }
+
+    const serverId = saveResult.data.value;
+    const setKeychainsResult = await Current.api.users.setUserKeychains(
+      serverId, // in case the user was newly created, use id from server
+      user.draft.keychains.map(({ id }) => id),
+    );
+
+    return setKeychainsResult.map(() => serverId);
   },
 );
 

@@ -38,7 +38,7 @@ describe(`Profile.queryProps`, () => {
       };
     });
 
-    const query = queryProps((() => {}) as any)(state);
+    const [query] = queryProps((() => {}) as any)(state);
     expect(Query.props(query)?.methods.map((m) => m.deletable)).toEqual([
       false,
       false,
