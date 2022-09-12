@@ -10,7 +10,6 @@ export default {
 const Template: ComponentStory<typeof SelectMenu> = (args) => <SelectMenu {...args} />;
 
 export const Default = Template.bind({});
-
 Default.args = {
   options: [
     { value: `1`, display: `Do this` },
@@ -18,4 +17,10 @@ Default.args = {
     { value: `3`, display: `Do the other thing` },
   ],
   selectedOption: `Do this`,
+};
+
+export const Deemphasized = Template.bind({});
+Deemphasized.args = {
+  ...Default.args,
+  deemphasized: true,
 };

@@ -35,3 +35,10 @@ export function dateFromUrl(urlDate: string): Date {
   const [month, days, year] = urlDate.split(`-`);
   return new Date(Date.parse(`${year}-${month}-${days}T12:00:00.000Z`));
 }
+
+export function formatDateAndTimeFromInputElements(date: string, time: string): string {
+  const expiry = new Date(date);
+  expiry.setHours(Number(time.split(`:`)[0]));
+  expiry.setMinutes(Number(time.split(`:`)[1]));
+  return `${formatDate(expiry, `medium`)} at ${expiry.toLocaleTimeString(`en-US`)}`;
+}

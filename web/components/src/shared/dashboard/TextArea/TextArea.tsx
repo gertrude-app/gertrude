@@ -1,9 +1,8 @@
-import React, { useId, useState } from 'react';
+import React, { useId } from 'react';
 import cx from 'classnames';
-import Label from './Label';
+import Label from '../TextInput/Label';
 
 type Props = {
-  type: 'email' | 'text' | 'positiveInteger' | 'password' | 'date' | 'time';
   label?: string;
   value: string;
   setValue(value: string): unknown;
@@ -16,8 +15,7 @@ type Props = {
   prefix?: string;
 };
 
-const TextInput: React.FC<Props> = ({
-  type,
+const TextArea: React.FC<Props> = ({
   label,
   value,
   setValue,
@@ -29,7 +27,6 @@ const TextInput: React.FC<Props> = ({
   unit,
   prefix,
 }) => {
-  const [localValue, setLocalValue] = useState(value);
   const id = useId();
   return (
     <div className={cx(`flex flex-col space-y-1 w-full`, className)}>
@@ -40,20 +37,15 @@ const TextInput: React.FC<Props> = ({
             <h3 className="text-gray-500">{prefix}</h3>
           </div>
         )}
-        <input
+        <textarea
           id={id}
-          type={type === `positiveInteger` ? `number` : type}
-          value={localValue}
+          value={value}
           required={!!required}
           autoFocus={autoFocus}
           placeholder={placeholder}
           disabled={disabled}
           onChange={(e) => {
-            const value = e.target.value;
-            setLocalValue(value);
-            if (type !== `positiveInteger` || isPositiveInteger(value)) {
-              setValue(value);
-            }
+            setValue(e.target.value);
           }}
           className={`border border-gray-200 ring-0 ring-gray-200 outline-none py-3 px-4 focus:shadow-md transition duration-150 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 text-gray-600 flex-grow z-10 w-12 ${
             unit ? `rounded-r-none` : `rounded-r-lg`
@@ -69,12 +61,4 @@ const TextInput: React.FC<Props> = ({
   );
 };
 
-export default TextInput;
-
-function isPositiveInteger(value: string): boolean {
-  return (
-    value.match(/^[0-9]+$/) !== null &&
-    Number.isInteger(Number(value)) &&
-    Number(value) >= 0
-  );
-}
+export default TextArea;

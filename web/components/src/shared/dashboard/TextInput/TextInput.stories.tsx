@@ -23,7 +23,21 @@ Default.args = {
 
 export const WithUnit = Template.bind({});
 WithUnit.args = {
-  type: `email`,
+  type: `positiveInteger`,
   label: `Interval`,
   unit: `seconds`,
+};
+
+export const WithPrefix = Template.bind({});
+WithPrefix.args = {
+  type: `text`,
+  label: `URL`,
+  prefix: `https://`,
+};
+
+export const WithUnitAndPrefix = Template.bind({});
+WithUnitAndPrefix.args = {
+  ...WithPrefix.args,
+  label: `Web address`,
+  unit: `.com`,
 };
