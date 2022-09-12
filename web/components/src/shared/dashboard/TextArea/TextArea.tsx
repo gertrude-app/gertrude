@@ -62,12 +62,3 @@ const TextArea: React.FC<Props> = ({
 };
 
 export default TextArea;
-
-// not sure if you needed this, it was making the linter mad because it wasn't being used
-// function isPositiveInteger(value: string): boolean {
-//   return (
-//     value.match(/^[0-9]+$/) !== null &&
-//     Number.isInteger(Number(value)) &&
-//     Number(value) >= 0
-//   );
-// }

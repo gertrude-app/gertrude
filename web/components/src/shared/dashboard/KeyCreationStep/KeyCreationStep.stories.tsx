@@ -23,11 +23,7 @@ Enabled.args = {
 
 export const Disabled = Template.bind({});
 Disabled.args = {
-  title: <h1>Lorem ipsum</h1>,
-  currentStep: 1,
+  ...Enabled.args,
   index: 2,
-  children: <div>html goes here</div>,
   numSteps: 2,
-  stepName: `Lorem ipsum`,
-  mode: `create`,
 };

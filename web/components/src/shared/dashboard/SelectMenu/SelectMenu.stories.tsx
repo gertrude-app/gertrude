@@ -21,11 +21,6 @@ Default.args = {
 
 export const Deemphasized = Template.bind({});
 Deemphasized.args = {
-  options: [
-    { value: `1`, display: `Do this` },
-    { value: `2`, display: `Do that` },
-    { value: `3`, display: `Do the other thing` },
-  ],
-  selectedOption: `Do this`,
+  ...Default.args,
   deemphasized: true,
 };

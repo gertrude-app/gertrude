@@ -119,14 +119,6 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
           currentStep={currentStep}
           index={2}
         >
-          <div className="flex justify-end mr-2 items-center">
-            <label className="mr-2 text-gray-600">Advanced:</label>
-            <Toggle
-              enabled={advancedAddressOptions}
-              small
-              setEnabled={setAdvancedAddressOptions}
-            />
-          </div>
           <TextInput
             type={`text`}
             label={`Web address:`}
@@ -136,6 +128,14 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
             className="mb-7"
           />
           <div className="bg-gray-50 px-2 py-4 rounded-lg">
+            <div className="flex justify-start mr-2 items-center ml-2 mb-2">
+              <label className="mr-2 text-gray-600">Advanced:</label>
+              <Toggle
+                enabled={advancedAddressOptions}
+                small
+                setEnabled={setAdvancedAddressOptions}
+              />
+            </div>
             <div className="flex items-center justify-end">
               <label className="mr-2 text-gray-600 font-medium">Address type:</label>
               <SelectMenu
@@ -151,7 +151,6 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
                       value: advancedAddressOptions && `regular expression`,
                       display: `Regular expression`,
                     },
-                    // don't love this
                   ].filter((x) => typeof x.value === `string`) as {
                     value: string;
                     display: string;
@@ -160,7 +159,6 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
                 selectedOption={addressType}
                 setSelected={(option) => {
                   setAddressType(
-                    // or this
                     option as 'standard' | 'strict' | 'regular expression' | 'IP address',
                   );
                 }}
@@ -416,7 +414,6 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
                           value: advancedAddressOptions && `regular expression`,
                           display: `Regular expression`,
                         },
-                        // don't love this
                       ].filter((x) => typeof x.value === `string`) as {
                         value: string;
                         display: string;

@@ -20,8 +20,6 @@ Unselected.args = {
 
 export const Selected = Template.bind({});
 Selected.args = {
-  icon: `globe-americas`,
-  title: `Lorem ipsum`,
-  description: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam quidem, cum veniam eos, similique animi impedit.`,
+  ...Unselected.args,
   selected: true,
 };
