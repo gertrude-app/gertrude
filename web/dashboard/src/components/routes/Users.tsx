@@ -6,12 +6,16 @@ import { fetchUsers } from '../../redux/slice-users';
 import ApiErrorMessage from '../ApiErrorMessage';
 import { Family } from '@dashboard/types/GraphQL';
 import * as typesafe from '../../lib/typesafe';
+import { isUnsaved } from '../shared/lib/id';
 
 const Users: React.FC = () => {
   const dispatch = useDispatch();
   const { users, request } = useSelector((state) => ({
     request: state.users.listRequest,
-    users: typesafe.objectValues(state.users.users).map((u) => u.original),
+    users: typesafe
+      .objectValues(state.users.users)
+      .map((editable) => editable.original)
+      .filter((user) => !isUnsaved(user.id)),
   }));
 
   useEffect(() => {

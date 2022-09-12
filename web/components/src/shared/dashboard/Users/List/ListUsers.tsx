@@ -21,8 +21,8 @@ const Users: React.FC<Props> = ({ users }) => (
             ))}
           </div>
           <Button
-            type="button"
-            onClick={() => {}}
+            type="link"
+            to="/users/new"
             color="primary-violet"
             className="self-center mb-16"
           >

@@ -2,16 +2,16 @@ import { JSXElementConstructor } from 'react';
 import { QueriedProps } from './store';
 
 export class Query {
-  static succeed<T extends JSXElementConstructor<any>>(
+  static resolve<T extends JSXElementConstructor<any>>(
     props: React.ComponentProps<T>,
   ): QueriedProps<T> {
-    return { state: `succeeded`, props };
+    return { state: `resolved`, props };
   }
 
   static props<T extends JSXElementConstructor<any>>(
     query: QueriedProps<T>,
   ): React.ComponentProps<T> | undefined {
-    if (query.state === `succeeded`) {
+    if (query.state === `resolved`) {
       return query.props;
     }
     return undefined;
@@ -21,6 +21,22 @@ export class Query {
 export class Req {
   static succeed<T>(payload: T): RequestState<T> {
     return { state: `succeeded`, payload };
+  }
+
+  static toUnresolvedQuery<E extends ApiError>(
+    req?: RequestState<never, E>,
+  ): QueriedProps<never> {
+    switch (req?.state) {
+      case undefined: /* fallthrough */
+      case `idle`:
+        return { state: `shouldFetch` };
+      case `ongoing`:
+        return { state: `ongoing` };
+      case `failed`:
+        return { state: `failed`, error: req.error };
+      case `succeeded`:
+        throw new Error(`unreachable`);
+    }
   }
 
   static fail<E>(error: E | undefined = undefined): RequestState<never, E> {
@@ -100,8 +116,13 @@ export function editable<T extends { id: UUID }>(original: T): Editable<T> {
   return { original, draft: JSON.parse(JSON.stringify(original)) };
 }
 
-export function isDirty<T extends { id: UUID }>(editable: Editable<T>): boolean {
-  return JSON.stringify(editable.original) !== JSON.stringify(editable.draft);
+export function isDirty<T extends { id: UUID }>(
+  editable: Editable<T>,
+  prop?: keyof T,
+): boolean {
+  const draft = prop ? editable.draft[prop] : editable.draft;
+  const original = prop ? editable.original[prop] : editable.original;
+  return JSON.stringify(original) !== JSON.stringify(draft);
 }
 
 export async function spinnerMin<T>(promise: Promise<T>, delayMs = 750): Promise<T> {

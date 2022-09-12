@@ -21,14 +21,18 @@ export default class Result<T, E> {
     return new Result<never, E>({ type: `error`, error });
   }
 
+  public static unexpectedError(): Result<never, ApiError> {
+    return Result.error({ type: `non_actionable` });
+  }
+
   public static merge<TA, TB, E>(
     a: Result<TA, E>,
     b: Result<TB, E>,
-  ): Result<[TA, TB], [E, E?]> {
+  ): Result<[TA, TB], E> {
     if (a.data.type === `error`) {
-      return Result.error([a.data.error, b.error]);
+      return Result.error(a.data.error);
     } else if (b.data.type === `error`) {
-      return Result.error([b.data.error, a.error]);
+      return Result.error(b.data.error);
     } else {
       return Result.success([a.data.value, b.data.value]);
     }
@@ -38,7 +42,7 @@ export default class Result<T, E> {
     success?: (value: T) => unknown;
     error?: (error: E) => unknown;
   }): void {
-    this.map({
+    this.mapBoth({
       success: config.success ?? ((value) => value),
       error: config.error ?? ((error) => error),
     });
@@ -48,7 +52,15 @@ export default class Result<T, E> {
     return this.with({ error: handler });
   }
 
-  public map<NewT, NewE>(config: {
+  public map<NewT>(transform: (value: T) => NewT): Result<NewT, E> {
+    if (this.data.type === `success`) {
+      return Result.success(transform(this.data.value));
+    } else {
+      return Result.error(this.data.error);
+    }
+  }
+
+  public mapBoth<NewT, NewE>(config: {
     success: (value: T) => NewT;
     error: (error: E) => NewE;
   }): Result<NewT, NewE> {
@@ -63,7 +75,7 @@ export default class Result<T, E> {
     mapSuccess: (value: T) => NewT,
     extractActionable?: ExtractActionableError,
   ): Result<NewT, ApiError> {
-    return this.map({
+    return this.mapBoth({
       success: mapSuccess,
       error: (error) => toApiError(error, extractActionable),
     });
