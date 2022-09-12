@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { v4 as uuid } from 'uuid';
 import ListKeychains from '@dashboard/Keychains/ListKeychains';
 import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
@@ -6,6 +7,7 @@ import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
 import {
   cancelKeychainEntityDelete,
+  createKeychainInitiated,
   deleteKeychain,
   fetchAdminKeychains,
   startKeychainEntityDelete,
@@ -13,6 +15,7 @@ import {
 
 const Keychains: React.FC = () => {
   const dispatch = useDispatch();
+  const adminId = useSelector((state) => state.auth.admin?.id ?? ``);
   const request = useSelector((state) => state.keychains.listAdminKeychainsRequest);
   const deleteId = useSelector((state) => state.keychains.deleting.keychain);
   const keychains = useSelector((state) =>
@@ -45,6 +48,7 @@ const Keychains: React.FC = () => {
         confirm: () => deleteId && dispatch(deleteKeychain(deleteId)),
         cancel: () => dispatch(cancelKeychainEntityDelete(`keychain`)),
       }}
+      onCreateNew={() => dispatch(createKeychainInitiated({ id: uuid(), adminId }))}
     />
   );
 };

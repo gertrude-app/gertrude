@@ -1,10 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Keychain } from '../api/keychains';
 import Current from '../environment';
-import { Req, toEditableMap } from './helpers';
+import { editable, Req, toEditableMap } from './helpers';
 import { createResultThunk } from './thunk';
+import * as empty from './empty';
 
 export interface KeychainsState {
+  fetchAdminKeychainRequest: RequestState;
   listAdminKeychainsRequest: RequestState;
   adminKeychains: Record<UUID, Editable<Keychain>>;
   deleting: {
@@ -16,6 +18,7 @@ type DeletableEntity = 'keychain';
 
 export function initialState(): KeychainsState {
   return {
+    fetchAdminKeychainRequest: Req.idle(),
     listAdminKeychainsRequest: Req.idle(),
     adminKeychains: {},
     deleting: {},
@@ -26,6 +29,12 @@ export const slice = createSlice({
   name: `keychains`,
   initialState,
   reducers: {
+    createKeychainInitiated(state, action: PayloadAction<{ id: UUID; adminId: UUID }>) {
+      state.adminKeychains[action.payload.id] = {
+        isNew: true,
+        ...editable(empty.keychain(action.payload.id, action.payload.adminId)),
+      };
+    },
     startKeychainEntityDelete(
       state,
       action: PayloadAction<{ type: DeletableEntity; id: UUID }>,
@@ -73,6 +82,10 @@ export const deleteKeychain = createResultThunk(
   Current.api.keychains.deleteKeychain,
 );
 
-export const { startKeychainEntityDelete, cancelKeychainEntityDelete } = slice.actions;
+export const {
+  startKeychainEntityDelete,
+  cancelKeychainEntityDelete,
+  createKeychainInitiated,
+} = slice.actions;
 
 export default slice.reducer;

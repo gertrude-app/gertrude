@@ -6,6 +6,7 @@ import authReducer from './slice-auth';
 import usersReducer from './slice-users';
 import adminReducer from './slice-admin';
 import keychainsReducer from './slice-keychains';
+import urlReducer from './slice-url';
 import storageMiddleware from './middleware-storage';
 import toastMiddleware from './middleware-toast';
 import redirectMiddleware from './middleware-redirect';
@@ -18,6 +19,7 @@ export const store = configureStore({
     menu: menuReducer,
     waitlist: waitlistReducer,
     users: usersReducer,
+    url: urlReducer,
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware().concat([

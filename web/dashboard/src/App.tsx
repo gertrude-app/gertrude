@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import AuthedChrome from './components/Authed';
 import Dashboard from './components/routes/Dashboard';
 import Login from './components/routes/Login';
 import MagicLink from './components/routes/MagicLink';
 import JoinWaitlist from './components/routes/JoinWaitlist';
 import AdminProfile from './components/routes/AdminProfile';
+import Keychain from './components/routes/Keychain';
 import Users from './components/routes/Users';
 import useWindowWidth from './hooks/window-width';
-import { useDispatch, useSelector } from './redux/hooks';
+import { useDispatch, useRedirect, useSelector } from './redux/hooks';
 import { windowWidthChanged } from './redux/slice-menu';
 import User from './components/routes/User';
 import UserActivityOverview from './components/routes/UserActivityOverview';
@@ -26,6 +27,11 @@ const App: React.FC = () => {
     }
   }, [dispatch, currentWindowWidth, stateWindowWidth]);
 
+  const redirect = useRedirect();
+  if (redirect) {
+    return <Navigate to={redirect} />;
+  }
+
   return (
     <Routes>
       {/* unauthed routes */}
@@ -37,7 +43,10 @@ const App: React.FC = () => {
       <Route path="/" element={<AuthedChrome />}>
         <Route index element={<Dashboard />} />
         <Route path="profile" element={<AdminProfile />} />
-        <Route path="keychains" element={<Keychains />} />
+        <Route path="keychains">
+          <Route index element={<Keychains />} />
+          <Route path=":keychainId" element={<Keychain />} />
+        </Route>
         <Route path="users">
           <Route index element={<Users />} />
           <Route path=":userId">

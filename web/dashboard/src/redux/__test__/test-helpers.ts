@@ -5,6 +5,7 @@ import { initialState as menuInitialState } from '../slice-menu';
 import { initialState as waitlistInitialState } from '../slice-waitlist';
 import { initialState as adminInitialState } from '../slice-admin';
 import { initialState as keychainsInitialState } from '../slice-keychains';
+import { initialState as urlInitialState } from '../slice-url';
 
 export function makeState(mutator: (state: State) => unknown = () => {}): State {
   const state: State = {
@@ -14,6 +15,7 @@ export function makeState(mutator: (state: State) => unknown = () => {}): State 
     menu: menuInitialState(),
     waitlist: waitlistInitialState(),
     users: usersInitialState(),
+    url: urlInitialState(),
   };
   mutator(state);
   return state;

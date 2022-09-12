@@ -8,9 +8,10 @@ import { ConfirmDeleteEntity } from '../../Modal';
 type Props = {
   keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
   remove: ConfirmableEntityAction;
+  onCreateNew(): unknown;
 };
 
-const ListKeychains: React.FC<Props> = ({ keychains, remove }) => (
+const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
   <div className="px-0 sm:px-4">
     <PageHeading icon="key">Keychains</PageHeading>
     <p className="mt-6 text-base antialiased text-gray-600">
@@ -34,7 +35,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove }) => (
       ))}
     </div>
     <div className="mt-10 flex justify-end border-t pt-8">
-      <Button type="button" onClick={() => {}} color="primary-violet">
+      <Button type="button" onClick={onCreateNew} color="primary-violet">
         <i className="fa fa-plus mr-2" /> Create keychain
       </Button>
     </div>
