@@ -2,6 +2,7 @@ import React from 'react';
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import Button from '../../Button';
+import { capitalize } from '../../lib/string';
 
 interface Props {
   type: 'destructive' | 'default' | 'container';
@@ -52,7 +53,7 @@ const Modal: React.FC<Props> = ({
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl">
-              {type === 'container' ? (
+              {type === `container` ? (
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-4">
                   <div className="flex justify-start items-center mb-5">
                     <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500">
@@ -62,9 +63,9 @@ const Modal: React.FC<Props> = ({
                     </div>
                     <Dialog.Title
                       as="h3"
-                      className="text-xl ml-4 font-semibold leading-6 text-gray-900 capitalize"
+                      className="text-xl ml-4 font-semibold leading-6 text-gray-900"
                     >
-                      {title}
+                      {capitalize(title)}
                     </Dialog.Title>
                   </div>
                   <div>{children}</div>
@@ -80,9 +81,9 @@ const Modal: React.FC<Props> = ({
                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                       <Dialog.Title
                         as="h3"
-                        className="text-lg font-semibold leading-6 text-gray-900 capitalize"
+                        className="text-lg font-semibold leading-6 text-gray-900"
                       >
-                        {title}
+                        {capitalize(title)}
                       </Dialog.Title>
                       <div className="mt-2">
                         {children && <p className="text-sm text-gray-500">{children}</p>}
@@ -104,7 +105,7 @@ const Modal: React.FC<Props> = ({
                 <Button
                   type="button"
                   small
-                  color={type === 'destructive' ? 'secondary-warning' : 'primary-violet'}
+                  color={type === `destructive` ? `secondary-warning` : `primary-violet`}
                   className="w-[100%] sm:w-auto"
                   onClick={onPrimaryClick}
                 >
