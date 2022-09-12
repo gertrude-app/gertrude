@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ListAdminKeychains } from '../api/admin/__generated__/ListAdminKeychains';
+import { Keychain } from '../api/keychains';
 import Current from '../environment';
-import { Req } from './helpers';
+import { Req, toEditableMap } from './helpers';
 import { createResultThunk } from './thunk';
 
 export interface KeychainsState {
-  listKeychainsRequest: RequestState<ListAdminKeychains['keychains']>;
+  listAdminKeychainsRequest: RequestState;
+  adminKeychains: Record<UUID, Editable<Keychain>>;
   deleting: {
     keychain?: UUID;
   };
@@ -15,7 +16,8 @@ type DeletableEntity = 'keychain';
 
 export function initialState(): KeychainsState {
   return {
-    listKeychainsRequest: Req.idle(),
+    listAdminKeychainsRequest: Req.idle(),
+    adminKeychains: {},
     deleting: {},
   };
 }
@@ -40,23 +42,23 @@ export const slice = createSlice({
     });
 
     builder.addCase(deleteKeychain.succeeded, (state, { meta }) => {
-      if (state.listKeychainsRequest.state === `succeeded`) {
-        state.listKeychainsRequest.payload = state.listKeychainsRequest.payload.filter(
-          (keychain) => keychain.id !== meta.arg,
-        );
-      }
+      delete state.adminKeychains[meta.arg];
     });
 
     builder.addCase(fetchAdminKeychains.started, (state) => {
-      state.listKeychainsRequest = Req.ongoing();
+      state.listAdminKeychainsRequest = Req.ongoing();
     });
 
     builder.addCase(fetchAdminKeychains.succeeded, (state, { payload }) => {
-      state.listKeychainsRequest = Req.succeed(payload);
+      state.listAdminKeychainsRequest = Req.succeed(void 0);
+      state.adminKeychains = {
+        ...state.adminKeychains,
+        ...toEditableMap(payload),
+      };
     });
 
     builder.addCase(fetchAdminKeychains.failed, (state, { error }) => {
-      state.listKeychainsRequest = Req.fail(error);
+      state.listAdminKeychainsRequest = Req.fail(error);
     });
   },
 });

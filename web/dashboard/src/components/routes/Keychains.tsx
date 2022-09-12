@@ -3,6 +3,7 @@ import ListKeychains from '@dashboard/Keychains/ListKeychains';
 import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
+import * as typesafe from '../../lib/typesafe';
 import {
   cancelKeychainEntityDelete,
   deleteKeychain,
@@ -12,8 +13,11 @@ import {
 
 const Keychains: React.FC = () => {
   const dispatch = useDispatch();
-  const request = useSelector((state) => state.keychains.listKeychainsRequest);
+  const request = useSelector((state) => state.keychains.listAdminKeychainsRequest);
   const deleteId = useSelector((state) => state.keychains.deleting.keychain);
+  const keychains = useSelector((state) =>
+    typesafe.objectValues(state.keychains.adminKeychains),
+  );
 
   const reqState = request.state;
   useEffect(() => {
@@ -30,10 +34,10 @@ const Keychains: React.FC = () => {
 
   return (
     <ListKeychains
-      keychains={request.payload.map((keychain) => ({
-        ...keychain,
-        description: keychain.description || undefined,
-        keys: keychain.keys.length,
+      keychains={keychains.map((keychain) => ({
+        ...keychain.original,
+        description: keychain.original.description || undefined,
+        keys: keychain.original.keys.length,
       }))}
       remove={{
         id: deleteId,
