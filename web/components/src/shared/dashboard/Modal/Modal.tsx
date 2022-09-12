@@ -12,6 +12,7 @@ interface Props {
   onPrimaryClick(): unknown;
   onDismiss(): unknown;
   children?: React.ReactNode;
+  icon: string;
 }
 
 const Modal: React.FC<Props> = ({
@@ -23,6 +24,7 @@ const Modal: React.FC<Props> = ({
   onDismiss,
   type,
   children,
+  icon,
 }) => (
   <Transition.Root show={isOpen} as={Fragment}>
     <Dialog as="div" className="relative z-10" onClose={onDismiss}>
@@ -54,9 +56,7 @@ const Modal: React.FC<Props> = ({
                 <div className="sm:flex sm:items-start">
                   <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500 sm:mx-0 zsm:h-10 zsm:w-10">
                     <i
-                      className={`fa fa-${
-                        type === 'destructive' ? 'exclamation-triangle' : 'info'
-                      } text-white -mt-px -translate-y-px text-2xl`}
+                      className={`fa fa-${icon} text-white -mt-px -translate-y-px text-2xl`}
                     />
                   </div>
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">

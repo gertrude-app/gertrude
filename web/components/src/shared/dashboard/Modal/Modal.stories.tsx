@@ -22,6 +22,7 @@ Default.args = {
       facere laudantium temporibus ea quasi.
     </>
   ),
+  icon: 'info',
 };
 
 export const Destructive = Template.bind({});
@@ -37,4 +38,5 @@ Destructive.args = {
       facere laudantium temporibus ea quasi.
     </>
   ),
+  icon: 'exclamation-triangle',
 };
