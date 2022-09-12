@@ -4,9 +4,9 @@ import Profile from '@dashboard/Profile';
 import { AdminNotificationMethod } from '@dashboard/types/Admin';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
-  cancelEntityDelete,
+  cancelAdminEntityDelete,
   fetchProfileData,
-  startEntityDelete,
+  startAdminEntityDelete,
   deleteNotification,
   deleteNotificationMethod,
   notificationChanged,
@@ -73,15 +73,16 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
         .filter(notNullish),
       deleteNotification: {
         id: deleteNotificationId,
-        start: (id) => dispatch(startEntityDelete({ type: `notification`, id })),
+        start: (id) => dispatch(startAdminEntityDelete({ type: `notification`, id })),
         confirm: () => dispatch(deleteNotification(deleteNotificationId ?? ``)),
-        cancel: () => dispatch(cancelEntityDelete(`notification`)),
+        cancel: () => dispatch(cancelAdminEntityDelete(`notification`)),
       },
       deleteMethod: {
         id: deleteMethodId,
-        start: (id) => dispatch(startEntityDelete({ type: `notificationMethod`, id })),
+        start: (id) =>
+          dispatch(startAdminEntityDelete({ type: `notificationMethod`, id })),
         confirm: () => dispatch(deleteNotificationMethod(deleteMethodId ?? ``)),
-        cancel: () => dispatch(cancelEntityDelete(`notificationMethod`)),
+        cancel: () => dispatch(cancelAdminEntityDelete(`notificationMethod`)),
       },
       pendingMethod: admin.pendingNotificationMethod,
       createNotification: () => dispatch(notificationCreated()),

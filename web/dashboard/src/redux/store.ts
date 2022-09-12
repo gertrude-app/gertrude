@@ -5,14 +5,16 @@ import menuReducer from './slice-menu';
 import authReducer from './slice-auth';
 import usersReducer from './slice-users';
 import adminReducer from './slice-admin';
+import keychainsReducer from './slice-keychains';
 import storageMiddleware from './middleware-storage';
 import toastMiddleware from './middleware-toast';
 import redirectMiddleware from './middleware-redirect';
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
     admin: adminReducer,
+    auth: authReducer,
+    keychains: keychainsReducer,
     menu: menuReducer,
     waitlist: waitlistReducer,
     users: usersReducer,

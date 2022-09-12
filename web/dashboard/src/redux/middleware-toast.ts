@@ -3,10 +3,10 @@ import { Action, Middleware } from '@reduxjs/toolkit';
 import { deleteActivityItems, deleteDevice, upsertUser, deleteUser } from './slice-users';
 import { ResultThunk } from './thunk';
 import { capitalize } from '../components/shared/lib/string';
+import { deleteKeychain } from './slice-keychains';
 import {
   confirmPendingNotificationMethod,
   createPendingNotificationMethod,
-  deleteKeychain,
   deleteNotification,
   deleteNotificationMethod,
   upsertNotification,
