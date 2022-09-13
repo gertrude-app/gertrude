@@ -38,6 +38,7 @@ export interface UsersState {
     device?: UUID;
     user?: UUID;
   };
+  deleted: UUID[];
 }
 
 export function initialState(): UsersState {
@@ -51,6 +52,7 @@ export function initialState(): UsersState {
     activityOverviews: {},
     activityDays: {},
     deleting: {},
+    deleted: [],
   };
 }
 
@@ -199,8 +201,9 @@ export const slice = createSlice({
       delete state.deleting.user;
     });
 
-    builder.addCase(deleteUser.succeeded, (state, action) => {
-      delete state.users[action.meta.arg];
+    builder.addCase(deleteUser.succeeded, (state, { meta }) => {
+      delete state.users[meta.arg];
+      state.deleted.push(meta.arg);
     });
 
     builder.addCase(deleteDevice.started, (state) => {

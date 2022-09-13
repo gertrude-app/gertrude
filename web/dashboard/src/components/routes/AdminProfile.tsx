@@ -36,8 +36,8 @@ const AdminProfile: React.FC = () => {
     return <Loading />;
   }
 
-  if (query.state === `failed`) {
-    return <ApiErrorMessage error={query.error} />;
+  if (query.state === `failed` || query.state === `entityDeleted`) {
+    return <ApiErrorMessage error={query.state === `failed` ? query.error : void 0} />;
   }
 
   return <Profile {...query.props} />;

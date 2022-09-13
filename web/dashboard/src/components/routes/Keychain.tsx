@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import EditKeychain from '@dashboard/Keychains/Edit';
 import { QueryProps } from '../../redux/store';
 import { useDispatch, useSelector } from '../../redux/hooks';
@@ -25,6 +25,10 @@ const Keychain: React.FC = () => {
     shouldFetch && dispatch(fetchAdminKeychain(id));
   }, [dispatch, id, shouldFetch]);
 
+  if (query.state === `entityDeleted`) {
+    return <Navigate to={query.redirectUrl} />;
+  }
+
   if (query.state === `shouldFetch` || query.state === `ongoing`) {
     return <Loading />;
   }
@@ -43,15 +47,18 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
     const keychain = state.keychains.adminKeychains[id];
     const fetchReq = state.keychains.fetchAdminKeychainRequest[id];
     const updateReq = state.keychains.updateAdminKeychainRequest[id];
-    const deleteId = state.keychains.deleting.keychain;
+    const deletingId = state.keychains.deleting.keychain;
+
+    if (state.keychains.deleted.includes(id)) {
+      return [Query.redirectDeleted(`/keychains`), false];
+    }
 
     if (!keychain && fetchReq?.state !== `succeeded`) {
       return [Req.toUnresolvedQuery(fetchReq), fetchReq?.state !== `failed`];
     }
 
     if (!keychain) {
-      // we get in this state briefly after a keychain is deleted
-      return [{ state: `ongoing` }, false];
+      return [Query.unexpectedError(), false];
     }
 
     return [
@@ -67,7 +74,7 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
         saveButtonDisabled:
           updateReq?.state === `ongoing` || (keychain.isNew ? false : !isDirty(keychain)),
         deleteKeychain: {
-          id: deleteId,
+          id: deletingId,
           start: () => dispatch(keychainEntityDeleteStarted({ type: `keychain`, id })),
           cancel: () => dispatch(keychainEntityDeleteCanceled(`keychain`)),
           confirm: () => dispatch(deleteKeychain(id)),

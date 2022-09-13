@@ -14,6 +14,7 @@ export interface KeychainsState {
   deleting: {
     keychain?: UUID;
   };
+  deleted: UUID[];
 }
 
 type DeletableEntity = 'keychain';
@@ -25,6 +26,7 @@ export function initialState(): KeychainsState {
     listAdminKeychainsRequest: Req.idle(),
     adminKeychains: {},
     deleting: {},
+    deleted: [],
   };
 }
 
@@ -101,6 +103,7 @@ export const slice = createSlice({
 
     builder.addCase(deleteKeychain.succeeded, (state, { meta }) => {
       delete state.adminKeychains[meta.arg];
+      state.deleted.push(meta.arg);
     });
 
     builder.addCase(fetchAdminKeychains.started, (state) => {

@@ -20,6 +20,10 @@ export class Query {
   public static unexpectedError(): QueriedProps<never> {
     return { state: `failed`, error: { type: `non_actionable` } };
   }
+
+  public static redirectDeleted(redirectUrl: string): QueriedProps<never> {
+    return { state: `entityDeleted`, redirectUrl };
+  }
 }
 
 export class Req {
