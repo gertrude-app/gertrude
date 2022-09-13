@@ -8,7 +8,6 @@ import SelectMenu from '../../../SelectMenu';
 import KeyScopeRadioOption from '../../../SelectableListItem';
 import Combobox, { ComboboxOption } from '../../../Combobox/Combobox';
 import RadioGroup from '../../../RadioGroup';
-import TextArea from '../../../TextArea';
 import { formatDateAndTimeFromInputElements } from '../../../../lib/dates';
 import SummaryLi from '../SummaryLi';
 import Label from '../../../TextInput/Label';
@@ -511,7 +510,8 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
             />
           </div>
         )}
-        <TextArea
+        <TextInput
+          type="textarea"
           value={comment}
           setValue={setComment}
           label="Comment:"

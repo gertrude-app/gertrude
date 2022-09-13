@@ -4,7 +4,6 @@ import { inflect } from '../../../lib/string';
 import { ConfirmableEntityAction } from '../../../types';
 import { ConfirmDeleteEntity } from '../../Modal';
 import PageHeading from '../../PageHeading';
-import TextArea from '../../TextArea';
 import TextInput from '../../TextInput';
 
 type Props = {
@@ -43,7 +42,13 @@ const EditKeychain: React.FC<Props> = ({
         setValue={setName}
         className="max-w-xl"
       />
-      <TextArea label="Description:" value={description} setValue={setDescription} />
+      <TextInput
+        type="textarea"
+        rows={5}
+        label="Description:"
+        value={description}
+        setValue={setDescription}
+      />
       <h2 className="mt-5 text-lg font-bold text-gray-700">
         {keys.length} {inflect(`key`, keys.length)}:
       </h2>
