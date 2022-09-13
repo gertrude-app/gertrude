@@ -30,7 +30,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
           description={description}
           removeText="Delete"
           onRemove={() => remove.start(id)}
-          editable
+          editUrl={`/keychains/${id}`}
         />
       ))}
     </div>

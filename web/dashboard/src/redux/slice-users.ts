@@ -58,10 +58,13 @@ export const slice = createSlice({
   name: `users`,
   initialState,
   reducers: {
-    startEntityDelete(state, action: PayloadAction<{ type: DeletableEntity; id: UUID }>) {
+    userEntityDeleteStarted(
+      state,
+      action: PayloadAction<{ type: DeletableEntity; id: UUID }>,
+    ) {
       state.deleting[action.payload.type] = action.payload.id;
     },
-    cancelEntityDelete(state, { payload: type }: PayloadAction<DeletableEntity>) {
+    userEntityDeleteCanceled(state, { payload: type }: PayloadAction<DeletableEntity>) {
       delete state.deleting[type];
     },
     userUpdated: (state, { payload }: PayloadAction<UserUpdate>) => {
@@ -297,7 +300,8 @@ export const deleteActivityItems = createResultThunk(
 
 // exports
 
-export const { userUpdated, startEntityDelete, cancelEntityDelete } = slice.actions;
+export const { userUpdated, userEntityDeleteStarted, userEntityDeleteCanceled } =
+  slice.actions;
 
 export default slice.reducer;
 

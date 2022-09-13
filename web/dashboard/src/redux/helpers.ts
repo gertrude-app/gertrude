@@ -16,6 +16,10 @@ export class Query {
     }
     return undefined;
   }
+
+  public static unexpectedError(): QueriedProps<never> {
+    return { state: `failed`, error: { type: `non_actionable` } };
+  }
 }
 
 export class Req {
@@ -109,7 +113,7 @@ export function revert<T extends { id: UUID }>({ original }: Editable<T>): Edita
 }
 
 export function commit<T extends { id: UUID }>({ draft }: Editable<T>): Editable<T> {
-  return editable(draft);
+  return { ...editable(draft), isNew: false };
 }
 
 export function editable<T extends { id: UUID }>(original: T): Editable<T> {

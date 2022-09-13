@@ -29,5 +29,5 @@ export const Editable = Template.bind({});
 Editable.args = {
   ...Shared.args,
   isPublic: false,
-  editable: true,
+  editUrl: `/keychains/1`,
 };

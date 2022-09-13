@@ -43,6 +43,15 @@ export interface CreateAdminNotificationInput {
   trigger: Trigger;
 }
 
+export interface CreateKeychainInput {
+  authorId: UUID;
+  deletedAt?: string | null;
+  description?: string | null;
+  id?: UUID | null;
+  isPublic?: boolean | null;
+  name: string;
+}
+
 export interface CreateUserInput {
   adminId: UUID;
   deletedAt?: string | null;
@@ -85,6 +94,15 @@ export interface UpdateAdminNotificationInput {
   id: UUID;
   methodId: UUID;
   trigger: Trigger;
+}
+
+export interface UpdateKeychainInput {
+  authorId: UUID;
+  deletedAt?: string | null;
+  description?: string | null;
+  id: UUID;
+  isPublic: boolean;
+  name: string;
 }
 
 export interface UpdateUserInput {

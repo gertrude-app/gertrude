@@ -39,6 +39,7 @@ export type QueriedProps<Component extends JSXElementConstructor<any>> =
   | { state: 'failed'; error?: ApiError }
   | { state: 'resolved'; props: React.ComponentProps<Component> };
 
-export type QueryProps<Component extends JSXElementConstructor<any>> = (
+export type QueryProps<Component extends JSXElementConstructor<any>, ExtraArg = void> = (
   dispatch: Dispatch,
+  extraArg: ExtraArg,
 ) => (state: State) => [query: QueriedProps<Component>, shouldFetch: boolean];

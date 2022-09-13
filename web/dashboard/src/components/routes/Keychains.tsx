@@ -6,11 +6,11 @@ import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
 import {
-  cancelKeychainEntityDelete,
+  keychainEntityDeleteCanceled,
   createKeychainInitiated,
   deleteKeychain,
   fetchAdminKeychains,
-  startKeychainEntityDelete,
+  keychainEntityDeleteStarted,
 } from '../../redux/slice-keychains';
 
 const Keychains: React.FC = () => {
@@ -44,9 +44,9 @@ const Keychains: React.FC = () => {
       }))}
       remove={{
         id: deleteId,
-        start: (id) => dispatch(startKeychainEntityDelete({ type: `keychain`, id })),
+        start: (id) => dispatch(keychainEntityDeleteStarted({ type: `keychain`, id })),
         confirm: () => deleteId && dispatch(deleteKeychain(deleteId)),
-        cancel: () => dispatch(cancelKeychainEntityDelete(`keychain`)),
+        cancel: () => dispatch(keychainEntityDeleteCanceled(`keychain`)),
       }}
       onCreateNew={() => dispatch(createKeychainInitiated({ id: uuid(), adminId }))}
     />
