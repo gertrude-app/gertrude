@@ -97,7 +97,7 @@ const Modal: React.FC<Props> = ({
                   type="button"
                   small
                   color="secondary-white"
-                  className="sm:mr-2 w-[100%] sm:w-auto mb-2 sm:mb-0"
+                  className="sm:m3-2 w-[100%] sm:w-auto mb-3 sm:mb-0"
                   onClick={onDismiss}
                 >
                   {secondaryButtonText}
