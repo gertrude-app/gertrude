@@ -1,4 +1,5 @@
 import React from 'react';
+import cx from 'classnames';
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import Button from '../../Button';
@@ -67,7 +68,12 @@ const Modal: React.FC<Props> = ({
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg lg:max-w-3xl">
+              <Dialog.Panel
+                className={cx(
+                  `relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg`,
+                  type === `container` && `lg:max-w-3xl`,
+                )}
+              >
                 {type === `container` ? (
                   <div className="bg-white px-4 pt-5 pb-4 sm:p-4">
                     <div className="flex justify-start items-center mb-5">
