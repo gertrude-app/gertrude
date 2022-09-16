@@ -23,7 +23,7 @@ const KeychainCard: React.FC<Props> = ({
   editUrl,
 }) => (
   <div className={cx(`rounded-xl shadow-lg flex`)}>
-    <div className="p-4 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-l-xl w-60 border border-r-0">
+    <div className="p-4 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-l-xl w-60 border border-r-0 shrink-0">
       <h1 className="text-white font-bold text-lg leading-6 mb-1.5">{name}</h1>
       <p className="text-sm text-white text-opacity-70">
         <span className="text-md font-bold">{keys}</span> keys
