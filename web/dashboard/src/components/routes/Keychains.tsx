@@ -19,7 +19,10 @@ const Keychains: React.FC = () => {
   const request = useSelector((state) => state.keychains.listAdminKeychainsRequest);
   const deleteId = useSelector((state) => state.keychains.deleting.keychain);
   const keychains = useSelector((state) =>
-    typesafe.objectValues(state.keychains.adminKeychains),
+    typesafe
+      .objectValues(state.keychains.adminKeychains)
+      // in case they started making a keychain and then navigated back here
+      .filter((keychain) => !keychain.isNew),
   );
 
   const reqState = request.state;
