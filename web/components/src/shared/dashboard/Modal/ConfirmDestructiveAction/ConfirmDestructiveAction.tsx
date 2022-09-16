@@ -21,7 +21,6 @@ const ConfirmDestructiveAction: React.FC<Props> = ({
   children,
 }) => (
   <Modal
-    icon="exclamation-triangle"
     type="destructive"
     title={title}
     primaryButtonText={confirmText}
