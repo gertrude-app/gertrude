@@ -129,7 +129,7 @@ function keychainProps(
     name: apiKeychain.name,
     description: apiKeychain.description ?? ``,
     isPublic: apiKeychain.isPublic,
-    keys: apiKeychain.keys.length,
+    numKeys: apiKeychain.keys.length,
   };
 }
 

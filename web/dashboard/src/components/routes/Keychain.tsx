@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import Loading from '../shared/Loading';
 import { isDirty, Query, Req } from '../../redux/helpers';
+import * as typesafe from '../../lib/typesafe';
 import {
   fetchAdminKeychain,
   keychainDescriptionUpdated,
@@ -66,7 +67,7 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
         isNew: keychain.isNew ?? false,
         name: keychain.draft.name,
         description: keychain.draft.description ?? ``,
-        keys: keychain.draft.keys,
+        keys: typesafe.objectValues(keychain.draft.keyRecords),
         setName: (name) => dispatch(keychainNameUpdated({ id, name })),
         setDescription: (description) =>
           dispatch(keychainDescriptionUpdated({ id, description })),

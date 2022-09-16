@@ -43,7 +43,7 @@ const Keychains: React.FC = () => {
       keychains={keychains.map((keychain) => ({
         ...keychain.original,
         description: keychain.original.description || undefined,
-        keys: keychain.original.keys.length,
+        numKeys: Object.values(keychain.original.keyRecords).length,
       }))}
       remove={{
         id: deleteId,

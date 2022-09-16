@@ -3,7 +3,6 @@ import Result from '../Result';
 import { gql, mutate } from '../apollo';
 import * as U from './__generated__/UpdateKeychain';
 import * as C from './__generated__/CreateKeychain';
-import { Keychain } from '.';
 
 export async function upsertKeychain(
   keychain: Editable<Keychain> & { adminId: UUID },

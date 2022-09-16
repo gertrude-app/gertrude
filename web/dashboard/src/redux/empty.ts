@@ -1,16 +1,14 @@
 import { unsavedId } from '@shared/lib/id';
 import { User } from '../api/users';
-import { Keychain } from '../api/keychains';
 
 export function keychain(id: UUID, adminId: UUID): Keychain {
   return {
-    __typename: `Keychain`,
     id,
     name: ``,
     description: ``,
     isPublic: false,
     authorId: adminId,
-    keys: [],
+    keyRecords: {},
   };
 }
 
