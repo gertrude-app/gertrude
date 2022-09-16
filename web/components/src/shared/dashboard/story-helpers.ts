@@ -35,7 +35,9 @@ export function adding<
   return items.map((item) => ({ ...add, ...item }));
 }
 
-export function confirmableEntityAction(): ConfirmableEntityAction {
+export function confirmableEntityAction<
+  StartArg = UUID,
+>(): ConfirmableEntityAction<StartArg> {
   return {
     start: () => {},
     confirm: () => {},

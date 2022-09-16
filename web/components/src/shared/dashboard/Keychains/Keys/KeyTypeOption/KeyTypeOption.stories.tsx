@@ -2,7 +2,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import KeyTypeOption from './KeyTypeOption';
 
 export default {
-  title: `Dashboard/Keys/KeyTypeOption`,
+  title: `Dashboard/Keychains/Keys/KeyTypeOption`,
   component: KeyTypeOption,
 } as ComponentMeta<typeof KeyTypeOption>;
 

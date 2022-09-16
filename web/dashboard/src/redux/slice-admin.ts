@@ -3,7 +3,6 @@ import { isUnsaved, unsavedId } from '@shared/lib/id';
 import { NotificationUpdate } from '@dashboard/Profile';
 import * as T from '@dashboard/types/Admin';
 import { Trigger } from '@dashboard/types/GraphQL';
-import { ListAdminKeychains } from '../api/admin/__generated__/ListAdminKeychains';
 import Current from '../environment';
 import { Req, editable, revert, commit } from './helpers';
 import * as typesafe from '../lib/typesafe';
@@ -15,10 +14,8 @@ export interface AdminState {
   notificationMethods: Record<UUID, T.AdminNotificationMethod>;
   notifications: Record<UUID, Editable<T.Notification> & { editing: boolean }>;
   saveNotificationRequests: Record<UUID, RequestState>;
-  listKeychainsRequest: RequestState<ListAdminKeychains['keychains']>;
   pendingNotificationMethod?: T.PendingNotificationMethod;
   deleting: {
-    keychain?: UUID;
     notification?: UUID;
     notificationMethod?: UUID;
   };
@@ -30,21 +27,23 @@ export function initialState(): AdminState {
     notificationMethods: {},
     notifications: {},
     saveNotificationRequests: {},
-    listKeychainsRequest: Req.idle(),
     deleting: {},
   };
 }
 
-type DeletableEntity = 'keychain' | 'notification' | 'notificationMethod';
+type DeletableEntity = 'notification' | 'notificationMethod';
 
 export const slice = createSlice({
   name: `admin`,
   initialState,
   reducers: {
-    startEntityDelete(state, action: PayloadAction<{ type: DeletableEntity; id: UUID }>) {
+    startAdminEntityDelete(
+      state,
+      action: PayloadAction<{ type: DeletableEntity; id: UUID }>,
+    ) {
       state.deleting[action.payload.type] = action.payload.id;
     },
-    cancelEntityDelete(state, { payload: type }: PayloadAction<DeletableEntity>) {
+    cancelAdminEntityDelete(state, { payload: type }: PayloadAction<DeletableEntity>) {
       delete state.deleting[type];
     },
     notificationCreated(state) {
@@ -134,18 +133,6 @@ export const slice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchAdminKeychains.started, (state) => {
-      state.listKeychainsRequest = Req.ongoing();
-    });
-
-    builder.addCase(fetchAdminKeychains.succeeded, (state, { payload }) => {
-      state.listKeychainsRequest = Req.succeed(payload);
-    });
-
-    builder.addCase(fetchAdminKeychains.failed, (state, { error }) => {
-      state.listKeychainsRequest = Req.fail(error);
-    });
-
     builder.addCase(fetchProfileData.started, (state) => {
       state.profileRequest = Req.ongoing();
     });
@@ -191,18 +178,6 @@ export const slice = createSlice({
 
     builder.addCase(fetchProfileData.failed, (state, { error }) => {
       state.profileRequest = Req.fail(error);
-    });
-
-    builder.addCase(deleteKeychain.started, (state) => {
-      delete state.deleting.keychain;
-    });
-
-    builder.addCase(deleteKeychain.succeeded, (state, { meta }) => {
-      if (state.listKeychainsRequest.state === `succeeded`) {
-        state.listKeychainsRequest.payload = state.listKeychainsRequest.payload.filter(
-          (keychain) => keychain.id !== meta.arg,
-        );
-      }
     });
 
     builder.addCase(deleteNotification.started, (state) => {
@@ -315,16 +290,6 @@ export const upsertNotification = createResultThunk(
   },
 );
 
-export const deleteKeychain = createResultThunk(
-  `${slice.name}/deleteKeychain`,
-  Current.api.keychains.deleteKeychain,
-);
-
-export const fetchAdminKeychains = createResultThunk(
-  `${slice.name}/fetchAdminKeychains`,
-  Current.api.admin.listKeychains,
-);
-
 export const createPendingNotificationMethod = createResultThunk(
   `${slice.name}/createPendingNotificationMethod`,
   async (_: void, { getState }) => {
@@ -348,8 +313,8 @@ export const confirmPendingNotificationMethod = createResultThunk(
 );
 
 export const {
-  startEntityDelete,
-  cancelEntityDelete,
+  startAdminEntityDelete,
+  cancelAdminEntityDelete,
   notificationChanged,
   notificationCreated,
   newNotificationMethodEvent,

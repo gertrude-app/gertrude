@@ -38,6 +38,7 @@ export interface UsersState {
     device?: UUID;
     user?: UUID;
   };
+  deleted: UUID[];
 }
 
 export function initialState(): UsersState {
@@ -51,6 +52,7 @@ export function initialState(): UsersState {
     activityOverviews: {},
     activityDays: {},
     deleting: {},
+    deleted: [],
   };
 }
 
@@ -58,10 +60,13 @@ export const slice = createSlice({
   name: `users`,
   initialState,
   reducers: {
-    startEntityDelete(state, action: PayloadAction<{ type: DeletableEntity; id: UUID }>) {
+    userEntityDeleteStarted(
+      state,
+      action: PayloadAction<{ type: DeletableEntity; id: UUID }>,
+    ) {
       state.deleting[action.payload.type] = action.payload.id;
     },
-    cancelEntityDelete(state, { payload: type }: PayloadAction<DeletableEntity>) {
+    userEntityDeleteCanceled(state, { payload: type }: PayloadAction<DeletableEntity>) {
       delete state.deleting[type];
     },
     userUpdated: (state, { payload }: PayloadAction<UserUpdate>) => {
@@ -196,8 +201,9 @@ export const slice = createSlice({
       delete state.deleting.user;
     });
 
-    builder.addCase(deleteUser.succeeded, (state, action) => {
-      delete state.users[action.meta.arg];
+    builder.addCase(deleteUser.succeeded, (state, { meta }) => {
+      delete state.users[meta.arg];
+      state.deleted.push(meta.arg);
     });
 
     builder.addCase(deleteDevice.started, (state) => {
@@ -297,7 +303,8 @@ export const deleteActivityItems = createResultThunk(
 
 // exports
 
-export const { userUpdated, startEntityDelete, cancelEntityDelete } = slice.actions;
+export const { userUpdated, userEntityDeleteStarted, userEntityDeleteCanceled } =
+  slice.actions;
 
 export default slice.reducer;
 

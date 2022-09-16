@@ -2,7 +2,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import KeyCreator from './KeyCreator';
 
 export default {
-  title: `Dashboard/Keys/KeyCreator`,
+  title: `Dashboard/Keychains/Keys/KeyCreator`,
   component: KeyCreator,
 } as ComponentMeta<typeof KeyCreator>;
 

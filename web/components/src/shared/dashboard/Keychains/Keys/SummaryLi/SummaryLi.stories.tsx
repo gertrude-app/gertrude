@@ -2,7 +2,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import SummaryLi from './SummaryLi';
 
 export default {
-  title: `Dashboard/Keys/SummaryLi`,
+  title: `Dashboard/Keychains/Keys/SummaryLi`,
   component: SummaryLi,
 } as ComponentMeta<typeof SummaryLi>;
 

@@ -2,7 +2,11 @@ type UUID = string;
 
 type EmailAddress = string;
 
-type Editable<T extends { id: UUID }> = { original: Readonly<T>; draft: T };
+type Editable<T extends { id: UUID }> = {
+  isNew?: boolean;
+  original: Readonly<T>;
+  draft: T;
+};
 
 type RequestState<T = void, E = ApiError> =
   | { state: 'idle' }

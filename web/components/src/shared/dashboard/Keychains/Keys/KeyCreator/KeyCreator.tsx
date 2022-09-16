@@ -2,17 +2,16 @@ import React, { useCallback, useEffect, useState } from 'react';
 import KeyCreationStep from '../KeyCreationStep';
 import cx from 'classnames';
 import KeyTypeOption from '../KeyTypeOption';
-import TextInput from '../TextInput';
-import Toggle from '../Toggle';
-import SelectMenu from '../SelectMenu';
-import KeyScopeRadioOption from '../SelectableListItem';
-import Combobox, { ComboboxOption } from '../Combobox/Combobox';
-import RadioGroup from '../RadioGroup';
-import TextArea from '../TextArea';
-import { formatDateAndTimeFromInputElements } from '../../lib/dates';
+import TextInput from '../../../TextInput';
+import Toggle from '../../../Toggle';
+import SelectMenu from '../../../SelectMenu';
+import KeyScopeRadioOption from '../../../SelectableListItem';
+import Combobox, { ComboboxOption } from '../../../Combobox/Combobox';
+import RadioGroup from '../../../RadioGroup';
+import { formatDateAndTimeFromInputElements } from '../../../../lib/dates';
 import SummaryLi from '../SummaryLi';
-import Label from '../TextInput/Label';
-import SelectableListItem from '../SelectableListItem';
+import Label from '../../../TextInput/Label';
+import SelectableListItem from '../../../SelectableListItem';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -511,7 +510,8 @@ const KeyCreator: React.FC<Props> = ({ mode }) => {
             />
           </div>
         )}
-        <TextArea
+        <TextInput
+          type="textarea"
           value={comment}
           setValue={setComment}
           label="Comment:"

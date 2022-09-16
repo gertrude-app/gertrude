@@ -1,5 +1,6 @@
 import { SubscriptionStatus } from '@dashboard/types/GraphQL';
 import Result from '../api/Result';
+import * as empty from '../redux/empty';
 import * as admin from '../api/admin';
 import * as users from '../api/users';
 import * as signup from '../api/signup';
@@ -30,9 +31,6 @@ export const throwingApiClient: ApiClient = {
     loginFromMagicLink: () => {
       throw new Error(`ApiClient.admin.loginFromMagicLink() not implemented.`);
     },
-    listKeychains: () => {
-      throw new Error(`ApiClient.admin.listKeychains() not implemented.`);
-    },
     getAdmin: () => {
       throw new Error(`ApiClient.admin.getAdmin() not implemented.`);
     },
@@ -59,6 +57,15 @@ export const throwingApiClient: ApiClient = {
   keychains: {
     deleteKeychain: () => {
       throw new Error(`ApiClient.keychains.deleteKeychain() not implemented.`);
+    },
+    listAdminKeychains: () => {
+      throw new Error(`ApiClient.keychains.listAdminKeychains() not implemented.`);
+    },
+    getAdminKeychain: () => {
+      throw new Error(`ApiClient.keychains.getAdminKeychain() not implemented.`);
+    },
+    upsertKeychain: () => {
+      throw new Error(`ApiClient.keychains.upsertKeychain() not implemented.`);
     },
   },
   users: {
@@ -108,9 +115,6 @@ export const noopApiClient: ApiClient = {
     loginFromMagicLink: async () => {
       return Result.success({ id: ``, token: `` });
     },
-    listKeychains: async () => {
-      return Result.success([]);
-    },
     getAdmin: async () => {
       return Result.success({
         __typename: `Admin`,
@@ -140,23 +144,22 @@ export const noopApiClient: ApiClient = {
     deleteKeychain: async () => {
       return Result.success(true);
     },
+    listAdminKeychains: async () => {
+      return Result.success([]);
+    },
+    getAdminKeychain: async () => {
+      return Result.success(empty.keychain(``, ``));
+    },
+    upsertKeychain: async () => {
+      return Result.true();
+    },
   },
   users: {
     list: async () => {
       return Result.success([]);
     },
     getUser: async () => {
-      return Result.success({
-        __typename: `User`,
-        id: ``,
-        name: ``,
-        screenshotsEnabled: false,
-        screenshotsResolution: 0,
-        screenshotsFrequency: 0,
-        keyloggingEnabled: false,
-        keychains: [],
-        devices: [],
-      });
+      return Result.success(empty.user());
     },
     upsertUser: async () => {
       return Result.success(``);

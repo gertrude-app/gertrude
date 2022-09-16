@@ -1,6 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import PillBadge from '../../PillBadge';
+import { Link } from 'react-router-dom';
 
 type Props = {
   name: string;
@@ -9,7 +10,7 @@ type Props = {
   isPublic: boolean;
   onRemove(): unknown;
   removeText?: string;
-  editable?: boolean;
+  editUrl?: string;
 };
 
 const KeychainCard: React.FC<Props> = ({
@@ -19,7 +20,7 @@ const KeychainCard: React.FC<Props> = ({
   description,
   onRemove,
   removeText = `Remove`,
-  editable = false,
+  editUrl,
 }) => (
   <div className={cx(`rounded-xl shadow-lg flex`)}>
     <div className="p-4 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-l-xl w-60 border border-r-0">
@@ -41,10 +42,13 @@ const KeychainCard: React.FC<Props> = ({
         )}
       </div>
       <div className="flex justify-end rounded-br-xl border-t bg-gray-50 pl-8 sm:pl-0">
-        {editable && (
-          <button className="px-5 py-2 text-gray-500 font-medium hover:bg-gray-100 transition duration-100">
+        {editUrl && (
+          <Link
+            to={editUrl}
+            className="px-5 py-2 text-gray-500 font-medium hover:bg-gray-100 transition duration-100"
+          >
             Edit
-          </button>
+          </Link>
         )}
         <button
           className="px-5 py-2 text-red-500 font-medium hover:bg-red-50 transition duration-100 rounded-br-xl"

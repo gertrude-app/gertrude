@@ -1,19 +1,29 @@
 import React, { useEffect } from 'react';
-import ListKeychains from '@dashboard/Keychains/ListKeychains';
+import { v4 as uuid } from 'uuid';
+import ListKeychains from '@dashboard/Keychains/List';
 import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
+import * as typesafe from '../../lib/typesafe';
 import {
-  cancelEntityDelete,
+  keychainEntityDeleteCanceled,
+  createKeychainInitiated,
   deleteKeychain,
   fetchAdminKeychains,
-  startEntityDelete,
-} from '../../redux/slice-admin';
+  keychainEntityDeleteStarted,
+} from '../../redux/slice-keychains';
 
 const Keychains: React.FC = () => {
   const dispatch = useDispatch();
-  const request = useSelector((state) => state.admin.listKeychainsRequest);
-  const deleteId = useSelector((state) => state.admin.deleting.keychain);
+  const adminId = useSelector((state) => state.auth.admin?.id ?? ``);
+  const request = useSelector((state) => state.keychains.listAdminKeychainsRequest);
+  const deleteId = useSelector((state) => state.keychains.deleting.keychain);
+  const keychains = useSelector((state) =>
+    typesafe
+      .objectValues(state.keychains.adminKeychains)
+      // in case they started making a keychain and then navigated back here
+      .filter((keychain) => !keychain.isNew),
+  );
 
   const reqState = request.state;
   useEffect(() => {
@@ -30,17 +40,18 @@ const Keychains: React.FC = () => {
 
   return (
     <ListKeychains
-      keychains={request.payload.map((keychain) => ({
-        ...keychain,
-        description: keychain.description || undefined,
-        keys: keychain.keys.length,
+      keychains={keychains.map((keychain) => ({
+        ...keychain.original,
+        description: keychain.original.description || undefined,
+        keys: keychain.original.keys.length,
       }))}
       remove={{
         id: deleteId,
-        start: (id) => dispatch(startEntityDelete({ type: `keychain`, id })),
+        start: (id) => dispatch(keychainEntityDeleteStarted({ type: `keychain`, id })),
         confirm: () => deleteId && dispatch(deleteKeychain(deleteId)),
-        cancel: () => dispatch(cancelEntityDelete(`keychain`)),
+        cancel: () => dispatch(keychainEntityDeleteCanceled(`keychain`)),
       }}
+      onCreateNew={() => dispatch(createKeychainInitiated({ id: uuid(), adminId }))}
     />
   );
 };

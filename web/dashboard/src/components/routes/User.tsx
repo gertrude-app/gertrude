@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import EditUser from '@dashboard/Users/EditUser';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
@@ -10,8 +10,8 @@ import {
   userUpdated,
   UserUpdate,
   upsertUser,
-  startEntityDelete,
-  cancelEntityDelete,
+  userEntityDeleteStarted,
+  userEntityDeleteCanceled,
   deleteDevice,
   deleteUser,
 } from '../../redux/slice-users';
@@ -25,12 +25,16 @@ import { isUnsaved, unsavedId } from '../shared/lib/id';
 
 const User: React.FC = () => {
   const dispatch = useDispatch();
-  const { userId = `` } = useParams<{ userId: string }>();
-  const [query, shouldFetch] = useSelector(queryProps(dispatch));
+  const { userId: id = `` } = useParams<{ userId: string }>();
+  const [query, shouldFetch] = useSelector(queryProps(dispatch, id));
 
   useEffect(() => {
-    shouldFetch && dispatch(fetchUser(userId));
-  }, [dispatch, userId, shouldFetch]);
+    shouldFetch && dispatch(fetchUser(id));
+  }, [dispatch, id, shouldFetch]);
+
+  if (query.state === `entityDeleted`) {
+    return <Navigate to={query.redirectUrl} />;
+  }
 
   if (query.state === `shouldFetch` || query.state === `ongoing`) {
     return <Loading />;
@@ -45,66 +49,70 @@ const User: React.FC = () => {
 
 export default User;
 
-export const queryProps: QueryProps<typeof EditUser> = (dispatch) => (appState) => {
-  const { userId = `` } = useParams<{ userId: string }>();
-  const id = userId === `new` ? unsavedId() : userId;
-  const state = appState.users;
-  const fetch = state.fetchUserRequest[id];
-  if (!isUnsaved(id) && fetch?.state !== `succeeded`) {
-    return [Req.toUnresolvedQuery(fetch), fetch?.state !== `failed`];
-  }
+export const queryProps: QueryProps<typeof EditUser, UUID> =
+  (dispatch, userId) => (appState) => {
+    const id = userId === `new` ? unsavedId() : userId;
+    const state = appState.users;
+    const fetch = state.fetchUserRequest[id];
 
-  const editable = state.users[id];
-  if (!editable) {
-    // we get in this state briefly after a user is deleted
-    return [{ state: `ongoing` }, false];
-  }
+    if (!isUnsaved(id) && fetch?.state !== `succeeded`) {
+      return [Req.toUnresolvedQuery(fetch), fetch?.state !== `failed`];
+    }
 
-  const user = editable.draft;
-  const update = state.updateUserRequest[id];
-  const deleteDeviceId = state.deleting.device;
-  const deleteUserId = state.deleting.user;
+    const editable = state.users[id];
 
-  function set(arg: Partial<UserUpdate>): void {
-    dispatch(userUpdated({ id, ...arg } as UserUpdate));
-  }
+    if (!editable && state.deleted.includes(userId)) {
+      return [Query.redirectDeleted(`/users`), false];
+    } else if (!editable) {
+      return [Query.unexpectedError(), false];
+    }
 
-  return [
-    Query.resolve({
-      isNew: isUnsaved(id),
-      name: user.name,
-      setName: (value) => set({ type: `name`, value }),
-      keyloggingEnabled: user.keyloggingEnabled,
-      setKeyloggingEnabled: (value) => set({ type: `keyloggingEnabled`, value }),
-      screenshotsEnabled: user.screenshotsEnabled,
-      setScreenshotsEnabled: (value) => set({ type: `screenshotsEnabled`, value }),
-      screenshotsResolution: user.screenshotsResolution,
-      setScreenshotsResolution: (value) => set({ type: `screenshotsResolution`, value }),
-      screenshotsFrequency: user.screenshotsFrequency,
-      setScreenshotsFrequency: (value) => set({ type: `screenshotsFrequency`, value }),
-      removeKeychain: (id) =>
-        dispatch(userUpdated({ id, type: `removeKeychain`, value: id })),
-      keychains: user.keychains.map(keychainProps),
-      devices: user.devices.map(deviceProps),
-      saveButtonDisabled:
-        !isUnsaved(id) && (!isDirty(editable) || update?.state === `ongoing`),
-      onSave: () => dispatch(upsertUser(id)),
-      deleteUser: {
-        id: deleteUserId,
-        start: () => dispatch(startEntityDelete({ type: `user`, id })),
-        confirm: () => dispatch(deleteUser(deleteUserId ?? ``)),
-        cancel: () => dispatch(cancelEntityDelete(`user`)),
-      },
-      deleteDevice: {
-        id: deleteDeviceId,
-        start: (id) => dispatch(startEntityDelete({ type: `device`, id })),
-        confirm: () => dispatch(deleteDevice(deleteDeviceId ?? ``)),
-        cancel: () => dispatch(cancelEntityDelete(`device`)),
-      },
-    }),
-    false,
-  ];
-};
+    const user = editable.draft;
+    const update = state.updateUserRequest[id];
+    const deleteDeviceId = state.deleting.device;
+    const deleteUserId = state.deleting.user;
+
+    function set(arg: Partial<UserUpdate>): void {
+      dispatch(userUpdated({ id, ...arg } as UserUpdate));
+    }
+
+    return [
+      Query.resolve({
+        isNew: isUnsaved(id),
+        name: user.name,
+        setName: (value) => set({ type: `name`, value }),
+        keyloggingEnabled: user.keyloggingEnabled,
+        setKeyloggingEnabled: (value) => set({ type: `keyloggingEnabled`, value }),
+        screenshotsEnabled: user.screenshotsEnabled,
+        setScreenshotsEnabled: (value) => set({ type: `screenshotsEnabled`, value }),
+        screenshotsResolution: user.screenshotsResolution,
+        setScreenshotsResolution: (value) =>
+          set({ type: `screenshotsResolution`, value }),
+        screenshotsFrequency: user.screenshotsFrequency,
+        setScreenshotsFrequency: (value) => set({ type: `screenshotsFrequency`, value }),
+        removeKeychain: (id) =>
+          dispatch(userUpdated({ id, type: `removeKeychain`, value: id })),
+        keychains: user.keychains.map(keychainProps),
+        devices: user.devices.map(deviceProps),
+        saveButtonDisabled:
+          !isUnsaved(id) && (!isDirty(editable) || update?.state === `ongoing`),
+        onSave: () => dispatch(upsertUser(id)),
+        deleteUser: {
+          id: deleteUserId,
+          start: () => dispatch(userEntityDeleteStarted({ type: `user`, id })),
+          confirm: () => dispatch(deleteUser(deleteUserId ?? ``)),
+          cancel: () => dispatch(userEntityDeleteCanceled(`user`)),
+        },
+        deleteDevice: {
+          id: deleteDeviceId,
+          start: (id) => dispatch(userEntityDeleteStarted({ type: `device`, id })),
+          confirm: () => dispatch(deleteDevice(deleteDeviceId ?? ``)),
+          cancel: () => dispatch(userEntityDeleteCanceled(`device`)),
+        },
+      }),
+      false,
+    ];
+  };
 
 // helpers
 
