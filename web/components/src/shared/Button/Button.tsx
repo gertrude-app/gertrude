@@ -56,7 +56,7 @@ const Button: React.FC<Props> = ({
   const rendersAsButton = props.type === `button` || props.type === `submit`;
   const classes = cx(
     colors,
-    `ring ring-offset-0 focus:ring-offset-4 shadow-sm rounded-lg font-bold [transition:100ms] outline-none block`,
+    `ring ring-offset-0 focus:ring-offset-2 shadow-sm rounded-lg font-bold [transition:100ms] outline-none block`,
     small ? `text-md px-5 py-2` : `text-lg px-10 py-2.5`,
     className,
     fullWidth ? `w-full` : `w-fit`,
