@@ -12,6 +12,9 @@ type Props = {
   onRemove(): unknown;
   removeText?: string;
   editUrl?: string;
+  small?: boolean;
+  selected?: boolean;
+  selectable?: boolean;
 };
 
 const KeychainCard: React.FC<Props> = ({
@@ -22,9 +25,16 @@ const KeychainCard: React.FC<Props> = ({
   onRemove,
   removeText = `Remove`,
   editUrl,
+  small = false,
+  selected = false,
+  selectable = false,
 }) => (
   <div
-    className={cx(`rounded-xl shadow-lg border bg-white flex flex-col justify-between`)}
+    className={cx(
+      `rounded-xl shadow-lg border bg-white flex flex-col justify-between transition duration-100`,
+      selected && 'bg-violet-50 border-violet-300',
+      selectable && !selected && 'hover:bg-gray-50 cursor-pointer',
+    )}
   >
     <div className="flex items-center">
       <div className="w-20 shrink-0 flex justify-center items-start">
@@ -33,41 +43,61 @@ const KeychainCard: React.FC<Props> = ({
         </div>
       </div>
       <div className="p-4 pl-0 flex-grow">
-        <div className="flex justify-between items-start">
+        <div
+          className={cx(`flex justify-between`, small ? 'items-center' : 'items-start')}
+        >
           <h2 className="font-medium text-lg text-gray-900">{name}</h2>
-          <h4 className="text-gray-500 shrink-0">
-            <span className="text-gray-600 font-medium">{keys}</span>{' '}
-            {inflect('key', keys)}
-          </h4>
+          <div className="flex flex-col items-end flex-grow">
+            <h4
+              className={cx('text-gray-500 shrink-0', small && isPublic && 'mb-1 mr-2')}
+            >
+              <span className="text-gray-600 font-medium">{keys}</span>{' '}
+              {inflect('key', keys)}
+            </h4>
+            {small && isPublic && <PillBadge type="green">Public</PillBadge>}
+          </div>
         </div>
-        <p className={cx(description ? `text-gray-600` : `text-gray-400 italic`, 'mt-2')}>
-          {description || 'No description'}
-        </p>
-      </div>
-    </div>
-    <div className="bg-gray-50 rounded-b-xl w-full flex justify-between items-center">
-      <div className="flex-grow ml-3">
-        {isPublic && (
-          <PillBadge type={'green'} className="border">
-            <i className="fa-solid fa-users mr-1 text-sm" /> Public
-          </PillBadge>
+        {small || (
+          <p
+            className={cx(description ? `text-gray-600` : `text-gray-400 italic`, 'mt-2')}
+          >
+            {description || 'No description'}
+          </p>
         )}
       </div>
-      <div>
-        <a
-          className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-gray-600 transition duration-100"
-          href={editUrl}
-        >
-          Edit
-        </a>
-        <button
-          className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-red-600 transition duration-100"
-          onClick={onRemove}
-        >
-          {removeText}
-        </button>
-      </div>
     </div>
+    {small || (
+      <div
+        className={cx(
+          'bg-gray-50 rounded-b-xl w-full flex justify-between items-center',
+          selected && 'bg-indigo-100/40',
+        )}
+      >
+        <div className="flex-grow ml-3">
+          {isPublic && (
+            <PillBadge type={'green'} className="border">
+              <i className="fa-solid fa-users mr-1 text-sm" /> Public
+            </PillBadge>
+          )}
+        </div>
+        <div className="flex items-stretch">
+          {editUrl && (
+            <a
+              className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-gray-600 transition duration-100 h-full select-none"
+              href={editUrl}
+            >
+              Edit
+            </a>
+          )}
+          <button
+            className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-red-600 transition duration-100 rounded-br-xl"
+            onClick={onRemove}
+          >
+            {removeText}
+          </button>
+        </div>
+      </div>
+    )}
   </div>
 );
 
