@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import PillBadge from '../../PillBadge';
-import { Link } from 'react-router-dom';
+import { inflect } from '../../../lib/string';
 
 type Props = {
   name: string;
@@ -11,6 +11,9 @@ type Props = {
   onRemove(): unknown;
   removeText?: string;
   editUrl?: string;
+  small?: boolean;
+  selected?: boolean;
+  selectable?: boolean;
 };
 
 const KeychainCard: React.FC<Props> = ({
@@ -21,43 +24,89 @@ const KeychainCard: React.FC<Props> = ({
   onRemove,
   removeText = `Remove`,
   editUrl,
+  small = false,
+  selected = false,
+  selectable = false,
 }) => (
-  <div className={cx(`rounded-xl shadow-lg flex`)}>
-    <div className="p-4 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-l-xl w-60 border border-r-0">
-      <h1 className="text-white font-bold text-lg leading-6 mb-1.5">{name}</h1>
-      <p className="text-sm text-white text-opacity-70">
-        <span className="text-md font-bold">{keys}</span> keys
-      </p>
-    </div>
-    <div className="flex flex-col justify-between flex-grow border border-l-0 rounded-r-xl bg-white">
-      <div className="relative p-3 flex justify-end sm:justify-start">
-        <p className="text-sm text-gray-500 mr-28 hidden sm:block min-h-[40px]">
-          {description || <i className="text-gray-400 antialiased">No description</i>}
-        </p>
-        {isPublic && (
-          <PillBadge type="green" small className="sm:absolute sm:right-2 top-2">
-            <i className={cx(`fa mr-2`, `fa-users text-green-500`)} />
-            Public
-          </PillBadge>
-        )}
+  <div
+    className={cx(
+      `rounded-xl shadow-lg border bg-white flex flex-col justify-between transition duration-100`,
+      selected && `bg-violet-50 border-violet-300`,
+      selectable && !selected && `hover:bg-gray-50 cursor-pointer`,
+      small && `min-h-[90px]`,
+    )}
+  >
+    <div className="flex items-center flex-grow">
+      <div className="w-20 shrink-0 flex justify-center items-start">
+        <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-fuchsia-500 rounded-full flex justify-center items-center text-white text-lg">
+          <i className="fa-solid fa-list" />
+        </div>
       </div>
-      <div className="flex justify-end rounded-br-xl border-t bg-gray-50 pl-8 sm:pl-0">
-        {editUrl && (
-          <Link
-            to={editUrl}
-            className="px-5 py-2 text-gray-500 font-medium hover:bg-gray-100 transition duration-100"
-          >
-            Edit
-          </Link>
-        )}
-        <button
-          className="px-5 py-2 text-red-500 font-medium hover:bg-red-50 transition duration-100 rounded-br-xl"
-          onClick={onRemove}
+      <div className="p-4 pl-0 flex-grow">
+        <div
+          className={cx(
+            `flex justify-between relative right-0`,
+            small ? `items-center` : `items-start`,
+          )}
         >
-          {removeText}
-        </button>
+          <h2 className="font-medium text-lg text-gray-900 truncate sm:whitespace-normal max-w-[110px] sm:max-w-none">
+            {name}
+          </h2>
+          <div className="flex flex-col items-end flex-grow min-w-[100px]">
+            <h4
+              className={cx(
+                `text-gray-500 shrink-0 min-w-max`,
+                small && isPublic && `mb-1 mr-2`,
+              )}
+            >
+              <span className="text-gray-600 font-medium shrink-0">{keys}</span>
+              {` `}
+              {inflect(`key`, keys)}
+            </h4>
+            {small && isPublic && <PillBadge type="green">Public</PillBadge>}
+          </div>
+        </div>
+        {small || (
+          <p
+            className={cx(description ? `text-gray-600` : `text-gray-400 italic`, `mt-2`)}
+          >
+            {description || `No description`}
+          </p>
+        )}
       </div>
     </div>
+    {small || (
+      <div
+        className={cx(
+          `bg-gray-50 rounded-b-xl w-full flex justify-between items-center`,
+          selected && `bg-indigo-100/40`,
+        )}
+      >
+        <div className="flex-grow ml-3">
+          {isPublic && (
+            <PillBadge type={`green`} className="border">
+              <i className="fa-solid fa-users mr-1 text-sm" /> Public
+            </PillBadge>
+          )}
+        </div>
+        <div className="flex items-stretch">
+          {editUrl && (
+            <a
+              className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-gray-600 transition duration-100 h-full select-none"
+              href={editUrl}
+            >
+              Edit
+            </a>
+          )}
+          <button
+            className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-red-600 transition duration-100 rounded-br-xl"
+            onClick={onRemove}
+          >
+            {removeText}
+          </button>
+        </div>
+      </div>
+    )}
   </div>
 );
 

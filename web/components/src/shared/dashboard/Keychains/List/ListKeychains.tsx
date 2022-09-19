@@ -20,7 +20,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
       a specific school class, etc. Or, you can put all of your keys in one keychain if
       you prefer.
     </p>
-    <div className="grid grid-cols-1 lg+:grid-cols-2 gap-10 lg+:gap-8 xl:gap-10 2xl:grid-cols-3 mt-10">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 lg+:gap-8 xl:gap-10 2xl:grid-cols-3 mt-10">
       {keychains.map(({ id, isPublic, name, description, keys }) => (
         <KeychainCard
           key={id}
