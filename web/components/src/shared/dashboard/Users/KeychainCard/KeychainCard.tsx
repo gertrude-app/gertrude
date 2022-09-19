@@ -44,10 +44,15 @@ const KeychainCard: React.FC<Props> = ({
       </div>
       <div className="p-4 pl-0 flex-grow">
         <div
-          className={cx(`flex justify-between`, small ? `items-center` : `items-start`)}
+          className={cx(
+            `flex justify-between relative right-0`,
+            small ? `items-center` : `items-start`,
+          )}
         >
-          <h2 className="font-medium text-lg text-gray-900">{name}</h2>
-          <div className="flex flex-col items-end flex-grow">
+          <h2 className="font-medium text-lg text-gray-900 truncate max-w-[110px] xs:max-w-none">
+            {name}
+          </h2>
+          <div className="flex flex-col items-end flex-grow min-w-[100px]">
             <h4
               className={cx(
                 `text-gray-500 shrink-0 min-w-max`,

@@ -9,7 +9,7 @@ type Props = {
 };
 
 const KeychainPicker: React.FC<Props> = ({ keychains, publicKeychains }) => (
-  <div className="bg-gray-50 rounded-xl p-4">
+  <div className="sm:bg-gray-50 rounded-xl sm:p-4">
     {keychains.length !== 0 ? (
       <>
         <h2 className="text-lg font-bold text-gray-600 mb-3">Your keychains</h2>
