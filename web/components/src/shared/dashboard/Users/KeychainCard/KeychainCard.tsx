@@ -49,7 +49,7 @@ const KeychainCard: React.FC<Props> = ({
             small ? `items-center` : `items-start`,
           )}
         >
-          <h2 className="font-medium text-lg text-gray-900 truncate max-w-[110px] xs:max-w-none">
+          <h2 className="font-medium text-lg text-gray-900 truncate sm:whitespace-normal max-w-[110px] sm:max-w-none">
             {name}
           </h2>
           <div className="flex flex-col items-end flex-grow min-w-[100px]">
