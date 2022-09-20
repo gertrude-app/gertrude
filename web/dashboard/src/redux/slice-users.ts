@@ -32,6 +32,7 @@ export interface UsersState {
   users: Record<UUID, Editable<User>>;
   fetchUserRequest: Record<UUID, RequestState>;
   updateUserRequest: Record<UUID, RequestState>;
+  addDeviceRequest?: RequestState<UUID>;
   activityOverviews: Record<UUID, RequestState<GetActivityOverview>>;
   activityDays: Record<ActivityDayKey, RequestState<ActivityDay>>;
   deleting: {
@@ -68,6 +69,9 @@ export const slice = createSlice({
     },
     userEntityDeleteCanceled(state, { payload: type }: PayloadAction<DeletableEntity>) {
       delete state.deleting[type];
+    },
+    addDeviceDismissed(state) {
+      delete state.addDeviceRequest;
     },
     userUpdated: (state, { payload }: PayloadAction<UserUpdate>) => {
       const draft = state.users[payload.id]?.draft;
@@ -218,6 +222,18 @@ export const slice = createSlice({
         }
       }
     });
+
+    builder.addCase(createUserToken.started, (state) => {
+      state.addDeviceRequest = Req.ongoing();
+    });
+
+    builder.addCase(createUserToken.succeeded, (state, { payload }) => {
+      state.addDeviceRequest = Req.succeed(payload);
+    });
+
+    builder.addCase(createUserToken.failed, (state, { error }) => {
+      state.addDeviceRequest = Req.fail(error);
+    });
   },
 });
 
@@ -301,10 +317,19 @@ export const deleteActivityItems = createResultThunk(
   },
 );
 
+export const createUserToken = createResultThunk(
+  `${slice.name}/createUserToken`,
+  Current.api.users.createUserToken,
+);
+
 // exports
 
-export const { userUpdated, userEntityDeleteStarted, userEntityDeleteCanceled } =
-  slice.actions;
+export const {
+  userUpdated,
+  addDeviceDismissed,
+  userEntityDeleteStarted,
+  userEntityDeleteCanceled,
+} = slice.actions;
 
 export default slice.reducer;
 

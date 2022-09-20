@@ -28,6 +28,12 @@ Default.args = {
   icon: `info`,
 };
 
+export const Loading = Template.bind({});
+Loading.args = {
+  ...Default.args,
+  loading: true,
+};
+
 export const Destructive = Template.bind({});
 Destructive.args = {
   ...Default.args,

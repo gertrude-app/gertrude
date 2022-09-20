@@ -63,6 +63,14 @@ export interface CreateUserInput {
   screenshotsResolution?: number | null;
 }
 
+export interface CreateUserTokenInput {
+  deletedAt?: string | null;
+  deviceId?: UUID | null;
+  id?: UUID | null;
+  userId: UUID;
+  value?: UUID | null;
+}
+
 export interface CreateWaitlistedUserInput {
   email: string;
   id?: UUID | null;

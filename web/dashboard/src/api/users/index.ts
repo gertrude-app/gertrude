@@ -7,4 +7,5 @@ export { upsertUser } from './upsertUser';
 export { setUserKeychains } from './setUserKeychains';
 export { deleteDevice } from './deleteDevice';
 export { deleteUser } from './deleteUser';
+export { createUserToken } from './createUserToken';
 export type { User } from './types';
