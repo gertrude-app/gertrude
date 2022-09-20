@@ -10,6 +10,9 @@ const Template: ComponentStory<typeof RadioGroup> = (args) => <RadioGroup {...ar
 
 export const Default = Template.bind({});
 Default.args = {
-  options: [`This way`, `That way`, `The other way`],
-  selectedOption: `This way`,
+  options: [
+    { display: `Option 1`, value: `option1` },
+    { display: `Option 2`, value: `option2` },
+  ],
+  selectedOption: `option1`,
 };

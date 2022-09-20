@@ -2,31 +2,36 @@ import cx from 'classnames';
 import React, { useState } from 'react';
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
 
-export type ComboboxOption = { name: string; id: string };
-
-interface Props {
-  options: Array<ComboboxOption>;
-  selectedOption: ComboboxOption;
-  setSelectedOption(o: ComboboxOption): void;
+interface Props<Value extends string = string> {
+  options: Array<{ value: Value; display: string }>;
+  selected: { value: Value; display: string };
+  setSelected(selected: Value): void;
 }
 
-const Combobox: React.FC<Props> = ({ options, selectedOption, setSelectedOption }) => {
+function Combobox<Value extends string = string>({
+  options,
+  selected,
+  setSelected,
+}: Parameters<React.FC<Props<Value>>>[0]): ReturnType<React.FC<Props<Value>>> {
   const [query, setQuery] = useState(``);
-
   const filteredOptions =
     query === ``
       ? options
       : options.filter((option) => {
-          return option.name.toLowerCase().includes(query.toLowerCase());
+          return option.display.toLowerCase().includes(query.toLowerCase());
         });
 
   return (
-    <HeadlessCombobox as="div" value={selectedOption} onChange={setSelectedOption}>
+    <HeadlessCombobox
+      as="div"
+      value={selected}
+      onChange={(option) => setSelected(option.value)}
+    >
       <div className="relative mt-1 rounded-lg border">
         <HeadlessCombobox.Input
           className="w-full rounded-lg bg-white py-3 pl-4 pr-10 shadow border-none outline-none focus:ring-indigo-500 focus:ring-2 focus:ring-offset-1 sm:text-md transition duration-100"
           onChange={(event) => setQuery(event.target.value)}
-          displayValue={(option: ComboboxOption) => option.name}
+          displayValue={(option: { display: string }) => option.display}
         />
         <HeadlessCombobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-lg px-3 focus:outline-none hover:bg-gray-50">
           <i
@@ -39,7 +44,7 @@ const Combobox: React.FC<Props> = ({ options, selectedOption, setSelectedOption 
           <HeadlessCombobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
             {filteredOptions.map((option) => (
               <HeadlessCombobox.Option
-                key={option.id}
+                key={option.value}
                 value={option}
                 className={({ active }) =>
                   cx(
@@ -51,7 +56,7 @@ const Combobox: React.FC<Props> = ({ options, selectedOption, setSelectedOption 
                 {({ active, selected }) => (
                   <>
                     <span className={cx(`block truncate`, selected && `font-semibold`)}>
-                      {option.name}
+                      {option.display}
                     </span>
 
                     {selected && (
@@ -76,6 +81,6 @@ const Combobox: React.FC<Props> = ({ options, selectedOption, setSelectedOption 
       </div>
     </HeadlessCombobox>
   );
-};
+}
 
 export default Combobox;

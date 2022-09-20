@@ -1,4 +1,5 @@
 import { expect, test, it, describe, vi } from 'vitest';
+import { unsavedId } from '@dashboard/lib/id';
 import { Req, editable } from '../helpers';
 import Current from '../../environment';
 import reducer, {
@@ -10,7 +11,6 @@ import reducer, {
 import { nextTick, makeGetState, makeState } from './test-helpers';
 import * as mock from './mocks';
 import Result from '../../api/Result';
-import { unsavedId } from '../../components/shared/lib/id';
 
 describe(`deleteDevice`, () => {
   it(`removes device from root users state on success`, () => {

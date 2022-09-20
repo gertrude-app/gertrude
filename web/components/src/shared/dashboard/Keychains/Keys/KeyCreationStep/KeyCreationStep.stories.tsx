@@ -10,20 +10,22 @@ const Template: ComponentStory<typeof KeyCreationStep> = (args) => (
   <KeyCreationStep {...args} />
 );
 
-export const Enabled = Template.bind({});
-Enabled.args = {
+export const Open = Template.bind({});
+Open.args = {
+  mode: `edit`,
+  activeTitle: `Add an optional widget:`,
+  lookaheadTitle: `Do something`,
   title: <h1>Lorem ipsum</h1>,
   currentStep: 1,
   index: 1,
-  children: <div>html goes here</div>,
-  numSteps: 1,
-  stepName: `Lorem ipsum`,
-  mode: `create`,
+  children: <div>some html goes here</div>,
+  isLast: false,
+  setCurrentStep: () => {},
+  canAdvance: true,
 };
 
-export const Disabled = Template.bind({});
-Disabled.args = {
-  ...Enabled.args,
+export const Closed = Template.bind({});
+Closed.args = {
+  ...Open.args,
   index: 2,
-  numSteps: 2,
 };

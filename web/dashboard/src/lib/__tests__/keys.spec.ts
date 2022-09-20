@@ -1,7 +1,33 @@
 import { expect, test, describe } from 'vitest';
-import * as keys from '../keys';
+import * as key from '@dashboard/lib/keys';
 
-describe(`keys.parse()`, () => {
+describe(`key.category()`, () => {
+  test(`returns the "category" (app|website) of a key`, () => {
+    const cases: Array<[Key, 'app' | 'website']> = [
+      [
+        {
+          type: `skeleton`,
+          scope: { type: `identifiedAppSlug`, identifiedAppSlug: `foo` },
+        },
+        `app`,
+      ],
+
+      [
+        {
+          type: `domain`,
+          domain: `goats.com`,
+          scope: { type: `unrestricted` },
+        },
+        `website`,
+      ],
+    ];
+    test.each(cases)(`key categorized correctly`, (input, expected) => {
+      expect(key.category(input)).toBe(expected);
+    });
+  });
+});
+
+describe(`key.parse()`, () => {
   const cases: Array<[Record<string, unknown>, Key | boolean]> = [
     [{}, false],
     [
@@ -48,9 +74,9 @@ describe(`keys.parse()`, () => {
 
   test.each(cases)(`parse input %s`, (obj, isValid) => {
     if (isValid) {
-      expect(keys.parse(JSON.stringify(obj))).toEqual(obj);
+      expect(key.parse(JSON.stringify(obj))).toEqual(obj);
     } else {
-      expect(keys.parse(JSON.stringify(obj))).toBeNull();
+      expect(key.parse(JSON.stringify(obj))).toBeNull();
     }
   });
 });

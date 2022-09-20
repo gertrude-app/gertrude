@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import Button from '../../Button';
-import { capitalize } from '../../lib/string';
+import { capitalize } from '../lib/string';
 import LoadingSpinner from '../../LoadingSpinner';
 
 interface Props {

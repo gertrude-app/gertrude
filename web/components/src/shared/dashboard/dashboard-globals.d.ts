@@ -26,7 +26,7 @@ type ApiError =
 
 type SingleAppScope =
   | { type: 'bundleId'; bundleId: string }
-  | { type: 'identifiedAppSlug'; slug: string };
+  | { type: 'identifiedAppSlug'; identifiedAppSlug: string };
 
 type AppScope =
   | { type: `webBrowsers` }
@@ -44,6 +44,8 @@ type Key =
 type KeyRecord = {
   id: UUID;
   key: Key;
+  comment?: string | null;
+  expiration?: string | null;
 };
 
 type Keychain = {

@@ -1,4 +1,4 @@
-import { isUnsaved } from '@shared/lib/id';
+import { isUnsaved } from '@dashboard/lib/id';
 import { UpdateUserInput } from '@dashboard/types/GraphQL';
 import Result from '../Result';
 import { gql, mutate } from '../apollo';

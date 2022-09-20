@@ -8,24 +8,30 @@ export default {
 
 const Template: ComponentStory<typeof Combobox> = (args) => <Combobox {...args} />;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Selected = Template.bind({});
+Selected.args = {
   options: [
-    { name: `Slack`, id: `app-1` },
-    { name: `Chrome`, id: `app-2` },
-    { name: `Figma`, id: `app-3` },
-    { name: `Notes`, id: `app-4` },
-    { name: `Firefox`, id: `app-5` },
-    { name: `VSCode`, id: `app-6` },
-    { name: `Skype`, id: `app-7` },
-    { name: `Sketch`, id: `app-8` },
-    { name: `Photoshop`, id: `app-9` },
-    { name: `Safari`, id: `app-10` },
-    { name: `Calendar`, id: `app-11` },
-    { name: `Brave`, id: `app-12` },
-    { name: `Edge`, id: `app-13` },
-    { name: `MatLab`, id: `app-14` },
-    { name: `Microsoft Teams`, id: `app-15` },
+    { display: `Slack`, value: `app-1` },
+    { display: `Chrome`, value: `app-2` },
+    { display: `Figma`, value: `app-3` },
+    { display: `Notes`, value: `app-4` },
+    { display: `Firefox`, value: `app-5` },
+    { display: `VSCode`, value: `app-6` },
+    { display: `Skype`, value: `app-7` },
+    { display: `Sketch`, value: `app-8` },
+    { display: `Photoshop`, value: `app-9` },
+    { display: `Safari`, value: `app-10` },
+    { display: `Calendar`, value: `app-11` },
+    { display: `Brave`, value: `app-12` },
+    { display: `Edge`, value: `app-13` },
+    { display: `MatLab`, value: `app-14` },
+    { display: `Microsoft Teams`, value: `app-15` },
   ],
-  selectedOption: { name: `Slack`, id: `app-1` },
+  selected: { display: `Slack`, value: `app-1` },
+};
+
+export const EmptySelected = Template.bind({});
+EmptySelected.args = {
+  ...Selected.args,
+  selected: { display: ``, value: `` },
 };

@@ -1,4 +1,4 @@
-import { unsavedId } from '@shared/lib/id';
+import { unsavedId } from '@dashboard/lib/id';
 import { User } from '../api/users';
 
 export function keychain(id: UUID, adminId: UUID): Keychain {

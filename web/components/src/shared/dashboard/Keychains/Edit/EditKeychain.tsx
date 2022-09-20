@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '../../../Button';
-import { inflect } from '../../../lib/string';
+import { inflect } from '../../lib/string';
 import { ConfirmableEntityAction } from '../../../types';
 import { ConfirmDeleteEntity } from '../../Modal';
 import PageHeading from '../../PageHeading';

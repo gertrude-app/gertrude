@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ReviewDay from '@dashboard/Users/Activity/ReviewDay';
+import { dateFromUrl } from '@dashboard/lib/dates';
+import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
-import Loading from '@shared/Loading';
 import * as typesafe from '../../lib/typesafe';
 import {
   deleteActivityItems,
   fetchActivityDay,
   activityDayKey,
 } from '../../redux/slice-users';
-import { dateFromUrl } from '../shared/lib/dates';
 
 const UserActivityDay: React.FC = () => {
   const { userId = ``, date = `` } = useParams<{ userId: string; date: string }>();

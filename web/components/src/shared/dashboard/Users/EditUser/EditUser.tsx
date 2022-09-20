@@ -12,7 +12,7 @@ import Toggle from '../../Toggle';
 import UserDevice from '../List/Card/Device';
 import PageHeading from '../../PageHeading';
 import { ConfirmDeleteEntity } from '../../Modal';
-import { inflect } from '../../../lib/string';
+import { inflect } from '../../lib/string';
 import ConnectModal from '../ConnectModal';
 
 interface Props {

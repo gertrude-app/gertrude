@@ -1,5 +1,5 @@
 import { UpdateAdminNotificationInput } from '@dashboard/types/GraphQL';
-import { isUnsaved } from '@shared/lib/id';
+import { isUnsaved } from '@dashboard/lib/id';
 import Result from '../Result';
 import { gql, mutate } from '../apollo';
 import * as U from './__generated__/UpdateNotification';

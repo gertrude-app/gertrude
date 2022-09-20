@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { isUnsaved, unsavedId } from '@shared/lib/id';
+import { isUnsaved, unsavedId } from '@dashboard/lib/id';
 import { NotificationUpdate } from '@dashboard/Profile';
 import * as T from '@dashboard/types/Admin';
 import { Trigger } from '@dashboard/types/GraphQL';
