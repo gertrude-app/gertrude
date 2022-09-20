@@ -14,6 +14,8 @@ import {
   userEntityDeleteCanceled,
   deleteDevice,
   deleteUser,
+  createUserToken,
+  addDeviceDismissed,
 } from '../../redux/slice-users';
 import { isDirty, Query, Req } from '../../redux/helpers';
 import {
@@ -109,6 +111,9 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
           confirm: () => dispatch(deleteDevice(deleteDeviceId ?? ``)),
           cancel: () => dispatch(userEntityDeleteCanceled(`device`)),
         },
+        startAddDevice: () => dispatch(createUserToken(id)),
+        dismissAddDevice: () => dispatch(addDeviceDismissed()),
+        addDeviceRequest: state.addDeviceRequest,
       }),
       false,
     ];

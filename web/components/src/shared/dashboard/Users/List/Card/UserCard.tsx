@@ -13,6 +13,7 @@ type Props = {
   devices: Subcomponents<typeof UserDevice>;
   screenshotsEnabled: boolean;
   keystrokesEnabled: boolean;
+  addDevice(): unknown;
 };
 
 const UserCard: React.FC<Props> = ({
@@ -23,6 +24,7 @@ const UserCard: React.FC<Props> = ({
   devices,
   screenshotsEnabled,
   keystrokesEnabled,
+  addDevice,
 }) => (
   <div className="rounded-xl border flex flex-col justify-between shadow-lg w-full bg-white sm:min-w-[400px]">
     <div className="p-5">
@@ -94,7 +96,10 @@ const UserCard: React.FC<Props> = ({
         </div>
       )}
       <div className="flex justify-center mt-2">
-        <button className="mt-1 text-violet-600 px-7 py-2 rounded-lg hover:bg-gray-100 self-center transition duration-100">
+        <button
+          onClick={addDevice}
+          className="mt-1 text-violet-600 px-7 py-2 rounded-lg hover:bg-gray-100 self-center transition duration-100"
+        >
           <i className="fa fa-plus mr-2" />
           Add device
         </button>

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import Loading from '@shared/Loading';
 import ListUsers from '@dashboard/Users/List';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import { fetchUsers } from '../../redux/slice-users';
+import { addDeviceDismissed, createUserToken, fetchUsers } from '../../redux/slice-users';
 import ApiErrorMessage from '../ApiErrorMessage';
 import { Family } from '@dashboard/types/GraphQL';
 import * as typesafe from '../../lib/typesafe';
@@ -10,8 +10,9 @@ import { isUnsaved } from '../shared/lib/id';
 
 const Users: React.FC = () => {
   const dispatch = useDispatch();
-  const { users, request } = useSelector((state) => ({
-    request: state.users.listRequest,
+  const { users, listRequest, addDeviceRequest } = useSelector((state) => ({
+    listRequest: state.users.listRequest,
+    addDeviceRequest: state.users.addDeviceRequest,
     users: typesafe
       .objectValues(state.users.users)
       .map((editable) => editable.original)
@@ -19,14 +20,14 @@ const Users: React.FC = () => {
   }));
 
   useEffect(() => {
-    request.state === `idle` && dispatch(fetchUsers());
-  }, [dispatch, request, request.state]);
+    listRequest.state === `idle` && dispatch(fetchUsers());
+  }, [dispatch, listRequest, listRequest.state]);
 
-  if (request.state === `failed`) {
-    return <ApiErrorMessage error={request.error} />;
+  if (listRequest.state === `failed`) {
+    return <ApiErrorMessage error={listRequest.error} />;
   }
 
-  if (request.state === `idle` || request.state === `ongoing`) {
+  if (listRequest.state === `idle` || listRequest.state === `ongoing`) {
     return <Loading />;
   }
 
@@ -49,6 +50,9 @@ const Users: React.FC = () => {
         screenshotsEnabled: resource.screenshotsEnabled,
         keystrokesEnabled: resource.keyloggingEnabled,
       }))}
+      startAddDevice={(userId) => dispatch(createUserToken(userId))}
+      dismissAddDevice={() => dispatch(addDeviceDismissed())}
+      addDeviceRequest={addDeviceRequest}
     />
   );
 };

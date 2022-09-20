@@ -4,13 +4,15 @@ import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import Button from '../../Button';
 import { capitalize } from '../../lib/string';
+import LoadingSpinner from '../../LoadingSpinner';
 
 interface Props {
-  type: 'destructive' | 'default' | 'container';
+  type: 'destructive' | 'default' | 'container' | 'error';
   title: string;
   primaryButtonText?: string;
   secondaryButtonText?: string;
   isOpen: boolean;
+  loading?: boolean;
   onPrimaryClick(): unknown;
   onDismiss(): unknown;
   children?: React.ReactNode;
@@ -27,6 +29,7 @@ const Modal: React.FC<Props> = ({
   type,
   children,
   icon,
+  loading,
 }) => {
   if (!icon) {
     switch (type) {
@@ -39,6 +42,8 @@ const Modal: React.FC<Props> = ({
       case `container`:
         icon = `list`;
         break;
+      case `error`:
+        icon = `bug`;
     }
   }
 
@@ -68,76 +73,86 @@ const Modal: React.FC<Props> = ({
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel
-                className={cx(
-                  `relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg`,
-                  type === `container` && `lg:max-w-3xl`,
-                )}
-              >
-                {type === `container` ? (
-                  <div className="bg-white px-4 pt-5 pb-4 sm:p-4">
-                    <div className="flex justify-start items-center mb-5">
-                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500">
-                        <i
-                          className={`fa fa-${icon} text-white -mt-px -translate-y-px text-2xl`}
-                        />
-                      </div>
-                      <Dialog.Title
-                        as="h3"
-                        className="text-xl ml-4 font-semibold leading-6 text-gray-900"
-                      >
-                        {capitalize(title)}
-                      </Dialog.Title>
-                    </div>
-                    <div>{children}</div>
-                  </div>
-                ) : (
-                  <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div className="sm:flex sm:items-start">
-                      <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500 sm:mx-0 zsm:h-10 zsm:w-10">
-                        <i
-                          className={`fa fa-${icon} text-white -mt-px -translate-y-px text-2xl`}
-                        />
-                      </div>
-                      <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              {loading ? (
+                <Dialog.Panel>
+                  <LoadingSpinner />
+                </Dialog.Panel>
+              ) : (
+                <Dialog.Panel
+                  className={cx(
+                    `relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg`,
+                    type === `container` && `lg:max-w-3xl`,
+                  )}
+                >
+                  {type === `container` ? (
+                    <div className="bg-white px-4 pt-5 pb-4 sm:p-4">
+                      <div className="flex justify-start items-center mb-5">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500">
+                          <i
+                            className={`fa fa-${icon} text-white -mt-px -translate-y-px text-2xl`}
+                          />
+                        </div>
                         <Dialog.Title
                           as="h3"
-                          className="text-lg font-semibold leading-6 text-gray-900"
+                          className="text-xl ml-4 font-semibold leading-6 text-gray-900"
                         >
                           {capitalize(title)}
                         </Dialog.Title>
-                        <div className="mt-2">
-                          {children && (
-                            <p className="text-sm text-gray-500">{children}</p>
-                          )}
+                      </div>
+                      <div>{children}</div>
+                    </div>
+                  ) : (
+                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                      <div className="sm:flex sm:items-start">
+                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500 sm:mx-0 zsm:h-10 zsm:w-10">
+                          <i
+                            className={`fa fa-${icon} text-white -mt-px -translate-y-px text-2xl`}
+                          />
+                        </div>
+                        <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                          <Dialog.Title
+                            as="h3"
+                            className="text-lg font-semibold leading-6 text-gray-900"
+                          >
+                            {capitalize(title)}
+                          </Dialog.Title>
+                          <div className="mt-2">
+                            {children && (
+                              <p className="text-sm text-gray-500">{children}</p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
+                  )}
+                  <div className="sm:bg-gray-50 px-4 py-3 flex flex-col items-stretch sm:flex-row sm:px-6 sm:justify-end">
+                    {type !== `error` && (
+                      <Button
+                        type="button"
+                        small
+                        color="secondary-white"
+                        className="sm:mr-3 w-[100%] sm:w-auto mb-3 sm:mb-0"
+                        onClick={onDismiss}
+                      >
+                        {secondaryButtonText}
+                      </Button>
+                    )}
+                    <Button
+                      type="button"
+                      small
+                      color={
+                        type === `destructive` || type === `error`
+                          ? `secondary-warning`
+                          : `primary-violet`
+                      }
+                      className="w-[100%] sm:w-auto"
+                      onClick={type === `error` ? onDismiss : onPrimaryClick}
+                    >
+                      {primaryButtonText}
+                    </Button>
                   </div>
-                )}
-                <div className="sm:bg-gray-50 px-4 py-3 flex flex-col items-stretch sm:flex-row sm:px-6 sm:justify-end">
-                  <Button
-                    type="button"
-                    small
-                    color="secondary-white"
-                    className="sm:mr-3 w-[100%] sm:w-auto mb-3 sm:mb-0"
-                    onClick={onDismiss}
-                  >
-                    {secondaryButtonText}
-                  </Button>
-                  <Button
-                    type="button"
-                    small
-                    color={
-                      type === `destructive` ? `secondary-warning` : `primary-violet`
-                    }
-                    className="w-[100%] sm:w-auto"
-                    onClick={onPrimaryClick}
-                  >
-                    {primaryButtonText}
-                  </Button>
-                </div>
-              </Dialog.Panel>
+                </Dialog.Panel>
+              )}
             </Transition.Child>
           </div>
         </div>

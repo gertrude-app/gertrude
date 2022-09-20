@@ -13,6 +13,7 @@ import UserDevice from '../List/Card/Device';
 import PageHeading from '../../PageHeading';
 import { ConfirmDeleteEntity } from '../../Modal';
 import { inflect } from '../../../lib/string';
+import ConnectModal from '../ConnectModal';
 
 interface Props {
   isNew: boolean;
@@ -30,7 +31,10 @@ interface Props {
   keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
   devices: Subcomponents<typeof UserDevice>;
   deleteUser: ConfirmableEntityAction<void>;
+  startAddDevice(): unknown;
+  dismissAddDevice(): unknown;
   deleteDevice: ConfirmableEntityAction;
+  addDeviceRequest?: RequestState<UUID>;
   saveButtonDisabled: boolean;
   onSave(): unknown;
 }
@@ -54,8 +58,12 @@ const EditUser: React.FC<Props> = ({
   deleteUser,
   saveButtonDisabled,
   onSave,
+  dismissAddDevice,
+  addDeviceRequest,
+  startAddDevice,
 }) => (
   <div className="relative max-w-3xl">
+    <ConnectModal request={addDeviceRequest} dismissAddDevice={dismissAddDevice} />
     <ConfirmDeleteEntity type="device" action={deleteDevice} />
     <ConfirmDeleteEntity type="user" action={deleteUser} />
     <PageHeading icon={isNew ? `user-plus` : `pen`}>
@@ -89,7 +97,10 @@ const EditUser: React.FC<Props> = ({
             </button>
           </div>
         ))}
-        <button className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition duration-100">
+        <button
+          onClick={startAddDevice}
+          className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition duration-100"
+        >
           <i className="fa fa-plus mr-2" />
           Add device
         </button>

@@ -3,21 +3,35 @@ import Button from '../../../Button';
 import PageHeading from '../../PageHeading';
 import NoUsers from './NoUsers';
 import UserCard from './Card';
-import { Subcomponents } from '../../../types';
+import { SubcomponentsOmit } from '../../../types';
+import ConnectModal from '../ConnectModal';
 
 type Props = {
-  users: Subcomponents<typeof UserCard>;
+  users: SubcomponentsOmit<typeof UserCard, 'addDevice'>;
+  addDeviceRequest?: RequestState<UUID>;
+  startAddDevice(userId: UUID): unknown;
+  dismissAddDevice(): unknown;
 };
 
-const Users: React.FC<Props> = ({ users }) => (
+const Users: React.FC<Props> = ({
+  users,
+  addDeviceRequest,
+  startAddDevice,
+  dismissAddDevice,
+}) => (
   <div className="flex flex-col">
+    <ConnectModal request={addDeviceRequest} dismissAddDevice={dismissAddDevice} />
     <PageHeading icon="users">Users</PageHeading>
     <div className="mt-8 flex flex-col">
       {users.length > 0 ? (
         <>
           <div className="mb-16 grid grid-cols-1 lg+:grid-cols-2 gap-10 lg+:gap-8 xl:gap-10 2xl:grid-cols-3">
             {users.map((user) => (
-              <UserCard key={user.id} {...user} />
+              <UserCard
+                key={user.id}
+                addDevice={() => startAddDevice(user.id)}
+                {...user}
+              />
             ))}
           </div>
           <Button
