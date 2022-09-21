@@ -2,9 +2,10 @@ import React from 'react';
 import Button from '../../../Button';
 import { inflect } from '../../lib/string';
 import { ConfirmableEntityAction } from '../../../types';
-import { ConfirmDeleteEntity } from '../../Modal';
+import Modal, { ConfirmDeleteEntity } from '../../Modal';
 import PageHeading from '../../PageHeading';
 import TextInput from '../../TextInput';
+import KeyCreator from '../Keys/KeyCreator';
 
 type Props = {
   isNew: boolean;
@@ -16,6 +17,8 @@ type Props = {
   keys: Array<{ id: UUID }>;
   saveButtonDisabled: boolean;
   onSave(): unknown;
+  editingKey?: EditKey.State;
+  updateEditingKey(event: EditKey.Event): unknown;
 };
 
 const EditKeychain: React.FC<Props> = ({
@@ -28,8 +31,33 @@ const EditKeychain: React.FC<Props> = ({
   deleteKeychain,
   saveButtonDisabled,
   onSave,
+  editingKey,
+  updateEditingKey,
 }) => (
   <div className="relative max-w-3xl">
+    <Modal
+      type="container"
+      title="Create a new key"
+      isOpen={!!editingKey}
+      icon="key"
+      primaryButtonText="Create key"
+      onPrimaryClick={() => {}}
+      onDismiss={() => {}}
+    >
+      <KeyCreator
+        update={updateEditingKey}
+        {...editingKey!}
+        apps={[
+          { slug: `slack`, name: `Slack` },
+          { slug: `chrome`, name: `Chrome` },
+          { slug: `figma`, name: `Figma` },
+          { slug: `notes`, name: `Notes` },
+          { slug: `firefox`, name: `Firefox` },
+          { slug: `slug`, name: `Skype` },
+          { slug: `vscode`, name: `Vscode` },
+        ]}
+      />
+    </Modal>
     <ConfirmDeleteEntity type="keychain" action={deleteKeychain} />
     <PageHeading icon="key" className="mb-4">
       {isNew ? `Create Keychain` : `Edit Keychain`}

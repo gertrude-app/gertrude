@@ -14,6 +14,7 @@ type Props = {
   mode: 'edit' | 'create';
   isLast?: boolean;
   canAdvance?: boolean;
+  update(event: EditKey.Event): unknown;
 };
 
 const KeyCreationStep: React.FC<Props> = ({
@@ -27,6 +28,7 @@ const KeyCreationStep: React.FC<Props> = ({
   lookaheadTitle,
   mode,
   canAdvance = true,
+  update,
 }) => {
   const open = currentStep === index;
   return (
@@ -63,8 +65,8 @@ const KeyCreationStep: React.FC<Props> = ({
             open ? `border-2 border-violet-400` : `border`,
           )}
         >
-          <button
-            className="flex justify-between w-full items-center cursor-pointer hover:bg-gray-50 transition duration-100 p-4 rounded-2xl outline-none focus:ring-2 ring-violet-400 [transition:200ms] text-left"
+          <div
+            className="flex justify-between w-full items-center cursor-pointer hover:bg-gray-50 transition duration-100 p-4 rounded-2xl outline-none [transition:200ms] text-left"
             onClick={() => {}}
           >
             {index === currentStep ? (
@@ -78,7 +80,7 @@ const KeyCreationStep: React.FC<Props> = ({
                 open && `-rotate-180`,
               )}
             />
-          </button>
+          </div>
           {open && (
             <div className="p-2 sm:p-4">
               {children}
@@ -92,7 +94,7 @@ const KeyCreationStep: React.FC<Props> = ({
                   {index !== 1 && (
                     <Button
                       type="button"
-                      onClick={() => {}}
+                      onClick={() => update({ set: `currentStep`, to: `prev` })}
                       color="secondary-white"
                       small
                     >
@@ -102,7 +104,7 @@ const KeyCreationStep: React.FC<Props> = ({
                   )}
                   <Button
                     type="button"
-                    onClick={() => {}}
+                    onClick={() => update({ set: `currentStep`, to: `next` })}
                     color="primary-violet"
                     small
                     disabled={!canAdvance}

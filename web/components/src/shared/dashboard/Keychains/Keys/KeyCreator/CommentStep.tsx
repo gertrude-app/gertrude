@@ -8,11 +8,13 @@ interface Props {
   mode: 'edit' | 'create';
   currentStepIndex: number;
   comment?: string;
+  update(event: EditKey.Event): unknown;
 }
 
-const CommentStep: React.FC<Props> = ({ mode, currentStepIndex, comment }) => (
+const CommentStep: React.FC<Props> = ({ mode, update, currentStepIndex, comment }) => (
   <KeyCreationStep
     mode={mode}
+    update={update}
     setCurrentStep={() => {}}
     lookaheadTitle="Add an optional comment"
     activeTitle="Add an optional comment:"
@@ -34,8 +36,8 @@ const CommentStep: React.FC<Props> = ({ mode, currentStepIndex, comment }) => (
   >
     <TextInput
       type="textarea"
-      value=""
-      setValue={() => {}}
+      value={comment ?? ``}
+      setValue={(newValue) => update({ set: `comment`, to: newValue })}
       placeholder="Optional note to yourself about this key"
     />
   </KeyCreationStep>

@@ -14,6 +14,7 @@ interface Props {
   address: string;
   addressType: 'strict' | 'standard' | 'ip' | 'domainRegex';
   showAdvancedAddressOptions: boolean;
+  update(event: EditKey.Event): unknown;
 }
 
 const AddressStep: React.FC<Props> = ({
@@ -23,9 +24,12 @@ const AddressStep: React.FC<Props> = ({
   address,
   addressType,
   showAdvancedAddressOptions,
+  update,
 }) => (
   <KeyCreationStep
     mode={mode}
+    update={update}
+    // TODO? necessry?
     setCurrentStep={() => {}}
     lookaheadTitle="Website address"
     activeTitle="Select website address:"
@@ -44,18 +48,24 @@ const AddressStep: React.FC<Props> = ({
       type="text"
       label="Web address:"
       value={address}
-      setValue={() => {}}
+      setValue={(updated) => update({ set: `address`, to: updated })}
       prefix="https://"
       className="mb-7"
     />
     <div className="bg-gray-50 px-2 py-4 rounded-lg">
       <div className="flex justify-start mr-2 items-center ml-2 mb-2">
         <label className="mr-2 text-gray-600">Advanced:</label>
-        <Toggle enabled={showAdvancedAddressOptions} small setEnabled={() => {}} />
+        <Toggle
+          enabled={showAdvancedAddressOptions}
+          small
+          setEnabled={(enabled) =>
+            update({ set: `showAdvancedAddressOptions`, to: enabled })
+          }
+        />
       </div>
       <div className="flex items-center justify-end">
         <label className="mr-2 text-gray-600 font-medium">Address type:</label>
-        <SelectMenu
+        <SelectMenu<EditKey.AddressType>
           options={
             [
               { value: `standard`, display: `Standard` },
@@ -69,12 +79,12 @@ const AddressStep: React.FC<Props> = ({
                 display: `Regular expression`,
               },
             ].filter((x) => typeof x.value === `string`) as {
-              value: string;
+              value: EditKey.AddressType;
               display: string;
             }[]
           }
           selectedOption={addressType}
-          setSelected={() => {}}
+          setSelected={(type) => update({ set: `addressType`, to: type })}
           deemphasized
         />
       </div>

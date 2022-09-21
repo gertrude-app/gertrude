@@ -1,5 +1,13 @@
 import React from 'react';
-import { relativeTime } from '../../../lib/dates';
+import {
+  relativeTime,
+  isoToDateInput,
+  formatDate,
+  daysFromNow,
+  isoToTimeInput,
+  utcToLocal,
+  isoToLocal,
+} from '../../../lib/dates';
 import TextInput from '../../../TextInput';
 import Toggle from '../../../Toggle';
 import KeyCreationStep from '../KeyCreationStep';
@@ -9,27 +17,18 @@ import UserInputText from './UserInputText';
 interface Props {
   mode: 'edit' | 'create';
   currentStepIndex: number;
-  expiration?: Date;
+  expiration?: string;
+  update(event: EditKey.Event): unknown;
 }
 
-function TitleText({ expiration }: { expiration: Date | undefined }): JSX.Element {
-  return (
-    <span>
-      {expiration ? (
-        <>
-          Expiring <UserInputText>{relativeTime(expiration)}</UserInputText>
-        </>
-      ) : (
-        <>
-          With <UserInputText>no expiration</UserInputText>
-        </>
-      )}
-    </span>
-  );
-}
-
-const ExpirationStep: React.FC<Props> = ({ mode, currentStepIndex, expiration }) => (
+const ExpirationStep: React.FC<Props> = ({
+  mode,
+  update,
+  currentStepIndex,
+  expiration,
+}) => (
   <KeyCreationStep
+    update={update}
     mode={mode}
     setCurrentStep={() => {}}
     lookaheadTitle="Add an optional expiration"
@@ -43,22 +42,31 @@ const ExpirationStep: React.FC<Props> = ({ mode, currentStepIndex, expiration })
     currentStep={currentStepIndex}
     index={8}
   >
-    <div className="flex justify-end mr-2 items-center">
-      <label className="mr-2 text-gray-600">Expires:</label>
-      <Toggle enabled={false} small setEnabled={() => {}} />
+    <div className="flex justify-end mr-2 items-center -mt-3">
+      <label className="mr-2 text-gray-600">Key expires</label>
+      <Toggle
+        enabled={!!expiration}
+        small
+        setEnabled={(enabled) =>
+          update({
+            set: `expirationDate`,
+            to: enabled ? formatDate(utcToLocal(daysFromNow(7)), `dateInput`) : undefined,
+          })
+        }
+      />
     </div>
     {expiration && (
-      <div className="flex flex-col sm:flex-row mt-4">
+      <div className="flex flex-col sm:flex-row">
         <TextInput
           type="date"
-          value=""
-          setValue={() => {}}
+          value={isoToDateInput(isoToLocal(expiration))}
+          setValue={(date) => update({ set: `expirationDate`, to: date })}
           label="Expiration date:"
           className="sm:mr-2 mb-4 sm:mb-0"
         />
         <TextInput
           type="time"
-          value=""
+          value={isoToTimeInput(isoToLocal(expiration))}
           setValue={() => {}}
           label="Expiration time:"
           className="sm:ml-2"
@@ -69,3 +77,19 @@ const ExpirationStep: React.FC<Props> = ({ mode, currentStepIndex, expiration })
 );
 
 export default ExpirationStep;
+
+function TitleText({ expiration }: { expiration: string | undefined }): JSX.Element {
+  return (
+    <span>
+      {expiration ? (
+        <>
+          Expiring <UserInputText>{relativeTime(new Date(expiration))}</UserInputText>
+        </>
+      ) : (
+        <>
+          With <UserInputText>no expiration</UserInputText>
+        </>
+      )}
+    </span>
+  );
+}

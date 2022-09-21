@@ -14,6 +14,7 @@ interface Props {
   appSlug?: string;
   appBundleId?: string;
   apps: Array<{ slug: string; name: string }>;
+  update(event: EditKey.Event): unknown;
 }
 
 const ChooseAppStep: React.FC<Props> = (props) => {
@@ -25,11 +26,13 @@ const ChooseAppStep: React.FC<Props> = (props) => {
     apps,
     appSlug,
     appBundleId,
+    update,
   } = props;
 
   return (
     <KeyCreationStep
       mode={mode}
+      update={update}
       canAdvance={canAdvance({ appIdentificationType, appSlug, appBundleId })}
       setCurrentStep={() => {}}
       lookaheadTitle="Select app"
@@ -45,7 +48,7 @@ const ChooseAppStep: React.FC<Props> = (props) => {
             { value: `bundleId`, display: `By bundle ID` },
           ]}
           selectedOption={appIdentificationType}
-          setSelectedOption={() => {}}
+          setSelectedOption={(to) => update({ set: `appIdentificationType`, to })}
           className="mb-4 -mt-5"
         />
         {appIdentificationType === `slug` ? (
@@ -57,7 +60,7 @@ const ChooseAppStep: React.FC<Props> = (props) => {
                 display: app.name,
               }))}
               selected={selectedApp({ appSlug, apps })}
-              setSelected={() => {}}
+              setSelected={(slug) => update({ set: `appSlug`, to: slug })}
             />
           </div>
         ) : (
@@ -65,7 +68,7 @@ const ChooseAppStep: React.FC<Props> = (props) => {
             type="text"
             label="App bundle ID:"
             value={appBundleId ?? ``}
-            setValue={() => {}}
+            setValue={(id) => update({ set: `appBundleId`, to: id })}
           />
         )}
       </div>

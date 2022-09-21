@@ -1,6 +1,7 @@
 import React, { useId, useState } from 'react';
 import cx from 'classnames';
 import Label from './Label';
+import { isoToDateInput } from '../lib/dates';
 
 type CommonProps = {
   label?: string;
@@ -59,6 +60,11 @@ const TextInput: React.FC<Props> = ({
           autoFocus={autoFocus}
           placeholder={placeholder}
           disabled={disabled}
+          // all date inputs must be in the future (for now, at least)
+          {...(props.type === `date`
+            ? { min: isoToDateInput(new Date().toISOString()) }
+            : {})}
+          // textarea "rows"
           {...(isInput(props) ? {} : { rows: props.rows })}
           onChange={(e) => {
             const value = e.target.value;

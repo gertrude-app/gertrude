@@ -1,32 +1,6 @@
 import { expect, test, describe } from 'vitest';
 import * as key from '@dashboard/lib/keys';
 
-describe(`key.category()`, () => {
-  test(`returns the "category" (app|website) of a key`, () => {
-    const cases: Array<[Key, 'app' | 'website']> = [
-      [
-        {
-          type: `skeleton`,
-          scope: { type: `identifiedAppSlug`, identifiedAppSlug: `foo` },
-        },
-        `app`,
-      ],
-
-      [
-        {
-          type: `domain`,
-          domain: `goats.com`,
-          scope: { type: `unrestricted` },
-        },
-        `website`,
-      ],
-    ];
-    test.each(cases)(`key categorized correctly`, (input, expected) => {
-      expect(key.category(input)).toBe(expected);
-    });
-  });
-});
-
 describe(`key.parse()`, () => {
   const cases: Array<[Record<string, unknown>, Key | boolean]> = [
     [{}, false],

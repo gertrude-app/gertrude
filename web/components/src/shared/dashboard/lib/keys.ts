@@ -1,30 +1,23 @@
+export function newKeyState(): EditKey.State {
+  return {
+    mode: `create`,
+    currentStep: `setKeyType`,
+    keyType: undefined, // `website`,
+    address: `temp.com`,
+    addressType: `standard`,
+    addressScope: `webBrowsers`,
+    showAdvancedAddressOptions: false,
+    showAdvancedAddressScopeOptions: false,
+    appIdentificationType: `slug`,
+    appScope: `unrestricted`,
+  };
+}
+
 export function scopeType(key: Key): AppScope['type'] {
   if (key.type === `skeleton`) {
     return `single`;
   }
   return key.scope.type;
-}
-
-export function category(key: Key): 'website' | 'app' {
-  if (key.type === `skeleton`) {
-    return `app`;
-  }
-  return `website`;
-
-  // switch (key.type) {
-  //   case 'ipAddress':
-  //     return key.ipAddress;
-  //   case 'skeleton':
-  //     return '*';
-  //   case 'anySubdomain':
-  //     return key.domain;
-  //   case 'domain':
-  //     return key.domain;
-  //   case 'domainRegex':
-  //     return key.pattern;
-  //   case 'path':
-  //     return key.path;
-  // }
 }
 
 export function target(key: Key): string {

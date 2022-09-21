@@ -9,20 +9,23 @@ interface Props {
   mode: 'edit' | 'create';
   currentStepIndex: number;
   addressScope: 'webBrowsers' | 'unrestricted' | 'singleApp';
-  showAdvancedAddressOptions: boolean;
+  showAdvancedAddressScopeOptions: boolean;
   appIdentificationType: 'bundleId' | 'slug';
   apps: Array<{ slug: string; name: string }>;
+  update(event: EditKey.Event): unknown;
 }
 
 const AddressScopeStep: React.FC<Props> = ({
   mode,
   currentStepIndex,
-  showAdvancedAddressOptions,
+  showAdvancedAddressScopeOptions,
   addressScope,
+  update,
 }) => {
   return (
     <KeyCreationStep
       mode={mode}
+      update={update}
       setCurrentStep={() => {}}
       activeTitle="Select affected apps:"
       lookaheadTitle="Affected apps"
@@ -39,28 +42,38 @@ const AddressScopeStep: React.FC<Props> = ({
         <h2 className="font-medium">Unlocked for:</h2>
         <div className="flex justify-end mr-2 items-center">
           <label className="mr-2 text-gray-600">Advanced:</label>
-          <Toggle enabled={showAdvancedAddressOptions} small setEnabled={() => {}} />
+          <Toggle
+            enabled={showAdvancedAddressScopeOptions}
+            small
+            setEnabled={(enabled) =>
+              update({ set: `showAdvancedAddressScopeOptions`, to: enabled })
+            }
+          />
         </div>
         <div className="mt-3 space-y-0.5">
           <SelectableListItem
             title={`Web browsers`}
             description={`Applies to all browsers, like Chrome, Safari, Firefox, etc.`}
             selected={addressScope === `webBrowsers`}
-            onClick={() => {}}
+            onClick={() => update({ set: `addressScope`, to: `webBrowsers` })}
             badges={[{ text: `Most common`, color: `green` }]}
           />
           <SelectableListItem
-            title={`All apps`}
-            description={`Permits access for every app (including browsers). Use for sites you're sure you trust.`}
+            title="All apps"
+            description="Permits access for every app (including browsers). Use for sites you're sure you trust."
             selected={addressScope === `unrestricted`}
-            onClick={() => {}}
+            onClick={() => update({ set: `addressScope`, to: `unrestricted` })}
           />
-          {showAdvancedAddressOptions && (
+          {showAdvancedAddressScopeOptions && (
             <SelectableListItem
-              title={`Single app`}
-              description={`Unlock this site for one specific app you choose.`}
+              title="Single app"
+              description="Unlock this site for one specific app you choose."
               selected={addressScope === `singleApp`}
-              onClick={() => {}}
+              onClick={() => update({ set: `addressScope`, to: `singleApp` })}
+              badges={[
+                { text: `Most safe`, color: `green` },
+                { text: `Advanced`, color: `yellow` },
+              ]}
             />
           )}
         </div>

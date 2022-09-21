@@ -15,6 +15,7 @@ import {
   keychainEntityDeleteCanceled,
   keychainEntityDeleteStarted,
   deleteKeychain,
+  editKeyEventReceived,
 } from '../../redux/slice-keychains';
 
 const Keychain: React.FC = () => {
@@ -49,6 +50,7 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
     const fetchReq = state.keychains.fetchAdminKeychainRequest[id];
     const updateReq = state.keychains.updateAdminKeychainRequest[id];
     const deletingId = state.keychains.deleting.keychain;
+    const editingKey = state.keychains.editingKey;
 
     if (state.keychains.deleted.includes(id)) {
       return [Query.redirectDeleted(`/keychains`), false];
@@ -72,6 +74,8 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
         setDescription: (description) =>
           dispatch(keychainDescriptionUpdated({ id, description })),
         onSave: () => dispatch(upsertKeychain(id)),
+        editingKey,
+        updateEditingKey: (event) => dispatch(editKeyEventReceived(event)),
         saveButtonDisabled:
           updateReq?.state === `ongoing` || (keychain.isNew ? false : !isDirty(keychain)),
         deleteKeychain: {

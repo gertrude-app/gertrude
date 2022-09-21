@@ -7,45 +7,14 @@ import AppScopeStep from './AppScopeStep';
 import KeyTypeStep from './KeyTypeStep';
 import CommentStep from './CommentStep';
 
-const STEP_TYPES = [
-  `setKeyType`,
-
-  // website key states
-  `websiteKey_setAddress`,
-  `websiteKey_setAppScope`,
-  `websiteKey_chooseApp`, // advanced, rarely used
-
-  // app key states
-  `appKey_chooseApp`,
-  `appKey_setAppScope`,
-  `appKey_setAddress`, // advanced, rarely used
-
-  `expiration`,
-  `comment`,
-] as const;
-
-type StepType = typeof STEP_TYPES[number];
-
-interface Props {
-  mode: 'create' | 'edit';
-  keyType?: 'website' | 'app';
-  address: string;
-  addressType: 'strict' | 'standard' | 'ip' | 'domainRegex';
-  addressScope: 'webBrowsers' | 'unrestricted' | 'singleApp';
-  showAdvancedAddressOptions: boolean;
-  showAdvancedAddressScopeOptions: boolean;
-  appIdentificationType: 'bundleId' | 'slug';
-  appSlug?: string;
-  appBundleId?: string;
-  appScope: 'unrestricted' | 'address';
-  expiration?: Date;
-  comment?: string;
+type Props = EditKey.State & {
+  update(event: EditKey.Event): unknown;
   apps: Array<{ slug: string; name: string }>;
-  currentStep?: StepType;
-}
+};
 
 const KeyCreator: React.FC<Props> = ({
   showAdvancedAddressOptions,
+  showAdvancedAddressScopeOptions,
   keyType,
   address,
   addressType,
@@ -59,16 +28,23 @@ const KeyCreator: React.FC<Props> = ({
   apps,
   appBundleId,
   appSlug,
+  update,
 }) => {
   const currentStepIndex = currentStep ? STEP_TYPES.indexOf(currentStep) + 1 : -1;
   return (
-    <div className="">
-      <KeyTypeStep mode={mode} currentStepIndex={currentStepIndex} keyType={keyType} />
+    <>
+      <KeyTypeStep
+        update={update}
+        mode={mode}
+        currentStepIndex={currentStepIndex}
+        keyType={keyType}
+      />
 
       {keyType !== `app` && (
         <AddressStep
           keyType={keyType ?? `website`}
           mode={mode}
+          update={update}
           currentStepIndex={currentStepIndex}
           address={address}
           addressType={addressType}
@@ -79,9 +55,10 @@ const KeyCreator: React.FC<Props> = ({
       {keyType !== `app` && (
         <AddressScopeStep
           mode={mode}
+          update={update}
           currentStepIndex={currentStepIndex}
           addressScope={addressScope}
-          showAdvancedAddressOptions={showAdvancedAddressOptions}
+          showAdvancedAddressScopeOptions={showAdvancedAddressScopeOptions}
           appIdentificationType={appIdentificationType}
           apps={apps}
         />
@@ -90,6 +67,7 @@ const KeyCreator: React.FC<Props> = ({
       {(keyType === `app` || addressScope === `singleApp`) && (
         <ChooseAppStep
           keyType={keyType ?? `app`}
+          update={update}
           mode={mode}
           currentStepIndex={currentStepIndex}
           appIdentificationType={appIdentificationType}
@@ -101,6 +79,7 @@ const KeyCreator: React.FC<Props> = ({
 
       {keyType === `app` && (
         <AppScopeStep
+          update={update}
           mode={mode}
           currentStepIndex={currentStepIndex}
           appScope={appScope}
@@ -109,6 +88,7 @@ const KeyCreator: React.FC<Props> = ({
 
       {keyType === `app` && appScope === `address` && (
         <AddressStep
+          update={update}
           keyType={keyType}
           mode={mode}
           currentStepIndex={currentStepIndex}
@@ -120,13 +100,31 @@ const KeyCreator: React.FC<Props> = ({
 
       <ExpirationStep
         mode={mode}
+        update={update}
         currentStepIndex={currentStepIndex}
         expiration={expiration}
       />
 
-      <CommentStep mode={mode} currentStepIndex={currentStepIndex} comment={comment} />
-    </div>
+      <CommentStep
+        mode={mode}
+        currentStepIndex={currentStepIndex}
+        comment={comment}
+        update={update}
+      />
+    </>
   );
 };
 
 export default KeyCreator;
+
+const STEP_TYPES: EditKey.Step[] = [
+  `setKeyType`,
+  `websiteKey_setAddress`,
+  `websiteKey_setAppScope`,
+  `websiteKey_chooseApp`,
+  `appKey_chooseApp`,
+  `appKey_setAppScope`,
+  `appKey_setAddress`,
+  `expiration`,
+  `comment`,
+];

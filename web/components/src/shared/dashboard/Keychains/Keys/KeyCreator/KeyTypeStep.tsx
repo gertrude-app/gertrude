@@ -9,9 +9,10 @@ interface Props {
   mode: 'create' | 'edit';
   keyType?: 'website' | 'app';
   currentStepIndex: number;
+  update(event: EditKey.Event): unknown;
 }
 
-const KeyTypeStep: React.FC<Props> = ({ mode, keyType, currentStepIndex }) => (
+const KeyTypeStep: React.FC<Props> = ({ mode, keyType, currentStepIndex, update }) => (
   <KeyCreationStep
     mode={mode}
     setCurrentStep={() => {}}
@@ -26,12 +27,13 @@ const KeyTypeStep: React.FC<Props> = ({ mode, keyType, currentStepIndex }) => (
     }
     currentStep={currentStepIndex}
     index={1}
+    update={update}
   >
     <div className="flex flex-col sm:flex-row -mt-4">
       <KeyTypeOption
         icon="earth-americas"
         selected={keyType === `website`}
-        onClick={() => {}}
+        onClick={() => update({ set: `keyType`, to: `website` })}
         title="Website key"
         description="Grant access to a specific website"
         className="sm:w-1/2 sm:mr-2 mb-3 sm:mb-0"
@@ -39,7 +41,7 @@ const KeyTypeStep: React.FC<Props> = ({ mode, keyType, currentStepIndex }) => (
       <KeyTypeOption
         icon="hamburger"
         selected={keyType === `app`}
-        onClick={() => {}}
+        onClick={() => update({ set: `keyType`, to: `app` })}
         title="App key"
         description="Grant access to a specific mac application"
         className="sm:w-1/2 sm:ml-2"

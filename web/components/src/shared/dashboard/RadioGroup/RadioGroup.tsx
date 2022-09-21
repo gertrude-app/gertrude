@@ -6,7 +6,7 @@ type Props<Value extends string> = {
   className?: string;
   options: Array<{ value: Value; display: string }>;
   selectedOption: Value;
-  setSelectedOption(selected: string): void;
+  setSelectedOption(selected: Value): void;
 };
 
 function RadioGroup<Value extends string = string>({

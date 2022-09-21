@@ -56,12 +56,25 @@ CreateAddressScope.args = {
   address: `goats.com`,
 };
 
+export const CreateExpirationOff = Template.bind({});
+CreateExpirationOff.args = {
+  ...CreateStart.args,
+  addressType: `standard`,
+  keyType: `website`,
+  currentStep: `expiration`,
+  address: `goats.com`,
+};
+
+const expiration = new Date();
+expiration.setDate(expiration.getDate() + 3);
+
 export const CreateExpiration = Template.bind({});
 CreateExpiration.args = {
   ...CreateStart.args,
   addressType: `standard`,
   keyType: `website`,
   currentStep: `expiration`,
+  expiration: expiration.toISOString(),
   address: `goats.com`,
 };
 
@@ -85,16 +98,13 @@ EditNoExpiration.args = {
   mode: `edit`,
 };
 
-const expiration = new Date();
-expiration.setDate(expiration.getDate() + 3);
-
 export const EditHasExpiration = Template.bind({});
 EditHasExpiration.args = {
   ...CreateExpiration.args,
   keyType: `website`,
   address: `goats.com`,
   currentStep: undefined,
-  expiration,
+  expiration: expiration.toISOString(),
   mode: `edit`,
 };
 

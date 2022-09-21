@@ -9,12 +9,14 @@ interface Props {
   mode: 'edit' | 'create';
   currentStepIndex: number;
   appScope: 'unrestricted' | 'address';
+  update(event: EditKey.Event): unknown;
 }
 
-const AppScopeStep: React.FC<Props> = ({ mode, currentStepIndex, appScope }) => {
+const AppScopeStep: React.FC<Props> = ({ mode, update, currentStepIndex, appScope }) => {
   return (
     <KeyCreationStep
       mode={mode}
+      update={update}
       setCurrentStep={() => {}}
       lookaheadTitle="Select app internet access"
       activeTitle="Select app internet access"
@@ -41,15 +43,15 @@ const AppScopeStep: React.FC<Props> = ({ mode, currentStepIndex, appScope }) => 
         <SelectableListItem
           title="Unrestricted internet access"
           description="Allows this app unrestricted network requests. Only for narrowly-focused apps that you trust."
-          selected={true}
-          onClick={() => {}}
+          selected={appScope === `unrestricted`}
+          onClick={() => update({ set: `appScope`, to: `unrestricted` })}
           badges={[{ text: `Most common`, color: `green` }]}
         />
         <SelectableListItem
           title="Access to a specific address"
           description="Allow this application to access a specific address."
-          selected={false}
-          onClick={() => {}}
+          selected={appScope === `address`}
+          onClick={() => update({ set: `appScope`, to: `address` })}
           badges={[
             { text: `Most safe`, color: `green` },
             { text: `Advanced`, color: `yellow` },

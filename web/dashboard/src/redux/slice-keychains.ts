@@ -3,16 +3,17 @@ import Current from '../environment';
 import { commit, editable, Req, toEditableMap } from './helpers';
 import { createResultThunk } from './thunk';
 import * as empty from './empty';
+import editKeyReducer from './edit-key-reducer';
 import Result from '../api/Result';
+import { newKeyState } from '../components/shared/dashboard/lib/keys';
 
 export interface KeychainsState {
   fetchAdminKeychainRequest: Record<UUID, RequestState>;
   updateAdminKeychainRequest: Record<UUID, RequestState>;
   listAdminKeychainsRequest: RequestState;
   adminKeychains: Record<UUID, Editable<Keychain>>;
-  deleting: {
-    keychain?: UUID;
-  };
+  editingKey?: EditKey.State;
+  deleting: { keychain?: UUID };
   deleted: UUID[];
 }
 
@@ -24,6 +25,8 @@ export function initialState(): KeychainsState {
     updateAdminKeychainRequest: {},
     listAdminKeychainsRequest: Req.idle(),
     adminKeychains: {},
+    // temp
+    editingKey: newKeyState(),
     deleting: {},
     deleted: [],
   };
@@ -38,6 +41,11 @@ export const slice = createSlice({
         isNew: true,
         ...editable(empty.keychain(action.payload.id, action.payload.adminId)),
       };
+    },
+    editKeyEventReceived(state, action: PayloadAction<EditKey.Event>) {
+      if (state.editingKey) {
+        editKeyReducer(state.editingKey, action.payload);
+      }
     },
     keychainEntityDeleteStarted(
       state,
@@ -157,6 +165,7 @@ export const {
   createKeychainInitiated,
   keychainDescriptionUpdated,
   keychainNameUpdated,
+  editKeyEventReceived,
 } = slice.actions;
 
 export default slice.reducer;
