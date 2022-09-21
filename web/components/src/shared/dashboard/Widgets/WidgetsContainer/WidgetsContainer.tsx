@@ -2,6 +2,7 @@ import React from 'react';
 import { UndoMainPadding } from '../../Chrome/Chrome';
 import DashboardWidget from '../DashboardWidget';
 import QuickActionsWidget from '../QuickActionsWidget';
+import UserOverviewWidget from '../UsersOverviewWidget';
 
 type Props = {
   className?: string;
@@ -12,7 +13,13 @@ const WidgetsContainer: React.FC<Props> = ({ className }) => (
     <QuickActionsWidget />
     <DashboardWidget>2</DashboardWidget>
     <DashboardWidget className="row-span-2">3</DashboardWidget>
-    <DashboardWidget>4</DashboardWidget>
+    <UserOverviewWidget
+      users={[
+        { name: 'Little Jimmy', online: true },
+        { name: 'Sally', online: true },
+        { name: 'Henry', online: false },
+      ]}
+    />
     <DashboardWidget>5</DashboardWidget>
   </UndoMainPadding>
 );
