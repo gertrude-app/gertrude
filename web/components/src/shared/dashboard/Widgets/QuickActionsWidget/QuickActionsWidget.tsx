@@ -8,7 +8,7 @@ type Props = {
 };
 
 const QuickActionsWidget: React.FC<Props> = ({ className }) => (
-  <DashboardWidget className="block">
+  <DashboardWidget className={className}>
     <h1 className="text-xl font-bold mt-2 ml-2">Good {timeOfDay(new Date())}, Betty!</h1>
     <p className="mb-4 ml-2 text-gray-500">
       Here's some quick actions you may find useful:

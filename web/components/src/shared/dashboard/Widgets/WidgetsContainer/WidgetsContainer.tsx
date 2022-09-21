@@ -9,10 +9,11 @@ type Props = {
 };
 
 const WidgetsContainer: React.FC<Props> = ({ className }) => (
-  <UndoMainPadding className="min-h-screen grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8 p-6 md:p-10">
-    <QuickActionsWidget />
+  <UndoMainPadding className="min-h-screen grid grid-cols-1 lg:grid-cols-2 xl:grid-rows-3 xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8 p-6 md:p-10">
+    <QuickActionsWidget className="xl:row-span-2" />
     <DashboardWidget>2</DashboardWidget>
-    <DashboardWidget className="row-span-2">3</DashboardWidget>
+    <DashboardWidget className="row-span-2 xl:row-span-3">3</DashboardWidget>
+    <DashboardWidget className="xl:row-span-2">4</DashboardWidget>
     <UserOverviewWidget
       users={[
         { name: 'Little Jimmy', online: true },
@@ -20,7 +21,6 @@ const WidgetsContainer: React.FC<Props> = ({ className }) => (
         { name: 'Henry', online: false },
       ]}
     />
-    <DashboardWidget>5</DashboardWidget>
   </UndoMainPadding>
 );
 

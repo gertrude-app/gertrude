@@ -9,7 +9,7 @@ type Props = {
 };
 
 const UsersOverview: React.FC<Props> = ({ className, users }) => (
-  <DashboardWidget className="space-y-4">
+  <DashboardWidget className={className}>
     {users.length > 0 ? (
       users.map((user) => <UserOverview user={user} />)
     ) : (
@@ -32,7 +32,7 @@ interface UserOverviewProps {
 
 const UserOverview: React.FC<UserOverviewProps> = ({ user }) => {
   return (
-    <div className="flex justify-between items-center rounded-xl p-3 bg-white border">
+    <div className="flex justify-between items-center rounded-xl py-4 px-4 even:bg-gray-50">
       <h3 className="font-medium text-gray-900">{user.name}</h3>
       {user.online ? (
         <PillBadge type="green">
