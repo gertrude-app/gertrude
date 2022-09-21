@@ -1,5 +1,5 @@
-import WidgetsContainer from '@shared/dashboard/WidgetsContainer';
 import React from 'react';
+import WidgetsContainer from '@shared/dashboard/Widgets/WidgetsContainer';
 
 const Dashboard: React.FC = () => (
   <div className="">
