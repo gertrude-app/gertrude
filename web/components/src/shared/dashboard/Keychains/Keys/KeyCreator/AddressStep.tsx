@@ -4,7 +4,7 @@ import TextInput from '../../../TextInput';
 import Toggle from '../../../Toggle';
 import KeyCreationStep from './KeyCreationStep';
 import SubdomainDemo from './SubdomainDemo';
-import GradientIcon from './GradientIcon';
+import GradientIcon from '../../../GradientIcon';
 import UserInputText from './UserInputText';
 import * as EditKey from '../../../lib/keys/edit';
 
@@ -34,7 +34,7 @@ const AddressStep: React.FC<Props> = ({
     activeTitle="Select website address:"
     title={
       <h2 className="font-medium text-gray-900 text-lg">
-        <GradientIcon icon="unlock" className="mr-2" />
+        <GradientIcon icon="unlock" className="mr-2" size="small" />
         {keyType === `website` ? `Unlocking ` : `Address `}
         {address.trim() !== `` && <UserInputText>{address}</UserInputText>}
       </h2>

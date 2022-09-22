@@ -1,6 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import PillBadge from '../../../../PillBadge';
+import GradientIcon from '../../../../GradientIcon';
 
 type Props = {
   model: string;
@@ -18,9 +19,7 @@ const UserDevice: React.FC<Props> = ({ model, status, icon, className }) => (
   >
     <div className="flex justify-between items-center">
       <div className="flex items-center">
-        <div className="flex justify-center items-center w-10 h-10 mr-3 bg-gradient-to-br from-indigo-500 to-fuchsia-500 rounded-full">
-          <i className={`fas fa-${icon} text-white text-opacity-80`} />
-        </div>
+        <GradientIcon icon={icon} size="medium" className="mr-3" />
         <h3 className="text-gray-500 text-lg font-medium">{model}</h3>
       </div>
       {status === `online` && (

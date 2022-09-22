@@ -11,7 +11,7 @@ import {
 import TextInput from '../../../TextInput';
 import Toggle from '../../../Toggle';
 import KeyCreationStep from './KeyCreationStep';
-import GradientIcon from './GradientIcon';
+import GradientIcon from '../../../GradientIcon';
 import UserInputText from './UserInputText';
 import * as EditKey from '../../../lib/keys/edit';
 
@@ -30,7 +30,7 @@ const ExpirationStep: React.FC<Props> = ({ mode, update, activeStep, expiration 
     activeTitle="Add an optional expiration:"
     title={
       <h2 className="font-medium text-gray-900 text-lg">
-        <GradientIcon icon="calendar" className="mr-2" />
+        <GradientIcon icon="calendar" className="mr-2" size="small" />
         <TitleText expiration={expiration} />
       </h2>
     }

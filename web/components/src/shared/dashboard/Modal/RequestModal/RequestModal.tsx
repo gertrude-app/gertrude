@@ -1,4 +1,5 @@
 import React from 'react';
+import { IconTypes } from '../../GradientIcon';
 import Modal from '../Modal';
 
 interface Props<Payload> {
@@ -12,7 +13,7 @@ interface Props<Payload> {
   withError?: (error?: ApiError) => React.ReactNode;
   onPrimaryClick(): unknown;
   onDismiss(): unknown;
-  icon?: string;
+  icon?: IconTypes;
 }
 
 function RequestModal<Payload>({

@@ -5,6 +5,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import Button from '../../Button';
 import { capitalize } from '../lib/string';
 import LoadingSpinner from '../../LoadingSpinner';
+import GradientIcon, { IconTypes } from '../GradientIcon';
 
 interface Props {
   type: 'destructive' | 'default' | 'container' | 'error';
@@ -17,7 +18,7 @@ interface Props {
   onDismiss(): unknown;
   primaryButtonDisabled?: boolean;
   children?: React.ReactNode;
-  icon?: string;
+  icon?: IconTypes;
 }
 
 const Modal: React.FC<Props> = ({
@@ -89,11 +90,7 @@ const Modal: React.FC<Props> = ({
                   {type === `container` ? (
                     <div className="bg-white px-4 pt-5 pb-4 sm:p-4">
                       <div className="flex justify-start items-center mb-5">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500">
-                          <i
-                            className={`fa fa-${icon} text-white -mt-px -translate-y-px text-2xl`}
-                          />
-                        </div>
+                        <GradientIcon icon={icon} size="large" />
                         <Dialog.Title
                           as="h3"
                           className="text-xl ml-4 font-semibold leading-6 text-gray-900"
@@ -106,11 +103,7 @@ const Modal: React.FC<Props> = ({
                   ) : (
                     <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                       <div className="sm:flex sm:items-start">
-                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500 sm:mx-0 zsm:h-10 zsm:w-10">
-                          <i
-                            className={`fa fa-${icon} text-white -mt-px -translate-y-px text-2xl`}
-                          />
-                        </div>
+                        <GradientIcon icon={icon} size="large" />
                         <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                           <Dialog.Title
                             as="h3"

@@ -2,7 +2,7 @@ import React from 'react';
 import { capitalize } from '../../../lib/string';
 import KeyCreationStep from './KeyCreationStep';
 import KeyTypeOption from '../KeyTypeOption';
-import GradientIcon from './GradientIcon';
+import GradientIcon from '../../../GradientIcon';
 import UserInputText from './UserInputText';
 import * as EditKey from '../../../lib/keys/edit';
 
@@ -21,7 +21,11 @@ const KeyTypeStep: React.FC<Props> = ({ mode, keyType, activeStep, update }) => 
     canAdvance={!!keyType}
     title={
       <h1 className="font-medium text-gray-900 text-lg">
-        <GradientIcon icon={keyType === `app` ? `window` : `globe`} className="mr-2" />
+        <GradientIcon
+          icon={keyType === `app` ? `window` : `globe`}
+          className="mr-2"
+          size="small"
+        />
         <UserInputText>{capitalize(keyType ?? `website`)}</UserInputText> key
       </h1>
     }
@@ -31,7 +35,7 @@ const KeyTypeStep: React.FC<Props> = ({ mode, keyType, activeStep, update }) => 
   >
     <div className="flex flex-col sm:flex-row -mt-4">
       <KeyTypeOption
-        icon="earth-americas"
+        icon="globe"
         selected={keyType === `website`}
         onClick={() => update({ type: `setKeyType`, to: `website` })}
         title="Website key"
