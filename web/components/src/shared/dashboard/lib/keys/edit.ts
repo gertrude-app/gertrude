@@ -51,5 +51,5 @@ export type Event =
   | { type: 'setExpirationDate'; to: string | undefined }
   | { type: 'setExpirationTime'; to: string }
   | { type: 'setComment'; to: string | undefined }
-  | { type: 'setCurrentStep'; to: Step | undefined }
+  | { type: 'inactiveStepClicked'; step: Step }
   | { type: 'setAddress'; to: string };

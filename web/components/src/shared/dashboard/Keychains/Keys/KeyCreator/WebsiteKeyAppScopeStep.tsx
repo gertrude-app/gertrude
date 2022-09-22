@@ -27,7 +27,6 @@ const WebsiteKeyAppScopeStep: React.FC<Props> = ({
     <KeyCreationStep
       mode={mode}
       update={update}
-      setCurrentStep={() => {}}
       activeTitle="Select affected apps:"
       lookaheadTitle="Affected apps"
       title={

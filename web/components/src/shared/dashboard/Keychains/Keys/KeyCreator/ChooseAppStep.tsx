@@ -35,7 +35,6 @@ const ChooseAppStep: React.FC<Props> = (props) => {
       mode={mode}
       update={update}
       canAdvance={canAdvance({ appIdentificationType, appSlug, appBundleId })}
-      setCurrentStep={() => {}}
       lookaheadTitle="Select app"
       activeTitle="Select app:"
       title={<Title {...props} />}

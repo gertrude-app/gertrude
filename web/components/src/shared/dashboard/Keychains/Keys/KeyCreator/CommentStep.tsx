@@ -16,7 +16,6 @@ const CommentStep: React.FC<Props> = ({ mode, update, activeStep, comment }) => 
   <KeyCreationStep
     mode={mode}
     update={update}
-    setCurrentStep={() => {}}
     lookaheadTitle="Add an optional comment"
     activeTitle="Add an optional comment:"
     title={

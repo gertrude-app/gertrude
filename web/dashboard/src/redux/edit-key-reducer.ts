@@ -129,6 +129,10 @@ export default function reducer(state: EditKey.State, action: EditKey.Event): vo
       state.comment = action.to;
       break;
 
+    case `inactiveStepClicked`:
+      state.activeStep = action.step;
+      break;
+
     default:
       break;
   }

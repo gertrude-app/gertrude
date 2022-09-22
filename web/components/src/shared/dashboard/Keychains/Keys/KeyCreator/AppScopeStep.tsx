@@ -18,7 +18,6 @@ const AppScopeStep: React.FC<Props> = ({ mode, update, activeStep, appScope }) =
     <KeyCreationStep
       mode={mode}
       update={update}
-      setCurrentStep={() => {}}
       lookaheadTitle="Select app internet access"
       activeTitle="Select app internet access"
       title={

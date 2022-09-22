@@ -11,7 +11,6 @@ type Props = {
   children: React.ReactNode;
   ownStep: EditKey.Step;
   activeStep: EditKey.Step;
-  setCurrentStep(num: number): void;
   mode: 'edit' | 'create';
   canAdvance?: boolean;
   update(event: EditKey.Event): unknown;
@@ -71,7 +70,7 @@ const KeyCreationStep: React.FC<Props> = ({
         >
           <div
             className="flex justify-between w-full items-center cursor-pointer hover:bg-gray-50 transition duration-100 p-4 rounded-2xl outline-none [transition:200ms] text-left"
-            onClick={() => {}}
+            onClick={() => update({ type: `inactiveStepClicked`, step: ownStep })}
           >
             {isActive ? (
               <h2 className="font-medium text-gray-900 text-lg">{activeTitle}</h2>
@@ -92,7 +91,7 @@ const KeyCreationStep: React.FC<Props> = ({
                 <div
                   className={cx(
                     `flex items-center mt-6`,
-                    ownStep === 1 ? `justify-end` : `justify-between`,
+                    isFirst ? `justify-end` : `justify-between`,
                   )}
                 >
                   {ownStep > EditKey.Step.SetKeyType && (

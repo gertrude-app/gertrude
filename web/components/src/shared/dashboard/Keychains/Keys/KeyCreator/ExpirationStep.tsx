@@ -26,7 +26,6 @@ const ExpirationStep: React.FC<Props> = ({ mode, update, activeStep, expiration 
   <KeyCreationStep
     update={update}
     mode={mode}
-    setCurrentStep={() => {}}
     lookaheadTitle="Add an optional expiration"
     activeTitle="Add an optional expiration:"
     title={

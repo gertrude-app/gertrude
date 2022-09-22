@@ -16,7 +16,6 @@ interface Props {
 const KeyTypeStep: React.FC<Props> = ({ mode, keyType, activeStep, update }) => (
   <KeyCreationStep
     mode={mode}
-    setCurrentStep={() => {}}
     activeTitle="Select key type:"
     lookaheadTitle=""
     canAdvance={!!keyType}

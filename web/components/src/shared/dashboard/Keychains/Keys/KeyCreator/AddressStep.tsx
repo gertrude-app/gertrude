@@ -30,8 +30,6 @@ const AddressStep: React.FC<Props> = ({
   <KeyCreationStep
     mode={mode}
     update={update}
-    // TODO? necessry?
-    setCurrentStep={() => {}}
     lookaheadTitle="Website address"
     activeTitle="Select website address:"
     title={
