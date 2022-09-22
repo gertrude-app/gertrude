@@ -1,7 +1,9 @@
+import * as EditKey from './keys/edit';
+
 export function newKeyState(): EditKey.State {
   return {
     mode: `create`,
-    currentStep: `setKeyType`,
+    activeStep: EditKey.Step.SetKeyType,
     keyType: undefined, // `website`,
     address: `temp.com`,
     addressType: `standard`,

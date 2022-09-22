@@ -1,18 +1,19 @@
 import React from 'react';
 import { capitalize } from '../../../lib/string';
-import KeyCreationStep from '../KeyCreationStep';
+import KeyCreationStep from './KeyCreationStep';
 import KeyTypeOption from '../KeyTypeOption';
 import GradientIcon from './GradientIcon';
 import UserInputText from './UserInputText';
+import * as EditKey from '../../../lib/keys/edit';
 
 interface Props {
   mode: 'create' | 'edit';
   keyType?: 'website' | 'app';
-  currentStepIndex: number;
+  activeStep: EditKey.Step;
   update(event: EditKey.Event): unknown;
 }
 
-const KeyTypeStep: React.FC<Props> = ({ mode, keyType, currentStepIndex, update }) => (
+const KeyTypeStep: React.FC<Props> = ({ mode, keyType, activeStep, update }) => (
   <KeyCreationStep
     mode={mode}
     setCurrentStep={() => {}}
@@ -25,15 +26,15 @@ const KeyTypeStep: React.FC<Props> = ({ mode, keyType, currentStepIndex, update 
         <UserInputText>{capitalize(keyType ?? `website`)}</UserInputText> key
       </h1>
     }
-    currentStep={currentStepIndex}
-    index={1}
+    ownStep={EditKey.Step.SetKeyType}
+    activeStep={activeStep}
     update={update}
   >
     <div className="flex flex-col sm:flex-row -mt-4">
       <KeyTypeOption
         icon="earth-americas"
         selected={keyType === `website`}
-        onClick={() => update({ set: `keyType`, to: `website` })}
+        onClick={() => update({ type: `setKeyType`, to: `website` })}
         title="Website key"
         description="Grant access to a specific website"
         className="sm:w-1/2 sm:mr-2 mb-3 sm:mb-0"
@@ -41,7 +42,7 @@ const KeyTypeStep: React.FC<Props> = ({ mode, keyType, currentStepIndex, update 
       <KeyTypeOption
         icon="hamburger"
         selected={keyType === `app`}
-        onClick={() => update({ set: `keyType`, to: `app` })}
+        onClick={() => update({ type: `setKeyType`, to: `app` })}
         title="App key"
         description="Grant access to a specific mac application"
         className="sm:w-1/2 sm:ml-2"

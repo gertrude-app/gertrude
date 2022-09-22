@@ -1,17 +1,18 @@
 import React from 'react';
 import TextInput from '../../../TextInput';
-import KeyCreationStep from '../KeyCreationStep';
+import KeyCreationStep from './KeyCreationStep';
 import GradientIcon from './GradientIcon';
 import UserInputText from './UserInputText';
+import * as EditKey from '../../../lib/keys/edit';
 
 interface Props {
   mode: 'edit' | 'create';
-  currentStepIndex: number;
+  activeStep: EditKey.Step;
   comment?: string;
   update(event: EditKey.Event): unknown;
 }
 
-const CommentStep: React.FC<Props> = ({ mode, update, currentStepIndex, comment }) => (
+const CommentStep: React.FC<Props> = ({ mode, update, activeStep, comment }) => (
   <KeyCreationStep
     mode={mode}
     update={update}
@@ -30,14 +31,13 @@ const CommentStep: React.FC<Props> = ({ mode, update, currentStepIndex, comment 
         )}
       </h2>
     }
-    currentStep={currentStepIndex}
-    index={9}
-    isLast
+    activeStep={activeStep}
+    ownStep={EditKey.Step.Comment}
   >
     <TextInput
       type="textarea"
       value={comment ?? ``}
-      setValue={(newValue) => update({ set: `comment`, to: newValue })}
+      setValue={(newValue) => update({ type: `setComment`, to: newValue })}
       placeholder="Optional note to yourself about this key"
     />
   </KeyCreationStep>

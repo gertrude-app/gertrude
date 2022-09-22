@@ -2,15 +2,16 @@ import React from 'react';
 import SelectMenu from '../../../SelectMenu';
 import TextInput from '../../../TextInput';
 import Toggle from '../../../Toggle';
-import KeyCreationStep from '../KeyCreationStep';
+import KeyCreationStep from './KeyCreationStep';
 import SubdomainDemo from './SubdomainDemo';
 import GradientIcon from './GradientIcon';
 import UserInputText from './UserInputText';
+import * as EditKey from '../../../lib/keys/edit';
 
 interface Props {
   keyType: 'app' | 'website';
   mode: 'edit' | 'create';
-  currentStepIndex: number;
+  activeStep: EditKey.Step;
   address: string;
   addressType: 'strict' | 'standard' | 'ip' | 'domainRegex';
   showAdvancedAddressOptions: boolean;
@@ -20,7 +21,7 @@ interface Props {
 const AddressStep: React.FC<Props> = ({
   mode,
   keyType,
-  currentStepIndex,
+  activeStep,
   address,
   addressType,
   showAdvancedAddressOptions,
@@ -40,15 +41,19 @@ const AddressStep: React.FC<Props> = ({
         {address.trim() !== `` && <UserInputText>{address}</UserInputText>}
       </h2>
     }
-    currentStep={currentStepIndex}
+    ownStep={
+      keyType === `website`
+        ? EditKey.Step.WebsiteKey_SetAddress
+        : EditKey.Step.AppKey_Advanced_SetAddress
+    }
+    activeStep={activeStep}
     canAdvance={address.trim() !== ``}
-    index={keyType === `website` ? 2 : 7}
   >
     <TextInput
       type="text"
       label="Web address:"
       value={address}
-      setValue={(updated) => update({ set: `address`, to: updated })}
+      setValue={(updated) => update({ type: `setAddress`, to: updated })}
       prefix="https://"
       className="mb-7"
     />
@@ -59,7 +64,7 @@ const AddressStep: React.FC<Props> = ({
           enabled={showAdvancedAddressOptions}
           small
           setEnabled={(enabled) =>
-            update({ set: `showAdvancedAddressOptions`, to: enabled })
+            update({ type: `setShowAdvancedAddressOptions`, to: enabled })
           }
         />
       </div>
@@ -84,7 +89,7 @@ const AddressStep: React.FC<Props> = ({
             }[]
           }
           selectedOption={addressType}
-          setSelected={(type) => update({ set: `addressType`, to: type })}
+          setSelected={(type) => update({ type: `setAddressType`, to: type })}
           deemphasized
         />
       </div>

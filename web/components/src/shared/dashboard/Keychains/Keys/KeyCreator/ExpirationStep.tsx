@@ -10,23 +10,19 @@ import {
 } from '../../../lib/dates';
 import TextInput from '../../../TextInput';
 import Toggle from '../../../Toggle';
-import KeyCreationStep from '../KeyCreationStep';
+import KeyCreationStep from './KeyCreationStep';
 import GradientIcon from './GradientIcon';
 import UserInputText from './UserInputText';
+import * as EditKey from '../../../lib/keys/edit';
 
 interface Props {
   mode: 'edit' | 'create';
-  currentStepIndex: number;
   expiration?: string;
   update(event: EditKey.Event): unknown;
+  activeStep: EditKey.Step;
 }
 
-const ExpirationStep: React.FC<Props> = ({
-  mode,
-  update,
-  currentStepIndex,
-  expiration,
-}) => (
+const ExpirationStep: React.FC<Props> = ({ mode, update, activeStep, expiration }) => (
   <KeyCreationStep
     update={update}
     mode={mode}
@@ -39,8 +35,8 @@ const ExpirationStep: React.FC<Props> = ({
         <TitleText expiration={expiration} />
       </h2>
     }
-    currentStep={currentStepIndex}
-    index={8}
+    activeStep={activeStep}
+    ownStep={EditKey.Step.Expiration}
   >
     <div className="flex justify-end mr-2 items-center -mt-3">
       <label className="mr-2 text-gray-600">Key expires</label>
@@ -49,7 +45,7 @@ const ExpirationStep: React.FC<Props> = ({
         small
         setEnabled={(enabled) =>
           update({
-            set: `expirationDate`,
+            type: `setExpirationDate`,
             to: enabled ? formatDate(utcToLocal(daysFromNow(7)), `dateInput`) : undefined,
           })
         }
@@ -60,7 +56,7 @@ const ExpirationStep: React.FC<Props> = ({
         <TextInput
           type="date"
           value={isoToDateInput(isoToLocal(expiration))}
-          setValue={(date) => update({ set: `expirationDate`, to: date })}
+          setValue={(date) => update({ type: `setExpirationDate`, to: date })}
           label="Expiration date:"
           className="sm:mr-2 mb-4 sm:mb-0"
         />

@@ -6,6 +6,7 @@ import Modal, { ConfirmDeleteEntity } from '../../Modal';
 import PageHeading from '../../PageHeading';
 import TextInput from '../../TextInput';
 import KeyCreator from '../Keys/KeyCreator';
+import * as EditKey from '../../lib/keys/edit';
 
 type Props = {
   isNew: boolean;

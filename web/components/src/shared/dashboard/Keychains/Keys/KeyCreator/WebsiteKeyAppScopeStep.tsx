@@ -1,13 +1,14 @@
 import React from 'react';
 import SelectableListItem from '../../../SelectableListItem';
 import Toggle from '../../../Toggle';
-import KeyCreationStep from '../KeyCreationStep';
+import KeyCreationStep from './KeyCreationStep';
 import GradientIcon from './GradientIcon';
 import UserInputText from './UserInputText';
+import * as EditKey from '../../../lib/keys/edit';
 
 interface Props {
   mode: 'edit' | 'create';
-  currentStepIndex: number;
+  activeStep: EditKey.Step;
   addressScope: 'webBrowsers' | 'unrestricted' | 'singleApp';
   showAdvancedAddressScopeOptions: boolean;
   appIdentificationType: 'bundleId' | 'slug';
@@ -15,9 +16,9 @@ interface Props {
   update(event: EditKey.Event): unknown;
 }
 
-const AddressScopeStep: React.FC<Props> = ({
+const WebsiteKeyAppScopeStep: React.FC<Props> = ({
   mode,
-  currentStepIndex,
+  activeStep,
   showAdvancedAddressScopeOptions,
   addressScope,
   update,
@@ -34,8 +35,8 @@ const AddressScopeStep: React.FC<Props> = ({
           <Title addressScope={addressScope} />
         </h2>
       }
-      currentStep={currentStepIndex}
-      index={3}
+      activeStep={activeStep}
+      ownStep={EditKey.Step.WebsiteKey_SetAppScope}
       canAdvance
     >
       <div>
@@ -46,7 +47,7 @@ const AddressScopeStep: React.FC<Props> = ({
             enabled={showAdvancedAddressScopeOptions}
             small
             setEnabled={(enabled) =>
-              update({ set: `showAdvancedAddressScopeOptions`, to: enabled })
+              update({ type: `setShowAdvancedAddressScopeOptions`, to: enabled })
             }
           />
         </div>
@@ -55,21 +56,21 @@ const AddressScopeStep: React.FC<Props> = ({
             title={`Web browsers`}
             description={`Applies to all browsers, like Chrome, Safari, Firefox, etc.`}
             selected={addressScope === `webBrowsers`}
-            onClick={() => update({ set: `addressScope`, to: `webBrowsers` })}
+            onClick={() => update({ type: `setAddressScope`, to: `webBrowsers` })}
             badges={[{ text: `Most common`, color: `green` }]}
           />
           <SelectableListItem
             title="All apps"
             description="Permits access for every app (including browsers). Use for sites you're sure you trust."
             selected={addressScope === `unrestricted`}
-            onClick={() => update({ set: `addressScope`, to: `unrestricted` })}
+            onClick={() => update({ type: `setAddressScope`, to: `unrestricted` })}
           />
           {showAdvancedAddressScopeOptions && (
             <SelectableListItem
               title="Single app"
               description="Unlock this site for one specific app you choose."
               selected={addressScope === `singleApp`}
-              onClick={() => update({ set: `addressScope`, to: `singleApp` })}
+              onClick={() => update({ type: `setAddressScope`, to: `singleApp` })}
               badges={[
                 { text: `Most safe`, color: `green` },
                 { text: `Advanced`, color: `yellow` },
@@ -82,7 +83,7 @@ const AddressScopeStep: React.FC<Props> = ({
   );
 };
 
-export default AddressScopeStep;
+export default WebsiteKeyAppScopeStep;
 
 const Title: React.FC<{
   addressScope: 'webBrowsers' | 'unrestricted' | 'singleApp';

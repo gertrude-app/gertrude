@@ -1,5 +1,6 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import KeyCreator from './KeyCreator';
+import * as EditKey from '../../../lib/keys/edit';
 
 export default {
   title: `Dashboard/Keychains/Keys/KeyCreator`,
@@ -11,7 +12,7 @@ const Template: ComponentStory<typeof KeyCreator> = (args) => <KeyCreator {...ar
 export const CreateStart = Template.bind({});
 CreateStart.args = {
   mode: `create`,
-  currentStep: `setKeyType`,
+  activeStep: EditKey.Step.SetKeyType,
   address: ``,
   addressType: `standard`,
   addressScope: `webBrowsers`,
@@ -34,7 +35,7 @@ export const CreateAddressType = Template.bind({});
 CreateAddressType.args = {
   ...CreateStart.args,
   keyType: `website`,
-  currentStep: `websiteKey_setAddress`,
+  activeStep: EditKey.Step.WebsiteKey_SetAddress,
   address: `goats.com`,
 };
 
@@ -43,7 +44,7 @@ CreateStrictAddressType.args = {
   ...CreateStart.args,
   addressType: `strict`,
   keyType: `website`,
-  currentStep: `websiteKey_setAddress`,
+  activeStep: EditKey.Step.WebsiteKey_SetAddress,
   address: `goats.com`,
 };
 
@@ -52,7 +53,7 @@ CreateAddressScope.args = {
   ...CreateStart.args,
   addressType: `standard`,
   keyType: `website`,
-  currentStep: `websiteKey_setAppScope`,
+  activeStep: EditKey.Step.WebsiteKey_SetAppScope,
   address: `goats.com`,
 };
 
@@ -61,7 +62,7 @@ CreateExpirationOff.args = {
   ...CreateStart.args,
   addressType: `standard`,
   keyType: `website`,
-  currentStep: `expiration`,
+  activeStep: EditKey.Step.Expiration,
   address: `goats.com`,
 };
 
@@ -73,7 +74,7 @@ CreateExpiration.args = {
   ...CreateStart.args,
   addressType: `standard`,
   keyType: `website`,
-  currentStep: `expiration`,
+  activeStep: EditKey.Step.Expiration,
   expiration: expiration.toISOString(),
   address: `goats.com`,
 };
@@ -83,7 +84,7 @@ EditComment.args = {
   ...CreateExpiration.args,
   keyType: `website`,
   address: `goats.com`,
-  currentStep: undefined,
+  activeStep: undefined,
   expiration: undefined,
   comment: `For AOPS`,
   mode: `edit`,
@@ -94,7 +95,7 @@ EditNoExpiration.args = {
   ...CreateExpiration.args,
   keyType: `website`,
   address: `goats.com`,
-  currentStep: undefined,
+  activeStep: undefined,
   mode: `edit`,
 };
 
@@ -103,7 +104,7 @@ EditHasExpiration.args = {
   ...CreateExpiration.args,
   keyType: `website`,
   address: `goats.com`,
-  currentStep: undefined,
+  activeStep: undefined,
   expiration: expiration.toISOString(),
   mode: `edit`,
 };
@@ -113,7 +114,7 @@ EditStepOpen.args = {
   ...CreateExpiration.args,
   keyType: `website`,
   address: `goats.com`,
-  currentStep: `websiteKey_setAddress`,
+  activeStep: EditKey.Step.WebsiteKey_SetAddress,
   mode: `edit`,
 };
 
@@ -121,7 +122,7 @@ export const CreateApp = Template.bind({});
 CreateApp.args = {
   ...CreateStart.args,
   keyType: `app`,
-  currentStep: `setKeyType`,
+  activeStep: EditKey.Step.SetKeyType,
   address: `goats.com`,
   appIdentificationType: `slug`,
   appSlug: `slack`,
@@ -130,13 +131,13 @@ CreateApp.args = {
 export const CreateAppSlug = Template.bind({});
 CreateAppSlug.args = {
   ...CreateApp.args,
-  currentStep: `appKey_chooseApp`,
+  activeStep: EditKey.Step.AppKey_ChooseApp,
 };
 
 export const CreateAppBundleId = Template.bind({});
 CreateAppBundleId.args = {
   ...CreateApp.args,
-  currentStep: `appKey_chooseApp`,
+  activeStep: EditKey.Step.AppKey_ChooseApp,
   appIdentificationType: `bundleId`,
   appBundleId: `com.goats.app`,
 };
@@ -144,19 +145,19 @@ CreateAppBundleId.args = {
 export const CreateAppScope = Template.bind({});
 CreateAppScope.args = {
   ...CreateAppSlug.args,
-  currentStep: `appKey_setAppScope`,
+  activeStep: EditKey.Step.AppKey_SetAppScope,
 };
 
 export const CreateAppExpiration = Template.bind({});
 CreateAppExpiration.args = {
   ...CreateAppSlug.args,
-  currentStep: `expiration`,
+  activeStep: EditKey.Step.Expiration,
 };
 
 export const CreateAppComment = Template.bind({});
 CreateAppComment.args = {
   ...CreateAppSlug.args,
-  currentStep: `comment`,
+  activeStep: EditKey.Step.Comment,
 };
 
 export const AppKeyAddressScope = Template.bind({});
@@ -164,7 +165,7 @@ AppKeyAddressScope.args = {
   ...CreateApp.args,
   keyType: `app`,
   appScope: `address`,
-  currentStep: `appKey_setAddress`,
+  activeStep: EditKey.Step.AppKey_Advanced_SetAddress,
 };
 
 export const EditAppKeyAddressScope = Template.bind({});
@@ -173,7 +174,7 @@ EditAppKeyAddressScope.args = {
   mode: `edit`,
   keyType: `app`,
   appScope: `address`,
-  currentStep: undefined,
+  activeStep: undefined,
 };
 
 export const WebKeyAppScope = Template.bind({});
@@ -182,12 +183,12 @@ WebKeyAppScope.args = {
   keyType: `website`,
   appScope: `address`,
   addressScope: `singleApp`,
-  currentStep: `websiteKey_chooseApp`,
+  activeStep: EditKey.Step.WebsiteKey_Advanced_ChooseApp,
 };
 
 export const EditWebKeyAppScope = Template.bind({});
 EditWebKeyAppScope.args = {
   ...WebKeyAppScope.args,
   mode: `edit`,
-  currentStep: undefined,
+  activeStep: undefined,
 };

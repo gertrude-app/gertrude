@@ -1,18 +1,19 @@
 import React from 'react';
 import SelectableListItem from '../../../SelectableListItem';
 import Label from '../../../TextInput/Label';
-import KeyCreationStep from '../KeyCreationStep';
+import KeyCreationStep from './KeyCreationStep';
 import GradientIcon from './GradientIcon';
 import UserInputText from './UserInputText';
+import * as EditKey from '../../../lib/keys/edit';
 
 interface Props {
   mode: 'edit' | 'create';
-  currentStepIndex: number;
+  activeStep: EditKey.Step;
   appScope: 'unrestricted' | 'address';
   update(event: EditKey.Event): unknown;
 }
 
-const AppScopeStep: React.FC<Props> = ({ mode, update, currentStepIndex, appScope }) => {
+const AppScopeStep: React.FC<Props> = ({ mode, update, activeStep, appScope }) => {
   return (
     <KeyCreationStep
       mode={mode}
@@ -35,8 +36,8 @@ const AppScopeStep: React.FC<Props> = ({ mode, update, currentStepIndex, appScop
           )}
         </h2>
       }
-      currentStep={currentStepIndex}
-      index={6}
+      ownStep={EditKey.Step.AppKey_SetAppScope}
+      activeStep={activeStep}
     >
       <Label>Key grants application:</Label>
       <div className="space-y-0.5 mt-3">
@@ -44,14 +45,14 @@ const AppScopeStep: React.FC<Props> = ({ mode, update, currentStepIndex, appScop
           title="Unrestricted internet access"
           description="Allows this app unrestricted network requests. Only for narrowly-focused apps that you trust."
           selected={appScope === `unrestricted`}
-          onClick={() => update({ set: `appScope`, to: `unrestricted` })}
+          onClick={() => update({ type: `setAppScope`, to: `unrestricted` })}
           badges={[{ text: `Most common`, color: `green` }]}
         />
         <SelectableListItem
           title="Access to a specific address"
           description="Allow this application to access a specific address."
           selected={appScope === `address`}
-          onClick={() => update({ set: `appScope`, to: `address` })}
+          onClick={() => update({ type: `setAppScope`, to: `address` })}
           badges={[
             { text: `Most safe`, color: `green` },
             { text: `Advanced`, color: `yellow` },

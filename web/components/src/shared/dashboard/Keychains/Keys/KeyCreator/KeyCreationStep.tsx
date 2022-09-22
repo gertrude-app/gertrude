@@ -1,6 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import Button from '../../../../Button';
+import * as EditKey from '../../../lib/keys/edit';
 
 type Props = {
   className?: string;
@@ -8,11 +9,10 @@ type Props = {
   activeTitle: string;
   title: React.ReactNode;
   children: React.ReactNode;
-  currentStep: number;
+  ownStep: EditKey.Step;
+  activeStep: EditKey.Step;
   setCurrentStep(num: number): void;
-  index: number; // starting from 1, to make it line up with the steps
   mode: 'edit' | 'create';
-  isLast?: boolean;
   canAdvance?: boolean;
   update(event: EditKey.Event): unknown;
 };
@@ -21,16 +21,20 @@ const KeyCreationStep: React.FC<Props> = ({
   className,
   title,
   activeTitle,
-  currentStep,
-  index,
+  ownStep,
+  activeStep,
   children,
-  isLast = false,
   lookaheadTitle,
   mode,
   canAdvance = true,
   update,
 }) => {
-  const open = currentStep === index;
+  const open = ownStep === activeStep;
+  const isFirst = ownStep === EditKey.Step.SetKeyType;
+  const isLast = ownStep === EditKey.Step.Comment;
+  const isActive = ownStep === activeStep;
+  const isBeforeActive = ownStep < activeStep;
+  const isAfterActive = ownStep > activeStep;
   return (
     <div className={cx(`flex items-stretch max-w-2xl min-h-[64px]`, className)}>
       {mode === `create` && (
@@ -42,21 +46,21 @@ const KeyCreationStep: React.FC<Props> = ({
           <div
             className={cx(
               `h-full border-r-2 border-dashed border-gray-300 absolute`,
-              index === 1 && `h-1/2 bottom-0`,
+              isFirst && `h-1/2 bottom-0`,
               isLast && `h-1/2 top-0`,
             )}
           />
           <div
             className={cx(
               `relative w-4 h-4 rounded-full border-2`,
-              index < currentStep && `border-indigo-500 bg-indigo-500`,
-              index === currentStep && `border-indigo-500 bg-indigo-50`,
-              index > currentStep && `border-gray-300 bg-gray-50`,
+              isBeforeActive && `border-indigo-500 bg-indigo-500`,
+              isActive && `border-indigo-500 bg-indigo-50`,
+              isAfterActive && `border-gray-300 bg-gray-50`,
             )}
           />
         </div>
       )}
-      {index > currentStep && mode === `create` ? (
+      {isAfterActive && mode === `create` ? (
         <h2 className="text-gray-500 text-lg flex items-center">{lookaheadTitle}</h2>
       ) : (
         <div
@@ -69,7 +73,7 @@ const KeyCreationStep: React.FC<Props> = ({
             className="flex justify-between w-full items-center cursor-pointer hover:bg-gray-50 transition duration-100 p-4 rounded-2xl outline-none [transition:200ms] text-left"
             onClick={() => {}}
           >
-            {index === currentStep ? (
+            {isActive ? (
               <h2 className="font-medium text-gray-900 text-lg">{activeTitle}</h2>
             ) : (
               title
@@ -84,17 +88,17 @@ const KeyCreationStep: React.FC<Props> = ({
           {open && (
             <div className="p-2 sm:p-4">
               {children}
-              {((mode === `create` && currentStep === index) || isLast) && (
+              {((mode === `create` && activeStep === ownStep) || isLast) && (
                 <div
                   className={cx(
                     `flex items-center mt-6`,
-                    index === 1 ? `justify-end` : `justify-between`,
+                    ownStep === 1 ? `justify-end` : `justify-between`,
                   )}
                 >
-                  {index !== 1 && (
+                  {ownStep > EditKey.Step.SetKeyType && (
                     <Button
                       type="button"
-                      onClick={() => update({ set: `currentStep`, to: `prev` })}
+                      onClick={() => update({ type: `prevStepClicked` })}
                       color="secondary-white"
                       small
                     >
@@ -104,7 +108,7 @@ const KeyCreationStep: React.FC<Props> = ({
                   )}
                   <Button
                     type="button"
-                    onClick={() => update({ set: `currentStep`, to: `next` })}
+                    onClick={() => update({ type: `nextStepClicked` })}
                     color="primary-violet"
                     small
                     disabled={!canAdvance}

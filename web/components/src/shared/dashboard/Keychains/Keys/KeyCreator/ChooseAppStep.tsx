@@ -2,14 +2,15 @@ import React from 'react';
 import Combobox from '../../../Combobox';
 import RadioGroup from '../../../RadioGroup';
 import TextInput from '../../../TextInput';
-import KeyCreationStep from '../KeyCreationStep';
+import KeyCreationStep from './KeyCreationStep';
 import GradientIcon from './GradientIcon';
 import UserInputText from './UserInputText';
+import * as EditKey from '../../../lib/keys/edit';
 
 interface Props {
   keyType: 'app' | 'website';
   mode: 'edit' | 'create';
-  currentStepIndex: number;
+  activeStep: EditKey.Step;
   appIdentificationType: 'bundleId' | 'slug';
   appSlug?: string;
   appBundleId?: string;
@@ -21,7 +22,7 @@ const ChooseAppStep: React.FC<Props> = (props) => {
   const {
     mode,
     keyType,
-    currentStepIndex,
+    activeStep,
     appIdentificationType,
     apps,
     appSlug,
@@ -38,8 +39,12 @@ const ChooseAppStep: React.FC<Props> = (props) => {
       lookaheadTitle="Select app"
       activeTitle="Select app:"
       title={<Title {...props} />}
-      currentStep={currentStepIndex}
-      index={keyType === `app` ? 5 : 4}
+      activeStep={activeStep}
+      ownStep={
+        keyType === `app`
+          ? EditKey.Step.AppKey_ChooseApp
+          : EditKey.Step.WebsiteKey_Advanced_ChooseApp
+      }
     >
       <div>
         <RadioGroup<'bundleId' | 'slug'>
@@ -48,7 +53,7 @@ const ChooseAppStep: React.FC<Props> = (props) => {
             { value: `bundleId`, display: `By bundle ID` },
           ]}
           selectedOption={appIdentificationType}
-          setSelectedOption={(to) => update({ set: `appIdentificationType`, to })}
+          setSelectedOption={(to) => update({ type: `setAppIdentificationType`, to })}
           className="mb-4 -mt-5"
         />
         {appIdentificationType === `slug` ? (
@@ -60,7 +65,7 @@ const ChooseAppStep: React.FC<Props> = (props) => {
                 display: app.name,
               }))}
               selected={selectedApp({ appSlug, apps })}
-              setSelected={(slug) => update({ set: `appSlug`, to: slug })}
+              setSelected={(slug) => update({ type: `setAppSlug`, to: slug })}
             />
           </div>
         ) : (
@@ -68,7 +73,7 @@ const ChooseAppStep: React.FC<Props> = (props) => {
             type="text"
             label="App bundle ID:"
             value={appBundleId ?? ``}
-            setValue={(id) => update({ set: `appBundleId`, to: id })}
+            setValue={(id) => update({ type: `setAppBundleId`, to: id })}
           />
         )}
       </div>

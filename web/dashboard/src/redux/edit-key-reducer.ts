@@ -1,109 +1,116 @@
 import { isoFromDateInput } from '@dashboard/lib/dates';
+import * as EditKey from '@dashboard/lib/keys/edit';
 
 export default function reducer(state: EditKey.State, action: EditKey.Event): void {
-  if (action.set === `currentStep` && action.to === `next`) {
-    switch (state.currentStep) {
-      case `setKeyType`:
-        state.currentStep =
-          state.keyType === `app` ? `appKey_chooseApp` : `websiteKey_setAddress`;
+  if (action.type === `nextStepClicked`) {
+    switch (state.activeStep) {
+      case EditKey.Step.SetKeyType:
+        state.activeStep =
+          state.keyType === `app`
+            ? EditKey.Step.AppKey_ChooseApp
+            : EditKey.Step.WebsiteKey_SetAddress;
         return;
-      case `websiteKey_setAddress`:
-        state.currentStep = `websiteKey_setAppScope`;
+      case EditKey.Step.WebsiteKey_SetAddress:
+        state.activeStep = EditKey.Step.WebsiteKey_SetAppScope;
         return;
-      case `websiteKey_chooseApp`:
-      case `appKey_setAddress`: // fallthrough
-        state.currentStep = `expiration`;
+      case EditKey.Step.WebsiteKey_Advanced_ChooseApp:
+      case EditKey.Step.AppKey_Advanced_SetAddress: // fallthrough
+        state.activeStep = EditKey.Step.Expiration;
         return;
-      case `appKey_setAppScope`:
-        state.currentStep = `expiration`;
+      case EditKey.Step.AppKey_SetAppScope:
+        state.activeStep = EditKey.Step.Expiration;
         return;
-      case `websiteKey_setAppScope`:
-        state.currentStep =
-          state.addressScope === `singleApp` ? `websiteKey_chooseApp` : `expiration`;
+      case EditKey.Step.WebsiteKey_SetAppScope:
+        state.activeStep =
+          state.addressScope === `singleApp`
+            ? EditKey.Step.WebsiteKey_Advanced_ChooseApp
+            : EditKey.Step.Expiration;
         return;
-      case `expiration`:
-        state.currentStep = `comment`;
+      case EditKey.Step.Expiration:
+        state.activeStep = EditKey.Step.Comment;
         return;
       default:
         return;
     }
   }
 
-  if (action.set === `currentStep` && action.to === `prev`) {
-    switch (state.currentStep) {
-      case `appKey_chooseApp`:
-        state.currentStep = `setKeyType`;
+  if (action.type === `prevStepClicked`) {
+    switch (state.activeStep) {
+      case EditKey.Step.AppKey_ChooseApp:
+        state.activeStep = EditKey.Step.SetKeyType;
         return;
-      case `websiteKey_setAppScope`:
-        state.currentStep = `websiteKey_setAddress`;
+      case EditKey.Step.WebsiteKey_SetAppScope:
+        state.activeStep = EditKey.Step.WebsiteKey_SetAddress;
         return;
-      case `websiteKey_setAddress`:
-        state.currentStep = `setKeyType`;
+      case EditKey.Step.WebsiteKey_SetAddress:
+        state.activeStep = EditKey.Step.SetKeyType;
         return;
-      case `expiration`:
+      case EditKey.Step.Expiration:
         if (state.keyType === `website`) {
-          state.currentStep =
+          state.activeStep =
             state.addressScope === `singleApp`
-              ? `websiteKey_chooseApp`
-              : `websiteKey_setAppScope`;
+              ? EditKey.Step.WebsiteKey_Advanced_ChooseApp
+              : EditKey.Step.WebsiteKey_SetAppScope;
         } else {
-          state.currentStep =
-            state.appScope === `address` ? `appKey_setAddress` : `appKey_setAppScope`;
+          state.activeStep =
+            state.appScope === `address`
+              ? EditKey.Step.AppKey_Advanced_SetAddress
+              : EditKey.Step.AppKey_SetAppScope;
         }
         return;
-      case `comment`:
-        state.currentStep = `expiration`;
+      case EditKey.Step.Comment:
+        state.activeStep = EditKey.Step.Expiration;
         return;
       default:
         return;
     }
   }
 
-  switch (action.set) {
-    case `keyType`:
+  switch (action.type) {
+    case `setKeyType`:
       state.keyType = action.to;
       break;
 
-    case `appSlug`:
+    case `setAppSlug`:
       state.appSlug = action.to;
       break;
 
-    case `appScope`:
+    case `setAppScope`:
       state.appScope = action.to;
       break;
 
-    case `addressScope`:
+    case `setAddressScope`:
       state.addressScope = action.to;
       break;
 
-    case `appIdentificationType`:
+    case `setAppIdentificationType`:
       state.appIdentificationType = action.to;
       break;
 
-    case `appBundleId`:
+    case `setAppBundleId`:
       state.appBundleId = action.to;
       break;
 
-    case `address`:
+    case `setAddress`:
       state.address = action.to;
       break;
 
-    case `showAdvancedAddressOptions`:
+    case `setShowAdvancedAddressOptions`:
       state.showAdvancedAddressOptions = action.to;
       break;
 
-    case `showAdvancedAddressScopeOptions`:
+    case `setShowAdvancedAddressScopeOptions`:
       state.showAdvancedAddressScopeOptions = action.to;
       if (action.to === false && state.addressScope === `singleApp`) {
         state.addressScope = `webBrowsers`;
       }
       break;
 
-    case `addressType`:
+    case `setAddressType`:
       state.addressType = action.to;
       break;
 
-    case `expirationDate`:
+    case `setExpirationDate`:
       if (action.to) {
         state.expiration = isoFromDateInput(action.to, state.expiration);
       } else {
@@ -111,14 +118,14 @@ export default function reducer(state: EditKey.State, action: EditKey.Event): vo
       }
       break;
 
-    case `expirationTime`:
+    case `setExpirationTime`:
       if (state.expiration) {
         const [date] = state.expiration.split(`T`);
         state.expiration = `${date}T${action.to}:00.000Z`;
       }
       break;
 
-    case `comment`:
+    case `setComment`:
       state.comment = action.to;
       break;
 
