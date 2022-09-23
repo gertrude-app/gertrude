@@ -1,7 +1,6 @@
 import Result from '../Result';
 import * as T from './__generated__/ListAdminKeychains';
 import { gql, query } from '../apollo';
-import { toMap } from '../../redux/helpers';
 
 export function mapKeychain(keychain: T.ListAdminKeychains['keychains'][0]): Keychain {
   return {
@@ -10,18 +9,23 @@ export function mapKeychain(keychain: T.ListAdminKeychains['keychains'][0]): Key
     description: keychain.description,
     isPublic: keychain.isPublic,
     authorId: keychain.authorId,
-    keyRecords: toMap(
-      keychain.keyRecords.map((keyRecord) => ({
-        id: keyRecord.id,
-        key: keyRecord.key.data as Key,
-      })),
-    ),
   };
 }
 
-export async function listAdminKeychains(): Promise<Result<Keychain[], ApiError>> {
+export async function listAdminKeychains(): Promise<
+  Result<[Keychain[], KeyRecord[]], ApiError>
+> {
   const result = await query<T.ListAdminKeychains>(QUERY);
-  return result.mapApi((data) => data.keychains.map(mapKeychain));
+  return result.mapApi((data) => [
+    data.keychains.map(mapKeychain),
+    data.keychains.flatMap((keychain) =>
+      keychain.keyRecords.map((keyRecord) => ({
+        id: keyRecord.id,
+        keychainId: keychain.id,
+        key: keyRecord.key.data as Key,
+      })),
+    ),
+  ]);
 }
 
 export const SINGLE_APP_SCOPE_FIELDS = gql`

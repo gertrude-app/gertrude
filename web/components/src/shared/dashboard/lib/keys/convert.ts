@@ -2,7 +2,7 @@ import { newKeyState } from '.';
 import * as EditKey from './edit';
 
 export function toState(keyRecord: KeyRecord): EditKey.State {
-  const state = newKeyState(keyRecord.id);
+  const state = newKeyState(keyRecord.id, keyRecord.keychainId);
   const key = keyRecord.key;
   state.activeStep = EditKey.Step.None;
   state.isNew = false;
@@ -109,6 +109,7 @@ function websiteKeyToKeyRecord(state: EditKey.State): KeyRecord | null {
   key.scope = scope;
   return {
     id: state.id,
+    keychainId: state.keychainId,
     key,
     comment: state.comment,
     expiration: state.expiration,
@@ -121,6 +122,7 @@ function appKeyToKeyRecord(state: EditKey.State): KeyRecord | null {
     if (!single) return null;
     return {
       id: state.id,
+      keychainId: state.keychainId,
       key: { type: `skeleton`, scope: single },
       comment: state.comment,
       expiration: state.expiration,

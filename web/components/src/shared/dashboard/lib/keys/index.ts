@@ -1,8 +1,9 @@
 import * as EditKey from './edit';
 
-export function newKeyState(id: UUID): EditKey.State {
+export function newKeyState(id: UUID, keychainId: UUID): EditKey.State {
   return {
     id,
+    keychainId,
     isNew: true,
     activeStep: EditKey.Step.SetKeyType,
     keyType: undefined,

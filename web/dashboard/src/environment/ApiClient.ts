@@ -67,6 +67,9 @@ export const throwingApiClient: ApiClient = {
     upsertKeychain: () => {
       throw new Error(`ApiClient.keychains.upsertKeychain() not implemented.`);
     },
+    upsertKeyRecord: () => {
+      throw new Error(`ApiClient.keychains.upsertKeyRecord() not implemented.`);
+    },
   },
   users: {
     list: () => {
@@ -148,12 +151,15 @@ export const noopApiClient: ApiClient = {
       return Result.success(true);
     },
     listAdminKeychains: async () => {
-      return Result.success([]);
+      return Result.success([[], []]);
     },
     getAdminKeychain: async () => {
-      return Result.success(empty.keychain(``, ``));
+      return Result.success([empty.keychain(``, ``), []]);
     },
     upsertKeychain: async () => {
+      return Result.true();
+    },
+    upsertKeyRecord: async () => {
       return Result.true();
     },
   },

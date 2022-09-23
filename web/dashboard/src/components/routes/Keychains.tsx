@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import ListKeychains from '@dashboard/Keychains/List';
 import Loading from '@shared/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
+import { original } from '../../redux/helpers';
 import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
 import {
@@ -20,9 +21,12 @@ const Keychains: React.FC = () => {
   const deleteId = useSelector((state) => state.keychains.deleting.keychain);
   const keychains = useSelector((state) =>
     typesafe
-      .objectValues(state.keychains.adminKeychains)
+      .objectValues(state.keychains.keychains)
       // in case they started making a keychain and then navigated back here
       .filter((keychain) => !keychain.isNew),
+  );
+  const keyRecords = useSelector((state) =>
+    typesafe.objectValues(state.keychains.keyRecords).map(original),
   );
 
   const reqState = request.state;
@@ -40,10 +44,10 @@ const Keychains: React.FC = () => {
 
   return (
     <ListKeychains
-      keychains={keychains.map((keychain) => ({
-        ...keychain.original,
-        description: keychain.original.description || undefined,
-        numKeys: Object.values(keychain.original.keyRecords).length,
+      keychains={keychains.map(({ original: keychain }) => ({
+        ...keychain,
+        description: keychain.description || undefined,
+        numKeys: keyRecords.filter((key) => key.keychainId === keychain.id).length,
       }))}
       remove={{
         id: deleteId,

@@ -17,6 +17,7 @@ type Key =
 
 type KeyRecord = {
   id: UUID;
+  keychainId: UUID;
   key: Key;
   comment?: string | null;
   expiration?: string | null;
@@ -28,5 +29,4 @@ type Keychain = {
   authorId: UUID;
   description: string | null;
   isPublic: boolean;
-  keyRecords: Record<UUID, KeyRecord>;
 };

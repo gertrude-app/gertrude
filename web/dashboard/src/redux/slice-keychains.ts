@@ -9,13 +9,14 @@ import * as empty from './empty';
 import editKeyReducer from './edit-key-reducer';
 import Result from '../api/Result';
 import { newKeyState } from '../components/shared/dashboard/lib/keys';
-import * as typesafe from '../lib/typesafe';
 
 export interface KeychainsState {
   fetchAdminKeychainRequest: Record<UUID, RequestState>;
   updateAdminKeychainRequest: Record<UUID, RequestState>;
   listAdminKeychainsRequest: RequestState;
-  adminKeychains: Record<UUID, Editable<Keychain>>;
+  saveKeyRecordRequest: RequestState;
+  keychains: Record<UUID, Editable<Keychain>>;
+  keyRecords: Record<UUID, Editable<KeyRecord>>;
   editingKey?: EditKey.State;
   deleting: { keychain?: UUID };
   deleted: UUID[];
@@ -28,7 +29,9 @@ export function initialState(): KeychainsState {
     fetchAdminKeychainRequest: {},
     updateAdminKeychainRequest: {},
     listAdminKeychainsRequest: Req.idle(),
-    adminKeychains: {},
+    saveKeyRecordRequest: Req.idle(),
+    keyRecords: {},
+    keychains: {},
     deleting: {},
     deleted: [],
   };
@@ -39,7 +42,7 @@ export const slice = createSlice({
   initialState,
   reducers: {
     createKeychainInitiated(state, action: PayloadAction<{ id: UUID; adminId: UUID }>) {
-      state.adminKeychains[action.payload.id] = {
+      state.keychains[action.payload.id] = {
         isNew: true,
         ...editable(empty.keychain(action.payload.id, action.payload.adminId)),
       };
@@ -59,7 +62,7 @@ export const slice = createSlice({
       delete state.deleting[action.payload];
     },
     keychainNameUpdated(state, action: PayloadAction<{ id: UUID; name: string }>) {
-      const keychain = state.adminKeychains[action.payload.id];
+      const keychain = state.keychains[action.payload.id];
       if (keychain) {
         keychain.draft.name = action.payload.name;
       }
@@ -68,28 +71,25 @@ export const slice = createSlice({
       state,
       action: PayloadAction<{ id: UUID; description: string }>,
     ) {
-      const keychain = state.adminKeychains[action.payload.id];
+      const keychain = state.keychains[action.payload.id];
       if (!keychain) {
         return;
       }
       const description = action.payload.description || null;
       keychain.draft.description = description;
     },
-    createNewKeyClicked(state) {
-      state.editingKey = newKeyState(uuid());
+    createNewKeyClicked(state, action: PayloadAction<UUID>) {
+      const keyState = newKeyState(uuid(), action.payload);
+      state.editingKey = keyState;
     },
     editKeyModalDismissed(state) {
       delete state.editingKey;
     },
     editKeyClicked(state, action: PayloadAction<UUID>) {
-      for (const { original: keychain } of typesafe.objectValues(state.adminKeychains)) {
-        const key = typesafe
-          .objectValues(keychain.keyRecords)
-          .find((keyRecord) => keyRecord.id === action.payload);
-        if (key) {
-          state.editingKey = convert.toState(key);
-          return;
-        }
+      const keyRecord = state.keyRecords[action.payload];
+      if (keyRecord) {
+        state.editingKey = convert.toState(keyRecord.original);
+        return;
       }
     },
   },
@@ -104,9 +104,9 @@ export const slice = createSlice({
 
     builder.addCase(upsertKeychain.succeeded, (state, { meta }) => {
       state.updateAdminKeychainRequest[meta.arg] = Req.succeed(void 0);
-      const keychain = state.adminKeychains[meta.arg];
+      const keychain = state.keychains[meta.arg];
       if (keychain) {
-        state.adminKeychains[meta.arg] = commit(keychain);
+        state.keychains[meta.arg] = commit(keychain);
       }
     });
 
@@ -120,7 +120,12 @@ export const slice = createSlice({
 
     builder.addCase(fetchAdminKeychain.succeeded, (state, { payload, meta }) => {
       state.fetchAdminKeychainRequest[meta.arg] = Req.succeed(void 0);
-      state.adminKeychains[payload.id] = editable(payload);
+      const [keychain, keyRecords] = payload;
+      state.keychains[keychain.id] = editable(keychain);
+      state.keyRecords = {
+        ...state.keyRecords,
+        ...toEditableMap(keyRecords),
+      };
     });
 
     builder.addCase(deleteKeychain.started, (state) => {
@@ -128,7 +133,7 @@ export const slice = createSlice({
     });
 
     builder.addCase(deleteKeychain.succeeded, (state, { meta }) => {
-      delete state.adminKeychains[meta.arg];
+      delete state.keychains[meta.arg];
       state.deleted.push(meta.arg);
     });
 
@@ -138,14 +143,35 @@ export const slice = createSlice({
 
     builder.addCase(fetchAdminKeychains.succeeded, (state, { payload }) => {
       state.listAdminKeychainsRequest = Req.succeed(void 0);
-      state.adminKeychains = {
-        ...state.adminKeychains,
-        ...toEditableMap(payload),
+      state.keychains = {
+        ...state.keychains,
+        ...toEditableMap(payload[0]),
+      };
+      state.keyRecords = {
+        ...state.keyRecords,
+        ...toEditableMap(payload[1]),
       };
     });
 
     builder.addCase(fetchAdminKeychains.failed, (state, { error }) => {
       state.listAdminKeychainsRequest = Req.fail(error);
+    });
+
+    builder.addCase(upsertEditingKeyRecord.started, (state) => {
+      state.saveKeyRecordRequest = Req.ongoing();
+    });
+
+    builder.addCase(upsertEditingKeyRecord.failed, (state, { error }) => {
+      state.saveKeyRecordRequest = Req.fail(error);
+    });
+
+    builder.addCase(upsertEditingKeyRecord.succeeded, (state) => {
+      state.saveKeyRecordRequest = Req.idle();
+      const savedRecord = convert.toKeyRecord(state.editingKey);
+      if (savedRecord) {
+        state.keyRecords[savedRecord.id] = editable(savedRecord);
+      }
+      delete state.editingKey;
     });
   },
 });
@@ -170,11 +196,25 @@ export const upsertKeychain = createResultThunk(
   async (id: UUID, { getState }) => {
     const state = getState();
     const adminId = state.auth.admin?.id ?? ``;
-    const keychain = state.keychains.adminKeychains[id];
+    const keychain = state.keychains.keychains[id];
     if (!keychain) {
       return Result.unexpectedError();
     }
     return Current.api.keychains.upsertKeychain({ ...keychain, adminId });
+  },
+);
+
+export const upsertEditingKeyRecord = createResultThunk(
+  `${slice.name}/upsertEditingKeyRecord`,
+  async (_, { getState }) => {
+    const state = getState().keychains;
+    const keyRecord = convert.toKeyRecord(state.editingKey);
+    if (!keyRecord) {
+      return Result.unexpectedError();
+    }
+    return Current.api.keychains.upsertKeyRecord(
+      editable(keyRecord, state.editingKey?.isNew),
+    );
   },
 );
 

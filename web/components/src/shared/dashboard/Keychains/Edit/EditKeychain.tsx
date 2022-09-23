@@ -24,7 +24,7 @@ type Props = {
   beginEditKey(id: UUID): unknown;
   updateEditingKey(event: EditKey.Event): unknown;
   dismissEditKeyModal(): unknown;
-  onKeySave(keyRecord: KeyRecord): unknown;
+  onKeySave(): unknown;
   onCreateNewKey(): unknown;
 };
 
@@ -58,12 +58,7 @@ const EditKeychain: React.FC<Props> = ({
         </>
       }
       primaryButtonDisabled={toKeyRecord(editingKey) === null}
-      onPrimaryClick={() => {
-        const record = toKeyRecord(editingKey);
-        if (record) {
-          onKeySave(record);
-        }
-      }}
+      onPrimaryClick={onKeySave}
       onDismiss={dismissEditKeyModal}
     >
       {editingKey && (

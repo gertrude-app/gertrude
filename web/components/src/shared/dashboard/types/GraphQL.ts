@@ -104,6 +104,22 @@ export interface UpdateAdminNotificationInput {
   trigger: Trigger;
 }
 
+export interface UpdateKeyRecordInput {
+  id: UUID;
+  keychainId: UUID;
+  key: string;
+  deletedAt?: string | null;
+  comment?: string | null;
+}
+
+export interface CreateKeyRecordInput {
+  comment?: string | null;
+  deletedAt?: string | null;
+  id?: UUID | null;
+  key: string;
+  keychainId: UUID;
+}
+
 export interface UpdateKeychainInput {
   authorId: UUID;
   deletedAt?: string | null;

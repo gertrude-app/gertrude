@@ -5,7 +5,7 @@ import { QueryProps } from '../../redux/store';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import Loading from '../shared/Loading';
-import { isDirty, Query, Req } from '../../redux/helpers';
+import { isDirty, original, Query, Req } from '../../redux/helpers';
 import * as typesafe from '../../lib/typesafe';
 import {
   fetchAdminKeychain,
@@ -19,6 +19,7 @@ import {
   createNewKeyClicked,
   editKeyModalDismissed,
   editKeyClicked,
+  upsertEditingKeyRecord,
 } from '../../redux/slice-keychains';
 
 const Keychain: React.FC = () => {
@@ -49,7 +50,7 @@ export default Keychain;
 
 export const queryProps: QueryProps<typeof EditKeychain, UUID> =
   (dispatch, id) => (state) => {
-    const keychain = state.keychains.adminKeychains[id];
+    const keychain = state.keychains.keychains[id];
     const fetchReq = state.keychains.fetchAdminKeychainRequest[id];
     const updateReq = state.keychains.updateAdminKeychainRequest[id];
     const deletingId = state.keychains.deleting.keychain;
@@ -72,7 +73,10 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
         isNew: keychain.isNew ?? false,
         name: keychain.draft.name,
         description: keychain.draft.description ?? ``,
-        keys: typesafe.objectValues(keychain.draft.keyRecords),
+        keys: typesafe
+          .objectValues(state.keychains.keyRecords)
+          .filter((editable) => !editable.isNew && editable.original.keychainId === id)
+          .map(original),
         setName: (name) => dispatch(keychainNameUpdated({ id, name })),
         setDescription: (description) =>
           dispatch(keychainDescriptionUpdated({ id, description })),
@@ -80,9 +84,9 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
         editingKey,
         updateEditingKey: (event) => dispatch(editKeyEventReceived(event)),
         dismissEditKeyModal: () => dispatch(editKeyModalDismissed()),
-        onCreateNewKey: () => dispatch(createNewKeyClicked()),
+        onCreateNewKey: () => dispatch(createNewKeyClicked(id)),
         beginEditKey: (id) => dispatch(editKeyClicked(id)),
-        onKeySave: () => {},
+        onKeySave: () => dispatch(upsertEditingKeyRecord()),
         saveButtonDisabled:
           updateReq?.state === `ongoing` || (keychain.isNew ? false : !isDirty(keychain)),
         deleteKeychain: {

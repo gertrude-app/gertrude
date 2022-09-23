@@ -8,7 +8,6 @@ export function keychain(id: UUID, adminId: UUID): Keychain {
     description: ``,
     isPublic: false,
     authorId: adminId,
-    keyRecords: {},
   };
 }
 

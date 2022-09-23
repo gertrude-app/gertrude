@@ -19,6 +19,7 @@ export enum Step {
 
 export type State = {
   id: UUID;
+  keychainId: UUID;
   isNew: boolean;
   keyType?: Type;
   address: string;

@@ -34,5 +34,5 @@ New.args = {
 export const CreatingKey = Template.bind({});
 CreatingKey.args = {
   ...Default.args,
-  editingKey: newKeyState(``),
+  editingKey: newKeyState(`keyid`, `keychainid`),
 };
