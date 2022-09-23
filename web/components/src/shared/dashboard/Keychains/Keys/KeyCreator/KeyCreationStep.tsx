@@ -105,20 +105,17 @@ const KeyCreationStep: React.FC<Props> = ({
                       Back
                     </Button>
                   )}
-                  <Button
-                    type="button"
-                    onClick={() => update({ type: `nextStepClicked` })}
-                    color="primary-violet"
-                    small
-                    disabled={!canAdvance}
-                  >
-                    {isLast ? `Create key` : `Next`}
-                    {
-                      <i
-                        className={`fa-solid fa-${isLast ? `key` : `arrow-right`} ml-2`}
-                      />
-                    }
-                  </Button>
+                  {!isLast && (
+                    <Button
+                      type="button"
+                      onClick={() => update({ type: `nextStepClicked` })}
+                      color="primary-violet"
+                      small
+                      disabled={!canAdvance}
+                    >
+                      Next <i className="fa-solid fa-arrow-right ml-2" />
+                    </Button>
+                  )}
                 </div>
               )}
             </div>

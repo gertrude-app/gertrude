@@ -7,6 +7,8 @@ import PageHeading from '../../PageHeading';
 import TextInput from '../../TextInput';
 import KeyCreator from '../Keys/KeyCreator';
 import * as EditKey from '../../lib/keys/edit';
+import { toKeyRecord } from '../../lib/keys/convert';
+import { target } from '../../lib/keys';
 
 type Props = {
   isNew: boolean;
@@ -15,11 +17,15 @@ type Props = {
   setName(name: string): unknown;
   setDescription(description: string): unknown;
   deleteKeychain: ConfirmableEntityAction<void>;
-  keys: Array<{ id: UUID }>;
+  keys: KeyRecord[];
   saveButtonDisabled: boolean;
   onSave(): unknown;
   editingKey?: EditKey.State;
+  beginEditKey(id: UUID): unknown;
   updateEditingKey(event: EditKey.Event): unknown;
+  dismissEditKeyModal(): unknown;
+  onKeySave(keyRecord: KeyRecord): unknown;
+  onCreateNewKey(): unknown;
 };
 
 const EditKeychain: React.FC<Props> = ({
@@ -34,30 +40,47 @@ const EditKeychain: React.FC<Props> = ({
   onSave,
   editingKey,
   updateEditingKey,
+  dismissEditKeyModal,
+  onKeySave,
+  beginEditKey,
+  onCreateNewKey,
 }) => (
   <div className="relative max-w-3xl">
     <Modal
       type="container"
-      title="Create a new key"
+      title={editingKey?.isNew ? `Create a new key` : `Edit key`}
       isOpen={!!editingKey}
       icon="key"
-      primaryButtonText="Create key"
-      onPrimaryClick={() => {}}
-      onDismiss={() => {}}
+      primaryButtonText={
+        <>
+          {editingKey?.isNew ? `Create` : `Save`} Key
+          <i className="fa-solid fa-key ml-2" />
+        </>
+      }
+      primaryButtonDisabled={toKeyRecord(editingKey) === null}
+      onPrimaryClick={() => {
+        const record = toKeyRecord(editingKey);
+        if (record) {
+          onKeySave(record);
+        }
+      }}
+      onDismiss={dismissEditKeyModal}
     >
-      <KeyCreator
-        update={updateEditingKey}
-        {...editingKey!}
-        apps={[
-          { slug: `slack`, name: `Slack` },
-          { slug: `chrome`, name: `Chrome` },
-          { slug: `figma`, name: `Figma` },
-          { slug: `notes`, name: `Notes` },
-          { slug: `firefox`, name: `Firefox` },
-          { slug: `slug`, name: `Skype` },
-          { slug: `vscode`, name: `Vscode` },
-        ]}
-      />
+      {editingKey && (
+        <KeyCreator
+          update={updateEditingKey}
+          {...editingKey}
+          apps={[
+            { slug: `slack`, name: `Slack` },
+            { slug: `chrome`, name: `Chrome` },
+            { slug: `figma`, name: `Figma` },
+            { slug: `notes`, name: `Notes` },
+            { slug: `firefox`, name: `Firefox` },
+            { slug: `slug`, name: `Skype` },
+            { slug: `vscode`, name: `Vscode` },
+          ]}
+        />
+      )}
     </Modal>
     <ConfirmDeleteEntity type="keychain" action={deleteKeychain} />
     <PageHeading icon="key" className="mb-4">
@@ -82,11 +105,21 @@ const EditKeychain: React.FC<Props> = ({
         {keys.length} {inflect(`key`, keys.length)}:
       </h2>
       <div>
-        {keys.map((key) => (
-          <div key={key.id} className="flex items-center justify-between">
-            Key: <pre className="text-fuchsia-700">{key.id}</pre>
+        {keys.map((record) => (
+          <div
+            key={record.id}
+            onClick={() => beginEditKey(record.id)}
+            className="flex items-center justify-between"
+          >
+            {target(record.key)} <pre className="text-fuchsia-700">{record.id}</pre>
           </div>
         ))}
+        <div className="mt-4 flex justify-end">
+          <Button color="secondary-white" small type="button" onClick={onCreateNewKey}>
+            <i className="fa-solid fa-plus mr-2" />
+            Add new key
+          </Button>
+        </div>
       </div>
       <div className="flex mt-5 justify-end border-t-2 pt-8 space-x-5">
         {!isNew && (

@@ -1,4 +1,3 @@
-export type Mode = 'create' | 'edit';
 export type Type = 'website' | 'app';
 export type AddressType = 'strict' | 'standard' | 'ip' | 'domainRegex';
 export type AddressScope = 'webBrowsers' | 'unrestricted' | 'singleApp';
@@ -19,8 +18,8 @@ export enum Step {
 }
 
 export type State = {
-  id?: UUID;
-  mode: Mode;
+  id: UUID;
+  isNew: boolean;
   keyType?: Type;
   address: string;
   addressType: AddressType;

@@ -9,12 +9,13 @@ import LoadingSpinner from '../../LoadingSpinner';
 interface Props {
   type: 'destructive' | 'default' | 'container' | 'error';
   title: string;
-  primaryButtonText?: string;
+  primaryButtonText?: string | React.ReactNode;
   secondaryButtonText?: string;
   isOpen: boolean;
   loading?: boolean;
   onPrimaryClick(): unknown;
   onDismiss(): unknown;
+  primaryButtonDisabled?: boolean;
   children?: React.ReactNode;
   icon?: string;
 }
@@ -24,6 +25,7 @@ const Modal: React.FC<Props> = ({
   title,
   primaryButtonText = `OK`,
   secondaryButtonText = `Cancel`,
+  primaryButtonDisabled = false,
   onPrimaryClick,
   onDismiss,
   type,
@@ -139,6 +141,7 @@ const Modal: React.FC<Props> = ({
                     )}
                     <Button
                       type="button"
+                      disabled={primaryButtonDisabled}
                       small
                       color={
                         type === `destructive` || type === `error`

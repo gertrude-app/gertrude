@@ -11,7 +11,8 @@ const Template: ComponentStory<typeof KeyCreator> = (args) => <KeyCreator {...ar
 
 export const CreateStart = Template.bind({});
 CreateStart.args = {
-  mode: `create`,
+  id: `1`,
+  isNew: true,
   activeStep: EditKey.Step.SetKeyType,
   address: ``,
   addressType: `standard`,
@@ -87,7 +88,7 @@ EditComment.args = {
   activeStep: undefined,
   expiration: undefined,
   comment: `For AOPS`,
-  mode: `edit`,
+  isNew: false,
 };
 
 export const EditNoExpiration = Template.bind({});
@@ -96,7 +97,7 @@ EditNoExpiration.args = {
   keyType: `website`,
   address: `goats.com`,
   activeStep: undefined,
-  mode: `edit`,
+  isNew: false,
 };
 
 export const EditHasExpiration = Template.bind({});
@@ -106,7 +107,7 @@ EditHasExpiration.args = {
   address: `goats.com`,
   activeStep: undefined,
   expiration: expiration.toISOString(),
-  mode: `edit`,
+  isNew: false,
 };
 
 export const EditStepOpen = Template.bind({});
@@ -115,7 +116,7 @@ EditStepOpen.args = {
   keyType: `website`,
   address: `goats.com`,
   activeStep: EditKey.Step.WebsiteKey_SetAddress,
-  mode: `edit`,
+  isNew: false,
 };
 
 export const CreateApp = Template.bind({});
@@ -171,7 +172,7 @@ AppKeyAddressScope.args = {
 export const EditAppKeyAddressScope = Template.bind({});
 EditAppKeyAddressScope.args = {
   ...CreateApp.args,
-  mode: `edit`,
+  isNew: false,
   keyType: `app`,
   appScope: `address`,
   activeStep: undefined,
@@ -189,6 +190,6 @@ WebKeyAppScope.args = {
 export const EditWebKeyAppScope = Template.bind({});
 EditWebKeyAppScope.args = {
   ...WebKeyAppScope.args,
-  mode: `edit`,
+  isNew: false,
   activeStep: undefined,
 };

@@ -24,20 +24,25 @@ const KeyCreator: React.FC<Props> = ({
   appScope,
   expiration,
   comment,
-  mode,
   activeStep,
   apps,
   appBundleId,
   appSlug,
   update,
+  isNew,
 }) => (
   <>
-    <KeyTypeStep update={update} mode={mode} activeStep={activeStep} keyType={keyType} />
+    <KeyTypeStep
+      update={update}
+      mode={isNew ? `create` : `edit`}
+      activeStep={activeStep}
+      keyType={keyType}
+    />
 
     {keyType !== `app` && (
       <AddressStep
         keyType={keyType ?? `website`}
-        mode={mode}
+        mode={isNew ? `create` : `edit`}
         update={update}
         activeStep={activeStep}
         address={address}
@@ -48,7 +53,7 @@ const KeyCreator: React.FC<Props> = ({
 
     {keyType !== `app` && (
       <WebsiteKeyAppScopeStep
-        mode={mode}
+        mode={isNew ? `create` : `edit`}
         update={update}
         activeStep={activeStep}
         addressScope={addressScope}
@@ -62,7 +67,7 @@ const KeyCreator: React.FC<Props> = ({
       <ChooseAppStep
         keyType={keyType ?? `app`}
         update={update}
-        mode={mode}
+        mode={isNew ? `create` : `edit`}
         activeStep={activeStep}
         appIdentificationType={appIdentificationType}
         apps={apps}
@@ -74,7 +79,7 @@ const KeyCreator: React.FC<Props> = ({
     {keyType === `app` && (
       <AppScopeStep
         update={update}
-        mode={mode}
+        mode={isNew ? `create` : `edit`}
         activeStep={activeStep}
         appScope={appScope}
       />
@@ -84,7 +89,7 @@ const KeyCreator: React.FC<Props> = ({
       <AddressStep
         update={update}
         keyType={keyType}
-        mode={mode}
+        mode={isNew ? `create` : `edit`}
         activeStep={activeStep}
         address={address}
         addressType={addressType}
@@ -93,13 +98,18 @@ const KeyCreator: React.FC<Props> = ({
     )}
 
     <ExpirationStep
-      mode={mode}
+      mode={isNew ? `create` : `edit`}
       update={update}
       activeStep={activeStep}
       expiration={expiration}
     />
 
-    <CommentStep mode={mode} activeStep={activeStep} comment={comment} update={update} />
+    <CommentStep
+      mode={isNew ? `create` : `edit`}
+      activeStep={activeStep}
+      comment={comment}
+      update={update}
+    />
   </>
 );
 

@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { v4 as uuid } from 'uuid';
 import * as EditKey from '@dashboard/lib/keys/edit';
+import * as convert from '@dashboard/lib/keys/convert';
 import Current from '../environment';
 import { commit, editable, Req, toEditableMap } from './helpers';
 import { createResultThunk } from './thunk';
@@ -7,6 +9,7 @@ import * as empty from './empty';
 import editKeyReducer from './edit-key-reducer';
 import Result from '../api/Result';
 import { newKeyState } from '../components/shared/dashboard/lib/keys';
+import * as typesafe from '../lib/typesafe';
 
 export interface KeychainsState {
   fetchAdminKeychainRequest: Record<UUID, RequestState>;
@@ -26,8 +29,6 @@ export function initialState(): KeychainsState {
     updateAdminKeychainRequest: {},
     listAdminKeychainsRequest: Req.idle(),
     adminKeychains: {},
-    // temp
-    editingKey: newKeyState(),
     deleting: {},
     deleted: [],
   };
@@ -73,6 +74,23 @@ export const slice = createSlice({
       }
       const description = action.payload.description || null;
       keychain.draft.description = description;
+    },
+    createNewKeyClicked(state) {
+      state.editingKey = newKeyState(uuid());
+    },
+    editKeyModalDismissed(state) {
+      delete state.editingKey;
+    },
+    editKeyClicked(state, action: PayloadAction<UUID>) {
+      for (const { original: keychain } of typesafe.objectValues(state.adminKeychains)) {
+        const key = typesafe
+          .objectValues(keychain.keyRecords)
+          .find((keyRecord) => keyRecord.id === action.payload);
+        if (key) {
+          state.editingKey = convert.toState(key);
+          return;
+        }
+      }
     },
   },
   extraReducers: (builder) => {
@@ -167,6 +185,9 @@ export const {
   keychainDescriptionUpdated,
   keychainNameUpdated,
   editKeyEventReceived,
+  editKeyModalDismissed,
+  createNewKeyClicked,
+  editKeyClicked,
 } = slice.actions;
 
 export default slice.reducer;

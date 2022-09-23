@@ -16,6 +16,9 @@ import {
   keychainEntityDeleteStarted,
   deleteKeychain,
   editKeyEventReceived,
+  createNewKeyClicked,
+  editKeyModalDismissed,
+  editKeyClicked,
 } from '../../redux/slice-keychains';
 
 const Keychain: React.FC = () => {
@@ -76,6 +79,10 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
         onSave: () => dispatch(upsertKeychain(id)),
         editingKey,
         updateEditingKey: (event) => dispatch(editKeyEventReceived(event)),
+        dismissEditKeyModal: () => dispatch(editKeyModalDismissed()),
+        onCreateNewKey: () => dispatch(createNewKeyClicked()),
+        beginEditKey: (id) => dispatch(editKeyClicked(id)),
+        onKeySave: () => {},
         saveButtonDisabled:
           updateReq?.state === `ongoing` || (keychain.isNew ? false : !isDirty(keychain)),
         deleteKeychain: {

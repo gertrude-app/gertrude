@@ -7,7 +7,7 @@ describe(`editKeyReducer()`, () => {
   let state: EditKey.State;
 
   beforeEach(() => {
-    state = newKeyState();
+    state = newKeyState(`abc123`);
   });
 
   test(`changing keyType`, () => {

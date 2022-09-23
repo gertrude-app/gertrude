@@ -1,7 +1,7 @@
 import { expect, test, describe } from 'vitest';
-import * as key from '@dashboard/lib/keys';
+import { parse } from '@dashboard/lib/keys/parse';
 
-describe(`key.parse()`, () => {
+describe(`parse()`, () => {
   const cases: Array<[Record<string, unknown>, Key | boolean]> = [
     [{}, false],
     [
@@ -48,9 +48,9 @@ describe(`key.parse()`, () => {
 
   test.each(cases)(`parse input %s`, (obj, isValid) => {
     if (isValid) {
-      expect(key.parse(JSON.stringify(obj))).toEqual(obj);
+      expect(parse(JSON.stringify(obj))).toEqual(obj);
     } else {
-      expect(key.parse(JSON.stringify(obj))).toBeNull();
+      expect(parse(JSON.stringify(obj))).toBeNull();
     }
   });
 });

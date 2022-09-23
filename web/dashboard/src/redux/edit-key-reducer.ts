@@ -130,7 +130,12 @@ export default function reducer(state: EditKey.State, action: EditKey.Event): vo
       break;
 
     case `inactiveStepClicked`:
-      state.activeStep = action.step;
+      if (!state.isNew && action.step === state.activeStep) {
+        // allow the user to go back to "all collapsed" state when EDITING
+        state.activeStep = EditKey.Step.None;
+      } else {
+        state.activeStep = action.step;
+      }
       break;
 
     default:
