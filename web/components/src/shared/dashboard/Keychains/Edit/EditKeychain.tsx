@@ -7,7 +7,6 @@ import PageHeading from '../../PageHeading';
 import TextInput from '../../TextInput';
 import KeyCreator from '../Keys/KeyCreator';
 import * as EditKey from '../../lib/keys/edit';
-import { toKeyRecord } from '../../lib/keys/convert';
 import { target } from '../../lib/keys';
 
 type Props = {
@@ -26,6 +25,7 @@ type Props = {
   dismissEditKeyModal(): unknown;
   onKeySave(): unknown;
   onCreateNewKey(): unknown;
+  keyModalSaveButtonDisabled: boolean;
 };
 
 const EditKeychain: React.FC<Props> = ({
@@ -44,12 +44,14 @@ const EditKeychain: React.FC<Props> = ({
   onKeySave,
   beginEditKey,
   onCreateNewKey,
+  keyModalSaveButtonDisabled,
 }) => (
   <div className="relative max-w-3xl">
     <Modal
       type="container"
       title={editingKey?.isNew ? `Create a new key` : `Edit key`}
       isOpen={!!editingKey}
+      contentHidden={!editingKey}
       icon="key"
       primaryButtonText={
         <>
@@ -57,7 +59,7 @@ const EditKeychain: React.FC<Props> = ({
           <i className="fa-solid fa-key ml-2" />
         </>
       }
-      primaryButtonDisabled={toKeyRecord(editingKey) === null}
+      primaryButtonDisabled={keyModalSaveButtonDisabled}
       onPrimaryClick={onKeySave}
       onDismiss={dismissEditKeyModal}
     >

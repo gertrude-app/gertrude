@@ -166,12 +166,12 @@ export const slice = createSlice({
     });
 
     builder.addCase(upsertEditingKeyRecord.succeeded, (state) => {
-      state.saveKeyRecordRequest = Req.idle();
       const savedRecord = convert.toKeyRecord(state.editingKey);
       if (savedRecord) {
         state.keyRecords[savedRecord.id] = editable(savedRecord);
       }
       delete state.editingKey;
+      state.saveKeyRecordRequest = Req.succeed(void 0);
     });
   },
 });

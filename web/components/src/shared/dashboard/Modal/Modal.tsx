@@ -18,6 +18,7 @@ interface Props {
   primaryButtonDisabled?: boolean;
   children?: React.ReactNode;
   icon?: string;
+  contentHidden?: boolean;
 }
 
 const Modal: React.FC<Props> = ({
@@ -32,6 +33,7 @@ const Modal: React.FC<Props> = ({
   children,
   icon,
   loading,
+  contentHidden,
 }) => {
   if (!icon) {
     switch (type) {
@@ -84,6 +86,7 @@ const Modal: React.FC<Props> = ({
                   className={cx(
                     `relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg`,
                     type === `container` && `lg:max-w-3xl`,
+                    contentHidden && `hidden`,
                   )}
                 >
                   {type === `container` ? (

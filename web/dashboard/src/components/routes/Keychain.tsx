@@ -21,6 +21,7 @@ import {
   editKeyClicked,
   upsertEditingKeyRecord,
 } from '../../redux/slice-keychains';
+import { toKeyRecord } from '../shared/dashboard/lib/keys/convert';
 
 const Keychain: React.FC = () => {
   const { keychainId: id = `` } = useParams<{ keychainId: string }>();
@@ -85,8 +86,11 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
         updateEditingKey: (event) => dispatch(editKeyEventReceived(event)),
         dismissEditKeyModal: () => dispatch(editKeyModalDismissed()),
         onCreateNewKey: () => dispatch(createNewKeyClicked(id)),
-        beginEditKey: (id) => dispatch(editKeyClicked(id)),
+        beginEditKey: (keyId) => dispatch(editKeyClicked(keyId)),
         onKeySave: () => dispatch(upsertEditingKeyRecord()),
+        keyModalSaveButtonDisabled:
+          toKeyRecord(editingKey) === null ||
+          state.keychains.saveKeyRecordRequest.state === `ongoing`,
         saveButtonDisabled:
           updateReq?.state === `ongoing` || (keychain.isNew ? false : !isDirty(keychain)),
         deleteKeychain: {
