@@ -69,23 +69,7 @@ const AddressStep: React.FC<Props> = ({
       <div className="flex items-center justify-end">
         <label className="mr-2 text-gray-600 font-medium">Address type:</label>
         <SelectMenu<EditKey.AddressType>
-          options={
-            [
-              { value: `standard`, display: `Standard` },
-              { value: `strict`, display: `Strict` },
-              {
-                value: showAdvancedAddressOptions && `IP address`,
-                display: `IP address`,
-              },
-              {
-                value: showAdvancedAddressOptions && `regular expression`,
-                display: `Regular expression`,
-              },
-            ].filter((x) => typeof x.value === `string`) as {
-              value: EditKey.AddressType;
-              display: string;
-            }[]
-          }
+          options={addressTypeOptions(showAdvancedAddressOptions)}
           selectedOption={addressType}
           setSelected={(type) => update({ type: `setAddressType`, to: type })}
           deemphasized
@@ -97,3 +81,23 @@ const AddressStep: React.FC<Props> = ({
 );
 
 export default AddressStep;
+
+// helpers
+
+function addressTypeOptions(
+  showAdvanced: boolean,
+): Array<{ value: EditKey.AddressType; display: string }> {
+  const opts: ReturnType<typeof addressTypeOptions> = [
+    { value: `standard`, display: `Standard` },
+    { value: `strict`, display: `Strict` },
+    { value: `ip`, display: `IP address` },
+    { value: `domainRegex`, display: `Regular expression` },
+  ];
+
+  if (showAdvanced) {
+    opts.push({ value: `ip`, display: `IP address` });
+    opts.push({ value: `domainRegex`, display: `Regular expression` });
+  }
+
+  return opts;
+}
