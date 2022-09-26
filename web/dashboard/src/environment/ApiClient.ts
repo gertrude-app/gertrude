@@ -5,12 +5,14 @@ import * as admin from '../api/admin';
 import * as users from '../api/users';
 import * as signup from '../api/signup';
 import * as keychains from '../api/keychains';
+import * as apps from '../api/apps';
 
 export interface ApiClient {
   admin: typeof admin;
   users: typeof users;
   signup: typeof signup;
   keychains: typeof keychains;
+  apps: typeof apps;
 }
 
 export const liveApiClient: ApiClient = {
@@ -18,9 +20,15 @@ export const liveApiClient: ApiClient = {
   users,
   signup,
   keychains,
+  apps,
 };
 
 export const throwingApiClient: ApiClient = {
+  apps: {
+    getIdentifiedApps: () => {
+      throw new Error(`ApiClient.apps.getIdentifiedApps not implemented`);
+    },
+  },
   admin: {
     login: () => {
       throw new Error(`ApiClient.admin.login() not implemented.`);
@@ -111,6 +119,11 @@ export const throwingApiClient: ApiClient = {
 };
 
 export const noopApiClient: ApiClient = {
+  apps: {
+    getIdentifiedApps: async () => {
+      return Result.success([]);
+    },
+  },
   admin: {
     login: async () => {
       return Result.success({ id: ``, token: `` });

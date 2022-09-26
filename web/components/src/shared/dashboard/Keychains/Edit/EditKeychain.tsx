@@ -26,6 +26,7 @@ type Props = {
   onKeySave(): unknown;
   onCreateNewKey(): unknown;
   keyModalSaveButtonDisabled: boolean;
+  apps: React.ComponentProps<typeof KeyCreator>['apps'];
 };
 
 const EditKeychain: React.FC<Props> = ({
@@ -45,6 +46,7 @@ const EditKeychain: React.FC<Props> = ({
   beginEditKey,
   onCreateNewKey,
   keyModalSaveButtonDisabled,
+  apps,
 }) => (
   <div className="relative max-w-3xl">
     <Modal
@@ -63,21 +65,7 @@ const EditKeychain: React.FC<Props> = ({
       onPrimaryClick={onKeySave}
       onDismiss={dismissEditKeyModal}
     >
-      {editingKey && (
-        <KeyCreator
-          update={updateEditingKey}
-          {...editingKey}
-          apps={[
-            { slug: `slack`, name: `Slack` },
-            { slug: `chrome`, name: `Chrome` },
-            { slug: `figma`, name: `Figma` },
-            { slug: `notes`, name: `Notes` },
-            { slug: `firefox`, name: `Firefox` },
-            { slug: `slug`, name: `Skype` },
-            { slug: `vscode`, name: `Vscode` },
-          ]}
-        />
-      )}
+      {editingKey && <KeyCreator update={updateEditingKey} {...editingKey} apps={apps} />}
     </Modal>
     <ConfirmDeleteEntity type="keychain" action={deleteKeychain} />
     <PageHeading icon="key" className="mb-4">

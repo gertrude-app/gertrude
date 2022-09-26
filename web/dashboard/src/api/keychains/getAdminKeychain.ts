@@ -6,7 +6,7 @@ import * as T from './__generated__/GetKeychain';
 export async function getAdminKeychain(
   id: UUID,
 ): Promise<Result<[Keychain, KeyRecord[]], ApiError>> {
-  const result = await query<T.GetKeychain, T.GetKeychainVariables>(Query, {
+  const result = await query<T.GetKeychain, T.GetKeychainVariables>(QUERY, {
     id,
   });
   return result.mapApi((data) => [
@@ -19,7 +19,7 @@ export async function getAdminKeychain(
   ]);
 }
 
-const Query = gql`
+const QUERY = gql`
   ${KEYCHAIN_FIELDS}
   query GetKeychain($id: UUID!) {
     keychain: getKeychain(id: $id) {

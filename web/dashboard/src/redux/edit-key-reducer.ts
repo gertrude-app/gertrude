@@ -10,6 +10,9 @@ export default function reducer(state: EditKey.State, action: EditKey.Event): vo
             ? EditKey.Step.AppKey_ChooseApp
             : EditKey.Step.WebsiteKey_SetAddress;
         return;
+      case EditKey.Step.AppKey_ChooseApp:
+        state.activeStep = EditKey.Step.AppKey_SetAppScope;
+        break;
       case EditKey.Step.WebsiteKey_SetAddress:
         state.activeStep = EditKey.Step.WebsiteKey_SetAppScope;
         return;

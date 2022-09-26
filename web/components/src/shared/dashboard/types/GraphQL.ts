@@ -43,6 +43,14 @@ export interface CreateAdminNotificationInput {
   trigger: Trigger;
 }
 
+export interface CreateKeyRecordInput {
+  comment?: string | null;
+  deletedAt?: string | null;
+  id?: UUID | null;
+  key: string;
+  keychainId: UUID;
+}
+
 export interface CreateKeychainInput {
   authorId: UUID;
   deletedAt?: string | null;
@@ -105,17 +113,9 @@ export interface UpdateAdminNotificationInput {
 }
 
 export interface UpdateKeyRecordInput {
+  comment?: string | null;
+  deletedAt?: string | null;
   id: UUID;
-  keychainId: UUID;
-  key: string;
-  deletedAt?: string | null;
-  comment?: string | null;
-}
-
-export interface CreateKeyRecordInput {
-  comment?: string | null;
-  deletedAt?: string | null;
-  id?: UUID | null;
   key: string;
   keychainId: UUID;
 }

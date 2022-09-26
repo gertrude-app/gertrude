@@ -22,29 +22,44 @@ import {
   upsertEditingKeyRecord,
 } from '../../redux/slice-keychains';
 import { toKeyRecord } from '../shared/dashboard/lib/keys/convert';
+import { getIdentifiedApps } from '../../redux/slice-apps';
 
 const Keychain: React.FC = () => {
   const { keychainId: id = `` } = useParams<{ keychainId: string }>();
   const dispatch = useDispatch();
-  const [query, shouldFetch] = useSelector(queryProps(dispatch, id));
+  const [keychainQuery, shouldFetchKeychain] = useSelector(queryProps(dispatch, id));
+  const appsReq = useSelector((state) => state.apps.request);
+  const appsReqState = appsReq.state;
 
   useEffect(() => {
-    shouldFetch && dispatch(fetchAdminKeychain(id));
-  }, [dispatch, id, shouldFetch]);
+    appsReqState === `idle` && dispatch(getIdentifiedApps());
+  }, [dispatch, appsReqState]);
 
-  if (query.state === `entityDeleted`) {
-    return <Navigate to={query.redirectUrl} />;
+  useEffect(() => {
+    shouldFetchKeychain && dispatch(fetchAdminKeychain(id));
+  }, [dispatch, id, shouldFetchKeychain]);
+
+  if (keychainQuery.state === `entityDeleted`) {
+    return <Navigate to={keychainQuery.redirectUrl} />;
   }
 
-  if (query.state === `shouldFetch` || query.state === `ongoing`) {
+  if (appsReq.state === `idle` || appsReq.state === `ongoing`) {
     return <Loading />;
   }
 
-  if (query.state === `failed`) {
-    return <ApiErrorMessage error={query.error} />;
+  if (keychainQuery.state === `shouldFetch` || keychainQuery.state === `ongoing`) {
+    return <Loading />;
   }
 
-  return <EditKeychain {...query.props} />;
+  if (appsReq.state === `failed`) {
+    return <ApiErrorMessage error={appsReq.error} />;
+  }
+
+  if (keychainQuery.state === `failed`) {
+    return <ApiErrorMessage error={keychainQuery.error} />;
+  }
+
+  return <EditKeychain {...keychainQuery.props} apps={appsReq.payload} />;
 };
 
 export default Keychain;
@@ -99,6 +114,7 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
           cancel: () => dispatch(keychainEntityDeleteCanceled(`keychain`)),
           confirm: () => dispatch(deleteKeychain(id)),
         },
+        apps: [],
       }),
       false,
     ];
