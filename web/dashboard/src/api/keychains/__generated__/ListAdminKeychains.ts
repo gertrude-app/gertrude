@@ -271,6 +271,8 @@ export interface ListAdminKeychains_keychains_keyRecords_key {
 export interface ListAdminKeychains_keychains_keyRecords {
   __typename: 'KeyRecord';
   id: string;
+  comment: string | null;
+  expiration: string | null;
   key: ListAdminKeychains_keychains_keyRecords_key;
 }
 

@@ -14,6 +14,8 @@ export async function getAdminKeychain(
     data.keychain.keyRecords.map((keyRecord) => ({
       id: keyRecord.id,
       keychainId: data.keychain.id,
+      comment: keyRecord.comment,
+      expiration: keyRecord.expiration,
       key: keyRecord.key.data as Key,
     })),
   ]);

@@ -269,6 +269,8 @@ export interface GetKeychain_keychain_keyRecords_key {
 export interface GetKeychain_keychain_keyRecords {
   __typename: 'KeyRecord';
   id: string;
+  comment: string | null;
+  expiration: string | null;
   key: GetKeychain_keychain_keyRecords_key;
 }
 

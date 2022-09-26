@@ -266,6 +266,8 @@ export interface KeychainFields_keyRecords_key {
 export interface KeychainFields_keyRecords {
   __typename: 'KeyRecord';
   id: string;
+  comment: string | null;
+  expiration: string | null;
   key: KeychainFields_keyRecords_key;
 }
 

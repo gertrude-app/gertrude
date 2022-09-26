@@ -69,6 +69,8 @@ export const KEYCHAIN_FIELDS = gql`
     authorId
     keyRecords: keys {
       id
+      comment
+      expiration: deletedAt
       key {
         jsonString
         data {

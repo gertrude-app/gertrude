@@ -89,7 +89,6 @@ export const slice = createSlice({
       const keyRecord = state.keyRecords[action.payload];
       if (keyRecord) {
         state.editingKey = convert.toState(keyRecord.original);
-        return;
       }
     },
   },
