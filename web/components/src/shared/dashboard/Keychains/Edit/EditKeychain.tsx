@@ -53,7 +53,6 @@ const EditKeychain: React.FC<Props> = ({
       type="container"
       title={editingKey?.isNew ? `Create a new key` : `Edit key`}
       isOpen={!!editingKey}
-      contentHidden={!editingKey}
       icon="key"
       primaryButtonText={
         <>
@@ -72,6 +71,7 @@ const EditKeychain: React.FC<Props> = ({
       {isNew ? `Create Keychain` : `Edit Keychain`}
     </PageHeading>
     <div className="mt-8 space-y-8">
+      <pre>{JSON.stringify(editingKey)}</pre>
       <TextInput
         type="text"
         label="Name:"
