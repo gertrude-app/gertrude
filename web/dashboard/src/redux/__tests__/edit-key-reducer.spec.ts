@@ -15,63 +15,69 @@ describe(`editKeyReducer()`, () => {
     expect(state.keyType).toBe(`app`);
   });
 
-  const nextPrevCases: Array<[string, () => ['next' | 'prev', EditKey.Step]]> = [
+  const nextPrevCases: Array<[string, 'next' | 'prev', EditKey.Step, () => void]> = [
     [
       `back from normal website key expiration`,
+      `prev`,
+      EditKey.Step.WebsiteKey_SetAppScope,
       () => {
         state.activeStep = EditKey.Step.Expiration;
         state.keyType = `website`;
-        return [`prev`, EditKey.Step.WebsiteKey_SetAppScope];
       },
     ],
     [
       `back from single app website key expiration`,
+      `prev`,
+      EditKey.Step.WebsiteKey_Advanced_ChooseApp,
       () => {
         state.activeStep = EditKey.Step.Expiration;
         state.keyType = `website`;
         state.addressScope = `singleApp`; // <-- advanced option
-        return [`prev`, EditKey.Step.WebsiteKey_Advanced_ChooseApp];
       },
     ],
     [
       `back from normal app key expiration`,
+      `prev`,
+      EditKey.Step.AppKey_SetAppScope,
       () => {
         state.activeStep = EditKey.Step.Expiration;
         state.keyType = `app`;
-        return [`prev`, EditKey.Step.AppKey_SetAppScope];
       },
     ],
     [
       `back from advanced address-scoped app key expiration`,
+      `prev`,
+      EditKey.Step.AppKey_Advanced_SetAddress,
       () => {
         state.activeStep = EditKey.Step.Expiration;
         state.keyType = `app`;
         state.appScope = `address`; // <-- advanced option
-        return [`prev`, EditKey.Step.AppKey_Advanced_SetAddress];
       },
     ],
     [
       `forward from website key advanced address scope`,
+      `next`,
+      EditKey.Step.WebsiteKey_Advanced_ChooseApp,
       () => {
         state.keyType = `website`;
         state.activeStep = EditKey.Step.WebsiteKey_SetAppScope;
         state.addressScope = `singleApp`; // <-- advanced option
-        return [`next`, EditKey.Step.WebsiteKey_Advanced_ChooseApp];
       },
     ],
     [
       `forward from website key advanced choose app`,
+      `next`,
+      EditKey.Step.Expiration,
       () => {
         state.keyType = `website`;
         state.activeStep = EditKey.Step.WebsiteKey_Advanced_ChooseApp;
         state.addressScope = `singleApp`; // <-- advanced option
-        return [`next`, EditKey.Step.Expiration];
       },
     ],
   ];
 
-  test.each(nextPrevCases)(`%s`, (_title, setup) => {
-    const [dir, expected] = setup();
+  test.each(nextPrevCases)(`%s`, (_title, dir, expected, setup) => {
+    setup();
     reducer(state, { type: dir === `next` ? `nextStepClicked` : `prevStepClicked` });
     expect(state.activeStep).toBe(expected);
   });
