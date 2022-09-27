@@ -11,7 +11,7 @@ import NotificationMethod from './NotificationMethod';
 import { ConfirmableEntityAction, SubcomponentsOmit } from '../../types';
 import { ConfirmDeleteEntity } from '../Modal';
 import { Trigger } from '../types/GraphQL';
-import { isUnsaved } from '../../lib/id';
+import { isUnsaved } from '../lib/id';
 import {
   PendingNotificationMethod,
   NewAdminNotificationMethodEvent,

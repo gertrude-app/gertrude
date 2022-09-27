@@ -23,7 +23,7 @@ import {
   GetUser_user_keychains,
 } from '../../api/users/__generated__/GetUser';
 import { QueryProps } from '../../redux/store';
-import { isUnsaved, unsavedId } from '../shared/lib/id';
+import { isUnsaved, unsavedId } from '@dashboard/lib/id';
 
 const User: React.FC = () => {
   const dispatch = useDispatch();
@@ -129,7 +129,7 @@ function keychainProps(
     name: apiKeychain.name,
     description: apiKeychain.description ?? ``,
     isPublic: apiKeychain.isPublic,
-    keys: apiKeychain.keys.length,
+    numKeys: apiKeychain.keys.length,
   };
 }
 

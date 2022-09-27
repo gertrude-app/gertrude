@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { formatDate } from '../../../../../lib/dates';
+import { formatDate } from '../../../../lib/dates';
 import PillBadge from '../../../../PillBadge';
 
 type Props = {

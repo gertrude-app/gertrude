@@ -12,7 +12,7 @@ import Toggle from '../../Toggle';
 import UserDevice from '../List/Card/Device';
 import PageHeading from '../../PageHeading';
 import { ConfirmDeleteEntity } from '../../Modal';
-import { inflect } from '../../../lib/string';
+import { inflect } from '../../lib/string';
 import ConnectModal from '../ConnectModal';
 
 interface Props {
@@ -159,7 +159,7 @@ const EditUser: React.FC<Props> = ({
               key={keychain.id}
               name={keychain.name}
               description={keychain.description}
-              keys={keychain.keys}
+              numKeys={keychain.numKeys}
               isPublic={keychain.isPublic}
               onRemove={() => removeKeychain(keychain.id)}
             />

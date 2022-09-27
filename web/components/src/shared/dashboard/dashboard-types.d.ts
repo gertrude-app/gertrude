@@ -1,5 +1,4 @@
 type UUID = string;
-
 type EmailAddress = string;
 
 type Editable<T extends { id: UUID }> = {

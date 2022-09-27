@@ -1,6 +1,7 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import EditKeychain from './EditKeychain';
 import { confirmableEntityAction } from '../../story-helpers';
+import { newKeyState } from '../../lib/keys';
 
 export default {
   title: `Dashboard/Keychains/Edit`,
@@ -28,4 +29,10 @@ export const New = Template.bind({});
 New.args = {
   ...Default.args,
   isNew: true,
+};
+
+export const CreatingKey = Template.bind({});
+CreatingKey.args = {
+  ...Default.args,
+  editingKey: newKeyState(`keyid`, `keychainid`),
 };

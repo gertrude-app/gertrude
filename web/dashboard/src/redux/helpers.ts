@@ -120,8 +120,19 @@ export function commit<T extends { id: UUID }>({ draft }: Editable<T>): Editable
   return { ...editable(draft), isNew: false };
 }
 
-export function editable<T extends { id: UUID }>(original: T): Editable<T> {
-  return { original, draft: JSON.parse(JSON.stringify(original)) };
+export function editable<T extends { id: UUID }>(
+  original: T,
+  isNew?: boolean,
+): Editable<T> {
+  return { original, draft: JSON.parse(JSON.stringify(original)), isNew };
+}
+
+export function original<T extends { id: UUID }>(editable: Editable<T>): T {
+  return editable.original;
+}
+
+export function draft<T extends { id: UUID }>(editable: Editable<T>): T {
+  return editable.draft;
 }
 
 export function isDirty<T extends { id: UUID }>(

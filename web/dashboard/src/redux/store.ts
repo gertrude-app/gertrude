@@ -7,6 +7,7 @@ import usersReducer from './slice-users';
 import adminReducer from './slice-admin';
 import keychainsReducer from './slice-keychains';
 import urlReducer from './slice-url';
+import appsReducer from './slice-apps';
 import storageMiddleware from './middleware-storage';
 import toastMiddleware from './middleware-toast';
 import redirectMiddleware from './middleware-redirect';
@@ -14,6 +15,7 @@ import redirectMiddleware from './middleware-redirect';
 export const store = configureStore({
   reducer: {
     admin: adminReducer,
+    apps: appsReducer,
     auth: authReducer,
     keychains: keychainsReducer,
     menu: menuReducer,

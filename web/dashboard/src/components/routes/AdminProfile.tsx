@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import Loading from '@shared/Loading';
 import Profile from '@dashboard/Profile';
 import { AdminNotificationMethod } from '@dashboard/types/Admin';
+import { capitalize } from '@dashboard/lib/string';
+import { isUnsaved } from '@dashboard/lib/id';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   cancelAdminEntityDelete,
@@ -20,8 +22,6 @@ import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
 import { isDirty, notNullish, Query, Req } from '../../redux/helpers';
 import { QueryProps, State } from '../../redux/store';
-import { capitalize } from '../shared/lib/string';
-import { isUnsaved } from '../shared/lib/id';
 
 const AdminProfile: React.FC = () => {
   const dispatch = useDispatch();

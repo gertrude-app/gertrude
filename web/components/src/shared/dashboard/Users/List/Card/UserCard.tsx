@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { inflect } from '../../../../lib/string';
+import { inflect } from '../../../lib/string';
 import UserDevice from './Device';
 import { Link } from 'react-router-dom';
 import { Subcomponents } from '../../../../types';

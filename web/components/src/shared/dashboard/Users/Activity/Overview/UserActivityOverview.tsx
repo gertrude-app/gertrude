@@ -1,5 +1,5 @@
 import React, { ComponentProps } from 'react';
-import { posessive } from '../../../../lib/string';
+import { posessive } from '../../../lib/string';
 import PartyMessage from '../../../../PartyMessage';
 import PageHeading from '../../../PageHeading';
 import ReviewSummaryCard from './DaySummaryCard';

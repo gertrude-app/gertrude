@@ -13,7 +13,7 @@ const Template: ComponentStory<typeof KeychainCard> = (args) => (
 export const Shared = Template.bind({});
 Shared.args = {
   name: `HTC`,
-  keys: 43,
+  numKeys: 43,
   isPublic: true,
   description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
   onRemove: () => {},

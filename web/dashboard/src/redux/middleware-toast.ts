@@ -1,9 +1,13 @@
 import toast from 'react-hot-toast';
 import { Action, Middleware } from '@reduxjs/toolkit';
+import { capitalize } from '@dashboard/lib/string';
 import { deleteActivityItems, deleteDevice, upsertUser, deleteUser } from './slice-users';
 import { ResultThunk } from './thunk';
-import { capitalize } from '../components/shared/lib/string';
-import { deleteKeychain, upsertKeychain } from './slice-keychains';
+import {
+  deleteKeychain,
+  upsertKeychain,
+  upsertEditingKeyRecord,
+} from './slice-keychains';
 import {
   confirmPendingNotificationMethod,
   createPendingNotificationMethod,
@@ -16,6 +20,7 @@ const toastMiddleware: Middleware = (_store) => (next) => (action) => {
   toastCrud(`save`, `user`, upsertUser, action);
   toastCrud(`delete`, `keychain`, deleteKeychain, action);
   toastCrud(`save`, `keychain`, upsertKeychain, action);
+  toastCrud(`save`, `key`, upsertEditingKeyRecord, action);
   toastCrud(`delete`, `keychain`, deleteKeychain, action);
   toastCrud(`delete`, `device`, deleteDevice, action);
   toastCrud(`delete`, `user`, deleteUser, action);

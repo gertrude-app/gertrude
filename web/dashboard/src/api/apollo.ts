@@ -34,7 +34,14 @@ function getClient(): ApolloClient<NormalizedCacheObject> {
 
   const client = new ApolloClient({
     link: from([authLink, httpLink]),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      // @see https://github.com/apollographql/apollo-client/issues/7050
+      // @see https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
+      possibleTypes: {
+        AppScopeData: [`WebBrowsersData`, `UnrestrictedData`, `SingleData`],
+        AppScopeSingleData: [`IdentifiedAppData`, `BundleIdData`],
+      },
+    }),
   });
 
   cachedClient = client;

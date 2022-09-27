@@ -1,5 +1,5 @@
 import { expect, it, test, describe } from 'vitest';
-import { unsavedId } from '@shared/lib/id';
+import { unsavedId } from '@dashboard/lib/id';
 import { SubscriptionStatus, Trigger } from '@dashboard/types/GraphQL';
 import { Req } from '../helpers';
 import reducer, {

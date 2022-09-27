@@ -1,7 +1,7 @@
 import { expect, it, describe } from 'vitest';
 import { SubscriptionStatus, Trigger } from '@dashboard/types/GraphQL';
 import { editable, Query, Req } from '../../../redux/helpers';
-import { makeState } from '../../../redux/__test__/test-helpers';
+import { makeState } from '../../../redux/__tests__/test-helpers';
 import { queryProps } from '../AdminProfile';
 
 describe(`Profile.queryProps`, () => {

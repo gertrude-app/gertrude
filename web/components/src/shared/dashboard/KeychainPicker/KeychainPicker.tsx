@@ -16,8 +16,9 @@ const KeychainPicker: React.FC<Props> = ({ keychains, publicKeychains }) => (
         <div className="space-y-3">
           {keychains.map((keychain) => (
             <KeychainCard
+              key={keychain.id}
               name={keychain.name}
-              keys={keychain.keys}
+              numKeys={keychain.numKeys}
               isPublic={keychain.isPublic}
               onRemove={() => {}}
               selectable
@@ -51,8 +52,9 @@ const KeychainPicker: React.FC<Props> = ({ keychains, publicKeychains }) => (
         .filter((k) => k.isPublic)
         .map((keychain) => (
           <KeychainCard
+            key={keychain.id}
             name={keychain.name}
-            keys={keychain.keys}
+            numKeys={keychain.numKeys}
             isPublic={keychain.isPublic}
             onRemove={() => {}}
             selectable

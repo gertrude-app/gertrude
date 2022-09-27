@@ -25,8 +25,8 @@ Default.args = {
   screenshotsResolution: 1000,
   setScreenshotsResolution: () => {},
   keychains: [
-    keychainProps({ name: `HTC`, keys: 43, isPublic: true }),
-    keychainProps({ name: `Public Speaking`, keys: 7, isPublic: false }),
+    keychainProps({ name: `HTC`, numKeys: 43, isPublic: true }),
+    keychainProps({ name: `Public Speaking`, numKeys: 7, isPublic: false }),
   ],
   devices: [
     { id: `1`, model: `M1 MacbookAir (2021)`, status: `online`, icon: `laptop` },

@@ -1,10 +1,13 @@
 import React from 'react';
 import Button from '../../../Button';
-import { inflect } from '../../../lib/string';
+import { inflect } from '../../lib/string';
 import { ConfirmableEntityAction } from '../../../types';
-import { ConfirmDeleteEntity } from '../../Modal';
+import Modal, { ConfirmDeleteEntity } from '../../Modal';
 import PageHeading from '../../PageHeading';
 import TextInput from '../../TextInput';
+import KeyCreator from '../Keys/KeyCreator';
+import * as EditKey from '../../lib/keys/edit';
+import { target } from '../../lib/keys';
 
 type Props = {
   isNew: boolean;
@@ -13,9 +16,17 @@ type Props = {
   setName(name: string): unknown;
   setDescription(description: string): unknown;
   deleteKeychain: ConfirmableEntityAction<void>;
-  keys: Array<{ id: UUID }>;
+  keys: KeyRecord[];
   saveButtonDisabled: boolean;
   onSave(): unknown;
+  editingKey?: EditKey.State;
+  beginEditKey(id: UUID): unknown;
+  updateEditingKey(event: EditKey.Event): unknown;
+  dismissEditKeyModal(): unknown;
+  onKeySave(): unknown;
+  onCreateNewKey(): unknown;
+  keyModalSaveButtonDisabled: boolean;
+  apps: React.ComponentProps<typeof KeyCreator>['apps'];
 };
 
 const EditKeychain: React.FC<Props> = ({
@@ -28,13 +39,39 @@ const EditKeychain: React.FC<Props> = ({
   deleteKeychain,
   saveButtonDisabled,
   onSave,
+  editingKey,
+  updateEditingKey,
+  dismissEditKeyModal,
+  onKeySave,
+  beginEditKey,
+  onCreateNewKey,
+  keyModalSaveButtonDisabled,
+  apps,
 }) => (
   <div className="relative max-w-3xl">
+    <Modal
+      type="container"
+      title={editingKey?.isNew ? `Create a new key` : `Edit key`}
+      isOpen={!!editingKey}
+      icon="key"
+      primaryButtonText={
+        <>
+          {editingKey?.isNew ? `Create` : `Save`} Key
+          <i className="fa-solid fa-key ml-2" />
+        </>
+      }
+      primaryButtonDisabled={keyModalSaveButtonDisabled}
+      onPrimaryClick={onKeySave}
+      onDismiss={dismissEditKeyModal}
+    >
+      {editingKey && <KeyCreator update={updateEditingKey} {...editingKey} apps={apps} />}
+    </Modal>
     <ConfirmDeleteEntity type="keychain" action={deleteKeychain} />
     <PageHeading icon="key" className="mb-4">
       {isNew ? `Create Keychain` : `Edit Keychain`}
     </PageHeading>
     <div className="mt-8 space-y-8">
+      <pre>{JSON.stringify(editingKey)}</pre>
       <TextInput
         type="text"
         label="Name:"
@@ -53,11 +90,21 @@ const EditKeychain: React.FC<Props> = ({
         {keys.length} {inflect(`key`, keys.length)}:
       </h2>
       <div>
-        {keys.map((key) => (
-          <div key={key.id} className="flex items-center justify-between">
-            Key: <pre className="text-fuchsia-700">{key.id}</pre>
+        {keys.map((record) => (
+          <div
+            key={record.id}
+            onClick={() => beginEditKey(record.id)}
+            className="flex items-center justify-between"
+          >
+            {target(record.key)} <pre className="text-fuchsia-700">{record.id}</pre>
           </div>
         ))}
+        <div className="mt-4 flex justify-end">
+          <Button color="secondary-white" small type="button" onClick={onCreateNewKey}>
+            <i className="fa-solid fa-plus mr-2" />
+            Add new key
+          </Button>
+        </div>
       </div>
       <div className="flex mt-5 justify-end border-t-2 pt-8 space-x-5">
         {!isNew && (

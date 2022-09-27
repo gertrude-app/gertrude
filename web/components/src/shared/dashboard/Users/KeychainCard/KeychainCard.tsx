@@ -1,12 +1,12 @@
 import React from 'react';
 import cx from 'classnames';
+import { inflect } from '../../lib/string';
 import PillBadge from '../../PillBadge';
-import { inflect } from '../../../lib/string';
 
 type Props = {
   name: string;
   description?: string;
-  keys: number;
+  numKeys: number;
   isPublic: boolean;
   onRemove(): unknown;
   removeText?: string;
@@ -19,7 +19,7 @@ type Props = {
 const KeychainCard: React.FC<Props> = ({
   isPublic,
   name,
-  keys,
+  numKeys,
   description,
   onRemove,
   removeText = `Remove`,
@@ -59,9 +59,9 @@ const KeychainCard: React.FC<Props> = ({
                 small && isPublic && `mb-1 mr-2`,
               )}
             >
-              <span className="text-gray-600 font-medium shrink-0">{keys}</span>
+              <span className="text-gray-600 font-medium shrink-0">{numKeys}</span>
               {` `}
-              {inflect(`key`, keys)}
+              {inflect(`key`, numKeys)}
             </h4>
             {small && isPublic && <PillBadge type="green">Public</PillBadge>}
           </div>

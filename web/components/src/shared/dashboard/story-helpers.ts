@@ -9,7 +9,7 @@ export function keychainProps(
     isPublic: false,
     name: `HTC`,
     description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
-    keys: 232,
+    numKeys: 232,
     onRemove: () => {},
     ...override,
   };
