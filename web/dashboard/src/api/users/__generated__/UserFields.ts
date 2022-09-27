@@ -9,7 +9,7 @@ import { Family } from './../../../../../components/src/shared/dashboard/types/G
 // GraphQL fragment: UserFields
 // ====================================================
 
-export interface UserFields_keychains_keys {
+export interface UserFields_keychains_keyRecords {
   __typename: 'KeyRecord';
   id: string;
 }
@@ -21,7 +21,7 @@ export interface UserFields_keychains {
   description: string | null;
   isPublic: boolean;
   authorId: string;
-  keys: UserFields_keychains_keys[];
+  keyRecords: UserFields_keychains_keyRecords[];
 }
 
 export interface UserFields_devices_model {

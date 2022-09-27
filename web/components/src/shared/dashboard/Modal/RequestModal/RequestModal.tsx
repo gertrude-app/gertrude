@@ -4,7 +4,10 @@ import Modal from '../Modal';
 interface Props<Payload> {
   request?: RequestState<Payload>;
   successTitle: string;
+  successType?: `default` | `container`;
   errorTitle?: string;
+  primaryButtonText?: React.ReactNode;
+  primaryButtonDisabled?: boolean;
   withPayload: (payload: Payload) => React.ReactNode;
   withError?: (error?: ApiError) => React.ReactNode;
   onPrimaryClick(): unknown;
@@ -15,19 +18,24 @@ interface Props<Payload> {
 function RequestModal<Payload>({
   request,
   successTitle,
+  successType = `default`,
   errorTitle = `Error`,
   withError,
   withPayload,
   onDismiss,
   onPrimaryClick,
+  primaryButtonDisabled,
+  primaryButtonText,
   icon,
 }: Parameters<React.FC<Props<Payload>>>[0]): ReturnType<React.FC<Props<Payload>>> {
   return (
     <Modal
-      type={request?.state === `failed` ? `error` : `default`}
+      type={request?.state === `failed` ? `error` : successType}
       title={request?.state === `failed` ? errorTitle : successTitle}
       loading={request?.state === `ongoing`}
       isOpen={!!request}
+      primaryButtonText={primaryButtonText}
+      primaryButtonDisabled={primaryButtonDisabled}
       onPrimaryClick={onPrimaryClick}
       onDismiss={onDismiss}
       icon={icon}

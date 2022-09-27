@@ -78,6 +78,9 @@ export const throwingApiClient: ApiClient = {
     upsertKeyRecord: () => {
       throw new Error(`ApiClient.keychains.upsertKeyRecord() not implemented.`);
     },
+    getSelectableKeychains: () => {
+      throw new Error(`ApiClient.keychains.getSelectableKeychains() not implemented.`);
+    },
   },
   users: {
     list: () => {
@@ -174,6 +177,9 @@ export const noopApiClient: ApiClient = {
     },
     upsertKeyRecord: async () => {
       return Result.true();
+    },
+    getSelectableKeychains: async () => {
+      return Result.success({ own: [], public: [] });
     },
   },
   users: {

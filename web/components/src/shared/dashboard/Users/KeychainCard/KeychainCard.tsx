@@ -5,15 +5,15 @@ import PillBadge from '../../PillBadge';
 
 type Props = {
   name: string;
-  description?: string;
+  description?: string | null;
   numKeys: number;
   isPublic: boolean;
-  onRemove(): unknown;
-  removeText?: string;
+  remove?: { text: string; handler: () => unknown };
   editUrl?: string;
   small?: boolean;
   selected?: boolean;
   selectable?: boolean;
+  onSelect?: () => unknown;
 };
 
 const KeychainCard: React.FC<Props> = ({
@@ -21,12 +21,12 @@ const KeychainCard: React.FC<Props> = ({
   name,
   numKeys,
   description,
-  onRemove,
-  removeText = `Remove`,
+  remove,
   editUrl,
   small = false,
   selected = false,
   selectable = false,
+  onSelect,
 }) => (
   <div
     className={cx(
@@ -35,6 +35,7 @@ const KeychainCard: React.FC<Props> = ({
       selectable && !selected && `hover:bg-gray-50 cursor-pointer`,
       small && `min-h-[90px]`,
     )}
+    onClick={selectable ? onSelect : undefined}
   >
     <div className="flex items-center flex-grow">
       <div className="w-20 shrink-0 flex justify-center items-start">
@@ -49,7 +50,7 @@ const KeychainCard: React.FC<Props> = ({
             small ? `items-center` : `items-start`,
           )}
         >
-          <h2 className="font-medium text-lg text-gray-900 truncate sm:whitespace-normal max-w-[110px] sm:max-w-none">
+          <h2 className="font-medium text-lg leading-6 text-gray-900 truncate sm:whitespace-normal max-w-[110px] sm:max-w-none">
             {name}
           </h2>
           <div className="flex flex-col items-end flex-grow min-w-[100px]">
@@ -98,12 +99,14 @@ const KeychainCard: React.FC<Props> = ({
               Edit
             </a>
           )}
-          <button
-            className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-red-600 transition duration-100 rounded-br-xl"
-            onClick={onRemove}
-          >
-            {removeText}
-          </button>
+          {remove && (
+            <button
+              className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-red-600 transition duration-100 rounded-br-xl"
+              onClick={remove.handler}
+            >
+              {remove.text}
+            </button>
+          )}
         </div>
       </div>
     )}

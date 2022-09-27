@@ -35,10 +35,8 @@ export interface UsersState {
   addDeviceRequest?: RequestState<UUID>;
   activityOverviews: Record<UUID, RequestState<GetActivityOverview>>;
   activityDays: Record<ActivityDayKey, RequestState<ActivityDay>>;
-  deleting: {
-    device?: UUID;
-    user?: UUID;
-  };
+  deleting: { device?: UUID; user?: UUID };
+  adding: { keychain?: Keychain | null };
   deleted: UUID[];
 }
 
@@ -53,6 +51,7 @@ export function initialState(): UsersState {
     activityOverviews: {},
     activityDays: {},
     deleting: {},
+    adding: {},
     deleted: [],
   };
 }
@@ -96,6 +95,25 @@ export const slice = createSlice({
           draft.keychains = draft.keychains.filter(({ id }) => id !== payload.value);
           break;
       }
+    },
+    addKeychainModalDismissed(state) {
+      state.adding = { keychain: undefined };
+    },
+    addKeychainClicked(state) {
+      state.adding = { keychain: null };
+    },
+    keychainSelected(state, action: PayloadAction<Keychain>) {
+      if (state.adding.keychain?.id === action.payload.id) {
+        state.adding = { keychain: null };
+      } else {
+        state.adding = { keychain: action.payload };
+      }
+    },
+    keychainAdded(state, { payload }: PayloadAction<UUID>) {
+      const keychain = state.adding.keychain;
+      if (!keychain) return;
+      state.users[payload]?.draft.keychains.push(keychain);
+      state.adding = { keychain: undefined };
     },
   },
 
@@ -329,6 +347,10 @@ export const {
   addDeviceDismissed,
   userEntityDeleteStarted,
   userEntityDeleteCanceled,
+  addKeychainClicked,
+  keychainSelected,
+  keychainAdded,
+  addKeychainModalDismissed,
 } = slice.actions;
 
 export default slice.reducer;

@@ -71,7 +71,6 @@ const EditKeychain: React.FC<Props> = ({
       {isNew ? `Create Keychain` : `Edit Keychain`}
     </PageHeading>
     <div className="mt-8 space-y-8">
-      <pre>{JSON.stringify(editingKey)}</pre>
       <TextInput
         type="text"
         label="Name:"

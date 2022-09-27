@@ -1,10 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import {
-  ConfirmableEntityAction,
-  Subcomponents,
-  SubcomponentsOmit,
-} from '../../../types';
+import { ConfirmableEntityAction, Subcomponents } from '../../../types';
 import Button from '../../../Button';
 import KeychainCard from '../KeychainCard';
 import TextInput from '../../TextInput';
@@ -14,6 +10,7 @@ import PageHeading from '../../PageHeading';
 import { ConfirmDeleteEntity } from '../../Modal';
 import { inflect } from '../../lib/string';
 import ConnectModal from '../ConnectModal';
+import AddKeychainModal from '../AddKeychainModal';
 
 interface Props {
   isNew: boolean;
@@ -28,7 +25,7 @@ interface Props {
   screenshotsFrequency: number;
   setScreenshotsFrequency(frequency: number): unknown;
   removeKeychain(id: UUID): unknown;
-  keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
+  keychains: Keychain[];
   devices: Subcomponents<typeof UserDevice>;
   deleteUser: ConfirmableEntityAction<void>;
   startAddDevice(): unknown;
@@ -37,6 +34,12 @@ interface Props {
   addDeviceRequest?: RequestState<UUID>;
   saveButtonDisabled: boolean;
   onSave(): unknown;
+  onAddKeychainClicked(): unknown;
+  onSelectKeychainToAdd(keychain: Keychain): unknown;
+  onConfirmAddKeychain(): unknown;
+  onDismissAddKeychain(): unknown;
+  selectingKeychain?: Keychain | null;
+  fetchSelectableKeychainsRequest?: RequestState<{ own: Keychain[]; public: Keychain[] }>;
 }
 
 const EditUser: React.FC<Props> = ({
@@ -61,9 +64,23 @@ const EditUser: React.FC<Props> = ({
   dismissAddDevice,
   addDeviceRequest,
   startAddDevice,
+  onAddKeychainClicked,
+  onSelectKeychainToAdd,
+  onDismissAddKeychain,
+  fetchSelectableKeychainsRequest,
+  selectingKeychain,
+  onConfirmAddKeychain,
 }) => (
   <div className="relative max-w-3xl">
     <ConnectModal request={addDeviceRequest} dismissAddDevice={dismissAddDevice} />
+    <AddKeychainModal
+      request={fetchSelectableKeychainsRequest}
+      onSelect={onSelectKeychainToAdd}
+      onDismiss={onDismissAddKeychain}
+      onConfirm={onConfirmAddKeychain}
+      selected={selectingKeychain ?? undefined}
+      existingKeychains={keychains}
+    />
     <ConfirmDeleteEntity type="device" action={deleteDevice} />
     <ConfirmDeleteEntity type="user" action={deleteUser} />
     <PageHeading icon={isNew ? `user-plus` : `pen`}>
@@ -161,10 +178,13 @@ const EditUser: React.FC<Props> = ({
               description={keychain.description}
               numKeys={keychain.numKeys}
               isPublic={keychain.isPublic}
-              onRemove={() => removeKeychain(keychain.id)}
+              remove={{ text: `Remove`, handler: () => removeKeychain(keychain.id) }}
             />
           ))}
-          <button className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition duration-100">
+          <button
+            className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition duration-100"
+            onClick={onAddKeychainClicked}
+          >
             <i className="fa fa-plus mr-2" />
             Add keychain
           </button>
