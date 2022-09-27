@@ -92,8 +92,8 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
           set({ type: `screenshotsResolution`, value }),
         screenshotsFrequency: user.screenshotsFrequency,
         setScreenshotsFrequency: (value) => set({ type: `screenshotsFrequency`, value }),
-        removeKeychain: (id) =>
-          dispatch(userUpdated({ id, type: `removeKeychain`, value: id })),
+        removeKeychain: (keychainId) =>
+          dispatch(userUpdated({ id, type: `removeKeychain`, value: keychainId })),
         keychains: user.keychains.map(keychainProps),
         devices: user.devices.map(deviceProps),
         saveButtonDisabled:
