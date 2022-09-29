@@ -93,7 +93,12 @@ const Button: React.FC<Props> = ({
     <Link
       className={classes}
       to={disabled ? `#` : props.to}
-      onClick={disabled ? (event) => event.preventDefault() : () => {}}
+      onClick={
+        disabled
+          ? (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
+              event.preventDefault()
+          : () => {}
+      }
     >
       {props.children}
     </Link>

@@ -18,9 +18,9 @@ dashboard:
 all:
 	make sync-clean
 	$(CONCURRENTLY) \
-	  -n rs,sb,mk,ds \
-	  -c cyan.dim,magenta.dim,yellow.dim,green.dim \
-	  "make watchsync" "make start-storybook" "make start-marketing" "make start-dashboard"
+	  -n rs,sb,mk,ds,dx \
+	  -c cyan.dim,magenta.dim,yellow.dim,green.dim,red.dim \
+	  "make watchsync" "make start-storybook" "make start-marketing" "make start-dashboard" "make start-docs"
 
 # scaffold
 
@@ -31,10 +31,12 @@ component:
 
 sync:
 	rsync --recursive --delete --exclude '*.stories.tsx' ./components/src/shared ./dashboard/src/components
-	rsync --recursive --delete --exclude '*.stories.tsx' ./components/src/shared ./marketing/components
+	rsync --recursive --delete --exclude '*.stories.tsx' --exclude 'dashboard' ./components/src/shared ./marketing/components
+	rsync --recursive --delete --exclude '*.stories.tsx' --exclude 'dashboard' ./components/src/shared ./docs/src/components
 
 sync-clean:
 	rm -rf ./dashboard/src/components/shared
+	rm -rf ./docs/src/components/shared
 	rm -rf ./marketing/components/shared
 
 watchsync:
@@ -49,11 +51,14 @@ start-marketing:
 start-dashboard:
 	cd dashboard && npm run start
 
+start-docs:
+	cd docs && npm run dev
+
 npm-install:
 	$(CONCURRENTLY) \
 	  -n root,comp,mark,dash \
-	  -c magenta.dim,yellow.dim,green.dim,cyan.dim \
-	  "npm i" "cd components && npm i" "cd marketing && npm i" "cd dashboard && npm i"
+	  -c magenta.dim,yellow.dim,green.dim,cyan.dim,red.dim \
+	  "npm i" "cd components && npm i" "cd marketing && npm i" "cd dashboard && npm i" "cd docs && npm i"
 
 codegen:
 	cd dashboard && node ./scripts/codegen.js
@@ -71,6 +76,9 @@ build-storybook: sync npm-install-root
 
 build-dashboard: sync npm-install-root
 	cd dashboard && npm install && npm run build
+
+build-docs: sync npm-install-root
+	cd docs && npm install && npx next build && npx next export
 
 # ci type things
 
@@ -96,14 +104,16 @@ ts-check:
 	npx tsc --noEmit --project ./dashboard
 	npx tsc --noEmit --project ./marketing
 	npx tsc --noEmit --project ./components
+	npx tsc --noEmit --project ./docs
 
 ts-watch:
 	$(CONCURRENTLY) \
-	  -n ds,mk,sb \
-		-c cyan.dim,magenta.dim,yellow.dim \
+	  -n ds,mk,sb,dx \
+		-c cyan.dim,magenta.dim,yellow.dim,red.dim \
 	  "npx tsc --noEmit --project ./dashboard --watch --preserveWatchOutput" \
 	  "npx tsc --noEmit --project ./marketing --watch --preserveWatchOutput" \
-	  "npx tsc --noEmit --project ./components --watch --preserveWatchOutput"
+	  "npx tsc --noEmit --project ./components --watch --preserveWatchOutput" \
+	  "npx tsc --noEmit --project ./docs --watch --preserveWatchOutput"
 
 fix:
 	make format
@@ -127,8 +137,8 @@ ALL_CMDS = \
   help \
   component \
   storybook marketing dashboard all \
-  start-storybook start-marketing start-dashboard \
-  build-storybook build-marketing build-dashboard \
+  start-storybook start-marketing start-dashboard start-docs \
+  build-storybook build-marketing build-dashboard build-docs \
   fix ts-watch ts-check lint lint-fix format format-check check \
   test test-watch \
   codegen

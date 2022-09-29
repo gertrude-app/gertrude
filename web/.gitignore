@@ -5,6 +5,7 @@ node_modules/
 components/storybook-static/
 dashboard/build
 dashboard/src/components/shared
+docs/src/components/shared
 marketing/components/shared
 marketing/.next
 marketing/out
