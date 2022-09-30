@@ -128,3 +128,10 @@ export function formatDateAndTimeFromInputElements(date: string, time: string): 
   expiry.setMinutes(Number(time.split(`:`)[1]));
   return `${formatDate(expiry, `medium`)} at ${expiry.toLocaleTimeString(`en-US`)}`;
 }
+
+export function timeOfDay(date: Date): 'morning' | 'afternoon' | 'evening' {
+  const time = date.getHours();
+  if (time < 12) return 'morning';
+  else if (time < 5) return 'afternoon';
+  return 'evening';
+}

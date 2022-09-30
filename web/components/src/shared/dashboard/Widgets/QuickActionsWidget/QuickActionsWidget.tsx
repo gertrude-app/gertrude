@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import DashboardWidget from '../DashboardWidget';
-import { timeOfDay } from '../../../lib/dates';
+import { timeOfDay } from '../../lib/dates';
 
 type Props = {
   className?: string;

@@ -3,7 +3,7 @@ import cx from 'classnames';
 import DashboardWidget from '../DashboardWidget';
 import Button from '../../../Button';
 import UnlockRequestCard from '../../UnlockRequestCard';
-import { inflect } from '../../../lib/string';
+import { inflect } from '../../lib/string';
 
 type Props = {
   className?: string;
