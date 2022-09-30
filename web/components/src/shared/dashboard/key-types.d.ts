@@ -29,4 +29,5 @@ type Keychain = {
   authorId: UUID;
   description: string | null;
   isPublic: boolean;
+  numKeys: number;
 };

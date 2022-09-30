@@ -1,8 +1,6 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { SubcomponentsOmit } from '../../types';
 import Modal from '../Modal';
 import { keychainProps } from '../story-helpers';
-import KeychainCard from '../Users/KeychainCard';
 import KeychainPicker from './KeychainPicker';
 
 export default {
@@ -10,7 +8,7 @@ export default {
   component: KeychainPicker,
 } as ComponentMeta<typeof KeychainPicker>;
 
-const keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'> = [
+const keychains = [
   keychainProps({ id: `id-htc`, name: `HTC`, numKeys: 232, isPublic: true }),
   keychainProps({ name: `Jimmy's Music Theory`, numKeys: 7 }),
   keychainProps({ name: `Jason's blog`, numKeys: 3, description: undefined }),
@@ -26,7 +24,7 @@ const keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'> = [
   }),
 ];
 
-const publicKeychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'> = [
+const publicKeychains = [
   keychainProps({ id: `id-htc`, name: `HTC`, numKeys: 232, isPublic: true }),
   keychainProps({ name: `Meyer Hatchery`, numKeys: 14, isPublic: true }),
   keychainProps({ name: `Google`, numKeys: 1402, isPublic: true }),
@@ -47,7 +45,10 @@ const Template: ComponentStory<typeof KeychainPicker> = (args) => (
 );
 
 export const Default = Template.bind({});
-Default.args = { keychains, publicKeychains };
+Default.args = {
+  selectableOwnKeychains: keychains,
+  selectablePublicKeychains: publicKeychains,
+};
 
 export const NoKeychains = Template.bind({});
-NoKeychains.args = { keychains: [], publicKeychains };
+NoKeychains.args = { ...Default.args, selectableOwnKeychains: [] };

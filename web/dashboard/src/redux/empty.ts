@@ -8,13 +8,13 @@ export function keychain(id: UUID, adminId: UUID): Keychain {
     description: ``,
     isPublic: false,
     authorId: adminId,
+    numKeys: 0,
   };
 }
 
 export function user(): User {
   return {
     id: unsavedId(),
-    __typename: `User`,
     name: ``,
     keyloggingEnabled: false,
     screenshotsEnabled: false,

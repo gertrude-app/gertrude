@@ -1,12 +1,12 @@
 import React from 'react';
-import { SubcomponentsOmit, ConfirmableEntityAction } from '../../../types';
+import { Subcomponents, ConfirmableEntityAction } from '../../../types';
 import Button from '../../../Button';
 import KeychainCard from '../../Users/KeychainCard';
 import PageHeading from '../../PageHeading';
 import { ConfirmDeleteEntity } from '../../Modal';
 
 type Props = {
-  keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
+  keychains: Subcomponents<typeof KeychainCard>;
   remove: ConfirmableEntityAction;
   onCreateNew(): unknown;
 };
@@ -28,8 +28,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
           name={name}
           numKeys={numKeys}
           description={description}
-          removeText="Delete"
-          onRemove={() => remove.start(id)}
+          remove={{ text: `Delete`, handler: () => remove.start(id) }}
           editUrl={`/keychains/${id}`}
         />
       ))}

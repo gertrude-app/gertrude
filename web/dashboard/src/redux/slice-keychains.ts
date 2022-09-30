@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
+import { newKeyState } from '@dashboard/lib/keys';
 import * as EditKey from '@dashboard/lib/keys/edit';
 import * as convert from '@dashboard/lib/keys/convert';
 import Current from '../environment';
@@ -8,12 +9,12 @@ import { createResultThunk } from './thunk';
 import * as empty from './empty';
 import editKeyReducer from './edit-key-reducer';
 import Result from '../api/Result';
-import { newKeyState } from '../components/shared/dashboard/lib/keys';
 
 export interface KeychainsState {
   fetchAdminKeychainRequest: Record<UUID, RequestState>;
   updateAdminKeychainRequest: Record<UUID, RequestState>;
   listAdminKeychainsRequest: RequestState;
+  fetchSelectableKeychainsRequest: RequestState<{ own: Keychain[]; public: Keychain[] }>;
   saveKeyRecordRequest: RequestState;
   keychains: Record<UUID, Editable<Keychain>>;
   keyRecords: Record<UUID, Editable<KeyRecord>>;
@@ -30,6 +31,7 @@ export function initialState(): KeychainsState {
     updateAdminKeychainRequest: {},
     listAdminKeychainsRequest: Req.idle(),
     saveKeyRecordRequest: Req.idle(),
+    fetchSelectableKeychainsRequest: Req.idle(),
     keyRecords: {},
     keychains: {},
     deleting: {},
@@ -156,6 +158,21 @@ export const slice = createSlice({
       state.listAdminKeychainsRequest = Req.fail(error);
     });
 
+    builder.addCase(fetchSelectableKeychains.started, (state) => {
+      state.fetchSelectableKeychainsRequest = Req.ongoing();
+    });
+
+    builder.addCase(fetchSelectableKeychains.failed, (state, { error }) => {
+      state.fetchSelectableKeychainsRequest = Req.fail(error);
+    });
+
+    builder.addCase(fetchSelectableKeychains.succeeded, (state, { payload }) => {
+      state.fetchSelectableKeychainsRequest = Req.succeed({
+        own: payload.own.filter((keychain) => !keychain.isPublic),
+        public: payload.public,
+      });
+    });
+
     builder.addCase(upsertEditingKeyRecord.started, (state) => {
       state.saveKeyRecordRequest = Req.ongoing();
     });
@@ -215,6 +232,11 @@ export const upsertEditingKeyRecord = createResultThunk(
       editable(keyRecord, state.editingKey?.isNew),
     );
   },
+);
+
+export const fetchSelectableKeychains = createResultThunk(
+  `${slice.name}/fetchSelectableKeychains`,
+  Current.api.keychains.getSelectableKeychains,
 );
 
 export const {

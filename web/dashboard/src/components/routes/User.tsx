@@ -16,14 +16,16 @@ import {
   deleteUser,
   createUserToken,
   addDeviceDismissed,
+  addKeychainClicked,
+  keychainSelected,
+  keychainAdded,
+  addKeychainModalDismissed,
 } from '../../redux/slice-users';
 import { isDirty, Query, Req } from '../../redux/helpers';
-import {
-  GetUser_user_devices,
-  GetUser_user_keychains,
-} from '../../api/users/__generated__/GetUser';
+import { GetUser_user_devices } from '../../api/users/__generated__/GetUser';
 import { QueryProps } from '../../redux/store';
 import { isUnsaved, unsavedId } from '@dashboard/lib/id';
+import { fetchSelectableKeychains } from '../../redux/slice-keychains';
 
 const User: React.FC = () => {
   const dispatch = useDispatch();
@@ -73,6 +75,8 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
     const update = state.updateUserRequest[id];
     const deleteDeviceId = state.deleting.device;
     const deleteUserId = state.deleting.user;
+    const fetchSelectableKeychainsRequest =
+      appState.keychains.fetchSelectableKeychainsRequest;
 
     function set(arg: Partial<UserUpdate>): void {
       dispatch(userUpdated({ id, ...arg } as UserUpdate));
@@ -92,9 +96,9 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
           set({ type: `screenshotsResolution`, value }),
         screenshotsFrequency: user.screenshotsFrequency,
         setScreenshotsFrequency: (value) => set({ type: `screenshotsFrequency`, value }),
-        removeKeychain: (id) =>
-          dispatch(userUpdated({ id, type: `removeKeychain`, value: id })),
-        keychains: user.keychains.map(keychainProps),
+        removeKeychain: (keychainId) =>
+          dispatch(userUpdated({ id, type: `removeKeychain`, value: keychainId })),
+        keychains: user.keychains,
         devices: user.devices.map(deviceProps),
         saveButtonDisabled:
           !isUnsaved(id) && (!isDirty(editable) || update?.state === `ongoing`),
@@ -114,24 +118,26 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
         startAddDevice: () => dispatch(createUserToken(id)),
         dismissAddDevice: () => dispatch(addDeviceDismissed()),
         addDeviceRequest: state.addDeviceRequest,
+        onAddKeychainClicked: () => {
+          dispatch(addKeychainClicked());
+          if (fetchSelectableKeychainsRequest.state === `idle`) {
+            dispatch(fetchSelectableKeychains());
+          }
+        },
+        onSelectKeychainToAdd: (keychain) => dispatch(keychainSelected(keychain)),
+        onConfirmAddKeychain: () => dispatch(keychainAdded(id)),
+        onDismissAddKeychain: () => dispatch(addKeychainModalDismissed()),
+        selectingKeychain: state.adding?.keychain,
+        fetchSelectableKeychainsRequest:
+          state.adding?.keychain === undefined
+            ? undefined
+            : fetchSelectableKeychainsRequest,
       }),
       false,
     ];
   };
 
 // helpers
-
-function keychainProps(
-  apiKeychain: GetUser_user_keychains,
-): React.ComponentProps<typeof EditUser>['keychains'][0] {
-  return {
-    id: apiKeychain.id,
-    name: apiKeychain.name,
-    description: apiKeychain.description ?? ``,
-    isPublic: apiKeychain.isPublic,
-    numKeys: apiKeychain.keys.length,
-  };
-}
 
 function deviceProps(
   apiDevice: GetUser_user_devices,

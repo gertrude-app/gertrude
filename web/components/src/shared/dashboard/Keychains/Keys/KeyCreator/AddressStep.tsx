@@ -90,8 +90,6 @@ function addressTypeOptions(
   const opts: ReturnType<typeof addressTypeOptions> = [
     { value: `standard`, display: `Standard` },
     { value: `strict`, display: `Strict` },
-    { value: `ip`, display: `IP address` },
-    { value: `domainRegex`, display: `Regular expression` },
   ];
 
   if (showAdvanced) {

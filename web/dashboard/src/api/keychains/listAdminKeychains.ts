@@ -2,16 +2,6 @@ import Result from '../Result';
 import * as T from './__generated__/ListAdminKeychains';
 import { gql, query } from '../apollo';
 
-export function mapKeychain(keychain: T.ListAdminKeychains['keychains'][0]): Keychain {
-  return {
-    id: keychain.id,
-    name: keychain.name,
-    description: keychain.description,
-    isPublic: keychain.isPublic,
-    authorId: keychain.authorId,
-  };
-}
-
 export async function listAdminKeychains(): Promise<
   Result<[Keychain[], KeyRecord[]], ApiError>
 > {
@@ -131,3 +121,18 @@ const QUERY = gql`
     }
   }
 `;
+
+export function mapKeychain(
+  keychain: Omit<T.ListAdminKeychains['keychains'][0], 'keyRecords'> & {
+    keyRecords: Array<{ id: UUID }>;
+  },
+): Keychain {
+  return {
+    id: keychain.id,
+    name: keychain.name,
+    description: keychain.description,
+    isPublic: keychain.isPublic,
+    authorId: keychain.authorId,
+    numKeys: keychain.keyRecords.length,
+  };
+}

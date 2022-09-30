@@ -16,7 +16,6 @@ Shared.args = {
   numKeys: 43,
   isPublic: true,
   description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum laboriosam aperiam quasi blanditiis.`,
-  onRemove: () => {},
 };
 
 export const Private = Template.bind({});

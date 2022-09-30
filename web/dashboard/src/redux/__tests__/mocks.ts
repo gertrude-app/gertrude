@@ -61,7 +61,6 @@ export function notificationMethod(
 
 export function user(override: Partial<User> = {}): User {
   return {
-    __typename: `User`,
     id: `mock.User--id--${Math.random()}`,
     name: `Huck`,
     screenshotsEnabled: true,
@@ -90,17 +89,14 @@ export function userDevice(
   };
 }
 
-export function userKeychain(
-  override: Partial<User['keychains'][0]> = {},
-): User['keychains'][0] {
+export function userKeychain(override: Partial<Keychain> = {}): Keychain {
   return {
-    __typename: `Keychain`,
     id: `mock.Keychain--id--${Math.random()}`,
     name: `HTC`,
     description: ``,
     isPublic: false,
     authorId: `mock.Admin--id--${Math.random()}`,
-    keys: [],
+    numKeys: 0,
     ...override,
   };
 }

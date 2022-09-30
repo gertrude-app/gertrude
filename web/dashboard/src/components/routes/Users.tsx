@@ -37,10 +37,7 @@ const Users: React.FC = () => {
         id: resource.id,
         name: resource.name,
         numKeychains: resource.keychains.length,
-        numKeys: resource.keychains.reduce(
-          (acc, keychain) => acc + keychain.keys.length,
-          0,
-        ),
+        numKeys: resource.keychains.reduce((acc, keychain) => acc + keychain.numKeys, 0),
         devices: resource.devices.map((device) => ({
           id: device.id,
           model: device.model.title,

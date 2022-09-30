@@ -1,33 +1,44 @@
 import React from 'react';
+import cx from 'classnames';
 import KeychainCard from '../Users/KeychainCard';
-import { SubcomponentsOmit } from '../../types';
 import Button from '../../Button';
 
 type Props = {
-  keychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
-  publicKeychains: SubcomponentsOmit<typeof KeychainCard, 'onRemove'>;
+  hasNoOwnKeychains: boolean;
+  selectableOwnKeychains: Keychain[];
+  selectablePublicKeychains: Keychain[];
+  onSelect(keychain: Keychain): unknown;
+  selected?: Keychain | null;
 };
 
-const KeychainPicker: React.FC<Props> = ({ keychains, publicKeychains }) => (
+const KeychainPicker: React.FC<Props> = ({
+  hasNoOwnKeychains,
+  selectableOwnKeychains,
+  selected,
+  selectablePublicKeychains,
+  onSelect,
+}) => (
   <div className="sm:bg-gray-50 rounded-xl sm:p-4">
-    {keychains.length !== 0 ? (
+    {selectableOwnKeychains.length !== 0 && (
       <>
-        <h2 className="text-lg font-bold text-gray-600 mb-3">Your keychains</h2>
-        <div className="space-y-3">
-          {keychains.map((keychain) => (
+        <h2 className="text-lg font-bold text-gray-600 mb-3">Your keychains:</h2>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {selectableOwnKeychains.map((keychain) => (
             <KeychainCard
               key={keychain.id}
               name={keychain.name}
               numKeys={keychain.numKeys}
               isPublic={keychain.isPublic}
-              onRemove={() => {}}
+              onSelect={() => onSelect(keychain)}
+              selected={selected?.id === keychain.id}
               selectable
               small
             />
           ))}
         </div>
       </>
-    ) : (
+    )}
+    {hasNoOwnKeychains && (
       <div className="flex flex-col justify-center items-center p-10 bg-gray-100 rounded-2xl shadow-inner">
         <i className="fa fa-key text-6xl text-gray-300" />
         <h2 className="text-xl font-bold mt-3 mb-2 text-center">No personal keychains</h2>
@@ -46,21 +57,27 @@ const KeychainPicker: React.FC<Props> = ({ keychains, publicKeychains }) => (
         </Button>
       </div>
     )}
-    <h2 className="text-lg font-bold text-gray-600 mb-3 mt-6">Public keychains</h2>
+    <h2
+      className={cx(
+        `text-lg font-bold text-gray-600 mb-3`,
+        selectableOwnKeychains.length > 0 && `mt-8`,
+      )}
+    >
+      Public keychains:
+    </h2>
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {publicKeychains
-        .filter((k) => k.isPublic)
-        .map((keychain) => (
-          <KeychainCard
-            key={keychain.id}
-            name={keychain.name}
-            numKeys={keychain.numKeys}
-            isPublic={keychain.isPublic}
-            onRemove={() => {}}
-            selectable
-            small
-          />
-        ))}
+      {selectablePublicKeychains.map((keychain) => (
+        <KeychainCard
+          key={keychain.id}
+          name={keychain.name}
+          numKeys={keychain.numKeys}
+          isPublic={keychain.isPublic}
+          selectable
+          onSelect={() => onSelect(keychain)}
+          selected={selected?.id === keychain.id}
+          small
+        />
+      ))}
     </div>
   </div>
 );

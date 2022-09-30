@@ -3,11 +3,14 @@ import { gql, query } from '../apollo';
 import * as T from './__generated__/GetUser';
 import { USER_FIELDS } from './listUsers';
 import { User } from './types';
+import { mapKeychain } from '../keychains/listAdminKeychains';
 
 export async function getUser(id: UUID): Promise<Result<User, ApiError>> {
-  return (await query<T.GetUser, T.GetUserVariables>(QUERY, { id })).mapApi(
-    (data) => data.user,
-  );
+  const result = await query<T.GetUser, T.GetUserVariables>(QUERY, { id });
+  return result.mapApi((data) => ({
+    ...data.user,
+    keychains: data.user.keychains.map(mapKeychain),
+  }));
 }
 
 const QUERY = gql`

@@ -10,6 +10,7 @@ export async function upsertKeychain(
   const input: UpdateKeychainInput = {
     id: keychain.draft.id,
     name: keychain.draft.name,
+    description: keychain.draft.description,
     authorId: keychain.adminId,
     isPublic: keychain.draft.isPublic,
   };

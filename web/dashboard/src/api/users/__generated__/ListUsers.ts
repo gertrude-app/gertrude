@@ -9,7 +9,7 @@ import { Family } from './../../../../../components/src/shared/dashboard/types/G
 // GraphQL query operation: ListUsers
 // ====================================================
 
-export interface ListUsers_user_keychains_keys {
+export interface ListUsers_user_keychains_keyRecords {
   __typename: 'KeyRecord';
   id: string;
 }
@@ -21,7 +21,7 @@ export interface ListUsers_user_keychains {
   description: string | null;
   isPublic: boolean;
   authorId: string;
-  keys: ListUsers_user_keychains_keys[];
+  keyRecords: ListUsers_user_keychains_keyRecords[];
 }
 
 export interface ListUsers_user_devices_model {

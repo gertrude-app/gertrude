@@ -32,6 +32,7 @@ const ScreenshotViewer: React.FC<Props> = ({
         src={url}
         width={width}
         height={height}
+        loading="lazy"
         alt="user screenshot"
       />
     </div>
