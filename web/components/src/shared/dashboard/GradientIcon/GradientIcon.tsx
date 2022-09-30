@@ -1,40 +1,41 @@
 import React from 'react';
 import cx from 'classnames';
 
-const icons = [
-  'comment',
-  'google-chrome',
-  'location',
-  'unlock',
-  'calendar',
-  'app-store',
-  'globe',
-  'lightning-bolt',
-  'window',
-  'pen-to-square',
-  'info',
-  'list',
-  'bug',
-  'exclamation-triangle',
-  'hamburger',
-  'desktop',
-  'key',
-  'user-plus',
-  'user',
-  'users',
-  'pen',
-  'email',
-  'text',
-  'slack',
-  'laptop',
+export const iconsList = [
+  `comment`,
+  `google-chrome`,
+  `location`,
+  `unlock`,
+  `calendar`,
+  `app-store`,
+  `globe`,
+  `lightning-bolt`,
+  `window`,
+  `pen-to-square`,
+  `info`,
+  `list`,
+  `bug`,
+  `exclamation-triangle`,
+  `hamburger`,
+  `desktop`,
+  `key`,
+  `user-plus`,
+  `user`,
+  `users`,
+  `pen`,
+  `email`,
+  `text`,
+  `slack`,
+  `laptop`,
 ] as const;
 
-export type IconTypes = typeof icons[number];
+export type IconType = typeof iconsList[number];
 
 interface Props {
   className?: string;
-  icon: IconTypes;
+  icon: IconType;
   size: `small` | `medium` | `large`;
+  subtle?: boolean;
 }
 
 const CLASS_MAP: Record<Props['icon'], string> = {
@@ -65,7 +66,7 @@ const CLASS_MAP: Record<Props['icon'], string> = {
   laptop: `fa-solid fa-laptop`,
 };
 
-const GradientIcon: React.FC<Props> = ({ icon, className, size }) => {
+const GradientIcon: React.FC<Props> = ({ icon, className, size, subtle = false }) => {
   if (size === `small`) {
     return (
       <i
@@ -76,25 +77,25 @@ const GradientIcon: React.FC<Props> = ({ icon, className, size }) => {
         )}
       />
     );
-  } else {
-    return (
-      <div
-        className={cx(
-          `mx-auto flex flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500 sm:ml-0`,
-          size === `large` ? `h-12 w-12` : `h-10 w-10`,
-          className,
-        )}
-      >
-        <i
-          className={cx(
-            `text-white `,
-            size === 'large' ? `text-2xl` : `text-lg`,
-            CLASS_MAP[icon],
-          )}
-        />
-      </div>
-    );
   }
+  return (
+    <div
+      className={cx(
+        `flex flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500`,
+        size === `large` ? `h-12 w-12` : `h-10 w-10`,
+        className,
+      )}
+    >
+      <i
+        className={cx(
+          `text-white`,
+          size === `large` && `text-2xl`,
+          subtle ? `text-opacity-80 text-md` : `text-lg`,
+          CLASS_MAP[icon],
+        )}
+      />
+    </div>
+  );
 };
 
 export default GradientIcon;

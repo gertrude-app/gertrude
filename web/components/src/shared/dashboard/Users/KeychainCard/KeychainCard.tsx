@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import { inflect } from '../../lib/string';
 import PillBadge from '../../PillBadge';
-import GradientIcon from '../../GradientIcon';
+import GradientIcon from '../../GradientIcon/GradientIcon';
 
 type Props = {
   name: string;

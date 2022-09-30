@@ -1,10 +1,10 @@
 import React from 'react';
 import cx from 'classnames';
-import GradientIcon, { IconTypes } from '../GradientIcon';
+import GradientIcon, { IconType } from '../GradientIcon/GradientIcon';
 
 type Props = {
   children: React.ReactNode;
-  icon: IconTypes;
+  icon: IconType;
   className?: string;
 };
 

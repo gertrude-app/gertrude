@@ -4,7 +4,7 @@ import Button from '../../../Button';
 import SelectMenu from '../../SelectMenu';
 import { Trigger } from '../../types/GraphQL';
 import { AdminNotificationMethod } from '../../types/Admin';
-import GradientIcon from '../../GradientIcon';
+import GradientIcon from '../../GradientIcon/GradientIcon';
 
 type Props = {
   trigger: Trigger;

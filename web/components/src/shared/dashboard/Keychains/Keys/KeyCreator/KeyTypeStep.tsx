@@ -2,7 +2,7 @@ import React from 'react';
 import { capitalize } from '../../../lib/string';
 import KeyCreationStep from './KeyCreationStep';
 import KeyTypeOption from '../KeyTypeOption';
-import GradientIcon from '../../../GradientIcon';
+import GradientIcon from '../../../GradientIcon/GradientIcon';
 import UserInputText from './UserInputText';
 import * as EditKey from '../../../lib/keys/edit';
 

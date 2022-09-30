@@ -4,7 +4,7 @@ import TextInput from '../../../TextInput';
 import Toggle from '../../../Toggle';
 import KeyCreationStep from './KeyCreationStep';
 import SubdomainDemo from './SubdomainDemo';
-import GradientIcon from '../../../GradientIcon';
+import GradientIcon from '../../../GradientIcon/GradientIcon';
 import UserInputText from './UserInputText';
 import * as EditKey from '../../../lib/keys/edit';
 

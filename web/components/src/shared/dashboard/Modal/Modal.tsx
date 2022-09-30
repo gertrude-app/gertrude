@@ -5,7 +5,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import Button from '../../Button';
 import { capitalize } from '../lib/string';
 import LoadingSpinner from '../../LoadingSpinner';
-import GradientIcon, { IconTypes } from '../GradientIcon';
+import GradientIcon, { IconType } from '../GradientIcon/GradientIcon';
 
 interface Props {
   type: 'destructive' | 'default' | 'container' | 'error';
@@ -18,7 +18,7 @@ interface Props {
   onDismiss(): unknown;
   primaryButtonDisabled?: boolean;
   children?: React.ReactNode;
-  icon?: IconTypes;
+  icon?: IconType;
 }
 
 const Modal: React.FC<Props> = ({
