@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import cx from 'classnames';
 
 interface Props {
@@ -6,9 +6,24 @@ interface Props {
   iconOnly?: boolean;
   className?: string;
   type?: 'default' | 'inverted' | 'on-dark';
+  textSize?:
+    | 'text-base'
+    | 'text-lg'
+    | 'text-xl'
+    | 'text-2xl'
+    | 'text-3xl'
+    | 'text-4xl'
+    | 'text-5xl';
 }
 
-const Logo: React.FC<Props> = ({ size = 40, className, iconOnly, type = `default` }) => {
+const Logo: React.FC<Props> = ({
+  size = 40,
+  className,
+  iconOnly,
+  type = `default`,
+  textSize = `text-4xl`,
+}) => {
+  const gradientId = useId();
   let outerColor = ``;
   let innerColor = ``;
 
@@ -22,7 +37,7 @@ const Logo: React.FC<Props> = ({ size = 40, className, iconOnly, type = `default
       innerColor = `#13182b`;
       break;
     default:
-      outerColor = `url(#inner_gradient)`;
+      outerColor = `url(#${gradientId})`;
       innerColor = `white`;
   }
 
@@ -45,7 +60,7 @@ const Logo: React.FC<Props> = ({ size = 40, className, iconOnly, type = `default
         {type === `default` && (
           <defs>
             <linearGradient
-              id="inner_gradient"
+              id={gradientId}
               x1="17.5088"
               y1="0.898834"
               x2="17.5088"
@@ -61,8 +76,9 @@ const Logo: React.FC<Props> = ({ size = 40, className, iconOnly, type = `default
       {!iconOnly && (
         <h1
           className={cx(
-            `text-4xl font-lato ml-2`,
+            `font-lato ml-2 whitespace-nowrap`,
             type === `inverted` || type === `on-dark` ? `text-white` : `text-gray-700`,
+            textSize,
           )}
         >
           Gertrude

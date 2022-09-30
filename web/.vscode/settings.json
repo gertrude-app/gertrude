@@ -7,6 +7,7 @@
     "**/tsconfig.tsbuildinfo": true,
     "dashboard/build/": true,
     "dashboard/src/components/shared/": true,
+    "docs/src/components/shared/": true,
     "marketing/components/shared/": true,
     "marketing/out/": true,
     "components/storybook-static/": true

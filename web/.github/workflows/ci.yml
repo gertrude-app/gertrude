@@ -32,6 +32,10 @@ jobs:
         uses: bahmutov/npm-install@v1
         with:
           working-directory: marketing
+      - name: npm install docs
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: docs
       - name: sync
         run: make sync
       - name: lint

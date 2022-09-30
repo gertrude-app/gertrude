@@ -3,6 +3,7 @@ local dev commands:
   > `make storybook` -- run local dev for components/storybook
   > `make marketing` -- run local dev for marketing site
   > `make dashboard` -- run local dev for dashboard site
+  > `make docs`      -- run local dev for docs site
   > `make all`       -- run local dev for all 3 simultaneously
 
 quality/ci commands:      
