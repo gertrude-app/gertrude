@@ -14,23 +14,23 @@ const QuickActionsWidget: React.FC<Props> = ({ className }) => (
       Here's some quick actions you may find useful:
     </p>
     <QuickAction
-      name={'Create new user'}
-      icon={'user-plus'}
-      href={'/users/new'}
-      className={''}
+      name={`Create new user`}
+      icon={`user-plus`}
+      href={`/users/new`}
+      className={``}
     />
     <QuickAction
-      name={'Create new keychain'}
-      icon={'key'}
-      href={'/keychains/id-123'}
-      className={''}
+      name={`Create new keychain`}
+      icon={`key`}
+      href={`/keychains/id-123`}
+      className={``}
     />
-    <QuickAction name={'View documentation'} icon={'book'} href={'#'} className={''} />
+    <QuickAction name={`View documentation`} icon={`book`} href={`#`} className={``} />
     <QuickAction
-      name={'Submit support request'}
-      icon={'life-ring'}
-      href={'#'}
-      className={''}
+      name={`Submit support request`}
+      icon={`life-ring`}
+      href={`#`}
+      className={``}
     />
   </DashboardWidget>
 );
@@ -49,7 +49,7 @@ const QuickAction: React.FC<QuickActionProps> = ({ name, icon, href, className }
     <a
       href={href}
       className={cx(
-        'p-4 flex items-center odd:bg-gray-50 rounded-xl hover:bg-violet-50 transition duration-100 focus:outline focus:outline-violet-200',
+        `p-4 flex items-center odd:bg-gray-50 rounded-xl hover:bg-violet-50 transition duration-100 focus:outline focus:outline-violet-200`,
         className,
       )}
     >

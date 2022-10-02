@@ -85,26 +85,20 @@ MoreContent.args = {
         voluptas, eveniet similique quae impedit."
       </p>
       <SelectableListItem
-        title={'Lorem ipsum'}
-        description={
-          'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dicta, nobis ullam voluptatum nisi dolorum beatae.'
-        }
+        title={`Lorem ipsum`}
+        description={`Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dicta, nobis ullam voluptatum nisi dolorum beatae.`}
         selected={true}
         onClick={() => {}}
       />
       <SelectableListItem
-        title={'Dolor sit'}
-        description={
-          'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dicta, nobis ullam voluptatum nisi dolorum beatae.'
-        }
+        title={`Dolor sit`}
+        description={`Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dicta, nobis ullam voluptatum nisi dolorum beatae.`}
         selected={false}
         onClick={() => {}}
       />
       <SelectableListItem
-        title={'Amet consectetur'}
-        description={
-          'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dicta, nobis ullam voluptatum nisi dolorum beatae.'
-        }
+        title={`Amet consectetur`}
+        description={`Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dicta, nobis ullam voluptatum nisi dolorum beatae.`}
         selected={false}
         onClick={() => {}}
       />

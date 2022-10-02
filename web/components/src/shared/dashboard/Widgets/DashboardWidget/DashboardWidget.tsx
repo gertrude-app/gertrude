@@ -7,7 +7,7 @@ type Props = {
 };
 
 const DashboardWidget: React.FC<Props> = ({ className, children }) => (
-  <div className={cx('border bg-white p-4 rounded-2xl shadow-lg', className)}>
+  <div className={cx(`border bg-white p-4 rounded-2xl shadow-lg`, className)}>
     {children}
   </div>
 );

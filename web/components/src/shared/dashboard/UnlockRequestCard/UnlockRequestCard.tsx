@@ -1,26 +1,19 @@
 import React from 'react';
 import Button from '../../Button';
-import { formatDate } from '../lib/dates';
+import { relativeTime } from '../lib/dates';
 
 type Props = {
-  className?: string;
   url: string;
   userName: string;
   comment?: string;
   time: Date;
 };
 
-const UnlockRequestCard: React.FC<Props> = ({
-  className,
-  url,
-  userName,
-  comment,
-  time,
-}) => (
+const UnlockRequestCard: React.FC<Props> = ({ url, userName, comment, time }) => (
   <div className="bg-white border p-4 rounded-xl shadow-lg mb-5">
     <div className="flex justify-between items-start mb-4">
       <h2 className="font-bold text-gray-900">{userName}</h2>
-      <h3 className="text-gray-400 text-sm">{formatDate(time, 'short')}</h3>
+      <h3 className="text-gray-400 text-sm">{relativeTime(time)}</h3>
     </div>
     <div className="p-2 bg-violet-50 rounded-xl mt-2 flex justify-center items-center">
       <h2 className="font-mono font-medium">{url}</h2>

@@ -11,12 +11,13 @@ type Props = {
 };
 
 const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) => (
-  <DashboardWidget className={cx('shadow-inner bg-gray-100', className)}>
+  <DashboardWidget className={cx(`shadow-inner bg-gray-100`, className)}>
     {unlockRequests
       .sort((a, b) => a.time.getTime() - b.time.getTime())
       .slice(0, 2)
       .map((req) => (
         <UnlockRequestCard
+          key={req.time.toISOString()} // this will need to change to the id or something
           userName={req.user}
           comment={req.comment}
           time={req.time}
@@ -26,8 +27,8 @@ const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) =>
     {unlockRequests.length > 2 && (
       <div className="flex flex-col items-center mb-3">
         <h3 className="text-gray-500 font-medium">
-          And {unlockRequests.length - 2} older{' '}
-          {inflect('request', unlockRequests.length - 2)}:
+          And {unlockRequests.length - 2} older{` `}
+          {inflect(`request`, unlockRequests.length - 2)}:
         </h3>
         <Button
           type="button"

@@ -13,9 +13,9 @@ const Template: ComponentStory<typeof UsersOverview> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   users: [
-    { name: 'Little Jimmy', online: true },
-    { name: 'Sally', online: true },
-    { name: 'Henry', online: false },
+    { name: `Little Jimmy`, online: true },
+    { name: `Sally`, online: true },
+    { name: `Henry`, online: false },
   ],
 };
 

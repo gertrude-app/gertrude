@@ -6,6 +6,8 @@ export default {
   component: UnlockRequestsWidget,
 } as ComponentMeta<typeof UnlockRequestsWidget>;
 
-const Template: ComponentStory<typeof UnlockRequestsWidget> = (args) => <UnlockRequestsWidget {...args} />;
+const Template: ComponentStory<typeof UnlockRequestsWidget> = (args) => (
+  <UnlockRequestsWidget {...args} />
+);
 
 export const Default = Template.bind({});

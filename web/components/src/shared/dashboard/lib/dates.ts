@@ -114,7 +114,7 @@ export function relativeTime(date: Date): string {
       return rtf.format(-Math.round(diff / num), unit as any);
     }
   }
-  return `now`;
+  return `just now`;
 }
 
 export function dateFromUrl(urlDate: string): Date {
@@ -131,7 +131,7 @@ export function formatDateAndTimeFromInputElements(date: string, time: string): 
 
 export function timeOfDay(date: Date): 'morning' | 'afternoon' | 'evening' {
   const time = date.getHours();
-  if (time < 12) return 'morning';
-  else if (time < 5) return 'afternoon';
-  return 'evening';
+  if (time < 12) return `morning`;
+  else if (time < 5) return `afternoon`;
+  return `evening`;
 }

@@ -152,7 +152,7 @@ export const UndoMainPadding: React.FC<{
   children: React.ReactNode;
   className?: string;
 }> = ({ children, className }) => (
-  <div className={cx('-my-6 md:-my-7 -mx-4 sm:-mx-6 md:-mx-8', className)}>
+  <div className={cx(`-my-6 md:-my-7 -mx-4 sm:-mx-6 md:-mx-8`, className)}>
     {children}
   </div>
 );
