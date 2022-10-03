@@ -77,3 +77,22 @@ NoUnlockRequests.args = {
   ...Default.args,
   unlockRequests: [],
 };
+
+export const NoUserActivity = Template.bind({});
+NoUserActivity.args = {
+  ...Default.args,
+  userActivity: [],
+};
+
+export const NoUserActivityOrUnlockRequests = Template.bind({});
+NoUserActivityOrUnlockRequests.args = {
+  ...Default.args,
+  userActivity: [],
+  unlockRequests: [],
+};
+
+export const NoUsers = Template.bind({});
+NoUsers.args = {
+  ...Default.args,
+  users: [],
+};

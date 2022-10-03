@@ -8,7 +8,6 @@ type Props = {
 };
 
 const UserActivityWidget: React.FC<Props> = ({ userActivity }) => {
-  console.log(userActivity);
   const caughtUp = userActivity.reduce(
     (acc, cur) => cur.unreviewedItems === 0 && acc,
     true,
@@ -16,7 +15,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity }) => {
   if (userActivity.length === 0)
     return (
       <DashboardWidget inset className="bg-violet-50">
-        <div className="flex flex-col justify-center items-center p-6 rounded-xl">
+        <div className="flex flex-col justify-center items-center p-6 rounded-xl h-full">
           <h3 className="font-bold text-black text-opacity-80 text-lg">
             No recorded user activity
           </h3>
@@ -24,7 +23,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity }) => {
             You can use Gertrude to monitor your users' activity
           </p>
           <Button type="link" color="primary-violet" to="/users/new" small>
-            <i className="fa-solid fa-arrow-right mr-2" /> Check it out
+            <i className="fa-solid fa-arrow-right mr-2" /> See how
           </Button>
         </div>
       </DashboardWidget>
