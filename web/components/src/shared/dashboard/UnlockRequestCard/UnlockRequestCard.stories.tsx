@@ -13,17 +13,16 @@ const Template: ComponentStory<typeof UnlockRequestCard> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   time: new Date(),
-  userName: 'Freddy',
-  url: 'github.com',
-  comment: "Pleeeease can I use this? It's sooooo cool",
+  userName: `Freddy`,
+  url: `github.com`,
+  comment: `Pleeeease can I use this? It's sooooo cool`,
 };
 
 export const LongComment = Template.bind({});
 LongComment.args = {
   ...Default.args,
-  url: 'khanacademy.org',
-  comment:
-    'This is just some online courses about math, science, history, economics, and lorem ipsum dolor sit, amet consectetur adipisicing elit. Aspernatur vel molestiae placeat ex, asperiores corporis deserunt. Laborum eligendi doloremque nostrum dolor, corporis nisi, minima pariatur ab officia eaque sequi. Veniam?',
+  url: `khanacademy.org`,
+  comment: `This is just some online courses about math, science, history, economics, and lorem ipsum dolor sit, amet consectetur adipisicing elit. Aspernatur vel molestiae placeat ex, asperiores corporis deserunt. Laborum eligendi doloremque nostrum dolor, corporis nisi, minima pariatur ab officia eaque sequi. Veniam?`,
 };
 
 export const NoComment = Template.bind({});
@@ -35,5 +34,5 @@ NoComment.args = {
 export const LongUrl = Template.bind({});
 LongUrl.args = {
   ...Default.args,
-  url: 'abc123xyz.aa__basdfoeihagafhfaskjfwiauefga32433h2h1232_ADfq23r.link',
+  url: `abc123xyz.aa__basdfoeihagafhfaskjfwiauefga32433h2h1232_ADfq23r.link`,
 };

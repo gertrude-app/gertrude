@@ -1,5 +1,4 @@
 import React from 'react';
-import cx from 'classnames';
 import DashboardWidget from '../DashboardWidget';
 import Button from '../../../Button';
 import UnlockRequestCard from '../../UnlockRequestCard';

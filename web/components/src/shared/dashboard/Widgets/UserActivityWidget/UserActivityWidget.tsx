@@ -65,9 +65,9 @@ export const UnreviewedItemsCard: React.FC<UnreviewedItemsCardProps> = ({ data }
   return (
     <div
       className={cx(
-        'bg-white border shadow-lg rounded-xl p-4 flex justify-between items-center relative transition duration-100 cursor-pointer hover:bg-violet-50',
+        `bg-white border shadow-lg rounded-xl p-4 flex justify-between items-center relative transition duration-100 cursor-pointer hover:bg-gray-50`,
         data.unreviewedItems === 0 &&
-          'bg-green-50 hover:bg-green-100 hover:bg-opacity-80',
+          `bg-green-50 hover:bg-green-100 hover:bg-opacity-80`,
       )}
     >
       <h2 className="font-bold">{data.user}</h2>

@@ -1,13 +1,11 @@
 import React from 'react';
 import cx from 'classnames';
 import { UndoMainPadding } from '../../Chrome/Chrome';
-import DashboardWidget from '../DashboardWidget';
 import QuickActionsWidget from '../QuickActionsWidget';
 import UnlockRequestsWidget from '../UnlockRequestsWidget';
 import UserOverviewWidget from '../UsersOverviewWidget';
 import UserActivityWidget from '../UserActivityWidget';
 import UserScreenshotsWidget from '../UserScreenshotsWidget';
-import { NumberLiteralType, StringLiteral } from 'typescript';
 
 type Props = {
   className?: string;

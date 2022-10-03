@@ -9,7 +9,7 @@ type Props = {
 };
 
 const UserScreenshotsWidget: React.FC<Props> = ({ className, userScreenshots }) => (
-  <DashboardWidget className={cx('', className)}>
+  <DashboardWidget className={cx(``, className)}>
     <div className="space-y-3">
       {userScreenshots.map((screenshot) => (
         <div className="p-2 pl-4 rounded-2xl flex justify-between items-center h-32 even:bg-gray-50">
@@ -21,6 +21,7 @@ const UserScreenshotsWidget: React.FC<Props> = ({ className, userScreenshots }) 
           </div>
           <img
             src={screenshot.img}
+            alt="User screenshot"
             className="block rounded-lg w-32 sm:h-full sm:w-auto md:h-auto md:w-48 lg:w-40 xl:w-36 ml-2"
           />
         </div>

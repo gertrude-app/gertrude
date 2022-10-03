@@ -22,7 +22,7 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
     <DashboardWidget
       inset
       className={cx(
-        'flex flex-col justify-center items-center p-6 bg-violet-50',
+        `flex flex-col justify-center items-center p-6 bg-violet-50`,
         className,
       )}
     >
