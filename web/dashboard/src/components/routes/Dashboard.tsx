@@ -40,6 +40,26 @@ const Dashboard: React.FC = () => {
           { user: 'Sally', unreviewedItems: 0 },
           { user: 'Henry', unreviewedItems: 23 },
         ]}
+        userScreenshots={[
+          {
+            userName: 'Little Jimmy',
+            img: 'https://placekitten.com/300/200',
+            app: 'Firefox',
+            time: new Date(),
+          },
+          {
+            userName: 'Sally',
+            img: 'https://placekitten.com/400/200',
+            app: 'Figma',
+            time: new Date(now.getTime() - 1000 * 120),
+          },
+          {
+            userName: 'Henry',
+            img: 'https://placekitten.com/500/300',
+            app: 'Notes',
+            time: new Date(now.getTime() - 1000 * 60),
+          },
+        ]}
       />
     </div>
   );
