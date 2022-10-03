@@ -11,7 +11,7 @@ type Props = {
 };
 
 const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) => (
-  <DashboardWidget className={cx(`shadow-inner bg-gray-100`, className)}>
+  <DashboardWidget inset className={className}>
     {unlockRequests
       .sort((a, b) => b.time.getTime() - a.time.getTime())
       .slice(0, 2)

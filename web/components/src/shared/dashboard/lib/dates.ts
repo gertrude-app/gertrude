@@ -132,6 +132,6 @@ export function formatDateAndTimeFromInputElements(date: string, time: string): 
 export function timeOfDay(date: Date): 'morning' | 'afternoon' | 'evening' {
   const time = date.getHours();
   if (time < 12) return `morning`;
-  else if (time < 5) return `afternoon`;
+  else if (time < 17) return `afternoon`;
   return `evening`;
 }

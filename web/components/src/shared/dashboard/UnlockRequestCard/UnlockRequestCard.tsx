@@ -29,7 +29,7 @@ const UnlockRequestCard: React.FC<Props> = ({ url, userName, comment, time }) =>
         onClick={() => {}}
         color="secondary-white"
         small
-        className="w-[100%] xs:w-auto mb-3"
+        className="w-[100%] xs:w-auto mb-3 xs:mb-0"
       >
         Deny
       </Button>
