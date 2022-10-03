@@ -34,6 +34,15 @@ sync:
 	rsync --recursive --delete --exclude '*.stories.tsx' --exclude 'dashboard' ./components/src/shared ./marketing/components
 	rsync --recursive --delete --exclude '*.stories.tsx' --exclude 'dashboard' ./components/src/shared ./docs/src/components
 
+clean: sync-clean
+	rm -rf docs/.next
+	rm -rf docs/out
+	rm -rf marketing/.next
+	rm -rf marketing/out
+	rm -rf dashboard/build
+	rm -rf dashboard/node_modules/.cache
+	rm -rf components/node_modules/.cache
+
 sync-clean:
 	rm -rf ./dashboard/src/components/shared
 	rm -rf ./docs/src/components/shared
@@ -130,9 +139,7 @@ check:
 CONCURRENTLY = node_modules/.bin/concurrently
 CLI_ARGS = $(filter-out $@, $(MAKECMDGOALS))
 ALL_CMDS = \
-  sync \
-  sync-clean \
-  watchsync \
+  sync watchsync clean sync-clean \
   npm-install \
   help \
   component \
