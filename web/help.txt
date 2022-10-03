@@ -5,8 +5,10 @@ local dev commands:
   > `make dashboard` -- run local dev for dashboard site
   > `make docs`      -- run local dev for docs site
   > `make all`       -- run local dev for all 3 simultaneously
+  > `make clean`     -- remove all caches, good when troubleshooting weird stuff
+  > `make ts-watch`  -- typescript check all subdirs, watch mode
 
-quality/ci commands:      
+quality/ci commands:
 
   > `make test`       -- run all unit tests
   > `make test-watch` -- run all unit tests, watch mode
@@ -14,7 +16,6 @@ quality/ci commands:
   > `make lint`       -- run eslint
   > `make lint-fix`   -- run eslint, auto-fixing where possible
   > `make ts-check`   -- typescript check all subdirs
-  > `make ts-watch`   -- typescript check all subdirs, watch mode
   > `make check`      -- test for prettier, lint, typescript errors
   > `make fix`        -- run lint fix and prettier format
 
