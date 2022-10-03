@@ -92,6 +92,7 @@ function deleteableChunks(
   chunkSize: number,
   deleteItems: (ids: UUID[]) => unknown,
 ): JSX.Element[] {
+  let numItemsRendered = 0;
   const ids: UUID[] = [];
   const elements: JSX.Element[] = [];
   const numChunks = Math.ceil(items.length / chunkSize);
@@ -102,7 +103,8 @@ function deleteableChunks(
 
     for (const item of chunkItems) {
       ids.push(item.id);
-      elements.push(renderItem(item, () => deleteItems([item.id])));
+      elements.push(renderItem(item, () => deleteItems([item.id]), numItemsRendered));
+      numItemsRendered++;
     }
 
     if (chunkIndex < numChunks - 1) {
@@ -139,7 +141,11 @@ function scrollToTop(): void {
   });
 }
 
-function renderItem(item: ActivityItem, deleteItem: () => unknown): JSX.Element {
+function renderItem(
+  item: ActivityItem,
+  deleteItem: () => unknown,
+  numRendered: number,
+): JSX.Element {
   if (item.type === `Screenshot`) {
     return (
       <ScreenshotViewer
@@ -149,6 +155,7 @@ function renderItem(item: ActivityItem, deleteItem: () => unknown): JSX.Element 
         height={item.height}
         onApprove={deleteItem}
         date={new Date(item.date)}
+        lazy={numRendered > 10}
       />
     );
   } else {

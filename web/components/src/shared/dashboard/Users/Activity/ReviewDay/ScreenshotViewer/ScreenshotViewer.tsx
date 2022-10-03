@@ -10,6 +10,7 @@ type Props = {
   height: number;
   onApprove(): unknown;
   date: Date;
+  lazy?: boolean;
 };
 
 const ScreenshotViewer: React.FC<Props> = ({
@@ -19,6 +20,7 @@ const ScreenshotViewer: React.FC<Props> = ({
   width,
   height,
   onApprove,
+  lazy = false,
 }) => (
   <div
     className={cx(
@@ -32,7 +34,7 @@ const ScreenshotViewer: React.FC<Props> = ({
         src={url}
         width={width}
         height={height}
-        loading="lazy"
+        loading={lazy ? `lazy` : `eager`}
         alt="user screenshot"
       />
     </div>
