@@ -16,11 +16,11 @@ const UnlockRequestCard: React.FC<Props> = ({ url, userName, comment, time }) =>
       <h3 className="text-gray-400 text-sm">{relativeTime(time)}</h3>
     </div>
     <div className="p-2 bg-violet-50 rounded-xl mt-2 flex justify-center items-center">
-      <h2 className="font-mono font-medium">{url}</h2>
+      <h2 className="font-mono font-medium overflow-scroll">{url}</h2>
     </div>
     {comment && (
       <div className="flex justify-center items-center mt-3">
-        <p className="text-center text-gray-500">"{comment}"</p>
+        <p className="text-center text-gray-500 text-sm sm:text-base">"{comment}"</p>
       </div>
     )}
     <div className="flex flex-col xs:flex-row items-stretch xs:justify-between xs:items-center mt-4 w-full">

@@ -35,6 +35,11 @@ const Dashboard: React.FC = () => {
           { name: `Sally`, online: true },
           { name: `Henry`, online: false },
         ]}
+        userActivity={[
+          { user: 'Little Jimmy', unreviewedItems: 245 },
+          { user: 'Sally', unreviewedItems: 0 },
+          { user: 'Henry', unreviewedItems: 23 },
+        ]}
       />
     </div>
   );
