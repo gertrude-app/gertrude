@@ -148,6 +148,11 @@ const PaddedMain: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="py-6 md:py-7 max-w-[1460px] px-4 sm:px-6 md:px-8">{children}</div>
 );
 
-export const UndoMainPadding: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => <div className="-my-6 md:-my-7 -mx-4 sm:-mx-6 md:-mx-8">{children}</div>;
+export const UndoMainPadding: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+}> = ({ children, className }) => (
+  <div className={cx(`-my-6 md:-my-7 -mx-4 sm:-mx-6 md:-mx-8`, className)}>
+    {children}
+  </div>
+);
