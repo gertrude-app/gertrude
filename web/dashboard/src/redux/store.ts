@@ -8,6 +8,7 @@ import adminReducer from './slice-admin';
 import keychainsReducer from './slice-keychains';
 import urlReducer from './slice-url';
 import appsReducer from './slice-apps';
+import dashboardReducer from './slice-dashboard';
 import storageMiddleware from './middleware-storage';
 import toastMiddleware from './middleware-toast';
 import redirectMiddleware from './middleware-redirect';
@@ -17,6 +18,7 @@ export const store = configureStore({
     admin: adminReducer,
     apps: appsReducer,
     auth: authReducer,
+    dashboard: dashboardReducer,
     keychains: keychainsReducer,
     menu: menuReducer,
     waitlist: waitlistReducer,

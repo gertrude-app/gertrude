@@ -12,7 +12,7 @@ const Template: ComponentStory<typeof UnlockRequestCard> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  time: new Date(),
+  createdAt: new Date().toISOString(),
   userName: `Freddy`,
   url: `github.com`,
   comment: `Pleeeease can I use this? It's sooooo cool`,

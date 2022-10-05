@@ -6,7 +6,7 @@ import DashboardWidget from '../DashboardWidget';
 
 type Props = {
   className?: string;
-  users: { name: string; online: boolean }[];
+  users: DashboardWidgetData['users'];
 };
 
 const UsersOverview: React.FC<Props> = ({ className, users }) => {
@@ -14,7 +14,7 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
     return (
       <DashboardWidget className={className}>
         {users.map((user) => (
-          <UserOverview user={user} />
+          <UserOverview key={user.id} {...user} />
         ))}
       </DashboardWidget>
     );
@@ -37,15 +37,11 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
 
 export default UsersOverview;
 
-interface UserOverviewProps {
-  user: { name: string; online: boolean };
-}
-
-const UserOverview: React.FC<UserOverviewProps> = ({ user }) => {
+const UserOverview: React.FC<DashboardWidgetData['users'][0]> = ({ isOnline, name }) => {
   return (
     <div className="flex justify-between items-center rounded-xl py-4 px-4 even:bg-gray-50">
-      <h3 className="font-medium text-gray-900">{user.name}</h3>
-      {user.online ? (
+      <h3 className="font-medium text-gray-900">{name}</h3>
+      {isOnline ? (
         <PillBadge type="green">
           <i className="mr-2 fa-solid fa-circle text-green-500 text-sm scale-75" />
           Online

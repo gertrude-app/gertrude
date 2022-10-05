@@ -3,4 +3,5 @@ dashboard/build
 dashboard/src/components/shared
 marketing/components/shared
 marketing/.next
+docs/.next
 marketing/out

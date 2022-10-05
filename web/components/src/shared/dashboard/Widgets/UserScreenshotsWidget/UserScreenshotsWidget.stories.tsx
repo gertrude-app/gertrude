@@ -1,5 +1,6 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import UserScreenshotsWidget from './UserScreenshotsWidget';
+import { withIds } from '../../story-helpers';
 
 export default {
   title: `Dashboard/Dashboard/Widgets/UserScreenshotsWidget`,
@@ -14,48 +15,42 @@ const now = new Date();
 
 export const Default = Template.bind({});
 Default.args = {
-  userScreenshots: [
+  screenshots: withIds([
     {
       userName: `Little Jimmy`,
-      img: `https://placekitten.com/300/200`,
-      app: `Firefox`,
-      time: new Date(),
+      url: `https://placekitten.com/300/200`,
+      createdAt: new Date().toISOString(),
     },
     {
       userName: `Sally`,
-      img: `https://placekitten.com/400/200`,
-      app: `Figma`,
-      time: new Date(now.getTime() - 1000 * 120),
+      url: `https://placekitten.com/400/200`,
+      createdAt: new Date(now.getTime() - 1000 * 120).toISOString(),
     },
     {
       userName: `Henry`,
-      img: `https://placekitten.com/500/300`,
-      app: `Notes`,
-      time: new Date(now.getTime() - 1000 * 60),
+      url: `https://placekitten.com/500/300`,
+      createdAt: new Date(now.getTime() - 1000 * 60).toISOString(),
     },
-  ],
+  ]),
 };
 
 export const WithWideDisplay = Template.bind({});
 WithWideDisplay.args = {
-  userScreenshots: [
+  screenshots: withIds([
     {
       userName: `Little Jimmy`,
-      img: `https://placekitten.com/700/200`,
-      app: `Firefox`,
-      time: new Date(),
+      url: `https://placekitten.com/700/200`,
+      createdAt: new Date().toISOString(),
     },
     {
       userName: `Sally`,
-      img: `https://placekitten.com/400/200`,
-      app: `Figma`,
-      time: new Date(now.getTime() - 1000 * 120),
+      url: `https://placekitten.com/400/200`,
+      createdAt: new Date(now.getTime() - 1000 * 120).toISOString(),
     },
     {
       userName: `Henry`,
-      img: `https://placekitten.com/500/300`,
-      app: `Notes`,
-      time: new Date(now.getTime() - 1000 * 60),
+      url: `https://placekitten.com/500/300`,
+      createdAt: new Date(now.getTime() - 1000 * 60).toISOString(),
     },
-  ],
+  ]),
 };

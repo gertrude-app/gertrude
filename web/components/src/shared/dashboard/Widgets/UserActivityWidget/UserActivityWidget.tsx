@@ -1,15 +1,17 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import DashboardWidget from '../DashboardWidget';
 import Button from '../../../Button';
+import { writable } from '../../lib/helpers';
 
 type Props = {
-  userActivity: { user: string; unreviewedItems: number }[];
+  userActivity: DashboardWidgetData['userActivity'];
 };
 
 const UserActivityWidget: React.FC<Props> = ({ userActivity }) => {
   const caughtUp = userActivity.reduce(
-    (acc, cur) => cur.unreviewedItems === 0 && acc,
+    (acc, cur) => cur.numUnreviewed === 0 && acc,
     true,
   );
   if (userActivity.length === 0)
@@ -28,6 +30,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity }) => {
         </div>
       </DashboardWidget>
     );
+
   if (caughtUp)
     return (
       <DashboardWidget
@@ -46,10 +49,15 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity }) => {
 
   return (
     <DashboardWidget inset className="space-y-3">
-      {userActivity
-        .sort((a, b) => b.unreviewedItems - a.unreviewedItems)
+      {writable(userActivity)
+        .sort((a, b) => b.numUnreviewed - a.numUnreviewed)
         .map((activity) => (
-          <UnreviewedItemsCard data={activity} />
+          <UnreviewedItemsCard
+            key={activity.id}
+            userId={activity.id}
+            userName={activity.userName}
+            numUnreviewed={activity.numUnreviewed}
+          />
         ))}
     </DashboardWidget>
   );
@@ -58,30 +66,34 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity }) => {
 export default UserActivityWidget;
 
 interface UnreviewedItemsCardProps {
-  data: { user: string; unreviewedItems: number };
+  userId: UUID;
+  userName: string;
+  numUnreviewed: number;
 }
 
-export const UnreviewedItemsCard: React.FC<UnreviewedItemsCardProps> = ({ data }) => {
-  return (
-    <div
-      className={cx(
-        `bg-white border shadow-lg rounded-xl p-4 flex justify-between items-center relative transition duration-100 cursor-pointer hover:bg-gray-50`,
-        data.unreviewedItems === 0 &&
-          `bg-green-50 hover:bg-green-100 hover:bg-opacity-80`,
-      )}
-    >
-      <h2 className="font-bold">{data.user}</h2>
-      <div className="flex flex-col items-end justify-center">
-        <div className="flex items-center">
-          {data.unreviewedItems === 0 && (
-            <div className="w-5 h-5 bg-green-400 flex justify-center items-center rounded-full mr-2">
-              <i className="fa-solid fa-check text-white text-sm" />
-            </div>
-          )}
-          <h1 className="font-black text-xl">{data.unreviewedItems}</h1>
-        </div>
-        <p className="text-sm text-gray-500">unreviewed items</p>
+export const UnreviewedItemsCard: React.FC<UnreviewedItemsCardProps> = ({
+  userId,
+  userName,
+  numUnreviewed,
+}) => (
+  <Link
+    to={`/users/${userId}/activity`}
+    className={cx(
+      `bg-white border shadow-lg rounded-xl p-4 flex justify-between items-center relative transition duration-100 cursor-pointer hover:bg-gray-50`,
+      numUnreviewed === 0 && `bg-green-50 hover:bg-green-100 hover:bg-opacity-80`,
+    )}
+  >
+    <h2 className="font-bold">{userName}</h2>
+    <div className="flex flex-col items-end justify-center">
+      <div className="flex items-center">
+        {numUnreviewed === 0 && (
+          <div className="w-5 h-5 bg-green-400 flex justify-center items-center rounded-full mr-2">
+            <i className="fa-solid fa-check text-white text-sm" />
+          </div>
+        )}
+        <h1 className="font-black text-xl">{numUnreviewed}</h1>
       </div>
+      <p className="text-sm text-gray-500">unreviewed items</p>
     </div>
-  );
-};
+  </Link>
+);

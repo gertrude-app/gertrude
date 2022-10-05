@@ -23,3 +23,29 @@ type ApiError =
   | { type: 'no_internet' }
   | ActionableApiError
   | { type: 'non_actionable'; rawErrors?: string[] };
+
+type DashboardWidgetData = {
+  unlockRequests: Array<{
+    id: UUID;
+    target: string;
+    userName: string;
+    comment?: string | null;
+    createdAt: string;
+  }>;
+  users: Array<{
+    id: UUID;
+    name: string;
+    isOnline: boolean;
+  }>;
+  userActivity: Array<{
+    id: UUID;
+    userName: string;
+    numUnreviewed: number;
+  }>;
+  userScreenshots: Array<{
+    id: UUID;
+    userName: string;
+    url: string;
+    createdAt: string;
+  }>;
+};

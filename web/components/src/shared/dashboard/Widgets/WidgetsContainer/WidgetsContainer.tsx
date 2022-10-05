@@ -9,11 +9,7 @@ import UserScreenshotsWidget from '../UserScreenshotsWidget';
 
 type Props = {
   className?: string;
-  unlockRequests: { url: string; user: string; comment?: string; time: Date }[];
-  users: { name: string; online: boolean }[];
-  userActivity: { user: string; unreviewedItems: number }[];
-  userScreenshots: { userName: string; img: string; app: string; time: Date }[];
-};
+} & DashboardWidgetData;
 
 const WidgetsContainer: React.FC<Props> = ({
   className,
@@ -38,13 +34,11 @@ const WidgetsContainer: React.FC<Props> = ({
             unlockRequests={unlockRequests}
           />
         )}
-        <UserScreenshotsWidget
-          userScreenshots={userScreenshots}
-          className="xl:row-span-2"
-        />
+        <UserScreenshotsWidget screenshots={userScreenshots} className="xl:row-span-2" />
         <UserOverviewWidget users={users} />
       </UndoMainPadding>
     );
+
   return (
     <UndoMainPadding className="w-full h-screen flex justify-center items-center sm:p-10">
       <div className="flex justify-center items-center flex-col p-8 lg:p-16 bg-white shadow-xl rounded-2xl relative left-4">

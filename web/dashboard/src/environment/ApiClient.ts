@@ -6,21 +6,24 @@ import * as users from '../api/users';
 import * as signup from '../api/signup';
 import * as keychains from '../api/keychains';
 import * as apps from '../api/apps';
+import * as dashboard from '../api/dashboard';
 
 export interface ApiClient {
   admin: typeof admin;
-  users: typeof users;
-  signup: typeof signup;
-  keychains: typeof keychains;
   apps: typeof apps;
+  dashboard: typeof dashboard;
+  keychains: typeof keychains;
+  signup: typeof signup;
+  users: typeof users;
 }
 
 export const liveApiClient: ApiClient = {
   admin,
-  users,
-  signup,
-  keychains,
   apps,
+  dashboard,
+  keychains,
+  signup,
+  users,
 };
 
 export const throwingApiClient: ApiClient = {
@@ -60,6 +63,11 @@ export const throwingApiClient: ApiClient = {
       throw new Error(
         `ApiClient.admin.confirmPendingNotificationMethod() not implemented.`,
       );
+    },
+  },
+  dashboard: {
+    getWidgets: () => {
+      throw new Error(`ApiClient.dashboard.getWidgets() not implemented.`);
     },
   },
   keychains: {
@@ -160,6 +168,16 @@ export const noopApiClient: ApiClient = {
     },
     confirmPendingNotificationMethod: async () => {
       return Result.success(true);
+    },
+  },
+  dashboard: {
+    getWidgets: async () => {
+      return Result.success({
+        unlockRequests: [],
+        users: [],
+        userActivity: [],
+        userScreenshots: [],
+      });
     },
   },
   keychains: {
