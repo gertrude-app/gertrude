@@ -9,6 +9,7 @@ import UserScreenshotsWidget from '../UserScreenshotsWidget';
 
 type Props = {
   className?: string;
+  createKeychain: () => unknown;
 } & DashboardWidgetData;
 
 const WidgetsContainer: React.FC<Props> = ({
@@ -17,6 +18,7 @@ const WidgetsContainer: React.FC<Props> = ({
   users,
   userActivity,
   userScreenshots,
+  createKeychain,
 }) => {
   if (users.length > 0)
     return (
@@ -26,7 +28,7 @@ const WidgetsContainer: React.FC<Props> = ({
           className,
         )}
       >
-        <QuickActionsWidget className="xl:row-span-2" />
+        <QuickActionsWidget createKeychain={createKeychain} className="xl:row-span-2" />
         <UserActivityWidget userActivity={userActivity} />
         {unlockRequests.length !== 0 && (
           <UnlockRequestsWidget

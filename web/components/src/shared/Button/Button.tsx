@@ -81,8 +81,9 @@ const Button: React.FC<Props> = ({
     return (
       <a
         className={classes}
-        href={disabled ? `.` : props.href}
-        onClick={disabled ? (event) => event.preventDefault() : () => {}}
+        {...(disabled
+          ? { onClick: (event) => event.preventDefault() }
+          : { href: props.href })}
       >
         {props.children}
       </a>
