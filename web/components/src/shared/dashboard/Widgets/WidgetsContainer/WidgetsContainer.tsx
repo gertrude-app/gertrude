@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { UndoMainPadding } from '../../Chrome/Chrome';
 import QuickActionsWidget from '../QuickActionsWidget';
@@ -53,19 +54,19 @@ const WidgetsContainer: React.FC<Props> = ({
         </p>
         <div className="mt-8 space-y-3">
           <RecommendedStep
-            onClick={() => {}}
+            href="https://docs.gertrude.app/getting-started"
+            title="Read our getting started guide"
+            icon="book"
+          />
+          <RecommendedStep
+            href="https://gertrude.app/download"
             title="Download a copy of the macOS app"
             icon="download"
           />
           <RecommendedStep
-            onClick={() => {}}
+            href="/users/new"
             title="Create a user for someone you want to protect"
             icon="user-plus"
-          />
-          <RecommendedStep
-            onClick={() => {}}
-            title="Create a device for that user"
-            icon="computer"
           />
         </div>
       </div>
@@ -78,23 +79,21 @@ export default WidgetsContainer;
 interface RecommendedStepProps {
   title: string;
   icon: string;
-  onClick(): void;
+  href: string;
 }
 
 export const RecommendedStep: React.FC<RecommendedStepProps> = ({
   title,
   icon,
-  onClick,
-}) => {
-  return (
-    <div
-      className="flex items-center p-4 pr-8 bg-gray-50 rounded-2xl cursor-pointer transition duration-150 hover:bg-gray-100 hover:scale-105"
-      onClick={onClick}
-    >
-      <div className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 w-14 h-14 flex justify-center items-center rounded-xl shrink-0">
-        <i className={`fa-solid fa-${icon} text-white text-xl`} />
-      </div>
-      <h2 className="ml-4 sm:text-lg font-medium">{title}</h2>
+  href,
+}) => (
+  <Link
+    to={href}
+    className="flex items-center p-4 pr-8 bg-gray-50 rounded-2xl cursor-pointer transition duration-150 hover:bg-gray-100 hover:scale-105"
+  >
+    <div className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 w-14 h-14 flex justify-center items-center rounded-xl shrink-0">
+      <i className={`fa-solid fa-${icon} text-white text-xl`} />
     </div>
-  );
-};
+    <h2 className="ml-4 sm:text-lg font-medium">{title}</h2>
+  </Link>
+);
