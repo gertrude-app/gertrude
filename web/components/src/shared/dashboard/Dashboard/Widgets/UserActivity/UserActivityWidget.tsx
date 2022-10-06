@@ -38,9 +38,9 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity }) => {
         inset
         className="bg-violet-50 flex flex-col justify-center items-center p-6"
       >
-        <i className="fa-solid fa-mug-hot bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent text-opacity-30 text-5xl" />
+        <i className="fa-solid fa-mug-hot bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text;] text-transparent text-opacity-30 text-5xl" />
         <h2 className="text-xl font-black text-black text-opacity-90 mt-2 mb-1">
-          You're all caught up!
+          You&rsquo;re all caught up!
         </h2>
         <p className="text-black text-opacity-60 text-center">
           No user activity items to review. Give yourself a pat on the back.
