@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 
-export const iconsList = [
+export const IconsList = [
   `comment`,
   `google-chrome`,
   `location`,
@@ -29,7 +29,7 @@ export const iconsList = [
   `laptop`,
 ] as const;
 
-export type IconType = typeof iconsList[number];
+export type IconType = typeof IconsList[number];
 
 interface Props {
   className?: string;

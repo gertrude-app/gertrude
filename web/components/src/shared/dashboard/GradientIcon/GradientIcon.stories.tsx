@@ -1,14 +1,15 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import GradientIcon, { iconsList } from './GradientIcon';
+import GradientIcon, { IconsList } from './GradientIcon';
 
 const GradientGrid: React.FC<{ size: `small` | `medium` | `large`; subtle: boolean }> = ({
   size,
   subtle,
 }) => (
-  <div className="flex flex-wrap max-w-lg">
-    {iconsList.map((icon) => (
-      <div className="p-3">
+  <div className="flex flex-wrap max-w-lg m-2">
+    {IconsList.map((icon) => (
+      <div className="flex flex-col m-1 w-12 items-center">
         <GradientIcon icon={icon} size={size} key={icon} subtle={subtle} />
+        <h2 className="text-[8px] text-gray-600 text-center">{icon}</h2>
       </div>
     ))}
   </div>
@@ -25,7 +26,7 @@ Grid.args = {
 };
 
 export default {
-  title: `Dashboard/GradientIcon`,
+  title: `Shared/GradientIcon`,
   component: GradientGrid,
   parameters: {
     layout: `fullscreen`,
