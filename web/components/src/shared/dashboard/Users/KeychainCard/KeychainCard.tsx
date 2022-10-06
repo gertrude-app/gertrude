@@ -2,6 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import { inflect } from '../../lib/string';
 import PillBadge from '../../PillBadge';
+import GradientIcon from '../../GradientIcon/GradientIcon';
 
 type Props = {
   name: string;
@@ -39,9 +40,7 @@ const KeychainCard: React.FC<Props> = ({
   >
     <div className="flex items-center flex-grow">
       <div className="w-20 shrink-0 flex justify-center items-start">
-        <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-fuchsia-500 rounded-full flex justify-center items-center text-white text-lg">
-          <i className="fa-solid fa-list" />
-        </div>
+        <GradientIcon icon="list" size="medium" className="mx-0" />
       </div>
       <div className="p-4 pl-0 flex-grow">
         <div

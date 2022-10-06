@@ -1,7 +1,7 @@
 import React from 'react';
 import TextInput from '../../../TextInput';
 import KeyCreationStep from './KeyCreationStep';
-import GradientIcon from './GradientIcon';
+import GradientIcon from '../../../GradientIcon';
 import UserInputText from './UserInputText';
 import * as EditKey from '../../../lib/keys/edit';
 
@@ -20,7 +20,7 @@ const CommentStep: React.FC<Props> = ({ mode, update, activeStep, comment }) => 
     activeTitle="Add an optional comment:"
     title={
       <h2 className="font-medium text-gray-900 text-lg">
-        <GradientIcon icon="comment" className="mr-2" />
+        <GradientIcon icon="comment" className="mr-2" size="small" />
         {comment ? (
           <>
             With the comment <UserInputText>&ldquo;{comment}&rdquo;</UserInputText>

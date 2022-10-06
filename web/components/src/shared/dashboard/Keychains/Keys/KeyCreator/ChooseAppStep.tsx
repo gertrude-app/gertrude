@@ -3,7 +3,7 @@ import Combobox from '../../../Combobox';
 import RadioGroup from '../../../RadioGroup';
 import TextInput from '../../../TextInput';
 import KeyCreationStep from './KeyCreationStep';
-import GradientIcon from './GradientIcon';
+import GradientIcon from '../../../GradientIcon';
 import UserInputText from './UserInputText';
 import * as EditKey from '../../../lib/keys/edit';
 
@@ -114,6 +114,7 @@ const Title: React.FC<Props> = ({
       <GradientIcon
         icon={appIdentificationType === `bundleId` ? `pen-to-square` : `app-store`}
         className="mr-2.5"
+        size="small"
       />
       {keyType === `app` ? `Allowing app ` : `App `}
       {appIdentificationType === `bundleId` ? `with id` : ``}

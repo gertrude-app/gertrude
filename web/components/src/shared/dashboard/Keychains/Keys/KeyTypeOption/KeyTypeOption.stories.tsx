@@ -12,7 +12,7 @@ const Template: ComponentStory<typeof KeyTypeOption> = (args) => (
 
 export const Unselected = Template.bind({});
 Unselected.args = {
-  icon: `globe-americas`,
+  icon: `globe`,
   title: `Lorem ipsum`,
   description: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Laboriosam quidem, cum veniam eos, similique animi impedit.`,
   selected: false,

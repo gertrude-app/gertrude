@@ -1,9 +1,10 @@
 import React from 'react';
 import cx from 'classnames';
+import GradientIcon, { IconType } from '../../../GradientIcon/GradientIcon';
 
 type Props = {
   className?: string;
-  icon: string;
+  icon: IconType;
   selected: boolean;
   onClick(): void;
   title: string;
@@ -30,11 +31,7 @@ const KeyTypeOption: React.FC<Props> = ({
       <i className="fa-solid fa-check absolute right-3 top-3 text-violet-500" />
     )}
     <h2 className="font-bold text-gray-700">
-      <i
-        className={cx(
-          `fa-solid fa-${icon} mr-1 bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text;] text-transparent`,
-        )}
-      />
+      <GradientIcon icon={icon} size="small" className="mr-1" />
       {` `}
       {title}
     </h2>

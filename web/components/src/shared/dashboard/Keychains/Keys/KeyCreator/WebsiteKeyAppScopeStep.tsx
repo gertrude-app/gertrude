@@ -2,7 +2,7 @@ import React from 'react';
 import SelectableListItem from '../../../SelectableListItem';
 import Toggle from '../../../Toggle';
 import KeyCreationStep from './KeyCreationStep';
-import GradientIcon from './GradientIcon';
+import GradientIcon from '../../../GradientIcon';
 import UserInputText from './UserInputText';
 import * as EditKey from '../../../lib/keys/edit';
 
@@ -91,21 +91,21 @@ const Title: React.FC<{
     case `webBrowsers`:
       return (
         <>
-          <GradientIcon icon="google-chrome" className="mr-2" />
+          <GradientIcon icon="google-chrome" className="mr-2" size="small" />
           For <UserInputText>all web browsers</UserInputText>
         </>
       );
     case `unrestricted`:
       return (
         <>
-          <GradientIcon icon="lightning-bolt" className="mr-2" />
+          <GradientIcon icon="lightning-bolt" className="mr-2" size="small" />
           For <UserInputText>all apps</UserInputText>
         </>
       );
     case `singleApp`:
       return (
         <>
-          <GradientIcon icon="location" className="mr-2" />
+          <GradientIcon icon="location" className="mr-2" size="small" />
           For <UserInputText>a single app</UserInputText>
         </>
       );

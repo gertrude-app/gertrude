@@ -2,7 +2,7 @@ import React from 'react';
 import SelectableListItem from '../../../SelectableListItem';
 import Label from '../../../TextInput/Label';
 import KeyCreationStep from './KeyCreationStep';
-import GradientIcon from './GradientIcon';
+import GradientIcon from '../../../GradientIcon';
 import UserInputText from './UserInputText';
 import * as EditKey from '../../../lib/keys/edit';
 
@@ -22,7 +22,10 @@ const AppScopeStep: React.FC<Props> = ({ mode, update, activeStep, appScope }) =
       activeTitle="Select app internet access"
       title={
         <h2 className="font-medium text-gray-900 text-lg space-x-2">
-          <GradientIcon icon={appScope === `unrestricted` ? `unlock` : `location`} />
+          <GradientIcon
+            icon={appScope === `unrestricted` ? `unlock` : `location`}
+            size="small"
+          />
           {appScope === `unrestricted` ? (
             <span>
               <UserInputText>Unrestricted</UserInputText> internet{` `}

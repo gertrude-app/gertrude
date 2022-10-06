@@ -4,6 +4,7 @@ import Button from '../../../Button';
 import SelectMenu from '../../SelectMenu';
 import { Trigger } from '../../types/GraphQL';
 import { AdminNotificationMethod } from '../../types/Admin';
+import GradientIcon from '../../GradientIcon/GradientIcon';
 
 type Props = {
   trigger: Trigger;
@@ -134,12 +135,7 @@ const Summary: React.FC<AdminNotificationMethod['data'] & { trigger: Trigger }> 
   props,
 ) => (
   <div className="p-5">
-    <i
-      className={cx(
-        `text-2xl mb-4 bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent [-webkit-background-clip:text;] w-min`,
-        methodIcon(props.type),
-      )}
-    />
+    <GradientIcon icon={props.type} size="small" className="w-min" />
     <h2 className="text-gray-700 text-lg">
       <span className="capitalize">{props.type}</span>
       {` `}
@@ -157,17 +153,6 @@ function methodTarget(method: AdminNotificationMethod['data']): string {
       return method.phoneNumber;
     case `slack`:
       return method.channelName;
-  }
-}
-
-function methodIcon(method: AdminNotificationMethod['data']['type']): string {
-  switch (method) {
-    case `email`:
-      return `fa fa-envelope`;
-    case `text`:
-      return `fa fa-mobile`;
-    case `slack`:
-      return `fa fa-slack`;
   }
 }
 
