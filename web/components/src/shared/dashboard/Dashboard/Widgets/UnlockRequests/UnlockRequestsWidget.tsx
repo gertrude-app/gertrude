@@ -15,7 +15,7 @@ const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) =>
   <DashboardWidget inset className={className}>
     <WidgetTitle icon="unlock" text="Unlock requests" />
     {writable(unlockRequests)
-      .sort((a, b) => (b.createdAt > a.createdAt ? -1 : 1))
+      .sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1))
       .slice(0, 2)
       .map((req) => (
         <UnlockRequestCard

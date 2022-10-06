@@ -1,6 +1,6 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import UserScreenshotsWidget from './UserScreenshotsWidget';
-import { withIds } from '../../../story-helpers';
+import { withIds, time } from '../../../story-helpers';
 
 export default {
   title: `Dashboard/Dashboard/Widgets/UserScreenshots`,
@@ -11,25 +11,23 @@ const Template: ComponentStory<typeof UserScreenshotsWidget> = (args) => (
   <UserScreenshotsWidget {...args} />
 );
 
-const now = new Date();
-
 export const Default = Template.bind({});
 Default.args = {
   screenshots: withIds([
     {
       userName: `Little Jimmy`,
       url: `https://placekitten.com/300/200`,
-      createdAt: new Date().toISOString(),
+      createdAt: time.now(),
     },
     {
       userName: `Sally`,
       url: `https://placekitten.com/400/200`,
-      createdAt: new Date(now.getTime() - 1000 * 120).toISOString(),
+      createdAt: time.subtracting({ minutes: 2 }),
     },
     {
       userName: `Henry`,
       url: `https://placekitten.com/500/300`,
-      createdAt: new Date(now.getTime() - 1000 * 60).toISOString(),
+      createdAt: time.subtracting({ minutes: 4 }),
     },
   ]),
 };
@@ -40,17 +38,17 @@ WithWideDisplay.args = {
     {
       userName: `Little Jimmy`,
       url: `https://placekitten.com/700/200`,
-      createdAt: new Date().toISOString(),
+      createdAt: time.now(),
     },
     {
       userName: `Sally`,
       url: `https://placekitten.com/400/200`,
-      createdAt: new Date(now.getTime() - 1000 * 120).toISOString(),
+      createdAt: time.subtracting({ minutes: 2 }),
     },
     {
       userName: `Henry`,
       url: `https://placekitten.com/500/300`,
-      createdAt: new Date(now.getTime() - 1000 * 60).toISOString(),
+      createdAt: time.subtracting({ minutes: 4 }),
     },
   ]),
 };

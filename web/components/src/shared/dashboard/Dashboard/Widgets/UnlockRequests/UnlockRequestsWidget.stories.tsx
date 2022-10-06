@@ -1,6 +1,6 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import UnlockRequestsWidget from './UnlockRequestsWidget';
-import { withIds } from '../../../story-helpers';
+import { withIds, time } from '../../../story-helpers';
 
 export default {
   title: `Dashboard/Dashboard/Widgets/UnlockRequests`,
@@ -11,7 +11,6 @@ const Template: ComponentStory<typeof UnlockRequestsWidget> = (args) => (
   <UnlockRequestsWidget {...args} />
 );
 
-const now = new Date();
 export const Default = Template.bind({});
 Default.args = {
   unlockRequests: withIds([
@@ -19,23 +18,23 @@ Default.args = {
       target: `gitlab.io`,
       userName: `Little Jimmy`,
       comment: `Super cool thing I want`,
-      createdAt: new Date(now.getTime() - 0).toISOString(), // now
+      createdAt: time.now(),
     },
     {
       target: `goats.com`,
       userName: `Henry`,
-      createdAt: new Date(now.getTime() - 1000 * 120).toISOString(), // 2 minutes ago
+      createdAt: time.subtracting({ minutes: 2 }),
     },
     {
       target: `github.com`,
       userName: `Little Jimmy`,
-      createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+      createdAt: time.subtracting({ days: 1 }),
     },
     {
       target: `magicschoolbus.com`,
       userName: `Sally`,
       comment: `For science class, thanks ❤️`,
-      createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7 * 2).toISOString(), // 2 weeks ago
+      createdAt: time.subtracting({ days: 14 }),
     },
   ]),
 };
@@ -48,7 +47,7 @@ JustOne.args = {
       target: `gitlab.io`,
       userName: `Little Jimmy`,
       comment: `Super cool thing I want`,
-      createdAt: new Date(now.getTime() - 0).toISOString(), // now
+      createdAt: time.now(),
     },
   ],
 };
@@ -60,13 +59,13 @@ JustTwo.args = {
       target: `gitlab.io`,
       userName: `Little Jimmy`,
       comment: `Super cool thing I want`,
-      createdAt: new Date(now.getTime() - 0).toISOString(), // now
+      createdAt: time.now(),
     },
     {
       target: `magicschoolbus.com`,
       userName: `Sally`,
       comment: `For science class, thanks ❤️`,
-      createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7 * 2).toISOString(), // 2 weeks ago
+      createdAt: time.subtracting({ days: 14 }),
     },
   ]),
 };
@@ -78,73 +77,73 @@ Lots.args = {
       target: `gitlab.io`,
       userName: `Little Jimmy`,
       comment: `Super cool thing I want`,
-      createdAt: new Date(now.getTime() - 0).toISOString(), // now
+      createdAt: time.now(),
     },
     {
       target: `gitlab.io`,
       userName: `Little Jimmy`,
       comment: `Super cool thing I want`,
-      createdAt: new Date(now.getTime() - 0).toISOString(), // now
+      createdAt: time.now(),
     },
     {
       target: `goats.com`,
       userName: `Henry`,
-      createdAt: new Date(now.getTime() - 1000 * 120).toISOString(), // 2 minutes ago
+      createdAt: time.subtracting({ minutes: 2 }),
     },
     {
       target: `github.com`,
       userName: `Little Jimmy`,
-      createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+      createdAt: time.subtracting({ days: 1 }),
     },
     {
       target: `magicschoolbus.com`,
       userName: `Sally`,
       comment: `For science class, thanks ❤️`,
-      createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7 * 2).toISOString(), // 2 weeks ago
+      createdAt: time.subtracting({ days: 14 }),
     },
     {
       target: `gitlab.io`,
       userName: `Little Jimmy`,
       comment: `Super cool thing I want`,
-      createdAt: new Date(now.getTime() - 0).toISOString(), // now
+      createdAt: time.now(),
     },
     {
       target: `goats.com`,
       userName: `Henry`,
-      createdAt: new Date(now.getTime() - 1000 * 120).toISOString(), // 2 minutes ago
+      createdAt: time.subtracting({ minutes: 2 }),
     },
     {
       target: `github.com`,
       userName: `Little Jimmy`,
-      createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+      createdAt: time.subtracting({ days: 1 }),
     },
     {
       target: `magicschoolbus.com`,
       userName: `Sally`,
       comment: `For science class, thanks ❤️`,
-      createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7 * 2).toISOString(), // 2 weeks ago
+      createdAt: time.subtracting({ days: 14 }),
     },
     {
       target: `gitlab.io`,
       userName: `Little Jimmy`,
       comment: `Super cool thing I want`,
-      createdAt: new Date(now.getTime() - 0).toISOString(), // now
+      createdAt: time.now(),
     },
     {
       target: `goats.com`,
       userName: `Henry`,
-      createdAt: new Date(now.getTime() - 1000 * 120).toISOString(), // 2 minutes ago
+      createdAt: time.subtracting({ minutes: 2 }),
     },
     {
       target: `github.com`,
       userName: `Little Jimmy`,
-      createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+      createdAt: time.subtracting({ days: 1 }),
     },
     {
       target: `magicschoolbus.com`,
       userName: `Sally`,
       comment: `For science class, thanks ❤️`,
-      createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7 * 2).toISOString(), // 2 weeks ago
+      createdAt: time.subtracting({ days: 14 }),
     },
   ]),
 };

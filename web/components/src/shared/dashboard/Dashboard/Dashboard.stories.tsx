@@ -1,7 +1,7 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
 import Dashboard from './Dashboard';
-import { withIds } from '../story-helpers';
+import { withIds, time } from '../story-helpers';
 
 export default {
   title: `Dashboard/Dashboard`,
@@ -12,7 +12,6 @@ export default {
 
 const Template: ComponentStory<typeof Dashboard> = (args) => <Dashboard {...args} />;
 
-const now = new Date();
 export const Default = Template.bind({});
 Default.args = {
   unlockRequests: withIds([
@@ -20,23 +19,23 @@ Default.args = {
       target: `gitlab.io`,
       userName: `Little Jimmy`,
       comment: `Super cool thing I want`,
-      createdAt: new Date(now.getTime() - 0).toISOString(), // now
+      createdAt: time.now(),
     },
     {
       target: `goats.com`,
       userName: `Henry`,
-      createdAt: new Date(now.getTime() - 1000 * 120).toISOString(), // 2 minutes ago
+      createdAt: time.subtracting({ minutes: 2 }),
     },
     {
       target: `github.com`,
       userName: `Little Jimmy`,
-      createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+      createdAt: time.subtracting({ days: 1 }),
     },
     {
       target: `magicschoolbus.com`,
       userName: `Sally`,
       comment: `For science class, thanks ❤️`,
-      createdAt: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7 * 2).toISOString(), // 2 weeks ago
+      createdAt: time.subtracting({ days: 14 }),
     },
   ]),
   users: withIds([
@@ -53,17 +52,17 @@ Default.args = {
     {
       userName: `Little Jimmy`,
       url: `https://placekitten.com/300/200`,
-      createdAt: new Date().toISOString(),
+      createdAt: time.now(),
     },
     {
       userName: `Sally`,
       url: `https://placekitten.com/400/200`,
-      createdAt: new Date(now.getTime() - 1000 * 120).toISOString(),
+      createdAt: time.subtracting({ minutes: 2 }),
     },
     {
       userName: `Henry`,
       url: `https://placekitten.com/500/300`,
-      createdAt: new Date(now.getTime() - 1000 * 60).toISOString(),
+      createdAt: time.subtracting({ minutes: 6 }),
     },
   ]),
 };
