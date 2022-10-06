@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { useDispatch, useRedirect, useSelector } from './redux/hooks';
+import { windowWidthChanged } from './redux/slice-menu';
 import AuthedChrome from './components/Authed';
 import Dashboard from './components/routes/Dashboard';
 import Login from './components/routes/Login';
@@ -8,13 +10,11 @@ import JoinWaitlist from './components/routes/JoinWaitlist';
 import AdminProfile from './components/routes/AdminProfile';
 import Keychain from './components/routes/Keychain';
 import Users from './components/routes/Users';
-import useWindowWidth from './hooks/window-width';
-import { useDispatch, useRedirect, useSelector } from './redux/hooks';
-import { windowWidthChanged } from './redux/slice-menu';
-import User from './components/routes/User';
 import UserActivityOverview from './components/routes/UserActivityOverview';
 import UserActivityDay from './components/routes/UserActivityDay';
 import Keychains from './components/routes/Keychains';
+import User from './components/routes/User';
+import useWindowWidth from './hooks/window-width';
 
 const App: React.FC = () => {
   const dispatch = useDispatch();

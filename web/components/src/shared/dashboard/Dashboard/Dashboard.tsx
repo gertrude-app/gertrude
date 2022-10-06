@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
-import { UndoMainPadding } from '../../Chrome/Chrome';
-import QuickActionsWidget from '../QuickActionsWidget';
-import UnlockRequestsWidget from '../UnlockRequestsWidget';
-import UserOverviewWidget from '../UsersOverviewWidget';
-import UserActivityWidget from '../UserActivityWidget';
-import UserScreenshotsWidget from '../UserScreenshotsWidget';
+import { UndoMainPadding } from '../Chrome/Chrome';
+import QuickActionsWidget from './Widgets/QuickActions';
+import UnlockRequestsWidget from './Widgets/UnlockRequests';
+import UserOverviewWidget from './Widgets/UsersOverview';
+import UserActivityWidget from './Widgets/UserActivity';
+import UserScreenshotsWidget from './Widgets/UserScreenshots';
 
 type Props = {
   className?: string;

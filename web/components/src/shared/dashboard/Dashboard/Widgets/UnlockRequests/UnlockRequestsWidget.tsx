@@ -1,9 +1,9 @@
 import React from 'react';
 import DashboardWidget from '../DashboardWidget';
-import Button from '../../../Button';
-import UnlockRequestCard from '../../UnlockRequestCard';
-import { inflect } from '../../lib/string';
-import { writable } from '../../lib/helpers';
+import Button from '../../../../Button';
+import UnlockRequestCard from './UnlockRequestCard';
+import { inflect } from '../../../lib/string';
+import { writable } from '../../../lib/helpers';
 import WidgetTitle from '../WidgetTitle';
 
 type Props = {

@@ -1,7 +1,7 @@
 import React from 'react';
 import DashboardWidget from '../DashboardWidget';
-import { timeOfDay } from '../../lib/dates';
-import Action from '../../../Action';
+import { timeOfDay } from '../../../lib/dates';
+import Action from '../../../../Action';
 
 type Props = {
   className?: string;

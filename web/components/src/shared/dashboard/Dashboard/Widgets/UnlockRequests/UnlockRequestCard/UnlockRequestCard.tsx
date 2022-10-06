@@ -1,6 +1,6 @@
 import React from 'react';
-import Button from '../../Button';
-import { relativeTime } from '../lib/dates';
+import Button from '../../../../../Button';
+import { relativeTime } from '../../../../lib/dates';
 
 type Props = {
   url: string;

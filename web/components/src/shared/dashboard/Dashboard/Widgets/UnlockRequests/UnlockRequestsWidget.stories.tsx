@@ -1,9 +1,9 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import UnlockRequestsWidget from './UnlockRequestsWidget';
-import { withIds } from '../../story-helpers';
+import { withIds } from '../../../story-helpers';
 
 export default {
-  title: `Dashboard/Dashboard/Widgets/UnlockRequestsWidget`,
+  title: `Dashboard/Dashboard/Widgets/UnlockRequests`,
   component: UnlockRequestsWidget,
 } as ComponentMeta<typeof UnlockRequestsWidget>;
 

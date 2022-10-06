@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import DashboardWidget from '../DashboardWidget';
-import Button from '../../../Button';
-import { writable } from '../../lib/helpers';
+import Button from '../../../../Button';
+import { writable } from '../../../lib/helpers';
 import WidgetTitle from '../WidgetTitle';
 
 type Props = {

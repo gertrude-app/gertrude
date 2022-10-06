@@ -1,9 +1,9 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import UserActivityWidget from './UserActivityWidget';
-import { withIds } from '../../story-helpers';
+import { withIds } from '../../../story-helpers';
 
 export default {
-  title: `Dashboard/Dashboard/Widgets/UserActivityWidget`,
+  title: `Dashboard/Dashboard/Widgets/UserActivity`,
   component: UserActivityWidget,
 } as ComponentMeta<typeof UserActivityWidget>;
 

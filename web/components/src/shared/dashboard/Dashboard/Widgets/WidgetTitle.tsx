@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import GradientIcon from '../GradientIcon/GradientIcon';
+import GradientIcon from '../../GradientIcon/GradientIcon';
 
 type Props = {
   text: string;

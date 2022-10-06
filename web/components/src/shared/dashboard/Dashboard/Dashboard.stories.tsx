@@ -1,18 +1,16 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { withStatefulChrome } from '../../../../decorators/StatefulChrome';
-import WidgetsContainer from './WidgetsContainer';
-import { withIds } from '../../story-helpers';
+import { withStatefulChrome } from '../../../decorators/StatefulChrome';
+import Dashboard from './Dashboard';
+import { withIds } from '../story-helpers';
 
 export default {
-  title: `Dashboard/Dashboard/WidgetsContainer`,
-  component: WidgetsContainer,
+  title: `Dashboard/Dashboard`,
+  component: Dashboard,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },
-} as ComponentMeta<typeof WidgetsContainer>;
+} as ComponentMeta<typeof Dashboard>;
 
-const Template: ComponentStory<typeof WidgetsContainer> = (args) => (
-  <WidgetsContainer {...args} />
-);
+const Template: ComponentStory<typeof Dashboard> = (args) => <Dashboard {...args} />;
 
 const now = new Date();
 export const Default = Template.bind({});

@@ -2,7 +2,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import UnlockRequestCard from './UnlockRequestCard';
 
 export default {
-  title: `Dashboard/Dashboard/UnlockRequestCard`,
+  title: `Dashboard/Dashboard/Widgets/UnlockRequests/UnlockRequestCard`,
   component: UnlockRequestCard,
 } as ComponentMeta<typeof UnlockRequestCard>;
 

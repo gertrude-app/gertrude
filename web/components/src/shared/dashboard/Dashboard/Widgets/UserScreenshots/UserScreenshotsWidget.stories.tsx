@@ -1,9 +1,9 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import UserScreenshotsWidget from './UserScreenshotsWidget';
-import { withIds } from '../../story-helpers';
+import { withIds } from '../../../story-helpers';
 
 export default {
-  title: `Dashboard/Dashboard/Widgets/UserScreenshotsWidget`,
+  title: `Dashboard/Dashboard/Widgets/UserScreenshots`,
   component: UserScreenshotsWidget,
 } as ComponentMeta<typeof UserScreenshotsWidget>;
 

@@ -1,9 +1,9 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import UsersOverview from './UsersOverviewWidget';
-import { withIds } from '../../story-helpers';
+import { withIds } from '../../../story-helpers';
 
 export default {
-  title: `Dashboard/Dashboard/Widgets/UserOverviewWidget`,
+  title: `Dashboard/Dashboard/Widgets/UserOverview`,
   component: UsersOverview,
 } as ComponentMeta<typeof UsersOverview>;
 

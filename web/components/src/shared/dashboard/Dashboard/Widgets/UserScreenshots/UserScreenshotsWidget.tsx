@@ -1,6 +1,6 @@
 import React from 'react';
 import DashboardWidget from '../DashboardWidget';
-import { relativeTime } from '../../lib/dates';
+import { relativeTime } from '../../../lib/dates';
 import WidgetTitle from '../WidgetTitle';
 
 type Props = {
