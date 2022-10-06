@@ -27,6 +27,8 @@ export const ICONS = [
   `phone`,
   `slack`,
   `laptop`,
+  `binoculars`,
+  `clock`,
 ] as const;
 
 export type IconType = typeof ICONS[number];
@@ -41,6 +43,7 @@ interface Props {
 const CLASS_MAP: Record<Props['icon'], string> = {
   calendar: `fa-solid fa-calendar-days`,
   comment: `fa-solid fa-comment`,
+  clock: `fa-solid fa-clock`,
   location: `fa-solid fa-location scale-110`,
   'app-store': `fa-brands fa-app-store-ios scale-110`,
   'pen-to-square': `fa-solid fa-pen-to-square`,
@@ -64,6 +67,7 @@ const CLASS_MAP: Record<Props['icon'], string> = {
   phone: `fa-solid fa-mobile`,
   slack: `fa-brands fa-slack`,
   laptop: `fa-solid fa-laptop`,
+  binoculars: `fa-solid fa-binoculars`,
 };
 
 const GradientIcon: React.FC<Props> = ({ icon, className, size, subtle = false }) => {

@@ -4,6 +4,7 @@ import cx from 'classnames';
 import DashboardWidget from '../DashboardWidget';
 import Button from '../../../Button';
 import { writable } from '../../lib/helpers';
+import WidgetTitle from '../WidgetTitle';
 
 type Props = {
   userActivity: DashboardWidgetData['userActivity'];
@@ -49,6 +50,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity }) => {
 
   return (
     <DashboardWidget inset className="space-y-3">
+      <WidgetTitle icon="binoculars" text="Activity" />
       {writable(userActivity)
         .sort((a, b) => b.numUnreviewed - a.numUnreviewed)
         .map((activity) => (

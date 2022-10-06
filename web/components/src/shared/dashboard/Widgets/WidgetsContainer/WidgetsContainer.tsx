@@ -25,20 +25,20 @@ const WidgetsContainer: React.FC<Props> = ({
     return (
       <UndoMainPadding
         className={cx(
-          `min-h-screen grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8 p-3 sm:p-6 md:p-10`,
+          `min-h-screen grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8 p-4 sm:p-6 md:p-10`,
           className,
         )}
       >
-        <QuickActionsWidget createKeychain={createKeychain} className="xl:row-span-2" />
+        <UserOverviewWidget users={users} />
         <UserActivityWidget userActivity={userActivity} />
+        <UserScreenshotsWidget screenshots={userScreenshots} className="xl:row-span-2" />
         {unlockRequests.length !== 0 && (
           <UnlockRequestsWidget
             className="row-span-2 xl:row-span-3"
             unlockRequests={unlockRequests}
           />
         )}
-        <UserScreenshotsWidget screenshots={userScreenshots} className="xl:row-span-2" />
-        <UserOverviewWidget users={users} />
+        <QuickActionsWidget createKeychain={createKeychain} className="xl:row-span-2" />
       </UndoMainPadding>
     );
 

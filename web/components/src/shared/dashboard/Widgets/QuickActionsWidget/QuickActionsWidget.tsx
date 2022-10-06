@@ -10,9 +10,9 @@ type Props = {
 
 const QuickActionsWidget: React.FC<Props> = ({ className, createKeychain }) => (
   <DashboardWidget className={className}>
-    <h1 className="text-xl font-bold mt-2 ml-2">Good {timeOfDay(new Date())}!</h1>
+    <h1 className="text-xl font-bold my-2 ml-2">Good {timeOfDay(new Date())}!</h1>
     <p className="mb-4 ml-2 text-gray-500">
-      Here's some quick actions you may find useful:
+      Here are some quick actions you may find useful:
     </p>
     <QuickAction name="Create new user" icon="user-plus" action="/users/new" />
     <QuickAction name="Create new keychain" icon="key" action={createKeychain} />
@@ -47,6 +47,6 @@ const QuickAction: React.FC<QuickActionProps> = ({ name, icon, action }) => (
     <div className="flex justify-center items-center text-white bg-gradient-to-br from-indigo-500 to-fuchsia-500 w-10 h-10 rounded-lg shrink-0">
       <i className={`fa-solid fa-${icon}`} />
     </div>
-    <h2 className="font-medium ml-3 text-lg text-gray-800">{name}</h2>
+    <h2 className="font-medium leading-5 ml-3 text-lg text-gray-800">{name}</h2>
   </Action>
 );

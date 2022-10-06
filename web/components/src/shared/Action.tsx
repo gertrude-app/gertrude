@@ -1,4 +1,5 @@
 import React from 'react';
+import cx from 'classnames';
 import { Link } from 'react-router-dom';
 
 type Props = {
@@ -28,7 +29,7 @@ const Action: React.FC<Props> = ({ className, children, ...props }) => {
   }
 
   return (
-    <button type="button" onClick={props.onClick} className={className}>
+    <button type="button" onClick={props.onClick} className={cx(`text-left`, className)}>
       {children}
     </button>
   );

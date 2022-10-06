@@ -4,6 +4,7 @@ import Button from '../../../Button';
 import UnlockRequestCard from '../../UnlockRequestCard';
 import { inflect } from '../../lib/string';
 import { writable } from '../../lib/helpers';
+import WidgetTitle from '../WidgetTitle';
 
 type Props = {
   className?: string;
@@ -12,6 +13,7 @@ type Props = {
 
 const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) => (
   <DashboardWidget inset className={className}>
+    <WidgetTitle icon="unlock" text="Unlock requests" />
     {writable(unlockRequests)
       .sort((a, b) => (b.createdAt > a.createdAt ? -1 : 1))
       .slice(0, 2)

@@ -1,7 +1,7 @@
 import React from 'react';
-import cx from 'classnames';
 import DashboardWidget from '../DashboardWidget';
 import { relativeTime } from '../../lib/dates';
+import WidgetTitle from '../WidgetTitle';
 
 type Props = {
   className?: string;
@@ -9,7 +9,8 @@ type Props = {
 };
 
 const UserScreenshotsWidget: React.FC<Props> = ({ className, screenshots }) => (
-  <DashboardWidget className={cx(``, className)}>
+  <DashboardWidget className={className}>
+    <WidgetTitle icon="clock" text="Recent screenshots" />
     <div className="space-y-3">
       {screenshots.map((screenshot) => (
         <div
