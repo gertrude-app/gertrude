@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 
-export const IconsList = [
+export const ICONS = [
   `comment`,
   `google-chrome`,
   `location`,
@@ -24,12 +24,14 @@ export const IconsList = [
   `users`,
   `pen`,
   `email`,
-  `text`,
+  `phone`,
   `slack`,
   `laptop`,
+  `binoculars`,
+  `clock`,
 ] as const;
 
-export type IconType = typeof IconsList[number];
+export type IconType = typeof ICONS[number];
 
 interface Props {
   className?: string;
@@ -41,15 +43,16 @@ interface Props {
 const CLASS_MAP: Record<Props['icon'], string> = {
   calendar: `fa-solid fa-calendar-days`,
   comment: `fa-solid fa-comment`,
+  clock: `fa-solid fa-clock`,
   location: `fa-solid fa-location scale-110`,
-  'app-store': `fa-brands fa-app-store-ios scale-125`,
+  'app-store': `fa-brands fa-app-store-ios scale-110`,
   'pen-to-square': `fa-solid fa-pen-to-square`,
   'google-chrome': `fa-brands fa-chrome`,
   'lightning-bolt': `fa-solid fa-bolt`,
   unlock: `fa-solid fa-unlock`,
   globe: `fa-solid fa-earth-americas`,
   window: `fa-solid fa-window-maximize`,
-  'exclamation-triangle': `fa-solid fa-exclamation-triangle`,
+  'exclamation-triangle': `fa-solid fa-exclamation-triangle -translate-y-px`,
   info: `fa-solid fa-info`,
   bug: `fa-solid fa-bug`,
   list: `fa-solid fa-list`,
@@ -61,9 +64,10 @@ const CLASS_MAP: Record<Props['icon'], string> = {
   users: `fa-solid fa-users`,
   pen: `fa-solid fa-pen`,
   email: `fa-solid fa-envelope`,
-  text: `fa-solid fa-mobile`,
+  phone: `fa-solid fa-mobile`,
   slack: `fa-brands fa-slack`,
   laptop: `fa-solid fa-laptop`,
+  binoculars: `fa-solid fa-binoculars`,
 };
 
 const GradientIcon: React.FC<Props> = ({ icon, className, size, subtle = false }) => {

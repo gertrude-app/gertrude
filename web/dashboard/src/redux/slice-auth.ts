@@ -125,8 +125,13 @@ export function getInitialAdmin(): AdminIds | null {
     return null;
   }
 
-  if (Current.env.isProd() || Current.sessionStorage.getItem(`dev_logged_out`) !== null) {
-    return adminFrom(Current.sessionStorage) ?? adminFrom(Current.localStorage);
+  const ids = adminFrom(Current.sessionStorage) ?? adminFrom(Current.localStorage);
+  if (ids || Current.env.isProd()) {
+    return ids;
+  }
+
+  if (Current.sessionStorage.getItem(`dev_logged_out`) !== null) {
+    return null;
   }
 
   const devCreds = Current.env.optionalVar(Optional.TestAdminCreds);

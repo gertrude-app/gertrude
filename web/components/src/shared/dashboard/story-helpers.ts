@@ -41,3 +41,30 @@ export function confirmableEntityAction<
     cancel: () => {},
   };
 }
+
+export const time = {
+  now,
+  subtracting,
+};
+
+function subtracting(amounts: {
+  days?: number;
+  hours?: number;
+  minutes?: number;
+}): string {
+  const date = new Date();
+  if (amounts.days) {
+    date.setDate(date.getDate() - amounts.days);
+  }
+  if (amounts.hours) {
+    date.setHours(date.getHours() - amounts.hours);
+  }
+  if (amounts.minutes) {
+    date.setMinutes(date.getMinutes() - amounts.minutes);
+  }
+  return date.toISOString();
+}
+
+function now(): string {
+  return new Date().toISOString();
+}

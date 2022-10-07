@@ -135,7 +135,11 @@ const Summary: React.FC<AdminNotificationMethod['data'] & { trigger: Trigger }> 
   props,
 ) => (
   <div className="p-5">
-    <GradientIcon icon={props.type} size="small" className="w-min" />
+    <GradientIcon
+      icon={props.type === `text` ? `phone` : props.type}
+      size="small"
+      className="w-min"
+    />
     <h2 className="text-gray-700 text-lg">
       <span className="capitalize">{props.type}</span>
       {` `}

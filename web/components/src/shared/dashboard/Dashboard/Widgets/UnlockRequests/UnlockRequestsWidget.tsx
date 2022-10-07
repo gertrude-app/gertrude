@@ -1,26 +1,29 @@
 import React from 'react';
 import DashboardWidget from '../DashboardWidget';
-import Button from '../../../Button';
-import UnlockRequestCard from '../../UnlockRequestCard';
-import { inflect } from '../../lib/string';
+import Button from '../../../../Button';
+import UnlockRequestCard from './UnlockRequestCard';
+import { inflect } from '../../../lib/string';
+import { writable } from '../../../lib/helpers';
+import WidgetTitle from '../WidgetTitle';
 
 type Props = {
   className?: string;
-  unlockRequests: { url: string; user: string; comment?: string; time: Date }[];
+  unlockRequests: DashboardWidgetData['unlockRequests'];
 };
 
 const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) => (
   <DashboardWidget inset className={className}>
-    {unlockRequests
-      .sort((a, b) => b.time.getTime() - a.time.getTime())
+    <WidgetTitle icon="unlock" text="Unlock requests" />
+    {writable(unlockRequests)
+      .sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1))
       .slice(0, 2)
       .map((req) => (
         <UnlockRequestCard
-          key={req.time.toISOString()} // this will need to change to the id or something
-          userName={req.user}
-          comment={req.comment}
-          time={req.time}
-          url={req.url}
+          key={req.id}
+          userName={req.userName}
+          comment={req.comment ?? undefined}
+          createdAt={req.createdAt}
+          url={req.target}
         />
       ))}
     {unlockRequests.length > 2 && (

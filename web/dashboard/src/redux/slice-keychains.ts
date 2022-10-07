@@ -45,8 +45,8 @@ export const slice = createSlice({
   reducers: {
     createKeychainInitiated(state, action: PayloadAction<{ id: UUID; adminId: UUID }>) {
       state.keychains[action.payload.id] = {
-        isNew: true,
         ...editable(empty.keychain(action.payload.id, action.payload.adminId)),
+        isNew: true,
       };
     },
     editKeyEventReceived(state, action: PayloadAction<EditKey.Event>) {

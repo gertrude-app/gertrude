@@ -1,15 +1,17 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import GradientIcon, { IconsList } from './GradientIcon';
+import GradientIcon, { ICONS } from './GradientIcon';
 
-const GradientGrid: React.FC<{ size: `small` | `medium` | `large`; subtle: boolean }> = ({
+const GradientGrid: React.FC<{ size: 'small' | 'medium' | 'large'; subtle: boolean }> = ({
   size,
   subtle,
 }) => (
-  <div className="flex flex-wrap max-w-lg m-2">
-    {IconsList.map((icon) => (
-      <div className="flex flex-col m-1 w-12 items-center">
+  <div className="grid grid-cols-4 gap-3">
+    {ICONS.map((icon) => (
+      <div className="flex flex-col bg-gray-100/40 px-4 py-8 items-center rounded-xl">
         <GradientIcon icon={icon} size={size} key={icon} subtle={subtle} />
-        <h2 className="text-[8px] text-gray-600 text-center">{icon}</h2>
+        <h2 className="text-xs whitespace-nowrap mt-2 font-mono text-gray-400 text-center">
+          {icon}
+        </h2>
       </div>
     ))}
   </div>
@@ -21,16 +23,13 @@ const Template: ComponentStory<typeof GradientGrid> = (args) => (
 
 export const Grid = Template.bind({});
 Grid.args = {
-  size: `small`,
+  size: `large`,
   subtle: false,
 };
 
 export default {
   title: `Shared/GradientIcon`,
   component: GradientGrid,
-  parameters: {
-    layout: `fullscreen`,
-  },
   argTypes: {
     size: {
       options: [`small`, `medium`, `large`],

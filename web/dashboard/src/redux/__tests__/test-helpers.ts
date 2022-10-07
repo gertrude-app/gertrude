@@ -7,12 +7,14 @@ import { initialState as adminInitialState } from '../slice-admin';
 import { initialState as keychainsInitialState } from '../slice-keychains';
 import { initialState as urlInitialState } from '../slice-url';
 import { initialState as appsInitialState } from '../slice-apps';
+import { initialState as dashboardInitialState } from '../slice-dashboard';
 
 export function makeState(mutator: (state: State) => unknown = () => {}): State {
   const state: State = {
     admin: adminInitialState(),
     apps: appsInitialState(),
     auth: authInitialState(),
+    dashboard: dashboardInitialState(),
     keychains: keychainsInitialState(),
     menu: menuInitialState(),
     waitlist: waitlistInitialState(),

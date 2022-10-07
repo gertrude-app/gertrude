@@ -1,20 +1,22 @@
 import React from 'react';
 import cx from 'classnames';
-import Button from '../../../Button';
-import PillBadge from '../../PillBadge';
+import Button from '../../../../Button';
+import PillBadge from '../../../PillBadge';
 import DashboardWidget from '../DashboardWidget';
+import WidgetTitle from '../WidgetTitle';
 
 type Props = {
   className?: string;
-  users: { name: string; online: boolean }[];
+  users: DashboardWidgetData['users'];
 };
 
 const UsersOverview: React.FC<Props> = ({ className, users }) => {
   if (users.length > 0)
     return (
       <DashboardWidget className={className}>
+        <WidgetTitle icon="users" text="Users" />
         {users.map((user) => (
-          <UserOverview user={user} />
+          <UserOverview key={user.id} {...user} />
         ))}
       </DashboardWidget>
     );
@@ -37,25 +39,19 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
 
 export default UsersOverview;
 
-interface UserOverviewProps {
-  user: { name: string; online: boolean };
-}
-
-const UserOverview: React.FC<UserOverviewProps> = ({ user }) => {
-  return (
-    <div className="flex justify-between items-center rounded-xl py-4 px-4 even:bg-gray-50">
-      <h3 className="font-medium text-gray-900">{user.name}</h3>
-      {user.online ? (
-        <PillBadge type="green">
-          <i className="mr-2 fa-solid fa-circle text-green-500 text-sm scale-75" />
-          Online
-        </PillBadge>
-      ) : (
-        <PillBadge type="yellow">
-          <i className="mr-2 fa-solid fa-circle text-yellow-500 text-sm scale-75" />
-          Offline
-        </PillBadge>
-      )}
-    </div>
-  );
-};
+const UserOverview: React.FC<DashboardWidgetData['users'][0]> = ({ isOnline, name }) => (
+  <div className="flex justify-between items-center rounded-xl py-4 px-4 even:bg-gray-50">
+    <h3 className="font-medium text-gray-900">{name}</h3>
+    {isOnline ? (
+      <PillBadge type="green">
+        <i className="mr-2 fa-solid fa-circle text-green-500 text-sm scale-75" />
+        online
+      </PillBadge>
+    ) : (
+      <PillBadge type="yellow">
+        <i className="mr-2 fa-solid fa-circle text-yellow-500 text-sm scale-75" />
+        offline
+      </PillBadge>
+    )}
+  </div>
+);

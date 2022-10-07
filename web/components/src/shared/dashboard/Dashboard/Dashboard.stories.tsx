@@ -1,0 +1,93 @@
+import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { withStatefulChrome } from '../../../decorators/StatefulChrome';
+import Dashboard from './Dashboard';
+import { withIds, time } from '../story-helpers';
+
+export default {
+  title: `Dashboard/Dashboard`,
+  component: Dashboard,
+  decorators: [withStatefulChrome],
+  parameters: { layout: `fullscreen` },
+} as ComponentMeta<typeof Dashboard>;
+
+const Template: ComponentStory<typeof Dashboard> = (args) => <Dashboard {...args} />;
+
+export const Default = Template.bind({});
+Default.args = {
+  unlockRequests: withIds([
+    {
+      target: `gitlab.io`,
+      userName: `Little Jimmy`,
+      comment: `Super cool thing I want`,
+      createdAt: time.now(),
+    },
+    {
+      target: `goats.com`,
+      userName: `Henry`,
+      createdAt: time.subtracting({ minutes: 2 }),
+    },
+    {
+      target: `github.com`,
+      userName: `Little Jimmy`,
+      createdAt: time.subtracting({ days: 1 }),
+    },
+    {
+      target: `magicschoolbus.com`,
+      userName: `Sally`,
+      comment: `For science class, thanks ❤️`,
+      createdAt: time.subtracting({ days: 14 }),
+    },
+  ]),
+  users: withIds([
+    { name: `Little Jimmy`, isOnline: true },
+    { name: `Sally`, isOnline: true },
+    { name: `Henry`, isOnline: false },
+  ]),
+  userActivity: withIds([
+    { userName: `Little Jimmy`, numUnreviewed: 245 },
+    { userName: `Sally`, numUnreviewed: 0 },
+    { userName: `Henry`, numUnreviewed: 23 },
+  ]),
+  userScreenshots: withIds([
+    {
+      userName: `Little Jimmy`,
+      url: `https://placekitten.com/300/200`,
+      createdAt: time.now(),
+    },
+    {
+      userName: `Sally`,
+      url: `https://placekitten.com/400/200`,
+      createdAt: time.subtracting({ minutes: 2 }),
+    },
+    {
+      userName: `Henry`,
+      url: `https://placekitten.com/500/300`,
+      createdAt: time.subtracting({ minutes: 6 }),
+    },
+  ]),
+};
+
+export const NoUnlockRequests = Template.bind({});
+NoUnlockRequests.args = {
+  ...Default.args,
+  unlockRequests: [],
+};
+
+export const NoUserActivity = Template.bind({});
+NoUserActivity.args = {
+  ...Default.args,
+  userActivity: [],
+};
+
+export const NoUserActivityOrUnlockRequests = Template.bind({});
+NoUserActivityOrUnlockRequests.args = {
+  ...Default.args,
+  userActivity: [],
+  unlockRequests: [],
+};
+
+export const NoUsers = Template.bind({});
+NoUsers.args = {
+  ...Default.args,
+  users: [],
+};

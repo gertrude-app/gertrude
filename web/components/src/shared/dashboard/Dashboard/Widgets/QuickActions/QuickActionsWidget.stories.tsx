@@ -2,7 +2,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import QuickActionsWidget from './QuickActionsWidget';
 
 export default {
-  title: `Dashboard/Dashboard/Widgets/QuickActionsWidget`,
+  title: `Dashboard/Dashboard/Widgets/QuickActions`,
   component: QuickActionsWidget,
 } as ComponentMeta<typeof QuickActionsWidget>;
 

@@ -1,68 +1,48 @@
-import React from 'react';
-import WidgetsContainer from '@shared/dashboard/Widgets/WidgetsContainer';
+import React, { useEffect } from 'react';
+import { v4 as uuid } from 'uuid';
+import Loading from '@shared/Loading';
+import Dashboard from '@dashboard/Dashboard';
+import { useDispatch, useSelector } from '../../redux/hooks';
+import { QueryProps } from '../../redux/store';
+import { Req, Query } from '../../redux/helpers';
+import { fetchDashboardData } from '../../redux/slice-dashboard';
+import { createKeychainInitiated } from '../../redux/slice-keychains';
+import ApiErrorMessage from '../ApiErrorMessage';
 
-const Dashboard: React.FC = () => {
-  const now = new Date();
-  return (
-    <div className="">
-      <WidgetsContainer
-        unlockRequests={[
-          {
-            url: `gitlab.io`,
-            user: `Little Jimmy`,
-            comment: `Super cool thing I want`,
-            time: new Date(now.getTime() - 0), // now
-          },
-          {
-            url: `goats.com`,
-            user: `Henry`,
-            time: new Date(now.getTime() - 1000 * 120), // 2 minutes ago
-          },
-          {
-            url: `github.com`,
-            user: `Little Jimmy`,
-            time: new Date(now.getTime() - 1000 * 60 * 60 * 24), // 1 day ago
-          },
-          {
-            url: `magicschoolbus.com`,
-            user: `Sally`,
-            comment: `For science class, thanks ❤️`,
-            time: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7 * 2), // 2 weeks ago
-          },
-        ]}
-        users={[
-          { name: `Little Jimmy`, online: true },
-          { name: `Sally`, online: true },
-          { name: `Henry`, online: false },
-        ]}
-        userActivity={[
-          { user: `Little Jimmy`, unreviewedItems: 245 },
-          { user: `Sally`, unreviewedItems: 0 },
-          { user: `Henry`, unreviewedItems: 23 },
-        ]}
-        userScreenshots={[
-          {
-            userName: `Little Jimmy`,
-            img: `https://placekitten.com/300/200`,
-            app: `Firefox`,
-            time: new Date(),
-          },
-          {
-            userName: `Sally`,
-            img: `https://placekitten.com/400/200`,
-            app: `Figma`,
-            time: new Date(now.getTime() - 1000 * 120),
-          },
-          {
-            userName: `Henry`,
-            img: `https://placekitten.com/500/300`,
-            app: `Notes`,
-            time: new Date(now.getTime() - 1000 * 60),
-          },
-        ]}
-      />
-    </div>
-  );
+const DashboardRoute: React.FC = () => {
+  const dispatch = useDispatch();
+  const [query, shouldFetch] = useSelector(queryProps(dispatch));
+
+  useEffect(() => {
+    if (shouldFetch) {
+      dispatch(fetchDashboardData());
+    }
+  }, [dispatch, shouldFetch]);
+
+  if (query.state !== `resolved` && query.state !== `failed`) {
+    return <Loading />;
+  }
+
+  if (query.state === `failed`) {
+    return <ApiErrorMessage error={query.error} />;
+  }
+
+  return <Dashboard {...query.props} />;
 };
 
-export default Dashboard;
+export default DashboardRoute;
+
+export const queryProps: QueryProps<typeof Dashboard> = (dispatch) => (state) => {
+  const adminId = state.auth.admin?.id ?? ``;
+  const request = state.dashboard.request;
+  if (request.state !== `succeeded`) {
+    return [Req.toUnresolvedQuery(request), request.state !== `failed`];
+  }
+  return [
+    Query.resolve({
+      ...request.payload,
+      createKeychain: () => dispatch(createKeychainInitiated({ id: uuid(), adminId })),
+    }),
+    false,
+  ];
+};
