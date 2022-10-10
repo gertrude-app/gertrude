@@ -33,7 +33,7 @@ export function toState(keyRecord: KeyRecord): EditKey.State {
 
   state.addressScope = `singleApp`;
   state.keyType = `app`;
-  if (key.scope.single.type === 'bundleId') {
+  if (key.scope.single.type === `bundleId`) {
     state.appBundleId = key.scope.single.bundleId;
   } else {
     state.appSlug = key.scope.single.identifiedAppSlug;
@@ -70,7 +70,7 @@ function setAddressFields(key: Key, state: EditKey.State): void {
 function toSkeleton(key: Key, state: EditKey.State): EditKey.State {
   state.keyType = `app`;
   state.appScope = `unrestricted`;
-  state.addressScope = 'singleApp';
+  state.addressScope = `singleApp`;
   if (key.scope.type === `bundleId`) {
     state.appIdentificationType = `bundleId`;
     state.appBundleId = key.scope.bundleId;

@@ -4,22 +4,21 @@ import { target } from '../lib/keys';
 import { toState } from '../lib/keys/convert';
 
 interface Props {
-  className?: string;
   record: KeyRecord;
 }
 
-const Key: React.FC<Props> = ({ className, record }) => {
+const Key: React.FC<Props> = ({ record }) => {
   const key = toState(record);
-  let scope = '';
+  let scope = ``;
   switch (key.addressScope) {
-    case 'singleApp':
+    case `singleApp`:
       scope = (key.appSlug || key.appBundleId) as string;
       break;
-    case 'unrestricted':
-      scope = 'all apps';
+    case `unrestricted`:
+      scope = `all apps`;
       break;
-    case 'webBrowsers':
-      scope = 'all web browsers';
+    case `webBrowsers`:
+      scope = `all web browsers`;
       break;
   }
 
@@ -29,38 +28,47 @@ const Key: React.FC<Props> = ({ className, record }) => {
         <p className="text-gray-500 whitespace-nowrap">
           <span
             className={cx(
-              key.keyType === 'website' ? 'text-fuchsia-700' : 'text-violet-700',
-              'font-bold',
+              key.keyType === `website` ? `text-fuchsia-700` : `text-violet-700`,
+              `font-bold`,
             )}
           >
             <span className="capitalize">{key.keyType}</span> key
-          </span>{' '}
-          unlocking{' '}
+          </span>
+          {` `}
+          unlocking{` `}
           <span
             className={cx(
-              target(record.key) !== '*'
-                ? 'font-mono px-1 text-gray-800 bg-violet-100 rounded'
-                : 'font-medium text-gray-800',
+              target(record.key) !== `*`
+                ? `font-mono px-1 text-gray-800 bg-violet-100 rounded`
+                : `font-medium text-gray-800`,
             )}
           >
-            {target(record.key) === '*' ? 'everything' : target(record.key)}
-          </span>{' '}
-          for{' '}
+            {target(record.key) === `*` ? `everything` : target(record.key)}
+          </span>
+          {` `}
+          for{` `}
           <span
             className={cx(
-              key.addressScope === 'singleApp' && !key.appSlug && 'font-mono px-1',
-              'font-medium text-gray-800',
-              key.addressScope === 'singleApp' && 'text-indigo-700',
-              key.addressScope === 'unrestricted' && 'text-emerald-700',
-              key.addressScope === 'webBrowsers' && 'text-purple-700',
+              key.addressScope === `singleApp` && !key.appSlug && `font-mono px-1`,
+              `font-medium text-gray-800`,
+              key.addressScope === `singleApp` && `text-indigo-700`,
+              key.addressScope === `unrestricted` && `text-pink-700`,
+              key.addressScope === `webBrowsers` && `text-purple-700`,
             )}
           >
             {scope}
           </span>
         </p>
       </div>
-      <div className="text-gray-400 flex justify-center items-center rounded-full w-8 h-8 bg-transparent hover:bg-violet-100 hover:text-red-500 shrink-0 ml-3">
-        <i className="fa-solid fa-trash" />
+      <div className="ml-1 flex items-center">
+        {key.comment && (
+          <div className="text-gray-400 flex justify-center items-center rounded-full w-8 h-8 bg-transparent hover:bg-violet-100 hover:text-gray-500 shrink-0 ml-1">
+            <i className="fa-solid fa-message" />
+          </div>
+        )}
+        <div className="text-gray-400 flex justify-center items-center rounded-full w-8 h-8 bg-transparent hover:bg-violet-100 hover:text-red-500 shrink-0 ml-1">
+          <i className="fa-solid fa-trash" />
+        </div>
       </div>
     </div>
   );
