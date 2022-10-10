@@ -14,7 +14,7 @@ import {
   userEntityDeleteCanceled,
   deleteDevice,
   deleteUser,
-  createUserToken,
+  createPendingAppConnection,
   addDeviceDismissed,
   addKeychainClicked,
   keychainSelected,
@@ -115,7 +115,7 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
           confirm: () => dispatch(deleteDevice(deleteDeviceId ?? ``)),
           cancel: () => dispatch(userEntityDeleteCanceled(`device`)),
         },
-        startAddDevice: () => dispatch(createUserToken(id)),
+        startAddDevice: () => dispatch(createPendingAppConnection(id)),
         dismissAddDevice: () => dispatch(addDeviceDismissed()),
         addDeviceRequest: state.addDeviceRequest,
         onAddKeychainClicked: () => {

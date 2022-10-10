@@ -118,8 +118,8 @@ export const throwingApiClient: ApiClient = {
     deleteUser: () => {
       throw new Error(`ApiClient.users.deleteUser() not implemented.`);
     },
-    createUserToken: () => {
-      throw new Error(`ApiClient.users.createUserToken() not implemented.`);
+    createPendingAppConnection: () => {
+      throw new Error(`ApiClient.users.createPendingUserConnection() not implemented.`);
     },
   },
   signup: {
@@ -228,8 +228,8 @@ export const noopApiClient: ApiClient = {
     deleteUser: async () => {
       return Result.success(true);
     },
-    createUserToken: async () => {
-      return Result.success(``);
+    createPendingAppConnection: async () => {
+      return Result.success(0);
     },
   },
   signup: {

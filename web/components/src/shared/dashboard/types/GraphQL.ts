@@ -71,14 +71,6 @@ export interface CreateUserInput {
   screenshotsResolution?: number | null;
 }
 
-export interface CreateUserTokenInput {
-  deletedAt?: string | null;
-  deviceId?: UUID | null;
-  id?: UUID | null;
-  userId: UUID;
-  value?: UUID | null;
-}
-
 export interface CreateWaitlistedUserInput {
   email: string;
   id?: UUID | null;
@@ -103,6 +95,10 @@ export interface LoginAdminInput {
 export interface SetUserKeychainsInput {
   keychainIds: UUID[];
   userId: UUID;
+}
+
+export interface UUIDInput {
+  uuid: string;
 }
 
 export interface UpdateAdminNotificationInput {

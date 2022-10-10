@@ -32,7 +32,7 @@ export interface UsersState {
   users: Record<UUID, Editable<User>>;
   fetchUserRequest: Record<UUID, RequestState>;
   updateUserRequest: Record<UUID, RequestState>;
-  addDeviceRequest?: RequestState<UUID>;
+  addDeviceRequest?: RequestState<number>;
   activityOverviews: Record<UUID, RequestState<GetActivityOverview>>;
   activityDays: Record<ActivityDayKey, RequestState<ActivityDay>>;
   deleting: { device?: UUID; user?: UUID };
@@ -241,15 +241,15 @@ export const slice = createSlice({
       }
     });
 
-    builder.addCase(createUserToken.started, (state) => {
+    builder.addCase(createPendingAppConnection.started, (state) => {
       state.addDeviceRequest = Req.ongoing();
     });
 
-    builder.addCase(createUserToken.succeeded, (state, { payload }) => {
+    builder.addCase(createPendingAppConnection.succeeded, (state, { payload }) => {
       state.addDeviceRequest = Req.succeed(payload);
     });
 
-    builder.addCase(createUserToken.failed, (state, { error }) => {
+    builder.addCase(createPendingAppConnection.failed, (state, { error }) => {
       state.addDeviceRequest = Req.fail(error);
     });
   },
@@ -335,9 +335,9 @@ export const deleteActivityItems = createResultThunk(
   },
 );
 
-export const createUserToken = createResultThunk(
-  `${slice.name}/createUserToken`,
-  Current.api.users.createUserToken,
+export const createPendingAppConnection = createResultThunk(
+  `${slice.name}/createPendingAppConnection`,
+  Current.api.users.createPendingAppConnection,
 );
 
 // exports

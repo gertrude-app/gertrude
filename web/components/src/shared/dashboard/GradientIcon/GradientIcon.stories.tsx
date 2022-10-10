@@ -5,7 +5,7 @@ const GradientGrid: React.FC<{ size: 'small' | 'medium' | 'large'; subtle: boole
   size,
   subtle,
 }) => (
-  <div className="grid grid-cols-4 gap-3">
+  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
     {ICONS.map((icon) => (
       <div className="flex flex-col bg-gray-100/40 px-4 py-8 items-center rounded-xl">
         <GradientIcon icon={icon} size={size} key={icon} subtle={subtle} />
