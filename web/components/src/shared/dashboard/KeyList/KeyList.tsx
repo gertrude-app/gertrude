@@ -8,7 +8,7 @@ type Props = {
 const KeyList: React.FC<Props> = ({ keys }) => (
   <div className="bg-white shadow-lg border rounded-xl p-3">
     {keys.map((key) => (
-      <Key record={key} />
+      <Key record={key} key={key.id} />
     ))}
   </div>
 );
