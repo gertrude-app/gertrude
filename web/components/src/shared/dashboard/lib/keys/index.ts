@@ -35,7 +35,7 @@ export function target(key: Key): string {
     case `skeleton`:
       return `*`;
     case `anySubdomain`:
-      return key.domain;
+      return `*.${key.domain}`;
     case `domain`:
       return key.domain;
     case `domainRegex`:
