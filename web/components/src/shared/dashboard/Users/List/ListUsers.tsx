@@ -8,7 +8,7 @@ import ConnectModal from '../ConnectModal';
 
 type Props = {
   users: SubcomponentsOmit<typeof UserCard, 'addDevice'>;
-  addDeviceRequest?: RequestState<UUID>;
+  addDeviceRequest?: RequestState<number>;
   startAddDevice(userId: UUID): unknown;
   dismissAddDevice(): unknown;
 };

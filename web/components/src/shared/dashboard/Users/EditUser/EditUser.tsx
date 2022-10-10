@@ -31,7 +31,7 @@ interface Props {
   startAddDevice(): unknown;
   dismissAddDevice(): unknown;
   deleteDevice: ConfirmableEntityAction;
-  addDeviceRequest?: RequestState<UUID>;
+  addDeviceRequest?: RequestState<number>;
   saveButtonDisabled: boolean;
   onSave(): unknown;
   onAddKeychainClicked(): unknown;

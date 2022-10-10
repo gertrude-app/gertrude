@@ -80,6 +80,6 @@ AddingDevice.args = {
   ...Default.args,
   addDeviceRequest: {
     state: `succeeded`,
-    payload: `e8e65309-fe54-4eda-9f02-d1983d670d03`,
+    payload: 123123,
   },
 };

@@ -4,7 +4,11 @@ import ListUsers from '@dashboard/Users/List';
 import { isUnsaved } from '@dashboard/lib/id';
 import { Family } from '@dashboard/types/GraphQL';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import { addDeviceDismissed, createUserToken, fetchUsers } from '../../redux/slice-users';
+import {
+  addDeviceDismissed,
+  createPendingAppConnection,
+  fetchUsers,
+} from '../../redux/slice-users';
 import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
 
@@ -47,7 +51,7 @@ const Users: React.FC = () => {
         screenshotsEnabled: resource.screenshotsEnabled,
         keystrokesEnabled: resource.keyloggingEnabled,
       }))}
-      startAddDevice={(userId) => dispatch(createUserToken(userId))}
+      startAddDevice={(userId) => dispatch(createPendingAppConnection(userId))}
       dismissAddDevice={() => dispatch(addDeviceDismissed())}
       addDeviceRequest={addDeviceRequest}
     />
