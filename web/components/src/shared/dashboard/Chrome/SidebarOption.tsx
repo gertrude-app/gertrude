@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { Link } from 'react-router-dom';
+import SmartLink from '../../SmartLink';
 
 interface Props {
   icon: string;
@@ -19,7 +19,7 @@ const SidebarOption: React.FC<Props> = ({
   isSelected,
   onClick,
 }) => (
-  <Link
+  <SmartLink
     to={to}
     onClick={onClick}
     className={cx(
@@ -50,7 +50,7 @@ const SidebarOption: React.FC<Props> = ({
     >
       {children}
     </h2>
-  </Link>
+  </SmartLink>
 );
 
 export default SidebarOption;

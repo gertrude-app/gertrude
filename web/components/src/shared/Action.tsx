@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { Link } from 'react-router-dom';
+import SmartLink from './SmartLink';
 
 type Props = {
   className?: string;
@@ -14,9 +14,9 @@ type Props = {
 const Action: React.FC<Props> = ({ className, children, ...props }) => {
   if (props.type === `link`) {
     return (
-      <Link to={props.to} className={className}>
+      <SmartLink to={props.to} className={className}>
         {children}
-      </Link>
+      </SmartLink>
     );
   }
 
@@ -29,7 +29,11 @@ const Action: React.FC<Props> = ({ className, children, ...props }) => {
   }
 
   return (
-    <button type="button" onClick={props.onClick} className={cx(`text-left`, className)}>
+    <button
+      type="button"
+      onClick={props.onClick}
+      className={cx(`text-left w-full`, className)}
+    >
       {children}
     </button>
   );

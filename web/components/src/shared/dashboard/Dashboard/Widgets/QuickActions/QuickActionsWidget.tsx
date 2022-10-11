@@ -24,7 +24,7 @@ const QuickActionsWidget: React.FC<Props> = ({ className, createKeychain }) => (
     <QuickAction
       name="Submit support request"
       icon="life-ring"
-      action="https://gertrude.app/support"
+      action="https://gertrude.app/contact"
     />
   </DashboardWidget>
 );
