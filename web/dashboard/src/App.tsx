@@ -27,6 +27,14 @@ const App: React.FC = () => {
     }
   }, [dispatch, currentWindowWidth, stateWindowWidth]);
 
+  useEffect(() => {
+    document.addEventListener(`click`, (e) => {
+      if (e.target instanceof HTMLElement && e.target.classList.contains(`ScrollTop`)) {
+        window.scrollTo({ top: 0 });
+      }
+    });
+  }, []);
+
   const redirect = useRedirect();
   if (redirect) {
     return <Navigate to={redirect} />;

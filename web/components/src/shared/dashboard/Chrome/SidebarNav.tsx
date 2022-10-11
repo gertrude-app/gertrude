@@ -68,15 +68,20 @@ const SidebarNav: React.FC<Props> = ({
       </div>
       <div className={cx(`grow border-t-4 border-white border-opacity-10 pt-4`)}>
         <SidebarOption
+          icon="book"
+          collapsed={collapsed}
+          to="https://docs.gertrude.app"
+          isSelected={false}
+        >
+          Docs
+        </SidebarOption>
+        <SidebarOption
           icon="life-ring"
           collapsed={collapsed}
-          to="/support"
+          to="https://gertrude.app/contact"
           isSelected={false}
         >
           Support
-        </SidebarOption>
-        <SidebarOption icon="cog" collapsed={collapsed} to="/settings" isSelected={false}>
-          Settings
         </SidebarOption>
       </div>
     </nav>

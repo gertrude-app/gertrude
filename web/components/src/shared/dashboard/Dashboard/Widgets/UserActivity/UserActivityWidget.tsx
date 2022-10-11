@@ -8,16 +8,17 @@ import WidgetTitle from '../WidgetTitle';
 
 type Props = {
   userActivity: DashboardWidgetData['userActivity'];
+  className?: string;
 };
 
-const UserActivityWidget: React.FC<Props> = ({ userActivity }) => {
+const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
   const caughtUp = userActivity.reduce(
     (acc, cur) => cur.numUnreviewed === 0 && acc,
     true,
   );
   if (userActivity.length === 0)
     return (
-      <DashboardWidget inset className="bg-violet-50">
+      <DashboardWidget className={cx(`bg-violet-50`, className)}>
         <div className="flex flex-col justify-center items-center p-6 rounded-xl h-full">
           <h3 className="font-bold text-black text-opacity-80 text-lg">
             No recorded user activity
@@ -31,12 +32,13 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity }) => {
         </div>
       </DashboardWidget>
     );
-
   if (caughtUp)
     return (
       <DashboardWidget
-        inset
-        className="bg-violet-50 flex flex-col justify-center items-center p-6"
+        className={cx(
+          `bg-violet-50 flex flex-col justify-center items-center p-6`,
+          className,
+        )}
       >
         <i className="fa-solid fa-mug-hot bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text;] text-transparent text-opacity-30 text-5xl" />
         <h2 className="text-xl font-black text-black text-opacity-90 mt-2 mb-1">
@@ -49,7 +51,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity }) => {
     );
 
   return (
-    <DashboardWidget inset className="space-y-3">
+    <DashboardWidget className={cx(`space-y-3`, className)}>
       <WidgetTitle icon="binoculars" text="Activity" />
       {writable(userActivity)
         .sort((a, b) => b.numUnreviewed - a.numUnreviewed)

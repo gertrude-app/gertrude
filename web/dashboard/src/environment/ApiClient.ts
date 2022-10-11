@@ -74,6 +74,9 @@ export const throwingApiClient: ApiClient = {
     deleteKeychain: () => {
       throw new Error(`ApiClient.keychains.deleteKeychain() not implemented.`);
     },
+    deleteKeyRecord: () => {
+      throw new Error(`ApiClient.keychains.deleteKeyRecord() not implemented.`);
+    },
     listAdminKeychains: () => {
       throw new Error(`ApiClient.keychains.listAdminKeychains() not implemented.`);
     },
@@ -182,6 +185,9 @@ export const noopApiClient: ApiClient = {
   },
   keychains: {
     deleteKeychain: async () => {
+      return Result.success(true);
+    },
+    deleteKeyRecord: async () => {
       return Result.success(true);
     },
     listAdminKeychains: async () => {

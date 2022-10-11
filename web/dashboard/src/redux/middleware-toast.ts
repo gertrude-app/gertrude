@@ -5,6 +5,7 @@ import { deleteActivityItems, deleteDevice, upsertUser, deleteUser } from './sli
 import { ResultThunk } from './thunk';
 import {
   deleteKeychain,
+  deleteKeyRecord,
   upsertKeychain,
   upsertEditingKeyRecord,
 } from './slice-keychains';
@@ -21,6 +22,7 @@ const toastMiddleware: Middleware = (_store) => (next) => (action) => {
   toastCrud(`delete`, `keychain`, deleteKeychain, action);
   toastCrud(`save`, `keychain`, upsertKeychain, action);
   toastCrud(`save`, `key`, upsertEditingKeyRecord, action);
+  toastCrud(`delete`, `key`, deleteKeyRecord, action);
   toastCrud(`delete`, `keychain`, deleteKeychain, action);
   toastCrud(`delete`, `device`, deleteDevice, action);
   toastCrud(`delete`, `user`, deleteUser, action);

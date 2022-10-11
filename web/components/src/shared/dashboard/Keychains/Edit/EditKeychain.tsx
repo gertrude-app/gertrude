@@ -6,8 +6,8 @@ import Modal, { ConfirmDeleteEntity } from '../../Modal';
 import PageHeading from '../../PageHeading';
 import TextInput from '../../TextInput';
 import KeyCreator from '../Keys/KeyCreator';
+import KeyList from '../../KeyList';
 import * as EditKey from '../../lib/keys/edit';
-import { target } from '../../lib/keys';
 
 type Props = {
   isNew: boolean;
@@ -16,6 +16,7 @@ type Props = {
   setName(name: string): unknown;
   setDescription(description: string): unknown;
   deleteKeychain: ConfirmableEntityAction<void>;
+  deleteKey: ConfirmableEntityAction;
   keys: KeyRecord[];
   saveButtonDisabled: boolean;
   onSave(): unknown;
@@ -37,6 +38,7 @@ const EditKeychain: React.FC<Props> = ({
   setDescription,
   keys,
   deleteKeychain,
+  deleteKey,
   saveButtonDisabled,
   onSave,
   editingKey,
@@ -67,6 +69,7 @@ const EditKeychain: React.FC<Props> = ({
       {editingKey && <KeyCreator update={updateEditingKey} {...editingKey} apps={apps} />}
     </Modal>
     <ConfirmDeleteEntity type="keychain" action={deleteKeychain} />
+    <ConfirmDeleteEntity type="key" action={deleteKey} />
     <PageHeading icon="key" className="mb-4">
       {isNew ? `Create Keychain` : `Edit Keychain`}
     </PageHeading>
@@ -85,19 +88,15 @@ const EditKeychain: React.FC<Props> = ({
         value={description}
         setValue={setDescription}
       />
-      <h2 className="mt-5 text-lg font-bold text-gray-700">
-        {keys.length} {inflect(`key`, keys.length)}:
-      </h2>
       <div>
-        {keys.map((record) => (
-          <div
-            key={record.id}
-            onClick={() => beginEditKey(record.id)}
-            className="flex items-center justify-between"
-          >
-            {target(record.key)} <pre className="text-fuchsia-700">{record.id}</pre>
-          </div>
-        ))}
+        <h2 className="mb-2 text-lg font-bold text-gray-700">
+          {keys.length} {inflect(`key`, keys.length)}:
+        </h2>
+        <KeyList
+          keys={keys}
+          editKey={beginEditKey}
+          deleteKey={(id) => deleteKey.start(id)}
+        />
         <div className="mt-4 flex justify-end">
           <Button color="secondary-white" small type="button" onClick={onCreateNewKey}>
             <i className="fa-solid fa-plus mr-2" />

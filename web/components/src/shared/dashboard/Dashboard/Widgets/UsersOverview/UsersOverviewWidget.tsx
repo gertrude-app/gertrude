@@ -13,7 +13,7 @@ type Props = {
 const UsersOverview: React.FC<Props> = ({ className, users }) => {
   if (users.length > 0)
     return (
-      <DashboardWidget className={className}>
+      <DashboardWidget inset className={className}>
         <WidgetTitle icon="users" text="Users" />
         {users.map((user) => (
           <UserOverview key={user.id} {...user} />

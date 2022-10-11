@@ -19,11 +19,11 @@ export interface KeychainsState {
   keychains: Record<UUID, Editable<Keychain>>;
   keyRecords: Record<UUID, Editable<KeyRecord>>;
   editingKey?: EditKey.State;
-  deleting: { keychain?: UUID };
+  deleting: { keychain?: UUID; key?: UUID };
   deleted: UUID[];
 }
 
-type DeletableEntity = 'keychain';
+type DeletableEntity = 'keychain' | 'key';
 
 export function initialState(): KeychainsState {
   return {
@@ -129,6 +129,15 @@ export const slice = createSlice({
       };
     });
 
+    builder.addCase(deleteKeyRecord.started, (state) => {
+      delete state.deleting.key;
+    });
+
+    builder.addCase(deleteKeyRecord.succeeded, (state, { meta }) => {
+      delete state.keyRecords[meta.arg];
+      state.deleted.push(meta.arg);
+    });
+
     builder.addCase(deleteKeychain.started, (state) => {
       delete state.deleting.keychain;
     });
@@ -200,6 +209,11 @@ export const fetchAdminKeychain = createResultThunk(
 export const fetchAdminKeychains = createResultThunk(
   `${slice.name}/fetchAdminKeychains`,
   Current.api.keychains.listAdminKeychains,
+);
+
+export const deleteKeyRecord = createResultThunk(
+  `${slice.name}/deleteKeyRecord`,
+  Current.api.keychains.deleteKeyRecord,
 );
 
 export const deleteKeychain = createResultThunk(

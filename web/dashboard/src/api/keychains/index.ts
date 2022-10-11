@@ -1,4 +1,5 @@
 export { deleteKeychain } from './deleteKeychain';
+export { deleteKeyRecord } from './deleteKeyRecord';
 export { listAdminKeychains } from './listAdminKeychains';
 export { getAdminKeychain } from './getAdminKeychain';
 export { upsertKeychain } from './upsertKeychain';
