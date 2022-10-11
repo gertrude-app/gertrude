@@ -13,7 +13,7 @@ type Props = {
   createKeychain: () => unknown;
 } & DashboardWidgetData;
 
-const WidgetsContainer: React.FC<Props> = ({
+const Dashboard: React.FC<Props> = ({
   className,
   unlockRequests,
   users,
@@ -29,16 +29,22 @@ const WidgetsContainer: React.FC<Props> = ({
           className,
         )}
       >
-        <UserOverviewWidget users={users} />
         <UserActivityWidget userActivity={userActivity} />
-        <UserScreenshotsWidget screenshots={userScreenshots} className="xl:row-span-2" />
+        <UserOverviewWidget users={users} />
+        <UserScreenshotsWidget
+          screenshots={userScreenshots}
+          className="xl:row-span-2 lg:-order-9"
+        />
         {unlockRequests.length !== 0 && (
           <UnlockRequestsWidget
-            className="row-span-2 xl:row-span-3"
+            className="row-span-2 xl:row-span-3 lg:-order-8"
             unlockRequests={unlockRequests}
           />
         )}
-        <QuickActionsWidget createKeychain={createKeychain} className="xl:row-span-2" />
+        <QuickActionsWidget
+          createKeychain={createKeychain}
+          className="xl:row-span-2 lg:-order-10"
+        />
       </UndoMainPadding>
     );
 
@@ -74,7 +80,7 @@ const WidgetsContainer: React.FC<Props> = ({
   );
 };
 
-export default WidgetsContainer;
+export default Dashboard;
 
 interface RecommendedStepProps {
   title: string;

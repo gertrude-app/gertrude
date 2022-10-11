@@ -18,7 +18,7 @@ const UserScreenshotsWidget: React.FC<Props> = ({ className, screenshots }) => (
         .map((screenshot) => (
           <div
             key={screenshot.id}
-            className="p-2 pl-4 rounded-2xl flex justify-between items-center h-32 even:bg-gray-50"
+            className="p-2 pl-4 rounded-2xl flex justify-between items-center h-24 sm:h-32 even:bg-gray-50"
           >
             <div>
               <h3 className="font-bold">{screenshot.userName}</h3>

@@ -9,14 +9,9 @@ type Props = {
 };
 
 const WidgetTitle: React.FC<Props> = ({ icon, text, className }) => (
-  <h3
-    className={cx(
-      `flex items-center px-1.5 pb-2 mb-4 border-b border-violet-400/20`,
-      className,
-    )}
-  >
-    <GradientIcon icon={icon} size="small" className="mr-2" />
-    <span className="font-bold text-lg text-gray-900 antialiased">{text}</span>
+  <h3 className={cx(`flex items-center mb-3 sm:mb-4`, className)}>
+    <GradientIcon icon={icon} size="medium" className="mr-1 scale-75" />
+    <span className="font-extrabold text-2xl">{text}</span>
   </h3>
 );
 
