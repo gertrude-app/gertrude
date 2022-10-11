@@ -1,6 +1,6 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
-import { Trigger } from '../types/GraphQL';
+import { SubscriptionStatus, Trigger } from '../types/GraphQL';
 import { withIdsAnd, confirmableEntityAction } from '../story-helpers';
 import { Email as CardStory } from './NotificationCard/NotificationCard.stories';
 import Profile from './Profile';
@@ -24,7 +24,7 @@ const notificationProps = {
 export const Default = Template.bind({});
 Default.args = {
   email: `johndoe@example.com`,
-  status: `active`,
+  status: SubscriptionStatus.active,
   methods: withIdsAnd({ deletable: false }, [
     { method: `email` as const, value: `me@example.com` },
     { method: `slack` as const, value: `#Gertrude` },
