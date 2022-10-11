@@ -5,9 +5,11 @@ import { toState } from '../lib/keys/convert';
 
 interface Props {
   record: KeyRecord;
+  onClick(): unknown;
+  onDelete(): unknown;
 }
 
-const Key: React.FC<Props> = ({ record }) => {
+const Key: React.FC<Props> = ({ record, onClick, onDelete }) => {
   const key = toState(record);
   let scope = ``;
   switch (key.addressScope) {
@@ -23,7 +25,10 @@ const Key: React.FC<Props> = ({ record }) => {
   }
 
   return (
-    <div className="py-2 px-3 rounded-xl odd:bg-gray-50 hover:bg-violet-50 cursor-pointer transition duration-100 flex justify-between items-center">
+    <div
+      className="py-2 px-3 rounded-xl odd:bg-gray-50 hover:bg-violet-50 cursor-pointer transition duration-100 flex justify-between items-center"
+      onClick={onClick}
+    >
       <div className="flex-grow relative overflow-hidden">
         <p className="text-gray-500 whitespace-nowrap">
           <span
@@ -66,9 +71,15 @@ const Key: React.FC<Props> = ({ record }) => {
             <i className="fa-solid fa-message" />
           </div>
         )}
-        <div className="text-gray-400 flex justify-center items-center rounded-full w-8 h-8 bg-transparent hover:bg-violet-100 hover:text-red-500 shrink-0 ml-1">
+        <button
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete();
+          }}
+          className="text-gray-300 flex justify-center items-center rounded-full w-8 h-8 bg-transparent hover:bg-violet-100 hover:text-red-500 shrink-0 ml-1"
+        >
           <i className="fa-solid fa-trash" />
-        </div>
+        </button>
       </div>
     </div>
   );

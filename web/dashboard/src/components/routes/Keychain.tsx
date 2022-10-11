@@ -15,6 +15,7 @@ import {
   keychainEntityDeleteCanceled,
   keychainEntityDeleteStarted,
   deleteKeychain,
+  deleteKeyRecord,
   editKeyEventReceived,
   createNewKeyClicked,
   editKeyModalDismissed,
@@ -69,7 +70,7 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
     const keychain = state.keychains.keychains[id];
     const fetchReq = state.keychains.fetchAdminKeychainRequest[id];
     const updateReq = state.keychains.updateAdminKeychainRequest[id];
-    const deletingId = state.keychains.deleting.keychain;
+    const deleting = state.keychains.deleting;
     const editingKey = state.keychains.editingKey;
 
     if (state.keychains.deleted.includes(id)) {
@@ -109,10 +110,16 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
         saveButtonDisabled:
           updateReq?.state === `ongoing` || (keychain.isNew ? false : !isDirty(keychain)),
         deleteKeychain: {
-          id: deletingId,
+          id: deleting.keychain,
           start: () => dispatch(keychainEntityDeleteStarted({ type: `keychain`, id })),
           cancel: () => dispatch(keychainEntityDeleteCanceled(`keychain`)),
           confirm: () => dispatch(deleteKeychain(id)),
+        },
+        deleteKey: {
+          id: deleting.key,
+          start: (id) => dispatch(keychainEntityDeleteStarted({ type: `key`, id })),
+          cancel: () => dispatch(keychainEntityDeleteCanceled(`key`)),
+          confirm: () => dispatch(deleteKeyRecord(deleting.key ?? ``)),
         },
         apps: [],
       }),
