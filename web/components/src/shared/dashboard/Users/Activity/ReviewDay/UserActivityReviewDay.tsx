@@ -69,7 +69,7 @@ const UserActivityReviewDay: React.FC<Props> = ({
       >
         {deleteableChunks(items, chunkSize, deleteItems)}
         <Button
-          className="self-center"
+          className="ScrollTop self-center"
           type="button"
           onClick={() => deleteItems(items.map((item) => item.id))}
           color="primary-violet"

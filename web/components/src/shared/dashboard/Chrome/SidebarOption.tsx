@@ -23,7 +23,7 @@ const SidebarOption: React.FC<Props> = ({
     to={to}
     onClick={onClick}
     className={cx(
-      `flex justify-start items-center`,
+      `ScrollTop flex justify-start items-center`,
       `cursor-pointer transition duration-75 select-none`,
       `bg-violet-500 bg-opacity-0`,
       `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50`,
