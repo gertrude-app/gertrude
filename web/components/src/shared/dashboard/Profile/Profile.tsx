@@ -1,7 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
 import Button from '../../Button';
-import { Link } from 'react-router-dom';
 import PageHeading from '../../dashboard/PageHeading';
 import PillBadge from '../../dashboard/PillBadge';
 import NewNotificationMethodSidebar from './NewNotificationMethodForm';
@@ -10,7 +9,7 @@ import TextInput from '../../dashboard/TextInput';
 import NotificationMethod from './NotificationMethod';
 import { ConfirmableEntityAction, SubcomponentsOmit } from '../../types';
 import { ConfirmDeleteEntity } from '../Modal';
-import { Trigger } from '../types/GraphQL';
+import { SubscriptionStatus, Trigger } from '../types/GraphQL';
 import { isUnsaved } from '../lib/id';
 import {
   PendingNotificationMethod,
@@ -26,7 +25,8 @@ export type NotificationUpdate = { id: UUID } & (
 
 interface Props {
   email: string;
-  status: string; // @TODO: enum
+  status: SubscriptionStatus;
+  billingPortalRequest: RequestState<string>;
   pendingMethod?: PendingNotificationMethod;
   methods: SubcomponentsOmit<typeof NotificationMethod, 'onDelete'>;
   notifications: SubcomponentsOmit<
@@ -38,6 +38,7 @@ interface Props {
   updateNotification(update: NotificationUpdate): unknown;
   saveNotification(id: UUID): unknown;
   createNotification(): unknown;
+  manageSubscription(): unknown;
   newMethodEventHandler(event: NewAdminNotificationMethodEvent): unknown;
 }
 
@@ -53,6 +54,8 @@ const Profile: React.FC<Props> = ({
   deleteMethod,
   pendingMethod,
   newMethodEventHandler,
+  billingPortalRequest,
+  manageSubscription,
 }) => (
   <div className="lg:px-4 relative">
     <ConfirmDeleteEntity type="notification" action={deleteNotification} />
@@ -82,7 +85,7 @@ const Profile: React.FC<Props> = ({
         <h2 className="text-lg text-gray-900 mb-2">Email address:</h2>
         <TextInput type="email" label="" value={email} setValue={() => {}} />
       </div>
-      <div className="px-8 py-4 bg-gray-100 rounded-xl lg:ml-2 flex justify-between relative border mt-4 lg:mt-0">
+      <div className="px-8 py-4 bg-gray-100 rounded-xl lg:ml-2 lg:w-1/3 flex justify-between relative border mt-4 lg:mt-0">
         <div className="flex justify-end items-start flex-col mr-8">
           <h2 className="font-bold text-gray-700">Basic plan</h2>
           <h3>
@@ -90,16 +93,24 @@ const Profile: React.FC<Props> = ({
             <span className="text-gray-700 text-3xl font-bold">10</span>
             <span className="text-gray-600 text-lg">/month</span>
           </h3>
-          <Link
-            className="mt-1 text-sm text-blue-700 hover:text-blue-800 cursor-pointer transition duration-100"
-            to="/profile"
-          >
-            Manage subscription
-          </Link>
+          {status !== `complimentary` && (
+            <a
+              {...(billingPortalRequest.state === `succeeded`
+                ? { href: billingPortalRequest.payload, target: `_blank` }
+                : {})}
+              className={cx(
+                `mt-1 text-sm whitespace-nowrap cursor-pointer transition duration-100`,
+                manageSubscriptionStateClasses(billingPortalRequest),
+              )}
+              onClick={
+                billingPortalRequest.state === `idle` ? manageSubscription : void 0
+              }
+            >
+              {manageSubscriptionText(billingPortalRequest)}
+            </a>
+          )}
         </div>
-        <PillBadge type="ok" className="absolute right-2 top-2">
-          {status}
-        </PillBadge>
+        <AccountStatusBadge status={status} />
       </div>
     </div>
     <div className="mt-12">
@@ -170,3 +181,81 @@ const Profile: React.FC<Props> = ({
 );
 
 export default Profile;
+
+const AccountStatusBadge: React.FC<{ status: SubscriptionStatus }> = ({ status }) => (
+  <PillBadge type={statusType(status)} className="absolute right-2 top-2">
+    {statusText(status)}
+  </PillBadge>
+);
+
+function statusType(
+  status: SubscriptionStatus,
+): React.ComponentProps<typeof PillBadge>['type'] {
+  switch (status) {
+    case `active`:
+    case `complimentary`:
+    case `emailVerified`:
+    case `pendingEmailVerification`:
+    case `trialing`:
+      return `ok`;
+    case `incomplete`:
+    case `incompleteExpired`:
+    case `pastDue`:
+      return `warning`;
+    case `canceled`:
+    case `signupCanceled`:
+    case `unpaid`:
+    default:
+      return `error`;
+  }
+}
+
+function statusText(status: SubscriptionStatus): string {
+  switch (status) {
+    case `active`:
+    case `canceled`:
+    case `complimentary`:
+    case `incomplete`:
+    case `trialing`:
+    case `unpaid`:
+      return status;
+    case `incompleteExpired`:
+      return `incomplete`;
+    case `emailVerified`:
+      return `email verified`;
+    case `pastDue`:
+      return `past due`;
+    case `pendingEmailVerification`:
+      return `pending email verification`;
+    case `signupCanceled`:
+      return `signup canceled`;
+    default:
+      return status;
+  }
+}
+
+function manageSubscriptionText(req: RequestState<unknown>): string {
+  switch (req.state) {
+    case `idle`:
+      return `Manage subscription...`;
+    case `ongoing`:
+      return `Loading...`;
+    case `failed`:
+      return `Failed to load`;
+    case `succeeded`:
+      return `Click here`;
+  }
+}
+
+function manageSubscriptionStateClasses(req: RequestState<unknown>): string {
+  switch (req.state) {
+    case `idle`:
+      return `text-blue-700/80 hover:text-blue-800`;
+    case `ongoing`:
+      return `text-gray-500 animate-pulse`;
+    case `failed`:
+      return `text-red-700`;
+    case `succeeded`:
+      return `text-blue-800 hover:underline`;
+  }
+}

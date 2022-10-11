@@ -17,6 +17,7 @@ import {
   newNotificationMethodEvent,
   createPendingNotificationMethod,
   confirmPendingNotificationMethod,
+  createBillingPortalSession,
 } from '../../redux/slice-admin';
 import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
@@ -61,6 +62,9 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
     Query.resolve({
       email: request.payload.email,
       status: request.payload.subscriptionStatus,
+      billingPortalRequest: state.admin.billingPortalRequest,
+      manageSubscription: () =>
+        dispatch(createBillingPortalSession(state.auth.admin?.id ?? ``)),
       methods: typesafe.objectValues(methods).map((method) => ({
         id: method.id,
         method: method.data.type,

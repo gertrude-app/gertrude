@@ -10,6 +10,7 @@ import { createResultThunk } from './thunk';
 import Result from '../api/Result';
 
 export interface AdminState {
+  billingPortalRequest: RequestState<string>;
   profileRequest: RequestState<T.Admin>;
   notificationMethods: Record<UUID, T.AdminNotificationMethod>;
   notifications: Record<UUID, Editable<T.Notification> & { editing: boolean }>;
@@ -23,6 +24,7 @@ export interface AdminState {
 
 export function initialState(): AdminState {
   return {
+    billingPortalRequest: Req.idle(),
     profileRequest: Req.idle(),
     notificationMethods: {},
     notifications: {},
@@ -188,6 +190,18 @@ export const slice = createSlice({
       delete state.notifications[meta.arg];
     });
 
+    builder.addCase(createBillingPortalSession.started, (state) => {
+      state.billingPortalRequest = Req.ongoing();
+    });
+
+    builder.addCase(createBillingPortalSession.failed, (state, { error }) => {
+      state.billingPortalRequest = Req.fail(error);
+    });
+
+    builder.addCase(createBillingPortalSession.succeeded, (state, { payload }) => {
+      state.billingPortalRequest = Req.succeed(payload);
+    });
+
     builder.addCase(deleteNotificationMethod.started, (state) => {
       delete state.deleting.notificationMethod;
     });
@@ -273,6 +287,11 @@ export const deleteNotificationMethod = createResultThunk(
 export const deleteNotification = createResultThunk(
   `${slice.name}/deleteNotification`,
   Current.api.admin.deleteNotification,
+);
+
+export const createBillingPortalSession = createResultThunk(
+  `${slice.name}/createBillingPortalSession`,
+  Current.api.admin.createBillingPortalSession,
 );
 
 export const upsertNotification = createResultThunk(

@@ -64,6 +64,9 @@ export const throwingApiClient: ApiClient = {
         `ApiClient.admin.confirmPendingNotificationMethod() not implemented.`,
       );
     },
+    createBillingPortalSession: () => {
+      throw new Error(`ApiClient.admin.createBillingPortalSession() not implemented.`);
+    },
   },
   dashboard: {
     getWidgets: () => {
@@ -171,6 +174,9 @@ export const noopApiClient: ApiClient = {
     },
     confirmPendingNotificationMethod: async () => {
       return Result.success(true);
+    },
+    createBillingPortalSession: async () => {
+      return Result.success(``);
     },
   },
   dashboard: {
