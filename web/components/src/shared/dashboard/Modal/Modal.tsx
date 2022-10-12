@@ -88,7 +88,7 @@ const Modal: React.FC<Props> = ({
                   )}
                 >
                   {type === `container` ? (
-                    <div className="bg-white px-4 pt-5 pb-4 sm:p-4">
+                    <div className="bg-white px-4 pt-5 pb-4 sm:p-4 relative">
                       <div className="flex justify-start items-center mb-5">
                         <GradientIcon icon={icon} size="large" />
                         <Dialog.Title
