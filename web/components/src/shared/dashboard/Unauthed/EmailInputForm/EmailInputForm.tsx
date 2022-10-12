@@ -8,6 +8,8 @@ type Props = {
   subTitle: string;
   email: string;
   setEmail(email: string): unknown;
+  password?: string;
+  setPassword?(password: string): unknown;
   onSubmit(): unknown;
 };
 
@@ -17,6 +19,8 @@ const EmailInputForm: React.FC<Props> = ({
   email,
   setEmail,
   onSubmit,
+  password,
+  setPassword,
 }) => (
   <form
     className="flex flex-col items-center space-x-3"
@@ -28,17 +32,35 @@ const EmailInputForm: React.FC<Props> = ({
     <Logo size={75} iconOnly />
     <h2 className="text-center mt-4 text-3xl font-inter">{title}</h2>
     <h3 className="text-center text-gray-500 mt-2">{subTitle}</h3>
-    <TextInput
-      type="email"
-      label="Email address"
-      className="mt-4 mb-6"
-      placeholder="you@example.com"
-      autoFocus={window.location.href.includes(`gertrude.app`)}
-      required
-      value={email}
-      setValue={setEmail}
-    />
-    <Button color="primary-violet" type="submit" fullWidth>
+    <div className="mt-4 space-y-4 mb-8 self-stretch">
+      <TextInput
+        type="email"
+        label="Email address"
+        placeholder="you@example.com"
+        autoFocus={window.location.href.includes(`gertrude.app`)}
+        required
+        value={email}
+        setValue={setEmail}
+      />
+      {setPassword && (
+        <TextInput
+          type="password"
+          label="Password:"
+          className="mb-6"
+          required
+          value={password ?? ``}
+          setValue={setPassword}
+        />
+      )}
+    </div>
+    <Button
+      disabled={
+        email.match(/^.+@.+$/) === null || (!!setPassword && (password || ``).length < 3)
+      }
+      color="primary-violet"
+      type="submit"
+      fullWidth
+    >
       Submit &rarr;
     </Button>
   </form>

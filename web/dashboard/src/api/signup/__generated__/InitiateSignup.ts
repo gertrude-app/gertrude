@@ -3,15 +3,15 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { EmailInput } from './../../../../../components/src/shared/dashboard/types/GraphQL';
+import { InitiateSignupInput } from './../../../../../components/src/shared/dashboard/types/GraphQL';
 
 // ====================================================
 // GraphQL mutation operation: InitiateSignup
 // ====================================================
 
 export interface InitiateSignup_result {
-  __typename: 'GenericResponse';
-  success: boolean;
+  __typename: 'OptionalUrlResponse';
+  url: string | null;
 }
 
 export interface InitiateSignup {
@@ -19,5 +19,5 @@ export interface InitiateSignup {
 }
 
 export interface InitiateSignupVariables {
-  input: EmailInput;
+  input: InitiateSignupInput;
 }

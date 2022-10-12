@@ -5,7 +5,7 @@ import LoadingSpinner from '../../../LoadingSpinner';
 
 type Props =
   | { request: `idle`; children: React.ReactNode }
-  | { request: `ongoing` }
+  | { request: `ongoing`; text?: string }
   | { request: `failed`; error: React.ReactNode }
   | { request: `succeeded`; message: string };
 
@@ -14,7 +14,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
     case `ongoing`:
       return (
         <FullscreenGradientBg>
-          <LoadingSpinner />
+          <LoadingSpinner text={props.text} />
         </FullscreenGradientBg>
       );
 

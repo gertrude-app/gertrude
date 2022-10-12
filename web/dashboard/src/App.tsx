@@ -6,6 +6,7 @@ import AuthedChrome from './components/Authed';
 import Dashboard from './components/routes/Dashboard';
 import Login from './components/routes/Login';
 import MagicLink from './components/routes/MagicLink';
+import VerifySignupEmail from './components/routes/VerifySignupEmail';
 import JoinWaitlist from './components/routes/JoinWaitlist';
 import AdminProfile from './components/routes/AdminProfile';
 import Keychain from './components/routes/Keychain';
@@ -48,6 +49,7 @@ const App: React.FC = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/otp/:token" element={<MagicLink />} />
       <Route path="/join-waitlist" element={<JoinWaitlist />} />
+      <Route path="/verify-signup-email/:token" element={<VerifySignupEmail />} />
 
       {Current.env.isProd() ? (
         <Route path="/join-waitlist" element={<JoinWaitlist />} />

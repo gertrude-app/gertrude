@@ -87,8 +87,10 @@ export interface DeleteMonitoringItemInput {
   type: string;
 }
 
-export interface EmailInput {
+export interface InitiateSignupInput {
   email: string;
+  password: string;
+  signupToken?: string | null;
 }
 
 export interface LoginAdminInput {
@@ -99,6 +101,10 @@ export interface LoginAdminInput {
 export interface SetUserKeychainsInput {
   keychainIds: UUID[];
   userId: UUID;
+}
+
+export interface StringInput {
+  value: string;
 }
 
 export interface UUIDInput {

@@ -5,14 +5,16 @@ import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   allowingSignups,
   emailUpdated,
+  passwordUpdated,
   joinWaitlist,
-  sendVerificationEmail,
+  initiateSignup,
 } from '../../redux/slice-signup';
 
 const Signup: React.FC = () => {
   const dispatch = useDispatch();
   const email = useSelector((state) => state.signup.email);
-  const verifyReq = useSelector((state) => state.signup.sendVerificationEmailReq);
+  const password = useSelector((state) => state.signup.password);
+  const signupReq = useSelector((state) => state.signup.signupReq);
   const allowReq = useSelector((state) => state.signup.allowingSignupsReq);
   const allowReqState = allowReq.state;
 
@@ -25,12 +27,12 @@ const Signup: React.FC = () => {
   if (
     allowReqState === `ongoing` ||
     allowReqState === `idle` ||
-    verifyReq.state === `ongoing`
+    signupReq.state === `ongoing`
   ) {
     return <FullscreenModalForm request="ongoing" />;
   }
 
-  if (allowReqState === `failed` || verifyReq.state === `failed`) {
+  if (allowReqState === `failed` || signupReq.state === `failed`) {
     return (
       <FullscreenModalForm
         request="failed"
@@ -39,7 +41,14 @@ const Signup: React.FC = () => {
     );
   }
 
-  if (verifyReq.state === `succeeded`) {
+  if (signupReq.state === `succeeded`) {
+    const url = signupReq.payload;
+    if (url) {
+      // redirect to stripe flow
+      window.location.href = url;
+      return <FullscreenModalForm request="ongoing" />;
+    }
+
     return (
       <FullscreenModalForm
         request="succeeded"
@@ -61,10 +70,12 @@ const Signup: React.FC = () => {
       ) : (
         <EmailInputForm
           title="Sign up"
-          subTitle="Enter your emaill address so we can send you a verification email"
+          subTitle="Enter your email and password, and we'll send you a verification email."
           email={email}
           setEmail={(email) => dispatch(emailUpdated(email))}
-          onSubmit={() => dispatch(sendVerificationEmail(email))}
+          password={password}
+          setPassword={(password) => dispatch(passwordUpdated(password))}
+          onSubmit={() => dispatch(initiateSignup({ email, password }))}
         />
       )}
     </FullscreenModalForm>

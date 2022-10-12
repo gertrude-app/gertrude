@@ -1,21 +1,28 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { InitiateSignupInput } from '@dashboard/types/GraphQL';
 import Current from '../environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 
 export interface SignupState {
   email: string;
+  password: string;
   allowingSignupsReq: RequestState<boolean>;
   joinWaitlistReq: RequestState;
-  sendVerificationEmailReq: RequestState;
+  createPaymentUrlReq: RequestState<string>;
+  verifyEmailReq: RequestState<UUID>;
+  signupReq: RequestState<string | null>;
 }
 
 export function initialState(): SignupState {
   return {
     email: ``,
+    password: ``,
     allowingSignupsReq: Req.idle(),
+    createPaymentUrlReq: Req.idle(),
     joinWaitlistReq: Req.idle(),
-    sendVerificationEmailReq: Req.idle(),
+    verifyEmailReq: Req.idle(),
+    signupReq: Req.idle(),
   };
 }
 
@@ -25,6 +32,9 @@ export const slice = createSlice({
   reducers: {
     emailUpdated: (state, action: PayloadAction<string>) => {
       state.email = action.payload;
+    },
+    passwordUpdated: (state, action: PayloadAction<string>) => {
+      state.password = action.payload;
     },
   },
   extraReducers(builder) {
@@ -40,16 +50,16 @@ export const slice = createSlice({
       state.allowingSignupsReq = Req.fail(action.error);
     });
 
-    builder.addCase(sendVerificationEmail.started, (state) => {
-      state.sendVerificationEmailReq = Req.ongoing();
+    builder.addCase(initiateSignup.started, (state) => {
+      state.signupReq = Req.ongoing();
     });
 
-    builder.addCase(sendVerificationEmail.succeeded, (state) => {
-      state.sendVerificationEmailReq = Req.succeed(void 0);
+    builder.addCase(initiateSignup.succeeded, (state, { payload }) => {
+      state.signupReq = Req.succeed(payload);
     });
 
-    builder.addCase(sendVerificationEmail.failed, (state, action) => {
-      state.sendVerificationEmailReq = Req.fail(action.error);
+    builder.addCase(initiateSignup.failed, (state, action) => {
+      state.signupReq = Req.fail(action.error);
     });
 
     builder.addCase(joinWaitlist.started, (state) => {
@@ -62,6 +72,30 @@ export const slice = createSlice({
 
     builder.addCase(joinWaitlist.failed, (state, action) => {
       state.joinWaitlistReq = Req.fail(action.error);
+    });
+
+    builder.addCase(verifySignupEmail.started, (state) => {
+      state.verifyEmailReq = Req.ongoing();
+    });
+
+    builder.addCase(verifySignupEmail.succeeded, (state, { payload }) => {
+      state.verifyEmailReq = Req.succeed(payload);
+    });
+
+    builder.addCase(verifySignupEmail.failed, (state, action) => {
+      state.verifyEmailReq = Req.fail(action.error);
+    });
+
+    builder.addCase(createSignupPaymentUrl.started, (state) => {
+      state.createPaymentUrlReq = Req.ongoing();
+    });
+
+    builder.addCase(createSignupPaymentUrl.succeeded, (state, { payload }) => {
+      state.createPaymentUrlReq = Req.succeed(payload);
+    });
+
+    builder.addCase(createSignupPaymentUrl.failed, (state, action) => {
+      state.createPaymentUrlReq = Req.fail(action.error);
     });
   },
 });
@@ -76,11 +110,22 @@ export const allowingSignups = createResultThunk(
   Current.api.signup.allowingSignups,
 );
 
-export const sendVerificationEmail = createResultThunk(
-  `${slice.name}/sendVerificationEmail`,
-  Current.api.signup.sendVerificationEmail,
+export const verifySignupEmail = createResultThunk(
+  `${slice.name}/verifySignupEmail`,
+  Current.api.signup.verifySignupEmail,
 );
 
-export const { emailUpdated } = slice.actions;
+export const createSignupPaymentUrl = createResultThunk(
+  `${slice.name}/createSignupPaymentUrl`,
+  Current.api.signup.createSignupPaymentUrl,
+);
+
+export const initiateSignup = createResultThunk(
+  `${slice.name}/initiateSignup`,
+  (input: InitiateSignupInput) =>
+    Current.api.signup.initiateSignup(input.email, input.password),
+);
+
+export const { emailUpdated, passwordUpdated } = slice.actions;
 
 export default slice.reducer;
