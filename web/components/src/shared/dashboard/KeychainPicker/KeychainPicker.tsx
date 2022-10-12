@@ -9,6 +9,7 @@ type Props = {
   selectablePublicKeychains: Keychain[];
   onSelect(keychain: Keychain): unknown;
   selected?: Keychain | null;
+  noPublic?: boolean;
 };
 
 const KeychainPicker: React.FC<Props> = ({
@@ -17,6 +18,7 @@ const KeychainPicker: React.FC<Props> = ({
   selected,
   selectablePublicKeychains,
   onSelect,
+  noPublic = false,
 }) => (
   <div className="sm:bg-gray-50 rounded-xl sm:p-4">
     {selectableOwnKeychains.length !== 0 && (
@@ -57,28 +59,32 @@ const KeychainPicker: React.FC<Props> = ({
         </Button>
       </div>
     )}
-    <h2
-      className={cx(
-        `text-lg font-bold text-gray-600 mb-3`,
-        selectableOwnKeychains.length > 0 && `mt-8`,
-      )}
-    >
-      Public keychains:
-    </h2>
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {selectablePublicKeychains.map((keychain) => (
-        <KeychainCard
-          key={keychain.id}
-          name={keychain.name}
-          numKeys={keychain.numKeys}
-          isPublic={keychain.isPublic}
-          selectable
-          onSelect={() => onSelect(keychain)}
-          selected={selected?.id === keychain.id}
-          small
-        />
-      ))}
-    </div>
+    {!noPublic && (
+      <>
+        <h2
+          className={cx(
+            `text-lg font-bold text-gray-600 mb-3`,
+            selectableOwnKeychains.length > 0 && `mt-8`,
+          )}
+        >
+          Public keychains:
+        </h2>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {selectablePublicKeychains.map((keychain) => (
+            <KeychainCard
+              key={keychain.id}
+              name={keychain.name}
+              numKeys={keychain.numKeys}
+              isPublic={keychain.isPublic}
+              selectable
+              onSelect={() => onSelect(keychain)}
+              selected={selected?.id === keychain.id}
+              small
+            />
+          ))}
+        </div>
+      </>
+    )}
   </div>
 );
 

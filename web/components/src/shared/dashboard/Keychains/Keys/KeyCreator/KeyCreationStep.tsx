@@ -35,7 +35,7 @@ const KeyCreationStep: React.FC<Props> = ({
   const isBeforeActive = ownStep < activeStep;
   const isAfterActive = ownStep > activeStep;
   return (
-    <div className={cx(`flex items-stretch max-w-2xl min-h-[64px]`, className)}>
+    <div className={cx(`flex items-stretch min-h-[64px]`, className)}>
       {mode === `create` && (
         <div
           className={cx(
