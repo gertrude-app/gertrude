@@ -132,6 +132,12 @@ export const throwingApiClient: ApiClient = {
     joinWaitlist: () => {
       throw new Error(`ApiClient.signup.joinWaitlist() not implemented.`);
     },
+    allowingSignups: () => {
+      throw new Error(`ApiClient.signup.allowingSignups() not implemented.`);
+    },
+    sendVerificationEmail: () => {
+      throw new Error(`ApiClient.signup.sendVerificationEmail() not implemented.`);
+    },
   },
 };
 
@@ -246,6 +252,12 @@ export const noopApiClient: ApiClient = {
   },
   signup: {
     joinWaitlist: async () => {
+      return Result.success(true);
+    },
+    allowingSignups: async () => {
+      return Result.success(false);
+    },
+    sendVerificationEmail: async () => {
       return Result.success(true);
     },
   },

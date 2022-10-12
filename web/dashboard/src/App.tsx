@@ -13,8 +13,10 @@ import Users from './components/routes/Users';
 import UserActivityOverview from './components/routes/UserActivityOverview';
 import UserActivityDay from './components/routes/UserActivityDay';
 import Keychains from './components/routes/Keychains';
+import Signup from './components/routes/Signup';
 import User from './components/routes/User';
 import useWindowWidth from './hooks/window-width';
+import Current from './environment';
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
@@ -46,6 +48,12 @@ const App: React.FC = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/otp/:token" element={<MagicLink />} />
       <Route path="/join-waitlist" element={<JoinWaitlist />} />
+
+      {Current.env.isProd() ? (
+        <Route path="/join-waitlist" element={<JoinWaitlist />} />
+      ) : (
+        <Route path="/signup" element={<Signup />} />
+      )}
 
       {/* authed routes */}
       <Route path="/" element={<AuthedChrome />}>

@@ -87,6 +87,10 @@ export interface DeleteMonitoringItemInput {
   type: string;
 }
 
+export interface EmailInput {
+  email: string;
+}
+
 export interface LoginAdminInput {
   email: string;
   password: string;

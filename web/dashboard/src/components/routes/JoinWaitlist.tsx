@@ -2,7 +2,7 @@ import React from 'react';
 import FullscreenModalForm from '@dashboard/Unauthed/FullscreenModalForm';
 import EmailInputForm from '@dashboard/Unauthed/EmailInputForm';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import { emailUpdated, joinWaitlist } from '../../redux/slice-waitlist';
+import { emailUpdated, joinWaitlist } from '../../redux/slice-signup';
 
 interface Props {
   request: RequestState;
@@ -51,8 +51,8 @@ export const JoinWaitlist: React.FC<Props> = ({ email, setEmail, request, submit
 
 const JoinWaitlistContainer: React.FC = () => {
   const dispatch = useDispatch();
-  const email = useSelector((state) => state.waitlist.email);
-  const request = useSelector((state) => state.waitlist.joinReq);
+  const email = useSelector((state) => state.signup.email);
+  const request = useSelector((state) => state.signup.joinWaitlistReq);
   return (
     <JoinWaitlist
       request={request}
