@@ -59,6 +59,8 @@ const TextInput: React.FC<Props> = ({
           autoFocus={autoFocus}
           placeholder={placeholder}
           disabled={disabled}
+          // passwords must be len > 4
+          {...(props.type === `password` ? { minLength: 4 } : {})}
           // all date inputs must be in the future (for now, at least)
           {...(props.type === `date`
             ? { min: isoToDateInput(new Date().toISOString()) }

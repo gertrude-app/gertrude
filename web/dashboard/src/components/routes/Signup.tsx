@@ -9,6 +9,7 @@ import {
   joinWaitlist,
   initiateSignup,
 } from '../../redux/slice-signup';
+import { Link } from 'react-router-dom';
 
 const Signup: React.FC = () => {
   const dispatch = useDispatch();
@@ -69,8 +70,20 @@ const Signup: React.FC = () => {
         />
       ) : (
         <EmailInputForm
-          title="Sign up"
-          subTitle="Enter your email and password, and we'll send you a verification email."
+          title="Signup"
+          subTitle={
+            <>
+              Got an account?{` `}
+              <Link
+                className="text-violet-700 border-b border-dotted border-violet-700"
+                to="/login"
+              >
+                Login
+              </Link>
+              {` `}
+              instead.
+            </>
+          }
           email={email}
           setEmail={(email) => dispatch(emailUpdated(email))}
           password={password}

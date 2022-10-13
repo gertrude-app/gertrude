@@ -5,7 +5,7 @@ import Logo from '../../../Logo';
 
 type Props = {
   title: string;
-  subTitle: string;
+  subTitle: React.ReactNode;
   email: string;
   setEmail(email: string): unknown;
   password?: string;
@@ -23,7 +23,7 @@ const EmailInputForm: React.FC<Props> = ({
   setPassword,
 }) => (
   <form
-    className="flex flex-col items-center space-x-3"
+    className="flex flex-col items-center space-x-3 max-w-sm sm:min-w-[384px] -mt-3"
     onSubmit={(event) => {
       event.preventDefault();
       onSubmit();
@@ -31,11 +31,11 @@ const EmailInputForm: React.FC<Props> = ({
   >
     <Logo size={75} iconOnly />
     <h2 className="text-center mt-4 text-3xl font-inter">{title}</h2>
-    <h3 className="text-center text-gray-500 mt-2">{subTitle}</h3>
+    <h3 className="text-center text-gray-500 mt-3">{subTitle}</h3>
     <div className="mt-4 space-y-4 mb-8 self-stretch">
       <TextInput
         type="email"
-        label="Email address"
+        label="Email address:"
         placeholder="you@example.com"
         autoFocus={window.location.href.includes(`gertrude.app`)}
         required
@@ -53,14 +53,7 @@ const EmailInputForm: React.FC<Props> = ({
         />
       )}
     </div>
-    <Button
-      disabled={
-        email.match(/^.+@.+$/) === null || (!!setPassword && (password || ``).length < 3)
-      }
-      color="primary-violet"
-      type="submit"
-      fullWidth
-    >
+    <Button color="primary-violet" type="submit" fullWidth>
       Submit &rarr;
     </Button>
   </form>
