@@ -7,6 +7,8 @@ import Dashboard from './components/routes/Dashboard';
 import Login from './components/routes/Login';
 import MagicLink from './components/routes/MagicLink';
 import VerifySignupEmail from './components/routes/VerifySignupEmail';
+import CheckoutSuccess from './components/routes/CheckoutSuccess';
+import CheckoutCancel from './components/routes/CheckoutCancel';
 import JoinWaitlist from './components/routes/JoinWaitlist';
 import AdminProfile from './components/routes/AdminProfile';
 import Keychain from './components/routes/Keychain';
@@ -48,13 +50,16 @@ const App: React.FC = () => {
       {/* unauthed routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/otp/:token" element={<MagicLink />} />
-      <Route path="/join-waitlist" element={<JoinWaitlist />} />
-      <Route path="/verify-signup-email/:token" element={<VerifySignupEmail />} />
 
       {Current.env.isProd() ? (
         <Route path="/join-waitlist" element={<JoinWaitlist />} />
       ) : (
-        <Route path="/signup" element={<Signup />} />
+        <>
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-signup-email/:token" element={<VerifySignupEmail />} />
+          <Route path="/checkout-success" element={<CheckoutSuccess />} />
+          <Route path="/checkout-cancel" element={<CheckoutCancel />} />
+        </>
       )}
 
       {/* authed routes */}

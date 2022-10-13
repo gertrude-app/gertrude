@@ -3,6 +3,7 @@ import { submitLoginForm, logoutClicked, loginFromMagicLink } from './slice-auth
 import { desktopSidebarCollapsedToggled } from './slice-menu';
 import Current from '../environment';
 import { State } from './store';
+import { handleSignupPaymentSuccess } from './slice-signup';
 
 const storageMiddleware: Middleware = (store) => (next) => (action) => {
   if (logoutClicked.match(action)) {
@@ -17,6 +18,7 @@ const storageMiddleware: Middleware = (store) => (next) => (action) => {
 
   if (
     submitLoginForm.succeeded.match(action) ||
+    handleSignupPaymentSuccess.succeeded.match(action) ||
     loginFromMagicLink.succeeded.match(action)
   ) {
     const admin = action.payload;

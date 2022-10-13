@@ -11,6 +11,7 @@ export interface SignupState {
   joinWaitlistReq: RequestState;
   createPaymentUrlReq: RequestState<string>;
   verifyEmailReq: RequestState<UUID>;
+  checkoutSuccessReq: RequestState;
   signupReq: RequestState<string | null>;
 }
 
@@ -22,6 +23,7 @@ export function initialState(): SignupState {
     createPaymentUrlReq: Req.idle(),
     joinWaitlistReq: Req.idle(),
     verifyEmailReq: Req.idle(),
+    checkoutSuccessReq: Req.idle(),
     signupReq: Req.idle(),
   };
 }
@@ -97,6 +99,18 @@ export const slice = createSlice({
     builder.addCase(createSignupPaymentUrl.failed, (state, action) => {
       state.createPaymentUrlReq = Req.fail(action.error);
     });
+
+    builder.addCase(handleSignupPaymentSuccess.started, (state) => {
+      state.checkoutSuccessReq = Req.ongoing();
+    });
+
+    builder.addCase(handleSignupPaymentSuccess.succeeded, (state) => {
+      state.checkoutSuccessReq = Req.succeed(void 0);
+    });
+
+    builder.addCase(handleSignupPaymentSuccess.failed, (state, action) => {
+      state.checkoutSuccessReq = Req.fail(action.error);
+    });
   },
 });
 
@@ -118,6 +132,16 @@ export const verifySignupEmail = createResultThunk(
 export const createSignupPaymentUrl = createResultThunk(
   `${slice.name}/createSignupPaymentUrl`,
   Current.api.signup.createSignupPaymentUrl,
+);
+
+export const handleSignupPaymentSuccess = createResultThunk(
+  `${slice.name}/handleSignupPaymentSuccess`,
+  Current.api.signup.handleSignupPaymentSuccess,
+);
+
+export const handleSignupPaymentCanceled = createResultThunk(
+  `${slice.name}/handleSignupPaymentCanceled`,
+  Current.api.signup.handleSignupPaymentCanceled,
 );
 
 export const initiateSignup = createResultThunk(

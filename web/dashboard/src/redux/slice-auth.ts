@@ -5,6 +5,7 @@ import { OptionalVar as Optional } from '../environment/Environment';
 import { StorageClient } from '../environment/Storage';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
+import { handleSignupPaymentSuccess } from './slice-signup';
 
 export interface AuthState {
   admin: AdminIds | null;
@@ -88,6 +89,10 @@ export const slice = createSlice({
 
     builder.addCase(loginFromMagicLink.failed, (state, action) => {
       state.loginFromMagicLinkRequest = Req.fail(action.error);
+    });
+
+    builder.addCase(handleSignupPaymentSuccess.succeeded, (state, { payload: admin }) => {
+      state.admin = admin;
     });
   },
 });

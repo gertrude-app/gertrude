@@ -29,6 +29,7 @@ export const ICONS = [
   `laptop`,
   `binoculars`,
   `clock`,
+  `thumbs-up`,
 ] as const;
 
 export type IconType = typeof ICONS[number];
@@ -68,6 +69,7 @@ const CLASS_MAP: Record<Props['icon'], string> = {
   slack: `fa-brands fa-slack`,
   laptop: `fa-solid fa-laptop`,
   binoculars: `fa-solid fa-binoculars`,
+  'thumbs-up': `fa-solid fa-thumbs-up translate-x-px`,
 };
 
 const GradientIcon: React.FC<Props> = ({ icon, className, size, subtle = false }) => {
