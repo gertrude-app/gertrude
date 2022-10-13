@@ -130,12 +130,13 @@ export function getInitialAdmin(): AdminIds | null {
     return null;
   }
 
-  const ids = adminFrom(Current.sessionStorage) ?? adminFrom(Current.localStorage);
+  const ids = adminFrom(Current.localStorage) ?? adminFrom(Current.sessionStorage);
   if (ids || Current.env.isProd()) {
     return ids;
   }
 
   if (Current.sessionStorage.getItem(`dev_logged_out`) !== null) {
+    Current.sessionStorage.removeItem(`dev_logged_out`);
     return null;
   }
 

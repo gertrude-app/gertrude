@@ -45,7 +45,7 @@ export const slice = createSlice({
     });
 
     builder.addCase(allowingSignups.succeeded, (state, { payload }) => {
-      state.allowingSignupsReq = payload ? Req.succeed(payload) : Req.fail();
+      state.allowingSignupsReq = Req.succeed(payload);
     });
 
     builder.addCase(allowingSignups.failed, (state, action) => {

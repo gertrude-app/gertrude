@@ -83,7 +83,7 @@ const Profile: React.FC<Props> = ({
     <div className="flex flex-col lg:flex-row mt-8">
       <div className="p-8 bg-gray-100 rounded-xl flex-grow lg:mr-2 border max-w-3xl">
         <h2 className="text-lg text-gray-900 mb-2">Email address:</h2>
-        <TextInput type="email" label="" value={email} setValue={() => {}} />
+        <TextInput type="email" label="" value={email} disabled setValue={() => {}} />
       </div>
       <div className="px-8 py-4 bg-gray-100 rounded-xl lg:ml-2 lg:w-1/3 flex justify-between relative border mt-4 lg:mt-0">
         <div className="flex justify-end items-start flex-col mr-8">

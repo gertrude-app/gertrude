@@ -22,12 +22,13 @@ function getClient(): ApolloClient<NormalizedCacheObject> {
   const httpLink = createHttpLink({ uri: Current.env.graphQLEndpoint() });
   const authLink = setContext((_, { headers }) => {
     const token =
-      Current.sessionStorage.getItem(`admin_token`) ??
-      Current.localStorage.getItem(`admin_token`);
+      Current.localStorage.getItem(`admin_token`) ??
+      Current.sessionStorage.getItem(`admin_token`);
     return {
       headers: {
         ...headers,
         Authorization: token ? `Bearer ${token}` : ``,
+        ...(Current.env.isProd() ? {} : { 'X-Dashboard-Url': window.location.origin }),
       },
     };
   });
