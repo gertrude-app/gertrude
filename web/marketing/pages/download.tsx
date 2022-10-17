@@ -1,7 +1,6 @@
 import Logo from '@shared/Logo';
 import Chrome from 'components/Chrome';
 import type { NextPage } from 'next';
-import Image, { StaticImageData } from 'next/image';
 import BigSur from '../public/macos-big-sur.png';
 import Monterey from '../public/macos-monterey.png';
 import Ventura from '../public/macos-ventura.png';
@@ -44,7 +43,7 @@ interface OperatingSystemProps {
 const OperatingSystem: React.FC<OperatingSystemProps> = ({ name, img }) => {
   return (
     <div className="flex flex-row xs:flex-col items-center p-3 rounded-xl shadow-lg bg-white flex-grow">
-      <img src={img} width={70} height={70} />
+      <img src={img} width={70} height={70} alt="macOS operating system icon" />
       <div className="mt-1 flex flex-col items-start xs:items-center ml-2 xs:ml-0">
         <label className="text-sm text-gray-500 -mb-1">macOS</label>
         <h3 className="font-bold text-gray-700 text-lg">{name}</h3>
