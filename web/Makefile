@@ -3,20 +3,17 @@ help:
 
 # local dev
 
-storybook:
+storybook: sync-clean-sync
 	make sync-clean
 	$(CONCURRENTLY) -n rs,sb -c cyan.dim,magenta.dim "make watchsync" "make start-storybook"
 
-marketing:
-	make sync-clean
+marketing: sync-clean sync
 	$(CONCURRENTLY) -n rs,nx -c cyan.dim,magenta.dim "make watchsync" "make start-marketing"
 
-dashboard:
-	make sync-clean
+dashboard: sync-clean sync
 	$(CONCURRENTLY) -n rs,sp -c cyan.dim,magenta.dim "make watchsync" "make start-dashboard"
 
-all:
-	make sync-clean
+all: sync-clean sync
 	$(CONCURRENTLY) \
 	  -n rs,sb,mk,ds,dx \
 	  -c cyan.dim,magenta.dim,yellow.dim,green.dim,red.dim \
