@@ -19,9 +19,9 @@ const Download: NextPage = () => {
             We currently support the following operating systems:
           </p>
           <div className="flex flex-col xs:flex-row space-y-2 xs:space-y-0 xs:space-x-6 self-stretch">
-            <OperatingSystem name="Big Sur" img={BigSur} />
-            <OperatingSystem name="Monterey" img={Monterey} />
-            <OperatingSystem name="Ventura" img={Ventura} />
+            <OperatingSystem name="Big Sur" img={BigSur.src} />
+            <OperatingSystem name="Monterey" img={Monterey.src} />
+            <OperatingSystem name="Ventura" img={Ventura.src} />
           </div>
         </div>
         <button className="bg-gradient-to-b from-white via-white to-fuchsia-100 px-8 py-4 text-2xl rounded-xl shadow-xl shadow-fuchsia-600 font-medium hover:-translate-y-1 transition duration-100 hover:shadow-2xl active:translate-y-1 active:shadow-md active:scale-95 hover:shadow-fuchsia-700">
@@ -38,13 +38,13 @@ export default Download;
 
 interface OperatingSystemProps {
   name: string;
-  img: StaticImageData;
+  img: string;
 }
 
 const OperatingSystem: React.FC<OperatingSystemProps> = ({ name, img }) => {
   return (
     <div className="flex flex-row xs:flex-col items-center p-3 rounded-xl shadow-lg bg-white flex-grow">
-      <Image src={img} width={70} height={70} />
+      <img src={img} width={70} height={70} />
       <div className="mt-1 flex flex-col items-start xs:items-center ml-2 xs:ml-0">
         <label className="text-sm text-gray-500 -mb-1">macOS</label>
         <h3 className="font-bold text-gray-700 text-lg">{name}</h3>
