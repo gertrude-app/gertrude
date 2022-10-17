@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '../../../Button';
 import SelectMenu from '../../SelectMenu';
-import TextInput from '../../TextInput';
+import TextInput from '../../../TextInput';
 import {
   AdminNotificationMethod,
   PendingNotificationMethod,

@@ -1,7 +1,7 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import Logo from '../../Logo';
 import SelectableListItem from '../SelectableListItem';
-import TextInput from '../TextInput';
+import TextInput from '../../TextInput';
 import Modal from './Modal';
 
 export default {

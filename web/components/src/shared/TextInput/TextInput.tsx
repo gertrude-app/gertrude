@@ -1,7 +1,6 @@
 import React, { useId, useState } from 'react';
 import cx from 'classnames';
 import Label from './Label';
-import { isoToDateInput } from '../lib/dates';
 
 type CommonProps = {
   label?: string;
@@ -101,4 +100,43 @@ function isInput(props: { type: Props['type'] }): props is {
   type: InputType;
 } & InputProps {
   return props.type !== `textarea`;
+}
+
+export function isoToDateInput(iso: string): string {
+  return formatDate(new Date(iso), `dateInput`);
+}
+
+export function formatDate(
+  date: Date,
+  style: 'long' | 'medium' | 'short' | 'url' | 'dateInput',
+): string {
+  if (style === `short`) {
+    return date.toLocaleDateString();
+  }
+
+  if (style === `url`) {
+    return [
+      `${date.getMonth() + 1}`.padStart(2, `0`),
+      `${date.getDate()}`.padStart(2, `0`),
+      `${date.getFullYear()}`,
+    ].join(`-`);
+  }
+
+  if (style === `dateInput`) {
+    return [
+      `${date.getFullYear()}`,
+      `${date.getMonth() + 1}`.padStart(2, `0`),
+      `${date.getDate()}`.padStart(2, `0`),
+    ].join(`-`);
+  }
+
+  return [
+    date.toLocaleDateString(`en-US`, { weekday: `long` }),
+    `, `,
+    date.toLocaleDateString(`en-US`, { month: style === `long` ? `long` : `short` }),
+    style === `long` ? ` ` : `. `,
+    date.getDate(),
+    `, `,
+    date.getFullYear(),
+  ].join(``);
 }

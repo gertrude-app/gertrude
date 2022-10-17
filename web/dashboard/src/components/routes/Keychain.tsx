@@ -22,8 +22,8 @@ import {
   editKeyClicked,
   upsertEditingKeyRecord,
 } from '../../redux/slice-keychains';
-import { toKeyRecord } from '../shared/dashboard/lib/keys/convert';
 import { getIdentifiedApps } from '../../redux/slice-apps';
+import { toKeyRecord } from '@dashboard/lib/keys/convert';
 
 const Keychain: React.FC = () => {
   const { keychainId: id = `` } = useParams<{ keychainId: string }>();

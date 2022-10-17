@@ -8,7 +8,7 @@ import {
   utcToLocal,
   isoToLocal,
 } from '../../../lib/dates';
-import TextInput from '../../../TextInput';
+import TextInput from '../../../../TextInput';
 import Toggle from '../../../Toggle';
 import KeyCreationStep from './KeyCreationStep';
 import GradientIcon from '../../../GradientIcon';

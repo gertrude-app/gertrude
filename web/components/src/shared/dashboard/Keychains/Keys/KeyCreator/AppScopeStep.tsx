@@ -1,6 +1,6 @@
 import React from 'react';
 import SelectableListItem from '../../../SelectableListItem';
-import Label from '../../../TextInput/Label';
+import Label from '../../../../TextInput/Label';
 import KeyCreationStep from './KeyCreationStep';
 import GradientIcon from '../../../GradientIcon';
 import UserInputText from './UserInputText';

@@ -4,7 +4,7 @@ import { inflect } from '../../lib/string';
 import { ConfirmableEntityAction } from '../../../types';
 import Modal, { ConfirmDeleteEntity } from '../../Modal';
 import PageHeading from '../../PageHeading';
-import TextInput from '../../TextInput';
+import TextInput from '../../../TextInput';
 import KeyCreator from '../Keys/KeyCreator';
 import KeyList from '../../KeyList';
 import * as EditKey from '../../lib/keys/edit';

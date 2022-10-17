@@ -5,7 +5,7 @@ import PageHeading from '../../dashboard/PageHeading';
 import PillBadge from '../../dashboard/PillBadge';
 import NewNotificationMethodSidebar from './NewNotificationMethodForm';
 import NotificationCard from './NotificationCard';
-import TextInput from '../../dashboard/TextInput';
+import TextInput from '../../TextInput';
 import NotificationMethod from './NotificationMethod';
 import { ConfirmableEntityAction, SubcomponentsOmit } from '../../types';
 import { ConfirmDeleteEntity } from '../Modal';
