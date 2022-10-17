@@ -8,9 +8,10 @@ import { matchPath } from 'react-router-dom';
 import { redirectCleared } from './slice-url';
 import type { State, Dispatch } from './store';
 
-export const useDispatch: typeof libUseDispatch<Dispatch> = () =>
-  libUseDispatch<Dispatch>();
 export const useSelector: TypedUseSelectorHook<State> = libUseSelector;
+
+/* eslint-disable-next-line */
+export const useDispatch = () => libUseDispatch<Dispatch>();
 
 export const useRedirect: () => string | null = () => {
   const dispatch = useDispatch();

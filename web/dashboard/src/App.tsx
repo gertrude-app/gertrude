@@ -6,6 +6,9 @@ import AuthedChrome from './components/Authed';
 import Dashboard from './components/routes/Dashboard';
 import Login from './components/routes/Login';
 import MagicLink from './components/routes/MagicLink';
+import VerifySignupEmail from './components/routes/VerifySignupEmail';
+import CheckoutSuccess from './components/routes/CheckoutSuccess';
+import CheckoutCancel from './components/routes/CheckoutCancel';
 import JoinWaitlist from './components/routes/JoinWaitlist';
 import AdminProfile from './components/routes/AdminProfile';
 import Keychain from './components/routes/Keychain';
@@ -13,8 +16,10 @@ import Users from './components/routes/Users';
 import UserActivityOverview from './components/routes/UserActivityOverview';
 import UserActivityDay from './components/routes/UserActivityDay';
 import Keychains from './components/routes/Keychains';
+import Signup from './components/routes/Signup';
 import User from './components/routes/User';
 import useWindowWidth from './hooks/window-width';
+import Current from './environment';
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
@@ -45,7 +50,17 @@ const App: React.FC = () => {
       {/* unauthed routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/otp/:token" element={<MagicLink />} />
-      <Route path="/join-waitlist" element={<JoinWaitlist />} />
+
+      {Current.env.isProd() ? (
+        <Route path="/join-waitlist" element={<JoinWaitlist />} />
+      ) : (
+        <>
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-signup-email/:token" element={<VerifySignupEmail />} />
+          <Route path="/checkout-success" element={<CheckoutSuccess />} />
+          <Route path="/checkout-cancel" element={<CheckoutCancel />} />
+        </>
+      )}
 
       {/* authed routes */}
       <Route path="/" element={<AuthedChrome />}>

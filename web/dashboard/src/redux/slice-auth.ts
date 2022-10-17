@@ -5,6 +5,7 @@ import { OptionalVar as Optional } from '../environment/Environment';
 import { StorageClient } from '../environment/Storage';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
+import { handleSignupPaymentSuccess } from './slice-signup';
 
 export interface AuthState {
   admin: AdminIds | null;
@@ -89,6 +90,10 @@ export const slice = createSlice({
     builder.addCase(loginFromMagicLink.failed, (state, action) => {
       state.loginFromMagicLinkRequest = Req.fail(action.error);
     });
+
+    builder.addCase(handleSignupPaymentSuccess.succeeded, (state, { payload: admin }) => {
+      state.admin = admin;
+    });
   },
 });
 
@@ -125,12 +130,13 @@ export function getInitialAdmin(): AdminIds | null {
     return null;
   }
 
-  const ids = adminFrom(Current.sessionStorage) ?? adminFrom(Current.localStorage);
+  const ids = adminFrom(Current.localStorage) ?? adminFrom(Current.sessionStorage);
   if (ids || Current.env.isProd()) {
     return ids;
   }
 
   if (Current.sessionStorage.getItem(`dev_logged_out`) !== null) {
+    Current.sessionStorage.removeItem(`dev_logged_out`);
     return null;
   }
 

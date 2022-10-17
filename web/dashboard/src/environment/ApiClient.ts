@@ -132,6 +132,24 @@ export const throwingApiClient: ApiClient = {
     joinWaitlist: () => {
       throw new Error(`ApiClient.signup.joinWaitlist() not implemented.`);
     },
+    allowingSignups: () => {
+      throw new Error(`ApiClient.signup.allowingSignups() not implemented.`);
+    },
+    initiateSignup: () => {
+      throw new Error(`ApiClient.signup.sendVerificationEmail() not implemented.`);
+    },
+    createSignupPaymentUrl: () => {
+      throw new Error(`ApiClient.signup.createSignupPaymentUrl() not implemented.`);
+    },
+    handleSignupPaymentCanceled: () => {
+      throw new Error(`ApiClient.signup.handleSignupPaymentCanceled() not implemented.`);
+    },
+    handleSignupPaymentSuccess: () => {
+      throw new Error(`ApiClient.signup.handleSignupPaymentSuccess() not implemented.`);
+    },
+    verifySignupEmail: () => {
+      throw new Error(`ApiClient.signup.verifySignupEmail() not implemented.`);
+    },
   },
 };
 
@@ -246,7 +264,25 @@ export const noopApiClient: ApiClient = {
   },
   signup: {
     joinWaitlist: async () => {
-      return Result.success(true);
+      return Result.true();
+    },
+    allowingSignups: async () => {
+      return Result.true();
+    },
+    initiateSignup: async () => {
+      return Result.success(null);
+    },
+    createSignupPaymentUrl: async () => {
+      return Result.success(``);
+    },
+    handleSignupPaymentCanceled: async () => {
+      return Result.true();
+    },
+    handleSignupPaymentSuccess: async () => {
+      return Result.success({ id: ``, token: `` });
+    },
+    verifySignupEmail: async () => {
+      return Result.success(``);
     },
   },
 };

@@ -2,10 +2,12 @@ import React from 'react';
 import cx from 'classnames';
 import FullscreenGradientBg from '../FullscreenGradientBg';
 import LoadingSpinner from '../../../LoadingSpinner';
+import GradientIcon from '../../GradientIcon';
+import Button from '../../../Button';
 
 type Props =
   | { request: `idle`; children: React.ReactNode }
-  | { request: `ongoing` }
+  | { request: `ongoing`; text?: string }
   | { request: `failed`; error: React.ReactNode }
   | { request: `succeeded`; message: string };
 
@@ -14,7 +16,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
     case `ongoing`:
       return (
         <FullscreenGradientBg>
-          <LoadingSpinner />
+          <LoadingSpinner text={props.text} />
         </FullscreenGradientBg>
       );
 
@@ -24,14 +26,30 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
         <FullscreenGradientBg>
           <div
             className={cx(
-              `bg-white font-sans rounded-2xl mx-4 px-10 py-6 shadow-lg flex items-center`,
-              props.request === `succeeded` ? `text-green-900` : `text-red-800`,
+              `bg-white font-sans max-w-lg rounded-2xl mx-4 pt-8 pl-7 pr-8 shadow-lg flex space-x-4`,
+              props.request === `failed` ? `items-start pb-6` : `items-center pb-8`,
             )}
           >
-            <span role="img" aria-hidden className="text-3xl pr-3">
-              {props.request === `succeeded` ? `🎉 ` : `😢`}
-            </span>
-            <span>{props.request === `succeeded` ? props.message : props.error}</span>
+            <GradientIcon
+              icon={props.request === `succeeded` ? `thumbs-up` : `exclamation-triangle`}
+              size="medium"
+            />
+            <div className="flex flex-col items-end">
+              <p className={cx(props.request === `failed` ?? `text-red-900`)}>
+                {props.request === `succeeded` ? props.message : props.error}
+              </p>
+              {props.request === `failed` && (
+                <Button
+                  color="secondary-white"
+                  type="external"
+                  href="https://gertrude.app/contact"
+                  small
+                  className="mt-5"
+                >
+                  Contact support &rarr;
+                </Button>
+              )}
+            </div>
           </div>
         </FullscreenGradientBg>
       );

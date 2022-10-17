@@ -1,6 +1,6 @@
 import React, { JSXElementConstructor } from 'react';
 import { configureStore } from '@reduxjs/toolkit';
-import waitlistReducer from './slice-waitlist';
+import signupReducer from './slice-signup';
 import menuReducer from './slice-menu';
 import authReducer from './slice-auth';
 import usersReducer from './slice-users';
@@ -21,7 +21,7 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     keychains: keychainsReducer,
     menu: menuReducer,
-    waitlist: waitlistReducer,
+    signup: signupReducer,
     users: usersReducer,
     url: urlReducer,
   },
