@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { ConfirmableEntityAction, Subcomponents } from '../../../types';
 import Button from '../../../Button';
 import KeychainCard from '../KeychainCard';
-import TextInput from '../../TextInput';
+import TextInput from '../../../TextInput';
 import Toggle from '../../Toggle';
 import UserDevice from '../List/Card/Device';
 import PageHeading from '../../PageHeading';

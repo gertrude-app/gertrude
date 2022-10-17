@@ -1,9 +1,9 @@
 import { UpdateAdminNotificationInput } from '@dashboard/types/GraphQL';
-import { isUnsaved } from '@dashboard/lib/id';
 import Result from '../Result';
 import { gql, mutate } from '../apollo';
 import * as U from './__generated__/UpdateNotification';
 import * as C from './__generated__/CreateNotification';
+import { isUnsaved } from '@dashboard/lib/id';
 
 export async function upsertNotification(
   input: UpdateAdminNotificationInput,

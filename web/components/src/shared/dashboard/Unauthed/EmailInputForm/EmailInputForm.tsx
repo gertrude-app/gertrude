@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '../../../Button';
-import TextInput from '../../TextInput';
+import TextInput from '../../../TextInput';
 import Logo from '../../../Logo';
 
 type Props = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import TextInput from '../../../TextInput';
+import TextInput from '../../../../TextInput';
 import KeyCreationStep from './KeyCreationStep';
 import GradientIcon from '../../../GradientIcon';
 import UserInputText from './UserInputText';

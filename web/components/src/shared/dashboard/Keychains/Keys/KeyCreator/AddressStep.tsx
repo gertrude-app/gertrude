@@ -1,6 +1,6 @@
 import React from 'react';
 import SelectMenu from '../../../SelectMenu';
-import TextInput from '../../../TextInput';
+import TextInput from '../../../../TextInput';
 import Toggle from '../../../Toggle';
 import KeyCreationStep from './KeyCreationStep';
 import SubdomainDemo from './SubdomainDemo';

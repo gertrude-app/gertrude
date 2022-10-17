@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import { Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
-import Label from '../TextInput/Label';
+import Label from '../../TextInput/Label';
 
 interface Props<Value extends string> {
   options: Array<{ value: Value; display: string }>;

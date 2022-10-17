@@ -1,16 +1,14 @@
 import Logo from '@shared/Logo';
-import MainFooter from 'components/MainFooter';
-import MainHeader from 'components/MainHeader';
+import Chrome from 'components/Chrome';
 import type { NextPage } from 'next';
 import Image, { StaticImageData } from 'next/image';
 import BigSur from '../public/macos-big-sur.png';
 import Monterey from '../public/macos-monterey.png';
 import Ventura from '../public/macos-ventura.png';
 
-const Home: NextPage = () => {
+const Download: NextPage = () => {
   return (
-    <main className="overflow-hidden flex flex-col min-h-screen">
-      <MainHeader />
+    <Chrome>
       <section className="bg-gradient-to-b from-violet-500 to-fuchsia-500 flex-grow flex flex-col justify-center items-center p-6 py-10">
         <div className="bg-gray-50 shadow-xl rounded-3xl py-8 px-6 xs:px-10 sm:px-20 flex flex-col items-center mb-6">
           <Logo type="default" iconOnly size={60} className="mb-4 xs:mb-6" />
@@ -32,12 +30,11 @@ const Home: NextPage = () => {
           </span>
         </button>
       </section>
-      <MainFooter />
-    </main>
+    </Chrome>
   );
 };
 
-export default Home;
+export default Download;
 
 interface OperatingSystemProps {
   name: string;
