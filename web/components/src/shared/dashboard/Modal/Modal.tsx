@@ -83,17 +83,17 @@ const Modal: React.FC<Props> = ({
               ) : (
                 <Dialog.Panel
                   className={cx(
-                    `relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg`,
+                    `relative transform rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg`,
                     type === `container` && `lg:max-w-3xl`,
                   )}
                 >
                   {type === `container` ? (
-                    <div className="bg-white px-4 pt-5 pb-4 sm:p-4 relative">
+                    <div className="bg-white rounded-lg px-4 pt-5 pb-4 sm:p-4 relative">
                       <div className="flex justify-start items-center mb-5">
                         <GradientIcon icon={icon} size="large" />
                         <Dialog.Title
                           as="h3"
-                          className="text-xl ml-4 font-semibold leading-6 text-gray-900"
+                          className="text-xl ml-4 font-bold leading-6 text-gray-900"
                         >
                           {capitalize(title)}
                         </Dialog.Title>
@@ -101,13 +101,13 @@ const Modal: React.FC<Props> = ({
                       <div>{children}</div>
                     </div>
                   ) : (
-                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div className="bg-white rounded-lg px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                       <div className="flex flex-col sm:flex-row items-center sm:items-start">
                         <GradientIcon icon={icon} size="large" />
                         <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                           <Dialog.Title
                             as="h3"
-                            className="text-lg font-semibold leading-6 text-gray-900"
+                            className="text-xl font-bold leading-6 text-gray-900"
                           >
                             {capitalize(title)}
                           </Dialog.Title>
@@ -120,7 +120,7 @@ const Modal: React.FC<Props> = ({
                       </div>
                     </div>
                   )}
-                  <div className="sm:bg-gray-50 px-4 py-3 flex flex-col items-stretch sm:flex-row sm:px-6 sm:justify-end">
+                  <div className="sm:bg-gray-50 rounded-b-lg px-4 py-3 flex flex-col items-stretch sm:flex-row sm:px-6 sm:justify-end">
                     {type !== `error` && (
                       <Button
                         type="button"
