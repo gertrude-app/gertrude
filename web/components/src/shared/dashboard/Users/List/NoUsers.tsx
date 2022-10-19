@@ -8,13 +8,7 @@ const NoUsers: React.FC = () => (
     <p className="text-gray-500">
       Get started by adding your first user and connecting their device(s)
     </p>
-    <Button
-      color="primary-violet"
-      type="button"
-      onClick={() => {}}
-      className="mt-6"
-      small
-    >
+    <Button color="primary-violet" type="link" to="/users/new" className="mt-6" small>
       <i className="fa fa-plus mr-4" />
       Add user
     </Button>
