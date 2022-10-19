@@ -9,7 +9,7 @@ type Props = {
   selectablePublicKeychains: Keychain[];
   onSelect(keychain: Keychain): unknown;
   selected?: Keychain | null;
-  noPublic?: boolean;
+  includePublic?: boolean;
 };
 
 const KeychainPicker: React.FC<Props> = ({
@@ -18,7 +18,7 @@ const KeychainPicker: React.FC<Props> = ({
   selected,
   selectablePublicKeychains,
   onSelect,
-  noPublic = false,
+  includePublic = true,
 }) => (
   <div className="sm:bg-gray-50 rounded-xl sm:p-4">
     {selectableOwnKeychains.length !== 0 && (
@@ -59,7 +59,7 @@ const KeychainPicker: React.FC<Props> = ({
         </Button>
       </div>
     )}
-    {!noPublic && (
+    {includePublic && (
       <>
         <h2
           className={cx(

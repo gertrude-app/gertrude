@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import cx from 'classnames';
 import KeychainPicker from '../KeychainPicker';
 import KeyCreator from '../Keychains/Keys/KeyCreator';
 import { relativeTime } from '../lib/dates';
@@ -7,6 +8,7 @@ import { Step } from '../lib/keys/edit';
 import Modal from '../Modal';
 import { keychains } from '../story-helpers';
 import Toggle from '../Toggle';
+import UserInputText from '../Keychains/Keys/KeyCreator/UserInputText';
 
 type Props = {
   step: 'preview request' | 'create key' | 'select keychain';
@@ -37,83 +39,68 @@ const UnlockRequestResponder: React.FC<Props> = ({
   appBundleId,
   protocol,
 }) => {
-  const [advanced, setAdvanced] = useState(false);
   const [appDetailsExpanded, setAppDetailsExpanded] = useState(false);
   if (step === `preview request`) {
     return (
       <Modal
         type={`container`}
         icon={`unlock`}
-        title={`Unlock request from ${userName}`}
+        title={`Unlock request`}
         isOpen={isOpen}
         primaryButtonText="Create key"
         secondaryButtonText="Deny"
         onPrimaryClick={() => {}}
         onDismiss={() => {}}
       >
-        <h3 className="absolute right-5 top-7 text-lg font-medium text-gray-500">
-          {relativeTime(dateRequested)}
-        </h3>
-        <div className="flex flex-col">
-          <div className="flex justify-center items-center p-4 relative">
-            <i className="fa-solid fa-quote-left absolute left-5 text-5xl text-gray-200 opacity-70 z-0" />
-            <i className="fa-solid fa-quote-right absolute right-5 text-5xl text-gray-200 opacity-70 z-0" />
-            <p className="text-center text-lg text-gray-500 font-medium relative z-10">
-              {comment || `No comment`}
-            </p>
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 px-3 pt-2">
+          <div className="flex flex-col items-center sm:items-start mr-4">
+            <h1 className="text-xl font-bold">{userName}</h1>
+            <h3 className="text-gray-500">{relativeTime(dateRequested)}</h3>
           </div>
-          <div className="flex flex-col bg-gray-50 p-4 mt-3 rounded-xl">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-bold text-lg text-gray-800">
-                {userName} wants access to:
-              </h2>
-              <div className="flex items-center">
-                <label className="mr-2 text-gray-600">Advanced:</label>
-                <Toggle enabled={advanced} small setEnabled={setAdvanced} />
-              </div>
-            </div>
-            <div className="flex-grow">
-              {advanced ? (
-                <div>
-                  {target.url && <TargetCard target={target.url} type={`URL`} />}
-                  {target.domain && <TargetCard target={target.domain} type={`Domain`} />}
-                  {target.IPAddress && (
-                    <TargetCard target={target.IPAddress} type={`IP address`} />
-                  )}
-                </div>
-              ) : (
-                <div className="border bg-white p-3 rounded-xl shadow overflow-hidden">
-                  <Link
-                    className="text-indigo-600 hover:text-indigo-700 transition duration-75 text-lg underline whitespace-nowrap"
-                    to={target.url || (target.domain && `https://${target.domain}`)!} // not sure how hrefs with ip addresses work
-                  >
-                    <i className="fa-solid fa-arrow-up-right-from-square mr-2" />
-                    {target.url || target.domain || target.IPAddress}
-                  </Link>
-                </div>
+          <div className="mt-3 sm:mt-0">
+            <UserInputText className="text-center sm:text-left">{comment}</UserInputText>
+          </div>
+        </div>
+        <div className="bg-gray-50 p-3 rounded-xl overflow-scroll">
+          <a
+            className="text-blue-700 underline cursor-pointer whitespace-nowrap sm:whitespace-normal"
+            href={
+              target.url ||
+              (target.domain && `https://${target.domain}`) ||
+              target.IPAddress
+            }
+          >
+            <i className="fa-solid fa-arrow-up-right-from-square mr-2" />
+            {target.url || target.domain || target.IPAddress}
+          </a>
+        </div>
+        <div className="bg-white border rounded-xl mb-1 flex flex-col mt-4 relative">
+          <button
+            className="hover:text-gray-600 text-gray-400 transition duration-100 absolute right-3 top-1 text-lg p-2 bg-transparent"
+            onClick={() => {
+              setAppDetailsExpanded(!appDetailsExpanded);
+            }}
+          >
+            <i
+              className={cx(
+                `fa-solid fa-chevron-down`,
+                appDetailsExpanded && '-rotate-180',
               )}
-            </div>
-          </div>
-          <div className="bg-white border rounded-xl mb-3 flex flex-col mt-4">
-            <AppDetail label="App" data={appName} />
-            {appDetailsExpanded && (
-              <>
-                <AppDetail label="App category" data={appCategory} />
-                <AppDetail label="App Bundle ID" data={appBundleId} />
-                <AppDetail label="Protocol" data={protocol} />
-              </>
-            )}
-            <div className="flex justify-center items-center py-1">
-              <button
-                className="p-2 px-4 hover:bg-violet-50 rounded-lg hover:text-violet-500 text-gray-500 transition duration-100"
-                onClick={() => {
-                  setAppDetailsExpanded(!appDetailsExpanded);
-                }}
-              >
-                {appDetailsExpanded ? `See less` : `See more`}
-              </button>
-            </div>
-          </div>
+            />
+          </button>
+          <AppDetail label="App" data={appName} />
+          {appDetailsExpanded && (
+            <>
+              <AppDetail label="App category" data={appCategory} />
+              <AppDetail label="Bundle ID" data={appBundleId} />
+              <AppDetail label="Protocol" data={protocol} />
+              {target.url && <AppDetail label="URL" data={target.url} />}
+              {target.domain && <AppDetail label="Domain" data={target.domain} />}
+              {target.IPAddress && (
+                <AppDetail label="IP Address" data={target.IPAddress} />
+              )}
+            </>
+          )}
         </div>
       </Modal>
     );
@@ -166,7 +153,7 @@ const UnlockRequestResponder: React.FC<Props> = ({
           selectableOwnKeychains={keychains}
           selectablePublicKeychains={[]}
           onSelect={() => {}}
-          noPublic
+          includePublic={false}
         />
       </div>
     </Modal>
@@ -175,26 +162,6 @@ const UnlockRequestResponder: React.FC<Props> = ({
 
 export default UnlockRequestResponder;
 
-interface TargetCardProps {
-  target: string;
-  type: 'IP address' | 'Domain' | 'URL';
-}
-
-const TargetCard: React.FC<TargetCardProps> = ({ target, type }) => {
-  return (
-    <div className="bg-white border shadow rounded-xl mb-3 p-3 flex flex-col items-start">
-      <h4 className="text-xs text-gray-500 font-medium uppercase">{type}</h4>
-      <Link
-        className="text-indigo-600 hover:text-indigo-700 transition duration-75 text-lg underline mt-1 cursor-pointer"
-        to={type === `URL` ? target : `https://${target}`}
-      >
-        <i className="fa-solid fa-arrow-up-right-from-square mr-2" />
-        {target}
-      </Link>
-    </div>
-  );
-};
-
 interface AppDetailProps {
   label: string;
   data: string;
@@ -202,9 +169,9 @@ interface AppDetailProps {
 
 const AppDetail: React.FC<AppDetailProps> = ({ label, data }) => {
   return (
-    <div className="flex items-center p-3 px-5 even:bg-gray-50">
-      <h3 className="text-gray-600 mr-3 font-medium">{label}:</h3>
-      <h2 className="text-gray-900 text-lg font-bold">{data}</h2>
+    <div className="flex items-center p-3 px-5 odd:bg-gray-50 last:rounded-b-xl overflow-scroll">
+      <h3 className="text-gray-600 mr-3 font-medium whitespace-nowrap">{label}:</h3>
+      <h2 className="text-gray-900 text-lg font-bold whitespace-nowrap">{data}</h2>
     </div>
   );
 };
