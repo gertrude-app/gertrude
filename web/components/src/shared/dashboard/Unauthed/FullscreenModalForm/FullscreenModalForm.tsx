@@ -26,16 +26,23 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
         <FullscreenGradientBg>
           <div
             className={cx(
-              `bg-white font-sans max-w-lg rounded-2xl mx-4 pt-8 pl-7 pr-8 shadow-lg flex space-x-4`,
-              props.request === `failed` ? `items-start pb-6` : `items-center pb-8`,
+              `bg-white font-sans max-w-lg rounded-2xl mx-4 pt-8 pl-7 pr-8 shadow-lg flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4`,
+              props.request === `failed`
+                ? `items-center sm:items-start pb-6`
+                : `items-center pb-8`,
             )}
           >
             <GradientIcon
               icon={props.request === `succeeded` ? `thumbs-up` : `exclamation-triangle`}
               size="medium"
             />
-            <div className="flex flex-col items-end">
-              <p className={cx(props.request === `failed` ?? `text-red-900`)}>
+            <div className="flex flex-col items-center sm:items-end">
+              <p
+                className={cx(
+                  `text-center sm:text-left`,
+                  props.request === `failed` ?? `text-red-900`,
+                )}
+              >
                 {props.request === `succeeded` ? props.message : props.error}
               </p>
               {props.request === `failed` && (
