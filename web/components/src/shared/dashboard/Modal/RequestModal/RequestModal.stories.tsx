@@ -4,9 +4,9 @@ import RequestModal from './RequestModal';
 export default {
   title: `Dashboard/Core/Modal/RequestModal`,
   component: RequestModal,
-} as ComponentMeta<typeof RequestModal<UUID>>;
+} as ComponentMeta<typeof RequestModal>;
 
-const Template: ComponentStory<typeof RequestModal<UUID>> = (args) => (
+const Template: ComponentStory<typeof RequestModal> = (args) => (
   <RequestModal {...args} />
 );
 
@@ -14,9 +14,8 @@ export const Loading = Template.bind({});
 Loading.args = {
   request: { state: `ongoing` },
   successTitle: `Success`,
-  withPayload: (payload) => <h1>Got your payload here: {payload}</h1>,
+  withPayload: (payload) => <h1>Got your payload here: {JSON.stringify(payload)}</h1>,
   withError: (err) => <h1>Got your error here, type: {err?.type}</h1>,
-  onDismiss: () => {},
   onPrimaryClick: () => {},
 };
 

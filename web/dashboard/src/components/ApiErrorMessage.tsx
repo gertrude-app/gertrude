@@ -7,9 +7,10 @@ import { logoutClicked } from '../redux/slice-auth';
 interface Props {
   error?: ApiError;
   wrapped?: boolean;
+  entity?: string;
 }
 
-const ApiErrorMessage: React.FC<Props> = ({ error, wrapped = true }) => {
+const ApiErrorMessage: React.FC<Props> = ({ error, entity, wrapped = true }) => {
   const Wrap = wrapped ? ErrorMessage : React.Fragment;
   const dispatch = useDispatch();
   switch (error?.type) {
@@ -18,6 +19,8 @@ const ApiErrorMessage: React.FC<Props> = ({ error, wrapped = true }) => {
     case `actionable`:
       return <Wrap>{error.message}</Wrap>;
     case undefined: /* fallthrough */
+    case `not_found`:
+      return <Wrap>{entity ? `${entity} not` : `Not`} found.</Wrap>;
     case `non_actionable`:
       return <Wrap>Something went wrong! Please try again.</Wrap>;
     case `auth_failed`:

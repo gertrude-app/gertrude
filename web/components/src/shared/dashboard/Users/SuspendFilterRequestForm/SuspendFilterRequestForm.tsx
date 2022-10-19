@@ -5,7 +5,6 @@ import SelectMenu from '../../SelectMenu';
 
 type Props = {
   username: string;
-  timeRequested: string;
   requestComment?: string;
   requestedDurationInSeconds: number;
   durationInSeconds: string;
@@ -30,8 +29,9 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
   <div className="mt-4 text-lg">
     <div>
       User <UserInputText small>{username}</UserInputText> requested a filter suspension
-      for{' '}
-      <UserInputText small>{Math.floor(requestedDurationInSeconds / 60)}</UserInputText>{' '}
+      for{` `}
+      <UserInputText small>{Math.floor(requestedDurationInSeconds / 60)}</UserInputText>
+      {` `}
       minutes
       {requestComment ? `, with the comment:` : `.`}
     </div>
@@ -43,11 +43,10 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
     <hr className="mt-6 opacity-50" />
     <form className="mt-4 space-y-5 mb-2">
       <SelectMenu
-        label="Duration:"
+        label="Granted duration:"
         options={DURATION_OPTS}
         selectedOption={durationInSeconds}
         setSelected={setDuration}
-        deemphasized
       />
       {durationInSeconds === `custom` && (
         <TextInput
@@ -70,7 +69,7 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
 
 export default SuspendFilterRequestForm;
 
-const DURATION_OPTS = [
+export const DURATION_OPTS = [
   { value: `180`, display: `3 minutes` },
   { value: `300`, display: `5 minutes` },
   { value: `600`, display: `10 minutes` },

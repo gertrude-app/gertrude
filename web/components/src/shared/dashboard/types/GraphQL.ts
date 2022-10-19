@@ -17,6 +17,12 @@ export enum Family {
   unknown = 'unknown',
 }
 
+export enum RequestStatus {
+  accepted = 'accepted',
+  pending = 'pending',
+  rejected = 'rejected',
+}
+
 export enum SubscriptionStatus {
   active = 'active',
   canceled = 'canceled',
@@ -133,6 +139,15 @@ export interface UpdateKeychainInput {
   id: UUID;
   isPublic: boolean;
   name: string;
+}
+
+export interface UpdateSuspendFilterRequestInput {
+  deviceId: UUID;
+  duration: number;
+  id: UUID;
+  requestComment?: string | null;
+  scope: string;
+  status: RequestStatus;
 }
 
 export interface UpdateUserInput {

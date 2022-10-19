@@ -22,7 +22,7 @@ const Template: ComponentStory<typeof KeychainPicker> = (args) => (
     isOpen={true}
     primaryButtonText="Add keychain"
     onPrimaryClick={() => {}}
-    onDismiss={() => {}}
+    onSecondaryClick={() => {}}
   >
     <KeychainPicker {...args} />
   </Modal>

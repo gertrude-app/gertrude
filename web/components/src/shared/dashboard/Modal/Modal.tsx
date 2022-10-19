@@ -15,7 +15,8 @@ interface Props {
   isOpen: boolean;
   loading?: boolean;
   onPrimaryClick(): unknown;
-  onDismiss(): unknown;
+  onSecondaryClick(): unknown;
+  onDismiss?(): unknown;
   primaryButtonDisabled?: boolean;
   children?: React.ReactNode;
   icon?: IconType;
@@ -28,6 +29,7 @@ const Modal: React.FC<Props> = ({
   secondaryButtonText = `Cancel`,
   primaryButtonDisabled = false,
   onPrimaryClick,
+  onSecondaryClick,
   onDismiss,
   type,
   children,
@@ -52,7 +54,11 @@ const Modal: React.FC<Props> = ({
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={onDismiss}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        onClose={onDismiss ? onDismiss : onSecondaryClick}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -113,7 +119,7 @@ const Modal: React.FC<Props> = ({
                           </Dialog.Title>
                           <div className="mt-2">
                             {children && (
-                              <p className="text-sm text-gray-500">{children}</p>
+                              <div className="text-sm text-gray-500">{children}</div>
                             )}
                           </div>
                         </div>
@@ -127,7 +133,7 @@ const Modal: React.FC<Props> = ({
                         small
                         color="secondary-white"
                         className="sm:mr-3 w-[100%] sm:w-auto mb-3 sm:mb-0"
-                        onClick={onDismiss}
+                        onClick={onSecondaryClick}
                       >
                         {secondaryButtonText}
                       </Button>
@@ -137,12 +143,10 @@ const Modal: React.FC<Props> = ({
                       disabled={primaryButtonDisabled}
                       small
                       color={
-                        type === `destructive` || type === `error`
-                          ? `secondary-warning`
-                          : `primary-violet`
+                        type === `destructive` ? `secondary-warning` : `primary-violet`
                       }
                       className="w-[100%] sm:w-auto"
-                      onClick={type === `error` ? onDismiss : onPrimaryClick}
+                      onClick={type === `error` ? onSecondaryClick : onPrimaryClick}
                     >
                       {primaryButtonText}
                     </Button>

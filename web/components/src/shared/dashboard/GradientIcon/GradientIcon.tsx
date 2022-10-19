@@ -30,7 +30,9 @@ export const ICONS = [
   `binoculars`,
   `clock`,
   `thumbs-up`,
+  `thumbs-down`,
   `stopwatch`,
+  `question`,
 ] as const;
 
 export type IconType = typeof ICONS[number];
@@ -68,9 +70,11 @@ const CLASS_MAP: Record<Props['icon'], string> = {
   email: `fa-solid fa-envelope`,
   phone: `fa-solid fa-mobile`,
   slack: `fa-brands fa-slack`,
+  question: `fa-solid fa-question`,
   laptop: `fa-solid fa-laptop`,
   binoculars: `fa-solid fa-binoculars`,
   'thumbs-up': `fa-solid fa-thumbs-up translate-x-px`,
+  'thumbs-down': `fa-solid fa-thumbs-down translate-y-px`,
   stopwatch: `fa-solid fa-stopwatch`,
 };
 

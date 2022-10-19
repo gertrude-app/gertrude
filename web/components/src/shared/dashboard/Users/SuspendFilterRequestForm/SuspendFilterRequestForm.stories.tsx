@@ -11,7 +11,7 @@ const inModal: DecoratorFn = (Story) => (
     primaryButtonText="Grant"
     secondaryButtonText="Deny"
     onPrimaryClick={() => {}}
-    onDismiss={() => {}}
+    onSecondaryClick={() => {}}
   >
     <Story />
   </Modal>
@@ -30,7 +30,6 @@ const Template: ComponentStory<typeof SuspendFilterRequestForm> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   username: `Win`,
-  timeRequested: `2021-03-01 12:00:00`,
   requestComment: `Watch some videos for Al's class`,
   requestedDurationInSeconds: 60 * 5,
   durationInSeconds: `60`,

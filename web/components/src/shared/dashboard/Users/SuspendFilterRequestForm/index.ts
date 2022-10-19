@@ -1,1 +1,1 @@
-export { default } from './SuspendFilterRequestForm';
+export { default, DURATION_OPTS } from './SuspendFilterRequestForm';

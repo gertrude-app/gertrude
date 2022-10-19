@@ -64,7 +64,7 @@ const EditKeychain: React.FC<Props> = ({
       }
       primaryButtonDisabled={keyModalSaveButtonDisabled}
       onPrimaryClick={onKeySave}
-      onDismiss={dismissEditKeyModal}
+      onSecondaryClick={dismissEditKeyModal}
     >
       {editingKey && <KeyCreator update={updateEditingKey} {...editingKey} apps={apps} />}
     </Modal>

@@ -28,7 +28,7 @@ function RequestModal<Payload>({
   primaryButtonDisabled,
   primaryButtonText,
   icon,
-}: Parameters<React.FC<Props<Payload>>>[0]): ReturnType<React.FC<Props<Payload>>> {
+}: Props<Payload>): ReturnType<React.FC<Props<Payload>>> {
   return (
     <Modal
       type={request?.state === `failed` ? `error` : successType}
@@ -38,7 +38,7 @@ function RequestModal<Payload>({
       primaryButtonText={primaryButtonText}
       primaryButtonDisabled={primaryButtonDisabled}
       onPrimaryClick={onPrimaryClick}
-      onDismiss={onDismiss}
+      onSecondaryClick={onDismiss}
       icon={icon}
     >
       {request?.state === `succeeded` ? withPayload(request.payload) : null}
