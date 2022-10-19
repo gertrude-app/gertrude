@@ -92,11 +92,13 @@ const EditKeychain: React.FC<Props> = ({
         <h2 className="mb-2 text-lg font-bold text-gray-700">
           {keys.length} {inflect(`key`, keys.length)}:
         </h2>
-        <KeyList
-          keys={keys}
-          editKey={beginEditKey}
-          deleteKey={(id) => deleteKey.start(id)}
-        />
+        {keys.length > 0 && (
+          <KeyList
+            keys={keys}
+            editKey={beginEditKey}
+            deleteKey={(id) => deleteKey.start(id)}
+          />
+        )}
         <div className="mt-4 flex justify-end">
           <Button color="secondary-white" small type="button" onClick={onCreateNewKey}>
             <i className="fa-solid fa-plus mr-2" />
