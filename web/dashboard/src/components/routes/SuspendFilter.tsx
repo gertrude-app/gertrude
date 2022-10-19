@@ -13,6 +13,7 @@ import {
   grantedCustomDurationInMinutesUpdated,
   updateSuspendFilterRequest,
 } from '../../redux/slice-filter-suspensions';
+import { isOlderThan } from '@shared/dashboard/lib/dates';
 
 const SuspendFilter: React.FC = () => {
   const dispatch = useDispatch();
@@ -92,6 +93,24 @@ const SuspendFilter: React.FC = () => {
     );
   }
 
+  if (isOlderThan(payload.createdAt, { hours: 2 })) {
+    return (
+      <Modal
+        type="error"
+        title="Suspend Filter Request"
+        isOpen={true}
+        onPrimaryClick={goToDashboard}
+        onSecondaryClick={goToDashboard}
+        icon="clock"
+      >
+        <span className="text-base">
+          This filter suspension request is <b>more than 2 hours old.</b> Have the user
+          request another one if they still need their filter suspended.
+        </span>
+      </Modal>
+    );
+  }
+
   return (
     <Modal
       type="default"
@@ -121,6 +140,7 @@ const SuspendFilter: React.FC = () => {
         requestComment={payload.requestComment}
         durationInSeconds={grantedDurationInSeconds}
         customDurationInMinutes={grantedCustomDurationInMinutes}
+        requestedAt={payload.createdAt}
         responseComment={responseComment}
         setResponseComment={(comment) => dispatch(responseCommentUpdated(comment))}
         setDuration={(duration) => dispatch(grantedDurationInSecondsUpdated(duration))}

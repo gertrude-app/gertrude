@@ -7,4 +7,5 @@ export interface SuspendFilterRequest {
   status: RequestStatus;
   requestedDurationInSeconds: number;
   requestComment?: string;
+  createdAt: string;
 }

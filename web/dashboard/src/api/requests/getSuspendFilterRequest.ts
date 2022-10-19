@@ -19,6 +19,7 @@ export async function getSuspendFilterRequest(
     requestedDurationInSeconds: data.request.requestedDurationInSeconds,
     requestComment: data.request.requestComment ?? undefined,
     userName: data.request.device.user.name,
+    createdAt: data.request.createdAt,
     status: data.request.status,
   }));
 }
@@ -29,6 +30,7 @@ const QUERY = gql`
       duration
       requestComment
       requestedDurationInSeconds: duration
+      createdAt
       status
       device {
         id

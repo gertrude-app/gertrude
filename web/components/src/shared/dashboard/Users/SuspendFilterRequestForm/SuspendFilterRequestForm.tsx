@@ -1,6 +1,8 @@
 import React from 'react';
 import TextInput from '../../../TextInput';
 import UserInputText from '../../Keychains/Keys/KeyCreator/UserInputText';
+import * as date from '../../lib/dates';
+import { capitalize } from '../../lib/string';
 import SelectMenu from '../../SelectMenu';
 
 type Props = {
@@ -13,6 +15,7 @@ type Props = {
   setResponseComment(comment: string): unknown;
   setDuration(duration: string): unknown;
   setCustomDuration(duration: string): unknown;
+  requestedAt: string;
 };
 
 const SuspendFilterRequestForm: React.FC<Props> = ({
@@ -25,11 +28,23 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
   setResponseComment,
   customDurationInMinutes,
   setCustomDuration,
+  requestedAt,
 }) => (
-  <div className="mt-4 text-lg">
+  <div className="mt-5 text-lg">
     <div>
-      User <UserInputText small>{username}</UserInputText> requested a filter suspension
-      for{` `}
+      {date.isOlderThan(requestedAt, { minutes: 5 }) ? (
+        <>
+          <UserInputText small>
+            {capitalize(date.relativeTime(new Date(requestedAt)))}
+          </UserInputText>
+          {` `}user
+        </>
+      ) : (
+        `User`
+      )}
+      {` `}
+      <UserInputText small>{username}</UserInputText> requested a filter suspension for
+      {` `}
       <UserInputText small>{Math.floor(requestedDurationInSeconds / 60)}</UserInputText>
       {` `}
       minutes

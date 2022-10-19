@@ -282,6 +282,7 @@ export const noopApiClient: ApiClient = {
         requestedDurationInSeconds: 0,
         userName: ``,
         status: RequestStatus.pending,
+        createdAt: ``,
       });
     },
     updateSuspendFilterRequest: async () => {

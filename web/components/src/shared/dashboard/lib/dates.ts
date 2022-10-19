@@ -1,4 +1,25 @@
-// import * as typesafe from './typesafe';
+export function isOlderThan(
+  isoOrDate: string | Date,
+  amounts: {
+    days?: number;
+    hours?: number;
+    minutes?: number;
+  },
+): boolean {
+  const date = typeof isoOrDate === `string` ? new Date(isoOrDate) : isoOrDate;
+  const compare = new Date();
+  if (amounts.days) {
+    compare.setDate(compare.getDate() - amounts.days);
+  }
+  if (amounts.hours) {
+    compare.setHours(compare.getHours() - amounts.hours);
+  }
+  if (amounts.minutes) {
+    compare.setMinutes(compare.getMinutes() - amounts.minutes);
+  }
+  return date < compare;
+}
+
 /**
  * long: `Thursday, August 18, 2022`
  * medium: `Thursday, Aug. 18, 2022`

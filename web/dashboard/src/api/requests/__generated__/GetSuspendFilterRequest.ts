@@ -25,6 +25,7 @@ export interface GetSuspendFilterRequest_request {
   duration: number;
   requestComment: string | null;
   requestedDurationInSeconds: number;
+  createdAt: string;
   status: RequestStatus;
   device: GetSuspendFilterRequest_request_device;
 }
