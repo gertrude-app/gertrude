@@ -39,8 +39,8 @@ const SelectableListItem: React.FC<Props> = ({
       </div>
     </div>
     <div className="flex-grow p-3">
-      <h3 className="font-bold">{title}</h3>
-      <p className="w-fit text-gray-500">{description}</p>
+      <h3 className="font-bold leading-tight">{title}</h3>
+      <p className="w-fit text-gray-500 text-sm mt-1 leading-snug">{description}</p>
       {badges && (
         <div className="flex mt-2 space-x-2">
           {badges.map((badge) => (

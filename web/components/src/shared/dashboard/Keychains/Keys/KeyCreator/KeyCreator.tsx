@@ -31,7 +31,7 @@ const KeyCreator: React.FC<Props> = ({
   update,
   isNew,
 }) => (
-  <>
+  <div className="min-w-[340px] xs:min-w-[475px] sm:min-w-[550px]">
     <KeyTypeStep
       update={update}
       mode={isNew ? `create` : `edit`}
@@ -110,7 +110,7 @@ const KeyCreator: React.FC<Props> = ({
       comment={comment}
       update={update}
     />
-  </>
+  </div>
 );
 
 export default KeyCreator;

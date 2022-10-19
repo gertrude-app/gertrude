@@ -33,7 +33,7 @@ const AddressStep: React.FC<Props> = ({
     lookaheadTitle="Website address"
     activeTitle="Select website address:"
     title={
-      <h2 className="font-medium text-gray-900 text-lg">
+      <h2 className="font-medium text-gray-900 text-lg max-w-[calc(100%-25px)] overflow-hidden">
         <GradientIcon icon="unlock" className="mr-2" size="small" />
         {keyType === `website` ? `Unlocking ` : `Address `}
         {address.trim() !== `` && <UserInputText>{address}</UserInputText>}
@@ -48,7 +48,7 @@ const AddressStep: React.FC<Props> = ({
     canAdvance={address.trim() !== ``}
   >
     <TextInput
-      type="text"
+      type="url"
       label="Web address:"
       value={address}
       setValue={(updated) => update({ type: `setAddress`, to: updated })}

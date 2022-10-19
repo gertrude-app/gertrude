@@ -16,7 +16,7 @@ const SubdomainDemo: React.FC<Props> = ({ address, addressType }) => {
   return (
     <div className="flex justify-end">
       {addressType === `standard` && (
-        <p className="text-right max-w-lg text-sm text-gray-400 my-2">
+        <p className="text-right max-w-lg text-sm text-gray-400 my-2 overflow-hidden">
           Allows any subdomain of{` `}
           <DemoURL domain={address} subdomains={[``]} />, for example
           {` `}
@@ -29,7 +29,7 @@ const SubdomainDemo: React.FC<Props> = ({ address, addressType }) => {
         </p>
       )}
       {addressType === `strict` && (
-        <p className="text-right max-w-lg text-sm text-gray-400 my-2">
+        <p className="text-right max-w-lg text-sm text-gray-400 my-2 overflow-hidden">
           Only allows access to{` `}
           <DemoURL blocked={false} domain={address} subdomains={[`www`]} />. Subdomains
           like
