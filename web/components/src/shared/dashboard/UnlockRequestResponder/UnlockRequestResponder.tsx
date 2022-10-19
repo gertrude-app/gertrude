@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import KeychainPicker from '../KeychainPicker';
 import KeyCreator from '../Keychains/Keys/KeyCreator';
@@ -7,7 +6,6 @@ import { relativeTime } from '../lib/dates';
 import { Step } from '../lib/keys/edit';
 import Modal from '../Modal';
 import { keychains } from '../story-helpers';
-import Toggle from '../Toggle';
 import UserInputText from '../Keychains/Keys/KeyCreator/UserInputText';
 
 type Props = {
@@ -84,7 +82,7 @@ const UnlockRequestResponder: React.FC<Props> = ({
             <i
               className={cx(
                 `fa-solid fa-chevron-down`,
-                appDetailsExpanded && '-rotate-180',
+                appDetailsExpanded && `-rotate-180`,
               )}
             />
           </button>
