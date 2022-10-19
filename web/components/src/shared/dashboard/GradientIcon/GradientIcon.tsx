@@ -33,6 +33,7 @@ export const ICONS = [
   `thumbs-down`,
   `stopwatch`,
   `question`,
+  `home`,
 ] as const;
 
 export type IconType = typeof ICONS[number];
@@ -55,6 +56,7 @@ const CLASS_MAP: Record<Props['icon'], string> = {
   'lightning-bolt': `fa-solid fa-bolt`,
   unlock: `fa-solid fa-unlock`,
   globe: `fa-solid fa-earth-americas`,
+  home: `fa-solid fa-home`,
   window: `fa-solid fa-window-maximize`,
   'exclamation-triangle': `fa-solid fa-exclamation-triangle -translate-y-px`,
   info: `fa-solid fa-info`,
