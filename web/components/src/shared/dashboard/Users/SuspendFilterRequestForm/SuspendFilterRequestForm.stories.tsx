@@ -18,7 +18,7 @@ const inModal: DecoratorFn = (Story) => (
 );
 
 export default {
-  title: `SuspendFilterRequestForm`,
+  title: `Dashboard/Users/SuspendFilterRequestForm`,
   component: SuspendFilterRequestForm,
   decorators: [inModal],
 } as ComponentMeta<typeof SuspendFilterRequestForm>;
