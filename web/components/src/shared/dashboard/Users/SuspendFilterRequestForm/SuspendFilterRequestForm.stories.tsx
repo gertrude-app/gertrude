@@ -4,7 +4,7 @@ import SuspendFilterRequestForm from './SuspendFilterRequestForm';
 
 const inModal: DecoratorFn = (Story) => (
   <Modal
-    type="default"
+    type="container"
     title="Suspend Filter Request"
     icon="stopwatch"
     isOpen

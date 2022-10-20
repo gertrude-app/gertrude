@@ -113,7 +113,7 @@ const SuspendFilter: React.FC = () => {
 
   return (
     <Modal
-      type="default"
+      type="container"
       title="Suspend Filter Request"
       icon="stopwatch"
       isOpen

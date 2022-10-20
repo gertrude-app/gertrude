@@ -30,8 +30,8 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
   setCustomDuration,
   requestedAt,
 }) => (
-  <div className="mt-5 text-lg">
-    <div>
+  <div className="mt-5 sm:px-2 text-lg">
+    <div className="leading-tight text-gray-700">
       {date.isOlderThan(requestedAt, { minutes: 5 }) ? (
         <>
           <UserInputText small>
@@ -51,8 +51,10 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
       {requestComment ? `, with the comment:` : `.`}
     </div>
     {requestComment && (
-      <div className="mt-4">
-        <UserInputText>&ldquo;{requestComment}&rdquo;</UserInputText>
+      <div className="mt-4 flex justify-center">
+        <UserInputText className="text-center text-gray-700">
+          &ldquo;{requestComment}&rdquo;
+        </UserInputText>
       </div>
     )}
     <hr className="mt-6 opacity-50" />
