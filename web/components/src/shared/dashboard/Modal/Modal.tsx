@@ -97,8 +97,8 @@ const Modal: React.FC<Props> = ({
                 <Dialog.Panel
                   className={cx(
                     `relative transform rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full`,
-                    type === `container` && `lg:max-w-3xl`,
-                    maximizeWidthForSmallScreens ? `w-full sm:w-auto` : `sm:max-w-lg`,
+                    type === `container` && `lg:max-w-4xl`,
+                    maximizeWidthForSmallScreens ? `w-full sm:w-auto` : `sm:max-w-xl`,
                   )}
                 >
                   {type === `container` ? (
