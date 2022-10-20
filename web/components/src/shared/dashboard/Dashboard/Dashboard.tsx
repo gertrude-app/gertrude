@@ -1,20 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import cx from 'classnames';
 import { UndoMainPadding } from '../Chrome/Chrome';
 import QuickActionsWidget from './Widgets/QuickActions';
 import UnlockRequestsWidget from './Widgets/UnlockRequests';
 import UserOverviewWidget from './Widgets/UsersOverview';
 import UserActivityWidget from './Widgets/UserActivity';
 import UserScreenshotsWidget from './Widgets/UserScreenshots';
+import PageHeading from '../PageHeading';
 
 type Props = {
-  className?: string;
   createKeychain: () => unknown;
 } & DashboardWidgetData;
 
 const Dashboard: React.FC<Props> = ({
-  className,
   unlockRequests,
   users,
   userActivity,
@@ -23,29 +21,27 @@ const Dashboard: React.FC<Props> = ({
 }) => {
   if (users.length > 0)
     return (
-      <UndoMainPadding
-        className={cx(
-          `min-h-screen grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8 p-4 sm:p-6 md:p-10`,
-          className,
-        )}
-      >
-        <UserActivityWidget userActivity={userActivity} />
-        <UserOverviewWidget users={users} />
-        <UserScreenshotsWidget
-          screenshots={userScreenshots}
-          className="xl:row-span-2 lg:-order-9"
-        />
-        {unlockRequests.length !== 0 && (
-          <UnlockRequestsWidget
-            className="row-span-2 xl:row-span-3 lg:-order-8"
-            unlockRequests={unlockRequests}
+      <>
+        <PageHeading icon="home">Dashboard</PageHeading>
+        <div className="pt-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8">
+          <UserActivityWidget userActivity={userActivity} />
+          <UserOverviewWidget users={users} />
+          <UserScreenshotsWidget
+            screenshots={userScreenshots}
+            className="xl:row-span-2 lg:-order-9"
           />
-        )}
-        <QuickActionsWidget
-          createKeychain={createKeychain}
-          className="xl:row-span-2 lg:-order-10"
-        />
-      </UndoMainPadding>
+          {unlockRequests.length !== 0 && (
+            <UnlockRequestsWidget
+              className="row-span-2 xl:row-span-3 lg:-order-8"
+              unlockRequests={unlockRequests}
+            />
+          )}
+          <QuickActionsWidget
+            createKeychain={createKeychain}
+            className="xl:row-span-2 lg:-order-10"
+          />
+        </div>
+      </>
     );
 
   return (

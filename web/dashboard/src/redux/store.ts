@@ -9,6 +9,7 @@ import keychainsReducer from './slice-keychains';
 import urlReducer from './slice-url';
 import appsReducer from './slice-apps';
 import dashboardReducer from './slice-dashboard';
+import filterSuspensionsReducer from './slice-filter-suspensions';
 import storageMiddleware from './middleware-storage';
 import toastMiddleware from './middleware-toast';
 import redirectMiddleware from './middleware-redirect';
@@ -21,6 +22,7 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     keychains: keychainsReducer,
     menu: menuReducer,
+    filterSuspensions: filterSuspensionsReducer,
     signup: signupReducer,
     users: usersReducer,
     url: urlReducer,

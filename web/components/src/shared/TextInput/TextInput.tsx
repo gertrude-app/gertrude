@@ -1,9 +1,11 @@
 import React, { useId, useState } from 'react';
 import cx from 'classnames';
 import Label from './Label';
+import { isoToDateInput } from '../lib/dates';
 
 type CommonProps = {
   label?: string;
+  optional?: boolean;
   value: string;
   setValue(value: string): unknown;
   autoFocus?: boolean;
@@ -30,6 +32,7 @@ type Props =
 
 const TextInput: React.FC<Props> = ({
   label,
+  optional,
   value,
   setValue,
   required = false,
@@ -44,7 +47,16 @@ const TextInput: React.FC<Props> = ({
   const Element = isInput(props) ? `input` : `textarea`;
   return (
     <div className={cx(`flex flex-col space-y-1 w-full`, className)}>
-      {label && <Label htmlFor={id}>{label}</Label>}
+      {(label || optional) && (
+        <div className="flex flex-row justify-between items-center">
+          {label && <Label htmlFor={id}>{label}</Label>}
+          {optional && (
+            <span className="text-violet-500/80 translate-y-px text-sm antialiased italic">
+              *optional
+            </span>
+          )}
+        </div>
+      )}
       <div className="flex shadow-sm rounded-lg">
         {isInput(props) && props.prefix && (
           <div className="flex justify-center items-center p-3 bg-gray-50 border border-r-0 rounded-l-lg">
@@ -90,6 +102,8 @@ const TextInput: React.FC<Props> = ({
 
 export default TextInput;
 
+// helpers
+
 function isPositiveInteger(value: string): boolean {
   return (
     value.match(/^[0-9]+$/) !== null &&
@@ -102,43 +116,4 @@ function isInput(props: { type: Props['type'] }): props is {
   type: InputType;
 } & InputProps {
   return props.type !== `textarea`;
-}
-
-export function isoToDateInput(iso: string): string {
-  return formatDate(new Date(iso), `dateInput`);
-}
-
-export function formatDate(
-  date: Date,
-  style: 'long' | 'medium' | 'short' | 'url' | 'dateInput',
-): string {
-  if (style === `short`) {
-    return date.toLocaleDateString();
-  }
-
-  if (style === `url`) {
-    return [
-      `${date.getMonth() + 1}`.padStart(2, `0`),
-      `${date.getDate()}`.padStart(2, `0`),
-      `${date.getFullYear()}`,
-    ].join(`-`);
-  }
-
-  if (style === `dateInput`) {
-    return [
-      `${date.getFullYear()}`,
-      `${date.getMonth() + 1}`.padStart(2, `0`),
-      `${date.getDate()}`.padStart(2, `0`),
-    ].join(`-`);
-  }
-
-  return [
-    date.toLocaleDateString(`en-US`, { weekday: `long` }),
-    `, `,
-    date.toLocaleDateString(`en-US`, { month: style === `long` ? `long` : `short` }),
-    style === `long` ? ` ` : `. `,
-    date.getDate(),
-    `, `,
-    date.getFullYear(),
-  ].join(``);
 }

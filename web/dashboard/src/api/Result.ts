@@ -151,6 +151,11 @@ function toApiError(
     return { type: `no_internet` };
   }
 
+  // probably database entity not found
+  if (error.some((e) => e.message.includes(`notFound`))) {
+    return { type: `not_found` };
+  }
+
   // we're done with well-known, common api errors, so now give the caller
   // a chance to apply special logic to extract a user-actionable error
   const actionable = (extractActionable ?? (() => {}))(error);

@@ -21,6 +21,7 @@ type ActionableApiError = {
 type ApiError =
   | { type: 'auth_failed' }
   | { type: 'no_internet' }
+  | { type: 'not_found' }
   | ActionableApiError
   | { type: 'non_actionable'; rawErrors?: string[] };
 

@@ -3,6 +3,7 @@ import { Action, Middleware } from '@reduxjs/toolkit';
 import { capitalize } from '@dashboard/lib/string';
 import { deleteActivityItems, deleteDevice, upsertUser, deleteUser } from './slice-users';
 import { ResultThunk } from './thunk';
+import { updateSuspendFilterRequest } from './slice-filter-suspensions';
 import {
   deleteKeychain,
   deleteKeyRecord,
@@ -32,6 +33,7 @@ const toastMiddleware: Middleware = (_store) => (next) => (action) => {
   toastCrud(`send`, `verification code`, createPendingNotificationMethod, action);
   toastCrud(`verify`, `confirmation code`, confirmPendingNotificationMethod, action);
   toastCrud(`approve`, `activity items`, deleteActivityItems, action);
+  toastCrud(`update`, `suspend filter request`, updateSuspendFilterRequest, action);
 
   return next(action);
 };
@@ -39,7 +41,7 @@ const toastMiddleware: Middleware = (_store) => (next) => (action) => {
 export default toastMiddleware;
 
 function toastCrud(
-  verb: 'save' | 'delete' | 'send' | 'verify' | 'approve',
+  verb: 'save' | 'update' | 'delete' | 'send' | 'verify' | 'approve',
   type: string,
   thunk: ResultThunk<any, any, any>,
   action: Action<unknown>,
@@ -53,6 +55,8 @@ function toastCrud(
     toast.dismiss();
     const pastTense = (() => {
       switch (verb) {
+        case `update`:
+          return `updated`;
         case `save`:
           return `saved`;
         case `delete`:

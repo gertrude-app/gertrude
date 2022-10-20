@@ -23,7 +23,7 @@ function SelectMenu<Value extends string = string>({
     <Listbox value={selectedOption} onChange={setSelected}>
       {({ open }) => (
         <div className="relative">
-          {label && <Label className="inline-block pb-px">{label}</Label>}
+          {label && <Label className="w-full inline-block pb-px">{label}</Label>}
           <div className="relative">
             <div className="rounded-md w-full shadow-sm">
               <div className="relative z-0 inline-flex rounded-md w-full border">

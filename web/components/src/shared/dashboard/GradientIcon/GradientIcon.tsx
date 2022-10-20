@@ -30,6 +30,10 @@ export const ICONS = [
   `binoculars`,
   `clock`,
   `thumbs-up`,
+  `thumbs-down`,
+  `stopwatch`,
+  `question`,
+  `home`,
 ] as const;
 
 export type IconType = typeof ICONS[number];
@@ -52,6 +56,7 @@ const CLASS_MAP: Record<Props['icon'], string> = {
   'lightning-bolt': `fa-solid fa-bolt`,
   unlock: `fa-solid fa-unlock`,
   globe: `fa-solid fa-earth-americas`,
+  home: `fa-solid fa-home`,
   window: `fa-solid fa-window-maximize`,
   'exclamation-triangle': `fa-solid fa-exclamation-triangle -translate-y-px`,
   info: `fa-solid fa-info`,
@@ -67,9 +72,12 @@ const CLASS_MAP: Record<Props['icon'], string> = {
   email: `fa-solid fa-envelope`,
   phone: `fa-solid fa-mobile`,
   slack: `fa-brands fa-slack`,
+  question: `fa-solid fa-question`,
   laptop: `fa-solid fa-laptop`,
   binoculars: `fa-solid fa-binoculars`,
   'thumbs-up': `fa-solid fa-thumbs-up translate-x-px`,
+  'thumbs-down': `fa-solid fa-thumbs-down translate-y-px`,
+  stopwatch: `fa-solid fa-stopwatch`,
 };
 
 const GradientIcon: React.FC<Props> = ({ icon, className, size, subtle = false }) => {

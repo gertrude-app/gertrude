@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { formatDate } from '@dashboard/lib/dates';
+import { formatDate } from '@shared/lib/dates';
 import { isUnsaved, unsavedId } from '@dashboard/lib/id';
 import { ActivityItem } from '@dashboard/Users/Activity/ReviewDay';
 import { DateRangeInput } from '@dashboard/types/GraphQL';

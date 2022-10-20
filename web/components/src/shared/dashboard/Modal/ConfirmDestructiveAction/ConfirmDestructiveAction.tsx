@@ -26,7 +26,7 @@ const ConfirmDestructiveAction: React.FC<Props> = ({
     primaryButtonText={confirmText}
     secondaryButtonText={cancelText}
     isOpen={!!openWhenPresent}
-    onDismiss={onDismiss}
+    onSecondaryClick={onDismiss}
     onPrimaryClick={onConfirm}
     children={children}
   />

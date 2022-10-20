@@ -1,10 +1,11 @@
-import { SubscriptionStatus } from '@dashboard/types/GraphQL';
+import { RequestStatus, SubscriptionStatus } from '@dashboard/types/GraphQL';
 import Result from '../api/Result';
 import * as empty from '../redux/empty';
 import * as admin from '../api/admin';
 import * as users from '../api/users';
 import * as signup from '../api/signup';
 import * as keychains from '../api/keychains';
+import * as requests from '../api/requests';
 import * as apps from '../api/apps';
 import * as dashboard from '../api/dashboard';
 
@@ -14,6 +15,7 @@ export interface ApiClient {
   dashboard: typeof dashboard;
   keychains: typeof keychains;
   signup: typeof signup;
+  requests: typeof requests;
   users: typeof users;
 }
 
@@ -23,6 +25,7 @@ export const liveApiClient: ApiClient = {
   dashboard,
   keychains,
   signup,
+  requests,
   users,
 };
 
@@ -126,6 +129,14 @@ export const throwingApiClient: ApiClient = {
     },
     createPendingAppConnection: () => {
       throw new Error(`ApiClient.users.createPendingUserConnection() not implemented.`);
+    },
+  },
+  requests: {
+    getSuspendFilterRequest: () => {
+      throw new Error(`ApiClient.requests.getSuspendFilterRequest() not implemented.`);
+    },
+    updateSuspendFilterRequest: () => {
+      throw new Error(`ApiClient.requests.updateSuspendFilterRequest() not implemented.`);
     },
   },
   signup: {
@@ -260,6 +271,22 @@ export const noopApiClient: ApiClient = {
     },
     createPendingAppConnection: async () => {
       return Result.success(0);
+    },
+  },
+  requests: {
+    getSuspendFilterRequest: async () => {
+      return Result.success({
+        id: ``,
+        deviceId: ``,
+        name: ``,
+        requestedDurationInSeconds: 0,
+        userName: ``,
+        status: RequestStatus.pending,
+        createdAt: ``,
+      });
+    },
+    updateSuspendFilterRequest: async () => {
+      return Result.true();
     },
   },
   signup: {

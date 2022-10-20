@@ -41,14 +41,14 @@ const UnlockRequestResponder: React.FC<Props> = ({
   if (step === `preview request`) {
     return (
       <Modal
-        type={`container`}
-        icon={`unlock`}
-        title={`Unlock request`}
+        type="container"
+        icon="unlock"
+        title="Unlock request"
         isOpen={isOpen}
         primaryButtonText="Create key"
         secondaryButtonText="Deny"
         onPrimaryClick={() => {}}
-        onDismiss={() => {}}
+        onSecondaryClick={() => {}}
       >
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 px-3 pt-2">
           <div className="flex flex-col items-center sm:items-start mr-4">
@@ -105,27 +105,27 @@ const UnlockRequestResponder: React.FC<Props> = ({
   } else if (step === `create key`) {
     return (
       <Modal
-        type={`container`}
-        icon={`key`}
-        title={`Create a key`}
+        type="container"
+        icon="key"
+        title="Create a key"
         isOpen={isOpen}
         primaryButtonText="Select a keychain"
         secondaryButtonText="Back"
         onPrimaryClick={() => {}}
-        onDismiss={() => {}}
+        onSecondaryClick={() => {}}
       >
         <div className="px-2">
           <KeyCreator
-            id={``}
-            keychainId={``}
+            id=""
+            keychainId=""
             isNew={false}
-            address={``}
-            addressType={`strict`}
-            addressScope={`webBrowsers`}
+            address=""
+            addressType="strict"
+            addressScope="webBrowsers"
             showAdvancedAddressOptions={false}
             showAdvancedAddressScopeOptions={false}
-            appIdentificationType={`bundleId`}
-            appScope={`address`}
+            appIdentificationType="bundleId"
+            appScope="address"
             update={() => {}}
             apps={[]}
             activeStep={Step.None}
@@ -136,14 +136,14 @@ const UnlockRequestResponder: React.FC<Props> = ({
   }
   return (
     <Modal
-      type={`container`}
-      icon={`key`}
-      title={`Select a keychain`}
+      type="container"
+      icon="key"
+      title="Select a keychain"
       isOpen={isOpen}
       primaryButtonText="Save"
       secondaryButtonText="Back"
       onPrimaryClick={() => {}}
-      onDismiss={() => {}}
+      onSecondaryClick={() => {}}
     >
       <div>
         <KeychainPicker

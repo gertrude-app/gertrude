@@ -8,6 +8,7 @@ import { initialState as keychainsInitialState } from '../slice-keychains';
 import { initialState as urlInitialState } from '../slice-url';
 import { initialState as appsInitialState } from '../slice-apps';
 import { initialState as dashboardInitialState } from '../slice-dashboard';
+import { initialState as filterSuspensionsInitialState } from '../slice-filter-suspensions';
 
 export function makeState(mutator: (state: State) => unknown = () => {}): State {
   const state: State = {
@@ -18,6 +19,7 @@ export function makeState(mutator: (state: State) => unknown = () => {}): State 
     keychains: keychainsInitialState(),
     menu: menuInitialState(),
     signup: signupInitialState(),
+    filterSuspensions: filterSuspensionsInitialState(),
     users: usersInitialState(),
     url: urlInitialState(),
   };
