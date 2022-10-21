@@ -34,41 +34,38 @@ const KeychainCard: React.FC<Props> = ({
       `rounded-xl shadow-lg border bg-white flex flex-col justify-between transition duration-100`,
       selected && `bg-violet-50 border-violet-300`,
       selectable && !selected && `hover:bg-gray-50 cursor-pointer`,
-      small && `min-h-[90px]`,
+      small && `min-h-[77px]`,
     )}
     onClick={selectable ? onSelect : undefined}
   >
-    <div className="flex items-center flex-grow">
-      <div className="w-20 shrink-0 flex justify-center items-start">
+    <div className="flex items-start flex-grow">
+      <div className="w-16 xs:w-20 shrink-0 pt-4 flex justify-center items-start">
         <GradientIcon icon="list" size="medium" className="mx-0" />
       </div>
-      <div className="p-4 pl-0 flex-grow">
-        <div
-          className={cx(
-            `flex justify-between relative right-0`,
-            small ? `items-center` : `items-start`,
-          )}
-        >
-          <h2 className="font-medium text-lg leading-6 text-gray-900 truncate sm:whitespace-normal max-w-[110px] sm:max-w-none">
+      <div className="pr-4 py-4 flex-col flex-grow">
+        <div className="flex flex-col md:flex-row  justify-between relative right-0">
+          <h2 className="mb-0.5 leading-tight text-left font-semibold text-lg leading-6 text-gray-900 sm:whitespace-normal">
             {name}
           </h2>
-          <div className="flex flex-col items-end flex-grow min-w-[100px]">
-            <h4
-              className={cx(
-                `text-gray-500 shrink-0 min-w-max`,
-                small && isPublic && `mb-1 mr-2`,
-              )}
-            >
-              <span className="text-gray-600 font-medium shrink-0">{numKeys}</span>
+          <div className="flex justify-between items-start space-x-2">
+            <h4 className="text-gray-500 shrink-0">
+              {numKeys}
               {` `}
               {inflect(`key`, numKeys)}
             </h4>
-            {small && isPublic && <PillBadge type="green">Public</PillBadge>}
+            {small && isPublic && (
+              <PillBadge small type="green">
+                Public
+              </PillBadge>
+            )}
           </div>
         </div>
         {small || (
           <p
-            className={cx(description ? `text-gray-600` : `text-gray-400 italic`, `mt-2`)}
+            className={cx(
+              description ? `text-gray-600 leading-tight` : `text-gray-400 italic`,
+              `mt-2 mb-1`,
+            )}
           >
             {description || `No description`}
           </p>
@@ -78,13 +75,13 @@ const KeychainCard: React.FC<Props> = ({
     {small || (
       <div
         className={cx(
-          `bg-gray-50 rounded-b-xl w-full flex justify-between items-center`,
+          `bg-gray-50 rounded-b-xl w-full flex justify-between`,
           selected && `bg-indigo-100/40`,
         )}
       >
         <div className="flex-grow ml-3">
           {isPublic && (
-            <PillBadge type={`green`} className="border">
+            <PillBadge type="green" className="border my-2">
               <i className="fa-solid fa-users mr-1 text-sm" /> Public
             </PillBadge>
           )}

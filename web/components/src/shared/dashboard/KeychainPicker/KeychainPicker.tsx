@@ -20,7 +20,7 @@ const KeychainPicker: React.FC<Props> = ({
   onSelect,
   includePublic = true,
 }) => (
-  <div className="sm:bg-gray-50 rounded-xl sm:p-4">
+  <div className="sm:bg-gray-50 xs:min-w-[450px] rounded-xl sm:p-4">
     {selectableOwnKeychains.length !== 0 && (
       <>
         <h2 className="text-lg font-bold text-gray-600 mb-3">Your keychains:</h2>

@@ -2,6 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import { target } from '../lib/keys';
 import { toState } from '../lib/keys/convert';
+import GradientIcon from '../GradientIcon';
 
 interface Props {
   record: KeyRecord;
@@ -31,16 +32,22 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete }) => {
     >
       <div className="flex-grow relative overflow-hidden">
         <p className="text-gray-500 whitespace-nowrap">
-          <span
-            className={cx(
-              key.keyType === `website` ? `text-fuchsia-700` : `text-violet-700`,
-              `font-bold`,
-            )}
-          >
-            <span className="capitalize">{key.keyType}</span> key
+          <GradientIcon
+            size="small"
+            className="sm:hidden mr-1.5"
+            icon={key.keyType === `website` ? `globe` : `app-store`}
+          />
+          <span className="hidden sm:inline">
+            <span
+              className={cx(
+                key.keyType === `website` ? `text-fuchsia-700` : `text-violet-700`,
+                `font-bold`,
+              )}
+            >
+              {key.keyType === `website` ? `Website` : `App`} key
+            </span>
+            {` `}unlocking{` `}
           </span>
-          {` `}
-          unlocking{` `}
           <span
             className={cx(
               target(record.key) !== `*`
@@ -50,18 +57,19 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete }) => {
           >
             {target(record.key) === `*` ? `everything` : target(record.key)}
           </span>
-          {` `}
-          for{` `}
-          <span
-            className={cx(
-              key.addressScope === `singleApp` && !key.appSlug && `font-mono px-1`,
-              `font-medium text-gray-800`,
-              key.addressScope === `singleApp` && `text-indigo-700`,
-              key.addressScope === `unrestricted` && `text-pink-700`,
-              key.addressScope === `webBrowsers` && `text-purple-700`,
-            )}
-          >
-            {scope}
+          <span className="hidden sm:inline">
+            {` `}for{` `}
+            <span
+              className={cx(
+                key.addressScope === `singleApp` && !key.appSlug && `font-mono px-1`,
+                `font-medium text-gray-800`,
+                key.addressScope === `singleApp` && `text-indigo-700`,
+                key.addressScope === `unrestricted` && `text-pink-700`,
+                key.addressScope === `webBrowsers` && `text-purple-700`,
+              )}
+            >
+              {scope}
+            </span>
           </span>
         </p>
       </div>

@@ -120,7 +120,7 @@ const Chrome: React.FC<Props> = ({
       )}
     >
       <MobileStickyHeader
-        className="sticky md:hidden"
+        className="sticky z-20 md:hidden"
         sidebarShown={mobileSidebarOpen}
         onHamburgerClick={onMobileHamburgerClick}
       />

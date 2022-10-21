@@ -43,7 +43,7 @@ const Button: React.FC<Props> = ({
         colors = `bg-violet-500 text-white border-2 border-white hover:bg-violet-400 ring-violet-500 focus:ring-white ring-offset-violet-500`;
         break;
       case `secondary-white`:
-        colors = `bg-gray-50 text-gray-500 border hover:bg-gray-100 ring-transparent focus:ring-indigo-400 focus:border-indigo-500`;
+        colors = `bg-gray-50 text-gray-500 border hover:bg-gray-100 ring-transparent focus:ring-indigo-400/50 focus:border-indigo-500`;
         break;
       case `secondary-warning`:
         colors = `bg-red-50 text-red-600 border-red-100 border hover:text-red-700 hover:bg-red-100 ring-transparent focus:ring-red-500 focus:border-red-500`;
@@ -57,7 +57,7 @@ const Button: React.FC<Props> = ({
   const classes = cx(
     colors,
     `ring ring-offset-0 focus:ring-offset-2 shadow-sm rounded-lg font-bold [transition:100ms] outline-none block`,
-    small ? `text-md px-5 py-2` : `text-lg px-10 py-2.5`,
+    small ? `text-md px-5 py-3.5 sm:py-2` : `text-lg px-10 py-2.5`,
     className,
     fullWidth ? `w-full` : `w-fit`,
     !rendersAsButton && `text-center`,

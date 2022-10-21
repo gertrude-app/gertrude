@@ -66,6 +66,7 @@ const KeyCreationStep: React.FC<Props> = ({
           className={cx(
             `rounded-2xl shadow-lg flex-grow my-2 bg-white`,
             open ? `border-2 border-violet-400` : `border`,
+            mode === `create` ? `max-w-[calc(100%-40px)]` : `max-w-full`,
           )}
         >
           <div
@@ -79,7 +80,7 @@ const KeyCreationStep: React.FC<Props> = ({
             )}
             <i
               className={cx(
-                `fa-solid fa-chevron-down text-gray-500 transition duration-150`,
+                `pl-2 fa-solid fa-chevron-down text-gray-500 transition duration-150`,
                 open && `-rotate-180`,
               )}
             />

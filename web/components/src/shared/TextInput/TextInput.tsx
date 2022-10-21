@@ -24,7 +24,14 @@ type InputProps = {
   prefix?: string;
 };
 
-type InputType = 'email' | 'text' | 'positiveInteger' | 'password' | 'date' | 'time';
+type InputType =
+  | 'email'
+  | 'text'
+  | 'url'
+  | 'positiveInteger'
+  | 'password'
+  | 'date'
+  | 'time';
 
 type Props =
   | ({ type: InputType } & InputProps & CommonProps)
@@ -59,7 +66,7 @@ const TextInput: React.FC<Props> = ({
       )}
       <div className="flex shadow-sm rounded-lg">
         {isInput(props) && props.prefix && (
-          <div className="flex justify-center items-center p-3 bg-gray-50 border border-r-0 rounded-l-lg">
+          <div className="hidden xs:flex justify-center items-center p-3 bg-gray-50 border border-r-0 rounded-l-lg">
             <h3 className="text-gray-500">{props.prefix}</h3>
           </div>
         )}
@@ -71,6 +78,9 @@ const TextInput: React.FC<Props> = ({
           autoFocus={autoFocus}
           placeholder={placeholder}
           disabled={disabled}
+          {...(props.type === `url`
+            ? { autoCapitalize: `none`, autoCorrect: `off` }
+            : {})}
           // passwords must be len > 4
           {...(props.type === `password` ? { minLength: 4 } : {})}
           // all date inputs must be in the future (for now, at least)
@@ -88,7 +98,7 @@ const TextInput: React.FC<Props> = ({
           }}
           className={`border border-gray-200 ring-0 ring-gray-200 outline-none py-3 px-4 focus:shadow-md transition duration-150 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 text-gray-600 flex-grow z-10 w-12 ${
             isInput(props) && props.unit ? `rounded-r-none` : `rounded-r-lg`
-          } ${isInput(props) && props.prefix ? `rounded-l-none` : `rounded-l-lg`}`}
+          } ${isInput(props) && props.prefix && `rounded-l-lg xs:rounded-l-none`}`}
         />
         {isInput(props) && props.unit && (
           <div className="flex justify-center items-center p-3 bg-gray-50 border border-l-0 rounded-r-lg">

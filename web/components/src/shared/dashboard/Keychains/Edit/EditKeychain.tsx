@@ -53,12 +53,13 @@ const EditKeychain: React.FC<Props> = ({
   <div className="relative max-w-3xl">
     <Modal
       type="container"
+      maximizeWidthForSmallScreens
       title={editingKey?.isNew ? `Create a new key` : `Edit key`}
       isOpen={!!editingKey}
       icon="key"
       primaryButtonText={
         <>
-          {editingKey?.isNew ? `Create` : `Save`} Key
+          {editingKey?.isNew ? `Create` : `Save`} key
           <i className="fa-solid fa-key ml-2" />
         </>
       }
