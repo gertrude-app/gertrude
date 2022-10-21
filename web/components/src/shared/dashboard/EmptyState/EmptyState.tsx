@@ -23,15 +23,15 @@ const EmptyState: React.FC<Props> = ({
 }) => (
   <div
     className={cx(
-      'flex flex-col justify-center items-center p-10 rounded-2xl shadow-inner',
-      violet ? 'bg-violet-100' : 'bg-gray-100',
+      `flex flex-col justify-center items-center p-10 rounded-2xl shadow-inner`,
+      violet ? `bg-violet-100` : `bg-gray-100`,
       className,
     )}
   >
     <i
       className={cx(
         `fa-solid fa-${icon} text-6xl`,
-        violet ? 'text-violet-300' : 'text-gray-300',
+        violet ? `text-violet-300` : `text-gray-300`,
       )}
     />
     <h2 className="text-xl font-bold mt-3 mb-2">{heading}</h2>

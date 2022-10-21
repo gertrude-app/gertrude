@@ -45,11 +45,11 @@ const KeychainPicker: React.FC<Props> = ({
       )}
       {hasNoOwnKeychains && (
         <EmptyState
-          heading={'No personal keychains'}
-          secondaryText={'Select a public keychain or create your own.'}
-          icon={'key'}
-          buttonText={'Create keychains'}
-          onButtonClick={() => navigate('/keychains')}
+          heading={`No personal keychains`}
+          secondaryText={`Select a public keychain or create your own.`}
+          icon={`key`}
+          buttonText={`Create keychains`}
+          onButtonClick={() => navigate(`/keychains`)}
         />
       )}
       {includePublic && (

@@ -40,7 +40,7 @@ const KeychainCard: React.FC<Props> = ({
   >
     <div className="flex items-stretch flex-grow">
       <div
-        className={cx('w-16 xs:w-20 shrink-0 py-4 flex justify-center items-center mr-2')}
+        className={cx(`w-16 xs:w-20 shrink-0 py-4 flex justify-center items-center mr-2`)}
       >
         <GradientIcon icon="list" size="medium" className="mx-0" />
       </div>

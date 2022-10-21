@@ -3,6 +3,7 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Script from 'next/script';
 import '../styles/globals.css';
+import Favicon from '../public/favicon.png';
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => (
   <>
@@ -12,6 +13,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => (
         name="description"
         content="Protect your loved ones with aggressive network filtering, plus screen and keystroke monitoring. Remotely supervise and control access from your own computer or phone. Available for macOS Big Sur, Monterey, and Ventura."
       />
+      <link rel="icon" type="image/png" href={Favicon.src} />
       <Script
         src="https://kit.fontawesome.com/597740db7b.js"
         strategy="beforeInteractive"

@@ -10,10 +10,10 @@ const Template: ComponentStory<typeof EmptyState> = (args) => <EmptyState {...ar
 
 export const Default = Template.bind({});
 Default.args = {
-  heading: 'No burgers',
-  secondaryText: "Let's make some!",
-  buttonText: 'Make a burger',
-  icon: 'burger',
+  heading: `No burgers`,
+  secondaryText: `Let's make some!`,
+  buttonText: `Make a burger`,
+  icon: `burger`,
 };
 
 export const Violet = Template.bind({});

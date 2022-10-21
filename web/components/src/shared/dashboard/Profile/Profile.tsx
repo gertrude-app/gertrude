@@ -169,10 +169,10 @@ const Profile: React.FC<Props> = ({
             </div>
           ) : (
             <EmptyState
-              heading={'No notifications'}
-              secondaryText={'Get started by creating a custom notification'}
-              icon={'bell'}
-              buttonText={'Create notification'}
+              heading={`No notifications`}
+              secondaryText={`Get started by creating a custom notification`}
+              icon={`bell`}
+              buttonText={`Create notification`}
               onButtonClick={createNotification}
               className="mt-6"
             />

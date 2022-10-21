@@ -4,6 +4,7 @@ import { slugifyWithCounter } from '@sindresorhus/slugify';
 import Layout from '@/components/Layout';
 import 'focus-visible';
 import '../styles/tailwind.css';
+import Favicon from '../../public/favicon.png';
 
 function getNodeText(node: Node): string {
   let text = ``;
@@ -91,6 +92,7 @@ const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }
     <>
       <Head>
         <title>{`${pageTitle} | Gertrude`}</title>
+        <link rel="icon" type="image/png" href={Favicon.src} />
         {description && <meta name="description" content={description} />}
       </Head>
       <Layout title={title} tableOfContents={tableOfContents}>

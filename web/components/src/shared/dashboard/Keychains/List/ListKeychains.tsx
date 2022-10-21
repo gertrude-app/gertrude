@@ -45,10 +45,10 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
       </>
     ) : (
       <EmptyState
-        heading={'No keychains'}
-        secondaryText={"Let's make one!"}
-        icon={'key'}
-        buttonText={'Create keychain'}
+        heading={`No keychains`}
+        secondaryText={`Let's make one!`}
+        icon={`key`}
+        buttonText={`Create keychain`}
         onButtonClick={onCreateNew}
         className="mt-6"
       />

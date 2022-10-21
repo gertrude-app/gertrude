@@ -115,10 +115,10 @@ const EditKeychain: React.FC<Props> = ({
           </>
         ) : (
           <EmptyState
-            heading={'No keys'}
+            heading={`No keys`}
             secondaryText="Add a key to this keychain:"
-            icon={'key'}
-            buttonText={'Create key'}
+            icon={`key`}
+            buttonText={`Create key`}
             onButtonClick={onCreateNewKey}
           />
         )}

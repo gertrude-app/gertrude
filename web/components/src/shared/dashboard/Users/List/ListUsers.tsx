@@ -50,11 +50,11 @@ const Users: React.FC<Props> = ({
         ) : (
           <div>
             <EmptyState
-              heading={'No users'}
-              secondaryText={'Get started by creating a protected user'}
-              icon={'user'}
-              buttonText={'Add a user'}
-              onButtonClick={() => navigate('/users/new')}
+              heading={`No users`}
+              secondaryText={`Get started by creating a protected user`}
+              icon={`user`}
+              buttonText={`Add a user`}
+              onButtonClick={() => navigate(`/users/new`)}
             />
           </div>
         )}
