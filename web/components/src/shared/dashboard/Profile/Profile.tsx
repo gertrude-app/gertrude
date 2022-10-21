@@ -15,6 +15,7 @@ import {
   PendingNotificationMethod,
   NewAdminNotificationMethodEvent,
 } from '../types/Admin';
+import EmptyState from '../EmptyState';
 
 export type NotificationUpdate = { id: UUID } & (
   | { type: 'startEditing' }
@@ -146,35 +147,48 @@ const Profile: React.FC<Props> = ({
             Custom notifications for different types of requests using one of your
             verified methods
           </p>
-          <div className="flex flex-wrap items-start pt-4 sm:pt-2 mb-4">
-            {notifications.map(({ id, ...props }) => (
-              <NotificationCard
-                key={id}
-                focus={isUnsaved(id)}
-                startEdit={() => updateNotification({ id, type: `startEditing` })}
-                cancelEdit={() => updateNotification({ id, type: `cancelEditing` })}
-                onDelete={() => deleteNotification.start(id)}
-                updateMethod={(methodId) =>
-                  updateNotification({ id, methodId, type: `changeMethod` })
-                }
-                updateTrigger={(trigger) =>
-                  updateNotification({ id, trigger, type: `changeTrigger` })
-                }
-                onSave={() => saveNotification(id)}
-                {...props}
-              />
-            ))}
-          </div>
+          {notifications.length > 0 ? (
+            <div className="flex flex-wrap items-start pt-4 sm:pt-2 mb-4">
+              {notifications.map(({ id, ...props }) => (
+                <NotificationCard
+                  key={id}
+                  focus={isUnsaved(id)}
+                  startEdit={() => updateNotification({ id, type: `startEditing` })}
+                  cancelEdit={() => updateNotification({ id, type: `cancelEditing` })}
+                  onDelete={() => deleteNotification.start(id)}
+                  updateMethod={(methodId) =>
+                    updateNotification({ id, methodId, type: `changeMethod` })
+                  }
+                  updateTrigger={(trigger) =>
+                    updateNotification({ id, trigger, type: `changeTrigger` })
+                  }
+                  onSave={() => saveNotification(id)}
+                  {...props}
+                />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              heading={'No notifications'}
+              secondaryText={'Get started by creating a custom notification'}
+              icon={'bell'}
+              buttonText={'Create notification'}
+              onButtonClick={createNotification}
+              className="mt-6"
+            />
+          )}
         </div>
-        <Button
-          type="button"
-          onClick={createNotification}
-          color="primary-violet"
-          className="self-center"
-        >
-          <i className="fa fa-plus mr-3" />
-          New notification
-        </Button>
+        {notifications.length !== 0 && (
+          <Button
+            type="button"
+            onClick={createNotification}
+            color="primary-violet"
+            className="self-center"
+          >
+            <i className="fa fa-plus mr-3" />
+            New notification
+          </Button>
+        )}
       </div>
     </div>
   </div>

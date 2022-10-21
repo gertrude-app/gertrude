@@ -8,6 +8,7 @@ import TextInput from '../../../TextInput';
 import KeyCreator from '../Keys/KeyCreator';
 import KeyList from '../../KeyList';
 import * as EditKey from '../../lib/keys/edit';
+import EmptyState from '../../EmptyState';
 
 type Props = {
   isNew: boolean;
@@ -90,22 +91,37 @@ const EditKeychain: React.FC<Props> = ({
         setValue={setDescription}
       />
       <div>
-        <h2 className="mb-2 text-lg font-bold text-gray-700">
-          {keys.length} {inflect(`key`, keys.length)}:
-        </h2>
-        {keys.length > 0 && (
-          <KeyList
-            keys={keys}
-            editKey={beginEditKey}
-            deleteKey={(id) => deleteKey.start(id)}
+        {keys.length > 0 ? (
+          <>
+            <h2 className="mb-2 text-lg font-bold text-gray-700">
+              {keys.length} {inflect(`key`, keys.length)}:
+            </h2>
+            <KeyList
+              keys={keys}
+              editKey={beginEditKey}
+              deleteKey={(id) => deleteKey.start(id)}
+            />
+            <div className="mt-4 flex justify-end">
+              <Button
+                color="secondary-white"
+                small
+                type="button"
+                onClick={onCreateNewKey}
+              >
+                <i className="fa-solid fa-plus mr-2" />
+                Add new key
+              </Button>
+            </div>
+          </>
+        ) : (
+          <EmptyState
+            heading={'No keys'}
+            secondaryText="Add a key to this keychain:"
+            icon={'key'}
+            buttonText={'Create key'}
+            onButtonClick={onCreateNewKey}
           />
         )}
-        <div className="mt-4 flex justify-end">
-          <Button color="secondary-white" small type="button" onClick={onCreateNewKey}>
-            <i className="fa-solid fa-plus mr-2" />
-            Add new key
-          </Button>
-        </div>
       </div>
       <div className="flex mt-5 justify-end border-t-2 pt-8 space-x-5">
         {!isNew && (
