@@ -75,7 +75,7 @@ npm-install-root:
 	npm install
 
 build-marketing: sync npm-install-root
-	cd marketing && npm install && npx next build && npx next export
+	cd marketing && npm install && npx next build && npx next export && cp _redirects out/
 
 build-storybook: sync npm-install-root
 	cd components && npm install && npm run build-storybook

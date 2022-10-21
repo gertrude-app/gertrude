@@ -40,13 +40,19 @@ const ContactStatusMessage: React.FC<Props> = ({ className, type, heading, messa
   }
 
   return (
-    <div className={cx(`${color.bg} bg-opacity-50 p-4 rounded-xl flex`, className)}>
+    <div
+      className={cx(
+        color.bg,
+        `bg-opacity-75 sm:bg-opacity-50 p-4 rounded-xl flex relative z-20`,
+        className,
+      )}
+    >
       <div className="w-8 flex items-center flex-col">
-        <i className={`fa-solid fa-${icon} ${color.iconText} text-xl`} />
+        <i className={cx(color.iconText, `fa-solid fa-${icon} text-xl`)} />
       </div>
       <div className="ml-3">
-        <h3 className={`${color.text} font-medium`}>{heading}</h3>
-        <p className={`${color.text} text-opacity-70 text-sm mt-1`}>{message}</p>
+        <h3 className={cx(color.text, `font-medium`)}>{heading}</h3>
+        <p className={cx(color.text, `sm:text-opacity-70 text-sm mt-1`)}>{message}</p>
       </div>
     </div>
   );

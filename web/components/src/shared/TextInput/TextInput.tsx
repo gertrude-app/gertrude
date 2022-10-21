@@ -13,6 +13,7 @@ type CommonProps = {
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  name?: string;
 };
 
 type TextAreaProps = {
@@ -47,6 +48,7 @@ const TextInput: React.FC<Props> = ({
   placeholder,
   className,
   disabled,
+  name,
   ...props
 }) => {
   const [localValue, setLocalValue] = useState(value);
@@ -78,6 +80,7 @@ const TextInput: React.FC<Props> = ({
           autoFocus={autoFocus}
           placeholder={placeholder}
           disabled={disabled}
+          name={name}
           {...(props.type === `url`
             ? { autoCapitalize: `none`, autoCorrect: `off` }
             : {})}
@@ -96,9 +99,15 @@ const TextInput: React.FC<Props> = ({
               setValue(value);
             }
           }}
-          className={`border border-gray-200 ring-0 ring-gray-200 outline-none py-3 px-4 focus:shadow-md transition duration-150 focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1 text-gray-600 flex-grow z-10 w-12 ${
-            isInput(props) && props.unit ? `rounded-r-none` : `rounded-r-lg`
-          } ${isInput(props) && props.prefix && `rounded-l-lg xs:rounded-l-none`}`}
+          className={cx(
+            `py-3 px-4 flex-grow z-10 w-12`,
+            `border border-gray-200`,
+            `transition duration-150`,
+            `text-gray-600 placeholder:text-gray-400/90 placeholder:antialiased`,
+            `ring-0 ring-gray-200 outline-none focus:shadow-md focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1`,
+            isInput(props) && props.unit ? `rounded-r-none` : `rounded-r-lg`,
+            isInput(props) && props.prefix && `rounded-l-lg xs:rounded-l-none`,
+          )}
         />
         {isInput(props) && props.unit && (
           <div className="flex justify-center items-center p-3 bg-gray-50 border border-l-0 rounded-r-lg">
