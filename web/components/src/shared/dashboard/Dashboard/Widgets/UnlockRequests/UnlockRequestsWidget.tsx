@@ -20,6 +20,7 @@ const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) =>
       .map((req) => (
         <UnlockRequestCard
           key={req.id}
+          id={req.id}
           userName={req.userName}
           comment={req.comment ?? undefined}
           createdAt={req.createdAt}
