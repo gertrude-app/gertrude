@@ -1,175 +1,151 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { v4 as uuid } from 'uuid';
 import cx from 'classnames';
 import KeychainPicker from '../KeychainPicker';
 import KeyCreator from '../Keychains/Keys/KeyCreator';
 import { relativeTime } from '../lib/dates';
-import { Step } from '../lib/keys/edit';
-import Modal from '../Modal';
-import { keychains } from '../story-helpers';
 import UserInputText from '../Keychains/Keys/KeyCreator/UserInputText';
+import * as EditKey from '../lib/keys/edit';
+import { newKeyState } from '../lib/keys';
 
 type Props = {
-  step: 'preview request' | 'create key' | 'select keychain';
-  userName: string;
-  comment?: string;
-  target: {
-    url?: string;
-    domain?: string;
-    IPAddress?: string;
-  };
-  isOpen: boolean;
-  dateRequested: Date;
-  appName: string;
-  appCategory: string;
-  appBundleId: string;
-  protocol: 'TCP' | 'UDP';
-};
+  step: 'reviewing' | 'editingKey' | 'selectingKeychain';
+  detailsExpanded: boolean;
+  setDetailsExpanded(expanded: boolean): unknown;
+  editingKey?: EditKey.State;
+  updateKey(update: EditKey.Event): unknown;
+  apps: React.ComponentProps<typeof KeyCreator>['apps'];
+  selectableKeychains: Keychain[];
+} & UnlockRequest;
 
 const UnlockRequestResponder: React.FC<Props> = ({
   step,
   userName,
-  comment,
-  target,
-  isOpen,
-  dateRequested,
+  requestComment,
+  editingKey,
+  updateKey,
+  url,
+  domain,
+  ipAddress,
+  createdAt,
   appName,
-  appCategory,
+  appCategories,
   appBundleId,
-  protocol,
+  requestProtocol,
+  detailsExpanded,
+  setDetailsExpanded,
+  selectableKeychains,
+  apps,
 }) => {
-  const [appDetailsExpanded, setAppDetailsExpanded] = useState(false);
-  if (step === `preview request`) {
+  if (step === `reviewing`) {
     return (
-      <Modal
-        type="container"
-        icon="unlock"
-        title="Unlock request"
-        isOpen={isOpen}
-        primaryButtonText="Create key"
-        secondaryButtonText="Deny"
-        onPrimaryClick={() => {}}
-        onSecondaryClick={() => {}}
-      >
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 px-3 pt-2">
-          <div className="flex flex-col items-center sm:items-start mr-4">
-            <h1 className="text-xl font-bold">{userName}</h1>
-            <h3 className="text-gray-500">{relativeTime(dateRequested)}</h3>
+      <>
+        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-4 px-3 sm:pt-2">
+          <div className="flex flex-col items-center sm:items-start sm:min-w-[105px] mr-4">
+            <h1 className="text-xl font-bold whitespace-nowrap pr-3">{userName}</h1>
+            <h3 className="text-gray-500">{relativeTime(createdAt)}</h3>
           </div>
           <div className="mt-3 sm:mt-0">
-            <UserInputText className="text-center sm:text-left">{comment}</UserInputText>
+            <UserInputText className="text-center sm:text-left">
+              &ldquo;{requestComment}&rdquo;
+            </UserInputText>
           </div>
         </div>
-        <div className="bg-gray-50 p-3 rounded-xl overflow-scroll">
+        <div className="bg-gray-50 p-3 rounded-xl *overflow-scroll">
           <a
-            className="text-blue-700 underline cursor-pointer whitespace-nowrap sm:whitespace-normal"
-            href={
-              target.url ||
-              (target.domain && `https://${target.domain}`) ||
-              target.IPAddress
-            }
+            className="text-blue-700 hover:underline focus:outline-none cursor-pointer break-all"
+            href={url || (domain && `https://${domain}`) || ipAddress}
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <i className="fa-solid fa-arrow-up-right-from-square mr-2" />
-            {target.url || target.domain || target.IPAddress}
+            {url || domain || ipAddress}
           </a>
         </div>
         <div className="bg-white border rounded-xl mb-1 flex flex-col mt-4 relative">
           <button
-            className="hover:text-gray-600 text-gray-400 transition duration-100 absolute right-3 top-1 text-lg p-2 bg-transparent"
-            onClick={() => {
-              setAppDetailsExpanded(!appDetailsExpanded);
-            }}
+            className="hover:text-gray-600 text-gray-400 transition duration-100 absolute right-2.5 top-0 text-lg p-2 bg-transparent"
+            onClick={() => setDetailsExpanded(!detailsExpanded)}
           >
             <i
-              className={cx(
-                `fa-solid fa-chevron-down`,
-                appDetailsExpanded && `-rotate-180`,
-              )}
+              className={cx(`fa-solid fa-chevron-down`, detailsExpanded && `-rotate-180`)}
             />
           </button>
-          <AppDetail label="App" data={appName} />
-          {appDetailsExpanded && (
+          <AppDetail expanded={detailsExpanded} label="App" data={appName} />
+          {detailsExpanded && (
             <>
-              <AppDetail label="App category" data={appCategory} />
-              <AppDetail label="Bundle ID" data={appBundleId} />
-              <AppDetail label="Protocol" data={protocol} />
-              {target.url && <AppDetail label="URL" data={target.url} />}
-              {target.domain && <AppDetail label="Domain" data={target.domain} />}
-              {target.IPAddress && (
-                <AppDetail label="IP Address" data={target.IPAddress} />
-              )}
+              <AppDetail
+                expanded={detailsExpanded}
+                label="App category"
+                data={appCategories.join(`, `)}
+              />
+              <AppDetail
+                expanded={detailsExpanded}
+                label="Bundle ID"
+                data={appBundleId}
+              />
+              <AppDetail
+                expanded={detailsExpanded}
+                label="Protocol"
+                data={requestProtocol}
+              />
+              <AppDetail expanded={detailsExpanded} label="URL" data={url} />
+              <AppDetail expanded={detailsExpanded} label="Domain" data={domain} />
+              <AppDetail expanded={detailsExpanded} label="IP Address" data={ipAddress} />
             </>
           )}
         </div>
-      </Modal>
+      </>
     );
-  } else if (step === `create key`) {
+  } else if (step === `editingKey`) {
     return (
-      <Modal
-        type="container"
-        icon="key"
-        title="Create a key"
-        isOpen={isOpen}
-        primaryButtonText="Select a keychain"
-        secondaryButtonText="Back"
-        onPrimaryClick={() => {}}
-        onSecondaryClick={() => {}}
-      >
-        <div className="px-2">
-          <KeyCreator
-            id=""
-            keychainId=""
-            isNew={false}
-            address=""
-            addressType="strict"
-            addressScope="webBrowsers"
-            showAdvancedAddressOptions={false}
-            showAdvancedAddressScopeOptions={false}
-            appIdentificationType="bundleId"
-            appScope="address"
-            update={() => {}}
-            apps={[]}
-            activeStep={Step.None}
-          />
-        </div>
-      </Modal>
+      <div className="px-2">
+        <KeyCreator
+          {...(editingKey ?? newKeyState(uuid(), uuid()))}
+          update={updateKey}
+          apps={apps}
+        />
+      </div>
     );
   }
   return (
-    <Modal
-      type="container"
-      icon="key"
-      title="Select a keychain"
-      isOpen={isOpen}
-      primaryButtonText="Save"
-      secondaryButtonText="Back"
-      onPrimaryClick={() => {}}
-      onSecondaryClick={() => {}}
-    >
-      <div>
-        <KeychainPicker
-          hasNoOwnKeychains={false}
-          selectableOwnKeychains={keychains}
-          selectablePublicKeychains={[]}
-          onSelect={() => {}}
-          includePublic={false}
-        />
-      </div>
-    </Modal>
+    <KeychainPicker
+      hasNoOwnKeychains={selectableKeychains.length === 0}
+      includePublic={false}
+      selectableOwnKeychains={selectableKeychains}
+      selectablePublicKeychains={[]}
+      onSelect={(keychain) => updateKey({ type: `setKeychainId`, to: keychain.id })}
+      selected={
+        selectableKeychains.find((keychain) => keychain.id === editingKey?.keychainId) ??
+        null
+      }
+    />
   );
 };
 
 export default UnlockRequestResponder;
 
 interface AppDetailProps {
+  expanded: boolean;
   label: string;
-  data: string;
+  data?: string;
 }
 
-const AppDetail: React.FC<AppDetailProps> = ({ label, data }) => {
+const AppDetail: React.FC<AppDetailProps> = ({ label, data, expanded }) => {
+  if (!data) {
+    return null;
+  }
   return (
-    <div className="flex items-center p-3 px-5 odd:bg-gray-50 last:rounded-b-xl overflow-scroll">
-      <h3 className="text-gray-600 mr-3 font-medium whitespace-nowrap">{label}:</h3>
-      <h2 className="text-gray-900 text-lg font-bold whitespace-nowrap">{data}</h2>
+    <div className="flex items-start p-3 px-5 text-sm sm:text-md odd:bg-gray-50 last:rounded-b-xl">
+      <h3
+        className={cx(
+          `text-gray-600 antialiased pr-3 font-medium`,
+          expanded && `min-w-[108px]`,
+        )}
+      >
+        {label}:
+      </h3>
+      <h2 className="text-gray-900 *font-mono font-bold break-all">{data}</h2>
     </div>
   );
 };

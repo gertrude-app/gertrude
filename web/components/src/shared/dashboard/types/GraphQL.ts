@@ -88,6 +88,12 @@ export interface DateRangeInput {
   start: string;
 }
 
+export interface DecideUnlockRequestInput {
+  id: UUID;
+  responseComment?: string | null;
+  status: RequestStatus;
+}
+
 export interface DeleteMonitoringItemInput {
   id: UUID;
   type: string;

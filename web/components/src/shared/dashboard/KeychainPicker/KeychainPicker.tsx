@@ -8,7 +8,7 @@ type Props = {
   selectableOwnKeychains: Keychain[];
   selectablePublicKeychains: Keychain[];
   onSelect(keychain: Keychain): unknown;
-  selected?: Keychain | null;
+  selected: Keychain | null;
   includePublic?: boolean;
 };
 

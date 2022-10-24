@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import EditUser from '@dashboard/Users/EditUser';
 import { Navigate, useParams } from 'react-router-dom';
 import Loading from '@shared/Loading';
+import { isUnsaved, unsavedId } from '@dashboard/lib/id';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import { familyToIcon } from './Users';
@@ -24,8 +25,7 @@ import {
 import { isDirty, Query, Req } from '../../redux/helpers';
 import { GetUser_user_devices } from '../../api/users/__generated__/GetUser';
 import { QueryProps } from '../../redux/store';
-import { isUnsaved, unsavedId } from '@dashboard/lib/id';
-import { fetchSelectableKeychains } from '../../redux/slice-keychains';
+import useSelectableKeychains from '../../hooks/selectable-keychains';
 
 const User: React.FC = () => {
   const dispatch = useDispatch();
@@ -58,6 +58,9 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
     const id = userId === `new` ? unsavedId() : userId;
     const state = appState.users;
     const fetch = state.fetchUserRequest[id];
+    const selectableKeychains = useSelectableKeychains(
+      state.adding.keychain !== undefined,
+    );
 
     if (!isUnsaved(id) && fetch?.state !== `succeeded`) {
       return [Req.toUnresolvedQuery(fetch), fetch?.state !== `failed`];
@@ -75,8 +78,6 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
     const update = state.updateUserRequest[id];
     const deleteDeviceId = state.deleting.device;
     const deleteUserId = state.deleting.user;
-    const fetchSelectableKeychainsRequest =
-      appState.keychains.fetchSelectableKeychainsRequest;
 
     function set(arg: Partial<UserUpdate>): void {
       dispatch(userUpdated({ id, ...arg } as UserUpdate));
@@ -118,20 +119,13 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
         startAddDevice: () => dispatch(createPendingAppConnection(id)),
         dismissAddDevice: () => dispatch(addDeviceDismissed()),
         addDeviceRequest: state.addDeviceRequest,
-        onAddKeychainClicked: () => {
-          dispatch(addKeychainClicked());
-          if (fetchSelectableKeychainsRequest.state === `idle`) {
-            dispatch(fetchSelectableKeychains());
-          }
-        },
+        onAddKeychainClicked: () => dispatch(addKeychainClicked()),
         onSelectKeychainToAdd: (keychain) => dispatch(keychainSelected(keychain)),
         onConfirmAddKeychain: () => dispatch(keychainAdded(id)),
         onDismissAddKeychain: () => dispatch(addKeychainModalDismissed()),
         selectingKeychain: state.adding?.keychain,
         fetchSelectableKeychainsRequest:
-          state.adding?.keychain === undefined
-            ? undefined
-            : fetchSelectableKeychainsRequest,
+          state.adding?.keychain === undefined ? undefined : selectableKeychains,
       }),
       false,
     ];

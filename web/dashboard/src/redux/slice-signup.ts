@@ -29,7 +29,7 @@ export function initialState(): SignupState {
 }
 
 export const slice = createSlice({
-  name: `waitlist`,
+  name: `signup`,
   initialState,
   reducers: {
     emailUpdated: (state, action: PayloadAction<string>) => {

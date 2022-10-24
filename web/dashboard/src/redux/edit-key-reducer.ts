@@ -74,6 +74,10 @@ export default function reducer(state: EditKey.State, action: EditKey.Event): vo
       state.keyType = action.to;
       break;
 
+    case `setKeychainId`:
+      state.keychainId = action.to;
+      break;
+
     case `setAppSlug`:
       state.appSlug = action.to;
       break;

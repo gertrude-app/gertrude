@@ -38,7 +38,7 @@ const AddKeychainModal: React.FC<Props> = ({
           (keychain) => !existingKeychains.some((kc) => kc.id === keychain.id),
         )}
         onSelect={onSelect}
-        selected={selected}
+        selected={selected ?? null}
       />
     )}
   />

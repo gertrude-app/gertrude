@@ -10,6 +10,7 @@ import urlReducer from './slice-url';
 import appsReducer from './slice-apps';
 import dashboardReducer from './slice-dashboard';
 import filterSuspensionsReducer from './slice-filter-suspensions';
+import unlockRequestsReducer from './slice-unlock-requests';
 import storageMiddleware from './middleware-storage';
 import toastMiddleware from './middleware-toast';
 import redirectMiddleware from './middleware-redirect';
@@ -25,6 +26,7 @@ export const store = configureStore({
     filterSuspensions: filterSuspensionsReducer,
     signup: signupReducer,
     users: usersReducer,
+    unlockRequests: unlockRequestsReducer,
     url: urlReducer,
   },
   middleware: (getDefaultMiddleware) => {

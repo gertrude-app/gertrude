@@ -26,7 +26,7 @@ export function initialState(): FilterSuspensionsState {
 }
 
 export const slice = createSlice({
-  name: `requests`,
+  name: `filter-suspensions`,
   initialState,
   reducers: {
     responseCommentUpdated: (state, action: PayloadAction<string>) => {

@@ -9,6 +9,8 @@ import { createResultThunk } from './thunk';
 import * as empty from './empty';
 import editKeyReducer from './edit-key-reducer';
 import Result from '../api/Result';
+import { acceptUnlockRequestClicked } from './slice-unlock-requests';
+import { keyForUnlockRequest } from '../lib/unlock-key';
 
 export interface KeychainsState {
   fetchAdminKeychainRequest: Record<UUID, RequestState>;
@@ -95,6 +97,14 @@ export const slice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(acceptUnlockRequestClicked, (state, action) => {
+      state.editingKey = convert.toState({
+        id: uuid(),
+        keychainId: uuid(),
+        key: keyForUnlockRequest(action.payload),
+      });
+    });
+
     builder.addCase(upsertKeychain.started, (state, { meta }) => {
       state.updateAdminKeychainRequest[meta.arg] = Req.ongoing();
     });
