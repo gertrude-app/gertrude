@@ -1,6 +1,6 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../../decorators/StatefulChrome';
-import { keychainProps } from '../../story-helpers';
+import { confirmableEntityAction, keychainProps } from '../../story-helpers';
 import EditUser from './EditUser';
 
 export default {
@@ -24,6 +24,8 @@ Default.args = {
   setScreenshotsFrequency: () => {},
   screenshotsResolution: 1000,
   setScreenshotsResolution: () => {},
+  deleteUser: confirmableEntityAction(),
+  deleteDevice: confirmableEntityAction(),
   keychains: [
     keychainProps({ name: `HTC`, numKeys: 43, isPublic: true }),
     keychainProps({ name: `Public Speaking`, numKeys: 7, isPublic: false }),
