@@ -106,7 +106,9 @@ const TextInput: React.FC<Props> = ({
             `text-gray-600 placeholder:text-gray-400/90 placeholder:antialiased`,
             `ring-0 ring-gray-200 outline-none focus:shadow-md focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1`,
             isInput(props) && props.unit ? `rounded-r-none` : `rounded-r-lg`,
-            isInput(props) && props.prefix && `rounded-l-lg xs:rounded-l-none`,
+            isInput(props) && props.prefix
+              ? `rounded-l-lg xs:rounded-l-none`
+              : `rounded-l-lg`,
           )}
         />
         {isInput(props) && props.unit && (
