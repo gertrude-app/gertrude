@@ -44,6 +44,18 @@ FirstStep.args = {
   requestProtocol: `TCP`,
 };
 
+export const NoAppName = Template.bind({});
+NoAppName.args = {
+  ...FirstStep.args,
+  appName: undefined,
+};
+
+export const EmptyStringComment = Template.bind({});
+EmptyStringComment.args = {
+  ...FirstStep.args,
+  requestComment: ``,
+};
+
 export const SecondStep = Template.bind({});
 SecondStep.args = {
   ...FirstStep.args,

@@ -45,11 +45,13 @@ const UnlockRequestResponder: React.FC<Props> = ({
             <h1 className="text-xl font-bold whitespace-nowrap pr-3">{userName}</h1>
             <h3 className="text-gray-500">{relativeTime(createdAt)}</h3>
           </div>
-          <div className="mt-3 sm:mt-0">
-            <UserInputText className="text-center sm:text-left">
-              &ldquo;{requestComment}&rdquo;
-            </UserInputText>
-          </div>
+          {requestComment && (
+            <div className="mt-3 sm:mt-0">
+              <UserInputText className="text-center sm:text-left">
+                &ldquo;{requestComment}&rdquo;
+              </UserInputText>
+            </div>
+          )}
         </div>
         <div className="bg-gray-50 p-3 rounded-xl *overflow-scroll">
           <a
@@ -71,7 +73,15 @@ const UnlockRequestResponder: React.FC<Props> = ({
               className={cx(`fa-solid fa-chevron-down`, detailsExpanded && `-rotate-180`)}
             />
           </button>
-          <AppDetail expanded={detailsExpanded} label="App" data={appName} />
+          {appName ? (
+            <AppDetail expanded={detailsExpanded} label="App" data={appName} />
+          ) : (
+            <AppDetail
+              expanded={detailsExpanded}
+              label="App Bundle ID"
+              data={appBundleId}
+            />
+          )}
           {detailsExpanded && (
             <>
               <AppDetail
@@ -79,11 +89,13 @@ const UnlockRequestResponder: React.FC<Props> = ({
                 label="App category"
                 data={appCategories.join(`, `)}
               />
-              <AppDetail
-                expanded={detailsExpanded}
-                label="Bundle ID"
-                data={appBundleId}
-              />
+              {appName && (
+                <AppDetail
+                  expanded={detailsExpanded}
+                  label="Bundle ID"
+                  data={appBundleId}
+                />
+              )}
               <AppDetail
                 expanded={detailsExpanded}
                 label="Protocol"

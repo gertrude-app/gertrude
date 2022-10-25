@@ -35,6 +35,7 @@ export function toState(keyRecord: KeyRecord): EditKey.State {
   state.keyType = `app`;
   if (key.scope.single.type === `bundleId`) {
     state.appBundleId = key.scope.single.bundleId;
+    state.appIdentificationType = `bundleId`;
   } else {
     state.appSlug = key.scope.single.identifiedAppSlug;
   }

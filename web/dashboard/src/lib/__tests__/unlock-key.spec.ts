@@ -84,6 +84,26 @@ describe(`keyForUnlockRequest()`, () => {
         },
       },
     ],
+    [
+      {
+        url: `https://cf.iadsdk.apple.com/adserver/2.6/config`,
+        domain: `cf.iadsdk.apple.com`,
+        ipAddress: `0.0.0.0`,
+        appBundleId: `.com.apple.ap.adprivacyd`,
+        appCategories: [],
+      },
+      {
+        type: `domain`,
+        domain: `cf.iadsdk.apple.com`,
+        scope: {
+          type: `single`,
+          single: {
+            type: `bundleId`,
+            bundleId: `.com.apple.ap.adprivacyd`,
+          },
+        },
+      },
+    ],
   ];
 
   test.each(cases)(`unlock request -> create key`, (decision, expectedKey) => {

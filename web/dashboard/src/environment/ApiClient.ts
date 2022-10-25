@@ -144,6 +144,9 @@ export const throwingApiClient: ApiClient = {
     getUnlockRequest: () => {
       throw new Error(`ApiClient.requests.getUnlockRequest() not implemented.`);
     },
+    getUserUnlockRequests: () => {
+      throw new Error(`ApiClient.requests.getUserUnlockRequests() not implemented.`);
+    },
   },
   signup: {
     joinWaitlist: () => {
@@ -300,6 +303,7 @@ export const noopApiClient: ApiClient = {
     getUnlockRequest: async () => {
       return Result.success({
         id: ``,
+        userId: ``,
         userName: ``,
         status: RequestStatus.pending,
         url: undefined,
@@ -312,6 +316,9 @@ export const noopApiClient: ApiClient = {
         requestProtocol: undefined,
         createdAt: ``,
       });
+    },
+    getUserUnlockRequests: async () => {
+      return Result.success([]);
     },
   },
   signup: {

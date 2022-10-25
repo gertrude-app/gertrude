@@ -14,13 +14,15 @@ type State =
   | 'decided';
 
 export interface UnlockRequestsState {
-  fetchReqs: Record<UUID, RequestState<UnlockRequest & { state: State }>>;
+  entities: Record<UUID, UnlockRequest & { state: State }>;
+  fetchReqs: Record<UUID, RequestState>;
   updateReqs: Record<UUID, RequestState>;
   detailsExpanded: boolean;
 }
 
 export function initialState(): UnlockRequestsState {
   return {
+    entities: {},
     fetchReqs: {},
     updateReqs: {},
     detailsExpanded: false,
@@ -35,13 +37,13 @@ export const slice = createSlice({
       state.detailsExpanded = !state.detailsExpanded;
     },
     acceptUnlockRequestClicked(state, action: PayloadAction<UnlockRequest>) {
-      const unlockRequest = Req.payload(state.fetchReqs[action.payload.id]);
+      const unlockRequest = state.entities[action.payload.id];
       if (unlockRequest) {
         unlockRequest.state = `editingKey`;
       }
     },
     selectKeychainClicked(state, action: PayloadAction<UUID>) {
-      const unlockRequest = Req.payload(state.fetchReqs[action.payload]);
+      const unlockRequest = state.entities[action.payload];
       if (unlockRequest) {
         unlockRequest.state = `selectingKeychain`;
       }
@@ -50,7 +52,7 @@ export const slice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(rejectUnlockRequest.started, (state, { meta }) => {
       state.updateReqs[meta.arg] = Req.ongoing();
-      const unlockRequest = Req.payload(state.fetchReqs[meta.arg]);
+      const unlockRequest = state.entities[meta.arg];
       if (unlockRequest) {
         unlockRequest.state = `pendingUpdate`;
       }
@@ -62,7 +64,7 @@ export const slice = createSlice({
 
     builder.addCase(rejectUnlockRequest.succeeded, (state, { meta }) => {
       state.updateReqs[meta.arg] = Req.succeed(void 0);
-      const unlockRequest = Req.payload(state.fetchReqs[meta.arg]);
+      const unlockRequest = state.entities[meta.arg];
       if (unlockRequest) {
         unlockRequest.state = `decided`;
         unlockRequest.status = `rejected`;
@@ -71,7 +73,7 @@ export const slice = createSlice({
 
     builder.addCase(acceptUnlockRequest.started, (state, { meta }) => {
       state.updateReqs[meta.arg] = Req.ongoing();
-      const unlockRequest = Req.payload(state.fetchReqs[meta.arg]);
+      const unlockRequest = state.entities[meta.arg];
       if (unlockRequest) {
         unlockRequest.state = `pendingUpdate`;
       }
@@ -83,10 +85,25 @@ export const slice = createSlice({
 
     builder.addCase(acceptUnlockRequest.succeeded, (state, { meta }) => {
       state.updateReqs[meta.arg] = Req.succeed(void 0);
-      const unlockRequest = Req.payload(state.fetchReqs[meta.arg]);
+      const unlockRequest = state.entities[meta.arg];
       if (unlockRequest) {
         unlockRequest.state = `decided`;
         unlockRequest.status = `accepted`;
+      }
+    });
+
+    builder.addCase(getUserUnlockRequests.started, (state, { meta }) => {
+      state.fetchReqs[meta.arg] = Req.ongoing();
+    });
+
+    builder.addCase(getUserUnlockRequests.failed, (state, { error, meta }) => {
+      state.fetchReqs[meta.arg] = Req.fail(error);
+    });
+
+    builder.addCase(getUserUnlockRequests.succeeded, (state, { payload, meta }) => {
+      state.fetchReqs[meta.arg] = Req.succeed(void 0);
+      for (const unlockRequest of payload) {
+        state.entities[unlockRequest.id] = { ...unlockRequest, state: `reviewing` };
       }
     });
 
@@ -100,10 +117,11 @@ export const slice = createSlice({
     });
 
     builder.addCase(getUnlockRequest.succeeded, (state, { payload, meta }) => {
-      state.fetchReqs[meta.arg] = Req.succeed({
+      state.fetchReqs[meta.arg] = Req.succeed(void 0);
+      state.entities[meta.arg] = {
         ...payload,
         state: payload.status === `pending` ? `reviewing` : `decided`,
-      });
+      };
     });
   },
 });
@@ -136,6 +154,11 @@ export const rejectUnlockRequest = createResultThunk(
 export const getUnlockRequest = createResultThunk(
   `${slice.name}/getUnlockRequest`,
   Current.api.requests.getUnlockRequest,
+);
+
+export const getUserUnlockRequests = createResultThunk(
+  `${slice.name}/getUserUnlockRequests`,
+  Current.api.requests.getUserUnlockRequests,
 );
 
 export const {

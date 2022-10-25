@@ -108,21 +108,18 @@ const Title: React.FC<Props> = ({
   appBundleId,
   appSlug,
   appIdentificationType,
-}) => {
-  return (
-    <h2 className="font-medium text-gray-900 text-lg">
-      <GradientIcon
-        icon={appIdentificationType === `bundleId` ? `pen-to-square` : `app-store`}
-        className="mr-2.5"
-        size="small"
-      />
-      {keyType === `app` ? `Allowing app ` : `App `}
-      {appIdentificationType === `bundleId` ? `with id` : ``}
-      <UserInputText>
-        {appIdentificationType === `bundleId`
-          ? appBundleId
-          : apps.find((app) => app.slug === appSlug)?.name ?? ``}
-      </UserInputText>
-    </h2>
-  );
-};
+}) => (
+  <h2 className="font-medium text-gray-900 text-lg">
+    <GradientIcon
+      icon={appIdentificationType === `bundleId` ? `pen-to-square` : `app-store`}
+      className="mr-2.5"
+      size="small"
+    />
+    {keyType === `app` ? `Allowing app ` : `App `}
+    <UserInputText>
+      {appIdentificationType === `bundleId`
+        ? appBundleId
+        : apps.find((app) => app.slug === appSlug)?.name ?? appBundleId}
+    </UserInputText>
+  </h2>
+);

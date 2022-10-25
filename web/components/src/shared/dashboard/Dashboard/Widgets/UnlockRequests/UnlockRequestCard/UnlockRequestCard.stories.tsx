@@ -1,4 +1,5 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { RequestStatus } from '../../../../types/GraphQL';
 import UnlockRequestCard from './UnlockRequestCard';
 
 export default {
@@ -16,6 +17,7 @@ Default.args = {
   userName: `Freddy`,
   url: `github.com`,
   comment: `Pleeeease can I use this? It's sooooo cool`,
+  status: RequestStatus.pending,
 };
 
 export const LongComment = Template.bind({});
@@ -23,6 +25,18 @@ LongComment.args = {
   ...Default.args,
   url: `khanacademy.org`,
   comment: `This is just some online courses about math, science, history, economics, and lorem ipsum dolor sit, amet consectetur adipisicing elit. Aspernatur vel molestiae placeat ex, asperiores corporis deserunt. Laborum eligendi doloremque nostrum dolor, corporis nisi, minima pariatur ab officia eaque sequi. Veniam?`,
+};
+
+export const Accepted = Template.bind({});
+Accepted.args = {
+  ...Default.args,
+  status: RequestStatus.accepted,
+};
+
+export const Rejected = Template.bind({});
+Rejected.args = {
+  ...Default.args,
+  status: RequestStatus.rejected,
 };
 
 export const NoComment = Template.bind({});

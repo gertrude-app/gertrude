@@ -6,8 +6,13 @@ export async function getUnlockRequest(
   id: UUID,
 ): Promise<Result<UnlockRequest, ApiError>> {
   const result = await query<T.UnlockRequest, T.UnlockRequestVariables>(QUERY, { id });
-  return result.mapApi(({ unlockRequest: req }) => ({
+  return result.mapApi((data) => mapUnlockRequest(data.unlockRequest));
+}
+
+export function mapUnlockRequest(req: T.UnlockRequest_unlockRequest): UnlockRequest {
+  return {
     id: req.id,
+    userId: req.device.user.id,
     userName: req.device.user.name,
     status: req.status,
     url: req.networkDecision.url ?? undefined,
@@ -20,37 +25,45 @@ export async function getUnlockRequest(
     appCategories: req.networkDecision.app?.categories ?? [],
     requestProtocol: req.networkDecision.ipProtocol?.description ?? undefined,
     createdAt: req.createdAt,
-  }));
+  };
 }
 
+export const UNLOCK_REQUEST_FIELDS = gql`
+  fragment UnlockRequestFields on UnlockRequest {
+    id
+    requestComment
+    createdAt
+    status
+    networkDecision {
+      ipProtocol {
+        description
+      }
+      url
+      hostname
+      ipAddress
+      app: appDescriptor {
+        bundleId
+        slug
+        displayName
+        categories
+        shortDescription
+      }
+    }
+    device {
+      id
+      user {
+        id
+        name
+      }
+    }
+  }
+`;
+
 const QUERY = gql`
+  ${UNLOCK_REQUEST_FIELDS}
   query UnlockRequest($id: UUID!) {
     unlockRequest: getUnlockRequest(id: $id) {
-      id
-      requestComment
-      createdAt
-      status
-      networkDecision {
-        ipProtocol {
-          description
-        }
-        url
-        hostname
-        ipAddress
-        app: appDescriptor {
-          bundleId
-          slug
-          displayName
-          categories
-          shortDescription
-        }
-      }
-      device {
-        id
-        user {
-          name
-        }
-      }
+      ...UnlockRequestFields
     }
   }
 `;

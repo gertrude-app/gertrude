@@ -6,15 +6,15 @@
 import { RequestStatus } from './../../../../../components/src/shared/dashboard/types/GraphQL';
 
 // ====================================================
-// GraphQL query operation: UnlockRequest
+// GraphQL fragment: UnlockRequestFields
 // ====================================================
 
-export interface UnlockRequest_unlockRequest_networkDecision_ipProtocol {
+export interface UnlockRequestFields_networkDecision_ipProtocol {
   __typename: 'IpProtocol';
   description: string;
 }
 
-export interface UnlockRequest_unlockRequest_networkDecision_app {
+export interface UnlockRequestFields_networkDecision_app {
   __typename: 'AppDescriptor';
   bundleId: string;
   slug: string | null;
@@ -23,41 +23,33 @@ export interface UnlockRequest_unlockRequest_networkDecision_app {
   shortDescription: string;
 }
 
-export interface UnlockRequest_unlockRequest_networkDecision {
+export interface UnlockRequestFields_networkDecision {
   __typename: 'NetworkDecision';
-  ipProtocol: UnlockRequest_unlockRequest_networkDecision_ipProtocol | null;
+  ipProtocol: UnlockRequestFields_networkDecision_ipProtocol | null;
   url: string | null;
   hostname: string | null;
   ipAddress: string | null;
-  app: UnlockRequest_unlockRequest_networkDecision_app | null;
+  app: UnlockRequestFields_networkDecision_app | null;
 }
 
-export interface UnlockRequest_unlockRequest_device_user {
+export interface UnlockRequestFields_device_user {
   __typename: 'User';
   id: string;
   name: string;
 }
 
-export interface UnlockRequest_unlockRequest_device {
+export interface UnlockRequestFields_device {
   __typename: 'Device';
   id: string;
-  user: UnlockRequest_unlockRequest_device_user;
+  user: UnlockRequestFields_device_user;
 }
 
-export interface UnlockRequest_unlockRequest {
+export interface UnlockRequestFields {
   __typename: 'UnlockRequest';
   id: string;
   requestComment: string | null;
   createdAt: string;
   status: RequestStatus;
-  networkDecision: UnlockRequest_unlockRequest_networkDecision;
-  device: UnlockRequest_unlockRequest_device;
-}
-
-export interface UnlockRequest {
-  unlockRequest: UnlockRequest_unlockRequest;
-}
-
-export interface UnlockRequestVariables {
-  id: UUID;
+  networkDecision: UnlockRequestFields_networkDecision;
+  device: UnlockRequestFields_device;
 }

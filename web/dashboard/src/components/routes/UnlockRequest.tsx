@@ -23,25 +23,33 @@ import {
 const UnlockRequest: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const goToDashboard: () => unknown = () => navigate(`/`);
+  let onDismiss: () => unknown = () => navigate(`/`);
   const { id = `` } = useParams<{ id: string }>();
-  const { fetchReq, detailsExpanded, editingKey, updateReq } = useSelector((state) => ({
-    editingKey: state.keychains.editingKey,
-    detailsExpanded: state.unlockRequests.detailsExpanded,
-    fetchReq: state.unlockRequests.fetchReqs[id],
-    updateReq: state.unlockRequests.updateReqs[id],
-  }));
+  const { fetchReq, detailsExpanded, editingKey, updateReq, unlockRequest } = useSelector(
+    (state) => ({
+      editingKey: state.keychains.editingKey,
+      detailsExpanded: state.unlockRequests.detailsExpanded,
+      unlockRequest: state.unlockRequests.entities[id],
+      fetchReq: state.unlockRequests.fetchReqs[id],
+      updateReq: state.unlockRequests.updateReqs[id],
+    }),
+  );
 
-  const unlockRequest = Req.payload(fetchReq);
+  if (unlockRequest) {
+    onDismiss = () => navigate(`/users/${unlockRequest.userId}/unlock-requests`);
+  }
+
   const appsReq = useApps(unlockRequest?.state === `editingKey`);
   const keychainsReq = useSelectableKeychains(unlockRequest?.state === `editingKey`);
 
   useEffect(() => {
-    !fetchReq?.state && dispatch(getUnlockRequest(id));
-  }, [fetchReq?.state, dispatch, id]);
+    if (!fetchReq?.state && !unlockRequest?.id) {
+      dispatch(getUnlockRequest(id));
+    }
+  }, [fetchReq?.state, dispatch, unlockRequest?.id, id]);
 
   if (
-    !fetchReq ||
+    (!fetchReq && !unlockRequest) ||
     fetchReq?.state === `ongoing` ||
     fetchReq?.state === `idle` ||
     unlockRequest?.state === `pendingUpdate` ||
@@ -51,14 +59,14 @@ const UnlockRequest: React.FC = () => {
     return <Loading />;
   }
 
-  if (fetchReq.state === `failed`) {
+  if (fetchReq?.state === `failed`) {
     return (
       <Modal
         type="error"
         title={fetchReq.error?.type === `not_found` ? `Not found` : `Error`}
         isOpen={true}
-        onPrimaryClick={goToDashboard}
-        onSecondaryClick={goToDashboard}
+        onPrimaryClick={onDismiss}
+        onSecondaryClick={onDismiss}
         icon={fetchReq.error?.type === `not_found` ? `question` : void 0}
       >
         <ApiErrorMessage entity="Unlock request" wrapped={false} error={fetchReq.error} />
@@ -72,8 +80,8 @@ const UnlockRequest: React.FC = () => {
         type="error"
         title={updateReq.error?.type === `not_found` ? `Not found` : `Error`}
         isOpen={true}
-        onPrimaryClick={goToDashboard}
-        onSecondaryClick={goToDashboard}
+        onPrimaryClick={onDismiss}
+        onSecondaryClick={onDismiss}
       >
         <ApiErrorMessage wrapped={false} error={updateReq.error} />
       </Modal>
@@ -91,8 +99,8 @@ const UnlockRequest: React.FC = () => {
         type="error"
         title="Unlock Request"
         isOpen={true}
-        onPrimaryClick={goToDashboard}
-        onSecondaryClick={goToDashboard}
+        onPrimaryClick={onDismiss}
+        onSecondaryClick={onDismiss}
         icon={unlockRequest.status === `rejected` ? `thumbs-down` : `thumbs-up`}
       >
         <div className="mt-4">
@@ -132,7 +140,7 @@ const UnlockRequest: React.FC = () => {
         }
       })()}
       secondaryButtonText={unlockRequest.state === `reviewing` ? `Deny` : `Cancel`}
-      onDismiss={goToDashboard}
+      onDismiss={onDismiss}
       primaryButtonDisabled={
         (unlockRequest.state === `editingKey` && toKeyRecord(editingKey) === null) ||
         (unlockRequest.state === `selectingKeychain` &&
@@ -157,10 +165,10 @@ const UnlockRequest: React.FC = () => {
             dispatch(rejectUnlockRequest(id));
             break;
           case `editingKey`:
-            goToDashboard();
+            onDismiss();
             break;
           case `selectingKeychain`:
-            goToDashboard();
+            onDismiss();
             break;
         }
       }}
