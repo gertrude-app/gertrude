@@ -53,6 +53,7 @@ type DashboardWidgetData = {
 
 interface UnlockRequest {
   id: UUID;
+  userId: UUID;
   userName: string;
   status: RequestStatus;
   url?: string;

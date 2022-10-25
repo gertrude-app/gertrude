@@ -11,6 +11,7 @@ import CheckoutSuccess from './components/routes/CheckoutSuccess';
 import CheckoutCancel from './components/routes/CheckoutCancel';
 import SuspendFilter from './components/routes/SuspendFilter';
 import UnlockRequest from './components/routes/UnlockRequest';
+import UserUnlockRequests from './components/routes/UserUnlockRequests';
 import JoinWaitlist from './components/routes/JoinWaitlist';
 import AdminProfile from './components/routes/AdminProfile';
 import Keychain from './components/routes/Keychain';
@@ -78,6 +79,7 @@ const App: React.FC = () => {
           <Route index element={<Users />} />
           <Route path=":userId">
             <Route index element={<User />} />
+            <Route path="unlock-requests" element={<UserUnlockRequests />} />
             <Route path="activity">
               <Route index element={<UserActivityOverview />} />
               <Route path=":date" element={<UserActivityDay />} />
