@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 import Modal from '@shared/dashboard/Modal';
 import SuspendFilterRequestForm from '@dashboard/Users/SuspendFilterRequestForm';
-import { RequestStatus } from '@shared/dashboard/types/GraphQL';
-import UserInputText from '@shared/dashboard/Keychains/Keys/KeyCreator/UserInputText';
+import { RequestStatus } from '@dashboard/types/GraphQL';
+import UserInputText from '@dashboard/Keychains/Keys/KeyCreator/UserInputText';
+import { isOlderThan } from '@dashboard/lib/dates';
+import Loading from '@dashboard/Modal/Loading';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import ApiErrorMessage from '../ApiErrorMessage';
@@ -13,7 +15,6 @@ import {
   grantedCustomDurationInMinutesUpdated,
   updateSuspendFilterRequest,
 } from '../../redux/slice-filter-suspensions';
-import { isOlderThan } from '@shared/dashboard/lib/dates';
 
 const SuspendFilter: React.FC = () => {
   const dispatch = useDispatch();
@@ -34,25 +35,15 @@ const SuspendFilter: React.FC = () => {
     grantedCustomDurationInMinutes:
       state.filterSuspensions.grantedCustomDurationInMinutes,
   }));
-  const requestState = fetchReq?.state;
 
   useEffect(() => {
-    if (!requestState) {
+    if (!fetchReq?.state) {
       dispatch(getSuspendFilterRequest(id));
     }
-  }, [requestState, dispatch, id]);
+  }, [fetchReq?.state, dispatch, id]);
 
   if (!fetchReq || fetchReq?.state === `ongoing` || fetchReq?.state === `idle`) {
-    return (
-      <Modal
-        type="default"
-        loading
-        title=""
-        isOpen={true}
-        onPrimaryClick={() => {}}
-        onSecondaryClick={() => {}}
-      />
-    );
+    return <Loading />;
   }
 
   if (fetchReq.state === `failed`) {
@@ -66,7 +57,7 @@ const SuspendFilter: React.FC = () => {
         icon={fetchReq.error?.type === `not_found` ? `question` : void 0}
       >
         <ApiErrorMessage
-          entity="Suspend filter Request"
+          entity="Suspend filter request"
           wrapped={false}
           error={fetchReq.error}
         />

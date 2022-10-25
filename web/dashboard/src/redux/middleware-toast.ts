@@ -4,6 +4,7 @@ import { capitalize } from '@dashboard/lib/string';
 import { deleteActivityItems, deleteDevice, upsertUser, deleteUser } from './slice-users';
 import { ResultThunk } from './thunk';
 import { updateSuspendFilterRequest } from './slice-filter-suspensions';
+import { acceptUnlockRequest, rejectUnlockRequest } from './slice-unlock-requests';
 import {
   deleteKeychain,
   deleteKeyRecord,
@@ -34,6 +35,8 @@ const toastMiddleware: Middleware = (_store) => (next) => (action) => {
   toastCrud(`verify`, `confirmation code`, confirmPendingNotificationMethod, action);
   toastCrud(`approve`, `activity items`, deleteActivityItems, action);
   toastCrud(`update`, `suspend filter request`, updateSuspendFilterRequest, action);
+  toastCrud(`reject`, `unlock request`, rejectUnlockRequest, action);
+  toastCrud(`accept`, `unlock request`, acceptUnlockRequest, action);
 
   return next(action);
 };
@@ -41,7 +44,15 @@ const toastMiddleware: Middleware = (_store) => (next) => (action) => {
 export default toastMiddleware;
 
 function toastCrud(
-  verb: 'save' | 'update' | 'delete' | 'send' | 'verify' | 'approve',
+  verb:
+    | 'save'
+    | 'update'
+    | 'delete'
+    | 'send'
+    | 'verify'
+    | 'approve'
+    | 'reject'
+    | 'accept',
   type: string,
   thunk: ResultThunk<any, any, any>,
   action: Action<unknown>,
@@ -56,17 +67,17 @@ function toastCrud(
     const pastTense = (() => {
       switch (verb) {
         case `update`:
-          return `updated`;
         case `save`:
-          return `saved`;
         case `delete`:
-          return `deleted`;
+        case `approve`:
+          return `${verb}d`;
+        case `accept`:
+        case `reject`:
+          return `${verb}ed`;
         case `send`:
           return `sent`;
         case `verify`:
           return `verified`;
-        case `approve`:
-          return `approved`;
       }
     })();
     toast.success(`${capitalize(type)} ${pastTense}!`);

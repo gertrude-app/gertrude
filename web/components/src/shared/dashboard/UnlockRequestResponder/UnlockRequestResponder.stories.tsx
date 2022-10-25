@@ -1,10 +1,28 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { ComponentStory, ComponentMeta, DecoratorFn } from '@storybook/react';
 import UnlockRequestResponder from './UnlockRequestResponder';
 import { time } from '../story-helpers';
+import Modal from '../Modal';
+
+const inModal: DecoratorFn = (Story) => (
+  <Modal
+    type="container"
+    title="Unlock Request"
+    icon="unlock"
+    isOpen
+    primaryButtonText="Accept"
+    secondaryButtonText="Deny"
+    onPrimaryClick={() => {}}
+    onSecondaryClick={() => {}}
+  >
+    <Story />
+  </Modal>
+);
 
 export default {
   title: `Dashboard/Users/UnlockRequestResponder`,
   component: UnlockRequestResponder,
+  decorators: [inModal],
+  parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof UnlockRequestResponder>;
 
 const Template: ComponentStory<typeof UnlockRequestResponder> = (args) => (
@@ -13,30 +31,27 @@ const Template: ComponentStory<typeof UnlockRequestResponder> = (args) => (
 
 export const FirstStep = Template.bind({});
 FirstStep.args = {
-  isOpen: true,
-  step: `preview request`,
+  step: `reviewing`,
   userName: `Winfield`,
-  comment: `schedule mayra appointments`,
-  target: {
-    url: `https://cdn-s.acuityscheduling.com/logo24613730.jpg?1650316493&whiteBg=1&rectangular=1`,
-    domain: `cdn-s.acuityscheduling.com`,
-    IPAddress: `151.101.2.132`,
-  },
-  dateRequested: new Date(time.subtracting({ minutes: 36 })),
+  requestComment: `schedule mayra appointments`,
+  url: `https://cdn-s.acuityscheduling.com/logo24613730.jpg?1650316493&whiteBg=1&rectangular=1`,
+  domain: `cdn-s.acuityscheduling.com`,
+  ipAddress: `151.101.2.132`,
+  createdAt: time.subtracting({ minutes: 36 }),
   appName: `Safari Browser`,
-  appCategory: `browser`,
+  appCategories: [`browser`],
   appBundleId: `.com.apple.Safari`,
-  protocol: `TCP`,
+  requestProtocol: `TCP`,
 };
 
 export const SecondStep = Template.bind({});
 SecondStep.args = {
   ...FirstStep.args,
-  step: `create key`,
+  step: `editingKey`,
 };
 
 export const ThirdStep = Template.bind({});
 ThirdStep.args = {
   ...FirstStep.args,
-  step: `select keychain`,
+  step: `selectingKeychain`,
 };

@@ -38,6 +38,7 @@ export type State = {
 
 export type Event =
   | { type: 'setKeyType'; to: Type }
+  | { type: 'setKeychainId'; to: UUID }
   | { type: 'nextStepClicked' }
   | { type: 'prevStepClicked' }
   | { type: 'setAddressType'; to: AddressType }

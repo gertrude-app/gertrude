@@ -138,6 +138,12 @@ export const throwingApiClient: ApiClient = {
     updateSuspendFilterRequest: () => {
       throw new Error(`ApiClient.requests.updateSuspendFilterRequest() not implemented.`);
     },
+    updateUnlockRequest: () => {
+      throw new Error(`ApiClient.requests.updateUnlockRequest() not implemented.`);
+    },
+    getUnlockRequest: () => {
+      throw new Error(`ApiClient.requests.getUnlockRequest() not implemented.`);
+    },
   },
   signup: {
     joinWaitlist: () => {
@@ -287,6 +293,25 @@ export const noopApiClient: ApiClient = {
     },
     updateSuspendFilterRequest: async () => {
       return Result.true();
+    },
+    updateUnlockRequest: async () => {
+      return Result.true();
+    },
+    getUnlockRequest: async () => {
+      return Result.success({
+        id: ``,
+        userName: ``,
+        status: RequestStatus.pending,
+        url: undefined,
+        domain: undefined,
+        ipAddress: undefined,
+        requestComment: undefined,
+        appName: undefined,
+        appBundleId: undefined,
+        appCategories: [],
+        requestProtocol: undefined,
+        createdAt: ``,
+      });
     },
   },
   signup: {

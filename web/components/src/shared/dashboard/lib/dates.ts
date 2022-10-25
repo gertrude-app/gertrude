@@ -77,7 +77,8 @@ export function isoFromDateInput(dateInput: string, existingIso?: string): strin
 
 const rtf = new Intl.RelativeTimeFormat(`en`, { numeric: `auto` });
 
-export function relativeTime(date: Date): string {
+export function relativeTime(isoOrDate: Date | string): string {
+  const date = typeof isoOrDate === `string` ? new Date(isoOrDate) : isoOrDate;
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const UNITS = {

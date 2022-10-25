@@ -15,7 +15,7 @@ export function initialState(): AppsState {
 }
 
 export const slice = createSlice({
-  name: `menu`,
+  name: `apps`,
   initialState,
   reducers: {},
   extraReducers: (builder) => {

@@ -50,3 +50,19 @@ type DashboardWidgetData = {
     createdAt: string;
   }>;
 };
+
+interface UnlockRequest {
+  id: UUID;
+  userName: string;
+  status: RequestStatus;
+  url?: string;
+  domain?: string;
+  ipAddress?: string;
+  requestComment?: string;
+  appName?: string;
+  appSlug?: string;
+  appBundleId?: string;
+  appCategories: string[];
+  requestProtocol?: string;
+  createdAt: string;
+}

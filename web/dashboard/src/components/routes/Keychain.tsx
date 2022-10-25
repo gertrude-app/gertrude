@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import EditKeychain from '@dashboard/Keychains/Edit';
+import { toKeyRecord } from '@dashboard/lib/keys/convert';
 import { QueryProps } from '../../redux/store';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import Loading from '../shared/Loading';
 import { isDirty, original, Query, Req } from '../../redux/helpers';
 import * as typesafe from '../../lib/typesafe';
+import useApps from '../../hooks/apps';
 import {
   fetchAdminKeychain,
   keychainDescriptionUpdated,
@@ -22,19 +24,12 @@ import {
   editKeyClicked,
   upsertEditingKeyRecord,
 } from '../../redux/slice-keychains';
-import { getIdentifiedApps } from '../../redux/slice-apps';
-import { toKeyRecord } from '@dashboard/lib/keys/convert';
 
 const Keychain: React.FC = () => {
   const { keychainId: id = `` } = useParams<{ keychainId: string }>();
   const dispatch = useDispatch();
+  const appsReq = useApps();
   const [keychainQuery, shouldFetchKeychain] = useSelector(queryProps(dispatch, id));
-  const appsReq = useSelector((state) => state.apps.request);
-  const appsReqState = appsReq.state;
-
-  useEffect(() => {
-    appsReqState === `idle` && dispatch(getIdentifiedApps());
-  }, [dispatch, appsReqState]);
 
   useEffect(() => {
     shouldFetchKeychain && dispatch(fetchAdminKeychain(id));
