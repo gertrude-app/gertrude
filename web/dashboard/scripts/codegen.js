@@ -67,8 +67,8 @@ function convertDatesToString() {
   const files = glob(`${CWD}/**/__generated__/**/*.ts`);
 
   if (files.length === 0) {
-    console.error(`No graphql files found by \`fix-timestamp-types.js\` script`);
-    console.error(`Did you run the script from somewhere other than the project root?`);
+    process.stderr.write(`No graphql files found by \`fix-timestamp-types.js\` script\n`);
+    process.stderr.write(`Did you run the script from outside the project root?\n`);
     process.exit(1);
   }
 
