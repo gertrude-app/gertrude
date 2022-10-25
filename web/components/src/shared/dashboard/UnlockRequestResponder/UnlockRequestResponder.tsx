@@ -73,7 +73,15 @@ const UnlockRequestResponder: React.FC<Props> = ({
               className={cx(`fa-solid fa-chevron-down`, detailsExpanded && `-rotate-180`)}
             />
           </button>
-          <AppDetail expanded={detailsExpanded} label="App" data={appName} />
+          {appName ? (
+            <AppDetail expanded={detailsExpanded} label="App" data={appName} />
+          ) : (
+            <AppDetail
+              expanded={detailsExpanded}
+              label="App Bundle ID"
+              data={appBundleId}
+            />
+          )}
           {detailsExpanded && (
             <>
               <AppDetail
@@ -81,11 +89,13 @@ const UnlockRequestResponder: React.FC<Props> = ({
                 label="App category"
                 data={appCategories.join(`, `)}
               />
-              <AppDetail
-                expanded={detailsExpanded}
-                label="Bundle ID"
-                data={appBundleId}
-              />
+              {appName && (
+                <AppDetail
+                  expanded={detailsExpanded}
+                  label="Bundle ID"
+                  data={appBundleId}
+                />
+              )}
               <AppDetail
                 expanded={detailsExpanded}
                 label="Protocol"
