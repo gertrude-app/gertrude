@@ -45,11 +45,13 @@ const UnlockRequestResponder: React.FC<Props> = ({
             <h1 className="text-xl font-bold whitespace-nowrap pr-3">{userName}</h1>
             <h3 className="text-gray-500">{relativeTime(createdAt)}</h3>
           </div>
-          <div className="mt-3 sm:mt-0">
-            <UserInputText className="text-center sm:text-left">
-              &ldquo;{requestComment}&rdquo;
-            </UserInputText>
-          </div>
+          {requestComment && (
+            <div className="mt-3 sm:mt-0">
+              <UserInputText className="text-center sm:text-left">
+                &ldquo;{requestComment}&rdquo;
+              </UserInputText>
+            </div>
+          )}
         </div>
         <div className="bg-gray-50 p-3 rounded-xl *overflow-scroll">
           <a
