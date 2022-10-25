@@ -48,6 +48,7 @@ const UnlockRequestCard: React.FC<Props> = ({
         type="link"
         to={`/unlock-requests/${id}`}
         color="primary-violet"
+        className="whitespace-nowrap"
         small
         fullWidth
       >
