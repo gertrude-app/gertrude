@@ -60,7 +60,7 @@ Container.args = {
         `Get this: another thing`,
         `Thing thing thing thing`,
       ].map((thing) => (
-        <div>
+        <div key={thing}>
           <h1 className="text-lg font-bold">{thing}</h1>
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa facere

@@ -169,6 +169,17 @@ AppKeyAddressScope.args = {
   activeStep: EditKey.Step.AppKey_Advanced_SetAddress,
 };
 
+export const EditAppKeyBundleId = Template.bind({});
+EditAppKeyBundleId.args = {
+  ...CreateApp.args,
+  isNew: false,
+  keyType: `app`,
+  activeStep: undefined,
+  appBundleId: `com.unknown.app`,
+  appSlug: undefined,
+  appIdentificationType: `bundleId`,
+};
+
 export const EditAppKeyAddressScope = Template.bind({});
 EditAppKeyAddressScope.args = {
   ...CreateApp.args,
