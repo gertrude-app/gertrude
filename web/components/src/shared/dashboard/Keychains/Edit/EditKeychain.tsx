@@ -119,7 +119,7 @@ const EditKeychain: React.FC<Props> = ({
             secondaryText="Add a key to this keychain:"
             icon={`key`}
             buttonText={`Create key`}
-            onButtonClick={onCreateNewKey}
+            action={onCreateNewKey}
           />
         )}
       </div>

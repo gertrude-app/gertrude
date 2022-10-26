@@ -8,7 +8,7 @@ type Props = {
   secondaryText: string;
   icon: string;
   buttonText: string;
-  onButtonClick(): void;
+  action: string | (() => unknown);
   violet?: boolean;
 };
 
@@ -17,7 +17,7 @@ const EmptyState: React.FC<Props> = ({
   heading,
   secondaryText,
   buttonText,
-  onButtonClick,
+  action,
   icon,
   violet = false,
 }) => (
@@ -36,16 +36,23 @@ const EmptyState: React.FC<Props> = ({
     />
     <h2 className="text-xl font-bold mt-3 mb-2">{heading}</h2>
     <p className="text-gray-500">{secondaryText}</p>
-    <Button
-      color="primary-violet"
-      type="button"
-      onClick={onButtonClick}
-      className="mt-6"
-      small
-    >
-      <i className="fa fa-plus mr-4" />
-      {buttonText}
-    </Button>
+    {typeof action === 'string' ? (
+      <Button color="primary-violet" type="link" to={action} className="mt-6" small>
+        <i className="fa fa-plus mr-4" />
+        {buttonText}
+      </Button>
+    ) : (
+      <Button
+        color="primary-violet"
+        type="button"
+        onClick={action}
+        className="mt-6"
+        small
+      >
+        <i className="fa fa-plus mr-4" />
+        {buttonText}
+      </Button>
+    )}
   </div>
 );
 

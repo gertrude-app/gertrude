@@ -49,7 +49,7 @@ const KeychainPicker: React.FC<Props> = ({
           secondaryText={`Select a public keychain or create your own.`}
           icon={`key`}
           buttonText={`Create keychains`}
-          onButtonClick={() => navigate(`/keychains`)}
+          action={`/keychains`}
         />
       )}
       {includePublic && (

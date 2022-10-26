@@ -49,7 +49,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
         secondaryText={`Let's make one!`}
         icon={`key`}
         buttonText={`Create keychain`}
-        onButtonClick={onCreateNew}
+        action={onCreateNew}
         className="mt-6"
       />
     )}

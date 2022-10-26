@@ -173,7 +173,7 @@ const Profile: React.FC<Props> = ({
               secondaryText={`Get started by creating a custom notification`}
               icon={`bell`}
               buttonText={`Create notification`}
-              onButtonClick={createNotification}
+              action={createNotification}
               className="mt-6"
             />
           )}

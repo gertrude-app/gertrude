@@ -54,7 +54,7 @@ const Users: React.FC<Props> = ({
               secondaryText={`Get started by creating a protected user`}
               icon={`user`}
               buttonText={`Add a user`}
-              onButtonClick={() => navigate(`/users/new`)}
+              action={`/users/new`}
             />
           </div>
         )}
