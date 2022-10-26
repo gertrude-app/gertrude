@@ -40,7 +40,10 @@ const KeychainCard: React.FC<Props> = ({
   >
     <div className="flex items-stretch flex-grow">
       <div
-        className={cx(`w-16 xs:w-20 shrink-0 py-4 flex justify-center items-center mr-2`)}
+        className={cx(
+          `w-16 xs:w-20 shrink-0 py-4 flex justify-center mr-2`,
+          small && `items-center`,
+        )}
       >
         <GradientIcon icon="list" size="medium" className="mx-0" />
       </div>
@@ -49,9 +52,9 @@ const KeychainCard: React.FC<Props> = ({
           <h2 className="text-left font-semibold text-lg leading-6 text-gray-900 sm:whitespace-normal">
             {name}
           </h2>
-          <div className="flex items-center space-x-2 shrink-0 mr-8">
+          <div className="flex md:justify-end pt-1 md:pt-0 items-center shrink-0 space-x-2 flex-grow">
             <h4 className="text-gray-500 shrink-0">
-              <span className="font-bold text-gray-600">{numKeys}</span>
+              {numKeys}
               {` `}
               {inflect(`key`, numKeys)}
             </h4>

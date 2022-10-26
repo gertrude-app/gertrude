@@ -5,7 +5,6 @@ import UserCard from './Card';
 import { SubcomponentsOmit } from '../../../types';
 import ConnectModal from '../ConnectModal';
 import EmptyState from '../../EmptyState';
-import { useNavigate } from 'react-router-dom';
 
 type Props = {
   users: SubcomponentsOmit<typeof UserCard, 'addDevice'>;
@@ -20,7 +19,6 @@ const Users: React.FC<Props> = ({
   startAddDevice,
   dismissAddDevice,
 }) => {
-  const navigate = useNavigate();
   return (
     <div className="flex flex-col">
       <ConnectModal request={addDeviceRequest} dismissAddDevice={dismissAddDevice} />

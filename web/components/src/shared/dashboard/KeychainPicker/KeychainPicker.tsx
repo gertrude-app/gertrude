@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import cx from 'classnames';
 import KeychainCard from '../Users/KeychainCard';
 import EmptyState from '../EmptyState';
@@ -21,7 +20,6 @@ const KeychainPicker: React.FC<Props> = ({
   onSelect,
   includePublic = true,
 }) => {
-  const navigate = useNavigate();
   return (
     <div className="sm:bg-gray-50 xs:min-w-[450px] rounded-xl sm:p-4">
       {selectableOwnKeychains.length !== 0 && (
