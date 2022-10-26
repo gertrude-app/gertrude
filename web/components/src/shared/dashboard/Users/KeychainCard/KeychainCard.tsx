@@ -38,16 +38,21 @@ const KeychainCard: React.FC<Props> = ({
     )}
     onClick={selectable ? onSelect : undefined}
   >
-    <div className="flex items-start flex-grow">
-      <div className="w-16 xs:w-20 shrink-0 pt-4 flex justify-center items-start">
+    <div className="flex items-stretch flex-grow">
+      <div
+        className={cx(
+          `w-16 xs:w-20 shrink-0 py-4 flex justify-center mr-2`,
+          small && `items-center`,
+        )}
+      >
         <GradientIcon icon="list" size="medium" className="mx-0" />
       </div>
-      <div className="pr-4 py-4 flex-col flex-grow">
-        <div className="flex flex-col md:flex-row  justify-between relative right-0">
-          <h2 className="mb-0.5 leading-tight text-left font-semibold text-lg leading-6 text-gray-900 sm:whitespace-normal">
+      <div className="pr-4 py-4 flex flex-col justify-center flex-grow">
+        <div className="flex flex-col md:flex-row justify-between md:items-center relative right-0">
+          <h2 className="text-left font-semibold text-lg leading-6 text-gray-900 sm:whitespace-normal">
             {name}
           </h2>
-          <div className="flex justify-between items-start space-x-2">
+          <div className="flex md:justify-end pt-1 md:pt-0 items-center shrink-0 space-x-2 flex-grow">
             <h4 className="text-gray-500 shrink-0">
               {numKeys}
               {` `}
@@ -64,7 +69,7 @@ const KeychainCard: React.FC<Props> = ({
           <p
             className={cx(
               description ? `text-gray-600 leading-tight` : `text-gray-400 italic`,
-              `mt-2 mb-1`,
+              `mt-1.5 mb-1`,
             )}
           >
             {description || `No description`}
