@@ -36,7 +36,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
     return (
       <DashboardWidget
         className={cx(
-          `bg-violet-50 flex flex-col justify-center items-center p-6`,
+          `bg-violet-50 flex flex-col justify-center items-center p-8 text-center`,
           className,
         )}
       >
