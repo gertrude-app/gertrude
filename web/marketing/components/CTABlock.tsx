@@ -12,7 +12,6 @@ const CTABlock: React.FC = () => {
         </h2>
         <a
           className="text-white font-extrabold text-3xl bg-gray-800 px-10 py-4 rounded-xl shadow-xl mt-8 hover:bg-gray-900 transition duration-150 flex items-center"
-          onClick={() => alert(`April fools`)}
           href={process.env.NEXT_PUBLIC_JOIN_WAITLIST_URL ?? ``}
         >
           <i className="fas fa-rocket mr-5" />

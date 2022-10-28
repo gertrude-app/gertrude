@@ -65,22 +65,20 @@ function SelectMenu<Value extends string = string>({
                     key={value}
                     className={({ active }) =>
                       cx(
-                        active
-                          ? `text-white bg-violet-800`
-                          : `text-gray-900 even:bg-gray-50`,
-                        `cursor-pointer select-none relative p-4 text-md`,
+                        active ? `bg-violet-100` : `text-gray-900`,
+                        `cursor-pointer select-none relative p-3.5 text-md`,
                       )
                     }
                     value={value}
                   >
-                    {({ selected, active }) => (
+                    {({ selected }) => (
                       <div className="flex flex-col">
                         <div className="flex justify-between">
                           <p className={selected ? `font-semibold` : `font-normal`}>
                             {display}
                           </p>
                           {selected ? (
-                            <span className={active ? `text-white` : `text-violet-700`}>
+                            <span className={`text-violet-700`}>
                               <i className="fa fa-check h-5 w-5" aria-hidden="true" />
                             </span>
                           ) : null}
