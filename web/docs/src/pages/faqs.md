@@ -13,3 +13,7 @@ Sint ipsa praesentium dolor error cumque velit tenetur.
 Sit commodi iste iure molestias qui amet voluptatem sed quaerat. Nostrum aut pariatur.
 Sint ipsa praesentium dolor error cumque velit tenetur quaerat exercitationem. Consequatur
 et cum atque mollitia qui quia necessitatibus.
+
+- phones/ipads?
+- exempted user
+- why does it force quit browsers?
