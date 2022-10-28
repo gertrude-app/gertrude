@@ -14,11 +14,11 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => (
         content="Protect your loved ones with aggressive network filtering, plus screen and keystroke monitoring. Remotely supervise and control access from your own computer or phone. Available for macOS Big Sur, Monterey, and Ventura."
       />
       <link rel="icon" type="image/png" href={Favicon.src} />
-      <Script
-        src="https://kit.fontawesome.com/597740db7b.js"
-        strategy="beforeInteractive"
-      ></Script>
     </Head>
+    <Script
+      src="https://kit.fontawesome.com/597740db7b.js"
+      strategy="beforeInteractive"
+    ></Script>
     <Component {...pageProps} />
   </>
 );

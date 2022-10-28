@@ -71,7 +71,7 @@ function SelectMenu<Value extends string = string>({
                     }
                     value={value}
                   >
-                    {({ selected, active }) => (
+                    {({ selected }) => (
                       <div className="flex flex-col">
                         <div className="flex justify-between">
                           <p className={selected ? `font-semibold` : `font-normal`}>
