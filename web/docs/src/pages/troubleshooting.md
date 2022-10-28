@@ -49,7 +49,7 @@ something you think should be unblocked is not,_ try these tips:
   [support request](https://gertrude.app/contact) describing in detail what you're
   struggling with. We'll be able to retrieve the debug data, which will give us extra
   insight into what's happening on your computer.
-- for more detailed information on unblocking websites and apps, see our article on
+- For more detailed information on unblocking websites and apps, see our article on
   [unblocking](/unblocking-guide)
 
 ## 3. Manually remove the filter

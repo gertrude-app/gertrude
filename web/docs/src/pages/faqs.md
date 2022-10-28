@@ -8,9 +8,9 @@ description:
 ## What makes Gertrude better?
 
 I'm a software developer who built Gertrude becuase I was trying to protect my kids
-online, and was frustrated with the _safety_ and _usability_ of other solutions on the
-market. A lot of Gertrude's core features come out of things I wanted to have trying to
-protect my kids online using other off-the shelf software, things like:
+online, and was frustrated with the lack of _safety_ and _usability_ of other solutions on
+the market. A lot of Gertrude's core features come out of things I wanted to have trying
+to protect my kids online using other off-the shelf software, things like:
 
 - **Real safety.** Nearly every other internet security tool tries to block _categories_
   of websites, like pornography, gambling, etc. This is tantalizing because its _so easy_,
