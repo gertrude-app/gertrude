@@ -83,7 +83,7 @@ export const UnreviewedItemsCard: React.FC<UnreviewedItemsCardProps> = ({
   <Link
     to={`/users/${userId}/activity`}
     className={cx(
-      `bg-white border shadow-lg rounded-xl p-4 flex justify-between items-center relative transition duration-100 cursor-pointer hover:bg-gray-50`,
+      `ScrollTop bg-white border shadow-lg rounded-xl p-4 flex justify-between items-center relative transition duration-100 cursor-pointer hover:bg-gray-50`,
       numUnreviewed === 0 && `bg-green-50 hover:bg-green-100 hover:bg-opacity-80`,
     )}
   >
