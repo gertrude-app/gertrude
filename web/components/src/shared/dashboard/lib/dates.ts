@@ -68,6 +68,7 @@ export function isoFromDateInput(dateInput: string, existingIso?: string): strin
   }
 
   const date = new Date(existingIso ?? Date.now());
+  date.setDate(1); // Reset to first day of month, avoid overflow
   const [year = 0, month = 0, day = 0] = dateInput.split(`-`).map((s) => parseInt(s, 10));
   date.setFullYear(year);
   date.setMonth(month - 1);

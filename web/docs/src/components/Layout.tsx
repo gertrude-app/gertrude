@@ -153,7 +153,7 @@ const Layout: React.FC<Props> = ({ children, title, tableOfContents }) => {
                 >
                   On this page
                 </h2>
-                <ol className="mt-4 space-y-3 text-sm">
+                <ol className="mt-4 space-y-3 text-sm leading-snug">
                   {tableOfContents.map((section) => (
                     <li key={section.id}>
                       <h3>

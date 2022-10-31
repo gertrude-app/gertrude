@@ -5,12 +5,12 @@ const styles = {
   note: {
     container: `bg-violet-50 dark:bg-slate-800/60 dark:ring-1 dark:ring-slate-300/10`,
     title: `text-violet-900 dark:text-violet-400`,
-    body: `text-violet-800 [--tw-prose-background:theme(colors.violet.50)] prose-a:text-violet-900 prose-code:text-violet-900 dark:text-slate-300 dark:prose-code:text-slate-300`,
+    body: `text-violet-800 [--tw-prose-background:theme(colors.violet.50)] prose-a:text-violet-900 prose-code:text-violet-900 dark:text-slate-300 dark:prose-code:text-slate-300 prose-strong:text-white prose-em:text-slate-100`,
   },
   warning: {
     container: `bg-amber-50 dark:bg-slate-800/60 dark:ring-1 dark:ring-slate-300/10`,
     title: `text-amber-900 dark:text-amber-500`,
-    body: `text-amber-800 [--tw-prose-underline:theme(colors.amber.400)] [--tw-prose-background:theme(colors.amber.50)] prose-a:text-amber-900 prose-code:text-amber-900 dark:text-slate-300 dark:[--tw-prose-underline:theme(colors.violet.700)] dark:prose-code:text-slate-300`,
+    body: `text-amber-800 [--tw-prose-underline:theme(colors.amber.400)] [--tw-prose-background:theme(colors.amber.50)] prose-a:text-amber-900 prose-strong:text-white prose-em:font-medium prose-em:text-slate-200 prose-code:text-amber-900 dark:text-slate-300 dark:[--tw-prose-underline:theme(colors.violet.700)] dark:prose-code:text-slate-300`,
   },
 };
 

@@ -1,5 +1,6 @@
 import Callout from '@/components/Callout';
 import { QuickLink, QuickLinks } from '@/components/QuickLinks';
+import ArticleImage from '@/components/ArticleImage';
 
 const tags = {
   callout: {
@@ -13,6 +14,14 @@ const tags = {
       },
     },
     render: Callout,
+  },
+  image: {
+    selfClosing: true,
+    attributes: {
+      src: { type: String },
+      caption: { type: String },
+    },
+    render: ArticleImage,
   },
   figure: {
     selfClosing: true,
