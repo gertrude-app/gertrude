@@ -22,7 +22,18 @@ const ApiErrorMessage: React.FC<Props> = ({ error, entity, wrapped = true }) => 
     case `not_found`:
       return <Wrap>{entity ? `${entity} not` : `Not`} found.</Wrap>;
     case `non_actionable`:
-      return <Wrap>Something went wrong! Please try again.</Wrap>;
+      return (
+        <Wrap>
+          Sorry, there&rsquo;s been some sort of technical glitch (probably on our end).
+          Please try again, or
+          {` `}
+          <a className="text-red-800 underline" href="https://gertrude.app/contact">
+            contact support
+          </a>
+          {` `}
+          if the problem persists.
+        </Wrap>
+      );
     case `auth_failed`:
       return (
         <Wrap>

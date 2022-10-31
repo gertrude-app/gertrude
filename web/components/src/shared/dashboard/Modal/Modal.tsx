@@ -156,6 +156,17 @@ const Modal: React.FC<Props> = ({
                         {secondaryButtonText}
                       </Button>
                     )}
+                    {type === `error` && (
+                      <Button
+                        type="external"
+                        small
+                        color="secondary-white"
+                        className="sm:mr-3 w-[100%] sm:w-auto mb-4 sm:mb-0"
+                        href="https://gertrude.app/contact"
+                      >
+                        Contact support
+                      </Button>
+                    )}
                     <Button
                       type="button"
                       disabled={primaryButtonDisabled}

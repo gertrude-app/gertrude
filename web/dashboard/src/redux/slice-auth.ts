@@ -135,13 +135,17 @@ export function getInitialAdmin(): AdminIds | null {
     return ids;
   }
 
-  if (Current.sessionStorage.getItem(`dev_logged_out`) !== null) {
-    Current.sessionStorage.removeItem(`dev_logged_out`);
+  const devCreds = Current.env.optionalVar(Optional.TestAdminCreds);
+  if (!devCreds || !devCreds.includes(`:`)) {
     return null;
   }
 
-  const devCreds = Current.env.optionalVar(Optional.TestAdminCreds);
-  if (!devCreds || !devCreds.includes(`:`)) {
+  if (window.location.pathname === `/login`) {
+    return null;
+  }
+
+  if (Current.sessionStorage.getItem(`dev_logged_out`) !== null) {
+    Current.sessionStorage.removeItem(`dev_logged_out`);
     return null;
   }
 
