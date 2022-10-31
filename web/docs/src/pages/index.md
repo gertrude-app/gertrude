@@ -245,6 +245,14 @@ blocking all internet request except those that you specifically allowed.
 
 {% image src="allowed.png" caption="This page was allowed because of the key we created earlier." /%}
 
+{% callout type="note" title="That site looks funny..." %}
+
+If you look closely, the website above doesn't look quite right. That's because it often
+takes _more than one key_ to get a site fully unblocked. Check out our
+[unblocking guide](/unblocking-guide) for more details.
+
+{% /callout %}
+
 ## Techniques for unlocking websites
 
 It's great to know that the Gertrude app is working, but you probably need _many more

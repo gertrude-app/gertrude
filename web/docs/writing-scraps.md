@@ -1,5 +1,10 @@
 # scraps of writing that might be useful later, but i pitched
 
+- why multiple keys are needed
+- how to isolate
+- what domains to be careful about
+- what domains are generally safe ?
+
 ## remote first
 
 Gertrude is built so that after the initial setup, you can _manage your protected users
