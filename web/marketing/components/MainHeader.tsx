@@ -5,10 +5,19 @@ import React from 'react';
 const MainHeader: React.FC = () => (
   <header className="flex justify-between items-center px-5 sm:px-8 py-6 bg-violet-500">
     <Logo type="inverted" />
-    <div>
+    <div className="flex space-x-3">
+      <Button
+        className="hidden sm:flex"
+        type="external"
+        href="https://dash.gertrude.app/login"
+        color="secondary-violet"
+        small
+      >
+        Log in
+      </Button>
       <Button
         type="external"
-        href={process.env.NEXT_PUBLIC_JOIN_WAITLIST_URL ?? ``}
+        href="https://dash.gertrude.app/signup"
         color="primary-white"
         small
       >

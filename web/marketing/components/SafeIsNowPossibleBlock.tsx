@@ -26,21 +26,21 @@ const SafeIsNowPossibleBlock: React.FC = () => {
             unlock. We make this managable by letting you:
           </p>
           <div className="flex flex-wrap justify-center items-stretch py-10 pb-0 lg:pb-10 -mx-7 sm:-mx-0">
-            <Feature icon={`mobile`}>
+            <Feature icon="mobile">
               Unlock websites and apps from wherever you are, on your own computer or
               phone
             </Feature>
-            <Feature icon={`share`}>
+            <Feature icon="share">
               Share protection settings and filter rules between multiple users
             </Feature>
-            <Feature icon={`key`}>
+            <Feature icon="key">
               Mix, match, and borrow groups of keys to unlock websites and apps
             </Feature>
-            <Feature icon={`bell`}>
+            <Feature icon="bell">
               Get text, email, or Slack notifications wherever you are when someone needs
               something unblocked
             </Feature>
-            <Feature icon={`eye`}>
+            <Feature icon="eye">
               Easily see which requests are being blocked and request unlocking
             </Feature>
           </div>

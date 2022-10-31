@@ -22,7 +22,6 @@ import Keychains from './components/routes/Keychains';
 import Signup from './components/routes/Signup';
 import User from './components/routes/User';
 import useWindowWidth from './hooks/window-width';
-import Current from './environment';
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
@@ -53,17 +52,11 @@ const App: React.FC = () => {
       {/* unauthed routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/otp/:token" element={<MagicLink />} />
-
-      {Current.env.isProd() ? (
-        <Route path="/join-waitlist" element={<JoinWaitlist />} />
-      ) : (
-        <>
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/verify-signup-email/:token" element={<VerifySignupEmail />} />
-          <Route path="/checkout-success" element={<CheckoutSuccess />} />
-          <Route path="/checkout-cancel" element={<CheckoutCancel />} />
-        </>
-      )}
+      <Route path="/join-waitlist" element={<JoinWaitlist />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/verify-signup-email/:token" element={<VerifySignupEmail />} />
+      <Route path="/checkout-success" element={<CheckoutSuccess />} />
+      <Route path="/checkout-cancel" element={<CheckoutCancel />} />
 
       {/* authed routes */}
       <Route path="/" element={<AuthedChrome />}>
