@@ -35,7 +35,7 @@ const UnlockRequestCard: React.FC<Props> = ({
     </div>
     <div className="py-3 px-5 bg-violet-50 rounded-xl mt-2 flex justify-center items-center">
       <h2 className="font-mono text-base whitespace-nowrap truncate">
-        {url.replace(/^https?:\/\//, ``)}
+        {url.replace(/^https?:\/\//, ``).replace(/\/$/, ``)}
       </h2>
     </div>
     {comment && (
