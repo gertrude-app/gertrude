@@ -15,8 +15,7 @@ export const ConfirmDeleteEntity: React.FC<Props> = ({ action, type }) => {
       onDismiss={action.cancel}
       onConfirm={action.confirm}
     >
-      Are you sure you want to delete this {type}? There is no undo, and you might regret
-      your decision in the morning.
+      Are you sure you want to delete this {type}? There is no undo.
     </ConfirmDestructiveAction>
   );
 };

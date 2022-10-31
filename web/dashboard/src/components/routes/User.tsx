@@ -45,7 +45,7 @@ const User: React.FC = () => {
   }
 
   if (query.state === `failed`) {
-    return <ApiErrorMessage error={query.error} />;
+    return <ApiErrorMessage entity="User" error={query.error} />;
   }
 
   return <EditUser {...query.props} />;

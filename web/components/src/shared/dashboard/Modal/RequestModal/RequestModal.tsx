@@ -42,11 +42,16 @@ function RequestModal<Payload>({
       icon={icon}
     >
       {request?.state === `succeeded` ? withPayload(request.payload) : null}
-      {request?.state === `failed`
-        ? withError
-          ? withError(request.error)
-          : `Sorry, something went wrong, please try again.`
-        : null}
+      {request?.state === `failed` ? (
+        withError ? (
+          withError(request.error)
+        ) : (
+          <>
+            Sorry, something went wrong (probably on our end). Please try again, or
+            contact support if the problem persists.
+          </>
+        )
+      ) : null}
     </Modal>
   );
 }

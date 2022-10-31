@@ -18,8 +18,7 @@ Default.args = {
   title: `Delete your only widget?`,
   children: (
     <>
-      Are you <b>sure?</b> There is no undo, and you might regret your decision in the
-      morning. Please think carefully.
+      Are you <b>sure?</b> There is no undo.
     </>
   ),
 };

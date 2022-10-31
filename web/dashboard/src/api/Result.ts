@@ -152,7 +152,9 @@ function toApiError(
   }
 
   // probably database entity not found
-  if (error.some((e) => e.message.includes(`notFound`))) {
+  if (
+    error.some((e) => e.message.includes(`notFound`) || e.message.includes(`Abort.404`))
+  ) {
     return { type: `not_found` };
   }
 
