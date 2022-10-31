@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { UndoMainPadding } from '../Chrome/Chrome';
 import QuickActionsWidget from './Widgets/QuickActions';
 import UnlockRequestsWidget from './Widgets/UnlockRequests';
@@ -7,6 +6,7 @@ import UserOverviewWidget from './Widgets/UsersOverview';
 import UserActivityWidget from './Widgets/UserActivity';
 import UserScreenshotsWidget from './Widgets/UserScreenshots';
 import PageHeading from '../PageHeading';
+import SmartLink from '../../SmartLink';
 
 type Props = {
   createKeychain: () => unknown;
@@ -56,7 +56,7 @@ const Dashboard: React.FC<Props> = ({
         </p>
         <div className="mt-8 space-y-3">
           <RecommendedStep
-            href="https://docs.gertrude.app/getting-started"
+            href="https://docs.gertrude.app"
             title="Read our getting started guide"
             icon="book"
           />
@@ -89,7 +89,7 @@ export const RecommendedStep: React.FC<RecommendedStepProps> = ({
   icon,
   href,
 }) => (
-  <Link
+  <SmartLink
     to={href}
     className="flex items-center p-4 pr-8 bg-gray-50 rounded-2xl cursor-pointer transition duration-150 hover:bg-gray-100 hover:scale-105"
   >
@@ -97,5 +97,5 @@ export const RecommendedStep: React.FC<RecommendedStepProps> = ({
       <i className={`fa-solid fa-${icon} text-white text-xl`} />
     </div>
     <h2 className="ml-4 sm:text-lg font-medium">{title}</h2>
-  </Link>
+  </SmartLink>
 );
