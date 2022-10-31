@@ -8,32 +8,13 @@ you'll need to perform when working with Gertrude. This guide aims to help you u
 how and why this works the way it does, and give you some helpful tools for making this
 job easier.
 
-## IMPORTANT: Isolate network activity
-
-Your computer is constantly making network requests to a myriad of websites and services.
-The vast majority of these don't cause you any noticable problem, and don't need to be
-unblocked. But, all those requests can make it _hard to find out which request DOES need
-to be unblocked._ For this reason, probably the number one thing you can do to make it
-easier to find what to unblock is **isolate network activity:**
-
-- **Close every other app** except the one you're working with. This will greatly reduce
-  the number of network requests you'll have to consider.
-- **Close other tabs** if you're working with a web browser, this also substantially
-  eliminates noise and makes it easier to find the right request.
-- **Be sure to clear and filter requests**. Enter a _search phrase_ into the filter field
-  of Gertrude's network activity screen. Usually part of the name of a website, or the app
-  you're using are helpful. Click the _clear requests_ button and then refresh the page,
-  or retry the activity that is not working.
-
-{% image src="isolating-requests.png" caption="Filter by a search phrase, and clear often" /%}
-
 ## Why multiple keys are needed
 
 One of the core things you need to understand is that when you're trying to unblock a
-specific website, it often takes _several keys to get the site fully working._ It seems
-like if I'm trying to unblock `happyfish.com`, I should be able to just create a key for
-`happyfish.com`, and everything should just work, right? Sadly, no. To explain why, I'll
-need to get just a little bit technical for a moment.
+specific website, it often takes _several keys to get the site fully working._ It's not
+untiutive why&mdash;it seems like if I'm trying to unblock `happyfish.com`, I should be
+able to just create a key for `happyfish.com`, and everything should just work, right?
+Sadly, no. To explain why, I'll need to get just a little bit technical for a moment.
 
 ### How websites work
 
@@ -118,15 +99,34 @@ the effort, but **there are several things that make this process easier:**
    and the site will immediately work correctly.
 2. The ability to send _unlock requests_ from the macOS app makes this process much
    easier.
-3. As long as you don't unlock domains like `google.com` or `facebook.com` accidentaly,
+3. As long as you don't unlock domains like `google.com` or `facebook.com` accidentally,
    there's usually very little danger in unlocking a few of the wrong domains while you're
    hunting for which domain or domains still needs to be unblocked for a site.
 4. You and your user/s will get good at this with a _little practice._
-5. Once you have a site fully unlocked, with Gertrudes _keychains_ feature, you can easily
+5. Once you have a site fully unlocked, with Gertrude's _keychains_ feature you can easily
    _share the full set of keys_ with all of the users you are protecting&mdash;you won't
    have to repeat the process again.
 6. You can always [reach out to us](https://gertrude.app/support) if you're having trouble
    getting a site unlocked.
 7. We're exploring some ways to in the future try to _automatically discover and unlock_
-   some or all of these other domains, so it's very likely this process will keep getting
-   easier over time.
+   some or all of these other supporting domains, so it's very likely this process will
+   keep getting easier over time.
+
+## Isolate network activity
+
+Your computer is constantly making network requests to a myriad of websites and services.
+The vast majority of these don't cause you any noticable problem, and don't need to be
+unblocked. But, all those requests can make it _hard to find out which request DOES need
+to be unblocked._ For this reason, probably the number one thing you can do to make it
+easier to find what to unblock is **isolate network activity:**
+
+- **Close every other app** except the one you're working with. This will greatly reduce
+  the number of network requests you'll have to consider.
+- **Close other tabs** if you're working with a web browser, this also substantially
+  eliminates noise and makes it easier to find the right request.
+- **Be sure to clear and filter requests**. Enter a _search phrase_ into the filter field
+  of Gertrude's network activity screen. Usually part of the name of a website, or the app
+  you're using are helpful. Click the _clear requests_ button and then refresh the page,
+  or retry the activity that is not working.
+
+{% image src="isolating-requests.png" caption="Filter by a search phrase, and clear often" /%}

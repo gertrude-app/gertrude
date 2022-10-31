@@ -27,17 +27,17 @@ your kids. You'll need _at least one user_ to do anything useful with Gertrude.
 
 The most common scenario is for Gertrude to be used by _parents_ protecting their _kids_.
 But that's definitely not the only way to use Gertrude. Peers, friends, relatives, etc.,
-can all be protected, but for the sake of brevity, we'll use the language of
-**parent/child** for the rest of this tutorial.
+can all be protected, but for the sake of brevity, we use the language of **parent/child**
+for most of our documentation.
 
 {% /callout %}
 
-To create a user, click the link in the dashboard of your Gertrude web admin account, or
+To _create a user,_ click the link in the dashboard of your Gertrude web admin account, or
 select "users" from the side bar on the left hand and click the button to add a new user.
 
 {% image src="create-first-user.png" caption="Go to the 'Users' screen to add your first user" /%}
 
-Enter the users **name**, and click to save the new user.
+Enter the users _name_, and click to save the new user.
 
 {% image src="edit-user.png" caption="Give your user a name, and click 'save'" /%}
 
@@ -133,7 +133,7 @@ name and save the user.
 
 ## Connecting a device
 
-The final step will need to take before installing the macOS app is _creating a new
+The final step you will need to take before installing the macOS app is _creating a new
 device_ for your user. To do so, click the **"add device"** button on the edit user
 screen. You'll see a pop-up giving you a special one-time connection code. Write this code
 down somewhere; you'll be using it shortly.
@@ -143,7 +143,8 @@ down somewhere; you'll be using it shortly.
 For the next part of the process you'll need to switch over to the computer that will be
 used by the child you're protecting. You might already be using that computer. But if
 you're a parent working through this tutorial on your own computer and your child uses a
-_different computer_ you'll need that computer to do the next few steps of initial setup.
+_different computer_ you'll need that computer in front of you to do the next few steps of
+initial setup.
 
 {% callout title="About shared computers" %}
 
@@ -229,7 +230,7 @@ items that are not green and resolve them.
 ### Testing the filter for a spin
 
 Next, I close the admin window and open up a web browser like a Google Chrome or Safari or
-Firefox. I if you try to visit an address on the internet, you will notice that the _page
+Firefox. If you try to visit an address on the internet, you will notice that the _page
 does not load._ That's because the filter is running and blocking the entire internet with
 the exception of the addresses that you have specifically unlocked. When Gertrude blocks
 something, you'll see an empty error page that looks something like this:
@@ -238,10 +239,9 @@ something, you'll see an empty error page that looks something like this:
 
 Earlier in this tutorial we created a website key. Let's test it now. _Try to visit the
 website you specified when creating your first key._ You should notice that your web
-browser **does allow that page to load,** although it's possible that _the page might look
-funny_ or not be working entirely correctly. We'll come back to that later. The fact that
-this page loads shows you that Gertrude's internet filter is working properly, that is,
-blocking all internet request except those that you specifically allowed.
+browser _does allow that page to load._ This shows you that Gertrude's internet filter is
+working properly, that is, blocking all internet request except those that you
+specifically allowed.
 
 {% image src="allowed.png" caption="This page was allowed because of the key we created earlier." /%}
 
@@ -255,7 +255,7 @@ takes _more than one key_ to get a site fully unblocked. Check out our
 
 ## Techniques for unlocking websites
 
-It's great to know that the Gertrude app is working, but you probably need _many more
+It's great to know that the Gertrude filter is working, but you probably need _many more
 websites unblocked in order for the computer to be usable_. In this section we will go
 over to techniques to make it _simpler and faster_ for you to accomplish this.
 
@@ -269,8 +269,8 @@ be easily shared and re-used._ As an example, the website
 educational platform. In order for it to work properly on a computer protected by
 Gertrude, it requires a _handful of keys to unlock the web addresses used by that
 platform._ There are thousands of students enrolled in AOPS classes. So it would be a
-shame if every Gertrude account owner had to create the _same set of keys_ to grant access
-to AOPS. Instead, **Gertrude offers a public keychain** containing just the keys to
+shame if every Gertrude account owner had to re-create the _same set of keys_ to grant
+access to AOPS. Instead, **Gertrude offers a public keychain** containing just the keys to
 unblock apps, which _many people can share._
 
 ### Adding a public keychain
@@ -307,7 +307,7 @@ Probably the most common way to unlock parts of the internet for your protected 
 by **responding to a user-initiated unlock request.**
 
 Move back to the computer or user being protected by the Gertrude macOS app. Start by
-_thinking of a website that your child needs access to_ that they currently don't have a
+_thinking of a website that your child needs access to_ that you currently don't have a
 key for. _Try to visit that website in a web browser_ and you'll notice once again that it
 is blocked: Gertrude's filter is not allowing access to that website, because there is no
 key instructing it to.
@@ -355,14 +355,15 @@ create new keys for your users._
 2. They open the network traffic window, and _find the request that was blocked._
 3. They then send an _unlock request_ to you, the admin, requesting that that website be
    unlocked.
-4. You then as the admin have the opportunity to _review and approve or reject_ that
+4. Then you, the admin, have the opportunity to _review and approve or reject_ that
    request. You approve the unlock request by _creating a key_ that unblocks that web
    address.
 
-We'll walk through all four steps now, and we have a more detailed article with advanced
-tips and tricks on unlocking that you can refer to later, if necessary. Start by **1)
-clearing the requests** to help you focus and find the correct request, then **2) click to
-filter by the partial word `khan`** as shown below:
+We'll walk through all four steps now, and we have
+[a more detailed article](/unblocking-guide) with advanced tips and tricks on unlocking
+that you can refer to later, if necessary. Start by **1) clearing the requests** to help
+you focus and find the correct request, then **2) click to filter by the partial word
+`khan`** as shown below:
 
 {% image src="filter-requests.png" caption="Clear the screen, then filter by 'khan'" /%}
 
@@ -450,10 +451,10 @@ being requested.
 
 {% image src="request-filter-suspension.png" caption="The user writes a comment and picks a duration" /%}
 
-Once submitted (provided you've configured an admin notification in your _Profile_
-screen), you'll receive an email, text or Slack letting you know that your user is
-requesting a filter suspension. You can grant or deny the request, and if desired, also
-change the amount of time requested.
+Once submitted (provided you've configured an admin notification in your
+[profile](https://dash.gertrude.app/profile) screen), you'll receive an email, text or
+Slack letting you know that your user is requesting a filter suspension. You can grant or
+deny the request, and if desired, also change the amount of time requested.
 
 {% image src="accept-filter-suspension.png" caption="You get to grant or deny the request, and modify the duration" /%}
 

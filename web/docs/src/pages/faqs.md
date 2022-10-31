@@ -9,8 +9,8 @@ description:
 
 I'm a software developer who built Gertrude becuase I was trying to protect my kids
 online, and was frustrated with the lack of _safety_ and _usability_ of other solutions on
-the market. A lot of Gertrude's core features come out of things I wanted to have trying
-to protect my kids online using other off-the shelf software, things like:
+the market. A lot of Gertrude's core features came out of things I wished I had while
+trying to protect my kids online using other off-the shelf software, things like:
 
 - **Real safety.** Nearly every other internet security tool tries to block _categories_
   of websites, like pornography, gambling, etc. This is tantalizing because its _so easy_,
@@ -34,12 +34,12 @@ to protect my kids online using other off-the shelf software, things like:
   hidden&mdash;the Gertrude app clearly lets the user know if their screen and keystrokes
   are being recorded. This also makes it so I can now temporarily suspend the
   filter&mdash;I know it's safe becuase I'll see their activity afterwards, and they know
-  it.
-- **Remote control.** Every other solution I tried had to be primarily configured and
-  managed _on my kids' computer_. Every time they needed something changed or unlocked,
-  they would have to bring me their computer so I could authenticate and tweak the
-  settings. I built Gertrude so that I could manage every aspect of their protection from
-  the comfort of _my own computer or phone, no matter where I was._
+  it too.
+- **Remote control.** Every other solution I tried had to be configured and managed _on my
+  kids' computer_. Every time they needed something changed or unlocked, they would have
+  to bring me their computer so I could authenticate and tweak the settings. I built
+  Gertrude so that I could manage every aspect of their protection from the comfort of _my
+  own computer or phone, no matter where I was._
 
 ## Does it work on iPhones or iPads?
 

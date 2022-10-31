@@ -13,11 +13,11 @@ common mistakes.
 ## Remember what's at stake
 
 It's going to take time, effort, and diligence to keep your kids safe on the internet. It
-will be annoying and frustrating at times, and will interrupt your day many times. There
+will be annoying and frustrating at times, and will interrupt your day frequently. There
 will always be a temptation to simplify your life by disabling protections and telling
 yourself that "my kid's a good kid, he'll be OK". Settle it ahead of time that you're
-willing to put in the time and effort to actually keep them safe. Gertrude helps a lot,
-but no tool can make this perfectly easy.
+willing to put in the time and effort to actually keep them safe. Gertrude helps a huge
+amount, but no tool can make this perfectly easy.
 
 Look up some statistics on pornography addiction. The numbers are heart-breaking and
 overwhelming. If you have a pre-teen or teenager (of either sex) with unrestricted access
@@ -29,7 +29,7 @@ than most realize.
 
 Gertrude is only as safe as the _admin account password_ protecting it. If your users know
 your password, or can guess it, all bets are off. Once they can authenticate as an admin,
-they can remove or disable all of Gertrude.
+they can remove or disable all of Gertrude's protections.
 
 If you use the same password for many things, or if your computer password is easy to
 guess, or easy to type, or hasn't been changed for a long time, your kids may very well
@@ -58,7 +58,7 @@ internet and its temptations. If they deeply understand and agree with _why_ you
 to keep them safe, you'll convert them to an ally, and provide them with more motivation
 to stay careful and innocent when presented with opportunities.
 
-## Practice other forms of internet safety
+## Practice layers of internet safety
 
 The best defense is a "defense in depth." Layer on other means of safety like:
 
@@ -67,3 +67,12 @@ The best defense is a "defense in depth." Layer on other means of safety like:
 - don't give your kids a phone, or make sure it is extremely locked down
 - keep your home wifi password a secret
 - put your wifi on a schedule, auto-disabling at night, if your router supports it
+
+## Be thoughtful about other settings
+
+If your own computers are carefully protected, that can't protect your kids from what
+their peers or friends might expose them to on unprotected phones or computers. Think very
+carefully about where and who your kids have access to, and consider making changes. Be
+willing to have an awkward conversation requiring all phones and devices to be collected
+and removed before you kids can play with friends with unprotected or partially protected
+devices.
