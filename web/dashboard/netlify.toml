@@ -1,11 +1,12 @@
 [build]
   publish = "build/"
   command = "cd ../ && make build-dashboard"
+  ignore = "false"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200
 
 [build.environment]
   SNOWPACK_PUBLIC_GRAPHQL_ENDPOINT = 'https://api.gertrude-app.com/graphql/dashboard'

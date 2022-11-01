@@ -1,6 +1,7 @@
 [build]
   publish = "out/"
   command = "cd ../ && make build-marketing"
+  ignore = "false"
 
 [build.environment]
   NODE_VERSION = "14.19.3"
