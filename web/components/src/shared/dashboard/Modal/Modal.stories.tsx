@@ -28,6 +28,14 @@ Default.args = {
   icon: `info`,
 };
 
+export const TinyError = Template.bind({});
+TinyError.args = {
+  ...Default.args,
+  type: `error`,
+  title: `Error`,
+  children: `User not found`,
+};
+
 export const Loading = Template.bind({});
 Loading.args = {
   ...Default.args,
