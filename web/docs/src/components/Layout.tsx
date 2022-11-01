@@ -8,6 +8,7 @@ import Prose from '@/components/Prose';
 import navigation from '@/navigation';
 import { Section } from '../pages/_app';
 import Logo from './shared/Logo';
+import DocFooterCta from './DocFooterCta';
 
 function useTableOfContents(tableOfContents: Section[]): string {
   const [currentSection, setCurrentSection] = useState(tableOfContents[0]?.id ?? ``);
@@ -109,6 +110,7 @@ const Layout: React.FC<Props> = ({ children, title, tableOfContents }) => {
               </header>
             )}
             <Prose>{children}</Prose>
+            <DocFooterCta />
           </article>
           <dl className="mt-12 flex border-t border-slate-200 pt-6 dark:border-slate-800">
             {previousPage && (

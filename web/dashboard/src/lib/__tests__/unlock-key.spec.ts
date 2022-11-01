@@ -1,5 +1,5 @@
 import { test, describe, expect } from 'vitest';
-import { keyForUnlockRequest } from '../unlock-key';
+import { keyForUnlockRequest, registrableDomain } from '../unlock-key';
 
 describe(`keyForUnlockRequest()`, () => {
   const cases: Array<[Parameters<typeof keyForUnlockRequest>[0], Key]> = [
@@ -13,8 +13,23 @@ describe(`keyForUnlockRequest()`, () => {
         appSlug: `brave`,
       },
       {
-        type: `domain`,
+        type: `anySubdomain`,
         domain: `some-site.com`,
+        scope: { type: `webBrowsers` },
+      },
+    ],
+    [
+      {
+        url: `https://docs.google.com/document/d/1/edit`,
+        domain: `docs.google.com`,
+        ipAddress: `1.2.3.4`,
+        appCategories: [`browser`],
+        appBundleId: `com.brave`,
+        appSlug: `brave`,
+      },
+      {
+        type: `domain`,
+        domain: `docs.google.com`,
         scope: { type: `webBrowsers` },
       },
     ],
@@ -28,8 +43,38 @@ describe(`keyForUnlockRequest()`, () => {
         appCategories: [`browser`],
       },
       {
-        type: `domain`,
+        type: `anySubdomain`,
         domain: `site2.com`,
+        scope: { type: `webBrowsers` },
+      },
+    ],
+    [
+      {
+        url: undefined,
+        domain: `www.site3.com`,
+        ipAddress: `1.2.3.4`,
+        appBundleId: `com.brave`,
+        appSlug: `brave`,
+        appCategories: [`browser`],
+      },
+      {
+        type: `anySubdomain`,
+        domain: `site3.com`,
+        scope: { type: `webBrowsers` },
+      },
+    ],
+    [
+      {
+        url: undefined,
+        domain: `static.site4.com`,
+        ipAddress: `1.2.3.4`,
+        appBundleId: `com.brave`,
+        appSlug: `brave`,
+        appCategories: [`browser`],
+      },
+      {
+        type: `anySubdomain`,
+        domain: `site4.com`,
         scope: { type: `webBrowsers` },
       },
     ],
@@ -58,7 +103,7 @@ describe(`keyForUnlockRequest()`, () => {
         appCategories: [],
       },
       {
-        type: `domain`,
+        type: `anySubdomain`,
         domain: `school-site.com`,
         scope: {
           type: `single`,
@@ -76,7 +121,7 @@ describe(`keyForUnlockRequest()`, () => {
         appCategories: [],
       },
       {
-        type: `domain`,
+        type: `anySubdomain`,
         domain: `school-site2.com`,
         scope: {
           type: `single`,
@@ -93,8 +138,8 @@ describe(`keyForUnlockRequest()`, () => {
         appCategories: [],
       },
       {
-        type: `domain`,
-        domain: `cf.iadsdk.apple.com`,
+        type: `anySubdomain`,
+        domain: `iadsdk.apple.com`,
         scope: {
           type: `single`,
           single: {
@@ -108,5 +153,19 @@ describe(`keyForUnlockRequest()`, () => {
 
   test.each(cases)(`unlock request -> create key`, (decision, expectedKey) => {
     expect(keyForUnlockRequest(decision)).toMatchObject(expectedKey);
+  });
+});
+
+describe(`registrableDomain()`, () => {
+  const cases: [string, string][] = [
+    [`example.com`, `example.com`],
+    [`EXAMPLE.com`, `example.com`],
+    [`www.example.com`, `example.com`],
+    [`docs.example.com`, `example.com`],
+    [`www.example.co.uk`, `example.co.uk`],
+    [`www.example.co.uk:8080`, `example.co.uk`],
+  ];
+  test.each(cases)(`extract registrable domain %s -> %s`, (input, expected) => {
+    expect(registrableDomain(input)).toMatchObject(expected);
   });
 });

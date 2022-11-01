@@ -1,10 +1,11 @@
+import React from 'react';
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
 import { slugifyWithCounter } from '@sindresorhus/slugify';
 import Layout from '@/components/Layout';
-import 'focus-visible';
-import '../styles/tailwind.css';
 import Favicon from '../../public/favicon.png';
+import '../styles/tailwind.css';
+import 'focus-visible';
 
 function getNodeText(node: Node): string {
   let text = ``;
