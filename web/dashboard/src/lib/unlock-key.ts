@@ -5,7 +5,7 @@ type Request = Pick<
 
 export function keyForUnlockRequest(request: Request): Key {
   let scope: Key['scope'] = { type: `webBrowsers` };
-  let type: `domain` | `ipAddress` = `domain`;
+  let type: 'domain' | 'ipAddress' | 'anySubdomain' = `domain`;
   let value = ``;
 
   if (request.url && !request.domain) {
@@ -31,10 +31,32 @@ export function keyForUnlockRequest(request: Request): Key {
     }
   }
 
-  switch (type) {
-    case `domain`:
-      return { type, domain: value, scope };
-    case `ipAddress`:
-      return { type, ipAddress: value, scope };
+  if (type === `ipAddress`) {
+    return { type, ipAddress: value, scope };
+  }
+
+  const registrable = registrableDomain(value);
+  if (UNSAFE_DOMAINS.includes(registrable)) {
+    return { type: `domain`, domain: value, scope };
+  } else {
+    return { type: `anySubdomain`, domain: registrable, scope };
   }
 }
+
+export function registrableDomain(input: string): string {
+  const domain = input.toLowerCase().replace(/:\d+$/, ``);
+  const parts = domain.split(`.`);
+  if (parts.length < 3) {
+    return domain;
+  }
+  parts.shift();
+  return parts.join(`.`);
+}
+
+const UNSAFE_DOMAINS = [
+  `google.com`,
+  `facebook.com`,
+  `twitter.com`,
+  `wikipedia.org`,
+  `youtube.com`,
+];
