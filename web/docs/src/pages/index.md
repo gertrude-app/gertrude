@@ -125,7 +125,7 @@ use that example later in the tutorial. Click **"Create key"** to finish the pro
 {% image src="create-key.png" caption="Create your first key" /%}
 
 Now that you've got a key and a keychain, you need to do one more step: _attach that
-keychain to your user._ Go back to the users screen, click to to edit the user you created
+keychain to your user._ Go back to the users screen, click to edit the user you created
 earlier, and then click to add a keychain. Select the keychain you just created by its
 name and save the user.
 
@@ -227,9 +227,9 @@ Ideally, you should see all green checkmarks, although when you're first getting
 it's common to have a few issues that need to be addressed. Take a moment and review any
 items that are not green and resolve them.
 
-### Testing the filter for a spin
+### Taking the filter for a spin
 
-Next, I close the admin window and open up a web browser like a Google Chrome or Safari or
+Next, I close the admin window and open up a web browser like Google Chrome or Safari or
 Firefox. If you try to visit an address on the internet, you will notice that the _page
 does not load._ That's because the filter is running and blocking the entire internet with
 the exception of the addresses that you have specifically unlocked. When Gertrude blocks
@@ -403,8 +403,7 @@ the unlock request was accepted._
 
 {% image src="unlock-request-accepted-notification.png" caption="Back on the users's Mac, a notification that it was accepted." /%}
 
-And if you refresh the web page, you'll _now have access_ to to the previously blocked
-site.
+And if you refresh the web page, you'll _now have access_ to the previously blocked site.
 
 {% image src="khan-unblocked.png" caption="Success! The site is now unblocked." /%}
 

@@ -12,7 +12,7 @@ job easier.
 
 One of the core things you need to understand is that when you're trying to unblock a
 specific website, it often takes _several keys to get the site fully working._ It's not
-untiutive why&mdash;it seems like if I'm trying to unblock `happyfish.com`, I should be
+intuitive why&mdash;it seems like if I'm trying to unblock `happyfish.com`, I should be
 able to just create a key for `happyfish.com`, and everything should just work, right?
 Sadly, no. To explain why, I'll need to get just a little bit technical for a moment.
 
@@ -67,9 +67,9 @@ are being blocked when we try to visit the page:
 {% image src="how-to-type-blocks.png" caption="After unblocking the domain, we still see all these blocked requests" /%}
 
 There is a bit of an art to figuring out which of these requests should be unlocked, but
-you'll get the knack of it. If you look closesly at the image above, several of the
-domains are repeated twice, so there are really fewer domains to think about than it
-appears. Also, there are a couple things we can ignore. The blocked request from the
+you'll get the knack of it. If you look closely at the image above, several of the domains
+are repeated twice, so there are really fewer domains to think about than it appears.
+Also, there are a couple things we can ignore. The blocked request from the
 `www.facebook.com` domain can (and _should_) be ignored&mdash;it's just a little embedded
 "like" button that won't prevent the site from working correctly. And the one from
 `google-analytics.com` is just a tracking website, its not necessary to unlock.
