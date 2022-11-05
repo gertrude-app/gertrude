@@ -1,0 +1,11 @@
+{
+  "name": "@shared/tailwind",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/preset.js",
+  "license": "ISC",
+  "dependencies": {
+    "@tailwindcss/forms": "^0.5.3",
+    "tailwindcss": "^3.2.1"
+  }
+}

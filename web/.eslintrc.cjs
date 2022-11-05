@@ -25,7 +25,7 @@ module.exports = {
     'default-case': `off`,
     'no-only-tests/no-only-tests': `error`,
     'no-useless-constructor': `off`,
-    '@typescript-eslint/no-non-null-assertion': `off`,
+    '@typescript-eslint/no-non-null-assertion': `error`,
     '@typescript-eslint/no-namespace': `off`,
     '@typescript-eslint/no-empty-function': `off`,
     '@typescript-eslint/ban-ts-comment': `off`,
@@ -213,6 +213,7 @@ module.exports = {
         '@typescript-eslint/explicit-module-boundary-types': `off`,
         '@typescript-eslint/explicit-function-return-type': `off`,
         '@typescript-eslint/no-non-null-asserted-optional-chain': `off`,
+        '@typescript-eslint/no-non-null-assertion': `off`,
       },
     },
     {
@@ -230,6 +231,7 @@ module.exports = {
         '@typescript-eslint/consistent-type-assertions': `off`,
         '@typescript-eslint/explicit-function-return-type': `off`,
         '@typescript-eslint/no-non-null-asserted-optional-chain': `off`,
+        '@typescript-eslint/no-non-null-assertion': `off`,
       },
     },
   ],
@@ -239,7 +241,7 @@ module.exports = {
     },
   },
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaVersion: 2020,
     ecmaFeatures: { jsx: true },
     sourceType: `module`,
   },

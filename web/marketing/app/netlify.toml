@@ -1,0 +1,14 @@
+[build]
+  publish = "out/"
+  command = "cd ../../ && make build-marketing"
+  ignore = "false"
+
+[[redirects]]
+  from = "/support" # in case i entered the url wrong somewhere...
+  to = "/contact"
+  status = 200
+
+[build.environment]
+  NODE_VERSION = "16.17.1"
+  NEXT_PUBLIC_JOIN_WAITLIST_URL = "https://dash.gertrude.app/join-waitlist"
+

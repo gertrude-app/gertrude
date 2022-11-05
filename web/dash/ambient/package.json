@@ -1,0 +1,7 @@
+{
+  "name": "@types/dash-ambient",
+  "version": "1.0.0",
+  "main": "",
+  "types": "src/index.d.ts",
+  "license": "ISC"
+}

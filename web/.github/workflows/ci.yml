@@ -12,32 +12,12 @@ jobs:
     name: check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
       - name: checkout
-        uses: actions/checkout@v2
-      - name: npm install root
-        uses: bahmutov/npm-install@v1
-      - name: npm install components
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: components
-          install-command: npm install --legacy-peer-deps
-      - name: npm install dashboard
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: dashboard
-      - name: npm install marketing
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: marketing
-      - name: npm install docs
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: docs
-      - name: sync
-        run: make sync
+        uses: actions/checkout@v3
+      - name: install pnpm
+        uses: pnpm/action-setup@v2
+      - name: install deps
+        run: pnpm install
       - name: lint
         run: make lint
       - name: format
@@ -53,59 +33,37 @@ jobs:
     name: storybook
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
       - name: checkout
-        uses: actions/checkout@v2
-      - name: sync
-        run: make sync
-      - name: npm install root
-        uses: bahmutov/npm-install@v1
-      - name: npm install components
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: components
-          install-command: npm install --legacy-peer-deps
+        uses: actions/checkout@v3
+      - name: install pnpm
+        uses: pnpm/action-setup@v2
+      - name: install deps
+        run: pnpm install
       - name: build storybook
-        run: cd components && npm run build-storybook
+        run: make build-storybook
 
   dashboard:
     name: dashboard
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
       - name: checkout
-        uses: actions/checkout@v2
-      - name: sync
-        run: make sync
-      - name: npm install root
-        uses: bahmutov/npm-install@v1
-      - name: npm install dashboard
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: dashboard
+        uses: actions/checkout@v3
+      - name: install pnpm
+        uses: pnpm/action-setup@v2
+      - name: install deps
+        run: pnpm install
       - name: build dashboard
-        run: cd dashboard && npm run build
+        run: make build-dash
 
   marketing:
     name: marketing
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
       - name: checkout
-        uses: actions/checkout@v2
-      - name: sync
-        run: make sync
-      - name: npm install root
-        uses: bahmutov/npm-install@v1
-      - name: npm install marketing
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: marketing
+        uses: actions/checkout@v3
+      - name: install pnpm
+        uses: pnpm/action-setup@v2
+      - name: install deps
+        run: pnpm install
       - name: build marketing
-        run: cd marketing && npm run build
+        run: make build-marketing
