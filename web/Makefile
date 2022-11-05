@@ -34,12 +34,13 @@ install:
 
 clean:
 	rm -rf dash/app/node_modules/.cache/snowpack
+	rm -rf storybook/node_modules/.cache/storybook
+	rm -rf node_modules/.cache/nx
 	rm -rf docs/app/.next
 	rm -rf docs/app/out
 	rm -rf marketing/app/.next
 	rm -rf marketing/app/out
 	rm -rf dash/app/build
-	rm -rf storybook/node_modules/.cache/storybook
 
 codegen:
 	cd dash/app && node ./scripts/codegen.js
@@ -83,38 +84,11 @@ lint-fix:
 	pnpm eslint . --fix
 
 ts-check:
-	$(CONCURRENTLY) --raw --success all \
-    "pnpm tsc --noEmit --project dash/app" \
-    "pnpm tsc --noEmit --project dash/ambient" \
-    "pnpm tsc --noEmit --project dash/components" \
-    "pnpm tsc --noEmit --project dash/datetime" \
-    "pnpm tsc --noEmit --project dash/keys" \
-    "pnpm tsc --noEmit --project dash/types" \
-    "pnpm tsc --noEmit --project dash/utils" \
-    "pnpm tsc --noEmit --project docs/app" \
-    "pnpm tsc --noEmit --project marketing/app" \
-    "pnpm tsc --noEmit --project marketing/components" \
-    "pnpm tsc --noEmit --project shared/components" \
-    "pnpm tsc --noEmit --project shared/datetime" \
-    "pnpm tsc --noEmit --project storybook"
+	pnpm exec nx run-many --parallel=10 --target=typecheck
 
+# see https://gist.github.com/jaredh159/e75d59ca2fd6abdc5262a87ee43d1344 for alternate method
 ts-watch:
-	$(CONCURRENTLY) \
-	  -n dash/app,dash/amb,dash/cmp,dash/dtm,dash/key,dash/typ,dash/utl,mark/app,mark/cmp,docs/app,shar/cmp,shar/dtm,shar/twd,strybook \
-		-c cyan.dim,red.dim,green.dim,blue.dim,gray,magenta.dim,yellow.dim,cyan,red,green,blue,magenta,#f80 \
-	  "pnpm tsc --noEmit --project dash/app --watch --preserveWatchOutput" \
-	  "pnpm tsc --noEmit --project dash/ambient --watch --preserveWatchOutput" \
-	  "pnpm tsc --noEmit --project dash/components --watch --preserveWatchOutput" \
-	  "pnpm tsc --noEmit --project dash/datetime --watch --preserveWatchOutput" \
-	  "pnpm tsc --noEmit --project dash/keys --watch --preserveWatchOutput" \
-	  "pnpm tsc --noEmit --project dash/types --watch --preserveWatchOutput" \
-	  "pnpm tsc --noEmit --project dash/utils --watch --preserveWatchOutput" \
-	  "pnpm tsc --noEmit --project docs/app --watch --preserveWatchOutput" \
-	  "pnpm tsc --noEmit --project marketing/app --watch --preserveWatchOutput" \
-	  "pnpm tsc --noEmit --project marketing/components --watch --preserveWatchOutput" \
-	  "pnpm tsc --noEmit --project shared/components --watch --preserveWatchOutput" \
-	  "pnpm tsc --noEmit --project shared/datetime --watch --preserveWatchOutput" \
-	  "pnpm tsc --noEmit --project storybook --watch --preserveWatchOutput"
+	pnpm exec nx run-many --parallel=50 --output-style=stream --target=typecheck:watch
 
 fix:
 	make format

@@ -1,5 +1,5 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { ContactStatusMessage } from '@marketing/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
   title: `Marketing/ContactStatusMessage`,

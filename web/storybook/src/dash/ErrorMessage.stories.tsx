@@ -1,5 +1,5 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { ErrorMessage } from '@dash/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
   title: `Dashboard/Core/ErrorMessage`,

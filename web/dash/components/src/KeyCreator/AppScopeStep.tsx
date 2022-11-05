@@ -2,9 +2,9 @@ import React from 'react';
 import { EditKey } from '@dash/keys';
 import { Label } from '@shared/components';
 import { SelectableListItem } from '../Forms';
-import KeyCreationStep from './KeyCreationStep';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
+import KeyCreationStep from './KeyCreationStep';
 
 interface Props {
   mode: 'edit' | 'create';

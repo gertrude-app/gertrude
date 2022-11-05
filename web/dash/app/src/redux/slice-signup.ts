@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { InitiateSignupInput } from '@dash/types';
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import type { InitiateSignupInput } from '@dash/types';
 import Current from '../environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';

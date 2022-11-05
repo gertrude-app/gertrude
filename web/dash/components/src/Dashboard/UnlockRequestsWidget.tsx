@@ -1,7 +1,8 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import { Api, DashboardWidgetData } from '@dash/types';
+import { Api } from '@dash/types';
 import { writable, newestFirst, inflect } from '@dash/utils';
+import type { DashboardWidgetData } from '@dash/types';
 import UnlockRequestCard from '../UnlockRequestCard';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';

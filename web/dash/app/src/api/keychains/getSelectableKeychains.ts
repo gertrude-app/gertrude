@@ -1,6 +1,6 @@
-import Result from '../Result';
-import { Keychain } from '@dash/keys';
-import * as T from './__generated__/GetSelectableKeychains';
+import type { Keychain } from '@dash/keys';
+import type Result from '../Result';
+import type * as T from './__generated__/GetSelectableKeychains';
 import { gql, query } from '../apollo';
 import { mapKeychain } from './listAdminKeychains';
 

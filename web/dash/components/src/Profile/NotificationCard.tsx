@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import cx from 'classnames';
-import { Trigger, AdminNotificationMethod } from '@dash/types';
+import { Trigger } from '@dash/types';
 import { Button } from '@shared/components';
+import type { AdminNotificationMethod } from '@dash/types';
 import { SelectMenu } from '../Forms';
 import GradientIcon from '../GradientIcon';
 

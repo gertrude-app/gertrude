@@ -1,7 +1,8 @@
 import React from 'react';
 import cx from 'classnames';
 import { TextInput, Button } from '@shared/components';
-import {
+import { isUnsaved } from '@dash/utils';
+import type {
   Trigger,
   SubscriptionStatus,
   PendingNotificationMethod,
@@ -9,7 +10,6 @@ import {
   ConfirmableEntityAction,
   NewAdminNotificationMethodEvent,
 } from '@dash/types';
-import { isUnsaved } from '@dash/utils';
 import { ConfirmDeleteEntity } from '../Modal';
 import EmptyState from '../EmptyState';
 import PageHeading from '../PageHeading';

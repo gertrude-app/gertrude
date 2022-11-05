@@ -1,7 +1,7 @@
 import React from 'react';
 import { timeOfDay } from '@dash/datetime';
-import DashboardWidget from './DashboardWidget';
 import Action from '../Action';
+import DashboardWidget from './DashboardWidget';
 
 type Props = {
   className?: string;

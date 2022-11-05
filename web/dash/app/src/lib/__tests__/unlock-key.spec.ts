@@ -1,5 +1,5 @@
-import { Key } from '@dash/keys';
 import { test, describe, expect } from 'vitest';
+import type { Key } from '@dash/keys';
 import { keyForUnlockRequest, registrableDomain } from '../unlock-key';
 
 describe(`keyForUnlockRequest()`, () => {

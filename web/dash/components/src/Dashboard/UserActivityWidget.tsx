@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { Button } from '@shared/components';
-import { DashboardWidgetData } from '@dash/types';
 import { writable } from '@dash/utils';
+import type { DashboardWidgetData } from '@dash/types';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 

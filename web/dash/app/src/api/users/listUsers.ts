@@ -1,7 +1,7 @@
-import Result from '../Result';
+import type Result from '../Result';
+import type * as T from './__generated__/ListUsers';
+import type { User } from './types';
 import { gql, query } from '../apollo';
-import * as T from './__generated__/ListUsers';
-import { User } from './types';
 import { mapKeychain } from '../keychains/listAdminKeychains';
 
 export async function list(): Promise<Result<User[], ApiError>> {

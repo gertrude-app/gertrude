@@ -1,6 +1,6 @@
-import { Keychain } from '@dash/keys';
 import { unsavedId } from '@dash/utils';
-import { User } from '../api/users';
+import type { Keychain } from '@dash/keys';
+import type { User } from '../api/users';
 
 export function keychain(id: UUID, adminId: UUID): Keychain {
   return {

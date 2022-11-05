@@ -1,6 +1,6 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { RequestStatus } from '@dash/types';
 import { ListUnlockRequests } from '@dash/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { withIds, time } from '../../story-helpers';
 

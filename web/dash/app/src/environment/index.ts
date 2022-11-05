@@ -1,11 +1,9 @@
-import { ApiClient, liveApiClient, noopApiClient, throwingApiClient } from './ApiClient';
-import {
-  EnvironmentClient,
-  LiveEnvironment,
-  NoopEnvironment,
-  ThrowingEnvironment,
-} from './Environment';
-import { StorageClient, LiveStorage, NoopStorage, ThrowingStorage } from './Storage';
+import type { ApiClient } from './ApiClient';
+import type { EnvironmentClient } from './Environment';
+import type { StorageClient } from './Storage';
+import { liveApiClient, noopApiClient, throwingApiClient } from './ApiClient';
+import { LiveEnvironment, NoopEnvironment, ThrowingEnvironment } from './Environment';
+import { LiveStorage, NoopStorage, ThrowingStorage } from './Storage';
 
 export interface Environment {
   api: ApiClient;

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import cx from 'classnames';
-import navigation from '@/navigation';
+import type navigation from '@/navigation';
 
 interface Props {
   navigation: typeof navigation;

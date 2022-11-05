@@ -1,5 +1,5 @@
-import { ComponentStory, ComponentMeta, DecoratorFn } from '@storybook/react';
 import { Modal, SuspendFilterRequestForm } from '@dash/components';
+import type { ComponentStory, ComponentMeta, DecoratorFn } from '@storybook/react';
 
 const inModal: DecoratorFn = (Story) => (
   <Modal

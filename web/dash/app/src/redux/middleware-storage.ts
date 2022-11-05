@@ -1,8 +1,8 @@
-import { Middleware } from '@reduxjs/toolkit';
+import type { Middleware } from '@reduxjs/toolkit';
+import type { State } from './store';
+import Current from '../environment';
 import { submitLoginForm, logoutClicked, loginFromMagicLink } from './slice-auth';
 import { desktopSidebarCollapsedToggled } from './slice-menu';
-import Current from '../environment';
-import { State } from './store';
 import { handleSignupPaymentSuccess } from './slice-signup';
 
 const storageMiddleware: Middleware = (store) => (next) => (action) => {

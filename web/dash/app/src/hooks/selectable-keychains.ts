@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Keychain } from '@dash/keys';
+import type { Keychain } from '@dash/keys';
 import { fetchSelectableKeychains } from '../redux/slice-keychains';
 import { useDispatch, useSelector } from '../redux/hooks';
 

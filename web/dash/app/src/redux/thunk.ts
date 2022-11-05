@@ -1,15 +1,14 @@
-import {
+import { createAction, nanoid } from '@reduxjs/toolkit';
+import type {
   AnyAction,
   ThunkAction as LibThunkAction,
-  createAction,
-  nanoid,
   ThunkDispatch,
   Action,
   ActionCreatorWithPreparedPayload,
 } from '@reduxjs/toolkit';
-import Result from '../api/Result';
-import { spinnerMin } from './helpers';
 import type { State, Dispatch } from './store';
+import type Result from '../api/Result';
+import { spinnerMin } from './helpers';
 
 export function createResultThunk<T, E, ThunkArg = void>(
   typePrefix: string,

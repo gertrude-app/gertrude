@@ -6,8 +6,8 @@ import {
   UnlockRequestResponder,
   UserInputText,
 } from '@dash/components';
-import { useDispatch, useSelector } from '../../redux/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from '../../redux/hooks';
 import { editKeyEventReceived } from '../../redux/slice-keychains';
 import ApiErrorMessage from '../ApiErrorMessage';
 import { Req } from '../../redux/helpers';

@@ -1,5 +1,5 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { KeystrokesViewer } from '@dash/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
   title: `Dashboard/Users/Activity/KeystrokesViewer`,

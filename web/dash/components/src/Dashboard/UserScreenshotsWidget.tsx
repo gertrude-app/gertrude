@@ -1,8 +1,8 @@
 import React from 'react';
-import DashboardWidget from './DashboardWidget';
-import { DashboardWidgetData } from '@dash/types';
 import { writable, newestFirst } from '@dash/utils';
 import { relativeTime } from '@dash/datetime';
+import type { DashboardWidgetData } from '@dash/types';
+import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
 type Props = {

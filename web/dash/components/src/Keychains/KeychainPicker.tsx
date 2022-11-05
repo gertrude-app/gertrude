@@ -1,8 +1,8 @@
 import React from 'react';
 import cx from 'classnames';
-import { Keychain } from '@dash/keys';
-import KeychainCard from './KeychainCard';
+import type { Keychain } from '@dash/keys';
 import EmptyState from '../EmptyState';
+import KeychainCard from './KeychainCard';
 
 type Props = {
   hasNoOwnKeychains: boolean;

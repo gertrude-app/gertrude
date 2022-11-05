@@ -1,7 +1,7 @@
-import { DecideUnlockRequestInput } from '@dash/types';
-import Result from '../Result';
+import type { DecideUnlockRequestInput } from '@dash/types';
+import type Result from '../Result';
+import type * as T from './__generated__/DecideUnlockRequest';
 import { gql, mutate } from '../apollo';
-import * as T from './__generated__/DecideUnlockRequest';
 
 export async function updateUnlockRequest(
   input: DecideUnlockRequestInput,

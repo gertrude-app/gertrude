@@ -1,6 +1,6 @@
 import React from 'react';
-import { SubcomponentsOmit } from '@dash/types';
 import { Button } from '@shared/components';
+import type { SubcomponentsOmit } from '@dash/types';
 import EmptyState from '../EmptyState';
 import PageHeading from '../PageHeading';
 import ConnectModal from './ConnectDeviceModal';

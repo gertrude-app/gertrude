@@ -29,6 +29,7 @@ module.exports = {
     '@typescript-eslint/no-namespace': `off`,
     '@typescript-eslint/no-empty-function': `off`,
     '@typescript-eslint/ban-ts-comment': `off`,
+    '@typescript-eslint/consistent-type-imports': `error`,
     '@typescript-eslint/no-useless-constructor': `error`,
     '@typescript-eslint/no-explicit-any': `off`,
     '@typescript-eslint/no-this-alias': `off`,
@@ -151,6 +152,10 @@ module.exports = {
     'getter-return': `error`,
 
     // import
+    'import/order': [
+      `error`,
+      { groups: [`builtin`, `external`, `type`, `parent`, `sibling`, `index`] },
+    ],
     'import/first': `error`,
     'import/no-amd': `error`,
     'import/no-webpack-loader-syntax': `error`,
@@ -168,6 +173,7 @@ module.exports = {
         ignore: [],
       },
     ],
+    'jsx-quotes': [`error`, `prefer-double`],
     'react/jsx-uses-react': `error`,
     'react/jsx-uses-vars': `error`,
     'react/no-danger-with-children': `error`,

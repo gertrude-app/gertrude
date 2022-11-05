@@ -1,4 +1,3 @@
-import type { NextPage } from 'next';
 import {
   CTABlock,
   DefenseInDepthBlock,
@@ -9,6 +8,7 @@ import {
   MainHeader,
   SafeIsNowPossibleBlock,
 } from '@marketing/components';
+import type { NextPage } from 'next';
 
 const Home: NextPage = () => {
   return (

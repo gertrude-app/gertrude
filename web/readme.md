@@ -30,6 +30,13 @@
 Run `make` for an overview of the most commonly used dev commands. Check out the
 `Makefile` for even more.
 
+For watching typescript errors, the following monstrosity of a bash command filters out
+some of the duplicates/noise:
+
+```sh
+script -q /dev/null make ts-watch | grep -P " [^\.][^\.][^ ]+: (- )?error TS\d+|(?<=0 errors)"
+```
+
 ## Tips on adding a new package
 
 - `pnpm` requires that the lib be explicitly listed as a dependency, so in other apps/libs

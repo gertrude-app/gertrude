@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
-import SidebarOption from './SidebarOption';
 import { Logo } from '@shared/components';
+import SidebarOption from './SidebarOption';
 
 interface Props {
   collapsed?: boolean;

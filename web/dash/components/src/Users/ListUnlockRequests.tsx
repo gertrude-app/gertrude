@@ -1,7 +1,8 @@
 import React from 'react';
 import cx from 'classnames';
-import { Subcomponents, RequestStatus } from '@dash/types';
+import { RequestStatus } from '@dash/types';
 import { posessive, newestFirst } from '@dash/utils';
+import type { Subcomponents } from '@dash/types';
 import UnlockRequestCard from '../UnlockRequestCard';
 import PageHeading from '../PageHeading';
 import PartyMessage from '../PartyMessage';

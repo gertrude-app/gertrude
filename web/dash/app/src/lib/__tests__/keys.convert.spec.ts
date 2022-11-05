@@ -1,5 +1,6 @@
 import { it, describe, expect } from 'vitest';
-import { KeyRecord, convert } from '@dash/keys';
+import { convert } from '@dash/keys';
+import type { KeyRecord } from '@dash/keys';
 
 describe(`convert.toState()`, () => {
   it(`sets appIdentificationType correctly for bundleId-only skeleton key`, () => {

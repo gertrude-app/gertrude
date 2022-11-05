@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { FullscreenModalForm } from '@dash/components';
-import { useDispatch, useSelector } from '../../redux/hooks';
 import { Navigate, useLocation, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import { loginFromMagicLink } from '../../redux/slice-auth';
 

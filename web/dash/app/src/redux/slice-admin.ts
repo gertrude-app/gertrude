@@ -1,12 +1,13 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { isUnsaved, unsavedId } from '@dash/utils';
-import { NotificationUpdate } from '@dash/components';
 import * as T from '@dash/types';
+import type { NotificationUpdate } from '@dash/components';
+import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
-import { Req, editable, revert, commit } from './helpers';
 import * as typesafe from '../lib/typesafe';
-import { createResultThunk } from './thunk';
 import Result from '../api/Result';
+import { Req, editable, revert, commit } from './helpers';
+import { createResultThunk } from './thunk';
 
 export interface AdminState {
   billingPortalRequest: RequestState<string>;

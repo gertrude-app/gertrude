@@ -1,6 +1,6 @@
-import { newKeyState } from '.';
+import type { AppScope, Key, KeyRecord, SingleAppScope } from './types';
 import * as EditKey from './edit';
-import { AppScope, Key, KeyRecord, SingleAppScope } from './types';
+import { newKeyState } from '.';
 
 export function toState(keyRecord: KeyRecord): EditKey.State {
   const state = newKeyState(keyRecord.id, keyRecord.keychainId);

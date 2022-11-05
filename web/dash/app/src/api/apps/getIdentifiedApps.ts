@@ -1,6 +1,6 @@
-import Result from '../Result';
+import type Result from '../Result';
+import type * as T from './__generated__/GetIdentifiedApps';
 import { gql, query } from '../apollo';
-import * as T from './__generated__/GetIdentifiedApps';
 
 export async function getIdentifiedApps(): Promise<
   Result<T.GetIdentifiedApps_apps[], ApiError>

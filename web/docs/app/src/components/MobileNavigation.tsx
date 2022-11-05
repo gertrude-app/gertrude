@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Dialog } from '@headlessui/react';
+import type navigation from '@/navigation';
 import Navigation from '@/components/Navigation';
-import navigation from '@/navigation';
 
 interface Props {
   navigation: typeof navigation;

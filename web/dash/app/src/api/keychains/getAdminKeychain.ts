@@ -1,8 +1,8 @@
-import Result from '../Result';
-import { Keychain, KeyRecord, Key } from '@dash/keys';
+import type { Keychain, KeyRecord, Key } from '@dash/keys';
+import type Result from '../Result';
+import type * as T from './__generated__/GetKeychain';
 import { gql, query } from '../apollo';
 import { KEYCHAIN_FIELDS, mapKeychain } from './listAdminKeychains';
-import * as T from './__generated__/GetKeychain';
 
 export async function getAdminKeychain(
   id: UUID,

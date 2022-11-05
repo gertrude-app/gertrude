@@ -5,7 +5,9 @@
   "scripts": {
     "start": "next-remote-watch ../components/src ../../shared/components/src",
     "export": "next export",
-    "build": "next build"
+    "build": "next build",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
   },
   "dependencies": {
     "@headlessui/react": "^1.6.6",

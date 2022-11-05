@@ -1,5 +1,5 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { Modal, KeychainPicker } from '@dash/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { keychainProps, keychains } from '../../story-helpers';
 
 export default {

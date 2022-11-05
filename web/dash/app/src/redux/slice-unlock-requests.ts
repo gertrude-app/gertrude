@@ -1,10 +1,12 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import * as convert from '@dash/keys';
-import { RequestStatus, UnlockRequest } from '@dash/types';
+import { RequestStatus } from '@dash/types';
+import type { UnlockRequest } from '@dash/types';
+import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
+import Result from '../api/Result';
 import { editable, Req } from './helpers';
 import { createResultThunk } from './thunk';
-import Result from '../api/Result';
 
 type State =
   | 'reviewing'

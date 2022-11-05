@@ -1,6 +1,6 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { Logo, TextInput } from '@shared/components';
 import { Modal, SelectableListItem } from '@dash/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
   title: `Dashboard/Modal/Modal`,

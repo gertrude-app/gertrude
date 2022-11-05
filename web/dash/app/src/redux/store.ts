@@ -1,5 +1,6 @@
-import React, { JSXElementConstructor } from 'react';
 import { configureStore } from '@reduxjs/toolkit';
+import type { JSXElementConstructor } from 'react';
+import type React from 'react';
 import signupReducer from './slice-signup';
 import menuReducer from './slice-menu';
 import authReducer from './slice-auth';

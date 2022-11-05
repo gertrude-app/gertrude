@@ -1,5 +1,5 @@
 import React from 'react';
-import { EditKey } from '@dash/keys';
+import type { EditKey } from '@dash/keys';
 import AddressStep from './AddressStep';
 import WebsiteKeyAppScopeStep from './WebsiteKeyAppScopeStep';
 import ExpirationStep from './ExpirationStep';

@@ -1,6 +1,6 @@
-import Result from '../Result';
-import { Keychain, KeyRecord, Key } from '@dash/keys';
-import * as T from './__generated__/ListAdminKeychains';
+import type { Keychain, KeyRecord, Key } from '@dash/keys';
+import type Result from '../Result';
+import type * as T from './__generated__/ListAdminKeychains';
 import { gql, query } from '../apollo';
 
 export async function listAdminKeychains(): Promise<

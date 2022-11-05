@@ -1,5 +1,5 @@
-import { ComponentStory, ComponentMeta, DecoratorFn } from '@storybook/react';
 import { Modal, UnlockRequestResponder } from '@dash/components';
+import type { ComponentStory, ComponentMeta, DecoratorFn } from '@storybook/react';
 import { time } from '../../story-helpers';
 
 const inModal: DecoratorFn = (Story) => (

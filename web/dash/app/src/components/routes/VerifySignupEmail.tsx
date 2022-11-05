@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { FullscreenModalForm } from '@dash/components';
-import { useDispatch, useSelector } from '../../redux/hooks';
 import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from '../../redux/hooks';
 import { verifySignupEmail, createSignupPaymentUrl } from '../../redux/slice-signup';
 import { Req } from '../../redux/helpers';
 

@@ -1,5 +1,5 @@
-import { JSXElementConstructor } from 'react';
-import { QueriedProps } from './store';
+import type { JSXElementConstructor } from 'react';
+import type { QueriedProps } from './store';
 
 export class Query {
   static resolve<T extends JSXElementConstructor<any>>(

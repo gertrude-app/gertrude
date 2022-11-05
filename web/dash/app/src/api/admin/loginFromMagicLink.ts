@@ -1,6 +1,6 @@
-import { AdminIds } from '@dash/types';
-import Result from '../Result';
-import * as T from './__generated__/LoginFromMagicLink';
+import type { AdminIds } from '@dash/types';
+import type Result from '../Result';
+import type * as T from './__generated__/LoginFromMagicLink';
 import { gql, mutate } from '../apollo';
 
 export async function loginFromMagicLink(

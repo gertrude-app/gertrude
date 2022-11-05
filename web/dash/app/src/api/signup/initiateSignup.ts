@@ -1,5 +1,5 @@
-import Result from '../Result';
-import * as T from './__generated__/InitiateSignup';
+import type Result from '../Result';
+import type * as T from './__generated__/InitiateSignup';
 import { gql, mutate } from '../apollo';
 
 export async function initiateSignup(

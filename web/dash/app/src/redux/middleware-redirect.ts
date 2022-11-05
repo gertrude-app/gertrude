@@ -1,5 +1,5 @@
-import { Middleware } from '@reduxjs/toolkit';
 import { isUnsaved } from '@dash/utils';
+import type { Middleware } from '@reduxjs/toolkit';
 import { upsertUser } from './slice-users';
 
 const redirectMiddleware: Middleware = (_store) => (next) => (action) => {

@@ -1,6 +1,6 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { KeyCreator } from '@dash/components';
 import { EditKey } from '@dash/keys';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
   title: `Dashboard/KeyCreator/KeyCreator`,

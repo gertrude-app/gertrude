@@ -1,5 +1,5 @@
-import { Key } from '@dash/keys';
-import { UnlockRequest } from '@dash/types';
+import type { Key } from '@dash/keys';
+import type { UnlockRequest } from '@dash/types';
 
 type Request = Pick<
   UnlockRequest,

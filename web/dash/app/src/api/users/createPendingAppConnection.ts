@@ -1,6 +1,6 @@
-import Result from '../Result';
+import type Result from '../Result';
+import type * as T from './__generated__/CreatePendingAppConnection';
 import { gql, mutate } from '../apollo';
-import * as T from './__generated__/CreatePendingAppConnection';
 
 export async function createPendingAppConnection(
   userId: UUID,
