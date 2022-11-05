@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { Loading, EditKeychain } from '@dash/components';
 import { toKeyRecord } from '@dash/keys';
-import { QueryProps } from '../../redux/store';
+import type { QueryProps } from '../../redux/store';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import { isDirty, original, Query, Req } from '../../redux/helpers';

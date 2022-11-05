@@ -1,6 +1,6 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { EditKeychain } from '@dash/components';
 import { newKeyState } from '@dash/keys';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { confirmableEntityAction } from '../../story-helpers';
 
 export default {

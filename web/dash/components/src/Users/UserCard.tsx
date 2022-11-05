@@ -1,8 +1,8 @@
 import React from 'react';
 import cx from 'classnames';
 import { Link } from 'react-router-dom';
-import { Subcomponents } from '@dash/types';
 import { inflect } from '@dash/utils';
+import type { Subcomponents } from '@dash/types';
 import UserDevice from './UserDevice';
 
 type Props = {

@@ -1,8 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AdminIds } from '@dash/types';
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import type { AdminIds } from '@dash/types';
+import type { StorageClient } from '../environment/Storage';
 import Current from '../environment';
 import { OptionalVar as Optional } from '../environment/Environment';
-import { StorageClient } from '../environment/Storage';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 import { handleSignupPaymentSuccess } from './slice-signup';

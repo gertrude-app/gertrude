@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { GetIdentifiedApps_apps } from '../api/apps/__generated__/GetIdentifiedApps';
+import type { GetIdentifiedApps_apps } from '../api/apps/__generated__/GetIdentifiedApps';
 import Current from '../environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { TextInput, Button } from '@shared/components';
-import {
+import type {
   AdminNotificationMethod,
   PendingNotificationMethod,
   NewAdminNotificationMethodEvent as Event,

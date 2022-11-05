@@ -1,7 +1,7 @@
-import { Keychain } from '@dash/keys';
-import Result from '../Result';
+import type { Keychain } from '@dash/keys';
+import type Result from '../Result';
+import type * as T from './__generated__/GetSelectableKeychains';
 import { gql, query } from '../apollo';
-import * as T from './__generated__/GetSelectableKeychains';
 import { mapKeychain } from './listAdminKeychains';
 
 export async function getSelectableKeychains(): Promise<

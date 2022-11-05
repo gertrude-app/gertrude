@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, TextInput } from '@shared/components';
-import { ConfirmableEntityAction } from '@dash/types';
-import { EditKey, KeyRecord } from '@dash/keys';
 import { inflect } from '@dash/utils';
+import type { ConfirmableEntityAction } from '@dash/types';
+import type { EditKey, KeyRecord } from '@dash/keys';
 import Modal, { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
 import KeyCreator from '../KeyCreator/KeyCreator';

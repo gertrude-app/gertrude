@@ -1,6 +1,6 @@
-import Result from '../Result';
+import type Result from '../Result';
+import type * as T from './__generated__/AllowingSignups';
 import { gql, query } from '../apollo';
-import * as T from './__generated__/AllowingSignups';
 
 export async function allowingSignups(): Promise<Result<boolean, ApiError>> {
   const result = await query<T.AllowingSignups>(QUERY);

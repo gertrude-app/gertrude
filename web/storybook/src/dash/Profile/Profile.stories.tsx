@@ -1,6 +1,6 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { SubscriptionStatus, Trigger } from '@dash/types';
 import { Profile } from '@dash/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { withIdsAnd, confirmableEntityAction } from '../../story-helpers';
 import { Email as CardStory } from './NotificationCard.stories';

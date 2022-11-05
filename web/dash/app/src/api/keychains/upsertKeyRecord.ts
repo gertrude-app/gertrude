@@ -1,9 +1,9 @@
-import { UpdateKeyRecordInput } from '@dash/types';
-import { KeyRecord } from '@dash/keys';
-import Result from '../Result';
+import type { UpdateKeyRecordInput } from '@dash/types';
+import type { KeyRecord } from '@dash/keys';
+import type Result from '../Result';
+import type * as U from './__generated__/UpdateKeyRecord';
+import type * as C from './__generated__/CreateKeyRecord';
 import { gql, mutate } from '../apollo';
-import * as U from './__generated__/UpdateKeyRecord';
-import * as C from './__generated__/CreateKeyRecord';
 
 export async function upsertKeyRecord(
   keyRecord: Editable<KeyRecord>,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconType } from '../GradientIcon';
+import type { IconType } from '../GradientIcon';
 import Modal from './Modal';
 
 interface Props<Payload> {

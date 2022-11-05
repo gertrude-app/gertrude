@@ -1,8 +1,8 @@
-import { DateRangeInput } from '@dash/types';
-import Result from '../Result';
+import type { DateRangeInput } from '@dash/types';
+import type Result from '../Result';
+import type * as T from './__generated__/GetActivityOverview';
 import { gql, query } from '../apollo';
 import { entireDay } from '../helpers';
-import * as T from './__generated__/GetActivityOverview';
 
 export async function getActivityOverview(
   userId: UUID,

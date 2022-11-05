@@ -1,5 +1,5 @@
 import React from 'react';
-import { DashboardWidgetData } from '@dash/types';
+import type { DashboardWidgetData } from '@dash/types';
 import { UndoMainPadding } from '../Chrome/Chrome';
 import PageHeading from '../PageHeading';
 import SmartLink from '../SmartLink';

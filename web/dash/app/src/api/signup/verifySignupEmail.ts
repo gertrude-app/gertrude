@@ -1,6 +1,6 @@
-import Result from '../Result';
+import type Result from '../Result';
+import type * as T from './__generated__/VerifySignupEmail';
 import { gql, mutate } from '../apollo';
-import * as T from './__generated__/VerifySignupEmail';
 
 export async function verifySignupEmail(token: UUID): Promise<Result<UUID, ApiError>> {
   const result = await mutate<T.VerifySignupEmail, T.VerifySignupEmailVariables>(

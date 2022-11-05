@@ -1,5 +1,5 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { UsersOverviewWidget } from '@dash/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withIds } from '../../story-helpers';
 
 export default {

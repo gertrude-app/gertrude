@@ -1,10 +1,10 @@
 import { isUnsaved } from '@dash/utils';
-import { UpdateUserInput } from '@dash/types';
-import Result from '../Result';
+import type { UpdateUserInput } from '@dash/types';
+import type Result from '../Result';
+import type * as U from './__generated__/UpdateUser';
+import type * as C from './__generated__/CreateUser';
+import type { User } from './types';
 import { gql, mutate } from '../apollo';
-import * as U from './__generated__/UpdateUser';
-import * as C from './__generated__/CreateUser';
-import { User } from './types';
 
 export async function upsertUser(
   user: User & { adminId: UUID },

@@ -1,9 +1,9 @@
-import { UpdateKeychainInput } from '@dash/types';
-import { Keychain } from '@dash/keys';
-import Result from '../Result';
+import type { UpdateKeychainInput } from '@dash/types';
+import type { Keychain } from '@dash/keys';
+import type Result from '../Result';
+import type * as U from './__generated__/UpdateKeychain';
+import type * as C from './__generated__/CreateKeychain';
 import { gql, mutate } from '../apollo';
-import * as U from './__generated__/UpdateKeychain';
-import * as C from './__generated__/CreateKeychain';
 
 export async function upsertKeychain(
   keychain: Editable<Keychain> & { adminId: UUID },

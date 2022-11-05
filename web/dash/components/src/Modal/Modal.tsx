@@ -4,7 +4,8 @@ import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { capitalize } from '@dash/utils';
 import { Button, LoadingSpinner } from '@shared/components';
-import GradientIcon, { IconType } from '../GradientIcon';
+import type { IconType } from '../GradientIcon';
+import GradientIcon from '../GradientIcon';
 
 interface Props {
   type: 'destructive' | 'default' | 'container' | 'error';

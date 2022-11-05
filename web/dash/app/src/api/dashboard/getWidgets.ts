@@ -1,7 +1,7 @@
-import { DashboardWidgetData } from '@dash/types';
-import Result from '../Result';
+import type { DashboardWidgetData } from '@dash/types';
+import type Result from '../Result';
+import type * as T from './__generated__/GetWidgets';
 import { gql, query } from '../apollo';
-import * as T from './__generated__/GetWidgets';
 
 export async function getWidgets(): Promise<Result<DashboardWidgetData, ApiError>> {
   const result = await query<T.GetWidgets>(QUERY);

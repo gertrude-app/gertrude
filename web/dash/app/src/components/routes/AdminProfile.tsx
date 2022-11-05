@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { Loading, Profile } from '@dash/components';
-import { AdminNotificationMethod } from '@dash/types';
 import { capitalize, isUnsaved } from '@dash/utils';
+import type { AdminNotificationMethod } from '@dash/types';
+import type { QueryProps, State } from '../../redux/store';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   cancelAdminEntityDelete,
@@ -20,7 +21,6 @@ import {
 import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
 import { isDirty, notNullish, Query, Req } from '../../redux/helpers';
-import { QueryProps, State } from '../../redux/store';
 
 const AdminProfile: React.FC = () => {
   const dispatch = useDispatch();

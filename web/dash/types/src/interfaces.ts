@@ -1,5 +1,5 @@
 import type { JSXElementConstructor, ComponentProps } from 'react';
-import { RequestStatus } from './api';
+import type { RequestStatus } from './api';
 
 export type Subcomponents<
   T extends keyof JSX.IntrinsicElements | JSXElementConstructor<any>,

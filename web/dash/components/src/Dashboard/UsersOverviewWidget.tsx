@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import { Button } from '@shared/components';
-import { DashboardWidgetData } from '@dash/types';
+import type { DashboardWidgetData } from '@dash/types';
 import PillBadge from '../PillBadge';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';

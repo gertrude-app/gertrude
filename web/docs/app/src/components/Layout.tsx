@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { Logo } from '@shared/components';
-import { Section } from '../pages/_app';
+import type { Section } from '../pages/_app';
 import DocFooterCta from './DocFooterCta';
 import MobileNavigation from '@/components/MobileNavigation';
 import Navigation from '@/components/Navigation';

@@ -1,5 +1,6 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { UserActivityReviewDay, ActivityItem } from '@dash/components';
+import { UserActivityReviewDay } from '@dash/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { ActivityItem } from '@dash/components';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
 
 export default {

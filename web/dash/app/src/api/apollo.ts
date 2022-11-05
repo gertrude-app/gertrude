@@ -1,14 +1,11 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  createHttpLink,
-  from,
+import { ApolloClient, InMemoryCache, createHttpLink, from } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import { GraphQLError } from 'graphql';
+import type {
   DocumentNode,
   TypedDocumentNode,
   NormalizedCacheObject,
 } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
-import { GraphQLError } from 'graphql';
 import Current from '../environment';
 import Result from './Result';
 

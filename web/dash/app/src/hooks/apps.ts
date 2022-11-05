@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { GetIdentifiedApps_apps } from '../api/apps/__generated__/GetIdentifiedApps';
+import type { GetIdentifiedApps_apps } from '../api/apps/__generated__/GetIdentifiedApps';
 import { getIdentifiedApps } from '../redux/slice-apps';
 import { useDispatch, useSelector } from '../redux/hooks';
 

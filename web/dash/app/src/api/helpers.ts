@@ -1,4 +1,4 @@
-import { DateRangeInput } from '@dash/types';
+import type { DateRangeInput } from '@dash/types';
 
 export function entireDay(date: Date): DateRangeInput {
   const start = new Date(date.getTime());

@@ -1,5 +1,6 @@
-import React, { ComponentProps } from 'react';
+import React from 'react';
 import { posessive } from '@dash/utils';
+import type { ComponentProps } from 'react';
 import PageHeading from '../../PageHeading';
 import PartyMessage from '../../PartyMessage';
 import ReviewSummaryCard from './DaySummaryCard';

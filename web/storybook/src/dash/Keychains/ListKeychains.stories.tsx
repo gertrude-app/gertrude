@@ -1,5 +1,5 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { ListKeychains } from '@dash/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { keychainProps } from '../../story-helpers';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 

@@ -1,8 +1,8 @@
 import toast from 'react-hot-toast';
-import { Action, Middleware } from '@reduxjs/toolkit';
 import { capitalize } from '@dash/utils';
+import type { Action, Middleware } from '@reduxjs/toolkit';
+import type { ResultThunk } from './thunk';
 import { deleteActivityItems, deleteDevice, upsertUser, deleteUser } from './slice-users';
-import { ResultThunk } from './thunk';
 import { updateSuspendFilterRequest } from './slice-filter-suspensions';
 import { acceptUnlockRequest, rejectUnlockRequest } from './slice-unlock-requests';
 import {

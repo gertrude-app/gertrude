@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConfirmableEntityAction } from '@dash/types';
+import type { ConfirmableEntityAction } from '@dash/types';
 import ConfirmDestructiveAction from './ConfirmDestructiveAction';
 
 type Props = {

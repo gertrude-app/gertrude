@@ -1,6 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
-import { newKeyState, EditKey, convert, Keychain, KeyRecord } from '@dash/keys';
+import { newKeyState, convert } from '@dash/keys';
+import type { EditKey, Keychain, KeyRecord } from '@dash/keys';
+import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
 import Result from '../api/Result';
 import { keyForUnlockRequest } from '../lib/unlock-key';

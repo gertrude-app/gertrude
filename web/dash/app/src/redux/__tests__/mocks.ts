@@ -1,14 +1,14 @@
 import { SubscriptionStatus, Trigger, Family } from '@dash/types';
-import { Keychain } from '@dash/keys';
-import { ActivityItem } from '@dash/components';
+import type { Keychain } from '@dash/keys';
+import type { ActivityItem } from '@dash/components';
 import type { User } from '../../api/users';
-import {
+import type {
   GetAdmin_admin,
   GetAdmin_admin_notifications,
   GetAdmin_admin_verifiedNotificationMethods,
   GetAdmin_admin_verifiedNotificationMethods_method,
 } from '../../api/admin/__generated__/GetAdmin';
-import { GetActivityOverview_counts } from '../../api/users/__generated__/GetActivityOverview';
+import type { GetActivityOverview_counts } from '../../api/users/__generated__/GetActivityOverview';
 
 export function adminProfile(override: Partial<GetAdmin_admin> = {}): GetAdmin_admin {
   return {

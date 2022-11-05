@@ -1,6 +1,6 @@
-import Result from '../Result';
+import type Result from '../Result';
+import type * as T from './__generated__/DeleteActivityItems';
 import { gql, mutate } from '../apollo';
-import * as T from './__generated__/DeleteActivityItems';
 
 export async function deleteActivityItems(
   userId: string,

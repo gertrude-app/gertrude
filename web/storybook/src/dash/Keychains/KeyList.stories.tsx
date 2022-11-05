@@ -1,5 +1,5 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { KeyList } from '@dash/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { keyExamples } from '../../story-helpers';
 
 export default {

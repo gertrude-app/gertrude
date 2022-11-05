@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { Keychain } from '@dash/keys';
+import type { Keychain } from '@dash/keys';
 import EmptyState from '../EmptyState';
 import KeychainCard from './KeychainCard';
 

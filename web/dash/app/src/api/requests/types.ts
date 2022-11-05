@@ -1,4 +1,4 @@
-import { RequestStatus } from '@dash/types';
+import type { RequestStatus } from '@dash/types';
 
 export interface SuspendFilterRequest {
   id: UUID;

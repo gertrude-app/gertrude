@@ -1,5 +1,5 @@
+import type { AppScope, Key, KeyRecord, SingleAppScope } from './types';
 import * as EditKey from './edit';
-import { AppScope, Key, KeyRecord, SingleAppScope } from './types';
 import { newKeyState } from '.';
 
 export function toState(keyRecord: KeyRecord): EditKey.State {

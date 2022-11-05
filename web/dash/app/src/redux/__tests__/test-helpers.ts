@@ -1,4 +1,4 @@
-import { State } from '../store';
+import type { State } from '../store';
 import { initialState as authInitialState } from '../slice-auth';
 import { initialState as usersInitialState } from '../slice-users';
 import { initialState as menuInitialState } from '../slice-menu';

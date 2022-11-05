@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import { Subcomponents, ConfirmableEntityAction } from '@dash/types';
+import type { Subcomponents, ConfirmableEntityAction } from '@dash/types';
 import EmptyState from '../EmptyState';
 import { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';

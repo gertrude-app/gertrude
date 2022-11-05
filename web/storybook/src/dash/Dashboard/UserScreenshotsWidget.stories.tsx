@@ -1,5 +1,5 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { UserScreenshotsWidget } from '@dash/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withIds, time } from '../../story-helpers';
 
 export default {

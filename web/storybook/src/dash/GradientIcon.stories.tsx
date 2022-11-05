@@ -1,5 +1,5 @@
-import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { GradientIcon, GRADIENT_ICONS } from '@dash/components';
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 const GradientGrid: React.FC<{ size: 'small' | 'medium' | 'large'; subtle: boolean }> = ({
   size,

@@ -1,5 +1,5 @@
-import { ConfirmableEntityAction } from '@dash/types';
-import { Keychain, KeyRecord } from '@dash/keys';
+import type { ConfirmableEntityAction } from '@dash/types';
+import type { Keychain, KeyRecord } from '@dash/keys';
 
 export function keychainProps(override: Partial<Keychain> = {}): Keychain {
   return {

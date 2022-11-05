@@ -1,5 +1,5 @@
 import React from 'react';
-import { KeyRecord } from '@dash/keys';
+import type { KeyRecord } from '@dash/keys';
 import Key from './KeyListKey';
 
 type Props = {

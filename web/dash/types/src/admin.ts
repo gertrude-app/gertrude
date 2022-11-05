@@ -1,4 +1,4 @@
-import { SubscriptionStatus, Trigger } from './api';
+import type { SubscriptionStatus, Trigger } from './api';
 
 export interface Admin {
   email: string;

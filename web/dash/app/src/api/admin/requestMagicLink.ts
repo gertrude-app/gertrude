@@ -1,6 +1,6 @@
-import Result from '../Result';
+import type Result from '../Result';
+import type * as T from './__generated__/RequestMagicLink';
 import { gql, mutate } from '../apollo';
-import * as T from './__generated__/RequestMagicLink';
 
 export async function requestMagicLink(email: string): Promise<Result<true, ApiError>> {
   const result = await mutate<T.RequestMagicLink, T.RequestMagicLinkVariables>(MUTATION, {

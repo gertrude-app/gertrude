@@ -1,9 +1,9 @@
-import { UpdateAdminNotificationInput } from '@dash/types';
 import { isUnsaved } from '@dash/utils';
-import Result from '../Result';
+import type { UpdateAdminNotificationInput } from '@dash/types';
+import type Result from '../Result';
+import type * as U from './__generated__/UpdateNotification';
+import type * as C from './__generated__/CreateNotification';
 import { gql, mutate } from '../apollo';
-import * as U from './__generated__/UpdateNotification';
-import * as C from './__generated__/CreateNotification';
 
 export async function upsertNotification(
   input: UpdateAdminNotificationInput,

@@ -1,7 +1,7 @@
-import Result from '../Result';
+import type Result from '../Result';
+import type * as T from './__generated__/GetActivityDay';
 import { gql, query } from '../apollo';
 import { entireDay } from '../helpers';
-import * as T from './__generated__/GetActivityDay';
 
 export async function getActivityDay(
   userId: string,
