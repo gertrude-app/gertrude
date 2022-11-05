@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "scripts": {
     "start": "start-storybook -p 4777 --ci --quiet",
-    "build": "build-storybook"
+    "build": "build-storybook",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
   },
   "dependencies": {
     "@dash/components": "workspace:*",

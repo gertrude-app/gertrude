@@ -151,6 +151,10 @@ module.exports = {
     'getter-return': `error`,
 
     // import
+    'import/order': [
+      `error`,
+      { groups: [`builtin`, `external`, `type`, `parent`, `sibling`, `index`] },
+    ],
     'import/first': `error`,
     'import/no-amd': `error`,
     'import/no-webpack-loader-syntax': `error`,

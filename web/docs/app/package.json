@@ -5,7 +5,9 @@
   "scripts": {
     "start": "next dev --port 7999",
     "build": "next build",
-    "export": "next export"
+    "export": "next export",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
   },
   "browserslist": "defaults, not ie <= 11",
   "dependencies": {
