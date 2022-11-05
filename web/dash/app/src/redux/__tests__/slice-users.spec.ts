@@ -8,9 +8,9 @@ import reducer, {
   fetchActivityOverview,
   upsertUser,
 } from '../slice-users';
+import Result from '../../api/Result';
 import { nextTick, makeGetState, makeState } from './test-helpers';
 import * as mock from './mocks';
-import Result from '../../api/Result';
 
 describe(`deleteDevice`, () => {
   it(`removes device from root users state on success`, () => {

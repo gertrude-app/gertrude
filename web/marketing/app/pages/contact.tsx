@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import cx from 'classnames';
-import type { NextPage } from 'next';
 import { TextInput, Logo, Button, LoadingSpinner } from '@shared/components';
 import { Chrome, ContactStatusMessage } from '@marketing/components';
+import type { NextPage } from 'next';
 
 const Contact: NextPage = () => {
   const [state, setState] = useState<'idle' | 'ongoing' | 'failed' | 'succeeded'>(`idle`);

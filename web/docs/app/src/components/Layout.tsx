@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import cx from 'classnames';
+import { Logo } from '@shared/components';
+import { Section } from '../pages/_app';
+import DocFooterCta from './DocFooterCta';
 import MobileNavigation from '@/components/MobileNavigation';
 import Navigation from '@/components/Navigation';
 import Prose from '@/components/Prose';
 import navigation from '@/navigation';
-import { Section } from '../pages/_app';
-import { Logo } from '@shared/components';
-import DocFooterCta from './DocFooterCta';
 
 function useTableOfContents(tableOfContents: Section[]): string {
   const [currentSection, setCurrentSection] = useState(tableOfContents[0]?.id ?? ``);

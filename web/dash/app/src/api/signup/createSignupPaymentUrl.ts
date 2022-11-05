@@ -1,6 +1,6 @@
 import Result from '../Result';
-import * as T from './__generated__/CreateSignupPaymentUrl';
 import { gql, mutate } from '../apollo';
+import * as T from './__generated__/CreateSignupPaymentUrl';
 
 export async function createSignupPaymentUrl(
   adminId: UUID,

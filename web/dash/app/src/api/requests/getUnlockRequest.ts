@@ -1,5 +1,5 @@
-import Result from '../Result';
 import { UnlockRequest } from '@dash/types';
+import Result from '../Result';
 import { gql, query } from '../apollo';
 import * as T from './__generated__/UnlockRequest';
 

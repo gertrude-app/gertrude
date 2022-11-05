@@ -1,7 +1,7 @@
 import { AdminIds } from '@dash/types';
 import Result from '../Result';
-import * as T from './__generated__/LoginAdmin';
 import { gql, mutate } from '../apollo';
+import * as T from './__generated__/LoginAdmin';
 
 export async function login(
   email: string,

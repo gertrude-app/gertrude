@@ -1,13 +1,13 @@
 import React from 'react';
 import { DashboardWidgetData } from '@dash/types';
 import { UndoMainPadding } from '../Chrome/Chrome';
+import PageHeading from '../PageHeading';
+import SmartLink from '../SmartLink';
 import QuickActionsWidget from './QuickActionsWidget';
 import UnlockRequestsWidget from './UnlockRequestsWidget';
 import UserOverviewWidget from './UsersOverviewWidget';
 import UserActivityWidget from './UserActivityWidget';
 import UserScreenshotsWidget from './UserScreenshotsWidget';
-import PageHeading from '../PageHeading';
-import SmartLink from '../SmartLink';
 
 type Props = {
   createKeychain: () => unknown;

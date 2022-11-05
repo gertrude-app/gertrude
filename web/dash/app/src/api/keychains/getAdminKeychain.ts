@@ -1,5 +1,5 @@
-import Result from '../Result';
 import { Keychain, KeyRecord, Key } from '@dash/keys';
+import Result from '../Result';
 import { gql, query } from '../apollo';
 import { KEYCHAIN_FIELDS, mapKeychain } from './listAdminKeychains';
 import * as T from './__generated__/GetKeychain';

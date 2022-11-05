@@ -7,8 +7,8 @@ import {
   SuspendFilterRequestForm,
   UserInputText,
 } from '@dash/components';
-import { useDispatch, useSelector } from '../../redux/hooks';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
 import {
   getSuspendFilterRequest,

@@ -5,8 +5,8 @@ import {
   useSelector as libUseSelector,
 } from 'react-redux';
 import { matchPath } from 'react-router-dom';
-import { redirectCleared } from './slice-url';
 import type { State, Dispatch } from './store';
+import { redirectCleared } from './slice-url';
 
 export const useSelector: TypedUseSelectorHook<State> = libUseSelector;
 

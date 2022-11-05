@@ -1,9 +1,9 @@
 import React from 'react';
 import Head from 'next/head';
-import type { AppProps } from 'next/app';
 import { slugifyWithCounter } from '@sindresorhus/slugify';
-import Layout from '@/components/Layout';
+import type { AppProps } from 'next/app';
 import Favicon from '../../public/favicon.png';
+import Layout from '@/components/Layout';
 import '../styles/tailwind.css';
 import 'focus-visible';
 

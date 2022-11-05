@@ -4,7 +4,6 @@ import { Loading, EditUser } from '@dash/components';
 import { isUnsaved, unsavedId } from '@dash/utils';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import ApiErrorMessage from '../ApiErrorMessage';
-import { familyToIcon } from './Users';
 import {
   fetchUser,
   userUpdated,
@@ -25,6 +24,7 @@ import { isDirty, Query, Req } from '../../redux/helpers';
 import { GetUser_user_devices } from '../../api/users/__generated__/GetUser';
 import { QueryProps } from '../../redux/store';
 import useSelectableKeychains from '../../hooks/selectable-keychains';
+import { familyToIcon } from './Users';
 
 const User: React.FC = () => {
   const dispatch = useDispatch();

@@ -1,6 +1,6 @@
 import Result from '../Result';
-import * as T from './__generated__/InitiateSignup';
 import { gql, mutate } from '../apollo';
+import * as T from './__generated__/InitiateSignup';
 
 export async function initiateSignup(
   email: string,

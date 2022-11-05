@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { FullscreenModalForm, EmailInputForm } from '@dash/components';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   allowingSignups,
@@ -8,7 +9,6 @@ import {
   joinWaitlist,
   initiateSignup,
 } from '../../redux/slice-signup';
-import { Link } from 'react-router-dom';
 
 const Signup: React.FC = () => {
   const dispatch = useDispatch();

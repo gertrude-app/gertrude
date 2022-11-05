@@ -1,7 +1,7 @@
 import React from 'react';
-import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Script from 'next/script';
+import type { AppProps } from 'next/app';
 import '../styles/globals.css';
 import Favicon from '../public/favicon.png';
 

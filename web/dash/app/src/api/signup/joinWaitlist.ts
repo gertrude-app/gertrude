@@ -1,6 +1,6 @@
 import Result from '../Result';
-import * as T from './__generated__/JoinWaitlist';
 import { gql, mutate } from '../apollo';
+import * as T from './__generated__/JoinWaitlist';
 
 export async function joinWaitlist(email: string): Promise<Result<boolean, ApiError>> {
   const result = await mutate<T.JoinWaitlist, T.JoinWaitlistVariables>(MUTATION, {

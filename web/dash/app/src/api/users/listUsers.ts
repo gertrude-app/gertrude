@@ -1,8 +1,8 @@
 import Result from '../Result';
 import { gql, query } from '../apollo';
+import { mapKeychain } from '../keychains/listAdminKeychains';
 import * as T from './__generated__/ListUsers';
 import { User } from './types';
-import { mapKeychain } from '../keychains/listAdminKeychains';
 
 export async function list(): Promise<Result<User[], ApiError>> {
   const result = await query<T.ListUsers>(QUERY);

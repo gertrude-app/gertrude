@@ -1,7 +1,7 @@
-import Result from '../Result';
 import { Keychain, KeyRecord, Key } from '@dash/keys';
-import * as T from './__generated__/ListAdminKeychains';
+import Result from '../Result';
 import { gql, query } from '../apollo';
+import * as T from './__generated__/ListAdminKeychains';
 
 export async function listAdminKeychains(): Promise<
   Result<[Keychain[], KeyRecord[]], ApiError>

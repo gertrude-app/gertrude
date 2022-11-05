@@ -2,10 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RequestStatus } from '@dash/types';
 import { DURATION_OPTS } from '@dash/components';
 import Current from '../environment';
-import { Req } from './helpers';
-import { createResultThunk } from './thunk';
 import { SuspendFilterRequest } from '../api/requests';
 import Result from '../api/Result';
+import { Req } from './helpers';
+import { createResultThunk } from './thunk';
 
 export interface FilterSuspensionsState {
   fetchReqs: Record<UUID, RequestState<SuspendFilterRequest>>;

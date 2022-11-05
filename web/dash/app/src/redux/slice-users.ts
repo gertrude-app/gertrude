@@ -5,12 +5,12 @@ import { isUnsaved, unsavedId } from '@dash/utils';
 import { DateRangeInput } from '@dash/types';
 import { Keychain } from '@dash/keys';
 import { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
-import { Req, toMap, toEditableMap, editable, commit, isDirty } from './helpers';
-import { createResultThunk } from './thunk';
 import Current from '../environment';
 import { User } from '../api/users';
-import * as empty from './empty';
 import Result from '../api/Result';
+import { Req, toMap, toEditableMap, editable, commit, isDirty } from './helpers';
+import { createResultThunk } from './thunk';
+import * as empty from './empty';
 
 interface ActivityDay {
   numDeleted: number;

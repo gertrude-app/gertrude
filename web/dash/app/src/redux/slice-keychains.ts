@@ -2,13 +2,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
 import { newKeyState, EditKey, convert, Keychain, KeyRecord } from '@dash/keys';
 import Current from '../environment';
+import Result from '../api/Result';
+import { keyForUnlockRequest } from '../lib/unlock-key';
 import { commit, editable, Req, toEditableMap } from './helpers';
 import { createResultThunk } from './thunk';
 import * as empty from './empty';
 import editKeyReducer from './edit-key-reducer';
-import Result from '../api/Result';
 import { acceptUnlockRequestClicked } from './slice-unlock-requests';
-import { keyForUnlockRequest } from '../lib/unlock-key';
 
 export interface KeychainsState {
   fetchAdminKeychainRequest: Record<UUID, RequestState>;

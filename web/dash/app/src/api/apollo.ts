@@ -9,8 +9,8 @@ import {
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { GraphQLError } from 'graphql';
-import Result from './Result';
 import Current from '../environment';
+import Result from './Result';
 
 export { gql } from '@apollo/client';
 
