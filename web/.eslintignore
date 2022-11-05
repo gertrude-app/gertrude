@@ -1,7 +1,5 @@
-components/storybook-static/
-dashboard/build
-dashboard/src/components/shared
-docs/src/components/shared
-marketing/components/shared
-marketing/.next
-marketing/out
+storybook/storybook-static/
+dash/app/build
+marketing/app/.next
+marketing/app/out
+

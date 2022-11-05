@@ -3,123 +3,118 @@ help:
 
 # local dev
 
-storybook: sync-clean-sync
-	make sync-clean
-	$(CONCURRENTLY) -n rs,sb -c cyan.dim,magenta.dim "make watchsync" "make start-storybook"
+dash:
+	pnpm --filter @dash/app start
 
-marketing: sync-clean sync
-	$(CONCURRENTLY) -n rs,nx -c cyan.dim,magenta.dim "make watchsync" "make start-marketing"
+marketing:
+	pnpm --filter @marketing/app start
 
-dashboard: sync-clean sync
-	$(CONCURRENTLY) -n rs,sp -c cyan.dim,magenta.dim "make watchsync" "make start-dashboard"
+docs:
+	pnpm --filter @docs/app start
 
-all: sync-clean sync
+storybook:
+	pnpm --filter @storybook/app start
+
+all:
 	$(CONCURRENTLY) \
-	  -n rs,sb,mk,ds,dx \
-	  -c cyan.dim,magenta.dim,yellow.dim,green.dim,red.dim \
-	  "make watchsync" "make start-storybook" "make start-marketing" "make start-dashboard" "make start-docs"
+	  -n ds,mk,dx,sb \
+	  -c cyan.dim,magenta.dim,yellow.dim,green.dim \
+	  "make dash" "make marketing" "make docs" "make storybook"
 
 # scaffold
 
 component:
-	node ./scripts/make-component.js $(CLI_ARGS)
+	node ./make-component.js $(CLI_ARGS)
 
 # utility
 
-sync:
-	rsync --recursive --delete --exclude '*.stories.tsx' ./components/src/shared ./dashboard/src/components
-	rsync --recursive --delete --exclude '*.stories.tsx' --exclude 'dashboard' ./components/src/shared ./marketing/components
-	rsync --recursive --delete --exclude '*.stories.tsx' --exclude 'dashboard' ./components/src/shared ./docs/src/components
+install:
+	which -s pnpm || npm install -g pnpm
+	pnpm install
 
-clean: sync-clean
-	rm -rf docs/.next
-	rm -rf docs/out
-	rm -rf marketing/.next
-	rm -rf marketing/out
-	rm -rf dashboard/build
-	rm -rf dashboard/node_modules/.cache
-	rm -rf components/node_modules/.cache
-
-sync-clean:
-	rm -rf ./dashboard/src/components/shared
-	rm -rf ./docs/src/components/shared
-	rm -rf ./marketing/components/shared
-
-watchsync:
-	watchexec --restart --watch ./components/src/shared --exts tsx,ts make sync
-
-start-storybook:
-	cd components && npm run storybook
-
-start-marketing:
-	cd marketing && npm run dev
-
-start-dashboard:
-	cd dashboard && npm run start
-
-start-docs:
-	cd docs && npm run dev
-
-npm-install:
-	$(CONCURRENTLY) \
-	  -n root,comp,mark,dash \
-	  -c magenta.dim,yellow.dim,green.dim,cyan.dim,red.dim \
-	  "npm i" "cd components && npm i" "cd marketing && npm i" "cd dashboard && npm i" "cd docs && npm i"
+clean:
+	rm -rf dash/app/node_modules/.cache/snowpack
+	rm -rf docs/app/.next
+	rm -rf docs/app/out
+	rm -rf marketing/app/.next
+	rm -rf marketing/app/out
+	rm -rf dash/app/build
+	rm -rf storybook/node_modules/.cache/storybook
 
 codegen:
-	cd dashboard && node ./scripts/codegen.js
+	cd dash/app && node ./scripts/codegen.js
+	bash ./dash/app/scripts/fix-imports.sh
 
 # build & deploy
 
-npm-install-root:
-	npm install
+build-marketing:
+	pnpm --filter @marketing/app build
+	pnpm --filter @marketing/app export
+	cp marketing/app/_redirects marketing/app/out
 
-build-marketing: sync npm-install-root
-	cd marketing && npm install && npx next build && npx next export && cp _redirects out/
+build-storybook:
+	pnpm --filter @storybook/app build
 
-build-storybook: sync npm-install-root
-	cd components && npm install && npm run build-storybook
+build-dash:
+	pnpm --filter @dash/app build
 
-build-dashboard: sync npm-install-root
-	cd dashboard && npm install && npm run build
-
-build-docs: sync npm-install-root
-	cd docs && npm install && npx next build && npx next export
+build-docs:
+	pnpm --filter @docs/app build
+	pnpm --filter @docs/app export
 
 # ci type things
 
 test:
-	cd dashboard && npx vitest run
+	pnpm vitest run
 
 test-watch:
-	cd dashboard && npx vitest watch
+	pnpm vitest watch
 
 format:
-	npx prettier --config ./.prettierrc.json --loglevel warn --write .
+	pnpm prettier --config ./.prettierrc.json --loglevel warn --write .
 
 format-check:
-	npx prettier --config ./.prettierrc.json --loglevel warn --check .
+	pnpm prettier --config ./.prettierrc.json --loglevel warn --check .
 
 lint:
-	npx eslint .
+	pnpm eslint .
 
 lint-fix:
-	npx eslint . --fix
+	pnpm eslint . --fix
 
 ts-check:
-	npx tsc --noEmit --project ./dashboard
-	npx tsc --noEmit --project ./marketing
-	npx tsc --noEmit --project ./components
-	npx tsc --noEmit --project ./docs
+	$(CONCURRENTLY) --raw --success all \
+    "pnpm tsc --noEmit --project dash/app" \
+    "pnpm tsc --noEmit --project dash/ambient" \
+    "pnpm tsc --noEmit --project dash/components" \
+    "pnpm tsc --noEmit --project dash/datetime" \
+    "pnpm tsc --noEmit --project dash/keys" \
+    "pnpm tsc --noEmit --project dash/types" \
+    "pnpm tsc --noEmit --project dash/utils" \
+    "pnpm tsc --noEmit --project docs/app" \
+    "pnpm tsc --noEmit --project marketing/app" \
+    "pnpm tsc --noEmit --project marketing/components" \
+    "pnpm tsc --noEmit --project shared/components" \
+    "pnpm tsc --noEmit --project shared/datetime" \
+    "pnpm tsc --noEmit --project storybook"
 
 ts-watch:
 	$(CONCURRENTLY) \
-	  -n ds,mk,sb,dx \
-		-c cyan.dim,magenta.dim,yellow.dim,red.dim \
-	  "npx tsc --noEmit --project ./dashboard --watch --preserveWatchOutput" \
-	  "npx tsc --noEmit --project ./marketing --watch --preserveWatchOutput" \
-	  "npx tsc --noEmit --project ./components --watch --preserveWatchOutput" \
-	  "npx tsc --noEmit --project ./docs --watch --preserveWatchOutput"
+	  -n dash/app,dash/amb,dash/cmp,dash/dtm,dash/key,dash/typ,dash/utl,mark/app,mark/cmp,docs/app,shar/cmp,shar/dtm,shar/twd,strybook \
+		-c cyan.dim,red.dim,green.dim,blue.dim,gray,magenta.dim,yellow.dim,cyan,red,green,blue,magenta,#f80 \
+	  "pnpm tsc --noEmit --project dash/app --watch --preserveWatchOutput" \
+	  "pnpm tsc --noEmit --project dash/ambient --watch --preserveWatchOutput" \
+	  "pnpm tsc --noEmit --project dash/components --watch --preserveWatchOutput" \
+	  "pnpm tsc --noEmit --project dash/datetime --watch --preserveWatchOutput" \
+	  "pnpm tsc --noEmit --project dash/keys --watch --preserveWatchOutput" \
+	  "pnpm tsc --noEmit --project dash/types --watch --preserveWatchOutput" \
+	  "pnpm tsc --noEmit --project dash/utils --watch --preserveWatchOutput" \
+	  "pnpm tsc --noEmit --project docs/app --watch --preserveWatchOutput" \
+	  "pnpm tsc --noEmit --project marketing/app --watch --preserveWatchOutput" \
+	  "pnpm tsc --noEmit --project marketing/components --watch --preserveWatchOutput" \
+	  "pnpm tsc --noEmit --project shared/components --watch --preserveWatchOutput" \
+	  "pnpm tsc --noEmit --project shared/datetime --watch --preserveWatchOutput" \
+	  "pnpm tsc --noEmit --project storybook --watch --preserveWatchOutput"
 
 fix:
 	make format
@@ -136,15 +131,13 @@ check:
 CONCURRENTLY = node_modules/.bin/concurrently
 CLI_ARGS = $(filter-out $@, $(MAKECMDGOALS))
 ALL_CMDS = \
-  sync watchsync clean sync-clean \
-  npm-install \
+  clean \
+  install \
   help \
   component \
-  storybook marketing dashboard all \
-  start-storybook start-marketing start-dashboard start-docs \
-  build-storybook build-marketing build-dashboard build-docs \
-  fix ts-watch ts-check lint lint-fix format format-check check \
-  test test-watch \
+  storybook marketing dash docs all \
+  build-storybook build-marketing build-dash build-docs \
+  fix ts-watch ts-check lint lint-fix format format-check check test \
   codegen
 
 .PHONY: $(ALL_CMDS)

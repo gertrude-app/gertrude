@@ -1,0 +1,7 @@
+[build]
+  publish = "out/"
+  command = "cd ../../ && make build-docs"
+  ignore = "false"
+
+[build.environment]
+  NODE_VERSION = "16.17.1"

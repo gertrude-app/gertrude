@@ -1,0 +1,7 @@
+[build]
+  publish = "storybook-static/"
+  command = "cd ../ && make build-storybook"
+  ignore = "false"
+
+[build.environment]
+  NODE_VERSION = "16.17.1"

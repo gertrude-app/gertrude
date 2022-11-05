@@ -1,7 +1,8 @@
-components/storybook-static/
-dashboard/build
-dashboard/src/components/shared
-marketing/components/shared
-marketing/.next
-docs/.next
-marketing/out
+**/node_modules/
+pnpm-lock.yaml
+storybook/storybook-static/
+dash/app/build
+marketing/app/.next
+marketing/app/out
+docs/app/.next
+docs/app/out

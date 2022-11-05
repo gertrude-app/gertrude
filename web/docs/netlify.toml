@@ -1,7 +1,0 @@
-[build]
-  publish = "out/"
-  command = "cd ../ && make build-docs"
-
-[build.environment]
-  NODE_VERSION = "14.19.3"
-  NPM_VERSION = "8.13.1"

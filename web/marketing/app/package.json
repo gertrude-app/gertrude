@@ -1,0 +1,26 @@
+{
+  "name": "@marketing/app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "next-remote-watch ../components/src ../../shared/components/src",
+    "export": "next export",
+    "build": "next build"
+  },
+  "dependencies": {
+    "@headlessui/react": "^1.6.6",
+    "@marketing/components": "workspace:*",
+    "@shared/components": "workspace:*",
+    "@shared/datetime": "workspace:*",
+    "@shared/tailwind": "workspace:*",
+    "classnames": "2.3.2",
+    "next": "12.3.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "18.11.9",
+    "next-remote-watch": "^2.0.0",
+    "next-transpile-modules": "^10.0.0"
+  }
+}

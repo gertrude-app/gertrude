@@ -1,0 +1,9 @@
+{
+  "name": "@dash/keys",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "ISC",
+  "dependencies": {
+    "@types/dash-ambient": "workspace:*"
+  }
+}
