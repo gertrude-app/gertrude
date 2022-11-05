@@ -173,6 +173,7 @@ module.exports = {
         ignore: [],
       },
     ],
+    'jsx-quotes': [`error`, `prefer-double`],
     'react/jsx-uses-react': `error`,
     'react/jsx-uses-vars': `error`,
     'react/no-danger-with-children': `error`,
