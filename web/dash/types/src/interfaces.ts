@@ -59,6 +59,3 @@ export interface UnlockRequest {
   requestProtocol?: string;
   createdAt: string;
 }
-
-// https://github.com/snowpackjs/snowpack/discussions/1589
-export const _SNOWPACK_INTERFACES = true;

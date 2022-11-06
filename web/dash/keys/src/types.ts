@@ -31,6 +31,3 @@ export type Keychain = {
   isPublic: boolean;
   numKeys: number;
 };
-
-// https://github.com/snowpackjs/snowpack/discussions/1589
-export const _SNOWPACK_TYPES = true;

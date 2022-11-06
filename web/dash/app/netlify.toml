@@ -9,10 +9,10 @@
   status = 200
 
 [build.environment]
-  SNOWPACK_PUBLIC_GRAPHQL_ENDPOINT = 'https://api.gertrude-app.com/graphql/dashboard'
+  VITE_GRAPHQL_ENDPOINT = 'https://api.gertrude-app.com/graphql/dashboard'
 
 [context.deploy-preview.environment]
-  SNOWPACK_PUBLIC_IS_STAGING = 'true'
-  SNOWPACK_PUBLIC_TEST_ADMIN_CREDS = 'BE000000-0000-0000-0000-000000000000:BE000000-0000-0000-0000-000000000000'
-  SNOWPACK_PUBLIC_GRAPHQL_ENDPOINT = 'https://api--staging.gertrude-app.com/graphql/dashboard'
+  VITE_IS_STAGING = 'true'
+  VITE_TEST_ADMIN_CREDS = 'BE000000-0000-0000-0000-000000000000:BE000000-0000-0000-0000-000000000000'
+  VITE_GRAPHQL_ENDPOINT = 'https://api--staging.gertrude-app.com/graphql/dashboard'
 

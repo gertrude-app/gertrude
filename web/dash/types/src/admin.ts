@@ -42,6 +42,3 @@ export interface Notification {
   trigger: Trigger;
   methodId: UUID;
 }
-
-// https://github.com/snowpackjs/snowpack/discussions/1589
-export const _SNOWPACK_ADMIN = true;
