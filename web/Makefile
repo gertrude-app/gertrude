@@ -63,7 +63,13 @@ build-docs:
 	pnpm --filter @docs/app build
 	pnpm --filter @docs/app export
 
-# ci type things
+# ci/test type things
+
+cy-open:
+	pnpm cypress open
+
+cy-run:
+	pnpm cypress run
 
 test:
 	pnpm vitest run
