@@ -43,6 +43,7 @@ const LoginForm: React.FC<Props> = ({
     <div className="self-stretch mt-5 sm:mt-7 mb-6 space-y-3">
       <TextInput
         type="email"
+        name="email"
         label="Email address:"
         placeholder="you@example.com"
         autoFocus={window.location.href.includes(`gertrude.app`)}
@@ -52,6 +53,7 @@ const LoginForm: React.FC<Props> = ({
       />
       <TextInput
         type="password"
+        name="password"
         label="Password:"
         required
         value={password}
@@ -63,6 +65,7 @@ const LoginForm: React.FC<Props> = ({
         Submit &rarr;
       </Button>
       <Button
+        testId="magic-link"
         disabled={email.match(/^.+@.+$/) === null}
         onClick={onSendMagicLink}
         color="secondary-white"

@@ -14,6 +14,7 @@ interface CommonProps {
   fullWidth?: boolean;
   small?: boolean;
   disabled?: boolean;
+  testId?: string;
 }
 
 type Props =
@@ -25,6 +26,7 @@ type Props =
 const Button: React.FC<Props> = ({
   small = false,
   fullWidth = false,
+  testId,
   color,
   className,
   disabled = false,
@@ -68,6 +70,8 @@ const Button: React.FC<Props> = ({
       <button
         type={props.type}
         className={classes}
+        disabled={disabled}
+        {...(testId ? { 'data-test': testId } : {})}
         {...(props.type === `button`
           ? { onClick: disabled ? () => {} : props.onClick }
           : {})}
@@ -81,6 +85,7 @@ const Button: React.FC<Props> = ({
     return (
       <a
         className={classes}
+        {...(testId ? { 'data-test': testId } : {})}
         {...(disabled
           ? { onClick: (event) => event.preventDefault() }
           : { href: props.href })}
@@ -94,6 +99,7 @@ const Button: React.FC<Props> = ({
     <Link
       className={classes}
       to={disabled ? `#` : props.to}
+      {...(testId ? { 'data-test': testId } : {})}
       onClick={
         disabled
           ? (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
