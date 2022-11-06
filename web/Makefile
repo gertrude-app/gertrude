@@ -33,7 +33,7 @@ install:
 	pnpm install
 
 clean:
-	rm -rf dash/app/node_modules/.cache/snowpack
+	rm -rf dash/app/node_modules/.vite
 	rm -rf storybook/node_modules/.cache/storybook
 	rm -rf node_modules/.cache/nx
 	rm -rf docs/app/.next

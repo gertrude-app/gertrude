@@ -71,7 +71,7 @@ jobs:
   cypress-run:
     runs-on: ubuntu-latest
     env:
-      SNOWPACK_PUBLIC_GRAPHQL_ENDPOINT: 'https://api--staging.gertrude-app.com/graphql/dashboard'
+      VITE_GRAPHQL_ENDPOINT: 'https://api--staging.gertrude-app.com/graphql/dashboard'
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -80,10 +80,8 @@ jobs:
       - name: install deps
         run: pnpm install
       - name: build
-        run: |
-          make build-dash
-          echo '{"rewrites":[{"source":"*","destination":"/index.html"}]}' > dash/app/build/serve.json
+        run: make build-dash
       - name: cypress
         uses: cypress-io/github-action@v4.2.0
         with:
-          start: pnpm dlx serve -p 8081 dash/app/build
+          start: pnpm --filter @dash/app preview

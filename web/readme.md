@@ -2,7 +2,7 @@
 
 ## Apps
 
-- `dash/app` - web admin dashboard (snowpack SPA)
+- `dash/app` - web admin dashboard (vite SPA)
 - `marketing/app` - marketing site (next.js app)
 - `docs/app` - docs site (next.js app)
 - `storybook` - storybook for all react components
