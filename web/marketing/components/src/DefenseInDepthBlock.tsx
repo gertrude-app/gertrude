@@ -32,29 +32,26 @@ interface GradientRectangleProps {
   direction: 'right' | 'left';
 }
 
-const GradientRectangle: React.FC<GradientRectangleProps> = ({ direction }) => {
-  return (
-    <div
-      className="md:h-32 h-12 flex-grow z-30"
-      style={{
-        background: `linear-gradient(to bottom ${direction}, transparent 50%, #8b5cf6 50%)`,
-      }}
-    />
-  );
-};
+const GradientRectangle: React.FC<GradientRectangleProps> = ({ direction }) => (
+  <div
+    className="md:h-32 h-12 flex-grow z-30"
+    style={{
+      background: `linear-gradient(to bottom ${direction}, transparent 50%, #8b5cf6 50%)`,
+    }}
+  />
+);
 
 interface IconCircleProps {
   icon: string;
 }
 
-const IconCircle: React.FC<IconCircleProps> = ({ icon }) => {
-  return (
-    <div className="md:w-32 w-24 md:h-32 h-24 rounded-full bg-gray-800 flex items-center justify-center my-5 sm:my-0 mx-5 sm:mx-10 shadow-2xl relative">
-      <i
-        className={`fa fa-${icon} text-4xl md:text-5xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent`}
-      />
-    </div>
-  );
-};
+const IconCircle: React.FC<IconCircleProps> = ({ icon }) => (
+  <div className="md:w-32 w-24 md:h-32 h-24 rounded-full bg-gray-800 flex items-center justify-center my-5 sm:my-0 mx-5 sm:mx-10 shadow-2xl relative">
+    <i
+      aria-hidden
+      className={`fa fa-${icon} text-4xl md:text-5xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent`}
+    />
+  </div>
+);
 
 export default DefenseInDepthBlock;

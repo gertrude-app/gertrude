@@ -12,7 +12,7 @@ const CTABlock: React.FC = () => (
       className="text-white font-extrabold text-3xl bg-gray-800 px-10 py-4 rounded-xl shadow-xl mt-8 hover:bg-gray-900 transition duration-150 flex items-center"
       href="https://dash.gertrude.app/signup"
     >
-      <i className="fas fa-rocket mr-4" />
+      <i aria-hidden className="fas fa-rocket mr-4" />
       <h2 className="leading-[90%]">Signup now</h2>
     </a>
   </section>
