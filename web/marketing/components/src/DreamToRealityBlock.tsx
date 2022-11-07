@@ -15,14 +15,14 @@ const DreamToRealityBlock: React.FC = () => (
         <div className="bg-gradient-to-br from-violet-500 to-fuchsia-500 w-12 h-12 rounded-lg flex justify-center items-center">
           <i aria-hidden className="fas fa-desktop text-white text-xl" />
         </div>
-        <h1 className="text-5xl font-extrabold font-inter mt-4">
+        <h2 className="text-5xl font-extrabold font-inter mt-4">
           <span className="text-black">
             From dream to{` `}
             <span className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent">
               reality
             </span>
           </span>
-        </h1>
+        </h2>
         <p className="text-xl text-gray-500 my-5 leading-8">
           Protect your loved ones with aggressive network filtering, plus screen and
           keystroke monitoring. Remotely supervise and control access from your own

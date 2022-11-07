@@ -8,7 +8,7 @@ const SafeIsNowPossibleBlock: React.FC = () => {
         <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -right-96 top-0 z-10" />
         <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-96 top-128 z-10" />
         <div className="lg:p-20 p-10 py-20">
-          <h1 className="font-inter text-5xl">
+          <h2 className="font-inter text-5xl">
             Safe is now{` `}
             <span
               className="relative line-through [text-decoration-thickness:5px] [text-decoration-color:#d946ef]"
@@ -20,7 +20,7 @@ const SafeIsNowPossibleBlock: React.FC = () => {
             <span className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent">
               possible
             </span>
-          </h1>
+          </h2>
           <p className="text-xl text-gray-500 mt-8 leading-8">
             Gertrude blocks the entire internet, only allowing parts you specifically
             unlock. We make this managable by letting you:

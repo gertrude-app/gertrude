@@ -74,7 +74,7 @@ const Logo: React.FC<Props> = ({
         )}
       </svg>
       {!iconOnly && (
-        <h1
+        <div
           className={cx(
             `font-lato ml-2 whitespace-nowrap`,
             type === `inverted` || type === `on-dark` ? `text-white` : `text-gray-700`,
@@ -82,7 +82,7 @@ const Logo: React.FC<Props> = ({
           )}
         >
           Gertrude
-        </h1>
+        </div>
       )}
     </div>
   );
