@@ -17,16 +17,18 @@ const DreamToRealityBlock: React.FC = () => (
         </div>
         <h2 className="text-5xl font-extrabold font-inter mt-4">
           <span className="text-black">
-            From dream to{` `}
+            Peace of mind for{` `}
             <span className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent">
-              reality
+              parents
             </span>
           </span>
         </h2>
         <p className="text-xl text-gray-500 my-5 leading-8">
-          Protect your loved ones with aggressive network filtering, plus screen and
-          keystroke monitoring. Remotely supervise and control access from your own
-          computer or phone. Early access available now.
+          Gertrude lets you block the entire internet, only unlocking the portions you
+          choose. Keep your kids <em>only</em> and <em>exactly</em> where you want them to
+          be online. Plus, review screenshots and keystrokes of their activity from your
+          own computer or phone. Early access available now for{` `}
+          <em>macOS</em>.
         </p>
         <div className="flex flex-col space-y-3 sm:flex-row sm:space-x-3 items-start sm:items-end">
           <a

@@ -24,16 +24,21 @@ const LosingBattleBlock: React.FC = () => (
         <div className="p-20 lg:px-20 px-10 lg:pl-0 -mb-20 lg:-mb-0">
           <h2 className="text-6xl font-extrabold font-inter text-white">
             <span className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent">
-              A losing battle
+              A losing game
             </span>
           </h2>
           <p className="text-xl text-gray-500 mt-8 leading-8">
-            Most internet safety tools try to block categories of the internet. With 1.7
-            billion websites, and hundreds of thousands more being added every day, taking
-            this approach only gives you the{` `}
+            Most internet safety tools try to block{` `}
+            <span className="text-gray-400 font-bold antialiased">categories</span> of the
+            internet. With 1.7 billion websites, and tens of thousands more being added
+            every day, it's simply impossible to maintain up-to-date lists correctly
+            categorizing even a fraction of dangerous websites. Taking this approach only
+            gives you the{` `}
             <span className="text-gray-400 font-bold antialiased">
-              illusion of safety...
+              illusion of safety.
             </span>
+            {` `}
+            We take a different approach...
           </p>
         </div>
       </div>

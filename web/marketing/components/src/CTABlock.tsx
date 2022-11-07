@@ -8,13 +8,21 @@ const CTABlock: React.FC = () => (
         Early access available now.
       </span>
     </h2>
-    <a
-      className="text-white font-extrabold text-3xl bg-gray-800 px-10 py-4 rounded-xl shadow-xl mt-8 hover:bg-gray-900 transition duration-150 flex items-center"
-      href="https://dash.gertrude.app/signup"
-    >
-      <i aria-hidden className="fas fa-rocket mr-4" />
-      <h2 className="leading-[90%]">Signup now</h2>
-    </a>
+    <div className="flex flex-col sm:flex-row items-center justify-center mt-8 gap-6">
+      <a
+        className="text-white font-extrabold text-3xl bg-gray-800 px-10 py-4 rounded-xl shadow-xl hover:bg-gray-900 transition duration-150 flex items-center"
+        href="https://dash.gertrude.app/signup"
+      >
+        <i aria-hidden className="fas fa-rocket mr-4" />
+        <span className="whitespace-nowrap">Signup now</span>
+      </a>
+      <a
+        className="bg-white/20 rounded-lg py-[19px] px-12 sm:px-6 inline-block text-white/80 whitespace-nowrap"
+        href="https://docs.gertrude.app"
+      >
+        &rdquo;Getting Started&ldquo; tutorial &rarr;
+      </a>
+    </div>
   </section>
 );
 

@@ -21,27 +21,30 @@ const SafeIsNowPossibleBlock: React.FC = () => {
               possible
             </span>
           </h2>
-          <p className="text-xl text-gray-500 mt-8 leading-8">
-            Gertrude blocks the entire internet, only allowing parts you specifically
-            unlock. We make this managable by letting you:
+          <p className="text-xl text-gray-500 mt-8 leading-8 max-w-4xl">
+            So you can't just block categories of the internet, but taking the reverse
+            approach is <b>hard</b>. Rather than give up and settle for the illusion of
+            safety, Gertrude makes this managable by letting you:
           </p>
           <div className="flex flex-wrap justify-center items-stretch py-10 pb-0 lg:pb-10 -mx-7 sm:-mx-0">
             <Feature icon="mobile">
               Unlock websites and apps from wherever you are, on your own computer or
-              phone
+              phone.
             </Feature>
             <Feature icon="share">
-              Share protection settings and filter rules between multiple users
+              Share unblock settings and protection rules between multiple users.
             </Feature>
             <Feature icon="key">
-              Mix, match, and borrow groups of keys to unlock websites and apps
+              Select curated lists of unblocking rules for instant access to commonly used
+              websites and apps.
             </Feature>
             <Feature icon="bell">
               Get text, email, or Slack notifications wherever you are when someone needs
-              something unblocked
+              something unblocked.
             </Feature>
             <Feature icon="eye">
-              Easily see which requests are being blocked and request unlocking
+              Remotely suspend your users filter temporarily, while uploading screenshots
+              of their activity for your later review.
             </Feature>
           </div>
         </div>
