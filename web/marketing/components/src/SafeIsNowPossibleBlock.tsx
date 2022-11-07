@@ -43,7 +43,7 @@ const SafeIsNowPossibleBlock: React.FC = () => {
               something unblocked.
             </Feature>
             <Feature icon="eye">
-              Remotely suspend your users filter temporarily, while uploading screenshots
+              Remotely suspend your users' filter temporarily, while uploading screenshots
               of their activity for your later review.
             </Feature>
           </div>
