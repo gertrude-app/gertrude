@@ -115,7 +115,7 @@ the effort, but **there are several things that make this process easier:**
 ## Isolate network activity
 
 Your computer is constantly making network requests to a myriad of websites and services.
-The vast majority of these don't cause you any noticable problem, and don't need to be
+The vast majority of these don't cause you any noticeable problem, and don't need to be
 unblocked. But, all those requests can make it _hard to find out which request DOES need
 to be unblocked._ For this reason, probably the number one thing you can do to make it
 easier to find what to unblock is **isolate network activity:**

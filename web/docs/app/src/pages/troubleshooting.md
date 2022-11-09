@@ -1,6 +1,6 @@
----
-title: Troubleshooting Problems
-description: Some basic tips and tricks for troubleshooting Gertrude
+-- title: Troubleshooting Problems description: Some basic tips and tricks for
+troubleshooting Gertrude
+
 ---
 
 {% .lead %} Try these troubleshooting tips and tricks if something isn't working quite
@@ -12,7 +12,7 @@ The Gertrude app has a built-in _health-check_ feature that tries to diagnose an
 you of common issues with the app. To access it, click the **Administrate...** option from
 the Gertrude menu bar icon dropdown, as shown below:
 
-{% image src="administrate.png" caption="Click the 'Adminstrate...' link to reach the health check" /%}
+{% image src="administrate.png" caption="Click the 'Administrate...' link to reach the health check" /%}
 
 The health check screen runs a series of tests on your Gertrude installation, and reports
 the results. You should have all _green check marks_, unless you're intentionally not

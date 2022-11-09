@@ -43,7 +43,7 @@ admin.
 
 ## Let them know you're watching
 
-If you're using Gertrudes _monitoring features_ (screenshots and keylogging), make sure
+If you're using Gertrude's _monitoring features_ (screenshots and keylogging), make sure
 that you're periodically reviewing them in the admin web dashboard. Specifically, make it
 a point to _frequently mention something you saw or read_ while reviewing your activity.
 This way, they will always know that everything they do on their computer is truly being

@@ -7,7 +7,7 @@ description:
 
 ## What makes Gertrude better?
 
-I'm a software developer who built Gertrude becuase I was trying to protect my kids
+I'm a software developer who built Gertrude because I was trying to protect my kids
 online, and was frustrated with the lack of _safety_ and _usability_ of other solutions on
 the market. A lot of Gertrude's core features came out of things I wished I had while
 trying to protect my kids online using other off-the shelf software, things like:
@@ -15,7 +15,7 @@ trying to protect my kids online using other off-the shelf software, things like
 - **Real safety.** Nearly every other internet security tool tries to block _categories_
   of websites, like pornography, gambling, etc. This is tantalizing because its _so easy_,
   but it doesn't actually work. With 1.7 billion websites on the internet, and thousands
-  being added every day, a motivated user will always be able to find innappropriate
+  being added every day, a motivated user will always be able to find inappropriate
   content not properly categorized. I needed something that _blocked the entire internet,_
   and let me choose what parts to unblock.
 - **Ease of use.** A few solutions do exist that will block the entire internet and let
@@ -33,7 +33,7 @@ trying to protect my kids online using other off-the shelf software, things like
   keystrokes_. I get to review these on my phone, any time I want. And it's not
   hidden&mdash;the Gertrude app clearly lets the user know if their screen and keystrokes
   are being recorded. This also makes it so I can now temporarily suspend the
-  filter&mdash;I know it's safe becuase I'll see their activity afterwards, and they know
+  filter&mdash;I know it's safe because I'll see their activity afterwards, and they know
   it too.
 - **Remote control.** Every other solution I tried had to be configured and managed _on my
   kids' computer_. Every time they needed something changed or unlocked, they would have
@@ -60,7 +60,7 @@ screen, and click to allow unrestricted access for the admin user account.
 
 If you share a computer with your kid, and the Gertrude app is installed on their macOS
 user, the filter will by default block all the internet requests from every other user on
-the computer. That's becuase the Gertrude filter system extension runs as `root` and has
+the computer. That's because the Gertrude filter system extension runs as `root` and has
 to make a decision about every network request attempted by every user on the system. For
 maximum safety, I built Gertrude to be _very defensive_, when in doubt, it always takes
 the most safe option, which is to forbid network requests for users it has no instructions

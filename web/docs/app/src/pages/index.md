@@ -174,7 +174,7 @@ The first time you click this icon, Gertrude will prompt you to enter a **connec
 code.** Enter the connection code that you wrote down earlier. When you submit the code
 you should receive a confirmation that the Gertrude Mac app is successfully connected.
 
-{% image src="connect-to-user.png" caption="Click to connect, and enter youe connection code" /%}
+{% image src="connect-to-user.png" caption="Click to connect, and enter your connection code" /%}
 
 ### Enabling the internet filter
 
@@ -188,7 +188,7 @@ icon again and then click the **"Turn on"** button as shown below:
 
 At this point, the macOS operating system _will block Gertrude from installing a system
 extension._ Click the button labeled **"Open Security Preferences"**, or manually open up
-the Sytem Preferences app, and choose _"Security & Privacy" > "General"._
+the System Preferences app, and choose _"Security & Privacy" > "General"._
 
 {% image src="system-extension-blocked.png" caption="Click 'Open Security Preferences'" /%}
 
@@ -478,9 +478,9 @@ user.
 
 _Approving_ an item is essentially the same thing as _deleting_ it. The idea is that an
 "approved" item does not need to be seen again. It's rare that you'll actually approve
-items invidually&mdash;you'll notice when you have large amounts of items to review, that
-Gertrude gives you the option to approve them _in chunks of one hundred at a time_, and
-also you can _approve an entire day at once_ at the bottom of the screen.
+items individually&mdash;you'll notice when you have large amounts of items to review,
+that Gertrude gives you the option to approve them _in chunks of one hundred at a time_,
+and also you can _approve an entire day at once_ at the bottom of the screen.
 
 {% callout type="note" title="Discussing screenshots with users" %}
 
