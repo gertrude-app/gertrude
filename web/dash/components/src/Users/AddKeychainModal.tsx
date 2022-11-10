@@ -33,6 +33,7 @@ const AddKeychainModal: React.FC<Props> = ({
     onDismiss={onDismiss}
     withPayload={(payload) => (
       <KeychainPicker
+        mode="addToUser"
         hasNoOwnKeychains={payload.own.length === 0}
         selectablePublicKeychains={payload.public.filter(
           (keychain) => !existingKeychains.some((kc) => kc.id === keychain.id),

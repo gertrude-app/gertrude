@@ -6,7 +6,6 @@ import { useUnlockRequestLoader } from '../loaders/unlock-request';
 const FetchUnlockRequest: React.FC = () => {
   const navigate = useNavigate();
   const { unlockRequestId = `` } = useParams<{ unlockRequestId: string }>();
-  console.log(`unlockRequestId`, unlockRequestId);
   const loader = useUnlockRequestLoader(unlockRequestId);
   if (loader.state === `unresolved`) {
     return loader.element;

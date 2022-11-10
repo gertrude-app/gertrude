@@ -16,8 +16,8 @@ const publicKeychains = [
 
 const Template: ComponentStory<typeof KeychainPicker> = (args) => (
   <Modal
-    type={`container`}
-    title={`Select a keychain`}
+    type="container"
+    title="Select a keychain"
     primaryButton={{ label: `Add keychain`, action: () => {} }}
     secondaryButton={() => {}}
   >
@@ -27,9 +27,29 @@ const Template: ComponentStory<typeof KeychainPicker> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
+  mode: `addToUser`,
   selectableOwnKeychains: keychains,
   selectablePublicKeychains: publicKeychains,
 };
 
-export const NoKeychains = Template.bind({});
-NoKeychains.args = { ...Default.args, selectableOwnKeychains: [] };
+export const NoOwnKeychains = Template.bind({});
+NoOwnKeychains.args = {
+  ...Default.args,
+  hasNoOwnKeychains: true,
+  selectableOwnKeychains: [],
+};
+
+export const AllOwnKeychainsAttached = Template.bind({});
+AllOwnKeychainsAttached.args = {
+  ...Default.args,
+  hasNoOwnKeychains: false,
+  selectableOwnKeychains: [],
+};
+
+export const NoKeychainsForUnlockRequest = Template.bind({});
+NoKeychainsForUnlockRequest.args = {
+  ...Default.args,
+  mode: `forUnlockRequestKey`,
+  hasNoOwnKeychains: true,
+  selectableOwnKeychains: [],
+};

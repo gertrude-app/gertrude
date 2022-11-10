@@ -30,6 +30,9 @@ describe(`unlock request flow`, () => {
         case `GetSelectableKeychains`:
           req.reply(keychainsRes);
           break;
+        case `CreateKeyRecord`:
+          req.reply({ data: { keyRecord: { id: `123` } } });
+          break;
         case `DecideUnlockRequest`:
           req.reply({ data: { unlockRequest: { id: `2` } } });
           break;
@@ -107,6 +110,14 @@ describe(`unlock request flow`, () => {
     cy.contains(`Select a keychain`);
     cy.contains(`Music Theory`);
     cy.contains(`Misc McStandard Keys`);
+  });
+
+  it(`prompts to create a keychain if admin has none`, () => {
+    keychainsRes.data.own = [];
+    cy.visit(`/users/1/unlock-requests/2/review`);
+    cy.contains(`Accept`).click();
+    cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2/select-keychain`);
+    cy.contains(`need a keychain to accept`);
   });
 
   it(`only shows keychains attached to a user`, () => {
