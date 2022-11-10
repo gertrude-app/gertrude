@@ -16,7 +16,8 @@ import FetchUnlockRequest from './components/routes/UnlockRequest/FetchUnlockReq
 import EditUnlockRequestKey from './components/routes/UnlockRequest/EditUnlockRequestKey';
 import DenyUnlockRequest from './components/routes/UnlockRequest/DenyUnlockRequest';
 import SelectUnlockRequestKeychain from './components/routes/UnlockRequest/SelectUnlockRequestKeychain';
-import UserUnlockRequests from './components/routes/UserUnlockRequests';
+import UserUnlockRequests from './components/routes/UnlockRequest/UserUnlockRequests';
+import UsersUnlockRequests from './components/routes/UnlockRequest/UsersUnlockRequests';
 import JoinWaitlist from './components/routes/JoinWaitlist';
 import AdminProfile from './components/routes/AdminProfile';
 import Keychain from './components/routes/Keychain';
@@ -69,6 +70,7 @@ const App: React.FC = () => {
         <Route index element={<Dashboard />} />
         <Route path="profile" element={<AdminProfile />} />
         <Route path="suspend-filter-requests/:id" element={<SuspendFilter />} />
+        <Route path="unlock-requests" element={<UsersUnlockRequests />} />
 
         <Route path="keychains">
           <Route index element={<Keychains />} />

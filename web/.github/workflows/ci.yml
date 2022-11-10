@@ -72,6 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VITE_GRAPHQL_ENDPOINT: 'https://api--staging.gertrude-app.com/graphql/dashboard'
+      VITE_TEST_ADMIN_CREDS: 'BE000000-0000-0000-0000-000000000000:BE000000-0000-0000-0000-000000000000'
     steps:
       - name: checkout
         uses: actions/checkout@v3

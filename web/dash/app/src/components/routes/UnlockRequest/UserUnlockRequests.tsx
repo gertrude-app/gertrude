@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Loading, ListUnlockRequests, ApiErrorMessage } from '@dash/components';
-import * as typesafe from '../../lib/typesafe';
-import { useDispatch, useSelector } from '../../redux/hooks';
-import { getUserUnlockRequests } from '../../redux/slice-unlock-requests';
+import * as typesafe from '../../../lib/typesafe';
+import { useDispatch, useSelector } from '../../../redux/hooks';
+import { getUserUnlockRequests } from '../../../redux/slice-unlock-requests';
 
 const UserUnlockRequests: React.FC = () => {
   const { userId: id = `` } = useParams<{ userId: string }>();
@@ -31,6 +31,7 @@ const UserUnlockRequests: React.FC = () => {
 
   return (
     <ListUnlockRequests
+      singleUser
       requests={requests.map((req) => ({
         id: req.id,
         url: req.url ?? req.domain ?? req.ipAddress ?? ``,

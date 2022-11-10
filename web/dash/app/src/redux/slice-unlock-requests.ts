@@ -10,6 +10,7 @@ import { createResultThunk } from './thunk';
 
 export interface UnlockRequestsState {
   entities: Record<UUID, UnlockRequest>;
+  fetchAllReq: RequestState;
   fetchReqs: Record<UUID, RequestState>;
   updateReqs: Record<UUID, RequestState>;
   detailsExpanded: boolean;
@@ -20,6 +21,7 @@ export function initialState(): UnlockRequestsState {
   return {
     entities: {},
     fetchReqs: {},
+    fetchAllReq: Req.idle(),
     updateReqs: {},
     detailsExpanded: false,
   };
@@ -88,6 +90,21 @@ export const slice = createSlice({
       }
     });
 
+    builder.addCase(getUsersUnlockRequests.started, (state) => {
+      state.fetchAllReq = Req.ongoing();
+    });
+
+    builder.addCase(getUsersUnlockRequests.failed, (state, { error }) => {
+      state.fetchAllReq = Req.fail(error);
+    });
+
+    builder.addCase(getUsersUnlockRequests.succeeded, (state, { payload }) => {
+      state.fetchAllReq = Req.succeed(void 0);
+      for (const unlockRequest of payload) {
+        state.entities[unlockRequest.id] = unlockRequest;
+      }
+    });
+
     builder.addCase(getUnlockRequest.started, (state, { meta }) => {
       state.detailsExpanded = false;
       state.fetchReqs[meta.arg] = Req.ongoing();
@@ -131,6 +148,11 @@ export const rejectUnlockRequest = createResultThunk(
 export const getUnlockRequest = createResultThunk(
   `${slice.name}/getUnlockRequest`,
   Current.api.requests.getUnlockRequest,
+);
+
+export const getUsersUnlockRequests = createResultThunk(
+  `${slice.name}/getUsersUnlockRequests`,
+  Current.api.requests.getUsersUnlockRequests,
 );
 
 export const getUserUnlockRequests = createResultThunk(

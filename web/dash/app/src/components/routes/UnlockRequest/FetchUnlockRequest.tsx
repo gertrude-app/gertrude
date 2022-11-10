@@ -13,7 +13,7 @@ const FetchUnlockRequest: React.FC = () => {
 
   const { entity: unlockRequest } = loader;
   if (unlockRequest.status === `pending`) {
-    return <Navigate to={`./review`} />;
+    return <Navigate to={`./review`} replace />;
   }
 
   return (

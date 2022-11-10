@@ -8,13 +8,14 @@ import PageHeading from '../PageHeading';
 import PartyMessage from '../PartyMessage';
 
 type Props = {
+  singleUser?: boolean;
   requests: Subcomponents<typeof UnlockRequestCard>;
 };
 
-const ListUnlockRequests: React.FC<Props> = ({ requests }) => (
+const ListUnlockRequests: React.FC<Props> = ({ requests, singleUser }) => (
   <div className="flex flex-col space-y-6">
     <PageHeading icon="unlock">
-      {requests.length > 0
+      {requests.length > 0 && singleUser
         ? `${posessive(requests[0]?.userName ?? ``)} unlock requests`
         : `Unlock requests`}
     </PageHeading>
