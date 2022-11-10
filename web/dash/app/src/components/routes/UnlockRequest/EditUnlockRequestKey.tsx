@@ -53,6 +53,7 @@ const EditUnlockRequestKey: React.FC = () => {
       icon="key"
       type="container"
       title="Review/edit unlocking key"
+      onDismiss={() => navigate(`../..`)}
       secondaryButton={{
         label: <>&larr; Back</>,
         action: () => navigate(`../select-keychain`),

@@ -77,7 +77,7 @@ const Modal: React.FC<Props> = ({
         as="div"
         className="relative z-30"
         onClose={
-          onDismiss ?? secondary?.action ?? type === `error` ? primary.action : () => {}
+          onDismiss ?? (secondary?.action ?? type === `error` ? primary.action : () => {})
         }
       >
         <Transition.Child

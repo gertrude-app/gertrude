@@ -56,6 +56,7 @@ const SelectUnlockRequestKeychain: React.FC = () => {
       type="container"
       icon="key"
       title="Select a keychain"
+      onDismiss={() => navigate(`../..`)}
       secondaryButton={{
         label: <>&larr; Back</>,
         action: () => navigate(`../review`),

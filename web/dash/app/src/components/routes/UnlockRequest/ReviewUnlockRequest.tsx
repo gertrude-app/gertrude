@@ -4,13 +4,25 @@ import { Modal, ReviewUnlockRequest } from '@dash/components';
 import { useDispatch, useSelector } from '../../../redux/hooks';
 import { detailsExpandedToggled } from '../../../redux/slice-unlock-requests';
 import { useUnlockRequestLoader } from '../loaders/unlock-request';
+import useApps from '../../../hooks/apps';
+import { useUserLoader } from '../loaders/user';
+import useSelectableKeychains from '../../../hooks/selectable-keychains';
 
 const ReviewUnlockRequestRoute: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { unlockRequestId: id = `` } = useParams<{ unlockRequestId: string }>();
+  const { unlockRequestId = ``, userId = `` } = useParams<{
+    unlockRequestId: UUID;
+    userId: UUID;
+  }>();
   const detailsExpanded = useSelector((state) => state.unlockRequests.detailsExpanded);
-  const loader = useUnlockRequestLoader(id);
+  const loader = useUnlockRequestLoader(unlockRequestId);
+
+  // preload entities used for acceptance to avoid spinner
+  useApps();
+  useUserLoader(userId);
+  useSelectableKeychains();
+
   if (loader.state === `unresolved`) {
     return loader.element;
   }
