@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
 import { newKeyState, convert } from '@dash/keys';
+import type { UnlockRequest } from '@dash/types';
 import type { EditKey, Keychain, KeyRecord } from '@dash/keys';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
@@ -10,7 +11,6 @@ import { commit, editable, Req, toEditableMap } from './helpers';
 import { createResultThunk } from './thunk';
 import * as empty from './empty';
 import editKeyReducer from './edit-key-reducer';
-import { acceptUnlockRequestClicked } from './slice-unlock-requests';
 
 export interface KeychainsState {
   fetchAdminKeychainRequest: Record<UUID, RequestState>;
@@ -86,6 +86,16 @@ export const slice = createSlice({
       const keyState = newKeyState(uuid(), action.payload);
       state.editingKey = keyState;
     },
+    unlockRequestReviewKeyClicked(
+      state,
+      { payload }: PayloadAction<{ keychainId: UUID; unlockRequest: UnlockRequest }>,
+    ) {
+      state.editingKey = convert.toState({
+        id: uuid(),
+        keychainId: payload.keychainId,
+        key: keyForUnlockRequest(payload.unlockRequest),
+      });
+    },
     editKeyModalDismissed(state) {
       delete state.editingKey;
     },
@@ -97,14 +107,6 @@ export const slice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(acceptUnlockRequestClicked, (state, action) => {
-      state.editingKey = convert.toState({
-        id: uuid(),
-        keychainId: uuid(),
-        key: keyForUnlockRequest(action.payload),
-      });
-    });
-
     builder.addCase(upsertKeychain.started, (state, { meta }) => {
       state.updateAdminKeychainRequest[meta.arg] = Req.ongoing();
     });
@@ -273,6 +275,7 @@ export const {
   editKeyModalDismissed,
   createNewKeyClicked,
   editKeyClicked,
+  unlockRequestReviewKeyClicked,
 } = slice.actions;
 
 export default slice.reducer;

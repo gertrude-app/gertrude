@@ -18,10 +18,8 @@ const Template: ComponentStory<typeof KeychainPicker> = (args) => (
   <Modal
     type={`container`}
     title={`Select a keychain`}
-    isOpen={true}
-    primaryButtonText="Add keychain"
-    onPrimaryClick={() => {}}
-    onSecondaryClick={() => {}}
+    primaryButton={{ label: `Add keychain`, action: () => {} }}
+    secondaryButton={() => {}}
   >
     <KeychainPicker {...args} />
   </Modal>

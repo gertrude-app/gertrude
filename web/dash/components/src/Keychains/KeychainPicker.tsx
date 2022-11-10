@@ -9,14 +9,14 @@ type Props = {
   selectableOwnKeychains: Keychain[];
   selectablePublicKeychains: Keychain[];
   onSelect(keychain: Keychain): unknown;
-  selected: Keychain | null;
+  selectedId?: UUID;
   includePublic?: boolean;
 };
 
 const KeychainPicker: React.FC<Props> = ({
   hasNoOwnKeychains,
   selectableOwnKeychains,
-  selected,
+  selectedId,
   selectablePublicKeychains,
   onSelect,
   includePublic = true,
@@ -34,7 +34,7 @@ const KeychainPicker: React.FC<Props> = ({
                 numKeys={keychain.numKeys}
                 isPublic={keychain.isPublic}
                 onSelect={() => onSelect(keychain)}
-                selected={selected?.id === keychain.id}
+                selected={selectedId === keychain.id}
                 selectable
                 small
               />
@@ -51,7 +51,7 @@ const KeychainPicker: React.FC<Props> = ({
           action={`/keychains`}
         />
       )}
-      {includePublic && (
+      {includePublic && selectablePublicKeychains.length > 0 && (
         <>
           <h2
             className={cx(
@@ -70,7 +70,7 @@ const KeychainPicker: React.FC<Props> = ({
                 isPublic={keychain.isPublic}
                 selectable
                 onSelect={() => onSelect(keychain)}
-                selected={selected?.id === keychain.id}
+                selected={selectedId === keychain.id}
                 small
               />
             ))}

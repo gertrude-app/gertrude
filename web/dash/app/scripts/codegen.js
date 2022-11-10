@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 // @ts-check
-const fs = require(`fs`);
-const { sync: glob } = require(`glob`);
-const exec = require(`x-exec`).default;
-const { c, log, green } = require(`x-chalk`);
+import fs from 'fs';
+import glob from 'glob';
+import xExec from 'x-exec';
+import { c, log, green } from 'x-chalk';
+
+// @ts-ignore
+const exec = xExec.default;
 
 const numSteps = 4;
 let step = 1;
@@ -18,7 +21,7 @@ if (endpointIndex !== -1) {
 
 const TYPES_PATH = `../types/src/api.ts`;
 exec(`rm -f ${CWD}/${TYPES_PATH}`);
-glob(`${CWD}/**/__generated__/**/*`).forEach((path) => exec(`rm -f ${path}`));
+glob.sync(`${CWD}/**/__generated__/**/*`).forEach((path) => exec(`rm -f ${path}`));
 
 log(c`{gray ${step++}/${numSteps}} {magenta Downloading schema...}`);
 success = exec.out(
@@ -55,7 +58,7 @@ exec(`rmdir __generated__`, CWD);
 // prettier the codegen'd files
 const PRETTIER_FORMAT = `${CWD}/../../node_modules/.bin/prettier --config ${CWD}/../../.prettierrc.json --write`;
 exec.exit(`${PRETTIER_FORMAT} ${TYPES_PATH}`);
-const typeDirs = glob(`${CWD}/**/__generated__/`);
+const typeDirs = glob.sync(`${CWD}/**/__generated__/`);
 typeDirs.forEach((path) => exec.exit(`${PRETTIER_FORMAT} ${path}`));
 
 log(c`{gray ${step++}/${numSteps}} {magenta Converting dates to string...}`);
@@ -65,7 +68,7 @@ green(`\nCodegen complete!\n`);
 process.exit(0);
 
 function convertDatesToString() {
-  const files = glob(`${CWD}/**/__generated__/**/*.ts`);
+  const files = glob.sync(`${CWD}/**/__generated__/**/*.ts`);
 
   if (files.length === 0) {
     process.stderr.write(`No graphql files found by \`fix-timestamp-types.js\` script\n`);

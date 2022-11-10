@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Loading, ListUsers } from '@dash/components';
+import { Loading, ListUsers, ApiErrorMessage } from '@dash/components';
 import { isUnsaved } from '@dash/utils';
 import { Family } from '@dash/types';
 import { useDispatch, useSelector } from '../../redux/hooks';
@@ -8,7 +8,6 @@ import {
   createPendingAppConnection,
   fetchUsers,
 } from '../../redux/slice-users';
-import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
 
 const Users: React.FC = () => {

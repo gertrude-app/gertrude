@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Loading, ListUnlockRequests } from '@dash/components';
+import { Loading, ListUnlockRequests, ApiErrorMessage } from '@dash/components';
 import * as typesafe from '../../lib/typesafe';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { getUserUnlockRequests } from '../../redux/slice-unlock-requests';
-import ApiErrorMessage from '../ApiErrorMessage';
 
 const UserUnlockRequests: React.FC = () => {
   const { userId: id = `` } = useParams<{ userId: string }>();
@@ -35,6 +34,7 @@ const UserUnlockRequests: React.FC = () => {
       requests={requests.map((req) => ({
         id: req.id,
         url: req.url ?? req.domain ?? req.ipAddress ?? ``,
+        userId: req.userId,
         userName: req.userName,
         status: req.status,
         comment: req.requestComment,

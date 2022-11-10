@@ -4,7 +4,7 @@ import type { AdminIds } from '@dash/types';
 import type { StorageClient } from '../environment/Storage';
 import Current from '../environment';
 import { OptionalVar as Optional } from '../environment/Environment';
-import { Req } from './helpers';
+import { isCypress, Req } from './helpers';
 import { createResultThunk } from './thunk';
 import { handleSignupPaymentSuccess } from './slice-signup';
 
@@ -42,6 +42,10 @@ export const slice = createSlice({
     },
     loginPasswordUpdated: (state, action: PayloadAction<string>) => {
       state.loginPassword = action.payload;
+    },
+    logoutRouteVisited: (state) => {
+      state.admin = null;
+      state.passwordLoginRequest = Req.idle();
     },
     logoutClicked: (state) => {
       state.admin = null;
@@ -120,7 +124,12 @@ export const loginFromMagicLink = createResultThunk(
 
 const { errorExpired } = slice.actions;
 
-export const { logoutClicked, loginEmailUpdated, loginPasswordUpdated } = slice.actions;
+export const {
+  logoutClicked,
+  logoutRouteVisited,
+  loginEmailUpdated,
+  loginPasswordUpdated,
+} = slice.actions;
 
 export default slice.reducer;
 
@@ -132,7 +141,7 @@ export function getInitialAdmin(): AdminIds | null {
   }
 
   const ids = adminFrom(Current.localStorage) ?? adminFrom(Current.sessionStorage);
-  if (ids || Current.env.isProd()) {
+  if (ids || Current.env.isProd() || isCypress()) {
     return ids;
   }
 

@@ -15,7 +15,8 @@ Default.args = {
   type: `default`,
   title: `Just fyi...`,
   isOpen: true,
-  onPrimaryClick: () => {},
+  primaryButton: () => {},
+  secondaryButton: { action: () => {} },
   onDismiss: () => {},
   children: (
     <>
@@ -29,8 +30,8 @@ Default.args = {
 export const TinyError = Template.bind({});
 TinyError.args = {
   ...Default.args,
-  type: `error`,
   title: `Error`,
+  secondaryButton: undefined,
   children: `User not found`,
 };
 
@@ -46,7 +47,7 @@ Destructive.args = {
   type: `destructive`,
   title: `NOOOOOOOOO!!!`,
   icon: `exclamation-triangle`,
-  primaryButtonText: `Delete`,
+  primaryButton: { label: `Delete`, action: () => {} },
 };
 
 export const Container = Template.bind({});

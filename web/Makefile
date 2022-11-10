@@ -66,10 +66,10 @@ build-docs:
 # ci/test type things
 
 cy-open:
-	pnpm cypress open
+	pnpm cypress open --project dash/app
 
 cy-run:
-	pnpm cypress run
+	pnpm cypress run --project dash/app
 
 test:
 	pnpm vitest run

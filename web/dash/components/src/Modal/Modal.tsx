@@ -8,32 +8,38 @@ import type { IconType } from '../GradientIcon';
 import GradientIcon from '../GradientIcon';
 
 interface Props {
-  type: 'destructive' | 'default' | 'container' | 'error';
+  type?: 'destructive' | 'default' | 'container' | 'error';
   title: string;
-  primaryButtonText?: string | React.ReactNode;
-  secondaryButtonText?: string;
-  isOpen: boolean;
+  isOpen?: boolean;
   loading?: boolean;
-  onPrimaryClick(): unknown;
-  onSecondaryClick(): unknown;
+  primaryButton:
+    | (() => unknown)
+    | {
+        action(): unknown;
+        label?: string | React.ReactNode;
+        disabled?: boolean;
+      };
+  secondaryButton?:
+    | (() => unknown)
+    | {
+        action(): unknown;
+        label?: string | React.ReactNode;
+        disabled?: boolean;
+      };
   onDismiss?(): unknown;
-  primaryButtonDisabled?: boolean;
   maximizeWidthForSmallScreens?: boolean;
   children?: React.ReactNode;
   icon?: IconType;
 }
 
 const Modal: React.FC<Props> = ({
-  isOpen,
+  isOpen = true,
   title,
-  primaryButtonText = `OK`,
-  secondaryButtonText = `Cancel`,
-  primaryButtonDisabled = false,
+  type = `default`,
   maximizeWidthForSmallScreens = false,
-  onPrimaryClick,
-  onSecondaryClick,
+  primaryButton,
+  secondaryButton,
   onDismiss,
-  type,
   children,
   icon,
   loading,
@@ -50,16 +56,29 @@ const Modal: React.FC<Props> = ({
         icon = `list`;
         break;
       case `error`:
-        icon = `bug`;
+        icon = `question`;
+        break;
     }
   }
+
+  const primary =
+    typeof primaryButton === `function`
+      ? { action: primaryButton, label: `OK` }
+      : primaryButton;
+
+  const secondary =
+    typeof secondaryButton === `function`
+      ? { action: secondaryButton, label: `Cancel` }
+      : secondaryButton;
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
         as="div"
         className="relative z-30"
-        onClose={onDismiss ? onDismiss : onSecondaryClick}
+        onClose={
+          onDismiss ?? secondary?.action ?? type === `error` ? primary.action : () => {}
+        }
       >
         <Transition.Child
           as={Fragment}
@@ -131,7 +150,10 @@ const Modal: React.FC<Props> = ({
                         <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                           <Dialog.Title
                             as="h3"
-                            className="text-xl font-bold leading-6 text-gray-900"
+                            className={cx(
+                              `text-xl font-bold leading-6`,
+                              type === `error` ? `text-red-800` : `text-gray-900`,
+                            )}
                           >
                             {capitalize(title)}
                           </Dialog.Title>
@@ -145,28 +167,33 @@ const Modal: React.FC<Props> = ({
                     </div>
                   )}
                   <div className="sm:bg-gray-50 rounded-b-lg px-4 py-3 pb-5 sm:pb-3 flex flex-col items-stretch sm:flex-row sm:px-6 sm:justify-end">
-                    {type !== `error` && (
+                    {secondary && (
                       <Button
                         type="button"
                         small
                         color="secondary-white"
                         className="sm:mr-3 w-[100%] sm:w-auto mb-4 sm:mb-0"
-                        onClick={onSecondaryClick}
+                        disabled={secondary.disabled}
+                        onClick={secondary.action}
                       >
-                        {secondaryButtonText}
+                        {secondary.label ?? `Cancel`}
                       </Button>
                     )}
                     <Button
                       type="button"
-                      disabled={primaryButtonDisabled}
+                      disabled={primary.disabled}
                       small
                       color={
-                        type === `destructive` ? `secondary-warning` : `primary-violet`
+                        type === `destructive`
+                          ? `secondary-warning`
+                          : type === `error`
+                          ? `secondary-violet`
+                          : `primary-violet`
                       }
                       className="w-[100%] sm:w-auto"
-                      onClick={type === `error` ? onSecondaryClick : onPrimaryClick}
+                      onClick={primary.action}
                     >
-                      {primaryButtonText}
+                      {primary.label}
                     </Button>
                   </div>
                 </Dialog.Panel>

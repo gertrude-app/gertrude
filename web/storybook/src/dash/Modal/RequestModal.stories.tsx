@@ -16,7 +16,7 @@ Loading.args = {
   successTitle: `Success`,
   withPayload: (payload) => <h1>Got your payload here: {JSON.stringify(payload)}</h1>,
   withError: (err) => <h1>Got your error here, type: {err?.type}</h1>,
-  onPrimaryClick: () => {},
+  primaryButton: () => {},
 };
 
 export const Loaded = Template.bind({});

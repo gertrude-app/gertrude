@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Loading, UserActivityOverview } from '@dash/components';
+import { ApiErrorMessage, Loading, UserActivityOverview } from '@dash/components';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import ApiErrorMessage from '../ApiErrorMessage';
 import { activityDayKey, fetchActivityOverview } from '../../redux/slice-users';
 import { Req } from '../../redux/helpers';
 

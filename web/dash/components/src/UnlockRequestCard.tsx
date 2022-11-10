@@ -9,6 +9,7 @@ import UserInputText from './UserInputText';
 type Props = {
   id: UUID;
   url: string;
+  userId: UUID;
   userName: string;
   status: Api.RequestStatus;
   comment?: string;
@@ -18,6 +19,7 @@ type Props = {
 const UnlockRequestCard: React.FC<Props> = ({
   id,
   url,
+  userId,
   userName,
   comment,
   status,
@@ -49,7 +51,7 @@ const UnlockRequestCard: React.FC<Props> = ({
       <div className="flex flex-row space-x-3 items-stretch mt-4 w-full">
         <Button
           type="link"
-          to={`/unlock-requests/${id}`}
+          to={`/users/${userId}/unlock-requests/${id}/deny`}
           color="secondary-white"
           small
           fullWidth
@@ -58,7 +60,7 @@ const UnlockRequestCard: React.FC<Props> = ({
         </Button>
         <Button
           type="link"
-          to={`/unlock-requests/${id}`}
+          to={`/users/${userId}/unlock-requests/${id}`}
           color="primary-violet"
           className="whitespace-nowrap"
           small

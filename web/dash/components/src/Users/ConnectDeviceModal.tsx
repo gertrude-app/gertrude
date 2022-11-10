@@ -11,7 +11,7 @@ const ConnectModal: React.FC<Props> = ({ dismissAddDevice, request }) => (
     request={request}
     successTitle="Connection Code"
     icon="desktop"
-    onPrimaryClick={dismissAddDevice}
+    primaryButton={dismissAddDevice}
     onDismiss={dismissAddDevice}
     withPayload={(payload) => (
       <div className="space-y-3 mb-2">

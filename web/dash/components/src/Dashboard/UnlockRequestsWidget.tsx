@@ -23,6 +23,7 @@ const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) =>
           <UnlockRequestCard
             key={req.id}
             id={req.id}
+            userId={req.userId}
             userName={req.userName}
             comment={req.comment ?? undefined}
             status={Api.RequestStatus.pending}

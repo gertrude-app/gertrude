@@ -68,7 +68,7 @@ jobs:
       - name: build marketing
         run: make build-marketing
 
-  cypress-run:
+  cypress:
     runs-on: ubuntu-latest
     env:
       VITE_GRAPHQL_ENDPOINT: 'https://api--staging.gertrude-app.com/graphql/dashboard'
@@ -85,3 +85,4 @@ jobs:
         uses: cypress-io/github-action@v4.2.0
         with:
           start: pnpm --filter @dash/app preview
+          project: dash/app

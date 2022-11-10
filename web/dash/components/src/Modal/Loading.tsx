@@ -2,14 +2,7 @@ import React from 'react';
 import Modal from './Modal';
 
 const Loading: React.FC = () => (
-  <Modal
-    type="default"
-    title=""
-    loading
-    isOpen={true}
-    onPrimaryClick={() => {}}
-    onSecondaryClick={() => {}}
-  />
+  <Modal type="default" title="" loading primaryButton={() => {}} />
 );
 
 export default Loading;

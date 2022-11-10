@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Loading, Profile } from '@dash/components';
+import { ApiErrorMessage, Loading, Profile } from '@dash/components';
 import { capitalize, isUnsaved } from '@dash/utils';
 import type { AdminNotificationMethod } from '@dash/types';
 import type { QueryProps, State } from '../../redux/store';
@@ -18,7 +18,6 @@ import {
   confirmPendingNotificationMethod,
   createBillingPortalSession,
 } from '../../redux/slice-admin';
-import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
 import { isDirty, notNullish, Query, Req } from '../../redux/helpers';
 

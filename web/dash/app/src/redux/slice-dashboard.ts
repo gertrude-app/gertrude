@@ -3,6 +3,7 @@ import type { DashboardWidgetData } from '@dash/types';
 import Current from '../environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
+import { acceptUnlockRequest, rejectUnlockRequest } from './slice-unlock-requests';
 
 export interface DashboardState {
   request: RequestState<DashboardWidgetData>;
@@ -27,6 +28,22 @@ export const slice = createSlice({
     });
     builder.addCase(fetchDashboardData.succeeded, (state, action) => {
       state.request = Req.succeed(action.payload);
+    });
+    builder.addCase(rejectUnlockRequest.succeeded, (state, action) => {
+      const payload = Req.payload(state.request);
+      if (payload) {
+        payload.unlockRequests = payload.unlockRequests.filter(
+          (unlockReq) => unlockReq.id !== action.meta.arg,
+        );
+      }
+    });
+    builder.addCase(acceptUnlockRequest.succeeded, (state, action) => {
+      const payload = Req.payload(state.request);
+      if (payload) {
+        payload.unlockRequests = payload.unlockRequests.filter(
+          (unlockReq) => unlockReq.id !== action.meta.arg,
+        );
+      }
     });
   },
 });

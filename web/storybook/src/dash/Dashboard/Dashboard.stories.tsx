@@ -1,7 +1,7 @@
 import { Dashboard } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { withIds, time } from '../../story-helpers';
+import { withIds, time, withIdsAnd } from '../../story-helpers';
 
 export default {
   title: `Dashboard/Dashboard/Screen`,
@@ -14,7 +14,7 @@ const Template: ComponentStory<typeof Dashboard> = (args) => <Dashboard {...args
 
 export const Default = Template.bind({});
 Default.args = {
-  unlockRequests: withIds([
+  unlockRequests: withIdsAnd({ userId: `user1` }, [
     {
       target: `gitlab.io`,
       userName: `Little Jimmy`,

@@ -8,18 +8,12 @@ import Result from '../api/Result';
 import { editable, Req } from './helpers';
 import { createResultThunk } from './thunk';
 
-type State =
-  | 'reviewing'
-  | 'editingKey'
-  | 'selectingKeychain'
-  | 'pendingUpdate'
-  | 'decided';
-
 export interface UnlockRequestsState {
-  entities: Record<UUID, UnlockRequest & { state: State }>;
+  entities: Record<UUID, UnlockRequest>;
   fetchReqs: Record<UUID, RequestState>;
   updateReqs: Record<UUID, RequestState>;
   detailsExpanded: boolean;
+  selectedKeychainId?: UUID;
 }
 
 export function initialState(): UnlockRequestsState {
@@ -38,26 +32,13 @@ export const slice = createSlice({
     detailsExpandedToggled(state) {
       state.detailsExpanded = !state.detailsExpanded;
     },
-    acceptUnlockRequestClicked(state, action: PayloadAction<UnlockRequest>) {
-      const unlockRequest = state.entities[action.payload.id];
-      if (unlockRequest) {
-        unlockRequest.state = `editingKey`;
-      }
-    },
-    selectKeychainClicked(state, action: PayloadAction<UUID>) {
-      const unlockRequest = state.entities[action.payload];
-      if (unlockRequest) {
-        unlockRequest.state = `selectingKeychain`;
-      }
+    keychainSelected(state, action: PayloadAction<UUID>) {
+      state.selectedKeychainId = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder.addCase(rejectUnlockRequest.started, (state, { meta }) => {
       state.updateReqs[meta.arg] = Req.ongoing();
-      const unlockRequest = state.entities[meta.arg];
-      if (unlockRequest) {
-        unlockRequest.state = `pendingUpdate`;
-      }
     });
 
     builder.addCase(rejectUnlockRequest.failed, (state, { error, meta }) => {
@@ -66,19 +47,16 @@ export const slice = createSlice({
 
     builder.addCase(rejectUnlockRequest.succeeded, (state, { meta }) => {
       state.updateReqs[meta.arg] = Req.succeed(void 0);
+      state.detailsExpanded = false;
+      state.selectedKeychainId = undefined;
       const unlockRequest = state.entities[meta.arg];
       if (unlockRequest) {
-        unlockRequest.state = `decided`;
         unlockRequest.status = RequestStatus.rejected;
       }
     });
 
     builder.addCase(acceptUnlockRequest.started, (state, { meta }) => {
       state.updateReqs[meta.arg] = Req.ongoing();
-      const unlockRequest = state.entities[meta.arg];
-      if (unlockRequest) {
-        unlockRequest.state = `pendingUpdate`;
-      }
     });
 
     builder.addCase(acceptUnlockRequest.failed, (state, { error, meta }) => {
@@ -87,9 +65,10 @@ export const slice = createSlice({
 
     builder.addCase(acceptUnlockRequest.succeeded, (state, { meta }) => {
       state.updateReqs[meta.arg] = Req.succeed(void 0);
+      state.detailsExpanded = false;
+      state.selectedKeychainId = undefined;
       const unlockRequest = state.entities[meta.arg];
       if (unlockRequest) {
-        unlockRequest.state = `decided`;
         unlockRequest.status = RequestStatus.accepted;
       }
     });
@@ -105,7 +84,7 @@ export const slice = createSlice({
     builder.addCase(getUserUnlockRequests.succeeded, (state, { payload, meta }) => {
       state.fetchReqs[meta.arg] = Req.succeed(void 0);
       for (const unlockRequest of payload) {
-        state.entities[unlockRequest.id] = { ...unlockRequest, state: `reviewing` };
+        state.entities[unlockRequest.id] = unlockRequest;
       }
     });
 
@@ -120,10 +99,7 @@ export const slice = createSlice({
 
     builder.addCase(getUnlockRequest.succeeded, (state, { payload, meta }) => {
       state.fetchReqs[meta.arg] = Req.succeed(void 0);
-      state.entities[meta.arg] = {
-        ...payload,
-        state: payload.status === `pending` ? `reviewing` : `decided`,
-      };
+      state.entities[meta.arg] = payload;
     });
   },
 });
@@ -131,8 +107,7 @@ export const slice = createSlice({
 export const acceptUnlockRequest = createResultThunk(
   `${slice.name}/acceptUnlockRequest`,
   async (id: UUID, { getState }) => {
-    const state = getState().keychains;
-    const keyRecord = convert.toKeyRecord(state.editingKey);
+    const keyRecord = convert.toKeyRecord(getState().keychains.editingKey);
     if (!keyRecord) {
       return Result.unexpectedError();
     }
@@ -163,10 +138,6 @@ export const getUserUnlockRequests = createResultThunk(
   Current.api.requests.getUserUnlockRequests,
 );
 
-export const {
-  detailsExpandedToggled,
-  selectKeychainClicked,
-  acceptUnlockRequestClicked,
-} = slice.actions;
+export const { detailsExpandedToggled, keychainSelected } = slice.actions;
 
 export default slice.reducer;

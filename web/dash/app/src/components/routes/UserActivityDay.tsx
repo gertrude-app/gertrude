@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { dateFromUrl } from '@dash/datetime';
-import { Loading, UserActivityReviewDay } from '@dash/components';
+import { ApiErrorMessage, Loading, UserActivityReviewDay } from '@dash/components';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import ApiErrorMessage from '../ApiErrorMessage';
 import * as typesafe from '../../lib/typesafe';
 import {
   deleteActivityItems,

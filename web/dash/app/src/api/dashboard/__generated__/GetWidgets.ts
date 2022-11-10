@@ -24,6 +24,7 @@ export interface GetWidgets_widgets_userActivity {
 export interface GetWidgets_widgets_unlockRequests {
   __typename: 'DashboardWidgetUnlockRequest';
   id: string;
+  userId: string;
   target: string;
   comment: string | null;
   createdAt: string;

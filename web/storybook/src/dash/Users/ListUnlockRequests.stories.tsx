@@ -2,7 +2,7 @@ import { RequestStatus } from '@dash/types';
 import { ListUnlockRequests } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { withIds, time } from '../../story-helpers';
+import { withIdsAnd, time } from '../../story-helpers';
 
 export default {
   title: `Dashboard/Users/ListUnlockRequests`,
@@ -17,7 +17,7 @@ const Template: ComponentStory<typeof ListUnlockRequests> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  requests: withIds([
+  requests: withIdsAnd({ userId: `user1` }, [
     {
       userName: `Huck`,
       url: `khanacademy.org`,

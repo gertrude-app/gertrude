@@ -1,0 +1,35 @@
+{
+  "data": {
+    "unlockRequest": {
+      "status": "accepted",
+      "networkDecision": {
+        "ipAddress": "234.423.32.2423",
+        "app": {
+          "__typename": "AppDescriptor",
+          "slug": "slack",
+          "displayName": "Slack",
+          "categories": ["chat"],
+          "bundleId": "BQR82RBBHL.com.tinyspeck.slackmacgap.helper",
+          "shortDescription": "Slack category:chat"
+        },
+        "ipProtocol": null,
+        "hostname": "someotherwebsite.com",
+        "url": null,
+        "__typename": "NetworkDecision"
+      },
+      "requestComment": "Need this for my dinasours class, k thx",
+      "id": "12b0f71a-6654-4b7b-8e74-08233b75c7a4",
+      "device": {
+        "id": "dd000000-1111-0000-0000-000000000000",
+        "user": {
+          "id": "297735d5-ed02-4783-9a30-f67523d36d2a",
+          "name": "Little Jimmy",
+          "__typename": "User"
+        },
+        "__typename": "Device"
+      },
+      "createdAt": "2022-11-06T12:23:28Z",
+      "__typename": "UnlockRequest"
+    }
+  }
+}
