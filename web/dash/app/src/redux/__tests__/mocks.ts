@@ -1,4 +1,5 @@
 import { SubscriptionStatus, Trigger, Family } from '@dash/types';
+import type { UnlockRequest } from '@dash/types';
 import type { Keychain } from '@dash/keys';
 import type { ActivityItem } from '@dash/components';
 import type { User } from '../../api/users';
@@ -9,6 +10,7 @@ import type {
   GetAdmin_admin_verifiedNotificationMethods_method,
 } from '../../api/admin/__generated__/GetAdmin';
 import type { GetActivityOverview_counts } from '../../api/users/__generated__/GetActivityOverview';
+import * as empty from '../../redux/empty';
 
 export function adminProfile(override: Partial<GetAdmin_admin> = {}): GetAdmin_admin {
   return {
@@ -126,5 +128,17 @@ export function keystrokeLine(override: Partial<ActivityItem> = {}): ActivityIte
     date: new Date().toISOString(),
     ...override,
     type: `KeystrokeLine`,
+  };
+}
+
+export function unlockRequest(override: Partial<UnlockRequest> = {}): UnlockRequest {
+  return {
+    ...empty.unlockRequest(
+      `mock.UnlockRequest--id--${Math.random()}`,
+      `mock.User--id--${Math.random()}`,
+    ),
+    domain: `example.com`,
+    appName: `Safari`,
+    ...override,
   };
 }

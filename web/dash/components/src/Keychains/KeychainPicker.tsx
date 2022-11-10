@@ -5,80 +5,94 @@ import EmptyState from '../EmptyState';
 import KeychainCard from './KeychainCard';
 
 type Props = {
+  mode: 'addToUser' | 'forUnlockRequestKey';
   hasNoOwnKeychains: boolean;
   selectableOwnKeychains: Keychain[];
   selectablePublicKeychains: Keychain[];
   onSelect(keychain: Keychain): unknown;
-  selected: Keychain | null;
-  includePublic?: boolean;
+  selectedId?: UUID;
 };
 
 const KeychainPicker: React.FC<Props> = ({
+  mode,
   hasNoOwnKeychains,
   selectableOwnKeychains,
-  selected,
+  selectedId,
   selectablePublicKeychains,
   onSelect,
-  includePublic = true,
-}) => {
-  return (
-    <div className="sm:bg-gray-50 xs:min-w-[450px] rounded-xl sm:p-4">
-      {selectableOwnKeychains.length !== 0 && (
-        <>
+}) => (
+  <div
+    className={cx(
+      `flex flex-col gap-6 *sm:bg-gray-50 xs:min-w-[450px] rounded-xl *sm:p-4`,
+      (selectableOwnKeychains.length > 0 || mode === `addToUser`) &&
+        `sm:bg-gray-50 sm:p-4`,
+    )}
+  >
+    {selectableOwnKeychains.length !== 0 && (
+      <div>
+        {mode === `addToUser` && (
           <h2 className="text-lg font-bold text-gray-600 mb-3">Your keychains:</h2>
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            {selectableOwnKeychains.map((keychain) => (
-              <KeychainCard
-                key={keychain.id}
-                name={keychain.name}
-                numKeys={keychain.numKeys}
-                isPublic={keychain.isPublic}
-                onSelect={() => onSelect(keychain)}
-                selected={selected?.id === keychain.id}
-                selectable
-                small
-              />
-            ))}
-          </div>
-        </>
-      )}
-      {hasNoOwnKeychains && (
+        )}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {selectableOwnKeychains.map((keychain) => (
+            <KeychainCard
+              key={keychain.id}
+              name={keychain.name}
+              numKeys={keychain.numKeys}
+              isPublic={keychain.isPublic}
+              onSelect={() => onSelect(keychain)}
+              selected={selectedId === keychain.id}
+              selectable
+              small
+            />
+          ))}
+        </div>
+      </div>
+    )}
+    {hasNoOwnKeychains && (
+      <EmptyState
+        icon="key"
+        heading={mode === `addToUser` ? `No personal keychains` : `No keychains`}
+        secondaryText={
+          mode === `addToUser`
+            ? `Select a public keychain or create your own.`
+            : `You'll need a keychain to accept this unlock request.`
+        }
+        buttonText="Create a keychain"
+        action="/keychains"
+      />
+    )}
+    {!hasNoOwnKeychains &&
+      selectableOwnKeychains.length === 0 &&
+      mode === `addToUser` && (
         <EmptyState
-          heading={`No personal keychains`}
-          secondaryText={`Select a public keychain or create your own.`}
-          icon={`key`}
-          buttonText={`Create keychains`}
-          action={`/keychains`}
+          icon="key"
+          heading="No selectable keychains"
+          secondaryText="This user already has all of your keychains. Add a new one, or choose a public keychain."
+          buttonText="Add a keychain"
+          action="/keychains"
         />
       )}
-      {includePublic && (
-        <>
-          <h2
-            className={cx(
-              `text-lg font-bold text-gray-600 mb-3`,
-              selectableOwnKeychains.length > 0 && `mt-8`,
-            )}
-          >
-            Public keychains:
-          </h2>
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            {selectablePublicKeychains.map((keychain) => (
-              <KeychainCard
-                key={keychain.id}
-                name={keychain.name}
-                numKeys={keychain.numKeys}
-                isPublic={keychain.isPublic}
-                selectable
-                onSelect={() => onSelect(keychain)}
-                selected={selected?.id === keychain.id}
-                small
-              />
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
+    {mode === `addToUser` && selectablePublicKeychains.length > 0 && (
+      <div>
+        <h2 className={cx(`text-lg font-bold text-gray-600 mb-3`)}>Public keychains:</h2>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {selectablePublicKeychains.map((keychain) => (
+            <KeychainCard
+              key={keychain.id}
+              name={keychain.name}
+              numKeys={keychain.numKeys}
+              isPublic={keychain.isPublic}
+              selectable
+              onSelect={() => onSelect(keychain)}
+              selected={selectedId === keychain.id}
+              small
+            />
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+);
 
 export default KeychainPicker;

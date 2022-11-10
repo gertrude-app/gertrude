@@ -1,4 +1,6 @@
 import { unsavedId } from '@dash/utils';
+import { RequestStatus } from '@dash/types';
+import type { UnlockRequest } from '@dash/types';
 import type { Keychain } from '@dash/keys';
 import type { User } from '../api/users';
 
@@ -23,5 +25,16 @@ export function user(): User {
     screenshotsFrequency: 120,
     keychains: [],
     devices: [],
+  };
+}
+
+export function unlockRequest(id: UUID, userId: UUID): UnlockRequest {
+  return {
+    id,
+    userId,
+    userName: ``,
+    status: RequestStatus.pending,
+    appCategories: [],
+    createdAt: new Date().toISOString(),
   };
 }

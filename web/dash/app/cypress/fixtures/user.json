@@ -1,0 +1,74 @@
+{
+  "data": {
+    "user": {
+      "__typename": "User",
+      "screenshotsResolution": 1200,
+      "id": "9a91793b-3a3f-4769-b564-4e8839b9db42",
+      "screenshotsFrequency": 60,
+      "keychains": [
+        {
+          "keyRecords": [
+            { "id": "6061eb32-ebd1-4988-8536-e2d786168c59", "__typename": "KeyRecord" },
+            { "id": "a22abb17-df6a-4e4e-b3c1-336b3c67f962", "__typename": "KeyRecord" }
+          ],
+          "authorId": "a073734c-7e26-4416-bb64-4c2d50552df0",
+          "id": "aaa00000-0000-0000-0000-000000000000",
+          "isPublic": true,
+          "description": "Keys for student's in Jared's How to Computer (HTC) class.",
+          "__typename": "Keychain",
+          "name": "HTC"
+        },
+        {
+          "keyRecords": [
+            { "id": "3b118034-3ca8-48c8-b580-2a97400a4502", "__typename": "KeyRecord" },
+            { "id": "5210f5d5-ab99-4355-94cf-bb4f6f3aaa99", "__typename": "KeyRecord" },
+            { "id": "6e8d848d-6b46-4865-aa1f-a6db9e72a6cf", "__typename": "KeyRecord" }
+          ],
+          "authorId": "be000000-0000-0000-0000-000000000000",
+          "id": "c6e9a59e-209b-4983-ab61-d8d19c76b3b7",
+          "isPublic": false,
+          "description": null,
+          "__typename": "Keychain",
+          "name": "Jimmy's Music Theory"
+        },
+        {
+          "keyRecords": [
+            { "id": "90afa58b-67a4-4df1-82cd-4978ddc9a01d", "__typename": "KeyRecord" },
+            { "id": "32560ac4-4edc-4620-959b-b8bc1bc0acce", "__typename": "KeyRecord" }
+          ],
+          "authorId": "be000000-0000-0000-0000-000000000000",
+          "id": "18628bce-e051-4e51-88ca-920408c730dc",
+          "isPublic": false,
+          "description": null,
+          "__typename": "Keychain",
+          "name": "Misc McStandard Keys"
+        }
+      ],
+      "keyloggingEnabled": true,
+      "devices": [
+        {
+          "id": "dd000000-1111-0000-0000-000000000000",
+          "model": {
+            "title": "M2 MacBook Air (2022)",
+            "__typename": "Model",
+            "family": "macBookAir"
+          },
+          "__typename": "Device",
+          "isOnline": false
+        },
+        {
+          "id": "60b963c3-c5ce-451a-a142-ceb577d9993f",
+          "model": {
+            "title": "21.5\" iMac (2019)",
+            "__typename": "Model",
+            "family": "iMac"
+          },
+          "__typename": "Device",
+          "isOnline": false
+        }
+      ],
+      "screenshotsEnabled": true,
+      "name": "Little Jimmy"
+    }
+  }
+}

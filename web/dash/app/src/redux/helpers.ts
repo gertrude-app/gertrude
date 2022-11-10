@@ -144,7 +144,13 @@ export function isDirty<T extends { id: UUID }>(
   return JSON.stringify(original) !== JSON.stringify(draft);
 }
 
-export async function spinnerMin<T>(promise: Promise<T>, delayMs = 750): Promise<T> {
+export function isCypress(): boolean {
+  return typeof window !== `undefined` && `Cypress` in window;
+}
+export async function spinnerMin<T>(
+  promise: Promise<T>,
+  delayMs = isCypress() ? 0 : 400,
+): Promise<T> {
   const start = Date.now();
   const result = await promise;
   const elapsed = Date.now() - start;

@@ -25,12 +25,15 @@ const AddKeychainModal: React.FC<Props> = ({
     successType="container"
     successTitle="Select a keychain"
     icon="key"
-    primaryButtonText="Add keychain"
-    primaryButtonDisabled={selected === undefined}
-    onPrimaryClick={onConfirm}
+    primaryButton={{
+      label: `Add keychain`,
+      action: onConfirm,
+      disabled: selected === undefined,
+    }}
     onDismiss={onDismiss}
     withPayload={(payload) => (
       <KeychainPicker
+        mode="addToUser"
         hasNoOwnKeychains={payload.own.length === 0}
         selectablePublicKeychains={payload.public.filter(
           (keychain) => !existingKeychains.some((kc) => kc.id === keychain.id),
@@ -39,7 +42,7 @@ const AddKeychainModal: React.FC<Props> = ({
           (keychain) => !existingKeychains.some((kc) => kc.id === keychain.id),
         )}
         onSelect={onSelect}
-        selected={selected ?? null}
+        selectedId={selected?.id}
       />
     )}
   />

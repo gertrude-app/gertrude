@@ -1,10 +1,13 @@
 .DS_Store
 *.swp
 **/.env*
+;w
+w;
 Session.vim
 node_modules/
 storybook/storybook-static/
 dash/app/build
+dash/app/cypress/downloads
 **/.next
 **/out
 **/tsconfig.tsbuildinfo

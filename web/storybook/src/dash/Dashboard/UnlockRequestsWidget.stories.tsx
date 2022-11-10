@@ -1,6 +1,6 @@
 import { UnlockRequestsWidget } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
-import { withIds, time } from '../../story-helpers';
+import { time, withIdsAnd } from '../../story-helpers';
 
 export default {
   title: `Dashboard/Dashboard/Widgets/UnlockRequests`,
@@ -13,7 +13,7 @@ const Template: ComponentStory<typeof UnlockRequestsWidget> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  unlockRequests: withIds([
+  unlockRequests: withIdsAnd({ userId: `user1` }, [
     {
       target: `gitlab.io`,
       userName: `Little Jimmy`,
@@ -44,6 +44,7 @@ JustOne.args = {
   unlockRequests: [
     {
       id: `1`,
+      userId: `user1`,
       target: `gitlab.io`,
       userName: `Little Jimmy`,
       comment: `Super cool thing I want`,
@@ -54,7 +55,7 @@ JustOne.args = {
 
 export const JustTwo = Template.bind({});
 JustTwo.args = {
-  unlockRequests: withIds([
+  unlockRequests: withIdsAnd({ userId: `user1` }, [
     {
       target: `gitlab.io`,
       userName: `Little Jimmy`,
@@ -72,7 +73,7 @@ JustTwo.args = {
 
 export const Lots = Template.bind({});
 Lots.args = {
-  unlockRequests: withIds([
+  unlockRequests: withIdsAnd({ userId: `user1` }, [
     {
       target: `gitlab.io`,
       userName: `Little Jimmy`,

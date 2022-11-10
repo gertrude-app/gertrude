@@ -68,10 +68,11 @@ jobs:
       - name: build marketing
         run: make build-marketing
 
-  cypress-run:
+  cypress:
     runs-on: ubuntu-latest
     env:
       VITE_GRAPHQL_ENDPOINT: 'https://api--staging.gertrude-app.com/graphql/dashboard'
+      VITE_TEST_ADMIN_CREDS: 'BE000000-0000-0000-0000-000000000000:BE000000-0000-0000-0000-000000000000'
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -85,3 +86,4 @@ jobs:
         uses: cypress-io/github-action@v4.2.0
         with:
           start: pnpm --filter @dash/app preview
+          project: dash/app

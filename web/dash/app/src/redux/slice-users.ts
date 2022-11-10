@@ -31,7 +31,7 @@ type DeletableEntity = 'device' | 'user';
 
 export interface UsersState {
   listRequest: RequestState;
-  users: Record<UUID, Editable<User>>;
+  entities: Record<UUID, Editable<User>>;
   fetchUserRequest: Record<UUID, RequestState>;
   updateUserRequest: Record<UUID, RequestState>;
   addDeviceRequest?: RequestState<number>;
@@ -45,7 +45,7 @@ export interface UsersState {
 export function initialState(): UsersState {
   return {
     listRequest: Req.idle(),
-    users: {
+    entities: {
       [unsavedId()]: editable(empty.user()),
     },
     fetchUserRequest: {},
@@ -75,7 +75,7 @@ export const slice = createSlice({
       delete state.addDeviceRequest;
     },
     userUpdated: (state, { payload }: PayloadAction<UserUpdate>) => {
-      const draft = state.users[payload.id]?.draft;
+      const draft = state.entities[payload.id]?.draft;
       if (!draft) return;
       switch (payload.type) {
         case `name`:
@@ -114,7 +114,7 @@ export const slice = createSlice({
     keychainAdded(state, { payload }: PayloadAction<UUID>) {
       const keychain = state.adding.keychain;
       if (!keychain) return;
-      state.users[payload]?.draft.keychains.push(keychain);
+      state.entities[payload]?.draft.keychains.push(keychain);
       state.adding = { keychain: undefined };
     },
   },
@@ -149,7 +149,7 @@ export const slice = createSlice({
 
     builder.addCase(fetchUsers.succeeded, (state, action) => {
       state.listRequest = Req.succeed(void 0);
-      state.users = { ...state.users, ...toEditableMap(action.payload) };
+      state.entities = { ...state.entities, ...toEditableMap(action.payload) };
     });
 
     builder.addCase(fetchUsers.failed, (state, action) => {
@@ -158,7 +158,7 @@ export const slice = createSlice({
 
     builder.addCase(fetchUser.succeeded, (state, { meta, payload }) => {
       state.fetchUserRequest[meta.arg] = Req.succeed(void 0);
-      state.users[meta.arg] = editable(payload);
+      state.entities[meta.arg] = editable(payload);
     });
 
     builder.addCase(fetchUser.failed, (state, action) => {
@@ -196,12 +196,12 @@ export const slice = createSlice({
 
     builder.addCase(upsertUser.succeeded, (state, { meta, payload }) => {
       state.updateUserRequest[meta.arg] = Req.succeed(void 0);
-      const user = state.users[meta.arg];
+      const user = state.entities[meta.arg];
       if (user && isUnsaved(meta.arg)) {
-        state.users[payload] = editable({ ...user.draft, id: payload });
-        state.users[unsavedId()] = editable(empty.user());
+        state.entities[payload] = editable({ ...user.draft, id: payload });
+        state.entities[unsavedId()] = editable(empty.user());
       } else if (user) {
-        state.users[meta.arg] = commit(user);
+        state.entities[meta.arg] = commit(user);
       }
     });
 
@@ -226,7 +226,7 @@ export const slice = createSlice({
     });
 
     builder.addCase(deleteUser.succeeded, (state, { meta }) => {
-      delete state.users[meta.arg];
+      delete state.entities[meta.arg];
       state.deleted.push(meta.arg);
     });
 
@@ -235,10 +235,10 @@ export const slice = createSlice({
     });
 
     builder.addCase(deleteDevice.succeeded, (state, { meta: { arg } }) => {
-      for (const [userId, user] of Object.entries(state.users)) {
+      for (const [userId, user] of Object.entries(state.entities)) {
         if (user.draft.devices.some(({ id }) => id === arg)) {
           user.draft.devices = user.draft.devices.filter(({ id }) => id !== arg);
-          state.users[userId] = commit(user);
+          state.entities[userId] = commit(user);
         }
       }
     });
@@ -295,7 +295,7 @@ export const upsertUser = createResultThunk(
   `${slice.name}/upsertUser`,
   async (userId: UUID, { getState }) => {
     const { users, auth } = getState();
-    const user = users.users[userId];
+    const user = users.entities[userId];
     const adminId = auth.admin?.id;
     if (!user || !adminId) {
       return Result.unexpectedError();

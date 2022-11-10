@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@shared/components';
 import { UndoMainPadding } from '../../Chrome/Chrome';
 import PartyMessage from '../../PartyMessage';
@@ -40,50 +40,56 @@ const UserActivityReviewDay: React.FC<Props> = ({
   numDeleted,
   deleteItems,
   chunkSize = 100,
-}) => (
-  <UndoMainPadding>
-    <header className="flex items-center justify-between py-4 px-6 border-b-2 bg-white">
-      <div className="flex items-center text-md sm:text-l">
-        <Link
-          to="../"
-          className="flex items-center mr-4 text-gray-400 antialiased hover:text-gray-600 transition duration-75"
+}) => {
+  const navigate = useNavigate();
+  return (
+    <UndoMainPadding>
+      <header className="flex items-center justify-between py-4 px-6 border-b-2 bg-white">
+        <div className="flex items-center text-md sm:text-l">
+          <Link
+            to="../"
+            className="flex items-center mr-4 text-gray-400 antialiased hover:text-gray-600 transition duration-75"
+          >
+            <i className="fa fa-chevron-left mr-2" aria-hidden /> Back
+          </Link>
+          <h1 className="font-medium text-gray-800">{date.toLocaleDateString()}</h1>
+        </div>
+        {items.length > 0 && (
+          <div className="text-gray-700 self-end sm:self-center flex items-center space-x-0.5 sm:space-x-1">
+            <span className="font-bold sm:text-lg">{numDeleted}</span>
+            <span className="hidden sm:inline">out of</span>
+            <span className="sm:hidden">/</span>
+            <span className="font-bold sm:text-lg">{numDeleted + items.length}</span>
+            <span className="hidden sm:inline">items reviewed</span>
+          </div>
+        )}
+      </header>
+      {items.length > 0 ? (
+        <div
+          id="delete-focus"
+          className="px-0 md:px-8 lg:px-10 py-5 md:py-10 pb-16 bg-gray-200 md:bg-transparent flex-grow space-y-8 flex flex-col"
         >
-          <i className="fa fa-chevron-left mr-2" aria-hidden /> Back
-        </Link>
-        <h1 className="font-medium text-gray-800">{date.toLocaleDateString()}</h1>
-      </div>
-      {items.length > 0 && (
-        <div className="text-gray-700 self-end sm:self-center flex items-center space-x-0.5 sm:space-x-1">
-          <span className="font-bold sm:text-lg">{numDeleted}</span>
-          <span className="hidden sm:inline">out of</span>
-          <span className="sm:hidden">/</span>
-          <span className="font-bold sm:text-lg">{numDeleted + items.length}</span>
-          <span className="hidden sm:inline">items reviewed</span>
+          {deleteableChunks(items, chunkSize, deleteItems)}
+          <Button
+            className="ScrollTop self-center"
+            type="button"
+            onClick={() => {
+              deleteItems(items.map((item) => item.id));
+              setTimeout(() => navigate(`..`), 1500);
+            }}
+            color="primary-violet"
+          >
+            Approve all
+          </Button>
+        </div>
+      ) : (
+        <div className="flex justify-center p-8">
+          <PartyMessage>Nothing to review for this day</PartyMessage>
         </div>
       )}
-    </header>
-    {items.length > 0 ? (
-      <div
-        id="delete-focus"
-        className="px-0 md:px-8 lg:px-10 py-5 md:py-10 pb-16 bg-gray-200 md:bg-transparent flex-grow space-y-8 flex flex-col"
-      >
-        {deleteableChunks(items, chunkSize, deleteItems)}
-        <Button
-          className="ScrollTop self-center"
-          type="button"
-          onClick={() => deleteItems(items.map((item) => item.id))}
-          color="primary-violet"
-        >
-          Approve all
-        </Button>
-      </div>
-    ) : (
-      <div className="flex justify-center p-8">
-        <PartyMessage>Nothing to review for this day</PartyMessage>
-      </div>
-    )}
-  </UndoMainPadding>
-);
+    </UndoMainPadding>
+  );
+};
 
 export default UserActivityReviewDay;
 

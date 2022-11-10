@@ -6,10 +6,10 @@ import {
   Loading,
   SuspendFilterRequestForm,
   UserInputText,
+  ErrorModal,
 } from '@dash/components';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import ApiErrorMessage from '../ApiErrorMessage';
 import {
   getSuspendFilterRequest,
   responseCommentUpdated,
@@ -49,33 +49,15 @@ const SuspendFilter: React.FC = () => {
   }
 
   if (fetchReq.state === `failed`) {
-    return (
-      <Modal
-        type="error"
-        title={fetchReq.error?.type === `not_found` ? `Not found` : `Error`}
-        isOpen={true}
-        onPrimaryClick={goToDashboard}
-        onSecondaryClick={goToDashboard}
-        icon={fetchReq.error?.type === `not_found` ? `question` : void 0}
-      >
-        <ApiErrorMessage
-          entity="Suspend filter request"
-          wrapped={false}
-          error={fetchReq.error}
-        />
-      </Modal>
-    );
+    return <ErrorModal entity="Suspend filter request" error={fetchReq.error} />;
   }
 
   const { payload } = fetchReq;
   if (payload.status === `accepted` || payload.status === `rejected`) {
     return (
       <Modal
-        type="error"
         title="Suspend Filter Request"
-        isOpen={true}
-        onPrimaryClick={goToDashboard}
-        onSecondaryClick={goToDashboard}
+        primaryButton={goToDashboard}
         icon={payload.status === `accepted` ? `thumbs-up` : `thumbs-down`}
       >
         <div className="mt-4">
@@ -88,14 +70,7 @@ const SuspendFilter: React.FC = () => {
 
   if (isOlderThan(payload.createdAt, { hours: 2 })) {
     return (
-      <Modal
-        type="error"
-        title="Suspend Filter Request"
-        isOpen={true}
-        onPrimaryClick={goToDashboard}
-        onSecondaryClick={goToDashboard}
-        icon="clock"
-      >
+      <Modal title="Suspend Filter Request" primaryButton={goToDashboard} icon="clock">
         <span className="text-base">
           This filter suspension request is <b>more than 2 hours old.</b> Have the user
           request another one if they still need their filter suspended.
@@ -109,23 +84,23 @@ const SuspendFilter: React.FC = () => {
       type="container"
       title="Suspend Filter Request"
       icon="stopwatch"
-      isOpen
-      primaryButtonText="Grant"
-      secondaryButtonText="Deny"
-      onPrimaryClick={() =>
-        dispatch(updateSuspendFilterRequest({ id, status: RequestStatus.accepted }))
-      }
-      onSecondaryClick={() =>
-        dispatch(updateSuspendFilterRequest({ id, status: RequestStatus.rejected }))
-      }
+      primaryButton={{
+        label: `Grant`,
+        action: () =>
+          dispatch(updateSuspendFilterRequest({ id, status: RequestStatus.accepted })),
+        disabled:
+          updateReq?.state === `ongoing` ||
+          updateReq?.state === `succeeded` ||
+          (grantedDurationInSeconds === `custom` &&
+            (Number.isNaN(Number(grantedCustomDurationInMinutes)) ||
+              Number(grantedCustomDurationInMinutes) <= 1)),
+      }}
+      secondaryButton={{
+        label: `Deny`,
+        action: () =>
+          dispatch(updateSuspendFilterRequest({ id, status: RequestStatus.rejected })),
+      }}
       onDismiss={goToDashboard}
-      primaryButtonDisabled={
-        updateReq?.state === `ongoing` ||
-        updateReq?.state === `succeeded` ||
-        (grantedDurationInSeconds === `custom` &&
-          (Number.isNaN(Number(grantedCustomDurationInMinutes)) ||
-            Number(grantedCustomDurationInMinutes) <= 1))
-      }
     >
       <SuspendFilterRequestForm
         username={payload.userName}

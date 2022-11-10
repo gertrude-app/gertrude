@@ -1,5 +1,5 @@
 import React from 'react';
-import { FullscreenModalForm, LoginForm } from '@dash/components';
+import { ApiErrorMessage, FullscreenModalForm, LoginForm } from '@dash/components';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
@@ -8,7 +8,6 @@ import {
   submitLoginForm,
   requestMagicLink,
 } from '../../redux/slice-auth';
-import ApiErrorMessage from '../ApiErrorMessage';
 import { Req } from '../../redux/helpers';
 
 type Props = React.ComponentProps<typeof LoginForm> & {

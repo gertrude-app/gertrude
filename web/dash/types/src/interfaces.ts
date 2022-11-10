@@ -21,6 +21,7 @@ export interface DashboardWidgetData {
   unlockRequests: Array<{
     id: UUID;
     target: string;
+    userId: UUID;
     userName: string;
     comment?: string | null;
     createdAt: string;

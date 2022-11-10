@@ -23,6 +23,7 @@ const QUERY = gql`
       }
       unlockRequests {
         id
+        userId
         target
         comment
         createdAt

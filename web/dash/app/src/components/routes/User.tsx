@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
-import { Loading, EditUser } from '@dash/components';
+import { Loading, EditUser, ApiErrorMessage } from '@dash/components';
 import { isUnsaved, unsavedId } from '@dash/utils';
 import type { UserUpdate } from '../../redux/slice-users';
 import type { GetUser_user_devices } from '../../api/users/__generated__/GetUser';
 import type { QueryProps } from '../../redux/store';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import ApiErrorMessage from '../ApiErrorMessage';
 import {
   fetchUser,
   userUpdated,
@@ -65,7 +64,7 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
       return [Req.toUnresolvedQuery(fetch), fetch?.state !== `failed`];
     }
 
-    const editable = state.users[id];
+    const editable = state.entities[id];
 
     if (!editable && state.deleted.includes(userId)) {
       return [Query.redirectDeleted(`/users`), false];

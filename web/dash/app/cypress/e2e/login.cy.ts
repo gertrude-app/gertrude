@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 describe(`dashboard app login`, () => {
-  it(`happy path`, () => {
+  it(`handles happy path`, () => {
     cy.visit(`/login`);
     cy.get(`input[name=email]`).type(`82uii.betsy-mcstandard@inbox.testmail.app`);
     cy.get(`input[name=password]`).type(`betsy123{enter}`);
@@ -14,7 +14,7 @@ describe(`dashboard app login`, () => {
     cy.contains(`Little Jimmy`);
   });
 
-  it(`wrong password`, () => {
+  it(`handles wrong password`, () => {
     cy.visit(`/login`);
     cy.get(`input[name=email]`).type(`82uii.betsy-mcstandard@inbox.testmail.app`);
     cy.get(`input[name=password]`).type(`bad{enter}`);
@@ -22,7 +22,7 @@ describe(`dashboard app login`, () => {
     cy.contains(`incorrect`);
   });
 
-  it(`magic-link`, () => {
+  it(`handles magic-link`, () => {
     cy.visit(`/login`);
     cy.get(`[data-test="magic-link"]`).should(`be.disabled`);
     cy.get(`input[name=email]`).type(`82uii.betsy-mcstandard@inbox.testmail.app`);

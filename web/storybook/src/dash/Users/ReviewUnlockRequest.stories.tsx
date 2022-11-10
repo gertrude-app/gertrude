@@ -1,4 +1,4 @@
-import { Modal, UnlockRequestResponder } from '@dash/components';
+import { Modal, ReviewUnlockRequest } from '@dash/components';
 import type { ComponentStory, ComponentMeta, DecoratorFn } from '@storybook/react';
 import { time } from '../../story-helpers';
 
@@ -7,30 +7,26 @@ const inModal: DecoratorFn = (Story) => (
     type="container"
     title="Unlock Request"
     icon="unlock"
-    isOpen
-    primaryButtonText="Accept"
-    secondaryButtonText="Deny"
-    onPrimaryClick={() => {}}
-    onSecondaryClick={() => {}}
+    primaryButton={{ label: `Accept`, action: () => {} }}
+    secondaryButton={{ label: `Deny`, action: () => {} }}
   >
     <Story />
   </Modal>
 );
 
 export default {
-  title: `Dashboard/Users/UnlockRequestResponder`,
-  component: UnlockRequestResponder,
+  title: `Dashboard/Users/ReviewUnlockRequest`,
+  component: ReviewUnlockRequest,
   decorators: [inModal],
   parameters: { layout: `fullscreen` },
-} as ComponentMeta<typeof UnlockRequestResponder>;
+} as ComponentMeta<typeof ReviewUnlockRequest>;
 
-const Template: ComponentStory<typeof UnlockRequestResponder> = (args) => (
-  <UnlockRequestResponder {...args} />
+const Template: ComponentStory<typeof ReviewUnlockRequest> = (args) => (
+  <ReviewUnlockRequest {...args} />
 );
 
-export const FirstStep = Template.bind({});
-FirstStep.args = {
-  step: `reviewing`,
+export const Default = Template.bind({});
+Default.args = {
   userName: `Winfield`,
   requestComment: `schedule mayra appointments`,
   url: `https://cdn-s.acuityscheduling.com/logo24613730.jpg?1650316493&whiteBg=1&rectangular=1`,
@@ -45,24 +41,12 @@ FirstStep.args = {
 
 export const NoAppName = Template.bind({});
 NoAppName.args = {
-  ...FirstStep.args,
+  ...Default.args,
   appName: undefined,
 };
 
 export const EmptyStringComment = Template.bind({});
 EmptyStringComment.args = {
-  ...FirstStep.args,
+  ...Default.args,
   requestComment: ``,
-};
-
-export const SecondStep = Template.bind({});
-SecondStep.args = {
-  ...FirstStep.args,
-  step: `editingKey`,
-};
-
-export const ThirdStep = Template.bind({});
-ThirdStep.args = {
-  ...FirstStep.args,
-  step: `selectingKeychain`,
 };

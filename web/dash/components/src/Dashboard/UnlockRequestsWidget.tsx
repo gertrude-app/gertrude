@@ -23,6 +23,7 @@ const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) =>
           <UnlockRequestCard
             key={req.id}
             id={req.id}
+            userId={req.userId}
             userName={req.userName}
             comment={req.comment ?? undefined}
             status={Api.RequestStatus.pending}
@@ -38,8 +39,8 @@ const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) =>
           {inflect(`request`, unlockRequests.length - 2)}:
         </h3>
         <Button
-          type="button"
-          onClick={() => {}}
+          type="link"
+          to="unlock-requests"
           color="secondary-white"
           small
           className="mt-3"

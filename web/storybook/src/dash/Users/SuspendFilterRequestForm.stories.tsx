@@ -7,10 +7,8 @@ const inModal: DecoratorFn = (Story) => (
     title="Suspend Filter Request"
     icon="stopwatch"
     isOpen
-    primaryButtonText="Grant"
-    secondaryButtonText="Deny"
-    onPrimaryClick={() => {}}
-    onSecondaryClick={() => {}}
+    primaryButton={{ label: `Grant`, action: () => {} }}
+    secondaryButton={{ label: `Deny`, action: () => {} }}
   >
     <Story />
   </Modal>

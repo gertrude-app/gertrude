@@ -4,7 +4,6 @@ import type { Action, Middleware } from '@reduxjs/toolkit';
 import type { ResultThunk } from './thunk';
 import { deleteActivityItems, deleteDevice, upsertUser, deleteUser } from './slice-users';
 import { updateSuspendFilterRequest } from './slice-filter-suspensions';
-import { acceptUnlockRequest, rejectUnlockRequest } from './slice-unlock-requests';
 import {
   deleteKeychain,
   deleteKeyRecord,
@@ -35,8 +34,6 @@ const toastMiddleware: Middleware = (_store) => (next) => (action) => {
   toastCrud(`verify`, `confirmation code`, confirmPendingNotificationMethod, action);
   toastCrud(`approve`, `activity items`, deleteActivityItems, action);
   toastCrud(`update`, `suspend filter request`, updateSuspendFilterRequest, action);
-  toastCrud(`reject`, `unlock request`, rejectUnlockRequest, action);
-  toastCrud(`accept`, `unlock request`, acceptUnlockRequest, action);
 
   return next(action);
 };

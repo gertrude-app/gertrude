@@ -5,13 +5,19 @@ import { windowWidthChanged } from './redux/slice-menu';
 import AuthedChrome from './components/Authed';
 import Dashboard from './components/routes/Dashboard';
 import Login from './components/routes/Login';
+import Logout from './components/routes/Logout';
 import MagicLink from './components/routes/MagicLink';
 import VerifySignupEmail from './components/routes/VerifySignupEmail';
 import CheckoutSuccess from './components/routes/CheckoutSuccess';
 import CheckoutCancel from './components/routes/CheckoutCancel';
 import SuspendFilter from './components/routes/SuspendFilter';
-import UnlockRequest from './components/routes/UnlockRequest';
-import UserUnlockRequests from './components/routes/UserUnlockRequests';
+import ReviewUnlockRequest from './components/routes/UnlockRequest/ReviewUnlockRequest';
+import FetchUnlockRequest from './components/routes/UnlockRequest/FetchUnlockRequest';
+import EditUnlockRequestKey from './components/routes/UnlockRequest/EditUnlockRequestKey';
+import DenyUnlockRequest from './components/routes/UnlockRequest/DenyUnlockRequest';
+import SelectUnlockRequestKeychain from './components/routes/UnlockRequest/SelectUnlockRequestKeychain';
+import UserUnlockRequests from './components/routes/UnlockRequest/UserUnlockRequests';
+import UsersUnlockRequests from './components/routes/UnlockRequest/UsersUnlockRequests';
 import JoinWaitlist from './components/routes/JoinWaitlist';
 import AdminProfile from './components/routes/AdminProfile';
 import Keychain from './components/routes/Keychain';
@@ -51,6 +57,7 @@ const App: React.FC = () => {
     <Routes>
       {/* unauthed routes */}
       <Route path="/login" element={<Login />} />
+      <Route path="/logout" element={<Logout />} />
       <Route path="/otp/:token" element={<MagicLink />} />
       <Route path="/join-waitlist" element={<JoinWaitlist />} />
       <Route path="/signup" element={<Signup />} />
@@ -63,16 +70,30 @@ const App: React.FC = () => {
         <Route index element={<Dashboard />} />
         <Route path="profile" element={<AdminProfile />} />
         <Route path="suspend-filter-requests/:id" element={<SuspendFilter />} />
-        <Route path="unlock-requests/:id" element={<UnlockRequest />} />
+        <Route path="unlock-requests" element={<UsersUnlockRequests />} />
+
         <Route path="keychains">
           <Route index element={<Keychains />} />
           <Route path=":keychainId" element={<Keychain />} />
         </Route>
+
         <Route path="users">
           <Route index element={<Users />} />
+
           <Route path=":userId">
             <Route index element={<User />} />
-            <Route path="unlock-requests" element={<UserUnlockRequests />} />
+
+            <Route path="unlock-requests">
+              <Route index element={<UserUnlockRequests />} />
+              <Route path=":unlockRequestId">
+                <Route index element={<FetchUnlockRequest />} />
+                <Route path="review" element={<ReviewUnlockRequest />} />
+                <Route path="select-keychain" element={<SelectUnlockRequestKeychain />} />
+                <Route path="edit-key" element={<EditUnlockRequestKey />} />
+                <Route path="deny" element={<DenyUnlockRequest />} />
+              </Route>
+            </Route>
+
             <Route path="activity">
               <Route index element={<UserActivityOverview />} />
               <Route path=":date" element={<UserActivityDay />} />

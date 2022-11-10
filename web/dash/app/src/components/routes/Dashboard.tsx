@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
-import { Loading, Dashboard } from '@dash/components';
+import { Loading, Dashboard, ApiErrorMessage } from '@dash/components';
 import type { QueryProps } from '../../redux/store';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { Req, Query } from '../../redux/helpers';
 import { fetchDashboardData } from '../../redux/slice-dashboard';
 import { createKeychainInitiated } from '../../redux/slice-keychains';
-import ApiErrorMessage from '../ApiErrorMessage';
 
 const DashboardRoute: React.FC = () => {
   const dispatch = useDispatch();

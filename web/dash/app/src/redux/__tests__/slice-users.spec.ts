@@ -16,7 +16,7 @@ describe(`deleteDevice`, () => {
   it(`removes device from root users state on success`, () => {
     let state = makeState((state) => {
       state.users.deleting.device = `device123`;
-      state.users.users = {
+      state.users.entities = {
         user123: editable(
           mock.user({
             id: `user123`,
@@ -30,8 +30,8 @@ describe(`deleteDevice`, () => {
     expect(state.deleting?.device).toBeUndefined();
 
     state = reducer(state, deleteDevice.succeeded(true, `device123`));
-    expect(state.users.user123?.original.devices).toEqual([]);
-    expect(state.users.user123?.draft.devices).toEqual([]);
+    expect(state.entities.user123?.original.devices).toEqual([]);
+    expect(state.entities.user123?.draft.devices).toEqual([]);
   });
 });
 
@@ -46,7 +46,7 @@ describe(`upsertUser`, () => {
     let unsaved = editable(mock.user());
     const getState = makeGetState((state) => {
       state.auth.admin = { id: `admin123`, token: `` };
-      unsaved = state.users.users[unsavedId()]!;
+      unsaved = state.users.entities[unsavedId()]!;
       unsaved.draft.name = `Blob jr.`;
     });
 
@@ -65,10 +65,10 @@ describe(`upsertUser`, () => {
     // now simulate the api request feeding a successful result back into the store
     const next = reducer(getState().users, upsertUser.succeeded(`user123`, unsavedId()));
     // the pending "new" user now has the server id
-    expect(next.users.user123?.original.name).toBe(`Blob jr.`);
-    expect(next.users.user123?.original.id).toBe(`user123`);
+    expect(next.entities.user123?.original.name).toBe(`Blob jr.`);
+    expect(next.entities.user123?.original.id).toBe(`user123`);
     // and we have a "fresh" new user
-    expect(next.users[unsavedId()]?.original.name).toBe(``);
+    expect(next.entities[unsavedId()]?.original.name).toBe(``);
   });
 
   it(`with existing user, passes correct arguments to API methods`, async () => {
@@ -100,7 +100,7 @@ describe(`upsertUser`, () => {
 
     const getState = makeGetState((state) => {
       state.auth.admin = { id: `admin123`, token: `` };
-      state.users.users = { user123: user };
+      state.users.entities = { user123: user };
     });
 
     await upsertUser(`user123`)(dispatch, getState);
@@ -122,7 +122,7 @@ describe(`upsertUser`, () => {
     user.draft.name = `Blob Jr.`; // <-- this is the edit
 
     const initialState = makeState((state) => {
-      state.users.users = { user123: user };
+      state.users.entities = { user123: user };
     });
 
     let state = reducer(initialState.users, upsertUser.started(`user123`));
@@ -132,7 +132,7 @@ describe(`upsertUser`, () => {
     expect(state.updateUserRequest.user123).toEqual(Req.succeed(void 0));
 
     // successfully saving causes the draft state to be "committed"
-    expect(state.users.user123?.original.name).toBe(`Blob Jr.`);
+    expect(state.entities.user123?.original.name).toBe(`Blob Jr.`);
   });
 });
 
