@@ -16,7 +16,7 @@ const Users: React.FC = () => {
     listRequest: state.users.listRequest,
     addDeviceRequest: state.users.addDeviceRequest,
     users: typesafe
-      .objectValues(state.users.users)
+      .objectValues(state.users.entities)
       .map((editable) => editable.original)
       .filter((user) => !isUnsaved(user.id)),
   }));

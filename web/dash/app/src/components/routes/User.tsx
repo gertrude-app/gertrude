@@ -64,7 +64,7 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
       return [Req.toUnresolvedQuery(fetch), fetch?.state !== `failed`];
     }
 
-    const editable = state.users[id];
+    const editable = state.entities[id];
 
     if (!editable && state.deleted.includes(userId)) {
       return [Query.redirectDeleted(`/users`), false];

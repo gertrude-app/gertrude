@@ -10,7 +10,7 @@ export function useUserLoader(id: UUID): EntityLoader<Editable<User>> {
   const dispatch = useDispatch();
   const { userReq, user } = useSelector((state) => ({
     userReq: state.users.fetchUserRequest[id],
-    user: state.users.users[id],
+    user: state.users.entities[id],
   }));
 
   useEffect(() => {
