@@ -1,13 +1,43 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import cx from 'classnames';
 
 interface Props {
   className?: string;
 }
 
 const ExampleWebsiteGraphic: React.FC<Props> = ({ className }) => {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  const options: IntersectionObserverInit = {
+    rootMargin: '0px',
+    threshold: 1,
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        setVisible(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          observer.unobserve(entry.target);
+        }
+      });
+    }, options);
+
+    if (ref.current) observer.observe(ref.current);
+
+    return () => {
+      if (ref.current) observer.unobserve(ref.current);
+    };
+  }, [ref, options]);
+
   return (
     <div
-      className={`absolute w-52 h-52 bg-gray-800 shadow-xl rounded-xl flex flex-col border border-white border-opacity-20 ${className}`}
+      className={cx(
+        `absolute w-52 h-52 bg-gray-800 shadow-xl rounded-xl flex flex-col border border-white border-opacity-20 transition duration-200 ${className}`,
+        visible ? 'opacity-1' : 'opacity-0 translate-y-6',
+      )}
+      ref={ref}
     >
       <div className="flex items-center">
         <div className="flex pl-3 pt-1">

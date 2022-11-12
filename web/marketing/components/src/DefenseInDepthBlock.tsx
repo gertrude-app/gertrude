@@ -1,7 +1,7 @@
 import React from 'react';
 
 const DefenseInDepthBlock: React.FC = () => (
-  <section className="bg-gradient-to-b from-gray-900 to-gray-800 px-10 md:px-16 pt-16 md:pt-24 flex items-center flex-col relative overflow-hidden">
+  <section className="bg-gradient-to-b from-gray-900 to-gray-800 px-10 md:px-16 pt-16 md:pt-28 pb-12 flex items-center flex-col relative overflow-hidden">
     <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -right-128 -top-72 z-20" />
     <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-20 -bottom-128 z-20" />
     <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-72 -bottom-96 z-20" />
@@ -27,24 +27,7 @@ const DefenseInDepthBlock: React.FC = () => (
       greatly increases their safety online, plus allows you to occasionally turn off the
       filter, safe in the knowledge that their activity is being observed.
     </p>
-    <section className="flex justify-center w-screen">
-      <GradientRectangle direction="left" />
-      <GradientRectangle direction="right" />
-    </section>
   </section>
-);
-
-interface GradientRectangleProps {
-  direction: 'right' | 'left';
-}
-
-const GradientRectangle: React.FC<GradientRectangleProps> = ({ direction }) => (
-  <div
-    className="md:h-32 h-12 flex-grow z-30"
-    style={{
-      background: `linear-gradient(to bottom ${direction}, transparent 50%, #8b5cf6 50%)`,
-    }}
-  />
 );
 
 interface IconCircleProps {

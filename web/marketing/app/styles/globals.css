@@ -7,7 +7,7 @@
 
 @layer utilities {
   .bg-fuchsia-radial-gradient {
-    background: radial-gradient(closest-side, rgb(200, 88, 231, 0.6), transparent);
+    background: radial-gradient(closest-side, rgb(200, 88, 231, 0.2), transparent);
   }
 
   .bg-topo {
