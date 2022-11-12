@@ -26,7 +26,7 @@ const SafeIsNowPossibleBlock: React.FC = () => {
             approach is <b>hard</b>. Rather than give up and settle for the illusion of
             safety, Gertrude makes this managable with these and many more features:
           </p>
-          <div className="flex flex-col mt-4 sm:mt-8 items-center py-10 pb-0 lg:pb-10 -mx-8 sm:-mx-0">
+          <div className="flex flex-col mt-4 sm:mt-8 items-center py-10 pb-0 -mx-8 sm:-mx-0">
             <Feature heading="Administrate on the go" side="left" icon="mobile">
               Unlock websites and apps from wherever you are, on your own computer or
               phone.

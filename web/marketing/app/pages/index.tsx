@@ -7,6 +7,7 @@ import {
   MainHeader,
   PeaceOfMindBlock,
   SafeIsNowPossibleBlock,
+  TestimonialsBlock,
 } from '@marketing/components';
 import type { NextPage } from 'next';
 
@@ -17,6 +18,7 @@ const Home: NextPage = () => (
     <PeaceOfMindBlock />
     <LosingBattleBlock />
     <SafeIsNowPossibleBlock />
+    <TestimonialsBlock />
     <DefenseInDepthBlock />
     <CTABlock />
     <MainFooter />

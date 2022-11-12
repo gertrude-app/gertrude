@@ -29,16 +29,20 @@ const HeroBlock: React.FC = () => {
     <section className="flex justify-center items-center sm:p-20 p-10 py-20 bg-gradient-to-b from-violet-500 to-fuchsia-500">
       <h1
         className={cx(
-          'lg:text-6xl text-5xl font-extrabold text-opacity-70 text-center leading-[120%] px-16 py-5 rounded-full [transition:500ms] flex items-center',
-          finishedTyping ? 'text-black bg-white shadow-xl' : 'text-white',
+          'lg:text-6xl text-5xl font-extrabold text-center leading-[120%] px-16 py-5 rounded-full [transition:500ms] flex items-center',
+          finishedTyping
+            ? 'text-black bg-white shadow-xl text-opacity-60'
+            : 'text-white text-opacity-70',
         )}
       >
         <i
           className={cx(
             'fa-solid transition duration-300 mr-12 -ml-4',
             finishedTyping ? 'opacity-1' : 'opacity-0',
-            loading ? 'fa-spinner animate-spin' : 'fa-search',
-            blocked ? 'text-red-500 fa-times' : 'text-gray-300',
+            loading ? 'fa-spinner animate-spin' : !blocked && 'fa-search',
+            blocked
+              ? 'fa-lock bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent'
+              : 'text-gray-300',
           )}
         />
         <span
