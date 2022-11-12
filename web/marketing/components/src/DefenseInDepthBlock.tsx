@@ -35,7 +35,7 @@ interface IconCircleProps {
 }
 
 const IconCircle: React.FC<IconCircleProps> = ({ icon }) => (
-  <div className="md:w-32 w-24 md:h-32 h-24 rounded-full bg-gray-800 flex items-center justify-center my-5 sm:my-0 mx-5 sm:mx-10 shadow-2xl relative">
+  <div className="md:w-32 w-24 md:h-32 h-24 rounded-full bg-gray-800 flex items-center justify-center my-2 sm:my-0 mx-3 sm:mx-10 shadow-2xl relative">
     <i
       aria-hidden
       className={`fa fa-${icon} text-4xl md:text-5xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent`}
