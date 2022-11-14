@@ -46,7 +46,7 @@ const LosingBattleBlock: React.FC = () => (
     <section
       className="h-32 flex border-l-2 border-none relative z-10"
       style={{
-        background: `linear-gradient(to bottom right, #111827 50%,  #f3f4f6 50%)`,
+        background: `linear-gradient(to bottom right, #111827 50%,  #f9fafb 50%)`,
       }}
     >
       <div className="hidden lg:block h-full w-20 ml-0.5  z-20"></div>
