@@ -13,9 +13,9 @@ const Testimonial: React.FC<Props> = ({ children, name, index, testimonialIndex 
     <div
       className={cx(
         `w-screen h-full flex justify-center items-center absolute [transition:300ms]`,
-        index < testimonialIndex && '-left-[100vw]',
-        index === testimonialIndex && 'left-0',
-        index > testimonialIndex && 'left-[100vw]',
+        index < testimonialIndex && `-left-[100vw]`,
+        index === testimonialIndex && `left-0`,
+        index > testimonialIndex && `left-[100vw]`,
       )}
     >
       <div className="mx-8 sm:mx-0 w-full sm:w-[calc(100vw-140px)] md:max-w-xl lg:max-w-2xl flex flex-col items-center relative">

@@ -9,12 +9,12 @@ const ExampleWebsiteGraphic: React.FC<Props> = ({ className }) => {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
-  const options: IntersectionObserverInit = {
-    rootMargin: '0px',
-    threshold: 1,
-  };
-
   useEffect(() => {
+    const options: IntersectionObserverInit = {
+      rootMargin: `0px`,
+      threshold: 1,
+    };
+
     const observer = new IntersectionObserver((entries, observer) => {
       entries.forEach((entry) => {
         setVisible(entry.isIntersecting);
@@ -26,16 +26,18 @@ const ExampleWebsiteGraphic: React.FC<Props> = ({ className }) => {
 
     if (ref.current) observer.observe(ref.current);
 
+    const cur = ref.current;
+
     return () => {
-      if (ref.current) observer.unobserve(ref.current);
+      if (cur) observer.unobserve(cur);
     };
-  }, [ref, options]);
+  }, [ref]);
 
   return (
     <div
       className={cx(
         `absolute w-52 h-52 bg-gray-800 shadow-xl rounded-xl flex flex-col border border-white border-opacity-20 transition duration-200 ${className}`,
-        visible ? 'opacity-1' : 'opacity-0 translate-y-6',
+        visible ? `opacity-1` : `opacity-0 translate-y-6`,
       )}
       ref={ref}
     >

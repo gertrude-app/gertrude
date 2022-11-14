@@ -9,19 +9,19 @@ const TestimonialsBlock: React.FC = () => {
       <div className="absolute bottom-12 flex space-x-2">
         <div
           className={`relative z-20 w-3 h-3 transition duration-100 cursor-pointer hover:scale-110 rounded-full ${
-            testimonialIndex === 0 ? 'bg-gray-400' : 'bg-gray-300 shadow-inner'
+            testimonialIndex === 0 ? `bg-gray-400` : `bg-gray-300 shadow-inner`
           }`}
           onClick={() => setTestimonialIndex(0)}
         />
         <div
           className={`relative z-20 w-3 h-3 transition duration-100 cursor-pointer hover:scale-110 rounded-full ${
-            testimonialIndex === 1 ? 'bg-gray-400' : 'bg-gray-300 shadow-inner'
+            testimonialIndex === 1 ? `bg-gray-400` : `bg-gray-300 shadow-inner`
           }`}
           onClick={() => setTestimonialIndex(1)}
         />
         <div
           className={`relative z-20 w-3 h-3 transition duration-100 cursor-pointer hover:scale-110 rounded-full ${
-            testimonialIndex === 2 ? 'bg-gray-400' : 'bg-gray-300 shadow-inner'
+            testimonialIndex === 2 ? `bg-gray-400` : `bg-gray-300 shadow-inner`
           }`}
           onClick={() => setTestimonialIndex(2)}
         />

@@ -12,12 +12,12 @@ const Feature: React.FC<Props> = ({ children, icon, side, heading }) => {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
-  const options: IntersectionObserverInit = {
-    rootMargin: '0px',
-    threshold: 1,
-  };
-
   useEffect(() => {
+    const options: IntersectionObserverInit = {
+      rootMargin: `0px`,
+      threshold: 1,
+    };
+
     const observer = new IntersectionObserver((entries, observer) => {
       entries.forEach((entry) => {
         setVisible(entry.isIntersecting);
@@ -29,26 +29,28 @@ const Feature: React.FC<Props> = ({ children, icon, side, heading }) => {
 
     if (ref.current) observer.observe(ref.current);
 
+    const cur = ref.current;
+
     return () => {
-      if (ref.current) observer.unobserve(ref.current);
+      if (cur) observer.unobserve(cur);
     };
-  }, [ref, options]);
+  }, [ref]);
 
   return (
     <div
       className={cx(
-        'm-6 transition duration-200 flex items-center relative z-20',
+        `m-6 transition duration-200 flex items-center relative z-20`,
         visible
-          ? cx('opacity-100', side === 'left' ? 'md:-rotate-3' : 'md:rotate-3')
-          : 'opacity-0 scale-90 translate-y-6',
-        side === 'left' ? 'lg:mr-96 flex-row-reverse' : 'lg:ml-96 flex-row',
+          ? cx(`opacity-100`, side === `left` ? `md:-rotate-3` : `md:rotate-3`)
+          : `opacity-0 scale-90 translate-y-6`,
+        side === `left` ? `lg:mr-96 flex-row-reverse` : `lg:ml-96 flex-row`,
       )}
       ref={ref}
     >
       <div
         className={cx(
-          'w-16 h-16 md:w-24 md:h-24 bg-white shadow-md flex justify-center items-center rounded-2xl absolute sm:relative z-30 -right-6 -top-6 sm:right-0 sm:top-0',
-          side === 'left' ? 'sm:ml-4 md:ml-8' : 'sm:mr-4 md:mr-8',
+          `w-16 h-16 md:w-24 md:h-24 bg-white shadow-md flex justify-center items-center rounded-2xl absolute sm:relative z-30 -right-6 -top-6 sm:right-0 sm:top-0`,
+          side === `left` ? `sm:ml-4 md:ml-8` : `sm:mr-4 md:mr-8`,
         )}
       >
         <i
