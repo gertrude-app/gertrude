@@ -1,7 +1,7 @@
 import {
   CTABlock,
   DefenseInDepthBlock,
-  DreamToRealityBlock,
+  PeaceOfMindForParentsBlock,
   HeroBlock,
   LosingBattleBlock,
   MainFooter,
@@ -15,7 +15,7 @@ const Home: NextPage = () => {
     <main className="overflow-hidden">
       <MainHeader />
       <HeroBlock />
-      <DreamToRealityBlock />
+      <PeaceOfMindForParentsBlock />
       <LosingBattleBlock />
       <SafeIsNowPossibleBlock />
       <DefenseInDepthBlock />

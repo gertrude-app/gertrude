@@ -1,7 +1,7 @@
 export { default as Chrome } from './Chrome';
 export { default as CTABlock } from './CTABlock';
 export { default as DefenseInDepthBlock } from './DefenseInDepthBlock';
-export { default as DreamToRealityBlock } from './DreamToRealityBlock';
+export { default as PeaceOfMindForParentsBlock } from './PeaceOfMindForParentsBlock';
 export { default as ExampleWebsiteGraphic } from './ExampleWebsiteGraphic';
 export { default as Feature } from './Feature';
 export { default as HeroBlock } from './HeroBlock';

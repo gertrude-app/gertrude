@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@shared/components';
 
-const DreamToRealityBlock: React.FC = () => (
+const PeaceOfMindForParentsBlock: React.FC = () => (
   <section
     style={{
       background: `linear-gradient(to bottom right, #f3f4f6 50%, white 50%)`,
@@ -60,4 +60,4 @@ const DreamToRealityBlock: React.FC = () => (
   </section>
 );
 
-export default DreamToRealityBlock;
+export default PeaceOfMindForParentsBlock;
