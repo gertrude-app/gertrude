@@ -13,7 +13,7 @@ type Props = {
 const UserDevice: React.FC<Props> = ({ model, status, icon, className }) => (
   <div
     className={cx(
-      `border rounded-full p-2 pr-4 shadow bg-white hover:bg-gray-50 cursor-pointer duration-75 transition`,
+      `border rounded-full p-2 pr-4 shadow bg-white duration-75 transition`,
       className,
     )}
   >
