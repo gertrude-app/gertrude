@@ -30,7 +30,7 @@ const PeaceOfMindBlock: React.FC = () => (
         </p>
         <div className="flex flex-col space-y-3 sm:flex-row sm:space-x-4 items-start sm:items-end">
           <a
-            className="text-white font-extrabold text-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center"
+            className="text-white font-extrabold text-xl bg-gradient-to-br w-[14.8rem] sm:w-auto from-violet-500 to-fuchsia-500 px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center"
             href="https://dash.gertrude.app/signup"
           >
             <i aria-hidden className="fas fa-rocket mr-4" />
@@ -40,7 +40,7 @@ const PeaceOfMindBlock: React.FC = () => (
             className="font-extrabold text-xl bg-white px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center hover:bg-violet-50 transition duration-100 border-[0.5px]"
             href="https://dash.gertrude.app/signup"
           >
-            <h2 className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent">
+            <h2 className="bg-gradient-to-br from-indigo-500 flex items-center to-fuchsia-500 bg-clip-text text-transparent">
               <i aria-hidden className="fas fa-book mr-4" />
               <span className="whitespace-nowrap">Read the docs</span>
             </h2>

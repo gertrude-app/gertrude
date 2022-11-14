@@ -38,9 +38,10 @@ const TestimonialsBlock: React.FC = () => {
         computer skills.
       </Testimonial>
       <Testimonial name="Jared H." index={2} testimonialIndex={testimonialIndex}>
-        I'm a bit biased because I made it, but I use Gertrude with all four of my kids
-        and would be devastated if it didn't exist. It's so much easier to use, and I feel
-        much more comfortable with my kids' online activity than I did before.
+        I'm a bit biased because I made it, but I use Gertrude with all of my kids and
+        would be devastated if I had to go back to what I was using before. It's safer and
+        much easier to use, and I feel more comfortable with my kids' online activity than
+        I ever have.
       </Testimonial>
       <button
         className="absolute w-12 h-12 bg-white rounded-full flex justify-center items-center shadow-lg text-gray-500 right-16 bottom-8 lg:bottom-auto hover:bg-violet-50 transition duration-50 z-20"

@@ -22,29 +22,30 @@ const SafeIsNowPossibleBlock: React.FC = () => {
             </span>
           </h2>
           <p className="text-xl text-gray-500 mt-8 leading-8 max-w-4xl">
-            So you can't just block categories of the internet, but taking the reverse
-            approach is <b>hard</b>. Rather than give up and settle for the illusion of
-            safety, Gertrude makes this managable with these and many more features:
+            So it's not safe to block only categories of the internet, but taking the
+            reverse approach is <b>hard</b>. Rather than give up and settle for the
+            illusion of safety, Gertrude makes this managable by letting you:
           </p>
-          <div className="flex flex-col mt-4 sm:mt-8 items-center py-10 pb-0 -mx-8 sm:-mx-0">
-            <Feature heading="Administrate on the go" side="left" icon="mobile">
-              Unlock websites and apps from wherever you are, on your own computer or
-              phone.
+          <div className="flex flex-col mt-4 sm:mt-6 items-center py-10 pb-0 -mx-8 sm:-mx-0">
+            <Feature heading="Take complete control" side="left" icon="location">
+              Choose exactly where your kids are allowed online, and make sure they can't
+              go anwhere else.
             </Feature>
-            <Feature heading="Sharable rules" side="right" icon="share">
-              Share unblock settings and protection rules between multiple users.
+            <Feature heading="Manage on the go" side="right" icon="mobile">
+              Add or remove sites from your own personal safelist from your phone or
+              computer, wherever you are.
             </Feature>
-            <Feature heading="Public keychains" side="left" icon="key">
-              Select curated lists of unblocking rules for instant access to commonly used
-              websites and apps.
+            <Feature heading="Get notified" side="left" icon="bell">
+              Get text, email, or Slack messages when your kid needs access to a blocked
+              site.
             </Feature>
-            <Feature heading="Notifications" side="right" icon="bell">
-              Get text, email, or Slack notifications wherever you are when someone needs
-              something unblocked.
+            <Feature heading="Suspend the filter" side="right" icon="stopwatch">
+              Temporarily allow the whole internet, while recording screenshots of their
+              activity and everything they type.
             </Feature>
-            <Feature heading="Filter suspensions" side="left" icon="eye">
-              Remotely suspend your users' filter temporarily, while uploading screenshots
-              of their activity for your later review.
+            <Feature heading="Protect the whole family" side="left" icon="users">
+              Manage all your kids with one account, sharing lists of safelisted sites
+              when it makes sense.
             </Feature>
           </div>
         </div>
