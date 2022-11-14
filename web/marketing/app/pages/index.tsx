@@ -18,8 +18,8 @@ const Home: NextPage = () => (
     <PeaceOfMindBlock />
     <LosingBattleBlock />
     <SafeIsNowPossibleBlock />
-    <TestimonialsBlock />
     <DefenseInDepthBlock />
+    <TestimonialsBlock />
     <CTABlock />
     <MainFooter />
   </main>

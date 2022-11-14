@@ -22,7 +22,7 @@ const DefenseInDepthBlock: React.FC = () => (
       safety, redundancy, and oversight. You get to review screenshots and keystrokes on
       your own time, on your own device.
     </p>
-    <p className="text-xl text-gray-400/90 mt-0 leading-8 md:text-center text-left max-w-5xl sm:mb-20 mb-12">
+    <p className="text-xl text-gray-400/90 mt-0 leading-8 md:text-center text-left max-w-5xl sm:mb-12 mb-8">
       Nothing secretive or creepy&mdash;we clearly show them they are being watched. This
       greatly increases their safety online, plus allows you to occasionally turn off the
       filter, safe in the knowledge that their activity is being observed.

@@ -4,7 +4,7 @@ import Testimonial from './Testimonial';
 const TestimonialsBlock: React.FC = () => {
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   return (
-    <section className="bg-gray-50 relative h-128 flex justify-center items-center overflow-hidden">
+    <section className="bg-gray-50 relative h-[28rem] sm:h-[24rem] flex justify-center items-center overflow-hidden">
       <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-52 -bottom-96 z-10" />
       <div className="absolute bottom-12 flex space-x-2">
         <div
@@ -32,9 +32,10 @@ const TestimonialsBlock: React.FC = () => {
         about my kids' online activities until I started using Gertrude.
       </Testimonial>
       <Testimonial name="Dr. Frank A." index={1} testimonialIndex={testimonialIndex}>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit hic, quae maxime
-        officia commodi dolorum id fuga molestiae eaque similique sint ipsa soluta eius
-        eveniet alias nesciunt, eos sed in?
+        We have used Gertrude for our two children for the past few years and have found
+        it to be absolutely the most secure product available. The app makes securing
+        children online something manageable for us as middle-aged parents with typical
+        computer skills.
       </Testimonial>
       <Testimonial name="Jared H." index={2} testimonialIndex={testimonialIndex}>
         I'm a bit biased because I made it, but I use Gertrude with all four of my kids
