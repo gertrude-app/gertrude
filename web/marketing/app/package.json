@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "next-remote-watch ../components/src ../../shared/components/src",
+    "start": "next dev",
     "export": "next export",
     "build": "next build",
     "typecheck": "tsc --noEmit",
@@ -22,7 +22,6 @@
   },
   "devDependencies": {
     "@types/node": "18.11.9",
-    "next-remote-watch": "^2.0.0",
     "next-transpile-modules": "^10.0.0"
   }
 }

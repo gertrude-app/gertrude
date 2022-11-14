@@ -6,7 +6,7 @@ interface Props {
 }
 
 const Feature: React.FC<Props> = ({ children, icon }) => (
-  <div className="shadow-lg w-128 m-5 rounded-2xl p-8 pl-10 sm:p-12 sm:pb-10 flex flex-col items-start relative overflow-hidden bg-white z-20">
+  <div className="shadow-lg w-128 m-5 rounded-2xl p-8 pl-10 sm:p-12 sm:pt-10 sm:pb-10 flex flex-col items-start relative overflow-hidden bg-white z-20">
     <div className="w-32 h-32 bg-violet-200 rounded-full absolute -left-16 -top-16">
       <i
         aria-hidden

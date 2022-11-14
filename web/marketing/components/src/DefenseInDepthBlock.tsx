@@ -6,18 +6,26 @@ const DefenseInDepthBlock: React.FC = () => (
     <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-20 -bottom-128 z-20" />
     <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-72 -bottom-96 z-20" />
     <div className="flex flex-row flex-wrap justify-center md:justify-center items-center mb-8 sm:mb-16 relative">
-      <IconCircle icon="filter" />
+      <IconCircle icon="lock" />
       <IconCircle icon="binoculars" />
       <IconCircle icon="keyboard" />
     </div>
     <h2 className="font-inter text-6xl md:text-7xl text-left md:text-center text-white">
       Defense in depth.
     </h2>
-    <p className="text-xl text-gray-500 mt-8 leading-8 md:text-center text-left max-w-5xl sm:mb-20 mb-12">
-      In addition to internet filtering, Gertrude allows you to collect screenshots of
-      your protected users' screens, as well as their keystrokes, for an unprecedented
-      level of safety, redundancy, and oversight. You get to review screenshots and
-      keystrokes on your own time, on your own device.
+    <p className="text-xl text-gray-400/90 mt-8 leading-8 md:text-center text-left max-w-5xl *sm:mb-20 mb-10">
+      In addition to internet filtering, Gertrude allows you to collect{` `}
+      <b className="text-gray-300">screenshots</b>
+      {` `}
+      of your protected users&rsquo; screens, as well as a record of{` `}
+      <b className="text-gray-300">everything they type</b>, for an unprecedented level of
+      safety, redundancy, and oversight. You get to review screenshots and keystrokes on
+      your own time, on your own device.
+    </p>
+    <p className="text-xl text-gray-400/90 mt-0 leading-8 md:text-center text-left max-w-5xl sm:mb-20 mb-12">
+      Nothing secretive or creepy&mdash;we clearly show them they are being watched. This
+      greatly increases their safety online, plus allows you to occasionally turn off the
+      filter, safe in the knowledge that their activity is being observed.
     </p>
     <section className="flex justify-center w-screen">
       <GradientRectangle direction="left" />
