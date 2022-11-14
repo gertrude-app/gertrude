@@ -1,10 +1,6 @@
 import React from 'react';
 
-<<<<<<< HEAD:marketing/components/src/PeaceOfMindForParentsBlock.tsx
-const PeaceOfMindForParentsBlock: React.FC = () => (
-=======
 const PeaceOfMindBlock: React.FC = () => (
->>>>>>> bcbce0d (marketing: redesigned and animated Feature, and animated ExampleWebsiteGraphic):marketing/components/src/PeaceOfMindBlock.tsx
   <section
     style={{
       background: `linear-gradient(to bottom right, #f3f4f6 50%, white 50%)`,
@@ -63,8 +59,4 @@ const PeaceOfMindBlock: React.FC = () => (
   </section>
 );
 
-<<<<<<< HEAD:marketing/components/src/PeaceOfMindForParentsBlock.tsx
-export default PeaceOfMindForParentsBlock;
-=======
 export default PeaceOfMindBlock;
->>>>>>> bcbce0d (marketing: redesigned and animated Feature, and animated ExampleWebsiteGraphic):marketing/components/src/PeaceOfMindBlock.tsx
