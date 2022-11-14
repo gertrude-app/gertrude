@@ -1,7 +1,6 @@
 import React from 'react';
-import { Button } from '@shared/components';
 
-const PeaceOfMindForParentsBlock: React.FC = () => (
+const PeaceOfMindBlock: React.FC = () => (
   <section
     style={{
       background: `linear-gradient(to bottom right, #f3f4f6 50%, white 50%)`,
@@ -15,7 +14,7 @@ const PeaceOfMindForParentsBlock: React.FC = () => (
         <div className="bg-gradient-to-br from-violet-500 to-fuchsia-500 w-12 h-12 rounded-lg flex justify-center items-center">
           <i aria-hidden className="fas fa-desktop text-white text-xl" />
         </div>
-        <h2 className="text-5xl font-extrabold font-inter mt-4">
+        <h2 className="text-5xl font-extrabold font-inter mt-6">
           <span className="text-black">
             Peace of mind for{` `}
             <span className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent">
@@ -29,22 +28,23 @@ const PeaceOfMindForParentsBlock: React.FC = () => (
           be online. Plus, review screenshots and keystrokes of their activity from your
           own computer or phone. Early access available now for <em>Apple computers.</em>
         </p>
-        <div className="flex flex-col space-y-3 sm:flex-row sm:space-x-3 items-start sm:items-end">
+        <div className="flex flex-col space-y-3 sm:flex-row sm:space-x-4 items-start sm:items-end">
           <a
-            className="text-white font-extrabold text-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center"
+            className="text-white font-extrabold text-xl bg-gradient-to-br w-[14.8rem] sm:w-auto from-violet-500 to-fuchsia-500 px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center"
             href="https://dash.gertrude.app/signup"
           >
             <i aria-hidden className="fas fa-rocket mr-4" />
             <h2 className="whitespace-nowrap">Get started</h2>
           </a>
-          <Button
-            className="whitespace-nowrap"
-            color="secondary-white"
-            type="external"
-            href="https://docs.gertrude.app"
+          <a
+            className="font-extrabold text-xl bg-white px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center hover:bg-violet-50 transition duration-100 border-[0.5px]"
+            href="https://dash.gertrude.app/signup"
           >
-            Read the docs &rarr;
-          </Button>
+            <h2 className="bg-gradient-to-br from-indigo-500 flex items-center to-fuchsia-500 bg-clip-text text-transparent">
+              <i aria-hidden className="fas fa-book mr-4" />
+              <span className="whitespace-nowrap">Read the docs</span>
+            </h2>
+          </a>
         </div>
       </div>
       <div className="w-1/2 h-112 bg-fuchsia-radial-gradient z-10 p-8 justify-center items-center lg:flex hidden">
@@ -59,4 +59,4 @@ const PeaceOfMindForParentsBlock: React.FC = () => (
   </section>
 );
 
-export default PeaceOfMindForParentsBlock;
+export default PeaceOfMindBlock;
