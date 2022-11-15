@@ -22,6 +22,7 @@ async function main(): Promise<void> {
 
   const browser = await puppeteer.launch({ headless: true, product: `chrome` });
   const page = await browser.newPage();
+  const url = `http://localhost:4777/${process.env.CI ? `` : `iframe.html`}`;
 
   // disable transitions
   await page.evaluateOnNewDocument(() =>
@@ -30,7 +31,11 @@ async function main(): Promise<void> {
       () => {
         const style = document.createElement(`style`);
         style.type = `text/css`;
-        style.innerHTML = `* { transition: none !important; }`;
+        style.innerHTML = `
+        * {
+           transition: none !important;
+           letter-spacing: -0.03em; /* sorta normalize CI fonts vs macOS  */
+        }`;
         document.querySelector(`head`)?.appendChild(style);
       },
       false,
@@ -38,20 +43,16 @@ async function main(): Promise<void> {
   );
 
   // ensure fonts loaded
-  await page.goto(
-    `http://localhost:4777/iframe.html?id=dashboard-core-gradienticon--grid`,
-  );
+  await page.goto(`${url}?id=dashboard-core-gradienticon--grid`);
   await new Promise((resolve) => setTimeout(resolve, 250));
 
   for (const test of tests) {
-    process.stderr.write(
-      `story name: ${test.name}, sizes: ${JSON.stringify(test.sizes)}\n`,
-    );
-    await page.goto(test.url);
+    process.stderr.write(`story id: ${test.id}, sizes: ${JSON.stringify(test.sizes)}\n`);
+    await page.goto(`${url}?id=${test.id}&viewMode=story`);
 
     for (const size of test.sizes) {
       await page.setViewport({ width: size.width, height: size.height });
-      await argosScreenshot(page, `${test.name}--w${size.width}xh${size.height}`, {
+      await argosScreenshot(page, `${test.id}--w${size.width}xh${size.height}`, {
         fullPage: true,
       });
     }

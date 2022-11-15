@@ -45,10 +45,28 @@ jobs:
         run: pnpm install
       - name: build storybook
         run: make build-storybook
+      - name: serve storybook
+        run: |
+          mv -f storybook/storybook-static/{iframe,index}.html
+          pnpm dlx serve -l 4777 storybook/storybook-static &
       - name: make screenshots
-        run: make visual-tests
+        run: make visual-test
       - name: upload screenshots
         run: pnpm dlx @argos-ci/cli upload storybook/visual-tests/screenshots/argos
+      - name: create screenshots pr
+        id: pr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          base: ${{ github.head_ref }}
+          commit-message: '[automated] update screenshots from CI'
+          branch: screenshots/patch/${{ github.head_ref }}
+          delete-branch: true
+          title: update screenshots from CI
+      - name: pr comment
+        if: ${{ steps.pr.outputs.pull-request-number }}
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: 'PR for changed screenshots: ${{ steps.pr.outputs.pull-request-url }}'
 
   dashboard:
     name: dashboard

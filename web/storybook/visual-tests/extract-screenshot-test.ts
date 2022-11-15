@@ -9,8 +9,7 @@ export const SIZES = {
 } as const;
 
 export interface ScreenshotTest {
-  name: string;
-  url: string;
+  id: string;
   sizes: Array<{ width: number; height: number }>;
 }
 
@@ -41,8 +40,7 @@ export function extractScreenshotTest(
       continue;
     }
     return {
-      name: storyData.id,
-      url: `http://localhost:4777/iframe.html?args=&id=${storyData.id}&viewMode=story`,
+      id: storyData.id,
       sizes: parseTestSizes(sizeStr),
     };
   }

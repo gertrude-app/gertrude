@@ -42,8 +42,7 @@ describe(`extractScreenshotTest()`, () => {
 
     const test = extractScreenshotTest(file, data);
     expect(test).toEqual({
-      name: `foo-bar-baz--rofl-copter`,
-      url: `http://localhost:4777/iframe.html?args=&id=foo-bar-baz--rofl-copter&viewMode=story`,
+      id: `foo-bar-baz--rofl-copter`,
       sizes: [{ width: 375, height: 812 }],
     });
   });
@@ -64,8 +63,7 @@ describe(`extractScreenshotTest()`, () => {
 
     const test = extractScreenshotTest(file, data);
     expect(test).toEqual({
-      name: `foo-bar-baz--rofl-copter`,
-      url: `http://localhost:4777/iframe.html?args=&id=foo-bar-baz--rofl-copter&viewMode=story`,
+      id: `foo-bar-baz--rofl-copter`,
       sizes: [{ width: 375, height: 812 }],
     });
   });
