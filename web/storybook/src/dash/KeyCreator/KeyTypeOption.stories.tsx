@@ -2,7 +2,7 @@ import { KeyTypeOption } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/KeyCreator/KeyTypeOption`,
+  title: 'Dashboard/KeyCreator/KeyTypeOption', // eslint-disable-line
   component: KeyTypeOption,
 } as ComponentMeta<typeof KeyTypeOption>;
 

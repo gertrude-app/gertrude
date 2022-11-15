@@ -2,7 +2,7 @@ import { ErrorMessage } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Core/ErrorMessage`,
+  title: 'Dashboard/Core/ErrorMessage', // eslint-disable-line
   component: ErrorMessage,
 } as ComponentMeta<typeof ErrorMessage>;
 

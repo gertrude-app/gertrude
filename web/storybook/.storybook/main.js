@@ -9,4 +9,7 @@ module.exports = {
   core: {
     builder: `@storybook/builder-vite`,
   },
+  features: {
+    buildStoriesJson: true,
+  },
 };

@@ -2,7 +2,7 @@ import { ConfirmDestructiveAction } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Modal/ConfirmDestructiveAction`,
+  title: 'Dashboard/Modal/ConfirmDestructiveAction', // eslint-disable-line
   component: ConfirmDestructiveAction,
 } as ComponentMeta<typeof ConfirmDestructiveAction>;
 

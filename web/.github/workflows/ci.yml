@@ -32,19 +32,30 @@ jobs:
   storybook:
     name: storybook
     runs-on: ubuntu-latest
+    env:
+      ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
     steps:
       - name: checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
       - name: install pnpm
         uses: pnpm/action-setup@v2
       - name: install deps
         run: pnpm install
       - name: build storybook
         run: make build-storybook
+      - name: make screenshots
+        run: make visual-tests
+      - name: upload screenshots
+        run: pnpm dlx @argos-ci/cli upload storybook/visual-tests/screenshots/argos
 
   dashboard:
     name: dashboard
     runs-on: ubuntu-latest
+    env:
+      VITE_GRAPHQL_ENDPOINT: ${{ secrets.STAGING_API_GRAPHQL_ENDPOINT }}
+      VITE_TEST_ADMIN_CREDS: ${{ secrets.TEST_ADMIN_CREDS }}
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -54,6 +65,11 @@ jobs:
         run: pnpm install
       - name: build dashboard
         run: make build-dash
+      - name: cypress
+        uses: cypress-io/github-action@v4.2.0
+        with:
+          start: pnpm --filter @dash/app preview
+          project: dash/app
 
   marketing:
     name: marketing
@@ -67,23 +83,3 @@ jobs:
         run: pnpm install
       - name: build marketing
         run: make build-marketing
-
-  cypress:
-    runs-on: ubuntu-latest
-    env:
-      VITE_GRAPHQL_ENDPOINT: 'https://api--staging.gertrude-app.com/graphql/dashboard'
-      VITE_TEST_ADMIN_CREDS: 'BE000000-0000-0000-0000-000000000000:BE000000-0000-0000-0000-000000000000'
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
-      - name: install pnpm
-        uses: pnpm/action-setup@v2
-      - name: install deps
-        run: pnpm install
-      - name: build
-        run: make build-dash
-      - name: cypress
-        uses: cypress-io/github-action@v4.2.0
-        with:
-          start: pnpm --filter @dash/app preview
-          project: dash/app

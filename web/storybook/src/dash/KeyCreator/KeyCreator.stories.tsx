@@ -3,7 +3,7 @@ import { EditKey } from '@dash/keys';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/KeyCreator/KeyCreator`,
+  title: 'Dashboard/KeyCreator/KeyCreator', // eslint-disable-line
   component: KeyCreator,
 } as ComponentMeta<typeof KeyCreator>;
 

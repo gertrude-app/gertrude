@@ -3,7 +3,7 @@ import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { keyExamples } from '../../story-helpers';
 
 export default {
-  title: `Dashboard/Keychains/KeyListKey`,
+  title: 'Dashboard/Keychains/KeyListKey', // eslint-disable-line
   component: KeyListKey,
 } as ComponentMeta<typeof KeyListKey>;
 

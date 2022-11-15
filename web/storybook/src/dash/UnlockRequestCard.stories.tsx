@@ -3,14 +3,16 @@ import { UnlockRequestCard } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Core/UnlockRequestCard`,
+  title: 'Dashboard/Core/UnlockRequestCard', // eslint-disable-line
   component: UnlockRequestCard,
+  screenshot: `xs`,
 } as ComponentMeta<typeof UnlockRequestCard>;
 
 const Template: ComponentStory<typeof UnlockRequestCard> = (args) => (
   <UnlockRequestCard {...args} />
 );
 
+// @screenshot: xs/300,sm/300
 export const Default = Template.bind({});
 Default.args = {
   createdAt: new Date().toISOString(),
@@ -27,12 +29,14 @@ LongComment.args = {
   comment: `This is just some online courses about math, science, history, economics, and lorem ipsum dolor sit, amet consectetur adipisicing elit. Aspernatur vel molestiae placeat ex, asperiores corporis deserunt. Laborum eligendi doloremque nostrum dolor, corporis nisi, minima pariatur ab officia eaque sequi. Veniam?`,
 };
 
+// @screenshot: 400/300
 export const Accepted = Template.bind({});
 Accepted.args = {
   ...Default.args,
   status: RequestStatus.accepted,
 };
 
+// @screenshot: 400/300
 export const Rejected = Template.bind({});
 Rejected.args = {
   ...Default.args,
@@ -45,6 +49,7 @@ NoComment.args = {
   comment: undefined,
 };
 
+// @screenshot: xs/300
 export const LongUrl = Template.bind({});
 LongUrl.args = {
   ...Default.args,

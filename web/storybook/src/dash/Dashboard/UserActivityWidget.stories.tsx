@@ -3,7 +3,7 @@ import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withIds } from '../../story-helpers';
 
 export default {
-  title: `Dashboard/Dashboard/Widgets/UserActivity`,
+  title: 'Dashboard/Dashboard/Widgets/UserActivity', // eslint-disable-line
   component: UserActivityWidget,
 } as ComponentMeta<typeof UserActivityWidget>;
 
@@ -20,6 +20,7 @@ Default.args = {
   ]),
 };
 
+// @screenshot: xs/250
 export const AllCaughtUp = Template.bind({});
 AllCaughtUp.args = {
   userActivity: withIds([

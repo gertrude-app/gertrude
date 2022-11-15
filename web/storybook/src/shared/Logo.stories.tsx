@@ -2,7 +2,7 @@ import { Logo } from '@shared/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Shared/Logo`,
+  title: 'Shared/Logo', // eslint-disable-line
   component: Logo,
   parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof Logo>;

@@ -3,7 +3,7 @@ import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withIds, time } from '../../story-helpers';
 
 export default {
-  title: `Dashboard/Dashboard/Widgets/UserScreenshots`,
+  title: 'Dashboard/Dashboard/Widgets/UserScreenshots', // eslint-disable-line
   component: UserScreenshotsWidget,
 } as ComponentMeta<typeof UserScreenshotsWidget>;
 

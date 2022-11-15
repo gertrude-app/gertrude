@@ -2,7 +2,7 @@ import { ContactStatusMessage } from '@marketing/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Marketing/ContactStatusMessage`,
+  title: 'Marketing/ContactStatusMessage', // eslint-disable-line
   component: ContactStatusMessage,
 } as ComponentMeta<typeof ContactStatusMessage>;
 

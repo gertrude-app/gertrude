@@ -15,7 +15,7 @@ const inModal: DecoratorFn = (Story) => (
 );
 
 export default {
-  title: `Dashboard/Users/ReviewUnlockRequest`,
+  title: 'Dashboard/Users/ReviewUnlockRequest', // eslint-disable-line
   component: ReviewUnlockRequest,
   decorators: [inModal],
   parameters: { layout: `fullscreen` },

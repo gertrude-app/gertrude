@@ -15,7 +15,7 @@ const inModal: DecoratorFn = (Story) => (
 );
 
 export default {
-  title: `Dashboard/Users/SuspendFilterRequestForm`,
+  title: 'Dashboard/Users/SuspendFilterRequestForm', // eslint-disable-line
   component: SuspendFilterRequestForm,
   decorators: [inModal],
 } as ComponentMeta<typeof SuspendFilterRequestForm>;

@@ -4,14 +4,16 @@ import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { confirmableEntityAction } from '../../story-helpers';
 
 export default {
-  title: `Dashboard/Keychains/Edit`,
+  title: 'Dashboard/Keychains/Edit', // eslint-disable-line
   component: EditKeychain,
+  screenshot: true,
 } as ComponentMeta<typeof EditKeychain>;
 
 const Template: ComponentStory<typeof EditKeychain> = (args) => (
   <EditKeychain {...args} />
 );
 
+// @screenshot: xs,md
 export const Default = Template.bind({});
 Default.args = {
   isNew: false,
@@ -23,14 +25,17 @@ Default.args = {
   setDescription: () => {},
   saveButtonDisabled: false,
   deleteKeychain: confirmableEntityAction<void>(),
+  deleteKey: confirmableEntityAction(),
 };
 
+// @screenshot: xs
 export const New = Template.bind({});
 New.args = {
   ...Default.args,
   isNew: true,
 };
 
+// @screenshot: xs/900
 export const CreatingKey = Template.bind({});
 CreatingKey.args = {
   ...Default.args,

@@ -4,7 +4,7 @@ import { keychainProps } from '../../story-helpers';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 
 export default {
-  title: `Dashboard/Keychains/ListKeychains`,
+  title: 'Dashboard/Keychains/ListKeychains', // eslint-disable-line
   component: ListKeychains,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],

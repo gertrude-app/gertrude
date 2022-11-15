@@ -2,7 +2,7 @@ import { RequestModal } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Modal/RequestModal`,
+  title: 'Dashboard/Modal/RequestModal', // eslint-disable-line
   component: RequestModal,
 } as ComponentMeta<typeof RequestModal>;
 

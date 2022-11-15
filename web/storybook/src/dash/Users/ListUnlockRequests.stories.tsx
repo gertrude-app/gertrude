@@ -5,7 +5,7 @@ import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { withIdsAnd, time } from '../../story-helpers';
 
 export default {
-  title: `Dashboard/Users/ListUnlockRequests`,
+  title: 'Dashboard/Users/ListUnlockRequests', // eslint-disable-line
   component: ListUnlockRequests,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],

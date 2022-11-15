@@ -4,7 +4,7 @@ import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { confirmableEntityAction, keychainProps } from '../../story-helpers';
 
 export default {
-  title: `Dashboard/Users/EditUser`,
+  title: 'Dashboard/Users/EditUser', // eslint-disable-line
   component: EditUser,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },

@@ -21,6 +21,7 @@
     "@shared/components": "workspace:*",
     "@shared/datetime": "workspace:*",
     "@shared/tailwind": "workspace:*",
+    "@shared/ts-utils": "workspace:*",
     "classnames": "^2.3.1",
     "graphql": "^16.5.0",
     "react": "^18.2.0",
@@ -31,12 +32,12 @@
     "uuid": "9.0.0"
   },
   "devDependencies": {
-    "@types/react": "^18.0.22",
-    "@types/react-dom": "^18.0.7",
-    "@vitejs/plugin-react": "^2.2.0",
     "@dash/types": "workspace:*",
     "@types/dash-ambient": "workspace:*",
+    "@types/react": "^18.0.22",
+    "@types/react-dom": "^18.0.7",
     "@types/uuid": "8.3.4",
+    "@vitejs/plugin-react": "^2.2.0",
     "glob": "8.0.3",
     "postcss": "^8.4.13",
     "typescript": "^4.8.4",

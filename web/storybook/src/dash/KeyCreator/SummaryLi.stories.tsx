@@ -2,7 +2,7 @@ import { SummaryLi } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/KeyCreator/SummaryLi`,
+  title: 'Dashboard/KeyCreator/SummaryLi', // eslint-disable-line
   component: SummaryLi,
 } as ComponentMeta<typeof SummaryLi>;
 

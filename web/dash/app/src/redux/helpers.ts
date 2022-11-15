@@ -159,7 +159,3 @@ export async function spinnerMin<T>(
   }
   return new Promise((res) => setTimeout(() => res(result), delayMs - elapsed));
 }
-
-export function notNullish<T>(x: T | null | undefined): x is T {
-  return x !== null && x !== undefined;
-}

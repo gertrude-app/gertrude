@@ -2,7 +2,7 @@ import { TextInput } from '@shared/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Core/TextInput`,
+  title: 'Shared/TextInput', // eslint-disable-line
   component: TextInput,
 } as ComponentMeta<typeof TextInput>;
 

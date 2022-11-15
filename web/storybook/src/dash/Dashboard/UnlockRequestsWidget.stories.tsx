@@ -3,7 +3,7 @@ import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { time, withIdsAnd } from '../../story-helpers';
 
 export default {
-  title: `Dashboard/Dashboard/Widgets/UnlockRequests`,
+  title: 'Dashboard/Dashboard/Widgets/UnlockRequests', // eslint-disable-line
   component: UnlockRequestsWidget,
 } as ComponentMeta<typeof UnlockRequestsWidget>;
 

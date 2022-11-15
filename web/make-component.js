@@ -30,7 +30,7 @@ const storyFile = `import { ComponentStory, ComponentMeta } from '@storybook/rea
 import { ${Component} } from '@${scope}/components';
 
 export default {
-  title: \`${Component}\`,
+  title: '${Component}', // eslint-disable-line
   component: ${Component},
 } as ComponentMeta<typeof ${Component}>;
 

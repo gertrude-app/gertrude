@@ -2,7 +2,7 @@ import { SelectMenu } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Forms/SelectMenu`,
+  title: 'Dashboard/Forms/SelectMenu', // eslint-disable-line
   component: SelectMenu,
 } as ComponentMeta<typeof SelectMenu>;
 

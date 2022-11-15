@@ -4,7 +4,7 @@ import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { withIds, time, withIdsAnd } from '../../story-helpers';
 
 export default {
-  title: `Dashboard/Dashboard/Screen`,
+  title: 'Dashboard/Dashboard/Screen', // eslint-disable-line
   component: Dashboard,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },
@@ -12,6 +12,7 @@ export default {
 
 const Template: ComponentStory<typeof Dashboard> = (args) => <Dashboard {...args} />;
 
+// @screenshot: xs/2500,xl
 export const Default = Template.bind({});
 Default.args = {
   unlockRequests: withIdsAnd({ userId: `user1` }, [
@@ -79,6 +80,7 @@ NoUserActivity.args = {
   userActivity: [],
 };
 
+// @screenshot: lg
 export const NoUserActivityOrUnlockRequests = Template.bind({});
 NoUserActivityOrUnlockRequests.args = {
   ...Default.args,
@@ -86,6 +88,7 @@ NoUserActivityOrUnlockRequests.args = {
   unlockRequests: [],
 };
 
+// @screenshot: xs,lg
 export const NoUsers = Template.bind({});
 NoUsers.args = {
   ...Default.args,

@@ -2,7 +2,7 @@ import { EmailInputForm } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Unauthed/EmailInputForm`,
+  title: 'Dashboard/Unauthed/EmailInputForm', // eslint-disable-line
   component: EmailInputForm,
   parameters: { layout: `centered` },
 } as ComponentMeta<typeof EmailInputForm>;

@@ -2,7 +2,7 @@ import { ConfirmDeleteEntity } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Modal/ConfirmDeleteEntity`,
+  title: 'Dashboard/Modal/ConfirmDeleteEntity', // eslint-disable-line
   component: ConfirmDeleteEntity,
   parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof ConfirmDeleteEntity>;

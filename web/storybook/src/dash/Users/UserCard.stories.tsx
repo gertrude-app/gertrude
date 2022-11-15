@@ -2,7 +2,7 @@ import { UserCard } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Users/UserCard`,
+  title: 'Dashboard/Users/UserCard', // eslint-disable-line
   component: UserCard,
 } as ComponentMeta<typeof UserCard>;
 

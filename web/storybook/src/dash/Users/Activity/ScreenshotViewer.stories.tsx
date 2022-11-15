@@ -2,7 +2,7 @@ import { ScreenshotViewer } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Users/Activity/ScreenshotViewer`,
+  title: 'Dashboard/Users/Activity/ScreenshotViewer', // eslint-disable-line
   component: ScreenshotViewer,
 } as ComponentMeta<typeof ScreenshotViewer>;
 

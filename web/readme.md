@@ -19,6 +19,7 @@
 - `shared/components` - react components used by more than one app
 - `shared/datetime` - date/time fns used by more than one app
 - `shared/tailwind` - shared tailwind preset
+- `shared/ts-utils` - shared typescript utilities
 
 ## Environment
 

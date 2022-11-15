@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { ApiErrorMessage, Loading, Profile } from '@dash/components';
 import { capitalize, isUnsaved } from '@dash/utils';
+import { notNullish } from '@shared/ts-utils';
 import type { AdminNotificationMethod } from '@dash/types';
 import type { QueryProps, State } from '../../redux/store';
 import { useDispatch, useSelector } from '../../redux/hooks';
@@ -19,7 +20,7 @@ import {
   createBillingPortalSession,
 } from '../../redux/slice-admin';
 import * as typesafe from '../../lib/typesafe';
-import { isDirty, notNullish, Query, Req } from '../../redux/helpers';
+import { isDirty, Query, Req } from '../../redux/helpers';
 
 const AdminProfile: React.FC = () => {
   const dispatch = useDispatch();
