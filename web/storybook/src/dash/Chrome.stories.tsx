@@ -2,7 +2,7 @@ import { Chrome } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Core/Chrome`,
+  title: 'Dashboard/Core/Chrome', // eslint-disable-line
   component: Chrome,
   parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof Chrome>;
@@ -13,6 +13,7 @@ const Template: ComponentStory<typeof Chrome> = (args) => (
   </Chrome>
 );
 
+// @screenshot
 export const Open = Template.bind({});
 Open.args = {
   mobileSidebarOpen: true,

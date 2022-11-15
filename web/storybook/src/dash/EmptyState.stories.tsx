@@ -2,12 +2,13 @@ import { EmptyState } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Core/EmptyState`,
+  title: 'Dashboard/Core/EmptyState', // eslint-disable-line
   component: EmptyState,
 } as ComponentMeta<typeof EmptyState>;
 
 const Template: ComponentStory<typeof EmptyState> = (args) => <EmptyState {...args} />;
 
+// @screenshot: xs/350,md/350
 export const Default = Template.bind({});
 Default.args = {
   heading: `No burgers`,
@@ -16,6 +17,7 @@ Default.args = {
   icon: `burger`,
 };
 
+// @screenshot: xs/350
 export const Violet = Template.bind({});
 Violet.args = {
   ...Default.args,

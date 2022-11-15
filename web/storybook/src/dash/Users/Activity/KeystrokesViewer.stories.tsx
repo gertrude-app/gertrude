@@ -2,7 +2,7 @@ import { KeystrokesViewer } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Users/Activity/KeystrokesViewer`,
+  title: 'Dashboard/Users/Activity/KeystrokesViewer', // eslint-disable-line
   component: KeystrokesViewer,
 } as ComponentMeta<typeof KeystrokesViewer>;
 

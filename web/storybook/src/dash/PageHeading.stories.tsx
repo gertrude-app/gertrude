@@ -2,7 +2,7 @@ import { PageHeading } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Core/PageHeading`,
+  title: 'Dashboard/Core/PageHeading', // eslint-disable-line
   component: PageHeading,
 } as ComponentMeta<typeof PageHeading>;
 

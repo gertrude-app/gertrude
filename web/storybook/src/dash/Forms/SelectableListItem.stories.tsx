@@ -2,7 +2,7 @@ import { SelectableListItem } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Forms/SelectableListItem`,
+  title: 'Dashboard/Forms/SelectableListItem', // eslint-disable-line
   component: SelectableListItem,
 } as ComponentMeta<typeof SelectableListItem>;
 

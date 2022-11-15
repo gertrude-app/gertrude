@@ -6,7 +6,7 @@ import { withIdsAnd, confirmableEntityAction } from '../../story-helpers';
 import { Email as CardStory } from './NotificationCard.stories';
 
 export default {
-  title: `Dashboard/Profile/Profile`,
+  title: 'Dashboard/Profile/Profile', // eslint-disable-line
   component: Profile,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],

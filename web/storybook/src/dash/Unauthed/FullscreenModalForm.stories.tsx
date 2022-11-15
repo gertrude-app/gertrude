@@ -2,7 +2,7 @@ import { EmailInputForm, FullscreenModalForm } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Unauthed/FullscreenModalForm`,
+  title: 'Dashboard/Unauthed/FullscreenModalForm', // eslint-disable-line
   component: FullscreenModalForm,
   parameters: {
     layout: `fullscreen`,

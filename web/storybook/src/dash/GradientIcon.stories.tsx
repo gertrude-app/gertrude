@@ -31,7 +31,7 @@ Grid.args = {
 };
 
 export default {
-  title: `Dashboard/Core/GradientIcon`,
+  title: 'Dashboard/Core/GradientIcon', // eslint-disable-line
   component: GradientGrid,
   argTypes: {
     size: {

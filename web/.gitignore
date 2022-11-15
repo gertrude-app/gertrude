@@ -7,7 +7,7 @@ Session.vim
 node_modules/
 storybook/storybook-static/
 dash/app/build
-dash/app/cypress/downloads
+**/cypress/downloads
 **/.next
 **/out
 **/tsconfig.tsbuildinfo

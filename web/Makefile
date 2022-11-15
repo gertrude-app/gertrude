@@ -77,6 +77,10 @@ test:
 test-watch:
 	pnpm vitest watch
 
+visual-test:
+	rm -rf storybook/visual-tests/screenshots/argos
+	cd storybook/visual-tests && ../node_modules/.bin/ts-node --project tsconfig.json run.ts
+
 format:
 	pnpm prettier --config ./.prettierrc.json --loglevel warn --write .
 

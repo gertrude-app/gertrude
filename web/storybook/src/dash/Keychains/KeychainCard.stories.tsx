@@ -2,7 +2,7 @@ import { KeychainCard } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Keychains/KeychainCard`,
+  title: 'Dashboard/Keychains/KeychainCard', // eslint-disable-line
   component: KeychainCard,
 } as ComponentMeta<typeof KeychainCard>;
 

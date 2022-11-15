@@ -2,7 +2,7 @@ import { Toggle } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Forms/Toggle`,
+  title: 'Dashboard/Forms/Toggle', // eslint-disable-line
   component: Toggle,
 } as ComponentMeta<typeof Toggle>;
 

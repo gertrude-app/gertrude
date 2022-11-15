@@ -4,7 +4,7 @@ import type { ActivityItem } from '@dash/components';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
 
 export default {
-  title: `Dashboard/Users/Activity/UserActivityReviewDay`,
+  title: 'Dashboard/Users/Activity/UserActivityReviewDay', // eslint-disable-line
   component: UserActivityReviewDay,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],

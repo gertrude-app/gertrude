@@ -2,7 +2,7 @@ import { UserDevice } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Users/UserDevice`,
+  title: 'Dashboard/Users/UserDevice', // eslint-disable-line
   component: UserDevice,
 } as ComponentMeta<typeof UserDevice>;
 

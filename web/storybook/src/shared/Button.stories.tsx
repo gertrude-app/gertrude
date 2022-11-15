@@ -2,7 +2,7 @@ import { Button } from '@shared/components';
 import type { ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Shared/Button`,
+  title: 'Shared/Button', // eslint-disable-line
   component: Button,
   parameters: {
     layout: `fullscreen`,

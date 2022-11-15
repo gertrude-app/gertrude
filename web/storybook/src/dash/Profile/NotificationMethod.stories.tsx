@@ -2,7 +2,7 @@ import { NotificationMethod } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Profile/NotificationMethod`,
+  title: 'Dashboard/Profile/NotificationMethod', // eslint-disable-line
   component: NotificationMethod,
 } as ComponentMeta<typeof NotificationMethod>;
 

@@ -3,7 +3,7 @@ import { Modal, SelectableListItem } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Modal/Modal`,
+  title: 'Dashboard/Modal/Modal', // eslint-disable-line
   component: Modal,
   parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof Modal>;

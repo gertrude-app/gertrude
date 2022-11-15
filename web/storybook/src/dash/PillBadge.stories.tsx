@@ -2,7 +2,7 @@ import { PillBadge } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Core/PillBadge`,
+  title: 'Dashboard/Core/PillBadge', // eslint-disable-line
   component: PillBadge,
 } as ComponentMeta<typeof PillBadge>;
 
@@ -27,4 +27,5 @@ const All: React.FC = () => (
 
 const Template: ComponentStory<typeof PillBadge> = () => <All />;
 
+// @screenshot: xs
 export const List = Template.bind({});

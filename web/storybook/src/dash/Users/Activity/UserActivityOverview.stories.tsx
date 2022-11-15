@@ -3,7 +3,7 @@ import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
 
 export default {
-  title: `Dashboard/Users/Activity/UserActivityOverview`,
+  title: 'Dashboard/Users/Activity/UserActivityOverview', // eslint-disable-line
   component: UserActivityOverview,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],

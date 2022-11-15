@@ -3,7 +3,7 @@ import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { keychainProps, keychains } from '../../story-helpers';
 
 export default {
-  title: `Dashboard/Keychains/KeychainPicker`,
+  title: 'Dashboard/Keychains/KeychainPicker', // eslint-disable-line
   component: KeychainPicker,
 } as ComponentMeta<typeof KeychainPicker>;
 

@@ -2,7 +2,7 @@ import { Combobox } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Forms/Combobox`,
+  title: 'Dashboard/Forms/Combobox', // eslint-disable-line
   component: Combobox,
 } as ComponentMeta<typeof Combobox>;
 

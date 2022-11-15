@@ -3,7 +3,7 @@ import { NotificationCard } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
-  title: `Dashboard/Profile/NotificationCard`,
+  title: 'Dashboard/Profile/NotificationCard', // eslint-disable-line
   component: NotificationCard,
 } as ComponentMeta<typeof NotificationCard>;
 
@@ -30,12 +30,14 @@ Email.args = {
 
 export const Text = Template.bind({});
 Text.args = {
+  ...Email.args,
   selectedMethod: { id: `2`, data: { type: `text`, phoneNumber: `(123) 456-7890` } },
   trigger: Trigger.unlockRequestSubmitted,
 };
 
 export const Slack = Template.bind({});
 Slack.args = {
+  ...Email.args,
   selectedMethod: {
     id: `3`,
     data: { type: `slack`, channelId: ``, channelName: `#Gertrude`, token: `` },
