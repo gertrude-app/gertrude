@@ -11,12 +11,7 @@ type Props = {
 };
 
 const UserDevice: React.FC<Props> = ({ model, status, icon, className }) => (
-  <div
-    className={cx(
-      `border rounded-full p-2 pr-4 shadow bg-white hover:bg-gray-50 cursor-pointer duration-75 transition`,
-      className,
-    )}
-  >
+  <div className={cx(`border rounded-full p-2 pr-4 shadow bg-white`, className)}>
     <div className="flex justify-between items-center">
       <div className="flex items-center">
         <GradientIcon icon={icon} size="medium" className="mr-3" subtle />

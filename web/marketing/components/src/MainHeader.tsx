@@ -3,7 +3,9 @@ import { Button, Logo } from '@shared/components';
 
 const MainHeader: React.FC = () => (
   <header className="flex justify-between items-center px-5 sm:px-8 py-6 bg-violet-500">
-    <Logo type="inverted" />
+    <a href="/">
+      <Logo type="inverted" />
+    </a>
     <div className="flex space-x-3">
       <Button
         className="hidden sm:flex"

@@ -20,14 +20,16 @@ const SidebarNav: React.FC<Props> = ({
 }) => (
   <div className="flex flex-col justify-between h-full">
     <nav className={cx(`flex flex-col`, collapsed ? `py-4` : `px-4`)}>
-      <Logo
-        type="on-dark"
-        className={cx(
-          `mb-4 sm:mb-6 scale-[0.8] sm:scale-100`,
-          collapsed ? `mt-3 ml-[1.2em]` : `mt-8 -ml-3 sm:ml-4`,
-        )}
-        iconOnly={collapsed}
-      />
+      <a href="/">
+        <Logo
+          type="on-dark"
+          className={cx(
+            `mb-4 sm:mb-6 scale-[0.8] sm:scale-100`,
+            collapsed ? `mt-3 ml-[1.2em]` : `mt-8 -ml-3 sm:ml-4`,
+          )}
+          iconOnly={collapsed}
+        />
+      </a>
       <div className={cx(`pb-4`)}>
         <SidebarOption
           icon="home"

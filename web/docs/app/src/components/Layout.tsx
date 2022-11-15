@@ -230,7 +230,7 @@ const Header: React.FC<{ navigation: typeof navigation }> = ({ navigation }) => 
         <MobileNavigation navigation={navigation} />
       </div>
       <div className="relative flex basis-0 items-center lg:flex-grow">
-        <Link href="/" aria-label="Home page">
+        <Link href="https://gertrude.app" aria-label="Gertrude home page">
           <div className="flex">
             <Logo
               textSize="text-3xl"
