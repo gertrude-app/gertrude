@@ -2,6 +2,7 @@ import { UserActivityReviewDay } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import type { ActivityItem } from '@dash/components';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
+import { testImgUrl } from '../../../story-helpers';
 
 export default {
   title: 'Dashboard/Users/Activity/UserActivityReviewDay', // eslint-disable-line
@@ -73,7 +74,7 @@ function screenshot(width = 800, height = 270, deleted?: boolean): ActivityItem 
   return {
     ...common(),
     type: `Screenshot`,
-    url: `https://placekitten.com/${width}/${height}`,
+    url: testImgUrl(width, height),
     width,
     height,
     deleted,

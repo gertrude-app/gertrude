@@ -1,6 +1,6 @@
 import { UserScreenshotsWidget } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
-import { withIds, time } from '../../story-helpers';
+import { withIds, time, testImgUrl } from '../../story-helpers';
 
 export default {
   title: 'Dashboard/Dashboard/Widgets/UserScreenshots', // eslint-disable-line
@@ -16,17 +16,17 @@ Default.args = {
   screenshots: withIds([
     {
       userName: `Little Jimmy`,
-      url: `https://placekitten.com/300/200`,
+      url: testImgUrl(300, 200),
       createdAt: time.now(),
     },
     {
       userName: `Sally`,
-      url: `https://placekitten.com/400/200`,
+      url: testImgUrl(400, 200),
       createdAt: time.subtracting({ minutes: 2 }),
     },
     {
       userName: `Henry`,
-      url: `https://placekitten.com/500/300`,
+      url: testImgUrl(500, 300),
       createdAt: time.subtracting({ minutes: 4 }),
     },
   ]),
@@ -37,17 +37,17 @@ WithWideDisplay.args = {
   screenshots: withIds([
     {
       userName: `Little Jimmy`,
-      url: `https://placekitten.com/700/200`,
+      url: testImgUrl(700, 200),
       createdAt: time.now(),
     },
     {
       userName: `Sally`,
-      url: `https://placekitten.com/400/200`,
+      url: testImgUrl(400, 200),
       createdAt: time.subtracting({ minutes: 2 }),
     },
     {
       userName: `Henry`,
-      url: `https://placekitten.com/500/300`,
+      url: testImgUrl(500, 300),
       createdAt: time.subtracting({ minutes: 4 }),
     },
   ]),
