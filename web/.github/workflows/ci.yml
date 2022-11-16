@@ -44,7 +44,7 @@ jobs:
       - name: install deps
         run: pnpm install
       - name: build storybook
-        run: make build-storybook
+        run: STORYBOOK_SCREENSHOT_TESTING=true make build-storybook
       - name: serve storybook
         run: |
           mv -f storybook/storybook-static/{iframe,index}.html

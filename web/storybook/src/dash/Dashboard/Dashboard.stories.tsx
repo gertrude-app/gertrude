@@ -1,7 +1,7 @@
 import { Dashboard } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { withIds, time, withIdsAnd } from '../../story-helpers';
+import { withIds, time, withIdsAnd, testImgUrl } from '../../story-helpers';
 
 export default {
   title: 'Dashboard/Dashboard/Screen', // eslint-disable-line
@@ -15,6 +15,7 @@ const Template: ComponentStory<typeof Dashboard> = (args) => <Dashboard {...args
 // @screenshot: xs/2500,xl
 export const Default = Template.bind({});
 Default.args = {
+  date: time.stable(),
   unlockRequests: withIdsAnd({ userId: `user1` }, [
     {
       target: `gitlab.io`,
@@ -52,17 +53,17 @@ Default.args = {
   userScreenshots: withIds([
     {
       userName: `Little Jimmy`,
-      url: `https://placekitten.com/300/200`,
+      url: testImgUrl(300, 200),
       createdAt: time.now(),
     },
     {
       userName: `Sally`,
-      url: `https://placekitten.com/400/200`,
+      url: testImgUrl(400, 200),
       createdAt: time.subtracting({ minutes: 2 }),
     },
     {
       userName: `Henry`,
-      url: `https://placekitten.com/500/300`,
+      url: testImgUrl(500, 300),
       createdAt: time.subtracting({ minutes: 6 }),
     },
   ]),

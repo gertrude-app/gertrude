@@ -24,8 +24,8 @@ async function main(): Promise<void> {
   const page = await browser.newPage();
   const url = `http://localhost:4777/${process.env.CI ? `` : `iframe.html`}`;
 
-  // disable transitions
-  await page.evaluateOnNewDocument(() =>
+  // inject css to stabilize screenshots
+  await page.evaluateOnNewDocument(() => {
     document.addEventListener(
       `DOMContentLoaded`,
       () => {
@@ -39,8 +39,8 @@ async function main(): Promise<void> {
         document.querySelector(`head`)?.appendChild(style);
       },
       false,
-    ),
-  );
+    );
+  });
 
   // ensure fonts loaded
   await page.goto(`${url}?id=dashboard-core-gradienticon--grid`);

@@ -6,11 +6,16 @@ import DashboardWidget from './DashboardWidget';
 type Props = {
   className?: string;
   createKeychain: () => unknown;
+  date?: Date;
 };
 
-const QuickActionsWidget: React.FC<Props> = ({ className, createKeychain }) => (
+const QuickActionsWidget: React.FC<Props> = ({
+  className,
+  createKeychain,
+  date = new Date(),
+}) => (
   <DashboardWidget className={className}>
-    <h1 className="text-2xl font-extrabold my-2 ml-2">Good {timeOfDay(new Date())}!</h1>
+    <h1 className="text-2xl font-extrabold my-2 ml-2">Good {timeOfDay(date)}!</h1>
     <p className="mb-4 ml-2 text-gray-500">
       Here are some quick actions you may find useful:
     </p>

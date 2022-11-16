@@ -13,6 +13,14 @@ export function keychainProps(override: Partial<Keychain> = {}): Keychain {
   };
 }
 
+export function testImgUrl(width: number, height: number): string {
+  // placekitten is random, so it causes false positives for visual regression tests
+  if (import.meta.env.STORYBOOK_SCREENSHOT_TESTING) {
+    return `https://fakeimg.pl/${width}x${height}/31235d/fff/`;
+  }
+  return `https://placekitten.com/${width}/${height}`;
+}
+
 export function withIds<T extends Record<string, unknown>>(
   items: T[],
 ): Array<T & { id: UUID }> {
@@ -46,7 +54,12 @@ export function confirmableEntityAction<
 export const time = {
   now,
   subtracting,
+  stable,
 };
+
+function stable(): Date {
+  return new Date(`2022-01-01T12:00:00.000Z`);
+}
 
 function subtracting(amounts: {
   days?: number;
