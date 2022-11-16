@@ -62,19 +62,14 @@ const ButtonStory: React.FC<{ color: ButtonColor; disabled?: boolean }> = ({
   </div>
 );
 
-export const PrimaryViolet = () => <ButtonStory color="primary-violet" />;
-export const PrimaryWhite = () => <ButtonStory color="primary-white" />;
-export const SecondaryWhite = () => <ButtonStory color="secondary-white" />;
-export const SecondaryViolet = () => <ButtonStory color="secondary-violet" />;
-export const SecondaryWarning = () => <ButtonStory color="secondary-warning" />;
-export const Disabled = () => <ButtonStory color="secondary-warning" disabled />;
+export const PrimaryOnVioletBg = () => <ButtonStory color="primary-on-violet-bg" />;
+export const SecondaryOnVioletBg = () => <ButtonStory color="secondary-on-violet-bg" />;
+export const Primary = () => <ButtonStory color="primary" />;
+export const Secondary = () => <ButtonStory color="secondary" />;
+export const Tertiary = () => <ButtonStory color="tertiary" />;
+export const Warning = () => <ButtonStory color="warning" />;
+export const Disabled = () => <ButtonStory color="warning" disabled />;
 
-function bgColor(color: ButtonColor) {
-  switch (color) {
-    case `primary-white`:
-    case `secondary-violet`:
-      return `bg-violet-500`;
-    default:
-      return ``;
-  }
+function bgColor(color: ButtonColor): string {
+  return color.includes('on-violet-bg') ? 'bg-violet-500' : 'bg-white';
 }

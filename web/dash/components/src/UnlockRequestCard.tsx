@@ -35,7 +35,7 @@ const UnlockRequestCard: React.FC<Props> = ({
       <h2 className="font-bold text-gray-900">{userName}</h2>
       <h3 className="text-gray-400 text-sm">{relativeTime(new Date(createdAt))}</h3>
     </div>
-    <div className="py-3 px-5 bg-violet-50 rounded-xl mt-2 flex justify-center items-center">
+    <div className="py-3 px-5 bg-gray-50 rounded-xl mt-2 flex justify-center items-center">
       <h2 className="font-mono text-base whitespace-nowrap truncate">
         {url.replace(/^https?:\/\//, ``).replace(/\/$/, ``)}
       </h2>
@@ -52,7 +52,7 @@ const UnlockRequestCard: React.FC<Props> = ({
         <Button
           type="link"
           to={`/users/${userId}/unlock-requests/${id}/deny`}
-          color="secondary-white"
+          color="tertiary"
           small
           fullWidth
         >
@@ -61,7 +61,7 @@ const UnlockRequestCard: React.FC<Props> = ({
         <Button
           type="link"
           to={`/users/${userId}/unlock-requests/${id}`}
-          color="primary-violet"
+          color="secondary"
           className="whitespace-nowrap"
           small
           fullWidth

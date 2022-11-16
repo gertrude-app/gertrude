@@ -27,7 +27,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
           <p className="mb-4 text-black text-opacity-50 text-center">
             You can use Gertrude to monitor your users' activity
           </p>
-          <Button type="link" color="primary-violet" to="/users/new" small>
+          <Button type="link" color="primary" to="/users/new" small>
             <i className="fa-solid fa-arrow-right mr-2" /> See how
           </Button>
         </div>

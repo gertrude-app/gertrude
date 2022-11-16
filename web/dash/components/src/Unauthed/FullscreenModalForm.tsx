@@ -25,7 +25,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
         <FullscreenGradientBg>
           <div
             className={cx(
-              `bg-white font-sans max-w-lg rounded-2xl mx-4 pt-8 pl-7 pr-8 shadow-lg flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4`,
+              `bg-white font-sans max-w-lg rounded-2xl mx-4 pt-8 pl-7 pr-8 shadow-lg flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 relative`,
               props.request === `failed`
                 ? `items-center sm:items-start pb-6`
                 : `items-center pb-8`,
@@ -38,7 +38,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
             <div className="flex flex-col items-center sm:items-end">
               <p
                 className={cx(
-                  `text-center sm:text-left`,
+                  `text-center sm:text-left text-gray-500`,
                   props.request === `failed` ?? `text-red-900`,
                 )}
               >
@@ -46,7 +46,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
               </p>
               {props.request === `failed` && (
                 <Button
-                  color="secondary-white"
+                  color="secondary"
                   type="external"
                   href="https://gertrude.app/contact"
                   small

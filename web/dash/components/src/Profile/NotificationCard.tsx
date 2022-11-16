@@ -88,7 +88,7 @@ const NotificationCard: React.FC<Props> = ({
         <Button
           type="button"
           onClick={startEdit}
-          color="secondary-white"
+          color="tertiary"
           small
           className={editing ? `hidden` : `block`}
         >
@@ -98,7 +98,7 @@ const NotificationCard: React.FC<Props> = ({
         <Button
           type="button"
           onClick={onDelete}
-          color="secondary-warning"
+          color="warning"
           small
           className={`${editing ? `hidden` : `block`} ml-3`}
         >
@@ -108,7 +108,7 @@ const NotificationCard: React.FC<Props> = ({
         <Button
           type="button"
           onClick={cancelEdit}
-          color="secondary-white"
+          color="tertiary"
           small
           className={`${editing ? `block` : `hidden`} mr-3`}
         >
@@ -117,7 +117,7 @@ const NotificationCard: React.FC<Props> = ({
         <Button
           type="button"
           onClick={onSave}
-          color="primary-violet"
+          color="secondary"
           disabled={saveButtonDisabled}
           small
           className={editing ? `block` : `hidden`}

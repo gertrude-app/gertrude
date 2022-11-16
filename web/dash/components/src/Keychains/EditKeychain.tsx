@@ -103,12 +103,7 @@ const EditKeychain: React.FC<Props> = ({
               deleteKey={(id) => deleteKey.start(id)}
             />
             <div className="mt-4 flex justify-end">
-              <Button
-                color="secondary-white"
-                small
-                type="button"
-                onClick={onCreateNewKey}
-              >
+              <Button color="secondary" small type="button" onClick={onCreateNewKey}>
                 <i className="fa-solid fa-plus mr-2" />
                 Add new key
               </Button>
@@ -126,12 +121,7 @@ const EditKeychain: React.FC<Props> = ({
       </div>
       <div className="flex mt-5 justify-end border-t-2 pt-8 space-x-5">
         {!isNew && (
-          <Button
-            type="button"
-            onClick={deleteKeychain.start}
-            color="secondary-warning"
-            small
-          >
+          <Button type="button" onClick={deleteKeychain.start} color="warning" small>
             Delete keychain
           </Button>
         )}
@@ -140,7 +130,7 @@ const EditKeychain: React.FC<Props> = ({
           type="button"
           disabled={saveButtonDisabled}
           onClick={onSave}
-          color="primary-violet"
+          color="primary"
         >
           {isNew ? `Create` : `Save`} keychain
         </Button>

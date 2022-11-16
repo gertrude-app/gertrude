@@ -61,14 +61,14 @@ const LoginForm: React.FC<Props> = ({
       />
     </div>
     <div className="space-y-3 self-stretch">
-      <Button color="primary-violet" type="submit" fullWidth>
+      <Button color="primary" type="submit" fullWidth>
         Submit &rarr;
       </Button>
       <Button
         testId="magic-link"
         disabled={email.match(/^.+@.+$/) === null}
         onClick={onSendMagicLink}
-        color="secondary-white"
+        color="secondary"
         type="button"
         fullWidth
       >

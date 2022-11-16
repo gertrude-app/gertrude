@@ -111,7 +111,7 @@ const Contact: NextPage = () => {
             <Button
               className="self-end relative z-10"
               type="submit"
-              color="primary-violet"
+              color="secondary"
               disabled={state === `ongoing` || state === `succeeded`}
             >
               <i className="fa-solid fa-arrow-right mr-3" />
