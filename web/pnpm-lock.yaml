@@ -149,8 +149,10 @@ importers:
 
   dash/keys:
     specifiers:
+      '@dash/types': workspace:*
       '@types/dash-ambient': workspace:*
-    dependencies:
+    devDependencies:
+      '@dash/types': link:../types
       '@types/dash-ambient': link:../ambient
 
   dash/types:

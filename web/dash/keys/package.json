@@ -7,7 +7,8 @@
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@dash/types": "workspace:*",
     "@types/dash-ambient": "workspace:*"
   }
 }

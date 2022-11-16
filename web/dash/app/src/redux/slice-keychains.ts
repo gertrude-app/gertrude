@@ -1,12 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
-import { newKeyState, convert } from '@dash/keys';
+import { newKeyState, convert, keyForUnlockRequest } from '@dash/keys';
 import type { UnlockRequest } from '@dash/types';
 import type { EditKey, Keychain, KeyRecord } from '@dash/keys';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
 import Result from '../api/Result';
-import { keyForUnlockRequest } from '../lib/unlock-key';
 import { commit, editable, Req, toEditableMap } from './helpers';
 import { createResultThunk } from './thunk';
 import * as empty from './empty';

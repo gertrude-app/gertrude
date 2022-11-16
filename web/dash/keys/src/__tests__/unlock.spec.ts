@@ -1,6 +1,6 @@
 import { test, describe, expect } from 'vitest';
-import type { Key } from '@dash/keys';
-import { keyForUnlockRequest, registrableDomain } from '../unlock-key';
+import type { Key } from '../types';
+import { keyForUnlockRequest, registrableDomain } from '../unlock';
 
 describe(`keyForUnlockRequest()`, () => {
   const cases: Array<[Parameters<typeof keyForUnlockRequest>[0], Key]> = [
