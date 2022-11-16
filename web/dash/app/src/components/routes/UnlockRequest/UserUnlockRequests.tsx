@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Loading, ListUnlockRequests, ApiErrorMessage } from '@dash/components';
-import * as typesafe from '../../../lib/typesafe';
+import { typesafe } from '@shared/ts-utils';
 import { useDispatch, useSelector } from '../../../redux/hooks';
 import { getUserUnlockRequests } from '../../../redux/slice-unlock-requests';
 

@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { Loading, EditKeychain, ApiErrorMessage } from '@dash/components';
 import { toKeyRecord } from '@dash/keys';
+import { typesafe } from '@shared/ts-utils';
 import type { QueryProps } from '../../redux/store';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { isDirty, original, Query, Req } from '../../redux/helpers';
-import * as typesafe from '../../lib/typesafe';
 import useApps from '../../hooks/apps';
 import {
   fetchAdminKeychain,
