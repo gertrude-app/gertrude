@@ -26,7 +26,7 @@ const UnlockRequestCard: React.FC<Props> = ({
   createdAt,
 }) => (
   <div
-    className={cx(`flex flex-col bg-white border p-4 rounded-xl shadow-lg max-w-3xl`, {
+    className={cx(`flex flex-col bg-white border p-4 rounded-xl max-w-3xl`, {
       'border-red-600/30': status === Api.RequestStatus.rejected,
       'border-green-700/40': status === Api.RequestStatus.accepted,
     })}

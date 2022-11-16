@@ -13,7 +13,7 @@ type Props = {
 };
 
 const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) => (
-  <DashboardWidget inset className={className}>
+  <DashboardWidget className={className}>
     <WidgetTitle icon="unlock" text="Unlock requests" />
     <div className="space-y-5">
       {writable(unlockRequests)
