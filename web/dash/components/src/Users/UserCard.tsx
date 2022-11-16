@@ -2,6 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import { Link } from 'react-router-dom';
 import { inflect } from '@dash/utils';
+import { Button } from '@shared/components';
 import type { Subcomponents } from '@dash/types';
 import UserDevice from './UserDevice';
 
@@ -26,53 +27,44 @@ const UserCard: React.FC<Props> = ({
   keystrokesEnabled,
   addDevice,
 }) => (
-  <div className="rounded-xl border flex flex-col justify-between shadow-lg w-full bg-white sm:min-w-[400px]">
+  <div className="rounded-xl border-[0.5px] flex flex-col justify-between shadow-lg w-full bg-white sm:min-w-[400px]">
     <div className="p-5">
-      <h1 className="text-3xl font-black text-gray-700 m-2 pb-4 mb-6 border-b">{name}</h1>
-      <div className="flex items-center mt-3 ml-2">
-        <i className="fa fa-key text-gray-400 text-lg" />
-        <h3 className="ml-3 text-gray-600">
-          <span className="text-lg font-bold">{numKeychains}</span>
-          {` `}
-          {inflect(`keychain`, numKeychains)},{` `}
-          <span className="text-lg font-bold">{numKeys}</span>
-          {` `}
-          {inflect(`key`, numKeys)}
-        </h3>
-      </div>
-      <div className="flex items-center mt-1 ml-2">
-        <i className="fa fa-camera text-gray-400" />
-        <h3 className="text-gray-600 ml-3">
-          Screenshots:{` `}
-          <span
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-black text-gray-700 mr-3">{name}</h1>
+        <div className="flex items-center space-x-4">
+          <div
             className={cx(
-              `text-lg font-bold`,
-              screenshotsEnabled ? `text-violet-600` : `text-gray-600`,
+              `w-9 h-9 rounded-full flex justify-center items-center text-lg`,
+              screenshotsEnabled
+                ? `bg-violet-200 text-violet-600`
+                : `bg-gray-100 text-gray-300`,
             )}
           >
-            {screenshotsEnabled ? `enabled` : `disabled`}
-          </span>
-        </h3>
-      </div>
-      <div className="flex items-center my-1 ml-2">
-        <i className="fa fa-keyboard text-gray-400" />
-        <h3 className="text-gray-600 ml-3">
-          Keystrokes:{` `}
-          <span
+            <i className="fa-solid fa-camera" />
+          </div>
+          <div
             className={cx(
-              `text-lg font-bold`,
-              keystrokesEnabled ? `text-violet-600` : `text-gray-600`,
+              `w-9 h-9 rounded-full flex justify-center items-center text-lg`,
+              keystrokesEnabled
+                ? `bg-violet-200 text-violet-600`
+                : `bg-gray-100 text-gray-300`,
             )}
           >
-            {keystrokesEnabled ? `monitored` : `not monitored`}
-          </span>
-        </h3>
+            <i className="fa-solid fa-keyboard" />
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-start items-center mb-4 mt-0.5">
+        <p className="text-gray-400">
+          <span className="font-medium text-gray-500">{numKeychains}</span> keychains •{` `}
+          <span className="font-medium text-gray-500">{numKeys}</span> keys
+        </p>
       </div>
       {devices.length ? (
         <>
           <div className="text-lg mt-4 -mb-4">
-            <p>
-              <span className="text-xl font-bold">{devices.length}</span>
+            <p className="text-gray-500">
+              <span className="text-xl font-bold text-gray-600">{devices.length}</span>
               {` `}
               {inflect(`device`, devices.length)}:
             </p>
@@ -95,30 +87,32 @@ const UserCard: React.FC<Props> = ({
           </h2>
         </div>
       )}
-      <div className="flex justify-center mt-2">
-        <button
+      <div className="flex justify-center my-3">
+        <Button
+          type="button"
+          color="secondary"
           onClick={addDevice}
-          className="mt-1 text-violet-600 px-7 py-2 rounded-lg hover:bg-gray-100 self-center transition duration-100"
+          small
+          className="mt-2"
         >
-          <i className="fa fa-plus mr-2" />
-          Add device
-        </button>
+          <i className="fa-solid fa-plus mr-2" /> Add device
+        </Button>
       </div>
     </div>
-    <div className="border-t flex bg-gray-100 rounded-b-xl divide-x divide-gray-200 hover:divide-gray-300/80">
+    <div className="border-t flex rounded-b-xl divide-x divide-gray-200 hover:divide-gray-300/80">
       <Link
         to={id}
-        className="ScrollTop w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-200 rounded-bl-xl"
+        className="ScrollTop transition duration-100 w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-50 rounded-bl-xl"
       >
         <i className="fa fa-pen text-sm mr-3 text-gray-600" aria-hidden="true" />
-        <h2 className="text-gray-500 text-[16px] tracking-wide">Edit</h2>
+        <h2 className="text-gray-500 text-lg tracking-wide">Edit</h2>
       </Link>
       <Link
         to={`${id}/activity`}
-        className="ScrollTop w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-200 rounded-br-xl"
+        className="ScrollTop transition duration-100 w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-50 rounded-br-xl"
       >
         <i className="fa fa-binoculars text-lg mr-3 text-gray-600" aria-hidden="true" />
-        <span className="text-gray-500 text-[16px] tracking-wide">Activity</span>
+        <span className="text-gray-500 text-lg tracking-wide">Activity</span>
       </Link>
     </div>
   </div>

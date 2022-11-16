@@ -71,5 +71,5 @@ export const Warning = () => <ButtonStory color="warning" />;
 export const Disabled = () => <ButtonStory color="warning" disabled />;
 
 function bgColor(color: ButtonColor): string {
-  return color.includes('on-violet-bg') ? 'bg-violet-500' : 'bg-white';
+  return color.includes(`on-violet-bg`) ? `bg-violet-500` : `bg-white`;
 }

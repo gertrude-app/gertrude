@@ -38,7 +38,7 @@ const Users: React.FC<Props> = ({
             <Button
               type="link"
               to="/users/new"
-              color="primary-violet"
+              color="primary"
               className="self-center mb-16"
             >
               <i className="fa fa-plus mr-4" />
