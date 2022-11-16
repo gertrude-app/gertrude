@@ -56,7 +56,8 @@ const UserCard: React.FC<Props> = ({
       </div>
       <div className="flex justify-start items-center mb-4 mt-0.5">
         <p className="text-gray-400">
-          <span className="font-medium text-gray-500">{numKeychains}</span> keychains •{` `}
+          <span className="font-medium text-gray-500">{numKeychains}</span> keychains •
+          {` `}
           <span className="font-medium text-gray-500">{numKeys}</span> keys
         </p>
       </div>
