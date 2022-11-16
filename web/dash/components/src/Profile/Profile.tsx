@@ -6,7 +6,7 @@ import type {
   Trigger,
   SubscriptionStatus,
   PendingNotificationMethod,
-  SubcomponentsOmit,
+  Subcomponents,
   ConfirmableEntityAction,
   NewAdminNotificationMethodEvent,
 } from '@dash/types';
@@ -30,11 +30,8 @@ interface Props {
   status: SubscriptionStatus;
   billingPortalRequest: RequestState<string>;
   pendingMethod?: PendingNotificationMethod;
-  methods: SubcomponentsOmit<typeof NotificationMethod, 'onDelete'>;
-  notifications: SubcomponentsOmit<
-    typeof NotificationCard,
-    'onDelete' | 'cancelEdit' | 'startEdit' | 'updateMethod' | 'updateTrigger' | 'onSave'
-  >;
+  methods: Subcomponents<typeof NotificationMethod>;
+  notifications: Subcomponents<typeof NotificationCard>;
   deleteNotification: ConfirmableEntityAction;
   deleteMethod: ConfirmableEntityAction;
   updateNotification(update: NotificationUpdate): unknown;

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import type { SubcomponentsOmit } from '@dash/types';
+import type { Subcomponents } from '@dash/types';
 import EmptyState from '../EmptyState';
 import PageHeading from '../PageHeading';
 import ConnectModal from './ConnectDeviceModal';
 import UserCard from './UserCard';
 
 type Props = {
-  users: SubcomponentsOmit<typeof UserCard, 'addDevice'>;
+  users: Subcomponents<typeof UserCard>;
   addDeviceRequest?: RequestState<number>;
   startAddDevice(userId: UUID): unknown;
   dismissAddDevice(): unknown;
