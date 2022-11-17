@@ -1,6 +1,20 @@
 import { it, describe, expect } from 'vitest';
+import type { UnlockRequestCreateKeyData } from '@dash/types';
 import type { KeyRecord } from '../types';
 import { convert } from '..';
+
+describe(`convert.unlockRequestToState()`, () => {
+  it(`sets the unlockRequestAddress`, () => {
+    const unlockRequest: UnlockRequestCreateKeyData = {
+      url: `https://xyz.cloudfront.net/jim/jam.js`,
+      appCategories: [`browser`],
+      appBundleId: `com.brave`,
+      appSlug: `brave`,
+    };
+    const state = convert.unlockRequestToState(`keyId`, `keychainId`, unlockRequest);
+    expect(state.unlockRequestAddress).toBe(`https://xyz.cloudfront.net/jim/jam.js`);
+  });
+});
 
 describe(`convert.toState()`, () => {
   it(`sets appIdentificationType correctly for bundleId-only skeleton key`, () => {

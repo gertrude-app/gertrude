@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import cx from 'classnames';
+import { domain } from '@dash/keys';
+import { notNullish } from '@shared/ts-utils';
 
 interface Props {
   address: string;
@@ -13,36 +15,48 @@ const SubdomainDemo: React.FC<Props> = ({ address, addressType }) => {
   ) {
     return null;
   }
+
+  const registrable = domain.registrable(address);
+  const subdomain = domain.subdomain(address);
+  const hostname = domain.hostname(address) ?? address;
   return (
     <div className="flex justify-end">
       {addressType === `standard` && (
-        <p className="text-right max-w-lg text-sm text-gray-400 my-2 overflow-hidden">
-          Allows any subdomain of{` `}
-          <DemoURL domain={address} subdomains={[``]} />, for example
-          {` `}
-          <DemoURL
-            domain={address}
-            rotate
-            subdomains={[`images`, `cdn`, `static`, `api`, `docs`]}
+        <div className="text-right text-sm text-gray-400 mb-2 mt-3 overflow-hidden">
+          <div className="mb-1">
+            Allows all subdomains of{` `}
+            <Address testId="standard-registrable">{registrable}</Address>
+            &mdash; for example:
+          </div>
+          <RotatingSubdomain
+            domain={registrable ?? address}
             blocked={false}
+            subdomains={[subdomain, `www`, `images`, `cdn`, `static`, `api`].filter(
+              notNullish,
+            )}
           />
-        </p>
+        </div>
       )}
       {addressType === `strict` && (
-        <p className="text-right max-w-lg text-sm text-gray-400 my-2 overflow-hidden">
-          Only allows access to{` `}
-          <DemoURL blocked={false} domain={address} subdomains={[`www`]} />. Subdomains
-          like
-          {` `}
-          <DemoURL
-            domain={address}
-            rotate
+        <div className="text-right text-sm text-gray-400 mb-2 mt-3 overflow-hidden">
+          <div className="mb-1">
+            Only allows access to{` `}
+            {subdomain || (registrable ?? address).length > 35 ? (
+              <Address testId="strict-hostname">{hostname}</Address>
+            ) : (
+              <>
+                <Address testId="strict-apex">{registrable ?? address}</Address> and{` `}
+                <Address testId="strict-www">www.{registrable ?? address}</Address>
+              </>
+            )}
+            &mdash; subdomains such as these are blocked:
+          </div>
+          <RotatingSubdomain
+            domain={registrable ?? address}
             subdomains={[`images`, `cdn`, `static`, `api`, `docs`]}
             blocked
           />
-          {` `}
-          are blocked
-        </p>
+        </div>
       )}
     </div>
   );
@@ -52,14 +66,12 @@ export default SubdomainDemo;
 
 interface RotatingSubdomainProps {
   domain: string;
-  rotate?: boolean;
   subdomains: string[];
   blocked?: boolean;
 }
 
-const DemoURL: React.FC<RotatingSubdomainProps> = ({
+const RotatingSubdomain: React.FC<RotatingSubdomainProps> = ({
   domain,
-  rotate = false,
   subdomains,
   blocked,
 }) => {
@@ -74,43 +86,45 @@ const DemoURL: React.FC<RotatingSubdomainProps> = ({
   }, [curIndex, subdomains.length]);
 
   useEffect(() => {
-    const id = setTimeout(shift, 2500);
+    const id = setTimeout(shift, 2000);
     return () => {
       clearTimeout(id);
     };
   }, [curIndex, shift]);
 
   return (
-    <span className="font-mono text-gray-500 px-1 rounded">
+    <Address>
       <span
-        className={cx(
-          `relative [transition:200ms] overflow-hidden whitespace-nowrap`,
-          rotate && `ml-12`,
-        )}
+        data-test="rotating-subdomains"
+        data-test-rotating-subdomains={subdomains.join(`,`)}
+        className="relative [transition:200ms] overflow-hidden whitespace-nowrap ml-12"
       >
-        {rotate
-          ? subdomains.map((subdomain, index) => (
-              <span
-                key={subdomain}
-                className={cx(
-                  `absolute right-0 [transition:200ms] opacity-0`,
-                  index < curIndex && `-top-5`,
-                  index === curIndex && `-top-0.5 opacity-100`,
-                  index > curIndex && `top-5`,
-                  blocked === undefined
-                    ? ``
-                    : blocked
-                    ? `text-red-600`
-                    : `text-green-600`,
-                )}
-              >
-                {subdomain}
-              </span>
-            ))
-          : subdomains[curIndex]}
+        {subdomains.filter(notNullish).map((subdomain, index) => (
+          <span
+            key={subdomain}
+            className={cx(
+              `absolute right-0 [transition:200ms] opacity-0`,
+              index < curIndex && `-top-5`,
+              index === curIndex && `-top-0.5 opacity-100`,
+              index > curIndex && `top-5`,
+              blocked === undefined ? `` : blocked ? `text-red-600` : `text-green-600`,
+            )}
+          >
+            {subdomain}
+          </span>
+        ))}
       </span>
       {subdomains[curIndex] && `.`}
       {domain}
-    </span>
+    </Address>
   );
 };
+
+const Address: React.FC<{ children: React.ReactNode; testId?: string }> = ({
+  children,
+  testId,
+}) => (
+  <span data-test={testId} className="font-mono text-gray-500 px-1 break-all">
+    {children}
+  </span>
+);

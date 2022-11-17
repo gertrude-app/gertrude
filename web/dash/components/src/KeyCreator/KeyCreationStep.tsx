@@ -113,6 +113,7 @@ const KeyCreationStep: React.FC<Props> = ({
                       color="primary-violet"
                       small
                       disabled={!canAdvance}
+                      testId="keycreator-next-step"
                     >
                       Next <i className="fa-solid fa-arrow-right ml-2" />
                     </Button>

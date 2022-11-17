@@ -1,4 +1,4 @@
-import type { AppScope, Key } from './types';
+import type { Key } from './types';
 import * as EditKey from './edit';
 
 export function newKeyState(id: UUID, keychainId: UUID): EditKey.State {
@@ -20,13 +20,6 @@ export function newKeyState(id: UUID, keychainId: UUID): EditKey.State {
     expiration: undefined,
     comment: undefined,
   };
-}
-
-export function scopeType(key: Key): AppScope['type'] {
-  if (key.type === `skeleton`) {
-    return `single`;
-  }
-  return key.scope.type;
 }
 
 export function target(key: Key): string {

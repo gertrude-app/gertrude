@@ -1,0 +1,44 @@
+{
+  "data": {
+    "keychain": {
+      "keyRecords": [
+        {
+          "id": "28c6dae2-7f7b-4bc0-95b6-532e87d52858",
+          "key": {
+            "data": {
+              "scope": { "type": "unrestricted", "__typename": "UnrestrictedData" },
+              "__typename": "DomainData",
+              "type": "domain",
+              "domain": "stackunderflow.com"
+            },
+            "__typename": "Key"
+          },
+          "comment": "here is a lovely comment",
+          "__typename": "KeyRecord",
+          "expiration": null
+        },
+        {
+          "id": "47c149f2-6587-435e-97f0-25a4d69992a7",
+          "key": {
+            "data": {
+              "scope": { "type": "webBrowsers", "__typename": "WebBrowsersData" },
+              "__typename": "DomainData",
+              "type": "domain",
+              "domain": "gitclub.com"
+            },
+            "__typename": "Key"
+          },
+          "comment": null,
+          "__typename": "KeyRecord",
+          "expiration": null
+        }
+      ],
+      "authorId": "be000000-0000-0000-0000-000000000000",
+      "id": "123",
+      "isPublic": false,
+      "description": null,
+      "__typename": "Keychain",
+      "name": "Misc McStandard Keys"
+    }
+  }
+}

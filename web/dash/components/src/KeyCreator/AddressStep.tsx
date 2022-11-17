@@ -48,6 +48,7 @@ const AddressStep: React.FC<Props> = ({
   >
     <TextInput
       type="url"
+      testId="key-address"
       label="Web address:"
       value={address}
       setValue={(updated) => update({ type: `setAddress`, to: updated })}
@@ -68,6 +69,7 @@ const AddressStep: React.FC<Props> = ({
       <div className="flex items-center justify-end">
         <label className="mr-2 text-gray-600 font-medium">Address type:</label>
         <SelectMenu<EditKey.AddressType>
+          testId="address-type"
           options={addressTypeOptions(showAdvancedAddressOptions)}
           selectedOption={addressType}
           setSelected={(type) => update({ type: `setAddressType`, to: type })}

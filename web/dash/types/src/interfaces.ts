@@ -59,3 +59,8 @@ export interface UnlockRequest {
   requestProtocol?: string;
   createdAt: string;
 }
+
+export type UnlockRequestCreateKeyData = Pick<
+  UnlockRequest,
+  'url' | 'domain' | 'ipAddress' | 'appCategories' | 'appBundleId' | 'appSlug'
+>;

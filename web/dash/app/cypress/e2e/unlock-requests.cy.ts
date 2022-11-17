@@ -9,15 +9,14 @@ describe(`unlock request flow`, () => {
   let keychainsRes: typeof selectableKeychainsFixture;
 
   beforeEach(() => {
+    cy.simulateLoggedIn();
+
     fetchRes = JSON.parse(JSON.stringify(unlockRequestFixture));
     fetchRes.data.unlockRequest.status = `pending`;
     fetchRes.data.unlockRequest.id = `2`;
     userRes = JSON.parse(JSON.stringify(userFixture));
     userRes.data.user.id = `1`;
     keychainsRes = JSON.parse(JSON.stringify(selectableKeychainsFixture));
-
-    localStorage.setItem(`admin_id`, `be000000-0000-0000-0000-000000000000`);
-    localStorage.setItem(`admin_token`, `be000000-0000-0000-0000-000000000000`);
 
     cy.intercept(`/graphql/dashboard`, (req) => {
       switch (req.body.operationName) {

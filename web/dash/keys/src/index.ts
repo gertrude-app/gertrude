@@ -4,3 +4,4 @@ export * as EditKey from './edit';
 export * from './types';
 export * from './utils';
 export * from './unlock';
+export * as domain from './domain';
