@@ -29,7 +29,10 @@ const AddressTypeHint: React.FC<Props> = ({ address, type }) => {
     return (
       <div
         data-test="invalid-domain-hint"
-        className="mt-4 min-h-[47px] text-right text-gray-400 flex justify-end items-center"
+        className={cx(
+          `mt-4 min-h-[47px] text-right text-gray-400 flex justify-end items-center`,
+          address.trim() === `` && `opacity-0`,
+        )}
       >
         <i className="fas opacity-60 fa-exclamation-triangle mr-2" />
         invalid address
