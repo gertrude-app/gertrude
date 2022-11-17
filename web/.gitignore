@@ -3,7 +3,7 @@
 **/.env*
 ;w
 w;
-Session.vim
+Session.vim*
 node_modules/
 storybook/storybook-static/
 dash/app/build
