@@ -1,22 +1,23 @@
 /// <reference types="cypress" />
-import selectableKeychainsFixture from '../fixtures/selectable-keychains.json';
-import unlockRequestFixture from '../fixtures/unlock-request.json';
-import userFixture from '../fixtures/user.json';
+import GetSelectableKeychains from '../fixtures/GetSelectableKeychains.json';
+import UnlockReqApp from '../fixtures/UnlockRequest-AppKey.json';
+import UnlockReqWebsite from '../fixtures/UnlockRequest-WebsiteKey.json';
+import GetUser from '../fixtures/GetUser.json';
 
 describe(`unlock request flow`, () => {
-  let fetchRes: typeof unlockRequestFixture;
-  let userRes: typeof userFixture;
-  let keychainsRes: typeof selectableKeychainsFixture;
+  let fetchRes: typeof UnlockReqApp;
+  let userRes: typeof GetUser;
+  let keychainsRes: typeof GetSelectableKeychains;
 
   beforeEach(() => {
     cy.simulateLoggedIn();
 
-    fetchRes = JSON.parse(JSON.stringify(unlockRequestFixture));
+    fetchRes = JSON.parse(JSON.stringify(UnlockReqApp));
     fetchRes.data.unlockRequest.status = `pending`;
     fetchRes.data.unlockRequest.id = `2`;
-    userRes = JSON.parse(JSON.stringify(userFixture));
+    userRes = JSON.parse(JSON.stringify(GetUser));
     userRes.data.user.id = `1`;
-    keychainsRes = JSON.parse(JSON.stringify(selectableKeychainsFixture));
+    keychainsRes = JSON.parse(JSON.stringify(GetSelectableKeychains));
 
     cy.intercept(`/graphql/dashboard`, (req) => {
       switch (req.body.operationName) {
@@ -162,5 +163,34 @@ describe(`unlock request flow`, () => {
     cy.visit(`/users/1/unlock-requests/2/deny`);
     cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2`);
     cy.contains(`rejected`);
+  });
+
+  it(`improves ux by leveraging unlock request source`, () => {
+    fetchRes = JSON.parse(JSON.stringify(UnlockReqWebsite));
+    cy.visit(`/users/1/unlock-requests/2/select-keychain`);
+    cy.contains(`Music Theory`).click();
+    cy.contains(`Review key`).click();
+    cy.contains(`jwpcdn.com`).click();
+
+    cy.testId(`unlock-request-src`).should(
+      `contain`,
+      fetchRes.data.unlockRequest.networkDecision.url,
+    );
+
+    cy.testId(`address-type`).within(() => {
+      cy.get(`button`).click();
+      cy.contains(`Strict`).click();
+    });
+
+    // we should get the full hostname with subdomain
+    cy.testId(`key-address`).should(`have.value`, `music.jwpcdn.com`);
+
+    cy.testId(`address-type`).within(() => {
+      cy.get(`button`).click();
+      cy.contains(`Standard`).click();
+    });
+
+    // hostname is eliminated again for a simpler `standard` type
+    cy.testId(`key-address`).should(`have.value`, `jwpcdn.com`);
   });
 });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { EditKey, validate } from '@dash/keys';
-import { TextInput } from '@shared/components';
+import { Label, TextInput } from '@shared/components';
 import { SelectMenu, Toggle } from '../Forms';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
@@ -14,6 +14,7 @@ interface Props {
   address: string;
   addressType: 'strict' | 'standard' | 'ip' | 'domainRegex';
   showAdvancedAddressOptions: boolean;
+  unlockRequestSource?: string;
   update(event: EditKey.Event): unknown;
 }
 
@@ -25,6 +26,7 @@ const AddressStep: React.FC<Props> = ({
   addressType,
   showAdvancedAddressOptions,
   update,
+  unlockRequestSource,
 }) => (
   <KeyCreationStep
     mode={mode}
@@ -46,7 +48,18 @@ const AddressStep: React.FC<Props> = ({
     activeStep={activeStep}
     canAdvance={validate.address(address, addressType)}
   >
+    {unlockRequestSource && (
+      <div className="-mt-4 mb-3" data-test="unlock-request-src">
+        <Label>For blocked request: </Label>
+        <UserInputText small>{unlockRequestSource}</UserInputText>
+      </div>
+    )}
     <TextInput
+      // force a re-render when changing type w/ unlock request
+      // present so we can programatically update the value to
+      // include or exclude the subdomain from the request,
+      // discarding what the TextInput already has in local state
+      key={unlockRequestSource ? addressType : `key-address`}
       type="url"
       testId="key-address"
       label="Web address:"

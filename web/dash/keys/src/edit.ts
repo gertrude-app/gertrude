@@ -23,7 +23,7 @@ export type State = {
   keychainId: UUID;
   isNew: boolean;
   keyType?: Type;
-  readonly unlockRequestAddress?: string;
+  unlockRequestAddress?: string;
   address: string;
   addressType: AddressType;
   addressScope: AddressScope;

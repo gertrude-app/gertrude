@@ -100,8 +100,4 @@ describe(`create key flow`, () => {
     cy.testId(`key-address`).type(`foo`);
     cy.testId(`keycreator-next-step`).should(`be.disabled`);
   });
-
-  // clicking escape in create key flow is trying to SAVE the key...
-  // show unlockRequestAddress as reference
-  // handle toggling strictness with untouched unlockRequestAddress, should not lose subdomain
 });

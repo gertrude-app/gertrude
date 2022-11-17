@@ -1,5 +1,5 @@
 import { isoFromDateInput } from '@dash/datetime';
-import { EditKey } from '@dash/keys';
+import { domain, EditKey } from '@dash/keys';
 
 export default function reducer(state: EditKey.State, action: EditKey.Event): void {
   if (action.type === `nextStepClicked`) {
@@ -114,7 +114,17 @@ export default function reducer(state: EditKey.State, action: EditKey.Event): vo
       break;
 
     case `setAddressType`:
+      if (state.addressType === action.to) {
+        break;
+      }
       state.addressType = action.to;
+      if (state.unlockRequestAddress) {
+        if (action.to === `strict`) {
+          state.address = domain.hostname(state.unlockRequestAddress) ?? state.address;
+        } else if (action.to === `standard`) {
+          state.address = domain.registrable(state.unlockRequestAddress) ?? state.address;
+        }
+      }
       break;
 
     case `setExpirationDate`:
