@@ -1,19 +1,40 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import cx from 'classnames';
-import { domain } from '@dash/keys';
+import { domain, validate } from '@dash/keys';
 import { notNullish } from '@shared/ts-utils';
 
 interface Props {
+  type: 'strict' | 'standard' | 'ip' | 'domainRegex';
   address: string;
-  addressType: 'strict' | 'standard' | 'ip' | 'domainRegex';
 }
 
-const SubdomainDemo: React.FC<Props> = ({ address, addressType }) => {
-  if (
-    (addressType !== `strict` && addressType !== `standard`) ||
-    !address.includes(`.`)
-  ) {
+const AddressTypeHint: React.FC<Props> = ({ address, type }) => {
+  if (domain.isIpAddress(address) && type !== `ip`) {
+    return (
+      <div data-test="incorrect-ip-hint" className="mt-4 text-right text-red-700">
+        Looks like you've entered an IP address. Enable <b>Advanced</b> mode and set the
+        {` `}
+        <b>Address type</b> above to <b className="whitespace-nowrap">IP address</b>
+        {` `}
+        if that was your intention.
+      </div>
+    );
+  }
+
+  if (![`strict`, `standard`].includes(type)) {
     return null;
+  }
+
+  if (!validate.address(address, type)) {
+    return (
+      <div
+        data-test="invalid-domain-hint"
+        className="mt-4 min-h-[47px] text-right text-gray-400 flex justify-end items-center"
+      >
+        <i className="fas opacity-60 fa-exclamation-triangle mr-2" />
+        invalid address
+      </div>
+    );
   }
 
   const registrable = domain.registrable(address);
@@ -21,7 +42,7 @@ const SubdomainDemo: React.FC<Props> = ({ address, addressType }) => {
   const hostname = domain.hostname(address) ?? address;
   return (
     <div className="flex justify-end">
-      {addressType === `standard` && (
+      {type === `standard` && (
         <div className="text-right text-sm text-gray-400 mb-2 mt-3 overflow-hidden">
           <div className="mb-1">
             Allows all subdomains of{` `}
@@ -37,7 +58,7 @@ const SubdomainDemo: React.FC<Props> = ({ address, addressType }) => {
           />
         </div>
       )}
-      {addressType === `strict` && (
+      {type === `strict` && (
         <div className="text-right text-sm text-gray-400 mb-2 mt-3 overflow-hidden">
           <div className="mb-1">
             Only allows access to{` `}
@@ -62,7 +83,7 @@ const SubdomainDemo: React.FC<Props> = ({ address, addressType }) => {
   );
 };
 
-export default SubdomainDemo;
+export default AddressTypeHint;
 
 interface RotatingSubdomainProps {
   domain: string;

@@ -1,4 +1,5 @@
 import { parseDomain, fromUrl, ParseResultType } from 'parse-domain';
+export { fromUrl };
 
 export function registrable(input: string): string | null {
   const parsed = parse(input);
@@ -34,6 +35,18 @@ export function hostname(input: string): string | null {
     return `${parsed.subdomain}.${hostname}`;
   }
   return hostname;
+}
+
+export function isIpAddress(input: string): boolean {
+  const parseResult = parseDomain(
+    input.match(/^https?:\/\//) ? fromUrl(input) : input.replace(/:\d+/, ``),
+  );
+  switch (parseResult?.type) {
+    case ParseResultType.Ip:
+      return true;
+    default:
+      return false;
+  }
 }
 
 function parse(

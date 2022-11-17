@@ -5,3 +5,4 @@ export * from './types';
 export * from './utils';
 export * from './unlock';
 export * as domain from './domain';
+export * as validate from './validate';

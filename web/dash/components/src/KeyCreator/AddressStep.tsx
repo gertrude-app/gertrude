@@ -1,11 +1,11 @@
 import React from 'react';
-import { EditKey } from '@dash/keys';
+import { EditKey, validate } from '@dash/keys';
 import { TextInput } from '@shared/components';
 import { SelectMenu, Toggle } from '../Forms';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';
-import SubdomainDemo from './SubdomainDemo';
+import AddressTypeHint from './AddressTypeHint';
 
 interface Props {
   keyType: 'app' | 'website';
@@ -44,7 +44,7 @@ const AddressStep: React.FC<Props> = ({
         : EditKey.Step.AppKey_Advanced_SetAddress
     }
     activeStep={activeStep}
-    canAdvance={address.trim() !== ``}
+    canAdvance={validate.address(address, addressType)}
   >
     <TextInput
       type="url"
@@ -76,7 +76,7 @@ const AddressStep: React.FC<Props> = ({
           deemphasized
         />
       </div>
-      <SubdomainDemo address={address} addressType={addressType} />
+      <AddressTypeHint address={address} type={addressType} />
     </div>
   </KeyCreationStep>
 );

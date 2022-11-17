@@ -83,9 +83,25 @@ describe(`create key flow`, () => {
     );
   });
 
+  it(`gives useful hint when entering IP address wrongly`, () => {
+    cy.visit(`/keychains/123`);
+    cy.contains(`Add new key`).click();
+    cy.contains(`Grant access to a specific website`).click();
+    cy.testId(`keycreator-next-step`).click();
+    cy.testId(`key-address`).type(`123.146.189.123`);
+    cy.testId(`incorrect-ip-hint`).should(`exist`);
+  });
+
+  it(`prevents proceeding and gives useful hint when address invalid`, () => {
+    cy.visit(`/keychains/123`);
+    cy.contains(`Add new key`).click();
+    cy.contains(`Grant access to a specific website`).click();
+    cy.testId(`keycreator-next-step`).click();
+    cy.testId(`key-address`).type(`foo`);
+    cy.testId(`keycreator-next-step`).should(`be.disabled`);
+  });
+
+  // clicking escape in create key flow is trying to SAVE the key...
   // show unlockRequestAddress as reference
   // handle toggling strictness with untouched unlockRequestAddress, should not lose subdomain
-  // handle validation, non-ip, non-registrable should not be valid
-  // don't show rotating subdomain area if not valid
-  // don't show next button enabled if not valid
 });
