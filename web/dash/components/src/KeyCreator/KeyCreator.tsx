@@ -30,6 +30,7 @@ const KeyCreator: React.FC<Props> = ({
   appSlug,
   update,
   isNew,
+  unlockRequestAddress,
 }) => (
   <div className="min-w-[340px] xs:min-w-[475px] sm:min-w-[550px]">
     <KeyTypeStep
@@ -48,6 +49,7 @@ const KeyCreator: React.FC<Props> = ({
         address={address}
         addressType={addressType}
         showAdvancedAddressOptions={showAdvancedAddressOptions}
+        unlockRequestSource={unlockRequestAddress}
       />
     )}
 
@@ -94,6 +96,7 @@ const KeyCreator: React.FC<Props> = ({
         address={address}
         addressType={addressType}
         showAdvancedAddressOptions={showAdvancedAddressOptions}
+        unlockRequestSource={unlockRequestAddress}
       />
     )}
 

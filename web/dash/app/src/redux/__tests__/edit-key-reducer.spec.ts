@@ -1,5 +1,5 @@
 import { expect, test, describe, beforeEach } from 'vitest';
-import { newKeyState, EditKey } from '@dash/keys';
+import { newKeyState, EditKey, convert } from '@dash/keys';
 import reducer from '../edit-key-reducer';
 
 describe(`editKeyReducer()`, () => {
@@ -7,6 +7,29 @@ describe(`editKeyReducer()`, () => {
 
   beforeEach(() => {
     state = newKeyState(`keyid`, `keychainId`);
+  });
+
+  test(`toggles strict/standard address type when unlock request address present`, () => {
+    state = convert.unlockRequestToState(`keyid`, `keychainId`, {
+      url: `https://cdn.foobar.com/jim/jam.js`,
+      appCategories: [`browser`],
+      appBundleId: `com.brave`,
+      appSlug: `brave`,
+    });
+    state.activeStep = EditKey.Step.WebsiteKey_SetAddress;
+    expect(state.address).toBe(`foobar.com`);
+
+    // toggle to strict, we they shouldn't have to restore the `cdn.` subdomain
+    reducer(state, { type: `setAddressType`, to: `strict` });
+
+    expect(state.address).toBe(`cdn.foobar.com`);
+    expect(state.addressType).toBe(`strict`);
+
+    // back to standard
+    reducer(state, { type: `setAddressType`, to: `standard` });
+
+    expect(state.address).toBe(`foobar.com`);
+    expect(state.addressType).toBe(`standard`);
   });
 
   test(`changing keyType`, () => {

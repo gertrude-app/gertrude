@@ -6,7 +6,6 @@ import type { EditKey, Keychain, KeyRecord } from '@dash/keys';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
 import Result from '../api/Result';
-import { keyForUnlockRequest } from '../lib/unlock-key';
 import { commit, editable, Req, toEditableMap } from './helpers';
 import { createResultThunk } from './thunk';
 import * as empty from './empty';
@@ -90,11 +89,11 @@ export const slice = createSlice({
       state,
       { payload }: PayloadAction<{ keychainId: UUID; unlockRequest: UnlockRequest }>,
     ) {
-      state.editingKey = convert.toState({
-        id: uuid(),
-        keychainId: payload.keychainId,
-        key: keyForUnlockRequest(payload.unlockRequest),
-      });
+      state.editingKey = convert.unlockRequestToState(
+        uuid(),
+        payload.keychainId,
+        payload.unlockRequest,
+      );
     },
     editKeyModalDismissed(state) {
       delete state.editingKey;

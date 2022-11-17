@@ -1,8 +1,22 @@
 import { test, describe, expect } from 'vitest';
-import type { Key } from '@dash/keys';
-import { keyForUnlockRequest, registrableDomain } from '../unlock-key';
+import type { Key } from '../types';
+import { keyForUnlockRequest } from '../unlock';
 
 describe(`keyForUnlockRequest()`, () => {
+  test(`dangerous domain set to strict mode`, () => {
+    const key = keyForUnlockRequest({
+      url: `https://xyz.cloudfront.net/jim/jam.js`,
+      appCategories: [`browser`],
+      appBundleId: `com.brave`,
+      appSlug: `brave`,
+    });
+    expect(key).toMatchObject({
+      type: `domain`, // <-- NOT `anySubdomain`
+      domain: `xyz.cloudfront.net`,
+      scope: { type: `webBrowsers` },
+    });
+  });
+
   const cases: Array<[Parameters<typeof keyForUnlockRequest>[0], Key]> = [
     [
       {
@@ -140,7 +154,7 @@ describe(`keyForUnlockRequest()`, () => {
       },
       {
         type: `anySubdomain`,
-        domain: `iadsdk.apple.com`,
+        domain: `apple.com`,
         scope: {
           type: `single`,
           single: {
@@ -154,19 +168,5 @@ describe(`keyForUnlockRequest()`, () => {
 
   test.each(cases)(`unlock request -> create key`, (decision, expectedKey) => {
     expect(keyForUnlockRequest(decision)).toMatchObject(expectedKey);
-  });
-});
-
-describe(`registrableDomain()`, () => {
-  const cases: [string, string][] = [
-    [`example.com`, `example.com`],
-    [`EXAMPLE.com`, `example.com`],
-    [`www.example.com`, `example.com`],
-    [`docs.example.com`, `example.com`],
-    [`www.example.co.uk`, `example.co.uk`],
-    [`www.example.co.uk:8080`, `example.co.uk`],
-  ];
-  test.each(cases)(`extract registrable domain %s -> %s`, (input, expected) => {
-    expect(registrableDomain(input)).toMatchObject(expected);
   });
 });

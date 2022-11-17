@@ -10,6 +10,7 @@ interface Props<Value extends string> {
   setSelected(value: Value): void;
   label?: string;
   deemphasized?: boolean;
+  testId?: string;
 }
 
 function SelectMenu<Value extends string = string>({
@@ -18,9 +19,10 @@ function SelectMenu<Value extends string = string>({
   setSelected,
   label,
   deemphasized = false,
+  testId,
 }: Parameters<React.FC<Props<Value>>>[0]): ReturnType<React.FC<Props<Value>>> {
   return (
-    <Listbox value={selectedOption} onChange={setSelected}>
+    <Listbox data-test={testId} value={selectedOption} onChange={setSelected}>
       {({ open }) => (
         <div className="relative">
           {label && <Label className="w-full inline-block pb-px">{label}</Label>}

@@ -1,11 +1,11 @@
 import React from 'react';
-import { EditKey } from '@dash/keys';
-import { TextInput } from '@shared/components';
+import { EditKey, validate } from '@dash/keys';
+import { Label, TextInput } from '@shared/components';
 import { SelectMenu, Toggle } from '../Forms';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';
-import SubdomainDemo from './SubdomainDemo';
+import AddressTypeHint from './AddressTypeHint';
 
 interface Props {
   keyType: 'app' | 'website';
@@ -14,6 +14,7 @@ interface Props {
   address: string;
   addressType: 'strict' | 'standard' | 'ip' | 'domainRegex';
   showAdvancedAddressOptions: boolean;
+  unlockRequestSource?: string;
   update(event: EditKey.Event): unknown;
 }
 
@@ -25,6 +26,7 @@ const AddressStep: React.FC<Props> = ({
   addressType,
   showAdvancedAddressOptions,
   update,
+  unlockRequestSource,
 }) => (
   <KeyCreationStep
     mode={mode}
@@ -44,10 +46,22 @@ const AddressStep: React.FC<Props> = ({
         : EditKey.Step.AppKey_Advanced_SetAddress
     }
     activeStep={activeStep}
-    canAdvance={address.trim() !== ``}
+    canAdvance={validate.address(address, addressType)}
   >
+    {unlockRequestSource && (
+      <div className="-mt-4 mb-3" data-test="unlock-request-src">
+        <Label>For blocked request: </Label>
+        <UserInputText small>{unlockRequestSource}</UserInputText>
+      </div>
+    )}
     <TextInput
+      // force a re-render when changing type w/ unlock request
+      // present so we can programatically update the value to
+      // include or exclude the subdomain from the request,
+      // discarding what the TextInput already has in local state
+      key={unlockRequestSource ? addressType : `key-address`}
       type="url"
+      testId="key-address"
       label="Web address:"
       value={address}
       setValue={(updated) => update({ type: `setAddress`, to: updated })}
@@ -68,13 +82,14 @@ const AddressStep: React.FC<Props> = ({
       <div className="flex items-center justify-end">
         <label className="mr-2 text-gray-600 font-medium">Address type:</label>
         <SelectMenu<EditKey.AddressType>
+          testId="address-type"
           options={addressTypeOptions(showAdvancedAddressOptions)}
           selectedOption={addressType}
           setSelected={(type) => update({ type: `setAddressType`, to: type })}
           deemphasized
         />
       </div>
-      <SubdomainDemo address={address} addressType={addressType} />
+      <AddressTypeHint address={address} type={addressType} />
     </div>
   </KeyCreationStep>
 );

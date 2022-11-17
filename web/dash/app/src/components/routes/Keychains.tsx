@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import { Loading, ListKeychains, ApiErrorMessage } from '@dash/components';
+import { typesafe } from '@shared/ts-utils';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { original } from '../../redux/helpers';
-import * as typesafe from '../../lib/typesafe';
 import {
   keychainEntityDeleteCanceled,
   createKeychainInitiated,

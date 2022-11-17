@@ -2,13 +2,13 @@ import React, { useEffect } from 'react';
 import { Loading, ListUsers, ApiErrorMessage } from '@dash/components';
 import { isUnsaved } from '@dash/utils';
 import { Family } from '@dash/types';
+import { typesafe } from '@shared/ts-utils';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   addDeviceDismissed,
   createPendingAppConnection,
   fetchUsers,
 } from '../../redux/slice-users';
-import * as typesafe from '../../lib/typesafe';
 
 const Users: React.FC = () => {
   const dispatch = useDispatch();

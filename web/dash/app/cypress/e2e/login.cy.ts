@@ -24,9 +24,9 @@ describe(`dashboard app login`, () => {
 
   it(`handles magic-link`, () => {
     cy.visit(`/login`);
-    cy.get(`[data-test="magic-link"]`).should(`be.disabled`);
+    cy.testId(`magic-link`).should(`be.disabled`);
     cy.get(`input[name=email]`).type(`82uii.betsy-mcstandard@inbox.testmail.app`);
-    cy.get(`[data-test="magic-link"]`).should(`not.be.disabled`);
+    cy.testId(`magic-link`).should(`not.be.disabled`);
 
     // todo: would be good to test actual email/otp flow here...
   });

@@ -1,6 +1,19 @@
+import type { UnlockRequestCreateKeyData } from '@dash/types';
 import type { AppScope, Key, KeyRecord, SingleAppScope } from './types';
 import * as EditKey from './edit';
-import { newKeyState } from '.';
+import { keyForUnlockRequest, newKeyState } from '.';
+
+export function unlockRequestToState(
+  keyRecordId: UUID,
+  keychainId: UUID,
+  request: UnlockRequestCreateKeyData,
+): EditKey.State {
+  const key = keyForUnlockRequest(request);
+  return {
+    ...toState({ id: keyRecordId, keychainId, key }),
+    unlockRequestAddress: request.url ?? request.domain ?? request.ipAddress,
+  };
+}
 
 export function toState(keyRecord: KeyRecord): EditKey.State {
   const state = newKeyState(keyRecord.id, keyRecord.keychainId);

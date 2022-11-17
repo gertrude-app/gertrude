@@ -1,12 +1,8 @@
-import type { Key } from '@dash/keys';
-import type { UnlockRequest } from '@dash/types';
+import type { UnlockRequestCreateKeyData } from '@dash/types';
+import type { Key } from './types';
+import * as domain from './domain';
 
-type Request = Pick<
-  UnlockRequest,
-  'url' | 'domain' | 'ipAddress' | 'appCategories' | 'appBundleId' | 'appSlug'
->;
-
-export function keyForUnlockRequest(request: Request): Key {
+export function keyForUnlockRequest(request: UnlockRequestCreateKeyData): Key {
   let scope: Key['scope'] = { type: `webBrowsers` };
   let type: 'domain' | 'ipAddress' | 'anySubdomain' = `domain`;
   let value = ``;
@@ -38,22 +34,12 @@ export function keyForUnlockRequest(request: Request): Key {
     return { type, ipAddress: value, scope };
   }
 
-  const registrable = registrableDomain(value);
-  if (UNSAFE_DOMAINS.includes(registrable)) {
+  const registrable = domain.registrable(value);
+  if (!registrable || UNSAFE_DOMAINS.includes(registrable)) {
     return { type: `domain`, domain: value, scope };
   } else {
     return { type: `anySubdomain`, domain: registrable, scope };
   }
-}
-
-export function registrableDomain(input: string): string {
-  const domain = input.toLowerCase().replace(/:\d+$/, ``);
-  const parts = domain.split(`.`);
-  if (parts.length < 3) {
-    return domain;
-  }
-  parts.shift();
-  return parts.join(`.`);
 }
 
 const UNSAFE_DOMAINS = [
@@ -62,4 +48,6 @@ const UNSAFE_DOMAINS = [
   `twitter.com`,
   `wikipedia.org`,
   `youtube.com`,
+  `cloudfront.net`,
+  `amazonaws.com`,
 ];

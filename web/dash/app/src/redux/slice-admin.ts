@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { isUnsaved, unsavedId } from '@dash/utils';
 import * as T from '@dash/types';
+import { typesafe } from '@shared/ts-utils';
 import type { NotificationUpdate } from '@dash/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
-import * as typesafe from '../lib/typesafe';
 import Result from '../api/Result';
 import { Req, editable, revert, commit } from './helpers';
 import { createResultThunk } from './thunk';

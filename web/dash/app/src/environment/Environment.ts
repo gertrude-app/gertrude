@@ -1,4 +1,4 @@
-import { enumValues } from '../lib/typesafe';
+import { enumValues } from '@shared/ts-utils';
 
 export enum Mode {
   Dev,

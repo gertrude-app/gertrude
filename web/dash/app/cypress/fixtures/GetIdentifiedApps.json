@@ -1,0 +1,191 @@
+{
+  "data": {
+    "apps": [
+      {
+        "slug": "chrome",
+        "category": {
+          "id": "7abf7b9c-ac52-4e16-98ff-8d4a6210b5b0",
+          "slug": "browser",
+          "__typename": "AppCategory",
+          "name": "Browser"
+        },
+        "id": "16a24cd6-ecac-49c9-8783-284d2fc3d264",
+        "selectable": true,
+        "bundleIds": [
+          {
+            "id": "aa5c1736-65f8-4051-a0dc-d9053324aed4",
+            "__typename": "BundleId",
+            "bundleId": ".com.google.Chrome.helper"
+          },
+          {
+            "id": "a74002d1-b0bf-4fe4-a65a-eac9c9e90a18",
+            "__typename": "BundleId",
+            "bundleId": ".com.google.Chrome"
+          }
+        ],
+        "__typename": "IdentifiedApp",
+        "name": "Chrome Browser"
+      },
+      {
+        "slug": "brave",
+        "category": {
+          "id": "7abf7b9c-ac52-4e16-98ff-8d4a6210b5b0",
+          "slug": "browser",
+          "__typename": "AppCategory",
+          "name": "Browser"
+        },
+        "id": "49e8dd73-a4a7-4182-b97d-46a325862f58",
+        "selectable": true,
+        "bundleIds": [
+          {
+            "id": "ce571c07-e538-4049-a051-b2dbbd6b21fe",
+            "__typename": "BundleId",
+            "bundleId": ".com.brave.Browser.helper"
+          },
+          {
+            "id": "6d12930a-7be4-431b-8c90-824d0dba4a66",
+            "__typename": "BundleId",
+            "bundleId": ".com.brave.Browser"
+          }
+        ],
+        "__typename": "IdentifiedApp",
+        "name": "Brave Browser"
+      },
+      {
+        "slug": "firefox",
+        "category": {
+          "id": "7abf7b9c-ac52-4e16-98ff-8d4a6210b5b0",
+          "slug": "browser",
+          "__typename": "AppCategory",
+          "name": "Browser"
+        },
+        "id": "ada408dc-f0e3-4c02-b387-e481ba693347",
+        "selectable": true,
+        "bundleIds": [
+          {
+            "id": "e47806e2-c4d3-463a-956f-87d6f4a720c8",
+            "__typename": "BundleId",
+            "bundleId": "43AQ936H96.org.mozilla.firefox"
+          }
+        ],
+        "__typename": "IdentifiedApp",
+        "name": "Firefox Browser"
+      },
+      {
+        "slug": "safari",
+        "category": {
+          "id": "7abf7b9c-ac52-4e16-98ff-8d4a6210b5b0",
+          "slug": "browser",
+          "__typename": "AppCategory",
+          "name": "Browser"
+        },
+        "id": "29bdc108-14d4-49ab-9fd5-22ed14c8dc9c",
+        "selectable": true,
+        "bundleIds": [
+          {
+            "id": "49fa8bc1-3c70-495e-90ae-e96a52b7e489",
+            "__typename": "BundleId",
+            "bundleId": "com.apple.Safari"
+          },
+          {
+            "id": "b1b036cb-a456-4c91-be9f-936dc1d1126e",
+            "__typename": "BundleId",
+            "bundleId": ".com.apple.Safari"
+          }
+        ],
+        "__typename": "IdentifiedApp",
+        "name": "Safari Browser"
+      },
+      {
+        "slug": "xcode",
+        "category": {
+          "id": "17f7b151-abec-42f0-80cf-5a69c41fa7ea",
+          "slug": "programming",
+          "__typename": "AppCategory",
+          "name": "Programming"
+        },
+        "id": "8a070dec-c132-4010-993f-c353fe6db851",
+        "selectable": true,
+        "bundleIds": [
+          {
+            "id": "0649f9c2-e848-4cf0-916a-31f67d3c45be",
+            "__typename": "BundleId",
+            "bundleId": "APPLECOMPUTER.com.apple.dt.Xcode"
+          },
+          {
+            "id": "1506c867-3cc5-4ca3-a1af-3ee28df6c52d",
+            "__typename": "BundleId",
+            "bundleId": ".com.apple.dt.Xcode.ITunesSoftwareService"
+          }
+        ],
+        "__typename": "IdentifiedApp",
+        "name": "Xcode"
+      },
+      {
+        "slug": "vscode",
+        "category": {
+          "id": "17f7b151-abec-42f0-80cf-5a69c41fa7ea",
+          "slug": "programming",
+          "__typename": "AppCategory",
+          "name": "Programming"
+        },
+        "id": "6cc5297a-3051-4115-8123-eb161ec8af39",
+        "selectable": true,
+        "bundleIds": [
+          {
+            "id": "91cf8043-a903-4a54-8331-ae37fd3747c6",
+            "__typename": "BundleId",
+            "bundleId": ".com.github.Electron.helper"
+          },
+          {
+            "id": "ba57c9b9-ff9d-417d-934e-8293927e42f6",
+            "__typename": "BundleId",
+            "bundleId": ".com.microsoft.VSCode.helper"
+          },
+          {
+            "id": "b164267d-9b28-46a6-9d84-c4d6de089482",
+            "__typename": "BundleId",
+            "bundleId": "UBF8T346G9.com.microsoft.VSCode"
+          },
+          {
+            "id": "5d19566f-e2e4-43e1-be0c-de8ef944b85e",
+            "__typename": "BundleId",
+            "bundleId": ".com.microsoft.VSCode"
+          }
+        ],
+        "__typename": "IdentifiedApp",
+        "name": "Visual Studio Code"
+      },
+      {
+        "slug": "slack",
+        "category": {
+          "id": "387c4e96-e64d-4e9d-b2bd-120ce0f0fb4e",
+          "slug": "chat",
+          "__typename": "AppCategory",
+          "name": "Chat"
+        },
+        "id": "ab067738-9ece-4f4f-9761-a9d5da85ec9e",
+        "selectable": true,
+        "bundleIds": [
+          {
+            "id": "ee6a41ba-b47a-4332-ba81-276b10c3d77a",
+            "__typename": "BundleId",
+            "bundleId": ".com.tinyspeck.slackmacgap.helper"
+          },
+          {
+            "id": "32b2de25-5fc5-4dd5-ba86-528efbda559e",
+            "__typename": "BundleId",
+            "bundleId": "BQR82RBBHL.com.tinyspeck.slackmacgap.helper"
+          },
+          {
+            "id": "acbc98e2-e778-44d2-9c58-417da5885581",
+            "__typename": "BundleId",
+            "bundleId": "BQR82RBBHL.com.tinyspeck.slackmacgap"
+          }
+        ],
+        "__typename": "IdentifiedApp",
+        "name": "Slack"
+      }
+    ]
+  }
+}

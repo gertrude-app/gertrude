@@ -1,14 +1,13 @@
 import type { JSXElementConstructor, ComponentProps } from 'react';
 import type { RequestStatus } from './api';
 
+type RemoveFns<T> = {
+  [K in keyof T as T[K] extends (...args: any) => any ? never : K]: T[K];
+};
+
 export type Subcomponents<
   T extends keyof JSX.IntrinsicElements | JSXElementConstructor<any>,
-> = Array<ComponentProps<T> & { id: string }>;
-
-export type SubcomponentsOmit<
-  T extends keyof JSX.IntrinsicElements | JSXElementConstructor<any>,
-  K extends keyof ComponentProps<T>,
-> = Array<Omit<ComponentProps<T> & { id: string }, K>>;
+> = Array<RemoveFns<ComponentProps<T>> & { id: string }>;
 
 export interface ConfirmableEntityAction<StartArg = UUID> {
   id?: UUID;
@@ -60,3 +59,8 @@ export interface UnlockRequest {
   requestProtocol?: string;
   createdAt: string;
 }
+
+export type UnlockRequestCreateKeyData = Pick<
+  UnlockRequest,
+  'url' | 'domain' | 'ipAddress' | 'appCategories' | 'appBundleId' | 'appSlug'
+>;
