@@ -4,13 +4,13 @@ const { red, green } = require(`x-chalk`);
 
 const args = process.argv.slice(2);
 if (args.length !== 2) {
-  red(`Usage: make component [@dash|@marketing|@shared] RadButton`);
+  red(`Usage: make component [@dash|@site|@shared] RadButton`);
   process.exit(1);
 }
 
 const scope = args[0].replace(/^@/, ``);
-if (![`dash`, `marketing`, `shared`].includes(scope)) {
-  red(`Usage: make component [@dash|@marketing|@shared] RadButton`);
+if (![`dash`, `site`, `shared`].includes(scope)) {
+  red(`Usage: make component [@dash|@site|@shared] RadButton`);
   process.exit(1);
 }
 

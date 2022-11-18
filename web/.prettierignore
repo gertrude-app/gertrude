@@ -2,7 +2,7 @@
 pnpm-lock.yaml
 storybook/storybook-static/
 dash/app/build
-marketing/app/.next
-marketing/app/out
+site/app/.next
+site/app/out
 docs/app/.next
 docs/app/out

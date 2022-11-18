@@ -5,11 +5,6 @@ process.env.VITE_GRAPHQL_ENDPOINT = ``;
 
 export default defineConfig({
   test: {
-    exclude: [
-      ...configDefaults.exclude,
-      `storybook/*`,
-      `dash/app/build/*`,
-      `marketing/*`,
-    ],
+    exclude: [...configDefaults.exclude, `storybook/*`, `dash/app/build/*`, `site/*`],
   },
 });

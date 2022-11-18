@@ -60,7 +60,7 @@ const Dashboard: React.FC<Props> = ({
         </p>
         <div className="mt-8 space-y-3">
           <RecommendedStep
-            href="https://docs.gertrude.app"
+            href="https://gertrude.app/docs"
             title="Read our getting started guide"
             icon="book"
           />

@@ -1,0 +1,6 @@
+# docs page root -> /docs/getting-started (for now)
+/docs /docs/getting-started 302
+
+# macOS redirects
+/app-redir/connect/more-info /docs/getting-started 301
+/app-redir/connect/contact-support /contact 301

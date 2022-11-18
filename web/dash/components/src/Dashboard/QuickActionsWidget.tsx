@@ -24,7 +24,7 @@ const QuickActionsWidget: React.FC<Props> = ({
     <QuickAction
       name="View documentation"
       icon="book"
-      action="https://docs.gertrude.app"
+      action="https://gertrude.app/docs"
     />
     <QuickAction
       name="Submit support request"
