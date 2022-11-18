@@ -25,6 +25,7 @@ const Template: ComponentStory<typeof ReviewUnlockRequest> = (args) => (
   <ReviewUnlockRequest {...args} />
 );
 
+// @screenshot: xs,md
 export const Default = Template.bind({});
 Default.args = {
   userName: `Winfield`,

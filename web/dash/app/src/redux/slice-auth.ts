@@ -1,10 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { env } from '@shared/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { AdminIds } from '@dash/types';
 import type { StorageClient } from '../environment/Storage';
 import Current from '../environment';
 import { OptionalVar as Optional } from '../environment/Environment';
-import { isCypress, Req } from './helpers';
+import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 import { handleSignupPaymentSuccess } from './slice-signup';
 
@@ -141,7 +142,7 @@ export function getInitialAdmin(): AdminIds | null {
   }
 
   const ids = adminFrom(Current.localStorage) ?? adminFrom(Current.sessionStorage);
-  if (ids || Current.env.isProd() || isCypress()) {
+  if (ids || Current.env.isProd() || env.isCypress()) {
     return ids;
   }
 

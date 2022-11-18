@@ -81,6 +81,9 @@ visual-test:
 	rm -rf storybook/visual-tests/screenshots/argos
 	cd storybook/visual-tests && ../node_modules/.bin/ts-node --project tsconfig.json run.ts
 
+visual-test-reset:
+	git restore --source=HEAD --staged --worktree -- storybook/visual-tests/screenshots/argos
+
 format:
 	pnpm prettier --config ./.prettierrc.json --loglevel warn --write .
 
@@ -121,7 +124,10 @@ ALL_CMDS = \
   component \
   storybook marketing dash docs all \
   build-storybook build-marketing build-dash build-docs \
-  fix ts-watch ts-check lint lint-fix format format-check check test \
+  test test-watch \
+  cy-open cy-run \
+  visual-test visual-test-reset \
+  fix ts-watch ts-check lint lint-fix format format-check check \
   codegen
 
 .PHONY: $(ALL_CMDS)

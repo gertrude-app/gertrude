@@ -4,17 +4,24 @@ import { inflect } from '@dash/utils';
 import PillBadge from '../PillBadge';
 import GradientIcon from '../GradientIcon';
 
-type Props = {
+type Props =
+  | ({
+      mode: 'list';
+      onRemove(): unknown;
+      removeText: string;
+      editUrl?: string;
+    } & Common)
+  | ({
+      mode: 'select';
+      selected: boolean;
+      onSelect(): unknown;
+    } & Common);
+
+type Common = {
   name: string;
   description?: string | null;
   numKeys: number;
   isPublic: boolean;
-  remove?: { text: string; handler: () => unknown };
-  editUrl?: string;
-  small?: boolean;
-  selected?: boolean;
-  selectable?: boolean;
-  onSelect?: () => unknown;
 };
 
 const KeychainCard: React.FC<Props> = ({
@@ -22,27 +29,22 @@ const KeychainCard: React.FC<Props> = ({
   name,
   numKeys,
   description,
-  remove,
-  editUrl,
-  small = false,
-  selected = false,
-  selectable = false,
-  onSelect,
+  ...props
 }) => (
   <div
     className={cx(
       `rounded-xl shadow-lg border bg-white flex flex-col justify-between transition duration-100`,
-      selected && `bg-violet-50 border-violet-300`,
-      selectable && !selected && `hover:bg-gray-50 cursor-pointer`,
-      small && `min-h-[77px]`,
+      isSelect(props) && props.selected && `bg-violet-50 border-violet-300`,
+      isSelect(props) && !props.selected && `hover:bg-gray-50 cursor-pointer`,
+      isSelect(props) && `min-h-[77px]`,
     )}
-    onClick={selectable ? onSelect : undefined}
+    onClick={isSelect(props) ? props.onSelect : undefined}
   >
     <div className="flex items-stretch flex-grow">
       <div
         className={cx(
           `w-16 xs:w-20 shrink-0 py-4 flex justify-center mr-2`,
-          small && `items-center`,
+          isSelect(props) && `items-center`,
         )}
       >
         <GradientIcon icon="list" size="medium" className="mx-0" />
@@ -58,14 +60,14 @@ const KeychainCard: React.FC<Props> = ({
               {` `}
               {inflect(`key`, numKeys)}
             </h4>
-            {small && isPublic && (
+            {isSelect(props) && isPublic && (
               <PillBadge small type="green">
                 Public
               </PillBadge>
             )}
           </div>
         </div>
-        {small || (
+        {isSelect(props) || (
           <p
             className={cx(
               description ? `text-gray-600 leading-tight` : `text-gray-400 italic`,
@@ -77,41 +79,51 @@ const KeychainCard: React.FC<Props> = ({
         )}
       </div>
     </div>
-    {small || (
+    {isSelect(props) || (
       <div
         className={cx(
           `bg-gray-50 rounded-b-xl w-full flex justify-between`,
-          selected && `bg-indigo-100/40`,
+          isSelect(props) && props.selected && `bg-indigo-100/40`,
         )}
       >
         <div className="flex-grow ml-3">
-          {isPublic && (
-            <PillBadge type="green" className="border my-2">
-              <i className="fa-solid fa-users mr-1 text-sm" /> Public
-            </PillBadge>
-          )}
+          <PillBadge
+            type="green"
+            className={cx(
+              `border my-2`,
+              !isPublic && `opacity-0`, // ensure equal heights
+            )}
+          >
+            <i className="fa-solid fa-users mr-1 text-sm" /> Public
+          </PillBadge>
         </div>
-        <div className="flex items-stretch">
-          {editUrl && (
-            <a
-              className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-gray-600 transition duration-100 h-full select-none"
-              href={editUrl}
-            >
-              Edit
-            </a>
-          )}
-          {remove && (
+        {props.mode === `list` && (
+          <div className="flex items-stretch">
+            {props.editUrl && (
+              <a
+                className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-gray-600 transition duration-100 select-none flex items-center"
+                href={props.editUrl}
+              >
+                Edit
+              </a>
+            )}
             <button
               className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-red-600 transition duration-100 rounded-br-xl"
-              onClick={remove.handler}
+              onClick={props.onRemove}
             >
-              {remove.text}
+              {props.removeText}
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     )}
   </div>
 );
 
 export default KeychainCard;
+
+function isSelect(props: { mode: Props['mode'] }): props is {
+  mode: 'select';
+} & Common {
+  return props.mode === `select`;
+}

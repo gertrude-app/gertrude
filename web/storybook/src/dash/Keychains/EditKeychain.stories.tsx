@@ -28,7 +28,6 @@ Default.args = {
   deleteKey: confirmableEntityAction(),
 };
 
-// @screenshot: 395/xs
 export const New = Template.bind({});
 New.args = {
   ...Default.args,

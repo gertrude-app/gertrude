@@ -21,6 +21,7 @@ const notificationProps = {
   saveButtonDisabled: false,
 };
 
+// @screenshot: xs,md
 export const Default = Template.bind({});
 Default.args = {
   email: `johndoe@example.com`,
@@ -64,4 +65,31 @@ Default.args = {
   ]),
   deleteMethod: confirmableEntityAction(),
   deleteNotification: confirmableEntityAction(),
+  billingPortalRequest: { state: `idle` },
+};
+
+// @screenshot: xs,md
+export const AddingMethod = Template.bind({});
+AddingMethod.args = {
+  ...Default.args,
+  pendingMethod: {
+    type: `email`,
+    email: ``,
+    sendCodeRequest: { state: `idle` },
+    confirmationRequest: { state: `idle` },
+    confirmationCode: `333243`,
+  },
+};
+
+// @screenshot: xs,md
+export const AddingMethodVerifying = Template.bind({});
+AddingMethodVerifying.args = {
+  ...Default.args,
+  pendingMethod: {
+    type: `email`,
+    email: ``,
+    sendCodeRequest: { state: `succeeded`, payload: `123456` },
+    confirmationRequest: { state: `idle` },
+    confirmationCode: `333234`,
+  },
 };

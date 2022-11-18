@@ -55,7 +55,16 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete }) => {
                 : `font-medium text-gray-800`,
             )}
           >
-            {target(record.key) === `*` ? `everything` : target(record.key)}
+            {target(record.key) === `*` ? (
+              <>
+                <span className="sm:hidden font-mono px-1 text-gray-800 bg-violet-100 rounded">
+                  {scope}
+                </span>
+                <span className="hidden sm:inline">everything</span>
+              </>
+            ) : (
+              target(record.key)
+            )}
           </span>
           <span className="hidden sm:inline">
             {` `}for{` `}

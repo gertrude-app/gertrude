@@ -13,14 +13,14 @@ const Template: ComponentStory<typeof UserActivityOverview> = (args) => (
   <UserActivityOverview {...args} />
 );
 
+// @screenshot: xs,md
 export const Default = Template.bind({});
 Default.args = {
-  userName: `Little Jimmy`,
+  userName: `Huck`,
   days: [
     { date: new Date(), numItems: 330, numCompleted: 0 },
     { date: new Date(), numItems: 117, numCompleted: 64 },
     { date: new Date(), numItems: 89, numCompleted: 89 },
-    { date: new Date(), numItems: 1317, numCompleted: 1317 },
   ],
 };
 

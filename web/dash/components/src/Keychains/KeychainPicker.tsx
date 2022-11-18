@@ -36,14 +36,13 @@ const KeychainPicker: React.FC<Props> = ({
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {selectableOwnKeychains.map((keychain) => (
             <KeychainCard
+              mode="select"
               key={keychain.id}
               name={keychain.name}
               numKeys={keychain.numKeys}
               isPublic={keychain.isPublic}
               onSelect={() => onSelect(keychain)}
               selected={selectedId === keychain.id}
-              selectable
-              small
             />
           ))}
         </div>
@@ -79,14 +78,13 @@ const KeychainPicker: React.FC<Props> = ({
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {selectablePublicKeychains.map((keychain) => (
             <KeychainCard
+              mode="select"
               key={keychain.id}
               name={keychain.name}
               numKeys={keychain.numKeys}
               isPublic={keychain.isPublic}
-              selectable
               onSelect={() => onSelect(keychain)}
               selected={selectedId === keychain.id}
-              small
             />
           ))}
         </div>

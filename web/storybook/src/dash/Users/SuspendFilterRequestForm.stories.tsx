@@ -24,6 +24,7 @@ const Template: ComponentStory<typeof SuspendFilterRequestForm> = (args) => (
   <SuspendFilterRequestForm {...args} />
 );
 
+// @screenshot: xs,md
 export const Default = Template.bind({});
 Default.args = {
   username: `Win`,
@@ -37,6 +38,7 @@ Default.args = {
   setCustomDuration: () => {},
 };
 
+// @screenshot: xs,md
 export const CustomDuration = Template.bind({});
 CustomDuration.args = {
   ...Default.args,

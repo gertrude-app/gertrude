@@ -30,12 +30,14 @@ Default.args = {
 export const Fetching = Template.bind({});
 Fetching.args = { request: `ongoing` };
 
+// @screenshot: xs,md
 export const Succeeded = Template.bind({});
 Succeeded.args = {
   request: `succeeded`,
   message: `Success! Check your email for a verification link.`,
 };
 
+// @screenshot: xs,md
 export const Failed = Template.bind({});
 Failed.args = {
   request: `failed`,

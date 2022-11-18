@@ -9,6 +9,7 @@ export default {
 
 const Template: ComponentStory<typeof KeyList> = (args) => <KeyList {...args} />;
 
+// @screenshot: xs/400,md/400
 export const Default = Template.bind({});
 Default.args = {
   keys: Object.values(keyExamples),

@@ -21,7 +21,6 @@ export { default as KeychainCard } from './Keychains/KeychainCard';
 export { default as KeychainPicker } from './Keychains/KeychainPicker';
 export { default as KeyCreator } from './KeyCreator/KeyCreator';
 export { default as KeyTypeOption } from './KeyCreator/KeyTypeOption';
-export { default as SummaryLi } from './KeyCreator/SummaryLi';
 export { default as ErrorMessage } from './ErrorMessage';
 export { default as ListUnlockRequests } from './Users/ListUnlockRequests';
 export { default as ReviewUnlockRequest } from './Users/ReviewUnlockRequest';

@@ -15,7 +15,7 @@ const Template: ComponentStory<typeof Dashboard> = (args) => <Dashboard {...args
 // @screenshot: xs/2500,xl
 export const Default = Template.bind({});
 Default.args = {
-  date: time.stable(),
+  date: new Date(time.stable()),
   unlockRequests: withIdsAnd({ userId: `user1` }, [
     {
       target: `gitlab.io`,

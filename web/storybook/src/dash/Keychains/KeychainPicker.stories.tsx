@@ -8,9 +8,8 @@ export default {
 } as ComponentMeta<typeof KeychainPicker>;
 
 const publicKeychains = [
-  keychainProps({ id: `id-htc`, name: `HTC`, numKeys: 232, isPublic: true }),
+  keychainProps({ name: `HTC`, numKeys: 232, isPublic: true }),
   keychainProps({ name: `Meyer Hatchery`, numKeys: 14, isPublic: true }),
-  keychainProps({ name: `Google`, numKeys: 1402, isPublic: true }),
   keychainProps({ name: `Gertrude.com`, numKeys: 1, isPublic: true }),
 ];
 
@@ -25,13 +24,15 @@ const Template: ComponentStory<typeof KeychainPicker> = (args) => (
   </Modal>
 );
 
+// @screenshot: xs/1300,lg/900
 export const Default = Template.bind({});
 Default.args = {
   mode: `addToUser`,
-  selectableOwnKeychains: keychains,
+  selectableOwnKeychains: keychains.filter((kc) => !kc.isPublic),
   selectablePublicKeychains: publicKeychains,
 };
 
+// @screenshot: xs/1000,lg
 export const NoOwnKeychains = Template.bind({});
 NoOwnKeychains.args = {
   ...Default.args,
@@ -46,6 +47,7 @@ AllOwnKeychainsAttached.args = {
   selectableOwnKeychains: [],
 };
 
+// @screenshot: xs
 export const NoKeychainsForUnlockRequest = Template.bind({});
 NoKeychainsForUnlockRequest.args = {
   ...Default.args,

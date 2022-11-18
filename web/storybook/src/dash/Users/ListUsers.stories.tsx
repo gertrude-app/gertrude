@@ -11,11 +11,18 @@ export default {
 
 const Template: ComponentStory<typeof ListUsers> = (args) => <ListUsers {...args} />;
 
+// @screenshot: xs,md
 export const Empty = Template.bind({});
-Empty.args = { users: [] };
+Empty.args = {
+  startAddDevice: () => {},
+  dismissAddDevice: () => {},
+  users: [],
+};
 
+// @screenshot: xs,md
 export const Default = Template.bind({});
 Default.args = {
+  ...Empty.args,
   users: [
     {
       id: `user-4`,
@@ -67,17 +74,11 @@ Default.args = {
   ],
 };
 
-export const AddingDeviceLoading = Template.bind({});
-AddingDeviceLoading.args = {
-  ...Default.args,
-  addDeviceRequest: {
-    state: `ongoing`,
-  },
-};
-
+// @screenshot: xs,md
 export const AddingDevice = Template.bind({});
 AddingDevice.args = {
   ...Default.args,
+  users: Default.args.users!.slice(0, 1),
   addDeviceRequest: {
     state: `succeeded`,
     payload: 123123,

@@ -1,6 +1,7 @@
 import { KeyCreator } from '@dash/components';
 import { EditKey } from '@dash/keys';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import { time } from '../../story-helpers';
 
 export default {
   title: 'Dashboard/KeyCreator/KeyCreator', // eslint-disable-line
@@ -9,6 +10,7 @@ export default {
 
 const Template: ComponentStory<typeof KeyCreator> = (args) => <KeyCreator {...args} />;
 
+// @screenshot xs/600,md/550
 export const CreateStart = Template.bind({});
 CreateStart.args = {
   id: `1`,
@@ -32,6 +34,7 @@ CreateStart.args = {
   ],
 };
 
+// @screenshot xs/600,md/550
 export const CreateAddressType = Template.bind({});
 CreateAddressType.args = {
   ...CreateStart.args,
@@ -49,6 +52,7 @@ CreateStrictAddressType.args = {
   address: `goats.com`,
 };
 
+// @screenshot xs/600,md/550
 export const CreateAddressScope = Template.bind({});
 CreateAddressScope.args = {
   ...CreateStart.args,
@@ -67,19 +71,18 @@ CreateExpirationOff.args = {
   address: `goats.com`,
 };
 
-const expiration = new Date();
-expiration.setDate(expiration.getDate() + 3);
-
+// @screenshot xs/600,md/550
 export const CreateExpiration = Template.bind({});
 CreateExpiration.args = {
   ...CreateStart.args,
   addressType: `standard`,
   keyType: `website`,
   activeStep: EditKey.Step.Expiration,
-  expiration: expiration.toISOString(),
+  expiration: time.stable(),
   address: `goats.com`,
 };
 
+// @screenshot xs/600,md/550
 export const EditComment = Template.bind({});
 EditComment.args = {
   ...CreateExpiration.args,
@@ -91,8 +94,8 @@ EditComment.args = {
   isNew: false,
 };
 
-export const EditNoExpiration = Template.bind({});
-EditNoExpiration.args = {
+export const EditNoComment = Template.bind({});
+EditNoComment.args = {
   ...CreateExpiration.args,
   keyType: `website`,
   address: `goats.com`,
@@ -106,10 +109,11 @@ EditHasExpiration.args = {
   keyType: `website`,
   address: `goats.com`,
   activeStep: undefined,
-  expiration: expiration.toISOString(),
+  expiration: time.stable(),
   isNew: false,
 };
 
+// @screenshot xs/600,md/550
 export const EditStepOpen = Template.bind({});
 EditStepOpen.args = {
   ...CreateExpiration.args,
@@ -129,6 +133,7 @@ CreateApp.args = {
   appSlug: `slack`,
 };
 
+// @screenshot xs/600,md/550
 export const CreateAppSlug = Template.bind({});
 CreateAppSlug.args = {
   ...CreateApp.args,
@@ -143,6 +148,7 @@ CreateAppBundleId.args = {
   appBundleId: `com.goats.app`,
 };
 
+// @screenshot xs/600,md/550
 export const CreateAppScope = Template.bind({});
 CreateAppScope.args = {
   ...CreateAppSlug.args,
@@ -161,6 +167,7 @@ CreateAppComment.args = {
   activeStep: EditKey.Step.Comment,
 };
 
+// @screenshot xs/600,md/550
 export const AppKeyAddressScope = Template.bind({});
 AppKeyAddressScope.args = {
   ...CreateApp.args,
@@ -189,6 +196,7 @@ EditAppKeyAddressScope.args = {
   activeStep: undefined,
 };
 
+// @screenshot xs/600,md/550
 export const WebKeyAppScope = Template.bind({});
 WebKeyAppScope.args = {
   ...CreateApp.args,

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import cx from 'classnames';
+import { env } from '@shared/components';
 
 interface Props {
   children: React.ReactNode;
@@ -48,17 +49,34 @@ const SubtleLogo: React.FC<SubtleLogoProps> = ({ size, x, y, angle, index }) => 
   </div>
 );
 
-const ScatteredLogos: React.FC = React.memo(() => (
-  <>
-    {new Array(15).fill(0).map((_, index) => (
-      <SubtleLogo
-        key={`subtle-logo-${index}`}
-        size={Math.random() * 150 + 50}
-        angle={Math.random() * 36}
-        x={Math.random() * 150 - 2}
-        y={Math.random() * 150 - 25}
-        index={index}
-      />
-    ))}
-  </>
-));
+const ScatteredLogos: React.FC = React.memo(() => {
+  useEffect(() => {
+    _stableRandomSeed = _SEED_INIT;
+  }, []);
+  return (
+    <>
+      {new Array(15).fill(0).map((_, index) => (
+        <SubtleLogo
+          key={`subtle-logo-${index}`}
+          size={random() * 150 + 50}
+          angle={random() * 36}
+          x={random() * 150 - 2}
+          y={random() * 150 - 25}
+          index={index}
+        />
+      ))}
+    </>
+  );
+});
+
+function random(): number {
+  return env.isScreenshotTest() ? stableRandom() : Math.random();
+}
+
+// https://stackoverflow.com/a/19303725/208770
+const _SEED_INIT = 101;
+let _stableRandomSeed = _SEED_INIT;
+function stableRandom(): number {
+  var x = Math.sin(_stableRandomSeed++) * 10000;
+  return x - Math.floor(x);
+}

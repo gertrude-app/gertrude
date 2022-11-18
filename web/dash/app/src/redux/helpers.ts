@@ -1,3 +1,4 @@
+import { env } from '@shared/components';
 import type { JSXElementConstructor } from 'react';
 import type { QueriedProps } from './store';
 
@@ -144,12 +145,9 @@ export function isDirty<T extends { id: UUID }>(
   return JSON.stringify(original) !== JSON.stringify(draft);
 }
 
-export function isCypress(): boolean {
-  return typeof window !== `undefined` && `Cypress` in window;
-}
 export async function spinnerMin<T>(
   promise: Promise<T>,
-  delayMs = isCypress() ? 0 : 400,
+  delayMs = env.isCypress() ? 0 : 400,
 ): Promise<T> {
   const start = Date.now();
   const result = await promise;

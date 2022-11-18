@@ -13,6 +13,7 @@ const Template: ComponentStory<typeof LoginForm> = (args) => (
   </FullscreenModalForm>
 );
 
+// @screenshot: xs,md
 export const Default = Template.bind({});
 Default.args = {
   email: ``,

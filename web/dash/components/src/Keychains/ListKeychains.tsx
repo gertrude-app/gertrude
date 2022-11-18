@@ -26,12 +26,14 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 lg+:gap-8 xl:gap-10 2xl:grid-cols-3 mt-10">
           {keychains.map(({ id, isPublic, name, description, numKeys }) => (
             <KeychainCard
+              mode="list"
               key={id}
               isPublic={isPublic}
               name={name}
               numKeys={numKeys}
               description={description}
-              remove={{ text: `Delete`, handler: () => remove.start(id) }}
+              onRemove={() => remove.start(id)}
+              removeText="Delete"
               editUrl={`/keychains/${id}`}
             />
           ))}

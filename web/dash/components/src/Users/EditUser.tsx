@@ -173,12 +173,14 @@ const EditUser: React.FC<Props> = ({
         <div className="p-3 flex flex-col space-y-4">
           {keychains.map((keychain) => (
             <KeychainCard
+              mode="list"
               key={keychain.id}
               name={keychain.name}
               description={keychain.description}
               numKeys={keychain.numKeys}
               isPublic={keychain.isPublic}
-              remove={{ text: `Remove`, handler: () => removeKeychain(keychain.id) }}
+              onRemove={() => removeKeychain(keychain.id)}
+              removeText="Remove"
             />
           ))}
           <button

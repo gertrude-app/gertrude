@@ -1,3 +1,4 @@
+import { env } from '@shared/components';
 import type { ConfirmableEntityAction } from '@dash/types';
 import type { Keychain, KeyRecord } from '@dash/keys';
 
@@ -15,7 +16,7 @@ export function keychainProps(override: Partial<Keychain> = {}): Keychain {
 
 export function testImgUrl(width: number, height: number): string {
   // placekitten is random, so it causes false positives for visual regression tests
-  if (import.meta.env.STORYBOOK_SCREENSHOT_TESTING) {
+  if (env.isScreenshotTest()) {
     return `https://fakeimg.pl/${width}x${height}/31235d/fff/`;
   }
   return `https://placekitten.com/${width}/${height}`;
@@ -57,8 +58,8 @@ export const time = {
   stable,
 };
 
-function stable(): Date {
-  return new Date(`2022-01-01T12:00:00.000Z`);
+function stable(): string {
+  return `2022-01-01T12:00:00.000Z`;
 }
 
 function subtracting(amounts: {
@@ -184,14 +185,12 @@ export const keyExamples: Record<string, KeyRecord> = {
 };
 
 export const keychains = [
-  keychainProps({ id: `id-htc`, name: `HTC`, numKeys: 232, isPublic: true }),
+  keychainProps({ name: `HTC`, numKeys: 232, isPublic: true }),
   keychainProps({ name: `Jimmy's Music Theory`, numKeys: 7 }),
   keychainProps({ name: `Jason's blog`, numKeys: 3, description: undefined }),
   keychainProps({ name: `Misc McStrandardishlong Keys`, numKeys: 1027 }),
-  keychainProps({ name: `John's stuff`, numKeys: 674 }),
   keychainProps({ name: `Smith family`, numKeys: 9, description: `A short description` }),
   keychainProps({ name: `Meyer Hatchery`, numKeys: 14, isPublic: true }),
-  keychainProps({ name: `Facebook`, numKeys: 2390 }),
   keychainProps({
     name: `Friends Library Internationalization Remote Safety Keychain for MSF`,
     numKeys: 2,

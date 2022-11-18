@@ -44,6 +44,8 @@ const Keychains: React.FC = () => {
     <ListKeychains
       keychains={keychains.map(({ original: keychain }) => ({
         ...keychain,
+        mode: `list`,
+        removeText: `Delete`,
         description: keychain.description || undefined,
         numKeys: keyRecords.filter((key) => key.keychainId === keychain.id).length,
       }))}

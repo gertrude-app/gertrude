@@ -15,6 +15,7 @@ const Template: ComponentStory<typeof ListUnlockRequests> = (args) => (
   <ListUnlockRequests {...args} />
 );
 
+// @screenshot: xs,md
 export const Default = Template.bind({});
 Default.args = {
   requests: withIdsAnd({ userId: `user1` }, [

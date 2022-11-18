@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDate } from '@dash/datetime';
+import { env } from '@shared/components';
 import GradientIcon from '../../GradientIcon';
 import PillBadge from '../../PillBadge';
 
@@ -11,7 +12,7 @@ type Props = {
 };
 
 const DaySummaryCard: React.FC<Props> = ({ date, numCompleted, numItems }) => {
-  const [completed, setCompleted] = useState(0);
+  const [completed, setCompleted] = useState(env.isScreenshotTest() ? numCompleted : 0);
   useEffect(() => {
     setTimeout(() => setCompleted(numCompleted), 50);
   }, [numCompleted]);

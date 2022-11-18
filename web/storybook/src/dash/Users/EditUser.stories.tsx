@@ -12,6 +12,7 @@ export default {
 
 const Template: ComponentStory<typeof EditUser> = (args) => <EditUser {...args} />;
 
+// @screenshot: xs,md
 export const Default = Template.bind({});
 Default.args = {
   name: `Little Jimmy`,
@@ -24,6 +25,11 @@ Default.args = {
   setScreenshotsFrequency: () => {},
   screenshotsResolution: 1000,
   setScreenshotsResolution: () => {},
+  onConfirmAddKeychain: () => {},
+  onDismissAddKeychain: () => {},
+  onAddKeychainClicked: () => {},
+  startAddDevice: () => {},
+  dismissAddDevice: () => {},
   deleteUser: confirmableEntityAction(),
   deleteDevice: confirmableEntityAction(),
   keychains: [

@@ -2,7 +2,7 @@ import { UserActivityReviewDay } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import type { ActivityItem } from '@dash/components';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
-import { testImgUrl } from '../../../story-helpers';
+import { testImgUrl, time } from '../../../story-helpers';
 
 export default {
   title: 'Dashboard/Users/Activity/UserActivityReviewDay', // eslint-disable-line
@@ -36,6 +36,7 @@ Default.args = {
 export const Empty = Template.bind({});
 Empty.args = { ...Default.args, items: [] };
 
+// @screenshot: xs,md
 export const Chunked = Template.bind({});
 Chunked.args = {
   ...Default.args,
@@ -57,7 +58,11 @@ Chunked.args = {
 
 function common(): { id: string; ids: string[]; date: string } {
   const current = `item-${Math.random()}`;
-  return { id: `${current}`, ids: [`${current}`], date: new Date().toISOString() };
+  return {
+    id: `${current}`,
+    ids: [`${current}`],
+    date: time.stable(),
+  };
 }
 
 function keystrokeLine(appName: string, line: string, deleted?: boolean): ActivityItem {
