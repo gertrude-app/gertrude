@@ -23,9 +23,10 @@ const DefenseInDepthBlock: React.FC = () => (
       your own time, on your own device.
     </p>
     <p className="text-xl text-gray-400/90 mt-0 leading-8 md:text-center text-left max-w-5xl sm:mb-24 mb-8">
-      Nothing secretive or creepy&mdash;we clearly show them they are being watched. This
-      greatly increases their safety online, plus allows you to occasionally turn off the
-      filter, safe in the knowledge that their activity is being observed.
+      We clearly display that they are being watched&mdash;there&lsquo;s nothing creepy or
+      secretive about it. This greatly increases their safety online, plus allows you to
+      occasionally turn off the filter, safe in the knowledge that their activity is being
+      observed.
     </p>
   </section>
 );
