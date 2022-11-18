@@ -75,7 +75,7 @@ const UserActivityReviewDay: React.FC<Props> = ({
             type="button"
             onClick={() => {
               deleteItems(items.map((item) => item.id));
-              setTimeout(() => navigate(`..`), 1500);
+              setTimeout(() => navigate(`..`, { replace: true }), 100);
             }}
             color="primary-violet"
           >
