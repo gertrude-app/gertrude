@@ -89,8 +89,8 @@ jobs:
           start: pnpm --filter @dash/app preview
           project: dash/app
 
-  marketing:
-    name: marketing
+  site:
+    name: site
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -99,5 +99,5 @@ jobs:
         uses: pnpm/action-setup@v2
       - name: install deps
         run: pnpm install
-      - name: build marketing
-        run: make build-marketing
+      - name: build site
+        run: make build-site

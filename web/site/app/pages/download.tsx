@@ -1,5 +1,5 @@
 import { Logo } from '@shared/components';
-import { Chrome } from '@marketing/components';
+import { Chrome } from '@site/components';
 import type { NextPage } from 'next';
 import BigSur from '../public/macos-big-sur.png';
 import Monterey from '../public/macos-monterey.png';

@@ -6,17 +6,17 @@ help:
 dash:
 	pnpm --filter @dash/app start
 
-marketing:
-	pnpm --filter @marketing/app start
+site:
+	pnpm --filter @site/app start
 
 storybook:
 	pnpm --filter @storybook/app start
 
 all:
 	$(CONCURRENTLY) \
-	  -n ds,mk,sb \
+	  -n ds,st,sb \
 	  -c cyan.dim,magenta.dim,green.dim \
-	  "make dash" "make marketing" "make storybook"
+	  "make dash" "make site" "make storybook"
 
 # scaffold
 
@@ -33,8 +33,8 @@ clean:
 	rm -rf dash/app/node_modules/.vite
 	rm -rf storybook/node_modules/.cache/storybook
 	rm -rf node_modules/.cache/nx
-	rm -rf marketing/app/.next
-	rm -rf marketing/app/out
+	rm -rf site/app/.next
+	rm -rf site/app/out
 	rm -rf dash/app/build
 
 codegen:
@@ -43,10 +43,10 @@ codegen:
 
 # build & deploy
 
-build-marketing:
-	pnpm --filter @marketing/app build
-	pnpm --filter @marketing/app export
-	cp marketing/app/_redirects marketing/app/out
+build-site:
+	pnpm --filter @site/app build
+	pnpm --filter @site/app export
+	cp site/app/_redirects site/app/out
 
 build-storybook:
 	pnpm --filter @storybook/app build
@@ -118,8 +118,8 @@ ALL_CMDS = \
   install \
   help \
   component \
-  storybook marketing dash all \
-  build-storybook build-marketing build-dash build-docs \
+  storybook site dash all \
+  build-storybook build-site build-dash build-docs \
   test test-watch \
   cy-open cy-run \
   visual-test visual-test-reset \

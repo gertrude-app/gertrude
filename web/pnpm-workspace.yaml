@@ -1,6 +1,6 @@
 packages:
   - 'dash/*'
   - 'docs/*'
-  - 'marketing/*'
+  - 'site/*'
   - 'shared/*'
   - 'storybook'

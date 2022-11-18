@@ -8,7 +8,7 @@ import {
   PeaceOfMindBlock,
   SafeIsNowPossibleBlock,
   TestimonialsBlock,
-} from '@marketing/components';
+} from '@site/components';
 import type { NextPage } from 'next';
 
 const Home: NextPage = () => (

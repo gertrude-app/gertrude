@@ -1,5 +1,5 @@
 {
-  "name": "@marketing/components",
+  "name": "@site/components",
   "version": "1.0.0",
   "main": "src/index.ts",
   "license": "ISC",

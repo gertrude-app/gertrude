@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@dash/components": "workspace:*",
-    "@marketing/components": "workspace:*",
+    "@site/components": "workspace:*",
     "@shared/components": "workspace:*",
     "@shared/tailwind": "workspace:*",
     "@storybook/addon-backgrounds": "^6.5.13",

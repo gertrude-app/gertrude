@@ -3,7 +3,7 @@ const transpileModules = require(`next-transpile-modules`);
 const withTranspiled = transpileModules([
   `@shared/datetime`,
   `@shared/components`,
-  `@marketing/components`,
+  `@site/components`,
 ]);
 
 /** @type {import('next').NextConfig} */

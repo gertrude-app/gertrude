@@ -187,55 +187,6 @@ importers:
     devDependencies:
       '@types/react': 18.0.21
 
-  marketing/app:
-    specifiers:
-      '@docsearch/react': ^3.2.1
-      '@headlessui/react': ^1.6.6
-      '@markdoc/markdoc': 0.1.7
-      '@markdoc/next.js': 0.1.6
-      '@marketing/components': workspace:*
-      '@shared/components': workspace:*
-      '@shared/datetime': workspace:*
-      '@shared/tailwind': workspace:*
-      '@sindresorhus/slugify': ^2.1.0
-      '@tailwindcss/typography': ^0.5.7
-      '@types/node': 18.11.9
-      classnames: 2.3.2
-      next: 12.3.2
-      next-transpile-modules: ^10.0.0
-      react: 18.2.0
-      react-dom: 18.2.0
-      tailwindcss: 3.2.4
-    dependencies:
-      '@docsearch/react': 3.3.0_biqbaboplfbrettd7655fr4n2y
-      '@headlessui/react': 1.7.3_biqbaboplfbrettd7655fr4n2y
-      '@markdoc/markdoc': 0.1.7
-      '@markdoc/next.js': 0.1.6_2aei3ensnnjdolfzz4dke3jiwy
-      '@marketing/components': link:../components
-      '@shared/components': link:../../shared/components
-      '@shared/datetime': link:../../shared/datetime
-      '@shared/tailwind': link:../../shared/tailwind
-      '@sindresorhus/slugify': 2.1.1
-      '@tailwindcss/typography': 0.5.7_tailwindcss@3.2.4
-      classnames: 2.3.2
-      next: 12.3.2_biqbaboplfbrettd7655fr4n2y
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-    devDependencies:
-      '@types/node': 18.11.9
-      next-transpile-modules: 10.0.0
-      tailwindcss: 3.2.4
-
-  marketing/components:
-    specifiers:
-      '@shared/components': workspace:*
-      classnames: 2.3.2
-      react: ^18.2.0
-    dependencies:
-      '@shared/components': link:../../shared/components
-      classnames: 2.3.2
-      react: 18.2.0
-
   shared/components:
     specifiers:
       '@shared/datetime': workspace:*
@@ -264,6 +215,55 @@ importers:
   shared/ts-utils:
     specifiers: {}
 
+  site/app:
+    specifiers:
+      '@docsearch/react': ^3.2.1
+      '@headlessui/react': ^1.6.6
+      '@markdoc/markdoc': 0.1.7
+      '@markdoc/next.js': 0.1.6
+      '@shared/components': workspace:*
+      '@shared/datetime': workspace:*
+      '@shared/tailwind': workspace:*
+      '@sindresorhus/slugify': ^2.1.0
+      '@site/components': workspace:*
+      '@tailwindcss/typography': ^0.5.7
+      '@types/node': 18.11.9
+      classnames: 2.3.2
+      next: 12.3.2
+      next-transpile-modules: ^10.0.0
+      react: 18.2.0
+      react-dom: 18.2.0
+      tailwindcss: 3.2.4
+    dependencies:
+      '@docsearch/react': 3.3.0_biqbaboplfbrettd7655fr4n2y
+      '@headlessui/react': 1.7.3_biqbaboplfbrettd7655fr4n2y
+      '@markdoc/markdoc': 0.1.7
+      '@markdoc/next.js': 0.1.6_2aei3ensnnjdolfzz4dke3jiwy
+      '@shared/components': link:../../shared/components
+      '@shared/datetime': link:../../shared/datetime
+      '@shared/tailwind': link:../../shared/tailwind
+      '@sindresorhus/slugify': 2.1.1
+      '@site/components': link:../components
+      '@tailwindcss/typography': 0.5.7_tailwindcss@3.2.4
+      classnames: 2.3.2
+      next: 12.3.2_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    devDependencies:
+      '@types/node': 18.11.9
+      next-transpile-modules: 10.0.0
+      tailwindcss: 3.2.4
+
+  site/components:
+    specifiers:
+      '@shared/components': workspace:*
+      classnames: 2.3.2
+      react: ^18.2.0
+    dependencies:
+      '@shared/components': link:../../shared/components
+      classnames: 2.3.2
+      react: 18.2.0
+
   storybook:
     specifiers:
       '@argos-ci/puppeteer': 0.0.2
@@ -272,10 +272,10 @@ importers:
       '@dash/keys': workspace:*
       '@dash/types': workspace:*
       '@headlessui/react': ^1.6.6
-      '@marketing/components': workspace:*
       '@shared/components': workspace:*
       '@shared/tailwind': workspace:*
       '@shared/ts-utils': workspace:*
+      '@site/components': workspace:*
       '@storybook/addon-actions': ^6.5.9
       '@storybook/addon-backgrounds': ^6.5.13
       '@storybook/addon-essentials': ^6.5.9
@@ -306,9 +306,9 @@ importers:
       vite: ^3.2.0
     dependencies:
       '@dash/components': link:../dash/components
-      '@marketing/components': link:../marketing/components
       '@shared/components': link:../shared/components
       '@shared/tailwind': link:../shared/tailwind
+      '@site/components': link:../site/components
       '@storybook/addon-backgrounds': 6.5.13_biqbaboplfbrettd7655fr4n2y
       '@storybook/addon-measure': 6.5.13_biqbaboplfbrettd7655fr4n2y
       '@storybook/addon-outline': 6.5.13_biqbaboplfbrettd7655fr4n2y

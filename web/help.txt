@@ -1,7 +1,7 @@
 local dev commands:
 
   > `make dash`      -- run local dev for dashboard site
-  > `make marketing` -- run local dev for marketing site
+  > `make site`      -- run local dev for main site
   > `make storybook` -- run local dev for components/storybook
   > `make docs`      -- run local dev for docs site
   > `make all`       -- run local dev for all 3 simultaneously
@@ -21,4 +21,4 @@ quality/ci commands:
 
 scaffold commands:
 
-  > `make component [@dash|@marketing|@shared] [name]` -- scaffold files for a new react component
+  > `make component [@dash|@main|@shared] [name]` -- scaffold files for a new react component

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import cx from 'classnames';
 import { TextInput, Logo, Button, LoadingSpinner } from '@shared/components';
-import { Chrome, ContactStatusMessage } from '@marketing/components';
+import { Chrome, ContactStatusMessage } from '@site/components';
 import type { NextPage } from 'next';
 
 const Contact: NextPage = () => {

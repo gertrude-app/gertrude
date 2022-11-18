@@ -1,5 +1,5 @@
 {
-  "name": "@marketing/app",
+  "name": "@site/app",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -14,7 +14,7 @@
     "@headlessui/react": "^1.6.6",
     "@markdoc/markdoc": "0.1.7",
     "@markdoc/next.js": "0.1.6",
-    "@marketing/components": "workspace:*",
+    "@site/components": "workspace:*",
     "@shared/components": "workspace:*",
     "@shared/datetime": "workspace:*",
     "@shared/tailwind": "workspace:*",
