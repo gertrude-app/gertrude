@@ -15,7 +15,7 @@ const Feature: React.FC<Props> = ({ children, icon, side, heading }) => {
   useEffect(() => {
     const options: IntersectionObserverInit = {
       rootMargin: `0px`,
-      threshold: 1,
+      threshold: 0.75,
     };
 
     const observer = new IntersectionObserver((entries, observer) => {

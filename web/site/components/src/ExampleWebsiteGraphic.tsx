@@ -12,7 +12,7 @@ const ExampleWebsiteGraphic: React.FC<Props> = ({ className }) => {
   useEffect(() => {
     const options: IntersectionObserverInit = {
       rootMargin: `0px`,
-      threshold: 1,
+      threshold: 0.75,
     };
 
     const observer = new IntersectionObserver((entries, observer) => {
