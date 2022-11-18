@@ -1,3 +1,4 @@
+const withMarkdoc = require(`@markdoc/next.js`);
 const transpileModules = require(`next-transpile-modules`);
 const withTranspiled = transpileModules([
   `@shared/datetime`,
@@ -7,15 +8,14 @@ const withTranspiled = transpileModules([
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   reactStrictMode: true,
+  pageExtensions: [`tsx`, `md`],
   swcMinify: true,
+  eslint: { ignoreDuringBuilds: true },
   experimental: {
     newNextLinkBehavior: true,
     scrollRestoration: true,
   },
 };
 
-module.exports = withTranspiled(nextConfig);
+module.exports = withMarkdoc()(withTranspiled(nextConfig));

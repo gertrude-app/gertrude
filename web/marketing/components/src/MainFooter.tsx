@@ -10,7 +10,7 @@ const MainFooter: React.FC = () => (
         <a href="/contact">Contact us</a>
       </li>
       <li className="transition duration-100 hover:text-white/60">
-        <a href="https://docs.gertrude.app">Documentation</a>
+        <a href="/docs">Documentation</a>
       </li>
     </ul>
   </footer>

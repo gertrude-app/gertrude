@@ -18,7 +18,7 @@ const CTABlock: React.FC = () => (
       </a>
       <a
         className="bg-white/10 hover:bg-white/20 shadow-xl rounded-lg py-[19px] px-12 sm:px-6 inline-block text-white/80 whitespace-nowrap text-lg transition duration-100"
-        href="https://docs.gertrude.app"
+        href="/docs/getting-started"
       >
         &rdquo;Getting Started&ldquo; tutorial &rarr;
       </a>

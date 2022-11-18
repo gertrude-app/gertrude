@@ -72,7 +72,7 @@ const SidebarNav: React.FC<Props> = ({
         <SidebarOption
           icon="book"
           collapsed={collapsed}
-          to="https://docs.gertrude.app"
+          to="https://gertrude.app/docs"
           isSelected={false}
         >
           Docs

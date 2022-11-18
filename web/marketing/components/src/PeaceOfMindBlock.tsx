@@ -38,7 +38,7 @@ const PeaceOfMindBlock: React.FC = () => (
           </a>
           <a
             className="font-extrabold text-xl bg-white px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center hover:bg-violet-50 transition duration-100 border-[0.5px]"
-            href="https://dash.gertrude.app/signup"
+            href="/docs"
           >
             <h2 className="bg-gradient-to-br from-indigo-500 flex items-center to-fuchsia-500 bg-clip-text text-transparent">
               <i aria-hidden className="fas fa-book mr-4" />
