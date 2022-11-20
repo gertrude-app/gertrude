@@ -1,6 +1,5 @@
 import React from 'react';
 import cx from 'classnames';
-import { Link } from 'react-router-dom';
 import { inflect } from '@dash/utils';
 import { Button } from '@shared/components';
 import type { Subcomponents } from '@dash/types';
@@ -36,7 +35,7 @@ const UserCard: React.FC<Props> = ({
             className={cx(
               `w-9 h-9 rounded-full flex justify-center items-center text-lg`,
               screenshotsEnabled
-                ? `bg-violet-200 text-violet-600`
+                ? `bg-indigo-100 text-indigo-500`
                 : `bg-gray-100 text-gray-300`,
             )}
           >
@@ -46,7 +45,7 @@ const UserCard: React.FC<Props> = ({
             className={cx(
               `w-9 h-9 rounded-full flex justify-center items-center text-lg`,
               keystrokesEnabled
-                ? `bg-violet-200 text-violet-600`
+                ? `bg-indigo-100 text-indigo-500`
                 : `bg-gray-100 text-gray-300`,
             )}
           >
@@ -88,33 +87,38 @@ const UserCard: React.FC<Props> = ({
           </h2>
         </div>
       )}
-      <div className="flex justify-center my-3">
-        <Button
-          type="button"
-          color="secondary"
-          onClick={addDevice}
-          small
-          className="mt-2"
-        >
-          <i className="fa-solid fa-plus mr-2" /> Add device
-        </Button>
+      <div
+        className={`flex ${
+          devices.length === 0 ? `justify-center` : `justify-end`
+        } mt-3 mr-2`}
+      >
+        {devices.length > 0 ? (
+          <button
+            className="w-8 h-8 rounded-full bg-violet-50 flex justify-center items-center text-violet-400 text-lg hover:bg-violet-100 transition duration-100 hover:text-violet-500"
+            onClick={addDevice}
+          >
+            <i className="fa-solid fa-plus" />
+          </button>
+        ) : (
+          <Button type="button" color="secondary" onClick={addDevice}>
+            <i className="fa-solid fa-plus mr-2" /> Add a device
+          </Button>
+        )}
       </div>
     </div>
-    <div className="border-t flex rounded-b-xl divide-x divide-gray-200 hover:divide-gray-300/80">
-      <Link
-        to={id}
-        className="ScrollTop transition duration-100 w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-50 rounded-bl-xl"
-      >
-        <i className="fa fa-pen text-sm mr-3 text-gray-600" aria-hidden="true" />
-        <h2 className="text-gray-500 text-lg tracking-wide">Edit</h2>
-      </Link>
-      <Link
+    <div className="flex rounded-b-xl p-3 space-x-3">
+      <Button type="link" color="tertiary" to={id} small className="flex-grow">
+        <i className="fa-solid fa-pen mr-2" /> Edit
+      </Button>
+      <Button
+        type="link"
+        color="secondary"
         to={`${id}/activity`}
-        className="ScrollTop transition duration-100 w-1/2 py-3 text-xl flex items-center justify-center hover:bg-gray-50 rounded-br-xl"
+        className="flex-grow"
+        disabled={devices.length === 0}
       >
-        <i className="fa fa-binoculars text-lg mr-3 text-gray-600" aria-hidden="true" />
-        <span className="text-gray-500 text-lg tracking-wide">Activity</span>
-      </Link>
+        <i className="fa-solid fa-binoculars mr-2" /> Activity
+      </Button>
     </div>
   </div>
 );
