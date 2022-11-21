@@ -33,6 +33,34 @@ describe(`convert.toState()`, () => {
     expect(state.appIdentificationType).toBe(`bundleId`);
   });
 
+  it(`turns on the advanced mode if key is domain regex`, () => {
+    const key: KeyRecord = {
+      id: `key-id`,
+      keychainId: `keychain-id`,
+      key: {
+        type: `domainRegex`,
+        pattern: `foo-*-bar.com`,
+        scope: { type: `webBrowsers` },
+      },
+    };
+    const state = convert.toState(key);
+    expect(state.showAdvancedAddressOptions).toBe(true);
+  });
+
+  it(`turns on the advanced mode if key is ip address`, () => {
+    const key: KeyRecord = {
+      id: `key-id`,
+      keychainId: `keychain-id`,
+      key: {
+        type: `ipAddress`,
+        ipAddress: `1.2.3.4`,
+        scope: { type: `webBrowsers` },
+      },
+    };
+    const state = convert.toState(key);
+    expect(state.showAdvancedAddressOptions).toBe(true);
+  });
+
   it(`sets appIdentificationType correctly for bundleId-only domain key`, () => {
     const key: KeyRecord = {
       id: `key-id`,
