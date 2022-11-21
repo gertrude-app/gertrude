@@ -112,9 +112,9 @@ const Profile: React.FC<Props> = ({
         <AccountStatusBadge status={status} />
       </div>
     </div>
-    <div className="mt-12">
+    <div className="mt-16">
       <div className="flex flex-col">
-        <div className="mb-10">
+        <div className="mb-16">
           <h2 className="text-2xl font-bold text-gray-800">Notification methods</h2>
           <p className="text-gray-500 mt-1">
             Verified ways that Gertrude can notify you for user requests
@@ -131,7 +131,7 @@ const Profile: React.FC<Props> = ({
           <Button
             type="button"
             onClick={() => newMethodEventHandler({ type: `create_clicked` })}
-            color="secondary-white"
+            color="secondary"
             small
             className="mt-4"
           >
@@ -180,7 +180,7 @@ const Profile: React.FC<Props> = ({
           <Button
             type="button"
             onClick={createNotification}
-            color="primary-violet"
+            color="primary"
             className="self-center"
           >
             <i className="fa fa-plus mr-3" />

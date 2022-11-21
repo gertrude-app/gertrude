@@ -5,11 +5,12 @@ import cx from 'classnames';
 interface CommonProps {
   className?: string;
   color:
-    | 'primary-violet'
-    | 'primary-white'
-    | 'secondary-violet'
-    | 'secondary-white'
-    | 'secondary-warning';
+    | 'primary-on-violet-bg'
+    | 'secondary-on-violet-bg'
+    | 'primary'
+    | 'secondary'
+    | 'tertiary'
+    | 'warning';
   children: React.ReactNode;
   fullWidth?: boolean;
   small?: boolean;
@@ -35,20 +36,23 @@ const Button: React.FC<Props> = ({
   let colors = ``;
   if (!disabled) {
     switch (color) {
-      case `primary-violet`:
-        colors = `bg-violet-800 text-white hover:bg-violet-900 ring-transparent focus:ring-violet-800`;
-        break;
-      case `primary-white`:
+      case `primary-on-violet-bg`:
         colors = `bg-white text-violet-500 hover:bg-violet-50 border-2 border-white hover:border-violet-50 ring-violet-500 ring-offset-violet-500 focus:ring-white`;
         break;
-      case `secondary-violet`:
+      case `secondary-on-violet-bg`:
         colors = `bg-violet-500 text-white border-2 border-white hover:bg-violet-400 ring-violet-500 focus:ring-white ring-offset-violet-500`;
         break;
-      case `secondary-white`:
-        colors = `bg-gray-50 text-gray-500 border hover:bg-gray-100 ring-transparent focus:ring-indigo-400/50 focus:border-indigo-500`;
+      case `primary`:
+        colors = `bg-violet-800 text-white hover:bg-violet-900 ring-transparent focus:ring-violet-800`;
         break;
-      case `secondary-warning`:
-        colors = `bg-red-50 text-red-600 border-red-100 border hover:text-red-700 hover:bg-red-100 ring-transparent focus:ring-red-500 focus:border-red-500`;
+      case `secondary`:
+        colors = `bg-violet-100 text-violet-600 hover:bg-violet-200 ring-transparent focus:ring-violet-300`;
+        break;
+      case `tertiary`:
+        colors = `bg-white text-gray-600 border hover:bg-gray-50 ring-transparent focus:ring-indigo-400/50 focus:border-indigo-200`;
+        break;
+      case `warning`:
+        colors = `bg-red-50 text-red-600 border-red-100 border-[0.5px] hover:text-red-700 hover:bg-red-100 ring-transparent focus:ring-red-500 focus:border-red-500`;
         break;
     }
   } else {
@@ -58,8 +62,8 @@ const Button: React.FC<Props> = ({
   const rendersAsButton = props.type === `button` || props.type === `submit`;
   const classes = cx(
     colors,
-    `ring ring-offset-0 focus:ring-offset-2 shadow-sm rounded-lg font-bold [transition:100ms] outline-none block`,
-    small ? `text-md px-5 py-3.5 sm:py-2` : `text-lg px-10 py-2.5`,
+    `ring ring-offset-0 focus:ring-offset-2 rounded-lg font-bold [transition:100ms] outline-none block`,
+    small ? `text-md px-5 py-3 sm:py-2.5` : `text-lg px-10 py-2.5`,
     className,
     fullWidth ? `w-full` : `w-fit`,
     !rendersAsButton && `text-center`,

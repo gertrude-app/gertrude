@@ -27,7 +27,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
           <p className="mb-4 text-black text-opacity-50 text-center">
             You can use Gertrude to monitor your users' activity
           </p>
-          <Button type="link" color="primary-violet" to="/users/new" small>
+          <Button type="link" color="primary" to="/users/new" small>
             <i className="fa-solid fa-arrow-right mr-2" /> See how
           </Button>
         </div>
@@ -84,7 +84,7 @@ export const UnreviewedItemsCard: React.FC<UnreviewedItemsCardProps> = ({
   <Link
     to={`/users/${userId}/activity`}
     className={cx(
-      `ScrollTop bg-white border shadow-lg rounded-xl p-4 flex justify-between items-center relative transition duration-100 cursor-pointer hover:bg-gray-50`,
+      `ScrollTop bg-white border rounded-xl p-4 flex justify-between items-center relative transition duration-100 cursor-pointer hover:bg-gray-50`,
       numUnreviewed === 0 && `bg-green-50 hover:bg-green-100 hover:bg-opacity-80`,
     )}
   >

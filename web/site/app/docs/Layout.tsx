@@ -234,14 +234,14 @@ const Header: React.FC<{ navigation: typeof navigation }> = ({ navigation }) => 
           <div className="flex">
             <Logo
               textSize="text-3xl"
-              className="hidden opacity-90 lg:flex"
+              className="hidden opacity-90 lg:flex lg:space-x-1.5"
               type="on-dark"
             />
             <Logo
               type="on-dark"
               size={32}
               textSize="text-2xl"
-              className="opacity-90 lg:hidden"
+              className="opacity-90 space-x-1 lg:hidden"
             />
             <span
               className={cx(

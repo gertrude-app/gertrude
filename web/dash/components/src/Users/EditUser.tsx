@@ -193,12 +193,7 @@ const EditUser: React.FC<Props> = ({
         </div>
         <div className="flex mt-5 justify-end border-t-2 pt-8 space-x-5">
           {!isNew && (
-            <Button
-              type="button"
-              onClick={deleteUser.start}
-              color="secondary-warning"
-              small
-            >
+            <Button type="button" onClick={deleteUser.start} color="warning" small>
               Delete user
             </Button>
           )}
@@ -207,7 +202,7 @@ const EditUser: React.FC<Props> = ({
             type="button"
             disabled={saveButtonDisabled}
             onClick={onSave}
-            color="primary-violet"
+            color="primary"
           >
             Save user
           </Button>

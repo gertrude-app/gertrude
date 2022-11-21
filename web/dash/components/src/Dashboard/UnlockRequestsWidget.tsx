@@ -13,7 +13,7 @@ type Props = {
 };
 
 const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) => (
-  <DashboardWidget inset className={className}>
+  <DashboardWidget className={className}>
     <WidgetTitle icon="unlock" text="Unlock requests" />
     <div className="space-y-5">
       {writable(unlockRequests)
@@ -38,13 +38,7 @@ const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) =>
           And {unlockRequests.length - 2} older{` `}
           {inflect(`request`, unlockRequests.length - 2)}:
         </h3>
-        <Button
-          type="link"
-          to="unlock-requests"
-          color="secondary-white"
-          small
-          className="mt-3"
-        >
+        <Button type="link" to="unlock-requests" color="tertiary" small className="mt-3">
           View all
         </Button>
       </div>

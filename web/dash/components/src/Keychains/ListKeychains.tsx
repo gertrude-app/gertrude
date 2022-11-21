@@ -39,7 +39,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
           ))}
         </div>
         <div className="mt-10 flex justify-end border-t pt-8">
-          <Button type="button" onClick={onCreateNew} color="primary-violet">
+          <Button type="button" onClick={onCreateNew} color="primary">
             <i className="fa fa-plus mr-2" /> Create keychain
           </Button>
         </div>

@@ -176,7 +176,7 @@ const Modal: React.FC<Props> = ({
                       <Button
                         type="button"
                         small
-                        color="secondary-white"
+                        color="tertiary"
                         className="sm:mr-3 w-[100%] sm:w-auto mb-4 sm:mb-0"
                         disabled={secondary.disabled}
                         onClick={secondary.action}
@@ -190,10 +190,10 @@ const Modal: React.FC<Props> = ({
                       small
                       color={
                         type === `destructive`
-                          ? `secondary-warning`
+                          ? `warning`
                           : type === `error`
-                          ? `secondary-violet`
-                          : `primary-violet`
+                          ? `secondary`
+                          : `primary`
                       }
                       className="w-[100%] sm:w-auto"
                       onClick={primary.action}

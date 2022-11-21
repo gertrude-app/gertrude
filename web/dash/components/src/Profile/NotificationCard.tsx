@@ -47,7 +47,7 @@ const NotificationCard: React.FC<Props> = ({
     <div
       ref={ref}
       className={cx(
-        `shadow-lg border rounded-xl w-full sm:w-128 flex flex-col bg-white m-2 sm:m-4`,
+        `shadow-lg border-[0.5px] rounded-xl w-full sm:w-128 flex flex-col bg-white m-2 sm:m-4`,
         focus && `ring-violet-500/90 ring-4 ring-offset-4`,
       )}
     >
@@ -88,7 +88,7 @@ const NotificationCard: React.FC<Props> = ({
         <Button
           type="button"
           onClick={startEdit}
-          color="secondary-white"
+          color="tertiary"
           small
           className={editing ? `hidden` : `block`}
         >
@@ -98,7 +98,7 @@ const NotificationCard: React.FC<Props> = ({
         <Button
           type="button"
           onClick={onDelete}
-          color="secondary-warning"
+          color="warning"
           small
           className={`${editing ? `hidden` : `block`} ml-3`}
         >
@@ -108,7 +108,7 @@ const NotificationCard: React.FC<Props> = ({
         <Button
           type="button"
           onClick={cancelEdit}
-          color="secondary-white"
+          color="tertiary"
           small
           className={`${editing ? `block` : `hidden`} mr-3`}
         >
@@ -117,7 +117,7 @@ const NotificationCard: React.FC<Props> = ({
         <Button
           type="button"
           onClick={onSave}
-          color="primary-violet"
+          color="secondary"
           disabled={saveButtonDisabled}
           small
           className={editing ? `block` : `hidden`}

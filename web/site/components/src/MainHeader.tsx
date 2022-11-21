@@ -11,7 +11,7 @@ const MainHeader: React.FC = () => (
         className="hidden sm:flex"
         type="external"
         href="https://dash.gertrude.app/login"
-        color="secondary-violet"
+        color="secondary-on-violet-bg"
         small
       >
         Log in
@@ -19,7 +19,7 @@ const MainHeader: React.FC = () => (
       <Button
         type="external"
         href="https://dash.gertrude.app/signup"
-        color="primary-white"
+        color="primary-on-violet-bg"
         small
       >
         Sign up

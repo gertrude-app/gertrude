@@ -11,10 +11,10 @@ type Props = {
 };
 
 const UserDevice: React.FC<Props> = ({ model, status, icon, className }) => (
-  <div className={cx(`border rounded-full p-2 pr-4 shadow bg-white`, className)}>
+  <div className={cx(`rounded-2xl p-3 px-4 bg-white border`, className)}>
     <div className="flex justify-between items-center">
       <div className="flex items-center">
-        <GradientIcon icon={icon} size="medium" className="mr-3" subtle />
+        <GradientIcon icon={icon} size="medium" className="mr-4" />
         <h3 className="text-gray-500 text-lg font-medium">{model}</h3>
       </div>
       {status === `online` && (
