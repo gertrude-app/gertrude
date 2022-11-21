@@ -10,3 +10,12 @@ Cypress.Commands.add(`simulateLoggedIn`, () => {
 Cypress.Commands.add(`testId`, (selector, ...args) => {
   return cy.get(`[data-test=${selector}]`, ...args);
 });
+
+Cypress.Commands.add(
+  `sidebarClick`,
+  (link: 'Dashboard' | 'Users' | 'Keychains' | 'Profile') => {
+    cy.testId(`sidebar-nav`).within(() => {
+      cy.contains(link).click();
+    });
+  },
+);

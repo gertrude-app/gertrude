@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { formatDate } from '@dash/datetime';
-import { isUnsaved, unsavedId } from '@dash/utils';
 import type { ActivityItem } from '@dash/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { DateRangeInput } from '@dash/types';
@@ -45,9 +44,7 @@ export interface UsersState {
 export function initialState(): UsersState {
   return {
     listRequest: Req.idle(),
-    entities: {
-      [unsavedId()]: editable(empty.user()),
-    },
+    entities: {},
     fetchUserRequest: {},
     updateUserRequest: {},
     activityOverviews: {},
@@ -73,6 +70,9 @@ export const slice = createSlice({
     },
     addDeviceDismissed(state) {
       delete state.addDeviceRequest;
+    },
+    newUserRouteVisited(state, { payload: id }: PayloadAction<UUID>) {
+      state.entities[id] = editable(empty.user(id), true);
     },
     userUpdated: (state, { payload }: PayloadAction<UserUpdate>) => {
       const draft = state.entities[payload.id]?.draft;
@@ -194,13 +194,10 @@ export const slice = createSlice({
       state.updateUserRequest[meta.arg] = Req.fail(error);
     });
 
-    builder.addCase(upsertUser.succeeded, (state, { meta, payload }) => {
+    builder.addCase(upsertUser.succeeded, (state, { meta }) => {
       state.updateUserRequest[meta.arg] = Req.succeed(void 0);
       const user = state.entities[meta.arg];
-      if (user && isUnsaved(meta.arg)) {
-        state.entities[payload] = editable({ ...user.draft, id: payload });
-        state.entities[unsavedId()] = editable(empty.user());
-      } else if (user) {
+      if (user) {
         state.entities[meta.arg] = commit(user);
       }
     });
@@ -301,22 +298,22 @@ export const upsertUser = createResultThunk(
       return Result.unexpectedError();
     }
 
-    const saveResult = await Current.api.users.upsertUser({ ...user.draft, adminId });
-    if (saveResult.data.type === `error`) {
+    const saveResult = await Current.api.users.upsertUser({
+      ...user.draft,
+      adminId,
+      isNew: user.isNew,
+    });
+
+    if (saveResult.data.type === `error` || !isDirty(user, `keychains`)) {
       return saveResult;
     }
 
-    if (!isDirty(user, `keychains`)) {
-      return saveResult;
-    }
-
-    const serverId = saveResult.data.value;
     const setKeychainsResult = await Current.api.users.setUserKeychains(
-      serverId, // in case the user was newly created, use id from server
+      user.draft.id,
       user.draft.keychains.map(({ id }) => id),
     );
 
-    return setKeychainsResult.map(() => serverId);
+    return setKeychainsResult;
   },
 );
 
@@ -353,6 +350,7 @@ export const {
   keychainSelected,
   keychainAdded,
   addKeychainModalDismissed,
+  newUserRouteVisited,
 } = slice.actions;
 
 export default slice.reducer;

@@ -76,9 +76,11 @@ function setAddressFields(key: Key, state: EditKey.State): void {
   } else if (key.type === `domainRegex`) {
     state.addressType = `domainRegex`;
     state.address = key.pattern;
+    state.showAdvancedAddressOptions = true;
   } else if (key.type === `ipAddress`) {
     state.addressType = `ip`;
     state.address = key.ipAddress;
+    state.showAdvancedAddressOptions = true;
   }
 }
 
