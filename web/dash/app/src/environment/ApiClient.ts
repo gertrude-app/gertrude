@@ -258,10 +258,10 @@ export const noopApiClient: ApiClient = {
       return Result.success([]);
     },
     getUser: async () => {
-      return Result.success(empty.user());
+      return Result.success(empty.user(``));
     },
     upsertUser: async () => {
-      return Result.success(``);
+      return Result.true();
     },
     setUserKeychains: async () => {
       return Result.success(true);

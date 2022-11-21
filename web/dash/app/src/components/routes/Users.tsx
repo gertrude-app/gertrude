@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Loading, ListUsers, ApiErrorMessage } from '@dash/components';
-import { isUnsaved } from '@dash/utils';
 import { Family } from '@dash/types';
 import { typesafe } from '@shared/ts-utils';
 import { useDispatch, useSelector } from '../../redux/hooks';
@@ -17,8 +16,8 @@ const Users: React.FC = () => {
     addDeviceRequest: state.users.addDeviceRequest,
     users: typesafe
       .objectValues(state.users.entities)
-      .map((editable) => editable.original)
-      .filter((user) => !isUnsaved(user.id)),
+      .filter((editable) => !editable.isNew)
+      .map((editable) => editable.original),
   }));
 
   useEffect(() => {

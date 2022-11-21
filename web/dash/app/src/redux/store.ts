@@ -14,7 +14,6 @@ import filterSuspensionsReducer from './slice-filter-suspensions';
 import unlockRequestsReducer from './slice-unlock-requests';
 import storageMiddleware from './middleware-storage';
 import toastMiddleware from './middleware-toast';
-import redirectMiddleware from './middleware-redirect';
 
 export const store = configureStore({
   reducer: {
@@ -31,11 +30,7 @@ export const store = configureStore({
     url: urlReducer,
   },
   middleware: (getDefaultMiddleware) => {
-    return getDefaultMiddleware().concat([
-      storageMiddleware,
-      toastMiddleware,
-      redirectMiddleware,
-    ]);
+    return getDefaultMiddleware().concat([storageMiddleware, toastMiddleware]);
   },
 });
 

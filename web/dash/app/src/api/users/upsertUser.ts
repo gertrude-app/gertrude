@@ -1,4 +1,3 @@
-import { isUnsaved } from '@dash/utils';
 import type { UpdateUserInput } from '@dash/types';
 import type Result from '../Result';
 import type * as U from './__generated__/UpdateUser';
@@ -7,9 +6,10 @@ import type { User } from './types';
 import { gql, mutate } from '../apollo';
 
 export async function upsertUser(
-  user: User & { adminId: UUID },
-): Promise<Result<UUID, ApiError>> {
-  const input: Omit<UpdateUserInput, 'id'> = {
+  user: User & { adminId: UUID; isNew?: boolean },
+): Promise<Result<true, ApiError>> {
+  const input: UpdateUserInput = {
+    id: user.id,
     adminId: user.adminId,
     name: user.name,
     keyloggingEnabled: user.keyloggingEnabled,
@@ -18,15 +18,15 @@ export async function upsertUser(
     screenshotsResolution: user.screenshotsResolution,
   };
 
-  const result = isUnsaved(user.id)
+  const result = user.isNew
     ? await mutate<C.CreateUser, C.CreateUserVariables>(CREATE_MUTATION, {
         input,
       })
     : await mutate<U.UpdateUser, U.UpdateUserVariables>(UPDATE_MUTATION, {
-        input: { ...input, id: user.id },
+        input,
       });
 
-  return result.mapApi((data) => data.user.id);
+  return result.mapApi(() => true);
 }
 
 const CREATE_MUTATION = gql`

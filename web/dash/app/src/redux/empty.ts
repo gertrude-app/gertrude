@@ -1,4 +1,3 @@
-import { unsavedId } from '@dash/utils';
 import { RequestStatus } from '@dash/types';
 import type { UnlockRequest } from '@dash/types';
 import type { Keychain } from '@dash/keys';
@@ -15,9 +14,9 @@ export function keychain(id: UUID, adminId: UUID): Keychain {
   };
 }
 
-export function user(): User {
+export function user(id: UUID): User {
   return {
-    id: unsavedId(),
+    id,
     name: ``,
     keyloggingEnabled: false,
     screenshotsEnabled: false,

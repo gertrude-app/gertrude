@@ -1,11 +1,11 @@
 import { expect, test, it, describe, vi } from 'vitest';
-import { unsavedId } from '@dash/utils';
 import { Req, editable } from '../helpers';
 import Current from '../../environment';
 import reducer, {
   deleteActivityItems,
   deleteDevice,
   fetchActivityOverview,
+  newUserRouteVisited,
   upsertUser,
 } from '../slice-users';
 import Result from '../../api/Result';
@@ -36,47 +36,16 @@ describe(`deleteDevice`, () => {
 });
 
 describe(`upsertUser`, () => {
-  it(`with new user, passes correct arguments to API methods`, async () => {
-    const dispatch = vi.fn();
-    Current.api.users.setUserKeychains = vi.fn(() => Promise.resolve(Result.true()));
-    Current.api.users.upsertUser = vi.fn(() =>
-      Promise.resolve(Result.success(`user123`)),
-    );
-
-    let unsaved = editable(mock.user());
-    const getState = makeGetState((state) => {
-      state.auth.admin = { id: `admin123`, token: `` };
-      unsaved = state.users.entities[unsavedId()]!;
-      unsaved.draft.name = `Blob jr.`;
-    });
-
-    await upsertUser(unsavedId())(dispatch, getState);
-
-    expect(Current.api.users.upsertUser).toHaveBeenCalledWith({
-      ...unsaved.draft,
-      name: `Blob jr.`,
-      adminId: `admin123`,
-    });
-
-    await nextTick();
-
-    expect(Current.api.users.setUserKeychains).not.toHaveBeenCalled();
-
-    // now simulate the api request feeding a successful result back into the store
-    const next = reducer(getState().users, upsertUser.succeeded(`user123`, unsavedId()));
-    // the pending "new" user now has the server id
-    expect(next.entities.user123?.original.name).toBe(`Blob jr.`);
-    expect(next.entities.user123?.original.id).toBe(`user123`);
-    // and we have a "fresh" new user
-    expect(next.entities[unsavedId()]?.original.name).toBe(``);
+  test(`visiting new user route creates empty new user entity`, () => {
+    let state = makeState().users;
+    state = reducer(state, newUserRouteVisited(`abc`));
+    expect(state.entities.abc?.isNew).toBe(true);
   });
 
   it(`with existing user, passes correct arguments to API methods`, async () => {
     const dispatch = vi.fn();
     Current.api.users.setUserKeychains = vi.fn(() => Promise.resolve(Result.true()));
-    Current.api.users.upsertUser = vi.fn(() =>
-      Promise.resolve(Result.success(`user123`)),
-    );
+    Current.api.users.upsertUser = vi.fn(() => Promise.resolve(Result.true()));
 
     const user = editable(
       mock.user({
@@ -128,7 +97,7 @@ describe(`upsertUser`, () => {
     let state = reducer(initialState.users, upsertUser.started(`user123`));
     expect(state.updateUserRequest.user123).toEqual(Req.ongoing());
 
-    state = reducer(initialState.users, upsertUser.succeeded(`user123`, `user123`));
+    state = reducer(initialState.users, upsertUser.succeeded(true, `user123`));
     expect(state.updateUserRequest.user123).toEqual(Req.succeed(void 0));
 
     // successfully saving causes the draft state to be "committed"

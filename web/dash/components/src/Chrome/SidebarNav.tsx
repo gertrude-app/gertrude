@@ -18,7 +18,7 @@ const SidebarNav: React.FC<Props> = ({
   urlPath,
   onInternalLinkClick,
 }) => (
-  <div className="flex flex-col justify-between h-full">
+  <div className="flex flex-col justify-between h-full" data-test="sidebar-nav">
     <nav className={cx(`flex flex-col`, collapsed ? `py-4` : `px-4`)}>
       <a href="/">
         <Logo

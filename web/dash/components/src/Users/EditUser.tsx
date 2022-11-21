@@ -90,6 +90,7 @@ const EditUser: React.FC<Props> = ({
       <TextInput
         type="text"
         label="Name:"
+        testId="user-name"
         value={name}
         setValue={setName}
         className="max-w-xl"

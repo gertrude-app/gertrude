@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { v4 as uuid } from 'uuid';
 import { Navigate, useParams } from 'react-router-dom';
 import { Loading, EditUser, ApiErrorMessage } from '@dash/components';
-import { isUnsaved, unsavedId } from '@dash/utils';
 import type { UserUpdate } from '../../redux/slice-users';
 import type { GetUser_user_devices } from '../../api/users/__generated__/GetUser';
 import type { QueryProps } from '../../redux/store';
+import { newUserRouteVisited } from '../../redux/slice-users';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   fetchUser,
@@ -26,13 +27,19 @@ import useSelectableKeychains from '../../hooks/selectable-keychains';
 import { familyToIcon } from './Users';
 
 const User: React.FC = () => {
-  const dispatch = useDispatch();
   const { userId: id = `` } = useParams<{ userId: string }>();
+  const newUserId = useMemo(() => uuid(), []);
+  const dispatch = useDispatch();
   const [query, shouldFetch] = useSelector(queryProps(dispatch, id));
 
   useEffect(() => {
     shouldFetch && dispatch(fetchUser(id));
-  }, [dispatch, id, shouldFetch]);
+    id === `new` && dispatch(newUserRouteVisited(newUserId));
+  }, [dispatch, id, shouldFetch, newUserId]);
+
+  if (id === `new`) {
+    return <Navigate to={`/users/${newUserId}`} replace />;
+  }
 
   if (query.state === `entityDeleted`) {
     return <Navigate to={query.redirectUrl} />;
@@ -52,21 +59,23 @@ const User: React.FC = () => {
 export default User;
 
 export const queryProps: QueryProps<typeof EditUser, UUID> =
-  (dispatch, userId) => (appState) => {
-    const id = userId === `new` ? unsavedId() : userId;
+  (dispatch, id) => (appState) => {
     const state = appState.users;
     const fetch = state.fetchUserRequest[id];
+    const editable = state.entities[id];
     const selectableKeychains = useSelectableKeychains(
       state.adding.keychain !== undefined,
     );
 
-    if (!isUnsaved(id) && fetch?.state !== `succeeded`) {
+    if (id === `new`) {
+      return [{ state: `ongoing` }, false];
+    }
+
+    if (!editable && fetch?.state !== `succeeded`) {
       return [Req.toUnresolvedQuery(fetch), fetch?.state !== `failed`];
     }
 
-    const editable = state.entities[id];
-
-    if (!editable && state.deleted.includes(userId)) {
+    if (!editable && state.deleted.includes(id)) {
       return [Query.redirectDeleted(`/users`), false];
     } else if (!editable) {
       return [Query.unexpectedError(), false];
@@ -83,7 +92,7 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
 
     return [
       Query.resolve({
-        isNew: isUnsaved(id),
+        isNew: editable.isNew === true,
         name: user.name,
         setName: (value) => set({ type: `name`, value }),
         keyloggingEnabled: user.keyloggingEnabled,
@@ -100,7 +109,9 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
         keychains: user.keychains,
         devices: user.devices.map(deviceProps),
         saveButtonDisabled:
-          !isUnsaved(id) && (!isDirty(editable) || update?.state === `ongoing`),
+          !isDirty(editable) ||
+          update?.state === `ongoing` ||
+          editable.draft.name.trim() === ``,
         onSave: () => dispatch(upsertUser(id)),
         deleteUser: {
           id: deleteUserId,
