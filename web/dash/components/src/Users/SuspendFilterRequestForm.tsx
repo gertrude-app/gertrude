@@ -79,6 +79,7 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
         optional
         value={responseComment}
         setValue={setResponseComment}
+        testId="suspend-filter-req-comment"
       />
     </form>
   </div>

@@ -1,6 +1,6 @@
 import { ScreenshotViewer } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
-import { testImgUrl } from '../../../story-helpers';
+import { testImgUrl, time } from '../../../story-helpers';
 
 export default {
   title: 'Dashboard/Users/Activity/ScreenshotViewer', // eslint-disable-line
@@ -16,21 +16,21 @@ Default.args = {
   url: testImgUrl(800, 600),
   width: 800,
   height: 600,
-  date: new Date(),
+  date: new Date(time.stable()),
 };
 
 export const Tall = Template.bind({});
 Tall.args = {
+  ...Default.args,
   url: testImgUrl(800, 900),
   width: 800,
   height: 900,
-  date: new Date(),
 };
 
 export const Wide = Template.bind({});
 Wide.args = {
+  ...Default.args,
   url: testImgUrl(1200, 400),
   width: 1200,
   height: 400,
-  date: new Date(),
 };

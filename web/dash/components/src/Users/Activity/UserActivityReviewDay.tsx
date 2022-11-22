@@ -79,6 +79,7 @@ const UserActivityReviewDay: React.FC<Props> = ({
             }}
             color="primary"
           >
+            <i className="fa-solid fa-thumbs-up mr-2" />
             Approve all
           </Button>
         </div>
@@ -120,6 +121,8 @@ function deleteableChunks(
           <Button
             className="self-center"
             type="button"
+            color="secondary-on-violet-bg"
+            small
             onClick={() => {
               deleteItems(toDelete);
               // sometimes scrolling to top seems to fail, possibly because
@@ -129,7 +132,6 @@ function deleteableChunks(
               setTimeout(scrollToTop, 50);
               setTimeout(scrollToTop, 150);
             }}
-            color="secondary"
           >
             Approve previous {[...ids].length} items
           </Button>

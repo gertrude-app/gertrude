@@ -110,13 +110,15 @@ const EditKeychain: React.FC<Props> = ({
             </div>
           </>
         ) : (
-          <EmptyState
-            heading={`No keys`}
-            secondaryText="Add a key to this keychain:"
-            icon={`key`}
-            buttonText={`Create key`}
-            action={onCreateNewKey}
-          />
+          !isNew && (
+            <EmptyState
+              heading="No keys"
+              secondaryText="Add a key to this keychain:"
+              icon="key"
+              buttonText="Create key"
+              action={onCreateNewKey}
+            />
+          )
         )}
       </div>
       <div className="flex mt-5 justify-end border-t-2 pt-8 space-x-5">

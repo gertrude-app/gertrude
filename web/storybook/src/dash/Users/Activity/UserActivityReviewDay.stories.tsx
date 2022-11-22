@@ -17,7 +17,7 @@ const Template: ComponentStory<typeof UserActivityReviewDay> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  date: new Date(),
+  date: new Date(time.stable()),
   items: [
     keystrokeLine(
       `Xcode`,

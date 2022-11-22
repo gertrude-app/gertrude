@@ -1,6 +1,7 @@
 import { RequestStatus } from '@dash/types';
 import { UnlockRequestCard } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import { time } from '../story-helpers';
 
 export default {
   title: 'Dashboard/Core/UnlockRequestCard', // eslint-disable-line
@@ -14,7 +15,7 @@ const Template: ComponentStory<typeof UnlockRequestCard> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  createdAt: new Date().toISOString(),
+  createdAt: new Date(time.stable()).toISOString(),
   userName: `Freddy`,
   url: `github.com`,
   comment: `Pleeeease can I use this? It's sooooo cool`,

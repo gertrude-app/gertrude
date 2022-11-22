@@ -34,6 +34,7 @@ describe(`unlock request flow`, () => {
           req.reply({ data: { keyRecord: { id: `123` } } });
           break;
         case `DecideUnlockRequest`:
+          req.alias = `decideUnlockRequest`;
           req.reply({ data: { unlockRequest: { id: `2` } } });
           break;
       }
@@ -57,6 +58,13 @@ describe(`unlock request flow`, () => {
     cy.visit(`/users/1/unlock-requests/2`);
     cy.url().should(`include`, `/review`);
     cy.contains(`Deny`).click();
+    cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2/deny-comment`);
+    cy.contains(`comment`);
+    cy.testId(`deny-unlock-req-comment`).type(`nope`);
+    cy.contains(`Deny`).click();
+    cy.wait(`@decideUnlockRequest`)
+      .its(`request.body.variables.input.responseComment`)
+      .should(`eq`, `nope`);
     cy.contains(`rejected`);
   });
 

@@ -152,7 +152,7 @@ const Modal: React.FC<Props> = ({
                     >
                       <div className="flex flex-col sm:flex-row items-center sm:items-start">
                         <GradientIcon icon={icon} size="large" />
-                        <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <div className="mt-3 text-center self-stretch sm:grow sm:mt-0 sm:ml-4 sm:text-left">
                           <Dialog.Title
                             as="h3"
                             className={cx(
@@ -162,7 +162,7 @@ const Modal: React.FC<Props> = ({
                           >
                             {capitalize(title)}
                           </Dialog.Title>
-                          <div className="mt-2">
+                          <div className="mt-2 w-full">
                             {children && (
                               <div className="text-sm text-gray-500">{children}</div>
                             )}
@@ -174,6 +174,7 @@ const Modal: React.FC<Props> = ({
                   <div className="sm:bg-gray-50 rounded-b-lg px-4 py-3 pb-5 sm:pb-3 flex flex-col items-stretch sm:flex-row sm:px-6 sm:justify-end">
                     {secondary && (
                       <Button
+                        testId="modal-secondary-btn"
                         type="button"
                         small
                         color="tertiary"
@@ -185,6 +186,7 @@ const Modal: React.FC<Props> = ({
                       </Button>
                     )}
                     <Button
+                      testId="modal-primary-btn"
                       type="button"
                       disabled={primary.disabled}
                       small
