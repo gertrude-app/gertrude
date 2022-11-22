@@ -152,6 +152,7 @@ export interface UpdateSuspendFilterRequestInput {
   duration: number;
   id: UUID;
   requestComment?: string | null;
+  responseComment?: string | null;
   scope: string;
   status: RequestStatus;
 }

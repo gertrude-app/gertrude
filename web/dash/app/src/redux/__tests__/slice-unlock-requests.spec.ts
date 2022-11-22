@@ -23,6 +23,7 @@ describe(`reducer`, () => {
     const state = makeState((s) => {
       s.unlockRequests.detailsExpanded = true;
       s.unlockRequests.selectedKeychainId = `1`;
+      s.unlockRequests.denyComment = `nope`;
     });
     const nextState = reducer(
       state.unlockRequests,
@@ -30,5 +31,6 @@ describe(`reducer`, () => {
     );
     expect(nextState.selectedKeychainId).toBe(undefined);
     expect(nextState.detailsExpanded).toBe(false);
+    expect(nextState.denyComment).toBe(undefined);
   });
 });

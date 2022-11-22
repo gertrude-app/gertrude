@@ -13,6 +13,7 @@ export interface UnlockRequestsState {
   fetchAllReq: RequestState;
   fetchReqs: Record<UUID, RequestState>;
   updateReqs: Record<UUID, RequestState>;
+  denyComment?: string;
   detailsExpanded: boolean;
   selectedKeychainId?: UUID;
 }
@@ -37,6 +38,9 @@ export const slice = createSlice({
     keychainSelected(state, action: PayloadAction<UUID>) {
       state.selectedKeychainId = action.payload;
     },
+    denyCommentUpdated(state, action: PayloadAction<string>) {
+      state.denyComment = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(rejectUnlockRequest.started, (state, { meta }) => {
@@ -51,6 +55,7 @@ export const slice = createSlice({
       state.updateReqs[meta.arg] = Req.succeed(void 0);
       state.detailsExpanded = false;
       state.selectedKeychainId = undefined;
+      state.denyComment = undefined;
       const unlockRequest = state.entities[meta.arg];
       if (unlockRequest) {
         unlockRequest.status = RequestStatus.rejected;
@@ -141,8 +146,14 @@ export const acceptUnlockRequest = createResultThunk(
 
 export const rejectUnlockRequest = createResultThunk(
   `${slice.name}/rejectUnlockRequest`,
-  (id: UUID) =>
-    Current.api.requests.updateUnlockRequest({ id, status: RequestStatus.rejected }),
+  (id: UUID, { getState }) => {
+    const comment = getState().unlockRequests.denyComment?.trim();
+    return Current.api.requests.updateUnlockRequest({
+      id,
+      status: RequestStatus.rejected,
+      responseComment: comment || undefined,
+    });
+  },
 );
 
 export const getUnlockRequest = createResultThunk(
@@ -160,6 +171,7 @@ export const getUserUnlockRequests = createResultThunk(
   Current.api.requests.getUserUnlockRequests,
 );
 
-export const { detailsExpandedToggled, keychainSelected } = slice.actions;
+export const { detailsExpandedToggled, denyCommentUpdated, keychainSelected } =
+  slice.actions;
 
 export default slice.reducer;

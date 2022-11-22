@@ -52,7 +52,8 @@ jobs:
       - name: make screenshots
         run: make visual-test
       - name: upload screenshots
-        run: pnpm dlx @argos-ci/cli upload storybook/visual-tests/screenshots/argos
+        run:
+          pnpm dlx @argos-ci/cli upload storybook/visual-tests/screenshots/argos || true
       - name: create screenshots pr
         id: pr
         uses: peter-evans/create-pull-request@v4

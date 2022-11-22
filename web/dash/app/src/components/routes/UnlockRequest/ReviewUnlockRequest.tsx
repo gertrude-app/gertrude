@@ -44,7 +44,7 @@ const ReviewUnlockRequestRoute: React.FC = () => {
       }}
       secondaryButton={{
         label: `Deny`,
-        action: () => navigate(`../deny`),
+        action: () => navigate(`../deny-comment`),
       }}
     >
       <ReviewUnlockRequest

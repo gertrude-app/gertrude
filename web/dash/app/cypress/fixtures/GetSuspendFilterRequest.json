@@ -1,0 +1,17 @@
+{
+  "data": {
+    "request": {
+      "status": "pending",
+      "device": {
+        "id": "dd000000-1111-0000-0000-000000000000",
+        "user": { "name": "Little Jimmy", "__typename": "User" },
+        "__typename": "Device"
+      },
+      "requestComment": "I want to watch a video",
+      "duration": 180,
+      "requestedDurationInSeconds": 180,
+      "createdAt": "2029-11-22T17:55:55Z",
+      "__typename": "SuspendFilterRequest"
+    }
+  }
+}

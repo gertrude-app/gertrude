@@ -92,6 +92,7 @@ export const updateSuspendFilterRequest = createResultThunk(
       deviceId: request.deviceId,
       duration: grantedDurationInSeconds(state),
       requestComment: request.requestComment,
+      responseComment: state.responseComment,
       scope: JSON.stringify({ type: `unrestricted` }),
       status: input.status,
     });

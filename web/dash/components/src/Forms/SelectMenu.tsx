@@ -22,9 +22,9 @@ function SelectMenu<Value extends string = string>({
   testId,
 }: Parameters<React.FC<Props<Value>>>[0]): ReturnType<React.FC<Props<Value>>> {
   return (
-    <Listbox data-test={testId} value={selectedOption} onChange={setSelected}>
+    <Listbox value={selectedOption} onChange={setSelected}>
       {({ open }) => (
-        <div className="relative">
+        <div data-test={testId} className="relative">
           {label && <Label className="w-full inline-block pb-px">{label}</Label>}
           <div className="relative">
             <div className="rounded-md w-full shadow-sm">
