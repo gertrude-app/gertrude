@@ -1,6 +1,7 @@
 import { UserActivityOverview } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
+import { time } from '../../../story-helpers';
 
 export default {
   title: 'Dashboard/Users/Activity/UserActivityOverview', // eslint-disable-line
@@ -18,9 +19,9 @@ export const Default = Template.bind({});
 Default.args = {
   userName: `Huck`,
   days: [
-    { date: new Date(), numItems: 330, numCompleted: 0 },
-    { date: new Date(), numItems: 117, numCompleted: 64 },
-    { date: new Date(), numItems: 89, numCompleted: 89 },
+    { date: new Date(time.stable()), numItems: 330, numCompleted: 0 },
+    { date: new Date(time.stable()), numItems: 117, numCompleted: 64 },
+    { date: new Date(time.stable()), numItems: 89, numCompleted: 89 },
   ],
 };
 
