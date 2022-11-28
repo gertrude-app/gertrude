@@ -1,16 +1,17 @@
 import React from 'react';
 import { Button, Logo } from '@shared/components';
+import { SmallScreenLoginDropdown } from './SmallScreenLoginDropdown';
 
 const MainHeader: React.FC = () => (
   <header className="flex justify-between items-center px-5 sm:px-8 py-6 bg-violet-500">
     <a href="/">
       <Logo type="inverted" />
     </a>
-    <div className="flex space-x-3">
+    <SmallScreenLoginDropdown />
+    <div className="hidden sm:flex space-x-3">
       <Button
-        className="hidden sm:flex"
         type="external"
-        href="https://dash.gertrude.app/login"
+        href="https://dash.gertrude.app"
         color="secondary-on-violet-bg"
         small
       >
