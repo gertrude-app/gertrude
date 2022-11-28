@@ -27,8 +27,8 @@ export const SmallScreenLoginDropdown: React.FC = () => {
                 <a
                   href="https://dash.gertrude.app/signup"
                   className={cx(
-                    active ? 'bg-violet-50 text-gray-900' : 'text-gray-700',
-                    'block px-4 py-2 text-base',
+                    active ? `bg-violet-50 text-gray-900` : `text-gray-700`,
+                    `block px-4 py-2 text-base`,
                   )}
                 >
                   Sign up
@@ -41,8 +41,8 @@ export const SmallScreenLoginDropdown: React.FC = () => {
                   <a
                     href="https://dash.gertrude.app"
                     className={cx(
-                      active ? 'bg-violet-50 text-gray-900' : 'text-gray-700',
-                      'block px-4 py-2 text-base',
+                      active ? `bg-violet-50 text-gray-900` : `text-gray-700`,
+                      `block px-4 py-2 text-base`,
                     )}
                   >
                     Log in
