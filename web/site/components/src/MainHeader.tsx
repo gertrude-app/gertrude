@@ -7,7 +7,7 @@ const MainHeader: React.FC = () => (
     <a href="/">
       <Logo type="inverted" />
     </a>
-    <SmallScreenLoginDropdown />
+    <SmallScreenLoginDropdown className="block sm:hidden" />
     <div className="hidden sm:flex space-x-3">
       <Button
         type="external"

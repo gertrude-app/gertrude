@@ -1,22 +1,23 @@
-import { Logo } from '@shared/components';
 import React from 'react';
+import Link from 'next/link';
+import { Logo } from '@shared/components';
 
 const MainFooter: React.FC = () => (
   <footer className="bg-gray-900">
     <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-start p-8 xs:p-12">
-      <div>
+      <Link href="/">
         <Logo type="on-dark" />
-      </div>
+      </Link>
       <div className="flex space-x-12 mt-10 sm:mt-0">
         <ul className="flex flex-col space-y-3 flex-grow">
           <li>
-            <FooterLink href="https://gertrude.app/download">Download</FooterLink>
+            <FooterLink href="/download">Download</FooterLink>
           </li>
           <li>
-            <FooterLink href="https://gertrude.app/docs">Documentation</FooterLink>
+            <FooterLink href="/docs">Documentation</FooterLink>
           </li>
           <li>
-            <FooterLink href="https://gertrude.app/contact">Contact us</FooterLink>
+            <FooterLink href="/contact">Contact us</FooterLink>
           </li>
         </ul>
         <ul className="flex flex-col space-y-3 flex-grow">
@@ -43,12 +44,13 @@ interface FooterLinkProps {
 }
 
 const FooterLink: React.FC<FooterLinkProps> = ({ children, href }) => {
+  const Element = href.startsWith(`https://`) ? `a` : Link;
   return (
-    <a
+    <Element
       href={href}
       className="text-slate-600 hover:text-slate-500 transition duration-100 p-1 text-lg"
     >
       {children}
-    </a>
+    </Element>
   );
 };
