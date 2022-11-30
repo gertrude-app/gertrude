@@ -3,7 +3,7 @@ import React from 'react';
 const CTABlock: React.FC = () => (
   <section className="bg-gradient-to-b from-violet-500 to-fuchsia-500 flex justify-center items-center flex-col md:p-28 p-10 py-14 md:py-28">
     <h2 className="text-white text-opacity-70 text-4xl font-bold mb-5 text-center">
-      $10/month. 30 day free trial.{` `}
+      $5/month. 60 day free trial.{` `}
       <span className="text-white text-opacity-90 font-extrabold">
         Early access available now.
       </span>
