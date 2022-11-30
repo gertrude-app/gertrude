@@ -5,6 +5,7 @@ interface Props {
   size?: number;
   iconOnly?: boolean;
   className?: string;
+  innerColorOverride?: string; // we need to fix the svg soon...
   type?: 'default' | 'inverted' | 'on-dark';
   textSize?:
     | 'text-base'
@@ -13,13 +14,15 @@ interface Props {
     | 'text-2xl'
     | 'text-3xl'
     | 'text-4xl'
-    | 'text-5xl';
+    | 'text-5xl'
+    | string;
 }
 
 const Logo: React.FC<Props> = ({
   size = 40,
   className,
   iconOnly,
+  innerColorOverride,
   type = `default`,
   textSize = `text-4xl`,
 }) => {
@@ -30,15 +33,15 @@ const Logo: React.FC<Props> = ({
   switch (type) {
     case `inverted`:
       outerColor = `white`;
-      innerColor = `#8b5cf6`;
+      innerColor = innerColorOverride ?? `#8b5cf6`;
       break;
     case `on-dark`:
       outerColor = `white`;
-      innerColor = `#13182b`;
+      innerColor = innerColorOverride ?? `#13182b`;
       break;
     default:
       outerColor = `url(#${gradientId})`;
-      innerColor = `white`;
+      innerColor = innerColorOverride ?? `white`;
   }
 
   return (

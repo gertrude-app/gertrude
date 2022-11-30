@@ -5,6 +5,7 @@ import type { AppProps } from 'next/app';
 import type { MarkDoc } from '../markdoc/headings';
 import { collectHeadings } from '../markdoc/headings';
 import Favicon from '../public/favicon.png';
+import OgImage from '../public/og-image.png';
 import DocsLayout from '../docs/Layout';
 import '../styles/globals.css';
 
@@ -37,6 +38,7 @@ const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={description} />
+        <meta name="og:image" content={OgImage.src} />
         <link rel="icon" type="image/png" href={Favicon.src} />
       </Head>
       <Script
