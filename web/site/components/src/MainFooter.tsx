@@ -1,19 +1,56 @@
 import React from 'react';
+import Link from 'next/link';
+import { Logo } from '@shared/components';
 
 const MainFooter: React.FC = () => (
-  <footer className="p-7 flex flex-col md:flex-row md:px-16 lg:px-24 md:justify-between justify-center items-center bg-fuchsia-500">
-    <p className="text-white text-opacity-50 text-xl">
-      © {new Date().getFullYear()} NetRivet Inc.
-    </p>
-    <ul className="flex flex-col md:flex-row space-y-1 md:space-y-0 md:space-x-6 w-full md:w-auto items-center text-white/50 mt-6 md:mt-0 mb-3 md:mb-0">
-      <li className="transition duration-100 hover:text-white/60">
-        <a href="/contact">Contact us</a>
-      </li>
-      <li className="transition duration-100 hover:text-white/60">
-        <a href="/docs">Documentation</a>
-      </li>
-    </ul>
+  <footer className="bg-gray-900">
+    <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-start p-8 xs:p-12">
+      <Link href="/">
+        <Logo type="on-dark" />
+      </Link>
+      <div className="flex space-x-12 mt-10 sm:mt-0">
+        <ul className="flex flex-col space-y-3 flex-grow">
+          <li>
+            <FooterLink href="/download">Download</FooterLink>
+          </li>
+          <li>
+            <FooterLink href="/docs">Documentation</FooterLink>
+          </li>
+          <li>
+            <FooterLink href="/contact">Contact us</FooterLink>
+          </li>
+        </ul>
+        <ul className="flex flex-col space-y-3 flex-grow">
+          <li>
+            <FooterLink href="https://dash.gertrude.app/signup">Signup</FooterLink>
+          </li>
+          <li>
+            <FooterLink href="https://dash.gertrude.app">Login</FooterLink>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div className="flex justify-center items-center p-6 pt-0">
+      <p className="text-slate-700 text-lg">© {new Date().getFullYear()} NetRivet Inc.</p>
+    </div>
   </footer>
 );
 
 export default MainFooter;
+
+interface FooterLinkProps {
+  children: React.ReactNode;
+  href: string;
+}
+
+const FooterLink: React.FC<FooterLinkProps> = ({ children, href }) => {
+  const Element = href.startsWith(`https://`) ? `a` : Link;
+  return (
+    <Element
+      href={href}
+      className="text-slate-600 hover:text-slate-500 transition duration-100 p-1 text-lg"
+    >
+      {children}
+    </Element>
+  );
+};

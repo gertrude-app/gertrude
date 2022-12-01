@@ -21,7 +21,7 @@ const EmailInputForm: React.FC<Props> = ({
   setPassword,
 }) => (
   <form
-    className="flex flex-col items-center space-x-3 max-w-sm sm:min-w-[384px] -mt-3"
+    className="flex flex-col items-center flex-grow"
     onSubmit={(event) => {
       event.preventDefault();
       onSubmit();
