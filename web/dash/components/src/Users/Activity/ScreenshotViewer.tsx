@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { Button } from '@shared/components';
+import { Button, isScreenshotTest } from '@shared/components';
 import ActivityItemTime from './ActivityItemTime';
 
 type Props = {
@@ -34,7 +34,7 @@ const ScreenshotViewer: React.FC<Props> = ({
         src={url}
         width={width}
         height={height}
-        loading={lazy ? `lazy` : `eager`}
+        loading={lazy && !isScreenshotTest() ? `lazy` : `eager`}
         alt="user screenshot"
       />
     </div>
