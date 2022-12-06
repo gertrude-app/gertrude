@@ -19,7 +19,7 @@ const icons = {
     <Icon color="blue" icon="lightbulb" {...props} />
   ),
   warning: (props: { className?: string }) => (
-    <Icon icon="warning" color="amber" {...props} />
+    <Icon color="amber" icon="warning" {...props} />
   ),
 };
 

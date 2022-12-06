@@ -26,8 +26,8 @@ const ${Component}: React.FC<Props> = ({ radProp }) => <h1>${Component} placehol
 export default ${Component};
 `;
 
-const storyFile = `import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { ${Component} } from '@${scope}/components';
+const storyFile = `import { ${Component} } from '@${scope}/components';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {
   title: '${Component}', // eslint-disable-line
