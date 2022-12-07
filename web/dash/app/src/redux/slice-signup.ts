@@ -86,7 +86,10 @@ export const slice = createSlice({
     });
 
     builder.addCase(verifySignupEmail.failed, (state, action) => {
-      state.verifyEmailReq = Req.fail(action.error);
+      // ignore react strict mode second request failure
+      if (state.verifyEmailReq.state !== `succeeded`) {
+        state.verifyEmailReq = Req.fail(action.error);
+      }
     });
 
     builder.addCase(createSignupPaymentUrl.started, (state) => {
