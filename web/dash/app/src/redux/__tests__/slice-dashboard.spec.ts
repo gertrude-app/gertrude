@@ -64,4 +64,30 @@ describe(`reducer`, () => {
       { id: `3`, userName: `Bob`, numUnreviewed: 33 },
     ]);
   });
+
+  test(`approving activity items never results in negative numbers`, () => {
+    const state = makeState();
+    state.dashboard.request = {
+      state: `succeeded`,
+      payload: {
+        unlockRequests: [],
+        users: [],
+        userActivity: [{ id: `2`, userName: `Huck`, numUnreviewed: 1 }],
+        userScreenshots: [],
+      },
+    };
+
+    const next = reducer(
+      state.dashboard,
+      deleteActivityItems.succeeded(true, {
+        userId: `2`,
+        // more than the number of unreviewed items, some came in since load
+        itemRootIds: [`1`, `2`],
+        date: new Date(),
+      }),
+    );
+    expect(Req.payload(next.request)?.userActivity).toEqual([
+      { id: `2`, userName: `Huck`, numUnreviewed: 0 },
+    ]);
+  });
 });
