@@ -54,7 +54,8 @@ export const slice = createSlice({
       if (!payload) return;
       const user = payload.userActivity.find((user) => user.id === arg.userId);
       if (user) {
-        user.numUnreviewed -= arg.itemRootIds.length;
+        // Math.max because new items may have streamed in since widget was loaded
+        user.numUnreviewed = Math.max(0, user.numUnreviewed - arg.itemRootIds.length);
       }
     });
   },
