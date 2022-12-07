@@ -9,7 +9,7 @@ const DocFooterCta: React.FC = () => (
         The Gertrude app helps you <b>protect your kids</b> online with{` `}
         <b>strict internet filtering</b> that you can manage from your{` `}
         <b>own computer or phone,</b> plus remote monitoring of screenshots and
-        keystrokes. $10/mo, with a 30 day free trial.
+        keystrokes. $5/mo, with a 60 day free trial.
       </p>
       <a
         className="mt-2 inline-flex rounded-lg bg-white px-4 py-1.5 text-sm font-bold text-violet-500"
