@@ -9,7 +9,6 @@ const VerifySignupEmail: React.FC = () => {
   const { token = `` } = useParams<{ token: UUID }>();
   const dispatch = useDispatch();
   const verifyReq = useSelector((state) => state.signup.verifyEmailReq);
-  const verifyReqState = verifyReq.state;
   const verifiedAdminId = Req.payload(verifyReq);
   const paymentUrlReq = useSelector((state) => state.signup.createPaymentUrlReq);
   const paymentUrlReqState = paymentUrlReq.state;
@@ -21,18 +20,10 @@ const VerifySignupEmail: React.FC = () => {
   }, [dispatch, verifiedAdminId, paymentUrlReqState]);
 
   useEffect(() => {
-    if (verifyReqState === `idle`) {
+    if (verifyReq?.state === `idle`) {
       dispatch(verifySignupEmail(token));
     }
-  }, [dispatch, token, verifyReqState]);
-
-  if (verifyReq.state === `idle` || verifyReq.state === `ongoing`) {
-    return <FullscreenModalForm request="ongoing" text="Verifying your email..." />;
-  }
-
-  if (paymentUrlReq.state === `idle` || paymentUrlReq.state === `ongoing`) {
-    return <FullscreenModalForm request="ongoing" text="Preparing for checkout..." />;
-  }
+  }, [dispatch, token, verifyReq?.state]);
 
   if (verifyReq.state === `failed`) {
     return <FullscreenModalForm request="failed" error="Failed to verify your email." />;
@@ -40,15 +31,20 @@ const VerifySignupEmail: React.FC = () => {
 
   if (paymentUrlReq.state === `failed`) {
     return (
-      <FullscreenModalForm
-        request="failed"
-        error="Failed to create checkout session, please try again."
-      />
+      <FullscreenModalForm request="failed" error="Unexpected error, please try again." />
     );
   }
 
+  if (verifyReq.state === `idle` || verifyReq.state === `ongoing`) {
+    return <FullscreenModalForm request="ongoing" text="Verifying your email..." />;
+  }
+
+  if (paymentUrlReq.state === `idle` || paymentUrlReq.state === `ongoing`) {
+    return <FullscreenModalForm request="ongoing" />;
+  }
+
   window.location.href = paymentUrlReq.payload;
-  return <FullscreenModalForm request="ongoing" text="Redirecting to checkout..." />;
+  return <FullscreenModalForm request="ongoing" text="Redirecting to trial setup..." />;
 };
 
 export default VerifySignupEmail;
