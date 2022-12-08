@@ -1,6 +1,6 @@
 import React from 'react';
 import { ApiErrorMessage, FullscreenModalForm, LoginForm } from '@dash/components';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   loginEmailUpdated,
@@ -27,9 +27,14 @@ export const Login: React.FC<Props> = ({
 }) => {
   const admin = useSelector((state) => state.auth.admin);
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  const returnToUrl = searchParams.get(`return_to`)
+    ? (searchParams.get(`return_to`) as string).replace(/__/g, `/`)
+    : `/`;
 
   if (admin !== null) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={returnToUrl} replace />;
   }
 
   if (passwordRequest.state === `ongoing` || magicLinkRequest.state === `ongoing`) {
@@ -46,7 +51,7 @@ export const Login: React.FC<Props> = ({
   }
 
   if (passwordRequest.state === `succeeded`) {
-    return <Navigate to="/" replace state={{ from: location }} />;
+    return <Navigate to={returnToUrl} replace state={{ from: location }} />;
   }
 
   if (passwordRequest.state === `failed` || magicLinkRequest.state === `failed`) {

@@ -63,4 +63,15 @@ describe(`dashboard app login`, () => {
     cy.visit(`/login`);
     cy.contains(`Dashboard`);
   });
+
+  // todo: remove .only
+  it(`remembers where you were intending to go and brings you back there after login`, () => {
+    sessionStorage.removeItem(`admin_id`);
+    sessionStorage.removeItem(`admin_token`);
+    cy.visit(`/users`);
+    cy.contains(`Account Login`);
+    cy.get(`input[name=email]`).type(`82uii.betsy-mcstandard@inbox.testmail.app`);
+    cy.get(`input[name=password]`).type(`betsy123{enter}`);
+    cy.contains(`M2 MacBook Air (2022)`);
+  });
 });
