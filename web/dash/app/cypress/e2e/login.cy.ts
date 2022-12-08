@@ -56,4 +56,11 @@ describe(`dashboard app login`, () => {
 
     cy.contains(`Check your email`);
   });
+
+  it(`redirects to / if admin is already logged in`, () => {
+    sessionStorage.setItem(`admin_id`, `be000000-0000-0000-0000-000000000000`);
+    sessionStorage.setItem(`admin_token`, `be000000-0000-0000-0000-000000000000`);
+    cy.visit(`/login`);
+    cy.contains(`Dashboard`);
+  });
 });
