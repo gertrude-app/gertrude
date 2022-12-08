@@ -33,6 +33,7 @@ const EmailInputForm: React.FC<Props> = ({
     <div className="mt-4 space-y-4 mb-8 self-stretch">
       <TextInput
         type="email"
+        name="email"
         label="Email address:"
         placeholder="you@example.com"
         autoFocus={window.location.href.includes(`gertrude.app`)}
@@ -43,6 +44,7 @@ const EmailInputForm: React.FC<Props> = ({
       {setPassword && (
         <TextInput
           type="password"
+          name="password"
           label="Password:"
           className="mb-6"
           required
