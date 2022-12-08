@@ -25,6 +25,11 @@ export const Login: React.FC<Props> = ({
   setPassword,
   onSendMagicLink,
 }) => {
+  const admin = useSelector((state) => state.auth.admin);
+  if (admin !== null) {
+    return <Navigate to="/" replace />;
+  }
+
   const location = useLocation();
   if (passwordRequest.state === `ongoing` || magicLinkRequest.state === `ongoing`) {
     return <FullscreenModalForm request="ongoing" />;
