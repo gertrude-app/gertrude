@@ -9,6 +9,7 @@ import {
   requestMagicLink,
 } from '../../redux/slice-auth';
 import { Req } from '../../redux/helpers';
+import useLoginRedirect from '../../hooks/login-redirect';
 
 type Props = React.ComponentProps<typeof LoginForm> & {
   passwordRequest: RequestState;
@@ -26,15 +27,10 @@ export const Login: React.FC<Props> = ({
   onSendMagicLink,
 }) => {
   const admin = useSelector((state) => state.auth.admin);
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const redirectUrl = useLoginRedirect();
 
-  const returnToUrl = searchParams.get(`return_to`)
-    ? decodeURIComponent(searchParams.get(`return_to`) as string)
-    : `/`;
-
-  if (admin !== null) {
-    return <Navigate to={returnToUrl} replace />;
+  if (admin !== null || passwordRequest.state === `succeeded`) {
+    return <Navigate to={redirectUrl ?? '/'} replace />;
   }
 
   if (passwordRequest.state === `ongoing` || magicLinkRequest.state === `ongoing`) {
@@ -48,10 +44,6 @@ export const Login: React.FC<Props> = ({
         message="Check your email for a magic link."
       />
     );
-  }
-
-  if (passwordRequest.state === `succeeded`) {
-    return <Navigate to={returnToUrl} replace state={{ from: location }} />;
   }
 
   if (passwordRequest.state === `failed` || magicLinkRequest.state === `failed`) {

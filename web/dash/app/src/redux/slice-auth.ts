@@ -159,8 +159,8 @@ export function getInitialAdmin(): AdminIds | null {
     return null;
   }
 
-  if (Current.sessionStorage.getItem(`dev_logged_out`) !== null) {
-    Current.sessionStorage.removeItem(`dev_logged_out`);
+  if (Current.localStorage.getItem(`dev_logged_out`) !== null) {
+    Current.localStorage.removeItem(`dev_logged_out`);
     return null;
   }
 

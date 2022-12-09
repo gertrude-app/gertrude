@@ -12,7 +12,7 @@ const storageMiddleware: Middleware = (store) => (next) => (action) => {
     Current.localStorage.removeItem(`admin_id`);
     Current.localStorage.removeItem(`admin_token`);
     if (!Current.env.isProd()) {
-      Current.sessionStorage.setItem(`dev_logged_out`, `true`);
+      Current.localStorage.setItem(`dev_logged_out`, `true`);
     }
   }
 
