@@ -30,7 +30,7 @@ export const Login: React.FC<Props> = ({
   const [searchParams] = useSearchParams();
 
   const returnToUrl = searchParams.get(`return_to`)
-    ? (searchParams.get(`return_to`) as string).replace(/__/g, `/`)
+    ? decodeURIComponent(searchParams.get(`return_to`) as string)
     : `/`;
 
   if (admin !== null) {

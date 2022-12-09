@@ -9,7 +9,7 @@ const Authed: React.FC = () => {
   if (!isLoggedIn) {
     return (
       <Navigate
-        to={`/login?return_to=${location.pathname.replace(/\//g, `__`)}`}
+        to={`/login?return_to=${encodeURIComponent(location.pathname)}`}
         replace
         state={{ from: location }}
       />

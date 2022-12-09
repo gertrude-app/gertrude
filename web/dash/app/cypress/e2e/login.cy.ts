@@ -58,18 +58,14 @@ describe(`dashboard app login`, () => {
   });
 
   it(`redirects to / if admin is already logged in`, () => {
-    sessionStorage.setItem(`admin_id`, `be000000-0000-0000-0000-000000000000`);
-    sessionStorage.setItem(`admin_token`, `be000000-0000-0000-0000-000000000000`);
+    cy.simulateLoggedIn();
     cy.visit(`/login`);
     cy.contains(`Dashboard`);
   });
 
-  // todo: remove .only
   it(`remembers where you were intending to go and brings you back there after login`, () => {
-    sessionStorage.removeItem(`admin_id`);
-    sessionStorage.removeItem(`admin_token`);
     cy.visit(`/users`);
-    cy.contains(`Account Login`);
+    cy.url().should(`include`, `/login`);
     cy.get(`input[name=email]`).type(`82uii.betsy-mcstandard@inbox.testmail.app`);
     cy.get(`input[name=password]`).type(`betsy123{enter}`);
     cy.contains(`M2 MacBook Air (2022)`);
