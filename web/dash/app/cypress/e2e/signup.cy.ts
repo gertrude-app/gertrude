@@ -1,15 +1,15 @@
 /// <reference types="cypress" />
+import { betsy } from '../fixtures/helpers';
 
 describe(`signup`, () => {
   it(`handles signup flow, minus stripe redirect`, () => {
     let checkoutUrl = ``;
-    const betsyId = `be000000-0000-0000-0000-000000000000`;
 
     cy.intercept(`/graphql/dashboard`, (req) => {
       switch (req.body.operationName) {
         case `VerifySignupEmail`:
           // use betsy's id for stripe direct checkout test
-          req.reply({ data: { admin: { id: betsyId } } });
+          req.reply({ data: { admin: { id: betsy.id } } });
           break;
         case `CreateSignupPaymentUrl`:
           req.alias = `createSignupPaymentUrl`;

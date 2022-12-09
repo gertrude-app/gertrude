@@ -18,4 +18,5 @@ export interface RequestMagicLink {
 
 export interface RequestMagicLinkVariables {
   email: string;
+  redirect?: string | null;
 }

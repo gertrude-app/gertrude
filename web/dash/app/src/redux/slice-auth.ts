@@ -115,7 +115,11 @@ export const submitLoginForm = createResultThunk(
 
 export const requestMagicLink = createResultThunk(
   `${slice.name}/requestMagicLink`,
-  (_, { getState }) => Current.api.admin.requestMagicLink(getState().auth.loginEmail),
+  (_, { getState }) =>
+    Current.api.admin.requestMagicLink(
+      getState().auth.loginEmail,
+      new URLSearchParams(window.location.search).get(`redirect`),
+    ),
 );
 
 export const loginFromMagicLink = createResultThunk(

@@ -3,6 +3,7 @@ import GetSelectableKeychains from '../fixtures/GetSelectableKeychains.json';
 import UnlockReqApp from '../fixtures/UnlockRequest-AppKey.json';
 import UnlockReqWebsite from '../fixtures/UnlockRequest-WebsiteKey.json';
 import GetUser from '../fixtures/GetUser.json';
+import { betsy } from '../fixtures/helpers';
 
 describe(`unlock request flow`, () => {
   let fetchRes: typeof UnlockReqApp;
@@ -149,9 +150,9 @@ describe(`unlock request flow`, () => {
   });
 
   it(`includes public keychains by admin`, () => {
-    localStorage.setItem(`admin_id`, `be000000-0000-0000-0000-000000000000`);
+    localStorage.setItem(`admin_id`, betsy.id);
     // simulate that the "HTC" public keychain is owned by the admin
-    keychainsRes.data.public[0]!.authorId = `be000000-0000-0000-0000-000000000000`;
+    keychainsRes.data.public[0]!.authorId = betsy.id;
     cy.visit(`/users/1/unlock-requests/2/select-keychain`);
     cy.contains(`HTC`);
   });
