@@ -1,6 +1,6 @@
 import React from 'react';
 import { ApiErrorMessage, FullscreenModalForm, LoginForm } from '@dash/components';
-import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   loginEmailUpdated,
@@ -30,7 +30,7 @@ export const Login: React.FC<Props> = ({
   const redirectUrl = useLoginRedirect();
 
   if (admin !== null || passwordRequest.state === `succeeded`) {
-    return <Navigate to={redirectUrl ?? '/'} replace />;
+    return <Navigate to={redirectUrl ?? `/`} replace />;
   }
 
   if (passwordRequest.state === `ongoing` || magicLinkRequest.state === `ongoing`) {

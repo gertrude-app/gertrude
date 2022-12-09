@@ -3,12 +3,14 @@ import { ApiErrorMessage, FullscreenModalForm } from '@dash/components';
 import { Navigate, useLocation, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { loginFromMagicLink } from '../../redux/slice-auth';
+import useLoginRedirect from '../../hooks/login-redirect';
 
 const MagicLink: React.FC = () => {
   const { token = `` } = useParams<{ token: string }>();
   const location = useLocation();
   const dispatch = useDispatch();
   const request = useSelector((state) => state.auth.loginFromMagicLinkRequest);
+  const redirectUrl = useLoginRedirect();
 
   useEffect(() => {
     dispatch(loginFromMagicLink(token));
@@ -20,7 +22,7 @@ const MagicLink: React.FC = () => {
       return <FullscreenModalForm request="ongoing" />;
 
     case `succeeded`:
-      return <Navigate to="/" replace state={{ from: location }} />;
+      return <Navigate to={redirectUrl ?? `/`} replace state={{ from: location }} />;
 
     case `failed`: {
       let error: React.ReactNode = (
