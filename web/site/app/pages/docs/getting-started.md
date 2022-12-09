@@ -18,7 +18,7 @@ getting started with Gertrude, [click here](https://www.youtube.com/watch?v=N8kL
 
 To start out, if you haven't already created a **Gertrude account** you'll need to do that
 first. To create an account [click this link](https://dash.gertrude.app/signup) and follow
-the sign-up instructions. The first 30 days are _totally free and you can cancel at any
+the sign-up instructions. The first 60 days are _totally free and you can cancel at any
 time._
 
 ### Creating your first user

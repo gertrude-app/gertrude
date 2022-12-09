@@ -44,7 +44,9 @@ async function main(): Promise<void> {
 
   // ensure fonts loaded
   await page.goto(`${url}?id=dashboard-core-gradienticon--grid`);
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 350));
+  await page.goto(`${url}?id=dashboard-dashboard-screen--no-users`);
+  await new Promise((resolve) => setTimeout(resolve, 350));
 
   for (const test of tests) {
     process.stderr.write(`story id: ${test.id}, sizes: ${JSON.stringify(test.sizes)}\n`);
