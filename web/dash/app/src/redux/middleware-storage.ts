@@ -24,6 +24,7 @@ const storageMiddleware: Middleware = (store) => (next) => (action) => {
     const admin = action.payload;
     Current.localStorage.setItem(`admin_id`, admin.id);
     Current.localStorage.setItem(`admin_token`, admin.token);
+    Current.localStorage.removeItem(`dev_logged_out`);
   }
 
   if (desktopSidebarCollapsedToggled.match(action)) {

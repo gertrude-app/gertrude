@@ -150,17 +150,16 @@ export function getInitialAdmin(): AdminIds | null {
     return ids;
   }
 
-  const devCreds = Current.env.optionalVar(Optional.TestAdminCreds);
-  if (!devCreds || !devCreds.includes(`:`)) {
-    return null;
-  }
-
   if (window.location.pathname === `/login`) {
     return null;
   }
 
   if (Current.localStorage.getItem(`dev_logged_out`) !== null) {
-    Current.localStorage.removeItem(`dev_logged_out`);
+    return null;
+  }
+
+  const devCreds = Current.env.optionalVar(Optional.TestAdminCreds);
+  if (!devCreds || !devCreds.includes(`:`)) {
     return null;
   }
 
