@@ -47,7 +47,7 @@ const PeaceOfMindBlock: React.FC = () => {
             >
               <h2 className="bg-gradient-to-br from-indigo-500 flex items-center to-fuchsia-500 bg-clip-text text-transparent">
                 <i aria-hidden className="fa-brands fa-youtube mr-3" />
-                <span className="whitespace-nowrap">Video demo</span>
+                <span className="whitespace-nowrap inline-flex">Video intro</span>
               </h2>
             </button>
           </div>
@@ -62,7 +62,7 @@ const PeaceOfMindBlock: React.FC = () => {
         </div>
       </div>
       {showingVideo && (
-        <VideoModal videoId="QgwxbbtA4wo" onDismiss={() => setShowingVideo(false)} />
+        <VideoModal videoId="NOBZ3BbCc44" onDismiss={() => setShowingVideo(false)} />
       )}
     </section>
   );

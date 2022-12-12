@@ -13,7 +13,7 @@ const OgImage: React.FC = () => (
     </div>
     <div className="h-1/2 grow text-[40px] text-center flex flex-col space-y-5">
       <div className="text-white text-opacity-70 font-bold">
-        Serious internet safety for{` `}
+        Serious parental controls for{` `}
         <b className="text-opacity-90 text-white font-extrabold">Apple computers.</b>
       </div>
       <div className="text-white text-opacity-70 font-bold">
