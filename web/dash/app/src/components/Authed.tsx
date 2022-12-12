@@ -7,7 +7,13 @@ const Authed: React.FC = () => {
   const isLoggedIn = useSelector((state) => state.auth.admin !== null);
   const location = useLocation();
   if (!isLoggedIn) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    return (
+      <Navigate
+        to={`/login?redirect=${encodeURIComponent(location.pathname)}`}
+        replace
+        state={{ from: location }}
+      />
+    );
   }
   return (
     <Chrome>

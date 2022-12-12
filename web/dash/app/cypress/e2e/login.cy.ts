@@ -56,4 +56,18 @@ describe(`dashboard app login`, () => {
 
     cy.contains(`Check your email`);
   });
+
+  it(`redirects to / if admin is already logged in`, () => {
+    cy.simulateLoggedIn();
+    cy.visit(`/login`);
+    cy.contains(`Dashboard`);
+  });
+
+  it(`remembers where you were intending to go and brings you back there after login`, () => {
+    cy.visit(`/users`);
+    cy.url().should(`include`, `/login`);
+    cy.get(`input[name=email]`).type(`82uii.betsy-mcstandard@inbox.testmail.app`);
+    cy.get(`input[name=password]`).type(`betsy123{enter}`);
+    cy.contains(`M2 MacBook Air (2022)`);
+  });
 });

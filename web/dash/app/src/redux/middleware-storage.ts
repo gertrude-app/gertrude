@@ -12,7 +12,7 @@ const storageMiddleware: Middleware = (store) => (next) => (action) => {
     Current.localStorage.removeItem(`admin_id`);
     Current.localStorage.removeItem(`admin_token`);
     if (!Current.env.isProd()) {
-      Current.sessionStorage.setItem(`dev_logged_out`, `true`);
+      Current.localStorage.setItem(`dev_logged_out`, `true`);
     }
   }
 
@@ -24,6 +24,7 @@ const storageMiddleware: Middleware = (store) => (next) => (action) => {
     const admin = action.payload;
     Current.localStorage.setItem(`admin_id`, admin.id);
     Current.localStorage.setItem(`admin_token`, admin.token);
+    Current.localStorage.removeItem(`dev_logged_out`);
   }
 
   if (desktopSidebarCollapsedToggled.match(action)) {

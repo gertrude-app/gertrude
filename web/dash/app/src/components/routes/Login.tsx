@@ -1,6 +1,6 @@
 import React from 'react';
 import { ApiErrorMessage, FullscreenModalForm, LoginForm } from '@dash/components';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   loginEmailUpdated,
@@ -9,6 +9,7 @@ import {
   requestMagicLink,
 } from '../../redux/slice-auth';
 import { Req } from '../../redux/helpers';
+import useLoginRedirect from '../../hooks/login-redirect';
 
 type Props = React.ComponentProps<typeof LoginForm> & {
   passwordRequest: RequestState;
@@ -25,7 +26,13 @@ export const Login: React.FC<Props> = ({
   setPassword,
   onSendMagicLink,
 }) => {
-  const location = useLocation();
+  const admin = useSelector((state) => state.auth.admin);
+  const redirectUrl = useLoginRedirect();
+
+  if (admin !== null || passwordRequest.state === `succeeded`) {
+    return <Navigate to={redirectUrl ?? `/`} replace />;
+  }
+
   if (passwordRequest.state === `ongoing` || magicLinkRequest.state === `ongoing`) {
     return <FullscreenModalForm request="ongoing" />;
   }
@@ -37,10 +44,6 @@ export const Login: React.FC<Props> = ({
         message="Check your email for a magic link."
       />
     );
-  }
-
-  if (passwordRequest.state === `succeeded`) {
-    return <Navigate to="/" replace state={{ from: location }} />;
   }
 
   if (passwordRequest.state === `failed` || magicLinkRequest.state === `failed`) {
