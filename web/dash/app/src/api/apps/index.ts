@@ -1,1 +1,0 @@
-export { getIdentifiedApps } from './getIdentifiedApps';

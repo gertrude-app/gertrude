@@ -1,7 +1,7 @@
-import type { ApiClient } from './ApiClient';
 import type { EnvironmentClient } from './Environment';
 import type { StorageClient } from './Storage';
-import { liveApiClient, noopApiClient, throwingApiClient } from './ApiClient';
+import type { ApiClient } from '../pairql/client';
+import liveApiClient, { throwingClient as throwingApiClient } from '../pairql/client';
 import { LiveEnvironment, NoopEnvironment, ThrowingEnvironment } from './Environment';
 import { LiveStorage, NoopStorage, ThrowingStorage } from './Storage';
 
