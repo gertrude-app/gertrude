@@ -5,7 +5,7 @@ import { typesafe } from '@shared/ts-utils';
 import type { NotificationUpdate } from '@dash/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
-import Result from '../api/Result';
+import Result from '../lib/Result';
 import { Req, editable, revert, commit } from './helpers';
 import { createResultThunk } from './thunk';
 
@@ -276,22 +276,22 @@ export const slice = createSlice({
 
 export const fetchProfileData = createResultThunk(
   `${slice.name}/fetchProfileData`,
-  Current.api.admin.getAdmin,
+  Current.api.getAdmin,
 );
 
 export const deleteNotificationMethod = createResultThunk(
   `${slice.name}/deleteNotificationMethod`,
-  Current.api.admin.deleteNotificationMethod,
+  (id: UUID) => Current.api.deleteEntity({ id, type: `AdminVerifiedNotificationMethod` }),
 );
 
 export const deleteNotification = createResultThunk(
   `${slice.name}/deleteNotification`,
-  Current.api.admin.deleteNotification,
+  (id: UUID) => Current.api.deleteEntity({ id, type: `AdminNotification` }),
 );
 
 export const createBillingPortalSession = createResultThunk(
   `${slice.name}/createBillingPortalSession`,
-  Current.api.admin.createBillingPortalSession,
+  Current.api.createBillingPortalSession,
 );
 
 export const upsertNotification = createResultThunk(
@@ -302,9 +302,10 @@ export const upsertNotification = createResultThunk(
     if (!notification) {
       return Result.error<ApiError>({ type: `non_actionable` });
     }
-    return Current.api.admin.upsertNotification({
-      adminId: state.auth.admin?.id ?? ``,
-      ...notification.draft,
+    return Current.api.saveNotification({
+      id: notification.draft.id,
+      methodId: notification.draft.methodId,
+      trigger: notification.draft.trigger,
     });
   },
 );
@@ -316,7 +317,7 @@ export const createPendingNotificationMethod = createResultThunk(
     if (!pendingMethod) {
       return Result.error<ApiError>({ type: `non_actionable` });
     }
-    return Current.api.admin.createPendingNotificationMethod(pendingMethod);
+    return Current.api.createPendingNotificationMethod(pendingMethod);
   },
 );
 
@@ -324,7 +325,7 @@ export const confirmPendingNotificationMethod = createResultThunk(
   `${slice.name}/confirmPendingNotificationMethod`,
   (_: void, { getState }) => {
     const pendingMethod = getState().admin.pendingNotificationMethod;
-    return Current.api.admin.confirmPendingNotificationMethod(
+    return Current.api.confirmPendingNotificationMethod(
       Req.payload(pendingMethod?.sendCodeRequest) ?? ``,
       Number(pendingMethod?.confirmationCode),
     );

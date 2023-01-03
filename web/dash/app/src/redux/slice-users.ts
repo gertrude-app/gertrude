@@ -7,7 +7,7 @@ import type { Keychain } from '@dash/keys';
 import type { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
 import type { User } from '../api/users';
 import Current from '../environment';
-import Result from '../api/Result';
+import Result from '../lib/Result';
 import { Req, toMap, toEditableMap, editable, commit, isDirty } from './helpers';
 import { createResultThunk } from './thunk';
 import * as empty from './empty';

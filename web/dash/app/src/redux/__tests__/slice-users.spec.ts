@@ -8,7 +8,7 @@ import reducer, {
   newUserRouteVisited,
   upsertUser,
 } from '../slice-users';
-import Result from '../../api/Result';
+import Result from '../../lib/Result';
 import { nextTick, makeGetState, makeState } from './test-helpers';
 import * as mock from './mocks';
 

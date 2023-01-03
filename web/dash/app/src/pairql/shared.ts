@@ -12,15 +12,37 @@ export enum DeviceModelFamily {
   unknown,
 }
 
-export enum AdminNotificationTrigger {
-  unlockRequestSubmitted,
-  suspendFilterRequestSubmitted,
-}
+export type AppScope =
+  | { type: 'unrestricted' }
+  | { type: 'webBrowsers' }
+  | {
+      type: 'single';
+      single:
+        | { type: 'bundleId'; bundleId: string }
+        | { type: 'identifiedAppSlug'; identifiedAppSlug: string };
+    };
+
+export type SharedKey =
+  | { type: 'anySubdomain'; domain: string; scope: AppScope }
+  | { type: 'domain'; domain: string; scope: AppScope }
+  | { type: 'domainRegex'; pattern: string; scope: AppScope }
+  | { type: 'skeleton'; pattern: string; scope: SingleAppScope }
+  | { type: 'ipAddress'; ipAddress: string; scope: AppScope }
+  | { type: 'path'; path: string; scope: AppScope };
+
+export type SingleAppScope =
+  | { type: 'bundleId'; bundleId: string }
+  | { type: 'identifiedAppSlug'; identifiedAppSlug: string };
 
 export enum ClientAuth {
   none,
   user,
   admin,
+}
+
+export enum AdminNotificationTrigger {
+  unlockRequestSubmitted,
+  suspendFilterRequestSubmitted,
 }
 
 export enum RequestStatus {

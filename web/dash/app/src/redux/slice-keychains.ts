@@ -5,7 +5,7 @@ import type { UnlockRequest } from '@dash/types';
 import type { EditKey, Keychain, KeyRecord } from '@dash/keys';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
-import Result from '../api/Result';
+import Result from '../lib/Result';
 import { commit, editable, Req, toEditableMap } from './helpers';
 import { createResultThunk } from './thunk';
 import * as empty from './empty';

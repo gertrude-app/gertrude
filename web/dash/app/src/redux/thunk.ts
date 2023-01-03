@@ -7,7 +7,7 @@ import type {
   ActionCreatorWithPreparedPayload,
 } from '@reduxjs/toolkit';
 import type { State, Dispatch } from './store';
-import type Result from '../api/Result';
+import type Result from '../lib/Result';
 import { spinnerMin } from './helpers';
 
 export function createResultThunk<T, E, ThunkArg = void>(

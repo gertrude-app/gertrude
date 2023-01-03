@@ -19,8 +19,8 @@ export interface ApiClient {
   joinWaitlist: typeof Pql.JoinWaitlist.fetch;
   getUsers: typeof Pql.GetUsers.fetch;
   handleCheckoutCancel: typeof Pql.HandleCheckoutCancel.fetch;
-  getUserUnlockRequests: typeof Pql.GetUserUnlockRequests.fetch;
   saveUser: typeof Pql.SaveUser.fetch;
+  getUserUnlockRequests: typeof Pql.GetUserUnlockRequests.fetch;
   getDashboardWidgets: typeof Pql.GetDashboardWidgets.fetch;
   deleteActivityItems: typeof Pql.DeleteActivityItems.fetch;
   getIdentifiedApps: typeof Pql.GetIdentifiedApps.fetch;
@@ -57,8 +57,8 @@ const liveClient: ApiClient = {
   joinWaitlist: Pql.JoinWaitlist.fetch,
   getUsers: Pql.GetUsers.fetch,
   handleCheckoutCancel: Pql.HandleCheckoutCancel.fetch,
-  getUserUnlockRequests: Pql.GetUserUnlockRequests.fetch,
   saveUser: Pql.SaveUser.fetch,
+  getUserUnlockRequests: Pql.GetUserUnlockRequests.fetch,
   getDashboardWidgets: Pql.GetDashboardWidgets.fetch,
   deleteActivityItems: Pql.DeleteActivityItems.fetch,
   getIdentifiedApps: Pql.GetIdentifiedApps.fetch,
@@ -129,11 +129,11 @@ export const throwingClient: ApiClient = {
   handleCheckoutCancel: () => {
     throw new Error('Apiclient.handleCheckoutCancel() not implemented');
   },
-  getUserUnlockRequests: () => {
-    throw new Error('Apiclient.getUserUnlockRequests() not implemented');
-  },
   saveUser: () => {
     throw new Error('Apiclient.saveUser() not implemented');
+  },
+  getUserUnlockRequests: () => {
+    throw new Error('Apiclient.getUserUnlockRequests() not implemented');
   },
   getDashboardWidgets: () => {
     throw new Error('Apiclient.getDashboardWidgets() not implemented');

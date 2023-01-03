@@ -4,7 +4,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import type { RequestStatus } from '@dash/types';
 import type { SuspendFilterRequest } from '../api/requests';
 import Current from '../environment';
-import Result from '../api/Result';
+import Result from '../lib/Result';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 

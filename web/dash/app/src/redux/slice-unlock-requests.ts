@@ -4,7 +4,7 @@ import { RequestStatus } from '@dash/types';
 import type { UnlockRequest } from '@dash/types';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
-import Result from '../api/Result';
+import Result from '../lib/Result';
 import { editable, Req } from './helpers';
 import { createResultThunk } from './thunk';
 
