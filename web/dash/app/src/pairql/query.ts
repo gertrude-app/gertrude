@@ -1,11 +1,11 @@
-import type { ClientAuth } from './shared';
-import Result from '../lib/Result';
+import { Result } from '@dash/pairs';
+import type { ClientAuth } from '@dash/pairs';
 
-export async function pqlQuery<Input, Output>(
+export async function query<Input, Output>(
   input: Input,
   auth: ClientAuth,
   operation: string,
-): Promise<Result<Output, string>> {
+): Promise<Result<Output>> {
   try {
     const res = await fetch(`/gertieql/dashboard/${operation}`, {
       method: `POST`,
@@ -17,6 +17,6 @@ export async function pqlQuery<Input, Output>(
     const json = await res.json();
     return Result.success(json);
   } catch (error) {
-    return Result.error(`${error}`);
+    return Result.error(`${error}` as any); // TODO: error handling for real
   }
 }

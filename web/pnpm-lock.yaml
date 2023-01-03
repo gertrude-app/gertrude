@@ -49,6 +49,7 @@ importers:
       '@dash/components': workspace:*
       '@dash/datetime': workspace:*
       '@dash/keys': workspace:*
+      '@dash/pairs': workspace:*
       '@dash/types': workspace:*
       '@dash/utils': workspace:*
       '@headlessui/react': ^1.6.6
@@ -82,6 +83,7 @@ importers:
       '@dash/components': link:../components
       '@dash/datetime': link:../datetime
       '@dash/keys': link:../keys
+      '@dash/pairs': link:../pairs
       '@dash/utils': link:../utils
       '@headlessui/react': 1.7.3_biqbaboplfbrettd7655fr4n2y
       '@reduxjs/toolkit': 1.8.6_kuo2ie247izvzll3jejufdtq3q
@@ -161,6 +163,12 @@ importers:
     devDependencies:
       '@dash/types': link:../types
       '@types/dash-ambient': link:../ambient
+
+  dash/pairs:
+    specifiers:
+      '@dash/utils': workspace:*
+    dependencies:
+      '@dash/utils': link:../utils
 
   dash/types:
     specifiers:

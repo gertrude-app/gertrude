@@ -1,25 +1,58 @@
+import { RequestStatus, Result } from '@dash/pairs';
 import type { ApiClient } from './client';
-import Result from '../lib/Result';
-import { RequestStatus } from './shared';
 
-export const noopClient: ApiClient = {
-  deleteEntity: async () => {
+const noopClient: ApiClient = {
+  allowingSignups: async () => {
     return Result.success({ success: true });
   },
-  saveKeychain: async () => {
+  confirmPendingNotificationMethod: async () => {
     return Result.success({ success: true });
-  },
-  signup: async () => {
-    return Result.success({});
-  },
-  getUserActivityDay: async () => {
-    return Result.success({ userName: ``, items: [] });
-  },
-  saveNotification: async () => {
-    return Result.success({ id: `` });
   },
   createBillingPortalSession: async () => {
     return Result.success({ url: `` });
+  },
+  createPendingAppConnection: async () => {
+    return Result.success({ code: 0 });
+  },
+  createPendingNotificationMethod: async () => {
+    return Result.success({ methodId: `` });
+  },
+  deleteActivityItems: async () => {
+    return Result.success({ success: true });
+  },
+  deleteEntity: async () => {
+    return Result.success({ success: true });
+  },
+  getAdmin: async () => {
+    return Result.success({
+      id: ``,
+      email: ``,
+      notifications: [],
+      verifiedNotificationMethods: [],
+    });
+  },
+  getAdminKeychain: async () => {
+    return Result.success({ success: true });
+  },
+  getAdminKeychains: async () => {
+    return Result.success([]);
+  },
+  getCheckoutUrl: async () => {
+    return Result.success({});
+  },
+  getDashboardWidgets: async () => {
+    return Result.success({
+      users: [],
+      userActivitySummaries: [],
+      unlockRequests: [],
+      recentScreenshots: [],
+    });
+  },
+  getIdentifiedApps: async () => {
+    return Result.success([]);
+  },
+  getSelectableKeychains: async () => {
+    return Result.success({ own: [], public: [] });
   },
   getSuspendFilterRequest: async () => {
     return Result.success({
@@ -30,101 +63,6 @@ export const noopClient: ApiClient = {
       requestComment: ``,
       status: RequestStatus.rejected,
       createdAt: new Date().toISOString(),
-    });
-  },
-  updateSuspendFilterRequest: async () => {
-    return Result.success({ success: true });
-  },
-  confirmPendingNotificationMethod: async () => {
-    return Result.success({ success: true });
-  },
-  getUnlockRequests: async () => {
-    return Result.success([]);
-  },
-  getCheckoutUrl: async () => {
-    return Result.success({});
-  },
-  getUser: async () => {
-    return Result.success({
-      id: ``,
-      name: ``,
-      keyloggingEnabled: false,
-      screenshotsEnabled: false,
-      screenshotsResolution: 1000,
-      screenshotsFrequency: 90,
-      keychains: [],
-      devices: [],
-      createdAt: new Date().toISOString(),
-    });
-  },
-  getUserActivityDays: async () => {
-    return Result.success({ userName: ``, days: [] });
-  },
-  getAdminKeychain: async () => {
-    throw new Error(`Not implemented`);
-  },
-  joinWaitlist: async () => {
-    return Result.success({ success: true });
-  },
-  getUsers: async () => {
-    return Result.success([]);
-  },
-  handleCheckoutCancel: async () => {
-    return Result.success({ success: true });
-  },
-  saveUser: async () => {
-    return Result.success({ success: true });
-  },
-  getUserUnlockRequests: async () => {
-    return Result.success([]);
-  },
-  getDashboardWidgets: async () => {
-    return Result.success({
-      users: [],
-      userActivitySummaries: [],
-      unlockRequests: [],
-      recentScreenshots: [],
-    });
-  },
-  deleteActivityItems: async () => {
-    return Result.success({ success: true });
-  },
-  getIdentifiedApps: async () => {
-    return Result.success([]);
-  },
-  requestMagicLink: async () => {
-    return Result.success({ success: true });
-  },
-  updateUnlockRequest: async () => {
-    return Result.success({ success: true });
-  },
-  verifySignupEmail: async () => {
-    return Result.success({ adminId: `` });
-  },
-  loginMagicLink: async () => {
-    return Result.success({ token: ``, adminId: `` });
-  },
-  saveKey: async () => {
-    return Result.success({ success: true });
-  },
-  handleCheckoutSuccess: async () => {
-    return Result.success({ token: ``, adminId: `` });
-  },
-  getAdminKeychains: async () => {
-    return Result.success([]);
-  },
-  createPendingNotificationMethod: async () => {
-    return Result.success({ methodId: `` });
-  },
-  getSelectableKeychains: async () => {
-    return Result.success({ own: [], public: [] });
-  },
-  getAdmin: async () => {
-    return Result.success({
-      id: ``,
-      email: ``,
-      notifications: [],
-      verifiedNotificationMethods: [],
     });
   },
   getUnlockRequest: async () => {
@@ -145,11 +83,72 @@ export const noopClient: ApiClient = {
       createdAt: new Date().toISOString(),
     });
   },
-  createPendingAppConnection: async () => {
-    return Result.success({ code: 0 });
+  getUnlockRequests: async () => {
+    return Result.success([]);
   },
-  allowingSignups: async () => {
+  getUser: async () => {
+    return Result.success({
+      id: ``,
+      name: ``,
+      keyloggingEnabled: false,
+      screenshotsEnabled: false,
+      screenshotsResolution: 1000,
+      screenshotsFrequency: 90,
+      keychains: [],
+      devices: [],
+      createdAt: new Date().toISOString(),
+    });
+  },
+  getUserActivityDay: async () => {
+    return Result.success({ userName: ``, items: [] });
+  },
+  getUserActivityDays: async () => {
+    return Result.success({ userName: ``, days: [] });
+  },
+  getUsers: async () => {
+    return Result.success([]);
+  },
+  getUserUnlockRequests: async () => {
+    return Result.success([]);
+  },
+  handleCheckoutCancel: async () => {
     return Result.success({ success: true });
+  },
+  handleCheckoutSuccess: async () => {
+    return Result.success({ token: ``, adminId: `` });
+  },
+  joinWaitlist: async () => {
+    return Result.success({ success: true });
+  },
+  loginMagicLink: async () => {
+    return Result.success({ token: ``, adminId: `` });
+  },
+  requestMagicLink: async () => {
+    return Result.success({ success: true });
+  },
+  saveKey: async () => {
+    return Result.success({ success: true });
+  },
+  saveKeychain: async () => {
+    return Result.success({ success: true });
+  },
+  saveNotification: async () => {
+    return Result.success({ id: `` });
+  },
+  saveUser: async () => {
+    return Result.success({ success: true });
+  },
+  signup: async () => {
+    return Result.success({});
+  },
+  updateSuspendFilterRequest: async () => {
+    return Result.success({ success: true });
+  },
+  updateUnlockRequest: async () => {
+    return Result.success({ success: true });
+  },
+  verifySignupEmail: async () => {
+    return Result.success({ adminId: `` });
   },
 };
 

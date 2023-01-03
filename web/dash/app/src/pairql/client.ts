@@ -1,188 +1,429 @@
 // auto-generated, do not edit
-import * as Pql from './pairs';
+import { ClientAuth } from '@dash/pairs';
+import type * as T from '@dash/pairs';
+import { query } from './query';
 
-export interface ApiClient {
-  deleteEntity: typeof Pql.DeleteEntity.fetch;
-  saveKeychain: typeof Pql.SaveKeychain.fetch;
-  signup: typeof Pql.Signup.fetch;
-  getUserActivityDay: typeof Pql.GetUserActivityDay.fetch;
-  saveNotification: typeof Pql.SaveNotification_v0.fetch;
-  createBillingPortalSession: typeof Pql.CreateBillingPortalSession.fetch;
-  getSuspendFilterRequest: typeof Pql.GetSuspendFilterRequest.fetch;
-  updateSuspendFilterRequest: typeof Pql.UpdateSuspendFilterRequest.fetch;
-  confirmPendingNotificationMethod: typeof Pql.ConfirmPendingNotificationMethod.fetch;
-  getUnlockRequests: typeof Pql.GetUnlockRequests.fetch;
-  getCheckoutUrl: typeof Pql.GetCheckoutUrl.fetch;
-  getUser: typeof Pql.GetUser.fetch;
-  getAdminKeychain: typeof Pql.GetAdminKeychain.fetch;
-  getUserActivityDays: typeof Pql.GetUserActivityDays.fetch;
-  joinWaitlist: typeof Pql.JoinWaitlist.fetch;
-  getUsers: typeof Pql.GetUsers.fetch;
-  handleCheckoutCancel: typeof Pql.HandleCheckoutCancel.fetch;
-  saveUser: typeof Pql.SaveUser.fetch;
-  getUserUnlockRequests: typeof Pql.GetUserUnlockRequests.fetch;
-  getDashboardWidgets: typeof Pql.GetDashboardWidgets.fetch;
-  deleteActivityItems: typeof Pql.DeleteActivityItems.fetch;
-  getIdentifiedApps: typeof Pql.GetIdentifiedApps.fetch;
-  requestMagicLink: typeof Pql.RequestMagicLink.fetch;
-  updateUnlockRequest: typeof Pql.UpdateUnlockRequest.fetch;
-  verifySignupEmail: typeof Pql.VerifySignupEmail.fetch;
-  loginMagicLink: typeof Pql.LoginMagicLink.fetch;
-  saveKey: typeof Pql.SaveKey.fetch;
-  handleCheckoutSuccess: typeof Pql.HandleCheckoutSuccess.fetch;
-  getAdminKeychains: typeof Pql.GetAdminKeychains.fetch;
-  createPendingNotificationMethod: typeof Pql.CreatePendingNotificationMethod.fetch;
-  getSelectableKeychains: typeof Pql.GetSelectableKeychains.fetch;
-  getAdmin: typeof Pql.GetAdmin.fetch;
-  getUnlockRequest: typeof Pql.GetUnlockRequest.fetch;
-  createPendingAppConnection: typeof Pql.CreatePendingAppConnection.fetch;
-  allowingSignups: typeof Pql.AllowingSignups.fetch;
-}
+export const liveClient = {
+  allowingSignups(
+    input: T.AllowingSignups.Input,
+  ): Promise<T.Result<T.AllowingSignups.Output>> {
+    return query<T.AllowingSignups.Input, T.AllowingSignups.Output>(
+      input,
+      ClientAuth.none,
+      `AllowingSignups`,
+    );
+  },
 
-const liveClient: ApiClient = {
-  deleteEntity: Pql.DeleteEntity.fetch,
-  saveKeychain: Pql.SaveKeychain.fetch,
-  signup: Pql.Signup.fetch,
-  getUserActivityDay: Pql.GetUserActivityDay.fetch,
-  saveNotification: Pql.SaveNotification_v0.fetch,
-  createBillingPortalSession: Pql.CreateBillingPortalSession.fetch,
-  getSuspendFilterRequest: Pql.GetSuspendFilterRequest.fetch,
-  updateSuspendFilterRequest: Pql.UpdateSuspendFilterRequest.fetch,
-  confirmPendingNotificationMethod: Pql.ConfirmPendingNotificationMethod.fetch,
-  getUnlockRequests: Pql.GetUnlockRequests.fetch,
-  getCheckoutUrl: Pql.GetCheckoutUrl.fetch,
-  getUser: Pql.GetUser.fetch,
-  getAdminKeychain: Pql.GetAdminKeychain.fetch,
-  getUserActivityDays: Pql.GetUserActivityDays.fetch,
-  joinWaitlist: Pql.JoinWaitlist.fetch,
-  getUsers: Pql.GetUsers.fetch,
-  handleCheckoutCancel: Pql.HandleCheckoutCancel.fetch,
-  saveUser: Pql.SaveUser.fetch,
-  getUserUnlockRequests: Pql.GetUserUnlockRequests.fetch,
-  getDashboardWidgets: Pql.GetDashboardWidgets.fetch,
-  deleteActivityItems: Pql.DeleteActivityItems.fetch,
-  getIdentifiedApps: Pql.GetIdentifiedApps.fetch,
-  requestMagicLink: Pql.RequestMagicLink.fetch,
-  updateUnlockRequest: Pql.UpdateUnlockRequest.fetch,
-  verifySignupEmail: Pql.VerifySignupEmail.fetch,
-  loginMagicLink: Pql.LoginMagicLink.fetch,
-  saveKey: Pql.SaveKey.fetch,
-  handleCheckoutSuccess: Pql.HandleCheckoutSuccess.fetch,
-  getAdminKeychains: Pql.GetAdminKeychains.fetch,
-  createPendingNotificationMethod: Pql.CreatePendingNotificationMethod.fetch,
-  getSelectableKeychains: Pql.GetSelectableKeychains.fetch,
-  getAdmin: Pql.GetAdmin.fetch,
-  getUnlockRequest: Pql.GetUnlockRequest.fetch,
-  createPendingAppConnection: Pql.CreatePendingAppConnection.fetch,
-  allowingSignups: Pql.AllowingSignups.fetch,
+  confirmPendingNotificationMethod(
+    input: T.ConfirmPendingNotificationMethod.Input,
+  ): Promise<T.Result<T.ConfirmPendingNotificationMethod.Output>> {
+    return query<
+      T.ConfirmPendingNotificationMethod.Input,
+      T.ConfirmPendingNotificationMethod.Output
+    >(input, ClientAuth.admin, `ConfirmPendingNotificationMethod`);
+  },
+
+  createBillingPortalSession(
+    input: T.CreateBillingPortalSession.Input,
+  ): Promise<T.Result<T.CreateBillingPortalSession.Output>> {
+    return query<T.CreateBillingPortalSession.Input, T.CreateBillingPortalSession.Output>(
+      input,
+      ClientAuth.admin,
+      `CreateBillingPortalSession`,
+    );
+  },
+
+  createPendingAppConnection(
+    input: T.CreatePendingAppConnection.Input,
+  ): Promise<T.Result<T.CreatePendingAppConnection.Output>> {
+    return query<T.CreatePendingAppConnection.Input, T.CreatePendingAppConnection.Output>(
+      input,
+      ClientAuth.admin,
+      `CreatePendingAppConnection`,
+    );
+  },
+
+  createPendingNotificationMethod(
+    input: T.CreatePendingNotificationMethod.Input,
+  ): Promise<T.Result<T.CreatePendingNotificationMethod.Output>> {
+    return query<
+      T.CreatePendingNotificationMethod.Input,
+      T.CreatePendingNotificationMethod.Output
+    >(input, ClientAuth.admin, `CreatePendingNotificationMethod`);
+  },
+
+  deleteActivityItems(
+    input: T.DeleteActivityItems.Input,
+  ): Promise<T.Result<T.DeleteActivityItems.Output>> {
+    return query<T.DeleteActivityItems.Input, T.DeleteActivityItems.Output>(
+      input,
+      ClientAuth.admin,
+      `DeleteActivityItems`,
+    );
+  },
+
+  deleteEntity(input: T.DeleteEntity.Input): Promise<T.Result<T.DeleteEntity.Output>> {
+    return query<T.DeleteEntity.Input, T.DeleteEntity.Output>(
+      input,
+      ClientAuth.admin,
+      `DeleteEntity`,
+    );
+  },
+
+  getAdmin(input: T.GetAdmin.Input): Promise<T.Result<T.GetAdmin.Output>> {
+    return query<T.GetAdmin.Input, T.GetAdmin.Output>(
+      input,
+      ClientAuth.admin,
+      `GetAdmin`,
+    );
+  },
+
+  // temp
+  getAdminKeychain(input: T.GetAdminKeychain.Input): Promise<T.Result<any>> {
+    return query<any, any>(input, ClientAuth.admin, `GetAdminKeychain`);
+  },
+
+  getAdminKeychains(
+    input: T.GetAdminKeychains.Input,
+  ): Promise<T.Result<T.GetAdminKeychains.Output>> {
+    return query<T.GetAdminKeychains.Input, T.GetAdminKeychains.Output>(
+      input,
+      ClientAuth.admin,
+      `GetAdminKeychains`,
+    );
+  },
+
+  getCheckoutUrl(
+    input: T.GetCheckoutUrl.Input,
+  ): Promise<T.Result<T.GetCheckoutUrl.Output>> {
+    return query<T.GetCheckoutUrl.Input, T.GetCheckoutUrl.Output>(
+      input,
+      ClientAuth.admin,
+      `GetCheckoutUrl`,
+    );
+  },
+
+  getDashboardWidgets(
+    input: T.GetDashboardWidgets.Input,
+  ): Promise<T.Result<T.GetDashboardWidgets.Output>> {
+    return query<T.GetDashboardWidgets.Input, T.GetDashboardWidgets.Output>(
+      input,
+      ClientAuth.admin,
+      `GetDashboardWidgets`,
+    );
+  },
+
+  getIdentifiedApps(
+    input: T.GetIdentifiedApps.Input,
+  ): Promise<T.Result<T.GetIdentifiedApps.Output>> {
+    return query<T.GetIdentifiedApps.Input, T.GetIdentifiedApps.Output>(
+      input,
+      ClientAuth.admin,
+      `GetIdentifiedApps`,
+    );
+  },
+
+  getSelectableKeychains(
+    input: T.GetSelectableKeychains.Input,
+  ): Promise<T.Result<T.GetSelectableKeychains.Output>> {
+    return query<T.GetSelectableKeychains.Input, T.GetSelectableKeychains.Output>(
+      input,
+      ClientAuth.admin,
+      `GetSelectableKeychains`,
+    );
+  },
+
+  getSuspendFilterRequest(
+    input: T.GetSuspendFilterRequest.Input,
+  ): Promise<T.Result<T.GetSuspendFilterRequest.Output>> {
+    return query<T.GetSuspendFilterRequest.Input, T.GetSuspendFilterRequest.Output>(
+      input,
+      ClientAuth.admin,
+      `GetSuspendFilterRequest`,
+    );
+  },
+
+  getUnlockRequest(
+    input: T.GetUnlockRequest.Input,
+  ): Promise<T.Result<T.GetUnlockRequest.Output>> {
+    return query<T.GetUnlockRequest.Input, T.GetUnlockRequest.Output>(
+      input,
+      ClientAuth.admin,
+      `GetUnlockRequest`,
+    );
+  },
+
+  getUnlockRequests(
+    input: T.GetUnlockRequests.Input,
+  ): Promise<T.Result<T.GetUnlockRequests.Output>> {
+    return query<T.GetUnlockRequests.Input, T.GetUnlockRequests.Output>(
+      input,
+      ClientAuth.admin,
+      `GetUnlockRequests`,
+    );
+  },
+
+  getUser(input: T.GetUser.Input): Promise<T.Result<T.GetUser.Output>> {
+    return query<T.GetUser.Input, T.GetUser.Output>(input, ClientAuth.admin, `GetUser`);
+  },
+
+  getUserActivityDay(
+    input: T.GetUserActivityDay.Input,
+  ): Promise<T.Result<T.GetUserActivityDay.Output>> {
+    return query<T.GetUserActivityDay.Input, T.GetUserActivityDay.Output>(
+      input,
+      ClientAuth.admin,
+      `GetUserActivityDay`,
+    );
+  },
+
+  getUserActivityDays(
+    input: T.GetUserActivityDays.Input,
+  ): Promise<T.Result<T.GetUserActivityDays.Output>> {
+    return query<T.GetUserActivityDays.Input, T.GetUserActivityDays.Output>(
+      input,
+      ClientAuth.admin,
+      `GetUserActivityDays`,
+    );
+  },
+
+  getUsers(input: T.GetUsers.Input): Promise<T.Result<T.GetUsers.Output>> {
+    return query<T.GetUsers.Input, T.GetUsers.Output>(
+      input,
+      ClientAuth.admin,
+      `GetUsers`,
+    );
+  },
+
+  getUserUnlockRequests(
+    input: T.GetUserUnlockRequests.Input,
+  ): Promise<T.Result<T.GetUserUnlockRequests.Output>> {
+    return query<T.GetUserUnlockRequests.Input, T.GetUserUnlockRequests.Output>(
+      input,
+      ClientAuth.admin,
+      `GetUserUnlockRequests`,
+    );
+  },
+
+  handleCheckoutCancel(
+    input: T.HandleCheckoutCancel.Input,
+  ): Promise<T.Result<T.HandleCheckoutCancel.Output>> {
+    return query<T.HandleCheckoutCancel.Input, T.HandleCheckoutCancel.Output>(
+      input,
+      ClientAuth.none,
+      `HandleCheckoutCancel`,
+    );
+  },
+
+  handleCheckoutSuccess(
+    input: T.HandleCheckoutSuccess.Input,
+  ): Promise<T.Result<T.HandleCheckoutSuccess.Output>> {
+    return query<T.HandleCheckoutSuccess.Input, T.HandleCheckoutSuccess.Output>(
+      input,
+      ClientAuth.none,
+      `HandleCheckoutSuccess`,
+    );
+  },
+
+  joinWaitlist(input: T.JoinWaitlist.Input): Promise<T.Result<T.JoinWaitlist.Output>> {
+    return query<T.JoinWaitlist.Input, T.JoinWaitlist.Output>(
+      input,
+      ClientAuth.none,
+      `JoinWaitlist`,
+    );
+  },
+
+  loginMagicLink(
+    input: T.LoginMagicLink.Input,
+  ): Promise<T.Result<T.LoginMagicLink.Output>> {
+    return query<T.LoginMagicLink.Input, T.LoginMagicLink.Output>(
+      input,
+      ClientAuth.none,
+      `LoginMagicLink`,
+    );
+  },
+
+  requestMagicLink(
+    input: T.RequestMagicLink.Input,
+  ): Promise<T.Result<T.RequestMagicLink.Output>> {
+    return query<T.RequestMagicLink.Input, T.RequestMagicLink.Output>(
+      input,
+      ClientAuth.none,
+      `RequestMagicLink`,
+    );
+  },
+
+  saveKey(input: T.SaveKey.Input): Promise<T.Result<T.SaveKey.Output>> {
+    return query<T.SaveKey.Input, T.SaveKey.Output>(input, ClientAuth.admin, `SaveKey`);
+  },
+
+  saveKeychain(input: T.SaveKeychain.Input): Promise<T.Result<T.SaveKeychain.Output>> {
+    return query<T.SaveKeychain.Input, T.SaveKeychain.Output>(
+      input,
+      ClientAuth.admin,
+      `SaveKeychain`,
+    );
+  },
+
+  saveNotification(
+    input: T.SaveNotification_v0.Input,
+  ): Promise<T.Result<T.SaveNotification_v0.Output>> {
+    return query<T.SaveNotification_v0.Input, T.SaveNotification_v0.Output>(
+      input,
+      ClientAuth.admin,
+      `SaveNotification_v0`,
+    );
+  },
+
+  saveUser(input: T.SaveUser.Input): Promise<T.Result<T.SaveUser.Output>> {
+    return query<T.SaveUser.Input, T.SaveUser.Output>(
+      input,
+      ClientAuth.admin,
+      `SaveUser`,
+    );
+  },
+
+  signup(input: T.Signup.Input): Promise<T.Result<T.Signup.Output>> {
+    return query<T.Signup.Input, T.Signup.Output>(input, ClientAuth.none, `Signup`);
+  },
+
+  updateSuspendFilterRequest(
+    input: T.UpdateSuspendFilterRequest.Input,
+  ): Promise<T.Result<T.UpdateSuspendFilterRequest.Output>> {
+    return query<T.UpdateSuspendFilterRequest.Input, T.UpdateSuspendFilterRequest.Output>(
+      input,
+      ClientAuth.admin,
+      `UpdateSuspendFilterRequest`,
+    );
+  },
+
+  updateUnlockRequest(
+    input: T.UpdateUnlockRequest.Input,
+  ): Promise<T.Result<T.UpdateUnlockRequest.Output>> {
+    return query<T.UpdateUnlockRequest.Input, T.UpdateUnlockRequest.Output>(
+      input,
+      ClientAuth.admin,
+      `UpdateUnlockRequest`,
+    );
+  },
+
+  verifySignupEmail(
+    input: T.VerifySignupEmail.Input,
+  ): Promise<T.Result<T.VerifySignupEmail.Output>> {
+    return query<T.VerifySignupEmail.Input, T.VerifySignupEmail.Output>(
+      input,
+      ClientAuth.none,
+      `VerifySignupEmail`,
+    );
+  },
 };
+
+export type ApiClient = typeof liveClient;
 
 export const throwingClient: ApiClient = {
-  deleteEntity: () => {
-    throw new Error('Apiclient.deleteEntity() not implemented');
-  },
-  saveKeychain: () => {
-    throw new Error('Apiclient.saveKeychain() not implemented');
-  },
-  signup: () => {
-    throw new Error('Apiclient.signup() not implemented');
-  },
-  getUserActivityDay: () => {
-    throw new Error('Apiclient.getUserActivityDay() not implemented');
-  },
-  saveNotification: () => {
-    throw new Error('Apiclient.saveNotification() not implemented');
-  },
-  createBillingPortalSession: () => {
-    throw new Error('Apiclient.createBillingPortalSession() not implemented');
-  },
-  getSuspendFilterRequest: () => {
-    throw new Error('Apiclient.getSuspendFilterRequest() not implemented');
-  },
-  updateSuspendFilterRequest: () => {
-    throw new Error('Apiclient.updateSuspendFilterRequest() not implemented');
+  allowingSignups: () => {
+    throw new Error(`Apiclient.allowingSignups() not implemented`);
   },
   confirmPendingNotificationMethod: () => {
-    throw new Error('Apiclient.confirmPendingNotificationMethod() not implemented');
+    throw new Error(`Apiclient.confirmPendingNotificationMethod() not implemented`);
   },
-  getUnlockRequests: () => {
-    throw new Error('Apiclient.getUnlockRequests() not implemented');
-  },
-  getCheckoutUrl: () => {
-    throw new Error('Apiclient.getCheckoutUrl() not implemented');
-  },
-  getUser: () => {
-    throw new Error('Apiclient.getUser() not implemented');
-  },
-  getAdminKeychain: () => {
-    throw new Error('Apiclient.getAdminKeychain() not implemented');
-  },
-  getUserActivityDays: () => {
-    throw new Error('Apiclient.getUserActivityDays() not implemented');
-  },
-  joinWaitlist: () => {
-    throw new Error('Apiclient.joinWaitlist() not implemented');
-  },
-  getUsers: () => {
-    throw new Error('Apiclient.getUsers() not implemented');
-  },
-  handleCheckoutCancel: () => {
-    throw new Error('Apiclient.handleCheckoutCancel() not implemented');
-  },
-  saveUser: () => {
-    throw new Error('Apiclient.saveUser() not implemented');
-  },
-  getUserUnlockRequests: () => {
-    throw new Error('Apiclient.getUserUnlockRequests() not implemented');
-  },
-  getDashboardWidgets: () => {
-    throw new Error('Apiclient.getDashboardWidgets() not implemented');
-  },
-  deleteActivityItems: () => {
-    throw new Error('Apiclient.deleteActivityItems() not implemented');
-  },
-  getIdentifiedApps: () => {
-    throw new Error('Apiclient.getIdentifiedApps() not implemented');
-  },
-  requestMagicLink: () => {
-    throw new Error('Apiclient.requestMagicLink() not implemented');
-  },
-  updateUnlockRequest: () => {
-    throw new Error('Apiclient.updateUnlockRequest() not implemented');
-  },
-  verifySignupEmail: () => {
-    throw new Error('Apiclient.verifySignupEmail() not implemented');
-  },
-  loginMagicLink: () => {
-    throw new Error('Apiclient.loginMagicLink() not implemented');
-  },
-  saveKey: () => {
-    throw new Error('Apiclient.saveKey() not implemented');
-  },
-  handleCheckoutSuccess: () => {
-    throw new Error('Apiclient.handleCheckoutSuccess() not implemented');
-  },
-  getAdminKeychains: () => {
-    throw new Error('Apiclient.getAdminKeychains() not implemented');
-  },
-  createPendingNotificationMethod: () => {
-    throw new Error('Apiclient.createPendingNotificationMethod() not implemented');
-  },
-  getSelectableKeychains: () => {
-    throw new Error('Apiclient.getSelectableKeychains() not implemented');
-  },
-  getAdmin: () => {
-    throw new Error('Apiclient.getAdmin() not implemented');
-  },
-  getUnlockRequest: () => {
-    throw new Error('Apiclient.getUnlockRequest() not implemented');
+  createBillingPortalSession: () => {
+    throw new Error(`Apiclient.createBillingPortalSession() not implemented`);
   },
   createPendingAppConnection: () => {
-    throw new Error('Apiclient.createPendingAppConnection() not implemented');
+    throw new Error(`Apiclient.createPendingAppConnection() not implemented`);
   },
-  allowingSignups: () => {
-    throw new Error('Apiclient.allowingSignups() not implemented');
+  createPendingNotificationMethod: () => {
+    throw new Error(`Apiclient.createPendingNotificationMethod() not implemented`);
+  },
+  deleteActivityItems: () => {
+    throw new Error(`Apiclient.deleteActivityItems() not implemented`);
+  },
+  deleteEntity: () => {
+    throw new Error(`Apiclient.deleteEntity() not implemented`);
+  },
+  getAdmin: () => {
+    throw new Error(`Apiclient.getAdmin() not implemented`);
+  },
+  getAdminKeychain: () => {
+    throw new Error(`Apiclient.getAdminKeychain() not implemented`);
+  },
+  getAdminKeychains: () => {
+    throw new Error(`Apiclient.getAdminKeychains() not implemented`);
+  },
+  getCheckoutUrl: () => {
+    throw new Error(`Apiclient.getCheckoutUrl() not implemented`);
+  },
+  getDashboardWidgets: () => {
+    throw new Error(`Apiclient.getDashboardWidgets() not implemented`);
+  },
+  getIdentifiedApps: () => {
+    throw new Error(`Apiclient.getIdentifiedApps() not implemented`);
+  },
+  getSelectableKeychains: () => {
+    throw new Error(`Apiclient.getSelectableKeychains() not implemented`);
+  },
+  getSuspendFilterRequest: () => {
+    throw new Error(`Apiclient.getSuspendFilterRequest() not implemented`);
+  },
+  getUnlockRequest: () => {
+    throw new Error(`Apiclient.getUnlockRequest() not implemented`);
+  },
+  getUnlockRequests: () => {
+    throw new Error(`Apiclient.getUnlockRequests() not implemented`);
+  },
+  getUser: () => {
+    throw new Error(`Apiclient.getUser() not implemented`);
+  },
+  getUserActivityDay: () => {
+    throw new Error(`Apiclient.getUserActivityDay() not implemented`);
+  },
+  getUserActivityDays: () => {
+    throw new Error(`Apiclient.getUserActivityDays() not implemented`);
+  },
+  getUsers: () => {
+    throw new Error(`Apiclient.getUsers() not implemented`);
+  },
+  getUserUnlockRequests: () => {
+    throw new Error(`Apiclient.getUserUnlockRequests() not implemented`);
+  },
+  handleCheckoutCancel: () => {
+    throw new Error(`Apiclient.handleCheckoutCancel() not implemented`);
+  },
+  handleCheckoutSuccess: () => {
+    throw new Error(`Apiclient.handleCheckoutSuccess() not implemented`);
+  },
+  joinWaitlist: () => {
+    throw new Error(`Apiclient.joinWaitlist() not implemented`);
+  },
+  loginMagicLink: () => {
+    throw new Error(`Apiclient.loginMagicLink() not implemented`);
+  },
+  requestMagicLink: () => {
+    throw new Error(`Apiclient.requestMagicLink() not implemented`);
+  },
+  saveKey: () => {
+    throw new Error(`Apiclient.saveKey() not implemented`);
+  },
+  saveKeychain: () => {
+    throw new Error(`Apiclient.saveKeychain() not implemented`);
+  },
+  saveNotification: () => {
+    throw new Error(`Apiclient.saveNotification() not implemented`);
+  },
+  saveUser: () => {
+    throw new Error(`Apiclient.saveUser() not implemented`);
+  },
+  signup: () => {
+    throw new Error(`Apiclient.signup() not implemented`);
+  },
+  updateSuspendFilterRequest: () => {
+    throw new Error(`Apiclient.updateSuspendFilterRequest() not implemented`);
+  },
+  updateUnlockRequest: () => {
+    throw new Error(`Apiclient.updateUnlockRequest() not implemented`);
+  },
+  verifySignupEmail: () => {
+    throw new Error(`Apiclient.verifySignupEmail() not implemented`);
   },
 };
-
-export default liveClient;

@@ -1,3 +1,4 @@
+// TODO: this should all be pulled in from pairql codegen
 export type SingleAppScope =
   | { type: 'bundleId'; bundleId: string }
   | { type: 'identifiedAppSlug'; identifiedAppSlug: string };
