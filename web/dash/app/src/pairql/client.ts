@@ -78,9 +78,14 @@ export const liveClient = {
     );
   },
 
-  // temp
-  getAdminKeychain(input: T.GetAdminKeychain.Input): Promise<T.Result<any>> {
-    return query<any, any>(input, ClientAuth.admin, `GetAdminKeychain`);
+  getAdminKeychain(
+    input: T.GetAdminKeychain.Input,
+  ): Promise<T.Result<T.GetAdminKeychain.Output>> {
+    return query<T.GetAdminKeychain.Input, T.GetAdminKeychain.Output>(
+      input,
+      ClientAuth.admin,
+      `GetAdminKeychain`,
+    );
   },
 
   getAdminKeychains(
@@ -322,108 +327,108 @@ export type ApiClient = typeof liveClient;
 
 export const throwingClient: ApiClient = {
   allowingSignups: () => {
-    throw new Error(`Apiclient.allowingSignups() not implemented`);
+    throw new Error(`ApiClient.allowingSignups() not implemented`);
   },
   confirmPendingNotificationMethod: () => {
-    throw new Error(`Apiclient.confirmPendingNotificationMethod() not implemented`);
+    throw new Error(`ApiClient.confirmPendingNotificationMethod() not implemented`);
   },
   createBillingPortalSession: () => {
-    throw new Error(`Apiclient.createBillingPortalSession() not implemented`);
+    throw new Error(`ApiClient.createBillingPortalSession() not implemented`);
   },
   createPendingAppConnection: () => {
-    throw new Error(`Apiclient.createPendingAppConnection() not implemented`);
+    throw new Error(`ApiClient.createPendingAppConnection() not implemented`);
   },
   createPendingNotificationMethod: () => {
-    throw new Error(`Apiclient.createPendingNotificationMethod() not implemented`);
+    throw new Error(`ApiClient.createPendingNotificationMethod() not implemented`);
   },
   deleteActivityItems: () => {
-    throw new Error(`Apiclient.deleteActivityItems() not implemented`);
+    throw new Error(`ApiClient.deleteActivityItems() not implemented`);
   },
   deleteEntity: () => {
-    throw new Error(`Apiclient.deleteEntity() not implemented`);
+    throw new Error(`ApiClient.deleteEntity() not implemented`);
   },
   getAdmin: () => {
-    throw new Error(`Apiclient.getAdmin() not implemented`);
+    throw new Error(`ApiClient.getAdmin() not implemented`);
   },
   getAdminKeychain: () => {
-    throw new Error(`Apiclient.getAdminKeychain() not implemented`);
+    throw new Error(`ApiClient.getAdminKeychain() not implemented`);
   },
   getAdminKeychains: () => {
-    throw new Error(`Apiclient.getAdminKeychains() not implemented`);
+    throw new Error(`ApiClient.getAdminKeychains() not implemented`);
   },
   getCheckoutUrl: () => {
-    throw new Error(`Apiclient.getCheckoutUrl() not implemented`);
+    throw new Error(`ApiClient.getCheckoutUrl() not implemented`);
   },
   getDashboardWidgets: () => {
-    throw new Error(`Apiclient.getDashboardWidgets() not implemented`);
+    throw new Error(`ApiClient.getDashboardWidgets() not implemented`);
   },
   getIdentifiedApps: () => {
-    throw new Error(`Apiclient.getIdentifiedApps() not implemented`);
+    throw new Error(`ApiClient.getIdentifiedApps() not implemented`);
   },
   getSelectableKeychains: () => {
-    throw new Error(`Apiclient.getSelectableKeychains() not implemented`);
+    throw new Error(`ApiClient.getSelectableKeychains() not implemented`);
   },
   getSuspendFilterRequest: () => {
-    throw new Error(`Apiclient.getSuspendFilterRequest() not implemented`);
+    throw new Error(`ApiClient.getSuspendFilterRequest() not implemented`);
   },
   getUnlockRequest: () => {
-    throw new Error(`Apiclient.getUnlockRequest() not implemented`);
+    throw new Error(`ApiClient.getUnlockRequest() not implemented`);
   },
   getUnlockRequests: () => {
-    throw new Error(`Apiclient.getUnlockRequests() not implemented`);
+    throw new Error(`ApiClient.getUnlockRequests() not implemented`);
   },
   getUser: () => {
-    throw new Error(`Apiclient.getUser() not implemented`);
+    throw new Error(`ApiClient.getUser() not implemented`);
   },
   getUserActivityDay: () => {
-    throw new Error(`Apiclient.getUserActivityDay() not implemented`);
+    throw new Error(`ApiClient.getUserActivityDay() not implemented`);
   },
   getUserActivityDays: () => {
-    throw new Error(`Apiclient.getUserActivityDays() not implemented`);
+    throw new Error(`ApiClient.getUserActivityDays() not implemented`);
   },
   getUsers: () => {
-    throw new Error(`Apiclient.getUsers() not implemented`);
+    throw new Error(`ApiClient.getUsers() not implemented`);
   },
   getUserUnlockRequests: () => {
-    throw new Error(`Apiclient.getUserUnlockRequests() not implemented`);
+    throw new Error(`ApiClient.getUserUnlockRequests() not implemented`);
   },
   handleCheckoutCancel: () => {
-    throw new Error(`Apiclient.handleCheckoutCancel() not implemented`);
+    throw new Error(`ApiClient.handleCheckoutCancel() not implemented`);
   },
   handleCheckoutSuccess: () => {
-    throw new Error(`Apiclient.handleCheckoutSuccess() not implemented`);
+    throw new Error(`ApiClient.handleCheckoutSuccess() not implemented`);
   },
   joinWaitlist: () => {
-    throw new Error(`Apiclient.joinWaitlist() not implemented`);
+    throw new Error(`ApiClient.joinWaitlist() not implemented`);
   },
   loginMagicLink: () => {
-    throw new Error(`Apiclient.loginMagicLink() not implemented`);
+    throw new Error(`ApiClient.loginMagicLink() not implemented`);
   },
   requestMagicLink: () => {
-    throw new Error(`Apiclient.requestMagicLink() not implemented`);
+    throw new Error(`ApiClient.requestMagicLink() not implemented`);
   },
   saveKey: () => {
-    throw new Error(`Apiclient.saveKey() not implemented`);
+    throw new Error(`ApiClient.saveKey() not implemented`);
   },
   saveKeychain: () => {
-    throw new Error(`Apiclient.saveKeychain() not implemented`);
+    throw new Error(`ApiClient.saveKeychain() not implemented`);
   },
   saveNotification: () => {
-    throw new Error(`Apiclient.saveNotification() not implemented`);
+    throw new Error(`ApiClient.saveNotification() not implemented`);
   },
   saveUser: () => {
-    throw new Error(`Apiclient.saveUser() not implemented`);
+    throw new Error(`ApiClient.saveUser() not implemented`);
   },
   signup: () => {
-    throw new Error(`Apiclient.signup() not implemented`);
+    throw new Error(`ApiClient.signup() not implemented`);
   },
   updateSuspendFilterRequest: () => {
-    throw new Error(`Apiclient.updateSuspendFilterRequest() not implemented`);
+    throw new Error(`ApiClient.updateSuspendFilterRequest() not implemented`);
   },
   updateUnlockRequest: () => {
-    throw new Error(`Apiclient.updateUnlockRequest() not implemented`);
+    throw new Error(`ApiClient.updateUnlockRequest() not implemented`);
   },
   verifySignupEmail: () => {
-    throw new Error(`Apiclient.verifySignupEmail() not implemented`);
+    throw new Error(`ApiClient.verifySignupEmail() not implemented`);
   },
 };

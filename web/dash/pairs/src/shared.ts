@@ -1,5 +1,17 @@
-export interface SuccessOutput {
-  success: boolean;
+export enum AdminNotificationTrigger {
+  unlockRequestSubmitted,
+  suspendFilterRequestSubmitted,
+}
+
+export type AppScope =
+  | { type: 'unrestricted' }
+  | { type: 'webBrowsers' }
+  | { type: 'single'; single: SingleAppScope };
+
+export enum ClientAuth {
+  none,
+  user,
+  admin,
 }
 
 export enum DeviceModelFamily {
@@ -12,10 +24,27 @@ export enum DeviceModelFamily {
   unknown,
 }
 
-export type AppScope =
-  | { type: 'unrestricted' }
-  | { type: 'webBrowsers' }
-  | { type: 'single'; single: SingleAppScope };
+export interface Key {
+  id: UUID;
+  comment?: string;
+  expiration?: ISODateString;
+  key: SharedKey;
+}
+
+export interface Keychain {
+  id: UUID;
+  name: string;
+  description?: string;
+  isPublic: boolean;
+  authorId: UUID;
+  keys: Array<Key>;
+}
+
+export enum RequestStatus {
+  pending,
+  accepted,
+  rejected,
+}
 
 export type SharedKey =
   | { type: 'anySubdomain'; domain: string; scope: AppScope }
@@ -25,23 +54,10 @@ export type SharedKey =
   | { type: 'ipAddress'; ipAddress: string; scope: AppScope }
   | { type: 'path'; path: string; scope: AppScope };
 
-export enum ClientAuth {
-  none,
-  user,
-  admin,
-}
-
 export type SingleAppScope =
   | { type: 'bundleId'; bundleId: string }
   | { type: 'identifiedAppSlug'; identifiedAppSlug: string };
 
-export enum AdminNotificationTrigger {
-  unlockRequestSubmitted,
-  suspendFilterRequestSubmitted,
-}
-
-export enum RequestStatus {
-  pending,
-  accepted,
-  rejected,
+export interface SuccessOutput {
+  success: boolean;
 }

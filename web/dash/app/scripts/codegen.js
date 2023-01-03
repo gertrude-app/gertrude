@@ -20,8 +20,9 @@ async function main() {
   const globalNames = Object.keys(shared).filter((name) => name !== `ClientAuth`);
   globalNames.push(`SuccessOutput`);
 
-  const sharedFile = Object.values(shared).join(`\n\n`);
-  fs.writeFileSync(`${PKG_DIR}/shared.ts`, spaced(SUCCESS_OUTPUT, sharedFile));
+  let sharedFile = Object.values(shared).join(`\n\n`);
+  sharedFile = sortShared(spaced(SUCCESS_OUTPUT, sharedFile));
+  fs.writeFileSync(`${PKG_DIR}/shared.ts`, sharedFile);
 
   const indexLines = [
     `export type { PqlError } from './Result';`,
@@ -34,10 +35,16 @@ async function main() {
   for (const [pairName, { pair }] of ordered) {
     const globals /** @type string[] */ = [];
     for (const typeName of globalNames) {
-      if (pair.includes(typeName)) {
+      const regex = new RegExp(`\\b${typeName}\\b`);
+      if (
+        pair.match(regex) &&
+        !pair.includes(`'${typeName}'`) &&
+        !pair.includes(`interface ${typeName}`)
+      ) {
         globals.push(typeName);
       }
     }
+
     let sharedImport = ``;
     if (globals.length > 0) {
       sharedImport = `import type { ${globals.join(`, `)} } from '../shared';\n`;
@@ -59,7 +66,7 @@ async function main() {
     const methodName = uncapitalize(pairName).replace(/_.*$/, ``);
     liveClientMethods.push(fetcher);
     throwingClientLines.push(
-      `  ${methodName}: () => { throw new Error('Apiclient.${methodName}() not implemented'); },`,
+      `  ${methodName}: () => { throw new Error(\`ApiClient.${methodName}() not implemented\`); },`,
     );
   }
 
@@ -139,6 +146,21 @@ function spaced(...strings) {
  */
 function expand(paircode) {
   return paircode.replace(/Array<{ /g, `Array<{\n`).replace(/{ /g, `{\n`);
+}
+
+/**
+ * @param {string} code
+ * @returns {string}
+ */
+function sortShared(code) {
+  const parts = code.split(`\n\n`).map((chunk) => {
+    const lines = chunk.split(`\n`);
+    const firstLine = lines[0];
+    const typeName = firstLine.replace(/export (:?type|interface|enum) ([^ ]+) .*/, `$2`);
+    return { typeName, chunk };
+  });
+  parts.sort((a, b) => a.typeName.localeCompare(b.typeName));
+  return parts.map((p) => p.chunk).join(`\n\n`);
 }
 
 const SUCCESS_OUTPUT = `
