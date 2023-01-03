@@ -1,3 +1,4 @@
+// auto-generated, do not edit
 export type { PqlError } from './Result';
 export { default as Result } from './Result';
 export * from './shared';

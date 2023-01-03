@@ -1,6 +1,6 @@
 import { it, describe, expect } from 'vitest';
 import type { UnlockRequestCreateKeyData } from '@dash/types';
-import type { KeyRecord } from '../types';
+import type { Key } from '@dash/types';
 import { convert } from '..';
 
 describe(`convert.unlockRequestToState()`, () => {
@@ -18,7 +18,7 @@ describe(`convert.unlockRequestToState()`, () => {
 
 describe(`convert.toState()`, () => {
   it(`sets appIdentificationType correctly for bundleId-only skeleton key`, () => {
-    const key: KeyRecord = {
+    const key: Key = {
       id: `key-id`,
       keychainId: `keychain-id`,
       key: {
@@ -34,7 +34,7 @@ describe(`convert.toState()`, () => {
   });
 
   it(`turns on the advanced mode if key is domain regex`, () => {
-    const key: KeyRecord = {
+    const key: Key = {
       id: `key-id`,
       keychainId: `keychain-id`,
       key: {
@@ -48,7 +48,7 @@ describe(`convert.toState()`, () => {
   });
 
   it(`turns on the advanced mode if key is ip address`, () => {
-    const key: KeyRecord = {
+    const key: Key = {
       id: `key-id`,
       keychainId: `keychain-id`,
       key: {
@@ -62,7 +62,7 @@ describe(`convert.toState()`, () => {
   });
 
   it(`sets appIdentificationType correctly for bundleId-only domain key`, () => {
-    const key: KeyRecord = {
+    const key: Key = {
       id: `key-id`,
       keychainId: `keychain-id`,
       key: {

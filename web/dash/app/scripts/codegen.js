@@ -2,16 +2,11 @@
 
 // @ts-check
 import fs from 'fs';
-import glob from 'glob';
 import fetch from 'node-fetch';
 import xExec from 'x-exec';
 
 // @ts-ignore
 const exec = xExec.default;
-
-const CWD = process.cwd();
-const APP_DIR = `${CWD}/src/pairql`;
-const PKG_DIR = `${CWD}/../pairs/src`;
 
 async function main() {
   clean();
@@ -22,9 +17,13 @@ async function main() {
 
   let sharedFile = Object.values(shared).join(`\n\n`);
   sharedFile = sortShared(spaced(SUCCESS_OUTPUT, sharedFile));
-  fs.writeFileSync(`${PKG_DIR}/shared.ts`, sharedFile);
+  fs.writeFileSync(
+    `${PKG_DIR}/shared.ts`,
+    spaced(`// auto-generated, do not edit`, sharedFile),
+  );
 
   const indexLines = [
+    `// auto-generated, do not edit`,
     `export type { PqlError } from './Result';`,
     `export { default as Result } from './Result';`,
     `export * from './shared';`,
@@ -72,8 +71,8 @@ async function main() {
 
   const clientFileLines = [
     `// auto-generated, do not edit`,
-    `import { ClientAuth } from '@dash/pairs';`,
-    `import type * as T from '@dash/pairs'`,
+    `import { ClientAuth } from '@dash/types';`,
+    `import type * as T from '@dash/types'`,
     `import { query } from './query';`,
     ``,
     `export const liveClient = {`,
@@ -96,12 +95,12 @@ async function main() {
   exec.exit(`${PRETTIER_FORMAT} ${PKG_DIR}/pairs/*.ts`);
 }
 
-main();
-
 function clean() {
-  exec(`rm -rf ${PKG_DIR}/pairs`);
-  exec(`rm -f ${PKG_DIR}/index.ts`);
+  exec(`mv ${PKG_DIR}/Result.ts ${PKG_DIR}/../Result.ts`);
+  exec(`rm -rf ${PKG_DIR}`);
+  exec(`mkdir -p ${PKG_DIR}`);
   exec(`mkdir -p ${PKG_DIR}/pairs`);
+  exec(`mv ${PKG_DIR}/../Result.ts ${PKG_DIR}/Result.ts`);
 }
 
 /**
@@ -163,6 +162,10 @@ function sortShared(code) {
   return parts.map((p) => p.chunk).join(`\n\n`);
 }
 
+const CWD = process.cwd();
+const APP_DIR = `${CWD}/src/pairql`;
+const PKG_DIR = `${CWD}/../types/src/pairql`;
+
 const SUCCESS_OUTPUT = `
 export interface SuccessOutput {
   success: boolean;
@@ -175,3 +178,5 @@ const PRETTIER_FORMAT = [
   `${CWD}/../../.prettierrc.json`,
   `--write`,
 ].join(` `);
+
+main();

@@ -1,6 +1,6 @@
 // auto-generated, do not edit
-import { ClientAuth } from '@dash/pairs';
-import type * as T from '@dash/pairs';
+import { ClientAuth } from '@dash/types';
+import type * as T from '@dash/types';
 import { query } from './query';
 
 export const liveClient = {

@@ -1,4 +1,4 @@
-import { RequestStatus, Result } from '@dash/pairs';
+import { RequestStatus, Result } from '@dash/types';
 import type { ApiClient } from './client';
 
 const noopClient: ApiClient = {

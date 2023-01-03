@@ -1,5 +1,10 @@
-import type { UnlockRequestCreateKeyData } from '@dash/types';
-import type { AppScope, Key, KeyRecord, SingleAppScope } from './types';
+import type {
+  AppScope,
+  Key,
+  SharedKey,
+  SingleAppScope,
+  UnlockRequestCreateKeyData,
+} from '@dash/types';
 import * as EditKey from './edit';
 import { keyForUnlockRequest, newKeyState } from '.';
 
@@ -15,7 +20,7 @@ export function unlockRequestToState(
   };
 }
 
-export function toState(keyRecord: KeyRecord): EditKey.State {
+export function toState(keyRecord: Key): EditKey.State {
   const state = newKeyState(keyRecord.id, keyRecord.keychainId);
   const key = keyRecord.key;
   state.activeStep = EditKey.Step.None;
@@ -57,7 +62,7 @@ export function toState(keyRecord: KeyRecord): EditKey.State {
   return state;
 }
 
-export function toKeyRecord(state?: EditKey.State): KeyRecord | null {
+export function toKeyRecord(state?: EditKey.State): Key | null {
   if (!state?.keyType) {
     return null;
   }
@@ -66,7 +71,7 @@ export function toKeyRecord(state?: EditKey.State): KeyRecord | null {
     : appKeyToKeyRecord(state);
 }
 
-function setAddressFields(key: Key, state: EditKey.State): void {
+function setAddressFields(key: SharedKey, state: EditKey.State): void {
   if (key.type === `domain`) {
     state.addressType = `strict`;
     state.address = key.domain;
@@ -84,7 +89,7 @@ function setAddressFields(key: Key, state: EditKey.State): void {
   }
 }
 
-function toSkeleton(key: Key, state: EditKey.State): EditKey.State {
+function toSkeleton(key: SharedKey, state: EditKey.State): EditKey.State {
   state.keyType = `app`;
   state.appScope = `unrestricted`;
   state.addressScope = `singleApp`;
@@ -98,9 +103,9 @@ function toSkeleton(key: Key, state: EditKey.State): EditKey.State {
   return state;
 }
 
-function websiteKeyToKeyRecord(state: EditKey.State): KeyRecord | null {
+function websiteKeyToKeyRecord(state: EditKey.State): Key | null {
   const tmpScope: AppScope = { type: `webBrowsers` };
-  let key: Key = { type: `domain`, domain: ``, scope: tmpScope };
+  let key: SharedKey = { type: `domain`, domain: ``, scope: tmpScope };
 
   switch (state.addressType) {
     case `standard`:
@@ -139,7 +144,7 @@ function websiteKeyToKeyRecord(state: EditKey.State): KeyRecord | null {
   };
 }
 
-function appKeyToKeyRecord(state: EditKey.State): KeyRecord | null {
+function appKeyToKeyRecord(state: EditKey.State): Key | null {
   if (state.appScope === `unrestricted`) {
     const single = singleAppScope(state);
     if (!single) return null;

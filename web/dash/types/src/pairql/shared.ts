@@ -1,3 +1,5 @@
+// auto-generated, do not edit
+
 export enum AdminNotificationTrigger {
   unlockRequestSubmitted,
   suspendFilterRequestSubmitted,
@@ -26,6 +28,7 @@ export enum DeviceModelFamily {
 
 export interface Key {
   id: UUID;
+  keychainId: UUID;
   comment?: string;
   expiration?: ISODateString;
   key: SharedKey;
@@ -50,7 +53,7 @@ export type SharedKey =
   | { type: 'anySubdomain'; domain: string; scope: AppScope }
   | { type: 'domain'; domain: string; scope: AppScope }
   | { type: 'domainRegex'; pattern: string; scope: AppScope }
-  | { type: 'skeleton'; pattern: string; scope: SingleAppScope }
+  | { type: 'skeleton'; scope: SingleAppScope }
   | { type: 'ipAddress'; ipAddress: string; scope: AppScope }
   | { type: 'path'; path: string; scope: AppScope };
 
@@ -60,4 +63,21 @@ export type SingleAppScope =
 
 export interface SuccessOutput {
   success: boolean;
+}
+
+export interface UnlockRequest {
+  id: UUID;
+  userId: UUID;
+  userName: string;
+  status: RequestStatus;
+  url?: string;
+  domain?: string;
+  ipAddress?: string;
+  requestComment?: string;
+  appName?: string;
+  appSlug?: string;
+  appBundleId?: string;
+  appCategories: string[];
+  requestProtocol?: string;
+  createdAt: ISODateString;
 }

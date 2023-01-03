@@ -1,5 +1,5 @@
-import { Result } from '@dash/pairs';
-import type { ClientAuth } from '@dash/pairs';
+import { Result } from '@dash/types';
+import type { ClientAuth } from '@dash/types';
 
 export async function query<Input, Output>(
   input: Input,

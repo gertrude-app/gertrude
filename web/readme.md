@@ -14,7 +14,6 @@
 - `dash/datetime` - date/time fns for dashboard
 - `dash/keys` - logic/domain knowledge around _keys_
 - `dash/types` - shared types (non-ambient) for dashboard
-- `dash/pairs` - pairql typedefs for dashboard
 - `dash/utils` - misc helpers (string, etc.) for dashboard
 - `site/components` - react components for site
 - `shared/components` - react components used by more than one app

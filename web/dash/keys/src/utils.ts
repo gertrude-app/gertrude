@@ -1,4 +1,4 @@
-import type { Key } from './types';
+import type { SharedKey } from '@dash/types';
 import * as EditKey from './edit';
 
 export function newKeyState(id: UUID, keychainId: UUID): EditKey.State {
@@ -22,7 +22,7 @@ export function newKeyState(id: UUID, keychainId: UUID): EditKey.State {
   };
 }
 
-export function target(key: Key): string {
+export function target(key: SharedKey): string {
   switch (key.type) {
     case `ipAddress`:
       return key.ipAddress;
