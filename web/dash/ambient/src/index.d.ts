@@ -9,6 +9,8 @@ type Editable<T extends { id: UUID }> = {
 };
 
 type PqlError = {
+  // todo, deal with these
+  type?: 'not_found' | 'non_actionable' | 'no_internet' | 'auth_failed' | 'actionable';
   debugMessage: string;
   userFacingMessage?: string;
   errorId?: UUID;

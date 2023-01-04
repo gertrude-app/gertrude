@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { AdminNotificationTrigger } from '../shared';
+import type { AdminNotificationTrigger, AdminSubscriptionStatus } from '../shared';
 
 export namespace GetAdmin {
   export type Input = void;
@@ -35,24 +35,10 @@ export namespace GetAdmin {
     methodId: UUID;
   }
 
-  export enum SubscriptionStatus {
-    pendingEmailVerification,
-    emailVerified,
-    signupCanceled,
-    complimentary,
-    incomplete,
-    incompleteExpired,
-    trialing,
-    active,
-    pastDue,
-    canceled,
-    unpaid,
-  }
-
   export interface Output {
     id: UUID;
     email: string;
-    subscriptionStatus: SubscriptionStatus;
+    subscriptionStatus: AdminSubscriptionStatus;
     notifications: Array<Notification>;
     verifiedNotificationMethods: Array<VerifiedNotificationMethod>;
   }

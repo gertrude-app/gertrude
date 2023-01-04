@@ -1,9 +1,9 @@
 import React from 'react';
-import type { KeyRecord } from '@dash/keys';
+import type { Key as KeyType } from '@dash/types';
 import Key from './KeyListKey';
 
 type Props = {
-  keys: KeyRecord[];
+  keys: KeyType[];
   editKey(id: UUID): unknown;
   deleteKey(id: UUID): unknown;
 };

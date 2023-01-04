@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, TextInput } from '@shared/components';
 import { inflect } from '@dash/utils';
-import type { ConfirmableEntityAction } from '@dash/types';
-import type { EditKey, KeyRecord } from '@dash/keys';
+import type { ConfirmableEntityAction, Key } from '@dash/types';
+import type { EditKey } from '@dash/keys';
 import Modal, { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
 import KeyCreator from '../KeyCreator/KeyCreator';
@@ -17,7 +17,7 @@ type Props = {
   setDescription(description: string): unknown;
   deleteKeychain: ConfirmableEntityAction<void>;
   deleteKey: ConfirmableEntityAction;
-  keys: KeyRecord[];
+  keys: Key[];
   saveButtonDisabled: boolean;
   onSave(): unknown;
   editingKey?: EditKey.State;

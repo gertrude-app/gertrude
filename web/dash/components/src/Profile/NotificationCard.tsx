@@ -1,13 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import cx from 'classnames';
-import { Trigger } from '@dash/types';
 import { Button } from '@shared/components';
-import type { AdminNotificationMethod } from '@dash/types';
+import type { AdminNotificationTrigger, GetAdmin } from '@dash/types';
 import { SelectMenu } from '../Forms';
 import GradientIcon from '../GradientIcon';
 
+type AdminNotificationMethod = GetAdmin.VerifiedNotificationMethod;
+
 type Props = {
-  trigger: Trigger;
+  trigger: AdminNotificationTrigger;
   methodOptions: Array<{ display: string; value: string }>;
   selectedMethod: AdminNotificationMethod;
   onDelete(): unknown;
@@ -15,7 +16,7 @@ type Props = {
   startEdit(): unknown;
   cancelEdit(): unknown;
   updateMethod(id: UUID): unknown;
-  updateTrigger(trigger: Trigger): unknown;
+  updateTrigger(trigger: AdminNotificationTrigger): unknown;
   onSave(): unknown;
   saveButtonDisabled: boolean;
   focus?: boolean;
@@ -51,7 +52,7 @@ const NotificationCard: React.FC<Props> = ({
         focus && `ring-violet-500/90 ring-4 ring-offset-4`,
       )}
     >
-      <Summary {...selectedMethod.data} trigger={trigger} />
+      <Summary {...selectedMethod} trigger={trigger} />
       <div
         className={cx(
           `p-4 space-y-4 -mt-4 [transition:150ms]`,
@@ -62,7 +63,7 @@ const NotificationCard: React.FC<Props> = ({
           <h3 className="mb-1 text-violet-800 font-medium text-md ml-1">Method:</h3>
           <SelectMenu
             options={methodOptions}
-            selectedOption={selectedMethod.id}
+            selectedOption={selectedMethod.value.id}
             setSelected={updateMethod}
           />
         </div>
@@ -71,11 +72,11 @@ const NotificationCard: React.FC<Props> = ({
           <SelectMenu
             options={[
               {
-                value: Trigger.suspendFilterRequestSubmitted,
+                value: `suspendFilterRequestSubmitted`,
                 display: `Suspension requests`,
               },
               {
-                value: Trigger.unlockRequestSubmitted,
+                value: `unlockRequestSubmitted`,
                 display: `Unlock requests`,
               },
             ]}
@@ -131,15 +132,11 @@ const NotificationCard: React.FC<Props> = ({
 
 export default NotificationCard;
 
-const Summary: React.FC<AdminNotificationMethod['data'] & { trigger: Trigger }> = (
-  props,
-) => (
+const Summary: React.FC<
+  AdminNotificationMethod & { trigger: AdminNotificationTrigger }
+> = (props) => (
   <div className="p-5">
-    <GradientIcon
-      icon={props.type === `text` ? `phone` : props.type}
-      size="small"
-      className="w-min"
-    />
+    <GradientIcon icon={methodIcon(props)} size="small" className="w-min" />
     <h2 className="text-gray-700 text-lg">
       <span className="capitalize">{props.type}</span>
       {` `}
@@ -149,22 +146,33 @@ const Summary: React.FC<AdminNotificationMethod['data'] & { trigger: Trigger }> 
   </div>
 );
 
-function methodTarget(method: AdminNotificationMethod['data']): string {
+function methodTarget(method: AdminNotificationMethod): string {
   switch (method.type) {
-    case `email`:
-      return method.email;
-    case `text`:
-      return method.phoneNumber;
-    case `slack`:
-      return method.channelName;
+    case `VerifiedEmailMethod`:
+      return method.value.email;
+    case `VerifiedTextMethod`:
+      return method.value.phoneNumber;
+    case `VerifiedSlackMethod`:
+      return method.value.channelName;
   }
 }
 
-function triggerText(trigger: Trigger): string {
+function triggerText(trigger: AdminNotificationTrigger): string {
   switch (trigger) {
-    case Trigger.suspendFilterRequestSubmitted:
+    case `suspendFilterRequestSubmitted`:
       return `filter suspension requests`;
-    case Trigger.unlockRequestSubmitted:
+    case `unlockRequestSubmitted`:
       return `unlock requests`;
+  }
+}
+
+function methodIcon(method: AdminNotificationMethod): 'email' | 'slack' | 'phone' {
+  switch (method.type) {
+    case `VerifiedEmailMethod`:
+      return `email`;
+    case `VerifiedTextMethod`:
+      return `phone`;
+    case `VerifiedSlackMethod`:
+      return `slack`;
   }
 }

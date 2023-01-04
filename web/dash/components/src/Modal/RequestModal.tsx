@@ -10,7 +10,7 @@ interface Props<Payload> {
   errorTitle?: string;
   primaryButton: React.ComponentProps<typeof Modal>['primaryButton'];
   withPayload: (payload: Payload) => React.ReactNode;
-  withError?: (error?: ApiError) => React.ReactNode;
+  withError?: (error?: PqlError) => React.ReactNode;
   onDismiss(): unknown;
   icon?: IconType;
 }

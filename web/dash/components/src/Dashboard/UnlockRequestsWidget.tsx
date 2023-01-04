@@ -1,15 +1,14 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import { Api } from '@dash/types';
 import { writable, newestFirst, inflect } from '@dash/utils';
-import type { DashboardWidgetData } from '@dash/types';
+import type { GetDashboardWidgets } from '@dash/types';
 import UnlockRequestCard from '../UnlockRequestCard';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
 type Props = {
   className?: string;
-  unlockRequests: DashboardWidgetData['unlockRequests'];
+  unlockRequests: GetDashboardWidgets.Output['unlockRequests'];
 };
 
 const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) => (
@@ -26,7 +25,7 @@ const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) =>
             userId={req.userId}
             userName={req.userName}
             comment={req.comment ?? undefined}
-            status={Api.RequestStatus.pending}
+            status="pending"
             createdAt={req.createdAt}
             url={req.target}
           />

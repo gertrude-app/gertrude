@@ -1,13 +1,13 @@
 import React from 'react';
 import { writable, newestFirst } from '@dash/utils';
 import { relativeTime } from '@dash/datetime';
-import type { DashboardWidgetData } from '@dash/types';
+import type { GetDashboardWidgets } from '@dash/types';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
 type Props = {
   className?: string;
-  screenshots: DashboardWidgetData['userScreenshots'];
+  screenshots: GetDashboardWidgets.Output['recentScreenshots'];
 };
 
 const UserScreenshotsWidget: React.FC<Props> = ({ className, screenshots }) => (

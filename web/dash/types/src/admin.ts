@@ -1,4 +1,4 @@
-import type { GetAdmin, CreatePendingNotificationMethod } from './';
+import type { CreatePendingNotificationMethod } from './';
 
 export type NewAdminNotificationMethodEvent =
   | { type: 'create_clicked' }

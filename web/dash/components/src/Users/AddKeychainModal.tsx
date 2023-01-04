@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Keychain } from '@dash/keys';
+import type { KeychainSummary as Keychain } from '@dash/types';
 import { RequestModal } from '../Modal';
 import KeychainPicker from '../Keychains/KeychainPicker';
 

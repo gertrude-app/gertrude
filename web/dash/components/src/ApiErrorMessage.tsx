@@ -4,7 +4,7 @@ import ErrorMessage from './ErrorMessage';
 import GenericError from './GenericError';
 
 interface Props {
-  error?: ApiError;
+  error?: PqlError;
   wrapped?: boolean;
   entity?: string;
 }
@@ -20,7 +20,7 @@ const ApiErrorMessage: React.FC<Props> = ({ error, entity, wrapped = true }) => 
         </Wrap>
       );
     case `actionable`:
-      return <Wrap>{error.message}</Wrap>;
+      return <Wrap>{error.userFacingMessage ?? `TODO`}</Wrap>;
     case `not_found`:
       return <Wrap>{entity ? `${entity} not` : `Not`} found.</Wrap>;
     case undefined: /* fallthrough */

@@ -9,7 +9,7 @@ interface Props {
     | 'contactSupport'
     | null
     | React.ComponentProps<typeof Modal>['secondaryButton'];
-  error?: ApiError;
+  error?: PqlError;
   nonActionableMessage?: string | React.ReactNode;
   entity?: string;
   onDismiss?(): unknown;

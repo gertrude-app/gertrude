@@ -6,7 +6,7 @@ export namespace GetDashboardWidgets {
   export interface Output {
     users: Array<{
       id: UUID;
-      userName: string;
+      name: string;
       isOnline: boolean;
     }>;
     userActivitySummaries: Array<{

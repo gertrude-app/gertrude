@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import { Button } from '@shared/components';
 import { relativeTime } from '@dash/datetime';
-import { Api } from '@dash/types';
+import type { RequestStatus } from '@dash/types';
 import GradientIcon from './GradientIcon';
 import UserInputText from './UserInputText';
 
@@ -11,7 +11,7 @@ type Props = {
   url: string;
   userId: UUID;
   userName: string;
-  status: Api.RequestStatus;
+  status: RequestStatus;
   comment?: string;
   createdAt: string;
 };
@@ -27,8 +27,8 @@ const UnlockRequestCard: React.FC<Props> = ({
 }) => (
   <div
     className={cx(`flex flex-col bg-white border p-4 rounded-xl max-w-3xl`, {
-      'border-red-600/30': status === Api.RequestStatus.rejected,
-      'border-green-700/40': status === Api.RequestStatus.accepted,
+      'border-red-600/30': status === `rejected`,
+      'border-green-700/40': status === `accepted`,
     })}
   >
     <div className="flex justify-between items-start mb-4">
@@ -47,7 +47,7 @@ const UnlockRequestCard: React.FC<Props> = ({
         </p>
       </div>
     )}
-    {status === Api.RequestStatus.pending ? (
+    {status === `pending` ? (
       <div className="flex flex-row space-x-3 items-stretch mt-4 w-full">
         <Button
           type="link"
@@ -74,11 +74,11 @@ const UnlockRequestCard: React.FC<Props> = ({
         <GradientIcon
           className="translate-x-1 scale-75"
           size="medium"
-          icon={status === Api.RequestStatus.accepted ? `thumbs-up` : `thumbs-down`}
+          icon={status === `accepted` ? `thumbs-up` : `thumbs-down`}
         />
         <span className="text-gray-600">Unlock request</span>
         <UserInputText small className="translate-y-0.5">
-          {status === Api.RequestStatus.accepted ? `accepted` : `rejected`}
+          {status === `accepted` ? `accepted` : `rejected`}
         </UserInputText>
         .
       </div>

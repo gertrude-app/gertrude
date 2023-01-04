@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { inflect } from '@dash/utils';
 import { TextInput, Button } from '@shared/components';
 import type { Subcomponents, ConfirmableEntityAction } from '@dash/types';
-import type { Keychain } from '@dash/keys';
+import type { KeychainSummary as Keychain } from '@dash/types';
 import { Toggle } from '../Forms';
 import KeychainCard from '../Keychains/KeychainCard';
 import { ConfirmDeleteEntity } from '../Modal';

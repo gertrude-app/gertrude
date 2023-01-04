@@ -5,10 +5,22 @@ export interface AdminKeychain {
   keys: Array<Key>;
 }
 
-export enum AdminNotificationTrigger {
-  unlockRequestSubmitted,
-  suspendFilterRequestSubmitted,
-}
+export type AdminNotificationTrigger =
+  | 'unlockRequestSubmitted'
+  | 'suspendFilterRequestSubmitted';
+
+export type AdminSubscriptionStatus =
+  | 'pendingEmailVerification'
+  | 'emailVerified'
+  | 'signupCanceled'
+  | 'complimentary'
+  | 'incomplete'
+  | 'incompleteExpired'
+  | 'trialing'
+  | 'active'
+  | 'pastDue'
+  | 'canceled'
+  | 'unpaid';
 
 export type AppScope =
   | { type: 'unrestricted' }
@@ -28,15 +40,14 @@ export interface Device {
   modelTitle: string;
 }
 
-export enum DeviceModelFamily {
-  macBookAir,
-  macBookPro,
-  mini,
-  iMac,
-  studio,
-  pro,
-  unknown,
-}
+export type DeviceModelFamily =
+  | 'macBookAir'
+  | 'macBookPro'
+  | 'mini'
+  | 'iMac'
+  | 'studio'
+  | 'pro'
+  | 'unknown';
 
 export interface Key {
   id: UUID;
@@ -55,11 +66,7 @@ export interface KeychainSummary {
   numKeys: number;
 }
 
-export enum RequestStatus {
-  pending,
-  accepted,
-  rejected,
-}
+export type RequestStatus = 'pending' | 'accepted' | 'rejected';
 
 export type SharedKey =
   | { type: 'anySubdomain'; domain: string; scope: AppScope }
