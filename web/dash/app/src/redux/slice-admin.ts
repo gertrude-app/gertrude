@@ -1,11 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { isUnsaved, unsavedId } from '@dash/utils';
 import { typesafe } from '@shared/ts-utils';
-import { Result, AdminNotificationTrigger } from '@dash/types';
+import { Result } from '@dash/types';
 import type {
   GetAdmin,
   PendingNotificationMethod,
   NewAdminNotificationMethodEvent,
+  AdminSubscriptionStatus,
 } from '@dash/types';
 import type { NotificationUpdate } from '@dash/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
@@ -17,7 +18,7 @@ export interface AdminState {
   billingPortalRequest: RequestState<string>;
   profileRequest: RequestState<{
     email: string;
-    subscriptionStatus: GetAdmin.SubscriptionStatus;
+    subscriptionStatus: AdminSubscriptionStatus;
   }>;
   notificationMethods: Record<UUID, GetAdmin.VerifiedNotificationMethod>;
   notifications: Record<UUID, Editable<GetAdmin.Notification> & { editing: boolean }>;
@@ -60,7 +61,7 @@ export const slice = createSlice({
         editing: true,
         ...editable({
           id: unsavedId(),
-          trigger: AdminNotificationTrigger.suspendFilterRequestSubmitted,
+          trigger: `suspendFilterRequestSubmitted`,
           methodId: typesafe.objectValues(state.notificationMethods)[0]?.value.id ?? ``,
         }),
       };

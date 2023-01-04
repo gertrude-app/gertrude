@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 import * as convert from '@dash/keys';
-import { RequestStatus } from '@dash/types';
 import type { UnlockRequest } from '@dash/types';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
@@ -58,7 +57,7 @@ export const slice = createSlice({
       state.denyComment = undefined;
       const unlockRequest = state.entities[meta.arg];
       if (unlockRequest) {
-        unlockRequest.status = RequestStatus.rejected;
+        unlockRequest.status = `rejected`;
       }
     });
 
@@ -76,7 +75,7 @@ export const slice = createSlice({
       state.selectedKeychainId = undefined;
       const unlockRequest = state.entities[meta.arg];
       if (unlockRequest) {
-        unlockRequest.status = RequestStatus.accepted;
+        unlockRequest.status = `accepted`;
       }
     });
 
@@ -140,7 +139,7 @@ export const acceptUnlockRequest = createResultThunk(
     // TODO: make an `AcceptUnlockRequest` pair, to combine these
     return Current.api.updateUnlockRequest({
       id,
-      status: RequestStatus.accepted,
+      status: `accepted`,
     });
   },
 );
@@ -151,7 +150,7 @@ export const rejectUnlockRequest = createResultThunk(
     const comment = getState().unlockRequests.denyComment?.trim();
     return Current.api.updateUnlockRequest({
       id,
-      status: RequestStatus.rejected,
+      status: `rejected`,
       responseComment: comment || undefined,
     });
   },

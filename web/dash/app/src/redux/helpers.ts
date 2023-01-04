@@ -19,7 +19,7 @@ export class Query {
   }
 
   public static unexpectedError(): QueriedProps<never> {
-    return { state: `failed`, error: { type: `non_actionable` } };
+    return { state: `failed`, error: { type: `non_actionable`, debugMessage: `TODO` } };
   }
 
   public static redirectDeleted(redirectUrl: string): QueriedProps<never> {
@@ -32,7 +32,7 @@ export class Req {
     return { state: `succeeded`, payload };
   }
 
-  static toUnresolvedQuery<E extends ApiError>(
+  static toUnresolvedQuery<E extends PqlError>(
     req?: RequestState<never, E>,
   ): QueriedProps<never> {
     switch (req?.state) {
@@ -42,7 +42,10 @@ export class Req {
       case `ongoing`:
         return { state: `ongoing` };
       case `failed`:
-        return { state: `failed`, error: req.error };
+        return {
+          state: `failed`,
+          error: req.error ?? { type: `non_actionable`, debugMessage: `TODO` },
+        };
       case `succeeded`:
         throw new Error(`unreachable`);
     }

@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import type { Keychain } from '@dash/keys';
+import type { KeychainSummary } from '@dash/types';
 import { fetchSelectableKeychains } from '../redux/slice-keychains';
 import { useDispatch, useSelector } from '../redux/hooks';
 import { Req } from '../redux/helpers';
 
 export default function useSelectableKeychains(
   fetch = true,
-): RequestState<{ own: Keychain[]; public: Keychain[] }, ApiError> {
+): RequestState<{ own: KeychainSummary[]; public: KeychainSummary[] }, PqlError> {
   const dispatch = useDispatch();
   const { entities, fetchSelectableKeychainsRequest } = useSelector(
     (state) => state.keychains,

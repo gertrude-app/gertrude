@@ -21,10 +21,6 @@ export default class Result<T, E> {
     return new Result<never, E>({ type: `error`, error });
   }
 
-  public static unexpectedError(): Result<never, ApiError> {
-    return Result.error({ type: `non_actionable` });
-  }
-
   public static merge<TA, TB, E>(
     a: Result<TA, E>,
     b: Result<TB, E>,

@@ -13,7 +13,7 @@ const CheckoutSuccess: React.FC = () => {
 
   useEffect(() => {
     if (reqState === `idle` && sessionId) {
-      dispatch(handleSignupPaymentSuccess(sessionId));
+      dispatch(handleSignupPaymentSuccess({ stripeCheckoutSessionid: sessionId }));
     }
   }, [dispatch, sessionId, reqState]);
 

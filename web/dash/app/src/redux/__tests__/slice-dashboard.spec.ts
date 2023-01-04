@@ -21,18 +21,21 @@ describe(`reducer`, () => {
           },
         ],
         users: [],
-        userActivity: [],
-        userScreenshots: [],
+        userActivitySummaries: [],
+        recentScreenshots: [],
       },
     };
 
     let next = reducer(
       state.dashboard,
-      acceptUnlockRequest.succeeded(true, `request-123`),
+      acceptUnlockRequest.succeeded({ success: true }, `request-123`),
     );
     expect(Req.payload(next.request)?.unlockRequests).toEqual([]);
 
-    next = reducer(state.dashboard, rejectUnlockRequest.succeeded(true, `request-123`));
+    next = reducer(
+      state.dashboard,
+      rejectUnlockRequest.succeeded({ success: true }, `request-123`),
+    );
     expect(Req.payload(next.request)?.unlockRequests).toEqual([]);
   });
 
@@ -43,23 +46,27 @@ describe(`reducer`, () => {
       payload: {
         unlockRequests: [],
         users: [],
-        userActivity: [
-          { id: `2`, userName: `Huck`, numUnreviewed: 11 },
-          { id: `3`, userName: `Bob`, numUnreviewed: 33 },
+        userActivitySummaries: [
+          // i added the `numReviewd` and made them up
+          { id: `2`, name: `Huck`, numReviewed: 22, numUnreviewed: 11 },
+          { id: `3`, name: `Bob`, numReviewed: 33, numUnreviewed: 33 },
         ],
-        userScreenshots: [],
+        recentScreenshots: [],
       },
     };
 
     const next = reducer(
       state.dashboard,
-      deleteActivityItems.succeeded(true, {
-        userId: `2`,
-        itemRootIds: [`1`, `2`],
-        date: new Date(),
-      }),
+      deleteActivityItems.succeeded(
+        { success: true },
+        {
+          userId: `2`,
+          itemRootIds: [`1`, `2`],
+          date: new Date(),
+        },
+      ),
     );
-    expect(Req.payload(next.request)?.userActivity).toEqual([
+    expect(Req.payload(next.request)?.userActivitySummaries).toEqual([
       { id: `2`, userName: `Huck`, numUnreviewed: 9 },
       { id: `3`, userName: `Bob`, numUnreviewed: 33 },
     ]);
@@ -72,21 +79,26 @@ describe(`reducer`, () => {
       payload: {
         unlockRequests: [],
         users: [],
-        userActivity: [{ id: `2`, userName: `Huck`, numUnreviewed: 1 }],
-        userScreenshots: [],
+        userActivitySummaries: [
+          { id: `2`, name: `Huck`, numReviewed: 99999, numUnreviewed: 1 },
+        ],
+        recentScreenshots: [],
       },
     };
 
     const next = reducer(
       state.dashboard,
-      deleteActivityItems.succeeded(true, {
-        userId: `2`,
-        // more than the number of unreviewed items, some came in since load
-        itemRootIds: [`1`, `2`],
-        date: new Date(),
-      }),
+      deleteActivityItems.succeeded(
+        { success: true },
+        {
+          userId: `2`,
+          // more than the number of unreviewed items, some came in since load
+          itemRootIds: [`1`, `2`],
+          date: new Date(),
+        },
+      ),
     );
-    expect(Req.payload(next.request)?.userActivity).toEqual([
+    expect(Req.payload(next.request)?.userActivitySummaries).toEqual([
       { id: `2`, userName: `Huck`, numUnreviewed: 0 },
     ]);
   });

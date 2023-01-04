@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Loading, ListUsers, ApiErrorMessage } from '@dash/components';
-import { Family } from '@dash/types';
 import { typesafe } from '@shared/ts-utils';
+import type { DeviceModelFamily } from '@dash/types';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   addDeviceDismissed,
@@ -41,14 +41,14 @@ const Users: React.FC = () => {
         numKeys: resource.keychains.reduce((acc, keychain) => acc + keychain.numKeys, 0),
         devices: resource.devices.map((device) => ({
           id: device.id,
-          model: device.model.title,
+          model: device.modelTitle,
           status: device.isOnline ? `online` : `offline`,
-          icon: familyToIcon(device.model.family),
+          icon: familyToIcon(device.modelFamily),
         })),
         screenshotsEnabled: resource.screenshotsEnabled,
         keystrokesEnabled: resource.keyloggingEnabled,
       }))}
-      startAddDevice={(userId) => dispatch(createPendingAppConnection(userId))}
+      startAddDevice={(userId) => dispatch(createPendingAppConnection({ userId }))}
       dismissAddDevice={() => dispatch(addDeviceDismissed())}
       addDeviceRequest={addDeviceRequest}
     />
@@ -57,16 +57,16 @@ const Users: React.FC = () => {
 
 export default Users;
 
-export function familyToIcon(family: Family): `laptop` | `desktop` {
+export function familyToIcon(family: DeviceModelFamily): `laptop` | `desktop` {
   switch (family) {
-    case Family.iMac:
-    case Family.pro:
-    case Family.studio:
-    case Family.mini:
+    case `iMac`:
+    case `pro`:
+    case `studio`:
+    case `mini`:
       return `desktop`;
-    case Family.macBookAir:
-    case Family.macBookPro:
-    case Family.unknown:
+    case `macBookAir`:
+    case `macBookPro`:
+    case `unknown`:
       return `laptop`;
   }
 }

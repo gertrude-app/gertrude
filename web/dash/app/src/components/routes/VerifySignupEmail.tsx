@@ -15,13 +15,13 @@ const VerifySignupEmail: React.FC = () => {
 
   useEffect(() => {
     if (paymentUrlReqState === `idle` && verifiedAdminId) {
-      dispatch(createSignupPaymentUrl(verifiedAdminId));
+      dispatch(createSignupPaymentUrl({ adminId: verifiedAdminId }));
     }
   }, [dispatch, verifiedAdminId, paymentUrlReqState]);
 
   useEffect(() => {
     if (verifyReq?.state === `idle`) {
-      dispatch(verifySignupEmail(token));
+      dispatch(verifySignupEmail({ token }));
     }
   }, [dispatch, token, verifyReq?.state]);
 

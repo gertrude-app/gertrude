@@ -13,7 +13,7 @@ describe(`reducer`, () => {
     });
     const nextState = reducer(
       state.unlockRequests,
-      acceptUnlockRequest.succeeded(true, `1`),
+      acceptUnlockRequest.succeeded({ success: true }, `1`),
     );
     expect(nextState.selectedKeychainId).toBe(undefined);
     expect(nextState.detailsExpanded).toBe(false);
@@ -27,7 +27,7 @@ describe(`reducer`, () => {
     });
     const nextState = reducer(
       state.unlockRequests,
-      rejectUnlockRequest.succeeded(true, `1`),
+      rejectUnlockRequest.succeeded({ success: true }, `1`),
     );
     expect(nextState.selectedKeychainId).toBe(undefined);
     expect(nextState.detailsExpanded).toBe(false);

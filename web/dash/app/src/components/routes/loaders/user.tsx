@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { ErrorModal, LoadingModal } from '@dash/components';
+import type { User } from '@dash/types';
 import type { EntityLoader } from './loader-types';
-import type { User } from '../../../api/users';
 import { useDispatch, useSelector } from '../../../redux/hooks';
 import UnexpectedError from '../../UnexpectedError';
 import { fetchUser } from '../../../redux/slice-users';

@@ -1,22 +1,21 @@
-import { SubscriptionStatus, Trigger, Family } from '@dash/types';
-import type { UnlockRequest } from '@dash/types';
-import type { Keychain } from '@dash/keys';
-import type { ActivityItem } from '@dash/components';
-import type { User } from '../../api/users';
 import type {
-  GetAdmin_admin,
-  GetAdmin_admin_notifications,
-  GetAdmin_admin_verifiedNotificationMethods,
-  GetAdmin_admin_verifiedNotificationMethods_method,
-} from '../../api/admin/__generated__/GetAdmin';
-import type { GetActivityOverview_counts } from '../../api/users/__generated__/GetActivityOverview';
+  User,
+  UnlockRequest,
+  GetAdmin,
+  Device,
+  KeychainSummary,
+  GetUserActivityDays,
+} from '@dash/types';
+import type { ActivityItem } from '@dash/components';
 import * as empty from '../../redux/empty';
 
-export function adminProfile(override: Partial<GetAdmin_admin> = {}): GetAdmin_admin {
+type Admin = GetAdmin.Output;
+
+export function adminProfile(override: Partial<Admin> = {}): Admin {
   return {
-    __typename: `Admin`,
+    id: `mock.Admin--id--${Math.random()}`,
     email: `you@example.com`,
-    subscriptionStatus: SubscriptionStatus.active,
+    subscriptionStatus: `active`,
     notifications: [],
     verifiedNotificationMethods: [],
     ...override,
@@ -24,40 +23,12 @@ export function adminProfile(override: Partial<GetAdmin_admin> = {}): GetAdmin_a
 }
 
 export function adminNotification(
-  override: Partial<GetAdmin_admin_notifications> = {},
-): GetAdmin_admin_notifications {
+  override: Partial<GetAdmin.Notification> = {},
+): GetAdmin.Notification {
   return {
-    __typename: `AdminNotification`,
     id: `mock.AdminNotification--id--${Math.random()}`,
-    trigger: Trigger.suspendFilterRequestSubmitted,
-    method: {
-      __typename: `AdminVerifiedNotificationMethod`,
-      id: `mock.AdminVerifiedNotificationMethod--id--${Math.random()}`,
-    },
-    ...override,
-  };
-}
-
-export function adminVerifiedNotificationMethod(
-  override: Partial<GetAdmin_admin_verifiedNotificationMethods> = {},
-): GetAdmin_admin_verifiedNotificationMethods {
-  return {
-    __typename: `AdminVerifiedNotificationMethod`,
-    id: `mock.AdminVerifiedNotificationMethod--id--${Math.random()}`,
-    method: notificationMethod(),
-    ...override,
-  };
-}
-
-export function notificationMethod(
-  override: Partial<GetAdmin_admin_verifiedNotificationMethods_method> = {},
-): GetAdmin_admin_verifiedNotificationMethods_method {
-  return {
-    __typename: `NotificationMethod`,
-    data: {
-      __typename: `EmailData`,
-      email: `them@example.com`,
-    },
+    trigger: `suspendFilterRequestSubmitted`,
+    methodId: `mock.AdminVerifiedNotificationMethod--id--${Math.random()}`,
     ...override,
   };
 }
@@ -72,27 +43,24 @@ export function user(override: Partial<User> = {}): User {
     keyloggingEnabled: true,
     keychains: [],
     devices: [],
+    createdAt: new Date().toISOString(),
     ...override,
   };
 }
 
-export function userDevice(
-  override: Partial<User['devices'][0]> = {},
-): User['devices'][0] {
+export function userDevice(override: Partial<Device> = {}): Device {
   return {
-    __typename: `Device`,
     id: `mock.Device--id--${Math.random()}`,
     isOnline: false,
-    model: {
-      __typename: `Model`,
-      family: Family.macBookAir,
-      title: `MacBook Air`,
-    },
+    modelFamily: `macBookAir`,
+    modelTitle: `MacBook Air`,
     ...override,
   };
 }
 
-export function userKeychain(override: Partial<Keychain> = {}): Keychain {
+export function keychainSummary(
+  override: Partial<KeychainSummary> = {},
+): KeychainSummary {
   return {
     id: `mock.Keychain--id--${Math.random()}`,
     name: `HTC`,
@@ -104,16 +72,15 @@ export function userKeychain(override: Partial<Keychain> = {}): Keychain {
   };
 }
 
-export function activityOverviewCounts(
-  numItems = 0,
-  numCompleted = 0,
+export function activityDay(
+  totalItems = 0,
+  numApproved = 0,
   start = new Date().toISOString(),
-): GetActivityOverview_counts {
+): GetUserActivityDays.Output['days'][number] {
   return {
-    __typename: `MonitoringRangeCounts`,
-    dateRange: { __typename: `DateRange`, start },
-    numItems,
-    numCompleted,
+    date: start,
+    totalItems,
+    numApproved,
   };
 }
 

@@ -57,7 +57,7 @@ const JoinWaitlistContainer: React.FC = () => {
       request={request}
       email={email}
       setEmail={(email) => dispatch(emailUpdated(email))}
-      submit={() => dispatch(joinWaitlist(email))}
+      submit={() => dispatch(joinWaitlist({ email }))}
     />
   );
 };

@@ -1,4 +1,4 @@
-import { RequestStatus, Result, GetAdmin } from '@dash/types';
+import { Result } from '@dash/types';
 import type { ApiClient } from './client';
 
 const noopClient: ApiClient = {
@@ -27,7 +27,7 @@ const noopClient: ApiClient = {
     return Result.success({
       id: ``,
       email: ``,
-      subscriptionStatus: GetAdmin.SubscriptionStatus.active,
+      subscriptionStatus: `active`,
       notifications: [],
       verifiedNotificationMethods: [],
     });
@@ -72,7 +72,7 @@ const noopClient: ApiClient = {
       userName: ``,
       requestedDurationInSeconds: 0,
       requestComment: ``,
-      status: RequestStatus.rejected,
+      status: `rejected`,
       createdAt: new Date().toISOString(),
     });
   },
@@ -81,7 +81,7 @@ const noopClient: ApiClient = {
       id: ``,
       userId: ``,
       userName: ``,
-      status: RequestStatus.rejected,
+      status: `rejected`,
       url: ``,
       domain: ``,
       ipAddress: ``,

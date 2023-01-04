@@ -22,7 +22,7 @@ const storageMiddleware: Middleware = (store) => (next) => (action) => {
     loginFromMagicLink.succeeded.match(action)
   ) {
     const admin = action.payload;
-    Current.localStorage.setItem(`admin_id`, admin.id);
+    Current.localStorage.setItem(`admin_id`, admin.adminId);
     Current.localStorage.setItem(`admin_token`, admin.token);
     Current.localStorage.removeItem(`dev_logged_out`);
   }

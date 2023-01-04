@@ -9,7 +9,7 @@ import reducer, {
   upsertUser,
 } from '../slice-users';
 import Result from '../../lib/Result';
-import { nextTick, makeGetState, makeState } from './test-helpers';
+import { makeGetState, makeState } from './test-helpers';
 import * as mock from './mocks';
 
 describe(`deleteDevice`, () => {
@@ -29,7 +29,7 @@ describe(`deleteDevice`, () => {
     state = reducer(state, deleteDevice.started(`device123`));
     expect(state.deleting?.device).toBeUndefined();
 
-    state = reducer(state, deleteDevice.succeeded(true, `device123`));
+    state = reducer(state, deleteDevice.succeeded({ success: true }, `device123`));
     expect(state.entities.user123?.original.devices).toEqual([]);
     expect(state.entities.user123?.draft.devices).toEqual([]);
   });
@@ -44,8 +44,9 @@ describe(`upsertUser`, () => {
 
   it(`with existing user, passes correct arguments to API methods`, async () => {
     const dispatch = vi.fn();
-    Current.api.users.setUserKeychains = vi.fn(() => Promise.resolve(Result.true()));
-    Current.api.users.upsertUser = vi.fn(() => Promise.resolve(Result.true()));
+    Current.api.saveUser = vi.fn(() =>
+      Promise.resolve(Result.success({ success: true })),
+    );
 
     const user = editable(
       mock.user({
@@ -53,8 +54,8 @@ describe(`upsertUser`, () => {
         keyloggingEnabled: true,
         screenshotsEnabled: true,
         keychains: [
-          mock.userKeychain({ id: `keychain1` }),
-          mock.userKeychain({ id: `keychain2` }),
+          mock.keychainSummary({ id: `keychain1` }),
+          mock.keychainSummary({ id: `keychain2` }),
         ],
       }),
     );
@@ -68,22 +69,16 @@ describe(`upsertUser`, () => {
     user.draft.keychains = [user.draft.keychains[0]!]; // <-- removed one
 
     const getState = makeGetState((state) => {
-      state.auth.admin = { id: `admin123`, token: `` };
+      state.auth.admin = { adminId: `admin123`, token: `` };
       state.users.entities = { user123: user };
     });
 
     await upsertUser(`user123`)(dispatch, getState);
 
-    expect(Current.api.users.upsertUser).toHaveBeenCalledWith({
+    expect(Current.api.saveUser).toHaveBeenCalledWith({
       ...user.draft,
       adminId: `admin123`,
     });
-
-    await nextTick();
-
-    expect(Current.api.users.setUserKeychains).toHaveBeenCalledWith(`user123`, [
-      `keychain1`,
-    ]);
   });
 
   test(`update user happy path`, () => {
@@ -97,7 +92,10 @@ describe(`upsertUser`, () => {
     let state = reducer(initialState.users, upsertUser.started(`user123`));
     expect(state.updateUserRequest.user123).toEqual(Req.ongoing());
 
-    state = reducer(initialState.users, upsertUser.succeeded(true, `user123`));
+    state = reducer(
+      initialState.users,
+      upsertUser.succeeded({ success: true }, `user123`),
+    );
     expect(state.updateUserRequest.user123).toEqual(Req.succeed(void 0));
 
     // successfully saving causes the draft state to be "committed"
@@ -114,11 +112,11 @@ describe(`fetchActivityOverview`, () => {
       state,
       fetchActivityOverview.succeeded(
         {
-          user: { __typename: `User`, name: `Huck` },
-          counts: [
-            mock.activityOverviewCounts(5, 0, `01-01-2022`),
-            mock.activityOverviewCounts(0, 0, `01-03-2022`), // <-- should be filtered out
-            mock.activityOverviewCounts(11, 0, `01-05-2022`), // <-- most recent, should be first
+          userName: `Huck`,
+          days: [
+            mock.activityDay(5, 0, `01-01-2022`),
+            mock.activityDay(0, 0, `01-03-2022`), // <-- should be filtered out
+            mock.activityDay(11, 0, `01-05-2022`), // <-- most recent, should be first
           ],
         },
         { userId: `user123` },
@@ -127,10 +125,10 @@ describe(`fetchActivityOverview`, () => {
 
     expect(state.activityOverviews).toEqual({
       user123: Req.succeed({
-        user: { __typename: `User`, name: `Huck` },
+        userName: `Huck`,
         counts: [
-          mock.activityOverviewCounts(11, 0, `01-05-2022`), // <-- most recent
-          mock.activityOverviewCounts(5, 0, `01-01-2022`),
+          mock.activityDay(11, 0, `01-05-2022`), // <-- most recent
+          mock.activityDay(5, 0, `01-01-2022`),
         ],
       }),
     });
@@ -139,7 +137,7 @@ describe(`fetchActivityOverview`, () => {
 
 describe(`deleteActivityItems`, () => {
   it(`dispatches correct action and invokes api`, () => {
-    Current.api.users.deleteActivityItems = vi.fn();
+    Current.api.deleteActivityItems = vi.fn();
 
     const getState = makeGetState((state) => {
       state.users.activityDays = {
@@ -159,7 +157,7 @@ describe(`deleteActivityItems`, () => {
       itemRootIds: [`item1`],
     })(vi.fn(), getState);
 
-    expect(Current.api.users.deleteActivityItems).toHaveBeenCalledWith(`user123`, [
+    expect(Current.api.deleteActivityItems).toHaveBeenCalledWith(`user123`, [
       { id: `item1`, type: `KeystrokeLine` },
     ]);
   });
@@ -179,11 +177,14 @@ describe(`deleteActivityItems`, () => {
 
     const next = reducer(
       state.users,
-      deleteActivityItems.succeeded(true, {
-        userId: `user123`,
-        date: new Date(`01-01-2022`),
-        itemRootIds: [`item1`],
-      }),
+      deleteActivityItems.succeeded(
+        { success: true },
+        {
+          userId: `user123`,
+          date: new Date(`01-01-2022`),
+          itemRootIds: [`item1`],
+        },
+      ),
     );
 
     const day = Req.payload(next.activityDays[`user123--01-01-2022`]);

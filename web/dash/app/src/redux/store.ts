@@ -41,7 +41,7 @@ export type QueriedProps<Component extends JSXElementConstructor<any>> =
   | { state: 'shouldFetch' }
   | { state: 'ongoing' }
   | { state: 'entityDeleted'; redirectUrl: string }
-  | { state: 'failed'; error?: ApiError }
+  | { state: 'failed'; error?: PqlError }
   | { state: 'resolved'; props: React.ComponentProps<Component> };
 
 export type QueryProps<Component extends JSXElementConstructor<any>, ExtraArg = void> = (
