@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
 import { newKeyState, convert } from '@dash/keys';
-import type { UnlockRequest } from '@dash/types';
-import type { EditKey, Keychain, KeyRecord } from '@dash/keys';
+import type { UnlockRequest, Key, KeychainSummary } from '@dash/types';
+import type { EditKey } from '@dash/keys';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
 import Result from '../lib/Result';
@@ -16,11 +16,11 @@ export interface KeychainsState {
   updateAdminKeychainRequest: Record<UUID, RequestState>;
 
   listAdminKeychainsRequest: RequestState;
-  entities: Record<UUID, Editable<Keychain>>;
+  entities: Record<UUID, Editable<KeychainSummary>>;
   fetchSelectableKeychainsRequest: RequestState;
 
   saveKeyRecordRequest: RequestState;
-  keyRecords: Record<UUID, Editable<KeyRecord>>;
+  keyRecords: Record<UUID, Editable<Key>>;
   editingKey?: EditKey.State;
   deleting: { keychain?: UUID; key?: UUID };
   deleted: UUID[];
@@ -80,8 +80,7 @@ export const slice = createSlice({
       if (!keychain) {
         return;
       }
-      const description = action.payload.description || null;
-      keychain.draft.description = description;
+      keychain.draft.description = action.payload.description;
     },
     createNewKeyClicked(state, action: PayloadAction<UUID>) {
       const keyState = newKeyState(uuid(), action.payload);
@@ -134,11 +133,10 @@ export const slice = createSlice({
 
     builder.addCase(fetchAdminKeychain.succeeded, (state, { payload, meta }) => {
       state.fetchAdminKeychainRequest[meta.arg] = Req.succeed(void 0);
-      const [keychain, keyRecords] = payload;
-      state.entities[keychain.id] = editable(keychain);
+      state.entities[payload.summary.id] = editable(payload.summary);
       state.keyRecords = {
         ...state.keyRecords,
-        ...toEditableMap(keyRecords),
+        ...toEditableMap(payload.keys),
       };
     });
 
@@ -168,11 +166,11 @@ export const slice = createSlice({
       state.listAdminKeychainsRequest = Req.succeed(void 0);
       state.entities = {
         ...state.entities,
-        ...toEditableMap(payload[0]),
+        ...toEditableMap(payload.map((adminKeychain) => adminKeychain.summary)),
       };
       state.keyRecords = {
         ...state.keyRecords,
-        ...toEditableMap(payload[1]),
+        ...toEditableMap(payload.flatMap((adminKeychain) => adminKeychain.keys)),
       };
     });
 
@@ -216,34 +214,39 @@ export const slice = createSlice({
 
 export const fetchAdminKeychain = createResultThunk(
   `${slice.name}/fetchAdminKeychain`,
-  Current.api.keychains.getAdminKeychain,
+  Current.api.getAdminKeychain,
 );
 
 export const fetchAdminKeychains = createResultThunk(
   `${slice.name}/fetchAdminKeychains`,
-  Current.api.keychains.listAdminKeychains,
+  Current.api.getAdminKeychains,
 );
 
 export const deleteKeyRecord = createResultThunk(
   `${slice.name}/deleteKeyRecord`,
-  Current.api.keychains.deleteKeyRecord,
+  (id: UUID) => Current.api.deleteEntity({ id, type: `Key` }),
 );
 
 export const deleteKeychain = createResultThunk(
   `${slice.name}/deleteKeychain`,
-  Current.api.keychains.deleteKeychain,
+  (id: UUID) => Current.api.deleteEntity({ id, type: `Keychain` }),
 );
 
 export const upsertKeychain = createResultThunk(
   `${slice.name}/upsertKeychain`,
   async (id: UUID, { getState }) => {
     const state = getState();
-    const adminId = state.auth.admin?.id ?? ``;
     const keychain = state.keychains.entities[id];
     if (!keychain) {
-      return Result.unexpectedError();
+      return Result.error({ debugMessage: `Keychain not found` });
     }
-    return Current.api.keychains.upsertKeychain({ ...keychain, adminId });
+    return Current.api.saveKeychain({
+      isNew: keychain.isNew ?? false,
+      id: keychain.draft.id,
+      name: keychain.draft.name,
+      description: keychain.draft.description,
+      isPublic: keychain.draft.isPublic,
+    });
   },
 );
 
@@ -253,17 +256,22 @@ export const upsertEditingKeyRecord = createResultThunk(
     const state = getState().keychains;
     const keyRecord = convert.toKeyRecord(state.editingKey);
     if (!keyRecord) {
-      return Result.unexpectedError();
+      return Result.error({ debugMessage: `Invalid key record` });
     }
-    return Current.api.keychains.upsertKeyRecord(
-      editable(keyRecord, state.editingKey?.isNew),
-    );
+    return Current.api.saveKey({
+      isNew: state.editingKey?.isNew ?? false,
+      id: keyRecord.id,
+      keychainId: keyRecord.keychainId,
+      key: keyRecord.key,
+      comment: keyRecord.comment,
+      expiration: keyRecord.expiration,
+    });
   },
 );
 
 export const fetchSelectableKeychains = createResultThunk(
   `${slice.name}/fetchSelectableKeychains`,
-  Current.api.keychains.getSelectableKeychains,
+  Current.api.getSelectableKeychains,
 );
 
 export const {

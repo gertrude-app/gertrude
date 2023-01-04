@@ -35,9 +35,24 @@ export namespace GetAdmin {
     methodId: UUID;
   }
 
+  export enum SubscriptionStatus {
+    pendingEmailVerification,
+    emailVerified,
+    signupCanceled,
+    complimentary,
+    incomplete,
+    incompleteExpired,
+    trialing,
+    active,
+    pastDue,
+    canceled,
+    unpaid,
+  }
+
   export interface Output {
     id: UUID;
     email: string;
+    subscriptionStatus: SubscriptionStatus;
     notifications: Array<Notification>;
     verifiedNotificationMethods: Array<VerifiedNotificationMethod>;
   }

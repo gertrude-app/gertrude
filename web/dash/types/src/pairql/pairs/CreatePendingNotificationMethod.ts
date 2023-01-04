@@ -3,19 +3,19 @@
 export namespace CreatePendingNotificationMethod {
   export type Input =
     | {
-        type: 'EmailInput';
+        type: 'Email';
         value: {
           email: string;
         };
       }
     | {
-        type: 'TextInput';
+        type: 'Text';
         value: {
           phoneNumber: string;
         };
       }
     | {
-        type: 'SlackInput';
+        type: 'Slack';
         value: {
           token: string;
           channelId: string;

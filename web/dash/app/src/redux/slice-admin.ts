@@ -1,21 +1,28 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { isUnsaved, unsavedId } from '@dash/utils';
-import * as T from '@dash/types';
 import { typesafe } from '@shared/ts-utils';
+import { Result, AdminNotificationTrigger } from '@dash/types';
+import type {
+  GetAdmin,
+  PendingNotificationMethod,
+  NewAdminNotificationMethodEvent,
+} from '@dash/types';
 import type { NotificationUpdate } from '@dash/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
-import Result from '../lib/Result';
 import { Req, editable, revert, commit } from './helpers';
 import { createResultThunk } from './thunk';
 
 export interface AdminState {
   billingPortalRequest: RequestState<string>;
-  profileRequest: RequestState<T.Admin>;
-  notificationMethods: Record<UUID, T.AdminNotificationMethod>;
-  notifications: Record<UUID, Editable<T.Notification> & { editing: boolean }>;
+  profileRequest: RequestState<{
+    email: string;
+    subscriptionStatus: GetAdmin.SubscriptionStatus;
+  }>;
+  notificationMethods: Record<UUID, GetAdmin.VerifiedNotificationMethod>;
+  notifications: Record<UUID, Editable<GetAdmin.Notification> & { editing: boolean }>;
   saveNotificationRequests: Record<UUID, RequestState>;
-  pendingNotificationMethod?: T.PendingNotificationMethod;
+  pendingNotificationMethod?: PendingNotificationMethod;
   deleting: {
     notification?: UUID;
     notificationMethod?: UUID;
@@ -53,8 +60,8 @@ export const slice = createSlice({
         editing: true,
         ...editable({
           id: unsavedId(),
-          trigger: T.Trigger.suspendFilterRequestSubmitted,
-          methodId: typesafe.objectValues(state.notificationMethods)[0]?.id ?? ``,
+          trigger: AdminNotificationTrigger.suspendFilterRequestSubmitted,
+          methodId: typesafe.objectValues(state.notificationMethods)[0]?.value.id ?? ``,
         }),
       };
     },
@@ -81,7 +88,7 @@ export const slice = createSlice({
     },
     newNotificationMethodEvent(
       state,
-      { payload }: PayloadAction<T.NewAdminNotificationMethodEvent>,
+      { payload }: PayloadAction<NewAdminNotificationMethodEvent>,
     ) {
       switch (payload.type) {
         case `create_clicked`:
@@ -89,8 +96,8 @@ export const slice = createSlice({
             sendCodeRequest: Req.idle(),
             confirmationRequest: Req.idle(),
             confirmationCode: ``,
-            type: `email`,
-            email: ``,
+            type: `Email`,
+            value: { email: `` },
           };
           break;
         case `cancel_clicked`:
@@ -102,28 +109,28 @@ export const slice = createSlice({
           }
           break;
         case `email_address_updated`:
-          if (state.pendingNotificationMethod?.type === `email`) {
-            state.pendingNotificationMethod.email = payload.email;
+          if (state.pendingNotificationMethod?.type === `Email`) {
+            state.pendingNotificationMethod.value.email = payload.email;
           }
           break;
         case `slack_channel_name_updated`:
-          if (state.pendingNotificationMethod?.type === `slack`) {
-            state.pendingNotificationMethod.channelName = payload.channelName;
+          if (state.pendingNotificationMethod?.type === `Slack`) {
+            state.pendingNotificationMethod.value.channelName = payload.channelName;
           }
           break;
         case `slack_channel_id_updated`:
-          if (state.pendingNotificationMethod?.type === `slack`) {
-            state.pendingNotificationMethod.channelId = payload.channelId;
+          if (state.pendingNotificationMethod?.type === `Slack`) {
+            state.pendingNotificationMethod.value.channelId = payload.channelId;
           }
           break;
         case `slack_token_updated`:
-          if (state.pendingNotificationMethod?.type === `slack`) {
-            state.pendingNotificationMethod.token = payload.token;
+          if (state.pendingNotificationMethod?.type === `Slack`) {
+            state.pendingNotificationMethod.value.token = payload.token;
           }
           break;
         case `text_phone_number_updated`:
-          if (state.pendingNotificationMethod?.type === `text`) {
-            state.pendingNotificationMethod.phoneNumber = payload.phoneNumber;
+          if (state.pendingNotificationMethod?.type === `Text`) {
+            state.pendingNotificationMethod.value.phoneNumber = payload.phoneNumber;
           }
           break;
         case `method_type_updated`:
@@ -148,33 +155,12 @@ export const slice = createSlice({
       for (const notification of payload.notifications) {
         state.notifications[notification.id] = {
           editing: false,
-          ...editable({
-            id: notification.id,
-            trigger: notification.trigger,
-            methodId: notification.method.id,
-          }),
+          ...editable(notification),
         };
       }
 
       for (const method of payload.verifiedNotificationMethods) {
-        state.notificationMethods[method.id] = {
-          id: method.id,
-          data: (() => {
-            switch (method.method.data.__typename) {
-              case `EmailData`:
-                return { type: `email`, email: method.method.data.email };
-              case `TextData`:
-                return { type: `text`, phoneNumber: method.method.data.phoneNumber };
-              case `SlackData`:
-                return {
-                  type: `slack`,
-                  token: method.method.data.token,
-                  channelId: method.method.data.channelId,
-                  channelName: method.method.data.channelName,
-                };
-            }
-          })(),
-        };
+        state.notificationMethods[method.value.id] = method;
       }
     });
 
@@ -199,7 +185,7 @@ export const slice = createSlice({
     });
 
     builder.addCase(createBillingPortalSession.succeeded, (state, { payload }) => {
-      state.billingPortalRequest = Req.succeed(payload);
+      state.billingPortalRequest = Req.succeed(payload.url);
     });
 
     builder.addCase(deleteNotificationMethod.started, (state) => {
@@ -220,11 +206,11 @@ export const slice = createSlice({
 
     builder.addCase(upsertNotification.succeeded, (state, { payload, meta: { arg } }) => {
       state.saveNotificationRequests[arg] = Req.succeed(void 0);
-      const notification = state.notifications[payload] ?? state.notifications[arg];
+      const notification = state.notifications[payload.id] ?? state.notifications[arg];
       if (notification) {
-        notification.original.id = payload;
-        notification.draft.id = payload;
-        state.notifications[payload] = { editing: false, ...commit(notification) };
+        notification.original.id = payload.id;
+        notification.draft.id = payload.id;
+        state.notifications[payload.id] = { editing: false, ...commit(notification) };
         if (isUnsaved(arg)) {
           delete state.notifications[arg];
         }
@@ -243,9 +229,9 @@ export const slice = createSlice({
       }
     });
 
-    builder.addCase(createPendingNotificationMethod.succeeded, (state, action) => {
+    builder.addCase(createPendingNotificationMethod.succeeded, (state, { payload }) => {
       if (state.pendingNotificationMethod) {
-        state.pendingNotificationMethod.sendCodeRequest = Req.succeed(action.payload);
+        state.pendingNotificationMethod.sendCodeRequest = Req.succeed(payload.methodId);
       }
     });
 
@@ -264,10 +250,10 @@ export const slice = createSlice({
     builder.addCase(confirmPendingNotificationMethod.succeeded, (state) => {
       if (state.pendingNotificationMethod) {
         const newId = Req.payload(state.pendingNotificationMethod.sendCodeRequest) ?? ``;
-        state.notificationMethods[newId] = {
-          id: newId,
-          data: state.pendingNotificationMethod,
-        };
+        state.notificationMethods[newId] = toVerifiedMethod(
+          state.pendingNotificationMethod,
+          newId,
+        );
         delete state.pendingNotificationMethod;
       }
     });
@@ -300,7 +286,7 @@ export const upsertNotification = createResultThunk(
     const state = getState();
     const notification = state.admin.notifications[id];
     if (!notification) {
-      return Result.error<ApiError>({ type: `non_actionable` });
+      return Result.error({ debugMessage: `Notification ${id} not found` });
     }
     return Current.api.saveNotification({
       id: notification.draft.id,
@@ -315,7 +301,7 @@ export const createPendingNotificationMethod = createResultThunk(
   async (_: void, { getState }) => {
     const pendingMethod = getState().admin.pendingNotificationMethod;
     if (!pendingMethod) {
-      return Result.error<ApiError>({ type: `non_actionable` });
+      return Result.error({ debugMessage: `missing pendingMethod` });
     }
     return Current.api.createPendingNotificationMethod(pendingMethod);
   },
@@ -325,10 +311,10 @@ export const confirmPendingNotificationMethod = createResultThunk(
   `${slice.name}/confirmPendingNotificationMethod`,
   (_: void, { getState }) => {
     const pendingMethod = getState().admin.pendingNotificationMethod;
-    return Current.api.confirmPendingNotificationMethod(
-      Req.payload(pendingMethod?.sendCodeRequest) ?? ``,
-      Number(pendingMethod?.confirmationCode),
-    );
+    return Current.api.confirmPendingNotificationMethod({
+      id: Req.payload(pendingMethod?.sendCodeRequest) ?? ``,
+      code: Number(pendingMethod?.confirmationCode),
+    });
   },
 );
 
@@ -341,3 +327,33 @@ export const {
 } = slice.actions;
 
 export default slice.reducer;
+
+// helpers
+
+function toVerifiedMethod(
+  pending: PendingNotificationMethod,
+  id: UUID,
+): GetAdmin.VerifiedNotificationMethod {
+  switch (pending.type) {
+    case `Email`:
+      return {
+        type: `VerifiedEmailMethod`,
+        value: { id: id, email: pending.value.email },
+      };
+    case `Slack`:
+      return {
+        type: `VerifiedSlackMethod`,
+        value: {
+          id: id,
+          channelId: pending.value.channelId,
+          channelName: pending.value.channelName,
+          token: pending.value.token,
+        },
+      };
+    case `Text`:
+      return {
+        type: `VerifiedTextMethod`,
+        value: { id: id, phoneNumber: pending.value.phoneNumber },
+      };
+  }
+}

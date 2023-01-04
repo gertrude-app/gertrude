@@ -1,7 +1,7 @@
 // auto-generated, do not edit
-import type { Keychain } from '../shared';
+import type { AdminKeychain } from '../shared';
 
 export namespace GetAdminKeychains {
   export type Input = void;
-  export type Output = Array<Keychain>;
+  export type Output = Array<AdminKeychain>;
 }

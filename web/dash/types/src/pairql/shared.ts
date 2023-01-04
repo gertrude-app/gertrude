@@ -1,5 +1,10 @@
 // auto-generated, do not edit
 
+export interface AdminKeychain {
+  summary: KeychainSummary;
+  keys: Array<Key>;
+}
+
 export enum AdminNotificationTrigger {
   unlockRequestSubmitted,
   suspendFilterRequestSubmitted,
@@ -14,6 +19,13 @@ export enum ClientAuth {
   none,
   user,
   admin,
+}
+
+export interface Device {
+  id: UUID;
+  isOnline: boolean;
+  modelFamily: DeviceModelFamily;
+  modelTitle: string;
 }
 
 export enum DeviceModelFamily {
@@ -34,13 +46,13 @@ export interface Key {
   key: SharedKey;
 }
 
-export interface Keychain {
+export interface KeychainSummary {
   id: UUID;
+  authorId: UUID;
   name: string;
   description?: string;
   isPublic: boolean;
-  authorId: UUID;
-  keys: Array<Key>;
+  numKeys: number;
 }
 
 export enum RequestStatus {
@@ -65,6 +77,17 @@ export interface SuccessOutput {
   success: boolean;
 }
 
+export interface SuspendFilterRequest {
+  id: UUID;
+  deviceId: UUID;
+  status: RequestStatus;
+  userName: string;
+  requestedDurationInSeconds: number;
+  requestComment?: string;
+  responseComment?: string;
+  createdAt: ISODateString;
+}
+
 export interface UnlockRequest {
   id: UUID;
   userId: UUID;
@@ -79,5 +102,17 @@ export interface UnlockRequest {
   appBundleId?: string;
   appCategories: string[];
   requestProtocol?: string;
+  createdAt: ISODateString;
+}
+
+export interface User {
+  id: UUID;
+  name: string;
+  keyloggingEnabled: boolean;
+  screenshotsEnabled: boolean;
+  screenshotsResolution: number;
+  screenshotsFrequency: number;
+  keychains: Array<KeychainSummary>;
+  devices: Array<Device>;
   createdAt: ISODateString;
 }

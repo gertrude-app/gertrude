@@ -1,8 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { DURATION_OPTS } from '@dash/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { RequestStatus } from '@dash/types';
-import type { SuspendFilterRequest } from '../api/requests';
+import type { RequestStatus, SuspendFilterRequest } from '@dash/types';
 import Current from '../environment';
 import Result from '../lib/Result';
 import { Req } from './helpers';
@@ -85,15 +84,12 @@ export const updateSuspendFilterRequest = createResultThunk(
     const state = getState().filterSuspensions;
     const request = Req.payload(state.fetchReqs[input.id]);
     if (!request) {
-      return Result.unexpectedError();
+      return Result.error({ debugMessage: `Request not found` });
     }
-    return Current.api.requests.updateSuspendFilterRequest({
+    return Current.api.updateSuspendFilterRequest({
       id: request.id,
-      deviceId: request.deviceId,
-      duration: grantedDurationInSeconds(state),
-      requestComment: request.requestComment,
+      durationInSeconds: grantedDurationInSeconds(state),
       responseComment: state.responseComment,
-      scope: JSON.stringify({ type: `unrestricted` }),
       status: input.status,
     });
   },
@@ -101,7 +97,7 @@ export const updateSuspendFilterRequest = createResultThunk(
 
 export const getSuspendFilterRequest = createResultThunk(
   `${slice.name}/getSuspendFilterRequest`,
-  Current.api.requests.getSuspendFilterRequest,
+  Current.api.getSuspendFilterRequest,
 );
 
 export const {

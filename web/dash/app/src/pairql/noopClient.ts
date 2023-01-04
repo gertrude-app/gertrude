@@ -1,4 +1,4 @@
-import { RequestStatus, Result } from '@dash/types';
+import { RequestStatus, Result, GetAdmin } from '@dash/types';
 import type { ApiClient } from './client';
 
 const noopClient: ApiClient = {
@@ -27,18 +27,29 @@ const noopClient: ApiClient = {
     return Result.success({
       id: ``,
       email: ``,
+      subscriptionStatus: GetAdmin.SubscriptionStatus.active,
       notifications: [],
       verifiedNotificationMethods: [],
     });
   },
   getAdminKeychain: async () => {
-    return Result.success({ success: true });
+    return Result.success({
+      summary: {
+        id: ``,
+        authorId: ``,
+        name: ``,
+        description: ``,
+        isPublic: false,
+        numKeys: 0,
+      },
+      keys: [],
+    });
   },
   getAdminKeychains: async () => {
     return Result.success([]);
   },
   getCheckoutUrl: async () => {
-    return Result.success({});
+    return Result.success({ url: `` });
   },
   getDashboardWidgets: async () => {
     return Result.success({
@@ -100,7 +111,7 @@ const noopClient: ApiClient = {
     });
   },
   getUserActivityDay: async () => {
-    return Result.success({ userName: ``, items: [] });
+    return Result.success({ numDeleted: 0, userName: ``, items: [] });
   },
   getUserActivityDays: async () => {
     return Result.success({ userName: ``, days: [] });
@@ -119,6 +130,9 @@ const noopClient: ApiClient = {
   },
   joinWaitlist: async () => {
     return Result.success({ success: true });
+  },
+  login: async () => {
+    return Result.success({ token: ``, adminId: `` });
   },
   loginMagicLink: async () => {
     return Result.success({ token: ``, adminId: `` });

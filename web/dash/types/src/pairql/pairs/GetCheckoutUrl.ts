@@ -6,6 +6,6 @@ export namespace GetCheckoutUrl {
   }
 
   export interface Output {
-    url?: string;
+    url: string;
   }
 }

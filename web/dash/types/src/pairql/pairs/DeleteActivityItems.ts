@@ -3,6 +3,7 @@ import type { SuccessOutput } from '../shared';
 
 export namespace DeleteActivityItems {
   export interface Input {
+    userId: UUID;
     keystrokeLineIds: UUID[];
     screenshotIds: UUID[];
   }

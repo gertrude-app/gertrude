@@ -238,6 +238,10 @@ export const liveClient = {
     );
   },
 
+  login(input: T.Login.Input): Promise<T.Result<T.Login.Output>> {
+    return query<T.Login.Input, T.Login.Output>(input, ClientAuth.none, `Login`);
+  },
+
   loginMagicLink(
     input: T.LoginMagicLink.Input,
   ): Promise<T.Result<T.LoginMagicLink.Output>> {
@@ -400,6 +404,9 @@ export const throwingClient: ApiClient = {
   },
   joinWaitlist: () => {
     throw new Error(`ApiClient.joinWaitlist() not implemented`);
+  },
+  login: () => {
+    throw new Error(`ApiClient.login() not implemented`);
   },
   loginMagicLink: () => {
     throw new Error(`ApiClient.loginMagicLink() not implemented`);

@@ -2,13 +2,16 @@ import { createSlice } from '@reduxjs/toolkit';
 import { formatDate } from '@dash/datetime';
 import type { ActivityItem } from '@dash/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { DateRangeInput } from '@dash/types';
-import type { Keychain } from '@dash/keys';
-import type { GetActivityOverview } from '../api/users/__generated__/GetActivityOverview';
-import type { User } from '../api/users';
+import type {
+  KeychainSummary,
+  GetUserActivityDays,
+  DateRangeInput,
+  User,
+} from '@dash/types';
 import Current from '../environment';
 import Result from '../lib/Result';
-import { Req, toMap, toEditableMap, editable, commit, isDirty } from './helpers';
+import { entireDay } from '../lib/helpers';
+import { Req, toMap, toEditableMap, editable, commit } from './helpers';
 import { createResultThunk } from './thunk';
 import * as empty from './empty';
 
@@ -34,10 +37,10 @@ export interface UsersState {
   fetchUserRequest: Record<UUID, RequestState>;
   updateUserRequest: Record<UUID, RequestState>;
   addDeviceRequest?: RequestState<number>;
-  activityOverviews: Record<UUID, RequestState<GetActivityOverview>>;
+  activityOverviews: Record<UUID, RequestState<GetUserActivityDays.Output>>;
   activityDays: Record<ActivityDayKey, RequestState<ActivityDay>>;
   deleting: { device?: UUID; user?: UUID };
-  adding: { keychain?: Keychain | null };
+  adding: { keychain?: KeychainSummary | null };
   deleted: UUID[];
 }
 
@@ -104,7 +107,7 @@ export const slice = createSlice({
     addKeychainClicked(state) {
       state.adding = { keychain: null };
     },
-    keychainSelected(state, action: PayloadAction<Keychain>) {
+    keychainSelected(state, action: PayloadAction<KeychainSummary>) {
       if (state.adding.keychain?.id === action.payload.id) {
         state.adding = { keychain: null };
       } else {
@@ -126,13 +129,21 @@ export const slice = createSlice({
 
     builder.addCase(fetchActivityDay.succeeded, (state, { payload, meta: { arg } }) => {
       state.activityDays[activityDayKey(arg.userId, arg.day)] = Req.succeed({
-        numDeleted: payload.counts[0]?.numDeleted ?? 0,
+        numDeleted: payload.numDeleted,
         items: toMap(
           payload.items.map((item) => {
-            if (item.__typename === `CoalescedKeystrokeLine`) {
-              return { ...item, type: `KeystrokeLine`, date: item.createdAt };
+            if (item.type === `CoalescedKeystrokeLine`) {
+              return {
+                type: `KeystrokeLine`,
+                date: item.value.createdAt,
+                ...item.value,
+              };
             } else {
-              return { ...item, type: `Screenshot`, date: item.createdAt };
+              return {
+                type: `Screenshot`,
+                date: item.value.createdAt,
+                ...item.value,
+              };
             }
           }),
         ),
@@ -176,9 +187,9 @@ export const slice = createSlice({
     builder.addCase(fetchActivityOverview.succeeded, (state, action) => {
       state.activityOverviews[action.meta.arg.userId] = Req.succeed({
         ...action.payload,
-        counts: action.payload.counts
-          .sort((a, b) => (a.dateRange.start < b.dateRange.start ? 1 : -1))
-          .filter((count) => count.numItems > 0),
+        counts: action.payload.days
+          .sort((a, b) => (a.date < b.date ? 1 : -1))
+          .filter((day) => day.totalItems > 0),
       });
     });
 
@@ -245,7 +256,7 @@ export const slice = createSlice({
     });
 
     builder.addCase(createPendingAppConnection.succeeded, (state, { payload }) => {
-      state.addDeviceRequest = Req.succeed(payload);
+      state.addDeviceRequest = Req.succeed(payload.code);
     });
 
     builder.addCase(createPendingAppConnection.failed, (state, { error }) => {
@@ -259,33 +270,33 @@ export const slice = createSlice({
 export const fetchActivityDay = createResultThunk(
   `${slice.name}/fetchActivityDay`,
   (arg: { userId: UUID; day: Date }) =>
-    Current.api.users.getActivityDay(arg.userId, arg.day),
+    Current.api.getUserActivityDay({ userId: arg.userId, range: entireDay(arg.day) }),
 );
 
 export const fetchActivityOverview = createResultThunk(
   `${slice.name}/fetchActivityOverview`,
   (arg: { userId: UUID; ranges?: DateRangeInput[] }) =>
-    Current.api.users.getActivityOverview(arg.userId, arg.ranges),
+    Current.api.getUserActivityDays({ userId: arg.userId, dateRanges: arg.ranges ?? [] }),
 );
 
 export const fetchUsers = createResultThunk(
   `${slice.name}/fetchUsers`,
-  Current.api.users.list,
+  Current.api.getUsers,
 );
 
 export const fetchUser = createResultThunk(
   `${slice.name}/fetchUser`,
-  Current.api.users.getUser,
+  Current.api.getUser,
 );
 
 export const deleteUser = createResultThunk(
   `${slice.name}/deleteUser`,
-  Current.api.users.deleteUser,
+  async (id: UUID) => Current.api.deleteEntity({ id, type: `User` }),
 );
 
 export const deleteDevice = createResultThunk(
   `${slice.name}/deleteDevice`,
-  Current.api.users.deleteDevice,
+  async (id: UUID) => Current.api.deleteEntity({ id, type: `Device` }),
 );
 
 export const upsertUser = createResultThunk(
@@ -293,27 +304,16 @@ export const upsertUser = createResultThunk(
   async (userId: UUID, { getState }) => {
     const { users, auth } = getState();
     const user = users.entities[userId];
-    const adminId = auth.admin?.id;
+    const adminId = auth.admin?.adminId;
     if (!user || !adminId) {
-      return Result.unexpectedError();
+      return Result.error({ debugMessage: `User or AdminId not found` });
     }
 
-    const saveResult = await Current.api.users.upsertUser({
+    return Current.api.saveUser({
       ...user.draft,
-      adminId,
-      isNew: user.isNew,
+      isNew: user.isNew ?? false,
+      keychainIds: user.draft.keychains.map(({ id }) => id),
     });
-
-    if (saveResult.data.type === `error` || !isDirty(user, `keychains`)) {
-      return saveResult;
-    }
-
-    const setKeychainsResult = await Current.api.users.setUserKeychains(
-      user.draft.id,
-      user.draft.keychains.map(({ id }) => id),
-    );
-
-    return setKeychainsResult;
   },
 );
 
@@ -323,20 +323,32 @@ export const deleteActivityItems = createResultThunk(
     const key = activityDayKey(arg.userId, arg.date);
     const day = Req.payload(getState().users.activityDays[key]);
     if (!day) {
-      return Result.error<ApiError>({ type: `non_actionable` });
+      return Result.error({ debugMessage: `activityDay not found` });
     }
-    const apiItems = arg.itemRootIds.flatMap((id) => {
-      const item = day.items[id];
-      return item?.ids.map((id) => ({ id, type: item?.type ?? `Screenshot` })) ?? [];
-    });
 
-    return Current.api.users.deleteActivityItems(arg.userId, apiItems);
+    const keystrokeLineIds: UUID[] = [];
+    const screenshotIds: UUID[] = [];
+
+    for (const id of arg.itemRootIds) {
+      const item = day.items[id];
+      if (item?.type === `KeystrokeLine`) {
+        keystrokeLineIds.push(item.id);
+      } else if (item?.type === `Screenshot`) {
+        screenshotIds.push(item.id);
+      }
+    }
+
+    return Current.api.deleteActivityItems({
+      userId: arg.userId,
+      keystrokeLineIds,
+      screenshotIds,
+    });
   },
 );
 
 export const createPendingAppConnection = createResultThunk(
   `${slice.name}/createPendingAppConnection`,
-  Current.api.users.createPendingAppConnection,
+  Current.api.createPendingAppConnection,
 );
 
 // exports

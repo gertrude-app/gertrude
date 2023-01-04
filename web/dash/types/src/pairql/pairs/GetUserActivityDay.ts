@@ -19,6 +19,7 @@ export namespace GetUserActivityDay {
           width: number;
           height: number;
           createdAt: ISODateString;
+          deletedAt?: ISODateString;
         };
       }
     | {
@@ -29,11 +30,13 @@ export namespace GetUserActivityDay {
           appName: string;
           line: string;
           createdAt: ISODateString;
+          deletedAt?: ISODateString;
         };
       };
 
   export interface Output {
     userName: string;
+    numDeleted: number;
     items: Array<Item>;
   }
 }

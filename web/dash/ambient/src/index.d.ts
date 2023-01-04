@@ -8,17 +8,27 @@ type Editable<T extends { id: UUID }> = {
   draft: T;
 };
 
-type RequestState<T = void, E = ApiError> =
+type PqlError = {
+  debugMessage: string;
+  userFacingMessage?: string;
+  errorId?: UUID;
+  clientRequestId?: UUID;
+  serverRequestId?: UUID;
+};
+
+type RequestState<T = void, E = PqlError> =
   | { state: 'idle' }
   | { state: 'ongoing' }
   | { state: 'failed'; error?: E }
   | { state: 'succeeded'; payload: T };
 
+// TODO: remove me
 type ActionableApiError = {
   type: 'actionable';
   message?: string;
 };
 
+// TODO: remove me
 type ApiError =
   | { type: 'auth_failed' }
   | { type: 'no_internet' }
