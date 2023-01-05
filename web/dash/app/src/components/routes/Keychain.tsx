@@ -60,7 +60,7 @@ export default Keychain;
 
 export const queryProps: QueryProps<typeof EditKeychain, UUID> =
   (dispatch, id) => (state) => {
-    const keychain = state.keychains.keychains[id];
+    const keychain = state.keychains.entities[id];
     const fetchReq = state.keychains.fetchAdminKeychainRequest[id];
     const updateReq = state.keychains.updateAdminKeychainRequest[id];
     const deleting = state.keychains.deleting;

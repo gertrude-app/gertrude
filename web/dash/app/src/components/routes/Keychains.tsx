@@ -19,7 +19,8 @@ const Keychains: React.FC = () => {
   const deleteId = useSelector((state) => state.keychains.deleting.keychain);
   const keychains = useSelector((state) =>
     typesafe
-      .objectValues(state.keychains.keychains)
+      .objectValues(state.keychains.entities)
+      .filter((keychain) => keychain.original.authorId === adminId)
       // in case they started making a keychain and then navigated back here
       .filter((keychain) => !keychain.isNew),
   );

@@ -39,6 +39,7 @@ const KeychainCard: React.FC<Props> = ({
       isSelect(props) && `min-h-[77px]`,
     )}
     onClick={isSelect(props) ? props.onSelect : undefined}
+    data-test="keychain-card"
   >
     <div className="flex items-stretch flex-grow">
       <div
@@ -103,6 +104,7 @@ const KeychainCard: React.FC<Props> = ({
               <a
                 className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-gray-600 transition duration-100 select-none flex items-center"
                 href={props.editUrl}
+                data-test="edit-keychain"
               >
                 Edit
               </a>
@@ -110,6 +112,7 @@ const KeychainCard: React.FC<Props> = ({
             <button
               className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-red-600 transition duration-100 rounded-br-xl"
               onClick={props.onRemove}
+              data-test="remove-keychain"
             >
               {props.removeText}
             </button>

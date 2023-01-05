@@ -14,10 +14,12 @@ import editKeyReducer from './edit-key-reducer';
 export interface KeychainsState {
   fetchAdminKeychainRequest: Record<UUID, RequestState>;
   updateAdminKeychainRequest: Record<UUID, RequestState>;
+
   listAdminKeychainsRequest: RequestState;
-  fetchSelectableKeychainsRequest: RequestState<{ own: Keychain[]; public: Keychain[] }>;
+  entities: Record<UUID, Editable<Keychain>>;
+  fetchSelectableKeychainsRequest: RequestState;
+
   saveKeyRecordRequest: RequestState;
-  keychains: Record<UUID, Editable<Keychain>>;
   keyRecords: Record<UUID, Editable<KeyRecord>>;
   editingKey?: EditKey.State;
   deleting: { keychain?: UUID; key?: UUID };
@@ -33,8 +35,8 @@ export function initialState(): KeychainsState {
     listAdminKeychainsRequest: Req.idle(),
     saveKeyRecordRequest: Req.idle(),
     fetchSelectableKeychainsRequest: Req.idle(),
+    entities: {},
     keyRecords: {},
-    keychains: {},
     deleting: {},
     deleted: [],
   };
@@ -45,7 +47,7 @@ export const slice = createSlice({
   initialState,
   reducers: {
     createKeychainInitiated(state, action: PayloadAction<{ id: UUID; adminId: UUID }>) {
-      state.keychains[action.payload.id] = {
+      state.entities[action.payload.id] = {
         ...editable(empty.keychain(action.payload.id, action.payload.adminId)),
         isNew: true,
       };
@@ -65,7 +67,7 @@ export const slice = createSlice({
       delete state.deleting[action.payload];
     },
     keychainNameUpdated(state, action: PayloadAction<{ id: UUID; name: string }>) {
-      const keychain = state.keychains[action.payload.id];
+      const keychain = state.entities[action.payload.id];
       if (keychain) {
         keychain.draft.name = action.payload.name;
       }
@@ -74,7 +76,7 @@ export const slice = createSlice({
       state,
       action: PayloadAction<{ id: UUID; description: string }>,
     ) {
-      const keychain = state.keychains[action.payload.id];
+      const keychain = state.entities[action.payload.id];
       if (!keychain) {
         return;
       }
@@ -116,9 +118,9 @@ export const slice = createSlice({
 
     builder.addCase(upsertKeychain.succeeded, (state, { meta }) => {
       state.updateAdminKeychainRequest[meta.arg] = Req.succeed(void 0);
-      const keychain = state.keychains[meta.arg];
+      const keychain = state.entities[meta.arg];
       if (keychain) {
-        state.keychains[meta.arg] = commit(keychain);
+        state.entities[meta.arg] = commit(keychain);
       }
     });
 
@@ -133,7 +135,7 @@ export const slice = createSlice({
     builder.addCase(fetchAdminKeychain.succeeded, (state, { payload, meta }) => {
       state.fetchAdminKeychainRequest[meta.arg] = Req.succeed(void 0);
       const [keychain, keyRecords] = payload;
-      state.keychains[keychain.id] = editable(keychain);
+      state.entities[keychain.id] = editable(keychain);
       state.keyRecords = {
         ...state.keyRecords,
         ...toEditableMap(keyRecords),
@@ -154,7 +156,7 @@ export const slice = createSlice({
     });
 
     builder.addCase(deleteKeychain.succeeded, (state, { meta }) => {
-      delete state.keychains[meta.arg];
+      delete state.entities[meta.arg];
       state.deleted.push(meta.arg);
     });
 
@@ -164,8 +166,8 @@ export const slice = createSlice({
 
     builder.addCase(fetchAdminKeychains.succeeded, (state, { payload }) => {
       state.listAdminKeychainsRequest = Req.succeed(void 0);
-      state.keychains = {
-        ...state.keychains,
+      state.entities = {
+        ...state.entities,
         ...toEditableMap(payload[0]),
       };
       state.keyRecords = {
@@ -187,9 +189,9 @@ export const slice = createSlice({
     });
 
     builder.addCase(fetchSelectableKeychains.succeeded, (state, { payload }) => {
-      state.fetchSelectableKeychainsRequest = Req.succeed({
-        own: payload.own.filter((keychain) => !keychain.isPublic),
-        public: payload.public,
+      state.fetchSelectableKeychainsRequest = Req.succeed(undefined);
+      payload.own.concat(payload.public).forEach((keychain) => {
+        state.entities[keychain.id] = editable(keychain);
       });
     });
 
@@ -237,7 +239,7 @@ export const upsertKeychain = createResultThunk(
   async (id: UUID, { getState }) => {
     const state = getState();
     const adminId = state.auth.admin?.id ?? ``;
-    const keychain = state.keychains.keychains[id];
+    const keychain = state.keychains.entities[id];
     if (!keychain) {
       return Result.unexpectedError();
     }
