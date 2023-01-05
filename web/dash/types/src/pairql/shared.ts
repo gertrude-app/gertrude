@@ -27,11 +27,7 @@ export type AppScope =
   | { type: 'webBrowsers' }
   | { type: 'single'; single: SingleAppScope };
 
-export enum ClientAuth {
-  none,
-  user,
-  admin,
-}
+export type ClientAuth = 'none' | 'user' | 'admin';
 
 export interface Device {
   id: UUID;

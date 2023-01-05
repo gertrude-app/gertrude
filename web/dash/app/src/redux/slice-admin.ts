@@ -7,6 +7,7 @@ import type {
   PendingNotificationMethod,
   NewAdminNotificationMethodEvent,
   AdminSubscriptionStatus,
+  CreatePendingNotificationMethod,
 } from '@dash/types';
 import type { NotificationUpdate } from '@dash/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
@@ -290,7 +291,7 @@ export const upsertNotification = createResultThunk(
       return Result.error({ debugMessage: `Notification ${id} not found` });
     }
     return Current.api.saveNotification({
-      id: notification.draft.id,
+      id: isUnsaved(notification.draft.id) ? undefined : notification.draft.id,
       methodId: notification.draft.methodId,
       trigger: notification.draft.trigger,
     });
@@ -304,7 +305,7 @@ export const createPendingNotificationMethod = createResultThunk(
     if (!pendingMethod) {
       return Result.error({ debugMessage: `missing pendingMethod` });
     }
-    return Current.api.createPendingNotificationMethod(pendingMethod);
+    return Current.api.createPendingNotificationMethod(toInput(pendingMethod));
   },
 );
 
@@ -356,5 +357,18 @@ function toVerifiedMethod(
         type: `VerifiedTextMethod`,
         value: { id: id, phoneNumber: pending.value.phoneNumber },
       };
+  }
+}
+
+function toInput(
+  pending: PendingNotificationMethod,
+): CreatePendingNotificationMethod.Input {
+  switch (pending.type) {
+    case `Email`:
+      return { type: `Email`, value: pending.value };
+    case `Text`:
+      return { type: `Text`, value: pending.value };
+    case `Slack`:
+      return { type: `Slack`, value: pending.value };
   }
 }

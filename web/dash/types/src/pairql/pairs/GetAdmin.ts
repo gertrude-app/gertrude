@@ -4,6 +4,12 @@ import type { AdminNotificationTrigger, AdminSubscriptionStatus } from '../share
 export namespace GetAdmin {
   export type Input = void;
 
+  export interface Notification {
+    id: UUID;
+    trigger: AdminNotificationTrigger;
+    methodId: UUID;
+  }
+
   export type VerifiedNotificationMethod =
     | {
         type: 'VerifiedEmailMethod';
@@ -28,12 +34,6 @@ export namespace GetAdmin {
           phoneNumber: string;
         };
       };
-
-  export interface Notification {
-    id: UUID;
-    trigger: AdminNotificationTrigger;
-    methodId: UUID;
-  }
 
   export interface Output {
     id: UUID;

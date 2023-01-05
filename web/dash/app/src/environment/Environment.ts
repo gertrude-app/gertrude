@@ -12,11 +12,11 @@ export enum OptionalVar {
 }
 
 export enum RequiredVar {
-  GraphQLEndpoint,
+  ApiEndpoint,
 }
 
 export interface EnvironmentClient {
-  graphQLEndpoint(): string;
+  apiEndpoint(): string;
   mode(): Mode;
   isDev(): boolean;
   isStaging(): boolean;
@@ -33,8 +33,8 @@ export class LiveEnvironment implements EnvironmentClient {
     }
   }
 
-  public graphQLEndpoint(): string {
-    return this.requiredVar(RequiredVar.GraphQLEndpoint);
+  public apiEndpoint(): string {
+    return this.requiredVar(RequiredVar.ApiEndpoint);
   }
 
   public mode(): Mode {
@@ -61,11 +61,11 @@ export class LiveEnvironment implements EnvironmentClient {
 
   public requiredVar(varName: RequiredVar): string {
     switch (varName) {
-      case RequiredVar.GraphQLEndpoint:
+      case RequiredVar.ApiEndpoint:
         return requireVar(
-          import.meta.env.VITE_GRAPHQL_ENDPOINT,
-          RequiredVar.GraphQLEndpoint,
-          `VITE_GRAPHQL_ENDPOINT`,
+          import.meta.env.VITE_API_ENDPOINT,
+          RequiredVar.ApiEndpoint,
+          `VITE_API_ENDPOINT`,
         );
       default:
         throw new Error(`Unhandled check for required var \`${RequiredVar[varName]}\``);
@@ -83,7 +83,7 @@ export class LiveEnvironment implements EnvironmentClient {
 }
 
 export class ThrowingEnvironment implements EnvironmentClient {
-  public graphQLEndpoint(): string {
+  public apiEndpoint(): string {
     throw new Error(`EnvironmentClient.graphQLEndpoint() not implemented.`);
   }
   public mode(): Mode {
@@ -107,7 +107,7 @@ export class ThrowingEnvironment implements EnvironmentClient {
 }
 
 export class NoopEnvironment implements EnvironmentClient {
-  public graphQLEndpoint(): string {
+  public apiEndpoint(): string {
     return ``;
   }
   public mode(): Mode {

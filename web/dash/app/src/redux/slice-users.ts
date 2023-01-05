@@ -187,7 +187,7 @@ export const slice = createSlice({
     builder.addCase(fetchActivityOverview.succeeded, (state, action) => {
       state.activityOverviews[action.meta.arg.userId] = Req.succeed({
         ...action.payload,
-        counts: action.payload.days
+        days: action.payload.days
           .sort((a, b) => (a.date < b.date ? 1 : -1))
           .filter((day) => day.totalItems > 0),
       });
@@ -276,7 +276,10 @@ export const fetchActivityDay = createResultThunk(
 export const fetchActivityOverview = createResultThunk(
   `${slice.name}/fetchActivityOverview`,
   (arg: { userId: UUID; ranges?: DateRangeInput[] }) =>
-    Current.api.getUserActivityDays({ userId: arg.userId, dateRanges: arg.ranges ?? [] }),
+    Current.api.getUserActivityDays({
+      userId: arg.userId,
+      dateRanges: arg.ranges ?? entireDays(14),
+    }),
 );
 
 export const fetchUsers = createResultThunk(
@@ -373,4 +376,15 @@ type ActivityDayKey = string;
 
 export function activityDayKey(userId: UUID, date: Date): ActivityDayKey {
   return `${userId}--${formatDate(date, `url`)}`;
+}
+
+function entireDays(numDays: number): DateRangeInput[] {
+  const now = new Date();
+  const ranges: DateRangeInput[] = [];
+  for (let i = 0; i < numDays; i++) {
+    const day = new Date(now.getTime());
+    day.setDate(now.getDate() - i);
+    ranges.push(entireDay(day));
+  }
+  return ranges;
 }
