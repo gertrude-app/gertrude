@@ -12,8 +12,8 @@ const Template: ComponentStory<typeof NewNotificationMethodForm> = (args) => (
 
 export const Email = Template.bind({});
 Email.args = {
-  type: `email`,
-  email: `blob@blob.com`,
+  type: `Email`,
+  value: { email: `blob@blob.com` },
   onEvent: () => {},
   sendCodeRequest: { state: `idle` },
   confirmationRequest: { state: `idle` },
@@ -23,15 +23,17 @@ Email.args = {
 export const Text = Template.bind({});
 Text.args = {
   ...Email.args,
-  type: `text`,
-  phoneNumber: `(555) 555-5555`,
+  type: `Text`,
+  value: { phoneNumber: `(555) 555-5555` },
 };
 
 export const Slack = Template.bind({});
 Slack.args = {
   ...Email.args,
-  type: `slack`,
-  channelName: `gertrude`,
-  channelId: `CX0823942d`,
-  token: `xoxb-1234567890-1234567890-1234567890`,
+  type: `Slack`,
+  value: {
+    channelName: `gertrude`,
+    channelId: `CX0823942d`,
+    token: `xoxb-1234567890-1234567890-1234567890`,
+  },
 };

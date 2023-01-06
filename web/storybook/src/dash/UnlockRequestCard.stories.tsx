@@ -1,4 +1,3 @@
-import { RequestStatus } from '@dash/types';
 import { UnlockRequestCard } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { time } from '../story-helpers';
@@ -19,7 +18,7 @@ Default.args = {
   userName: `Freddy`,
   url: `github.com`,
   comment: `Pleeeease can I use this? It's sooooo cool`,
-  status: RequestStatus.pending,
+  status: `pending`,
 };
 
 export const LongComment = Template.bind({});
@@ -32,13 +31,13 @@ LongComment.args = {
 export const Accepted = Template.bind({});
 Accepted.args = {
   ...Default.args,
-  status: RequestStatus.accepted,
+  status: `accepted`,
 };
 
 export const Rejected = Template.bind({});
 Rejected.args = {
   ...Default.args,
-  status: RequestStatus.rejected,
+  status: `rejected`,
 };
 
 export const NoComment = Template.bind({});

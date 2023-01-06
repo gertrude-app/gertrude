@@ -17,7 +17,7 @@ const Template: ComponentStory<typeof ListKeychains> = (args) => (
 // @screenshot: md
 export const Default = Template.bind({});
 Default.args = {
-  keychains: withIdsAnd({ mode: `list`, removeText: `Delete` } as const, [
+  keychains: withIdsAnd({ mode: `list` as const, removeText: `Delete` }, [
     keychainProps({ name: `HTC`, numKeys: 232, isPublic: true }),
     keychainProps({ name: `Jimmy's Music Theory`, numKeys: 7 }),
     keychainProps({ name: `Jason's blog`, numKeys: 3, description: undefined }),

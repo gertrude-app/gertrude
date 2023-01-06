@@ -19,7 +19,7 @@ type Props =
 
 type Common = {
   name: string;
-  description?: string | null;
+  description?: string;
   numKeys: number;
   isPublic: boolean;
 };

@@ -15,7 +15,6 @@ Loading.args = {
   request: { state: `ongoing` },
   successTitle: `Success`,
   withPayload: (payload) => <h1>Got your payload here: {JSON.stringify(payload)}</h1>,
-  withError: (err) => <h1>Got your error here, type: {err?.type}</h1>,
   primaryButton: () => {},
 };
 
@@ -30,6 +29,11 @@ Error.args = {
   ...Loading.args,
   request: {
     state: `failed`,
-    error: { type: `actionable`, message: `Well shucks, we blew a gasket.` },
+    error: {
+      id: ``,
+      type: `clientError`,
+      debugMessage: ``,
+      userMessage: `Well shucks, we blew a gasket.`,
+    },
   },
 };

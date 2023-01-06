@@ -7,17 +7,3 @@ type Editable<T extends { id: UUID }> = {
   original: Readonly<T>;
   draft: T;
 };
-
-// TODO: remove me
-type ActionableApiError = {
-  type: 'actionable';
-  message?: string;
-};
-
-// TODO: remove me
-type ApiError =
-  | { type: 'auth_failed' }
-  | { type: 'no_internet' }
-  | { type: 'not_found' }
-  | ActionableApiError
-  | { type: 'non_actionable'; rawErrors?: string[] };

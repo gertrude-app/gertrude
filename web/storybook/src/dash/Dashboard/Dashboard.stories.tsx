@@ -45,12 +45,12 @@ Default.args = {
     { name: `Sally`, isOnline: true },
     { name: `Henry`, isOnline: false },
   ]),
-  userActivity: withIds([
-    { userName: `Little Jimmy`, numUnreviewed: 245 },
-    { userName: `Sally`, numUnreviewed: 0 },
-    { userName: `Henry`, numUnreviewed: 23 },
+  userActivitySummaries: withIdsAnd({ numReviewed: 0 }, [
+    { name: `Little Jimmy`, numUnreviewed: 245 },
+    { name: `Sally`, numUnreviewed: 0 },
+    { name: `Henry`, numUnreviewed: 23 },
   ]),
-  userScreenshots: withIds([
+  recentScreenshots: withIds([
     {
       userName: `Little Jimmy`,
       url: testImgUrl(300, 200),
@@ -78,14 +78,14 @@ NoUnlockRequests.args = {
 export const NoUserActivity = Template.bind({});
 NoUserActivity.args = {
   ...Default.args,
-  userActivity: [],
+  userActivitySummaries: [],
 };
 
 // @screenshot: lg
 export const NoUserActivityOrUnlockRequests = Template.bind({});
 NoUserActivityOrUnlockRequests.args = {
   ...Default.args,
-  userActivity: [],
+  userActivitySummaries: [],
   unlockRequests: [],
 };
 

@@ -1,4 +1,3 @@
-import { RequestStatus } from '@dash/types';
 import { ListUnlockRequests } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
@@ -23,28 +22,28 @@ Default.args = {
       userName: `Huck`,
       url: `khanacademy.org`,
       comment: `i'm thirsty for some computer programming`,
-      status: RequestStatus.accepted,
+      status: `accepted` as const,
       createdAt: time.subtracting({ hours: 3 }),
     },
     {
       userName: `Freddy`,
       url: `github.com`,
       comment: `Pleeeease can I use this? It's sooooo cool`,
-      status: RequestStatus.pending,
+      status: `pending` as const,
       createdAt: time.subtracting({ minutes: 3 }),
     },
     {
       userName: `Sally`,
       url: `gitlab.com`,
       comment: `I need this for my job`,
-      status: RequestStatus.pending,
+      status: `pending` as const,
       createdAt: time.subtracting({ hours: 1 }),
     },
     {
       userName: `Winfield`,
       url: `gitlab.com`,
       comment: `Need to research whales for Al`,
-      status: RequestStatus.rejected,
+      status: `rejected` as const,
       createdAt: time.subtracting({ hours: 4 }),
     },
   ]),

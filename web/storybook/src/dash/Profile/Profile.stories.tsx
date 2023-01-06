@@ -1,4 +1,3 @@
-import { SubscriptionStatus, Trigger } from '@dash/types';
 import { Profile } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
@@ -25,7 +24,7 @@ const notificationProps = {
 export const Default = Template.bind({});
 Default.args = {
   email: `johndoe@example.com`,
-  status: SubscriptionStatus.active,
+  status: `active`,
   methods: withIdsAnd({ deletable: false }, [
     { method: `email` as const, value: `me@example.com` },
     { method: `slack` as const, value: `#Gertrude` },
@@ -35,31 +34,34 @@ Default.args = {
   notifications: withIdsAnd(notificationProps, [
     {
       selectedMethod: {
-        id: `1`,
-        data: { type: `email` as const, email: `me@example.com` },
+        type: `VerifiedEmailMethod` as const,
+        value: { id: `1`, email: `me@example.com` },
       },
-      trigger: Trigger.suspendFilterRequestSubmitted,
+      trigger: `suspendFilterRequestSubmitted` as const,
       editing: true,
     },
     {
       selectedMethod: {
-        id: `2`,
-        data: {
-          type: `slack` as const,
+        type: `VerifiedSlackMethod` as const,
+        value: {
+          id: `2`,
           channelId: ``,
           channelName: `#Gertrude`,
           token: ``,
         },
       },
-      trigger: Trigger.unlockRequestSubmitted,
+      trigger: `unlockRequestSubmitted` as const,
       editing: false,
     },
     {
       selectedMethod: {
-        id: `3`,
-        data: { type: `text` as const, phoneNumber: `(555) 555-5555` },
+        type: `VerifiedTextMethod` as const,
+        value: {
+          id: `3`,
+          phoneNumber: `(555) 555-5555`,
+        },
       },
-      trigger: Trigger.suspendFilterRequestSubmitted,
+      trigger: `suspendFilterRequestSubmitted` as const,
       editing: false,
     },
   ]),
@@ -73,8 +75,8 @@ export const AddingMethod = Template.bind({});
 AddingMethod.args = {
   ...Default.args,
   pendingMethod: {
-    type: `email`,
-    email: ``,
+    type: `Email`,
+    value: { email: `` },
     sendCodeRequest: { state: `idle` },
     confirmationRequest: { state: `idle` },
     confirmationCode: `333243`,
@@ -86,8 +88,8 @@ export const AddingMethodVerifying = Template.bind({});
 AddingMethodVerifying.args = {
   ...Default.args,
   pendingMethod: {
-    type: `email`,
-    email: ``,
+    type: `Email`,
+    value: { email: `` },
     sendCodeRequest: { state: `succeeded`, payload: `123456` },
     confirmationRequest: { state: `idle` },
     confirmationCode: `333234`,

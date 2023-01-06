@@ -1,6 +1,6 @@
 import { UserActivityWidget } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
-import { withIds } from '../../story-helpers';
+import { withIdsAnd } from '../../story-helpers';
 
 export default {
   title: 'Dashboard/Dashboard/Widgets/UserActivity', // eslint-disable-line
@@ -13,20 +13,20 @@ const Template: ComponentStory<typeof UserActivityWidget> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  userActivity: withIds([
-    { userName: `Little Jimmy`, numUnreviewed: 245 },
-    { userName: `Sally`, numUnreviewed: 0 },
-    { userName: `Henry`, numUnreviewed: 23 },
+  userActivity: withIdsAnd({ numReviewed: 0 }, [
+    { name: `Little Jimmy`, numUnreviewed: 245 },
+    { name: `Sally`, numUnreviewed: 0 },
+    { name: `Henry`, numUnreviewed: 23 },
   ]),
 };
 
 // @screenshot: xs/250
 export const AllCaughtUp = Template.bind({});
 AllCaughtUp.args = {
-  userActivity: withIds([
-    { userName: `Little Jimmy`, numUnreviewed: 0 },
-    { userName: `Sally`, numUnreviewed: 0 },
-    { userName: `Henry`, numUnreviewed: 0 },
+  userActivity: withIdsAnd({ numReviewed: 0 }, [
+    { name: `Little Jimmy`, numUnreviewed: 0 },
+    { name: `Sally`, numUnreviewed: 0 },
+    { name: `Henry`, numUnreviewed: 0 },
   ]),
 };
 

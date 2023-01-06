@@ -1,8 +1,7 @@
 import { env } from '@shared/components';
-import type { ConfirmableEntityAction } from '@dash/types';
-import type { Keychain, KeyRecord } from '@dash/keys';
+import type { ConfirmableEntityAction, KeychainSummary, Key } from '@dash/types';
 
-export function keychainProps(override: Partial<Keychain> = {}): Keychain {
+export function keychainProps(override: Partial<KeychainSummary> = {}): KeychainSummary {
   return {
     id: `id-${Math.random()}`,
     isPublic: false,
@@ -22,23 +21,15 @@ export function testImgUrl(width: number, height: number): string {
   return `https://placekitten.com/${width}/${height}`;
 }
 
-export function withIds<T extends Record<string, unknown>>(
-  items: T[],
-): Array<T & { id: UUID }> {
+export function withIds<T>(items: T[]): Array<T & { id: UUID }> {
   return items.map((item, index) => ({ ...item, id: `${index + 1}` }));
 }
 
-export function withIdsAnd<
-  T extends Record<string, unknown>,
-  K extends Record<string, unknown>,
->(add: K, items: T[]): Array<T & K & { id: UUID }> {
+export function withIdsAnd<T, K>(add: K, items: T[]): Array<T & K & { id: UUID }> {
   return adding(add, withIds(items));
 }
 
-export function adding<
-  T extends Record<string, unknown>,
-  K extends Record<string, unknown>,
->(add: K, items: T[]): Array<T & K> {
+export function adding<T, K>(add: K, items: T[]): Array<T & K> {
   return items.map((item) => ({ ...add, ...item }));
 }
 
@@ -84,7 +75,7 @@ function now(): string {
   return new Date().toISOString();
 }
 
-export const keyExamples: Record<string, KeyRecord> = {
+export const keyExamples: Record<string, Key> = {
   // this is a "website" key of the "standard" type, unlocking `*.super-safe.com` for all web browsers
   standardWeb: {
     id: `1`,
