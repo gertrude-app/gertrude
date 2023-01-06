@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import type { PqlError } from '@dash/types';
 import ErrorMessage from './ErrorMessage';
 import GenericError from './GenericError';
 
@@ -14,16 +15,8 @@ const ApiErrorMessage: React.FC<Props> = ({ error, wrapped = true }) => {
     return <Wrap>{error.userMessage}</Wrap>;
   }
   switch (error?.type) {
-    case `no_internet`:
-      return (
-        <Wrap>
-          Something seems funny with the network. Are you sure you're connected to the
-          internet?
-        </Wrap>
-      );
     case `notFound`:
       return <Wrap>{error.entityName ? `${error.entityName} not` : `Not`} found.</Wrap>;
-    case undefined: /* fallthrough */
     case `loggedOut`:
       return (
         <Wrap>

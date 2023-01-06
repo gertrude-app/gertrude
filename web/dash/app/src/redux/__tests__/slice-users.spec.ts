@@ -77,7 +77,8 @@ describe(`upsertUser`, () => {
 
     expect(Current.api.saveUser).toHaveBeenCalledWith({
       ...user.draft,
-      adminId: `admin123`,
+      isNew: false,
+      keychainIds: [`keychain1`],
     });
   });
 
@@ -126,7 +127,7 @@ describe(`fetchActivityOverview`, () => {
     expect(state.activityOverviews).toEqual({
       user123: Req.succeed({
         userName: `Huck`,
-        counts: [
+        days: [
           mock.activityDay(11, 0, `01-05-2022`), // <-- most recent
           mock.activityDay(5, 0, `01-01-2022`),
         ],
@@ -157,9 +158,11 @@ describe(`deleteActivityItems`, () => {
       itemRootIds: [`item1`],
     })(vi.fn(), getState);
 
-    expect(Current.api.deleteActivityItems).toHaveBeenCalledWith(`user123`, [
-      { id: `item1`, type: `KeystrokeLine` },
-    ]);
+    expect(Current.api.deleteActivityItems).toHaveBeenCalledWith({
+      userId: `user123`,
+      keystrokeLineIds: [`item1`],
+      screenshotIds: [],
+    });
   });
 
   it(`increments numDeleted and sets item deleted bool`, () => {

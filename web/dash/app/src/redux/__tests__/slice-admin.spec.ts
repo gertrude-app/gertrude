@@ -36,8 +36,10 @@ describe(`create new notification method flow`, () => {
       sendCodeRequest: Req.idle(),
       confirmationRequest: Req.idle(),
       confirmationCode: ``,
-      type: `email`,
-      email: ``,
+      type: `Email`,
+      value: {
+        email: ``,
+      },
     });
 
     // step 2: update the email address to a valid state
@@ -45,7 +47,9 @@ describe(`create new notification method flow`, () => {
       state,
       newNotificationMethodEvent({ type: `email_address_updated`, email: `foo@bar.com` }),
     );
-    expect(state.pendingNotificationMethod).toMatchObject({ email: `foo@bar.com` });
+    expect(state.pendingNotificationMethod).toMatchObject({
+      value: { email: `foo@bar.com` },
+    });
 
     // step 3: simulate a successfull request to generate a code
     state = reducer(
@@ -60,9 +64,9 @@ describe(`create new notification method flow`, () => {
     state = reducer(state, confirmPendingNotificationMethod.succeeded({ success: true }));
     expect(state.pendingNotificationMethod).toBeUndefined();
     expect(state.notificationMethods.pendingId).toMatchObject({
-      id: `pendingId`,
-      data: {
-        type: `email`,
+      type: `VerifiedEmailMethod`,
+      value: {
+        id: `pendingId`,
         email: `foo@bar.com`,
       },
     });
@@ -104,12 +108,12 @@ describe(`fetchProfileData`, () => {
 
     expect(nextState.notificationMethods).toEqual({
       verifiedMethod1: {
-        id: `verifiedMethod1`,
-        data: { type: `email`, email: `blob@blob.com` },
+        type: `VerifiedEmailMethod`,
+        value: { id: `verifiedMethod1`, email: `blob@blob.com` },
       },
       verifiedMethod2: {
-        id: `verifiedMethod2`,
-        data: { type: `text`, phoneNumber: `7` },
+        type: `VerifiedTextMethod`,
+        value: { id: `verifiedMethod2`, phoneNumber: `7` },
       },
     });
 

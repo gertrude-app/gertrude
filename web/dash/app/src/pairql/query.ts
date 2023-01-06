@@ -1,5 +1,5 @@
 import { Result } from '@dash/types';
-import type { ClientAuth, ServerPqlError } from '@dash/types';
+import type { ClientAuth, PqlError, ServerPqlError } from '@dash/types';
 import Current from '../environment';
 
 export async function query<Input, Output>(
@@ -37,10 +37,8 @@ export async function query<Input, Output>(
   }
 
   try {
-    const res = await fetch(
-      `${Current.env.apiEndpoint()}/pairql/dashboard/${operation}`,
-      init,
-    );
+    const ENDPOINT = Current.env.apiEndpoint();
+    const res = await fetch(`${ENDPOINT}/pairql/dashboard/${operation}`, init);
     const json = await res.json();
     if (res.status >= 300 || `__cyStubbedError` in json) {
       return errorResult(toClientError(json));
@@ -48,12 +46,7 @@ export async function query<Input, Output>(
       return Result.success(json);
     }
   } catch (error) {
-    return errorResult({
-      id: `b3162834`,
-      type: `clientError`,
-      debugMessage: `Unexpected error: ${error}`,
-      showContactSupport: true,
-    });
+    return handleUnknown(error);
   }
 }
 
@@ -75,6 +68,25 @@ function toClientError(serverError: ServerPqlError): PqlError {
     userAction: serverError.userAction,
     debugMessage: serverError.debugMessage,
     entityName: serverError.entityName,
+    tag: serverError.dashboardTag,
     showContactSupport: serverError.showContactSupport,
   };
+}
+
+function handleUnknown(error: unknown): Result<never, PqlError> {
+  if (`${error}`.includes(`Failed to fetch`)) {
+    return errorResult({
+      id: `34fbe3e3`,
+      type: `clientError`,
+      userMessage: `Something seems funny with the network. Are you sure you're connected to the internet?`,
+      debugMessage: String(error),
+    });
+  }
+
+  return errorResult({
+    id: `b3162834`,
+    type: `clientError`,
+    debugMessage: `Unexpected error: ${error}`,
+    showContactSupport: true,
+  });
 }

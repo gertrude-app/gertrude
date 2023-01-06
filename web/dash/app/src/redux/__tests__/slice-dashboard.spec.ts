@@ -67,8 +67,8 @@ describe(`reducer`, () => {
       ),
     );
     expect(Req.payload(next.request)?.userActivitySummaries).toEqual([
-      { id: `2`, userName: `Huck`, numUnreviewed: 9 },
-      { id: `3`, userName: `Bob`, numUnreviewed: 33 },
+      { id: `2`, name: `Huck`, numReviewed: 22, numUnreviewed: 9 },
+      { id: `3`, name: `Bob`, numReviewed: 33, numUnreviewed: 33 },
     ]);
   });
 
@@ -80,7 +80,7 @@ describe(`reducer`, () => {
         unlockRequests: [],
         users: [],
         userActivitySummaries: [
-          { id: `2`, name: `Huck`, numReviewed: 99999, numUnreviewed: 1 },
+          { id: `2`, name: `Huck`, numReviewed: 1, numUnreviewed: 1 },
         ],
         recentScreenshots: [],
       },
@@ -99,7 +99,7 @@ describe(`reducer`, () => {
       ),
     );
     expect(Req.payload(next.request)?.userActivitySummaries).toEqual([
-      { id: `2`, userName: `Huck`, numUnreviewed: 0 },
+      { id: `2`, name: `Huck`, numReviewed: 1, numUnreviewed: 0 },
     ]);
   });
 });
