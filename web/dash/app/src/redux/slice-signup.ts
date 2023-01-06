@@ -91,15 +91,15 @@ export const slice = createSlice({
       }
     });
 
-    builder.addCase(createSignupPaymentUrl.started, (state) => {
+    builder.addCase(getCheckoutUrl.started, (state) => {
       state.createPaymentUrlReq = Req.ongoing();
     });
 
-    builder.addCase(createSignupPaymentUrl.succeeded, (state, { payload }) => {
+    builder.addCase(getCheckoutUrl.succeeded, (state, { payload }) => {
       state.createPaymentUrlReq = Req.succeed(payload.url);
     });
 
-    builder.addCase(createSignupPaymentUrl.failed, (state, action) => {
+    builder.addCase(getCheckoutUrl.failed, (state, action) => {
       state.createPaymentUrlReq = Req.fail(action.error);
     });
 
@@ -132,8 +132,8 @@ export const verifySignupEmail = createResultThunk(
   Current.api.verifySignupEmail,
 );
 
-export const createSignupPaymentUrl = createResultThunk(
-  `${slice.name}/createSignupPaymentUrl`,
+export const getCheckoutUrl = createResultThunk(
+  `${slice.name}/getCheckoutUrl`,
   Current.api.getCheckoutUrl,
 );
 

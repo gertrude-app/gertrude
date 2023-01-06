@@ -1,5 +1,5 @@
 import { Result } from '@dash/types';
-import type { ClientAuth } from '@dash/types';
+import type { ClientAuth, ServerPqlError } from '@dash/types';
 import Current from '../environment';
 
 export async function query<Input, Output>(
@@ -13,7 +13,14 @@ export async function query<Input, Output>(
     const token =
       Current.localStorage.getItem(`admin_token`) ??
       Current.sessionStorage.getItem(`admin_token`);
-    headers[`X-AdminToken`] = token ?? ``;
+    if (!token) {
+      return errorResult({
+        id: `10569a9f`,
+        type: `loggedOut`,
+        debugMessage: `No admin token found`,
+      });
+    }
+    headers[`X-AdminToken`] = token;
   }
 
   if (!Current.env.isProd()) {
@@ -35,8 +42,39 @@ export async function query<Input, Output>(
       init,
     );
     const json = await res.json();
-    return Result.success(json);
+    if (res.status >= 300 || `__cyStubbedError` in json) {
+      return errorResult(toClientError(json));
+    } else {
+      return Result.success(json);
+    }
   } catch (error) {
-    return Result.error({ debugMessage: `${error}` }); // TODO: error handling for real
+    return errorResult({
+      id: `b3162834`,
+      type: `clientError`,
+      debugMessage: `Unexpected error: ${error}`,
+      showContactSupport: true,
+    });
   }
+}
+
+// helpers
+
+function errorResult(error: PqlError): Result<never, PqlError> {
+  if (!Current.env.isProd()) {
+    console.error(`PqlError`, error); // eslint-disable-line no-console
+  }
+  return Result.error(error);
+}
+
+function toClientError(serverError: ServerPqlError): PqlError {
+  return {
+    id: serverError.id,
+    type: serverError.type,
+    serverRequestId: serverError.requestId,
+    userMessage: serverError.userMessage,
+    userAction: serverError.userAction,
+    debugMessage: serverError.debugMessage,
+    entityName: serverError.entityName,
+    showContactSupport: serverError.showContactSupport,
+  };
 }

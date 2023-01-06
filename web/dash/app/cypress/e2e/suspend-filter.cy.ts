@@ -1,20 +1,21 @@
 /// <reference types="cypress" />
-import GetSuspendFilterRequest from '../fixtures/GetSuspendFilterRequest.json';
+import * as mock from '../../src/redux/__tests__/mocks';
 
 describe(`suspend filter request flow`, () => {
   beforeEach(() => {
     cy.simulateLoggedIn();
-    cy.intercept(`/graphql/dashboard`, (req) => {
-      switch (req.body.operationName) {
-        case `GetSuspendFilterRequest`:
-          req.reply(GetSuspendFilterRequest);
-          break;
+    cy.intercept(`/pairql/dashboard/GetSuspendFilterRequest`, (req) => {
+      req.reply(
+        mock.suspendFilterRequest({
+          id: `1`,
+          requestComment: `I want to watch a video`,
+        }),
+      );
+    });
 
-        case `UpdateSuspendFilterRequest`:
-          req.alias = `updateSuspendFilterRequest`;
-          req.reply({ data: { request: { id: `1` } } });
-          break;
-      }
+    cy.intercept(`/pairql/dashboard/UpdateSuspendFilterRequest`, (req) => {
+      req.alias = `updateSuspendFilterRequest`;
+      req.reply({ success: true });
     });
   });
 
@@ -26,7 +27,7 @@ describe(`suspend filter request flow`, () => {
     cy.testId(`modal-primary-btn`).click();
 
     cy.wait(`@updateSuspendFilterRequest`)
-      .its(`request.body.variables.input.responseComment`)
+      .its(`request.body.responseComment`)
       .should(`eq`, `i'll be watching you`);
   });
 });

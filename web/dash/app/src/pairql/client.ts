@@ -99,7 +99,7 @@ export const liveClient = {
   ): Promise<T.Result<T.GetCheckoutUrl.Output>> {
     return query<T.GetCheckoutUrl.Input, T.GetCheckoutUrl.Output>(
       input,
-      `admin`,
+      `none`,
       `GetCheckoutUrl`,
     );
   },

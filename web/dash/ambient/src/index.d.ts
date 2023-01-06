@@ -9,13 +9,21 @@ type Editable<T extends { id: UUID }> = {
 };
 
 type PqlError = {
-  // todo, deal with these
-  type?: 'not_found' | 'non_actionable' | 'no_internet' | 'auth_failed' | 'actionable';
+  id: string;
+  type:
+    | 'notFound'
+    | 'badRequest'
+    | 'serverError'
+    | 'unauthorized'
+    | 'loggedOut'
+    | 'clientError';
+  serverRequestId?: string;
+  clientRequestId?: string;
+  userMessage?: string;
+  userAction?: string;
   debugMessage: string;
-  userFacingMessage?: string;
-  errorId?: UUID;
-  clientRequestId?: UUID;
-  serverRequestId?: UUID;
+  entityName?: string;
+  showContactSupport?: boolean;
 };
 
 type RequestState<T = void, E = PqlError> =

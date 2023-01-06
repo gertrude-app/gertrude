@@ -3,7 +3,7 @@ import type { SuccessOutput } from '../shared';
 
 export namespace HandleCheckoutCancel {
   export interface Input {
-    stripeCheckoutSessionid: string;
+    stripeCheckoutSessionId: string;
   }
 
   export type Output = SuccessOutput;

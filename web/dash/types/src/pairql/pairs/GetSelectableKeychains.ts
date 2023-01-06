@@ -1,19 +1,11 @@
 // auto-generated, do not edit
+import type { KeychainSummary } from '../shared';
 
 export namespace GetSelectableKeychains {
   export type Input = void;
 
-  export interface Keychain {
-    id: UUID;
-    name: string;
-    isPublic: boolean;
-    authorId: UUID;
-    description?: string;
-    numKeys: number;
-  }
-
   export interface Output {
-    own: Array<Keychain>;
-    public: Array<Keychain>;
+    own: Array<KeychainSummary>;
+    public: Array<KeychainSummary>;
   }
 }

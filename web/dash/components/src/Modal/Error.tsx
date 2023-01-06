@@ -30,7 +30,7 @@ const Error: React.FC<Props> = ({
   return (
     <Modal
       type="error"
-      title={title ?? (error?.type === `not_found` ? `Not found` : `Error`)}
+      title={title ?? (error?.type === `notFound` ? `Not found` : `Error`)}
       icon={icon}
       onDismiss={onDismiss}
       primaryButton={primaryButton ?? (() => (window.location.href = `/`))}

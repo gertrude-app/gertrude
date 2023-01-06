@@ -1,44 +1,47 @@
 /// <reference types="cypress" />
-import GetSelectableKeychains from '../fixtures/GetSelectableKeychains.json';
-import UnlockReqApp from '../fixtures/UnlockRequest-AppKey.json';
-import UnlockReqWebsite from '../fixtures/UnlockRequest-WebsiteKey.json';
-import GetUser from '../fixtures/GetUser.json';
+import type {
+  UnlockRequest,
+  GetSelectableKeychains,
+  User,
+  KeychainSummary,
+} from '@dash/types';
 import { betsy } from '../fixtures/helpers';
+import * as mock from '../../src/redux/__tests__/mocks';
 
 describe(`unlock request flow`, () => {
-  let fetchRes: typeof UnlockReqApp;
-  let userRes: typeof GetUser;
-  let keychainsRes: typeof GetSelectableKeychains;
+  let unlockRequest: UnlockRequest;
+  let user: User;
+  let selectable: GetSelectableKeychains.Output;
+  let keychain: KeychainSummary;
 
   beforeEach(() => {
     cy.simulateLoggedIn();
 
-    fetchRes = JSON.parse(JSON.stringify(UnlockReqApp));
-    fetchRes.data.unlockRequest.status = `pending`;
-    fetchRes.data.unlockRequest.id = `2`;
-    userRes = JSON.parse(JSON.stringify(GetUser));
-    userRes.data.user.id = `1`;
-    keychainsRes = JSON.parse(JSON.stringify(GetSelectableKeychains));
+    keychain = mock.keychainSummary({ authorId: betsy.id, name: `Music Theory` });
+    user = mock.user({ id: `1`, keychains: [keychain] });
+    selectable = { own: [keychain], public: [] };
+    unlockRequest = mock.unlockRequest({ id: `2`, userId: `1` });
 
-    cy.intercept(`/graphql/dashboard`, (req) => {
-      switch (req.body.operationName) {
-        case `UnlockRequest`:
-          req.reply(fetchRes);
-          break;
-        case `GetUser`:
-          req.reply(userRes);
-          break;
-        case `GetSelectableKeychains`:
-          req.reply(keychainsRes);
-          break;
-        case `CreateKeyRecord`:
-          req.reply({ data: { keyRecord: { id: `123` } } });
-          break;
-        case `DecideUnlockRequest`:
-          req.alias = `decideUnlockRequest`;
-          req.reply({ data: { unlockRequest: { id: `2` } } });
-          break;
-      }
+    cy.intercept(`/pairql/dashboard/GetUnlockRequest`, (req) => {
+      req.reply(unlockRequest);
+    });
+
+    cy.intercept(`/pairql/dashboard/GetUser`, (req) => {
+      req.reply(user);
+    });
+
+    cy.intercept(`/pairql/dashboard/GetIdentifiedApps`, (req) => {
+      req.reply([mock.identifiedApp()]);
+    });
+
+    cy.intercept(`/pairql/dashboard/GetSelectableKeychains`, (req) => {
+      req.reply(selectable);
+    });
+
+    cy.intercept(`/pairql/dashboard/SaveKey`, { success: true });
+    cy.intercept(`/pairql/dashboard/UpdateUnlockRequest`, (req) => {
+      req.alias = `updateUnlockRequest`;
+      req.reply({ success: true });
     });
   });
 
@@ -63,32 +66,39 @@ describe(`unlock request flow`, () => {
     cy.contains(`comment`);
     cy.testId(`deny-unlock-req-comment`).type(`nope`);
     cy.contains(`Deny`).click();
-    cy.wait(`@decideUnlockRequest`)
-      .its(`request.body.variables.input.responseComment`)
+    cy.wait(`@updateUnlockRequest`)
+      .its(`request.body.responseComment`)
       .should(`eq`, `nope`);
     cy.contains(`rejected`);
   });
 
   it(`displays not found error if not found`, () => {
-    cy.intercept(`/graphql/dashboard`, { errors: [{ message: `notFound` }] });
+    cy.intercept(`/pairql/dashboard/GetUnlockRequest`, {
+      __cyStubbedError: true,
+      type: `notFound`,
+      entityName: `Unlock request`,
+    });
     cy.visit(`/users/1/unlock-requests/2-nope`);
     cy.contains(`Unlock request not found`);
   });
 
   it(`shows generic error for unknown error`, () => {
-    cy.intercept(`/graphql/dashboard`, { what: `nope` });
+    cy.intercept(`/pairql/dashboard/GetUnlockRequest`, {
+      __cyStubbedError: true,
+      type: `serverError`,
+    });
     cy.visit(`/users/1/unlock-requests/2`);
     cy.contains(`try again`);
   });
 
   it(`shows shows decided status: accepted`, () => {
-    fetchRes.data.unlockRequest.status = `accepted`;
+    unlockRequest.status = `accepted`;
     cy.visit(`/users/1/unlock-requests/2`);
     cy.contains(`accepted`);
   });
 
   it(`shows shows decided status: rejected`, () => {
-    fetchRes.data.unlockRequest.status = `rejected`;
+    unlockRequest.status = `rejected`;
     cy.visit(`/users/1/unlock-requests/2`);
     cy.contains(`rejected`);
   });
@@ -99,14 +109,14 @@ describe(`unlock request flow`, () => {
   });
 
   it(`redirects to /unlock-request/:id when review loads non-pending`, () => {
-    fetchRes.data.unlockRequest.status = `rejected`;
+    unlockRequest.status = `rejected`;
     cy.visit(`/users/1/unlock-requests/2/review`);
     cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2`);
   });
 
   it(`shows review modal on review screen`, () => {
-    fetchRes.data.unlockRequest.requestComment = `please dad!`;
-    fetchRes.data.unlockRequest.networkDecision.hostname = `happyfish.com`;
+    unlockRequest.requestComment = `please dad!`;
+    unlockRequest.domain = `happyfish.com`;
     cy.visit(`/users/1/unlock-requests/2/review`);
     cy.contains(`please dad!`);
     cy.contains(`happyfish.com`);
@@ -118,11 +128,10 @@ describe(`unlock request flow`, () => {
     cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2/select-keychain`);
     cy.contains(`Select a keychain`);
     cy.contains(`Music Theory`);
-    cy.contains(`Misc McStandard Keys`);
   });
 
   it(`prompts to create a keychain if admin has none`, () => {
-    keychainsRes.data.own = [];
+    selectable.own = [];
     cy.visit(`/users/1/unlock-requests/2/review`);
     cy.contains(`Accept`).click();
     cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2/select-keychain`);
@@ -130,15 +139,13 @@ describe(`unlock request flow`, () => {
   });
 
   it(`only shows keychains attached to a user`, () => {
-    // make sure our test is actually doing something
-    expect(userRes.data.user.keychains.map((k) => k.name)).to.contain(
-      `Misc McStandard Keys`,
-    );
+    const keychain2 = mock.keychainSummary({
+      authorId: betsy.id,
+      name: `Misc McStandard Keys`,
+    });
 
-    // user doesn't have `Misc McStandard Keys` keychain...
-    userRes.data.user.keychains = userRes.data.user.keychains.filter(
-      (keychain) => keychain.name !== `Misc McStandard Keys`,
-    );
+    user = mock.user({ id: `1`, keychains: [keychain] }); // <-- doesn't have keychain2
+    selectable = { own: [keychain, keychain2], public: [] };
 
     cy.visit(`/users/1/unlock-requests/2/select-keychain`);
 
@@ -151,8 +158,14 @@ describe(`unlock request flow`, () => {
 
   it(`includes public keychains by admin`, () => {
     localStorage.setItem(`admin_id`, betsy.id);
-    // simulate that the "HTC" public keychain is owned by the admin
-    keychainsRes.data.public[0]!.authorId = betsy.id;
+
+    const htc = mock.keychainSummary({
+      isPublic: true,
+      authorId: betsy.id, // <--  admin owns the public keychain
+      name: `HTC`,
+    });
+
+    selectable = { own: [keychain], public: [htc] };
     cy.visit(`/users/1/unlock-requests/2/select-keychain`);
     cy.contains(`HTC`);
   });
@@ -161,30 +174,31 @@ describe(`unlock request flow`, () => {
     cy.visit(`/users/1/unlock-requests/2/edit-key`);
     cy.contains(`Music Theory`).click();
     cy.contains(`Review key`).click();
-    cy.intercept(`/graphql/dashboard`, { errors: [{ message: `nope` }] });
+    cy.intercept(`/pairql/dashboard/UpdateUnlockRequest`, {
+      __cyStubbedError: true,
+      type: `serverError`,
+    });
     cy.contains(`Submit`).click();
     cy.contains(`Contact support`);
   });
 
   it(`handles deny flow, starting from deny url`, () => {
     // so when we redirect back to ../, the api says it has been rejected
-    fetchRes.data.unlockRequest.status = `rejected`;
+    unlockRequest.status = `rejected`;
     cy.visit(`/users/1/unlock-requests/2/deny`);
     cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2`);
     cy.contains(`rejected`);
   });
 
   it(`improves ux by leveraging unlock request source`, () => {
-    fetchRes = JSON.parse(JSON.stringify(UnlockReqWebsite));
+    unlockRequest.url = `https://music.jwpcdn.com/player/v/8.26.2/gapro.js`;
+    unlockRequest.domain = `music.jwpcdn.com`;
     cy.visit(`/users/1/unlock-requests/2/select-keychain`);
     cy.contains(`Music Theory`).click();
     cy.contains(`Review key`).click();
     cy.contains(`jwpcdn.com`).click();
 
-    cy.testId(`unlock-request-src`).should(
-      `contain`,
-      fetchRes.data.unlockRequest.networkDecision.url,
-    );
+    cy.testId(`unlock-request-src`).should(`contain`, unlockRequest.url);
 
     cy.testId(`address-type`).within(() => {
       cy.get(`button`).click();

@@ -2,7 +2,7 @@
 
 export namespace HandleCheckoutSuccess {
   export interface Input {
-    stripeCheckoutSessionid: string;
+    stripeCheckoutSessionId: string;
   }
 
   export interface Output {

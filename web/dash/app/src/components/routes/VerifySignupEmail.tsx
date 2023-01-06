@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { FullscreenModalForm } from '@dash/components';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import { verifySignupEmail, createSignupPaymentUrl } from '../../redux/slice-signup';
+import { verifySignupEmail, getCheckoutUrl } from '../../redux/slice-signup';
 import { Req } from '../../redux/helpers';
 
 const VerifySignupEmail: React.FC = () => {
@@ -13,9 +13,10 @@ const VerifySignupEmail: React.FC = () => {
   const paymentUrlReq = useSelector((state) => state.signup.createPaymentUrlReq);
   const paymentUrlReqState = paymentUrlReq.state;
 
+
   useEffect(() => {
     if (paymentUrlReqState === `idle` && verifiedAdminId) {
-      dispatch(createSignupPaymentUrl({ adminId: verifiedAdminId }));
+      dispatch(getCheckoutUrl({ adminId: verifiedAdminId }));
     }
   }, [dispatch, verifiedAdminId, paymentUrlReqState]);
 

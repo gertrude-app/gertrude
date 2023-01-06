@@ -64,6 +64,19 @@ export interface KeychainSummary {
 
 export type RequestStatus = 'pending' | 'accepted' | 'rejected';
 
+export interface ServerPqlError {
+  version: number;
+  id: string;
+  requestId: string;
+  type: 'notFound' | 'badRequest' | 'serverError' | 'unauthorized' | 'loggedOut';
+  userMessage?: string;
+  userAction?: string;
+  debugMessage: string;
+  entityName?: string;
+  showContactSupport: boolean;
+  statusCode: number;
+}
+
 export type SharedKey =
   | { type: 'anySubdomain'; domain: string; scope: AppScope }
   | { type: 'domain'; domain: string; scope: AppScope }

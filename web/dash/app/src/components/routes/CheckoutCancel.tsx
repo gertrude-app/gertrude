@@ -10,7 +10,7 @@ const CheckoutCancel: React.FC = () => {
   const sessionId = params.get(`session_id`) ?? ``;
 
   useEffect(() => {
-    dispatch(handleSignupPaymentCanceled({ stripeCheckoutSessionid: sessionId }));
+    dispatch(handleSignupPaymentCanceled({ stripeCheckoutSessionId: sessionId }));
   }, [dispatch, sessionId]);
 
   return (
