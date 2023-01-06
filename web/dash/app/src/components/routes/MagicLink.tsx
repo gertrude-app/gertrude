@@ -28,10 +28,7 @@ const MagicLink: React.FC = () => {
       let error: React.ReactNode = (
         <ApiErrorMessage wrapped={false} error={request.error} />
       );
-      if (
-        request.error?.type === `actionable` &&
-        request.error.debugMessage?.includes(`token not found`) // TODO
-      ) {
+      if (request.error?.tag === `magicLinkTokenNotFound`) {
         error = (
           <span className="text-gray-900 antialiased">
             Magic Link token not found, or expired. Please{` `}

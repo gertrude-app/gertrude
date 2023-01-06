@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { RequestStatus } from '@dash/types';
 import { isOlderThan } from '@dash/datetime';
 import {
   Modal,
@@ -49,7 +48,7 @@ const SuspendFilter: React.FC = () => {
   }
 
   if (fetchReq.state === `failed`) {
-    return <ErrorModal entity="Suspend filter request" error={fetchReq.error} />;
+    return <ErrorModal error={fetchReq.error} />;
   }
 
   const { payload } = fetchReq;

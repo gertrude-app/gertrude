@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import * as convert from '@dash/keys';
-import type { UnlockRequest } from '@dash/types';
+import { Result } from '@dash/types';
+import type { UnlockRequest, RequestState } from '@dash/types';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
-import Result from '../lib/Result';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 
@@ -130,7 +130,7 @@ export const acceptUnlockRequest = createResultThunk(
   async (id: UUID, { getState }) => {
     const key = convert.toKeyRecord(getState().keychains.editingKey);
     if (!key) {
-      return Result.error({ debugMessage: `Invalid key record` });
+      return Result.unexpectedError(`dc0c35c2`, `Invalid key record`);
     }
     const insert = await Current.api.saveKey({ isNew: true, ...key });
     if (insert.isError) {

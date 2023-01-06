@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { GetDashboardWidgets } from '@dash/types';
+import type { GetDashboardWidgets, RequestState } from '@dash/types';
 import Current from '../environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';

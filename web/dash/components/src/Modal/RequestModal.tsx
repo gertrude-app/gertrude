@@ -1,4 +1,5 @@
 import React from 'react';
+import type { RequestState } from '@dash/types';
 import type { IconType } from '../GradientIcon';
 import Modal from './Modal';
 import { ErrorModal } from '.';
@@ -10,7 +11,6 @@ interface Props<Payload> {
   errorTitle?: string;
   primaryButton: React.ComponentProps<typeof Modal>['primaryButton'];
   withPayload: (payload: Payload) => React.ReactNode;
-  withError?: (error?: PqlError) => React.ReactNode;
   onDismiss(): unknown;
   icon?: IconType;
 }
@@ -20,7 +20,6 @@ function RequestModal<Payload>({
   successTitle,
   successType = `default`,
   errorTitle = `Error`,
-  withError,
   withPayload,
   onDismiss,
   primaryButton,
@@ -33,7 +32,6 @@ function RequestModal<Payload>({
         primaryButton={primaryButton}
         error={request.error}
         onDismiss={onDismiss}
-        nonActionableMessage={withError?.(request.error)}
       />
     );
   }

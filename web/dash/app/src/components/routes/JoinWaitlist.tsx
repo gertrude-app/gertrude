@@ -1,5 +1,6 @@
 import React from 'react';
 import { FullscreenModalForm, EmailInputForm } from '@dash/components';
+import type { RequestState } from '@dash/types';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { emailUpdated, joinWaitlist } from '../../redux/slice-signup';
 

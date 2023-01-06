@@ -50,7 +50,7 @@ const User: React.FC = () => {
   }
 
   if (query.state === `failed`) {
-    return <ApiErrorMessage entity="User" error={query.error} />;
+    return <ApiErrorMessage error={query.error} />;
   }
 
   return <EditUser {...query.props} />;
@@ -78,7 +78,7 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
     if (!editable && state.deleted.includes(id)) {
       return [Query.redirectDeleted(`/users`), false];
     } else if (!editable) {
-      return [Query.unexpectedError(), false];
+      return [Query.unexpectedError(`c989c73a`, `missing user`), false];
     }
 
     const user = editable.draft;

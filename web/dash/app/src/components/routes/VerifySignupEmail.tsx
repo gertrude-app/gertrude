@@ -13,7 +13,6 @@ const VerifySignupEmail: React.FC = () => {
   const paymentUrlReq = useSelector((state) => state.signup.createPaymentUrlReq);
   const paymentUrlReqState = paymentUrlReq.state;
 
-
   useEffect(() => {
     if (paymentUrlReqState === `idle` && verifiedAdminId) {
       dispatch(getCheckoutUrl({ adminId: verifiedAdminId }));

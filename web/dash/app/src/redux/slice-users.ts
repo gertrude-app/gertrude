@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { formatDate } from '@dash/datetime';
+import { Result } from '@dash/types';
 import type { ActivityItem } from '@dash/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type {
@@ -7,9 +8,9 @@ import type {
   GetUserActivityDays,
   DateRangeInput,
   User,
+  RequestState,
 } from '@dash/types';
 import Current from '../environment';
-import Result from '../lib/Result';
 import { entireDay } from '../lib/helpers';
 import { Req, toMap, toEditableMap, editable, commit } from './helpers';
 import { createResultThunk } from './thunk';
@@ -309,7 +310,7 @@ export const upsertUser = createResultThunk(
     const user = users.entities[userId];
     const adminId = auth.admin?.adminId;
     if (!user || !adminId) {
-      return Result.error({ debugMessage: `User or AdminId not found` });
+      return Result.unexpectedError(`37abe6aa`, `User or AdminId not found`);
     }
 
     return Current.api.saveUser({
@@ -326,7 +327,7 @@ export const deleteActivityItems = createResultThunk(
     const key = activityDayKey(arg.userId, arg.date);
     const day = Req.payload(getState().users.activityDays[key]);
     if (!day) {
-      return Result.error({ debugMessage: `activityDay not found` });
+      return Result.unexpectedError(`3a29c2c2`, `ActivityDay data not found`);
     }
 
     const keystrokeLineIds: UUID[] = [];

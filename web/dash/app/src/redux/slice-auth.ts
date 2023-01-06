@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { env } from '@shared/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { Login } from '@dash/types';
+import type { Login, RequestState } from '@dash/types';
 import type { StorageClient } from '../environment/Storage';
 import Current from '../environment';
 import { OptionalVar as Optional } from '../environment/Environment';

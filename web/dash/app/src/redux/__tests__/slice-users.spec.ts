@@ -1,4 +1,5 @@
 import { expect, test, it, describe, vi } from 'vitest';
+import { Result } from '@dash/types';
 import { Req, editable } from '../helpers';
 import Current from '../../environment';
 import reducer, {
@@ -8,7 +9,6 @@ import reducer, {
   newUserRouteVisited,
   upsertUser,
 } from '../slice-users';
-import Result from '../../lib/Result';
 import { makeGetState, makeState } from './test-helpers';
 import * as mock from './mocks';
 

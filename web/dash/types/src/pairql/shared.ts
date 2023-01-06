@@ -74,6 +74,7 @@ export interface ServerPqlError {
   debugMessage: string;
   entityName?: string;
   showContactSupport: boolean;
+  tag?: 'magicLinkTokenNotFound';
   statusCode: number;
 }
 

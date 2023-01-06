@@ -1,3 +1,4 @@
+import type { RequestState } from './utility';
 import type { CreatePendingNotificationMethod } from './';
 
 export type NewAdminNotificationMethodEvent =

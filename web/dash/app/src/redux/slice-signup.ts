@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import type { RequestState } from '@dash/types';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
 import { Req } from './helpers';

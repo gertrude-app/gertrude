@@ -15,6 +15,14 @@ const ApiErrorMessage: React.FC<Props> = ({ error, wrapped = true }) => {
     return <Wrap>{error.userMessage}</Wrap>;
   }
   switch (error?.type) {
+    // TODO: re-implement, using userMessage
+    // case `no_internet`:
+    //   return (
+    //     <Wrap>
+    //       Something seems funny with the network. Are you sure you're connected to the
+    //       internet?
+    //     </Wrap>
+    //   );
     case `notFound`:
       return <Wrap>{error.entityName ? `${error.entityName} not` : `Not`} found.</Wrap>;
     case `loggedOut`:

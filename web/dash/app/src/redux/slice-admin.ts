@@ -8,6 +8,7 @@ import type {
   NewAdminNotificationMethodEvent,
   AdminSubscriptionStatus,
   CreatePendingNotificationMethod,
+  RequestState,
 } from '@dash/types';
 import type { NotificationUpdate } from '@dash/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
@@ -288,7 +289,7 @@ export const upsertNotification = createResultThunk(
     const state = getState();
     const notification = state.admin.notifications[id];
     if (!notification) {
-      return Result.error({ debugMessage: `Notification ${id} not found` });
+      return Result.unexpectedError(`1662407a`, `Notification ${id} not found`);
     }
     return Current.api.saveNotification({
       id: isUnsaved(notification.draft.id) ? undefined : notification.draft.id,
@@ -303,7 +304,7 @@ export const createPendingNotificationMethod = createResultThunk(
   async (_: void, { getState }) => {
     const pendingMethod = getState().admin.pendingNotificationMethod;
     if (!pendingMethod) {
-      return Result.error({ debugMessage: `missing pendingMethod` });
+      return Result.unexpectedError(`ae1d1cab`, `missing pendingMethod`);
     }
     return Current.api.createPendingNotificationMethod(toInput(pendingMethod));
   },

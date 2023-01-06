@@ -1,4 +1,5 @@
 import React from 'react';
+import type { PqlError } from '@dash/types';
 import type { IconType } from '../GradientIcon';
 import ApiErrorMessage from '../ApiErrorMessage';
 import Modal from './Modal';
@@ -10,8 +11,6 @@ interface Props {
     | null
     | React.ComponentProps<typeof Modal>['secondaryButton'];
   error?: PqlError;
-  nonActionableMessage?: string | React.ReactNode;
-  entity?: string;
   onDismiss?(): unknown;
   primaryButton?: React.ComponentProps<typeof Modal>['primaryButton'];
   icon?: IconType;
@@ -20,9 +19,7 @@ interface Props {
 const Error: React.FC<Props> = ({
   title,
   secondaryButton = `contactSupport`,
-  nonActionableMessage,
   error,
-  entity,
   primaryButton,
   onDismiss,
   icon = `exclamation-triangle`,
@@ -46,11 +43,7 @@ const Error: React.FC<Props> = ({
       }
     >
       <div className="py-2">
-        {error?.type === `non_actionable` && nonActionableMessage !== undefined ? (
-          nonActionableMessage
-        ) : (
-          <ApiErrorMessage error={error} entity={entity} wrapped={false} />
-        )}
+        <ApiErrorMessage error={error} wrapped={false} />
       </div>
     </Modal>
   );

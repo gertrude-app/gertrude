@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
 import { newKeyState, convert } from '@dash/keys';
-import type { UnlockRequest, Key, KeychainSummary } from '@dash/types';
+import { Result } from '@dash/types';
+import type { UnlockRequest, Key, KeychainSummary, RequestState } from '@dash/types';
 import type { EditKey } from '@dash/keys';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
-import Result from '../lib/Result';
 import { commit, editable, Req, toEditableMap } from './helpers';
 import { createResultThunk } from './thunk';
 import * as empty from './empty';
@@ -238,7 +238,7 @@ export const upsertKeychain = createResultThunk(
     const state = getState();
     const keychain = state.keychains.entities[id];
     if (!keychain) {
-      return Result.error({ debugMessage: `Keychain not found` });
+      return Result.unexpectedError(`e81a5099`, `Keychain not found`);
     }
     return Current.api.saveKeychain({
       isNew: keychain.isNew ?? false,
@@ -256,7 +256,7 @@ export const upsertEditingKeyRecord = createResultThunk(
     const state = getState().keychains;
     const keyRecord = convert.toKeyRecord(state.editingKey);
     if (!keyRecord) {
-      return Result.error({ debugMessage: `Invalid key record` });
+      return Result.unexpectedError(`aa11e7f2`, `Invalid key record`);
     }
     return Current.api.saveKey({
       isNew: state.editingKey?.isNew ?? false,

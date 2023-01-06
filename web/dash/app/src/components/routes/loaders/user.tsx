@@ -34,7 +34,7 @@ export function useUserLoader(id: UUID): EntityLoader<Editable<User>> {
     return {
       state: `unresolved`,
       isError: true,
-      element: <ErrorModal entity="User" error={userReq.error} />,
+      element: <ErrorModal error={userReq.error} />,
     };
   }
 
