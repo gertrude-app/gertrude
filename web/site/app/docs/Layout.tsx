@@ -163,8 +163,9 @@ const Layout: React.FC<Props> = ({ children, title, tableOfContents }) => {
                           href={`#${section.id}`}
                           className={cx(
                             isActive(section)
-                              ? `text-violet-400`
-                              : `font-normal text-slate-400 hover:text-slate-300`,
+                              ? `text-violet-300`
+                              : `text-slate-500 hover:text-slate-300`,
+                            'font-medium transition duration-100',
                           )}
                         >
                           {section.title}
@@ -177,11 +178,12 @@ const Layout: React.FC<Props> = ({ children, title, tableOfContents }) => {
                               <li key={subSection.id}>
                                 <Link
                                   href={`#${subSection.id}`}
-                                  className={
+                                  className={cx(
                                     isActive(subSection)
-                                      ? `text-violet-400`
-                                      : `hover:text-slate-300`
-                                  }
+                                      ? `text-violet-300`
+                                      : `hover:text-slate-300 text-slate-500`,
+                                    'transition duration-100 font-medium',
+                                  )}
                                 >
                                   {subSection.title}
                                 </Link>
@@ -245,11 +247,12 @@ const Header: React.FC<{ navigation: typeof navigation }> = ({ navigation }) => 
             />
             <span
               className={cx(
-                `font-lato ml-1 bg-gradient-to-br from-indigo-500 to-fuchsia-400 bg-clip-text text-[1.625rem] font-extrabold text-transparent lg:text-[2rem]`,
-                `mr-[48px] lg:mr-0 lg:translate-y-px`,
+                `bg-white ml-1.5 px-2.5 py-0 rounded-lg mr-[48px] lg:mr-0 lg:translate-y-0.5 flex justify-center items-center`,
               )}
             >
-              Docs
+              <span className="font-extrabold bg-gradient-to-br from-indigo-500 to-fuchsia-400 bg-clip-text text-[1.625rem] text-transparent lg:text-2xl">
+                Docs
+              </span>
             </span>
           </div>
         </Link>

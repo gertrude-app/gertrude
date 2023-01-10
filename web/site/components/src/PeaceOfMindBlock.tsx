@@ -6,13 +6,13 @@ const PeaceOfMindBlock: React.FC = () => {
   return (
     <section
       style={{
-        background: `linear-gradient(to bottom right, #f3f4f6 50%, white 50%)`,
+        background: `linear-gradient(to bottom right, #f7f8fA 50%, white 50%)`,
       }}
       className="relative"
     >
       <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-96 -bottom-112" />
       <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -right-96" />
-      <div className="lg:ml-10 flex justify-start py-8 items-center relative">
+      <div className="lg:ml-10 flex justify-start pb-8 items-center relative">
         <div className="lg:w-1/2 p-12 lg:pl-12 sm:pl-16 pl-8 pr-8">
           <div className="bg-gradient-to-br from-violet-500 to-fuchsia-500 w-12 h-12 rounded-lg flex justify-center items-center">
             <i aria-hidden className="fas fa-desktop text-white text-xl" />
