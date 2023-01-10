@@ -83,6 +83,7 @@ const EditKeychain: React.FC<Props> = ({
         value={name}
         setValue={setName}
         className="max-w-xl"
+        name="name"
       />
       <TextInput
         type="textarea"
@@ -90,6 +91,8 @@ const EditKeychain: React.FC<Props> = ({
         label="Description:"
         value={description}
         setValue={setDescription}
+        className="max-w-xl"
+        name="description"
       />
       <div>
         {keys.length > 0 ? (

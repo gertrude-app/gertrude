@@ -67,7 +67,7 @@ export async function query<Data, Vars>(
     } else if (!data) {
       return Result.error([new GraphQLError(`No data returned`)]);
     } else {
-      // in dev mode, apollo freezes it's objects, so you can't sort or otherwise mutate
+      // in dev mode, apollo freezes its objects, so you can't sort or otherwise mutate
       if (import.meta.env.MODE === `development`) {
         data = JSON.parse(JSON.stringify(data));
       }
