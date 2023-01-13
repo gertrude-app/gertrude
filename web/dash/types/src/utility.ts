@@ -23,9 +23,16 @@ export type UnlockRequestCreateKeyData = Pick<
 
 export type PqlError = Omit<
   ServerPqlError,
-  'requestId' | 'version' | 'statusCode' | 'showContactSupport' | 'type'
+  | 'requestId'
+  | 'version'
+  | 'statusCode'
+  | 'showContactSupport'
+  | 'type'
+  | 'dashboardTag'
+  | 'appTag'
 > & {
   type: ServerPqlError['type'] | 'clientError';
+  tag?: ServerPqlError['dashboardTag'];
   showContactSupport?: boolean;
   serverRequestId?: string;
   clientRequestId?: string;

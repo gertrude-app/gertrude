@@ -74,7 +74,8 @@ export interface ServerPqlError {
   debugMessage: string;
   entityName?: string;
   showContactSupport: boolean;
-  tag?: 'magicLinkTokenNotFound';
+  dashboardTag?: 'magicLinkTokenNotFound' | 'slackVerificationFailed';
+  appTag?: 'userTokenNotFound' | 'connectionCodeNotFound';
   statusCode: number;
 }
 
