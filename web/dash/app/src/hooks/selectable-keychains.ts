@@ -11,7 +11,7 @@ export default function useSelectableKeychains(
   const { entities, fetchSelectableKeychainsRequest } = useSelector(
     (state) => state.keychains,
   );
-  const adminId = useSelector((state) => state.auth.admin?.id) ?? ``;
+  const adminId = useSelector((state) => state.auth.admin?.adminId) ?? ``;
 
   useEffect(() => {
     if (fetch && fetchSelectableKeychainsRequest.state === `idle`) {
