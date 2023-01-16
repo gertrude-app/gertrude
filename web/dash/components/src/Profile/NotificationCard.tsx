@@ -138,10 +138,10 @@ const Summary: React.FC<
   <div className="p-5">
     <GradientIcon icon={methodIcon(props)} size="small" className="w-min" />
     <h2 className="text-gray-700 text-lg">
-      <span className="capitalize">{props.type}</span>
+      {methodVerb(props)}
       {` `}
       <span className="font-bold">{methodTarget(props)}</span> for{` `}
-      <span className="text-gray-900">{triggerText(props.trigger)}</span>
+      {triggerText(props.trigger)}
     </h2>
   </div>
 );
@@ -163,6 +163,17 @@ function triggerText(trigger: AdminNotificationTrigger): string {
       return `filter suspension requests`;
     case `unlockRequestSubmitted`:
       return `unlock requests`;
+  }
+}
+
+function methodVerb(method: AdminNotificationMethod): 'Email' | 'Slack' | 'Text' {
+  switch (method.type) {
+    case `VerifiedEmailMethod`:
+      return `Email`;
+    case `VerifiedTextMethod`:
+      return `Text`;
+    case `VerifiedSlackMethod`:
+      return `Slack`;
   }
 }
 
