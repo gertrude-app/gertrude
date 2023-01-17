@@ -1,4 +1,3 @@
-import { Trigger } from '@dash/types';
 import { NotificationCard } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
@@ -13,8 +12,11 @@ const Template: ComponentStory<typeof NotificationCard> = (args) => (
 
 export const Email = Template.bind({});
 Email.args = {
-  selectedMethod: { id: `1`, data: { type: `email`, email: `me@example.com` } },
-  trigger: Trigger.unlockRequestSubmitted,
+  selectedMethod: {
+    type: `VerifiedEmailMethod`,
+    value: { id: `1`, email: `me@example.com` },
+  },
+  trigger: `unlockRequestSubmitted`,
   editing: false,
   onDelete: () => {},
   startEdit: () => {},
@@ -31,16 +33,24 @@ Email.args = {
 export const Text = Template.bind({});
 Text.args = {
   ...Email.args,
-  selectedMethod: { id: `2`, data: { type: `text`, phoneNumber: `(123) 456-7890` } },
-  trigger: Trigger.unlockRequestSubmitted,
+  selectedMethod: {
+    type: `VerifiedTextMethod`,
+    value: { id: `2`, phoneNumber: `(123) 456-7890` },
+  },
+  trigger: `unlockRequestSubmitted`,
 };
 
 export const Slack = Template.bind({});
 Slack.args = {
   ...Email.args,
   selectedMethod: {
-    id: `3`,
-    data: { type: `slack`, channelId: ``, channelName: `#Gertrude`, token: `` },
+    type: `VerifiedSlackMethod`,
+    value: {
+      id: `3`,
+      channelId: ``,
+      channelName: `#Gertrude`,
+      token: ``,
+    },
   },
-  trigger: Trigger.suspendFilterRequestSubmitted,
+  trigger: `suspendFilterRequestSubmitted`,
 };

@@ -9,10 +9,10 @@
   status = 200
 
 [build.environment]
-  VITE_GRAPHQL_ENDPOINT = 'https://api.gertrude-app.com/graphql/dashboard'
+  VITE_API_ENDPOINT = 'https://api.gertrude.app'
 
 [context.deploy-preview.environment]
   VITE_IS_STAGING = 'true'
   VITE_TEST_ADMIN_CREDS = 'be000000-0000-0000-0000-000000000000:be000000-0000-0000-0000-000000000000'
-  VITE_GRAPHQL_ENDPOINT = 'https://api--staging.gertrude-app.com/graphql/dashboard'
+  VITE_API_ENDPOINT= 'https://api--staging.gertrude.app'
 

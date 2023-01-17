@@ -1,11 +1,11 @@
 import React from 'react';
 import cx from 'classnames';
 import { target, toState } from '@dash/keys';
-import type { KeyRecord } from '@dash/keys';
+import type { Key as KeyType } from '@dash/types';
 import GradientIcon from '../GradientIcon';
 
 interface Props {
-  record: KeyRecord;
+  record: KeyType;
   onClick(): unknown;
   onDelete(): unknown;
 }

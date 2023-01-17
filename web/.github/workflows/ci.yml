@@ -73,7 +73,7 @@ jobs:
     name: dashboard
     runs-on: ubuntu-latest
     env:
-      VITE_GRAPHQL_ENDPOINT: ${{ secrets.STAGING_API_GRAPHQL_ENDPOINT }}
+      VITE_API_ENDPOINT: ${{ secrets.STAGING_API_ENDPOINT }}
       VITE_TEST_ADMIN_CREDS: ${{ secrets.TEST_ADMIN_CREDS }}
     steps:
       - name: checkout

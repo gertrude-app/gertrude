@@ -1,5 +1,5 @@
 import React from 'react';
-import type { DashboardWidgetData } from '@dash/types';
+import type { GetDashboardWidgets } from '@dash/types';
 import { UndoMainPadding } from '../Chrome/Chrome';
 import PageHeading from '../PageHeading';
 import SmartLink from '../SmartLink';
@@ -12,13 +12,13 @@ import UserScreenshotsWidget from './UserScreenshotsWidget';
 type Props = {
   createKeychain: () => unknown;
   date?: Date;
-} & DashboardWidgetData;
+} & GetDashboardWidgets.Output;
 
 const Dashboard: React.FC<Props> = ({
   unlockRequests,
   users,
-  userActivity,
-  userScreenshots,
+  userActivitySummaries,
+  recentScreenshots,
   createKeychain,
   date = new Date(),
 }) => {
@@ -27,10 +27,10 @@ const Dashboard: React.FC<Props> = ({
       <>
         <PageHeading icon="home">Dashboard</PageHeading>
         <div className="pt-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8">
-          <UserActivityWidget userActivity={userActivity} />
+          <UserActivityWidget userActivity={userActivitySummaries} />
           <UserOverviewWidget users={users} />
           <UserScreenshotsWidget
-            screenshots={userScreenshots}
+            screenshots={recentScreenshots}
             className="xl:row-span-2 lg:-order-9"
           />
           {unlockRequests.length !== 0 && (

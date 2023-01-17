@@ -65,7 +65,7 @@ const Signup: React.FC = () => {
           subTitle="We'll notify you when you can begin trying out Gertrude"
           email={email}
           setEmail={(email) => dispatch(emailUpdated(email))}
-          onSubmit={() => dispatch(joinWaitlist(email))}
+          onSubmit={() => dispatch(joinWaitlist({ email }))}
         />
       ) : (
         <EmailInputForm

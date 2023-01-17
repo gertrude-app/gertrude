@@ -5,20 +5,17 @@ describe(`signup`, () => {
   it(`handles signup flow, minus stripe redirect`, () => {
     let checkoutUrl = ``;
 
-    cy.intercept(`/graphql/dashboard`, (req) => {
-      switch (req.body.operationName) {
-        case `VerifySignupEmail`:
-          // use betsy's id for stripe direct checkout test
-          req.reply({ data: { admin: { id: betsy.id } } });
-          break;
-        case `CreateSignupPaymentUrl`:
-          req.alias = `createSignupPaymentUrl`;
-          req.reply((res) => {
-            checkoutUrl = res.body.data.payment.url;
-            res.body = { errors: [] };
-          });
-          break;
-      }
+    cy.intercept(`/pairql/dashboard/VerifySignupEmail`, (req) => {
+      // use betsy's id for stripe direct checkout test
+      req.reply({ adminId: betsy.id });
+    });
+
+    cy.intercept(`/pairql/dashboard/GetCheckoutUrl`, (req) => {
+      req.alias = `getCheckoutUrl`;
+      req.reply((res) => {
+        checkoutUrl = res.body.url;
+        res.body = { error: {}, __cyStubbedError: true };
+      });
     });
 
     cy.visit(`/signup`);
@@ -27,7 +24,7 @@ describe(`signup`, () => {
     cy.contains(`Verification email sent`);
 
     cy.visit(`/verify-signup-email/123`);
-    cy.wait(`@createSignupPaymentUrl`).then(() => {
+    cy.wait(`@getCheckoutUrl`).then(() => {
       cy.writeFile(`cypress/screenshots/checkoutUrl.json`, { url: checkoutUrl });
     });
 
@@ -48,44 +45,25 @@ describe(`signup`, () => {
   });
 
   it(`sends correct mutation and auto logs-in on success`, () => {
-    cy.intercept(`/graphql/dashboard`, (req) => {
-      switch (req.body.operationName) {
-        case `HandleSignupPaymentSuccess`:
-          req.alias = `signup`;
-          req.reply({
-            data: {
-              token: {
-                value: `token-123`,
-                admin: { id: `admin-123` },
-              },
-            },
-          });
-          break;
-        case `GetWidgets`:
-          req.alias = `widgets`;
-          req.reply({
-            data: {
-              widgets: {
-                unlockRequests: [],
-                users: [],
-                userActivity: [],
-                userScreenshots: [],
-              },
-            },
-          });
-          break;
-      }
+    cy.intercept(`/pairql/dashboard/HandleCheckoutSuccess`, (req) => {
+      req.alias = `signup`;
+      req.reply({ token: `token-123`, adminId: `admin-123` });
+    });
+
+    cy.intercept(`/pairql/dashboard/GetDashboardWidgets`, (req) => {
+      req.alias = `widgets`;
+      req.reply({ unlockRequests: [], users: [], userActivity: [], userScreenshots: [] });
     });
 
     cy.visit(`/checkout-success?session_id=cs_test_123`);
 
     cy.wait(`@signup`)
-      .its(`request.body.variables.input.value`)
+      .its(`request.body.stripeCheckoutSessionId`)
       .should(`eq`, `cs_test_123`);
 
     cy.wait(`@widgets`)
-      .its(`request.headers.authorization`)
-      .should(`eq`, `Bearer token-123`);
+      .its(`request.headers.${`X-AdminToken`.toLowerCase()}`)
+      .should(`eq`, `token-123`);
 
     cy.contains(`Welcome to Gertrude!`).then(() => {
       expect(localStorage.getItem(`admin_id`)).to.eq(`admin-123`);

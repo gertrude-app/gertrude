@@ -2,8 +2,8 @@ import React, { useEffect, useMemo } from 'react';
 import { v4 as uuid } from 'uuid';
 import { Navigate, useParams } from 'react-router-dom';
 import { Loading, EditUser, ApiErrorMessage } from '@dash/components';
+import type { Device } from '@dash/types';
 import type { UserUpdate } from '../../redux/slice-users';
-import type { GetUser_user_devices } from '../../api/users/__generated__/GetUser';
 import type { QueryProps } from '../../redux/store';
 import { newUserRouteVisited } from '../../redux/slice-users';
 import { useDispatch, useSelector } from '../../redux/hooks';
@@ -50,7 +50,7 @@ const User: React.FC = () => {
   }
 
   if (query.state === `failed`) {
-    return <ApiErrorMessage entity="User" error={query.error} />;
+    return <ApiErrorMessage error={query.error} />;
   }
 
   return <EditUser {...query.props} />;
@@ -78,7 +78,7 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
     if (!editable && state.deleted.includes(id)) {
       return [Query.redirectDeleted(`/users`), false];
     } else if (!editable) {
-      return [Query.unexpectedError(), false];
+      return [Query.unexpectedError(`c989c73a`, `missing user`), false];
     }
 
     const user = editable.draft;
@@ -125,7 +125,7 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
           confirm: () => dispatch(deleteDevice(deleteDeviceId ?? ``)),
           cancel: () => dispatch(userEntityDeleteCanceled(`device`)),
         },
-        startAddDevice: () => dispatch(createPendingAppConnection(id)),
+        startAddDevice: () => dispatch(createPendingAppConnection({ userId: id })),
         dismissAddDevice: () => dispatch(addDeviceDismissed()),
         addDeviceRequest: state.addDeviceRequest,
         onAddKeychainClicked: () => dispatch(addKeychainClicked()),
@@ -143,12 +143,12 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
 // helpers
 
 function deviceProps(
-  apiDevice: GetUser_user_devices,
+  apiDevice: Device,
 ): React.ComponentProps<typeof EditUser>['devices'][0] {
   return {
     id: apiDevice.id,
-    model: apiDevice.model.title,
+    model: apiDevice.modelTitle,
     status: apiDevice.isOnline ? `online` : `offline`,
-    icon: familyToIcon(apiDevice.model.family),
+    icon: familyToIcon(apiDevice.modelFamily),
   };
 }

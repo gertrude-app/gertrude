@@ -13,7 +13,7 @@ const MagicLink: React.FC = () => {
   const redirectUrl = useLoginRedirect();
 
   useEffect(() => {
-    dispatch(loginFromMagicLink(token));
+    dispatch(loginFromMagicLink({ token }));
   }, [dispatch, token]);
 
   switch (request.state) {
@@ -28,10 +28,7 @@ const MagicLink: React.FC = () => {
       let error: React.ReactNode = (
         <ApiErrorMessage wrapped={false} error={request.error} />
       );
-      if (
-        request.error?.type === `actionable` &&
-        request.error.message?.includes(`token not found`)
-      ) {
+      if (request.error?.tag === `magicLinkTokenNotFound`) {
         error = (
           <span className="text-gray-900 antialiased">
             Magic Link token not found, or expired. Please{` `}

@@ -1,13 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { env } from '@shared/components';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { AdminIds } from '@dash/types';
+import type { Login, RequestState } from '@dash/types';
 import type { StorageClient } from '../environment/Storage';
 import Current from '../environment';
 import { OptionalVar as Optional } from '../environment/Environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 import { handleSignupPaymentSuccess } from './slice-signup';
+
+type AdminIds = Login.Output;
 
 export interface AuthState {
   admin: AdminIds | null;
@@ -107,7 +109,10 @@ export const submitLoginForm = createResultThunk(
   `${slice.name}/submitLoginForm`,
   async (_, { getState, dispatch }) => {
     const { loginEmail, loginPassword } = getState().auth;
-    const result = await Current.api.admin.login(loginEmail, loginPassword);
+    const result = await Current.api.login({
+      email: loginEmail,
+      password: loginPassword,
+    });
     result.withError(() => setTimeout(() => dispatch(errorExpired()), 6000));
     return result;
   },
@@ -116,15 +121,15 @@ export const submitLoginForm = createResultThunk(
 export const requestMagicLink = createResultThunk(
   `${slice.name}/requestMagicLink`,
   (_, { getState }) =>
-    Current.api.admin.requestMagicLink(
-      getState().auth.loginEmail,
-      new URLSearchParams(window.location.search).get(`redirect`),
-    ),
+    Current.api.requestMagicLink({
+      email: getState().auth.loginEmail,
+      redirect: new URLSearchParams(window.location.search).get(`redirect`) ?? undefined,
+    }),
 );
 
 export const loginFromMagicLink = createResultThunk(
   `${slice.name}/loginFromMagicLink`,
-  Current.api.admin.loginFromMagicLink,
+  Current.api.loginMagicLink,
 );
 
 const { errorExpired } = slice.actions;
@@ -163,17 +168,17 @@ export function getInitialAdmin(): AdminIds | null {
     return null;
   }
 
-  const [id = ``, token = ``] = devCreds.split(`:`);
-  Current.sessionStorage.setItem(`admin_id`, id);
+  const [adminId = ``, token = ``] = devCreds.split(`:`);
+  Current.sessionStorage.setItem(`admin_id`, adminId);
   Current.sessionStorage.setItem(`admin_token`, token);
-  return { id, token };
+  return { adminId, token };
 }
 
 function adminFrom(storage: StorageClient): AdminIds | null {
-  const id = storage.getItem(`admin_id`);
+  const adminId = storage.getItem(`admin_id`);
   const token = storage.getItem(`admin_token`);
-  if (id && token) {
-    return { id, token };
+  if (adminId && token) {
+    return { adminId, token };
   }
   return null;
 }

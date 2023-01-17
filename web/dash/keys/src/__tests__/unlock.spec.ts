@@ -1,5 +1,5 @@
 import { test, describe, expect } from 'vitest';
-import type { Key } from '../types';
+import type { SharedKey } from '@dash/types';
 import { keyForUnlockRequest } from '../unlock';
 
 describe(`keyForUnlockRequest()`, () => {
@@ -17,7 +17,7 @@ describe(`keyForUnlockRequest()`, () => {
     });
   });
 
-  const cases: Array<[Parameters<typeof keyForUnlockRequest>[0], Key]> = [
+  const cases: Array<[Parameters<typeof keyForUnlockRequest>[0], SharedKey]> = [
     [
       {
         url: `https://some-site.com/jim/jam`,

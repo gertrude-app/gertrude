@@ -1,14 +1,16 @@
 import React from 'react';
 import cx from 'classnames';
 import { Button } from '@shared/components';
-import type { DashboardWidgetData } from '@dash/types';
+import type { GetDashboardWidgets } from '@dash/types';
 import PillBadge from '../PillBadge';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
+type User = GetDashboardWidgets.Output['users'][number];
+
 type Props = {
   className?: string;
-  users: DashboardWidgetData['users'];
+  users: User[];
 };
 
 const UsersOverview: React.FC<Props> = ({ className, users }) => {
@@ -40,7 +42,7 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
 
 export default UsersOverview;
 
-const UserOverview: React.FC<DashboardWidgetData['users'][0]> = ({ isOnline, name }) => (
+const UserOverview: React.FC<User> = ({ isOnline, name }) => (
   <div className="flex justify-between items-center rounded-xl py-4 px-4 even:bg-gray-50">
     <h3 className="font-medium text-gray-900">{name}</h3>
     {isOnline ? (

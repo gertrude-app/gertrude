@@ -1,13 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { DashboardWidgetData } from '@dash/types';
+import type { GetDashboardWidgets, RequestState } from '@dash/types';
 import Current from '../environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 import { acceptUnlockRequest, rejectUnlockRequest } from './slice-unlock-requests';
 import { deleteActivityItems } from './slice-users';
 
+type Widgets = GetDashboardWidgets.Output;
+
 export interface DashboardState {
-  request: RequestState<DashboardWidgetData>;
+  request: RequestState<Widgets>;
 }
 
 export function initialState(): DashboardState {
@@ -52,7 +54,7 @@ export const slice = createSlice({
     builder.addCase(deleteActivityItems.succeeded, (state, { meta: { arg } }) => {
       const payload = Req.payload(state.request);
       if (!payload) return;
-      const user = payload.userActivity.find((user) => user.id === arg.userId);
+      const user = payload.userActivitySummaries.find((user) => user.id === arg.userId);
       if (user) {
         // Math.max because new items may have streamed in since widget was loaded
         user.numUnreviewed = Math.max(0, user.numUnreviewed - arg.itemRootIds.length);
@@ -63,7 +65,7 @@ export const slice = createSlice({
 
 export const fetchDashboardData = createResultThunk(
   `${slice.name}/fetchDashboardData`,
-  Current.api.dashboard.getWidgets,
+  Current.api.getDashboardWidgets,
 );
 
 export default slice.reducer;

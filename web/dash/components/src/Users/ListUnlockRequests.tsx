@@ -1,6 +1,5 @@
 import React from 'react';
 import cx from 'classnames';
-import { RequestStatus } from '@dash/types';
 import { posessive, newestFirst } from '@dash/utils';
 import type { Subcomponents } from '@dash/types';
 import UnlockRequestCard from '../UnlockRequestCard';
@@ -23,9 +22,7 @@ const ListUnlockRequests: React.FC<Props> = ({ requests, singleUser }) => (
       <div className={cx(requests.length > 1 && `grid gap-5 grid-cols-1 lg:grid-cols-2`)}>
         {requests
           .sort((a, b) =>
-            a.status === RequestStatus.pending && b.status !== RequestStatus.pending
-              ? -1
-              : newestFirst(a, b),
+            a.status === `pending` && b.status !== `pending` ? -1 : newestFirst(a, b),
           )
           .map((request) => (
             <UnlockRequestCard key={request.id} {...request} />

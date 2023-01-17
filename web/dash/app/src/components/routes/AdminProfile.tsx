@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { ApiErrorMessage, Loading, Profile } from '@dash/components';
 import { capitalize, isUnsaved } from '@dash/utils';
 import { notNullish, typesafe } from '@shared/ts-utils';
-import type { AdminNotificationMethod } from '@dash/types';
+import type { GetAdmin } from '@dash/types';
 import type { QueryProps, State } from '../../redux/store';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
@@ -23,12 +23,11 @@ import { isDirty, Query, Req } from '../../redux/helpers';
 
 const AdminProfile: React.FC = () => {
   const dispatch = useDispatch();
-  const adminId = useSelector((state) => state.auth.admin?.id ?? ``);
   const [query, shouldFetch] = useSelector(queryProps(dispatch));
 
   useEffect(() => {
-    shouldFetch && dispatch(fetchProfileData(adminId));
-  }, [dispatch, adminId, shouldFetch]);
+    shouldFetch && dispatch(fetchProfileData());
+  }, [dispatch, shouldFetch]);
 
   if (query.state === `shouldFetch` || query.state === `ongoing`) {
     return <Loading />;
@@ -60,11 +59,10 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
       email: request.payload.email,
       status: request.payload.subscriptionStatus,
       billingPortalRequest: state.admin.billingPortalRequest,
-      manageSubscription: () =>
-        dispatch(createBillingPortalSession(state.auth.admin?.id ?? ``)),
+      manageSubscription: () => dispatch(createBillingPortalSession()),
       methods: typesafe.objectValues(methods).map((method) => ({
-        id: method.id,
-        method: method.data.type,
+        id: method.value.id,
+        method: methodSimpleType(method),
         value: methodPrimaryValue(method),
         deletable: methodDeletable(method, admin.notifications, request.payload.email),
       })),
@@ -106,14 +104,27 @@ export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
 
 // helpers
 
-function methodPrimaryValue(method: AdminNotificationMethod): string {
-  switch (method.data.type) {
-    case `email`:
-      return method.data.email.toLowerCase();
-    case `slack`:
-      return `#` + method.data.channelName.replace(/^#/, ``);
-    case `text`: {
-      const number = method.data.phoneNumber;
+function methodSimpleType(
+  method: GetAdmin.VerifiedNotificationMethod,
+): 'email' | 'slack' | 'text' {
+  switch (method.type) {
+    case `VerifiedEmailMethod`:
+      return `email`;
+    case `VerifiedSlackMethod`:
+      return `slack`;
+    case `VerifiedTextMethod`:
+      return `text`;
+  }
+}
+
+function methodPrimaryValue(method: GetAdmin.VerifiedNotificationMethod): string {
+  switch (method.type) {
+    case `VerifiedEmailMethod`:
+      return method.value.email.toLowerCase();
+    case `VerifiedSlackMethod`:
+      return `#` + method.value.channelName.replace(/^#/, ``);
+    case `VerifiedTextMethod`: {
+      const number = method.value.phoneNumber;
       if (number.match(/^\d{10}$/)) {
         return `(${number.slice(0, 3)}) ${number.slice(3, 6)}-${number.slice(6, 10)}`;
       }
@@ -123,19 +134,19 @@ function methodPrimaryValue(method: AdminNotificationMethod): string {
 }
 
 function methodDeletable(
-  method: AdminNotificationMethod,
+  method: GetAdmin.VerifiedNotificationMethod,
   notifications: State['admin']['notifications'],
   adminEmail: EmailAddress,
 ): any {
   const methodBeingUsed = typesafe
     .objectValues(notifications)
-    .some((notification) => notification.original.methodId === method.id);
+    .some((notification) => notification.original.methodId === method.value.id);
 
   if (methodBeingUsed) {
     return false;
   }
 
-  return method.data.type !== `email` || method.data.email !== adminEmail;
+  return method.type !== `VerifiedEmailMethod` || method.value.email !== adminEmail;
 }
 
 function makeGetNotificationProps(
@@ -156,8 +167,8 @@ function makeGetNotificationProps(
         ? false
         : !isDirty(editable) || state.saveNotificationRequests[id]?.state === `ongoing`,
       methodOptions: typesafe.objectValues(methods).map((method) => ({
-        display: `${capitalize(method.data.type)} ${methodPrimaryValue(method)}`,
-        value: method.id,
+        display: `${capitalize(methodSimpleType(method))} ${methodPrimaryValue(method)}`,
+        value: method.value.id,
       })),
       editing: editable.editing,
     };

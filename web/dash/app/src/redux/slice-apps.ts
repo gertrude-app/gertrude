@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { GetIdentifiedApps_apps } from '../api/apps/__generated__/GetIdentifiedApps';
+import type { GetIdentifiedApps, RequestState } from '@dash/types';
 import Current from '../environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 
 export interface AppsState {
-  request: RequestState<GetIdentifiedApps_apps[]>;
+  request: RequestState<GetIdentifiedApps.Output>;
 }
 
 export function initialState(): AppsState {
@@ -35,7 +35,7 @@ export const slice = createSlice({
 
 export const getIdentifiedApps = createResultThunk(
   `${slice.name}/getIdentifiedApps`,
-  Current.api.apps.getIdentifiedApps,
+  Current.api.getIdentifiedApps,
 );
 
 export default slice.reducer;

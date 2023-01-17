@@ -1,70 +1,72 @@
-import { SubscriptionStatus, Trigger, Family } from '@dash/types';
-import type { UnlockRequest } from '@dash/types';
-import type { Keychain } from '@dash/keys';
-import type { ActivityItem } from '@dash/components';
-import type { User } from '../../api/users';
+import { v4 as uuid } from 'uuid';
 import type {
-  GetAdmin_admin,
-  GetAdmin_admin_notifications,
-  GetAdmin_admin_verifiedNotificationMethods,
-  GetAdmin_admin_verifiedNotificationMethods_method,
-} from '../../api/admin/__generated__/GetAdmin';
-import type { GetActivityOverview_counts } from '../../api/users/__generated__/GetActivityOverview';
+  User,
+  UnlockRequest,
+  GetAdmin,
+  Device,
+  KeychainSummary,
+  GetUserActivityDays,
+  SuspendFilterRequest,
+  GetIdentifiedApps,
+} from '@dash/types';
+import type { ActivityItem } from '@dash/components';
 import * as empty from '../../redux/empty';
 
-export function adminProfile(override: Partial<GetAdmin_admin> = {}): GetAdmin_admin {
+type Admin = GetAdmin.Output;
+
+export function adminProfile(override: Partial<Admin> = {}): Admin {
   return {
-    __typename: `Admin`,
+    id: uuid(),
     email: `you@example.com`,
-    subscriptionStatus: SubscriptionStatus.active,
+    subscriptionStatus: `active`,
     notifications: [],
     verifiedNotificationMethods: [],
     ...override,
   };
 }
 
+export function identifiedApp(
+  override: Partial<GetIdentifiedApps.Output[number]> = {},
+): GetIdentifiedApps.Output[number] {
+  return {
+    id: uuid(),
+    name: `Brave Browser`,
+    slug: `brave`,
+    selectable: true,
+    bundleIds: [{ id: uuid(), bundleId: `com.brave.Browser` }],
+    ...override,
+  };
+}
+
+export function suspendFilterRequest(
+  override: Partial<SuspendFilterRequest>,
+): SuspendFilterRequest {
+  return {
+    id: uuid(),
+    deviceId: uuid(),
+    status: `pending`,
+    userName: `Little Jimmy`,
+    requestComment: `I want to watch a video`,
+    requestedDurationInSeconds: 120,
+    createdAt: new Date().toISOString(),
+    ...override,
+  };
+}
+
 export function adminNotification(
-  override: Partial<GetAdmin_admin_notifications> = {},
-): GetAdmin_admin_notifications {
+  override: Partial<GetAdmin.Notification> = {},
+): GetAdmin.Notification {
   return {
-    __typename: `AdminNotification`,
-    id: `mock.AdminNotification--id--${Math.random()}`,
-    trigger: Trigger.suspendFilterRequestSubmitted,
-    method: {
-      __typename: `AdminVerifiedNotificationMethod`,
-      id: `mock.AdminVerifiedNotificationMethod--id--${Math.random()}`,
-    },
-    ...override,
-  };
-}
-
-export function adminVerifiedNotificationMethod(
-  override: Partial<GetAdmin_admin_verifiedNotificationMethods> = {},
-): GetAdmin_admin_verifiedNotificationMethods {
-  return {
-    __typename: `AdminVerifiedNotificationMethod`,
-    id: `mock.AdminVerifiedNotificationMethod--id--${Math.random()}`,
-    method: notificationMethod(),
-    ...override,
-  };
-}
-
-export function notificationMethod(
-  override: Partial<GetAdmin_admin_verifiedNotificationMethods_method> = {},
-): GetAdmin_admin_verifiedNotificationMethods_method {
-  return {
-    __typename: `NotificationMethod`,
-    data: {
-      __typename: `EmailData`,
-      email: `them@example.com`,
-    },
+    id: uuid(),
+    trigger: `suspendFilterRequestSubmitted`,
+    methodId: uuid(),
     ...override,
   };
 }
 
 export function user(override: Partial<User> = {}): User {
   return {
-    id: `mock.User--id--${Math.random()}`,
+    id: uuid(),
     name: `Huck`,
     screenshotsEnabled: true,
     screenshotsResolution: 1000,
@@ -72,53 +74,49 @@ export function user(override: Partial<User> = {}): User {
     keyloggingEnabled: true,
     keychains: [],
     devices: [],
+    createdAt: new Date().toISOString(),
     ...override,
   };
 }
 
-export function userDevice(
-  override: Partial<User['devices'][0]> = {},
-): User['devices'][0] {
+export function userDevice(override: Partial<Device> = {}): Device {
   return {
-    __typename: `Device`,
-    id: `mock.Device--id--${Math.random()}`,
+    id: uuid(),
     isOnline: false,
-    model: {
-      __typename: `Model`,
-      family: Family.macBookAir,
-      title: `MacBook Air`,
-    },
+    modelFamily: `macBookAir`,
+    modelTitle: `MacBook Air`,
     ...override,
   };
 }
 
-export function userKeychain(override: Partial<Keychain> = {}): Keychain {
+export function keychainSummary(
+  override: Partial<KeychainSummary> = {},
+): KeychainSummary {
   return {
-    id: `mock.Keychain--id--${Math.random()}`,
+    id: uuid(),
     name: `HTC`,
     description: ``,
     isPublic: false,
-    authorId: `mock.Admin--id--${Math.random()}`,
+    authorId: uuid(),
     numKeys: 0,
     ...override,
   };
 }
 
-export function activityOverviewCounts(
-  numItems = 0,
-  numCompleted = 0,
+export function activityDay(
+  totalItems = 0,
+  numApproved = 0,
   start = new Date().toISOString(),
-): GetActivityOverview_counts {
+): GetUserActivityDays.Output['days'][number] {
   return {
-    __typename: `MonitoringRangeCounts`,
-    dateRange: { __typename: `DateRange`, start },
-    numItems,
-    numCompleted,
+    date: start,
+    totalItems,
+    numApproved,
   };
 }
 
 export function keystrokeLine(override: Partial<ActivityItem> = {}): ActivityItem {
-  const id = override.id ?? `id-${Math.random()}`;
+  const id = override.id ?? uuid();
   const ids = override.ids ?? [id];
   return {
     id,
@@ -133,12 +131,13 @@ export function keystrokeLine(override: Partial<ActivityItem> = {}): ActivityIte
 
 export function unlockRequest(override: Partial<UnlockRequest> = {}): UnlockRequest {
   return {
-    ...empty.unlockRequest(
-      `mock.UnlockRequest--id--${Math.random()}`,
-      `mock.User--id--${Math.random()}`,
-    ),
+    ...empty.unlockRequest(uuid(), uuid()),
+    userName: `Huck`,
+    requestComment: `Please dad!`,
     domain: `example.com`,
-    appName: `Safari`,
+    appName: `Brave`,
+    appSlug: `brave`,
+    appCategories: [`browser`],
     ...override,
   };
 }

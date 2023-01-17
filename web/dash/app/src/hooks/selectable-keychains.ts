@@ -1,17 +1,17 @@
 import { useEffect } from 'react';
-import type { Keychain } from '@dash/keys';
+import type { KeychainSummary, RequestState } from '@dash/types';
 import { fetchSelectableKeychains } from '../redux/slice-keychains';
 import { useDispatch, useSelector } from '../redux/hooks';
 import { Req } from '../redux/helpers';
 
 export default function useSelectableKeychains(
   fetch = true,
-): RequestState<{ own: Keychain[]; public: Keychain[] }, ApiError> {
+): RequestState<{ own: KeychainSummary[]; public: KeychainSummary[] }> {
   const dispatch = useDispatch();
   const { entities, fetchSelectableKeychainsRequest } = useSelector(
     (state) => state.keychains,
   );
-  const adminId = useSelector((state) => state.auth.admin?.id) ?? ``;
+  const adminId = useSelector((state) => state.auth.admin?.adminId) ?? ``;
 
   useEffect(() => {
     if (fetch && fetchSelectableKeychainsRequest.state === `idle`) {

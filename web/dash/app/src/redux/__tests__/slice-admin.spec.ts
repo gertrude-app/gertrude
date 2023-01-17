@@ -1,6 +1,6 @@
 import { expect, it, test, describe } from 'vitest';
 import { unsavedId } from '@dash/utils';
-import { SubscriptionStatus, Trigger } from '@dash/types';
+// import { AdminSubscriptionStatus, AdminNotTrigger } from '@dash/types';
 import { Req } from '../helpers';
 import reducer, {
   confirmPendingNotificationMethod,
@@ -19,7 +19,7 @@ describe(`createNotification flow`, () => {
     let state = reducer(undefined, notificationCreated());
     expect(state.notifications[tempId]).toBeDefined();
 
-    state = reducer(state, upsertNotification.succeeded(`apiId`, tempId));
+    state = reducer(state, upsertNotification.succeeded({ id: `apiId` }, tempId));
     expect(state.notifications[tempId]).toBeUndefined();
     expect(state.notifications.apiId).toBeDefined();
   });
@@ -36,8 +36,10 @@ describe(`create new notification method flow`, () => {
       sendCodeRequest: Req.idle(),
       confirmationRequest: Req.idle(),
       confirmationCode: ``,
-      type: `email`,
-      email: ``,
+      type: `Email`,
+      value: {
+        email: ``,
+      },
     });
 
     // step 2: update the email address to a valid state
@@ -45,21 +47,26 @@ describe(`create new notification method flow`, () => {
       state,
       newNotificationMethodEvent({ type: `email_address_updated`, email: `foo@bar.com` }),
     );
-    expect(state.pendingNotificationMethod).toMatchObject({ email: `foo@bar.com` });
+    expect(state.pendingNotificationMethod).toMatchObject({
+      value: { email: `foo@bar.com` },
+    });
 
     // step 3: simulate a successfull request to generate a code
-    state = reducer(state, createPendingNotificationMethod.succeeded(`pendingId`));
+    state = reducer(
+      state,
+      createPendingNotificationMethod.succeeded({ methodId: `pendingId` }),
+    );
     expect(state.pendingNotificationMethod).toMatchObject({
       sendCodeRequest: Req.succeed(`pendingId`),
     });
 
     // step 4: simulate a successful verification code submitted
-    state = reducer(state, confirmPendingNotificationMethod.succeeded(true));
+    state = reducer(state, confirmPendingNotificationMethod.succeeded({ success: true }));
     expect(state.pendingNotificationMethod).toBeUndefined();
     expect(state.notificationMethods.pendingId).toMatchObject({
-      id: `pendingId`,
-      data: {
-        type: `email`,
+      type: `VerifiedEmailMethod`,
+      value: {
+        id: `pendingId`,
         email: `foo@bar.com`,
       },
     });
@@ -70,53 +77,43 @@ describe(`fetchProfileData`, () => {
   it(`.succeeded sets correctly massaged data on state slice`, () => {
     const apiData = mock.adminProfile({
       email: `blob@blob.com`,
-      subscriptionStatus: SubscriptionStatus.trialing,
+      subscriptionStatus: `trialing`,
       verifiedNotificationMethods: [
-        mock.adminVerifiedNotificationMethod({
-          id: `verifiedMethod1`,
-          method: mock.notificationMethod({
-            data: { __typename: `EmailData`, email: `blob@blob.com` },
-          }),
-        }),
-        mock.adminVerifiedNotificationMethod({
-          id: `verifiedMethod2`,
-          method: mock.notificationMethod({
-            data: { __typename: `TextData`, phoneNumber: `7` },
-          }),
-        }),
+        {
+          type: `VerifiedEmailMethod`,
+          value: { id: `verifiedMethod1`, email: `blob@blob.com` },
+        },
+        {
+          type: `VerifiedTextMethod`,
+          value: { id: `verifiedMethod2`, phoneNumber: `7` },
+        },
       ],
       notifications: [
         mock.adminNotification({
           id: `notification1`,
-          trigger: Trigger.unlockRequestSubmitted,
-          method: {
-            __typename: `AdminVerifiedNotificationMethod`,
-            id: `verifiedMethod2`,
-          },
+          trigger: `unlockRequestSubmitted`,
+          methodId: `verifiedMethod2`,
         }),
       ],
     });
 
-    const nextState = reducer(
-      makeState().admin,
-      fetchProfileData.succeeded(apiData, `admin123`),
-    );
+    const nextState = reducer(makeState().admin, fetchProfileData.succeeded(apiData));
 
     expect(nextState.profileRequest).toEqual(
       Req.succeed({
         email: `blob@blob.com`,
-        subscriptionStatus: SubscriptionStatus.trialing,
+        subscriptionStatus: `trialing`,
       }),
     );
 
     expect(nextState.notificationMethods).toEqual({
       verifiedMethod1: {
-        id: `verifiedMethod1`,
-        data: { type: `email`, email: `blob@blob.com` },
+        type: `VerifiedEmailMethod`,
+        value: { id: `verifiedMethod1`, email: `blob@blob.com` },
       },
       verifiedMethod2: {
-        id: `verifiedMethod2`,
-        data: { type: `text`, phoneNumber: `7` },
+        type: `VerifiedTextMethod`,
+        value: { id: `verifiedMethod2`, phoneNumber: `7` },
       },
     });
 
@@ -125,12 +122,12 @@ describe(`fetchProfileData`, () => {
         editing: false,
         original: {
           id: `notification1`,
-          trigger: Trigger.unlockRequestSubmitted,
+          trigger: `unlockRequestSubmitted`,
           methodId: `verifiedMethod2`,
         },
         draft: {
           id: `notification1`,
-          trigger: Trigger.unlockRequestSubmitted,
+          trigger: `unlockRequestSubmitted`,
           methodId: `verifiedMethod2`,
         },
       },

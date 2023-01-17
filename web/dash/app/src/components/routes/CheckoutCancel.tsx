@@ -7,10 +7,10 @@ import { handleSignupPaymentCanceled } from '../../redux/slice-signup';
 const CheckoutCancel: React.FC = () => {
   const [params] = useSearchParams();
   const dispatch = useDispatch();
-  const sessionId = params.get(`session_id`);
+  const sessionId = params.get(`session_id`) ?? ``;
 
   useEffect(() => {
-    dispatch(handleSignupPaymentCanceled(sessionId ?? ``));
+    dispatch(handleSignupPaymentCanceled({ stripeCheckoutSessionId: sessionId }));
   }, [dispatch, sessionId]);
 
   return (

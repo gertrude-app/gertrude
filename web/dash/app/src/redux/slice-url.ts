@@ -28,7 +28,7 @@ export const slice = createSlice({
 
 export const joinWaitlist = createResultThunk(
   `${slice.name}/join`,
-  Current.api.signup.joinWaitlist,
+  Current.api.joinWaitlist,
 );
 
 export const { redirectCleared } = slice.actions;

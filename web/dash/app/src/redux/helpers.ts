@@ -1,4 +1,5 @@
 import { env } from '@shared/components';
+import type { RequestState, PqlError } from '@dash/types';
 import type { JSXElementConstructor } from 'react';
 import type { QueriedProps } from './store';
 
@@ -18,8 +19,15 @@ export class Query {
     return undefined;
   }
 
-  public static unexpectedError(): QueriedProps<never> {
-    return { state: `failed`, error: { type: `non_actionable` } };
+  public static unexpectedError(id: string, message: string): QueriedProps<never> {
+    return {
+      state: `failed`,
+      error: {
+        id,
+        type: `clientError`,
+        debugMessage: `Query.unexpectedError: ${message}`,
+      },
+    };
   }
 
   public static redirectDeleted(redirectUrl: string): QueriedProps<never> {
@@ -32,7 +40,7 @@ export class Req {
     return { state: `succeeded`, payload };
   }
 
-  static toUnresolvedQuery<E extends ApiError>(
+  static toUnresolvedQuery<E extends PqlError>(
     req?: RequestState<never, E>,
   ): QueriedProps<never> {
     switch (req?.state) {
@@ -42,13 +50,20 @@ export class Req {
       case `ongoing`:
         return { state: `ongoing` };
       case `failed`:
-        return { state: `failed`, error: req.error };
+        return {
+          state: `failed`,
+          error: req.error ?? {
+            id: `651ebe47`,
+            type: `clientError`,
+            debugMessage: `Req.toUnresolvedQuery: failed request with no error`,
+          },
+        };
       case `succeeded`:
         throw new Error(`unreachable`);
     }
   }
 
-  static fail<E>(error: E | undefined = undefined): RequestState<never, E> {
+  static fail(error: PqlError | undefined = undefined): RequestState<never> {
     return { state: `failed`, error };
   }
 

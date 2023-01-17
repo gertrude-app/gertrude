@@ -1,24 +1,17 @@
 /// <reference types="cypress" />
-import ListUsers from '../fixtures/ListUsers.json';
+import * as mock from '../../src/redux/__tests__/mocks';
 
 describe(`user screen`, () => {
   beforeEach(() => {
     cy.simulateLoggedIn();
-    cy.intercept(`/graphql/dashboard`, (req) => {
-      switch (req.body.operationName) {
-        case `ListUsers`:
-          req.alias = `listUsers`;
-          req.reply(ListUsers);
-          break;
-        case `CreateUser`:
-          req.alias = `createUser`;
-          req.reply({ data: { user: { id: `123` } } });
-          break;
-        case `UpdateUser`:
-          req.alias = `updateUser`;
-          req.reply({ data: { user: { id: `123` } } });
-          break;
-      }
+
+    cy.intercept(`/pairql/dashboard/SaveUser`, (req) => {
+      req.alias = `saveUser`;
+      req.reply({ success: true });
+    });
+
+    cy.intercept(`/pairql/dashboard/GetUsers`, (req) => {
+      req.reply([mock.user({ id: `user-123` })]);
     });
   });
 
@@ -28,14 +21,14 @@ describe(`user screen`, () => {
       cy.testId(`user-name`).type(`Bo`);
 
       cy.contains(`Save user`).click();
-      cy.wait(`@createUser`);
+      cy.wait(`@saveUser`);
 
       cy.testId(`page-heading`).should(`have.text`, `Edit user`);
       cy.contains(`Save user`).should(`be.disabled`);
 
       cy.testId(`user-name`).type(`az`);
       cy.contains(`Save user`).should(`be.enabled`).click();
-      cy.wait(`@updateUser`);
+      cy.wait(`@saveUser`);
 
       cy.sidebarClick(`Users`);
       cy.contains(`Boaz`);

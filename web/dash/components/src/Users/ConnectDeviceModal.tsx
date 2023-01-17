@@ -1,4 +1,5 @@
 import React from 'react';
+import type { RequestState } from '@dash/types';
 import { RequestModal } from '../Modal';
 
 interface Props {

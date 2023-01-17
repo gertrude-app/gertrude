@@ -14,7 +14,7 @@ import {
 
 const Keychains: React.FC = () => {
   const dispatch = useDispatch();
-  const adminId = useSelector((state) => state.auth.admin?.id ?? ``);
+  const adminId = useSelector((state) => state.auth.admin?.adminId ?? ``);
   const request = useSelector((state) => state.keychains.listAdminKeychainsRequest);
   const deleteId = useSelector((state) => state.keychains.deleting.keychain);
   const keychains = useSelector((state) =>

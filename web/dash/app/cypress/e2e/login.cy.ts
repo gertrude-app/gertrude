@@ -3,13 +3,9 @@ import { betsy } from '../fixtures/helpers';
 
 describe(`dashboard app login`, () => {
   beforeEach(() => {
-    cy.intercept(`/graphql/dashboard`, (req) => {
-      switch (req.body.operationName) {
-        case `RequestMagicLink`:
-          req.alias = `requestMagicLink`;
-          req.reply({ data: { result: { success: true } } });
-          break;
-      }
+    cy.intercept(`/pairql/dashboard/RequestMagicLink`, (req) => {
+      req.alias = `requestMagicLink`;
+      req.reply({ success: true });
     });
   });
 
@@ -29,7 +25,7 @@ describe(`dashboard app login`, () => {
     cy.get(`input[name=email]`).type(betsy.email);
     cy.get(`input[name=password]`).type(`bad{enter}`);
     cy.location(`pathname`).should(`eq`, `/login`);
-    cy.contains(`incorrect`);
+    cy.contains(`Incorrect`);
   });
 
   it(`handles magic-link`, () => {
@@ -38,9 +34,7 @@ describe(`dashboard app login`, () => {
     cy.get(`input[name=email]`).type(betsy.email);
     cy.testId(`magic-link`).should(`not.be.disabled`).click();
 
-    cy.wait(`@requestMagicLink`)
-      .its(`request.body.variables.email`)
-      .should(`eq`, betsy.email);
+    cy.wait(`@requestMagicLink`).its(`request.body.email`).should(`eq`, betsy.email);
 
     cy.contains(`Check your email`);
   });
@@ -51,7 +45,7 @@ describe(`dashboard app login`, () => {
     cy.testId(`magic-link`).click();
 
     cy.wait(`@requestMagicLink`)
-      .its(`request.body.variables`)
+      .its(`request.body`)
       .should(`deep.equal`, { email: betsy.email, redirect: `/users/123` });
 
     cy.contains(`Check your email`);
@@ -63,7 +57,7 @@ describe(`dashboard app login`, () => {
     cy.contains(`Dashboard`);
   });
 
-  it(`remembers where you were intending to go and brings you back there after login`, () => {
+  it(`redirects to intended location after login`, () => {
     cy.visit(`/users`);
     cy.url().should(`include`, `/login`);
     cy.get(`input[name=email]`).type(`82uii.betsy-mcstandard@inbox.testmail.app`);

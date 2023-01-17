@@ -17,7 +17,7 @@ const SelectUnlockRequestKeychain: React.FC = () => {
   const keychainsReq = useSelectableKeychains();
 
   const { adminId, selectedId } = useSelector((state) => ({
-    adminId: state.auth.admin?.id ?? ``,
+    adminId: state.auth.admin?.adminId ?? ``,
     selectedId: state.unlockRequests.selectedKeychainId,
   }));
 

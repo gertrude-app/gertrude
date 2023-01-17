@@ -1,11 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 import * as convert from '@dash/keys';
-import { RequestStatus } from '@dash/types';
-import type { UnlockRequest } from '@dash/types';
+import { Result } from '@dash/types';
+import type { UnlockRequest, RequestState } from '@dash/types';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
-import Result from '../api/Result';
-import { editable, Req } from './helpers';
+import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 
 export interface UnlockRequestsState {
@@ -58,7 +57,7 @@ export const slice = createSlice({
       state.denyComment = undefined;
       const unlockRequest = state.entities[meta.arg];
       if (unlockRequest) {
-        unlockRequest.status = RequestStatus.rejected;
+        unlockRequest.status = `rejected`;
       }
     });
 
@@ -76,7 +75,7 @@ export const slice = createSlice({
       state.selectedKeychainId = undefined;
       const unlockRequest = state.entities[meta.arg];
       if (unlockRequest) {
-        unlockRequest.status = RequestStatus.accepted;
+        unlockRequest.status = `accepted`;
       }
     });
 
@@ -129,17 +128,18 @@ export const slice = createSlice({
 export const acceptUnlockRequest = createResultThunk(
   `${slice.name}/acceptUnlockRequest`,
   async (id: UUID, { getState }) => {
-    const keyRecord = convert.toKeyRecord(getState().keychains.editingKey);
-    if (!keyRecord) {
-      return Result.unexpectedError();
+    const key = convert.toKeyRecord(getState().keychains.editingKey);
+    if (!key) {
+      return Result.unexpectedError(`dc0c35c2`, `Invalid key record`);
     }
-    const insert = await Current.api.keychains.upsertKeyRecord(editable(keyRecord, true));
+    const insert = await Current.api.saveKey({ isNew: true, ...key });
     if (insert.isError) {
       return insert;
     }
-    return Current.api.requests.updateUnlockRequest({
+    // TODO: make an `AcceptUnlockRequest` pair, to combine these
+    return Current.api.updateUnlockRequest({
       id,
-      status: RequestStatus.accepted,
+      status: `accepted`,
     });
   },
 );
@@ -148,9 +148,9 @@ export const rejectUnlockRequest = createResultThunk(
   `${slice.name}/rejectUnlockRequest`,
   (id: UUID, { getState }) => {
     const comment = getState().unlockRequests.denyComment?.trim();
-    return Current.api.requests.updateUnlockRequest({
+    return Current.api.updateUnlockRequest({
       id,
-      status: RequestStatus.rejected,
+      status: `rejected`,
       responseComment: comment || undefined,
     });
   },
@@ -158,17 +158,17 @@ export const rejectUnlockRequest = createResultThunk(
 
 export const getUnlockRequest = createResultThunk(
   `${slice.name}/getUnlockRequest`,
-  Current.api.requests.getUnlockRequest,
+  Current.api.getUnlockRequest,
 );
 
 export const getUsersUnlockRequests = createResultThunk(
   `${slice.name}/getUsersUnlockRequests`,
-  Current.api.requests.getUsersUnlockRequests,
+  Current.api.getUnlockRequests,
 );
 
 export const getUserUnlockRequests = createResultThunk(
   `${slice.name}/getUserUnlockRequests`,
-  Current.api.requests.getUserUnlockRequests,
+  Current.api.getUserUnlockRequests,
 );
 
 export const { detailsExpandedToggled, denyCommentUpdated, keychainSelected } =

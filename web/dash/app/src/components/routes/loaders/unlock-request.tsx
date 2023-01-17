@@ -35,7 +35,7 @@ export function useUnlockRequestLoader(id: UUID): EntityLoader<UnlockRequest> {
     return {
       state: `unresolved`,
       isError: true,
-      element: <ErrorModal entity="Unlock request" error={fetchReq.error} />,
+      element: <ErrorModal error={fetchReq.error} />,
     };
   }
 

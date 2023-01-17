@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { RequestStatus } from '@dash/types';
 import { isOlderThan } from '@dash/datetime';
 import {
   Modal,
@@ -49,7 +48,7 @@ const SuspendFilter: React.FC = () => {
   }
 
   if (fetchReq.state === `failed`) {
-    return <ErrorModal entity="Suspend filter request" error={fetchReq.error} />;
+    return <ErrorModal error={fetchReq.error} />;
   }
 
   const { payload } = fetchReq;
@@ -86,8 +85,7 @@ const SuspendFilter: React.FC = () => {
       icon="stopwatch"
       primaryButton={{
         label: `Grant`,
-        action: () =>
-          dispatch(updateSuspendFilterRequest({ id, status: RequestStatus.accepted })),
+        action: () => dispatch(updateSuspendFilterRequest({ id, status: `accepted` })),
         disabled:
           updateReq?.state === `ongoing` ||
           updateReq?.state === `succeeded` ||
@@ -97,8 +95,7 @@ const SuspendFilter: React.FC = () => {
       }}
       secondaryButton={{
         label: `Deny`,
-        action: () =>
-          dispatch(updateSuspendFilterRequest({ id, status: RequestStatus.rejected })),
+        action: () => dispatch(updateSuspendFilterRequest({ id, status: `rejected` })),
       }}
       onDismiss={goToDashboard}
     >

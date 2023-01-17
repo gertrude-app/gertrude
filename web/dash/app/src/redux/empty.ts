@@ -1,9 +1,6 @@
-import { RequestStatus } from '@dash/types';
-import type { UnlockRequest } from '@dash/types';
-import type { Keychain } from '@dash/keys';
-import type { User } from '../api/users';
+import type { KeychainSummary, UnlockRequest, User } from '@dash/types';
 
-export function keychain(id: UUID, adminId: UUID): Keychain {
+export function keychain(id: UUID, adminId: UUID): KeychainSummary {
   return {
     id,
     name: ``,
@@ -24,6 +21,7 @@ export function user(id: UUID): User {
     screenshotsFrequency: 120,
     keychains: [],
     devices: [],
+    createdAt: new Date().toISOString(),
   };
 }
 
@@ -32,7 +30,7 @@ export function unlockRequest(id: UUID, userId: UUID): UnlockRequest {
     id,
     userId,
     userName: ``,
-    status: RequestStatus.pending,
+    status: `pending`,
     appCategories: [],
     createdAt: new Date().toISOString(),
   };

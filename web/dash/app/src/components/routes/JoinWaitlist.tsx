@@ -1,5 +1,6 @@
 import React from 'react';
 import { FullscreenModalForm, EmailInputForm } from '@dash/components';
+import type { RequestState } from '@dash/types';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import { emailUpdated, joinWaitlist } from '../../redux/slice-signup';
 
@@ -57,7 +58,7 @@ const JoinWaitlistContainer: React.FC = () => {
       request={request}
       email={email}
       setEmail={(email) => dispatch(emailUpdated(email))}
-      submit={() => dispatch(joinWaitlist(email))}
+      submit={() => dispatch(joinWaitlist({ email }))}
     />
   );
 };

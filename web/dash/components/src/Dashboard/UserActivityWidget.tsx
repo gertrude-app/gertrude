@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { Button } from '@shared/components';
 import { writable } from '@dash/utils';
-import type { DashboardWidgetData } from '@dash/types';
+import type { GetDashboardWidgets } from '@dash/types';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
 type Props = {
-  userActivity: DashboardWidgetData['userActivity'];
+  userActivity: GetDashboardWidgets.Output['userActivitySummaries'];
   className?: string;
 };
 
@@ -60,7 +60,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
           <UnreviewedItemsCard
             key={activity.id}
             userId={activity.id}
-            userName={activity.userName}
+            userName={activity.name}
             numUnreviewed={activity.numUnreviewed}
           />
         ))}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ApiErrorMessage, FullscreenModalForm, LoginForm } from '@dash/components';
 import { Navigate } from 'react-router-dom';
+import type { RequestState } from '@dash/types';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   loginEmailUpdated,

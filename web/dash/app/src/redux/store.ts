@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import type { JSXElementConstructor } from 'react';
+import type { PqlError } from '@dash/types';
 import type React from 'react';
 import signupReducer from './slice-signup';
 import menuReducer from './slice-menu';
@@ -41,7 +42,7 @@ export type QueriedProps<Component extends JSXElementConstructor<any>> =
   | { state: 'shouldFetch' }
   | { state: 'ongoing' }
   | { state: 'entityDeleted'; redirectUrl: string }
-  | { state: 'failed'; error?: ApiError }
+  | { state: 'failed'; error?: PqlError }
   | { state: 'resolved'; props: React.ComponentProps<Component> };
 
 export type QueryProps<Component extends JSXElementConstructor<any>, ExtraArg = void> = (

@@ -9,7 +9,8 @@
   },
   "devDependencies": {
     "@dash/types": "workspace:*",
-    "@types/dash-ambient": "workspace:*"
+    "@types/dash-ambient": "workspace:*",
+    "@types/node": "18.11.9"
   },
   "dependencies": {
     "parse-domain": "7.0.1"

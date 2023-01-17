@@ -75,7 +75,7 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
     }
 
     if (!keychain) {
-      return [Query.unexpectedError(), false];
+      return [Query.unexpectedError(`42f173f9`, `missing keychain`), false];
     }
 
     return [

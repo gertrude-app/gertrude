@@ -1,22 +1,5 @@
-import type { SubscriptionStatus, Trigger } from './api';
-
-export interface Admin {
-  email: string;
-  subscriptionStatus: SubscriptionStatus;
-}
-
-export interface AdminIds {
-  id: UUID;
-  token: UUID;
-}
-
-export interface AdminNotificationMethod {
-  id: UUID;
-  data:
-    | { type: `email`; email: string }
-    | { type: `text`; phoneNumber: string }
-    | { type: `slack`; token: string; channelName: string; channelId: string };
-}
+import type { RequestState } from './utility';
+import type { CreatePendingNotificationMethod } from './';
 
 export type NewAdminNotificationMethodEvent =
   | { type: 'create_clicked' }
@@ -29,16 +12,13 @@ export type NewAdminNotificationMethodEvent =
   | { type: 'slack_channel_id_updated'; channelId: string }
   | { type: 'slack_token_updated'; token: string }
   | { type: 'text_phone_number_updated'; phoneNumber: string }
-  | { type: 'method_type_updated'; methodType: AdminNotificationMethod['data']['type'] };
+  | {
+      type: 'method_type_updated';
+      methodType: CreatePendingNotificationMethod.Input['type'];
+    };
 
 export type PendingNotificationMethod = {
   sendCodeRequest: RequestState<UUID>;
   confirmationRequest: RequestState;
   confirmationCode: string;
-} & AdminNotificationMethod['data'];
-
-export interface Notification {
-  id: UUID;
-  trigger: Trigger;
-  methodId: UUID;
-}
+} & CreatePendingNotificationMethod.Input;

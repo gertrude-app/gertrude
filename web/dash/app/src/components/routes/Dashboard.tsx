@@ -31,7 +31,7 @@ const DashboardRoute: React.FC = () => {
 export default DashboardRoute;
 
 export const queryProps: QueryProps<typeof Dashboard> = (dispatch) => (state) => {
-  const adminId = state.auth.admin?.id ?? ``;
+  const adminId = state.auth.admin?.adminId ?? ``;
   const request = state.dashboard.request;
   if (request.state !== `succeeded`) {
     return [Req.toUnresolvedQuery(request), request.state !== `failed`];

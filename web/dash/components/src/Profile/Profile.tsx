@@ -3,12 +3,13 @@ import cx from 'classnames';
 import { TextInput, Button } from '@shared/components';
 import { isUnsaved } from '@dash/utils';
 import type {
-  Trigger,
-  SubscriptionStatus,
+  AdminSubscriptionStatus,
+  AdminNotificationTrigger,
   PendingNotificationMethod,
   Subcomponents,
   ConfirmableEntityAction,
   NewAdminNotificationMethodEvent,
+  RequestState,
 } from '@dash/types';
 import { ConfirmDeleteEntity } from '../Modal';
 import EmptyState from '../EmptyState';
@@ -21,13 +22,13 @@ import NotificationMethod from './NotificationMethod';
 export type NotificationUpdate = { id: UUID } & (
   | { type: 'startEditing' }
   | { type: 'cancelEditing' }
-  | { type: 'changeTrigger'; trigger: Trigger }
+  | { type: 'changeTrigger'; trigger: AdminNotificationTrigger }
   | { type: 'changeMethod'; methodId: UUID }
 );
 
 interface Props {
   email: string;
-  status: SubscriptionStatus;
+  status: AdminSubscriptionStatus;
   billingPortalRequest: RequestState<string>;
   pendingMethod?: PendingNotificationMethod;
   methods: Subcomponents<typeof NotificationMethod>;
@@ -194,14 +195,16 @@ const Profile: React.FC<Props> = ({
 
 export default Profile;
 
-const AccountStatusBadge: React.FC<{ status: SubscriptionStatus }> = ({ status }) => (
+const AccountStatusBadge: React.FC<{ status: AdminSubscriptionStatus }> = ({
+  status,
+}) => (
   <PillBadge type={statusType(status)} className="absolute right-2 top-2">
     {statusText(status)}
   </PillBadge>
 );
 
 function statusType(
-  status: SubscriptionStatus,
+  status: AdminSubscriptionStatus,
 ): React.ComponentProps<typeof PillBadge>['type'] {
   switch (status) {
     case `active`:
@@ -222,7 +225,7 @@ function statusType(
   }
 }
 
-function statusText(status: SubscriptionStatus): string {
+function statusText(status: AdminSubscriptionStatus): string {
   switch (status) {
     case `active`:
     case `canceled`:

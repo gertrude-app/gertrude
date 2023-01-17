@@ -39,7 +39,6 @@ clean:
 
 codegen:
 	cd dash/app && node ./scripts/codegen.js
-	bash ./dash/app/scripts/fix-imports.sh
 
 # build & deploy
 

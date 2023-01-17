@@ -1,86 +1,180 @@
 #!/usr/bin/env node
+
 // @ts-check
 import fs from 'fs';
-import glob from 'glob';
+import fetch from 'node-fetch';
 import xExec from 'x-exec';
-import { c, log, green } from 'x-chalk';
 
 // @ts-ignore
 const exec = xExec.default;
 
-const numSteps = 4;
-let step = 1;
-let success = true;
+async function main() {
+  clean();
+
+  const { shared, pairs } = await getData();
+  const globalNames = Object.keys(shared).filter((name) => name !== `ClientAuth`);
+  globalNames.push(`SuccessOutput`);
+
+  let sharedFile = Object.values(shared).join(`\n\n`);
+  sharedFile = sortShared(spaced(SUCCESS_OUTPUT, sharedFile));
+  fs.writeFileSync(
+    `${PKG_DIR}/shared.ts`,
+    spaced(`// auto-generated, do not edit`, sharedFile),
+  );
+
+  const indexLines = [
+    `// auto-generated, do not edit`,
+    `export { default as Result } from './Result';`,
+    `export * from './shared';`,
+  ];
+
+  const ordered = Object.entries(pairs).sort(([a], [b]) => a.localeCompare(b));
+
+  for (const [pairName, { pair }] of ordered) {
+    const globals /** @type string[] */ = [];
+    for (const typeName of globalNames) {
+      const regex = new RegExp(`\\b${typeName}\\b`);
+      if (
+        pair.match(regex) &&
+        !pair.includes(`'${typeName}'`) &&
+        !pair.includes(`interface ${typeName}`)
+      ) {
+        globals.push(typeName);
+      }
+    }
+
+    let sharedImport = ``;
+    if (globals.length > 0) {
+      sharedImport = `import type { ${globals.join(`, `)} } from '../shared';\n`;
+    }
+    fs.writeFileSync(
+      `${PKG_DIR}/pairs/${pairName}.ts`,
+      `// auto-generated, do not edit\n` + spaced(sharedImport, expand(pair)),
+    );
+
+    indexLines.push(`export * from './pairs/${pairName}';`);
+  }
+
+  fs.writeFileSync(`${PKG_DIR}/index.ts`, indexLines.join(`\n`));
+
+  const liveClientMethods /** @type string[] */ = [];
+  const throwingClientLines /** @type string[] */ = [];
+
+  for (const [pairName, { fetcher }] of ordered) {
+    const methodName = uncapitalize(pairName).replace(/_.*$/, ``);
+    liveClientMethods.push(fetcher);
+    throwingClientLines.push(
+      `  ${methodName}: () => { throw new Error(\`ApiClient.${methodName}() not implemented\`); },`,
+    );
+  }
+
+  const clientFileLines = [
+    `// auto-generated, do not edit`,
+    `import type * as T from '@dash/types'`,
+    `import { query } from './query';`,
+    ``,
+    `export const liveClient = {`,
+    liveClientMethods.join(`,\n\n`),
+    `};`,
+    ``,
+    `export type ApiClient = typeof liveClient;`,
+    ``,
+    `export const throwingClient: ApiClient = {`,
+    ...throwingClientLines,
+    `};`,
+    ``,
+  ];
+
+  fs.writeFileSync(`${APP_DIR}/client.ts`, clientFileLines.join(`\n`));
+
+  // prettier the codegen'd files
+  exec.exit(`${PRETTIER_FORMAT} ${APP_DIR}/*.ts`);
+  exec.exit(`${PRETTIER_FORMAT} ${PKG_DIR}/*.ts`);
+  exec.exit(`${PRETTIER_FORMAT} ${PKG_DIR}/pairs/*.ts`);
+}
+
+function clean() {
+  exec(`mv ${PKG_DIR}/Result.ts ${PKG_DIR}/../Result.ts`);
+  exec(`rm -rf ${PKG_DIR}`);
+  exec(`mkdir -p ${PKG_DIR}`);
+  exec(`mkdir -p ${PKG_DIR}/pairs`);
+  exec(`mv ${PKG_DIR}/../Result.ts ${PKG_DIR}/Result.ts`);
+}
+
+/**
+ * @returns {Promise<{
+ *   shared: Record<string, string>;
+ *   pairs: Record<string, { pair: string, fetcher: string }>;
+ * }>}
+ */
+async function getData() {
+  let endpoint = `http://127.0.0.1:8082/dashboard-ts-codegen`;
+  const endpointIndex = process.argv.indexOf(`--endpoint`);
+  if (endpointIndex !== -1) {
+    endpoint = process.argv[endpointIndex + 1];
+  }
+
+  const res = await fetch(endpoint);
+
+  /** @type {any} */
+  const json = await res.json();
+  return json;
+}
+
+/**
+ * @param {string} s
+ * @returns {string}
+ */
+function uncapitalize(s) {
+  return s.charAt(0).toLowerCase() + s.slice(1);
+}
+
+/**
+ * @param {string[]} strings
+ * @returns {string}
+ */
+function spaced(...strings) {
+  return strings.join(`\n\n`);
+}
+
+/**
+ * @param {string} paircode
+ * @returns {string}
+ */
+function expand(paircode) {
+  return paircode.replace(/Array<{ /g, `Array<{\n`).replace(/{ /g, `{\n`);
+}
+
+/**
+ * @param {string} code
+ * @returns {string}
+ */
+function sortShared(code) {
+  const parts = code.split(`\n\n`).map((chunk) => {
+    const lines = chunk.split(`\n`);
+    const firstLine = lines[0];
+    const typeName = firstLine.replace(/export (:?type|interface|enum) ([^ ]+) .*/, `$2`);
+    return { typeName, chunk };
+  });
+  parts.sort((a, b) => a.typeName.localeCompare(b.typeName));
+  return parts.map((p) => p.chunk).join(`\n\n`);
+}
+
 const CWD = process.cwd();
+const APP_DIR = `${CWD}/src/pairql`;
+const PKG_DIR = `${CWD}/../types/src/pairql`;
 
-let endpoint = `http://127.0.0.1:8080/graphql/dashboard`;
-const endpointIndex = process.argv.indexOf(`--endpoint`);
-if (endpointIndex !== -1) {
-  endpoint = process.argv[endpointIndex + 1];
+const SUCCESS_OUTPUT = `
+export interface SuccessOutput {
+  success: boolean;
 }
+`.trim();
 
-const TYPES_PATH = `../types/src/api.ts`;
-exec(`rm -f ${CWD}/${TYPES_PATH}`);
-glob.sync(`${CWD}/**/__generated__/**/*`).forEach((path) => exec(`rm -f ${path}`));
+const PRETTIER_FORMAT = [
+  `${CWD}/../../node_modules/.bin/prettier`,
+  `--config`,
+  `${CWD}/../../.prettierrc.json`,
+  `--write`,
+].join(` `);
 
-log(c`{gray ${step++}/${numSteps}} {magenta Downloading schema...}`);
-success = exec.out(
-  `apollo client:download-schema --endpoint=${endpoint} ./schema.graphql`,
-  CWD,
-);
-
-if (!success) {
-  log(``);
-  process.exit(1);
-}
-
-log(c`{gray ${step++}/${numSteps}} {magenta Downloading types...}`);
-success = exec.out(
-  `npx apollo client:codegen
-    --passthroughCustomScalars
-    --localSchemaFile=schema.graphql
-    --globalTypesFile=${TYPES_PATH}
-    --target=typescript
-    --tagName=gql`.replace(/\n {4}/g, ` `),
-  CWD,
-);
-
-if (!success) {
-  log(``);
-  process.exit(1);
-}
-
-log(c`{gray ${step++}/${numSteps}} {magenta Cleaning up...}`);
-exec(`rm -f schema.graphql`, CWD);
-
-exec(`rmdir __generated__`, CWD);
-
-// prettier the codegen'd files
-const PRETTIER_FORMAT = `${CWD}/../../node_modules/.bin/prettier --config ${CWD}/../../.prettierrc.json --write`;
-exec.exit(`${PRETTIER_FORMAT} ${TYPES_PATH}`);
-const typeDirs = glob.sync(`${CWD}/**/__generated__/`);
-typeDirs.forEach((path) => exec.exit(`${PRETTIER_FORMAT} ${path}`));
-
-log(c`{gray ${step++}/${numSteps}} {magenta Converting dates to string...}`);
-convertDatesToString();
-
-green(`\nCodegen complete!\n`);
-process.exit(0);
-
-function convertDatesToString() {
-  const files = glob.sync(`${CWD}/**/__generated__/**/*.ts`);
-
-  if (files.length === 0) {
-    process.stderr.write(`No graphql files found by \`fix-timestamp-types.js\` script\n`);
-    process.stderr.write(`Did you run the script from outside the project root?\n`);
-    process.exit(1);
-  }
-
-  for (const file of files) {
-    const content = fs.readFileSync(file, `utf-8`);
-    fs.writeFileSync(file, content.replace(/: Date( \| null)?;/gm, `: string$1;`));
-  }
-}
-
-// 👋 NOTE: the `make codegen` cmd also invokes ./fix-imports.sh, which for
-// some reason doesn't work when i invoke it from node with exec()
+main();
