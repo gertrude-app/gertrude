@@ -22,22 +22,12 @@ describe(`unlock request flow`, () => {
     selectable = { own: [keychain], public: [] };
     unlockRequest = mock.unlockRequest({ id: `2`, userId: `1` });
 
-    cy.intercept(`/pairql/dashboard/GetUnlockRequest`, (req) => {
-      req.reply(unlockRequest);
-    });
-
-    cy.intercept(`/pairql/dashboard/GetUser`, (req) => {
-      req.reply(user);
-    });
-
-    cy.intercept(`/pairql/dashboard/GetIdentifiedApps`, (req) => {
-      req.reply([mock.identifiedApp()]);
-    });
-
-    cy.intercept(`/pairql/dashboard/GetSelectableKeychains`, (req) => {
-      req.reply(selectable);
-    });
-
+    cy.intercept(`/pairql/dashboard/GetUnlockRequest`, (req) => req.reply(unlockRequest));
+    cy.intercept(`/pairql/dashboard/GetUser`, (req) => req.reply(user));
+    cy.intercept(`/pairql/dashboard/GetIdentifiedApps`, [mock.identifiedApp()]);
+    cy.intercept(`/pairql/dashboard/GetSelectableKeychains`, (req) =>
+      req.reply(selectable),
+    );
     cy.intercept(`/pairql/dashboard/SaveKey`, { success: true });
     cy.intercept(`/pairql/dashboard/UpdateUnlockRequest`, (req) => {
       req.alias = `updateUnlockRequest`;
@@ -157,15 +147,14 @@ describe(`unlock request flow`, () => {
   });
 
   it(`includes public keychains by admin`, () => {
-    localStorage.setItem(`admin_id`, betsy.id);
-
     const htc = mock.keychainSummary({
       isPublic: true,
       authorId: betsy.id, // <--  admin owns the public keychain
       name: `HTC`,
     });
 
-    selectable = { own: [keychain], public: [htc] };
+    selectable = { own: [keychain, htc], public: [htc] };
+    user = mock.user({ id: `1`, keychains: [keychain, htc] });
     cy.visit(`/users/1/unlock-requests/2/select-keychain`);
     cy.contains(`HTC`);
   });

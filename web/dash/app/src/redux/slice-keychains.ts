@@ -14,11 +14,9 @@ import editKeyReducer from './edit-key-reducer';
 export interface KeychainsState {
   fetchAdminKeychainRequest: Record<UUID, RequestState>;
   updateAdminKeychainRequest: Record<UUID, RequestState>;
-
   listAdminKeychainsRequest: RequestState;
   entities: Record<UUID, Editable<KeychainSummary>>;
   fetchSelectableKeychainsRequest: RequestState;
-
   saveKeyRecordRequest: RequestState;
   keyRecords: Record<UUID, Editable<Key>>;
   editingKey?: EditKey.State;

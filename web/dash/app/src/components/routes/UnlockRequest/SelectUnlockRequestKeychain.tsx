@@ -48,8 +48,8 @@ const SelectUnlockRequestKeychain: React.FC = () => {
   const keychains = keychainsReq.payload;
   const userKeychainIds = user.original.keychains.map((keychain) => keychain.id);
   const selectableKeychains = keychains.own
-    .filter((keychain) => userKeychainIds.includes(keychain.id))
-    .concat(keychains.public.filter((keychain) => keychain.authorId === adminId));
+    .filter((kc) => userKeychainIds.includes(kc.id))
+    .concat(keychains.public.filter((kc) => kc.authorId === adminId));
 
   return (
     <Modal
