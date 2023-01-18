@@ -110,7 +110,14 @@ const UserCard: React.FC<Props> = ({
       </div>
     </div>
     <div className="flex rounded-b-xl p-3 space-x-3">
-      <Button type="link" color="tertiary" to={id} small className="flex-grow">
+      <Button
+        type="link"
+        color="tertiary"
+        to={id}
+        testId="edit-user"
+        small
+        className="flex-grow"
+      >
         <i className="fa-solid fa-pen mr-2" /> Edit
       </Button>
       <Button
