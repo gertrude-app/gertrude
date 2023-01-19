@@ -76,7 +76,12 @@ describe(`upsertUser`, () => {
     await upsertUser(`user123`)(dispatch, getState);
 
     expect(Current.api.saveUser).toHaveBeenCalledWith({
-      ...user.draft,
+      id: user.draft.id,
+      name: user.draft.name,
+      keyloggingEnabled: user.draft.keyloggingEnabled,
+      screenshotsEnabled: user.draft.screenshotsEnabled,
+      screenshotsFrequency: user.draft.screenshotsFrequency,
+      screenshotsResolution: user.draft.screenshotsResolution,
       isNew: false,
       keychainIds: [`keychain1`],
     });

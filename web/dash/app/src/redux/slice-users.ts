@@ -314,7 +314,12 @@ export const upsertUser = createResultThunk(
     }
 
     return Current.api.saveUser({
-      ...user.draft,
+      id: user.draft.id,
+      name: user.draft.name,
+      keyloggingEnabled: user.draft.keyloggingEnabled,
+      screenshotsEnabled: user.draft.screenshotsEnabled,
+      screenshotsFrequency: user.draft.screenshotsFrequency,
+      screenshotsResolution: user.draft.screenshotsResolution,
       isNew: user.isNew ?? false,
       keychainIds: user.draft.keychains.map(({ id }) => id),
     });
