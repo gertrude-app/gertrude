@@ -146,7 +146,7 @@ describe(`deleteActivityItems`, () => {
           numDeleted: 0,
           items: {
             item1: mock.keystrokeLine({ id: `item1` }),
-            item2: mock.keystrokeLine({ id: `item2` }),
+            item2: mock.keystrokeLine({ id: `item2`, ids: [`item2`, `item3`] }),
           },
         }),
       };
@@ -155,12 +155,12 @@ describe(`deleteActivityItems`, () => {
     deleteActivityItems({
       userId: `user123`,
       date: new Date(`01-01-2022`),
-      itemRootIds: [`item1`],
+      itemRootIds: [`item2`],
     })(vi.fn(), getState);
 
     expect(Current.api.deleteActivityItems).toHaveBeenCalledWith({
       userId: `user123`,
-      keystrokeLineIds: [`item1`],
+      keystrokeLineIds: [`item2`, `item3`], // <-- deletes BOTH ids
       screenshotIds: [],
     });
   });

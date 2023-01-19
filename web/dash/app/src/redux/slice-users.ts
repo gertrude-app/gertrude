@@ -330,13 +330,13 @@ export const deleteActivityItems = createResultThunk(
       return Result.unexpectedError(`3a29c2c2`, `ActivityDay data not found`);
     }
 
-    const keystrokeLineIds: UUID[] = [];
+    let keystrokeLineIds: UUID[] = [];
     const screenshotIds: UUID[] = [];
 
     for (const id of arg.itemRootIds) {
       const item = day.items[id];
       if (item?.type === `KeystrokeLine`) {
-        keystrokeLineIds.push(item.id);
+        keystrokeLineIds = [...keystrokeLineIds, ...item.ids];
       } else if (item?.type === `Screenshot`) {
         screenshotIds.push(item.id);
       }
