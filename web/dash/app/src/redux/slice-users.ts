@@ -314,7 +314,12 @@ export const upsertUser = createResultThunk(
     }
 
     return Current.api.saveUser({
-      ...user.draft,
+      id: user.draft.id,
+      name: user.draft.name,
+      keyloggingEnabled: user.draft.keyloggingEnabled,
+      screenshotsEnabled: user.draft.screenshotsEnabled,
+      screenshotsFrequency: user.draft.screenshotsFrequency,
+      screenshotsResolution: user.draft.screenshotsResolution,
       isNew: user.isNew ?? false,
       keychainIds: user.draft.keychains.map(({ id }) => id),
     });
@@ -330,13 +335,13 @@ export const deleteActivityItems = createResultThunk(
       return Result.unexpectedError(`3a29c2c2`, `ActivityDay data not found`);
     }
 
-    const keystrokeLineIds: UUID[] = [];
+    let keystrokeLineIds: UUID[] = [];
     const screenshotIds: UUID[] = [];
 
     for (const id of arg.itemRootIds) {
       const item = day.items[id];
       if (item?.type === `KeystrokeLine`) {
-        keystrokeLineIds.push(item.id);
+        keystrokeLineIds = [...keystrokeLineIds, ...item.ids];
       } else if (item?.type === `Screenshot`) {
         screenshotIds.push(item.id);
       }
