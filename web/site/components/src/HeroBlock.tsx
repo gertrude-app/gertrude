@@ -10,7 +10,7 @@ const HeroBlock: React.FC = () => {
             `lg:text-6xl text-5xl font-extrabold text-center leading-[120%] text-white text-opacity-60`,
           )}
         >
-          Finally, real{' '}
+          Finally, real{` `}
           <span className="text-white text-opacity-90">internet safety</span>
           {` `}
           is possible

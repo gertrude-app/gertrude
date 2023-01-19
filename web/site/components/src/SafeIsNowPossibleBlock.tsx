@@ -1,12 +1,13 @@
 import React from 'react';
 import Feature from './Feature';
+import GlowEffect from './GlowEffect';
 
 const SafeIsNowPossibleBlock: React.FC = () => {
   return (
     <section className="bg-gray-100 bg-topo">
       <section className="relative">
-        <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -right-96 top-0 z-10" />
-        <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-96 top-128 z-10" />
+        <GlowEffect className="-right-96 top-0" />
+        <GlowEffect className="-left-96 top-128" />
         <div className="lg:p-20 p-10 py-20">
           <h2 className="font-inter text-5xl">
             Safe is now{` `}

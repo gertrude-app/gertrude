@@ -5,7 +5,6 @@ const TestimonialsBlock: React.FC = () => {
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   return (
     <section className="bg-gray-50 relative h-[28rem] sm:h-[24rem] flex justify-center items-center overflow-hidden">
-      <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-52 -bottom-96 z-10" />
       <div className="absolute bottom-12 flex space-x-2">
         <div
           className={`relative z-20 w-3 h-3 transition duration-100 cursor-pointer hover:scale-110 rounded-full ${

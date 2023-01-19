@@ -165,7 +165,7 @@ const Layout: React.FC<Props> = ({ children, title, tableOfContents }) => {
                             isActive(section)
                               ? `text-violet-300`
                               : `text-slate-500 hover:text-slate-300`,
-                            'font-medium transition duration-100',
+                            `font-medium transition duration-100`,
                           )}
                         >
                           {section.title}
@@ -182,7 +182,7 @@ const Layout: React.FC<Props> = ({ children, title, tableOfContents }) => {
                                     isActive(subSection)
                                       ? `text-violet-300`
                                       : `hover:text-slate-300 text-slate-500`,
-                                    'transition duration-100 font-medium',
+                                    `transition duration-100 font-medium`,
                                   )}
                                 >
                                   {subSection.title}
