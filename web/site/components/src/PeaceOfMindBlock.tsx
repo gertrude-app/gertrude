@@ -9,7 +9,7 @@ const PeaceOfMindBlock: React.FC = () => {
       style={{
         background: `linear-gradient(to bottom right, #f7f8fA 50%, white 50%)`,
       }}
-      className="relative"
+      className="relative pt-8"
     >
       <GlowEffect className="-left-96 -bottom-112" />
       <GlowEffect className="-right-96" />
