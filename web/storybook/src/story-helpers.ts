@@ -1,5 +1,13 @@
 import { env } from '@shared/components';
 import type { ConfirmableEntityAction, KeychainSummary, Key } from '@dash/types';
+import Placeholder400x600 from './static/placeholder/400x600.png';
+import Placeholder300x200 from './static/placeholder/300x200.png';
+import Placeholder400x200 from './static/placeholder/400x200.png';
+import Placeholder500x300 from './static/placeholder/500x300.png';
+import Placeholder700x200 from './static/placeholder/700x200.png';
+import Placeholder800x600 from './static/placeholder/800x600.png';
+import Placeholder800x900 from './static/placeholder/800x900.png';
+import Placeholder1200x400 from './static/placeholder/1200x400.png';
 
 export function keychainProps(override: Partial<KeychainSummary> = {}): KeychainSummary {
   return {
@@ -14,11 +22,18 @@ export function keychainProps(override: Partial<KeychainSummary> = {}): Keychain
 }
 
 export function testImgUrl(width: number, height: number): string {
-  // placekitten is random, so it causes false positives for visual regression tests
-  if (env.isScreenshotTest()) {
-    return `https://fakeimg.pl/${width}x${height}/31235d/fff/`;
+  if (!env.isScreenshotTest()) {
+    return `https://placekitten.com/${width}/${height}`;
   }
-  return `https://placekitten.com/${width}/${height}`;
+
+  const key = `${width}x${height}`;
+  const placeholder = PLACEHOLDERS[key];
+  if (!placeholder) {
+    throw new Error(
+      `No deterministic placeholder image for size \`${key}\`. Use an existing supported size, or add a new one.`,
+    );
+  }
+  return placeholder;
 }
 
 export function withIds<T>(items: T[]): Array<T & { id: UUID }> {
@@ -188,3 +203,14 @@ export const keychains = [
     description: `Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
   }),
 ];
+
+const PLACEHOLDERS: Record<string, string> = {
+  '400x600': Placeholder400x600,
+  '300x200': Placeholder300x200,
+  '400x200': Placeholder400x200,
+  '500x300': Placeholder500x300,
+  '700x200': Placeholder700x200,
+  '800x600': Placeholder800x600,
+  '800x900': Placeholder800x900,
+  '1200x400': Placeholder1200x400,
+};

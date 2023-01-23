@@ -44,12 +44,12 @@ Chunked.args = {
   items: [
     keystrokeLine(`Xcode`, `import Foundation`),
     keystrokeLine(`Brave`, `Hello world`),
-    screenshot(600, 200),
+    screenshot(700, 200),
     keystrokeLine(`Xcode`, `import Foundation`),
-    screenshot(600, 200),
+    screenshot(700, 200),
     keystrokeLine(`Brave`, `Hello world`),
-    screenshot(600, 200),
-    screenshot(600, 200),
+    screenshot(700, 200),
+    screenshot(700, 200),
     keystrokeLine(`Xcode`, `import Foundation`),
   ],
 };
@@ -75,7 +75,7 @@ function keystrokeLine(appName: string, line: string, deleted?: boolean): Activi
   };
 }
 
-function screenshot(width = 800, height = 270, deleted?: boolean): ActivityItem {
+function screenshot(width = 800, height = 600, deleted?: boolean): ActivityItem {
   return {
     ...common(),
     type: `Screenshot`,
