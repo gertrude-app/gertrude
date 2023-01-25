@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import cx from 'classnames';
+import { useIntersectionObserver } from '../../app/lib/hooks';
 
 interface Props {
   children: string;
@@ -9,38 +10,16 @@ interface Props {
 }
 
 const Feature: React.FC<Props> = ({ children, icon, side, heading }) => {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const options: IntersectionObserverInit = {
-      rootMargin: `0px`,
-      threshold: 0.75,
-    };
-
-    const observer = new IntersectionObserver((entries, observer) => {
-      entries.forEach((entry) => {
-        setVisible(entry.isIntersecting);
-        if (entry.isIntersecting) {
-          observer.unobserve(entry.target);
-        }
-      });
-    }, options);
-
-    if (ref.current) observer.observe(ref.current);
-
-    const cur = ref.current;
-
-    return () => {
-      if (cur) observer.unobserve(cur);
-    };
-  }, [ref]);
+  const { ref, intersected } = useIntersectionObserver({
+    rootMargin: `0px`,
+    threshold: 0.75,
+  });
 
   return (
     <div
       className={cx(
         `m-6 transition duration-200 flex items-center relative z-20`,
-        visible
+        intersected
           ? cx(`opacity-100`, side === `left` ? `md:-rotate-3` : `md:rotate-3`)
           : `opacity-0 scale-90 translate-y-6`,
         side === `left` ? `lg:mr-96 flex-row-reverse` : `lg:ml-96 flex-row`,

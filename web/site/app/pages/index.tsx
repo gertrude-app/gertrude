@@ -2,7 +2,7 @@ import {
   CTABlock,
   DefenseInDepthBlock,
   HeroBlock,
-  LosingBattleBlock,
+  LosingGameBlock,
   MainFooter,
   MainHeader,
   PeaceOfMindBlock,
@@ -16,7 +16,7 @@ const Home: NextPage = () => (
     <MainHeader />
     <HeroBlock />
     <PeaceOfMindBlock />
-    <LosingBattleBlock />
+    <LosingGameBlock />
     <SafeIsNowPossibleBlock />
     <DefenseInDepthBlock />
     <TestimonialsBlock />

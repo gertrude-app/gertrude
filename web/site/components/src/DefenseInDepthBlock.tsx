@@ -1,10 +1,11 @@
 import React from 'react';
+import GlowEffect from './GlowEffect';
 
 const DefenseInDepthBlock: React.FC = () => (
-  <section className="bg-gradient-to-b from-gray-900 to-gray-800 px-10 md:px-16 pt-16 md:pt-28 pb-12 flex items-center flex-col relative overflow-hidden">
-    <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -right-128 -top-72 z-20" />
-    <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-20 -bottom-128 z-20" />
-    <div className="w-176 h-176 absolute bg-fuchsia-radial-gradient -left-72 -bottom-96 z-20" />
+  <section className="bg-gradient-to-b from-slate-900 to-slate-800 px-10 md:px-16 pt-16 md:pt-28 pb-12 flex items-center flex-col relative overflow-hidden">
+    <GlowEffect className="-right-128 -top-72 z-20" />
+    <GlowEffect className="-left-20 -bottom-128 z-20" />
+    <GlowEffect className="-left-72 -bottom-96 z-20" />
     <div className="flex flex-row flex-wrap justify-center md:justify-center items-center mb-8 sm:mb-16 relative">
       <IconCircle icon="lock" />
       <IconCircle icon="binoculars" />
@@ -36,7 +37,7 @@ interface IconCircleProps {
 }
 
 const IconCircle: React.FC<IconCircleProps> = ({ icon }) => (
-  <div className="md:w-32 w-24 md:h-32 h-24 rounded-full bg-gray-800 flex items-center justify-center my-2 sm:my-0 mx-3 sm:mx-10 shadow-2xl relative">
+  <div className="md:w-32 w-24 md:h-32 h-24 rounded-full bg-slate-800 flex items-center justify-center my-2 sm:my-0 mx-3 sm:mx-10 shadow-2xl relative">
     <i
       aria-hidden
       className={`fa fa-${icon} text-4xl md:text-5xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent`}

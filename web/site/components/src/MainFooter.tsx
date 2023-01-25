@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Logo } from '@shared/components';
 
 const MainFooter: React.FC = () => (
-  <footer className="bg-gray-900">
+  <footer className="bg-slate-900">
     <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-start p-8 xs:p-12">
       <Link href="/">
         <Logo type="on-dark" />
