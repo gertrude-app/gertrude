@@ -47,9 +47,10 @@ No. It only works for _Mac computers._ This is primarily because I built Gertrud
 originally for myself, and I only needed a solution for the computers where my kids did
 their homework. I already had a very reliable way of keeping them safe on a
 phone&mdash;don't give them one. When I finally got my 16+ year old a phone, I protected
-it using the Apple ScreenTime feature, which is very effective, although a real pain to
-setup. I hope to have an article coming soon with details on how to fully secure an iPhone
-with ScreenTime.
+it using the Apple Screen Time feature, which is very effective, although difficult to
+setup. Check out our
+[guide to locking down an iPhone](/docs/definitive-guide-to-locking-down-an-iphone) for
+more information.
 
 ## I can't access the internet on my admin user account
 

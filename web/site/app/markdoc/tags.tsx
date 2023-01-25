@@ -20,6 +20,7 @@ const tags = {
     attributes: {
       src: { type: String },
       caption: { type: String },
+      alt: { type: String },
     },
     render: ArticleImage,
   },

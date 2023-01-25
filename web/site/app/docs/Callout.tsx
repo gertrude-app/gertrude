@@ -25,7 +25,7 @@ const icons = {
 
 interface Props {
   type: 'note' | 'warning';
-  title: string;
+  title?: string;
   children: React.ReactNode;
 }
 
@@ -35,10 +35,14 @@ const Callout: React.FC<Props> = ({ type, title, children }) => {
     <span className={cx(`my-8 flex rounded-3xl p-6`, styles[type].container)}>
       <IconComponent className="h-8 w-8 flex-none" />
       <span className="ml-4 flex-auto">
-        <span className={cx(`font-lexend m-0 block text-xl`, styles[type].title)}>
-          {title}
-        </span>
-        <span className={cx(`prose mt-2.5 block`, styles[type].body)}>{children}</span>
+        {title && (
+          <span
+            className={cx(`font-lexend m-0 block text-xl mb-2.5`, styles[type].title)}
+          >
+            {title}
+          </span>
+        )}
+        <span className={cx(`prose *mt-2.5 block`, styles[type].body)}>{children}</span>
       </span>
     </span>
   );
