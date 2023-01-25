@@ -27,7 +27,7 @@ const WebsiteCounter: React.FC = () => {
 
   return (
     <div className="flex justify-center flex-col pt-12 mt-8 md:mt-20 relative z-10">
-      <div className="flex flex-col items-start space-y-2 sm:space-y-3 lg:space-y-6">
+      <div className="flex flex-col items-start space-y-2 sm:space-y-3 lg:space-y-4">
         <h2 className="font-inter text-4xl xs:text-5xl sm:text-6xl lg:text-8xl text-white w-[716px]">
           {totalWebsites.toLocaleString()}
         </h2>
@@ -54,7 +54,7 @@ const WebsiteCounter: React.FC = () => {
           </InfoText>
           <div className="absolute -right-8 -bottom-8 w-60 h-48 bg-rain rounded-3xl hidden lg:block" />
         </Statistic>
-        <Statistic intersectionMargin="-120px" className="order-1 md:order-none">
+        <Statistic intersectionMargin="-120px" className="order-1">
           <ImportantNumber>3</ImportantNumber>
           <InfoText citation="https://siteefy.com/how-many-websites-are-there/">
             New websites created <Em>every second</Em>
@@ -107,10 +107,10 @@ interface StatisticProps {
 const Statistic: React.FC<StatisticProps> = ({
   children,
   className,
-  intersectionMargin,
+  // intersectionMargin,
 }) => {
   const { ref, intersected } = useIntersectionObserver({
-    rootMargin: intersectionMargin,
+    rootMargin: `25px`, // intersectionMargin,
     threshold: 1,
   });
 

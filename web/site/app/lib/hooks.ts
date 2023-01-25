@@ -22,16 +22,20 @@ export function useIntersectionObserver(options: IntersectionObserverInit): {
 } {
   const ref = useRef(null);
   const [intersected, setIntersected] = useState(false);
+  const { root, rootMargin, threshold } = options;
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries, observer) => {
-      entries.forEach((entry) => {
-        setIntersected(entry.isIntersecting);
-        if (entry.isIntersecting) {
-          observer.unobserve(entry.target);
-        }
-      });
-    }, options);
+    const observer = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          setIntersected(entry.isIntersecting);
+          if (entry.isIntersecting) {
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { root, rootMargin, threshold },
+    );
 
     if (ref.current) observer.observe(ref.current);
 
@@ -40,7 +44,7 @@ export function useIntersectionObserver(options: IntersectionObserverInit): {
     return () => {
       if (cur) observer.unobserve(cur);
     };
-  }, [ref, options]);
+  }, [ref, root, rootMargin, threshold]);
 
   return { intersected, ref };
 }
