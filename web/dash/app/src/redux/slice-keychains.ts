@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
 import { newKeyState, convert } from '@dash/keys';
 import { Result } from '@dash/types';
+import * as date from '@dash/datetime';
 import type { UnlockRequest, Key, KeychainSummary, RequestState } from '@dash/types';
 import type { EditKey } from '@dash/keys';
 import type { PayloadAction } from '@reduxjs/toolkit';
@@ -191,15 +192,15 @@ export const slice = createSlice({
       });
     });
 
-    builder.addCase(upsertEditingKeyRecord.started, (state) => {
+    builder.addCase(upsertEditingKey.started, (state) => {
       state.saveKeyRecordRequest = Req.ongoing();
     });
 
-    builder.addCase(upsertEditingKeyRecord.failed, (state, { error }) => {
+    builder.addCase(upsertEditingKey.failed, (state, { error }) => {
       state.saveKeyRecordRequest = Req.fail(error);
     });
 
-    builder.addCase(upsertEditingKeyRecord.succeeded, (state) => {
+    builder.addCase(upsertEditingKey.succeeded, (state) => {
       const savedRecord = convert.toKeyRecord(state.editingKey);
       if (savedRecord) {
         state.keyRecords[savedRecord.id] = editable(savedRecord);
@@ -248,21 +249,21 @@ export const upsertKeychain = createResultThunk(
   },
 );
 
-export const upsertEditingKeyRecord = createResultThunk(
-  `${slice.name}/upsertEditingKeyRecord`,
+export const upsertEditingKey = createResultThunk(
+  `${slice.name}/upsertEditingKey`,
   async (_, { getState }) => {
     const state = getState().keychains;
-    const keyRecord = convert.toKeyRecord(state.editingKey);
-    if (!keyRecord) {
+    const key = convert.toKeyRecord(state.editingKey);
+    if (!key) {
       return Result.unexpectedError(`aa11e7f2`, `Invalid key record`);
     }
     return Current.api.saveKey({
       isNew: state.editingKey?.isNew ?? false,
-      id: keyRecord.id,
-      keychainId: keyRecord.keychainId,
-      key: keyRecord.key,
-      comment: keyRecord.comment,
-      expiration: keyRecord.expiration,
+      id: key.id,
+      keychainId: key.keychainId,
+      key: key.key,
+      comment: key.comment,
+      expiration: date.forServer(key.expiration),
     });
   },
 );
