@@ -10,6 +10,7 @@ import type {
   GetIdentifiedApps,
 } from '@dash/types';
 import type { ActivityItem } from '@dash/components';
+import type { EditKey } from '@dash/keys';
 import * as empty from '../../redux/empty';
 
 type Admin = GetAdmin.Output;
@@ -138,6 +139,24 @@ export function unlockRequest(override: Partial<UnlockRequest> = {}): UnlockRequ
     appName: `Brave`,
     appSlug: `brave`,
     appCategories: [`browser`],
+    ...override,
+  };
+}
+
+export function editKeyState(override: Partial<EditKey.State> = {}): EditKey.State {
+  return {
+    id: uuid(),
+    keychainId: uuid(),
+    isNew: false,
+    keyType: `website`,
+    address: `foo.com`,
+    addressType: `standard`,
+    addressScope: `webBrowsers`,
+    showAdvancedAddressOptions: false,
+    showAdvancedAddressScopeOptions: false,
+    appIdentificationType: `slug`,
+    appScope: `address`,
+    activeStep: -1,
     ...override,
   };
 }
