@@ -20,7 +20,7 @@ import {
   createNewKeyClicked,
   editKeyModalDismissed,
   editKeyClicked,
-  upsertEditingKey,
+  upsertEditingKeyRecord,
 } from '../../redux/slice-keychains';
 
 const Keychain: React.FC = () => {
@@ -96,7 +96,7 @@ export const queryProps: QueryProps<typeof EditKeychain, UUID> =
         dismissEditKeyModal: () => dispatch(editKeyModalDismissed()),
         onCreateNewKey: () => dispatch(createNewKeyClicked(id)),
         beginEditKey: (keyId) => dispatch(editKeyClicked(keyId)),
-        onKeySave: () => dispatch(upsertEditingKey()),
+        onKeySave: () => dispatch(upsertEditingKeyRecord()),
         keyModalSaveButtonDisabled:
           toKeyRecord(editingKey) === null ||
           state.keychains.saveKeyRecordRequest.state === `ongoing`,
