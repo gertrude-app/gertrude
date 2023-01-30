@@ -8,7 +8,7 @@ import {
   deleteKeychain,
   deleteKeyRecord,
   upsertKeychain,
-  upsertEditingKey,
+  upsertEditingKeyRecord,
 } from './slice-keychains';
 import {
   confirmPendingNotificationMethod,
@@ -22,7 +22,7 @@ const toastMiddleware: Middleware = (_store) => (next) => (action) => {
   toastCrud(`save`, `user`, upsertUser, action);
   toastCrud(`delete`, `keychain`, deleteKeychain, action);
   toastCrud(`save`, `keychain`, upsertKeychain, action);
-  toastCrud(`save`, `key`, upsertEditingKey, action);
+  toastCrud(`save`, `key`, upsertEditingKeyRecord, action);
   toastCrud(`delete`, `key`, deleteKeyRecord, action);
   toastCrud(`delete`, `keychain`, deleteKeychain, action);
   toastCrud(`delete`, `device`, deleteDevice, action);

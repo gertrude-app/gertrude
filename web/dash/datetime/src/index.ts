@@ -98,16 +98,6 @@ export function relativeTime(isoOrDate: Date | string): string {
   return `just now`;
 }
 
-export function forServer(date: string): string;
-export function forServer(date?: string): string | undefined;
-export function forServer(date?: Date): string | undefined;
-
-export function forServer(date: string | Date | undefined): string | undefined {
-  if (!date) return undefined;
-  const isoDate = typeof date == `string` ? date : date.toISOString();
-  return isoDate.replace(/\.\d\d\dZ$/, `Z`);
-}
-
 export function dateFromUrl(urlDate: string): Date {
   const [month, days, year] = urlDate.split(`-`);
   return new Date(Date.parse(`${year}-${month}-${days}T12:00:00.000Z`));
