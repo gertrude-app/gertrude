@@ -39,19 +39,26 @@ development.
 
 ## Start by deleting apps
 
+{% callout %}
+
+For brevity's sake, this tutorial only refers to iPhones, but these steps work the same
+for **iPads.**
+
+{% /callout %}
+
 The iPhone comes with many built-in apps, and before you started working to lock down your
 child's phone, you or they may have installed more. Therefore, the first thing you should
 do is _delete every single app_ that they don't absolutely need.
 
 To delete an app, tap and hold it's icon, until you see the option to _remove_ it:
 
-{% image src="lockdown-iphone/remove-app.png" alt="locking down an iphone: how to delete an app" /%}
+{% image src="lockdown-iphone/remove-app.png" alt="locking down an iPhone: how to delete an app" /%}
 
 Then tap to _delete the app_:
 
-{% image src="lockdown-iphone/delete-app.png" alt="locking down an iphone: confirm deleting an app" /%}
+{% image src="lockdown-iphone/delete-app.png" alt="locking down an iPhone: confirm deleting an app" /%}
 
-{% callout type="warning" %}
+{% callout %}
 
 For some reason, a few of the apps provided by Apple **do not give you the option to
 delete** them&mdash;they only allow you to remove them from the home screen. If you
@@ -63,14 +70,15 @@ below.
 Again, _delete as many apps as you can_&mdash;it's much simpler than disabling them
 through the Screen Time settings below.
 
-## Getting Started with Screen Time
+{% callout type="warning" %}
 
-{% callout %}
-
-For brevity's sake, this tutorial only refers to iPhones, but these steps work the same
-for **iPads.**
+Both the **Apple Maps** and **Google Maps** apps can be used to view **nude photos,** and
+should be deleted. For more details (including a recommendation for a replacement), see
+[here](/docs/five-things-you-forgot-when-locking-down-your-kids-iphone#4-explicit-images-in-maps-apps).
 
 {% /callout %}
+
+## Getting Started with Screen Time
 
 The main feature of an iPhone that you use to lock it down is a built in
 application/setting called **Screen Time**. You may be familiar with this app, because
@@ -81,17 +89,17 @@ your kid has access to.
 To get started, get your child's phone, and go to **Settings &rarr; Screen Time**, as
 shown below:
 
-{% image src="lockdown-iphone/settings-screentime.png" caption="Settings &rarr; Screen Time" alt="locking down an iphone: start at 'Settings' -> 'Screen Time'" /%}
+{% image src="lockdown-iphone/settings-screentime.png" caption="Settings &rarr; Screen Time" alt="locking down an iPhone: start at 'Settings' -> 'Screen Time'" /%}
 
 Then, click to _turn on_ Screen Time:
 
-{% image src="lockdown-iphone/turn-on-screentime.png" caption="Turn on Screen Time, then click 'Continue'" alt="locking down an iphone: tap to turn onn Screen Time" /%}
+{% image src="lockdown-iphone/turn-on-screentime.png" caption="Turn on Screen Time, then click 'Continue'" alt="locking down an iPhone: tap to turn onn Screen Time" /%}
 
 ### "My iPhone" or "My Child's"
 
-The next prompt will ask you if the phone is "your", or your child's.
+The next prompt will ask you if the phone is "My iPhone", or "My Child's".
 
-{% image src="lockdown-iphone/mine-or-childs.png" caption="Read below for guidance on what to choose..." alt="locking down an iphone: what to do when it asks you 'Is This iPhone for Yourself or Your Child?'?" /%}
+{% image src="lockdown-iphone/mine-or-childs.png" caption="Read below for guidance on what to choose..." alt="locking down an iPhone: what to do when it asks you 'Is This iPhone for Yourself or Your Child?'?" /%}
 
 You can select _either_ option, however, if you choose "My Child's", you'll need to have
 **Family Sharing** already set up. You can pause at this point and set up Family Sharing
@@ -121,20 +129,20 @@ If you chose _"My Child's iPhone",_ you'll be presented with several screens gui
 through some setup steps. We'll be _skipping_ most of them, because you can manage all of
 the same settings from the normal interface, and it's important you learn how to do so.
 
-{% image src="lockdown-iphone/wizard-downtime.png" caption="Choose NOT NOW (you'll set this up later)" alt="locking down an iphone: choose 'not now' when prompted about Downtime, you'll set this up later" /%}
+{% image src="lockdown-iphone/wizard-downtime.png" caption="Choose NOT NOW (you'll set this up later)" alt="locking down an iPhone: choose 'not now' when prompted about Downtime, you'll set this up later" /%}
 
-{% image src="lockdown-iphone/wizard-app-limits.png" caption="Choose NOT NOW (you'll set this up later)" alt="locking down an iphone: choose 'not now' when prompted about App Limits, you'll set these up later if necessary" /%}
+{% image src="lockdown-iphone/wizard-app-limits.png" caption="Choose NOT NOW (you'll set this up later)" alt="locking down an iPhone: choose 'not now' when prompted about App Limits, you'll set these up later if necessary" /%}
 
-{% image src="lockdown-iphone/wizard-content-privacy.png" caption="Choose CONTINUE" alt="locking down an iphone: click 'continue' when shown the screen about Content & Privacy" /%}
+{% image src="lockdown-iphone/wizard-content-privacy.png" caption="Choose CONTINUE" alt="locking down an iPhone: click 'continue' when shown the screen about Content & Privacy" /%}
 
-{% image src="lockdown-iphone/wizard-passcode-recovery.png" caption="Enter your Apple ID or skip by clicking 'Cancel'" alt="locking down an iphone: enter your Apple ID to allow for Screen Time passcode recovery" /%}
+{% image src="lockdown-iphone/wizard-passcode-recovery.png" caption="Enter your Apple ID or skip by clicking 'Cancel'" alt="locking down an iPhone: enter your Apple ID to allow for Screen Time passcode recovery" /%}
 
 ### Setting a passcode
 
 At this point, if you are setting up your child's iPhone _without_ Family Sharing you'll
 need to click the button labeled **Use Screen Time passcode**, shown here:
 
-{% image src="lockdown-iphone/use-screen-time-passcode.png" caption="If not using Family Sharing, tap to set a passcode" alt="locking down an iphone: click 'Use Screen Time Passcode' and set a totally unique 4-digit code" /%}
+{% image src="lockdown-iphone/use-screen-time-passcode.png" caption="If not using Family Sharing, tap to set a passcode" alt="locking down an iPhone: click 'Use Screen Time Passcode' and set a totally unique 4-digit code" /%}
 
 {% callout type="warning" title="Choose a unique passcode!" %}
 
@@ -149,13 +157,13 @@ be able to easily guess it.
 
 At the next screen, enter and confirm a _4 digit passcode:_
 
-{% image src="lockdown-iphone/set-passcode.png" caption="Set and confirm your UNIQUE passcode" alt="locking down an iphone: when prompted, choose a unique passcode to protect Screen Time" /%}
+{% image src="lockdown-iphone/set-passcode.png" caption="Set and confirm your UNIQUE passcode" alt="locking down an iPhone: when prompted, choose a unique passcode to protect Screen Time" /%}
 
-{% callout type="warning" title="Don't leak the passcode!" %}
+{% callout type="warning" title="Careful with that passcode!" %}
 
 Screen Time currently only gives you the option to use a 4 digit passcode. The downside of
 this is that **if your child is able to see you** while you're entering this code, it's
-extremely easy for them to figure it out. It's worth it to be _very paranoid_ about this.
+extremely easy for them to remember it. It's worth it to be _very paranoid_ about this.
 Take an extra moment to ensure your child is out of the room, or not anywhere where they
 can at all see the screen of their device whenever you enter this code.
 
@@ -167,7 +175,7 @@ The Screen Time controls have five main sections. We'll work through them one by
 starting with **Downtime**, although we'll have the most to say about the fifth area,
 which is the most important.
 
-{% image src="lockdown-iphone/downtime.png" caption="Downtime" alt="locking down an iphone: 'Downtime' controls, used to specify schedules for permitted activity" /%}
+{% image src="lockdown-iphone/downtime.png" caption="Downtime" alt="locking down an iPhone: 'Downtime' controls, used to specify schedules for permitted activity" /%}
 
 **Downtime** allows you to _enforce a scheduled period_ when your child has no access (or
 limited access) to their device. While not strictly necessary to keep your kids safe,
@@ -179,7 +187,7 @@ helps encourage good sleep habits.
 Tap to enable a scheduled downtime, and set the schedule for a time that seems appropriate
 for your child.
 
-{% image src="lockdown-iphone/scheduled-downtime.png" caption="Enabled Scheduled Downtime" alt="locking down an iphone: tap to enable scheduled Downtime" /%}
+{% image src="lockdown-iphone/scheduled-downtime.png" caption="Enabled Scheduled Downtime" alt="locking down an iPhone: tap to enable scheduled Downtime" /%}
 
 {% callout type="warning" %}
 
@@ -189,13 +197,13 @@ suggestion.
 
 {% /callout %}
 
-{% image src="lockdown-iphone/block-at-downtime.png" caption="Turn on 'Block at Downtime'" alt="locking down an iphone: be sure to turn on 'Block at Downtime', or else Downtime limits can be overridden by your child" /%}
+{% image src="lockdown-iphone/block-at-downtime.png" caption="Turn on 'Block at Downtime'" alt="locking down an iPhone: be sure to turn on 'Block at Downtime', or else Downtime limits can be overridden by your child" /%}
 
 ## App Limits
 
 The next section on the main screen is for **App Limits**.
 
-{% image src="lockdown-iphone/app-limits.png" caption="App Limits" alt="locking down an iphone: App Limits settings" /%}
+{% image src="lockdown-iphone/app-limits.png" caption="App Limits" alt="locking down an iPhone: App Limits settings" /%}
 
 This tutorial won't cover App Limits in depth, because they're not central to protecting
 your kids. Every app that could be dangerous should be completely blocked by techniques
@@ -224,12 +232,12 @@ same category.
 
 The next section on the main screen is for **Communication Limits**.
 
-{% image src="lockdown-iphone/communication-limits.png" caption="Communication Limits" alt="locking down an iphone: Communication Limits settings" /%}
+{% image src="lockdown-iphone/communication-limits.png" caption="Communication Limits" alt="locking down an iPhone: Communication Limits settings" /%}
 
 The **Communication Limits** settings area (shown below) allows you to control who your
 child can communicate with.
 
-{% image src="lockdown-iphone/communication-limits-settings.png" caption="Communication Limits settings" alt="locking down an iphone: the inner screen of settings for Screen Time Communication Limits" /%}
+{% image src="lockdown-iphone/communication-limits-settings.png" caption="Communication Limits settings" alt="locking down an iPhone: the inner screen of settings for Screen Time Communication Limits" /%}
 
 Depending on your particular situation, it might be wise and appropriate to limit
 communication to specifically approved contacts, or prohibit communication during
@@ -240,13 +248,13 @@ your child and unique context, we won't try to give any guidelines in this tutor
 
 The next section on the main screen is for **Always Allowed**.
 
-{% image src="lockdown-iphone/always-allowed.png" caption="Always Allowed" alt="locking down an iphone: Always Allowed lets you specify apps not subject to Downtime" /%}
+{% image src="lockdown-iphone/always-allowed.png" caption="Always Allowed" alt="locking down an iPhone: Always Allowed lets you specify apps not subject to Downtime" /%}
 
 This section is a bit confusing. In my opinion it should be a screen within the Downtime
 settings area. It's only normal purpose is to _bypass Downtime restrictions_ in certain
 ways.
 
-{% image src="lockdown-iphone/always-allowed-settings.png" caption="These settings allow you to <b>bypass</b> Downtime restrictions" alt="locking down an iphone: Always Allowed settings let you pick apps that are not subject to Downtime schedule restrictions" /%}
+{% image src="lockdown-iphone/always-allowed-settings.png" caption="These settings allow you to <b>bypass</b> Downtime restrictions" alt="locking down an iPhone: Always Allowed settings let you pick apps that are not subject to Downtime schedule restrictions" /%}
 
 A good example of a good _Allowed App_ would be the **Clock** app, if you wanted your
 child to be able to use their iPhone as an alarm clock, and have access to set it after
@@ -262,23 +270,22 @@ If your goal is to completely lock down your child's iPhone, making it a truly s
 device, most of the controls you're going to need to set are in the fifth and final
 section, labeled **Content & Privacy Restrictions**:
 
-{% image src="lockdown-iphone/content-privacy-restrictions.png" caption="Most of your work will happen in this section" alt="locking down an iphone: Cthe Screen Time > Content & Privacy Restrictions area is where most of the important controls and settings live" /%}
+{% image src="lockdown-iphone/content-privacy-restrictions.png" caption="Most of your work will happen in this section" alt="locking down an iPhone: Cthe Screen Time > Content & Privacy Restrictions area is where most of the important controls and settings live" /%}
 
 Start by tapping to _enable restrictions:_
 
-{% image src="lockdown-iphone/enable-restrictions.png" caption="Toggle to enable Content & Privacy Restrictions" alt="locking down an iphone: click to enable Content & Privacy Restrictions" /%}
+{% image src="lockdown-iphone/enable-restrictions.png" caption="Toggle to enable Content & Privacy Restrictions" alt="locking down an iPhone: click to enable Content & Privacy Restrictions" /%}
 
 ### iTunes &amp; App Store Purchases
 
-Start by drilling into the section labeled _iTunes &amp; App Store Purchases_, shown
-below:
+Then drill into the section labeled _iTunes &amp; App Store Purchases_, shown below:
 
-{% image src="lockdown-iphone/itunes-app-store-purchases.png" caption="Tap to drill into iTunes & App Store next" alt="locking down an iphone: Content & Privacy Restrictions > iTunes & App Store Purchases" /%}
+{% image src="lockdown-iphone/itunes-app-store-purchases.png" caption="Tap to drill into iTunes & App Store next" alt="locking down an iPhone: Content & Privacy Restrictions > iTunes & App Store Purchases" /%}
 
 For maximum safety, we recommend disabling all three of the settings shown below by
 setting them to **Don't allow**.
 
-{% image src="lockdown-iphone/dont-allow-installing-deleting-apps.png" caption="<b>Don't allow</b> installing, deleting, or in-app purchases" alt="locking down an iphone: don't allow installing apps, deleting apps, or in-app purchases" /%}
+{% image src="lockdown-iphone/dont-allow-installing-deleting-apps.png" caption="<b>Don't allow</b> installing, deleting, or in-app purchases" alt="locking down an iPhone: don't allow installing apps, deleting apps, or in-app purchases" /%}
 
 Don't worry, you'll _still be able to add new apps_ when you child needs them and you
 approve. You'll simply have to temporarily allow installing apps in this section, install
@@ -299,7 +306,7 @@ apps, 3) delete the app, and then 4) disable deleting apps again.
 Next, tap the back button to get back to the _Content & Privacy Restrictions_ screen, and
 then drill down into the second section, labeled **Allowed Apps**:
 
-{% image src="lockdown-iphone/allowed-apps.png" caption="Go back one screen, then choose <b>Allowed Apps</b>" alt="locking down an iphone: Content & Privacy Restrictions > Allowed Apps" /%}
+{% image src="lockdown-iphone/allowed-apps.png" caption="Go back one screen, then choose <b>Allowed Apps</b>" alt="locking down an iPhone: Content & Privacy Restrictions > Allowed Apps" /%}
 
 This is another section that is a bit confusing at the outset, because there is another
 screen at the main level called **Always Allowed** that looks very similar. That screen
@@ -309,7 +316,7 @@ entirely, irrespective of Downtime.
 This is an **extremely important area** because it's the only way you can disable/remove
 certain apps, like Safari.
 
-{% image src="lockdown-iphone/disable-safari-siri.png" caption="Disable any apps you want to block. Be sure to disable Safari and Siri" alt="locking down an iphone: disable apps that Apple doesn't let you delete" /%}
+{% image src="lockdown-iphone/disable-safari-siri.png" caption="Disable any apps you want to block. Be sure to disable Safari and Siri" alt="locking down an iPhone: disable apps that Apple doesn't let you delete" /%}
 
 Work through the list of apps, _leaving enabled **only the apps** that are truly
 necessary, and you're **sure are safe**_. We encourage you to take a _very conservative_
@@ -323,12 +330,12 @@ understand that apps with a very benign purpose can have **serious loopholes** y
 have thought of.
 
 **One story** might help drive this home. At one point I was considering allowing the
-_Audible_ app (for listening to audiobooks) on an old iPod we had lying around. I figured
-as long as I controlled which books were downloaded (because they don't have the ability
-to purchase a new book), the app should be safe, right? I took a few minutes to explore
-the app, and found that there was a feature where you could search for new audiobooks. A
-few well-crafted search terms filled the screen with **adult books with semi-pornagraphic
-covers.** I didn't install the app after all.
+_Audible_ app (for listening to audiobooks) on an old phone we had lying around. I figured
+as long as I controlled which books were downloaded (because my kids didn't have the
+ability to purchase a new book), the app should be safe, right? I took a few minutes to
+explore the app, and found that there was a feature where you could search for new
+audiobooks. A few well-crafted search terms filled the screen with **adult books with
+semi-pornagraphic covers.** I didn't install the app after all.
 
 Whenever you're about to allow a new app, take 5 minutes exploring the app. Imagine
 someone will give you $10,000 if you can find inappropriate content on it. You'd be
@@ -344,8 +351,8 @@ their age or gender. Apple does grant some controls limiting what websites can b
 accessed, but in our experience, these controls are for the most part extremely deficient,
 and unreliable.
 
-Necessary web usage for school should be done on a computer, ideally in a public place,
-with a filter that blocks every website except those you have explicitly safe-listed.
+Accessing necessary websites for school should be done on a computer, ideally in a public
+place, with a filter that blocks every site except those you have explicitly safe-listed.
 
 {% /callout %}
 
@@ -355,7 +362,6 @@ Parents often don't realize this, but having access to Siri puts the entire inte
 your child's fingertips. Even if you have Safari blocked, Siri offers an alternative
 method of searching and browsing the internet. Your child can simply ask Siri to look
 something up, and she will happily respond with snippets of content **including images**.
-Siri must be disabled.
 
 {% /callout %}
 
@@ -364,11 +370,11 @@ Siri must be disabled.
 Next, tap the back button to get back to the _Content & Privacy Restrictions_ screen, and
 then drill down into the second section, labled **Content Restrictions**:
 
-{% image src="lockdown-iphone/content-restrictions.png" caption="Go back one screen, then choose <b>Content Restrictions</b>" alt="locking down an iphone: Content Restrictions, where many of the most important settings live" /%}
+{% image src="lockdown-iphone/content-restrictions.png" caption="Go back one screen, then choose <b>Content Restrictions</b>" alt="locking down an iPhone: Content Restrictions, where many of the most important settings live" /%}
 
 Which brings you to this screen:
 
-{% image src="lockdown-iphone/content-restrictions-settings.png" alt="locking down an iphone: Screen Time > Content & Privacy Restrictions > Content Restrictions" /%}
+{% image src="lockdown-iphone/content-restrictions-settings.png" alt="locking down an iPhone: Screen Time > Content & Privacy Restrictions > Content Restrictions" /%}
 
 There's a lot to take in on this screen. Loads of different settings. Go through _each
 setting_ one by one, _turning it to the **safest (or most disabled) option,**_ unless you
@@ -376,7 +382,7 @@ have a good reason to do otherwise. For example, anywhere it offers you the opti
 "Clean" or "Explicit", choose "Clean", if it offers "Off" and "On" choose "On", and if it
 offers "Don't Allow" or "Allow" choose "Allow".
 
-{% image src="lockdown-iphone/clean-not-explicit.png" caption="choose CLEAN, OFF, or DON'T ALLOW for most options" alt="locking down an iphone: choose 'clean', 'off', or 'don't allow' for most options in Content Restrictions" /%}
+{% image src="lockdown-iphone/clean-not-explicit.png" caption="choose CLEAN, OFF, or DON'T ALLOW for most options" alt="locking down an iPhone: choose 'clean', 'off', or 'don't allow' for most options in Content Restrictions" /%}
 
 Three of the sub-sections deserve particular attention, the first is **Apps**:
 
@@ -385,7 +391,7 @@ Three of the sub-sections deserve particular attention, the first is **Apps**:
 Within _Content & Privacy Restrictions_, there is a drill down for a section labled
 **Apps**, as shown below:
 
-{% image src="lockdown-iphone/content-restrictions-apps.png" alt="locking down an iphone: the 'Apps' section of Content Restrictions has to do with app age ratings" /%}
+{% image src="lockdown-iphone/content-restrictions-apps.png" alt="locking down an iPhone: the 'Apps' section of Content Restrictions has to do with app age ratings" /%}
 
 In my opinion, this area should be renamed as well. It's confusing because this is the
 third screen that seems to control access to apps, we've already seen _Always Allowed_
@@ -394,7 +400,7 @@ apps, and _Allowed Apps_, and now here we have just _Apps_.
 The purpose of this area is really to control **what age rating** of apps may be
 installed, which you can see from the drill-down screen:
 
-{% image src="lockdown-iphone/app-age-rating.png" caption="This screen should be called <b>App Age Rating</b>" alt="locking down an iphone: understanding the Content Restrictions > Apps screen" /%}
+{% image src="lockdown-iphone/app-age-rating.png" caption="This screen should be called <b>App Age Rating</b>" alt="locking down an iPhone: understanding the Content Restrictions > Apps screen" /%}
 
 What you choose here really only matters if you _have also allowed_ your child the
 authority to _install apps_, which I don't recommend. Assuming you have not allowed
@@ -418,11 +424,11 @@ you're trying to install.
 The second area that requires some more detailed explanation is the **Web Content**
 drill-down:
 
-{% image src="lockdown-iphone/web-content.png" alt="locking down an iphone: Content Restrictions > Web Content" /%}
+{% image src="lockdown-iphone/web-content.png" alt="locking down an iPhone: Content Restrictions > Web Content" /%}
 
 It is critical that you choose **Allowed Websites Only** for this section.
 
-{% image src="lockdown-iphone/allowed-websites-only.png" caption="Make <b>sure</b> you select 'Allowed Websites Only'" alt="locking down an iphone: Content Restrictions > Web Content should be set to 'Allowed Websites Only'" /%}
+{% image src="lockdown-iphone/allowed-websites-only.png" caption="Make <b>sure</b> you select 'Allowed Websites Only'" alt="locking down an iPhone: Content Restrictions > Web Content should be set to 'Allowed Websites Only'" /%}
 
 Even if you have taken our recomendation to _entirely disable web-browsing by removing the
 Safari app_, you still need to set this setting to _Allowed Websites Only_. That's because
@@ -444,7 +450,7 @@ websites being created every day.
 The third and final area that deserves special treatment is the **Siri &rarr; Web Search
 Content:**
 
-{% image src="lockdown-iphone/siri-web-search-content.png" alt="locking down an iphone: be sure to disallow Siri > Web Search Content" /%}
+{% image src="lockdown-iphone/siri-web-search-content.png" alt="locking down an iPhone: be sure to disallow Siri > Web Search Content" /%}
 
 Make sure you've got this set to **Don't Allow.**
 
@@ -458,3 +464,10 @@ the thought experiment I proposed above: spend a few minutes with each app, imag
 would immediately win $10,000 if you could find something inappropriate or dangerous.
 Imagine you are a bored, impulsive, motivated teenager with a lot of persistence and time
 on their hands.
+
+{% callout %}
+
+We also recommend you check the items in our article about
+[things you probably forgot to lock down](/docs/five-things-you-forgot-when-locking-down-your-kids-iphone).
+
+{% /callout %}

@@ -1,10 +1,12 @@
 import Callout from '../docs/Callout';
 import { QuickLink, QuickLinks } from '../docs/QuickLinks';
 import ArticleImage from '../docs/ArticleImage';
+import ClickToReveal from '../docs/ClickToReveal';
 
 const tags = {
   callout: {
     attributes: {
+      alt: { type: Boolean },
       title: { type: String },
       type: {
         type: String,
@@ -32,6 +34,13 @@ const tags = {
       caption: { type: String },
     },
     render: renderFigure,
+  },
+  'click-to-reveal': {
+    selfClosing: false,
+    attributes: {
+      title: { type: String },
+    },
+    render: ClickToReveal,
   },
   'quick-links': {
     render: QuickLinks,

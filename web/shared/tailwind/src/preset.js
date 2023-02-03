@@ -13,6 +13,21 @@ module.exports = {
       '2xl': `1600px`,
     },
     extend: {
+      animation: {
+        'bounce-right': `bounce-right 0.5s linear infinite`,
+      },
+      keyframes: {
+        'bounce-right': {
+          '0%, 100%': {
+            transform: `translateX(0)`,
+            animationTimingFunction: `cubic-bezier(0.8, 0, 1, 1)`,
+          },
+          '50%': {
+            transform: `translateX(10px)`,
+            animationTimingFunction: `cubic-bezier(0, 0, 0.2, 1)`,
+          },
+        },
+      },
       spacing: {
         112: `28rem`,
         128: `32rem`,
