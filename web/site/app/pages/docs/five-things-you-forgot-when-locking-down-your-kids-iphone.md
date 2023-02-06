@@ -25,10 +25,10 @@ Apple's built-in **Messages** app comes with a growing number of app-integration
 
 {% image src="lockdown-iphone/imessage-apps.png" caption="this row of mini-apps is shown when composing a text message" alt="what you forgot locking down your kid's iPhone: iMessage mini-apps can expose your child to explicit content" /%}
 
-If your child clicks on the `#images` app (shown above), they are able to _search through
-a huge inventory of animated gifs_. The image below shows a harmless search query, but
-there are loads of sexually suggestive and otherwise inappropriate images your child
-shouldn't be able to browse.
+If your child clicks on the `#images` (Hashtag Images) app (shown above), they are able to
+_search through a huge inventory of animated gifs_. The image below shows a harmless
+search query, but there are loads of sexually suggestive and otherwise inappropriate
+images your child shouldn't be able to browse.
 
 {% image src="lockdown-iphone/messages-images.png" caption="close of up the '#images' app" alt="what you forgot locking down your kid's iPhone: the #images app should be removed for your child's safety" /%}
 
@@ -58,6 +58,15 @@ app by going to "Settings > Screen Time > content & Privacy Restrictions > iTune
 Store Purchases" and choose _Don't Allow_ for "Installing Apps":
 
 {% image src="lockdown-iphone/dont-allow-installing-apps.png" caption="Remove authority to install apps, or they can re-install" alt="what you forgot locking down your kid's iPhone: remove authority to install apps to prevent more unsafe iMessage apps" /%}
+
+{% callout type="warning" alt=true %}
+
+This same exploit exists on the Messages app **for the Mac.** Unfortunately, there doesn't
+seem to be a similar way to delete the app on macOS. If your child uses a Mac computer,
+the only way to remove this is by deleting the Messages app, or using an internet filter
+program like [Gertrude](/) to block searching for innappropriate images.
+
+{% /callout %}
 
 {% /click-to-reveal %}
 

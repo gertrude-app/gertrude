@@ -6,10 +6,10 @@ description:
 ---
 
 {% .lead %} With a little hard work, it's possible to entirely lock down an iPhone or iPad
-so that it is _extremely safe_ for your child to use. Thankfully, in recent versions of
-iOS, Apple gives parents all the tools they need to limit and control access, apps, and
-content. The bad news is that these controls are scattered over an unintuitive hodge-podge
-of settings screens, and there are several important loopholes that are easy to miss.
+so that it is _extremely safe_ for your child to use. Apple gives parents all the tools
+they need to limit and control access, apps, and internet content. The bad news is that
+these controls are scattered over an unintuitive hodge-podge of settings screens, and
+there are several important loopholes that are easy to miss.
 
 {% .lead %} This tutorial will walk you step by step through the process.
 
@@ -32,7 +32,7 @@ And if you already have given them one, think hard about taking it back.
 I am the father of four children (currently 16, 15, 12, and 9), and only my oldest son has
 a phone, which he got a few weeks _after_ his 16th birthday. Many generations of kids have
 survived their pre-teen and adolescent years without a phone, and yours can too. I realize
-it's bucking an extremely strong societal norm, but absolutely nothing beats the
+it's going against an extremely strong societal norm, but absolutely nothing beats the
 simplicity and safety of them simply not having a phone. And there's a growing amount of
 research showing that you might be greatly helping their cognitive and emotional
 development.
@@ -41,8 +41,8 @@ development.
 
 {% callout %}
 
-For brevity's sake, this tutorial only refers to iPhones, but these steps work the same
-for **iPads.**
+For brevity's sake, this tutorial only refers to **iPhones**, but these steps work the
+same for **iPads.**
 
 {% /callout %}
 
@@ -50,7 +50,7 @@ The iPhone comes with many built-in apps, and before you started working to lock
 child's phone, you or they may have installed more. Therefore, the first thing you should
 do is _delete every single app_ that they don't absolutely need.
 
-To delete an app, tap and hold it's icon, until you see the option to _remove_ it:
+To delete an app, tap and _hold_ it's icon, until you see the option to _remove_ it:
 
 {% image src="lockdown-iphone/remove-app.png" alt="locking down an iPhone: how to delete an app" /%}
 
@@ -78,16 +78,44 @@ should be deleted. For more details (including a recommendation for a replacemen
 
 {% /callout %}
 
+## Disable Siri Integrations
+
+The next thing you need to do is take a moment to _disable some Siri integration
+settings_. It's important to do this _before_ disabling Siri entirely via Screen Time
+(explained below) because once Siri is disabled, these options are no longer visible, but
+are still in effect.
+
+Start by going to the main **Settings App**.
+
+{% image src="lockdown-iphone/main-settings-app.png" caption="Go to the main <b>Settings</b> app" alt="locking down an iPhone: the main Settings app" /%}
+
+Scroll down, and tap **Siri & Search**.
+
+{% image src="lockdown-iphone/siri-search-main.png" caption="Tap Siri & Search" alt="locking down an iPhone: Siri & Search settings" /%}
+
+Then disable all the settings shown below:
+
+{% image src="lockdown-iphone/siri-disable-all.png" caption="Turn <b>all</b> of these settings OFF" alt="locking down an iPhone: disable all Siri system integrations for safety" /%}
+
+{% callout type="warning" %}
+
+It's critically important that you disable **Show in Look Up** and **Show in Spotlight**.
+These settings are hard to understand and often missed by parents when locking down a
+child's phone. If you don't disable these settings, your child will be able to
+[search for and view images and content](/docs/five-things-you-forgot-when-locking-down-your-kids-iphone)
+from the internet through their phone's search and look up features.
+
+{% /callout %}
+
 ## Getting Started with Screen Time
 
-The main feature of an iPhone that you use to lock it down is a built in
-application/setting called **Screen Time**. You may be familiar with this app, because
-many adults use it to track how much time they spend on their phones, which is one of it's
-primary purposes. But it also has some really powerful features to completely control what
-your kid has access to.
+Now that we've got apps deleted and Siri integrations turned off, we'll turn our attention
+to **Screen Time**, which is the main tool Apple gives you to lock down an iOS device. You
+may already be familiar with Screen Time, because many adults use it to track how much
+time they spend on their phones, which is one of it's primary purposes. But it also has
+some really powerful features to _completely control what your kid has access to._
 
-To get started, get your child's phone, and go to **Settings &rarr; Screen Time**, as
-shown below:
+To get started, go to **Settings &rarr; Screen Time**, as shown below:
 
 {% image src="lockdown-iphone/settings-screentime.png" caption="Settings &rarr; Screen Time" alt="locking down an iPhone: start at 'Settings' -> 'Screen Time'" /%}
 
@@ -114,7 +142,7 @@ degree, you'll just have to make any changes _from your child's device_ rather t
 your own.
 
 At this point, the instructions for continuing **briefly diverge,** depending on what
-choice you made on the last screen.
+choice you made between "My iPhone" or "My Child's".
 
 ### Setup wizard steps for Family Sharing
 
@@ -135,29 +163,30 @@ the same settings from the normal interface, and it's important you learn how to
 
 {% image src="lockdown-iphone/wizard-content-privacy.png" caption="Choose CONTINUE" alt="locking down an iPhone: click 'continue' when shown the screen about Content & Privacy" /%}
 
-{% image src="lockdown-iphone/wizard-passcode-recovery.png" caption="Enter your Apple ID or skip by clicking 'Cancel'" alt="locking down an iPhone: enter your Apple ID to allow for Screen Time passcode recovery" /%}
+{% image src="lockdown-iphone/wizard-passcode-recovery.png" caption="entering your Apple ID here is recommended, but not required" alt="locking down an iPhone: enter your Apple ID to allow for Screen Time passcode recovery" /%}
 
 ### Setting a passcode
 
 At this point, if you are setting up your child's iPhone _without_ Family Sharing you'll
-need to click the button labeled **Use Screen Time passcode**, shown here:
+need to click the button labeled **Use Screen Time passcode**, shown below. Otherwise, you
+should already be seeing the screen prompting you to set a passcode.
 
 {% image src="lockdown-iphone/use-screen-time-passcode.png" caption="If not using Family Sharing, tap to set a passcode" alt="locking down an iPhone: click 'Use Screen Time Passcode' and set a totally unique 4-digit code" /%}
-
-{% callout type="warning" title="Choose a unique passcode!" %}
-
-It's very important that you choose an **entirely random** 4 digit passcode. Please do not
-use something easily guessable by your child, like a birthday, your street address, your
-debit card pin, or any 4 digit number you may have ever used for a padlock or alarm
-system, or anything like that. Most people re-use the same pins and combinations, so if
-don't choose something totally unique for this passcode, it's very likely your child will
-be able to easily guess it.
-
-{% /callout %}
 
 At the next screen, enter and confirm a _4 digit passcode:_
 
 {% image src="lockdown-iphone/set-passcode.png" caption="Set and confirm your UNIQUE passcode" alt="locking down an iPhone: when prompted, choose a unique passcode to protect Screen Time" /%}
+
+{% callout type="warning" title="Choose a unique passcode!" %}
+
+It's very important that you choose an **entirely new and random** 4 digit passcode.
+Please do not use something easily guessable by your child, like a birthday, your street
+address, your debit card pin, or any 4 digit number you may have ever used for a padlock
+or alarm system, or anything like that. Most people re-use the same pins and combinations,
+so if don't choose something totally unique for this passcode, it's very likely your child
+will be able to easily guess it.
+
+{% /callout %}
 
 {% callout type="warning" title="Careful with that passcode!" %}
 
