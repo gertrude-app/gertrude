@@ -1,4 +1,4 @@
-import React, { useId } from 'react';
+import React from 'react';
 import cx from 'classnames';
 
 interface Props {
@@ -24,7 +24,6 @@ const Logo: React.FC<Props> = ({
   type = `default`,
   textSize = `text-4xl`,
 }) => {
-  const gradientId = useId();
   let color = ``;
 
   switch (type) {
