@@ -27,7 +27,7 @@ const EmailInputForm: React.FC<Props> = ({
       onSubmit();
     }}
   >
-    <Logo size={75} iconOnly />
+    <Logo size={90} iconOnly className="-mt-4 mb-2" />
     <h2 className="text-center mt-4 text-3xl font-inter">{title}</h2>
     <h3 className="text-center text-gray-500 mt-3">{subTitle}</h3>
     <div className="mt-4 space-y-4 mb-8 self-stretch">

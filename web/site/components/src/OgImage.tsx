@@ -4,12 +4,7 @@ import React from 'react';
 const OgImage: React.FC = () => (
   <section className="bg-gradient-to-b from-violet-500 to-fuchsia-500 flex justify-center items-stretch flex-col w-[1200px] h-[627px]">
     <div className="h-1/2 flex items-center justify-center">
-      <Logo
-        type="inverted"
-        size={150}
-        textSize="text-[155px]"
-        innerColorOverride="rgb(153 74 239)"
-      />
+      <Logo type="inverted" size={210} textSize="text-[155px]" className="-ml-4" />
     </div>
     <div className="h-1/2 grow text-[40px] text-center flex flex-col space-y-5">
       <div className="text-white text-opacity-70 font-bold">

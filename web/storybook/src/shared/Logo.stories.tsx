@@ -10,7 +10,7 @@ export default {
 const Template: ComponentStory<typeof Logo> = (args) => <Logo {...args} />;
 
 export const Default = Template.bind({});
-Default.args = { type: `default`, size: 45 };
+Default.args = { type: `default` };
 Default.decorators = [
   (Story) => (
     <div className="py-8 flex justify-center">
@@ -23,7 +23,7 @@ export const DefaultIconOnly = Template.bind({});
 DefaultIconOnly.args = {
   type: `default`,
   iconOnly: true,
-  size: 75,
+  size: 90,
 };
 DefaultIconOnly.decorators = [
   (Story) => (
@@ -37,7 +37,6 @@ export const Inverted = Template.bind({});
 Inverted.args = {
   type: `inverted`,
   iconOnly: false,
-  size: 40,
 };
 Inverted.decorators = [
   (Story) => (
@@ -49,30 +48,4 @@ Inverted.decorators = [
 
 export const InvertedIconOnly = Template.bind({});
 InvertedIconOnly.decorators = Inverted.decorators;
-InvertedIconOnly.args = { ...Inverted.args, iconOnly: true };
-
-export const InvertedLarge = Template.bind({});
-InvertedLarge.decorators = Inverted.decorators;
-InvertedLarge.args = { ...Inverted.args, iconOnly: true, size: 65 };
-
-export const Dark = Template.bind({});
-Dark.args = {
-  type: `on-dark`,
-  iconOnly: false,
-  size: 40,
-};
-Dark.decorators = [
-  (Story) => (
-    <div className="py-8 bg-gray-900 flex justify-center">
-      <Story />
-    </div>
-  ),
-];
-
-export const DarkIconOnly = Template.bind({});
-DarkIconOnly.decorators = Dark.decorators;
-DarkIconOnly.args = { ...Dark.args, iconOnly: true };
-
-export const DarkLarge = Template.bind({});
-DarkLarge.decorators = Dark.decorators;
-DarkLarge.args = { ...Dark.args, iconOnly: true, size: 65 };
+InvertedIconOnly.args = { ...Inverted.args, iconOnly: true, size: 90 };

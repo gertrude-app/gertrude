@@ -22,10 +22,10 @@ const SidebarNav: React.FC<Props> = ({
     <nav className={cx(`flex flex-col`, collapsed ? `py-4` : `px-4`)}>
       <a href="/">
         <Logo
-          type="on-dark"
+          type="inverted"
           className={cx(
             `mb-4 sm:mb-6 scale-[0.8] sm:scale-100`,
-            collapsed ? `mt-3 ml-[1.2em]` : `mt-8 -ml-3 sm:ml-4`,
+            collapsed ? `mt-3 ml-[1.35em]` : `mt-8 -ml-2 sm:ml-4`,
           )}
           iconOnly={collapsed}
         />

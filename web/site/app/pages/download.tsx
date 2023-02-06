@@ -9,8 +9,8 @@ const Download: NextPage = () => (
   <Chrome>
     <section className="bg-gradient-to-b from-violet-500 to-fuchsia-500 flex-grow flex flex-col justify-center items-center p-6 py-10">
       <div className="bg-gray-50 shadow-xl rounded-3xl py-8 px-6 xs:px-10 sm:px-20 flex flex-col items-center mb-6">
-        <Logo type="default" iconOnly size={60} className="mb-4 xs:mb-6" />
-        <h1 className="text-3xl font-inter mb-4 xs:mb-6 text-center">
+        <Logo type="default" iconOnly size={90} className="mb-4 xs:mb-6" />
+        <h1 className="text-3xl font-inter mb-4 xs:mb-4 text-center">
           Download Gertrude
         </h1>
         <p className="text-gray-500 mb-6 text-center">

@@ -6,7 +6,7 @@ interface Props {}
 const AppIcon: React.FC<Props> = ({}) => {
   return (
     <div className="p-6 rounded-[40px] bg-white shadow-lg flex flex-col justify-center items-center">
-      <Logo iconOnly size={180} className="" />
+      <Logo iconOnly size={200} className="" />
     </div>
   );
 };

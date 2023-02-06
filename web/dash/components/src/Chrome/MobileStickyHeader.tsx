@@ -38,7 +38,7 @@ const MobileStickyHeader: React.FC<MobileStickyHeaderProps> = ({
         sidebarShown ? `opacity-0` : `opacity-100`,
       )}
     >
-      <Logo type="on-dark" className="scale-75 sm:scale-90 opacity-90 antialiased" />
+      <Logo type="inverted" className="scale-75 sm:scale-90 opacity-90 antialiased" />
     </Link>
     <div className="px-3 py-2 opacity-0">
       <i className="fa fa-bars text-3xl text-white" aria-hidden="true" />
