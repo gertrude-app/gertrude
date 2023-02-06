@@ -324,6 +324,8 @@ Then tap to _disable Siri & Dictation_:
 
 If you haven't taken the time to carefully lock down your child's iPhone, we have a
 highly-detailed, [step-by-step guide,](/docs/definitive-guide-to-locking-down-an-iphone)
-including many screenshots. We really urge you to take this responsibility seriously.
+including many screenshots.
 
 {% /callout %}
+
+{% article-feedback-form name="five-things" /%}

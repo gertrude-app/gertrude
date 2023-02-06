@@ -500,3 +500,5 @@ We also recommend you check the items in our article about
 [things you probably forgot to lock down](/docs/five-things-you-forgot-when-locking-down-your-kids-iphone).
 
 {% /callout %}
+
+{% article-feedback-form name="lockdown-iphone-guide" /%}

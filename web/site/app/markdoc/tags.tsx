@@ -1,3 +1,4 @@
+import ArticleFeedbackForm from 'docs/ArticleFeedbackForm';
 import Callout from '../docs/Callout';
 import { QuickLink, QuickLinks } from '../docs/QuickLinks';
 import ArticleImage from '../docs/ArticleImage';
@@ -41,6 +42,12 @@ const tags = {
       title: { type: String },
     },
     render: ClickToReveal,
+  },
+  'article-feedback-form': {
+    attributes: {
+      name: { type: String },
+    },
+    render: ArticleFeedbackForm,
   },
   'quick-links': {
     render: QuickLinks,
