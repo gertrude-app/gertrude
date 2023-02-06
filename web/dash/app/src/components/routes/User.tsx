@@ -67,6 +67,10 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
       state.adding.keychain !== undefined,
     );
 
+    if (state.deleted.includes(id)) {
+      return [Query.redirectDeleted(`/users`), false];
+    }
+
     if (id === `new`) {
       return [{ state: `ongoing` }, false];
     }
@@ -75,9 +79,7 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
       return [Req.toUnresolvedQuery(fetch), fetch?.state !== `failed`];
     }
 
-    if (!editable && state.deleted.includes(id)) {
-      return [Query.redirectDeleted(`/users`), false];
-    } else if (!editable) {
+    if (!editable) {
       return [Query.unexpectedError(`c989c73a`, `missing user`), false];
     }
 

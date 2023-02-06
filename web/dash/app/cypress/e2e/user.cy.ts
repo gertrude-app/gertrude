@@ -10,9 +10,9 @@ describe(`user screen`, () => {
       req.reply({ success: true });
     });
 
-    cy.intercept(`/pairql/dashboard/GetUsers`, (req) => {
-      req.reply([mock.user({ id: `user-123` })]);
-    });
+    cy.intercept(`/pairql/dashboard/GetUsers`, [mock.user({ id: `user-123` })]);
+
+    cy.intercept(`/pairql/dashboard/DeleteEntity`, { success: true });
   });
 
   describe(`new user creation`, () => {
@@ -45,6 +45,19 @@ describe(`user screen`, () => {
       // don't show the empty new user in the list
       cy.sidebarClick(`Users`);
       cy.testId(`user-card`).should(`have.length`, 1);
+    });
+  });
+
+  describe(`user deletion`, () => {
+    it(`redirects to /users path`, () => {
+      cy.visit(`/users`);
+      cy.contains(`Edit`).click();
+
+      cy.contains(`Delete user`).click();
+      cy.testId(`modal-primary-btn`).click();
+
+      // redirects to /users
+      cy.location(`pathname`).should(`eq`, `/users`);
     });
   });
 });
