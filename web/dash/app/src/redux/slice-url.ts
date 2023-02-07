@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import Current from '../environment';
+import { logoutRouteVisited } from './slice-auth';
 import { createKeychainInitiated } from './slice-keychains';
 import { createResultThunk } from './thunk';
 
@@ -22,6 +23,10 @@ export const slice = createSlice({
   extraReducers(builder) {
     builder.addCase(createKeychainInitiated, (state, { payload }) => {
       state.redirect = `/keychains/${payload.id}`;
+    });
+
+    builder.addCase(logoutRouteVisited, () => {
+      return initialState();
     });
   },
 });

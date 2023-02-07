@@ -10,6 +10,7 @@ import { commit, editable, Req, toEditableMap } from './helpers';
 import { createResultThunk } from './thunk';
 import * as empty from './empty';
 import editKeyReducer from './edit-key-reducer';
+import { logoutRouteVisited } from './slice-auth';
 
 export interface KeychainsState {
   fetchAdminKeychainRequest: Record<UUID, RequestState>;
@@ -107,6 +108,10 @@ export const slice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(upsertKeychain.started, (state, { meta }) => {
       state.updateAdminKeychainRequest[meta.arg] = Req.ongoing();
+    });
+
+    builder.addCase(logoutRouteVisited, () => {
+      return initialState();
     });
 
     builder.addCase(upsertKeychain.failed, (state, { error, meta }) => {

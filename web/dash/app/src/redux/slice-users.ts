@@ -15,6 +15,7 @@ import { entireDay } from '../lib/helpers';
 import { Req, toMap, toEditableMap, editable, commit } from './helpers';
 import { createResultThunk } from './thunk';
 import * as empty from './empty';
+import { logoutRouteVisited } from './slice-auth';
 
 interface ActivityDay {
   numDeleted: number;
@@ -126,6 +127,10 @@ export const slice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchActivityDay.started, (state, { meta: { arg } }) => {
       state.activityDays[activityDayKey(arg.userId, arg.day)] = Req.ongoing();
+    });
+
+    builder.addCase(logoutRouteVisited, () => {
+      return initialState();
     });
 
     builder.addCase(fetchActivityDay.succeeded, (state, { payload, meta: { arg } }) => {

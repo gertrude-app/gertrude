@@ -1,12 +1,17 @@
 import type { Middleware } from '@reduxjs/toolkit';
 import type { State } from './store';
 import Current from '../environment';
-import { submitLoginForm, logoutClicked, loginFromMagicLink } from './slice-auth';
+import {
+  submitLoginForm,
+  logoutClicked,
+  loginFromMagicLink,
+  logoutRouteVisited,
+} from './slice-auth';
 import { desktopSidebarCollapsedToggled } from './slice-menu';
 import { handleSignupPaymentSuccess } from './slice-signup';
 
 const storageMiddleware: Middleware = (store) => (next) => (action) => {
-  if (logoutClicked.match(action)) {
+  if (logoutClicked.match(action) || logoutRouteVisited.match(action)) {
     Current.sessionStorage.removeItem(`admin_id`);
     Current.sessionStorage.removeItem(`admin_token`);
     Current.localStorage.removeItem(`admin_id`);

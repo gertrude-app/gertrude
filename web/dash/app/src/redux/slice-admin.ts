@@ -15,6 +15,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
 import { Req, editable, revert, commit } from './helpers';
 import { createResultThunk } from './thunk';
+import { logoutRouteVisited } from './slice-auth';
 
 export interface AdminState {
   billingPortalRequest: RequestState<string>;
@@ -147,6 +148,10 @@ export const slice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchProfileData.started, (state) => {
       state.profileRequest = Req.ongoing();
+    });
+
+    builder.addCase(logoutRouteVisited, () => {
+      return initialState();
     });
 
     builder.addCase(fetchProfileData.succeeded, (state, { payload }) => {

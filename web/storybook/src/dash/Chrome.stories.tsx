@@ -19,7 +19,6 @@ Open.args = {
   mobileSidebarOpen: true,
   onMobileHamburgerClick: () => {},
   onMobileSidebarClose: () => {},
-  onLogout: () => alert(`you're logged out!`),
   sidebarCollapsed: false,
   onToggleSidebarCollapsed: () => {},
   urlPath: `/`,

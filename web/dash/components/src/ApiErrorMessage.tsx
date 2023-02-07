@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import type { PqlError } from '@dash/types';
 import ErrorMessage from './ErrorMessage';
 import GenericError from './GenericError';
@@ -11,6 +11,8 @@ interface Props {
 
 const ApiErrorMessage: React.FC<Props> = ({ error, wrapped = true }) => {
   const Wrap = wrapped ? ErrorMessage : React.Fragment;
+  const location = useLocation();
+
   if (error?.userMessage) {
     return <Wrap>{error.userMessage}</Wrap>;
   }
@@ -19,12 +21,15 @@ const ApiErrorMessage: React.FC<Props> = ({ error, wrapped = true }) => {
       return <Wrap>{error.entityName ? `${error.entityName} not` : `Not`} found.</Wrap>;
     case `loggedOut`:
       return (
-        <Wrap>
-          Your session expired. Please{` `}
-          <Link to="/logout" className="underline text-blue-700 hover:text-blue-600">
-            login again.
-          </Link>
-        </Wrap>
+        <Navigate
+          to={`/logout${
+            location.pathname === `/`
+              ? ``
+              : `?redirect=${encodeURIComponent(location.pathname)}`
+          }`}
+          replace
+          state={{ from: location }}
+        />
       );
   }
   return (

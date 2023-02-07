@@ -5,6 +5,7 @@ import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 import { acceptUnlockRequest, rejectUnlockRequest } from './slice-unlock-requests';
 import { deleteActivityItems } from './slice-users';
+import { logoutRouteVisited } from './slice-auth';
 
 type Widgets = GetDashboardWidgets.Output;
 
@@ -26,9 +27,15 @@ export const slice = createSlice({
     builder.addCase(fetchDashboardData.started, (state) => {
       state.request = Req.ongoing();
     });
+
+    builder.addCase(logoutRouteVisited, () => {
+      return initialState();
+    });
+
     builder.addCase(fetchDashboardData.failed, (state, { error }) => {
       state.request = Req.fail(error);
     });
+
     builder.addCase(fetchDashboardData.succeeded, (state, action) => {
       state.request = Req.succeed(action.payload);
     });

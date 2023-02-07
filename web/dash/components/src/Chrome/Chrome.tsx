@@ -10,7 +10,6 @@ interface Props {
   mobileSidebarOpen: boolean;
   onMobileHamburgerClick(): unknown;
   onMobileSidebarClose(): unknown;
-  onLogout(): unknown;
   onInternalLinkClick(): unknown;
   sidebarCollapsed: boolean;
   onToggleSidebarCollapsed(): unknown;
@@ -23,7 +22,6 @@ const Chrome: React.FC<Props> = ({
   onMobileHamburgerClick,
   onMobileSidebarClose,
   urlPath,
-  onLogout,
   sidebarCollapsed,
   onToggleSidebarCollapsed,
   onInternalLinkClick,
@@ -80,11 +78,7 @@ const Chrome: React.FC<Props> = ({
                 </div>
               </Transition.Child>
               {/* mark: end floating mobile overlay close 'X' button */}
-              <SidebarNav
-                onInternalLinkClick={onInternalLinkClick}
-                onLogout={onLogout}
-                urlPath={urlPath}
-              />
+              <SidebarNav onInternalLinkClick={onInternalLinkClick} urlPath={urlPath} />
             </Dialog.Panel>
             {/* mark: end mobile sidebar wrapper */}
           </Transition.Child>
@@ -108,7 +102,6 @@ const Chrome: React.FC<Props> = ({
         collapsed={sidebarCollapsed}
         toggleCollapsed={onToggleSidebarCollapsed}
         onInternalLinkClick={onInternalLinkClick}
-        onLogout={onLogout}
         urlPath={urlPath}
       />
     </div>

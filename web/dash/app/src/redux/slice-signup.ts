@@ -4,6 +4,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
+import { logoutRouteVisited } from './slice-auth';
 
 export interface SignupState {
   email: string;
@@ -43,6 +44,10 @@ export const slice = createSlice({
   extraReducers(builder) {
     builder.addCase(allowingSignups.started, (state) => {
       state.allowingSignupsReq = Req.ongoing();
+    });
+
+    builder.addCase(logoutRouteVisited, () => {
+      return initialState();
     });
 
     builder.addCase(allowingSignups.succeeded, (state, { payload }) => {

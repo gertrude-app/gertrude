@@ -6,6 +6,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
+import { logoutRouteVisited } from './slice-auth';
 
 export interface UnlockRequestsState {
   entities: Record<UUID, UnlockRequest>;
@@ -44,6 +45,10 @@ export const slice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(rejectUnlockRequest.started, (state, { meta }) => {
       state.updateReqs[meta.arg] = Req.ongoing();
+    });
+
+    builder.addCase(logoutRouteVisited, () => {
+      return initialState();
     });
 
     builder.addCase(rejectUnlockRequest.failed, (state, { error, meta }) => {
