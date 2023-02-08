@@ -16,7 +16,7 @@ const ArticleFeedbackForm: React.FC<Props> = ({ name }) => (
       </p>
     </div>
     <form
-      className="pl-12 flex flex-col space-y-4 text-white max-w-2xl"
+      className="pl-12 flex flex-col space-y-4 text-white max-w-2xl pr-2"
       data-netlify="true"
       name={name}
       method="POST"

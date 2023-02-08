@@ -6,17 +6,38 @@ description:
 ---
 
 {% .lead %} With a little hard work, it's possible to entirely lock down an iPhone or iPad
-so that it is _extremely safe_ for your child to use. Apple gives parents all the tools
-they need to limit and control access, apps, and internet content. The bad news is that
+so that it is _extremely safe_ for your child to use. Thanks to Apple, parents have all
+the tools they need to control access, apps, and internet content. The bad news is that
 these controls are scattered over an unintuitive hodge-podge of settings screens, and
-there are several important loopholes that are easy to miss.
+there are several important loopholes that are easy to miss. This tutorial will walk you
+step-by-step through the entire process.
 
-{% .lead %} This tutorial will walk you step by step through the process.
+{% callout title="What do you mean by <b class='underline'>safe</b>?" %}
 
-{% callout %}
+Many parents naively think that the primary danger posed by internet-connected devices is
+that they could allow **predators to gain access to your child.** While this is a
+legitimate danger and a horrific tragedy whenever it occurs, it is nevertheless
+**relatively rare** and often distracts parents from dealing with the dangers which
+**almost certainly will affect their kids.**
 
-This article is written for parents wanting to take a _very strict_ approach to locking
-down their child's iPhone.
+What is sadly **unbelievably common** is for adolescents of both sexes&mdash;because of
+their own innate curiousity, surging hormones, and lack of impulse control&mdash;to
+develop lifelong addictions to pornography or to be deeply scarred by engaging with other
+types of socially and emotionally damaging content and behavior on the internet.
+
+You wouldn't fill your child's closet with hard-core adult magazines and hope they would
+have enough self-control to never look inside. Giving your child a phone that is not
+thoroughly locked down is _exactly the same._
+
+As unpleasant as it might be, it's worth familiarizing yourself with some of the
+[heart-breaking statistics,](https://www.guardchild.com/statistics/) like:
+
+- 90% of children ages 8-16 have seen online pornography
+- 70% of children ages 7-18 have _accidentally_ encountered porn searching the web while
+  doing homework
+- the largest group of internet porn consumers is children ages 12-17
+- 22% of teenage girls say they have posted nude or semi-nude photos of themselves online
+- 37% of the internet is pornography
 
 {% /callout %}
 
@@ -34,21 +55,32 @@ a phone, which he got a few weeks _after_ his 16th birthday. Many generations of
 survived their pre-teen and adolescent years without a phone, and yours can too. I realize
 it's going against an extremely strong societal norm, but absolutely nothing beats the
 simplicity and safety of them simply not having a phone. And there's a growing amount of
-research showing that you might be greatly helping their cognitive and emotional
-development.
+[research](https://www.frontiersin.org/articles/10.3389/fpsyt.2021.669042/full) showing
+that you might be greatly helping their cognitive and emotional development.
 
-## Start by deleting apps
+{% callout title="iPhones, iPads &nbsp; . . . and Androids" %}
 
-{% callout %}
+For brevity's sake, the rest of this tutorial only refers to **iPhones**, but these steps
+work the same for **iPads.**
 
-For brevity's sake, this tutorial only refers to **iPhones**, but these steps work the
-same for **iPads.**
+However, none of what you'll find below applies to **Android phones or tablets**. While
+there certainly are some tools and apps for parental controls on an Android, in my
+opinion, they are **far less powerful and safe** than the deeply integrated controls Apple
+provides. It's enough of a difference to warrant spending the extra money on an Apple
+device, or considering a phone designed for parental controls like
+[Gabb](https://gabbwireless.com/) or [Bark](https://www.bark.us/bark-phone/) rather than
+an Android.
 
 {% /callout %}
 
+## Start by deleting apps
+
 The iPhone comes with many built-in apps, and before you started working to lock down your
 child's phone, you or they may have installed more. Therefore, the first thing you should
-do is _delete every single app_ that they don't absolutely need.
+do is _delete every single app_ that they don't need or you haven't thoroughly checked for
+safety. A child's phone is a tool, not an entertainment device. It should definitely
+**not** allow them to surf the web, play non-educational games, search for and install
+apps, or access music, videos, or social media content from the internet.
 
 To delete an app, tap and _hold_ it's icon, until you see the option to _remove_ it:
 
@@ -67,14 +99,11 @@ below.
 
 {% /callout %}
 
-Again, _delete as many apps as you can_&mdash;it's much simpler than disabling them
-through the Screen Time settings below.
-
 {% callout type="warning" %}
 
 Both the **Apple Maps** and **Google Maps** apps can be used to view **nude photos,** and
-should be deleted. For more details (including a recommendation for a replacement), see
-[here](/docs/five-things-you-forgot-when-locking-down-your-kids-iphone#4-explicit-images-in-maps-apps).
+should be deleted. For more details (including a recommendation for a replacement),
+[see here](/docs/five-things-you-forgot-when-locking-down-your-kids-iphone#4-explicit-images-in-maps-apps).
 
 {% /callout %}
 
@@ -139,7 +168,8 @@ it takes to do the initial setup of Family Sharing, and a restriction that once 
 turn 18, they will be able to disable these restrictions themselves. On the other hand, if
 you choose "This is My iPhone" you'll still be able to protect the device to the same
 degree, you'll just have to make any changes _from your child's device_ rather than from
-your own.
+your own. If you're not sure what to do, I recommend choosing **My iPhone**, only because
+it's a little simpler to get started.
 
 At this point, the instructions for continuing **briefly diverge,** depending on what
 choice you made between "My iPhone" or "My Child's".
@@ -148,22 +178,19 @@ choice you made between "My iPhone" or "My Child's".
 
 {% callout %}
 
-**Skip this section** if you chose _"My iPhone"_ in the preceding step. You won't see the
+**Skip this section if you chose "My iPhone"** in the preceding step. You won't see the
 below screens, and you'll rejoin us in the next section.
 
 {% /callout %}
 
 If you chose _"My Child's iPhone",_ you'll be presented with several screens guiding you
-through some setup steps. We'll be _skipping_ most of them, because you can manage all of
-the same settings from the normal interface, and it's important you learn how to do so.
+through some setup steps. Skip past all three screens shown below.
 
-{% image src="lockdown-iphone/wizard-downtime.png" caption="Choose NOT NOW (you'll set this up later)" alt="locking down an iPhone: choose 'not now' when prompted about Downtime, you'll set this up later" /%}
+{% image src="lockdown-iphone/wizard-skip.png" caption="Skip these screens" alt="locking down an iPhone: skip these screens when setting up Screen Time" /%}
 
-{% image src="lockdown-iphone/wizard-app-limits.png" caption="Choose NOT NOW (you'll set this up later)" alt="locking down an iPhone: choose 'not now' when prompted about App Limits, you'll set these up later if necessary" /%}
+When it prompts you to _enter your Apple ID,_ click **cancel**.
 
-{% image src="lockdown-iphone/wizard-content-privacy.png" caption="Choose CONTINUE" alt="locking down an iPhone: click 'continue' when shown the screen about Content & Privacy" /%}
-
-{% image src="lockdown-iphone/wizard-passcode-recovery.png" caption="entering your Apple ID here is recommended, but not required" alt="locking down an iPhone: enter your Apple ID to allow for Screen Time passcode recovery" /%}
+{% image src="lockdown-iphone/wizard-passcode-recovery.png" caption="Skip this step by clicking <b>cancel</b>" alt="locking down an iPhone: enter your Apple ID to allow for Screen Time passcode recovery" /%}
 
 ### Setting a passcode
 
@@ -173,7 +200,8 @@ should already be seeing the screen prompting you to set a passcode.
 
 {% image src="lockdown-iphone/use-screen-time-passcode.png" caption="If not using Family Sharing, tap to set a passcode" alt="locking down an iPhone: click 'Use Screen Time Passcode' and set a totally unique 4-digit code" /%}
 
-At the next screen, enter and confirm a _4 digit passcode:_
+Which will bring up _this screen_ (if it's not already up), where you should enter and
+confirm a _4 digit passcode:_
 
 {% image src="lockdown-iphone/set-passcode.png" caption="Set and confirm your UNIQUE passcode" alt="locking down an iPhone: when prompted, choose a unique passcode to protect Screen Time" /%}
 
@@ -183,18 +211,21 @@ It's very important that you choose an **entirely new and random** 4 digit passc
 Please do not use something easily guessable by your child, like a birthday, your street
 address, your debit card pin, or any 4 digit number you may have ever used for a padlock
 or alarm system, or anything like that. Most people re-use the same pins and combinations,
-so if don't choose something totally unique for this passcode, it's very likely your child
-will be able to easily guess it.
+so if you don't choose something totally unique for this passcode, it's very likely your
+child will be able to easily guess it.
 
 {% /callout %}
 
 {% callout type="warning" title="Careful with that passcode!" %}
 
-Screen Time currently only gives you the option to use a 4 digit passcode. The downside of
-this is that **if your child is able to see you** while you're entering this code, it's
-extremely easy for them to remember it. It's worth it to be _very paranoid_ about this.
-Take an extra moment to ensure your child is out of the room, or not anywhere where they
-can at all see the screen of their device whenever you enter this code.
+**If your child is able to see you while you're entering this code,** it's extremely easy
+for them to remember it. It's worth it to be _very paranoid_ about this. My friend's son
+learned his parent's passwords by secretly watching them type, and ended up using their
+devices to look at porn.
+
+I make my kids to look away whenever I'm entering a password, I frequently change my
+passwords, and I'm especially careful with their Screen Time passcode&mdash;holding the
+phone only inches from my chest when entering the numbers.
 
 {% /callout %}
 
@@ -237,25 +268,13 @@ The next section on the main screen is for **App Limits**.
 This tutorial won't cover App Limits in depth, because they're not central to protecting
 your kids. Every app that could be dangerous should be completely blocked by techniques
 shown later in this tutorial. If you have some apps that you only want grant limited time
-for each day, then App Limits can be a useful tool for that end. However, App Limits is
-significantly limited in that it doesn't let you specify limits for _specific apps_, only
-_app categories_, which you have no control over.
+for each day, then App Limits can be a useful tool for that end.
 
 In my opinion, web-browsing (Safari) and all social media apps should be _entirely
 eliminated_ from your child's iPhone, not regulated with time limits. Phones should
 provide only tools for communication (email, phone, and texting), plus required safe apps
-for school, and work, as needed. Web browsing should only be done on a computer, ideally
-in a public place, with a tool like [Gertrude](/) to restrict access and provide
-supervision.
-
-{% callout %}
-
-There are a few apps (like **Messages**&mdash;for sending/receiving _texts_), for which
-Apple provides no way to disable. One workaround is to set an App Limit for **1 minute**
-for that app's category&mdash;provided that doesn't cripple other important apps in the
-same category.
-
-{% /callout %}
+for school and work, as needed. Web browsing should only be done on a computer, ideally in
+a public place, with a tool like [Gertrude](/) to restrict access and provide supervision.
 
 ## Communication Limits
 
@@ -311,29 +330,25 @@ Then drill into the section labeled _iTunes &amp; App Store Purchases_, shown be
 
 {% image src="lockdown-iphone/itunes-app-store-purchases.png" caption="Tap to drill into iTunes & App Store next" alt="locking down an iPhone: Content & Privacy Restrictions > iTunes & App Store Purchases" /%}
 
-For maximum safety, we recommend disabling all three of the settings shown below by
-setting them to **Don't allow**.
+For a safe iPhone, all three of these options should be set to **Don't allow**.
 
 {% image src="lockdown-iphone/dont-allow-installing-deleting-apps.png" caption="<b>Don't allow</b> installing, deleting, or in-app purchases" alt="locking down an iPhone: don't allow installing apps, deleting apps, or in-app purchases" /%}
 
-Don't worry, you'll _still be able to add new apps_ when you child needs them and you
-approve. You'll simply have to temporarily allow installing apps in this section, install
-the app, and then revoke the privilege again.
+{% callout title="Managing Apps Over Time" %}
 
-{% callout %}
+You can still add new apps you approve when you child needs them. You just temporarily
+allow installing apps in this section, install the app, and then revoke the installation
+privilege again.
 
-After you set the settings to what is shown above, **you won't be able to delete apps.**
-That's one of the reasons we started by encouraging you to first delete all unnecessary
-apps. Don't worry though, if you ever later on want to remove an app from your child's
-phone, all you need to do is 1) enter the passcode, 2) temporarily _allow_ deleting
-apps, 3) delete the app, and then 4) disable deleting apps again.
+Same with _deleting_ apps: just temporarily allow deleting, remove the app, and
+re-disable.
 
 {% /callout %}
 
 ### Allowed Apps
 
 Next, tap the back button to get back to the _Content & Privacy Restrictions_ screen, and
-then drill down into the second section, labeled **Allowed Apps**:
+then tap to select the second section, labeled **Allowed Apps**:
 
 {% image src="lockdown-iphone/allowed-apps.png" caption="Go back one screen, then choose <b>Allowed Apps</b>" alt="locking down an iPhone: Content & Privacy Restrictions > Allowed Apps" /%}
 
@@ -343,14 +358,16 @@ let you exempt certain apps from Downtime. This screen lets you enable/disable a
 entirely, irrespective of Downtime.
 
 This is an **extremely important area** because it's the only way you can disable/remove
-certain apps, like Safari.
+certain apps, like **Safari**&mdash;the built-in app for surfing the web which is the
+single most dangerous app on your child's iPhone.
 
-{% image src="lockdown-iphone/disable-safari-siri.png" caption="Disable any apps you want to block. Be sure to disable Safari and Siri" alt="locking down an iPhone: disable apps that Apple doesn't let you delete" /%}
+{% image src="lockdown-iphone/disable-safari-siri.png" caption="Disable any apps you want to block. Be sure to disable <b class='underline'>Safari</b> and Siri" alt="locking down an iPhone: disable apps that Apple doesn't let you delete" /%}
 
 Work through the list of apps, _leaving enabled **only the apps** that are truly
 necessary, and you're **sure are safe**_. We encourage you to take a _very conservative_
 approach: kids' phones should be very minimal. The more apps you allow, the more chance
-you've accidentally opened up something that could be dangerous for them.
+you've accidentally opened up something that could allow them unrestricted access to the
+internet.
 
 {% callout title="How do I know if an app is safe?" %}
 
@@ -363,8 +380,8 @@ _Audible_ app (for listening to audiobooks) on an old phone we had lying around.
 as long as I controlled which books were downloaded (because my kids didn't have the
 ability to purchase a new book), the app should be safe, right? I took a few minutes to
 explore the app, and found that there was a feature where you could search for new
-audiobooks. A few well-crafted search terms filled the screen with **adult books with
-semi-pornagraphic covers.** I didn't install the app after all.
+audiobooks. A few simple search terms filled the screen with **adult books with
+semi-pornagraphic covers.** I deleted the app.
 
 Whenever you're about to allow a new app, take 5 minutes exploring the app. Imagine
 someone will give you $10,000 if you can find inappropriate content on it. You'd be
@@ -372,16 +389,16 @@ surprised how often you can.
 
 {% /callout %}
 
-{% callout title="Disabling Safari" %}
+{% callout title="What about web research?" %}
 
-We **strongly urge** that you _entirely disable_ the Safari browser on your child's phone
-or device. Simply put, it's just too risky to allow Safari on a child's phone, no matter
-their age or gender. Apple does grant some controls limiting what websites can be
-accessed, but in our experience, these controls are for the most part extremely deficient,
-and unreliable.
+Kids shouldn't be doing homework research on a phone, period. For starters, a phone is not
+the right tool for serious academic research. And further, researching on the web is
+actually a very high-risk activity:
+[70% of children](https://www.guardchild.com/statistics/) ages 7-18 have accidentally
+encountered porn searching the web while doing homework.
 
-Accessing necessary websites for school should be done on a computer, ideally in a public
-place, with a filter that blocks every site except those you have explicitly safe-listed.
+In our household, research for homework is always done on a computer, either under direct
+parental supervision, or with filtering and screen recording provided by the Gertrude app.
 
 {% /callout %}
 
@@ -397,7 +414,7 @@ something up, and she will happily respond with snippets of content **including 
 ### Content Restrictions
 
 Next, tap the back button to get back to the _Content & Privacy Restrictions_ screen, and
-then drill down into the second section, labled **Content Restrictions**:
+then tap to move into the second section, labled **Content Restrictions**:
 
 {% image src="lockdown-iphone/content-restrictions.png" caption="Go back one screen, then choose <b>Content Restrictions</b>" alt="locking down an iPhone: Content Restrictions, where many of the most important settings live" /%}
 
@@ -408,8 +425,8 @@ Which brings you to this screen:
 There's a lot to take in on this screen. Loads of different settings. Go through _each
 setting_ one by one, _turning it to the **safest (or most disabled) option,**_ unless you
 have a good reason to do otherwise. For example, anywhere it offers you the options of
-"Clean" or "Explicit", choose "Clean", if it offers "Off" and "On" choose "On", and if it
-offers "Don't Allow" or "Allow" choose "Allow".
+"Clean" or "Explicit", choose "Clean", if it offers "Off" and "On" choose "Off", and if it
+offers "Don't Allow" or "Allow" choose "Don't Allow".
 
 {% image src="lockdown-iphone/clean-not-explicit.png" caption="choose CLEAN, OFF, or DON'T ALLOW for most options" alt="locking down an iPhone: choose 'clean', 'off', or 'don't allow' for most options in Content Restrictions" /%}
 
@@ -417,8 +434,8 @@ Three of the sub-sections deserve particular attention, the first is **Apps**:
 
 ### Content Restrictions &rarr; Apps
 
-Within _Content & Privacy Restrictions_, there is a drill down for a section labled
-**Apps**, as shown below:
+Within _Content & Privacy Restrictions_, there is another section labled **Apps**, as
+shown below:
 
 {% image src="lockdown-iphone/content-restrictions-apps.png" alt="locking down an iPhone: the 'Apps' section of Content Restrictions has to do with app age ratings" /%}
 
@@ -431,20 +448,16 @@ installed, which you can see from the drill-down screen:
 
 {% image src="lockdown-iphone/app-age-rating.png" caption="This screen should be called <b>App Age Rating</b>" alt="locking down an iPhone: understanding the Content Restrictions > Apps screen" /%}
 
-What you choose here really only matters if you _have also allowed_ your child the
-authority to _install apps_, which I don't recommend. Assuming you have not allowed
-installing apps, I recommend setting this to at least `9+` or `12+`, or even
-`Allow all`&mdash;since you will personally be individually approving and installing each
-app. Setting it to lower than that can cause apps you approve to not show up (see below).
+Set this to `12+` or even `Allow All`&mdash;your child can't install apps anyway, and you
+will be approving every app individually. Setting it too low can cause mysterious missing
+apps (see below).
 
 {% callout title="An app I installed for my child won't show up!" type="warning" %}
 
-If you chose a very conservative value like `4+` for your app _age rating_, you may find
-that apps you approve of and want your child to have access to _won't appear on their home
-screen_. That's because most apps that aren't specifically designed for very young
-children have ratings higher than `4+`. To fix this, just make sure you have removed the
-right to install apps, and then set the age limit to a higher level which allows the app
-you're trying to install.
+If you chose a very conservative value like `4+` for your app _age rating_, some apps you
+want your kids to use may **dissappear**. To fix this, just make sure you have removed the
+right to install apps, and then set the age limit to a higher level and the app should
+reappear.
 
 {% /callout %}
 
@@ -465,12 +478,14 @@ many apps have what amounts to a built-in web-browser, and reach out to the inte
 load content when your child is using them. Without this setting chosen, otherwise safe
 apps can become alternative portals to the internet.
 
-{% callout title="Why not just 'Limit Adult Websites'?" type="warning" %}
+{% callout title="Why not 'Limit Adult Websites'?" type="warning" %}
 
 It might be tempting to choose the second option: **Limit Adult Websites**, but we urge
 you not to. If you do, you're trusting that someone has correctly identified and
 categorized over 2 billion websites, and is staying on top of the nearly 250,000 new
-websites being created every day.
+websites being created every day. I've personally tested a filter that blocks **millions**
+of known adult domains, and it still took only a few minutes to find explicit content that
+was unblocked.
 
 {% /callout %}
 
@@ -493,6 +508,29 @@ the thought experiment I proposed above: spend a few minutes with each app, imag
 would immediately win $10,000 if you could find something inappropriate or dangerous.
 Imagine you are a bored, impulsive, motivated teenager with a lot of persistence and time
 on their hands.
+
+## Having the Right Mindset
+
+I wish I could tell you that there's _"one simple trick"_ or some _silver-bullet
+technology_ to easily and perfectly protect your kids in this new world we live in.
+There's not. The reality is that **it's going to take time, effort, and diligence** to
+keep your kids safe online. It will be _annoying, frustrating, and inconvenient_ at times,
+and will interrupt your day frequently. There will be a _constant temptation to simplify
+your life_ by disabling protections and telling yourself that "my kid will be OK."
+
+But don't despair, this really is possible. An enormously important step is just to settle
+it ahead of time that you're willing to put in the time and effort to actually keep them
+safe. Your kids might moan and groan, but they'll survive&mdash;and thank you one day.
+Stay the course, it's worth it.
+
+Once you've got your kids iPhone locked down, I urge you to think carefully about their
+**computer usage** as well. If your kid has a Mac, you might want to check out
+[Gertrude,](/) the app I built to keep my own kids safe while doing school online.
+
+And please, let me know using the form below if you have any questions or difficulties
+following this tutorial, I'd be happy to hear from you!
+
+{% .border-b .border-slate-700 .mb-12 .mx-12 %}&nbsp;
 
 {% callout %}
 

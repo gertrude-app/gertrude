@@ -5,18 +5,11 @@ description:
   bizarrely unintuitive fixes it takes to fix them.
 ---
 
-{% .lead .mb-12 %} I consider myself pretty tech-savvy: I've been a software developer for
-15 years, and have apps in the App store. So when I locked down my oldest son's first
-iPhone, I was fairly confident I had covered all my bases. But boy, was I wrong. _Grab
-your child's phone **right this minute** and check if you missed any of these too._
-
-{% callout title="What's with all the goats? 🐐" %}
-
-In order to avoid filling this post with harmful images, all of the examples below show
-pictures of **goats.** Every time you see one, **imagine your child were searching for
-something sexually explicit** or otherwise inappropriate.
-
-{% /callout %}
+{% .lead .mb-12 %} I consider myself pretty tech-savvy&mdash;I've been a software
+developer for 15 years, and even have apps in the App store. So when I locked down my
+oldest son's first iPhone, I was fairly confident I had covered all my bases. But boy, was
+I wrong. _Grab your child's phone **right this minute** and check if you missed any of
+these too._
 
 ## 1. `#images` iMessage App
 
@@ -36,39 +29,47 @@ images your child shouldn't be able to browse.
 
 {% click-to-reveal title="Show me how to fix it" %}
 
-**1.** Start by scrolling to the _far right_ tapping on the **More** icon:
+**Step 1.** Scroll to the far right and tap on the _more_ (**•••**) icon:
 
 {% image src="lockdown-iphone/messages-more.png" caption="Scroll to the right and click this icon" alt="what you forgot locking down your kid's iPhone: start by clicking the 'more' icon to remove the #images app" /%}
 
-**2.** Next, swipe left to _remove the app from "Favorites"_.
+**Step 2.** Next, swipe left to remove the app from _Favorites_.
 
-{% image src="lockdown-iphone/images-remove-from-favorites.png" caption="Swipe left to remove from Favorites" alt="what you forgot locking down your kid's iPhone: swipe left to remove #images from favorites" /%}
+{% image src="lockdown-iphone/images-remove-from-favorites.png" caption="Swipe left to 'Remove from Favorites'" alt="what you forgot locking down your kid's iPhone: swipe left to remove #images from favorites" /%}
 
-**3.** Then the app will appear in the section labeled _MORE APPS_. Swipe left again in
-this section to fully delete the app:
+**Step 3.** Then the app will appear in the section labeled _MORE APPS_. Swipe left again
+in this section to fully delete the app:
 
 {% image src="lockdown-iphone/images-delete-app.png" caption="Swipe left to delete the app once and for all" alt="what you forgot locking down your kid's iPhone: then delete the #images app" /%}
 
-**4.** Repeat for any other iMessage Apps that may already be installed. The `#images` app
-is the main offender that comes pre-installed, but it's possible your child has already
-installed other iMessage apps that expose them to undesirable content.
+**Step 4.** Repeat for any other iMessage Apps that may already be installed. The
+`#images` app is the most dangerous app, but we also recommend deleting the rest of them,
+with the exception of the _Photos_ app.
 
-**5.** Ensure that your child doesn't have the ability to _re-install_ this (or any other)
-app by going to "Settings > Screen Time > content & Privacy Restrictions > iTunes & App
-Store Purchases" and choose _Don't Allow_ for "Installing Apps":
+**Step 5.** Ensure that your child doesn't have the ability to _re-install_ this (or any
+other) app by going to "Settings > Screen Time > Content & Privacy Restrictions > iTunes &
+App Store Purchases" and choose _Don't Allow_ for "Installing Apps":
 
 {% image src="lockdown-iphone/dont-allow-installing-apps.png" caption="Remove authority to install apps, or they can re-install" alt="what you forgot locking down your kid's iPhone: remove authority to install apps to prevent more unsafe iMessage apps" /%}
 
 {% callout type="warning" alt=true %}
 
-This same exploit exists on the Messages app **for the Mac.** Unfortunately, there doesn't
-seem to be a similar way to delete the app on macOS. If your child uses a Mac computer,
-the only way to remove this is by deleting the Messages app, or using an internet filter
-program like [Gertrude](/) to block searching for innappropriate images.
+This same exploit also exists on the Messages app **for the Mac.** Unfortunately, there
+doesn't seem to be a similar way to delete `#images` on macOS. If your child uses a Mac
+computer, the only way to remove this is by deleting the Messages app, or using an
+internet filter program like [Gertrude](/) to block searching for innappropriate images.
 
 {% /callout %}
 
 {% /click-to-reveal %}
+
+{% callout title="What's with all the goats? 🐐" %}
+
+In order to avoid filling this post with harmful images, all of the examples show pictures
+of **goats.** Every time you see one, **imagine your child were searching for something
+sexually explicit** or otherwise inappropriate.
+
+{% /callout %}
 
 ## 2. Explicit Images in Maps Apps
 
@@ -100,17 +101,16 @@ is, but we do recommend you revoke that privilege after deleting the map apps.
 
 {% callout alt=true %}
 
-If you've already deleted _Apple Maps_ and are only deleting _Google Maps_, you can skip
+If you've already deleted Apple Maps and are **only deleting Google Maps**, you can skip
 this step.
 
 {% /callout %}
 
-Once you've allowed deleting apps, for some reason iOS still won't let you delete the
-_Apple Maps_ app. The workaround for this is to _fully power-off the phone and restart
-it._ To power off the phone, hold down the "side" button and the "volume down" button at
-the same time.
+Once you've allowed deleting apps, you won't actually be able to delete _Apple Maps_ until
+you fully power off the phone and restart. To power off the phone, hold down the "side"
+button and the "volume down" button at the same time.
 
-{% image src="lockdown-iphone/slide-to-power-off.png" caption="Hold down side and volume down buttons to fully power off." alt="what you forgot locking down your kid's iPhone: hold down side and volume down buttons to power off" /%}
+{% image src="lockdown-iphone/slide-to-power-off.png" caption="Strangely, you have to power off before you can delete Apple maps" alt="what you forgot locking down your kid's iPhone: hold down side and volume down buttons to power off" /%}
 
 After the phone has powered off, turn it on again by holding the right side button until
 the Apple logo appears.
@@ -123,7 +123,7 @@ delete it.
 
 {% image src="lockdown-iphone/delete-apple-maps.png" caption="Press and hold the icon to delete Apple Maps" alt="what you forgot locking down your kid's iPhone: how to delete Apple Maps with Screen Time" /%}
 
-**Step 4.** Now that the app is deleted, _disable again the ability to delete apps_ by
+**Step 4.** Now that the app is deleted, _forbid again the ability to delete apps_ by
 going back to "Settings > Screen Time > Content & Privacy Restrictions > iTunes & App
 Store Purchases":
 
@@ -154,7 +154,7 @@ incentive for them to change this setting.
 
 {% callout alt=true %}
 
-If your child needs a map/navigation app, at the time of this writing (2/2023) the
+If your child needs a map/navigation app, at the time of this writing (2/8/2023) the
 **Waze** app does not allow viewing of business images, and should be a safe alternative
 for older teens who need a turn-by-turn direction app.
 
@@ -162,22 +162,28 @@ for older teens who need a turn-by-turn direction app.
 
 {% /click-to-reveal %}
 
-## 3. Internet Results in Spotlight
+## 3. Internet Content in Searches
 
 To test if your child's phone is vulnerable to this commonly missed item, _**pull down**
 from the middle of the home screen_ to access the iPhone's built-in _search prompt_.
 
-{% image src="lockdown-iphone/spotlight-search.png" caption="Swipe down bring up Spotlight search, then type a search phrase" alt="what you forgot locking down your kid's iPhone: spotlight searching on an iPhone can access internet images" /%}
+{% image src="lockdown-iphone/spotlight-search.png" caption="Swipe down bring up search, then type a search phrase" alt="what you forgot locking down your kid's iPhone: spotlight searching on an iPhone can access internet images" /%}
 
-After pressing _Search_, _Spotlight_ leverages _Siri_ to search the internet and return
-results, **including images**. Imagine a less innocent search query than `goats`:
+After pressing the _search_ button, Siri is activated behind the scenes to search the
+internet and return results, **including images**. Again, imagine a less innocent search
+than `goats`:
 
-{% image src="lockdown-iphone/spotlight-search-results.png" caption="Spotlight search can pull images and other content from the internet" alt="what you forgot locking down your kid's iPhone: spotlight searching on iOS by default can load and display images from the web" /%}
+{% image src="lockdown-iphone/spotlight-search-results.png" caption="Search can use Siri to pull images and content from the internet" alt="what you forgot locking down your kid's iPhone: spotlight searching on iOS by default can load and display images from the web" /%}
 
 {% click-to-reveal title="show me how to fix it" %}
 
-This one is a little tricky to fix, because if you have Siri disabled via Screen Time, the
-controls you need to fix this loophole are _not visible._
+{% callout type="warning" alt=true %}
+
+The fix for this one is unintuitive because if you have Siri disabled via Screen Time, the
+controls you need to fix this loophole are **not visible,** which is why Step 1 is
+required.
+
+{% /callout %}
 
 **Step 1.** Temporarily _allow_ the use of Siri by going to: Settings > Screen Time >
 Content & Privacy Restrictions > Allowed Apps.
@@ -189,8 +195,8 @@ Spotlight searching features disabled).
 
 {% image src="lockdown-iphone/enable-siri-dictation.png" caption="Temporarily <b>enable</b> Siri" alt="what you forgot locking down your kid's iPhone: temporarily enable Siri & Dictation" /%}
 
-**Step 2.** Back in the _main settings screen_, you should now be able to see an option
-for **Siri & Search**
+**Step 2.** Go back to the _main settings screen_, where you should now be able to see an
+option for **Siri & Search**
 
 {% image src="lockdown-iphone/siri-search-main.png" caption="Now you can find \"Siri & Search\" in the main Settings screen" alt="what you forgot locking down your kid's iPhone: now you can see \"Siri & Search\" in the main Settings app" /%}
 
@@ -198,23 +204,23 @@ Click to **disable "Show in Spotlight"**:
 
 {% image src="lockdown-iphone/disable-show-in-spotlight.png" caption="DISABLE 'Show in Spotlight'" alt="what you forgot locking down your kid's iPhone: diable 'Show in Spotlight'" /%}
 
-**Step 3.** Finally, now that Siri can no longer provide results to Spotlight, you need to
-_reverse step 1_ by disabling Siri & Dictation. Go to Settings > Screen Time > Content &
-Privacy Restrictions, and disallow Siri & Dictation.
+**Step 3.** Finally, now that Siri can no longer provide results to Spotlight (the name of
+the built-in iOS search feature), you need to _reverse step 1_ by disabling Siri &
+Dictation. Go to Settings > Screen Time > Content & Privacy Restrictions, and disallow
+Siri & Dictation.
 
 {% image src="lockdown-iphone/disable-siri-dictation.png" caption="<b>Disable</b> Siri again (same location as step 1)" alt="what you forgot locking down your kid's iPhone: re-disable Siri again in Screen Time" /%}
 
 {% /click-to-reveal %}
 
-## 4. Internet Results in "Look Up"
+## 4. Web Searching from iBooks, Notes, Kindle, and Other Apps.
 
-Most apps that deal with text (like ebook readers, Bible apps, Notes, etc.) allow the user
-to _highlight a search term and **"Look Up"**_.
+Most apps that deal with text (like ebook readers, Bible apps, Notes, and **many more**)
+allow the user to _highlight a search term and **"Look Up"**_.
 
-{% image src="lockdown-iphone/look-up.png" caption="Highlight a word, then tap 'Look Up'" alt="what you forgot locking down your kid's iPhone: highlight a word and tap 'Look Up'" /%}
+{% image src="lockdown-iphone/lookup-books.png" caption="Most apps let you highlight a word, then tap 'Look Up'" alt="what you forgot locking down your kid's iPhone: highlight a word and tap 'Look Up'" /%}
 
-By default, your child's iPhone can access Siri (and through it, the whole internet), when
-"looking up" words, and Siri frequently displays **images** in the result set.
+Which brings up this:
 
 {% image src="lockdown-iphone/look-up-results.png" caption="An example of images pulled from the web in response to a 'Look Up'" alt="what you forgot locking down your kid's iPhone: Look Up on iOS can access and display to your child images from the web" /%}
 
@@ -222,24 +228,23 @@ By default, your child's iPhone can access Siri (and through it, the whole inter
 
 {% callout alt=true %}
 
-These steps are nearly identical to the fix for Spotlight searching, except for what
-setting to disable in step 2.
+These steps are nearly identical to the fix for _Internet Content in Searches_, except for
+what setting to disable in step 2.
 
 {% /callout %}
 
 **Step 1.** Temporarily _allow_ the use of Siri by going to: Settings > Screen Time >
-Content & Privacy Restrictions > Allowed Apps. (If you don't allow the use of Siri, the
-settings screen we need to use next will be hidden and inaccessible.)
+Content & Privacy Restrictions > Allowed Apps. (We need Siri enabled to get to the
+settings shown below.)
 
 {% image src="lockdown-iphone/allowed-apps.png" caption="Go to 'Allowed Apps'" alt="what you forgot locking down your kid's iPhone: Screen Time -> Content & Privacy Restrictions > Allowed Apps" /%}
 
-Then, _temporarily allow_ Siri & Dictation (you'll disable it again once we get the look
-up internet search disabled).
+Tap to **temporarily enable** Siri & Dictation.
 
 {% image src="lockdown-iphone/enable-siri-dictation.png" caption="Temporarily <b>enable</b> Siri" alt="what you forgot locking down your kid's iPhone: temporarily enable Siri to fix the other settings" /%}
 
-**Step 2.** Back in the _main settings screen_, you should now be able to see an option
-for **Siri & Search**
+**Step 2.** Go back to the _main settings screen_, where you should now be able to see an
+option for **Siri & Search**
 
 {% image src="lockdown-iphone/siri-search-main.png" caption="Now you can go back to 'Settings > Siri & Search'" alt="what you forgot locking down your kid's iPhone: now you can find 'Siri & Search' under the main Settings screen" /%}
 
@@ -255,46 +260,33 @@ Privacy Restrictions, and disallow Siri & Dictation.
 
 {% /click-to-reveal %}
 
-## 5. Fully Disable Siri
+## 5. Siri Internet Access
 
-A frequent mistake parents make is to leave the Siri virtual assistant enabled, or
-partially enabled. While Siri can provide help for many harmless tasks, it can also bypass
-other restrictions to access and _display almost any content on the internet._ To test if
-your child's device is vulnerable, activate Siri and ask her to show you pictures of
-something.
+A frequent mistake parents make is to leave Siri fully or partially enabled. While Siri
+can provide help for many harmless tasks, it can also bypass other restrictions to access
+and _display almost any content on the internet._ To test if your child's device is
+vulnerable, **ask Siri to show you pictures of something.**
 
 {% image src="lockdown-iphone/siri-search.png" caption="An example of images pulled from the web in response to a 'Look Up'" alt="what you forgot locking down your kid's iPhone: Siri can show your child images and content from anywhere on the internet" /%}
 
-Unfortunately, simply disabling Siri from the Screen Time settings is not sufficient. You
-must first update a handful of Siri integration points and _then_ disable Siri, or else
-multiple system services will still be able to use Siri to access the internet and show
-content to your child.
+Unfortunately, simply disabling Siri from the Screen Time settings is not sufficient to
+fix this. Follow the steps below for instructions.
 
 {% click-to-reveal title="show me how to fix it" %}
 
-**Step 1.** Before we disable Siri, we need to _adjust some settings._
-
-Go to "Settings > Siri & Search":
+**Step 1.** Before we disable Siri, we need to _adjust some settings._ Go to Settings >
+Siri & Search:
 
 {% image src="lockdown-iphone/siri-search-main.png" caption="Settings > Siri & Search" alt="what you forgot locking down your kid's iPhone: Settings > Search (in the main Settings app screen)" /%}
 
-Then disable all of the options shown below. If you don't disable these settings, then
-Siri will still be able to (among other things) provide internet content for _Spotlight_
-(searching) and _Look Up_ (clicking "Look Up" after highlighting a word in any app).
+Then disable all of the options shown below. Doing so prevents Siri from providing
+internet images and content when searching (Spotlight) or looking up definitions (Look
+Up).
 
 {% image src="lockdown-iphone/siri-disable-all.png" caption="Turn <b>all</b> of these settings OFF" alt="what you forgot locking down your kid's iPhone: disable all Siri system integrations for safety" /%}
 
-**Step 2.** Disable app/Siri integrations _(optional)_.
-
-{% callout alt=true %}
-
-Although this step is less critically important for safety, we still advise you take a
-moment and do it.
-
-{% /callout %}
-
-On the same settings screen from _step 1_, scroll down a bit further to find **individual
-app settings** for Siri, shown below:
+**Step 2.** Disable app/Siri integrations. On the same settings screen from _Step 1_,
+scroll down a bit further to find **individual app settings** for Siri, shown below:
 
 {% image src="lockdown-iphone/siri-app-settings.png" caption="Individual app + Siri settings" alt="what you forgot locking down your kid's iPhone: here's where individual apps' integration with Siri can be controlled" /%}
 
@@ -320,11 +312,51 @@ Then tap to _disable Siri & Dictation_:
 
 {% /click-to-reveal %}
 
+## Bonus: Protecting Household Devices
+
+If you checked and fixed all of the loopholes we've shown so far, and have
+[locked down your child's iPhone](/docs/definitive-guide-to-locking-down-an-iphone) using
+Screen Time, then you're doing great. But there's one more thing most parents forget:
+**most households have many internet-connected devices, ALL of which must be protected
+with passwords.** Take a minute do do a thorough review of all the phones, computers, and
+devices in your house, including:
+
+- your phone and your spouse's
+- all computers, including yours
+- phones, iPads, or tablets used by younger/older siblings
+- old devices lying around in closets and cupboards
+
+All of these devices must be _secured with passwords_ or have unsafe apps/priveleges
+removed. If this seems extreme, I assure you it's not. A couple I know found out too late
+that their 13 year old son was taking a laptop from their bedroom at night while they
+slept in order to fuel a growing pornography addiction.
+
+Also, if your devices are protected with passwords, you need to **change those passwords
+regularly.** Most people re-use the same passwords for many accounts and devices. Kids are
+smart enough to figure this out, and yours probably already know your favorite password.
+
+{% callout title="But <b>my</b> kid's a good kid..." type="warning" %}
+
+Don't fall into the trap of thinking _"it won't happen to **my** kid, he/she is such a
+good kid!"_
+
+No other generation in history has had access to what can now be found on the internet
+with a few clicks. Millions of well-raised, innocent kids from good families are getting
+permanently scarred by the addicitive nature of content they should never have known even
+existed.
+
+You **absolutely can** protect your kid, but you're going to have to make up your mind to
+be proactive and diligent. It will cost you a little time, and some inconvenience, but it
+is **completely worth it**.
+
+{% /callout %}
+
+{% .border-b .border-slate-700 .mb-12 .mx-12 %}&nbsp;
+
 {% callout title="Step-by-step guide to locking down an iPhone" %}
 
 If you haven't taken the time to carefully lock down your child's iPhone, we have a
-highly-detailed, [step-by-step guide,](/docs/definitive-guide-to-locking-down-an-iphone)
-including many screenshots.
+[step-by-step guide](/docs/definitive-guide-to-locking-down-an-iphone).
 
 {% /callout %}
 

@@ -6,6 +6,19 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+/* tighten up lists inside of markdown docs */
+.prose :where(ul > li):not(:where([class~='not-prose'] *)) {
+  font-size: 95%;
+  line-height: 1.45;
+  margin-top: 0.6em;
+  margin-bottom: 0.6em;
+}
+
+/* helps very-small screen callouts w/ floated icon */
+.Callout .prose > * {
+  margin-top: 0;
+}
+
 @layer utilities {
   .bg-fuchsia-radial-gradient {
     background: radial-gradient(closest-side, rgb(200, 88, 231, 0.2), transparent);

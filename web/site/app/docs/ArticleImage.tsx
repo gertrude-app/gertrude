@@ -19,7 +19,7 @@ const ArticleImage: React.FC<Props> = ({ src, caption, alt }) => (
     </div>
     {caption && (
       <div
-        className="mb-4 pt-2 text-center *text-[15px] italic text-slate-300"
+        className="mb-4 pt-2.5 text-center *text-[15px] italic text-slate-300 leading-tight"
         dangerouslySetInnerHTML={{ __html: caption }}
       />
     )}
