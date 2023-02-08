@@ -243,7 +243,7 @@ const Header: React.FC<{ navigation: typeof navigation }> = ({ navigation }) => 
               type="inverted"
               size={32}
               textSize="text-2xl"
-              className="opacity-90 lg:hidden"
+              className="opacity-90 lg:hidden mr-[48px]"
             />
           </div>
         </Link>
