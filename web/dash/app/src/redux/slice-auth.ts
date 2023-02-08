@@ -4,6 +4,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import type { Login, RequestState } from '@dash/types';
 import type { StorageClient } from '../environment/Storage';
 import Current from '../environment';
+import { OptionalVar as Optional } from '../environment/Environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 import { handleSignupPaymentSuccess } from './slice-signup';
@@ -46,10 +47,6 @@ export const slice = createSlice({
       state.loginPassword = action.payload;
     },
     logoutRouteVisited: (state) => {
-      state.admin = null;
-      state.passwordLoginRequest = Req.idle();
-    },
-    logoutClicked: (state) => {
       state.admin = null;
       state.passwordLoginRequest = Req.idle();
     },
@@ -133,12 +130,8 @@ export const loginFromMagicLink = createResultThunk(
 
 const { errorExpired } = slice.actions;
 
-export const {
-  logoutClicked,
-  logoutRouteVisited,
-  loginEmailUpdated,
-  loginPasswordUpdated,
-} = slice.actions;
+export const { logoutRouteVisited, loginEmailUpdated, loginPasswordUpdated } =
+  slice.actions;
 
 export default slice.reducer;
 
@@ -157,20 +150,19 @@ export function getInitialAdmin(): AdminIds | null {
   if (window.location.pathname === `/login`) {
     return null;
   }
-  return null;
-  // if (Current.localStorage.getItem(`dev_logged_out`) !== null) {
-  //   return null;
-  // }
+  if (Current.localStorage.getItem(`dev_logged_out`) !== null) {
+    return null;
+  }
 
-  // const devCreds = Current.env.optionalVar(Optional.TestAdminCreds);
-  // if (!devCreds || !devCreds.includes(`:`)) {
-  //   return null;
-  // }
+  const devCreds = Current.env.optionalVar(Optional.TestAdminCreds);
+  if (!devCreds || !devCreds.includes(`:`)) {
+    return null;
+  }
 
-  // const [adminId = ``, token = ``] = devCreds.split(`:`);
-  // Current.sessionStorage.setItem(`admin_id`, adminId);
-  // Current.sessionStorage.setItem(`admin_token`, token);
-  // return { adminId, token };
+  const [adminId = ``, token = ``] = devCreds.split(`:`);
+  Current.sessionStorage.setItem(`admin_id`, adminId);
+  Current.sessionStorage.setItem(`admin_token`, token);
+  return { adminId, token };
 }
 
 function adminFrom(storage: StorageClient): AdminIds | null {
