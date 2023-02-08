@@ -3,7 +3,7 @@ import { Logo } from '@shared/components';
 
 const DocFooterCta: React.FC = () => (
   <div className="mt-16 flex flex-col gap-3 rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-500 p-6 text-white sm:flex-row sm:items-start sm:gap-8">
-    <Logo type="inverted" className="-mt-1" textSize="text-2xl" size={23} />
+    <Logo type="inverted" textSize="text-3xl" size={45} />
     <div className="flex flex-col items-end">
       <p className="text-base leading-6">
         The Gertrude app helps you <b>protect your kids</b> online with{` `}

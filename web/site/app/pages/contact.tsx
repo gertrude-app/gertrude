@@ -38,8 +38,8 @@ const Contact: NextPage = () => {
             )}
             <Logo
               iconOnly
-              size={300}
-              className="absolute -left-10 -bottom-24 opacity-20"
+              size={400}
+              className="absolute -left-28 -bottom-24 opacity-20"
             />
           </div>
           <form

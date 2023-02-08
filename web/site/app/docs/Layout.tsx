@@ -235,25 +235,16 @@ const Header: React.FC<{ navigation: typeof navigation }> = ({ navigation }) => 
         <Link href="/" aria-label="Gertrude home page">
           <div className="flex">
             <Logo
-              textSize="text-3xl"
-              className="hidden opacity-90 lg:flex lg:space-x-1.5"
-              type="on-dark"
+              textSize="text-4xl"
+              className="hidden opacity-90 lg:flex"
+              type="inverted"
             />
             <Logo
-              type="on-dark"
+              type="inverted"
               size={32}
               textSize="text-2xl"
-              className="opacity-90 space-x-1 lg:hidden"
+              className="opacity-90 lg:hidden mr-[48px]"
             />
-            <span
-              className={cx(
-                `bg-white ml-1.5 px-2.5 py-0 rounded-lg mr-[48px] lg:mr-0 lg:translate-y-0.5 flex justify-center items-center`,
-              )}
-            >
-              <span className="font-extrabold bg-gradient-to-br from-indigo-500 to-fuchsia-400 bg-clip-text text-[1.625rem] text-transparent lg:text-2xl">
-                Docs
-              </span>
-            </span>
           </div>
         </Link>
       </div>

@@ -6,7 +6,7 @@ const MainFooter: React.FC = () => (
   <footer className="bg-slate-900">
     <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-start p-8 xs:p-12">
       <Link href="/">
-        <Logo type="on-dark" />
+        <Logo type="inverted" />
       </Link>
       <div className="flex space-x-12 mt-10 sm:mt-0">
         <ul className="flex flex-col space-y-3 flex-grow">
