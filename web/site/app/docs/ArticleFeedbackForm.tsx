@@ -32,6 +32,7 @@ const ArticleFeedbackForm: React.FC<Props> = ({ name }) => (
             type="text"
             name="name"
             id="name"
+            required
           />
         </fieldset>
         <fieldset className="lg:w-1/2 mt-4 lg:mt-0">
@@ -44,6 +45,7 @@ const ArticleFeedbackForm: React.FC<Props> = ({ name }) => (
             name="email"
             id="email"
             placeholder="you@example.com"
+            required
           />
         </fieldset>
       </div>
@@ -56,6 +58,7 @@ const ArticleFeedbackForm: React.FC<Props> = ({ name }) => (
           name="message"
           id="message"
           rows={5}
+          required
         />
       </fieldset>
       <fieldset>
