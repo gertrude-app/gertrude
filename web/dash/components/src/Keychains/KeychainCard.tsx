@@ -33,7 +33,7 @@ const KeychainCard: React.FC<Props> = ({
 }) => (
   <div
     className={cx(
-      `rounded-xl shadow-lg border-[0.5px] bg-white flex flex-col justify-between transition duration-100`,
+      `rounded-xl shadow-md border-[0.5px] bg-white flex flex-col justify-between transition duration-100`,
       isSelect(props) && props.selected && `bg-violet-50 border-violet-300`,
       isSelect(props) && !props.selected && `hover:bg-gray-50 cursor-pointer`,
       isSelect(props) && `min-h-[77px]`,

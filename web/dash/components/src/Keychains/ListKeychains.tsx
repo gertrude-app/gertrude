@@ -15,7 +15,7 @@ type Props = {
 const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
   <div>
     <PageHeading icon="key">Keychains</PageHeading>
-    <p className="mt-6 text-base antialiased text-gray-600">
+    <p className="mt-8 text-base font-medium antialiased text-gray-600">
       Keychains are clusters of related individual "keys" for selectively unlocking
       internet access. They can be organized however you like—per use, by application, for
       a specific school class, etc. Or, you can put all of your keys in one keychain if
@@ -23,7 +23,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
     </p>
     {keychains.length > 0 ? (
       <>
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 lg+:gap-8 xl:gap-10 2xl:grid-cols-3 mt-10">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 lg+:gap-8 2xl:grid-cols-3 mt-10 bg-gray-100 border p-8 rounded-3xl">
           {keychains.map(({ id, isPublic, name, description, numKeys }) => (
             <KeychainCard
               mode="list"
@@ -38,7 +38,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
             />
           ))}
         </div>
-        <div className="mt-10 flex justify-end border-t pt-8">
+        <div className="mt-10 flex justify-end">
           <Button type="button" onClick={onCreateNew} color="primary">
             <i className="fa fa-plus mr-2" /> Create keychain
           </Button>
@@ -52,7 +52,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
         icon={`key`}
         buttonText={`Create keychain`}
         action={onCreateNew}
-        className="mt-6"
+        className="mt-8"
       />
     )}
   </div>
