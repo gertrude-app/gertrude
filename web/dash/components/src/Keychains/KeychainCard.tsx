@@ -50,7 +50,12 @@ const KeychainCard: React.FC<Props> = ({
       >
         <GradientIcon icon="list" size="medium" className="mx-0" />
       </div>
-      <div className="pr-4 py-4 flex flex-col justify-center flex-grow">
+      <div
+        className={cx(
+          'pr-4 py-4 flex flex-col flex-grow',
+          isSelect(props) ? 'justify-center' : 'justify-start',
+        )}
+      >
         <div className="flex flex-col md:flex-row justify-between md:items-center relative right-0">
           <h2 className="text-left font-semibold text-lg leading-6 text-gray-900 sm:whitespace-normal">
             {name}
