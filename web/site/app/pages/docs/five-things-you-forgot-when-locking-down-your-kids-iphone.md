@@ -3,7 +3,7 @@ title: Five Things You Forgot When Locking Down your Kid's iPhone
 image: /five-things-og-image.jpg
 description:
   The five things you probably forgot when locking down your kid's iPhone... and the
-  bizarrely unintuitive fixes it takes to fix them.
+  bizarrely unintuitive steps it takes to fix them.
 ---
 
 {% .lead .mb-12 %} I consider myself pretty tech-savvy&mdash;I've been a software
