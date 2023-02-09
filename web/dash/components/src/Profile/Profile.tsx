@@ -57,7 +57,7 @@ const Profile: React.FC<Props> = ({
   billingPortalRequest,
   manageSubscription,
 }) => (
-  <div className="lg:px-4 relative">
+  <div className="relative">
     <ConfirmDeleteEntity type="notification" action={deleteNotification} />
     <ConfirmDeleteEntity type="notification method" action={deleteMethod} />
     <div
@@ -113,81 +113,82 @@ const Profile: React.FC<Props> = ({
         <AccountStatusBadge status={status} />
       </div>
     </div>
-    <div className="mt-16">
-      <div className="flex flex-col">
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-800">Notification methods</h2>
-          <p className="text-gray-500 mt-1">
-            Verified ways that Gertrude can notify you for user requests
-          </p>
-          <ul className="mt-5">
-            {methods.map((method) => (
-              <NotificationMethod
-                onDelete={() => deleteMethod.start(method.id)}
-                key={method.id}
-                {...method}
-              />
-            ))}
-          </ul>
+    <div className="mt-12 flex flex-col space-y-12">
+      <div className="xs:bg-white xs:border p-2 xs:p-8 rounded-3xl">
+        <h2 className="text-2xl font-bold text-gray-800">Notification methods</h2>
+        <p className="text-gray-500 mt-1">
+          Verified ways that Gertrude can notify you for user requests
+        </p>
+        <ul className="mt-6">
+          {methods.map((method) => (
+            <NotificationMethod
+              onDelete={() => deleteMethod.start(method.id)}
+              key={method.id}
+              {...method}
+            />
+          ))}
+        </ul>
+        <div className="mt-6 flex justify-start">
           <Button
             type="button"
             onClick={() => newMethodEventHandler({ type: `create_clicked` })}
             color="secondary"
             small
-            className="mt-4"
           >
             <i className="fa fa-plus mr-3" />
             Add method
           </Button>
         </div>
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
-          <p className="text-gray-500 mt-1">
-            Custom notifications for different types of requests using one of your
-            verified methods
-          </p>
-          {notifications.length > 0 ? (
-            <div className="flex flex-wrap items-start pt-4 sm:pt-2 mb-4">
-              {notifications.map(({ id, ...props }) => (
-                <NotificationCard
-                  key={id}
-                  focus={isUnsaved(id)}
-                  startEdit={() => updateNotification({ id, type: `startEditing` })}
-                  cancelEdit={() => updateNotification({ id, type: `cancelEditing` })}
-                  onDelete={() => deleteNotification.start(id)}
-                  updateMethod={(methodId) =>
-                    updateNotification({ id, methodId, type: `changeMethod` })
-                  }
-                  updateTrigger={(trigger) =>
-                    updateNotification({ id, trigger, type: `changeTrigger` })
-                  }
-                  onSave={() => saveNotification(id)}
-                  {...props}
-                />
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              heading={`No notifications`}
-              secondaryText={`Get started by creating a custom notification`}
-              icon={`bell`}
-              buttonText={`Create notification`}
-              action={createNotification}
-              className="mt-6"
-            />
+      </div>
+      <div className="xs:bg-white xs:border p-2 xs:p-8 rounded-3xl">
+        <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
+        <p className="text-gray-500 mt-1 mb-2">
+          Custom notifications for different types of requests using one of your verified
+          methods
+        </p>
+        {notifications.length > 0 ? (
+          <div className="flex flex-wrap items-stretch pt-6 sm:pt-2 mb-6">
+            {notifications.map(({ id, ...props }) => (
+              <NotificationCard
+                key={id}
+                focus={isUnsaved(id)}
+                startEdit={() => updateNotification({ id, type: `startEditing` })}
+                cancelEdit={() => updateNotification({ id, type: `cancelEditing` })}
+                onDelete={() => deleteNotification.start(id)}
+                updateMethod={(methodId) =>
+                  updateNotification({ id, methodId, type: `changeMethod` })
+                }
+                updateTrigger={(trigger) =>
+                  updateNotification({ id, trigger, type: `changeTrigger` })
+                }
+                onSave={() => saveNotification(id)}
+                {...props}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            heading={`No notifications`}
+            secondaryText={`Get started by creating a custom notification`}
+            icon={`bell`}
+            buttonText={`Create notification`}
+            action={createNotification}
+            className="mt-6 bg-gray-50"
+          />
+        )}
+        <div className="flex justify-center md:justify-start items-center pt-2">
+          {notifications.length !== 0 && (
+            <Button
+              type="button"
+              onClick={createNotification}
+              color="primary"
+              className="self-center"
+            >
+              <i className="fa fa-plus mr-3" />
+              New notification
+            </Button>
           )}
         </div>
-        {notifications.length !== 0 && (
-          <Button
-            type="button"
-            onClick={createNotification}
-            color="primary"
-            className="self-center"
-          >
-            <i className="fa fa-plus mr-3" />
-            New notification
-          </Button>
-        )}
       </div>
     </div>
   </div>

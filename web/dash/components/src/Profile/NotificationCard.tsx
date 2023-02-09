@@ -48,14 +48,14 @@ const NotificationCard: React.FC<Props> = ({
     <div
       ref={ref}
       className={cx(
-        `shadow-lg border-[0.5px] rounded-xl w-full sm:w-128 flex flex-col bg-white m-2 sm:m-4`,
+        `shadow-md border-[0.5px] rounded-xl w-full sm:w-128 flex flex-col bg-white mx-0 xs:mx-2 sm:mx-3 my-2 sm:my-3`,
         focus && `ring-violet-500/90 ring-4 ring-offset-4`,
       )}
     >
       <Summary {...selectedMethod} trigger={trigger} />
       <div
         className={cx(
-          `p-4 space-y-4 -mt-4 [transition:150ms]`,
+          `p-4 space-y-4 -mt-4 [transition:150ms] flex-grow`,
           editing ? `h-56` : `h-0 opacity-0 overflow-hidden`,
         )}
       >
@@ -85,46 +85,57 @@ const NotificationCard: React.FC<Props> = ({
           />
         </div>
       </div>
-      <div className="bg-gray-100 rounded-b-xl flex justify-end items-center p-3">
-        <Button
-          type="button"
-          onClick={startEdit}
-          color="tertiary"
-          small
-          className={editing ? `hidden` : `block`}
-        >
-          <i className="fa fa-pen mr-3" />
-          Edit
-        </Button>
-        <Button
-          type="button"
-          onClick={onDelete}
-          color="warning"
-          small
-          className={`${editing ? `hidden` : `block`} ml-3`}
-        >
-          <i className="fa fa-trash mr-3" />
-          Delete
-        </Button>
-        <Button
-          type="button"
-          onClick={cancelEdit}
-          color="tertiary"
-          small
-          className={`${editing ? `block` : `hidden`} mr-3`}
-        >
-          Cancel
-        </Button>
-        <Button
-          type="button"
-          onClick={onSave}
-          color="secondary"
-          disabled={saveButtonDisabled}
-          small
-          className={editing ? `block` : `hidden`}
-        >
-          Save
-        </Button>
+      <div className="bg-gray-50 rounded-b-xl flex justify-between items-center p-3 px-4">
+        <GradientIcon
+          icon={methodIcon(selectedMethod)}
+          size="medium"
+          className="shrink-0 hidden xs:flex"
+        />
+        <div className="flex flex-col xs:flex-row xs:justify-end flex-grow">
+          <Button
+            type="button"
+            onClick={startEdit}
+            color="tertiary"
+            small
+            className={cx(editing ? `hidden` : `block`, `w-[100%] xs:w-auto`)}
+          >
+            <i className="fa fa-pen mr-3" />
+            Edit
+          </Button>
+          <Button
+            type="button"
+            onClick={onDelete}
+            color="warning"
+            small
+            className={`${
+              editing ? `hidden` : `block`
+            } mt-3 xs:mt-0 xs:ml-3 w-[100%] xs:w-auto`}
+          >
+            <i className="fa fa-trash mr-3" />
+            Delete
+          </Button>
+          <Button
+            type="button"
+            onClick={cancelEdit}
+            color="tertiary"
+            small
+            className={`${
+              editing ? `block` : `hidden`
+            } mb-3 xs:mb-0 xs:mr-3 w-[100%] xs:w-auto`}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            onClick={onSave}
+            color="secondary"
+            disabled={saveButtonDisabled}
+            small
+            className={cx(editing ? `block` : `hidden`, `w-[100%] xs:w-auto`)}
+          >
+            Save
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -136,7 +147,6 @@ const Summary: React.FC<
   AdminNotificationMethod & { trigger: AdminNotificationTrigger }
 > = (props) => (
   <div className="p-5">
-    <GradientIcon icon={methodIcon(props)} size="small" className="w-min" />
     <h2 className="text-gray-700 text-lg">
       {methodVerb(props)}
       {` `}

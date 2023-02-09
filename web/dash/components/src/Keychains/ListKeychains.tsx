@@ -13,7 +13,7 @@ type Props = {
 };
 
 const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
-  <div className="px-0 sm:px-4">
+  <div>
     <PageHeading icon="key">Keychains</PageHeading>
     <p className="mt-6 text-base antialiased text-gray-600">
       Keychains are clusters of related individual "keys" for selectively unlocking
