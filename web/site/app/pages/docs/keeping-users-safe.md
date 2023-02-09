@@ -68,7 +68,7 @@ The best defense is a "defense in depth." Layer on other means of safety like:
 - keep your home wifi password a secret
 - put your wifi on a schedule, auto-disabling at night, if your router supports it
 
-## Be thoughtful about other settings
+## Be thoughtful about other contexts
 
 If your own computers are carefully protected, that can't protect your kids from what
 their peers or friends might expose them to on unprotected phones or computers. Think very

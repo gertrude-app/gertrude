@@ -16,10 +16,10 @@ const navigation = [
         title: `How to lock down an iPhone`,
         href: `/docs/definitive-guide-to-locking-down-an-iphone`,
       },
-      // {
-      //   title: `What You Forgot Locking Down Your Kids’ iPhone`,
-      //   href: `/docs/five-things-you-forgot-when-locking-down-your-kids-iphone`,
-      // },
+      {
+        title: `What You Forgot Locking Down Your Kids’ iPhone`,
+        href: `/docs/five-things-you-forgot-when-locking-down-your-kids-iphone`,
+      },
     ],
   },
 ];

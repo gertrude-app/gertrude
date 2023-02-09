@@ -10,6 +10,7 @@ export type MarkDoc = {
   frontmatter: {
     title: string;
     description: string;
+    image?: string;
     pageTitle: string;
   };
   content: Array<Node | string>;
