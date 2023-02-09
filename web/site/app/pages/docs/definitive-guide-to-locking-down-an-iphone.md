@@ -1,5 +1,6 @@
 ---
 title: The Definitive Guide to Locking Down an iPhone
+image: /lockdown-og-image.jpg
 description:
   A step-by-step guide to completely locking down an iPhone or iPad, for parents who are
   serious about protecting their kids from the dangers of unrestricted online activity.
@@ -223,7 +224,7 @@ for them to remember it. It's worth it to be _very paranoid_ about this. My frie
 learned his parent's passwords by secretly watching them type, and ended up using their
 devices to look at porn.
 
-I make my kids to look away whenever I'm entering a password, I frequently change my
+I make my kids look away whenever I'm entering a password, I frequently change my
 passwords, and I'm especially careful with their Screen Time passcode&mdash;holding the
 phone only inches from my chest when entering the numbers.
 

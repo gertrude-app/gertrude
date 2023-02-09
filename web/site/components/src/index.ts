@@ -11,5 +11,4 @@ export { default as MainFooter } from './MainFooter';
 export { default as MainHeader } from './MainHeader';
 export { default as SafeIsNowPossibleBlock } from './SafeIsNowPossibleBlock';
 export { default as TestimonialsBlock } from './TestimonialsBlock';
-export { default as OgImage } from './OgImage';
 export { default as VideoModal } from './VideoModal';

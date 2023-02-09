@@ -1,9 +1,11 @@
-import { OgImage } from '@site/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { ComponentMeta } from '@storybook/react';
+import LockdownGuideOgImage from './LockdownGuideOgImage';
+import SiteOgImage from './SiteOgImage';
+import FiveThingsYouForgotOgImage from './FiveThingsYouForgotOgImage';
 
 export default {
-  title: 'Site/OgImage', // eslint-disable-line
-  component: OgImage,
+  title: 'Site/OgImages', // eslint-disable-line
+  component: SiteOgImage,
   parameters: {
     layout: `fullscreen`,
     viewport: {
@@ -19,8 +21,8 @@ export default {
       defaultViewport: `ogImage`,
     },
   },
-} as ComponentMeta<typeof OgImage>;
+} as ComponentMeta<typeof SiteOgImage>;
 
-const Template: ComponentStory<typeof OgImage> = (args) => <OgImage {...args} />;
-
-export const Default = Template.bind({});
+export const Site = SiteOgImage;
+export const LockdownGuide = LockdownGuideOgImage;
+export const FiveThingsYouForgot = FiveThingsYouForgotOgImage;
