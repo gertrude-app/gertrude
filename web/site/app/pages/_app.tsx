@@ -1,6 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
+import { useRouter } from 'next/router';
 import type { AppProps } from 'next/app';
 import type { MarkDoc } from '../markdoc/headings';
 import { collectHeadings } from '../markdoc/headings';
@@ -11,8 +12,10 @@ import '../styles/globals.css';
 
 const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }) => {
   let Main: JSX.Element = <Component {...pageProps} />;
-
+  const router = useRouter();
   const ogImage = pageProps.markdoc?.frontmatter.image ?? OgImage.src;
+  const path = router.asPath === `/` ? `` : router.asPath;
+  const canonicalUrl = (`https://gertrude.app` + path).split(`?`)[0];
   let pageTitle = `Gertrude | Real internet safety for macOS`;
   let description = `Protect your loved ones with aggressive network filtering, plus screen and keystroke monitoring. Remotely supervise and control access from your own computer or phone. Available for macOS Big Sur, Monterey, and Ventura.`;
 
@@ -41,6 +44,7 @@ const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }
         <meta name="description" content={description} />
         <meta name="og:image" content={ogImage} />
         <link rel="icon" type="image/png" href={Favicon.src} />
+        <link rel="canonical" href={canonicalUrl} />
       </Head>
       <Script
         src="https://kit.fontawesome.com/597740db7b.js"
