@@ -6,6 +6,7 @@ import type { RequestStatus, SuspendFilterRequest, RequestState } from '@dash/ty
 import Current from '../environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
+import { logoutRouteVisited } from './slice-auth';
 
 export interface FilterSuspensionsState {
   fetchReqs: Record<UUID, RequestState<SuspendFilterRequest>>;
@@ -42,6 +43,10 @@ export const slice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(updateSuspendFilterRequest.started, (state, { meta }) => {
       state.updateReqs[meta.arg.id] = Req.ongoing();
+    });
+
+    builder.addCase(logoutRouteVisited, () => {
+      return initialState();
     });
 
     builder.addCase(updateSuspendFilterRequest.failed, (state, { error, meta }) => {

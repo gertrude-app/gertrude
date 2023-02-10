@@ -50,10 +50,6 @@ export const slice = createSlice({
       state.admin = null;
       state.passwordLoginRequest = Req.idle();
     },
-    logoutClicked: (state) => {
-      state.admin = null;
-      state.passwordLoginRequest = Req.idle();
-    },
   },
 
   extraReducers: (builder) => {
@@ -134,12 +130,8 @@ export const loginFromMagicLink = createResultThunk(
 
 const { errorExpired } = slice.actions;
 
-export const {
-  logoutClicked,
-  logoutRouteVisited,
-  loginEmailUpdated,
-  loginPasswordUpdated,
-} = slice.actions;
+export const { logoutRouteVisited, loginEmailUpdated, loginPasswordUpdated } =
+  slice.actions;
 
 export default slice.reducer;
 
@@ -158,7 +150,6 @@ export function getInitialAdmin(): AdminIds | null {
   if (window.location.pathname === `/login`) {
     return null;
   }
-
   if (Current.localStorage.getItem(`dev_logged_out`) !== null) {
     return null;
   }

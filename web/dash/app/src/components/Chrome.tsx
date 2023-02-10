@@ -1,7 +1,6 @@
 import React from 'react';
 import { Chrome } from '@dash/components';
 import { useDispatch, useSelector } from '../redux/hooks';
-import { logoutClicked } from '../redux/slice-auth';
 import {
   hamburgerMenuClicked,
   mobileSidebarClosed,
@@ -24,7 +23,6 @@ const ChromeContainer: React.FC<Props> = ({ children }) => {
       children={children}
       mobileSidebarOpen={mobileSidebarOpen}
       urlPath={location.pathname}
-      onLogout={() => dispatch(logoutClicked())}
       sidebarCollapsed={sidebarCollapsed}
       onMobileHamburgerClick={() => dispatch(hamburgerMenuClicked())}
       onMobileSidebarClose={() => dispatch(mobileSidebarClosed())}

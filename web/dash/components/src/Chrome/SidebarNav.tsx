@@ -1,12 +1,12 @@
 import React from 'react';
 import cx from 'classnames';
 import { Logo } from '@shared/components';
+import { Link } from 'react-router-dom';
 import SidebarOption from './SidebarOption';
 
 interface Props {
   collapsed?: boolean;
   toggleCollapsed?: () => unknown;
-  onLogout(): unknown;
   onInternalLinkClick(): unknown;
   urlPath: string;
 }
@@ -14,7 +14,6 @@ interface Props {
 const SidebarNav: React.FC<Props> = ({
   collapsed = false,
   toggleCollapsed,
-  onLogout,
   urlPath,
   onInternalLinkClick,
 }) => (
@@ -114,8 +113,8 @@ const SidebarNav: React.FC<Props> = ({
           )}
         />
       </button>
-      <button
-        type="button"
+      <Link
+        to={`/logout`}
         className={cx(
           collapsed ? `hidden` : `flex`,
           `justify-end items-center px-4 mr-px`,
@@ -123,10 +122,9 @@ const SidebarNav: React.FC<Props> = ({
           `transition duration-100 cursor-pointer`,
           `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50 rounded-md`,
         )}
-        onClick={onLogout}
       >
         Log out <i aria-hidden="true" className="ml-1.5 fa fa-sign-out" />
-      </button>
+      </Link>
     </div>
   </div>
 );

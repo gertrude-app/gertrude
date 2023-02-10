@@ -57,11 +57,21 @@ describe(`dashboard app login`, () => {
     cy.contains(`Dashboard`);
   });
 
-  it(`redirects to intended location after login`, () => {
+  it(`redirects to intended location after login (missing admin tokens)`, () => {
     cy.visit(`/users`);
     cy.url().should(`include`, `/login`);
     cy.get(`input[name=email]`).type(`82uii.betsy-mcstandard@inbox.testmail.app`);
     cy.get(`input[name=password]`).type(`betsy123{enter}`);
-    cy.contains(`M2 MacBook Air (2022)`);
+    cy.location(`pathname`).should(`eq`, `/users`);
+  });
+
+  it(`redirects to intended location after login (expired admin tokens)`, () => {
+    localStorage.setItem(`admin_id`, betsy.id);
+    localStorage.setItem(`admin_token`, `deadbeef-dead-beef-dead-beefdeadbeef`);
+    cy.visit(`/users`);
+    cy.url().should(`include`, `/login`);
+    cy.get(`input[name=email]`).type(`82uii.betsy-mcstandard@inbox.testmail.app`);
+    cy.get(`input[name=password]`).type(`betsy123{enter}`);
+    cy.location(`pathname`).should(`eq`, `/users`);
   });
 });

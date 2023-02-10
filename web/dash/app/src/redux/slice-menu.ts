@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import Current from '../environment';
+import { logoutRouteVisited } from './slice-auth';
 
 export interface MenuState {
   mobileSidebarOpen: boolean;
@@ -37,6 +38,11 @@ export const slice = createSlice({
     windowWidthChanged: (state, action: PayloadAction<number>) => {
       state.windowWidth = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(logoutRouteVisited, () => {
+      return initialState();
+    });
   },
 });
 

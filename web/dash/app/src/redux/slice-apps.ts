@@ -3,6 +3,7 @@ import type { GetIdentifiedApps, RequestState } from '@dash/types';
 import Current from '../environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
+import { logoutRouteVisited } from './slice-auth';
 
 export interface AppsState {
   request: RequestState<GetIdentifiedApps.Output>;
@@ -21,6 +22,10 @@ export const slice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(getIdentifiedApps.started, (state) => {
       state.request = Req.ongoing();
+    });
+
+    builder.addCase(logoutRouteVisited, () => {
+      return initialState();
     });
 
     builder.addCase(getIdentifiedApps.failed, (state, { error }) => {
