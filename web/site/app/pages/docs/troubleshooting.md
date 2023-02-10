@@ -50,7 +50,7 @@ something you think should be unblocked is not,_ try these tips:
   struggling with. We'll be able to retrieve the debug data, which will give us extra
   insight into what's happening on your computer.
 - For more detailed information on unblocking websites and apps, see our article on
-  [unblocking](/unblocking-guide)
+  [unblocking](/docs/unblocking-guide)
 
 ## 3. Manually remove the filter
 

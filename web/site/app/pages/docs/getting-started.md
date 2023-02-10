@@ -254,7 +254,7 @@ specifically allowed.
 
 If you look closely, the website above doesn't look quite right. That's because it often
 takes _more than one key_ to get a site fully unblocked. Check out our
-[unblocking guide](/unblocking-guide) for more details.
+[unblocking guide](/docs/unblocking-guide) for more details.
 
 {% /callout %}
 
@@ -291,8 +291,8 @@ user.
 
 At this point, if you go back to the computer or user that is being protected by the
 Gertrude Mac app, you should be able to navigate to
-[artofproblemsolving.com](artofproblemsolving.com) and it should load properly. This
-demonstrates the _power and flexibility of using and sharing keychains._
+[artofproblemsolving.com](https://artofproblemsolving.com) and it should load properly.
+This demonstrates the _power and flexibility of using and sharing keychains._
 
 You may want to spend a few minutes browsing through the list of publicly available
 keychains, you may find that one or more of them is useful to you. You'll also notice that
@@ -365,10 +365,10 @@ create new keys for your users._
    address.
 
 We'll walk through all four steps now, and we have
-[a more detailed article](/unblocking-guide) with advanced tips and tricks on unlocking
-that you can refer to later, if necessary. Start by **1) clearing the requests** to help
-you focus and find the correct request, then **2) click to filter by the partial word
-`khan`** as shown below:
+[a more detailed article](/docs/unblocking-guide) with advanced tips and tricks on
+unlocking that you can refer to later, if necessary. Start by **1) clearing the requests**
+to help you focus and find the correct request, then **2) click to filter by the partial
+word `khan`** as shown below:
 
 {% image src="filter-requests.png" caption="Clear the screen, then filter by 'khan'" /%}
 
