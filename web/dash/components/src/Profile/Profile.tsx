@@ -81,17 +81,17 @@ const Profile: React.FC<Props> = ({
     </div>
     <PageHeading icon="user">Profile</PageHeading>
     <div className="flex flex-col lg:flex-row mt-8">
-      <div className="p-8 bg-gray-100 rounded-xl flex-grow lg:mr-2 border max-w-3xl">
+      <div className="p-8 bg-gray-100 rounded-xl flex-grow lg:mr-2 border lg:max-w-3xl">
         <h2 className="text-lg text-gray-900 mb-2">Email address:</h2>
         <TextInput type="email" label="" value={email} disabled setValue={() => {}} />
       </div>
-      <div className="px-8 py-4 bg-gray-100 rounded-xl lg:ml-2 lg:w-1/3 flex justify-between relative border mt-4 lg:mt-0">
+      <div className="p-8 bg-gray-100 rounded-xl lg:ml-8 lg:w-1/3 flex justify-between relative border mt-4 lg:mt-0">
         <div className="flex justify-end items-start flex-col mr-8">
-          <h2 className="font-bold text-gray-700">Basic plan</h2>
-          <h3>
-            <span className="text-gray-600">$</span>
-            <span className="text-gray-700 text-3xl font-bold">10</span>
-            <span className="text-gray-600 text-lg">/month</span>
+          <h2 className="font-bold text-xl text-gray-700">Basic plan</h2>
+          <h3 className="my-1">
+            <span className="text-gray-600 font-medium text-lg relative bottom-3">$</span>
+            <span className="text-gray-900 text-4xl font-bold">5</span>
+            <span className="text-gray-600 text-lg font-medium">/month</span>
           </h3>
           {status !== `complimentary` && (
             <a
@@ -99,7 +99,7 @@ const Profile: React.FC<Props> = ({
                 ? { href: billingPortalRequest.payload, target: `_blank` }
                 : {})}
               className={cx(
-                `mt-1 text-sm whitespace-nowrap cursor-pointer transition duration-100`,
+                `mt-2 text-sm whitespace-nowrap cursor-pointer transition duration-100`,
                 manageSubscriptionStateClasses(billingPortalRequest),
               )}
               onClick={
@@ -199,7 +199,7 @@ export default Profile;
 const AccountStatusBadge: React.FC<{ status: AdminSubscriptionStatus }> = ({
   status,
 }) => (
-  <PillBadge type={statusType(status)} className="absolute right-2 top-2">
+  <PillBadge type={statusType(status)} className="absolute right-2 top-2 border">
     {statusText(status)}
   </PillBadge>
 );
