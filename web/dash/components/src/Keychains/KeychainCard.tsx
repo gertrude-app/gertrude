@@ -52,8 +52,8 @@ const KeychainCard: React.FC<Props> = ({
       </div>
       <div
         className={cx(
-          'pr-4 py-4 flex flex-col flex-grow',
-          isSelect(props) ? 'justify-center' : 'justify-start',
+          `pr-4 py-4 flex flex-col flex-grow`,
+          isSelect(props) ? `justify-center` : `justify-start`,
         )}
       >
         <div className="flex flex-col md:flex-row justify-between md:items-center relative right-0">

@@ -36,15 +36,7 @@ const WebsiteCounter: React.FC = () => {
           {totalWebsites.toLocaleString()}
         </h2>
         <h3 className="text-2xl sm:text-3xl lg:text-4xl text-white text-opacity-60 font-medium sm:font-bold tracking-wider">
-          websites on the internet{` `}
-          <a
-            href={`https://firstsiteguide.com/how-many-websites/`}
-            className="text-gray-600 hover:text-blue-300 transition duration-100"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <i className="fa-solid fa-arrow-up-right-from-square text-sm relative bottom-3 -left-1" />
-          </a>
+          websites on the internet*
         </h3>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-16">
@@ -61,8 +53,8 @@ const WebsiteCounter: React.FC = () => {
         </Statistic>
         <Statistic visible={intersected} delay={250} className="order-1">
           <ImportantNumber>3</ImportantNumber>
-          <InfoText citation="https://siteefy.com/how-many-websites-are-there/">
-            New websites created <Em>every second</Em>
+          <InfoText>
+            New websites created <Em>every second</Em>‡
           </InfoText>
         </Statistic>
         <Statistic
@@ -71,8 +63,8 @@ const WebsiteCounter: React.FC = () => {
           className="row-span-1 lg:row-span-2 order-4 md:order-none"
         >
           <ImportantNumber>37%</ImportantNumber>
-          <InfoText citation="https://www.bbc.com/news/technology-23030090">
-            Of all websites on the internet <Em>are porn</Em>
+          <InfoText>
+            Of all websites on the internet <Em>are porn</Em>†
           </InfoText>
           <div className="absolute -left-8 -bottom-8 w-60 h-60 bg-rain rounded-xl hidden lg:block" />
         </Statistic>
@@ -101,6 +93,32 @@ const WebsiteCounter: React.FC = () => {
       </div>
       {/* intersection observer: */}
       <div ref={ref} />
+      <div className="mt-8 flex flex-col justify-center items-center space-y-1">
+        <a
+          className="transition text-opacity-10 hover:text-opacity-20 text-white"
+          href="https://firstsiteguide.com/how-many-websites/"
+        >
+          <span className="text-white text-opacity-40 text-xl">*</span>
+          {` `}
+          firstsiteguide.com/how-many-websites
+        </a>
+        <a
+          className="transition text-opacity-10 hover:text-opacity-20 text-white"
+          href="https://siteefy.com/how-many-websites-are-there/"
+        >
+          <span className="text-white text-opacity-40 text-xl">‡</span>
+          {` `}
+          siteefy.com/how-many-websites-are-there
+        </a>
+        <a
+          className="transition text-opacity-10 hover:text-opacity-20 text-white"
+          href="https://www.bbc.com/news/technology-23030090"
+        >
+          <span className="text-white text-opacity-40 text-xl">†</span>
+          {` `}
+          www.bbc.com/news/technology-23030090
+        </a>
+      </div>
     </div>
   );
 };
@@ -130,7 +148,7 @@ const Statistic: React.FC<StatisticProps> = ({ children, className, delay, visib
     if (visible) {
       setTimeout(() => setAppeared(true), delay);
     }
-  }, [visible, appeared]);
+  }, [visible, appeared, delay]);
 
   return (
     <div
@@ -174,20 +192,10 @@ interface InfoTextProps {
   citation?: string;
 }
 
-const InfoText: React.FC<InfoTextProps> = ({ children, citation }) => {
+const InfoText: React.FC<InfoTextProps> = ({ children }) => {
   return (
     <p className="mt-4 text-white text-opacity-60 font-medium text-lg relative z-10">
       {children}
-      {citation && (
-        <a
-          href={citation}
-          className="text-gray-500 hover:text-blue-300 transition duration-100"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <i className="fa-solid fa-arrow-up-right-from-square text-xs relative bottom-1.5 left-0.5" />
-        </a>
-      )}
     </p>
   );
 };
