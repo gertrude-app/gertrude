@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
 import { useIntersectionObserver, useInterval } from '../../app/lib/hooks';
 
@@ -8,6 +8,10 @@ const WebsiteCounter: React.FC = () => {
   const [websitesToday, setWebsitesToday] = useState(3 * 60 * 60 * 24);
   const [websitesThisWeek, setWebsitesThisWeek] = useState(3 * 60 * 60 * 24 * 7);
   const [websitesSinceVisitingSite, setWebsitesSinceVisitingSite] = useState(0);
+  const { ref, intersected } = useIntersectionObserver({
+    rootMargin: `0px`,
+    threshold: 1,
+  });
 
   useInterval(() => {
     setTotalWebsites(totalWebsites + 1);
@@ -45,7 +49,8 @@ const WebsiteCounter: React.FC = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-16">
         <Statistic
-          intersectionMargin="-80px"
+          visible={intersected}
+          delay={0}
           className="col-span-1 lg:col-span-2 hidden md:block"
         >
           <ImportantNumber>{websitesThisWeek.toLocaleString()}</ImportantNumber>
@@ -54,14 +59,15 @@ const WebsiteCounter: React.FC = () => {
           </InfoText>
           <div className="absolute -right-8 -bottom-8 w-60 h-48 bg-rain rounded-3xl hidden lg:block" />
         </Statistic>
-        <Statistic intersectionMargin="-120px" className="order-1">
+        <Statistic visible={intersected} delay={250} className="order-1">
           <ImportantNumber>3</ImportantNumber>
           <InfoText citation="https://siteefy.com/how-many-websites-are-there/">
             New websites created <Em>every second</Em>
           </InfoText>
         </Statistic>
         <Statistic
-          intersectionMargin="-30px"
+          visible={intersected}
+          delay={150}
           className="row-span-1 lg:row-span-2 order-4 md:order-none"
         >
           <ImportantNumber>37%</ImportantNumber>
@@ -70,20 +76,21 @@ const WebsiteCounter: React.FC = () => {
           </InfoText>
           <div className="absolute -left-8 -bottom-8 w-60 h-60 bg-rain rounded-xl hidden lg:block" />
         </Statistic>
-        <Statistic intersectionMargin="40px" className="hidden md:block">
+        <Statistic visible={intersected} delay={50} className="hidden md:block">
           <ImportantNumber>{websitesThisHour.toLocaleString()}</ImportantNumber>
           <InfoText>
             New websites in the <Em>last hour</Em>
           </InfoText>
         </Statistic>
-        <Statistic intersectionMargin="20px" className="order-3 md:order-none">
+        <Statistic visible={intersected} delay={200} className="order-3 md:order-none">
           <ImportantNumber>{websitesToday.toLocaleString()}</ImportantNumber>
           <InfoText>
             New websites created in the <Em>last 24 hours</Em>
           </InfoText>
         </Statistic>
         <Statistic
-          intersectionMargin="0px"
+          visible={intersected}
+          delay={100}
           className="col-span-1 lg:col-span-2 xl:col-span-1 order-2 md:order-none"
         >
           <ImportantNumber>{websitesSinceVisitingSite.toLocaleString()}</ImportantNumber>
@@ -92,6 +99,8 @@ const WebsiteCounter: React.FC = () => {
           </InfoText>
         </Statistic>
       </div>
+      {/* intersection observer: */}
+      <div ref={ref} />
     </div>
   );
 };
@@ -101,24 +110,36 @@ export default WebsiteCounter;
 interface StatisticProps {
   children: React.ReactNode;
   className?: string;
-  intersectionMargin: string;
+  delay: number;
+  visible: boolean;
 }
 
-const Statistic: React.FC<StatisticProps> = ({
-  children,
-  className,
-  // intersectionMargin,
-}) => {
+const Statistic: React.FC<StatisticProps> = ({ children, className, delay, visible }) => {
+  const [appeared, setAppeared] = useState(false);
   const { ref, intersected } = useIntersectionObserver({
-    rootMargin: `25px`, // intersectionMargin,
+    rootMargin: `25px`,
     threshold: 1,
   });
+  const [windowWidth, setWindowWidth] = useState(1025);
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+  }, [windowWidth]);
+
+  useEffect(() => {
+    if (visible) {
+      setTimeout(() => setAppeared(true), delay);
+    }
+  }, [visible, appeared]);
 
   return (
     <div
       className={cx(
         `p-10 bg-slate-800 rounded-xl shadow-xl border-gray-700 border-[0.5px] relative overflow-hidden transition duration-200`,
-        intersected ? `opacity-100` : `opacity-0 translate-y-4`,
+        // when cards are stacked, make them appear one at a time; otherwise with cool synchronized animation
+        (windowWidth < 1024 ? intersected : appeared)
+          ? `opacity-100`
+          : `opacity-0 translate-y-4`,
         className,
       )}
       ref={ref}
