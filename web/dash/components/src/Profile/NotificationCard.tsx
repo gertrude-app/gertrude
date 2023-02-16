@@ -107,9 +107,10 @@ const NotificationCard: React.FC<Props> = ({
             onClick={onDelete}
             color="warning"
             small
-            className={`${
-              editing ? `hidden` : `block`
-            } mt-3 xs:mt-0 xs:ml-3 w-[100%] xs:w-auto`}
+            className={cx(
+              editing ? `hidden` : `block`,
+              `mt-3 xs:mt-0 xs:ml-3 w-[100%] xs:w-auto`,
+            )}
           >
             <i className="fa fa-trash mr-3" />
             Delete
@@ -119,9 +120,10 @@ const NotificationCard: React.FC<Props> = ({
             onClick={cancelEdit}
             color="tertiary"
             small
-            className={`${
-              editing ? `block` : `hidden`
-            } mb-3 xs:mb-0 xs:mr-3 w-[100%] xs:w-auto`}
+            className={cx(
+              editing ? `block` : `hidden`,
+              `mb-3 xs:mb-0 xs:mr-3 w-[100%] xs:w-auto`,
+            )}
           >
             Cancel
           </Button>
