@@ -109,14 +109,14 @@ const UserCard: React.FC<Props> = ({
         )}
       </div>
     </div>
-    <div className="flex rounded-b-xl p-3 space-x-3">
+    <div className="flex flex-col xs:flex-row rounded-b-xl p-3 space-y-3 xs:space-y-0 xs:space-x-3">
       <Button
         type="link"
         color="tertiary"
         to={id}
         testId="edit-user"
         small
-        className="flex-grow"
+        className="flex-grow w-[100%] xs:w-auto"
       >
         <i className="fa-solid fa-pen mr-2" /> Edit
       </Button>
@@ -124,7 +124,7 @@ const UserCard: React.FC<Props> = ({
         type="link"
         color="secondary"
         to={`${id}/activity`}
-        className="flex-grow"
+        className="flex-grow w-[100%] xs:w-auto"
         disabled={devices.length === 0}
       >
         <i className="fa-solid fa-binoculars mr-2" /> Activity

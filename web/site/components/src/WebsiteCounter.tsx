@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
 import { useIntersectionObserver, useInterval } from '../../app/lib/hooks';
 
@@ -8,6 +8,16 @@ const WebsiteCounter: React.FC = () => {
   const [websitesToday, setWebsitesToday] = useState(3 * 60 * 60 * 24);
   const [websitesThisWeek, setWebsitesThisWeek] = useState(3 * 60 * 60 * 24 * 7);
   const [websitesSinceVisitingSite, setWebsitesSinceVisitingSite] = useState(0);
+  const { ref, intersected } = useIntersectionObserver({
+    rootMargin: `0px`,
+    threshold: 1,
+  });
+
+  const [windowHeight, setWindowHeight] = useState(800);
+
+  useEffect(() => {
+    setWindowHeight(window.innerHeight);
+  }, [windowHeight]);
 
   useInterval(() => {
     setTotalWebsites(totalWebsites + 1);
@@ -32,65 +42,92 @@ const WebsiteCounter: React.FC = () => {
           {totalWebsites.toLocaleString()}
         </h2>
         <h3 className="text-2xl sm:text-3xl lg:text-4xl text-white text-opacity-60 font-medium sm:font-bold tracking-wider">
-          websites on the internet{` `}
-          <a
-            href={`https://firstsiteguide.com/how-many-websites/`}
-            className="text-gray-600 hover:text-blue-300 transition duration-100"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <i className="fa-solid fa-arrow-up-right-from-square text-sm relative bottom-3 -left-1" />
-          </a>
+          websites on the internet*
         </h3>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-16">
-        <Statistic
-          intersectionMargin="-80px"
-          className="col-span-1 lg:col-span-2 hidden md:block"
+      <div className="flex justify-center items-center">
+        {/* intersection observer: */}
+        <div ref={ref} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-16">
+          <Statistic
+            visible={intersected}
+            delay={0}
+            className="col-span-1 lg:col-span-2 hidden md:block"
+          >
+            <ImportantNumber>{websitesThisWeek.toLocaleString()}</ImportantNumber>
+            <InfoText>
+              New websites created <Em>this week</Em>
+            </InfoText>
+            <div className="absolute -right-8 -bottom-8 w-60 h-48 bg-rain rounded-3xl hidden lg:block" />
+          </Statistic>
+          <Statistic visible={intersected} delay={250} className="order-1">
+            <ImportantNumber>3</ImportantNumber>
+            <InfoText>
+              New websites created <Em>every second</Em>‡
+            </InfoText>
+          </Statistic>
+          <Statistic
+            visible={intersected}
+            delay={150}
+            className="row-span-1 lg:row-span-2 order-4 md:order-none"
+          >
+            <ImportantNumber>37%</ImportantNumber>
+            <InfoText>
+              Of all websites on the internet <Em>are porn</Em>†
+            </InfoText>
+            <div className="absolute -left-8 -bottom-8 w-60 h-60 bg-rain rounded-xl hidden lg:block" />
+          </Statistic>
+          <Statistic visible={intersected} delay={50} className="hidden md:block">
+            <ImportantNumber>{websitesThisHour.toLocaleString()}</ImportantNumber>
+            <InfoText>
+              New websites in the <Em>last hour</Em>
+            </InfoText>
+          </Statistic>
+          <Statistic visible={intersected} delay={200} className="order-3 md:order-none">
+            <ImportantNumber>{websitesToday.toLocaleString()}</ImportantNumber>
+            <InfoText>
+              New websites created in the <Em>last 24 hours</Em>
+            </InfoText>
+          </Statistic>
+          <Statistic
+            visible={intersected}
+            delay={100}
+            className="col-span-1 lg:col-span-2 xl:col-span-1 order-2 md:order-none"
+          >
+            <ImportantNumber>
+              {websitesSinceVisitingSite.toLocaleString()}
+            </ImportantNumber>
+            <InfoText>
+              New websites created since you visited <Em>this site</Em>
+            </InfoText>
+          </Statistic>
+        </div>
+      </div>
+      <div className="mt-8 flex flex-col justify-center items-center space-y-0">
+        <a
+          className="transition text-opacity-20 hover:text-opacity-30 text-white text-sm"
+          href="https://firstsiteguide.com/how-many-websites/"
         >
-          <ImportantNumber>{websitesThisWeek.toLocaleString()}</ImportantNumber>
-          <InfoText>
-            New websites created <Em>this week</Em>
-          </InfoText>
-          <div className="absolute -right-8 -bottom-8 w-60 h-48 bg-rain rounded-3xl hidden lg:block" />
-        </Statistic>
-        <Statistic intersectionMargin="-120px" className="order-1">
-          <ImportantNumber>3</ImportantNumber>
-          <InfoText citation="https://siteefy.com/how-many-websites-are-there/">
-            New websites created <Em>every second</Em>
-          </InfoText>
-        </Statistic>
-        <Statistic
-          intersectionMargin="-30px"
-          className="row-span-1 lg:row-span-2 order-4 md:order-none"
+          <span className="text-white text-opacity-40 text-lg">*</span>
+          {` `}
+          https://firstsiteguide.com/how-many-websites
+        </a>
+        <a
+          className="transition text-opacity-20 hover:text-opacity-30 text-white text-sm"
+          href="https://siteefy.com/how-many-websites-are-there/"
         >
-          <ImportantNumber>37%</ImportantNumber>
-          <InfoText citation="https://www.bbc.com/news/technology-23030090">
-            Of all websites on the internet <Em>are porn</Em>
-          </InfoText>
-          <div className="absolute -left-8 -bottom-8 w-60 h-60 bg-rain rounded-xl hidden lg:block" />
-        </Statistic>
-        <Statistic intersectionMargin="40px" className="hidden md:block">
-          <ImportantNumber>{websitesThisHour.toLocaleString()}</ImportantNumber>
-          <InfoText>
-            New websites in the <Em>last hour</Em>
-          </InfoText>
-        </Statistic>
-        <Statistic intersectionMargin="20px" className="order-3 md:order-none">
-          <ImportantNumber>{websitesToday.toLocaleString()}</ImportantNumber>
-          <InfoText>
-            New websites created in the <Em>last 24 hours</Em>
-          </InfoText>
-        </Statistic>
-        <Statistic
-          intersectionMargin="0px"
-          className="col-span-1 lg:col-span-2 xl:col-span-1 order-2 md:order-none"
+          <span className="text-white text-opacity-40 text-lg">‡</span>
+          {` `}
+          https://siteefy.com/how-many-websites-are-there
+        </a>
+        <a
+          className="transition text-opacity-20 hover:text-opacity-30 text-white text-sm"
+          href="https://www.bbc.com/news/technology-23030090"
         >
-          <ImportantNumber>{websitesSinceVisitingSite.toLocaleString()}</ImportantNumber>
-          <InfoText>
-            New websites created since you visited <Em>this site</Em>
-          </InfoText>
-        </Statistic>
+          <span className="text-white text-opacity-40 text-lg">†</span>
+          {` `}
+          https://www.bbc.com/news/technology-23030090
+        </a>
       </div>
     </div>
   );
@@ -101,24 +138,36 @@ export default WebsiteCounter;
 interface StatisticProps {
   children: React.ReactNode;
   className?: string;
-  intersectionMargin: string;
+  delay: number;
+  visible: boolean;
 }
 
-const Statistic: React.FC<StatisticProps> = ({
-  children,
-  className,
-  // intersectionMargin,
-}) => {
+const Statistic: React.FC<StatisticProps> = ({ children, className, delay, visible }) => {
+  const [appeared, setAppeared] = useState(false);
   const { ref, intersected } = useIntersectionObserver({
-    rootMargin: `25px`, // intersectionMargin,
+    rootMargin: `25px`,
     threshold: 1,
   });
+  const [windowWidth, setWindowWidth] = useState(1025);
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+  }, [windowWidth]);
+
+  useEffect(() => {
+    if (visible) {
+      setTimeout(() => setAppeared(true), delay);
+    }
+  }, [visible, appeared, delay]);
 
   return (
     <div
       className={cx(
         `p-10 bg-slate-800 rounded-xl shadow-xl border-gray-700 border-[0.5px] relative overflow-hidden transition duration-200`,
-        intersected ? `opacity-100` : `opacity-0 translate-y-4`,
+        // when cards are stacked, make them appear one at a time; otherwise with cool synchronized animation
+        (windowWidth < 1024 ? intersected : appeared)
+          ? `opacity-100`
+          : `opacity-0 translate-y-4`,
         className,
       )}
       ref={ref}
@@ -153,20 +202,10 @@ interface InfoTextProps {
   citation?: string;
 }
 
-const InfoText: React.FC<InfoTextProps> = ({ children, citation }) => {
+const InfoText: React.FC<InfoTextProps> = ({ children }) => {
   return (
     <p className="mt-4 text-white text-opacity-60 font-medium text-lg relative z-10">
       {children}
-      {citation && (
-        <a
-          href={citation}
-          className="text-gray-500 hover:text-blue-300 transition duration-100"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <i className="fa-solid fa-arrow-up-right-from-square text-xs relative bottom-1.5 left-0.5" />
-        </a>
-      )}
     </p>
   );
 };

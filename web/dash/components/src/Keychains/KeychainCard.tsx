@@ -33,7 +33,7 @@ const KeychainCard: React.FC<Props> = ({
 }) => (
   <div
     className={cx(
-      `rounded-xl shadow-lg border-[0.5px] bg-white flex flex-col justify-between transition duration-100`,
+      `rounded-xl shadow-md border-[0.5px] bg-white flex flex-col justify-between transition duration-100`,
       isSelect(props) && props.selected && `bg-violet-50 border-violet-300`,
       isSelect(props) && !props.selected && `hover:bg-gray-50 cursor-pointer`,
       isSelect(props) && `min-h-[77px]`,
@@ -50,7 +50,12 @@ const KeychainCard: React.FC<Props> = ({
       >
         <GradientIcon icon="list" size="medium" className="mx-0" />
       </div>
-      <div className="pr-4 py-4 flex flex-col justify-center flex-grow">
+      <div
+        className={cx(
+          `pr-4 py-4 flex flex-col flex-grow`,
+          isSelect(props) ? `justify-center` : `justify-start`,
+        )}
+      >
         <div className="flex flex-col md:flex-row justify-between md:items-center relative right-0">
           <h2 className="text-left font-semibold text-lg leading-6 text-gray-900 sm:whitespace-normal">
             {name}
