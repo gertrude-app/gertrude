@@ -98,6 +98,12 @@ jobs:
         with:
           start: pnpm --filter @dash/app preview
           project: dash/app
+      - name: upload-videos
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-videos
+          path: dash/app/cypress/videos
 
   site:
     name: site
