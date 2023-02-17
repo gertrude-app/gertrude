@@ -11,4 +11,5 @@ dash/app/cypress/screenshots
 **/cypress/downloads
 **/.next
 **/out
+**/dist
 **/tsconfig.tsbuildinfo
