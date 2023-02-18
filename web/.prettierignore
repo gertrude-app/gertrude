@@ -6,3 +6,4 @@ site/app/.next
 site/app/out
 docs/app/.next
 docs/app/out
+appviews/dist

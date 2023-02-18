@@ -12,6 +12,9 @@ jobs:
     name: check
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
       - name: checkout
         uses: actions/checkout@v3
       - name: install pnpm
@@ -33,6 +36,9 @@ jobs:
     env:
       ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
     steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
       - name: checkout
         uses: actions/checkout@v3
         with:
@@ -74,6 +80,9 @@ jobs:
       VITE_API_ENDPOINT: ${{ secrets.STAGING_API_ENDPOINT }}
       VITE_TEST_ADMIN_CREDS: ${{ secrets.TEST_ADMIN_CREDS }}
     steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
       - name: reset staging # cypress tests depend slightly on staging api state
         run: curl --silent ${{ secrets.STAGING_API_RESET_ROUTE  }}; true
       - name: checkout
@@ -89,11 +98,20 @@ jobs:
         with:
           start: pnpm --filter @dash/app preview
           project: dash/app
+      - name: upload-videos
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-videos
+          path: dash/app/cypress/videos
 
   site:
     name: site
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
       - name: checkout
         uses: actions/checkout@v3
       - name: install pnpm

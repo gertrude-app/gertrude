@@ -1,0 +1,18 @@
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('./Inter.woff2') format('woff2');
+}
+
+* {
+  touch-callout: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
