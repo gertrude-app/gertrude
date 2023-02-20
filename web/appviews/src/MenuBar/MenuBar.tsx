@@ -8,6 +8,8 @@ import Keyboard from '../Icons/Keyboard';
 import Gear from '../Icons/Gear';
 import ArrowRotateRight from '../Icons/ArrowRotateRight';
 import Laptop from '../Icons/Laptop';
+import { containerize } from '../lib/store';
+import store from './menubar-store';
 
 type FilterState =
   | { state: 'off' }
@@ -137,4 +139,4 @@ const MenuBar: React.FC<Props> = (props) => {
   );
 };
 
-export default MenuBar;
+export default containerize(store, MenuBar);
