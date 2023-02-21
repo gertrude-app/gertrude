@@ -201,6 +201,7 @@ importers:
     specifiers:
       '@shared/datetime': workspace:*
       classnames: ^2.3.2
+      preact: ^10.11.3
       react: ^18.2.0
       react-dom: ^18.2.0
       react-router-dom: ^6.4.3
@@ -210,6 +211,8 @@ importers:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-router-dom: 6.4.3_biqbaboplfbrettd7655fr4n2y
+    devDependencies:
+      preact: 10.12.1
 
   shared/datetime:
     specifiers: {}
@@ -11671,7 +11674,6 @@ packages:
 
   /preact/10.12.1:
     resolution: {integrity: sha512-l8386ixSsBdbreOAkqtrwqHwdvR35ID8c3rKPa8lCWuO86dBi32QWHV4vfsZK1utLLFMvw+Z5Ad4XLkZzchscg==}
-    dev: false
 
   /prelude-ls/1.1.2:
     resolution: {integrity: sha512-ESF23V4SKG6lVSGZgYNpbsiaAkdab6ZgOxe52p7+Kid3W3u3bxR4Vfd/o21dmN7jSt0IwgZ4v5MUd26FEtXE9w==}
