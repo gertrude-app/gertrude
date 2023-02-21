@@ -1,7 +1,7 @@
 {
   "name": "@macos/appviews",
-  "private": true,
   "version": "1.0.0",
+  "main": "./src/export.ts",
   "type": "module",
   "scripts": {
     "start": "vite",

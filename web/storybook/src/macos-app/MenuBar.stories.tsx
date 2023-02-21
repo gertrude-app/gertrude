@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
+import { MenuBar } from '@macos/appviews';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
-import MenuBar from '../../../appviews/src/MenuBar/MenuBar';
 
 export default {
   title: 'MacOSApp/MenuBar', // eslint-disable-line
