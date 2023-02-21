@@ -43,6 +43,7 @@ importers:
   appviews:
     specifiers:
       '@preact/preset-vite': ^2.5.0
+      '@shared/components': workspace:*
       '@shared/tailwind': workspace:*
       classnames: 2.3.2
       preact: ^10.11.3
@@ -50,6 +51,7 @@ importers:
       vite: ^4.1.0
     dependencies:
       '@preact/preset-vite': 2.5.0_preact@10.12.1+vite@4.1.2
+      '@shared/components': link:../shared/components
       '@shared/tailwind': link:../shared/tailwind
       preact: 10.12.1
       typescript: 4.9.5

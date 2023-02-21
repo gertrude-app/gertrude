@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@preact/preset-vite": "^2.5.0",
+    "@shared/components": "workspace:*",
     "@shared/tailwind": "workspace:*",
     "preact": "^10.11.3",
     "typescript": "^4.9.3",

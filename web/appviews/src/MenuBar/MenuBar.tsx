@@ -1,11 +1,13 @@
 import React from 'react';
 import cx from 'classnames';
+import { Logo } from '@shared/components';
 import ClockRotateLeft from '../Icons/ClockRotateLeft';
 import TowerBroadcast from '../Icons/TowerBroadcast';
 import Binoculars from '../Icons/Binoculars';
 import Keyboard from '../Icons/Keyboard';
 import Gear from '../Icons/Gear';
 import ArrowRotateRight from '../Icons/ArrowRotateRight';
+import Laptop from '../Icons/Laptop';
 
 type FilterState =
   | { state: 'off' }
@@ -26,16 +28,13 @@ const MenuBar: React.FC<Props> = (props) => {
     let badgeColors = ``;
     switch (props.filterState.state) {
       case `off`:
-        badgeColors =
-          `bg-red-500 dark:bg-red-500/30 dark:border dark:border-red-500/70 dark:text-red-200`;
+        badgeColors = `bg-red-500 dark:bg-red-500/30 dark:border dark:border-red-500/70 dark:text-red-200`;
         break;
       case `suspended`:
-        badgeColors =
-          `bg-yellow-500 dark:bg-yellow-500/30 dark:border dark:border-yellow-500/70 dark:text-yellow-200`;
+        badgeColors = `bg-yellow-500 dark:bg-yellow-500/30 dark:border dark:border-yellow-500/70 dark:text-yellow-200`;
         break;
       default:
-        badgeColors =
-          `bg-green-500 dark:bg-green-500/30 dark:border dark:border-green-500/70 dark:text-green-300`;
+        badgeColors = `bg-green-500 dark:bg-green-500/30 dark:border dark:border-green-500/70 dark:text-green-300`;
         break;
     }
 
@@ -124,7 +123,18 @@ const MenuBar: React.FC<Props> = (props) => {
       </div>
     );
   }
-  return <div>connect a device</div>;
+  return (
+    <div className="flex flex-col justify-center items-center h-full">
+      <p className="text-black/80 dark:text-white/70 font-medium">Welcome to</p>
+      <Logo type="default" className="dark:[filter:brightness(600%)]" />
+      <button className="flex items-center text-lg font-bold bg-white/90 px-6 py-3 rounded-xl mt-8 shadow-md transition duration-100 hover:bg-white/100 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow">
+        <Laptop className="w-6 mr-3 text-indigo-600" />
+        <span className="bg-gradient-to-br from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent [-webkit-background-clip:text;]">
+          Connect a device
+        </span>
+      </button>
+    </div>
+  );
 };
 
 export default MenuBar;

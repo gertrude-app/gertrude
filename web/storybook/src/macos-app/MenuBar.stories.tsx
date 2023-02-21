@@ -69,3 +69,27 @@ const DarkOverDarkTemplate: ComponentStory<typeof MenuBar> = () => (
   <ThreeModes colors="dark bg-[rgb(27,27,27)]" />
 );
 export const DarkModeOverDarkBackground = DarkOverDarkTemplate.bind({});
+
+const NotConnectedTemplate: ComponentStory<typeof MenuBar> = () => {
+  return (
+    <div className="flex space-x-4">
+      <div
+        className={cx(
+          `bg-gradient-to-l from-[rgb(140,140,140)] to-[rgb(230,230,236)]`,
+          `rounded-2xl w-[400px] h-[300px]`,
+        )}
+      >
+        <MenuBar state="notConnected" />
+      </div>
+      <div
+        className={cx(
+          `dark bg-gradient-to-l from-[rgb(27,27,27)] to-[rgb(120,120,120)]`,
+          `rounded-2xl w-[400px] h-[300px]`,
+        )}
+      >
+        <MenuBar state="notConnected" />
+      </div>
+    </div>
+  );
+};
+export const NotConnected = NotConnectedTemplate.bind({});
