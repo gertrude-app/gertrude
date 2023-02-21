@@ -10,9 +10,10 @@
   },
   "dependencies": {
     "@dash/components": "workspace:*",
-    "@site/components": "workspace:*",
+    "@macos/appviews": "workspace:*",
     "@shared/components": "workspace:*",
     "@shared/tailwind": "workspace:*",
+    "@site/components": "workspace:*",
     "@storybook/addon-backgrounds": "^6.5.13",
     "@storybook/addon-measure": "^6.5.13",
     "@storybook/addon-outline": "^6.5.13",

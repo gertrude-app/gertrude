@@ -1,7 +1,7 @@
 {
-  "name": "@gertrude/webviews",
-  "private": true,
+  "name": "@macos/appviews",
   "version": "1.0.0",
+  "main": "./src/export.ts",
   "type": "module",
   "scripts": {
     "start": "vite",
@@ -12,9 +12,13 @@
   },
   "dependencies": {
     "@preact/preset-vite": "^2.5.0",
+    "@shared/components": "workspace:*",
     "@shared/tailwind": "workspace:*",
     "preact": "^10.11.3",
     "typescript": "^4.9.3",
     "vite": "^4.1.0"
+  },
+  "devDependencies": {
+    "classnames": "2.3.2"
   }
 }
