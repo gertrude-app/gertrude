@@ -103,7 +103,7 @@ const WebsiteCounter: React.FC = () => {
           </Statistic>
         </div>
       </div>
-      <div className="mt-8 flex flex-col justify-center items-center space-y-0">
+      <div className="mt-8 flex flex-col antialiased justify-center items-center -space-y-1.5">
         <a
           className="transition text-opacity-20 hover:text-opacity-30 text-white text-sm"
           href="https://firstsiteguide.com/how-many-websites/"
