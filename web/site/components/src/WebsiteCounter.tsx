@@ -2,8 +2,14 @@ import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
 import { useIntersectionObserver, useInterval } from '../../app/lib/hooks';
 
+const REF_DATE = new Date(2022, 8, 12).getTime();
+
 const WebsiteCounter: React.FC = () => {
-  const [totalWebsites, setTotalWebsites] = useState(1938726736);
+  const [totalWebsites, setTotalWebsites] = useState(() => {
+    const secondsSinceRefDate = Math.floor((Date.now() - REF_DATE) / 1000);
+    const newWebsitesSinceRefDate = secondsSinceRefDate * 3;
+    return 1_980_000_000 + newWebsitesSinceRefDate;
+  });
   const [websitesThisHour, setWebsitesThisHour] = useState(3 * 60 * 60);
   const [websitesToday, setWebsitesToday] = useState(3 * 60 * 60 * 24);
   const [websitesThisWeek, setWebsitesThisWeek] = useState(3 * 60 * 60 * 24 * 7);
@@ -40,6 +46,7 @@ const WebsiteCounter: React.FC = () => {
       <div className="flex flex-col items-start space-y-2 sm:space-y-3 lg:space-y-4">
         <h2 className="font-inter text-4xl xs:text-5xl sm:text-6xl lg:text-8xl text-white w-[716px]">
           {totalWebsites.toLocaleString()}
+          <br />
         </h2>
         <h3 className="text-2xl sm:text-3xl lg:text-4xl text-white text-opacity-60 font-medium sm:font-bold tracking-wider">
           websites on the internet*
@@ -103,7 +110,7 @@ const WebsiteCounter: React.FC = () => {
           </Statistic>
         </div>
       </div>
-      <div className="mt-8 flex flex-col justify-center items-center space-y-0">
+      <div className="mt-8 flex flex-col antialiased justify-center items-center -space-y-1.5">
         <a
           className="transition text-opacity-20 hover:text-opacity-30 text-white text-sm"
           href="https://firstsiteguide.com/how-many-websites/"
