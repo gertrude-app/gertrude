@@ -122,7 +122,7 @@ function deleteableChunks(
             className="self-center"
             type="button"
             color="secondary-on-violet-bg"
-            small
+            size="medium"
             onClick={() => {
               deleteItems(toDelete);
               // sometimes scrolling to top seems to fail, possibly because

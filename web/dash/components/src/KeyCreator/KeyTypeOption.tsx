@@ -32,7 +32,7 @@ const KeyTypeOption: React.FC<Props> = ({
       <i className="fa-solid fa-check absolute right-3 top-3 text-violet-500" />
     )}
     <h2 className="font-bold text-gray-700">
-      <GradientIcon icon={icon} size="small" className="mr-1" />
+      <GradientIcon icon={icon} size="medium" className="mr-1" />
       {` `}
       {title}
     </h2>

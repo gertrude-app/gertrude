@@ -20,7 +20,7 @@ const CommentStep: React.FC<Props> = ({ mode, update, activeStep, comment }) => 
     activeTitle="Add an optional comment:"
     title={
       <h2 className="font-medium text-gray-900 text-lg">
-        <GradientIcon icon="comment" className="mr-2" size="small" />
+        <GradientIcon icon="comment" className="mr-2" size="medium" />
         {comment ? (
           <>
             With the comment <UserInputText>&ldquo;{comment}&rdquo;</UserInputText>

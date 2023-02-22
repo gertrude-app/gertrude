@@ -53,7 +53,7 @@ const UnlockRequestCard: React.FC<Props> = ({
           type="link"
           to={`/users/${userId}/unlock-requests/${id}/deny-comment`}
           color="tertiary"
-          small
+          size="medium"
           fullWidth
         >
           Deny
@@ -63,7 +63,7 @@ const UnlockRequestCard: React.FC<Props> = ({
           to={`/users/${userId}/unlock-requests/${id}`}
           color="secondary"
           className="whitespace-nowrap"
-          small
+          size="medium"
           fullWidth
         >
           Accept &rarr;

@@ -13,7 +13,7 @@ interface CommonProps {
     | 'warning';
   children: React.ReactNode;
   fullWidth?: boolean;
-  small?: boolean;
+  size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   testId?: string;
 }
@@ -25,7 +25,7 @@ type Props =
   | ({ type: 'link'; to: string } & CommonProps);
 
 const Button: React.FC<Props> = ({
-  small = false,
+  size = 'large',
   fullWidth = false,
   testId,
   color,
@@ -60,10 +60,22 @@ const Button: React.FC<Props> = ({
   }
 
   const rendersAsButton = props.type === `button` || props.type === `submit`;
+  let sizeClass = '';
+  switch (size) {
+    case 'small':
+      sizeClass = 'text-base px-4 py-1.5 font-semibold';
+      break;
+    case 'medium':
+      sizeClass = 'text-base px-5 py-3 sm:py-2.5';
+      break;
+    default:
+      sizeClass = 'text-lg px-10 py-2.5';
+      break;
+  }
   const classes = cx(
     colors,
     `ring ring-offset-0 focus:ring-offset-2 rounded-lg font-bold [transition:100ms] outline-none block`,
-    small ? `text-md px-5 py-3 sm:py-2.5` : `text-lg px-10 py-2.5`,
+    sizeClass,
     className,
     fullWidth ? `w-full` : `w-fit`,
     !rendersAsButton && `text-center`,

@@ -96,7 +96,7 @@ const NotificationCard: React.FC<Props> = ({
             type="button"
             onClick={startEdit}
             color="tertiary"
-            small
+            size="medium"
             className={cx(editing ? `hidden` : `block`, `w-[100%] xs:w-auto`)}
           >
             <i className="fa fa-pen mr-3" />
@@ -106,7 +106,7 @@ const NotificationCard: React.FC<Props> = ({
             type="button"
             onClick={onDelete}
             color="warning"
-            small
+            size="medium"
             className={cx(
               editing ? `hidden` : `block`,
               `mt-3 xs:mt-0 xs:ml-3 w-[100%] xs:w-auto`,
@@ -119,7 +119,7 @@ const NotificationCard: React.FC<Props> = ({
             type="button"
             onClick={cancelEdit}
             color="tertiary"
-            small
+            size="medium"
             className={cx(
               editing ? `block` : `hidden`,
               `mb-3 xs:mb-0 xs:mr-3 w-[100%] xs:w-auto`,
@@ -132,7 +132,7 @@ const NotificationCard: React.FC<Props> = ({
             onClick={onSave}
             color="secondary"
             disabled={saveButtonDisabled}
-            small
+            size="medium"
             className={cx(editing ? `block` : `hidden`, `w-[100%] xs:w-auto`)}
           >
             Save

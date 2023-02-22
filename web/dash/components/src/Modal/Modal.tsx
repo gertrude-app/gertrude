@@ -176,7 +176,7 @@ const Modal: React.FC<Props> = ({
                       <Button
                         testId="modal-secondary-btn"
                         type="button"
-                        small
+                        size="medium"
                         color="tertiary"
                         className="sm:mr-3 w-[100%] sm:w-auto mb-4 sm:mb-0"
                         disabled={secondary.disabled}
@@ -189,7 +189,7 @@ const Modal: React.FC<Props> = ({
                       testId="modal-primary-btn"
                       type="button"
                       disabled={primary.disabled}
-                      small
+                      size="medium"
                       color={
                         type === `destructive`
                           ? `warning`

@@ -41,8 +41,39 @@ const ButtonStory: React.FC<{ color: ButtonColor; disabled?: boolean }> = ({
       </Button>
     </div>
     <div className="space-y-2">
-      <h2>Small:</h2>
-      <Button type="button" disabled={disabled} small color={color} onClick={() => {}}>
+      <h2>Medium:</h2>
+      <Button
+        type="button"
+        disabled={disabled}
+        size="medium"
+        color={color}
+        onClick={() => {}}
+      >
+        Join the waitlist
+      </Button>
+    </div>
+    <div className="space-y-2">
+      <h2>Medium & Full width:</h2>
+      <Button
+        type="button"
+        disabled={disabled}
+        fullWidth
+        size="medium"
+        color={color}
+        onClick={() => {}}
+      >
+        Join the waitlist
+      </Button>
+    </div>
+    <div className="space-y-2">
+      <h2>Small</h2>
+      <Button
+        type="button"
+        disabled={disabled}
+        size="small"
+        color={color}
+        onClick={() => {}}
+      >
         Join the waitlist
       </Button>
     </div>
@@ -52,7 +83,7 @@ const ButtonStory: React.FC<{ color: ButtonColor; disabled?: boolean }> = ({
         type="button"
         disabled={disabled}
         fullWidth
-        small
+        size="small"
         color={color}
         onClick={() => {}}
       >

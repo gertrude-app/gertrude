@@ -115,7 +115,7 @@ const UserCard: React.FC<Props> = ({
         color="tertiary"
         to={id}
         testId="edit-user"
-        small
+        size="medium"
         className="flex-grow w-[100%] xs:w-auto"
       >
         <i className="fa-solid fa-pen mr-2" /> Edit

@@ -133,7 +133,7 @@ const Profile: React.FC<Props> = ({
             type="button"
             onClick={() => newMethodEventHandler({ type: `create_clicked` })}
             color="secondary"
-            small
+            size="medium"
           >
             <i className="fa fa-plus mr-3" />
             Add method

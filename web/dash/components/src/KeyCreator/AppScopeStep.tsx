@@ -24,7 +24,7 @@ const AppScopeStep: React.FC<Props> = ({ mode, update, activeStep, appScope }) =
         <h2 className="font-medium text-gray-900 text-lg space-x-2">
           <GradientIcon
             icon={appScope === `unrestricted` ? `unlock` : `location`}
-            size="small"
+            size="medium"
           />
           {appScope === `unrestricted` ? (
             <span>
