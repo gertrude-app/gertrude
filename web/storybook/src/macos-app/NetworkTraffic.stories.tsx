@@ -11,7 +11,7 @@ export default {
 } as ComponentMeta<typeof NetworkTraffic>;
 
 const LightTemplate: ComponentStory<typeof NetworkTraffic> = (args) => (
-  <AppWindow width={900} height={530}>
+  <AppWindow width={900} height={600}>
     <NetworkTraffic {...args} />
   </AppWindow>
 );
@@ -19,7 +19,7 @@ export const LightMode = LightTemplate.bind({});
 LightMode.args = {};
 
 const DarkTemplate: ComponentStory<typeof NetworkTraffic> = (args) => (
-  <AppWindow width={900} height={530}>
+  <AppWindow width={900} height={600} dark>
     <NetworkTraffic {...args} />
   </AppWindow>
 );

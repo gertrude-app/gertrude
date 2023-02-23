@@ -46,10 +46,10 @@ const Button: React.FC<Props> = ({
         colors = `bg-violet-800 border border-violet-800 hover:border-violet-900 text-white hover:bg-violet-900 ring-transparent focus:ring-violet-800`;
         break;
       case `secondary`:
-        colors = `bg-violet-100 border border-violet-100 hover:border-violet-200 text-violet-600 hover:bg-violet-200 ring-transparent focus:ring-violet-300`;
+        colors = `bg-violet-100 dark:bg-slate-800/80 border border-violet-100 dark:border-slate-700/70 hover:border-violet-200 dark:hover:bg-slate-700/80 text-violet-600 dark:text-white/80 hover:bg-violet-200 ring-transparent focus:ring-violet-300`;
         break;
       case `tertiary`:
-        colors = `bg-white text-gray-600 border hover:bg-gray-50 ring-transparent focus:ring-indigo-400/50 focus:border-indigo-200`;
+        colors = `bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-300 border dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 ring-transparent focus:ring-indigo-400/50 focus:border-indigo-200 dark:ring-offset-slate-900`;
         break;
       case `warning`:
         colors = `bg-red-50 text-red-600 border-red-100 border hover:text-red-700 hover:bg-red-100 ring-transparent focus:ring-red-500 focus:border-red-500`;
