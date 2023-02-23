@@ -42,6 +42,7 @@ importers:
 
   appviews:
     specifiers:
+      '@dash/components': workspace:*
       '@preact/preset-vite': ^2.5.0
       '@shared/components': workspace:*
       '@shared/tailwind': workspace:*
@@ -50,6 +51,7 @@ importers:
       typescript: ^4.9.3
       vite: ^4.1.0
     dependencies:
+      '@dash/components': link:../dash/components
       '@preact/preset-vite': 2.5.0_preact@10.12.1+vite@4.1.2
       '@shared/components': link:../shared/components
       '@shared/tailwind': link:../shared/tailwind
