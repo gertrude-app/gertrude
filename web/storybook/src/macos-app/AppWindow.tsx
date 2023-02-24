@@ -13,7 +13,7 @@ const AppWindow: React.FC<Props> = ({ children, width, height, dark = false }) =
     <div
       className={cx(
         `shadow-lg flex flex-col border-[0.5px] rounded-xl border-slate-300`,
-        dark && 'dark',
+        dark && `dark`,
       )}
       style={{ height, width }}
     >

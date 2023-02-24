@@ -1,4 +1,4 @@
-import { Toggle } from '@dash/components';
+import { Toggle } from '@shared/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 export default {

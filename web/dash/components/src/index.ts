@@ -29,7 +29,6 @@ export { default as UserCard } from './Users/UserCard';
 export { default as UserDevice } from './Users/UserDevice';
 export { default as Combobox } from './Forms/Combobox';
 export { default as RadioGroup } from './Forms/RadioGroup';
-export { default as Toggle } from './Forms/Toggle';
 export { default as SelectMenu } from './Forms/SelectMenu';
 export { default as SelectableListItem } from './Forms/SelectableListItem';
 export { default as EditUser } from './Users/EditUser';

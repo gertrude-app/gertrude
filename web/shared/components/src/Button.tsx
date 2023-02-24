@@ -25,7 +25,7 @@ type Props =
   | ({ type: 'link'; to: string } & CommonProps);
 
 const Button: React.FC<Props> = ({
-  size = 'large',
+  size = `large`,
   fullWidth = false,
   testId,
   color,
@@ -60,16 +60,16 @@ const Button: React.FC<Props> = ({
   }
 
   const rendersAsButton = props.type === `button` || props.type === `submit`;
-  let sizeClass = '';
+  let sizeClass = ``;
   switch (size) {
-    case 'small':
-      sizeClass = 'text-base px-4 py-1.5 font-semibold';
+    case `small`:
+      sizeClass = `text-base px-4 py-1.5 font-semibold`;
       break;
-    case 'medium':
-      sizeClass = 'text-base px-5 py-3 sm:py-2.5';
+    case `medium`:
+      sizeClass = `text-base px-5 py-3 sm:py-2.5`;
       break;
     default:
-      sizeClass = 'text-lg px-10 py-2.5';
+      sizeClass = `text-lg px-10 py-2.5`;
       break;
   }
   const classes = cx(

@@ -1,10 +1,9 @@
 import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@dash/utils';
-import { TextInput, Button } from '@shared/components';
+import { TextInput, Button, Toggle } from '@shared/components';
 import type { Subcomponents, ConfirmableEntityAction, RequestState } from '@dash/types';
 import type { KeychainSummary as Keychain } from '@dash/types';
-import { Toggle } from '../Forms';
 import KeychainCard from '../Keychains/KeychainCard';
 import { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';

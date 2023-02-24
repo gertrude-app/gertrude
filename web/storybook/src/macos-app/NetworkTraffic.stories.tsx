@@ -1,5 +1,5 @@
 import { NetworkTraffic } from '@macos/appviews';
-import { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import AppWindow from './AppWindow';
 
 export default {

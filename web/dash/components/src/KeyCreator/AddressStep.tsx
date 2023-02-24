@@ -1,7 +1,7 @@
 import React from 'react';
 import { EditKey, validate } from '@dash/keys';
-import { Label, TextInput } from '@shared/components';
-import { SelectMenu, Toggle } from '../Forms';
+import { Label, TextInput, Toggle } from '@shared/components';
+import { SelectMenu } from '../Forms';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';
