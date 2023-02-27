@@ -78,6 +78,7 @@ const UserActivityReviewDay: React.FC<Props> = ({
               setTimeout(() => navigate(`..`, { replace: true }), 100);
             }}
             color="primary"
+            size="large"
           >
             <i className="fa-solid fa-thumbs-up mr-2" />
             Approve all
@@ -122,7 +123,6 @@ function deleteableChunks(
             className="self-center"
             type="button"
             color="secondary-on-violet-bg"
-            size="medium"
             onClick={() => {
               deleteItems(toDelete);
               // sometimes scrolling to top seems to fail, possibly because

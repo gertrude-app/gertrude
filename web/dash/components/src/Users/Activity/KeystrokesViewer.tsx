@@ -36,7 +36,7 @@ const KeystrokesViewer: React.FC<Props> = ({
     </div>
     <div className="p-4 pt-0 flex justify-between">
       <ActivityItemTime date={date} />
-      <Button color="tertiary" size="medium" type="button" onClick={onApprove}>
+      <Button color="tertiary" type="button" onClick={onApprove}>
         Approve
       </Button>
     </div>

@@ -49,7 +49,6 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
                   color="secondary"
                   type="external"
                   href="https://gertrude.app/contact"
-                  size="medium"
                   className="mt-5"
                 >
                   Contact support &rarr;

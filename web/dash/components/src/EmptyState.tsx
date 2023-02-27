@@ -37,18 +37,12 @@ const EmptyState: React.FC<Props> = ({
     <h2 className="text-xl font-bold mt-3 mb-2">{heading}</h2>
     <p className="text-gray-500">{secondaryText}</p>
     {typeof action === `string` ? (
-      <Button color="primary" type="link" to={action} className="mt-6" size="medium">
+      <Button color="primary" type="link" to={action} className="mt-6">
         <i className="fa fa-plus mr-4" />
         {buttonText}
       </Button>
     ) : (
-      <Button
-        color="primary"
-        type="button"
-        onClick={action}
-        className="mt-6"
-        size="medium"
-      >
+      <Button color="primary" type="button" onClick={action} className="mt-6">
         <i className="fa fa-plus mr-4" />
         {buttonText}
       </Button>

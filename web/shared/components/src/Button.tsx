@@ -25,7 +25,7 @@ type Props =
   | ({ type: 'link'; to: string } & CommonProps);
 
 const Button: React.FC<Props> = ({
-  size = `large`,
+  size = `medium`,
   fullWidth = false,
   testId,
   color,

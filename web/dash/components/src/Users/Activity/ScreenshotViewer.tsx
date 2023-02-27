@@ -40,7 +40,7 @@ const ScreenshotViewer: React.FC<Props> = ({
     </div>
     <div className="px-4 py-3 sm:py-4 pt-0 flex justify-between items-start">
       <ActivityItemTime date={date} />
-      <Button color="tertiary" size="medium" type="button" onClick={onApprove}>
+      <Button color="tertiary" type="button" onClick={onApprove}>
         Approve
       </Button>
     </div>

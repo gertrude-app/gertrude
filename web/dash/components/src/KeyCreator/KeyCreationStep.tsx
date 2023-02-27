@@ -100,7 +100,6 @@ const KeyCreationStep: React.FC<Props> = ({
                       type="button"
                       onClick={() => update({ type: `prevStepClicked` })}
                       color="tertiary"
-                      size="medium"
                     >
                       <i className="fa-solid fa-arrow-left mr-2" />
                       Back
@@ -111,7 +110,6 @@ const KeyCreationStep: React.FC<Props> = ({
                       type="button"
                       onClick={() => update({ type: `nextStepClicked` })}
                       color="secondary"
-                      size="medium"
                       disabled={!canAdvance}
                       testId="keycreator-next-step"
                     >
