@@ -176,7 +176,7 @@ const NetworkTraffic: React.FC<Props> = () => {
           Clear requests
         </Button>
       </header>
-      <div className="flex flex-col p-4 flex-grow overflow-scroll">
+      <div className="flex flex-col p-4 flex-grow overflow-y-scroll">
         {testRequests
           .filter((req) => req.address.toUpperCase().includes(filterQuery.toUpperCase()))
           .filter((req) => (TCPOnly ? req.protocol === `TCP` : true))
