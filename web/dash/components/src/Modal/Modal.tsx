@@ -133,7 +133,7 @@ const Modal: React.FC<Props> = ({
                       )}
                     >
                       <div className="flex justify-start items-center mb-5">
-                        <GradientIcon icon={icon} size="large" />
+                        <GradientIcon icon={icon} size="medium" />
                         <Dialog.Title
                           as="h3"
                           className="text-xl ml-4 font-bold leading-6 text-gray-900"
@@ -151,7 +151,7 @@ const Modal: React.FC<Props> = ({
                       )}
                     >
                       <div className="flex flex-col sm:flex-row items-center sm:items-start">
-                        <GradientIcon icon={icon} size="large" />
+                        <GradientIcon icon={icon} size="medium" />
                         <div className="mt-3 text-center self-stretch sm:grow sm:mt-0 sm:ml-4 sm:text-left">
                           <Dialog.Title
                             as="h3"

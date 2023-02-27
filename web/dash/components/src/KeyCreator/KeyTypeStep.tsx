@@ -24,7 +24,7 @@ const KeyTypeStep: React.FC<Props> = ({ mode, keyType, activeStep, update }) => 
         <GradientIcon
           icon={keyType === `app` ? `window` : `globe`}
           className="mr-2"
-          size="medium"
+          size="small"
         />
         <UserInputText>{capitalize(keyType ?? `website`)}</UserInputText> key
       </h1>

@@ -112,7 +112,7 @@ const Title: React.FC<Props> = ({
     <GradientIcon
       icon={appIdentificationType === `bundleId` ? `pen-to-square` : `app-store`}
       className="mr-2.5"
-      size="medium"
+      size="small"
     />
     {keyType === `app` ? `Allowing app ` : `App `}
     <UserInputText>

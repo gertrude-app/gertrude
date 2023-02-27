@@ -91,21 +91,21 @@ const Title: React.FC<{
     case `webBrowsers`:
       return (
         <>
-          <GradientIcon icon="google-chrome" className="mr-2" size="medium" />
+          <GradientIcon icon="google-chrome" className="mr-2" size="small" />
           For <UserInputText>all web browsers</UserInputText>
         </>
       );
     case `unrestricted`:
       return (
         <>
-          <GradientIcon icon="lightning-bolt" className="mr-2" size="medium" />
+          <GradientIcon icon="lightning-bolt" className="mr-2" size="small" />
           For <UserInputText>all apps</UserInputText>
         </>
       );
     case `singleApp`:
       return (
         <>
-          <GradientIcon icon="location" className="mr-2" size="medium" />
+          <GradientIcon icon="location" className="mr-2" size="small" />
           For <UserInputText>a single app</UserInputText>
         </>
       );
