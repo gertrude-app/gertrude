@@ -23,7 +23,7 @@ const DaySummaryCard: React.FC<Props> = ({ date, numCompleted, numItems }) => {
       className={`block p-6 rounded-xl shadow-lg border bg-white hover:border-violet-400 transition cursor-pointer duration-100`}
     >
       <div className="flex items-center space-x-2 mb-4">
-        <GradientIcon icon="calendar" size="small" className="w=min" />
+        <GradientIcon icon="calendar" size="small" className="mr-1" />
         <h2 className="text-gray-700 grow text-lg font-medium relative">
           <span className="sm:hidden">{formatDate(date, `short`)}</span>
           <span className="hidden sm:inline">{formatDate(date, `medium`)}</span>

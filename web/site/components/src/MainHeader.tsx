@@ -13,7 +13,6 @@ const MainHeader: React.FC = () => (
         type="external"
         href="https://dash.gertrude.app"
         color="secondary-on-violet-bg"
-        small
       >
         Log in
       </Button>
@@ -21,7 +20,6 @@ const MainHeader: React.FC = () => (
         type="external"
         href="https://dash.gertrude.app/signup"
         color="primary-on-violet-bg"
-        small
       >
         Sign up
       </Button>

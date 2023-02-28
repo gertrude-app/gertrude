@@ -113,6 +113,7 @@ const Contact: NextPage = () => {
               type="submit"
               color="secondary"
               disabled={state === `ongoing` || state === `succeeded`}
+              size="large"
             >
               <i className="fa-solid fa-arrow-right mr-3" />
               Submit

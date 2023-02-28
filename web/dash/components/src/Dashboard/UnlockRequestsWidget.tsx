@@ -37,7 +37,7 @@ const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) =>
           And {unlockRequests.length - 2} older{` `}
           {inflect(`request`, unlockRequests.length - 2)}:
         </h3>
-        <Button type="link" to="unlock-requests" color="tertiary" small className="mt-3">
+        <Button type="link" to="unlock-requests" color="tertiary" className="mt-3">
           View all
         </Button>
       </div>

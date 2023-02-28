@@ -8,13 +8,11 @@
     "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
   },
   "dependencies": {
+    "@headlessui/react": "1.7.11",
     "@shared/datetime": "workspace:*",
     "classnames": "^2.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.3"
-  },
-  "devDependencies": {
-    "preact": "^10.11.3"
   }
 }

@@ -103,7 +103,7 @@ const UserCard: React.FC<Props> = ({
             <i className="fa-solid fa-plus" />
           </button>
         ) : (
-          <Button type="button" color="secondary" onClick={addDevice}>
+          <Button type="button" color="secondary" onClick={addDevice} size="large">
             <i className="fa-solid fa-plus mr-2" /> Add a device
           </Button>
         )}
@@ -115,7 +115,6 @@ const UserCard: React.FC<Props> = ({
         color="tertiary"
         to={id}
         testId="edit-user"
-        small
         className="flex-grow w-[100%] xs:w-auto"
       >
         <i className="fa-solid fa-pen mr-2" /> Edit
@@ -126,6 +125,7 @@ const UserCard: React.FC<Props> = ({
         to={`${id}/activity`}
         className="flex-grow w-[100%] xs:w-auto"
         disabled={devices.length === 0}
+        size="large"
       >
         <i className="fa-solid fa-binoculars mr-2" /> Activity
       </Button>

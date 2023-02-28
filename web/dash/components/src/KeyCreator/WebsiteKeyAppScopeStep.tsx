@@ -1,6 +1,7 @@
 import React from 'react';
 import { EditKey } from '@dash/keys';
-import { Toggle, SelectableListItem } from '../Forms';
+import { Toggle } from '@shared/components';
+import { SelectableListItem } from '../Forms';
 import UserInputText from '../UserInputText';
 import GradientIcon from '../GradientIcon';
 import KeyCreationStep from './KeyCreationStep';

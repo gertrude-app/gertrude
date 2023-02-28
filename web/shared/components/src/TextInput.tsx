@@ -96,8 +96,7 @@ const TextInput: React.FC<Props> = ({
           // textarea "rows"
           {...(isInput(props) ? {} : { rows: props.rows })}
           onChange={(e) => {
-            // @ts-ignore (for preact/appviews)
-            const value = e.target?.value;
+            const value = e.target.value;
             setLocalValue(value);
             if (props.type !== `positiveInteger` || isPositiveInteger(value)) {
               setValue(value);

@@ -95,7 +95,7 @@ const GradientIcon: React.FC<Props> = ({ icon, className, size, subtle = false }
   return (
     <div
       className={cx(
-        `flex flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500`,
+        `inline-flex flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500`,
         size === `large` ? `h-12 w-12` : `h-10 w-10`,
         className,
       )}

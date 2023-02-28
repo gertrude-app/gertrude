@@ -9,8 +9,7 @@ import {
   relativeTime,
 } from '@dash/datetime';
 import { EditKey } from '@dash/keys';
-import { TextInput } from '@shared/components';
-import { Toggle } from '../Forms';
+import { TextInput, Toggle } from '@shared/components';
 import UserInputText from '../UserInputText';
 import GradientIcon from '../GradientIcon';
 import KeyCreationStep from './KeyCreationStep';

@@ -53,7 +53,7 @@ const EmailInputForm: React.FC<Props> = ({
         />
       )}
     </div>
-    <Button color="primary" type="submit" fullWidth>
+    <Button color="primary" type="submit" fullWidth size="large">
       Submit &rarr;
     </Button>
   </form>

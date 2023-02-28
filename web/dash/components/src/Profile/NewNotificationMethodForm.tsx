@@ -90,7 +90,6 @@ const EditNotificationSidebar: React.FC<Props> = ({
           onClick={() => onEvent({ type: `send_code_clicked` })}
           color="secondary"
           disabled={!methodValid(props) || sendCodeRequest.state === `ongoing`}
-          small
           className="self-end mt-4"
         >
           {sendCodeRequest.state === `ongoing` ? `Sending...` : `Send verification code`}
@@ -110,7 +109,6 @@ const EditNotificationSidebar: React.FC<Props> = ({
               type="button"
               onClick={() => onEvent({ type: `verify_code_clicked` })}
               color="secondary"
-              small
               disabled={
                 confirmationCode.match(/^\d{6}$/) === null ||
                 confirmationRequest.state === `ongoing`
@@ -123,7 +121,6 @@ const EditNotificationSidebar: React.FC<Props> = ({
               type="button"
               onClick={() => onEvent({ type: `send_code_clicked` })}
               color="tertiary"
-              small
               disabled={!methodValid(props) || confirmationRequest.state === `ongoing`}
             >
               Resend
@@ -138,6 +135,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
       color="tertiary"
       fullWidth
       className="mt-auto justify-end"
+      size="large"
     >
       Cancel
     </Button>

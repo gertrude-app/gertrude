@@ -1,4 +1,7 @@
-import React, { render } from 'preact';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import MenuBar from './MenuBar/MenuBar';
 
-render(<MenuBar state="notConnected" />, document.getElementById(`app`) as HTMLElement);
+ReactDOM.createRoot(document.getElementById(`app`) as HTMLElement).render(
+  <MenuBar state="notConnected" />,
+);

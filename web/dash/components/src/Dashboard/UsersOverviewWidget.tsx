@@ -33,7 +33,7 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
     >
       <h3 className="font-bold text-black text-opacity-80 text-lg">No users</h3>
       <p className="mb-4 text-black text-opacity-50">Let's create one!</p>
-      <Button type="link" color="primary" to="/users/new" small>
+      <Button type="link" color="primary" to="/users/new">
         <i className="fa-solid fa-user-plus mr-2" /> Add user
       </Button>
     </DashboardWidget>

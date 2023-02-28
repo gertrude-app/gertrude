@@ -61,7 +61,7 @@ const LoginForm: React.FC<Props> = ({
       />
     </div>
     <div className="space-y-3 self-stretch">
-      <Button color="primary" type="submit" fullWidth>
+      <Button color="primary" type="submit" fullWidth size="large">
         Submit &rarr;
       </Button>
       <Button
@@ -71,6 +71,7 @@ const LoginForm: React.FC<Props> = ({
         color="secondary"
         type="button"
         fullWidth
+        size="large"
       >
         Send Magic Link
       </Button>

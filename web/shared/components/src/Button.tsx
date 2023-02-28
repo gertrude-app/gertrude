@@ -13,7 +13,7 @@ interface CommonProps {
     | 'warning';
   children: React.ReactNode;
   fullWidth?: boolean;
-  small?: boolean;
+  size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   testId?: string;
 }
@@ -25,7 +25,7 @@ type Props =
   | ({ type: 'link'; to: string } & CommonProps);
 
 const Button: React.FC<Props> = ({
-  small = false,
+  size = `medium`,
   fullWidth = false,
   testId,
   color,
@@ -46,10 +46,10 @@ const Button: React.FC<Props> = ({
         colors = `bg-violet-800 border border-violet-800 hover:border-violet-900 text-white hover:bg-violet-900 ring-transparent focus:ring-violet-800`;
         break;
       case `secondary`:
-        colors = `bg-violet-100 border border-violet-100 hover:border-violet-200 text-violet-600 hover:bg-violet-200 ring-transparent focus:ring-violet-300`;
+        colors = `bg-violet-100 dark:bg-slate-800/80 border border-violet-100 dark:border-slate-700/70 hover:border-violet-200 dark:hover:bg-slate-700/80 text-violet-600 dark:text-white/80 hover:bg-violet-200 ring-transparent focus:ring-violet-300 dark:focus:ring-violet-400/50 dark:ring-offset-slate-900`;
         break;
       case `tertiary`:
-        colors = `bg-white text-gray-600 border hover:bg-gray-50 ring-transparent focus:ring-indigo-400/50 focus:border-indigo-200`;
+        colors = `bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-300 border dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 ring-transparent focus:ring-indigo-400/50 focus:border-indigo-200 dark:ring-offset-slate-900`;
         break;
       case `warning`:
         colors = `bg-red-50 text-red-600 border-red-100 border hover:text-red-700 hover:bg-red-100 ring-transparent focus:ring-red-500 focus:border-red-500`;
@@ -60,10 +60,22 @@ const Button: React.FC<Props> = ({
   }
 
   const rendersAsButton = props.type === `button` || props.type === `submit`;
+  let sizeClass = ``;
+  switch (size) {
+    case `small`:
+      sizeClass = `text-base px-4 py-1.5 font-semibold`;
+      break;
+    case `medium`:
+      sizeClass = `text-base px-5 py-3 sm:py-2.5`;
+      break;
+    default:
+      sizeClass = `text-lg px-10 py-2.5`;
+      break;
+  }
   const classes = cx(
     colors,
     `ring ring-offset-0 focus:ring-offset-2 rounded-lg font-bold [transition:100ms] outline-none block`,
-    small ? `text-md px-5 py-3 sm:py-2.5` : `text-lg px-10 py-2.5`,
+    sizeClass,
     className,
     fullWidth ? `w-full` : `w-fit`,
     !rendersAsButton && `text-center`,

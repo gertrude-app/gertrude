@@ -26,7 +26,6 @@ const VideoModal: React.FC<Props> = ({ onDismiss, videoId }) => (
       </div>
     </div>
     <Button
-      small
       className="antialiased absolute top-0 right-0 m-7"
       color="secondary"
       onClick={onDismiss}

@@ -1,10 +1,9 @@
 import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@dash/utils';
-import { TextInput, Button } from '@shared/components';
+import { TextInput, Button, Toggle } from '@shared/components';
 import type { Subcomponents, ConfirmableEntityAction, RequestState } from '@dash/types';
 import type { KeychainSummary as Keychain } from '@dash/types';
-import { Toggle } from '../Forms';
 import KeychainCard from '../Keychains/KeychainCard';
 import { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
@@ -194,12 +193,11 @@ const EditUser: React.FC<Props> = ({
         </div>
         <div className="flex mt-5 justify-end border-t-2 pt-8 space-x-5">
           {!isNew && (
-            <Button type="button" onClick={deleteUser.start} color="warning" small>
+            <Button type="button" onClick={deleteUser.start} color="warning">
               Delete user
             </Button>
           )}
           <Button
-            small
             type="button"
             disabled={saveButtonDisabled}
             onClick={onSave}
