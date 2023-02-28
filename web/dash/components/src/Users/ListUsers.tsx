@@ -40,7 +40,7 @@ const Users: React.FC<Props> = ({
               to="/users/new"
               color="primary"
               className="self-center mb-16"
-              size="medium"
+              size="large"
             >
               <i className="fa fa-plus mr-4" />
               Add a user

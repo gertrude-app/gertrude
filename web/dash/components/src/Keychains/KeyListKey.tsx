@@ -33,7 +33,7 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete }) => {
       <div className="flex-grow relative overflow-hidden">
         <p className="text-gray-500 whitespace-nowrap">
           <GradientIcon
-            size="medium"
+            size="small"
             className="sm:hidden mr-1.5"
             icon={key.keyType === `website` ? `globe` : `app-store`}
           />

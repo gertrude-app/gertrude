@@ -35,7 +35,7 @@ const AddressStep: React.FC<Props> = ({
     activeTitle="Select website address:"
     title={
       <h2 className="font-medium text-gray-900 text-lg max-w-[calc(100%-25px)] overflow-hidden">
-        <GradientIcon icon="unlock" className="mr-2" size="medium" />
+        <GradientIcon icon="unlock" className="mr-2" size="small" />
         {keyType === `website` ? `Unlocking ` : `Address `}
         {address.trim() !== `` && <UserInputText>{address}</UserInputText>}
       </h2>
