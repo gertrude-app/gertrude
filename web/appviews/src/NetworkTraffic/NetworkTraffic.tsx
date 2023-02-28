@@ -138,7 +138,6 @@ const NetworkTraffic: React.FC = () => {
             className="bg-slate-50 dark:bg-slate-800/50 dark:focus:bg-slate-800 rounded-xl px-4 py-2 w-80 transition duration-100 focus:bg-slate-50 focus:shadow-md outline-none border-[0.5px] dark:border-slate-700 placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
             placeholder="Filter..."
             value={filterQuery}
-            // @ts-ignore
             onChange={(e) => setFilterQuery(e.target.value)}
           />
           <button
@@ -171,7 +170,6 @@ const NetworkTraffic: React.FC = () => {
             </span>
           </div>
         </div>
-        {/* @ts-ignore */}
         <Button color="tertiary" size="small" type="button" onClick={() => {}}>
           <i className="fa-solid fa-ban mr-2 text-red-400" />
           Clear requests
@@ -196,7 +194,6 @@ const NetworkTraffic: React.FC = () => {
             <span className="text-slate-600 dark:text-slate-400 font-medium mb-3">
               4 addresses selected
             </span>
-            {/* @ts-ignore */}
             <Button color="secondary" type="button" onClick={() => {}}>
               Send unlock request
               <i className="fa-solid fa-arrow-right ml-2" />
