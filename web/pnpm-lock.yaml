@@ -43,6 +43,7 @@ importers:
   appviews:
     specifiers:
       '@dash/components': workspace:*
+      '@headlessui/react': 1.7.12
       '@shared/components': workspace:*
       '@shared/tailwind': workspace:*
       '@types/react': 18.0.28
@@ -55,6 +56,7 @@ importers:
       vite: ^4.1.0
     dependencies:
       '@dash/components': link:../dash/components
+      '@headlessui/react': 1.7.12_biqbaboplfbrettd7655fr4n2y
       '@shared/components': link:../shared/components
       '@shared/tailwind': link:../shared/tailwind
       '@vitejs/plugin-react': 3.1.0_vite@4.1.2
@@ -2569,6 +2571,18 @@ packages:
 
   /@headlessui/react/1.7.11_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-EaDbVgcyiylhtskZZf4Qb/JiiByY7cYbd0qgZ9xm2pm2X7hKojG0P4TaQYKgPOV3vojPhd/pZyQh3nmRkkcSyw==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: ^16 || ^17 || ^18
+      react-dom: ^16 || ^17 || ^18
+    dependencies:
+      client-only: 0.0.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@headlessui/react/1.7.12_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-FhSx5V+Qp0GvbTpaxyS+ymGDDNntCacClWsk/d8Upbr19g3AsPbjfPk4+m2CgJGcuCB5Dz7LpUIOAbvQTyjL2g==}
     engines: {node: '>=10'}
     peerDependencies:
       react: ^16 || ^17 || ^18

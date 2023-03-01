@@ -19,6 +19,7 @@ type CommonProps = {
 
 type TextAreaProps = {
   rows?: number;
+  noResize?: boolean;
 };
 
 type InputProps = {
@@ -108,6 +109,8 @@ const TextInput: React.FC<Props> = ({
             `transition duration-150`,
             `text-gray-600 placeholder:text-gray-400/90 placeholder:antialiased`,
             `ring-0 ring-gray-200 outline-none focus:shadow-md focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1`,
+            `dark:bg-slate-800/50 dark:border-slate-700 dark:placeholder:text-slate-500 dark:text-white`,
+            !isInput(props) && props.noResize && `resize-none`,
             isInput(props) && props.unit && `rounded-r-none`,
             isInput(props) && props.prefix && `xs:rounded-l-none`,
           )}
