@@ -3,14 +3,12 @@ import cx from 'classnames';
 import { Button, TextInput } from '@shared/components';
 import { Transition } from '@headlessui/react';
 
-interface Props {}
-
-const RequestSuspension: React.FC<Props> = ({}) => {
-  const [reason, setReason] = useState('');
+const RequestSuspension: React.FC = () => {
+  const [reason, setReason] = useState(``);
   const [duration, setDuration] = useState<number | null>(null);
   const [popupOpen, setPopupOpen] = useState(false);
   const [popupPage, setPopupPage] = useState<1 | 2>(1);
-  const [customDuration, setCustomDuration] = useState('');
+  const [customDuration, setCustomDuration] = useState(``);
 
   return (
     <div className="h-full flex items-stretch flex-col bg-white rounded-b-xl relative">
@@ -25,7 +23,7 @@ const RequestSuspension: React.FC<Props> = ({}) => {
       >
         <div
           className={cx(
-            'absolute flex justify-center items-center w-full h-full top-0 left-0 bg-black/60 z-40 rounded-b-xl',
+            `absolute flex justify-center items-center w-full h-full top-0 left-0 bg-black/60 z-40 rounded-b-xl`,
           )}
           onClick={() => {
             setPopupOpen(false);
@@ -34,14 +32,14 @@ const RequestSuspension: React.FC<Props> = ({}) => {
         >
           <div
             className={cx(
-              'h-[330px] w-96 bg-white rounded-xl shadow-xl relative overflow-hidden',
+              `h-[330px] w-96 bg-white rounded-xl shadow-xl relative overflow-hidden`,
             )}
             onClick={(event) => event.stopPropagation()}
           >
             <div
               className={cx(
-                'absolute w-full flex flex-col items-stretch top-0 p-4 [transition:200ms]',
-                popupPage === 1 ? 'left-0 opacity-100' : '-left-96 opacity-0',
+                `absolute w-full flex flex-col items-stretch top-0 p-4 [transition:200ms]`,
+                popupPage === 1 ? `left-0 opacity-100` : `-left-96 opacity-0`,
               )}
             >
               <h3 className="font-bold mb-3">Suspension duration</h3>
@@ -52,10 +50,12 @@ const RequestSuspension: React.FC<Props> = ({}) => {
                     onClick={() => {
                       setDuration(minutes);
                       setPopupOpen(false);
+                      setCustomDuration(``);
                     }}
                   >
-                    {minutes > 59 ? minutes / 60 : minutes}{' '}
-                    {minutes > 59 ? (minutes === 60 ? 'hour' : 'hours') : 'minutes'}
+                    {minutes > 59 ? minutes / 60 : minutes}
+                    {` `}
+                    {minutes > 59 ? (minutes === 60 ? `hour` : `hours`) : `minutes`}
                   </button>
                 ))}
               </div>
@@ -75,8 +75,8 @@ const RequestSuspension: React.FC<Props> = ({}) => {
             </div>
             <div
               className={cx(
-                'absolute w-full h-full top-0 p-4 [transition:200ms] flex flex-col justify-between',
-                popupPage === 2 ? 'left-0 opacity-100' : 'left-96 opacity-0',
+                `absolute w-full h-full top-0 p-4 [transition:200ms] flex flex-col justify-between`,
+                popupPage === 2 ? `left-0 opacity-100` : `left-96 opacity-0`,
               )}
             >
               <div>
@@ -139,7 +139,7 @@ const RequestSuspension: React.FC<Props> = ({}) => {
           size="medium"
         >
           <i className="fa-regular fa-clock mr-2" />
-          {duration ? `${duration} minutes` : `Choose duration...`}
+          {duration ? displayDuration(duration, !!customDuration) : `Choose duration...`}
         </Button>
         <Button
           type="button"
@@ -157,3 +157,11 @@ const RequestSuspension: React.FC<Props> = ({}) => {
 };
 
 export default RequestSuspension;
+
+function displayDuration(minutes: number, custom: boolean): string {
+  if (minutes >= 60 && !custom) {
+    return `${minutes / 60} hour${minutes / 60 !== 1 ? `s` : ``}`;
+  } else {
+    return `${minutes} minute${minutes !== 1 ? `s` : ``}`;
+  }
+}
