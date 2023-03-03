@@ -10,7 +10,10 @@ type Props = {
 const Label: React.FC<Props> = ({ children, htmlFor, className }) => (
   <label
     htmlFor={htmlFor}
-    className={cx(`text-left text-gray-500 font-semibold text-md mb-1`, className)}
+    className={cx(
+      `text-left text-slate-500 dark:text-slate-300 font-semibold text-md mb-1`,
+      className,
+    )}
   >
     {children}
   </label>

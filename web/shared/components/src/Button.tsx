@@ -56,7 +56,7 @@ const Button: React.FC<Props> = ({
         break;
     }
   } else {
-    colors = `bg-gray-50 text-gray-400 border border-gray-200 cursor-not-allowed ring-transparent focus:ring-gray-200`;
+    colors = `bg-gray-50 dark:bg-black/50 text-gray-400 dark:text-slate-600 border border-gray-200 dark:border-slate-800 cursor-not-allowed ring-transparent focus:ring-gray-200`;
   }
 
   const rendersAsButton = props.type === `button` || props.type === `submit`;
