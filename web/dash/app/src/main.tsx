@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { Tooltip } from 'react-tooltip';
 import { store } from './redux/store';
 import App from './App';
 
@@ -13,5 +14,11 @@ ReactDOM.createRoot(document.getElementById(`root`)!).render(
     <BrowserRouter>
       <App />
     </BrowserRouter>
+    <Tooltip
+      id="key-comment"
+      variant="light"
+      className="shadow-lg max-w-sm text-center z-50"
+      style={{ borderRadius: `10px`, color: `#475569` }}
+    />
   </Provider>,
 );
