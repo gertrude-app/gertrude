@@ -84,7 +84,11 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete }) => {
       </div>
       <div className="ml-1 flex items-center">
         {key.comment && (
-          <div className="text-gray-400 flex justify-center items-center rounded-full w-8 h-8 bg-transparent hover:bg-violet-100 hover:text-gray-500 shrink-0 ml-1">
+          <div
+            className="text-gray-400 flex justify-center items-center rounded-full w-8 h-8 bg-transparent hover:bg-violet-100 hover:text-gray-500 shrink-0 ml-1"
+            data-tooltip-content={key.comment}
+            data-tooltip-id="key-comment"
+          >
             <i className="fa-solid fa-message" />
           </div>
         )}

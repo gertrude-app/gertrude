@@ -103,7 +103,7 @@ const TextInput: React.FC<Props> = ({
             }
           }}
           className={cx(
-            `py-3 px-4 flex-grow z-10 w-12`,
+            `py-3 px-4 flex-grow w-12`,
             `border border-gray-200 rounded-lg`,
             `transition duration-150`,
             `text-gray-600 placeholder:text-gray-400/90 placeholder:antialiased`,
