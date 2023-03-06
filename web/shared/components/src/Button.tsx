@@ -46,7 +46,7 @@ const Button: React.FC<Props> = ({
         colors = `bg-violet-800 border border-violet-800 hover:border-violet-900 text-white hover:bg-violet-900 ring-transparent focus:ring-violet-800`;
         break;
       case `secondary`:
-        colors = `bg-violet-100 dark:bg-slate-800/80 border border-violet-100 dark:border-slate-700/70 hover:border-violet-200 dark:hover:bg-slate-700/80 text-violet-600 dark:text-white/80 hover:bg-violet-200 ring-transparent focus:ring-violet-300 dark:focus:ring-violet-400/50 dark:ring-offset-slate-900`;
+        colors = `bg-violet-100 dark:bg-slate-800/80 border border-violet-100 dark:border-slate-700/70 hover:border-violet-200 dark:hover:bg-slate-700/80 text-violet-600 dark:text-white/80 hover:bg-violet-200 ring-transparent focus:ring-violet-300 dark:focus:ring-indigo-500/70 dark:ring-offset-slate-900`;
         break;
       case `tertiary`:
         colors = `bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-300 border dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 ring-transparent focus:ring-indigo-400/50 focus:border-indigo-200 dark:ring-offset-slate-900`;
@@ -56,7 +56,7 @@ const Button: React.FC<Props> = ({
         break;
     }
   } else {
-    colors = `bg-gray-50 text-gray-400 border border-gray-200 cursor-not-allowed ring-transparent focus:ring-gray-200`;
+    colors = `bg-gray-50 dark:bg-black/50 text-gray-400 dark:text-slate-600 border border-gray-200 dark:border-slate-800 cursor-not-allowed ring-transparent focus:ring-gray-200`;
   }
 
   const rendersAsButton = props.type === `button` || props.type === `submit`;

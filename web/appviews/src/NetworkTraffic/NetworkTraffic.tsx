@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
-import { Button, Toggle } from '@shared/components';
+import { Button, TextInput, Toggle } from '@shared/components';
 import NetworkRequest from './NetworkRequest';
 
 const testRequests: Array<{
@@ -127,6 +127,7 @@ const testRequests: Array<{
 
 const NetworkTraffic: React.FC = () => {
   const [filterQuery, setFilterQuery] = useState(``);
+  const [explanation, setExplanation] = useState(``);
   const [TCPOnly, setTCPOnly] = useState(false);
   const [blocksOnly, setBlocksOnly] = useState(true);
 
@@ -185,11 +186,15 @@ const NetworkTraffic: React.FC = () => {
       </div>
       <div className="border-b border-slate-200 dark:border-slate-800 shadow-xl shadow-black/5 dark:shadow-black/50 rotate-180">
         <div className="rotate-180 p-4 flex justify-between">
-          <textarea
-            className="resize-none border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50 dark:focus:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-slate-300 focus:bg-white focus:ring-0 transition duration-100 w-96 dark:text-white/90"
-            placeholder="Explanation..."
+          <TextInput
+            type="textarea"
+            value={explanation}
+            setValue={setExplanation}
             rows={3}
-          ></textarea>
+            className="w-96"
+            placeholder="Explanation..."
+            noResize
+          />
           <div className="flex flex-col justify-end items-end">
             <span className="text-slate-600 dark:text-slate-400 font-medium mb-3">
               4 addresses selected

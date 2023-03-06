@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@dash/components": "workspace:*",
+    "@headlessui/react": "1.7.12",
     "@shared/components": "workspace:*",
     "@shared/tailwind": "workspace:*",
     "@vitejs/plugin-react": "3.1.0",
