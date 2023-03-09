@@ -11,30 +11,42 @@ export default {
   },
 } as ComponentMeta<typeof MenuBar>;
 
+const fns = {
+  onResumeFilterClicked: () => {},
+  onSuspendFilterClicked: () => {},
+  onRefreshRulesClicked: () => {},
+  onAdministrateClicked: () => {},
+  onViewNetworkTrafficClicked: () => {},
+  onConnectToUserClicked: () => {},
+};
+
 const ThreeModes: React.FC<{ colors: string }> = ({ colors }) => (
   <div className="flex space-x-4">
-    <div className={cx(colors, `rounded-2xl w-[400px] h-[300px]`)}>
+    <div className={cx(colors, `rounded-2xl`)}>
       <MenuBar
-        state="connected"
+        case="connected"
         recordingKeystrokes={false}
-        recordingScreenshots={false}
-        filterState={{ state: `on` }}
+        recordingScreen={false}
+        filterState={{ case: `on` }}
+        {...fns}
       />
     </div>
-    <div className={cx(colors, `rounded-2xl w-[400px] h-[300px]`)}>
+    <div className={cx(colors, `rounded-2xl`)}>
       <MenuBar
-        state="connected"
+        case="connected"
         recordingKeystrokes={false}
-        recordingScreenshots={true}
-        filterState={{ state: `off` }}
+        recordingScreen={true}
+        filterState={{ case: `off` }}
+        {...fns}
       />
     </div>
-    <div className={cx(colors, `rounded-2xl w-[400px] h-[300px]`)}>
+    <div className={cx(colors, `rounded-2xl`)}>
       <MenuBar
-        state="connected"
+        case="connected"
         recordingKeystrokes={true}
-        recordingScreenshots={true}
-        filterState={{ state: `suspended`, expiration: `3 minutes from now` }}
+        recordingScreen={true}
+        filterState={{ case: `suspended`, expiration: `3 minutes from now` }}
+        {...fns}
       />
     </div>
   </div>
@@ -76,18 +88,18 @@ const NotConnectedTemplate: StoryFn<typeof MenuBar> = () => {
       <div
         className={cx(
           `bg-gradient-to-l from-[rgb(140,140,140)] to-[rgb(230,230,236)]`,
-          `rounded-2xl w-[400px] h-[300px]`,
+          `rounded-2xl`,
         )}
       >
-        <MenuBar state="notConnected" />
+        <MenuBar case="notConnected" {...fns} />
       </div>
       <div
         className={cx(
           `dark bg-gradient-to-l from-[rgb(27,27,27)] to-[rgb(120,120,120)]`,
-          `rounded-2xl w-[400px] h-[300px]`,
+          `rounded-2xl`,
         )}
       >
-        <MenuBar state="notConnected" />
+        <MenuBar case="notConnected" {...fns} />
       </div>
     </div>
   );

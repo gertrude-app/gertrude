@@ -1,27 +1,30 @@
 import type { Action } from '../lib/store';
 import { Store } from '../lib/store';
 
-type FilterState =
-  | { state: 'off' }
-  | { state: 'on' }
-  | { state: 'suspended'; expiration: string };
+// begin codegen
+export type FilterState =
+  | { case: 'suspended'; expiration: string }
+  | { case: 'off' }
+  | { case: 'on' };
 
 export type AppState =
-  | { state: 'notConnected' }
   | {
-      state: 'connected';
+      case: 'connected';
       recordingKeystrokes: boolean;
-      recordingScreenshots: boolean;
+      recordingScreen: boolean;
       filterState: FilterState;
-    };
+    }
+  | { case: 'notConnected' };
 
-type AppEvent =
+export type AppEvent =
+  | 'fakeConnect'
+  | 'menuBarIconClicked'
   | 'resumeFilterClicked'
   | 'suspendFilterClicked'
   | 'refreshRulesClicked'
   | 'administrateClicked'
-  | 'viewNetworkTrafficClicked'
-  | 'fakeConnect';
+  | 'viewNetworkTrafficClicked';
+// end codegen
 
 export type Props = AppState & {
   onResumeFilterClicked(): unknown;
@@ -34,7 +37,7 @@ export type Props = AppState & {
 
 export class MenuBarStore extends Store<AppState, AppEvent, Props> {
   initializer(): AppState {
-    return { state: `notConnected` };
+    return { case: `notConnected` };
   }
 
   reducer(state: AppState, action: Action<AppState>): AppState {

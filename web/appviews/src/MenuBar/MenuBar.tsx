@@ -1,6 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import { Logo } from '@shared/components';
+import type { Props } from './menubar-store';
 import ClockRotateLeft from '../Icons/ClockRotateLeft';
 import TowerBroadcast from '../Icons/TowerBroadcast';
 import Binoculars from '../Icons/Binoculars';
@@ -11,24 +12,10 @@ import Laptop from '../Icons/Laptop';
 import { containerize } from '../lib/store';
 import store from './menubar-store';
 
-type FilterState =
-  | { state: 'off' }
-  | { state: 'on' }
-  | { state: 'suspended'; expiration: string };
-
-type Props =
-  | { state: 'notConnected' }
-  | {
-      state: 'connected';
-      recordingKeystrokes: boolean;
-      recordingScreenshots: boolean;
-      filterState: FilterState;
-    };
-
-const MenuBar: React.FC<Props> = (props) => {
-  if (props.state === `connected`) {
+export const MenuBar: React.FC<Props> = (props) => {
+  if (props.case === `connected`) {
     let badgeColors = ``;
-    switch (props.filterState.state) {
+    switch (props.filterState.case) {
       case `off`:
         badgeColors = `bg-red-500 dark:bg-red-500/30 dark:border dark:border-red-500/70 dark:text-red-200`;
         break;
@@ -41,35 +28,47 @@ const MenuBar: React.FC<Props> = (props) => {
     }
 
     return (
-      <div className="p-3 select-none flex flex-col h-full">
+      <div className="p-3 select-none flex flex-col w-[400px] h-[300px]">
         <div className="bg-white/20 dark:bg-white/5 shadow-md px-3 py-2 rounded-xl border-[0.5px] border-white/30 dark:border-white/20">
           <div className="flex justify-between items-center">
             <h3 className="text-black dark:text-white font-medium">Internet filter</h3>
             <span
-              className={cx(`text-white px-3 py-0 rounded-full font-medium`, badgeColors)}
+              className={cx(
+                `text-white px-3 py-0.5 rounded-full text-sm font-medium uppercase`,
+                badgeColors,
+              )}
             >
-              {props.filterState.state}
+              {props.filterState.case}
             </span>
           </div>
-          {props.filterState.state === `suspended` && (
+          {props.filterState.case === `suspended` && (
             <div className="mt-1 -mb-0.5 flex justify-between items-center pr-0">
               <p className="text-sm text-black/70 dark:text-white/70">
                 Filter will resume {props.filterState.expiration}
               </p>
-              <button className="text-black/60 dark:text-white/60 hover:text-black/90 dark:hover:text-white/90 font-medium transition duration-100">
+              <button
+                onClick={props.onResumeFilterClicked}
+                className="text-black/60 dark:text-white/60 hover:text-black/90 dark:hover:text-white/90 font-medium transition duration-100"
+              >
                 resume
               </button>
             </div>
           )}
         </div>
         <div className="flex mt-3 space-x-3">
-          <button className="flex-grow shadow-md transition duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row">
-            <TowerBroadcast className="h-5 shrink-0 text-black/70 dark:text-white/80" />
-            <p className="text-sm font-medium text-left leading-5 dark:text-white">
+          <button
+            onClick={props.onViewNetworkTrafficClicked}
+            className="flex-grow shadow-md transition duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row"
+          >
+            <TowerBroadcast className="h-5 w-6 shrink-0 text-black/70 dark:text-white/80" />
+            <p className="text-sm font-medium text-left leading-5 dark:text-white leading-tight">
               View network requests
             </p>
           </button>
-          <button className="flex-grow shadow-md transition duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row">
+          <button
+            onClick={props.onSuspendFilterClicked}
+            className="flex-grow shadow-md transition duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row"
+          >
             <ClockRotateLeft className="h-5 shrink-0 text-black/70 dark:text-white/80" />
             <p className="text-sm font-medium text-left leading-5 dark:text-white">
               Suspend filter
@@ -82,7 +81,7 @@ const MenuBar: React.FC<Props> = (props) => {
               <div
                 className={cx(
                   `rounded-full w-10 h-10 flex justify-center items-center`,
-                  props.recordingScreenshots
+                  props.recordingScreen
                     ? `bg-indigo-300/40 dark:bg-indigo-600/50 text-indigo-600 dark:text-indigo-300`
                     : `bg-black/5 dark:bg-white/5 text-black/30 dark:text-white/30`,
                 )}
@@ -105,18 +104,24 @@ const MenuBar: React.FC<Props> = (props) => {
                 Keystrokes are being monitored
               </p>
             )}
-            {props.recordingScreenshots && (
+            {props.recordingScreen && (
               <p className="text-xs mt-0.5 text-center italic text-black/50 dark:text-white/50">
                 Screen is being monitored
               </p>
             )}
           </div>
           <div className="flex flex-col justify-center items-center space-y-1 w-1/2">
-            <button className="flex items-center font-medium text-black/80 dark:text-white/80 transition duration-100 hover:bg-white/20 dark:hover:bg-white/10 hover:text-black dark:hover:text-white px-4 py-0.5 rounded-lg">
+            <button
+              onClick={props.onRefreshRulesClicked}
+              className="flex items-center font-medium text-black/80 dark:text-white/80 transition duration-100 hover:bg-white/20 dark:hover:bg-white/10 hover:text-black dark:hover:text-white px-4 py-0.5 rounded-lg"
+            >
               <ArrowRotateRight className="w-3.5 mr-2" />
               Refresh rules
             </button>
-            <button className="flex items-center font-medium text-black/80 dark:text-white/80 transition duration-100 hover:bg-white/20 dark:hover:bg-white/10 hover:text-black dark:hover:text-white px-4 py-0.5 rounded-lg">
+            <button
+              onClick={props.onAdministrateClicked}
+              className="flex items-center font-medium text-black/80 dark:text-white/80 transition duration-100 hover:bg-white/20 dark:hover:bg-white/10 hover:text-black dark:hover:text-white px-4 py-0.5 rounded-lg"
+            >
               <Gear className="w-3.5 mr-2" />
               Administrate
             </button>
@@ -126,10 +131,13 @@ const MenuBar: React.FC<Props> = (props) => {
     );
   }
   return (
-    <div className="flex flex-col justify-center items-center h-full">
+    <div className="flex flex-col justify-center items-center w-[400px] h-[300px]">
       <p className="text-black/80 dark:text-white/70 font-medium">Welcome to</p>
       <Logo type="default" className="dark:[filter:brightness(600%)]" />
-      <button className="flex items-center text-lg font-bold bg-white/90 px-6 py-3 rounded-xl mt-8 shadow-md transition duration-100 hover:bg-white/100 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow">
+      <button
+        onClick={props.onConnectToUserClicked}
+        className="flex items-center text-lg font-bold bg-white/90 px-6 py-3 rounded-xl mt-8 shadow-md transition duration-100 hover:bg-white/100 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow"
+      >
         <Laptop className="w-6 mr-3 text-indigo-600" />
         <span className="bg-gradient-to-br from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent [-webkit-background-clip:text;]">
           Connect a device
