@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import cx from 'classnames';
 import { Logo } from '@shared/components';
 import type { Props } from './menubar-store';
@@ -13,7 +13,30 @@ import { containerize } from '../lib/store';
 import store from './menubar-store';
 
 export const MenuBar: React.FC<Props> = (props) => {
-  if (props.case === `connected`) {
+  const [code, setCode] = useState(``);
+  if (props.connection.case === `enteringConnectionCode`) {
+    return (
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          props.onConnectSubmit(Number(code));
+        }}
+      >
+        <input type="text" value={code} onChange={(e) => setCode(e.target.value)} />
+        <button type="submit">Submit</button>
+      </form>
+    );
+  }
+
+  if (props.connection.case === `connecting`) {
+    return <div>Connecting...</div>;
+  }
+
+  if (props.connection.case === `connectFailed`) {
+    return <div>Error: {props.connection.connectFailed}</div>;
+  }
+
+  if (props.connection.case === `connected`) {
     let badgeColors = ``;
     switch (props.filterState.case) {
       case `off`:
@@ -61,7 +84,7 @@ export const MenuBar: React.FC<Props> = (props) => {
             className="flex-grow shadow-md transition duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row"
           >
             <TowerBroadcast className="h-5 w-6 shrink-0 text-black/70 dark:text-white/80" />
-            <p className="text-sm font-medium text-left leading-5 dark:text-white leading-tight">
+            <p className="text-sm font-medium text-left dark:text-white leading-tight">
               View network requests
             </p>
           </button>
@@ -81,7 +104,7 @@ export const MenuBar: React.FC<Props> = (props) => {
               <div
                 className={cx(
                   `rounded-full w-10 h-10 flex justify-center items-center`,
-                  props.recordingScreen
+                  props.connection.screenshotsEnabled
                     ? `bg-indigo-300/40 dark:bg-indigo-600/50 text-indigo-600 dark:text-indigo-300`
                     : `bg-black/5 dark:bg-white/5 text-black/30 dark:text-white/30`,
                 )}
@@ -91,7 +114,7 @@ export const MenuBar: React.FC<Props> = (props) => {
               <div
                 className={cx(
                   `rounded-full w-10 h-10 flex justify-center items-center`,
-                  props.recordingKeystrokes
+                  props.connection.keyloggingEnabled
                     ? `bg-indigo-300/40 dark:bg-indigo-600/50 text-indigo-600 dark:text-indigo-300`
                     : `bg-black/5 dark:bg-white/5 text-black/30 dark:text-white/30`,
                 )}
@@ -99,12 +122,12 @@ export const MenuBar: React.FC<Props> = (props) => {
                 <Keyboard className="w-5" />
               </div>
             </div>
-            {props.recordingKeystrokes && (
+            {props.connection.keyloggingEnabled && (
               <p className="text-xs mt-0.5 text-center italic text-black/50 dark:text-white/50">
                 Keystrokes are being monitored
               </p>
             )}
-            {props.recordingScreen && (
+            {props.connection.screenshotsEnabled && (
               <p className="text-xs mt-0.5 text-center italic text-black/50 dark:text-white/50">
                 Screen is being monitored
               </p>
@@ -135,7 +158,7 @@ export const MenuBar: React.FC<Props> = (props) => {
       <p className="text-black/80 dark:text-white/70 font-medium">Welcome to</p>
       <Logo type="default" className="dark:[filter:brightness(600%)]" />
       <button
-        onClick={props.onConnectToUserClicked}
+        onClick={props.onConnectClicked}
         className="flex items-center text-lg font-bold bg-white/90 px-6 py-3 rounded-xl mt-8 shadow-md transition duration-100 hover:bg-white/100 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow"
       >
         <Laptop className="w-6 mr-3 text-indigo-600" />

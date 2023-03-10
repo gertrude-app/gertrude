@@ -21,6 +21,14 @@
   -webkit-user-select: none;
 }
 
+input,
+textarea {
+  touch-callout: default;
+  user-select: auto;
+  -webkit-touch-callout: default;
+  -webkit-user-select: auto;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -21,7 +21,7 @@ export abstract class Store<
 
   emitter(window: any): (event: AppEvent) => unknown {
     return (event: AppEvent) => {
-      window.webkit.messageHandlers.appView.postMessage(event);
+      window.webkit.messageHandlers.appView.postMessage(JSON.stringify(event));
     };
   }
 

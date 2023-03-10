@@ -17,34 +17,42 @@ const fns = {
   onRefreshRulesClicked: () => {},
   onAdministrateClicked: () => {},
   onViewNetworkTrafficClicked: () => {},
-  onConnectToUserClicked: () => {},
+  onConnectClicked: () => {},
+  onConnectSubmit: () => {},
+};
+
+const filterState = { case: `on` } as const;
+
+const user = {
+  name: ``,
+  keyloggingEnabled: true,
+  screenshotsEnabled: false,
 };
 
 const ThreeModes: React.FC<{ colors: string }> = ({ colors }) => (
   <div className="flex space-x-4">
     <div className={cx(colors, `rounded-2xl`)}>
       <MenuBar
-        case="connected"
-        recordingKeystrokes={false}
-        recordingScreen={false}
+        connection={{
+          case: `connected`,
+          ...user,
+          keyloggingEnabled: false,
+          screenshotsEnabled: false,
+        }}
         filterState={{ case: `on` }}
         {...fns}
       />
     </div>
     <div className={cx(colors, `rounded-2xl`)}>
       <MenuBar
-        case="connected"
-        recordingKeystrokes={false}
-        recordingScreen={true}
+        connection={{ case: `connected`, ...user, keyloggingEnabled: false }}
         filterState={{ case: `off` }}
         {...fns}
       />
     </div>
     <div className={cx(colors, `rounded-2xl`)}>
       <MenuBar
-        case="connected"
-        recordingKeystrokes={true}
-        recordingScreen={true}
+        connection={{ case: `connected`, ...user }}
         filterState={{ case: `suspended`, expiration: `3 minutes from now` }}
         {...fns}
       />
@@ -91,7 +99,11 @@ const NotConnectedTemplate: StoryFn<typeof MenuBar> = () => {
           `rounded-2xl`,
         )}
       >
-        <MenuBar case="notConnected" {...fns} />
+        <MenuBar
+          filterState={filterState}
+          connection={{ case: `notConnected` }}
+          {...fns}
+        />
       </div>
       <div
         className={cx(
@@ -99,7 +111,11 @@ const NotConnectedTemplate: StoryFn<typeof MenuBar> = () => {
           `rounded-2xl`,
         )}
       >
-        <MenuBar case="notConnected" {...fns} />
+        <MenuBar
+          filterState={filterState}
+          connection={{ case: `notConnected` }}
+          {...fns}
+        />
       </div>
     </div>
   );
