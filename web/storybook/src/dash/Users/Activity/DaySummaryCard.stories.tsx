@@ -1,5 +1,5 @@
 import { DaySummaryCard } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { time } from '../../../story-helpers';
 
 export default {
@@ -7,9 +7,7 @@ export default {
   component: DaySummaryCard,
 } as ComponentMeta<typeof DaySummaryCard>;
 
-const Template: ComponentStory<typeof DaySummaryCard> = (args) => (
-  <DaySummaryCard {...args} />
-);
+const Template: StoryFn<typeof DaySummaryCard> = (args) => <DaySummaryCard {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

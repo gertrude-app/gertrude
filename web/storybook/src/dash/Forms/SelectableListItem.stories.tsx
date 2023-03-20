@@ -1,12 +1,12 @@
 import { SelectableListItem } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Forms/SelectableListItem', // eslint-disable-line
   component: SelectableListItem,
 } as ComponentMeta<typeof SelectableListItem>;
 
-const Template: ComponentStory<typeof SelectableListItem> = (args) => (
+const Template: StoryFn<typeof SelectableListItem> = (args) => (
   <SelectableListItem {...args} />
 );
 

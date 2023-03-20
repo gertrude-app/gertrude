@@ -1,5 +1,5 @@
 import { UserActivityReviewDay } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import type { ActivityItem } from '@dash/components';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
 import { testImgUrl, time } from '../../../story-helpers';
@@ -11,7 +11,7 @@ export default {
   decorators: [withStatefulChrome],
 } as ComponentMeta<typeof UserActivityReviewDay>;
 
-const Template: ComponentStory<typeof UserActivityReviewDay> = (args) => (
+const Template: StoryFn<typeof UserActivityReviewDay> = (args) => (
   <UserActivityReviewDay {...args} />
 );
 

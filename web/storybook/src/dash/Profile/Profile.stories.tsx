@@ -1,5 +1,5 @@
 import { Profile } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { withIdsAnd, confirmableEntityAction } from '../../story-helpers';
 import { Email as CardStory } from './NotificationCard.stories';
@@ -11,7 +11,7 @@ export default {
   decorators: [withStatefulChrome],
 } as ComponentMeta<typeof Profile>;
 
-const Template: ComponentStory<typeof Profile> = (args) => <Profile {...args} />;
+const Template: StoryFn<typeof Profile> = (args) => <Profile {...args} />;
 
 const notificationProps = {
   methodOptions: CardStory.args?.methodOptions!,

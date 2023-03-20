@@ -1,6 +1,6 @@
 import { KeyCreator } from '@dash/components';
 import { EditKey } from '@dash/keys';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { time } from '../../story-helpers';
 
 export default {
@@ -8,7 +8,7 @@ export default {
   component: KeyCreator,
 } as ComponentMeta<typeof KeyCreator>;
 
-const Template: ComponentStory<typeof KeyCreator> = (args) => <KeyCreator {...args} />;
+const Template: StoryFn<typeof KeyCreator> = (args) => <KeyCreator {...args} />;
 
 // @screenshot xs/600,md/550
 export const CreateStart = Template.bind({});

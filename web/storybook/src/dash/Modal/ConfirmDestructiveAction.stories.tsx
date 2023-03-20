@@ -1,12 +1,12 @@
 import { ConfirmDestructiveAction } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Modal/ConfirmDestructiveAction', // eslint-disable-line
   component: ConfirmDestructiveAction,
 } as ComponentMeta<typeof ConfirmDestructiveAction>;
 
-const Template: ComponentStory<typeof ConfirmDestructiveAction> = (args) => (
+const Template: StoryFn<typeof ConfirmDestructiveAction> = (args) => (
   <ConfirmDestructiveAction {...args} />
 );
 

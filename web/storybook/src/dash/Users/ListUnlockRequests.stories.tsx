@@ -1,5 +1,5 @@
 import { ListUnlockRequests } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { withIdsAnd, time } from '../../story-helpers';
 
@@ -10,7 +10,7 @@ export default {
   decorators: [withStatefulChrome],
 } as ComponentMeta<typeof ListUnlockRequests>;
 
-const Template: ComponentStory<typeof ListUnlockRequests> = (args) => (
+const Template: StoryFn<typeof ListUnlockRequests> = (args) => (
   <ListUnlockRequests {...args} />
 );
 

@@ -1,5 +1,5 @@
 import { NetworkTraffic } from '@macos/appviews';
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { ComponentMeta, StoryFn } from '@storybook/react';
 import AppWindow from './AppWindow';
 
 export default {
@@ -10,7 +10,7 @@ export default {
   },
 } as ComponentMeta<typeof NetworkTraffic>;
 
-const LightTemplate: ComponentStory<typeof NetworkTraffic> = (args) => (
+const LightTemplate: StoryFn<typeof NetworkTraffic> = (args) => (
   <AppWindow width={900} height={600}>
     <NetworkTraffic {...args} />
   </AppWindow>
@@ -18,7 +18,7 @@ const LightTemplate: ComponentStory<typeof NetworkTraffic> = (args) => (
 export const LightMode = LightTemplate.bind({});
 LightMode.args = {};
 
-const DarkTemplate: ComponentStory<typeof NetworkTraffic> = (args) => (
+const DarkTemplate: StoryFn<typeof NetworkTraffic> = (args) => (
   <AppWindow width={900} height={600} dark>
     <NetworkTraffic {...args} />
   </AppWindow>

@@ -1,12 +1,12 @@
 import { TextInput } from '@shared/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Shared/TextInput', // eslint-disable-line
   component: TextInput,
 } as ComponentMeta<typeof TextInput>;
 
-const Template: ComponentStory<typeof TextInput> = (args) => (
+const Template: StoryFn<typeof TextInput> = (args) => (
   <div>
     <TextInput {...args} className="max-w-sm" />
     <TextInput {...args} className="mt-5" />

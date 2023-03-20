@@ -1,5 +1,5 @@
 import { EditUser } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { confirmableEntityAction, keychainProps } from '../../story-helpers';
 
@@ -10,7 +10,7 @@ export default {
   parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof EditUser>;
 
-const Template: ComponentStory<typeof EditUser> = (args) => <EditUser {...args} />;
+const Template: StoryFn<typeof EditUser> = (args) => <EditUser {...args} />;
 
 // @screenshot: xs,md
 export const Default = Template.bind({});

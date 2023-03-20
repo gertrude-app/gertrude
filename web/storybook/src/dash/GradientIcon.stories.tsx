@@ -1,5 +1,5 @@
 import { GradientIcon, GRADIENT_ICONS } from '@dash/components';
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { ComponentMeta, StoryFn } from '@storybook/react';
 
 const GradientGrid: React.FC<{ size: 'small' | 'medium' | 'large'; subtle: boolean }> = ({
   size,
@@ -20,9 +20,7 @@ const GradientGrid: React.FC<{ size: 'small' | 'medium' | 'large'; subtle: boole
   </div>
 );
 
-const Template: ComponentStory<typeof GradientGrid> = (args) => (
-  <GradientGrid {...args} />
-);
+const Template: StoryFn<typeof GradientGrid> = (args) => <GradientGrid {...args} />;
 
 export const Grid = Template.bind({});
 Grid.args = {

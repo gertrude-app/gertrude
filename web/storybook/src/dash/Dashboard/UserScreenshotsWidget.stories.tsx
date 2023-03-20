@@ -1,5 +1,5 @@
 import { UserScreenshotsWidget } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { withIds, time, testImgUrl } from '../../story-helpers';
 
 export default {
@@ -7,7 +7,7 @@ export default {
   component: UserScreenshotsWidget,
 } as ComponentMeta<typeof UserScreenshotsWidget>;
 
-const Template: ComponentStory<typeof UserScreenshotsWidget> = (args) => (
+const Template: StoryFn<typeof UserScreenshotsWidget> = (args) => (
   <UserScreenshotsWidget {...args} />
 );
 

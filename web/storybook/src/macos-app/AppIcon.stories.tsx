@@ -1,4 +1,4 @@
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import AppIcon from './AppIcon';
 
 export default {
@@ -9,6 +9,6 @@ export default {
   },
 } as ComponentMeta<typeof AppIcon>;
 
-const Template: ComponentStory<typeof AppIcon> = (args) => <AppIcon {...args} />;
+const Template: StoryFn<typeof AppIcon> = (args) => <AppIcon {...args} />;
 
 export const Default = Template.bind({});

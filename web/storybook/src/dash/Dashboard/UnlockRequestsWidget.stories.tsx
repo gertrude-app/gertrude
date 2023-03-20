@@ -1,5 +1,5 @@
 import { UnlockRequestsWidget } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { time, withIdsAnd } from '../../story-helpers';
 
 export default {
@@ -7,7 +7,7 @@ export default {
   component: UnlockRequestsWidget,
 } as ComponentMeta<typeof UnlockRequestsWidget>;
 
-const Template: ComponentStory<typeof UnlockRequestsWidget> = (args) => (
+const Template: StoryFn<typeof UnlockRequestsWidget> = (args) => (
   <UnlockRequestsWidget {...args} />
 );
 

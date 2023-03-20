@@ -1,5 +1,5 @@
 import { Modal, KeychainPicker } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { keychainProps, keychains } from '../../story-helpers';
 
 export default {
@@ -13,7 +13,7 @@ const publicKeychains = [
   keychainProps({ name: `Gertrude.com`, numKeys: 1, isPublic: true }),
 ];
 
-const Template: ComponentStory<typeof KeychainPicker> = (args) => (
+const Template: StoryFn<typeof KeychainPicker> = (args) => (
   <Modal
     type="container"
     title="Select a keychain"

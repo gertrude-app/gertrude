@@ -1,5 +1,5 @@
 import { Modal, SuspendFilterRequestForm } from '@dash/components';
-import type { ComponentStory, ComponentMeta, DecoratorFn } from '@storybook/react';
+import type { StoryFn, ComponentMeta, DecoratorFn } from '@storybook/react';
 
 const inModal: DecoratorFn = (Story) => (
   <Modal
@@ -20,7 +20,7 @@ export default {
   decorators: [inModal],
 } as ComponentMeta<typeof SuspendFilterRequestForm>;
 
-const Template: ComponentStory<typeof SuspendFilterRequestForm> = (args) => (
+const Template: StoryFn<typeof SuspendFilterRequestForm> = (args) => (
   <SuspendFilterRequestForm {...args} />
 );
 

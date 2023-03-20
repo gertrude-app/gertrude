@@ -1,5 +1,5 @@
 import { FullscreenModalForm, LoginForm } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Unauthed/LoginForm', // eslint-disable-line
@@ -7,7 +7,7 @@ export default {
   parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof LoginForm>;
 
-const Template: ComponentStory<typeof LoginForm> = (args) => (
+const Template: StoryFn<typeof LoginForm> = (args) => (
   <FullscreenModalForm request="idle">
     <LoginForm {...args} />
   </FullscreenModalForm>

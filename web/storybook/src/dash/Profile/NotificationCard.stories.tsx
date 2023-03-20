@@ -1,12 +1,12 @@
 import { NotificationCard } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Profile/NotificationCard', // eslint-disable-line
   component: NotificationCard,
 } as ComponentMeta<typeof NotificationCard>;
 
-const Template: ComponentStory<typeof NotificationCard> = (args) => (
+const Template: StoryFn<typeof NotificationCard> = (args) => (
   <NotificationCard {...args} />
 );
 

@@ -1,5 +1,5 @@
 import { PillBadge } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Core/PillBadge', // eslint-disable-line
@@ -25,7 +25,7 @@ const All: React.FC = () => (
   </div>
 );
 
-const Template: ComponentStory<typeof PillBadge> = () => <All />;
+const Template: StoryFn<typeof PillBadge> = () => <All />;
 
 // @screenshot: xs
 export const List = Template.bind({});

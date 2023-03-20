@@ -1,12 +1,12 @@
 import { EmptyState } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Core/EmptyState', // eslint-disable-line
   component: EmptyState,
 } as ComponentMeta<typeof EmptyState>;
 
-const Template: ComponentStory<typeof EmptyState> = (args) => <EmptyState {...args} />;
+const Template: StoryFn<typeof EmptyState> = (args) => <EmptyState {...args} />;
 
 // @screenshot: xs/350,md/350
 export const Default = Template.bind({});

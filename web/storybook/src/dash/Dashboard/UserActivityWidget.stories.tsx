@@ -1,5 +1,5 @@
 import { UserActivityWidget } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { withIdsAnd } from '../../story-helpers';
 
 export default {
@@ -7,7 +7,7 @@ export default {
   component: UserActivityWidget,
 } as ComponentMeta<typeof UserActivityWidget>;
 
-const Template: ComponentStory<typeof UserActivityWidget> = (args) => (
+const Template: StoryFn<typeof UserActivityWidget> = (args) => (
   <UserActivityWidget {...args} />
 );
 

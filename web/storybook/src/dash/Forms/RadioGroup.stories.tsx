@@ -1,12 +1,12 @@
 import { RadioGroup } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Forms/RadioGroup', // eslint-disable-line
   component: RadioGroup,
 } as ComponentMeta<typeof RadioGroup>;
 
-const Template: ComponentStory<typeof RadioGroup> = (args) => <RadioGroup {...args} />;
+const Template: StoryFn<typeof RadioGroup> = (args) => <RadioGroup {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

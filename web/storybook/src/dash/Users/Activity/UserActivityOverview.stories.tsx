@@ -1,5 +1,5 @@
 import { UserActivityOverview } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
 import { time } from '../../../story-helpers';
 
@@ -10,7 +10,7 @@ export default {
   decorators: [withStatefulChrome],
 } as ComponentMeta<typeof UserActivityOverview>;
 
-const Template: ComponentStory<typeof UserActivityOverview> = (args) => (
+const Template: StoryFn<typeof UserActivityOverview> = (args) => (
   <UserActivityOverview {...args} />
 );
 

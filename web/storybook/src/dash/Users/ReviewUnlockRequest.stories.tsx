@@ -1,5 +1,5 @@
 import { Modal, ReviewUnlockRequest } from '@dash/components';
-import type { ComponentStory, ComponentMeta, DecoratorFn } from '@storybook/react';
+import type { StoryFn, ComponentMeta, DecoratorFn } from '@storybook/react';
 import { time } from '../../story-helpers';
 
 const inModal: DecoratorFn = (Story) => (
@@ -21,7 +21,7 @@ export default {
   parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof ReviewUnlockRequest>;
 
-const Template: ComponentStory<typeof ReviewUnlockRequest> = (args) => (
+const Template: StoryFn<typeof ReviewUnlockRequest> = (args) => (
   <ReviewUnlockRequest {...args} />
 );
 

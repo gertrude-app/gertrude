@@ -1,5 +1,5 @@
 import { EmailInputForm } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Unauthed/EmailInputForm', // eslint-disable-line
@@ -7,7 +7,7 @@ export default {
   parameters: { layout: `centered` },
 } as ComponentMeta<typeof EmailInputForm>;
 
-const Template: ComponentStory<typeof EmailInputForm> = (args) => (
+const Template: StoryFn<typeof EmailInputForm> = (args) => (
   <div className="max-w-md">
     <EmailInputForm {...args} />
   </div>

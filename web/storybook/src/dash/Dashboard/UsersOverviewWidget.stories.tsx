@@ -1,5 +1,5 @@
 import { UsersOverviewWidget } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { withIds } from '../../story-helpers';
 
 export default {
@@ -7,7 +7,7 @@ export default {
   component: UsersOverviewWidget,
 } as ComponentMeta<typeof UsersOverviewWidget>;
 
-const Template: ComponentStory<typeof UsersOverviewWidget> = (args) => (
+const Template: StoryFn<typeof UsersOverviewWidget> = (args) => (
   <UsersOverviewWidget {...args} />
 );
 

@@ -1,12 +1,12 @@
 import { SelectMenu } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Forms/SelectMenu', // eslint-disable-line
   component: SelectMenu,
 } as ComponentMeta<typeof SelectMenu>;
 
-const Template: ComponentStory<typeof SelectMenu> = (args) => <SelectMenu {...args} />;
+const Template: StoryFn<typeof SelectMenu> = (args) => <SelectMenu {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

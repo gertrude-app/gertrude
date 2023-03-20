@@ -1,6 +1,6 @@
 import { EditKeychain } from '@dash/components';
 import { newKeyState } from '@dash/keys';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { confirmableEntityAction } from '../../story-helpers';
 
 export default {
@@ -9,9 +9,7 @@ export default {
   screenshot: true,
 } as ComponentMeta<typeof EditKeychain>;
 
-const Template: ComponentStory<typeof EditKeychain> = (args) => (
-  <EditKeychain {...args} />
-);
+const Template: StoryFn<typeof EditKeychain> = (args) => <EditKeychain {...args} />;
 
 // @screenshot: xs,md
 export const Default = Template.bind({});
