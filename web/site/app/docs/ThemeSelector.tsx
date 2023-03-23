@@ -7,7 +7,9 @@ interface Props {
 }
 
 const ThemeSelector: React.FC<Props> = ({ className }) => {
-  const [selectedTheme, setSelectedTheme] = useState<typeof themes[number] | null>(null);
+  const [selectedTheme, setSelectedTheme] = useState<(typeof themes)[number] | null>(
+    null,
+  );
 
   useEffect(() => {
     if (selectedTheme) {

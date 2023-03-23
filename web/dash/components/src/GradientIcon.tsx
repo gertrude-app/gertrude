@@ -36,7 +36,7 @@ export const ICONS = [
   `home`,
 ] as const;
 
-export type IconType = typeof ICONS[number];
+export type IconType = (typeof ICONS)[number];
 
 interface Props {
   className?: string;
