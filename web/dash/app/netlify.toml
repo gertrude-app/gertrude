@@ -1,6 +1,6 @@
 [build]
   publish = "build/"
-  command = "cd ../../ && make build-dash"
+  command = "pnpm build"
   ignore = "false"
 
 [[redirects]]

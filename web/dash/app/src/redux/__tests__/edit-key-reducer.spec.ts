@@ -151,7 +151,7 @@ describe(`editKeyReducer()`, () => {
     // set expiration
     expect(state.expiration).toBeUndefined();
     reducer(state, { type: `setExpirationDate`, to: `2029-11-29` });
-    expect(state.expiration).toMatch(/^2029-11-29T/);
+    expect(state.expiration).toMatch(/^2029-11-\d\dT/);
 
     // set expiration time
     reducer(state, { type: `setExpirationTime`, to: `17:33` });

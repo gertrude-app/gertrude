@@ -1,6 +1,6 @@
 [build]
   publish = "storybook-static/"
-  command = "cd ../ && make build-storybook"
+  command = "pnpm build"
   ignore = "false"
 
 [build.environment]

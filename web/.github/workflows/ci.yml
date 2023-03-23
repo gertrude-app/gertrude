@@ -18,14 +18,16 @@ jobs:
         uses: pnpm/action-setup@v2
       - name: install deps
         run: pnpm install
+      - name: setup just
+        uses: extractions/setup-just@v1
       - name: lint
-        run: make lint
+        run: just lint
       - name: format
-        run: make format-check
+        run: just format-check
       - name: typecheck
-        run: make ts-check
+        run: just typecheck
       - name: test
-        run: make test
+        run: just test
 
   storybook:
     name: storybook
@@ -41,14 +43,16 @@ jobs:
         uses: pnpm/action-setup@v2
       - name: install deps
         run: pnpm install
+      - name: setup just
+        uses: extractions/setup-just@v1
       - name: build storybook
-        run: STORYBOOK_SCREENSHOT_TESTING=true make build-storybook
+        run: STORYBOOK_SCREENSHOT_TESTING=true just build-storybook
       - name: serve storybook
         run: |
           mv -f storybook/storybook-static/{iframe,index}.html
           pnpm dlx serve -l 4777 storybook/storybook-static &
-      - name: make screenshots
-        run: make visual-test
+      - name: take screenshots
+        run: just visual-test
       - name: upload screenshots
         run:
           pnpm dlx @argos-ci/cli upload storybook/visual-tests/screenshots/argos || true
@@ -82,8 +86,10 @@ jobs:
         uses: pnpm/action-setup@v2
       - name: install deps
         run: pnpm install
+      - name: setup just
+        uses: extractions/setup-just@v1
       - name: build dashboard
-        run: make build-dash
+        run: just build-dash
       - name: cypress
         uses: cypress-io/github-action@v4.2.0
         with:
@@ -106,5 +112,7 @@ jobs:
         uses: pnpm/action-setup@v2
       - name: install deps
         run: pnpm install
+      - name: setup just
+        uses: extractions/setup-just@v1
       - name: build site
-        run: make build-site
+        run: just build-site
