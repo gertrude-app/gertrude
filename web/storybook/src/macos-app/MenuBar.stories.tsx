@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import { MenuBar } from '@macos/appviews';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'MacOSApp/MenuBar', // eslint-disable-line
@@ -40,37 +40,37 @@ const ThreeModes: React.FC<{ colors: string }> = ({ colors }) => (
   </div>
 );
 
-const LightTemplate: ComponentStory<typeof MenuBar> = () => (
+const LightTemplate: StoryFn<typeof MenuBar> = () => (
   <ThreeModes colors="bg-gradient-to-l from-[rgb(140,140,140)] to-[rgb(230,230,236)]" />
 );
 export const LightMode = LightTemplate.bind({});
 
-const LightOverLightTemplate: ComponentStory<typeof MenuBar> = () => (
+const LightOverLightTemplate: StoryFn<typeof MenuBar> = () => (
   <ThreeModes colors="bg-[rgb(230,230,236)]" />
 );
 export const LightModeOverLightBackground = LightOverLightTemplate.bind({});
 
-const LightOverDarkTemplate: ComponentStory<typeof MenuBar> = () => (
+const LightOverDarkTemplate: StoryFn<typeof MenuBar> = () => (
   <ThreeModes colors="bg-[rgb(140,140,140)]" />
 );
 export const LightModeOverDarkBackground = LightOverDarkTemplate.bind({});
 
-const DarkTemplate: ComponentStory<typeof MenuBar> = () => (
+const DarkTemplate: StoryFn<typeof MenuBar> = () => (
   <ThreeModes colors="dark bg-gradient-to-l from-[rgb(27,27,27)] to-[rgb(120,120,120)]" />
 );
 export const DarkMode = DarkTemplate.bind({});
 
-const DarkOverLightTemplate: ComponentStory<typeof MenuBar> = () => (
+const DarkOverLightTemplate: StoryFn<typeof MenuBar> = () => (
   <ThreeModes colors="dark bg-[rgb(120,120,120)]" />
 );
 export const DarkModeOverLightBackground = DarkOverLightTemplate.bind({});
 
-const DarkOverDarkTemplate: ComponentStory<typeof MenuBar> = () => (
+const DarkOverDarkTemplate: StoryFn<typeof MenuBar> = () => (
   <ThreeModes colors="dark bg-[rgb(27,27,27)]" />
 );
 export const DarkModeOverDarkBackground = DarkOverDarkTemplate.bind({});
 
-const NotConnectedTemplate: ComponentStory<typeof MenuBar> = () => {
+const NotConnectedTemplate: StoryFn<typeof MenuBar> = () => {
   return (
     <div className="flex space-x-4">
       <div

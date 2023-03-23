@@ -1,5 +1,5 @@
 import { EmailInputForm, FullscreenModalForm } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Unauthed/FullscreenModalForm', // eslint-disable-line
@@ -9,7 +9,7 @@ export default {
   },
 } as ComponentMeta<typeof FullscreenModalForm>;
 
-const Template: ComponentStory<typeof FullscreenModalForm> = (args) => (
+const Template: StoryFn<typeof FullscreenModalForm> = (args) => (
   <FullscreenModalForm {...args} />
 );
 

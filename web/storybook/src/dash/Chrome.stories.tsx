@@ -1,5 +1,5 @@
 import { Chrome } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Core/Chrome', // eslint-disable-line
@@ -7,7 +7,7 @@ export default {
   parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof Chrome>;
 
-const Template: ComponentStory<typeof Chrome> = (args) => (
+const Template: StoryFn<typeof Chrome> = (args) => (
   <Chrome {...args}>
     <h1 className="text-center">Page content here...</h1>
   </Chrome>

@@ -1,12 +1,12 @@
 import { UserDevice } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Users/UserDevice', // eslint-disable-line
   component: UserDevice,
 } as ComponentMeta<typeof UserDevice>;
 
-const Template: ComponentStory<typeof UserDevice> = (args) => <UserDevice {...args} />;
+const Template: StoryFn<typeof UserDevice> = (args) => <UserDevice {...args} />;
 
 export const Online = Template.bind({});
 Online.args = { model: `14" Macbook Pro`, icon: `laptop`, status: `online` };

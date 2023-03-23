@@ -1,8 +1,13 @@
 import './index.css';
-import { addDecorator } from '@storybook/react';
 import { MemoryRouter } from 'react-router-dom';
 
-addDecorator((storyFn) => <MemoryRouter>{storyFn()}</MemoryRouter>);
+export const decorators = [
+  (Story) => (
+    <MemoryRouter>
+      <Story />
+    </MemoryRouter>
+  ),
+];
 
 const viewports = {
   smallMobile: {

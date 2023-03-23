@@ -27,14 +27,14 @@ export default ${Component};
 `;
 
 const storyFile = `import { ${Component} } from '@${scope}/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: '${Component}', // eslint-disable-line
   component: ${Component},
 } as ComponentMeta<typeof ${Component}>;
 
-const Template: ComponentStory<typeof ${Component}> = (args) => <${Component} {...args} />;
+const Template: StoryFn<typeof ${Component}> = (args) => <${Component} {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {}

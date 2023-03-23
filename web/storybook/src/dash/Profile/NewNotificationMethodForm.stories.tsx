@@ -1,12 +1,12 @@
 import { NewNotificationMethodForm } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Profile/NewNotificationMethodForm', // eslint-disable-line
   component: NewNotificationMethodForm,
 } as ComponentMeta<typeof NewNotificationMethodForm>;
 
-const Template: ComponentStory<typeof NewNotificationMethodForm> = (args) => (
+const Template: StoryFn<typeof NewNotificationMethodForm> = (args) => (
   <NewNotificationMethodForm {...args} />
 );
 

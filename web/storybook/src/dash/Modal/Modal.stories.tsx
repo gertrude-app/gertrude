@@ -1,6 +1,6 @@
 import { Logo, TextInput } from '@shared/components';
 import { Modal, SelectableListItem } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Modal/Modal', // eslint-disable-line
@@ -8,7 +8,7 @@ export default {
   parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof Modal>;
 
-const Template: ComponentStory<typeof Modal> = (args) => <Modal {...args} />;
+const Template: StoryFn<typeof Modal> = (args) => <Modal {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

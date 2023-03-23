@@ -1,12 +1,12 @@
 import { UserCard } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Users/UserCard', // eslint-disable-line
   component: UserCard,
 } as ComponentMeta<typeof UserCard>;
 
-const Template: ComponentStory<typeof UserCard> = (args) => <UserCard {...args} />;
+const Template: StoryFn<typeof UserCard> = (args) => <UserCard {...args} />;
 
 export const Standard = Template.bind({});
 Standard.args = {

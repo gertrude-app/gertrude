@@ -1,5 +1,5 @@
 import { ListKeychains } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { keychainProps, withIdsAnd } from '../../story-helpers';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 
@@ -10,9 +10,7 @@ export default {
   decorators: [withStatefulChrome],
 } as ComponentMeta<typeof ListKeychains>;
 
-const Template: ComponentStory<typeof ListKeychains> = (args) => (
-  <ListKeychains {...args} />
-);
+const Template: StoryFn<typeof ListKeychains> = (args) => <ListKeychains {...args} />;
 
 // @screenshot: md
 export const Default = Template.bind({});

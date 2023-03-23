@@ -1,12 +1,12 @@
 import { Combobox } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Forms/Combobox', // eslint-disable-line
   component: Combobox,
 } as ComponentMeta<typeof Combobox>;
 
-const Template: ComponentStory<typeof Combobox> = (args) => <Combobox {...args} />;
+const Template: StoryFn<typeof Combobox> = (args) => <Combobox {...args} />;
 
 export const Selected = Template.bind({});
 Selected.args = {

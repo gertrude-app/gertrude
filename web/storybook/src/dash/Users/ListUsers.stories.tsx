@@ -1,5 +1,5 @@
 import { ListUsers } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 
 export default {
@@ -9,7 +9,7 @@ export default {
   decorators: [withStatefulChrome],
 } as ComponentMeta<typeof ListUsers>;
 
-const Template: ComponentStory<typeof ListUsers> = (args) => <ListUsers {...args} />;
+const Template: StoryFn<typeof ListUsers> = (args) => <ListUsers {...args} />;
 
 // @screenshot: xs,md
 export const Empty = Template.bind({});

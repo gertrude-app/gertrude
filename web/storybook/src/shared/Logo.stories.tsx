@@ -1,5 +1,5 @@
 import { Logo } from '@shared/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Shared/Logo', // eslint-disable-line
@@ -7,7 +7,7 @@ export default {
   parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof Logo>;
 
-const Template: ComponentStory<typeof Logo> = (args) => <Logo {...args} />;
+const Template: StoryFn<typeof Logo> = (args) => <Logo {...args} />;
 
 export const Default = Template.bind({});
 Default.args = { type: `default` };

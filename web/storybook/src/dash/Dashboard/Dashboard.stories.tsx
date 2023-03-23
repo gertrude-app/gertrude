@@ -1,5 +1,5 @@
 import { Dashboard } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { withIds, time, withIdsAnd, testImgUrl } from '../../story-helpers';
 
@@ -10,7 +10,7 @@ export default {
   parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof Dashboard>;
 
-const Template: ComponentStory<typeof Dashboard> = (args) => <Dashboard {...args} />;
+const Template: StoryFn<typeof Dashboard> = (args) => <Dashboard {...args} />;
 
 // @screenshot: xs/2500,xl
 export const Default = Template.bind({});

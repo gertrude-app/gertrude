@@ -1,5 +1,5 @@
 import { RequestSuspension } from '@macos/appviews';
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { ComponentMeta, StoryFn } from '@storybook/react';
 import AppWindow from './AppWindow';
 
 export default {
@@ -10,7 +10,7 @@ export default {
   },
 } as ComponentMeta<typeof RequestSuspension>;
 
-const LightTemplate: ComponentStory<typeof RequestSuspension> = (args) => (
+const LightTemplate: StoryFn<typeof RequestSuspension> = (args) => (
   <AppWindow width={600} height={400}>
     <RequestSuspension {...args} />
   </AppWindow>
@@ -18,7 +18,7 @@ const LightTemplate: ComponentStory<typeof RequestSuspension> = (args) => (
 export const LightMode = LightTemplate.bind({});
 LightMode.args = {};
 
-const DarkTemplate: ComponentStory<typeof RequestSuspension> = (args) => (
+const DarkTemplate: StoryFn<typeof RequestSuspension> = (args) => (
   <AppWindow width={600} height={400} dark>
     <RequestSuspension {...args} />
   </AppWindow>

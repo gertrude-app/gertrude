@@ -1,5 +1,5 @@
 import { KeystrokesViewer } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { time } from '../../../story-helpers';
 
 export default {
@@ -7,7 +7,7 @@ export default {
   component: KeystrokesViewer,
 } as ComponentMeta<typeof KeystrokesViewer>;
 
-const Template: ComponentStory<typeof KeystrokesViewer> = (args) => (
+const Template: StoryFn<typeof KeystrokesViewer> = (args) => (
   <KeystrokesViewer {...args} />
 );
 

@@ -1,5 +1,5 @@
 import { KeyList } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import { keyExamples } from '../../story-helpers';
 
 export default {
@@ -7,7 +7,7 @@ export default {
   component: KeyList,
 } as ComponentMeta<typeof KeyList>;
 
-const Template: ComponentStory<typeof KeyList> = (args) => <KeyList {...args} />;
+const Template: StoryFn<typeof KeyList> = (args) => <KeyList {...args} />;
 
 // @screenshot: xs/400,md/400
 export const Default = Template.bind({});

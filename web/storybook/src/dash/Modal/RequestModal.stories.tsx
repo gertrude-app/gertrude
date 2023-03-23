@@ -1,14 +1,12 @@
 import { RequestModal } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Modal/RequestModal', // eslint-disable-line
   component: RequestModal,
 } as ComponentMeta<typeof RequestModal>;
 
-const Template: ComponentStory<typeof RequestModal> = (args) => (
-  <RequestModal {...args} />
-);
+const Template: StoryFn<typeof RequestModal> = (args) => <RequestModal {...args} />;
 
 export const Loading = Template.bind({});
 Loading.args = {

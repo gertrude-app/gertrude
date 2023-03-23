@@ -1,12 +1,12 @@
 import { ContactStatusMessage } from '@site/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Site/ContactStatusMessage', // eslint-disable-line
   component: ContactStatusMessage,
 } as ComponentMeta<typeof ContactStatusMessage>;
 
-const Template: ComponentStory<typeof ContactStatusMessage> = (args) => (
+const Template: StoryFn<typeof ContactStatusMessage> = (args) => (
   <ContactStatusMessage {...args} />
 );
 

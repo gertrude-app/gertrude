@@ -1,4 +1,4 @@
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 import DmgBackground from './DmgBackground';
 
 export default {
@@ -21,8 +21,6 @@ export default {
   },
 } as ComponentMeta<typeof DmgBackground>;
 
-const Template: ComponentStory<typeof DmgBackground> = (args) => (
-  <DmgBackground {...args} />
-);
+const Template: StoryFn<typeof DmgBackground> = (args) => <DmgBackground {...args} />;
 
 export const Default = Template.bind({});

@@ -1,4 +1,4 @@
-const { mergeConfig } = require('vite');
+import { mergeConfig } from 'vite';
 
 module.exports = {
   async viteFinal(config, { configType }) {
@@ -15,10 +15,7 @@ module.exports = {
     { name: `@storybook/addon-essentials`, options: { docs: false } },
     `@storybook/addon-interactions`,
   ],
-  framework: `@storybook/react`,
-  core: {
-    builder: `@storybook/builder-vite`,
-  },
+  framework: `@storybook/react-vite`,
   features: {
     buildStoriesJson: true,
   },

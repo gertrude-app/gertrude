@@ -1,12 +1,12 @@
 import { PageHeading } from '@dash/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Dashboard/Core/PageHeading', // eslint-disable-line
   component: PageHeading,
 } as ComponentMeta<typeof PageHeading>;
 
-const Template: ComponentStory<typeof PageHeading> = (args) => <PageHeading {...args} />;
+const Template: StoryFn<typeof PageHeading> = (args) => <PageHeading {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

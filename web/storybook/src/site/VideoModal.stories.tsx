@@ -1,5 +1,5 @@
 import { VideoModal } from '@site/components';
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {
   title: 'Site/VideoModal', // eslint-disable-line
@@ -7,7 +7,7 @@ export default {
   parameters: { layout: `fullscreen` },
 } as ComponentMeta<typeof VideoModal>;
 
-const Template: ComponentStory<typeof VideoModal> = (args) => <VideoModal {...args} />;
+const Template: StoryFn<typeof VideoModal> = (args) => <VideoModal {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
