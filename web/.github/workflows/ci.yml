@@ -16,6 +16,15 @@ jobs:
         uses: actions/checkout@v3
       - name: install pnpm
         uses: pnpm/action-setup@v2
+      - name: get pnpm store path
+        id: pnpm-cache
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - uses: actions/cache/restore@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-
       - name: install deps
         run: pnpm install
       - name: setup just
@@ -41,8 +50,19 @@ jobs:
           fetch-depth: 2
       - name: install pnpm
         uses: pnpm/action-setup@v2
+      - name: get pnpm store path
+        id: pnpm-cache
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - uses: actions/cache/restore@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-
       - name: install deps
         run: pnpm install
+      - name: ensure puppeteer # caching w/ actions/cache necessitates this
+        run: node storybook/node_modules/puppeteer/install.js
       - name: setup just
         uses: extractions/setup-just@v1
       - name: build storybook
@@ -84,6 +104,15 @@ jobs:
         uses: actions/checkout@v3
       - name: install pnpm
         uses: pnpm/action-setup@v2
+      - name: get pnpm store path
+        id: pnpm-cache
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - uses: actions/cache/restore@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-
       - name: install deps
         run: pnpm install
       - name: setup just
@@ -110,6 +139,15 @@ jobs:
         uses: actions/checkout@v3
       - name: install pnpm
         uses: pnpm/action-setup@v2
+      - name: get pnpm store path
+        id: pnpm-cache
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-
       - name: install deps
         run: pnpm install
       - name: setup just
