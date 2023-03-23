@@ -8,7 +8,7 @@ importers:
       '@typescript-eslint/eslint-plugin': ^5.56.0
       '@typescript-eslint/parser': ^5.56.0
       concurrently: 7.5.0
-      cypress: 10.11.0
+      cypress: 12.8.1
       eslint: ^8.26.0
       eslint-config-prettier: ^8.8.0
       eslint-plugin-import: ^2.27.5
@@ -26,7 +26,7 @@ importers:
       '@typescript-eslint/eslint-plugin': 5.56.0_6bcdxphflfurldh3exj5v4fc7u
       '@typescript-eslint/parser': 5.56.0_wfbjqwo7t3vcfhi3bbcsxszipi
       concurrently: 7.5.0
-      cypress: 10.11.0
+      cypress: 12.8.1
       eslint: 8.26.0
       eslint-config-prettier: 8.8.0_eslint@8.26.0
       eslint-plugin-import: 2.27.5_wzhulkwtd4s3jsqhg2wlcu3jcq
@@ -5361,9 +5361,9 @@ packages:
   /csstype/3.1.1:
     resolution: {integrity: sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==}
 
-  /cypress/10.11.0:
-    resolution: {integrity: sha512-lsaE7dprw5DoXM00skni6W5ElVVLGAdRUUdZjX2dYsGjbY/QnpzWZ95Zom1mkGg0hAaO/QVTZoFVS7Jgr/GUPA==}
-    engines: {node: '>=12.0.0'}
+  /cypress/12.8.1:
+    resolution: {integrity: sha512-lIFbKdaSYAOarNLHNFa2aPZu6YSF+8UY4VRXMxJrFUnk6RvfG0AWsZ7/qle/aIz30TNUD4aOihz2ZgS4vuQVSA==}
+    engines: {node: ^14.0.0 || ^16.0.0 || >=18.0.0}
     hasBin: true
     requiresBuild: true
     dependencies:
