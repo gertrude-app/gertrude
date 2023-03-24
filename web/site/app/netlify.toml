@@ -1,7 +1,13 @@
 [build]
   publish = "out/"
-  command = "cd ../../ && make build-site"
   ignore = "false"
+  command = """
+  cd ../../ && \
+	pnpm --filter @site/app build && \
+  pnpm --filter @site/app export && \
+  cp site/app/_redirects site/app/out
+  """
+
 
 [[redirects]]
   from = "/support" # in case i entered the url wrong somewhere...
