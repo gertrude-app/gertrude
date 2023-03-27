@@ -1,6 +1,6 @@
 import type { ComponentMeta } from '@storybook/react';
-import LockdownGuideOgImage from './LockdownGuideOgImage';
 import SiteOgImage from './SiteOgImage';
+import LockdownGuideOgImage from './LockdownGuideOgImage';
 import FiveThingsYouForgotOgImage from './FiveThingsYouForgotOgImage';
 
 export default {
@@ -23,6 +23,6 @@ export default {
   },
 } as ComponentMeta<typeof SiteOgImage>;
 
-export const Site = SiteOgImage;
-export const LockdownGuide = LockdownGuideOgImage;
-export const FiveThingsYouForgot = FiveThingsYouForgotOgImage;
+export const Site = () => <SiteOgImage />;
+export const LockdownGuide = () => <LockdownGuideOgImage />;
+export const FiveThingsYouForgot = () => <FiveThingsYouForgotOgImage />;
