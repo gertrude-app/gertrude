@@ -39,11 +39,13 @@ interface Props {
   onDismissAddKeychain(): unknown;
   selectingKeychain?: Keychain | null;
   fetchSelectableKeychainsRequest?: RequestState<{ own: Keychain[]; public: Keychain[] }>;
+  id: string;
 }
 
 const EditUser: React.FC<Props> = ({
   isNew,
   name,
+  id,
   setName,
   keyloggingEnabled,
   setKeyloggingEnabled,
@@ -79,6 +81,8 @@ const EditUser: React.FC<Props> = ({
       onConfirm={onConfirmAddKeychain}
       selected={selectingKeychain ?? undefined}
       existingKeychains={keychains}
+      userName={name}
+      userId={id}
     />
     <ConfirmDeleteEntity type="device" action={deleteDevice} />
     <ConfirmDeleteEntity type="user" action={deleteUser} />

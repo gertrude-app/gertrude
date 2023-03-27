@@ -96,6 +96,7 @@ export const queryProps: QueryProps<typeof EditUser, UUID> =
       Query.resolve({
         isNew: editable.isNew === true,
         name: user.name,
+        id: user.id,
         setName: (value) => set({ type: `name`, value }),
         keyloggingEnabled: user.keyloggingEnabled,
         setKeyloggingEnabled: (value) => set({ type: `keyloggingEnabled`, value }),

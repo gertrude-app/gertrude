@@ -82,6 +82,8 @@ const SelectUnlockRequestKeychain: React.FC = () => {
         selectablePublicKeychains={[]}
         onSelect={(keychain) => dispatch(keychainSelected(keychain.id))}
         selectedId={selectedId}
+        userName={user.original.name}
+        userId={user.original.id}
       />
     </Modal>
   );

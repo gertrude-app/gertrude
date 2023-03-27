@@ -25,33 +25,53 @@ const Template: StoryFn<typeof KeychainPicker> = (args) => (
 );
 
 // @screenshot: xs/1300,lg/900
-export const Default = Template.bind({});
-Default.args = {
+export const AddToUserHappyPath = Template.bind({});
+AddToUserHappyPath.args = {
   mode: `addToUser`,
   selectableOwnKeychains: keychains.filter((kc) => !kc.isPublic),
   selectablePublicKeychains: publicKeychains,
 };
 
 // @screenshot: xs/1000,lg
-export const NoOwnKeychains = Template.bind({});
-NoOwnKeychains.args = {
-  ...Default.args,
+export const AddToUserNoOwnKeychains = Template.bind({});
+AddToUserNoOwnKeychains.args = {
+  ...AddToUserHappyPath.args,
   hasNoOwnKeychains: true,
   selectableOwnKeychains: [],
 };
 
-export const AllOwnKeychainsAttached = Template.bind({});
-AllOwnKeychainsAttached.args = {
-  ...Default.args,
+// @screenshot: xs/1000,lg
+export const AddToUserHasAllPersonalKeychains = Template.bind({});
+AddToUserHasAllPersonalKeychains.args = {
+  ...AddToUserHappyPath.args,
   hasNoOwnKeychains: false,
+  selectableOwnKeychains: [],
+  userName: `Little Jimmy`,
+};
+
+export const ForUnlockRequestHappyPath = Template.bind({});
+ForUnlockRequestHappyPath.args = {
+  mode: `forUnlockRequestKey`,
+  hasNoOwnKeychains: false,
+  selectableOwnKeychains: keychains.filter((kc) => !kc.isPublic),
+};
+
+// @screenshot: xs
+export const ForUnlockRequestNoPersonalKeychains = Template.bind({});
+ForUnlockRequestNoPersonalKeychains.args = {
+  ...ForUnlockRequestHappyPath.args,
+  mode: `forUnlockRequestKey`,
+  hasNoOwnKeychains: true,
+  userName: `Little Jimmy`,
   selectableOwnKeychains: [],
 };
 
 // @screenshot: xs
-export const NoKeychainsForUnlockRequest = Template.bind({});
-NoKeychainsForUnlockRequest.args = {
-  ...Default.args,
+export const ForUnlockRequestUserNeedsAKeychain = Template.bind({});
+ForUnlockRequestUserNeedsAKeychain.args = {
+  ...ForUnlockRequestHappyPath.args,
   mode: `forUnlockRequestKey`,
-  hasNoOwnKeychains: true,
+  hasNoOwnKeychains: false,
+  userName: `Little Jimmy`,
   selectableOwnKeychains: [],
 };

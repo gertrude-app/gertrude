@@ -10,6 +10,8 @@ interface Props {
   onConfirm(): unknown;
   onSelect(keychain: Keychain): unknown;
   existingKeychains: Keychain[];
+  userName: string;
+  userId: string;
 }
 
 const AddKeychainModal: React.FC<Props> = ({
@@ -19,6 +21,8 @@ const AddKeychainModal: React.FC<Props> = ({
   onSelect,
   selected,
   existingKeychains,
+  userName,
+  userId,
 }) => (
   <RequestModal
     request={request}
@@ -43,6 +47,8 @@ const AddKeychainModal: React.FC<Props> = ({
         )}
         onSelect={onSelect}
         selectedId={selected?.id}
+        userName={userName}
+        userId={userId}
       />
     )}
   />

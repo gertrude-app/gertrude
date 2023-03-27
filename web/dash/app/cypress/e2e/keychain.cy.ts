@@ -12,22 +12,6 @@ describe(`create keychain`, () => {
     cy.intercept(`/pairql/dashboard/GetUsers`, [mock.user()]);
   });
 
-  it(`allows selection of brand new keychains`, () => {
-    // admin starts with no keychains
-    cy.intercept(`/pairql/dashboard/GetAdminKeychains`, []);
-    // and no prior selectable keychains
-    cy.intercept(`/pairql/dashboard/GetSelectableKeychains`, { own: [], public: [] });
-
-    cy.visit(`/keychains`);
-    cy.contains(`Create keychain`).click();
-    cy.get(`input[name=name]`).type(`New test keychain`);
-    cy.contains(`Create keychain`).click();
-    cy.sidebarClick(`Users`);
-    cy.testId(`edit-user`).click();
-    cy.contains(`Add keychain`).click();
-    cy.contains(`New test keychain`);
-  });
-
   it(`doesn't allow selection of recently deleted keychains`, () => {
     const existing: AdminKeychain = {
       summary: mock.keychainSummary({ name: `Existing`, authorId: betsy.id }),
@@ -48,5 +32,56 @@ describe(`create keychain`, () => {
     cy.testId(`edit-user`).click();
     cy.contains(`Add keychain`).click();
     cy.contains(`Existing`).should(`not.exist`);
+  });
+
+  it(`(the keychain picker) shows empty state when user already has all personal keychains`, () => {
+    const existing: AdminKeychain = {
+      summary: mock.keychainSummary({ name: `Test keychain`, authorId: betsy.id }),
+      keys: [],
+    };
+
+    cy.intercept(`/pairql/dashboard/GetAdminKeychains`, [existing]);
+    cy.intercept(`/pairql/dashboard/GetSelectableKeychains`, {
+      own: [existing],
+      public: [],
+    });
+    cy.intercept(`/pairql/dashboard/GetUsers`, [
+      mock.user({ keychains: [existing.summary] }),
+    ]);
+
+    cy.visit(`/keychains`);
+    cy.contains(`Test keychain`);
+    cy.sidebarClick(`Users`);
+    cy.testId(`edit-user`).click();
+    cy.contains(`Test keychain`);
+    cy.contains(`Add keychain`).click();
+    cy.contains(`No selectable keychains`);
+  });
+
+  describe(`no keychains to start`, () => {
+    beforeEach(() => {
+      // admin starts with no keychains
+      cy.intercept(`/pairql/dashboard/GetAdminKeychains`, []);
+      // and no prior selectable keychains
+      cy.intercept(`/pairql/dashboard/GetSelectableKeychains`, { own: [], public: [] });
+    });
+
+    it(`allows selection of brand new keychains`, () => {
+      cy.visit(`/keychains`);
+      cy.contains(`Create keychain`).click();
+      cy.get(`input[name=name]`).type(`New test keychain`);
+      cy.contains(`Create keychain`).click();
+      cy.sidebarClick(`Users`);
+      cy.testId(`edit-user`).click();
+      cy.contains(`Add keychain`).click();
+      cy.contains(`New test keychain`);
+    });
+
+    it(`(the keychain picker) shows empty state when admin has no personal keychains to assign`, () => {
+      cy.visit(`/users`);
+      cy.testId(`edit-user`).click();
+      cy.contains(`Add keychain`).click();
+      cy.contains(`No personal keychains`);
+    });
   });
 });

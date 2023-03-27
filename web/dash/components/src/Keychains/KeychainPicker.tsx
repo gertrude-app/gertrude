@@ -11,6 +11,8 @@ type Props = {
   selectablePublicKeychains: Keychain[];
   onSelect(keychain: Keychain): unknown;
   selectedId?: UUID;
+  userName: string;
+  userId: string;
 };
 
 const KeychainPicker: React.FC<Props> = ({
@@ -20,6 +22,8 @@ const KeychainPicker: React.FC<Props> = ({
   selectedId,
   selectablePublicKeychains,
   onSelect,
+  userId,
+  userName,
 }) => (
   <div
     className={cx(
@@ -54,24 +58,38 @@ const KeychainPicker: React.FC<Props> = ({
         heading={mode === `addToUser` ? `No personal keychains` : `No keychains`}
         secondaryText={
           mode === `addToUser`
-            ? `Select a public keychain or create your own.`
-            : `You'll need a keychain to accept this unlock request.`
+            ? `Select a public keychain below, or create a keychain of your own.`
+            : `Before you can accept this unlock request, ${userName} needs to have at least one keychain created by you.`
         }
         buttonText="Create a keychain"
         action="/keychains"
       />
     )}
-    {!hasNoOwnKeychains &&
-      selectableOwnKeychains.length === 0 &&
-      mode === `addToUser` && (
-        <EmptyState
-          icon="key"
-          heading="No selectable keychains"
-          secondaryText="This user already has all of your keychains. Add a new one, or choose a public keychain."
-          buttonText="Add a keychain"
-          action="/keychains"
-        />
-      )}
+    {!hasNoOwnKeychains && selectableOwnKeychains.length === 0 && (
+      <EmptyState
+        icon="key"
+        heading={
+          mode === `forUnlockRequestKey` ? `No keychains` : `No selectable keychains`
+        }
+        secondaryText={
+          mode === `forUnlockRequestKey`
+            ? `Before you can accept this unlock request, ${userName} needs to have at least one keychain created by you.`
+            : `${userName} already has all of your keychains. You can create a new one, or choose a public keychain below.`
+        }
+        buttonText="Create a keychain"
+        action="/keychains"
+        secondaryButton={
+          mode === `forUnlockRequestKey`
+            ? {
+                text: `Assign a keychain`,
+                action: `/users/${userId}`,
+                icon: `user`,
+              }
+            : undefined
+        }
+      />
+    )}
+
     {mode === `addToUser` && selectablePublicKeychains.length > 0 && (
       <div>
         <h2 className={cx(`text-lg font-bold text-gray-600 mb-3`)}>Public keychains:</h2>

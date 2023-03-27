@@ -76,9 +76,9 @@ const Button: React.FC<Props> = ({
     colors,
     `ring ring-offset-0 focus:ring-offset-2 rounded-lg font-bold [transition:100ms] outline-none block`,
     sizeClass,
-    className,
-    fullWidth ? `w-full` : `w-fit`,
+    fullWidth ? `w-full` : `w-auto`,
     !rendersAsButton && `text-center`,
+    className,
   );
 
   if (rendersAsButton) {
