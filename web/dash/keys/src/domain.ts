@@ -1,6 +1,13 @@
 import { parseDomain, fromUrl, ParseResultType } from 'parse-domain';
 export { fromUrl };
 
+export function sanitizeUserInput(input: string): string {
+  return input
+    .replace(/^https?:\/\//, ``) // remove protocol
+    .replace(/\/.*/, ``) // remove path
+    .toLowerCase();
+}
+
 export function registrable(input: string): string | null {
   const parsed = parse(input);
   if (parsed) {

@@ -6,6 +6,7 @@ import type {
   UnlockRequestCreateKeyData,
 } from '@dash/types';
 import * as EditKey from './edit';
+import * as domain from './domain';
 import { keyForUnlockRequest, newKeyState } from '.';
 
 export function unlockRequestToState(
@@ -104,28 +105,29 @@ function toSkeleton(key: SharedKey, state: EditKey.State): EditKey.State {
 }
 
 function websiteKeyToKeyRecord(state: EditKey.State): Key | null {
+  const address = domain.sanitizeUserInput(state.address);
   const tmpScope: AppScope = { type: `webBrowsers` };
   let key: SharedKey = { type: `domain`, domain: ``, scope: tmpScope };
 
   switch (state.addressType) {
     case `standard`:
     case `strict`:
-      if (!domainValid(state.address)) return null;
+      if (!domainValid(address)) return null;
       key = {
         type: state.addressType === `standard` ? `anySubdomain` : `domain`,
-        domain: state.address,
+        domain: address,
         scope: tmpScope,
       };
       break;
 
     case `ip`:
-      if (!ipAddressValid(state.address)) return null;
-      key = { type: `ipAddress`, ipAddress: state.address, scope: tmpScope };
+      if (!ipAddressValid(address)) return null;
+      key = { type: `ipAddress`, ipAddress: address, scope: tmpScope };
       break;
 
     case `domainRegex`:
-      if (!domainValid(state.address) || !state.address.includes(`*`)) return null;
-      key = { type: `domainRegex`, pattern: state.address, scope: tmpScope };
+      if (!domainValid(address) || !address.includes(`*`)) return null;
+      key = { type: `domainRegex`, pattern: address, scope: tmpScope };
       break;
   }
 

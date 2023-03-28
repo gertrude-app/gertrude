@@ -5,10 +5,11 @@ import { notNullish } from '@shared/ts-utils';
 
 interface Props {
   type: 'strict' | 'standard' | 'ip' | 'domainRegex';
-  address: string;
+  unsanitizedAddress: string;
 }
 
-const AddressTypeHint: React.FC<Props> = ({ address, type }) => {
+const AddressTypeHint: React.FC<Props> = ({ unsanitizedAddress, type }) => {
+  const address = domain.sanitizeUserInput(unsanitizedAddress);
   if (domain.isIpAddress(address) && type !== `ip`) {
     return (
       <div data-test="incorrect-ip-hint" className="mt-4 text-right text-red-700">

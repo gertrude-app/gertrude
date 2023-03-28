@@ -89,7 +89,7 @@ const AddressStep: React.FC<Props> = ({
           deemphasized
         />
       </div>
-      <AddressTypeHint address={address} type={addressType} />
+      <AddressTypeHint unsanitizedAddress={address} type={addressType} />
     </div>
   </KeyCreationStep>
 );
