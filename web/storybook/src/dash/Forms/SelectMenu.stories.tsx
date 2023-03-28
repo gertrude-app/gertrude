@@ -8,8 +8,8 @@ export default {
 
 const Template: StoryFn<typeof SelectMenu> = (args) => <SelectMenu {...args} />;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Large = Template.bind({});
+Large.args = {
   options: [
     { value: `1`, display: `Do this` },
     { value: `2`, display: `Do that` },
@@ -18,8 +18,14 @@ Default.args = {
   selectedOption: `Do this`,
 };
 
-export const Deemphasized = Template.bind({});
-Deemphasized.args = {
-  ...Default.args,
-  deemphasized: true,
+export const Medium = Template.bind({});
+Medium.args = {
+  ...Large.args,
+  size: 'medium',
+};
+
+export const Small = Template.bind({});
+Small.args = {
+  ...Large.args,
+  size: 'small',
 };

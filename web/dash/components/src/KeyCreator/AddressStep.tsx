@@ -86,7 +86,7 @@ const AddressStep: React.FC<Props> = ({
           options={addressTypeOptions(showAdvancedAddressOptions)}
           selectedOption={addressType}
           setSelected={(type) => update({ type: `setAddressType`, to: type })}
-          deemphasized
+          size="medium"
         />
       </div>
       <AddressTypeHint unsanitizedAddress={address} type={addressType} />

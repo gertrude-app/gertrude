@@ -52,7 +52,7 @@ const Button: React.FC<Props> = ({
         colors = `bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-300 border dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 ring-transparent focus:ring-indigo-400/50 focus:border-indigo-200 dark:ring-offset-slate-900`;
         break;
       case `warning`:
-        colors = `bg-red-50 text-red-600 border-red-100 border hover:text-red-700 hover:bg-red-100 ring-transparent focus:ring-red-500 focus:border-red-500`;
+        colors = `bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-300 border-red-100 dark:border-red-600/50 border hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-500/20 dark:hover:text-red-200 ring-transparent focus:ring-red-500 focus:border-red-500 dark:ring-offset-slate-900`;
         break;
     }
   } else {
