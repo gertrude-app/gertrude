@@ -106,6 +106,23 @@ describe(`create key flow`, () => {
     cy.testId(`incorrect-ip-hint`).should(`exist`);
   });
 
+  it(`ignores scheme and path if entered by user`, () => {
+    cy.visit(`/keychains/123`);
+    cy.contains(`Create key`).click();
+    cy.contains(`Grant access to a specific website`).click();
+    cy.testId(`keycreator-next-step`).click();
+    cy.testId(`key-address`).type(`https://radsite.com/with/some-path`); // <-- 👋
+    cy.testId(`keycreator-next-step`).should(`not.be.disabled`);
+
+    cy.intercept(`/pairql/dashboard/SaveKey`, (req) => {
+      req.alias = `saveKey`;
+      req.reply({ success: true });
+    });
+
+    cy.testId(`modal-primary-btn`).click();
+    cy.wait(`@saveKey`).its(`request.body.key.domain`).should(`equal`, `radsite.com`);
+  });
+
   it(`prevents proceeding and gives useful hint when address invalid`, () => {
     cy.visit(`/keychains/123`);
     cy.contains(`Create key`).click();

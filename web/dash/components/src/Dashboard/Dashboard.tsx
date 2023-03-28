@@ -29,10 +29,12 @@ const Dashboard: React.FC<Props> = ({
         <div className="pt-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8">
           <UserActivityWidget userActivity={userActivitySummaries} />
           <UserOverviewWidget users={users} />
-          <UserScreenshotsWidget
-            screenshots={recentScreenshots}
-            className="xl:row-span-2 lg:-order-9"
-          />
+          {recentScreenshots.length !== 0 && (
+            <UserScreenshotsWidget
+              screenshots={recentScreenshots}
+              className="xl:row-span-2 lg:-order-9"
+            />
+          )}
           {unlockRequests.length !== 0 && (
             <UnlockRequestsWidget
               className="row-span-2 xl:row-span-3 lg:-order-8"

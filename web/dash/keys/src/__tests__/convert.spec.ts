@@ -1,7 +1,28 @@
-import { it, describe, expect } from 'vitest';
+import { test, it, describe, expect } from 'vitest';
 import type { UnlockRequestCreateKeyData } from '@dash/types';
 import type { Key } from '@dash/types';
+import type * as EditKey from '../edit';
 import { convert } from '..';
+import * as mock from './mocks';
+
+describe(`convert.toKeyRecord()`, () => {
+  const cases: Array<[EditKey.State | undefined, Key | null]> = [
+    [undefined, null],
+    [
+      // extra junk supplied by user, scheme + path...
+      mock.keyState({ address: `https://example.com/with/path` }),
+      mock.anySubdomainKey(`example.com`), // <-- is stripped
+    ],
+  ];
+  test.each(cases)(`convert key record %s -> %s`, (input, expected) => {
+    const converted = convert.toKeyRecord(input);
+    if (expected === null) {
+      expect(converted).toBeNull();
+    } else {
+      expect(converted).toMatchObject(expected);
+    }
+  });
+});
 
 describe(`convert.unlockRequestToState()`, () => {
   it(`sets the unlockRequestAddress`, () => {
