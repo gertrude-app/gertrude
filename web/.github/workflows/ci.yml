@@ -20,7 +20,7 @@ jobs:
         id: pnpm-cache
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache/restore@v3
+      - uses: actions/cache@v3
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: pnpm-cache-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -54,9 +54,11 @@ jobs:
         id: pnpm-cache
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache/restore@v3
+      - uses: actions/cache@v3
         with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          path: |
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ~/.cache/puppeteer
           key: pnpm-cache-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: pnpm-cache-v1-
       - name: install deps
@@ -106,9 +108,11 @@ jobs:
         id: pnpm-cache
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache/restore@v3
+      - uses: actions/cache@v3
         with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          path: |
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ~/.cache/Cypress
           key: pnpm-cache-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: pnpm-cache-v1-
       - name: install deps
@@ -143,9 +147,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
       - uses: actions/cache@v3
         with:
-          path: |
-            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-            ~/.cache/Cypress
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: pnpm-cache-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: pnpm-cache-v1-
       - name: install deps
