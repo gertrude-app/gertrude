@@ -2,7 +2,7 @@ import type { StoryFn, ComponentMeta } from '@storybook/react';
 import AppIcon from './AppIcon';
 
 export default {
-  title: 'MacOSApp/AppIcon', // eslint-disable-line
+  title: 'MacOS App/AppIcon', // eslint-disable-line
   component: AppIcon,
   parameters: {
     layout: `centered`,

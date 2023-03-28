@@ -3,7 +3,7 @@ import type { ComponentMeta, StoryFn } from '@storybook/react';
 import AppWindow from './AppWindow';
 
 export default {
-  title: 'MacOSApp/NetworkTraffic', // eslint-disable-line
+  title: 'MacOS App/NetworkTraffic', // eslint-disable-line
   component: NetworkTraffic,
   parameters: {
     layout: `centered`,
