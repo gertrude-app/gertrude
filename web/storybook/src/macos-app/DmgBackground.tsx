@@ -18,16 +18,16 @@ const DmgBackground: React.FC = () => (
           className="shrink-0 opacity-80 rotate-6"
         >
           <g
-            stroke-width="22"
+            strokeWidth="22"
             stroke="hsl(0, 0%, 100%)"
             fill="none"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             transform="rotate(310, 400, 400)"
           >
             <path
               d="M250 250.55055594444275Q491 236.55055594444275 400 400.55055594444275Q333 533.5505559444427 550 550.5505559444427 "
-              marker-end="url(#SvgjsMarker1486)"
+              markerEnd="url(#SvgjsMarker1486)"
             ></path>
           </g>
           <defs>

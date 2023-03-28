@@ -2,7 +2,7 @@ import type { StoryFn, ComponentMeta } from '@storybook/react';
 import DmgBackground from './DmgBackground';
 
 export default {
-  title: 'MacOSApp/DmgBackground', // eslint-disable-line
+  title: 'MacOS App/DmgBackground', // eslint-disable-line
   component: DmgBackground,
   parameters: {
     layout: `fullscreen`,

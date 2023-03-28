@@ -39,6 +39,11 @@ codegen:
 
 # build & deploy
 
+appviews:
+	@rm -rf appviews/dist/ ../swift/rewrite/Xcode/Gertrude/WebViews/MenuBar
+	@pnpm --filter @macos/appviews build
+	@cp -R appviews/dist ../swift/rewrite/Xcode/Gertrude/WebViews/MenuBar
+
 build-site:
 	@pnpm --filter @site/app build
 	@pnpm --filter @site/app export
@@ -76,6 +81,9 @@ format:
 
 format-check:
 	@pnpm prettier --config ./.prettierrc.json --loglevel warn --check .
+
+format-codegen:
+	@pnpm prettier --config ./.prettierrc.json --loglevel warn --write "appviews/**/*-{store,types}.ts"
 
 lint:
 	@pnpm eslint .
