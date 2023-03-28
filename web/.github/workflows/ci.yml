@@ -23,8 +23,8 @@ jobs:
       - uses: actions/cache/restore@v3
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: pnpm-store-
+          key: pnpm-cache-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: pnpm-cache-v1-
       - name: install deps
         run: pnpm install
       - name: setup just
@@ -57,12 +57,10 @@ jobs:
       - uses: actions/cache/restore@v3
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: pnpm-store-
+          key: pnpm-cache-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: pnpm-cache-v1-
       - name: install deps
         run: pnpm install
-      - name: ensure puppeteer # caching w/ actions/cache necessitates this
-        run: node storybook/node_modules/puppeteer/install.js
       - name: setup just
         uses: extractions/setup-just@v1
       - name: build storybook
@@ -111,8 +109,8 @@ jobs:
       - uses: actions/cache/restore@v3
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: pnpm-store-
+          key: pnpm-cache-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: pnpm-cache-v1-
       - name: install deps
         run: pnpm install
       - name: setup just
@@ -145,9 +143,11 @@ jobs:
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
       - uses: actions/cache@v3
         with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: pnpm-store-
+          path: |
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ~/.cache/Cypress
+          key: pnpm-cache-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: pnpm-cache-v1-
       - name: install deps
         run: pnpm install
       - name: setup just
