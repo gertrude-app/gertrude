@@ -21,7 +21,7 @@ function SelectMenu<Value extends string = string>({
   size = `large`,
   testId,
 }: Parameters<React.FC<Props<Value>>>[0]): ReturnType<React.FC<Props<Value>>> {
-  let buttonStyles = '';
+  let buttonStyles = ``;
   switch (size) {
     case `small`:
       buttonStyles = `py-1 bg-white dark:bg-slate-900 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-500 dark:text-slate-400 dark:ring-offset-slate-900`;
@@ -81,8 +81,8 @@ function SelectMenu<Value extends string = string>({
                           ? `bg-violet-100 dark:text-slate-200`
                           : `text-gray-900 dark:text-slate-300`,
                         `cursor-pointer select-none relative`,
-                        size === 'small' ? 'py-2 px-3' : 'p-3.5 text-md',
-                        size === 'small' && active && 'bg-slate-50 dark:bg-slate-700/50',
+                        size === `small` ? `py-2 px-3` : `p-3.5 text-md`,
+                        size === `small` && active && `bg-slate-50 dark:bg-slate-700/50`,
                       )
                     }
                     value={value}

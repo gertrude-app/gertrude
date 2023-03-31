@@ -3,7 +3,7 @@ import type { ComponentMeta, StoryFn } from '@storybook/react';
 import AppWindow from './AppWindow';
 
 export default {
-  title: 'MacOSApp/Administrate', // eslint-disable-line
+  title: 'MacOS App/Administrate', // eslint-disable-line
   component: Administrate,
   parameters: {
     layout: `centered`,
@@ -11,7 +11,7 @@ export default {
 } as ComponentMeta<typeof Administrate>;
 
 const LightTemplate: StoryFn<typeof Administrate> = (args) => (
-  <AppWindow width={900} height={600}>
+  <AppWindow width={900} height={530}>
     <Administrate {...args} />
   </AppWindow>
 );
@@ -19,37 +19,47 @@ const LightTemplate: StoryFn<typeof Administrate> = (args) => (
 export const LightModeChecksPassing = LightTemplate.bind({});
 LightModeChecksPassing.args = {
   healthCheck: {
-    appVersion: '0.5.0',
-    mostRecentAppVersion: '0.5.0',
-    filterVersion: '0.5.0',
-    mostRecentFilterVersion: '0.5.0',
+    appVersion: `0.5.0`,
+    mostRecentAppVersion: `0.5.0`,
+    filterVersion: `0.5.0`,
+    mostRecentFilterVersion: `0.5.0`,
     screenRecordingPermission: true,
     keystrokeRecordingPermission: true,
     isAdministrator: false,
     filterToAppCommunicationVerified: true,
-    notificationSetting: 'alert',
-    accountStatus: 'active',
+    notificationSetting: `alert`,
+    accountStatus: `active`,
     keysLoaded: 23,
   },
-  filterStatus: 'on',
+  filterStatus: `on`,
+  userName: `Little Jimmy`,
+  screenshotMonitoringEnabled: true,
+  keystrokeMonitoringEnabled: false,
 };
 
 export const LightModeChecksFailing = LightTemplate.bind({});
 LightModeChecksFailing.args = {
+  ...LightModeChecksPassing.args,
   healthCheck: {
     ...LightModeChecksPassing.args.healthCheck!,
     appVersion: `0.4.12`,
     screenRecordingPermission: false,
-    notificationSetting: 'banners',
+    notificationSetting: `banners`,
   },
-  filterStatus: 'suspended',
+  filterStatus: `suspended`,
 };
 
 const DarkTemplate: StoryFn<typeof Administrate> = (args) => (
-  <AppWindow width={900} height={600} dark>
+  <AppWindow width={900} height={530} dark>
     <Administrate {...args} />
   </AppWindow>
 );
 
-export const DarkMode = DarkTemplate.bind({});
-DarkMode.args = {};
+export const DarkModeChecksPassing = DarkTemplate.bind({});
+DarkModeChecksPassing.args = {
+  ...LightModeChecksPassing.args,
+};
+export const DarkModeChecksFailing = DarkTemplate.bind({});
+DarkModeChecksFailing.args = {
+  ...LightModeChecksFailing.args,
+};

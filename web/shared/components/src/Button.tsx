@@ -43,7 +43,7 @@ const Button: React.FC<Props> = ({
         colors = `bg-violet-500 text-white border-2 border-white hover:bg-violet-400 ring-violet-500 focus:ring-white ring-offset-violet-500`;
         break;
       case `primary`:
-        colors = `bg-violet-800 border border-violet-800 hover:border-violet-900 text-white hover:bg-violet-900 ring-transparent focus:ring-violet-800`;
+        colors = `bg-violet-800 dark:bg-violet-700 border border-violet-800 dark:border-violet-700 hover:border-violet-900 dark:hover:border-violet-800 text-white dark:hover:bg-violet-800 hover:bg-violet-900 ring-transparent focus:ring-violet-800 dark:ring-offset-slate-900`;
         break;
       case `secondary`:
         colors = `bg-violet-100 dark:bg-slate-800/80 border border-violet-100 dark:border-slate-700/70 hover:border-violet-200 dark:hover:bg-slate-700/80 text-violet-600 dark:text-white/80 hover:bg-violet-200 ring-transparent focus:ring-violet-300 dark:focus:ring-indigo-500/70 dark:ring-offset-slate-900`;

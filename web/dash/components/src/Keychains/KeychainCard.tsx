@@ -1,9 +1,9 @@
 import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@dash/utils';
+import { Button } from '@shared/components';
 import PillBadge from '../PillBadge';
 import GradientIcon from '../GradientIcon';
-import { Button } from '@shared/components';
 
 type Props =
   | ({
@@ -107,9 +107,25 @@ const KeychainCard: React.FC<Props> = ({
         {props.mode === `list` && (
           <div className="flex items-center pr-2 space-x-2">
             {props.editUrl && (
-              <Button type="link" color='tertiary' size='small' to={props.editUrl} testId="edit-keychain">Edit</Button>
+              <Button
+                type="link"
+                color="tertiary"
+                size="small"
+                to={props.editUrl}
+                testId="edit-keychain"
+              >
+                Edit
+              </Button>
             )}
-            <Button type="button" onClick={props.onRemove} color="warning" testId="remove-keychain" size="small">{props.removeText}</Button>
+            <Button
+              type="button"
+              onClick={props.onRemove}
+              color="warning"
+              testId="remove-keychain"
+              size="small"
+            >
+              {props.removeText}
+            </Button>
           </div>
         )}
       </div>

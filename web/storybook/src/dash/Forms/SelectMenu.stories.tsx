@@ -21,11 +21,11 @@ Large.args = {
 export const Medium = Template.bind({});
 Medium.args = {
   ...Large.args,
-  size: 'medium',
+  size: `medium`,
 };
 
 export const Small = Template.bind({});
 Small.args = {
   ...Large.args,
-  size: 'small',
+  size: `small`,
 };
