@@ -1,4 +1,4 @@
-import { SelectMenu } from '@dash/components';
+import { SelectMenu } from '@shared/components';
 import type { StoryFn, ComponentMeta } from '@storybook/react';
 
 export default {

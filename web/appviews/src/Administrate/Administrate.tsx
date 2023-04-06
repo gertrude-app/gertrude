@@ -49,7 +49,6 @@ const Administrate: React.FC<Props> = ({
 
   let pageElement = (
     <HomeScreen
-      page={page}
       setPage={setPage}
       filterStatus={filterStatus}
       failingChecksCount={failingChecksCount}
@@ -64,7 +63,6 @@ const Administrate: React.FC<Props> = ({
     case `home`:
       pageElement = (
         <HomeScreen
-          page={page}
           setPage={setPage}
           filterStatus={filterStatus}
           failingChecksCount={failingChecksCount}

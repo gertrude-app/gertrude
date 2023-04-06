@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import type { Page } from './Administrate';
+import type { Page } from '../Administrate';
 
 interface Props {
   page: Page;

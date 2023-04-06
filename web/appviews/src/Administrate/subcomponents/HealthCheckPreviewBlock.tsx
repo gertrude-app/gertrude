@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import { Button } from '@shared/components';
-import type { Page } from './Administrate';
+import type { Page } from '../Administrate';
 
 interface Props {
   failingChecksCount: number;

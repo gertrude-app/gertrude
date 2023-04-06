@@ -1,8 +1,7 @@
 import React from 'react';
 import { capitalize } from '@dash/utils';
 import * as date from '@dash/datetime';
-import { TextInput } from '@shared/components';
-import { SelectMenu } from '../Forms';
+import { TextInput, SelectMenu } from '@shared/components';
 import UserInputText from '../UserInputText';
 
 type Props = {

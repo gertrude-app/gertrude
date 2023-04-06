@@ -1,5 +1,4 @@
-import { SelectMenu } from '@dash/components';
-import { Button } from '@shared/components';
+import { Button, SelectMenu } from '@shared/components';
 import React from 'react';
 
 interface Props {

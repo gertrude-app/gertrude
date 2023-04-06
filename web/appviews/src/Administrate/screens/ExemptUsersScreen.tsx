@@ -1,8 +1,6 @@
 import React from 'react';
 
-interface Props {}
-
-const ExemptUsersScreen: React.FC<Props> = ({}) => {
+const ExemptUsersScreen: React.FC = () => {
   return <h1>ExemptUsersScreen</h1>;
 };
 

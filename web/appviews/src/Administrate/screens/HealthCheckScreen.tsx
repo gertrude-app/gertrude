@@ -1,6 +1,6 @@
 import { Button } from '@shared/components';
 import React from 'react';
-import { HealthCheckStatus } from '../Administrate';
+import type { HealthCheckStatus } from '../Administrate';
 import HealthCheckItem from '../subcomponents/HealthCheckItem';
 
 interface Props {
@@ -31,10 +31,10 @@ const HealthCheckScreen: React.FC<Props> = ({ healthCheck, failingChecksCount })
         <HealthCheckItem
           status={
             healthCheck.appVersion === healthCheck.mostRecentAppVersion
-              ? 'good'
-              : 'warning'
+              ? `good`
+              : `warning`
           }
-          title={'App version'}
+          title={`App version`}
           description={
             healthCheck.appVersion === healthCheck.mostRecentAppVersion
               ? `You're up to date (${healthCheck.appVersion})`
@@ -44,8 +44,8 @@ const HealthCheckScreen: React.FC<Props> = ({ healthCheck, failingChecksCount })
             healthCheck.appVersion !== healthCheck.mostRecentAppVersion
               ? {
                   onClick: () => {},
-                  label: 'Update',
-                  icon: 'sync',
+                  label: `Update`,
+                  icon: `sync`,
                 }
               : undefined
           }
@@ -53,10 +53,10 @@ const HealthCheckScreen: React.FC<Props> = ({ healthCheck, failingChecksCount })
         <HealthCheckItem
           status={
             healthCheck.filterVersion === healthCheck.mostRecentFilterVersion
-              ? 'good'
-              : 'warning'
+              ? `good`
+              : `warning`
           }
-          title={'Filter version'}
+          title={`Filter version`}
           description={
             healthCheck.filterVersion === healthCheck.mostRecentFilterVersion
               ? `You're up to date (${healthCheck.filterVersion})`
@@ -66,65 +66,65 @@ const HealthCheckScreen: React.FC<Props> = ({ healthCheck, failingChecksCount })
             healthCheck.filterVersion !== healthCheck.mostRecentFilterVersion
               ? {
                   onClick: () => {},
-                  label: 'Update',
-                  icon: 'sync',
+                  label: `Update`,
+                  icon: `sync`,
                 }
               : undefined
           }
         />
         <HealthCheckItem
-          status={healthCheck.screenRecordingPermission ? 'good' : 'bad'}
-          title={'Screen recording permission'}
+          status={healthCheck.screenRecordingPermission ? `good` : `bad`}
+          title={`Screen recording permission`}
           description={
             healthCheck.screenRecordingPermission
-              ? 'Gertrude has the permission it needs'
-              : 'Please grant Gertrude permission to record your screen'
+              ? `Gertrude has the permission it needs`
+              : `Please grant Gertrude permission to record your screen`
           }
           action={
             !healthCheck.screenRecordingPermission
-              ? { label: 'Fix permission', onClick: () => {}, icon: 'cog' }
+              ? { label: `Fix permission`, onClick: () => {}, icon: `cog` }
               : undefined
           }
         />
         <HealthCheckItem
-          status={healthCheck.keystrokeRecordingPermission ? 'good' : 'bad'}
-          title={'Keystroke recording permission'}
+          status={healthCheck.keystrokeRecordingPermission ? `good` : `bad`}
+          title={`Keystroke recording permission`}
           description={
             healthCheck.keystrokeRecordingPermission
-              ? 'Gertrude has the permission it needs'
-              : 'Please grant Gertrude permission to record your keystrokes'
+              ? `Gertrude has the permission it needs`
+              : `Please grant Gertrude permission to record your keystrokes`
           }
           action={
             !healthCheck.keystrokeRecordingPermission
-              ? { label: 'Fix permission', onClick: () => {}, icon: 'cog' }
+              ? { label: `Fix permission`, onClick: () => {}, icon: `cog` }
               : undefined
           }
         />
         <HealthCheckItem
-          status={healthCheck.isAdministrator ? 'bad' : 'good'}
-          title={'macOS user account type'}
+          status={healthCheck.isAdministrator ? `bad` : `good`}
+          title={`macOS user account type`}
           action={
             healthCheck.isAdministrator
               ? {
-                  label: 'Remove user administrator privilege',
+                  label: `Remove user administrator privilege`,
                   onClick: () => {},
-                  icon: 'user',
+                  icon: `user`,
                 }
               : undefined
           }
         />
         <HealthCheckItem
-          status={healthCheck.filterToAppCommunicationVerified ? 'good' : 'bad'}
-          title={'Filter to app communication'}
+          status={healthCheck.filterToAppCommunicationVerified ? `good` : `bad`}
+          title={`Filter to app communication`}
           description={
-            healthCheck.filterToAppCommunicationVerified ? 'Verified' : 'Not verified'
+            healthCheck.filterToAppCommunicationVerified ? `Verified` : `Not verified`
           }
           action={
             !healthCheck.filterToAppCommunicationVerified
               ? {
-                  label: 'Do something',
+                  label: `Do something`,
                   onClick: () => {},
-                  icon: 'exclamation',
+                  icon: `exclamation`,
                 }
               : undefined
           }
@@ -132,58 +132,58 @@ const HealthCheckScreen: React.FC<Props> = ({ healthCheck, failingChecksCount })
         <HealthCheckItem
           status={(() => {
             switch (healthCheck.notificationSetting) {
-              case 'alert':
-                return 'good';
-              case 'banners':
-                return 'warning';
-              case 'none':
-                return 'bad';
+              case `alert`:
+                return `good`;
+              case `banners`:
+                return `warning`;
+              case `none`:
+                return `bad`;
             }
           })()}
-          title={'Notification settings'}
+          title={`Notification settings`}
           description={
-            healthCheck.notificationSetting === 'alert'
-              ? 'Set to "alert"'
+            healthCheck.notificationSetting === `alert`
+              ? `Set to "alert"`
               : `Set to "${healthCheck.notificationSetting}", recommended setting is "alert"`
           }
           action={
-            healthCheck.notificationSetting !== 'alert'
+            healthCheck.notificationSetting !== `alert`
               ? {
-                  label: 'Fix permission',
+                  label: `Fix permission`,
                   onClick: () => {},
-                  icon: 'cog',
+                  icon: `cog`,
                 }
               : undefined
           }
         />
         <HealthCheckItem
-          status={healthCheck.accountStatus === 'active' ? 'good' : 'bad'}
-          title={'Gertrude account status'}
+          status={healthCheck.accountStatus === `active` ? `good` : `bad`}
+          title={`Gertrude account status`}
           description={`Current status: ${healthCheck.accountStatus}`}
           action={
-            healthCheck.accountStatus !== 'active'
+            healthCheck.accountStatus !== `active`
               ? {
-                  label: 'Fix it',
+                  label: `Fix it`,
                   onClick: () => {},
-                  icon: 'exclamation',
+                  icon: `exclamation`,
                 }
               : undefined
           }
         />
         <HealthCheckItem
-          status={healthCheck.keysLoaded ? 'good' : 'bad'}
-          title={'Filter rules'}
+          status={healthCheck.keysLoaded ? `good` : `bad`}
+          title={`Filter rules`}
           description={
             healthCheck.keysLoaded
               ? `Looks good, ${healthCheck.keysLoaded} keys loaded`
-              : 'No keys loaded'
+              : `No keys loaded`
           }
           action={
             !healthCheck.keysLoaded
               ? {
-                  label: 'Fix it',
+                  label: `Fix it`,
                   onClick: () => {},
-                  icon: 'exclamation',
+                  icon: `exclamation`,
                 }
               : undefined
           }

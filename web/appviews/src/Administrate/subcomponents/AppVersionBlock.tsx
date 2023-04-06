@@ -1,6 +1,5 @@
-import { SelectMenu } from '@dash/components';
-import { Button } from '@shared/components';
 import React from 'react';
+import { Button, SelectMenu } from '@shared/components';
 
 interface Props {
   appVersion: string;

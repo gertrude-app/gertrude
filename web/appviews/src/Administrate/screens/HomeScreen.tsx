@@ -1,14 +1,13 @@
 import React from 'react';
 import cx from 'classnames';
 import { Button } from '@shared/components';
+import type { Page } from '../Administrate';
 import FilterStatusBlock from '../subcomponents/FilterStatusBlock';
 import HealthCheckPreviewBlock from '../subcomponents/HealthCheckPreviewBlock';
 import AppVersionBlock from '../subcomponents/AppVersionBlock';
 import UserBlock from '../subcomponents/UserBlock';
-import { Page } from '../Administrate';
 
 interface Props {
-  page: Page;
   setPage: (page: Page) => void;
   filterStatus: 'on' | 'off' | 'suspended';
   failingChecksCount: number;
@@ -19,7 +18,6 @@ interface Props {
 }
 
 const HomeScreen: React.FC<Props> = ({
-  page,
   setPage,
   filterStatus,
   failingChecksCount,
