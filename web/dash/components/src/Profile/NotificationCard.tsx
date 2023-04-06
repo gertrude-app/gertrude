@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import cx from 'classnames';
-import { Button } from '@shared/components';
+import { Button, SelectMenu } from '@shared/components';
 import type { AdminNotificationTrigger, GetAdmin } from '@dash/types';
-import { SelectMenu } from '../Forms';
 import GradientIcon from '../GradientIcon';
 
 type AdminNotificationMethod = GetAdmin.VerifiedNotificationMethod;

@@ -1,11 +1,10 @@
 import React from 'react';
-import { TextInput, Button } from '@shared/components';
+import { TextInput, Button, SelectMenu } from '@shared/components';
 import type {
   PendingNotificationMethod,
   NewAdminNotificationMethodEvent as Event,
   CreatePendingNotificationMethod,
 } from '@dash/types';
-import { SelectMenu } from '../Forms';
 
 type Props = PendingNotificationMethod & {
   onEvent(event: Event): unknown;

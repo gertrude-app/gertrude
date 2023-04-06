@@ -1,7 +1,6 @@
 import React from 'react';
 import { EditKey, validate } from '@dash/keys';
-import { Label, TextInput, Toggle } from '@shared/components';
-import { SelectMenu } from '../Forms';
+import { Label, TextInput, Toggle, SelectMenu } from '@shared/components';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';
@@ -86,7 +85,7 @@ const AddressStep: React.FC<Props> = ({
           options={addressTypeOptions(showAdvancedAddressOptions)}
           selectedOption={addressType}
           setSelected={(type) => update({ type: `setAddressType`, to: type })}
-          deemphasized
+          size="medium"
         />
       </div>
       <AddressTypeHint unsanitizedAddress={address} type={addressType} />

@@ -1,6 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@dash/utils';
+import { Button } from '@shared/components';
 import PillBadge from '../PillBadge';
 import GradientIcon from '../GradientIcon';
 
@@ -88,7 +89,7 @@ const KeychainCard: React.FC<Props> = ({
     {isSelect(props) || (
       <div
         className={cx(
-          `bg-gray-50 rounded-b-xl w-full flex justify-between`,
+          `bg-gray-50 rounded-b-xl w-full flex items-center py-2 justify-between`,
           isSelect(props) && props.selected && `bg-indigo-100/40`,
         )}
       >
@@ -96,7 +97,7 @@ const KeychainCard: React.FC<Props> = ({
           <PillBadge
             type="green"
             className={cx(
-              `border my-2`,
+              `border`,
               !isPublic && `opacity-0`, // ensure equal heights
             )}
           >
@@ -104,23 +105,27 @@ const KeychainCard: React.FC<Props> = ({
           </PillBadge>
         </div>
         {props.mode === `list` && (
-          <div className="flex items-stretch">
+          <div className="flex items-center pr-2 space-x-2">
             {props.editUrl && (
-              <a
-                className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-gray-600 transition duration-100 select-none flex items-center"
-                href={props.editUrl}
-                data-test="edit-keychain"
+              <Button
+                type="link"
+                color="tertiary"
+                size="small"
+                to={props.editUrl}
+                testId="edit-keychain"
               >
                 Edit
-              </a>
+              </Button>
             )}
-            <button
-              className="font-medium hover:bg-gray-100 px-4 py-2 cursor-pointer text-red-600 transition duration-100 rounded-br-xl"
+            <Button
+              type="button"
               onClick={props.onRemove}
-              data-test="remove-keychain"
+              color="warning"
+              testId="remove-keychain"
+              size="small"
             >
               {props.removeText}
-            </button>
+            </Button>
           </div>
         )}
       </div>

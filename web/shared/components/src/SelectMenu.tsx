@@ -2,14 +2,14 @@ import React from 'react';
 import cx from 'classnames';
 import { Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
-import { Label } from '@shared/components';
+import Label from './Label';
 
 interface Props<Value extends string> {
   options: Array<{ value: Value; display: string }>;
   selectedOption: Value;
   setSelected(value: Value): void;
   label?: string;
-  deemphasized?: boolean;
+  size?: 'small' | 'medium' | 'large';
   testId?: string;
 }
 
@@ -18,18 +18,30 @@ function SelectMenu<Value extends string = string>({
   selectedOption,
   setSelected,
   label,
-  deemphasized = false,
+  size = `large`,
   testId,
 }: Parameters<React.FC<Props<Value>>>[0]): ReturnType<React.FC<Props<Value>>> {
+  let buttonStyles = ``;
+  switch (size) {
+    case `small`:
+      buttonStyles = `py-1 bg-white dark:bg-slate-900 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-500 dark:text-slate-400 dark:ring-offset-slate-900`;
+      break;
+    case `medium`:
+      buttonStyles = `py-2 bg-white text-gray-400 hover:bg-gray-100`;
+      break;
+    case `large`:
+      buttonStyles = `py-3 bg-violet-800 text-white hover:bg-violet-900`;
+      break;
+  }
   return (
     <Listbox value={selectedOption} onChange={setSelected}>
       {({ open }) => (
         <div data-test={testId} className="relative">
           {label && <Label className="w-full inline-block pb-px">{label}</Label>}
           <div className="relative">
-            <div className="rounded-md w-full shadow-sm">
-              <div className="relative z-0 inline-flex rounded-md w-full border">
-                <div className="relative flex flex-grow items-center bg-white pl-3 pr-4 border border-transparent rounded-l-md text-gray-700">
+            <div className="rounded-md w-full">
+              <div className="relative z-0 inline-flex rounded-md w-full border dark:border-slate-700">
+                <div className="relative flex flex-grow items-center bg-white dark:bg-slate-900 pl-3 pr-4 border border-transparent rounded-l-md text-gray-700 dark:text-slate-300">
                   <p className="ml-2.5 font-medium">
                     {(options.find((opt) => opt.value === selectedOption) ?? options[0])
                       ?.display ?? `make a selection...`}
@@ -38,9 +50,7 @@ function SelectMenu<Value extends string = string>({
                 <Listbox.Button
                   className={cx(
                     `relative inline-flex items-center px-4 rounded-l-none rounded-r-md text-sm font-medium focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms]`,
-                    !deemphasized
-                      ? `py-3 bg-violet-800 text-white hover:bg-violet-900`
-                      : `py-2 bg-white text-gray-400 hover:bg-gray-100`,
+                    buttonStyles,
                   )}
                 >
                   <span className="sr-only">Change published status</span>
@@ -61,14 +71,18 @@ function SelectMenu<Value extends string = string>({
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Listbox.Options className="origin-top-right absolute z-20 right-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Listbox.Options className="origin-top-right absolute z-20 right-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 focus:outline-none">
                 {options.map(({ value, display }) => (
                   <Listbox.Option
                     key={value}
                     className={({ active }) =>
                       cx(
-                        active ? `bg-violet-100` : `text-gray-900`,
-                        `cursor-pointer select-none relative p-3.5 text-md`,
+                        active
+                          ? `bg-violet-100 dark:text-slate-200`
+                          : `text-gray-900 dark:text-slate-300`,
+                        `cursor-pointer select-none relative`,
+                        size === `small` ? `py-2 px-3` : `p-3.5 text-md`,
+                        size === `small` && active && `bg-slate-50 dark:bg-slate-700/50`,
                       )
                     }
                     value={value}
