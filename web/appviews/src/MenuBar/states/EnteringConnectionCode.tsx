@@ -1,6 +1,6 @@
 import React from 'react';
+import type { AppEvent, ViewAction } from '../menubar-store';
 import { MenuBarSized } from '../MenuBar';
-import { AppEvent, ViewAction } from '../menubar-store';
 
 interface Props {
   emit: (event: AppEvent) => unknown;

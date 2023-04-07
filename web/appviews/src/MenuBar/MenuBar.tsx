@@ -1,9 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
-import { Logo } from '@shared/components';
 import type { AppState, ViewState, AppEvent, ViewAction } from './menubar-store';
 import type { PropsOf } from '../lib/store';
-import Laptop from '../Icons/Laptop';
 import { containerize } from '../lib/store';
 import store from './menubar-store';
 import Connected from './states/Connected';

@@ -1,8 +1,8 @@
 import React from 'react';
-import { MenuBarSized } from '../MenuBar';
 import { Logo } from '@shared/components';
+import type { AppEvent } from '../menubar-store';
+import { MenuBarSized } from '../MenuBar';
 import Laptop from '../../Icons/Laptop';
-import { AppEvent } from '../menubar-store';
 
 interface Props {
   emit: (event: AppEvent) => unknown;

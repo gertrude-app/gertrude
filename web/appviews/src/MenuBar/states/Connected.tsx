@@ -1,5 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
+import type { AppEvent, FilterState } from '../menubar-store';
 import { MenuBarSized } from '../MenuBar';
 import FilterBadge, { FilterStateBadge } from '../FilterBadge';
 
@@ -9,7 +10,6 @@ import Binoculars from '../../Icons/Binoculars';
 import Keyboard from '../../Icons/Keyboard';
 import ArrowRotateRight from '../../Icons/ArrowRotateRight';
 import Gear from '../../Icons/Gear';
-import { AppEvent, FilterState } from '../menubar-store';
 
 interface Props {
   emit: (event: AppEvent) => unknown;
