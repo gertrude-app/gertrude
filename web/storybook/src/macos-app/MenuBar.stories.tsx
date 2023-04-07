@@ -11,165 +11,161 @@ export default {
   },
 } as ComponentMeta<typeof MenuBar>;
 
-const ThreeModes: React.FC<{ colors: string }> = ({ colors }) => (
-  <div className="flex flex-col space-y-4">
-    <div className={cx(colors, `rounded-2xl`)}>
-      <MenuBar
-        case="connected"
-        recordingKeystrokes={true}
-        recordingScreen={true}
-        filterState={{ case: `on` }}
-        {...props}
-      />
-    </div>
-    <div className={cx(colors, `rounded-2xl`)}>
-      <MenuBar
-        case="connected"
-        recordingKeystrokes={false}
-        recordingScreen={true}
-        filterState={{ case: `off` }}
-        {...props}
-      />
-    </div>
-    <div className={cx(colors, `rounded-2xl`)}>
-      <MenuBar
-        case="connected"
-        recordingKeystrokes={false}
-        recordingScreen={false}
-        filterState={{ case: `suspended`, expiration: `3 minutes from now` }}
-        {...props}
-      />
-    </div>
-  </div>
-);
+type MenuBarWrapperProps = {
+  colors: string;
+  theme: 'light' | 'dark';
+} & React.ComponentProps<typeof MenuBar>;
 
 const LightTemplate: StoryFn<typeof MenuBar> = () => (
-  <ThreeModes colors="bg-gradient-to-l from-[rgb(140,140,140)] to-[rgb(230,230,236)]" />
+  <ThreeModesThreeColors theme="light" />
 );
 export const LightMode = LightTemplate.bind({});
 
-const LightOverLightTemplate: StoryFn<typeof MenuBar> = () => (
-  <ThreeModes colors="bg-[rgb(230,230,236)]" />
-);
-export const LightModeOverLightBackground = LightOverLightTemplate.bind({});
-
-const LightOverDarkTemplate: StoryFn<typeof MenuBar> = () => (
-  <ThreeModes colors="bg-[rgb(140,140,140)]" />
-);
-export const LightModeOverDarkBackground = LightOverDarkTemplate.bind({});
-
 const DarkTemplate: StoryFn<typeof MenuBar> = () => (
-  <ThreeModes colors="dark bg-gradient-to-l from-[rgb(27,27,27)] to-[rgb(120,120,120)]" />
+  <ThreeModesThreeColors theme="dark" />
 );
 export const DarkMode = DarkTemplate.bind({});
 
-const DarkOverLightTemplate: StoryFn<typeof MenuBar> = () => (
-  <ThreeModes colors="dark bg-[rgb(120,120,120)]" />
+const NotConnectedTemplate: StoryFn<typeof MenuBar> = () => (
+  <BothThemes case="notConnected" {...commonProps} />
 );
-export const DarkModeOverLightBackground = DarkOverLightTemplate.bind({});
-
-const DarkOverDarkTemplate: StoryFn<typeof MenuBar> = () => (
-  <ThreeModes colors="dark bg-[rgb(27,27,27)]" />
-);
-export const DarkModeOverDarkBackground = DarkOverDarkTemplate.bind({});
-
-const NotConnectedTemplate: StoryFn<typeof MenuBar> = () => {
-  return (
-    <div className="flex flex-col space-y-4">
-      <div
-        className={cx(
-          `bg-gradient-to-l from-[rgb(140,140,140)] to-[rgb(230,230,236)]`,
-          `rounded-2xl`,
-        )}
-      >
-        <MenuBar case="notConnected" {...props} />
-      </div>
-      <div
-        className={cx(
-          `dark bg-gradient-to-l from-[rgb(27,27,27)] to-[rgb(120,120,120)]`,
-          `rounded-2xl`,
-        )}
-      >
-        <MenuBar case="notConnected" {...props} />
-      </div>
-    </div>
-  );
-};
 export const NotConnected = NotConnectedTemplate.bind({});
 
-const EnteringCodeTemplate: StoryFn<typeof MenuBar> = () => {
-  return (
-    <div className="flex flex-col space-y-4">
-      <div
-        className={cx(
-          `bg-gradient-to-l from-[rgb(140,140,140)] to-[rgb(230,230,236)]`,
-          `rounded-2xl`,
-        )}
-      >
-        <MenuBar case="enteringConnectionCode" {...props} />
-      </div>
-      <div
-        className={cx(
-          `dark bg-gradient-to-l from-[rgb(27,27,27)] to-[rgb(120,120,120)]`,
-          `rounded-2xl`,
-        )}
-      >
-        <MenuBar case="enteringConnectionCode" {...props} connectionCode="not valid" />
-      </div>
-    </div>
-  );
-};
+const EnteringCodeTemplate: StoryFn<typeof MenuBar> = () => (
+  <BothThemes case="enteringConnectionCode" {...commonProps} />
+);
 export const EnteringCode = EnteringCodeTemplate.bind({});
 
-const ConnectingTemplate: StoryFn<typeof MenuBar> = () => {
-  return (
-    <div className="flex flex-col space-y-4">
-      <div
-        className={cx(
-          `bg-gradient-to-l from-[rgb(140,140,140)] to-[rgb(230,230,236)]`,
-          `rounded-2xl`,
-        )}
-      >
-        <MenuBar case="connecting" {...props} />
-      </div>
-      <div
-        className={cx(
-          `dark bg-gradient-to-l from-[rgb(27,27,27)] to-[rgb(120,120,120)]`,
-          `rounded-2xl`,
-        )}
-      >
-        <MenuBar case="connecting" {...props} />
-      </div>
-    </div>
-  );
-};
+const ConnectingTemplate: StoryFn<typeof MenuBar> = () => (
+  <BothThemes case="connecting" {...commonProps} />
+);
 export const Connecting = ConnectingTemplate.bind({});
 
-const ConnectFailedTemplate: StoryFn<typeof MenuBar> = () => {
+const ConnectFailedTemplate: StoryFn<typeof MenuBar> = () => (
+  <BothThemes case="connectionFailed" error="Printer caught on fire" {...commonProps} />
+);
+export const ConnectFailed = ConnectFailedTemplate.bind({});
+
+// helpers
+const MenuBarWrapper: React.FC<MenuBarWrapperProps> = (props) => {
+  return (
+    <div className={cx(props.colors, `rounded-2xl shrink-0`, props.theme)}>
+      <MenuBar {...props} />
+    </div>
+  );
+};
+
+const BothThemes: React.FC<React.ComponentProps<typeof MenuBar>> = (props) => {
   return (
     <div className="flex flex-col space-y-4">
-      <div
-        className={cx(
-          `bg-gradient-to-l from-[rgb(140,140,140)] to-[rgb(230,230,236)]`,
-          `rounded-2xl`,
-        )}
-      >
-        <MenuBar case="connectionFailed" error="Printer caught on fire" {...props} />
+      <MenuBarWrapper
+        {...props}
+        theme="light"
+        colors="bg-gradient-to-l from-[rgb(140,140,140)] to-[rgb(230,230,236)]"
+      />
+      <MenuBarWrapper
+        {...props}
+        theme="dark"
+        colors="bg-gradient-to-l from-[rgb(27,27,27)] to-[rgb(120,120,120)]"
+      />
+    </div>
+  );
+};
+
+const ThreeModesThreeColors: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
+  const propOptions: Record<
+    'first' | 'second' | 'third',
+    React.ComponentProps<typeof MenuBarWrapper>
+  > = {
+    first: {
+      colors: '',
+      theme,
+      case: `connected`,
+      recordingKeystrokes: true,
+      recordingScreen: true,
+      filterState: { case: `on` },
+      ...commonProps,
+    },
+    second: {
+      colors: '',
+      theme,
+      case: `connected`,
+      recordingKeystrokes: false,
+      recordingScreen: true,
+      filterState: { case: `off` },
+      ...commonProps,
+    },
+    third: {
+      colors: '',
+      theme,
+      case: `connected`,
+      recordingKeystrokes: false,
+      recordingScreen: false,
+      filterState: { case: `suspended`, expiration: `3 minutes from now` },
+      ...commonProps,
+    },
+  };
+  return (
+    <div className="flex flex-row space-x-4">
+      <div className="flex flex-col space-y-4">
+        <MenuBarWrapper
+          {...propOptions.first}
+          colors={theme === 'light' ? 'bg-[rgb(230,230,236)]' : 'bg-[rgb(120,120,120)]'}
+        />
+        <MenuBarWrapper
+          {...propOptions.second}
+          colors={theme === 'light' ? 'bg-[rgb(230,230,236)]' : 'bg-[rgb(120,120,120)]'}
+        />
+        <MenuBarWrapper
+          {...propOptions.third}
+          colors={theme === 'light' ? 'bg-[rgb(230,230,236)]' : 'bg-[rgb(120,120,120)]'}
+        />
       </div>
-      <div
-        className={cx(
-          `dark bg-gradient-to-l from-[rgb(27,27,27)] to-[rgb(120,120,120)]`,
-          `rounded-2xl`,
-        )}
-      >
-        <MenuBar case="connectionFailed" error="Printer caught on fire" {...props} />
+      <div className="flex flex-col space-y-4">
+        <MenuBarWrapper
+          {...propOptions.first}
+          colors={
+            theme === 'light'
+              ? 'bg-gradient-to-l from-[rgb(140,140,140)] to-[rgb(230,230,236)]'
+              : 'bg-gradient-to-l from-[rgb(27,27,27)] to-[rgb(120,120,120)]'
+          }
+        />
+        <MenuBarWrapper
+          {...propOptions.second}
+          colors={
+            theme === 'light'
+              ? 'bg-gradient-to-l from-[rgb(140,140,140)] to-[rgb(230,230,236)]'
+              : 'bg-gradient-to-l from-[rgb(27,27,27)] to-[rgb(120,120,120)]'
+          }
+        />
+        <MenuBarWrapper
+          {...propOptions.third}
+          colors={
+            theme === 'light'
+              ? 'bg-gradient-to-l from-[rgb(140,140,140)] to-[rgb(230,230,236)]'
+              : 'bg-gradient-to-l from-[rgb(27,27,27)] to-[rgb(120,120,120)]'
+          }
+        />
+      </div>
+      <div className="flex flex-col space-y-4">
+        <MenuBarWrapper
+          {...propOptions.first}
+          colors={theme === 'light' ? 'bg-[rgb(140,140,140)]' : 'bg-[rgb(27,27,27)]'}
+        />
+        <MenuBarWrapper
+          {...propOptions.second}
+          colors={theme === 'light' ? 'bg-[rgb(140,140,140)]' : 'bg-[rgb(27,27,27)]'}
+        />
+        <MenuBarWrapper
+          {...propOptions.third}
+          colors={theme === 'light' ? 'bg-[rgb(140,140,140)]' : 'bg-[rgb(27,27,27)]'}
+        />
       </div>
     </div>
   );
 };
-export const ConnectFailed = ConnectFailedTemplate.bind({});
 
-const props = {
+const commonProps = {
   connectionCode: `123456`,
   emit: () => {},
   dispatch: () => {},
