@@ -1,4 +1,5 @@
 import React from 'react';
+import cx from 'classnames';
 import type { AppEvent, ViewAction } from '../menubar-store';
 import { MenuBarSized } from '../MenuBar';
 
@@ -9,12 +10,18 @@ interface Props {
 }
 
 const EnteringConnectionCode: React.FC<Props> = ({ emit, connectionCode, dispatch }) => {
+  const codeValid = connectionCode.match(/^\d{6}$/) !== null;
+  function submit(): void {
+    if (!codeValid) return;
+    emit({ case: `connectSubmit`, code: Number(connectionCode) });
+    dispatch({ type: `connectionCodeUpdated`, code: `` });
+  }
   return (
     <MenuBarSized className="p-2">
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          emit({ case: `connectSubmit`, code: Number(connectionCode) });
+          submit();
         }}
         className="flex flex-col items-stretch justify-end h-full"
       >
@@ -23,7 +30,7 @@ const EnteringConnectionCode: React.FC<Props> = ({ emit, connectionCode, dispatc
             Enter connection code
           </h3>
           <h4 className="text-black/50 font-medium dark:text-white/60">
-            From Gertrude dashboard
+            from Gertrude dashboard
           </h4>
         </div>
         <div className="flex justify-center rounded-xl space-x-1 bg-white/20 p-4">
@@ -37,13 +44,18 @@ const EnteringConnectionCode: React.FC<Props> = ({ emit, connectionCode, dispatc
             className="rounded-l-xl rounded-r border-none h-12 shadow focus:ring-indigo-500 focus:ring-2 transition duration-100"
           />
           <button
-            type="submit"
-            disabled={connectionCode.match(/^\d{6}$/) === null}
-            className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 hover:from-indigo-600 hover:to-fuchsia-600 px-4 rounded-r-xl rounded-l font-medium text-white shadow transition duration-100 active:scale-95"
+            type="button"
+            // nb: using `disabled` and type=submit not working in webview
+            onClick={submit}
+            className={cx(
+              `bg-gradient-to-br px-4 rounded-r-xl rounded-l font-medium text-white shadow transition duration-100 active:scale-95`,
+              `from-indigo-500 to-fuchsia-500`,
+              codeValid
+                ? `hover:from-indigo-600 hover:to-fuchsia-600`
+                : `cursor-not-allowed opacity-60`,
+            )}
           >
-            {connectionCode.match(/^\d{6}$/) === null
-              ? `invalid state, disable`
-              : `Submit`}
+            Submit
           </button>
         </div>
       </form>

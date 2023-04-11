@@ -33,7 +33,7 @@ export const MenuBar: React.FC<Props> = ({
   }
 
   if (props.case === `connectionFailed`) {
-    return <ConnectFailed error={props.error} />;
+    return <ConnectFailed emit={emit} error={props.error} />;
   }
 
   if (props.case === `connectionSucceded`) {

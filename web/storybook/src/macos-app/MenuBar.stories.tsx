@@ -36,41 +36,46 @@ const EnteringCodeTemplate: StoryFn<typeof MenuBar> = () => (
 );
 export const EnteringCode = EnteringCodeTemplate.bind({});
 
+const EnteringCodeInvalidTemplate: StoryFn<typeof MenuBar> = () => (
+  <BothThemes case="enteringConnectionCode" {...commonProps} connectionCode="invalid" />
+);
+export const EnteringCodeInvalid = EnteringCodeInvalidTemplate.bind({});
+
 const ConnectingTemplate: StoryFn<typeof MenuBar> = () => (
   <BothThemes case="connecting" {...commonProps} />
 );
 export const Connecting = ConnectingTemplate.bind({});
 
 const ConnectFailedTemplate: StoryFn<typeof MenuBar> = () => (
-  <BothThemes case="connectionFailed" error="Printer caught on fire" {...commonProps} />
+  <BothThemes
+    case="connectionFailed"
+    error="Printer caught on fire, some really long error lets push it onto two lines"
+    {...commonProps}
+  />
 );
 export const ConnectFailed = ConnectFailedTemplate.bind({});
 
 // helpers
-const MenuBarWrapper: React.FC<MenuBarWrapperProps> = (props) => {
-  return (
-    <div className={cx(props.colors, `rounded-2xl shrink-0`, props.theme)}>
-      <MenuBar {...props} />
-    </div>
-  );
-};
+const MenuBarWrapper: React.FC<MenuBarWrapperProps> = (props) => (
+  <div className={cx(props.colors, `rounded-2xl shrink-0`, props.theme)}>
+    <MenuBar {...props} />
+  </div>
+);
 
-const BothThemes: React.FC<React.ComponentProps<typeof MenuBar>> = (props) => {
-  return (
-    <div className="flex flex-col space-y-4">
-      <MenuBarWrapper
-        {...props}
-        theme="light"
-        colors="bg-gradient-to-l from-[rgb(149,149,149)] to-[rgb(236,236,236)]"
-      />
-      <MenuBarWrapper
-        {...props}
-        theme="dark"
-        colors="bg-gradient-to-l from-[rgb(34,34,34)] to-[rgb(126,126,126)]"
-      />
-    </div>
-  );
-};
+const BothThemes: React.FC<React.ComponentProps<typeof MenuBar>> = (props) => (
+  <div className="flex flex-col space-y-4">
+    <MenuBarWrapper
+      {...props}
+      theme="light"
+      colors="bg-gradient-to-l from-[rgb(149,149,149)] to-[rgb(236,236,236)]"
+    />
+    <MenuBarWrapper
+      {...props}
+      theme="dark"
+      colors="bg-gradient-to-l from-[rgb(34,34,34)] to-[rgb(126,126,126)]"
+    />
+  </div>
+);
 
 const ThreeModesThreeColors: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
   const propOptions: Record<

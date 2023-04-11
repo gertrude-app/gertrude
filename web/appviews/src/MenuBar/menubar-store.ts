@@ -30,6 +30,7 @@ export type AppEvent =
   | { case: 'viewNetworkTrafficClicked' }
   | { case: 'connectClicked' }
   | { case: 'retryConnectClicked' }
+  | { case: 'connectFailedHelpClicked' }
   | { case: 'welcomeAdminClicked' }
   | { case: 'turnOnFilterClicked' };
 // end codegen

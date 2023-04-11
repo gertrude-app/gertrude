@@ -4,13 +4,6 @@ import type { AppEvent, FilterState } from '../menubar-store';
 import { MenuBarSized } from '../MenuBar';
 import FilterBadge, { FilterStateBadge } from '../FilterBadge';
 
-import TowerBroadcast from '../../Icons/TowerBroadcast';
-import ClockRotateLeft from '../../Icons/ClockRotateLeft';
-import Binoculars from '../../Icons/Binoculars';
-import Keyboard from '../../Icons/Keyboard';
-import ArrowRotateRight from '../../Icons/ArrowRotateRight';
-import Gear from '../../Icons/Gear';
-
 interface Props {
   emit: (event: AppEvent) => unknown;
   filterState: FilterState;
@@ -58,7 +51,7 @@ const Connected: React.FC<Props> = ({
           onClick={() => emit({ case: `viewNetworkTrafficClicked` })}
           className="flex-grow shadow-md transition duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row"
         >
-          <TowerBroadcast className="h-5 w-6 shrink-0 text-black/70 dark:text-white/80" />
+          <i className="fa fa-tower-broadcast text-xl w-6 shrink-0 text-black/70 dark:text-white/80" />
           <p className="text-sm font-medium text-left dark:text-white leading-tight">
             View network requests
           </p>
@@ -67,7 +60,7 @@ const Connected: React.FC<Props> = ({
           onClick={() => emit({ case: `suspendFilterClicked` })}
           className="flex-grow shadow-md transition duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row"
         >
-          <ClockRotateLeft className="h-5 shrink-0 text-black/70 dark:text-white/80" />
+          <i className="fa fa-clock-rotate-left text-xl *h-5 shrink-0 text-black/70 dark:text-white/80" />
           <p className="text-sm font-medium text-left leading-5 dark:text-white">
             Suspend filter
           </p>
@@ -84,7 +77,7 @@ const Connected: React.FC<Props> = ({
                   : `bg-black/5 dark:bg-white/5 text-black/30 dark:text-white/30`,
               )}
             >
-              <Binoculars className="w-5" />
+              <i className="fa fa-binoculars text-xl w-5" />
             </div>
             <div
               className={cx(
@@ -94,7 +87,7 @@ const Connected: React.FC<Props> = ({
                   : `bg-black/5 dark:bg-white/5 text-black/30 dark:text-white/30`,
               )}
             >
-              <Keyboard className="w-5" />
+              <i className="fa fa-keyboard text-xl w-5" />
             </div>
           </div>
           {recordingKeystrokes && (
@@ -113,14 +106,14 @@ const Connected: React.FC<Props> = ({
             onClick={() => emit({ case: `refreshRulesClicked` })}
             className="flex items-center font-medium text-black/80 dark:text-white/80 transition duration-100 hover:bg-white/20 dark:hover:bg-white/10 hover:text-black dark:hover:text-white px-4 py-0.5 rounded-lg"
           >
-            <ArrowRotateRight className="w-3.5 mr-2" />
+            <i className="fa fa-arrow-rotate-right text-sm w-3.5 mr-2" />
             Refresh rules
           </button>
           <button
             onClick={() => emit({ case: `administrateClicked` })}
             className="flex items-center font-medium text-black/80 dark:text-white/80 transition duration-100 hover:bg-white/20 dark:hover:bg-white/10 hover:text-black dark:hover:text-white px-4 py-0.5 rounded-lg"
           >
-            <Gear className="w-3.5 mr-2" />
+            <i className="fa fa-gear text-sm w-3.5 mr-2" />
             Administrate
           </button>
         </div>
