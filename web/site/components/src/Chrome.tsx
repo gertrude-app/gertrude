@@ -6,14 +6,12 @@ interface Props {
   children: React.ReactNode;
 }
 
-const Chrome: React.FC<Props> = ({ children }) => {
-  return (
-    <main className="overflow-hidden flex flex-col min-h-screen">
-      <MainHeader />
-      {children}
-      <MainFooter />
-    </main>
-  );
-};
+const Chrome: React.FC<Props> = ({ children }) => (
+  <main className="overflow-hidden flex flex-col min-h-screen">
+    <MainHeader />
+    {children}
+    <MainFooter />
+  </main>
+);
 
 export default Chrome;

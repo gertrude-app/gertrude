@@ -23,30 +23,28 @@ const Error: React.FC<Props> = ({
   primaryButton,
   onDismiss,
   icon = `exclamation-triangle`,
-}) => {
-  return (
-    <Modal
-      type="error"
-      title={title ?? (error?.type === `notFound` ? `Not found` : `Error`)}
-      icon={icon}
-      onDismiss={onDismiss}
-      primaryButton={primaryButton ?? (() => (window.location.href = `/`))}
-      secondaryButton={
-        secondaryButton === `contactSupport`
-          ? {
-              label: `Contact support`,
-              action: () => (window.location.href = `https://gertrude.app/contact`),
-            }
-          : secondaryButton === null
-          ? undefined
-          : secondaryButton
-      }
-    >
-      <div className="py-2">
-        <ApiErrorMessage error={error} wrapped={false} />
-      </div>
-    </Modal>
-  );
-};
+}) => (
+  <Modal
+    type="error"
+    title={title ?? (error?.type === `notFound` ? `Not found` : `Error`)}
+    icon={icon}
+    onDismiss={onDismiss}
+    primaryButton={primaryButton ?? (() => (window.location.href = `/`))}
+    secondaryButton={
+      secondaryButton === `contactSupport`
+        ? {
+            label: `Contact support`,
+            action: () => (window.location.href = `https://gertrude.app/contact`),
+          }
+        : secondaryButton === null
+        ? undefined
+        : secondaryButton
+    }
+  >
+    <div className="py-2">
+      <ApiErrorMessage error={error} wrapped={false} />
+    </div>
+  </Modal>
+);
 
 export default Error;

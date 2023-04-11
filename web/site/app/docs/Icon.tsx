@@ -63,23 +63,21 @@ type GradientProps = {
   gradientTransform: string;
 };
 
-export const Gradient: React.FC<GradientProps> = ({ id, color, gradientTransform }) => {
-  return (
-    <radialGradient
-      cx={0}
-      cy={0}
-      r={1}
-      gradientUnits="userSpaceOnUse"
-      id={id}
-      color={color}
-      gradientTransform={gradientTransform}
-    >
-      {gradients[color].map((stop: any, stopIndex: any) => (
-        <stop key={stopIndex} {...stop} />
-      ))}
-    </radialGradient>
-  );
-};
+export const Gradient: React.FC<GradientProps> = ({ id, color, gradientTransform }) => (
+  <radialGradient
+    cx={0}
+    cy={0}
+    r={1}
+    gradientUnits="userSpaceOnUse"
+    id={id}
+    color={color}
+    gradientTransform={gradientTransform}
+  >
+    {gradients[color].map((stop: any, stopIndex: any) => (
+      <stop key={stopIndex} {...stop} />
+    ))}
+  </radialGradient>
+);
 
 export const LightMode: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <g className="hidden">{children}</g>
