@@ -188,31 +188,27 @@ interface ImportantNumberProps {
   children: React.ReactNode;
 }
 
-const ImportantNumber: React.FC<ImportantNumberProps> = ({ children }) => {
-  return <h3 className="text-5xl text-white font-inter relative">{children}</h3>;
-};
+const ImportantNumber: React.FC<ImportantNumberProps> = ({ children }) => (
+  <h3 className="text-5xl text-white font-inter relative">{children}</h3>
+);
 
 interface EmProps {
   children: React.ReactNode;
 }
 
-const Em: React.FC<EmProps> = ({ children }) => {
-  return (
-    <span className="font-extrabold italic bg-gradient-to-br from-violet-400 to-fuchsia-400 text-transparent bg-clip-text pr-1 relative">
-      {children}
-    </span>
-  );
-};
+const Em: React.FC<EmProps> = ({ children }) => (
+  <span className="font-extrabold italic bg-gradient-to-br from-violet-400 to-fuchsia-400 text-transparent bg-clip-text pr-1 relative">
+    {children}
+  </span>
+);
 
 interface InfoTextProps {
   children: React.ReactNode;
   citation?: string;
 }
 
-const InfoText: React.FC<InfoTextProps> = ({ children }) => {
-  return (
-    <p className="mt-4 text-white text-opacity-60 font-medium text-lg relative z-10">
-      {children}
-    </p>
-  );
-};
+const InfoText: React.FC<InfoTextProps> = ({ children }) => (
+  <p className="mt-4 text-white text-opacity-60 font-medium text-lg relative z-10">
+    {children}
+  </p>
+);

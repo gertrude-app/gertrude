@@ -17,20 +17,22 @@ export type Section = {
 
 function useTableOfContents(tableOfContents: Section[]): string {
   const [currentSection, setCurrentSection] = useState(tableOfContents[0]?.id ?? ``);
-  const getHeadings = useCallback((tableOfContents: Section[]) => {
-    return tableOfContents
-      .flatMap((node) => [node.id, ...(node.children ?? []).map((child) => child.id)])
-      .map((id) => {
-        const el = document.getElementById(id ?? ``);
-        if (!el) {
-          return { id: ``, top: 0 };
-        }
-        const style = window.getComputedStyle(el);
-        const scrollMt = parseFloat(style.scrollMarginTop);
-        const top = window.scrollY + el.getBoundingClientRect().top - scrollMt;
-        return { id, top };
-      });
-  }, []);
+  const getHeadings = useCallback(
+    (tableOfContents: Section[]) =>
+      tableOfContents
+        .flatMap((node) => [node.id, ...(node.children ?? []).map((child) => child.id)])
+        .map((id) => {
+          const el = document.getElementById(id ?? ``);
+          if (!el) {
+            return { id: ``, top: 0 };
+          }
+          const style = window.getComputedStyle(el);
+          const scrollMt = parseFloat(style.scrollMarginTop);
+          const top = window.scrollY + el.getBoundingClientRect().top - scrollMt;
+          return { id, top };
+        }),
+    [],
+  );
 
   useEffect(() => {
     if (tableOfContents.length === 0) return;

@@ -17,9 +17,9 @@ function Combobox<Value extends string = string>({
   const filteredOptions =
     query === ``
       ? options
-      : options.filter((option) => {
-          return option.display.toLowerCase().includes(query.toLowerCase());
-        });
+      : options.filter((option) =>
+          option.display.toLowerCase().includes(query.toLowerCase()),
+        );
 
   return (
     <HeadlessCombobox

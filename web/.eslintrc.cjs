@@ -215,6 +215,12 @@ module.exports = {
   },
   overrides: [
     {
+      files: [`**/*.tsx`],
+      rules: {
+        'arrow-body-style': [`error`, `as-needed`],
+      },
+    },
+    {
       files: [`**/*.stories.tsx`, `**/cypress/**/*.cy.ts`],
       rules: {
         '@typescript-eslint/explicit-module-boundary-types': `off`,
