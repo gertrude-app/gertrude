@@ -32,7 +32,6 @@ const UserBlock: React.FC<Props> = ({
 
   return (
     <div className="p-4 border-[0.5px] border-slate-200 dark:border-slate-700 dark:bg-slate-800/50 shadow rounded-xl relative overflow-hidden">
-      <div className="absolute w-96 h-96 bg-slate-50 dark:bg-slate-900/50 rotate-12 -right-10 -top-10" />
       <div className="flex justify-between items-stretch relative">
         <div className="flex flex-col justify-between">
           <h3 className="font-semibold text-xl text-slate-600 dark:text-slate-400">

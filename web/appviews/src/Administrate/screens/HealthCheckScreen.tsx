@@ -9,8 +9,8 @@ interface Props {
 }
 
 const HealthCheckScreen: React.FC<Props> = ({ healthCheck, failingChecksCount }) => (
-  <div className="h-full p-4 overflow-scroll">
-    <header className="flex items-center justify-between">
+  <div className="h-full overflow-scroll relative">
+    <header className="flex items-center justify-between border-b p-4 border-slate-200 dark:border-slate-800 sticky bg-white dark:bg-slate-900 top-0">
       <div>
         <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
           Health check
@@ -26,7 +26,7 @@ const HealthCheckScreen: React.FC<Props> = ({ healthCheck, failingChecksCount })
         Recheck
       </Button>
     </header>
-    <ul className="mt-6 flex flex-col space-y-2">
+    <ul className="flex flex-col space-y-2 p-4">
       <HealthCheckItem
         status={
           healthCheck.appVersion === healthCheck.mostRecentAppVersion ? `good` : `warning`

@@ -12,7 +12,7 @@ const HealthCheckPreviewBlock: React.FC<Props> = ({ failingChecksCount, setPage 
   <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow border-slate-200 dark:border-slate-700 border-[0.5px] p-4 flex-grow relative overflow-hidden">
     <div
       className={cx(
-        `absolute top-1 right-1 w-10 h-10 bg-red-100 dark:bg-red-500/10 rounded-xl rounded-bl-3xl flex justify-center items-center`,
+        `absolute top-1 right-1 w-10 h-10 bg-red-50 dark:bg-red-500/10 rounded-xl rounded-bl-3xl flex justify-center items-center`,
         failingChecksCount === 0 && `hidden`,
       )}
     >
