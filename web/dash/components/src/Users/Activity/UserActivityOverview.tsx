@@ -6,14 +6,14 @@ import EmptyState from '../../EmptyState';
 import ReviewSummaryCard from './DaySummaryCard';
 
 type Props = {
-  userName: string;
+  userName?: string;
   days: Array<ComponentProps<typeof ReviewSummaryCard>>;
 };
 
 const UserActivityOverviewScreen: React.FC<Props> = ({ userName, days }) => (
   <>
     <PageHeading icon="user" className="mb-4 sm:mb-7">
-      {posessive(userName)} Activity
+      {userName ? posessive(userName) : `All User`} Activity
     </PageHeading>
     {days.length > 0 ? (
       <div className="my-8">

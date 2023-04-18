@@ -58,4 +58,9 @@ export const Empty: Story = props({
   days: [],
 });
 
+export const AllUsers: Story = props({
+  ...Default.args,
+  userName: undefined,
+});
+
 export default meta;

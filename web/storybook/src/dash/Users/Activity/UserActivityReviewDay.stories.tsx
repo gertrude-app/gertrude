@@ -15,17 +15,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = props({
   date: new Date(time.stable()),
-  items: [
-    keystrokeLine(
-      `Xcode`,
-      `importFoundationhereisareallylonglinethatwillcauseproblemspotentiallyblahblahblahlorem`,
-    ),
-    screenshot(400, 600, true),
-    keystrokeLine(`Brave`, `Hello world`),
-    keystrokeLine(`Xcode`, `import Foundation`),
-    screenshot(),
-    screenshot(),
-  ],
+  items: activity[`Sally`],
   numDeleted: 0,
   deleteItems: () => {},
 });
