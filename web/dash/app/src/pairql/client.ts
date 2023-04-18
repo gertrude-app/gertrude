@@ -187,6 +187,16 @@ export const liveClient = {
     );
   },
 
+  getUsersActivityOverviews(
+    input: T.GetUsersActivityOverviews.Input,
+  ): Promise<T.Result<T.GetUsersActivityOverviews.Output>> {
+    return query<T.GetUsersActivityOverviews.Input, T.GetUsersActivityOverviews.Output>(
+      input,
+      `admin`,
+      `GetUsersActivityOverviews`,
+    );
+  },
+
   getUserActivityDays(
     input: T.GetUserActivityDays.Input,
   ): Promise<T.Result<T.GetUserActivityDays.Output>> {
@@ -437,5 +447,8 @@ export const throwingClient: ApiClient = {
   },
   verifySignupEmail: () => {
     throw new Error(`ApiClient.verifySignupEmail() not implemented`);
+  },
+  getUsersActivityOverviews: () => {
+    throw new Error(`ApiClient.getUsersActivityOverviews() not implemented`);
   },
 };

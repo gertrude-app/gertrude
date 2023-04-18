@@ -13,12 +13,11 @@ const UserActivityOverviewRoute: React.FC = () => {
     days: state.users.activityDays,
   }));
 
-  const reqState = request?.state;
   useEffect(() => {
-    if (!reqState || reqState === `idle`) {
+    if (!request?.state || request?.state === `idle`) {
       dispatch(fetchActivityOverview({ userId }));
     }
-  }, [dispatch, userId, reqState]);
+  }, [dispatch, userId, request?.state]);
 
   if (!request || request.state === `idle` || request.state === `ongoing`) {
     return <Loading />;

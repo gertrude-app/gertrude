@@ -173,9 +173,9 @@ export async function spinnerMin<T>(
   return new Promise((res) => setTimeout(() => res(result), delayMs - elapsed));
 }
 
-type Days = Array<{ date: string; numApproved: number; totalItems: number }>;
-
-export function sortActivityDays(days: Days): Days {
+export function sortActivityDays<T extends { date: string; totalItems: number }>(
+  days: Array<T>,
+): Array<T> {
   return days
     .sort((a, b) => (a.date < b.date ? 1 : -1))
     .filter((day) => day.totalItems > 0);

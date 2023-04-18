@@ -29,6 +29,7 @@ import Keychains from './components/routes/Keychains';
 import Signup from './components/routes/Signup';
 import User from './components/routes/User';
 import useWindowWidth from './hooks/window-width';
+import AllUsersActivityOverview from './components/routes/AllUsersActivityOverview';
 import UsersActivityDay from './components/routes/UsersActivityDay';
 
 const App: React.FC = () => {
@@ -83,6 +84,7 @@ const App: React.FC = () => {
           <Route index element={<Users />} />
 
           <Route path="activity">
+            <Route index element={<AllUsersActivityOverview />} />
             <Route path=":date" element={<UsersActivityDay />} />
           </Route>
 

@@ -30,10 +30,7 @@ const AllUsersActivityReviewDay: React.FC<Props> = ({
 }) => {
   const navigate = useNavigate();
 
-  const items: ActivityItem[] = [];
-  typesafe
-    .objectEntries(activity)
-    .map(([, activityItems]) => items.push(...activityItems));
+  const items = typesafe.objectValues(activity).flat();
 
   return (
     <UndoMainPadding>

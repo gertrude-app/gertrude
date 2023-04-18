@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { typesafe } from '@shared/ts-utils';
 import { formatDate } from '@dash/datetime';
 import { Result } from '@dash/types';
 import type { ActivityItem } from '@dash/components';
@@ -39,6 +40,7 @@ export interface UsersState {
   listRequest: RequestState;
   entities: Record<UUID, Editable<User>>;
   fetchAllUsersDay: Record<AllUsersActivityDayKey, RequestState>;
+  fetchAllActivityOverviews: RequestState;
   fetchUserRequest: Record<UUID, RequestState>;
   updateUserRequest: Record<UUID, RequestState>;
   addDeviceRequest?: RequestState<number>;
@@ -54,6 +56,7 @@ export function initialState(): UsersState {
     listRequest: Req.idle(),
     entities: {},
     fetchAllUsersDay: {},
+    fetchAllActivityOverviews: Req.idle(),
     fetchUserRequest: {},
     updateUserRequest: {},
     activityOverviews: {},
@@ -182,9 +185,7 @@ export const slice = createSlice({
     builder.addCase(fetchActivityOverview.succeeded, (state, action) => {
       state.activityOverviews[action.meta.arg.userId] = Req.succeed({
         ...action.payload,
-        days: action.payload.days
-          .sort((a, b) => (a.date < b.date ? 1 : -1))
-          .filter((day) => day.totalItems > 0),
+        days: sortActivityDays(action.payload.days),
       });
     });
 
@@ -211,13 +212,13 @@ export const slice = createSlice({
     builder.addCase(deleteActivityItems.succeeded, (state, action) => {
       const { date, itemRootIds } = action.meta.arg;
       for (const day of matchingActivityDays(state.activityDays, date)) {
-      day.numDeleted += itemRootIds.length;
-      for (const id of itemRootIds) {
-        const item = day.items[id];
-        if (item) {
-          item.deleted = true;
+        day.numDeleted += itemRootIds.length;
+        for (const id of itemRootIds) {
+          const item = day.items[id];
+          if (item) {
+            item.deleted = true;
+          }
         }
-      }
       }
     });
 
@@ -254,6 +255,7 @@ export const slice = createSlice({
     builder.addCase(createPendingAppConnection.failed, (state, { error }) => {
       state.addDeviceRequest = Req.fail(error);
     });
+
     builder.addCase(fetchUsersActivityDay.started, (state, action) => {
       state.fetchAllUsersDay[formatDate(action.meta.arg, `url`)] = Req.ongoing();
     });
@@ -275,6 +277,24 @@ export const slice = createSlice({
       state.fetchAllUsersDay[formatDate(meta.arg, `url`)] = Req.fail(error);
     });
 
+    builder.addCase(fetchUsersActivityOverviews.started, (state) => {
+      state.fetchAllActivityOverviews = Req.ongoing();
+    });
+
+    builder.addCase(fetchUsersActivityOverviews.succeeded, (state, action) => {
+      state.fetchAllActivityOverviews = Req.succeed(void 0);
+
+      for (const overview of action.payload) {
+        state.activityOverviews[overview.userId] = Req.succeed({
+          userName: overview.userName,
+          days: sortActivityDays(overview.days),
+        });
+      }
+    });
+
+    builder.addCase(fetchUsersActivityOverviews.failed, (state, { error }) => {
+      state.fetchAllActivityOverviews = Req.fail(error);
+    });
   },
 });
 
@@ -298,6 +318,12 @@ export const fetchActivityOverview = createResultThunk(
 export const fetchUsersActivityDay = createResultThunk(
   `${slice.name}/fetchUsersActivityDay`,
   (arg: Date) => Current.api.getUsersActivityDay({ range: entireDay(arg) }),
+);
+
+export const fetchUsersActivityOverviews = createResultThunk(
+  `${slice.name}/fetchUsersActivityOverviews`,
+  (arg: { ranges?: DateRangeInput[] }) =>
+    Current.api.getUsersActivityOverviews(arg?.ranges ?? entireDays(14)),
 );
 
 export const fetchUsers = createResultThunk(
@@ -350,14 +376,14 @@ export const deleteActivityItems = createResultThunk(
     const screenshotIds: UUID[] = [];
 
     for (const day of matchingActivityDays(getState().users.activityDays, arg.date)) {
-    for (const id of arg.itemRootIds) {
-      const item = day.items[id];
-      if (item?.type === `KeystrokeLine`) {
-        keystrokeLineIds = [...keystrokeLineIds, ...item.ids];
-      } else if (item?.type === `Screenshot`) {
-        screenshotIds.push(item.id);
+      for (const id of arg.itemRootIds) {
+        const item = day.items[id];
+        if (item?.type === `KeystrokeLine`) {
+          keystrokeLineIds = [...keystrokeLineIds, ...item.ids];
+        } else if (item?.type === `Screenshot`) {
+          screenshotIds.push(item.id);
+        }
       }
-    }
     }
 
     return Current.api.deleteActivityItems({
@@ -425,7 +451,7 @@ export function entireDays(numDays: number): DateRangeInput[] {
 }
 
 function itemsToMap(items: GetUserActivityDay.Item[]): Record<UUID, ActivityItem> {
-  const newRecord = toMap(
+  return toMap(
     items.map((item) => {
       if (item.type === `CoalescedKeystrokeLine`) {
         return {
@@ -442,6 +468,4 @@ function itemsToMap(items: GetUserActivityDay.Item[]): Record<UUID, ActivityItem
       }
     }),
   );
-
-  return newRecord;
 }

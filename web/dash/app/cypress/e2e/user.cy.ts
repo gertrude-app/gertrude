@@ -65,6 +65,28 @@ describe(`user screen`, () => {
   });
 
   describe(`all users activity`, () => {
+    it(`overviews page`, () => {
+      cy.intercept(`/pairql/dashboard/GetUsersActivityOverviews`, [
+        mock.allUsersActivityOverviewItem({
+          userId: `1`,
+          days: [
+            mock.activityDay(10, 4, time.now()),
+            mock.activityDay(1234, 5, time.subtracting({ days: 1 })),
+          ],
+        }),
+        mock.allUsersActivityOverviewItem({
+          userId: `456`,
+          userName: `Suzy`,
+          days: [mock.activityDay(16, 2, time.now())],
+        }),
+      ]);
+
+      cy.visit(`/users/activity`);
+
+      cy.contains(`6 out of 26`);
+      cy.contains(`5 out of 1234`);
+    });
+
     it(`review day`, () => {
       const ids = [
         `a70ab833-d7c5-4eb0-8a86-83738188bec0`,

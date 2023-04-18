@@ -8,6 +8,7 @@ import reducer, {
   deleteDevice,
   fetchActivityOverview,
   fetchUsersActivityDay,
+  fetchUsersActivityOverviews,
   newUserRouteVisited,
   upsertUser,
 } from '../slice-users';
@@ -242,5 +243,57 @@ describe(`deleteActivityItems`, () => {
     const day = Req.payload(next.activityDays[`user123--01-01-2022`]);
     expect(day?.numDeleted).toBe(1);
     expect(day?.items.item1?.deleted).toBe(true);
+  });
+});
+
+describe(`fetchUsersActivityDay`, () => {
+  it(`sets the activityDays state correctly`, () => {
+    const date = new Date(`01-01-2022`);
+    let state = reducer(void 0, fetchUsersActivityDay.started(date));
+    expect(state.fetchAllUsersDay[formatDate(date, `url`)]).toEqual(Req.ongoing());
+
+    state = reducer(
+      state,
+      fetchUsersActivityDay.succeeded(
+        [
+          {
+            userName: `Sue`,
+            userId: `123`,
+            numDeleted: 2,
+            items: [
+              {
+                type: `CoalescedKeystrokeLine`,
+                value: {
+                  id: `123`,
+                  ids: [`123`, `456`],
+                  appName: `VSCode`,
+                  line: `imr`,
+                  createdAt: new Date(`01-01-2022`).toISOString(),
+                },
+              },
+            ],
+          },
+        ],
+        date,
+      ),
+    );
+
+    expect(state.activityDays[`123--01-01-2022`]).toEqual(
+      Req.succeed({
+        userName: `Sue`,
+        numDeleted: 2,
+        items: {
+          '123': {
+            id: `123`,
+            type: `KeystrokeLine`,
+            ids: [`123`, `456`],
+            appName: `VSCode`,
+            line: `imr`,
+            date: new Date(`01-01-2022`).toISOString(),
+            createdAt: new Date(`01-01-2022`).toISOString(),
+          },
+        },
+      }),
+    );
   });
 });

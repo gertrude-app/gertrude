@@ -10,7 +10,6 @@ import { deleteActivityItems, fetchUsersActivityDay } from '../../redux/slice-us
 const UsersActivityDay: React.FC = () => {
   const { date = `` } = useParams<{ date: string }>();
   const day = dateFromUrl(date);
-  const key = formatDate(day, `url`);
   const dispatch = useDispatch();
   const request = useSelector((state) => state.users.fetchAllUsersDay[date]);
   const allActivity = useSelector((state) => state.users.activityDays);
@@ -37,7 +36,7 @@ const UsersActivityDay: React.FC = () => {
       continue;
     }
 
-    if (activityDayKey.endsWith(key)) {
+    if (activityDayKey.endsWith(date)) {
       const payload = activityRequest.payload;
 
       activity[payload.userName] = typesafe.objectValues(payload.items);

@@ -2,7 +2,7 @@ import { UserActivityReviewDay } from '@dash/components';
 import type { StoryObj, Meta } from '@storybook/react';
 import type { ActivityItem } from '@dash/components';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
-import { props, testImgUrl, time } from '../../../story-helpers';
+import { activity, props, testImgUrl, time } from '../../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Users/Activity/UserActivityReviewDay', // eslint-disable-line

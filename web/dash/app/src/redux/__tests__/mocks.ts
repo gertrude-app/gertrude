@@ -9,6 +9,7 @@ import type {
   SuspendFilterRequest,
   GetIdentifiedApps,
   GetUsersActivityDay,
+  GetUsersActivityOverviews,
 } from '@dash/types';
 import type { ActivityItem } from '@dash/components';
 import * as empty from '../../redux/empty';
@@ -113,6 +114,17 @@ export function activityDay(
     date: start,
     totalItems,
     numApproved,
+  };
+}
+
+export function allUsersActivityOverviewItem(
+  override: Partial<GetUsersActivityOverviews.Output[number]> = {},
+): GetUsersActivityOverviews.Output[number] {
+  return {
+    userName: `Bob`,
+    userId: uuid(),
+    days: [activityDay(1, 1), activityDay(35, 25), activityDay(110, 1)],
+    ...override,
   };
 }
 

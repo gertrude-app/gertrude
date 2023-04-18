@@ -119,6 +119,9 @@ const noopClient: ApiClient = {
   getUserActivityDays: async () => {
     return Result.success({ userName: ``, days: [] });
   },
+  getUsersActivityOverviews: async () => {
+    return Result.success([]);
+  },
   getUsers: async () => {
     return Result.success([]);
   },
