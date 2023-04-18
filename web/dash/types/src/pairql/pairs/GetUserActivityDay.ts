@@ -37,6 +37,6 @@ export namespace GetUserActivityDay {
   export interface Output {
     userName: string;
     numDeleted: number;
-    items: Array<Item>;
+    items: Item[];
   }
 }

@@ -167,6 +167,16 @@ export const liveClient = {
     return query<T.GetUser.Input, T.GetUser.Output>(input, `admin`, `GetUser`);
   },
 
+  getUsersActivityDay(
+    input: T.GetUsersActivityDay.Input,
+  ): Promise<T.Result<T.GetUsersActivityDay.Output>> {
+    return query<T.GetUsersActivityDay.Input, T.GetUsersActivityDay.Output>(
+      input,
+      `admin`,
+      `GetUsersActivityDay`,
+    );
+  },
+
   getUserActivityDay(
     input: T.GetUserActivityDay.Input,
   ): Promise<T.Result<T.GetUserActivityDay.Output>> {
@@ -373,6 +383,9 @@ export const throwingClient: ApiClient = {
   },
   getUserActivityDay: () => {
     throw new Error(`ApiClient.getUserActivityDay() not implemented`);
+  },
+  getUsersActivityDay: () => {
+    throw new Error(`ApiClient.getUsersActivityDay() not implemented`);
   },
   getUserActivityDays: () => {
     throw new Error(`ApiClient.getUserActivityDays() not implemented`);

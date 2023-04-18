@@ -1,11 +1,13 @@
 import { expect, test, it, describe, vi } from 'vitest';
 import { Result } from '@dash/types';
+import { formatDate } from '@dash/datetime';
 import { Req, editable } from '../helpers';
 import Current from '../../environment';
 import reducer, {
   deleteActivityItems,
   deleteDevice,
   fetchActivityOverview,
+  fetchUsersActivityDay,
   newUserRouteVisited,
   upsertUser,
 } from '../slice-users';
@@ -109,6 +111,49 @@ describe(`upsertUser`, () => {
   });
 });
 
+describe(`fetchUsersActivityDays`, () => {
+  it(`sets the activityOverviews state correctly`, async () => {
+    let state = reducer(void 0, fetchUsersActivityOverviews.started({}));
+    expect(state.fetchAllActivityOverviews).toEqual(Req.ongoing());
+
+    state = reducer(
+      state,
+      fetchUsersActivityOverviews.succeeded(
+        [
+          {
+            userId: `123`,
+            userName: `Keith Heijnal`,
+            days: [
+              mock.activityDay(5, 2, `01-01-2022`),
+              mock.activityDay(11, 5, `01-05-2022`),
+            ],
+          },
+          {
+            userId: `456`,
+            userName: `John Lawrence`,
+            days: [],
+          },
+        ],
+        {},
+      ),
+    );
+
+    expect(state.activityOverviews).toEqual({
+      123: Req.succeed({
+        userName: `Keith Heijnal`,
+        days: [
+          mock.activityDay(11, 5, `01-05-2022`),
+          mock.activityDay(5, 2, `01-01-2022`),
+        ],
+      }),
+      456: Req.succeed({
+        userName: `John Lawrence`,
+        days: [],
+      }),
+    });
+  });
+});
+
 describe(`fetchActivityOverview`, () => {
   it(`filters out ranges with no items, and orders most recent first`, async () => {
     let state = reducer(void 0, fetchActivityOverview.started({ userId: `user123` }));
@@ -148,6 +193,7 @@ describe(`deleteActivityItems`, () => {
     const getState = makeGetState((state) => {
       state.users.activityDays = {
         'user123--01-01-2022': Req.succeed({
+          userName: `Bob Dylan`,
           numDeleted: 0,
           items: {
             item1: mock.keystrokeLine({ id: `item1` }),
@@ -158,13 +204,11 @@ describe(`deleteActivityItems`, () => {
     });
 
     deleteActivityItems({
-      userId: `user123`,
       date: new Date(`01-01-2022`),
       itemRootIds: [`item2`],
     })(vi.fn(), getState);
 
     expect(Current.api.deleteActivityItems).toHaveBeenCalledWith({
-      userId: `user123`,
       keystrokeLineIds: [`item2`, `item3`], // <-- deletes BOTH ids
       screenshotIds: [],
     });
@@ -174,6 +218,7 @@ describe(`deleteActivityItems`, () => {
     const state = makeState((state) => {
       state.users.activityDays = {
         'user123--01-01-2022': Req.succeed({
+          userName: `Josh`,
           numDeleted: 0,
           items: {
             item1: mock.keystrokeLine({ id: `item1` }),
@@ -188,7 +233,6 @@ describe(`deleteActivityItems`, () => {
       deleteActivityItems.succeeded(
         { success: true },
         {
-          userId: `user123`,
           date: new Date(`01-01-2022`),
           itemRootIds: [`item1`],
         },

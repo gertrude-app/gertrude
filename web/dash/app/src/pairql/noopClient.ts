@@ -113,6 +113,9 @@ const noopClient: ApiClient = {
   getUserActivityDay: async () => {
     return Result.success({ numDeleted: 0, userName: ``, items: [] });
   },
+  getUsersActivityDay: async () => {
+    return Result.success([]);
+  },
   getUserActivityDays: async () => {
     return Result.success({ userName: ``, days: [] });
   },

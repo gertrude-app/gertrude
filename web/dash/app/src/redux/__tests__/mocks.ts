@@ -8,6 +8,7 @@ import type {
   GetUserActivityDays,
   SuspendFilterRequest,
   GetIdentifiedApps,
+  GetUsersActivityDay,
 } from '@dash/types';
 import type { ActivityItem } from '@dash/components';
 import * as empty from '../../redux/empty';
@@ -112,6 +113,43 @@ export function activityDay(
     date: start,
     totalItems,
     numApproved,
+  };
+}
+
+export function allUsersActivityDay(
+  override: Partial<GetUsersActivityDay.Output[number]> = {},
+): GetUsersActivityDay.Output[number] {
+  const width = 700;
+  const height = 400;
+  const id = uuid();
+  return {
+    userName: `Bob`,
+    numDeleted: 0,
+    userId: uuid(),
+    items: [
+      {
+        type: `Screenshot`,
+        value: {
+          id: id,
+          ids: [id],
+          url: `https://placekitten.com/${width}/${height}`,
+          width: width,
+          height: height,
+          createdAt: new Date().toISOString(),
+        },
+      },
+      {
+        type: `CoalescedKeystrokeLine`,
+        value: {
+          id: id,
+          ids: [id, uuid(), uuid()],
+          appName: `Messages`,
+          line: `Sure, that'll do`,
+          createdAt: new Date().toISOString(),
+        },
+      },
+    ],
+    ...override,
   };
 }
 

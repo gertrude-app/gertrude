@@ -20,6 +20,7 @@ export * from './pairs/GetUnlockRequest';
 export * from './pairs/GetUnlockRequests';
 export * from './pairs/GetUser';
 export * from './pairs/GetUserActivityDay';
+export * from './pairs/GetUsersActivityDay';
 export * from './pairs/GetUserActivityDays';
 export * from './pairs/GetUsers';
 export * from './pairs/GetUserUnlockRequests';

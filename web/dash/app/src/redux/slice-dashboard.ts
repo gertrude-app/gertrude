@@ -4,7 +4,6 @@ import Current from '../environment';
 import { Req } from './helpers';
 import { createResultThunk } from './thunk';
 import { acceptUnlockRequest, rejectUnlockRequest } from './slice-unlock-requests';
-import { deleteActivityItems } from './slice-users';
 import { logoutRouteVisited } from './slice-auth';
 
 type Widgets = GetDashboardWidgets.Output;
@@ -55,16 +54,6 @@ export const slice = createSlice({
         payload.unlockRequests = payload.unlockRequests.filter(
           (unlockReq) => unlockReq.id !== action.meta.arg,
         );
-      }
-    });
-
-    builder.addCase(deleteActivityItems.succeeded, (state, { meta: { arg } }) => {
-      const payload = Req.payload(state.request);
-      if (!payload) return;
-      const user = payload.userActivitySummaries.find((user) => user.id === arg.userId);
-      if (user) {
-        // Math.max because new items may have streamed in since widget was loaded
-        user.numUnreviewed = Math.max(0, user.numUnreviewed - arg.itemRootIds.length);
       }
     });
   },

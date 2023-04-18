@@ -6,18 +6,20 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import type {
   KeychainSummary,
   GetUserActivityDays,
+  GetUserActivityDay,
   DateRangeInput,
   User,
   RequestState,
 } from '@dash/types';
 import Current from '../environment';
 import { entireDay } from '../lib/helpers';
-import { Req, toMap, toEditableMap, editable, commit } from './helpers';
+import { Req, toMap, toEditableMap, editable, commit, sortActivityDays } from './helpers';
 import { createResultThunk } from './thunk';
 import * as empty from './empty';
 import { logoutRouteVisited } from './slice-auth';
 
-interface ActivityDay {
+export interface ActivityDay {
+  userName: string;
   numDeleted: number;
   items: Record<UUID, ActivityItem>;
 }
@@ -36,6 +38,7 @@ type DeletableEntity = 'device' | 'user';
 export interface UsersState {
   listRequest: RequestState;
   entities: Record<UUID, Editable<User>>;
+  fetchAllUsersDay: Record<AllUsersActivityDayKey, RequestState>;
   fetchUserRequest: Record<UUID, RequestState>;
   updateUserRequest: Record<UUID, RequestState>;
   addDeviceRequest?: RequestState<number>;
@@ -50,6 +53,7 @@ export function initialState(): UsersState {
   return {
     listRequest: Req.idle(),
     entities: {},
+    fetchAllUsersDay: {},
     fetchUserRequest: {},
     updateUserRequest: {},
     activityOverviews: {},
@@ -135,24 +139,9 @@ export const slice = createSlice({
 
     builder.addCase(fetchActivityDay.succeeded, (state, { payload, meta: { arg } }) => {
       state.activityDays[activityDayKey(arg.userId, arg.day)] = Req.succeed({
+        userName: payload.userName,
         numDeleted: payload.numDeleted,
-        items: toMap(
-          payload.items.map((item) => {
-            if (item.type === `CoalescedKeystrokeLine`) {
-              return {
-                type: `KeystrokeLine`,
-                date: item.value.createdAt,
-                ...item.value,
-              };
-            } else {
-              return {
-                type: `Screenshot`,
-                date: item.value.createdAt,
-                ...item.value,
-              };
-            }
-          }),
-        ),
+        items: itemsToMap(payload.items),
       });
     });
 
@@ -220,18 +209,15 @@ export const slice = createSlice({
     });
 
     builder.addCase(deleteActivityItems.succeeded, (state, action) => {
-      const { userId, date, itemRootIds } = action.meta.arg;
-      const day = Req.payload(state.activityDays[activityDayKey(userId, date)]);
-      if (!day) {
-        return;
-      }
-
+      const { date, itemRootIds } = action.meta.arg;
+      for (const day of matchingActivityDays(state.activityDays, date)) {
       day.numDeleted += itemRootIds.length;
       for (const id of itemRootIds) {
         const item = day.items[id];
         if (item) {
           item.deleted = true;
         }
+      }
       }
     });
 
@@ -268,6 +254,27 @@ export const slice = createSlice({
     builder.addCase(createPendingAppConnection.failed, (state, { error }) => {
       state.addDeviceRequest = Req.fail(error);
     });
+    builder.addCase(fetchUsersActivityDay.started, (state, action) => {
+      state.fetchAllUsersDay[formatDate(action.meta.arg, `url`)] = Req.ongoing();
+    });
+
+    builder.addCase(fetchUsersActivityDay.succeeded, (state, { meta, payload }) => {
+      const date = formatDate(meta.arg, `url`);
+      state.fetchAllUsersDay[date] = Req.succeed(void 0);
+
+      for (const activity of payload) {
+        state.activityDays[activityDayKey(activity.userId, meta.arg)] = Req.succeed({
+          userName: activity.userName,
+          numDeleted: activity.numDeleted,
+          items: itemsToMap(activity.items),
+        });
+      }
+    });
+
+    builder.addCase(fetchUsersActivityDay.failed, (state, { meta, error }) => {
+      state.fetchAllUsersDay[formatDate(meta.arg, `url`)] = Req.fail(error);
+    });
+
   },
 });
 
@@ -286,6 +293,11 @@ export const fetchActivityOverview = createResultThunk(
       userId: arg.userId,
       dateRanges: arg.ranges ?? entireDays(14),
     }),
+);
+
+export const fetchUsersActivityDay = createResultThunk(
+  `${slice.name}/fetchUsersActivityDay`,
+  (arg: Date) => Current.api.getUsersActivityDay({ range: entireDay(arg) }),
 );
 
 export const fetchUsers = createResultThunk(
@@ -333,16 +345,11 @@ export const upsertUser = createResultThunk(
 
 export const deleteActivityItems = createResultThunk(
   `${slice.name}/deleteActivityItems`,
-  async (arg: { userId: UUID; date: Date; itemRootIds: UUID[] }, { getState }) => {
-    const key = activityDayKey(arg.userId, arg.date);
-    const day = Req.payload(getState().users.activityDays[key]);
-    if (!day) {
-      return Result.unexpectedError(`3a29c2c2`, `ActivityDay data not found`);
-    }
-
+  async (arg: { date: Date; itemRootIds: UUID[] }, { getState }) => {
     let keystrokeLineIds: UUID[] = [];
     const screenshotIds: UUID[] = [];
 
+    for (const day of matchingActivityDays(getState().users.activityDays, arg.date)) {
     for (const id of arg.itemRootIds) {
       const item = day.items[id];
       if (item?.type === `KeystrokeLine`) {
@@ -351,14 +358,30 @@ export const deleteActivityItems = createResultThunk(
         screenshotIds.push(item.id);
       }
     }
+    }
 
     return Current.api.deleteActivityItems({
-      userId: arg.userId,
       keystrokeLineIds,
       screenshotIds,
     });
   },
 );
+
+function matchingActivityDays(
+  activityDays: UsersState['activityDays'],
+  date: Date,
+): Array<ActivityDay> {
+  const formattedDate = formatDate(date, `url`);
+  const activityDaysSorted: Array<ActivityDay> = [];
+
+  for (const [key, day] of typesafe.objectEntries(activityDays)) {
+    if (!key.endsWith(formattedDate) || day.state !== `succeeded`) {
+      continue;
+    }
+    activityDaysSorted.push(day.payload);
+  }
+  return activityDaysSorted;
+}
 
 export const createPendingAppConnection = createResultThunk(
   `${slice.name}/createPendingAppConnection`,
@@ -384,12 +407,13 @@ export default slice.reducer;
 // helpers
 
 type ActivityDayKey = string;
+type AllUsersActivityDayKey = string;
 
 export function activityDayKey(userId: UUID, date: Date): ActivityDayKey {
   return `${userId}--${formatDate(date, `url`)}`;
 }
 
-function entireDays(numDays: number): DateRangeInput[] {
+export function entireDays(numDays: number): DateRangeInput[] {
   const now = new Date();
   const ranges: DateRangeInput[] = [];
   for (let i = 0; i < numDays; i++) {
@@ -398,4 +422,26 @@ function entireDays(numDays: number): DateRangeInput[] {
     ranges.push(entireDay(day));
   }
   return ranges;
+}
+
+function itemsToMap(items: GetUserActivityDay.Item[]): Record<UUID, ActivityItem> {
+  const newRecord = toMap(
+    items.map((item) => {
+      if (item.type === `CoalescedKeystrokeLine`) {
+        return {
+          type: `KeystrokeLine` as const,
+          date: item.value.createdAt,
+          ...item.value,
+        };
+      } else {
+        return {
+          type: `Screenshot` as const,
+          date: item.value.createdAt,
+          ...item.value,
+        };
+      }
+    }),
+  );
+
+  return newRecord;
 }

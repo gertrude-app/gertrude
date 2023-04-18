@@ -37,7 +37,7 @@ const UserActivityDay: React.FC = () => {
       date={day}
       numDeleted={request.payload.numDeleted}
       deleteItems={(itemRootIds) =>
-        dispatch(deleteActivityItems({ userId, date: day, itemRootIds }))
+        dispatch(deleteActivityItems({ date: day, itemRootIds }))
       }
       items={typesafe.objectValues(request.payload.items).filter((item) => !item.deleted)}
     />
