@@ -1,4 +1,4 @@
 export { MenuBar } from './MenuBar/MenuBar';
-export { default as NetworkTraffic } from './NetworkTraffic/NetworkTraffic';
+export { BlockedRequests } from './BlockedRequests/BlockedRequests';
 export { default as RequestSuspension } from './RequestSuspension/RequestSuspension';
 export { default as Administrate } from './Administrate/Administrate';
