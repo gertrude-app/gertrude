@@ -1,17 +1,17 @@
 import { Logo, TextInput } from '@shared/components';
 import { Modal, SelectableListItem } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Modal/Modal', // eslint-disable-line
   component: Modal,
   parameters: { layout: `fullscreen` },
-} as ComponentMeta<typeof Modal>;
+} satisfies Meta<typeof Modal>;
 
-const Template: StoryFn<typeof Modal> = (args) => <Modal {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   type: `default`,
   title: `Just fyi...`,
   isOpen: true,
@@ -25,33 +25,29 @@ Default.args = {
     </>
   ),
   icon: `info`,
-};
+});
 
-export const TinyError = Template.bind({});
-TinyError.args = {
+export const TinyError: Story = props({
   ...Default.args,
   title: `Error`,
   secondaryButton: undefined,
   children: `User not found`,
-};
+});
 
-export const Loading = Template.bind({});
-Loading.args = {
+export const Loading: Story = props({
   ...Default.args,
   loading: true,
-};
+});
 
-export const Destructive = Template.bind({});
-Destructive.args = {
+export const Destructive: Story = props({
   ...Default.args,
   type: `destructive`,
   title: `NOOOOOOOOO!!!`,
   icon: `exclamation-triangle`,
   primaryButton: { label: `Delete`, action: () => {} },
-};
+});
 
-export const Container = Template.bind({});
-Container.args = {
+export const Container: Story = props({
   ...Default.args,
   type: `container`,
   title: `Cute little container`,
@@ -77,10 +73,9 @@ Container.args = {
       ))}
     </div>
   ),
-};
+});
 
-export const ContainerAlt = Template.bind({});
-ContainerAlt.args = {
+export const ContainerAlt: Story = props({
   ...Container.args,
   icon: `hamburger`,
   title: `Struggling to think of a good title`,
@@ -131,4 +126,6 @@ ContainerAlt.args = {
       </div>
     </div>
   ),
-};
+});
+
+export default meta;

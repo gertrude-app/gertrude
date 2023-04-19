@@ -1,29 +1,27 @@
 import { RequestModal } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Modal/RequestModal', // eslint-disable-line
   component: RequestModal,
-} as ComponentMeta<typeof RequestModal>;
+} satisfies Meta<typeof RequestModal>;
 
-const Template: StoryFn<typeof RequestModal> = (args) => <RequestModal {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const Loading = Template.bind({});
-Loading.args = {
+export const Loading: Story = props({
   request: { state: `ongoing` },
   successTitle: `Success`,
   withPayload: (payload) => <h1>Got your payload here: {JSON.stringify(payload)}</h1>,
   primaryButton: () => {},
-};
+});
 
-export const Loaded = Template.bind({});
-Loaded.args = {
+export const Loaded: Story = props({
   ...Loading.args,
   request: { state: `succeeded`, payload: `123` },
-};
+});
 
-export const Error = Template.bind({});
-Error.args = {
+export const Error: Story = props({
   ...Loading.args,
   request: {
     state: `failed`,
@@ -34,4 +32,6 @@ Error.args = {
       userMessage: `Well shucks, we blew a gasket.`,
     },
   },
-};
+});
+
+export default meta;

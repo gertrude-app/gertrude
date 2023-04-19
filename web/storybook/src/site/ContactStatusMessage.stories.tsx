@@ -1,39 +1,36 @@
 import { ContactStatusMessage } from '@site/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../story-helpers';
 
-export default {
+const meta = {
   title: 'Site/ContactStatusMessage', // eslint-disable-line
   component: ContactStatusMessage,
-} as ComponentMeta<typeof ContactStatusMessage>;
+} satisfies Meta<typeof ContactStatusMessage>;
 
-const Template: StoryFn<typeof ContactStatusMessage> = (args) => (
-  <ContactStatusMessage {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const Info = Template.bind({});
-Info.args = {
+export const Info: Story = props({
   type: `info`,
   heading: `Just FYI...`,
   message: `Lorem ipsum dolor sit amet consectetur adipisicing elit.`,
-};
+});
 
-export const Success = Template.bind({});
-Success.args = {
+export const Success: Story = props({
   type: `success`,
   heading: `Something went right!`,
   message: `Lorem ipsum dolor sit amet consectetur adipisicing elit.`,
-};
+});
 
-export const Warning = Template.bind({});
-Warning.args = {
+export const Warning: Story = props({
   type: `warning`,
   heading: `Hmmm...`,
   message: `Lorem ipsum dolor sit amet consectetur adipisicing elit.`,
-};
+});
 
-export const Error = Template.bind({});
-Error.args = {
+export const Error: Story = props({
   type: `error`,
   heading: `Uh-oh, something awful happened`,
   message: `Lorem ipsum dolor sit amet consectetur adipisicing elit.`,
-};
+});
+
+export default meta;

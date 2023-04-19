@@ -1,18 +1,20 @@
 import { RadioGroup } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Forms/RadioGroup', // eslint-disable-line
   component: RadioGroup,
-} as ComponentMeta<typeof RadioGroup>;
+} satisfies Meta<typeof RadioGroup>;
 
-const Template: StoryFn<typeof RadioGroup> = (args) => <RadioGroup {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   options: [
     { display: `Option 1`, value: `option1` },
     { display: `Option 2`, value: `option2` },
   ],
   selectedOption: `option1`,
-};
+});
+
+export default meta;

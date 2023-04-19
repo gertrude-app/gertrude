@@ -1,4 +1,4 @@
-import type { ComponentMeta } from '@storybook/react';
+import type { Meta } from '@storybook/react';
 import SiteOgImage from './SiteOgImage';
 import LockdownGuideOgImage from './LockdownGuideOgImage';
 import FiveThingsYouForgotOgImage from './FiveThingsYouForgotOgImage';
@@ -21,7 +21,7 @@ export default {
       defaultViewport: `ogImage`,
     },
   },
-} as ComponentMeta<typeof SiteOgImage>;
+} satisfies Meta<typeof SiteOgImage>;
 
 export const Site = () => <SiteOgImage />;
 export const LockdownGuide = () => <LockdownGuideOgImage />;

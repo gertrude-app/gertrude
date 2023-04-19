@@ -1,15 +1,15 @@
 import { Combobox } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Forms/Combobox', // eslint-disable-line
   component: Combobox,
-} as ComponentMeta<typeof Combobox>;
+} satisfies Meta<typeof Combobox>;
 
-const Template: StoryFn<typeof Combobox> = (args) => <Combobox {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const Selected = Template.bind({});
-Selected.args = {
+export const Selected: Story = props({
   options: [
     { display: `Slack`, value: `app-1` },
     { display: `Chrome`, value: `app-2` },
@@ -28,10 +28,11 @@ Selected.args = {
     { display: `Microsoft Teams`, value: `app-15` },
   ],
   selected: { display: `Slack`, value: `app-1` },
-};
+});
 
-export const EmptySelected = Template.bind({});
-EmptySelected.args = {
+export const EmptySelected: Story = props({
   ...Selected.args,
   selected: { display: ``, value: `` },
-};
+});
+
+export default meta;

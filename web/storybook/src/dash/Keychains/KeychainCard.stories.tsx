@@ -1,16 +1,16 @@
 import { KeychainCard } from '@dash/components';
 import { Label } from '@shared/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Keychains/KeychainCard', // eslint-disable-line
   component: KeychainCard,
-} as ComponentMeta<typeof KeychainCard>;
+} satisfies Meta<typeof KeychainCard>;
 
-const Template: StoryFn<typeof KeychainCard> = (args) => <KeychainCard {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const ListPublic = Template.bind({});
-ListPublic.args = {
+export const ListPublic: Story = props({
   mode: `list`,
   name: `HTC`,
   numKeys: 43,
@@ -19,66 +19,58 @@ ListPublic.args = {
   onRemove: () => {},
   removeText: `Delete`,
   editUrl: `/`,
-};
+});
 
-export const ListPrivateNoEdit = Template.bind({});
-ListPrivateNoEdit.args = {
+export const ListPrivateNoEdit: Story = props({
   ...ListPublic.args,
   name: `Wilhite kids`,
   isPublic: false,
   editUrl: undefined,
   removeText: `Remove`,
-};
+});
 
-export const ListPublicNoEdit = Template.bind({});
-ListPublicNoEdit.args = {
+export const ListPublicNoEdit: Story = props({
   ...ListPublic.args,
   editUrl: undefined,
   removeText: `Remove`,
-};
+});
 
-export const ListPrivate = Template.bind({});
-ListPrivate.args = {
+export const ListPrivate: Story = props({
   ...ListPublic.args,
   name: `Wilhite kids`,
   isPublic: false,
-};
+});
 
-export const ListPrivateNoDescription = Template.bind({});
-ListPrivateNoDescription.args = {
+export const ListPrivateNoDescription: Story = props({
   ...ListPrivate.args,
   description: undefined,
   name: `Wilhite kids`,
   isPublic: false,
-};
+});
 
-export const SelectPrivate = Template.bind({});
-SelectPrivate.args = {
+export const SelectPrivate: Story = props({
   ...ListPrivate.args,
   mode: `select`,
   selected: false,
   onSelect: () => {},
   isPublic: false,
-};
+});
 
-export const SelectedPrivate = Template.bind({});
-SelectedPrivate.args = {
+export const SelectedPrivate: Story = props({
   ...SelectPrivate.args,
   selected: true,
-};
+});
 
-export const SelectPublic = Template.bind({});
-SelectPublic.args = {
+export const SelectPublic: Story = props({
   ...SelectPrivate.args,
   name: `HTC`,
   isPublic: true,
-};
+});
 
-export const SelectedPublic = Template.bind({});
-SelectedPublic.args = {
+export const SelectedPublic: Story = props({
   ...SelectPublic.args,
   selected: true,
-};
+});
 
 // @screenshot: xs/1200,sm/1200,md/1200
 export const Collection = () => (
@@ -104,3 +96,5 @@ export const Collection = () => (
     </div>
   </div>
 );
+
+export default meta;

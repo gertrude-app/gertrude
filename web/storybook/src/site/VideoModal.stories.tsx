@@ -1,16 +1,18 @@
 import { VideoModal } from '@site/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../story-helpers';
 
-export default {
+const meta = {
   title: 'Site/VideoModal', // eslint-disable-line
   component: VideoModal,
   parameters: { layout: `fullscreen` },
-} as ComponentMeta<typeof VideoModal>;
+} satisfies Meta<typeof VideoModal>;
 
-const Template: StoryFn<typeof VideoModal> = (args) => <VideoModal {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   onDismiss: () => {},
   videoId: `QgwxbbtA4wo`,
-};
+});
+
+export default meta;

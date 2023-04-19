@@ -1,14 +1,16 @@
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
 import AppIcon from './AppIcon';
 
-export default {
+const meta = {
   title: 'MacOS App/AppIcon', // eslint-disable-line
   component: AppIcon,
   parameters: {
     layout: `centered`,
   },
-} as ComponentMeta<typeof AppIcon>;
+} satisfies Meta<typeof AppIcon>;
 
-const Template: StoryFn<typeof AppIcon> = (args) => <AppIcon {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
+export const Default: Story = {};
+
+export default meta;

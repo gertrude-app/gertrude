@@ -1,42 +1,41 @@
 import { TextInput } from '@shared/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../story-helpers';
 
-export default {
+const meta = {
   title: 'Shared/TextInput', // eslint-disable-line
   component: TextInput,
-} as ComponentMeta<typeof TextInput>;
+  decorators: [(story) => <div className="max-w-sm">{story()}</div>],
+} satisfies Meta<typeof TextInput>;
 
-const Template: StoryFn<typeof TextInput> = (args) => (
-  <div>
-    <TextInput {...args} className="max-w-sm" />
-    <TextInput {...args} className="mt-5" />
-  </div>
-);
+type Story = StoryObj<typeof TextInput>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   type: `email`,
   label: `Email address`,
   placeholder: `you@example.com`,
-};
+  value: ``,
+  setValue: () => {},
+});
 
-export const WithUnit = Template.bind({});
-WithUnit.args = {
+export const WithUnit: Story = props({
+  ...Default.args,
   type: `positiveInteger`,
   label: `Interval`,
   unit: `seconds`,
-};
+});
 
-export const WithPrefix = Template.bind({});
-WithPrefix.args = {
+export const WithPrefix: Story = props({
+  ...Default.args,
   type: `text`,
   label: `URL`,
   prefix: `https://`,
-};
+});
 
-export const WithUnitAndPrefix = Template.bind({});
-WithUnitAndPrefix.args = {
+export const WithUnitAndPrefix: Story = props({
   ...WithPrefix.args,
   label: `Web address`,
   unit: `.com`,
-};
+});
+
+export default meta;

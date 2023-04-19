@@ -1,27 +1,27 @@
 import { RequestSuspension } from '@macos/appviews';
-import type { ComponentMeta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
+import type { ComponentProps as Wrapping } from 'react';
+import { props } from '../story-helpers';
 import AppWindow from './AppWindow';
 
-export default {
+const meta = {
   title: 'MacOS App/RequestSuspension', // eslint-disable-line
-  component: RequestSuspension,
-  parameters: {
-    layout: `centered`,
-  },
-} as ComponentMeta<typeof RequestSuspension>;
+  component: AppWindow<Wrapping<typeof RequestSuspension>>,
+  parameters: { layout: `centered` },
+} satisfies Meta<typeof AppWindow<Wrapping<typeof RequestSuspension>>>;
 
-const LightTemplate: StoryFn<typeof RequestSuspension> = (args) => (
-  <AppWindow width={600} height={400}>
-    <RequestSuspension {...args} />
-  </AppWindow>
-);
-export const LightMode = LightTemplate.bind({});
-LightMode.args = {};
+type Story = StoryObj<typeof meta>;
 
-const DarkTemplate: StoryFn<typeof RequestSuspension> = (args) => (
-  <AppWindow width={600} height={400} dark>
-    <RequestSuspension {...args} />
-  </AppWindow>
-);
-export const DarkMode = DarkTemplate.bind({});
-DarkMode.args = {};
+export const LightMode: Story = props({
+  width: 600,
+  height: 400,
+  wrapping: RequestSuspension,
+  props: {},
+});
+
+export const DarkMode: Story = props({
+  ...LightMode.args,
+  dark: true,
+});
+
+export default meta;

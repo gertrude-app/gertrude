@@ -1,15 +1,33 @@
 import { Button } from '@shared/components';
-import type { ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
 
-export default {
+const meta = {
   title: 'Shared/Button', // eslint-disable-line
   component: Button,
-  parameters: {
-    layout: `fullscreen`,
-  },
-} as ComponentMeta<typeof Button>;
+  parameters: { layout: `fullscreen` },
+} satisfies Meta<typeof Button>;
+
+type Story = StoryObj<typeof Button>;
+
+export const Primary: Story = { render: () => <ButtonStory color="primary" /> };
+export const Secondary: Story = { render: () => <ButtonStory color="secondary" /> };
+export const Tertiary: Story = { render: () => <ButtonStory color="tertiary" /> };
+export const Warning: Story = { render: () => <ButtonStory color="warning" /> };
+export const Disabled: Story = { render: () => <ButtonStory color="warning" disabled /> };
+export const PrimaryOnVioletBg: Story = {
+  render: () => <ButtonStory color="primary-on-violet-bg" />,
+};
+export const SecondaryOnVioletBg: Story = {
+  render: () => <ButtonStory color="secondary-on-violet-bg" />,
+};
+
+// helpers
 
 type ButtonColor = React.ComponentProps<typeof Button>['color'];
+
+function bgColor(color: ButtonColor): string {
+  return color.includes(`on-violet-bg`) ? `bg-violet-500` : `bg-white`;
+}
 
 const ButtonStory: React.FC<{ color: ButtonColor; disabled?: boolean }> = ({
   color,
@@ -100,14 +118,4 @@ const ButtonStory: React.FC<{ color: ButtonColor; disabled?: boolean }> = ({
   </div>
 );
 
-export const PrimaryOnVioletBg = () => <ButtonStory color="primary-on-violet-bg" />;
-export const SecondaryOnVioletBg = () => <ButtonStory color="secondary-on-violet-bg" />;
-export const Primary = () => <ButtonStory color="primary" />;
-export const Secondary = () => <ButtonStory color="secondary" />;
-export const Tertiary = () => <ButtonStory color="tertiary" />;
-export const Warning = () => <ButtonStory color="warning" />;
-export const Disabled = () => <ButtonStory color="warning" disabled />;
-
-function bgColor(color: ButtonColor): string {
-  return color.includes(`on-violet-bg`) ? `bg-violet-500` : `bg-white`;
-}
+export default meta;

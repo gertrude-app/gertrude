@@ -1,36 +1,33 @@
 import { UserActivityWidget } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
-import { withIdsAnd } from '../../story-helpers';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props, withIdsAnd } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Dashboard/Widgets/UserActivity', // eslint-disable-line
   component: UserActivityWidget,
-} as ComponentMeta<typeof UserActivityWidget>;
+} satisfies Meta<typeof UserActivityWidget>;
 
-const Template: StoryFn<typeof UserActivityWidget> = (args) => (
-  <UserActivityWidget {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   userActivity: withIdsAnd({ numReviewed: 0 }, [
     { name: `Little Jimmy`, numUnreviewed: 245 },
     { name: `Sally`, numUnreviewed: 0 },
     { name: `Henry`, numUnreviewed: 23 },
   ]),
-};
+});
 
 // @screenshot: xs/250
-export const AllCaughtUp = Template.bind({});
-AllCaughtUp.args = {
+export const AllCaughtUp: Story = props({
   userActivity: withIdsAnd({ numReviewed: 0 }, [
     { name: `Little Jimmy`, numUnreviewed: 0 },
     { name: `Sally`, numUnreviewed: 0 },
     { name: `Henry`, numUnreviewed: 0 },
   ]),
-};
+});
 
-export const NoUsers = Template.bind({});
-NoUsers.args = {
+export const NoUsers: Story = props({
   userActivity: [],
-};
+});
+
+export default meta;

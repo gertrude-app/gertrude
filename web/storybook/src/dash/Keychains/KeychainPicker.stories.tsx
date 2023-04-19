@@ -1,11 +1,25 @@
 import { Modal, KeychainPicker } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
-import { keychainProps, keychains } from '../../story-helpers';
+import type { StoryObj, Meta } from '@storybook/react';
+import { keychainProps, keychains, props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Keychains/KeychainPicker', // eslint-disable-line
   component: KeychainPicker,
-} as ComponentMeta<typeof KeychainPicker>;
+  decorators: [
+    (Story) => (
+      <Modal
+        type="container"
+        title="Select a keychain"
+        primaryButton={{ label: `Add keychain`, action: () => {} }}
+        secondaryButton={() => {}}
+      >
+        <Story />
+      </Modal>
+    ),
+  ],
+} satisfies Meta<typeof KeychainPicker>;
+
+type Story = StoryObj<typeof meta>;
 
 const publicKeychains = [
   keychainProps({ name: `HTC`, numKeys: 232, isPublic: true }),
@@ -13,65 +27,56 @@ const publicKeychains = [
   keychainProps({ name: `Gertrude.com`, numKeys: 1, isPublic: true }),
 ];
 
-const Template: StoryFn<typeof KeychainPicker> = (args) => (
-  <Modal
-    type="container"
-    title="Select a keychain"
-    primaryButton={{ label: `Add keychain`, action: () => {} }}
-    secondaryButton={() => {}}
-  >
-    <KeychainPicker {...args} />
-  </Modal>
-);
-
 // @screenshot: xs/1300,lg/900
-export const AddToUserHappyPath = Template.bind({});
-AddToUserHappyPath.args = {
+export const AddToUserHappyPath: Story = props({
   mode: `addToUser`,
+  userName: `Little Jimmy`,
+  userId: `1234`,
+  hasNoOwnKeychains: false,
   selectableOwnKeychains: keychains.filter((kc) => !kc.isPublic),
   selectablePublicKeychains: publicKeychains,
-};
+});
 
 // @screenshot: xs/1000,lg
-export const AddToUserNoOwnKeychains = Template.bind({});
-AddToUserNoOwnKeychains.args = {
+export const AddToUserNoOwnKeychains: Story = props({
   ...AddToUserHappyPath.args,
   hasNoOwnKeychains: true,
   selectableOwnKeychains: [],
-};
+});
 
 // @screenshot: xs/1000,lg
-export const AddToUserHasAllPersonalKeychains = Template.bind({});
-AddToUserHasAllPersonalKeychains.args = {
+export const AddToUserHasAllPersonalKeychains: Story = props({
   ...AddToUserHappyPath.args,
   hasNoOwnKeychains: false,
   selectableOwnKeychains: [],
   userName: `Little Jimmy`,
-};
+});
 
-export const ForUnlockRequestHappyPath = Template.bind({});
-ForUnlockRequestHappyPath.args = {
+export const ForUnlockRequestHappyPath: Story = props({
   mode: `forUnlockRequestKey`,
+  userName: `Little Jimmy`,
+  userId: `1234`,
   hasNoOwnKeychains: false,
   selectableOwnKeychains: keychains.filter((kc) => !kc.isPublic),
-};
+  selectablePublicKeychains: publicKeychains,
+});
 
 // @screenshot: xs
-export const ForUnlockRequestNoPersonalKeychains = Template.bind({});
-ForUnlockRequestNoPersonalKeychains.args = {
+export const ForUnlockRequestNoPersonalKeychains: Story = props({
   ...ForUnlockRequestHappyPath.args,
   mode: `forUnlockRequestKey`,
   hasNoOwnKeychains: true,
   userName: `Little Jimmy`,
   selectableOwnKeychains: [],
-};
+});
 
 // @screenshot: xs
-export const ForUnlockRequestUserNeedsAKeychain = Template.bind({});
-ForUnlockRequestUserNeedsAKeychain.args = {
+export const ForUnlockRequestUserNeedsAKeychain: Story = props({
   ...ForUnlockRequestHappyPath.args,
   mode: `forUnlockRequestKey`,
   hasNoOwnKeychains: false,
   userName: `Little Jimmy`,
   selectableOwnKeychains: [],
-};
+});
+
+export default meta;

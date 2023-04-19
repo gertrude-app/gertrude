@@ -1,25 +1,30 @@
 import { FullscreenModalForm, LoginForm } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Unauthed/LoginForm', // eslint-disable-line
   component: LoginForm,
   parameters: { layout: `fullscreen` },
-} as ComponentMeta<typeof LoginForm>;
+  decorators: [
+    (Story) => (
+      <FullscreenModalForm request="idle">
+        <Story />
+      </FullscreenModalForm>
+    ),
+  ],
+} satisfies Meta<typeof LoginForm>;
 
-const Template: StoryFn<typeof LoginForm> = (args) => (
-  <FullscreenModalForm request="idle">
-    <LoginForm {...args} />
-  </FullscreenModalForm>
-);
+type Story = StoryObj<typeof meta>;
 
 // @screenshot: xs,md
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   email: ``,
   setEmail: () => {},
   password: ``,
   setPassword: () => {},
   onSubmit: () => {},
   onSendMagicLink: () => {},
-};
+});
+
+export default meta;

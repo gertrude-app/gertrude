@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import { MenuBar } from '@macos/appviews';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react';
 
 export default {
   title: 'MacOS App/MenuBar', // eslint-disable-line
@@ -9,7 +9,7 @@ export default {
   parameters: {
     layout: `centered`,
   },
-} as ComponentMeta<typeof MenuBar>;
+} satisfies Meta<typeof MenuBar>;
 
 type MenuBarWrapperProps = {
   colors: string;

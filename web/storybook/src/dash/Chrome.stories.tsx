@@ -1,37 +1,35 @@
 import { Chrome } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Core/Chrome', // eslint-disable-line
   component: Chrome,
   parameters: { layout: `fullscreen` },
-} as ComponentMeta<typeof Chrome>;
+} satisfies Meta<typeof Chrome>;
 
-const Template: StoryFn<typeof Chrome> = (args) => (
-  <Chrome {...args}>
-    <h1 className="text-center">Page content here...</h1>
-  </Chrome>
-);
+type Story = StoryObj<typeof meta>;
 
 // @screenshot
-export const Open = Template.bind({});
-Open.args = {
+export const Open: Story = props({
   mobileSidebarOpen: true,
   onMobileHamburgerClick: () => {},
   onMobileSidebarClose: () => {},
   sidebarCollapsed: false,
   onToggleSidebarCollapsed: () => {},
+  onInternalLinkClick: () => {},
   urlPath: `/`,
-};
+  children: <h1 className="text-center">Page content here...</h1>,
+});
 
-export const Closed = Template.bind({});
-Closed.args = {
+export const Closed: Story = props({
   ...Open.args,
   mobileSidebarOpen: false,
-};
+});
 
-export const Collapsed = Template.bind({});
-Collapsed.args = {
+export const Collapsed: Story = props({
   ...Open.args,
   sidebarCollapsed: true,
-};
+});
+
+export default meta;

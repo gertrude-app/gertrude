@@ -27,17 +27,19 @@ export default ${Component};
 `;
 
 const storyFile = `import { ${Component} } from '@${scope}/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../story-helpers';
 
-export default {
+const meta = {
   title: '${Component}', // eslint-disable-line
   component: ${Component},
-} as ComponentMeta<typeof ${Component}>;
+} satisfies Meta<typeof ${Component}>;
 
-const Template: StoryFn<typeof ${Component}> = (args) => <${Component} {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {}
+export const Default: Story = props({})
+
+export default meta;
 `;
 
 fs.writeFileSync(`./${scope}/components/src/${Component}.tsx`, componentFile);

@@ -1,13 +1,13 @@
 import { QuickActionsWidget } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
 
-export default {
+const meta = {
   title: 'Dashboard/Dashboard/Widgets/QuickActionsWidget', // eslint-disable-line
   component: QuickActionsWidget,
-} as ComponentMeta<typeof QuickActionsWidget>;
+} satisfies Meta<typeof QuickActionsWidget>;
 
-const Template: StoryFn<typeof QuickActionsWidget> = (args) => (
-  <QuickActionsWidget {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
+export const Default: Story = {};
+
+export default meta;

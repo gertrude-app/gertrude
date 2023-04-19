@@ -1,20 +1,23 @@
 import { EmailInputForm } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Unauthed/EmailInputForm', // eslint-disable-line
   component: EmailInputForm,
   parameters: { layout: `centered` },
-} as ComponentMeta<typeof EmailInputForm>;
+  decorators: [(story) => <div className="max-w-md">{story()}</div>],
+} satisfies Meta<typeof EmailInputForm>;
 
-const Template: StoryFn<typeof EmailInputForm> = (args) => (
-  <div className="max-w-md">
-    <EmailInputForm {...args} />
-  </div>
-);
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   title: `Join the waitlist`,
   subTitle: `We'll notify you when you can begin trying out Gertrude`,
-};
+  email: ``,
+  setEmail: () => {},
+  setPassword: () => {},
+  onSubmit: () => {},
+});
+
+export default meta;

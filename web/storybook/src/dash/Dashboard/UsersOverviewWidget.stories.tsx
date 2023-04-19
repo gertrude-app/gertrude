@@ -1,26 +1,24 @@
 import { UsersOverviewWidget } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
-import { withIds } from '../../story-helpers';
+import type { StoryObj, Meta } from '@storybook/react';
+import { withIds, props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Dashboard/Widgets/UserOverview', // eslint-disable-line
   component: UsersOverviewWidget,
-} as ComponentMeta<typeof UsersOverviewWidget>;
+} satisfies Meta<typeof UsersOverviewWidget>;
 
-const Template: StoryFn<typeof UsersOverviewWidget> = (args) => (
-  <UsersOverviewWidget {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   users: withIds([
     { name: `Little Jimmy`, isOnline: true },
     { name: `Sally`, isOnline: true },
     { name: `Henry`, isOnline: false },
   ]),
-};
+});
 
-export const NoUsers = Template.bind({});
-NoUsers.args = {
+export const NoUsers: Story = props({
   users: [],
-};
+});
+
+export default meta;

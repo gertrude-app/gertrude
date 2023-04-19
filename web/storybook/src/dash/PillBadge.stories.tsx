@@ -1,12 +1,7 @@
 import { PillBadge } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
 
-export default {
-  title: 'Dashboard/Core/PillBadge', // eslint-disable-line
-  component: PillBadge,
-} as ComponentMeta<typeof PillBadge>;
-
-const All: React.FC = () => (
+const PillBadges: React.FC = () => (
   <div className="space-y-6">
     <PillBadge type="info">info</PillBadge>
     <PillBadge type="blue">blue</PillBadge>
@@ -25,7 +20,14 @@ const All: React.FC = () => (
   </div>
 );
 
-const Template: StoryFn<typeof PillBadge> = () => <All />;
+const meta = {
+  title: 'Dashboard/Core/PillBadge', // eslint-disable-line
+  component: PillBadges,
+} satisfies Meta<typeof PillBadges>;
+
+type Story = StoryObj<typeof meta>;
 
 // @screenshot: xs
-export const List = Template.bind({});
+export const List: Story = {};
+
+export default meta;

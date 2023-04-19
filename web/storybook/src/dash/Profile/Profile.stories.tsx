@@ -1,17 +1,17 @@
 import { Profile } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { withIdsAnd, confirmableEntityAction } from '../../story-helpers';
+import { withIdsAnd, confirmableEntityAction, props } from '../../story-helpers';
 import { Email as CardStory } from './NotificationCard.stories';
 
-export default {
+const meta = {
   title: 'Dashboard/Profile/Profile', // eslint-disable-line
   component: Profile,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
-} as ComponentMeta<typeof Profile>;
+} satisfies Meta<typeof Profile>;
 
-const Template: StoryFn<typeof Profile> = (args) => <Profile {...args} />;
+type Story = StoryObj<typeof meta>;
 
 const notificationProps = {
   methodOptions: CardStory.args?.methodOptions!,
@@ -21,8 +21,7 @@ const notificationProps = {
 };
 
 // @screenshot: xs,md
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   email: `johndoe@example.com`,
   status: `active`,
   methods: withIdsAnd({ deletable: false }, [
@@ -68,11 +67,10 @@ Default.args = {
   deleteMethod: confirmableEntityAction(),
   deleteNotification: confirmableEntityAction(),
   billingPortalRequest: { state: `idle` },
-};
+});
 
 // @screenshot: xs,md
-export const AddingMethod = Template.bind({});
-AddingMethod.args = {
+export const AddingMethod: Story = props({
   ...Default.args,
   pendingMethod: {
     type: `Email`,
@@ -81,11 +79,10 @@ AddingMethod.args = {
     confirmationRequest: { state: `idle` },
     confirmationCode: `333243`,
   },
-};
+});
 
 // @screenshot: xs,md
-export const AddingMethodVerifying = Template.bind({});
-AddingMethodVerifying.args = {
+export const AddingMethodVerifying: Story = props({
   ...Default.args,
   pendingMethod: {
     type: `Email`,
@@ -94,4 +91,6 @@ AddingMethodVerifying.args = {
     confirmationRequest: { state: `idle` },
     confirmationCode: `333234`,
   },
-};
+});
+
+export default meta;

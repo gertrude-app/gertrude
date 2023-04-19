@@ -1,17 +1,15 @@
 import { ConfirmDestructiveAction } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Modal/ConfirmDestructiveAction', // eslint-disable-line
   component: ConfirmDestructiveAction,
-} as ComponentMeta<typeof ConfirmDestructiveAction>;
+} satisfies Meta<typeof ConfirmDestructiveAction>;
 
-const Template: StoryFn<typeof ConfirmDestructiveAction> = (args) => (
-  <ConfirmDestructiveAction {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   openWhenPresent: `some-id`,
   onConfirm: () => {},
   onDismiss: () => {},
@@ -21,4 +19,6 @@ Default.args = {
       Are you <b>sure?</b> There is no undo.
     </>
   ),
-};
+});
+
+export default meta;

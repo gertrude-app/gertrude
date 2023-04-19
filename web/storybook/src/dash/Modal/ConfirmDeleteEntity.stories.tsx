@@ -1,18 +1,16 @@
 import { ConfirmDeleteEntity } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Modal/ConfirmDeleteEntity', // eslint-disable-line
   component: ConfirmDeleteEntity,
   parameters: { layout: `fullscreen` },
-} as ComponentMeta<typeof ConfirmDeleteEntity>;
+} satisfies Meta<typeof ConfirmDeleteEntity>;
 
-const Template: StoryFn<typeof ConfirmDeleteEntity> = (args) => (
-  <ConfirmDeleteEntity {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   type: `widget`,
   action: {
     id: `some-id`,
@@ -20,4 +18,6 @@ Default.args = {
     confirm: () => {},
     cancel: () => {},
   },
-};
+});
+
+export default meta;

@@ -1,22 +1,21 @@
 import { NotificationCard } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Profile/NotificationCard', // eslint-disable-line
   component: NotificationCard,
-} as ComponentMeta<typeof NotificationCard>;
+} satisfies Meta<typeof NotificationCard>;
 
-const Template: StoryFn<typeof NotificationCard> = (args) => (
-  <NotificationCard {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const Email = Template.bind({});
-Email.args = {
+export const Email: Story = props({
   selectedMethod: {
     type: `VerifiedEmailMethod`,
     value: { id: `1`, email: `me@example.com` },
   },
   trigger: `unlockRequestSubmitted`,
+  saveButtonDisabled: false,
   editing: false,
   onDelete: () => {},
   startEdit: () => {},
@@ -28,20 +27,18 @@ Email.args = {
     { display: `Text (555) 555-5555`, value: `2` },
     { display: `Slack #Gertrude`, value: `3` },
   ],
-};
+});
 
-export const Text = Template.bind({});
-Text.args = {
+export const Text: Story = props({
   ...Email.args,
   selectedMethod: {
     type: `VerifiedTextMethod`,
     value: { id: `2`, phoneNumber: `(123) 456-7890` },
   },
   trigger: `unlockRequestSubmitted`,
-};
+});
 
-export const Slack = Template.bind({});
-Slack.args = {
+export const Slack: Story = props({
   ...Email.args,
   selectedMethod: {
     type: `VerifiedSlackMethod`,
@@ -53,4 +50,6 @@ Slack.args = {
     },
   },
   trigger: `suspendFilterRequestSubmitted`,
-};
+});
+
+export default meta;

@@ -1,18 +1,15 @@
 import { UserScreenshotsWidget } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
-import { withIds, time, testImgUrl } from '../../story-helpers';
+import type { StoryObj, Meta } from '@storybook/react';
+import { withIds, props, time, testImgUrl } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Dashboard/Widgets/UserScreenshots', // eslint-disable-line
   component: UserScreenshotsWidget,
-} as ComponentMeta<typeof UserScreenshotsWidget>;
+} satisfies Meta<typeof UserScreenshotsWidget>;
 
-const Template: StoryFn<typeof UserScreenshotsWidget> = (args) => (
-  <UserScreenshotsWidget {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   screenshots: withIds([
     {
       userName: `Little Jimmy`,
@@ -30,10 +27,9 @@ Default.args = {
       createdAt: time.subtracting({ minutes: 4 }),
     },
   ]),
-};
+});
 
-export const WithWideDisplay = Template.bind({});
-WithWideDisplay.args = {
+export const WithWideDisplay: Story = props({
   screenshots: withIds([
     {
       userName: `Little Jimmy`,
@@ -51,4 +47,6 @@ WithWideDisplay.args = {
       createdAt: time.subtracting({ minutes: 4 }),
     },
   ]),
-};
+});
+
+export default meta;

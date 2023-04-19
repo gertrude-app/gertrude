@@ -1,18 +1,15 @@
 import { UnlockRequestsWidget } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
-import { time, withIdsAnd } from '../../story-helpers';
+import type { StoryObj, Meta } from '@storybook/react';
+import { time, withIdsAnd, props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Dashboard/Widgets/UnlockRequests', // eslint-disable-line
   component: UnlockRequestsWidget,
-} as ComponentMeta<typeof UnlockRequestsWidget>;
+} satisfies Meta<typeof UnlockRequestsWidget>;
 
-const Template: StoryFn<typeof UnlockRequestsWidget> = (args) => (
-  <UnlockRequestsWidget {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   unlockRequests: withIdsAnd({ userId: `user1` }, [
     {
       target: `gitlab.io`,
@@ -37,10 +34,9 @@ Default.args = {
       createdAt: time.subtracting({ days: 14 }),
     },
   ]),
-};
+});
 
-export const JustOne = Template.bind({});
-JustOne.args = {
+export const JustOne: Story = props({
   unlockRequests: [
     {
       id: `1`,
@@ -51,10 +47,9 @@ JustOne.args = {
       createdAt: time.now(),
     },
   ],
-};
+});
 
-export const JustTwo = Template.bind({});
-JustTwo.args = {
+export const JustTwo: Story = props({
   unlockRequests: withIdsAnd({ userId: `user1` }, [
     {
       target: `gitlab.io`,
@@ -69,10 +64,9 @@ JustTwo.args = {
       createdAt: time.subtracting({ days: 14 }),
     },
   ]),
-};
+});
 
-export const Lots = Template.bind({});
-Lots.args = {
+export const Lots: Story = props({
   unlockRequests: withIdsAnd({ userId: `user1` }, [
     {
       target: `gitlab.io`,
@@ -147,4 +141,6 @@ Lots.args = {
       createdAt: time.subtracting({ days: 14 }),
     },
   ]),
-};
+});
+
+export default meta;

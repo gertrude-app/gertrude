@@ -1,65 +1,64 @@
 import { Administrate } from '@macos/appviews';
-import type { ComponentMeta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
+import type { ComponentProps as Wrapping } from 'react';
+import { props } from '../story-helpers';
 import AppWindow from './AppWindow';
 
-export default {
+const meta = {
   title: 'MacOS App/Administrate', // eslint-disable-line
-  component: Administrate,
-  parameters: {
-    layout: `centered`,
+  component: AppWindow<Wrapping<typeof Administrate>>,
+  parameters: { layout: `centered` },
+} satisfies Meta<typeof AppWindow<Wrapping<typeof Administrate>>>;
+
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+
+export const LightModeChecksPassing: Story = props({
+  width: 900,
+  height: 530,
+  wrapping: Administrate,
+  props: {
+    healthCheck: {
+      appVersion: `0.5.0`,
+      mostRecentAppVersion: `0.5.0`,
+      filterVersion: `0.5.0`,
+      mostRecentFilterVersion: `0.5.0`,
+      screenRecordingPermission: true,
+      keystrokeRecordingPermission: true,
+      isAdministrator: false,
+      filterToAppCommunicationVerified: true,
+      notificationSetting: `alert`,
+      accountStatus: `active`,
+      keysLoaded: 23,
+    },
+    filterStatus: `on`,
+    userName: `Little Jimmy`,
+    screenshotMonitoringEnabled: true,
+    keystrokeMonitoringEnabled: false,
   },
-} as ComponentMeta<typeof Administrate>;
+});
 
-const LightTemplate: StoryFn<typeof Administrate> = (args) => (
-  <AppWindow width={900} height={530}>
-    <Administrate {...args} />
-  </AppWindow>
-);
-
-export const LightModeChecksPassing = LightTemplate.bind({});
-LightModeChecksPassing.args = {
-  healthCheck: {
-    appVersion: `0.5.0`,
-    mostRecentAppVersion: `0.5.0`,
-    filterVersion: `0.5.0`,
-    mostRecentFilterVersion: `0.5.0`,
-    screenRecordingPermission: true,
-    keystrokeRecordingPermission: true,
-    isAdministrator: false,
-    filterToAppCommunicationVerified: true,
-    notificationSetting: `alert`,
-    accountStatus: `active`,
-    keysLoaded: 23,
-  },
-  filterStatus: `on`,
-  userName: `Little Jimmy`,
-  screenshotMonitoringEnabled: true,
-  keystrokeMonitoringEnabled: false,
-};
-
-export const LightModeChecksFailing = LightTemplate.bind({});
-LightModeChecksFailing.args = {
+export const LightModeChecksFailing: Story = props({
   ...LightModeChecksPassing.args,
-  healthCheck: {
-    ...LightModeChecksPassing.args.healthCheck!,
-    appVersion: `0.4.12`,
-    screenRecordingPermission: false,
-    notificationSetting: `banners`,
+  props: {
+    ...LightModeChecksPassing.args.props,
+    healthCheck: {
+      ...LightModeChecksPassing.args.props.healthCheck,
+      appVersion: `0.4.12`,
+      screenRecordingPermission: false,
+      notificationSetting: `banners`,
+    },
+    filterStatus: `suspended`,
   },
-  filterStatus: `suspended`,
-};
+});
 
-const DarkTemplate: StoryFn<typeof Administrate> = (args) => (
-  <AppWindow width={900} height={530} dark>
-    <Administrate {...args} />
-  </AppWindow>
-);
-
-export const DarkModeChecksPassing = DarkTemplate.bind({});
-DarkModeChecksPassing.args = {
+export const DarkModeChecksPassing: Story = props({
   ...LightModeChecksPassing.args,
-};
-export const DarkModeChecksFailing = DarkTemplate.bind({});
-DarkModeChecksFailing.args = {
+  dark: true,
+});
+
+export const DarkModeChecksFailing: Story = props({
   ...LightModeChecksFailing.args,
-};
+  dark: true,
+});

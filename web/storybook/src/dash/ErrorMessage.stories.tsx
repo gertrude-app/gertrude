@@ -1,17 +1,20 @@
 import { ErrorMessage } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Core/ErrorMessage', // eslint-disable-line
   component: ErrorMessage,
-} as ComponentMeta<typeof ErrorMessage>;
+} satisfies Meta<typeof ErrorMessage>;
 
-const Template: StoryFn<typeof ErrorMessage> = (args) => <ErrorMessage {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = { children: `Something went wrong!` };
+export const Default: Story = props({
+  children: `Something went wrong!`,
+});
 
-export const LongMessage = Template.bind({});
-LongMessage.args = {
+export const LongMessage: Story = props({
   children: `EADDRINUSE: Really sorry about this, but it seems like something (or several things) went wrong! Maybe you should check the specs on the rotary girder!`,
-};
+});
+
+export default meta;

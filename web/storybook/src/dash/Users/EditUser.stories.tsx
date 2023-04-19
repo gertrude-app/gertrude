@@ -1,20 +1,21 @@
 import { EditUser } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { confirmableEntityAction, keychainProps } from '../../story-helpers';
+import { confirmableEntityAction, props, keychainProps } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Users/EditUser', // eslint-disable-line
   component: EditUser,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },
-} as ComponentMeta<typeof EditUser>;
+} satisfies Meta<typeof EditUser>;
 
-const Template: StoryFn<typeof EditUser> = (args) => <EditUser {...args} />;
+type Story = StoryObj<typeof meta>;
 
 // @screenshot: xs,md
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
+  id: `1`,
+  isNew: false,
   name: `Little Jimmy`,
   setName: () => {},
   keyloggingEnabled: false,
@@ -25,6 +26,8 @@ Default.args = {
   setScreenshotsFrequency: () => {},
   screenshotsResolution: 1000,
   setScreenshotsResolution: () => {},
+  saveButtonDisabled: true,
+  onSave: () => {},
   onConfirmAddKeychain: () => {},
   onDismissAddKeychain: () => {},
   onAddKeychainClicked: () => {},
@@ -40,4 +43,6 @@ Default.args = {
     { id: `1`, model: `M1 MacbookAir (2021)`, status: `online`, icon: `laptop` },
     { id: `2`, model: `Mac Mini (2018)`, status: `offline`, icon: `desktop` },
   ],
-};
+});
+
+export default meta;

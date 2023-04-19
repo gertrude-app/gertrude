@@ -1,20 +1,18 @@
 import { EmailInputForm, FullscreenModalForm } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Unauthed/FullscreenModalForm', // eslint-disable-line
   component: FullscreenModalForm,
   parameters: {
     layout: `fullscreen`,
   },
-} as ComponentMeta<typeof FullscreenModalForm>;
+} satisfies Meta<typeof FullscreenModalForm>;
 
-const Template: StoryFn<typeof FullscreenModalForm> = (args) => (
-  <FullscreenModalForm {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   request: `idle`,
   children: (
     <EmailInputForm
@@ -25,21 +23,22 @@ Default.args = {
       onSubmit={() => {}}
     />
   ),
-};
+});
 
-export const Fetching = Template.bind({});
-Fetching.args = { request: `ongoing` };
+export const Fetching: Story = props({
+  request: `ongoing`,
+});
 
 // @screenshot: xs,md
-export const Succeeded = Template.bind({});
-Succeeded.args = {
+export const Succeeded: Story = props({
   request: `succeeded`,
   message: `Success! Check your email for a verification link.`,
-};
+});
 
 // @screenshot: xs,md
-export const Failed = Template.bind({});
-Failed.args = {
+export const Failed: Story = props({
   request: `failed`,
   error: `Something went wrong. Please try again.`,
-};
+});
+
+export default meta;
