@@ -1,4 +1,4 @@
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react';
 import DmgBackground from './DmgBackground';
 
 export default {
@@ -19,7 +19,7 @@ export default {
       defaultViewport: `dmgWindow`,
     },
   },
-} as ComponentMeta<typeof DmgBackground>;
+} satisfies Meta<typeof DmgBackground>;
 
 const Template: StoryFn<typeof DmgBackground> = (args) => <DmgBackground {...args} />;
 

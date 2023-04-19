@@ -1,31 +1,30 @@
 import { DaySummaryCard } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
-import { time } from '../../../story-helpers';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props, time } from '../../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Users/Activity/DaySummaryCard', // eslint-disable-line
   component: DaySummaryCard,
-} as ComponentMeta<typeof DaySummaryCard>;
+} satisfies Meta<typeof DaySummaryCard>;
 
-const Template: StoryFn<typeof DaySummaryCard> = (args) => <DaySummaryCard {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   date: new Date(time.stable()),
   numItems: 36,
   numCompleted: 24,
-};
+});
 
-export const Empty = Template.bind({});
-Empty.args = {
+export const Empty: Story = props({
   ...Default.args,
   numItems: 77,
   numCompleted: 0,
-};
+});
 
-export const Completed = Template.bind({});
-Completed.args = {
+export const Completed: Story = props({
   ...Default.args,
   numItems: 77,
   numCompleted: 77,
-};
+});
+
+export default meta;

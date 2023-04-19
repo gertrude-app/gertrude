@@ -1,27 +1,26 @@
 import { ListUsers } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Users/ListUsers', // eslint-disable-line
   component: ListUsers,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
-} as ComponentMeta<typeof ListUsers>;
+} satisfies Meta<typeof ListUsers>;
 
-const Template: StoryFn<typeof ListUsers> = (args) => <ListUsers {...args} />;
+type Story = StoryObj<typeof meta>;
 
 // @screenshot: xs,md
-export const Empty = Template.bind({});
-Empty.args = {
+export const Empty: Story = props({
   startAddDevice: () => {},
   dismissAddDevice: () => {},
   users: [],
-};
+});
 
 // @screenshot: xs,md
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   ...Empty.args,
   users: [
     {
@@ -72,15 +71,16 @@ Default.args = {
       ],
     },
   ],
-};
+});
 
 // @screenshot: xs,md
-export const AddingDevice = Template.bind({});
-AddingDevice.args = {
+export const AddingDevice: Story = props({
   ...Default.args,
-  users: Default.args.users!.slice(0, 1),
+  users: Default.args.users.slice(0, 1),
   addDeviceRequest: {
     state: `succeeded`,
     payload: 123123,
   },
-};
+});
+
+export default meta;

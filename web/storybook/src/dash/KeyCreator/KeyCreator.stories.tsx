@@ -1,21 +1,21 @@
 import { KeyCreator } from '@dash/components';
 import { EditKey } from '@dash/keys';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
-import { time } from '../../story-helpers';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props, time } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/KeyCreator/KeyCreator', // eslint-disable-line
   component: KeyCreator,
-} as ComponentMeta<typeof KeyCreator>;
+} satisfies Meta<typeof KeyCreator>;
 
-const Template: StoryFn<typeof KeyCreator> = (args) => <KeyCreator {...args} />;
+type Story = StoryObj<typeof meta>;
 
 // @screenshot xs/600,md/550
-export const CreateStart = Template.bind({});
-CreateStart.args = {
+export const CreateStart: Story = props({
   id: `1`,
   isNew: true,
   activeStep: EditKey.Step.SetKeyType,
+  keychainId: `kc1`,
   address: ``,
   addressType: `standard`,
   addressScope: `webBrowsers`,
@@ -23,6 +23,7 @@ CreateStart.args = {
   showAdvancedAddressOptions: false,
   showAdvancedAddressScopeOptions: false,
   appScope: `unrestricted`,
+  update: () => {},
   apps: [
     { slug: `slack`, name: `Slack` },
     { slug: `chrome`, name: `Chrome` },
@@ -32,183 +33,165 @@ CreateStart.args = {
     { slug: `slug`, name: `Skype` },
     { slug: `vscode`, name: `Vscode` },
   ],
-};
+});
 
 // @screenshot xs/600,md/550
-export const CreateAddressType = Template.bind({});
-CreateAddressType.args = {
+export const CreateAddressType: Story = props({
   ...CreateStart.args,
   keyType: `website`,
   activeStep: EditKey.Step.WebsiteKey_SetAddress,
   address: `goats.com`,
-};
+});
 
-export const CreateStrictAddressType = Template.bind({});
-CreateStrictAddressType.args = {
+export const CreateStrictAddressType: Story = props({
   ...CreateStart.args,
   addressType: `strict`,
   keyType: `website`,
   activeStep: EditKey.Step.WebsiteKey_SetAddress,
   address: `goats.com`,
-};
+});
 
 // @screenshot xs/600,md/550
-export const CreateAddressScope = Template.bind({});
-CreateAddressScope.args = {
+export const CreateAddressScope: Story = props({
   ...CreateStart.args,
   addressType: `standard`,
   keyType: `website`,
   activeStep: EditKey.Step.WebsiteKey_SetAppScope,
   address: `goats.com`,
-};
+});
 
-export const CreateExpirationOff = Template.bind({});
-CreateExpirationOff.args = {
+export const CreateExpirationOff: Story = props({
   ...CreateStart.args,
   addressType: `standard`,
   keyType: `website`,
   activeStep: EditKey.Step.Expiration,
   address: `goats.com`,
-};
+});
 
 // @screenshot xs/600,md/550
-export const CreateExpiration = Template.bind({});
-CreateExpiration.args = {
+export const CreateExpiration: Story = props({
   ...CreateStart.args,
   addressType: `standard`,
   keyType: `website`,
   activeStep: EditKey.Step.Expiration,
   expiration: time.stable(),
   address: `goats.com`,
-};
+});
 
 // @screenshot xs/600,md/550
-export const EditComment = Template.bind({});
-EditComment.args = {
+export const EditComment: Story = props({
   ...CreateExpiration.args,
   keyType: `website`,
   address: `goats.com`,
-  activeStep: undefined,
+  activeStep: EditKey.Step.None,
   expiration: undefined,
   comment: `For AOPS`,
   isNew: false,
-};
+});
 
-export const EditNoComment = Template.bind({});
-EditNoComment.args = {
+export const EditNoComment: Story = props({
   ...CreateExpiration.args,
   keyType: `website`,
   address: `goats.com`,
-  activeStep: undefined,
+  activeStep: EditKey.Step.None,
   isNew: false,
-};
+});
 
-export const EditHasExpiration = Template.bind({});
-EditHasExpiration.args = {
+export const EditHasExpiration: Story = props({
   ...CreateExpiration.args,
   keyType: `website`,
   address: `goats.com`,
-  activeStep: undefined,
+  activeStep: EditKey.Step.None,
   expiration: time.stable(),
   isNew: false,
-};
+});
 
 // @screenshot xs/600,md/550
-export const EditStepOpen = Template.bind({});
-EditStepOpen.args = {
+export const EditStepOpen: Story = props({
   ...CreateExpiration.args,
   keyType: `website`,
   address: `goats.com`,
   activeStep: EditKey.Step.WebsiteKey_SetAddress,
   isNew: false,
-};
+});
 
-export const CreateApp = Template.bind({});
-CreateApp.args = {
+export const CreateApp: Story = props({
   ...CreateStart.args,
   keyType: `app`,
   activeStep: EditKey.Step.SetKeyType,
   address: `goats.com`,
   appIdentificationType: `slug`,
   appSlug: `slack`,
-};
+});
 
 // @screenshot xs/600,md/550
-export const CreateAppSlug = Template.bind({});
-CreateAppSlug.args = {
+export const CreateAppSlug: Story = props({
   ...CreateApp.args,
   activeStep: EditKey.Step.AppKey_ChooseApp,
-};
+});
 
-export const CreateAppBundleId = Template.bind({});
-CreateAppBundleId.args = {
+export const CreateAppBundleId: Story = props({
   ...CreateApp.args,
   activeStep: EditKey.Step.AppKey_ChooseApp,
   appIdentificationType: `bundleId`,
   appBundleId: `com.goats.app`,
-};
+});
 
 // @screenshot xs/600,md/550
-export const CreateAppScope = Template.bind({});
-CreateAppScope.args = {
+export const CreateAppScope: Story = props({
   ...CreateAppSlug.args,
   activeStep: EditKey.Step.AppKey_SetAppScope,
-};
+});
 
-export const CreateAppExpiration = Template.bind({});
-CreateAppExpiration.args = {
+export const CreateAppExpiration: Story = props({
   ...CreateAppSlug.args,
   activeStep: EditKey.Step.Expiration,
-};
+});
 
-export const CreateAppComment = Template.bind({});
-CreateAppComment.args = {
+export const CreateAppComment: Story = props({
   ...CreateAppSlug.args,
   activeStep: EditKey.Step.Comment,
-};
+});
 
 // @screenshot xs/600,md/550
-export const AppKeyAddressScope = Template.bind({});
-AppKeyAddressScope.args = {
+export const AppKeyAddressScope: Story = props({
   ...CreateApp.args,
   keyType: `app`,
   appScope: `address`,
   activeStep: EditKey.Step.AppKey_Advanced_SetAddress,
-};
+});
 
-export const EditAppKeyBundleId = Template.bind({});
-EditAppKeyBundleId.args = {
+export const EditAppKeyBundleId: Story = props({
   ...CreateApp.args,
   isNew: false,
   keyType: `app`,
-  activeStep: undefined,
+  activeStep: EditKey.Step.None,
   appBundleId: `com.unknown.app`,
   appSlug: undefined,
   appIdentificationType: `bundleId`,
-};
+});
 
-export const EditAppKeyAddressScope = Template.bind({});
-EditAppKeyAddressScope.args = {
+export const EditAppKeyAddressScope: Story = props({
   ...CreateApp.args,
   isNew: false,
   keyType: `app`,
   appScope: `address`,
-  activeStep: undefined,
-};
+  activeStep: EditKey.Step.None,
+});
 
 // @screenshot xs/600,md/550
-export const WebKeyAppScope = Template.bind({});
-WebKeyAppScope.args = {
+export const WebKeyAppScope: Story = props({
   ...CreateApp.args,
   keyType: `website`,
   appScope: `address`,
   addressScope: `singleApp`,
   activeStep: EditKey.Step.WebsiteKey_Advanced_ChooseApp,
-};
+});
 
-export const EditWebKeyAppScope = Template.bind({});
-EditWebKeyAppScope.args = {
+export const EditWebKeyAppScope: Story = props({
   ...WebKeyAppScope.args,
   isNew: false,
-  activeStep: undefined,
-};
+  activeStep: EditKey.Step.None,
+});
+
+export default meta;

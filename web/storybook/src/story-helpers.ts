@@ -90,7 +90,11 @@ function now(): string {
   return new Date().toISOString();
 }
 
-export const keyExamples: Record<string, Key> = {
+export function props<T>(args: T): { args: T } {
+  return { args };
+}
+
+export const keyExamples = {
   // this is a "website" key of the "standard" type, unlocking `*.super-safe.com` for all web browsers
   standardWeb: {
     id: `1`,
@@ -188,7 +192,7 @@ export const keyExamples: Record<string, Key> = {
     },
     comment: undefined,
   },
-};
+} satisfies Record<string, Key>;
 
 export const keychains = [
   keychainProps({ name: `HTC`, numKeys: 232, isPublic: true }),

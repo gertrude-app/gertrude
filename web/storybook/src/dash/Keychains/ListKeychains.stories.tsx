@@ -1,20 +1,19 @@
 import { ListKeychains } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
-import { keychainProps, withIdsAnd } from '../../story-helpers';
+import type { StoryObj, Meta } from '@storybook/react';
+import { keychainProps, props, withIdsAnd } from '../../story-helpers';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 
-export default {
+const meta = {
   title: 'Dashboard/Keychains/ListKeychains', // eslint-disable-line
   component: ListKeychains,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
-} as ComponentMeta<typeof ListKeychains>;
+} satisfies Meta<typeof ListKeychains>;
 
-const Template: StoryFn<typeof ListKeychains> = (args) => <ListKeychains {...args} />;
+type Story = StoryObj<typeof meta>;
 
 // @screenshot: md
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   keychains: withIdsAnd({ mode: `list` as const, removeText: `Delete` }, [
     keychainProps({ name: `HTC`, numKeys: 232, isPublic: true }),
     keychainProps({ name: `Jimmy's Music Theory`, numKeys: 7 }),
@@ -39,15 +38,16 @@ Default.args = {
     confirm: () => {},
     cancel: () => {},
   },
-};
+});
 
 // @screenshot: md
-export const Deleting = Template.bind({});
-Deleting.args = {
+export const Deleting: Story = props({
   ...Default.args,
-  keychains: Default.args.keychains!.slice(0, 1),
+  keychains: Default.args.keychains.slice(0, 1),
   remove: {
-    ...Default.args.remove!,
+    ...Default.args.remove,
     id: `id-htc`,
   },
-};
+});
+
+export default meta;

@@ -1,19 +1,17 @@
 import { EditKeychain } from '@dash/components';
 import { newKeyState } from '@dash/keys';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
-import { confirmableEntityAction } from '../../story-helpers';
+import type { StoryObj, Meta } from '@storybook/react';
+import { confirmableEntityAction, props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Keychains/Edit', // eslint-disable-line
   component: EditKeychain,
-  screenshot: true,
-} as ComponentMeta<typeof EditKeychain>;
+} satisfies Meta<typeof EditKeychain>;
 
-const Template: StoryFn<typeof EditKeychain> = (args) => <EditKeychain {...args} />;
+type Story = StoryObj<typeof meta>;
 
 // @screenshot: xs,md
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   isNew: false,
   name: `HTC`,
   description: `A collection of keys for Jared's HTC class.`,
@@ -21,20 +19,27 @@ Default.args = {
   setName: () => {},
   onSave: () => {},
   setDescription: () => {},
+  beginEditKey: () => {},
+  updateEditingKey: () => {},
+  dismissEditKeyModal: () => {},
+  onKeySave: () => {},
+  onCreateNewKey: () => {},
+  keyModalSaveButtonDisabled: false,
   saveButtonDisabled: false,
   deleteKeychain: confirmableEntityAction<void>(),
   deleteKey: confirmableEntityAction(),
-};
+  apps: [],
+});
 
-export const New = Template.bind({});
-New.args = {
+export const New: Story = props({
   ...Default.args,
   isNew: true,
-};
+});
 
 // @screenshot: xs/900
-export const CreatingKey = Template.bind({});
-CreatingKey.args = {
+export const CreatingKey: Story = props({
   ...Default.args,
   editingKey: newKeyState(`keyid`, `keychainid`),
-};
+});
+
+export default meta;

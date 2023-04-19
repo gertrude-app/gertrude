@@ -1,34 +1,30 @@
 import { NewNotificationMethodForm } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Profile/NewNotificationMethodForm', // eslint-disable-line
   component: NewNotificationMethodForm,
-} as ComponentMeta<typeof NewNotificationMethodForm>;
+} satisfies Meta<typeof NewNotificationMethodForm>;
 
-const Template: StoryFn<typeof NewNotificationMethodForm> = (args) => (
-  <NewNotificationMethodForm {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const Email = Template.bind({});
-Email.args = {
+export const Email: Story = props({
   type: `Email`,
   value: { email: `blob@blob.com` },
   onEvent: () => {},
   sendCodeRequest: { state: `idle` },
   confirmationRequest: { state: `idle` },
   confirmationCode: ``,
-};
+});
 
-export const Text = Template.bind({});
-Text.args = {
+export const Text: Story = props({
   ...Email.args,
   type: `Text`,
   value: { phoneNumber: `(555) 555-5555` },
-};
+});
 
-export const Slack = Template.bind({});
-Slack.args = {
+export const Slack: Story = props({
   ...Email.args,
   type: `Slack`,
   value: {
@@ -36,4 +32,6 @@ Slack.args = {
     channelId: `CX0823942d`,
     token: `xoxb-1234567890-1234567890-1234567890`,
   },
-};
+});
+
+export default meta;

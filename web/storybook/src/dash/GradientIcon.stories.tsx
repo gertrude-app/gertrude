@@ -1,5 +1,6 @@
 import { GradientIcon, GRADIENT_ICONS } from '@dash/components';
-import type { ComponentMeta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
+import { props } from '../story-helpers';
 
 const GradientGrid: React.FC<{ size: 'small' | 'medium' | 'large'; subtle: boolean }> = ({
   size,
@@ -20,15 +21,14 @@ const GradientGrid: React.FC<{ size: 'small' | 'medium' | 'large'; subtle: boole
   </div>
 );
 
-const Template: StoryFn<typeof GradientGrid> = (args) => <GradientGrid {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const Grid = Template.bind({});
-Grid.args = {
+export const Grid: Story = props({
   size: `large`,
   subtle: false,
-};
+});
 
-export default {
+const meta = {
   title: 'Dashboard/Core/GradientIcon', // eslint-disable-line
   component: GradientGrid,
   argTypes: {
@@ -37,4 +37,6 @@ export default {
       control: `radio`,
     },
   },
-} as ComponentMeta<typeof GradientGrid>;
+} satisfies Meta<typeof GradientGrid>;
+
+export default meta;

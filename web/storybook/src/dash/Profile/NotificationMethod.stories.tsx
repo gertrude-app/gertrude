@@ -1,29 +1,31 @@
 import { NotificationMethod } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Profile/NotificationMethod', // eslint-disable-line
   component: NotificationMethod,
-} as ComponentMeta<typeof NotificationMethod>;
+} satisfies Meta<typeof NotificationMethod>;
 
-const Template: StoryFn<typeof NotificationMethod> = (args) => (
-  <NotificationMethod {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
-export const Email = Template.bind({});
-Email.args = {
+export const Email: Story = props({
   method: `email`,
   value: `me@example.com`,
-};
+  deletable: true,
+  onDelete: () => {},
+});
 
-export const Text = Template.bind({});
-Text.args = {
+export const Text: Story = props({
+  ...Email.args,
   method: `text`,
   value: `+1 (555) 555-5555`,
-};
+});
 
-export const Slack = Template.bind({});
-Slack.args = {
+export const Slack: Story = props({
+  ...Email.args,
   method: `slack`,
   value: `#Gertrude`,
-};
+});
+
+export default meta;

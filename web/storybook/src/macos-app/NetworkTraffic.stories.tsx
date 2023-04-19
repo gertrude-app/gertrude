@@ -1,27 +1,27 @@
 import { NetworkTraffic } from '@macos/appviews';
-import type { ComponentMeta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
+import type { ComponentProps as Wrapping } from 'react';
+import { props } from '../story-helpers';
 import AppWindow from './AppWindow';
 
-export default {
+const meta = {
   title: 'MacOS App/NetworkTraffic', // eslint-disable-line
-  component: NetworkTraffic,
-  parameters: {
-    layout: `centered`,
-  },
-} as ComponentMeta<typeof NetworkTraffic>;
+  component: AppWindow<Wrapping<typeof NetworkTraffic>>,
+  parameters: { layout: `centered` },
+} satisfies Meta<typeof AppWindow<Wrapping<typeof NetworkTraffic>>>;
 
-const LightTemplate: StoryFn<typeof NetworkTraffic> = (args) => (
-  <AppWindow width={900} height={600}>
-    <NetworkTraffic {...args} />
-  </AppWindow>
-);
-export const LightMode = LightTemplate.bind({});
-LightMode.args = {};
+type Story = StoryObj<typeof meta>;
 
-const DarkTemplate: StoryFn<typeof NetworkTraffic> = (args) => (
-  <AppWindow width={900} height={600} dark>
-    <NetworkTraffic {...args} />
-  </AppWindow>
-);
-export const DarkMode = DarkTemplate.bind({});
-DarkMode.args = {};
+export const LightMode: Story = props({
+  width: 900,
+  height: 600,
+  wrapping: NetworkTraffic,
+  props: {},
+});
+
+export const DarkMode: Story = props({
+  ...LightMode.args,
+  dark: true,
+});
+
+export default meta;

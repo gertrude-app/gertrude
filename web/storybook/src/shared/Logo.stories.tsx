@@ -1,51 +1,54 @@
 import { Logo } from '@shared/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
 
-export default {
+const meta = {
   title: 'Shared/Logo', // eslint-disable-line
   component: Logo,
   parameters: { layout: `fullscreen` },
-} as ComponentMeta<typeof Logo>;
+} satisfies Meta<typeof Logo>;
 
-const Template: StoryFn<typeof Logo> = (args) => <Logo {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = { type: `default` };
-Default.decorators = [
-  (Story) => (
-    <div className="py-8 flex justify-center">
-      <Story />
-    </div>
-  ),
-];
-
-export const DefaultIconOnly = Template.bind({});
-DefaultIconOnly.args = {
-  type: `default`,
-  iconOnly: true,
-  size: 90,
+export const Default: Story = {
+  decorators: [
+    (Story) => (
+      <div className="py-8 flex justify-center">
+        <Story />
+      </div>
+    ),
+  ],
 };
-DefaultIconOnly.decorators = [
-  (Story) => (
-    <div className="py-8 flex justify-center">
-      <Story />
-    </div>
-  ),
-];
 
-export const Inverted = Template.bind({});
-Inverted.args = {
-  type: `inverted`,
-  iconOnly: false,
+export const DefaultIconOnly: Story = {
+  decorators: Default.decorators,
+  args: {
+    type: `default`,
+    iconOnly: true,
+    size: 90,
+  },
 };
-Inverted.decorators = [
-  (Story) => (
-    <div className="py-8 bg-violet-500 flex justify-center">
-      <Story />
-    </div>
-  ),
-];
 
-export const InvertedIconOnly = Template.bind({});
-InvertedIconOnly.decorators = Inverted.decorators;
-InvertedIconOnly.args = { ...Inverted.args, iconOnly: true, size: 90 };
+export const Inverted: Story = {
+  decorators: [
+    (Story) => (
+      <div className="py-8 bg-violet-500 flex justify-center">
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    type: `inverted`,
+    iconOnly: false,
+  },
+};
+
+export const InvertedIconOnly: Story = {
+  decorators: Inverted.decorators,
+  args: {
+    type: `inverted`,
+    iconOnly: true,
+    size: 90,
+  },
+};
+
+export default meta;

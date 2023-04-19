@@ -1,41 +1,35 @@
 import { KeyListKey } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
-import { keyExamples } from '../../story-helpers';
+import type { StoryObj, Meta } from '@storybook/react';
+import { keyExamples, props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Keychains/KeyListKey', // eslint-disable-line
   component: KeyListKey,
-} as ComponentMeta<typeof KeyListKey>;
+} satisfies Meta<typeof KeyListKey>;
 
-const Template: StoryFn<typeof KeyListKey> = (args) => <KeyListKey {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const StandardWebsite = Template.bind({});
-StandardWebsite.args = {
+export const StandardWebsite: Story = props({
   record: keyExamples.standardWeb,
-};
+});
 
-export const StrictWebsite = Template.bind({});
-StrictWebsite.args = {
+export const StrictWebsite: Story = props({
   record: keyExamples.strictWeb,
-};
+});
 
-export const NormalApp = Template.bind({});
-NormalApp.args = {
+export const NormalApp: Story = props({
   record: keyExamples.skeletonApp,
-};
+});
 
-export const NormalAppWithBundleId = Template.bind({});
-NormalAppWithBundleId.args = {
+export const NormalAppWithBundleId: Story = props({
   record: keyExamples.skeletonAppBundleId,
-};
+});
 
-export const SingleAppKey = Template.bind({});
-SingleAppKey.args = {
+export const SingleAppKey: Story = props({
   record: keyExamples.singleApp,
-};
+});
 
-export const UnrestrictedForAllApps = Template.bind({});
-UnrestrictedForAllApps.args = {
+export const UnrestrictedForAllApps: Story = props({
   record: {
     id: `6`,
     keychainId: `1`,
@@ -48,4 +42,6 @@ UnrestrictedForAllApps.args = {
     },
     comment: undefined,
   },
-};
+});
+
+export default meta;

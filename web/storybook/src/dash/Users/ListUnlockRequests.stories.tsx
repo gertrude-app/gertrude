@@ -1,22 +1,19 @@
 import { ListUnlockRequests } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { withIdsAnd, time } from '../../story-helpers';
+import { withIdsAnd, props, time } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Users/ListUnlockRequests', // eslint-disable-line
   component: ListUnlockRequests,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
-} as ComponentMeta<typeof ListUnlockRequests>;
+} satisfies Meta<typeof ListUnlockRequests>;
 
-const Template: StoryFn<typeof ListUnlockRequests> = (args) => (
-  <ListUnlockRequests {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
 // @screenshot: xs,md
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   requests: withIdsAnd({ userId: `user1` }, [
     {
       userName: `Huck`,
@@ -47,10 +44,11 @@ Default.args = {
       createdAt: time.subtracting({ hours: 4 }),
     },
   ]),
-};
+});
 
-export const Empty = Template.bind({});
-Empty.args = {
+export const Empty: Story = props({
   ...Default.args,
   requests: [],
-};
+});
+
+export default meta;

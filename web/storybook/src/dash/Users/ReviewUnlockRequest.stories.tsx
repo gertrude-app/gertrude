@@ -1,33 +1,33 @@
 import { Modal, ReviewUnlockRequest } from '@dash/components';
-import type { StoryFn, ComponentMeta, DecoratorFn } from '@storybook/react';
-import { time } from '../../story-helpers';
+import type { StoryObj, Meta } from '@storybook/react';
+import { time, props } from '../../story-helpers';
 
-const inModal: DecoratorFn = (Story) => (
-  <Modal
-    type="container"
-    title="Unlock Request"
-    icon="unlock"
-    primaryButton={{ label: `Accept`, action: () => {} }}
-    secondaryButton={{ label: `Deny`, action: () => {} }}
-  >
-    <Story />
-  </Modal>
-);
-
-export default {
+const meta = {
   title: 'Dashboard/Users/ReviewUnlockRequest', // eslint-disable-line
   component: ReviewUnlockRequest,
-  decorators: [inModal],
+  decorators: [
+    (Story) => (
+      <Modal
+        type="container"
+        title="Unlock Request"
+        icon="unlock"
+        primaryButton={{ label: `Accept`, action: () => {} }}
+        secondaryButton={{ label: `Deny`, action: () => {} }}
+      >
+        <Story />
+      </Modal>
+    ),
+  ],
   parameters: { layout: `fullscreen` },
-} as ComponentMeta<typeof ReviewUnlockRequest>;
+} satisfies Meta<typeof ReviewUnlockRequest>;
 
-const Template: StoryFn<typeof ReviewUnlockRequest> = (args) => (
-  <ReviewUnlockRequest {...args} />
-);
+type Story = StoryObj<typeof meta>;
 
 // @screenshot: xs,md
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
+  id: `1`,
+  userId: `user1`,
+  status: `pending`,
   userName: `Winfield`,
   requestComment: `schedule mayra appointments`,
   url: `https://cdn-s.acuityscheduling.com/logo24613730.jpg?1650316493&whiteBg=1&rectangular=1`,
@@ -38,16 +38,18 @@ Default.args = {
   appCategories: [`browser`],
   appBundleId: `.com.apple.Safari`,
   requestProtocol: `TCP`,
-};
+  detailsExpanded: false,
+  setDetailsExpanded: () => {},
+});
 
-export const NoAppName = Template.bind({});
-NoAppName.args = {
+export const NoAppName: Story = props({
   ...Default.args,
   appName: undefined,
-};
+});
 
-export const EmptyStringComment = Template.bind({});
-EmptyStringComment.args = {
+export const EmptyStringComment: Story = props({
   ...Default.args,
   requestComment: ``,
-};
+});
+
+export default meta;

@@ -1,4 +1,4 @@
-import type { ComponentMeta } from '@storybook/react';
+import type { Meta } from '@storybook/react';
 import * as ProductHunt from './ProductHunt';
 
 export default {
@@ -19,7 +19,7 @@ export default {
       defaultViewport: `productHunt`,
     },
   },
-} as ComponentMeta<typeof ProductHunt.BlockedRequests>;
+} satisfies Meta<typeof ProductHunt.BlockedRequests>;
 
 export const Image1 = () => <ProductHunt.BlockedRequests />;
 export const Image2 = () => <ProductHunt.UnlockRequest />;

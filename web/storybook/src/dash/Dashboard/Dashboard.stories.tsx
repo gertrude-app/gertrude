@@ -1,20 +1,19 @@
 import { Dashboard } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { withIds, time, withIdsAnd, testImgUrl } from '../../story-helpers';
+import { withIds, time, withIdsAnd, testImgUrl, props } from '../../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Dashboard/Screen', // eslint-disable-line
   component: Dashboard,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },
-} as ComponentMeta<typeof Dashboard>;
+} satisfies Meta<typeof Dashboard>;
 
-const Template: StoryFn<typeof Dashboard> = (args) => <Dashboard {...args} />;
+type Story = StoryObj<typeof meta>;
 
 // @screenshot: xs/2500,xl
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   date: new Date(time.stable()),
   unlockRequests: withIdsAnd({ userId: `user1` }, [
     {
@@ -67,31 +66,29 @@ Default.args = {
       createdAt: time.subtracting({ minutes: 6 }),
     },
   ]),
-};
+});
 
-export const NoUnlockRequests = Template.bind({});
-NoUnlockRequests.args = {
+export const NoUnlockRequests: Story = props({
   ...Default.args,
   unlockRequests: [],
-};
+});
 
-export const NoUserActivity = Template.bind({});
-NoUserActivity.args = {
+export const NoUserActivity: Story = props({
   ...Default.args,
   userActivitySummaries: [],
-};
+});
 
 // @screenshot: lg
-export const NoUserActivityOrUnlockRequests = Template.bind({});
-NoUserActivityOrUnlockRequests.args = {
+export const NoUserActivityOrUnlockRequests: Story = props({
   ...Default.args,
   userActivitySummaries: [],
   unlockRequests: [],
-};
+});
 
 // @screenshot: xs,lg
-export const NoUsers = Template.bind({});
-NoUsers.args = {
+export const NoUsers: Story = props({
   ...Default.args,
   users: [],
-};
+});
+
+export default meta;

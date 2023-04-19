@@ -1,15 +1,17 @@
 import { PageHeading } from '@dash/components';
-import type { StoryFn, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
+import { props } from '../story-helpers';
 
-export default {
+const meta = {
   title: 'Dashboard/Core/PageHeading', // eslint-disable-line
   component: PageHeading,
-} as ComponentMeta<typeof PageHeading>;
+} satisfies Meta<typeof PageHeading>;
 
-const Template: StoryFn<typeof PageHeading> = (args) => <PageHeading {...args} />;
+type Story = StoryObj<typeof meta>;
 
-export const Default = Template.bind({});
-Default.args = {
+export const Default: Story = props({
   children: `Profile`,
   icon: `user`,
-};
+});
+
+export default meta;
