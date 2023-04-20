@@ -10,8 +10,6 @@ const meta = {
   parameters: { layout: `centered` },
 } satisfies Meta<typeof AppWindow<Wrapping<typeof Administrate>>>;
 
-export default meta;
-
 type Story = StoryObj<typeof meta>;
 
 export const LightModeChecksPassing: Story = props({
@@ -62,3 +60,5 @@ export const DarkModeChecksFailing: Story = props({
   ...LightModeChecksFailing.args,
   dark: true,
 });
+
+export default meta;
