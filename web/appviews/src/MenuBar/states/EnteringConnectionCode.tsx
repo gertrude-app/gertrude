@@ -14,7 +14,6 @@ const EnteringConnectionCode: React.FC<Props> = ({ emit, connectionCode, dispatc
   function submit(): void {
     if (!codeValid) return;
     emit({ case: `connectSubmit`, code: Number(connectionCode) });
-    dispatch({ type: `connectionCodeUpdated`, code: `` });
   }
   return (
     <MenuBarSized className="p-2">

@@ -40,9 +40,7 @@ codegen:
 # build & deploy
 
 appviews:
-	@rm -rf appviews/dist/ ../swift/rewrite/Xcode/Gertrude/WebViews/MenuBar
-	@pnpm --filter @macos/appviews build
-	@cp -R appviews/dist ../swift/rewrite/Xcode/Gertrude/WebViews/MenuBar
+	@cd appviews && pnpm typecheck && node generate.cjs
 
 build-site:
 	@pnpm --filter @site/app build

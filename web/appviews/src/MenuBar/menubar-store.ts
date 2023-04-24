@@ -1,4 +1,4 @@
-import type { Action } from '../lib/store';
+import type { ActionOf } from '../lib/store';
 import { Store } from '../lib/store';
 
 // begin codegen
@@ -44,20 +44,27 @@ export type ViewAction = {
   code: string;
 };
 
+export type Action = ActionOf<AppState, AppEvent, ViewAction>;
+export type State = AppState & ViewState;
+
 export class MenuBarStore extends Store<AppState, AppEvent, ViewState, ViewAction> {
-  initializer(): AppState & ViewState {
+  initializer(): State {
     return { case: `notConnected`, connectionCode: `` };
   }
 
-  reducer(
-    state: AppState & ViewState,
-    action: Action<AppState, ViewAction>,
-  ): AppState & ViewState {
+  reducer(state: State, action: Action): State {
     switch (action.type) {
       case `receivedUpdatedAppState`:
         return { ...state, ...action.appState };
       case `connectionCodeUpdated`:
         return { ...state, connectionCode: action.code };
+      case `appEventEmitted`:
+        switch (action.event.case) {
+          case `connectSubmit`:
+            return { ...state, connectionCode: `` };
+          default:
+            return state;
+        }
     }
   }
 }

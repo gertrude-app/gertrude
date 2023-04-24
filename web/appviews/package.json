@@ -24,6 +24,7 @@
   "devDependencies": {
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
-    "classnames": "2.3.2"
+    "classnames": "2.3.2",
+    "x-exec": "^1.2.0"
   }
 }

@@ -1,4 +1,4 @@
-import type { Action } from '../lib/store';
+import type { ActionOf } from '../lib/store';
 import { Store } from '../lib/store';
 
 // begin codegen
@@ -13,62 +13,81 @@ export type Request = {
 
 export type AppState = {
   windowOpen: boolean;
+  selectedRequestIds: UUID[];
   requests: Request[];
   filterText: string;
   tcpOnly: boolean;
-  unlockRequest:
+  createUnlockRequests:
     | { case: 'failed'; error: string }
     | { case: 'idle' }
-    | { case: 'loading' }
+    | { case: 'ongoing' }
     | { case: 'succeeded' };
 };
 
 export type AppEvent =
-  | { case: 'updateFilterText'; text: string }
-  | { case: 'unlockRequestSubmitted'; ids: UUID[] }
-  | { case: 'openWindow' }
-  | { case: 'closeWindow' }
-  | { case: 'toggleTcpOnly' }
-  | { case: 'clearRequests' };
+  | { case: 'filterTextUpdated'; text: string }
+  | { case: 'unlockRequestSubmitted'; comment?: string }
+  | { case: 'toggleRequestSelected'; id: UUID }
+  | { case: 'requestFailedTryAgainClicked' }
+  | { case: 'tcpOnlyToggled' }
+  | { case: 'clearRequestsClicked' }
+  | { case: 'closeWindow' };
 // end codegen
 
 export type ViewState = {
-  selectedRequests: UUID[];
   unlockRequestExplanation: string;
 };
 
-export type ViewAction =
-  | { type: 'requestFailedTryAgainClicked' }
-  | { type: 'explanationUpdated'; text: string }
-  | { type: 'toggleRequestSelected'; id: UUID };
+export type ViewAction = { type: 'explanationUpdated'; text: string };
 
-export class NetworkTrafficStore extends Store<
+export type Action = ActionOf<AppState, AppEvent, ViewAction>;
+export type State = AppState & ViewState;
+
+export class BlockedRequestsStore extends Store<
   AppState,
   AppEvent,
   ViewState,
   ViewAction
 > {
-  initializer(): AppState & ViewState {
+  appState(): AppState {
     return {
       windowOpen: true,
-      requests: [],
       filterText: ``,
+      selectedRequestIds: [],
+      requests: [],
       tcpOnly: true,
-      unlockRequest: { case: `idle` },
-      selectedRequests: [],
+      createUnlockRequests: { case: `idle` },
+    };
+  }
+
+  viewState(): ViewState {
+    return {
       unlockRequestExplanation: ``,
     };
   }
 
-  reducer(
-    state: AppState & ViewState,
-    action: Action<AppState, ViewAction>,
-  ): AppState & ViewState {
+  initializer(): State {
+    return { ...this.appState(), ...this.viewState() };
+  }
+
+  reducer(state: State, action: Action): State {
     switch (action.type) {
-      default:
+      case `receivedUpdatedAppState`: {
+        const reqSucceeded =
+          state.createUnlockRequests.case === `ongoing` &&
+          action.appState.createUnlockRequests.case === `succeeded`;
+        return {
+          ...state,
+          ...action.appState,
+          unlockRequestExplanation: reqSucceeded ? `` : state.unlockRequestExplanation,
+        };
+      }
+      case `explanationUpdated`:
+        return { ...state, unlockRequestExplanation: action.text };
+      case `appEventEmitted`:
         return state;
     }
   }
 }
 
-export default new NetworkTrafficStore();
+export default new BlockedRequestsStore();
