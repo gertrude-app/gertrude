@@ -1,15 +1,13 @@
-import { ReviewDayHeader } from '@dash/components';
+import { FeedHeader } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { time } from '../../../story-helpers';
 
 export default {
-  title: 'Dashboard/Users/Activity/ReviewDayHeader', // eslint-disable-line
-  component: ReviewDayHeader,
-} as ComponentMeta<typeof ReviewDayHeader>;
+  title: 'Dashboard/Users/Activity/FeedHeader', // eslint-disable-line
+  component: FeedHeader,
+} as ComponentMeta<typeof FeedHeader>;
 
-const Template: ComponentStory<typeof ReviewDayHeader> = (args) => (
-  <ReviewDayHeader {...args} />
-);
+const Template: ComponentStory<typeof FeedHeader> = (args) => <FeedHeader {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

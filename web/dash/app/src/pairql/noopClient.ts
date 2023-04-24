@@ -110,16 +110,16 @@ const noopClient: ApiClient = {
       createdAt: new Date().toISOString(),
     });
   },
-  getUserActivityDay: async () => {
+  userActivityFeed: async () => {
     return Result.success({ numDeleted: 0, userName: ``, items: [] });
   },
-  getUsersActivityDay: async () => {
+  combinedUsersActivityFeed: async () => {
     return Result.success([]);
   },
-  getUserActivityDays: async () => {
+  userActivitySummaries: async () => {
     return Result.success({ userName: ``, days: [] });
   },
-  getUsersActivityOverviews: async () => {
+  combinedUsersActivitySummaries: async () => {
     return Result.success([]);
   },
   getUsers: async () => {

@@ -3,7 +3,7 @@ export { default as Profile } from './Profile/Profile';
 export { default as FullscreenModalForm } from './Unauthed/FullscreenModalForm';
 export { default as EmailInputForm } from './Unauthed/EmailInputForm';
 export { default as LoginForm } from './Unauthed/LoginForm';
-export { default as UserActivityOverview } from './Users/Activity/UserActivityOverview';
+export { default as ActivitySummaries } from './Users/Activity/ActivitySummaries';
 export { default as EditKeychain } from './Keychains/EditKeychain';
 export { default as Modal, Loading as LoadingModal, ErrorModal } from './Modal';
 export { default as ConfirmDeleteEntity } from './Modal/ConfirmDeleteEntity';
@@ -41,10 +41,10 @@ export { default as UnlockRequestsWidget } from './Dashboard/UnlockRequestsWidge
 export { default as UserScreenshotsWidget } from './Dashboard/UserScreenshotsWidget';
 export { default as UserActivityWidget } from './Dashboard/UserActivityWidget';
 export { default as UsersOverviewWidget } from './Dashboard/UsersOverviewWidget';
-export { default as UserActivityReviewDay } from './Users/Activity/UserActivityReviewDay';
-export { default as ReviewDayHeader } from './Users/Activity/ReviewDayHeader';
+export { default as UserActivityFeed } from './Users/Activity/UserActivityFeed';
+export { default as FeedHeader } from './Users/Activity/FeedHeader';
 export { default as ReviewDayWrapper } from './Users/Activity/ReviewDayWrapper';
-export { default as AllUsersActivityReviewDay } from './Users/Activity/AllUsersActivityReviewDay';
+export { default as CombinedUsersActivityFeed } from './Users/Activity/CombinedUsersActivityFeed';
 export { default as UserActivityHeader } from './Users/Activity/UserActivityHeader';
 export { default as Loading } from './Loading';
 export { default as GenericError } from './GenericError';
@@ -55,4 +55,4 @@ export { default as GradientIcon, ICONS as GRADIENT_ICONS } from './GradientIcon
 export { default as SuspendFilterRequestForm } from './Users/SuspendFilterRequestForm';
 export { DURATION_OPTS } from './Users/SuspendFilterRequestForm';
 export type { NotificationUpdate } from './Profile/Profile';
-export type { ActivityItem } from './Users/Activity/UserActivityReviewDay';
+export type { ActivityFeedItem } from './Users/Activity/UserActivityFeed';

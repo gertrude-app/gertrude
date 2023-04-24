@@ -1,17 +1,17 @@
-import { AllUsersActivityReviewDay } from '@dash/components';
+import { CombinedUsersActivityFeed } from '@dash/components';
 import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
 import { activity, time } from '../../../story-helpers';
 
 export default {
-  title: 'Dashboard/Users/Activity/AllUsersActivityReviewDay', // eslint-disable-line
-  component: AllUsersActivityReviewDay,
+  title: 'Dashboard/Users/Activity/CombinedUsersActivityFeed', // eslint-disable-line
+  component: CombinedUsersActivityFeed,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
-} as ComponentMeta<typeof AllUsersActivityReviewDay>;
+} as ComponentMeta<typeof CombinedUsersActivityFeed>;
 
-const Template: ComponentStory<typeof AllUsersActivityReviewDay> = (args) => (
-  <AllUsersActivityReviewDay {...args} />
+const Template: ComponentStory<typeof CombinedUsersActivityFeed> = (args) => (
+  <CombinedUsersActivityFeed {...args} />
 );
 
 // @screenshot: xs,md

@@ -1,0 +1,26 @@
+;FFMETADATA1
+[CHAPTER]
+TIMEBASE=1/1000
+START=-29526
+END=984
+title=create key flow handles entered domain with subdomain correctly
+[CHAPTER]
+TIMEBASE=1/1000
+START=1011
+END=31526
+title=create key flow handles entered domain with no subdomain correctly
+[CHAPTER]
+TIMEBASE=1/1000
+START=31515
+END=62047
+title=create key flow gives useful hint when entering IP address wrongly
+[CHAPTER]
+TIMEBASE=1/1000
+START=62052
+END=92584
+title=create key flow ignores scheme and path if entered by user
+[CHAPTER]
+TIMEBASE=1/1000
+START=92503
+END=123123
+title=create key flow prevents proceeding and gives useful hint when address invalid

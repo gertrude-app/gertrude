@@ -6,9 +6,9 @@ import Current from '../../environment';
 import reducer, {
   deleteActivityItems,
   deleteDevice,
-  fetchActivityOverview,
-  fetchUsersActivityDay,
-  fetchUsersActivityOverviews,
+  fetchUserActivitySummaries,
+  fetchCombinedUsersActivityFeed,
+  fetchCombinedUsersActivitySummaries,
   newUserRouteVisited,
   upsertUser,
 } from '../slice-users';
@@ -114,19 +114,19 @@ describe(`upsertUser`, () => {
 
 describe(`fetchUsersActivityDays`, () => {
   it(`sets the activityOverviews state correctly`, async () => {
-    let state = reducer(void 0, fetchUsersActivityOverviews.started({}));
-    expect(state.fetchAllActivityOverviews).toEqual(Req.ongoing());
+    let state = reducer(void 0, fetchCombinedUsersActivitySummaries.started({}));
+    expect(state.fetchCombinedUsersActivitySummaries).toEqual(Req.ongoing());
 
     state = reducer(
       state,
-      fetchUsersActivityOverviews.succeeded(
+      fetchCombinedUsersActivitySummaries.succeeded(
         [
           {
             userId: `123`,
             userName: `Keith Heijnal`,
             days: [
-              mock.activityDay(5, 2, `01-01-2022`),
-              mock.activityDay(11, 5, `01-05-2022`),
+              mock.userActivitySummary(5, 2, `01-01-2022`),
+              mock.userActivitySummary(11, 5, `01-05-2022`),
             ],
           },
           {
@@ -139,12 +139,12 @@ describe(`fetchUsersActivityDays`, () => {
       ),
     );
 
-    expect(state.activityOverviews).toEqual({
+    expect(state.userActivitySummaries).toEqual({
       123: Req.succeed({
         userName: `Keith Heijnal`,
         days: [
-          mock.activityDay(11, 5, `01-05-2022`),
-          mock.activityDay(5, 2, `01-01-2022`),
+          mock.userActivitySummary(11, 5, `01-05-2022`),
+          mock.userActivitySummary(5, 2, `01-01-2022`),
         ],
       }),
       456: Req.succeed({
@@ -157,30 +157,33 @@ describe(`fetchUsersActivityDays`, () => {
 
 describe(`fetchActivityOverview`, () => {
   it(`filters out ranges with no items, and orders most recent first`, async () => {
-    let state = reducer(void 0, fetchActivityOverview.started({ userId: `user123` }));
-    expect(state.activityOverviews).toEqual({ user123: Req.ongoing() });
+    let state = reducer(
+      void 0,
+      fetchUserActivitySummaries.started({ userId: `user123` }),
+    );
+    expect(state.userActivitySummaries).toEqual({ user123: Req.ongoing() });
 
     state = reducer(
       state,
-      fetchActivityOverview.succeeded(
+      fetchUserActivitySummaries.succeeded(
         {
           userName: `Huck`,
           days: [
-            mock.activityDay(5, 0, `01-01-2022`),
-            mock.activityDay(0, 0, `01-03-2022`), // <-- should be filtered out
-            mock.activityDay(11, 0, `01-05-2022`), // <-- most recent, should be first
+            mock.userActivitySummary(5, 0, `01-01-2022`),
+            mock.userActivitySummary(0, 0, `01-03-2022`), // <-- should be filtered out
+            mock.userActivitySummary(11, 0, `01-05-2022`), // <-- most recent, should be first
           ],
         },
         { userId: `user123` },
       ),
     );
 
-    expect(state.activityOverviews).toEqual({
+    expect(state.userActivitySummaries).toEqual({
       user123: Req.succeed({
         userName: `Huck`,
         days: [
-          mock.activityDay(11, 0, `01-05-2022`), // <-- most recent
-          mock.activityDay(5, 0, `01-01-2022`),
+          mock.userActivitySummary(11, 0, `01-05-2022`), // <-- most recent
+          mock.userActivitySummary(5, 0, `01-01-2022`),
         ],
       }),
     });
@@ -192,7 +195,7 @@ describe(`deleteActivityItems`, () => {
     Current.api.deleteActivityItems = vi.fn();
 
     const getState = makeGetState((state) => {
-      state.users.activityDays = {
+      state.users.userActivityFeedDays = {
         'user123--01-01-2022': Req.succeed({
           userName: `Bob Dylan`,
           numDeleted: 0,
@@ -217,7 +220,7 @@ describe(`deleteActivityItems`, () => {
 
   it(`increments numDeleted and sets item deleted bool`, () => {
     const state = makeState((state) => {
-      state.users.activityDays = {
+      state.users.userActivityFeedDays = {
         'user123--01-01-2022': Req.succeed({
           userName: `Josh`,
           numDeleted: 0,
@@ -240,7 +243,7 @@ describe(`deleteActivityItems`, () => {
       ),
     );
 
-    const day = Req.payload(next.activityDays[`user123--01-01-2022`]);
+    const day = Req.payload(next.userActivityFeedDays[`user123--01-01-2022`]);
     expect(day?.numDeleted).toBe(1);
     expect(day?.items.item1?.deleted).toBe(true);
   });
@@ -249,12 +252,14 @@ describe(`deleteActivityItems`, () => {
 describe(`fetchUsersActivityDay`, () => {
   it(`sets the activityDays state correctly`, () => {
     const date = new Date(`01-01-2022`);
-    let state = reducer(void 0, fetchUsersActivityDay.started(date));
-    expect(state.fetchAllUsersDay[formatDate(date, `url`)]).toEqual(Req.ongoing());
+    let state = reducer(void 0, fetchCombinedUsersActivityFeed.started(date));
+    expect(state.fetchCombinedUsersActivityFeed[formatDate(date, `url`)]).toEqual(
+      Req.ongoing(),
+    );
 
     state = reducer(
       state,
-      fetchUsersActivityDay.succeeded(
+      fetchCombinedUsersActivityFeed.succeeded(
         [
           {
             userName: `Sue`,
@@ -273,12 +278,18 @@ describe(`fetchUsersActivityDay`, () => {
               },
             ],
           },
+          {
+            userName: `Danny Boy`,
+            userId: `556`,
+            numDeleted: 0,
+            items: [],
+          },
         ],
         date,
       ),
     );
 
-    expect(state.activityDays[`123--01-01-2022`]).toEqual(
+    expect(state.userActivityFeedDays[`123--01-01-2022`]).toEqual(
       Req.succeed({
         userName: `Sue`,
         numDeleted: 2,
@@ -295,5 +306,8 @@ describe(`fetchUsersActivityDay`, () => {
         },
       }),
     );
+
+    // Users with no activity are filtered out
+    expect(state.userActivityFeedDays[`556--01-01-2022`]).toEqual(undefined);
   });
 });

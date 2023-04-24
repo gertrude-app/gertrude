@@ -1,22 +1,27 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { dateFromUrl, formatDate } from '@dash/datetime';
+import { dateFromUrl } from '@dash/datetime';
 import { typesafe } from '@shared/ts-utils';
-import { AllUsersActivityReviewDay, ApiErrorMessage, Loading } from '@dash/components';
-import type { ActivityItem } from '@dash/components';
+import { CombinedUsersActivityFeed, ApiErrorMessage, Loading } from '@dash/components';
+import type { ActivityFeedItem } from '@dash/components';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import { deleteActivityItems, fetchUsersActivityDay } from '../../redux/slice-users';
+import {
+  deleteActivityItems,
+  fetchCombinedUsersActivityFeed,
+} from '../../redux/slice-users';
 
-const UsersActivityDay: React.FC = () => {
+const CombinedUsersActivityFeedRoute: React.FC = () => {
   const { date = `` } = useParams<{ date: string }>();
   const day = dateFromUrl(date);
   const dispatch = useDispatch();
-  const request = useSelector((state) => state.users.fetchAllUsersDay[date]);
-  const allActivity = useSelector((state) => state.users.activityDays);
+  const request = useSelector(
+    (state) => state.users.fetchCombinedUsersActivityFeed[date],
+  );
+  const allActivity = useSelector((state) => state.users.userActivityFeedDays);
 
   useEffect(() => {
     if (!request?.state || request?.state === `idle`) {
-      dispatch(fetchUsersActivityDay(day));
+      dispatch(fetchCombinedUsersActivityFeed(day));
     }
   }, [dispatch, day, request?.state]);
 
@@ -28,7 +33,7 @@ const UsersActivityDay: React.FC = () => {
     return <ApiErrorMessage error={request.error} />;
   }
 
-  const activity: Record<string, ActivityItem[]> = {};
+  const activity: Record<string, ActivityFeedItem[]> = {};
   let numDeleted = 0;
 
   for (const [activityDayKey, activityRequest] of typesafe.objectEntries(allActivity)) {
@@ -45,7 +50,7 @@ const UsersActivityDay: React.FC = () => {
   }
 
   return (
-    <AllUsersActivityReviewDay
+    <CombinedUsersActivityFeed
       date={day}
       activity={activity}
       numDeleted={numDeleted}
@@ -56,4 +61,4 @@ const UsersActivityDay: React.FC = () => {
   );
 };
 
-export default UsersActivityDay;
+export default CombinedUsersActivityFeedRoute;

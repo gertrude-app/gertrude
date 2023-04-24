@@ -1,20 +1,20 @@
 import React, { useEffect } from 'react';
-import { ApiErrorMessage, Loading, UserActivityOverview } from '@dash/components';
+import { ApiErrorMessage, Loading, ActivitySummaries } from '@dash/components';
 import { typesafe } from '@shared/ts-utils';
 import { formatDate } from '@shared/datetime';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import { fetchUsersActivityOverviews } from '../../redux/slice-users';
+import { fetchCombinedUsersActivitySummaries } from '../../redux/slice-users';
 
-const AllUsersActivityOverviewRoute: React.FC = () => {
+const CombinedUsersActivitySummariesRoute: React.FC = () => {
   const dispatch = useDispatch();
   const { request, overviews } = useSelector((state) => ({
-    request: state.users.fetchAllActivityOverviews,
-    overviews: state.users.activityOverviews,
+    request: state.users.fetchCombinedUsersActivitySummaries,
+    overviews: state.users.userActivitySummaries,
   }));
 
   useEffect(() => {
     if (!request?.state || request?.state === `idle`) {
-      dispatch(fetchUsersActivityOverviews({}));
+      dispatch(fetchCombinedUsersActivitySummaries({}));
     }
   }, [dispatch, request?.state]);
 
@@ -52,7 +52,7 @@ const AllUsersActivityOverviewRoute: React.FC = () => {
     }
   }
 
-  return <UserActivityOverview days={[...daysMap.values()]} />;
+  return <ActivitySummaries days={[...daysMap.values()]} />;
 };
 
-export default AllUsersActivityOverviewRoute;
+export default CombinedUsersActivitySummariesRoute;

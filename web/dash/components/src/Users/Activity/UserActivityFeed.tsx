@@ -5,7 +5,7 @@ import { UndoMainPadding } from '../../Chrome/Chrome';
 import EmptyState from '../../EmptyState';
 import KeystrokesViewer from './KeystrokesViewer';
 import ScreenshotViewer from './ScreenshotViewer';
-import ReviewDayHeader from './ReviewDayHeader';
+import FeedHeader from './FeedHeader';
 import ReviewDayWrapper from './ReviewDayWrapper';
 
 interface Screenshot {
@@ -21,7 +21,7 @@ interface KeystrokeLine {
   line: string;
 }
 
-export type ActivityItem = (Screenshot | KeystrokeLine) & {
+export type ActivityFeedItem = (Screenshot | KeystrokeLine) & {
   id: UUID;
   ids: UUID[];
   date: string;
@@ -30,13 +30,13 @@ export type ActivityItem = (Screenshot | KeystrokeLine) & {
 
 interface Props {
   date: Date;
-  items: ActivityItem[];
+  items: ActivityFeedItem[];
   numDeleted: number;
   deleteItems(ids: UUID[]): unknown;
   chunkSize?: number;
 }
 
-const UserActivityReviewDay: React.FC<Props> = ({
+const UserActivityFeed: React.FC<Props> = ({
   date,
   items,
   numDeleted,
@@ -46,7 +46,7 @@ const UserActivityReviewDay: React.FC<Props> = ({
   const navigate = useNavigate();
   return (
     <UndoMainPadding className="px-0 md:px-8 lg:px-10 py-5 md:py-10 pt-0 md:pt-4 pb-16 flex flex-col">
-      <ReviewDayHeader date={date} numItems={items.length} numDeleted={numDeleted} />
+      <FeedHeader date={date} numItems={items.length} numDeleted={numDeleted} />
       {items.length > 0 ? (
         <ReviewDayWrapper>
           {deleteableChunks(items, chunkSize, deleteItems)}
@@ -81,10 +81,10 @@ const UserActivityReviewDay: React.FC<Props> = ({
   );
 };
 
-export default UserActivityReviewDay;
+export default UserActivityFeed;
 
 export function deleteableChunks(
-  items: ActivityItem[],
+  items: ActivityFeedItem[],
   chunkSize: number,
   deleteItems: (ids: UUID[]) => unknown,
 ): JSX.Element[] {
@@ -139,7 +139,7 @@ function scrollToTop(): void {
 }
 
 function renderItem(
-  item: ActivityItem,
+  item: ActivityFeedItem,
   deleteItem: () => unknown,
   numRendered: number,
 ): JSX.Element {

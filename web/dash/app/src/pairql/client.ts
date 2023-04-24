@@ -13,6 +13,25 @@ export const liveClient = {
     );
   },
 
+  combinedUsersActivityFeed(
+    input: T.CombinedUsersActivityFeed.Input,
+  ): Promise<T.Result<T.CombinedUsersActivityFeed.Output>> {
+    return query<T.CombinedUsersActivityFeed.Input, T.CombinedUsersActivityFeed.Output>(
+      input,
+      `admin`,
+      `CombinedUsersActivityFeed`,
+    );
+  },
+
+  combinedUsersActivitySummaries(
+    input: T.CombinedUsersActivitySummaries.Input,
+  ): Promise<T.Result<T.CombinedUsersActivitySummaries.Output>> {
+    return query<
+      T.CombinedUsersActivitySummaries.Input,
+      T.CombinedUsersActivitySummaries.Output
+    >(input, `admin`, `CombinedUsersActivitySummaries`);
+  },
+
   confirmPendingNotificationMethod(
     input: T.ConfirmPendingNotificationMethod.Input,
   ): Promise<T.Result<T.ConfirmPendingNotificationMethod.Output>> {
@@ -52,12 +71,12 @@ export const liveClient = {
   },
 
   deleteActivityItems(
-    input: T.DeleteActivityItems.Input,
-  ): Promise<T.Result<T.DeleteActivityItems.Output>> {
-    return query<T.DeleteActivityItems.Input, T.DeleteActivityItems.Output>(
+    input: T.DeleteActivityItems_v2.Input,
+  ): Promise<T.Result<T.DeleteActivityItems_v2.Output>> {
+    return query<T.DeleteActivityItems_v2.Input, T.DeleteActivityItems_v2.Output>(
       input,
       `admin`,
-      `DeleteActivityItems`,
+      `DeleteActivityItems_v2`,
     );
   },
 
@@ -165,46 +184,6 @@ export const liveClient = {
 
   getUser(input: T.GetUser.Input): Promise<T.Result<T.GetUser.Output>> {
     return query<T.GetUser.Input, T.GetUser.Output>(input, `admin`, `GetUser`);
-  },
-
-  getUsersActivityDay(
-    input: T.GetUsersActivityDay.Input,
-  ): Promise<T.Result<T.GetUsersActivityDay.Output>> {
-    return query<T.GetUsersActivityDay.Input, T.GetUsersActivityDay.Output>(
-      input,
-      `admin`,
-      `GetUsersActivityDay`,
-    );
-  },
-
-  getUserActivityDay(
-    input: T.GetUserActivityDay.Input,
-  ): Promise<T.Result<T.GetUserActivityDay.Output>> {
-    return query<T.GetUserActivityDay.Input, T.GetUserActivityDay.Output>(
-      input,
-      `admin`,
-      `GetUserActivityDay`,
-    );
-  },
-
-  getUsersActivityOverviews(
-    input: T.GetUsersActivityOverviews.Input,
-  ): Promise<T.Result<T.GetUsersActivityOverviews.Output>> {
-    return query<T.GetUsersActivityOverviews.Input, T.GetUsersActivityOverviews.Output>(
-      input,
-      `admin`,
-      `GetUsersActivityOverviews`,
-    );
-  },
-
-  getUserActivityDays(
-    input: T.GetUserActivityDays.Input,
-  ): Promise<T.Result<T.GetUserActivityDays.Output>> {
-    return query<T.GetUserActivityDays.Input, T.GetUserActivityDays.Output>(
-      input,
-      `admin`,
-      `GetUserActivityDays`,
-    );
   },
 
   getUsers(input: T.GetUsers.Input): Promise<T.Result<T.GetUsers.Output>> {
@@ -323,6 +302,26 @@ export const liveClient = {
     );
   },
 
+  userActivityFeed(
+    input: T.UserActivityFeed.Input,
+  ): Promise<T.Result<T.UserActivityFeed.Output>> {
+    return query<T.UserActivityFeed.Input, T.UserActivityFeed.Output>(
+      input,
+      `admin`,
+      `UserActivityFeed`,
+    );
+  },
+
+  userActivitySummaries(
+    input: T.UserActivitySummaries.Input,
+  ): Promise<T.Result<T.UserActivitySummaries.Output>> {
+    return query<T.UserActivitySummaries.Input, T.UserActivitySummaries.Output>(
+      input,
+      `admin`,
+      `UserActivitySummaries`,
+    );
+  },
+
   verifySignupEmail(
     input: T.VerifySignupEmail.Input,
   ): Promise<T.Result<T.VerifySignupEmail.Output>> {
@@ -339,6 +338,12 @@ export type ApiClient = typeof liveClient;
 export const throwingClient: ApiClient = {
   allowingSignups: () => {
     throw new Error(`ApiClient.allowingSignups() not implemented`);
+  },
+  combinedUsersActivityFeed: () => {
+    throw new Error(`ApiClient.combinedUsersActivityFeed() not implemented`);
+  },
+  combinedUsersActivitySummaries: () => {
+    throw new Error(`ApiClient.combinedUsersActivitySummaries() not implemented`);
   },
   confirmPendingNotificationMethod: () => {
     throw new Error(`ApiClient.confirmPendingNotificationMethod() not implemented`);
@@ -391,15 +396,6 @@ export const throwingClient: ApiClient = {
   getUser: () => {
     throw new Error(`ApiClient.getUser() not implemented`);
   },
-  getUserActivityDay: () => {
-    throw new Error(`ApiClient.getUserActivityDay() not implemented`);
-  },
-  getUsersActivityDay: () => {
-    throw new Error(`ApiClient.getUsersActivityDay() not implemented`);
-  },
-  getUserActivityDays: () => {
-    throw new Error(`ApiClient.getUserActivityDays() not implemented`);
-  },
   getUsers: () => {
     throw new Error(`ApiClient.getUsers() not implemented`);
   },
@@ -445,10 +441,13 @@ export const throwingClient: ApiClient = {
   updateUnlockRequest: () => {
     throw new Error(`ApiClient.updateUnlockRequest() not implemented`);
   },
+  userActivityFeed: () => {
+    throw new Error(`ApiClient.userActivityFeed() not implemented`);
+  },
+  userActivitySummaries: () => {
+    throw new Error(`ApiClient.userActivitySummaries() not implemented`);
+  },
   verifySignupEmail: () => {
     throw new Error(`ApiClient.verifySignupEmail() not implemented`);
-  },
-  getUsersActivityOverviews: () => {
-    throw new Error(`ApiClient.getUsersActivityOverviews() not implemented`);
   },
 };

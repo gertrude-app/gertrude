@@ -108,7 +108,7 @@ function clean() {
  * }>}
  */
 async function getData() {
-  let endpoint = `http://127.0.0.1:8080/dashboard-ts-codegen`;
+  let endpoint = `http://192.168.10.227:8080/dashboard-ts-codegen`;
   const endpointIndex = process.argv.indexOf(`--endpoint`);
   if (endpointIndex !== -1) {
     endpoint = process.argv[endpointIndex + 1];

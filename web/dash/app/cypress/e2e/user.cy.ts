@@ -66,18 +66,18 @@ describe(`user screen`, () => {
 
   describe(`all users activity`, () => {
     it(`overviews page`, () => {
-      cy.intercept(`/pairql/dashboard/GetUsersActivityOverviews`, [
-        mock.allUsersActivityOverviewItem({
+      cy.intercept(`/pairql/dashboard/CombinedUsersActivitySummaries`, [
+        mock.combinedUsersActivitySummary({
           userId: `1`,
           days: [
-            mock.activityDay(10, 4, time.now()),
-            mock.activityDay(1234, 5, time.subtracting({ days: 1 })),
+            mock.userActivitySummary(10, 4, time.now()),
+            mock.userActivitySummary(1234, 5, time.subtracting({ days: 1 })),
           ],
         }),
-        mock.allUsersActivityOverviewItem({
+        mock.combinedUsersActivitySummary({
           userId: `456`,
           userName: `Suzy`,
-          days: [mock.activityDay(16, 2, time.now())],
+          days: [mock.userActivitySummary(16, 2, time.now())],
         }),
       ]);
 
@@ -93,11 +93,11 @@ describe(`user screen`, () => {
         `ff285ff7-28d8-43f6-8ecd-bb6c3037196c`,
         `359741a3-b61c-456e-a50b-47cc4abfc33a`,
       ];
-      cy.intercept(`/pairql/dashboard/GetUsersActivityDay`, (req) => {
-        req.alias = `getUsersActivityDay`;
+      cy.intercept(`/pairql/dashboard/CombinedUsersActivityFeed`, (req) => {
+        req.alias = `combinedUsersActivityFeed`;
         req.reply([
-          mock.allUsersActivityDay(),
-          mock.allUsersActivityDay({
+          mock.combinedUsersActivityFeed(),
+          mock.combinedUsersActivityFeed({
             userName: `Suzy`,
             numDeleted: 1,
             items: [
@@ -118,11 +118,11 @@ describe(`user screen`, () => {
 
       cy.visit(`/users/activity/03-06-2023`);
 
-      cy.wait(`@getUsersActivityDay`)
+      cy.wait(`@combinedUsersActivityFeed`)
         .its(`request.body`)
         .should(`deep.equal`, { range: entireDay(dateFromUrl(`03-06-2023`)) });
 
-      cy.intercept(`/pairql/dashboard/DeleteActivityItems`, (req) => {
+      cy.intercept(`/pairql/dashboard/DeleteActivityItems_v2`, (req) => {
         req.alias = `deleteActivityItems`;
         req.reply({ success: true });
       });

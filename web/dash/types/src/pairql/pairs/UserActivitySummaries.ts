@@ -1,6 +1,6 @@
 // auto-generated, do not edit
 
-export namespace GetUserActivityDays {
+export namespace UserActivitySummaries {
   export interface Input {
     userId: UUID;
     dateRanges: Array<{

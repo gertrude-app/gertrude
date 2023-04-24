@@ -1,6 +1,6 @@
 // auto-generated, do not edit
 
-export namespace GetUsersActivityOverviews {
+export namespace CombinedUsersActivitySummaries {
   export type Input = Array<{
     start: string;
     end: string;

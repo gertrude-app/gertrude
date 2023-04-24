@@ -10,7 +10,7 @@ type Props = {
   days: Array<ComponentProps<typeof ReviewSummaryCard>>;
 };
 
-const UserActivityOverviewScreen: React.FC<Props> = ({ userName, days }) => (
+const ActivitySummaries: React.FC<Props> = ({ userName, days }) => (
   <>
     <PageHeading icon="user" className="mb-4 sm:mb-7">
       {userName ? posessive(userName) : `All User`} Activity
@@ -39,4 +39,4 @@ const UserActivityOverviewScreen: React.FC<Props> = ({ userName, days }) => (
   </>
 );
 
-export default UserActivityOverviewScreen;
+export default ActivitySummaries;

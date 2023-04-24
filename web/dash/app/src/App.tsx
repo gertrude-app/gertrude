@@ -23,14 +23,14 @@ import JoinWaitlist from './components/routes/JoinWaitlist';
 import AdminProfile from './components/routes/AdminProfile';
 import Keychain from './components/routes/Keychain';
 import Users from './components/routes/Users';
-import UserActivityOverview from './components/routes/UserActivityOverview';
-import UserActivityDay from './components/routes/UserActivityDay';
+import UserActivitySummaries from './components/routes/UserActivitySummaries';
 import Keychains from './components/routes/Keychains';
 import Signup from './components/routes/Signup';
 import User from './components/routes/User';
 import useWindowWidth from './hooks/window-width';
-import AllUsersActivityOverview from './components/routes/AllUsersActivityOverview';
-import UsersActivityDay from './components/routes/UsersActivityDay';
+import AllUsersActivityOverview from './components/routes/CombinedUsersActivitySummaries';
+import CombinedUsersActivityFeedRoute from './components/routes/CombinedUsersActivityFeed';
+import UserActivityFeed from './components/routes/UserActivityFeed';
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
@@ -85,7 +85,7 @@ const App: React.FC = () => {
 
           <Route path="activity">
             <Route index element={<AllUsersActivityOverview />} />
-            <Route path=":date" element={<UsersActivityDay />} />
+            <Route path=":date" element={<CombinedUsersActivityFeedRoute />} />
           </Route>
 
           <Route path=":userId">
@@ -104,8 +104,8 @@ const App: React.FC = () => {
             </Route>
 
             <Route path="activity">
-              <Route index element={<UserActivityOverview />} />
-              <Route path=":date" element={<UserActivityDay />} />
+              <Route index element={<UserActivitySummaries />} />
+              <Route path=":date" element={<UserActivityFeed />} />
             </Route>
           </Route>
         </Route>

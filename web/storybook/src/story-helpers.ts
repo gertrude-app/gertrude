@@ -1,6 +1,6 @@
 import { env } from '@shared/components';
 import { time } from '@shared/datetime';
-import type { ActivityItem } from '@dash/components';
+import type { ActivityFeedItem } from '@dash/components';
 import type { ConfirmableEntityAction, KeychainSummary, Key } from '@dash/types';
 import Placeholder400x600 from './static/placeholder/400x600.png';
 import Placeholder300x200 from './static/placeholder/300x200.png';
@@ -61,38 +61,6 @@ export function confirmableEntityAction<
     cancel: () => {},
   };
 }
-
-// export const time = {
-//   now,
-//   subtracting,
-//   stable,
-// };
-
-// function stable(): string {
-//   return `2022-01-01T12:00:00.000Z`;
-// }
-
-// function subtracting(amounts: {
-//   days?: number;
-//   hours?: number;
-//   minutes?: number;
-// }): string {
-//   const date = new Date();
-//   if (amounts.days) {
-//     date.setDate(date.getDate() - amounts.days);
-//   }
-//   if (amounts.hours) {
-//     date.setHours(date.getHours() - amounts.hours);
-//   }
-//   if (amounts.minutes) {
-//     date.setMinutes(date.getMinutes() - amounts.minutes);
-//   }
-//   return date.toISOString();
-// }
-
-// function now(): string {
-//   return new Date().toISOString();
-// }
 
 export function props<T>(args: T): { args: T } {
   return { args };
@@ -264,7 +232,7 @@ export function keystrokeLine(
   appName: string,
   line: string,
   deleted?: boolean,
-): ActivityItem {
+): ActivityFeedItem {
   return {
     ...common(),
     type: `KeystrokeLine`,
@@ -274,7 +242,11 @@ export function keystrokeLine(
   };
 }
 
-export function screenshot(width = 800, height = 600, deleted?: boolean): ActivityItem {
+export function screenshot(
+  width = 800,
+  height = 600,
+  deleted?: boolean,
+): ActivityFeedItem {
   return {
     ...common(),
     type: `Screenshot`,

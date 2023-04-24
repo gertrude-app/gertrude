@@ -5,13 +5,13 @@ import type {
   GetAdmin,
   Device,
   KeychainSummary,
-  GetUserActivityDays,
+  UserActivitySummaries,
   SuspendFilterRequest,
   GetIdentifiedApps,
-  GetUsersActivityDay,
-  GetUsersActivityOverviews,
+  CombinedUsersActivityFeed,
+  CombinedUsersActivitySummaries,
 } from '@dash/types';
-import type { ActivityItem } from '@dash/components';
+import type { ActivityFeedItem } from '@dash/components';
 import * as empty from '../../redux/empty';
 
 type Admin = GetAdmin.Output;
@@ -105,11 +105,11 @@ export function keychainSummary(
   };
 }
 
-export function activityDay(
+export function userActivitySummary(
   totalItems = 0,
   numApproved = 0,
   start = new Date().toISOString(),
-): GetUserActivityDays.Output['days'][number] {
+): UserActivitySummaries.Output['days'][number] {
   return {
     date: start,
     totalItems,
@@ -117,20 +117,24 @@ export function activityDay(
   };
 }
 
-export function allUsersActivityOverviewItem(
-  override: Partial<GetUsersActivityOverviews.Output[number]> = {},
-): GetUsersActivityOverviews.Output[number] {
+export function combinedUsersActivitySummary(
+  override: Partial<CombinedUsersActivitySummaries.Output[number]> = {},
+): CombinedUsersActivitySummaries.Output[number] {
   return {
     userName: `Bob`,
     userId: uuid(),
-    days: [activityDay(1, 1), activityDay(35, 25), activityDay(110, 1)],
+    days: [
+      userActivitySummary(1, 1),
+      userActivitySummary(35, 25),
+      userActivitySummary(110, 1),
+    ],
     ...override,
   };
 }
 
-export function allUsersActivityDay(
-  override: Partial<GetUsersActivityDay.Output[number]> = {},
-): GetUsersActivityDay.Output[number] {
+export function combinedUsersActivityFeed(
+  override: Partial<CombinedUsersActivityFeed.Output[number]> = {},
+): CombinedUsersActivityFeed.Output[number] {
   const width = 700;
   const height = 400;
   const id = uuid();
@@ -165,7 +169,9 @@ export function allUsersActivityDay(
   };
 }
 
-export function keystrokeLine(override: Partial<ActivityItem> = {}): ActivityItem {
+export function keystrokeLine(
+  override: Partial<ActivityFeedItem> = {},
+): ActivityFeedItem {
   const id = override.id ?? uuid();
   const ids = override.ids ?? [id];
   return {

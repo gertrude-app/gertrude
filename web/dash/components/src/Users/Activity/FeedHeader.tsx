@@ -8,7 +8,7 @@ interface Props {
   numDeleted: number;
 }
 
-const ReviewDayHeader: React.FC<Props> = ({ date, numItems, numDeleted }) => (
+const FeedHeader: React.FC<Props> = ({ date, numItems, numDeleted }) => (
   <header className="flex items-center justify-between p-2 pr-6 rounded-b-2xl md:rounded-t-2xl shadow-lg shadow-slate-800/10 bg-white max-w-7xl mb-8 z-20 relative">
     <div className="flex items-center text-md sm:text-l">
       <Link
@@ -31,4 +31,4 @@ const ReviewDayHeader: React.FC<Props> = ({ date, numItems, numDeleted }) => (
   </header>
 );
 
-export default ReviewDayHeader;
+export default FeedHeader;

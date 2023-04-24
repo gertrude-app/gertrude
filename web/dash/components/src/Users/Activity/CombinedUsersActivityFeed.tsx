@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@shared/components';
 import { posessive } from '@dash/utils';
 import { typesafe } from '@shared/ts-utils';
-import type { ActivityItem } from './UserActivityReviewDay';
+import type { ActivityFeedItem } from './UserActivityFeed';
 import { UndoMainPadding } from '../../Chrome/Chrome';
 import PartyMessage from '../../PartyMessage';
-import { deleteableChunks } from './UserActivityReviewDay';
-import ReviewDayHeader from './ReviewDayHeader';
+import { deleteableChunks } from './UserActivityFeed';
+import FeedHeader from './FeedHeader';
 import ReviewDayWrapper from './ReviewDayWrapper';
 import UserActivityHeader from './UserActivityHeader';
 
@@ -15,13 +15,13 @@ type UserName = string;
 
 interface Props {
   date: Date;
-  activity: Record<UserName, ActivityItem[]>;
+  activity: Record<UserName, ActivityFeedItem[]>;
   numDeleted: number;
   deleteItems(ids: UUID[]): unknown;
   chunkSize?: number;
 }
 
-const AllUsersActivityReviewDay: React.FC<Props> = ({
+const CombinedUsersActivityFeed: React.FC<Props> = ({
   date,
   activity,
   numDeleted,
@@ -34,27 +34,27 @@ const AllUsersActivityReviewDay: React.FC<Props> = ({
 
   return (
     <UndoMainPadding>
-      <ReviewDayHeader date={date} numItems={items.length} numDeleted={numDeleted} />
+      <FeedHeader date={date} numItems={items.length} numDeleted={numDeleted} />
       {items.length > 0 ? (
         <ReviewDayWrapper>
           {typesafe.objectEntries(activity).map(([userName, items]) => (
             <div key={userName} className="flex flex-col justify-center space-y-4">
               <UserActivityHeader>{userName}</UserActivityHeader>
               {deleteableChunks(items, chunkSize, deleteItems)}
-              <div className="flex justify-center pb-8">
-                <Button
-                  className="ScrollTop"
-                  type="button"
-                  onClick={() => {
-                    deleteItems(items.map((item) => item.id));
-                    setTimeout(() => navigate(`..`, { replace: true }), 100);
-                  }}
-                  color="primary"
-                >
-                  <i className="fa-solid fa-thumbs-up mr-2" />
-                  Approve all {posessive(userName)} activity
-                </Button>
-              </div>
+              {typesafe.objectValues(activity).length > 1 && (
+                <div className="flex justify-center pb-8">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      deleteItems(items.map((item) => item.id));
+                    }}
+                    color="secondary"
+                  >
+                    <i className="fa-solid fa-thumbs-up mr-2" />
+                    Approve all {posessive(userName)} activity
+                  </Button>
+                </div>
+              )}
             </div>
           ))}
           <hr className="h-[3px] bg-gradient-to-l from-indigo-500 to-fuchsia-500 opacity-20" />
@@ -80,4 +80,4 @@ const AllUsersActivityReviewDay: React.FC<Props> = ({
   );
 };
 
-export default AllUsersActivityReviewDay;
+export default CombinedUsersActivityFeed;
