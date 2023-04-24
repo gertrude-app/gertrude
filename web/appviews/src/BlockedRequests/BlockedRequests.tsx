@@ -16,13 +16,27 @@ export const BlockedRequests: React.FC<Props> = ({
   emit,
   dispatch,
   unlockRequestExplanation,
-  selectedRequests,
-  unlockRequest,
+  createUnlockRequests,
+  selectedRequestIds,
 }) => {
+  // TODO: extract and test
   const filteredRequests = requests
-    // TODO(jared): text filtering needs to be re-implmented more carefully
-    .filter((req) => req.searchableText.toLowerCase().includes(filterText.toLowerCase()))
-    .filter((req) => (tcpOnly ? req.protocol === `tcp` : true));
+    .filter((req) => {
+      if (filterText.trim() === ``) return true;
+      const query = filterText.toLowerCase();
+      const textToSearch = req.searchableText.toLowerCase();
+      if (!query.includes(` `)) {
+        return textToSearch.includes(query);
+      } else {
+        for (const part in query.split(/\s+/g)) {
+          if (textToSearch.includes(part)) return true;
+        }
+      }
+      return true;
+    })
+    .filter((req) => (tcpOnly ? req.protocol === `tcp` : true))
+    .sort((a, b) => (b.time > a.time ? 1 : -1));
+
   return (
     <div className="bg-white dark:bg-slate-900 h-full flex flex-col rounded-b-xl">
       <header className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900">
@@ -31,7 +45,7 @@ export const BlockedRequests: React.FC<Props> = ({
             className="bg-slate-50 dark:bg-slate-800/50 dark:focus:bg-slate-800 rounded-xl px-4 py-2 w-80 transition duration-100 focus:bg-slate-50 focus:shadow-md outline-none border-[0.5px] dark:border-slate-700 placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
             placeholder="Filter..."
             value={filterText}
-            onChange={(e) => emit({ case: `updateFilterText`, text: e.target.value })}
+            onChange={(e) => emit({ case: `filterTextUpdated`, text: e.target.value })}
           />
           <button
             className={cx(
@@ -40,7 +54,7 @@ export const BlockedRequests: React.FC<Props> = ({
                 ? `opacity-100 translate-y-0 cursor-pointer`
                 : `opacity-0 translate-y-1 cursor-default`,
             )}
-            onClick={() => emit({ case: `updateFilterText`, text: `` })}
+            onClick={() => emit({ case: `filterTextUpdated`, text: `` })}
           >
             <i className="fa-solid fa-times text-slate-500 text-sm" />
           </button>
@@ -49,7 +63,7 @@ export const BlockedRequests: React.FC<Props> = ({
           <div className="flex items-center space-x-2">
             <Toggle
               enabled={tcpOnly}
-              setEnabled={() => emit({ case: `toggleTcpOnly` })}
+              setEnabled={() => emit({ case: `tcpOnlyToggled` })}
               small
             />
             <span className="text-slate-700 dark:text-slate-300 font-medium">
@@ -57,7 +71,12 @@ export const BlockedRequests: React.FC<Props> = ({
             </span>
           </div>
         </div>
-        <Button color="tertiary" size="small" type="button" onClick={() => {}}>
+        <Button
+          color="tertiary"
+          size="small"
+          type="button"
+          onClick={() => emit({ case: `clearRequestsClicked` })}
+        >
           <i className="fa-solid fa-ban mr-2 text-red-400" />
           Clear requests
         </Button>
@@ -75,10 +94,8 @@ export const BlockedRequests: React.FC<Props> = ({
               protocol={req.protocol}
               target={req.target}
               app={req.app}
-              selected={selectedRequests.includes(req.id)}
-              onSelectToggle={() =>
-                dispatch({ type: `toggleRequestSelected`, id: req.id })
-              }
+              selected={selectedRequestIds.includes(req.id)}
+              onSelectToggle={() => emit({ case: `toggleRequestSelected`, id: req.id })}
             />
           ))}
       </div>
@@ -86,8 +103,8 @@ export const BlockedRequests: React.FC<Props> = ({
         emit={emit}
         dispatch={dispatch}
         unlockRequestExplanation={unlockRequestExplanation}
-        selectedRequests={selectedRequests}
-        unlockRequest={unlockRequest}
+        selectedRequestIds={selectedRequestIds}
+        createUnlockRequests={createUnlockRequests}
       />
     </div>
   );
@@ -98,21 +115,21 @@ type PanelProps = Omit<Props, 'requests' | 'filterText' | 'tcpOnly' | 'windowOpe
 const BottomPanel: React.FC<PanelProps> = ({
   unlockRequestExplanation,
   dispatch,
-  selectedRequests,
-  unlockRequest,
+  selectedRequestIds,
+  createUnlockRequests,
   emit,
 }) => {
-  if (selectedRequests.length === 0 && unlockRequest.case === `idle`) {
+  if (selectedRequestIds.length === 0 && createUnlockRequests.case === `idle`) {
     return null;
   }
-  if (unlockRequest.case === `loading`) {
+  if (createUnlockRequests.case === `ongoing`) {
     return (
       <BottomPanelWrap>
         spinner here... (maybe extract component from menubar?)
       </BottomPanelWrap>
     );
   }
-  if (unlockRequest.case === `succeeded`) {
+  if (createUnlockRequests.case === `succeeded`) {
     return (
       <BottomPanelWrap>
         Unlock request sent successfully! (i think a "close window" button might be nice
@@ -120,14 +137,14 @@ const BottomPanel: React.FC<PanelProps> = ({
       </BottomPanelWrap>
     );
   }
-  if (unlockRequest.case === `failed`) {
+  if (createUnlockRequests.case === `failed`) {
     return (
       <BottomPanelWrap>
         Failed to send unlock request:{` `}
-        <span className="text-red-500 px-3">{unlockRequest.error}</span>
+        <span className="text-red-500 px-3">{createUnlockRequests.error}</span>
         <button
           className="border border-black px-3 py-1 rounded-md"
-          onClick={() => dispatch({ type: `requestFailedTryAgainClicked` })}
+          onClick={() => emit({ case: `requestFailedTryAgainClicked` })}
         >
           try again
         </button>
@@ -147,12 +164,20 @@ const BottomPanel: React.FC<PanelProps> = ({
       />
       <div className="flex flex-col justify-end items-end">
         <span className="text-slate-600 dark:text-slate-400 font-medium mb-3">
-          {selectedRequests.length} addresses selected
+          {selectedRequestIds.length} addresses selected
         </span>
         <Button
           color="secondary"
           type="button"
-          onClick={() => emit({ case: `unlockRequestSubmitted`, ids: selectedRequests })}
+          onClick={() =>
+            emit({
+              case: `unlockRequestSubmitted`,
+              comment:
+                unlockRequestExplanation.trim() === ``
+                  ? undefined
+                  : unlockRequestExplanation,
+            })
+          }
         >
           Send unlock request
           <i className="fa-solid fa-arrow-right ml-2" />

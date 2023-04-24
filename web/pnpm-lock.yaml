@@ -54,6 +54,7 @@ importers:
       react-dom: 18.2.0
       typescript: ^4.9.3
       vite: ^4.1.0
+      x-exec: ^1.2.0
     dependencies:
       '@dash/components': link:../dash/components
       '@headlessui/react': 1.7.12_biqbaboplfbrettd7655fr4n2y
@@ -68,6 +69,7 @@ importers:
       '@types/react': 18.0.28
       '@types/react-dom': 18.0.11
       classnames: 2.3.2
+      x-exec: 1.2.0
 
   dash/ambient:
     specifiers: {}

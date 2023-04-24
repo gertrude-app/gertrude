@@ -1,8 +1,9 @@
 import { useReducer, useEffect } from 'react';
 import type React from 'react';
 
-export type Action<AppState, ViewAction> =
+export type ActionOf<AppState, AppEvent, ViewAction> =
   | { type: 'receivedUpdatedAppState'; appState: AppState }
+  | { type: 'appEventEmitted'; event: AppEvent }
   | ViewAction;
 
 export type PropsOf<AppState, ViewState, AppEvent, ViewAction> = AppState &
@@ -12,14 +13,21 @@ export type PropsOf<AppState, ViewState, AppEvent, ViewAction> = AppState &
   };
 
 export abstract class Store<AppState, AppEvent, ViewState, ViewAction> {
-  bind(window: any, dispatch: React.Dispatch<Action<AppState, ViewAction>>): void {
+  bind(
+    window: any,
+    dispatch: React.Dispatch<ActionOf<AppState, AppEvent, ViewAction>>,
+  ): void {
     window.updateAppState = (appState: AppState) => {
       dispatch({ type: `receivedUpdatedAppState`, appState });
     };
   }
 
-  emitter(window: any): (event: AppEvent) => unknown {
+  emitter(
+    window: any,
+    dispatch: React.Dispatch<ActionOf<AppState, AppEvent, ViewAction>>,
+  ): (event: AppEvent) => unknown {
     return (event: AppEvent) => {
+      dispatch({ type: `appEventEmitted`, event });
       window.webkit.messageHandlers.appView.postMessage(JSON.stringify(event));
     };
   }
@@ -28,7 +36,7 @@ export abstract class Store<AppState, AppEvent, ViewState, ViewAction> {
 
   abstract reducer(
     state: AppState & ViewState,
-    action: Action<AppState, ViewAction>,
+    action: ActionOf<AppState, AppEvent, ViewAction>,
   ): AppState & ViewState;
 }
 
@@ -37,7 +45,11 @@ export function containerize<AppState, AppEvent, ViewState, ViewAction>(
   component: React.FC<PropsOf<AppState, ViewState, AppEvent, ViewAction>>,
 ): React.FC {
   return () => {
-    const [state, dispatch] = useReducer(store.reducer, undefined, store.initializer);
+    const [state, dispatch] = useReducer(
+      store.reducer.bind(store),
+      undefined,
+      store.initializer.bind(store),
+    );
 
     useEffect(() => {
       store.bind(window, dispatch);
@@ -45,7 +57,7 @@ export function containerize<AppState, AppEvent, ViewState, ViewAction>(
 
     const props = {
       ...state,
-      emit: store.emitter(window),
+      emit: store.emitter(window, dispatch),
       dispatch,
     };
 

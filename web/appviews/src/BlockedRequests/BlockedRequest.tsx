@@ -37,7 +37,7 @@ const BlockedRequest: React.FC<Props> = ({
         />
       </div>
       <span className="text-xs text-slate-400/80 dark:text-slate-500 ml-4 font-mono">
-        {time}
+        {new Date(time).toLocaleTimeString().replace(/ +/g, ``)}
       </span>
       <span
         className={cx(
