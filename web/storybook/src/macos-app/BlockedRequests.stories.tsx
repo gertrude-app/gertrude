@@ -115,7 +115,7 @@ export const DarkModeSubmitting = props({
   dark: true,
   props: {
     ...LightModeSelected.args.props,
-    createUnlockRequests: { case: `loading` },
+    createUnlockRequests: { case: `ongoing` },
   },
 });
 

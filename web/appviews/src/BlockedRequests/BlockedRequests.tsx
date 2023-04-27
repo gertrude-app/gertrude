@@ -86,7 +86,7 @@ export const BlockedRequests: React.FC<Props> = ({
           <div className="h-full flex justify-center items-center">
             <div className="flex flex-col items-center">
               <Loading />
-              <h3 className="text-xl font-medium text-slate-400 mt-8">
+              <h3 className="text-xl font-medium text-slate-400 dark:text-slate-500 mt-8">
                 Waiting for requests...
               </h3>
             </div>
@@ -135,34 +135,43 @@ const BottomPanel: React.FC<PanelProps> = ({
     return (
       <BottomPanelWrap className="flex flex-col justify-center items-center h-32">
         <Loading className="scale-50" />
-        <span className="text-slate-400 text-sm">Submitting...</span>
+        <span className="text-slate-400 dark:text-slate-500 text-sm">Submitting...</span>
       </BottomPanelWrap>
     );
   }
   if (createUnlockRequests.case === `succeeded`) {
     return (
-      <BottomPanelWrap>
-        Unlock request sent successfully! (i think a "close window" button might be nice
-        here)
+      <BottomPanelWrap className="flex justify-between items-center h-20">
+        <span className="text-lg text-slate-500 dark:text-slate-400 font-medium ml-2 flex items-center">
+          <i className="fa-solid fa-check mr-3 text-green-500" />
+          Unlock request sent!
+        </span>
+        <Button type="button" onClick={() => {}} color="secondary" size="medium">
+          Close window
+        </Button>
       </BottomPanelWrap>
     );
   }
   if (createUnlockRequests.case === `failed`) {
     return (
-      <BottomPanelWrap>
-        Failed to send unlock request:{` `}
-        <span className="text-red-500 px-3">{createUnlockRequests.error}</span>
-        <button
-          className="border border-black px-3 py-1 rounded-md"
-          onClick={() => emit({ case: `requestFailedTryAgainClicked` })}
-        >
-          try again
-        </button>
+      <BottomPanelWrap className="flex h-44">
+        <div className="flex flex-col items-center p-4 rounded-2xl border border-red-200 dark:border-red-700/50 bg-red-50/30 dark:bg-red-600/5 flex-grow">
+          <span className="font-bold text-lg text-slate-700 dark:text-white/80">
+            Failed to send unlock request:
+          </span>
+          <span className="text-red-500 mb-4 dark:text-red-400">
+            {createUnlockRequests.error}
+          </span>
+          <Button type="button" onClick={() => {}} color="warning" size="small">
+            <i className="fa-solid fa-redo mr-2" />
+            Try again
+          </Button>
+        </div>
       </BottomPanelWrap>
     );
   }
   return (
-    <BottomPanelWrap className="justify-between h-36">
+    <BottomPanelWrap className="justify-between h-32">
       <TextInput
         type="textarea"
         value={unlockRequestExplanation}
