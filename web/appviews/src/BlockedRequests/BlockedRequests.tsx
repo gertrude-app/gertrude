@@ -32,7 +32,7 @@ export const BlockedRequests: React.FC<Props> = ({
           if (textToSearch.includes(part)) return true;
         }
       }
-      return true;
+      return false;
     })
     .filter((req) => (tcpOnly ? req.protocol === `tcp` : true))
     .sort((a, b) => (b.time > a.time ? 1 : -1));
@@ -93,7 +93,15 @@ export const BlockedRequests: React.FC<Props> = ({
           </div>
         )}
         {requests.length > 0 && filteredRequests.length === 0 && (
-          <span>no matching requests</span>
+          <div className="h-full flex flex-col justify-center items-center border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-black/20">
+            <i className="fa-solid fa-cow text-6xl text-slate-300 dark:text-slate-700" />
+            <h3 className="text-2xl font-bold mt-6 dark:text-white/80">
+              No matching requests
+            </h3>
+            <p className="max-w-sm text-center mt-2 text-slate-500 dark:text-slate-400">
+              Try changing the filter query or toggling TCP only
+            </p>
+          </div>
         )}
         {filteredRequests.length > 0 &&
           filteredRequests.map((req) => (
