@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { Button, TextInput, Toggle } from '@shared/components';
+import { Button, Loading, TextInput, Toggle } from '@shared/components';
 import type { AppState, ViewState, AppEvent, ViewAction } from './blockedrequests-store';
 import type { PropsOf } from '../lib/store';
 import { containerize } from '../lib/store';
@@ -38,7 +38,7 @@ export const BlockedRequests: React.FC<Props> = ({
     .sort((a, b) => (b.time > a.time ? 1 : -1));
 
   return (
-    <div className="bg-white dark:bg-slate-900 h-full flex flex-col rounded-b-xl">
+    <div className="bg-white dark:bg-slate-900 flex flex-col rounded-b-xl h-screen">
       <header className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center">
           <input
@@ -82,7 +82,16 @@ export const BlockedRequests: React.FC<Props> = ({
         </Button>
       </header>
       <div className="flex flex-col p-4 flex-grow overflow-y-scroll">
-        {requests.length === 0 && <span>...waiting for requests</span>}
+        {requests.length === 0 && (
+          <div className="h-full flex justify-center items-center">
+            <div className="flex flex-col items-center">
+              <Loading />
+              <h3 className="text-xl font-medium text-slate-400 mt-8">
+                Waiting for requests...
+              </h3>
+            </div>
+          </div>
+        )}
         {requests.length > 0 && filteredRequests.length === 0 && (
           <span>no matching requests</span>
         )}
@@ -124,8 +133,9 @@ const BottomPanel: React.FC<PanelProps> = ({
   }
   if (createUnlockRequests.case === `ongoing`) {
     return (
-      <BottomPanelWrap>
-        spinner here... (maybe extract component from menubar?)
+      <BottomPanelWrap className="flex flex-col justify-center items-center h-32">
+        <Loading className="scale-50" />
+        <span className="text-slate-400 text-sm">Submitting...</span>
       </BottomPanelWrap>
     );
   }
@@ -152,7 +162,7 @@ const BottomPanel: React.FC<PanelProps> = ({
     );
   }
   return (
-    <BottomPanelWrap className="justify-between">
+    <BottomPanelWrap className="justify-between h-36">
       <TextInput
         type="textarea"
         value={unlockRequestExplanation}
@@ -191,7 +201,7 @@ const BottomPanelWrap: React.FC<{ className?: string; children: React.ReactNode 
   className,
   children,
 }) => (
-  <div className="border-b border-slate-200 dark:border-slate-800 shadow-xl shadow-black/5 dark:shadow-black/50 rotate-180">
+  <div className="border-b border-slate-200 dark:border-slate-800 shadow-lg shadow-black/5 dark:shadow-black/50 rotate-180 [transition:200ms]">
     <div className={cx(`rotate-180 p-4 flex`, className)}>{children}</div>
   </div>
 );

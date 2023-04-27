@@ -8,7 +8,7 @@ import AppWindow from './AppWindow';
 const meta = {
   title: 'MacOS App/Blocked Requests', // eslint-disable-line
   component: AppWindow<Wrapping<typeof BlockedRequests>>,
-  parameters: { layout: `centered` },
+  parameters: { layout: `fullscreen` },
 } satisfies Meta<typeof AppWindow<Wrapping<typeof BlockedRequests>>>;
 
 type Story = StoryObj<typeof meta>;
@@ -17,13 +17,14 @@ export const LightMode = props({
   width: 900,
   height: 600,
   wrapping: BlockedRequests,
+  fullscreen: true,
   props: {
     requests: requests(),
     windowOpen: true,
     filterText: ``,
     tcpOnly: false,
-    unlockRequest: { case: `idle` },
-    selectedRequests: [],
+    createUnlockRequests: { case: `idle` },
+    selectedRequestIds: [],
     unlockRequestExplanation: ``,
     emit: () => {},
     dispatch: () => {},
@@ -35,7 +36,7 @@ export const LightModeSelected = props({
   props: {
     ...LightMode.args.props,
     unlockRequestExplanation: `need this for my math class, dad!`,
-    selectedRequests: [`1`, `2`],
+    selectedRequestIds: [`1`, `2`],
   },
 });
 
@@ -59,7 +60,7 @@ export const LightModeSubmitting = props({
   ...LightModeSelected.args,
   props: {
     ...LightModeSelected.args.props,
-    unlockRequest: { case: `loading` },
+    createUnlockRequests: { case: `ongoing` },
   },
 });
 
@@ -67,7 +68,7 @@ export const LightModeSubmitSuccess = props({
   ...LightModeSelected.args,
   props: {
     ...LightModeSelected.args.props,
-    unlockRequest: { case: `succeeded` },
+    createUnlockRequests: { case: `succeeded` },
   },
 });
 
@@ -75,7 +76,7 @@ export const LightModeSubmitError = props({
   ...LightModeSelected.args,
   props: {
     ...LightModeSelected.args.props,
-    unlockRequest: { case: `failed`, error: `something went wrong` },
+    createUnlockRequests: { case: `failed`, error: `Something went wrong` },
   },
 });
 
@@ -89,7 +90,7 @@ export const DarkModeSelected = props({
   dark: true,
   props: {
     ...LightMode.args.props,
-    selectedRequests: [`1`, `2`],
+    selectedRequestIds: [`1`, `2`],
   },
 });
 
@@ -114,7 +115,7 @@ export const DarkModeSubmitting = props({
   dark: true,
   props: {
     ...LightModeSelected.args.props,
-    unlockRequest: { case: `loading` },
+    createUnlockRequests: { case: `loading` },
   },
 });
 
@@ -123,7 +124,7 @@ export const DarkModeSubmitSuccess = props({
   dark: true,
   props: {
     ...LightModeSelected.args.props,
-    unlockRequest: { case: `succeeded` },
+    createUnlockRequests: { case: `succeeded` },
   },
 });
 
@@ -132,7 +133,7 @@ export const DarkModeSubmitError = props({
   dark: true,
   props: {
     ...LightModeSelected.args.props,
-    unlockRequest: { case: `failed`, error: `something went wrong` },
+    createUnlockRequests: { case: `failed`, error: `something went wrong` },
   },
 });
 
