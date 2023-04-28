@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@shared/components';
+import { formatDate } from '@dash/datetime';
 import { UndoMainPadding } from '../../Chrome/Chrome';
-import PartyMessage from '../../PartyMessage';
+import EmptyState from '../../EmptyState';
 import KeystrokesViewer from './KeystrokesViewer';
 import ScreenshotViewer from './ScreenshotViewer';
-import { formatDate } from '@dash/datetime';
 
 interface Screenshot {
   type: 'Screenshot';
@@ -53,7 +53,7 @@ const UserActivityReviewDay: React.FC<Props> = ({
           >
             <i className="fa fa-chevron-left mr-2" aria-hidden /> Back
           </Link>
-          <h1 className="font-bold text-slate-800">{formatDate(date, 'medium')}</h1>
+          <h1 className="font-bold text-slate-800">{formatDate(date, `medium`)}</h1>
         </div>
         {items.length > 0 && (
           <div className="text-slate-600 self-end sm:self-center flex items-center space-x-0.5 sm:space-x-1">
@@ -86,8 +86,15 @@ const UserActivityReviewDay: React.FC<Props> = ({
           </Button>
         </div>
       ) : (
-        <div className="flex justify-center p-8">
-          <PartyMessage>Nothing to review for this day</PartyMessage>
+        <div className="p-8">
+          <EmptyState
+            heading={`All caught up!`}
+            secondaryText={`Nothing left to review for this day.`}
+            icon={`image`}
+            buttonText={`Back to activity`}
+            buttonIcon="arrow-left"
+            action={`../`}
+          />
         </div>
       )}
     </UndoMainPadding>

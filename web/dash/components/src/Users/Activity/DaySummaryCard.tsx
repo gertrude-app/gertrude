@@ -31,28 +31,28 @@ const DaySummaryCard: React.FC<Props> = ({
         <div className="flex flex-col items-center self-stretch">
           <div
             className={cx(
-              'border border-dashed border-slate-200 flex-grow',
-              index === 0 && 'border-none',
+              `border border-dashed border-slate-200 flex-grow`,
+              index === 0 && `border-none`,
             )}
           />
           <div
             className={cx(
-              'w-7 h-7 border-2 rounded-full flex justify-center items-center',
-              numCompleted === 0 ? 'border-slate-200' : 'border-violet-500',
-              numCompleted === numItems && 'bg-violet-500',
+              `w-7 h-7 border-2 rounded-full flex justify-center items-center`,
+              numCompleted === 0 ? `border-slate-200` : `border-violet-500`,
+              numCompleted === numItems && `bg-violet-500`,
             )}
           >
             <i
               className={cx(
-                'fa fa-check',
-                numCompleted === numItems ? 'text-white' : 'text-slate-50',
+                `fa fa-check`,
+                numCompleted === numItems ? `text-white` : `text-slate-50`,
               )}
             />
           </div>
           <div
             className={cx(
-              'border border-dashed border-slate-200 flex-grow',
-              index === numDays - 1 && 'border-none',
+              `border border-dashed border-slate-200 flex-grow`,
+              index === numDays - 1 && `border-none`,
             )}
           />
         </div>

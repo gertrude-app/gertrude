@@ -8,6 +8,7 @@ type Props = {
   secondaryText: string;
   icon: string;
   buttonText: string;
+  buttonIcon?: string;
   action: string | (() => unknown);
   secondaryButton?: {
     action: string | (() => unknown);
@@ -22,6 +23,7 @@ const EmptyState: React.FC<Props> = ({
   heading,
   secondaryText,
   buttonText,
+  buttonIcon = `plus`,
   action,
   secondaryButton,
   icon,
@@ -45,12 +47,12 @@ const EmptyState: React.FC<Props> = ({
     <div className="flex flex-col sm:flex-row sm:items-center justify-center items-stretch mt-6 w-full">
       {typeof action === `string` ? (
         <Button color="primary" type="link" to={action}>
-          <i className="fa fa-plus mr-4" />
+          <i className={`fa fa-${buttonIcon} mr-4`} />
           {buttonText}
         </Button>
       ) : (
         <Button color="primary" type="button" onClick={action}>
-          <i className="fa fa-plus mr-4" />
+          <i className={`fa fa-${buttonIcon} mr-4`} />
           {buttonText}
         </Button>
       )}

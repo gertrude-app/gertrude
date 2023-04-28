@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { AppIcon } from '@shared/components';
 import GlowEffect from './GlowEffect';
 import VideoModal from './VideoModal';
-import { AppIcon } from '@shared/components';
 
 const PeaceOfMindBlock: React.FC = () => {
   const [showingVideo, setShowingVideo] = useState(false);
