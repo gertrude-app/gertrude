@@ -32,17 +32,17 @@ const UnlockRequestCard: React.FC<Props> = ({
     })}
   >
     <div className="flex justify-between items-start mb-4">
-      <h2 className="font-bold text-gray-900">{userName}</h2>
-      <h3 className="text-gray-400 text-sm">{relativeTime(new Date(createdAt))}</h3>
+      <h2 className="font-bold text-slate-900">{userName}</h2>
+      <h3 className="text-slate-400 text-sm">{relativeTime(new Date(createdAt))}</h3>
     </div>
-    <div className="py-3 px-5 bg-gray-50 rounded-xl mt-2 flex justify-center items-center">
+    <div className="py-3 px-5 bg-slate-50 rounded-xl mt-2 flex justify-center items-center">
       <h2 className="font-mono text-base whitespace-nowrap truncate">
         {url.replace(/^https?:\/\//, ``).replace(/\/$/, ``)}
       </h2>
     </div>
     {comment && (
       <div className="flex justify-center items-center mt-3">
-        <p className="text-center text-gray-500 text-sm sm:text-base">
+        <p className="text-center text-slate-500 text-sm sm:text-base">
           &ldquo;{comment}&rdquo;
         </p>
       </div>
@@ -74,7 +74,7 @@ const UnlockRequestCard: React.FC<Props> = ({
           size="medium"
           icon={status === `accepted` ? `thumbs-up` : `thumbs-down`}
         />
-        <span className="text-gray-600">Unlock request</span>
+        <span className="text-slate-600">Unlock request</span>
         <UserInputText small className="translate-y-0.5">
           {status === `accepted` ? `accepted` : `rejected`}
         </UserInputText>

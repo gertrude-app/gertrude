@@ -15,7 +15,7 @@ const UserDevice: React.FC<Props> = ({ model, status, icon, className }) => (
     <div className="flex justify-between items-center">
       <div className="flex items-center">
         <GradientIcon icon={icon} size="medium" className="mr-4" />
-        <h3 className="text-gray-600 text-lg font-medium">{model}</h3>
+        <h3 className="text-slate-600 text-lg font-medium">{model}</h3>
       </div>
       {status === `online` && (
         <>

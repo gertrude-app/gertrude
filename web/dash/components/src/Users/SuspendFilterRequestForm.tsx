@@ -30,7 +30,7 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
   requestedAt,
 }) => (
   <div className="mt-5 sm:px-2 text-lg">
-    <div className="leading-tight text-gray-700">
+    <div className="leading-tight text-slate-700">
       {date.isOlderThan(requestedAt, { minutes: 5 }) ? (
         <>
           <UserInputText small>
@@ -51,7 +51,7 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
     </div>
     {requestComment && (
       <div className="mt-4 flex justify-center">
-        <UserInputText className="text-center text-gray-700">
+        <UserInputText className="text-center text-slate-700">
           &ldquo;{requestComment}&rdquo;
         </UserInputText>
       </div>

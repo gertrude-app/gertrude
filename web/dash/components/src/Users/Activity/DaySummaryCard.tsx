@@ -24,7 +24,7 @@ const DaySummaryCard: React.FC<Props> = ({ date, numCompleted, numItems }) => {
     >
       <div className="flex items-center space-x-2 mb-4">
         <GradientIcon icon="calendar" size="small" className="mr-1" />
-        <h2 className="text-gray-700 grow text-lg font-medium relative">
+        <h2 className="text-slate-700 grow text-lg font-medium relative">
           <span className="sm:hidden">{formatDate(date, `short`)}</span>
           <span className="hidden sm:inline">{formatDate(date, `medium`)}</span>
           {numCompleted === numItems && (
@@ -34,13 +34,13 @@ const DaySummaryCard: React.FC<Props> = ({ date, numCompleted, numItems }) => {
           )}
         </h2>
       </div>
-      <div className="h-4 shadow-inner bg-gray-200 rounded-full">
+      <div className="h-4 shadow-inner bg-slate-200 rounded-full">
         <div
           className={`h-4 bg-gradient-to-br from-indigo-500 to-fuchsia-500 rounded-full [transition-property:width] duration-200 ease-in-out`}
           style={{ width: `${(completed / numItems) * 100}%` }}
         />
       </div>
-      <p className="mt-2 text-gray-600">
+      <p className="mt-2 text-slate-600">
         <span className="text-lg font-bold">{numCompleted}</span> out of{` `}
         <span className="text-lg font-bold">{numItems}</span> items reviewed
       </p>

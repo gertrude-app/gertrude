@@ -9,8 +9,8 @@ type Props = {
 };
 
 const NotificationMethod: React.FC<Props> = ({ deletable, onDelete, method, value }) => (
-  <li className="pl-4 xs:pr-2 py-2 flex justify-between items-center odd:bg-gray-100 xs:odd:bg-gray-50 rounded-lg max-w-4xl">
-    <h2 className="text-gray-700">
+  <li className="pl-4 xs:pr-2 py-2 flex justify-between items-center odd:bg-slate-100 xs:odd:bg-slate-50 rounded-lg max-w-4xl">
+    <h2 className="text-slate-700">
       <span className="capitalize">{method}</span>
       <span className="text-violet-700 font-medium pl-1.5">{value}</span>
     </h2>
@@ -22,7 +22,7 @@ const NotificationMethod: React.FC<Props> = ({ deletable, onDelete, method, valu
         deletable ? `cursor-pointer hover:bg-opacity-5` : `cursor-not-allowed`,
       )}
     >
-      <i className={cx(`fa fa-trash`, deletable ? `text-red-400` : `text-gray-300`)} />
+      <i className={cx(`fa fa-trash`, deletable ? `text-red-400` : `text-slate-300`)} />
     </button>
   </li>
 );

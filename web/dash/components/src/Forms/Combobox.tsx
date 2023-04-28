@@ -33,9 +33,9 @@ function Combobox<Value extends string = string>({
           onChange={(event) => setQuery(event.target.value)}
           displayValue={(option: { display: string }) => option.display}
         />
-        <HeadlessCombobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-lg px-3 focus:outline-none hover:bg-gray-50">
+        <HeadlessCombobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-lg px-3 focus:outline-none hover:bg-slate-50">
           <i
-            className="fa-solid fa-chevron-down h-5 w-5 text-gray-400"
+            className="fa-solid fa-chevron-down h-5 w-5 text-slate-400"
             aria-hidden="true"
           />
         </HeadlessCombobox.Button>
@@ -49,7 +49,7 @@ function Combobox<Value extends string = string>({
                 className={({ active }) =>
                   cx(
                     `relative cursor-pointer select-none py-2 pl-3 pr-9`,
-                    active ? `bg-violet-700 text-white` : `text-gray-900`,
+                    active ? `bg-violet-700 text-white` : `text-slate-900`,
                   )
                 }
               >

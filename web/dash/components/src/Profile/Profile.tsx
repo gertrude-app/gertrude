@@ -62,7 +62,7 @@ const Profile: React.FC<Props> = ({
     <ConfirmDeleteEntity type="notification method" action={deleteMethod} />
     <div
       className={cx(
-        `absolute left-0 top-0 w-full h-full z-20 bg-gray-50 bg-opacity-60`,
+        `absolute left-0 top-0 w-full h-full z-20 bg-slate-50 bg-opacity-60`,
         pendingMethod ? `block` : `hidden`,
       )}
     />
@@ -81,17 +81,19 @@ const Profile: React.FC<Props> = ({
     </div>
     <PageHeading icon="user">Profile</PageHeading>
     <div className="flex flex-col lg:flex-row mt-8">
-      <div className="p-8 bg-gray-100 rounded-xl flex-grow lg:mr-2 border lg:max-w-3xl">
-        <h2 className="text-lg text-gray-900 mb-2">Email address:</h2>
+      <div className="p-8 bg-slate-100 rounded-xl flex-grow lg:mr-2 border lg:max-w-3xl">
+        <h2 className="text-lg text-slate-900 mb-2">Email address:</h2>
         <TextInput type="email" label="" value={email} disabled setValue={() => {}} />
       </div>
-      <div className="p-8 bg-gray-100 rounded-xl lg:ml-8 lg:w-1/3 flex justify-between relative border mt-4 lg:mt-0">
+      <div className="p-8 bg-slate-100 rounded-xl lg:ml-8 lg:w-1/3 flex justify-between relative border mt-4 lg:mt-0">
         <div className="flex justify-end items-start flex-col mr-8">
-          <h2 className="font-bold text-xl text-gray-700">Basic plan</h2>
+          <h2 className="font-bold text-xl text-slate-700">Basic plan</h2>
           <h3 className="my-1">
-            <span className="text-gray-600 font-medium text-lg relative bottom-3">$</span>
-            <span className="text-gray-900 text-4xl font-bold">5</span>
-            <span className="text-gray-600 text-lg font-medium">/month</span>
+            <span className="text-slate-600 font-medium text-lg relative bottom-3">
+              $
+            </span>
+            <span className="text-slate-900 text-4xl font-bold">5</span>
+            <span className="text-slate-600 text-lg font-medium">/month</span>
           </h3>
           {status !== `complimentary` && (
             <a
@@ -115,8 +117,8 @@ const Profile: React.FC<Props> = ({
     </div>
     <div className="mt-12 flex flex-col space-y-12">
       <div className="xs:bg-white xs:border p-2 xs:p-8 rounded-3xl">
-        <h2 className="text-2xl font-bold text-gray-800">Notification methods</h2>
-        <p className="text-gray-500 mt-1">
+        <h2 className="text-2xl font-bold text-slate-800">Notification methods</h2>
+        <p className="text-slate-500 mt-1">
           Verified ways that Gertrude can notify you for user requests
         </p>
         <ul className="mt-6">
@@ -140,8 +142,8 @@ const Profile: React.FC<Props> = ({
         </div>
       </div>
       <div className="xs:bg-white xs:border p-2 xs:p-8 rounded-3xl">
-        <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
-        <p className="text-gray-500 mt-1 mb-2">
+        <h2 className="text-2xl font-bold text-slate-800">Notifications</h2>
+        <p className="text-slate-500 mt-1 mb-2">
           Custom notifications for different types of requests using one of your verified
           methods
         </p>
@@ -172,7 +174,7 @@ const Profile: React.FC<Props> = ({
             icon={`bell`}
             buttonText={`Create notification`}
             action={createNotification}
-            className="mt-6 bg-gray-50"
+            className="mt-6 bg-slate-50"
           />
         )}
         <div className="flex justify-center md:justify-start items-center pt-2">
@@ -268,7 +270,7 @@ function manageSubscriptionStateClasses(req: RequestState<unknown>): string {
     case `idle`:
       return `text-blue-700/80 hover:text-blue-800`;
     case `ongoing`:
-      return `text-gray-500 animate-pulse`;
+      return `text-slate-500 animate-pulse`;
     case `failed`:
       return `text-red-700`;
     case `succeeded`:

@@ -30,18 +30,18 @@ const EmptyState: React.FC<Props> = ({
   <div
     className={cx(
       `flex flex-col justify-center items-center p-6 sm:p-10 rounded-2xl shadow-inner`,
-      violet ? `bg-violet-100` : `bg-gray-100`,
+      violet ? `bg-violet-100` : `bg-slate-100`,
       className,
     )}
   >
     <i
       className={cx(
         `fa-solid fa-${icon} text-6xl`,
-        violet ? `text-violet-300` : `text-gray-300`,
+        violet ? `text-violet-300` : `text-slate-300`,
       )}
     />
     <h2 className="text-xl font-bold mt-3 mb-2 text-center">{heading}</h2>
-    <p className="text-gray-500 text-center">{secondaryText}</p>
+    <p className="text-slate-500 text-center">{secondaryText}</p>
     <div className="flex flex-col sm:flex-row sm:items-center justify-center items-stretch mt-6 w-full">
       {typeof action === `string` ? (
         <Button color="primary" type="link" to={action}>

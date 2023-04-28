@@ -36,7 +36,7 @@ const KeychainCard: React.FC<Props> = ({
     className={cx(
       `rounded-xl shadow-md border-[0.5px] bg-white flex flex-col justify-between transition duration-100`,
       isSelect(props) && props.selected && `bg-violet-50 border-violet-300`,
-      isSelect(props) && !props.selected && `hover:bg-gray-50 cursor-pointer`,
+      isSelect(props) && !props.selected && `hover:bg-slate-50 cursor-pointer`,
       isSelect(props) && `min-h-[77px]`,
     )}
     onClick={isSelect(props) ? props.onSelect : undefined}
@@ -58,11 +58,11 @@ const KeychainCard: React.FC<Props> = ({
         )}
       >
         <div className="flex flex-col md:flex-row justify-between md:items-center relative right-0">
-          <h2 className="text-left font-semibold text-lg leading-6 text-gray-900 sm:whitespace-normal">
+          <h2 className="text-left font-semibold text-lg leading-6 text-slate-900 sm:whitespace-normal">
             {name}
           </h2>
           <div className="flex md:justify-end pt-1 md:pt-0 items-center shrink-0 space-x-2 flex-grow">
-            <h4 className="text-gray-500 shrink-0">
+            <h4 className="text-slate-500 shrink-0">
               {numKeys}
               {` `}
               {inflect(`key`, numKeys)}
@@ -77,7 +77,7 @@ const KeychainCard: React.FC<Props> = ({
         {isSelect(props) || (
           <p
             className={cx(
-              description ? `text-gray-600 leading-tight` : `text-gray-400 italic`,
+              description ? `text-slate-600 leading-tight` : `text-slate-400 italic`,
               `mt-1.5 mb-1`,
             )}
           >
@@ -89,7 +89,7 @@ const KeychainCard: React.FC<Props> = ({
     {isSelect(props) || (
       <div
         className={cx(
-          `bg-gray-50 rounded-b-xl w-full flex items-center py-2 justify-between`,
+          `bg-slate-50 rounded-b-xl w-full flex items-center py-2 justify-between`,
           isSelect(props) && props.selected && `bg-indigo-100/40`,
         )}
       >

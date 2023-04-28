@@ -38,7 +38,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
             <div className="flex flex-col items-center sm:items-end">
               <p
                 className={cx(
-                  `text-center sm:text-left text-gray-500`,
+                  `text-center sm:text-left text-slate-500`,
                   props.request === `failed` ?? `text-red-900`,
                 )}
               >

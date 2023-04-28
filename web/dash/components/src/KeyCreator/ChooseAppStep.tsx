@@ -56,7 +56,7 @@ const ChooseAppStep: React.FC<Props> = (props) => {
         />
         {appIdentificationType === `slug` ? (
           <div>
-            <label className="text-gray-600 font-bold">Type application name:</label>
+            <label className="text-slate-600 font-bold">Type application name:</label>
             <Combobox
               options={apps.map((app) => ({
                 value: app.slug,
@@ -108,7 +108,7 @@ const Title: React.FC<Props> = ({
   appSlug,
   appIdentificationType,
 }) => (
-  <h2 className="font-medium text-gray-900 text-lg">
+  <h2 className="font-medium text-slate-900 text-lg">
     <GradientIcon
       icon={appIdentificationType === `bundleId` ? `pen-to-square` : `app-store`}
       className="mr-2.5"

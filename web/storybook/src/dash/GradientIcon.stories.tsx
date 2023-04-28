@@ -10,10 +10,10 @@ const GradientGrid: React.FC<{ size: 'small' | 'medium' | 'large'; subtle: boole
     {GRADIENT_ICONS.map((icon) => (
       <div
         key={icon}
-        className="flex flex-col bg-gray-100/40 px-4 py-8 items-center rounded-xl"
+        className="flex flex-col bg-slate-100/40 px-4 py-8 items-center rounded-xl"
       >
         <GradientIcon icon={icon} size={size} key={icon} subtle={subtle} />
-        <h2 className="text-xs whitespace-nowrap mt-2 font-mono text-gray-400 text-center">
+        <h2 className="text-xs whitespace-nowrap mt-2 font-mono text-slate-400 text-center">
           {icon}
         </h2>
       </div>

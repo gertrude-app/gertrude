@@ -20,7 +20,7 @@ const KeyTypeStep: React.FC<Props> = ({ mode, keyType, activeStep, update }) => 
     lookaheadTitle=""
     canAdvance={!!keyType}
     title={
-      <h1 className="font-medium text-gray-900 text-lg">
+      <h1 className="font-medium text-slate-900 text-lg">
         <GradientIcon
           icon={keyType === `app` ? `window` : `globe`}
           className="mr-2"

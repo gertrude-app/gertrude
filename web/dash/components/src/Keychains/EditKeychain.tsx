@@ -97,7 +97,7 @@ const EditKeychain: React.FC<Props> = ({
       <div>
         {keys.length > 0 ? (
           <>
-            <h2 className="mb-2 text-lg font-bold text-gray-700">
+            <h2 className="mb-2 text-lg font-bold text-slate-700">
               {keys.length} {inflect(`key`, keys.length)}:
             </h2>
             <KeyList

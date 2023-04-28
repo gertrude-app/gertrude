@@ -20,7 +20,7 @@ const FilterBadge: React.FC<Props> = ({ color, onClick, children }) => (
           color === `orange`,
         'bg-green-500 dark:bg-green-500/30 dark:border-green-500/70 dark:text-green-300':
           color === `green`,
-        'bg-gray-500/70 hover:bg-gray-600/70 antialiased text-gray-100 dark:bg-gray-800/60 hover:dark:bg-gray-900/80 transition duration-100 dark:border-gray-500 dark:text-gray-300':
+        'bg-slate-500/70 hover:bg-slate-600/70 antialiased text-slate-100 dark:bg-slate-800/60 hover:dark:bg-slate-900/80 transition duration-100 dark:border-slate-500 dark:text-slate-300':
           color === `grey`,
       },
     )}

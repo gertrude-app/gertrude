@@ -94,7 +94,7 @@ const Modal: React.FC<Props> = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-gradient-to-b bg-gray-900/70 from-transparent via-transparent to-violet-900/20 bg-opacity-75 transition-opacity" />
+          <div className="fixed inset-0 bg-gradient-to-b bg-slate-900/70 from-transparent via-transparent to-violet-900/20 bg-opacity-75 transition-opacity" />
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 overflow-y-auto">
@@ -136,7 +136,7 @@ const Modal: React.FC<Props> = ({
                         <GradientIcon icon={icon} size="large" />
                         <Dialog.Title
                           as="h3"
-                          className="text-xl ml-4 font-bold leading-6 text-gray-900"
+                          className="text-xl ml-4 font-bold leading-6 text-slate-900"
                         >
                           {capitalize(title)}
                         </Dialog.Title>
@@ -157,21 +157,21 @@ const Modal: React.FC<Props> = ({
                             as="h3"
                             className={cx(
                               `text-xl font-bold leading-6`,
-                              type === `error` ? `text-red-800` : `text-gray-900`,
+                              type === `error` ? `text-red-800` : `text-slate-900`,
                             )}
                           >
                             {capitalize(title)}
                           </Dialog.Title>
                           <div className="mt-2 w-full">
                             {children && (
-                              <div className="text-sm text-gray-500">{children}</div>
+                              <div className="text-sm text-slate-500">{children}</div>
                             )}
                           </div>
                         </div>
                       </div>
                     </div>
                   )}
-                  <div className="sm:bg-gray-50 rounded-b-lg px-4 py-3 pb-5 sm:pb-3 flex flex-col items-stretch sm:flex-row sm:px-6 sm:justify-end">
+                  <div className="sm:bg-slate-50 rounded-b-lg px-4 py-3 pb-5 sm:pb-3 flex flex-col items-stretch sm:flex-row sm:px-6 sm:justify-end">
                     {secondary && (
                       <Button
                         testId="modal-secondary-btn"

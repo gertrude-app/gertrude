@@ -14,16 +14,16 @@ const DefenseInDepthBlock: React.FC = () => (
     <h2 className="font-inter text-6xl md:text-7xl text-left md:text-center text-white">
       Defense in depth.
     </h2>
-    <p className="text-xl text-gray-400/90 mt-8 leading-8 md:text-center text-left max-w-5xl *sm:mb-20 mb-10">
+    <p className="text-xl text-slate-400/90 mt-8 leading-8 md:text-center text-left max-w-5xl *sm:mb-20 mb-10">
       In addition to internet filtering, Gertrude allows you to collect{` `}
-      <b className="text-gray-300">screenshots</b>
+      <b className="text-slate-300">screenshots</b>
       {` `}
       of your protected users&rsquo; screens, as well as a record of{` `}
-      <b className="text-gray-300">everything they type</b>, for an unprecedented level of
-      safety, redundancy, and oversight. You get to review screenshots and keystrokes on
-      your own time, on your own device.
+      <b className="text-slate-300">everything they type</b>, for an unprecedented level
+      of safety, redundancy, and oversight. You get to review screenshots and keystrokes
+      on your own time, on your own device.
     </p>
-    <p className="text-xl text-gray-400/90 mt-0 leading-8 md:text-center text-left max-w-5xl sm:mb-24 mb-8">
+    <p className="text-xl text-slate-400/90 mt-0 leading-8 md:text-center text-left max-w-5xl sm:mb-24 mb-8">
       We clearly display that they are being watched&mdash;there&lsquo;s nothing creepy or
       secretive about it. This greatly increases their safety online, plus allows you to
       occasionally turn off the filter, safe in the knowledge that their activity is being

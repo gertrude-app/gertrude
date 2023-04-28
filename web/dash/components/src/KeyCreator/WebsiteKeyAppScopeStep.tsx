@@ -29,7 +29,7 @@ const WebsiteKeyAppScopeStep: React.FC<Props> = ({
     activeTitle="Select affected apps:"
     lookaheadTitle="Affected apps"
     title={
-      <h2 className="font-medium text-gray-900 text-lg">
+      <h2 className="font-medium text-slate-900 text-lg">
         <Title addressScope={addressScope} />
       </h2>
     }
@@ -40,7 +40,7 @@ const WebsiteKeyAppScopeStep: React.FC<Props> = ({
     <div>
       <h2 className="font-medium">Unlocked for:</h2>
       <div className="flex justify-end mr-2 items-center">
-        <label className="mr-2 text-gray-600">Advanced:</label>
+        <label className="mr-2 text-slate-600">Advanced:</label>
         <Toggle
           enabled={showAdvancedAddressScopeOptions}
           small

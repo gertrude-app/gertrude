@@ -55,7 +55,7 @@ const Chrome: React.FC<Props> = ({
             leaveTo="-translate-x-full"
           >
             {/* mark: begin mobile sidebar wrapper */}
-            <Dialog.Panel className="relative flex flex-col w-72 bg-gray-900 bg-gradient-to-br from-transparent to-violet-900/40">
+            <Dialog.Panel className="relative flex flex-col w-72 bg-slate-900 bg-gradient-to-br from-transparent to-violet-900/40">
               {/* mark: begin floating mobile overlay close 'X' button */}
               <Transition.Child
                 as={Fragment}
@@ -95,7 +95,7 @@ const Chrome: React.FC<Props> = ({
       className={cx(
         sidebarCollapsed ? `w-20` : `w-72`,
         `hidden relative flex-col md:flex md:fixed md:inset-y-0 transition-[width]`,
-        `bg-gray-900 bg-gradient-to-br from-transparent to-violet-900/40`,
+        `bg-slate-900 bg-gradient-to-br from-transparent to-violet-900/40`,
       )}
     >
       <SidebarNav
@@ -126,7 +126,7 @@ const Chrome: React.FC<Props> = ({
             : node.removeAttribute(`inert`))
         }
       >
-        <div className={`bg-gray-50 [min-height:calc(100vh-64px)] md:min-h-screen`}>
+        <div className={`bg-slate-50 [min-height:calc(100vh-64px)] md:min-h-screen`}>
           <PaddedMain>{children}</PaddedMain>
         </div>
       </main>

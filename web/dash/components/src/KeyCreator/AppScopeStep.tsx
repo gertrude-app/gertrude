@@ -20,7 +20,7 @@ const AppScopeStep: React.FC<Props> = ({ mode, update, activeStep, appScope }) =
     lookaheadTitle="Select app internet access"
     activeTitle="Select app internet access"
     title={
-      <h2 className="font-medium text-gray-900 text-lg space-x-2">
+      <h2 className="font-medium text-slate-900 text-lg space-x-2">
         <GradientIcon
           icon={appScope === `unrestricted` ? `unlock` : `location`}
           size="small"

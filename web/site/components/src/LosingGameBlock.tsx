@@ -24,11 +24,11 @@ const LosingGameBlock: React.FC = () => (
               A losing game
             </span>
           </h2>
-          <p className="text-xl text-gray-500 mt-8 leading-8 max-w-3xl">
+          <p className="text-xl text-slate-500 mt-8 leading-8 max-w-3xl">
             Most internet safety tools try to block{` `}
-            <span className="text-gray-400 font-bold antialiased">categories</span> of the
-            internet. With{` `}
-            <span className="text-gray-400 font-bold antialiased">2 billion</span>
+            <span className="text-slate-300 font-bold antialiased">categories</span> of
+            the internet. With{` `}
+            <span className="text-slate-300 font-bold antialiased">2 billion</span>
             {` `}
             websites, and tens of thousands more being added every day, it's simply
             impossible to maintain up-to-date lists correctly categorizing even a fraction

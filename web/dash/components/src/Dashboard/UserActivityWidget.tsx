@@ -84,7 +84,7 @@ export const UnreviewedItemsCard: React.FC<UnreviewedItemsCardProps> = ({
   <Link
     to={`/users/${userId}/activity`}
     className={cx(
-      `ScrollTop bg-white border rounded-xl p-4 flex justify-between items-center relative transition duration-100 cursor-pointer hover:bg-gray-50`,
+      `ScrollTop bg-white border rounded-xl p-4 flex justify-between items-center relative transition duration-100 cursor-pointer hover:bg-slate-50`,
       numUnreviewed === 0 && `bg-green-50 hover:bg-green-100 hover:bg-opacity-80`,
     )}
   >
@@ -98,7 +98,7 @@ export const UnreviewedItemsCard: React.FC<UnreviewedItemsCardProps> = ({
         )}
         <h1 className="font-black text-xl">{numUnreviewed}</h1>
       </div>
-      <p className="text-sm text-gray-500">unreviewed items</p>
+      <p className="text-sm text-slate-500">unreviewed items</p>
     </div>
   </Link>
 );

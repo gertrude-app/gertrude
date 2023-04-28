@@ -38,9 +38,9 @@ const Feature: React.FC<Props> = ({ children, icon, side, heading }) => {
         />
       </div>
       <div className="shadow-lg rounded-2xl sm:w-128 p-8 sm:p-12 sm:pb-10 flex flex-col items-start relative bg-white z-20 overflow-hidden">
-        <div className="w-128 h-128 absolute rotate-12 bg-gray-50 left-80 -top-52" />
-        <h3 className="text-xl font-bold mb-2 text-gray-700 relative">{heading}</h3>
-        <p className="sm:text-lg text-base text-gray-400 leading-7 relative">
+        <div className="w-128 h-128 absolute rotate-12 bg-slate-50 left-80 -top-52" />
+        <h3 className="text-xl font-bold mb-2 text-slate-700 relative">{heading}</h3>
+        <p className="sm:text-lg text-base text-slate-400 leading-7 relative">
           {children}
         </p>
       </div>

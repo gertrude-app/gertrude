@@ -26,10 +26,10 @@ function SelectMenu<Value extends string = string>({
   let buttonStyles = ``;
   switch (size) {
     case `small`:
-      buttonStyles = `py-1 bg-white dark:bg-slate-900 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-500 dark:text-slate-400 dark:ring-offset-slate-900`;
+      buttonStyles = `py-1 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 dark:ring-offset-slate-900`;
       break;
     case `medium`:
-      buttonStyles = `py-2 bg-white text-gray-400 hover:bg-gray-100`;
+      buttonStyles = `py-2 bg-white text-slate-400 hover:bg-slate-100`;
       break;
     case `large`:
       buttonStyles = `py-3 bg-violet-800 text-white hover:bg-violet-900`;
@@ -46,7 +46,7 @@ function SelectMenu<Value extends string = string>({
           <div className="relative">
             <div className="rounded-md w-full">
               <div className="relative z-0 inline-flex rounded-md w-full border dark:border-slate-700">
-                <div className="relative flex flex-grow items-center bg-white dark:bg-slate-900 pl-3 pr-4 border border-transparent rounded-l-md text-gray-700 dark:text-slate-300">
+                <div className="relative flex flex-grow items-center bg-white dark:bg-slate-900 pl-3 pr-4 border border-transparent rounded-l-md text-slate-700 dark:text-slate-300">
                   <p className="ml-2.5 font-medium">
                     {(options.find((opt) => opt.value === selectedOption) ?? options[0])
                       ?.display ?? `make a selection...`}
@@ -54,7 +54,7 @@ function SelectMenu<Value extends string = string>({
                 </div>
                 <Listbox.Button
                   className={cx(
-                    `relative inline-flex items-center px-4 rounded-l-none rounded-r-md text-sm font-medium focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms]`,
+                    `relative inline-flex items-center px-4 rounded-l-none rounded-r-md text-sm font-medium focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-50 focus:ring-indigo-500 [transition:100ms]`,
                     buttonStyles,
                     disabled && `cursor-not-allowed pointer-events-none`,
                   )}
@@ -85,7 +85,7 @@ function SelectMenu<Value extends string = string>({
                       cx(
                         active
                           ? `bg-violet-100 dark:text-slate-200`
-                          : `text-gray-900 dark:text-slate-300`,
+                          : `text-slate-900 dark:text-slate-300`,
                         `cursor-pointer select-none relative`,
                         size === `small` ? `py-2 px-3` : `p-3.5 text-md`,
                         size === `small` && active && `bg-slate-50 dark:bg-slate-700/50`,

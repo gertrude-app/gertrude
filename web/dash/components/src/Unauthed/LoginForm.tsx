@@ -28,7 +28,7 @@ const LoginForm: React.FC<Props> = ({
   >
     <Logo className="-mt-6 mb-0" size={110} iconOnly />
     <h2 className="text-center mt-4 text-3xl font-inter">Account Login</h2>
-    <h3 className="text-center text-sm sm:text-base text-gray-500/90 mt-3">
+    <h3 className="text-center text-sm sm:text-base text-slate-500/90 mt-3">
       Forgot your password, or too hard to type? Request a <em>magic link</em> with just
       your email address. Or,{` `}
       <Link

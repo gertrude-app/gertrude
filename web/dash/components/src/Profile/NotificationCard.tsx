@@ -84,7 +84,7 @@ const NotificationCard: React.FC<Props> = ({
           />
         </div>
       </div>
-      <div className="bg-gray-50 rounded-b-xl flex justify-between items-center p-3 px-4">
+      <div className="bg-slate-50 rounded-b-xl flex justify-between items-center p-3 px-4">
         <GradientIcon
           icon={methodIcon(selectedMethod)}
           size="medium"
@@ -144,7 +144,7 @@ const Summary: React.FC<
   AdminNotificationMethod & { trigger: AdminNotificationTrigger }
 > = (props) => (
   <div className="p-5">
-    <h2 className="text-gray-700 text-lg">
+    <h2 className="text-slate-700 text-lg">
       {methodVerb(props)}
       {` `}
       <span className="font-bold">{methodTarget(props)}</span> for{` `}

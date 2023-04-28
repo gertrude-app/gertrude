@@ -48,7 +48,7 @@ const WebsiteCounter: React.FC = () => {
           {totalWebsites.toLocaleString()}
           <br />
         </h2>
-        <h3 className="text-2xl sm:text-3xl lg:text-4xl text-white text-opacity-60 font-medium sm:font-bold tracking-wider">
+        <h3 className="text-2xl sm:text-3xl lg:text-4xl text-slate-400 font-medium sm:font-bold tracking-wider">
           websites on the internet*
         </h3>
       </div>
@@ -170,7 +170,7 @@ const Statistic: React.FC<StatisticProps> = ({ children, className, delay, visib
   return (
     <div
       className={cx(
-        `p-10 bg-slate-800 rounded-xl shadow-xl border-gray-700 border-[0.5px] relative overflow-hidden transition duration-200`,
+        `p-10 bg-slate-800 rounded-xl shadow-xl border-slate-700 border-[0.5px] relative overflow-hidden transition duration-200`,
         // when cards are stacked, make them appear one at a time; otherwise with cool synchronized animation
         (windowWidth < 1024 ? intersected : appeared)
           ? `opacity-100`

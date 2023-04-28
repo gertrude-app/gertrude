@@ -31,12 +31,12 @@ const KeyTypeOption: React.FC<Props> = ({
     {selected && (
       <i className="fa-solid fa-check absolute right-3 top-3 text-violet-500" />
     )}
-    <h2 className="font-bold text-gray-700">
+    <h2 className="font-bold text-slate-700">
       <GradientIcon icon={icon} size="small" className="mr-1" />
       {` `}
       {title}
     </h2>
-    <p className="text-sm text-gray-500 mt-1">{description}</p>
+    <p className="text-sm text-slate-500 mt-1">{description}</p>
   </button>
 );
 

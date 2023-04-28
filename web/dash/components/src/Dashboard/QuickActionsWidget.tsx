@@ -16,7 +16,7 @@ const QuickActionsWidget: React.FC<Props> = ({
 }) => (
   <DashboardWidget className={className}>
     <h1 className="text-2xl font-extrabold my-2 ml-2">Good {timeOfDay(date)}!</h1>
-    <p className="mb-4 ml-2 text-gray-500">
+    <p className="mb-4 ml-2 text-slate-500">
       Here are some quick actions you may find useful:
     </p>
     <QuickAction name="Create new user" icon="user-plus" action="/users/new" />
@@ -47,11 +47,11 @@ const QuickAction: React.FC<QuickActionProps> = ({ name, icon, action }) => (
     {...(typeof action === `string`
       ? { type: `link`, to: action }
       : { type: `button`, onClick: action })}
-    className="p-4 flex items-center odd:bg-gray-50 rounded-xl hover:bg-violet-50 transition duration-100 focus:outline focus:outline-violet-200"
+    className="p-4 flex items-center odd:bg-slate-50 rounded-xl hover:bg-violet-50 transition duration-100 focus:outline focus:outline-violet-200"
   >
     <div className="flex justify-center items-center text-white bg-gradient-to-br from-indigo-500 to-fuchsia-500 w-10 h-10 rounded-lg shrink-0">
       <i className={`fa-solid fa-${icon}`} />
     </div>
-    <h2 className="font-medium leading-5 ml-3 text-lg text-gray-800">{name}</h2>
+    <h2 className="font-medium leading-5 ml-3 text-lg text-slate-800">{name}</h2>
   </Action>
 );

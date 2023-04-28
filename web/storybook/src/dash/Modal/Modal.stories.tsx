@@ -82,10 +82,10 @@ export const ContainerAlt: Story = props({
   children: (
     <div>
       <h1 className="text-xl font-bold">This is a `container` modal</h1>
-      <p className="my-2 text-gray-500">
+      <p className="my-2 text-slate-500">
         It's pretty cool. I can put all kinds of custom html in here, like
       </p>
-      <ul className="list-disc ml-6 text-gray-700">
+      <ul className="list-disc ml-6 text-slate-700">
         <li>Headings</li>
         <li>Paragraphs</li>
         <li>Unordered lists</li>
@@ -100,7 +100,7 @@ export const ContainerAlt: Story = props({
         placeholder="Sorry, no editing"
         className="mt-3"
       />
-      <p className="my-2 mt-5 text-gray-500">Or one of these cool things:</p>
+      <p className="my-2 mt-5 text-slate-500">Or one of these cool things:</p>
       <div className="space-y-0.5">
         <SelectableListItem
           title={`Option one`}

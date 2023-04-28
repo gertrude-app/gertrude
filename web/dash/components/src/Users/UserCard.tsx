@@ -32,14 +32,14 @@ const UserCard: React.FC<Props> = ({
   >
     <div className="p-5">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-black text-gray-700 mr-3">{name}</h1>
+        <h1 className="text-3xl font-black text-slate-700 mr-3">{name}</h1>
         <div className="flex items-center space-x-4">
           <div
             className={cx(
               `w-9 h-9 rounded-full flex justify-center items-center text-lg`,
               screenshotsEnabled
                 ? `bg-indigo-100 text-indigo-500`
-                : `bg-gray-100 text-gray-300`,
+                : `bg-slate-100 text-slate-300`,
             )}
           >
             <i className="fa-solid fa-camera" />
@@ -49,7 +49,7 @@ const UserCard: React.FC<Props> = ({
               `w-9 h-9 rounded-full flex justify-center items-center text-lg`,
               keystrokesEnabled
                 ? `bg-indigo-100 text-indigo-500`
-                : `bg-gray-100 text-gray-300`,
+                : `bg-slate-100 text-slate-300`,
             )}
           >
             <i className="fa-solid fa-keyboard" />
@@ -57,17 +57,17 @@ const UserCard: React.FC<Props> = ({
         </div>
       </div>
       <div className="flex justify-start items-center mb-4 mt-0.5">
-        <p className="text-gray-400">
-          <span className="font-medium text-gray-500">{numKeychains}</span> keychains •
+        <p className="text-slate-400">
+          <span className="font-medium text-slate-500">{numKeychains}</span> keychains •
           {` `}
-          <span className="font-medium text-gray-500">{numKeys}</span> keys
+          <span className="font-medium text-slate-500">{numKeys}</span> keys
         </p>
       </div>
       {devices.length ? (
         <>
           <div className="text-lg mt-4 -mb-4">
-            <p className="text-gray-500">
-              <span className="text-xl font-bold text-gray-600">{devices.length}</span>
+            <p className="text-slate-500">
+              <span className="text-xl font-bold text-slate-600">{devices.length}</span>
               {` `}
               {inflect(`device`, devices.length)}:
             </p>
@@ -85,7 +85,7 @@ const UserCard: React.FC<Props> = ({
         </>
       ) : (
         <div className="flex flex-col items-center">
-          <h2 className="text-lg mt-4 font-medium text-gray-700 self-start">
+          <h2 className="text-lg mt-4 font-medium text-slate-700 self-start">
             No devices
           </h2>
         </div>

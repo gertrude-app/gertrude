@@ -16,7 +16,7 @@ const MobileStickyHeader: React.FC<MobileStickyHeaderProps> = ({
 }) => (
   <header
     className={cx(
-      `h-[64px] top-0 justify-between items-center px-1 py-4 shadow z-30 bg-gray-900 bg-gradient-to-br from-transparent via-transparent to-violet-900/40 flex`,
+      `h-[64px] top-0 justify-between items-center px-1 py-4 shadow z-30 bg-slate-900 bg-gradient-to-br from-transparent via-transparent to-violet-900/40 flex`,
       className,
     )}
   >

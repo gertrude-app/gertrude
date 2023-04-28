@@ -4,23 +4,23 @@ import Testimonial from './Testimonial';
 const TestimonialsBlock: React.FC = () => {
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   return (
-    <section className="bg-gray-50 relative h-[28rem] sm:h-[24rem] flex justify-center items-center overflow-hidden">
+    <section className="bg-slate-50 relative h-[28rem] sm:h-[24rem] flex justify-center items-center overflow-hidden">
       <div className="absolute bottom-12 flex space-x-2">
         <div
           className={`relative z-20 w-3 h-3 transition duration-100 cursor-pointer hover:scale-110 rounded-full ${
-            testimonialIndex === 0 ? `bg-gray-400` : `bg-gray-300 shadow-inner`
+            testimonialIndex === 0 ? `bg-slate-400` : `bg-slate-300 shadow-inner`
           }`}
           onClick={() => setTestimonialIndex(0)}
         />
         <div
           className={`relative z-20 w-3 h-3 transition duration-100 cursor-pointer hover:scale-110 rounded-full ${
-            testimonialIndex === 1 ? `bg-gray-400` : `bg-gray-300 shadow-inner`
+            testimonialIndex === 1 ? `bg-slate-400` : `bg-slate-300 shadow-inner`
           }`}
           onClick={() => setTestimonialIndex(1)}
         />
         <div
           className={`relative z-20 w-3 h-3 transition duration-100 cursor-pointer hover:scale-110 rounded-full ${
-            testimonialIndex === 2 ? `bg-gray-400` : `bg-gray-300 shadow-inner`
+            testimonialIndex === 2 ? `bg-slate-400` : `bg-slate-300 shadow-inner`
           }`}
           onClick={() => setTestimonialIndex(2)}
         />
@@ -43,7 +43,7 @@ const TestimonialsBlock: React.FC = () => {
         I ever have.
       </Testimonial>
       <button
-        className="absolute w-12 h-12 bg-white rounded-full flex justify-center items-center shadow-lg text-gray-500 right-16 bottom-8 lg:bottom-auto hover:bg-violet-50 transition duration-50 z-20"
+        className="absolute w-12 h-12 bg-white rounded-full flex justify-center items-center shadow-lg text-slate-500 right-16 bottom-8 lg:bottom-auto hover:bg-violet-50 transition duration-50 z-20"
         onClick={() => {
           if (testimonialIndex < 2) {
             setTestimonialIndex(testimonialIndex + 1);
@@ -55,7 +55,7 @@ const TestimonialsBlock: React.FC = () => {
         <i className="fa-solid fa-chevron-right" />
       </button>
       <button
-        className="absolute w-12 h-12 bg-white rounded-full flex justify-center items-center shadow-lg text-gray-500 left-16 bottom-8 lg:bottom-auto hover:bg-violet-50 transition duration-50 z-20"
+        className="absolute w-12 h-12 bg-white rounded-full flex justify-center items-center shadow-lg text-slate-500 left-16 bottom-8 lg:bottom-auto hover:bg-violet-50 transition duration-50 z-20"
         onClick={() => {
           if (testimonialIndex > 0) {
             setTestimonialIndex(testimonialIndex - 1);

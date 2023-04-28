@@ -1,5 +1,5 @@
 import type { StoryObj, Meta } from '@storybook/react';
-import AppIcon from './AppIcon';
+import { AppIcon } from '@shared/components';
 
 const meta = {
   title: 'MacOS App/AppIcon', // eslint-disable-line

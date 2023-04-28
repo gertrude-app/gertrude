@@ -16,7 +16,7 @@ type Props = {
 const UsersOverview: React.FC<Props> = ({ className, users }) => {
   if (users.length > 0)
     return (
-      <DashboardWidget inset className={className}>
+      <DashboardWidget className={className}>
         <WidgetTitle icon="users" text="Users" />
         {users.map((user) => (
           <UserOverview key={user.id} {...user} />
@@ -43,8 +43,8 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
 export default UsersOverview;
 
 const UserOverview: React.FC<User> = ({ isOnline, name }) => (
-  <div className="flex justify-between items-center rounded-xl py-4 px-4 even:bg-gray-50">
-    <h3 className="font-medium text-gray-900">{name}</h3>
+  <div className="flex justify-between items-center rounded-xl py-4 px-4 even:bg-slate-50">
+    <h3 className="font-medium text-slate-900">{name}</h3>
     {isOnline ? (
       <PillBadge type="green">
         <i className="mr-2 fa-solid fa-circle text-green-500 text-sm scale-75" />
