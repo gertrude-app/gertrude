@@ -27,10 +27,10 @@ const UserCard: React.FC<Props> = ({
   addDevice,
 }) => (
   <div
-    className="rounded-xl border-[0.5px] flex flex-col justify-between shadow-lg w-full bg-white sm:min-w-[400px]"
+    className="rounded-xl border-[0.5px] flex flex-col justify-between shadow-lg bg-white sm:min-w-[400px]"
     data-test="user-card"
   >
-    <div className="p-5">
+    <div className="p-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-black text-slate-700 mr-3">{name}</h1>
         <div className="flex items-center space-x-4">

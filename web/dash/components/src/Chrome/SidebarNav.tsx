@@ -18,13 +18,13 @@ const SidebarNav: React.FC<Props> = ({
   onInternalLinkClick,
 }) => (
   <div className="flex flex-col justify-between h-full" data-test="sidebar-nav">
-    <nav className={cx(`flex flex-col`, collapsed ? `py-4` : `px-4`)}>
+    <nav className={cx(`flex flex-col`, collapsed ? `py-4 px-2` : `px-3`)}>
       <a href="/">
         <Logo
           type="inverted"
           className={cx(
             `mb-4 sm:mb-6 scale-[0.8] sm:scale-100`,
-            collapsed ? `mt-3 ml-[1.35em]` : `mt-8 -ml-2 sm:ml-4`,
+            collapsed ? `mt-3 ml-[0.8em]` : `mt-8 -ml-2 sm:ml-4`,
           )}
           iconOnly={collapsed}
         />
@@ -67,7 +67,7 @@ const SidebarNav: React.FC<Props> = ({
           Profile
         </SidebarOption>
       </div>
-      <div className={cx(`grow border-t-4 border-white border-opacity-10 pt-4`)}>
+      <div className={cx(`grow border-t-2 border-slate-300 border-opacity-10 pt-4`)}>
         <SidebarOption
           icon="book"
           collapsed={collapsed}
@@ -108,7 +108,7 @@ const SidebarNav: React.FC<Props> = ({
         <i
           aria-hidden="true"
           className={cx(
-            `fas text-2xl text-white text-opacity-60`,
+            `fas text-2xl text-slate-300 text-opacity-80`,
             collapsed ? `fa-chevron-right` : `fa-chevron-left mr-3`,
           )}
         />
@@ -118,7 +118,7 @@ const SidebarNav: React.FC<Props> = ({
         className={cx(
           collapsed ? `hidden` : `flex`,
           `justify-end items-center px-4 mr-px`,
-          `text-white text-opacity-50 text-right hover:text-opacity-60 whitespace-nowrap`,
+          `text-violet-300 text-opacity-70 text-right hover:text-opacity-60 whitespace-nowrap`,
           `transition duration-100 cursor-pointer`,
           `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50 rounded-md`,
         )}
