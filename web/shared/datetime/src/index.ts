@@ -30,7 +30,7 @@ export function formatDate(
     date.toLocaleDateString(`en-US`, { weekday: `long` }),
     `, `,
     date.toLocaleDateString(`en-US`, { month: style === `long` ? `long` : `short` }),
-    style === `long` ? ` ` : `. `,
+    ` `,
     date.getDate(),
     `, `,
     date.getFullYear(),

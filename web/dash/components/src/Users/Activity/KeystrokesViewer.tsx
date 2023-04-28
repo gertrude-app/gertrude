@@ -34,7 +34,7 @@ const KeystrokesViewer: React.FC<Props> = ({
         <p key={`line-${idx}`}>{line}</p>
       ))}
     </div>
-    <div className="p-4 pt-0 flex justify-between">
+    <div className="p-4 pt-0 flex justify-between items-center">
       <ActivityItemTime date={date} />
       <Button color="tertiary" type="button" onClick={onApprove}>
         Approve
