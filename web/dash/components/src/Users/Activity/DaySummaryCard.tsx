@@ -27,7 +27,7 @@ const DaySummaryCard: React.FC<Props> = ({
 
   return (
     <div className="flex items-stretch">
-      <div className="space-x-4 justify-center items-center px-8 hidden lg:flex">
+      <div className="space-x-4 justify-center items-center px-8 hidden md+:flex">
         <div className="flex flex-col items-center self-stretch">
           <div
             className={cx(
@@ -59,7 +59,7 @@ const DaySummaryCard: React.FC<Props> = ({
       </div>
       <Link
         to={formatDate(date, `url`)}
-        className={`block p-6 rounded-xl shadow-md border-[0.5px] border-slate-200 bg-white hover:shadow-lg transition cursor-pointer duration-100 flex-grow my-4`}
+        className={`block p-6 rounded-xl shadow-lg shadow-slate-300/50 border-[0.5px] border-slate-200 bg-white hover:shadow-xl hover:shadow-slate-300/50 transition cursor-pointer duration-100 flex-grow my-4`}
       >
         <div className="flex items-center space-x-2 mb-4">
           <h2 className="text-slate-700 grow text-lg font-bold relative">

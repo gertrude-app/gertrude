@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { AppIcon } from '@shared/components';
 import GlowEffect from './GlowEffect';
 import VideoModal from './VideoModal';
 
@@ -55,7 +54,12 @@ const PeaceOfMindBlock: React.FC = () => {
           </div>
         </div>
         <div className="w-1/2 h-112 bg-fuchsia-radial-gradient z-10 p-8 justify-center items-center lg:flex hidden">
-          <AppIcon className="scale-125 rotate-6" />
+          <div className="w-96 h-96 bg-white rounded-full shadow-xl overflow-hidden flex justify-center items-center">
+            <i
+              aria-hidden
+              className="fa fa-lock text-9xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent scale-125"
+            />
+          </div>
         </div>
       </div>
       {showingVideo && (

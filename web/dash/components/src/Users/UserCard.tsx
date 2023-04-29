@@ -27,7 +27,7 @@ const UserCard: React.FC<Props> = ({
   addDevice,
 }) => (
   <div
-    className="rounded-xl border-[0.5px] flex flex-col justify-between shadow-lg bg-white sm:min-w-[400px]"
+    className="rounded-xl border-[0.5px] border-slate-200 flex flex-col justify-between shadow-lg shadow-slate-300/50 bg-white sm:min-w-[400px]"
     data-test="user-card"
   >
     <div className="p-6">

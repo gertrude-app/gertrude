@@ -17,7 +17,6 @@ const PageHeading: React.FC<Props> = ({ children, icon, className }) => (
         {children}
       </h1>
     </div>
-    {/* <hr className="h-1 bg-gradient-to-r from-indigo-500 to-fuchsia-500" /> */}
   </header>
 );
 

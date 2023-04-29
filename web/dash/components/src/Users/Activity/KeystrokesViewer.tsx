@@ -20,7 +20,7 @@ const KeystrokesViewer: React.FC<Props> = ({
 }) => (
   <div
     className={cx(
-      `border-y md:border-x2 md:rounded-xl md:shadow-lg bg-white max-w-7xl`,
+      `border-y md:border-x2 md:rounded-xl md:shadow-lg md:shadow-slate-300/50 bg-white max-w-7xl`,
       className,
     )}
   >

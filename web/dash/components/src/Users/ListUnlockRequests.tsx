@@ -5,7 +5,7 @@ import { posessive } from '@shared/string';
 import type { Subcomponents } from '@dash/types';
 import UnlockRequestCard from '../UnlockRequestCard';
 import PageHeading from '../PageHeading';
-import PartyMessage from '../PartyMessage';
+import EmptyState from '../EmptyState';
 
 type Props = {
   singleUser?: boolean;
@@ -30,7 +30,14 @@ const ListUnlockRequests: React.FC<Props> = ({ requests, singleUser }) => (
           ))}
       </div>
     ) : (
-      <PartyMessage>No unlock requests for this user</PartyMessage>
+      <EmptyState
+        heading={`No unlock requests for this user`}
+        secondaryText={`This user has not submitted any unlock requests.`}
+        icon={`unlock`}
+        buttonText={`Back to dashboard`}
+        buttonIcon={`arrow-left`}
+        action={``}
+      />
     )}
   </div>
 );

@@ -102,7 +102,7 @@ const AppDetail: React.FC<AppDetailProps> = ({ label, data, expanded }) => {
       >
         {label}:
       </h3>
-      <h2 className="text-slate-900 *font-mono font-bold break-all">{data}</h2>
+      <h2 className="text-slate-900 font-bold break-all">{data}</h2>
     </div>
   );
 };

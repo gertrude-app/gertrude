@@ -24,7 +24,7 @@ const ScreenshotViewer: React.FC<Props> = ({
 }) => (
   <div
     className={cx(
-      `border-y-[0.5px] md:border-x-[0.5px] border-slate-200 md:rounded-2xl md:shadow-md bg-white max-w-7xl`,
+      `border-y-[0.5px] md:border-x-[0.5px] border-slate-200 md:rounded-2xl md:shadow-lg md:shadow-slate-300/50 bg-white max-w-7xl`,
       className,
     )}
   >
