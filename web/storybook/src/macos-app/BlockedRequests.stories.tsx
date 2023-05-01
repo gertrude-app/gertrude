@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BlockedRequests } from '@macos/appviews';
 import type { Meta, StoryObj } from '@storybook/react';
 import type { ComponentProps as Wrapping } from 'react';
@@ -8,7 +9,7 @@ import AppWindow from './AppWindow';
 const meta = {
   title: 'MacOS App/Blocked Requests', // eslint-disable-line
   component: AppWindow<Wrapping<typeof BlockedRequests>>,
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: window.parent === window ? `fullscreen` : `centered` },
 } satisfies Meta<typeof AppWindow<Wrapping<typeof BlockedRequests>>>;
 
 type Story = StoryObj<typeof meta>;
@@ -17,13 +18,13 @@ export const LightMode = props({
   width: 900,
   height: 600,
   wrapping: BlockedRequests,
-  fullscreen: true,
+  fullscreen: window.parent === window,
   props: {
     requests: requests(),
     windowOpen: true,
     filterText: ``,
     tcpOnly: false,
-    createUnlockRequests: { case: `idle` },
+    createUnlockRequests: { case: `idle` } as const,
     selectedRequestIds: [],
     unlockRequestExplanation: ``,
     emit: () => {},
@@ -36,7 +37,7 @@ export const LightModeSelected = props({
   props: {
     ...LightMode.args.props,
     unlockRequestExplanation: `need this for my math class, dad!`,
-    selectedRequestIds: [`1`, `2`],
+    selectedRequestIds: [`12`, `13`],
   },
 });
 
@@ -136,6 +137,48 @@ export const DarkModeSubmitError = props({
     createUnlockRequests: { case: `failed`, error: `something went wrong` },
   },
 });
+
+export const StatefulTransitions = () => {
+  const props = { ...LightModeSelected.args.props };
+  const states: Array<Wrapping<typeof BlockedRequests>> = [
+    { ...props, requests: [], selectedRequestIds: [] },
+    { ...props, selectedRequestIds: [] },
+    { ...props },
+    { ...props, createUnlockRequests: { case: `ongoing` } },
+    { ...props, createUnlockRequests: { case: `succeeded` } },
+    { ...props, createUnlockRequests: { case: `failed`, error: `whoops!` } },
+    { ...props, filterText: `zsherlqx`, selectedRequestIds: [] },
+  ];
+  const [index, setIndex] = useState(0);
+  const [dark, setDark] = useState(false);
+  return (
+    <div>
+      <AppWindow
+        width={900}
+        height={600}
+        wrapping={BlockedRequests}
+        fullscreen={window.parent === window}
+        props={{ ...states[index]! }}
+        dark={dark}
+      />
+      <div className="flex cursor-pointer justify-center gap-x-6 m-6 uppercase opacity-50 text-sm">
+        <div
+          className={index === 0 ? `opacity-25` : ``}
+          onClick={() => index > 0 && setIndex(index - 1)}
+        >
+          &larr; prev state
+        </div>
+        <div onClick={() => setDark(!dark)}>Dark/light</div>
+        <div
+          className={index === states.length - 1 ? `opacity-25` : ``}
+          onClick={() => index < states.length - 1 && setIndex(index + 1)}
+        >
+          next state &rarr;
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // helpers
 

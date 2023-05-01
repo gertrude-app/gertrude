@@ -38,7 +38,7 @@ export const BlockedRequests: React.FC<Props> = ({
     .sort((a, b) => (b.time > a.time ? 1 : -1));
 
   return (
-    <div className="bg-white dark:bg-slate-900 flex flex-col rounded-b-xl h-screen">
+    <div className="bg-white dark:bg-slate-900 flex flex-col rounded-b-xl h-full appview:h-screen">
       <header className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center">
           <input

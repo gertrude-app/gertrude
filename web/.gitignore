@@ -5,6 +5,7 @@
 w;
 Session.vim*
 node_modules/
+appviews/src/main.tsx
 storybook/storybook-static/
 dash/app/build
 dash/app/cypress/screenshots
