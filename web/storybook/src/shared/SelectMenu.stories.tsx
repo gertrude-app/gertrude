@@ -1,9 +1,9 @@
 import { SelectMenu } from '@shared/components';
 import type { StoryObj, Meta } from '@storybook/react';
-import { props } from '../../story-helpers';
+import { props } from '../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Forms/SelectMenu', // eslint-disable-line
+  title: 'Shared/SelectMenu', // eslint-disable-line
   component: SelectMenu,
 } satisfies Meta<typeof SelectMenu>;
 

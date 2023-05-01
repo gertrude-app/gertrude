@@ -5,6 +5,7 @@ interface Props<T> {
   width: number;
   height: number;
   dark?: boolean;
+  fullscreen?: boolean;
   wrapping: React.FC<T>;
   props: T;
 }
@@ -15,7 +16,10 @@ export default function AppWindow<T>({
   dark,
   wrapping,
   props,
+  fullscreen,
 }: Props<T>): ReturnType<React.FC<Props<T>>> {
+  if (fullscreen) return <div className={cx(dark && `dark`)}>{wrapping(props)}</div>;
+
   return (
     <div
       className={cx(

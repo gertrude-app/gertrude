@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { Button, TextInput, Toggle } from '@shared/components';
+import { Button, Loading, TextInput, Toggle } from '@shared/components';
 import type { AppState, ViewState, AppEvent, ViewAction } from './blockedrequests-store';
 import type { PropsOf } from '../lib/store';
 import { containerize } from '../lib/store';
@@ -32,13 +32,13 @@ export const BlockedRequests: React.FC<Props> = ({
           if (textToSearch.includes(part)) return true;
         }
       }
-      return true;
+      return false;
     })
     .filter((req) => (tcpOnly ? req.protocol === `tcp` : true))
     .sort((a, b) => (b.time > a.time ? 1 : -1));
 
   return (
-    <div className="bg-white dark:bg-slate-900 h-full flex flex-col rounded-b-xl">
+    <div className="bg-white dark:bg-slate-900 flex flex-col rounded-b-xl h-screen">
       <header className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center">
           <input
@@ -82,9 +82,26 @@ export const BlockedRequests: React.FC<Props> = ({
         </Button>
       </header>
       <div className="flex flex-col p-4 flex-grow overflow-y-scroll">
-        {requests.length === 0 && <span>...waiting for requests</span>}
+        {requests.length === 0 && (
+          <div className="h-full flex justify-center items-center">
+            <div className="flex flex-col items-center">
+              <Loading />
+              <h3 className="text-xl font-medium text-slate-400 dark:text-slate-500 mt-8">
+                Waiting for requests...
+              </h3>
+            </div>
+          </div>
+        )}
         {requests.length > 0 && filteredRequests.length === 0 && (
-          <span>no matching requests</span>
+          <div className="h-full flex flex-col justify-center items-center border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-black/20">
+            <i className="fa-solid fa-cow text-6xl text-slate-300 dark:text-slate-700" />
+            <h3 className="text-2xl font-bold mt-6 dark:text-white/80">
+              No matching requests
+            </h3>
+            <p className="max-w-sm text-center mt-2 text-slate-500 dark:text-slate-400">
+              Try changing the filter query or toggling TCP only
+            </p>
+          </div>
         )}
         {filteredRequests.length > 0 &&
           filteredRequests.map((req) => (
@@ -124,35 +141,45 @@ const BottomPanel: React.FC<PanelProps> = ({
   }
   if (createUnlockRequests.case === `ongoing`) {
     return (
-      <BottomPanelWrap>
-        spinner here... (maybe extract component from menubar?)
+      <BottomPanelWrap className="flex flex-col justify-center items-center h-32">
+        <Loading className="scale-50" />
+        <span className="text-slate-400 dark:text-slate-500 text-sm">Submitting...</span>
       </BottomPanelWrap>
     );
   }
   if (createUnlockRequests.case === `succeeded`) {
     return (
-      <BottomPanelWrap>
-        Unlock request sent successfully! (i think a "close window" button might be nice
-        here)
+      <BottomPanelWrap className="flex justify-between items-center h-20">
+        <span className="text-lg text-slate-500 dark:text-slate-400 font-medium ml-2 flex items-center">
+          <i className="fa-solid fa-check mr-3 text-green-500" />
+          Unlock request sent!
+        </span>
+        <Button type="button" onClick={() => {}} color="secondary" size="medium">
+          Close window
+        </Button>
       </BottomPanelWrap>
     );
   }
   if (createUnlockRequests.case === `failed`) {
     return (
-      <BottomPanelWrap>
-        Failed to send unlock request:{` `}
-        <span className="text-red-500 px-3">{createUnlockRequests.error}</span>
-        <button
-          className="border border-black px-3 py-1 rounded-md"
-          onClick={() => emit({ case: `requestFailedTryAgainClicked` })}
-        >
-          try again
-        </button>
+      <BottomPanelWrap className="flex h-44">
+        <div className="flex flex-col items-center p-4 rounded-2xl border border-red-200 dark:border-red-700/50 bg-red-50/30 dark:bg-red-600/5 flex-grow">
+          <span className="font-bold text-lg text-slate-700 dark:text-white/80">
+            Failed to send unlock request:
+          </span>
+          <span className="text-red-500 mb-4 dark:text-red-400">
+            {createUnlockRequests.error}
+          </span>
+          <Button type="button" onClick={() => {}} color="warning" size="small">
+            <i className="fa-solid fa-redo mr-2" />
+            Try again
+          </Button>
+        </div>
       </BottomPanelWrap>
     );
   }
   return (
-    <BottomPanelWrap className="justify-between">
+    <BottomPanelWrap className="justify-between h-32">
       <TextInput
         type="textarea"
         value={unlockRequestExplanation}
@@ -191,7 +218,7 @@ const BottomPanelWrap: React.FC<{ className?: string; children: React.ReactNode 
   className,
   children,
 }) => (
-  <div className="border-b border-slate-200 dark:border-slate-800 shadow-xl shadow-black/5 dark:shadow-black/50 rotate-180">
+  <div className="border-b border-slate-200 dark:border-slate-800 shadow-lg shadow-black/5 dark:shadow-black/50 rotate-180 [transition:200ms]">
     <div className={cx(`rotate-180 p-4 flex`, className)}>{children}</div>
   </div>
 );
