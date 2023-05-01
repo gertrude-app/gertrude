@@ -39,8 +39,8 @@ codegen:
 
 # build & deploy
 
-appviews:
-	@cd appviews && pnpm typecheck && node generate.cjs
+appviews isolate="":
+	@cd appviews && pnpm typecheck && node generate.cjs {{isolate}}
 
 build-site:
 	@pnpm --filter @site/app build

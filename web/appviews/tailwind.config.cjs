@@ -1,3 +1,5 @@
+const plugin = require(`tailwindcss/plugin`); // eslint-disable-line
+
 module.exports = {
   presets: [require(`@shared/tailwind`)],
   content: [
@@ -8,4 +10,9 @@ module.exports = {
     `../shared/components/src/Toggle.tsx`,
   ],
   darkMode: `class`,
+  plugins: [
+    plugin(({ addVariant }) => {
+      addVariant(`appview`, `.appview-fullscreen &`);
+    }),
+  ],
 };

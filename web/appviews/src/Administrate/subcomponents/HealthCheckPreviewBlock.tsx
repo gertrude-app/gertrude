@@ -1,14 +1,14 @@
 import React from 'react';
 import cx from 'classnames';
 import { Button } from '@shared/components';
-import type { Page } from '../Administrate';
+import type { Screen } from '../administrate-store';
 
 interface Props {
   failingChecksCount: number;
-  setPage: (page: Page) => void;
+  setScreen(screen: Screen): unknown;
 }
 
-const HealthCheckPreviewBlock: React.FC<Props> = ({ failingChecksCount, setPage }) => (
+const HealthCheckPreviewBlock: React.FC<Props> = ({ failingChecksCount, setScreen }) => (
   <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow border-slate-200 dark:border-slate-700 border-[0.5px] p-4 flex-grow relative overflow-hidden">
     <div
       className={cx(
@@ -30,7 +30,7 @@ const HealthCheckPreviewBlock: React.FC<Props> = ({ failingChecksCount, setPage 
     </p>
     <Button
       type="button"
-      onClick={() => setPage(`health_check`)}
+      onClick={() => setScreen(`healthCheck`)}
       color={failingChecksCount === 0 ? `tertiary` : `warning`}
       size="small"
       className="absolute right-4 bottom-4"

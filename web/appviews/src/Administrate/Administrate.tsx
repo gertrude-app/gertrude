@@ -1,94 +1,81 @@
 import React from 'react';
+import type { AppEvent, AppState, ViewState, ViewAction } from './administrate-store';
+import type { PropsOf } from '../lib/store';
+import { containerize } from '../lib/store';
 import SidebarNav from './subcomponents/SidebarNav';
 import HomeScreen from './screens/HomeScreen';
 import HealthCheckScreen from './screens/HealthCheckScreen';
 import ExemptUsersScreen from './screens/ExemptUsersScreen';
+import HealthChecker from './HealthChecker';
+import store from './administrate-store';
 
-export type Page = 'home' | 'health_check' | 'exempt_users';
-export type HealthCheckStatus = {
-  appVersion: string;
-  mostRecentAppVersion: string;
-  filterVersion: string;
-  mostRecentFilterVersion: string;
-  screenRecordingPermission: boolean;
-  keystrokeRecordingPermission: boolean;
-  isAdministrator: boolean;
-  filterToAppCommunicationVerified: boolean;
-  notificationSetting: 'banners' | 'alert' | 'none';
-  accountStatus: 'active' | 'inactive';
-  keysLoaded: number;
-};
+type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 
-interface Props {
-  healthCheck: HealthCheckStatus;
-  filterStatus: 'on' | 'off' | 'suspended';
-  userName: string;
-  screenshotMonitoringEnabled: boolean;
-  keystrokeMonitoringEnabled: boolean;
-}
-
-const Administrate: React.FC<Props> = ({
+export const Administrate: React.FC<Props> = ({
   healthCheck,
-  filterStatus,
+  filterState,
   userName,
   screenshotMonitoringEnabled,
   keystrokeMonitoringEnabled,
+  installedAppVersion,
+  emit,
+  screen,
 }) => {
-  const [page, setPage] = React.useState<Page>(`home`);
-
-  const failingChecksCount = [
-    healthCheck.appVersion === healthCheck.mostRecentAppVersion,
-    healthCheck.filterVersion === healthCheck.mostRecentFilterVersion,
-    healthCheck.screenRecordingPermission,
-    healthCheck.keystrokeRecordingPermission,
-    healthCheck.filterToAppCommunicationVerified,
-    healthCheck.notificationSetting === `alert`,
-    healthCheck.accountStatus === `active`,
-    healthCheck.keysLoaded > 0,
-  ].filter((item) => !item).length;
+  const health = new HealthChecker(
+    healthCheck,
+    installedAppVersion,
+    screenshotMonitoringEnabled,
+    keystrokeMonitoringEnabled,
+  );
 
   let pageElement = (
     <HomeScreen
-      setPage={setPage}
-      filterStatus={filterStatus}
-      failingChecksCount={failingChecksCount}
-      appVersion={healthCheck.appVersion}
+      setScreen={() => emit({ case: `gotoScreenClicked`, screen })}
+      filterState={filterState}
+      failingChecksCount={health.failingChecksCount}
+      appVersion={installedAppVersion}
       userName={userName}
       keystrokeMonitoringEnabled={keystrokeMonitoringEnabled}
       screenshotMonitoringEnabled={screenshotMonitoringEnabled}
     />
   );
 
-  switch (page) {
+  switch (screen) {
     case `home`:
       pageElement = (
         <HomeScreen
-          setPage={setPage}
-          filterStatus={filterStatus}
-          failingChecksCount={failingChecksCount}
-          appVersion={healthCheck.appVersion}
+          setScreen={() => emit({ case: `gotoScreenClicked`, screen: `home` })}
+          filterState={filterState}
+          failingChecksCount={health.failingChecksCount}
+          appVersion={installedAppVersion}
           userName={userName}
           keystrokeMonitoringEnabled={keystrokeMonitoringEnabled}
           screenshotMonitoringEnabled={screenshotMonitoringEnabled}
         />
       );
       break;
-    case `health_check`:
+    case `healthCheck`:
       pageElement = (
         <HealthCheckScreen
-          healthCheck={healthCheck}
-          failingChecksCount={failingChecksCount}
+          {...healthCheck}
+          installedAppVersion={installedAppVersion}
+          screenshotMonitoringEnabled={keystrokeMonitoringEnabled}
+          keystrokeMonitoringEnabled={screenshotMonitoringEnabled}
+          emit={(action) => emit({ case: `healthCheck`, action })}
         />
       );
       break;
-    case `exempt_users`:
+    case `exemptUsers`:
       pageElement = <ExemptUsersScreen />;
       break;
   }
 
   return (
-    <div className="flex h-full">
-      <SidebarNav page={page} setPage={setPage} />
+    <div className="flex h-full appview:h-screen">
+      <SidebarNav
+        screen={screen}
+        setScreen={(screen) => emit({ case: `gotoScreenClicked`, screen })}
+      />
       <main className="flex-grow bg-white dark:bg-slate-900 rounded-br-xl">
         {pageElement}
       </main>
@@ -96,4 +83,7 @@ const Administrate: React.FC<Props> = ({
   );
 };
 
-export default Administrate;
+export default containerize<AppState, AppEvent, ViewState, ViewAction>(
+  store,
+  Administrate,
+);

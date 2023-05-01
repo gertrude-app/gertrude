@@ -3,13 +3,23 @@
 const fs = require(`node:fs`);
 const exec = require(`x-exec`).default;
 
-const MODULES = [`MenuBar`, `BlockedRequests`];
+const MODULES = [`MenuBar`, `BlockedRequests`, `Administrate`];
 const WEBVIEW_DIR = `${__dirname}/../../swift/rewrite/Xcode/Gertrude/WebViews`;
+
+const isolated = process.argv[2];
+if (isolated && !MODULES.includes(isolated)) {
+  process.stderr.write(`\nModule must be one of: \`${MODULES.join(`\`, \``)}\`\n\n`);
+  process.exit(1);
+}
 
 fs.rmSync(`./dist`, { recursive: true, force: true });
 fs.mkdirSync(`./dist`, { recursive: true });
 
 MODULES.forEach((module) => {
+  if (isolated && module !== isolated) {
+    return;
+  }
+
   const fileContent = `
     import React from 'react';
     import ReactDOM from 'react-dom/client';
