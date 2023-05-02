@@ -26,7 +26,7 @@ const Dashboard: React.FC<Props> = ({
     return (
       <>
         <PageHeading icon="home">Dashboard</PageHeading>
-        <div className="pt-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8">
+        <div className="pt-6 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8">
           <UserActivityWidget userActivity={userActivitySummaries} />
           <UserOverviewWidget users={users} />
           {recentScreenshots.length !== 0 && (

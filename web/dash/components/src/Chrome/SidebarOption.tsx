@@ -1,9 +1,10 @@
 import React from 'react';
 import cx from 'classnames';
 import SmartLink from '../SmartLink';
+import { HeroIcon } from '@dash/types';
 
 interface Props {
-  icon: string;
+  Icon: HeroIcon;
   children: string;
   collapsed: boolean;
   to: string;
@@ -12,7 +13,7 @@ interface Props {
 }
 
 const SidebarOption: React.FC<Props> = ({
-  icon,
+  Icon,
   children,
   collapsed,
   to,
@@ -25,25 +26,25 @@ const SidebarOption: React.FC<Props> = ({
     className={cx(
       `ScrollTop flex justify-start items-center`,
       `cursor-pointer transition duration-75 select-none rounded-xl`,
-      `bg-violet-500 bg-opacity-0`,
       `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50`,
-      isSelected ? `bg-opacity-20` : `hover:bg-opacity-10`,
       collapsed
         ? `py-[1.2em] my-[0.3em] pl-[1.1em] flex justify-center items-center`
-        : `py-[6px] sm:py-[8px] md:py-[12px] px-5 my-3 `,
+        : `py-[10px] sm:py-[12px] md:py-[12px] px-5  my-1.5 md:my-3`,
+      isSelected ? `bg-violet-50` : `hover:bg-slate-50`,
     )}
   >
-    <i
+    <Icon
       aria-hidden="true"
       className={cx(
-        `fa fa-${icon} mr-2.5 sm:mr-4 text-xl sm:text-2xl leading-none w-7`,
-        isSelected ? `text-violet-400` : `text-violet-300 text-opacity-40`,
+        `mr-2.5 sm:mr-4 text-xl sm:text-2xl leading-none w-7`,
+        isSelected ? `text-violet-500` : `text-violet-400`,
       )}
     />
     <h2
       className={cx(
-        `text-slate-300/80 text-[18px] sm:text-xl antialiased font-bold`,
+        `text-[18px] sm:text-xl antialiased font-bold`,
         collapsed ? `hidden` : `block`,
+        isSelected ? `text-violet-600` : `text-slate-700`,
       )}
     >
       {children}

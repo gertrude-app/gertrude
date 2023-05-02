@@ -158,6 +158,7 @@ importers:
       '@dash/types': workspace:*
       '@dash/utils': workspace:*
       '@headlessui/react': ^1.7.3
+      '@heroicons/react': 2.0.17
       '@shared/components': workspace:*
       '@shared/string': workspace:*
       '@shared/ts-utils': workspace:*
@@ -174,6 +175,7 @@ importers:
       '@dash/types': link:../types
       '@dash/utils': link:../utils
       '@headlessui/react': 1.7.3_biqbaboplfbrettd7655fr4n2y
+      '@heroicons/react': 2.0.17_react@18.2.0
       '@shared/components': link:../../shared/components
       '@shared/string': link:../../shared/string
       '@shared/ts-utils': link:../../shared/ts-utils
@@ -208,9 +210,11 @@ importers:
   dash/types:
     specifiers:
       '@dash/utils': workspace:*
+      '@heroicons/react': 2.0.17
       '@types/dash-ambient': workspace:*
     dependencies:
       '@dash/utils': link:../utils
+      '@heroicons/react': 2.0.17
       '@types/dash-ambient': link:../ambient
 
   dash/utils:
@@ -2387,6 +2391,20 @@ packages:
     dependencies:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@heroicons/react/2.0.17:
+    resolution: {integrity: sha512-90GMZktkA53YbNzHp6asVEDevUQCMtxWH+2UK2S8OpnLEu7qckTJPhNxNQG52xIR1WFTwFqtH6bt7a60ZNcLLA==}
+    peerDependencies:
+      react: '>= 16'
+    dev: false
+
+  /@heroicons/react/2.0.17_react@18.2.0:
+    resolution: {integrity: sha512-90GMZktkA53YbNzHp6asVEDevUQCMtxWH+2UK2S8OpnLEu7qckTJPhNxNQG52xIR1WFTwFqtH6bt7a60ZNcLLA==}
+    peerDependencies:
+      react: '>= 16'
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /@humanwhocodes/config-array/0.11.7:

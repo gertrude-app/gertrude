@@ -13,6 +13,7 @@
     "@dash/types": "workspace:*",
     "@dash/utils": "workspace:*",
     "@headlessui/react": "^1.7.3",
+    "@heroicons/react": "2.0.17",
     "@shared/components": "workspace:*",
     "@shared/string": "workspace:*",
     "@shared/ts-utils": "workspace:*",
