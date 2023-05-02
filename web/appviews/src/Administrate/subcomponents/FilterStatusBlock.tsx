@@ -2,14 +2,14 @@ import { Button, SelectMenu } from '@shared/components';
 import React from 'react';
 
 interface Props {
-  filterStatus: 'on' | 'off' | 'suspended';
+  filterState: 'on' | 'off' | 'suspended';
 }
 
-const FilterStatusBlock: React.FC<Props> = ({ filterStatus }) => {
+const FilterStatusBlock: React.FC<Props> = ({ filterState }) => {
   let filterIndicatorColor = `bg-green-500`;
   let setFilterButtonColor: 'warning' | 'primary' | 'secondary' = `warning`;
   let setFilterButtonText = `Stop`;
-  switch (filterStatus) {
+  switch (filterState) {
     case `off`:
       filterIndicatorColor = `bg-red-500`;
       setFilterButtonColor = `primary`;
@@ -28,7 +28,7 @@ const FilterStatusBlock: React.FC<Props> = ({ filterStatus }) => {
         <div className="flex items-center space-x-2">
           <div className={`${filterIndicatorColor} w-3 h-3 rounded-full`} />
           <h3 className="text-slate-800 dark:text-slate-100 font-bold text-xl">
-            Filter is {filterStatus}
+            Filter is {filterState}
           </h3>
         </div>
         <Button
@@ -46,7 +46,7 @@ const FilterStatusBlock: React.FC<Props> = ({ filterStatus }) => {
           onClick={() => {}}
           color="tertiary"
           size="small"
-          disabled={filterStatus !== `on`}
+          disabled={filterState !== `on`}
         >
           Suspend filter
         </Button>

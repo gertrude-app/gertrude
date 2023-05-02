@@ -25,10 +25,14 @@ export abstract class Store<AppState, AppEvent, ViewState, ViewAction> {
   emitter(
     window: any,
     dispatch: React.Dispatch<ActionOf<AppState, AppEvent, ViewAction>>,
-  ): (event: AppEvent) => unknown {
-    return (event: AppEvent) => {
-      dispatch({ type: `appEventEmitted`, event });
-      window.webkit.messageHandlers.appView.postMessage(JSON.stringify(event));
+  ): (event: AppEvent | '__APPVIEW_READY__') => unknown {
+    return (event: AppEvent | '__APPVIEW_READY__') => {
+      if (event === `__APPVIEW_READY__`) {
+        window.webkit.messageHandlers.appView.postMessage(event);
+      } else {
+        dispatch({ type: `appEventEmitted`, event });
+        window.webkit.messageHandlers.appView.postMessage(JSON.stringify(event));
+      }
     };
   }
 
@@ -51,16 +55,14 @@ export function containerize<AppState, AppEvent, ViewState, ViewAction>(
       store.initializer.bind(store),
     );
 
+    const emit = store.emitter(window, dispatch);
+
     useEffect(() => {
       store.bind(window, dispatch);
-    }, []);
+      emit(`__APPVIEW_READY__`);
+    }, [emit]);
 
-    const props = {
-      ...state,
-      emit: store.emitter(window, dispatch),
-      dispatch,
-    };
-
+    const props = { ...state, emit, dispatch };
     return component(props);
   };
 }

@@ -1,25 +1,25 @@
 import React from 'react';
 import cx from 'classnames';
 import { Button } from '@shared/components';
-import type { Page } from '../Administrate';
+import type { Screen } from '../administrate-store';
 import FilterStatusBlock from '../subcomponents/FilterStatusBlock';
 import HealthCheckPreviewBlock from '../subcomponents/HealthCheckPreviewBlock';
 import AppVersionBlock from '../subcomponents/AppVersionBlock';
 import UserBlock from '../subcomponents/UserBlock';
 
 interface Props {
-  setPage: (page: Page) => void;
-  filterStatus: 'on' | 'off' | 'suspended';
+  filterState: 'on' | 'off' | 'suspended';
   failingChecksCount: number;
   appVersion: string;
   userName: string;
   keystrokeMonitoringEnabled: boolean;
   screenshotMonitoringEnabled: boolean;
+  setScreen(screen: Screen): void;
 }
 
 const HomeScreen: React.FC<Props> = ({
-  setPage,
-  filterStatus,
+  setScreen,
+  filterState,
   failingChecksCount,
   appVersion,
   userName,
@@ -33,10 +33,10 @@ const HomeScreen: React.FC<Props> = ({
     <div className="flex flex-col justify-between h-full p-4">
       <div className="flex flex-col space-y-4">
         <div className="flex space-x-4">
-          <FilterStatusBlock filterStatus={filterStatus} />
+          <FilterStatusBlock filterState={filterState} />
           <HealthCheckPreviewBlock
             failingChecksCount={failingChecksCount}
-            setPage={setPage}
+            setScreen={setScreen}
           />
         </div>
         <AppVersionBlock appVersion={appVersion} />

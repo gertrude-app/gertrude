@@ -3,33 +3,65 @@ import cx from 'classnames';
 import { Button } from '@shared/components';
 
 interface Props {
-  status: 'good' | 'bad' | 'warning';
+  status: 'checking' | 'ok' | 'warn' | 'fail' | 'errorDetermining';
   title: string;
   description?: string;
-  action?: {
-    label: string;
-    icon: string;
-    onClick: () => void;
-  };
+  warnDescription?: string;
+  failDescription?: string;
+  errorDeterminingDescription?: string;
+  actionLevel?: 'warn' | 'fail' | 'never';
+  actionLabel: string;
+  actionIcon: string;
+  onAction: () => void;
 }
 
-const HealthCheckItem: React.FC<Props> = ({ status, title, description, action }) => {
-  let iconColor = ``;
-  let icon = ``;
+const HealthCheckItem: React.FC<Props> = ({
+  status,
+  title,
+  description,
+  warnDescription,
+  failDescription,
+  errorDeterminingDescription,
+  actionLevel = `fail`,
+  actionLabel,
+  actionIcon,
+  onAction,
+}) => {
+  let iconColor: string;
+  let icon: string;
+  let subtitle: string | undefined;
   switch (status) {
-    case `good`:
+    case `ok`:
       iconColor = `bg-green-500`;
-      icon = `fa-solid fa-check`;
+      icon = `fa-solid fa-check translate-x-[0.5px]`;
+      subtitle = description;
       break;
-    case `bad`:
+    case `fail`:
       iconColor = `bg-red-500`;
-      icon = `fa-solid fa-times`;
+      icon = `fa-solid fa-times translate-x-[0.5px]`;
+      subtitle = failDescription ?? description;
       break;
-    case `warning`:
+    case `warn`:
       iconColor = `bg-yellow-400`;
       icon = `fa-solid fa-minus`;
+      subtitle = warnDescription ?? description;
+      break;
+    case `checking`:
+      iconColor = `bg-purple-500 dark:bg-purple-800`;
+      icon = `fa-solid fa-sync animate-spin dark:text-slate-100`;
+      break;
+    case `errorDetermining`:
+      iconColor = `bg-gray-500/90`;
+      icon = `fa-solid fa-exclamation translate-x-[0.5px]`;
+      subtitle =
+        errorDeterminingDescription ?? `Unexpected check error, please try again`;
       break;
   }
+
+  const showAction =
+    actionLevel !== `never` &&
+    ((actionLevel === `warn` && (status === `warn` || status === `fail`)) ||
+      status === `fail`);
 
   return (
     <div className="flex items-center p-2 rounded-xl bg-slate-50 dark:bg-slate-800/30">
@@ -40,12 +72,12 @@ const HealthCheckItem: React.FC<Props> = ({ status, title, description, action }
       </div>
       <div className="flex-grow ml-4">
         <h3 className="font-medium text-slate-800 dark:text-slate-200">{title}</h3>
-        <p className="text-slate-500 dark:text-slate-400">{description}</p>
+        {subtitle && <p className="text-slate-500 dark:text-slate-400">{subtitle}</p>}
       </div>
-      {action && (
-        <Button type="button" onClick={action.onClick} color="tertiary" size="small">
-          <i className={`fa-solid fa-${action.icon} mr-2`} />
-          {action.label}
+      {showAction && (
+        <Button type="button" onClick={onAction} color="tertiary" size="small">
+          <i className={`fa-solid fa-${actionIcon} mr-2`} />
+          {actionLabel}
         </Button>
       )}
     </div>
