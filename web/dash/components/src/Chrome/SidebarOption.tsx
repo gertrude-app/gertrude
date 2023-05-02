@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
+import type { HeroIcon } from '@dash/types';
 import SmartLink from '../SmartLink';
-import { HeroIcon } from '@dash/types';
 
 interface Props {
   Icon: HeroIcon;

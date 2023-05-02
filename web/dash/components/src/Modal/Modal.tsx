@@ -2,8 +2,8 @@ import React from 'react';
 import cx from 'classnames';
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { capitalize } from '@shared/string';
-import { Button, LoadingSpinner } from '@shared/components';
+import { capitalize } from '@dash/utils';
+import { Button, Loading } from '@shared/components';
 import type { IconType } from '../GradientIcon';
 import GradientIcon from '../GradientIcon';
 
@@ -115,7 +115,9 @@ const Modal: React.FC<Props> = ({
             >
               {loading ? (
                 <Dialog.Panel>
-                  <LoadingSpinner />
+                  <div className="p-8 rounded-3xl">
+                    <Loading />
+                  </div>
                 </Dialog.Panel>
               ) : (
                 <Dialog.Panel

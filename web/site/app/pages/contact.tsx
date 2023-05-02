@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import cx from 'classnames';
-import { TextInput, Logo, Button, LoadingSpinner } from '@shared/components';
+import { TextInput, Logo, Button, Loading } from '@shared/components';
 import { Chrome, ContactStatusMessage } from '@site/components';
 import type { NextPage } from 'next';
 
@@ -19,7 +19,7 @@ const Contact: NextPage = () => {
             <h1 className="text-2xl font-inter text-slate-900">Contact us</h1>
             {state === `ongoing` && (
               <div className="hidden sm:block sm:pt-8">
-                <LoadingSpinner />
+                <Loading />
               </div>
             )}
             {state === `failed` && (

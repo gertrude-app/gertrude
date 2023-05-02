@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { Button, LoadingSpinner } from '@shared/components';
+import { Button, Loading } from '@shared/components';
 import GradientIcon from '../GradientIcon';
 import FullscreenGradientBg from './FullscreenGradientBg';
 
@@ -15,7 +15,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
     case `ongoing`:
       return (
         <FullscreenGradientBg>
-          <LoadingSpinner text={props.text} />
+          <Loading />
         </FullscreenGradientBg>
       );
 
