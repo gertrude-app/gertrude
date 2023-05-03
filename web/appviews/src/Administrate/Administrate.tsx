@@ -17,9 +17,14 @@ export const Administrate: React.FC<Props> = ({
   userName,
   screenshotMonitoringEnabled,
   keystrokeMonitoringEnabled,
+  filterSuspensionDurationInSeconds,
   installedAppVersion,
+  releaseChannel,
+  exemptableUsers,
   emit,
+  dispatch,
   screen,
+  quitting,
 }) => {
   const health = new HealthChecker(
     healthCheck,
@@ -28,29 +33,24 @@ export const Administrate: React.FC<Props> = ({
     keystrokeMonitoringEnabled,
   );
 
-  let pageElement = (
-    <HomeScreen
-      setScreen={() => emit({ case: `gotoScreenClicked`, screen })}
-      filterState={filterState}
-      failingChecksCount={health.failingChecksCount}
-      appVersion={installedAppVersion}
-      userName={userName}
-      keystrokeMonitoringEnabled={keystrokeMonitoringEnabled}
-      screenshotMonitoringEnabled={screenshotMonitoringEnabled}
-    />
-  );
+  let pageElement: JSX.Element;
 
   switch (screen) {
     case `home`:
       pageElement = (
         <HomeScreen
-          setScreen={() => emit({ case: `gotoScreenClicked`, screen: `home` })}
+          dispatch={dispatch}
+          filterSuspensionDurationInSeconds={filterSuspensionDurationInSeconds}
+          releaseChannel={releaseChannel}
+          emit={emit}
+          setScreen={(screen) => emit({ case: `gotoScreenClicked`, screen })}
           filterState={filterState}
           failingChecksCount={health.failingChecksCount}
           appVersion={installedAppVersion}
           userName={userName}
           keystrokeMonitoringEnabled={keystrokeMonitoringEnabled}
           screenshotMonitoringEnabled={screenshotMonitoringEnabled}
+          quitting={quitting}
         />
       );
       break;
@@ -66,7 +66,7 @@ export const Administrate: React.FC<Props> = ({
       );
       break;
     case `exemptUsers`:
-      pageElement = <ExemptUsersScreen />;
+      pageElement = <ExemptUsersScreen emit={emit} users={exemptableUsers} />;
       break;
   }
 

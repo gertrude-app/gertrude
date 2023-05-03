@@ -4,7 +4,7 @@ import type { AppEvent } from '../menubar-store';
 import { MenuBarSized } from '../MenuBar';
 
 interface Props {
-  emit: (event: AppEvent) => unknown;
+  emit(event: AppEvent): unknown;
 }
 
 const Welcome: React.FC<Props> = ({ emit }) => (

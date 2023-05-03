@@ -4,8 +4,8 @@ import type { AppEvent, ViewAction } from '../menubar-store';
 import { MenuBarSized } from '../MenuBar';
 
 interface Props {
-  emit: (event: AppEvent) => unknown;
-  dispatch: (action: ViewAction) => unknown;
+  emit(event: AppEvent): unknown;
+  dispatch(action: ViewAction): unknown;
   connectionCode: string;
 }
 

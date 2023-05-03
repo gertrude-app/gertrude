@@ -11,6 +11,7 @@ interface Props<Value extends string> {
   label?: string;
   size?: 'small' | 'medium' | 'large';
   testId?: string;
+  disabled?: boolean;
 }
 
 function SelectMenu<Value extends string = string>({
@@ -20,6 +21,7 @@ function SelectMenu<Value extends string = string>({
   label,
   size = `large`,
   testId,
+  disabled,
 }: Parameters<React.FC<Props<Value>>>[0]): ReturnType<React.FC<Props<Value>>> {
   let buttonStyles = ``;
   switch (size) {
@@ -36,7 +38,10 @@ function SelectMenu<Value extends string = string>({
   return (
     <Listbox value={selectedOption} onChange={setSelected}>
       {({ open }) => (
-        <div data-test={testId} className="relative">
+        <div
+          data-test={testId}
+          className={cx(`relative`, disabled && `opacity-60 cursor-not-allowed`)}
+        >
           {label && <Label className="w-full inline-block pb-px">{label}</Label>}
           <div className="relative">
             <div className="rounded-md w-full">
@@ -51,6 +56,7 @@ function SelectMenu<Value extends string = string>({
                   className={cx(
                     `relative inline-flex items-center px-4 rounded-l-none rounded-r-md text-sm font-medium focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 [transition:100ms]`,
                     buttonStyles,
+                    disabled && `cursor-not-allowed pointer-events-none`,
                   )}
                 >
                   <span className="sr-only">Change published status</span>

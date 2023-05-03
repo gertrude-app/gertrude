@@ -21,21 +21,25 @@ export const HomeChecksPassingLight: Story = props({
     windowOpen: true,
     healthCheck: {
       latestAppVersion: { case: `ok`, value: `2.0.0` },
-      filterData: {
-        case: `ok`,
-        value: { version: `2.0.0`, numKeys: 42 },
+      filterStatus: {
+        case: `installed`,
+        version: `2.0.0`,
+        numUserKeys: 42,
       },
       screenRecordingPermissionOk: true,
       keystrokeRecordingPermissionOk: true,
       macOsUserType: { case: `ok`, value: `standard` },
-      notificationsPermission: `alert`,
+      notificationsSetting: `alert`,
       accountStatus: { case: `ok`, value: `active` },
     },
     installedAppVersion: `2.0.0`,
-    filterState: `on`,
+    filterState: { case: `on` },
     userName: `Little Jimmy`,
     screenshotMonitoringEnabled: true,
     keystrokeMonitoringEnabled: false,
+    releaseChannel: `stable`,
+    quitting: false,
+    filterSuspensionDurationInSeconds: `300`,
     emit: () => {},
     dispatch: () => {},
   },
@@ -67,14 +71,15 @@ export const HealthCheckFailingLight: Story = props({
     screen: `healthCheck`,
     healthCheck: {
       latestAppVersion: { case: `ok`, value: `2.1.0` },
-      filterData: {
-        case: `ok`,
-        value: { version: `1.6.0`, numKeys: 0 },
+      filterStatus: {
+        case: `installed`,
+        version: `1.6.0`,
+        numUserKeys: 0,
       },
       screenRecordingPermissionOk: false,
       keystrokeRecordingPermissionOk: false,
       macOsUserType: { case: `ok`, value: `admin` },
-      notificationsPermission: `none`,
+      notificationsSetting: `none`,
       accountStatus: { case: `ok`, value: `inactive` },
     },
     screenshotMonitoringEnabled: true,
@@ -94,9 +99,9 @@ export const HomeChecksFailingLight: Story = props({
     healthCheck: {
       ...HomeChecksPassingLight.args.props.healthCheck,
       screenshotMonitoringEnabled: false,
-      notificationsPermission: `none`,
+      notificationsSetting: `none`,
     },
-    filterState: `suspended`,
+    filterState: { case: `on` },
   },
 });
 
@@ -112,11 +117,11 @@ export const HealthCheckErrorLight: Story = props({
     screen: `healthCheck`,
     healthCheck: {
       latestAppVersion: { case: `error` },
-      filterData: { case: `error` },
+      filterStatus: { case: `unexpected` },
       screenRecordingPermissionOk: false,
       keystrokeRecordingPermissionOk: false,
       macOsUserType: { case: `error`, message: `Check the specs on the rotary girder` },
-      notificationsPermission: `none`,
+      notificationsSetting: `none`,
       accountStatus: { case: `error` },
     },
   },
@@ -125,6 +130,29 @@ export const HealthCheckErrorLight: Story = props({
 export const HealthCheckErrorDark: Story = props({
   ...HealthCheckErrorLight.args,
   dark: true,
+});
+
+export const ExemptUsers: Story = props({
+  ...HomeChecksPassingLight.args,
+  props: {
+    ...HomeChecksPassingLight.args.props,
+    exemptableUsers: {
+      case: `ok`,
+      value: [
+        { id: 501, name: `Dad`, isExempt: true, isAdmin: true },
+        { id: 503, name: `Big Suzy`, isExempt: false, isAdmin: false },
+      ],
+    },
+    screen: `exemptUsers`,
+  },
+});
+
+export const ExemptUsersError: Story = props({
+  ...ExemptUsers.args,
+  props: {
+    ...ExemptUsers.args.props,
+    exemptableUsers: { case: `error` },
+  },
 });
 
 export default meta;

@@ -1,17 +1,20 @@
 import React from 'react';
 import cx from 'classnames';
 import { Button } from '@shared/components';
+import type { AppEvent } from '../administrate-store';
 
 interface Props {
   screenshotMonitoringEnabled: boolean;
   keystrokeMonitoringEnabled: boolean;
   userName: string;
+  emit(event: AppEvent): unknown;
 }
 
 const UserBlock: React.FC<Props> = ({
   screenshotMonitoringEnabled,
   keystrokeMonitoringEnabled,
   userName,
+  emit,
 }) => {
   const monitoringStyles = {
     screenshotButton: `bg-slate-200/70 text-slate-400 dark:bg-slate-800 dark:text-slate-600`,
@@ -41,7 +44,12 @@ const UserBlock: React.FC<Props> = ({
             </span>
           </h3>
           <div className="flex">
-            <Button type="button" onClick={() => {}} color="tertiary" size="small">
+            <Button
+              type="button"
+              onClick={() => emit({ case: `reconnectUserClicked` })}
+              color="tertiary"
+              size="small"
+            >
               Connect to a different user
             </Button>
           </div>
