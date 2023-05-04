@@ -28,7 +28,7 @@ const SidebarOption: React.FC<Props> = ({
       `cursor-pointer transition duration-75 select-none rounded-xl`,
       `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50`,
       collapsed
-        ? `py-[1.2em] my-[0.3em] pl-[1.1em] flex justify-center items-center`
+        ? `py-[1.2em] my-[0.3em] pl-[1em] flex justify-center items-center`
         : `py-[10px] sm:py-[12px] md:py-[12px] px-5  my-1.5 md:my-3`,
       isSelected ? `bg-violet-50` : `hover:bg-slate-50`,
     )}

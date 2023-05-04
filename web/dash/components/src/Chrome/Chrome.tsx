@@ -110,7 +110,7 @@ const Chrome: React.FC<Props> = ({
     <div
       className={cx(
         `flex flex-col flex-1 transition-[padding]`,
-        sidebarCollapsed ? `md:pl-24` : `md:pl-[304px] xl:pl-80`,
+        sidebarCollapsed ? `md:pl-24` : `md:pl-[304px]`,
       )}
     >
       <MobileStickyHeader

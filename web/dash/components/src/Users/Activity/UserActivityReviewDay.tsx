@@ -44,8 +44,8 @@ const UserActivityReviewDay: React.FC<Props> = ({
 }) => {
   const navigate = useNavigate();
   return (
-    <UndoMainPadding>
-      <header className="flex items-center justify-between py-4 px-6 border-b-2 bg-white">
+    <UndoMainPadding className="px-0 md:px-8 lg:px-10 py-5 md:py-10 pt-0 md:pt-4 pb-16 flex flex-col">
+      <header className="flex items-center justify-between py-4 px-6 rounded-b-2xl md:rounded-t-2xl shadow-lg shadow-slate-800/10 bg-white max-w-7xl mb-8 z-20 relative">
         <div className="flex items-center text-md sm:text-l">
           <Link
             to="../"
@@ -58,17 +58,17 @@ const UserActivityReviewDay: React.FC<Props> = ({
         {items.length > 0 && (
           <div className="text-slate-600 self-end sm:self-center flex items-center space-x-0.5 sm:space-x-1">
             <span className="font-bold sm:text-lg">{numDeleted}</span>
-            <span className="hidden sm:inline">out of</span>
-            <span className="sm:hidden">/</span>
+            <span className="hidden lg:inline">out of</span>
+            <span className="lg:hidden">/</span>
             <span className="font-bold sm:text-lg">{numDeleted + items.length}</span>
-            <span className="hidden sm:inline">items reviewed</span>
+            <span className="hidden lg:inline">items reviewed</span>
           </div>
         )}
       </header>
       {items.length > 0 ? (
         <div
           id="delete-focus"
-          className="px-0 md:px-8 lg:px-10 py-5 md:py-10 pb-16 bg-slate-200 md:bg-transparent flex-grow space-y-8 flex flex-col"
+          className="bg-slate-200 md:bg-transparent flex-grow space-y-8 flex flex-col"
         >
           {deleteableChunks(items, chunkSize, deleteItems)}
           <Button
@@ -86,7 +86,7 @@ const UserActivityReviewDay: React.FC<Props> = ({
           </Button>
         </div>
       ) : (
-        <div className="p-8">
+        <div className="">
           <EmptyState
             heading={`All caught up!`}
             secondaryText={`Nothing left to review for this day.`}
@@ -94,6 +94,7 @@ const UserActivityReviewDay: React.FC<Props> = ({
             buttonText={`Back to activity`}
             buttonIcon="arrow-left"
             action={`../`}
+            className="max-w-7xl"
           />
         </div>
       )}
