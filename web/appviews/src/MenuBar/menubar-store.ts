@@ -3,7 +3,7 @@ import { Store } from '../lib/store';
 
 // begin codegen
 export type FilterState =
-  | { case: 'suspended'; expiration: string }
+  | { case: 'suspended'; resuming: string }
   | { case: 'off' }
   | { case: 'on' };
 

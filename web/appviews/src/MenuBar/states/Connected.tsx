@@ -35,7 +35,7 @@ const Connected: React.FC<Props> = ({
       </div>
       {filterState.case === `suspended` && (
         <p className="mt-1 italic text-sm text-black/70 dark:text-white/70">
-          Resuming {filterState.expiration}
+          Resuming {filterState.resuming}
         </p>
       )}
     </div>

@@ -7,6 +7,7 @@ module.exports = {
     `../shared/components/src/TextInput.tsx`,
     `../shared/components/src/Toggle.tsx`,
     `../shared/components/src/Loading.tsx`,
+    `../shared/components/src/SelectMenu.tsx`,
   ],
   darkMode: `class`,
 };

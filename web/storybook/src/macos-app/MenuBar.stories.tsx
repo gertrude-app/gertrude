@@ -106,7 +106,7 @@ const ThreeModesThreeColors: React.FC<{ theme: 'light' | 'dark' }> = ({ theme })
       case: `connected`,
       recordingKeystrokes: false,
       recordingScreen: false,
-      filterState: { case: `suspended`, expiration: `3 minutes from now` },
+      filterState: { case: `suspended`, resuming: `3 minutes from now` },
       ...commonProps,
     },
   };

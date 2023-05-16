@@ -1,4 +1,6 @@
 import type { ActionOf } from '../lib/store';
+import type { FilterState } from '../MenuBar/menubar-store';
+import type { Failable } from '../lib/failable';
 import { Store } from '../lib/store';
 
 // begin codegen
@@ -6,25 +8,37 @@ export type Screen = 'home' | 'healthCheck' | 'exemptUsers';
 
 export type HealthCheck = {
   latestAppVersion?: { case: 'ok'; value: string } | { case: 'error'; message?: string };
-  filterData?:
-    | { case: 'ok'; value: { version: string; numKeys: number } }
-    | { case: 'error'; message?: string };
+  filterStatus?:
+    | { case: 'installed'; version: string; numUserKeys: number }
+    | { case: 'installing' }
+    | { case: 'installTimeout' }
+    | { case: 'notInstalled' }
+    | { case: 'unexpected' }
+    | { case: 'communicationBroken' };
   accountStatus?:
     | { case: 'ok'; value: 'active' | 'needsAttention' | 'inactive' }
     | { case: 'error'; message?: string };
   screenRecordingPermissionOk?: boolean;
   keystrokeRecordingPermissionOk?: boolean;
   macOsUserType?:
-    | { case: 'ok'; value: 'standard' | 'admin' }
+    | { case: 'ok'; value: 'admin' | 'standard' }
     | { case: 'error'; message?: string };
   notificationsSetting?: 'none' | 'banner' | 'alert';
+};
+
+export type ExemptableUser = {
+  id: number;
+  name: string;
+  isAdmin: boolean;
+  isExempt: boolean;
 };
 
 export type HealthCheckAction =
   | 'recheckClicked'
   | 'upgradeAppClicked'
+  | 'installFilterClicked'
   | 'repairFilterCommunicationClicked'
-  | 'restartFilterClicked'
+  | 'repairOutOfDateFilterClicked'
   | 'fixScreenRecordingPermissionClicked'
   | 'fixKeystrokeRecordingPermissionClicked'
   | 'removeUserAdminPrivilegeClicked'
@@ -35,21 +49,42 @@ export type AppState = {
   windowOpen: boolean;
   screen: Screen;
   healthCheck: HealthCheck;
-  filterState: 'on' | 'off' | 'suspended';
+  filterState: FilterState;
   userName: string;
   screenshotMonitoringEnabled: boolean;
   keystrokeMonitoringEnabled: boolean;
   installedAppVersion: string;
+  releaseChannel: 'stable' | 'beta' | 'canary';
+  quitting: boolean;
+  exemptableUsers?: Failable<ExemptableUser[]>;
 };
 
 export type AppEvent =
   | { case: 'healthCheck'; action: HealthCheckAction }
   | { case: 'gotoScreenClicked'; screen: Screen }
-  | { case: 'closeWindow' };
+  | { case: 'releaseChannelUpdated'; channel: 'stable' | 'beta' | 'canary' }
+  | { case: 'suspendFilterClicked'; durationInSeconds: number }
+  | { case: 'setUserExemption'; userId: number; enabled: boolean }
+  | { case: 'closeWindow' }
+  | { case: 'stopFilterClicked' }
+  | { case: 'startFilterClicked' }
+  | { case: 'resumeFilterClicked' }
+  | { case: 'reinstallAppClicked' }
+  | { case: 'quitAppClicked' }
+  | { case: 'reconnectUserClicked' }
+  | { case: 'administrateOSUserAccountsClicked' }
+  | { case: 'checkForAppUpdatesClicked' };
 // end codegen
 
-export type ViewState = {}; // eslint-disable-line
-export type ViewAction = never;
+export type ViewState = {
+  filterSuspensionDurationInSeconds: string;
+};
+
+export type ViewAction = {
+  type: 'filterSuspensionDurationInSecondsChanged';
+  value: string;
+};
+
 export type Action = ActionOf<AppState, AppEvent, ViewAction>;
 export type State = AppState & ViewState;
 
@@ -58,17 +93,21 @@ export class AdministrateStore extends Store<AppState, AppEvent, ViewState, View
     return {
       windowOpen: true,
       screen: `home`,
-      filterState: `off`,
+      filterState: { case: `off` },
       userName: ``,
       installedAppVersion: `0.0.0`,
       screenshotMonitoringEnabled: false,
       keystrokeMonitoringEnabled: false,
       healthCheck: {},
+      releaseChannel: `stable`,
+      quitting: false,
     };
   }
 
   viewState(): ViewState {
-    return {};
+    return {
+      filterSuspensionDurationInSeconds: String(60 * 5), // 5 minutes
+    };
   }
 
   initializer(): State {
@@ -77,6 +116,8 @@ export class AdministrateStore extends Store<AppState, AppEvent, ViewState, View
 
   reducer(state: State, action: Action): State {
     switch (action.type) {
+      case `filterSuspensionDurationInSecondsChanged`:
+        return { ...state, filterSuspensionDurationInSeconds: action.value };
       case `receivedUpdatedAppState`:
         return { ...state, ...action.appState };
       case `appEventEmitted`:

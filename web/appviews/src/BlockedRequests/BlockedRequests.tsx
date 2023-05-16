@@ -4,6 +4,7 @@ import { Button, Loading, TextInput, Toggle } from '@shared/components';
 import type { AppState, ViewState, AppEvent, ViewAction } from './blockedrequests-store';
 import type { PropsOf } from '../lib/store';
 import { containerize } from '../lib/store';
+import ErrorBlock from '../ErrorBlock';
 import store from './blockedrequests-store';
 import BlockedRequest from './BlockedRequest';
 
@@ -163,18 +164,13 @@ const BottomPanel: React.FC<PanelProps> = ({
   if (createUnlockRequests.case === `failed`) {
     return (
       <BottomPanelWrap className="flex h-44">
-        <div className="flex flex-col items-center p-4 rounded-2xl border border-red-200 dark:border-red-700/50 bg-red-50/30 dark:bg-red-600/5 flex-grow">
-          <span className="font-bold text-lg text-slate-700 dark:text-white/80">
-            Failed to send unlock request:
-          </span>
-          <span className="text-red-500 mb-4 dark:text-red-400">
-            {createUnlockRequests.error}
-          </span>
-          <Button type="button" onClick={() => {}} color="warning" size="small">
-            <i className="fa-solid fa-redo mr-2" />
-            Try again
-          </Button>
-        </div>
+        <ErrorBlock
+          title="Failed to send unlock request:"
+          message={createUnlockRequests.error}
+          buttonText="Try Again"
+          buttonIcon="fa-redo"
+          buttonAction={() => emit({ case: `requestFailedTryAgainClicked` })}
+        />
       </BottomPanelWrap>
     );
   }
