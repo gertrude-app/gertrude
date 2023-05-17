@@ -1,5 +1,5 @@
 import React from 'react';
-import { capitalize } from '@dash/utils';
+import { capitalize } from '@shared/string';
 import * as date from '@dash/datetime';
 import { TextInput, SelectMenu } from '@shared/components';
 import UserInputText from '../UserInputText';

@@ -14,6 +14,7 @@
     "@dash/components": "workspace:*",
     "@headlessui/react": "1.7.12",
     "@shared/components": "workspace:*",
+    "@shared/string": "workspace:*",
     "@shared/tailwind": "workspace:*",
     "@shared/ts-utils": "workspace:*",
     "@vitejs/plugin-react": "3.1.0",

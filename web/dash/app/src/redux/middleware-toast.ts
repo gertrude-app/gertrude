@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import { capitalize } from '@dash/utils';
+import { capitalize } from '@shared/string';
 import type { Action, Middleware } from '@reduxjs/toolkit';
 import type { ResultThunk } from './thunk';
 import { deleteActivityItems, deleteDevice, upsertUser, deleteUser } from './slice-users';

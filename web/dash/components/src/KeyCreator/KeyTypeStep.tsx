@@ -1,6 +1,6 @@
 import React from 'react';
 import { EditKey } from '@dash/keys';
-import { capitalize } from '@dash/utils';
+import { capitalize } from '@shared/string';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';

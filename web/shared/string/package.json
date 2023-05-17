@@ -1,0 +1,10 @@
+{
+  "name": "@shared/string",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
+  }
+}

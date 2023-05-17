@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import { writable, newestFirst, inflect } from '@dash/utils';
+import { writable, newestFirst } from '@dash/utils';
+import { inflect } from '@shared/string';
 import type { GetDashboardWidgets } from '@dash/types';
 import UnlockRequestCard from '../UnlockRequestCard';
 import DashboardWidget from './DashboardWidget';

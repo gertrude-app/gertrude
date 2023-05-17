@@ -1,5 +1,5 @@
 import React from 'react';
-import { posessive } from '@dash/utils';
+import { posessive } from '@shared/string';
 import type { ComponentProps } from 'react';
 import PageHeading from '../../PageHeading';
 import PartyMessage from '../../PartyMessage';

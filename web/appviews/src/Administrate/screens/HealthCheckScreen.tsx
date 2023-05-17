@@ -1,6 +1,7 @@
 import { Button } from '@shared/components';
 import cx from 'classnames';
 import React from 'react';
+import { inflect } from '@shared/string';
 import type { HealthCheck, HealthCheckAction } from '../administrate-store';
 import HealthCheckItem from '../subcomponents/HealthCheckItem';
 import HealthChecker from '../HealthChecker';
@@ -55,9 +56,10 @@ const HealthCheckScreen: React.FC<Props> = ({
             {health.isChecking
               ? `Checking...`
               : health.failingChecksCount
-              ? `${health.failingChecksCount} failing check${
-                  health.failingChecksCount > 1 ? `s` : ``
-                }!`
+              ? `${health.failingChecksCount} ${inflect(
+                  `failing check`,
+                  health.failingChecksCount,
+                )}!`
               : `Everything looks good!`}
           </span>
         </div>
