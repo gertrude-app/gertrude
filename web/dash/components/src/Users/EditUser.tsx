@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { inflect } from '@dash/utils';
+import { inflect } from '@shared/string';
 import { TextInput, Button, Toggle } from '@shared/components';
 import type { Subcomponents, ConfirmableEntityAction, RequestState } from '@dash/types';
 import type { KeychainSummary as Keychain } from '@dash/types';

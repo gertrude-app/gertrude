@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { inflect } from '@dash/utils';
+import { inflect } from '@shared/string';
 import { Button } from '@shared/components';
 import type { Subcomponents } from '@dash/types';
 import UserDevice from './UserDevice';

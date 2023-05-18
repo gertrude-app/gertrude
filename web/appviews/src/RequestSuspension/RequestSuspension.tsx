@@ -1,19 +1,62 @@
-import React, { useState } from 'react';
+import React from 'react';
 import cx from 'classnames';
+import { inflect } from '@shared/string';
 import { Button, TextInput } from '@shared/components';
 import { Transition } from '@headlessui/react';
+import type {
+  AppState,
+  ViewState,
+  AppEvent,
+  ViewAction,
+} from './requestsuspension-store';
+import type { PropsOf } from '../lib/store';
+import { containerize } from '../lib/store';
+import ErrorBlock from '../ErrorBlock';
+import store from './requestsuspension-store';
 
-const RequestSuspension: React.FC = () => {
-  const [reason, setReason] = useState(``);
-  const [duration, setDuration] = useState<number | null>(null);
-  const [popupOpen, setPopupOpen] = useState(false);
-  const [popupPage, setPopupPage] = useState<1 | 2>(1);
-  const [customDuration, setCustomDuration] = useState(``);
+type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 
+export const RequestSuspension: React.FC<Props> = ({
+  overlay,
+  dispatch,
+  customDurationString,
+  emit,
+  comment,
+  durationInSeconds,
+  request,
+}) => {
+  if (request.case === `ongoing`) {
+    return <div className="h-full appview:h-screen">Submitting...</div>;
+  } else if (request.case === `succeeded`) {
+    return (
+      <div className="h-full appview:h-screen">
+        Filter suspension request submitted.
+        <Button
+          type="button"
+          color="primary"
+          onClick={() => emit({ case: `closeWindow` })}
+        >
+          Close window
+        </Button>
+      </div>
+    );
+  } else if (request.case === `failed`) {
+    return (
+      <div className="h-full appview:h-screen">
+        <ErrorBlock
+          title="Filter suspension request failed:"
+          message={request.error}
+          buttonText="Try Again"
+          buttonIcon="fa-redo"
+          buttonAction={() => emit({ case: `requestFailedTryAgainClicked` })}
+        />
+      </div>
+    );
+  }
   return (
-    <div className="h-full flex items-stretch flex-col bg-white dark:bg-slate-900 rounded-b-xl relative">
+    <div className="h-full appview:h-screen flex items-stretch flex-col bg-white dark:bg-slate-900 rounded-b-xl relative">
       <Transition
-        show={popupOpen}
+        show={overlay !== undefined}
         enter="transition-opacity duration-75"
         enterFrom="opacity-0"
         enterTo="opacity-100"
@@ -25,10 +68,7 @@ const RequestSuspension: React.FC = () => {
           className={cx(
             `absolute flex justify-center items-center w-full h-full top-0 left-0 bg-black/60 z-40 rounded-b-xl`,
           )}
-          onClick={() => {
-            setPopupOpen(false);
-            setPopupPage(1);
-          }}
+          onClick={() => dispatch({ type: `overlayBackgroundClicked` })}
         >
           <div
             className={cx(
@@ -39,7 +79,7 @@ const RequestSuspension: React.FC = () => {
             <div
               className={cx(
                 `absolute w-full flex flex-col items-stretch top-0 p-4 [transition:200ms]`,
-                popupPage === 1 ? `left-0 opacity-100` : `-left-96 opacity-0`,
+                overlay === `main` ? `left-0 opacity-100` : `-left-96 opacity-0`,
               )}
             >
               <h3 className="font-bold mb-3 dark:text-slate-100">Suspension duration</h3>
@@ -48,11 +88,7 @@ const RequestSuspension: React.FC = () => {
                   <button
                     key={minutes}
                     className="text-left rounded-lg px-3 py-2 bg-slate-50 dark:bg-slate-700 font-medium text-slate-700 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-600 transition duration-100"
-                    onClick={() => {
-                      setDuration(minutes);
-                      setPopupOpen(false);
-                      setCustomDuration(``);
-                    }}
+                    onClick={() => dispatch({ type: `standardDurationClicked`, minutes })}
                   >
                     {minutes > 59 ? minutes / 60 : minutes}
                     {` `}
@@ -67,9 +103,7 @@ const RequestSuspension: React.FC = () => {
               </div>
               <button
                 className="rounded-lg p-2 bg-slate-50 dark:bg-slate-700 font-medium text-slate-700 dark:text-slate-100 text-center hover:bg-slate-100 dark:hover:bg-slate-600"
-                onClick={() => {
-                  setPopupPage(2);
-                }}
+                onClick={() => dispatch({ type: `customDurationClicked` })}
               >
                 Custom duration...
               </button>
@@ -77,7 +111,7 @@ const RequestSuspension: React.FC = () => {
             <div
               className={cx(
                 `absolute w-full h-full top-0 [transition:200ms] flex flex-col justify-between`,
-                popupPage === 2 ? `left-0 opacity-100` : `left-96 opacity-0`,
+                overlay === `customDuration` ? `left-0 opacity-100` : `left-96 opacity-0`,
               )}
             >
               <div className="p-4">
@@ -86,15 +120,15 @@ const RequestSuspension: React.FC = () => {
                 </h3>
                 <TextInput
                   type="positiveInteger"
-                  value={customDuration}
-                  setValue={setCustomDuration}
+                  value={customDurationString}
+                  setValue={(value) => dispatch({ type: `customDurationUpdated`, value })}
                   unit="minutes"
                 />
               </div>
               <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 p-4 rounded-b-xl">
                 <Button
                   type="button"
-                  onClick={() => setPopupPage(1)}
+                  onClick={() => dispatch({ type: `backFromCustomDurationClicked` })}
                   color="tertiary"
                   size="medium"
                 >
@@ -103,14 +137,10 @@ const RequestSuspension: React.FC = () => {
                 </Button>
                 <Button
                   type="button"
-                  onClick={() => {
-                    setDuration(Number(customDuration));
-                    setPopupOpen(false);
-                    setPopupPage(1);
-                  }}
+                  onClick={() => dispatch({ type: `chooseCustomDurationClicked` })}
                   color="secondary"
                   size="medium"
-                  disabled={!customDuration}
+                  disabled={!customDurationValid(customDurationString)}
                 >
                   Choose
                   <i className="fa-solid fa-check ml-2" />
@@ -126,8 +156,8 @@ const RequestSuspension: React.FC = () => {
         </h2>
         <TextInput
           type="textarea"
-          value={reason}
-          setValue={setReason}
+          value={comment}
+          setValue={(value) => dispatch({ type: `commentUpdated`, value })}
           rows={5}
           label="Reason:"
           noResize
@@ -137,19 +167,30 @@ const RequestSuspension: React.FC = () => {
       <div className="flex justify-between items-center p-4 dark:bg-black/10 rounded-b-xl border-t border-slate-200 dark:border-slate-800">
         <Button
           type="button"
-          onClick={() => setPopupOpen(true)}
+          onClick={() => dispatch({ type: `durationButtonClicked` })}
           color="tertiary"
           size="medium"
         >
           <i className="fa-regular fa-clock mr-2" />
-          {duration ? displayDuration(duration, !!customDuration) : `Choose duration...`}
+          {chooseDurationButtonText(customDurationString, durationInSeconds)}
         </Button>
         <Button
           type="button"
-          onClick={() => {}}
+          onClick={() => {
+            const duration = chosenDurationInSeconds(
+              customDurationString,
+              durationInSeconds,
+            );
+            if (duration !== null) {
+              emit({ case: `requestSubmitted`, durationInSeconds: duration, comment });
+            }
+          }}
           color="secondary"
           size="medium"
-          disabled={!duration}
+          disabled={
+            overlay !== undefined ||
+            chosenDurationInSeconds(customDurationString, durationInSeconds) === null
+          }
         >
           Submit
           <i className="fa-solid fa-arrow-right ml-2" />
@@ -159,12 +200,48 @@ const RequestSuspension: React.FC = () => {
   );
 };
 
-export default RequestSuspension;
-
-function displayDuration(minutes: number, custom: boolean): string {
-  if (minutes >= 60 && !custom) {
-    return `${minutes / 60} hour${minutes / 60 !== 1 ? `s` : ``}`;
+function chosenDurationInSeconds(
+  customDurationString: string,
+  durationInSeconds?: number,
+): number | null {
+  if (customDurationValid(customDurationString)) {
+    const minutes = Number(customDurationString);
+    return minutes * 60;
+  } else if (durationInSeconds !== undefined) {
+    return durationInSeconds;
   } else {
-    return `${minutes} minute${minutes !== 1 ? `s` : ``}`;
+    return null;
   }
+}
+
+function chooseDurationButtonText(
+  customDurationString: string,
+  durationInSeconds?: number,
+): string {
+  if (customDurationValid(customDurationString)) {
+    const minutes = Number(customDurationString);
+    return `${minutes} ${inflect(`minute`, minutes)}`;
+  } else if (durationInSeconds !== undefined) {
+    const minutes = Math.round(durationInSeconds / 60);
+    if (minutes < 60) {
+      return `${minutes} ${inflect(`minute`, minutes)}`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const left = minutes % 60;
+    if (left === 0) {
+      return `${hours} ${inflect(`hour`, hours)}`;
+    }
+    return `${hours} ${inflect(`hour`, hours)} ${left} ${inflect(`minute`, left)}`;
+  } else {
+    return `Choose duration...`;
+  }
+}
+
+export default containerize<AppState, AppEvent, ViewState, ViewAction>(
+  store,
+  RequestSuspension,
+);
+
+function customDurationValid(input: string): boolean {
+  return /^[1-9][0-9]*$/.test(input);
 }

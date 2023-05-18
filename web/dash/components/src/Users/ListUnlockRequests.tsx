@@ -1,6 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
-import { posessive, newestFirst } from '@dash/utils';
+import { newestFirst } from '@dash/utils';
+import { posessive } from '@shared/string';
 import type { Subcomponents } from '@dash/types';
 import UnlockRequestCard from '../UnlockRequestCard';
 import PageHeading from '../PageHeading';

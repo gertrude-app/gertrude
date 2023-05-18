@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { capitalize } from '@dash/utils';
+import { capitalize } from '@shared/string';
 
 type Props<Value extends string> = {
   className?: string;

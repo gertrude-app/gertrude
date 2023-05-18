@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { ApiErrorMessage, Loading, Profile } from '@dash/components';
-import { capitalize, isUnsaved } from '@dash/utils';
+import { isUnsaved } from '@dash/utils';
+import { capitalize } from '@shared/string';
 import { notNullish, typesafe } from '@shared/ts-utils';
 import type { GetAdmin } from '@dash/types';
 import type { QueryProps, State } from '../../redux/store';
