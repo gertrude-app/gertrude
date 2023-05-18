@@ -10,8 +10,11 @@ import type {
   ViewAction,
 } from './requestsuspension-store';
 import type { PropsOf } from '../lib/store';
+import type { AccountStatus } from '../Administrate/HealthChecker';
 import { containerize } from '../lib/store';
 import ErrorBlock from '../ErrorBlock';
+import InactiveAccountScreen from '../components/InactiveAccountBlock';
+import WarningBanner from '../components/WarningBanner';
 import store from './requestsuspension-store';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
@@ -71,8 +74,32 @@ export const RequestSuspension: React.FC<Props> = ({
       </div>
     );
   }
+
+  // @jaredh159 - change this to see the different states
+  const accountStatus: AccountStatus = `needsAttention`;
+
+  // @TODO ~ all these ts-ignores can be removed once the real state is hooked up
+  // @ts-ignore
+  if (accountStatus === `inactive`) {
+    return <InactiveAccountScreen short />;
+  }
+
   return (
     <div className="h-full appview:h-screen flex items-stretch flex-col bg-white dark:bg-slate-900 rounded-b-xl relative">
+      {/* @ts-ignore */}
+      {(accountStatus === `error` || accountStatus === `needsAttention`) && (
+        <div className="border-b border-slate-200 dark:border-slate-800 p-4 dark:bg-slate-900 bg-white">
+          <WarningBanner
+            // @ts-ignore
+            severity={accountStatus === `needsAttention` ? `warning` : `error`}
+          >
+            {/* @ts-ignore */}
+            {accountStatus === `needsAttention`
+              ? `Your Gertrude account payment is past due!`
+              : `We've encountered an unknown account error.`}
+          </WarningBanner>
+        </div>
+      )}
       <Transition
         show={overlay !== undefined}
         enter="transition-opacity duration-75"
@@ -176,7 +203,7 @@ export const RequestSuspension: React.FC<Props> = ({
           type="textarea"
           value={comment}
           setValue={(value) => dispatch({ type: `commentUpdated`, value })}
-          rows={5}
+          rows={accountStatus === `needsAttention` || accountStatus === `error` ? 2 : 5}
           label="Reason:"
           noResize
           placeholder="Super compelling reason"

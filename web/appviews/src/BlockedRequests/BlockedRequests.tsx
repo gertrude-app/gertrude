@@ -3,10 +3,13 @@ import cx from 'classnames';
 import { Button, Loading, TextInput, Toggle } from '@shared/components';
 import type { AppState, ViewState, AppEvent, ViewAction } from './blockedrequests-store';
 import type { PropsOf } from '../lib/store';
+import type { AccountStatus } from '../Administrate/HealthChecker';
 import { containerize } from '../lib/store';
 import ErrorBlock from '../ErrorBlock';
-import store from './blockedrequests-store';
+import WarningBanner from '../components/WarningBanner';
+import InactiveAccountScreen from '../components/InactiveAccountBlock';
 import BlockedRequest from './BlockedRequest';
+import store from './blockedrequests-store';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 
@@ -38,8 +41,31 @@ export const BlockedRequests: React.FC<Props> = ({
     .filter((req) => (tcpOnly ? req.protocol === `tcp` : true))
     .sort((a, b) => (b.time > a.time ? 1 : -1));
 
+  // @jaredh159 - change this to see the different states
+  const accountStatus: AccountStatus = `needsAttention`;
+
+  // @TODO ~ all these ts-ignores can be removed once the real state is hooked up
+  // @ts-ignore
+  if (accountStatus === `inactive`) {
+    return <InactiveAccountScreen />;
+  }
+
   return (
     <div className="bg-white dark:bg-slate-900 flex flex-col rounded-b-xl h-full appview:h-screen">
+      {/* @ts-ignore */}
+      {(accountStatus === `error` || accountStatus === `needsAttention`) && (
+        <div className="border-b border-slate-200 dark:border-slate-800 p-4 dark:bg-slate-900 bg-white">
+          <WarningBanner
+            // @ts-ignore
+            severity={accountStatus === `needsAttention` ? `warning` : `error`}
+          >
+            {/* @ts-ignore */}
+            {accountStatus === `needsAttention`
+              ? `Your Gertrude account payment is past due! Login to the web admin dashboard before app loses functionality.`
+              : `We've encountered an unknown account error. Please try restarting the app.`}
+          </WarningBanner>
+        </div>
+      )}
       <header className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center">
           <input
