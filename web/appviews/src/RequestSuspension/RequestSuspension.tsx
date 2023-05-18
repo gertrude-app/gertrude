@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@shared/string';
-import { Button, TextInput } from '@shared/components';
+import { Button, Loading, TextInput } from '@shared/components';
 import { Transition } from '@headlessui/react';
 import type {
   AppState,
@@ -26,29 +26,47 @@ export const RequestSuspension: React.FC<Props> = ({
   request,
 }) => {
   if (request.case === `ongoing`) {
-    return <div className="h-full appview:h-screen">Submitting...</div>;
+    return (
+      <div className="h-full appview:h-screen flex justify-center items-center flex-col space-y-4 bg-white dark:bg-slate-900 rounded-b-xl">
+        <Loading />
+        <h3 className="text-slate-500 font-medium text-lg dark:text-slate-400">
+          Submitting...
+        </h3>
+      </div>
+    );
   } else if (request.case === `succeeded`) {
     return (
-      <div className="h-full appview:h-screen">
-        Filter suspension request submitted.
-        <Button
-          type="button"
-          color="primary"
-          onClick={() => emit({ case: `closeWindow` })}
-        >
-          Close window
-        </Button>
+      <div className="h-full appview:h-screen flex justify-center items-center p-8 bg-white dark:bg-slate-900 rounded-b-xl">
+        <div className="flex justify-center items-center flex-col border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/30 rounded-2xl w-full h-full">
+          <div className="flex flex-row items-center space-x-3 mb-8">
+            <div className="bg-green-500 rounded-full w-6 h-6 flex justify-center items-center">
+              <i className="fa-solid fa-check text-white dark:text-slate-900" />
+            </div>
+            <h3 className="text-lg text-slate-600 dark:text-slate-300 font-medium">
+              Filter suspension request submitted
+            </h3>
+          </div>
+          <Button
+            type="button"
+            color="secondary"
+            onClick={() => emit({ case: `closeWindow` })}
+          >
+            <i className="mr-2 fa-solid fa-times" />
+            Close window
+          </Button>
+        </div>
       </div>
     );
   } else if (request.case === `failed`) {
     return (
-      <div className="h-full appview:h-screen">
+      <div className="h-full appview:h-screen flex justify-center items-center p-8 bg-white dark:bg-slate-900 rounded-b-xl">
         <ErrorBlock
           title="Filter suspension request failed:"
           message={request.error}
           buttonText="Try Again"
           buttonIcon="fa-redo"
           buttonAction={() => emit({ case: `requestFailedTryAgainClicked` })}
+          className="h-full"
         />
       </div>
     );
