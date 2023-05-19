@@ -36,7 +36,7 @@ const HomeScreen: React.FC<Props> = ({
   quitting,
   releaseChannel,
 }) => (
-  <div className="flex flex-col justify-between h-full p-4">
+  <div className="flex flex-col justify-between h-full p-4 overflow-scroll">
     <div className="flex flex-col space-y-4">
       <div className="flex space-x-4">
         <FilterStatusBlock

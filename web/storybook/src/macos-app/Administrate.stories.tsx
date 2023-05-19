@@ -50,6 +50,72 @@ export const HomeChecksPassingDark: Story = props({
   dark: true,
 });
 
+export const HomeAccountNeedsAttentionLight: Story = props({
+  ...HomeChecksPassingLight.args,
+  props: {
+    ...HomeChecksPassingLight.args.props,
+    healthCheck: {
+      ...HomeChecksPassingLight.args.props.healthCheck,
+      accountStatus: { case: `ok`, value: `needsAttention` },
+    },
+  },
+});
+
+export const HomeAccountNeedsAttentionDark: Story = props({
+  ...HomeAccountNeedsAttentionLight.args,
+  dark: true,
+});
+
+export const HomeAccountInactiveLight: Story = props({
+  ...HomeChecksPassingLight.args,
+  props: {
+    ...HomeChecksPassingLight.args.props,
+    healthCheck: {
+      ...HomeChecksPassingLight.args.props.healthCheck,
+      accountStatus: { case: `ok`, value: `inactive` },
+    },
+  },
+});
+
+export const HomeAccountInactiveDark: Story = props({
+  ...HomeAccountInactiveLight.args,
+  dark: true,
+});
+
+export const HomeAccountErrorLight: Story = props({
+  ...HomeChecksPassingLight.args,
+  props: {
+    ...HomeChecksPassingLight.args.props,
+    healthCheck: {
+      ...HomeChecksPassingLight.args.props.healthCheck,
+      accountStatus: { case: `error` },
+    },
+  },
+});
+
+export const HomeAccountErrorDark: Story = props({
+  ...HomeAccountErrorLight.args,
+  dark: true,
+});
+
+export const HomeChecksFailingLight: Story = props({
+  ...HomeChecksPassingLight.args,
+  props: {
+    ...HomeChecksPassingLight.args.props,
+    healthCheck: {
+      ...HomeChecksPassingLight.args.props.healthCheck,
+      screenshotMonitoringEnabled: false,
+      notificationsSetting: `none`,
+    },
+    filterState: { case: `on` },
+  },
+});
+
+export const HomeChecksFailingDark: Story = props({
+  ...HomeChecksFailingLight.args,
+  dark: true,
+});
+
 export const HealthCheckLoadingLight: Story = props({
   ...HomeChecksPassingLight.args,
   props: {
@@ -80,7 +146,7 @@ export const HealthCheckFailingLight: Story = props({
       keystrokeRecordingPermissionOk: false,
       macOsUserType: { case: `ok`, value: `admin` },
       notificationsSetting: `none`,
-      accountStatus: { case: `ok`, value: `inactive` },
+      accountStatus: { case: `ok`, value: `active` },
     },
     screenshotMonitoringEnabled: true,
     keystrokeMonitoringEnabled: true,
@@ -89,24 +155,6 @@ export const HealthCheckFailingLight: Story = props({
 
 export const HealthCheckFailingDark: Story = props({
   ...HealthCheckFailingLight.args,
-  dark: true,
-});
-
-export const HomeChecksFailingLight: Story = props({
-  ...HomeChecksPassingLight.args,
-  props: {
-    ...HomeChecksPassingLight.args.props,
-    healthCheck: {
-      ...HomeChecksPassingLight.args.props.healthCheck,
-      screenshotMonitoringEnabled: false,
-      notificationsSetting: `none`,
-    },
-    filterState: { case: `on` },
-  },
-});
-
-export const HomeChecksFailingDark: Story = props({
-  ...HomeChecksFailingLight.args,
   dark: true,
 });
 
@@ -132,7 +180,7 @@ export const HealthCheckErrorDark: Story = props({
   dark: true,
 });
 
-export const ExemptUsers: Story = props({
+export const ExemptUsersLight: Story = props({
   ...HomeChecksPassingLight.args,
   props: {
     ...HomeChecksPassingLight.args.props,
@@ -147,12 +195,22 @@ export const ExemptUsers: Story = props({
   },
 });
 
-export const ExemptUsersError: Story = props({
-  ...ExemptUsers.args,
+export const ExemptUsersDark: Story = props({
+  ...ExemptUsersLight.args,
+  dark: true,
+});
+
+export const ExemptUsersErrorLight: Story = props({
+  ...ExemptUsersLight.args,
   props: {
-    ...ExemptUsers.args.props,
+    ...ExemptUsersLight.args.props,
     exemptableUsers: { case: `error` },
   },
+});
+
+export const ExemptUsersErrorDark: Story = props({
+  ...ExemptUsersErrorLight.args,
+  dark: true,
 });
 
 export default meta;
