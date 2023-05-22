@@ -96,7 +96,7 @@ const Chrome: React.FC<Props> = ({
       className={cx(
         sidebarCollapsed ? `w-20` : `w-72`,
         `hidden relative flex-col md:flex md:fixed md:inset-y-0 transition-[width] m-4`,
-        `bg-white rounded-2xl shadow-lg shadow-slate-500/20`,
+        `bg-slate-900 bg-gradient-to-b from-transparent to-violet-900/50 rounded-2xl shadow-lg shadow-slate-500/30`,
       )}
     >
       <SidebarNav

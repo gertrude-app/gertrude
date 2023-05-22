@@ -110,7 +110,7 @@ const Title: React.FC<Props> = ({
 }) => (
   <h2 className="font-medium text-slate-900 text-lg">
     <GradientIcon
-      icon={appIdentificationType === `bundleId` ? `pen-to-square` : `app-store`}
+      icon={appIdentificationType === `bundleId` ? `edit` : `app-store`}
       className="mr-2.5"
       size="small"
     />

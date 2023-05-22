@@ -174,7 +174,7 @@ const EditUser: React.FC<Props> = ({
       </div>
       <div className="mt-12">
         <h2 className="text-lg font-bold text-slate-700 mb-2">Keychains</h2>
-        <div className="p-3 flex flex-col space-y-4">
+        <div className="py-3 flex flex-col space-y-4">
           {keychains.map((keychain) => (
             <KeychainCard
               mode="list"

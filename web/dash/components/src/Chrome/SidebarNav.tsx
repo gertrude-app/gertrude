@@ -29,13 +29,14 @@ const SidebarNav: React.FC<Props> = ({
   onInternalLinkClick,
 }) => (
   <div className="flex flex-col justify-between h-full" data-test="sidebar-nav">
-    <nav className={cx(`flex flex-col`, collapsed ? `py-4 px-2` : `px-3`)}>
+    <nav className={cx(`flex flex-col`, collapsed ? `py-4 px-2` : `px-4`)}>
       <a href="/">
         <Logo
           className={cx(
             `mb-4 sm:mb-6 scale-[0.8] sm:scale-100`,
-            collapsed ? `mt-3 ml-[0.8em]` : `mt-8 -ml-2 sm:ml-4`,
+            collapsed ? `mt-3 ml-[0.87em]` : `mt-8 -ml-2 sm:ml-4`,
           )}
+          type="inverted"
           iconOnly={collapsed}
         />
       </a>
@@ -77,7 +78,7 @@ const SidebarNav: React.FC<Props> = ({
           Profile
         </SidebarOption>
       </div>
-      <hr className="bg-slate-200/70 border-0 h-0.5 mx-4" />
+      <hr className="bg-indigo-200/10 border-0 h-0.5 mx-4" />
       <div className={cx(`grow pt-4`)}>
         <SidebarOption
           Icon={BookOpenIcon}
@@ -98,16 +99,19 @@ const SidebarNav: React.FC<Props> = ({
       </div>
     </nav>
     <div
-      className={cx(`flex h-14 md:h-auto border-t border-slate-200/70 items-center p-1`, {
-        'justify-center': collapsed,
-        'justify-between': !collapsed && toggleCollapsed !== undefined,
-        'justify-end': !collapsed && toggleCollapsed === undefined,
-      })}
+      className={cx(
+        `flex h-14 md:h-auto border-t border-indigo-200/10 items-center p-1`,
+        {
+          'justify-center': collapsed,
+          'justify-between': !collapsed && toggleCollapsed !== undefined,
+          'justify-end': !collapsed && toggleCollapsed === undefined,
+        },
+      )}
     >
       <button
         type="button"
         className={cx(
-          `h-14 hover:bg-violet-50 hover:text-violet-400 text-slate-400 items-center justify-center hidden md:flex`,
+          `h-14 hover:bg-violet-500/30 hover:text-violet-400 text-violet-200/50 items-center justify-center hidden md:flex`,
           `cursor-pointer transition duration-100`,
           `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50`,
           collapsed
@@ -130,7 +134,7 @@ const SidebarNav: React.FC<Props> = ({
         className={cx(
           collapsed ? `hidden` : `flex`,
           `justify-end items-center px-4 mr-px`,
-          `text-violet-400 text-right hover:text-violet-500 whitespace-nowrap`,
+          `text-violet-400 text-right hover:text-violet-300 whitespace-nowrap`,
           `transition duration-100 cursor-pointer`,
           `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50 rounded-md`,
         )}

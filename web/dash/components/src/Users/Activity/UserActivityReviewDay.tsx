@@ -45,11 +45,11 @@ const UserActivityReviewDay: React.FC<Props> = ({
   const navigate = useNavigate();
   return (
     <UndoMainPadding className="px-0 md:px-8 lg:px-10 py-5 md:py-10 pt-0 md:pt-4 pb-16 flex flex-col">
-      <header className="flex items-center justify-between py-4 px-6 rounded-b-2xl md:rounded-t-2xl shadow-lg shadow-slate-800/10 bg-white max-w-7xl mb-8 z-20 relative">
+      <header className="flex items-center justify-between p-2 pr-6 rounded-b-2xl md:rounded-t-2xl shadow-lg shadow-slate-800/10 bg-white max-w-7xl mb-8 z-20 relative">
         <div className="flex items-center text-md sm:text-l">
           <Link
             to="../"
-            className="flex items-center mr-4 sm:mr-8 text-slate-400 antialiased hover:text-slate-600 transition duration-75"
+            className="flex items-center mr-4 sm:mr-8 text-slate-500 hover:bg-violet-50 py-2 px-4 rounded-xl antialiased hover:text-violet-600 transition duration-100"
           >
             <i className="fa fa-chevron-left mr-2" aria-hidden /> Back
           </Link>

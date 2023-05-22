@@ -84,10 +84,11 @@ const UserCard: React.FC<Props> = ({
           </div>
         </>
       ) : (
-        <div className="flex flex-col items-center">
-          <h2 className="text-lg mt-4 font-medium text-slate-700 self-start">
-            No devices
-          </h2>
+        <div className="bg-slate-50 p-6 flex flex-col justify-center items-center rounded-xl">
+          <h2 className="text-xl font-medium text-slate-500 mb-4">No devices</h2>
+          <Button type="button" color="secondary" onClick={addDevice} size="large">
+            <i className="fa-solid fa-plus mr-2" /> Add a device
+          </Button>
         </div>
       )}
       <div
@@ -95,17 +96,13 @@ const UserCard: React.FC<Props> = ({
           devices.length === 0 ? `justify-center` : `justify-end`
         } mt-3 mr-2`}
       >
-        {devices.length > 0 ? (
+        {devices.length > 0 && (
           <button
             className="w-8 h-8 rounded-full bg-violet-50 flex justify-center items-center text-violet-400 text-lg hover:bg-violet-100 transition duration-100 hover:text-violet-500"
             onClick={addDevice}
           >
             <i className="fa-solid fa-plus" />
           </button>
-        ) : (
-          <Button type="button" color="secondary" onClick={addDevice} size="large">
-            <i className="fa-solid fa-plus mr-2" /> Add a device
-          </Button>
         )}
       </div>
     </div>

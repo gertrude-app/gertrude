@@ -26,10 +26,13 @@ const UnlockRequestCard: React.FC<Props> = ({
   createdAt,
 }) => (
   <div
-    className={cx(`flex flex-col bg-white border p-4 rounded-xl max-w-3xl`, {
-      'border-red-600/30': status === `rejected`,
-      'border-green-700/40': status === `accepted`,
-    })}
+    className={cx(
+      `flex flex-col bg-white border border-slate-200 p-4 rounded-2xl max-w-3xl`,
+      {
+        'border-red-600/30': status === `rejected`,
+        'border-green-700/40': status === `accepted`,
+      },
+    )}
   >
     <div className="flex justify-between items-start mb-4">
       <h2 className="font-bold text-slate-900">{userName}</h2>

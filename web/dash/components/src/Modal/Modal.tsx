@@ -2,8 +2,8 @@ import React from 'react';
 import cx from 'classnames';
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { capitalize } from '@dash/utils';
 import { Button, Loading } from '@shared/components';
+import { capitalize } from '@shared/string';
 import type { IconType } from '../GradientIcon';
 import GradientIcon from '../GradientIcon';
 
