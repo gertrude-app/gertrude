@@ -17,7 +17,7 @@ const MobileStickyHeader: React.FC<MobileStickyHeaderProps> = ({
 }) => (
   <header
     className={cx(
-      `h-[64px] top-0 justify-between items-center px-1 py-4 z-30 bg-white flex shadow-md shadow-slate-300/20`,
+      `h-[64px] top-0 justify-between items-center px-1 py-4 z-30 bg-slate-900 flex shadow-md shadow-slate-300/20`,
       className,
     )}
   >
@@ -36,7 +36,7 @@ const MobileStickyHeader: React.FC<MobileStickyHeaderProps> = ({
         sidebarShown ? `opacity-0` : `opacity-100`,
       )}
     >
-      <Logo className="scale-75 sm:scale-90 antialiased" />
+      <Logo className="scale-75 sm:scale-90 antialiased" type="inverted" />
     </Link>
     <div className="px-3 py-2 opacity-0">
       <i className="fa fa-bars text-3xl text-white" aria-hidden="true" />

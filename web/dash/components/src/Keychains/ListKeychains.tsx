@@ -23,7 +23,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
     </p>
     {keychains.length > 0 ? (
       <>
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 lg+:gap-8 2xl:grid-cols-3 mt-10 bg-slate-100/50 border border-slate-200 p-8 rounded-3xl">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 lg+:gap-8 2xl:grid-cols-3 mt-10 bg-slate-100/50 border border-slate-200 p-4 xs:p-8 rounded-3xl">
           {keychains.map(({ id, isPublic, name, description, numKeys }) => (
             <KeychainCard
               mode="list"

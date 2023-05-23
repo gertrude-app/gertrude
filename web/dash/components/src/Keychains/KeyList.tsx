@@ -9,7 +9,7 @@ type Props = {
 };
 
 const KeyList: React.FC<Props> = ({ keys, editKey, deleteKey }) => (
-  <div className="bg-white shadow-lg shadow-slate-300/50 border-[0.5px] border-slate-200 rounded-xl p-3">
+  <div className="bg-slate-100 border border-slate-200 rounded-3xl p-6 lg:p-8 flex flex-col">
     {keys.map((key) => (
       <Key
         key={key.id}

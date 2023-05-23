@@ -50,7 +50,7 @@ const EditKeychain: React.FC<Props> = ({
   keyModalSaveButtonDisabled,
   apps,
 }) => (
-  <div className="relative max-w-3xl">
+  <div className="relative max-w-6xl">
     <Modal
       icon="key"
       type="container"
@@ -77,23 +77,25 @@ const EditKeychain: React.FC<Props> = ({
       {isNew ? `Create Keychain` : `Edit Keychain`}
     </PageHeading>
     <div className="mt-8 space-y-8">
-      <TextInput
-        type="text"
-        label="Name:"
-        value={name}
-        setValue={setName}
-        className="max-w-xl"
-        name="name"
-      />
-      <TextInput
-        type="textarea"
-        rows={5}
-        label="Description:"
-        value={description}
-        setValue={setDescription}
-        className="max-w-xl"
-        name="description"
-      />
+      <div className="flex flex-col gap-8 border border-slate-200 p-6 lg:p-8 rounded-3xl bg-slate-100">
+        <TextInput
+          type="text"
+          label="Name:"
+          value={name}
+          setValue={setName}
+          className="max-w-3xl"
+          name="name"
+        />
+        <TextInput
+          type="textarea"
+          rows={5}
+          label="Description:"
+          value={description}
+          setValue={setDescription}
+          className="max-w-3xl"
+          name="description"
+        />
+      </div>
       <div>
         {keys.length > 0 ? (
           <>

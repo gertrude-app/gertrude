@@ -27,21 +27,16 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete }) => {
 
   return (
     <div
-      className="py-2 px-3 rounded-xl odd:bg-slate-50 hover:bg-violet-50 cursor-pointer transition duration-100 flex justify-between items-center"
+      className="py-3 px-4 rounded-xl odd:bg-slate-50 hover:bg-slate-200 cursor-pointer transition duration-100 flex justify-between"
       onClick={onClick}
     >
-      <div className="flex-grow relative overflow-hidden">
-        <p className="text-slate-500 whitespace-nowrap">
-          <GradientIcon
-            size="small"
-            className="sm:hidden mr-1.5"
-            icon={key.keyType === `website` ? `globe` : `app-store`}
-          />
+      <div className="flex-grow relative overflow-x-hidden flex items-center">
+        <p className="text-slate-600 font-medium whitespace-nowrap">
           <span className="hidden sm:inline">
             <span
               className={cx(
-                key.keyType === `website` ? `text-fuchsia-700` : `text-violet-700`,
-                `font-bold`,
+                `text-slate-900 font-bold px-1 rounded py-0.5 mr-0.5`,
+                key.keyType === `website` ? `bg-fuchsia-200` : `bg-violet-200`,
               )}
             >
               {key.keyType === `website` ? `Website` : `App`} key
@@ -51,8 +46,8 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete }) => {
           <span
             className={cx(
               target(record.key) !== `*`
-                ? `font-mono px-1 text-slate-800 bg-violet-100 rounded`
-                : `font-medium text-slate-800`,
+                ? `font-mono font-semibold text-indigo-700 px-1 bg-indigo-100 rounded`
+                : `font-bold text-slate-800`,
             )}
           >
             {target(record.key) === `*` ? (
@@ -71,10 +66,10 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete }) => {
             <span
               className={cx(
                 key.addressScope === `singleApp` && !key.appSlug && `font-mono px-1`,
-                `font-medium text-slate-800`,
-                key.addressScope === `singleApp` && `text-indigo-700`,
-                key.addressScope === `unrestricted` && `text-pink-700`,
-                key.addressScope === `webBrowsers` && `text-purple-700`,
+                `font-bold text-slate-800 underline underline-offset-2 decoration-fuchsia-500`,
+                // key.addressScope === `singleApp` && `text-indigo-700`,
+                // key.addressScope === `unrestricted` && `text-fuchsia-700`,
+                // key.addressScope === `webBrowsers` && `text-violet-700`,
               )}
             >
               {scope}
@@ -85,7 +80,7 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete }) => {
       <div className="ml-1 flex items-center">
         {key.comment && (
           <div
-            className="text-slate-400 flex justify-center items-center rounded-full w-8 h-8 bg-transparent hover:bg-violet-100 hover:text-slate-500 shrink-0 ml-1"
+            className="text-slate-400 flex justify-center items-center rounded-full w-8 h-8 bg-transparent hover:bg-slate-100 hover:text-slate-500 shrink-0 ml-1"
             data-tooltip-content={key.comment}
             data-tooltip-id="key-comment"
           >
@@ -97,7 +92,7 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete }) => {
             event.stopPropagation();
             onDelete();
           }}
-          className="text-slate-300 flex justify-center items-center rounded-full w-8 h-8 bg-transparent hover:bg-violet-100 hover:text-red-500 shrink-0 ml-1"
+          className="text-slate-400 flex justify-center items-center rounded-full w-8 h-8 bg-transparent hover:bg-red-50 hover:text-red-500 shrink-0 ml-1"
         >
           <i className="fa-solid fa-trash" />
         </button>

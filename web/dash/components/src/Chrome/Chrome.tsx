@@ -42,7 +42,7 @@ const Chrome: React.FC<Props> = ({
           leaveTo="opacity-0"
         >
           {/* mark: semi transparent overlay */}
-          <div className="fixed inset-0 bg-slate-100 bg-opacity-70" />
+          <div className="fixed inset-0 bg-slate-700 bg-opacity-90" />
         </Transition.Child>
 
         <div className="fixed inset-0 flex z-40">
@@ -56,7 +56,7 @@ const Chrome: React.FC<Props> = ({
             leaveTo="-translate-x-full"
           >
             {/* mark: begin mobile sidebar wrapper */}
-            <Dialog.Panel className="relative flex flex-col w-72 bg-white rounded-r-xl shadow-lg shadow-slate-300/30">
+            <Dialog.Panel className="relative flex flex-col w-72 bg-slate-900 bg-gradient-to-b from-transparent to-violet-900/20 rounded-xl shadow-lg shadow-black/30 m-2">
               {/* mark: begin floating mobile overlay close 'X' button */}
               <Transition.Child
                 as={Fragment}
@@ -70,11 +70,11 @@ const Chrome: React.FC<Props> = ({
                 <div className="absolute top-0 right-0 -mr-12 pt-4">
                   <button
                     type="button"
-                    className="shadow-lg shadow-slate-500/30 hover:bg-slate-50 flex items-center justify-center h-10 w-10 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50"
+                    className="shadow-lg shadow-black/30 text-slate-400 hover:text-slate-300 flex items-center justify-center h-10 w-10 bg-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50"
                     onClick={onMobileSidebarClose}
                   >
                     <span className="sr-only">Close sidebar</span>
-                    <XMarkIcon className="h-6 leading-none text-slate-400" />
+                    <XMarkIcon className="h-6 leading-none" />
                   </button>
                 </div>
               </Transition.Child>
