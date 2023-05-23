@@ -9,23 +9,6 @@ type ItemButton = {
   action: HealthCheckAction;
 };
 
-export type AccountStatus =
-  | 'active'
-  | 'needsAttention'
-  | 'inactive'
-  | 'error'
-  | 'loading';
-
-export function statusFromHealthCheck(healthCheck: HealthCheck): AccountStatus {
-  if (!healthCheck.accountStatus) return `loading`;
-  switch (healthCheck.accountStatus.case) {
-    case `ok`:
-      return healthCheck.accountStatus.value;
-    case `error`:
-      return `error`;
-  }
-}
-
 export type ItemData = { title: string } & (
   | { state: 'checking' }
   | { state: 'ok'; message?: string }

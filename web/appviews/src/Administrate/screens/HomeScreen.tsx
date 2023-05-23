@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@shared/components';
 import type { AppEvent, Screen, ViewAction } from '../administrate-store';
-import type { FilterState } from '../../MenuBar/menubar-store';
+import type { FilterState } from '../../lib/shared-types';
 import FilterStatusBlock from '../subcomponents/FilterStatusBlock';
 import HealthCheckPreviewBlock from '../subcomponents/HealthCheckPreviewBlock';
 import AppVersionBlock from '../subcomponents/AppVersionBlock';

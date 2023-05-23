@@ -82,22 +82,6 @@ export const HomeAccountInactiveDark: Story = props({
   dark: true,
 });
 
-export const HomeAccountErrorLight: Story = props({
-  ...HomeChecksPassingLight.args,
-  props: {
-    ...HomeChecksPassingLight.args.props,
-    healthCheck: {
-      ...HomeChecksPassingLight.args.props.healthCheck,
-      accountStatus: { case: `error` },
-    },
-  },
-});
-
-export const HomeAccountErrorDark: Story = props({
-  ...HomeAccountErrorLight.args,
-  dark: true,
-});
-
 export const HomeChecksFailingLight: Story = props({
   ...HomeChecksPassingLight.args,
   props: {

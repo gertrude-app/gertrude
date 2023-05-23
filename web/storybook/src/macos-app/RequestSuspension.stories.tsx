@@ -18,6 +18,7 @@ export const LightMode: Story = props({
   wrapping: RequestSuspension,
   props: {
     windowOpen: true,
+    adminAccountStatus: `active` as const,
     request: { case: `idle` },
     comment: ``,
     customDurationString: ``,
@@ -84,6 +85,22 @@ export const SubmitErrorLight: Story = props({
   },
 });
 
+export const AccountWarningLight: Story = props({
+  ...LightMode.args,
+  props: {
+    ...LightMode.args.props,
+    adminAccountStatus: `needsAttention`,
+  },
+});
+
+export const AccountInactiveLight: Story = props({
+  ...LightMode.args,
+  props: {
+    ...LightMode.args.props,
+    adminAccountStatus: `inactive`,
+  },
+});
+
 export const DarkMode: Story = props({
   ...LightMode.args,
   dark: true,
@@ -144,6 +161,22 @@ export const SubmitErrorDark: Story = props({
   props: {
     ...DarkMode.args.props,
     request: { case: `failed`, error: `Printer on fire` },
+  },
+});
+
+export const AccountWarningDark: Story = props({
+  ...DarkMode.args,
+  props: {
+    ...DarkMode.args.props,
+    adminAccountStatus: `needsAttention`,
+  },
+});
+
+export const AccountInactiveDark: Story = props({
+  ...DarkMode.args,
+  props: {
+    ...DarkMode.args.props,
+    adminAccountStatus: `inactive`,
   },
 });
 

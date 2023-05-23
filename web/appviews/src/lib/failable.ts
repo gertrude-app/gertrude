@@ -1,6 +1,6 @@
 export type Failable<T> = { case: 'ok'; value: T } | { case: 'error'; message?: string };
 
-export function value<T>(failable: Failable<T> | undefined): T | undefined {
+export function valueOf<T>(failable: Failable<T> | undefined): T | undefined {
   return failable?.case === `ok` ? failable.value : undefined;
 }
 
