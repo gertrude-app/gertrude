@@ -1,4 +1,5 @@
 import type { ActionOf } from '../lib/store';
+import type { AdminAccountStatus } from '../lib/shared-types';
 import { Store } from '../lib/store';
 
 // begin codegen
@@ -22,6 +23,7 @@ export type AppState = {
     | { case: 'idle' }
     | { case: 'ongoing' }
     | { case: 'succeeded' };
+  adminAccountStatus: AdminAccountStatus;
 };
 
 export type AppEvent =
@@ -31,7 +33,9 @@ export type AppEvent =
   | { case: 'requestFailedTryAgainClicked' }
   | { case: 'tcpOnlyToggled' }
   | { case: 'clearRequestsClicked' }
-  | { case: 'closeWindow' };
+  | { case: 'closeWindow' }
+  | { case: 'inactiveAccountRecheckClicked' }
+  | { case: 'inactiveAccountDisconnectAppClicked' };
 // end codegen
 
 export type ViewState = {
@@ -51,6 +55,7 @@ export class BlockedRequestsStore extends Store<
 > {
   appState(): AppState {
     return {
+      adminAccountStatus: `active`,
       windowOpen: true,
       filterText: ``,
       selectedRequestIds: [],

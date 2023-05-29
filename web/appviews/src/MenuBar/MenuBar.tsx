@@ -53,6 +53,7 @@ export const MenuBar: React.FC<Props> = ({
         filterState={props.filterState}
         recordingScreen={props.recordingScreen}
         recordingKeystrokes={props.recordingKeystrokes}
+        adminAttentionRequired={props.adminAttentionRequired}
       />
     );
   }

@@ -10,11 +10,10 @@ import type {
   ViewAction,
 } from './requestsuspension-store';
 import type { PropsOf } from '../lib/store';
-import type { AccountStatus } from '../Administrate/HealthChecker';
 import { containerize } from '../lib/store';
 import ErrorBlock from '../ErrorBlock';
 import InactiveAccountScreen from '../components/InactiveAccountBlock';
-import WarningBanner from '../components/WarningBanner';
+import AccountPastDueBanner from '../components/AccountPastDueBanner';
 import store from './requestsuspension-store';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
@@ -27,6 +26,7 @@ export const RequestSuspension: React.FC<Props> = ({
   comment,
   durationInSeconds,
   request,
+  adminAccountStatus,
 }) => {
   if (request.case === `ongoing`) {
     return (
@@ -75,31 +75,19 @@ export const RequestSuspension: React.FC<Props> = ({
     );
   }
 
-  // @jaredh159 - change this to see the different states
-  const accountStatus: AccountStatus = `needsAttention`;
-
-  // @TODO ~ all these ts-ignores can be removed once the real state is hooked up
-  // @ts-ignore
-  if (accountStatus === `inactive`) {
-    return <InactiveAccountScreen short />;
+  if (adminAccountStatus === `inactive`) {
+    return (
+      <InactiveAccountScreen
+        short
+        onRecheck={() => emit({ case: `inactiveAccountRecheckClicked` })}
+        onDisconnect={() => emit({ case: `inactiveAccountDisconnectAppClicked` })}
+      />
+    );
   }
 
   return (
     <div className="h-full appview:h-screen flex items-stretch flex-col bg-white dark:bg-slate-900 rounded-b-xl relative">
-      {/* @ts-ignore */}
-      {(accountStatus === `error` || accountStatus === `needsAttention`) && (
-        <div className="border-b border-slate-200 dark:border-slate-800 p-4 dark:bg-slate-900 bg-white">
-          <WarningBanner
-            // @ts-ignore
-            severity={accountStatus === `needsAttention` ? `warning` : `error`}
-          >
-            {/* @ts-ignore */}
-            {accountStatus === `needsAttention`
-              ? `Your Gertrude account payment is past due!`
-              : `We've encountered an unknown account error.`}
-          </WarningBanner>
-        </div>
-      )}
+      {adminAccountStatus === `needsAttention` && <AccountPastDueBanner small />}
       <Transition
         show={overlay !== undefined}
         enter="transition-opacity duration-75"
@@ -195,7 +183,12 @@ export const RequestSuspension: React.FC<Props> = ({
           </div>
         </div>
       </Transition>
-      <div className="p-8 bg-slate-50 dark:bg-slate-900 flex-grow flex justify-center flex-col items-center">
+      <div
+        className={cx(
+          `p-8 bg-slate-50 dark:bg-slate-900 flex-grow flex justify-center flex-col items-center`,
+          adminAccountStatus === `needsAttention` && `py-6`,
+        )}
+      >
         <h2 className="text-lg font-semibold text-center dark:text-slate-100">
           Request temporary filter suspension
         </h2>
@@ -203,7 +196,7 @@ export const RequestSuspension: React.FC<Props> = ({
           type="textarea"
           value={comment}
           setValue={(value) => dispatch({ type: `commentUpdated`, value })}
-          rows={accountStatus === `needsAttention` || accountStatus === `error` ? 2 : 5}
+          rows={adminAccountStatus === `needsAttention` ? 3 : 5}
           label="Reason:"
           noResize
           placeholder="Super compelling reason"

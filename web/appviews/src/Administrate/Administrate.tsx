@@ -1,14 +1,15 @@
 import React from 'react';
 import type { AppEvent, AppState, ViewState, ViewAction } from './administrate-store';
 import type { PropsOf } from '../lib/store';
+import { valueOf } from '../lib/failable';
 import { containerize } from '../lib/store';
-import WarningBanner from '../components/WarningBanner';
 import InactiveAccountScreen from '../components/InactiveAccountBlock';
+import AccountPastDueBanner from '../components/AccountPastDueBanner';
 import SidebarNav from './subcomponents/SidebarNav';
 import HomeScreen from './screens/HomeScreen';
 import HealthCheckScreen from './screens/HealthCheckScreen';
 import ExemptUsersScreen from './screens/ExemptUsersScreen';
-import HealthChecker, { statusFromHealthCheck } from './HealthChecker';
+import HealthChecker from './HealthChecker';
 import store from './administrate-store';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
@@ -34,7 +35,6 @@ export const Administrate: React.FC<Props> = ({
     screenshotMonitoringEnabled,
     keystrokeMonitoringEnabled,
   );
-  const accountStatus = statusFromHealthCheck(healthCheck);
 
   let pageElement: JSX.Element;
 
@@ -73,22 +73,19 @@ export const Administrate: React.FC<Props> = ({
       break;
   }
 
-  if (accountStatus === `inactive`) {
-    return <InactiveAccountScreen />;
+  if (valueOf(healthCheck.accountStatus) === `inactive`) {
+    return (
+      <InactiveAccountScreen
+        onRecheck={() => emit({ case: `inactiveAccountRecheckClicked` })}
+        onDisconnect={() => emit({ case: `inactiveAccountDisconnectAppClicked` })}
+      />
+    );
   }
 
   return (
     <div className="flex flex-col h-full appview:h-screen">
-      {(accountStatus === `error` || accountStatus === `needsAttention`) && (
-        <div className="border-b border-slate-200 dark:border-slate-800 p-4 dark:bg-slate-900 bg-white">
-          <WarningBanner
-            severity={accountStatus === `needsAttention` ? `warning` : `error`}
-          >
-            {accountStatus === `needsAttention`
-              ? `Your Gertrude account payment is past due! Login to the web admin dashboard before app loses functionality.`
-              : `We've encountered an unknown account error. Please try restarting the app.`}
-          </WarningBanner>
-        </div>
+      {valueOf(healthCheck.accountStatus) === `needsAttention` && (
+        <AccountPastDueBanner />
       )}
       <div className="flex rounded-b-xl overflow-hidden flex-grow">
         <SidebarNav

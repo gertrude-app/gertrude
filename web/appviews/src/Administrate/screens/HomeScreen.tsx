@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@shared/components';
 import type { AppEvent, Screen, ViewAction } from '../administrate-store';
-import type { FilterState } from '../../MenuBar/menubar-store';
+import type { FilterState } from '../../lib/shared-types';
 import FilterStatusBlock from '../subcomponents/FilterStatusBlock';
 import HealthCheckPreviewBlock from '../subcomponents/HealthCheckPreviewBlock';
 import AppVersionBlock from '../subcomponents/AppVersionBlock';
@@ -36,7 +36,7 @@ const HomeScreen: React.FC<Props> = ({
   quitting,
   releaseChannel,
 }) => (
-  <div className="flex flex-col justify-between h-full p-4 overflow-scroll">
+  <div className="flex flex-col justify-between h-full p-4">
     <div className="flex flex-col space-y-4">
       <div className="flex space-x-4">
         <FilterStatusBlock

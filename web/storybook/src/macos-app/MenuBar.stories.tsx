@@ -99,6 +99,7 @@ const ThreeModesThreeColors: React.FC<{ theme: 'light' | 'dark' }> = ({ theme })
       recordingScreen: true,
       filterState: { case: `off` },
       ...commonProps,
+      adminAttentionRequired: true,
     },
     third: {
       colors: ``,
@@ -172,6 +173,7 @@ const ThreeModesThreeColors: React.FC<{ theme: 'light' | 'dark' }> = ({ theme })
 
 const commonProps = {
   connectionCode: `123456`,
+  adminAttentionRequired: false,
   emit: () => {},
   dispatch: () => {},
 };

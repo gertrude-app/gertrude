@@ -20,6 +20,7 @@ export const LightMode = props({
   wrapping: BlockedRequests,
   fullscreen: window.parent === window,
   props: {
+    adminAccountStatus: `active` as const,
     requests: requests(),
     windowOpen: true,
     filterText: ``,
@@ -81,6 +82,22 @@ export const LightModeSubmitError = props({
   },
 });
 
+export const LightModeAccountNeedsAttention = props({
+  ...LightModeSelected.args,
+  props: {
+    ...LightModeSelected.args.props,
+    adminAccountStatus: `needsAttention`,
+  },
+});
+
+export const LightModeAccountInactive = props({
+  ...LightModeSelected.args,
+  props: {
+    ...LightModeSelected.args.props,
+    adminAccountStatus: `inactive`,
+  },
+});
+
 export const DarkMode = props({
   ...LightMode.args,
   dark: true,
@@ -135,6 +152,22 @@ export const DarkModeSubmitError = props({
   props: {
     ...LightModeSelected.args.props,
     createUnlockRequests: { case: `failed`, error: `something went wrong` },
+  },
+});
+
+export const DarkModeAccountNeedsAttention = props({
+  ...DarkModeSelected.args,
+  props: {
+    ...DarkModeSelected.args.props,
+    adminAccountStatus: `needsAttention`,
+  },
+});
+
+export const DarkModeAccountInactive = props({
+  ...DarkModeSelected.args,
+  props: {
+    ...DarkModeSelected.args.props,
+    adminAccountStatus: `inactive`,
   },
 });
 

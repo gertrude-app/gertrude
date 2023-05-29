@@ -1,12 +1,8 @@
 import type { ActionOf } from '../lib/store';
+import type { FilterState } from '../lib/shared-types';
 import { Store } from '../lib/store';
 
 // begin codegen
-export type FilterState =
-  | { case: 'suspended'; resuming: string }
-  | { case: 'off' }
-  | { case: 'on' };
-
 export type AppState =
   | { case: 'connectionFailed'; error: string }
   | { case: 'connectionSucceded'; userName: string }
@@ -15,6 +11,7 @@ export type AppState =
       filterState: FilterState;
       recordingScreen: boolean;
       recordingKeystrokes: boolean;
+      adminAttentionRequired: boolean;
     }
   | { case: 'notConnected' }
   | { case: 'enteringConnectionCode' }

@@ -1,6 +1,6 @@
 import { Button, SelectMenu } from '@shared/components';
 import React from 'react';
-import type { FilterState } from '../../MenuBar/menubar-store';
+import type { FilterState } from '../../lib/shared-types';
 import type { AppEvent, ViewAction } from '../administrate-store';
 
 interface Props {

@@ -20,6 +20,14 @@ export abstract class Store<AppState, AppEvent, ViewState, ViewAction> {
     window.updateAppState = (appState: AppState) => {
       dispatch({ type: `receivedUpdatedAppState`, appState });
     };
+    window.updateColorScheme = (colorScheme: 'light' | 'dark') => {
+      try {
+        document.body.classList.remove(`light`, `dark`);
+        document.body.classList.add(colorScheme);
+      } catch {
+        // ¯\_(ツ)_/¯
+      }
+    };
   }
 
   emitter(

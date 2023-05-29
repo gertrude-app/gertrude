@@ -1,4 +1,5 @@
 import type { ActionOf } from '../lib/store';
+import type { AdminAccountStatus } from '../lib/shared-types';
 import { Store } from '../lib/store';
 
 // begin codegen
@@ -9,12 +10,15 @@ export type AppState = {
     | { case: 'idle' }
     | { case: 'ongoing' }
     | { case: 'succeeded' };
+  adminAccountStatus: AdminAccountStatus;
 };
 
 export type AppEvent =
   | { case: 'requestSubmitted'; durationInSeconds: number; comment?: string }
   | { case: 'closeWindow' }
-  | { case: 'requestFailedTryAgainClicked' };
+  | { case: 'requestFailedTryAgainClicked' }
+  | { case: 'inactiveAccountRecheckClicked' }
+  | { case: 'inactiveAccountDisconnectAppClicked' };
 // end codegen
 
 export type ViewState = {
@@ -45,6 +49,7 @@ export class RequestSuspensionStore extends Store<
 > {
   initializer(): AppState & ViewState {
     return {
+      adminAccountStatus: `active`,
       windowOpen: true,
       request: { case: `idle` },
       comment: ``,

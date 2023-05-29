@@ -1,6 +1,6 @@
 import type { ActionOf } from '../lib/store';
-import type { FilterState } from '../MenuBar/menubar-store';
 import type { Failable } from '../lib/failable';
+import type { AdminAccountStatus, FilterState } from '../lib/shared-types';
 import { Store } from '../lib/store';
 
 // begin codegen
@@ -15,9 +15,7 @@ export type HealthCheck = {
     | { case: 'notInstalled' }
     | { case: 'unexpected' }
     | { case: 'communicationBroken' };
-  accountStatus?:
-    | { case: 'ok'; value: 'active' | 'needsAttention' | 'inactive' }
-    | { case: 'error'; message?: string };
+  accountStatus?: Failable<AdminAccountStatus>;
   screenRecordingPermissionOk?: boolean;
   keystrokeRecordingPermissionOk?: boolean;
   macOsUserType?:
@@ -73,7 +71,9 @@ export type AppEvent =
   | { case: 'quitAppClicked' }
   | { case: 'reconnectUserClicked' }
   | { case: 'administrateOSUserAccountsClicked' }
-  | { case: 'checkForAppUpdatesClicked' };
+  | { case: 'checkForAppUpdatesClicked' }
+  | { case: 'inactiveAccountRecheckClicked' }
+  | { case: 'inactiveAccountDisconnectAppClicked' };
 // end codegen
 
 export type ViewState = {
