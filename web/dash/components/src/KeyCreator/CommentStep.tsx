@@ -19,15 +19,17 @@ const CommentStep: React.FC<Props> = ({ mode, update, activeStep, comment }) => 
     lookaheadTitle="Add an optional comment"
     activeTitle="Add an optional comment:"
     title={
-      <h2 className="font-medium text-slate-900 text-lg">
+      <h2 className="font-medium text-slate-900 text-lg flex items-center space-x-2">
         <GradientIcon icon="comment" className="mr-2" size="small" />
-        {comment ? (
-          <>
-            With the comment <UserInputText>&ldquo;{comment}&rdquo;</UserInputText>
-          </>
-        ) : (
-          `No comment`
-        )}
+        <span>
+          {comment ? (
+            <>
+              With the comment <UserInputText>&ldquo;{comment}&rdquo;</UserInputText>
+            </>
+          ) : (
+            `No comment`
+          )}
+        </span>
       </h2>
     }
     activeStep={activeStep}

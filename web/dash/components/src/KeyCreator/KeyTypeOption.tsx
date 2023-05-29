@@ -22,7 +22,7 @@ const KeyTypeOption: React.FC<Props> = ({
 }) => (
   <button
     className={cx(
-      `relative flex flex-col justify-start text-left border-2 rounded-xl p-4 cursor-pointer transition duration-100 outline-none focus:ring-violet-300 ring-2 ring-transparent ring-offset-2`,
+      `relative flex flex-col justify-start text-left border rounded-xl p-4 cursor-pointer transition duration-200 outline-none focus:ring-violet-300 ring-2 ring-transparent ring-offset-2`,
       selected ? `border-violet-400 bg-violet-50` : `hover:bg-violet-50/50`,
       className,
     )}
@@ -31,12 +31,11 @@ const KeyTypeOption: React.FC<Props> = ({
     {selected && (
       <i className="fa-solid fa-check absolute right-3 top-3 text-violet-500" />
     )}
-    <h2 className="font-bold text-slate-700">
-      <GradientIcon icon={icon} size="small" className="mr-1" />
-      {` `}
+    <h2 className="flex items-center font-bold text-slate-700">
+      <GradientIcon icon={icon} size="small" className="mr-2" />
       {title}
     </h2>
-    <p className="text-sm text-slate-500 mt-1">{description}</p>
+    <p className="text-sm text-slate-500 mt-2">{description}</p>
   </button>
 );
 

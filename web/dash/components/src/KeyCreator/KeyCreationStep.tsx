@@ -64,8 +64,10 @@ const KeyCreationStep: React.FC<Props> = ({
       ) : (
         <div
           className={cx(
-            `rounded-2xl shadow-lg flex-grow my-2 bg-white`,
-            open ? `border-2 border-violet-400` : `border`,
+            `rounded-2xl flex-grow my-2 border-[0.5px] border-slate-200 bg-white`,
+            open
+              ? `shadow-slate-30/60 shadow-lg border-2 border-violet-200`
+              : `shadow-md shadow-slate-300/50`,
             mode === `create` ? `max-w-[calc(100%-40px)]` : `max-w-full`,
           )}
         >

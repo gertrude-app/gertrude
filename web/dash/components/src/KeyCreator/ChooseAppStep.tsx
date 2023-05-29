@@ -108,13 +108,13 @@ const Title: React.FC<Props> = ({
   appSlug,
   appIdentificationType,
 }) => (
-  <h2 className="font-medium text-slate-900 text-lg">
+  <h2 className="font-medium text-slate-900 text-lg flex items-center space-x-2">
     <GradientIcon
       icon={appIdentificationType === `bundleId` ? `edit` : `app-store`}
-      className="mr-2.5"
+      className="mr-2"
       size="small"
     />
-    {keyType === `app` ? `Allowing app ` : `App `}
+    <span>{keyType === `app` ? `Allowing app ` : `App `}</span>
     <UserInputText>
       {appIdentificationType === `bundleId`
         ? appBundleId

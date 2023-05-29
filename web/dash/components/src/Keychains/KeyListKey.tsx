@@ -164,7 +164,7 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type, isLast = false 
             : 'none'}
         </span>
       </TableCell>
-      <TableCell className="flex justify-start items-center p-2 pr-0 bg-transparent border-none group-hover:bg-slate-100 group-hover:-translate-x-[4.5px]">
+      <TableCell className="flex justify-start items-center p-2 pr-0 bg-transparent border-none group-hover:bg-transparent group-hover:-translate-x-[4.5px]">
         <Button type="button" onClick={onDelete} color="warning" size="small">
           Delete
         </Button>

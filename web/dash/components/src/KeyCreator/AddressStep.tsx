@@ -33,9 +33,9 @@ const AddressStep: React.FC<Props> = ({
     lookaheadTitle="Website address"
     activeTitle="Select website address:"
     title={
-      <h2 className="font-medium text-slate-900 text-lg max-w-[calc(100%-25px)] overflow-hidden">
+      <h2 className="font-medium text-slate-900 text-lg max-w-[calc(100%-25px)] overflow-hidden flex items-center space-x-2">
         <GradientIcon icon="unlock" className="mr-2" size="small" />
-        {keyType === `website` ? `Unlocking ` : `Address `}
+        <span>{keyType === `website` ? `Unlocking ` : `Address `}</span>
         {address.trim() !== `` && <UserInputText>{address}</UserInputText>}
       </h2>
     }

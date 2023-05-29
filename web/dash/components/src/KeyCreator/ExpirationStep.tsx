@@ -28,7 +28,7 @@ const ExpirationStep: React.FC<Props> = ({ mode, update, activeStep, expiration 
     lookaheadTitle="Add an optional expiration"
     activeTitle="Add an optional expiration:"
     title={
-      <h2 className="font-medium text-slate-900 text-lg">
+      <h2 className="font-medium text-slate-900 text-lg flex items-center space-x-2">
         <GradientIcon icon="calendar" className="mr-2" size="small" />
         <TitleText expiration={expiration} />
       </h2>
