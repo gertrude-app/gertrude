@@ -50,7 +50,7 @@ const EditKeychain: React.FC<Props> = ({
   keyModalSaveButtonDisabled,
   apps,
 }) => {
-  const [viewMode, setViewMode] = useState<'list' | 'table'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'table'>(`list`);
   return (
     <div className="relative max-w-6xl">
       <Modal
@@ -107,12 +107,12 @@ const EditKeychain: React.FC<Props> = ({
                 <h2 className="text-lg font-bold text-slate-700">
                   {keys.length} {inflect(`key`, keys.length)}:
                 </h2>
-                <div className="flex items-center space-x-4">
+                <div className="hidden xl:flex items-center space-x-4">
                   <span className="text-slate-500">List view</span>
                   <Toggle
-                    enabled={viewMode === 'table'}
+                    enabled={viewMode === `table`}
                     setEnabled={() =>
-                      setViewMode(viewMode === 'table' ? 'list' : 'table')
+                      setViewMode(viewMode === `table` ? `list` : `table`)
                     }
                   />
                   <span className="text-slate-500">Table view</span>

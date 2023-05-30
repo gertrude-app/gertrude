@@ -1,9 +1,9 @@
 import React from 'react';
 import cx from 'classnames';
 import { target, toState } from '@dash/keys';
-import type { Key as KeyType } from '@dash/types';
-import GradientIcon from '../GradientIcon';
 import { Button } from '@shared/components';
+import { ClockIcon } from '@heroicons/react/24/solid';
+import type { Key as KeyType } from '@dash/types';
 
 interface Props {
   record: KeyType;
@@ -73,9 +73,6 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type, isLast = false 
                 className={cx(
                   key.addressScope === `singleApp` && !key.appSlug && `font-mono px-1`,
                   `font-bold text-slate-800 underline underline-offset-2 decoration-fuchsia-500`,
-                  // key.addressScope === `singleApp` && `text-indigo-700`,
-                  // key.addressScope === `unrestricted` && `text-fuchsia-700`,
-                  // key.addressScope === `webBrowsers` && `text-violet-700`,
                 )}
               >
                 {scope}
@@ -112,18 +109,19 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type, isLast = false 
       onClick={onClick}
     >
       <TableCell
-        className={cx(isLast && 'rounded-bl-2xl', `flex justify-center items-center`)}
+        className={cx(isLast && `rounded-bl-2xl`, `flex justify-center items-center`)}
       >
         <span
           className={cx(
             `rounded-full px-4 py-0.5 font-medium text-white`,
-            key.keyType === 'website' ? 'bg-fuchsia-400' : ' bg-violet-400',
+            key.keyType === `website` ? `bg-fuchsia-400` : ` bg-violet-400`,
           )}
         >
           {key.keyType === `website` ? `Website` : `App`}
         </span>
       </TableCell>
-      <TableCell>
+      <TableCell className="max-w-[280px] overflow-hidden relative">
+        <div className="absolute h-full w-16 top-auto bottom-0 right-0 rounded-r-lg bg-gradient-to-r from-transparent via-slate-50 to-slate-50" />
         <span
           className={cx(
             target(record.key) !== `*`
@@ -148,26 +146,29 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type, isLast = false 
           {scope}
         </span>
       </TableCell>
-      <TableCell className={cx(isLast ? 'rounded-br-2xl' : '', `flex`)}>
+      <TableCell className={cx(isLast ? `rounded-br-2xl` : ``, `flex`)}>
         <span
           className={cx(
-            'font-medium italic',
+            `font-medium italic`,
             !key.comment
-              ? 'flex-grow flex justify-center text-slate-400'
+              ? `flex-grow flex justify-center text-slate-400`
               : `text-slate-600`,
           )}
         >
           {key.comment
             ? key.comment.length > 30
-              ? key.comment.substring(0, 30) + '...'
+              ? key.comment.substring(0, 30) + `...`
               : key.comment
-            : 'none'}
+            : `none`}
         </span>
       </TableCell>
-      <TableCell className="flex justify-start items-center p-2 pr-0 bg-transparent border-none group-hover:bg-transparent group-hover:-translate-x-[4.5px]">
+      <TableCell className="flex justify-start items-center p-2 pr-0 bg-transparent border-none group-hover:bg-slate-100 group-hover:-translate-x-[4px]">
         <Button type="button" onClick={onDelete} color="warning" size="small">
           Delete
         </Button>
+      </TableCell>
+      <TableCell className="flex justify-start items-center w-10 h-10 bg-transparent border-none group-hover:bg-slate-100 group-hover:-translate-x-[5px]">
+        {key.expiration && <ClockIcon className="w-5 shrink-0 text-slate-400" />}
       </TableCell>
     </tr>
   );
@@ -180,17 +181,15 @@ interface TableCellProps {
   className?: string;
 }
 
-const TableCell: React.FC<TableCellProps> = ({ children, className }) => {
-  return (
-    <td className={cx('p-1')}>
-      <div
-        className={cx(
-          `p-4 bg-slate-50 rounded-lg border-[0.5px] border-slate-200 group-hover:bg-slate-200/60 transition duration-200`,
-          className,
-        )}
-      >
-        {children}
-      </div>
-    </td>
-  );
-};
+const TableCell: React.FC<TableCellProps> = ({ children, className }) => (
+  <td className={cx(`p-1`)}>
+    <div
+      className={cx(
+        `p-4 bg-slate-50 rounded-lg border-[0.5px] border-slate-200 transition duration-200`,
+        className,
+      )}
+    >
+      {children}
+    </div>
+  </td>
+);

@@ -89,7 +89,14 @@ const Button: React.FC<Props> = ({
         disabled={disabled}
         {...(testId ? { 'data-test': testId } : {})}
         {...(props.type === `button`
-          ? { onClick: disabled ? () => {} : props.onClick }
+          ? {
+              onClick: disabled
+                ? () => {}
+                : (event) => {
+                    event.stopPropagation();
+                    props.onClick();
+                  },
+            }
           : {})}
       >
         {props.children}
