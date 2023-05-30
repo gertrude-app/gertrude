@@ -4,7 +4,7 @@ import type { AdminAccountStatus, FilterState } from '../lib/shared-types';
 import { Store } from '../lib/store';
 
 // begin codegen
-export type Screen = 'home' | 'healthCheck' | 'exemptUsers';
+export type Screen = 'home' | 'healthCheck' | 'exemptUsers' | 'advanced';
 
 export type HealthCheck = {
   latestAppVersion?: { case: 'ok'; value: string } | { case: 'error'; message?: string };
@@ -43,6 +43,23 @@ export type HealthCheckAction =
   | 'fixNotificationPermissionClicked'
   | 'zeroKeysRefreshRulesClicked';
 
+export type AdvancedState = {
+  pairqlEndpointOverride?: string;
+  pairqlEndpointDefault: string;
+  websocketEndpointOverride?: string;
+  websocketEndpointDefault: string;
+  appcastEndpointOverride?: string;
+  appcastEndpointDefault: string;
+  appVersions?: { [key: string]: string };
+};
+
+export type AdvancedAction =
+  | { case: 'pairqlEndpointSet'; url?: string }
+  | { case: 'websocketEndpointSet'; url?: string }
+  | { case: 'appcastEndpointSet'; url?: string }
+  | { case: 'forceUpdateToSpecificVersionClicked'; version: string }
+  | { case: 'deleteAllDeviceStorageClicked' };
+
 export type AppState = {
   windowOpen: boolean;
   screen: Screen;
@@ -55,10 +72,12 @@ export type AppState = {
   releaseChannel: 'stable' | 'beta' | 'canary';
   quitting: boolean;
   exemptableUsers?: Failable<ExemptableUser[]>;
+  advanced?: AdvancedState;
 };
 
 export type AppEvent =
-  | { case: 'healthCheck'; action: HealthCheckAction }
+  | { case: 'healthCheck'; healthCheckAction: HealthCheckAction }
+  | { case: 'advanced'; advancedAction: AdvancedAction }
   | { case: 'gotoScreenClicked'; screen: Screen }
   | { case: 'releaseChannelUpdated'; channel: 'stable' | 'beta' | 'canary' }
   | { case: 'suspendFilterClicked'; durationInSeconds: number }

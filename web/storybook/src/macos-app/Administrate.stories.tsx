@@ -197,4 +197,21 @@ export const ExemptUsersErrorDark: Story = props({
   dark: true,
 });
 
+export const Advanced: Story = props({
+  ...HomeChecksPassingLight.args,
+  props: {
+    ...HomeChecksPassingLight.args.props,
+    screen: `advanced`,
+    advanced: {
+      pairqlEndpointDefault: `https://api.getrude.app/pairql`,
+      websocketEndpointDefault: `https://api.getrude.app/websocket-app`,
+      appcastEndpointDefault: `https://api.getrude.app/appcast.xml`,
+      appVersions: {
+        '2.1.1': `2.1.1`,
+        '2.2.0': `2.2.0 (beta)`,
+      },
+    },
+  },
+});
+
 export default meta;
