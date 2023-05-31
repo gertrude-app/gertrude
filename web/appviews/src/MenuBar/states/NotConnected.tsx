@@ -7,7 +7,7 @@ interface Props {
   emit(event: AppEvent): unknown;
 }
 
-const Welcome: React.FC<Props> = ({ emit }) => (
+const NotConnected: React.FC<Props> = ({ emit }) => (
   <MenuBarSized className="flex flex-col justify-center items-center">
     <p className="text-black/80 dark:text-white/70 font-medium">Welcome to</p>
     <Logo type="default" className="dark:[filter:brightness(600%)]" />
@@ -23,4 +23,4 @@ const Welcome: React.FC<Props> = ({ emit }) => (
   </MenuBarSized>
 );
 
-export default Welcome;
+export default NotConnected;

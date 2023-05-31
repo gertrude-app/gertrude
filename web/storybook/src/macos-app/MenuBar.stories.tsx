@@ -46,6 +46,11 @@ const ConnectingTemplate: StoryFn<typeof MenuBar> = () => (
 );
 export const Connecting = ConnectingTemplate.bind({});
 
+const ConnectSuccessTemplate: StoryFn<typeof MenuBar> = () => (
+  <BothThemes case="connectionSucceded" userName="Little Jimmy" {...commonProps} />
+);
+export const Connected = ConnectSuccessTemplate.bind({});
+
 const ConnectFailedTemplate: StoryFn<typeof MenuBar> = () => (
   <BothThemes
     case="connectionFailed"
