@@ -29,7 +29,7 @@ const WebsiteKeyAppScopeStep: React.FC<Props> = ({
     activeTitle="Select affected apps:"
     lookaheadTitle="Affected apps"
     title={
-      <h2 className="font-medium text-gray-900 text-lg">
+      <h2 className="font-medium text-slate-900 text-lg flex items-center space-x-2">
         <Title addressScope={addressScope} />
       </h2>
     }
@@ -40,7 +40,7 @@ const WebsiteKeyAppScopeStep: React.FC<Props> = ({
     <div>
       <h2 className="font-medium">Unlocked for:</h2>
       <div className="flex justify-end mr-2 items-center">
-        <label className="mr-2 text-gray-600">Advanced:</label>
+        <label className="mr-2 text-slate-600">Advanced:</label>
         <Toggle
           enabled={showAdvancedAddressScopeOptions}
           small
@@ -90,21 +90,24 @@ const Title: React.FC<{
       return (
         <>
           <GradientIcon icon="google-chrome" className="mr-2" size="small" />
-          For <UserInputText>all web browsers</UserInputText>
+          <span>For</span>
+          <UserInputText>all web browsers</UserInputText>
         </>
       );
     case `unrestricted`:
       return (
         <>
           <GradientIcon icon="lightning-bolt" className="mr-2" size="small" />
-          For <UserInputText>all apps</UserInputText>
+          <span>For</span>
+          <UserInputText>all apps</UserInputText>
         </>
       );
     case `singleApp`:
       return (
         <>
           <GradientIcon icon="location" className="mr-2" size="small" />
-          For <UserInputText>a single app</UserInputText>
+          <span>For</span>
+          <UserInputText>a single app</UserInputText>
         </>
       );
   }

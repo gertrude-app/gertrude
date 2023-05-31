@@ -26,7 +26,7 @@ const PeaceOfMindBlock: React.FC = () => {
               </span>
             </span>
           </h2>
-          <p className="text-xl text-gray-500 my-5 leading-8">
+          <p className="text-xl text-slate-500 my-5 leading-8">
             Gertrude lets you block the entire internet, only unlocking the portions you
             choose. Keep your kids <em>only</em> and <em>exactly</em> where you want them
             to be online. Plus, review screenshots and keystrokes of their activity from
@@ -35,7 +35,7 @@ const PeaceOfMindBlock: React.FC = () => {
           </p>
           <div className="flex flex-col space-y-3 sm:flex-row sm:space-x-4 items-start sm:items-end">
             <a
-              className="text-white font-extrabold text-xl bg-gradient-to-br w-[14.8rem] sm:w-auto from-violet-500 to-fuchsia-500 px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center"
+              className="text-white font-extrabold text-xl bg-gradient-to-br w-[14.8rem] sm:w-auto from-violet-500 to-fuchsia-500 px-8 py-3 rounded-xl shadow-xl shadow-fuchsia-600/20 mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center"
               href="https://dash.gertrude.app/signup"
             >
               <i aria-hidden className="fas fa-rocket mr-4" />
@@ -44,7 +44,7 @@ const PeaceOfMindBlock: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowingVideo(true)}
-              className="font-extrabold text-xl bg-white px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center hover:bg-violet-50 transition duration-100 border-[0.5px]"
+              className="font-extrabold text-xl bg-white px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center hover:bg-violet-50 transition duration-100 border-[0.5px] border-slate-200"
             >
               <h2 className="bg-gradient-to-br from-indigo-500 flex items-center to-fuchsia-500 bg-clip-text text-transparent">
                 <i aria-hidden className="fa-brands fa-youtube mr-3" />

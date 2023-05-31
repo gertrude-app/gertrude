@@ -49,14 +49,14 @@ const Button: React.FC<Props> = ({
         colors = `bg-violet-100 dark:bg-slate-800/80 border border-violet-100 dark:border-slate-700/70 hover:border-violet-200 dark:hover:bg-slate-700/80 text-violet-600 dark:text-white/80 hover:bg-violet-200 ring-transparent focus:ring-violet-300 dark:focus:ring-indigo-500/70 dark:ring-offset-slate-900`;
         break;
       case `tertiary`:
-        colors = `bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-300 border dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 ring-transparent focus:ring-indigo-400/50 focus:border-indigo-200 dark:ring-offset-slate-900`;
+        colors = `bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 ring-transparent focus:ring-indigo-400/50 focus:border-indigo-200 dark:ring-offset-slate-900`;
         break;
       case `warning`:
         colors = `bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-300 border-red-100 dark:border-red-600/50 border hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-500/20 dark:hover:text-red-200 ring-transparent focus:ring-red-500 focus:border-red-500 dark:ring-offset-slate-900`;
         break;
     }
   } else {
-    colors = `bg-gray-50 dark:bg-black/50 text-gray-400 dark:text-slate-600 border border-gray-200 dark:border-slate-800 cursor-not-allowed ring-transparent focus:ring-gray-200`;
+    colors = `bg-slate-50 dark:bg-black/50 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-800 cursor-not-allowed ring-transparent focus:ring-slate-200`;
   }
 
   const rendersAsButton = props.type === `button` || props.type === `submit`;
@@ -89,7 +89,14 @@ const Button: React.FC<Props> = ({
         disabled={disabled}
         {...(testId ? { 'data-test': testId } : {})}
         {...(props.type === `button`
-          ? { onClick: disabled ? () => {} : props.onClick }
+          ? {
+              onClick: disabled
+                ? () => {}
+                : (event) => {
+                    event.stopPropagation();
+                    props.onClick();
+                  },
+            }
           : {})}
       >
         {props.children}

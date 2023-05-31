@@ -98,7 +98,7 @@ const EditUser: React.FC<Props> = ({
         setValue={setName}
         className="max-w-xl"
       />
-      <h2 className="mt-5 text-lg font-bold text-gray-700">
+      <h2 className="mt-5 text-lg font-bold text-slate-700">
         {devices.length} {inflect(`device`, devices.length)}:
       </h2>
       <div className="flex flex-col">
@@ -112,7 +112,7 @@ const EditUser: React.FC<Props> = ({
             />
             <button
               onClick={() => deleteDevice.start(device.id)}
-              className="transition duration-100 flex justify-center items-center w-10 h-10 rounded-full hover:bg-gray-100 cursor-pointer text-gray-500 hover:text-red-500"
+              className="transition duration-100 flex justify-center items-center w-10 h-10 rounded-full hover:bg-slate-100 cursor-pointer text-slate-500 hover:text-red-500"
             >
               <i className="fa fa-trash" />
             </button>
@@ -127,23 +127,23 @@ const EditUser: React.FC<Props> = ({
         </button>
       </div>
       <div className="mt-4">
-        <h2 className="text-lg font-bold text-gray-700">Monitoring</h2>
-        <div className="flex justify-between items-center bg-gray-100 my-3 p-4 sm:p-6 rounded-xl">
+        <h2 className="text-lg font-bold text-slate-700">Monitoring</h2>
+        <div className="flex justify-between items-center bg-slate-100 my-3 p-4 sm:p-6 rounded-xl">
           <div className="mr-3">
-            <h3 className="font-medium text-gray-700">Enable keylogging</h3>
-            <p className="text-gray-500 text-sm">
+            <h3 className="font-medium text-slate-700">Enable keylogging</h3>
+            <p className="text-slate-500 text-sm">
               Sends reports of all keystrokes to your review
             </p>
           </div>
           <Toggle enabled={keyloggingEnabled} setEnabled={setKeyloggingEnabled} />
         </div>
         <div
-          className={`bg-gray-100 my-3 p-4 sm:p-6 rounded-xl overflow-hidden relative [transition:150ms]`}
+          className={`bg-slate-100 my-3 p-4 sm:p-6 rounded-xl overflow-hidden relative [transition:150ms]`}
         >
           <div className="flex justify-between items-center">
             <div className="mr-3">
-              <h3 className="font-medium text-gray-700">Enable screenshots</h3>
-              <p className="text-gray-500 text-sm">
+              <h3 className="font-medium text-slate-700">Enable screenshots</h3>
+              <p className="text-slate-500 text-sm">
                 Periodically take a screenshot and upload for your review
               </p>
             </div>
@@ -173,8 +173,8 @@ const EditUser: React.FC<Props> = ({
         </div>
       </div>
       <div className="mt-12">
-        <h2 className="text-lg font-bold text-gray-700 mb-2">Keychains</h2>
-        <div className="p-3 flex flex-col space-y-4">
+        <h2 className="text-lg font-bold text-slate-700 mb-2">Keychains</h2>
+        <div className="py-3 flex flex-col space-y-4">
           {keychains.map((keychain) => (
             <KeychainCard
               mode="list"

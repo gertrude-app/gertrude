@@ -63,7 +63,7 @@ const Logo: React.FC<Props> = ({
         <div
           className={cx(
             `font-lato whitespace-nowrap ml-2.5`,
-            type === `inverted` ? `text-white` : `text-gray-700`,
+            type === `inverted` ? `text-white` : `text-slate-700`,
             textSize,
           )}
         >

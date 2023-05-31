@@ -2,6 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import { Link } from 'react-router-dom';
 import { Logo } from '@shared/components';
+import { Bars3Icon } from '@heroicons/react/24/solid';
 
 interface MobileStickyHeaderProps {
   className?: string;
@@ -16,7 +17,7 @@ const MobileStickyHeader: React.FC<MobileStickyHeaderProps> = ({
 }) => (
   <header
     className={cx(
-      `h-[64px] top-0 justify-between items-center px-1 py-4 shadow z-30 bg-gray-900 bg-gradient-to-br from-transparent via-transparent to-violet-900/40 flex`,
+      `h-[64px] top-0 justify-between items-center px-1 py-4 z-30 bg-slate-900 flex shadow-md shadow-slate-300/20`,
       className,
     )}
   >
@@ -26,10 +27,7 @@ const MobileStickyHeader: React.FC<MobileStickyHeaderProps> = ({
       onClick={onHamburgerClick}
     >
       <span className="sr-only">Open sidebar</span>
-      <i
-        className="fa fa-bars text-3xl text-white text-opacity-70 hover:text-opacity-90 transition duration-100 cursor-pointer"
-        aria-hidden="true"
-      />
+      <Bars3Icon className="h-9 text-slate-500 text-opacity-70 hover:text-opacity-90 transition duration-100 cursor-pointer" />
     </button>
     <Link
       to="/"
@@ -38,7 +36,7 @@ const MobileStickyHeader: React.FC<MobileStickyHeaderProps> = ({
         sidebarShown ? `opacity-0` : `opacity-100`,
       )}
     >
-      <Logo type="inverted" className="scale-75 sm:scale-90 opacity-90 antialiased" />
+      <Logo className="scale-75 sm:scale-90 antialiased" type="inverted" />
     </Link>
     <div className="px-3 py-2 opacity-0">
       <i className="fa fa-bars text-3xl text-white" aria-hidden="true" />

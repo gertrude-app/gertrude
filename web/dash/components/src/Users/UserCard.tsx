@@ -27,19 +27,19 @@ const UserCard: React.FC<Props> = ({
   addDevice,
 }) => (
   <div
-    className="rounded-xl border-[0.5px] flex flex-col justify-between shadow-lg w-full bg-white sm:min-w-[400px]"
+    className="rounded-xl border-[0.5px] border-slate-200 flex flex-col justify-between shadow-lg shadow-slate-300/50 bg-white sm:min-w-[400px]"
     data-test="user-card"
   >
-    <div className="p-5">
+    <div className="p-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-black text-gray-700 mr-3">{name}</h1>
+        <h2 className="text-3xl font-extrabold text-slate-700 mr-3">{name}</h2>
         <div className="flex items-center space-x-4">
           <div
             className={cx(
               `w-9 h-9 rounded-full flex justify-center items-center text-lg`,
               screenshotsEnabled
                 ? `bg-indigo-100 text-indigo-500`
-                : `bg-gray-100 text-gray-300`,
+                : `bg-slate-100 text-slate-300`,
             )}
           >
             <i className="fa-solid fa-camera" />
@@ -49,7 +49,7 @@ const UserCard: React.FC<Props> = ({
               `w-9 h-9 rounded-full flex justify-center items-center text-lg`,
               keystrokesEnabled
                 ? `bg-indigo-100 text-indigo-500`
-                : `bg-gray-100 text-gray-300`,
+                : `bg-slate-100 text-slate-300`,
             )}
           >
             <i className="fa-solid fa-keyboard" />
@@ -57,17 +57,17 @@ const UserCard: React.FC<Props> = ({
         </div>
       </div>
       <div className="flex justify-start items-center mb-4 mt-0.5">
-        <p className="text-gray-400">
-          <span className="font-medium text-gray-500">{numKeychains}</span> keychains •
+        <p className="text-slate-500">
+          <span className="font-semibold text-slate-600">{numKeychains}</span> keychains •
           {` `}
-          <span className="font-medium text-gray-500">{numKeys}</span> keys
+          <span className="font-semibold text-slate-600">{numKeys}</span> keys
         </p>
       </div>
       {devices.length ? (
         <>
           <div className="text-lg mt-4 -mb-4">
-            <p className="text-gray-500">
-              <span className="text-xl font-bold text-gray-600">{devices.length}</span>
+            <p className="text-slate-500">
+              <span className="text-xl font-bold text-slate-600">{devices.length}</span>
               {` `}
               {inflect(`device`, devices.length)}:
             </p>
@@ -84,10 +84,11 @@ const UserCard: React.FC<Props> = ({
           </div>
         </>
       ) : (
-        <div className="flex flex-col items-center">
-          <h2 className="text-lg mt-4 font-medium text-gray-700 self-start">
-            No devices
-          </h2>
+        <div className="bg-slate-50 p-6 flex flex-col justify-center items-center rounded-xl">
+          <h2 className="text-xl font-medium text-slate-500 mb-4">No devices</h2>
+          <Button type="button" color="secondary" onClick={addDevice} size="large">
+            <i className="fa-solid fa-plus mr-2" /> Add a device
+          </Button>
         </div>
       )}
       <div
@@ -95,17 +96,13 @@ const UserCard: React.FC<Props> = ({
           devices.length === 0 ? `justify-center` : `justify-end`
         } mt-3 mr-2`}
       >
-        {devices.length > 0 ? (
+        {devices.length > 0 && (
           <button
             className="w-8 h-8 rounded-full bg-violet-50 flex justify-center items-center text-violet-400 text-lg hover:bg-violet-100 transition duration-100 hover:text-violet-500"
             onClick={addDevice}
           >
             <i className="fa-solid fa-plus" />
           </button>
-        ) : (
-          <Button type="button" color="secondary" onClick={addDevice} size="large">
-            <i className="fa-solid fa-plus mr-2" /> Add a device
-          </Button>
         )}
       </div>
     </div>

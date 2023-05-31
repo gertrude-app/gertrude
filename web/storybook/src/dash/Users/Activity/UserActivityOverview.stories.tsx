@@ -16,9 +16,40 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = props({
   userName: `Huck`,
   days: [
-    { date: new Date(time.stable()), numItems: 330, numCompleted: 0 },
-    { date: new Date(time.stable()), numItems: 117, numCompleted: 64 },
-    { date: new Date(time.stable()), numItems: 89, numCompleted: 89 },
+    {
+      date: new Date(time.stable()),
+      numItems: 330,
+      index: 0,
+      numDays: 3,
+      numCompleted: 0,
+    },
+    {
+      date: new Date(time.stable()),
+      numItems: 117,
+      index: 1,
+      numDays: 3,
+      numCompleted: 64,
+    },
+    {
+      date: new Date(time.stable()),
+      numItems: 89,
+      index: 2,
+      numDays: 3,
+      numCompleted: 89,
+    },
+  ],
+});
+
+export const Single: Story = props({
+  userName: `Huck`,
+  days: [
+    {
+      date: new Date(time.stable()),
+      numItems: 330,
+      index: 0,
+      numDays: 3,
+      numCompleted: 330,
+    },
   ],
 });
 

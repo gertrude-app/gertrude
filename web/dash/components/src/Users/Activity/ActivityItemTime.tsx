@@ -5,7 +5,7 @@ interface Props {
 }
 
 const ActivityItemTime: React.FC<Props> = ({ date }) => (
-  <div className="text-violet-900/90 text-xs">
+  <div className="text-slate-500 text-sm font-medium">
     {date.toLocaleDateString()} - {date.toLocaleTimeString()}
   </div>
 );

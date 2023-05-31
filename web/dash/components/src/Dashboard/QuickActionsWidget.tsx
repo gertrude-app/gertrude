@@ -1,5 +1,12 @@
 import React from 'react';
 import { timeOfDay } from '@dash/datetime';
+import {
+  BookOpenIcon,
+  KeyIcon,
+  LifebuoyIcon,
+  UserPlusIcon,
+} from '@heroicons/react/24/solid';
+import type { HeroIcon } from '@dash/types';
 import Action from '../Action';
 import DashboardWidget from './DashboardWidget';
 
@@ -16,19 +23,19 @@ const QuickActionsWidget: React.FC<Props> = ({
 }) => (
   <DashboardWidget className={className}>
     <h1 className="text-2xl font-extrabold my-2 ml-2">Good {timeOfDay(date)}!</h1>
-    <p className="mb-4 ml-2 text-gray-500">
+    <p className="mb-4 ml-2 text-slate-500">
       Here are some quick actions you may find useful:
     </p>
-    <QuickAction name="Create new user" icon="user-plus" action="/users/new" />
-    <QuickAction name="Create new keychain" icon="key" action={createKeychain} />
+    <QuickAction name="Create new user" Icon={UserPlusIcon} action="/users/new" />
+    <QuickAction name="Create new keychain" Icon={KeyIcon} action={createKeychain} />
     <QuickAction
       name="View documentation"
-      icon="book"
+      Icon={BookOpenIcon}
       action="https://gertrude.app/docs"
     />
     <QuickAction
       name="Submit support request"
-      icon="life-ring"
+      Icon={LifebuoyIcon}
       action="https://gertrude.app/contact"
     />
   </DashboardWidget>
@@ -38,20 +45,20 @@ export default QuickActionsWidget;
 
 interface QuickActionProps {
   name: string;
-  icon: string;
+  Icon: HeroIcon;
   action: string | (() => unknown);
 }
 
-const QuickAction: React.FC<QuickActionProps> = ({ name, icon, action }) => (
+const QuickAction: React.FC<QuickActionProps> = ({ name, Icon, action }) => (
   <Action
     {...(typeof action === `string`
       ? { type: `link`, to: action }
       : { type: `button`, onClick: action })}
-    className="p-4 flex items-center odd:bg-gray-50 rounded-xl hover:bg-violet-50 transition duration-100 focus:outline focus:outline-violet-200"
+    className="p-4 flex items-center odd:bg-slate-50 rounded-xl hover:bg-violet-50 transition duration-100 focus:outline focus:outline-violet-200"
   >
     <div className="flex justify-center items-center text-white bg-gradient-to-br from-indigo-500 to-fuchsia-500 w-10 h-10 rounded-lg shrink-0">
-      <i className={`fa-solid fa-${icon}`} />
+      <Icon className="w-5" />
     </div>
-    <h2 className="font-medium leading-5 ml-3 text-lg text-gray-800">{name}</h2>
+    <h2 className="font-medium leading-5 ml-3 text-lg text-slate-800">{name}</h2>
   </Action>
 );

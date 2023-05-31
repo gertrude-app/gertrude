@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@dash/utils": "workspace:*",
+    "@heroicons/react": "2.0.17",
     "@types/dash-ambient": "workspace:*"
   }
 }

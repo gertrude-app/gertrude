@@ -27,7 +27,7 @@ const ReviewUnlockRequest: React.FC<Props> = ({
     <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-4 px-3 sm:pt-2">
       <div className="flex flex-col items-center sm:items-start sm:min-w-[105px] mr-4">
         <h1 className="text-xl font-bold whitespace-nowrap pr-3">{userName}</h1>
-        <h3 className="text-gray-500">{relativeTime(createdAt)}</h3>
+        <h3 className="text-slate-500">{relativeTime(createdAt)}</h3>
       </div>
       {requestComment && (
         <div className="mt-3 sm:mt-0">
@@ -37,7 +37,7 @@ const ReviewUnlockRequest: React.FC<Props> = ({
         </div>
       )}
     </div>
-    <div className="bg-gray-50 p-3 rounded-xl *overflow-scroll">
+    <div className="bg-slate-50 p-3 rounded-xl *overflow-scroll">
       <a
         className="text-blue-700 hover:underline focus:outline-none cursor-pointer break-all"
         href={url || (domain && `https://${domain}`) || ipAddress}
@@ -50,7 +50,7 @@ const ReviewUnlockRequest: React.FC<Props> = ({
     </div>
     <div className="bg-white border rounded-xl mb-1 flex flex-col mt-4 relative">
       <button
-        className="hover:text-gray-600 text-gray-400 transition duration-100 absolute right-2.5 top-0 text-lg p-2 bg-transparent"
+        className="hover:text-slate-600 text-slate-400 transition duration-100 absolute right-2.5 top-0 text-lg p-2 bg-transparent"
         onClick={() => setDetailsExpanded(!detailsExpanded)}
       >
         <i className={cx(`fa-solid fa-chevron-down`, detailsExpanded && `-rotate-180`)} />
@@ -93,16 +93,16 @@ const AppDetail: React.FC<AppDetailProps> = ({ label, data, expanded }) => {
     return null;
   }
   return (
-    <div className="flex items-start p-3 px-5 text-sm sm:text-md odd:bg-gray-50 last:rounded-b-xl">
+    <div className="flex items-start p-3 px-5 text-sm sm:text-md odd:bg-slate-50 last:rounded-b-xl">
       <h3
         className={cx(
-          `text-gray-600 antialiased pr-3 font-medium`,
+          `text-slate-600 antialiased pr-3 font-medium`,
           expanded && `min-w-[108px]`,
         )}
       >
         {label}:
       </h3>
-      <h2 className="text-gray-900 *font-mono font-bold break-all">{data}</h2>
+      <h2 className="text-slate-900 font-bold break-all">{data}</h2>
     </div>
   );
 };

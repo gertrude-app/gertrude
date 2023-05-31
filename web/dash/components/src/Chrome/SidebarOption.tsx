@@ -1,9 +1,10 @@
 import React from 'react';
 import cx from 'classnames';
+import type { HeroIcon } from '@dash/types';
 import SmartLink from '../SmartLink';
 
 interface Props {
-  icon: string;
+  Icon: HeroIcon;
   children: string;
   collapsed: boolean;
   to: string;
@@ -12,7 +13,7 @@ interface Props {
 }
 
 const SidebarOption: React.FC<Props> = ({
-  icon,
+  Icon,
   children,
   collapsed,
   to,
@@ -24,28 +25,26 @@ const SidebarOption: React.FC<Props> = ({
     onClick={onClick}
     className={cx(
       `ScrollTop flex justify-start items-center`,
-      `cursor-pointer transition duration-75 select-none`,
-      `bg-violet-500 bg-opacity-0`,
+      `cursor-pointer transition duration-75 select-none rounded-xl`,
       `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50`,
-      isSelected ? `bg-opacity-20` : `hover:bg-opacity-10`,
       collapsed
-        ? `py-[1.4em] pl-[1.65em]`
-        : `rounded-xl py-[6px] sm:py-[8px] md:py-[12px] px-5 my-3 `,
+        ? `py-[1.2em] my-[0.3em] pl-[1em] flex justify-center items-center`
+        : `py-[10px] sm:py-[12px] md:py-[12px] px-5  my-1.5 md:my-3`,
+      isSelected ? `bg-violet-500/20 hover:bg-violet-500/30` : `hover:bg-violet-500/10`,
     )}
   >
-    <i
+    <Icon
       aria-hidden="true"
       className={cx(
-        `fa fa-${icon} mr-2.5 sm:mr-4 text-xl sm:text-2xl leading-none w-7`,
-        isSelected
-          ? `bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-transparent bg-clip-text [-webkit-background-clip:text;]`
-          : `text-violet-300 text-opacity-40`,
+        `mr-2.5 sm:mr-4 text-xl sm:text-2xl leading-none w-7`,
+        isSelected ? `fill-purple-400` : `text-violet-500`,
       )}
     />
     <h2
       className={cx(
-        `text-white text-[18px] sm:text-xl antialiased text-opacity-60 font-bold`,
+        `text-[18px] sm:text-xl antialiased font-bold`,
         collapsed ? `hidden` : `block`,
+        isSelected ? `text-violet-200` : `text-indigo-200/70`,
       )}
     >
       {children}

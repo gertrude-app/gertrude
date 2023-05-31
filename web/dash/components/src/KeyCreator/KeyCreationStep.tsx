@@ -44,7 +44,7 @@ const KeyCreationStep: React.FC<Props> = ({
         >
           <div
             className={cx(
-              `h-full border-r-2 border-dashed border-gray-300 absolute`,
+              `h-full border-r-2 border-dashed border-slate-300 absolute`,
               isFirst && `h-1/2 bottom-0`,
               isLast && `h-1/2 top-0`,
             )}
@@ -52,35 +52,37 @@ const KeyCreationStep: React.FC<Props> = ({
           <div
             className={cx(
               `relative w-4 h-4 rounded-full border-2`,
-              isBeforeActive && `border-indigo-500 bg-indigo-500`,
-              isActive && `border-indigo-500 bg-indigo-50`,
-              isAfterActive && `border-gray-300 bg-gray-50`,
+              isBeforeActive && `border-violet-500 bg-violet-500`,
+              isActive && `border-violet-500 bg-violet-50`,
+              isAfterActive && `border-slate-300 bg-slate-50`,
             )}
           />
         </div>
       )}
       {isAfterActive && mode === `create` ? (
-        <h2 className="text-gray-500 text-lg flex items-center">{lookaheadTitle}</h2>
+        <h2 className="text-slate-500 text-lg flex items-center">{lookaheadTitle}</h2>
       ) : (
         <div
           className={cx(
-            `rounded-2xl shadow-lg flex-grow my-2 bg-white`,
-            open ? `border-2 border-violet-400` : `border`,
+            `rounded-2xl flex-grow my-2 border-[0.5px] border-slate-200 bg-white`,
+            open
+              ? `shadow-slate-30/60 shadow-lg border-2 border-violet-200`
+              : `shadow-md shadow-slate-300/50`,
             mode === `create` ? `max-w-[calc(100%-40px)]` : `max-w-full`,
           )}
         >
           <div
-            className="flex justify-between w-full items-center cursor-pointer hover:bg-gray-50 transition duration-100 p-4 rounded-2xl outline-none [transition:200ms] text-left"
+            className="flex justify-between w-full items-center cursor-pointer hover:bg-slate-50 transition duration-100 p-4 rounded-2xl outline-none [transition:200ms] text-left"
             onClick={() => update({ type: `inactiveStepClicked`, step: ownStep })}
           >
             {isActive ? (
-              <h2 className="font-medium text-gray-900 text-lg">{activeTitle}</h2>
+              <h2 className="font-medium text-slate-900 text-lg">{activeTitle}</h2>
             ) : (
               title
             )}
             <i
               className={cx(
-                `pl-2 fa-solid fa-chevron-down text-gray-500 transition duration-150`,
+                `pl-2 fa-solid fa-chevron-down text-slate-500 transition duration-150`,
                 open && `-rotate-180`,
               )}
             />

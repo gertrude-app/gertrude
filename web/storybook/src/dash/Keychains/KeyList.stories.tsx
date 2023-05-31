@@ -10,8 +10,15 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 // @screenshot: xs/400,md/400
-export const Default: Story = props({
+export const List: Story = props({
   keys: Object.values(keyExamples),
+  viewMode: `list`,
+});
+
+// @screenshot: lg/400,xl/400
+export const Table: Story = props({
+  keys: Object.values(keyExamples),
+  viewMode: `table`,
 });
 
 export default meta;

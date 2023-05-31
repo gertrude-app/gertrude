@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@shared/components';
+import { formatDate } from '@dash/datetime';
 import { UndoMainPadding } from '../../Chrome/Chrome';
-import PartyMessage from '../../PartyMessage';
+import EmptyState from '../../EmptyState';
 import KeystrokesViewer from './KeystrokesViewer';
 import ScreenshotViewer from './ScreenshotViewer';
 
@@ -43,31 +44,31 @@ const UserActivityReviewDay: React.FC<Props> = ({
 }) => {
   const navigate = useNavigate();
   return (
-    <UndoMainPadding>
-      <header className="flex items-center justify-between py-4 px-6 border-b-2 bg-white">
+    <UndoMainPadding className="px-0 md:px-8 lg:px-10 py-5 md:py-10 pt-0 md:pt-4 pb-16 flex flex-col">
+      <header className="flex items-center justify-between p-2 pr-6 rounded-b-2xl md:rounded-t-2xl shadow-lg shadow-slate-800/10 bg-white max-w-7xl mb-8 z-20 relative">
         <div className="flex items-center text-md sm:text-l">
           <Link
             to="../"
-            className="flex items-center mr-4 text-gray-400 antialiased hover:text-gray-600 transition duration-75"
+            className="flex items-center mr-4 sm:mr-8 text-slate-500 hover:bg-violet-50 py-2 px-4 rounded-xl antialiased hover:text-violet-600 transition duration-100"
           >
             <i className="fa fa-chevron-left mr-2" aria-hidden /> Back
           </Link>
-          <h1 className="font-medium text-gray-800">{date.toLocaleDateString()}</h1>
+          <h1 className="font-bold text-slate-800">{formatDate(date, `medium`)}</h1>
         </div>
         {items.length > 0 && (
-          <div className="text-gray-700 self-end sm:self-center flex items-center space-x-0.5 sm:space-x-1">
+          <div className="text-slate-600 self-center flex items-center space-x-0.5 sm:space-x-1">
             <span className="font-bold sm:text-lg">{numDeleted}</span>
-            <span className="hidden sm:inline">out of</span>
-            <span className="sm:hidden">/</span>
+            <span className="hidden lg:inline">out of</span>
+            <span className="lg:hidden">/</span>
             <span className="font-bold sm:text-lg">{numDeleted + items.length}</span>
-            <span className="hidden sm:inline">items reviewed</span>
+            <span className="hidden lg:inline">items reviewed</span>
           </div>
         )}
       </header>
       {items.length > 0 ? (
         <div
           id="delete-focus"
-          className="px-0 md:px-8 lg:px-10 py-5 md:py-10 pb-16 bg-gray-200 md:bg-transparent flex-grow space-y-8 flex flex-col"
+          className="bg-slate-200 md:bg-transparent flex-grow space-y-8 flex flex-col"
         >
           {deleteableChunks(items, chunkSize, deleteItems)}
           <Button
@@ -85,8 +86,16 @@ const UserActivityReviewDay: React.FC<Props> = ({
           </Button>
         </div>
       ) : (
-        <div className="flex justify-center p-8">
-          <PartyMessage>Nothing to review for this day</PartyMessage>
+        <div className="">
+          <EmptyState
+            heading={`All caught up!`}
+            secondaryText={`Nothing left to review for this day.`}
+            icon={`image`}
+            buttonText={`Back to activity`}
+            buttonIcon="arrow-left"
+            action={`../`}
+            className="max-w-7xl"
+          />
         </div>
       )}
     </UndoMainPadding>

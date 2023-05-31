@@ -34,7 +34,7 @@ const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) =>
     </div>
     {unlockRequests.length > 2 && (
       <div className="mt-8 flex flex-col items-center mb-3">
-        <h3 className="text-gray-500 font-medium">
+        <h3 className="text-slate-500 font-medium">
           And {unlockRequests.length - 2} older{` `}
           {inflect(`request`, unlockRequests.length - 2)}:
         </h3>

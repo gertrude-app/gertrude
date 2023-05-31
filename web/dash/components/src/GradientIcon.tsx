@@ -1,5 +1,33 @@
 import React from 'react';
 import cx from 'classnames';
+import {
+  Bars3Icon,
+  BoltIcon,
+  BugAntIcon,
+  CalendarDaysIcon,
+  ChatBubbleOvalLeftIcon,
+  ClockIcon,
+  ComputerDesktopIcon,
+  DevicePhoneMobileIcon,
+  EnvelopeIcon,
+  ExclamationTriangleIcon,
+  GlobeAmericasIcon,
+  HandThumbDownIcon,
+  HandThumbUpIcon,
+  HomeIcon,
+  InformationCircleIcon,
+  KeyIcon,
+  ListBulletIcon,
+  LockOpenIcon,
+  MapPinIcon,
+  PencilIcon,
+  QuestionMarkCircleIcon,
+  UserIcon,
+  UserPlusIcon,
+  UsersIcon,
+  WindowIcon,
+} from '@heroicons/react/24/solid';
+import type { HeroIcon } from '@dash/types';
 
 export const ICONS = [
   `comment`,
@@ -11,7 +39,7 @@ export const ICONS = [
   `globe`,
   `lightning-bolt`,
   `window`,
-  `pen-to-square`,
+  `edit`,
   `info`,
   `list`,
   `bug`,
@@ -42,55 +70,50 @@ interface Props {
   className?: string;
   icon: IconType;
   size: `small` | `medium` | `large`;
-  subtle?: boolean;
 }
 
-const CLASS_MAP: Record<Props['icon'], string> = {
-  calendar: `fa-solid fa-calendar-days`,
-  comment: `fa-solid fa-comment`,
-  clock: `fa-solid fa-clock`,
-  location: `fa-solid fa-location scale-110`,
+const CLASS_MAP: Record<IconType, HeroIcon | string> = {
+  calendar: CalendarDaysIcon,
+  comment: ChatBubbleOvalLeftIcon,
+  clock: ClockIcon,
+  location: MapPinIcon,
   'app-store': `fa-brands fa-app-store-ios scale-110`,
-  'pen-to-square': `fa-solid fa-pen-to-square`,
+  edit: `fa-solid fa-pen-to-square`,
   'google-chrome': `fa-brands fa-chrome`,
-  'lightning-bolt': `fa-solid fa-bolt`,
-  unlock: `fa-solid fa-unlock`,
-  globe: `fa-solid fa-earth-americas`,
-  home: `fa-solid fa-home`,
-  window: `fa-solid fa-window-maximize`,
-  'exclamation-triangle': `fa-solid fa-exclamation-triangle -translate-y-px`,
-  info: `fa-solid fa-info`,
-  bug: `fa-solid fa-bug`,
-  list: `fa-solid fa-list`,
-  hamburger: `fa-solid fa-hamburger`,
-  desktop: `fa-solid fa-desktop translate-y-px`,
-  key: `fa-solid fa-key`,
-  user: `fa-solid fa-user`,
-  'user-plus': `fa-solid fa-user-plus scale-90 translate-x-px`,
-  users: `fa-solid fa-users`,
-  pen: `fa-solid fa-pen`,
-  email: `fa-solid fa-envelope`,
-  phone: `fa-solid fa-mobile`,
+  'lightning-bolt': BoltIcon,
+  unlock: LockOpenIcon,
+  globe: GlobeAmericasIcon,
+  home: HomeIcon,
+  window: WindowIcon,
+  'exclamation-triangle': ExclamationTriangleIcon,
+  info: InformationCircleIcon,
+  bug: BugAntIcon,
+  list: ListBulletIcon,
+  hamburger: Bars3Icon,
+  desktop: ComputerDesktopIcon,
+  key: KeyIcon,
+  user: UserIcon,
+  'user-plus': UserPlusIcon,
+  users: UsersIcon,
+  pen: PencilIcon,
+  email: EnvelopeIcon,
+  phone: DevicePhoneMobileIcon,
   slack: `fa-brands fa-slack`,
-  question: `fa-solid fa-question`,
+  question: QuestionMarkCircleIcon,
   laptop: `fa-solid fa-laptop`,
   binoculars: `fa-solid fa-binoculars`,
-  'thumbs-up': `fa-solid fa-thumbs-up translate-x-px`,
-  'thumbs-down': `fa-solid fa-thumbs-down translate-y-px`,
+  'thumbs-up': HandThumbUpIcon,
+  'thumbs-down': HandThumbDownIcon,
   stopwatch: `fa-solid fa-stopwatch`,
 };
 
-const GradientIcon: React.FC<Props> = ({ icon, className, size, subtle = false }) => {
+const GradientIcon: React.FC<Props> = ({ icon, className, size }) => {
+  const Icon = CLASS_MAP[icon];
   if (size === `small`) {
-    return (
-      <i
-        className={cx(
-          `bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text;] text-transparent`,
-          CLASS_MAP[icon],
-          className,
-        )}
-      />
-    );
+    if (typeof Icon === `string`) {
+      return <i className={cx(`text-violet-500`, Icon, className)} />;
+    }
+    return <Icon className={cx(`w-5 h-5 text-violet-500`, className)} />;
   }
   return (
     <div
@@ -100,14 +123,11 @@ const GradientIcon: React.FC<Props> = ({ icon, className, size, subtle = false }
         className,
       )}
     >
-      <i
-        className={cx(
-          `text-white`,
-          size === `large` && `text-2xl`,
-          subtle ? `text-opacity-80 text-md` : `text-lg`,
-          CLASS_MAP[icon],
-        )}
-      />
+      {typeof Icon === `string` ? (
+        <i className={cx(`text-white`, size === `large` && `text-2xl`, Icon)} />
+      ) : (
+        <Icon className={cx(`text-white w-5`, size === `large` && `w-6`)} />
+      )}
     </div>
   );
 };

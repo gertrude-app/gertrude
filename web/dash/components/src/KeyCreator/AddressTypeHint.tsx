@@ -31,7 +31,7 @@ const AddressTypeHint: React.FC<Props> = ({ unsanitizedAddress, type }) => {
       <div
         data-test="invalid-domain-hint"
         className={cx(
-          `mt-4 min-h-[47px] text-right text-gray-400 flex justify-end items-center`,
+          `mt-4 min-h-[47px] text-right text-slate-400 flex justify-end items-center`,
           address.trim() === `` && `opacity-0`,
         )}
       >
@@ -47,7 +47,7 @@ const AddressTypeHint: React.FC<Props> = ({ unsanitizedAddress, type }) => {
   return (
     <div className="flex justify-end">
       {type === `standard` && (
-        <div className="text-right text-sm text-gray-400 mb-2 mt-3 overflow-hidden">
+        <div className="text-right text-sm text-slate-400 mb-2 mt-3 overflow-hidden">
           <div className="mb-1">
             Allows all subdomains of{` `}
             <Address testId="standard-registrable">{registrable}</Address>
@@ -63,7 +63,7 @@ const AddressTypeHint: React.FC<Props> = ({ unsanitizedAddress, type }) => {
         </div>
       )}
       {type === `strict` && (
-        <div className="text-right text-sm text-gray-400 mb-2 mt-3 overflow-hidden">
+        <div className="text-right text-sm text-slate-400 mb-2 mt-3 overflow-hidden">
           <div className="mb-1">
             Only allows access to{` `}
             {subdomain || (registrable ?? address).length > 35 ? (
@@ -149,7 +149,7 @@ const Address: React.FC<{ children: React.ReactNode; testId?: string }> = ({
   children,
   testId,
 }) => (
-  <span data-test={testId} className="font-mono text-gray-500 px-1 break-all">
+  <span data-test={testId} className="font-mono text-slate-500 px-1 break-all">
     {children}
   </span>
 );

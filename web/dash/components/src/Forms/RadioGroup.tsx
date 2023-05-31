@@ -21,7 +21,7 @@ function RadioGroup<Value extends string = string>({
         <button
           key={value}
           className={cx(
-            `flex items-center hover:bg-gray-50 w-full rounded-lg p-1.5 outline-none focus:ring-2 focus:ring-violet-300 transition duration:100 text-left leading-5`,
+            `flex items-center hover:bg-slate-50 w-full rounded-lg p-1.5 outline-none focus:ring-2 focus:ring-violet-300 transition duration:100 text-left leading-5`,
           )}
           onClick={() => setSelectedOption(value)}
         >
@@ -35,7 +35,7 @@ function RadioGroup<Value extends string = string>({
           </div>
           <h3
             className={cx(
-              selectedOption === value ? `font-medium text-gray-800` : `text-gray-600`,
+              selectedOption === value ? `font-medium text-slate-800` : `text-slate-600`,
             )}
           >
             {capitalize(display)}

@@ -2,7 +2,7 @@ import React from 'react';
 import { posessive } from '@shared/string';
 import type { ComponentProps } from 'react';
 import PageHeading from '../../PageHeading';
-import PartyMessage from '../../PartyMessage';
+import EmptyState from '../../EmptyState';
 import ReviewSummaryCard from './DaySummaryCard';
 
 type Props = {
@@ -16,13 +16,25 @@ const UserActivityOverviewScreen: React.FC<Props> = ({ userName, days }) => (
       {posessive(userName)} Activity
     </PageHeading>
     {days.length > 0 ? (
-      <div className="my-8 space-y-6 sm:space-y-10">
-        {days.map((day) => (
-          <ReviewSummaryCard key={`${day.date}`} {...day} />
+      <div className="my-8">
+        {days.map((day, index) => (
+          <ReviewSummaryCard
+            key={`${day.date}`}
+            {...day}
+            index={index}
+            numDays={days.length}
+          />
         ))}
       </div>
     ) : (
-      <PartyMessage>Nothing to review from the last two weeks</PartyMessage>
+      <EmptyState
+        heading={`No activity to review`}
+        secondaryText={`No activity has been reported from this user in the past two weeks.`}
+        icon={`user`}
+        buttonText={`Back to all users`}
+        buttonIcon="users"
+        action={`/users`}
+      />
     )}
   </>
 );

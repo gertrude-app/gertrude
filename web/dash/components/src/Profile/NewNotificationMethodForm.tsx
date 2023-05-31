@@ -18,7 +18,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
   ...props
 }) => (
   <div className="p-8 flex flex-col grow h-full">
-    <h2 className="text-2xl font-black text-gray-700 mb-8">New notification method</h2>
+    <h2 className="text-2xl font-black text-slate-700 mb-8">New notification method</h2>
     <div className="flex flex-col space-y-6">
       <SelectMenu
         label="Method:"
@@ -96,7 +96,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
       ) : (
         <>
           <TextInput
-            className="mt-8 pt-8 border-t border-gray-200/50"
+            className="mt-8 pt-8 border-t border-slate-200/50"
             label="Enter 6-digit code:"
             type="text"
             value={confirmationCode}

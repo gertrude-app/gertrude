@@ -30,13 +30,15 @@ const UserActivityOverviewRoute: React.FC = () => {
   return (
     <UserActivityOverview
       userName={request.payload.userName}
-      days={request.payload.days.map((day) => {
+      days={request.payload.days.map((day, index) => {
         const date = new Date(day.date);
         const loadedDay = Req.payload(days[activityDayKey(userId, date)]);
         return {
           date,
           numItems: day.totalItems,
           numCompleted: loadedDay?.numDeleted ?? day.numApproved,
+          index,
+          numDays: request.payload.days.length,
         };
       })}
     />

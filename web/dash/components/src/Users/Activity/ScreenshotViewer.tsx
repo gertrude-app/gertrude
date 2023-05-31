@@ -24,13 +24,13 @@ const ScreenshotViewer: React.FC<Props> = ({
 }) => (
   <div
     className={cx(
-      `border-y md:border-x md:rounded-xl md:shadow-lg bg-white max-w-7xl`,
+      `border-y-[0.5px] md:border-x-[0.5px] border-slate-200 md:rounded-2xl md:shadow-lg md:shadow-slate-300/50 bg-white max-w-7xl`,
       className,
     )}
   >
-    <div className="md:mx-4 mb-3 sm:mb-0 md:mt-4 flex justify-center bg-violet-100/50 rounded-lg">
+    <div className="md:mx-4 mb-3 sm:mb-0 md:mt-4 flex justify-center bg-slate-100 rounded-xl">
       <img
-        className="md:rounded-lg shadow-inner"
+        className="md:rounded-2xl shadow-inner"
         src={url}
         width={width}
         height={height}
@@ -38,7 +38,7 @@ const ScreenshotViewer: React.FC<Props> = ({
         alt="user screenshot"
       />
     </div>
-    <div className="px-4 py-3 sm:py-4 pt-0 flex justify-between items-start">
+    <div className="px-4 py-3 sm:py-4 pt-0 flex justify-between items-center">
       <ActivityItemTime date={date} />
       <Button color="tertiary" type="button" onClick={onApprove}>
         Approve

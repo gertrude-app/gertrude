@@ -33,9 +33,9 @@ const AddressStep: React.FC<Props> = ({
     lookaheadTitle="Website address"
     activeTitle="Select website address:"
     title={
-      <h2 className="font-medium text-gray-900 text-lg max-w-[calc(100%-25px)] overflow-hidden">
+      <h2 className="font-medium text-slate-900 text-lg max-w-[calc(100%-25px)] overflow-hidden flex items-center space-x-2">
         <GradientIcon icon="unlock" className="mr-2" size="small" />
-        {keyType === `website` ? `Unlocking ` : `Address `}
+        <span>{keyType === `website` ? `Unlocking ` : `Address `}</span>
         {address.trim() !== `` && <UserInputText>{address}</UserInputText>}
       </h2>
     }
@@ -67,9 +67,9 @@ const AddressStep: React.FC<Props> = ({
       prefix="https://"
       className="mb-7"
     />
-    <div className="bg-gray-50 px-2 py-4 rounded-lg">
+    <div className="bg-slate-50 px-2 py-4 rounded-lg">
       <div className="flex justify-start mr-2 items-center ml-2 mb-2">
-        <label className="mr-2 text-gray-600">Advanced:</label>
+        <label className="mr-2 text-slate-600">Advanced:</label>
         <Toggle
           enabled={showAdvancedAddressOptions}
           small
@@ -79,7 +79,7 @@ const AddressStep: React.FC<Props> = ({
         />
       </div>
       <div className="flex items-center justify-end">
-        <label className="mr-2 text-gray-600 font-medium">Address type:</label>
+        <label className="mr-2 text-slate-600 font-medium">Address type:</label>
         <SelectMenu<EditKey.AddressType>
           testId="address-type"
           options={addressTypeOptions(showAdvancedAddressOptions)}

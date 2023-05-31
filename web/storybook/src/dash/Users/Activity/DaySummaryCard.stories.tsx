@@ -11,6 +11,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = props({
   date: new Date(time.stable()),
+  index: 0,
+  numDays: 2,
   numItems: 36,
   numCompleted: 24,
 });

@@ -20,7 +20,7 @@ const SelectableListItem: React.FC<Props> = ({
   <button
     className={cx(
       `flex w-full text-left transition duration-100 rounded-xl outline-none focus:ring-2 focus:ring-violet-400`,
-      selected ? `bg-violet-50` : `hover:bg-gray-50`,
+      selected ? `bg-violet-50` : `hover:bg-slate-50`,
     )}
     onClick={onClick}
   >
@@ -40,7 +40,7 @@ const SelectableListItem: React.FC<Props> = ({
     </div>
     <div className="flex-grow p-3">
       <h3 className="font-bold leading-tight">{title}</h3>
-      <p className="w-fit text-gray-500 text-sm mt-1 leading-snug">{description}</p>
+      <p className="w-fit text-slate-500 text-sm mt-1 leading-snug">{description}</p>
       {badges && (
         <div className="flex mt-2 space-x-2">
           {badges.map((badge) => (

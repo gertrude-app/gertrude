@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import cx from 'classnames';
 import { Dialog, Transition } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 import SidebarNav from './SidebarNav';
 import MobileStickyHeader from './MobileStickyHeader';
 
@@ -27,7 +28,7 @@ const Chrome: React.FC<Props> = ({
   onInternalLinkClick,
   usingMobileView = false,
 }) => (
-  <div className="Chrome">
+  <div className="Chrome bg-slate-50">
     {/* mark: begin mobile menu */}
     <Transition.Root show={mobileSidebarOpen} as={Fragment}>
       <Dialog as="div" className="relative z-40 md:hidden" onClose={onMobileSidebarClose}>
@@ -41,7 +42,7 @@ const Chrome: React.FC<Props> = ({
           leaveTo="opacity-0"
         >
           {/* mark: semi transparent overlay */}
-          <div className="fixed inset-0 bg-black bg-opacity-70" />
+          <div className="fixed inset-0 bg-slate-700 bg-opacity-90" />
         </Transition.Child>
 
         <div className="fixed inset-0 flex z-40">
@@ -55,7 +56,7 @@ const Chrome: React.FC<Props> = ({
             leaveTo="-translate-x-full"
           >
             {/* mark: begin mobile sidebar wrapper */}
-            <Dialog.Panel className="relative flex flex-col w-72 bg-gray-900 bg-gradient-to-br from-transparent to-violet-900/40">
+            <Dialog.Panel className="relative flex flex-col w-72 bg-slate-900 bg-gradient-to-b from-transparent to-violet-900/20 rounded-xl shadow-lg shadow-black/30 m-2">
               {/* mark: begin floating mobile overlay close 'X' button */}
               <Transition.Child
                 as={Fragment}
@@ -66,14 +67,14 @@ const Chrome: React.FC<Props> = ({
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <div className="absolute top-0 right-0 -mr-12 pt-3">
+                <div className="absolute top-0 right-0 -mr-12 pt-4">
                   <button
                     type="button"
-                    className="ml-1 flex items-center justify-center h-10 w-10 opacity-80 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white/50"
+                    className="shadow-lg shadow-black/30 text-slate-400 hover:text-slate-300 flex items-center justify-center h-10 w-10 bg-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50"
                     onClick={onMobileSidebarClose}
                   >
                     <span className="sr-only">Close sidebar</span>
-                    <i className="fa fa-times text-2xl leading-none text-white" />
+                    <XMarkIcon className="h-6 leading-none" />
                   </button>
                 </div>
               </Transition.Child>
@@ -94,8 +95,8 @@ const Chrome: React.FC<Props> = ({
     <div
       className={cx(
         sidebarCollapsed ? `w-20` : `w-72`,
-        `hidden relative flex-col md:flex md:fixed md:inset-y-0 transition-[width]`,
-        `bg-gray-900 bg-gradient-to-br from-transparent to-violet-900/40`,
+        `hidden relative flex-col md:flex md:fixed md:inset-y-0 transition-[width] m-4`,
+        `bg-slate-900 bg-gradient-to-b from-transparent to-violet-900/50 rounded-2xl shadow-lg shadow-slate-500/30`,
       )}
     >
       <SidebarNav
@@ -109,7 +110,7 @@ const Chrome: React.FC<Props> = ({
     <div
       className={cx(
         `flex flex-col flex-1 transition-[padding]`,
-        sidebarCollapsed ? `md:pl-20` : `md:pl-72`,
+        sidebarCollapsed ? `md:pl-24` : `md:pl-[304px]`,
       )}
     >
       <MobileStickyHeader
@@ -126,7 +127,7 @@ const Chrome: React.FC<Props> = ({
             : node.removeAttribute(`inert`))
         }
       >
-        <div className={`bg-gray-50 [min-height:calc(100vh-64px)] md:min-h-screen`}>
+        <div className={`[min-height:calc(100vh-64px)] md:min-h-screen`}>
           <PaddedMain>{children}</PaddedMain>
         </div>
       </main>

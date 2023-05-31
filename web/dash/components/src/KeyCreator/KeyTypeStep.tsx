@@ -20,13 +20,14 @@ const KeyTypeStep: React.FC<Props> = ({ mode, keyType, activeStep, update }) => 
     lookaheadTitle=""
     canAdvance={!!keyType}
     title={
-      <h1 className="font-medium text-gray-900 text-lg">
+      <h1 className="font-medium text-slate-900 text-lg flex items-center space-x-2">
         <GradientIcon
           icon={keyType === `app` ? `window` : `globe`}
           className="mr-2"
           size="small"
         />
-        <UserInputText>{capitalize(keyType ?? `website`)}</UserInputText> key
+        <UserInputText>{capitalize(keyType ?? `website`)}</UserInputText>
+        <span>key</span>
       </h1>
     }
     ownStep={EditKey.Step.SetKeyType}

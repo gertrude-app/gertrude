@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { Button, LoadingSpinner } from '@shared/components';
+import { Button, Loading } from '@shared/components';
 import GradientIcon from '../GradientIcon';
 import FullscreenGradientBg from './FullscreenGradientBg';
 
@@ -15,7 +15,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
     case `ongoing`:
       return (
         <FullscreenGradientBg>
-          <LoadingSpinner text={props.text} />
+          <Loading withWhiteBg />
         </FullscreenGradientBg>
       );
 
@@ -38,7 +38,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
             <div className="flex flex-col items-center sm:items-end">
               <p
                 className={cx(
-                  `text-center sm:text-left text-gray-500`,
+                  `text-center sm:text-left text-slate-500`,
                   props.request === `failed` ?? `text-red-900`,
                 )}
               >

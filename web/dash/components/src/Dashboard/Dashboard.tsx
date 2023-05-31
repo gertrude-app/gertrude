@@ -26,7 +26,7 @@ const Dashboard: React.FC<Props> = ({
     return (
       <>
         <PageHeading icon="home">Dashboard</PageHeading>
-        <div className="pt-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8">
+        <div className="pt-6 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8">
           <UserActivityWidget userActivity={userActivitySummaries} />
           <UserOverviewWidget users={users} />
           {recentScreenshots.length !== 0 && (
@@ -53,10 +53,10 @@ const Dashboard: React.FC<Props> = ({
   return (
     <UndoMainPadding className="w-full h-screen flex justify-center items-center sm:p-10">
       <div className="flex justify-center items-center flex-col p-8 lg:p-16 bg-white shadow-xl rounded-2xl relative left-4">
-        <h1 className="text-center text-3xl font-inter text-gray-900">
+        <h1 className="text-center text-3xl font-inter text-slate-900">
           Welcome to Gertrude!
         </h1>
-        <p className="text-center sm:text-lg text-gray-500 mt-3 max-w-xl">
+        <p className="text-center sm:text-lg text-slate-500 mt-3 max-w-xl">
           It looks like you're new around here; that's great! Here's what we recommend to
           get started:
         </p>
@@ -97,7 +97,7 @@ export const RecommendedStep: React.FC<RecommendedStepProps> = ({
 }) => (
   <SmartLink
     to={href}
-    className="flex items-center p-4 pr-8 bg-gray-50 rounded-2xl cursor-pointer transition duration-150 hover:bg-gray-100 hover:scale-105"
+    className="flex items-center p-4 pr-8 bg-slate-50 rounded-2xl cursor-pointer transition duration-150 hover:bg-slate-100 hover:scale-105"
   >
     <div className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 w-14 h-14 flex justify-center items-center rounded-xl shrink-0">
       <i className={`fa-solid fa-${icon} text-white text-xl`} />

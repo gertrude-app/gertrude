@@ -30,7 +30,7 @@ const MagicLink: React.FC = () => {
       );
       if (request.error?.tag === `magicLinkTokenNotFound`) {
         error = (
-          <span className="text-gray-900 antialiased">
+          <span className="text-slate-900 antialiased">
             Magic Link token not found, or expired. Please{` `}
             <a href="/login" className="underline text-blue-700 hover:text-blue-600">
               try again.

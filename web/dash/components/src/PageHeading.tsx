@@ -11,13 +11,12 @@ type Props = {
 
 const PageHeading: React.FC<Props> = ({ children, icon, className }) => (
   <header className={cx(className)} data-test="page-heading">
-    <div className="flex justify-start items-center mb-3">
+    <div className="flex justify-start items-center">
       <GradientIcon icon={icon} size="large" className="mr-3" />
-      <h1 className="text-4xl font-bold flex justify-start items-center text-gray-800">
+      <h1 className="text-4xl font-bold flex justify-start items-center text-slate-800">
         {children}
       </h1>
     </div>
-    <hr className="h-1 bg-gradient-to-r from-indigo-500 to-fuchsia-500" />
   </header>
 );
 

@@ -3,7 +3,7 @@ import Feature from './Feature';
 import GlowEffect from './GlowEffect';
 
 const SafeIsNowPossibleBlock: React.FC = () => (
-  <section className="bg-gray-100 bg-topo">
+  <section className="bg-slate-100 bg-topo">
     <section className="relative">
       <GlowEffect className="-right-96 top-0" />
       <GlowEffect className="-left-96 top-128" />
@@ -21,7 +21,7 @@ const SafeIsNowPossibleBlock: React.FC = () => (
             possible
           </span>
         </h2>
-        <p className="text-xl text-gray-500 mt-8 leading-8 max-w-4xl">
+        <p className="text-xl text-slate-500 mt-8 leading-8 max-w-4xl">
           So it's not safe to block only categories of the internet, but taking the
           reverse approach is <b>hard</b>. Rather than give up and settle for the illusion
           of safety, Gertrude makes this managable by letting you:
