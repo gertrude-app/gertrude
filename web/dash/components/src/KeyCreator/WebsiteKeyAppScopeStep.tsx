@@ -89,7 +89,7 @@ const Title: React.FC<{
     case `webBrowsers`:
       return (
         <>
-          <GradientIcon icon="google-chrome" className="mr-r" size="small" />
+          <GradientIcon icon="google-chrome" className="mr-2" size="small" />
           <span>For</span>
           <UserInputText>all web browsers</UserInputText>
         </>

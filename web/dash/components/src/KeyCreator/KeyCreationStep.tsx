@@ -52,8 +52,8 @@ const KeyCreationStep: React.FC<Props> = ({
           <div
             className={cx(
               `relative w-4 h-4 rounded-full border-2`,
-              isBeforeActive && `border-indigo-500 bg-indigo-500`,
-              isActive && `border-indigo-500 bg-indigo-50`,
+              isBeforeActive && `border-violet-500 bg-violet-500`,
+              isActive && `border-violet-500 bg-violet-50`,
               isAfterActive && `border-slate-300 bg-slate-50`,
             )}
           />

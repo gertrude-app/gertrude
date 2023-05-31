@@ -37,7 +37,7 @@ const SidebarOption: React.FC<Props> = ({
       aria-hidden="true"
       className={cx(
         `mr-2.5 sm:mr-4 text-xl sm:text-2xl leading-none w-7`,
-        isSelected ? `text-violet-400` : `text-violet-500`,
+        isSelected ? `fill-purple-400` : `text-violet-500`,
       )}
     />
     <h2

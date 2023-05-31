@@ -56,7 +56,7 @@ const UserActivityReviewDay: React.FC<Props> = ({
           <h1 className="font-bold text-slate-800">{formatDate(date, `medium`)}</h1>
         </div>
         {items.length > 0 && (
-          <div className="text-slate-600 self-end sm:self-center flex items-center space-x-0.5 sm:space-x-1">
+          <div className="text-slate-600 self-center flex items-center space-x-0.5 sm:space-x-1">
             <span className="font-bold sm:text-lg">{numDeleted}</span>
             <span className="hidden lg:inline">out of</span>
             <span className="lg:hidden">/</span>

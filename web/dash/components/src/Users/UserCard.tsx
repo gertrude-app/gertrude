@@ -32,7 +32,7 @@ const UserCard: React.FC<Props> = ({
   >
     <div className="p-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-black text-slate-700 mr-3">{name}</h1>
+        <h2 className="text-3xl font-extrabold text-slate-700 mr-3">{name}</h2>
         <div className="flex items-center space-x-4">
           <div
             className={cx(
@@ -57,10 +57,10 @@ const UserCard: React.FC<Props> = ({
         </div>
       </div>
       <div className="flex justify-start items-center mb-4 mt-0.5">
-        <p className="text-slate-400">
-          <span className="font-medium text-slate-500">{numKeychains}</span> keychains •
+        <p className="text-slate-500">
+          <span className="font-semibold text-slate-600">{numKeychains}</span> keychains •
           {` `}
-          <span className="font-medium text-slate-500">{numKeys}</span> keys
+          <span className="font-semibold text-slate-600">{numKeys}</span> keys
         </p>
       </div>
       {devices.length ? (

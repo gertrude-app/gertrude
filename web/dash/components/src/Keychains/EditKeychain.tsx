@@ -80,8 +80,8 @@ const EditKeychain: React.FC<Props> = ({
       <PageHeading icon="key" className="mb-4">
         {isNew ? `Create Keychain` : `Edit Keychain`}
       </PageHeading>
-      <div className="mt-8 space-y-8">
-        <div className="flex flex-col gap-8 border border-slate-200 p-6 lg:p-8 rounded-3xl bg-slate-100">
+      <div className="mt-8 space-y-16">
+        <div className="flex flex-col gap-8">
           <TextInput
             type="text"
             label="Name:"

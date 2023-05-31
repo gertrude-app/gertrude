@@ -74,7 +74,7 @@ const DaySummaryCard: React.FC<Props> = ({
         </div>
         <div className="h-4 shadow-inner bg-slate-200 rounded-full">
           <div
-            className={`h-4 bg-gradient-to-br from-indigo-500 to-fuchsia-500 rounded-full [transition-property:width] duration-200 ease-in-out`}
+            className={`h-4 bg-gradient-to-r from-indigo-500 to-fuchsia-500 rounded-full [transition-property:width] duration-200 ease-in-out`}
             style={{ width: `${(completed / numItems) * 100}%` }}
           />
         </div>
