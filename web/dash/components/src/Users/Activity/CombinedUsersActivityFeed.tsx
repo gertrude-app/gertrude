@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@shared/components';
-import { posessive } from '@dash/utils';
+import { posessive } from '@shared/string';
 import { typesafe } from '@shared/ts-utils';
 import type { ActivityFeedItem } from './UserActivityFeed';
 import { UndoMainPadding } from '../../Chrome/Chrome';
-import PartyMessage from '../../PartyMessage';
+import { FeedCaughtUp } from './UserActivityFeed';
 import { deleteableChunks } from './UserActivityFeed';
 import FeedHeader from './FeedHeader';
 import ReviewDayWrapper from './ReviewDayWrapper';
@@ -72,9 +72,7 @@ const CombinedUsersActivityFeed: React.FC<Props> = ({
           </Button>
         </ReviewDayWrapper>
       ) : (
-        <div className="flex justify-center p-8">
-          <PartyMessage>Nothing to review for this day</PartyMessage>
-        </div>
+        <FeedCaughtUp />
       )}
     </UndoMainPadding>
   );

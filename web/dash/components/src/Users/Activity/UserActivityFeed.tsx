@@ -65,23 +65,25 @@ const UserActivityFeed: React.FC<Props> = ({
           </Button>
         </ReviewDayWrapper>
       ) : (
-        <div className="">
-          <EmptyState
-            heading={`All caught up!`}
-            secondaryText={`Nothing left to review for this day.`}
-            icon={`image`}
-            buttonText={`Back to activity`}
-            buttonIcon="arrow-left"
-            action={`../`}
-            className="max-w-7xl"
-          />
-        </div>
+        <FeedCaughtUp />
       )}
     </UndoMainPadding>
   );
 };
 
 export default UserActivityFeed;
+
+export const FeedCaughtUp: React.FC = () => (
+  <EmptyState
+    heading="All caught up!"
+    secondaryText="Nothing left to review for this day."
+    icon="image"
+    buttonText="Back to activity"
+    buttonIcon="arrow-left"
+    action="../"
+    className="max-w-7xl"
+  />
+);
 
 export function deleteableChunks(
   items: ActivityFeedItem[],

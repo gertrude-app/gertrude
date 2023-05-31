@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { posessive } from '@dash/utils';
+import { posessive } from '@shared/string';
 
 type Props = {
   children: string;
