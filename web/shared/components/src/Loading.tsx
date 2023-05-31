@@ -24,12 +24,10 @@ const Loading: React.FC<Props> = ({ className, withWhiteBg }) => {
 
 export default Loading;
 
-const Animation: React.FC<{ className?: string }> = ({ className }) => {
-  return (
-    <div className={cx(`w-16 h-14 flex items-start justify-between`, className)}>
-      <div className="rounded-full bg-gradient-to-tr from-indigo-500 to-fuchsia-500 animate-[loader-bounce_1.5s_0.1s_ease-out_infinite]" />
-      <div className="rounded-full bg-gradient-to-tr from-indigo-500 to-fuchsia-500 animate-[loader-bounce_1.5s_0.2s_ease-out_infinite]" />
-      <div className="rounded-full bg-gradient-to-tr from-indigo-500 to-fuchsia-500 animate-[loader-bounce_1.5s_0.3s_ease-out_infinite]" />
-    </div>
-  );
-};
+const Animation: React.FC<{ className?: string }> = ({ className }) => (
+  <div className={cx(`w-16 h-14 flex items-start justify-between`, className)}>
+    <div className="rounded-full bg-gradient-to-tr from-indigo-500 to-fuchsia-500 animate-[loader-bounce_1.5s_0.1s_ease-out_infinite]" />
+    <div className="rounded-full bg-gradient-to-tr from-indigo-500 to-fuchsia-500 animate-[loader-bounce_1.5s_0.2s_ease-out_infinite]" />
+    <div className="rounded-full bg-gradient-to-tr from-indigo-500 to-fuchsia-500 animate-[loader-bounce_1.5s_0.3s_ease-out_infinite]" />
+  </div>
+);

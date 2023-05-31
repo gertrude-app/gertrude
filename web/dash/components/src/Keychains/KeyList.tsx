@@ -23,29 +23,28 @@ const KeyList: React.FC<Props> = ({ keys, editKey, deleteKey, viewMode }) => (
         />
       ))}
     </div>
-    <table className={cx(viewMode === `table` && `xl:table`, `hidden`)}>
-      <thead>
-        <tr>
-          <TableHeading index={0}>Key type</TableHeading>
-          <TableHeading index={1} className="w-[280px]">
-            Key target
-          </TableHeading>
-          <TableHeading index={2}>Key scope</TableHeading>
-          <TableHeading index={3}>Comment</TableHeading>
-        </tr>
-      </thead>
-      <tbody>
-        {keys.map((key) => (
-          <Key
-            key={key.id}
-            record={key}
-            onClick={() => editKey(key.id)}
-            onDelete={() => deleteKey(key.id)}
-            type="table"
-          />
-        ))}
-      </tbody>
-    </table>
+    <div
+      className={cx(
+        viewMode === `table` && `xl:grid`,
+        `hidden gap-2 [grid-template-columns:14%_26%_22%_20%_10%_3%]`,
+      )}
+    >
+      <TableHeading>Key type</TableHeading>
+      <TableHeading>Key target</TableHeading>
+      <TableHeading>Key scope</TableHeading>
+      <TableHeading>Comment</TableHeading>
+      <div />
+      <div />
+      {keys.map((key) => (
+        <Key
+          key={key.id}
+          record={key}
+          onClick={() => editKey(key.id)}
+          onDelete={() => deleteKey(key.id)}
+          type="table"
+        />
+      ))}
+    </div>
   </div>
 );
 
@@ -54,17 +53,12 @@ export default KeyList;
 interface TableHeadingProps {
   children: React.ReactNode;
   className?: string;
-  index: number;
 }
 
-const TableHeading: React.FC<TableHeadingProps> = ({ children, index, className }) => (
-  <th className={cx(`p-1 group`, className)}>
-    <div
-      className={cx(
-        `p-4 bg-white text-left rounded-lg border-[0.5px] border-slate-200 group-first-of-type:rounded-tl-2xl group-last-of-type:rounded-tr-2xl`,
-      )}
-    >
-      {children}
-    </div>
-  </th>
+const TableHeading: React.FC<TableHeadingProps> = ({ children }) => (
+  <div
+    className={cx(`p-4 bg-white text-left rounded-lg border-[0.5px] border-slate-200`)}
+  >
+    <h4 className="font-bold text-slate-900">{children}</h4>
+  </div>
 );

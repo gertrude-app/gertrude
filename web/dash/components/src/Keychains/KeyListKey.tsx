@@ -101,15 +101,8 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
     );
   }
   return (
-    <tr
-      className="hover:scale-[101%] transition duration-200 cursor-pointer group"
-      onClick={onClick}
-    >
-      <TableCell
-        className={cx(
-          `group-last-of-type:rounded-bl-2xl flex justify-center items-center`,
-        )}
-      >
+    <>
+      <TableCell onClick={onClick} className={cx(`flex justify-center items-center`)}>
         <span
           className={cx(
             `rounded-full px-4 py-0.5 font-medium text-white`,
@@ -119,12 +112,12 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
           {key.keyType === `website` ? `Website` : `App`}
         </span>
       </TableCell>
-      <TableCell className="max-w-[280px] overflow-hidden relative">
-        <div className="absolute h-full w-16 top-auto bottom-0 right-0 rounded-r-lg bg-gradient-to-r from-transparent via-slate-50 to-slate-50" />
+      <TableCell onClick={onClick} className="max-w-[280px] overflow-hidden relative">
+        <div className="absolute h-full w-12 top-auto bottom-0 right-0 rounded-r-lg bg-gradient-to-r from-transparent via-slate-50 to-slate-50" />
         <span
           className={cx(
             target(record.key) !== `*`
-              ? `font-mono font-semibold text-indigo-700 px-1 bg-indigo-100 rounded`
+              ? `font-mono font-semibold text-indigo-700 px-1 bg-indigo-100 rounded whitespace-nowrap`
               : `font-bold text-slate-800`,
           )}
         >
@@ -140,12 +133,13 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
           )}
         </span>
       </TableCell>
-      <TableCell>
-        <span className="underline decoration-fuchsia-500 underline-offset-2 font-semibold">
+      <TableCell onClick={onClick} className="relative">
+        <div className="absolute h-full w-12 top-auto bottom-0 right-0 rounded-r-lg bg-gradient-to-r from-transparent via-slate-50 to-slate-50" />
+        <span className="underline decoration-fuchsia-500 underline-offset-2 font-semibold whitespace-nowrap">
           {scope}
         </span>
       </TableCell>
-      <TableCell className={cx(`group-last-of-type:rounded-br-2xl flex`)}>
+      <TableCell onClick={onClick} className="flex">
         <span
           className={cx(
             `font-medium italic`,
@@ -161,15 +155,15 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
             : `none`}
         </span>
       </TableCell>
-      <TableCell className="flex justify-start items-center p-2 pr-0 bg-transparent border-none group-hover:bg-slate-100 group-hover:-translate-x-[4px]">
+      <TableCell onClick={onClick} className="px-1 bg-transparent border-none">
         <Button type="button" onClick={onDelete} color="warning" size="small">
           Delete
         </Button>
       </TableCell>
-      <TableCell className="flex justify-start items-center w-10 h-10 bg-transparent border-none group-hover:bg-slate-100 group-hover:-translate-x-[5px]">
+      <TableCell onClick={onClick} className="pl-1 bg-transparent border-none">
         {key.expiration && <ClockIcon className="w-5 shrink-0 text-slate-400" />}
       </TableCell>
-    </tr>
+    </>
   );
 };
 
@@ -177,18 +171,18 @@ export default Key;
 
 interface TableCellProps {
   children: React.ReactNode;
+  onClick(): unknown;
   className?: string;
 }
 
-const TableCell: React.FC<TableCellProps> = ({ children, className }) => (
-  <td className={cx(`p-1`)}>
-    <div
-      className={cx(
-        `p-4 bg-slate-50 rounded-lg border-[0.5px] border-slate-200 transition duration-200`,
-        className,
-      )}
-    >
-      {children}
-    </div>
-  </td>
+const TableCell: React.FC<TableCellProps> = ({ children, className, onClick }) => (
+  <div
+    className={cx(
+      `p-4 bg-slate-50 rounded-lg border-[0.5px] border-slate-200 transition duration-200 cursor-pointer flex justify-start items-center overflow-hidden`,
+      className,
+    )}
+    onClick={onClick}
+  >
+    {children}
+  </div>
 );
