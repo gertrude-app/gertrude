@@ -35,14 +35,13 @@ const KeyList: React.FC<Props> = ({ keys, editKey, deleteKey, viewMode }) => (
         </tr>
       </thead>
       <tbody>
-        {keys.map((key, i) => (
+        {keys.map((key) => (
           <Key
             key={key.id}
             record={key}
             onClick={() => editKey(key.id)}
             onDelete={() => deleteKey(key.id)}
             type="table"
-            isLast={i === keys.length - 1}
           />
         ))}
       </tbody>
@@ -59,12 +58,10 @@ interface TableHeadingProps {
 }
 
 const TableHeading: React.FC<TableHeadingProps> = ({ children, index, className }) => (
-  <th className={cx(`p-1`, className)}>
+  <th className={cx(`p-1 group`, className)}>
     <div
       className={cx(
-        `p-4 bg-white text-left rounded-lg border-[0.5px] border-slate-200`,
-        index === 0 && `rounded-tl-2xl`,
-        index === 3 && `rounded-tr-2xl`,
+        `p-4 bg-white text-left rounded-lg border-[0.5px] border-slate-200 group-first-of-type:rounded-tl-2xl group-last-of-type:rounded-tr-2xl`,
       )}
     >
       {children}

@@ -116,7 +116,7 @@ const Modal: React.FC<Props> = ({
               {loading ? (
                 <Dialog.Panel>
                   <div className="p-8 rounded-3xl">
-                    <Loading />
+                    <Loading withWhiteBg />
                   </div>
                 </Dialog.Panel>
               ) : (

@@ -40,6 +40,19 @@ export const Default: Story = props({
   ],
 });
 
+export const Single: Story = props({
+  userName: `Huck`,
+  days: [
+    {
+      date: new Date(time.stable()),
+      numItems: 330,
+      index: 0,
+      numDays: 3,
+      numCompleted: 330,
+    },
+  ],
+});
+
 export const Empty: Story = props({
   ...Default.args,
   days: [],

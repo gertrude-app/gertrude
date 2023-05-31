@@ -10,10 +10,9 @@ interface Props {
   onClick(): unknown;
   onDelete(): unknown;
   type: 'list' | 'table';
-  isLast?: boolean;
 }
 
-const Key: React.FC<Props> = ({ record, onClick, onDelete, type, isLast = false }) => {
+const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
   const key = toState(record);
   let scope = ``;
   switch (key.addressScope) {
@@ -27,8 +26,6 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type, isLast = false 
       scope = `all web browsers`;
       break;
   }
-
-  // [key.keytype (website or app)] key unlocking [target(record.key) === * ? everything : target(record.key)] for [scope]
 
   if (type === `list`) {
     return (
@@ -109,7 +106,9 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type, isLast = false 
       onClick={onClick}
     >
       <TableCell
-        className={cx(isLast && `rounded-bl-2xl`, `flex justify-center items-center`)}
+        className={cx(
+          `group-last-of-type:rounded-bl-2xl flex justify-center items-center`,
+        )}
       >
         <span
           className={cx(
@@ -146,7 +145,7 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type, isLast = false 
           {scope}
         </span>
       </TableCell>
-      <TableCell className={cx(isLast ? `rounded-br-2xl` : ``, `flex`)}>
+      <TableCell className={cx(`group-last-of-type:rounded-br-2xl flex`)}>
         <span
           className={cx(
             `font-medium italic`,

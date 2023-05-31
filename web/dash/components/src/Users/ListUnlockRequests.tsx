@@ -36,7 +36,7 @@ const ListUnlockRequests: React.FC<Props> = ({ requests, singleUser }) => (
         icon={`unlock`}
         buttonText={`Back to dashboard`}
         buttonIcon={`arrow-left`}
-        action={``}
+        action={`/`}
       />
     )}
   </div>

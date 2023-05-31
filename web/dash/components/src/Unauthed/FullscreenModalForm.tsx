@@ -15,7 +15,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
     case `ongoing`:
       return (
         <FullscreenGradientBg>
-          <Loading />
+          <Loading withWhiteBg />
         </FullscreenGradientBg>
       );
 
