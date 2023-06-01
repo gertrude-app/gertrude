@@ -44,7 +44,9 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
     if (activityDayKey.endsWith(date)) {
       const payload = activityRequest.payload;
 
-      activity[payload.userName] = typesafe.objectValues(payload.items);
+      activity[payload.userName] = typesafe
+        .objectValues(payload.items)
+        .filter((item) => !item.deleted);
       numDeleted += payload.numDeleted;
     }
   }
