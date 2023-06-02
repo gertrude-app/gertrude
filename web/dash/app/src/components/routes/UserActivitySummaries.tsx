@@ -1,45 +1,40 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { ApiErrorMessage, Loading, ActivitySummaries } from '@dash/components';
-import { useDispatch, useSelector } from '../../redux/hooks';
-import { activityDayKey, fetchUserActivitySummaries } from '../../redux/slice-users';
-import { Req } from '../../redux/helpers';
+import { entireDays } from '../../lib/days';
+import { useQuery, Key } from '../../hooks';
+import Current from '../../environment';
 
 const UserActivitySummariesRoute: React.FC = () => {
   const { userId = `` } = useParams<{ userId: string }>();
-  const dispatch = useDispatch();
-  const { request, days } = useSelector((state) => ({
-    request: state.users.userActivitySummaries[userId],
-    days: state.users.userActivityFeedDays,
-  }));
 
-  useEffect(() => {
-    if (!request?.state || request?.state === `idle`) {
-      dispatch(fetchUserActivitySummaries({ userId }));
-    }
-  }, [dispatch, userId, request?.state]);
+  const getSummaries = useQuery(Key.userActivitySummaries(userId), () =>
+    Current.api.userActivitySummaries({ userId, dateRanges: entireDays(14) }),
+  );
 
-  if (!request || request.state === `idle` || request.state === `ongoing`) {
+  if (getSummaries.isLoading) {
     return <Loading />;
   }
-  if (request.state === `failed`) {
-    return <ApiErrorMessage error={request.error} />;
+
+  if (getSummaries.isError) {
+    return <ApiErrorMessage error={getSummaries.error} />;
   }
+
+  const summaries = getSummaries.data;
 
   return (
     <ActivitySummaries
-      userName={request.payload.userName}
-      days={request.payload.days.map((day, index) => {
-        const date = new Date(day.date);
-        const loadedDay = Req.payload(days[activityDayKey(userId, date)]);
-        return {
-          date,
+      userName={summaries.userName}
+      days={summaries.days
+        .filter((day) => day.totalItems > 0)
+        .sort((a, b) => (a.date < b.date ? 1 : -1))
+        .map((day, index) => ({
+          date: new Date(day.date),
           numItems: day.totalItems,
-          numCompleted: loadedDay?.numDeleted ?? day.numApproved,
+          numCompleted: day.numApproved,
           index,
-          numDays: request.payload.days.length,
-        };
-      })}
+          numDays: summaries.days.length,
+        }))}
     />
   );
 };

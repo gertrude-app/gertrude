@@ -2,18 +2,24 @@ import type { RequestState } from './utility';
 import type { CreatePendingNotificationMethod } from './';
 
 export type NewAdminNotificationMethodEvent =
-  | { type: 'create_clicked' }
-  | { type: 'cancel_clicked' }
-  | { type: 'send_code_clicked' }
-  | { type: 'verify_code_clicked' }
-  | { type: 'code_updated'; code: string }
-  | { type: 'email_address_updated'; email: string }
-  | { type: 'slack_channel_name_updated'; channelName: string }
-  | { type: 'slack_channel_id_updated'; channelId: string }
-  | { type: 'slack_token_updated'; token: string }
-  | { type: 'text_phone_number_updated'; phoneNumber: string }
+  | { type: 'createClicked' }
+  | { type: 'cancelClicked' }
+  | { type: 'sendCodeClicked' }
+  | { type: 'verifyCodeClicked' }
+  | { type: 'createPendingMethodStarted' }
+  | { type: 'createPendingMethodSucceeded'; methodId: UUID }
+  | { type: 'createPendingMethodFailed' }
+  | { type: 'confirmPendingMethodStarted' }
+  | { type: 'confirmPendingMethodSucceeded' }
+  | { type: 'confirmPendingMethodFailed' }
+  | { type: 'codeUpdated'; code: string }
+  | { type: 'emailAddressUpdated'; email: string }
+  | { type: 'slackChannelNameUpdated'; channelName: string }
+  | { type: 'slackChannelIdUpdated'; channelId: string }
+  | { type: 'slackTokenUpdated'; token: string }
+  | { type: 'textPhoneNumberUpdated'; phoneNumber: string }
   | {
-      type: 'method_type_updated';
+      type: 'methodTypeUpdated';
       methodType: CreatePendingNotificationMethod.Input['type'];
     };
 

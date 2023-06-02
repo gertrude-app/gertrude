@@ -1,50 +1,55 @@
-import React from 'react';
+import { v4 as uuid } from 'uuid';
+import React, { useState } from 'react';
 import { ErrorModal, KeyCreator, LoadingModal, Modal } from '@dash/components';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { toKeyRecord } from '@dash/keys';
-import { useDispatch, useSelector } from '../../../redux/hooks';
-import useApps from '../../../hooks/apps';
-import { editKeyEventReceived } from '../../../redux/slice-keychains';
-import UnexpectedError from '../../UnexpectedError';
-import { acceptUnlockRequest } from '../../../redux/slice-unlock-requests';
+import { convert, toKeyRecord } from '@dash/keys';
+import { Result } from '@dash/types';
+import type { EditKey } from '@dash/keys';
+import Current from '../../../environment';
+import { useQuery, Key, useZip, useMutation, useApps } from '../../../hooks';
+import editKeyReducer from '../../../reducers/edit-key-reducer';
 
 const EditUnlockRequestKey: React.FC = () => {
-  const { unlockRequestId = `` } = useParams<{ unlockRequestId: string }>();
-  const dispatch = useDispatch();
+  const { id = ``, keychainId = `` } = useParams<{ id: string; keychainId: string }>();
+  const [key, setKey] = useState<EditKey.State | null>(null);
   const navigate = useNavigate();
-  const appsReq = useApps();
-  const { key, updateReq } = useSelector((state) => ({
-    key: state.keychains.editingKey,
-    updateReq: state.unlockRequests.updateReqs[unlockRequestId],
-  }));
 
-  if (!key) {
-    return <Navigate to="../select-keychain" />;
-  }
+  const query = useZip(
+    useApps(),
+    useQuery(Key.unlockRequest(id), () => Current.api.getUnlockRequest(id), {
+      onReceive: (unlockRequest) =>
+        setKey(convert.unlockRequestToState(uuid(), keychainId, unlockRequest)),
+    }),
+  );
 
-  if (
-    appsReq.state === `ongoing` ||
-    appsReq.state === `idle` ||
-    updateReq?.state === `ongoing`
-  ) {
-    return <LoadingModal />;
-  }
+  const accept = useMutation(async (key: EditKey.State) => {
+    const keyRecord = convert.toKeyRecord(key);
+    if (!keyRecord) return Result.resolveUnexpected(`76cfc4ee`);
+    const insert = await Current.api.saveKey({ isNew: true, ...keyRecord });
+    if (insert.isError) return insert;
+    // TODO: make an `AcceptUnlockRequest` pair, to combine these
+    return Current.api.updateUnlockRequest({ id, status: `accepted` });
+  });
 
-  if (appsReq.state === `failed`) {
-    return <UnexpectedError id="d9fedb07" />;
-  }
-
-  if (updateReq?.state === `failed`) {
+  if (accept.isError) {
     return (
       <ErrorModal
         title="Error accepting unlock request"
-        error={updateReq.error}
+        error={accept.error}
         primaryButton={{ label: `Try again`, action: () => navigate(`..`) }}
       />
     );
   }
 
-  if (updateReq?.state === `succeeded`) {
+  if (query.isError) {
+    return <ErrorModal error={query.error} />;
+  }
+
+  if (query.isLoading || accept.isLoading || !key) {
+    return <LoadingModal />;
+  }
+
+  if (accept.isSuccess) {
     return <Navigate to=".." />;
   }
 
@@ -60,15 +65,18 @@ const EditUnlockRequestKey: React.FC = () => {
       }}
       primaryButton={{
         label: <>Submit &rarr;</>,
-        action: () => dispatch(acceptUnlockRequest(unlockRequestId)),
+        action: () => accept.mutate(key),
         disabled: toKeyRecord(key) === null,
       }}
     >
       <div className="px-2">
         <KeyCreator
           {...key}
-          update={(event) => dispatch(editKeyEventReceived(event))}
-          apps={appsReq.payload}
+          update={(event) => {
+            editKeyReducer(key, event);
+            setKey({ ...key });
+          }}
+          apps={query.data[0]}
         />
       </div>
     </Modal>

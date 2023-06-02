@@ -1,14 +1,16 @@
+import { useQueryClient } from '@tanstack/react-query';
 import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useDispatch } from '../../redux/hooks';
-import { logoutRouteVisited } from '../../redux/slice-auth';
+import { useAuth } from '../../hooks/auth';
 
 const Logout: React.FC = () => {
-  const dispatch = useDispatch();
+  const { logout } = useAuth();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    dispatch(logoutRouteVisited());
-  }, [dispatch]);
+    logout();
+    queryClient.clear();
+  }, [logout, queryClient]);
 
   return <Navigate to={`/login${window.location.search}`} replace />;
 };

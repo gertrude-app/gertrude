@@ -1,12 +1,12 @@
 import React from 'react';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
-import { useSelector } from '../redux/hooks';
+import { useAuth } from '../hooks/auth';
 import Chrome from './Chrome';
 
 const Authed: React.FC = () => {
-  const isLoggedIn = useSelector((state) => state.auth.admin !== null);
+  const { admin } = useAuth();
   const location = useLocation();
-  if (!isLoggedIn) {
+  if (admin === null) {
     return (
       <Navigate
         to={`/logout${

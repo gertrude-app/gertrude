@@ -1,44 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ApiErrorMessage, FullscreenModalForm, LoginForm } from '@dash/components';
 import { Navigate } from 'react-router-dom';
-import type { RequestState } from '@dash/types';
-import { useDispatch, useSelector } from '../../redux/hooks';
-import {
-  loginEmailUpdated,
-  loginPasswordUpdated,
-  submitLoginForm,
-  requestMagicLink,
-} from '../../redux/slice-auth';
-import { Req } from '../../redux/helpers';
-import useLoginRedirect from '../../hooks/login-redirect';
+import { useAuth } from '../../hooks/auth';
+import { useMutation, useLoginRedirect } from '../../hooks';
+import Current from '../../environment';
 
-type Props = React.ComponentProps<typeof LoginForm> & {
-  passwordRequest: RequestState;
-  magicLinkRequest: RequestState;
-};
-
-export const Login: React.FC<Props> = ({
-  email,
-  setEmail,
-  passwordRequest,
-  magicLinkRequest,
-  onSubmit,
-  password,
-  setPassword,
-  onSendMagicLink,
-}) => {
-  const admin = useSelector((state) => state.auth.admin);
+export const Login: React.FC = () => {
+  const { admin, login } = useAuth();
   const redirectUrl = useLoginRedirect();
+  const [email, setEmail] = useState(``);
+  const [password, setPassword] = useState(``);
 
-  if (admin !== null || passwordRequest.state === `succeeded`) {
+  const requestMagicLink = useMutation(() =>
+    Current.api.requestMagicLink({
+      email,
+      redirect: new URLSearchParams(window.location.search).get(`redirect`) ?? undefined,
+    }),
+  );
+
+  const loginMutation = useMutation(() => Current.api.login({ email, password }), {
+    onSuccess: ({ adminId, token }) => login(adminId, token),
+  });
+
+  if (admin !== null || loginMutation.isSuccess) {
     return <Navigate to={redirectUrl ?? `/`} replace />;
   }
 
-  if (passwordRequest.state === `ongoing` || magicLinkRequest.state === `ongoing`) {
+  if (loginMutation.isLoading || requestMagicLink.isLoading) {
     return <FullscreenModalForm request="ongoing" />;
   }
 
-  if (magicLinkRequest.state === `succeeded`) {
+  if (requestMagicLink.isSuccess) {
     return (
       <FullscreenModalForm
         request="succeeded"
@@ -47,14 +39,14 @@ export const Login: React.FC<Props> = ({
     );
   }
 
-  if (passwordRequest.state === `failed` || magicLinkRequest.state === `failed`) {
+  if (loginMutation.isError || requestMagicLink.isError) {
     return (
       <FullscreenModalForm
         request="failed"
         error={
           <ApiErrorMessage
             wrapped={false}
-            error={Req.error(passwordRequest) ?? Req.error(magicLinkRequest)}
+            error={loginMutation.error ?? requestMagicLink.error ?? undefined}
           />
         }
       />
@@ -68,35 +60,11 @@ export const Login: React.FC<Props> = ({
         setEmail={setEmail}
         password={password}
         setPassword={setPassword}
-        onSubmit={onSubmit}
-        onSendMagicLink={onSendMagicLink}
+        onSubmit={() => loginMutation.mutate(undefined)}
+        onSendMagicLink={() => requestMagicLink.mutate(undefined)}
       />
     </FullscreenModalForm>
   );
 };
 
-// container
-
-const LoginContainer: React.FC = () => {
-  const dispatch = useDispatch();
-  const { email, password, passwordRequest, magicLinkRequest } = useSelector((state) => ({
-    email: state.auth.loginEmail,
-    password: state.auth.loginPassword,
-    passwordRequest: state.auth.passwordLoginRequest,
-    magicLinkRequest: state.auth.requestMagicLinkRequest,
-  }));
-  return (
-    <Login
-      passwordRequest={passwordRequest}
-      magicLinkRequest={magicLinkRequest}
-      email={email}
-      setEmail={(email) => dispatch(loginEmailUpdated(email))}
-      password={password}
-      setPassword={(password) => dispatch(loginPasswordUpdated(password))}
-      onSubmit={() => dispatch(submitLoginForm())}
-      onSendMagicLink={() => dispatch(requestMagicLink())}
-    />
-  );
-};
-
-export default LoginContainer;
+export default Login;

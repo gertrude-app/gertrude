@@ -6,7 +6,7 @@ import type {
   KeychainSummary,
 } from '@dash/types';
 import { betsy } from '../fixtures/helpers';
-import * as mock from '../../src/redux/__tests__/mocks';
+import * as mock from '../../src/reducers/__tests__/mocks';
 
 describe(`unlock request flow`, () => {
   let unlockRequest: UnlockRequest;
@@ -17,7 +17,11 @@ describe(`unlock request flow`, () => {
   beforeEach(() => {
     cy.simulateLoggedIn();
 
-    keychain = mock.keychainSummary({ authorId: betsy.id, name: `Music Theory` });
+    keychain = mock.keychainSummary({
+      id: `keychain-id`,
+      authorId: betsy.id,
+      name: `Music Theory`,
+    });
     user = mock.user({ id: `1`, keychains: [keychain] });
     selectable = { own: [keychain], public: [] };
     unlockRequest = mock.unlockRequest({ id: `2`, userId: `1` });
@@ -42,7 +46,17 @@ describe(`unlock request flow`, () => {
     cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2/select-keychain`);
     cy.contains(`Music Theory`).click();
     cy.contains(`Review key`).click();
-    cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2/edit-key`);
+    cy.location(`pathname`).should(
+      `eq`,
+      `/users/1/unlock-requests/2/edit-key/keychain-id`,
+    );
+
+    // server should now say it's been accepted when it refetches
+    cy.intercept(
+      `/pairql/dashboard/GetUnlockRequest`,
+      mock.unlockRequest({ id: `2`, userId: `1`, status: `accepted` }),
+    );
+
     cy.contains(`Submit`).click();
     cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2`);
     cy.contains(`accepted`);
@@ -52,9 +66,16 @@ describe(`unlock request flow`, () => {
     cy.visit(`/users/1/unlock-requests/2`);
     cy.url().should(`include`, `/review`);
     cy.contains(`Deny`).click();
-    cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2/deny-comment`);
+    cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2/deny`);
     cy.contains(`comment`);
     cy.testId(`deny-unlock-req-comment`).type(`nope`);
+
+    // server should say it's been rejected when it refetches
+    cy.intercept(
+      `/pairql/dashboard/GetUnlockRequest`,
+      mock.unlockRequest({ id: `2`, userId: `1`, status: `rejected` }),
+    );
+
     cy.contains(`Deny`).click();
     cy.wait(`@updateUnlockRequest`)
       .its(`request.body.responseComment`)
@@ -173,7 +194,7 @@ describe(`unlock request flow`, () => {
   });
 
   it(`shows useful error message on accept failure`, () => {
-    cy.visit(`/users/1/unlock-requests/2/edit-key`);
+    cy.visit(`/users/1/unlock-requests/2/select-keychain`);
     cy.contains(`Music Theory`).click();
     cy.contains(`Review key`).click();
     cy.intercept(`/pairql/dashboard/UpdateUnlockRequest`, {
@@ -185,9 +206,15 @@ describe(`unlock request flow`, () => {
   });
 
   it(`handles deny flow, starting from deny url`, () => {
-    // so when we redirect back to ../, the api says it has been rejected
-    unlockRequest.status = `rejected`;
     cy.visit(`/users/1/unlock-requests/2/deny`);
+
+    // server should say it's been rejected when it refetches
+    cy.intercept(
+      `/pairql/dashboard/GetUnlockRequest`,
+      mock.unlockRequest({ id: `2`, userId: `1`, status: `rejected` }),
+    );
+
+    cy.contains(`Deny`).click();
     cy.location(`pathname`).should(`eq`, `/users/1/unlock-requests/2`);
     cy.contains(`rejected`);
   });

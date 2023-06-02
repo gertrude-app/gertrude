@@ -1,37 +1,28 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Loading, ListUnlockRequests, ApiErrorMessage } from '@dash/components';
-import { typesafe } from '@shared/ts-utils';
-import { useDispatch, useSelector } from '../../../redux/hooks';
-import { getUserUnlockRequests } from '../../../redux/slice-unlock-requests';
+import Current from '../../../environment';
+import { useQuery, useUser, Key, useZip } from '../../../hooks';
 
 const UserUnlockRequests: React.FC = () => {
   const { userId: id = `` } = useParams<{ userId: string }>();
-  const dispatch = useDispatch();
-  const fetch = useSelector((state) => state.unlockRequests.fetchReqs[id]);
-  const requests = useSelector((state) =>
-    typesafe
-      .objectValues(state.unlockRequests.entities)
-      .filter((req) => req.userId === id),
+  const query = useZip(
+    useQuery(Key.userUnlockRequests(id), () => Current.api.getUserUnlockRequests(id)),
+    useUser(id),
   );
 
-  useEffect(() => {
-    if (fetch?.state === undefined || fetch?.state === `idle`) {
-      dispatch(getUserUnlockRequests(id));
-    }
-  }, [dispatch, id, fetch?.state]);
-
-  if (!fetch?.state || fetch?.state === `idle` || fetch?.state === `ongoing`) {
+  if (query.isLoading) {
     return <Loading />;
   }
 
-  if (fetch?.state === `failed`) {
-    return <ApiErrorMessage error={fetch.error} />;
+  if (query.isError) {
+    return <ApiErrorMessage error={query.error} />;
   }
 
+  const [requests, user] = query.data;
   return (
     <ListUnlockRequests
-      singleUser
+      userName={user.name}
       requests={requests.map((req) => ({
         id: req.id,
         url: req.url ?? req.domain ?? req.ipAddress ?? ``,

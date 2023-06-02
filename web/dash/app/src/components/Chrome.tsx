@@ -1,33 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Chrome } from '@dash/components';
-import { useDispatch, useSelector } from '../redux/hooks';
-import {
-  hamburgerMenuClicked,
-  mobileSidebarClosed,
-  desktopSidebarCollapsedToggled,
-  menuInternalLinkClicked,
-} from '../redux/slice-menu';
+import useWindowWidth from '../hooks/window-width';
+import Current from '../environment';
 
 interface Props {
   children: React.ReactNode;
 }
 
 const ChromeContainer: React.FC<Props> = ({ children }) => {
-  const dispatch = useDispatch();
-  const mobileSidebarOpen = useSelector((state) => state.menu.mobileSidebarOpen);
-  const sidebarCollapsed = useSelector((state) => state.menu.desktopSidebarCollapsed);
-  const windowWidth = useSelector((state) => state.menu.windowWidth);
+  const windowWidth = useWindowWidth();
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] = useState(
+    Current.localStorage.getItem(`desktop_sidebar_collapsed`) === `true`,
+  );
 
   return (
     <Chrome
       children={children}
       mobileSidebarOpen={mobileSidebarOpen}
       urlPath={location.pathname}
-      sidebarCollapsed={sidebarCollapsed}
-      onMobileHamburgerClick={() => dispatch(hamburgerMenuClicked())}
-      onMobileSidebarClose={() => dispatch(mobileSidebarClosed())}
-      onToggleSidebarCollapsed={() => dispatch(desktopSidebarCollapsedToggled())}
-      onInternalLinkClick={() => dispatch(menuInternalLinkClicked())}
+      sidebarCollapsed={desktopSidebarCollapsed}
+      onMobileHamburgerClick={() => setMobileSidebarOpen(true)}
+      onMobileSidebarClose={() => setMobileSidebarOpen(false)}
+      onToggleSidebarCollapsed={() => {
+        const toggled = !desktopSidebarCollapsed;
+        Current.localStorage.setItem(`desktop_sidebar_collapsed`, `${toggled}`);
+        setDesktopSidebarCollapsed(toggled);
+      }}
+      onInternalLinkClick={() => setMobileSidebarOpen(false)}
       usingMobileView={windowWidth < 768}
     />
   );

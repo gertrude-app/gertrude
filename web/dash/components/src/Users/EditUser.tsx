@@ -30,7 +30,7 @@ interface Props {
   startAddDevice(): unknown;
   dismissAddDevice(): unknown;
   deleteDevice: ConfirmableEntityAction;
-  addDeviceRequest?: RequestState<number>;
+  addDeviceRequest?: RequestState<{ code: number }>;
   saveButtonDisabled: boolean;
   onSave(): unknown;
   onAddKeychainClicked(): unknown;
@@ -202,6 +202,7 @@ const EditUser: React.FC<Props> = ({
             </Button>
           )}
           <Button
+            className="ScrollTop"
             type="button"
             disabled={saveButtonDisabled}
             onClick={onSave}

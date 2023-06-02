@@ -1,36 +1,19 @@
 import { expect, it, test, describe } from 'vitest';
-import { unsavedId } from '@dash/utils';
-import { Req } from '../helpers';
-import reducer, {
-  confirmPendingNotificationMethod,
-  createPendingNotificationMethod,
-  fetchProfileData,
-  newNotificationMethodEvent,
-  notificationCreated,
-  upsertNotification,
-} from '../slice-admin';
-import { makeState } from './test-helpers';
+import type { State } from '../admin-reducer';
+import { Req } from '../../lib/helpers';
+import reducer, { initialState } from '../admin-reducer';
 import * as mock from './mocks';
-
-describe(`createNotification flow`, () => {
-  test(`happy path, replacing temporary client id`, () => {
-    const tempId = unsavedId();
-    let state = reducer(undefined, notificationCreated());
-    expect(state.notifications[tempId]).toBeDefined();
-
-    state = reducer(state, upsertNotification.succeeded({ id: `apiId` }, tempId));
-    expect(state.notifications[tempId]).toBeUndefined();
-    expect(state.notifications.apiId).toBeDefined();
-  });
-});
 
 describe(`create new notification method flow`, () => {
   test(`happy path`, () => {
+    let state: State = { ...initialState };
+
     // step 1: create a new pending notification method
-    let state = reducer(
-      undefined,
-      newNotificationMethodEvent({ type: `create_clicked` }),
-    );
+    state = reducer(state, {
+      type: `newNotificationMethodEvent`,
+      event: { type: `createClicked` },
+    });
+
     expect(state.pendingNotificationMethod).toEqual({
       sendCodeRequest: Req.idle(),
       confirmationRequest: Req.idle(),
@@ -42,37 +25,62 @@ describe(`create new notification method flow`, () => {
     });
 
     // step 2: update the email address to a valid state
-    state = reducer(
-      state,
-      newNotificationMethodEvent({ type: `email_address_updated`, email: `foo@bar.com` }),
-    );
+    state = reducer(state, {
+      type: `newNotificationMethodEvent`,
+      event: { type: `emailAddressUpdated`, email: `foo@bar.com` },
+    });
+
     expect(state.pendingNotificationMethod).toMatchObject({
       value: { email: `foo@bar.com` },
     });
 
     // step 3: simulate a successfull request to generate a code
-    state = reducer(
-      state,
-      createPendingNotificationMethod.succeeded({ methodId: `pendingId` }),
-    );
+    state = reducer(state, {
+      type: `newNotificationMethodEvent`,
+      event: { type: `createPendingMethodStarted` },
+    });
+
     expect(state.pendingNotificationMethod).toMatchObject({
-      sendCodeRequest: Req.succeed(`pendingId`),
+      sendCodeRequest: Req.ongoing(),
+    });
+
+    state = reducer(state, {
+      type: `newNotificationMethodEvent`,
+      event: { type: `createPendingMethodSucceeded`, methodId: `new-method-id` },
+    });
+
+    expect(state.pendingNotificationMethod).toMatchObject({
+      sendCodeRequest: Req.succeed(`new-method-id`),
     });
 
     // step 4: simulate a successful verification code submitted
-    state = reducer(state, confirmPendingNotificationMethod.succeeded({ success: true }));
+    state = reducer(state, {
+      type: `newNotificationMethodEvent`,
+      event: { type: `confirmPendingMethodStarted` },
+    });
+
+    expect(state.pendingNotificationMethod).toMatchObject({
+      confirmationRequest: Req.ongoing(),
+    });
+
+    state = reducer(state, {
+      type: `newNotificationMethodEvent`,
+      event: { type: `confirmPendingMethodSucceeded` },
+    });
+
     expect(state.pendingNotificationMethod).toBeUndefined();
-    expect(state.notificationMethods.pendingId).toMatchObject({
+
+    expect(state.notificationMethods[`new-method-id`]).toMatchObject({
       type: `VerifiedEmailMethod`,
       value: {
-        id: `pendingId`,
+        id: `new-method-id`,
         email: `foo@bar.com`,
       },
     });
   });
 });
 
-describe(`fetchProfileData`, () => {
+describe(`receiving admin from api`, () => {
   it(`.succeeded sets correctly massaged data on state slice`, () => {
     const apiData = mock.adminProfile({
       email: `blob@blob.com`,
@@ -96,13 +104,12 @@ describe(`fetchProfileData`, () => {
       ],
     });
 
-    const nextState = reducer(makeState().admin, fetchProfileData.succeeded(apiData));
-
-    expect(nextState.profileRequest).toEqual(
-      Req.succeed({
-        email: `blob@blob.com`,
-        subscriptionStatus: `trialing`,
-      }),
+    const nextState = reducer(
+      { ...initialState },
+      {
+        type: `receivedAdmin`,
+        admin: apiData,
+      },
     );
 
     expect(nextState.notificationMethods).toEqual({
@@ -118,6 +125,7 @@ describe(`fetchProfileData`, () => {
 
     expect(nextState.notifications).toEqual({
       notification1: {
+        id: `notification1`,
         editing: false,
         original: {
           id: `notification1`,

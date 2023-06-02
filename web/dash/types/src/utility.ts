@@ -31,6 +31,7 @@ export type PqlError = Omit<
   | 'dashboardTag'
   | 'appTag'
 > & {
+  isPqlError: true;
   type: ServerPqlError['type'] | 'clientError';
   tag?: ServerPqlError['dashboardTag'];
   showContactSupport?: boolean;

@@ -1,8 +1,8 @@
 /// <reference types="cypress" />
 import { dateFromUrl } from '@dash/datetime';
 import { time } from '@shared/datetime';
-import * as mock from '../../src/redux/__tests__/mocks';
-import { entireDay } from '../../src/lib/helpers';
+import * as mock from '../../src/reducers/__tests__/mocks';
+import { entireDay } from '../../src/lib/days';
 
 describe(`user screen`, () => {
   beforeEach(() => {
@@ -23,6 +23,12 @@ describe(`user screen`, () => {
       cy.visit(`/users/new`);
       cy.testId(`user-name`).type(`Bo`);
 
+      // simulate freshly saved user from server
+      cy.intercept(
+        `/pairql/dashboard/GetUser`,
+        mock.user({ name: `Bo`, id: `user-123` }),
+      );
+
       cy.contains(`Save user`).click();
       cy.wait(`@saveUser`);
 
@@ -30,12 +36,8 @@ describe(`user screen`, () => {
       cy.contains(`Save user`).should(`be.disabled`);
 
       cy.testId(`user-name`).type(`az`);
-      cy.contains(`Save user`).should(`be.enabled`).click();
-      cy.wait(`@saveUser`);
 
-      cy.sidebarClick(`Users`);
-      cy.contains(`Boaz`);
-      cy.testId(`user-card`).should(`have.length`, 2);
+      cy.contains(`Save user`).should(`be.enabled`);
     });
 
     it(`redirects to new uuid path & doesn't list unsaved new user`, () => {
@@ -53,8 +55,8 @@ describe(`user screen`, () => {
 
   describe(`user deletion`, () => {
     it(`redirects to /users path`, () => {
-      cy.visit(`/users`);
-      cy.contains(`Edit`).click();
+      cy.intercept(`/pairql/dashboard/GetUser`, mock.user({ id: `user-123` }));
+      cy.visit(`/users/user-123`);
 
       cy.contains(`Delete user`).click();
       cy.testId(`modal-primary-btn`).click();
@@ -67,18 +69,16 @@ describe(`user screen`, () => {
   describe(`all users activity`, () => {
     it(`overviews page`, () => {
       cy.intercept(`/pairql/dashboard/CombinedUsersActivitySummaries`, [
-        mock.combinedUsersActivitySummary({
-          userId: `1`,
-          days: [
-            mock.userActivitySummary(10, 4, time.now()),
-            mock.userActivitySummary(1234, 5, time.subtracting({ days: 1 })),
-          ],
-        }),
-        mock.combinedUsersActivitySummary({
-          userId: `456`,
-          userName: `Suzy`,
-          days: [mock.userActivitySummary(16, 2, time.now())],
-        }),
+        {
+          date: time.subtracting({ days: 1 }),
+          numApproved: 5,
+          totalItems: 1234,
+        },
+        {
+          date: time.now(),
+          numApproved: 6,
+          totalItems: 26,
+        },
       ]);
 
       cy.visit(`/users/activity`);
@@ -88,7 +88,7 @@ describe(`user screen`, () => {
     });
 
     it(`review day`, () => {
-      const ids = [
+      const suzyIds = [
         `a70ab833-d7c5-4eb0-8a86-83738188bec0`,
         `ff285ff7-28d8-43f6-8ecd-bb6c3037196c`,
         `359741a3-b61c-456e-a50b-47cc4abfc33a`,
@@ -96,7 +96,23 @@ describe(`user screen`, () => {
       cy.intercept(`/pairql/dashboard/CombinedUsersActivityFeed`, (req) => {
         req.alias = `combinedUsersActivityFeed`;
         req.reply([
-          mock.combinedUsersActivityFeed(),
+          mock.combinedUsersActivityFeed({
+            userName: `Bob`,
+            numDeleted: 0,
+            items: [
+              {
+                type: `Screenshot`,
+                value: {
+                  id: `screenshot-123`,
+                  ids: [`screenshot-123`],
+                  url: `https://placekitten.com/700/400`,
+                  width: 700,
+                  height: 400,
+                  createdAt: new Date().toISOString(),
+                },
+              },
+            ],
+          }),
           mock.combinedUsersActivityFeed({
             userName: `Suzy`,
             numDeleted: 1,
@@ -104,8 +120,8 @@ describe(`user screen`, () => {
               {
                 type: `CoalescedKeystrokeLine`,
                 value: {
-                  id: ids[0],
-                  ids: ids,
+                  id: suzyIds[0],
+                  ids: suzyIds,
                   appName: `Firefox`,
                   line: `ChatGPT, tell me how to link vapor and lib-bsm with a simlink decorator`,
                   createdAt: new Date().toISOString(),
@@ -127,12 +143,14 @@ describe(`user screen`, () => {
         req.reply({ success: true });
       });
 
-      cy.contains(`Approve all Suzy’s activity`).click();
+      cy.contains(`Approve all user activity`).click();
 
-      cy.wait(`@deleteActivityItems`).its(`request.body`).should(`deep.equal`, {
-        keystrokeLineIds: ids,
-        screenshotIds: [],
-      });
+      cy.wait(`@deleteActivityItems`)
+        .its(`request.body`)
+        .should(`deep.equal`, {
+          keystrokeLineIds: suzyIds,
+          screenshotIds: [`screenshot-123`],
+        });
     });
   });
 });

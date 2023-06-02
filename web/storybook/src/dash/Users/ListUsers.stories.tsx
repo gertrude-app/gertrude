@@ -79,7 +79,7 @@ export const AddingDevice: Story = props({
   users: Default.args.users.slice(0, 1),
   addDeviceRequest: {
     state: `succeeded`,
-    payload: 123123,
+    payload: { code: 123123 },
   },
 });
 

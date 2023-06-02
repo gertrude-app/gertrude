@@ -265,12 +265,12 @@ export const liveClient = {
   },
 
   saveNotification(
-    input: T.SaveNotification_v0.Input,
-  ): Promise<T.Result<T.SaveNotification_v0.Output>> {
-    return query<T.SaveNotification_v0.Input, T.SaveNotification_v0.Output>(
+    input: T.SaveNotification.Input,
+  ): Promise<T.Result<T.SaveNotification.Output>> {
+    return query<T.SaveNotification.Input, T.SaveNotification.Output>(
       input,
       `admin`,
-      `SaveNotification_v0`,
+      `SaveNotification`,
     );
   },
 

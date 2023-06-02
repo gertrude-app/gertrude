@@ -28,14 +28,14 @@ const EditNotificationSidebar: React.FC<Props> = ({
           { value: `Slack`, display: `Slack` },
         ]}
         selectedOption={props.type}
-        setSelected={(methodType) => onEvent({ type: `method_type_updated`, methodType })}
+        setSelected={(methodType) => onEvent({ type: `methodTypeUpdated`, methodType })}
       />
       {props.type === `Email` ? (
         <TextInput
           key="email"
           type="email"
           value={props.value.email}
-          setValue={(email) => onEvent({ type: `email_address_updated`, email })}
+          setValue={(email) => onEvent({ type: `emailAddressUpdated`, email })}
           label="Email address:"
           required
         />
@@ -47,7 +47,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
           required
           value={props.value.phoneNumber}
           setValue={(phoneNumber) =>
-            onEvent({ type: `text_phone_number_updated`, phoneNumber })
+            onEvent({ type: `textPhoneNumberUpdated`, phoneNumber })
           }
         />
       ) : (
@@ -59,7 +59,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
             required
             value={props.value.channelName}
             setValue={(channelName) =>
-              onEvent({ type: `slack_channel_name_updated`, channelName })
+              onEvent({ type: `slackChannelNameUpdated`, channelName })
             }
           />
           <TextInput
@@ -68,7 +68,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
             required
             value={props.value.channelId}
             setValue={(channelId) =>
-              onEvent({ type: `slack_channel_id_updated`, channelId })
+              onEvent({ type: `slackChannelIdUpdated`, channelId })
             }
           />
           <TextInput
@@ -77,7 +77,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
             placeholder="xoxb-xxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxx"
             required
             value={props.value.token}
-            setValue={(token) => onEvent({ type: `slack_token_updated`, token })}
+            setValue={(token) => onEvent({ type: `slackTokenUpdated`, token })}
           />
         </>
       )}
@@ -86,7 +86,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
       {sendCodeRequest.state !== `succeeded` ? (
         <Button
           type="button"
-          onClick={() => onEvent({ type: `send_code_clicked` })}
+          onClick={() => onEvent({ type: `sendCodeClicked` })}
           color="secondary"
           disabled={!methodValid(props) || sendCodeRequest.state === `ongoing`}
           className="self-end mt-4"
@@ -101,12 +101,12 @@ const EditNotificationSidebar: React.FC<Props> = ({
             type="text"
             value={confirmationCode}
             disabled={confirmationRequest.state === `ongoing`}
-            setValue={(code) => onEvent({ type: `code_updated`, code })}
+            setValue={(code) => onEvent({ type: `codeUpdated`, code })}
           />
           <div className="flex justify-start flex-row-reverse mt-4">
             <Button
               type="button"
-              onClick={() => onEvent({ type: `verify_code_clicked` })}
+              onClick={() => onEvent({ type: `verifyCodeClicked` })}
               color="secondary"
               disabled={
                 confirmationCode.match(/^\d{6}$/) === null ||
@@ -118,7 +118,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
             </Button>
             <Button
               type="button"
-              onClick={() => onEvent({ type: `send_code_clicked` })}
+              onClick={() => onEvent({ type: `sendCodeClicked` })}
               color="tertiary"
               disabled={!methodValid(props) || confirmationRequest.state === `ongoing`}
             >
@@ -130,7 +130,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
     </div>
     <Button
       type="button"
-      onClick={() => onEvent({ type: `cancel_clicked` })}
+      onClick={() => onEvent({ type: `cancelClicked` })}
       color="tertiary"
       fullWidth
       className="mt-auto justify-end"

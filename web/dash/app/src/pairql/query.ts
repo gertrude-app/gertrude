@@ -15,6 +15,7 @@ export async function query<Input, Output>(
       Current.sessionStorage.getItem(`admin_token`);
     if (!token) {
       return errorResult({
+        isPqlError: true,
         id: `10569a9f`,
         type: `loggedOut`,
         debugMessage: `No admin token found`,
@@ -50,6 +51,21 @@ export async function query<Input, Output>(
   }
 }
 
+// todo: maybe move this?
+export function ensurePqlError(error: unknown): PqlError {
+  if (typeof error === `object` && error !== null && `isPqlError` in error) {
+    return error as PqlError;
+  } else {
+    return {
+      isPqlError: true,
+      id: `59b169c4`,
+      type: `clientError`,
+      debugMessage: `Unexpected non-pql error: ${error}`,
+      showContactSupport: true,
+    };
+  }
+}
+
 // helpers
 
 function errorResult(error: PqlError): Result<never, PqlError> {
@@ -61,6 +77,7 @@ function errorResult(error: PqlError): Result<never, PqlError> {
 
 function toClientError(serverError: ServerPqlError): PqlError {
   return {
+    isPqlError: true,
     id: serverError.id,
     type: serverError.type,
     serverRequestId: serverError.requestId,
@@ -76,6 +93,7 @@ function toClientError(serverError: ServerPqlError): PqlError {
 function handleUnknown(error: unknown): Result<never, PqlError> {
   if (`${error}`.includes(`Failed to fetch`)) {
     return errorResult({
+      isPqlError: true,
       id: `34fbe3e3`,
       type: `clientError`,
       userMessage: `Something seems funny with the network. Are you sure you're connected to the internet?`,
@@ -84,6 +102,7 @@ function handleUnknown(error: unknown): Result<never, PqlError> {
   }
 
   return errorResult({
+    isPqlError: true,
     id: `b3162834`,
     type: `clientError`,
     debugMessage: `Unexpected error: ${error}`,

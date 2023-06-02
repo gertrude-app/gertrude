@@ -8,7 +8,7 @@ import UserCard from './UserCard';
 
 type Props = {
   users: Subcomponents<typeof UserCard>;
-  addDeviceRequest?: RequestState<number>;
+  addDeviceRequest?: RequestState<{ code: number }>;
   startAddDevice(userId: UUID): unknown;
   dismissAddDevice(): unknown;
 };

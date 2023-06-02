@@ -153,7 +153,7 @@ const noopClient: ApiClient = {
     return Result.success({ success: true });
   },
   saveNotification: async () => {
-    return Result.success({ id: `` });
+    return Result.success({ success: true });
   },
   saveUser: async () => {
     return Result.success({ success: true });

@@ -19,10 +19,10 @@ export const Default = Template.bind({});
 Default.args = {
   date: new Date(time.stable()),
   chunkSize: 3,
-  activity: activity,
+  activity,
   numDeleted: 0,
   deleteItems: () => {},
 };
 
 export const Empty = Template.bind({});
-Empty.args = { ...Default.args, activity: {} };
+Empty.args = { ...Default.args, activity: [] };

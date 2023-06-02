@@ -1,45 +1,56 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { dateFromUrl } from '@dash/datetime';
-import { typesafe } from '@shared/ts-utils';
 import { ApiErrorMessage, Loading, UserActivityFeed } from '@dash/components';
-import { useDispatch, useSelector } from '../../redux/hooks';
+import { Result } from '@dash/types';
+import Current from '../../environment';
+import { useQuery, Key, useMutation, useOptimism } from '../../hooks';
+import { entireDay } from '../../lib/days';
 import {
-  deleteActivityItems,
-  fetchUserActivityFeed,
-  activityDayKey,
-} from '../../redux/slice-users';
+  outputItemToActivityFeedItem,
+  prepareUserActivityDelete,
+} from '../../lib/user-activity';
 
 const UserActivityFeedRoute: React.FC = () => {
-  const { userId = ``, date = `` } = useParams<{ userId: string; date: string }>();
-  const day = dateFromUrl(date);
-  const key = activityDayKey(userId, day);
-  const dispatch = useDispatch();
-  const request = useSelector((state) => state.users.userActivityFeedDays[key]);
-  const reqState = request?.state;
+  const { userId = ``, urlDate = `` } = useParams<{ userId: string; urlDate: string }>();
+  const date = dateFromUrl(urlDate);
+  const optimistic = useOptimism();
+  const queryKey = Key.userActivityFeed(userId, urlDate);
 
-  useEffect(() => {
-    if (!reqState || reqState === `idle`) {
-      dispatch(fetchUserActivityFeed({ userId, day: dateFromUrl(date) }));
-    }
-  }, [dispatch, userId, date, reqState]);
+  const query = useQuery(queryKey, () =>
+    Current.api.userActivityFeed({ userId, range: entireDay(date) }),
+  );
 
-  if (!request || request.state === `idle` || request.state === `ongoing`) {
+  const deleteItems = useMutation(
+    (rootIds: UUID[]) => {
+      const data = query.data;
+      if (!data) return Result.resolveUnexpected(`c86706e8`);
+      const [input, nextState] = prepareUserActivityDelete(rootIds, data);
+      optimistic.update(queryKey, nextState);
+      return Current.api.deleteActivityItems(input);
+    },
+    {
+      invalidating: [queryKey, Key.userActivitySummaries(userId), Key.dashboard],
+      toast: `delete:activity-items`,
+    },
+  );
+
+  if (query.isLoading) {
     return <Loading />;
   }
 
-  if (request.state === `failed`) {
-    return <ApiErrorMessage error={request.error} />;
+  if (query.isError) {
+    return <ApiErrorMessage error={query.error} />;
   }
 
   return (
     <UserActivityFeed
-      date={day}
-      numDeleted={request.payload.numDeleted}
-      deleteItems={(itemRootIds) =>
-        dispatch(deleteActivityItems({ date: day, itemRootIds }))
-      }
-      items={typesafe.objectValues(request.payload.items).filter((item) => !item.deleted)}
+      date={date}
+      numDeleted={query.data.numDeleted}
+      deleteItems={(rootIds) => deleteItems.mutate(rootIds)}
+      items={query.data.items
+        .map(outputItemToActivityFeedItem)
+        .filter((item) => !item.deleted)}
     />
   );
 };

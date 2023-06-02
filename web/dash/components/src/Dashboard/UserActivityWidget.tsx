@@ -19,7 +19,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
   );
   if (userActivity.length === 0)
     return (
-      <DashboardWidget className={cx(`bg-violet-50`, className)}>
+      <DashboardWidget className={cx(`!bg-violet-50`, className)}>
         <div className="flex flex-col justify-center items-center p-6 rounded-xl h-full">
           <h3 className="font-bold text-black text-opacity-80 text-lg">
             No recorded user activity

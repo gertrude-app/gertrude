@@ -12,7 +12,7 @@ import type {
   CombinedUsersActivitySummaries,
 } from '@dash/types';
 import type { ActivityFeedItem } from '@dash/components';
-import * as empty from '../../redux/empty';
+import * as empty from '../../lib/empty';
 
 type Admin = GetAdmin.Output;
 
@@ -120,16 +120,7 @@ export function userActivitySummary(
 export function combinedUsersActivitySummary(
   override: Partial<CombinedUsersActivitySummaries.Output[number]> = {},
 ): CombinedUsersActivitySummaries.Output[number] {
-  return {
-    userName: `Bob`,
-    userId: uuid(),
-    days: [
-      userActivitySummary(1, 1),
-      userActivitySummary(35, 25),
-      userActivitySummary(110, 1),
-    ],
-    ...override,
-  };
+  return { ...userActivitySummary(1, 1), ...override };
 }
 
 export function combinedUsersActivityFeed(
@@ -141,7 +132,6 @@ export function combinedUsersActivityFeed(
   return {
     userName: `Bob`,
     numDeleted: 0,
-    userId: uuid(),
     items: [
       {
         type: `Screenshot`,

@@ -40,7 +40,7 @@ function RequestModal<Payload>({
       type={successType}
       title={successTitle}
       loading={request?.state === `ongoing`}
-      isOpen={!!request}
+      isOpen={!!request && request.state !== `idle`}
       primaryButton={primaryButton}
       secondaryButton={onDismiss}
       icon={icon}
