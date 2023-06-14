@@ -18,7 +18,7 @@ type Props = {
   updateTrigger(trigger: AdminNotificationTrigger): unknown;
   onSave(): unknown;
   saveButtonDisabled: boolean;
-  focus?: boolean;
+  isNew: boolean;
 };
 
 const NotificationCard: React.FC<Props> = ({
@@ -33,22 +33,22 @@ const NotificationCard: React.FC<Props> = ({
   updateTrigger,
   onSave,
   saveButtonDisabled,
-  focus,
+  isNew,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (focus && ref.current) {
+    if (isNew && ref.current) {
       ref.current.focus();
       ref.current.scrollIntoView({ behavior: `smooth` });
     }
-  }, [focus]);
+  }, [isNew]);
 
   return (
     <div
       ref={ref}
       className={cx(
         `shadow-lg shadow-slate-300/50 border-[0.5px] border-slate-200 rounded-xl w-full sm:w-128 flex flex-col bg-white mx-0 xs:mx-2 sm:mx-3 my-2 sm:my-3`,
-        focus && `ring-violet-500/90 ring-4 ring-offset-4`,
+        isNew && `ring-violet-500/90 ring-4 ring-offset-4`,
       )}
     >
       <Summary {...selectedMethod} trigger={trigger} />

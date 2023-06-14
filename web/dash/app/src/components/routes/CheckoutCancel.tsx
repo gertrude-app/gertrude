@@ -1,17 +1,16 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FullscreenModalForm } from '@dash/components';
-import { useDispatch } from '../../redux/hooks';
-import { handleSignupPaymentCanceled } from '../../redux/slice-signup';
+import { useFireAndForget } from '../../hooks';
+import Current from '../../environment';
 
 const CheckoutCancel: React.FC = () => {
   const [params] = useSearchParams();
-  const dispatch = useDispatch();
   const sessionId = params.get(`session_id`) ?? ``;
 
-  useEffect(() => {
-    dispatch(handleSignupPaymentCanceled({ stripeCheckoutSessionId: sessionId }));
-  }, [dispatch, sessionId]);
+  useFireAndForget(() =>
+    Current.api.handleCheckoutCancel({ stripeCheckoutSessionId: sessionId }),
+  );
 
   return (
     <FullscreenModalForm

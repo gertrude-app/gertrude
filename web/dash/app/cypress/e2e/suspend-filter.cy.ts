@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-import * as mock from '../../src/redux/__tests__/mocks';
+import * as mock from '../../src/reducers/__tests__/mocks';
 
 describe(`suspend filter request flow`, () => {
   beforeEach(() => {

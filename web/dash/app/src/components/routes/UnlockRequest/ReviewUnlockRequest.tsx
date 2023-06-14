@@ -1,34 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { Modal, ReviewUnlockRequest } from '@dash/components';
-import { useDispatch, useSelector } from '../../../redux/hooks';
-import { detailsExpandedToggled } from '../../../redux/slice-unlock-requests';
-import { useUnlockRequestLoader } from '../loaders/unlock-request';
-import useApps from '../../../hooks/apps';
-import { useUserLoader } from '../loaders/user';
-import useSelectableKeychains from '../../../hooks/selectable-keychains';
+import { ErrorModal, LoadingModal, Modal, ReviewUnlockRequest } from '@dash/components';
+import {
+  useUser,
+  useApps,
+  useSelectableKeychains,
+  useUnlockRequest,
+} from '../../../hooks';
 
 const ReviewUnlockRequestRoute: React.FC = () => {
+  const { id = ``, userId = `` } = useParams<{ id: UUID; userId: UUID }>();
+  const [detailsExpanded, setDetailsExpanded] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { unlockRequestId = ``, userId = `` } = useParams<{
-    unlockRequestId: UUID;
-    userId: UUID;
-  }>();
-  const detailsExpanded = useSelector((state) => state.unlockRequests.detailsExpanded);
-  const loader = useUnlockRequestLoader(unlockRequestId);
+  const query = useUnlockRequest(id);
 
-  // preload entities used for acceptance to avoid spinner
+  // used by subsequent screens, prefetch to minimize spinners
   useApps();
-  useUserLoader(userId);
+  useUser(userId);
   useSelectableKeychains();
 
-  if (loader.state === `unresolved`) {
-    return loader.element;
+  if (query.isLoading) {
+    return <LoadingModal />;
   }
 
-  const { entity: unlockRequest } = loader;
-  if (unlockRequest.status !== `pending`) {
+  if (query.isError) {
+    return <ErrorModal error={query.error} />;
+  }
+
+  if (query.data.status !== `pending`) {
     return <Navigate to=".." />;
   }
 
@@ -44,13 +43,13 @@ const ReviewUnlockRequestRoute: React.FC = () => {
       }}
       secondaryButton={{
         label: `Deny`,
-        action: () => navigate(`../deny-comment`),
+        action: () => navigate(`../deny`),
       }}
     >
       <ReviewUnlockRequest
         detailsExpanded={detailsExpanded}
-        setDetailsExpanded={() => dispatch(detailsExpandedToggled())}
-        {...unlockRequest}
+        setDetailsExpanded={() => setDetailsExpanded(!detailsExpanded)}
+        {...query.data}
       />
     </Modal>
   );

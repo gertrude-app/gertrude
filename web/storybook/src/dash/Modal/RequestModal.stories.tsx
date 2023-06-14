@@ -27,6 +27,7 @@ export const Error: Story = props({
     state: `failed`,
     error: {
       id: ``,
+      isPqlError: true,
       type: `clientError`,
       debugMessage: ``,
       userMessage: `Well shucks, we blew a gasket.`,

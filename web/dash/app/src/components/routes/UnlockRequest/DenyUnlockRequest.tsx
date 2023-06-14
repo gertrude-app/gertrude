@@ -1,36 +1,72 @@
-import { useEffect } from 'react';
-import { ErrorModal, LoadingModal } from '@dash/components';
+import React, { useState } from 'react';
+import { ErrorModal, LoadingModal, Modal } from '@dash/components';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import React from 'react';
-import { useDispatch, useSelector } from '../../../redux/hooks';
-import { rejectUnlockRequest } from '../../../redux/slice-unlock-requests';
+import { TextInput } from '@shared/components';
+import { useMutation, useOptimism, Key, useUnlockRequest } from '../../../hooks';
+import Current from '../../../environment';
 
 const DenyUnlockRequest: React.FC = () => {
-  const { unlockRequestId = `` } = useParams<{ unlockRequestId: string }>();
-  const request = useSelector((s) => s.unlockRequests.updateReqs[unlockRequestId]);
+  const { id = `` } = useParams<{ id: string }>();
+  const [comment, setComment] = useState(``);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const optimistic = useOptimism();
+  const query = useUnlockRequest(id);
 
-  useEffect(() => {
-    if (!request?.state) {
-      dispatch(rejectUnlockRequest(unlockRequestId));
+  const deny = useMutation(() => {
+    if (query.data) {
+      optimistic.update(Key.unlockRequest(id), { ...query.data, status: `rejected` });
     }
-  }, [request?.state, dispatch, unlockRequestId]);
+    return Current.api.updateUnlockRequest({
+      id,
+      status: `rejected`,
+      responseComment: comment.trim() === `` ? undefined : comment,
+    });
+  });
 
-  if (!request || request.state === `ongoing` || request.state === `idle`) {
+  if (query.isLoading || deny.isLoading) {
     return <LoadingModal />;
   }
 
-  if (request.state === `failed`) {
+  if (query.isError) {
+    return <ErrorModal error={query.error} />;
+  }
+
+  if (deny.isError) {
     return (
       <ErrorModal
         title="Error denying unlock request"
-        error={request.error}
+        error={deny.error}
         primaryButton={{ label: `Try again`, action: () => navigate(`..`) }}
       />
     );
   }
-  return <Navigate to=".." />;
+
+  if (deny.isSuccess) {
+    return <Navigate to=".." />;
+  }
+
+  return (
+    <Modal
+      icon="comment"
+      title="Add a comment"
+      primaryButton={{
+        label: <>Deny &rarr;</>,
+        action: () => deny.mutate(undefined),
+      }}
+      secondaryButton={() => navigate(`../..`)}
+    >
+      <div className="mt-4">
+        <TextInput
+          placeholder="*optional - will be seen by your child"
+          setValue={(value) => setComment(value)}
+          autoFocus
+          type="textarea"
+          value={comment}
+          testId="deny-unlock-req-comment"
+        />
+      </div>
+    </Modal>
+  );
 };
 
 export default DenyUnlockRequest;

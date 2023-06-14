@@ -1,49 +1,34 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { FullscreenModalForm } from '@dash/components';
 import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from '../../redux/hooks';
-import { verifySignupEmail, getCheckoutUrl } from '../../redux/slice-signup';
-import { Req } from '../../redux/helpers';
+import { useFireAndForget } from '../../hooks';
+import Current from '../../environment';
 
 const VerifySignupEmail: React.FC = () => {
   const { token = `` } = useParams<{ token: UUID }>();
-  const dispatch = useDispatch();
-  const verifyReq = useSelector((state) => state.signup.verifyEmailReq);
-  const verifiedAdminId = Req.payload(verifyReq);
-  const paymentUrlReq = useSelector((state) => state.signup.createPaymentUrlReq);
-  const paymentUrlReqState = paymentUrlReq.state;
 
-  useEffect(() => {
-    if (paymentUrlReqState === `idle` && verifiedAdminId) {
-      dispatch(getCheckoutUrl({ adminId: verifiedAdminId }));
-    }
-  }, [dispatch, verifiedAdminId, paymentUrlReqState]);
+  const verifyEmail = useFireAndForget(() => Current.api.verifySignupEmail({ token }));
 
-  useEffect(() => {
-    if (verifyReq?.state === `idle`) {
-      dispatch(verifySignupEmail({ token }));
-    }
-  }, [dispatch, token, verifyReq?.state]);
+  const getCheckoutUrl = useFireAndForget(
+    () => Current.api.getCheckoutUrl({ adminId: verifyEmail.data?.adminId ?? `` }),
+    { when: verifyEmail.isSuccess },
+  );
 
-  if (verifyReq.state === `failed`) {
+  if (verifyEmail.isError) {
     return <FullscreenModalForm request="failed" error="Failed to verify your email." />;
   }
 
-  if (paymentUrlReq.state === `failed`) {
+  if (getCheckoutUrl.isError) {
     return (
       <FullscreenModalForm request="failed" error="Unexpected error, please try again." />
     );
   }
 
-  if (verifyReq.state === `idle` || verifyReq.state === `ongoing`) {
-    return <FullscreenModalForm request="ongoing" text="Verifying your email..." />;
-  }
-
-  if (paymentUrlReq.state === `idle` || paymentUrlReq.state === `ongoing`) {
+  if (verifyEmail.isLoading || getCheckoutUrl.isLoading) {
     return <FullscreenModalForm request="ongoing" />;
   }
 
-  window.location.href = paymentUrlReq.payload;
+  window.location.href = getCheckoutUrl.data.url;
   return <FullscreenModalForm request="ongoing" text="Redirecting to trial setup..." />;
 };
 

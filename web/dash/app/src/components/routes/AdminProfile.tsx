@@ -1,107 +1,130 @@
-import React, { useEffect } from 'react';
+import { v4 as uuid } from 'uuid';
+import React, { useReducer } from 'react';
 import { ApiErrorMessage, Loading, Profile } from '@dash/components';
-import { isUnsaved } from '@dash/utils';
 import { capitalize } from '@shared/string';
 import { notNullish, typesafe } from '@shared/ts-utils';
-import type { GetAdmin } from '@dash/types';
-import type { QueryProps, State } from '../../redux/store';
-import { useDispatch, useSelector } from '../../redux/hooks';
-import {
-  cancelAdminEntityDelete,
-  fetchProfileData,
-  startAdminEntityDelete,
-  deleteNotification,
-  deleteNotificationMethod,
-  notificationChanged,
-  upsertNotification,
-  notificationCreated,
-  newNotificationMethodEvent,
-  createPendingNotificationMethod,
-  confirmPendingNotificationMethod,
-  createBillingPortalSession,
-} from '../../redux/slice-admin';
-import { isDirty, Query, Req } from '../../redux/helpers';
+import { Result } from '@dash/types';
+import type {
+  GetAdmin,
+  CreatePendingNotificationMethod,
+  PendingNotificationMethod,
+} from '@dash/types';
+import type { State } from '../../reducers/admin-reducer';
+import { isDirty, Req } from '../../lib/helpers';
+import { useQuery, Key, useMutation, useConfirmableDelete } from '../../hooks';
+import Current from '../../environment';
+import ReqState from '../../lib/ReqState';
+import reducer, { initialState } from '../../reducers/admin-reducer';
 
 const AdminProfile: React.FC = () => {
-  const dispatch = useDispatch();
-  const [query, shouldFetch] = useSelector(queryProps(dispatch));
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  useEffect(() => {
-    shouldFetch && dispatch(fetchProfileData());
-  }, [dispatch, shouldFetch]);
+  const query = useQuery(Key.admin, Current.api.getAdmin, {
+    onReceive: (admin) => dispatch({ type: `receivedAdmin`, admin }),
+  });
 
-  if (query.state === `shouldFetch` || query.state === `ongoing`) {
+  const createBillingPortalSession = useMutation(Current.api.createBillingPortalSession);
+
+  const deleteNotification = useConfirmableDelete(`AdminNotification`, {
+    invalidating: [Key.admin],
+  });
+
+  const deleteMethod = useConfirmableDelete(`AdminVerifiedNotificationMethod`, {
+    invalidating: [Key.admin],
+  });
+
+  const saveNotification = useMutation(
+    (id: UUID) => {
+      const notification = state.notifications[id];
+      if (!notification) return Result.resolveUnexpected(`1662407a`);
+      return Current.api.saveNotification({
+        id: notification.id,
+        isNew: notification.isNew === true,
+        methodId: notification.draft.methodId,
+        trigger: notification.draft.trigger,
+      });
+    },
+    { toast: `save:notification`, invalidating: [Key.admin] },
+  );
+
+  const createPendingNotificationMethod = useMutation(
+    () => {
+      const method = state.pendingNotificationMethod;
+      if (!method) return Result.resolveUnexpected(`bc7511bb`);
+      dispatch(PendingMethod.createStarted);
+      return Current.api.createPendingNotificationMethod(toInput(method));
+    },
+    {
+      onSuccess: ({ methodId }) => dispatch(PendingMethod.createSucceeded(methodId)),
+      onError: () => dispatch(PendingMethod.createFailed),
+      toast: `create:pending-notification-method`,
+      invalidating: [Key.admin],
+    },
+  );
+
+  const confirmPendingNotificationMethod = useMutation(
+    () => {
+      dispatch(PendingMethod.confirmStarted);
+      return Current.api.confirmPendingNotificationMethod({
+        id: Req.payload(state.pendingNotificationMethod?.sendCodeRequest) ?? ``,
+        code: Number(state.pendingNotificationMethod?.confirmationCode),
+      });
+    },
+    {
+      onSuccess: () => dispatch(PendingMethod.confirmSucceeded),
+      onError: () => dispatch(PendingMethod.confirmFailed),
+      toast: `confirm:pending-notification-method`,
+      invalidating: [Key.admin],
+    },
+  );
+
+  const notificationProps = makeNotificationProps(state, saveNotification.isLoading);
+
+  if (query.isLoading) {
     return <Loading />;
   }
 
-  if (query.state === `failed` || query.state === `entityDeleted`) {
-    return <ApiErrorMessage error={query.state === `failed` ? query.error : void 0} />;
+  if (query.isError) {
+    return <ApiErrorMessage error={query.error} />;
   }
 
-  return <Profile {...query.props} />;
-};
-
-export default AdminProfile;
-
-export const queryProps: QueryProps<typeof Profile> = (dispatch) => (state) => {
-  const request = state.admin.profileRequest;
-  if (request.state !== `succeeded`) {
-    return [Req.toUnresolvedQuery(request), request.state !== `failed`];
-  }
-
-  const admin = state.admin;
-  const methods = admin.notificationMethods;
-  const deleteNotificationId = admin.deleting.notification;
-  const deleteMethodId = admin.deleting.notificationMethod;
-  const notificationProps = makeGetNotificationProps(admin);
-
-  return [
-    Query.resolve({
-      email: request.payload.email,
-      status: request.payload.subscriptionStatus,
-      billingPortalRequest: state.admin.billingPortalRequest,
-      manageSubscription: () => dispatch(createBillingPortalSession()),
-      methods: typesafe.objectValues(methods).map((method) => ({
+  return (
+    <Profile
+      email={query.data.email}
+      status={query.data.subscriptionStatus}
+      billingPortalRequest={ReqState.fromMutation(createBillingPortalSession)}
+      methods={typesafe.objectValues(state.notificationMethods).map((method) => ({
         id: method.value.id,
         method: methodSimpleType(method),
         value: methodPrimaryValue(method),
-        deletable: methodDeletable(method, admin.notifications, request.payload.email),
-      })),
-      notifications: typesafe
-        .objectValues(admin.notifications)
+        deletable: methodDeletable(method, state.notifications, query.data.email),
+      }))}
+      notifications={typesafe
+        .objectValues(state.notifications)
         .map(notificationProps)
-        .filter(notNullish),
-      deleteNotification: {
-        id: deleteNotificationId,
-        start: (id) => dispatch(startAdminEntityDelete({ type: `notification`, id })),
-        confirm: () => dispatch(deleteNotification(deleteNotificationId ?? ``)),
-        cancel: () => dispatch(cancelAdminEntityDelete(`notification`)),
-      },
-      deleteMethod: {
-        id: deleteMethodId,
-        start: (id) =>
-          dispatch(startAdminEntityDelete({ type: `notificationMethod`, id })),
-        confirm: () => dispatch(deleteNotificationMethod(deleteMethodId ?? ``)),
-        cancel: () => dispatch(cancelAdminEntityDelete(`notificationMethod`)),
-      },
-      pendingMethod: admin.pendingNotificationMethod,
-      createNotification: () => dispatch(notificationCreated()),
-      saveNotification: (id) => dispatch(upsertNotification(id)),
-      updateNotification: (update) => dispatch(notificationChanged(update)),
-      newMethodEventHandler: (event) => {
+        .filter(notNullish)}
+      deleteNotification={deleteNotification}
+      deleteMethod={deleteMethod}
+      pendingMethod={state.pendingNotificationMethod}
+      updateNotification={(update) => dispatch({ type: `updateNotification`, update })}
+      saveNotification={(id) => saveNotification.mutate(id)}
+      createNotification={() => dispatch({ type: `notificationCreated`, id: uuid() })}
+      manageSubscription={() => createBillingPortalSession.mutate()}
+      newMethodEventHandler={(event) => {
         switch (event.type) {
-          case `send_code_clicked`:
-            return dispatch(createPendingNotificationMethod());
-          case `verify_code_clicked`:
-            return dispatch(confirmPendingNotificationMethod());
+          case `sendCodeClicked`:
+            return createPendingNotificationMethod.mutate(undefined);
+          case `verifyCodeClicked`:
+            return confirmPendingNotificationMethod.mutate(undefined);
           default:
-            return dispatch(newNotificationMethodEvent(event));
+            return dispatch({ type: `newNotificationMethodEvent`, event });
         }
-      },
-    }),
-    false,
-  ];
+      }}
+    />
+  );
 };
+
+export default AdminProfile;
 
 // helpers
 
@@ -136,9 +159,9 @@ function methodPrimaryValue(method: GetAdmin.VerifiedNotificationMethod): string
 
 function methodDeletable(
   method: GetAdmin.VerifiedNotificationMethod,
-  notifications: State['admin']['notifications'],
-  adminEmail: EmailAddress,
-): any {
+  notifications: State['notifications'],
+  adminEmail: string,
+): boolean {
   const methodBeingUsed = typesafe
     .objectValues(notifications)
     .some((notification) => notification.original.methodId === method.value.id);
@@ -150,10 +173,11 @@ function methodDeletable(
   return method.type !== `VerifiedEmailMethod` || method.value.email !== adminEmail;
 }
 
-function makeGetNotificationProps(
-  state: State['admin'],
+function makeNotificationProps(
+  state: State,
+  savingNotification: boolean,
 ): (
-  editable: State['admin']['notifications'][string],
+  editable: State['notifications'][number],
 ) => React.ComponentProps<typeof Profile>['notifications'][0] | null {
   return (editable) => {
     const { id, ...notification } = editable.draft;
@@ -164,14 +188,57 @@ function makeGetNotificationProps(
       id,
       trigger: notification.trigger,
       selectedMethod: method,
-      saveButtonDisabled: isUnsaved(id)
+      saveButtonDisabled: editable.isNew
         ? false
-        : !isDirty(editable) || state.saveNotificationRequests[id]?.state === `ongoing`,
+        : !isDirty(editable) || savingNotification,
       methodOptions: typesafe.objectValues(methods).map((method) => ({
         display: `${capitalize(methodSimpleType(method))} ${methodPrimaryValue(method)}`,
         value: method.value.id,
       })),
-      editing: editable.editing,
+      editing: editable.editing === true,
+      isNew: editable.isNew === true,
     };
   };
 }
+
+function toInput(
+  pending: PendingNotificationMethod,
+): CreatePendingNotificationMethod.Input {
+  switch (pending.type) {
+    case `Email`:
+      return { type: `Email`, value: pending.value };
+    case `Text`:
+      return { type: `Text`, value: pending.value };
+    case `Slack`:
+      return { type: `Slack`, value: pending.value };
+  }
+}
+
+const PendingMethod = {
+  createStarted: {
+    type: `newNotificationMethodEvent`,
+    event: { type: `createPendingMethodStarted` },
+  },
+  createFailed: {
+    type: `newNotificationMethodEvent`,
+    event: { type: `createPendingMethodFailed` },
+  },
+  createSucceeded(methodId: UUID) {
+    return {
+      type: `newNotificationMethodEvent`,
+      event: { type: `createPendingMethodSucceeded`, methodId },
+    } as const;
+  },
+  confirmStarted: {
+    type: `newNotificationMethodEvent`,
+    event: { type: `confirmPendingMethodStarted` },
+  },
+  confirmSucceeded: {
+    type: `newNotificationMethodEvent`,
+    event: { type: `confirmPendingMethodSucceeded` },
+  },
+  confirmFailed: {
+    type: `newNotificationMethodEvent`,
+    event: { type: `confirmPendingMethodFailed` },
+  },
+} as const;

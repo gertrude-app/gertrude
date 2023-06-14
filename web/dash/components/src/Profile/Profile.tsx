@@ -1,7 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
 import { TextInput, Button } from '@shared/components';
-import { isUnsaved } from '@dash/utils';
 import type {
   AdminSubscriptionStatus,
   AdminNotificationTrigger,
@@ -29,7 +28,7 @@ export type NotificationUpdate = { id: UUID } & (
 interface Props {
   email: string;
   status: AdminSubscriptionStatus;
-  billingPortalRequest: RequestState<string>;
+  billingPortalRequest: RequestState<{ url: string }>;
   pendingMethod?: PendingNotificationMethod;
   methods: Subcomponents<typeof NotificationMethod>;
   notifications: Subcomponents<typeof NotificationCard>;
@@ -98,7 +97,7 @@ const Profile: React.FC<Props> = ({
           {status !== `complimentary` && (
             <a
               {...(billingPortalRequest.state === `succeeded`
-                ? { href: billingPortalRequest.payload, target: `_blank` }
+                ? { href: billingPortalRequest.payload.url, target: `_blank` }
                 : {})}
               className={cx(
                 `mt-2 text-sm whitespace-nowrap cursor-pointer transition duration-100`,
@@ -133,7 +132,7 @@ const Profile: React.FC<Props> = ({
         <div className="mt-6 flex justify-start">
           <Button
             type="button"
-            onClick={() => newMethodEventHandler({ type: `create_clicked` })}
+            onClick={() => newMethodEventHandler({ type: `createClicked` })}
             color="secondary"
           >
             <i className="fa fa-plus mr-3" />
@@ -152,7 +151,6 @@ const Profile: React.FC<Props> = ({
             {notifications.map(({ id, ...props }) => (
               <NotificationCard
                 key={id}
-                focus={isUnsaved(id)}
                 startEdit={() => updateNotification({ id, type: `startEditing` })}
                 cancelEdit={() => updateNotification({ id, type: `cancelEditing` })}
                 onDelete={() => deleteNotification.start(id)}

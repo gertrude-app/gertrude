@@ -38,6 +38,7 @@ export const Default: Story = props({
       },
       trigger: `suspendFilterRequestSubmitted` as const,
       editing: true,
+      isNew: false,
     },
     {
       selectedMethod: {
@@ -51,6 +52,7 @@ export const Default: Story = props({
       },
       trigger: `unlockRequestSubmitted` as const,
       editing: false,
+      isNew: false,
     },
     {
       selectedMethod: {
@@ -62,6 +64,7 @@ export const Default: Story = props({
       },
       trigger: `suspendFilterRequestSubmitted` as const,
       editing: false,
+      isNew: false,
     },
   ]),
   deleteMethod: confirmableEntityAction(),

@@ -51,6 +51,7 @@ module.exports = {
       {
         allowExpressions: true,
         allowTypedFunctionExpressions: true,
+        allowHigherOrderFunctions: true,
       },
     ],
     'no-unreachable-loop': `error`,

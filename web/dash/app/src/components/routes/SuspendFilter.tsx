@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useReducer } from 'react';
 import { isOlderThan } from '@dash/datetime';
 import {
   Modal,
@@ -8,66 +8,62 @@ import {
   ErrorModal,
 } from '@dash/components';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from '../../redux/hooks';
-import {
-  getSuspendFilterRequest,
-  responseCommentUpdated,
-  grantedDurationInSecondsUpdated,
-  grantedCustomDurationInMinutesUpdated,
-  updateSuspendFilterRequest,
-} from '../../redux/slice-filter-suspensions';
+import reducer, {
+  initialState,
+  durationInSeconds,
+} from '../../reducers/suspend-filter-request-reducer';
+import { useQuery, useMutation, Key } from '../../hooks';
+import Current from '../../environment';
 
 const SuspendFilter: React.FC = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const goToDashboard: () => unknown = () => navigate(`/`);
   const { id = `` } = useParams<{ id: string }>();
-  const {
-    updateReq,
-    fetchReq,
-    responseComment,
-    grantedDurationInSeconds,
-    grantedCustomDurationInMinutes,
-  } = useSelector((state) => ({
-    updateReq: state.filterSuspensions.updateReqs[id],
-    fetchReq: state.filterSuspensions.fetchReqs[id],
-    responseComment: state.filterSuspensions.responseComment,
-    grantedDurationInSeconds: state.filterSuspensions.grantedDurationInSeconds,
-    grantedCustomDurationInMinutes:
-      state.filterSuspensions.grantedCustomDurationInMinutes,
-  }));
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const navigate = useNavigate();
+  const queryKey = Key.suspendFilterRequest(id);
+  const goToDashboard: () => unknown = () => navigate(`/`);
 
-  useEffect(() => {
-    if (!fetchReq?.state) {
-      dispatch(getSuspendFilterRequest(id));
-    }
-  }, [fetchReq?.state, dispatch, id]);
+  const query = useQuery(
+    Key.suspendFilterRequest(id),
+    () => Current.api.getSuspendFilterRequest(id),
+    { onReceive: (request) => dispatch({ type: `receivedRequest`, request }) },
+  );
 
-  if (!fetchReq || fetchReq?.state === `ongoing` || fetchReq?.state === `idle`) {
+  const update = useMutation(
+    (status: 'accepted' | 'rejected') =>
+      Current.api.updateSuspendFilterRequest({
+        id,
+        durationInSeconds: durationInSeconds(state),
+        responseComment: state.responseComment.trim() || undefined,
+        status,
+      }),
+    { invalidating: [queryKey], toast: `update:suspend-filter-request` },
+  );
+
+  if (query.isLoading) {
     return <Loading />;
   }
 
-  if (fetchReq.state === `failed`) {
-    return <ErrorModal error={fetchReq.error} />;
+  if (query.isError) {
+    return <ErrorModal error={query.error} />;
   }
 
-  const { payload } = fetchReq;
-  if (payload.status === `accepted` || payload.status === `rejected`) {
+  const request = query.data;
+  if (request.status === `accepted` || request.status === `rejected`) {
     return (
       <Modal
         title="Suspend Filter Request"
         primaryButton={goToDashboard}
-        icon={payload.status === `accepted` ? `thumbs-up` : `thumbs-down`}
+        icon={request.status === `accepted` ? `thumbs-up` : `thumbs-down`}
       >
         <div className="mt-4">
           <span className="text-base pr-1">The filter suspension request has been</span>
-          <UserInputText small>{payload.status}</UserInputText>.
+          <UserInputText small>{request.status}</UserInputText>.
         </div>
       </Modal>
     );
   }
 
-  if (isOlderThan(payload.createdAt, { hours: 2 })) {
+  if (isOlderThan(request.createdAt, { hours: 2 })) {
     return (
       <Modal title="Suspend Filter Request" primaryButton={goToDashboard} icon="clock">
         <span className="text-base">
@@ -85,33 +81,31 @@ const SuspendFilter: React.FC = () => {
       icon="stopwatch"
       primaryButton={{
         label: `Grant`,
-        action: () => dispatch(updateSuspendFilterRequest({ id, status: `accepted` })),
+        action: () => update.mutate(`accepted`),
         disabled:
-          updateReq?.state === `ongoing` ||
-          updateReq?.state === `succeeded` ||
-          (grantedDurationInSeconds === `custom` &&
-            (Number.isNaN(Number(grantedCustomDurationInMinutes)) ||
-              Number(grantedCustomDurationInMinutes) <= 1)),
+          update.isLoading ||
+          update.isSuccess ||
+          (state.grantedDurationInSeconds === `custom` &&
+            (Number.isNaN(Number(state.grantedCustomDurationInMinutes)) ||
+              Number(state.grantedCustomDurationInMinutes) <= 1)),
       }}
       secondaryButton={{
         label: `Deny`,
-        action: () => dispatch(updateSuspendFilterRequest({ id, status: `rejected` })),
+        action: () => update.mutate(`rejected`),
       }}
       onDismiss={goToDashboard}
     >
       <SuspendFilterRequestForm
-        username={payload.userName}
-        requestedDurationInSeconds={payload.requestedDurationInSeconds}
-        requestComment={payload.requestComment}
-        durationInSeconds={grantedDurationInSeconds}
-        customDurationInMinutes={grantedCustomDurationInMinutes}
-        requestedAt={payload.createdAt}
-        responseComment={responseComment}
-        setResponseComment={(comment) => dispatch(responseCommentUpdated(comment))}
-        setDuration={(duration) => dispatch(grantedDurationInSecondsUpdated(duration))}
-        setCustomDuration={(custom) =>
-          dispatch(grantedCustomDurationInMinutesUpdated(custom))
-        }
+        username={request.userName}
+        requestedDurationInSeconds={request.requestedDurationInSeconds}
+        requestComment={request.requestComment}
+        durationInSeconds={state.grantedDurationInSeconds}
+        customDurationInMinutes={state.grantedCustomDurationInMinutes}
+        requestedAt={request.createdAt}
+        responseComment={state.responseComment}
+        setResponseComment={(comment) => dispatch({ type: `updateComment`, comment })}
+        setDuration={(duration) => dispatch({ type: `updateDuration`, duration })}
+        setCustomDuration={(custom) => dispatch({ type: `updateCustomDuration`, custom })}
       />
     </Modal>
   );

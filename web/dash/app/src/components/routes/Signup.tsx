@@ -1,38 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { FullscreenModalForm, EmailInputForm } from '@dash/components';
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from '../../redux/hooks';
-import {
-  allowingSignups,
-  emailUpdated,
-  passwordUpdated,
-  joinWaitlist,
-  initiateSignup,
-} from '../../redux/slice-signup';
+import { useMutation } from '../../hooks';
+import Current from '../../environment';
 
 const Signup: React.FC = () => {
-  const dispatch = useDispatch();
-  const email = useSelector((state) => state.signup.email);
-  const password = useSelector((state) => state.signup.password);
-  const signupReq = useSelector((state) => state.signup.signupReq);
-  const allowReq = useSelector((state) => state.signup.allowingSignupsReq);
-  const allowReqState = allowReq.state;
+  const [email, setEmail] = useState(``);
+  const [password, setPassword] = useState(``);
+  const signup = useMutation(() => Current.api.signup({ email, password }));
 
-  useEffect(() => {
-    if (allowReqState === `idle`) {
-      dispatch(allowingSignups());
-    }
-  }, [dispatch, allowReqState]);
-
-  if (
-    allowReqState === `ongoing` ||
-    allowReqState === `idle` ||
-    signupReq.state === `ongoing`
-  ) {
+  if (signup.isLoading) {
     return <FullscreenModalForm request="ongoing" />;
   }
 
-  if (allowReqState === `failed` || signupReq.state === `failed`) {
+  if (signup.isError) {
     return (
       <FullscreenModalForm
         request="failed"
@@ -41,14 +22,7 @@ const Signup: React.FC = () => {
     );
   }
 
-  if (signupReq.state === `succeeded`) {
-    const url = signupReq.payload;
-    if (url) {
-      // redirect to stripe flow
-      window.location.href = url;
-      return <FullscreenModalForm request="ongoing" />;
-    }
-
+  if (signup.isSuccess) {
     return (
       <FullscreenModalForm
         request="succeeded"
@@ -59,37 +33,27 @@ const Signup: React.FC = () => {
 
   return (
     <FullscreenModalForm request="idle">
-      {allowReq.payload === false ? (
-        <EmailInputForm
-          title="Join the waitlist"
-          subTitle="We'll notify you when you can begin trying out Gertrude"
-          email={email}
-          setEmail={(email) => dispatch(emailUpdated(email))}
-          onSubmit={() => dispatch(joinWaitlist({ email }))}
-        />
-      ) : (
-        <EmailInputForm
-          title="Signup"
-          subTitle={
-            <>
-              Got an account?{` `}
-              <Link
-                className="text-violet-700 border-b border-dotted border-violet-700"
-                to="/login"
-              >
-                Login
-              </Link>
-              {` `}
-              instead.
-            </>
-          }
-          email={email}
-          setEmail={(email) => dispatch(emailUpdated(email))}
-          password={password}
-          setPassword={(password) => dispatch(passwordUpdated(password))}
-          onSubmit={() => dispatch(initiateSignup({ email, password }))}
-        />
-      )}
+      <EmailInputForm
+        title="Signup"
+        subTitle={
+          <>
+            Got an account?{` `}
+            <Link
+              className="text-violet-700 border-b border-dotted border-violet-700"
+              to="/login"
+            >
+              Login
+            </Link>
+            {` `}
+            instead.
+          </>
+        }
+        email={email}
+        setEmail={setEmail}
+        password={password}
+        setPassword={setPassword}
+        onSubmit={() => signup.mutate(undefined)}
+      />
     </FullscreenModalForm>
   );
 };

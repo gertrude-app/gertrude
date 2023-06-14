@@ -9,10 +9,9 @@ import KeychainCard from './KeychainCard';
 type Props = {
   keychains: Subcomponents<typeof KeychainCard>;
   remove: ConfirmableEntityAction;
-  onCreateNew(): unknown;
 };
 
-const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
+const ListKeychains: React.FC<Props> = ({ keychains, remove }) => (
   <div>
     <PageHeading icon="key">Keychains</PageHeading>
     <p className="mt-8 text-base font-medium antialiased text-slate-600">
@@ -39,7 +38,7 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
           ))}
         </div>
         <div className="mt-10 flex justify-end">
-          <Button size="large" type="button" onClick={onCreateNew} color="primary">
+          <Button size="large" type="link" to="/keychains/new" color="primary">
             <i className="fa fa-plus mr-2" /> Create keychain
           </Button>
         </div>
@@ -47,11 +46,11 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove, onCreateNew }) => (
       </>
     ) : (
       <EmptyState
-        heading={`No keychains`}
-        secondaryText={`Let's make one!`}
-        icon={`key`}
-        buttonText={`Create keychain`}
-        action={onCreateNew}
+        heading="No keychains"
+        secondaryText="Let's make one!"
+        icon="key"
+        buttonText="Create keychain"
+        action="/keychains/new"
         className="mt-8"
       />
     )}

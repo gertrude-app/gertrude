@@ -17,6 +17,7 @@ export const Email: Story = props({
   trigger: `unlockRequestSubmitted`,
   saveButtonDisabled: false,
   editing: false,
+  isNew: false,
   onDelete: () => {},
   startEdit: () => {},
   cancelEdit: () => {},

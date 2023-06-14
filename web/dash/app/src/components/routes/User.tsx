@@ -1,157 +1,139 @@
-import React, { useEffect, useMemo } from 'react';
 import { v4 as uuid } from 'uuid';
 import { Navigate, useParams } from 'react-router-dom';
-import { Loading, EditUser, ApiErrorMessage } from '@dash/components';
-import type { Device } from '@dash/types';
-import type { UserUpdate } from '../../redux/slice-users';
-import type { QueryProps } from '../../redux/store';
-import { newUserRouteVisited } from '../../redux/slice-users';
-import { useDispatch, useSelector } from '../../redux/hooks';
+import { Loading, ApiErrorMessage } from '@dash/components';
+import React, { useEffect, useMemo, useReducer } from 'react';
+import { EditUser } from '@dash/components';
+import type { User } from '@dash/types';
+import * as empty from '../../lib/empty';
+import { isDirty } from '../../lib/helpers';
+import Current from '../../environment';
 import {
-  fetchUser,
-  userUpdated,
-  upsertUser,
-  userEntityDeleteStarted,
-  userEntityDeleteCanceled,
-  deleteDevice,
-  deleteUser,
-  createPendingAppConnection,
-  addDeviceDismissed,
-  addKeychainClicked,
-  keychainSelected,
-  keychainAdded,
-  addKeychainModalDismissed,
-} from '../../redux/slice-users';
-import { isDirty, Query, Req } from '../../redux/helpers';
-import useSelectableKeychains from '../../hooks/selectable-keychains';
-import { familyToIcon } from './Users';
+  useMutation,
+  Key,
+  useQuery,
+  useSelectableKeychains,
+  useConfirmableDelete,
+} from '../../hooks';
+import ReqState from '../../lib/ReqState';
+import reducer from '../../reducers/user-reducer';
+import { deviceProps } from './Users';
 
-const User: React.FC = () => {
+const UserRoute: React.FC = () => {
   const { userId: id = `` } = useParams<{ userId: string }>();
-  const newUserId = useMemo(() => uuid(), []);
-  const dispatch = useDispatch();
-  const [query, shouldFetch] = useSelector(queryProps(dispatch, id));
+  const [state, dispatch] = useReducer(reducer, {});
+  const queryKey = Key.user(id);
+  const getKeychains = useSelectableKeychains();
+  const deleteUser = useConfirmableDelete(`User`, { id });
+  const deleteDevice = useConfirmableDelete(`Device`, { invalidating: [queryKey] });
 
+  const getUser = useQuery(queryKey, () => Current.api.getUser(id), {
+    onReceive: (user) => dispatch({ type: `setUser`, user }),
+    enabled: id !== `new` && state.user?.isNew !== true,
+  });
+
+  const addDevice = useMutation((userId: UUID) =>
+    Current.api.createPendingAppConnection({ userId }),
+  );
+
+  const saveUser = useMutation(
+    (editableUser: Editable<User>) =>
+      Current.api.saveUser({
+        id: editableUser.draft.id,
+        name: editableUser.draft.name,
+        keyloggingEnabled: editableUser.draft.keyloggingEnabled,
+        screenshotsEnabled: editableUser.draft.screenshotsEnabled,
+        screenshotsFrequency: editableUser.draft.screenshotsFrequency,
+        screenshotsResolution: editableUser.draft.screenshotsResolution,
+        isNew: editableUser.isNew ?? false,
+        keychainIds: editableUser.draft.keychains.map(({ id }) => id),
+      }),
+    {
+      onSuccess: () => dispatch({ type: `userSaved` }),
+      invalidating: [queryKey],
+      toast: `save:user`,
+    },
+  );
+
+  const newUserId = useMemo(() => uuid(), []);
   useEffect(() => {
-    shouldFetch && dispatch(fetchUser(id));
-    id === `new` && dispatch(newUserRouteVisited(newUserId));
-  }, [dispatch, id, shouldFetch, newUserId]);
+    id === `new` && dispatch({ type: `setUser`, user: empty.user(newUserId), new: true });
+  }, [id, newUserId]);
 
   if (id === `new`) {
     return <Navigate to={`/users/${newUserId}`} replace />;
   }
 
-  if (query.state === `entityDeleted`) {
-    return <Navigate to={query.redirectUrl} />;
+  if (deleteUser.state === `success`) {
+    return <Navigate to="/users" />;
   }
 
-  if (query.state === `shouldFetch` || query.state === `ongoing`) {
+  if (getUser.isError) {
+    return <ApiErrorMessage error={getUser.error} />;
+  }
+
+  if (!state.user) {
     return <Loading />;
   }
 
-  if (query.state === `failed`) {
-    return <ApiErrorMessage error={query.error} />;
-  }
+  const { user, addingKeychain } = state;
+  const { draft, original } = user;
 
-  return <EditUser {...query.props} />;
+  return (
+    <EditUser
+      isNew={state.user.isNew || false}
+      name={draft.name}
+      id={draft.id}
+      setName={(name) => dispatch({ type: `setName`, name })}
+      keyloggingEnabled={draft.keyloggingEnabled}
+      setKeyloggingEnabled={(enabled) =>
+        dispatch({ type: `setKeyloggingEnabled`, enabled })
+      }
+      screenshotsEnabled={draft.screenshotsEnabled}
+      setScreenshotsEnabled={(enabled) =>
+        dispatch({ type: `setScreenshotsEnabled`, enabled })
+      }
+      screenshotsResolution={draft.screenshotsResolution}
+      setScreenshotsResolution={(resolution) =>
+        dispatch({ type: `setScreenshotsResolution`, resolution })
+      }
+      screenshotsFrequency={draft.screenshotsFrequency}
+      setScreenshotsFrequency={(frequency) =>
+        dispatch({ type: `setScreenshotsFrequency`, frequency })
+      }
+      removeKeychain={(id) => dispatch({ type: `removeKeychain`, id })}
+      keychains={draft.keychains}
+      devices={original.devices.map(deviceProps)}
+      deleteUser={deleteUser}
+      startAddDevice={() => addDevice.mutate(id)}
+      dismissAddDevice={() => addDevice.reset()}
+      addDeviceRequest={ReqState.fromMutation(addDevice)}
+      deleteDevice={deleteDevice}
+      saveButtonDisabled={
+        !isDirty(state.user) || draft.name.trim() === `` || saveUser.isLoading
+      }
+      onSave={() => saveUser.mutate(user)}
+      onAddKeychainClicked={() => dispatch({ type: `setAddingKeychain`, keychain: null })}
+      onSelectKeychainToAdd={(keychain) =>
+        dispatch({
+          type: `setAddingKeychain`,
+          keychain: addingKeychain?.id === keychain.id ? null : keychain,
+        })
+      }
+      onConfirmAddKeychain={() => {
+        addingKeychain && dispatch({ type: `addKeychain`, keychain: addingKeychain });
+        dispatch({ type: `setAddingKeychain`, keychain: undefined });
+      }}
+      onDismissAddKeychain={() =>
+        dispatch({ type: `setAddingKeychain`, keychain: undefined })
+      }
+      selectingKeychain={addingKeychain}
+      fetchSelectableKeychainsRequest={
+        addingKeychain === undefined ? undefined : ReqState.fromQuery(getKeychains)
+      }
+    />
+  );
 };
 
-export default User;
-
-export const queryProps: QueryProps<typeof EditUser, UUID> =
-  (dispatch, id) => (appState) => {
-    const state = appState.users;
-    const fetch = state.fetchUserRequest[id];
-    const editable = state.entities[id];
-    const selectableKeychains = useSelectableKeychains(
-      state.adding.keychain !== undefined,
-    );
-
-    if (state.deleted.includes(id)) {
-      return [Query.redirectDeleted(`/users`), false];
-    }
-
-    if (id === `new`) {
-      return [{ state: `ongoing` }, false];
-    }
-
-    if (!editable && fetch?.state !== `succeeded`) {
-      return [Req.toUnresolvedQuery(fetch), fetch?.state !== `failed`];
-    }
-
-    if (!editable) {
-      return [Query.unexpectedError(`c989c73a`, `missing user`), false];
-    }
-
-    const user = editable.draft;
-    const update = state.updateUserRequest[id];
-    const deleteDeviceId = state.deleting.device;
-    const deleteUserId = state.deleting.user;
-
-    function set(arg: Partial<UserUpdate>): void {
-      dispatch(userUpdated({ id, ...arg } as UserUpdate));
-    }
-
-    return [
-      Query.resolve({
-        isNew: editable.isNew === true,
-        name: user.name,
-        id: user.id,
-        setName: (value) => set({ type: `name`, value }),
-        keyloggingEnabled: user.keyloggingEnabled,
-        setKeyloggingEnabled: (value) => set({ type: `keyloggingEnabled`, value }),
-        screenshotsEnabled: user.screenshotsEnabled,
-        setScreenshotsEnabled: (value) => set({ type: `screenshotsEnabled`, value }),
-        screenshotsResolution: user.screenshotsResolution,
-        setScreenshotsResolution: (value) =>
-          set({ type: `screenshotsResolution`, value }),
-        screenshotsFrequency: user.screenshotsFrequency,
-        setScreenshotsFrequency: (value) => set({ type: `screenshotsFrequency`, value }),
-        removeKeychain: (keychainId) =>
-          dispatch(userUpdated({ id, type: `removeKeychain`, value: keychainId })),
-        keychains: user.keychains,
-        devices: user.devices.map(deviceProps),
-        saveButtonDisabled:
-          !isDirty(editable) ||
-          update?.state === `ongoing` ||
-          editable.draft.name.trim() === ``,
-        onSave: () => dispatch(upsertUser(id)),
-        deleteUser: {
-          id: deleteUserId,
-          start: () => dispatch(userEntityDeleteStarted({ type: `user`, id })),
-          confirm: () => dispatch(deleteUser(deleteUserId ?? ``)),
-          cancel: () => dispatch(userEntityDeleteCanceled(`user`)),
-        },
-        deleteDevice: {
-          id: deleteDeviceId,
-          start: (id) => dispatch(userEntityDeleteStarted({ type: `device`, id })),
-          confirm: () => dispatch(deleteDevice(deleteDeviceId ?? ``)),
-          cancel: () => dispatch(userEntityDeleteCanceled(`device`)),
-        },
-        startAddDevice: () => dispatch(createPendingAppConnection({ userId: id })),
-        dismissAddDevice: () => dispatch(addDeviceDismissed()),
-        addDeviceRequest: state.addDeviceRequest,
-        onAddKeychainClicked: () => dispatch(addKeychainClicked()),
-        onSelectKeychainToAdd: (keychain) => dispatch(keychainSelected(keychain)),
-        onConfirmAddKeychain: () => dispatch(keychainAdded(id)),
-        onDismissAddKeychain: () => dispatch(addKeychainModalDismissed()),
-        selectingKeychain: state.adding?.keychain,
-        fetchSelectableKeychainsRequest:
-          state.adding?.keychain === undefined ? undefined : selectableKeychains,
-      }),
-      false,
-    ];
-  };
+export default UserRoute;
 
 // helpers
-
-function deviceProps(
-  apiDevice: Device,
-): React.ComponentProps<typeof EditUser>['devices'][0] {
-  return {
-    id: apiDevice.id,
-    model: apiDevice.modelTitle,
-    status: apiDevice.isOnline ? `online` : `offline`,
-    icon: familyToIcon(apiDevice.modelFamily),
-  };
-}

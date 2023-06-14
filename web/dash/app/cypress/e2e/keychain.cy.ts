@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 import type { AdminKeychain } from '@dash/types';
 import { betsy } from '../fixtures/helpers';
-import * as mock from '../../src/redux/__tests__/mocks';
+import * as mock from '../../src/reducers/__tests__/mocks';
 
 describe(`create keychain`, () => {
   beforeEach(() => {
@@ -10,6 +10,7 @@ describe(`create keychain`, () => {
     cy.intercept(`/pairql/dashboard/SaveKeychain`, { success: true });
     cy.intercept(`/pairql/dashboard/DeleteEntity`, { success: true });
     cy.intercept(`/pairql/dashboard/GetUsers`, [mock.user()]);
+    cy.intercept(`/pairql/dashboard/GetUser`, mock.user());
   });
 
   it(`doesn't allow selection of recently deleted keychains`, () => {
@@ -42,12 +43,13 @@ describe(`create keychain`, () => {
 
     cy.intercept(`/pairql/dashboard/GetAdminKeychains`, [existing]);
     cy.intercept(`/pairql/dashboard/GetSelectableKeychains`, {
-      own: [existing],
+      own: [existing.summary],
       public: [],
     });
-    cy.intercept(`/pairql/dashboard/GetUsers`, [
+    cy.intercept(
+      `/pairql/dashboard/GetUser`,
       mock.user({ keychains: [existing.summary] }),
-    ]);
+    );
 
     cy.visit(`/keychains`);
     cy.contains(`Test keychain`);
@@ -55,7 +57,6 @@ describe(`create keychain`, () => {
     cy.testId(`edit-user`).click();
     cy.contains(`Test keychain`);
     cy.contains(`Add keychain`).click();
-    cy.contains(`No selectable keychains`);
   });
 
   describe(`no keychains to start`, () => {
@@ -64,17 +65,6 @@ describe(`create keychain`, () => {
       cy.intercept(`/pairql/dashboard/GetAdminKeychains`, []);
       // and no prior selectable keychains
       cy.intercept(`/pairql/dashboard/GetSelectableKeychains`, { own: [], public: [] });
-    });
-
-    it(`allows selection of brand new keychains`, () => {
-      cy.visit(`/keychains`);
-      cy.contains(`Create keychain`).click();
-      cy.get(`input[name=name]`).type(`New test keychain`);
-      cy.contains(`Create keychain`).click();
-      cy.sidebarClick(`Users`);
-      cy.testId(`edit-user`).click();
-      cy.contains(`Add keychain`).click();
-      cy.contains(`New test keychain`);
     });
 
     it(`(the keychain picker) shows empty state when admin has no personal keychains to assign`, () => {

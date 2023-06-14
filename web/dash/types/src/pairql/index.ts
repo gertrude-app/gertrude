@@ -31,7 +31,7 @@ export * from './pairs/LoginMagicLink';
 export * from './pairs/RequestMagicLink';
 export * from './pairs/SaveKey';
 export * from './pairs/SaveKeychain';
-export * from './pairs/SaveNotification_v0';
+export * from './pairs/SaveNotification';
 export * from './pairs/SaveUser';
 export * from './pairs/Signup';
 export * from './pairs/UpdateSuspendFilterRequest';

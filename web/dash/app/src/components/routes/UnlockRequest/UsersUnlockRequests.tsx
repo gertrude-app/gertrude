@@ -1,33 +1,22 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Loading, ListUnlockRequests, ApiErrorMessage } from '@dash/components';
-import { typesafe } from '@shared/ts-utils';
-import { useDispatch, useSelector } from '../../../redux/hooks';
-import { getUsersUnlockRequests } from '../../../redux/slice-unlock-requests';
+import Current from '../../../environment';
+import { useQuery, Key } from '../../../hooks';
 
 const UsersUnlockRequests: React.FC = () => {
-  const dispatch = useDispatch();
-  const fetch = useSelector((state) => state.unlockRequests.fetchAllReq);
-  const requests = useSelector((state) =>
-    typesafe.objectValues(state.unlockRequests.entities),
-  );
+  const query = useQuery(Key.combinedUsersUnlockRequests, Current.api.getUnlockRequests);
 
-  useEffect(() => {
-    if (fetch?.state === undefined || fetch?.state === `idle`) {
-      dispatch(getUsersUnlockRequests());
-    }
-  }, [dispatch, fetch?.state]);
-
-  if (!fetch?.state || fetch?.state === `idle` || fetch?.state === `ongoing`) {
+  if (query.isLoading) {
     return <Loading />;
   }
 
-  if (fetch?.state === `failed`) {
-    return <ApiErrorMessage error={fetch.error} />;
+  if (query.isError) {
+    return <ApiErrorMessage error={query.error} />;
   }
 
   return (
     <ListUnlockRequests
-      requests={requests.map((req) => ({
+      requests={query.data.map((req) => ({
         id: req.id,
         url: req.url ?? req.domain ?? req.ipAddress ?? ``,
         userId: req.userId,

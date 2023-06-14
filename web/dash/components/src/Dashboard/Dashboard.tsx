@@ -10,7 +10,6 @@ import UserActivityWidget from './UserActivityWidget';
 import UserScreenshotsWidget from './UserScreenshotsWidget';
 
 type Props = {
-  createKeychain: () => unknown;
   date?: Date;
 } & GetDashboardWidgets.Output;
 
@@ -19,7 +18,6 @@ const Dashboard: React.FC<Props> = ({
   users,
   userActivitySummaries,
   recentScreenshots,
-  createKeychain,
   date = new Date(),
 }) => {
   if (users.length > 0)
@@ -41,11 +39,7 @@ const Dashboard: React.FC<Props> = ({
               unlockRequests={unlockRequests}
             />
           )}
-          <QuickActionsWidget
-            date={date}
-            createKeychain={createKeychain}
-            className="xl:row-span-2 lg:-order-10"
-          />
+          <QuickActionsWidget date={date} className="xl:row-span-2 lg:-order-10" />
         </div>
       </>
     );

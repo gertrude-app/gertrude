@@ -19,3 +19,17 @@ export function posessive(name: string): string {
 export function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+export function pastTense(s: string): string {
+  const lastLetter = s.charAt(s.length - 1);
+  switch (lastLetter) {
+    case `e`:
+      return `${s}d`;
+    case `y`:
+      return `${s.slice(0, -1)}ied`;
+    case `d`:
+      return `${s.slice(0, -1)}t`;
+    default:
+      return `${s}ed`;
+  }
+}

@@ -1,27 +1,28 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSearchParams, Navigate } from 'react-router-dom';
 import { FullscreenModalForm } from '@dash/components';
-import { useDispatch, useSelector } from '../../redux/hooks';
-import { handleSignupPaymentSuccess } from '../../redux/slice-signup';
+import { Result } from '@dash/types';
+import { useAuth, useFireAndForget } from '../../hooks';
+import Current from '../../environment';
 
 const CheckoutSuccess: React.FC = () => {
+  const { login } = useAuth();
   const [params] = useSearchParams();
-  const dispatch = useDispatch();
-  const req = useSelector((state) => state.signup.checkoutSuccessReq);
-  const reqState = req.state;
   const sessionId = params.get(`session_id`);
 
-  useEffect(() => {
-    if (reqState === `idle` && sessionId) {
-      dispatch(handleSignupPaymentSuccess({ stripeCheckoutSessionId: sessionId }));
-    }
-  }, [dispatch, sessionId, reqState]);
+  const query = useFireAndForget(
+    () => {
+      if (!sessionId) return Result.resolveUnexpected(`4c61dc17`);
+      return Current.api.handleCheckoutSuccess({ stripeCheckoutSessionId: sessionId });
+    },
+    { onReceive: ({ adminId, token }) => login(adminId, token) },
+  );
 
-  if (req.state === `ongoing` || req.state === `idle`) {
+  if (query.isLoading) {
     return <FullscreenModalForm request="ongoing" text="Completing signup..." />;
   }
 
-  if (!sessionId) {
+  if (query.isError && !sessionId) {
     return (
       <FullscreenModalForm
         request="failed"
@@ -30,7 +31,7 @@ const CheckoutSuccess: React.FC = () => {
     );
   }
 
-  if (req.state === `failed`) {
+  if (query.isError) {
     return (
       <FullscreenModalForm
         request="failed"
