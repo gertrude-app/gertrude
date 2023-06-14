@@ -2,25 +2,25 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { dateFromUrl } from '@dash/datetime';
 import { typesafe } from '@shared/ts-utils';
-import { ApiErrorMessage, Loading, UserActivityReviewDay } from '@dash/components';
+import { ApiErrorMessage, Loading, UserActivityFeed } from '@dash/components';
 import { useDispatch, useSelector } from '../../redux/hooks';
 import {
   deleteActivityItems,
-  fetchActivityDay,
+  fetchUserActivityFeed,
   activityDayKey,
 } from '../../redux/slice-users';
 
-const UserActivityDay: React.FC = () => {
+const UserActivityFeedRoute: React.FC = () => {
   const { userId = ``, date = `` } = useParams<{ userId: string; date: string }>();
   const day = dateFromUrl(date);
   const key = activityDayKey(userId, day);
   const dispatch = useDispatch();
-  const request = useSelector((state) => state.users.activityDays[key]);
+  const request = useSelector((state) => state.users.userActivityFeedDays[key]);
   const reqState = request?.state;
 
   useEffect(() => {
     if (!reqState || reqState === `idle`) {
-      dispatch(fetchActivityDay({ userId, day: dateFromUrl(date) }));
+      dispatch(fetchUserActivityFeed({ userId, day: dateFromUrl(date) }));
     }
   }, [dispatch, userId, date, reqState]);
 
@@ -33,15 +33,15 @@ const UserActivityDay: React.FC = () => {
   }
 
   return (
-    <UserActivityReviewDay
+    <UserActivityFeed
       date={day}
       numDeleted={request.payload.numDeleted}
       deleteItems={(itemRootIds) =>
-        dispatch(deleteActivityItems({ userId, date: day, itemRootIds }))
+        dispatch(deleteActivityItems({ date: day, itemRootIds }))
       }
       items={typesafe.objectValues(request.payload.items).filter((item) => !item.deleted)}
     />
   );
 };
 
-export default UserActivityDay;
+export default UserActivityFeedRoute;

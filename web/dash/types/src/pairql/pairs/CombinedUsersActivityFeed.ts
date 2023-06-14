@@ -1,8 +1,7 @@
 // auto-generated, do not edit
 
-export namespace GetUserActivityDay {
+export namespace CombinedUsersActivityFeed {
   export interface Input {
-    userId: UUID;
     range: {
       start: string;
       end: string;
@@ -34,9 +33,10 @@ export namespace GetUserActivityDay {
         };
       };
 
-  export interface Output {
+  export type Output = Array<{
+    userId: UUID;
     userName: string;
     numDeleted: number;
     items: Array<Item>;
-  }
+  }>;
 }

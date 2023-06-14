@@ -48,7 +48,7 @@ const ReviewUnlockRequest: React.FC<Props> = ({
         {url || domain || ipAddress}
       </a>
     </div>
-    <div className="bg-white border rounded-xl mb-1 flex flex-col mt-4 relative">
+    <div className="bg-white border border-slate-200 rounded-xl mb-1 flex flex-col mt-4 relative">
       <button
         className="hover:text-slate-600 text-slate-400 transition duration-100 absolute right-2.5 top-0 text-lg p-2 bg-transparent"
         onClick={() => setDetailsExpanded(!detailsExpanded)}

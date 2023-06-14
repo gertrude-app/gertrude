@@ -1,24 +1,23 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ApiErrorMessage, Loading, UserActivityOverview } from '@dash/components';
+import { ApiErrorMessage, Loading, ActivitySummaries } from '@dash/components';
 import { useDispatch, useSelector } from '../../redux/hooks';
-import { activityDayKey, fetchActivityOverview } from '../../redux/slice-users';
+import { activityDayKey, fetchUserActivitySummaries } from '../../redux/slice-users';
 import { Req } from '../../redux/helpers';
 
-const UserActivityOverviewRoute: React.FC = () => {
+const UserActivitySummariesRoute: React.FC = () => {
   const { userId = `` } = useParams<{ userId: string }>();
   const dispatch = useDispatch();
   const { request, days } = useSelector((state) => ({
-    request: state.users.activityOverviews[userId],
-    days: state.users.activityDays,
+    request: state.users.userActivitySummaries[userId],
+    days: state.users.userActivityFeedDays,
   }));
 
-  const reqState = request?.state;
   useEffect(() => {
-    if (!reqState || reqState === `idle`) {
-      dispatch(fetchActivityOverview({ userId }));
+    if (!request?.state || request?.state === `idle`) {
+      dispatch(fetchUserActivitySummaries({ userId }));
     }
-  }, [dispatch, userId, reqState]);
+  }, [dispatch, userId, request?.state]);
 
   if (!request || request.state === `idle` || request.state === `ongoing`) {
     return <Loading />;
@@ -28,7 +27,7 @@ const UserActivityOverviewRoute: React.FC = () => {
   }
 
   return (
-    <UserActivityOverview
+    <ActivitySummaries
       userName={request.payload.userName}
       days={request.payload.days.map((day, index) => {
         const date = new Date(day.date);
@@ -45,4 +44,4 @@ const UserActivityOverviewRoute: React.FC = () => {
   );
 };
 
-export default UserActivityOverviewRoute;
+export default UserActivitySummariesRoute;

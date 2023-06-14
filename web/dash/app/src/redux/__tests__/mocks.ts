@@ -5,11 +5,13 @@ import type {
   GetAdmin,
   Device,
   KeychainSummary,
-  GetUserActivityDays,
+  UserActivitySummaries,
   SuspendFilterRequest,
   GetIdentifiedApps,
+  CombinedUsersActivityFeed,
+  CombinedUsersActivitySummaries,
 } from '@dash/types';
-import type { ActivityItem } from '@dash/components';
+import type { ActivityFeedItem } from '@dash/components';
 import * as empty from '../../redux/empty';
 
 type Admin = GetAdmin.Output;
@@ -103,11 +105,11 @@ export function keychainSummary(
   };
 }
 
-export function activityDay(
+export function userActivitySummary(
   totalItems = 0,
   numApproved = 0,
   start = new Date().toISOString(),
-): GetUserActivityDays.Output['days'][number] {
+): UserActivitySummaries.Output['days'][number] {
   return {
     date: start,
     totalItems,
@@ -115,7 +117,61 @@ export function activityDay(
   };
 }
 
-export function keystrokeLine(override: Partial<ActivityItem> = {}): ActivityItem {
+export function combinedUsersActivitySummary(
+  override: Partial<CombinedUsersActivitySummaries.Output[number]> = {},
+): CombinedUsersActivitySummaries.Output[number] {
+  return {
+    userName: `Bob`,
+    userId: uuid(),
+    days: [
+      userActivitySummary(1, 1),
+      userActivitySummary(35, 25),
+      userActivitySummary(110, 1),
+    ],
+    ...override,
+  };
+}
+
+export function combinedUsersActivityFeed(
+  override: Partial<CombinedUsersActivityFeed.Output[number]> = {},
+): CombinedUsersActivityFeed.Output[number] {
+  const width = 700;
+  const height = 400;
+  const id = uuid();
+  return {
+    userName: `Bob`,
+    numDeleted: 0,
+    userId: uuid(),
+    items: [
+      {
+        type: `Screenshot`,
+        value: {
+          id: id,
+          ids: [id],
+          url: `https://placekitten.com/${width}/${height}`,
+          width: width,
+          height: height,
+          createdAt: new Date().toISOString(),
+        },
+      },
+      {
+        type: `CoalescedKeystrokeLine`,
+        value: {
+          id: id,
+          ids: [id, uuid(), uuid()],
+          appName: `Messages`,
+          line: `Sure, that'll do`,
+          createdAt: new Date().toISOString(),
+        },
+      },
+    ],
+    ...override,
+  };
+}
+
+export function keystrokeLine(
+  override: Partial<ActivityFeedItem> = {},
+): ActivityFeedItem {
   const id = override.id ?? uuid();
   const ids = override.ids ?? [id];
   return {

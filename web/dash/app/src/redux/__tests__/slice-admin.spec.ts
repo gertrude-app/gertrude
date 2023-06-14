@@ -1,6 +1,5 @@
 import { expect, it, test, describe } from 'vitest';
 import { unsavedId } from '@dash/utils';
-// import { AdminSubscriptionStatus, AdminNotTrigger } from '@dash/types';
 import { Req } from '../helpers';
 import reducer, {
   confirmPendingNotificationMethod,

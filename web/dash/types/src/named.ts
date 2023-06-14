@@ -1,3 +1,3 @@
-import type { GetUserActivityDays } from './pairql';
+import type { UserActivitySummaries } from './pairql';
 
-export type DateRangeInput = GetUserActivityDays.Input['dateRanges'][number];
+export type DateRangeInput = UserActivitySummaries.Input['dateRanges'][number];

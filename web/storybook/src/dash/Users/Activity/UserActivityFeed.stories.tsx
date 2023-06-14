@@ -1,31 +1,21 @@
-import { UserActivityReviewDay } from '@dash/components';
+import { UserActivityFeed } from '@dash/components';
 import type { StoryObj, Meta } from '@storybook/react';
-import type { ActivityItem } from '@dash/components';
+import type { ActivityFeedItem } from '@dash/components';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
-import { props, testImgUrl, time } from '../../../story-helpers';
+import { activity, props, testImgUrl, time } from '../../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Users/Activity/UserActivityReviewDay', // eslint-disable-line
-  component: UserActivityReviewDay,
+  component: UserActivityFeed,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
-} satisfies Meta<typeof UserActivityReviewDay>;
+} satisfies Meta<typeof UserActivityFeed>;
 
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = props({
   date: new Date(time.stable()),
-  items: [
-    keystrokeLine(
-      `Xcode`,
-      `importFoundationhereisareallylonglinethatwillcauseproblemspotentiallyblahblahblahlorem`,
-    ),
-    screenshot(400, 600, true),
-    keystrokeLine(`Brave`, `Hello world`),
-    keystrokeLine(`Xcode`, `import Foundation`),
-    screenshot(),
-    screenshot(),
-  ],
+  items: activity[`Sally`],
   numDeleted: 0,
   deleteItems: () => {},
 });
@@ -63,7 +53,11 @@ function common(): { id: string; ids: string[]; date: string } {
   };
 }
 
-function keystrokeLine(appName: string, line: string, deleted?: boolean): ActivityItem {
+function keystrokeLine(
+  appName: string,
+  line: string,
+  deleted?: boolean,
+): ActivityFeedItem {
   return {
     ...common(),
     type: `KeystrokeLine`,
@@ -73,7 +67,7 @@ function keystrokeLine(appName: string, line: string, deleted?: boolean): Activi
   };
 }
 
-function screenshot(width = 800, height = 600, deleted?: boolean): ActivityItem {
+function screenshot(width = 800, height = 600, deleted?: boolean): ActivityFeedItem {
   return {
     ...common(),
     type: `Screenshot`,

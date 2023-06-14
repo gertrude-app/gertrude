@@ -1,14 +1,14 @@
-import { UserActivityOverview } from '@dash/components';
+import { ActivitySummaries } from '@dash/components';
 import type { StoryObj, Meta } from '@storybook/react';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
 import { props, time } from '../../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/Activity/UserActivityOverview', // eslint-disable-line
-  component: UserActivityOverview,
+  title: 'Dashboard/Users/Activity/ActivitySummaries', // eslint-disable-line
+  component: ActivitySummaries,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
-} satisfies Meta<typeof UserActivityOverview>;
+} satisfies Meta<typeof ActivitySummaries>;
 
 type Story = StoryObj<typeof meta>;
 
@@ -56,6 +56,11 @@ export const Single: Story = props({
 export const Empty: Story = props({
   ...Default.args,
   days: [],
+});
+
+export const AllUsers: Story = props({
+  ...Default.args,
+  userName: undefined,
 });
 
 export default meta;

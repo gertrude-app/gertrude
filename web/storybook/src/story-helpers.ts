@@ -1,4 +1,6 @@
 import { env } from '@shared/components';
+import { time } from '@shared/datetime';
+import type { ActivityFeedItem } from '@dash/components';
 import type { ConfirmableEntityAction, KeychainSummary, Key } from '@dash/types';
 import Placeholder400x600 from './static/placeholder/400x600.png';
 import Placeholder300x200 from './static/placeholder/300x200.png';
@@ -8,6 +10,8 @@ import Placeholder700x200 from './static/placeholder/700x200.png';
 import Placeholder800x600 from './static/placeholder/800x600.png';
 import Placeholder800x900 from './static/placeholder/800x900.png';
 import Placeholder1200x400 from './static/placeholder/1200x400.png';
+
+export { time };
 
 export function keychainProps(override: Partial<KeychainSummary> = {}): KeychainSummary {
   return {
@@ -56,38 +60,6 @@ export function confirmableEntityAction<
     confirm: () => {},
     cancel: () => {},
   };
-}
-
-export const time = {
-  now,
-  subtracting,
-  stable,
-};
-
-function stable(): string {
-  return `2022-01-01T12:00:00.000Z`;
-}
-
-function subtracting(amounts: {
-  days?: number;
-  hours?: number;
-  minutes?: number;
-}): string {
-  const date = new Date();
-  if (amounts.days) {
-    date.setDate(date.getDate() - amounts.days);
-  }
-  if (amounts.hours) {
-    date.setHours(date.getHours() - amounts.hours);
-  }
-  if (amounts.minutes) {
-    date.setMinutes(date.getMinutes() - amounts.minutes);
-  }
-  return date.toISOString();
-}
-
-function now(): string {
-  return new Date().toISOString();
 }
 
 export function props<T>(args: T): { args: T } {
@@ -208,6 +180,34 @@ export const keychains = [
   }),
 ];
 
+export const activity = {
+  'Little Jimmy': [
+    keystrokeLine(
+      `Xcode`,
+      `importFoundationhereisareallylonglinethatwillcauseproblemspotentiallyblahblahblahlorem`,
+    ),
+    screenshot(400, 600, true),
+    keystrokeLine(`Brave`, `Hello world`),
+    keystrokeLine(`Xcode`, `import Foundation`),
+    screenshot(),
+  ],
+  Henry: [
+    keystrokeLine(`Firefox`, `turtles`),
+    screenshot(400, 600, true),
+    keystrokeLine(`Brave`, `Hello world`),
+    keystrokeLine(`Xcode`, `import Foundation`),
+    screenshot(),
+    screenshot(),
+    keystrokeLine(`Messages`, `Sounds good, thanks`),
+    screenshot(),
+  ],
+  Sally: [
+    keystrokeLine(`Skype`, `No puedo nadar.`),
+    screenshot(400, 600, true),
+    keystrokeLine(`Brave`, `Hello world`),
+  ],
+};
+
 const PLACEHOLDERS: Record<string, string> = {
   '400x600': Placeholder400x600,
   '300x200': Placeholder300x200,
@@ -218,3 +218,41 @@ const PLACEHOLDERS: Record<string, string> = {
   '800x900': Placeholder800x900,
   '1200x400': Placeholder1200x400,
 };
+
+export function common(): { id: string; ids: string[]; date: string } {
+  const current = `item-${Math.random()}`;
+  return {
+    id: `${current}`,
+    ids: [`${current}`],
+    date: time.stable(),
+  };
+}
+
+export function keystrokeLine(
+  appName: string,
+  line: string,
+  deleted?: boolean,
+): ActivityFeedItem {
+  return {
+    ...common(),
+    type: `KeystrokeLine`,
+    appName,
+    line,
+    deleted,
+  };
+}
+
+export function screenshot(
+  width = 800,
+  height = 600,
+  deleted?: boolean,
+): ActivityFeedItem {
+  return {
+    ...common(),
+    type: `Screenshot`,
+    url: testImgUrl(width, height),
+    width,
+    height,
+    deleted,
+  };
+}

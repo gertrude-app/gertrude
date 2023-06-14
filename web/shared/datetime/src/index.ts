@@ -36,3 +36,35 @@ export function formatDate(
     date.getFullYear(),
   ].join(``);
 }
+
+export const time = {
+  now,
+  subtracting,
+  stable,
+};
+
+function stable(): string {
+  return `2022-01-01T12:00:00.000Z`;
+}
+
+function subtracting(amounts: {
+  days?: number;
+  hours?: number;
+  minutes?: number;
+}): string {
+  const date = new Date();
+  if (amounts.days) {
+    date.setDate(date.getDate() - amounts.days);
+  }
+  if (amounts.hours) {
+    date.setHours(date.getHours() - amounts.hours);
+  }
+  if (amounts.minutes) {
+    date.setMinutes(date.getMinutes() - amounts.minutes);
+  }
+  return date.toISOString();
+}
+
+function now(): string {
+  return new Date().toISOString();
+}

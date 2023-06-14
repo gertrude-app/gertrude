@@ -1,11 +1,12 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@shared/components';
-import { formatDate } from '@dash/datetime';
 import { UndoMainPadding } from '../../Chrome/Chrome';
 import EmptyState from '../../EmptyState';
 import KeystrokesViewer from './KeystrokesViewer';
 import ScreenshotViewer from './ScreenshotViewer';
+import FeedHeader from './FeedHeader';
+import ReviewDayWrapper from './ReviewDayWrapper';
 
 interface Screenshot {
   type: 'Screenshot';
@@ -20,7 +21,7 @@ interface KeystrokeLine {
   line: string;
 }
 
-export type ActivityItem = (Screenshot | KeystrokeLine) & {
+export type ActivityFeedItem = (Screenshot | KeystrokeLine) & {
   id: UUID;
   ids: UUID[];
   date: string;
@@ -29,13 +30,13 @@ export type ActivityItem = (Screenshot | KeystrokeLine) & {
 
 interface Props {
   date: Date;
-  items: ActivityItem[];
+  items: ActivityFeedItem[];
   numDeleted: number;
   deleteItems(ids: UUID[]): unknown;
   chunkSize?: number;
 }
 
-const UserActivityReviewDay: React.FC<Props> = ({
+const UserActivityFeed: React.FC<Props> = ({
   date,
   items,
   numDeleted,
@@ -45,31 +46,9 @@ const UserActivityReviewDay: React.FC<Props> = ({
   const navigate = useNavigate();
   return (
     <UndoMainPadding className="px-0 md:px-8 lg:px-10 py-5 md:py-10 pt-0 md:pt-4 pb-16 flex flex-col">
-      <header className="flex items-center justify-between p-2 pr-6 rounded-b-2xl md:rounded-t-2xl shadow-lg shadow-slate-800/10 bg-white max-w-7xl mb-8 z-20 relative">
-        <div className="flex items-center text-md sm:text-l">
-          <Link
-            to="../"
-            className="flex items-center mr-4 sm:mr-8 text-slate-500 hover:bg-violet-50 py-2 px-4 rounded-xl antialiased hover:text-violet-600 transition duration-100"
-          >
-            <i className="fa fa-chevron-left mr-2" aria-hidden /> Back
-          </Link>
-          <h1 className="font-bold text-slate-800">{formatDate(date, `medium`)}</h1>
-        </div>
-        {items.length > 0 && (
-          <div className="text-slate-600 self-center flex items-center space-x-0.5 sm:space-x-1">
-            <span className="font-bold sm:text-lg">{numDeleted}</span>
-            <span className="hidden lg:inline">out of</span>
-            <span className="lg:hidden">/</span>
-            <span className="font-bold sm:text-lg">{numDeleted + items.length}</span>
-            <span className="hidden lg:inline">items reviewed</span>
-          </div>
-        )}
-      </header>
+      <FeedHeader date={date} numItems={items.length} numDeleted={numDeleted} />
       {items.length > 0 ? (
-        <div
-          id="delete-focus"
-          className="bg-slate-200 md:bg-transparent flex-grow space-y-8 flex flex-col"
-        >
+        <ReviewDayWrapper>
           {deleteableChunks(items, chunkSize, deleteItems)}
           <Button
             className="ScrollTop self-center"
@@ -84,28 +63,30 @@ const UserActivityReviewDay: React.FC<Props> = ({
             <i className="fa-solid fa-thumbs-up mr-2" />
             Approve all
           </Button>
-        </div>
+        </ReviewDayWrapper>
       ) : (
-        <div className="">
-          <EmptyState
-            heading={`All caught up!`}
-            secondaryText={`Nothing left to review for this day.`}
-            icon={`image`}
-            buttonText={`Back to activity`}
-            buttonIcon="arrow-left"
-            action={`../`}
-            className="max-w-7xl"
-          />
-        </div>
+        <FeedCaughtUp />
       )}
     </UndoMainPadding>
   );
 };
 
-export default UserActivityReviewDay;
+export default UserActivityFeed;
 
-function deleteableChunks(
-  items: ActivityItem[],
+export const FeedCaughtUp: React.FC = () => (
+  <EmptyState
+    heading="All caught up!"
+    secondaryText="Nothing left to review for this day."
+    icon="image"
+    buttonText="Back to activity"
+    buttonIcon="arrow-left"
+    action="../"
+    className="max-w-7xl"
+  />
+);
+
+export function deleteableChunks(
+  items: ActivityFeedItem[],
   chunkSize: number,
   deleteItems: (ids: UUID[]) => unknown,
 ): JSX.Element[] {
@@ -127,9 +108,11 @@ function deleteableChunks(
     if (chunkIndex < numChunks - 1) {
       const toDelete = [...ids];
       elements.push(
-        <div key={`${ids[ids.length - 1] ?? ``}-separator`} className="self-center pb-8">
+        <div
+          key={`${ids[ids.length - 1] ?? ``}-separator`}
+          className="flex justify-center pb-8"
+        >
           <Button
-            className="self-center"
             type="button"
             color="secondary-on-violet-bg"
             onClick={() => {
@@ -158,7 +141,7 @@ function scrollToTop(): void {
 }
 
 function renderItem(
-  item: ActivityItem,
+  item: ActivityFeedItem,
   deleteItem: () => unknown,
   numRendered: number,
 ): JSX.Element {

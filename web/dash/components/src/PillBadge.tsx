@@ -14,26 +14,26 @@ const PillBadge: React.FC<Props> = ({ type, className, children, small }) => {
   switch (type) {
     case `green`:
     case `ok`:
-      colors = `bg-green-100 text-green-700`;
+      colors = `bg-green-50 border-green-200 text-green-600`;
       break;
     case `red`:
     case `error`:
-      colors = `bg-red-100 text-red-700`;
+      colors = `bg-red-50 border-red-200 text-red-600`;
       break;
     case `yellow`:
     case `warning`:
-      colors = `bg-yellow-100 text-yellow-700`;
+      colors = `bg-yellow-50 border-yellow-200 text-yellow-600`;
       break;
     case `blue`:
     case `info`:
-      colors = `bg-indigo-100 text-indigo-700`;
+      colors = `bg-blue-50 border-blue-200 text-blue-600`;
       break;
   }
 
   return (
     <div
       className={cx(
-        `rounded-full max-w-fit`,
+        `rounded-full max-w-fit border`,
         small ? `text-sm px-[16px] pt-[3px] pb-[4px]` : `px-6 py-0.5`,
         colors,
         className,
