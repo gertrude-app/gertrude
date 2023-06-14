@@ -33,6 +33,7 @@ export * from './pairs/SaveKey';
 export * from './pairs/SaveKeychain';
 export * from './pairs/SaveNotification';
 export * from './pairs/SaveUser';
+export * from './pairs/SendPasswordResetEmail';
 export * from './pairs/Signup';
 export * from './pairs/UpdateSuspendFilterRequest';
 export * from './pairs/UpdateUnlockRequest';

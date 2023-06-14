@@ -158,6 +158,9 @@ const noopClient: ApiClient = {
   saveUser: async () => {
     return Result.success({ success: true });
   },
+  sendPasswordResetEmail: async () => {
+    return Result.success({ success: true });
+  },
   signup: async () => {
     return Result.success({});
   },

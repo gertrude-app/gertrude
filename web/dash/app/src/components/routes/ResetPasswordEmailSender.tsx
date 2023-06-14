@@ -9,7 +9,7 @@ const ResetPassword: React.FC = () => {
   const [page, setPage] = useState<'form' | 'confirmation'>('form');
   return (
     <FullscreenGradientBg>
-      <div className="bg-white rounded-3xl shadow-xl z-10 mx-4 relative h-96 w-128 overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-xl z-10 mx-4 relative h-128 xs:h-96 w-128 overflow-hidden">
         <div
           className={cx(
             'flex flex-col justify-between absolute [transition:300ms] h-full w-full top-0',

@@ -278,6 +278,16 @@ export const liveClient = {
     return query<T.SaveUser.Input, T.SaveUser.Output>(input, `admin`, `SaveUser`);
   },
 
+  sendPasswordResetEmail(
+    input: T.SendPasswordResetEmail.Input,
+  ): Promise<T.Result<T.SendPasswordResetEmail.Output>> {
+    return query<T.SendPasswordResetEmail.Input, T.SendPasswordResetEmail.Output>(
+      input,
+      `none`,
+      `SendPasswordResetEmail`,
+    );
+  },
+
   signup(input: T.Signup.Input): Promise<T.Result<T.Signup.Output>> {
     return query<T.Signup.Input, T.Signup.Output>(input, `none`, `Signup`);
   },
@@ -431,6 +441,9 @@ export const throwingClient: ApiClient = {
   },
   saveUser: () => {
     throw new Error(`ApiClient.saveUser() not implemented`);
+  },
+  sendPasswordResetEmail: () => {
+    throw new Error(`ApiClient.sendPasswordResetEmail() not implemented`);
   },
   signup: () => {
     throw new Error(`ApiClient.signup() not implemented`);
