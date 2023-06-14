@@ -9,12 +9,11 @@ type Props = {
 
 const UserActivityHeader: React.FC<Props> = ({ children, className }) => (
   <header className={cx(className)} data-test="page-heading">
-    <div className="flex justify-center items-center">
-      <h1 className="text-4xl font-bold flex justify-start items-center text-gray-800 mb-3">
+    <div className="flex items-center">
+      <h2 className="text-3xl lg:text-4xl ml-4 md:ml-0 font-bold flex justify-start items-center text-gray-800 mb-2">
         {posessive(children)} Activity
-      </h1>
+      </h2>
     </div>
-    <hr className="h-1 bg-gradient-to-r from-indigo-500 to-fuchsia-500" />
   </header>
 );
 

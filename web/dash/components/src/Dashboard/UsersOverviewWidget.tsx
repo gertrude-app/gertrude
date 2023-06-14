@@ -17,7 +17,12 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
   if (users.length > 0)
     return (
       <DashboardWidget className={className}>
-        <WidgetTitle icon="users" text="Users" />
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <WidgetTitle icon="users" text="Users" className="mb-0 sm:mb-0 mt-0" />
+          <Button type="link" to="/users" size="small" color="tertiary">
+            All users
+          </Button>
+        </div>
         {users.map((user) => (
           <UserOverview key={user.id} {...user} />
         ))}
@@ -43,16 +48,16 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
 export default UsersOverview;
 
 const UserOverview: React.FC<User> = ({ isOnline, name }) => (
-  <div className="flex justify-between items-center rounded-xl py-4 px-4 even:bg-slate-50">
+  <div className="flex justify-between items-center rounded-xl py-4 px-4 even:bg-slate-50/50">
     <h3 className="font-medium text-slate-900">{name}</h3>
     {isOnline ? (
-      <PillBadge type="green">
-        <i className="mr-2 fa-solid fa-circle text-green-500 text-sm scale-75" />
+      <PillBadge className="px-4" type="green">
+        <i className="mr-2 fa-solid fa-circle text-green-400 text-sm scale-50" />
         online
       </PillBadge>
     ) : (
-      <PillBadge type="yellow">
-        <i className="mr-2 fa-solid fa-circle text-yellow-500 text-sm scale-75" />
+      <PillBadge className="px-4" type="yellow">
+        <i className="mr-2 fa-solid fa-circle text-yellow-400 text-sm scale-50" />
         offline
       </PillBadge>
     )}

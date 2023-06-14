@@ -34,7 +34,7 @@ const KeychainCard: React.FC<Props> = ({
 }) => (
   <div
     className={cx(
-      `rounded-xl shadow-lg shadow-slate-300/50 border-[0.5px] border-slate-200 bg-white flex flex-col justify-between transition duration-100`,
+      `rounded-2xl shadow-lg shadow-slate-300/50 border-[0.5px] border-slate-200 bg-white flex flex-col justify-between transition duration-100`,
       isSelect(props) && props.selected && `bg-violet-50 border-violet-300`,
       isSelect(props) && !props.selected && `hover:bg-slate-50 cursor-pointer`,
       isSelect(props) && `min-h-[77px]`,
@@ -89,7 +89,7 @@ const KeychainCard: React.FC<Props> = ({
     {isSelect(props) || (
       <div
         className={cx(
-          `bg-slate-50 rounded-b-xl w-full flex items-center py-2 justify-between`,
+          `bg-slate-50 rounded-b-2xl w-full flex items-center py-2 justify-between`,
           isSelect(props) && props.selected && `bg-indigo-100/40`,
         )}
       >

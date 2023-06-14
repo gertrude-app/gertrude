@@ -59,6 +59,6 @@ const QuickAction: React.FC<QuickActionProps> = ({ name, Icon, action }) => (
     <div className="flex justify-center items-center text-white bg-gradient-to-br from-indigo-500 to-fuchsia-500 w-10 h-10 rounded-lg shrink-0">
       <Icon className="w-5" />
     </div>
-    <h2 className="font-medium leading-5 ml-3 text-lg text-slate-800">{name}</h2>
+    <h3 className="font-medium leading-5 ml-3 text-lg text-slate-700">{name}</h3>
   </Action>
 );

@@ -27,7 +27,7 @@ const UnlockRequestCard: React.FC<Props> = ({
 }) => (
   <div
     className={cx(
-      `flex flex-col bg-white border border-slate-200 p-4 rounded-2xl max-w-3xl`,
+      `flex flex-col bg-violet-50/50 border-[0.5px] border-violet-100 p-4 rounded-2xl max-w-3xl`,
       {
         'border-red-600/30': status === `rejected`,
         'border-green-700/40': status === `accepted`,
@@ -38,8 +38,8 @@ const UnlockRequestCard: React.FC<Props> = ({
       <h2 className="font-bold text-slate-900">{userName}</h2>
       <h3 className="text-slate-400 text-sm">{relativeTime(new Date(createdAt))}</h3>
     </div>
-    <div className="py-3 px-5 bg-slate-50 rounded-xl mt-2 flex justify-center items-center">
-      <h2 className="font-mono text-base whitespace-nowrap truncate">
+    <div className="py-3 px-5 bg-violet-50 rounded-xl mt-2 flex justify-center items-center">
+      <h2 className="font-mono text-base whitespace-nowrap truncate text-violet-900">
         {url.replace(/^https?:\/\//, ``).replace(/\/$/, ``)}
       </h2>
     </div>
