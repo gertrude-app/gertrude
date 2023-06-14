@@ -40,7 +40,7 @@ const LoginForm: React.FC<Props> = ({
       {` `}
       if you don&rsquo;t have an account yet.
     </h3>
-    <div className="self-stretch mt-5 sm:mt-7 mb-6 space-y-3">
+    <div className="self-stretch mt-5 sm:mt-7 space-y-3">
       <TextInput
         type="email"
         name="email"
@@ -60,6 +60,12 @@ const LoginForm: React.FC<Props> = ({
         setValue={setPassword}
       />
     </div>
+    <Link
+      to="/reset-password"
+      className="mb-6 mt-2 self-end text-violet-500 text-sm hover:text-violet-800 transition duration-100"
+    >
+      Forgot password?
+    </Link>
     <div className="space-y-3 self-stretch">
       <Button color="primary" type="submit" fullWidth size="large">
         Submit &rarr;
