@@ -1,30 +1,56 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import FullscreenGradientBg from '@dash/components/src/Unauthed/FullscreenGradientBg';
 import { Button, TextInput } from '@shared/components';
+import { ErrorMessage } from '@dash/components';
+import { useMutation } from '../../hooks';
+import Current from '../../environment';
 
-interface Props {}
-
-const ChangePassword: React.FC<Props> = ({}) => {
+const ChangePassword: React.FC = () => {
   const { token } = useParams<{ token: UUID }>();
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState(``);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const resetPassword = useMutation(
+    (data: { verificationToken: string; newPassword: string }) =>
+      Current.api.resetPassword({ ...data }),
+  );
+  if (!token) {
+    return (
+      <div className="h-screen w-screen flex justify-center items-center">
+        <ErrorMessage className="max-w-md">Invalid token</ErrorMessage>
+      </div>
+    );
+  }
+  if (resetPassword.data && resetPassword.data.success) {
+    return <Navigate to={`/login?from=reset`} replace />;
+  }
   return (
     <FullscreenGradientBg>
       <div className="bg-white rounded-3xl shadow-xl z-10 mx-4">
-        <div className="px-6 xs:px-8 py-8">
+        <div className="px-6 xs:px-8 py-8 flex flex-col items-center">
           <h1 className="font-inter text-3xl text-center">Choose a new password</h1>
           <p className="text-slate-500 max-w-md mt-4 text-center">
-            Enter a new password for your account, and we'll log you in.
+            Enter a new password for your account, and we'll redirect you back to the
+            login screen.
           </p>
+          {resetPassword.isError && (
+            <ErrorMessage className="mt-6">
+              {resetPassword.error.userMessage ?? `Hmm, something went wrong.`}
+            </ErrorMessage>
+          )}
+          {resetPassword.data && !resetPassword.data.success && (
+            <ErrorMessage className="mt-6 max-w-md">
+              Invalid token. Please request a new password reset link.
+            </ErrorMessage>
+          )}
         </div>
         <div className="px-6 xs:px-8 py-8 bg-slate-50 rounded-b-3xl flex flex-col gap-8">
           <div className="flex justify-between items-center">
             <TextInput
               value={password}
               setValue={setPassword}
-              type={passwordVisible ? 'text' : 'password'}
+              type={passwordVisible ? `text` : `password`}
               className="flex-gro"
             />
             <button
@@ -41,7 +67,9 @@ const ChangePassword: React.FC<Props> = ({}) => {
           <Button
             type="button"
             color="primary"
-            onClick={() => {}}
+            onClick={() =>
+              resetPassword.mutate({ verificationToken: token, newPassword: password })
+            }
             className="flex-grow"
             disabled={password.length <= 4}
           >

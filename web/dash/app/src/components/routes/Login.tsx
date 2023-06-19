@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ApiErrorMessage, FullscreenModalForm, LoginForm } from '@dash/components';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/auth';
 import { useMutation, useLoginRedirect } from '../../hooks';
 import Current from '../../environment';
@@ -10,6 +10,8 @@ export const Login: React.FC = () => {
   const redirectUrl = useLoginRedirect();
   const [email, setEmail] = useState(``);
   const [password, setPassword] = useState(``);
+  const [searchParams] = useSearchParams();
+  const fromPage = searchParams.get(`from`);
 
   const requestMagicLink = useMutation(() =>
     Current.api.requestMagicLink({
@@ -62,6 +64,7 @@ export const Login: React.FC = () => {
         setPassword={setPassword}
         onSubmit={() => loginMutation.mutate(undefined)}
         onSendMagicLink={() => requestMagicLink.mutate(undefined)}
+        fromPasswordReset={fromPage === `reset`}
       />
     </FullscreenModalForm>
   );

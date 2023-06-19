@@ -29,6 +29,7 @@ export * from './pairs/JoinWaitlist';
 export * from './pairs/Login';
 export * from './pairs/LoginMagicLink';
 export * from './pairs/RequestMagicLink';
+export * from './pairs/ResetPassword';
 export * from './pairs/SaveKey';
 export * from './pairs/SaveKeychain';
 export * from './pairs/SaveNotification';

@@ -9,6 +9,7 @@ type Props = {
   setEmail(email: string): unknown;
   onSubmit(): unknown;
   onSendMagicLink(): unknown;
+  fromPasswordReset?: boolean;
 };
 
 const LoginForm: React.FC<Props> = ({
@@ -18,6 +19,7 @@ const LoginForm: React.FC<Props> = ({
   setPassword,
   password,
   onSendMagicLink,
+  fromPasswordReset = false,
 }) => (
   <form
     className="flex flex-col items-center max-w-sm"
@@ -28,18 +30,26 @@ const LoginForm: React.FC<Props> = ({
   >
     <Logo className="-mt-6 mb-0" size={110} iconOnly />
     <h2 className="text-center mt-4 text-3xl font-inter">Account Login</h2>
-    <h3 className="text-center text-sm sm:text-base text-slate-500/90 mt-3">
-      Forgot your password, or too hard to type? Request a <em>magic link</em> with just
-      your email address. Or,{` `}
-      <Link
-        className="text-violet-700 border-b border-dotted border-violet-700"
-        to="/signup"
-      >
-        signup
-      </Link>
-      {` `}
-      if you don&rsquo;t have an account yet.
-    </h3>
+    {fromPasswordReset ? (
+      <div className="w-full bg-fuchsia-50 rounded-2xl p-6 mt-4">
+        <p className="text-fuchsia-600 font-mediumi text-sm xs:text-base">
+          Password successfully changed! Please log in with your new password.
+        </p>
+      </div>
+    ) : (
+      <p className="text-center text-sm sm:text-base text-slate-500/90 mt-3">
+        Forgot your password, or too hard to type? Request a <em>magic link</em> with just
+        your email address. Or,{` `}
+        <Link
+          className="text-violet-700 border-b border-dotted border-violet-700"
+          to="/signup"
+        >
+          signup
+        </Link>
+        {` `}
+        if you don&rsquo;t have an account yet.
+      </p>
+    )}
     <div className="self-stretch mt-5 sm:mt-7 space-y-3">
       <TextInput
         type="email"

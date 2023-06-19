@@ -146,6 +146,9 @@ const noopClient: ApiClient = {
   requestMagicLink: async () => {
     return Result.success({ success: true });
   },
+  resetPassword: async () => {
+    return Result.success({ success: true });
+  },
   saveKey: async () => {
     return Result.success({ success: true });
   },

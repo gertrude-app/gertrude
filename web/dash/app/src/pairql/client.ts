@@ -252,6 +252,14 @@ export const liveClient = {
     );
   },
 
+  resetPassword(input: T.ResetPassword.Input): Promise<T.Result<T.ResetPassword.Output>> {
+    return query<T.ResetPassword.Input, T.ResetPassword.Output>(
+      input,
+      `none`,
+      `ResetPassword`,
+    );
+  },
+
   saveKey(input: T.SaveKey.Input): Promise<T.Result<T.SaveKey.Output>> {
     return query<T.SaveKey.Input, T.SaveKey.Output>(input, `admin`, `SaveKey`);
   },
@@ -429,6 +437,9 @@ export const throwingClient: ApiClient = {
   },
   requestMagicLink: () => {
     throw new Error(`ApiClient.requestMagicLink() not implemented`);
+  },
+  resetPassword: () => {
+    throw new Error(`ApiClient.resetPassword() not implemented`);
   },
   saveKey: () => {
     throw new Error(`ApiClient.saveKey() not implemented`);

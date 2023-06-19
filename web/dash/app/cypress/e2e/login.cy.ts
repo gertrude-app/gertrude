@@ -6,7 +6,7 @@ describe(`dashboard app login`, () => {
     cy.interceptPql(`RequestMagicLink`, { success: true });
   });
 
-  xdescribe(`standard login procedures`, () => {
+  describe(`standard login procedures`, () => {
     it(`handles happy path`, () => {
       cy.visit(`/login`);
       cy.get(`input[name=email]`).type(betsy.email);
@@ -75,6 +75,57 @@ describe(`dashboard app login`, () => {
   });
 
   describe(`password reset`, () => {
-    it(`handles happy path`, () => {});
+    it(`shows email sent confirmation when no error`, () => {
+      cy.intercept(`/pairql/dashboard/SendPasswordResetEmail`, (req) => {
+        req.alias = `sendPasswordResetEmail`;
+        req.reply({ success: true });
+      });
+      cy.visit(`/login`);
+      cy.contains(`Forgot password?`).click();
+      cy.location(`pathname`).should(`eq`, `/reset-password`);
+      cy.contains(`Reset your password`);
+      cy.get(`input[type=email]`).type(betsy.email);
+      cy.contains(`Send reset link`).click();
+      cy.contains(`Email sent!`).should(`be.visible`);
+    });
+
+    it(`shows error when there's no user with given email address`, () => {
+      cy.intercept(`/pairql/dashboard/SendPasswordResetEmail`, (req) => {
+        req.alias = `sendPasswordResetEmail`;
+        req.reply({ success: false });
+      });
+      cy.visit(`/login`);
+      cy.contains(`Forgot password?`).click();
+      cy.location(`pathname`).should(`eq`, `/reset-password`);
+      cy.contains(`Reset your password`);
+      cy.get(`input[type=email]`).type(betsy.email);
+      cy.contains(`Send reset link`).click();
+      cy.contains(`Uh-oh!`).should(`be.visible`);
+    });
+
+    it(`logs user back in after password reset`, () => {
+      cy.intercept(`/pairql/dashboard/ResetPassword`, (req) => {
+        req.alias = `resetPassword`;
+        req.reply({ success: true });
+      });
+      cy.visit(`/reset-password/123`);
+      cy.contains(`Choose a new password`);
+      cy.get(`input[type=password]`).type(`super_secret?`);
+      cy.contains(`Log in`).click();
+      cy.contains(`Password successfully changed!`);
+    });
+
+    it(`shows error when password reset fails due to invalid token`, () => {
+      cy.intercept(`/pairql/dashboard/ResetPassword`, (req) => {
+        req.alias = `resetPassword`;
+        req.reply({ success: false });
+      });
+      cy.visit(`/reset-password/123`);
+      cy.contains(`Choose a new password`);
+      cy.get(`input[type=password]`).type(`super_secret?`);
+      cy.contains(`Log in`).click();
+      cy.contains(`Uh-oh!`);
+      cy.contains(`Invalid token.`);
+    });
   });
 });
