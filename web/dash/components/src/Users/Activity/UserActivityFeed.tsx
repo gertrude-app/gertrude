@@ -115,15 +115,8 @@ export function deleteableChunks(
           <Button
             type="button"
             color="secondary-on-violet-bg"
-            onClick={() => {
-              deleteItems(toDelete);
-              // sometimes scrolling to top seems to fail, possibly because
-              // the repaint hasn't finished, or maybe because of react re-renders,
-              // so, retry a couple times to hopefully land in the right spot
-              setTimeout(scrollToTop, 0);
-              setTimeout(scrollToTop, 50);
-              setTimeout(scrollToTop, 150);
-            }}
+            className="ScrollTop"
+            onClick={() => deleteItems(toDelete)}
           >
             Approve previous {[...ids].length} items
           </Button>
@@ -132,12 +125,6 @@ export function deleteableChunks(
     }
   }
   return elements;
-}
-
-function scrollToTop(): void {
-  document.getElementById(`delete-focus`)?.scrollIntoView({
-    behavior: `smooth`,
-  });
 }
 
 function renderItem(
