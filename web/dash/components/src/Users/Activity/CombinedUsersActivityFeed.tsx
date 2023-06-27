@@ -44,11 +44,9 @@ const CombinedUsersActivityFeed: React.FC<Props> = ({
                 <div className="flex justify-center pb-8">
                   <Button
                     type="button"
-                    onClick={() => {
-                      deleteItems(items.map((item) => item.id));
-                    }}
+                    onClick={() => deleteItems(items.map((item) => item.id))}
                     color="secondary"
-                    className="mt-4"
+                    className="ScrollTop mt-4"
                   >
                     <i className="fa-solid fa-thumbs-up mr-2" />
                     Approve all {posessive(userName)} activity

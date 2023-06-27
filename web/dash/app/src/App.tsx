@@ -31,7 +31,11 @@ const App: React.FC = () => {
   useEffect(() => {
     document.addEventListener(`click`, (e) => {
       if (e.target instanceof HTMLElement && e.target.classList.contains(`ScrollTop`)) {
-        window.scrollTo({ top: 0 });
+        window.scrollTo({ top: 0, behavior: `smooth` });
+        // retry a couple times, to fix anomalies from (i think) react re-renders
+        setTimeout(() => window.scrollTo({ top: 0, behavior: `smooth` }), 150);
+        setTimeout(() => window.scrollTo({ top: 0, behavior: `smooth` }), 250);
+        setTimeout(() => window.scrollTo({ top: 0 }), 300);
       }
     });
   }, []);
