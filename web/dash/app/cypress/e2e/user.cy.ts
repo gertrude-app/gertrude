@@ -66,8 +66,8 @@ describe(`user screen`, () => {
     });
   });
 
-  describe(`all users activity`, () => {
-    it(`overviews page`, () => {
+  describe(`combined users screens`, () => {
+    it(`summary page displays aggregate totals in correct order`, () => {
       cy.intercept(`/pairql/dashboard/CombinedUsersActivitySummaries`, [
         {
           date: time.subtracting({ days: 1 }),
@@ -87,48 +87,30 @@ describe(`user screen`, () => {
       cy.contains(`5 out of 1234`);
     });
 
-    it(`review day`, () => {
-      const suzyIds = [
-        `a70ab833-d7c5-4eb0-8a86-83738188bec0`,
-        `ff285ff7-28d8-43f6-8ecd-bb6c3037196c`,
-        `359741a3-b61c-456e-a50b-47cc4abfc33a`,
-      ];
+    it(`activity feed displays items in correct order`, () => {
       cy.intercept(`/pairql/dashboard/CombinedUsersActivityFeed`, (req) => {
         req.alias = `combinedUsersActivityFeed`;
         req.reply([
-          mock.combinedUsersActivityFeed({
+          {
             userName: `Bob`,
             numDeleted: 0,
-            items: [
-              {
-                type: `Screenshot`,
-                value: {
-                  id: `screenshot-123`,
-                  ids: [`screenshot-123`],
-                  url: `https://placekitten.com/700/400`,
-                  width: 700,
-                  height: 400,
-                  createdAt: new Date().toISOString(),
-                },
-              },
-            ],
-          }),
-          mock.combinedUsersActivityFeed({
+            items: [mock.screenshotActivityItem({ id: `screenshot-123` })],
+          },
+          {
             userName: `Suzy`,
             numDeleted: 1,
             items: [
-              {
-                type: `CoalescedKeystrokeLine`,
-                value: {
-                  id: suzyIds[0],
-                  ids: suzyIds,
-                  appName: `Firefox`,
-                  line: `ChatGPT, tell me how to link vapor and lib-bsm with a simlink decorator`,
-                  createdAt: new Date().toISOString(),
-                },
-              },
+              mock.screenshotActivityItem({ id: `screenshot-234` }),
+              mock.screenshotActivityItem({ id: `screenshot-345` }),
+              mock.screenshotActivityItem({ id: `screenshot-456` }),
+              mock.keystrokeActivityItem({
+                id: `ks-1`,
+                ids: [`ks-1`, `ks-2`, `ks-3`], // <-- aggregated ids
+                appName: `Firefox`,
+                line: `ChatGPT, tell me how to link vapor and lib-bsm with a simlink decorator`,
+              }),
             ],
-          }),
+          },
         ]);
       });
 
@@ -143,13 +125,22 @@ describe(`user screen`, () => {
         req.reply({ success: true });
       });
 
+      // suzy has more items, so her activity should be first
+      cy.testId(`page-heading`).first().should(`have.text`, `Suzy’s Activity`);
+      cy.testId(`page-heading`).last().should(`have.text`, `Bob’s Activity`);
+
       cy.contains(`Approve all user activity`).click();
 
       cy.wait(`@deleteActivityItems`)
         .its(`request.body`)
         .should(`deep.equal`, {
-          keystrokeLineIds: suzyIds,
-          screenshotIds: [`screenshot-123`],
+          keystrokeLineIds: [`ks-1`, `ks-2`, `ks-3`], // <-- aggregated ids
+          screenshotIds: [
+            `screenshot-123`,
+            `screenshot-234`,
+            `screenshot-345`,
+            `screenshot-456`,
+          ],
         });
     });
   });
