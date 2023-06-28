@@ -4,19 +4,15 @@ import * as mock from '../../src/reducers/__tests__/mocks';
 describe(`suspend filter request flow`, () => {
   beforeEach(() => {
     cy.simulateLoggedIn();
-    cy.intercept(`/pairql/dashboard/GetSuspendFilterRequest`, (req) => {
-      req.reply(
-        mock.suspendFilterRequest({
-          id: `1`,
-          requestComment: `I want to watch a video`,
-        }),
-      );
-    });
+    cy.interceptPql(
+      `GetSuspendFilterRequest`,
+      mock.suspendFilterRequest({
+        id: `1`,
+        requestComment: `I want to watch a video`,
+      }),
+    );
 
-    cy.intercept(`/pairql/dashboard/UpdateSuspendFilterRequest`, (req) => {
-      req.alias = `updateSuspendFilterRequest`;
-      req.reply({ success: true });
-    });
+    cy.interceptPql(`UpdateSuspendFilterRequest`, { success: true });
   });
 
   it(`handles full happy path for GRANT w/ all redirects`, () => {
@@ -26,7 +22,7 @@ describe(`suspend filter request flow`, () => {
     cy.testId(`suspend-filter-req-comment`).type(`i'll be watching you`);
     cy.testId(`modal-primary-btn`).click();
 
-    cy.wait(`@updateSuspendFilterRequest`)
+    cy.wait(`@UpdateSuspendFilterRequest`)
       .its(`request.body.responseComment`)
       .should(`eq`, `i'll be watching you`);
   });

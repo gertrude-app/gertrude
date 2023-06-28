@@ -1,9 +1,15 @@
 /// <reference types="cypress" />
 
-declare namespace Cypress {
-  interface Chainable {
-    simulateLoggedIn(): Chainable<any>;
-    testId(selector: string, ...args: any[]): Chainable<any>;
-    sidebarClick(link: 'Dashboard' | 'Users' | 'Keychains' | 'Profile'): void;
+import type { interceptPql, forcePqlErr } from './intercept';
+
+declare global {
+  namespace Cypress {
+    interface Chainable<Subject> {
+      simulateLoggedIn(): void;
+      testId(selector: string, ...args: any[]): Chainable<Subject>;
+      sidebarClick(link: 'Dashboard' | 'Users' | 'Keychains' | 'Profile'): void;
+      interceptPql: typeof interceptPql;
+      forcePqlErr: typeof forcePqlErr;
+    }
   }
 }
