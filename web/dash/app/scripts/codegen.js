@@ -86,8 +86,39 @@ async function main() {
 
   fs.writeFileSync(`${APP_DIR}/client.ts`, clientFileLines.join(`\n`));
 
+  const cypressLines = [
+    `// auto-generated, do not edit`,
+    `import type * as T from '@dash/types';`,
+    ``,
+  ];
+
+  const names = [];
+  for (const [name] of ordered) {
+    names.push(name);
+    cypressLines.push(
+      `export function interceptPql(slug: \`${name}\`, output: T.${name}.Output): void;`,
+    );
+  }
+
+  const path = `\`/pairql/dashboard/\${slug}\``;
+  cypressLines.push(``);
+  cypressLines.push(`export function interceptPql(slug: string, output: any): void {`);
+  cypressLines.push(`  cy.intercept(${path}, output).as(slug);`);
+  cypressLines.push(`}`);
+  cypressLines.push(``);
+  cypressLines.push(`export function forcePqlErr(`);
+  cypressLines.push(`  slug: '${names.join(`' | '`)}',`);
+  cypressLines.push(`  details: Record<string, any> = {},`);
+  cypressLines.push(`): void {`);
+  cypressLines.push(`  cy.intercept(${path}, { __cyStubbedError: true, ...details });`);
+  cypressLines.push(`}`);
+  cypressLines.push(``);
+
+  fs.writeFileSync(`${CY_DIR}/intercept.ts`, cypressLines.join(`\n`));
+
   // prettier the codegen'd files
   exec.exit(`${PRETTIER_FORMAT} ${APP_DIR}/*.ts`);
+  exec.exit(`${PRETTIER_FORMAT} ${CY_DIR}/intercept.ts`);
   exec.exit(`${PRETTIER_FORMAT} ${PKG_DIR}/*.ts`);
   exec.exit(`${PRETTIER_FORMAT} ${PKG_DIR}/pairs/*.ts`);
 }
@@ -162,6 +193,7 @@ function sortShared(code) {
 const CWD = process.cwd();
 const APP_DIR = `${CWD}/src/pairql`;
 const PKG_DIR = `${CWD}/../types/src/pairql`;
+const CY_DIR = `${CWD}/cypress/support`;
 
 const PRETTIER_FORMAT = [
   `${CWD}/../../node_modules/.bin/prettier`,

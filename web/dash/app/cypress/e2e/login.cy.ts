@@ -3,10 +3,7 @@ import { betsy } from '../fixtures/helpers';
 
 describe(`dashboard app login`, () => {
   beforeEach(() => {
-    cy.intercept(`/pairql/dashboard/RequestMagicLink`, (req) => {
-      req.alias = `requestMagicLink`;
-      req.reply({ success: true });
-    });
+    cy.interceptPql(`RequestMagicLink`, { success: true });
   });
 
   it(`handles happy path`, () => {
@@ -34,7 +31,7 @@ describe(`dashboard app login`, () => {
     cy.get(`input[name=email]`).type(betsy.email);
     cy.testId(`magic-link`).should(`not.be.disabled`).click();
 
-    cy.wait(`@requestMagicLink`).its(`request.body.email`).should(`eq`, betsy.email);
+    cy.wait(`@RequestMagicLink`).its(`request.body.email`).should(`eq`, betsy.email);
 
     cy.contains(`Check your email`);
   });
@@ -44,7 +41,7 @@ describe(`dashboard app login`, () => {
     cy.get(`input[name=email]`).type(betsy.email);
     cy.testId(`magic-link`).click();
 
-    cy.wait(`@requestMagicLink`)
+    cy.wait(`@RequestMagicLink`)
       .its(`request.body`)
       .should(`deep.equal`, { email: betsy.email, redirect: `/users/123` });
 

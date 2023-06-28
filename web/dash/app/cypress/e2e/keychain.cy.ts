@@ -6,11 +6,11 @@ import * as mock from '../../src/reducers/__tests__/mocks';
 describe(`create keychain`, () => {
   beforeEach(() => {
     cy.simulateLoggedIn();
-    cy.intercept(`/pairql/dashboard/GetIdentifiedApps`, []);
-    cy.intercept(`/pairql/dashboard/SaveKeychain`, { success: true });
-    cy.intercept(`/pairql/dashboard/DeleteEntity`, { success: true });
-    cy.intercept(`/pairql/dashboard/GetUsers`, [mock.user()]);
-    cy.intercept(`/pairql/dashboard/GetUser`, mock.user());
+    cy.interceptPql(`GetIdentifiedApps`, []);
+    cy.interceptPql(`SaveKeychain`, { success: true });
+    cy.interceptPql(`DeleteEntity`, { success: true });
+    cy.interceptPql(`GetUsers`, [mock.user()]);
+    cy.interceptPql(`GetUser`, mock.user());
   });
 
   it(`doesn't allow selection of recently deleted keychains`, () => {
@@ -19,8 +19,8 @@ describe(`create keychain`, () => {
       keys: [],
     };
 
-    cy.intercept(`/pairql/dashboard/GetAdminKeychains`, [existing]);
-    cy.intercept(`/pairql/dashboard/GetSelectableKeychains`, { own: [], public: [] });
+    cy.interceptPql(`GetAdminKeychains`, [existing]);
+    cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
 
     cy.visit(`/keychains`);
     cy.contains(`Existing`)
@@ -41,15 +41,12 @@ describe(`create keychain`, () => {
       keys: [],
     };
 
-    cy.intercept(`/pairql/dashboard/GetAdminKeychains`, [existing]);
-    cy.intercept(`/pairql/dashboard/GetSelectableKeychains`, {
+    cy.interceptPql(`GetAdminKeychains`, [existing]);
+    cy.interceptPql(`GetSelectableKeychains`, {
       own: [existing.summary],
       public: [],
     });
-    cy.intercept(
-      `/pairql/dashboard/GetUser`,
-      mock.user({ keychains: [existing.summary] }),
-    );
+    cy.interceptPql(`GetUser`, mock.user({ keychains: [existing.summary] }));
 
     cy.visit(`/keychains`);
     cy.contains(`Test keychain`);
@@ -62,9 +59,9 @@ describe(`create keychain`, () => {
   describe(`no keychains to start`, () => {
     beforeEach(() => {
       // admin starts with no keychains
-      cy.intercept(`/pairql/dashboard/GetAdminKeychains`, []);
+      cy.interceptPql(`GetAdminKeychains`, []);
       // and no prior selectable keychains
-      cy.intercept(`/pairql/dashboard/GetSelectableKeychains`, { own: [], public: [] });
+      cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
     });
 
     it(`(the keychain picker) shows empty state when admin has no personal keychains to assign`, () => {

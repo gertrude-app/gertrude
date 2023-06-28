@@ -3,13 +3,11 @@ import { betsy } from '../fixtures/helpers';
 
 describe(`signup`, () => {
   it(`handles signup flow, minus stripe redirect`, () => {
-    cy.intercept(`/pairql/dashboard/VerifySignupEmail`, (req) => {
-      // use betsy's id for stripe direct checkout test
-      req.reply({ adminId: betsy.id });
-    });
+    // use betsy's id for stripe direct checkout test
+    cy.interceptPql(`VerifySignupEmail`, { adminId: betsy.id });
 
     // prevent trying to go to stripe, which causes cross-origin issues
-    cy.intercept(`/pairql/dashboard/GetCheckoutUrl`, { __cyStubbedError: true });
+    cy.forcePqlErr(`GetCheckoutUrl`);
 
     cy.visit(`/signup`);
     cy.get(`input[name=email]`).type(`e2e-test-${Date.now()}@gertrude.app`);
@@ -21,23 +19,25 @@ describe(`signup`, () => {
   });
 
   it(`sends correct mutation and auto logs-in on success`, () => {
-    cy.intercept(`/pairql/dashboard/HandleCheckoutSuccess`, (req) => {
-      req.alias = `signup`;
-      req.reply({ token: `token-123`, adminId: `admin-123` });
+    cy.interceptPql(`HandleCheckoutSuccess`, {
+      token: `token-123`,
+      adminId: `admin-123`,
     });
 
-    cy.intercept(`/pairql/dashboard/GetDashboardWidgets`, (req) => {
-      req.alias = `widgets`;
-      req.reply({ unlockRequests: [], users: [], userActivity: [], userScreenshots: [] });
+    cy.interceptPql(`GetDashboardWidgets`, {
+      users: [],
+      unlockRequests: [],
+      userActivitySummaries: [],
+      recentScreenshots: [],
     });
 
     cy.visit(`/checkout-success?session_id=cs_test_123`);
 
-    cy.wait(`@signup`)
+    cy.wait(`@HandleCheckoutSuccess`)
       .its(`request.body.stripeCheckoutSessionId`)
       .should(`eq`, `cs_test_123`);
 
-    cy.wait(`@widgets`)
+    cy.wait(`@GetDashboardWidgets`)
       .its(`request.headers.${`X-AdminToken`.toLowerCase()}`)
       .should(`eq`, `token-123`);
 

@@ -7,15 +7,9 @@ import { entireDay } from '../../src/lib/days';
 describe(`user screen`, () => {
   beforeEach(() => {
     cy.simulateLoggedIn();
-
-    cy.intercept(`/pairql/dashboard/SaveUser`, (req) => {
-      req.alias = `saveUser`;
-      req.reply({ success: true });
-    });
-
-    cy.intercept(`/pairql/dashboard/GetUsers`, [mock.user({ id: `user-123` })]);
-
-    cy.intercept(`/pairql/dashboard/DeleteEntity`, { success: true });
+    cy.interceptPql(`SaveUser`, { success: true });
+    cy.interceptPql(`GetUsers`, [mock.user({ id: `user-123` })]);
+    cy.interceptPql(`DeleteEntity`, { success: true });
   });
 
   describe(`new user creation`, () => {
@@ -30,7 +24,7 @@ describe(`user screen`, () => {
       );
 
       cy.contains(`Save user`).click();
-      cy.wait(`@saveUser`);
+      cy.wait(`@SaveUser`);
 
       cy.testId(`page-heading`).should(`have.text`, `Edit user`);
       cy.contains(`Save user`).should(`be.disabled`);
@@ -55,7 +49,7 @@ describe(`user screen`, () => {
 
   describe(`user deletion`, () => {
     it(`redirects to /users path`, () => {
-      cy.intercept(`/pairql/dashboard/GetUser`, mock.user({ id: `user-123` }));
+      cy.interceptPql(`GetUser`, mock.user({ id: `user-123` }));
       cy.visit(`/users/user-123`);
 
       cy.contains(`Delete user`).click();
@@ -68,7 +62,7 @@ describe(`user screen`, () => {
 
   describe(`combined users screens`, () => {
     it(`summary page displays aggregate totals in correct order`, () => {
-      cy.intercept(`/pairql/dashboard/CombinedUsersActivitySummaries`, [
+      cy.interceptPql(`CombinedUsersActivitySummaries`, [
         {
           date: time.subtracting({ days: 1 }),
           numApproved: 5,
@@ -88,42 +82,36 @@ describe(`user screen`, () => {
     });
 
     it(`activity feed displays items in correct order`, () => {
-      cy.intercept(`/pairql/dashboard/CombinedUsersActivityFeed`, (req) => {
-        req.alias = `combinedUsersActivityFeed`;
-        req.reply([
-          {
-            userName: `Bob`,
-            numDeleted: 0,
-            items: [mock.screenshotActivityItem({ id: `screenshot-123` })],
-          },
-          {
-            userName: `Suzy`,
-            numDeleted: 1,
-            items: [
-              mock.screenshotActivityItem({ id: `screenshot-234` }),
-              mock.screenshotActivityItem({ id: `screenshot-345` }),
-              mock.screenshotActivityItem({ id: `screenshot-456` }),
-              mock.keystrokeActivityItem({
-                id: `ks-1`,
-                ids: [`ks-1`, `ks-2`, `ks-3`], // <-- aggregated ids
-                appName: `Firefox`,
-                line: `ChatGPT, tell me how to link vapor and lib-bsm with a simlink decorator`,
-              }),
-            ],
-          },
-        ]);
-      });
+      cy.interceptPql(`CombinedUsersActivityFeed`, [
+        {
+          userName: `Bob`,
+          numDeleted: 0,
+          items: [mock.screenshotActivityItem({ id: `screenshot-123` })],
+        },
+        {
+          userName: `Suzy`,
+          numDeleted: 1,
+          items: [
+            mock.screenshotActivityItem({ id: `screenshot-234` }),
+            mock.screenshotActivityItem({ id: `screenshot-345` }),
+            mock.screenshotActivityItem({ id: `screenshot-456` }),
+            mock.keystrokeActivityItem({
+              id: `ks-1`,
+              ids: [`ks-1`, `ks-2`, `ks-3`], // <-- aggregated ids
+              appName: `Firefox`,
+              line: `ChatGPT, tell me how to link vapor and lib-bsm with a simlink decorator`,
+            }),
+          ],
+        },
+      ]);
 
       cy.visit(`/users/activity/03-06-2023`);
 
-      cy.wait(`@combinedUsersActivityFeed`)
+      cy.wait(`@CombinedUsersActivityFeed`)
         .its(`request.body`)
         .should(`deep.equal`, { range: entireDay(dateFromUrl(`03-06-2023`)) });
 
-      cy.intercept(`/pairql/dashboard/DeleteActivityItems_v2`, (req) => {
-        req.alias = `deleteActivityItems`;
-        req.reply({ success: true });
-      });
+      cy.interceptPql(`DeleteActivityItems_v2`, { success: true });
 
       // suzy has more items, so her activity should be first
       cy.testId(`page-heading`).first().should(`have.text`, `Suzy’s Activity`);
@@ -131,7 +119,7 @@ describe(`user screen`, () => {
 
       cy.contains(`Approve all user activity`).click();
 
-      cy.wait(`@deleteActivityItems`)
+      cy.wait(`@DeleteActivityItems_v2`)
         .its(`request.body`)
         .should(`deep.equal`, {
           keystrokeLineIds: [`ks-1`, `ks-2`, `ks-3`], // <-- aggregated ids

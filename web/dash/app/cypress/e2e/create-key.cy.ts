@@ -1,34 +1,29 @@
 /// <reference types="cypress" />
-import type { AdminKeychain, GetIdentifiedApps } from '@dash/types';
 
 describe(`create key flow`, () => {
   beforeEach(() => {
     cy.simulateLoggedIn();
     cy.viewport(1024, 875);
 
-    cy.intercept(`/pairql/dashboard/GetIdentifiedApps`, (req) => {
-      const app: GetIdentifiedApps.Output[number] = {
+    cy.interceptPql(`GetIdentifiedApps`, [
+      {
         id: `app-123`,
         name: `Brave`,
         slug: `brave`,
         selectable: true,
         bundleIds: [],
-      };
-      req.reply([app]);
-    });
+      },
+    ]);
 
-    cy.intercept(`/pairql/dashboard/GetAdminKeychain`, (req) => {
-      const keychain: AdminKeychain = {
-        summary: {
-          id: `123`,
-          name: `Betsy's Keychain`,
-          authorId: `admin-123`,
-          isPublic: false,
-          numKeys: 0,
-        },
-        keys: [],
-      };
-      req.reply(keychain);
+    cy.interceptPql(`GetAdminKeychain`, {
+      summary: {
+        id: `123`,
+        name: `Betsy's Keychain`,
+        authorId: `admin-123`,
+        isPublic: false,
+        numKeys: 0,
+      },
+      keys: [],
     });
   });
 
@@ -114,13 +109,10 @@ describe(`create key flow`, () => {
     cy.testId(`key-address`).type(`https://radsite.com/with/some-path`); // <-- 👋
     cy.testId(`keycreator-next-step`).should(`not.be.disabled`);
 
-    cy.intercept(`/pairql/dashboard/SaveKey`, (req) => {
-      req.alias = `saveKey`;
-      req.reply({ success: true });
-    });
+    cy.interceptPql(`SaveKey`, { success: true });
 
     cy.testId(`modal-primary-btn`).click();
-    cy.wait(`@saveKey`).its(`request.body.key.domain`).should(`equal`, `radsite.com`);
+    cy.wait(`@SaveKey`).its(`request.body.key.domain`).should(`equal`, `radsite.com`);
   });
 
   it(`prevents proceeding and gives useful hint when address invalid`, () => {
