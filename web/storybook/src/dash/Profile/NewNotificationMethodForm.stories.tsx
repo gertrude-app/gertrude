@@ -10,8 +10,8 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 export const Email: Story = props({
-  type: `Email`,
-  value: { email: `blob@blob.com` },
+  case: `email`,
+  email: `blob@blob.com`,
   onEvent: () => {},
   sendCodeRequest: { state: `idle` },
   confirmationRequest: { state: `idle` },

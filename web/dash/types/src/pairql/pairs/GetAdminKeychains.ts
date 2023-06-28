@@ -3,5 +3,5 @@ import type { AdminKeychain } from '../shared';
 
 export namespace GetAdminKeychains {
   export type Input = void;
-  export type Output = Array<AdminKeychain>;
+  export type Output = AdminKeychain[];
 }

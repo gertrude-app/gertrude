@@ -11,8 +11,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Email: Story = props({
   selectedMethod: {
-    type: `VerifiedEmailMethod`,
-    value: { id: `1`, email: `me@example.com` },
+    id: `1`,
+    config: { case: `email`, email: `me@example.com` },
   },
   trigger: `unlockRequestSubmitted`,
   saveButtonDisabled: false,
@@ -33,8 +33,8 @@ export const Email: Story = props({
 export const Text: Story = props({
   ...Email.args,
   selectedMethod: {
-    type: `VerifiedTextMethod`,
-    value: { id: `2`, phoneNumber: `(123) 456-7890` },
+    id: `2`,
+    config: { case: `text`, phoneNumber: `(123) 456-7890` },
   },
   trigger: `unlockRequestSubmitted`,
 });
@@ -42,9 +42,9 @@ export const Text: Story = props({
 export const Slack: Story = props({
   ...Email.args,
   selectedMethod: {
-    type: `VerifiedSlackMethod`,
-    value: {
-      id: `3`,
+    id: `3`,
+    config: {
+      case: `slack`,
       channelId: ``,
       channelName: `#Gertrude`,
       token: ``,

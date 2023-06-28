@@ -2,15 +2,17 @@ import { produce } from 'immer';
 import { typesafe } from '@shared/ts-utils';
 import type { NotificationUpdate } from '@dash/components';
 import type {
+  AdminNotification,
   GetAdmin,
   NewAdminNotificationMethodEvent,
   PendingNotificationMethod,
+  VerifiedNotificationMethod,
 } from '@dash/types';
 import { editable, Req, revert } from '../lib/helpers';
 
 export type State = {
-  notifications: Record<UUID, Editable<GetAdmin.Notification> & { editing?: boolean }>;
-  notificationMethods: Record<UUID, GetAdmin.VerifiedNotificationMethod>;
+  notifications: Record<UUID, Editable<AdminNotification> & { editing?: boolean }>;
+  notificationMethods: Record<UUID, VerifiedNotificationMethod>;
   pendingNotificationMethod?: PendingNotificationMethod;
   deleting: {
     notification?: UUID;
@@ -37,7 +39,7 @@ export function reducer(state: State, action: Action): State | undefined {
 
       state.notificationMethods = {};
       for (const method of action.admin.verifiedNotificationMethods) {
-        state.notificationMethods[method.value.id] = method;
+        state.notificationMethods[method.id] = method;
       }
 
       return;
@@ -50,7 +52,7 @@ export function reducer(state: State, action: Action): State | undefined {
           {
             id,
             trigger: `suspendFilterRequestSubmitted`,
-            methodId: typesafe.objectValues(state.notificationMethods)[0]?.value.id ?? ``,
+            methodId: typesafe.objectValues(state.notificationMethods)[0]?.id ?? ``,
           },
           true,
         ),
@@ -66,8 +68,8 @@ export function reducer(state: State, action: Action): State | undefined {
             sendCodeRequest: Req.idle(),
             confirmationRequest: Req.idle(),
             confirmationCode: ``,
-            type: `Email`,
-            value: { email: `` },
+            case: `email`,
+            email: ``,
           };
           return;
         case `cancelClicked`:
@@ -79,33 +81,33 @@ export function reducer(state: State, action: Action): State | undefined {
           }
           return;
         case `emailAddressUpdated`:
-          if (state.pendingNotificationMethod?.type === `Email`) {
-            state.pendingNotificationMethod.value.email = action.event.email;
+          if (state.pendingNotificationMethod?.case === `email`) {
+            state.pendingNotificationMethod.email = action.event.email;
           }
           return;
         case `slackChannelNameUpdated`:
-          if (state.pendingNotificationMethod?.type === `Slack`) {
-            state.pendingNotificationMethod.value.channelName = action.event.channelName;
+          if (state.pendingNotificationMethod?.case === `slack`) {
+            state.pendingNotificationMethod.channelName = action.event.channelName;
           }
           return;
         case `slackChannelIdUpdated`:
-          if (state.pendingNotificationMethod?.type === `Slack`) {
-            state.pendingNotificationMethod.value.channelId = action.event.channelId;
+          if (state.pendingNotificationMethod?.case === `slack`) {
+            state.pendingNotificationMethod.channelId = action.event.channelId;
           }
           return;
         case `slackTokenUpdated`:
-          if (state.pendingNotificationMethod?.type === `Slack`) {
-            state.pendingNotificationMethod.value.token = action.event.token;
+          if (state.pendingNotificationMethod?.case === `slack`) {
+            state.pendingNotificationMethod.token = action.event.token;
           }
           return;
         case `textPhoneNumberUpdated`:
-          if (state.pendingNotificationMethod?.type === `Text`) {
-            state.pendingNotificationMethod.value.phoneNumber = action.event.phoneNumber;
+          if (state.pendingNotificationMethod?.case === `text`) {
+            state.pendingNotificationMethod.phoneNumber = action.event.phoneNumber;
           }
           return;
         case `methodTypeUpdated`:
           if (state.pendingNotificationMethod) {
-            state.pendingNotificationMethod.type = action.event.methodType;
+            state.pendingNotificationMethod.case = action.event.methodType;
           }
           return;
         case `createPendingMethodStarted`:
@@ -188,27 +190,21 @@ export default produce(reducer);
 function toVerifiedMethod(
   pending: PendingNotificationMethod,
   id: UUID,
-): GetAdmin.VerifiedNotificationMethod {
-  switch (pending.type) {
-    case `Email`:
+): VerifiedNotificationMethod {
+  switch (pending.case) {
+    case `email`:
+      return { id, config: { case: `email`, email: pending.email } };
+    case `text`:
+      return { id, config: { case: `text`, phoneNumber: pending.phoneNumber } };
+    case `slack`:
       return {
-        type: `VerifiedEmailMethod`,
-        value: { id: id, email: pending.value.email },
-      };
-    case `Slack`:
-      return {
-        type: `VerifiedSlackMethod`,
-        value: {
-          id: id,
-          channelId: pending.value.channelId,
-          channelName: pending.value.channelName,
-          token: pending.value.token,
+        id,
+        config: {
+          case: `slack`,
+          channelId: pending.channelId,
+          channelName: pending.channelName,
+          token: pending.token,
         },
-      };
-    case `Text`:
-      return {
-        type: `VerifiedTextMethod`,
-        value: { id: id, phoneNumber: pending.value.phoneNumber },
       };
   }
 }

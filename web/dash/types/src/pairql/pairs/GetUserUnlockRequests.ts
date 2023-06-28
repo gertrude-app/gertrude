@@ -3,5 +3,5 @@ import type { UnlockRequest } from '../shared';
 
 export namespace GetUserUnlockRequests {
   export type Input = UUID;
-  export type Output = Array<UnlockRequest>;
+  export type Output = UnlockRequest[];
 }

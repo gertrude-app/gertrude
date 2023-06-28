@@ -6,6 +6,5 @@ export namespace ConfirmPendingNotificationMethod {
     id: UUID;
     code: number;
   }
-
   export type Output = SuccessOutput;
 }

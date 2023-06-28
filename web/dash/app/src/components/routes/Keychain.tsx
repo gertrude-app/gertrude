@@ -19,8 +19,8 @@ const Keychain: React.FC = () => {
   const editableKeychain = state.keychain;
   const queryKey = Key.adminKeychain(id);
   const appsQuery = useQuery(Key.apps, Current.api.getIdentifiedApps);
-  const deleteKeychain = useConfirmableDelete(`Keychain`, { id });
-  const deleteKey = useConfirmableDelete(`Key`, { invalidating: [queryKey] });
+  const deleteKeychain = useConfirmableDelete(`keychain`, { id });
+  const deleteKey = useConfirmableDelete(`key`, { invalidating: [queryKey] });
 
   const newKeychainId = useMemo(() => uuid(), []);
   useEffect(() => {

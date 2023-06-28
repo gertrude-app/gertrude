@@ -1,4 +1,5 @@
 // auto-generated, do not edit
+import type { UserActivityItem } from '../shared';
 
 export namespace UserActivityFeed {
   export interface Input {
@@ -9,34 +10,9 @@ export namespace UserActivityFeed {
     };
   }
 
-  export type Item =
-    | {
-        type: 'Screenshot';
-        value: {
-          id: UUID;
-          ids: UUID[];
-          url: string;
-          width: number;
-          height: number;
-          createdAt: ISODateString;
-          deletedAt?: ISODateString;
-        };
-      }
-    | {
-        type: 'CoalescedKeystrokeLine';
-        value: {
-          id: UUID;
-          ids: UUID[];
-          appName: string;
-          line: string;
-          createdAt: ISODateString;
-          deletedAt?: ISODateString;
-        };
-      };
-
   export interface Output {
     userName: string;
     numDeleted: number;
-    items: Array<Item>;
+    items: UserActivityItem[];
   }
 }

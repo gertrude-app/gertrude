@@ -13,10 +13,9 @@ async function main() {
 
   const { shared, pairs } = await getData();
   const globalNames = Object.keys(shared).filter((name) => name !== `ClientAuth`);
-  globalNames.push(`SuccessOutput`);
 
   let sharedFile = Object.values(shared).join(`\n\n`);
-  sharedFile = sortShared(spaced(SUCCESS_OUTPUT, sharedFile));
+  sharedFile = sortShared(spaced(sharedFile));
   fs.writeFileSync(
     `${PKG_DIR}/shared.ts`,
     spaced(`// auto-generated, do not edit`, sharedFile),
@@ -163,12 +162,6 @@ function sortShared(code) {
 const CWD = process.cwd();
 const APP_DIR = `${CWD}/src/pairql`;
 const PKG_DIR = `${CWD}/../types/src/pairql`;
-
-const SUCCESS_OUTPUT = `
-export interface SuccessOutput {
-  success: boolean;
-}
-`.trim();
 
 const PRETTIER_FORMAT = [
   `${CWD}/../../node_modules/.bin/prettier`,

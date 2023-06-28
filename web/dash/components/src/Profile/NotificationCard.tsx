@@ -1,15 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import cx from 'classnames';
 import { Button, SelectMenu } from '@shared/components';
-import type { AdminNotificationTrigger, GetAdmin } from '@dash/types';
+import { capitalize } from '@shared/string';
+import type { AdminNotificationTrigger, VerifiedNotificationMethod } from '@dash/types';
 import GradientIcon from '../GradientIcon';
-
-type AdminNotificationMethod = GetAdmin.VerifiedNotificationMethod;
 
 type Props = {
   trigger: AdminNotificationTrigger;
   methodOptions: Array<{ display: string; value: string }>;
-  selectedMethod: AdminNotificationMethod;
+  selectedMethod: VerifiedNotificationMethod;
   onDelete(): unknown;
   editing: boolean;
   startEdit(): unknown;
@@ -62,7 +61,7 @@ const NotificationCard: React.FC<Props> = ({
           <h3 className="mb-1 text-violet-800 font-medium text-md ml-1">Method:</h3>
           <SelectMenu
             options={methodOptions}
-            selectedOption={selectedMethod.value.id}
+            selectedOption={selectedMethod.id}
             setSelected={updateMethod}
           />
         </div>
@@ -141,11 +140,11 @@ const NotificationCard: React.FC<Props> = ({
 export default NotificationCard;
 
 const Summary: React.FC<
-  AdminNotificationMethod & { trigger: AdminNotificationTrigger }
+  VerifiedNotificationMethod & { trigger: AdminNotificationTrigger }
 > = (props) => (
   <div className="p-5">
     <h2 className="text-slate-700 text-lg">
-      {methodVerb(props)}
+      {capitalize(props.config.case)}
       {` `}
       <span className="font-bold">{methodTarget(props)}</span> for{` `}
       {triggerText(props.trigger)}
@@ -153,14 +152,14 @@ const Summary: React.FC<
   </div>
 );
 
-function methodTarget(method: AdminNotificationMethod): string {
-  switch (method.type) {
-    case `VerifiedEmailMethod`:
-      return method.value.email;
-    case `VerifiedTextMethod`:
-      return method.value.phoneNumber;
-    case `VerifiedSlackMethod`:
-      return method.value.channelName;
+function methodTarget(method: VerifiedNotificationMethod): string {
+  switch (method.config.case) {
+    case `email`:
+      return method.config.email;
+    case `text`:
+      return method.config.phoneNumber;
+    case `slack`:
+      return method.config.channelName;
   }
 }
 
@@ -173,24 +172,11 @@ function triggerText(trigger: AdminNotificationTrigger): string {
   }
 }
 
-function methodVerb(method: AdminNotificationMethod): 'Email' | 'Slack' | 'Text' {
-  switch (method.type) {
-    case `VerifiedEmailMethod`:
-      return `Email`;
-    case `VerifiedTextMethod`:
-      return `Text`;
-    case `VerifiedSlackMethod`:
-      return `Slack`;
-  }
-}
-
-function methodIcon(method: AdminNotificationMethod): 'email' | 'slack' | 'phone' {
-  switch (method.type) {
-    case `VerifiedEmailMethod`:
-      return `email`;
-    case `VerifiedTextMethod`:
+function methodIcon(method: VerifiedNotificationMethod): 'email' | 'slack' | 'phone' {
+  switch (method.config.case) {
+    case `text`:
       return `phone`;
-    case `VerifiedSlackMethod`:
-      return `slack`;
+    default:
+      return method.config.case;
   }
 }

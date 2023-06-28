@@ -33,8 +33,8 @@ export const Default: Story = props({
   notifications: withIdsAnd(notificationProps, [
     {
       selectedMethod: {
-        type: `VerifiedEmailMethod` as const,
-        value: { id: `1`, email: `me@example.com` },
+        id: `1`,
+        config: { case: `email` as const, email: `me@example.com` },
       },
       trigger: `suspendFilterRequestSubmitted` as const,
       editing: true,
@@ -42,9 +42,9 @@ export const Default: Story = props({
     },
     {
       selectedMethod: {
-        type: `VerifiedSlackMethod` as const,
-        value: {
-          id: `2`,
+        id: `2`,
+        config: {
+          case: `slack` as const,
           channelId: ``,
           channelName: `#Gertrude`,
           token: ``,
@@ -56,9 +56,9 @@ export const Default: Story = props({
     },
     {
       selectedMethod: {
-        type: `VerifiedTextMethod` as const,
-        value: {
-          id: `3`,
+        id: `3`,
+        config: {
+          case: `text` as const,
           phoneNumber: `(555) 555-5555`,
         },
       },
@@ -76,8 +76,8 @@ export const Default: Story = props({
 export const AddingMethod: Story = props({
   ...Default.args,
   pendingMethod: {
-    type: `Email`,
-    value: { email: `` },
+    case: `email`,
+    email: ``,
     sendCodeRequest: { state: `idle` },
     confirmationRequest: { state: `idle` },
     confirmationCode: `333243`,
@@ -88,8 +88,8 @@ export const AddingMethod: Story = props({
 export const AddingMethodVerifying: Story = props({
   ...Default.args,
   pendingMethod: {
-    type: `Email`,
-    value: { email: `` },
+    case: `email`,
+    email: ``,
     sendCodeRequest: { state: `succeeded`, payload: `123456` },
     confirmationRequest: { state: `idle` },
     confirmationCode: `333234`,

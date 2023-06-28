@@ -2,7 +2,13 @@
 
 export interface AdminKeychain {
   summary: KeychainSummary;
-  keys: Array<Key>;
+  keys: Key[];
+}
+
+export interface AdminNotification {
+  id: UUID;
+  trigger: AdminNotificationTrigger;
+  methodId: UUID;
 }
 
 export type AdminNotificationTrigger =
@@ -130,7 +136,36 @@ export interface User {
   screenshotsEnabled: boolean;
   screenshotsResolution: number;
   screenshotsFrequency: number;
-  keychains: Array<KeychainSummary>;
-  devices: Array<Device>;
+  keychains: KeychainSummary[];
+  devices: Device[];
   createdAt: ISODateString;
+}
+
+export type UserActivityItem =
+  | {
+      case: 'screenshot';
+      id: UUID;
+      ids: UUID[];
+      url: string;
+      width: number;
+      height: number;
+      createdAt: ISODateString;
+      deletedAt?: ISODateString;
+    }
+  | {
+      case: 'keystrokeLine';
+      id: UUID;
+      ids: UUID[];
+      appName: string;
+      line: string;
+      createdAt: ISODateString;
+      deletedAt?: ISODateString;
+    };
+
+export interface VerifiedNotificationMethod {
+  id: UUID;
+  config:
+    | { case: 'slack'; channelId: string; channelName: string; token: string }
+    | { case: 'email'; email: string }
+    | { case: 'text'; phoneNumber: string };
 }

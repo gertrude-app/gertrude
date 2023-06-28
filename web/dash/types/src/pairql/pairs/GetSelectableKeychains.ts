@@ -5,7 +5,7 @@ export namespace GetSelectableKeychains {
   export type Input = void;
 
   export interface Output {
-    own: Array<KeychainSummary>;
-    public: Array<KeychainSummary>;
+    own: KeychainSummary[];
+    public: KeychainSummary[];
   }
 }

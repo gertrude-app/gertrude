@@ -23,29 +23,29 @@ const EditNotificationSidebar: React.FC<Props> = ({
       <SelectMenu
         label="Method:"
         options={[
-          { value: `Email`, display: `Email` },
-          { value: `Text`, display: `Text` },
-          { value: `Slack`, display: `Slack` },
+          { value: `email`, display: `Email` },
+          { value: `text`, display: `Text` },
+          { value: `slack`, display: `Slack` },
         ]}
-        selectedOption={props.type}
+        selectedOption={props.case}
         setSelected={(methodType) => onEvent({ type: `methodTypeUpdated`, methodType })}
       />
-      {props.type === `Email` ? (
+      {props.case === `email` ? (
         <TextInput
           key="email"
           type="email"
-          value={props.value.email}
+          value={props.email}
           setValue={(email) => onEvent({ type: `emailAddressUpdated`, email })}
           label="Email address:"
           required
         />
-      ) : props.type === `Text` ? (
+      ) : props.case === `text` ? (
         <TextInput
           key="text"
           label="Phone number:"
           type="text"
           required
-          value={props.value.phoneNumber}
+          value={props.phoneNumber}
           setValue={(phoneNumber) =>
             onEvent({ type: `textPhoneNumberUpdated`, phoneNumber })
           }
@@ -57,7 +57,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
             label="Channel name:"
             type="text"
             required
-            value={props.value.channelName}
+            value={props.channelName}
             setValue={(channelName) =>
               onEvent({ type: `slackChannelNameUpdated`, channelName })
             }
@@ -66,7 +66,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
             label="Channel ID:"
             type="text"
             required
-            value={props.value.channelId}
+            value={props.channelId}
             setValue={(channelId) =>
               onEvent({ type: `slackChannelIdUpdated`, channelId })
             }
@@ -76,7 +76,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
             type="text"
             placeholder="xoxb-xxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxx"
             required
-            value={props.value.token}
+            value={props.token}
             setValue={(token) => onEvent({ type: `slackTokenUpdated`, token })}
           />
         </>
@@ -146,20 +146,20 @@ export default EditNotificationSidebar;
 // helpers
 
 function methodValid(props: CreatePendingNotificationMethod.Input): boolean {
-  switch (props.type) {
-    case `Email`:
-      return props.value.email?.match(/^.+@.+$/) !== null;
-    case `Text`:
+  switch (props.case) {
+    case `email`:
+      return props.email?.match(/^.+@.+$/) !== null;
+    case `text`:
       return (
-        props.value.phoneNumber !== undefined &&
-        props.value.phoneNumber.match(/\d{4}/) !== null &&
-        props.value.phoneNumber.match(/^(\d|\(|\)| |-|\+)+$/) !== null
+        props.phoneNumber !== undefined &&
+        props.phoneNumber.match(/\d{4}/) !== null &&
+        props.phoneNumber.match(/^(\d|\(|\)| |-|\+)+$/) !== null
       );
-    case `Slack`:
+    case `slack`:
       return (
-        props.value.token?.startsWith(`xoxb-`) &&
-        props.value.channelName?.length > 1 &&
-        props.value.channelId?.length > 3
+        props.token?.startsWith(`xoxb-`) &&
+        props.channelName?.length > 1 &&
+        props.channelId?.length > 3
       );
   }
 }

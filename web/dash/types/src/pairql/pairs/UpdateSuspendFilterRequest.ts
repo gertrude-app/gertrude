@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { RequestStatus, SuccessOutput } from '../shared';
+import type { SuccessOutput, RequestStatus } from '../shared';
 
 export namespace UpdateSuspendFilterRequest {
   export interface Input {

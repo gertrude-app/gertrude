@@ -5,12 +5,12 @@ export namespace DeleteEntity {
   export interface Input {
     id: UUID;
     type:
-      | 'AdminNotification'
-      | 'AdminVerifiedNotificationMethod'
-      | 'Device'
-      | 'Key'
-      | 'Keychain'
-      | 'User';
+      | 'adminNotification'
+      | 'adminVerifiedNotificationMethod'
+      | 'device'
+      | 'key'
+      | 'keychain'
+      | 'user';
   }
 
   export type Output = SuccessOutput;

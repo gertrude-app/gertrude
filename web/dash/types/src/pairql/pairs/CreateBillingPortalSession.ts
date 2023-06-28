@@ -2,7 +2,6 @@
 
 export namespace CreateBillingPortalSession {
   export type Input = void;
-
   export interface Output {
     url: string;
   }

@@ -4,11 +4,7 @@ import { ApiErrorMessage, Loading, Profile } from '@dash/components';
 import { capitalize } from '@shared/string';
 import { notNullish, typesafe } from '@shared/ts-utils';
 import { Result } from '@dash/types';
-import type {
-  GetAdmin,
-  CreatePendingNotificationMethod,
-  PendingNotificationMethod,
-} from '@dash/types';
+import type { VerifiedNotificationMethod } from '@dash/types';
 import type { State } from '../../reducers/admin-reducer';
 import { isDirty, Req } from '../../lib/helpers';
 import { useQuery, Key, useMutation, useConfirmableDelete } from '../../hooks';
@@ -25,11 +21,11 @@ const AdminProfile: React.FC = () => {
 
   const createBillingPortalSession = useMutation(Current.api.createBillingPortalSession);
 
-  const deleteNotification = useConfirmableDelete(`AdminNotification`, {
+  const deleteNotification = useConfirmableDelete(`adminNotification`, {
     invalidating: [Key.admin],
   });
 
-  const deleteMethod = useConfirmableDelete(`AdminVerifiedNotificationMethod`, {
+  const deleteMethod = useConfirmableDelete(`adminVerifiedNotificationMethod`, {
     invalidating: [Key.admin],
   });
 
@@ -52,7 +48,7 @@ const AdminProfile: React.FC = () => {
       const method = state.pendingNotificationMethod;
       if (!method) return Result.resolveUnexpected(`bc7511bb`);
       dispatch(PendingMethod.createStarted);
-      return Current.api.createPendingNotificationMethod(toInput(method));
+      return Current.api.createPendingNotificationMethod(method);
     },
     {
       onSuccess: ({ methodId }) => dispatch(PendingMethod.createSucceeded(methodId)),
@@ -94,8 +90,8 @@ const AdminProfile: React.FC = () => {
       status={query.data.subscriptionStatus}
       billingPortalRequest={ReqState.fromMutation(createBillingPortalSession)}
       methods={typesafe.objectValues(state.notificationMethods).map((method) => ({
-        id: method.value.id,
-        method: methodSimpleType(method),
+        id: method.id,
+        method: method.config.case,
         value: methodPrimaryValue(method),
         deletable: methodDeletable(method, state.notifications, query.data.email),
       }))}
@@ -128,27 +124,14 @@ export default AdminProfile;
 
 // helpers
 
-function methodSimpleType(
-  method: GetAdmin.VerifiedNotificationMethod,
-): 'email' | 'slack' | 'text' {
-  switch (method.type) {
-    case `VerifiedEmailMethod`:
-      return `email`;
-    case `VerifiedSlackMethod`:
-      return `slack`;
-    case `VerifiedTextMethod`:
-      return `text`;
-  }
-}
-
-function methodPrimaryValue(method: GetAdmin.VerifiedNotificationMethod): string {
-  switch (method.type) {
-    case `VerifiedEmailMethod`:
-      return method.value.email.toLowerCase();
-    case `VerifiedSlackMethod`:
-      return `#` + method.value.channelName.replace(/^#/, ``);
-    case `VerifiedTextMethod`: {
-      const number = method.value.phoneNumber;
+function methodPrimaryValue(method: VerifiedNotificationMethod): string {
+  switch (method.config.case) {
+    case `email`:
+      return method.config.email.toLowerCase();
+    case `slack`:
+      return `#` + method.config.channelName.replace(/^#/, ``);
+    case `text`: {
+      const number = method.config.phoneNumber;
       if (number.match(/^\d{10}$/)) {
         return `(${number.slice(0, 3)}) ${number.slice(3, 6)}-${number.slice(6, 10)}`;
       }
@@ -158,19 +141,19 @@ function methodPrimaryValue(method: GetAdmin.VerifiedNotificationMethod): string
 }
 
 function methodDeletable(
-  method: GetAdmin.VerifiedNotificationMethod,
+  method: VerifiedNotificationMethod,
   notifications: State['notifications'],
   adminEmail: string,
 ): boolean {
   const methodBeingUsed = typesafe
     .objectValues(notifications)
-    .some((notification) => notification.original.methodId === method.value.id);
+    .some((notification) => notification.original.methodId === method.id);
 
   if (methodBeingUsed) {
     return false;
   }
 
-  return method.type !== `VerifiedEmailMethod` || method.value.email !== adminEmail;
+  return method.config.case !== `email` || method.config.email !== adminEmail;
 }
 
 function makeNotificationProps(
@@ -192,26 +175,13 @@ function makeNotificationProps(
         ? false
         : !isDirty(editable) || savingNotification,
       methodOptions: typesafe.objectValues(methods).map((method) => ({
-        display: `${capitalize(methodSimpleType(method))} ${methodPrimaryValue(method)}`,
-        value: method.value.id,
+        display: `${capitalize(method.config.case)} ${methodPrimaryValue(method)}`,
+        value: method.id,
       })),
       editing: editable.editing === true,
       isNew: editable.isNew === true,
     };
   };
-}
-
-function toInput(
-  pending: PendingNotificationMethod,
-): CreatePendingNotificationMethod.Input {
-  switch (pending.type) {
-    case `Email`:
-      return { type: `Email`, value: pending.value };
-    case `Text`:
-      return { type: `Text`, value: pending.value };
-    case `Slack`:
-      return { type: `Slack`, value: pending.value };
-  }
 }
 
 const PendingMethod = {

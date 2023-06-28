@@ -20,7 +20,7 @@ export type NewAdminNotificationMethodEvent =
   | { type: 'textPhoneNumberUpdated'; phoneNumber: string }
   | {
       type: 'methodTypeUpdated';
-      methodType: CreatePendingNotificationMethod.Input['type'];
+      methodType: CreatePendingNotificationMethod.Input['case'];
     };
 
 export type PendingNotificationMethod = {

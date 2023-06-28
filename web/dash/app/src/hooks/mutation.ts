@@ -152,17 +152,17 @@ function getToast(toastId?: ToastId): { verb: string; entity: string } | undefin
 
 function toastIdFromDeleteEntityType(type: DeleteEntity.Input['type']): ToastId {
   switch (type) {
-    case `AdminNotification`:
+    case `adminNotification`:
       return `delete:notification`;
-    case `AdminVerifiedNotificationMethod`:
+    case `adminVerifiedNotificationMethod`:
       return `delete:notification-method`;
-    case `Device`:
+    case `device`:
       return `delete:device`;
-    case `Key`:
+    case `key`:
       return `delete:key`;
-    case `Keychain`:
+    case `keychain`:
       return `delete:keychain`;
-    case `User`:
+    case `user`:
       return `delete:user`;
   }
 }

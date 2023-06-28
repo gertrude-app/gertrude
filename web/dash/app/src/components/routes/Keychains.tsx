@@ -5,7 +5,7 @@ import Current from '../../environment';
 
 const Keychains: React.FC = () => {
   const query = useQuery(Key.adminKeychains, Current.api.getAdminKeychains);
-  const deleteKeychain = useConfirmableDelete(`Keychain`, {
+  const deleteKeychain = useConfirmableDelete(`keychain`, {
     invalidating: [Key.adminKeychains],
   });
 

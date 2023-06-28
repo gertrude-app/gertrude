@@ -18,10 +18,8 @@ describe(`create new notification method flow`, () => {
       sendCodeRequest: Req.idle(),
       confirmationRequest: Req.idle(),
       confirmationCode: ``,
-      type: `Email`,
-      value: {
-        email: ``,
-      },
+      case: `email`,
+      email: ``,
     });
 
     // step 2: update the email address to a valid state
@@ -31,7 +29,7 @@ describe(`create new notification method flow`, () => {
     });
 
     expect(state.pendingNotificationMethod).toMatchObject({
-      value: { email: `foo@bar.com` },
+      email: `foo@bar.com`,
     });
 
     // step 3: simulate a successfull request to generate a code
@@ -71,11 +69,8 @@ describe(`create new notification method flow`, () => {
     expect(state.pendingNotificationMethod).toBeUndefined();
 
     expect(state.notificationMethods[`new-method-id`]).toMatchObject({
-      type: `VerifiedEmailMethod`,
-      value: {
-        id: `new-method-id`,
-        email: `foo@bar.com`,
-      },
+      id: `new-method-id`,
+      config: { case: `email`, email: `foo@bar.com` },
     });
   });
 });
@@ -87,12 +82,12 @@ describe(`receiving admin from api`, () => {
       subscriptionStatus: `trialing`,
       verifiedNotificationMethods: [
         {
-          type: `VerifiedEmailMethod`,
-          value: { id: `verifiedMethod1`, email: `blob@blob.com` },
+          id: `verifiedMethod1`,
+          config: { case: `email`, email: `blob@blob.com` },
         },
         {
-          type: `VerifiedTextMethod`,
-          value: { id: `verifiedMethod2`, phoneNumber: `7` },
+          id: `verifiedMethod2`,
+          config: { case: `text`, phoneNumber: `7` },
         },
       ],
       notifications: [
@@ -114,12 +109,12 @@ describe(`receiving admin from api`, () => {
 
     expect(nextState.notificationMethods).toEqual({
       verifiedMethod1: {
-        type: `VerifiedEmailMethod`,
-        value: { id: `verifiedMethod1`, email: `blob@blob.com` },
+        id: `verifiedMethod1`,
+        config: { case: `email`, email: `blob@blob.com` },
       },
       verifiedMethod2: {
-        type: `VerifiedTextMethod`,
-        value: { id: `verifiedMethod2`, phoneNumber: `7` },
+        id: `verifiedMethod2`,
+        config: { case: `text`, phoneNumber: `7` },
       },
     });
 

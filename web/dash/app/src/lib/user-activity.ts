@@ -1,20 +1,22 @@
-import type { CombinedUsersActivityFeed, UserActivityFeed } from '@dash/types';
+import type {
+  CombinedUsersActivityFeed,
+  UserActivityFeed,
+  UserActivityItem,
+} from '@dash/types';
 import type { ActivityFeedItem } from '@dash/components';
 
-export function outputItemToActivityFeedItem(
-  item: UserActivityFeed.Item,
-): ActivityFeedItem {
-  if (item.type === `CoalescedKeystrokeLine`) {
+export function outputItemToActivityFeedItem(item: UserActivityItem): ActivityFeedItem {
+  if (item.case === `keystrokeLine`) {
     return {
       type: `KeystrokeLine` as const,
-      date: item.value.createdAt,
-      ...item.value,
+      date: item.createdAt,
+      ...item,
     };
   } else {
     return {
       type: `Screenshot` as const,
-      date: item.value.createdAt,
-      ...item.value,
+      date: item.createdAt,
+      ...item,
     };
   }
 }
@@ -54,11 +56,11 @@ export function prepareUserActivityDelete(
   const screenshotIds: UUID[] = [];
   // impure filter function, but prevents iterating twice
   const remaining = queryData.items.filter((item) => {
-    if (itemRootIds.includes(item.value.id)) {
-      if (item.type === `CoalescedKeystrokeLine`) {
-        keystrokeLineIds = [...keystrokeLineIds, ...item.value.ids];
+    if (itemRootIds.includes(item.id)) {
+      if (item.case === `keystrokeLine`) {
+        keystrokeLineIds = [...keystrokeLineIds, ...item.ids];
       } else {
-        screenshotIds.push(item.value.id);
+        screenshotIds.push(item.id);
       }
       return false;
     }

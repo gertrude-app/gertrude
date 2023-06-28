@@ -9,6 +9,7 @@ import type {
   SuspendFilterRequest,
   GetIdentifiedApps,
   CombinedUsersActivitySummaries,
+  AdminNotification,
 } from '@dash/types';
 import type { ActivityFeedItem } from '@dash/components';
 import * as empty from '../../lib/empty';
@@ -55,8 +56,8 @@ export function suspendFilterRequest(
 }
 
 export function adminNotification(
-  override: Partial<GetAdmin.Notification> = {},
-): GetAdmin.Notification {
+  override: Partial<AdminNotification> = {},
+): AdminNotification {
   return {
     id: uuid(),
     trigger: `suspendFilterRequestSubmitted`,
@@ -123,64 +124,56 @@ export function combinedUsersActivitySummary(
 }
 
 type KeystrokeActivityItem = {
-  type: 'CoalescedKeystrokeLine';
-  value: {
-    id: UUID;
-    ids: UUID[];
-    appName: string;
-    line: string;
-    createdAt: ISODateString;
-    deletedAt?: ISODateString;
-  };
+  case: 'keystrokeLine';
+  id: UUID;
+  ids: UUID[];
+  appName: string;
+  line: string;
+  createdAt: ISODateString;
+  deletedAt?: ISODateString;
 };
 
 export function keystrokeActivityItem(
-  override: Partial<KeystrokeActivityItem['value']> = {},
+  override: Partial<KeystrokeActivityItem> = {},
 ): KeystrokeActivityItem {
   const id = override.id ?? uuid();
   return {
-    type: `CoalescedKeystrokeLine`,
-    value: {
-      id: id,
-      ids: [id],
-      appName: `appName-${Math.random()}`,
-      line: `line-${Math.random()}`,
-      createdAt: new Date().toISOString(),
-      ...override,
-    },
+    case: `keystrokeLine`,
+    id: id,
+    ids: [id],
+    appName: `appName-${Math.random()}`,
+    line: `line-${Math.random()}`,
+    createdAt: new Date().toISOString(),
+    ...override,
   };
 }
 
 type ScreenshotActivityItem = {
-  type: 'Screenshot';
-  value: {
-    id: UUID;
-    ids: UUID[];
-    url: string;
-    width: number;
-    height: number;
-    createdAt: ISODateString;
-    deletedAt?: ISODateString;
-  };
+  case: 'screenshot';
+  id: UUID;
+  ids: UUID[];
+  url: string;
+  width: number;
+  height: number;
+  createdAt: ISODateString;
+  deletedAt?: ISODateString;
 };
 
 export function screenshotActivityItem(
-  override: Partial<ScreenshotActivityItem['value']> = {},
+  override: Partial<ScreenshotActivityItem> = {},
 ): ScreenshotActivityItem {
   const id = override.id ?? uuid();
   const width = override.width ?? 600;
   const height = override.height ?? 400;
   return {
-    type: `Screenshot`,
-    value: {
-      id,
-      ids: [id],
-      url: `https://placekitten.com/${width}/${height}`,
-      width,
-      height,
-      createdAt: new Date().toISOString(),
-      ...override,
-    },
+    case: `screenshot`,
+    id,
+    ids: [id],
+    url: `https://placekitten.com/${width}/${height}`,
+    width,
+    height,
+    createdAt: new Date().toISOString(),
+    ...override,
   };
 }
 
