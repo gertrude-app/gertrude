@@ -25,7 +25,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
         <FullscreenGradientBg>
           <div
             className={cx(
-              `bg-white font-sans max-w-lg rounded-3xl mx-4 pt-8 pl-7 pr-8 shadow-lg flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 relative`,
+              `bg-white font-sans max-w-lg rounded-2xl mx-4 pt-8 pl-7 pr-8 shadow-lg flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 relative`,
               props.request === `failed`
                 ? `items-center sm:items-start pb-6`
                 : `items-center pb-8`,
@@ -62,7 +62,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
 
   return (
     <FullscreenGradientBg>
-      <div className="pb-8 sm:pb-8 pt-12 px-5 sm:px-8 w-full max-w-md rounded-3xl shadow-lg flex justify-center items-center flex-row border bg-white relative z-10 mx-3 sm:mx-10">
+      <div className="pb-8 sm:pb-8 pt-12 px-5 sm:px-8 w-full max-w-md rounded-2xl shadow-lg flex justify-center items-center flex-row border bg-white relative z-10 mx-3 sm:mx-10">
         {props.children}
       </div>
     </FullscreenGradientBg>

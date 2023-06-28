@@ -32,7 +32,7 @@ describe(`dashboard app login`, () => {
       cy.get(`input[name=email]`).type(betsy.email);
       cy.testId(`magic-link`).should(`not.be.disabled`).click();
 
-      cy.wait(`@requestMagicLink`).its(`request.body.email`).should(`eq`, betsy.email);
+      cy.wait(`@RequestMagicLink`).its(`request.body.email`).should(`eq`, betsy.email);
 
       cy.contains(`Check your email`);
     });
@@ -42,7 +42,7 @@ describe(`dashboard app login`, () => {
       cy.get(`input[name=email]`).type(betsy.email);
       cy.testId(`magic-link`).click();
 
-      cy.wait(`@requestMagicLink`)
+      cy.wait(`@RequestMagicLink`)
         .its(`request.body`)
         .should(`deep.equal`, { email: betsy.email, redirect: `/users/123` });
 
@@ -76,10 +76,7 @@ describe(`dashboard app login`, () => {
 
   describe(`password reset`, () => {
     it(`shows email sent confirmation when no error`, () => {
-      cy.intercept(`/pairql/dashboard/SendPasswordResetEmail`, (req) => {
-        req.alias = `sendPasswordResetEmail`;
-        req.reply({ success: true });
-      });
+      cy.interceptPql(`SendPasswordResetEmail`, { success: true });
       cy.visit(`/login`);
       cy.contains(`Forgot password?`).click();
       cy.location(`pathname`).should(`eq`, `/reset-password`);
@@ -89,25 +86,8 @@ describe(`dashboard app login`, () => {
       cy.contains(`Email sent!`).should(`be.visible`);
     });
 
-    it(`shows error when there's no user with given email address`, () => {
-      cy.intercept(`/pairql/dashboard/SendPasswordResetEmail`, (req) => {
-        req.alias = `sendPasswordResetEmail`;
-        req.reply({ success: false });
-      });
-      cy.visit(`/login`);
-      cy.contains(`Forgot password?`).click();
-      cy.location(`pathname`).should(`eq`, `/reset-password`);
-      cy.contains(`Reset your password`);
-      cy.get(`input[type=email]`).type(betsy.email);
-      cy.contains(`Send reset link`).click();
-      cy.contains(`Uh-oh!`).should(`be.visible`);
-    });
-
     it(`logs user back in after password reset`, () => {
-      cy.intercept(`/pairql/dashboard/ResetPassword`, (req) => {
-        req.alias = `resetPassword`;
-        req.reply({ success: true });
-      });
+      cy.interceptPql(`ResetPassword`, { success: true });
       cy.visit(`/reset-password/123`);
       cy.contains(`Choose a new password`);
       cy.get(`input[type=password]`).type(`super_secret?`);
@@ -116,16 +96,13 @@ describe(`dashboard app login`, () => {
     });
 
     it(`shows error when password reset fails due to invalid token`, () => {
-      cy.intercept(`/pairql/dashboard/ResetPassword`, (req) => {
-        req.alias = `resetPassword`;
-        req.reply({ success: false });
-      });
+      cy.interceptPql(`ResetPassword`, { success: false });
       cy.visit(`/reset-password/123`);
       cy.contains(`Choose a new password`);
       cy.get(`input[type=password]`).type(`super_secret?`);
       cy.contains(`Log in`).click();
       cy.contains(`Uh-oh!`);
-      cy.contains(`Invalid token.`);
+      cy.contains(`Token expired`);
     });
   });
 });

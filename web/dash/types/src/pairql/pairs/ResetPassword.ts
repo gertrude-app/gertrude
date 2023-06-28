@@ -3,9 +3,8 @@ import type { SuccessOutput } from '../shared';
 
 export namespace ResetPassword {
   export interface Input {
-    newPassword: string;
-    verificationToken: string;
+    token: UUID;
+    password: string;
   }
-
   export type Output = SuccessOutput;
 }
