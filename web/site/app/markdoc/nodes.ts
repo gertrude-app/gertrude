@@ -1,13 +1,18 @@
-import { nodes as defaultNodes } from '@markdoc/markdoc';
+import { nodes } from '@markdoc/markdoc';
+import CodeBlock from './CodeBlock';
 
-const nodes = {
+export default {
   document: {
     render: undefined,
   },
+  fence: {
+    render: CodeBlock,
+    attributes: nodes.fence.attributes,
+  },
   th: {
-    ...defaultNodes.th,
+    ...nodes.th,
     attributes: {
-      ...defaultNodes.th.attributes,
+      ...nodes.th.attributes,
       scope: {
         type: String,
         default: `col`,
@@ -15,5 +20,3 @@ const nodes = {
     },
   },
 };
-
-export default nodes;

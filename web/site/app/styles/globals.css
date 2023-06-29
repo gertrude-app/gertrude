@@ -19,6 +19,12 @@
   margin-top: 0;
 }
 
+/* tweak prismjs code blocks */
+.code pre[class*='language-'] {
+  border-radius: 4px;
+  background: #020617;
+}
+
 @layer utilities {
   .bg-fuchsia-radial-gradient {
     background: radial-gradient(closest-side, rgb(200, 88, 231, 0.2), transparent);
