@@ -1,5 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
+import { ExclamationCircleIcon } from '@heroicons/react/24/solid';
 
 type Props = {
   className?: string;
@@ -7,10 +8,11 @@ type Props = {
 };
 
 const ErrorMessage: React.FC<Props> = ({ className, children }) => (
-  <div className={cx(`flex justify-center`, className)}>
-    <div className="antialiased max-w-lg bg-red-100 p-6 rounded-2xl flex items-center shadow-lg">
-      <i className="fa-solid fa-exclamation-triangle shrink-0 mr-4 text-xl text-red-400" />
-      <p className="font-medium text-red-600">{children}</p>
+  <div className={cx(`bg-red-50 p-6 rounded-2xl flex space-x-4 items-start`, className)}>
+    <ExclamationCircleIcon className="h-8 text-red-500 shrink-0" />
+    <div>
+      <h3 className="font-bold text-red-600 text-lg">Uh-oh!</h3>
+      <p className="text-red-500 font-medium">{children}</p>
     </div>
   </div>
 );

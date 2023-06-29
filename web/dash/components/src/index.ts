@@ -1,6 +1,7 @@
 export { default as Chrome } from './Chrome/Chrome';
 export { default as Profile } from './Profile/Profile';
 export { default as FullscreenModalForm } from './Unauthed/FullscreenModalForm';
+export { default as FullscreenGradientBg } from './Unauthed/FullscreenGradientBg';
 export { default as EmailInputForm } from './Unauthed/EmailInputForm';
 export { default as LoginForm } from './Unauthed/LoginForm';
 export { default as ActivitySummaries } from './Users/Activity/ActivitySummaries';

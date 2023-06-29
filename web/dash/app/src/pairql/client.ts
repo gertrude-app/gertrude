@@ -252,6 +252,14 @@ export const liveClient = {
     );
   },
 
+  resetPassword(input: T.ResetPassword.Input): Promise<T.Result<T.ResetPassword.Output>> {
+    return query<T.ResetPassword.Input, T.ResetPassword.Output>(
+      input,
+      `none`,
+      `ResetPassword`,
+    );
+  },
+
   saveKey(input: T.SaveKey.Input): Promise<T.Result<T.SaveKey.Output>> {
     return query<T.SaveKey.Input, T.SaveKey.Output>(input, `admin`, `SaveKey`);
   },
@@ -276,6 +284,16 @@ export const liveClient = {
 
   saveUser(input: T.SaveUser.Input): Promise<T.Result<T.SaveUser.Output>> {
     return query<T.SaveUser.Input, T.SaveUser.Output>(input, `admin`, `SaveUser`);
+  },
+
+  sendPasswordResetEmail(
+    input: T.SendPasswordResetEmail.Input,
+  ): Promise<T.Result<T.SendPasswordResetEmail.Output>> {
+    return query<T.SendPasswordResetEmail.Input, T.SendPasswordResetEmail.Output>(
+      input,
+      `none`,
+      `SendPasswordResetEmail`,
+    );
   },
 
   signup(input: T.Signup.Input): Promise<T.Result<T.Signup.Output>> {
@@ -420,6 +438,9 @@ export const throwingClient: ApiClient = {
   requestMagicLink: () => {
     throw new Error(`ApiClient.requestMagicLink() not implemented`);
   },
+  resetPassword: () => {
+    throw new Error(`ApiClient.resetPassword() not implemented`);
+  },
   saveKey: () => {
     throw new Error(`ApiClient.saveKey() not implemented`);
   },
@@ -431,6 +452,9 @@ export const throwingClient: ApiClient = {
   },
   saveUser: () => {
     throw new Error(`ApiClient.saveUser() not implemented`);
+  },
+  sendPasswordResetEmail: () => {
+    throw new Error(`ApiClient.sendPasswordResetEmail() not implemented`);
   },
   signup: () => {
     throw new Error(`ApiClient.signup() not implemented`);

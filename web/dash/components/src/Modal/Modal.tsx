@@ -122,7 +122,7 @@ const Modal: React.FC<Props> = ({
               ) : (
                 <Dialog.Panel
                   className={cx(
-                    `relative transform rounded-lg bg-white text-left shadow-xl transition-all min-w-[300px] sm:my-8 sm:w-full`,
+                    `relative transform rounded-lg overflow-hidden bg-white text-left shadow-xl transition-all min-w-[300px] sm:my-8 sm:w-full`,
                     type === `container` && `lg:max-w-4xl`,
                     maximizeWidthForSmallScreens ? `w-full sm:w-auto` : `sm:max-w-xl`,
                   )}

@@ -26,6 +26,8 @@ import UserRoute from './components/routes/User';
 import CombinedUsersActivitySummaries from './components/routes/CombinedUsersActivitySummaries';
 import CombinedUsersActivityFeedRoute from './components/routes/CombinedUsersActivityFeed';
 import UserActivityFeed from './components/routes/UserActivityFeed';
+import RequestPasswordReset from './components/routes/RequestPasswordReset';
+import ChangePassword from './components/routes/ChangePassword';
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -50,6 +52,8 @@ const App: React.FC = () => {
       <Route path="/verify-signup-email/:token" element={<VerifySignupEmail />} />
       <Route path="/checkout-success" element={<CheckoutSuccess />} />
       <Route path="/checkout-cancel" element={<CheckoutCancel />} />
+      <Route path="/reset-password" element={<RequestPasswordReset />} />
+      <Route path="/reset-password/:token" element={<ChangePassword />} />
 
       {/* authed routes */}
       <Route path="/" element={<AuthedChrome />}>

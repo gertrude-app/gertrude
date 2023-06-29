@@ -95,6 +95,7 @@ export function interceptPql(
   slug: `RequestMagicLink`,
   output: T.RequestMagicLink.Output,
 ): void;
+export function interceptPql(slug: `ResetPassword`, output: T.ResetPassword.Output): void;
 export function interceptPql(slug: `SaveKey`, output: T.SaveKey.Output): void;
 export function interceptPql(slug: `SaveKeychain`, output: T.SaveKeychain.Output): void;
 export function interceptPql(
@@ -102,6 +103,10 @@ export function interceptPql(
   output: T.SaveNotification.Output,
 ): void;
 export function interceptPql(slug: `SaveUser`, output: T.SaveUser.Output): void;
+export function interceptPql(
+  slug: `SendPasswordResetEmail`,
+  output: T.SendPasswordResetEmail.Output,
+): void;
 export function interceptPql(slug: `Signup`, output: T.Signup.Output): void;
 export function interceptPql(
   slug: `UpdateSuspendFilterRequest`,
@@ -158,10 +163,12 @@ export function forcePqlErr(
     | 'Login'
     | 'LoginMagicLink'
     | 'RequestMagicLink'
+    | 'ResetPassword'
     | 'SaveKey'
     | 'SaveKeychain'
     | 'SaveNotification'
     | 'SaveUser'
+    | 'SendPasswordResetEmail'
     | 'Signup'
     | 'UpdateSuspendFilterRequest'
     | 'UpdateUnlockRequest'

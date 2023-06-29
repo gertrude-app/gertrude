@@ -87,6 +87,7 @@ importers:
       '@dash/types': workspace:*
       '@dash/utils': workspace:*
       '@headlessui/react': ^1.6.6
+      '@heroicons/react': 2.0.17
       '@shared/components': workspace:*
       '@shared/datetime': workspace:*
       '@shared/string': workspace:*
@@ -123,6 +124,7 @@ importers:
       '@dash/keys': link:../keys
       '@dash/utils': link:../utils
       '@headlessui/react': 1.7.3_biqbaboplfbrettd7655fr4n2y
+      '@heroicons/react': 2.0.17_react@18.2.0
       '@shared/components': link:../../shared/components
       '@shared/datetime': link:../../shared/datetime
       '@shared/string': link:../../shared/string
