@@ -27,6 +27,9 @@ const MainFooter: React.FC = () => (
           <li>
             <FooterLink href="https://dash.gertrude.app">Login</FooterLink>
           </li>
+          <li>
+            <FooterLink href="/blog">Blog</FooterLink>
+          </li>
         </ul>
       </div>
     </div>

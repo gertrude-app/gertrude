@@ -22,6 +22,31 @@ const navigation = [
       },
     ],
   },
+  {
+    title: `Engineering Blog`,
+    links: [
+      {
+        title: `Protocol Static Function Quirk`,
+        href: `/blog/swift-protocol-static-function-selection-quirk`,
+      },
+      {
+        title: `Vapor + Postgres + GH Actions`,
+        href: `/blog/vapor-swift-postgres-github-action-test-workflow`,
+      },
+      {
+        title: `Query Running MacOS Apps`,
+        href: `/blog/querying-running-applications-in-macos`,
+      },
+      {
+        title: `Requesting Accesibility Control`,
+        href: `/blog/macos-request-accessibility-control`,
+      },
+      {
+        title: `... View all posts [6]`,
+        href: `/blog`,
+      },
+    ],
+  },
 ];
 
 export default navigation;
