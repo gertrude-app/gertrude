@@ -65,17 +65,19 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
             ))}
         </div>
       </div>
-      <div className="bg-violet-50/50 py-5 px-3 sm:px-4 rounded-b-3xl">
-        <Button
-          type="link"
-          to="/users/activity"
-          color="secondary"
-          className=""
-          size="large"
-        >
-          All activity
-        </Button>
-      </div>
+      {userActivity.filter((a) => a.numUnreviewed > 0).length > 1 && (
+        <div className="bg-violet-50/50 py-5 px-3 sm:px-4 rounded-b-3xl">
+          <Button
+            type="link"
+            to="/users/activity"
+            color="secondary"
+            className=""
+            size="large"
+          >
+            All activity
+          </Button>
+        </div>
+      )}
     </DashboardWidget>
   );
 };
