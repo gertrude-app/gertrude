@@ -8,7 +8,8 @@ import Connected from './states/Connected';
 import EnteringConnectionCode from './states/EnteringConnectionCode';
 import ConnectFailed from './states/ConnectFailed';
 import Connecting from './states/Connecting';
-import Welcome from './states/Welcome';
+import NotConnected from './states/NotConnected';
+import ConnectSucceeded from './states/ConnectSucceeded';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 
@@ -37,13 +38,7 @@ export const MenuBar: React.FC<Props> = ({
   }
 
   if (props.case === `connectionSucceded`) {
-    return (
-      <MenuBarSized>
-        connected to user: {props.userName}
-        {` `}
-        <button onClick={() => emit({ case: `welcomeAdminClicked` })}>go to admin</button>
-      </MenuBarSized>
-    );
+    return <ConnectSucceeded emit={emit} userName={props.userName} />;
   }
 
   if (props.case === `connected`) {
@@ -57,7 +52,7 @@ export const MenuBar: React.FC<Props> = ({
       />
     );
   }
-  return <Welcome emit={emit} />;
+  return <NotConnected emit={emit} />;
 };
 
 // not sure why i have to specify the generics here... 🤔

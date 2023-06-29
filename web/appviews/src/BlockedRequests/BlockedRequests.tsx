@@ -23,24 +23,7 @@ export const BlockedRequests: React.FC<Props> = ({
   selectedRequestIds,
   adminAccountStatus,
 }) => {
-  // TODO: extract and test
-  const filteredRequests = requests
-    .filter((req) => {
-      if (filterText.trim() === ``) return true;
-      const query = filterText.toLowerCase();
-      const textToSearch = req.searchableText.toLowerCase();
-      if (!query.includes(` `)) {
-        return textToSearch.includes(query);
-      } else {
-        for (const part in query.split(/\s+/g)) {
-          if (textToSearch.includes(part)) return true;
-        }
-      }
-      return false;
-    })
-    .filter((req) => (tcpOnly ? req.protocol === `tcp` : true))
-    .sort((a, b) => (b.time > a.time ? 1 : -1));
-
+  const filteredRequests = filterVisibleRequests(requests, filterText, tcpOnly);
   if (adminAccountStatus === `inactive`) {
     return (
       <InactiveAccountScreen
@@ -239,3 +222,30 @@ export default containerize<AppState, AppEvent, ViewState, ViewAction>(
   store,
   BlockedRequests,
 );
+
+export function filterVisibleRequests<
+  R extends {
+    searchableText: string;
+    protocol: 'tcp' | 'udp' | 'other';
+    time: ISODateString;
+  },
+>(requests: R[], userFilterText: string, tcpOnly: boolean): R[] {
+  return requests
+    .filter((req) => {
+      if (userFilterText.trim() === ``) return true;
+      const query = userFilterText.toLowerCase();
+      const textToSearch = req.searchableText.toLowerCase();
+      if (!query.includes(` `)) {
+        return textToSearch.includes(query);
+      } else {
+        for (const part of query.split(/\s+/g)) {
+          if (!textToSearch.includes(part)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    })
+    .filter((req) => (tcpOnly ? req.protocol === `tcp` : true))
+    .sort((a, b) => (b.time > a.time ? 1 : -1));
+}

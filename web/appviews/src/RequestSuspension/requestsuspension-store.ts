@@ -3,7 +3,7 @@ import type { AdminAccountStatus } from '../lib/shared-types';
 import { Store } from '../lib/store';
 
 // begin codegen
-export type AppState = {
+export interface AppState {
   windowOpen: boolean;
   request:
     | { case: 'failed'; error: string }
@@ -11,7 +11,7 @@ export type AppState = {
     | { case: 'ongoing' }
     | { case: 'succeeded' };
   adminAccountStatus: AdminAccountStatus;
-};
+}
 
 export type AppEvent =
   | { case: 'requestSubmitted'; durationInSeconds: number; comment?: string }

@@ -9,6 +9,7 @@ import SidebarNav from './subcomponents/SidebarNav';
 import HomeScreen from './screens/HomeScreen';
 import HealthCheckScreen from './screens/HealthCheckScreen';
 import ExemptUsersScreen from './screens/ExemptUsersScreen';
+import HiddenAdvancedScreen from './screens/HiddenAdvancedScreen';
 import HealthChecker from './HealthChecker';
 import store from './administrate-store';
 
@@ -27,6 +28,7 @@ export const Administrate: React.FC<Props> = ({
   emit,
   dispatch,
   screen,
+  advanced,
   quitting,
 }) => {
   const health = new HealthChecker(
@@ -70,6 +72,17 @@ export const Administrate: React.FC<Props> = ({
       break;
     case `exemptUsers`:
       pageElement = <ExemptUsersScreen emit={emit} users={exemptableUsers} />;
+      break;
+
+    case `advanced`:
+      pageElement = advanced ? (
+        <HiddenAdvancedScreen
+          {...advanced}
+          emit={(action) => emit({ case: `advanced`, action })}
+        />
+      ) : (
+        <>Loading...</>
+      );
       break;
   }
 
