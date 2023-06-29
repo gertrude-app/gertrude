@@ -66,7 +66,7 @@ export const Administrate: React.FC<Props> = ({
           installedAppVersion={installedAppVersion}
           screenshotMonitoringEnabled={keystrokeMonitoringEnabled}
           keystrokeMonitoringEnabled={screenshotMonitoringEnabled}
-          emit={(healthCheckAction) => emit({ case: `healthCheck`, healthCheckAction })}
+          emit={(action) => emit({ case: `healthCheck`, action })}
         />
       );
       break;
@@ -78,7 +78,7 @@ export const Administrate: React.FC<Props> = ({
       pageElement = advanced ? (
         <HiddenAdvancedScreen
           {...advanced}
-          emit={(advancedAction) => emit({ case: `advanced`, advancedAction })}
+          emit={(action) => emit({ case: `advanced`, action })}
         />
       ) : (
         <>Loading...</>

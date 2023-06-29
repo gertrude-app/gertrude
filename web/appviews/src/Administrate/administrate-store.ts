@@ -6,7 +6,7 @@ import { Store } from '../lib/store';
 // begin codegen
 export type Screen = 'home' | 'healthCheck' | 'exemptUsers' | 'advanced';
 
-export type HealthCheck = {
+export interface HealthCheck {
   latestAppVersion?: { case: 'ok'; value: string } | { case: 'error'; message?: string };
   filterStatus?:
     | { case: 'installed'; version: string; numUserKeys: number }
@@ -22,14 +22,14 @@ export type HealthCheck = {
     | { case: 'ok'; value: 'admin' | 'standard' }
     | { case: 'error'; message?: string };
   notificationsSetting?: 'none' | 'banner' | 'alert';
-};
+}
 
-export type ExemptableUser = {
+export interface ExemptableUser {
   id: number;
   name: string;
   isAdmin: boolean;
   isExempt: boolean;
-};
+}
 
 export type HealthCheckAction =
   | 'recheckClicked'
@@ -43,7 +43,7 @@ export type HealthCheckAction =
   | 'fixNotificationPermissionClicked'
   | 'zeroKeysRefreshRulesClicked';
 
-export type AdvancedState = {
+export interface AdvancedState {
   pairqlEndpointOverride?: string;
   pairqlEndpointDefault: string;
   websocketEndpointOverride?: string;
@@ -51,7 +51,7 @@ export type AdvancedState = {
   appcastEndpointOverride?: string;
   appcastEndpointDefault: string;
   appVersions?: { [key: string]: string };
-};
+}
 
 export type AdvancedAction =
   | { case: 'pairqlEndpointSet'; url?: string }
@@ -60,7 +60,7 @@ export type AdvancedAction =
   | { case: 'forceUpdateToSpecificVersionClicked'; version: string }
   | { case: 'deleteAllDeviceStorageClicked' };
 
-export type AppState = {
+export interface AppState {
   windowOpen: boolean;
   screen: Screen;
   healthCheck: HealthCheck;
@@ -73,11 +73,11 @@ export type AppState = {
   quitting: boolean;
   exemptableUsers?: Failable<ExemptableUser[]>;
   advanced?: AdvancedState;
-};
+}
 
 export type AppEvent =
-  | { case: 'healthCheck'; healthCheckAction: HealthCheckAction }
-  | { case: 'advanced'; advancedAction: AdvancedAction }
+  | { case: 'healthCheck'; action: HealthCheckAction }
+  | { case: 'advanced'; action: AdvancedAction }
   | { case: 'gotoScreenClicked'; screen: Screen }
   | { case: 'releaseChannelUpdated'; channel: 'stable' | 'beta' | 'canary' }
   | { case: 'suspendFilterClicked'; durationInSeconds: number }

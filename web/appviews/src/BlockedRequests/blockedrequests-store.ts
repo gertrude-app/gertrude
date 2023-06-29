@@ -3,16 +3,16 @@ import type { AdminAccountStatus } from '../lib/shared-types';
 import { Store } from '../lib/store';
 
 // begin codegen
-export type Request = {
+export interface Request {
   id: UUID;
   time: ISODateString;
   target: string;
   protocol: 'tcp' | 'udp' | 'other';
   searchableText: string;
   app: string;
-};
+}
 
-export type AppState = {
+export interface AppState {
   windowOpen: boolean;
   selectedRequestIds: UUID[];
   requests: Request[];
@@ -24,7 +24,7 @@ export type AppState = {
     | { case: 'ongoing' }
     | { case: 'succeeded' };
   adminAccountStatus: AdminAccountStatus;
-};
+}
 
 export type AppEvent =
   | { case: 'filterTextUpdated'; text: string }
