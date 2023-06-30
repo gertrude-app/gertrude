@@ -12,6 +12,7 @@ export type AppState =
       recordingScreen: boolean;
       recordingKeystrokes: boolean;
       adminAttentionRequired: boolean;
+      updateStatus?: 'available' | 'nag' | 'require';
     }
   | { case: 'notConnected' }
   | { case: 'enteringConnectionCode' }
@@ -29,7 +30,10 @@ export type AppEvent =
   | { case: 'retryConnectClicked' }
   | { case: 'connectFailedHelpClicked' }
   | { case: 'welcomeAdminClicked' }
-  | { case: 'turnOnFilterClicked' };
+  | { case: 'turnOnFilterClicked' }
+  | { case: 'updateNagDismissClicked' }
+  | { case: 'updateNagUpdateClicked' }
+  | { case: 'updateRequiredUpdateClicked' };
 // end codegen
 
 export type ViewState = {

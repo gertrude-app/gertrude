@@ -4,7 +4,7 @@ const fs = require(`node:fs`);
 const exec = require(`x-exec`).default;
 
 const MODULES = [`MenuBar`, `BlockedRequests`, `Administrate`, `RequestSuspension`];
-const WEBVIEW_DIR = `${__dirname}/../../swift/rewrite/Xcode/Gertrude/WebViews`;
+const WEBVIEW_DIR = `${__dirname}/../../swift/macapp/Xcode/Gertrude/WebViews`;
 
 const isolated = process.argv[2];
 if (isolated && !MODULES.includes(isolated)) {
