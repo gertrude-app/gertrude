@@ -31,6 +31,30 @@ const NotConnectedTemplate: StoryFn<typeof MenuBar> = () => (
 );
 export const NotConnected = NotConnectedTemplate.bind({});
 
+const UpdateNagTemplate: StoryFn<typeof MenuBar> = () => (
+  <BothThemes
+    case="connected"
+    {...commonProps}
+    recordingKeystrokes
+    recordingScreen
+    filterState={{ case: `on` }}
+    updateStatus="nag"
+  />
+);
+export const UpdateNag = UpdateNagTemplate.bind({});
+
+const UpdateRequiredTemplate: StoryFn<typeof MenuBar> = () => (
+  <BothThemes
+    case="connected"
+    {...commonProps}
+    recordingKeystrokes
+    recordingScreen
+    filterState={{ case: `on` }}
+    updateStatus="require"
+  />
+);
+export const UpdateRequired = UpdateRequiredTemplate.bind({});
+
 const EnteringCodeTemplate: StoryFn<typeof MenuBar> = () => (
   <BothThemes case="enteringConnectionCode" {...commonProps} />
 );

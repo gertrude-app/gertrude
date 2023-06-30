@@ -10,6 +10,8 @@ import ConnectFailed from './states/ConnectFailed';
 import Connecting from './states/Connecting';
 import NotConnected from './states/NotConnected';
 import ConnectSucceeded from './states/ConnectSucceeded';
+import UpdateNag from './states/UpdateNag';
+import UpdateRequired from './states/UpdateRequired';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 
@@ -39,6 +41,14 @@ export const MenuBar: React.FC<Props> = ({
 
   if (props.case === `connectionSucceded`) {
     return <ConnectSucceeded emit={emit} userName={props.userName} />;
+  }
+
+  if (props.case === `connected` && props.updateStatus === `nag`) {
+    return <UpdateNag emit={emit} />;
+  }
+
+  if (props.case === `connected` && props.updateStatus === `require`) {
+    return <UpdateRequired emit={emit} />;
   }
 
   if (props.case === `connected`) {

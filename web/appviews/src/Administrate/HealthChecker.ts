@@ -58,7 +58,10 @@ export default class HealthChecker {
         state: `unexpected`,
         message: failable.errorMessage(latestAppVersion),
       };
-    } else if (this.installedAppVersion === latestAppVersion.value) {
+    } else if (
+      this.installedAppVersion === latestAppVersion.value ||
+      this.installedAppVersion > latestAppVersion.value
+    ) {
       return {
         title: `App Version`,
         state: `ok`,
