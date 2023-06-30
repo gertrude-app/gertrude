@@ -37,10 +37,10 @@ const TestimonialsBlock: React.FC = () => {
         computer skills.
       </Testimonial>
       <Testimonial name="Jared H." index={2} testimonialIndex={testimonialIndex}>
-        I'm a bit biased because I made it, but I use Gertrude with all of my kids and
-        would be devastated if I had to go back to what I was using before. It's safer and
-        much easier to use, and I feel more comfortable with my kids' online activity than
-        I ever have.
+        I take online safety very seriously. I needed a bulletproof mac internet filter
+        for my kids. When I couldn't find anything up to my standards, I built Gertrude.
+        I'm biased, but I think it's the best tool out there for mac website blocking and
+        oversight with keylogging and screenshots.
       </Testimonial>
       <button
         className="absolute w-12 h-12 bg-white rounded-full flex justify-center items-center shadow-lg text-slate-500 right-16 bottom-8 lg:bottom-auto hover:bg-violet-50 transition duration-50 z-20"

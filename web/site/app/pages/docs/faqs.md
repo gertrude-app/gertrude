@@ -41,6 +41,33 @@ trying to protect my kids online using other off-the shelf software, things like
   Gertrude so that I could manage every aspect of their protection from the comfort of _my
   own computer or phone, no matter where I was._
 
+## Can it block or filter the internet?
+
+Yes, this is one of Gertrude's flagship features. We think it's the best mac internet
+filter on the market right now because:
+
+- It takes the only safe approach, blocking _every website_ by default, and only allowing
+  those sites you specifically label as safe. Most mac website blockers work by hoping to
+  categorize and block just the bad websites.
+- It provides _convenient controls,_ letting you set up lists of unblocked websites from
+  your own computer or phone, and share them between your kids.
+- We provide tools for your child to _identify blocked websites_ and request access. You
+  get to respond on your time, from your own phone, unblocking sites you deem safe.
+
+## Does it provide keylogging?
+
+Yes. Observing and monitoring what your child types can be an extremely powerful form of
+accountability and safety. Gertrude comes with a built-in mac keylogger which, when
+enabled, captures nearly everything they type (except passwords and credit card numbers).
+This keylogger data is uploaded for the parent to later review from their computer or
+phone. Gertrude is not meant for spying -- when keystroke monitoring is enabled, your
+child is clearly notified that their typing is being recorded. But, provided their
+computer is configured correctly, they are not able to disable the keylogging -- making it
+a perfect fit for trusting relationships of accountability like between a parent and
+child, or a peer with a trusted accountability partner.
+
+{% image src="recording-keystrokes.png" caption="Mac keylogging for parents" /%}
+
 ## Does it work on iPhones or iPads?
 
 No. It only works for _Mac computers._ This is primarily because I built Gertrude
