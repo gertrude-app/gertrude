@@ -20,6 +20,14 @@ const navigation = [
         title: `What You Forgot Locking Down Your Kids’ iPhone`,
         href: `/docs/five-things-you-forgot-when-locking-down-your-kids-iphone`,
       },
+      {
+        title: `Mac internet filtering/blocking`,
+        href: `/docs/mac-internet-filter`,
+      },
+      // {
+      //   title: `Gertrude for keylogging`,
+      //   href: `/docs/mac-keylogger`,
+      // },
     ],
   },
   {
