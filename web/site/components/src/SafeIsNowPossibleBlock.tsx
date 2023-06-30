@@ -29,7 +29,8 @@ const SafeIsNowPossibleBlock: React.FC = () => (
         <div className="flex flex-col mt-4 sm:mt-6 items-center py-10 pb-0 -mx-8 sm:-mx-0">
           <Feature heading="Take complete control" side="left" icon="location">
             Choose exactly where your kids are allowed online, and make sure they can't go
-            anwhere else.
+            anwhere else. No other mac internet filter allows the same level of strict
+            control.
           </Feature>
           <Feature heading="Manage on the go" side="right" icon="mobile">
             Add or remove sites from your own personal safelist from your phone or
@@ -37,15 +38,15 @@ const SafeIsNowPossibleBlock: React.FC = () => (
           </Feature>
           <Feature heading="Get notified" side="left" icon="bell">
             Get text, email, or Slack messages when your kid needs access to a blocked
-            site.
+            site or requests a temporary suspension of the mac internet blocker.
           </Feature>
           <Feature heading="Suspend the filter" side="right" icon="stopwatch">
             Temporarily allow the whole internet, while recording screenshots of their
-            activity and everything they type.
+            activity and everything they type with a built-in mac keylogger.
           </Feature>
           <Feature heading="Protect the whole family" side="left" icon="users">
             Manage all your kids with one account, sharing lists of safelisted sites when
-            it makes sense.
+            it makes sense. Only $5/month for the whole family.
           </Feature>
         </div>
       </div>

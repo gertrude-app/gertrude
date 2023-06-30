@@ -17,7 +17,7 @@ const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }
   const path = router.asPath === `/` ? `` : router.asPath;
   const canonicalUrl = (`https://gertrude.app` + path).split(`?`)[0];
   let pageTitle = `Gertrude | Real internet safety for macOS`;
-  let description = `Protect your loved ones with aggressive network filtering, plus screen and keystroke monitoring. Remotely supervise and control access from your own computer or phone. Available for macOS Big Sur, Monterey, and Ventura.`;
+  let description = `Protect your kids online with easy-to-use Mac internet filtering, internet blocking, and mac keylogging.`;
 
   // docs markdown pages
   if (pageProps.markdoc) {
