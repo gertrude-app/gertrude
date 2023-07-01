@@ -66,7 +66,7 @@ computer is configured correctly, they are not able to disable the keylogging --
 a perfect fit for trusting relationships of accountability like between a parent and
 child, or a peer with a trusted accountability partner.
 
-{% image src="recording-keystrokes.png" caption="Mac keylogging for parents" /%}
+{% image src="recording-keystrokes.png" caption="We clearly display when keylogging is active" alt="Mac keylogging for parents" /%}
 
 ## Does it work on iPhones or iPads?
 

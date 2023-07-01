@@ -24,10 +24,10 @@ const navigation = [
         title: `Mac internet filtering/blocking`,
         href: `/docs/mac-internet-filter`,
       },
-      // {
-      //   title: `Gertrude for keylogging`,
-      //   href: `/docs/mac-keylogger`,
-      // },
+      {
+        title: `Gertrude for mac keylogging`,
+        href: `/docs/mac-keylogger`,
+      },
     ],
   },
   {

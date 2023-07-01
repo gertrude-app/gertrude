@@ -13,26 +13,27 @@ and only where you want them to be.
 
 According to recent estimates, there are over **2 billion** websites on the internet, with
 over _250,000_ being created every day. There are a ton of innocent and educational
-websites out there, but sadly it's mixed in with a **tremendous amount of dangerous
+websites out there, but sadly they are mixed in with a **tremendous amount of dangerous
 content**. Studies have indicated that perhaps **37% of the internet is pornography**.
 
 ## An Illusion of Safety...
 
 Most mac website blockers work by attempting to _categorize all of the websites_ into
-buckets like "adult", "gambling", "social media", etc. This seems promising--just exclude
-the bad parts, and you'll be left with a safe internet, right? Sadly, no. With 2 billion
-websites, and 3 new ones created **every second** these lists are _always hopelessly out
-of date_. We like to say that they provide only _the illusion of safety_. If you want to
-feel like you're keeping your kids safe, turn on a mac internet filter that blocks by
-category. But if you want to _actually protect your kids_, you'll need another approach.
+buckets like "adult", "gambling", "social media", etc. This seems promising&mdash;just
+exclude the bad parts, and you'll be left with a safe internet, right? Sadly, no. With 2
+billion websites, and 3 new ones created **every second** these lists are _always
+hopelessly out of date_. We like to say that they provide only _the illusion of safety_.
+If you want to feel like you're keeping your kids safe, turn on a mac internet filter that
+blocks by category. But if you want to _actually protect your kids_, you'll need another
+approach.
 
 ## How to Block the Whole Internet...
 
 The only way to make a macOS website filter that is actually safe is to forget trying to
 categorize websites. Instead, every single website must be "guilty until proven
-innocent"--blocked unless it has been specifically allowed by you as the parent. Sadly,
-there are very few tools that exist that work in this mode, and the ones that do are
-almost so difficult to use that they're not worth it.
+innocent"&mdash;blocked unless it has been specifically allowed by you as the parent.
+However, there are very few tools that exist that work in this mode, and the ones that do
+are almost so difficult to use that they're not worth it.
 
 I was a dad and a computer programmer who got so frustrated with the lack of usable tools
 for blocking the internet that I built my own app. Gertrude is the mac internet filter I
@@ -63,3 +64,19 @@ make this easy by:
   monitor everything they type. When combined with the strict mac website filter Gertrude
   provides, these tools add up to an incredibly powerful combination for keeping your kids
   safe online.
+
+## Enabling Gertrude's Internet Filter
+
+To enable website blocking in Gertrude, you just click to turn on the filter after
+installing the mac app and connecting to a user.
+
+{% image src="enable-filter.png" caption="Enable filtering with a single click" alt="Mac internet filter" /%}
+
+If you check your "System Settings" (or "System Preferences" in older versions), you'll
+see Gertrude registered as a content filter:
+
+{% image src="content-filter.png" caption="Gertrude's internet filter" alt="Mac content filter" /%}
+
+Your users will be able to access a screen showing all of the blocked requests:
+
+{% image src="network-requests-window.png" caption="You can view every blocked request" alt="Mac website blocker" /%}
