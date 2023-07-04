@@ -27,7 +27,18 @@ export const RequestSuspension: React.FC<Props> = ({
   durationInSeconds,
   request,
   adminAccountStatus,
+  internetConnected,
 }) => {
+  if (!internetConnected) {
+    return (
+      <div className="h-full appview:h-screen flex justify-center bg-white dark:bg-slate-900 items-center px-12">
+        <ErrorBlock
+          title="No Internet!"
+          message="You must be connected to the internet in order to submit a filter suspension request. If you’re trying to connect to a public wifi network, consider temporarily using a hotspot."
+        />
+      </div>
+    );
+  }
   if (request.case === `ongoing`) {
     return (
       <div className="h-full appview:h-screen flex justify-center items-center flex-col space-y-4 bg-white dark:bg-slate-900 rounded-b-xl">
@@ -66,9 +77,11 @@ export const RequestSuspension: React.FC<Props> = ({
         <ErrorBlock
           title="Filter suspension request failed:"
           message={request.error}
-          buttonText="Try Again"
-          buttonIcon="fa-redo"
-          buttonAction={() => emit({ case: `requestFailedTryAgainClicked` })}
+          button={{
+            text: `Try Again`,
+            icon: `fa-redo`,
+            action: () => emit({ case: `requestFailedTryAgainClicked` }),
+          }}
           className="h-full"
         />
       </div>

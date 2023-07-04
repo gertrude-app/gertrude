@@ -166,9 +166,11 @@ const BottomPanel: React.FC<PanelProps> = ({
         <ErrorBlock
           title="Failed to send unlock request:"
           message={createUnlockRequests.error}
-          buttonText="Try Again"
-          buttonIcon="fa-redo"
-          buttonAction={() => emit({ case: `requestFailedTryAgainClicked` })}
+          button={{
+            text: `Try Again`,
+            icon: `fa-redo`,
+            action: () => emit({ case: `requestFailedTryAgainClicked` }),
+          }}
         />
       </BottomPanelWrap>
     );
