@@ -24,18 +24,24 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 // @screenshot: xs,md
-export const Default: Story = props({
-  username: `Win`,
-  requestComment: `Watch some videos for Al's class`,
-  requestedDurationInSeconds: 60 * 5,
-  requestedAt: time.subtracting({ minutes: 5 }),
-  durationInSeconds: `60`,
-  customDurationInMinutes: ``,
-  responseComment: ``,
-  setResponseComment: () => {},
-  setDuration: () => {},
-  setCustomDuration: () => {},
-});
+export const Default: Story = {
+  args: {
+    username: `Win`,
+    requestComment: `Watch some videos for Al's class`,
+    requestedDurationInSeconds: 60 * 5,
+    requestedAt: time.subtracting({ minutes: 5 }),
+    durationInSeconds: `60`,
+    customDurationInMinutes: ``,
+    responseComment: ``,
+    setResponseComment: () => {},
+    setDuration: () => {},
+    setCustomDuration: () => {},
+  },
+  play: async () => {
+    // @ts-ignore
+    document.querySelector(`button[aria-haspopup="listbox"]`)?.click();
+  },
+};
 
 // @screenshot: xs,md
 export const CustomDuration: Story = props({
