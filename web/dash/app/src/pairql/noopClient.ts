@@ -134,9 +134,6 @@ const noopClient: ApiClient = {
   handleCheckoutSuccess: async () => {
     return Result.success({ token: ``, adminId: `` });
   },
-  joinWaitlist: async () => {
-    return Result.success({ success: true });
-  },
   login: async () => {
     return Result.success({ token: ``, adminId: `` });
   },

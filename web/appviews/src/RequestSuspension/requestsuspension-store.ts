@@ -11,6 +11,7 @@ export interface AppState {
     | { case: 'ongoing' }
     | { case: 'succeeded' };
   adminAccountStatus: AdminAccountStatus;
+  internetConnected: boolean;
 }
 
 export type AppEvent =
@@ -54,6 +55,7 @@ export class RequestSuspensionStore extends Store<
       request: { case: `idle` },
       comment: ``,
       customDurationString: ``,
+      internetConnected: true,
     };
   }
 

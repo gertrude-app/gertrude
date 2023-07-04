@@ -102,7 +102,7 @@ export const EditHasExpiration: Story = props({
   keyType: `website`,
   address: `goats.com`,
   activeStep: EditKey.Step.None,
-  expiration: time.stable(),
+  expiration: time.adding({ days: 7 }),
   isNew: false,
 });
 
@@ -112,6 +112,7 @@ export const EditStepOpen: Story = props({
   keyType: `website`,
   address: `goats.com`,
   activeStep: EditKey.Step.WebsiteKey_SetAddress,
+  expiration: time.adding({ days: 7 }),
   isNew: false,
 });
 

@@ -220,14 +220,6 @@ export const liveClient = {
     );
   },
 
-  joinWaitlist(input: T.JoinWaitlist.Input): Promise<T.Result<T.JoinWaitlist.Output>> {
-    return query<T.JoinWaitlist.Input, T.JoinWaitlist.Output>(
-      input,
-      `none`,
-      `JoinWaitlist`,
-    );
-  },
-
   login(input: T.Login.Input): Promise<T.Result<T.Login.Output>> {
     return query<T.Login.Input, T.Login.Output>(input, `none`, `Login`);
   },
@@ -425,9 +417,6 @@ export const throwingClient: ApiClient = {
   },
   handleCheckoutSuccess: () => {
     throw new Error(`ApiClient.handleCheckoutSuccess() not implemented`);
-  },
-  joinWaitlist: () => {
-    throw new Error(`ApiClient.joinWaitlist() not implemented`);
   },
   login: () => {
     throw new Error(`ApiClient.login() not implemented`);

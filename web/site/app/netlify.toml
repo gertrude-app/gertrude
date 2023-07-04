@@ -16,5 +16,9 @@
 
 [build.environment]
   NODE_VERSION = "16.17.1"
-  NEXT_PUBLIC_JOIN_WAITLIST_URL = "https://dash.gertrude.app/join-waitlist"
 
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    Content-Security-Policy = "frame-ancestors 'none'"

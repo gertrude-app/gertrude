@@ -85,7 +85,6 @@ export function interceptPql(
   slug: `HandleCheckoutSuccess`,
   output: T.HandleCheckoutSuccess.Output,
 ): void;
-export function interceptPql(slug: `JoinWaitlist`, output: T.JoinWaitlist.Output): void;
 export function interceptPql(slug: `Login`, output: T.Login.Output): void;
 export function interceptPql(
   slug: `LoginMagicLink`,
@@ -159,7 +158,6 @@ export function forcePqlErr(
     | 'GetUserUnlockRequests'
     | 'HandleCheckoutCancel'
     | 'HandleCheckoutSuccess'
-    | 'JoinWaitlist'
     | 'Login'
     | 'LoginMagicLink'
     | 'RequestMagicLink'

@@ -4,7 +4,6 @@ export namespace Signup {
   export interface Input {
     email: string;
     password: string;
-    signupToken?: string;
   }
 
   export interface Output {

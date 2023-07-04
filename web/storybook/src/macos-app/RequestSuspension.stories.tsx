@@ -22,8 +22,17 @@ export const LightMode: Story = props({
     request: { case: `idle` },
     comment: ``,
     customDurationString: ``,
+    internetConnected: true,
     emit: () => {},
     dispatch: () => {},
+  },
+});
+
+export const NoInternetLight: Story = props({
+  ...LightMode.args,
+  props: {
+    ...LightMode.args.props,
+    internetConnected: false,
   },
 });
 
@@ -104,6 +113,14 @@ export const AccountInactiveLight: Story = props({
 export const DarkMode: Story = props({
   ...LightMode.args,
   dark: true,
+});
+
+export const NoInternetDark: Story = props({
+  ...DarkMode.args,
+  props: {
+    ...DarkMode.args.props,
+    internetConnected: false,
+  },
 });
 
 export const FilledOutDark: Story = props({

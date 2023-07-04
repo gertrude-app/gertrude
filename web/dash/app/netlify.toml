@@ -16,3 +16,8 @@
   VITE_TEST_ADMIN_CREDS = 'be000000-0000-0000-0000-000000000000:be000000-0000-0000-0000-000000000000'
   VITE_API_ENDPOINT= 'https://api--staging.gertrude.app'
 
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    Content-Security-Policy = "frame-ancestors 'none'"
