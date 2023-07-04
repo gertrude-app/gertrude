@@ -25,7 +25,6 @@ export * from './pairs/GetUsers';
 export * from './pairs/GetUserUnlockRequests';
 export * from './pairs/HandleCheckoutCancel';
 export * from './pairs/HandleCheckoutSuccess';
-export * from './pairs/JoinWaitlist';
 export * from './pairs/Login';
 export * from './pairs/LoginMagicLink';
 export * from './pairs/RequestMagicLink';
