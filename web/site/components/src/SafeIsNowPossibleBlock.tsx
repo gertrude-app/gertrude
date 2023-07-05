@@ -24,12 +24,12 @@ const SafeIsNowPossibleBlock: React.FC = () => (
         <p className="text-xl text-slate-500 mt-8 leading-8 max-w-4xl">
           So it's not safe to block only categories of the internet, but taking the
           reverse approach is <b>hard</b>. Rather than give up and settle for the illusion
-          of safety, Gertrude makes this managable by letting you:
+          of safety, Gertrude makes this manageable by letting you:
         </p>
         <div className="flex flex-col mt-4 sm:mt-6 items-center py-10 pb-0 -mx-8 sm:-mx-0">
           <Feature heading="Take complete control" side="left" icon="location">
             Choose exactly where your kids are allowed online, and make sure they can't go
-            anwhere else. No other mac internet filter allows the same level of strict
+            anywhere else. No other mac internet filter allows the same level of strict
             control.
           </Feature>
           <Feature heading="Manage on the go" side="right" icon="mobile">

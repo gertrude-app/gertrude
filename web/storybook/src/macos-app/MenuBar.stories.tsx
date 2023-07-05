@@ -27,9 +27,19 @@ const DarkTemplate: StoryFn<typeof MenuBar> = () => (
 export const DarkMode = DarkTemplate.bind({});
 
 const NotConnectedTemplate: StoryFn<typeof MenuBar> = () => (
-  <BothThemes case="notConnected" {...commonProps} />
+  <BothThemes case="notConnected" filterInstalled={false} {...commonProps} />
 );
 export const NotConnected = NotConnectedTemplate.bind({});
+
+const NotConnectedActionsTemplate: StoryFn<typeof MenuBar> = () => (
+  <BothThemes
+    case="notConnected"
+    filterInstalled={true}
+    {...commonProps}
+    showingNotConnectedActions
+  />
+);
+export const NotConnectedActions = NotConnectedActionsTemplate.bind({});
 
 const UpdateNagTemplate: StoryFn<typeof MenuBar> = () => (
   <BothThemes
@@ -203,6 +213,7 @@ const ThreeModesThreeColors: React.FC<{ theme: 'light' | 'dark' }> = ({ theme })
 const commonProps = {
   connectionCode: `123456`,
   adminAttentionRequired: false,
+  showingNotConnectedActions: false,
   emit: () => {},
   dispatch: () => {},
 };

@@ -9,6 +9,7 @@ describe(`suspend filter request flow`, () => {
       mock.suspendFilterRequest({
         id: `1`,
         requestComment: `I want to watch a video`,
+        requestedDurationInSeconds: 60 * 10,
       }),
     );
 
@@ -19,11 +20,28 @@ describe(`suspend filter request flow`, () => {
     cy.visit(`suspend-filter-requests/1`);
     cy.contains(`I want to watch a video`);
 
+    // dropdown populated from request data, 600 seconds = 10 minutes
+    cy.testId(`select-suspension-duration`).contains(`10 minutes`);
+
+    cy.testId(`select-suspension-duration`).find(`button`).click();
+    cy.testId(`select-suspension-duration`).contains(`5 minutes`).click();
+
+    // request after save invalidation should come back accepted
+    cy.interceptPql(
+      `GetSuspendFilterRequest`,
+      mock.suspendFilterRequest({ id: `1`, status: `accepted` }),
+    );
+
     cy.testId(`suspend-filter-req-comment`).type(`i'll be watching you`);
     cy.testId(`modal-primary-btn`).click();
 
-    cy.wait(`@UpdateSuspendFilterRequest`)
-      .its(`request.body.responseComment`)
-      .should(`eq`, `i'll be watching you`);
+    cy.wait(`@UpdateSuspendFilterRequest`).its(`request.body`).should(`deep.equal`, {
+      id: `1`,
+      durationInSeconds: 300,
+      responseComment: `i'll be watching you`,
+      status: `accepted`,
+    });
+
+    cy.contains(`accepted`);
   });
 });

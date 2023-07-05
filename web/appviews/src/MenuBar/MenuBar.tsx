@@ -7,16 +7,18 @@ import store from './menubar-store';
 import Connected from './states/Connected';
 import EnteringConnectionCode from './states/EnteringConnectionCode';
 import ConnectFailed from './states/ConnectFailed';
-import Connecting from './states/Connecting';
+import Throbbing from './states/Throbbing';
 import NotConnected from './states/NotConnected';
 import ConnectSucceeded from './states/ConnectSucceeded';
 import UpdateNag from './states/UpdateNag';
 import UpdateRequired from './states/UpdateRequired';
+import NotConnectedActions from './states/NotConnectedActions';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 
 export const MenuBar: React.FC<Props> = ({
   connectionCode,
+  showingNotConnectedActions,
   emit,
   dispatch,
   ...props
@@ -32,7 +34,7 @@ export const MenuBar: React.FC<Props> = ({
   }
 
   if (props.case === `connecting`) {
-    return <Connecting />;
+    return <Throbbing />;
   }
 
   if (props.case === `connectionFailed`) {
@@ -62,7 +64,23 @@ export const MenuBar: React.FC<Props> = ({
       />
     );
   }
-  return <NotConnected emit={emit} />;
+
+  if (props.case === `notConnected` && showingNotConnectedActions) {
+    return (
+      <NotConnectedActions
+        emit={emit}
+        onBackClicked={() => dispatch({ type: `toggleShowingNotConnectedActions` })}
+        filterInstalled={props.filterInstalled}
+      />
+    );
+  }
+
+  return (
+    <NotConnected
+      emit={emit}
+      onActionsIconClicked={() => dispatch({ type: `toggleShowingNotConnectedActions` })}
+    />
+  );
 };
 
 // not sure why i have to specify the generics here... 🤔
