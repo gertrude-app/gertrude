@@ -8,9 +8,10 @@ description:
 ## What makes Gertrude better?
 
 I'm a software developer who built Gertrude because I was trying to protect my kids
-online, and was frustrated with the lack of _safety_ and _usability_ of other solutions on
-the market. A lot of Gertrude's core features came out of things I wished I had while
-trying to protect my kids online using other off-the shelf software, things like:
+online, and was frustrated with the lack of _safety_ and _usability_ of other parental
+controls apps for Mac on the market. A lot of Gertrude's core features came out of things
+I wished I had while trying to protect my kids online using other off-the shelf software,
+things like:
 
 - **Real safety.** Nearly every other internet security tool tries to block _categories_
   of websites, like pornography, gambling, etc. This is tantalizing because its _so easy_,
@@ -44,7 +45,7 @@ trying to protect my kids online using other off-the shelf software, things like
 ## Can it block or filter the internet?
 
 Yes, this is one of Gertrude's flagship features. We think it's the best mac internet
-filter on the market right now because:
+filter and website blocker on the market right now because:
 
 - It takes the only safe approach, blocking _every website_ by default, and only allowing
   those sites you specifically label as safe. Most mac website blockers work by hoping to
@@ -60,13 +61,15 @@ Yes. Observing and monitoring what your child types can be an extremely powerful
 accountability and safety. Gertrude comes with a built-in mac keylogger which, when
 enabled, captures nearly everything they type (except passwords and credit card numbers).
 This keylogger data is uploaded for the parent to later review from their computer or
-phone. Gertrude is not meant for spying -- when keystroke monitoring is enabled, your
+phone. Gertrude is not meant for spying&mdash;when keystroke monitoring is enabled, your
 child is clearly notified that their typing is being recorded. But, provided their
-computer is configured correctly, they are not able to disable the keylogging -- making it
-a perfect fit for trusting relationships of accountability like between a parent and
+computer is configured correctly, they are not able to disable the keylogging&mdash;making
+it a perfect fit for trusting relationships of accountability like between a parent and
 child, or a peer with a trusted accountability partner.
 
 {% image src="recording-keystrokes.png" caption="We clearly display when keylogging is active" alt="Mac keylogging for parents" /%}
+
+{% image src="review-keylogging.png" caption="Review everything your child types, on your own time" alt="mac parental controls keylogger" /%}
 
 ## Does it work on iPhones or iPads?
 

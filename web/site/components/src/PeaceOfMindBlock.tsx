@@ -30,8 +30,7 @@ const PeaceOfMindBlock: React.FC = () => {
             Gertrude lets you block the entire internet, only unlocking the portions you
             choose. Keep your kids <em>only</em> and <em>exactly</em> where you want them
             to be online. Plus, review screenshots and keystrokes of their activity from
-            your own computer or phone. Early access available now for{` `}
-            <em>Apple computers.</em>
+            your own computer or phone. Mac parental controls have never been this good.
           </p>
           <div className="flex flex-col space-y-3 sm:flex-row sm:space-x-4 items-start sm:items-end">
             <a

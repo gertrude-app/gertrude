@@ -16,16 +16,14 @@ const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }
   const ogImage = pageProps.markdoc?.frontmatter.image ?? OgImage.src;
   const path = router.asPath === `/` ? `` : router.asPath;
   const canonicalUrl = (`https://gertrude.app` + path).split(`?`)[0];
-  let pageTitle = `Gertrude | Real internet safety for macOS`;
+  let pageTitle = `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`;
   let description = `Protect your kids online with easy-to-use Mac internet filtering, internet blocking, and mac keylogging.`;
 
   // docs markdown pages
   if (pageProps.markdoc) {
-    const title = pageProps.markdoc.frontmatter.title ?? `Gertrude Docs`;
-    pageTitle = pageProps.markdoc.frontmatter.pageTitle
-      ? `${title} | Gertrude Docs`
-      : title;
-
+    const title = pageProps.markdoc.frontmatter.title;
+    if (!title) throw new Error(`Missing title in frontmatter for ${path}`);
+    pageTitle = `${title} | Gertrude Internet Filter & Parental Controls`;
     description = pageProps.markdoc?.frontmatter.description;
     const tableOfContents = pageProps.markdoc?.content
       ? collectHeadings(pageProps.markdoc.content)

@@ -22,10 +22,10 @@ Most mac website blockers work by attempting to _categorize all of the websites_
 buckets like "adult", "gambling", "social media", etc. This seems promising&mdash;just
 exclude the bad parts, and you'll be left with a safe internet, right? Sadly, no. With 2
 billion websites, and 3 new ones created **every second** these lists are _always
-hopelessly out of date_. We like to say that they provide only _the illusion of safety_.
-If you want to feel like you're keeping your kids safe, turn on a mac internet filter that
-blocks by category. But if you want to _actually protect your kids_, you'll need another
-approach.
+hopelessly out of date_. We like to say that these types of parental controls app provide
+only _the illusion of safety_. If you want to feel like you're keeping your kids safe,
+turn on a mac internet filter that blocks by category. But if you want to _actually
+protect your kids_, you'll need another approach.
 
 ## How to Block the Whole Internet...
 
@@ -35,12 +35,12 @@ innocent"&mdash;blocked unless it has been specifically allowed by you as the pa
 However, there are very few tools that exist that work in this mode, and the ones that do
 are almost so difficult to use that they're not worth it.
 
-I was a dad and a computer programmer who got so frustrated with the lack of usable tools
-for blocking the internet that I built my own app. Gertrude is the mac internet filter I
-wished existed five years ago. It's simply the safest tool on the market for parents who
-truly care about and are willing to invest a little time in the online safety of their
-kids. It's internet filter only has one mode - block everything you haven't explicitly
-safe-listed.
+I was a dad and a computer programmer who got so frustrated with the lack of usable
+parental controls for blocking the internet that I built my own app. Gertrude is the mac
+internet filter I wished existed five years ago. It's simply the safest tool on the market
+for parents who truly care about and are willing to invest a little time in the online
+safety of their kids. It's internet filter only has one mode&mdash;block everything you
+haven't explicitly safe-listed.
 
 ## ...Without Driving Yourself Crazy
 
