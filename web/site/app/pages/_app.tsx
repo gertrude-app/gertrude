@@ -16,7 +16,7 @@ const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }
   const ogImage = pageProps.markdoc?.frontmatter.image ?? OgImage.src;
   const path = router.asPath === `/` ? `` : router.asPath;
   const canonicalUrl = (`https://gertrude.app` + path).split(`?`)[0];
-  let pageTitle = `Gertrude | Real internet safety for macOS`;
+  let pageTitle = `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`;
   let description = `Protect your kids online with easy-to-use Mac internet filtering, internet blocking, and mac keylogging.`;
 
   // docs markdown pages
