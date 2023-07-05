@@ -60,6 +60,7 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
     <form className="mt-4 space-y-5 mb-2">
       <SelectMenu
         label="Granted duration:"
+        testId="select-suspension-duration"
         options={DURATION_OPTS}
         selectedOption={durationInSeconds}
         setSelected={setDuration}

@@ -18,6 +18,7 @@ export function reducer(state: State, action: Action): State | undefined {
   switch (action.type) {
     case `receivedRequest`:
       state.request = action.request;
+      state.grantedDurationInSeconds = String(action.request.requestedDurationInSeconds);
       return;
 
     case `updateComment`:
