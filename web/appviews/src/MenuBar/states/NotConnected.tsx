@@ -5,10 +5,15 @@ import { MenuBarSized } from '../MenuBar';
 
 interface Props {
   emit(event: AppEvent): unknown;
+  onActionsIconClicked(): unknown;
 }
 
-const NotConnected: React.FC<Props> = ({ emit }) => (
-  <MenuBarSized className="flex flex-col justify-center items-center">
+const NotConnected: React.FC<Props> = ({ emit, onActionsIconClicked }) => (
+  <MenuBarSized className="flex flex-col justify-center items-center relative">
+    <i
+      onClick={onActionsIconClicked}
+      className="fa-solid fa-gear text-md cursor-pointer absolute top-4 left-4 text-black/10 hover:text-black/30 dark:text-white/10 hover:dark:text-white/30 transition-colors"
+    />
     <p className="text-black/80 dark:text-white/70 font-medium">Welcome to</p>
     <Logo type="default" className="dark:[filter:brightness(600%)]" />
     <button
