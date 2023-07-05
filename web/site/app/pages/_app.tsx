@@ -21,11 +21,9 @@ const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }
 
   // docs markdown pages
   if (pageProps.markdoc) {
-    const title = pageProps.markdoc.frontmatter.title ?? `Gertrude Docs`;
-    pageTitle = pageProps.markdoc.frontmatter.pageTitle
-      ? `${title} | Gertrude Docs`
-      : title;
-
+    const title = pageProps.markdoc.frontmatter.title;
+    if (!title) throw new Error(`Missing title in frontmatter for ${path}`);
+    pageTitle = `${title} | Gertrude Internet Filter & Parental Controls`;
     description = pageProps.markdoc?.frontmatter.description;
     const tableOfContents = pageProps.markdoc?.content
       ? collectHeadings(pageProps.markdoc.content)
