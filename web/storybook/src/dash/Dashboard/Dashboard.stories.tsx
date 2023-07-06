@@ -40,9 +40,9 @@ export const Default: Story = props({
     },
   ]),
   users: withIds([
-    { name: `Little Jimmy`, isOnline: true },
-    { name: `Sally`, isOnline: true },
-    { name: `Henry`, isOnline: false },
+    { name: `Little Jimmy`, isOnline: true, numDevices: 1 },
+    { name: `Sally`, isOnline: true, numDevices: 2 },
+    { name: `Henry`, isOnline: false, numDevices: 0 },
   ]),
   userActivitySummaries: withIdsAnd({ numReviewed: 0 }, [
     { name: `Little Jimmy`, numUnreviewed: 245 },
@@ -66,6 +66,7 @@ export const Default: Story = props({
       createdAt: time.subtracting({ minutes: 6 }),
     },
   ]),
+  numAdminNotifications: 2,
 });
 
 export const NoUnlockRequests: Story = props({

@@ -8,6 +8,7 @@ export namespace GetDashboardWidgets {
       id: UUID;
       name: string;
       isOnline: boolean;
+      numDevices: number;
     }>;
     userActivitySummaries: Array<{
       id: UUID;
@@ -29,5 +30,6 @@ export namespace GetDashboardWidgets {
       url: string;
       createdAt: ISODateString;
     }>;
+    numAdminNotifications: number;
   }
 }

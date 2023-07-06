@@ -57,6 +57,7 @@ const noopClient: ApiClient = {
       userActivitySummaries: [],
       unlockRequests: [],
       recentScreenshots: [],
+      numAdminNotifications: 0,
     });
   },
   getIdentifiedApps: async () => {
