@@ -44,4 +44,18 @@ describe(`suspend filter request flow`, () => {
 
     cy.contains(`accepted`);
   });
+
+  it(`handles initialization of custom duration`, () => {
+    cy.interceptPql(
+      `GetSuspendFilterRequest`,
+      mock.suspendFilterRequest({
+        id: `1`,
+        requestedDurationInSeconds: 60 * 17, // <-- 17 minutes, custom duration
+      }),
+    );
+
+    cy.visit(`suspend-filter-requests/1`);
+    cy.testId(`select-suspension-duration`).contains(`custom duration`);
+    cy.contains(`Custom duration (minutes):`);
+  });
 });

@@ -1,4 +1,5 @@
 import { produce } from 'immer';
+import { DURATION_OPTS } from '@dash/components';
 import type { SuspendFilterRequest } from '@dash/types';
 
 export type State = {
@@ -19,6 +20,12 @@ export function reducer(state: State, action: Action): State | undefined {
     case `receivedRequest`:
       state.request = action.request;
       state.grantedDurationInSeconds = String(action.request.requestedDurationInSeconds);
+      if (!DURATION_OPTS.map((o) => o.value).includes(state.grantedDurationInSeconds)) {
+        state.grantedDurationInSeconds = `custom`;
+        state.grantedCustomDurationInMinutes = String(
+          action.request.requestedDurationInSeconds / 60,
+        );
+      }
       return;
 
     case `updateComment`:
