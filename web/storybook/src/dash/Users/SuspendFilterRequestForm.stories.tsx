@@ -37,9 +37,11 @@ export const Default: Story = {
     setDuration: () => {},
     setCustomDuration: () => {},
   },
+  // allow screenshotting open dropdown, verifying not cutoff
   play: async () => {
-    // @ts-ignore
-    document.querySelector(`button[aria-haspopup="listbox"]`)?.click();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const button = document.querySelector(`button[aria-haspopup="listbox"]`);
+    button instanceof HTMLElement && button.click();
   },
 };
 

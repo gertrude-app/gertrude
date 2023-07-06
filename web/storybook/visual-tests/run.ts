@@ -20,6 +20,10 @@ async function main(): Promise<void> {
     .map(([file, story]) => extractScreenshotTest(file, story))
     .filter(notNullish);
 
+  if (!tests.some((t) => t.id === `dashboard-users-suspendfilterrequestform--default`)) {
+    throw new Error(`story w/ custom wait not found, possibly renamed`);
+  }
+
   const browser = await puppeteer.launch({ headless: true, product: `chrome` });
   const page = await browser.newPage();
   const url = `http://localhost:4777/${process.env.CI ? `` : `iframe.html`}`;
