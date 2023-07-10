@@ -39,7 +39,7 @@ describe(`user screen`, () => {
 
       // redirects to /users/<new-user-id>
       cy.location(`pathname`).should(`not.eq`, `/users/new`);
-      cy.contains(`Create user`);
+      cy.contains(`New user`);
 
       // don't show the empty new user in the list
       cy.sidebarClick(`Users`);

@@ -15,11 +15,11 @@ const ConnectModal: React.FC<Props> = ({ dismissAddDevice, request }) => (
     primaryButton={dismissAddDevice}
     onDismiss={dismissAddDevice}
     withPayload={(payload) => (
-      <div className="space-y-3 mb-2">
+      <div className="space-y-3 mb-2 flex flex-col">
         <div>
           Enter the code below into the <i>Gertrude Mac App</i>:
         </div>
-        <code className="block text-3xl text-green-700 tracking-widest block text-center">
+        <code className="block text-3xl text-fuchsia-700 tracking-widest font-bold bg-fuchsia-50 w-fit self-center px-4 py-1 rounded-lg">
           {payload.code}
         </code>
         <div>

@@ -45,4 +45,17 @@ export const Default: Story = props({
   ],
 });
 
+// @screenshot: xs,md
+export const New: Story = props({
+  ...Default.args,
+  name: ``,
+  isNew: true,
+});
+
+// @screenshot: xs,md
+export const NoDevices: Story = props({
+  ...Default.args,
+  devices: [],
+});
+
 export default meta;

@@ -122,7 +122,7 @@ const Modal: React.FC<Props> = ({
               ) : (
                 <Dialog.Panel
                   className={cx(
-                    `relative transform rounded-2xl sm:rounded-3xl bg-white text-left shadow-xl transition-all min-w-[300px] sm:my-8 sm:w-full`,
+                    `relative transform rounded-2xl bg-white text-left shadow-xl transition-all min-w-[300px] sm:my-8 sm:w-full`,
                     type === `container` && `lg:max-w-4xl`,
                     maximizeWidthForSmallScreens ? `w-full sm:w-auto` : `sm:max-w-xl`,
                   )}
@@ -173,7 +173,7 @@ const Modal: React.FC<Props> = ({
                       </div>
                     </div>
                   )}
-                  <div className="sm:bg-slate-50 rounded-b-2xl sm:rounded-b-3xl px-4 py-3 pb-5 sm:pb-4 sm:pt-4 flex flex-col items-stretch sm:flex-row sm:justify-end">
+                  <div className="sm:bg-slate-50 rounded-b-2xl sm:rounded-b-3xl pb-4 sm:pb-3 p-3 flex flex-col items-stretch sm:flex-row sm:justify-end">
                     {secondary && (
                       <Button
                         testId="modal-secondary-btn"
