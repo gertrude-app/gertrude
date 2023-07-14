@@ -94,29 +94,34 @@ const Dashboard: React.FC<Props> = ({
     <UndoMainPadding className="flex justify-center items-center md:min-h-screen">
       <FloatingMessage className="flex flex-col items-center p-6 sm:p-8 lg:p-12">
         <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
-          Welcome to the Gertrude parent site!
+          Welcome to the parent website!
         </h1>
         <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
-          The first step to getting up and running is to create a user for at least one of
-          your kids!
+          The first step to getting up and running is to{` `}
+          <b>
+            create a <span className="underline">user</span>
+          </b>
+          {` `}
+          for at least one of your kids.
         </p>
         <div className="mt-12 flex flex-col gap-4">
           <OnboardingRecommendation
-            title={`Create a user`}
-            icon={`fa-solid fa-user-plus`}
-            href={`/users/new`}
+            title="Create a user"
+            icon="fa-solid fa-user-plus"
+            href="/users/new"
             primary
           />
           <div className="flex flex-col xl:flex-row gap-4">
             <OnboardingRecommendation
-              title={`Show me how (2 min)`}
-              icon={`fa-brands fa-youtube`}
-              href={`/`}
+              title="How-to video (2 min)"
+              icon="fa-brands fa-youtube"
+              href="https://www.youtube.com/watch?v=-2CmBj1lZBg"
+              openInNewTab
             />
             <OnboardingRecommendation
-              title={`Read our getting started guide`}
-              icon={`fa-solid fa-question-circle`}
-              href={`https://gertrude.app/docs/getting-started`}
+              title="Read our getting started guide"
+              icon="fa-solid fa-question-circle"
+              href="https://gertrude.app/docs/getting-started"
               openInNewTab
             />
           </div>

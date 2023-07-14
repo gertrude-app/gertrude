@@ -80,7 +80,7 @@ const EditUser: React.FC<Props> = ({
         <div className="flex-grow flex items-center justify-center">
           <div className="flex flex-col gap-2 flex-grow max-w-2xl">
             <Label htmlFor="name" className="text-xl ml-6 md:ml-9">
-              Name:
+              Child&rsquo;s name:
             </Label>
             <input
               className="border-[0.5px] border-slate-200 shadow text-2xl md:text-3xl lg:text-4xl px-6 md:px-8 py-3 md:py-4 rounded-2xl md:rounded-3xl placeholder:text-slate-200 outline-none outline-transparent outline-offset-0 focus:outline-2 focus:outline-violet-500 [transition:200ms] focus:shadow-md font-medium text-slate-800 placeholder:font-normal"
@@ -131,14 +131,6 @@ const EditUser: React.FC<Props> = ({
       <ConfirmDeleteEntity type="user" action={deleteUser} />
       <PageHeading icon={`pen`}>Edit user</PageHeading>
       <div className="mt-8">
-        <TextInput
-          type="text"
-          label="Name:"
-          testId="user-name"
-          value={name}
-          setValue={setName}
-          className="max-w-xl"
-        />
         {devices.length === 0 && (
           <div className="mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow border-[0.5px] border-slate-200">
             <AddDeviceInstructions
@@ -150,6 +142,14 @@ const EditUser: React.FC<Props> = ({
         )}
         {devices.length > 0 && (
           <>
+            <TextInput
+              type="text"
+              label="Name:"
+              testId="user-name"
+              value={name}
+              setValue={setName}
+              className="max-w-xl"
+            />
             <h2 className="mt-5 text-lg font-bold text-slate-700">
               {devices.length} {inflect(`device`, devices.length)}:
             </h2>
@@ -257,15 +257,17 @@ const EditUser: React.FC<Props> = ({
           <Button type="button" onClick={deleteUser.start} color="warning">
             Delete user
           </Button>
-          <Button
-            className="ScrollTop"
-            type="button"
-            disabled={saveButtonDisabled}
-            onClick={onSave}
-            color="primary"
-          >
-            Save user
-          </Button>
+          {devices.length > 0 && (
+            <Button
+              className="ScrollTop"
+              type="button"
+              disabled={saveButtonDisabled}
+              onClick={onSave}
+              color="primary"
+            >
+              Save user
+            </Button>
+          )}
         </div>
       </div>
     </div>

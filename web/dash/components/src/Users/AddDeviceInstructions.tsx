@@ -18,22 +18,24 @@ const AddDeviceInstructions: React.FC<Props> = ({
   startAddDevice,
 }) => (
   <>
-    {onMainDashboard ? (
-      <>
-        <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
-          Congrats on making your first user!
-        </h1>
-        <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
-          To finish getting setup, you'll need to do 3 steps:
-        </p>
-      </>
-    ) : (
-      <h2 className="mb-8 text-2xl font-bold">Follow these steps to connect a device:</h2>
-    )}
+    <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+      {onMainDashboard ? `Congrats on making your first user!` : `Nearly there!`}
+    </h1>
+    <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
+      {onMainDashboard ? (
+        <span>To finish getting started, you'll need to do 3 steps:</span>
+      ) : (
+        <span>
+          To start protecting <i className="font-bold">{userName}</i>, you'll need to do 3
+          steps:
+        </span>
+      )}
+    </p>
 
     <ol className="flex flex-col gap-4 mt-8">
       <ListStep index={1}>
-        On the computer {userName} uses, download the Gertrude Mac app from
+        On the computer <b className="underline">{userName}</b> uses, download the
+        Gertrude Mac app from
         {` `}
         <a href="https://gertrude.app/download" target="_blank" rel="noreferrer">
           https://gertrude.app/download
@@ -78,16 +80,17 @@ const AddDeviceInstructions: React.FC<Props> = ({
     <div className="flex flex-col-reverse lg:flex-row gap-4 mt-12 w-full">
       <OnboardingRecommendation
         className="flex-grow"
-        title={`Get more help`}
-        icon={`fa-solid fa-life-ring`}
-        href={`https://gertrude.app/contact`}
+        title="Get more help"
+        icon="fa-solid fa-life-ring"
+        href="https://gertrude.app/contact"
         openInNewTab
       />
       <OnboardingRecommendation
         className="flex-grow"
-        title={`Show me how (90s)`}
-        icon={`fa-brands fa-youtube`}
-        href={`/`}
+        title="How-to video (2 min)"
+        icon="fa-brands fa-youtube"
+        href="https://www.youtube.com/watch?v=2NZaoGZYFOw"
+        openInNewTab
         primary
       />
     </div>
