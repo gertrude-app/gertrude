@@ -78,9 +78,19 @@ export function user(override: Partial<User> = {}): User {
     devices: [
       {
         id: `mac-123`,
-        isOnline: true,
         modelFamily: `macBookAir`,
         modelTitle: `MacBook Air`,
+        releaseChannel: `stable`,
+        users: [
+          {
+            name: `Little Jimmy`,
+            id: uuid(),
+            isOnline: true,
+          },
+        ],
+        appVersion: `2.2.0`,
+        serialNumber: `C02XV0Y0JGH7`,
+        modelIdentifier: `MacBookAir8,1`,
       },
     ],
     createdAt: new Date().toISOString(),
@@ -91,7 +101,17 @@ export function user(override: Partial<User> = {}): User {
 export function userDevice(override: Partial<Device> = {}): Device {
   return {
     id: uuid(),
-    isOnline: false,
+    appVersion: `2.2.0`,
+    users: [
+      {
+        name: `Little Jimmy`,
+        id: uuid(),
+        isOnline: true,
+      },
+    ],
+    modelIdentifier: `MacBookAir8,1`,
+    serialNumber: `C02XV0Y0JGH7`,
+    releaseChannel: `stable`,
     modelFamily: `macBookAir`,
     modelTitle: `MacBook Air`,
     ...override,

@@ -60,8 +60,8 @@ export function deviceProps(
 ): React.ComponentProps<typeof EditUser>['devices'][0] {
   return {
     id: apiDevice.id,
-    model: apiDevice.modelTitle,
-    status: apiDevice.isOnline ? `online` : `offline`,
-    icon: familyToIcon(apiDevice.modelFamily),
+    modelTitle: apiDevice.modelTitle,
+    modelIdentifier: apiDevice.modelIdentifier,
+    status: apiDevice.users.some((user) => user.isOnline) ? `online` : `offline`,
   };
 }

@@ -111,6 +111,19 @@ const noopClient: ApiClient = {
       createdAt: new Date().toISOString(),
     });
   },
+  getDevice: async () => {
+    return Result.success({
+      id: ``,
+      name: undefined,
+      releaseChannel: `stable`,
+      appVersion: ``,
+      users: [],
+      serialNumber: ``,
+      modelIdentifier: ``,
+      modelFamily: `unknown`,
+      modelTitle: ``,
+    });
+  },
   userActivityFeed: async () => {
     return Result.success({ numDeleted: 0, userName: ``, items: [] });
   },
@@ -125,6 +138,16 @@ const noopClient: ApiClient = {
   },
   getUsers: async () => {
     return Result.success([]);
+  },
+  getDevices: async () => {
+    return Result.success([]);
+  },
+  latestAppVersions: async () => {
+    return Result.success({
+      stable: ``,
+      beta: ``,
+      canary: ``,
+    });
   },
   getUserUnlockRequests: async () => {
     return Result.success([]);
@@ -157,6 +180,9 @@ const noopClient: ApiClient = {
     return Result.success({ success: true });
   },
   saveUser: async () => {
+    return Result.success({ success: true });
+  },
+  saveDevice: async () => {
     return Result.success({ success: true });
   },
   sendPasswordResetEmail: async () => {

@@ -69,16 +69,17 @@ const UserCard: React.FC<Props> = ({
             <p className="text-slate-500">
               <span className="text-xl font-bold text-slate-600">{devices.length}</span>
               {` `}
-              {inflect(`device`, devices.length)}:
+              {inflect(`computer`, devices.length)}:
             </p>
           </div>
           <div className="flex flex-col mt-3 space-y-3 pt-3">
             {devices.map((device) => (
               <UserDevice
                 key={device.id}
-                model={device.model}
+                id={device.id}
+                modelTitle={device.modelTitle}
+                modelIdentifier={device.modelIdentifier}
                 status={device.status}
-                icon={device.icon}
               />
             ))}
           </div>

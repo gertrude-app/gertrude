@@ -68,7 +68,7 @@ const KeychainCard: React.FC<Props> = ({
               {inflect(`key`, numKeys)}
             </h4>
             {isSelect(props) && isPublic && (
-              <PillBadge small type="green">
+              <PillBadge size="medium" type="green">
                 Public
               </PillBadge>
             )}
@@ -96,6 +96,7 @@ const KeychainCard: React.FC<Props> = ({
         <div className="flex-grow ml-3">
           <PillBadge
             type="green"
+            size="large"
             className={cx(
               `border`,
               !isPublic && `opacity-0`, // ensure equal heights

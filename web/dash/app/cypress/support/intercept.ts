@@ -73,6 +73,13 @@ export function interceptPql(
 ): void;
 export function interceptPql(slug: `GetUser`, output: T.GetUser.Output): void;
 export function interceptPql(slug: `GetUsers`, output: T.GetUsers.Output): void;
+export function interceptPql(slug: `GetDevice`, output: T.GetDevice.Output): void;
+export function interceptPql(slug: `SaveDevice`, output: T.SaveDevice.Output): void;
+export function interceptPql(slug: `GetDevices`, output: T.GetDevices.Output): void;
+export function interceptPql(
+  slug: `LatestAppVersions`,
+  output: T.LatestAppVersions.Output,
+): void;
 export function interceptPql(
   slug: `GetUserUnlockRequests`,
   output: T.GetUserUnlockRequests.Output,
@@ -155,6 +162,8 @@ export function forcePqlErr(
     | 'GetUnlockRequests'
     | 'GetUser'
     | 'GetUsers'
+    | 'GetDevice'
+    | 'GetDevices'
     | 'GetUserUnlockRequests'
     | 'HandleCheckoutCancel'
     | 'HandleCheckoutSuccess'

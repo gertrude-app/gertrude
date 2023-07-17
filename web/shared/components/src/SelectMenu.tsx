@@ -44,9 +44,9 @@ function SelectMenu<Value extends string = string>({
         >
           {label && <Label className="w-full inline-block pb-px">{label}</Label>}
           <div className="relative">
-            <div className="rounded-md w-full">
-              <div className="relative z-0 inline-flex rounded-md w-full border dark:border-slate-700">
-                <div className="relative flex flex-grow items-center bg-white dark:bg-slate-900 pl-3 pr-4 border border-transparent rounded-l-md text-slate-700 dark:text-slate-300">
+            <div className="rounded-lg w-full">
+              <div className="relative z-0 inline-flex rounded-lg w-full border dark:border-slate-700">
+                <div className="relative flex flex-grow items-center bg-white dark:bg-slate-900 pl-3 pr-4 border border-transparent rounded-l-lg text-slate-700 dark:text-slate-300">
                   <p className="ml-2.5 font-medium">
                     {(options.find((opt) => opt.value === selectedOption) ?? options[0])
                       ?.display ?? `make a selection...`}
@@ -54,7 +54,7 @@ function SelectMenu<Value extends string = string>({
                 </div>
                 <Listbox.Button
                   className={cx(
-                    `relative inline-flex items-center px-4 rounded-l-none rounded-r-md text-sm font-medium focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-50 focus:ring-indigo-500 [transition:100ms]`,
+                    `relative inline-flex items-center px-4 rounded-l-none rounded-r-lg text-sm font-medium focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-50 focus:ring-indigo-500 [transition:100ms]`,
                     buttonStyles,
                     disabled && `cursor-not-allowed pointer-events-none`,
                   )}
@@ -77,16 +77,16 @@ function SelectMenu<Value extends string = string>({
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Listbox.Options className="origin-top-right absolute z-20 right-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Listbox.Options className="origin-top-right absolute z-20 right-0 mt-2 p-2 w-72 rounded-xl shadow-lg overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none flex flex-col">
                 {options.map(({ value, display }) => (
                   <Listbox.Option
                     key={value}
                     className={({ active }) =>
                       cx(
                         active
-                          ? `bg-violet-100 dark:text-slate-200`
+                          ? `bg-violet-100 text-slate-900 dark:text-slate-200`
                           : `text-slate-900 dark:text-slate-300`,
-                        `cursor-pointer select-none relative`,
+                        `cursor-pointer select-none relative rounded-lg transition duration-75`,
                         size === `small` ? `py-2 px-3` : `p-3.5 text-md`,
                         size === `small` && active && `bg-slate-50 dark:bg-slate-700/50`,
                       )

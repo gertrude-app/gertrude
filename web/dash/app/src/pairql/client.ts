@@ -132,6 +132,24 @@ export const liveClient = {
     );
   },
 
+  getDevice(input: T.GetDevice.Input): Promise<T.Result<T.GetDevice.Output>> {
+    return query<T.GetDevice.Input, T.GetDevice.Output>(input, `admin`, `GetDevice`);
+  },
+
+  getDevices(input: T.GetDevices.Input): Promise<T.Result<T.GetDevices.Output>> {
+    return query<T.GetDevices.Input, T.GetDevices.Output>(input, `admin`, `GetDevices`);
+  },
+
+  latestAppVersions(
+    input: T.LatestAppVersions.Input,
+  ): Promise<T.Result<T.LatestAppVersions.Output>> {
+    return query<T.LatestAppVersions.Input, T.LatestAppVersions.Output>(
+      input,
+      `admin`,
+      `LatestAppVersions`,
+    );
+  },
+
   getIdentifiedApps(
     input: T.GetIdentifiedApps.Input,
   ): Promise<T.Result<T.GetIdentifiedApps.Output>> {
@@ -278,6 +296,10 @@ export const liveClient = {
     return query<T.SaveUser.Input, T.SaveUser.Output>(input, `admin`, `SaveUser`);
   },
 
+  saveDevice(input: T.SaveDevice.Input): Promise<T.Result<T.SaveDevice.Output>> {
+    return query<T.SaveDevice.Input, T.SaveDevice.Output>(input, `admin`, `SaveDevice`);
+  },
+
   sendPasswordResetEmail(
     input: T.SendPasswordResetEmail.Input,
   ): Promise<T.Result<T.SendPasswordResetEmail.Output>> {
@@ -388,6 +410,15 @@ export const throwingClient: ApiClient = {
   getDashboardWidgets: () => {
     throw new Error(`ApiClient.getDashboardWidgets() not implemented`);
   },
+  getDevice: () => {
+    throw new Error(`ApiClient.getDevice() not implemented`);
+  },
+  getDevices: () => {
+    throw new Error(`ApiClient.getDevices() not implemented`);
+  },
+  latestAppVersions: () => {
+    throw new Error(`ApiClient.latestAppVersions() not implemented`);
+  },
   getIdentifiedApps: () => {
     throw new Error(`ApiClient.getIdentifiedApps() not implemented`);
   },
@@ -441,6 +472,9 @@ export const throwingClient: ApiClient = {
   },
   saveUser: () => {
     throw new Error(`ApiClient.saveUser() not implemented`);
+  },
+  saveDevice: () => {
+    throw new Error(`ApiClient.saveDevice() not implemented`);
   },
   sendPasswordResetEmail: () => {
     throw new Error(`ApiClient.sendPasswordResetEmail() not implemented`);

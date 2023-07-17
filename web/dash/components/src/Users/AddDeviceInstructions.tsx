@@ -21,7 +21,7 @@ const AddDeviceInstructions: React.FC<Props> = ({
     <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
       {onMainDashboard ? `Congrats on making your first user!` : `Nearly there!`}
     </h1>
-    <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
+    <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl mx-auto">
       {onMainDashboard ? (
         <span>To finish getting started, you'll need to do 3 steps:</span>
       ) : (

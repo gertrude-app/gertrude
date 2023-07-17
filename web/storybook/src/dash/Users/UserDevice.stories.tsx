@@ -10,14 +10,22 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 export const Online: Story = props({
-  model: `14" Macbook Pro`,
+  modelTitle: `15" Macbook Pro (2023)`,
+  id: `123`,
+  modelIdentifier: `Mac14,10`,
   icon: `laptop`,
   status: `online`,
+  name: `Silvery`,
 });
 
 export const Offline: Story = props({
   ...Online.args,
   status: `offline`,
+});
+
+export const NoName: Story = props({
+  ...Online.args,
+  name: undefined,
 });
 
 export default meta;

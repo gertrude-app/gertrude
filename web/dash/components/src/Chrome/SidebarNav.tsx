@@ -5,6 +5,7 @@ import {
   BookOpenIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ComputerDesktopIcon,
   HomeIcon,
   KeyIcon,
   LifebuoyIcon,
@@ -58,6 +59,15 @@ const SidebarNav: React.FC<Props> = ({
           onClick={onInternalLinkClick}
         >
           Users
+        </SidebarOption>
+        <SidebarOption
+          Icon={ComputerDesktopIcon}
+          collapsed={collapsed}
+          to="/computers"
+          isSelected={urlPath.startsWith(`/computers`)}
+          onClick={onInternalLinkClick}
+        >
+          Computers
         </SidebarOption>
         <SidebarOption
           Icon={KeyIcon}

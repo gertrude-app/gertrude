@@ -157,9 +157,11 @@ const EditUser: React.FC<Props> = ({
               {devices.map((device) => (
                 <div key={device.id} className="flex items-center mt-3">
                   <UserDevice
-                    model={device.model}
+                    modelTitle={device.modelTitle}
+                    modelIdentifier={device.modelIdentifier}
+                    id={device.id}
+                    name={device.name}
                     status={device.status}
-                    icon={device.icon}
                     className="flex-grow mr-3"
                   />
                   <button

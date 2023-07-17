@@ -80,11 +80,11 @@ const Profile: React.FC<Props> = ({
     </div>
     <PageHeading icon="user">Profile</PageHeading>
     <div className="flex flex-col lg:flex-row mt-8">
-      <div className="p-8 bg-slate-100 rounded-xl flex-grow lg:mr-2 border lg:max-w-3xl">
+      <div className="p-8 bg-slate-100 rounded-xl flex-grow lg:mr-2 border border-slate-200 lg:max-w-3xl">
         <h2 className="text-lg text-slate-900 mb-2">Email address:</h2>
         <TextInput type="email" label="" value={email} disabled setValue={() => {}} />
       </div>
-      <div className="p-8 bg-slate-100 rounded-xl lg:ml-8 lg:w-1/3 flex justify-between relative border mt-4 lg:mt-0">
+      <div className="p-8 bg-slate-100 rounded-xl lg:ml-8 lg:w-1/3 flex justify-between relative border border-slate-200 mt-4 lg:mt-0">
         <div className="flex justify-end items-start flex-col mr-8">
           <h2 className="font-bold text-xl text-slate-700">Basic plan</h2>
           <h3 className="my-1">
@@ -115,7 +115,7 @@ const Profile: React.FC<Props> = ({
       </div>
     </div>
     <div className="mt-12 flex flex-col space-y-12">
-      <div className="xs:bg-white xs:border p-2 xs:p-8 rounded-3xl">
+      <div className="xs:bg-white xs:border border-slate-200 p-2 xs:p-8 rounded-3xl">
         <h2 className="text-2xl font-bold text-slate-800">Notification methods</h2>
         <p className="text-slate-500 mt-1">
           Verified ways that Gertrude can notify you for user requests
@@ -140,7 +140,7 @@ const Profile: React.FC<Props> = ({
           </Button>
         </div>
       </div>
-      <div className="xs:bg-white xs:border p-2 xs:p-8 rounded-3xl">
+      <div className="xs:bg-white xs:border border-slate-200 p-2 xs:p-8 rounded-3xl">
         <h2 className="text-2xl font-bold text-slate-800">Notifications</h2>
         <p className="text-slate-500 mt-1 mb-2">
           Custom notifications for different types of requests using one of your verified
@@ -199,7 +199,11 @@ export default Profile;
 const AccountStatusBadge: React.FC<{ status: AdminSubscriptionStatus }> = ({
   status,
 }) => (
-  <PillBadge type={statusType(status)} className="absolute right-2 top-2 border">
+  <PillBadge
+    type={statusType(status)}
+    size="large"
+    className="absolute right-2 top-2 border"
+  >
     {statusText(status)}
   </PillBadge>
 );

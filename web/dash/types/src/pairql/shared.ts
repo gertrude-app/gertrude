@@ -1,5 +1,7 @@
 // auto-generated, do not edit
 
+import type { ReleaseChannel } from '../named';
+
 export interface AdminKeychain {
   summary: KeychainSummary;
   keys: Key[];
@@ -37,7 +39,16 @@ export type ClientAuth = 'none' | 'user' | 'admin' | 'superAdmin';
 
 export interface Device {
   id: UUID;
-  isOnline: boolean;
+  name?: string;
+  releaseChannel: ReleaseChannel;
+  users: Array<{
+    name: string;
+    id: string;
+    isOnline: boolean;
+  }>;
+  appVersion: string;
+  serialNumber: string;
+  modelIdentifier: string;
   modelFamily: DeviceModelFamily;
   modelTitle: string;
 }
