@@ -23,12 +23,19 @@ describe(`signup`, () => {
       token: `token-123`,
       adminId: `admin-123`,
     });
-
     cy.interceptPql(`GetDashboardWidgets`, {
       users: [],
       unlockRequests: [],
       userActivitySummaries: [],
       recentScreenshots: [],
+      numAdminNotifications: 0,
+    });
+    cy.interceptPql(`GetAdmin`, {
+      id: betsy.id,
+      email: betsy.email,
+      subscriptionStatus: `active`,
+      notifications: [],
+      verifiedNotificationMethods: [],
     });
 
     cy.visit(`/checkout-success?session_id=cs_test_123`);
@@ -41,7 +48,7 @@ describe(`signup`, () => {
       .its(`request.headers.${`X-AdminToken`.toLowerCase()}`)
       .should(`eq`, `token-123`);
 
-    cy.contains(`Welcome to Gertrude!`).then(() => {
+    cy.contains(`Welcome to the parent website!`).then(() => {
       expect(localStorage.getItem(`admin_id`)).to.eq(`admin-123`);
       expect(localStorage.getItem(`admin_token`)).to.eq(`token-123`);
     });

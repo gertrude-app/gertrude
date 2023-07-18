@@ -15,6 +15,9 @@ type Story = StoryObj<typeof meta>;
 // @screenshot: xs/2500,xl
 export const Default: Story = props({
   date: new Date(time.stable()),
+  startAddDevice: () => {},
+  dismissAddDevice: () => {},
+  addDeviceRequest: { state: `idle` },
   unlockRequests: withIdsAnd({ userId: `user1` }, [
     {
       target: `gitlab.io`,
@@ -90,6 +93,18 @@ export const NoUserActivityOrUnlockRequests: Story = props({
 export const NoUsers: Story = props({
   ...Default.args,
   users: [],
+});
+
+// @screenshot: xs,lg
+export const NoDevices: Story = props({
+  ...Default.args,
+  users: withIds([{ name: `Little Jimmy`, isOnline: true, numDevices: 0 }]),
+});
+
+// @screenshot: xs,lg
+export const NoNotifications: Story = props({
+  ...Default.args,
+  numAdminNotifications: 0,
 });
 
 export default meta;

@@ -75,7 +75,14 @@ export function user(override: Partial<User> = {}): User {
     screenshotsFrequency: 60,
     keyloggingEnabled: true,
     keychains: [],
-    devices: [],
+    devices: [
+      {
+        id: `mac-123`,
+        isOnline: true,
+        modelFamily: `macBookAir`,
+        modelTitle: `MacBook Air`,
+      },
+    ],
     createdAt: new Date().toISOString(),
     ...override,
   };

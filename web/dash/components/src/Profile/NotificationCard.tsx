@@ -107,6 +107,7 @@ const NotificationCard: React.FC<Props> = ({
               editing ? `hidden` : `block`,
               `mt-3 xs:mt-0 xs:ml-3 w-[100%] xs:w-auto`,
             )}
+            testId="delete-notification"
           >
             <i className="fa fa-trash mr-3" />
             Delete

@@ -2,20 +2,31 @@ import { Loading, ApiErrorMessage } from '@dash/components';
 import React from 'react';
 import { Dashboard } from '@dash/components';
 import Current from '../../environment';
-import { useQuery, Key } from '../../hooks';
+import { useQuery, Key, useMutation } from '../../hooks';
+import ReqState from '../../lib/ReqState';
 
 const DashboardRoute: React.FC = () => {
-  const query = useQuery(Key.dashboard, Current.api.getDashboardWidgets);
+  const widgetsQuery = useQuery(Key.dashboard, Current.api.getDashboardWidgets);
+  const addDevice = useMutation((userId: UUID) =>
+    Current.api.createPendingAppConnection({ userId }),
+  );
 
-  if (query.isLoading) {
+  if (widgetsQuery.isLoading) {
     return <Loading />;
   }
 
-  if (query.isError) {
-    return <ApiErrorMessage error={query.error} />;
+  if (widgetsQuery.isError) {
+    return <ApiErrorMessage error={widgetsQuery.error} />;
   }
 
-  return <Dashboard {...query.data} />;
+  return (
+    <Dashboard
+      startAddDevice={(userId) => addDevice.mutate(userId)}
+      dismissAddDevice={() => addDevice.reset()}
+      addDeviceRequest={ReqState.fromMutation(addDevice)}
+      {...widgetsQuery.data}
+    />
+  );
 };
 
 export default DashboardRoute;
