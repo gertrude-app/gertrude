@@ -154,7 +154,12 @@ const BottomPanel: React.FC<PanelProps> = ({
           <i className="fa-solid fa-check mr-3 text-green-500" />
           Unlock request sent!
         </span>
-        <Button type="button" onClick={() => {}} color="secondary" size="medium">
+        <Button
+          type="button"
+          onClick={() => emit({ case: `closeWindow` })}
+          color="secondary"
+          size="medium"
+        >
           Close window
         </Button>
       </BottomPanelWrap>
