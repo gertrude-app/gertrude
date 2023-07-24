@@ -46,7 +46,12 @@ const HealthCheckItem: React.FC<Props> = (props) => {
       </div>
       <div className="flex-grow ml-4">
         <h3 className="font-medium text-slate-800 dark:text-slate-200">{props.title}</h3>
-        {message && <p className="text-slate-500 dark:text-slate-400">{message}</p>}
+        {message && (
+          <p
+            className="text-slate-500 dark:text-slate-400"
+            dangerouslySetInnerHTML={{ __html: message }}
+          />
+        )}
       </div>
       {button && (
         <Button

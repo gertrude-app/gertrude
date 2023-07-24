@@ -281,12 +281,12 @@ export default class HealthChecker {
     } else if (filterStatus.case === `communicationBroken`) {
       return [
         {
-          title: `Filter to app communication`,
+          title: `Filter to app communication broken`,
           state: `fail`,
-          message: `Verification failed`,
+          message: `If repair and recheck fails, <em>restart the computer</em> to resolve`,
           button: {
             icon: `sync`,
-            label: `Restart filter`,
+            label: `Attempt repair`,
             action: `repairFilterCommunicationClicked`,
           },
         },
