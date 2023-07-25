@@ -24,7 +24,7 @@ const UserRoute: React.FC = () => {
   const queryKey = Key.user(id);
   const getKeychains = useSelectableKeychains();
   const deleteUser = useConfirmableDelete(`user`, { id });
-  const deleteDevice = useConfirmableDelete(`device`, { invalidating: [queryKey] });
+  const deleteDevice = useConfirmableDelete(`userDevice`, { invalidating: [queryKey] });
 
   const getUser = useQuery(queryKey, () => Current.api.getUser(id), {
     onReceive: (user) => dispatch({ type: `setUser`, user }),

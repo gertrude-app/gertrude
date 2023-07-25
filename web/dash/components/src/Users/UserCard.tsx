@@ -79,6 +79,7 @@ const UserCard: React.FC<Props> = ({
                 id={device.id}
                 modelTitle={device.modelTitle}
                 modelIdentifier={device.modelIdentifier}
+                name={device.name}
                 status={device.status}
               />
             ))}

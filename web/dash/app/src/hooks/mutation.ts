@@ -107,7 +107,7 @@ export type MutationResult<T, V> = UseMutationResult<T, PqlError, V>;
 
 type ToastId =
   | 'delete:user'
-  | 'delete:device'
+  | 'delete:computer'
   | 'delete:notification'
   | 'delete:notification-method'
   | 'delete:keychain'
@@ -130,7 +130,7 @@ function getToast(toastId?: ToastId): { verb: string; entity: string } | undefin
   const entity = entitySlug.replace(/-/g, ` `);
   switch (toastId) {
     case `delete:user`:
-    case `delete:device`:
+    case `delete:computer`:
     case `delete:notification`:
     case `delete:keychain`:
     case `delete:notification-method`:
@@ -158,8 +158,8 @@ function toastIdFromDeleteEntityType(type: DeleteEntity.Input['type']): ToastId 
       return `delete:notification`;
     case `adminVerifiedNotificationMethod`:
       return `delete:notification-method`;
-    case `device`:
-      return `delete:device`;
+    case `userDevice`:
+      return `delete:computer`;
     case `key`:
       return `delete:key`;
     case `keychain`:

@@ -2,10 +2,6 @@
 import type * as T from '@dash/types';
 
 export function interceptPql(
-  slug: `AllowingSignups`,
-  output: T.AllowingSignups.Output,
-): void;
-export function interceptPql(
   slug: `CombinedUsersActivityFeed`,
   output: T.CombinedUsersActivityFeed.Output,
 ): void;
@@ -51,6 +47,8 @@ export function interceptPql(
   slug: `GetDashboardWidgets`,
   output: T.GetDashboardWidgets.Output,
 ): void;
+export function interceptPql(slug: `GetDevice`, output: T.GetDevice.Output): void;
+export function interceptPql(slug: `GetDevices`, output: T.GetDevices.Output): void;
 export function interceptPql(
   slug: `GetIdentifiedApps`,
   output: T.GetIdentifiedApps.Output,
@@ -73,13 +71,6 @@ export function interceptPql(
 ): void;
 export function interceptPql(slug: `GetUser`, output: T.GetUser.Output): void;
 export function interceptPql(slug: `GetUsers`, output: T.GetUsers.Output): void;
-export function interceptPql(slug: `GetDevice`, output: T.GetDevice.Output): void;
-export function interceptPql(slug: `SaveDevice`, output: T.SaveDevice.Output): void;
-export function interceptPql(slug: `GetDevices`, output: T.GetDevices.Output): void;
-export function interceptPql(
-  slug: `LatestAppVersions`,
-  output: T.LatestAppVersions.Output,
-): void;
 export function interceptPql(
   slug: `GetUserUnlockRequests`,
   output: T.GetUserUnlockRequests.Output,
@@ -92,6 +83,10 @@ export function interceptPql(
   slug: `HandleCheckoutSuccess`,
   output: T.HandleCheckoutSuccess.Output,
 ): void;
+export function interceptPql(
+  slug: `LatestAppVersions`,
+  output: T.LatestAppVersions.Output,
+): void;
 export function interceptPql(slug: `Login`, output: T.Login.Output): void;
 export function interceptPql(
   slug: `LoginMagicLink`,
@@ -102,6 +97,7 @@ export function interceptPql(
   output: T.RequestMagicLink.Output,
 ): void;
 export function interceptPql(slug: `ResetPassword`, output: T.ResetPassword.Output): void;
+export function interceptPql(slug: `SaveDevice`, output: T.SaveDevice.Output): void;
 export function interceptPql(slug: `SaveKey`, output: T.SaveKey.Output): void;
 export function interceptPql(slug: `SaveKeychain`, output: T.SaveKeychain.Output): void;
 export function interceptPql(
@@ -141,7 +137,6 @@ export function interceptPql(slug: string, output: any): void {
 
 export function forcePqlErr(
   slug:
-    | 'AllowingSignups'
     | 'CombinedUsersActivityFeed'
     | 'CombinedUsersActivitySummaries'
     | 'ConfirmPendingNotificationMethod'
@@ -155,6 +150,8 @@ export function forcePqlErr(
     | 'GetAdminKeychains'
     | 'GetCheckoutUrl'
     | 'GetDashboardWidgets'
+    | 'GetDevice'
+    | 'GetDevices'
     | 'GetIdentifiedApps'
     | 'GetSelectableKeychains'
     | 'GetSuspendFilterRequest'
@@ -162,15 +159,15 @@ export function forcePqlErr(
     | 'GetUnlockRequests'
     | 'GetUser'
     | 'GetUsers'
-    | 'GetDevice'
-    | 'GetDevices'
     | 'GetUserUnlockRequests'
     | 'HandleCheckoutCancel'
     | 'HandleCheckoutSuccess'
+    | 'LatestAppVersions'
     | 'Login'
     | 'LoginMagicLink'
     | 'RequestMagicLink'
     | 'ResetPassword'
+    | 'SaveDevice'
     | 'SaveKey'
     | 'SaveKeychain'
     | 'SaveNotification'

@@ -2,9 +2,6 @@ import { Result } from '@dash/types';
 import type { ApiClient } from './client';
 
 const noopClient: ApiClient = {
-  allowingSignups: async () => {
-    return Result.success({ success: true });
-  },
   confirmPendingNotificationMethod: async () => {
     return Result.success({ success: true });
   },

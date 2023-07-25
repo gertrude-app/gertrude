@@ -80,17 +80,8 @@ export function user(override: Partial<User> = {}): User {
         id: `mac-123`,
         modelFamily: `macBookAir`,
         modelTitle: `MacBook Air`,
-        releaseChannel: `stable`,
-        users: [
-          {
-            name: `Little Jimmy`,
-            id: uuid(),
-            isOnline: true,
-          },
-        ],
-        appVersion: `2.2.0`,
-        serialNumber: `C02XV0Y0JGH7`,
         modelIdentifier: `MacBookAir8,1`,
+        isOnline: true,
       },
     ],
     createdAt: new Date().toISOString(),

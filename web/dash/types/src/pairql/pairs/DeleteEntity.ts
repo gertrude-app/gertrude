@@ -7,7 +7,7 @@ export namespace DeleteEntity {
     type:
       | 'adminNotification'
       | 'adminVerifiedNotificationMethod'
-      | 'device'
+      | 'userDevice'
       | 'key'
       | 'keychain'
       | 'user';

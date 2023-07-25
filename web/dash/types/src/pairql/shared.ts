@@ -1,7 +1,5 @@
 // auto-generated, do not edit
 
-import type { ReleaseChannel } from '../named';
-
 export interface AdminKeychain {
   summary: KeychainSummary;
   keys: Key[];
@@ -41,11 +39,7 @@ export interface Device {
   id: UUID;
   name?: string;
   releaseChannel: ReleaseChannel;
-  users: Array<{
-    name: string;
-    id: string;
-    isOnline: boolean;
-  }>;
+  users: Array<{ id: UUID; name: string; isOnline: boolean }>;
   appVersion: string;
   serialNumber: string;
   modelIdentifier: string;
@@ -54,6 +48,7 @@ export interface Device {
 }
 
 export type DeviceModelFamily =
+  | 'macBook'
   | 'macBookAir'
   | 'macBookPro'
   | 'mini'
@@ -78,6 +73,8 @@ export interface KeychainSummary {
   isPublic: boolean;
   numKeys: number;
 }
+
+export type ReleaseChannel = 'stable' | 'beta' | 'canary';
 
 export type RequestStatus = 'pending' | 'accepted' | 'rejected';
 
@@ -148,7 +145,7 @@ export interface User {
   screenshotsResolution: number;
   screenshotsFrequency: number;
   keychains: KeychainSummary[];
-  devices: Device[];
+  devices: UserDevice[];
   createdAt: ISODateString;
 }
 
@@ -172,6 +169,15 @@ export type UserActivityItem =
       createdAt: ISODateString;
       deletedAt?: ISODateString;
     };
+
+export interface UserDevice {
+  id: UUID;
+  isOnline: boolean;
+  modelFamily: DeviceModelFamily;
+  modelTitle: string;
+  modelIdentifier: string;
+  customName?: string;
+}
 
 export interface VerifiedNotificationMethod {
   id: UUID;
