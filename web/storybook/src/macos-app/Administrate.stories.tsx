@@ -121,11 +121,7 @@ export const HealthCheckFailingLight: Story = props({
     screen: `healthCheck`,
     healthCheck: {
       latestAppVersion: { case: `ok`, value: `2.1.0` },
-      filterStatus: {
-        case: `installed`,
-        version: `1.6.0`,
-        numUserKeys: 0,
-      },
+      filterStatus: { case: `communicationBroken` },
       screenRecordingPermissionOk: false,
       keystrokeRecordingPermissionOk: false,
       macOsUserType: { case: `ok`, value: `admin` },
