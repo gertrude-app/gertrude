@@ -4,7 +4,7 @@ import { time } from '@shared/datetime';
 import * as mock from '../../src/reducers/__tests__/mocks';
 import { entireDay } from '../../src/lib/days';
 
-describe(`user screen`, () => {
+describe(`children screen`, () => {
   beforeEach(() => {
     cy.simulateLoggedIn();
     cy.interceptPql(`SaveUser`, { success: true });
@@ -12,8 +12,8 @@ describe(`user screen`, () => {
     cy.interceptPql(`DeleteEntity`, { success: true });
   });
 
-  describe(`new user creation`, () => {
-    it(`creating and updating user`, () => {
+  describe(`new child creation`, () => {
+    it(`creating and updating child`, () => {
       cy.visit(`/users/new`);
       cy.testId(`user-name`).type(`Bo`);
 
@@ -23,36 +23,36 @@ describe(`user screen`, () => {
         mock.user({ name: `Bo`, id: `user-123` }),
       );
 
-      cy.contains(`Save user`).click();
+      cy.contains(`Save child`).click();
       cy.wait(`@SaveUser`);
 
-      cy.testId(`page-heading`).should(`have.text`, `Edit user`);
-      cy.contains(`Save user`).should(`be.disabled`);
+      cy.testId(`page-heading`).should(`have.text`, `Edit child`);
+      cy.contains(`Save child`).should(`be.disabled`);
 
       cy.testId(`user-name`).type(`az`);
 
-      cy.contains(`Save user`).should(`be.enabled`);
+      cy.contains(`Save child`).should(`be.enabled`);
     });
 
-    it(`redirects to new uuid path & doesn't list unsaved new user`, () => {
+    it(`redirects to new uuid path & doesn't list unsaved new child`, () => {
       cy.visit(`/users/new`);
 
       // redirects to /users/<new-user-id>
       cy.location(`pathname`).should(`not.eq`, `/users/new`);
-      cy.contains(`New user`);
+      cy.contains(`New child`);
 
       // don't show the empty new user in the list
-      cy.sidebarClick(`Users`);
+      cy.sidebarClick(`Children`);
       cy.testId(`user-card`).should(`have.length`, 1);
     });
   });
 
-  describe(`user deletion`, () => {
+  describe(`child deletion`, () => {
     it(`redirects to /users path`, () => {
       cy.interceptPql(`GetUser`, mock.user({ id: `user-123` }));
       cy.visit(`/users/user-123`);
 
-      cy.contains(`Delete user`).click();
+      cy.contains(`Delete child`).click();
       cy.testId(`modal-primary-btn`).click();
 
       // redirects to /users
@@ -60,7 +60,7 @@ describe(`user screen`, () => {
     });
   });
 
-  describe(`combined users screens`, () => {
+  describe(`combined children screens`, () => {
     it(`summary page displays aggregate totals in correct order`, () => {
       cy.interceptPql(`CombinedUsersActivitySummaries`, [
         {

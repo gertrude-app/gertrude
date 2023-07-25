@@ -46,7 +46,7 @@ describe(`dashboard onboarding nudges`, () => {
     cy.location(`pathname`).should(`match`, /^\/users\/[a-f0-9-]{36}$/);
 
     cy.testId(`user-name`).type(`Leopold`);
-    cy.contains(`Save user`).click();
+    cy.contains(`Save child`).click();
     cy.contains(`need to do 3 steps`);
     cy.contains(`Get connection code`).click();
     cy.contains(`123456`).should(`be.visible`);

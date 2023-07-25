@@ -76,7 +76,7 @@ const EditUser: React.FC<Props> = ({
   if (isNew) {
     return (
       <div className="-my-6 md:-my-7 py-6 md:py-7 min-h-[calc(100vh-64px)] md:min-h-screen flex flex-col">
-        <PageHeading icon="user-plus">New user</PageHeading>
+        <PageHeading icon="user-plus">New child</PageHeading>
         <div className="flex-grow flex items-center justify-center">
           <div className="flex flex-col gap-2 flex-grow max-w-2xl">
             <Label htmlFor="name" className="text-xl ml-6 md:ml-9">
@@ -105,7 +105,7 @@ const EditUser: React.FC<Props> = ({
             onClick={onSave}
             disabled={saveButtonDisabled}
           >
-            Save user
+            Save child
           </Button>
         </footer>
       </div>
@@ -129,7 +129,7 @@ const EditUser: React.FC<Props> = ({
       />
       <ConfirmDeleteEntity type="device" action={deleteDevice} />
       <ConfirmDeleteEntity type="user" action={deleteUser} />
-      <PageHeading icon={`pen`}>Edit user</PageHeading>
+      <PageHeading icon={`pen`}>Edit child</PageHeading>
       <div className="mt-8">
         {devices.length === 0 && (
           <div className="mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow border-[0.5px] border-slate-200">
@@ -257,7 +257,7 @@ const EditUser: React.FC<Props> = ({
         )}
         <div className="flex mt-8 justify-end border-t-2 border-slate-200 pt-8 space-x-5">
           <Button type="button" onClick={deleteUser.start} color="warning">
-            Delete user
+            Delete child
           </Button>
           {devices.length > 0 && (
             <Button
@@ -267,7 +267,7 @@ const EditUser: React.FC<Props> = ({
               onClick={onSave}
               color="primary"
             >
-              Save user
+              Save child
             </Button>
           )}
         </div>
