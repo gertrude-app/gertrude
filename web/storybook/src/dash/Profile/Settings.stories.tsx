@@ -1,15 +1,15 @@
-import { Profile } from '@dash/components';
+import { Settings } from '@dash/components';
 import type { StoryObj, Meta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { withIdsAnd, confirmableEntityAction, props } from '../../story-helpers';
 import { Email as CardStory } from './NotificationCard.stories';
 
 const meta = {
-  title: 'Dashboard/Profile/Profile', // eslint-disable-line
-  component: Profile,
+  title: 'Dashboard/Settings/Settings', // eslint-disable-line
+  component: Settings,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
-} satisfies Meta<typeof Profile>;
+} satisfies Meta<typeof Settings>;
 
 type Story = StoryObj<typeof meta>;
 

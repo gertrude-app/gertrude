@@ -456,7 +456,7 @@ being requested.
 {% image src="request-filter-suspension.png" caption="The user writes a comment and picks a duration" /%}
 
 Once submitted (provided you've configured an admin notification in your
-[profile](https://dash.gertrude.app/profile) screen), you'll receive an email, text or
+[settings](https://dash.gertrude.app/settings) screen), you'll receive an email, text or
 Slack letting you know that your user is requesting a filter suspension. You can grant or
 deny the request, and if desired, also change the amount of time requested.
 

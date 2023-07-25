@@ -77,11 +77,11 @@ describe(`dashboard onboarding nudges`, () => {
       numAdminNotifications: 0, // <-- no notifications
     });
 
-    cy.visit(`/profile`);
+    cy.visit(`/settings`);
     cy.contains(`No notifications`);
     cy.sidebarClick(`Dashboard`);
     cy.contains(`Create your first notification!`);
     cy.contains(`Create a notification`).click();
-    cy.location(`pathname`).should(`eq`, `/profile`);
+    cy.location(`pathname`).should(`eq`, `/settings`);
   });
 });

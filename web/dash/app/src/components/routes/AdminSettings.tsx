@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import React, { useReducer } from 'react';
-import { ApiErrorMessage, Loading, Profile } from '@dash/components';
+import { ApiErrorMessage, Loading, Settings } from '@dash/components';
 import { capitalize } from '@shared/string';
 import { notNullish, typesafe } from '@shared/ts-utils';
 import { Result } from '@dash/types';
@@ -12,7 +12,7 @@ import Current from '../../environment';
 import ReqState from '../../lib/ReqState';
 import reducer, { initialState } from '../../reducers/admin-reducer';
 
-const AdminProfile: React.FC = () => {
+const AdminSettings: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const query = useQuery(Key.admin, Current.api.getAdmin, {
@@ -85,7 +85,7 @@ const AdminProfile: React.FC = () => {
   }
 
   return (
-    <Profile
+    <Settings
       email={query.data.email}
       status={query.data.subscriptionStatus}
       billingPortalRequest={ReqState.fromMutation(createBillingPortalSession)}
@@ -120,7 +120,7 @@ const AdminProfile: React.FC = () => {
   );
 };
 
-export default AdminProfile;
+export default AdminSettings;
 
 // helpers
 
@@ -161,7 +161,7 @@ function makeNotificationProps(
   savingNotification: boolean,
 ): (
   editable: State['notifications'][number],
-) => React.ComponentProps<typeof Profile>['notifications'][0] | null {
+) => React.ComponentProps<typeof Settings>['notifications'][0] | null {
   return (editable) => {
     const { id, ...notification } = editable.draft;
     const methods = state.notificationMethods;

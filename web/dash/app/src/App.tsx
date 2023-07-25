@@ -14,7 +14,7 @@ import DenyUnlockRequest from './components/routes/UnlockRequest/DenyUnlockReque
 import SelectUnlockRequestKeychain from './components/routes/UnlockRequest/SelectUnlockRequestKeychain';
 import UserUnlockRequests from './components/routes/UnlockRequest/UserUnlockRequests';
 import UsersUnlockRequests from './components/routes/UnlockRequest/UsersUnlockRequests';
-import AdminProfile from './components/routes/AdminProfile';
+import AdminSettings from './components/routes/AdminSettings';
 import Keychain from './components/routes/Keychain';
 import Users from './components/routes/Users';
 import UserActivitySummaries from './components/routes/UserActivitySummaries';
@@ -56,7 +56,7 @@ const App: React.FC = () => {
       {/* authed routes */}
       <Route path="/" element={<AuthedChrome />}>
         <Route index element={<Dashboard />} />
-        <Route path="profile" element={<AdminProfile />} />
+        <Route path="settings" element={<AdminSettings />} />
         <Route path="suspend-filter-requests/:id" element={<SuspendFilter />} />
         <Route path="unlock-requests" element={<UsersUnlockRequests />} />
 

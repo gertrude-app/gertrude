@@ -7,7 +7,7 @@ declare global {
     interface Chainable<Subject> {
       simulateLoggedIn(): void;
       testId(selector: string, ...args: any[]): Chainable<Subject>;
-      sidebarClick(link: 'Dashboard' | 'Users' | 'Keychains' | 'Profile'): void;
+      sidebarClick(link: 'Dashboard' | 'Users' | 'Keychains' | 'Settings'): void;
       interceptPql: typeof interceptPql;
       forcePqlErr: typeof forcePqlErr;
     }

@@ -6,6 +6,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ComputerDesktopIcon,
+  Cog6ToothIcon,
   HomeIcon,
   KeyIcon,
   LifebuoyIcon,
@@ -79,13 +80,13 @@ const SidebarNav: React.FC<Props> = ({
           Keychains
         </SidebarOption>
         <SidebarOption
-          Icon={UserIcon}
+          Icon={Cog6ToothIcon}
           collapsed={collapsed}
-          to="/profile"
+          to="/settings"
           onClick={onInternalLinkClick}
-          isSelected={urlPath.startsWith(`/profile`)}
+          isSelected={urlPath.startsWith(`/settings`)}
         >
-          Profile
+          Settings
         </SidebarOption>
       </div>
       <hr className="bg-indigo-200/10 border-0 h-0.5 mx-4" />
