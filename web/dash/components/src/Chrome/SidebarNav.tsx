@@ -10,7 +10,6 @@ import {
   HomeIcon,
   KeyIcon,
   LifebuoyIcon,
-  UserIcon,
   UsersIcon,
 } from '@heroicons/react/24/solid';
 import { Logo } from '@shared/components';
@@ -40,6 +39,7 @@ const SidebarNav: React.FC<Props> = ({
           )}
           type="inverted"
           iconOnly={collapsed}
+          withForParents
         />
       </a>
       <div className={cx(`pb-4`)}>
@@ -59,7 +59,7 @@ const SidebarNav: React.FC<Props> = ({
           isSelected={urlPath.startsWith(`/users`)}
           onClick={onInternalLinkClick}
         >
-          Users
+          Children
         </SidebarOption>
         <SidebarOption
           Icon={ComputerDesktopIcon}

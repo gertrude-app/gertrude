@@ -12,7 +12,7 @@ type Props = {
 
 const ActivitySummaries: React.FC<Props> = ({ userName, days }) => (
   <>
-    <PageHeading icon={userName ? 'user' : 'users'} className="mb-4 sm:mb-7">
+    <PageHeading icon={userName ? `user` : `users`} className="mb-4 sm:mb-7">
       {userName ? posessive(userName) : `All Child`} Activity
     </PageHeading>
     {days.length > 0 ? (

@@ -18,7 +18,7 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
     return (
       <DashboardWidget className={className}>
         <div className="flex items-center justify-between mb-3 sm:mb-4">
-          <WidgetTitle icon="users" text="Children" className="mb-0 sm:mb-0 mt-0" />
+          <WidgetTitle icon="users" text="Children" className="!mb-0" />
           <Button type="link" to="/users" size="small" color="tertiary">
             All children
           </Button>
