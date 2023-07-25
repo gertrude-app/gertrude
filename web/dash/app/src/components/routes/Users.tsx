@@ -1,7 +1,7 @@
 import React from 'react';
 import { Loading, ListUsers, ApiErrorMessage } from '@dash/components';
 import type { EditUser } from '@dash/components';
-import type { Device, DeviceModelFamily } from '@dash/types';
+import type { UserDevice, DeviceModelFamily } from '@dash/types';
 import Current from '../../environment';
 import { useQuery, Key, useMutation } from '../../hooks';
 import ReqState from '../../lib/ReqState';
@@ -50,18 +50,20 @@ export function familyToIcon(family: DeviceModelFamily): `laptop` | `desktop` {
       return `desktop`;
     case `macBookAir`:
     case `macBookPro`:
+    case `macBook`:
     case `unknown`:
       return `laptop`;
   }
 }
 
 export function deviceProps(
-  apiDevice: Device,
-): React.ComponentProps<typeof EditUser>['devices'][0] {
+  apiDevice: UserDevice,
+): React.ComponentProps<typeof EditUser>['devices'][number] {
   return {
     id: apiDevice.id,
-    model: apiDevice.modelTitle,
+    modelTitle: apiDevice.modelTitle,
+    modelIdentifier: apiDevice.modelIdentifier,
+    name: apiDevice.customName,
     status: apiDevice.isOnline ? `online` : `offline`,
-    icon: familyToIcon(apiDevice.modelFamily),
   };
 }

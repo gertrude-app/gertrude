@@ -15,6 +15,9 @@ import type {
   GetUnlockRequests,
   GetSuspendFilterRequest,
   GetAdmin,
+  GetDevices,
+  GetDevice,
+  LatestAppVersions,
 } from '@dash/types';
 
 export class QueryKey<T> {
@@ -43,6 +46,18 @@ export class Key extends QueryKey<never> {
 
   static user(id: UUID): QueryKey<GetUser.Output> {
     return new QueryKey(`users/:id`, [`users`, id], id);
+  }
+
+  static get devices(): QueryKey<GetDevices.Output> {
+    return new QueryKey(`computers`, [`computers`]);
+  }
+
+  static get latestAppVersions(): QueryKey<LatestAppVersions.Output> {
+    return new QueryKey(`latest-app-versions`, [`latest-app-versions`]);
+  }
+
+  static device(id: UUID): QueryKey<GetDevice.Output> {
+    return new QueryKey(`computers/:id`, [`computers`, id], id);
   }
 
   static userActivitySummaries(id: UUID): QueryKey<UserActivitySummaries.Output> {

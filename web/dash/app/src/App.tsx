@@ -28,6 +28,8 @@ import CombinedUsersActivityFeedRoute from './components/routes/CombinedUsersAct
 import UserActivityFeed from './components/routes/UserActivityFeed';
 import RequestPasswordReset from './components/routes/RequestPasswordReset';
 import ChangePassword from './components/routes/ChangePassword';
+import Computers from './components/routes/Computers';
+import Computer from './components/routes/Computer';
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -65,6 +67,11 @@ const App: React.FC = () => {
         <Route path="keychains">
           <Route index element={<Keychains />} />
           <Route path=":keychainId" element={<Keychain />} />
+        </Route>
+
+        <Route path="computers">
+          <Route index element={<Computers />} />
+          <Route path=":computerId" element={<Computer />} />
         </Route>
 
         <Route path="users">

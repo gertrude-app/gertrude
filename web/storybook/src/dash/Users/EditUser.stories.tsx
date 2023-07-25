@@ -40,8 +40,19 @@ export const Default: Story = props({
     keychainProps({ name: `Public Speaking`, numKeys: 7, isPublic: false }),
   ],
   devices: [
-    { id: `1`, model: `M1 MacbookAir (2021)`, status: `online`, icon: `laptop` },
-    { id: `2`, model: `Mac Mini (2018)`, status: `offline`, icon: `desktop` },
+    {
+      id: `1`,
+      name: `Silvery`,
+      modelIdentifier: `Mac14,10`,
+      modelTitle: `16" MacBook Pro (2023)`,
+      status: `online`,
+    },
+    {
+      id: `2`,
+      modelIdentifier: `Mac14,14`,
+      modelTitle: `Mac Studio (2023)`,
+      status: `offline`,
+    },
   ],
 });
 

@@ -3,16 +3,6 @@ import type * as T from '@dash/types';
 import { query } from './query';
 
 export const liveClient = {
-  allowingSignups(
-    input: T.AllowingSignups.Input,
-  ): Promise<T.Result<T.AllowingSignups.Output>> {
-    return query<T.AllowingSignups.Input, T.AllowingSignups.Output>(
-      input,
-      `none`,
-      `AllowingSignups`,
-    );
-  },
-
   combinedUsersActivityFeed(
     input: T.CombinedUsersActivityFeed.Input,
   ): Promise<T.Result<T.CombinedUsersActivityFeed.Output>> {
@@ -132,6 +122,14 @@ export const liveClient = {
     );
   },
 
+  getDevice(input: T.GetDevice.Input): Promise<T.Result<T.GetDevice.Output>> {
+    return query<T.GetDevice.Input, T.GetDevice.Output>(input, `admin`, `GetDevice`);
+  },
+
+  getDevices(input: T.GetDevices.Input): Promise<T.Result<T.GetDevices.Output>> {
+    return query<T.GetDevices.Input, T.GetDevices.Output>(input, `admin`, `GetDevices`);
+  },
+
   getIdentifiedApps(
     input: T.GetIdentifiedApps.Input,
   ): Promise<T.Result<T.GetIdentifiedApps.Output>> {
@@ -220,6 +218,16 @@ export const liveClient = {
     );
   },
 
+  latestAppVersions(
+    input: T.LatestAppVersions.Input,
+  ): Promise<T.Result<T.LatestAppVersions.Output>> {
+    return query<T.LatestAppVersions.Input, T.LatestAppVersions.Output>(
+      input,
+      `admin`,
+      `LatestAppVersions`,
+    );
+  },
+
   login(input: T.Login.Input): Promise<T.Result<T.Login.Output>> {
     return query<T.Login.Input, T.Login.Output>(input, `none`, `Login`);
   },
@@ -250,6 +258,10 @@ export const liveClient = {
       `none`,
       `ResetPassword`,
     );
+  },
+
+  saveDevice(input: T.SaveDevice.Input): Promise<T.Result<T.SaveDevice.Output>> {
+    return query<T.SaveDevice.Input, T.SaveDevice.Output>(input, `admin`, `SaveDevice`);
   },
 
   saveKey(input: T.SaveKey.Input): Promise<T.Result<T.SaveKey.Output>> {
@@ -346,9 +358,6 @@ export const liveClient = {
 export type ApiClient = typeof liveClient;
 
 export const throwingClient: ApiClient = {
-  allowingSignups: () => {
-    throw new Error(`ApiClient.allowingSignups() not implemented`);
-  },
   combinedUsersActivityFeed: () => {
     throw new Error(`ApiClient.combinedUsersActivityFeed() not implemented`);
   },
@@ -388,6 +397,12 @@ export const throwingClient: ApiClient = {
   getDashboardWidgets: () => {
     throw new Error(`ApiClient.getDashboardWidgets() not implemented`);
   },
+  getDevice: () => {
+    throw new Error(`ApiClient.getDevice() not implemented`);
+  },
+  getDevices: () => {
+    throw new Error(`ApiClient.getDevices() not implemented`);
+  },
   getIdentifiedApps: () => {
     throw new Error(`ApiClient.getIdentifiedApps() not implemented`);
   },
@@ -418,6 +433,9 @@ export const throwingClient: ApiClient = {
   handleCheckoutSuccess: () => {
     throw new Error(`ApiClient.handleCheckoutSuccess() not implemented`);
   },
+  latestAppVersions: () => {
+    throw new Error(`ApiClient.latestAppVersions() not implemented`);
+  },
   login: () => {
     throw new Error(`ApiClient.login() not implemented`);
   },
@@ -429,6 +447,9 @@ export const throwingClient: ApiClient = {
   },
   resetPassword: () => {
     throw new Error(`ApiClient.resetPassword() not implemented`);
+  },
+  saveDevice: () => {
+    throw new Error(`ApiClient.saveDevice() not implemented`);
   },
   saveKey: () => {
     throw new Error(`ApiClient.saveKey() not implemented`);

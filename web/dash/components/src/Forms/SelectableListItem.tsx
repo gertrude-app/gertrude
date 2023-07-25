@@ -44,7 +44,12 @@ const SelectableListItem: React.FC<Props> = ({
       {badges && (
         <div className="flex mt-2 space-x-2">
           {badges.map((badge) => (
-            <PillBadge key={badge.color} small className="border" type={badge.color}>
+            <PillBadge
+              key={badge.color}
+              size="small"
+              className="border"
+              type={badge.color}
+            >
               {badge.text}
             </PillBadge>
           ))}

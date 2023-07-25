@@ -19,4 +19,5 @@ module.exports = {
   features: {
     buildStoriesJson: true,
   },
+  staticDirs: [`../../dash/app/public`],
 };

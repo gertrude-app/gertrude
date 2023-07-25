@@ -37,12 +37,18 @@ export type ClientAuth = 'none' | 'user' | 'admin' | 'superAdmin';
 
 export interface Device {
   id: UUID;
-  isOnline: boolean;
+  name?: string;
+  releaseChannel: ReleaseChannel;
+  users: Array<{ id: UUID; name: string; isOnline: boolean }>;
+  appVersion: string;
+  serialNumber: string;
+  modelIdentifier: string;
   modelFamily: DeviceModelFamily;
   modelTitle: string;
 }
 
 export type DeviceModelFamily =
+  | 'macBook'
   | 'macBookAir'
   | 'macBookPro'
   | 'mini'
@@ -67,6 +73,8 @@ export interface KeychainSummary {
   isPublic: boolean;
   numKeys: number;
 }
+
+export type ReleaseChannel = 'stable' | 'beta' | 'canary';
 
 export type RequestStatus = 'pending' | 'accepted' | 'rejected';
 
@@ -137,7 +145,7 @@ export interface User {
   screenshotsResolution: number;
   screenshotsFrequency: number;
   keychains: KeychainSummary[];
-  devices: Device[];
+  devices: UserDevice[];
   createdAt: ISODateString;
 }
 
@@ -161,6 +169,15 @@ export type UserActivityItem =
       createdAt: ISODateString;
       deletedAt?: ISODateString;
     };
+
+export interface UserDevice {
+  id: UUID;
+  isOnline: boolean;
+  modelFamily: DeviceModelFamily;
+  modelTitle: string;
+  modelIdentifier: string;
+  customName?: string;
+}
 
 export interface VerifiedNotificationMethod {
   id: UUID;
