@@ -35,7 +35,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
     );
   if (caughtUp)
     return (
-      <DashboardWidget className={cx(`flex justify-center items-center p-4`, className)}>
+      <DashboardWidget className={cx(`flex justify-center items-center !p-4`, className)}>
         <div className="flex flex-col justify-center items-center bg-gradient-to-b from-violet-50 to-violet-100 h-full rounded-3xl p-8 flex-grow">
           <i className="fa-solid fa-mug-hot bg-gradient-to-br from-violet-200 to-violet-400 bg-clip-text [-webkit-background-clip:text;] text-transparent text-5xl" />
           <h2 className="text-xl font-black text-black text-opacity-90 mt-4 mb-1">
@@ -49,7 +49,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
     );
 
   return (
-    <DashboardWidget className={cx(`p-0 sm:p-0`, className)}>
+    <DashboardWidget className={cx(`!p-0 !sm:p-0`, className)}>
       <div className="p-3 sm:p-4 pb-2 sm:pb-2">
         <WidgetTitle icon="binoculars" text="Activity" />
         <div className="mb-4 flex flex-col space-y-2">

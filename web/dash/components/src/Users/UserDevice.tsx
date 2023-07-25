@@ -35,8 +35,10 @@ const UserDevice: React.FC<Props> = ({
         />
       </div>
       <div>
-        <h3 className="text-slate-900 text-lg font-bold">{name || modelTitle}</h3>
-        {name && <h4 className="text-sm text-slate-500">{modelTitle}</h4>}
+        <h3 className="text-slate-900 text-lg font-bold line-clamp-1">
+          {name || modelTitle}
+        </h3>
+        {name && <h4 className="text-sm text-slate-500 line-clamp-1">{modelTitle}</h4>}
       </div>
     </div>
     {status === `online` && (

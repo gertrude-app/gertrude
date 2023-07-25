@@ -68,7 +68,7 @@ const KeychainCard: React.FC<Props> = ({
               {inflect(`key`, numKeys)}
             </h4>
             {isSelect(props) && isPublic && (
-              <PillBadge size="medium" type="green">
+              <PillBadge size="small" type="green">
                 Public
               </PillBadge>
             )}

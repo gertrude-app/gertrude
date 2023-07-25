@@ -46,7 +46,7 @@ const SelectableListItem: React.FC<Props> = ({
           {badges.map((badge) => (
             <PillBadge
               key={badge.color}
-              size="medium"
+              size="small"
               className="border"
               type={badge.color}
             >

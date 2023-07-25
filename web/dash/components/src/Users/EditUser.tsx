@@ -151,7 +151,7 @@ const EditUser: React.FC<Props> = ({
               className="max-w-xl"
             />
             <h2 className="mt-5 text-lg font-bold text-slate-700">
-              {devices.length} {inflect(`device`, devices.length)}:
+              {devices.length} {inflect(`computer`, devices.length)}:
             </h2>
             <div className="flex flex-col max-w-3xl">
               {devices.map((device) => (
@@ -177,7 +177,7 @@ const EditUser: React.FC<Props> = ({
                 className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition duration-100"
               >
                 <i className="fa fa-plus mr-2" />
-                Add device
+                Add a computer
               </button>
             </div>
             <div className="mt-4 max-w-3xl">

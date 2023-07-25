@@ -71,8 +71,8 @@ const EditComputer: React.FC<Props> = ({
           type="text"
           value={name}
           setValue={setName}
-          placeholder="Computer name"
-          label="Name:"
+          placeholder="how you refer to this computer"
+          label="Computer name:"
           className="max-w-xl"
           testId="computer-name-input"
         />

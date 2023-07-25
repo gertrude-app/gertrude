@@ -87,9 +87,12 @@ const UserCard: React.FC<Props> = ({
         </>
       ) : (
         <div className="bg-slate-50 p-6 flex flex-col justify-center items-center rounded-xl">
-          <h2 className="text-xl font-medium text-slate-500 mb-4">No devices</h2>
-          <Button type="button" color="secondary" onClick={addDevice} size="large">
-            <i className="fa-solid fa-plus mr-2" /> Add a device
+          <h2 className="text-xl font-medium text-slate-500 mb-4 italic">
+            <i className="fa-solid fa-exclamation-triangle text-lg mr-2" />
+            Setup incomplete
+          </h2>
+          <Button type="link" color="secondary" to={id} size="large">
+            Finish setup <i className="fa-solid fa-arrow-right ml-2" />
           </Button>
         </div>
       )}
@@ -108,27 +111,29 @@ const UserCard: React.FC<Props> = ({
         )}
       </div>
     </div>
-    <div className="flex flex-col xs:flex-row rounded-b-xl p-4 space-y-3 xs:space-y-0 xs:space-x-3">
-      <Button
-        type="link"
-        color="tertiary"
-        to={id}
-        testId="edit-user"
-        className="flex-grow w-[100%] xs:w-auto"
-      >
-        <i className="fa-solid fa-pen mr-2" /> Edit
-      </Button>
-      <Button
-        type="link"
-        color="secondary"
-        to={`${id}/activity`}
-        className="flex-grow w-[100%] xs:w-auto"
-        disabled={devices.length === 0}
-        size="large"
-      >
-        <i className="fa-solid fa-binoculars mr-2" /> Activity
-      </Button>
-    </div>
+    {devices.length !== 0 && (
+      <div className="flex flex-col xs:flex-row rounded-b-xl p-4 space-y-3 xs:space-y-0 xs:space-x-3">
+        <Button
+          type="link"
+          color="tertiary"
+          to={id}
+          testId="edit-user"
+          className="flex-grow w-[100%] xs:w-auto"
+        >
+          <i className="fa-solid fa-pen mr-2" /> Edit
+        </Button>
+        <Button
+          type="link"
+          color="secondary"
+          to={`${id}/activity`}
+          className="flex-grow w-[100%] xs:w-auto"
+          disabled={devices.length === 0}
+          size="large"
+        >
+          <i className="fa-solid fa-binoculars mr-2" /> Activity
+        </Button>
+      </div>
+    )}
   </div>
 );
 

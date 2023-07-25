@@ -66,7 +66,7 @@ const DaySummaryCard: React.FC<Props> = ({
             <span className="sm:hidden">{formatDate(date, `short`)}</span>
             <span className="hidden sm:inline">{formatDate(date, `medium`)}</span>
             {numCompleted === numItems && (
-              <PillBadge type="green" size="medium" className="absolute right-0 top-0">
+              <PillBadge type="green" size="small" className="absolute right-0 top-0">
                 <i className="fa fa-check mr-1" /> Completed
               </PillBadge>
             )}

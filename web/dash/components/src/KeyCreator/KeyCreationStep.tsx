@@ -44,9 +44,10 @@ const KeyCreationStep: React.FC<Props> = ({
         >
           <div
             className={cx(
-              `h-full border-r-2 border-dashed border-slate-300 absolute`,
+              `border-r-2 border-dashed border-slate-300 absolute`,
               isFirst && `h-1/2 bottom-0`,
               isLast && `h-1/2 top-0`,
+              !isFirst && !isLast && `h-full`,
             )}
           />
           <div
@@ -64,10 +65,10 @@ const KeyCreationStep: React.FC<Props> = ({
       ) : (
         <div
           className={cx(
-            `rounded-2xl flex-grow my-2 border-[0.5px] border-slate-200 bg-white`,
+            `rounded-2xl flex-grow my-2 bg-white`,
             open
-              ? `shadow-slate-30/60 shadow-lg border-2 border-violet-200`
-              : `shadow-md shadow-slate-300/50`,
+              ? `shadow-lg shadow-slate-30/60 border-violet-200 border-2`
+              : `shadow-md shadow-slate-300/50 border-slate-200 border-[0.5px]`,
             mode === `create` ? `max-w-[calc(100%-40px)]` : `max-w-full`,
           )}
         >
