@@ -220,32 +220,46 @@ export const RequestSuspension: React.FC<Props> = ({
           type="button"
           onClick={() => dispatch({ type: `durationButtonClicked` })}
           color="tertiary"
-          size="medium"
+          size="small"
         >
           <i className="fa-regular fa-clock mr-2" />
           {chooseDurationButtonText(customDurationString, durationInSeconds)}
         </Button>
-        <Button
-          type="button"
-          onClick={() => {
-            const duration = chosenDurationInSeconds(
-              customDurationString,
-              durationInSeconds,
-            );
-            if (duration !== null) {
-              emit({ case: `requestSubmitted`, durationInSeconds: duration, comment });
+        <div className="flex items-center gap-4">
+          <Button
+            type="button"
+            onClick={() => {}}
+            color="tertiary"
+            size="small"
+            disabled={
+              overlay !== undefined ||
+              chosenDurationInSeconds(customDurationString, durationInSeconds) === null
             }
-          }}
-          color="secondary"
-          size="medium"
-          disabled={
-            overlay !== undefined ||
-            chosenDurationInSeconds(customDurationString, durationInSeconds) === null
-          }
-        >
-          Submit
-          <i className="fa-solid fa-arrow-right ml-2" />
-        </Button>
+          >
+            Start suspension
+          </Button>
+          <Button
+            type="button"
+            onClick={() => {
+              const duration = chosenDurationInSeconds(
+                customDurationString,
+                durationInSeconds,
+              );
+              if (duration !== null) {
+                emit({ case: `requestSubmitted`, durationInSeconds: duration, comment });
+              }
+            }}
+            color="secondary"
+            size="small"
+            disabled={
+              overlay !== undefined ||
+              chosenDurationInSeconds(customDurationString, durationInSeconds) === null
+            }
+          >
+            Submit request
+            <i className="fa-solid fa-arrow-right ml-2" />
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -284,7 +298,7 @@ function chooseDurationButtonText(
     }
     return `${hours} ${inflect(`hour`, hours)} ${left} ${inflect(`minute`, left)}`;
   } else {
-    return `Choose duration...`;
+    return `Choose duration`;
   }
 }
 

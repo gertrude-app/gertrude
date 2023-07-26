@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import type { AppEvent, Screen, ViewAction } from '../administrate-store';
+import type { AppEvent, Screen } from '../administrate-store';
 import type { FilterState } from '../../lib/shared-types';
 import FilterStatusBlock from '../subcomponents/FilterStatusBlock';
 import HealthCheckPreviewBlock from '../subcomponents/HealthCheckPreviewBlock';
@@ -15,11 +15,9 @@ interface Props {
   releaseChannel: 'stable' | 'beta' | 'canary';
   keystrokeMonitoringEnabled: boolean;
   screenshotMonitoringEnabled: boolean;
-  filterSuspensionDurationInSeconds: string;
   quitting: boolean;
   setScreen(screen: Screen): void;
   emit(event: AppEvent): unknown;
-  dispatch(action: ViewAction): unknown;
 }
 
 const HomeScreen: React.FC<Props> = ({
@@ -30,21 +28,14 @@ const HomeScreen: React.FC<Props> = ({
   userName,
   keystrokeMonitoringEnabled,
   screenshotMonitoringEnabled,
-  filterSuspensionDurationInSeconds,
   emit,
-  dispatch,
   quitting,
   releaseChannel,
 }) => (
   <div className="flex flex-col justify-between h-full p-4">
     <div className="flex flex-col space-y-4">
       <div className="flex space-x-4">
-        <FilterStatusBlock
-          dispatch={dispatch}
-          emit={emit}
-          filterState={filterState}
-          filterSuspensionDurationInSeconds={filterSuspensionDurationInSeconds}
-        />
+        <FilterStatusBlock emit={emit} filterState={filterState} />
         <HealthCheckPreviewBlock
           failingChecksCount={failingChecksCount}
           setScreen={setScreen}
