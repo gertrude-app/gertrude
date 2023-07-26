@@ -5,6 +5,7 @@ export namespace VerifySignupEmail {
     token: UUID;
   }
   export interface Output {
+    token: UUID;
     adminId: UUID;
   }
 }

@@ -249,8 +249,6 @@ function statusText(status: AdminSubscriptionStatus): string {
       return `pending email verification`;
     case `signupCanceled`:
       return `signup canceled`;
-    default:
-      return status;
   }
 }
 

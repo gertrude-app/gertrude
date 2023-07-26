@@ -6,8 +6,6 @@ import Login from './components/routes/Login';
 import Logout from './components/routes/Logout';
 import MagicLink from './components/routes/MagicLink';
 import VerifySignupEmail from './components/routes/VerifySignupEmail';
-import CheckoutSuccess from './components/routes/CheckoutSuccess';
-import CheckoutCancel from './components/routes/CheckoutCancel';
 import SuspendFilter from './components/routes/SuspendFilter';
 import ReviewUnlockRequest from './components/routes/UnlockRequest/ReviewUnlockRequest';
 import FetchUnlockRequest from './components/routes/UnlockRequest/FetchUnlockRequest';
@@ -52,8 +50,6 @@ const App: React.FC = () => {
       <Route path="/otp/:token" element={<MagicLink />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/verify-signup-email/:token" element={<VerifySignupEmail />} />
-      <Route path="/checkout-success" element={<CheckoutSuccess />} />
-      <Route path="/checkout-cancel" element={<CheckoutCancel />} />
       <Route path="/reset-password" element={<RequestPasswordReset />} />
       <Route path="/reset-password/:token" element={<ChangePassword />} />
 

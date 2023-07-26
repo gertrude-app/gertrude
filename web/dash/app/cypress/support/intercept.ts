@@ -40,10 +40,6 @@ export function interceptPql(
   output: T.GetAdminKeychains.Output,
 ): void;
 export function interceptPql(
-  slug: `GetCheckoutUrl`,
-  output: T.GetCheckoutUrl.Output,
-): void;
-export function interceptPql(
   slug: `GetDashboardWidgets`,
   output: T.GetDashboardWidgets.Output,
 ): void;
@@ -74,14 +70,6 @@ export function interceptPql(slug: `GetUsers`, output: T.GetUsers.Output): void;
 export function interceptPql(
   slug: `GetUserUnlockRequests`,
   output: T.GetUserUnlockRequests.Output,
-): void;
-export function interceptPql(
-  slug: `HandleCheckoutCancel`,
-  output: T.HandleCheckoutCancel.Output,
-): void;
-export function interceptPql(
-  slug: `HandleCheckoutSuccess`,
-  output: T.HandleCheckoutSuccess.Output,
 ): void;
 export function interceptPql(
   slug: `LatestAppVersions`,
@@ -132,7 +120,12 @@ export function interceptPql(
 ): void;
 
 export function interceptPql(slug: string, output: any): void {
-  cy.intercept(`/pairql/dashboard/${slug}`, output).as(slug);
+  let response = output;
+  // cypress chokes on the empty object, doesn't understand it should reply w/ it
+  if (JSON.stringify(output) === `{}`) {
+    response = `{}`;
+  }
+  cy.intercept(`/pairql/dashboard/${slug}`, response).as(slug);
 }
 
 export function forcePqlErr(
@@ -148,7 +141,6 @@ export function forcePqlErr(
     | 'GetAdmin'
     | 'GetAdminKeychain'
     | 'GetAdminKeychains'
-    | 'GetCheckoutUrl'
     | 'GetDashboardWidgets'
     | 'GetDevice'
     | 'GetDevices'
@@ -160,8 +152,6 @@ export function forcePqlErr(
     | 'GetUser'
     | 'GetUsers'
     | 'GetUserUnlockRequests'
-    | 'HandleCheckoutCancel'
-    | 'HandleCheckoutSuccess'
     | 'LatestAppVersions'
     | 'Login'
     | 'LoginMagicLink'

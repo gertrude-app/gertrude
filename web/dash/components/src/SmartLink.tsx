@@ -9,14 +9,14 @@ type SmartLinkProps = {
   children: React.ReactNode;
 };
 
-const SmartLink: React.FC<SmartLinkProps> = (props) => {
+const SmartLink: React.FC<SmartLinkProps> = ({ openInNewTab, ...props }) => {
   if (typeof props.to === `string` && props.to.startsWith(`http`)) {
     return (
       <a
         href={props.to}
         onClick={props.onClick}
         className={props.className}
-        target={props.openInNewTab ? `_blank` : undefined}
+        target={openInNewTab ? `_blank` : undefined}
         rel="noreferrer"
       >
         {props.children}
