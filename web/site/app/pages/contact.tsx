@@ -13,7 +13,7 @@ const Contact: NextPage = () => {
 
   return (
     <Chrome>
-      <section className="bg-gradient-to-b from-violet-500 to-fuchsia-500 flex-grow flex flex-col justify-center items-center p-6 py-6">
+      <section className="bg-gradient-to-b from-violet-500 to-fuchsia-500 flex-grow flex flex-col justify-center items-center px-6 pt-8 sm:pt-16 pb-16">
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl flex flex-col sm:flex-row overflow-hidden relative w-full sm:w-auto sm:space-x-6">
           <div className="sm:w-56 md:w-72 mb-6 sm:mb-0 space-y-2">
             <h1 className="text-2xl font-inter text-slate-900">Contact us</h1>

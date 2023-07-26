@@ -1,14 +1,16 @@
 import { Logo } from '@shared/components';
 import { Chrome } from '@site/components';
 import type { NextPage } from 'next';
+import Catalina from '../public/macos-catalina.png';
 import BigSur from '../public/macos-big-sur.png';
 import Monterey from '../public/macos-monterey.png';
 import Ventura from '../public/macos-ventura.png';
+import Sonoma from '../public/macos-sonoma.png';
 
 const Download: NextPage = () => (
   <Chrome>
     <section className="bg-gradient-to-b from-violet-500 to-fuchsia-500 flex-grow flex flex-col justify-center items-center p-6 py-10">
-      <div className="bg-slate-50 shadow-xl rounded-3xl py-8 px-6 xs:px-10 sm:px-20 flex flex-col items-center mb-6">
+      <div className="bg-slate-50 shadow-xl rounded-3xl py-8 px-6 xs:px-10 sm:px-12 flex flex-col items-center mb-6">
         <Logo type="default" iconOnly size={90} className="mb-4 xs:mb-6" />
         <h1 className="text-3xl font-inter mb-4 xs:mb-4 text-center">
           Download Gertrude
@@ -16,10 +18,12 @@ const Download: NextPage = () => (
         <p className="text-slate-500 mb-6 text-center">
           We currently support the following operating systems:
         </p>
-        <div className="flex flex-col xs:flex-row space-y-2 xs:space-y-0 xs:space-x-6 self-stretch">
+        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6 self-stretch">
+          <OperatingSystem name="Catalina" img={Catalina.src} />
           <OperatingSystem name="Big Sur" img={BigSur.src} />
           <OperatingSystem name="Monterey" img={Monterey.src} />
           <OperatingSystem name="Ventura" img={Ventura.src} />
+          <OperatingSystem name="Sonoma" img={Sonoma.src} />
         </div>
       </div>
       <a
@@ -43,9 +47,9 @@ interface OperatingSystemProps {
 }
 
 const OperatingSystem: React.FC<OperatingSystemProps> = ({ name, img }) => (
-  <div className="flex flex-row xs:flex-col items-center p-3 rounded-xl shadow-lg bg-white flex-grow">
+  <div className="flex flex-row md:flex-col items-center p-3 rounded-xl shadow-lg bg-white flex-grow shrink-0">
     <img src={img} width={70} height={70} alt="macOS operating system icon" />
-    <div className="mt-1 flex flex-col items-start xs:items-center ml-2 xs:ml-0">
+    <div className="mt-1 flex flex-col items-start md:items-center ml-2 md:ml-0">
       <label className="text-sm text-slate-500 -mb-1">macOS</label>
       <h3 className="font-bold text-slate-700 text-lg">{name}</h3>
     </div>
