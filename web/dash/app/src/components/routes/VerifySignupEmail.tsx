@@ -1,35 +1,26 @@
 import React from 'react';
 import { FullscreenModalForm } from '@dash/components';
-import { useParams } from 'react-router-dom';
-import { useFireAndForget } from '../../hooks';
+import { Navigate, useParams } from 'react-router-dom';
+import { useAuth, useFireAndForget } from '../../hooks';
 import Current from '../../environment';
 
 const VerifySignupEmail: React.FC = () => {
   const { token = `` } = useParams<{ token: UUID }>();
+  const { login } = useAuth();
 
-  const verifyEmail = useFireAndForget(() => Current.api.verifySignupEmail({ token }));
-
-  const getCheckoutUrl = useFireAndForget(
-    () => Current.api.getCheckoutUrl({ adminId: verifyEmail.data?.adminId ?? `` }),
-    { when: verifyEmail.isSuccess },
-  );
+  const verifyEmail = useFireAndForget(() => Current.api.verifySignupEmail({ token }), {
+    onReceive: ({ adminId, token }) => login(adminId, token),
+  });
 
   if (verifyEmail.isError) {
     return <FullscreenModalForm request="failed" error="Failed to verify your email." />;
   }
 
-  if (getCheckoutUrl.isError) {
-    return (
-      <FullscreenModalForm request="failed" error="Unexpected error, please try again." />
-    );
-  }
-
-  if (verifyEmail.isLoading || getCheckoutUrl.isLoading) {
+  if (verifyEmail.isLoading) {
     return <FullscreenModalForm request="ongoing" />;
   }
 
-  window.location.href = getCheckoutUrl.data.url;
-  return <FullscreenModalForm request="ongoing" text="Redirecting to trial setup..." />;
+  return <Navigate to="/" replace />;
 };
 
 export default VerifySignupEmail;

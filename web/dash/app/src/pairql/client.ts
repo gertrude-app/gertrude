@@ -102,16 +102,6 @@ export const liveClient = {
     );
   },
 
-  getCheckoutUrl(
-    input: T.GetCheckoutUrl.Input,
-  ): Promise<T.Result<T.GetCheckoutUrl.Output>> {
-    return query<T.GetCheckoutUrl.Input, T.GetCheckoutUrl.Output>(
-      input,
-      `none`,
-      `GetCheckoutUrl`,
-    );
-  },
-
   getDashboardWidgets(
     input: T.GetDashboardWidgets.Input,
   ): Promise<T.Result<T.GetDashboardWidgets.Output>> {
@@ -195,26 +185,6 @@ export const liveClient = {
       input,
       `admin`,
       `GetUserUnlockRequests`,
-    );
-  },
-
-  handleCheckoutCancel(
-    input: T.HandleCheckoutCancel.Input,
-  ): Promise<T.Result<T.HandleCheckoutCancel.Output>> {
-    return query<T.HandleCheckoutCancel.Input, T.HandleCheckoutCancel.Output>(
-      input,
-      `none`,
-      `HandleCheckoutCancel`,
-    );
-  },
-
-  handleCheckoutSuccess(
-    input: T.HandleCheckoutSuccess.Input,
-  ): Promise<T.Result<T.HandleCheckoutSuccess.Output>> {
-    return query<T.HandleCheckoutSuccess.Input, T.HandleCheckoutSuccess.Output>(
-      input,
-      `none`,
-      `HandleCheckoutSuccess`,
     );
   },
 
@@ -391,9 +361,6 @@ export const throwingClient: ApiClient = {
   getAdminKeychains: () => {
     throw new Error(`ApiClient.getAdminKeychains() not implemented`);
   },
-  getCheckoutUrl: () => {
-    throw new Error(`ApiClient.getCheckoutUrl() not implemented`);
-  },
   getDashboardWidgets: () => {
     throw new Error(`ApiClient.getDashboardWidgets() not implemented`);
   },
@@ -426,12 +393,6 @@ export const throwingClient: ApiClient = {
   },
   getUserUnlockRequests: () => {
     throw new Error(`ApiClient.getUserUnlockRequests() not implemented`);
-  },
-  handleCheckoutCancel: () => {
-    throw new Error(`ApiClient.handleCheckoutCancel() not implemented`);
-  },
-  handleCheckoutSuccess: () => {
-    throw new Error(`ApiClient.handleCheckoutSuccess() not implemented`);
   },
   latestAppVersions: () => {
     throw new Error(`ApiClient.latestAppVersions() not implemented`);

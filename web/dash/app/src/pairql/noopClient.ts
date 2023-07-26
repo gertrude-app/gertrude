@@ -45,9 +45,6 @@ const noopClient: ApiClient = {
   getAdminKeychains: async () => {
     return Result.success([]);
   },
-  getCheckoutUrl: async () => {
-    return Result.success({ url: `` });
-  },
   getDashboardWidgets: async () => {
     return Result.success({
       users: [],
@@ -149,12 +146,6 @@ const noopClient: ApiClient = {
   getUserUnlockRequests: async () => {
     return Result.success([]);
   },
-  handleCheckoutCancel: async () => {
-    return Result.success({ success: true });
-  },
-  handleCheckoutSuccess: async () => {
-    return Result.success({ token: ``, adminId: `` });
-  },
   login: async () => {
     return Result.success({ token: ``, adminId: `` });
   },
@@ -195,7 +186,7 @@ const noopClient: ApiClient = {
     return Result.success({ success: true });
   },
   verifySignupEmail: async () => {
-    return Result.success({ adminId: `` });
+    return Result.success({ token: ``, adminId: `` });
   },
 };
 

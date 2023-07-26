@@ -91,7 +91,7 @@ const EditComputer: React.FC<Props> = ({
           <span>Running:</span>
           <span className="font-bold text-slate-800 shrink-0">Gertrude {appVersion}</span>
         </div>
-        {appVersion === latestReleaseVersion ? (
+        {appVersion >= latestReleaseVersion ? (
           <PillBadge type="green" size="small" className="shrink-0">
             Up to date
           </PillBadge>
