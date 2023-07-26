@@ -63,7 +63,7 @@ const Connected: React.FC<Props> = ({
       </button>
     </div>
     <div className="flex justify-between flex-grow mt-3 space-x-3">
-      <div className="flex flex-col justify-center items-center bg-white/20 dark:bg-white/5 p-3 rounded-lg shadow-md border-[0.5px] border-white/30 dark:border-white/20 w-1/2">
+      <div className="flex flex-col justify-center items-center bg-white/20 dark:bg-white/5 p-3 rounded-xl shadow-md border-[0.5px] border-white/30 dark:border-white/20 w-1/2">
         <div className="flex justify-center items-center space-x-3 mb-1">
           <div
             className={cx(
