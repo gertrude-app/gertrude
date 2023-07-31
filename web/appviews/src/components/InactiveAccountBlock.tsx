@@ -36,8 +36,8 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
             </p>
           )}
           <p>
-            To <strong>restore the account,</strong> login to the Gertrude web admin
-            dashboard, resolve the payment issue, and click the <strong>Recheck</strong>
+            To <strong>restore the account,</strong> login to the Gertrude parent site and
+            resolve the payment issue, then click the <strong>Recheck</strong>
             {` `}
             button below.
           </p>
@@ -51,10 +51,10 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
           <p>
             Contact us at at{` `}
             <a
-              href="mailto:support@gertrude.app"
+              href="https://gertrude.app/contact"
               className="font-semibold text-slate-800 dark:text-slate-200 border-b-2 pb-1 border-transparent dark:border-transparent hover:border-slate-600 dark:hover:border-slate-100 hover:pb-0.5 [transition:200ms]"
             >
-              support@gertrude.app
+              https://gertrude.app/contact
             </a>
             {` `}
             to get help.

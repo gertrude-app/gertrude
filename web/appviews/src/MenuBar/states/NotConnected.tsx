@@ -22,7 +22,7 @@ const NotConnected: React.FC<Props> = ({ emit, onActionsIconClicked }) => (
     >
       <i className="fa fa-laptop text-xl w-6 mr-3 text-indigo-600" />
       <span className="bg-gradient-to-br from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent [-webkit-background-clip:text;]">
-        Connect a device
+        Connect to child
       </span>
     </button>
   </MenuBarSized>

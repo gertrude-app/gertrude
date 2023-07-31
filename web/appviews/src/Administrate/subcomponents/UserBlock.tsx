@@ -38,7 +38,7 @@ const UserBlock: React.FC<Props> = ({
       <div className="flex justify-between items-stretch relative">
         <div className="flex flex-col justify-between">
           <h3 className="font-semibold text-xl text-slate-600 dark:text-slate-400">
-            Connected to user{` `}
+            Connected to child{` `}
             <span className="font-black text-slate-900 dark:text-slate-100">
               {userName}
             </span>
@@ -50,7 +50,7 @@ const UserBlock: React.FC<Props> = ({
               color="tertiary"
               size="small"
             >
-              Connect to a different user
+              Connect to a different child
             </Button>
           </div>
         </div>

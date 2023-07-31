@@ -6,10 +6,10 @@ const AccountPastDueBanner: React.FC<{ small?: boolean; withoutBorder?: boolean 
   withoutBorder = false,
 }) => (
   <WarningBanner severity="warning" withoutBorder={withoutBorder}>
-    Your Gertrude account is past due!{` `}
+    Gertrude account is past due!{` `}
     {!small && (
       <>
-        Login to the web admin dashboard before the app
+        Login to the Gertrude parent site before the app
         {` `}
         <b>loses functionality.</b>
       </>
