@@ -30,9 +30,10 @@ const FilterStatusBlock: React.FC<Props> = ({ filterState, emit }) => {
       </div>
       <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-b-xl flex space-x-4 items-center">
         <span className="text-sm text-slate-400 dark:text-slate-500 max-w-sm">
-          To manually suspend the filter, open the{' '}
-          <strong className="text-slate-500 dark:text-slate-400">Suspend filter</strong>{' '}
-          screen and click{' '}
+          To manually suspend the filter, open the{` `}
+          <strong className="text-slate-500 dark:text-slate-400">Suspend filter</strong>
+          {` `}
+          screen and click{` `}
           <strong className="text-slate-500 dark:text-slate-400">Start suspension</strong>
         </span>
       </div>

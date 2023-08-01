@@ -21,7 +21,8 @@ export const LightMode: Story = props({
     adminAccountStatus: `active` as const,
     request: { case: `idle` },
     comment: ``,
-    customDurationString: ``,
+    page: `duration`,
+    duration: { mode: `standard`, seconds: null },
     internetConnected: true,
     emit: () => {},
     dispatch: () => {},
@@ -36,37 +37,49 @@ export const NoInternetLight: Story = props({
   },
 });
 
-export const FilledOutLight: Story = props({
+export const OptionSelectedLight: Story = props({
   ...LightMode.args,
   props: {
     ...LightMode.args.props,
     comment: `Please dad!`,
-    durationInSeconds: 60 * 120,
+    duration: {
+      mode: `standard`,
+      seconds: 1800,
+    },
   },
 });
 
-export const MainOverlayLight: Story = props({
+export const CustomDurationDrawerOpenLight: Story = props({
   ...LightMode.args,
   props: {
     ...LightMode.args.props,
-    overlay: `main`,
+    duration: {
+      mode: `custom`,
+      seconds: null,
+    },
   },
 });
 
-export const CustomOverlayLight: Story = props({
+export const CustomDurationDrawerFilledOutLight: Story = props({
   ...LightMode.args,
   props: {
     ...LightMode.args.props,
-    overlay: `customDuration`,
+    duration: {
+      mode: `custom`,
+      seconds: 3660,
+    },
   },
 });
 
-export const CustomOverlayFilledOutLight: Story = props({
+export const CommentPageLight: Story = props({
   ...LightMode.args,
   props: {
     ...LightMode.args.props,
-    overlay: `customDuration`,
-    customDurationString: `113`,
+    page: `comment`,
+    duration: {
+      mode: `standard`,
+      seconds: 1800,
+    },
   },
 });
 
@@ -102,6 +115,18 @@ export const AccountWarningLight: Story = props({
   },
 });
 
+export const AccountWarningDrawerOpenLight: Story = props({
+  ...LightMode.args,
+  props: {
+    ...LightMode.args.props,
+    adminAccountStatus: `needsAttention`,
+    duration: {
+      mode: `custom`,
+      seconds: null,
+    },
+  },
+});
+
 export const AccountInactiveLight: Story = props({
   ...LightMode.args,
   props: {
@@ -123,37 +148,49 @@ export const NoInternetDark: Story = props({
   },
 });
 
-export const FilledOutDark: Story = props({
+export const OptionSelectedDark: Story = props({
   ...DarkMode.args,
   props: {
     ...DarkMode.args.props,
     comment: `Please dad!`,
-    durationInSeconds: 60 * 9,
+    duration: {
+      mode: `standard`,
+      seconds: 1800,
+    },
   },
 });
 
-export const MainOverlayDark: Story = props({
+export const CustomDurationDrawerOpenDark: Story = props({
   ...DarkMode.args,
   props: {
     ...DarkMode.args.props,
-    overlay: `main`,
+    duration: {
+      mode: `custom`,
+      seconds: null,
+    },
   },
 });
 
-export const CustomOverlayDark: Story = props({
+export const CustomDurationDrawerFilledOutDark: Story = props({
   ...DarkMode.args,
   props: {
     ...DarkMode.args.props,
-    overlay: `customDuration`,
+    duration: {
+      mode: `custom`,
+      seconds: 3660,
+    },
   },
 });
 
-export const CustomOverlayFilledOutDark: Story = props({
+export const CommentPageDark: Story = props({
   ...DarkMode.args,
   props: {
     ...DarkMode.args.props,
-    overlay: `customDuration`,
-    customDurationString: `113`,
+    page: `comment`,
+    duration: {
+      mode: `standard`,
+      seconds: 1800,
+    },
   },
 });
 
@@ -186,6 +223,18 @@ export const AccountWarningDark: Story = props({
   props: {
     ...DarkMode.args.props,
     adminAccountStatus: `needsAttention`,
+  },
+});
+
+export const AccountWarningDrawerOpenDark: Story = props({
+  ...DarkMode.args,
+  props: {
+    ...DarkMode.args.props,
+    adminAccountStatus: `needsAttention`,
+    duration: {
+      mode: `custom`,
+      seconds: null,
+    },
   },
 });
 

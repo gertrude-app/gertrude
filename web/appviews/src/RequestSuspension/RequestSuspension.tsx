@@ -1,8 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { inflect } from '@shared/string';
 import { Button, Loading, TextInput } from '@shared/components';
-import { Transition } from '@headlessui/react';
 import type {
   AppState,
   ViewState,
@@ -14,17 +12,16 @@ import { containerize } from '../lib/store';
 import ErrorBlock from '../ErrorBlock';
 import InactiveAccountScreen from '../components/InactiveAccountBlock';
 import AccountPastDueBanner from '../components/AccountPastDueBanner';
-import store from './requestsuspension-store';
+import store, { standardDurationOptions } from './requestsuspension-store';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 
 export const RequestSuspension: React.FC<Props> = ({
-  overlay,
   dispatch,
-  customDurationString,
   emit,
   comment,
-  durationInSeconds,
+  page,
+  duration,
   request,
   adminAccountStatus,
   internetConnected,
@@ -41,7 +38,7 @@ export const RequestSuspension: React.FC<Props> = ({
   }
   if (request.case === `ongoing`) {
     return (
-      <div className="h-full appview:h-screen flex justify-center items-center flex-col space-y-4 bg-white dark:bg-slate-900 rounded-b-xl">
+      <div className="h-full appview:h-screen flex justify-center items-center flex-col space-y-4 bg-white dark:bg-slate-900 rounded-b-lg">
         <Loading />
         <h3 className="text-slate-500 font-medium text-lg dark:text-slate-400">
           Submitting...
@@ -50,7 +47,7 @@ export const RequestSuspension: React.FC<Props> = ({
     );
   } else if (request.case === `succeeded`) {
     return (
-      <div className="h-full appview:h-screen flex justify-center items-center p-8 bg-white dark:bg-slate-900 rounded-b-xl">
+      <div className="h-full appview:h-screen flex justify-center items-center p-8 bg-white dark:bg-slate-900 rounded-b-lg">
         <div className="flex justify-center items-center flex-col border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/30 rounded-2xl w-full h-full">
           <div className="flex flex-row items-center space-x-3 mb-8">
             <div className="bg-green-500 rounded-full w-6 h-6 flex justify-center items-center">
@@ -73,7 +70,7 @@ export const RequestSuspension: React.FC<Props> = ({
     );
   } else if (request.case === `failed`) {
     return (
-      <div className="h-full appview:h-screen flex justify-center items-center p-8 bg-white dark:bg-slate-900 rounded-b-xl">
+      <div className="h-full appview:h-screen flex justify-center items-center p-8 bg-white dark:bg-slate-900 rounded-b-lg">
         <ErrorBlock
           title="Filter suspension request failed:"
           message={request.error}
@@ -99,214 +96,212 @@ export const RequestSuspension: React.FC<Props> = ({
   }
 
   return (
-    <div className="h-full appview:h-screen flex items-stretch flex-col bg-white dark:bg-slate-900 rounded-b-xl relative">
-      {adminAccountStatus === `needsAttention` && <AccountPastDueBanner small />}
-      <Transition
-        show={overlay !== undefined}
-        enter="transition-opacity duration-75"
-        enterFrom="opacity-0"
-        enterTo="opacity-100"
-        leave="transition-opacity duration-150"
-        leaveFrom="opacity-100"
-        leaveTo="opacity-0"
+    <div className="h-full appview:h-screen flex relative">
+      <RequestSuspensionPage
+        page="duration"
+        curPage={page}
+        className="flex flex-col bg-white dark:bg-slate-900 rounded-b-lg"
       >
-        <div
-          className={cx(
-            `absolute flex justify-center items-center w-full h-full top-0 left-0 bg-black/60 z-40 rounded-b-xl`,
-          )}
-          onClick={() => dispatch({ type: `overlayBackgroundClicked` })}
-        >
+        <div className="flex flex-col justify-center items-center flex-grow pb-20">
+          <h3 className="font-bold mb-3 dark:text-slate-100">
+            Choose a suspension duration
+          </h3>
+          <div className="grid grid-cols-3 gap-2">
+            {standardDurationOptions.map((seconds) => {
+              const minutes = seconds / 60;
+              return (
+                <button
+                  key={minutes}
+                  className={cx(
+                    `text-left rounded-lg px-3 py-2 border-[0.5px] border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-medium text-slate-700 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 transition duration-100 min-w-[180px]`,
+                    seconds === duration.seconds &&
+                      `!bg-violet-100 dark:!bg-violet-700/60 !border-violet-200 dark:!border-violet-600 !text-violet-700 dark:!text-violet-100 hover:!bg-violet-200 dark:hover:!bg-violet-700`,
+                  )}
+                  onClick={() => dispatch({ type: `standardDurationClicked`, seconds })}
+                >
+                  {minutes > 59 ? minutes / 60 : minutes}
+                  {` `}
+                  {minutes > 59 ? (minutes === 60 ? `hour` : `hours`) : `minutes`}
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex justify-center my-2.5">
+            <span className="before:[content:'-_'] after:[content:'_-'] uppercase text-sm text-slate-400 dark:text-slate-500">
+              or
+            </span>
+          </div>
+          <button
+            className="rounded-lg p-2 border-[0.5px] border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-medium text-slate-700 dark:text-slate-100 text-center hover:bg-slate-100 dark:hover:bg-slate-700 w-[200px]"
+            onClick={() => dispatch({ type: `chooseCustomDurationClicked` })}
+          >
+            Custom duration...
+          </button>
           <div
             className={cx(
-              `h-[330px] w-96 bg-white dark:bg-slate-800 rounded-xl shadow-xl relative overflow-hidden`,
+              `absolute left-0 top-0 bg-slate-100 dark:bg-slate-900 w-full h-full rounded-b-lg backdrop-blur-xl [transition:300ms]`,
+              duration.mode === `custom`
+                ? `opacity-80 block hover:bg-slate-200 dark:hover:bg-slate-800`
+                : `opacity-0 hidden`,
             )}
-            onClick={(event) => event.stopPropagation()}
+            onClick={() => dispatch({ type: `closeCustomDurationDrawer` })}
+          />
+          <div
+            className={cx(
+              `absolute left-0 bottom-0 w-full bg-white dark:bg-slate-900 rotate-180 transition duration-30 rounded-t-lg`,
+              duration.mode === `custom` &&
+                `shadow-md dark:shadow-lg shadow-slate-300/30 dark:shadow-black/30 rounded-b-xl`,
+            )}
           >
             <div
               className={cx(
-                `absolute w-full flex flex-col items-stretch top-0 p-4 [transition:200ms]`,
-                overlay === `main` ? `left-0 opacity-100` : `-left-96 opacity-0`,
+                `border-t border-slate-200 dark:border-slate-700/70 dark:bg-slate-800/30 p-4 flex flex-col justify-end rounded-b-lg rotate-180 relative overflow-hidden`,
+                `[transition:300ms]`,
+                duration.mode === `custom` ? `h-52 rounded-t-xl` : `h-20`,
               )}
             >
-              <h3 className="font-bold mb-3 dark:text-slate-100">Suspension duration</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {[3, 5, 10, 20, 30, 60, 90, 120].map((minutes) => (
-                  <button
-                    key={minutes}
-                    className="text-left rounded-lg px-3 py-2 bg-slate-50 dark:bg-slate-700 font-medium text-slate-700 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-600 transition duration-100"
-                    onClick={() => dispatch({ type: `standardDurationClicked`, minutes })}
-                  >
-                    {minutes > 59 ? minutes / 60 : minutes}
-                    {` `}
-                    {minutes > 59 ? (minutes === 60 ? `hour` : `hours`) : `minutes`}
-                  </button>
-                ))}
-              </div>
-              <div className="flex justify-center my-2.5">
-                <span className="before:[content:'-_'] after:[content:'_-'] uppercase text-sm text-slate-400">
-                  or
-                </span>
-              </div>
-              <button
-                className="rounded-lg p-2 bg-slate-50 dark:bg-slate-700 font-medium text-slate-700 dark:text-slate-100 text-center hover:bg-slate-100 dark:hover:bg-slate-600"
-                onClick={() => dispatch({ type: `customDurationClicked` })}
+              <div
+                className={cx(
+                  `absolute w-full flex justify-center [transition:300ms]`,
+                  duration.mode === `custom` ? `top-0` : `top-16`,
+                )}
               >
-                Custom duration...
-              </button>
-            </div>
-            <div
-              className={cx(
-                `absolute w-full h-full top-0 [transition:200ms] flex flex-col justify-between`,
-                overlay === `customDuration` ? `left-0 opacity-100` : `left-96 opacity-0`,
-              )}
-            >
-              <div className="p-4">
-                <h3 className="font-bold mb-3 dark:text-slate-100">
-                  Choose a custom duration
-                </h3>
                 <TextInput
                   type="positiveInteger"
-                  value={customDurationString}
-                  setValue={(value) => dispatch({ type: `customDurationUpdated`, value })}
+                  value={String(duration.seconds ? duration.seconds / 60 : 0)}
+                  setValue={(value) =>
+                    dispatch({
+                      type: `customDurationUpdated`,
+                      seconds: Number(value) * 60,
+                    })
+                  }
+                  className={cx(
+                    `max-w-sm [transition:300ms] relative top-8`,
+                    duration.mode === `custom` ? `opacity-100` : `opacity-0`,
+                  )}
                   unit="minutes"
                 />
               </div>
-              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 p-4 rounded-b-xl">
+              <button
+                className={cx(
+                  `absolute top-2 w-6 h-6 bg-slate-100 dark:bg-slate-700 rounded-full flex justify-center items-center hover:scale-105 hover:bg-slate-200 dark:hover:bg-slate-600 [transition:300ms] active:scale-95`,
+                  duration.mode === `custom`
+                    ? `opacity-100 right-2`
+                    : `opacity-0 -right-6`,
+                )}
+                onClick={() => dispatch({ type: `closeCustomDurationDrawer` })}
+              >
+                <i className="fa-solid fa-times text-slate-400 text-sm" />
+              </button>
+              <div className="flex flex-row-reverse justify-between items-center">
                 <Button
                   type="button"
-                  onClick={() => dispatch({ type: `backFromCustomDurationClicked` })}
-                  color="tertiary"
-                  size="medium"
-                >
-                  <i className="fa-solid fa-arrow-left mr-2" />
-                  Back
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => dispatch({ type: `chooseCustomDurationClicked` })}
+                  onClick={() => dispatch({ type: `nextFromDurationPageClicked` })}
                   color="secondary"
-                  size="medium"
-                  disabled={!customDurationValid(customDurationString)}
+                  disabled={!duration.seconds}
                 >
-                  Choose
-                  <i className="fa-solid fa-check ml-2" />
+                  Next
+                  <i className="ml-2 fa-solid fa-chevron-right" />
                 </Button>
+                {adminAccountStatus === `needsAttention` && (
+                  <AccountPastDueBanner small withoutBorder />
+                )}
               </div>
             </div>
           </div>
         </div>
-      </Transition>
-      <div
-        className={cx(
-          `p-8 bg-slate-50 dark:bg-slate-900 flex-grow flex justify-center flex-col items-center`,
-          adminAccountStatus === `needsAttention` && `py-6`,
-        )}
+      </RequestSuspensionPage>
+      <RequestSuspensionPage
+        page={`comment`}
+        curPage={page}
+        className="flex flex-col bg-white dark:bg-slate-900"
       >
-        <h2 className="text-lg font-semibold text-center dark:text-slate-100">
-          Request temporary filter suspension
-        </h2>
-        <TextInput
-          type="textarea"
-          value={comment}
-          setValue={(value) => dispatch({ type: `commentUpdated`, value })}
-          rows={adminAccountStatus === `needsAttention` ? 3 : 5}
-          label="Reason:"
-          noResize
-          placeholder="Super compelling reason"
-        />
-      </div>
-      <div className="flex justify-between items-center p-4 dark:bg-black/10 rounded-b-xl border-t border-slate-200 dark:border-slate-800">
-        <Button
-          type="button"
-          onClick={() => dispatch({ type: `durationButtonClicked` })}
-          color="tertiary"
-          size="small"
-        >
-          <i className="fa-regular fa-clock mr-2" />
-          {chooseDurationButtonText(customDurationString, durationInSeconds)}
-        </Button>
-        <div className="flex items-center gap-4">
+        <div className="flex-grow flex flex-col justify-center items-center p-8">
+          <h3 className="text-slate-900 text-lg font-bold mb-4 dark:text-slate-200">
+            Add an optional comment
+          </h3>
+          <TextInput
+            type="textarea"
+            value={comment}
+            setValue={(value) => dispatch({ type: `commentUpdated`, value })}
+            placeholder="Super compelling reason"
+            noResize
+            rows={3}
+          />
+        </div>
+        <div className="h-20 flex justify-between p-4 border-t border-slate-200 dark:border-slate-700 items-center">
           <Button
             type="button"
-            onClick={() => {}}
+            onClick={() => dispatch({ type: `backFromCommentPageClicked` })}
             color="tertiary"
-            size="small"
-            disabled={
-              overlay !== undefined ||
-              chosenDurationInSeconds(customDurationString, durationInSeconds) === null
-            }
+            disabled={!duration.seconds}
           >
-            Start suspension
+            <i className="mr-2 fa-solid fa-chevron-left" />
+            Back
           </Button>
+          <span className="font-medium text-slate-800 dark:text-slate-400">
+            {formatDuration(duration.seconds || 0)}
+          </span>
           <Button
             type="button"
-            onClick={() => {
-              const duration = chosenDurationInSeconds(
-                customDurationString,
-                durationInSeconds,
-              );
-              if (duration !== null) {
-                emit({ case: `requestSubmitted`, durationInSeconds: duration, comment });
-              }
-            }}
-            color="secondary"
-            size="small"
-            disabled={
-              overlay !== undefined ||
-              chosenDurationInSeconds(customDurationString, durationInSeconds) === null
+            onClick={() =>
+              emit({
+                case: `requestSubmitted`,
+                durationInSeconds: duration.seconds || 0,
+                comment,
+              })
             }
+            color="secondary"
+            disabled={!duration.seconds}
           >
-            Submit request
-            <i className="fa-solid fa-arrow-right ml-2" />
+            Request suspension
+            <i className="ml-2 fa-solid fa-chevron-right" />
           </Button>
         </div>
-      </div>
+      </RequestSuspensionPage>
     </div>
   );
 };
 
-function chosenDurationInSeconds(
-  customDurationString: string,
-  durationInSeconds?: number,
-): number | null {
-  if (customDurationValid(customDurationString)) {
-    const minutes = Number(customDurationString);
-    return minutes * 60;
-  } else if (durationInSeconds !== undefined) {
-    return durationInSeconds;
-  } else {
-    return null;
-  }
+interface RequestSuspensionPageProps {
+  page: 'duration' | 'comment';
+  curPage: 'duration' | 'comment';
+  children: React.ReactNode;
+  className?: string;
 }
 
-function chooseDurationButtonText(
-  customDurationString: string,
-  durationInSeconds?: number,
-): string {
-  if (customDurationValid(customDurationString)) {
-    const minutes = Number(customDurationString);
-    return `${minutes} ${inflect(`minute`, minutes)}`;
-  } else if (durationInSeconds !== undefined) {
-    const minutes = Math.round(durationInSeconds / 60);
-    if (minutes < 60) {
-      return `${minutes} ${inflect(`minute`, minutes)}`;
-    }
-    const hours = Math.floor(minutes / 60);
-    const left = minutes % 60;
-    if (left === 0) {
-      return `${hours} ${inflect(`hour`, hours)}`;
-    }
-    return `${hours} ${inflect(`hour`, hours)} ${left} ${inflect(`minute`, left)}`;
-  } else {
-    return `Choose duration`;
+const RequestSuspensionPage: React.FC<RequestSuspensionPageProps> = ({
+  page,
+  curPage,
+  children,
+  className,
+}) => (
+  <div
+    className={cx(
+      `w-full h-full absolute top-0 [transition:300ms] duration-200`,
+      page === `duration` && curPage === `comment` && `-left-full opacity-0`,
+      page === curPage && `left-0 opacity-100`,
+      page === `comment` && curPage === `duration` && `left-full opacity-0`,
+      className,
+    )}
+  >
+    {children}
+  </div>
+);
+
+function formatDuration(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  if (hours) {
+    return `${hours} hour${hours === 1 ? `` : `s`}`;
   }
+  if (minutes) {
+    return `${minutes} minute${minutes === 1 ? `` : `s`}`;
+  }
+  return `${Math.floor(seconds)} seconds`;
 }
 
 export default containerize<AppState, AppEvent, ViewState, ViewAction>(
   store,
   RequestSuspension,
 );
-
-function customDurationValid(input: string): boolean {
-  return /^[1-9][0-9]*$/.test(input);
-}

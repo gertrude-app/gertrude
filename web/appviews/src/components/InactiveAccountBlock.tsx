@@ -20,7 +20,7 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
     >
       <div
         className={cx(
-          `border-2 border-red-200 dark:border-red-500/40 rounded-2xl h-full flex flex-col bg-red-50 dark:bg-red-500/20`,
+          `border border-red-100 dark:border-red-500/40 rounded-2xl h-full flex flex-col bg-red-50/50 dark:bg-red-500/20`,
           short ? `p-6` : `p-8`,
         )}
       >
@@ -52,7 +52,7 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
             Contact us at at{` `}
             <a
               href="mailto:support@gertrude.app"
-              className="font-semibold text-slate-800 dark:text-slate-200 border-b-2 pb-1 border-red-50 dark:border-transparent hover:border-slate-600 dark:hover:border-slate-100 hover:pb-0.5 [transition:200ms]"
+              className="font-semibold text-slate-800 dark:text-slate-200 border-b-2 pb-1 border-transparent dark:border-transparent hover:border-slate-600 dark:hover:border-slate-100 hover:pb-0.5 [transition:200ms]"
             >
               support@gertrude.app
             </a>
@@ -60,7 +60,7 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
             to get help.
           </p>
         </div>
-        <div className="flex items-center space-x-4 bg-white dark:bg-slate-900 p-4 rounded-xl self-stretch justify-between border border-red-200 dark:border-red-500/50">
+        <div className="flex items-center space-x-4 bg-white dark:bg-slate-900 p-4 rounded-xl self-stretch justify-between border border-red-100 dark:border-red-500/50">
           <Button
             type="button"
             onClick={() => {
