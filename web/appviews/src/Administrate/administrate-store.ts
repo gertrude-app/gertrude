@@ -9,12 +9,12 @@ export type Screen = 'home' | 'healthCheck' | 'exemptUsers' | 'advanced';
 export interface HealthCheck {
   latestAppVersion?: { case: 'ok'; value: string } | { case: 'error'; message?: string };
   filterStatus?:
+    | { case: 'communicationBroken'; repairing: boolean }
     | { case: 'installed'; version: string; numUserKeys: number }
     | { case: 'installing' }
     | { case: 'installTimeout' }
     | { case: 'notInstalled' }
-    | { case: 'unexpected' }
-    | { case: 'communicationBroken' };
+    | { case: 'unexpected' };
   accountStatus?: Failable<AdminAccountStatus>;
   screenRecordingPermissionOk?: boolean;
   keystrokeRecordingPermissionOk?: boolean;

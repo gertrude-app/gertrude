@@ -27,19 +27,6 @@ const HealthCheckScreen: React.FC<Props> = ({
     keystrokeMonitoringEnabled,
   );
 
-  const items = health.items;
-  items.sort((a, b) => {
-    if (a.state === `fail` && b.state !== `fail`) return -1;
-    if (a.state !== `fail` && b.state === `fail`) return 1;
-    if (a.state === `warn` && b.state !== `warn`) return -1;
-    if (a.state !== `warn` && b.state === `warn`) return 1;
-    if (a.state === `unexpected` && b.state !== `unexpected`) return -1;
-    if (a.state !== `unexpected` && b.state === `unexpected`) return 1;
-    if (a.state === `checking` && b.state !== `checking`) return -1;
-    if (a.state !== `checking` && b.state === `checking`) return 1;
-    return 0;
-  });
-
   return (
     <div className="h-full overflow-y-scroll appview:overflow-y-auto relative">
       <header className="flex items-center justify-between border-b p-4 border-slate-200 dark:border-slate-800 sticky bg-white dark:bg-slate-900 top-0 z-10">
@@ -77,7 +64,7 @@ const HealthCheckScreen: React.FC<Props> = ({
         </Button>
       </header>
       <ul className="flex flex-col space-y-2 p-4">
-        {items.map((item) => (
+        {health.items.map((item) => (
           <HealthCheckItem key={item.title} {...item} emit={emit} />
         ))}
       </ul>

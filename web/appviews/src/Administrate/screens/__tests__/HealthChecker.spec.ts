@@ -38,9 +38,18 @@ describe(`HealthChecker`, () => {
       ]);
     });
 
-    it(`returns  single "fail" when communication problem`, () => {
+    it(`filter status remains pending if retrying communication repair`, () => {
       const checker = makeChecker({
-        filterStatus: { case: `communicationBroken` },
+        filterStatus: { case: `communicationBroken`, repairing: true },
+      });
+      expect(checker.filterItems).toEqual([
+        { title: `Filter status`, state: `checking` },
+      ]);
+    });
+
+    it(`returns single "fail" when communication problem, and repair not in progress`, () => {
+      const checker = makeChecker({
+        filterStatus: { case: `communicationBroken`, repairing: false },
       });
       expect(checker.filterItems).toEqual([
         {

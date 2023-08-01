@@ -241,7 +241,8 @@ export default class HealthChecker {
     if (
       filterStatus === undefined ||
       latestAppVersion === undefined ||
-      filterStatus.case === `installing`
+      filterStatus.case === `installing` ||
+      (filterStatus.case === `communicationBroken` && filterStatus.repairing)
     ) {
       return [
         {
