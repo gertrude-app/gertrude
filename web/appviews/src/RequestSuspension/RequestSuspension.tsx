@@ -12,7 +12,7 @@ import { containerize } from '../lib/store';
 import ErrorBlock from '../ErrorBlock';
 import InactiveAccountScreen from '../components/InactiveAccountBlock';
 import AccountPastDueBanner from '../components/AccountPastDueBanner';
-import store, { standardDurationOptions } from './requestsuspension-store';
+import store, { STANDARD_DURATION_OPTIONS } from './requestsuspension-store';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 
@@ -98,8 +98,8 @@ export const RequestSuspension: React.FC<Props> = ({
   return (
     <div className="h-full appview:h-screen flex relative">
       <RequestSuspensionPage
-        page="duration"
-        curPage={page}
+        pageType="duration"
+        currentlyViewedPage={page}
         className="flex flex-col bg-white dark:bg-slate-900 rounded-b-lg"
       >
         <div className="flex flex-col justify-center items-center flex-grow pb-20">
@@ -107,7 +107,7 @@ export const RequestSuspension: React.FC<Props> = ({
             Choose a suspension duration
           </h3>
           <div className="grid grid-cols-3 gap-2">
-            {standardDurationOptions.map((seconds) => {
+            {STANDARD_DURATION_OPTIONS.map((seconds) => {
               const minutes = seconds / 60;
               return (
                 <button
@@ -119,9 +119,7 @@ export const RequestSuspension: React.FC<Props> = ({
                   )}
                   onClick={() => dispatch({ type: `standardDurationClicked`, seconds })}
                 >
-                  {minutes > 59 ? minutes / 60 : minutes}
-                  {` `}
-                  {minutes > 59 ? (minutes === 60 ? `hour` : `hours`) : `minutes`}
+                  {formatDuration(seconds)}
                 </button>
               );
             })}
@@ -162,7 +160,7 @@ export const RequestSuspension: React.FC<Props> = ({
             >
               <div
                 className={cx(
-                  `absolute w-full flex justify-center [transition:300ms]`,
+                  `absolute w-full left-0 flex justify-center [transition:300ms]`,
                   duration.mode === `custom` ? `top-0` : `top-16`,
                 )}
               >
@@ -201,10 +199,22 @@ export const RequestSuspension: React.FC<Props> = ({
                   disabled={!duration.seconds}
                 >
                   Next
-                  <i className="ml-2 fa-solid fa-chevron-right" />
+                  <i className="ml-3 fa-solid fa-chevron-right" />
                 </Button>
-                {adminAccountStatus === `needsAttention` && (
+                {adminAccountStatus === `needsAttention` ? (
                   <AccountPastDueBanner small withoutBorder />
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      /* TODO */
+                    }}
+                    color="tertiary"
+                    disabled={!duration.seconds}
+                  >
+                    <i className="mr-3 fa-solid fa-lock" />
+                    Start suspension
+                  </Button>
                 )}
               </div>
             </div>
@@ -212,8 +222,8 @@ export const RequestSuspension: React.FC<Props> = ({
         </div>
       </RequestSuspensionPage>
       <RequestSuspensionPage
-        page={`comment`}
-        curPage={page}
+        pageType={`comment`}
+        currentlyViewedPage={page}
         className="flex flex-col bg-white dark:bg-slate-900"
       >
         <div className="flex-grow flex flex-col justify-center items-center p-8">
@@ -236,7 +246,7 @@ export const RequestSuspension: React.FC<Props> = ({
             color="tertiary"
             disabled={!duration.seconds}
           >
-            <i className="mr-2 fa-solid fa-chevron-left" />
+            <i className="mr-3 fa-solid fa-chevron-left" />
             Back
           </Button>
           <span className="font-medium text-slate-800 dark:text-slate-400">
@@ -255,7 +265,7 @@ export const RequestSuspension: React.FC<Props> = ({
             disabled={!duration.seconds}
           >
             Request suspension
-            <i className="ml-2 fa-solid fa-chevron-right" />
+            <i className="ml-3 fa-solid fa-chevron-right" />
           </Button>
         </div>
       </RequestSuspensionPage>
@@ -264,24 +274,28 @@ export const RequestSuspension: React.FC<Props> = ({
 };
 
 interface RequestSuspensionPageProps {
-  page: 'duration' | 'comment';
-  curPage: 'duration' | 'comment';
+  pageType: 'duration' | 'comment';
+  currentlyViewedPage: 'duration' | 'comment';
   children: React.ReactNode;
   className?: string;
 }
 
 const RequestSuspensionPage: React.FC<RequestSuspensionPageProps> = ({
-  page,
-  curPage,
+  pageType,
+  currentlyViewedPage,
   children,
   className,
 }) => (
   <div
     className={cx(
       `w-full h-full absolute top-0 [transition:300ms] duration-200`,
-      page === `duration` && curPage === `comment` && `-left-full opacity-0`,
-      page === curPage && `left-0 opacity-100`,
-      page === `comment` && curPage === `duration` && `left-full opacity-0`,
+      pageType === `duration` &&
+        currentlyViewedPage === `comment` &&
+        `-left-full opacity-0`,
+      pageType === currentlyViewedPage && `left-0 opacity-100`,
+      pageType === `comment` &&
+        currentlyViewedPage === `duration` &&
+        `left-full opacity-0`,
       className,
     )}
   >

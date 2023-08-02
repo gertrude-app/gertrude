@@ -45,10 +45,8 @@ export type ViewAction =
   | { type: 'nextFromDurationPageClicked' }
   | { type: 'backFromCommentPageClicked' };
 
-export type StandardDuration = 300 | 600 | 1200 | 1800 | 3600 | 7200;
-export const standardDurationOptions: StandardDuration[] = [
-  300, 600, 1200, 1800, 3600, 7200,
-];
+export const STANDARD_DURATION_OPTIONS = [300, 600, 1200, 1800, 3600, 7200] as const;
+export type StandardDuration = (typeof STANDARD_DURATION_OPTIONS)[number];
 
 export type Action = ActionOf<AppState, AppEvent, ViewAction>;
 export type State = AppState & ViewState;
