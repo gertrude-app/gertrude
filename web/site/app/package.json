@@ -16,6 +16,7 @@
     "@markdoc/next.js": "0.2.2",
     "@shared/components": "workspace:*",
     "@shared/datetime": "workspace:*",
+    "@shared/string": "workspace:*",
     "@shared/tailwind": "workspace:*",
     "@sindresorhus/slugify": "^2.1.0",
     "@site/components": "workspace:*",
