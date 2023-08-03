@@ -21,12 +21,10 @@ export const Administrate: React.FC<Props> = ({
   userName,
   screenshotMonitoringEnabled,
   keystrokeMonitoringEnabled,
-  filterSuspensionDurationInSeconds,
   installedAppVersion,
   releaseChannel,
   exemptableUsers,
   emit,
-  dispatch,
   screen,
   advanced,
   quitting,
@@ -44,8 +42,6 @@ export const Administrate: React.FC<Props> = ({
     case `home`:
       pageElement = (
         <HomeScreen
-          dispatch={dispatch}
-          filterSuspensionDurationInSeconds={filterSuspensionDurationInSeconds}
           releaseChannel={releaseChannel}
           emit={emit}
           setScreen={(screen) => emit({ case: `gotoScreenClicked`, screen })}

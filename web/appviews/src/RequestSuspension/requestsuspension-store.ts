@@ -24,20 +24,29 @@ export type AppEvent =
 
 export type ViewState = {
   comment: string;
-  durationInSeconds?: number;
-  overlay?: 'main' | 'customDuration';
-  customDurationString: string;
+  page: 'duration' | 'comment';
+  duration:
+    | {
+        mode: `standard`;
+        seconds: StandardDuration | null;
+      }
+    | {
+        mode: `custom`;
+        seconds: number | null;
+      };
 };
 
 export type ViewAction =
   | { type: 'commentUpdated'; value: string }
-  | { type: 'customDurationUpdated'; value: string }
-  | { type: 'standardDurationClicked'; minutes: number }
-  | { type: 'overlayBackgroundClicked' }
-  | { type: 'backFromCustomDurationClicked' }
+  | { type: 'standardDurationClicked'; seconds: StandardDuration }
+  | { type: 'customDurationUpdated'; seconds: number }
   | { type: 'chooseCustomDurationClicked' }
-  | { type: 'durationButtonClicked' }
-  | { type: 'customDurationClicked' };
+  | { type: 'closeCustomDurationDrawer' }
+  | { type: 'nextFromDurationPageClicked' }
+  | { type: 'backFromCommentPageClicked' };
+
+export const STANDARD_DURATION_OPTIONS = [300, 600, 1200, 1800, 3600, 7200] as const;
+export type StandardDuration = (typeof STANDARD_DURATION_OPTIONS)[number];
 
 export type Action = ActionOf<AppState, AppEvent, ViewAction>;
 export type State = AppState & ViewState;
@@ -54,7 +63,11 @@ export class RequestSuspensionStore extends Store<
       windowOpen: true,
       request: { case: `idle` },
       comment: ``,
-      customDurationString: ``,
+      page: `duration`,
+      duration: {
+        mode: `standard`,
+        seconds: null,
+      },
       internetConnected: true,
     };
   }
@@ -66,29 +79,18 @@ export class RequestSuspensionStore extends Store<
     switch (action.type) {
       case `commentUpdated`:
         return { ...state, comment: action.value };
-      case `backFromCustomDurationClicked`:
-        return { ...state, overlay: `main` };
-      case `overlayBackgroundClicked`:
-        return { ...state, overlay: undefined };
-      case `durationButtonClicked`:
-        return { ...state, overlay: `main` };
-      case `customDurationUpdated`:
-        return { ...state, customDurationString: action.value };
       case `standardDurationClicked`:
-        return {
-          ...state,
-          overlay: undefined,
-          durationInSeconds: action.minutes * 60,
-        };
+        return { ...state, duration: { mode: `standard`, seconds: action.seconds } };
+      case `customDurationUpdated`:
+        return { ...state, duration: { mode: `custom`, seconds: action.seconds } };
       case `chooseCustomDurationClicked`:
-        return {
-          ...state,
-          overlay: undefined,
-          customDurationString: ``,
-          durationInSeconds: Number(state.customDurationString) * 60,
-        };
-      case `customDurationClicked`:
-        return { ...state, overlay: `customDuration` };
+        return { ...state, duration: { mode: `custom`, seconds: null } };
+      case `closeCustomDurationDrawer`:
+        return { ...state, duration: { mode: `standard`, seconds: null } };
+      case `nextFromDurationPageClicked`:
+        return { ...state, page: `comment` };
+      case `backFromCommentPageClicked`:
+        return { ...state, page: `duration` };
       case `receivedUpdatedAppState`:
         return { ...state, ...action.appState };
       case `appEventEmitted`:

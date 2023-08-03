@@ -1,8 +1,11 @@
 import React from 'react';
 import WarningBanner from './WarningBanner';
 
-const AccountPastDueBanner: React.FC<{ small?: boolean }> = ({ small }) => (
-  <WarningBanner severity="warning">
+const AccountPastDueBanner: React.FC<{ small?: boolean; withoutBorder?: boolean }> = ({
+  small,
+  withoutBorder = false,
+}) => (
+  <WarningBanner severity="warning" withoutBorder={withoutBorder}>
     Your Gertrude account is past due!{` `}
     {!small && (
       <>

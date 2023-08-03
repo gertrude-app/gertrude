@@ -1,12 +1,23 @@
 import React from 'react';
+import cx from 'classnames';
 
 interface Props {
   children: React.ReactNode;
   severity: 'warning' | 'error';
+  withoutBorder?: boolean;
 }
 
-const WarningBanner: React.FC<Props> = ({ children, severity }) => (
-  <div className="border-b border-slate-200 dark:border-slate-800 p-3 dark:bg-slate-900 bg-white">
+const WarningBanner: React.FC<Props> = ({
+  children,
+  severity,
+  withoutBorder = false,
+}) => (
+  <div
+    className={cx(
+      !withoutBorder &&
+        `border-b border-slate-200 dark:border-slate-800 p-3 dark:bg-slate-900 bg-white`,
+    )}
+  >
     <div
       className={`p-3 rounded-2xl flex justify-center items-center space-x-4 ${
         severity === `warning`

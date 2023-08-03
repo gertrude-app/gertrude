@@ -18,8 +18,11 @@ const BlockedRequest: React.FC<Props> = ({
   selected,
   onSelectToggle,
 }) => (
-  <div className="flex items-center justify-between p-3 rounded-xl even:bg-slate-50 dark:even:bg-slate-800/50">
-    <div className="flex items-center">
+  <div
+    className="flex items-center justify-between p-3 rounded-xl even:bg-slate-50 dark:even:bg-slate-800/30 transition duration-100 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+    onClick={onSelectToggle}
+  >
+    <div className="flex items-center flex-grow">
       <div
         className={cx(
           `border w-6 h-6 rounded-full transition duration-100 hover:scale-105 cursor-pointer flex justify-center items-center shrink-0`,
@@ -27,7 +30,6 @@ const BlockedRequest: React.FC<Props> = ({
             ? `bg-violet-700 border-violet-700`
             : `border-slate-300 hover:border-slate-400 dark:border-slate-600 dark:hover:border-slate-500`,
         )}
-        onClick={onSelectToggle}
       >
         <i
           className={cx(
@@ -49,9 +51,11 @@ const BlockedRequest: React.FC<Props> = ({
       >
         {protocol}
       </span>
-      <span className="text-sm font-mono ml-6 text-slate-800 dark:text-slate-200 max-w-sm text-ellipsis overflow-hidden block whitespace-nowrap">
-        {target}
-      </span>
+      <div className="mx-6 flex-grow relative self-stretch flex items-center w-0">
+        <span className="text-sm font-mono text-slate-800 dark:text-slate-200 overflow-ellipsis overflow-hidden whitespace-nowrap">
+          {target}
+        </span>
+      </div>
     </div>
     <span className="shrink-0 max-w-[220px] overflow-hidden whitespace-nowrap text-ellipsis text-slate-400 dark:text-slate-500 font-medium">
       {app}

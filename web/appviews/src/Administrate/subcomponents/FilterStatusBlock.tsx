@@ -1,21 +1,14 @@
-import { Button, SelectMenu } from '@shared/components';
+import { Button } from '@shared/components';
 import React from 'react';
 import type { FilterState } from '../../lib/shared-types';
-import type { AppEvent, ViewAction } from '../administrate-store';
+import type { AppEvent } from '../administrate-store';
 
 interface Props {
   filterState: FilterState;
-  filterSuspensionDurationInSeconds: string;
   emit(event: AppEvent): unknown;
-  dispatch(action: ViewAction): unknown;
 }
 
-const FilterStatusBlock: React.FC<Props> = ({
-  filterState,
-  emit,
-  dispatch,
-  filterSuspensionDurationInSeconds,
-}) => {
+const FilterStatusBlock: React.FC<Props> = ({ filterState, emit }) => {
   const filter = filterProps(filterState);
   return (
     <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow border-slate-200 dark:border-slate-700 border-[0.5px] flex-grow">
@@ -36,38 +29,13 @@ const FilterStatusBlock: React.FC<Props> = ({
         </Button>
       </div>
       <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-b-xl flex space-x-4 items-center">
-        <Button
-          type="button"
-          onClick={() =>
-            emit({
-              case: `suspendFilterClicked`,
-              durationInSeconds: Number(filterSuspensionDurationInSeconds),
-            })
-          }
-          color="tertiary"
-          size="small"
-          disabled={filterState.case !== `on`}
-        >
-          Suspend filter
-        </Button>
-        <SelectMenu
-          disabled={filterState.case !== `on`}
-          size="small"
-          options={[
-            { value: String(5 * 60), display: `for 5 minutes` },
-            { value: String(10 * 60), display: `for 10 minutes` },
-            { value: String(30 * 60), display: `for 30 minutes` },
-            { value: String(60 * 60), display: `for 1 hour` },
-            { value: String(60 * 60 * 3), display: `for 3 hours` },
-          ]}
-          selectedOption={filterSuspensionDurationInSeconds}
-          setSelected={(value) =>
-            dispatch({
-              type: `filterSuspensionDurationInSecondsChanged`,
-              value,
-            })
-          }
-        />
+        <span className="text-sm text-slate-400 dark:text-slate-500 max-w-sm">
+          To manually suspend the filter, open the{` `}
+          <strong className="text-slate-500 dark:text-slate-400">Suspend filter</strong>
+          {` `}
+          screen and click{` `}
+          <strong className="text-slate-500 dark:text-slate-400">Start suspension</strong>
+        </span>
       </div>
     </div>
   );
