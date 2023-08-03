@@ -148,9 +148,9 @@ export default class HealthChecker {
       };
     } else if (this.data.macOsUserType.value !== `standard`) {
       return {
-        title: `macOS user account type`,
+        title: `Mac user has admin privileges`,
         state: `fail`,
-        message: `Admin users can disable and uninstall Gertrude`,
+        message: `Admin users can disable Gertrude if they have the password`,
         button: {
           icon: `user`,
           label: `Remove admin privilege`,
