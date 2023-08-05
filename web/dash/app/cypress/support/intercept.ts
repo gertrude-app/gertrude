@@ -120,11 +120,8 @@ export function interceptPql(
 ): void;
 
 export function interceptPql(slug: string, output: any): void {
-  let response = output;
   // cypress chokes on the empty object, doesn't understand it should reply w/ it
-  if (JSON.stringify(output) === `{}`) {
-    response = `{}`;
-  }
+  const response = JSON.stringify(output) === `{}` ? `{}` : output;
   cy.intercept(`/pairql/dashboard/${slug}`, response).as(slug);
 }
 

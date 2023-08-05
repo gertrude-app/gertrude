@@ -16,7 +16,7 @@ export function useQuery<T>(
 function useQueryResult<T>(
   key: unknown[],
   fn: () => Promise<Result<T, PqlError>>,
-  options: QueryOptions<T> & Partial<UseQueryOptions> = {},
+  options: QueryOptions<T> & Partial<UseQueryOptions<T, PqlError>> = {},
 ): QueryResult<T> {
   return useLibQuery({
     queryKey: key,
@@ -27,8 +27,8 @@ function useQueryResult<T>(
       }
       return value;
     },
-    enabled: options.enabled,
     retry: env.isCypress() ? false : 3,
+    ...options,
   });
 }
 
