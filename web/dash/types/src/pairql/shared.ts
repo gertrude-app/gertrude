@@ -88,7 +88,10 @@ export interface ServerPqlError {
   debugMessage: string;
   entityName?: string;
   showContactSupport: boolean;
-  dashboardTag?: 'magicLinkTokenNotFound' | 'slackVerificationFailed';
+  dashboardTag?:
+    | 'magicLinkTokenNotFound'
+    | 'slackVerificationFailed'
+    | 'emailAlreadyVerified';
   appTag?: 'userTokenNotFound' | 'connectionCodeNotFound';
   statusCode: number;
 }

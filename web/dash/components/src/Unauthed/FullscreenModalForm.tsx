@@ -5,13 +5,14 @@ import GradientIcon from '../GradientIcon';
 import FullscreenGradientBg from './FullscreenGradientBg';
 
 type Props =
-  | { request: `idle`; children: React.ReactNode }
-  | { request: `ongoing`; text?: string }
-  | { request: `failed`; error: React.ReactNode }
-  | { request: `succeeded`; message: string };
+  | { state: `idle`; children: React.ReactNode }
+  | { state: `ongoing`; text?: string }
+  | { state: `failed`; error: React.ReactNode }
+  | { state: `succeeded`; message: string }
+  | { state: `custom`; children: React.ReactNode };
 
 const FullscreenModalForm: React.FC<Props> = (props) => {
-  switch (props.request) {
+  switch (props.state) {
     case `ongoing`:
       return (
         <FullscreenGradientBg>
@@ -21,38 +22,38 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
 
     case `succeeded`:
     case `failed`:
+    case `custom`:
       return (
         <FullscreenGradientBg>
           <div
             className={cx(
-              `bg-white font-sans max-w-lg rounded-2xl mx-4 pt-8 pl-7 pr-8 shadow-lg flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 relative`,
-              props.request === `failed`
-                ? `items-center sm:items-start pb-6`
-                : `items-center pb-8`,
+              `bg-white font-sans max-w-lg rounded-2xl mx-4 pt-8 pl-7 pr-8 shadow-lg flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 relative items-center`,
+              props.state !== `succeeded` ? `sm:items-start pb-6` : `pb-8`,
             )}
           >
             <GradientIcon
-              icon={props.request === `succeeded` ? `thumbs-up` : `exclamation-triangle`}
+              icon={props.state === `failed` ? `exclamation-triangle` : `thumbs-up`}
               size="medium"
             />
             <div className="flex flex-col items-center sm:items-end">
-              <p
-                className={cx(
-                  `text-center sm:text-left text-slate-500`,
-                  props.request === `failed` ?? `text-red-900`,
-                )}
-              >
-                {props.request === `succeeded` ? props.message : props.error}
-              </p>
-              {props.request === `failed` && (
-                <Button
-                  color="secondary"
-                  type="external"
-                  href="https://gertrude.app/contact"
-                  className="mt-5"
-                >
-                  Contact support &rarr;
-                </Button>
+              {props.state === `custom` ? (
+                props.children
+              ) : (
+                <>
+                  <p className="text-center sm:text-left text-slate-500">
+                    {props.state === `succeeded` ? props.message : props.error}
+                  </p>
+                  {props.state === `failed` && (
+                    <Button
+                      color="secondary"
+                      type="external"
+                      href="https://gertrude.app/contact"
+                      className="mt-5"
+                    >
+                      Contact support &rarr;
+                    </Button>
+                  )}
+                </>
               )}
             </div>
           </div>

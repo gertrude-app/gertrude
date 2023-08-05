@@ -8,7 +8,7 @@ const meta = {
   parameters: { layout: `fullscreen` },
   decorators: [
     (Story) => (
-      <FullscreenModalForm request="idle">
+      <FullscreenModalForm state="idle">
         <Story />
       </FullscreenModalForm>
     ),

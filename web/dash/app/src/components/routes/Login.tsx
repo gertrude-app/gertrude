@@ -29,13 +29,13 @@ export const Login: React.FC = () => {
   }
 
   if (loginMutation.isLoading || requestMagicLink.isLoading) {
-    return <FullscreenModalForm request="ongoing" />;
+    return <FullscreenModalForm state="ongoing" />;
   }
 
   if (requestMagicLink.isSuccess) {
     return (
       <FullscreenModalForm
-        request="succeeded"
+        state="succeeded"
         message="Check your email for a magic link."
       />
     );
@@ -44,7 +44,7 @@ export const Login: React.FC = () => {
   if (loginMutation.isError || requestMagicLink.isError) {
     return (
       <FullscreenModalForm
-        request="failed"
+        state="failed"
         error={
           <ApiErrorMessage
             wrapped={false}
@@ -56,7 +56,7 @@ export const Login: React.FC = () => {
   }
 
   return (
-    <FullscreenModalForm request="idle">
+    <FullscreenModalForm state="idle">
       <LoginForm
         email={email}
         setEmail={setEmail}

@@ -1,5 +1,5 @@
 import { ApiErrorMessage, FullscreenModalForm } from '@dash/components';
-import { Navigate, useLocation, useParams } from 'react-router-dom';
+import { Navigate, Link, useLocation, useParams } from 'react-router-dom';
 import React from 'react';
 import { useFireAndForget, useLoginRedirect } from '../../hooks';
 import Current from '../../environment';
@@ -21,17 +21,17 @@ const MagicLink: React.FC = () => {
       error = (
         <span className="text-slate-900 antialiased">
           Magic Link token not found, or expired. Please{` `}
-          <a href="/login" className="underline text-blue-700 hover:text-blue-600">
+          <Link to="/login" className="underline text-blue-700 hover:text-blue-600">
             try again.
-          </a>
+          </Link>
         </span>
       );
     }
-    return <FullscreenModalForm request="failed" error={error} />;
+    return <FullscreenModalForm state="failed" error={error} />;
   }
 
   if (query.isLoading) {
-    return <FullscreenModalForm request="ongoing" />;
+    return <FullscreenModalForm state="ongoing" />;
   }
 
   return <Navigate to={redirectUrl ?? `/`} replace state={{ from: location }} />;

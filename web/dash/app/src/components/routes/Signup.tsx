@@ -10,13 +10,13 @@ const Signup: React.FC = () => {
   const signup = useMutation(() => Current.api.signup({ email, password }));
 
   if (signup.isLoading) {
-    return <FullscreenModalForm request="ongoing" />;
+    return <FullscreenModalForm state="ongoing" />;
   }
 
   if (signup.isError) {
     return (
       <FullscreenModalForm
-        request="failed"
+        state="failed"
         error="Shucks! Something went wrong, please try again."
       />
     );
@@ -25,14 +25,14 @@ const Signup: React.FC = () => {
   if (signup.isSuccess) {
     return (
       <FullscreenModalForm
-        request="succeeded"
+        state="succeeded"
         message="Verification email sent! Please check your inbox."
       />
     );
   }
 
   return (
-    <FullscreenModalForm request="idle">
+    <FullscreenModalForm state="idle">
       <EmailInputForm
         title="Signup"
         subTitle={

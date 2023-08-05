@@ -13,7 +13,7 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = props({
-  request: `idle`,
+  state: `idle`,
   children: (
     <EmailInputForm
       title="Join the waitlist"
@@ -26,18 +26,18 @@ export const Default: Story = props({
 });
 
 export const Fetching: Story = props({
-  request: `ongoing`,
+  state: `ongoing`,
 });
 
 // @screenshot: xs,md
 export const Succeeded: Story = props({
-  request: `succeeded`,
+  state: `succeeded`,
   message: `Success! Check your email for a verification link.`,
 });
 
 // @screenshot: xs,md
 export const Failed: Story = props({
-  request: `failed`,
+  state: `failed`,
   error: `Something went wrong. Please try again.`,
 });
 
