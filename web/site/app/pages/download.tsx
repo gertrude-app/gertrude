@@ -1,7 +1,7 @@
 import { Logo } from '@shared/components';
 import { Chrome } from '@site/components';
 import type { NextPage } from 'next';
-// import Catalina from '../public/macos-catalina.png';
+import Catalina from '../public/macos-catalina.png';
 import BigSur from '../public/macos-big-sur.png';
 import Monterey from '../public/macos-monterey.png';
 import Ventura from '../public/macos-ventura.png';
@@ -19,7 +19,7 @@ const Download: NextPage = () => (
           We currently support the following operating systems:
         </p>
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6 self-stretch">
-          {/* <OperatingSystem name="Catalina" img={Catalina.src} /> */}
+          <OperatingSystem name="Catalina" img={Catalina.src} />
           <OperatingSystem name="Big Sur" img={BigSur.src} />
           <OperatingSystem name="Monterey" img={Monterey.src} />
           <OperatingSystem name="Ventura" img={Ventura.src} />
