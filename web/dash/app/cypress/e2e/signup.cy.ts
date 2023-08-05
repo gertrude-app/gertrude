@@ -1,7 +1,26 @@
 /// <reference types="cypress" />
 
 describe(`signup`, () => {
-  beforeEach(() => {
+  // NB: we let as many requests go to origin for this flow as possible
+  it(`handles signup flow, minus stripe redirect`, () => {
+    cy.visit(`/signup`);
+    const email = `e2e-user-${Date.now()}@gertrude.app`;
+    cy.get(`input[name=email]`).type(email);
+    cy.get(`input[name=password]`).type(`bobbobbob{enter}`);
+    cy.contains(`Verification email sent`);
+
+    // logging in before email verification should not work
+    cy.visit(`/login`);
+    cy.get(`input[name=email]`).type(email);
+    cy.get(`input[name=password]`).type(`bobbobbob{enter}`);
+    cy.contains(`until your email is verified`);
+
+    // we can't click an email verify link, so intercept from here out
+    cy.interceptPql(`VerifySignupEmail`, {
+      adminId: `admin-123`,
+      token: `token-123`,
+    });
+
     cy.interceptPql(`GetDashboardWidgets`, {
       users: [],
       unlockRequests: [],
@@ -9,31 +28,12 @@ describe(`signup`, () => {
       recentScreenshots: [],
       numAdminNotifications: 0,
     });
-  });
 
-  it(`handles signup flow, minus stripe redirect`, () => {
-    cy.interceptPql(`VerifySignupEmail`, {
-      adminId: `admin-123`,
-      token: `token-123`,
-    });
-
-    cy.interceptPql(`Signup`, {});
-
-    cy.visit(`/signup`);
-    cy.get(`input[name=email]`).type(`new-user@example.com`);
-    cy.get(`input[name=password]`).type(`bobbobbob{enter}`);
-
-    cy.wait(`@Signup`).its(`request.body`).should(`deep.eq`, {
-      email: `new-user@example.com`,
-      password: `bobbobbob`,
-    });
-    cy.contains(`Verification email sent`);
-
-    cy.visit(`/verify-signup-email/ephemeral-123`);
+    cy.visit(`/verify-signup-email/verify-token-123`);
 
     cy.wait(`@VerifySignupEmail`)
       .its(`request.body`)
-      .should(`deep.eq`, { token: `ephemeral-123` });
+      .should(`deep.eq`, { token: `verify-token-123` });
 
     cy.wait(`@GetDashboardWidgets`)
       .its(`request.headers.${`X-AdminToken`.toLowerCase()}`)
