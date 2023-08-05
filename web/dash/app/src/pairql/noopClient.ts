@@ -177,7 +177,7 @@ const noopClient: ApiClient = {
     return Result.success({ success: true });
   },
   signup: async () => {
-    return Result.success({});
+    return Result.success({ success: true });
   },
   updateSuspendFilterRequest: async () => {
     return Result.success({ success: true });

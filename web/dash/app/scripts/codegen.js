@@ -101,18 +101,21 @@ async function main() {
   }
 
   const path = `\`/pairql/dashboard/\${slug}\``;
-  cypressLines.push(``);
-  cypressLines.push(`export function interceptPql(slug: string, output: any): void {`);
-  cypressLines.push(`  cy.intercept(${path}, output).as(slug);`);
-  cypressLines.push(`}`);
-  cypressLines.push(``);
+
+  cypressLines.push(`
+    export function interceptPql(slug: string, output: any): void {
+      // cypress chokes on the empty object, doesn't understand it should reply w/ it
+      const response = JSON.stringify(output) === \`{}\` ? \`{}\` : output;
+      cy.intercept(${path}, response).as(slug);
+    }
+  `);
+
   cypressLines.push(`export function forcePqlErr(`);
   cypressLines.push(`  slug: '${names.join(`' | '`)}',`);
   cypressLines.push(`  details: Record<string, any> = {},`);
   cypressLines.push(`): void {`);
   cypressLines.push(`  cy.intercept(${path}, { __cyStubbedError: true, ...details });`);
   cypressLines.push(`}`);
-  cypressLines.push(``);
 
   fs.writeFileSync(`${CY_DIR}/intercept.ts`, cypressLines.join(`\n`));
 
