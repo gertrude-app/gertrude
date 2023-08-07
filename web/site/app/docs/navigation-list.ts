@@ -34,6 +34,10 @@ const navigation = [
     title: `Engineering Blog`,
     links: [
       {
+        title: `Generic TypeScript React Components`,
+        href: `/blog/generic-react-components-typescript`,
+      },
+      {
         title: `Protocol Static Function Quirk`,
         href: `/blog/swift-protocol-static-function-selection-quirk`,
       },
