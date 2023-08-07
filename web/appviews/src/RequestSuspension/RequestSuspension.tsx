@@ -98,40 +98,6 @@ export const RequestSuspension: React.FC<Props> = ({
 
   return (
     <div className="min-h-screen flex relative overflow-hidden">
-      <div
-        className={cx(
-          `p-4 z-10 w-screen flex flex-row-reverse justify-between items-center absolute bottom-0 left-0`,
-          page === `comment` && `hidden`,
-        )}
-      >
-        <Button
-          type="button"
-          onClick={() => dispatch({ type: `nextFromDurationPageClicked` })}
-          color="secondary"
-          disabled={!duration.seconds}
-        >
-          Next
-          <i className="ml-3 fa-solid fa-chevron-right" />
-        </Button>
-        {adminAccountStatus === `needsAttention` ? (
-          <AccountPastDueBanner small withoutBorder />
-        ) : (
-          <Button
-            type="button"
-            onClick={() =>
-              emit({
-                case: `grantSuspensionClicked`,
-                durationInSeconds: duration.seconds ?? 0,
-              })
-            }
-            color="tertiary"
-            disabled={!duration.seconds}
-          >
-            <i className="mr-3 fa-solid fa-lock" />
-            Grant suspension
-          </Button>
-        )}
-      </div>
       <RequestSuspensionPage
         pageType="duration"
         currentlyViewedPage={page}
@@ -172,23 +138,23 @@ export const RequestSuspension: React.FC<Props> = ({
           </button>
           <div
             className={cx(
-              `absolute left-0 top-0 bg-slate-100 dark:bg-slate-900 w-full h-full rounded-b-lg backdrop-blur-xl [transition:300ms]`,
+              `absolute left-0 top-0 bg-slate-200 dark:bg-slate-900 w-full h-full rounded-b-lg backdrop-blur-xl [transition:300ms]`,
               duration.mode === `custom`
-                ? `opacity-80 block hover:bg-slate-200 dark:hover:bg-slate-800`
+                ? `opacity-80 dark:opacity-90 block hover:bg-slate-300 dark:hover:bg-slate-800`
                 : `opacity-0 hidden`,
             )}
             onClick={() => dispatch({ type: `closeCustomDurationDrawer` })}
           />
           <div
             className={cx(
-              `absolute left-0 bottom-0 w-full bg-white dark:bg-slate-900 rotate-180 transition duration-30 rounded-t-lg`,
+              `absolute left-0 bottom-0 w-full bg-white dark:bg-slate-900 rotate-180 transition duration-30`,
               duration.mode === `custom` &&
                 `shadow-md dark:shadow-lg shadow-slate-300/30 dark:shadow-black/30 rounded-b-xl`,
             )}
           >
             <div
               className={cx(
-                `border-t border-slate-200 dark:border-slate-700/70 dark:bg-slate-800/30 p-4 flex flex-col justify-end rounded-b-lg rotate-180 relative overflow-hidden`,
+                `border-t border-slate-200 dark:border-slate-700/70 dark:bg-slate-800/30 flex flex-col justify-end rounded-b-xl rotate-180 relative overflow-hidden`,
                 `[transition:300ms]`,
                 duration.mode === `custom` ? `h-48 rounded-t-xl` : `h-20`,
               )}
@@ -227,6 +193,37 @@ export const RequestSuspension: React.FC<Props> = ({
               >
                 <i className="fa-solid fa-times text-slate-400 text-sm" />
               </button>
+              <div
+                className={cx(`p-4 flex flex-row-reverse justify-between items-center`)}
+              >
+                <Button
+                  type="button"
+                  onClick={() => dispatch({ type: `nextFromDurationPageClicked` })}
+                  color="secondary"
+                  disabled={!duration.seconds}
+                >
+                  Next
+                  <i className="ml-3 fa-solid fa-chevron-right" />
+                </Button>
+                {adminAccountStatus === `needsAttention` ? (
+                  <AccountPastDueBanner small withoutBorder />
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      emit({
+                        case: `grantSuspensionClicked`,
+                        durationInSeconds: duration.seconds ?? 0,
+                      })
+                    }
+                    color="tertiary"
+                    disabled={!duration.seconds}
+                  >
+                    <i className="mr-3 fa-solid fa-lock" />
+                    Grant suspension
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -299,14 +296,14 @@ const RequestSuspensionPage: React.FC<RequestSuspensionPageProps> = ({
 }) => (
   <div
     className={cx(
-      `h-screen w-screen absolute top-0 [transition:300ms] duration-200`,
+      `h-full w-full absolute top-0 [transition:300ms] duration-200`,
       pageType === `duration` &&
         currentlyViewedPage === `comment` &&
-        `--left-screen opacity-0`,
+        `-left-full opacity-0x`,
       pageType === currentlyViewedPage && `left-0 opacity-100`,
       pageType === `comment` &&
         currentlyViewedPage === `duration` &&
-        `left-screen opacity-0`,
+        `left-full opacity-0x`,
       className,
     )}
   >
