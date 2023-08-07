@@ -32,7 +32,7 @@ const EnteringConnectionCode: React.FC<Props> = ({ emit, connectionCode, dispatc
             from Gertrude parent site
           </h4>
         </div>
-        <div className="flex justify-center rounded-xl space-x-1 bg-white/20 p-4">
+        <div className="flex justify-center rounded-2xl space-x-1 bg-white/20 p-4">
           <input
             type="text"
             value={connectionCode}
@@ -40,7 +40,7 @@ const EnteringConnectionCode: React.FC<Props> = ({ emit, connectionCode, dispatc
             onChange={(e) =>
               dispatch({ type: `connectionCodeUpdated`, code: e.target.value })
             }
-            className="rounded-l-xl rounded-r border-none h-12 shadow focus:ring-indigo-500 focus:ring-2 transition duration-100"
+            className="rounded-l-xl rounded-r border-none h-12 shadow focus:ring-indigo-500 focus:ring-2 transition duration-100 flex-grow"
           />
           <button
             type="button"
