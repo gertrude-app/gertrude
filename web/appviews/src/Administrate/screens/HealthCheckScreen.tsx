@@ -28,7 +28,7 @@ const HealthCheckScreen: React.FC<Props> = ({
   );
 
   return (
-    <div className="h-full overflow-y-scroll appview:overflow-y-auto relative">
+    <div className="h-full overflow-y-auto relative">
       <header className="flex items-center justify-between border-b p-4 border-slate-200 dark:border-slate-800 sticky bg-white dark:bg-slate-900 top-0 z-10">
         <div>
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">

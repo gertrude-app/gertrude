@@ -1,5 +1,6 @@
 import './index.css';
 import { MemoryRouter } from 'react-router-dom';
+import type { Preview } from '@storybook/react';
 
 export const decorators = [
   (Story) => (
@@ -37,3 +38,12 @@ export const parameters = {
     },
   },
 };
+
+const preview: Preview = {
+  globalTypes: {
+    darkMode: { defaultValue: false },
+    className: { defaultValue: `dark` },
+  },
+};
+
+export default preview;

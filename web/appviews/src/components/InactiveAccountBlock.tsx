@@ -14,7 +14,7 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
   return (
     <div
       className={cx(
-        `h-full appview:h-screen flex flex-col justify-center items-center bg-white dark:bg-slate-900 rounded-b-xl`,
+        `min-h-screen flex flex-col justify-center items-center bg-white dark:bg-slate-900`,
         short ? `p-4` : `p-8`,
       )}
     >
@@ -43,7 +43,7 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
           </p>
           {!short && (
             <p>
-              If you no longer with to use Gertrude, click the <strong>Disconnect</strong>
+              If you no longer wish to use Gertrude, click the <strong>Disconnect</strong>
               {` `}
               button below, then uninstall the app.
             </p>
@@ -60,7 +60,7 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
             to get help.
           </p>
         </div>
-        <div className="flex items-center space-x-4 bg-white dark:bg-slate-900 p-4 rounded-xl self-stretch justify-between border border-red-100 dark:border-red-500/50">
+        <div className="flex items-center mt-6 space-x-4 bg-white dark:bg-slate-900 p-4 rounded-xl self-stretch justify-between border border-red-100 dark:border-red-500/50">
           <Button
             type="button"
             onClick={() => {
