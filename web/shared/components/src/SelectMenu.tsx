@@ -22,7 +22,7 @@ function SelectMenu<Value extends string = string>({
   size = `large`,
   testId,
   disabled,
-}: Parameters<React.FC<Props<Value>>>[0]): ReturnType<React.FC<Props<Value>>> {
+}: Props<Value>): ReturnType<React.FC<Props<Value>>> {
   let buttonStyles = ``;
   switch (size) {
     case `small`:

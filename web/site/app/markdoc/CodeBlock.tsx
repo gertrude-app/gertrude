@@ -6,6 +6,8 @@ import 'prismjs/components/prism-rust.min';
 import 'prismjs/components/prism-swift.min';
 import 'prismjs/components/prism-yaml.min';
 import 'prismjs/components/prism-typescript.min';
+import 'prismjs/components/prism-jsx.min';
+import 'prismjs/components/prism-tsx.min';
 
 const CodeBlock: React.FC<{ children: React.ReactNode; 'data-language': string }> = ({
   children,
