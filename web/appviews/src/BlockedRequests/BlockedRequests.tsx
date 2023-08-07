@@ -34,7 +34,7 @@ export const BlockedRequests: React.FC<Props> = ({
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 flex flex-col rounded-b-xl h-full appview:h-screen appview:overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 flex flex-col h-screen overflow-hidden">
       {adminAccountStatus === `needsAttention` && <AccountPastDueBanner />}
       <header className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center">
@@ -181,23 +181,23 @@ const BottomPanel: React.FC<PanelProps> = ({
     );
   }
   return (
-    <BottomPanelWrap className="justify-between h-32">
+    <BottomPanelWrap className="justify-between h-32 space-x-4">
       <TextInput
         type="textarea"
         value={unlockRequestExplanation}
         setValue={(value) => dispatch({ type: `explanationUpdated`, text: value })}
         rows={3}
-        className="w-96"
         placeholder="Explanation..."
         noResize
       />
-      <div className="flex flex-col justify-end items-end">
+      <div className="flex flex-col justify-end items-end ">
         <span className="text-slate-600 dark:text-slate-400 font-medium mb-3">
           {selectedRequestIds.length} addresses selected
         </span>
         <Button
           color="secondary"
           type="button"
+          className="whitespace-nowrap"
           onClick={() =>
             emit({
               case: `unlockRequestSubmitted`,

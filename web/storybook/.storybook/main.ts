@@ -14,6 +14,7 @@ module.exports = {
     `@storybook/addon-links`,
     { name: `@storybook/addon-essentials`, options: { docs: false } },
     `@storybook/addon-interactions`,
+    `storybook-tailwind-dark-mode`,
   ],
   framework: `@storybook/react-vite`,
   features: {

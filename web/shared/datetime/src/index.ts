@@ -1,3 +1,5 @@
+import { inflect } from '@shared/string';
+
 export function isoToDateInput(iso: string): string {
   return formatDate(new Date(iso), `dateInput`);
 }
@@ -42,6 +44,7 @@ export const time = {
   subtracting,
   adding,
   stable,
+  humanDuration,
 };
 
 function stable(): string {
@@ -82,4 +85,20 @@ function subtracting(amounts: {
 
 function now(): string {
   return new Date().toISOString();
+}
+
+function humanDuration(seconds: number): string {
+  let minutes = Math.round(seconds / 60);
+  if (minutes < 60 || minutes === 90) {
+    return `${minutes} ${inflect(`minute`, minutes)}`;
+  }
+  const hours = Math.floor(minutes / 60);
+  minutes = minutes % 60;
+  if (minutes === 0) {
+    return `${hours} ${inflect(`hour`, hours)}`;
+  } else if (minutes === 30) {
+    return `${hours}.5 ${inflect(`hour`, hours)}`;
+  } else {
+    return `${hours} ${inflect(`hour`, hours)} ${minutes} ${inflect(`minute`, minutes)}`;
+  }
 }

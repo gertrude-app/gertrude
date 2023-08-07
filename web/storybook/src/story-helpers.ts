@@ -265,3 +265,21 @@ export function screenshot(
     deleted,
   };
 }
+
+export function appWindow(width = 900, height = 600): Record<string, any> {
+  return {
+    layout: `fullscreen`,
+    viewport: {
+      viewports: {
+        appWindow: {
+          name: `AppWindow`,
+          styles: {
+            width: `${width}px`,
+            height: `${height}px`,
+          },
+        },
+      },
+      defaultViewport: `appWindow`,
+    },
+  };
+}

@@ -14,7 +14,7 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
   return (
     <div
       className={cx(
-        `h-full appview:h-screen flex flex-col justify-center items-center bg-white dark:bg-slate-900 rounded-b-xl`,
+        `min-h-screen flex flex-col justify-center items-center bg-white dark:bg-slate-900`,
         short ? `p-4` : `p-8`,
       )}
     >
@@ -36,14 +36,14 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
             </p>
           )}
           <p>
-            To <strong>restore the account,</strong> login to the Gertrude web admin
-            dashboard, resolve the payment issue, and click the <strong>Recheck</strong>
+            To <strong>restore the account,</strong> login to the Gertrude parent site and
+            resolve the payment issue, then click the <strong>Recheck</strong>
             {` `}
             button below.
           </p>
           {!short && (
             <p>
-              If you no longer with to use Gertrude, click the <strong>Disconnect</strong>
+              If you no longer wish to use Gertrude, click the <strong>Disconnect</strong>
               {` `}
               button below, then uninstall the app.
             </p>
@@ -51,16 +51,16 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
           <p>
             Contact us at at{` `}
             <a
-              href="mailto:support@gertrude.app"
+              href="https://gertrude.app/contact"
               className="font-semibold text-slate-800 dark:text-slate-200 border-b-2 pb-1 border-transparent dark:border-transparent hover:border-slate-600 dark:hover:border-slate-100 hover:pb-0.5 [transition:200ms]"
             >
-              support@gertrude.app
+              https://gertrude.app/contact
             </a>
             {` `}
             to get help.
           </p>
         </div>
-        <div className="flex items-center space-x-4 bg-white dark:bg-slate-900 p-4 rounded-xl self-stretch justify-between border border-red-100 dark:border-red-500/50">
+        <div className="flex items-center mt-6 space-x-4 bg-white dark:bg-slate-900 p-4 rounded-xl self-stretch justify-between border border-red-100 dark:border-red-500/50">
           <Button
             type="button"
             onClick={() => {

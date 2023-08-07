@@ -92,18 +92,16 @@ export const Administrate: React.FC<Props> = ({
   }
 
   return (
-    <div className="flex flex-col h-full appview:h-screen">
+    <div className="flex flex-col min-h-screen">
       {valueOf(healthCheck.accountStatus) === `needsAttention` && (
         <AccountPastDueBanner />
       )}
-      <div className="flex rounded-b-xl overflow-hidden flex-grow">
+      <div className="flex overflow-hidden flex-grow">
         <SidebarNav
           screen={screen}
           setScreen={(screen) => emit({ case: `gotoScreenClicked`, screen })}
         />
-        <main className="flex-grow bg-white dark:bg-slate-900 rounded-br-xl">
-          {pageElement}
-        </main>
+        <main className="flex-grow bg-white dark:bg-slate-900">{pageElement}</main>
       </div>
     </div>
   );

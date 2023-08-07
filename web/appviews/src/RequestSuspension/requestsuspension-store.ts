@@ -16,6 +16,7 @@ export interface AppState {
 
 export type AppEvent =
   | { case: 'requestSubmitted'; durationInSeconds: number; comment?: string }
+  | { case: 'grantSuspensionClicked'; durationInSeconds: number }
   | { case: 'closeWindow' }
   | { case: 'requestFailedTryAgainClicked' }
   | { case: 'inactiveAccountRecheckClicked' }
@@ -26,14 +27,8 @@ export type ViewState = {
   comment: string;
   page: 'duration' | 'comment';
   duration:
-    | {
-        mode: `standard`;
-        seconds: StandardDuration | null;
-      }
-    | {
-        mode: `custom`;
-        seconds: number | null;
-      };
+    | { mode: `standard`; seconds: StandardDuration | null }
+    | { mode: `custom`; seconds: number | null };
 };
 
 export type ViewAction =
@@ -84,7 +79,10 @@ export class RequestSuspensionStore extends Store<
       case `customDurationUpdated`:
         return { ...state, duration: { mode: `custom`, seconds: action.seconds } };
       case `chooseCustomDurationClicked`:
-        return { ...state, duration: { mode: `custom`, seconds: null } };
+        return {
+          ...state,
+          duration: { mode: `custom`, seconds: state.duration.seconds ?? 90 * 60 },
+        };
       case `closeCustomDurationDrawer`:
         return { ...state, duration: { mode: `standard`, seconds: null } };
       case `nextFromDurationPageClicked`:

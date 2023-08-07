@@ -1,13 +1,7 @@
 const defaultTheme = require(`tailwindcss/defaultTheme`);
-const plugin = require(`tailwindcss/plugin`);
 
 module.exports = {
-  plugins: [
-    require(`@tailwindcss/forms`),
-    plugin(({ addVariant }) => {
-      addVariant(`appview`, `.appview-fullscreen &`);
-    }),
-  ],
+  plugins: [require(`@tailwindcss/forms`)],
   darkMode: `class`,
   theme: {
     screens: {

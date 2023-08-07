@@ -45,6 +45,7 @@ importers:
       '@dash/components': workspace:*
       '@headlessui/react': 1.7.12
       '@shared/components': workspace:*
+      '@shared/datetime': workspace:*
       '@shared/string': workspace:*
       '@shared/tailwind': workspace:*
       '@shared/ts-utils': workspace:*
@@ -61,6 +62,7 @@ importers:
       '@dash/components': link:../dash/components
       '@headlessui/react': 1.7.12_biqbaboplfbrettd7655fr4n2y
       '@shared/components': link:../shared/components
+      '@shared/datetime': link:../shared/datetime
       '@shared/string': link:../shared/string
       '@shared/tailwind': link:../shared/tailwind
       '@shared/ts-utils': link:../shared/ts-utils
@@ -246,7 +248,10 @@ importers:
       react-router-dom: 6.4.3_biqbaboplfbrettd7655fr4n2y
 
   shared/datetime:
-    specifiers: {}
+    specifiers:
+      '@shared/string': workspace:*
+    dependencies:
+      '@shared/string': link:../string
 
   shared/string:
     specifiers: {}
@@ -270,6 +275,7 @@ importers:
       '@markdoc/next.js': 0.2.2
       '@shared/components': workspace:*
       '@shared/datetime': workspace:*
+      '@shared/string': workspace:*
       '@shared/tailwind': workspace:*
       '@sindresorhus/slugify': ^2.1.0
       '@site/components': workspace:*
@@ -295,6 +301,7 @@ importers:
       '@markdoc/next.js': 0.2.2_igkwadbjzzjda3pckvsn6lxjiu
       '@shared/components': link:../../shared/components
       '@shared/datetime': link:../../shared/datetime
+      '@shared/string': link:../../shared/string
       '@shared/tailwind': link:../../shared/tailwind
       '@sindresorhus/slugify': 2.1.1
       '@site/components': link:../components
@@ -368,6 +375,7 @@ importers:
       react-dom: ^18.0.0
       react-router-dom: ^6.3.0
       storybook: 7.0.0-rc.4
+      storybook-tailwind-dark-mode: 1.0.22
       tailwindcss: 3.3.3
       ts-node: 10.9.1
       vite: ^3.2.0
@@ -407,6 +415,7 @@ importers:
       react-dom: 18.2.0_react@18.2.0
       react-router-dom: 6.4.3_biqbaboplfbrettd7655fr4n2y
       storybook: 7.0.0-rc.4
+      storybook-tailwind-dark-mode: 1.0.22_biqbaboplfbrettd7655fr4n2y
       tailwindcss: 3.3.3_ts-node@10.9.1
       ts-node: 10.9.1_@types+node@18.11.9
       vite: 3.2.2
@@ -3799,7 +3808,7 @@ packages:
       tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1'
     dependencies:
       mini-svg-data-uri: 1.4.4
-      tailwindcss: 3.3.3
+      tailwindcss: 3.3.3_ts-node@10.9.1
     dev: false
 
   /@tailwindcss/typography/0.5.7_tailwindcss@3.3.3:
@@ -9877,6 +9886,26 @@ packages:
 
   /store2/2.14.2:
     resolution: {integrity: sha512-siT1RiqlfQnGqgT/YzXVUNsom9S0H1OX+dpdGN1xkyYATo4I6sep5NmsRD/40s3IIOvlCq6akxkqG82urIZW1w==}
+    dev: false
+
+  /storybook-tailwind-dark-mode/1.0.22_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-I0HSVCuvo3OkaGDnCjLM7V1OYmQccrUCAGZ5ZaJfl9s3e93WA6DKFpQRbuoSidci+PTy+KvgrINgE08rA16bWA==}
+    peerDependencies:
+      '@storybook/addons': ^7.0.0
+      '@storybook/api': ^7.0.0
+      '@storybook/components': ^7.0.0
+      '@storybook/core-events': ^7.0.0
+      '@storybook/theming': ^7.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /storybook/7.0.0-rc.4:

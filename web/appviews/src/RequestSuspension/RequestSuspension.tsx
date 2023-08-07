@@ -1,5 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
+import { time } from '@shared/datetime';
 import { Button, Loading, TextInput } from '@shared/components';
 import type {
   AppState,
@@ -28,7 +29,7 @@ export const RequestSuspension: React.FC<Props> = ({
 }) => {
   if (!internetConnected) {
     return (
-      <div className="h-full appview:h-screen flex justify-center bg-white dark:bg-slate-900 items-center px-12">
+      <div className="min-h-screen flex justify-center bg-white dark:bg-slate-900 items-center px-12">
         <ErrorBlock
           title="No Internet!"
           message="You must be connected to the internet in order to submit a filter suspension request. If you’re trying to connect to a public wifi network, consider temporarily using a hotspot."
@@ -38,7 +39,7 @@ export const RequestSuspension: React.FC<Props> = ({
   }
   if (request.case === `ongoing`) {
     return (
-      <div className="h-full appview:h-screen flex justify-center items-center flex-col space-y-4 bg-white dark:bg-slate-900 rounded-b-lg">
+      <div className="min-h-screen flex justify-center items-center flex-col space-y-4 bg-white dark:bg-slate-900">
         <Loading />
         <h3 className="text-slate-500 font-medium text-lg dark:text-slate-400">
           Submitting...
@@ -47,8 +48,8 @@ export const RequestSuspension: React.FC<Props> = ({
     );
   } else if (request.case === `succeeded`) {
     return (
-      <div className="h-full appview:h-screen flex justify-center items-center p-8 bg-white dark:bg-slate-900 rounded-b-lg">
-        <div className="flex justify-center items-center flex-col border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/30 rounded-2xl w-full h-full">
+      <div className="min-h-screen flex justify-center items-center p-8 bg-white dark:bg-slate-900">
+        <div className="flex justify-center items-center flex-col border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/30 rounded-2xl self-stretch w-full">
           <div className="flex flex-row items-center space-x-3 mb-8">
             <div className="bg-green-500 rounded-full w-6 h-6 flex justify-center items-center">
               <i className="fa-solid fa-check text-white dark:text-slate-900" />
@@ -70,7 +71,7 @@ export const RequestSuspension: React.FC<Props> = ({
     );
   } else if (request.case === `failed`) {
     return (
-      <div className="h-full appview:h-screen flex justify-center items-center p-8 bg-white dark:bg-slate-900 rounded-b-lg">
+      <div className="min-h-screen flex justify-center items-center p-8 bg-white dark:bg-slate-900">
         <ErrorBlock
           title="Filter suspension request failed:"
           message={request.error}
@@ -96,11 +97,45 @@ export const RequestSuspension: React.FC<Props> = ({
   }
 
   return (
-    <div className="h-full appview:h-screen flex relative">
+    <div className="min-h-screen flex relative overflow-hidden">
+      <div
+        className={cx(
+          `p-4 z-10 w-screen flex flex-row-reverse justify-between items-center absolute bottom-0 left-0`,
+          page === `comment` && `hidden`,
+        )}
+      >
+        <Button
+          type="button"
+          onClick={() => dispatch({ type: `nextFromDurationPageClicked` })}
+          color="secondary"
+          disabled={!duration.seconds}
+        >
+          Next
+          <i className="ml-3 fa-solid fa-chevron-right" />
+        </Button>
+        {adminAccountStatus === `needsAttention` ? (
+          <AccountPastDueBanner small withoutBorder />
+        ) : (
+          <Button
+            type="button"
+            onClick={() =>
+              emit({
+                case: `grantSuspensionClicked`,
+                durationInSeconds: duration.seconds ?? 0,
+              })
+            }
+            color="tertiary"
+            disabled={!duration.seconds}
+          >
+            <i className="mr-3 fa-solid fa-lock" />
+            Grant suspension
+          </Button>
+        )}
+      </div>
       <RequestSuspensionPage
         pageType="duration"
         currentlyViewedPage={page}
-        className="flex flex-col bg-white dark:bg-slate-900 rounded-b-lg"
+        className="flex flex-col bg-white dark:bg-slate-900"
       >
         <div className="flex flex-col justify-center items-center flex-grow pb-20">
           <h3 className="font-bold mb-3 dark:text-slate-100">
@@ -119,7 +154,7 @@ export const RequestSuspension: React.FC<Props> = ({
                   )}
                   onClick={() => dispatch({ type: `standardDurationClicked`, seconds })}
                 >
-                  {formatDuration(seconds)}
+                  {time.humanDuration(seconds)}
                 </button>
               );
             })}
@@ -155,7 +190,7 @@ export const RequestSuspension: React.FC<Props> = ({
               className={cx(
                 `border-t border-slate-200 dark:border-slate-700/70 dark:bg-slate-800/30 p-4 flex flex-col justify-end rounded-b-lg rotate-180 relative overflow-hidden`,
                 `[transition:300ms]`,
-                duration.mode === `custom` ? `h-52 rounded-t-xl` : `h-20`,
+                duration.mode === `custom` ? `h-48 rounded-t-xl` : `h-20`,
               )}
             >
               <div
@@ -165,8 +200,9 @@ export const RequestSuspension: React.FC<Props> = ({
                 )}
               >
                 <TextInput
+                  key={duration.mode} // number type local value override
                   type="positiveInteger"
-                  value={String(duration.seconds ? duration.seconds / 60 : 0)}
+                  value={String(duration.seconds ? duration.seconds / 60 : 90)}
                   setValue={(value) =>
                     dispatch({
                       type: `customDurationUpdated`,
@@ -191,32 +227,6 @@ export const RequestSuspension: React.FC<Props> = ({
               >
                 <i className="fa-solid fa-times text-slate-400 text-sm" />
               </button>
-              <div className="flex flex-row-reverse justify-between items-center">
-                <Button
-                  type="button"
-                  onClick={() => dispatch({ type: `nextFromDurationPageClicked` })}
-                  color="secondary"
-                  disabled={!duration.seconds}
-                >
-                  Next
-                  <i className="ml-3 fa-solid fa-chevron-right" />
-                </Button>
-                {adminAccountStatus === `needsAttention` ? (
-                  <AccountPastDueBanner small withoutBorder />
-                ) : (
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      /* TODO */
-                    }}
-                    color="tertiary"
-                    disabled={!duration.seconds}
-                  >
-                    <i className="mr-3 fa-solid fa-lock" />
-                    Start suspension
-                  </Button>
-                )}
-              </div>
             </div>
           </div>
         </div>
@@ -236,6 +246,7 @@ export const RequestSuspension: React.FC<Props> = ({
             setValue={(value) => dispatch({ type: `commentUpdated`, value })}
             placeholder="Super compelling reason"
             noResize
+            className="max-w-[550px] justify-center"
             rows={3}
           />
         </div>
@@ -249,8 +260,8 @@ export const RequestSuspension: React.FC<Props> = ({
             <i className="mr-3 fa-solid fa-chevron-left" />
             Back
           </Button>
-          <span className="font-medium text-slate-800 dark:text-slate-400">
-            {formatDuration(duration.seconds || 0)}
+          <span className="font-medium text-slate-400 dark:text-slate-600">
+            {time.humanDuration(duration.seconds || 0)}
           </span>
           <Button
             type="button"
@@ -288,32 +299,20 @@ const RequestSuspensionPage: React.FC<RequestSuspensionPageProps> = ({
 }) => (
   <div
     className={cx(
-      `w-full h-full absolute top-0 [transition:300ms] duration-200`,
+      `h-screen w-screen absolute top-0 [transition:300ms] duration-200`,
       pageType === `duration` &&
         currentlyViewedPage === `comment` &&
-        `-left-full opacity-0`,
+        `--left-screen opacity-0`,
       pageType === currentlyViewedPage && `left-0 opacity-100`,
       pageType === `comment` &&
         currentlyViewedPage === `duration` &&
-        `left-full opacity-0`,
+        `left-screen opacity-0`,
       className,
     )}
   >
     {children}
   </div>
 );
-
-function formatDuration(seconds: number): string {
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  if (hours) {
-    return `${hours} hour${hours === 1 ? `` : `s`}`;
-  }
-  if (minutes) {
-    return `${minutes} minute${minutes === 1 ? `` : `s`}`;
-  }
-  return `${Math.floor(seconds)} seconds`;
-}
 
 export default containerize<AppState, AppEvent, ViewState, ViewAction>(
   store,

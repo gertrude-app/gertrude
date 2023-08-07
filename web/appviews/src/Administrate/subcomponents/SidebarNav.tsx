@@ -10,7 +10,7 @@ interface Props {
 const SidebarNav: React.FC<Props> = ({ screen, setScreen }) => {
   const [timesHiddenClicked, setTimesHiddenClicked] = useState(0);
   return (
-    <nav className="border-slate-200 dark:border-slate-800 border-r p-2 font-bold flex flex-col items-stretch space-y-1 bg-white dark:bg-slate-900 rounded-bl-xl">
+    <nav className="border-slate-200 dark:border-slate-800 border-r p-2 font-bold flex flex-col items-stretch space-y-1 bg-white dark:bg-slate-900">
       <SidebarButton
         isActive={screen === `home`}
         onClick={() => setScreen(`home`)}

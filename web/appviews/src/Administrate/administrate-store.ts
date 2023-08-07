@@ -9,12 +9,12 @@ export type Screen = 'home' | 'healthCheck' | 'exemptUsers' | 'advanced';
 export interface HealthCheck {
   latestAppVersion?: { case: 'ok'; value: string } | { case: 'error'; message?: string };
   filterStatus?:
+    | { case: 'communicationBroken'; repairing: boolean }
     | { case: 'installed'; version: string; numUserKeys: number }
     | { case: 'installing' }
     | { case: 'installTimeout' }
     | { case: 'notInstalled' }
-    | { case: 'unexpected' }
-    | { case: 'communicationBroken' };
+    | { case: 'unexpected' };
   accountStatus?: Failable<AdminAccountStatus>;
   screenRecordingPermissionOk?: boolean;
   keystrokeRecordingPermissionOk?: boolean;
@@ -80,7 +80,6 @@ export type AppEvent =
   | { case: 'advanced'; action: AdvancedAction }
   | { case: 'gotoScreenClicked'; screen: Screen }
   | { case: 'releaseChannelUpdated'; channel: 'stable' | 'beta' | 'canary' }
-  | { case: 'suspendFilterClicked'; durationInSeconds: number }
   | { case: 'setUserExemption'; userId: number; enabled: boolean }
   | { case: 'closeWindow' }
   | { case: 'stopFilterClicked' }

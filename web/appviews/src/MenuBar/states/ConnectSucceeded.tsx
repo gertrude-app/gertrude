@@ -10,7 +10,7 @@ interface Props {
 const ConnectSucceeded: React.FC<Props> = ({ emit, userName }) => (
   <MenuBarSized className="flex flex-col justify-center items-center">
     <p className="text-black/80 dark:text-white/70 font-medium">
-      Success! Connected to user:
+      Success!&nbsp; Connected to child:
     </p>
     <p className="mt-2 font-inter text-black dark:text-white text-xl">{userName}</p>
     <button
