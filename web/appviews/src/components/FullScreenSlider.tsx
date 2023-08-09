@@ -7,7 +7,7 @@ interface Props {
 }
 
 const FullScreenSlider: React.FC<Props> = ({ pages, index }) => (
-  <div className="h-screen w-screen relative bg-white dark:bg-slate-900">
+  <div className="h-screen w-screen relative bg-white dark:bg-slate-900 overflow-hidden">
     {pages.map((page, i) => (
       <div
         className={cx(
