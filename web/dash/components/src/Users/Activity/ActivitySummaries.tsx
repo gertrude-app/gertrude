@@ -28,12 +28,12 @@ const ActivitySummaries: React.FC<Props> = ({ userName, days }) => (
       </div>
     ) : (
       <EmptyState
-        heading={`No activity to review`}
-        secondaryText={`No activity has been reported from this user in the past two weeks.`}
-        icon={`user`}
-        buttonText={`Back to all users`}
+        heading="No activity to review"
+        secondaryText="No activity has been reported from this child in the past two weeks."
+        icon="user"
+        buttonText="Back to all children"
         buttonIcon="users"
-        action={`/users`}
+        action="/children"
       />
     )}
   </>

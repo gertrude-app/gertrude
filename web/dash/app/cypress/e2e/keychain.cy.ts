@@ -35,7 +35,7 @@ describe(`create keychain`, () => {
     cy.contains(`Existing`).should(`not.exist`);
   });
 
-  it(`(the keychain picker) shows empty state when user already has all personal keychains`, () => {
+  it(`(the keychain picker) shows empty state when child already has all personal keychains`, () => {
     const existing: AdminKeychain = {
       summary: mock.keychainSummary({ name: `Test keychain`, authorId: betsy.id }),
       keys: [],
@@ -58,14 +58,14 @@ describe(`create keychain`, () => {
 
   describe(`no keychains to start`, () => {
     beforeEach(() => {
-      // admin starts with no keychains
+      // parent starts with no keychains
       cy.interceptPql(`GetAdminKeychains`, []);
       // and no prior selectable keychains
       cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
     });
 
-    it(`(the keychain picker) shows empty state when admin has no personal keychains to assign`, () => {
-      cy.visit(`/users`);
+    it(`(the keychain picker) shows empty state when parent has no personal keychains to assign`, () => {
+      cy.visit(`/children`);
       cy.testId(`edit-user`).click();
       cy.contains(`Add keychain`).click();
       cy.contains(`No personal keychains`);

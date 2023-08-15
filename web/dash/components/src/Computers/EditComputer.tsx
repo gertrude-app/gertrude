@@ -117,7 +117,7 @@ const EditComputer: React.FC<Props> = ({
       </div>
     </div>
     <div className="border border-slate-200 mt-4 sm:mt-6 rounded-3xl bg-white p-6 sm:p-8">
-      <h3 className="text-xl font-bold text-slate-900">Users on this computer:</h3>
+      <h3 className="text-xl font-bold text-slate-900">Children using this computer:</h3>
       <div className="mt-6">
         {users.map((user) => (
           <ComputerUser key={user.id} {...user} />
@@ -151,7 +151,7 @@ interface ComputerUserProps {
 
 const ComputerUser: React.FC<ComputerUserProps> = ({ name, id, isOnline }) => (
   <Link
-    to={`/users/${id}`}
+    to={`/children/${id}`}
     className="flex justify-between items-center odd:bg-slate-50 hover:bg-slate-100 transition duration-100 px-4 py-3 rounded-xl"
   >
     <h4 className="text-slate-700 font-semibold sm:text-lg">{name}</h4>

@@ -66,7 +66,7 @@ const CombinedUsersActivityFeed: React.FC<Props> = ({
             size="large"
           >
             <i className="fa-solid fa-thumbs-up mr-2" />
-            Approve all user activity
+            Approve all child activity
           </Button>
         </ReviewDayWrapper>
       ) : (

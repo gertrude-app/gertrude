@@ -1,3 +1,6 @@
+# parent rename
+/docs/keeping-users-safe /docs/keeping-children-safe 301
+
 # docs page root -> /docs/getting-started (for now)
 /docs /docs/getting-started 302
 

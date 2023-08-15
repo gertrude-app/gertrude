@@ -29,7 +29,7 @@ const UserScreenshotsWidget: React.FC<Props> = ({ className, screenshots }) => (
             </div>
             <img
               src={screenshot.url}
-              alt="User screenshot"
+              alt="Child screenshot"
               className="block rounded-lg w-32 sm:h-full sm:w-auto md:h-auto md:w-48 lg:w-40 xl:w-36 ml-2"
             />
           </div>

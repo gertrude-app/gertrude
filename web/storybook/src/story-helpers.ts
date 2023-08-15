@@ -283,3 +283,21 @@ export function appWindow(width = 900, height = 600): Record<string, any> {
     },
   };
 }
+
+export function fixedViewport(width: number, height: number): Record<string, any> {
+  return {
+    layout: `fullscreen`,
+    viewport: {
+      viewports: {
+        fixed: {
+          name: `Fixed`,
+          styles: {
+            width: `${width}px`,
+            height: `${height}px`,
+          },
+        },
+      },
+      defaultViewport: `fixed`,
+    },
+  };
+}

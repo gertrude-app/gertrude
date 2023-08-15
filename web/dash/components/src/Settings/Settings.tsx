@@ -118,7 +118,7 @@ const Settings: React.FC<Props> = ({
       <div className="xs:bg-white xs:border border-slate-200 p-2 xs:p-8 rounded-3xl">
         <h2 className="text-2xl font-bold text-slate-800">Notification methods</h2>
         <p className="text-slate-500 mt-1">
-          Verified ways that Gertrude can notify you for user requests
+          Verified ways that Gertrude can notify you for child requests
         </p>
         <ul className="mt-6">
           {methods.map((method) => (

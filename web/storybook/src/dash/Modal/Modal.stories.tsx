@@ -31,7 +31,7 @@ export const TinyError: Story = props({
   ...Default.args,
   title: `Error`,
   secondaryButton: undefined,
-  children: `User not found`,
+  children: `Child not found`,
 });
 
 export const Loading: Story = props({

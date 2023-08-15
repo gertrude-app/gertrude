@@ -11,14 +11,14 @@ const MainHeader: React.FC = () => (
     <div className="hidden sm:flex space-x-3">
       <Button
         type="external"
-        href="https://dash.gertrude.app"
+        href="https://parents.gertrude.app"
         color="secondary-on-violet-bg"
       >
         Log in
       </Button>
       <Button
         type="external"
-        href="https://dash.gertrude.app/signup"
+        href="https://parents.gertrude.app/signup"
         color="primary-on-violet-bg"
       >
         Sign up

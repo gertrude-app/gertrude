@@ -187,7 +187,7 @@ export default class HealthChecker {
         return {
           title: `Notification settings`,
           state: `fail`,
-          message: `Notifications disabled, users will miss critical updates`,
+          message: `Notifications disabled, child will miss critical updates`,
           button: {
             icon: `cog`,
             label: `Fix setting`,
@@ -225,13 +225,13 @@ export default class HealthChecker {
         return {
           title: `Gertrude account status`,
           state: `warn`,
-          message: `Needs attention: log in to the Gertrude parent admin website for more details`,
+          message: `Needs attention: log in to the Gertrude parents website for more details`,
         };
       default:
         return {
           title: `Gertrude account status`,
           state: `fail`,
-          message: `Log in to the Gertrude parent admin website to resolve`,
+          message: `Log in to the Gertrude parents website to resolve`,
         };
     }
   }

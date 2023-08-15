@@ -38,39 +38,39 @@ describe(`dashboard app login`, () => {
     });
 
     it(`handles magic-link with redirect`, () => {
-      cy.visit(`/login?redirect=${encodeURIComponent(`/users/123`)}`);
+      cy.visit(`/login?redirect=${encodeURIComponent(`/children/123`)}`);
       cy.get(`input[name=email]`).type(betsy.email);
       cy.testId(`magic-link`).click();
 
       cy.wait(`@RequestMagicLink`)
         .its(`request.body`)
-        .should(`deep.equal`, { email: betsy.email, redirect: `/users/123` });
+        .should(`deep.equal`, { email: betsy.email, redirect: `/children/123` });
 
       cy.contains(`Check your email`);
     });
 
-    it(`redirects to / if admin is already logged in`, () => {
+    it(`redirects to / if parent is already logged in`, () => {
       cy.simulateLoggedIn();
       cy.visit(`/login`);
       cy.contains(`Dashboard`);
     });
 
     it(`redirects to intended location after login (missing admin tokens)`, () => {
-      cy.visit(`/users`);
+      cy.visit(`/children`);
       cy.url().should(`include`, `/login`);
       cy.get(`input[name=email]`).type(`82uii.betsy-mcstandard@inbox.testmail.app`);
       cy.get(`input[name=password]`).type(`betsy123{enter}`);
-      cy.location(`pathname`).should(`eq`, `/users`);
+      cy.location(`pathname`).should(`eq`, `/children`);
     });
 
-    it(`redirects to intended location after login (expired admin tokens)`, () => {
+    it(`redirects to intended location after login (expired tokens)`, () => {
       localStorage.setItem(`admin_id`, betsy.id);
       localStorage.setItem(`admin_token`, `deadbeef-dead-beef-dead-beefdeadbeef`);
-      cy.visit(`/users`);
+      cy.visit(`/children`);
       cy.url().should(`include`, `/login`);
       cy.get(`input[name=email]`).type(`82uii.betsy-mcstandard@inbox.testmail.app`);
       cy.get(`input[name=password]`).type(`betsy123{enter}`);
-      cy.location(`pathname`).should(`eq`, `/users`);
+      cy.location(`pathname`).should(`eq`, `/children`);
     });
   });
 
@@ -86,7 +86,7 @@ describe(`dashboard app login`, () => {
       cy.contains(`Email sent!`).should(`be.visible`);
     });
 
-    it(`logs user back in after password reset`, () => {
+    it(`logs parent back in after password reset`, () => {
       cy.interceptPql(`ResetPassword`, { success: true });
       cy.visit(`/reset-password/123`);
       cy.contains(`Choose a new password`);

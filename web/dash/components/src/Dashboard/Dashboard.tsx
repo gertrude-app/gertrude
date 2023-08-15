@@ -97,18 +97,17 @@ const Dashboard: React.FC<Props> = ({
           Welcome to the parent website!
         </h1>
         <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
-          The first step to getting up and running is to{` `}
-          <b>
-            create a <span className="underline">user</span>
-          </b>
+          The first step to getting up and running is to
           {` `}
-          for at least one of your kids.
+          <b>add a child</b>
+          {` `}
+          that you'd like to protect.
         </p>
         <div className="mt-12 flex flex-col gap-4">
           <OnboardingRecommendation
-            title="Create a user"
+            title="Add a child"
             icon="fa-solid fa-user-plus"
-            href="/users/new"
+            href="/children/new"
             primary
           />
           <div className="flex flex-col xl:flex-row gap-4">

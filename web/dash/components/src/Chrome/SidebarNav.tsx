@@ -55,8 +55,8 @@ const SidebarNav: React.FC<Props> = ({
         <SidebarOption
           Icon={UsersIcon}
           collapsed={collapsed}
-          to="/users"
-          isSelected={urlPath.startsWith(`/users`)}
+          to="/children"
+          isSelected={urlPath.startsWith(`/children`)}
           onClick={onInternalLinkClick}
         >
           Children

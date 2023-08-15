@@ -70,7 +70,7 @@ const App: React.FC = () => {
           <Route path=":computerId" element={<Computer />} />
         </Route>
 
-        <Route path="users">
+        <Route path="children">
           <Route index element={<Users />} />
 
           <Route path="activity">

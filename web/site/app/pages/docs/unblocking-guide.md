@@ -102,10 +102,10 @@ the effort, but **there are several things that make this process easier:**
 3. As long as you don't unlock domains like `google.com` or `facebook.com` accidentally,
    there's usually very little danger in unlocking a few of the wrong domains while you're
    hunting for which domain or domains still needs to be unblocked for a site.
-4. You and your user/s will get good at this with a _little practice._
+4. You and your children will get good at this with a _little practice._
 5. Once you have a site fully unlocked, with Gertrude's _keychains_ feature you can easily
-   _share the full set of keys_ with all of the users you are protecting&mdash;you won't
-   have to repeat the process again.
+   _share the full set of keys_ with all of the children you are protecting&mdash;you
+   won't have to repeat the process again.
 6. You can always [reach out to us](https://gertrude.app/support) if you're having trouble
    getting a site unlocked.
 7. We're exploring some ways to in the future try to _automatically discover and unlock_
