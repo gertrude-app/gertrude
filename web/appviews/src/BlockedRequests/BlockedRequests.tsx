@@ -39,14 +39,14 @@ export const BlockedRequests: React.FC<Props> = ({
       <header className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center">
           <input
-            className="bg-slate-50 dark:bg-slate-800/50 dark:focus:bg-slate-800 rounded-xl px-4 py-2 w-80 transition duration-100 focus:bg-slate-50 focus:shadow-md outline-none border-[0.5px] dark:border-slate-700 placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
+            className="bg-slate-50 dark:bg-slate-800/50 dark:focus:bg-slate-800 rounded-xl px-4 py-2 w-80 transition-[background-color,box-shadow] duration-100 focus:bg-slate-50 focus:shadow-md outline-none border-[0.5px] dark:border-slate-700 placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
             placeholder="Filter..."
             value={filterText}
             onChange={(e) => emit({ case: `filterTextUpdated`, text: e.target.value })}
           />
           <button
             className={cx(
-              `border border-slate-200 dark:border-slate-700 w-7 h-7 rounded-full mx-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition duration-100 flex justify-center items-center`,
+              `border border-slate-200 dark:border-slate-700 w-7 h-7 rounded-full mx-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-[background-color,opacity,transform] duration-100 flex justify-center items-center`,
               filterText
                 ? `opacity-100 translate-y-0 cursor-pointer`
                 : `opacity-0 translate-y-1 cursor-default`,
@@ -220,7 +220,7 @@ const BottomPanelWrap: React.FC<{ className?: string; children: React.ReactNode 
   className,
   children,
 }) => (
-  <div className="border-b border-slate-200 dark:border-slate-800 shadow-lg shadow-black/5 dark:shadow-black/50 rotate-180 [transition:200ms]">
+  <div className="border-b border-slate-200 dark:border-slate-800 shadow-lg shadow-black/5 dark:shadow-black/50 rotate-180">
     <div className={cx(`rotate-180 p-4 flex`, className)}>{children}</div>
   </div>
 );

@@ -23,7 +23,7 @@ const Toggle: React.FC<Props> = ({ enabled, setEnabled, small }) => (
       className={cx(
         enabled ? (small ? `translate-x-4` : `translate-x-5`) : `translate-x-0`,
         small ? `h-4 w-4` : `h-5 w-5`,
-        `pointer-events-none inline-block rounded-full bg-white dark:bg-slate-200 shadow transform ring-0 transition ease-in-out duration-200`,
+        `pointer-events-none inline-block rounded-full bg-white dark:bg-slate-200 shadow transform ring-0 transition-transform ease-in-out duration-200`,
       )}
     />
   </Switch>

@@ -43,7 +43,7 @@ const PeaceOfMindBlock: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowingVideo(true)}
-              className="font-extrabold text-xl bg-white px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center hover:bg-violet-50 transition duration-100 border-[0.5px] border-slate-200"
+              className="font-extrabold text-xl bg-white px-8 py-3 rounded-xl shadow-xl mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center hover:bg-violet-50 transition-[background-color] duration-100 border-[0.5px] border-slate-200"
             >
               <h2 className="bg-gradient-to-br from-indigo-500 flex items-center to-fuchsia-500 bg-clip-text text-transparent">
                 <i aria-hidden className="fa-brands fa-youtube mr-3" />

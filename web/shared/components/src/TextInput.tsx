@@ -106,7 +106,7 @@ const TextInput: React.FC<Props> = ({
           className={cx(
             `py-3 px-4 flex-grow w-12`,
             `border border-slate-200 rounded-lg`,
-            `transition duration-150`,
+            `transition-[border-color,ring-color] duration-150`,
             `text-slate-600 placeholder:text-slate-400/90 placeholder:antialiased`,
             `ring-0 ring-slate-200 outline-none focus:shadow-md focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1`,
             `dark:bg-slate-700/20 dark:border-slate-700 dark:placeholder:text-slate-500 dark:text-white`,

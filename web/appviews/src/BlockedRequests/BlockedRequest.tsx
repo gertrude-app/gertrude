@@ -19,13 +19,13 @@ const BlockedRequest: React.FC<Props> = ({
   onSelectToggle,
 }) => (
   <div
-    className="flex items-center justify-between p-3 rounded-xl even:bg-slate-50 dark:even:bg-slate-800/30 transition duration-100 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+    className="flex items-center justify-between p-3 rounded-xl even:bg-slate-50 dark:even:bg-slate-800/30 transition-[background-color] duration-100 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
     onClick={onSelectToggle}
   >
     <div className="flex items-center flex-grow">
       <div
         className={cx(
-          `border w-6 h-6 rounded-full transition duration-100 hover:scale-105 cursor-pointer flex justify-center items-center shrink-0`,
+          `border w-6 h-6 rounded-full transition-[border-color,background-color] duration-100 hover:scale-105 cursor-pointer flex justify-center items-center shrink-0`,
           selected
             ? `bg-violet-700 border-violet-700`
             : `border-slate-300 hover:border-slate-400 dark:border-slate-600 dark:hover:border-slate-500`,
@@ -33,7 +33,7 @@ const BlockedRequest: React.FC<Props> = ({
       >
         <i
           className={cx(
-            `fa-solid fa-check text-white even:text-slate-50 text-sm transition duration-150`,
+            `fa-solid fa-check text-white even:text-slate-50 text-sm transition-[color,transform] duration-150`,
             selected ? `scale-100 dark:text-white` : `scale-50 dark:text-slate-900`,
           )}
         />

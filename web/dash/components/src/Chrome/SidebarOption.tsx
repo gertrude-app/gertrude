@@ -25,7 +25,7 @@ const SidebarOption: React.FC<Props> = ({
     onClick={onClick}
     className={cx(
       `ScrollTop flex justify-start items-center`,
-      `cursor-pointer transition duration-75 select-none rounded-xl`,
+      `cursor-pointer transition-[background-color] duration-75 select-none rounded-xl`,
       `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50`,
       collapsed
         ? `py-[1.2em] my-[0.3em] pl-[1em] flex justify-center items-center`

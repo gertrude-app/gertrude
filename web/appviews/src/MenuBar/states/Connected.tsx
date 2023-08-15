@@ -45,7 +45,7 @@ const Connected: React.FC<Props> = ({
     <div className="flex mt-3 space-x-3">
       <button
         onClick={() => emit({ case: `viewNetworkTrafficClicked` })}
-        className="flex-grow shadow-md transition duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row"
+        className="flex-grow shadow-md transition-[background-color] duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row"
       >
         <i className="fa fa-tower-broadcast text-xl w-6 shrink-0 text-black/70 dark:text-white/80" />
         <p className="text-sm font-medium text-left dark:text-white leading-tight">
@@ -54,7 +54,7 @@ const Connected: React.FC<Props> = ({
       </button>
       <button
         onClick={() => emit({ case: `suspendFilterClicked` })}
-        className="flex-grow shadow-md transition duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row"
+        className="flex-grow shadow-md transition-[background-color] duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row"
       >
         <i className="fa fa-clock-rotate-left text-xl *h-5 shrink-0 text-black/70 dark:text-white/80" />
         <p className="text-sm font-medium text-left leading-5 dark:text-white">
@@ -100,14 +100,14 @@ const Connected: React.FC<Props> = ({
       <div className="flex flex-col justify-center items-center space-y-1 w-1/2">
         <button
           onClick={() => emit({ case: `refreshRulesClicked` })}
-          className="flex items-center font-medium text-black/80 dark:text-white/80 transition duration-100 hover:bg-white/20 dark:hover:bg-white/10 hover:text-black dark:hover:text-white px-5 py-0.5 rounded-lg"
+          className="flex items-center font-medium text-black/80 dark:text-white/80 transition-[background-color] duration-100 hover:bg-white/20 dark:hover:bg-white/10 hover:text-black dark:hover:text-white px-5 py-0.5 rounded-lg"
         >
           <i className="fa fa-arrow-rotate-right text-sm w-3.5 mr-2" />
           Refresh rules
         </button>
         <button
           onClick={() => emit({ case: `administrateClicked` })}
-          className="relative flex items-center font-medium text-black/80 dark:text-white/80 transition duration-100 hover:bg-white/20 dark:hover:bg-white/10 hover:text-black dark:hover:text-white px-5 py-0.5 rounded-lg"
+          className="relative flex items-center font-medium text-black/80 dark:text-white/80 transition-[background-color] duration-100 hover:bg-white/20 dark:hover:bg-white/10 hover:text-black dark:hover:text-white px-5 py-0.5 rounded-lg"
         >
           {adminAttentionRequired && (
             <>

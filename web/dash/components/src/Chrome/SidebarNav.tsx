@@ -146,7 +146,7 @@ const SidebarNav: React.FC<Props> = ({
           collapsed ? `hidden` : `flex`,
           `justify-end items-center px-4 mr-px`,
           `text-violet-400 text-right hover:text-violet-300 whitespace-nowrap`,
-          `transition duration-100 cursor-pointer`,
+          `transition-[color] duration-100 cursor-pointer`,
           `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50 rounded-md`,
         )}
       >

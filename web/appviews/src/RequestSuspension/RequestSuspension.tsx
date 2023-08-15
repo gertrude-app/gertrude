@@ -125,22 +125,19 @@ const DurationPage: React.FC<
     <div className="flex flex-col justify-start items-center flex-grow p-10 mb-20">
       <h3 className="font-bold mb-3 dark:text-slate-100">Choose a suspension duration</h3>
       <div className="grid grid-cols-3 gap-2">
-        {STANDARD_DURATION_OPTIONS.map((seconds) => {
-          const minutes = seconds / 60;
-          return (
-            <button
-              key={minutes}
-              className={cx(
-                `text-left rounded-lg px-3 py-2 border-[0.5px] border-slate-200 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/50 font-medium text-slate-700 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition duration-100 min-w-[180px]`,
-                seconds === duration.seconds &&
-                  `!bg-violet-100 dark:!bg-violet-700/60 !border-violet-200 dark:!border-violet-600 !text-violet-700 dark:!text-violet-100 hover:!bg-violet-200 dark:hover:!bg-violet-700`,
-              )}
-              onClick={() => dispatch({ type: `standardDurationClicked`, seconds })}
-            >
-              {time.humanDuration(seconds)}
-            </button>
-          );
-        })}
+        {STANDARD_DURATION_OPTIONS.map((seconds) => (
+          <button
+            key={seconds}
+            className={cx(
+              `text-left rounded-lg px-3 py-2 border-[0.5px] border-slate-200 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/50 font-medium text-slate-700 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-100 min-w-[180px]`,
+              seconds === duration.seconds &&
+                `!bg-violet-100 dark:!bg-violet-700/60 !border-violet-200 dark:!border-violet-600 !text-violet-700 dark:!text-violet-100 hover:!bg-violet-200 dark:hover:!bg-violet-700`,
+            )}
+            onClick={() => dispatch({ type: `standardDurationClicked`, seconds })}
+          >
+            {time.humanDuration(seconds)}
+          </button>
+        ))}
       </div>
       <div className="flex justify-center my-2.5">
         <span className="before:[content:'-_'] after:[content:'_-'] uppercase text-sm text-slate-400 dark:text-slate-500">
@@ -155,7 +152,7 @@ const DurationPage: React.FC<
       </button>
       <div
         className={cx(
-          `absolute left-0 top-0 bg-slate-200 dark:bg-slate-900 w-full h-full rounded-b-lg backdrop-blur-xl [transition:300ms]`,
+          `absolute left-0 top-0 bg-slate-200 dark:bg-slate-900 w-full h-full rounded-b-lg backdrop-blur-xl duration-300 transition-[opacity,display,background-color]`,
           duration.mode === `custom`
             ? `opacity-80 dark:opacity-90 block hover:bg-slate-300 dark:hover:bg-slate-800`
             : `opacity-0 hidden`,
@@ -164,15 +161,14 @@ const DurationPage: React.FC<
       />
       <div
         className={cx(
-          `absolute left-0 bottom-0 w-full bg-white dark:bg-slate-900 rotate-180 transition duration-30`,
+          `absolute left-0 bottom-0 w-full bg-white dark:bg-slate-900 rotate-180 transition-shadow duration-300`,
           duration.mode === `custom` &&
             `shadow-md dark:shadow-lg shadow-slate-300/30 dark:shadow-black/30 rounded-b-xl`,
         )}
       >
         <div
           className={cx(
-            `border-t border-slate-200 dark:border-slate-700/70 dark:bg-slate-800/30 flex flex-col justify-end rounded-b-xl rotate-180 relative overflow-hidden`,
-            `[transition:300ms]`,
+            `border-t border-slate-200 dark:border-slate-700/70 dark:bg-slate-800/30 flex flex-col justify-end rounded-b-xl rotate-180 relative overflow-hidden duration-300 transition-[height]`,
             duration.mode === `custom` ? `h-48 rounded-t-xl` : `h-20`,
           )}
         >
@@ -198,7 +194,7 @@ const DurationPage: React.FC<
           </div>
           <button
             className={cx(
-              `absolute top-2 w-6 h-6 bg-slate-100 dark:bg-slate-700 rounded-full flex justify-center items-center hover:scale-105 hover:bg-slate-200 dark:hover:bg-slate-600 [transition:300ms] active:scale-95`,
+              `absolute top-2 w-6 h-6 bg-slate-100 dark:bg-slate-700 rounded-full flex justify-center items-center hover:scale-105 hover:bg-slate-200 dark:hover:bg-slate-600 duration-300 transision-[opacity,right] active:scale-95`,
               duration.mode === `custom` ? `opacity-100 right-2` : `opacity-0 -right-6`,
             )}
             onClick={() => dispatch({ type: `closeCustomDurationDrawer` })}

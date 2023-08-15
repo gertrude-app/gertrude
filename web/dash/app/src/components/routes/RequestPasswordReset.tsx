@@ -23,7 +23,7 @@ const RequestPasswordReset: React.FC = () => {
       <div className="bg-white rounded-2xl shadow-xl z-10 mx-4 relative h-128 xs:h-96 w-128 overflow-hidden">
         <div
           className={cx(
-            `flex flex-col justify-between absolute [transition:300ms] h-full w-full top-0`,
+            `flex flex-col justify-between absolute transition-[left,opacity] duration-300 h-full w-full top-0`,
             page === `form` ? `left-0 opacity-100` : `-left-128 opacity-0`,
           )}
         >
@@ -60,7 +60,7 @@ const RequestPasswordReset: React.FC = () => {
         </div>
         <div
           className={cx(
-            `flex flex-col justify-center items-center absolute [transition:300ms] h-full w-full top-0 p-12`,
+            `flex flex-col justify-center items-center absolute transition-[left,opacity] duration-300 h-full w-full top-0 p-12`,
             page === `form` ? `left-128 opacity-0` : `left-0 opacity-100`,
           )}
         >

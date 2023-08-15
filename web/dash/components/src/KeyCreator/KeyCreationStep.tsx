@@ -73,7 +73,7 @@ const KeyCreationStep: React.FC<Props> = ({
           )}
         >
           <div
-            className="flex justify-between w-full items-center cursor-pointer hover:bg-slate-50 transition duration-100 p-4 rounded-2xl outline-none [transition:200ms] text-left"
+            className="flex justify-between w-full items-center cursor-pointer hover:bg-slate-50 transition-[background-color] duration-100 p-4 rounded-2xl outline-none text-left"
             onClick={() => update({ type: `inactiveStepClicked`, step: ownStep })}
           >
             {isActive ? (
@@ -83,7 +83,7 @@ const KeyCreationStep: React.FC<Props> = ({
             )}
             <i
               className={cx(
-                `pl-2 fa-solid fa-chevron-down text-slate-500 transition duration-150`,
+                `pl-2 fa-solid fa-chevron-down text-slate-500 transition-transform duration-150`,
                 open && `-rotate-180`,
               )}
             />

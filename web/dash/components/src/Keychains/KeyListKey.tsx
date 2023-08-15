@@ -30,7 +30,7 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
   if (type === `list`) {
     return (
       <div
-        className="py-3 px-4 rounded-xl odd:bg-slate-50 hover:bg-slate-200 cursor-pointer transition duration-100 flex justify-between"
+        className="py-3 px-4 rounded-xl odd:bg-slate-50 hover:bg-slate-200 cursor-pointer transition-[background-color] duration-100 flex justify-between"
         onClick={onClick}
       >
         <div className="flex-grow relative overflow-x-hidden flex items-center">
@@ -178,7 +178,7 @@ interface TableCellProps {
 const TableCell: React.FC<TableCellProps> = ({ children, className, onClick }) => (
   <div
     className={cx(
-      `p-4 bg-slate-50 rounded-lg border-[0.5px] border-slate-200 transition duration-200 cursor-pointer flex justify-start items-center overflow-hidden`,
+      `p-4 bg-slate-50 rounded-lg border-[0.5px] border-slate-200 duration-200 cursor-pointer flex justify-start items-center overflow-hidden`,
       className,
     )}
     onClick={onClick}

@@ -27,7 +27,7 @@ function RadioGroup<Value extends string = string>({
         >
           <div
             className={cx(
-              `w-4 h-4 border rounded-full mr-2 flex justify-center items-center transition duration:100`,
+              `w-4 h-4 border rounded-full mr-2 flex justify-center items-center transition-[background-color,border-color] duration:100`,
               selectedOption === value && `bg-violet-600 border-violet-600`,
             )}
           >

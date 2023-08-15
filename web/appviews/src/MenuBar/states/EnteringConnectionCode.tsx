@@ -47,7 +47,7 @@ const EnteringConnectionCode: React.FC<Props> = ({ emit, connectionCode, dispatc
             // nb: using `disabled` and type=submit not working in webview
             onClick={submit}
             className={cx(
-              `bg-gradient-to-br px-4 rounded-r-xl rounded-l font-medium text-white shadow transition duration-100 active:scale-95`,
+              `bg-gradient-to-br px-4 rounded-r-xl rounded-l font-semibold text-white shadow transition-transform duration-100 active:scale-95`,
               `from-indigo-500 to-fuchsia-500`,
               codeValid
                 ? `hover:from-indigo-600 hover:to-fuchsia-600`

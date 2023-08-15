@@ -50,7 +50,7 @@ const ChangePassword: React.FC = () => {
               type={passwordVisible ? `text` : `password`}
             />
             <button
-              className="ml-4 rounded-full w-10 h-10 shrink-0 flex justify-center items-center text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition duration-200"
+              className="ml-4 rounded-full w-10 h-10 shrink-0 flex justify-center items-center text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition-colors duration-200"
               onClick={() => setPasswordVisible(!passwordVisible)}
             >
               {passwordVisible ? (

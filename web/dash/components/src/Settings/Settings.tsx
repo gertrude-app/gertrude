@@ -67,7 +67,7 @@ const Settings: React.FC<Props> = ({
     />
     <div
       className={cx(
-        `fixed bg-white top-0 right-0 w-76 md:w-96 h-screen border-l shadow-xl [transition:150ms] z-30 flex flex-col justify-beween`,
+        `fixed bg-white top-0 right-0 w-76 md:w-96 h-screen border-l border-slate-200 shadow-xl transition-[margin-right] z-30 flex flex-col justify-beween`,
         pendingMethod ? `mr-0` : `-mr-112`,
       )}
     >
@@ -100,7 +100,7 @@ const Settings: React.FC<Props> = ({
                 ? { href: billingPortalRequest.payload.url, target: `_blank` }
                 : {})}
               className={cx(
-                `mt-2 text-sm whitespace-nowrap cursor-pointer transition duration-100`,
+                `mt-2 text-sm whitespace-nowrap cursor-pointer transition-[color] duration-100`,
                 manageSubscriptionStateClasses(billingPortalRequest),
               )}
               onClick={

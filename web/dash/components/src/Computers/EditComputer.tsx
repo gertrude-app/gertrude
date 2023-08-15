@@ -71,7 +71,7 @@ const EditComputer: React.FC<Props> = ({
           type="text"
           value={name}
           setValue={setName}
-          placeholder="how you refer to this computer"
+          placeholder="How you refer to this computer"
           label="Computer name:"
           className="max-w-xl"
           testId="computer-name-input"
@@ -152,7 +152,7 @@ interface ComputerUserProps {
 const ComputerUser: React.FC<ComputerUserProps> = ({ name, id, isOnline }) => (
   <Link
     to={`/children/${id}`}
-    className="flex justify-between items-center odd:bg-slate-50 hover:bg-slate-100 transition duration-100 px-4 py-3 rounded-xl"
+    className="flex justify-between items-center odd:bg-slate-50 hover:bg-slate-100 transition-[background-color] duration-100 px-4 py-3 rounded-xl"
   >
     <h4 className="text-slate-700 font-semibold sm:text-lg">{name}</h4>
     <div className="flex items-center gap-2">

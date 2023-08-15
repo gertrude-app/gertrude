@@ -50,10 +50,15 @@ const ReviewUnlockRequest: React.FC<Props> = ({
     </div>
     <div className="bg-white border border-slate-200 rounded-xl mb-1 flex flex-col mt-4 relative">
       <button
-        className="hover:text-slate-600 text-slate-400 transition duration-100 absolute right-2.5 top-0 text-lg p-2 bg-transparent"
+        className="hover:text-slate-600 text-slate-400 transition-[color] duration-100 absolute right-2.5 top-0 text-lg p-2 bg-transparent"
         onClick={() => setDetailsExpanded(!detailsExpanded)}
       >
-        <i className={cx(`fa-solid fa-chevron-down`, detailsExpanded && `-rotate-180`)} />
+        <i
+          className={cx(
+            `fa-solid fa-chevron-down transition-transform duration-100`,
+            detailsExpanded && `-rotate-180`,
+          )}
+        />
       </button>
       {appName ? (
         <AppDetail expanded={detailsExpanded} label="App" data={appName} />

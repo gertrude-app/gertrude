@@ -15,7 +15,7 @@ const ConnectSucceeded: React.FC<Props> = ({ emit, userName }) => (
     <p className="mt-2 font-inter text-black dark:text-white text-xl">{userName}</p>
     <button
       onClick={() => emit({ case: `welcomeAdminClicked` })}
-      className="flex items-center text-lg font-bold bg-white/90 px-6 py-3 rounded-xl mt-8 shadow-md transition duration-100 hover:bg-white/100 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow"
+      className="flex items-center text-lg font-bold bg-white/90 px-6 py-3 rounded-xl mt-8 shadow-md transition-[background-color,box-shadow,transform] duration-100 hover:bg-white/100 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow"
     >
       <span className="bg-gradient-to-br from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent [-webkit-background-clip:text;]">
         Continue

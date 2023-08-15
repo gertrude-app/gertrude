@@ -41,7 +41,7 @@ const LoginForm: React.FC<Props> = ({
         Forgot your password, or too hard to type? Request a <em>magic link</em> with just
         your email address. Or,{` `}
         <Link
-          className="text-violet-700 border-b border-dotted border-violet-700"
+          className="text-violet-700 border-b border-dotted border-violet-700 hover:text-violet-900 transition-[color]"
           to="/signup"
         >
           signup
@@ -72,7 +72,7 @@ const LoginForm: React.FC<Props> = ({
     </div>
     <Link
       to="/reset-password"
-      className="mb-6 mt-2 self-end text-violet-500 text-sm hover:text-violet-800 transition duration-100"
+      className="mb-6 mt-2 self-end text-violet-500 text-sm hover:text-violet-800 transition-[color] duration-100"
     >
       Forgot password?
     </Link>

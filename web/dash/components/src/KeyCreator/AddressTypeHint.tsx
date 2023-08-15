@@ -122,13 +122,13 @@ const RotatingSubdomain: React.FC<RotatingSubdomainProps> = ({
       <span
         data-test="rotating-subdomains"
         data-test-rotating-subdomains={subdomains.join(`,`)}
-        className="relative [transition:200ms] overflow-hidden whitespace-nowrap ml-12"
+        className="relative overflow-hidden whitespace-nowrap ml-12"
       >
         {subdomains.filter(notNullish).map((subdomain, index) => (
           <span
             key={subdomain}
             className={cx(
-              `absolute right-0 [transition:200ms] opacity-0`,
+              `absolute right-0 transition-[opacity,top] duration-200 opacity-0`,
               index < curIndex && `-top-5`,
               index === curIndex && `-top-0.5 opacity-100`,
               index > curIndex && `top-5`,

@@ -18,7 +18,9 @@ const EditNotificationSidebar: React.FC<Props> = ({
   ...props
 }) => (
   <div className="p-8 flex flex-col grow h-full">
-    <h2 className="text-2xl font-black text-slate-700 mb-8">New notification method</h2>
+    <h2 className="text-2xl font-extrabold text-slate-700 mb-8">
+      New notification method
+    </h2>
     <div className="flex flex-col space-y-6">
       <SelectMenu
         label="Method:"

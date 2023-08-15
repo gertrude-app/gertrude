@@ -11,7 +11,7 @@ interface Props {
 const Testimonial: React.FC<Props> = ({ children, name, index, testimonialIndex }) => (
   <div
     className={cx(
-      `w-screen h-full flex justify-center items-center absolute [transition:300ms]`,
+      `w-screen h-full flex justify-center items-center absolute transition-[left] duration-300`,
       index < testimonialIndex && `-left-[100vw]`,
       index === testimonialIndex && `left-0`,
       index > testimonialIndex && `left-[100vw]`,
