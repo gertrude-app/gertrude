@@ -10,8 +10,8 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const HomeChecksPassing: Story = props({
-  screen: `home`,
+export const Actions: Story = props({
+  screen: `actions`,
   windowOpen: true,
   healthCheck: {
     latestAppVersion: { case: `ok`, value: `2.0.0` },
@@ -38,34 +38,16 @@ export const HomeChecksPassing: Story = props({
   dispatch: () => {},
 });
 
-export const HomeAccountNeedsAttention: Story = props({
-  ...HomeChecksPassing.args,
+export const ActionsAccountInactive: Story = props({
+  ...Actions.args,
   healthCheck: {
-    ...HomeChecksPassing.args.healthCheck,
-    accountStatus: { case: `ok`, value: `needsAttention` },
-  },
-});
-
-export const HomeAccountInactive: Story = props({
-  ...HomeChecksPassing.args,
-  healthCheck: {
-    ...HomeChecksPassing.args.healthCheck,
+    ...Actions.args.healthCheck,
     accountStatus: { case: `ok`, value: `inactive` },
   },
 });
 
-export const HomeChecksFailing: Story = props({
-  ...HomeChecksPassing.args,
-  healthCheck: {
-    ...HomeChecksPassing.args.healthCheck,
-    screenshotMonitoringEnabled: false,
-    notificationsSetting: `none`,
-  },
-  filterState: { case: `on` },
-});
-
 export const HealthCheckLoading: Story = props({
-  ...HomeChecksPassing.args,
+  ...Actions.args,
   screen: `healthCheck`,
   healthCheck: {},
 });
@@ -101,7 +83,7 @@ export const HealthCheckError: Story = props({
 });
 
 export const ExemptUsers: Story = props({
-  ...HomeChecksPassing.args,
+  ...Actions.args,
   screen: `exemptUsers`,
   exemptableUsers: {
     case: `ok`,
@@ -118,7 +100,7 @@ export const ExemptUsersError: Story = props({
 });
 
 export const Advanced: Story = props({
-  ...HomeChecksPassing.args,
+  ...Actions.args,
   screen: `advanced`,
   advanced: {
     pairqlEndpointDefault: `https://api.getrude.app/pairql`,

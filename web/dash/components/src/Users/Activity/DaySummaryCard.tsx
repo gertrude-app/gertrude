@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { formatDate } from '@dash/datetime';
-import { env } from '@shared/components';
-import PillBadge from '../../PillBadge';
+import { env, PillBadge } from '@shared/components';
 
 type Props = {
   date: Date;

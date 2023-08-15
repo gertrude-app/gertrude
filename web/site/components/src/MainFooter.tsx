@@ -34,9 +34,7 @@ const MainFooter: React.FC = () => (
       </div>
     </div>
     <div className="flex justify-center items-center p-6 pt-0">
-      <p className="text-slate-700 text-lg">
-        © {new Date().getFullYear()} NetRivet Inc.
-      </p>
+      <p className="text-slate-700 text-lg">© {new Date().getFullYear()} NetRivet Inc.</p>
     </div>
   </footer>
 );

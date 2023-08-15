@@ -51,7 +51,6 @@ export { default as Loading } from './Loading';
 export { default as GenericError } from './GenericError';
 export { default as ApiErrorMessage } from './ApiErrorMessage';
 export { default as EmptyState } from './EmptyState';
-export { default as PillBadge } from './PillBadge';
 export { default as GradientIcon, ICONS as GRADIENT_ICONS } from './GradientIcon';
 export { default as SuspendFilterRequestForm } from './Users/SuspendFilterRequestForm';
 export { default as ComputerCard } from './Computers/ComputerCard';

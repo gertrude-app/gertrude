@@ -76,8 +76,6 @@ export function isoFromDateInput(dateInput: string, existingIso?: string): strin
   return date.toISOString();
 }
 
-const rtf = new Intl.RelativeTimeFormat(`en`, { numeric: `auto` });
-
 export function relativeTime(isoOrDate: Date | string): string {
   const date = typeof isoOrDate === `string` ? new Date(isoOrDate) : isoOrDate;
   const now = new Date();
@@ -92,6 +90,7 @@ export function relativeTime(isoOrDate: Date | string): string {
   } as const;
   for (const [unit, num] of Object.entries(UNITS)) {
     if (Math.abs(diff) > num || unit === `second`) {
+      const rtf = new Intl.RelativeTimeFormat(`en`, { numeric: `auto` });
       return rtf.format(-Math.round(diff / num), unit as any);
     }
   }

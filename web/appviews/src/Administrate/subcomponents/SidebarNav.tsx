@@ -10,16 +10,20 @@ interface Props {
 const SidebarNav: React.FC<Props> = ({ screen, setScreen }) => {
   const [timesHiddenClicked, setTimesHiddenClicked] = useState(0);
   return (
-    <nav className="border-slate-200 dark:border-slate-800 border-r p-2 font-bold flex flex-col items-stretch space-y-1 bg-white dark:bg-slate-900">
-      <SidebarButton
-        isActive={screen === `home`}
-        onClick={() => setScreen(`home`)}
-        icon="home"
-      />
+    <nav
+      className={cx(
+        `border-slate-200 dark:border-slate-800 border-r p-2 font-bold flex flex-col items-stretch space-y-1 bg-white dark:bg-slate-900 fixed h-full z-20 top-0`,
+      )}
+    >
       <SidebarButton
         isActive={screen === `healthCheck`}
         onClick={() => setScreen(`healthCheck`)}
         icon="heart-pulse"
+      />
+      <SidebarButton
+        isActive={screen === `actions`}
+        onClick={() => setScreen(`actions`)}
+        icon="arrow-pointer"
       />
       <SidebarButton
         isActive={screen === `exemptUsers`}
