@@ -29,7 +29,7 @@ describe(`create keychain`, () => {
         cy.testId(`remove-keychain`).click();
       });
     cy.testId(`modal-primary-btn`).click();
-    cy.sidebarClick(`Users`);
+    cy.sidebarClick(`Children`);
     cy.testId(`edit-user`).click();
     cy.contains(`Add keychain`).click();
     cy.contains(`Existing`).should(`not.exist`);
@@ -50,7 +50,7 @@ describe(`create keychain`, () => {
 
     cy.visit(`/keychains`);
     cy.contains(`Test keychain`);
-    cy.sidebarClick(`Users`);
+    cy.sidebarClick(`Children`);
     cy.testId(`edit-user`).click();
     cy.contains(`Test keychain`);
     cy.contains(`Add keychain`).click();

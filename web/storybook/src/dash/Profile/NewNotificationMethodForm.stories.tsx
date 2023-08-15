@@ -3,7 +3,7 @@ import type { StoryObj, Meta } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Profile/NewNotificationMethodForm', // eslint-disable-line
+  title: 'Dashboard/Settings/NewNotificationMethodForm', // eslint-disable-line
   component: NewNotificationMethodForm,
 } satisfies Meta<typeof NewNotificationMethodForm>;
 

@@ -7,6 +7,7 @@ import {
   CalendarDaysIcon,
   ChatBubbleOvalLeftIcon,
   ClockIcon,
+  Cog6ToothIcon,
   ComputerDesktopIcon,
   DevicePhoneMobileIcon,
   EnvelopeIcon,
@@ -62,6 +63,7 @@ export const ICONS = [
   `stopwatch`,
   `question`,
   `home`,
+  `cog`,
 ] as const;
 
 export type IconType = (typeof ICONS)[number];
@@ -105,6 +107,7 @@ const CLASS_MAP: Record<IconType, HeroIcon | string> = {
   'thumbs-up': HandThumbUpIcon,
   'thumbs-down': HandThumbDownIcon,
   stopwatch: `fa-solid fa-stopwatch`,
+  cog: Cog6ToothIcon,
 };
 
 const GradientIcon: React.FC<Props> = ({ icon, className, size }) => {

@@ -21,7 +21,7 @@ const Users: React.FC<Props> = ({
 }) => (
   <div className="flex flex-col">
     <ConnectModal request={addDeviceRequest} dismissAddDevice={dismissAddDevice} />
-    <PageHeading icon="users">Users</PageHeading>
+    <PageHeading icon="users">Children</PageHeading>
     <div className="mt-8 flex flex-col">
       {users.length > 0 ? (
         <>

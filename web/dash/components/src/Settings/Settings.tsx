@@ -41,7 +41,7 @@ interface Props {
   newMethodEventHandler(event: NewAdminNotificationMethodEvent): unknown;
 }
 
-const Profile: React.FC<Props> = ({
+const Settings: React.FC<Props> = ({
   email,
   status,
   methods,
@@ -78,7 +78,7 @@ const Profile: React.FC<Props> = ({
         />
       )}
     </div>
-    <PageHeading icon="user">Profile</PageHeading>
+    <PageHeading icon="cog">Settings</PageHeading>
     <div className="flex flex-col lg:flex-row mt-8">
       <div className="p-8 bg-slate-100 rounded-xl flex-grow lg:mr-2 border border-slate-200 lg:max-w-3xl">
         <h2 className="text-lg text-slate-900 mb-2">Email address:</h2>
@@ -194,7 +194,7 @@ const Profile: React.FC<Props> = ({
   </div>
 );
 
-export default Profile;
+export default Settings;
 
 const AccountStatusBadge: React.FC<{ status: AdminSubscriptionStatus }> = ({
   status,

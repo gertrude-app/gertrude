@@ -29,7 +29,7 @@ const LoginForm: React.FC<Props> = ({
     }}
   >
     <Logo className="-mt-6 mb-0" size={110} iconOnly />
-    <h2 className="text-center mt-4 text-3xl font-inter">Account Login</h2>
+    <h2 className="text-center mt-4 text-3xl font-inter">Parent Login</h2>
     {fromPasswordReset ? (
       <div className="w-full bg-fuchsia-50 rounded-2xl p-6 mt-4">
         <p className="text-fuchsia-600 font-mediumi text-sm xs:text-base">

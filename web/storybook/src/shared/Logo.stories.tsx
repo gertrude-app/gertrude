@@ -19,6 +19,14 @@ export const Default: Story = {
   ],
 };
 
+export const DefaultParentSite: Story = {
+  decorators: Default.decorators,
+  args: {
+    type: `default`,
+    withForParents: true,
+  },
+};
+
 export const DefaultIconOnly: Story = {
   decorators: Default.decorators,
   args: {
@@ -31,7 +39,7 @@ export const DefaultIconOnly: Story = {
 export const Inverted: Story = {
   decorators: [
     (Story) => (
-      <div className="py-8 bg-violet-500 flex justify-center">
+      <div className="py-8 bg-slate-900 flex justify-center">
         <Story />
       </div>
     ),
@@ -39,6 +47,21 @@ export const Inverted: Story = {
   args: {
     type: `inverted`,
     iconOnly: false,
+  },
+};
+
+export const InvertedParentSite: Story = {
+  decorators: [
+    (Story) => (
+      <div className="py-8 bg-slate-900 flex justify-center">
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    type: `inverted`,
+    iconOnly: false,
+    withForParents: true,
   },
 };
 

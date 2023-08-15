@@ -20,7 +20,7 @@ const CreateFirstNotificationWidget: React.FC<Props> = ({ className }) => (
         </p>
       </div>
       <div className="py-4 sm:py-5 px-3 sm:px-4 -mb-3 sm:-mb-4 -mx-3 sm:-mx-4 bg-slate-50 rounded-b-3xl">
-        <Button type="link" to="/profile" color="primary">
+        <Button type="link" to="/settings" color="primary">
           Create a notification
         </Button>
       </div>
