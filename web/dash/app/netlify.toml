@@ -4,6 +4,11 @@
   ignore = "false"
 
 [[redirects]]
+  from = "/users/*"
+  to = "/children/:splat"
+  status = 301
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
