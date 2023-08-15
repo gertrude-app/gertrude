@@ -35,7 +35,7 @@ const PeaceOfMindBlock: React.FC = () => {
           <div className="flex flex-col space-y-3 sm:flex-row sm:space-x-4 items-start sm:items-end">
             <a
               className="text-white font-extrabold text-xl bg-gradient-to-br w-[14.8rem] sm:w-auto from-violet-500 to-fuchsia-500 px-8 py-3 rounded-xl shadow-xl shadow-fuchsia-600/20 mt-3 hover:from-violet-600 hover:to-fuchsia-600 inline-flex items-center"
-              href="https://dash.gertrude.app/signup"
+              href="https://parents.gertrude.app/signup"
             >
               <i aria-hidden className="fas fa-rocket mr-4" />
               <h2 className="whitespace-nowrap">Get started</h2>

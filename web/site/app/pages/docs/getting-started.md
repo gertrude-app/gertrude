@@ -17,9 +17,9 @@ getting started with Gertrude, [click here](https://www.youtube.com/watch?v=N8kL
 ## Setting up your parent account
 
 To start out, if you haven't already created a **Gertrude account** you'll need to do that
-first. To create an account [click this link](https://dash.gertrude.app/signup) and follow
-the sign-up instructions. The first 60 days are _totally free and you can cancel at any
-time._
+first. To create an account [click this link](https://parents.gertrude.app/signup) and
+follow the sign-up instructions. The first 60 days are _totally free and you can cancel at
+any time._
 
 ### Adding your first child
 
@@ -390,8 +390,8 @@ add a comment, and then **click submit**.
 
 Now that the unlock request is submitted, put back on your parent hat (you've been
 impersonating your _child_ for the last few minutes), and visit the
-[home screen](https://dash.gertrude.app) of the parents website. You'll notice that there
-is a new unlock request visible:
+[home screen](https://parents.gertrude.app) of the parents website. You'll notice that
+there is a new unlock request visible:
 
 {% image src="dashboard-unlock-request.png" caption="The recently submitted unlock request in your parents website" /%}
 
