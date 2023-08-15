@@ -67,7 +67,7 @@ const SuspendFilter: React.FC = () => {
     return (
       <Modal title="Suspend Filter Request" primaryButton={goToDashboard} icon="clock">
         <span className="text-base">
-          This filter suspension request is <b>more than 2 hours old.</b> Have the user
+          This filter suspension request is <b>more than 2 hours old.</b> Have the child
           request another one if they still need their filter suspended.
         </span>
       </Modal>

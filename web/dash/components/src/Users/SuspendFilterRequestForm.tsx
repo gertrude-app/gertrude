@@ -36,10 +36,10 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
           <UserInputText small>
             {capitalize(date.relativeTime(new Date(requestedAt)))}
           </UserInputText>
-          {` `}user
+          {` `}child
         </>
       ) : (
-        `User`
+        `Child`
       )}
       {` `}
       <UserInputText small>{username}</UserInputText> requested a filter suspension for

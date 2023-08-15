@@ -18,7 +18,7 @@ const DefenseInDepthBlock: React.FC = () => (
       In addition to internet filtering, Gertrude allows you to collect{` `}
       <b className="text-slate-300">screenshots</b>
       {` `}
-      of your protected users&rsquo; screens, as well as a record of{` `}
+      of your child&rsquo;s screens, as well as a record of{` `}
       <b className="text-slate-300">everything they type</b>, for an unprecedented level
       of safety, redundancy, and oversight. You get to review screenshots and keystrokes
       on your own time, on your own device.

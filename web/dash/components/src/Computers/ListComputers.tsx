@@ -16,12 +16,12 @@ const ListComputers: React.FC<Props> = ({ devices }) => (
     {devices.length === 0 && (
       <EmptyState
         className="mt-8"
-        heading={`No computers`}
-        secondaryText={`Computers are created automatically when you install and connect the Gertrude Mac app for one of your users.`}
-        icon={`desktop`}
-        buttonText={`See users`}
+        heading="No computers"
+        secondaryText="Computers are created automatically when you install and connect the Gertrude Mac app for one of your children."
+        icon="desktop"
+        buttonText="See children"
         buttonIcon="users"
-        action={`/users`}
+        action="/children"
       />
     )}
     <div className="mt-8 grid grid-cols-1 lg+:grid-cols-2 2xl:grid-cols-3 gap-8">

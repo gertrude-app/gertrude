@@ -14,10 +14,7 @@ export const WithName: Story = props({
   id: `1234`,
   modelTitle: `Mac Studio (2023)`,
   modelIdentifier: `Mac14,14`,
-  status: {
-    online: true,
-    userName: `Juliet`,
-  },
+  onlineUser: `Juliet`,
 });
 
 export const WithoutName: Story = props({
@@ -27,9 +24,7 @@ export const WithoutName: Story = props({
 
 export const Offline: Story = props({
   ...WithName.args,
-  status: {
-    online: false,
-  },
+  onlineUser: undefined,
 });
 
 export default meta;

@@ -187,7 +187,7 @@ export default class HealthChecker {
         return {
           title: `Notification settings`,
           state: `fail`,
-          message: `Notifications disabled, users will miss critical updates`,
+          message: `Notifications disabled, child will miss critical updates`,
           button: {
             icon: `cog`,
             label: `Fix setting`,

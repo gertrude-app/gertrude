@@ -60,11 +60,11 @@ const UserRoute: React.FC = () => {
   }, [id, newUserId]);
 
   if (id === `new`) {
-    return <Navigate to={`/users/${newUserId}`} replace />;
+    return <Navigate to={`/children/${newUserId}`} replace />;
   }
 
   if (deleteUser.state === `success`) {
-    return <Navigate to="/users" />;
+    return <Navigate to="/children" />;
   }
 
   if (getUser.isError) {

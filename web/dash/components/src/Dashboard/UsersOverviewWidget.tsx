@@ -19,7 +19,7 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
       <DashboardWidget className={className}>
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <WidgetTitle icon="users" text="Children" className="!mb-0" />
-          <Button type="link" to="/users" size="small" color="tertiary">
+          <Button type="link" to="/children" size="small" color="tertiary">
             All children
           </Button>
         </div>
@@ -37,8 +37,8 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
       )}
     >
       <h3 className="font-bold text-black text-opacity-80 text-lg">No children</h3>
-      <p className="mb-4 text-black text-opacity-50">Let's create one!</p>
-      <Button type="link" color="primary" to="/users/new">
+      <p className="mb-4 text-black text-opacity-50">Let's add one!</p>
+      <Button type="link" color="primary" to="/children/new">
         <i className="fa-solid fa-user-plus mr-2" /> Add child
       </Button>
     </DashboardWidget>

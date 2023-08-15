@@ -76,7 +76,7 @@ const EditUser: React.FC<Props> = ({
   if (isNew) {
     return (
       <div className="-my-6 md:-my-7 py-6 md:py-7 min-h-[calc(100vh-64px)] md:min-h-screen flex flex-col">
-        <PageHeading icon="user-plus">New child</PageHeading>
+        <PageHeading icon="user-plus">Add a child</PageHeading>
         <div className="flex-grow flex items-center justify-center">
           <div className="flex flex-col gap-2 flex-grow max-w-2xl">
             <Label htmlFor="name" className="text-xl ml-6 md:ml-9">
@@ -95,7 +95,7 @@ const EditUser: React.FC<Props> = ({
           </div>
         </div>
         <footer className="flex flex-col sm:flex-row justify-end gap-4">
-          <Button size="large" type="link" color="tertiary" to="/users">
+          <Button size="large" type="link" color="tertiary" to="/children">
             Cancel
           </Button>
           <Button

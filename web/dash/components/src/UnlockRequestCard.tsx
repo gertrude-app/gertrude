@@ -55,7 +55,7 @@ const UnlockRequestCard: React.FC<Props> = ({
       <div className="flex flex-row space-x-3 items-stretch mt-4 w-full">
         <Button
           type="link"
-          to={`/users/${userId}/unlock-requests/${id}/deny`}
+          to={`/children/${userId}/unlock-requests/${id}/deny`}
           color="tertiary"
           fullWidth
         >
@@ -63,7 +63,7 @@ const UnlockRequestCard: React.FC<Props> = ({
         </Button>
         <Button
           type="link"
-          to={`/users/${userId}/unlock-requests/${id}`}
+          to={`/children/${userId}/unlock-requests/${id}`}
           color="secondary"
           className="whitespace-nowrap"
           fullWidth

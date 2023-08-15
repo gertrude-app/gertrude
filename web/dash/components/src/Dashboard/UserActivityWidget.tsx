@@ -22,12 +22,12 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
       <DashboardWidget className={cx(`!bg-violet-50`, className)}>
         <div className="flex flex-col justify-center items-center p-6 rounded-xl h-full">
           <h3 className="font-bold text-black text-opacity-80 text-lg">
-            No recorded user activity
+            No recorded child activity
           </h3>
           <p className="mb-4 text-violet-600/80 text-center">
-            You can use Gertrude to monitor your users' activity
+            You can use Gertrude to monitor your childrens activity
           </p>
-          <Button type="link" color="primary" to="/users">
+          <Button type="link" color="primary" to="/children">
             <i className="fa-solid fa-arrow-right mr-2" /> See how
           </Button>
         </div>
@@ -42,7 +42,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
             You&rsquo;re all caught up!
           </h2>
           <p className="text-violet-600/80 text-center">
-            No user activity items to review. Give yourself a pat on the back.
+            No child activity items to review. Give yourself a pat on the back.
           </p>
         </div>
       </DashboardWidget>
@@ -69,7 +69,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
         <div className="bg-violet-50/50 py-5 px-3 sm:px-4 rounded-b-3xl">
           <Button
             type="link"
-            to="/users/activity"
+            to="/children/activity"
             color="secondary"
             className=""
             size="large"
@@ -96,7 +96,7 @@ export const UnreviewedItemsCard: React.FC<UnreviewedItemsCardProps> = ({
   numUnreviewed,
 }) => (
   <Link
-    to={userId ? `/users/${userId}/activity` : `/users/activity`}
+    to={userId ? `/children/${userId}/activity` : `/children/activity`}
     className={cx(
       `ScrollTop rounded-xl border-[0.5px] p-4 flex justify-between items-center relative transition duration-100 cursor-pointer hover:bg-slate-50`,
       numUnreviewed === 0
