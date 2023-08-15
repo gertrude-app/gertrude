@@ -4,7 +4,7 @@ import { time } from '@shared/datetime';
 import * as mock from '../../src/reducers/__tests__/mocks';
 import { entireDay } from '../../src/lib/days';
 
-describe(`user screen`, () => {
+describe(`children screen`, () => {
   beforeEach(() => {
     cy.simulateLoggedIn();
     cy.interceptPql(`SaveUser`, { success: true });
@@ -12,9 +12,9 @@ describe(`user screen`, () => {
     cy.interceptPql(`DeleteEntity`, { success: true });
   });
 
-  describe(`new user creation`, () => {
-    it(`creating and updating user`, () => {
-      cy.visit(`/users/new`);
+  describe(`new child creation`, () => {
+    it(`creating and updating child`, () => {
+      cy.visit(`/children/new`);
       cy.testId(`user-name`).type(`Bo`);
 
       // simulate freshly saved user from server
@@ -23,44 +23,44 @@ describe(`user screen`, () => {
         mock.user({ name: `Bo`, id: `user-123` }),
       );
 
-      cy.contains(`Save user`).click();
+      cy.contains(`Save child`).click();
       cy.wait(`@SaveUser`);
 
-      cy.testId(`page-heading`).should(`have.text`, `Edit user`);
-      cy.contains(`Save user`).should(`be.disabled`);
+      cy.testId(`page-heading`).should(`have.text`, `Edit child`);
+      cy.contains(`Save child`).should(`be.disabled`);
 
       cy.testId(`user-name`).type(`az`);
 
-      cy.contains(`Save user`).should(`be.enabled`);
+      cy.contains(`Save child`).should(`be.enabled`);
     });
 
-    it(`redirects to new uuid path & doesn't list unsaved new user`, () => {
-      cy.visit(`/users/new`);
+    it(`redirects to new uuid path & doesn't list unsaved new child`, () => {
+      cy.visit(`/children/new`);
 
-      // redirects to /users/<new-user-id>
-      cy.location(`pathname`).should(`not.eq`, `/users/new`);
-      cy.contains(`New user`);
+      // redirects to /children/<new-user-id>
+      cy.location(`pathname`).should(`not.eq`, `/children/new`);
+      cy.contains(`Add a child`);
 
       // don't show the empty new user in the list
-      cy.sidebarClick(`Users`);
+      cy.sidebarClick(`Children`);
       cy.testId(`user-card`).should(`have.length`, 1);
     });
   });
 
-  describe(`user deletion`, () => {
-    it(`redirects to /users path`, () => {
+  describe(`child deletion`, () => {
+    it(`redirects to /children path`, () => {
       cy.interceptPql(`GetUser`, mock.user({ id: `user-123` }));
-      cy.visit(`/users/user-123`);
+      cy.visit(`/children/user-123`);
 
-      cy.contains(`Delete user`).click();
+      cy.contains(`Delete child`).click();
       cy.testId(`modal-primary-btn`).click();
 
-      // redirects to /users
-      cy.location(`pathname`).should(`eq`, `/users`);
+      // redirects to /children
+      cy.location(`pathname`).should(`eq`, `/children`);
     });
   });
 
-  describe(`combined users screens`, () => {
+  describe(`combined children screens`, () => {
     it(`summary page displays aggregate totals in correct order`, () => {
       cy.interceptPql(`CombinedUsersActivitySummaries`, [
         {
@@ -75,7 +75,7 @@ describe(`user screen`, () => {
         },
       ]);
 
-      cy.visit(`/users/activity`);
+      cy.visit(`/children/activity`);
 
       cy.contains(`6 out of 26`);
       cy.contains(`5 out of 1234`);
@@ -105,19 +105,20 @@ describe(`user screen`, () => {
         },
       ]);
 
-      cy.visit(`/users/activity/03-06-2023`);
+      cy.visit(`/children/activity/03-06-2023`);
 
       cy.wait(`@CombinedUsersActivityFeed`)
         .its(`request.body`)
         .should(`deep.equal`, { range: entireDay(dateFromUrl(`03-06-2023`)) });
 
       cy.interceptPql(`DeleteActivityItems_v2`, { success: true });
+      cy.interceptPql(`CombinedUsersActivitySummaries`, []);
 
       // suzy has more items, so her activity should be first
       cy.testId(`page-heading`).first().should(`have.text`, `Suzy’s Activity`);
       cy.testId(`page-heading`).last().should(`have.text`, `Bob’s Activity`);
 
-      cy.contains(`Approve all user activity`).click();
+      cy.contains(`Approve all child activity`).click();
 
       cy.wait(`@DeleteActivityItems_v2`)
         .its(`request.body`)

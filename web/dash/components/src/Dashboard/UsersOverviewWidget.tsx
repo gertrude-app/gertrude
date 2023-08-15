@@ -18,9 +18,9 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
     return (
       <DashboardWidget className={className}>
         <div className="flex items-center justify-between mb-3 sm:mb-4">
-          <WidgetTitle icon="users" text="Users" className="mb-0 sm:mb-0 mt-0" />
-          <Button type="link" to="/users" size="small" color="tertiary">
-            All users
+          <WidgetTitle icon="users" text="Children" className="!mb-0" />
+          <Button type="link" to="/children" size="small" color="tertiary">
+            All children
           </Button>
         </div>
         {users.map((user) => (
@@ -36,10 +36,10 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
         className,
       )}
     >
-      <h3 className="font-bold text-black text-opacity-80 text-lg">No users</h3>
-      <p className="mb-4 text-black text-opacity-50">Let's create one!</p>
-      <Button type="link" color="primary" to="/users/new">
-        <i className="fa-solid fa-user-plus mr-2" /> Add user
+      <h3 className="font-bold text-black text-opacity-80 text-lg">No children</h3>
+      <p className="mb-4 text-black text-opacity-50">Let's add one!</p>
+      <Button type="link" color="primary" to="/children/new">
+        <i className="fa-solid fa-user-plus mr-2" /> Add child
       </Button>
     </DashboardWidget>
   );

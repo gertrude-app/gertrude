@@ -16,7 +16,7 @@ import * as empty from '../../lib/empty';
 
 type Admin = GetAdmin.Output;
 
-export function adminProfile(override: Partial<Admin> = {}): Admin {
+export function adminSettings(override: Partial<Admin> = {}): Admin {
   return {
     id: uuid(),
     email: `you@example.com`,

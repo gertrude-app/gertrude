@@ -14,45 +14,49 @@ getting started with Gertrude, [click here](https://www.youtube.com/watch?v=N8kL
 
 ---
 
-## Setting up your admin account
+## Setting up your parent account
 
 To start out, if you haven't already created a **Gertrude account** you'll need to do that
-first. To create an account [click this link](https://dash.gertrude.app/signup) and follow
-the sign-up instructions. The first 60 days are _totally free and you can cancel at any
-time._
+first. To create an account [click this link](https://parents.gertrude.app/signup) and
+follow the sign-up instructions. The first 60 days are _totally free and you can cancel at
+any time._
 
-### Creating your first user
+### Adding your first child
 
-Once you have your Gertrude account created you'll probably want to start by creating at
-least one user. A **"user"** in Gertrude represents _someone that you want to protect._
-This is very often one of your own children if you are a parent using Gertrude to protect
-your kids. You'll need _at least one user_ to do anything useful with Gertrude.
+Once you have your Gertrude account created you'll need to start by adding at least one
+child. A **"child"** in Gertrude represents _someone that you want to protect._ This is
+very often one of your own children if you are a parent using Gertrude to protect your
+kids&mdash;but it could also be a peer whom you are protecting in a relationship of
+accountability. You'll need to add _at least one child_ to do anything useful with
+Gertrude.
 
 {% callout title="Regarding terminology..." %}
 
 The most common scenario is for Gertrude to be used by _parents_ protecting their _kids_.
 But that's definitely not the only way to use Gertrude. Peers, friends, relatives, etc.,
-can all be protected, but for the sake of brevity, we use the language of **parent/child**
-for most of our documentation.
+can all be protected, but for the sake of simplicity, we use the language of
+**parent/child** throughout the Gertrude app and websites.
 
 {% /callout %}
 
-To _create a user,_ click the link in the dashboard of your Gertrude web admin account, or
-select "users" from the side bar on the left hand and click the button to add a new user.
+To _add a child,_ click the link in the dashboard of the Gertrude parents website, or
+select "children" from the side bar on the left hand and click the button to add a new
+child.
 
-{% image src="create-first-user.png" caption="Go to the 'Users' screen to add your first user" /%}
+{% image src="create-first-user.png" caption="Go to the 'Children' screen to add your first child" /%}
 
-Enter the users _name_, and click to save the new user.
+Enter the child's _name_, and click to save the new child.
 
-{% image src="edit-user.png" caption="Give your user a name, and click 'save'" /%}
+{% image src="edit-user.png" caption="Enter your child's name, and click 'save'" /%}
 
-### Monitoring user activity
+### Monitoring child activity
 
-While you are creating your first user, you can also set up **monitoring** if you wish.
-Gertrude allows you to see everything _your users have typed_ and also can _take periodic
-screenshots of your users screens_ for you to review later. You can always change these
-settings later, but we recommend enabling them for the greatest safety, and also because
-it will help you learn about all of Gertrude's features as you work through this tutorial.
+While you are adding your first child, you can also set up **monitoring** if you wish.
+Gertrude allows you to see everything _your children have typed_ and also can _take
+periodic screenshots of your child's screens_ for you to review later. You can always
+change these settings later, but we recommend enabling them for the greatest safety, and
+also because it will help you learn about all of Gertrude's features as you work through
+this tutorial.
 
 {% image src="monitoring-options.png" caption="monitoring options" /%}
 
@@ -61,8 +65,8 @@ it will help you learn about all of Gertrude's features as you work through this
 ### Keychains
 
 Near the bottom of the screen is a section that allows you to attach what we call
-**"keychains"** to your user. One of the main features of Gertrude is that it acts as an
-**internet filter** for your users Mac computers. Gertrude's filter blocks the _entire
+**"keychains"** to your child. One of the main features of Gertrude is that it acts as an
+**internet filter** for your child's Mac computers. Gertrude's filter blocks the _entire
 internet_, only allowing access to the sites and apps you specifically designate as safe.
 
 {% callout title="Our unique approach" %}
@@ -77,20 +81,21 @@ up-to-date enough to make blocking categories actually safe in practice.
 
 ### Keys
 
-The way you _unblock part of the internet_ for your user is by granting them what we call
+The way you _unblock part of the internet_ for your child is by granting them what we call
 a **"key"**. A key either _a)_ "unlocks" a single **website**, or _b)_ grants a **single
 app** access to the internet. These keys are organized into groups called **"keychains"**,
-and it's here on the user screen that you have the ability to add keychains to your user.
+and it's here on the edit child screen that you have the ability to add keychains to your
+child.
 
-{% image src="create-keychain.png" caption="adding a keychain from the 'Edit user' screen" /%}
+{% image src="create-keychain.png" caption="adding a keychain from the 'Edit child' screen" /%}
 
-Until you add at least one keychain your user will have no access to the internet
+Until you add at least one keychain your child will have no access to the internet
 whatsoever while Gertrude's filter is enabled.
 
 ## Creating your first key
 
 You haven't created any of your own keychains yet, so currently the only keychains you can
-attach to this new user are _publicly available keychains_. We'll talk more about those
+attach to this new child are _publicly available keychains_. We'll talk more about those
 later, but for now let's practice by _setting up your own keychain with a single key._
 
 ### Creating a new keychain
@@ -123,25 +128,25 @@ sure are safe for your children to use.
 ### Creating and attaching your first key
 
 For the sake of this tutorial, start by creating a single _website_ key. Enter the address
-of a website that you want your user to have access to, and leave the rest of the options
+of a website that you want your child to have access to, and leave the rest of the options
 unchanged. If you can't think of a website to unlock, enter `how-to-type.com`, as we'll
 use that example later in the tutorial. Click **"Create key"** to finish the process.
 
 {% image src="create-key.png" caption="Create your first key" /%}
 
 Now that you've got a key and a keychain, you need to do one more step: _attach that
-keychain to your user._ Go back to the users screen, click to edit the user you created
+keychain to your child._ Go back to the children screen, click to edit the child you added
 earlier, and then click to add a keychain. Select the keychain you just created by its
-name and save the user.
+name and save the child.
 
-{% image src="attach-keychain.png" caption="On the 'Edit user' screen, add the keychain" /%}
+{% image src="attach-keychain.png" caption="On the 'Edit child' screen, add the keychain" /%}
 
-## Connecting a device
+## Connecting a computer
 
-The final step you will need to take before installing the macOS app is _creating a new
-device_ for your user. To do so, click the **"add device"** button on the edit user
-screen. You'll see a pop-up giving you a special one-time connection code. Write this code
-down somewhere; you'll be using it shortly.
+The final step you will need to take before installing the macOS app is _getting a code_
+to connect this child to a Mac computer running Gertrude. To do so, click the **Add a
+computer"** button on the edit child screen. You'll see a pop-up giving you a special
+one-time connection code. Write this code down somewhere; you'll be using it shortly.
 
 {% image src="add-device.png" caption="Click to add a device, and copy the connection code" /%}
 
@@ -280,17 +285,17 @@ unblock apps, which _many people can share._
 
 ### Adding a public keychain
 
-To see how this works, let's temporarily add the AOPS keychain to your user. Go back to
+To see how this works, let's temporarily give the AOPS keychain to your child. Go back to
 the computer where you set up and created your Gertrude account. Navigate to the
-[Users](https://dash.gertrude.app/users) screen and _select the user you recently
-created._ Click to add a keychain, and then search through the bottom section which lists
-public keychains, until you find the one for **AOPS.** Choose that keychain and save the
-user.
+[Children](https://parents.gertrude.app/children) screen and _select the child you
+recently added._ Click to add a keychain, and then search through the bottom section which
+lists public keychains, until you find the one for **AOPS.** Choose that keychain and save
+the child.
 
-{% image src="aops-keychain.png" caption="Find and add the 'AOPS' public keychain to your user" /%}
+{% image src="aops-keychain.png" caption="Find and add the 'AOPS' public keychain to your child" /%}
 
-At this point, if you go back to the computer or user that is being protected by the
-Gertrude Mac app, you should be able to navigate to
+At this point, if you go back to the computer that is being protected by the Gertrude Mac
+app, you should be able to navigate to
 [artofproblemsolving.com](https://artofproblemsolving.com) and it should load properly.
 This demonstrates the _power and flexibility of using and sharing keychains._
 
@@ -308,14 +313,14 @@ easier to mix and match and share keychains without causing more work for yourse
 
 ## Unlock requests
 
-Probably the most common way to unlock parts of the internet for your protected users is
-by **responding to a user-initiated unlock request.**
+Probably the most common way to unlock parts of the internet for your children is by
+**responding to a child-initiated unlock request.**
 
-Move back to the computer or user being protected by the Gertrude macOS app. Start by
-_thinking of a website that your child needs access to_ that you currently don't have a
-key for. _Try to visit that website in a web browser_ and you'll notice once again that it
-is blocked: Gertrude's filter is not allowing access to that website, because there is no
-key instructing it to.
+Move back to the computer (or switch to the macOS user) being protected by the Gertrude
+macOS app. Start by _thinking of a website that your child needs access to_ that you
+currently don't have a key for. _Try to visit that website in a web browser_ and you'll
+notice once again that it is blocked: Gertrude's filter is not allowing access to that
+website, because there is no key instructing it to.
 
 {% callout title="Need inspiration?" %}
 
@@ -352,17 +357,15 @@ window.
 Assuming we can find the right request (more on that in a moment), the Gertrude app allows
 us to then **send an unlock request** to have that specific website unblocked. Once you
 get used to this, it's common that this method becomes the _primary way in which you
-create new keys for your users._
+create new keys for your children._
 
 ### The unlock request flow
 
-1. A user tries to access a website on the internet, and are _blocked._
+1. A child tries to access a website on the internet, and are _blocked._
 2. They open the network traffic window, and _find the request that was blocked._
-3. They then send an _unlock request_ to you, the admin, requesting that that website be
-   unlocked.
-4. Then you, the admin, have the opportunity to _review and approve or reject_ that
-   request. You approve the unlock request by _creating a key_ that unblocks that web
-   address.
+3. They then send an _unlock request_ to you requesting that that website be unlocked.
+4. Then you have the opportunity to _review and approve or reject_ that request. You
+   approve the unlock request by _creating a key_ that unblocks that web address.
 
 We'll walk through all four steps now, and we have
 [a more detailed article](/docs/unblocking-guide) with advanced tips and tricks on
@@ -385,12 +388,12 @@ add a comment, and then **click submit**.
 
 ### Accepting an unlock request
 
-Now that the unlock request is submitted, put back on your admin hat (you've been
-impersonating your Gertrude _user_ for the last few minutes), and visit the
-[home screen](https://dash.gertrude.app) of the admin web dashboard. You'll notice that
+Now that the unlock request is submitted, put back on your parent hat (you've been
+impersonating your _child_ for the last few minutes), and visit the
+[home screen](https://parents.gertrude.app) of the parents website. You'll notice that
 there is a new unlock request visible:
 
-{% image src="dashboard-unlock-request.png" caption="The recently submitted unlock request in your admin dashboard" /%}
+{% image src="dashboard-unlock-request.png" caption="The recently submitted unlock request in your parents website" /%}
 
 Click to **accept** the request, and you'll be taken to a screen where Gertrude recommends
 a key that will unlock the given request. You're free to stop and edit the key if you
@@ -406,17 +409,17 @@ keychain, so select it and click submit.
 Back on the computer running the Gertrude macOS app, you should see a _notification that
 the unlock request was accepted._
 
-{% image src="unlock-request-accepted-notification.png" caption="Back on the users's Mac, a notification that it was accepted." /%}
+{% image src="unlock-request-accepted-notification.png" caption="Back on the child's Mac, a notification that it was accepted." /%}
 
 And if you refresh the web page, you'll _now have access_ to the previously blocked site.
 
 {% image src="khan-unblocked.png" caption="Success! The site is now unblocked." /%}
 
-You should spend a few minutes with each of your users, showing them how to identify
+You should spend a few minutes with each of your children, showing them how to identify
 blocked requests and send unlock requests. In our experience, kids of all ages pick it up
-pretty fast. Once you're in a groove, your protected users will send you unlock requests
-when they need something, and you'll be _notified via email, text, or Slack_, and can
-approve or reject from your own computer or phone, no matter where you are.
+pretty fast. Once you're in a groove, your children will send you unlock requests when
+they need something, and you'll be _notified via email, text, or Slack_, and can approve
+or reject from your own computer or phone, no matter where you are.
 
 ## Filter suspensions
 
@@ -425,14 +428,14 @@ filter completely.** Examples of these sorts of situations include when your chi
 taking an online test, or doing some unusual activity or research. In these cases it
 _doesn't make sense to go through the work of creating keys or unlock requests_ because
 the websites they will be visiting _won't be needed again._ For times like this, you as
-the admin have the ability to **remotely suspend the filter** for a designated period of
+the parent have the ability to **remotely suspend the filter** for a designated period of
 time, after which it will resume normal filtering.
 
 {% callout type="warning" title="Is it safe to suspend the filter?" %}
 
-If you have enabled **monitoring** of your user, all of their activity will continue to be
-recorded and uploaded for your later review. As long as your users know this, we've found
-that these temporary filter suspensions are very safe.
+If you have enabled **monitoring** of your children, all of their activity will continue
+to be recorded and uploaded for your later review. As long as your children know this,
+we've found that these temporary filter suspensions are very safe.
 
 {% /callout %}
 
@@ -440,42 +443,42 @@ that these temporary filter suspensions are very safe.
 
 The way filter suspensions work is similar (although simpler) than unlock requests.
 
-1. one of your users _submits a "suspend filter request"_ from the Gertrude macOS app.
-2. you (the admin) _receive a notification_ via text message, email, or Slack
+1. one of your children _submits a "suspend filter request"_ from the Gertrude macOS app.
+2. you (the parent) _receive a notification_ via text message, email, or Slack
 3. the link in the notification takes you to a screen where you can _accept or deny_
 
-To request that the filter be disabled, the user begins by clicking the **"Disable filter
+To request that the filter be disabled, the child begins by clicking the **"Disable filter
 temporarily..."** option in the Gertrude menu dropdown.
 
 {% image src="disable-filter-temporarily.png" caption="Click to request a filter suspension" /%}
 
-The user is shown a form where they can fill out the _length of time_ they wish to have
+The child is shown a form where they can fill out the _length of time_ they wish to have
 the filter suspended, and optionally a _comment explaining why_ the filter suspension is
 being requested.
 
-{% image src="request-filter-suspension.png" caption="The user writes a comment and picks a duration" /%}
+{% image src="request-filter-suspension.png" caption="The child writes a comment and picks a duration" /%}
 
-Once submitted (provided you've configured an admin notification in your
-[profile](https://dash.gertrude.app/profile) screen), you'll receive an email, text or
-Slack letting you know that your user is requesting a filter suspension. You can grant or
-deny the request, and if desired, also change the amount of time requested.
+Once submitted (provided you've configured a notification in your
+[settings](https://parents.gertrude.app/settings) screen), you'll receive an email, text
+or Slack letting you know that your child is requesting a filter suspension. You can grant
+or deny the request, and if desired, also change the amount of time requested.
 
 {% image src="accept-filter-suspension.png" caption="You get to grant or deny the request, and modify the duration" /%}
 
-## Reviewing user activity
+## Reviewing child activity
 
-If you elected to enable monitoring of your user, you will be able to **review your users
-activity** from within the Gertrude web admin. If you enabled key logging and screenshots
-as recommended in the beginning of this tutorial as recommended, you should already have a
-few items that you can review. To see how this works, login to your Gertrude web admin
-account and go to the _users_ screen and select the **activity** link from the user you
-created.
+If you elected to enable monitoring of your child, you will be able to **review your
+child's activity** from within the Gertrude parents website. If you enabled key logging
+and screenshots as recommended in the beginning of this tutorial as recommended, you
+should already have a few items that you can review. To see how this works, login to the
+Gertrude parents website and go to the _children_ screen and select the **activity** link
+from the child you added.
 
-{% image src="users-activity.png" caption="Go to 'Users' and click 'Activity'" /%}
+{% image src="users-activity.png" caption="Go to 'Children' and click 'Activity'" /%}
 
 You should see on the next screen that there are some _unreviewed activity items._ Click
 to view these and you will see a mixture of screenshots and text that was typed by the
-user.
+child.
 
 {% image src="unreviewed-activity.png" caption="Click to review activity" /%}
 
@@ -487,36 +490,35 @@ items individually&mdash;you'll notice when you have large amounts of items to r
 that Gertrude gives you the option to approve them _in chunks of one hundred at a time_,
 and also you can _approve an entire day at once_ at the bottom of the screen.
 
-{% callout type="note" title="Discussing screenshots with users" %}
+{% callout type="note" title="Discussing screenshots with children" %}
 
 It's not absolutely necessary that you always meticulously review each and every activity
 item. But we **strongly recommend** that you at least review _some_ of them so that you
 can **periodically make comments** to your kids about what you've seen and read while
 reviewing. The _knowledge that they are being watched_ is one of the key components of
-what makes your users safe.
+what makes your children safe.
 
 {% /callout %}
 
 ## App Administrative Actions
 
-Gertrude is built so that after the initial setup, you can _manage your protected users
-from any computer, phone or device_ where you have access to the internet. However,
-sometimes it is convenient to do _some basic administrative tasks_ directly on the your
-users' computer. For this reason the Gertrude app has some special protected admin-only
-options that you as the account owner can access and make use of when you wish. To access
-this screen, click the Gertrude app icon in the menu bar, then select _"Administrate..."_
-and supply your admin username and password.
+Gertrude is built so that after the initial setup, you can _manage your children from any
+computer, phone or device_ where you have access to the internet. However, sometimes it is
+convenient to do _some basic administrative tasks_ directly on the your child's computer.
+For this reason the Gertrude app has some special protected admin-only options that you as
+the account owner can access and make use of when you wish. To access this screen, click
+the Gertrude app icon in the menu bar, then select _"Administrate..."_ and supply your
+admin username and password.
 
-{% image src="administrate.png" caption="Click for admin-only options on your user's computer" /%}
+{% image src="administrate.png" caption="Click for admin-only options on your child's computer" /%}
 
 On the left-hand side click the **actions** navigation item.
 
-{% image src="admin-actions.png" caption="Click for admin-only options on your user's computer" /%}
+{% image src="admin-actions.png" caption="Click for admin-only options on your child's computer" /%}
 
 From this screen you may perform a number of _admin-only_ actions, including:
 
-- manually _stopping, starting_, or _suspending_ the filter
 - checking for Gertrude _app updates_
-- testing out screenshot permission and resolution
-- reconnecting to a different Gertrude user
+- reconnecting to a different child
+- manually \_stopping, the filter
 - _quitting_ the app

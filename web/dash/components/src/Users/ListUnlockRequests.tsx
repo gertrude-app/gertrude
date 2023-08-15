@@ -29,12 +29,12 @@ const ListUnlockRequests: React.FC<Props> = ({ requests, userName }) => (
       </div>
     ) : (
       <EmptyState
-        heading={`No unlock requests for this user`}
-        secondaryText={`This user has not submitted any unlock requests.`}
-        icon={`unlock`}
-        buttonText={`Back to dashboard`}
-        buttonIcon={`arrow-left`}
-        action={`/`}
+        heading="No unlock requests for this child"
+        secondaryText="This child has not submitted any unlock requests."
+        icon="unlock"
+        buttonText="Back to dashboard"
+        buttonIcon="arrow-left"
+        action="/"
       />
     )}
   </div>

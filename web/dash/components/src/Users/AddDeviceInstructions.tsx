@@ -19,7 +19,7 @@ const AddDeviceInstructions: React.FC<Props> = ({
 }) => (
   <>
     <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
-      {onMainDashboard ? `Congrats on making your first user!` : `Nearly there!`}
+      {onMainDashboard ? `Congrats on adding your first child!` : `Nearly there!`}
     </h1>
     <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl mx-auto">
       {onMainDashboard ? (
@@ -45,8 +45,8 @@ const AddDeviceInstructions: React.FC<Props> = ({
       </ListStep>
       {onMainDashboard ? (
         <ListStep index={2}>
-          Then, from back here inside the parent site, get a one-time user connection code
-          by{` `}
+          Then, from back here inside the parent site, get a one-time connection code by
+          {` `}
           <span
             className="cursor-pointer text-indigo-500"
             onClick={() => startAddDevice(userId)}
@@ -57,8 +57,8 @@ const AddDeviceInstructions: React.FC<Props> = ({
       ) : (
         <>
           <ListStep index={2}>
-            Then, from back here inside the parent site, get a one-time user connection
-            code by clicking the button below:
+            Then, from back here inside the parent site, get a one-time connection code by
+            clicking the button below:
           </ListStep>
           <Button
             type="button"

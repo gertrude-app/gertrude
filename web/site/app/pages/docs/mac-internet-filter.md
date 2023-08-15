@@ -68,7 +68,7 @@ make this easy by:
 ## Enabling Gertrude's Internet Filter
 
 To enable website blocking in Gertrude, you just click to turn on the filter after
-installing the mac app and connecting to a user.
+installing the mac app and connecting to a child.
 
 {% image src="enable-filter.png" caption="Enable filtering with a single click" alt="Mac internet filter" /%}
 
@@ -77,6 +77,6 @@ see Gertrude registered as a content filter:
 
 {% image src="content-filter.png" caption="Gertrude's internet filter" alt="Mac content filter" /%}
 
-Your users will be able to access a screen showing all of the blocked requests:
+Your children will be able to access a screen showing all of the blocked requests:
 
 {% image src="network-requests-window.png" caption="You can view every blocked request" alt="Mac website blocker" /%}

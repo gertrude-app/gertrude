@@ -10,7 +10,7 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = props({
-  children: `Profile`,
+  children: `Page heading`,
   icon: `user`,
 });
 

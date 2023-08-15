@@ -82,7 +82,7 @@ const KeychainPicker: React.FC<Props> = ({
           mode === `forUnlockRequestKey`
             ? {
                 text: `Assign a keychain`,
-                action: `/users/${userId}`,
+                action: `/children/${userId}`,
                 icon: `user`,
               }
             : undefined

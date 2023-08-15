@@ -84,8 +84,8 @@ more information.
 
 ## I can't access the internet on my admin user account
 
-_TLDR_&mdash;Sign in as your protected user, go to the "Administrate" > "Exempt Users"
-screen, and click to allow unrestricted access for the admin user account.
+_TLDR_&mdash;Sign in as your child, go to the "Administrate" > "Exempt Users" screen, and
+click to allow unrestricted access for the admin user account.
 
 {% image src="exempt-users.png" caption="Exempt an admin user from filtering" /%}
 
@@ -113,7 +113,7 @@ exempt user and have unrestricted internet and no monitoring from the Gertrude a
 ## Why are browsers forced to quit after a filter suspension expires?
 
 For maximum safety. Modern web browsers use `http2`, allowing them to _re-use socket
-connections_ to transmit data. In English, what that means is that any websites your user
+connections_ to transmit data. In English, what that means is that any websites your child
 has opened during a filter suspension _will remain partially unblocked after the filter
 suspension expires,_ as the browser will keep using a connection opened during the
 suspension. To prevent this, we terminate all browsers 60 seconds after a suspension

@@ -21,7 +21,7 @@ const Users: React.FC<Props> = ({
 }) => (
   <div className="flex flex-col">
     <ConnectModal request={addDeviceRequest} dismissAddDevice={dismissAddDevice} />
-    <PageHeading icon="users">Users</PageHeading>
+    <PageHeading icon="users">Children</PageHeading>
     <div className="mt-8 flex flex-col">
       {users.length > 0 ? (
         <>
@@ -36,23 +36,23 @@ const Users: React.FC<Props> = ({
           </div>
           <Button
             type="link"
-            to="/users/new"
+            to="/children/new"
             color="primary"
             className="self-center mb-16"
             size="large"
           >
             <i className="fa fa-plus mr-4" />
-            Add a user
+            Add a child
           </Button>
         </>
       ) : (
         <div>
           <EmptyState
-            heading={`No users`}
-            secondaryText={`Get started by creating a protected user`}
-            icon={`user`}
-            buttonText={`Add a user`}
-            action={`/users/new`}
+            heading="No children"
+            secondaryText="Get started by adding a child."
+            icon="user"
+            buttonText="Add a child"
+            action="/children/new"
           />
         </div>
       )}

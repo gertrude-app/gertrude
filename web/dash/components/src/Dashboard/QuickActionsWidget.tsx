@@ -21,8 +21,8 @@ const QuickActionsWidget: React.FC<Props> = ({ className, date = new Date() }) =
     <p className="mb-4 ml-2 text-slate-500">
       Here are some quick actions you may find useful:
     </p>
-    <QuickAction name="Create new user" Icon={UserPlusIcon} action="/users/new" />
-    <QuickAction name="Create new keychain" Icon={KeyIcon} action="/keychains/new" />
+    <QuickAction name="Add a new child" Icon={UserPlusIcon} action="/children/new" />
+    <QuickAction name="Create a new keychain" Icon={KeyIcon} action="/keychains/new" />
     <QuickAction
       name="View documentation"
       Icon={BookOpenIcon}

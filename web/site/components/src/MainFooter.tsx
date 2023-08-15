@@ -22,10 +22,10 @@ const MainFooter: React.FC = () => (
         </ul>
         <ul className="flex flex-col space-y-3 flex-grow">
           <li>
-            <FooterLink href="https://dash.gertrude.app/signup">Signup</FooterLink>
+            <FooterLink href="https://parents.gertrude.app/signup">Signup</FooterLink>
           </li>
           <li>
-            <FooterLink href="https://dash.gertrude.app">Login</FooterLink>
+            <FooterLink href="https://parents.gertrude.app">Login</FooterLink>
           </li>
           <li>
             <FooterLink href="/blog">Blog</FooterLink>

@@ -37,15 +37,14 @@ already know it. We recommend _changing your password regularly,_ and being care
 type it while your kids are watching. I require my kids to _look away_ or be in another
 room whenever I'm typing a password.
 
-This also goes for your _Gertrude web admin account_. Your users should not know the
-password for that account, or have access to a computer where you are logged in as the
-admin.
+This also goes for your _Gertrude parent account_. Your users should not know the password
+for that account, or have access to a computer where you are logged in as the parent.
 
 ## Let them know you're watching
 
 If you're using Gertrude's _monitoring features_ (screenshots and keylogging), make sure
-that you're periodically reviewing them in the admin web dashboard. Specifically, make it
-a point to _frequently mention something you saw or read_ while reviewing your activity.
+that you're periodically reviewing them in the parents website. Specifically, make it a
+point to _frequently mention something you saw or read_ while reviewing your activity.
 This way, they will always know that everything they do on their computer is truly being
 watched, which is often as effective in keeping them in safe places as the filter itself.
 It takes a little bit of time each day or each week to do this, but it's truly worth it.

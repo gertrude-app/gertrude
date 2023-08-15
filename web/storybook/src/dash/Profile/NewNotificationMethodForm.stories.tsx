@@ -1,10 +1,11 @@
 import { NewNotificationMethodForm } from '@dash/components';
 import type { StoryObj, Meta } from '@storybook/react';
-import { props } from '../../story-helpers';
+import { props, fixedViewport } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Profile/NewNotificationMethodForm', // eslint-disable-line
+  title: 'Dashboard/Settings/NewNotificationMethodForm', // eslint-disable-line
   component: NewNotificationMethodForm,
+  parameters: fixedViewport(385, 812),
 } satisfies Meta<typeof NewNotificationMethodForm>;
 
 type Story = StoryObj<typeof meta>;

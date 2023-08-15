@@ -13,7 +13,7 @@ const DocFooterCta: React.FC = () => (
       </p>
       <a
         className="mt-2 inline-flex rounded-lg bg-white px-4 py-1.5 text-sm font-bold text-violet-500"
-        href="https://dash.gertrude.app/signup"
+        href="https://parents.gertrude.app/signup"
       >
         Start free trial &rarr;
       </a>

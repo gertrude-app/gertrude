@@ -8,7 +8,8 @@
   - creating an `Admin` in the database with `.subscriptionStatus` set to
     `.pendingEmailVerification`
   - stores an ephemeral verification token
-  - generates an email containing link to: `dash.gertrude.app/verify-signup-email/<token>`
+  - generates an email containing link to:
+    `parents.gertrude.app/verify-signup-email/<token>`
 
 ## verify email
 

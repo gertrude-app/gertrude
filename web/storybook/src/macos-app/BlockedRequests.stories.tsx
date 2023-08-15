@@ -24,6 +24,11 @@ export const Default = props({
   dispatch: () => {},
 });
 
+export const Wide = props({
+  ...Default.args,
+  width: 1200,
+});
+
 export const Selected = props({
   ...Default.args,
   unlockRequestExplanation: `need this for my math class, dad!`,

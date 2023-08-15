@@ -38,9 +38,10 @@ privacy, and also because it promotes healthy self-regulation.
 
 ## Enabling Keylogging in Gertrude
 
-To enable keylogging, log in to the [parent's dashboard](https://dash.gertrude.app/users)
-and go to the **Users** screen. Click the **Edit** button for the child you would like to
-betin monitoring. Click to enable and save the user.
+To enable keylogging, log in to the
+[parent's dashboard](https://parents.gertrude.app/children) and go to the **Children**
+screen. Click the **Edit** button for the child you would like to betin monitoring. Click
+to enable and save the child.
 
 {% image src="enable-keylogging.png" caption="Gertrude's controls for enabling keylogging" alt="Enable keylogging with a single click" /%}
 
@@ -49,7 +50,7 @@ betin monitoring. Click to enable and save the user.
 Once configured, the Gertrude Mac app will constantly record your child's typing, and
 every few minutes upload the data to our servers where only you the parent can have access
 to it. Then, whenever you want, you can log into the parental dashboard, go to the
-**Users** screen and click to view the **Activity** of your child.
+**Children** screen and click to view the **Activity** of your child.
 
 {% image src="users-activity.png" caption="Click the <b>Activity</b> button to review keylogging" alt="Review mac keylogging" /%}
 

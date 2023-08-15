@@ -15,12 +15,12 @@ const CreateFirstNotificationWidget: React.FC<Props> = ({ className }) => (
           Create your first notification!
         </h1>
         <p className="ml-2 text-slate-500 flex-grow">
-          Gertrude can notify you with a text, email, or Slack when one of your kids needs
-          a website unblocked, or would like the filter temporarily suspended.
+          Gertrude can notify you with a text, email, or Slack when one of your children
+          needs a website unblocked, or would like the filter temporarily suspended.
         </p>
       </div>
       <div className="py-4 sm:py-5 px-3 sm:px-4 -mb-3 sm:-mb-4 -mx-3 sm:-mx-4 bg-slate-50 rounded-b-3xl">
-        <Button type="link" to="/profile" color="primary">
+        <Button type="link" to="/settings" color="primary">
           Create a notification
         </Button>
       </div>

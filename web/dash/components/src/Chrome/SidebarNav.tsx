@@ -6,10 +6,10 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ComputerDesktopIcon,
+  Cog6ToothIcon,
   HomeIcon,
   KeyIcon,
   LifebuoyIcon,
-  UserIcon,
   UsersIcon,
 } from '@heroicons/react/24/solid';
 import { Logo } from '@shared/components';
@@ -39,6 +39,7 @@ const SidebarNav: React.FC<Props> = ({
           )}
           type="inverted"
           iconOnly={collapsed}
+          withForParents
         />
       </a>
       <div className={cx(`pb-4`)}>
@@ -54,11 +55,11 @@ const SidebarNav: React.FC<Props> = ({
         <SidebarOption
           Icon={UsersIcon}
           collapsed={collapsed}
-          to="/users"
-          isSelected={urlPath.startsWith(`/users`)}
+          to="/children"
+          isSelected={urlPath.startsWith(`/children`)}
           onClick={onInternalLinkClick}
         >
-          Users
+          Children
         </SidebarOption>
         <SidebarOption
           Icon={ComputerDesktopIcon}
@@ -79,13 +80,13 @@ const SidebarNav: React.FC<Props> = ({
           Keychains
         </SidebarOption>
         <SidebarOption
-          Icon={UserIcon}
+          Icon={Cog6ToothIcon}
           collapsed={collapsed}
-          to="/profile"
+          to="/settings"
           onClick={onInternalLinkClick}
-          isSelected={urlPath.startsWith(`/profile`)}
+          isSelected={urlPath.startsWith(`/settings`)}
         >
-          Profile
+          Settings
         </SidebarOption>
       </div>
       <hr className="bg-indigo-200/10 border-0 h-0.5 mx-4" />

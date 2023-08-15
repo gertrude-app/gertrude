@@ -35,7 +35,7 @@ const ScreenshotViewer: React.FC<Props> = ({
         width={width}
         height={height}
         loading={lazy && !isScreenshotTest() ? `lazy` : `eager`}
-        alt="user screenshot"
+        alt="child screenshot"
       />
     </div>
     <div className="px-4 py-3 sm:py-4 pt-0 flex justify-between items-center">

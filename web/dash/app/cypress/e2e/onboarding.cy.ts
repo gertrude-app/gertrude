@@ -41,12 +41,12 @@ describe(`dashboard onboarding nudges`, () => {
     });
 
     cy.visit(`/`);
-    cy.contains(`create a user for at least one of your kids`);
-    cy.contains(`Create a user`).click();
-    cy.location(`pathname`).should(`match`, /^\/users\/[a-f0-9-]{36}$/);
+    cy.contains(`add a child that you'd like to protect`);
+    cy.contains(`Add a child`).click();
+    cy.location(`pathname`).should(`match`, /^\/children\/[a-f0-9-]{36}$/);
 
     cy.testId(`user-name`).type(`Leopold`);
-    cy.contains(`Save user`).click();
+    cy.contains(`Save child`).click();
     cy.contains(`need to do 3 steps`);
     cy.contains(`Get connection code`).click();
     cy.contains(`123456`).should(`be.visible`);
@@ -54,7 +54,7 @@ describe(`dashboard onboarding nudges`, () => {
 
   it(`connect device from dashboard nudge`, () => {
     cy.interceptPql(`GetDashboardWidgets`, {
-      // we have a user, but no devices
+      // we have a child, but no devices
       users: [{ name: leopold.name, id: leopold.id, isOnline: true, numDevices: 0 }],
       unlockRequests: [],
       userActivitySummaries: [],
@@ -63,7 +63,7 @@ describe(`dashboard onboarding nudges`, () => {
     });
 
     cy.visit(`/`);
-    cy.contains(`Congrats on making your first user!`);
+    cy.contains(`Congrats on adding your first child!`);
     cy.contains(`clicking here`).click();
     cy.contains(`123456`).should(`be.visible`);
   });
@@ -77,11 +77,11 @@ describe(`dashboard onboarding nudges`, () => {
       numAdminNotifications: 0, // <-- no notifications
     });
 
-    cy.visit(`/profile`);
+    cy.visit(`/settings`);
     cy.contains(`No notifications`);
     cy.sidebarClick(`Dashboard`);
     cy.contains(`Create your first notification!`);
     cy.contains(`Create a notification`).click();
-    cy.location(`pathname`).should(`eq`, `/profile`);
+    cy.location(`pathname`).should(`eq`, `/settings`);
   });
 });

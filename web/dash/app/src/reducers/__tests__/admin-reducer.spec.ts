@@ -77,7 +77,7 @@ describe(`create new notification method flow`, () => {
 
 describe(`receiving admin from api`, () => {
   it(`.succeeded sets correctly massaged data on state slice`, () => {
-    const apiData = mock.adminProfile({
+    const apiData = mock.adminSettings({
       email: `blob@blob.com`,
       subscriptionStatus: `trialing`,
       verifiedNotificationMethods: [

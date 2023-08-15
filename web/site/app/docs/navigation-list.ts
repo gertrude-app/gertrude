@@ -6,7 +6,7 @@ const navigation = [
       { title: `Frequently Asked Questions`, href: `/docs/faqs` },
       { title: `Troubleshooting`, href: `/docs/troubleshooting` },
       { title: `Unblocking Guide`, href: `/docs/unblocking-guide` },
-      { title: `Keeping Users Safe`, href: `/docs/keeping-users-safe` },
+      { title: `Keeping Children Safe`, href: `/docs/keeping-children-safe` },
     ],
   },
   {
