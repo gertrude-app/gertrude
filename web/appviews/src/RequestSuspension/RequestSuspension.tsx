@@ -23,8 +23,8 @@ export const RequestSuspension: React.FC<Props> = ({
   emit,
   comment,
   page,
-  duration,
   request,
+  duration,
   adminAccountStatus,
   internetConnected,
 }) => {
@@ -178,8 +178,8 @@ const DurationPage: React.FC<
         >
           <div
             className={cx(
-              `absolute w-full left-0 flex justify-center [transition:300ms]`,
-              duration.mode === `custom` ? `top-0` : `top-16`,
+              `absolute w-full left-0 flex justify-center transition-opacity duration-300 top-0`,
+              duration.mode === `custom` ? `opacity-100` : `opacity-0`,
             )}
           >
             <TextInput
@@ -192,10 +192,7 @@ const DurationPage: React.FC<
                   seconds: Number(value) * 60,
                 })
               }
-              className={cx(
-                `max-w-sm [transition:300ms] relative top-8`,
-                duration.mode === `custom` ? `opacity-100` : `opacity-0`,
-              )}
+              className={cx(`max-w-sm relative top-8`)}
               unit="minutes"
             />
           </div>
@@ -208,7 +205,11 @@ const DurationPage: React.FC<
           >
             <i className="fa-solid fa-times text-slate-400 text-sm" />
           </button>
-          <div className={cx(`p-4 flex flex-row-reverse justify-between items-center`)}>
+          <div
+            className={cx(
+              `p-4 flex flex-row-reverse justify-between items-center relative z-10`,
+            )}
+          >
             <Button
               type="button"
               onClick={() => dispatch({ type: `nextFromDurationPageClicked` })}
