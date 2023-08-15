@@ -67,7 +67,7 @@ describe(`unlock request flow`, () => {
     cy.contains(`rejected`);
   });
 
-  it(`shows empty state if admin has no personal keychains to assign`, () => {
+  it(`shows empty state if parent has no personal keychains to assign`, () => {
     cy.interceptPql(`GetUser`, mock.user({ id: `1`, keychains: [] }));
     cy.visit(`/children/1/unlock-requests/2`);
     cy.url().should(`include`, `/review`);
@@ -76,7 +76,7 @@ describe(`unlock request flow`, () => {
     cy.contains(`No keychains`);
   });
 
-  it(`shows alternate empty state if child has no personal keychains, but the admin has at least one they could assign`, () => {
+  it(`shows alternate empty state if child has no personal keychains, but the parent has at least one they could assign`, () => {
     cy.interceptPql(`GetUser`, mock.user({ id: `1`, keychains: [] }));
     cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
     cy.visit(`/children/1/unlock-requests/2`);
@@ -175,10 +175,10 @@ describe(`unlock request flow`, () => {
     cy.contains(`Misc McStandard Keys`).should(`not.exist`);
   });
 
-  it(`includes public keychains by admin`, () => {
+  it(`includes public keychains by parent`, () => {
     const htc = mock.keychainSummary({
       isPublic: true,
-      authorId: betsy.id, // <--  admin owns the public keychain
+      authorId: betsy.id, // <--  parent owns the public keychain
       name: `HTC`,
     });
 

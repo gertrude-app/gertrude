@@ -14,7 +14,7 @@ getting started with Gertrude, [click here](https://www.youtube.com/watch?v=N8kL
 
 ---
 
-## Setting up your admin account
+## Setting up your parent account
 
 To start out, if you haven't already created a **Gertrude account** you'll need to do that
 first. To create an account [click this link](https://dash.gertrude.app/signup) and follow
@@ -39,7 +39,7 @@ can all be protected, but for the sake of simplicity, we use the language of
 
 {% /callout %}
 
-To _add a child,_ click the link in the dashboard of your Gertrude web admin account, or
+To _add a child,_ click the link in the dashboard of the Gertrude parents website, or
 select "children" from the side bar on the left hand and click the button to add a new
 child.
 
@@ -363,11 +363,9 @@ create new keys for your children._
 
 1. A child tries to access a website on the internet, and are _blocked._
 2. They open the network traffic window, and _find the request that was blocked._
-3. They then send an _unlock request_ to you, the admin, requesting that that website be
-   unlocked.
-4. Then you, the admin, have the opportunity to _review and approve or reject_ that
-   request. You approve the unlock request by _creating a key_ that unblocks that web
-   address.
+3. They then send an _unlock request_ to you requesting that that website be unlocked.
+4. Then you have the opportunity to _review and approve or reject_ that request. You
+   approve the unlock request by _creating a key_ that unblocks that web address.
 
 We'll walk through all four steps now, and we have
 [a more detailed article](/docs/unblocking-guide) with advanced tips and tricks on
@@ -390,12 +388,12 @@ add a comment, and then **click submit**.
 
 ### Accepting an unlock request
 
-Now that the unlock request is submitted, put back on your admin hat (you've been
+Now that the unlock request is submitted, put back on your parent hat (you've been
 impersonating your _child_ for the last few minutes), and visit the
-[home screen](https://dash.gertrude.app) of the admin web dashboard. You'll notice that
-there is a new unlock request visible:
+[home screen](https://dash.gertrude.app) of the parents website. You'll notice that there
+is a new unlock request visible:
 
-{% image src="dashboard-unlock-request.png" caption="The recently submitted unlock request in your admin dashboard" /%}
+{% image src="dashboard-unlock-request.png" caption="The recently submitted unlock request in your parents website" /%}
 
 Click to **accept** the request, and you'll be taken to a screen where Gertrude recommends
 a key that will unlock the given request. You're free to stop and edit the key if you
@@ -430,7 +428,7 @@ filter completely.** Examples of these sorts of situations include when your chi
 taking an online test, or doing some unusual activity or research. In these cases it
 _doesn't make sense to go through the work of creating keys or unlock requests_ because
 the websites they will be visiting _won't be needed again._ For times like this, you as
-the admin have the ability to **remotely suspend the filter** for a designated period of
+the parent have the ability to **remotely suspend the filter** for a designated period of
 time, after which it will resume normal filtering.
 
 {% callout type="warning" title="Is it safe to suspend the filter?" %}
@@ -446,7 +444,7 @@ we've found that these temporary filter suspensions are very safe.
 The way filter suspensions work is similar (although simpler) than unlock requests.
 
 1. one of your children _submits a "suspend filter request"_ from the Gertrude macOS app.
-2. you (the admin) _receive a notification_ via text message, email, or Slack
+2. you (the parent) _receive a notification_ via text message, email, or Slack
 3. the link in the notification takes you to a screen where you can _accept or deny_
 
 To request that the filter be disabled, the child begins by clicking the **"Disable filter
@@ -460,7 +458,7 @@ being requested.
 
 {% image src="request-filter-suspension.png" caption="The child writes a comment and picks a duration" /%}
 
-Once submitted (provided you've configured an admin notification in your
+Once submitted (provided you've configured a notification in your
 [settings](https://parents.gertrude.app/settings) screen), you'll receive an email, text
 or Slack letting you know that your child is requesting a filter suspension. You can grant
 or deny the request, and if desired, also change the amount of time requested.
@@ -470,11 +468,11 @@ or deny the request, and if desired, also change the amount of time requested.
 ## Reviewing child activity
 
 If you elected to enable monitoring of your child, you will be able to **review your
-child's activity** from within the Gertrude web admin. If you enabled key logging and
-screenshots as recommended in the beginning of this tutorial as recommended, you should
-already have a few items that you can review. To see how this works, login to your
-Gertrude web admin account and go to the _children_ screen and select the **activity**
-link from the child you added.
+child's activity** from within the Gertrude parents website. If you enabled key logging
+and screenshots as recommended in the beginning of this tutorial as recommended, you
+should already have a few items that you can review. To see how this works, login to the
+Gertrude parents website and go to the _children_ screen and select the **activity** link
+from the child you added.
 
 {% image src="users-activity.png" caption="Go to 'Children' and click 'Activity'" /%}
 

@@ -49,7 +49,7 @@ describe(`dashboard app login`, () => {
       cy.contains(`Check your email`);
     });
 
-    it(`redirects to / if admin is already logged in`, () => {
+    it(`redirects to / if parent is already logged in`, () => {
       cy.simulateLoggedIn();
       cy.visit(`/login`);
       cy.contains(`Dashboard`);
@@ -63,7 +63,7 @@ describe(`dashboard app login`, () => {
       cy.location(`pathname`).should(`eq`, `/children`);
     });
 
-    it(`redirects to intended location after login (expired admin tokens)`, () => {
+    it(`redirects to intended location after login (expired tokens)`, () => {
       localStorage.setItem(`admin_id`, betsy.id);
       localStorage.setItem(`admin_token`, `deadbeef-dead-beef-dead-beefdeadbeef`);
       cy.visit(`/children`);
@@ -86,7 +86,7 @@ describe(`dashboard app login`, () => {
       cy.contains(`Email sent!`).should(`be.visible`);
     });
 
-    it(`logs admin back in after password reset`, () => {
+    it(`logs parent back in after password reset`, () => {
       cy.interceptPql(`ResetPassword`, { success: true });
       cy.visit(`/reset-password/123`);
       cy.contains(`Choose a new password`);

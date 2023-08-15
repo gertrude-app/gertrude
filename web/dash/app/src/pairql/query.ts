@@ -18,7 +18,7 @@ export async function query<Input, Output>(
         isPqlError: true,
         id: `10569a9f`,
         type: `loggedOut`,
-        debugMessage: `No admin token found`,
+        debugMessage: `No parent token found`,
       });
     }
     headers[`X-AdminToken`] = token;
