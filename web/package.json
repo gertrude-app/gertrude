@@ -19,7 +19,7 @@
     "nx": "16.7.2",
     "prettier": "3.0.2",
     "typescript": "5.2.1-rc",
-    "vitest": "0.29.7",
+    "vitest": "0.34.2",
     "x-chalk": "^1.0.1"
   }
 }
