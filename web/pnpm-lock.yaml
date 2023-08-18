@@ -17,7 +17,7 @@ importers:
       eslint-plugin-react: ^7.32.2
       eslint-plugin-react-hooks: ^4.6.0
       nx: 15.8.8
-      prettier: 2.8.6
+      prettier: 3.0.2
       typescript: 5.2.1-rc
       vitest: 0.29.7
       x-chalk: ^1.0.1
@@ -35,7 +35,7 @@ importers:
       eslint-plugin-react: 7.32.2_eslint@8.26.0
       eslint-plugin-react-hooks: 4.6.0_eslint@8.26.0
       nx: 15.8.8
-      prettier: 2.8.6
+      prettier: 3.0.2
       typescript: 5.2.1-rc
       vitest: 0.29.7
       x-chalk: 1.0.1
@@ -8992,9 +8992,9 @@ packages:
     hasBin: true
     dev: false
 
-  /prettier/2.8.6:
-    resolution: {integrity: sha512-mtuzdiBbHwPEgl7NxWlqOkithPyp4VN93V7VeHVWBF+ad3I5avc0RVDT4oImXQy9H/AqxA2NSQH8pSxHW6FYbQ==}
-    engines: {node: '>=10.13.0'}
+  /prettier/3.0.2:
+    resolution: {integrity: sha512-o2YR9qtniXvwEZlOKbveKfDQVyqxbEIWn48Z8m3ZJjBjcCmUy3xZGIv+7AkaeuaTr6yPXJjwv07ZWlsWbEy1rQ==}
+    engines: {node: '>=14'}
     hasBin: true
     dev: true
 

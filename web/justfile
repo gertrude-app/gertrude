@@ -75,13 +75,13 @@ visual-test-reset:
 	@git restore --source=HEAD --staged --worktree -- storybook/visual-tests/screenshots/argos
 
 format:
-	@pnpm prettier --config ./.prettierrc.json --loglevel warn --write .
+	@pnpm prettier --config ./.prettierrc.json --log-level warn --write .
 
 format-check:
-	@pnpm prettier --config ./.prettierrc.json --loglevel warn --check .
+	@pnpm prettier --config ./.prettierrc.json --log-level warn --check .
 
 format-codegen:
-	@pnpm prettier --config ./.prettierrc.json --loglevel warn --write "appviews/**/*-{store,types}.ts"
+	@pnpm prettier --config ./.prettierrc.json --log-level warn --write "appviews/**/*-{store,types}.ts"
 
 lint:
 	@pnpm eslint .
