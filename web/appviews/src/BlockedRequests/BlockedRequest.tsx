@@ -19,10 +19,10 @@ const BlockedRequest: React.FC<Props> = ({
   onSelectToggle,
 }) => (
   <div
-    className="flex items-center justify-between p-3 rounded-xl even:bg-slate-50 dark:even:bg-slate-800/30 transition-[background-color] duration-100 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+    className="flex relative items-center justify-between p-3 rounded-xl group even:bg-slate-50 dark:even:bg-[#141A2A] transition-[background-color] hover:bg-slate-100 dark:hover:bg-slate-800 duration-100 cursor-pointer overflow-x-hidden shrink-0"
     onClick={onSelectToggle}
   >
-    <div className="flex items-center flex-grow">
+    <div className="flex items-center">
       <div
         className={cx(
           `border w-6 h-6 rounded-full transition-[border-color,background-color] duration-100 hover:scale-105 cursor-pointer flex justify-center items-center shrink-0`,
@@ -51,15 +51,18 @@ const BlockedRequest: React.FC<Props> = ({
       >
         {protocol}
       </span>
-      <div className="mx-6 flex-grow relative self-stretch flex items-center w-0">
+      <div className="mx-6 flex-grow relative self-stretch flex items-center">
         <span className="text-sm font-mono text-slate-800 dark:text-slate-200 overflow-ellipsis overflow-hidden whitespace-nowrap">
           {target}
         </span>
       </div>
     </div>
-    <span className="shrink-0 max-w-[220px] overflow-hidden whitespace-nowrap text-ellipsis text-slate-400 dark:text-slate-500 font-medium">
-      {app}
-    </span>
+    <div className="shrink-0 absolute right-0 overflow-hidden whitespace-nowrap text-ellipsis text-slate-400 dark:text-slate-500 font-medium flex">
+      <div className="w-16 shrink-0 bg-gradient-to-r from-[#ffffff00] dark:from-[#0f172a00] group-odd:to-white dark:group-odd:to-slate-900 group-even:to-slate-50 dark:group-even:to-[#141A2E] group-hover:to-slate-100 dark:group-hover:to-slate-800" />
+      <span className="shrink-0 group-even:bg-slate-50 group-odd:bg-white dark:group-even:bg-[#141A2E] dark:group-odd:bg-slate-900 group-hover:bg-slate-100 pr-4 dark:group-hover:bg-slate-800 pl-8">
+        {app}
+      </span>
+    </div>
   </div>
 );
 

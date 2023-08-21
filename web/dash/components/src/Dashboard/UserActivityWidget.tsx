@@ -21,7 +21,7 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
     return (
       <DashboardWidget className={cx(`!bg-violet-50`, className)}>
         <div className="flex flex-col justify-center items-center p-6 rounded-xl h-full">
-          <h3 className="font-bold text-black text-opacity-80 text-lg">
+          <h3 className="font-bold text-black text-opacity-80 text-lg text-center">
             No recorded child activity
           </h3>
           <p className="mb-4 text-violet-600/80 text-center">

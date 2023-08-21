@@ -32,7 +32,7 @@ const PillBadge: React.FC<Props> = ({ type, className, children, size }) => {
   return (
     <div
       className={cx(
-        `max-w-fit border rounded-full flex justify-center`,
+        `max-w-fit border rounded-full flex justify-center items-center`,
         {
           'text-xs px-[12px] py-[2px]': size === `small`,
           'text-base px-6 py-0.5': size === `large`,

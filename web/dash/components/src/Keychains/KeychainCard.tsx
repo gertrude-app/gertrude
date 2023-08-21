@@ -101,7 +101,7 @@ const KeychainCard: React.FC<Props> = ({
               !isPublic && `opacity-0`, // ensure equal heights
             )}
           >
-            <i className="fa-solid fa-users mr-1 text-sm" /> Public
+            <i className="fa-solid fa-users mr-2 text-sm" /> Public
           </PillBadge>
         </div>
         {props.mode === `list` && (
