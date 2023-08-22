@@ -27,7 +27,7 @@ const MobileStickyHeader: React.FC<MobileStickyHeaderProps> = ({
       onClick={onHamburgerClick}
     >
       <span className="sr-only">Open sidebar</span>
-      <Bars3Icon className="h-9 text-slate-500 text-opacity-70 hover:text-opacity-90 transition duration-100 cursor-pointer" />
+      <Bars3Icon className="h-9 text-slate-500 text-opacity-70 hover:text-opacity-90 transition-[text-opacity] duration-100 cursor-pointer" />
     </button>
     <Link
       to="/"

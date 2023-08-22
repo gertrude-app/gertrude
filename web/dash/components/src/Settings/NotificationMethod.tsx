@@ -18,7 +18,7 @@ const NotificationMethod: React.FC<Props> = ({ deletable, onDelete, method, valu
       onClick={deletable ? onDelete : undefined}
       disabled={!deletable}
       className={cx(
-        `w-10 h-10 rounded-full transition duration-75 bg-black bg-opacity-0 flex justify-center items-center mr-2 shrink-0`,
+        `w-10 h-10 rounded-full transition-colors duration-75 bg-black bg-opacity-0 flex justify-center items-center mr-2 shrink-0`,
         deletable ? `cursor-pointer hover:bg-opacity-5` : `cursor-not-allowed`,
       )}
     >

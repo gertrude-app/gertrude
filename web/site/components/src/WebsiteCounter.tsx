@@ -112,7 +112,7 @@ const WebsiteCounter: React.FC = () => {
       </div>
       <div className="mt-8 flex flex-col antialiased justify-center items-center -space-y-1.5">
         <a
-          className="transition text-opacity-20 hover:text-opacity-30 text-white text-sm"
+          className="transition-opacity opacity-20 hover:opacity-30 text-white text-sm"
           href="https://firstsiteguide.com/how-many-websites/"
         >
           <span className="text-white text-opacity-40 text-lg">*</span>
@@ -120,7 +120,7 @@ const WebsiteCounter: React.FC = () => {
           https://firstsiteguide.com/how-many-websites
         </a>
         <a
-          className="transition text-opacity-20 hover:text-opacity-30 text-white text-sm"
+          className="transition-opacity opacity-20 hover:opacity-30 text-white text-sm"
           href="https://siteefy.com/how-many-websites-are-there/"
         >
           <span className="text-white text-opacity-40 text-lg">‡</span>
@@ -128,7 +128,7 @@ const WebsiteCounter: React.FC = () => {
           https://siteefy.com/how-many-websites-are-there
         </a>
         <a
-          className="transition text-opacity-20 hover:text-opacity-30 text-white text-sm"
+          className="transition-opacity opacity-20 hover:opacity-30 text-white text-sm"
           href="https://www.bbc.com/news/technology-23030090"
         >
           <span className="text-white text-opacity-40 text-lg">†</span>
@@ -170,7 +170,7 @@ const Statistic: React.FC<StatisticProps> = ({ children, className, delay, visib
   return (
     <div
       className={cx(
-        `p-10 bg-slate-800 rounded-xl shadow-xl border-slate-700 border-[0.5px] relative overflow-hidden transition duration-200`,
+        `p-10 bg-slate-800 rounded-xl shadow-xl border-slate-700 border-[0.5px] relative overflow-hidden transition-[opacity,transform] duration-200`,
         // when cards are stacked, make them appear one at a time; otherwise with cool synchronized animation
         (windowWidth < 1024 ? intersected : appeared)
           ? `opacity-100`

@@ -47,7 +47,7 @@ const Action: React.FC<{ label: string; onClick: () => unknown }> = ({
   onClick,
 }) => (
   <button
-    className="text-slate-600 w-56 py-2 shadow-md rounded-md font-bold bg-white/80 text-sm transition-all hover:bg-white/100 hover:-translate-y-[1px] hover:shadow-lg active:translate-y-0 active:shadow"
+    className="text-slate-600 w-56 py-2 shadow-md rounded-md font-bold bg-white/80 text-sm duration-150 transition-[background-color,transform,box-shadow] hover:bg-white/100 hover:-translate-y-[1px] hover:shadow-lg active:translate-y-0 active:shadow"
     onClick={onClick}
   >
     {label}

@@ -15,13 +15,13 @@ const ConnectFailed: React.FC<Props> = ({ error, emit }) => (
       <div className="flex space-x-2 justify-between mt-4">
         <button
           onClick={() => emit({ case: `connectFailedHelpClicked` })}
-          className="px-6 py-1.5 rounded-lg bg-white/30 dark:bg-white/20 font-bold active:scale-95 transition duration-100 hover:bg-white/20 dark:hover:bg-white/30 dark:text-white"
+          className="px-6 py-1.5 rounded-lg bg-white/30 dark:bg-white/20 font-bold active:scale-95 transition-[background-color] duration-100 hover:bg-white/20 dark:hover:bg-white/30 dark:text-white"
         >
           Get help
         </button>
         <button
           onClick={() => emit({ case: `retryConnectClicked` })}
-          className="px-6 py-1.5 rounded-lg bg-white dark:bg-white/80 font-bold active:scale-95 transition duration-100 hover:bg-white/80 dark:hover:bg-white"
+          className="px-6 py-1.5 rounded-lg bg-white dark:bg-white/80 font-bold active:scale-95 transition-[background-color] duration-100 hover:bg-white/80 dark:hover:bg-white"
         >
           Try again
         </button>

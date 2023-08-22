@@ -13,7 +13,7 @@ const FeedHeader: React.FC<Props> = ({ date, numItems, numDeleted }) => (
     <div className="flex items-center text-md sm:text-l">
       <Link
         to="../"
-        className="flex items-center mr-4 sm:mr-8 text-slate-500 hover:bg-violet-50 py-2 px-4 rounded-xl antialiased hover:text-violet-600 transition duration-100"
+        className="flex items-center mr-4 sm:mr-8 text-slate-500 hover:bg-violet-50 py-2 px-4 rounded-xl antialiased hover:text-violet-600 transition-colors duration-100 font-medium"
       >
         <i className="fa fa-chevron-left mr-2" aria-hidden /> Back
       </Link>

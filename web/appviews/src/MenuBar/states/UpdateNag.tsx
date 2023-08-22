@@ -16,14 +16,14 @@ const UpdateNag: React.FC<Props> = ({ emit }) => (
     <div className="flex mt-8 gap-3">
       <button
         onClick={() => emit({ case: `updateNagUpdateClicked` })}
-        className="flex items-center text-lg font-bold bg-violet-500/90 px-7 py-3 rounded-xl shadow-md transition duration-100 hover:bg-violet-600/90 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow"
+        className="flex items-center text-lg font-bold bg-violet-500/90 px-7 py-3 rounded-xl shadow-md transition-[transform,background-color,box-shadow] duration-100 hover:bg-violet-600/90 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow"
       >
         <i className="fa fa-sync text-xl w-6 mr-2 text-white" />
         <span className="text-white">Update</span>
       </button>
       <button
         onClick={() => emit({ case: `updateNagDismissClicked` })}
-        className="flex items-center text-lg font-bold bg-white/90 px-5 py-3 rounded-xl shadow-md transition duration-100 hover:bg-white/100 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow"
+        className="flex items-center text-lg font-bold bg-white/90 px-5 py-3 rounded-xl shadow-md transition-[transform,background-color,box-shadow] duration-100 hover:bg-white/100 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow"
       >
         <i className="fa fa-stopwatch text-xl w-6 mr-2 text-gray-600/80" />
         <span className="text-gray-600 antialiased">Do it later...</span>

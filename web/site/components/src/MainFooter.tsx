@@ -48,14 +48,11 @@ interface FooterLinkProps {
   href: string;
 }
 
-const FooterLink: React.FC<FooterLinkProps> = ({ children, href }) => {
-  const Element = href.startsWith(`https://`) ? `a` : Link;
-  return (
-    <Element
-      href={href}
-      className="text-slate-600 hover:text-slate-500 transition duration-100 p-1 text-lg"
-    >
-      {children}
-    </Element>
-  );
-};
+const FooterLink: React.FC<FooterLinkProps> = ({ children, href }) => (
+  <Link
+    href={href}
+    className="text-slate-600 hover:text-slate-500 transition-[color] duration-100 p-1 text-lg"
+  >
+    {children}
+  </Link>
+);

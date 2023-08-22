@@ -17,15 +17,13 @@ const UserBlock: React.FC<Props> = ({
   emit,
 }) => {
   const monitoringStyles = {
-    screenshotButton: `bg-slate-200/70 text-slate-400 dark:bg-slate-800 dark:text-slate-600`,
-    screenshotButtonText: `text-slate-500`,
+    screenshotIndicator: `bg-slate-200/70 text-slate-400 dark:bg-slate-800 dark:text-slate-600`,
     keystrokeIndicator: `bg-slate-200/70 text-slate-400 dark:bg-slate-800 dark:text-slate-600`,
     screenshotText: `text-slate-500 dark:text-slate-400`,
     keystrokeText: `text-slate-500 dark:text-slate-400`,
   };
   if (screenshotMonitoringEnabled) {
-    monitoringStyles.screenshotButton = `bg-indigo-100 dark:bg-indigo-500/30 text-indigo-500 dark:text-indigo-400`;
-    monitoringStyles.screenshotButtonText = `text-indigo-500`;
+    monitoringStyles.screenshotIndicator = `bg-indigo-100 dark:bg-indigo-500/30 text-indigo-500 dark:text-indigo-400`;
     monitoringStyles.screenshotText = `text-indigo-500`;
   }
   if (keystrokeMonitoringEnabled) {
@@ -56,24 +54,14 @@ const UserBlock: React.FC<Props> = ({
         </div>
         <div className="flex flex-col items-end relative">
           <div className="flex space-x-4">
-            <button
+            <div
               className={cx(
-                `rounded-full flex items-center transition-all duration-200 group w-8 hover:w-[182px] overflow-hidden active:scale-95`,
-                monitoringStyles.screenshotButton,
+                `w-8 h-8 rounded-full flex justify-center items-center shrink-0`,
+                monitoringStyles.screenshotIndicator,
               )}
             >
-              <div className="w-8 h-8 rounded-full flex justify-center items-center shrink-0">
-                <i className="fa-solid fa-binoculars" />
-              </div>
-              <span
-                className={cx(
-                  `opacity-0 transition duration-200 group-hover:opacity-100 text-sm pl-1 whitespace-nowrap`,
-                  monitoringStyles.screenshotButtonText,
-                )}
-              >
-                Take test screenshot
-              </span>
-            </button>
+              <i className="fa-solid fa-binoculars" />
+            </div>
             <div
               className={cx(
                 `w-8 h-8 rounded-full flex justify-center items-center`,

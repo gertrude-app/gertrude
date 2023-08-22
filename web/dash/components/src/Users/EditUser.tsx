@@ -83,7 +83,7 @@ const EditUser: React.FC<Props> = ({
               Child&rsquo;s name:
             </Label>
             <input
-              className="border-[0.5px] border-slate-200 shadow text-2xl md:text-3xl lg:text-4xl px-6 md:px-8 py-3 md:py-4 rounded-2xl md:rounded-3xl placeholder:text-slate-200 outline-none outline-transparent outline-offset-0 focus:outline-2 focus:outline-violet-500 [transition:200ms] focus:shadow-md font-medium text-slate-800 placeholder:font-normal"
+              className="border-[0.5px] border-slate-200 shadow text-2xl md:text-3xl lg:text-4xl px-6 md:px-8 py-3 md:py-4 rounded-2xl md:rounded-3xl placeholder:text-slate-200 outline-none outline-transparent outline-offset-0 focus:outline-2 focus:outline-violet-500 transition duration-200 focus:shadow-md font-medium text-slate-800 placeholder:font-normal"
               id="name"
               name="name"
               value={name}
@@ -166,7 +166,7 @@ const EditUser: React.FC<Props> = ({
                   />
                   <button
                     onClick={() => deleteDevice.start(device.id)}
-                    className="transition duration-100 flex justify-center items-center w-10 h-10 rounded-full hover:bg-slate-100 cursor-pointer text-slate-500 hover:text-red-500"
+                    className="transition-colors duration-100 flex justify-center items-center w-10 h-10 rounded-full hover:bg-slate-100 cursor-pointer text-slate-500 hover:text-red-500"
                   >
                     <i className="fa fa-trash" />
                   </button>
@@ -174,7 +174,7 @@ const EditUser: React.FC<Props> = ({
               ))}
               <button
                 onClick={startAddDevice}
-                className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition duration-100"
+                className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition-colors duration-100"
               >
                 <i className="fa fa-plus mr-2" />
                 Add a computer
@@ -192,7 +192,7 @@ const EditUser: React.FC<Props> = ({
                 <Toggle enabled={keyloggingEnabled} setEnabled={setKeyloggingEnabled} />
               </div>
               <div
-                className={`bg-slate-100 my-3 p-4 sm:p-6 rounded-xl overflow-hidden relative [transition:150ms]`}
+                className={`bg-slate-100 my-3 p-4 sm:p-6 rounded-xl overflow-hidden relative`}
               >
                 <div className="flex justify-between items-center">
                   <div className="mr-3">
@@ -208,7 +208,7 @@ const EditUser: React.FC<Props> = ({
                 </div>
                 <div
                   className={cx(
-                    `flex flex-col space-y-3 md:flex-row md:space-x-3 md:space-y-0 mt-5 transition duration-100`,
+                    `flex flex-col space-y-3 md:flex-row md:space-x-3 md:space-y-0 mt-5`,
                     screenshotsEnabled ? `opacity-100` : `opacity-0 hidden`,
                   )}
                 >
@@ -245,7 +245,7 @@ const EditUser: React.FC<Props> = ({
                   />
                 ))}
                 <button
-                  className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition duration-100"
+                  className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition-colors duration-100"
                   onClick={onAddKeychainClicked}
                 >
                   <i className="fa fa-plus mr-2" />

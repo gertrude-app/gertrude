@@ -167,7 +167,7 @@ const Layout: React.FC<Props> = ({ children, title, tableOfContents }) => {
                             isActive(section)
                               ? `text-violet-300`
                               : `text-slate-500 hover:text-slate-300`,
-                            `font-medium transition duration-100`,
+                            `font-medium transition-[color] duration-100`,
                           )}
                         >
                           {section.title}
@@ -184,7 +184,7 @@ const Layout: React.FC<Props> = ({ children, title, tableOfContents }) => {
                                     isActive(subSection)
                                       ? `text-violet-300`
                                       : `hover:text-slate-300 text-slate-500`,
-                                    `transition duration-100 font-medium`,
+                                    `transition-[color] duration-100 font-medium`,
                                   )}
                                 >
                                   {subSection.title}
@@ -224,7 +224,7 @@ const Header: React.FC<{ navigation: typeof navigation }> = ({ navigation }) => 
   return (
     <header
       className={cx(
-        `sticky top-0 z-50 flex flex-wrap items-center justify-between px-4 py-5 shadow-slate-900/5 transition duration-500 shadow-none sm:px-6 lg:px-8`,
+        `sticky top-0 z-50 flex flex-wrap items-center justify-between px-4 py-5 shadow-slate-900/5 transition-[background-color] duration-500 shadow-none sm:px-6 lg:px-8`,
         isScrolled
           ? `bg-slate-900/95 backdrop-blur [@supports(backdrop-filter:blur(0))]:bg-slate-900/75`
           : `bg-transparent`,

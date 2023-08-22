@@ -18,7 +18,7 @@ const NotConnected: React.FC<Props> = ({ emit, onActionsIconClicked }) => (
     <Logo type="default" className="dark:[filter:brightness(600%)]" />
     <button
       onClick={() => emit({ case: `connectClicked` })}
-      className="flex items-center text-lg font-bold bg-white/90 px-6 py-3 rounded-xl mt-8 shadow-md transition duration-100 hover:bg-white/100 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow"
+      className="flex items-center text-lg font-bold bg-white/90 px-6 py-3 rounded-xl mt-8 shadow-md transition-[background-color,transform,box-shadow] duration-100 hover:bg-white/100 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow"
     >
       <i className="fa fa-laptop text-xl w-6 mr-3 text-indigo-600" />
       <span className="bg-gradient-to-br from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent [-webkit-background-clip:text;]">

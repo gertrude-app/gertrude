@@ -60,7 +60,7 @@ const SidebarButton: React.FC<SideBarButtonProps> = ({
   <button
     onClick={onClick}
     className={cx(
-      `transition duration-100 w-12 h-12 flex justify-center items-center rounded-lg`,
+      `transition-colors duration-100 w-12 h-12 flex justify-center items-center rounded-lg`,
       isActive
         ? `bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400`
         : `text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-600 dark:hover:text-slate-400`,

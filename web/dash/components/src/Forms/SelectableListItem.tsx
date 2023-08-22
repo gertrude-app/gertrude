@@ -29,7 +29,7 @@ const SelectableListItem: React.FC<Props> = ({
     >
       <div
         className={cx(
-          `rounded-full flex justify-center items-center text-white [transition:100ms]`,
+          `rounded-full flex justify-center items-center text-white transition-[width,border-width,border]`,
           selected
             ? `border-none w-6 h-6 bg-gradient-to-br from-indigo-500 to-fuchsia-500`
             : `w-5 h-5 border-2 `,

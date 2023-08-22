@@ -22,7 +22,7 @@ const UserDevice: React.FC<Props> = ({
   <Link
     to={`/computers/${id}`}
     className={cx(
-      `rounded-2xl p-2 px-3 bg-white border border-slate-200 transition duration-100 hover:bg-slate-50 flex justify-between items-center gap-6`,
+      `rounded-2xl p-2 px-3 bg-white border border-slate-200 transition-[background-color] duration-100 hover:bg-slate-50 flex justify-between items-center gap-6`,
       className,
     )}
   >

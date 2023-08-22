@@ -103,7 +103,7 @@ const UserCard: React.FC<Props> = ({
       >
         {devices.length > 0 && (
           <button
-            className="w-8 h-8 rounded-full bg-violet-50 flex justify-center items-center text-violet-400 text-lg hover:bg-violet-100 transition duration-100 hover:text-violet-500"
+            className="w-8 h-8 rounded-full bg-violet-50 flex justify-center items-center text-violet-400 text-lg hover:bg-violet-100 transition-colors duration-100 hover:text-violet-500"
             onClick={addDevice}
           >
             <i className="fa-solid fa-plus" />

@@ -53,7 +53,7 @@ const NotificationCard: React.FC<Props> = ({
       <Summary {...selectedMethod} trigger={trigger} />
       <div
         className={cx(
-          `p-4 space-y-4 -mt-4 [transition:150ms] flex-grow`,
+          `p-4 space-y-4 -mt-4 duration-150 transition-[height,opacity] flex-grow`,
           editing ? `h-56` : `h-0 opacity-0 overflow-hidden`,
         )}
       >

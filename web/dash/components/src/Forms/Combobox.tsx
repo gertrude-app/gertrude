@@ -27,9 +27,9 @@ function Combobox<Value extends string = string>({
       value={selected}
       onChange={(option: { value: Value }) => setSelected(option.value)}
     >
-      <div className="relative mt-1 rounded-lg border">
+      <div className="relative mt-1 rounded-lg border border-slate-200">
         <HeadlessCombobox.Input
-          className="w-full rounded-lg bg-white py-3 pl-4 pr-10 shadow border-none outline-none focus:ring-indigo-500 focus:ring-2 focus:ring-offset-1 sm:text-md transition duration-100"
+          className="w-full rounded-lg bg-white py-3 pl-4 pr-10 shadow border-none outline-none focus:ring-indigo-500 focus:ring-2 focus:ring-offset-1 transition duration-100"
           onChange={(event) => setQuery(event.target.value)}
           displayValue={(option: { display: string }) => option.display}
         />
@@ -41,15 +41,15 @@ function Combobox<Value extends string = string>({
         </HeadlessCombobox.Button>
 
         {filteredOptions.length > 0 && (
-          <HeadlessCombobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+          <HeadlessCombobox.Options className="absolute z-10 mt-2 max-h-60 w-full overflow-auto rounded-xl bg-white p-2 text-base shadow-lg border-[0.5px] border-slate-200 focus:outline-none sm:text-sm">
             {filteredOptions.map((option) => (
               <HeadlessCombobox.Option
                 key={option.value}
                 value={option}
                 className={({ active }) =>
                   cx(
-                    `relative cursor-pointer select-none py-2 pl-3 pr-9`,
-                    active ? `bg-violet-700 text-white` : `text-slate-900`,
+                    `relative cursor-pointer select-none py-2 pl-3 pr-9 rounded-lg font-medium transition-colors duration-100`,
+                    active ? `bg-violet-100 text-violet-700` : `text-slate-900`,
                   )
                 }
               >

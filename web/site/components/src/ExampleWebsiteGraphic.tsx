@@ -15,7 +15,7 @@ const ExampleWebsiteGraphic: React.FC<Props> = ({ className }) => {
   return (
     <div
       className={cx(
-        `absolute w-52 h-52 bg-slate-800 shadow-xl rounded-xl flex flex-col border border-slate-700 transition duration-200 z-10 ${className}`,
+        `absolute w-52 h-52 bg-slate-800 shadow-xl rounded-xl flex flex-col border border-slate-700 transition-[transform,opacity] duration-200 z-10 ${className}`,
         intersected ? `opacity-1` : `opacity-0 translate-y-6`,
       )}
       ref={ref}

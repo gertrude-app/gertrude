@@ -49,7 +49,7 @@ const QuickAction: React.FC<QuickActionProps> = ({ name, Icon, action }) => (
     {...(typeof action === `string`
       ? { type: `link`, to: action }
       : { type: `button`, onClick: action })}
-    className="p-4 flex items-center odd:bg-slate-50 rounded-xl hover:bg-violet-50 transition duration-100 focus:outline focus:outline-violet-200"
+    className="p-4 flex items-center odd:bg-slate-50 rounded-xl hover:bg-violet-50 transition-[background-color] duration-100 focus:outline focus:outline-violet-200"
   >
     <div className="flex justify-center items-center text-white bg-gradient-to-br from-indigo-500 to-fuchsia-500 w-10 h-10 rounded-lg shrink-0">
       <Icon className="w-5" />

@@ -54,14 +54,14 @@ function SelectMenu<Value extends string = string>({
                 </div>
                 <Listbox.Button
                   className={cx(
-                    `relative inline-flex items-center px-4 rounded-l-none rounded-r-lg text-sm font-medium focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-50 focus:ring-indigo-500 [transition:100ms]`,
+                    `relative inline-flex items-center px-4 rounded-l-none rounded-r-lg text-sm font-medium focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-50 focus:ring-indigo-500 transition-[outline,background-color] duration-100`,
                     buttonStyles,
                     disabled && `cursor-not-allowed pointer-events-none`,
                   )}
                 >
                   <span className="sr-only">Change published status</span>
                   <i
-                    className={`fa fa-chevron-down text-xl text-opacity-90 transition duration-100 ${
+                    className={`fa fa-chevron-down text-xl text-opacity-90 transition-transform duration-100 ${
                       open ? `-rotate-180` : `rotate-0`
                     }`}
                     aria-hidden="true"
@@ -73,9 +73,12 @@ function SelectMenu<Value extends string = string>({
             <Transition
               show={open}
               as={Fragment}
-              leave="transition ease-in duration-100"
+              leave="transition-[opacity,transform] ease-in duration-100"
               leaveFrom="opacity-100"
-              leaveTo="opacity-0"
+              leaveTo="opacity-0 -translate-y-1"
+              enter="transition-[opacity,transform] ease-in duration-100"
+              enterFrom="opacity-0 -translate-y-1"
+              enterTo="opacity-100"
             >
               <Listbox.Options className="origin-top-right absolute z-20 right-0 mt-2 p-2 w-72 rounded-xl shadow-lg overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none flex flex-col">
                 {options.map(({ value, display }) => (
@@ -86,7 +89,7 @@ function SelectMenu<Value extends string = string>({
                         active
                           ? `bg-violet-100 text-slate-900 dark:text-slate-200`
                           : `text-slate-900 dark:text-slate-300`,
-                        `cursor-pointer select-none relative rounded-lg transition duration-75`,
+                        `cursor-pointer select-none relative rounded-lg transition-[background-color] duration-75`,
                         size === `small` ? `py-2 px-3` : `p-3.5 text-md`,
                         size === `small` && active && `bg-slate-50 dark:bg-slate-700/50`,
                       )

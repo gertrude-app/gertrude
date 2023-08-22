@@ -28,7 +28,7 @@ const Download: NextPage = () => (
       </div>
       <a
         href="https://gertrude.nyc3.digitaloceanspaces.com/releases/Gertrude.dmg"
-        className="bg-gradient-to-b from-white via-white to-fuchsia-100 px-8 py-4 text-2xl rounded-xl shadow-xl shadow-fuchsia-600 font-medium hover:-translate-y-1 transition duration-100 hover:shadow-2xl active:translate-y-1 active:shadow-md active:scale-95 hover:shadow-fuchsia-700 flex justify-center items-center"
+        className="bg-gradient-to-b from-white via-white to-fuchsia-100 px-8 py-4 text-2xl rounded-xl shadow-xl shadow-fuchsia-600 font-medium hover:-translate-y-1 transition-[box-shadow,transform] duration-100 hover:shadow-2xl active:translate-y-1 active:shadow-md active:scale-95 hover:shadow-fuchsia-700 flex justify-center items-center"
       >
         <i className="fa-solid fa-download mr-4 bg-gradient-to-br from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent [-webkit-background-clip:text;]" />
         <span className="bg-gradient-to-br from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent [-webkit-background-clip:text;]">

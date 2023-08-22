@@ -108,8 +108,8 @@ const User: React.FC<UserProps> = ({ name, isExempt, onToggle }) => (
   >
     <button
       className={cx(
-        `w-5 h-5 rounded-full border-slate-300 dark:border-slate-700 border mr-4 flex justify-center items-center hover:scale-105 transition duration-100`,
-        isExempt && `bg-red-500 border-red-500 dark:border-red-500`,
+        `w-5 h-5 rounded-full border-slate-300 dark:border-slate-700 border mr-4 flex justify-center items-center hover:scale-105 transition-[transform,border-color,border,background-color] duration-100`,
+        isExempt && `bg-red-500 !border-red-500 dark:border-red-500`,
       )}
     >
       <i className="fa-solid fa-check text-white dark:text-slate-900 text-xs" />

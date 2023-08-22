@@ -18,7 +18,7 @@ const Feature: React.FC<Props> = ({ children, icon, side, heading }) => {
   return (
     <div
       className={cx(
-        `m-6 transition duration-200 flex items-center relative z-20`,
+        `m-6 transition-[opacity,transform] duration-200 flex items-center relative z-20`,
         intersected
           ? cx(`opacity-100`, side === `left` ? `md:-rotate-3` : `md:rotate-3`)
           : `opacity-0 scale-90 translate-y-6`,

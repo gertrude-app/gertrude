@@ -59,7 +59,7 @@ const DaySummaryCard: React.FC<Props> = ({
       </div>
       <Link
         to={formatDate(date, `url`)}
-        className={`block p-6 rounded-xl shadow-lg shadow-slate-300/50 border-[0.5px] border-slate-200 bg-white hover:shadow-xl hover:shadow-slate-300/50 transition cursor-pointer duration-100 flex-grow my-4`}
+        className={`block p-6 rounded-xl shadow-lg shadow-slate-300/50 border-[0.5px] border-slate-200 bg-white hover:shadow-xl hover:shadow-slate-300/50 transition-shadow cursor-pointer duration-100 flex-grow my-4`}
       >
         <div className="flex items-center space-x-2 mb-4">
           <h2 className="text-slate-700 grow text-lg font-bold relative">
@@ -74,7 +74,7 @@ const DaySummaryCard: React.FC<Props> = ({
         </div>
         <div className="h-4 shadow-inner bg-slate-200 rounded-full">
           <div
-            className={`h-4 bg-gradient-to-r from-indigo-500 to-fuchsia-500 rounded-full [transition-property:width] duration-200 ease-in-out`}
+            className={`h-4 bg-gradient-to-r from-indigo-500 to-fuchsia-500 rounded-full transition-[width] duration-200 ease-in-out`}
             style={{ width: `${(completed / numItems) * 100}%` }}
           />
         </div>
