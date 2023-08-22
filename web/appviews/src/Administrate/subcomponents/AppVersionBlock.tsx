@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, SelectMenu } from '@shared/components';
+import { Button } from '@shared/components';
 import type { AppEvent } from '../administrate-store';
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
   emit(event: AppEvent): unknown;
 }
 
-const AppVersionBlock: React.FC<Props> = ({ appVersion, releaseChannel, emit }) => (
+const AppVersionBlock: React.FC<Props> = ({ appVersion, emit }) => (
   <div className="p-4 bg-slate-50 dark:bg-black/10 rounded-xl">
     <h3 className="font-semibold text-xl text-slate-600 dark:text-slate-400">
       Running version{` `}
@@ -28,16 +28,6 @@ const AppVersionBlock: React.FC<Props> = ({ appVersion, releaseChannel, emit }) 
         >
           Check for updates
         </Button>
-        <SelectMenu
-          size="small"
-          options={[
-            { value: `stable`, display: `stable versions` },
-            { value: `beta`, display: `beta versions` },
-            { value: `canary`, display: `canary versions` },
-          ]}
-          selectedOption={releaseChannel}
-          setSelected={(channel) => emit({ case: `releaseChannelUpdated`, channel })}
-        />
       </div>
       <Button
         type="button"

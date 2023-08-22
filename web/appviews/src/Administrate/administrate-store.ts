@@ -79,7 +79,6 @@ export type AppEvent =
   | { case: 'healthCheck'; action: HealthCheckAction }
   | { case: 'advanced'; action: AdvancedAction }
   | { case: 'gotoScreenClicked'; screen: Screen }
-  | { case: 'releaseChannelUpdated'; channel: 'stable' | 'beta' | 'canary' }
   | { case: 'setUserExemption'; userId: number; enabled: boolean }
   | { case: 'closeWindow' }
   | { case: 'stopFilterClicked' }

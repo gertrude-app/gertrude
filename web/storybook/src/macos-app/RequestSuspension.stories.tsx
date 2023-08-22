@@ -18,6 +18,7 @@ export const Default: Story = props({
   page: `duration`,
   duration: { mode: `standard`, seconds: null },
   internetConnected: true,
+  filterCommunicationConfirmed: true,
   emit: () => {},
   dispatch: () => {},
 });
@@ -25,6 +26,11 @@ export const Default: Story = props({
 export const NoInternet: Story = props({
   ...Default.args,
   internetConnected: false,
+});
+
+export const NoFilterCommunication = props({
+  ...Default.args,
+  filterCommunicationConfirmed: false,
 });
 
 export const OptionSelected: Story = props({

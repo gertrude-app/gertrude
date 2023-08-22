@@ -20,6 +20,7 @@ export const Default = props({
   createUnlockRequests: { case: `idle` } as const,
   selectedRequestIds: [],
   unlockRequestExplanation: ``,
+  filterCommunicationConfirmed: undefined,
   emit: () => {},
   dispatch: () => {},
 });
@@ -27,6 +28,11 @@ export const Default = props({
 export const Wide = props({
   ...Default.args,
   width: 1200,
+});
+
+export const NoFilterCommunication = props({
+  ...Default.args,
+  filterCommunicationConfirmed: false,
 });
 
 export const Selected = props({

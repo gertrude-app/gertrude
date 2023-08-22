@@ -19,13 +19,14 @@ const ExemptUsersScreen: React.FC<Props> = ({ users, emit }) => {
       <div className="p-6">
         <ErrorBlock
           title="Unexpected error"
-          message="Check health, or contact support if the problem persists."
           button={{
             text: `Check health`,
             icon: `fa-heart-pulse`,
             action: () => emit({ case: `gotoScreenClicked`, screen: `healthCheck` }),
           }}
-        />
+        >
+          Check health, or contact support if the problem persists.
+        </ErrorBlock>
       </div>
     );
   }

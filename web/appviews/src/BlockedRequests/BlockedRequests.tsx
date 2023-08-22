@@ -4,6 +4,7 @@ import { Button, Loading, TextInput, Toggle } from '@shared/components';
 import type { AppState, ViewState, AppEvent, ViewAction } from './blockedrequests-store';
 import type { PropsOf } from '../lib/store';
 import { containerize } from '../lib/store';
+import ErrorScreen from '../ErrorScreen';
 import ErrorBlock from '../ErrorBlock';
 import InactiveAccountScreen from '../components/InactiveAccountBlock';
 import AccountPastDueBanner from '../components/AccountPastDueBanner';
@@ -22,6 +23,7 @@ export const BlockedRequests: React.FC<Props> = ({
   createUnlockRequests,
   selectedRequestIds,
   adminAccountStatus,
+  filterCommunicationConfirmed,
 }) => {
   const filteredRequests = filterVisibleRequests(requests, filterText, tcpOnly);
   if (adminAccountStatus === `inactive`) {
@@ -30,6 +32,24 @@ export const BlockedRequests: React.FC<Props> = ({
         onRecheck={() => emit({ case: `inactiveAccountRecheckClicked` })}
         onDisconnect={() => emit({ case: `inactiveAccountDisconnectAppClicked` })}
       />
+    );
+  }
+
+  if (filterCommunicationConfirmed === false) {
+    return (
+      <ErrorScreen
+        title="Can't view network requests!"
+        button={{
+          text: `Administrate`,
+          action: () => emit({ case: `noFilterCommunicationAdministrateClicked` }),
+          icon: `fa-cog`,
+        }}
+      >
+        Sorry, we're having trouble communicating with the internet filter, so we can't
+        show you any blocked requests right now. If a parent is nearby, they can likely
+        fix the problem from the <b>Administrate screen.</b> If not,{` `}
+        <b>restarting the computer</b> will fix the problem.
+      </ErrorScreen>
     );
   }
 
@@ -170,13 +190,14 @@ const BottomPanel: React.FC<PanelProps> = ({
       <BottomPanelWrap className="flex h-44">
         <ErrorBlock
           title="Failed to send unlock request:"
-          message={createUnlockRequests.error}
           button={{
             text: `Try Again`,
             icon: `fa-redo`,
             action: () => emit({ case: `requestFailedTryAgainClicked` }),
           }}
-        />
+        >
+          {createUnlockRequests.error}
+        </ErrorBlock>
       </BottomPanelWrap>
     );
   }
