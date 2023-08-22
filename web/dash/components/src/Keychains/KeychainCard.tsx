@@ -1,8 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@shared/string';
-import { Button } from '@shared/components';
-import PillBadge from '../PillBadge';
+import { Button, PillBadge } from '@shared/components';
 import GradientIcon from '../GradientIcon';
 
 type Props =
@@ -102,7 +101,7 @@ const KeychainCard: React.FC<Props> = ({
               !isPublic && `opacity-0`, // ensure equal heights
             )}
           >
-            <i className="fa-solid fa-users mr-1 text-sm" /> Public
+            <i className="fa-solid fa-users mr-2 text-sm" /> Public
           </PillBadge>
         </div>
         {props.mode === `list` && (

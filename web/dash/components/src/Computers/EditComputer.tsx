@@ -2,9 +2,9 @@ import React from 'react';
 import cx from 'classnames';
 import { Button, SelectMenu, TextInput } from '@shared/components';
 import { Link } from 'react-router-dom';
+import PillBadge from '@shared/components/src/PillBadge';
 import type { ReleaseChannel } from '@dash/types';
 import PageHeading from '../PageHeading';
-import PillBadge from '../PillBadge';
 
 interface Props {
   name: string;

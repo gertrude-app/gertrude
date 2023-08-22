@@ -1,4 +1,4 @@
-import { PillBadge } from '@dash/components';
+import { PillBadge } from '@shared/components';
 import type { StoryObj, Meta } from '@storybook/react';
 
 const PillBadges: React.FC = () => (

@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { TextInput, Button } from '@shared/components';
+import { TextInput, Button, PillBadge } from '@shared/components';
 import type {
   AdminSubscriptionStatus,
   AdminNotificationTrigger,
@@ -13,7 +13,6 @@ import type {
 import { ConfirmDeleteEntity } from '../Modal';
 import EmptyState from '../EmptyState';
 import PageHeading from '../PageHeading';
-import PillBadge from '../PillBadge';
 import NewNotificationMethodSidebar from './NewNotificationMethodForm';
 import NotificationCard from './NotificationCard';
 import NotificationMethod from './NotificationMethod';

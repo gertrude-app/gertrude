@@ -4,7 +4,7 @@ import type { AdminAccountStatus, FilterState } from '../lib/shared-types';
 import { Store } from '../lib/store';
 
 // begin codegen
-export type Screen = 'home' | 'healthCheck' | 'exemptUsers' | 'advanced';
+export type Screen = 'healthCheck' | 'actions' | 'exemptUsers' | 'advanced';
 
 export interface HealthCheck {
   latestAppVersion?: { case: 'ok'; value: string } | { case: 'error'; message?: string };
@@ -110,7 +110,7 @@ export class AdministrateStore extends Store<AppState, AppEvent, ViewState, View
   appState(): AppState {
     return {
       windowOpen: true,
-      screen: `home`,
+      screen: `healthCheck`,
       filterState: { case: `off` },
       userName: ``,
       installedAppVersion: `0.0.0`,

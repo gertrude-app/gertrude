@@ -5,17 +5,20 @@ interface Props {
   children: React.ReactNode;
   severity: 'warning' | 'error';
   withoutBorder?: boolean;
+  className?: string;
 }
 
 const WarningBanner: React.FC<Props> = ({
   children,
   severity,
   withoutBorder = false,
+  className,
 }) => (
   <div
     className={cx(
       !withoutBorder &&
         `border-b border-slate-200 dark:border-slate-800 p-3 dark:bg-slate-900 bg-white`,
+      className,
     )}
   >
     <div
