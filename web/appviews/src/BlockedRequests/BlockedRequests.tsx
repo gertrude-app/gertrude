@@ -78,7 +78,7 @@ export const BlockedRequests: React.FC<Props> = ({
           Clear requests
         </Button>
       </header>
-      <div className="flex flex-col p-4 flex-grow overflow-y-scroll">
+      <div className="flex flex-col p-4 flex-grow overflow-y-auto">
         {requests.length === 0 && (
           <div className="h-full flex justify-center items-center">
             <div className="flex flex-col items-center">

@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 * {
   touch-callout: none;
   user-select: none;
@@ -13,6 +17,23 @@ textarea {
   -webkit-user-select: auto;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+.dark *::-webkit-scrollbar,
+body.dark::-webkit-scrollbar {
+  width: 12px;
+}
+
+.dark *::-webkit-scrollbar-track,
+body.dark::-webkit-scrollbar-track {
+  background-color: #0f172a;
+}
+
+.dark *::-webkit-scrollbar-thumb,
+body.dark::-webkit-scrollbar-thumb {
+  background-color: #1e293b;
+  border-radius: 6px;
+}
+
+.dark *::-webkit-scrollbar-thumb:hover,
+body.dark::-webkit-scrollbar-thumb {
+  background-color: #334155;
+}
