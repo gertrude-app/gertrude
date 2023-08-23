@@ -28,14 +28,44 @@ export const Actions: Story = props({
   },
   installedAppVersion: `2.0.0`,
   filterState: { case: `on` },
-  userName: `Little Jimmy`,
-  screenshotMonitoringEnabled: true,
-  keystrokeMonitoringEnabled: false,
+  user: {
+    name: `Little Jimmy`,
+    screenshotMonitoringEnabled: true,
+    keystrokeMonitoringEnabled: false,
+  },
   releaseChannel: `stable`,
   quitting: false,
   filterSuspensionDurationInSeconds: `300`,
+  dangerZoneModal: `hidden`,
+  availableAppUpdate: undefined,
   emit: () => {},
   dispatch: () => {},
+});
+
+export const ActionsNoUserOrFilter: Story = props({
+  ...Actions.args,
+  user: undefined,
+  filterState: { case: `off` },
+});
+
+export const ActionsUpdateAvailable: Story = props({
+  ...Actions.args,
+  availableAppUpdate: { semver: `4.2.1`, required: false },
+});
+
+export const ActionsUpdateRequired: Story = props({
+  ...Actions.args,
+  availableAppUpdate: { semver: `4.2.1`, required: true },
+});
+
+export const ActionsBetaChannel: Story = props({
+  ...Actions.args,
+  releaseChannel: `beta`,
+});
+
+export const ActionsModalOpen: Story = props({
+  ...Actions.args,
+  dangerZoneModal: `stopFilter`,
 });
 
 export const ActionsAccountInactive: Story = props({

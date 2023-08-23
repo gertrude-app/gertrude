@@ -17,16 +17,17 @@ type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 export const Administrate: React.FC<Props> = ({
   healthCheck,
   filterState,
-  userName,
-  screenshotMonitoringEnabled,
-  keystrokeMonitoringEnabled,
+  user,
   installedAppVersion,
+  availableAppUpdate,
   releaseChannel,
   exemptableUsers,
-  emit,
   screen,
   advanced,
   quitting,
+  dangerZoneModal,
+  emit,
+  dispatch,
 }) => {
   let pageElement: JSX.Element;
 
@@ -36,8 +37,8 @@ export const Administrate: React.FC<Props> = ({
         <HealthCheckScreen
           {...healthCheck}
           installedAppVersion={installedAppVersion}
-          screenshotMonitoringEnabled={keystrokeMonitoringEnabled}
-          keystrokeMonitoringEnabled={screenshotMonitoringEnabled}
+          screenshotMonitoringEnabled={user?.keystrokeMonitoringEnabled ?? false}
+          keystrokeMonitoringEnabled={user?.screenshotMonitoringEnabled ?? false}
           emit={(action) => emit({ case: `healthCheck`, action })}
         />
       );
@@ -47,10 +48,12 @@ export const Administrate: React.FC<Props> = ({
         <ActionsScreen
           releaseChannel={releaseChannel}
           emit={emit}
-          filterState={filterState}
+          dispatch={dispatch}
+          filterRunning={filterState.case === `on`}
           installedAppVersion={installedAppVersion}
-          newestAvailableVersion={{ version: `2.0.1`, required: false }} // TODO
-          userName={userName}
+          availableAppUpdate={availableAppUpdate}
+          dangerZoneModal={dangerZoneModal}
+          userName={user?.name}
           quitting={quitting}
         />
       );

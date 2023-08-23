@@ -68,7 +68,7 @@ const Connected: React.FC<Props> = ({
             : `hover:bg-white/30 dark:hover:bg-white/10`,
         )}
       >
-        <i className="fa fa-clock-rotate-left text-xl *h-5 shrink-0 text-black/70 dark:text-white/80" />
+        <i className="fa fa-clock-rotate-left text-xl shrink-0 text-black/70 dark:text-white/80" />
         <p className="text-sm font-medium text-left leading-5 dark:text-white">
           Suspend filter
         </p>

@@ -250,6 +250,19 @@ export default class HealthChecker {
           state: `checking`,
         },
       ];
+    } else if (filterStatus.case === `disabled`) {
+      return [
+        {
+          title: `Filter status`,
+          state: `warn`,
+          message: `Filter has been disabled`,
+          button: {
+            icon: `cog`,
+            label: `Enable filter`,
+            action: `enableFilterClicked`,
+          },
+        },
+      ];
     } else if (filterStatus.case === `notInstalled`) {
       return [
         {
