@@ -9,7 +9,6 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-// @screenshot: xs/350,md/350
 export const Default: Story = props({
   heading: `No burgers`,
   secondaryText: `Let's make some!`,
@@ -18,7 +17,6 @@ export const Default: Story = props({
   action: () => {},
 });
 
-// @screenshot: xs/350,md/350
 export const WithSecondaryButton: Story = props({
   heading: `No burgers`,
   secondaryText: `Let's make some!`,
@@ -32,7 +30,6 @@ export const WithSecondaryButton: Story = props({
   },
 });
 
-// @screenshot: xs/350
 export const Violet: Story = props({
   ...Default.args,
   violet: true,

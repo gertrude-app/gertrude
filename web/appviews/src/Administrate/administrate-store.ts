@@ -14,6 +14,7 @@ export interface HealthCheck {
     | { case: 'installing' }
     | { case: 'installTimeout' }
     | { case: 'notInstalled' }
+    | { case: 'disabled' }
     | { case: 'unexpected' };
   accountStatus?: Failable<AdminAccountStatus>;
   screenRecordingPermissionOk?: boolean;
@@ -35,6 +36,7 @@ export type HealthCheckAction =
   | 'recheckClicked'
   | 'upgradeAppClicked'
   | 'installFilterClicked'
+  | 'enableFilterClicked'
   | 'repairFilterCommunicationClicked'
   | 'repairOutOfDateFilterClicked'
   | 'fixScreenRecordingPermissionClicked'
@@ -65,9 +67,12 @@ export interface AppState {
   screen: Screen;
   healthCheck: HealthCheck;
   filterState: FilterState;
-  userName: string;
-  screenshotMonitoringEnabled: boolean;
-  keystrokeMonitoringEnabled: boolean;
+  user?: {
+    name: string;
+    screenshotMonitoringEnabled: boolean;
+    keystrokeMonitoringEnabled: boolean;
+  };
+  availableAppUpdate?: { semver: string; required: boolean };
   installedAppVersion: string;
   releaseChannel: 'stable' | 'beta' | 'canary';
   quitting: boolean;
@@ -79,29 +84,27 @@ export type AppEvent =
   | { case: 'healthCheck'; action: HealthCheckAction }
   | { case: 'advanced'; action: AdvancedAction }
   | { case: 'gotoScreenClicked'; screen: Screen }
-  | { case: 'releaseChannelUpdated'; channel: 'stable' | 'beta' | 'canary' }
   | { case: 'setUserExemption'; userId: number; enabled: boolean }
   | { case: 'closeWindow' }
-  | { case: 'stopFilterClicked' }
-  | { case: 'startFilterClicked' }
-  | { case: 'resumeFilterClicked' }
-  | { case: 'reinstallAppClicked' }
-  | { case: 'quitAppClicked' }
-  | { case: 'reconnectUserClicked' }
+  | { case: 'confirmStopFilterClicked' }
+  | { case: 'confirmQuitAppClicked' }
+  | { case: 'disconnectUserClicked' }
   | { case: 'administrateOSUserAccountsClicked' }
-  | { case: 'checkForAppUpdatesClicked' }
+  | { case: 'updateAppNowClicked' }
   | { case: 'inactiveAccountRecheckClicked' }
   | { case: 'inactiveAccountDisconnectAppClicked' };
 // end codegen
 
 export type ViewState = {
   filterSuspensionDurationInSeconds: string;
+  dangerZoneModal: 'hidden' | 'stopFilter' | 'quitApp';
 };
 
-export type ViewAction = {
-  type: 'filterSuspensionDurationInSecondsChanged';
-  value: string;
-};
+export type ViewAction =
+  | { type: 'filterSuspensionDurationInSecondsChanged'; value: string }
+  | { type: 'dangerZoneModalDismissed' }
+  | { type: 'dangerZoneStopFilterClicked' }
+  | { type: 'dangerZoneQuitAppClicked' };
 
 export type Action = ActionOf<AppState, AppEvent, ViewAction>;
 export type State = AppState & ViewState;
@@ -112,10 +115,7 @@ export class AdministrateStore extends Store<AppState, AppEvent, ViewState, View
       windowOpen: true,
       screen: `healthCheck`,
       filterState: { case: `off` },
-      userName: ``,
       installedAppVersion: `0.0.0`,
-      screenshotMonitoringEnabled: false,
-      keystrokeMonitoringEnabled: false,
       healthCheck: {},
       releaseChannel: `stable`,
       quitting: false,
@@ -125,6 +125,7 @@ export class AdministrateStore extends Store<AppState, AppEvent, ViewState, View
   viewState(): ViewState {
     return {
       filterSuspensionDurationInSeconds: String(60 * 5), // 5 minutes
+      dangerZoneModal: `hidden`,
     };
   }
 
@@ -138,7 +139,16 @@ export class AdministrateStore extends Store<AppState, AppEvent, ViewState, View
         return { ...state, filterSuspensionDurationInSeconds: action.value };
       case `receivedUpdatedAppState`:
         return { ...state, ...action.appState };
+      case `dangerZoneStopFilterClicked`:
+        return { ...state, dangerZoneModal: `stopFilter` };
+      case `dangerZoneQuitAppClicked`:
+        return { ...state, dangerZoneModal: `quitApp` };
+      case `dangerZoneModalDismissed`:
+        return { ...state, dangerZoneModal: `hidden` };
       case `appEventEmitted`:
+        if (action.event.case === `confirmStopFilterClicked`) {
+          return { ...state, dangerZoneModal: `hidden` };
+        }
         return state;
     }
   }

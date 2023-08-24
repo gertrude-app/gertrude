@@ -10,7 +10,7 @@ import type {
 } from './requestsuspension-store';
 import type { PropsOf } from '../lib/store';
 import { containerize } from '../lib/store';
-import ErrorBlock from '../ErrorBlock';
+import ErrorScreen from '../ErrorScreen';
 import InactiveAccountScreen from '../components/InactiveAccountBlock';
 import AccountPastDueBanner from '../components/AccountPastDueBanner';
 import FullScreenSlider from '../components/FullScreenSlider';
@@ -27,17 +27,35 @@ export const RequestSuspension: React.FC<Props> = ({
   duration,
   adminAccountStatus,
   internetConnected,
+  filterCommunicationConfirmed,
 }) => {
   if (!internetConnected) {
     return (
-      <div className="min-h-screen flex justify-center bg-white dark:bg-slate-900 items-center px-12">
-        <ErrorBlock
-          title="No Internet!"
-          message="You must be connected to the internet in order to submit a filter suspension request. If you’re trying to connect to a public wifi network, consider temporarily using a hotspot."
-        />
-      </div>
+      <ErrorScreen title="No Internet!">
+        You must be connected to the internet in order to submit a filter suspension
+        request. If you’re trying to connect to a public wifi network, consider
+        temporarily using a hotspot.
+      </ErrorScreen>
     );
   }
+  if (filterCommunicationConfirmed === false) {
+    return (
+      <ErrorScreen
+        title="Can't suspend filter!"
+        button={{
+          text: `Administrate`,
+          action: () => emit({ case: `noFilterCommunicationAdministrateClicked` }),
+          icon: `fa-cog`,
+        }}
+      >
+        Sorry, we're having trouble communicating with the internet filter, so we can't
+        suspend the filter right now. If a parent is nearby, they can likely fix the
+        problem from the <b>Administrate screen.</b> If not,{` `}
+        <b>restarting the computer</b> will fix the problem.
+      </ErrorScreen>
+    );
+  }
+
   if (request.case === `ongoing`) {
     return (
       <div className="min-h-screen flex justify-center items-center flex-col space-y-4 bg-white dark:bg-slate-900">
@@ -72,18 +90,16 @@ export const RequestSuspension: React.FC<Props> = ({
     );
   } else if (request.case === `failed`) {
     return (
-      <div className="min-h-screen flex justify-center items-center p-8 bg-white dark:bg-slate-900">
-        <ErrorBlock
-          title="Filter suspension request failed:"
-          message={request.error}
-          button={{
-            text: `Try Again`,
-            icon: `fa-redo`,
-            action: () => emit({ case: `requestFailedTryAgainClicked` }),
-          }}
-          className="h-full"
-        />
-      </div>
+      <ErrorScreen
+        title="Filter suspension request failed:"
+        children={request.error}
+        button={{
+          text: `Try Again`,
+          icon: `fa-redo`,
+          action: () => emit({ case: `requestFailedTryAgainClicked` }),
+        }}
+        className="h-full"
+      />
     );
   }
 

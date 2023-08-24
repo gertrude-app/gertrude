@@ -24,6 +24,7 @@ export interface AppState {
     | { case: 'ongoing' }
     | { case: 'succeeded' };
   adminAccountStatus: AdminAccountStatus;
+  filterCommunicationConfirmed?: boolean;
 }
 
 export type AppEvent =
@@ -35,7 +36,8 @@ export type AppEvent =
   | { case: 'clearRequestsClicked' }
   | { case: 'closeWindow' }
   | { case: 'inactiveAccountRecheckClicked' }
-  | { case: 'inactiveAccountDisconnectAppClicked' };
+  | { case: 'inactiveAccountDisconnectAppClicked' }
+  | { case: 'noFilterCommunicationAdministrateClicked' };
 // end codegen
 
 export type ViewState = {

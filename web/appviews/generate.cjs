@@ -31,6 +31,14 @@ MODULES.forEach((module) => {
 
   fs.writeFileSync(`./src/main.tsx`, fileContent);
   exec.out(`pnpm vite build --mode production --outDir ./dist/${module}`, __dirname);
+
+  const indexHtml = fs.readFileSync(`./dist/${module}/index.html`, `utf-8`);
+  const lightHtml = indexHtml.replace(`<body>`, `<body class="light">`);
+  const darkHmtl = indexHtml.replace(`<body>`, `<body class="dark">`);
+  fs.writeFileSync(`./dist/${module}/index.light.html`, lightHtml);
+  fs.writeFileSync(`./dist/${module}/index.dark.html`, darkHmtl);
+  exec.out(`rm ./dist/${module}/index.html`, __dirname);
+
   exec.out(`rm -rf ${WEBVIEW_DIR}/${module}`, __dirname);
   exec.exit(`cp -R ./dist/${module} ${WEBVIEW_DIR}/${module}`, __dirname);
 });

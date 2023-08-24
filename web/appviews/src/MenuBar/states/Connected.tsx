@@ -45,7 +45,13 @@ const Connected: React.FC<Props> = ({
     <div className="flex mt-3 space-x-3">
       <button
         onClick={() => emit({ case: `viewNetworkTrafficClicked` })}
-        className="flex-grow shadow-md transition-[background-color] duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row"
+        disabled={filterState.case === `off`}
+        className={cx(
+          `flex-grow shadow-md transition-[background-color] duration-100 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row`,
+          filterState.case === `off`
+            ? `opacity-50 cursor-not-allowed`
+            : `hover:bg-white/30 dark:hover:bg-white/10`,
+        )}
       >
         <i className="fa fa-tower-broadcast text-xl w-6 shrink-0 text-black/70 dark:text-white/80" />
         <p className="text-sm font-medium text-left dark:text-white leading-tight">
@@ -54,9 +60,15 @@ const Connected: React.FC<Props> = ({
       </button>
       <button
         onClick={() => emit({ case: `suspendFilterClicked` })}
-        className="flex-grow shadow-md transition-[background-color] duration-100 hover:bg-white/30 dark:hover:bg-white/10 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row"
+        disabled={filterState.case === `off`}
+        className={cx(
+          `flex-grow shadow-md transition-[background-color] duration-100 px-4 py-3 space-x-5 bg-white/20 dark:bg-white/5 border-[0.5px] border-white/30 dark:border-white/20 rounded-xl w-1/2 flex justify-start items-center flex-row`,
+          filterState.case === `off`
+            ? `opacity-50 cursor-not-allowed`
+            : `hover:bg-white/30 dark:hover:bg-white/10`,
+        )}
       >
-        <i className="fa fa-clock-rotate-left text-xl *h-5 shrink-0 text-black/70 dark:text-white/80" />
+        <i className="fa fa-clock-rotate-left text-xl shrink-0 text-black/70 dark:text-white/80" />
         <p className="text-sm font-medium text-left leading-5 dark:text-white">
           Suspend filter
         </p>

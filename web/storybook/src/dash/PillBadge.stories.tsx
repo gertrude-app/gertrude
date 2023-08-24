@@ -49,7 +49,6 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-// @screenshot: xs
 export const List: Story = {};
 
 export default meta;
