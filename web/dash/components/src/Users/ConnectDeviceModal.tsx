@@ -23,7 +23,7 @@ const ConnectModal: React.FC<Props> = ({ dismissAddDevice, request }) => (
           {payload.code}
         </code>
         <div>
-          The device will show up in the list <em>once it has connected.</em>
+          The computer will show up in the list <em>once it has connected.</em>
         </div>
       </div>
     )}
