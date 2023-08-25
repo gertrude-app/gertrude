@@ -18,8 +18,8 @@ getting started with Gertrude, [click here](https://www.youtube.com/watch?v=N8kL
 
 To start out, if you haven't already created a **Gertrude account** you'll need to do that
 first. To create an account [click this link](https://parents.gertrude.app/signup) and
-follow the sign-up instructions. The first 60 days are _totally free and you can cancel at
-any time._
+follow the sign-up instructions. No credit card is required, the first 60 days are
+_totally free, and you can cancel at any time._
 
 ### Adding your first child
 
@@ -47,24 +47,113 @@ child.
 
 Enter the child's _name_, and click to save the new child.
 
-{% image src="edit-user.png" caption="Enter your child's name, and click 'save'" /%}
+{% image src="add-child.png" caption="Enter your child's name, and click 'save'" /%}
 
-### Monitoring child activity
+### Mac App Connection Code
 
-While you are adding your first child, you can also set up **monitoring** if you wish.
-Gertrude allows you to see everything _your children have typed_ and also can _take
-periodic screenshots of your child's screens_ for you to review later. You can always
-change these settings later, but we recommend enabling them for the greatest safety, and
-also because it will help you learn about all of Gertrude's features as you work through
-this tutorial.
+To finish setting up your first child, we'll need to install the Gertrude Mac app on their
+computer. But before we do that, you'll grab a one-time connection code to connect the app
+to the child you just added. To do so, click the **Add a computer"** button on the edit
+child screen. You'll see a pop-up giving you a special one-time connection code. Write
+this code down somewhere; you'll be using it shortly.
+
+{% image src="get-connection-code.png" caption="Click <b>Get connection code</b>" /%}
+{% image src="got-connection-code.png" caption="Then copy down the code" /%}
+
+## Connecting a computer
+
+For the next part of the process you'll need to switch over to the computer that will be
+used by the child you're protecting. You might already be using that computer. But if
+you're a parent working through this tutorial on your own computer and your child uses a
+_different computer_ you'll need that computer in front of you to do the next few steps of
+initial setup.
+
+{% callout title="About shared computers" %}
+
+If you and your child **share the same computer** you might already be using that computer
+right now. If that's the case, you can either log into the parents site **on your phone**
+and finish this tutorial logged into this computer as your child; _or_ finish the setup by
+switching back and forth between the Mac users on the shared computer. For safety, you
+will need to make sure you have _separate macOS **users**_&mdash;one for you, and one for
+your child.
+
+{% /callout %}
+
+### Downloading the Gertrude macOS app
+
+On the computer that will be protected, login to the macOS user that you desire to
+protect, then open a web browser, visit the Gertrude website
+[download page](https://gertrude.app/download), and click the download link to download a
+copy of the most recent version of the Gertrude macOS app. Double-click on the downloaded
+file and then drag the Gertrude application into the applications folder.
+
+{% image src="dmg.png" caption="Drag the Gertrude app into Applications" /%}
+
+Next, **double-click** on the Gertrude application icon in the applications folder to
+launch it for the first time. Once Gertrude is launched, the only visible difference
+you'll see is that _there will be a new icon in your menu bar,_ as shown below:
+
+{% image src="menu-bar-icon.png" caption="The Gertrude app menu bar icon in the upper right corner" /%}
+
+The first time you click this icon, Gertrude will prompt you to enter a **connection
+code.** Enter the connection code that you wrote down earlier. When you submit the code
+you should receive a confirmation that the Gertrude Mac app is successfully connected.
+
+{% image src="connect-to-user.png" caption="Click <b>Connect to child</b>" /%}
+{% image src="enter-connection-code.png" caption="And enter the connection code you got from the parents websitk" /%}
+
+### Enabling the internet filter
+
+The next thing you need to do is to **turn on Gertrude's internet filter.** Getting the
+filter fully activated takes a couple of steps, because the _operating system wants to
+make very clear to you that Gertrude has your permission to filter all the internet
+traffic on this computer._ To begin the process of starting the filter, click the Gertrude
+icon again and then click the **"Turn on"** button as shown below:
+
+{% image src="enable-filter.png" caption="Click 'Turn on' to begin the process of enabling the filter" /%}
+
+At this point, the macOS operating system _will block Gertrude from installing a system
+extension._ Click the button labeled **"Open Security Preferences"**, or manually open up
+the System Preferences app, and choose _"Security & Privacy" > "General"._
+
+{% image src="system-extension-blocked.png" caption="Click 'Open Security Preferences'" /%}
+
+From the _"Security & Privacy" > "General"._ screen, click the _unlock_ icon to authorize,
+and then choose to **allow** the system extension from Gertrude.
+
+{% image src="security-allowance.png" caption="Allow Gertrude to install a system extension" /%}
+
+As a final step, you should now see a prompt asking you if Gertrude can filter network
+activity.
+
+{% image src="allow-filtering.png" caption="Allow Gertrude to filter network content" /%}
+
+**Congratulations!** Those steps are out of the way, and Gertrude has installed it's
+network filter. You won't have to repeat those steps again. If you click the Gertrude menu
+bar icon now, you should see that **the filter is enabled.**
+
+{% image src="filter-enabled.png" caption="The filter is now enabled" /%}
+
+## Monitoring child activity
+
+Now that you've got the Mac app installed on your child's computer, if you go back to the
+parents website and click to edit your child, you'll some new options have appeared:
 
 {% image src="monitoring-options.png" caption="monitoring options" /%}
+
+Now might be a good time set up **monitoring** if you wish. Gertrude allows you to see
+everything _your children have typed_ and also can _take periodic screenshots of your
+child's screens_ for you to review later. You can always change these settings later, but
+we recommend enabling them for the greatest safety, and also because it will help you
+learn about all of Gertrude's features as you work through this tutorial.
+
+{% image src="monitoring-enabled.png" caption="Enable monitoring, at least as while working through this tutorial" /%}
 
 ## Keychains & Keys
 
 ### Keychains
 
-Near the bottom of the screen is a section that allows you to attach what we call
+Near the bottom of the same screen is a section that allows you to attach what we call
 **"keychains"** to your child. One of the main features of Gertrude is that it acts as an
 **internet filter** for your child's Mac computers. Gertrude's filter blocks the _entire
 internet_, only allowing access to the sites and apps you specifically designate as safe.
@@ -140,80 +229,6 @@ earlier, and then click to add a keychain. Select the keychain you just created 
 name and save the child.
 
 {% image src="attach-keychain.png" caption="On the 'Edit child' screen, add the keychain" /%}
-
-## Connecting a computer
-
-The final step you will need to take before installing the macOS app is _getting a code_
-to connect this child to a Mac computer running Gertrude. To do so, click the **Add a
-computer"** button on the edit child screen. You'll see a pop-up giving you a special
-one-time connection code. Write this code down somewhere; you'll be using it shortly.
-
-{% image src="add-device.png" caption="Click to add a device, and copy the connection code" /%}
-
-For the next part of the process you'll need to switch over to the computer that will be
-used by the child you're protecting. You might already be using that computer. But if
-you're a parent working through this tutorial on your own computer and your child uses a
-_different computer_ you'll need that computer in front of you to do the next few steps of
-initial setup.
-
-{% callout title="About shared computers" %}
-
-If you and your child **share the same computer** you'll be staying on the same device for
-the rest of this tutorial. You will however need to make sure you have _separate macOS
-**users**_&mdash;one for you, and one for your child.
-
-{% /callout %}
-
-### Downloading the Gertrude macOS app
-
-On the computer that will be protected, login to the macOS user that you desire to
-protect, then open a web browser, visit the Gertrude website
-[download page](https://gertrude.app/download), and click the download link to download a
-copy of the most recent version of the Gertrude macOS app. Double-click on the downloaded
-file and then drag the Gertrude application into the applications folder.
-
-{% image src="dmg.png" caption="Drag the Gertrude app into Applications" /%}
-
-Next, **double-click** on the Gertrude application icon in the applications folder to
-launch it for the first time. Once Gertrude is launched, the only visible difference
-you'll see is that _there will be a new icon in your menu bar,_ as shown below:
-
-{% image src="menu-bar-icon.png" caption="The Gertrude app menu bar icon in the upper right corner" /%}
-
-The first time you click this icon, Gertrude will prompt you to enter a **connection
-code.** Enter the connection code that you wrote down earlier. When you submit the code
-you should receive a confirmation that the Gertrude Mac app is successfully connected.
-
-{% image src="connect-to-user.png" caption="Click to connect, and enter your connection code" /%}
-
-### Enabling the internet filter
-
-The next thing you need to do is to **turn on Gertrude's internet filter.** Getting the
-filter fully activated takes a couple of steps, because the _operating system wants to
-make very clear to you that Gertrude has your permission to filter all the internet
-traffic on this computer._ To begin the process of starting the filter, click the Gertrude
-icon again and then click the **"Turn on"** button as shown below:
-
-{% image src="enable-filter.png" caption="Click 'Turn on' to begin the process of enabling the filter" /%}
-
-At this point, the macOS operating system _will block Gertrude from installing a system
-extension._ Click the button labeled **"Open Security Preferences"**, or manually open up
-the System Preferences app, and choose _"Security & Privacy" > "General"._
-
-{% image src="system-extension-blocked.png" caption="Click 'Open Security Preferences'" /%}
-
-From the _"Security & Privacy" > "General"._ screen, click the _unlock_ icon to authorize,
-and then choose to **allow** the system extension from Gertrude.
-
-{% image src="security-allowance.png" caption="Allow Gertrude to install a system extension" /%}
-
-As a final step, you should now see a prompt asking you if Gertrude can filter network
-activity.
-
-{% image src="allow-filtering.png" caption="Allow Gertrude to filter network content" /%}
-
-**Congratulations!** Those steps are out of the way, and Gertrude has installed it's
-network filter. You won't have to repeat those steps again.
 
 ## Exploring the Gertrude app
 
@@ -330,23 +345,14 @@ and free learning platform, which we use in the screenshots below.
 {% /callout %}
 
 Click the Gertrude app icon in the menu bar and select the item entitled **View network
-traffic.**
+requests.**
 
-{% image src="view-network-traffic.png" caption="Click the 'View network traffic...' option" /%}
+{% image src="view-network-traffic.png" caption="Click the 'View network requests...' option" /%}
 
-This brings up _a window which shows you a live display of all the requests that the
+This brings up _a window whjch shows you a live display of all the requests that the
 Gertrude filter is handling and blocking._
 
-{% image src="network-requests-window.png" caption="The network traffic window" /%}
-
-{% callout type="warning" title="Where's the window?" %}
-
-Sometimes the windows that are opened by the Gertrude app can be hard to find. They
-sometimes appear **behind other windows** or _don't jump to the top of the screen_ like
-you would expect. So sometimes you need to hunt around just a little bit to find the
-window.
-
-{% /callout %}
+{% image src="network-requests-window.png" caption="The network requests window" /%}
 
 With the network requests Gertrude window open, **refresh the blocked page** in your web
 browser. You _should see one or more new blocked requests_ flowing in to the Gertrude
@@ -362,7 +368,7 @@ create new keys for your children._
 ### The unlock request flow
 
 1. A child tries to access a website on the internet, and are _blocked._
-2. They open the network traffic window, and _find the request that was blocked._
+2. They open the network requests window, and _find the request that was blocked._
 3. They then send an _unlock request_ to you requesting that that website be unlocked.
 4. Then you have the opportunity to _review and approve or reject_ that request. You
    approve the unlock request by _creating a key_ that unblocks that web address.
@@ -384,7 +390,7 @@ are filtering for blocks containing `khan`. You should see something like this:
 To _submit an unlock request_ for the block, **click the small unlock icon**, optionally
 add a comment, and then **click submit**.
 
-{% image src="create-unlock-request.png" caption="Click the unlock icon, then submit." /%}
+{% image src="create-unlock-request.png" caption="Click the blocked request, then send." /%}
 
 ### Accepting an unlock request
 
@@ -456,7 +462,7 @@ The child is shown a form where they can fill out the _length of time_ they wish
 the filter suspended, and optionally a _comment explaining why_ the filter suspension is
 being requested.
 
-{% image src="request-filter-suspension.png" caption="The child writes a comment and picks a duration" /%}
+{% image src="request-filter-suspension.png" caption="The child picks a duration, and can add a comment" /%}
 
 Once submitted (provided you've configured a notification in your
 [settings](https://parents.gertrude.app/settings) screen), you'll receive an email, text
@@ -499,26 +505,3 @@ reviewing. The _knowledge that they are being watched_ is one of the key compone
 what makes your children safe.
 
 {% /callout %}
-
-## App Administrative Actions
-
-Gertrude is built so that after the initial setup, you can _manage your children from any
-computer, phone or device_ where you have access to the internet. However, sometimes it is
-convenient to do _some basic administrative tasks_ directly on the your child's computer.
-For this reason the Gertrude app has some special protected admin-only options that you as
-the account owner can access and make use of when you wish. To access this screen, click
-the Gertrude app icon in the menu bar, then select _"Administrate..."_ and supply your
-admin username and password.
-
-{% image src="administrate.png" caption="Click for admin-only options on your child's computer" /%}
-
-On the left-hand side click the **actions** navigation item.
-
-{% image src="admin-actions.png" caption="Click for admin-only options on your child's computer" /%}
-
-From this screen you may perform a number of _admin-only_ actions, including:
-
-- checking for Gertrude _app updates_
-- reconnecting to a different child
-- manually \_stopping, the filter
-- _quitting_ the app

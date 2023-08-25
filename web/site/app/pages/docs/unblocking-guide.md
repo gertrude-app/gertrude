@@ -129,4 +129,4 @@ easier to find what to unblock is **isolate network activity:**
   you're using are helpful. Click the _clear requests_ button and then refresh the page,
   or retry the activity that is not working.
 
-{% image src="isolating-requests.png" caption="Filter by a search phrase, and clear often" /%}
+{% image src="filter-requests.png" caption="Filter by a search phrase, and clear often" /%}
