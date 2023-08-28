@@ -27,7 +27,7 @@ export const SmallScreenLoginDropdown: React.FC<Props> = ({ className }) => (
         <div className="p-2">
           <Menu.Item>
             <a
-              href="https://parents.gertrude.app/signup"
+              href="https://parents.gertrude.app"
               className="hover:bg-violet-100 rounded-lg hover:text-violet-700 text-slate-700 block px-4 py-2 text-base font-medium transition-colors duration-200"
             >
               Log in
@@ -35,7 +35,7 @@ export const SmallScreenLoginDropdown: React.FC<Props> = ({ className }) => (
           </Menu.Item>
           <Menu.Item>
             <a
-              href="https://parents.gertrude.app"
+              href="https://parents.gertrude.app/signup"
               className="hover:bg-violet-100 rounded-lg hover:text-violet-700 text-slate-700 block px-4 py-2 text-base font-medium transition-colors duration-200"
             >
               Sign up
