@@ -129,19 +129,21 @@ function getToast(toastId?: ToastId): { verb: string; entity: string } | undefin
   const [verb = ``, entitySlug = ``] = toastId.split(`:`);
   const entity = entitySlug.replace(/-/g, ` `);
   switch (toastId) {
-    case `delete:user`:
     case `delete:computer`:
     case `delete:notification`:
     case `delete:keychain`:
     case `delete:notification-method`:
     case `delete:key`:
     case `update:suspend-filter-request`:
-    case `save:user`:
     case `save:keychain`:
     case `save:key`:
     case `save:computer`:
     case `save:notification`:
       return { verb, entity };
+
+    case `delete:user`:
+    case `save:user`:
+      return { verb, entity: `child` };
 
     case `create:pending-notification-method`:
       return { verb: `send`, entity: `verification code` };
