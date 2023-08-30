@@ -23,6 +23,7 @@ export * from './pairs/GetUnlockRequests';
 export * from './pairs/GetUser';
 export * from './pairs/GetUsers';
 export * from './pairs/GetUserUnlockRequests';
+export * from './pairs/HollandTalkSubscription';
 export * from './pairs/LatestAppVersions';
 export * from './pairs/Login';
 export * from './pairs/LoginMagicLink';

@@ -69,9 +69,9 @@ const TextInput: React.FC<Props> = ({
           )}
         </div>
       )}
-      <div className="flex shadow-sm rounded-lg">
+      <div className="flex shadow-sm rounded-xl">
         {isInput(props) && props.prefix && (
-          <div className="hidden xs:flex justify-center items-center p-3 bg-slate-50 dark:bg-slate-700/50 border border-r-0 dark:border-slate-700 rounded-l-lg">
+          <div className="hidden xs:flex justify-center items-center p-3 bg-slate-50 dark:bg-slate-700/50 border border-r-0 dark:border-slate-700 rounded-l-xl">
             <h3 className="text-slate-500 dark:text-slate-400">{props.prefix}</h3>
           </div>
         )}
@@ -105,7 +105,7 @@ const TextInput: React.FC<Props> = ({
           }}
           className={cx(
             `py-3 px-4 flex-grow w-12`,
-            `border border-slate-200 rounded-lg`,
+            `border border-slate-200 rounded-xl`,
             `transition-[border-color,ring-color] duration-150`,
             `text-slate-600 placeholder:text-slate-400/90 placeholder:antialiased`,
             `ring-0 ring-slate-200 outline-none focus:shadow-md focus:border-indigo-500 focus:ring-indigo-500 focus:ring-1`,
@@ -116,7 +116,7 @@ const TextInput: React.FC<Props> = ({
           )}
         />
         {isInput(props) && props.unit && (
-          <div className="flex justify-center items-center p-3 bg-slate-50 dark:bg-slate-700/50 border border-l-0 dark:border-slate-700 rounded-r-lg">
+          <div className="flex justify-center items-center p-3 bg-slate-50 dark:bg-slate-700/50 border border-l-0 dark:border-slate-700 rounded-r-xl">
             <h3 className="text-slate-500 dark:text-slate-400">{props.unit}</h3>
           </div>
         )}

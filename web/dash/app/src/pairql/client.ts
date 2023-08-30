@@ -188,6 +188,16 @@ export const liveClient = {
     );
   },
 
+  hollandTalkSubscription(
+    input: T.HollandTalkSubscription.Input,
+  ): Promise<T.Result<T.HollandTalkSubscription.Output>> {
+    return query<T.HollandTalkSubscription.Input, T.HollandTalkSubscription.Output>(
+      input,
+      `none`,
+      `HollandTalkSubscription`,
+    );
+  },
+
   latestAppVersions(
     input: T.LatestAppVersions.Input,
   ): Promise<T.Result<T.LatestAppVersions.Output>> {
@@ -393,6 +403,9 @@ export const throwingClient: ApiClient = {
   },
   getUserUnlockRequests: () => {
     throw new Error(`ApiClient.getUserUnlockRequests() not implemented`);
+  },
+  hollandTalkSubscription: () => {
+    throw new Error(`ApiClient.hollandTalkSubscription() not implemented`);
   },
   latestAppVersions: () => {
     throw new Error(`ApiClient.latestAppVersions() not implemented`);

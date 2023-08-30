@@ -63,7 +63,7 @@ const FullscreenModalForm: React.FC<Props> = (props) => {
 
   return (
     <FullscreenGradientBg>
-      <div className="pb-8 sm:pb-8 pt-12 px-5 sm:px-8 w-full max-w-md rounded-2xl shadow-lg flex justify-center items-center flex-row border bg-white relative z-10 mx-3 sm:mx-10">
+      <div className="pb-8 sm:pb-8 pt-12 px-5 sm:px-8 w-full max-w-md rounded-2xl shadow-lg flex justify-center items-center flex-row bg-white relative z-10 mx-3 sm:mx-10 overflow-hidden">
         {props.children}
       </div>
     </FullscreenGradientBg>
