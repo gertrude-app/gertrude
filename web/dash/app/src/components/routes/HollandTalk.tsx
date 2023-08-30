@@ -29,6 +29,11 @@ const HollandTalk: React.FC = () => {
           <p className="text-lg text-slate-500 text-center mt-2 relative">
             Enter your email address to be notified when we release the talk online.
           </p>
+          <div className="self-stretch flex justify-end pr-8">
+            <span className="font-signature text-6xl -rotate-[20deg] text-fuchsia-500">
+              -Jared
+            </span>
+          </div>
         </div>
         <TextInput
           type="email"
