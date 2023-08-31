@@ -9,6 +9,7 @@ type Props = {
   date: Date;
   onApprove(): unknown;
   application: string;
+  duringSuspension: boolean;
 };
 
 const KeystrokesViewer: React.FC<Props> = ({
@@ -17,19 +18,19 @@ const KeystrokesViewer: React.FC<Props> = ({
   date,
   application,
   onApprove,
+  duringSuspension,
 }) => (
   <div
     className={cx(
-      `border-y md:border-x2 md:rounded-xl md:shadow-lg md:shadow-slate-300/50 bg-white max-w-7xl`,
+      `border-y-[0.5px] border-x-[0.5px] rounded-2xl md:shadow-lg md:shadow-slate-300/50 bg-white max-w-7xl border-slate-200`,
+      !duringSuspension && `!border-x-0 md:!border-x-[0.5px]`,
       className,
     )}
   >
-    <div className="flex justify-between pt-3 px-5 rounded-t-xl">
-      <h2 className="text-slate-600 font-medium -ml-0.5">
-        Application: <span className="font-bold text-violet-700">{application}</span>
-      </h2>
-    </div>
-    <div className="bg-slate-900 bg-gradient-to-br from-transparent via-transparent to-violet-900/30 text-slate-400 p-6 mt-2 sm:mt-3 mb-4 mx-0 md:mx-4 md:rounded-lg font-mono overflow-x-auto">
+    <h2 className="text-slate-600 font-medium -ml-0.5 pt-2 px-5">
+      Application: <span className="font-bold text-violet-700">{application}</span>
+    </h2>
+    <div className="bg-gradient-to-b from-slate-900 to-slate-800 text-slate-400 p-4 xs:p-6 mt-2 sm:mt-3 mb-4 mx-2 md:mx-4 rounded-xl font-mono overflow-x-auto">
       {strokes.split(`\n`).map((line, idx) => (
         <p key={`line-${idx}`}>{line}</p>
       ))}

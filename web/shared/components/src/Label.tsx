@@ -11,7 +11,7 @@ const Label: React.FC<Props> = ({ children, htmlFor, className }) => (
   <label
     htmlFor={htmlFor}
     className={cx(
-      `text-left text-slate-500 dark:text-slate-300 font-semibold text-md mb-1`,
+      `text-left text-slate-700 dark:text-slate-200 font-medium text-md mb-1`,
       className,
     )}
   >

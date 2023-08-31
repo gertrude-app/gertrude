@@ -59,7 +59,6 @@ const App: React.FC = () => {
       <Route path="/" element={<AuthedChrome />}>
         <Route index element={<Dashboard />} />
         <Route path="settings" element={<AdminSettings />} />
-        <Route path="suspend-filter-requests/:id" element={<SuspendFilter />} />
         <Route path="unlock-requests" element={<UsersUnlockRequests />} />
 
         <Route path="keychains">
@@ -82,6 +81,8 @@ const App: React.FC = () => {
 
           <Route path=":userId">
             <Route index element={<UserRoute />} />
+
+            <Route path="suspend-filter-requests/:id" element={<SuspendFilter />} />
 
             <Route path="unlock-requests">
               <Route index element={<UserUnlockRequests />} />

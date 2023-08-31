@@ -2,16 +2,17 @@ import { expect, test, describe } from 'vitest';
 import reducer, { initialState } from '../suspend-filter-request-reducer';
 
 describe(`suspendFilterRequestReducer()`, () => {
-  test(`initializes granted duration with requested basic duration`, () => {
-    const apiRequest = {
-      id: `sfr-1`,
-      deviceId: `d-1`,
-      status: `pending` as const,
-      userName: `Little Jimmy`,
-      createdAt: new Date().toISOString(),
-      requestedDurationInSeconds: 60 * 10,
-    };
+  const apiRequest = {
+    id: `sfr-1`,
+    deviceId: `d-1`,
+    status: `pending` as const,
+    userName: `Little Jimmy`,
+    createdAt: new Date().toISOString(),
+    requestedDurationInSeconds: 60 * 10,
+    extraMonitoringOptions: {},
+  };
 
+  test(`initializes granted duration with requested basic duration`, () => {
     const nextState = reducer(
       { ...initialState },
       { type: `receivedRequest`, request: apiRequest },
@@ -22,18 +23,14 @@ describe(`suspendFilterRequestReducer()`, () => {
   });
 
   test(`initializes granted duration with requested custom duration`, () => {
-    const apiRequest = {
-      id: `sfr-1`,
-      deviceId: `d-1`,
-      status: `pending` as const,
-      userName: `Little Jimmy`,
-      createdAt: new Date().toISOString(),
+    const customDurationApiRequest = {
+      ...apiRequest,
       requestedDurationInSeconds: 60 * 17, // <-- 17 minutes
     };
 
     const nextState = reducer(
       { ...initialState },
-      { type: `receivedRequest`, request: apiRequest },
+      { type: `receivedRequest`, request: customDurationApiRequest },
     );
 
     expect(nextState).toMatchObject({

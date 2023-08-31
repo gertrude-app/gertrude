@@ -222,7 +222,7 @@ export const activity = [
     userName: `Sally`,
     items: [
       keystrokeLine(`Skype`, `No puedo nadar.`),
-      screenshot(400, 600, true),
+      screenshot(800, 600, true),
       keystrokeLine(`Brave`, `Hello world`),
     ],
   },
@@ -241,6 +241,7 @@ export function keystrokeLine(
   appName: string,
   line: string,
   deleted?: boolean,
+  duringSuspension?: boolean,
 ): ActivityFeedItem {
   return {
     ...common(),
@@ -248,6 +249,7 @@ export function keystrokeLine(
     appName,
     line,
     deleted,
+    duringSuspension: duringSuspension || false,
   };
 }
 
@@ -255,6 +257,7 @@ export function screenshot(
   width = 800,
   height = 600,
   deleted?: boolean,
+  duringSuspension?: boolean,
 ): ActivityFeedItem {
   return {
     ...common(),
@@ -263,6 +266,7 @@ export function screenshot(
     width,
     height,
     deleted,
+    duringSuspension: duringSuspension || false,
   };
 }
 

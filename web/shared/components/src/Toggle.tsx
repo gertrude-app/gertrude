@@ -6,9 +6,10 @@ interface Props {
   enabled: boolean;
   setEnabled: (enabled: boolean) => unknown;
   small?: boolean;
+  testId?: string;
 }
 
-const Toggle: React.FC<Props> = ({ enabled, setEnabled, small }) => (
+const Toggle: React.FC<Props> = ({ enabled, setEnabled, small, testId }) => (
   <Switch
     checked={enabled}
     onChange={setEnabled}
@@ -17,6 +18,7 @@ const Toggle: React.FC<Props> = ({ enabled, setEnabled, small }) => (
       small ? `h-5 w-9` : `h-6 w-11`,
       `relative inline-flex flex-shrink-0 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 dark:ring-offset-slate-900`,
     )}
+    {...(testId ? { 'data-test': testId } : {})}
   >
     <span
       aria-hidden="true"

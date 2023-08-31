@@ -10,6 +10,7 @@ type Props = {
   height: number;
   onApprove(): unknown;
   date: Date;
+  duringSuspension: boolean;
   lazy?: boolean;
 };
 
@@ -20,17 +21,19 @@ const ScreenshotViewer: React.FC<Props> = ({
   width,
   height,
   onApprove,
+  duringSuspension,
   lazy = false,
 }) => (
   <div
     className={cx(
-      `border-y-[0.5px] md:border-x-[0.5px] border-slate-200 md:rounded-2xl md:shadow-lg md:shadow-slate-300/50 bg-white max-w-7xl`,
+      `md:shadow-lg md:shadow-slate-300/50 max-w-7xl bg-white border-slate-200 rounded-2xl border-[0.5px]`,
+      !duringSuspension && `!border-x-0 md:!border-x-[0.5px]`,
       className,
     )}
   >
-    <div className="md:mx-4 mb-3 sm:mb-0 md:mt-4 flex justify-center bg-slate-100 rounded-xl">
+    <div className={cx(`md:mx-4 mb-3 sm:mb-0 md:mt-4 flex justify-center rounded-xl`)}>
       <img
-        className="md:rounded-2xl shadow-inner"
+        className="rounded-t-2xl md:rounded-b-2xl shadow-inner w-full md:w-auto"
         src={url}
         width={width}
         height={height}

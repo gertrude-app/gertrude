@@ -16,6 +16,7 @@ export { useMutation, useDeleteEntity, useConfirmableDelete } from './mutation';
 export { useQuery, useAuth, Key };
 export { useZip } from './zip';
 export { default as useWindowWidth } from './window-width';
+export { default as useObservedReducer } from './observed-reducer';
 
 export function useSelectableKeychains(): QueryResult<{
   own: KeychainSummary[];

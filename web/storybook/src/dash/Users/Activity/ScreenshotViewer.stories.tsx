@@ -13,6 +13,7 @@ export const Default: Story = props({
   url: testImgUrl(800, 600),
   width: 800,
   height: 600,
+  duringSuspension: false,
   date: new Date(time.stable()),
 });
 

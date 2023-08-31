@@ -60,6 +60,15 @@ export const liveClient = {
     >(input, `admin`, `CreatePendingNotificationMethod`);
   },
 
+  decideFilterSuspensionRequest(
+    input: T.DecideFilterSuspensionRequest.Input,
+  ): Promise<T.Result<T.DecideFilterSuspensionRequest.Output>> {
+    return query<
+      T.DecideFilterSuspensionRequest.Input,
+      T.DecideFilterSuspensionRequest.Output
+    >(input, `admin`, `DecideFilterSuspensionRequest`);
+  },
+
   deleteActivityItems(
     input: T.DeleteActivityItems_v2.Input,
   ): Promise<T.Result<T.DeleteActivityItems_v2.Output>> {
@@ -284,16 +293,6 @@ export const liveClient = {
     return query<T.Signup.Input, T.Signup.Output>(input, `none`, `Signup`);
   },
 
-  updateSuspendFilterRequest(
-    input: T.UpdateSuspendFilterRequest.Input,
-  ): Promise<T.Result<T.UpdateSuspendFilterRequest.Output>> {
-    return query<T.UpdateSuspendFilterRequest.Input, T.UpdateSuspendFilterRequest.Output>(
-      input,
-      `admin`,
-      `UpdateSuspendFilterRequest`,
-    );
-  },
-
   updateUnlockRequest(
     input: T.UpdateUnlockRequest.Input,
   ): Promise<T.Result<T.UpdateUnlockRequest.Output>> {
@@ -355,6 +354,9 @@ export const throwingClient: ApiClient = {
   },
   createPendingNotificationMethod: () => {
     throw new Error(`ApiClient.createPendingNotificationMethod() not implemented`);
+  },
+  decideFilterSuspensionRequest: () => {
+    throw new Error(`ApiClient.decideFilterSuspensionRequest() not implemented`);
   },
   deleteActivityItems: () => {
     throw new Error(`ApiClient.deleteActivityItems() not implemented`);
@@ -442,9 +444,6 @@ export const throwingClient: ApiClient = {
   },
   signup: () => {
     throw new Error(`ApiClient.signup() not implemented`);
-  },
-  updateSuspendFilterRequest: () => {
-    throw new Error(`ApiClient.updateSuspendFilterRequest() not implemented`);
   },
   updateUnlockRequest: () => {
     throw new Error(`ApiClient.updateUnlockRequest() not implemented`);

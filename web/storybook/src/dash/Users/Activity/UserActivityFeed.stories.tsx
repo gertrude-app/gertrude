@@ -1,8 +1,7 @@
 import { UserActivityFeed } from '@dash/components';
 import type { StoryObj, Meta } from '@storybook/react';
-import type { ActivityFeedItem } from '@dash/components';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
-import { activity, props, testImgUrl, time } from '../../../story-helpers';
+import { activity, keystrokeLine, props, screenshot, time } from '../../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Users/Activity/UserActivityReviewDay', // eslint-disable-line
@@ -18,6 +17,39 @@ export const Default: Story = props({
   items: activity[2]?.items ?? [],
   numDeleted: 0,
   deleteItems: () => {},
+});
+
+// @screenshot: xs,md
+export const WithSuspensions: Story = props({
+  ...Default.args,
+  items: [
+    keystrokeLine(`VSCode`, `import React from 'react';`, false, false),
+    keystrokeLine(`Arc`, `why did twitter change to x?`, false, true),
+    screenshot(800, 600, false, true),
+    keystrokeLine(
+      `Notion`,
+      `everybody say hi to our new team member, @curdie`,
+      false,
+      true,
+    ),
+    screenshot(500, 300, false, true),
+    keystrokeLine(`VSCode`, `import React from 'react';`, false, false),
+    keystrokeLine(`Arc`, `why did twitter change to x?`, false, false),
+    screenshot(800, 600, false, true),
+    keystrokeLine(
+      `Notion`,
+      `everybody say hi to our new team member, @curdie`,
+      false,
+      true,
+    ),
+    screenshot(700, 200, false, false),
+    keystrokeLine(
+      `Notion`,
+      `everybody say hi to our new team member, @curdie`,
+      false,
+      true,
+    ),
+  ],
 });
 
 export const Empty: Story = props({
@@ -41,41 +73,5 @@ export const Chunked: Story = props({
     keystrokeLine(`Xcode`, `import Foundation`),
   ],
 });
-
-// helpers
-
-function common(): { id: string; ids: string[]; date: string } {
-  const current = `item-${Math.random()}`;
-  return {
-    id: `${current}`,
-    ids: [`${current}`],
-    date: time.stable(),
-  };
-}
-
-function keystrokeLine(
-  appName: string,
-  line: string,
-  deleted?: boolean,
-): ActivityFeedItem {
-  return {
-    ...common(),
-    type: `KeystrokeLine`,
-    appName,
-    line,
-    deleted,
-  };
-}
-
-function screenshot(width = 800, height = 600, deleted?: boolean): ActivityFeedItem {
-  return {
-    ...common(),
-    type: `Screenshot`,
-    url: testImgUrl(width, height),
-    width,
-    height,
-    deleted,
-  };
-}
 
 export default meta;

@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React from 'react';
 import { isOlderThan } from '@dash/datetime';
 import {
   Modal,
@@ -9,18 +9,24 @@ import {
 } from '@dash/components';
 import { useNavigate, useParams } from 'react-router-dom';
 import reducer, {
-  initialState,
   durationInSeconds,
+  userInitialState,
+  useUserObserver,
 } from '../../reducers/suspend-filter-request-reducer';
-import { useQuery, useMutation, Key } from '../../hooks';
+import { useQuery, useMutation, useObservedReducer, Key } from '../../hooks';
 import Current from '../../environment';
 
 const SuspendFilter: React.FC = () => {
-  const { id = `` } = useParams<{ id: string }>();
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const { userId = ``, id = `` } = useParams<{ userId: UUID; id: UUID }>();
   const navigate = useNavigate();
   const queryKey = Key.suspendFilterRequest(id);
   const goToDashboard: () => unknown = () => navigate(`/`);
+
+  const [state, dispatch] = useObservedReducer(
+    reducer,
+    userInitialState(userId),
+    useUserObserver(userId),
+  );
 
   const query = useQuery(
     Key.suspendFilterRequest(id),
@@ -30,11 +36,17 @@ const SuspendFilter: React.FC = () => {
 
   const update = useMutation(
     (status: 'accepted' | 'rejected') =>
-      Current.api.updateSuspendFilterRequest({
+      Current.api.decideFilterSuspensionRequest({
         id,
-        durationInSeconds: durationInSeconds(state),
+        decision:
+          status === `rejected`
+            ? { case: `rejected` }
+            : {
+                case: `accepted`,
+                durationInSeconds: durationInSeconds(state),
+                extraMonitoring: state.extraMonitoring,
+              },
         responseComment: state.responseComment.trim() || undefined,
-        status,
       }),
     { invalidating: [queryKey], toast: `update:suspend-filter-request` },
   );
@@ -106,6 +118,11 @@ const SuspendFilter: React.FC = () => {
         setResponseComment={(comment) => dispatch({ type: `updateComment`, comment })}
         setDuration={(duration) => dispatch({ type: `updateDuration`, duration })}
         setCustomDuration={(custom) => dispatch({ type: `updateCustomDuration`, custom })}
+        extraMonitoringOptions={request.extraMonitoringOptions}
+        selectedExtraMonitoringOption={state.extraMonitoring}
+        setSelectedExtraMonitoringOption={(extraMonitoring) =>
+          dispatch({ type: `updateExtraMonitoring`, extraMonitoring })
+        }
       />
     </Modal>
   );

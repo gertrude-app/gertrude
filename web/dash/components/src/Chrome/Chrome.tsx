@@ -34,24 +34,24 @@ const Chrome: React.FC<Props> = ({
       <Dialog as="div" className="relative z-40 md:hidden" onClose={onMobileSidebarClose}>
         <Transition.Child
           as={Fragment}
-          enter="transition-opacity ease-linear duration-300"
+          enter="transition-opacity ease-linear duration-200"
           enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="transition-opacity ease-linear duration-300"
+          enterTo=""
+          leave="transition-opacity ease-linear duration-200"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
           {/* mark: semi transparent overlay */}
-          <div className="fixed inset-0 bg-slate-700 bg-opacity-90" />
+          <div className="fixed inset-0 bg-white bg-opacity-50 backdrop-blur-xl" />
         </Transition.Child>
 
         <div className="fixed inset-0 flex z-40">
           <Transition.Child
             as={Fragment}
-            enter="transition-transform ease-in-out duration-300 transform"
+            enter="transition-transform ease-in-out duration-200 transform"
             enterFrom="-translate-x-full"
             enterTo="translate-x-0"
-            leave="transition-[transform] ease-in-out duration-300 transform"
+            leave="transition-[transform] ease-in-out duration-200 transform"
             leaveFrom="translate-x-0"
             leaveTo="-translate-x-full"
           >
@@ -60,10 +60,10 @@ const Chrome: React.FC<Props> = ({
               {/* mark: begin floating mobile overlay close 'X' button */}
               <Transition.Child
                 as={Fragment}
-                enter="ease-in-out duration-300"
+                enter="ease-in-out duration-200"
                 enterFrom="opacity-0"
                 enterTo="opacity-100"
-                leave="ease-in-out duration-300"
+                leave="ease-in-out duration-200"
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
