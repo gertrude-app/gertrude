@@ -66,7 +66,11 @@ const Keychain: React.FC = () => {
         expiration: keyRecord.expiration,
       });
     },
-    { toast: `save:key`, invalidating: [queryKey] },
+    {
+      toast: `save:key`,
+      onSuccess: () => dispatch({ type: `keySaved` }),
+      invalidating: [queryKey],
+    },
   );
 
   if (id === `new`) {

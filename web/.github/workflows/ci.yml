@@ -5,7 +5,7 @@ on:
     branches:
       - master
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, labeled]
 
 jobs:
   check:
@@ -68,17 +68,19 @@ jobs:
       - name: build storybook
         run: STORYBOOK_SCREENSHOT_TESTING=true just build-storybook
       - name: serve storybook
+        if: contains(github.event.pull_request.labels.*.name, 'run-argos')
         run: |
           mv -f storybook/storybook-static/{iframe,index}.html
           pnpm dlx serve -l 4777 storybook/storybook-static &
-      - name: take screenshots
-        run: just visual-test
-      - name: upload screenshots
+      - name: screenshots
+        if: contains(github.event.pull_request.labels.*.name, 'run-argos')
         run:
-          pnpm dlx @argos-ci/cli upload storybook/visual-tests/screenshots/argos || true
+          just visual-test pnpm dlx @argos-ci/cli upload
+          storybook/visual-tests/screenshots/argos || true
       - name: create screenshots pr
         id: pr
         uses: peter-evans/create-pull-request@v4
+        if: contains(github.event.pull_request.labels.*.name, 'run-argos')
         with:
           base: ${{ github.head_ref }}
           commit-message: '[automated] update screenshots from CI'

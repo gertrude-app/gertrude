@@ -4,7 +4,7 @@ describe(`create key flow`, () => {
   beforeEach(() => {
     cy.simulateLoggedIn();
     cy.viewport(1024, 875);
-
+    cy.interceptPql(`SaveKey`, { success: true });
     cy.interceptPql(`GetIdentifiedApps`, [
       {
         id: `app-123`,
@@ -14,7 +14,6 @@ describe(`create key flow`, () => {
         bundleIds: [],
       },
     ]);
-
     cy.interceptPql(`GetAdminKeychain`, {
       summary: {
         id: `123`,
@@ -58,6 +57,28 @@ describe(`create key flow`, () => {
       `data-test-rotating-subdomains`,
       `images,cdn,static,api,docs`,
     );
+
+    // server should send back keychain with saved key
+    cy.interceptPql(`GetAdminKeychain`, {
+      summary: {
+        id: `123`,
+        name: `Betsy's Keychain`,
+        authorId: `admin-123`,
+        isPublic: false,
+        numKeys: 1,
+      },
+      keys: [
+        {
+          id: `key-id`,
+          keychainId: `keychain-id`,
+          key: { type: `domain`, domain: `foo.com`, scope: { type: `webBrowsers` } },
+        },
+      ],
+    });
+
+    cy.testId(`modal-primary-btn`).click();
+    cy.testId(`modal-primary-btn`).should(`not.exist`); // modal dismissed
+    cy.contains(`Save keychain`).should(`be.disabled`); // keychain not dirty
   });
 
   it(`handles entered domain with no subdomain correctly`, () => {

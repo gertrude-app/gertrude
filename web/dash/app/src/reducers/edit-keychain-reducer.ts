@@ -18,6 +18,7 @@ type EditKeychainAction =
   | { type: 'createNewKeychain'; id: UUID; adminId: UUID }
   | { type: 'beginEditKey'; id: UUID }
   | { type: 'keychainSaved' }
+  | { type: 'keySaved' }
   | { type: 'cancelEditKey' }
   | { type: 'createNewKey' }
   | { type: 'updateEditingKey'; event: EditKey.Event }
@@ -48,6 +49,7 @@ function reducer(
   switch (action.type) {
     case `receivedKeychain`:
       state.keychain.original = action.keychain.summary;
+      state.keychain.draft.numKeys = action.keychain.summary.numKeys;
       state.keys = action.keychain.keys;
       return;
 
@@ -81,6 +83,7 @@ function reducer(
       }
       return;
 
+    case `keySaved`:
     case `cancelEditKey`:
       delete state.editingKey;
       return;
