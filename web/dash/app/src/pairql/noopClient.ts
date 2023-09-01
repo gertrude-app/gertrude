@@ -118,6 +118,9 @@ const noopClient: ApiClient = {
       modelTitle: ``,
     });
   },
+  hollandTalkSubscription: async () => {
+    return Result.success({ success: true });
+  },
   userActivityFeed: async () => {
     return Result.success({ numDeleted: 0, userName: ``, items: [] });
   },

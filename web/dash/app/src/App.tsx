@@ -28,6 +28,7 @@ import RequestPasswordReset from './components/routes/RequestPasswordReset';
 import ChangePassword from './components/routes/ChangePassword';
 import Computers from './components/routes/Computers';
 import Computer from './components/routes/Computer';
+import HollandTalk from './components/routes/HollandTalk';
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -45,6 +46,7 @@ const App: React.FC = () => {
   return (
     <Routes>
       {/* unauthed routes */}
+      <Route path="/holland" element={<HollandTalk />} />
       <Route path="/login" element={<Login />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/otp/:token" element={<MagicLink />} />

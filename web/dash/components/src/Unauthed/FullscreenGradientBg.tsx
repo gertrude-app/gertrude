@@ -35,11 +35,11 @@ const SubtleLogo: React.FC<SubtleLogoProps> = ({ size, x, y, angle, index }) => 
     }}
     className={cx(
       index % 3 !== 0 ? `hidden sm:flex` : `flex`,
-      `border-2 absolute border-dashed justify-center items-center border-white border-opacity-40`,
+      `border-2 absolute border-dashed justify-center items-center border-white border-opacity-30`,
     )}
   >
     <div
-      className="border-2 border-dashed rotate-12 border-white border-opacity-40"
+      className="border-2 border-dashed rotate-12 border-white border-opacity-30"
       style={{
         width: size / 1.7,
         height: size / 1.7,
