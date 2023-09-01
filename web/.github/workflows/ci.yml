@@ -74,9 +74,9 @@ jobs:
           pnpm dlx serve -l 4777 storybook/storybook-static &
       - name: screenshots
         if: contains(github.event.pull_request.labels.*.name, 'run-argos')
-        run:
-          just visual-test pnpm dlx @argos-ci/cli upload
-          storybook/visual-tests/screenshots/argos || true
+        run: |
+          just visual-test
+          pnpm dlx @argos-ci/cli upload storybook/visual-tests/screenshots/argos || true
       - name: create screenshots pr
         id: pr
         uses: peter-evans/create-pull-request@v4
