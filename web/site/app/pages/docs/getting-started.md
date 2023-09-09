@@ -10,7 +10,7 @@ practice using all of the core features of Gertrude. {% .lead %}
 ---
 
 _**NOTE:** If you'd prefer to watch a step-by-step **video** showing all aspects of
-getting started with Gertrude, [click here](https://www.youtube.com/watch?v=N8kLEKls6UU)._
+getting started with Gertrude, [click here](https://youtu.be/nSgDq8uEFTk)._
 
 ---
 
