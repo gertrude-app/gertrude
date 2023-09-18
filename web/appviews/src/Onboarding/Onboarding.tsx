@@ -89,8 +89,8 @@ export const Onboarding: React.FC<Props> = ({
       break;
   }
   return (
-    <div className="p-8 h-screen relative flex items-center justify-center">
-      <div className="absolute top-0 right-0 bottom-0 p-3">Parent Setup</div>
+    <div className="h-screen">
+      {/* <div className="absolute top-0 right-0 bottom-0 p-3">Parent Setup</div> */}
       {stepComponent}
     </div>
   );

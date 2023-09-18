@@ -16,6 +16,35 @@ export interface MacOSUser {
 
 export type UserRemediationStep = 'create' | 'switch' | 'demote' | 'choose';
 
+export type OnboardingStep =
+  | 'welcome'
+  | 'confirmGertrudeAccount'
+  | 'noGertrudeAccount'
+  | 'macosUserAccountType'
+  | 'getChildConnectionCode'
+  | 'connectChild'
+  | 'allowNotifications_start'
+  | 'allowNotifications_grant'
+  | 'allowScreenshots_required'
+  | 'allowScreenshots_openSysSettings'
+  | 'allowScreenshots_grantAndRestart'
+  | 'allowScreenshots_success'
+  | 'allowKeylogging_required'
+  | 'allowKeylogging_openSysSettings'
+  | 'allowKeylogging_grant'
+  | 'allowKeylogging_failed'
+  | 'allowKeylogging_success'
+  | 'installSysExt_explain'
+  | 'installSysExt_start'
+  | 'installSysExt_allowInstall'
+  | 'installSysExt_allowFiltering'
+  | 'installSysExt_failed'
+  | 'installSysExt_success'
+  | 'locateMenuBarIcon'
+  | 'viewHealthCheck'
+  | 'howToUseGertrude'
+  | 'finish';
+
 export interface AppState {
   os: 'catalina' | 'bigSurOrMonterey' | 'venturaOrLater';
   macOSUser: {
@@ -26,34 +55,7 @@ export interface AppState {
   connectChildRequest: RequestState<string>;
   screenRecordingPermissionGranted: boolean;
   keyloggingPermissionGranted: boolean;
-  step:
-    | 'welcome'
-    | 'confirmGertrudeAccount'
-    | 'noGertrudeAccount'
-    | 'macosUserAccountType'
-    | 'getChildConnectionCode'
-    | 'connectChild'
-    | 'allowNotifications_start'
-    | 'allowNotifications_grant'
-    | 'allowScreenshots_required'
-    | 'allowScreenshots_openSysSettings'
-    | 'allowScreenshots_grantAndRestart'
-    | 'allowScreenshots_success'
-    | 'allowKeylogging_required'
-    | 'allowKeylogging_openSysSettings'
-    | 'allowKeylogging_grant'
-    | 'allowKeylogging_failed'
-    | 'allowKeylogging_success'
-    | 'installSysExt_explain'
-    | 'installSysExt_start'
-    | 'installSysExt_allowInstall'
-    | 'installSysExt_allowFiltering'
-    | 'installSysExt_failed'
-    | 'installSysExt_success'
-    | 'locateMenuBarIcon'
-    | 'viewHealthCheck'
-    | 'howToUseGertrude'
-    | 'finish';
+  step: OnboardingStep;
 }
 
 export type AppEvent =
