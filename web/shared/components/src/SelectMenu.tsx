@@ -32,7 +32,7 @@ function SelectMenu<Value extends string = string>({
       buttonStyles = `py-2 bg-white text-slate-400 hover:bg-slate-100`;
       break;
     case `large`:
-      buttonStyles = `!py-2 bg-slate-white text-slate-300 hover:bg-slate-100 m-1 !rounded-xl`;
+      buttonStyles = `!py-2 bg-slate-white text-slate-300 hover:bg-slate-100 m-1 !rounded-lg focus:!ring-offset-0`;
       break;
   }
   return (
