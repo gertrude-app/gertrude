@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import cx from 'classnames';
 import type { AppEvent, MacOSUser, UserRemediationStep } from '../onboarding-store';
 import QrCode from '../images/signup-qr-code.png';
+import { Button } from '@shared/components';
+import TellMeMoreButton from '../TellMeMoreButton';
+import InformationModal from '../InformationModal';
 
 interface Emit {
   emit(event: AppEvent): unknown;
@@ -45,12 +49,7 @@ const MacOSUserAccountType: React.FC<Props> = ({
     }
   }
 
-  return (
-    <div>
-      <h1 className="text-3xl">MacOS User Type</h1>
-      {body}
-    </div>
-  );
+  return body;
 };
 
 export default MacOSUserAccountType;
@@ -157,24 +156,35 @@ const StartRemediation: React.FC<StartRemediationProps> = ({ action }) => {
 };
 
 const WarnUserIsAdmin: React.FC<Emit> = ({ emit }) => (
-  <div>
-    <p className="my-4">
+  <div className="flex h-full flex-col justify-center items-center p-12">
+    <h1 className="text-3xl font-bold">Hmm, this user has admin privileges</h1>
+    <p className="my-4 text-lg text-slate-500 text-center max-w-2xl">
       This macOS user has admin privileges, and so should <b>not be used</b> by a child
       protected by Gertrude. Admin privileges make it easy for your child to disable and
-      bypass Gertrude. <span className="text-fuchsia-600">[Tell me more]</span>
+      bypass Gertrude.
     </p>
-    <button
-      className="bg-blue-500 text-white font-bold py-2 px-4"
-      onClick={() => emit({ case: `primaryBtnClicked` })}
-    >
-      Show me how to fix it &rarr;
-    </button>
-    <button
-      className="bg-gray-400 text-white font-bold py-2 px-4"
-      onClick={() => emit({ case: `secondaryBtnClicked` })}
-    >
-      I understand the risks, proceed anyway &rarr;
-    </button>
+    <TellMeMoreButton onClick={() => {}}>Tell me more</TellMeMoreButton>
+    <div className="flex flex-col gap-4 mt-8">
+      <Button
+        color="primary"
+        size="large"
+        type="button"
+        onClick={() => emit({ case: `primaryBtnClicked` })}
+        className="shadow shadow-violet-200/80"
+      >
+        Show me how to fix it <i className="fa-solid fa-arrow-right ml-2" />
+      </Button>
+      <Button
+        color="secondary"
+        size="large"
+        type="button"
+        onClick={() => emit({ case: `primaryBtnClicked` })}
+        className="shadow shadow-violet-200/80"
+      >
+        I understand the risks, proceed anyway{' '}
+        <i className="fa-solid fa-arrow-right ml-2" />
+      </Button>
+    </div>
   </div>
 );
 
@@ -183,28 +193,50 @@ interface HappyPathProps extends Emit {
   userName: string;
 }
 
-const HappyPath: React.FC<HappyPathProps> = ({ emit, userName, adminUsers }) => (
-  <div>
-    <p className="my-4">
-      🎉 Hooray, this macOS user (<code>{userName}</code>) does <b>not</b> have admin
-      privileges, which is just what we want.
-    </p>
-    <div className="bg-orange-100 rounded-lg p-3 mb-4">
-      <b className="block">Watch out!</b>
-      Make sure that your child doesn't know the password for the{` `}
-      <span
-        dangerouslySetInnerHTML={{
-          __html: adminUsers.map((name) => `<code>${name}</code>`).join(` or `),
-        }}
-      />
-      {` `}
-      user, or else they could disable Gertrude.
+const HappyPath: React.FC<HappyPathProps> = ({ emit, userName, adminUsers }) => {
+  const [showModal, setShowModal] = useState(false);
+  return (
+    <div className="h-full flex flex-col justify-center items-center p-12 relative">
+      <InformationModal open={showModal} setOpen={setShowModal}>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat at tempore culpa
+        eaque, exercitationem molestiae voluptate, pariatur temporibus inventore excepturi
+        sunt odit ea facere placeat iure cumque? Animi, maiores alias.
+      </InformationModal>
+      <h1 className="text-3xl font-bold">Yay, you've got the right macOS user type!</h1>
+      <p className="my-4 text-lg text-slate-500">
+        This macOS user (<span>{userName}</span>) does <b>not</b> have admin privileges,
+        which is just what we want.
+      </p>
+      <TellMeMoreButton onClick={() => setShowModal(true)}>
+        Why does this matter?
+      </TellMeMoreButton>
+      <div className="mt-4 mb-8 border border-slate-200 p-6 pt-8 rounded-2xl relative">
+        <div className="absolute left-4 -top-6 w-12 h-12 rounded-full bg-slate-50 flex justify-center items-center">
+          <i className="fa-solid fas fa-circle-exclamation text-3xl text-orange-300" />
+        </div>
+        <h3 className="text-lg font-semibold text-slate-700">Watch out!</h3>
+        <p className="text-slate-500 mt-2">
+          Make sure that your child doesn't know the password for the{` `}
+          <span
+            className="font-medium"
+            dangerouslySetInnerHTML={{
+              __html: adminUsers
+                .map((name) => `<span key="${name}">${name}</span>`)
+                .join(` or `),
+            }}
+          />
+          {` `}
+          user, or else they could disable Gertrude.
+        </p>
+      </div>
+      <Button
+        color="primary"
+        size="large"
+        type="button"
+        onClick={() => emit({ case: `primaryBtnClicked` })}
+      >
+        Coninue <i className="fa-solid fa-arrow-right ml-2" />
+      </Button>
     </div>
-    <button
-      className="bg-blue-500 text-white font-bold py-2 px-4"
-      onClick={() => emit({ case: `primaryBtnClicked` })}
-    >
-      Next &rarr;
-    </button>
-  </div>
-);
+  );
+};

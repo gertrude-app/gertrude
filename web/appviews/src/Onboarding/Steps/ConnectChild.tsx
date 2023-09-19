@@ -18,7 +18,7 @@ const ConnectChild: React.FC<Props> = ({ emit, dispatch, connectionCode, request
         <div>
           <h1 className="text-3xl">Connect a child</h1>
           <p>Enter the 6-digit connection code from the Gertrude parent's site</p>
-          <input type="text" value={connectionCode} />
+          <input type="text" onChange={() => {}} value={connectionCode} />
           <button
             className="bg-blue-500 text-white font-bold py-2 px-4"
             onClick={() =>

@@ -4,6 +4,7 @@ import type { PropsOf } from '../lib/store';
 import { containerize } from '../lib/store';
 import store from './onboarding-store';
 import * as Step from './Steps';
+import StepSwitcher, { OnboardingPage } from './StepSwitcher';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 
@@ -17,82 +18,168 @@ export const Onboarding: React.FC<Props> = ({
   os,
 }) => {
   let stepComponent: React.ReactNode;
-  switch (step) {
-    case `welcome`:
-      stepComponent = <Step.Welcome emit={emit} />;
-      break;
-    case `confirmGertrudeAccount`:
-      stepComponent = <Step.ConfirmGertrudeAccount emit={emit} />;
-      break;
-    case `noGertrudeAccount`:
-      stepComponent = <Step.NoGertrudeAccount emit={emit} />;
-      break;
-    case `macosUserAccountType`:
-      stepComponent = (
-        <Step.MacosUserAccountType
-          current={macOSUser.current}
-          users={macOSUser.list}
-          remediationStep={macOSUser.remediationStep}
-          emit={emit}
-        />
-      );
-      break;
-    case `getChildConnectionCode`:
-      stepComponent = <Step.GetConnectionCode emit={emit} />;
-      break;
-    case `connectChild`:
-      stepComponent = (
-        <Step.ConnectChild
-          connectionCode={connectionCode}
-          request={connectChildRequest}
-          dispatch={dispatch}
-          emit={emit}
-        />
-      );
-      break;
-    case `allowNotifications_start`:
-    case `allowNotifications_grant`:
-      stepComponent = <Step.AllowNotifications os={os} step={step} emit={emit} />;
-      break;
-    case `allowScreenshots_required`:
-    case `allowScreenshots_openSysSettings`:
-    case `allowScreenshots_grantAndRestart`:
-    case `allowScreenshots_success`:
-      stepComponent = <Step.AllowScreenshots os={os} step={step} emit={emit} />;
-      break;
-    case `allowKeylogging_required`:
-    case `allowKeylogging_openSysSettings`:
-    case `allowKeylogging_grant`:
-    case `allowKeylogging_failed`:
-    case `allowKeylogging_success`:
-      stepComponent = <Step.AllowKeylogging os={os} step={step} emit={emit} />;
-      break;
-    case `installSysExt_explain`:
-    case `installSysExt_start`:
-    case `installSysExt_allowInstall`:
-    case `installSysExt_allowFiltering`:
-    case `installSysExt_failed`:
-    case `installSysExt_success`:
-      stepComponent = <Step.InstallSysExt os={os} step={step} emit={emit} />;
-      break;
-    case `locateMenuBarIcon`:
-      stepComponent = <Step.LocateMenuBarIcon emit={emit} />;
-      break;
-    case `viewHealthCheck`:
-      stepComponent = <Step.ViewHealthCheck emit={emit} />;
-      break;
-    case `howToUseGertrude`:
-      stepComponent = <Step.HowToUseGertrude emit={emit} />;
-      break;
-    case `finish`:
-      stepComponent = <Step.Finish emit={emit} />;
-      break;
-  }
   return (
-    <div className="h-screen">
-      {/* <div className="absolute top-0 right-0 bottom-0 p-3">Parent Setup</div> */}
-      {stepComponent}
-    </div>
+    <StepSwitcher step={step}>
+      <OnboardingPage step="welcome" component={<Step.Welcome emit={emit} />} />
+      <OnboardingPage
+        step="confirmGertrudeAccount"
+        component={<Step.ConfirmGertrudeAccount emit={emit} />}
+      />
+      <OnboardingPage
+        step="noGertrudeAccount"
+        component={<Step.NoGertrudeAccount emit={emit} />}
+      />
+      <OnboardingPage
+        step="macosUserAccountType"
+        component={
+          <Step.MacosUserAccountType
+            current={macOSUser.current}
+            users={macOSUser.list}
+            remediationStep={macOSUser.remediationStep}
+            emit={emit}
+          />
+        }
+        confetti={!macOSUser.current.isAdmin}
+      />
+      <OnboardingPage
+        step="getChildConnectionCode"
+        component={<Step.GetConnectionCode emit={emit} />}
+      />
+      <OnboardingPage
+        step="connectChild"
+        component={
+          <Step.ConnectChild
+            connectionCode={connectionCode}
+            request={connectChildRequest}
+            dispatch={dispatch}
+            emit={emit}
+          />
+        }
+      />
+      <OnboardingPage
+        step="allowNotifications_start"
+        component={
+          <Step.AllowNotifications os={os} step="allowNotifications_start" emit={emit} />
+        }
+      />
+      <OnboardingPage
+        step="allowNotifications_grant"
+        component={
+          <Step.AllowNotifications os={os} step="allowNotifications_grant" emit={emit} />
+        }
+      />
+      <OnboardingPage
+        step="allowScreenshots_required"
+        component={
+          <Step.AllowScreenshots os={os} step="allowScreenshots_required" emit={emit} />
+        }
+      />
+      <OnboardingPage
+        step="allowScreenshots_openSysSettings"
+        component={
+          <Step.AllowScreenshots
+            os={os}
+            step="allowScreenshots_openSysSettings"
+            emit={emit}
+          />
+        }
+      />
+      <OnboardingPage
+        step="allowScreenshots_grantAndRestart"
+        component={
+          <Step.AllowScreenshots
+            os={os}
+            step="allowScreenshots_grantAndRestart"
+            emit={emit}
+          />
+        }
+      />
+      <OnboardingPage
+        step="allowScreenshots_success"
+        component={
+          <Step.AllowScreenshots os={os} step="allowScreenshots_success" emit={emit} />
+        }
+      />
+      <OnboardingPage
+        step="allowKeylogging_required"
+        component={
+          <Step.AllowKeylogging os={os} step="allowKeylogging_required" emit={emit} />
+        }
+      />
+      <OnboardingPage
+        step="allowKeylogging_openSysSettings"
+        component={
+          <Step.AllowKeylogging
+            os={os}
+            step="allowKeylogging_openSysSettings"
+            emit={emit}
+          />
+        }
+      />
+      <OnboardingPage
+        step="allowKeylogging_grant"
+        component={
+          <Step.AllowKeylogging os={os} step="allowKeylogging_grant" emit={emit} />
+        }
+      />
+      <OnboardingPage
+        step="allowKeylogging_failed"
+        component={
+          <Step.AllowKeylogging os={os} step="allowKeylogging_failed" emit={emit} />
+        }
+      />
+      <OnboardingPage
+        step="allowKeylogging_success"
+        component={
+          <Step.AllowKeylogging os={os} step="allowKeylogging_success" emit={emit} />
+        }
+      />
+      <OnboardingPage
+        step="installSysExt_explain"
+        component={
+          <Step.InstallSysExt os={os} step="installSysExt_explain" emit={emit} />
+        }
+      />
+      <OnboardingPage
+        step="installSysExt_start"
+        component={<Step.InstallSysExt os={os} step="installSysExt_start" emit={emit} />}
+      />
+      <OnboardingPage
+        step="installSysExt_allowInstall"
+        component={
+          <Step.InstallSysExt os={os} step="installSysExt_allowInstall" emit={emit} />
+        }
+      />
+      <OnboardingPage
+        step="installSysExt_allowFiltering"
+        component={
+          <Step.InstallSysExt os={os} step="installSysExt_allowFiltering" emit={emit} />
+        }
+      />
+      <OnboardingPage
+        step="installSysExt_failed"
+        component={<Step.InstallSysExt os={os} step="installSysExt_failed" emit={emit} />}
+      />
+      <OnboardingPage
+        step="installSysExt_success"
+        component={
+          <Step.InstallSysExt os={os} step="installSysExt_success" emit={emit} />
+        }
+      />
+      <OnboardingPage
+        step="locateMenuBarIcon"
+        component={<Step.LocateMenuBarIcon emit={emit} />}
+      />
+      <OnboardingPage
+        step="viewHealthCheck"
+        component={<Step.ViewHealthCheck emit={emit} />}
+      />
+      <OnboardingPage
+        step="howToUseGertrude"
+        component={<Step.HowToUseGertrude emit={emit} />}
+      />
+      <OnboardingPage step="finish" component={<Step.Finish emit={emit} />} />
+    </StepSwitcher>
   );
 };
 
