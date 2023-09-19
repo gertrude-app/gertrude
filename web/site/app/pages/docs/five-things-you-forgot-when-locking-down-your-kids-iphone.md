@@ -14,6 +14,15 @@ these too._
 
 ## 1. `#images` iMessage App
 
+{% callout type="warning" title="iOS 17 Warning" %}
+
+Apple recently released iOS version 17 (on 9/17/23). As of right now, the current version
+`17.0.0` **does not permit disabling the #images app.** There is currently no known
+workaround, but we are hopeful that Apple will release an update restoring control for
+parents. Until then **we recommend that you DO NOT UPDATE your child's device to iOS 17**.
+
+{% /callout %}
+
 Apple's built-in **Messages** app comes with a growing number of app-integrations (called
 `iMessage apps`) that allow for sending non-text items in text messages.
 
