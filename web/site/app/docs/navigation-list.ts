@@ -28,6 +28,10 @@ const navigation = [
         title: `Gertrude for mac keylogging`,
         href: `/docs/mac-keylogger`,
       },
+      {
+        title: `No Removing Images GIF search in iOS 17`,
+        href: `/docs/ios-17-cant-delete-messages-images`,
+      },
     ],
   },
   {
