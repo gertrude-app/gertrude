@@ -71,7 +71,7 @@ jobs:
         if: contains(github.event.pull_request.labels.*.name, 'run-argos')
         run: |
           mv -f storybook/storybook-static/{iframe,index}.html
-          pnpm dlx serve -l 4777 storybook/storybook-static &
+          pnpm dlx serve@14.2.1 -l 4777 storybook/storybook-static &
       - name: screenshots
         if: contains(github.event.pull_request.labels.*.name, 'run-argos')
         run: |

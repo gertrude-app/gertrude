@@ -15,6 +15,9 @@ type Props = {
   setDuration(duration: string): unknown;
   setCustomDuration(duration: string): unknown;
   requestedAt: string;
+  extraMonitoringOptions: Record<string, string>;
+  selectedExtraMonitoringOption?: string;
+  setSelectedExtraMonitoringOption(option: string): unknown;
 };
 
 const SuspendFilterRequestForm: React.FC<Props> = ({
@@ -28,9 +31,12 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
   customDurationInMinutes,
   setCustomDuration,
   requestedAt,
+  extraMonitoringOptions,
+  selectedExtraMonitoringOption,
+  setSelectedExtraMonitoringOption,
 }) => (
-  <div className="mt-5 sm:px-2 text-lg">
-    <div className="leading-tight text-slate-700">
+  <div className="mt-5 sm:px-2 text-lg flex flex-col">
+    <div className="text-slate-700">
       {date.isOlderThan(requestedAt, { minutes: 5 }) ? (
         <>
           <UserInputText small>
@@ -57,31 +63,48 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
       </div>
     )}
     <hr className="mt-6 opacity-50" />
-    <form className="mt-4 space-y-5 mb-2">
-      <SelectMenu
-        label="Granted duration:"
-        testId="select-suspension-duration"
-        options={DURATION_OPTS}
-        selectedOption={durationInSeconds}
-        setSelected={setDuration}
-      />
-      {durationInSeconds === `custom` && (
-        <TextInput
-          type="positiveInteger"
-          label="Custom duration (minutes):"
-          value={customDurationInMinutes ?? ``}
-          setValue={setCustomDuration}
+    <div className="flex justify-center">
+      <form className="mt-4 space-y-5 mb-2 max-w-2xl flex-grow">
+        <SelectMenu
+          label="Duration:"
+          testId="select-suspension-duration"
+          options={DURATION_OPTS}
+          selectedOption={durationInSeconds}
+          setSelected={setDuration}
         />
-      )}
-      <TextInput
-        label="Your comment:"
-        type="textarea"
-        optional
-        value={responseComment}
-        setValue={setResponseComment}
-        testId="suspend-filter-req-comment"
-      />
-    </form>
+        {durationInSeconds === `custom` && (
+          <TextInput
+            type="positiveInteger"
+            label="Custom duration (minutes):"
+            value={customDurationInMinutes ?? ``}
+            setValue={setCustomDuration}
+          />
+        )}
+        {Object.values(extraMonitoringOptions).length > 0 && (
+          <SelectMenu
+            label="Extra monitoring:"
+            testId="select-extra-monitoring-option"
+            options={[
+              { value: `off`, display: `Off` },
+              ...Object.entries(extraMonitoringOptions).map(([value, display]) => ({
+                value,
+                display,
+              })),
+            ]}
+            selectedOption={selectedExtraMonitoringOption ?? `off`}
+            setSelected={setSelectedExtraMonitoringOption}
+          />
+        )}
+        <TextInput
+          label="Your comment:"
+          type="textarea"
+          optional
+          value={responseComment}
+          setValue={setResponseComment}
+          testId="suspend-filter-req-comment"
+        />
+      </form>
+    </div>
   </div>
 );
 

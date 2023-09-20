@@ -63,7 +63,7 @@ const TextInput: React.FC<Props> = ({
         <div className="flex flex-row justify-between items-center">
           {label && <Label htmlFor={id}>{label}</Label>}
           {optional && (
-            <span className="text-violet-500/80 translate-y-px text-sm antialiased italic">
+            <span className="text-violet-500/80 font-medium translate-y-px text-sm antialiased italic">
               *optional
             </span>
           )}

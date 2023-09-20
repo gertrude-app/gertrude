@@ -120,6 +120,7 @@ export interface SuspendFilterRequest {
   requestedDurationInSeconds: number;
   requestComment?: string;
   responseComment?: string;
+  extraMonitoringOptions: { [key: string]: string };
   createdAt: ISODateString;
 }
 
@@ -160,6 +161,7 @@ export type UserActivityItem =
       url: string;
       width: number;
       height: number;
+      duringSuspension: boolean;
       createdAt: ISODateString;
       deletedAt?: ISODateString;
     }
@@ -169,6 +171,7 @@ export type UserActivityItem =
       ids: UUID[];
       appName: string;
       line: string;
+      duringSuspension: boolean;
       createdAt: ISODateString;
       deletedAt?: ISODateString;
     };

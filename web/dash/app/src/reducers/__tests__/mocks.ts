@@ -51,6 +51,7 @@ export function suspendFilterRequest(
     requestComment: `I want to watch a video`,
     requestedDurationInSeconds: 120,
     createdAt: new Date().toISOString(),
+    extraMonitoringOptions: {},
     ...override,
   };
 }
@@ -149,6 +150,7 @@ type KeystrokeActivityItem = {
   line: string;
   createdAt: ISODateString;
   deletedAt?: ISODateString;
+  duringSuspension: boolean;
 };
 
 export function keystrokeActivityItem(
@@ -162,6 +164,7 @@ export function keystrokeActivityItem(
     appName: `appName-${Math.random()}`,
     line: `line-${Math.random()}`,
     createdAt: new Date().toISOString(),
+    duringSuspension: false,
     ...override,
   };
 }
@@ -173,6 +176,7 @@ type ScreenshotActivityItem = {
   url: string;
   width: number;
   height: number;
+  duringSuspension: boolean;
   createdAt: ISODateString;
   deletedAt?: ISODateString;
 };
@@ -191,6 +195,7 @@ export function screenshotActivityItem(
     width,
     height,
     createdAt: new Date().toISOString(),
+    duringSuspension: false,
     ...override,
   };
 }
@@ -206,6 +211,7 @@ export function keystrokeLine(
     appName: `appName-${Math.random()}`,
     line: `line-${Math.random()}`,
     date: new Date().toISOString(),
+    duringSuspension: false,
     ...override,
     type: `KeystrokeLine`,
   };

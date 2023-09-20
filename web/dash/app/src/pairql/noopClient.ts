@@ -65,10 +65,12 @@ const noopClient: ApiClient = {
       id: ``,
       deviceId: ``,
       userName: ``,
+      userId: ``,
       requestedDurationInSeconds: 0,
       requestComment: ``,
       status: `rejected`,
       createdAt: new Date().toISOString(),
+      extraMonitoringOptions: {},
     });
   },
   getUnlockRequest: async () => {
@@ -136,6 +138,9 @@ const noopClient: ApiClient = {
   getUsers: async () => {
     return Result.success([]);
   },
+  decideFilterSuspensionRequest: async () => {
+    return Result.success({ success: true });
+  },
   getDevices: async () => {
     return Result.success([]);
   },
@@ -180,9 +185,6 @@ const noopClient: ApiClient = {
     return Result.success({ success: true });
   },
   signup: async () => {
-    return Result.success({ success: true });
-  },
-  updateSuspendFilterRequest: async () => {
     return Result.success({ success: true });
   },
   updateUnlockRequest: async () => {

@@ -13,6 +13,7 @@ export const Basic: Story = props({
   strokes: `Dearest digital diary,\nsSorry it's been so long. I'll try to right more.\nUntil tomorrow.`,
   date: new Date(time.stable()),
   application: `Notes`,
+  duringSuspension: false,
 });
 
 export const Short: Story = props({

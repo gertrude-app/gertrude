@@ -36,6 +36,13 @@ export const Default: Story = {
     setResponseComment: () => {},
     setDuration: () => {},
     setCustomDuration: () => {},
+    selectedExtraMonitoringOption: `off`,
+    setSelectedExtraMonitoringOption: () => {},
+    extraMonitoringOptions: {
+      '@60': `1.5x screenshots`,
+      '@30': `2x screenshots`,
+      '@20': `3x screenshots`,
+    },
   },
   // allow screenshotting open dropdown, verifying not cutoff
   play: async () => {
@@ -44,6 +51,11 @@ export const Default: Story = {
     button instanceof HTMLElement && button.click();
   },
 };
+
+export const NoExtraMonitoringOptions: Story = props({
+  ...Default.args,
+  extraMonitoringOptions: {},
+});
 
 // @screenshot: xs,md
 export const CustomDuration: Story = props({

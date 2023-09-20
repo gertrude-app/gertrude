@@ -58,13 +58,23 @@ async function main(): Promise<void> {
 
     for (const size of test.sizes) {
       await page.setViewport({ width: size.width, height: size.height });
-      await page.waitForSelector(`#storybook-root > *`);
-      if (test.id === `dashboard-users-suspendfilterrequestform--default`) {
-        await page.waitForSelector(`ul[role="listbox"]`);
+      try {
+        await page.waitForSelector(`#storybook-root > *`);
+        if (test.id === `dashboard-users-suspendfilterrequestform--default`) {
+          await page.waitForSelector(`ul[role="listbox"]`);
+        }
+        await argosScreenshot(page, `${test.id}--w${size.width}`, {
+          fullPage: true,
+        });
+      } catch (error) {
+        const errorText = await page.evaluate(
+          () =>
+            document.querySelector(`.sb-errordisplay`)?.textContent ??
+            document.body.textContent,
+        );
+        console.error(errorText); // eslint-disable-line no-console
+        process.exit(1);
       }
-      await argosScreenshot(page, `${test.id}--w${size.width}`, {
-        fullPage: true,
-      });
     }
   }
   await browser.close();
