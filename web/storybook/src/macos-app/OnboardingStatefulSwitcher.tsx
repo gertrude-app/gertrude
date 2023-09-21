@@ -8,6 +8,9 @@ import React from 'react';
 
 const OnboardingStatefulSwitcher: React.FC = () => {
   const [step, setStep] = React.useState<OnboardingStep>('welcome');
+  const [connectChildState, setConnectChildState] = React.useState<
+    'idle' | 'ongoing' | 'failed' | 'succeeded'
+  >(`idle`);
 
   return (
     <div
@@ -29,7 +32,10 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep('connectChild');
             break;
           case 'connectChild':
-            setStep('allowNotifications_start');
+            if (connectChildState === 'idle') setConnectChildState('ongoing');
+            if (connectChildState === 'ongoing') setConnectChildState('succeeded');
+            else if (connectChildState === 'succeeded') setConnectChildState('failed');
+            else if (connectChildState === 'failed') setStep('allowNotifications_start');
             break;
           case 'allowNotifications_start':
             setStep('allowNotifications_grant');
@@ -129,12 +135,14 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           step="connectChild"
           component={
             <Step.ConnectChild
-              connectionCode={'123-456'}
-              request={{ state: `idle` }}
+              connectionCode={'123456'}
+              request={{ state: connectChildState, payload: 'Suzy' }}
               dispatch={() => {}}
               emit={() => {}}
             />
           }
+          confetti={connectChildState === 'succeeded'}
+          confettiDeps={[connectChildState]}
         />
         <OnboardingPage
           step="allowNotifications_start"

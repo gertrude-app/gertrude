@@ -19,9 +19,10 @@ const InformationModal: React.FC<Props> = ({ open, setOpen, children }) => {
     >
       <div
         className={cx(
-          'bg-white rounded-3xl transition-[opacity,transform] duration-300',
+          'bg-white rounded-3xl transition-[opacity,transform] duration-500',
           open ? `opacity-100` : `opacity-0 translate-y-8`,
         )}
+        onClick={(e) => e.stopPropagation()}
       >
         <p className="max-w-2xl p-10 pb-6 text-slate-600 text-lg">{children}</p>
         <div className="flex justify-end p-4 pt-0 rounded-b-3xl">

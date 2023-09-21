@@ -5,6 +5,8 @@ import QrCode from '../images/signup-qr-code.png';
 import { Button } from '@shared/components';
 import TellMeMoreButton from '../TellMeMoreButton';
 import InformationModal from '../InformationModal';
+import QRCode from '../QRCode';
+import Callout from '../Callout';
 
 interface Emit {
   emit(event: AppEvent): unknown;
@@ -68,49 +70,35 @@ const ChooseRemediation: React.FC<ChooseRemediationProps> = ({
   const canSwitch = nonAdmins.length > 0;
   const numRemediations = canDemote && canSwitch ? `three` : `two`;
   return (
-    <div>
-      <p className="my-3">
+    <div className="p-12 flex flex-col justify-center h-full">
+      <h1 className="text-3xl font-bold">Here's how we can fix this</h1>
+      <p className="mt-4 mb-8 text-lg text-slate-500 max-w-xl">
         There are {numRemediations} ways to fix this issue, and we have short videos
         showing you how to do each of them.
       </p>
-      <ol className="list-decimal list-inside">
+      <ol className="flex flex-col gap-4">
         {canSwitch && (
-          <li>
+          <PossibleRemediation
+            emit={emit}
+            buttonAction="chooseSwitchToNonAdminUserClicked"
+          >
             {nonAdmins.length === 1
               ? `Have your child always use the existing non-admin user `
               : `Have your child always use one of the the non-admin users: `}
             <b>{nonAdmins.join(`, `)}</b>
-            <button
-              className="bg-blue-500 text-white font-bold py-2 px-4"
-              onClick={() => emit({ case: `chooseSwitchToNonAdminUserClicked` })}
-            >
-              Show me how &rarr;
-            </button>
-          </li>
+          </PossibleRemediation>
         )}
         {canDemote && (
-          <li>
+          <PossibleRemediation emit={emit} buttonAction="chooseDemoteAdminClicked">
             {demotable.length === 1
               ? `Remove the admin privilege from the existing user `
               : `Remove the admin privilege from one of these existing users: `}
             <b>{demotable.join(`, `)}</b> and have your child always login as that user
-            <button
-              className="bg-blue-500 text-white font-bold py-2 px-4"
-              onClick={() => emit({ case: `chooseDemoteAdminClicked` })}
-            >
-              Show me how &rarr;
-            </button>
-          </li>
+          </PossibleRemediation>
         )}
-        <li>
+        <PossibleRemediation emit={emit} buttonAction="chooseCreateNonAdminClicked">
           Create a <b>new non-admin user</b> for your child to always log in with
-          <button
-            className="bg-blue-500 text-white font-bold py-2 px-4"
-            onClick={() => emit({ case: `chooseCreateNonAdminClicked` })}
-          >
-            Show me how &rarr;
-          </button>
-        </li>
+        </PossibleRemediation>
       </ol>
     </div>
   );
@@ -126,67 +114,77 @@ const StartRemediation: React.FC<StartRemediationProps> = ({ action }) => {
   switch (action) {
     case `create`:
       tutorialSlug = `h1`;
-      lead = `Creating a new non-admin macOS user for your child will allow Gertrude to safely do it's job.`;
+      lead = `Creating a new non-admin macOS user for your child will allow Gertrude to safely do its job.`;
       break;
     case `switch`:
-      lead = `Having your child always use a non-admin macOS user will allow Gertrude to safely do it's job.`;
+      lead = `Having your child always use a non-admin macOS user will allow Gertrude to safely do its job.`;
       tutorialSlug = `h2`;
       break;
     case `demote`:
-      lead = `Removing admin privileges for the macOS user your child uses will allow Gertrude to safely do it's job.`;
+      lead = `Removing admin privileges for the macOS user your child uses will allow Gertrude to safely do its job.`;
       tutorialSlug = `h3`;
       break;
   }
   return (
-    <div>
-      <p className="mb-3">{lead}</p>
-      <p className="mb-3">
+    <div className="flex flex-col justify-center items-center h-full p-12">
+      <h2 className="text-3xl font-bold max-w-2xl text-center">{lead}</h2>
+      <p className="mt-6 mb-4 max-w-3xl text-lg text-slate-500 text-center">
         It only takes a few minutes, but you'll need to log out of this user
         {action === `demote` ? ` and restart the computer` : ``} as part of the process,
         so it's best if you view the instructions on your phone so we can walk you through
         the process.
       </p>
-      <p>
-        Aim your phone's camera at the QR code below, or open the URL:{` `}
-        <code>https://gertrude.app/{tutorialSlug}</code>
+      <p className="text-lg text-slate-600 font-medium max-w-xl text-center">
+        Aim your phone's camera at the QR code below for a video that will walk you
+        through every step.
       </p>
-      <img className="h-[200px]" src={QrCode} alt="QR code" />
+      <div className="flex justify-center mt-8">
+        <QRCode img={QrCode} url={`https://gertrude.app/${tutorialSlug}`} />
+      </div>
     </div>
   );
 };
 
-const WarnUserIsAdmin: React.FC<Emit> = ({ emit }) => (
-  <div className="flex h-full flex-col justify-center items-center p-12">
-    <h1 className="text-3xl font-bold">Hmm, this user has admin privileges</h1>
-    <p className="my-4 text-lg text-slate-500 text-center max-w-2xl">
-      This macOS user has admin privileges, and so should <b>not be used</b> by a child
-      protected by Gertrude. Admin privileges make it easy for your child to disable and
-      bypass Gertrude.
-    </p>
-    <TellMeMoreButton onClick={() => {}}>Tell me more</TellMeMoreButton>
-    <div className="flex flex-col gap-4 mt-8">
-      <Button
-        color="primary"
-        size="large"
-        type="button"
-        onClick={() => emit({ case: `primaryBtnClicked` })}
-        className="shadow shadow-violet-200/80"
-      >
-        Show me how to fix it <i className="fa-solid fa-arrow-right ml-2" />
-      </Button>
-      <Button
-        color="secondary"
-        size="large"
-        type="button"
-        onClick={() => emit({ case: `primaryBtnClicked` })}
-        className="shadow shadow-violet-200/80"
-      >
-        I understand the risks, proceed anyway{' '}
-        <i className="fa-solid fa-arrow-right ml-2" />
-      </Button>
+const WarnUserIsAdmin: React.FC<Emit> = ({ emit }) => {
+  const [showModal, setShowModal] = useState(false);
+  return (
+    <div className="flex h-full flex-col justify-center items-center p-12 relative">
+      <InformationModal open={showModal} setOpen={setShowModal}>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat at tempore culpa
+        eaque, exercitationem molestiae voluptate, pariatur temporibus inventore excepturi
+        sunt odit ea facere placeat iure cumque? Animi, maiores alias.
+      </InformationModal>
+      <h1 className="text-3xl font-bold">Hmm, this user has admin privileges</h1>
+      <p className="my-4 text-lg text-slate-500 text-center max-w-2xl">
+        This macOS user has admin privileges, and so should <b>not be used</b> by a child
+        protected by Gertrude. Admin privileges make it easy for your child to disable and
+        bypass Gertrude.
+      </p>
+      <TellMeMoreButton onClick={() => setShowModal(true)}>Tell me more</TellMeMoreButton>
+      <div className="flex flex-col gap-4 mt-8">
+        <Button
+          color="primary"
+          size="large"
+          type="button"
+          onClick={() => emit({ case: `primaryBtnClicked` })}
+          className="shadow shadow-violet-200/80"
+        >
+          Show me how to fix it <i className="fa-solid fa-arrow-right ml-2" />
+        </Button>
+        <Button
+          color="secondary"
+          size="large"
+          type="button"
+          onClick={() => emit({ case: `primaryBtnClicked` })}
+          className="shadow shadow-violet-200/80"
+        >
+          I understand the risks, proceed anyway{' '}
+          <i className="fa-solid fa-arrow-right ml-2" />
+        </Button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 interface HappyPathProps extends Emit {
   adminUsers: string[];
@@ -210,25 +208,19 @@ const HappyPath: React.FC<HappyPathProps> = ({ emit, userName, adminUsers }) => 
       <TellMeMoreButton onClick={() => setShowModal(true)}>
         Why does this matter?
       </TellMeMoreButton>
-      <div className="mt-4 mb-8 border border-slate-200 p-6 pt-8 rounded-2xl relative">
-        <div className="absolute left-4 -top-6 w-12 h-12 rounded-full bg-slate-50 flex justify-center items-center">
-          <i className="fa-solid fas fa-circle-exclamation text-3xl text-orange-300" />
-        </div>
-        <h3 className="text-lg font-semibold text-slate-700">Watch out!</h3>
-        <p className="text-slate-500 mt-2">
-          Make sure that your child doesn't know the password for the{` `}
-          <span
-            className="font-medium"
-            dangerouslySetInnerHTML={{
-              __html: adminUsers
-                .map((name) => `<span key="${name}">${name}</span>`)
-                .join(` or `),
-            }}
-          />
-          {` `}
-          user, or else they could disable Gertrude.
-        </p>
-      </div>
+      <Callout heading="Watch out!" type={'warning'} className="mt-4 mb-8">
+        Make sure that your child doesn't know the password for the{` `}
+        <span
+          className="font-medium"
+          dangerouslySetInnerHTML={{
+            __html: adminUsers
+              .map((name) => `<span key="${name}">${name}</span>`)
+              .join(` or `),
+          }}
+        />
+        {` `}
+        user, or else they could disable Gertrude.
+      </Callout>
       <Button
         color="primary"
         size="large"
@@ -238,5 +230,34 @@ const HappyPath: React.FC<HappyPathProps> = ({ emit, userName, adminUsers }) => 
         Coninue <i className="fa-solid fa-arrow-right ml-2" />
       </Button>
     </div>
+  );
+};
+
+type PossibleRemediationProps = Emit & {
+  buttonAction:
+    | 'chooseCreateNonAdminClicked'
+    | 'chooseSwitchToNonAdminUserClicked'
+    | 'chooseDemoteAdminClicked';
+  children: React.ReactNode;
+};
+
+const PossibleRemediation: React.FC<PossibleRemediationProps> = ({
+  emit,
+  buttonAction,
+  children,
+}) => {
+  return (
+    <li className="bg-white shadow-md shadow-slate-300/30 rounded-2xl flex flex-col max-w-3xl">
+      <p className="text-slate-600 p-6 pb-2 text-lg">{children}</p>
+      <Button
+        color="secondary"
+        size="medium"
+        type="button"
+        onClick={() => emit({ case: buttonAction })}
+        className="self-end m-4 mt-0"
+      >
+        Show me how <i className="fa-solid fa-arrow-right ml-2" />
+      </Button>
+    </li>
   );
 };

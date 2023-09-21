@@ -17,7 +17,6 @@ export const Onboarding: React.FC<Props> = ({
   macOSUser,
   os,
 }) => {
-  let stepComponent: React.ReactNode;
   return (
     <StepSwitcher step={step}>
       <OnboardingPage step="welcome" component={<Step.Welcome emit={emit} />} />
@@ -55,6 +54,8 @@ export const Onboarding: React.FC<Props> = ({
             emit={emit}
           />
         }
+        confetti={connectChildRequest.state === `succeeded`}
+        confettiDeps={[connectChildRequest.state]}
       />
       <OnboardingPage
         step="allowNotifications_start"
@@ -99,6 +100,7 @@ export const Onboarding: React.FC<Props> = ({
         component={
           <Step.AllowScreenshots os={os} step="allowScreenshots_success" emit={emit} />
         }
+        confetti
       />
       <OnboardingPage
         step="allowKeylogging_required"

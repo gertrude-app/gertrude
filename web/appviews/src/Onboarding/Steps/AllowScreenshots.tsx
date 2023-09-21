@@ -1,6 +1,9 @@
 import React from 'react';
 import type { AppEvent } from '../onboarding-store';
 import GrantPermission from '../images/grant-permission.png';
+import Callout from '../Callout';
+import { Button } from '@shared/components';
+import ExpandableImage from '../ExpandableImage';
 
 interface Props {
   emit(event: AppEvent): unknown;
@@ -12,100 +15,131 @@ interface Props {
     | 'allowScreenshots_success';
 }
 
-const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => (
-  <div>
-    <h1 className="text-3xl mb-3">Allow Screen Recording</h1>
-    <AllowScreenshotsStep emit={emit} step={step} os={os} />
-  </div>
-);
-
-const AllowScreenshotsStep: React.FC<Props> = ({ emit, step, os }) => {
+const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
   const systemSettings =
     os === `venturaOrLater` ? `System Settings` : `System Preferences`;
   switch (step) {
     case `allowScreenshots_required`:
       return (
-        <>
-          <p className="mb-3">
+        <div className="flex flex-col items-center justify-center h-full">
+          <h1 className="text-3xl font-bold">Grant screen recording permission</h1>
+          <p className="mt-4 mb-8 text-lg text-slate-500 max-w-2xl text-center">
             Gertrude needs your permission to record the screen, so it can take
             screenshots of your child's activity.
           </p>
-
-          <div className="my-4 bg-blue-100 px-4 py-2 rounded-lg">
-            <b>Good to know:</b>
-            <ul className="list-disc list-inside">
+          <Callout heading="Good to know:" type="info">
+            <ul className="list-disc list-inside ml-2">
               <li>You control if and when we record screenshots</li>
               <li>Your child is shown when their screen is being recorded</li>
             </ul>
+          </Callout>
+          <div className="flex flex-col w-80 gap-4 mt-8">
+            <Button
+              color="primary"
+              size="large"
+              type="button"
+              onClick={() => emit({ case: `primaryBtnClicked` })}
+              className="shadow shadow-violet-200/80"
+            >
+              Grant permission
+              <i className="fa-solid fa-arrow-right ml-2" />
+            </Button>
+            <Button
+              color="secondary"
+              size="large"
+              type="button"
+              onClick={() => emit({ case: `primaryBtnClicked` })}
+              className="shadow shadow-violet-200/80"
+            >
+              Skip this step...
+            </Button>
           </div>
-          <button
-            className="bg-blue-500 text-white font-bold py-2 px-4"
-            onClick={() => emit({ case: `primaryBtnClicked` })}
-          >
-            Grant permission &rarr;
-          </button>
-          <button
-            className="bg-gray-400 text-white font-bold py-2 px-4"
-            onClick={() => emit({ case: `secondaryBtnClicked` })}
-          >
-            Skip this step...
-          </button>
-        </>
+        </div>
       );
     case `allowScreenshots_openSysSettings`:
       return (
-        <>
-          <p>
-            Just now, a system popup should have appeared that looks like this:
-            <img src={GrantPermission} alt="Grant permission" className="rounded-xl" />
-            Find it and click{` `}
+        <div className="h-full flex flex-col items-center justify-center">
+          <h1 className="text-3xl font-bold">Open {systemSettings}</h1>
+          <p className="text-lg text-slate-500 max-w-xl text-center mt-4 mb-8">
+            Just now, a system popup should have appeared that looks like this. Find it
+            and click{` `}
             <b>Open {systemSettings}.</b>
           </p>
-          <button
-            className="bg-blue-500 text-white font-bold py-2 px-4"
-            onClick={() => emit({ case: `primaryBtnClicked` })}
-          >
-            Done &rarr;
-          </button>
-          <button
-            className="bg-gray-400 text-white font-bold py-2 px-4"
-            onClick={() => emit({ case: `secondaryBtnClicked` })}
-          >
-            Can't find the popup...
-          </button>
-        </>
+          <ExpandableImage
+            src={GrantPermission}
+            alt={'Grant permission'}
+            width={450}
+            height={200}
+          />
+          <div className="flex flex-col w-80 gap-4 mt-8">
+            <Button
+              color="primary"
+              size="large"
+              type="button"
+              onClick={() => emit({ case: `primaryBtnClicked` })}
+              className="shadow shadow-violet-200/80"
+            >
+              Done
+              <i className="fa-solid fa-arrow-right ml-2" />
+            </Button>
+            <Button
+              color="secondary"
+              size="large"
+              type="button"
+              onClick={() => emit({ case: `primaryBtnClicked` })}
+              className="shadow shadow-violet-200/80"
+            >
+              Can't find the popup...
+            </Button>
+          </div>
+        </div>
       );
     case `allowScreenshots_grantAndRestart`:
       return (
-        <>
-          <p>
+        <div className="h-full flex flex-col justify-center items-center">
+          <h1 className="text-3xl font-bold">Allow screenshots</h1>
+          <p className="text-lg text-slate-500 max-w-2xl text-center mt-4 mb-8">
             Follow the steps shown below, which include <b>quitting Gertrude.</b> This
             screen will open again when it restarts.
           </p>
-          <img
+          <ExpandableImage
             src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/screen-recording-add-gertrude.gif"
-            className="h-[425px] rounded-xl"
-            alt=""
+            alt={'Allow screenshots'}
+            width={900 / 2}
+            height={650 / 2}
           />
-          <button
-            className="bg-gray-400 text-white font-bold py-2 px-4"
-            onClick={() => emit({ case: `secondaryBtnClicked` })}
+          <Button
+            color="tertiary"
+            size="large"
+            type="button"
+            onClick={() => emit({ case: `primaryBtnClicked` })}
+            className="mt-8"
           >
             Help, I'm still here...
-          </button>
-        </>
+          </Button>
+        </div>
       );
     case `allowScreenshots_success`:
       return (
-        <>
-          <p>🎉 Hooray, Gertrude has the permission it needs to take screenshots.</p>
-          <button
-            className="bg-blue-500 text-white font-bold py-2 px-4"
-            onClick={() => emit({ case: `primaryBtnClicked` })}
-          >
-            Next &rarr;
-          </button>
-        </>
+        <div className="h-full flex flex-col justify-center items-center">
+          <i className="fa-solid fa-champagne-glasses text-7xl text-slate-300 mb-8 w-40 h-40 border-2 border-slate-200/80 border-dashed rounded-full flex justify-center items-center" />
+          <div className="flex flex-col items-center bg-white p-12 rounded-3xl shadow-lg shadow-slate-300/30">
+            <h1 className="text-3xl font-bold">Awesome!</h1>
+            <p className="text-lg text-slate-500 max-w-xl text-center mt-4">
+              Gertrude now has the permission it needs to take screenshots.
+            </p>
+            <Button
+              color="primary"
+              size="large"
+              type="button"
+              onClick={() => emit({ case: `primaryBtnClicked` })}
+              className="mt-8"
+            >
+              Next
+              <i className="fa-solid fa-arrow-right ml-2" />
+            </Button>
+          </div>
+        </div>
       );
   }
 };

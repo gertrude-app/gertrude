@@ -1,5 +1,4 @@
 import React, { useContext, useRef, useState } from 'react';
-import ReactDom from 'react-dom';
 import ConfettiExplosion from 'react-confetti-explosion';
 import cx from 'classnames';
 import { OnboardingStep } from './onboarding-store';
@@ -29,12 +28,14 @@ interface OnboardingStepProps {
   step: OnboardingStep;
   component: React.ReactNode;
   confetti?: boolean;
+  confettiDeps?: any[];
 }
 
 export const OnboardingPage: React.FC<OnboardingStepProps> = ({
   step,
   component,
   confetti,
+  confettiDeps,
 }) => {
   const currentStep = useContext(CurrentStepContext);
   const hasBeenVisited = useRef(false);
@@ -51,7 +52,7 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
         }, 1000);
       }
     }
-  }, [step, currentStep, hasBeenVisited.current]);
+  }, [step, currentStep, hasBeenVisited.current, confettiDeps]);
 
   return (
     <div
