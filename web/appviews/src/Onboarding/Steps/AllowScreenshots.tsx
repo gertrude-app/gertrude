@@ -12,6 +12,7 @@ interface Props {
     | 'allowScreenshots_required'
     | 'allowScreenshots_openSysSettings'
     | 'allowScreenshots_grantAndRestart'
+    | 'allowScreenshots_failed'
     | 'allowScreenshots_success';
 }
 
@@ -136,6 +137,38 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
               Next
               <i className="fa-solid fa-arrow-right ml-2" />
             </Button>
+          </div>
+        </div>
+      );
+    case `allowScreenshots_failed`:
+      return (
+        <div className="h-full flex flex-col justify-center items-center p-12">
+          <div className="flex flex-col items-center border-2 border-slate-200/60 border-dashed p-12 rounded-3xl">
+            <h1 className="text-3xl font-bold">Hmm... something didn't work</h1>
+            <p className="text-lg text-slate-500 mt-4">
+              We still don't have permission to record the screen. Please try again.
+            </p>
+            <div className="flex flex-col w-80 gap-4 mt-8">
+              <Button
+                color="primary"
+                size="large"
+                type="button"
+                onClick={() => emit({ case: `primaryBtnClicked` })}
+                className="shadow shadow-violet-200/80"
+              >
+                Try again
+                <i className="fa-solid fa-arrow-right ml-2" />
+              </Button>
+              <Button
+                color="secondary"
+                size="large"
+                type="button"
+                onClick={() => emit({ case: `primaryBtnClicked` })}
+                className="shadow shadow-violet-200/80"
+              >
+                Skip this step...
+              </Button>
+            </div>
           </div>
         </div>
       );

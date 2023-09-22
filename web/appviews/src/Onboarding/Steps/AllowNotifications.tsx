@@ -7,7 +7,10 @@ import GrantPermissionGif from '../images/grant-permission.gif';
 interface Props {
   emit(event: AppEvent): unknown;
   os: 'catalina' | 'bigSurOrMonterey' | 'venturaOrLater';
-  step: 'allowNotifications_start' | 'allowNotifications_grant';
+  step:
+    | 'allowNotifications_start'
+    | 'allowNotifications_grant'
+    | 'allowNotifications_failed';
 }
 
 const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
@@ -85,6 +88,46 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
             width={360}
             height={360 * 0.75}
           />
+        </div>
+      );
+    case `allowNotifications_failed`:
+      return (
+        <div className="h-full flex flex-col justify-center items-center p-12">
+          <h1 className="text-3xl font-bold">
+            Shucks, the notifications still don't seem right
+          </h1>
+          <p className="mt-2 text-lg text-slate-500">
+            Watch the video for more information.
+          </p>
+          <iframe
+            className="my-6 rounded-xl"
+            width="560"
+            height="315"
+            src="https://www.youtube-nocookie.com/embed/ytN1HhQX3xo?rel=0"
+            title="YouTube video player"
+            allowFullScreen
+          />
+          <div className="flex flex-col w-80 gap-4">
+            <Button
+              color="primary"
+              size="large"
+              type="button"
+              onClick={() => emit({ case: `primaryBtnClicked` })}
+              className="shadow shadow-violet-200/80"
+            >
+              Check again
+              <i className="fa-solid fa-arrow-right ml-2" />
+            </Button>
+            <Button
+              color="secondary"
+              size="large"
+              type="button"
+              onClick={() => emit({ case: `primaryBtnClicked` })}
+              className="shadow shadow-violet-200/80"
+            >
+              Skip for now
+            </Button>
+          </div>
         </div>
       );
   }

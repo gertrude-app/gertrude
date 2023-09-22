@@ -8,7 +8,7 @@ interface Props {
 
 const HowToUseGertrude: React.FC<Props> = ({ emit }) => (
   <div className="h-full flex flex-col justify-center items-center p-12">
-    <h1 className="text-3xl font-bold">How to Use Gertrude</h1>
+    <h1 className="text-3xl font-bold">How to use Gertrude</h1>
     <p className="text-lg text-slate-500 mt-2 text-center">
       The 7-minute video below walks you through the basics of using Gertrude, including:
     </p>
@@ -19,8 +19,8 @@ const HowToUseGertrude: React.FC<Props> = ({ emit }) => (
     </ul>
     <iframe
       className="my-8 rounded-2xl"
-      width="560"
-      height="315"
+      width="500"
+      height="280"
       src="https://www.youtube-nocookie.com/embed/ytN1HhQX3xo?rel=0"
       title="YouTube video player"
       allowFullScreen

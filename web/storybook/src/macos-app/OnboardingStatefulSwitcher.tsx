@@ -40,6 +40,9 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`allowNotifications_grant`);
             break;
           case `allowNotifications_grant`:
+            setStep(`allowNotifications_failed`);
+            break;
+          case `allowNotifications_failed`:
             setStep(`allowScreenshots_required`);
             break;
           case `allowScreenshots_required`:
@@ -52,6 +55,9 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`allowScreenshots_success`);
             break;
           case `allowScreenshots_success`:
+            setStep(`allowScreenshots_failed`);
+            break;
+          case `allowScreenshots_failed`:
             setStep(`allowKeylogging_required`);
             break;
           case `allowKeylogging_required`:
@@ -161,6 +167,16 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           }
         />
         <OnboardingPage
+          step="allowNotifications_failed"
+          component={
+            <Step.AllowNotifications
+              os={`venturaOrLater`}
+              step="allowNotifications_failed"
+              emit={() => {}}
+            />
+          }
+        />
+        <OnboardingPage
           step="allowScreenshots_required"
           component={
             <Step.AllowScreenshots
@@ -200,6 +216,16 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             />
           }
           confetti
+        />
+        <OnboardingPage
+          step="allowScreenshots_failed"
+          component={
+            <Step.AllowScreenshots
+              os={`venturaOrLater`}
+              step="allowScreenshots_failed"
+              emit={() => {}}
+            />
+          }
         />
         <OnboardingPage
           step="allowKeylogging_required"

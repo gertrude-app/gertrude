@@ -142,7 +142,7 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
             video below for troubleshooting steps:
           </p>
           <iframe
-            className="my-8 rounded-xl"
+            className="my-6 rounded-xl"
             width="560"
             height="315"
             src="https://www.youtube-nocookie.com/embed/ytN1HhQX3xo?rel=0"

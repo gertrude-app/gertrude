@@ -69,6 +69,12 @@ export const Onboarding: React.FC<Props> = ({
       }
     />
     <OnboardingPage
+      step="allowNotifications_failed"
+      component={
+        <Step.AllowNotifications os={os} step="allowNotifications_failed" emit={emit} />
+      }
+    />
+    <OnboardingPage
       step="allowScreenshots_required"
       component={
         <Step.AllowScreenshots os={os} step="allowScreenshots_required" emit={emit} />
@@ -100,6 +106,12 @@ export const Onboarding: React.FC<Props> = ({
         <Step.AllowScreenshots os={os} step="allowScreenshots_success" emit={emit} />
       }
       confetti
+    />
+    <OnboardingPage
+      step="allowScreenshots_failed"
+      component={
+        <Step.AllowScreenshots os={os} step="allowScreenshots_failed" emit={emit} />
+      }
     />
     <OnboardingPage
       step="allowKeylogging_required"

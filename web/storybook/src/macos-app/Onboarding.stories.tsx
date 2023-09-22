@@ -138,6 +138,11 @@ export const AllowNotificationsGrant: Story = props({
   step: `allowNotifications_grant`,
 });
 
+export const AllowNotificationsFailed: Story = props({
+  ...Welcome.args,
+  step: `allowNotifications_failed`,
+});
+
 export const AllowScreenshotsRequired: Story = props({
   ...Welcome.args,
   step: `allowScreenshots_required`,
@@ -156,6 +161,11 @@ export const AllowScreenshotsGrant: Story = props({
 export const AllowScreenshotsSuccess: Story = props({
   ...Welcome.args,
   step: `allowScreenshots_success`,
+});
+
+export const AllowScreenshotsFailed: Story = props({
+  ...Welcome.args,
+  step: `allowScreenshots_failed`,
 });
 
 export const AllowKeyloggingRequired: Story = props({

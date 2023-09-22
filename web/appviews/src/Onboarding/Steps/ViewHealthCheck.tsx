@@ -19,7 +19,7 @@ const ViewHealthCheck: React.FC<Props> = ({ emit }) => (
       <Callout type="info" heading="Good to know">
         The health check screen will show a warning about you having <b>zero keys.</b>
         {` `}
-        That's expected at this point, since you're just getting setup. 👍
+        That's expected at this point, since you're just getting setup.
       </Callout>
       <Button
         type="button"
