@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import cx from 'classnames';
+import { Button } from '@shared/components';
 import type { AppEvent, MacOSUser, UserRemediationStep } from '../onboarding-store';
 import QrCode from '../images/signup-qr-code.png';
-import { Button } from '@shared/components';
 import TellMeMoreButton from '../TellMeMoreButton';
 import InformationModal from '../InformationModal';
 import QRCode from '../QRCode';
@@ -178,7 +177,7 @@ const WarnUserIsAdmin: React.FC<Emit> = ({ emit }) => {
           onClick={() => emit({ case: `primaryBtnClicked` })}
           className="shadow shadow-violet-200/80"
         >
-          I understand the risks, proceed anyway{' '}
+          I understand the risks, proceed anyway{` `}
           <i className="fa-solid fa-arrow-right ml-2" />
         </Button>
       </div>
@@ -208,7 +207,7 @@ const HappyPath: React.FC<HappyPathProps> = ({ emit, userName, adminUsers }) => 
       <TellMeMoreButton onClick={() => setShowModal(true)}>
         Why does this matter?
       </TellMeMoreButton>
-      <Callout heading="Watch out!" type={'warning'} className="mt-4 mb-8">
+      <Callout heading="Watch out!" type={`warning`} className="mt-4 mb-8">
         Make sure that your child doesn't know the password for the{` `}
         <span
           className="font-medium"
@@ -245,19 +244,17 @@ const PossibleRemediation: React.FC<PossibleRemediationProps> = ({
   emit,
   buttonAction,
   children,
-}) => {
-  return (
-    <li className="bg-white shadow-md shadow-slate-300/30 rounded-2xl flex flex-col max-w-3xl">
-      <p className="text-slate-600 p-6 pb-2 text-lg">{children}</p>
-      <Button
-        color="secondary"
-        size="medium"
-        type="button"
-        onClick={() => emit({ case: buttonAction })}
-        className="self-end m-4 mt-0"
-      >
-        Show me how <i className="fa-solid fa-arrow-right ml-2" />
-      </Button>
-    </li>
-  );
-};
+}) => (
+  <li className="bg-white shadow-md shadow-slate-300/30 rounded-2xl flex flex-col max-w-3xl">
+    <p className="text-slate-600 p-6 pb-2 text-lg">{children}</p>
+    <Button
+      color="secondary"
+      size="medium"
+      type="button"
+      onClick={() => emit({ case: buttonAction })}
+      className="self-end m-4 mt-0"
+    >
+      Show me how <i className="fa-solid fa-arrow-right ml-2" />
+    </Button>
+  </li>
+);

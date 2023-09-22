@@ -30,7 +30,7 @@ const NoGertrudeAccount: React.FC<Props> = ({ emit }) => {
             type="button"
             onClick={() => emit({ case: `primaryBtnClicked` })}
           >
-            Done, I have a gertrude account now{' '}
+            Done, I have a gertrude account now{` `}
             <i className="fa-solid fa-arrow-right ml-2" />
           </Button>
           <Button
@@ -47,7 +47,7 @@ const NoGertrudeAccount: React.FC<Props> = ({ emit }) => {
       <div className="flex flex-col justify-center items-center">
         <div
           className={cx(
-            'flex flex-col items-center transition-opacity duration-500',
+            `flex flex-col items-center transition-opacity duration-500`,
             codeClicked && `opacity-0`,
           )}
         >

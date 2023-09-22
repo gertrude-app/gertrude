@@ -1,6 +1,6 @@
 import React from 'react';
-import type { AppEvent } from '../onboarding-store';
 import { Button } from '@shared/components';
+import type { AppEvent } from '../onboarding-store';
 
 interface Props {
   emit: (event: AppEvent) => unknown;

@@ -1,6 +1,6 @@
 import React from 'react';
-import type { AppEvent } from '../onboarding-store';
 import { Button } from '@shared/components';
+import type { AppEvent } from '../onboarding-store';
 import ExpandableImage from '../ExpandableImage';
 import GrantPermissionGif from '../images/grant-permission.gif';
 
@@ -81,7 +81,7 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
           </div>
           <ExpandableImage
             src={GrantPermissionGif}
-            alt={'Grant permission'}
+            alt={`Grant permission`}
             width={360}
             height={360 * 0.75}
           />

@@ -6,9 +6,10 @@ interface Props {
   alt: string;
   width: number;
   height: number;
+  className?: string;
 }
 
-const ExpandableImage: React.FC<Props> = ({ src, alt, width, height }) => {
+const ExpandableImage: React.FC<Props> = ({ src, alt, width, height, className }) => {
   const [imageExpanded, setImageExpanded] = useState(false);
   const [imageFrameCoords, setImageFrameCoords] = useState({ x: 0, y: 0 });
   const imageFrameRef = useRef<HTMLDivElement>(null);
@@ -18,12 +19,12 @@ const ExpandableImage: React.FC<Props> = ({ src, alt, width, height }) => {
       const { x, y } = imageFrameRef.current.getBoundingClientRect();
       setImageFrameCoords({ x, y });
     }
-  }, [imageFrameRef.current]);
+  }, []);
 
   return (
     <div
       ref={imageFrameRef}
-      className="shrink-0"
+      className={cx(`shrink-0`, className)}
       style={{
         width,
         height,
@@ -32,7 +33,7 @@ const ExpandableImage: React.FC<Props> = ({ src, alt, width, height }) => {
       {imageFrameRef.current && (
         <img
           className={cx(
-            'rounded-3xl mb-6 cursor-pointer absolute',
+            `rounded-3xl mb-6 cursor-pointer absolute`,
             imageExpanded
               ? `cursor-zoom-out shadow-xl shadow-slate-500/50`
               : `cursor-zoom-in`,

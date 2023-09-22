@@ -1,7 +1,7 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import ConfettiExplosion from 'react-confetti-explosion';
 import cx from 'classnames';
-import { OnboardingStep } from './onboarding-store';
+import type { OnboardingStep } from './onboarding-store';
 import CurrentStepContext from './CurrentStepContext';
 
 interface Props {
@@ -10,12 +10,37 @@ interface Props {
 }
 
 const StepSwitcher: React.FC<Props> = ({ step, children }) => {
+  const [expandBlurs, setExpandBlurs] = useState(false);
+
+  useEffect(() => {
+    if (step === `finish`) {
+      setTimeout(() => {
+        setExpandBlurs(true);
+      }, 500);
+    }
+  }, [step]);
+
   return (
     <CurrentStepContext.Provider value={step}>
       <div className="w-screen h-screen relative overflow-hidden bg-slate-50">
-        <div className="absolute -left-96 -bottom-72 w-152 h-152 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)]" />
-        <div className="absolute left-0 -bottom-96 w-152 h-152 [background:radial-gradient(#d946ef56_0%,transparent_70%,transparent)]" />
-        <div className="absolute -right-80 -bottom-80 w-152 h-152 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)]" />
+        <div
+          className={cx(
+            `absolute -left-96 -bottom-72 w-152 h-152 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
+            expandBlurs && `scale-[350%]`,
+          )}
+        />
+        <div
+          className={cx(
+            `absolute left-0 -bottom-96 w-152 h-152 [background:radial-gradient(#d946ef56_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
+            expandBlurs && `scale-[350%]`,
+          )}
+        />
+        <div
+          className={cx(
+            `absolute -right-80 -bottom-80 w-152 h-152 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
+            expandBlurs && `scale-[350%]`,
+          )}
+        />
         {children}
       </div>
     </CurrentStepContext.Provider>
@@ -48,11 +73,10 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
       if (confetti) {
         setTimeout(() => {
           setShowConfetti(true);
-          console.log(`confetti!`);
         }, 1000);
       }
     }
-  }, [step, currentStep, hasBeenVisited.current, confettiDeps]);
+  }, [step, currentStep, confettiDeps, confetti]);
 
   return (
     <div

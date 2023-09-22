@@ -7,7 +7,7 @@ interface Props {
 }
 
 const QRCode: React.FC<Props> = ({ img, url }) => {
-  const [side, setSide] = useState<'qr' | 'url'>('qr');
+  const [side, setSide] = useState<'qr' | 'url'>(`qr`);
   return (
     <div className="[perspective:400px]">
       <div
@@ -18,7 +18,7 @@ const QRCode: React.FC<Props> = ({ img, url }) => {
         onClick={() => setSide(side === `qr` ? `url` : `qr`)}
       >
         <div className="absolute w-full h-full left-0 top-0 [backface-visibility:hidden] rounded-3xl overflow-hidden">
-          <img src={img} className="w-full h-full" />
+          <img src={img} className="w-full h-full" alt="QR code" />
         </div>
         <div className="absolute w-full h-full left-0 top-0 [backface-visibility:hidden] rounded-3xl [transform:rotateY(180deg)] bg-white flex flex-col justify-center items-center p-4 gap-3">
           <span className="text-slate-400 text-sm text-center">

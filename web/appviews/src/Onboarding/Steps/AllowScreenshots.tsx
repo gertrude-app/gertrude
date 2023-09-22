@@ -1,8 +1,8 @@
 import React from 'react';
+import { Button } from '@shared/components';
 import type { AppEvent } from '../onboarding-store';
 import GrantPermission from '../images/grant-permission.png';
 import Callout from '../Callout';
-import { Button } from '@shared/components';
 import ExpandableImage from '../ExpandableImage';
 
 interface Props {
@@ -39,7 +39,6 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
               size="large"
               type="button"
               onClick={() => emit({ case: `primaryBtnClicked` })}
-              className="shadow shadow-violet-200/80"
             >
               Grant permission
               <i className="fa-solid fa-arrow-right ml-2" />
@@ -67,7 +66,7 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
           </p>
           <ExpandableImage
             src={GrantPermission}
-            alt={'Grant permission'}
+            alt={`Grant permission`}
             width={450}
             height={200}
           />
@@ -104,7 +103,7 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
           </p>
           <ExpandableImage
             src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/screen-recording-add-gertrude.gif"
-            alt={'Allow screenshots'}
+            alt={`Allow screenshots`}
             width={900 / 2}
             height={650 / 2}
           />
@@ -122,7 +121,6 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
     case `allowScreenshots_success`:
       return (
         <div className="h-full flex flex-col justify-center items-center">
-          <i className="fa-solid fa-champagne-glasses text-7xl text-slate-300 mb-8 w-40 h-40 border-2 border-slate-200/80 border-dashed rounded-full flex justify-center items-center" />
           <div className="flex flex-col items-center bg-white p-12 rounded-3xl shadow-lg shadow-slate-300/30">
             <h1 className="text-3xl font-bold">Awesome!</h1>
             <p className="text-lg text-slate-500 max-w-xl text-center mt-4">

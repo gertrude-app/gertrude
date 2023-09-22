@@ -37,7 +37,6 @@ export type OnboardingStep =
   | 'installSysExt_explain'
   | 'installSysExt_start'
   | 'installSysExt_allowInstall'
-  | 'installSysExt_allowFiltering'
   | 'installSysExt_failed'
   | 'installSysExt_success'
   | 'locateMenuBarIcon'

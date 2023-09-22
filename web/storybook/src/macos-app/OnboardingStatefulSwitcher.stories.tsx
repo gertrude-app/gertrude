@@ -1,6 +1,6 @@
-import OnboardingStatefulSwitcher from './OnboardingStatefulSwitcher';
 import type { StoryObj, Meta } from '@storybook/react';
 import { props, appWindow } from '../story-helpers';
+import OnboardingStatefulSwitcher from './OnboardingStatefulSwitcher';
 
 const meta = {
   title: 'MacOS App/Onboarding/Transitions', // eslint-disable-line
