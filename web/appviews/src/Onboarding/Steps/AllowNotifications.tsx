@@ -53,7 +53,7 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
       );
     case `allowNotifications_grant`:
       return (
-        <div className="flex h-full items-center p-12 gap-12">
+        <div className="flex h-full items-center justify-center p-12 gap-12">
           <div className="flex flex-col">
             <h1 className="text-3xl font-bold">Set notifications to "Alerts"</h1>
             <p className="mt-4 text-lg text-slate-500 max-w-xl">
@@ -87,6 +87,7 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
             alt={`Grant permission`}
             width={360}
             height={360 * 0.75}
+            showInstructions
           />
         </div>
       );

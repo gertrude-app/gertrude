@@ -68,7 +68,7 @@ const Welcome: React.FC<Props> = ({ emit }) => {
         </h1>
         <p
           className={cx(
-            `text-xl max-w-xl text-center text-white font-medium mt-6 mb-10 transition-[opacity,transform] duration-[1s] ease-out delay-[3.5s]`,
+            `text-xl max-w-xl text-center text-white/80 font-medium mt-6 mb-10 transition-[opacity,transform] duration-[1s] ease-out delay-[3.5s]`,
             !loaded && `opacity-0 translate-y-8`,
           )}
         >

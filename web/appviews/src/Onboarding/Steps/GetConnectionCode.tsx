@@ -39,9 +39,10 @@ const GetConnectionCode: React.FC<Props> = ({ emit }) => (
     </div>
     <ExpandableImage
       src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/get-connection-code.png"
-      alt="TODO"
+      alt="Get connection code"
       width={400}
       height={260}
+      showInstructions
     />
   </div>
 );

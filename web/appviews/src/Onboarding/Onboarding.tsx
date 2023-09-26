@@ -142,13 +142,6 @@ export const Onboarding: React.FC<Props> = ({
       }
     />
     <OnboardingPage
-      step="allowKeylogging_success"
-      component={
-        <Step.AllowKeylogging os={os} step="allowKeylogging_success" emit={emit} />
-      }
-      confetti
-    />
-    <OnboardingPage
       step="installSysExt_explain"
       component={<Step.InstallSysExt os={os} step="installSysExt_explain" emit={emit} />}
     />

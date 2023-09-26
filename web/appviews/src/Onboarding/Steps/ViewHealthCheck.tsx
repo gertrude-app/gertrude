@@ -9,10 +9,10 @@ interface Props {
 }
 
 const ViewHealthCheck: React.FC<Props> = ({ emit }) => (
-  <div className="h-full flex items-center p-12 gap-12">
+  <div className="h-full flex items-center justify-center p-12 gap-12">
     <div>
       <h1 className="text-3xl font-bold">Admin health check</h1>
-      <p className="mt-2 text-lg text-slate-500 mb-8">
+      <p className="mt-2 text-lg text-slate-500 mb-8 max-w-2xl">
         One good thing to know about is the <b>Health Check Screen</b>. It's a quick way
         to see if everything is working correctly, and sometimes can help you fix issues.
       </p>

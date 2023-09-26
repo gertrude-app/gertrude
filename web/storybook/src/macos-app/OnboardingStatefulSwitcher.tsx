@@ -70,9 +70,6 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`allowKeylogging_failed`);
             break;
           case `allowKeylogging_failed`:
-            setStep(`allowKeylogging_success`);
-            break;
-          case `allowKeylogging_success`:
             setStep(`installSysExt_explain`);
             break;
           case `installSysExt_explain`:
@@ -266,17 +263,6 @@ const OnboardingStatefulSwitcher: React.FC = () => {
               emit={() => {}}
             />
           }
-        />
-        <OnboardingPage
-          step="allowKeylogging_success"
-          component={
-            <Step.AllowKeylogging
-              os={`venturaOrLater`}
-              step="allowKeylogging_success"
-              emit={() => {}}
-            />
-          }
-          confetti
         />
         <OnboardingPage
           step="installSysExt_explain"

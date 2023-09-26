@@ -12,8 +12,7 @@ interface Props {
     | 'allowKeylogging_required'
     | 'allowKeylogging_openSysSettings'
     | 'allowKeylogging_grant'
-    | 'allowKeylogging_failed'
-    | 'allowKeylogging_success';
+    | 'allowKeylogging_failed';
 }
 
 const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
@@ -168,27 +167,6 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
               className="shadow shadow-violet-200/80"
             >
               Skip this for now...
-            </Button>
-          </div>
-        </div>
-      );
-    case `allowKeylogging_success`:
-      return (
-        <div className="h-full flex flex-col justify-center items-center">
-          <div className="flex flex-col items-center bg-white p-12 rounded-3xl shadow-lg shadow-slate-300/30">
-            <h1 className="text-3xl font-bold">Awesome!</h1>
-            <p className="text-lg text-slate-500 max-w-xl text-center mt-4">
-              Gertrude now has the permission it needs to record typing.
-            </p>
-            <Button
-              color="primary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-              className="mt-8"
-            >
-              Next
-              <i className="fa-solid fa-arrow-right ml-2" />
             </Button>
           </div>
         </div>

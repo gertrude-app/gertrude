@@ -20,6 +20,43 @@ const StepSwitcher: React.FC<Props> = ({ step, children }) => {
         setExpandBlurs(true);
       }, 500);
     }
+    switch (step) {
+      case `welcome`:
+      case `confirmGertrudeAccount`:
+      case `noGertrudeAccount`:
+        setProgressStep(1);
+        break;
+      case `macosUserAccountType`:
+        setProgressStep(2);
+        break;
+      case `getChildConnectionCode`:
+      case `connectChild`:
+        setProgressStep(3);
+        break;
+      case `allowNotifications_start`:
+      case `allowNotifications_grant`:
+      case `allowNotifications_failed`:
+        setProgressStep(4);
+        break;
+      case `allowScreenshots_required`:
+      case `allowScreenshots_openSysSettings`:
+      case `allowScreenshots_grantAndRestart`:
+      case `allowScreenshots_success`:
+      case `allowScreenshots_failed`:
+        setProgressStep(5);
+        break;
+      case `allowKeylogging_required`:
+      case `allowKeylogging_openSysSettings`:
+      case `allowKeylogging_grant`:
+      case `allowKeylogging_failed`:
+        setProgressStep(6);
+        break;
+      // all remaining cases:
+      default:
+        setProgressStep(7);
+        break;
+    }
+
     if (step === `macosUserAccountType`) setProgressStep(2);
     else if (step === `getChildConnectionCode`) setProgressStep(3);
     else if (step === `allowNotifications_start`) setProgressStep(4);
@@ -52,7 +89,7 @@ const StepSwitcher: React.FC<Props> = ({ step, children }) => {
         {children}
         <div
           className={cx(
-            'absolute top-0 left-0 w-full p-4 flex justify-center items-center transition-[opacity,transform] duration-1000',
+            `absolute top-0 left-0 w-full p-4 flex justify-center items-center transition-[opacity,transform] duration-1000`,
             (step === `welcome` || step === `finish`) && `-translate-y-16 opacity-0`,
           )}
         >

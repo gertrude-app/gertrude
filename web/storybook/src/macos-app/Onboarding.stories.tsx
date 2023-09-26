@@ -188,11 +188,6 @@ export const AllowKeyloggingFailed: Story = props({
   step: `allowKeylogging_failed`,
 });
 
-export const AllowKeyloggingSuccess: Story = props({
-  ...Welcome.args,
-  step: `allowKeylogging_success`,
-});
-
 export const InstallSysExtExplain: Story = props({
   ...Welcome.args,
   step: `installSysExt_explain`,
