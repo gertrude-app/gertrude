@@ -56,13 +56,6 @@ const StepSwitcher: React.FC<Props> = ({ step, children }) => {
         setProgressStep(7);
         break;
     }
-
-    if (step === `macosUserAccountType`) setProgressStep(2);
-    else if (step === `getChildConnectionCode`) setProgressStep(3);
-    else if (step === `allowNotifications_start`) setProgressStep(4);
-    else if (step === `allowScreenshots_required`) setProgressStep(5);
-    else if (step === `allowKeylogging_required`) setProgressStep(6);
-    else if (step === `installSysExt_explain`) setProgressStep(7);
   }, [step]);
 
   return (

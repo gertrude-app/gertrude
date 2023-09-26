@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import cx from 'classnames';
+import CurrentStepContext from './CurrentStepContext';
 
 interface Props {
   src: string;
@@ -22,17 +23,17 @@ const ExpandableImage: React.FC<Props> = ({
   const [imageFrameCoords, setImageFrameCoords] = useState({ x: 0, y: 0 });
   const [hasBeenExpanded, setHasBeenExpanded] = useState(false);
   const imageFrameRef = useRef<HTMLDivElement>(null);
+  const currentStep = useContext(CurrentStepContext);
 
   const aspectRatio = width / height;
   const maxWidth = 800;
 
-  const imageFrameBoundingRect = imageFrameRef.current?.getBoundingClientRect();
-
   useEffect(() => {
-    if (imageFrameBoundingRect) {
-      setImageFrameCoords({ x: imageFrameBoundingRect.x, y: imageFrameBoundingRect.y });
+    if (imageFrameRef.current) {
+      const { x, y } = imageFrameRef.current.getBoundingClientRect();
+      setImageFrameCoords({ x, y });
     }
-  }, [imageFrameBoundingRect]);
+  }, [currentStep, imageFrameRef]);
 
   return (
     <>

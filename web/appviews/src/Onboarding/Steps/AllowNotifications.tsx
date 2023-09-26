@@ -2,7 +2,6 @@ import React from 'react';
 import { Button } from '@shared/components';
 import type { AppEvent } from '../onboarding-store';
 import ExpandableImage from '../ExpandableImage';
-import GrantPermissionGif from '../images/grant-permission.gif';
 
 interface Props {
   emit(event: AppEvent): unknown;
@@ -27,7 +26,7 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
           </p>
           <img
             src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/notification.png"
-            alt=""
+            alt="Allow notifications"
             className="rounded-xl mb-8"
           />
           <div className="flex flex-row justify-center gap-4">
@@ -83,10 +82,10 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
             </div>
           </div>
           <ExpandableImage
-            src={GrantPermissionGif}
+            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/venturaOrLater/allow-notifications.gif"
             alt={`Grant permission`}
-            width={360}
-            height={360 * 0.75}
+            width={800 / 2}
+            height={600 / 2}
             showInstructions
           />
         </div>

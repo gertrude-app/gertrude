@@ -66,47 +66,49 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
             </Button>
           </div>
           <ExpandableImage
-            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/dont-block-install-sys-ext.png"
+            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/venturaOrLater/sys-ext-blocked.png"
             alt="Don't click te blue button!"
-            width={380}
-            height={365}
+            width={800 / 2}
+            height={600 / 2}
           />
         </div>
       );
     case `installSysExt_allowInstall`:
       return (
-        <div className="h-full flex flex-col justify-center items-center">
-          <h1 className="text-3xl font-bold">Allow system extenson</h1>
-          <p className="my-4 text-lg text-slate-500 max-w-xl text-center">
-            Next, in the {systemSettings} app follow the steps shown below to allow the
-            installation:
-          </p>
-          <ExpandableImage
-            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/allow-sys-ext.png"
-            alt={`Allow system extension install`}
-            width={760 * 0.75}
-            height={280 * 0.75}
-          />
-          <div className="flex flex-col w-80 gap-4 mt-8">
-            <Button
-              color="primary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-            >
-              Done
-              <i className="fa-solid fa-arrow-right ml-2" />
-            </Button>
-            <Button
-              color="secondary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-              className="shadow shadow-violet-200/80"
-            >
-              Help, I'm stuck...
-            </Button>
+        <div className="h-full flex justify-center items-center p-12 gap-12">
+          <div className="flex flex-col">
+            <h1 className="text-3xl font-bold">Allow system extenson</h1>
+            <p className="my-4 text-lg text-slate-500 max-w-xl">
+              Next, in the {systemSettings} app follow the steps shown to allow the
+              installation:
+            </p>
+            <div className="flex flex-col w-80 gap-4 mt-4">
+              <Button
+                color="primary"
+                size="large"
+                type="button"
+                onClick={() => emit({ case: `primaryBtnClicked` })}
+              >
+                Done
+                <i className="fa-solid fa-arrow-right ml-2" />
+              </Button>
+              <Button
+                color="secondary"
+                size="large"
+                type="button"
+                onClick={() => emit({ case: `primaryBtnClicked` })}
+                className="shadow shadow-violet-200/80"
+              >
+                Help, I'm stuck...
+              </Button>
+            </div>
           </div>
+          <ExpandableImage
+            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/venturaOrLater/finish-install-sys-ext.gif"
+            alt={`Allow system extension install`}
+            width={800 / 2}
+            height={600 / 2}
+          />
         </div>
       );
     case `installSysExt_failed`:

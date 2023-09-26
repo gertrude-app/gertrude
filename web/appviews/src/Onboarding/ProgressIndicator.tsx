@@ -17,6 +17,7 @@ const ProgressIndicator: React.FC<Props> = ({ step }) => (
     />
     {new Array(7).fill(null).map((_, i) => (
       <Step
+        key={i} // fine in this context
         number={i + 1}
         status={step < i + 1 ? `incomplete` : step > i + 1 ? `complete` : `current`}
       />

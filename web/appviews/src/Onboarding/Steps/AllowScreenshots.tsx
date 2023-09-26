@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from '@shared/components';
 import type { AppEvent } from '../onboarding-store';
-import GrantPermission from '../images/grant-permission.png';
 import Callout from '../Callout';
 import ExpandableImage from '../ExpandableImage';
 
@@ -58,40 +57,42 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
       );
     case `allowScreenshots_openSysSettings`:
       return (
-        <div className="h-full flex flex-col items-center justify-center">
-          <h1 className="text-3xl font-bold">Open {systemSettings}</h1>
-          <p className="text-lg text-slate-500 max-w-xl text-center mt-4 mb-8">
-            Just now, a system popup should have appeared that looks like this. Find it
-            and click{` `}
-            <b>Open {systemSettings}.</b>
-          </p>
-          <ExpandableImage
-            src={GrantPermission}
-            alt={`Grant permission`}
-            width={450}
-            height={200}
-          />
-          <div className="flex flex-col w-80 gap-4 mt-8">
-            <Button
-              color="primary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-              className="shadow shadow-violet-200/80"
-            >
-              Done
-              <i className="fa-solid fa-arrow-right ml-2" />
-            </Button>
-            <Button
-              color="secondary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-              className="shadow shadow-violet-200/80"
-            >
-              Can't find the popup...
-            </Button>
+        <div className="h-full flex items-center justify-center p-12 gap-12">
+          <div className="flex flex-col">
+            <h1 className="text-3xl font-bold">Open {systemSettings}</h1>
+            <p className="text-lg text-slate-500 max-w-lg mt-4">
+              Just now, a system popup should have appeared that looks like this. Find it
+              and click{` `}
+              <b>Open {systemSettings}.</b>
+            </p>
+            <div className="flex flex-col w-80 gap-4 mt-8">
+              <Button
+                color="primary"
+                size="large"
+                type="button"
+                onClick={() => emit({ case: `primaryBtnClicked` })}
+                className="shadow shadow-violet-200/80"
+              >
+                Done
+                <i className="fa-solid fa-arrow-right ml-2" />
+              </Button>
+              <Button
+                color="secondary"
+                size="large"
+                type="button"
+                onClick={() => emit({ case: `primaryBtnClicked` })}
+                className="shadow shadow-violet-200/80"
+              >
+                Can't find the popup...
+              </Button>
+            </div>
           </div>
+          <ExpandableImage
+            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/venturaOrLater/accessibility-access.png"
+            alt={`Grant permission`}
+            width={640 / 2}
+            height={490 / 2}
+          />
         </div>
       );
     case `allowScreenshots_grantAndRestart`:
@@ -103,10 +104,10 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
             screen will open again when it restarts.
           </p>
           <ExpandableImage
-            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/screen-recording-add-gertrude.gif"
+            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/venturaOrLater/allow-screen-recording.gif"
             alt={`Allow screenshots`}
-            width={900 / 2}
-            height={650 / 2}
+            width={800 / 2}
+            height={600 / 2}
           />
           <Button
             color="tertiary"
