@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import cx from 'classnames';
-import CurrentStepContext from './CurrentStepContext';
+import useWindowWidth from '../lib/hooks';
 
 interface Props {
   src: string;
@@ -23,17 +23,18 @@ const ExpandableImage: React.FC<Props> = ({
   const [imageFrameCoords, setImageFrameCoords] = useState({ x: 0, y: 0 });
   const [hasBeenExpanded, setHasBeenExpanded] = useState(false);
   const imageFrameRef = useRef<HTMLDivElement>(null);
-  const currentStep = useContext(CurrentStepContext);
+  const windowWidth = useWindowWidth();
 
   const aspectRatio = width / height;
   const maxWidth = 800;
 
   useEffect(() => {
     if (imageFrameRef.current) {
-      const { x, y } = imageFrameRef.current.getBoundingClientRect();
+      const x = imageFrameRef.current.offsetLeft;
+      const y = imageFrameRef.current.offsetTop;
       setImageFrameCoords({ x, y });
     }
-  }, [currentStep, imageFrameRef]);
+  }, [imageFrameRef, windowWidth]);
 
   return (
     <>
@@ -48,10 +49,7 @@ const ExpandableImage: React.FC<Props> = ({
       />
       <div
         ref={imageFrameRef}
-        className={cx(
-          `shrink-0 z-20 flex justify-center bg-slate-200/50 rounded-3xl shadow-inner shadow-slate-300/30`,
-          className,
-        )}
+        className={cx(`shrink-0 z-20 flex justify-center`, className)}
         style={{
           width,
           height,
@@ -94,7 +92,7 @@ const ExpandableImage: React.FC<Props> = ({
                   Math.min(0.9 * window.innerWidth, 800) / (aspectRatio * 2)
                 : imageFrameCoords.y,
               transitionProperty: `width, height, left, top, box-shadow`,
-              transitionDuration: `500ms`,
+              transitionDuration: hasBeenExpanded ? `500ms` : `0`,
             }}
             src={src}
             alt={alt}

@@ -109,13 +109,13 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
   confettiDeps,
 }) => {
   const currentStep = useContext(CurrentStepContext);
-  const hasBeenVisited = useRef(false);
+  const [hasBeenVisited, setHasBeenVisited] = useState(false);
   const pageRef = useRef<HTMLDivElement>(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
   React.useEffect(() => {
     if (step === currentStep) {
-      hasBeenVisited.current = true;
+      setHasBeenVisited(true);
       if (confetti) {
         setTimeout(() => {
           setShowConfetti(true);
@@ -130,7 +130,7 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
       className={cx(
         step === currentStep
           ? `left-0`
-          : hasBeenVisited.current
+          : hasBeenVisited
           ? `left-[-100%] opacity-0`
           : `left-full opacity-0`,
         `absolute w-full h-full left-0 top-0 transition-[opacity,left] duration-700`,
