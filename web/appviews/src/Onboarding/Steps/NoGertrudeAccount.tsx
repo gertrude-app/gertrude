@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
-import { Button } from '@shared/components';
 import type { AppEvent } from '../onboarding-store';
 import QrCode from '../images/signup-qr-code.png';
 import QRCode from '../QRCode';
+import * as Onboarding from '../UtilityComponents';
 
 interface Props {
   emit: (event: AppEvent) => unknown;
@@ -12,37 +12,26 @@ interface Props {
 const NoGertrudeAccount: React.FC<Props> = ({ emit }) => {
   const [codeClicked, setCodeClicked] = useState(false);
   return (
-    <div className="h-full flex justify-center items-center p-16 gap-12">
+    <Onboarding.Centered direction="row" className="gap-12">
       <div>
-        <h1 className="text-3xl font-bold">No problem, let's make one!</h1>
-        <p className="text-slate-500 mt-4 text-lg max-w-lg">
+        <Onboarding.Heading>No problem, let's make one!</Onboarding.Heading>
+        <Onboarding.Text className="mt-4 max-w-lg">
           It only takes a minute to create an account. We recommend you{` `}
           <b>sign up on your phone,</b> instead of this device. Aim your phone's camera at
           the QR code and it will take you to the signup page.
-        </p>
-        <p className="text-lg text-slate-500 mt-2 max-w-lg">
+        </Onboarding.Text>
+        <Onboarding.Text className="mt-2 max-w-lg">
           Once you've verified your email, come back here and click to continue.
-        </p>
-        <div className="flex flex-col gap-4 mt-6 max-w-md">
-          <Button
-            color="primary"
-            size="large"
-            type="button"
-            onClick={() => emit({ case: `primaryBtnClicked` })}
-          >
-            Done, I have a gertrude account now{` `}
-            <i className="fa-solid fa-arrow-right ml-2" />
-          </Button>
-          <Button
-            color="secondary"
-            size="large"
-            type="button"
-            onClick={() => emit({ case: `secondaryBtnClicked` })}
-            className="shadow shadow-violet-200/80"
-          >
-            I don't want to signup, quit Gertrude
-          </Button>
-        </div>
+        </Onboarding.Text>
+        <Onboarding.ButtonGroup
+          primary={{
+            text: `Done, I have a gertrude account now`,
+            icon: `fa-solid fa-arrow-right`,
+          }}
+          secondary={{ text: `Done, I have a gertrude account now`, shadow: true }}
+          emit={emit}
+          className="mt-6 max-w-md"
+        />
       </div>
       <div className="flex flex-col justify-center items-center">
         <div
@@ -58,7 +47,7 @@ const NoGertrudeAccount: React.FC<Props> = ({ emit }) => {
           <QRCode img={QrCode} url="https://gertrude.app/signup" />
         </div>
       </div>
-    </div>
+    </Onboarding.Centered>
   );
 };
 

@@ -73,9 +73,6 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`installSysExt_explain`);
             break;
           case `installSysExt_explain`:
-            setStep(`installSysExt_start`);
-            break;
-          case `installSysExt_start`:
             setStep(`installSysExt_allowInstall`);
             break;
           case `installSysExt_allowInstall`:
@@ -275,16 +272,6 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           }
         />
         <OnboardingPage
-          step="installSysExt_start"
-          component={
-            <Step.InstallSysExt
-              os={`venturaOrLater`}
-              step="installSysExt_start"
-              emit={() => {}}
-            />
-          }
-        />
-        <OnboardingPage
           step="installSysExt_allowInstall"
           component={
             <Step.InstallSysExt
@@ -317,20 +304,17 @@ const OnboardingStatefulSwitcher: React.FC = () => {
         />
         <OnboardingPage
           step="locateMenuBarIcon"
-          component={<Step.LocateMenuBarIcon emit={() => {}} />}
+          component={<Step.LocateMenuBarIcon emit={() => {}} os="venturaOrLater" />}
         />
         <OnboardingPage
           step="viewHealthCheck"
-          component={<Step.ViewHealthCheck emit={() => {}} />}
+          component={<Step.ViewHealthCheck emit={() => {}} os="venturaOrLater" />}
         />
         <OnboardingPage
           step="howToUseGertrude"
           component={<Step.HowToUseGertrude emit={() => {}} />}
         />
-        <OnboardingPage
-          step="finish"
-          component={<Step.Finish emit={() => {}} shown={step === `finish`} />}
-        />
+        <OnboardingPage step="finish" component={<Step.Finish emit={() => {}} />} />
       </StepSwitcher>
     </div>
   );

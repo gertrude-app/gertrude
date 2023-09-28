@@ -1,15 +1,14 @@
 import React from 'react';
-import { Button } from '@shared/components';
 import type { AppEvent, OSGroup } from '../onboarding-store';
 import Callout from '../Callout';
 import ExpandableImage from '../ExpandableImage';
+import * as Onboarding from '../UtilityComponents';
 
 interface Props {
   emit(event: AppEvent): unknown;
   os: OSGroup;
   step:
     | 'installSysExt_explain'
-    | 'installSysExt_start'
     | 'installSysExt_allowInstall'
     | 'installSysExt_allowFiltering'
     | 'installSysExt_failed'
@@ -22,87 +21,40 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
   switch (step) {
     case `installSysExt_explain`:
       return (
-        <div className="h-full flex flex-col justify-center items-center p-12">
-          <h1 className="text-3xl font-bold">Just one more step!</h1>
-          <p className="my-4 max-w-2xl text-lg text-center text-slate-500 mb-8">
+        <Onboarding.Centered>
+          <Onboarding.Heading>Just one more step!</Onboarding.Heading>
+          <Onboarding.Text className="my-4 max-w-2xl mb-8" centered>
             What gives Gertrude it's superpowers is something called a{` `}
             <b>system extension</b>. Because it's so powerful, you have to give it special
             permission to do it's job.
-          </p>
+          </Onboarding.Text>
           <Callout heading="Good to know:" type="info">
             <p>You can disable and remove the system extension at any time.</p>
           </Callout>
-          <Button
-            color="primary"
-            size="large"
-            type="button"
-            onClick={() => emit({ case: `primaryBtnClicked` })}
+          <Onboarding.PrimaryButton
+            emit={emit}
+            icon="fa-solid fa-arrow-right"
             className="mt-8"
           >
             Next
-            <i className="fa-solid fa-arrow-right ml-2" />
-          </Button>
-        </div>
-      );
-    case `installSysExt_start`:
-      return (
-        <div className="h-full flex justify-center items-center p-12 gap-12">
-          <div>
-            <h1 className="text-3xl font-bold">Install system extension</h1>
-            <p className="mt-4 text-lg text-slate-500 max-w-xl">
-              When you click the button below, then be sure to choose the <b>GRAY</b>
-              {` `}
-              button to open {systemSettings}.
-            </p>
-            <Button
-              color="primary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-              className="mt-8"
-            >
-              Start the installation
-              <i className="fa-solid fa-arrow-right ml-2" />
-            </Button>
-          </div>
-          <ExpandableImage
-            fileName="sys-ext-blocked.png"
-            os={os}
-            alt="Don't click te blue button!"
-            width={800 / 2}
-            height={600 / 2}
-          />
-        </div>
+          </Onboarding.PrimaryButton>
+        </Onboarding.Centered>
       );
     case `installSysExt_allowInstall`:
       return (
-        <div className="h-full flex justify-center items-center p-12 gap-12">
+        <Onboarding.Centered className="gap-12" direction="row">
           <div className="flex flex-col">
-            <h1 className="text-3xl font-bold">Allow system extenson</h1>
-            <p className="my-4 text-lg text-slate-500 max-w-xl">
+            <Onboarding.Heading>Allow system extenson</Onboarding.Heading>
+            <Onboarding.Text className="my-4 max-w-xl">
               Next, in the {systemSettings} app follow the steps shown to allow the
               installation:
-            </p>
-            <div className="flex flex-col w-80 gap-4 mt-4">
-              <Button
-                color="primary"
-                size="large"
-                type="button"
-                onClick={() => emit({ case: `primaryBtnClicked` })}
-              >
-                Done
-                <i className="fa-solid fa-arrow-right ml-2" />
-              </Button>
-              <Button
-                color="secondary"
-                size="large"
-                type="button"
-                onClick={() => emit({ case: `primaryBtnClicked` })}
-                className="shadow shadow-violet-200/80"
-              >
-                Help, I'm stuck...
-              </Button>
-            </div>
+            </Onboarding.Text>
+            <Onboarding.ButtonGroup
+              primary={{ text: `Done`, icon: `fa-solid fa-arrow-right` }}
+              secondary={{ text: `Help, I'm stuck...`, shadow: true }}
+              emit={emit}
+              className="w-80 mt-4"
+            />
           </div>
           <ExpandableImage
             fileName="finish-install-sys-ext.gif"
@@ -111,16 +63,18 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
             width={800 / 2}
             height={600 / 2}
           />
-        </div>
+        </Onboarding.Centered>
       );
     case `installSysExt_failed`:
       return (
-        <div className="h-full flex flex-col justify-center items-center">
-          <h1 className="text-3xl font-bold mb-2">Hmm, somthing didn't work...</h1>
-          <p className="text-lg text-slate-500 text-center max-w-2xl">
+        <Onboarding.Centered className="h-full flex flex-col justify-center items-center">
+          <Onboarding.Heading className="mb-2">
+            Hmm, somthing didn't work...
+          </Onboarding.Heading>
+          <Onboarding.Text className="max-w-2xl" centered>
             Shucks! The system extension did not install correctly. Watch this short video
             for troubleshooting tips.
-          </p>
+          </Onboarding.Text>
           <iframe
             className="my-6 rounded-xl"
             width="560"
@@ -129,51 +83,33 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
             title="YouTube video player"
             allowFullScreen
           />
-          <div className="flex flex-col w-80 gap-4">
-            <Button
-              color="primary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-              className="shadow shadow-violet-200/80"
-            >
-              Try again
-              <i className="fa-solid fa-arrow-right ml-2" />
-            </Button>
-            <Button
-              color="secondary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-              className="shadow shadow-violet-200/80"
-            >
-              Skip install for now...
-            </Button>
-          </div>
-        </div>
+          <Onboarding.ButtonGroup
+            primary={{ text: `Try again`, icon: `fa-solid fa-arrow-right` }}
+            secondary={{ text: `Skip install for now...`, shadow: true }}
+            emit={emit}
+            className="w-80"
+          />
+        </Onboarding.Centered>
       );
     case `installSysExt_success`:
       return (
-        <div className="h-full flex flex-col justify-center items-center">
-          <h1 className="text-3xl font-bold">System extension installed!</h1>
-          <p className="text-lg text-slate-500 mt-4 mb-8">
+        <Onboarding.Centered>
+          <Onboarding.Heading>System extension installed!</Onboarding.Heading>
+          <Onboarding.Text className="mt-4 mb-8">
             Hooray, we've confirmed the system extension is <em>ready to go!</em>
-          </p>
+          </Onboarding.Text>
           <Callout type="info" heading="Good to know:">
             You're past all the hard parts, all that's left it to briefly show you around
             a bit.
           </Callout>
-          <Button
-            color="primary"
-            size="large"
-            type="button"
-            onClick={() => emit({ case: `primaryBtnClicked` })}
+          <Onboarding.PrimaryButton
+            icon="fa-solid fa-arrow-right"
+            emit={emit}
             className="mt-8"
           >
             Next
-            <i className="fa-solid fa-arrow-right ml-2" />
-          </Button>
-        </div>
+          </Onboarding.PrimaryButton>
+        </Onboarding.Centered>
       );
     default:
       return <h1>{step}</h1>;

@@ -1,17 +1,17 @@
 import React from 'react';
-import { Button } from '@shared/components';
 import type { AppEvent } from '../onboarding-store';
+import * as Onboarding from '../UtilityComponents';
 
 interface Props {
   emit(event: AppEvent): unknown;
 }
 
 const HowToUseGertrude: React.FC<Props> = ({ emit }) => (
-  <div className="h-full flex flex-col justify-center items-center p-12">
-    <h1 className="text-3xl font-bold">How to use Gertrude</h1>
-    <p className="text-lg text-slate-500 mt-2 text-center">
+  <Onboarding.Centered>
+    <Onboarding.Heading>How to use Gertrude</Onboarding.Heading>
+    <Onboarding.Text className="mt-2" centered>
       The 7-minute video below walks you through the basics of using Gertrude, including:
-    </p>
+    </Onboarding.Text>
     <ul className="flex flex-wrap gap-2 mt-4 justify-center">
       <ListItem index={1}>How to unblock parts of the internet</ListItem>
       <ListItem index={2}>How to see what your child is doing online</ListItem>
@@ -25,15 +25,10 @@ const HowToUseGertrude: React.FC<Props> = ({ emit }) => (
       title="YouTube video player"
       allowFullScreen
     />
-    <Button
-      type="button"
-      onClick={() => emit({ case: `primaryBtnClicked` })}
-      color="primary"
-      size="large"
-    >
-      Finish <i className="fas fa-arrow-right ml-2" />
-    </Button>
-  </div>
+    <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" emit={emit}>
+      Finish
+    </Onboarding.PrimaryButton>
+  </Onboarding.Centered>
 );
 
 export default HowToUseGertrude;

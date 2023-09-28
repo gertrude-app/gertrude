@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button } from '@shared/components';
 import type { AppEvent, OSGroup } from '../onboarding-store';
 import ExpandableImage from '../ExpandableImage';
+import * as Onboarding from '../UtilityComponents';
 
 interface Props {
   emit: (event: AppEvent) => unknown;
@@ -9,15 +9,15 @@ interface Props {
 }
 
 const LocateMenuBarIcon: React.FC<Props> = ({ emit, os }) => (
-  <div className="flex flex-col justify-center items-center h-full p-12">
-    <h1 className="text-3xl font-bold">Find the menu bar icon</h1>
-    <p className="mt-4 mb-2 text-slate-500 text-lg text-center max-w-2xl">
+  <Onboarding.Centered>
+    <Onboarding.Heading>Find the menu bar icon</Onboarding.Heading>
+    <Onboarding.Text className="mt-4 mb-2 max-w-2xl" centered>
       From now on, you'll click the <b>menu bar icon</b> whenever you or your child needs
       to <em>interact with the Gertrude app.</em>
-    </p>
-    <p className="mb-8 text-slate-500 text-lg text-center max-w-2xl">
+    </Onboarding.Text>
+    <Onboarding.Text className="mb-8 max-w-2xl" centered>
       Look up in the top right corner of your screen to find it, and give it a click.
-    </p>
+    </Onboarding.Text>
     <ExpandableImage
       fileName="menu-bar-icon.png"
       os={os}
@@ -25,16 +25,10 @@ const LocateMenuBarIcon: React.FC<Props> = ({ emit, os }) => (
       width={560}
       height={220}
     />
-    <Button
-      type="button"
-      onClick={() => emit({ case: `primaryBtnClicked` })}
-      color="primary"
-      size="large"
-      className="mt-8"
-    >
+    <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" className="mt-8" emit={emit}>
       Found it, next
-    </Button>
-  </div>
+    </Onboarding.PrimaryButton>
+  </Onboarding.Centered>
 );
 
 export default LocateMenuBarIcon;

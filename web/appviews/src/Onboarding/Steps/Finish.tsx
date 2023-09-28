@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import cx from 'classnames';
 import type { AppEvent } from '../onboarding-store';
+import CurrentStepContext from '../CurrentStepContext';
 
 interface Props {
   emit: (event: AppEvent) => unknown;
-  shown: boolean;
 }
 
-const Finish: React.FC<Props> = ({ emit, shown }) => {
+const Finish: React.FC<Props> = ({ emit }) => {
   const [fadeIn, setFadeIn] = useState(false);
+  const currentStep = useContext(CurrentStepContext);
+  const shown = currentStep === `finish`;
 
   useEffect(() => {
     if (shown) {

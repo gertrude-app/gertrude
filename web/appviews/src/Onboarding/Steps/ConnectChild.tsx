@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
-import { Button } from '@shared/components';
 import type { AppEvent, RequestState, ViewAction } from '../onboarding-store';
+import * as Onboarding from '../UtilityComponents';
 
 interface Props {
   emit(event: AppEvent): unknown;
@@ -11,7 +11,7 @@ interface Props {
 }
 
 const ConnectChild: React.FC<Props> = ({ emit, dispatch, connectionCode, request }) => (
-  <div className="h-full flex flex-col justify-center items-center relative">
+  <Onboarding.Centered className="relative">
     <div
       className={cx(
         `absolute transition-[opacity,transform] duration-500 flex flex-col items-center`,
@@ -72,15 +72,9 @@ const ConnectChild: React.FC<Props> = ({ emit, dispatch, connectionCode, request
         </span>
         .
       </p>
-      <Button
-        type="button"
-        onClick={() => emit({ case: `primaryBtnClicked` })}
-        color="primary"
-        size="large"
-      >
+      <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" emit={emit}>
         Next
-        <i className="fa-solid fa-arrow-right ml-2" />
-      </Button>
+      </Onboarding.PrimaryButton>
     </div>
     <div
       className={cx(
@@ -91,27 +85,17 @@ const ConnectChild: React.FC<Props> = ({ emit, dispatch, connectionCode, request
       )}
     >
       <h1 className="text-3xl font-bold">Uh-oh, something went wrong</h1>
-      <p className="mt-2 mb-6 text-lg text-slate-500">Failed to connect child</p>
-      <div className="flex flex-col justify-center w-80 gap-4">
-        <Button
-          type="button"
-          onClick={() => emit({ case: `primaryBtnClicked` })}
-          color="primary"
-          size="large"
-        >
-          Try again
-        </Button>
-        <Button
-          type="button"
-          onClick={() => emit({ case: `secondaryBtnClicked` })}
-          color="secondary"
-          size="large"
-        >
-          Get help
-        </Button>
-      </div>
+      <p className="mt-2 mb-6 text-lg text-slate-500">
+        {request.state === `failed` ? request.error : `Failed to connect child`}
+      </p>
+      <Onboarding.ButtonGroup
+        primary={{ text: `Try again` }}
+        secondary={{ text: `Get help` }}
+        emit={emit}
+        className="w-80"
+      />
     </div>
-  </div>
+  </Onboarding.Centered>
 );
 
 export default ConnectChild;

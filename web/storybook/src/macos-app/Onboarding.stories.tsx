@@ -193,11 +193,6 @@ export const InstallSysExtExplain: Story = props({
   step: `installSysExt_explain`,
 });
 
-export const InstallSysExtStart: Story = props({
-  ...Welcome.args,
-  step: `installSysExt_start`,
-});
-
 export const InstallSysExtAllowInstall: Story = props({
   ...Welcome.args,
   step: `installSysExt_allowInstall`,

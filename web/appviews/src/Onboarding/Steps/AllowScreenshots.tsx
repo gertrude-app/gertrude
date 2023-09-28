@@ -3,6 +3,7 @@ import { Button } from '@shared/components';
 import type { AppEvent, OSGroup } from '../onboarding-store';
 import Callout from '../Callout';
 import ExpandableImage from '../ExpandableImage';
+import * as Onboarding from '../UtilityComponents';
 
 interface Props {
   emit(event: AppEvent): unknown;
@@ -21,71 +22,50 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
   switch (step) {
     case `allowScreenshots_required`:
       return (
-        <div className="flex flex-col items-center justify-center h-full">
-          <h1 className="text-3xl font-bold">Grant screen recording permission</h1>
-          <p className="mt-4 mb-8 text-lg text-slate-500 max-w-2xl text-center">
+        <Onboarding.Centered>
+          <Onboarding.Heading className="text-3xl font-bold">
+            Grant screen recording permission
+          </Onboarding.Heading>
+          <Onboarding.Text className="mt-4 mb-8 max-w-2xl" centered>
             Gertrude needs your permission to record the screen, so it can take
             screenshots of your child's activity.
-          </p>
+          </Onboarding.Text>
           <Callout heading="Good to know:" type="info">
             <ul className="list-disc list-inside ml-2">
               <li>You control if and when we record screenshots</li>
               <li>Your child is shown when their screen is being recorded</li>
             </ul>
           </Callout>
-          <div className="flex flex-col w-80 gap-4 mt-8">
-            <Button
-              color="primary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-            >
-              Grant permission
-              <i className="fa-solid fa-arrow-right ml-2" />
-            </Button>
-            <Button
-              color="secondary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-              className="shadow shadow-violet-200/80"
-            >
-              Skip this step...
-            </Button>
-          </div>
-        </div>
+          <Onboarding.ButtonGroup
+            primary={{
+              text: `Grant permission`,
+              icon: `fa-solid fa-arrow-right`,
+            }}
+            secondary={{ text: `Skip this step...`, shadow: true }}
+            emit={emit}
+            className="mt-8 w-80"
+          />
+        </Onboarding.Centered>
       );
     case `allowScreenshots_openSysSettings`:
       return (
-        <div className="h-full flex items-center justify-center p-12 gap-12">
+        <Onboarding.Centered direction="row" className="gap-12">
           <div className="flex flex-col">
-            <h1 className="text-3xl font-bold">Open {systemSettings}</h1>
-            <p className="text-lg text-slate-500 max-w-lg mt-4">
+            <Onboarding.Heading>Open {systemSettings}</Onboarding.Heading>
+            <Onboarding.Text className="max-w-lg mt-4">
               Just now, a system popup should have appeared that looks like this. Find it
               and click{` `}
               <b>Open {systemSettings}.</b>
-            </p>
-            <div className="flex flex-col w-80 gap-4 mt-8">
-              <Button
-                color="primary"
-                size="large"
-                type="button"
-                onClick={() => emit({ case: `primaryBtnClicked` })}
-                className="shadow shadow-violet-200/80"
-              >
-                Done
-                <i className="fa-solid fa-arrow-right ml-2" />
-              </Button>
-              <Button
-                color="secondary"
-                size="large"
-                type="button"
-                onClick={() => emit({ case: `primaryBtnClicked` })}
-                className="shadow shadow-violet-200/80"
-              >
-                Can't find the popup...
-              </Button>
-            </div>
+            </Onboarding.Text>
+            <Onboarding.ButtonGroup
+              primary={{
+                text: `Done`,
+                icon: `fa-solid fa-arrow-right`,
+              }}
+              secondary={{ text: `Can't find the popup...`, shadow: true }}
+              emit={emit}
+              className="mt-8 w-80"
+            />
           </div>
           <ExpandableImage
             fileName="accessibility-access.png"
@@ -94,16 +74,16 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
             width={640 / 2}
             height={490 / 2}
           />
-        </div>
+        </Onboarding.Centered>
       );
     case `allowScreenshots_grantAndRestart`:
       return (
-        <div className="h-full flex flex-col justify-center items-center">
-          <h1 className="text-3xl font-bold">Allow screenshots</h1>
-          <p className="text-lg text-slate-500 max-w-2xl text-center mt-4 mb-8">
+        <Onboarding.Centered>
+          <Onboarding.Heading>Allow screenshots</Onboarding.Heading>
+          <Onboarding.Text className="max-w-2xl mt-4 mb-8" centered>
             Follow the steps shown below, which include <b>quitting Gertrude.</b> This
             screen will open again when it restarts.
-          </p>
+          </Onboarding.Text>
           <ExpandableImage
             fileName="allow-screen-recording.gif"
             os={os}
@@ -120,60 +100,45 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
           >
             Help, I'm still here...
           </Button>
-        </div>
+        </Onboarding.Centered>
       );
     case `allowScreenshots_success`:
       return (
-        <div className="h-full flex flex-col justify-center items-center">
+        <Onboarding.Centered>
           <div className="flex flex-col items-center bg-white p-12 rounded-3xl shadow-lg shadow-slate-300/30">
-            <h1 className="text-3xl font-bold">Awesome!</h1>
-            <p className="text-lg text-slate-500 max-w-xl text-center mt-4">
+            <Onboarding.Heading>Awesome!</Onboarding.Heading>
+            <Onboarding.Text className="max-w-xl mt-4" centered>
               Gertrude now has the permission it needs to take screenshots.
-            </p>
-            <Button
-              color="primary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
+            </Onboarding.Text>
+            <Onboarding.PrimaryButton
+              emit={emit}
+              icon="fa-solid fa-arrow-right"
               className="mt-8"
             >
               Next
-              <i className="fa-solid fa-arrow-right ml-2" />
-            </Button>
+            </Onboarding.PrimaryButton>
           </div>
-        </div>
+        </Onboarding.Centered>
       );
     case `allowScreenshots_failed`:
       return (
-        <div className="h-full flex flex-col justify-center items-center p-12">
+        <Onboarding.Centered>
           <div className="flex flex-col items-center border-2 border-slate-200/60 border-dashed p-12 rounded-3xl">
-            <h1 className="text-3xl font-bold">Hmm... something didn't work</h1>
-            <p className="text-lg text-slate-500 mt-4">
+            <Onboarding.Heading>Hmm... something didn't work</Onboarding.Heading>
+            <Onboarding.Text className="mt-4">
               We still don't have permission to record the screen. Please try again.
-            </p>
-            <div className="flex flex-col w-80 gap-4 mt-8">
-              <Button
-                color="primary"
-                size="large"
-                type="button"
-                onClick={() => emit({ case: `primaryBtnClicked` })}
-                className="shadow shadow-violet-200/80"
-              >
-                Try again
-                <i className="fa-solid fa-arrow-right ml-2" />
-              </Button>
-              <Button
-                color="secondary"
-                size="large"
-                type="button"
-                onClick={() => emit({ case: `primaryBtnClicked` })}
-                className="shadow shadow-violet-200/80"
-              >
-                Skip this step...
-              </Button>
-            </div>
+            </Onboarding.Text>
+            <Onboarding.ButtonGroup
+              primary={{
+                text: `Try again`,
+                icon: `fa-solid fa-arrow-right`,
+              }}
+              secondary={{ text: `Skip this step...`, shadow: true }}
+              emit={emit}
+              className="mt-8 w-80"
+            />
           </div>
-        </div>
+        </Onboarding.Centered>
       );
   }
 };

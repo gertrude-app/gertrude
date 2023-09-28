@@ -146,10 +146,6 @@ export const Onboarding: React.FC<Props> = ({
       component={<Step.InstallSysExt os={os} step="installSysExt_explain" emit={emit} />}
     />
     <OnboardingPage
-      step="installSysExt_start"
-      component={<Step.InstallSysExt os={os} step="installSysExt_start" emit={emit} />}
-    />
-    <OnboardingPage
       step="installSysExt_allowInstall"
       component={
         <Step.InstallSysExt os={os} step="installSysExt_allowInstall" emit={emit} />
@@ -176,10 +172,7 @@ export const Onboarding: React.FC<Props> = ({
       step="howToUseGertrude"
       component={<Step.HowToUseGertrude emit={emit} />}
     />
-    <OnboardingPage
-      step="finish"
-      component={<Step.Finish emit={emit} shown={step === `finish`} />}
-    />
+    <OnboardingPage step="finish" component={<Step.Finish emit={emit} />} />
   </StepSwitcher>
 );
 

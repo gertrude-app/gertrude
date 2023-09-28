@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button } from '@shared/components';
 import type { AppEvent, OSGroup } from '../onboarding-store';
 import ExpandableImage from '../ExpandableImage';
 import Callout from '../Callout';
+import * as Onboarding from '../UtilityComponents';
 
 interface Props {
   emit: (event: AppEvent) => unknown;
@@ -10,27 +10,25 @@ interface Props {
 }
 
 const ViewHealthCheck: React.FC<Props> = ({ emit, os }) => (
-  <div className="h-full flex items-center justify-center p-12 gap-12">
+  <Onboarding.Centered className="gap-12" direction="row">
     <div>
-      <h1 className="text-3xl font-bold">Admin health check</h1>
-      <p className="mt-2 text-lg text-slate-500 mb-8 max-w-2xl">
+      <Onboarding.Heading>Admin health check</Onboarding.Heading>
+      <Onboarding.Text className="mt-2 mb-8 max-w-2xl">
         One good thing to know about is the <b>Health Check Screen</b>. It's a quick way
         to see if everything is working correctly, and sometimes can help you fix issues.
-      </p>
+      </Onboarding.Text>
       <Callout type="info" heading="Good to know">
         The health check screen will show a warning about you having <b>zero keys.</b>
         {` `}
         That's expected at this point, since you're just getting setup.
       </Callout>
-      <Button
-        type="button"
-        onClick={() => emit({ case: `primaryBtnClicked` })}
-        color="primary"
-        size="large"
-        className="mt-4"
+      <Onboarding.PrimaryButton
+        icon="fa-solid fa-arrow-right"
+        className="mt-6"
+        emit={emit}
       >
         Found it, next
-      </Button>
+      </Onboarding.PrimaryButton>
     </div>
     <ExpandableImage
       fileName="administrate.png"
@@ -39,7 +37,7 @@ const ViewHealthCheck: React.FC<Props> = ({ emit, os }) => (
       width={500 * 0.75}
       height={285 * 0.75}
     />
-  </div>
+  </Onboarding.Centered>
 );
 
 export default ViewHealthCheck;

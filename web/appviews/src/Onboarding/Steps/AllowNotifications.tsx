@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button } from '@shared/components';
 import type { AppEvent, OSGroup } from '../onboarding-store';
 import ExpandableImage from '../ExpandableImage';
+import * as Onboarding from '../UtilityComponents';
 
 interface Props {
   emit(event: AppEvent): unknown;
@@ -18,68 +18,44 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
   switch (step) {
     case `allowNotifications_start`:
       return (
-        <div className="h-full justify-center items-center flex flex-col">
-          <h1 className="text-3xl font-bold">Now let's allow notifications</h1>
-          <p className="mt-2 mb-8 text-lg text-slate-500 text-center max-w-xl">
+        <Onboarding.Centered>
+          <Onboarding.Heading>Now let's allow notifications</Onboarding.Heading>
+          <Onboarding.Text className="mt-2 mb-8 max-w-xl" centered>
             Gertrude sends <b>a small number of important notifications</b>, so it's
             important that your child sees them.
-          </p>
+          </Onboarding.Text>
           <img
             src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/notification.png"
             alt="Allow notifications"
             className="rounded-xl mb-8"
           />
-          <div className="flex flex-row justify-center gap-4">
-            <Button
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-              color="primary"
-              size="large"
-            >
-              Open {systemSettings}
-              <i className="fa-solid fa-arrow-right ml-2" />
-            </Button>
-            <Button
-              type="button"
-              onClick={() => emit({ case: `secondaryBtnClicked` })}
-              color="secondary"
-              size="large"
-            >
-              Skip this step
-            </Button>
-          </div>
-        </div>
+          <Onboarding.ButtonGroup
+            primary={{ text: `Open ${systemSettings}`, icon: `fa-solid fa-arrow-right` }}
+            secondary={{ text: `Skip this step`, shadow: true }}
+            emit={emit}
+            direction="row"
+          />
+        </Onboarding.Centered>
       );
     case `allowNotifications_grant`:
       return (
-        <div className="flex h-full items-center justify-center p-12 gap-12">
+        <Onboarding.Centered className="gap-12" direction="row">
           <div className="flex flex-col">
-            <h1 className="text-3xl font-bold">Set notifications to "Alerts"</h1>
-            <p className="mt-4 text-lg text-slate-500 max-w-xl">
+            <Onboarding.Heading>Set notifications to "Alerts"</Onboarding.Heading>
+            <Onboarding.Text className="mt-4 max-w-xl">
               We just opened the {systemSettings} app. Set Gertrude's notifications to
               {` `}
               <b>Alerts</b> as shown here:
-            </p>
-            <div className="flex flex-col gap-4 mt-8">
-              <Button
-                type="button"
-                onClick={() => emit({ case: `primaryBtnClicked` })}
-                color="primary"
-                size="large"
-              >
-                Done
-                <i className="fa-solid fa-arrow-right ml-2" />
-              </Button>
-              <Button
-                type="button"
-                onClick={() => emit({ case: `secondaryBtnClicked` })}
-                color="secondary"
-                size="large"
-                className="shadow shadow-violet-200/80"
-              >
-                Help...
-              </Button>
-            </div>
+            </Onboarding.Text>
+            <Onboarding.ButtonGroup
+              primary={{
+                text: `Done`,
+                icon: `fa-solid fa-arrow-right`,
+              }}
+              secondary={{ text: `Help...`, shadow: true }}
+              emit={emit}
+              className="mt-8"
+            />
           </div>
           <ExpandableImage
             fileName="allow-notifications.gif"
@@ -89,17 +65,17 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
             height={600 / 2}
             showInstructions
           />
-        </div>
+        </Onboarding.Centered>
       );
     case `allowNotifications_failed`:
       return (
-        <div className="h-full flex flex-col justify-center items-center p-12">
-          <h1 className="text-3xl font-bold">
+        <Onboarding.Centered>
+          <Onboarding.Heading>
             Shucks, the notifications still don't seem right
-          </h1>
-          <p className="mt-2 text-lg text-slate-500">
+          </Onboarding.Heading>
+          <Onboarding.Text className="mt-2">
             Watch the video for more information.
-          </p>
+          </Onboarding.Text>
           <iframe
             className="my-6 rounded-xl"
             width="560"
@@ -108,28 +84,16 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
             title="YouTube video player"
             allowFullScreen
           />
-          <div className="flex flex-col w-80 gap-4">
-            <Button
-              color="primary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-              className="shadow shadow-violet-200/80"
-            >
-              Check again
-              <i className="fa-solid fa-arrow-right ml-2" />
-            </Button>
-            <Button
-              color="secondary"
-              size="large"
-              type="button"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
-              className="shadow shadow-violet-200/80"
-            >
-              Skip for now
-            </Button>
-          </div>
-        </div>
+          <Onboarding.ButtonGroup
+            primary={{
+              text: `Check again`,
+              icon: `fa-solid fa-arrow-right`,
+            }}
+            secondary={{ text: `Skip for now`, shadow: true }}
+            emit={emit}
+            className="w-80"
+          />
+        </Onboarding.Centered>
       );
   }
 };

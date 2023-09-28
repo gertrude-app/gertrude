@@ -6,6 +6,7 @@ import TellMeMoreButton from '../TellMeMoreButton';
 import InformationModal from '../InformationModal';
 import QRCode from '../QRCode';
 import Callout from '../Callout';
+import * as Onboarding from '../UtilityComponents';
 
 interface Emit {
   emit(event: AppEvent): unknown;
@@ -70,11 +71,11 @@ const ChooseRemediation: React.FC<ChooseRemediationProps> = ({
   const numRemediations = canDemote && canSwitch ? `three` : `two`;
   return (
     <div className="p-12 flex flex-col justify-center h-full">
-      <h1 className="text-3xl font-bold">Here's how we can fix this</h1>
-      <p className="mt-4 mb-8 text-lg text-slate-500 max-w-xl">
+      <Onboarding.Heading>Here's how we can fix this</Onboarding.Heading>
+      <Onboarding.Text className="mt-4 mb-8 max-w-xl">
         There are {numRemediations} ways to fix this issue, and we have short videos
         showing you how to do each of them.
-      </p>
+      </Onboarding.Text>
       <ol className="flex flex-col gap-4">
         {canSwitch && (
           <PossibleRemediation
@@ -126,17 +127,19 @@ const StartRemediation: React.FC<StartRemediationProps> = ({ action }) => {
   }
   return (
     <div className="flex flex-col justify-center items-center h-full p-12">
-      <h2 className="text-3xl font-bold max-w-2xl text-center">{lead}</h2>
-      <p className="mt-6 mb-4 max-w-3xl text-lg text-slate-500 text-center">
+      <Onboarding.Heading className="max-w-2xl" centered>
+        {lead}
+      </Onboarding.Heading>
+      <Onboarding.Text className="mt-6 mb-4 max-w-3xl" centered>
         It only takes a few minutes, but you'll need to log out of this user
         {action === `demote` ? ` and restart the computer` : ``} as part of the process,
         so it's best if you view the instructions on your phone so we can walk you through
         the process.
-      </p>
-      <p className="text-lg text-slate-600 font-medium max-w-xl text-center">
+      </Onboarding.Text>
+      <Onboarding.Text className="font-medium max-w-xl !text-slate-600" centered>
         Aim your phone's camera at the QR code below for a video that will walk you
         through every step.
-      </p>
+      </Onboarding.Text>
       <div className="flex justify-center mt-8">
         <QRCode img={QrCode} url={`https://gertrude.app/${tutorialSlug}`} />
       </div>
@@ -147,41 +150,31 @@ const StartRemediation: React.FC<StartRemediationProps> = ({ action }) => {
 const WarnUserIsAdmin: React.FC<Emit> = ({ emit }) => {
   const [showModal, setShowModal] = useState(false);
   return (
-    <div className="flex h-full flex-col justify-center items-center p-12 relative">
+    <Onboarding.Centered className="relative">
       <InformationModal open={showModal} setOpen={setShowModal}>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat at tempore culpa
         eaque, exercitationem molestiae voluptate, pariatur temporibus inventore excepturi
         sunt odit ea facere placeat iure cumque? Animi, maiores alias.
       </InformationModal>
-      <h1 className="text-3xl font-bold">Hmm, this user has admin privileges</h1>
-      <p className="my-4 text-lg text-slate-500 text-center max-w-2xl">
+      <Onboarding.Heading centered>
+        Hmm, this user has admin privileges
+      </Onboarding.Heading>
+      <Onboarding.Text className="my-4 max-w-2xl" centered>
         This macOS user has admin privileges, and so should <b>not be used</b> by a child
         protected by Gertrude. Admin privileges make it easy for your child to disable and
         bypass Gertrude.
-      </p>
+      </Onboarding.Text>
       <TellMeMoreButton onClick={() => setShowModal(true)}>Tell me more</TellMeMoreButton>
-      <div className="flex flex-col gap-4 mt-8">
-        <Button
-          color="primary"
-          size="large"
-          type="button"
-          onClick={() => emit({ case: `primaryBtnClicked` })}
-          className="shadow shadow-violet-200/80"
-        >
-          Show me how to fix it <i className="fa-solid fa-arrow-right ml-2" />
-        </Button>
-        <Button
-          color="secondary"
-          size="large"
-          type="button"
-          onClick={() => emit({ case: `primaryBtnClicked` })}
-          className="shadow shadow-violet-200/80"
-        >
-          I understand the risks, proceed anyway{` `}
-          <i className="fa-solid fa-arrow-right ml-2" />
-        </Button>
-      </div>
-    </div>
+      <Onboarding.ButtonGroup
+        primary={{ text: `Show me how to fix it`, icon: `fa-solid fa-arrow-right` }}
+        secondary={{
+          text: `I understand the risks, proceed anyway`,
+          icon: `fa-solid fa-arrow-right`,
+        }}
+        emit={emit}
+        className="mt-8"
+      />
+    </Onboarding.Centered>
   );
 };
 
@@ -193,17 +186,17 @@ interface HappyPathProps extends Emit {
 const HappyPath: React.FC<HappyPathProps> = ({ emit, userName, adminUsers }) => {
   const [showModal, setShowModal] = useState(false);
   return (
-    <div className="h-full flex flex-col justify-center items-center p-12 relative">
+    <Onboarding.Centered className="relative">
       <InformationModal open={showModal} setOpen={setShowModal}>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat at tempore culpa
         eaque, exercitationem molestiae voluptate, pariatur temporibus inventore excepturi
         sunt odit ea facere placeat iure cumque? Animi, maiores alias.
       </InformationModal>
-      <h1 className="text-3xl font-bold">Yay, you've got the right macOS user type!</h1>
-      <p className="my-4 text-lg text-slate-500">
+      <Onboarding.Heading>Yay, you've got the right macOS user type!</Onboarding.Heading>
+      <Onboarding.Text className="my-4" centered>
         This macOS user (<span>{userName}</span>) does <b>not</b> have admin privileges,
         which is just what we want.
-      </p>
+      </Onboarding.Text>
       <TellMeMoreButton onClick={() => setShowModal(true)}>
         Why does this matter?
       </TellMeMoreButton>
@@ -220,15 +213,10 @@ const HappyPath: React.FC<HappyPathProps> = ({ emit, userName, adminUsers }) => 
         {` `}
         user, or else they could disable Gertrude.
       </Callout>
-      <Button
-        color="primary"
-        size="large"
-        type="button"
-        onClick={() => emit({ case: `primaryBtnClicked` })}
-      >
-        Coninue <i className="fa-solid fa-arrow-right ml-2" />
-      </Button>
-    </div>
+      <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" emit={emit}>
+        Continue
+      </Onboarding.PrimaryButton>
+    </Onboarding.Centered>
   );
 };
 

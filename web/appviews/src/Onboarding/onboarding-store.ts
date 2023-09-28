@@ -36,7 +36,6 @@ export type OnboardingStep =
   | 'allowKeylogging_grant'
   | 'allowKeylogging_failed'
   | 'installSysExt_explain'
-  | 'installSysExt_start'
   | 'installSysExt_allowInstall'
   | 'installSysExt_failed'
   | 'installSysExt_success'
