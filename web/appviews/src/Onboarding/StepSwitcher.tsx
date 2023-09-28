@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import ConfettiExplosion from 'react-confetti-explosion';
 import cx from 'classnames';
 import type { OnboardingStep } from './onboarding-store';
@@ -12,49 +12,42 @@ interface Props {
 
 const StepSwitcher: React.FC<Props> = ({ step, children }) => {
   const [expandBlurs, setExpandBlurs] = useState(false);
-  const [progressStep, setProgressStep] = useState(1);
+  const progressStep = (() => {
+    switch (step) {
+      case `welcome`:
+      case `confirmGertrudeAccount`:
+      case `noGertrudeAccount`:
+        return 1;
+      case `macosUserAccountType`:
+        return 2;
+      case `getChildConnectionCode`:
+      case `connectChild`:
+        return 3;
+      case `allowNotifications_start`:
+      case `allowNotifications_grant`:
+      case `allowNotifications_failed`:
+        return 4;
+      case `allowScreenshots_required`:
+      case `allowScreenshots_openSysSettings`:
+      case `allowScreenshots_grantAndRestart`:
+      case `allowScreenshots_success`:
+      case `allowScreenshots_failed`:
+        return 5;
+      case `allowKeylogging_required`:
+      case `allowKeylogging_openSysSettings`:
+      case `allowKeylogging_grant`:
+      case `allowKeylogging_failed`:
+        return 6;
+      default:
+        return 7;
+    }
+  })();
 
   useEffect(() => {
     if (step === `finish`) {
       setTimeout(() => {
         setExpandBlurs(true);
       }, 500);
-    }
-    switch (step) {
-      case `welcome`:
-      case `confirmGertrudeAccount`:
-      case `noGertrudeAccount`:
-        setProgressStep(1);
-        break;
-      case `macosUserAccountType`:
-        setProgressStep(2);
-        break;
-      case `getChildConnectionCode`:
-      case `connectChild`:
-        setProgressStep(3);
-        break;
-      case `allowNotifications_start`:
-      case `allowNotifications_grant`:
-      case `allowNotifications_failed`:
-        setProgressStep(4);
-        break;
-      case `allowScreenshots_required`:
-      case `allowScreenshots_openSysSettings`:
-      case `allowScreenshots_grantAndRestart`:
-      case `allowScreenshots_success`:
-      case `allowScreenshots_failed`:
-        setProgressStep(5);
-        break;
-      case `allowKeylogging_required`:
-      case `allowKeylogging_openSysSettings`:
-      case `allowKeylogging_grant`:
-      case `allowKeylogging_failed`:
-        setProgressStep(6);
-        break;
-      // all remaining cases:
-      default:
-        setProgressStep(7);
-        break;
     }
   }, [step]);
 
@@ -110,7 +103,6 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
 }) => {
   const currentStep = useContext(CurrentStepContext);
   const [hasBeenVisited, setHasBeenVisited] = useState(false);
-  const pageRef = useRef<HTMLDivElement>(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
   React.useEffect(() => {
@@ -126,7 +118,6 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
 
   return (
     <div
-      ref={pageRef}
       className={cx(
         step === currentStep
           ? `left-0`

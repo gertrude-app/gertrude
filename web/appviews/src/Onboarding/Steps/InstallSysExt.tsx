@@ -1,12 +1,12 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import type { AppEvent } from '../onboarding-store';
+import type { AppEvent, OSGroup } from '../onboarding-store';
 import Callout from '../Callout';
 import ExpandableImage from '../ExpandableImage';
 
 interface Props {
   emit(event: AppEvent): unknown;
-  os: 'catalina' | 'bigSurOrMonterey' | 'venturaOrLater';
+  os: OSGroup;
   step:
     | 'installSysExt_explain'
     | 'installSysExt_start'
@@ -66,7 +66,8 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
             </Button>
           </div>
           <ExpandableImage
-            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/venturaOrLater/sys-ext-blocked.png"
+            fileName="sys-ext-blocked.png"
+            os={os}
             alt="Don't click te blue button!"
             width={800 / 2}
             height={600 / 2}
@@ -104,7 +105,8 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
             </div>
           </div>
           <ExpandableImage
-            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/venturaOrLater/finish-install-sys-ext.gif"
+            fileName="finish-install-sys-ext.gif"
+            os={os}
             alt={`Allow system extension install`}
             width={800 / 2}
             height={600 / 2}

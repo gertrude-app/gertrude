@@ -41,7 +41,7 @@ export const Onboarding: React.FC<Props> = ({
     />
     <OnboardingPage
       step="getChildConnectionCode"
-      component={<Step.GetConnectionCode emit={emit} />}
+      component={<Step.GetConnectionCode emit={emit} os={os} />}
     />
     <OnboardingPage
       step="connectChild"
@@ -166,11 +166,11 @@ export const Onboarding: React.FC<Props> = ({
     />
     <OnboardingPage
       step="locateMenuBarIcon"
-      component={<Step.LocateMenuBarIcon emit={emit} />}
+      component={<Step.LocateMenuBarIcon emit={emit} os={os} />}
     />
     <OnboardingPage
       step="viewHealthCheck"
-      component={<Step.ViewHealthCheck emit={emit} />}
+      component={<Step.ViewHealthCheck emit={emit} os={os} />}
     />
     <OnboardingPage
       step="howToUseGertrude"

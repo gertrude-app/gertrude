@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import cx from 'classnames';
+import type { OSGroup } from './onboarding-store';
 import useWindowWidth from '../lib/hooks';
 
 interface Props {
-  src: string;
+  fileName: string;
+  os: OSGroup;
   alt: string;
   width: number;
   height: number;
@@ -12,7 +14,8 @@ interface Props {
 }
 
 const ExpandableImage: React.FC<Props> = ({
-  src,
+  fileName,
+  os,
   alt,
   width,
   height,
@@ -94,7 +97,7 @@ const ExpandableImage: React.FC<Props> = ({
               transitionProperty: `width, height, left, top, box-shadow`,
               transitionDuration: hasBeenExpanded ? `500ms` : `0`,
             }}
-            src={src}
+            src={`https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/${os}/${fileName}`}
             alt={alt}
             onClick={() => {
               setImageExpanded(!imageExpanded);

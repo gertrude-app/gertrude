@@ -1,14 +1,15 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import type { AppEvent } from '../onboarding-store';
+import type { AppEvent, OSGroup } from '../onboarding-store';
 import ExpandableImage from '../ExpandableImage';
 import Callout from '../Callout';
 
 interface Props {
   emit: (event: AppEvent) => unknown;
+  os: OSGroup;
 }
 
-const ViewHealthCheck: React.FC<Props> = ({ emit }) => (
+const ViewHealthCheck: React.FC<Props> = ({ emit, os }) => (
   <div className="h-full flex items-center justify-center p-12 gap-12">
     <div>
       <h1 className="text-3xl font-bold">Admin health check</h1>
@@ -32,7 +33,8 @@ const ViewHealthCheck: React.FC<Props> = ({ emit }) => (
       </Button>
     </div>
     <ExpandableImage
-      src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/administrate.png"
+      fileName="administrate.png"
+      os={os}
       alt="Admin health check screen"
       width={500 * 0.75}
       height={285 * 0.75}

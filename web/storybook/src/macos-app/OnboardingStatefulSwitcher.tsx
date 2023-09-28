@@ -128,7 +128,7 @@ const OnboardingStatefulSwitcher: React.FC = () => {
         />
         <OnboardingPage
           step="getChildConnectionCode"
-          component={<Step.GetConnectionCode emit={() => {}} />}
+          component={<Step.GetConnectionCode emit={() => {}} os="venturaOrLater" />}
         />
         <OnboardingPage
           step="connectChild"

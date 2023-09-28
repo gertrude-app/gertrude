@@ -45,8 +45,10 @@ export type OnboardingStep =
   | 'howToUseGertrude'
   | 'finish';
 
+export type OSGroup = 'catalina' | 'bigSurOrMonterey' | 'venturaOrLater';
+
 export interface AppState {
-  os: 'catalina' | 'bigSurOrMonterey' | 'venturaOrLater';
+  os: OSGroup;
   macOSUser: {
     current: MacOSUser;
     list: Array<MacOSUser>;

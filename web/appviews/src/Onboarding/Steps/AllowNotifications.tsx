@@ -1,11 +1,11 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import type { AppEvent } from '../onboarding-store';
+import type { AppEvent, OSGroup } from '../onboarding-store';
 import ExpandableImage from '../ExpandableImage';
 
 interface Props {
   emit(event: AppEvent): unknown;
-  os: 'catalina' | 'bigSurOrMonterey' | 'venturaOrLater';
+  os: OSGroup;
   step:
     | 'allowNotifications_start'
     | 'allowNotifications_grant'
@@ -82,7 +82,8 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
             </div>
           </div>
           <ExpandableImage
-            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/venturaOrLater/allow-notifications.gif"
+            fileName="allow-notifications.gif"
+            os={os}
             alt={`Grant permission`}
             width={800 / 2}
             height={600 / 2}

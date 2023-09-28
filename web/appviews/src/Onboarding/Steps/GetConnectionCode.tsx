@@ -1,13 +1,14 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import type { AppEvent } from '../onboarding-store';
+import type { AppEvent, OSGroup } from '../onboarding-store';
 import ExpandableImage from '../ExpandableImage';
 
 interface Props {
   emit: (event: AppEvent) => unknown;
+  os: OSGroup;
 }
 
-const GetConnectionCode: React.FC<Props> = ({ emit }) => (
+const GetConnectionCode: React.FC<Props> = ({ emit, os }) => (
   <div className="flex flex-row items-center justify-center h-full p-12 gap-12 relative">
     <div>
       <h1 className="text-3xl font-bold">Get Connection Code</h1>
@@ -38,10 +39,11 @@ const GetConnectionCode: React.FC<Props> = ({ emit }) => (
       </div>
     </div>
     <ExpandableImage
-      src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/get-connection-code.png"
+      fileName="get-connection-code.png"
+      os={os}
       alt="Get connection code"
-      width={400}
-      height={260}
+      width={800 / 2}
+      height={600 / 2}
       showInstructions
     />
   </div>

@@ -1,12 +1,12 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import type { AppEvent } from '../onboarding-store';
+import type { AppEvent, OSGroup } from '../onboarding-store';
 import Callout from '../Callout';
 import ExpandableImage from '../ExpandableImage';
 
 interface Props {
   emit(event: AppEvent): unknown;
-  os: 'catalina' | 'bigSurOrMonterey' | 'venturaOrLater';
+  os: OSGroup;
   step:
     | 'allowKeylogging_required'
     | 'allowKeylogging_openSysSettings'
@@ -90,7 +90,8 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
             </div>
           </div>
           <ExpandableImage
-            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/venturaOrLater/accessibility-access.png"
+            fileName="accessibility-access.png"
+            os={os}
             alt={`Grant permission`}
             width={640 / 2}
             height={490 / 2}
@@ -105,7 +106,8 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
             Now, in the {systemSettings} app, follow the steps shown below.
           </p>
           <ExpandableImage
-            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/screen-recording-add-gertrude.gif"
+            fileName="screen-recording-add-gertrude.gif"
+            os={os}
             alt={`Grant permission`}
             width={900 / 2}
             height={650 / 2}

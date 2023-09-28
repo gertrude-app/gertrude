@@ -1,13 +1,14 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import type { AppEvent } from '../onboarding-store';
+import type { AppEvent, OSGroup } from '../onboarding-store';
 import ExpandableImage from '../ExpandableImage';
 
 interface Props {
   emit: (event: AppEvent) => unknown;
+  os: OSGroup;
 }
 
-const LocateMenuBarIcon: React.FC<Props> = ({ emit }) => (
+const LocateMenuBarIcon: React.FC<Props> = ({ emit, os }) => (
   <div className="flex flex-col justify-center items-center h-full p-12">
     <h1 className="text-3xl font-bold">Find the menu bar icon</h1>
     <p className="mt-4 mb-2 text-slate-500 text-lg text-center max-w-2xl">
@@ -18,7 +19,8 @@ const LocateMenuBarIcon: React.FC<Props> = ({ emit }) => (
       Look up in the top right corner of your screen to find it, and give it a click.
     </p>
     <ExpandableImage
-      src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/menu-bar-icon.png"
+      fileName="menu-bar-icon.png"
+      os={os}
       alt={`Locate menu bar icon`}
       width={560}
       height={220}

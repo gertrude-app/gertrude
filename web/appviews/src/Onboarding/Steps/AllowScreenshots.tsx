@@ -1,12 +1,12 @@
 import React from 'react';
 import { Button } from '@shared/components';
-import type { AppEvent } from '../onboarding-store';
+import type { AppEvent, OSGroup } from '../onboarding-store';
 import Callout from '../Callout';
 import ExpandableImage from '../ExpandableImage';
 
 interface Props {
   emit(event: AppEvent): unknown;
-  os: 'catalina' | 'bigSurOrMonterey' | 'venturaOrLater';
+  os: OSGroup;
   step:
     | 'allowScreenshots_required'
     | 'allowScreenshots_openSysSettings'
@@ -88,7 +88,8 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
             </div>
           </div>
           <ExpandableImage
-            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/venturaOrLater/accessibility-access.png"
+            fileName="accessibility-access.png"
+            os={os}
             alt={`Grant permission`}
             width={640 / 2}
             height={490 / 2}
@@ -104,7 +105,8 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
             screen will open again when it restarts.
           </p>
           <ExpandableImage
-            src="https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/venturaOrLater/allow-screen-recording.gif"
+            fileName="allow-screen-recording.gif"
+            os={os}
             alt={`Allow screenshots`}
             width={800 / 2}
             height={600 / 2}
