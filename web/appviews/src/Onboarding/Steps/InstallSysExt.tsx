@@ -9,7 +9,7 @@ interface Props {
   os: OSGroup;
   step:
     | 'installSysExt_explain'
-    | 'installSysExt_allowInstall'
+    | 'installSysExt_allow'
     | 'installSysExt_allowFiltering'
     | 'installSysExt_failed'
     | 'installSysExt_success';
@@ -40,7 +40,7 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
           </Onboarding.PrimaryButton>
         </Onboarding.Centered>
       );
-    case `installSysExt_allowInstall`:
+    case `installSysExt_allow`:
       return (
         <Onboarding.Centered className="gap-12" direction="row">
           <div className="flex flex-col">

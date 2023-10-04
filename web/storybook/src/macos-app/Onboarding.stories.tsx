@@ -11,18 +11,17 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 export const Welcome: Story = props({
+  windowOpen: true,
   os: `venturaOrLater`,
   step: `welcome`,
   connectChildRequest: { state: `idle` },
   screenRecordingPermissionGranted: false,
   keyloggingPermissionGranted: false,
-  macOSUser: {
-    current: { id: 502, name: `Suzy`, isAdmin: false },
-    list: [
-      { id: 501, name: `Bob McParent`, isAdmin: true },
-      { id: 502, name: `Suzy`, isAdmin: false },
-    ],
-  },
+  currentUser: { id: 502, name: `Suzy`, isAdmin: false },
+  users: [
+    { id: 501, name: `Bob McParent`, isAdmin: true },
+    { id: 502, name: `Suzy`, isAdmin: false },
+  ],
   connectionCode: ``,
 });
 
@@ -44,60 +43,42 @@ export const MacUserGood: Story = props({
 export const MacUserGood2: Story = props({
   ...Welcome.args,
   step: `macosUserAccountType`,
-  macOSUser: {
-    ...Welcome.args.macOSUser,
-    list: [
-      { id: 501, name: `Bob McParent`, isAdmin: true },
-      { id: 504, name: `Betsy`, isAdmin: true },
-    ],
-  },
+  users: [
+    { id: 501, name: `Bob McParent`, isAdmin: true },
+    { id: 504, name: `Betsy`, isAdmin: true },
+  ],
 });
 
 export const MacUserBad: Story = props({
   ...Welcome.args,
   step: `macosUserAccountType`,
-  macOSUser: {
-    current: { id: 501, name: `Bob McParent`, isAdmin: true },
-    list: [{ id: 501, name: `Bob McParent`, isAdmin: true }],
-  },
+  currentUser: { id: 501, name: `Bob McParent`, isAdmin: true },
+  users: [{ id: 501, name: `Bob McParent`, isAdmin: true }],
 });
 
 export const MacUserChoose: Story = props({
   ...MacUserBad.args,
-  macOSUser: {
-    ...MacUserBad.args.macOSUser,
-    remediationStep: `choose`,
-    current: { id: 501, name: `Bob McParent`, isAdmin: true },
-    list: [
-      { id: 501, name: `Bob McParent`, isAdmin: true },
-      { id: 502, name: `Sally McMom`, isAdmin: true },
-      { id: 502, name: `Little Jimmy`, isAdmin: false },
-    ],
-  },
+  userRemediationStep: `choose`,
+  users: [
+    { id: 501, name: `Bob McParent`, isAdmin: true },
+    { id: 502, name: `Sally McMom`, isAdmin: true },
+    { id: 502, name: `Little Jimmy`, isAdmin: false },
+  ],
 });
 
 export const MacUserTutorialCreate: Story = props({
   ...MacUserBad.args,
-  macOSUser: {
-    ...MacUserBad.args.macOSUser,
-    remediationStep: `create`,
-  },
+  userRemediationStep: `create`,
 });
 
 export const MacUserTutorialSwitch: Story = props({
   ...MacUserBad.args,
-  macOSUser: {
-    ...MacUserBad.args.macOSUser,
-    remediationStep: `switch`,
-  },
+  userRemediationStep: `switch`,
 });
 
 export const MacUserTutorialDemote: Story = props({
   ...MacUserBad.args,
-  macOSUser: {
-    ...MacUserBad.args.macOSUser,
-    remediationStep: `demote`,
-  },
+  userRemediationStep: `demote`,
 });
 
 export const GetConnectionCode: Story = props({
@@ -195,7 +176,7 @@ export const InstallSysExtExplain: Story = props({
 
 export const InstallSysExtAllowInstall: Story = props({
   ...Welcome.args,
-  step: `installSysExt_allowInstall`,
+  step: `installSysExt_allow`,
 });
 
 export const InstallSysExtFail: Story = props({

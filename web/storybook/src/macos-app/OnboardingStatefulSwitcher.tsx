@@ -73,9 +73,9 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`installSysExt_explain`);
             break;
           case `installSysExt_explain`:
-            setStep(`installSysExt_allowInstall`);
+            setStep(`installSysExt_allow`);
             break;
-          case `installSysExt_allowInstall`:
+          case `installSysExt_allow`:
             setStep(`installSysExt_failed`);
             break;
           case `installSysExt_failed`:
@@ -272,11 +272,11 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           }
         />
         <OnboardingPage
-          step="installSysExt_allowInstall"
+          step="installSysExt_allow"
           component={
             <Step.InstallSysExt
               os={`venturaOrLater`}
-              step="installSysExt_allowInstall"
+              step="installSysExt_allow"
               emit={() => {}}
             />
           }

@@ -14,7 +14,7 @@ interface Emit {
 
 interface Props extends Emit {
   users: Array<MacOSUser>;
-  current: MacOSUser;
+  current?: MacOSUser;
   remediationStep?: UserRemediationStep;
 }
 
@@ -29,7 +29,7 @@ const MacOSUserAccountType: React.FC<Props> = ({
   const demotable = admins.length > 1 ? [...admins] : [];
 
   let body: JSX.Element;
-  if (!current.isAdmin) {
+  if (current?.isAdmin) {
     body = <HappyPath emit={emit} adminUsers={admins} userName={current.name} />;
   } else {
     switch (remediationStep) {

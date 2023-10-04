@@ -14,7 +14,9 @@ export const Onboarding: React.FC<Props> = ({
   connectionCode,
   step,
   connectChildRequest,
-  macOSUser,
+  currentUser,
+  userRemediationStep,
+  users,
   os,
 }) => (
   <StepSwitcher step={step}>
@@ -31,13 +33,13 @@ export const Onboarding: React.FC<Props> = ({
       step="macosUserAccountType"
       component={
         <Step.MacosUserAccountType
-          current={macOSUser.current}
-          users={macOSUser.list}
-          remediationStep={macOSUser.remediationStep}
+          current={currentUser}
+          users={users}
+          remediationStep={userRemediationStep}
           emit={emit}
         />
       }
-      confetti={!macOSUser.current.isAdmin}
+      confetti={currentUser?.isAdmin === false}
     />
     <OnboardingPage
       step="getChildConnectionCode"
@@ -146,10 +148,8 @@ export const Onboarding: React.FC<Props> = ({
       component={<Step.InstallSysExt os={os} step="installSysExt_explain" emit={emit} />}
     />
     <OnboardingPage
-      step="installSysExt_allowInstall"
-      component={
-        <Step.InstallSysExt os={os} step="installSysExt_allowInstall" emit={emit} />
-      }
+      step="installSysExt_allow"
+      component={<Step.InstallSysExt os={os} step="installSysExt_allow" emit={emit} />}
     />
     <OnboardingPage
       step="installSysExt_failed"
