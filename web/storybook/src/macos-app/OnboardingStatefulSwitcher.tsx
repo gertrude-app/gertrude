@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import StepSwitcher, {
   OnboardingPage,
 } from '@macos/appviews/src/Onboarding/StepSwitcher';
@@ -6,8 +6,8 @@ import * as Step from '@macos/appviews/src/Onboarding/Steps';
 import type { OnboardingStep } from '@macos/appviews/src/Onboarding/onboarding-store';
 
 const OnboardingStatefulSwitcher: React.FC = () => {
-  const [step, setStep] = React.useState<OnboardingStep>(`welcome`);
-  const [connectChildState, setConnectChildState] = React.useState<
+  const [step, setStep] = useState<OnboardingStep>(`welcome`);
+  const [connectChildState, setConnectChildState] = useState<
     'idle' | 'ongoing' | 'failed' | 'succeeded'
   >(`idle`);
 
@@ -99,16 +99,13 @@ const OnboardingStatefulSwitcher: React.FC = () => {
         }
       }}
     >
-      <StepSwitcher step={step}>
-        <OnboardingPage step="welcome" component={<Step.Welcome emit={() => {}} />} />
+      <StepSwitcher>
+        <OnboardingPage step="welcome" component={<Step.Welcome />} />
         <OnboardingPage
           step="confirmGertrudeAccount"
-          component={<Step.ConfirmGertrudeAccount emit={() => {}} />}
+          component={<Step.ConfirmGertrudeAccount />}
         />
-        <OnboardingPage
-          step="noGertrudeAccount"
-          component={<Step.NoGertrudeAccount emit={() => {}} />}
-        />
+        <OnboardingPage step="noGertrudeAccount" component={<Step.NoGertrudeAccount />} />
         <OnboardingPage
           step="macosUserAccountType"
           component={
@@ -118,14 +115,13 @@ const OnboardingStatefulSwitcher: React.FC = () => {
                 { id: 501, name: `Bob McParent`, isAdmin: true },
                 { id: 502, name: `Suzy`, isAdmin: false },
               ]}
-              emit={() => {}}
             />
           }
           confetti
         />
         <OnboardingPage
           step="getChildConnectionCode"
-          component={<Step.GetConnectionCode emit={() => {}} os="venturaOrLater" />}
+          component={<Step.GetConnectionCode />}
         />
         <OnboardingPage
           step="connectChild"
@@ -133,8 +129,6 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             <Step.ConnectChild
               connectionCode={`123456`}
               request={{ case: connectChildState, payload: `Suzy` }}
-              dispatch={() => {}}
-              emit={() => {}}
             />
           }
           confetti={connectChildState === `succeeded`}
@@ -142,179 +136,74 @@ const OnboardingStatefulSwitcher: React.FC = () => {
         />
         <OnboardingPage
           step="allowNotifications_start"
-          component={
-            <Step.AllowNotifications
-              os={`venturaOrLater`}
-              step="allowNotifications_start"
-              emit={() => {}}
-            />
-          }
+          component={<Step.AllowNotifications step="allowNotifications_start" />}
         />
         <OnboardingPage
           step="allowNotifications_grant"
-          component={
-            <Step.AllowNotifications
-              os={`venturaOrLater`}
-              step="allowNotifications_grant"
-              emit={() => {}}
-            />
-          }
+          component={<Step.AllowNotifications step="allowNotifications_grant" />}
         />
         <OnboardingPage
           step="allowNotifications_failed"
-          component={
-            <Step.AllowNotifications
-              os={`venturaOrLater`}
-              step="allowNotifications_failed"
-              emit={() => {}}
-            />
-          }
+          component={<Step.AllowNotifications step="allowNotifications_failed" />}
         />
         <OnboardingPage
           step="allowScreenshots_required"
-          component={
-            <Step.AllowScreenshots
-              os={`venturaOrLater`}
-              step="allowScreenshots_required"
-              emit={() => {}}
-            />
-          }
+          component={<Step.AllowScreenshots step="allowScreenshots_required" />}
         />
         <OnboardingPage
           step="allowScreenshots_openSysSettings"
-          component={
-            <Step.AllowScreenshots
-              os={`venturaOrLater`}
-              step="allowScreenshots_openSysSettings"
-              emit={() => {}}
-            />
-          }
+          component={<Step.AllowScreenshots step="allowScreenshots_openSysSettings" />}
         />
         <OnboardingPage
           step="allowScreenshots_grantAndRestart"
-          component={
-            <Step.AllowScreenshots
-              os={`venturaOrLater`}
-              step="allowScreenshots_grantAndRestart"
-              emit={() => {}}
-            />
-          }
+          component={<Step.AllowScreenshots step="allowScreenshots_grantAndRestart" />}
         />
         <OnboardingPage
           step="allowScreenshots_success"
-          component={
-            <Step.AllowScreenshots
-              os={`venturaOrLater`}
-              step="allowScreenshots_success"
-              emit={() => {}}
-            />
-          }
+          component={<Step.AllowScreenshots step="allowScreenshots_success" />}
           confetti
         />
         <OnboardingPage
           step="allowScreenshots_failed"
-          component={
-            <Step.AllowScreenshots
-              os={`venturaOrLater`}
-              step="allowScreenshots_failed"
-              emit={() => {}}
-            />
-          }
+          component={<Step.AllowScreenshots step="allowScreenshots_failed" />}
         />
         <OnboardingPage
           step="allowKeylogging_required"
-          component={
-            <Step.AllowKeylogging
-              os={`venturaOrLater`}
-              step="allowKeylogging_required"
-              emit={() => {}}
-            />
-          }
+          component={<Step.AllowKeylogging step="allowKeylogging_required" />}
         />
         <OnboardingPage
           step="allowKeylogging_openSysSettings"
-          component={
-            <Step.AllowKeylogging
-              os={`venturaOrLater`}
-              step="allowKeylogging_openSysSettings"
-              emit={() => {}}
-            />
-          }
+          component={<Step.AllowKeylogging step="allowKeylogging_openSysSettings" />}
         />
         <OnboardingPage
           step="allowKeylogging_grant"
-          component={
-            <Step.AllowKeylogging
-              os={`venturaOrLater`}
-              step="allowKeylogging_grant"
-              emit={() => {}}
-            />
-          }
+          component={<Step.AllowKeylogging step="allowKeylogging_grant" />}
         />
         <OnboardingPage
           step="allowKeylogging_failed"
-          component={
-            <Step.AllowKeylogging
-              os={`venturaOrLater`}
-              step="allowKeylogging_failed"
-              emit={() => {}}
-            />
-          }
+          component={<Step.AllowKeylogging step="allowKeylogging_failed" />}
         />
         <OnboardingPage
           step="installSysExt_explain"
-          component={
-            <Step.InstallSysExt
-              os={`venturaOrLater`}
-              step="installSysExt_explain"
-              emit={() => {}}
-            />
-          }
+          component={<Step.InstallSysExt step="installSysExt_explain" />}
         />
         <OnboardingPage
           step="installSysExt_allow"
-          component={
-            <Step.InstallSysExt
-              os={`venturaOrLater`}
-              step="installSysExt_allow"
-              emit={() => {}}
-            />
-          }
+          component={<Step.InstallSysExt step="installSysExt_allow" />}
         />
         <OnboardingPage
           step="installSysExt_failed"
-          component={
-            <Step.InstallSysExt
-              os={`venturaOrLater`}
-              step="installSysExt_failed"
-              emit={() => {}}
-            />
-          }
+          component={<Step.InstallSysExt step="installSysExt_failed" />}
         />
         <OnboardingPage
           step="installSysExt_success"
-          component={
-            <Step.InstallSysExt
-              os={`venturaOrLater`}
-              step="installSysExt_success"
-              emit={() => {}}
-            />
-          }
+          component={<Step.InstallSysExt step="installSysExt_success" />}
           confetti
         />
-        <OnboardingPage
-          step="locateMenuBarIcon"
-          component={<Step.LocateMenuBarIcon emit={() => {}} os="venturaOrLater" />}
-        />
-        <OnboardingPage
-          step="viewHealthCheck"
-          component={<Step.ViewHealthCheck emit={() => {}} os="venturaOrLater" />}
-        />
-        <OnboardingPage
-          step="howToUseGertrude"
-          component={<Step.HowToUseGertrude emit={() => {}} />}
-        />
-        <OnboardingPage step="finish" component={<Step.Finish emit={() => {}} />} />
+        <OnboardingPage step="locateMenuBarIcon" component={<Step.LocateMenuBarIcon />} />
+        <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
+        <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />
+        <OnboardingPage step="finish" component={<Step.Finish />} />
       </StepSwitcher>
     </div>
   );

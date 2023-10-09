@@ -1,12 +1,7 @@
 import React from 'react';
-import type { AppEvent } from '../onboarding-store';
 import * as Onboarding from '../UtilityComponents';
 
-interface Props {
-  emit(event: AppEvent): unknown;
-}
-
-const HowToUseGertrude: React.FC<Props> = ({ emit }) => (
+const HowToUseGertrude: React.FC = () => (
   <Onboarding.Centered>
     <Onboarding.Heading>How to use Gertrude</Onboarding.Heading>
     <Onboarding.Text className="mt-2" centered>
@@ -25,7 +20,7 @@ const HowToUseGertrude: React.FC<Props> = ({ emit }) => (
       title="YouTube video player"
       allowFullScreen
     />
-    <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" emit={emit}>
+    <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right">
       Finish
     </Onboarding.PrimaryButton>
   </Onboarding.Centered>

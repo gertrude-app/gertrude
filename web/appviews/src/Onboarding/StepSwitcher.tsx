@@ -2,18 +2,18 @@ import React, { useContext, useEffect, useState } from 'react';
 import ConfettiExplosion from 'react-confetti-explosion';
 import cx from 'classnames';
 import type { OnboardingStep } from './onboarding-store';
-import CurrentStepContext from './CurrentStepContext';
 import ProgressIndicator from './ProgressIndicator';
+import OnboardingContext from './OnboardingContext';
 
 interface Props {
-  step: OnboardingStep;
   children: React.ReactNode;
 }
 
-const StepSwitcher: React.FC<Props> = ({ step, children }) => {
+const StepSwitcher: React.FC<Props> = ({ children }) => {
   const [expandBlurs, setExpandBlurs] = useState(false);
+  const { currentStep } = useContext(OnboardingContext);
   const progressStep = (() => {
-    switch (step) {
+    switch (currentStep) {
       case `welcome`:
       case `confirmGertrudeAccount`:
       case `noGertrudeAccount`:
@@ -44,45 +44,44 @@ const StepSwitcher: React.FC<Props> = ({ step, children }) => {
   })();
 
   useEffect(() => {
-    if (step === `finish`) {
+    if (currentStep === `finish`) {
       setTimeout(() => {
         setExpandBlurs(true);
       }, 500);
     }
-  }, [step]);
+  }, [currentStep]);
 
   return (
-    <CurrentStepContext.Provider value={step}>
-      <div className="w-screen h-screen relative overflow-hidden bg-slate-50">
-        <div
-          className={cx(
-            `absolute -left-96 -bottom-72 w-152 h-152 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
-            expandBlurs && `scale-[350%]`,
-          )}
-        />
-        <div
-          className={cx(
-            `absolute left-0 -bottom-96 w-152 h-152 [background:radial-gradient(#d946ef56_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
-            expandBlurs && `scale-[350%]`,
-          )}
-        />
-        <div
-          className={cx(
-            `absolute -right-80 -bottom-80 w-152 h-152 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
-            expandBlurs && `scale-[350%]`,
-          )}
-        />
-        {children}
-        <div
-          className={cx(
-            `absolute top-0 left-0 w-full p-5 flex justify-center items-center transition-[opacity,transform] duration-500`,
-            (step === `welcome` || step === `finish`) && `-translate-y-16 opacity-0`,
-          )}
-        >
-          <ProgressIndicator step={progressStep} />
-        </div>
+    <div className="w-screen h-screen relative overflow-hidden bg-slate-50">
+      <div
+        className={cx(
+          `absolute -left-96 -bottom-72 w-152 h-152 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
+          expandBlurs && `scale-[350%]`,
+        )}
+      />
+      <div
+        className={cx(
+          `absolute left-0 -bottom-96 w-152 h-152 [background:radial-gradient(#d946ef56_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
+          expandBlurs && `scale-[350%]`,
+        )}
+      />
+      <div
+        className={cx(
+          `absolute -right-80 -bottom-80 w-152 h-152 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
+          expandBlurs && `scale-[350%]`,
+        )}
+      />
+      {children}
+      <div
+        className={cx(
+          `absolute top-0 left-0 w-full p-5 flex justify-center items-center transition-[opacity,transform] duration-500`,
+          (currentStep === `welcome` || currentStep === `finish`) &&
+            `-translate-y-16 opacity-0`,
+        )}
+      >
+        <ProgressIndicator step={progressStep} />
       </div>
-    </CurrentStepContext.Provider>
+    </div>
   );
 };
 
@@ -101,11 +100,11 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
   confetti,
   confettiDeps,
 }) => {
-  const currentStep = useContext(CurrentStepContext);
+  const { currentStep } = useContext(OnboardingContext);
   const [hasBeenVisited, setHasBeenVisited] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (step === currentStep) {
       setHasBeenVisited(true);
       if (confetti) {

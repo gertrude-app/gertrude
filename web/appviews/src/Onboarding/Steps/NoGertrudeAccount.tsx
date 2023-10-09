@@ -1,13 +1,8 @@
 import React from 'react';
-import type { AppEvent } from '../onboarding-store';
 import QRCode from '../QRCode';
 import * as Onboarding from '../UtilityComponents';
 
-interface Props {
-  emit: (event: AppEvent) => unknown;
-}
-
-const NoGertrudeAccount: React.FC<Props> = ({ emit }) => (
+const NoGertrudeAccount: React.FC = () => (
   <Onboarding.Centered direction="row" className="ml-2 gap-4">
     <div>
       <Onboarding.Heading>No problem, let’s make one!</Onboarding.Heading>
@@ -22,7 +17,6 @@ const NoGertrudeAccount: React.FC<Props> = ({ emit }) => (
       <Onboarding.ButtonGroup
         primary="Done, I have a Gertrude account now"
         secondary={{ text: `I don’t want an account, quit...`, shadow: true }}
-        emit={emit}
         className="mt-6 max-w-md"
       />
     </div>

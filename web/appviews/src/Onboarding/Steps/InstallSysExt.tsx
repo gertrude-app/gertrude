@@ -1,12 +1,10 @@
-import React from 'react';
-import type { AppEvent, OSGroup } from '../onboarding-store';
+import React, { useContext } from 'react';
 import Callout from '../Callout';
 import ExpandableImage from '../ExpandableImage';
 import * as Onboarding from '../UtilityComponents';
+import OnboardingContext from '../OnboardingContext';
 
 interface Props {
-  emit(event: AppEvent): unknown;
-  os: OSGroup;
   step:
     | 'installSysExt_explain'
     | 'installSysExt_allow'
@@ -15,9 +13,8 @@ interface Props {
     | 'installSysExt_success';
 }
 
-const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
-  const systemSettings =
-    os === `venturaOrLater` ? `System Settings` : `System Preferences`;
+const InstallSysExt: React.FC<Props> = ({ step }) => {
+  const { systemSettingsName } = useContext(OnboardingContext);
   switch (step) {
     case `installSysExt_explain`:
       return (
@@ -31,11 +28,7 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
           <Callout heading="Good to know:" type="info">
             <p>You can disable and remove the system extension at any time.</p>
           </Callout>
-          <Onboarding.PrimaryButton
-            emit={emit}
-            icon="fa-solid fa-arrow-right"
-            className="mt-8"
-          >
+          <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" className="mt-8">
             Next
           </Onboarding.PrimaryButton>
         </Onboarding.Centered>
@@ -46,19 +39,17 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
           <div className="flex flex-col">
             <Onboarding.Heading>Allow system extenson</Onboarding.Heading>
             <Onboarding.Text className="my-4 max-w-xl">
-              Next, in the {systemSettings} app follow the steps shown to allow the
+              Next, in the {systemSettingsName} app follow the steps shown to allow the
               installation:
             </Onboarding.Text>
             <Onboarding.ButtonGroup
               primary="Done"
               secondary={{ text: `Help, I'm stuck...`, shadow: true }}
-              emit={emit}
               className="w-80 mt-4"
             />
           </div>
           <ExpandableImage
             fileName="finish-install-sys-ext.gif"
-            os={os}
             alt={`Allow system extension install`}
             width={800 / 2}
             height={600 / 2}
@@ -86,7 +77,6 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
           <Onboarding.ButtonGroup
             primary="Try again"
             secondary={{ text: `Skip install for now...`, shadow: true }}
-            emit={emit}
             className="w-80"
           />
         </Onboarding.Centered>
@@ -102,11 +92,7 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
             You're past all the hard parts, all that's left it to briefly show you around
             a bit.
           </Callout>
-          <Onboarding.PrimaryButton
-            icon="fa-solid fa-arrow-right"
-            emit={emit}
-            className="mt-8"
-          >
+          <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" className="mt-8">
             Next
           </Onboarding.PrimaryButton>
         </Onboarding.Centered>

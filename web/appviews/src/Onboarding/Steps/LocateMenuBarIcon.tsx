@@ -1,14 +1,8 @@
 import React from 'react';
-import type { AppEvent, OSGroup } from '../onboarding-store';
 import ExpandableImage from '../ExpandableImage';
 import * as Onboarding from '../UtilityComponents';
 
-interface Props {
-  emit: (event: AppEvent) => unknown;
-  os: OSGroup;
-}
-
-const LocateMenuBarIcon: React.FC<Props> = ({ emit, os }) => (
+const LocateMenuBarIcon: React.FC = () => (
   <Onboarding.Centered>
     <Onboarding.Heading>Find the menu bar icon</Onboarding.Heading>
     <Onboarding.Text className="mt-4 mb-3 max-w-2xl" centered>
@@ -22,7 +16,6 @@ const LocateMenuBarIcon: React.FC<Props> = ({ emit, os }) => (
       fileName="locate-menubar-icon.gif"
       lessRounded
       showInstructions={false}
-      os={os}
       alt={`Locate menu bar icon`}
       width={798 / 1.9}
       height={600 / 1.9}
@@ -30,7 +23,6 @@ const LocateMenuBarIcon: React.FC<Props> = ({ emit, os }) => (
     <Onboarding.PrimaryButton
       icon="fa-solid fa-arrow-right"
       className="mt-6 translate-y-2"
-      emit={emit}
     >
       Found it, next
     </Onboarding.PrimaryButton>

@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import cx from 'classnames';
-import type { OSGroup } from './onboarding-store';
 import useWindowWidth from '../lib/hooks';
+import OnboardingContext from './OnboardingContext';
 
 interface Props {
   fileName: string;
-  os: OSGroup;
   alt: string;
   width: number;
   height: number;
@@ -16,7 +15,6 @@ interface Props {
 
 const ExpandableImage: React.FC<Props> = ({
   fileName,
-  os,
   alt,
   width,
   height,
@@ -24,6 +22,7 @@ const ExpandableImage: React.FC<Props> = ({
   lessRounded = false,
   className,
 }) => {
+  const { os } = useContext(OnboardingContext);
   const [imageExpanded, setImageExpanded] = useState(false);
   const [imageFrameCoords, setImageFrameCoords] = useState({ x: 0, y: 0 });
   const [hasBeenExpanded, setHasBeenExpanded] = useState(false);

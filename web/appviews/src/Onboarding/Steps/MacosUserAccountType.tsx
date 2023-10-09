@@ -1,45 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Button } from '@shared/components';
-import type { AppEvent, MacOSUser, UserRemediationStep } from '../onboarding-store';
+import type { MacOSUser, UserRemediationStep } from '../onboarding-store';
 import TellMeMoreButton from '../TellMeMoreButton';
 import InformationModal from '../InformationModal';
 import QRCode from '../QRCode';
 import Callout from '../Callout';
 import * as Onboarding from '../UtilityComponents';
+import OnboardingContext from '../OnboardingContext';
 
-interface Emit {
-  emit(event: AppEvent): unknown;
-}
-
-interface Props extends Emit {
+interface Props {
   users: Array<MacOSUser>;
   current?: MacOSUser;
   remediationStep?: UserRemediationStep;
 }
 
-const MacOSUserAccountType: React.FC<Props> = ({
-  emit,
-  users,
-  current,
-  remediationStep,
-}) => {
+const MacOSUserAccountType: React.FC<Props> = ({ users, current, remediationStep }) => {
   const admins = users.filter((u) => u.isAdmin).map((u) => u.name);
   const nonAdmins = users.filter((u) => !u.isAdmin).map((u) => u.name);
   const demotable = admins.length > 1 ? [...admins] : [];
 
   let body: JSX.Element;
   if (current?.isAdmin === false) {
-    body = <HappyPath emit={emit} adminUsers={admins} userName={current.name} />;
+    body = <HappyPath adminUsers={admins} userName={current.name} />;
   } else {
     switch (remediationStep) {
       case undefined:
-        body = <WarnUserIsAdmin emit={emit} />;
+        body = <WarnUserIsAdmin />;
         break;
 
       case `choose`:
-        body = (
-          <ChooseRemediation emit={emit} nonAdmins={nonAdmins} demotable={demotable} />
-        );
+        body = <ChooseRemediation nonAdmins={nonAdmins} demotable={demotable} />;
         break;
 
       case `create`:
@@ -55,13 +45,12 @@ const MacOSUserAccountType: React.FC<Props> = ({
 
 export default MacOSUserAccountType;
 
-type ChooseRemediationProps = Emit & {
+type ChooseRemediationProps = {
   nonAdmins: string[];
   demotable: string[];
 };
 
 const ChooseRemediation: React.FC<ChooseRemediationProps> = ({
-  emit,
   demotable,
   nonAdmins,
 }) => {
@@ -77,10 +66,7 @@ const ChooseRemediation: React.FC<ChooseRemediationProps> = ({
       </Onboarding.Text>
       <ol className="flex flex-col gap-4">
         {canSwitch && (
-          <PossibleRemediation
-            emit={emit}
-            buttonAction="chooseSwitchToNonAdminUserClicked"
-          >
+          <PossibleRemediation buttonAction="chooseSwitchToNonAdminUserClicked">
             {nonAdmins.length === 1
               ? `Have your child always use the existing non-admin user `
               : `Have your child always use one of the the non-admin users: `}
@@ -88,14 +74,14 @@ const ChooseRemediation: React.FC<ChooseRemediationProps> = ({
           </PossibleRemediation>
         )}
         {canDemote && (
-          <PossibleRemediation emit={emit} buttonAction="chooseDemoteAdminClicked">
+          <PossibleRemediation buttonAction="chooseDemoteAdminClicked">
             {demotable.length === 1
               ? `Remove the admin privilege from the existing user `
               : `Remove the admin privilege from one of these existing users: `}
             <b>{demotable.join(`, `)}</b> and have your child always login as that user.
           </PossibleRemediation>
         )}
-        <PossibleRemediation emit={emit} buttonAction="chooseCreateNonAdminClicked">
+        <PossibleRemediation buttonAction="chooseCreateNonAdminClicked">
           Create a <b>new non-admin user</b> for your child to always log in with.
         </PossibleRemediation>
       </ol>
@@ -121,7 +107,7 @@ const StartRemediation: React.FC<StartRemediationProps> = ({ action }) => {
       break;
     case `demote`:
       lead = `Removing admin privileges for the macOS user your child uses will allow Gertrude to safely do its job.`;
-      tutorialSlug = `h3`;
+      tutorialSlug = `h3`; // eslint-disable-line
       break;
   }
   return (
@@ -156,8 +142,9 @@ const AboutUsers: React.FC = () => (
   </>
 );
 
-const WarnUserIsAdmin: React.FC<Emit> = ({ emit }) => {
+const WarnUserIsAdmin: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
+  const { emit } = useContext(OnboardingContext);
   return (
     <Onboarding.Centered className="relative">
       <InformationModal open={showModal} setOpen={setShowModal}>
@@ -188,20 +175,20 @@ const WarnUserIsAdmin: React.FC<Emit> = ({ emit }) => {
         secondary={{
           text: `I understand the risks, proceed anyway...`,
         }}
-        emit={emit}
         className="mt-8"
       />
     </Onboarding.Centered>
   );
 };
 
-interface HappyPathProps extends Emit {
+interface HappyPathProps {
   adminUsers: string[];
   userName: string;
 }
 
-const HappyPath: React.FC<HappyPathProps> = ({ emit, userName, adminUsers }) => {
+const HappyPath: React.FC<HappyPathProps> = ({ userName, adminUsers }) => {
   const [showModal, setShowModal] = useState(false);
+  const { emit } = useContext(OnboardingContext);
   return (
     <Onboarding.Centered className="relative">
       <InformationModal open={showModal} setOpen={setShowModal}>
@@ -237,14 +224,14 @@ const HappyPath: React.FC<HappyPathProps> = ({ emit, userName, adminUsers }) => 
         {` `}
         user, or else they could disable Gertrude.
       </Callout>
-      <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" emit={emit}>
+      <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right">
         Continue
       </Onboarding.PrimaryButton>
     </Onboarding.Centered>
   );
 };
 
-type PossibleRemediationProps = Emit & {
+type PossibleRemediationProps = {
   buttonAction:
     | 'chooseCreateNonAdminClicked'
     | 'chooseSwitchToNonAdminUserClicked'
@@ -253,20 +240,22 @@ type PossibleRemediationProps = Emit & {
 };
 
 const PossibleRemediation: React.FC<PossibleRemediationProps> = ({
-  emit,
   buttonAction,
   children,
-}) => (
-  <li className="bg-white shadow-md shadow-slate-300/30 rounded-2xl flex flex-col max-w-3xl">
-    <p className="text-slate-600 p-6 pb-2 text-lg">{children}</p>
-    <Button
-      color="secondary"
-      size="medium"
-      type="button"
-      onClick={() => emit({ case: buttonAction })}
-      className="self-end m-4 mt-0"
-    >
-      Show me how <i className="fa-solid fa-arrow-right ml-2" />
-    </Button>
-  </li>
-);
+}) => {
+  const { emit } = useContext(OnboardingContext);
+  return (
+    <li className="bg-white shadow-md shadow-slate-300/30 rounded-2xl flex flex-col max-w-3xl">
+      <p className="text-slate-600 p-6 pb-2 text-lg">{children}</p>
+      <Button
+        color="secondary"
+        size="medium"
+        type="button"
+        onClick={() => emit({ case: buttonAction })}
+        className="self-end m-4 mt-0"
+      >
+        Show me how <i className="fa-solid fa-arrow-right ml-2" />
+      </Button>
+    </li>
+  );
+};

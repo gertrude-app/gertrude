@@ -1,14 +1,8 @@
 import React from 'react';
-import type { AppEvent, OSGroup } from '../onboarding-store';
 import ExpandableImage from '../ExpandableImage';
 import * as Onboarding from '../UtilityComponents';
 
-interface Props {
-  emit: (event: AppEvent) => unknown;
-  os: OSGroup;
-}
-
-const GetConnectionCode: React.FC<Props> = ({ emit, os }) => (
+const GetConnectionCode: React.FC = () => (
   <Onboarding.Centered direction="row" className="gap-12">
     <div>
       <Onboarding.Heading>Get Connection Code</Onboarding.Heading>
@@ -21,12 +15,10 @@ const GetConnectionCode: React.FC<Props> = ({ emit, os }) => (
       <Onboarding.ButtonGroup
         primary="Got it, next"
         secondary={{ text: `Help, I’m stuck...` }}
-        emit={emit}
       />
     </div>
     <ExpandableImage
       fileName="get-connection-code.png"
-      os={os}
       alt="Get connection code"
       width={682 / 2}
       height={443 / 2}

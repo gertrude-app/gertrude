@@ -1,15 +1,9 @@
 import React from 'react';
-import type { AppEvent, OSGroup } from '../onboarding-store';
 import ExpandableImage from '../ExpandableImage';
 import Callout from '../Callout';
 import * as Onboarding from '../UtilityComponents';
 
-interface Props {
-  emit: (event: AppEvent) => unknown;
-  os: OSGroup;
-}
-
-const ViewHealthCheck: React.FC<Props> = ({ emit, os }) => (
+const ViewHealthCheck: React.FC = () => (
   <Onboarding.Centered className="gap-12" direction="row">
     <div>
       <Onboarding.Heading>Admin health check</Onboarding.Heading>
@@ -22,18 +16,13 @@ const ViewHealthCheck: React.FC<Props> = ({ emit, os }) => (
         The health check screen will show a warning about having <b>zero keys.</b>
         {` `}That’s expected, since you’re just getting setup.
       </Callout>
-      <Onboarding.PrimaryButton
-        icon="fa-solid fa-arrow-right"
-        className="mt-8"
-        emit={emit}
-      >
+      <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" className="mt-8">
         Found it, next
       </Onboarding.PrimaryButton>
     </div>
     <ExpandableImage
       fileName="administrate.png"
       lessRounded
-      os={os}
       alt="Admin health check screen"
       width={800 * 0.45}
       height={600 * 0.45}

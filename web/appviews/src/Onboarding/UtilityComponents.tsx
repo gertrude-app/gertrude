@@ -1,51 +1,50 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import cx from 'classnames';
 import { Button } from '@shared/components';
-import type { AppEvent } from './onboarding-store';
+import OnboardingContext from './OnboardingContext';
 
 interface ButtonProps {
   children: React.ReactNode;
   icon?: string;
-  emit: (event: AppEvent) => unknown;
   className?: string;
 }
 
-export const PrimaryButton: React.FC<ButtonProps> = ({
-  children,
-  icon,
-  emit,
-  className,
-}) => (
-  <Button
-    type="button"
-    color="primary"
-    size="large"
-    onClick={() => emit({ case: `primaryBtnClicked` })}
-    className={className}
-  >
-    {children}
-    {icon && <i className={cx(icon, `ml-3`)} />}
-  </Button>
-);
+export const PrimaryButton: React.FC<ButtonProps> = ({ children, icon, className }) => {
+  const { emit } = useContext(OnboardingContext);
+  return (
+    <Button
+      type="button"
+      color="primary"
+      size="large"
+      onClick={() => emit({ case: `primaryBtnClicked` })}
+      className={className}
+    >
+      {children}
+      {icon && <i className={cx(icon, `ml-3`)} />}
+    </Button>
+  );
+};
 
 export const SecondaryButton: React.FC<ButtonProps & { shadow?: boolean }> = ({
   children,
   icon,
-  emit,
   shadow,
   className,
-}) => (
-  <Button
-    type="button"
-    color="secondary"
-    size="large"
-    onClick={() => emit({ case: `secondaryBtnClicked` })}
-    className={cx(shadow && `shadow shadow-violet-200/80`, className)}
-  >
-    {children}
-    {icon && <i className={cx(icon, `ml-3`)} />}
-  </Button>
-);
+}) => {
+  const { emit } = useContext(OnboardingContext);
+  return (
+    <Button
+      type="button"
+      color="secondary"
+      size="large"
+      onClick={() => emit({ case: `secondaryBtnClicked` })}
+      className={cx(shadow && `shadow shadow-violet-200/80`, className)}
+    >
+      {children}
+      {icon && <i className={cx(icon, `ml-3`)} />}
+    </Button>
+  );
+};
 
 interface ButtonGroupProps {
   primary: string | { text: string; icon: string | false };
@@ -56,7 +55,6 @@ interface ButtonGroupProps {
   };
   direction?: 'row' | 'column';
   className?: string;
-  emit: (event: AppEvent) => unknown;
 }
 
 export const ButtonGroup: React.FC<ButtonGroupProps> = ({
@@ -64,13 +62,11 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   secondary,
   direction = `column`,
   className,
-  emit,
 }) => (
   <div
     className={cx(`flex gap-4`, direction === `row` ? `flex-row` : `flex-col`, className)}
   >
     <PrimaryButton
-      emit={emit}
       icon={
         typeof primary === `string`
           ? `fa-solid fa-arrow-right`
@@ -79,7 +75,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
     >
       {typeof primary === `string` ? primary : primary.text}
     </PrimaryButton>
-    <SecondaryButton emit={emit} icon={secondary.icon} shadow={secondary.shadow}>
+    <SecondaryButton icon={secondary.icon} shadow={secondary.shadow}>
       {secondary.text}
     </SecondaryButton>
   </div>

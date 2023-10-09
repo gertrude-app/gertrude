@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import cx from 'classnames';
-import type { AppEvent } from '../onboarding-store';
+import OnboardingContext from '../OnboardingContext';
 
-interface Props {
-  emit: (event: AppEvent) => unknown;
-}
-
-const Welcome: React.FC<Props> = ({ emit }) => {
+const Welcome: React.FC = () => {
+  const { emit } = useContext(OnboardingContext);
   const [loaded, setLoaded] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
 

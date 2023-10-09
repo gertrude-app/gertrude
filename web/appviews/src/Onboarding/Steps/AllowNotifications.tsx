@@ -1,20 +1,17 @@
-import React from 'react';
-import type { AppEvent, OSGroup } from '../onboarding-store';
+import React, { useContext } from 'react';
 import ExpandableImage from '../ExpandableImage';
 import * as Onboarding from '../UtilityComponents';
+import OnboardingContext from '../OnboardingContext';
 
 interface Props {
-  emit(event: AppEvent): unknown;
-  os: OSGroup;
   step:
     | 'allowNotifications_start'
     | 'allowNotifications_grant'
     | 'allowNotifications_failed';
 }
 
-const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
-  const systemSettings =
-    os === `venturaOrLater` ? `System Settings` : `System Preferences`;
+const AllowNotifications: React.FC<Props> = ({ step }) => {
+  const { systemSettingsName } = useContext(OnboardingContext);
   switch (step) {
     case `allowNotifications_start`:
       return (
@@ -30,9 +27,8 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
             className="rounded-xl mb-8"
           />
           <Onboarding.ButtonGroup
-            primary={`Open ${systemSettings}`}
+            primary={`Open ${systemSettingsName}`}
             secondary={{ text: `Skip this step`, shadow: true }}
-            emit={emit}
             direction="row"
           />
         </Onboarding.Centered>
@@ -43,20 +39,18 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
           <div className="flex flex-col">
             <Onboarding.Heading>Set notifications to "Alerts"</Onboarding.Heading>
             <Onboarding.Text className="mt-4 max-w-xl">
-              We just opened the {systemSettings} app. Set Gertrude's notifications to
+              We just opened the {systemSettingsName} app. Set Gertrude's notifications to
               {` `}
               <b>Alerts</b> as shown here:
             </Onboarding.Text>
             <Onboarding.ButtonGroup
               primary="Done"
               secondary={{ text: `Help...`, shadow: true }}
-              emit={emit}
               className="mt-8"
             />
           </div>
           <ExpandableImage
             fileName="allow-notifications.gif"
-            os={os}
             alt={`Grant permission`}
             width={800 / 2}
             height={600 / 2}
@@ -83,7 +77,6 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
           <Onboarding.ButtonGroup
             primary="Check again"
             secondary={{ text: `Skip for now`, shadow: true }}
-            emit={emit}
             className="w-80"
           />
         </Onboarding.Centered>

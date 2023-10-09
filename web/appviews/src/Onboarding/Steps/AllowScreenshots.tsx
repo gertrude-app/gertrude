@@ -1,13 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Button } from '@shared/components';
-import type { AppEvent, OSGroup } from '../onboarding-store';
 import Callout from '../Callout';
 import ExpandableImage from '../ExpandableImage';
 import * as Onboarding from '../UtilityComponents';
+import OnboardingContext from '../OnboardingContext';
 
 interface Props {
-  emit(event: AppEvent): unknown;
-  os: OSGroup;
   step:
     | 'allowScreenshots_required'
     | 'allowScreenshots_openSysSettings'
@@ -16,9 +14,8 @@ interface Props {
     | 'allowScreenshots_success';
 }
 
-const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
-  const systemSettings =
-    os === `venturaOrLater` ? `System Settings` : `System Preferences`;
+const AllowScreenshots: React.FC<Props> = ({ step }) => {
+  const { systemSettingsName, emit } = useContext(OnboardingContext);
   switch (step) {
     case `allowScreenshots_required`:
       return (
@@ -39,7 +36,6 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
           <Onboarding.ButtonGroup
             primary="Grant permission"
             secondary={{ text: `Skip this step...`, shadow: true }}
-            emit={emit}
             className="mt-8 w-80"
           />
         </Onboarding.Centered>
@@ -48,22 +44,20 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
       return (
         <Onboarding.Centered direction="row" className="gap-12">
           <div className="flex flex-col">
-            <Onboarding.Heading>Open {systemSettings}</Onboarding.Heading>
+            <Onboarding.Heading>Open {systemSettingsName}</Onboarding.Heading>
             <Onboarding.Text className="max-w-lg mt-4">
               Just now, a system popup should have appeared that looks like this. Find it
               and click{` `}
-              <b>Open {systemSettings}.</b>
+              <b>Open {systemSettingsName}.</b>
             </Onboarding.Text>
             <Onboarding.ButtonGroup
               primary="Done"
               secondary={{ text: `I don’t see a popup...`, shadow: true }}
-              emit={emit}
               className="mt-8 w-80"
             />
           </div>
           <ExpandableImage
             fileName="accessibility-access.png"
-            os={os}
             alt={`Grant permission`}
             width={640 / 2}
             height={490 / 2}
@@ -80,7 +74,6 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
           </Onboarding.Text>
           <ExpandableImage
             fileName="allow-screen-recording.gif"
-            os={os}
             alt={`Allow screenshots`}
             width={800 / 1.9}
             height={600 / 1.9}
@@ -104,11 +97,7 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
             <Onboarding.Text className="max-w-xl mt-4" centered>
               Gertrude now has the permission it needs to take screenshots.
             </Onboarding.Text>
-            <Onboarding.PrimaryButton
-              emit={emit}
-              icon="fa-solid fa-arrow-right"
-              className="mt-8"
-            >
+            <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" className="mt-8">
               Next
             </Onboarding.PrimaryButton>
           </div>
@@ -125,7 +114,6 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
             <Onboarding.ButtonGroup
               primary="Try again"
               secondary={{ text: `Skip this step...`, shadow: true }}
-              emit={emit}
               className="mt-8 w-80"
             />
           </div>

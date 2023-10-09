@@ -1,19 +1,17 @@
 import React, { useContext, useRef, useEffect } from 'react';
 import cx from 'classnames';
-import type { AppEvent, RequestState, ViewAction } from '../onboarding-store';
+import type { RequestState } from '../onboarding-store';
 import * as Onboarding from '../UtilityComponents';
-import CurrentStepContext from '../CurrentStepContext';
+import OnboardingContext from '../OnboardingContext';
 
 interface Props {
-  emit(event: AppEvent): unknown;
-  dispatch(action: ViewAction): unknown;
   connectionCode: string;
   request: RequestState<string, string>;
 }
 
-const ConnectChild: React.FC<Props> = ({ emit, dispatch, connectionCode, request }) => {
+const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const currentStep = useContext(CurrentStepContext);
+  const { currentStep, emit, dispatch } = useContext(OnboardingContext);
   const codeValid = connectionCode.match(/^\d{6}$/) !== null;
 
   useEffect(() => {
@@ -106,7 +104,7 @@ const ConnectChild: React.FC<Props> = ({ emit, dispatch, connectionCode, request
           </span>
           .
         </p>
-        <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" emit={emit}>
+        <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right">
           Next
         </Onboarding.PrimaryButton>
       </div>
@@ -125,7 +123,6 @@ const ConnectChild: React.FC<Props> = ({ emit, dispatch, connectionCode, request
         <Onboarding.ButtonGroup
           primary={{ text: `Try again`, icon: false }}
           secondary={{ text: `Get help` }}
-          emit={emit}
           className="w-80"
         />
       </div>

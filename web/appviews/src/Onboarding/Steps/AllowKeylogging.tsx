@@ -1,12 +1,10 @@
-import React from 'react';
-import type { AppEvent, OSGroup } from '../onboarding-store';
+import React, { useContext } from 'react';
 import Callout from '../Callout';
 import ExpandableImage from '../ExpandableImage';
 import * as Onboarding from '../UtilityComponents';
+import OnboardingContext from '../OnboardingContext';
 
 interface Props {
-  emit(event: AppEvent): unknown;
-  os: OSGroup;
   step:
     | 'allowKeylogging_required'
     | 'allowKeylogging_openSysSettings'
@@ -14,9 +12,8 @@ interface Props {
     | 'allowKeylogging_failed';
 }
 
-const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
-  const systemSettings =
-    os === `venturaOrLater` ? `System Settings` : `System Preferences`;
+const AllowKeylogging: React.FC<Props> = ({ step }) => {
+  const { systemSettingsName } = useContext(OnboardingContext);
   switch (step) {
     case `allowKeylogging_required`:
       return (
@@ -37,7 +34,6 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
           <Onboarding.ButtonGroup
             primary="Grant permission"
             secondary={{ text: `Skip this step...`, shadow: true }}
-            emit={emit}
             className="mt-8 w-80"
           />
         </Onboarding.Centered>
@@ -46,22 +42,20 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
       return (
         <Onboarding.Centered className="gap-12" direction="row">
           <div className="flex flex-col">
-            <Onboarding.Heading>Open {systemSettings}</Onboarding.Heading>
+            <Onboarding.Heading>Open {systemSettingsName}</Onboarding.Heading>
             <Onboarding.Text className="max-w-lg mt-4">
               Just now, a system popup should have appeared that looks like this. Find it
               and click{` `}
-              <b>Open {systemSettings}.</b>
+              <b>Open {systemSettingsName}.</b>
             </Onboarding.Text>
             <Onboarding.ButtonGroup
               primary="Done"
               secondary={{ text: `I don’t see a popup...`, shadow: true }}
-              emit={emit}
               className="mt-8 w-80"
             />
           </div>
           <ExpandableImage
             fileName="accessibility-access.png"
-            os={os}
             alt={`Grant permission`}
             width={640 / 2}
             height={490 / 2}
@@ -73,11 +67,10 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
         <Onboarding.Centered>
           <Onboarding.Heading>Allow keylogging</Onboarding.Heading>
           <Onboarding.Text className="max-w-xl mt-4 mb-16" centered>
-            Now, in the {systemSettings} app, follow the steps shown below.
+            Now, in the {systemSettingsName} app, follow the steps shown below.
           </Onboarding.Text>
           <ExpandableImage
             fileName="allow-keylogging.png"
-            os={os}
             alt={`Grant permission`}
             width={900 / 2}
             height={650 / 2}
@@ -86,7 +79,6 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
             direction="row"
             primary="Done"
             secondary={{ text: `Help, I'm having trouble...`, shadow: true }}
-            emit={emit}
             className="mt-8"
           />
         </Onboarding.Centered>
@@ -112,7 +104,6 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
           <Onboarding.ButtonGroup
             primary="Done, recheck"
             secondary={{ text: `Skip this for now...`, shadow: true }}
-            emit={emit}
             className="w-80"
           />
         </Onboarding.Centered>
