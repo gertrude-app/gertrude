@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@shared/components';
 import type { AppEvent, MacOSUser, UserRemediationStep } from '../onboarding-store';
-import QrCode from '../images/signup-qr-code.png';
 import TellMeMoreButton from '../TellMeMoreButton';
 import InformationModal from '../InformationModal';
 import QRCode from '../QRCode';
@@ -29,7 +28,7 @@ const MacOSUserAccountType: React.FC<Props> = ({
   const demotable = admins.length > 1 ? [...admins] : [];
 
   let body: JSX.Element;
-  if (current?.isAdmin) {
+  if (current?.isAdmin === false) {
     body = <HappyPath emit={emit} adminUsers={admins} userName={current.name} />;
   } else {
     switch (remediationStep) {
@@ -71,7 +70,7 @@ const ChooseRemediation: React.FC<ChooseRemediationProps> = ({
   const numRemediations = canDemote && canSwitch ? `three` : `two`;
   return (
     <div className="p-12 flex flex-col justify-center h-full">
-      <Onboarding.Heading>Here's how we can fix this</Onboarding.Heading>
+      <Onboarding.Heading>Here’s how we can fix this</Onboarding.Heading>
       <Onboarding.Text className="mt-4 mb-8 max-w-xl">
         There are {numRemediations} ways to fix this issue, and we have short videos
         showing you how to do each of them.
@@ -85,7 +84,7 @@ const ChooseRemediation: React.FC<ChooseRemediationProps> = ({
             {nonAdmins.length === 1
               ? `Have your child always use the existing non-admin user `
               : `Have your child always use one of the the non-admin users: `}
-            <b>{nonAdmins.join(`, `)}</b>
+            <b>{nonAdmins.join(`, `)}</b>.
           </PossibleRemediation>
         )}
         {canDemote && (
@@ -93,11 +92,11 @@ const ChooseRemediation: React.FC<ChooseRemediationProps> = ({
             {demotable.length === 1
               ? `Remove the admin privilege from the existing user `
               : `Remove the admin privilege from one of these existing users: `}
-            <b>{demotable.join(`, `)}</b> and have your child always login as that user
+            <b>{demotable.join(`, `)}</b> and have your child always login as that user.
           </PossibleRemediation>
         )}
         <PossibleRemediation emit={emit} buttonAction="chooseCreateNonAdminClicked">
-          Create a <b>new non-admin user</b> for your child to always log in with
+          Create a <b>new non-admin user</b> for your child to always log in with.
         </PossibleRemediation>
       </ol>
     </div>
@@ -126,50 +125,68 @@ const StartRemediation: React.FC<StartRemediationProps> = ({ action }) => {
       break;
   }
   return (
-    <div className="flex flex-col justify-center items-center h-full p-12">
-      <Onboarding.Heading className="max-w-2xl" centered>
+    <div className="flex flex-col justify-center items-center h-full p-12 pt-16">
+      <Onboarding.Heading className="max-w-[730px]" centered>
         {lead}
       </Onboarding.Heading>
       <Onboarding.Text className="mt-6 mb-4 max-w-3xl" centered>
-        It only takes a few minutes, but you'll need to log out of this user
-        {action === `demote` ? ` and restart the computer` : ``} as part of the process,
-        so it's best if you view the instructions on your phone so we can walk you through
-        the process.
+        It only takes a few minutes, but you’ll need to <b>log out</b> of this user
+        {action === `demote` ? ` (and maybe restart the computer)` : ``} as part of the
+        process, so it’s best if you view the instructions on your phone so we can walk
+        you through the process.
       </Onboarding.Text>
       <Onboarding.Text className="font-medium max-w-xl !text-slate-600" centered>
-        Aim your phone's camera at the QR code below for a video that will walk you
+        Aim your phone’s camera at the QR code below for a video that will walk you
         through every step.
       </Onboarding.Text>
       <div className="flex justify-center mt-8">
-        <QRCode img={QrCode} url={`https://gertrude.app/${tutorialSlug}`} />
+        <QRCode url={`gertrude.app/signup`} />
       </div>
     </div>
   );
 };
+
+const AboutUsers: React.FC = () => (
+  <>
+    Mac computers allow you to have more than one <b>user.</b> Having more than one user
+    allows different people to use the same computer, each with their own settings and
+    documents. There are two <i>types</i> of users: <b>Admin</b> and{` `}
+    <b>Standard.</b> Admin users can disable, bypass, and uninstall Gertrude, while
+    Standard users cannot.
+  </>
+);
 
 const WarnUserIsAdmin: React.FC<Emit> = ({ emit }) => {
   const [showModal, setShowModal] = useState(false);
   return (
     <Onboarding.Centered className="relative">
       <InformationModal open={showModal} setOpen={setShowModal}>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat at tempore culpa
-        eaque, exercitationem molestiae voluptate, pariatur temporibus inventore excepturi
-        sunt odit ea facere placeat iure cumque? Animi, maiores alias.
+        <AboutUsers />
       </InformationModal>
       <Onboarding.Heading centered>
-        Hmm, this user has admin privileges
+        <i className="fas fa-exclamation-triangle text-yellow-600 mr-4" />
+        Uh oh, this user has admin privileges
       </Onboarding.Heading>
       <Onboarding.Text className="my-4 max-w-2xl" centered>
-        This macOS user has admin privileges, and so should <b>not be used</b> by a child
-        protected by Gertrude. Admin privileges make it easy for your child to disable and
-        bypass Gertrude.
+        This macOS user should <b>not be used</b> by a child being protected by Gertrude.
+        Admin privileges make it easy for your child to disable and bypass Gertrude.
       </Onboarding.Text>
-      <TellMeMoreButton onClick={() => setShowModal(true)}>Tell me more</TellMeMoreButton>
+      <TellMeMoreButton
+        onClick={() => {
+          setShowModal(true);
+          emit({
+            case: `tellMeMoreClicked`,
+            step: `macosUserAccountType`,
+            detail: `adminUser sad path`,
+          });
+        }}
+      >
+        Tell me more
+      </TellMeMoreButton>
       <Onboarding.ButtonGroup
-        primary={{ text: `Show me how to fix it`, icon: `fa-solid fa-arrow-right` }}
+        primary="Show me how to fix it"
         secondary={{
-          text: `I understand the risks, proceed anyway`,
-          icon: `fa-solid fa-arrow-right`,
+          text: `I understand the risks, proceed anyway...`,
         }}
         emit={emit}
         className="mt-8"
@@ -188,20 +205,27 @@ const HappyPath: React.FC<HappyPathProps> = ({ emit, userName, adminUsers }) => 
   return (
     <Onboarding.Centered className="relative">
       <InformationModal open={showModal} setOpen={setShowModal}>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat at tempore culpa
-        eaque, exercitationem molestiae voluptate, pariatur temporibus inventore excepturi
-        sunt odit ea facere placeat iure cumque? Animi, maiores alias.
+        <AboutUsers />
       </InformationModal>
-      <Onboarding.Heading>Yay, you've got the right macOS user type!</Onboarding.Heading>
+      <Onboarding.Heading>Yay, you’ve got the right macOS user type!</Onboarding.Heading>
       <Onboarding.Text className="my-4" centered>
         This macOS user (<span>{userName}</span>) does <b>not</b> have admin privileges,
         which is just what we want.
       </Onboarding.Text>
-      <TellMeMoreButton onClick={() => setShowModal(true)}>
+      <TellMeMoreButton
+        onClick={() => {
+          setShowModal(true);
+          emit({
+            case: `tellMeMoreClicked`,
+            step: `macosUserAccountType`,
+            detail: `happyPath`,
+          });
+        }}
+      >
         Why does this matter?
       </TellMeMoreButton>
       <Callout heading="Watch out!" type={`warning`} className="mt-4 mb-8">
-        Make sure that your child doesn't know the password for the{` `}
+        Make sure that your child doesn’t know the <b>password</b> for the{` `}
         <span
           className="font-medium"
           dangerouslySetInnerHTML={{

@@ -37,10 +37,7 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
             </ul>
           </Callout>
           <Onboarding.ButtonGroup
-            primary={{
-              text: `Grant permission`,
-              icon: `fa-solid fa-arrow-right`,
-            }}
+            primary="Grant permission"
             secondary={{ text: `Skip this step...`, shadow: true }}
             emit={emit}
             className="mt-8 w-80"
@@ -58,11 +55,8 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
               <b>Open {systemSettings}.</b>
             </Onboarding.Text>
             <Onboarding.ButtonGroup
-              primary={{
-                text: `Done`,
-                icon: `fa-solid fa-arrow-right`,
-              }}
-              secondary={{ text: `Can't find the popup...`, shadow: true }}
+              primary="Done"
+              secondary={{ text: `I don’t see a popup...`, shadow: true }}
               emit={emit}
               className="mt-8 w-80"
             />
@@ -80,7 +74,7 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
       return (
         <Onboarding.Centered>
           <Onboarding.Heading>Allow screenshots</Onboarding.Heading>
-          <Onboarding.Text className="max-w-2xl mt-4 mb-8" centered>
+          <Onboarding.Text className="max-w-2xl mt-4 mb-16" centered>
             Follow the steps shown below, which include <b>quitting Gertrude.</b> This
             screen will open again when it restarts.
           </Onboarding.Text>
@@ -88,15 +82,15 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
             fileName="allow-screen-recording.gif"
             os={os}
             alt={`Allow screenshots`}
-            width={800 / 2}
-            height={600 / 2}
+            width={800 / 1.9}
+            height={600 / 1.9}
           />
           <Button
             color="tertiary"
             size="large"
             type="button"
             onClick={() => emit({ case: `primaryBtnClicked` })}
-            className="mt-8"
+            className="mt-2 translate-y-4"
           >
             Help, I'm still here...
           </Button>
@@ -129,10 +123,7 @@ const AllowScreenshots: React.FC<Props> = ({ emit, step, os }) => {
               We still don't have permission to record the screen. Please try again.
             </Onboarding.Text>
             <Onboarding.ButtonGroup
-              primary={{
-                text: `Try again`,
-                icon: `fa-solid fa-arrow-right`,
-              }}
+              primary="Try again"
               secondary={{ text: `Skip this step...`, shadow: true }}
               emit={emit}
               className="mt-8 w-80"

@@ -75,7 +75,7 @@ const StepSwitcher: React.FC<Props> = ({ step, children }) => {
         {children}
         <div
           className={cx(
-            `absolute top-0 left-0 w-full p-4 flex justify-center items-center transition-[opacity,transform] duration-1000`,
+            `absolute top-0 left-0 w-full p-5 flex justify-center items-center transition-[opacity,transform] duration-500`,
             (step === `welcome` || step === `finish`) && `-translate-y-16 opacity-0`,
           )}
         >
@@ -120,11 +120,11 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
     <div
       className={cx(
         step === currentStep
-          ? `left-0`
+          ? `left-0 z-10`
           : hasBeenVisited
           ? `left-[-100%] opacity-0`
           : `left-full opacity-0`,
-        `absolute w-full h-full left-0 top-0 transition-[opacity,left] duration-700`,
+        `absolute w-full h-full top-0 transition-[opacity,left] duration-700`,
       )}
     >
       {showConfetti && (

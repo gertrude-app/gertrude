@@ -48,10 +48,7 @@ export const SecondaryButton: React.FC<ButtonProps & { shadow?: boolean }> = ({
 );
 
 interface ButtonGroupProps {
-  primary: {
-    text: string;
-    icon?: string;
-  };
+  primary: string | { text: string; icon: string | false };
   secondary: {
     text: string;
     icon?: string;
@@ -72,8 +69,15 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   <div
     className={cx(`flex gap-4`, direction === `row` ? `flex-row` : `flex-col`, className)}
   >
-    <PrimaryButton emit={emit} icon={primary.icon}>
-      {primary.text}
+    <PrimaryButton
+      emit={emit}
+      icon={
+        typeof primary === `string`
+          ? `fa-solid fa-arrow-right`
+          : primary.icon || undefined
+      }
+    >
+      {typeof primary === `string` ? primary : primary.text}
     </PrimaryButton>
     <SecondaryButton emit={emit} icon={secondary.icon} shadow={secondary.shadow}>
       {secondary.text}
@@ -100,7 +104,13 @@ interface TextProps {
 }
 
 export const Text: React.FC<TextProps> = ({ children, centered, className }) => (
-  <p className={cx(`text-lg text-slate-500`, centered && `text-center`, className)}>
+  <p
+    className={cx(
+      `text-lg text-slate-600 antialiased`,
+      centered && `text-center`,
+      className,
+    )}
+  >
     {children}
   </p>
 );

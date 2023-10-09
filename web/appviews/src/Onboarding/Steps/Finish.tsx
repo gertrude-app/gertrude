@@ -51,7 +51,7 @@ const Finish: React.FC<Props> = ({ emit }) => {
             !fadeIn && `opacity-0 translate-y-6`,
           )}
         >
-          gertrude.app/contact
+          https://gertrude.app/contact
         </span>
         <div
           className={cx(

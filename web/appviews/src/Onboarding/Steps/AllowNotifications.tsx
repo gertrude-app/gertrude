@@ -30,7 +30,7 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
             className="rounded-xl mb-8"
           />
           <Onboarding.ButtonGroup
-            primary={{ text: `Open ${systemSettings}`, icon: `fa-solid fa-arrow-right` }}
+            primary={`Open ${systemSettings}`}
             secondary={{ text: `Skip this step`, shadow: true }}
             emit={emit}
             direction="row"
@@ -48,10 +48,7 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
               <b>Alerts</b> as shown here:
             </Onboarding.Text>
             <Onboarding.ButtonGroup
-              primary={{
-                text: `Done`,
-                icon: `fa-solid fa-arrow-right`,
-              }}
+              primary="Done"
               secondary={{ text: `Help...`, shadow: true }}
               emit={emit}
               className="mt-8"
@@ -63,7 +60,6 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
             alt={`Grant permission`}
             width={800 / 2}
             height={600 / 2}
-            showInstructions
           />
         </Onboarding.Centered>
       );
@@ -85,10 +81,7 @@ const AllowNotifications: React.FC<Props> = ({ emit, step, os }) => {
             allowFullScreen
           />
           <Onboarding.ButtonGroup
-            primary={{
-              text: `Check again`,
-              icon: `fa-solid fa-arrow-right`,
-            }}
+            primary="Check again"
             secondary={{ text: `Skip for now`, shadow: true }}
             emit={emit}
             className="w-80"

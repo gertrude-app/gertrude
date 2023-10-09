@@ -25,8 +25,8 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
           <Onboarding.Heading>Just one more step!</Onboarding.Heading>
           <Onboarding.Text className="my-4 max-w-2xl mb-8" centered>
             What gives Gertrude it's superpowers is something called a{` `}
-            <b>system extension</b>. Because it's so powerful, you have to give it special
-            permission to do it's job.
+            <b>system extension</b>. 🚀 Because it's so powerful, you have to give it{` `}
+            <span className="underline">special permission</span> to do it's job.
           </Onboarding.Text>
           <Callout heading="Good to know:" type="info">
             <p>You can disable and remove the system extension at any time.</p>
@@ -50,7 +50,7 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
               installation:
             </Onboarding.Text>
             <Onboarding.ButtonGroup
-              primary={{ text: `Done`, icon: `fa-solid fa-arrow-right` }}
+              primary="Done"
               secondary={{ text: `Help, I'm stuck...`, shadow: true }}
               emit={emit}
               className="w-80 mt-4"
@@ -84,7 +84,7 @@ const InstallSysExt: React.FC<Props> = ({ emit, step, os }) => {
             allowFullScreen
           />
           <Onboarding.ButtonGroup
-            primary={{ text: `Try again`, icon: `fa-solid fa-arrow-right` }}
+            primary="Try again"
             secondary={{ text: `Skip install for now...`, shadow: true }}
             emit={emit}
             className="w-80"

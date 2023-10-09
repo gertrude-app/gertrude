@@ -13,13 +13,14 @@ const GetConnectionCode: React.FC<Props> = ({ emit, os }) => (
     <div>
       <Onboarding.Heading>Get Connection Code</Onboarding.Heading>
       <Onboarding.Text className="mt-4 mb-6 max-w-2xl">
-        On your phone, open the Gertrude parents website at{` `}
-        <span className="font-medium">parents.gertrude.app</span>, and select the child
-        you want to connect to. Then, click the <b>Get Connection Code</b> button.
+        On your <b>phone,</b> open the Gertrude parents website at{` `}
+        <span className="text-pink-500 font-medium">https://parents.gertrude.app</span>,
+        and select the child you want to connect to. Then, click the{` `}
+        <b>Get Connection Code</b> button.
       </Onboarding.Text>
       <Onboarding.ButtonGroup
-        primary={{ text: `Got it, next`, icon: `fa-solid fa-arrow-right` }}
-        secondary={{ text: `Got it, next`, icon: `fa-solid fa-arrow-right` }}
+        primary="Got it, next"
+        secondary={{ text: `Help, I’m stuck...` }}
         emit={emit}
       />
     </div>
@@ -27,9 +28,8 @@ const GetConnectionCode: React.FC<Props> = ({ emit, os }) => (
       fileName="get-connection-code.png"
       os={os}
       alt="Get connection code"
-      width={800 / 2}
-      height={600 / 2}
-      showInstructions
+      width={682 / 2}
+      height={443 / 2}
     />
   </Onboarding.Centered>
 );

@@ -35,7 +35,7 @@ interface StepProps {
 const Step: React.FC<StepProps> = ({ status }) => (
   <div
     className={cx(
-      `border-2 w-4 h-4 rounded-full flex justify-center items-center font-bold text-lg relative transition-[background-color,border-color,color] duration-700 delay-500`,
+      `border-2 w-3.5 h-3.5 rounded-full flex justify-center items-center font-bold text-lg relative transition-[background-color,border-color,color] duration-700 delay-500`,
       {
         'border-violet-500 bg-violet-500': status === `current`,
         'border-violet-300 bg-violet-200': status === `complete`,

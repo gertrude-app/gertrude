@@ -9,8 +9,9 @@ interface Props {
   alt: string;
   width: number;
   height: number;
-  className?: string;
+  lessRounded?: boolean;
   showInstructions?: boolean;
+  className?: string;
 }
 
 const ExpandableImage: React.FC<Props> = ({
@@ -19,8 +20,9 @@ const ExpandableImage: React.FC<Props> = ({
   alt,
   width,
   height,
+  showInstructions = true,
+  lessRounded = false,
   className,
-  showInstructions,
 }) => {
   const [imageExpanded, setImageExpanded] = useState(false);
   const [imageFrameCoords, setImageFrameCoords] = useState({ x: 0, y: 0 });
@@ -58,24 +60,24 @@ const ExpandableImage: React.FC<Props> = ({
           height,
         }}
       >
-        {showInstructions && (
-          <div
-            className={cx(
-              `relative -top-12 flex flex-col items-center gap-1.5 text-slate-400 text-sm transition-opacity duration-300`,
-              hasBeenExpanded && `opacity-0`,
-            )}
-          >
-            <span>Click to enlarge</span>
-            <i className="fa-solid fa-chevron-down animate-bounce" />
-          </div>
-        )}
+        <div
+          className={cx(
+            `relative -top-12 flex flex-col items-center gap-1.5 text-slate-400 text-sm transition-opacity duration-300`,
+            hasBeenExpanded && `opacity-0`,
+            !showInstructions && `hidden`,
+          )}
+        >
+          <span>Click to enlarge</span>
+          <i className="fa-solid fa-chevron-down animate-bounce" />
+        </div>
         {imageFrameRef.current && (
           <img
             className={cx(
-              `rounded-3xl mb-6 cursor-pointer absolute object-cover object-center`,
+              `mb-6 cursor-pointer absolute object-cover object-center`,
               imageExpanded
                 ? `cursor-zoom-out shadow-2xl shadow-slate-500/50`
                 : `cursor-zoom-in`,
+              lessRounded ? `rounded-lg` : `rounded-3xl`,
             )}
             style={{
               width: imageExpanded
@@ -95,7 +97,7 @@ const ExpandableImage: React.FC<Props> = ({
                   Math.min(0.9 * window.innerWidth, 800) / (aspectRatio * 2)
                 : imageFrameCoords.y,
               transitionProperty: `width, height, left, top, box-shadow`,
-              transitionDuration: hasBeenExpanded ? `500ms` : `0`,
+              transitionDuration: hasBeenExpanded ? `250ms` : `0`,
             }}
             src={`https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/${os}/${fileName}`}
             alt={alt}

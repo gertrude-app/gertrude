@@ -21,24 +21,21 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
     case `allowKeylogging_required`:
       return (
         <Onboarding.Centered className="h-full flex flex-col justify-center items-center">
-          <Onboarding.Heading>Now let's allow keylogging</Onboarding.Heading>
+          <Onboarding.Heading>Now let’s allow keylogging</Onboarding.Heading>
           <Onboarding.Text className="mt-4 mb-8 max-w-2xl" centered>
             Gertrude needs your permission to record what your child types
           </Onboarding.Text>
           <Callout heading="Good to know:" type="info">
             <ul className="list-disc list-inside ml-2">
               <li>You control if and when we record typing</li>
-              <li>Your child is shown their typing is being recorded</li>
+              <li>Your child is shown when their typing is being recorded</li>
               <li>
-                We can't record passwords, credit card numbers, or other sensitive info
+                We can’t record passwords, credit card numbers, or other sensitive info
               </li>
             </ul>
           </Callout>
           <Onboarding.ButtonGroup
-            primary={{
-              text: `Grant permission`,
-              icon: `fa-solid fa-arrow-right`,
-            }}
+            primary="Grant permission"
             secondary={{ text: `Skip this step...`, shadow: true }}
             emit={emit}
             className="mt-8 w-80"
@@ -56,11 +53,8 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
               <b>Open {systemSettings}.</b>
             </Onboarding.Text>
             <Onboarding.ButtonGroup
-              primary={{
-                text: `Done`,
-                icon: `fa-solid fa-arrow-right`,
-              }}
-              secondary={{ text: `Can't find the popup...`, shadow: true }}
+              primary="Done"
+              secondary={{ text: `I don’t see a popup...`, shadow: true }}
               emit={emit}
               className="mt-8 w-80"
             />
@@ -78,24 +72,22 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
       return (
         <Onboarding.Centered>
           <Onboarding.Heading>Allow keylogging</Onboarding.Heading>
-          <Onboarding.Text className="max-w-xl mt-4 mb-8" centered>
+          <Onboarding.Text className="max-w-xl mt-4 mb-16" centered>
             Now, in the {systemSettings} app, follow the steps shown below.
           </Onboarding.Text>
           <ExpandableImage
-            fileName="screen-recording-add-gertrude.gif"
+            fileName="allow-keylogging.png"
             os={os}
             alt={`Grant permission`}
             width={900 / 2}
             height={650 / 2}
           />
           <Onboarding.ButtonGroup
-            primary={{
-              text: `Done`,
-              icon: `fa-solid fa-arrow-right`,
-            }}
+            direction="row"
+            primary="Done"
             secondary={{ text: `Help, I'm having trouble...`, shadow: true }}
             emit={emit}
-            className="mt-8 w-80"
+            className="mt-8"
           />
         </Onboarding.Centered>
       );
@@ -118,10 +110,7 @@ const AllowKeylogging: React.FC<Props> = ({ emit, step, os }) => {
             allowFullScreen
           />
           <Onboarding.ButtonGroup
-            primary={{
-              text: `Done, recheck`,
-              icon: `fa-solid fa-arrow-right`,
-            }}
+            primary="Done, recheck"
             secondary={{ text: `Skip this for now...`, shadow: true }}
             emit={emit}
             className="w-80"

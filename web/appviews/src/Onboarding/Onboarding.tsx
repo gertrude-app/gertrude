@@ -55,8 +55,8 @@ export const Onboarding: React.FC<Props> = ({
           emit={emit}
         />
       }
-      confetti={connectChildRequest.state === `succeeded`}
-      confettiDeps={[connectChildRequest.state]}
+      confetti={connectChildRequest.case === `succeeded`}
+      confettiDeps={[connectChildRequest.case]}
     />
     <OnboardingPage
       step="allowNotifications_start"

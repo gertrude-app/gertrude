@@ -132,7 +132,7 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           component={
             <Step.ConnectChild
               connectionCode={`123456`}
-              request={{ state: connectChildState, payload: `Suzy` }}
+              request={{ case: connectChildState, payload: `Suzy` }}
               dispatch={() => {}}
               emit={() => {}}
             />

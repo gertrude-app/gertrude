@@ -14,7 +14,7 @@ export const Welcome: Story = props({
   windowOpen: true,
   os: `venturaOrLater`,
   step: `welcome`,
-  connectChildRequest: { state: `idle` },
+  connectChildRequest: { case: `idle` },
   screenRecordingPermissionGranted: false,
   keyloggingPermissionGranted: false,
   currentUser: { id: 502, name: `Suzy`, isAdmin: false },
@@ -94,19 +94,19 @@ export const ConnectChildIdle: Story = props({
 export const ConnectChildOngoing: Story = props({
   ...Welcome.args,
   step: `connectChild`,
-  connectChildRequest: { state: `ongoing` },
+  connectChildRequest: { case: `ongoing` },
 });
 
 export const ConnectChildFailed: Story = props({
   ...Welcome.args,
   step: `connectChild`,
-  connectChildRequest: { state: `failed` },
+  connectChildRequest: { case: `failed` },
 });
 
 export const ConnectChildSuccess: Story = props({
   ...Welcome.args,
   step: `connectChild`,
-  connectChildRequest: { state: `succeeded`, payload: `Little Jimmy` },
+  connectChildRequest: { case: `succeeded`, payload: `Little Jimmy` },
 });
 
 export const AllowNotificationsStart: Story = props({

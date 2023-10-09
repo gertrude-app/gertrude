@@ -2,10 +2,10 @@ import type { ActionOf } from '../lib/store';
 import { Store } from '../lib/store';
 
 export type RequestState<T = void, E = string> =
-  | { state: 'idle' }
-  | { state: 'ongoing' }
-  | { state: 'failed'; error?: E }
-  | { state: 'succeeded'; payload: T };
+  | { case: 'idle' }
+  | { case: 'ongoing' }
+  | { case: 'failed'; error?: E }
+  | { case: 'succeeded'; payload: T };
 
 // begin codegen
 export type OnboardingStep =
@@ -57,7 +57,8 @@ export interface AppState {
 }
 
 export type AppEvent =
-  | { case: 'connectChildSubmitted'; connectChildSubmitted: number }
+  | { case: 'connectChildSubmitted'; code: number }
+  | { case: 'tellMeMoreClicked'; step: OnboardingStep; detail?: string }
   | { case: 'closeWindow' }
   | { case: 'primaryBtnClicked' }
   | { case: 'secondaryBtnClicked' }
@@ -67,7 +68,7 @@ export type AppEvent =
 // end codegen
 
 export type ViewState = { connectionCode: string };
-export type ViewAction = { type: 'updateConnectionCode'; code: string };
+export type ViewAction = { type: 'connectionCodeUpdated'; code: string };
 
 export type Action = ActionOf<AppState, AppEvent, ViewAction>;
 export type State = AppState & ViewState;
@@ -78,7 +79,7 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
       windowOpen: false,
       os: `venturaOrLater`,
       step: `welcome`,
-      connectChildRequest: { state: `idle` },
+      connectChildRequest: { case: `idle` },
       currentUser: { id: 501, name: ``, isAdmin: false },
       users: [],
       connectionCode: ``,
@@ -87,9 +88,23 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
 
   reducer(
     state: AppState & ViewState,
-    _action: ActionOf<AppState, AppEvent, ViewAction>,
+    action: ActionOf<AppState, AppEvent, ViewAction>,
   ): AppState & ViewState {
-    return state;
+    switch (action.type) {
+      case `connectionCodeUpdated`:
+        return { ...state, connectionCode: action.code };
+      case `receivedUpdatedAppState`:
+        return { ...state, ...action.appState };
+      case `appEventEmitted`:
+        switch (action.event.case) {
+          case `connectChildSubmitted`:
+            return { ...state, connectionCode: `` };
+          default:
+            return state;
+        }
+      default:
+        return state;
+    }
   }
 }
 
