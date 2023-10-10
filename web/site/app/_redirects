@@ -7,3 +7,15 @@
 # macOS redirects
 /app-redir/connect/more-info /docs/getting-started 301
 /app-redir/connect/contact-support /contact 301
+
+# onboarding redirects
+/start https://parents.gertrude.app/signup 302
+/cu-v https://youtu.be/Z_kC6ZfXZDU 302 # create a macos user, ventura or later
+/cu-b https://youtu.be/FFFOF3BmSos 302 # create a macos user, monterey or earlier
+/cu-c https://youtu.be/FFFOF3BmSos 302 # create a macos user, monterey or earlier
+/du-v https://youtu.be/oYlGQuYqu1c 302 # demote an admin user, ventura or later
+/du-b https://youtu.be/GfxT2bJX4Ck 302 # demote an admin user, monterey or earlier
+/du-c https://youtu.be/GfxT2bJX4Ck 302 # demote an admin user, monterey or earlier
+/su-v https://youtu.be/lAoeKEFy9Zw 302 # swith to non-admin, ventura or later
+/su-b https://youtu.be/jhufHnF6nEI 302 # swith to non-admin, monterey or earlier
+/su-c https://youtu.be/jhufHnF6nEI 302 # swith to non-admin, monterey or earlier
