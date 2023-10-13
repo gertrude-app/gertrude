@@ -8,7 +8,7 @@ const NoGertrudeAccount: React.FC = () => (
       <Onboarding.Heading>No problem, let’s make one!</Onboarding.Heading>
       <Onboarding.Text className="mt-4 max-w-lg">
         We recommend you <b>sign up on your phone,</b> instead of this computer.{` `}
-        <b>Aim your phone's camera</b> at the QR code and it will take you to the signup
+        <b>Aim your phone’s camera</b> at the QR code and it will take you to the signup
         page.
       </Onboarding.Text>
       <Onboarding.Text className="mt-3 max-w-lg">

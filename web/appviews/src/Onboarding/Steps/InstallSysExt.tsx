@@ -59,7 +59,7 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
       return (
         <Onboarding.Centered className="h-full flex flex-col justify-center items-center">
           <Onboarding.Heading className="mb-2">
-            Hmm, something didn't work...
+            Hmm, something didn’t work...
           </Onboarding.Heading>
           <Onboarding.Text className="max-w-2xl" centered>
             Shucks! The system extension did not install correctly. Watch this short video
@@ -85,10 +85,10 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
         <Onboarding.Centered>
           <Onboarding.Heading>System extension installed!</Onboarding.Heading>
           <Onboarding.Text className="mt-4 mb-8">
-            Hooray, we've confirmed the system extension is <em>ready to go!</em>
+            Hooray, we’ve confirmed the system extension is <em>ready to go!</em>
           </Onboarding.Text>
           <Callout type="info" heading="Good to know:">
-            You're past all the hard parts, all that's left it to briefly show you around
+            You’re past all the hard parts, all that’s left it to briefly show you around
             a bit.
           </Callout>
           <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" className="mt-8">

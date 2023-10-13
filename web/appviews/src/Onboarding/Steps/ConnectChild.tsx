@@ -43,7 +43,7 @@ const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
       >
         <h1 className="text-3xl font-bold">Connect a child</h1>
         <p className="text-lg text-slate-500 mt-4">
-          Enter the 6-digit connection code from the Gertrude parent's site:
+          Enter the 6-digit connection code from the Gertrude parent’s site:
         </p>
         <div className="flex mt-8 space-x-4">
           <input
@@ -99,7 +99,7 @@ const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
       >
         <h1 className="text-3xl font-bold">Success!</h1>
         <p className="mt-2 mb-6 text-lg text-slate-500">
-          You've connected this computer to the child{` `}
+          You’ve connected this computer to the child{` `}
           <span className="font-medium text-slate-600">
             {request.case === `succeeded` && request.payload}
           </span>

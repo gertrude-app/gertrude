@@ -48,7 +48,7 @@ export const RequestSuspension: React.FC<Props> = ({
           icon: `fa-cog`,
         }}
       >
-        Sorry, we're having trouble communicating with the internet filter, so we can't
+        Sorry, we’re having trouble communicating with the internet filter, so we can’t
         suspend the filter right now. If a parent is nearby, they can likely fix the
         problem from the <b>Administrate screen.</b> If not,{` `}
         <b>restarting the computer</b> will fix the problem.

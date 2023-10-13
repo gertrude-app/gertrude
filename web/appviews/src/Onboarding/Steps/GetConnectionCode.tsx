@@ -21,8 +21,8 @@ const GetConnectionCode: React.FC = () => {
               computer.
             </p>
             <p>
-              Aim your phone's camera at the QR code to navigate to the right screen to
-              get this code, or to create a child if you haven't already.
+              Aim your phone’s camera at the QR code to navigate to the right screen to
+              get this code, or to create a child if you haven’t already.
             </p>
           </div>
           <QRCode url="gertrude.app/a-c" />

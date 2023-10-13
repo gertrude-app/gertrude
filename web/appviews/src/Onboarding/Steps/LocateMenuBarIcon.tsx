@@ -6,7 +6,7 @@ const LocateMenuBarIcon: React.FC = () => (
   <Onboarding.Centered>
     <Onboarding.Heading>Find the menu bar icon</Onboarding.Heading>
     <Onboarding.Text className="mt-4 mb-3 max-w-2xl" centered>
-      From now on, you'll click the <b>menu bar icon</b> whenever you or your child needs
+      From now on, you’ll click the <b>menu bar icon</b> whenever you or your child needs
       to <em>interact with the Gertrude app.</em>
     </Onboarding.Text>
     <Onboarding.Text className="mb-6 max-w-2xl" centered>

@@ -69,8 +69,8 @@ const Welcome: React.FC = () => {
             !loaded && `opacity-0 translate-y-8`,
           )}
         >
-          We're thrilled that you're here. You (the parent) will need to do a small amount
-          of setup and configuration to get started. We'll walk you through every step of
+          We’re thrilled that you’re here. You (the parent) will need to do a small amount
+          of setup and configuration to get started. We’ll walk you through every step of
           the way, and it should only take about 5-7 minutes.
         </p>
         <div
@@ -87,7 +87,7 @@ const Welcome: React.FC = () => {
             }}
           >
             <span className="bg-gradient-to-r from-indigo-600 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text] text-transparent flex items-center space-x-3">
-              <span>Let's do this</span>
+              <span>Let’s do this</span>
               <i className="fa-solid fa-arrow-right" />
             </span>
           </button>

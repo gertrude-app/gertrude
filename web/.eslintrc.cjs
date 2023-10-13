@@ -225,6 +225,7 @@ module.exports = {
       files: [`appviews/**/*.tsx`],
       rules: {
         'jsx-a11y/accessible-emoji': `off`,
+        'react/no-unescaped-entities': `error`,
       },
     },
     {

@@ -25,7 +25,7 @@ const AllowScreenshots: React.FC<Props> = ({ step }) => {
           </Onboarding.Heading>
           <Onboarding.Text className="mt-4 mb-8 max-w-2xl" centered>
             Gertrude needs your permission to record the screen, so it can take
-            screenshots of your child's activity.
+            screenshots of your child’s activity.
           </Onboarding.Text>
           <Callout heading="Good to know:" type="info">
             <ul className="list-disc list-inside ml-2">

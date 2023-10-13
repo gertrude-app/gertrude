@@ -37,7 +37,7 @@ const Finish: React.FC = () => {
             !fadeIn && `opacity-0 translate-y-6`,
           )}
         >
-          You're all set up! If you have any questions or run into any problems you can
+          You’re all set up! If you have any questions or run into any problems you can
           always reach us at:
         </p>
         <span
