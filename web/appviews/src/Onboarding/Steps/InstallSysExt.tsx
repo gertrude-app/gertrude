@@ -37,7 +37,7 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
       return (
         <Onboarding.Centered className="space-x-12" direction="row">
           <div className="flex flex-col">
-            <Onboarding.Heading>Allow system extenson</Onboarding.Heading>
+            <Onboarding.Heading>Allow system extension</Onboarding.Heading>
             <Onboarding.Text className="my-4 max-w-xl">
               Next, in the {systemSettingsName} app follow the steps shown to allow the
               installation:
