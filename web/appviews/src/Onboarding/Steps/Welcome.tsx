@@ -80,14 +80,15 @@ const Welcome: React.FC = () => {
           )}
         >
           <button
-            className={`flex items-center justify-center gap-3 bg-white px-10 py-5 rounded-2xl text-xl font-semibold shadow-lg hover:opacity-90 transiton-[opacity,transform] duration-200 active:scale-[98%] active:shadow-md`}
+            className={`bg-white px-10 py-5 rounded-2xl text-xl font-semibold shadow-lg hover:opacity-90 transiton-[opacity,transform] duration-200 active:scale-[98%] active:shadow-md`}
             onClick={() => {
               setFadeOut(true);
               setTimeout(() => emit({ case: `primaryBtnClicked` }), 1000);
             }}
           >
-            <span className="bg-gradient-to-r from-indigo-600 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text] text-transparent">
-              Let's do this <i className="fa-solid fa-arrow-right" />
+            <span className="bg-gradient-to-r from-indigo-600 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text] text-transparent flex items-center space-x-3">
+              <span>Let's do this</span>
+              <i className="fa-solid fa-arrow-right" />
             </span>
           </button>
         </div>

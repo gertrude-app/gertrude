@@ -32,7 +32,7 @@ const QRCode: React.FC<Props> = ({ url }) => {
             <div className="absolute w-full h-full left-0 top-0 [backface-visibility:hidden] rounded-3xl overflow-hidden">
               <img src={img} className="w-full h-full" alt="QR code" />
             </div>
-            <div className="absolute w-full h-full left-0 top-0 [backface-visibility:hidden] rounded-3xl [transform:rotateY(180deg)] bg-white flex flex-col justify-center items-center p-4 gap-3">
+            <div className="absolute w-full h-full left-0 top-0 [backface-visibility:hidden] rounded-3xl [transform:rotateY(180deg)] bg-white flex flex-col justify-center items-center p-4 space-y-3">
               <span className="text-slate-400 text-sm text-center">
                 Enter this URL into your browser:
               </span>

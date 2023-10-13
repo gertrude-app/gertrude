@@ -9,7 +9,7 @@ const GetConnectionCode: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const { emit } = useContext(OnboardingContext);
   return (
-    <Onboarding.Centered direction="row" className="gap-12">
+    <Onboarding.Centered direction="row" className="space-x-12">
       <InformationModal open={showModal} setOpen={setShowModal}>
         <div className="flex">
           <div className="space-y-4">
@@ -28,7 +28,7 @@ const GetConnectionCode: React.FC = () => {
           <QRCode url="gertrude.app/a-c" />
         </div>
       </InformationModal>
-      <div>
+      <div className="!ml-0">
         <Onboarding.Heading>Get Connection Code</Onboarding.Heading>
         <Onboarding.Text className="mt-4 mb-6 max-w-2xl">
           On your <b>phone,</b> open the Gertrude parents website at{` `}

@@ -44,7 +44,7 @@ const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
         <p className="text-lg text-slate-500 mt-4">
           Enter the 6-digit connection code from the Gertrude parent's site:
         </p>
-        <div className="flex mt-8 gap-4">
+        <div className="flex mt-8 space-x-4">
           <input
             ref={inputRef}
             disabled={currentStep !== `connectChild`}
@@ -62,7 +62,7 @@ const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
               emit({ case: `connectChildSubmitted`, code: Number(connectionCode) })
             }
             className={cx(
-              `bg-gradient-to-r from-violet-500 to-fuchsia-500 px-6 text-xl flex justify-center items-center gap-3 font-medium text-white rounded-2xl shadow-xl shadow-violet-500/40 transition-[transform,box-shadow,opacity] duration-300 outline-none focus:ring-0 w-44`,
+              `bg-gradient-to-r from-violet-500 to-fuchsia-500 px-6 text-xl flex justify-center items-center font-medium text-white rounded-2xl shadow-xl shadow-violet-500/40 transition-[transform,box-shadow,opacity] duration-300 outline-none focus:ring-0 w-44`,
               codeValid
                 ? `cursor-pointer hover:scale-[102%] active:scale-[98%] hover:shadow-2xl hover:shadow-violet-500/50 active:shadow-lg active:shadow-violet-500/30`
                 : `cursor-not-allowed opacity-80`,
@@ -70,7 +70,7 @@ const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
           >
             <div
               className={cx(
-                `flex gap-3 items-center transition-[opacity,transform] duration-300 absolute`,
+                `flex space-x-3 items-center transition-[opacity,transform] duration-300 absolute`,
                 request.case === `idle` ? `opacity-100` : `opacity-0 scale-50`,
               )}
             >
@@ -79,7 +79,7 @@ const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
             </div>
             <div
               className={cx(
-                `flex gap-3 items-center transition-[opacity,transform] duration-300 absolute`,
+                `flex items-center transition-[opacity,transform] duration-300 absolute`,
                 request.case === `ongoing` ? `opacity-100` : `opacity-0 translate-y-4`,
               )}
             >

@@ -35,7 +35,7 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
       );
     case `installSysExt_allow`:
       return (
-        <Onboarding.Centered className="gap-12" direction="row">
+        <Onboarding.Centered className="space-x-12" direction="row">
           <div className="flex flex-col">
             <Onboarding.Heading>Allow system extenson</Onboarding.Heading>
             <Onboarding.Text className="my-4 max-w-xl">

@@ -64,7 +64,7 @@ const ChooseRemediation: React.FC<ChooseRemediationProps> = ({
         There are {numRemediations} ways to fix this issue, and we have short videos
         showing you how to do each of them.
       </Onboarding.Text>
-      <ol className="flex flex-col gap-4">
+      <ol className="flex flex-col space-y-4">
         {canSwitch && (
           <PossibleRemediation buttonAction="chooseSwitchToNonAdminUserClicked">
             {nonAdmins.length === 1

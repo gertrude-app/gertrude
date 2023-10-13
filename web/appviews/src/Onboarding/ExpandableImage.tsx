@@ -59,7 +59,7 @@ const ExpandableImage: React.FC<Props> = ({
       >
         <div
           className={cx(
-            `relative -top-12 flex flex-col items-center gap-1.5 text-slate-400 text-sm transition-opacity duration-300`,
+            `relative -top-12 flex flex-col items-center space-y-1.5 text-slate-400 text-sm transition-opacity duration-300`,
             hasBeenExpanded && `opacity-0`,
             !showInstructions && `hidden`,
           )}

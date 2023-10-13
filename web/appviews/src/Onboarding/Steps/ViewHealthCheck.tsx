@@ -4,7 +4,7 @@ import Callout from '../Callout';
 import * as Onboarding from '../UtilityComponents';
 
 const ViewHealthCheck: React.FC = () => (
-  <Onboarding.Centered className="gap-12" direction="row">
+  <Onboarding.Centered className="space-x-12" direction="row">
     <div>
       <Onboarding.Heading>Admin health check</Onboarding.Heading>
       <Onboarding.Text className="mt-3 mb-8 max-w-2xl">

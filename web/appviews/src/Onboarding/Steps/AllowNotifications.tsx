@@ -37,7 +37,7 @@ const AllowNotifications: React.FC<Props> = ({ step }) => {
       );
     case `allowNotifications_grant`:
       return (
-        <Onboarding.Centered className="gap-12" direction="row">
+        <Onboarding.Centered className="space-x-12" direction="row">
           <InformationModal open={showModal} setOpen={setShowModal}>
             If you can’t find the <b>{systemSettingsName} app</b>, try closing
             applications, moving windows, and checking any additional desktops you may
@@ -48,7 +48,7 @@ const AllowNotifications: React.FC<Props> = ({ step }) => {
             <Onboarding.TextButton>click here</Onboarding.TextButton>
             {` `}to watch a short troubleshooting video.
           </InformationModal>
-          <div className="flex flex-col">
+          <div className="flex flex-col !ml-0">
             <Onboarding.Heading>Set notifications to “Alerts”</Onboarding.Heading>
             <Onboarding.Text className="mt-4 max-w-xl">
               We just opened the {systemSettingsName} app. Set Gertrude’s notifications to

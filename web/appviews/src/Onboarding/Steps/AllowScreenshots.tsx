@@ -42,7 +42,7 @@ const AllowScreenshots: React.FC<Props> = ({ step }) => {
       );
     case `allowScreenshots_grantAndRestart`:
       return (
-        <Onboarding.Centered direction="row" className="gap-12">
+        <Onboarding.Centered direction="row" className="space-x-12">
           <InformationModal open={showModal} setOpen={setShowModal}>
             If you can’t find the <b>{systemSettingsName} app</b>, try closing
             applications, moving windows, and checking any additional desktops you may
@@ -57,7 +57,7 @@ const AllowScreenshots: React.FC<Props> = ({ step }) => {
             {` `} to watch a short troubleshooting video. Or, it’s OK to skip this step
             for now, and fix it later after contacting us for help.
           </InformationModal>
-          <div className="flex flex-col">
+          <div className="flex flex-col !ml-0">
             <Onboarding.Heading>Allow screenshots</Onboarding.Heading>
             <Onboarding.Text className="max-w-2xl mt-4 mb-8">
               Follow the steps shown, which include <b>quitting Gertrude.</b> This screen

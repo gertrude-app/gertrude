@@ -52,6 +52,6 @@
   },
   "browserslist": [
     "defaults",
-    "Safari > 14"
+    "Safari > 13"
   ]
 }

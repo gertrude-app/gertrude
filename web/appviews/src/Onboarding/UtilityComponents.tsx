@@ -62,7 +62,11 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   className,
 }) => (
   <div
-    className={cx(`flex gap-4`, direction === `row` ? `flex-row` : `flex-col`, className)}
+    className={cx(
+      `flex`,
+      direction === `row` ? `flex-row space-x-4` : `flex-col space-y-4`,
+      className,
+    )}
   >
     <PrimaryButton
       icon={

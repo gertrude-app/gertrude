@@ -42,7 +42,7 @@ const AllowKeylogging: React.FC<Props> = ({ step }) => {
       );
     case `allowKeylogging_openSysSettings`:
       return (
-        <Onboarding.Centered className="gap-12" direction="row">
+        <Onboarding.Centered className="space-x-12" direction="row">
           <InformationModal open={showModal} setOpen={setShowModal}>
             Try closing other applications, moving windows, and checking any additional
             desktops you may have open. Still can’t find it? No problem&mdash;click the
@@ -51,7 +51,7 @@ const AllowKeylogging: React.FC<Props> = ({ step }) => {
             you’re in that area, scroll to and click “Accessibility.” That will put you in
             the <em>same spot</em> as clicking the popup.
           </InformationModal>
-          <div className="flex flex-col">
+          <div className="flex flex-col !ml-0">
             <Onboarding.Heading>Open {systemSettingsName}</Onboarding.Heading>
             <Onboarding.Text className="max-w-lg mt-4">
               Just now, a system popup should have appeared that looks like this. Find it
