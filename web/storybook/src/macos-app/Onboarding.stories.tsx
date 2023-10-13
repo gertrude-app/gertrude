@@ -14,7 +14,6 @@ export const Welcome: Story = props({
   windowOpen: true,
   os: `venturaOrLater`,
   step: `welcome`,
-  receivedAppState: true,
   connectChildRequest: { case: `idle` },
   screenRecordingPermissionGranted: false,
   keyloggingPermissionGranted: false,
@@ -24,6 +23,8 @@ export const Welcome: Story = props({
     { id: 502, name: `Suzy`, isAdmin: false },
   ],
   connectionCode: ``,
+  didResume: false,
+  receivedAppState: true,
 });
 
 export const ConfirmGertrudeAcct: Story = props({

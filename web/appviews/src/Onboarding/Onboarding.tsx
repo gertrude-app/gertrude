@@ -19,6 +19,7 @@ export const Onboarding: React.FC<Props> = ({
   userRemediationStep,
   users,
   receivedAppState,
+  didResume,
   os,
 }) => (
   <OnboardingContext.Provider
@@ -47,7 +48,7 @@ export const Onboarding: React.FC<Props> = ({
             remediationStep={userRemediationStep}
           />
         }
-        confetti={currentUser?.isAdmin === false}
+        confetti={didResume && currentUser?.isAdmin === false}
       />
       <OnboardingPage
         step="getChildConnectionCode"

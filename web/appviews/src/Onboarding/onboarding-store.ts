@@ -66,7 +66,11 @@ export type AppEvent =
   | { case: 'chooseDemoteAdminClicked' };
 // end codegen
 
-export type ViewState = { connectionCode: string; receivedAppState: boolean };
+export type ViewState = {
+  connectionCode: string;
+  receivedAppState: boolean;
+  didResume: boolean;
+};
 export type ViewAction = { type: 'connectionCodeUpdated'; code: string };
 
 export type Action = ActionOf<AppState, AppEvent, ViewAction>;
@@ -83,6 +87,7 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
       users: [],
       connectionCode: ``,
       receivedAppState: false,
+      didResume: false,
     };
   }
 
@@ -94,7 +99,12 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
       case `connectionCodeUpdated`:
         return { ...state, connectionCode: action.code };
       case `receivedUpdatedAppState`:
-        return { ...state, ...action.appState, receivedAppState: true };
+        return {
+          ...state,
+          ...action.appState,
+          didResume: state.receivedAppState === false && state.step !== `welcome`,
+          receivedAppState: true,
+        };
       case `appEventEmitted`:
         switch (action.event.case) {
           case `connectChildSubmitted`:
