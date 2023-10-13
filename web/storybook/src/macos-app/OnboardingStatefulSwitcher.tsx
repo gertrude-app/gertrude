@@ -96,7 +96,7 @@ const OnboardingStatefulSwitcher: React.FC = () => {
         }
       }}
     >
-      <StepSwitcher>
+      <StepSwitcher ready>
         <OnboardingPage step="welcome" component={<Step.Welcome />} />
         <OnboardingPage
           step="confirmGertrudeAccount"

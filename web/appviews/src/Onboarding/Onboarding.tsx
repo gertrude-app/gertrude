@@ -18,6 +18,7 @@ export const Onboarding: React.FC<Props> = ({
   currentUser,
   userRemediationStep,
   users,
+  receivedAppState,
   os,
 }) => (
   <OnboardingContext.Provider
@@ -30,7 +31,7 @@ export const Onboarding: React.FC<Props> = ({
       dispatch,
     }}
   >
-    <StepSwitcher>
+    <StepSwitcher ready={receivedAppState}>
       <OnboardingPage step="welcome" component={<Step.Welcome />} />
       <OnboardingPage
         step="confirmGertrudeAccount"

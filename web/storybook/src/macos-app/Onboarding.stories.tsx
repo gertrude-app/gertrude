@@ -14,6 +14,7 @@ export const Welcome: Story = props({
   windowOpen: true,
   os: `venturaOrLater`,
   step: `welcome`,
+  receivedAppState: true,
   connectChildRequest: { case: `idle` },
   screenRecordingPermissionGranted: false,
   keyloggingPermissionGranted: false,
