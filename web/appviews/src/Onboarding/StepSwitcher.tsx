@@ -28,7 +28,6 @@ const StepSwitcher: React.FC<Props> = ({ children }) => {
       case `allowNotifications_failed`:
         return 4;
       case `allowScreenshots_required`:
-      case `allowScreenshots_openSysSettings`:
       case `allowScreenshots_grantAndRestart`:
       case `allowScreenshots_success`:
       case `allowScreenshots_failed`:

@@ -23,7 +23,6 @@ const ViewHealthCheck: React.FC = () => (
     <ExpandableImage
       fileName="administrate.png"
       lessRounded
-      alt="Admin health check screen"
       width={800 * 0.45}
       height={600 * 0.45}
     />

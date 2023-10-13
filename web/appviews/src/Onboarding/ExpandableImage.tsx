@@ -5,7 +5,6 @@ import OnboardingContext from './OnboardingContext';
 
 interface Props {
   fileName: string;
-  alt: string;
   width: number;
   height: number;
   lessRounded?: boolean;
@@ -15,7 +14,6 @@ interface Props {
 
 const ExpandableImage: React.FC<Props> = ({
   fileName,
-  alt,
   width,
   height,
   showInstructions = true,
@@ -99,7 +97,7 @@ const ExpandableImage: React.FC<Props> = ({
               transitionDuration: hasBeenExpanded ? `250ms` : `0`,
             }}
             src={`https://gertrude.nyc3.digitaloceanspaces.com/appview-assets/onboarding/${os}/${fileName}`}
-            alt={alt}
+            alt=""
             onClick={() => {
               setImageExpanded(!imageExpanded);
               setHasBeenExpanded(true);

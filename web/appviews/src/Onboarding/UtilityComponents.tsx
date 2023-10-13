@@ -25,19 +25,16 @@ export const PrimaryButton: React.FC<ButtonProps> = ({ children, icon, className
   );
 };
 
-export const SecondaryButton: React.FC<ButtonProps & { shadow?: boolean }> = ({
-  children,
-  icon,
-  shadow,
-  className,
-}) => {
+export const SecondaryButton: React.FC<
+  ButtonProps & { shadow?: boolean; onClick?: () => unknown }
+> = ({ children, icon, shadow, className, onClick }) => {
   const { emit } = useContext(OnboardingContext);
   return (
     <Button
       type="button"
       color="secondary"
       size="large"
-      onClick={() => emit({ case: `secondaryBtnClicked` })}
+      onClick={() => (onClick ? onClick() : emit({ case: `secondaryBtnClicked` }))}
       className={cx(shadow && `shadow shadow-violet-200/80`, className)}
     >
       {children}
@@ -52,6 +49,7 @@ interface ButtonGroupProps {
     text: string;
     icon?: string;
     shadow?: boolean;
+    onClick?: () => void;
   };
   direction?: 'row' | 'column';
   className?: string;
@@ -75,11 +73,45 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
     >
       {typeof primary === `string` ? primary : primary.text}
     </PrimaryButton>
-    <SecondaryButton icon={secondary.icon} shadow={secondary.shadow}>
+    <SecondaryButton
+      icon={secondary.icon}
+      onClick={secondary.onClick}
+      shadow={secondary.shadow}
+    >
       {secondary.text}
     </SecondaryButton>
   </div>
 );
+
+export const TextButton: React.FC<{
+  children: React.ReactNode;
+  onClick?: () => unknown;
+}> = ({ children, onClick }) => {
+  const { emit } = useContext(OnboardingContext);
+  return (
+    <button
+      className="text-blue-700 hover:underline cursor-pointer"
+      onClick={() => (onClick ? onClick() : emit({ case: `secondaryBtnClicked` }))}
+    >
+      {children}
+    </button>
+  );
+};
+
+export const EscapeHatchButton: React.FC<{
+  children: React.ReactNode;
+  onClick?: () => unknown;
+}> = ({ children, onClick }) => {
+  const { emit } = useContext(OnboardingContext);
+  return (
+    <button
+      className="text-sm text-slate-600 hover:text-red-700 antialiased opacity-75 absolute bottom-6 right-6"
+      onClick={() => (onClick ? onClick() : emit({ case: `secondaryBtnClicked` }))}
+    >
+      {children}
+    </button>
+  );
+};
 
 interface HeadingProps {
   children: React.ReactNode;

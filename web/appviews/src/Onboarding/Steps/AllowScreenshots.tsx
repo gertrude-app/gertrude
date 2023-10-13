@@ -1,20 +1,20 @@
-import React, { useContext } from 'react';
-import { Button } from '@shared/components';
+import React, { useContext, useState } from 'react';
 import Callout from '../Callout';
 import ExpandableImage from '../ExpandableImage';
 import * as Onboarding from '../UtilityComponents';
 import OnboardingContext from '../OnboardingContext';
+import InformationModal from '../InformationModal';
 
 interface Props {
   step:
     | 'allowScreenshots_required'
-    | 'allowScreenshots_openSysSettings'
     | 'allowScreenshots_grantAndRestart'
     | 'allowScreenshots_failed'
     | 'allowScreenshots_success';
 }
 
 const AllowScreenshots: React.FC<Props> = ({ step }) => {
+  const [showModal, setShowModal] = useState(false);
   const { systemSettingsName, emit } = useContext(OnboardingContext);
   switch (step) {
     case `allowScreenshots_required`:
@@ -40,53 +40,52 @@ const AllowScreenshots: React.FC<Props> = ({ step }) => {
           />
         </Onboarding.Centered>
       );
-    case `allowScreenshots_openSysSettings`:
-      return (
-        <Onboarding.Centered direction="row" className="gap-12">
-          <div className="flex flex-col">
-            <Onboarding.Heading>Open {systemSettingsName}</Onboarding.Heading>
-            <Onboarding.Text className="max-w-lg mt-4">
-              Just now, a system popup should have appeared that looks like this. Find it
-              and click{` `}
-              <b>Open {systemSettingsName}.</b>
-            </Onboarding.Text>
-            <Onboarding.ButtonGroup
-              primary="Done"
-              secondary={{ text: `I don’t see a popup...`, shadow: true }}
-              className="mt-8 w-80"
-            />
-          </div>
-          <ExpandableImage
-            fileName="accessibility-access.png"
-            alt={`Grant permission`}
-            width={640 / 2}
-            height={490 / 2}
-          />
-        </Onboarding.Centered>
-      );
     case `allowScreenshots_grantAndRestart`:
       return (
-        <Onboarding.Centered>
-          <Onboarding.Heading>Allow screenshots</Onboarding.Heading>
-          <Onboarding.Text className="max-w-2xl mt-4 mb-16" centered>
-            Follow the steps shown below, which include <b>quitting Gertrude.</b> This
-            screen will open again when it restarts.
-          </Onboarding.Text>
+        <Onboarding.Centered direction="row" className="gap-12">
+          <InformationModal open={showModal} setOpen={setShowModal}>
+            If you can’t find the <b>{systemSettingsName} app</b>, try closing
+            applications, moving windows, and checking any additional desktops you may
+            have open. Failing that, click the Apple icon () in the far upper left corner
+            of your screen, and choose “{systemSettingsName}...” then search for “Privacy
+            &amp; Security.” Once you’re in that area, scroll down and select “Screen
+            Recording” then follow the steps shown in the animated image below this popup.
+            If you’re still stuck,{` `}
+            <Onboarding.TextButton onClick={() => emit({ case: `primaryBtnClicked` })}>
+              click here
+            </Onboarding.TextButton>
+            {` `} to watch a short troubleshooting video. Or, it’s OK to skip this step
+            for now, and fix it later after contacting us for help.
+          </InformationModal>
+          <div className="flex flex-col">
+            <Onboarding.Heading>Allow screenshots</Onboarding.Heading>
+            <Onboarding.Text className="max-w-2xl mt-4 mb-8">
+              Follow the steps shown, which include <b>quitting Gertrude.</b> This screen
+              will open again when it restarts.
+            </Onboarding.Text>
+            <Onboarding.SecondaryButton
+              onClick={() => {
+                setShowModal(true);
+                emit({
+                  case: `infoModalOpened`,
+                  step: `allowScreenshots_grantAndRestart`,
+                  detail: `helpStuck`,
+                });
+              }}
+            >
+              Help, I’m stuck...
+            </Onboarding.SecondaryButton>
+          </div>
           <ExpandableImage
             fileName="allow-screen-recording.gif"
-            alt={`Allow screenshots`}
             width={800 / 1.9}
             height={600 / 1.9}
           />
-          <Button
-            color="tertiary"
-            size="large"
-            type="button"
-            onClick={() => emit({ case: `primaryBtnClicked` })}
-            className="mt-2 translate-y-4"
+          <Onboarding.EscapeHatchButton
+            onClick={() => emit({ case: `secondaryBtnClicked` })}
           >
-            Help, I'm still here...
-          </Button>
+            Continue and resolve later &rarr;
+          </Onboarding.EscapeHatchButton>
         </Onboarding.Centered>
       );
     case `allowScreenshots_success`:
@@ -106,17 +105,26 @@ const AllowScreenshots: React.FC<Props> = ({ step }) => {
     case `allowScreenshots_failed`:
       return (
         <Onboarding.Centered>
-          <div className="flex flex-col items-center border-2 border-slate-200/60 border-dashed p-12 rounded-3xl">
-            <Onboarding.Heading>Hmm... something didn't work</Onboarding.Heading>
-            <Onboarding.Text className="mt-4">
-              We still don't have permission to record the screen. Please try again.
-            </Onboarding.Text>
-            <Onboarding.ButtonGroup
-              primary="Try again"
-              secondary={{ text: `Skip this step...`, shadow: true }}
-              className="mt-8 w-80"
-            />
-          </div>
+          <Onboarding.Heading>
+            <i className="fas fa-exclamation-triangle text-yellow-600 mr-4" />
+            Screen recording permission not granted
+          </Onboarding.Heading>
+          <Onboarding.Text className="mt-2">
+            Watch the short video below for more troubleshooting steps.
+          </Onboarding.Text>
+          <iframe
+            className="my-6 rounded-xl"
+            width="560"
+            height="315"
+            src="https://www.youtube-nocookie.com/embed/ytN1HhQX3xo?rel=0"
+            title="YouTube video player"
+            allowFullScreen
+          />
+          <Onboarding.ButtonGroup
+            primary="Try again"
+            secondary={{ text: `Skip for now`, shadow: true }}
+            className="w-80"
+          />
         </Onboarding.Centered>
       );
   }

@@ -20,7 +20,7 @@ const NoGertrudeAccount: React.FC = () => (
         className="mt-6 max-w-md"
       />
     </div>
-    <QRCode url="gertrude.app/signup" />
+    <QRCode url="gertrude.app/start" />
   </Onboarding.Centered>
 );
 

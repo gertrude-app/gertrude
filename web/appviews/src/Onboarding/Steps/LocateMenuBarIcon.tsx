@@ -16,7 +16,6 @@ const LocateMenuBarIcon: React.FC = () => (
       fileName="locate-menubar-icon.gif"
       lessRounded
       showInstructions={false}
-      alt={`Locate menu bar icon`}
       width={798 / 1.9}
       height={600 / 1.9}
     />

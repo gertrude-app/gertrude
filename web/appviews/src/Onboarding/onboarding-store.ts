@@ -19,7 +19,6 @@ export type OnboardingStep =
   | 'allowNotifications_grant'
   | 'allowNotifications_failed'
   | 'allowScreenshots_required'
-  | 'allowScreenshots_openSysSettings'
   | 'allowScreenshots_grantAndRestart'
   | 'allowScreenshots_failed'
   | 'allowScreenshots_success'
@@ -58,7 +57,7 @@ export interface AppState {
 
 export type AppEvent =
   | { case: 'connectChildSubmitted'; code: number }
-  | { case: 'tellMeMoreClicked'; step: OnboardingStep; detail?: string }
+  | { case: 'infoModalOpened'; step: OnboardingStep; detail?: string }
   | { case: 'closeWindow' }
   | { case: 'primaryBtnClicked' }
   | { case: 'secondaryBtnClicked' }

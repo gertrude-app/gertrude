@@ -94,20 +94,22 @@ interface StartRemediationProps {
 }
 
 const StartRemediation: React.FC<StartRemediationProps> = ({ action }) => {
+  const { os } = useContext(OnboardingContext);
+  const osSuffix = os[0] ?? ``;
   let lead: string;
   let tutorialSlug: string;
   switch (action) {
     case `create`:
-      tutorialSlug = `h1`;
+      tutorialSlug = `cu-${osSuffix}`;
       lead = `Creating a new non-admin macOS user for your child will allow Gertrude to safely do its job.`;
       break;
     case `switch`:
       lead = `Having your child always use a non-admin macOS user will allow Gertrude to safely do its job.`;
-      tutorialSlug = `h2`;
+      tutorialSlug = `su-${osSuffix}`;
       break;
     case `demote`:
       lead = `Removing admin privileges for the macOS user your child uses will allow Gertrude to safely do its job.`;
-      tutorialSlug = `h3`; // eslint-disable-line
+      tutorialSlug = `du-${osSuffix}`;
       break;
   }
   return (
@@ -126,8 +128,11 @@ const StartRemediation: React.FC<StartRemediationProps> = ({ action }) => {
         through every step.
       </Onboarding.Text>
       <div className="flex justify-center mt-8">
-        <QRCode url={`gertrude.app/signup`} />
+        <QRCode url={`gertrude.app/${tutorialSlug}`} />
       </div>
+      <Onboarding.EscapeHatchButton>
+        Or, continue without fixing &rarr;
+      </Onboarding.EscapeHatchButton>
     </div>
   );
 };
@@ -162,7 +167,7 @@ const WarnUserIsAdmin: React.FC = () => {
         onClick={() => {
           setShowModal(true);
           emit({
-            case: `tellMeMoreClicked`,
+            case: `infoModalOpened`,
             step: `macosUserAccountType`,
             detail: `adminUser sad path`,
           });
@@ -203,7 +208,7 @@ const HappyPath: React.FC<HappyPathProps> = ({ userName, adminUsers }) => {
         onClick={() => {
           setShowModal(true);
           emit({
-            case: `tellMeMoreClicked`,
+            case: `infoModalOpened`,
             step: `macosUserAccountType`,
             detail: `happyPath`,
           });

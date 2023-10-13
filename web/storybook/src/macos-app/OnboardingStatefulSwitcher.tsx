@@ -46,9 +46,6 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`allowScreenshots_required`);
             break;
           case `allowScreenshots_required`:
-            setStep(`allowScreenshots_openSysSettings`);
-            break;
-          case `allowScreenshots_openSysSettings`:
             setStep(`allowScreenshots_grantAndRestart`);
             break;
           case `allowScreenshots_grantAndRestart`:
@@ -149,10 +146,6 @@ const OnboardingStatefulSwitcher: React.FC = () => {
         <OnboardingPage
           step="allowScreenshots_required"
           component={<Step.AllowScreenshots step="allowScreenshots_required" />}
-        />
-        <OnboardingPage
-          step="allowScreenshots_openSysSettings"
-          component={<Step.AllowScreenshots step="allowScreenshots_openSysSettings" />}
         />
         <OnboardingPage
           step="allowScreenshots_grantAndRestart"

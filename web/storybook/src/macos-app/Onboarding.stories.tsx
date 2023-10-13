@@ -129,11 +129,6 @@ export const AllowScreenshotsRequired: Story = props({
   step: `allowScreenshots_required`,
 });
 
-export const AllowScreenshotsOpenSettings: Story = props({
-  ...Welcome.args,
-  step: `allowScreenshots_openSysSettings`,
-});
-
 export const AllowScreenshotsGrant: Story = props({
   ...Welcome.args,
   step: `allowScreenshots_grantAndRestart`,

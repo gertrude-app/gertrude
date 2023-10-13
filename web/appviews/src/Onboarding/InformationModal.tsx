@@ -23,7 +23,7 @@ const InformationModal: React.FC<Props> = ({ open, setOpen, children }) => (
       )}
       onClick={(e) => e.stopPropagation()}
     >
-      <p className="max-w-2xl p-10 pb-6 text-slate-600 text-lg">{children}</p>
+      <p className="max-w-3xl p-10 pb-6 text-slate-600 text-lg">{children}</p>
       <div className="flex justify-end p-4 pt-0 rounded-b-3xl">
         <Button
           color="tertiary"

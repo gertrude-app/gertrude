@@ -21,9 +21,9 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
         <Onboarding.Centered>
           <Onboarding.Heading>Just one more step!</Onboarding.Heading>
           <Onboarding.Text className="my-4 max-w-2xl mb-8" centered>
-            What gives Gertrude it's superpowers is something called a{` `}
-            <b>system extension</b>. 🚀 Because it's so powerful, you have to give it{` `}
-            <span className="underline">special permission</span> to do it's job.
+            What gives Gertrude its superpowers is something called a{` `}
+            <b>system extension</b>. 🚀 Because it’s so powerful, you have to give it{` `}
+            <span className="underline">special permission</span> to do its job.
           </Onboarding.Text>
           <Callout heading="Good to know:" type="info">
             <p>You can disable and remove the system extension at any time.</p>
@@ -50,7 +50,6 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
           </div>
           <ExpandableImage
             fileName="finish-install-sys-ext.gif"
-            alt={`Allow system extension install`}
             width={800 / 2}
             height={600 / 2}
           />
@@ -60,7 +59,7 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
       return (
         <Onboarding.Centered className="h-full flex flex-col justify-center items-center">
           <Onboarding.Heading className="mb-2">
-            Hmm, somthing didn't work...
+            Hmm, something didn't work...
           </Onboarding.Heading>
           <Onboarding.Text className="max-w-2xl" centered>
             Shucks! The system extension did not install correctly. Watch this short video

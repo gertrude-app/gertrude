@@ -80,10 +80,6 @@ export const Onboarding: React.FC<Props> = ({
         component={<Step.AllowScreenshots step="allowScreenshots_required" />}
       />
       <OnboardingPage
-        step="allowScreenshots_openSysSettings"
-        component={<Step.AllowScreenshots step="allowScreenshots_openSysSettings" />}
-      />
-      <OnboardingPage
         step="allowScreenshots_grantAndRestart"
         component={<Step.AllowScreenshots step="allowScreenshots_grantAndRestart" />}
       />
