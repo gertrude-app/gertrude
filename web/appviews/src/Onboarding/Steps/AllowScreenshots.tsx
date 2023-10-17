@@ -51,7 +51,12 @@ const AllowScreenshots: React.FC<Props> = ({ step }) => {
             &amp; Security.” Once you’re in that area, scroll down and select “Screen
             Recording” then follow the steps shown in the animated image below this popup.
             If you’re still stuck,{` `}
-            <Onboarding.TextButton onClick={() => emit({ case: `primaryBtnClicked` })}>
+            <Onboarding.TextButton
+              onClick={() => {
+                setShowModal(false);
+                emit({ case: `primaryBtnClicked` });
+              }}
+            >
               click here
             </Onboarding.TextButton>
             {` `} to watch a short troubleshooting video. Or, it’s OK to skip this step

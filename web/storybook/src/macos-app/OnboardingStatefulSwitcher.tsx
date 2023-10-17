@@ -58,9 +58,6 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`allowKeylogging_required`);
             break;
           case `allowKeylogging_required`:
-            setStep(`allowKeylogging_openSysSettings`);
-            break;
-          case `allowKeylogging_openSysSettings`:
             setStep(`allowKeylogging_grant`);
             break;
           case `allowKeylogging_grant`:
@@ -163,10 +160,6 @@ const OnboardingStatefulSwitcher: React.FC = () => {
         <OnboardingPage
           step="allowKeylogging_required"
           component={<Step.AllowKeylogging step="allowKeylogging_required" />}
-        />
-        <OnboardingPage
-          step="allowKeylogging_openSysSettings"
-          component={<Step.AllowKeylogging step="allowKeylogging_openSysSettings" />}
         />
         <OnboardingPage
           step="allowKeylogging_grant"

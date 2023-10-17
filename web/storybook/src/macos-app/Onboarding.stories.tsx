@@ -151,11 +151,6 @@ export const AllowKeyloggingRequired: Story = props({
   step: `allowKeylogging_required`,
 });
 
-export const AllowKeyloggingOpenSettings: Story = props({
-  ...Welcome.args,
-  step: `allowKeylogging_openSysSettings`,
-});
-
 export const AllowKeyloggingGrant: Story = props({
   ...Welcome.args,
   step: `allowKeylogging_grant`,

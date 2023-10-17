@@ -11,7 +11,7 @@ const TellMeMoreButton: React.FC<Props> = ({ onClick, children, className }) => 
   <button
     onClick={onClick}
     className={cx(
-      `font-medium text-violet-500 hover:bg-violet-100 rounded-xl transition-[background-color,transform] duration-200 px-6 py-2 active:scale-[97%] active:bg-violet-200`,
+      `font-medium text-violet-500 hover:bg-violet-100 rounded-xl transition-[background-color,transform] duration-200 mx-2 px-4 py-2 active:scale-[97%] active:bg-violet-200`,
       className,
     )}
   >

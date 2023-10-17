@@ -49,7 +49,7 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
             />
           </div>
           <ExpandableImage
-            fileName="finish-install-sys-ext.gif"
+            fileName="install-sys-ext.gif"
             width={800 / 2}
             height={600 / 2}
           />

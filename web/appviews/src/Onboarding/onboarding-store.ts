@@ -23,7 +23,6 @@ export type OnboardingStep =
   | 'allowScreenshots_failed'
   | 'allowScreenshots_success'
   | 'allowKeylogging_required'
-  | 'allowKeylogging_openSysSettings'
   | 'allowKeylogging_grant'
   | 'allowKeylogging_failed'
   | 'installSysExt_explain'

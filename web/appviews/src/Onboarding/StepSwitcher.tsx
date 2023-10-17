@@ -34,7 +34,6 @@ const StepSwitcher: React.FC<Props> = ({ children, ready }) => {
       case `allowScreenshots_failed`:
         return 5;
       case `allowKeylogging_required`:
-      case `allowKeylogging_openSysSettings`:
       case `allowKeylogging_grant`:
       case `allowKeylogging_failed`:
         return 6;

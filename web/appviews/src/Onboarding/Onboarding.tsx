@@ -99,10 +99,6 @@ export const Onboarding: React.FC<Props> = ({
         component={<Step.AllowKeylogging step="allowKeylogging_required" />}
       />
       <OnboardingPage
-        step="allowKeylogging_openSysSettings"
-        component={<Step.AllowKeylogging step="allowKeylogging_openSysSettings" />}
-      />
-      <OnboardingPage
         step="allowKeylogging_grant"
         component={<Step.AllowKeylogging step="allowKeylogging_grant" />}
       />
