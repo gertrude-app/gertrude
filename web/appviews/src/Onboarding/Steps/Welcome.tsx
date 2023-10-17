@@ -86,9 +86,11 @@ const Welcome: React.FC = () => {
               setTimeout(() => emit({ case: `primaryBtnClicked` }), 1000);
             }}
           >
-            <span className="bg-gradient-to-r from-indigo-600 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text] text-transparent flex items-center space-x-3">
-              <span>Let’s do this</span>
-              <i className="fa-solid fa-arrow-right" />
+            <span>
+              <span className="bg-gradient-to-r from-indigo-600 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text] text-transparent">
+                Let’s do this
+              </span>
+              <i className="ml-2 fa-solid fa-arrow-right text-fuchsia-500" />
             </span>
           </button>
         </div>
