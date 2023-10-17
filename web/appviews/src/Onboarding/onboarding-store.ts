@@ -101,7 +101,8 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
         return {
           ...state,
           ...action.appState,
-          didResume: state.receivedAppState === false && state.step !== `welcome`,
+          didResume:
+            state.receivedAppState === false && action.appState.step !== `welcome`,
           receivedAppState: true,
         };
       case `appEventEmitted`:
