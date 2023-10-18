@@ -4,13 +4,19 @@ import OnboardingContext from '../OnboardingContext';
 
 const Welcome: React.FC = () => {
   const { emit } = useContext(OnboardingContext);
-  const [loaded, setLoaded] = useState(false);
+  const [fontLoaded, setFontLoaded] = useState(false);
+  const [heyThereDone, setHeyThereDone] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const id = setTimeout(() => setLoaded(true), 1000);
+    const id = setTimeout(() => setFontLoaded(true), 1200);
     return () => clearTimeout(id);
-  }, [loaded, setLoaded]);
+  }, [setHeyThereDone]);
+
+  useEffect(() => {
+    const id = setTimeout(() => setHeyThereDone(true), 2400);
+    return () => clearTimeout(id);
+  }, [setHeyThereDone]);
 
   return (
     <div
@@ -22,16 +28,21 @@ const Welcome: React.FC = () => {
       <div
         className={cx(
           `w-screen h-[200vh] left-0 absolute bg-gradient-to-b from-white via-white to-transparent transition-[top] duration-[5s]`,
-          loaded ? `-top-[200vh]` : `top-0`,
+          heyThereDone ? `-top-[200vh]` : `top-0`,
         )}
       />
-      <span className={cx(`absolute text-6xl font-lato text-black`)}>
+      <span
+        className={cx(
+          `absolute text-6xl font-lato`,
+          fontLoaded ? `text-black` : `text-transparent`,
+        )}
+      >
         {`Hey there!`.split(``).map((letter, index) => (
           <span
             key={letter + index}
             className={cx(
               `transition-[opacity,transform] duration-[1s] inline-block ease-in`,
-              loaded && `opacity-0 -translate-y-20`,
+              heyThereDone && `opacity-0 -translate-y-20`,
             )}
             style={{
               transitionDelay: `${index * 50}ms`,
@@ -53,7 +64,7 @@ const Welcome: React.FC = () => {
               key={letter + index}
               className={cx(
                 `transition-[opacity,transform] duration-[1s] inline-block ease-out`,
-                !loaded && `opacity-0 translate-y-8`,
+                !heyThereDone && `opacity-0 translate-y-8`,
               )}
               style={{
                 transitionDelay: `${index * 50 + 2500}ms`,
@@ -66,7 +77,7 @@ const Welcome: React.FC = () => {
         <p
           className={cx(
             `text-xl max-w-xl text-center text-white/80 font-medium mt-6 mb-10 transition-[opacity,transform] duration-[1s] ease-out delay-[3.5s]`,
-            !loaded && `opacity-0 translate-y-8`,
+            !heyThereDone && `opacity-0 translate-y-8`,
           )}
         >
           We’re thrilled that you’re here. You (the parent) will need to do a small amount
@@ -76,7 +87,7 @@ const Welcome: React.FC = () => {
         <div
           className={cx(
             `transition-[opacity,transform] duration-[1s] ease-out delay-[4s]`,
-            !loaded && `opacity-0 translate-y-8 pointer-events-none`,
+            !heyThereDone && `opacity-0 translate-y-8 pointer-events-none`,
           )}
         >
           <button
