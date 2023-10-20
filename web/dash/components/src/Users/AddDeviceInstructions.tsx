@@ -23,10 +23,12 @@ const AddDeviceInstructions: React.FC<Props> = ({
     </h1>
     <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl mx-auto">
       {onMainDashboard ? (
-        <span>To finish getting started, you'll need to do 3 steps:</span>
+        <span>
+          To finish getting started, you'll need to do <b>2 steps:</b>
+        </span>
       ) : (
         <span>
-          To start protecting <i className="font-bold">{userName}</i>, you'll need to do 3
+          To start protecting <i className="font-bold">{userName}</i>, you'll need to do 2
           steps:
         </span>
       )}
@@ -43,39 +45,29 @@ const AddDeviceInstructions: React.FC<Props> = ({
         {` `}
         then install and launch the app.
       </ListStep>
-      {onMainDashboard ? (
-        <ListStep index={2}>
-          Then, from back here inside the parent site, get a one-time connection code by
-          {` `}
-          <span
-            className="cursor-pointer text-indigo-500"
-            onClick={() => startAddDevice(userId)}
-          >
-            clicking here.
-          </span>
-        </ListStep>
-      ) : (
-        <>
-          <ListStep index={2}>
-            Then, from back here inside the parent site, get a one-time connection code by
-            clicking the button below:
-          </ListStep>
-          <Button
-            type="button"
-            onClick={() => startAddDevice(userId)}
-            color="primary"
-            className="self-center flex items-center gap-2"
-          >
-            <ComputerDesktopIcon className="h-5" />
-            Get connection code
-          </Button>
-        </>
-      )}
-      <ListStep index={3}>
-        Finally, back on {userName}'s computer, click the Gertrude icon in the menu bar
-        and enter the connection code.{` `}
-        {!onMainDashboard && `Once the device connects, you will be able to see it here.`}
+      <ListStep index={2}>
+        When the Gertrude app asks for a <b>connection code</b>, come back here and click
+        the button below:
       </ListStep>
+      <Button
+        size="large"
+        type="button"
+        onClick={() => startAddDevice(userId)}
+        color="primary"
+        className="self-center hidden sm:flex items-center gap-2"
+      >
+        <ComputerDesktopIcon className="h-5" />
+        Get connection code
+      </Button>
+      <Button
+        type="button"
+        onClick={() => startAddDevice(userId)}
+        color="primary"
+        className="flex sm:hidden justify-center items-center gap-2"
+      >
+        <ComputerDesktopIcon className="h-5" />
+        Get connection code
+      </Button>
     </ol>
     <div className="flex flex-col-reverse lg:flex-row gap-4 mt-12 w-full">
       <OnboardingRecommendation
