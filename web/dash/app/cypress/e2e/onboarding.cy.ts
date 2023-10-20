@@ -47,7 +47,7 @@ describe(`dashboard onboarding nudges`, () => {
 
     cy.testId(`user-name`).type(`Leopold`);
     cy.contains(`Save child`).click();
-    cy.contains(`need to do 3 steps`);
+    cy.contains(`need to do 2 steps`);
     cy.contains(`Get connection code`).click();
     cy.contains(`123456`).should(`be.visible`);
   });
@@ -64,7 +64,7 @@ describe(`dashboard onboarding nudges`, () => {
 
     cy.visit(`/`);
     cy.contains(`Congrats on adding your first child!`);
-    cy.contains(`clicking here`).click();
+    cy.contains(`Get connection code`).click();
     cy.contains(`123456`).should(`be.visible`);
   });
 

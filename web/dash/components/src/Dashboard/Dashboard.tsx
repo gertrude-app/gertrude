@@ -170,7 +170,7 @@ export const OnboardingRecommendation: React.FC<OnboardingRecommendationProps> =
   <SmartLink
     to={href}
     className={cx(
-      `flex items-center gap-6 p-2 pr-4 lg:pr-8 rounded-2xl border transition-[background-color] duration-150 group`,
+      `flex items-center gap-4 p-2 pr-4 lg:pr-8 rounded-2xl border transition-[background-color] duration-150 group`,
       primary
         ? `border-violet-100 bg-violet-50/50 hover:bg-violet-50`
         : `border-slate-100 hover:bg-slate-50`,
