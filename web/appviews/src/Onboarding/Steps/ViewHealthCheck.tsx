@@ -1,7 +1,8 @@
 import React from 'react';
-import ExpandableImage from '../ExpandableImage';
+import ExpandableContent from '../ExpandableContent';
 import Callout from '../Callout';
 import * as Onboarding from '../UtilityComponents';
+import assets from '../cdn-assets';
 
 const ViewHealthCheck: React.FC = () => (
   <Onboarding.Centered className="space-x-12" direction="row">
@@ -20,8 +21,8 @@ const ViewHealthCheck: React.FC = () => (
         Found it, next
       </Onboarding.PrimaryButton>
     </div>
-    <ExpandableImage
-      fileName="administrate.png"
+    <ExpandableContent
+      asset={assets.img(`administrate.png`)}
       lessRounded
       width={800 * 0.45}
       height={600 * 0.45}

@@ -1,6 +1,7 @@
 import React from 'react';
-import ExpandableImage from '../ExpandableImage';
+import ExpandableContent from '../ExpandableContent';
 import * as Onboarding from '../UtilityComponents';
+import assets from '../cdn-assets';
 
 const LocateMenuBarIcon: React.FC = () => (
   <Onboarding.Centered>
@@ -12,8 +13,8 @@ const LocateMenuBarIcon: React.FC = () => (
     <Onboarding.Text className="mb-6 max-w-2xl" centered>
       Look up in the top right corner of your screen to find it, and give it a click.
     </Onboarding.Text>
-    <ExpandableImage
-      fileName="locate-menubar-icon.gif"
+    <ExpandableContent
+      asset={assets.img(`locate-menubar-icon.gif`)}
       lessRounded
       showInstructions={false}
       width={798 / 1.9}

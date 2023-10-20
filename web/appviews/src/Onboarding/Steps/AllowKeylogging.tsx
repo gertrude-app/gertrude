@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
 import Callout from '../Callout';
-import ExpandableImage from '../ExpandableImage';
+import ExpandableContent from '../ExpandableContent';
 import * as Onboarding from '../UtilityComponents';
+import assets from '../cdn-assets';
 import OnboardingContext from '../OnboardingContext';
 import InformationModal from '../InformationModal';
 import TellMeMoreButton from '../TellMeMoreButton';
@@ -11,7 +12,7 @@ interface Props {
 }
 
 const AllowKeylogging: React.FC<Props> = ({ step }) => {
-  const { systemSettingsName, emit } = useContext(OnboardingContext);
+  const { systemSettingsName, os, currentStep, emit } = useContext(OnboardingContext);
   const [showModal, setShowModal] = useState(false);
   switch (step) {
     case `allowKeylogging_required`:
@@ -97,8 +98,8 @@ const AllowKeylogging: React.FC<Props> = ({ step }) => {
               className="mt-8 w-80"
             />
           </div>
-          <ExpandableImage
-            fileName="allow-keylogging.gif"
+          <ExpandableContent
+            asset={assets.osImg(os, `allow-keylogging.gif`)}
             width={640 / 1.7}
             height={490 / 1.7}
           />
@@ -114,13 +115,16 @@ const AllowKeylogging: React.FC<Props> = ({ step }) => {
           <Onboarding.Text className="max-w-2xl" centered>
             Watch the short video below for troubleshooting steps:
           </Onboarding.Text>
-          <iframe
-            className="my-6 rounded-xl"
-            width="560"
-            height="315"
-            src="https://www.youtube-nocookie.com/embed/ytN1HhQX3xo?rel=0"
-            title="YouTube video player"
-            allowFullScreen
+          <ExpandableContent
+            width={640 * 0.8}
+            height={360 * 0.8}
+            asset={assets.osVideo(
+              os,
+              `troubleshoot-keylogging`,
+              currentStep === `allowKeylogging_failed`,
+            )}
+            className="mt-4 mb-6"
+            showInstructions={false}
           />
           <Onboarding.ButtonGroup
             primary="Try recheck"

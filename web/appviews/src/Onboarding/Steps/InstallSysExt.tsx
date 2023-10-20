@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
 import Callout from '../Callout';
-import ExpandableImage from '../ExpandableImage';
+import ExpandableContent from '../ExpandableContent';
 import * as Onboarding from '../UtilityComponents';
+import assets from '../cdn-assets';
 import OnboardingContext from '../OnboardingContext';
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
 }
 
 const InstallSysExt: React.FC<Props> = ({ step }) => {
-  const { systemSettingsName } = useContext(OnboardingContext);
+  const { systemSettingsName, os, currentStep } = useContext(OnboardingContext);
   switch (step) {
     case `installSysExt_explain`:
       return (
@@ -48,8 +49,8 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
               className="w-80 mt-4"
             />
           </div>
-          <ExpandableImage
-            fileName="install-sys-ext.gif"
+          <ExpandableContent
+            asset={assets.osImg(os, `install-sys-ext.gif`)}
             width={800 / 2}
             height={600 / 2}
           />
@@ -59,19 +60,23 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
       return (
         <Onboarding.Centered className="h-full flex flex-col justify-center items-center">
           <Onboarding.Heading className="mb-2">
+            <i className="fas fa-exclamation-triangle text-yellow-600 mr-4" />
             Hmm, something didn’t work...
           </Onboarding.Heading>
           <Onboarding.Text className="max-w-2xl" centered>
             Shucks! The system extension did not install correctly. Watch this short video
             for troubleshooting tips.
           </Onboarding.Text>
-          <iframe
-            className="my-6 rounded-xl"
-            width="560"
-            height="315"
-            src="https://www.youtube-nocookie.com/embed/ytN1HhQX3xo?rel=0"
-            title="YouTube video player"
-            allowFullScreen
+          <ExpandableContent
+            width={640 * 0.8}
+            height={360 * 0.8}
+            asset={assets.osVideo(
+              os,
+              `troubleshoot-sys-ext-install`,
+              currentStep === `installSysExt_failed`,
+            )}
+            className="mt-4 mb-6"
+            showInstructions={false}
           />
           <Onboarding.ButtonGroup
             primary="Try again"

@@ -14,4 +14,5 @@ const OnboardingContext = createContext<{
   emit() {},
   dispatch() {},
 });
+
 export default OnboardingContext;

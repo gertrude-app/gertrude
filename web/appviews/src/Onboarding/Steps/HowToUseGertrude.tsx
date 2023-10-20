@@ -1,30 +1,35 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import ExpandableContent from '../ExpandableContent';
 import * as Onboarding from '../UtilityComponents';
+import OnboardingContext from '../OnboardingContext';
+import assets from '../cdn-assets';
 
-const HowToUseGertrude: React.FC = () => (
-  <Onboarding.Centered>
-    <Onboarding.Heading>How to use Gertrude</Onboarding.Heading>
-    <Onboarding.Text className="mt-2" centered>
-      The 7-minute video below walks you through the basics of using Gertrude, including:
-    </Onboarding.Text>
-    <ul className="flex flex-wrap mt-3 justify-center">
-      <ListItem index={1}>How to unblock parts of the internet</ListItem>
-      <ListItem index={2}>How to see what your child is doing online</ListItem>
-      <ListItem index={3}>How to suspend the filter temporarily</ListItem>
-    </ul>
-    <iframe
-      className="my-8 rounded-2xl"
-      width="500"
-      height="280"
-      src="https://www.youtube-nocookie.com/embed/ytN1HhQX3xo?rel=0"
-      title="YouTube video player"
-      allowFullScreen
-    />
-    <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right">
-      Finish
-    </Onboarding.PrimaryButton>
-  </Onboarding.Centered>
-);
+const HowToUseGertrude: React.FC = () => {
+  const { currentStep } = useContext(OnboardingContext);
+  return (
+    <Onboarding.Centered>
+      <Onboarding.Heading>How to use Gertrude</Onboarding.Heading>
+      <Onboarding.Text className="mt-2" centered>
+        The short video below walks you through the basics of using Gertrude, including:
+      </Onboarding.Text>
+      <ul className="flex flex-wrap mt-3 justify-center">
+        <ListItem index={1}>How to unblock parts of the internet</ListItem>
+        <ListItem index={2}>How to see what your child is doing online</ListItem>
+        <ListItem index={3}>How to suspend the filter temporarily</ListItem>
+      </ul>
+      <ExpandableContent
+        width={640 * 0.8}
+        height={360 * 0.8}
+        asset={assets.video(`post-onboarding-tour`, currentStep === `howToUseGertrude`)}
+        className="mt-4 mb-6"
+        showInstructions={false}
+      />
+      <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right">
+        Finish
+      </Onboarding.PrimaryButton>
+    </Onboarding.Centered>
+  );
+};
 
 export default HowToUseGertrude;
 
