@@ -78,7 +78,7 @@ const ExpandableContent: React.FC<Props> = ({
     <>
       <div
         className={cx(
-          `w-full h-full absolute -left-12 top-0 bg-white/30 transition-[opacity,backdrop-filter] duration-500 z-10`,
+          `!ml-0 w-full h-full absolute left-0 top-0 bg-white/30 transition-[opacity,backdrop-filter] duration-500 z-10`,
           expanded
             ? `opacity-100 cursor-zoom-out backdrop-blur-lg`
             : `opacity-0 pointer-events-none`,
@@ -89,7 +89,7 @@ const ExpandableContent: React.FC<Props> = ({
         }}
       >
         {!isImage && (
-          <div className="absolute top-4 -right-8 text-slate-400/80 text-sm antialiased">
+          <div className="absolute top-4 right-4 text-slate-400/80 text-sm antialiased">
             <i className="fa-solid fa-times mr-1" />
             <span className="uppercase">Close</span>
           </div>
