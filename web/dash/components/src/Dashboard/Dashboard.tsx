@@ -114,7 +114,7 @@ const Dashboard: React.FC<Props> = ({
             <OnboardingRecommendation
               title="How-to video (2 min)"
               icon="fa-brands fa-youtube"
-              href="https://youtu.be/C4Mxp-u6s6s"
+              href="https://youtu.be/xMMuLngWhYE"
               openInNewTab
             />
             <OnboardingRecommendation

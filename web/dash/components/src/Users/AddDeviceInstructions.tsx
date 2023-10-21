@@ -81,7 +81,7 @@ const AddDeviceInstructions: React.FC<Props> = ({
         className="flex-grow"
         title="How-to video (2 min)"
         icon="fa-brands fa-youtube"
-        href="https://youtu.be/ytN1HhQX3xo"
+        href="https://youtu.be/0GuhxIbYz-4"
         openInNewTab
         primary
       />
