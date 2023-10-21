@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Chrome } from '@dash/components';
-import type { DecoratorFn } from '@storybook/react';
+import type { Decorator } from '@storybook/react';
 
 const StatefulChrome: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [open, setOpen] = useState(false);
@@ -20,7 +20,7 @@ const StatefulChrome: React.FC<{ children: React.ReactNode }> = ({ children }) =
   );
 };
 
-export const withStatefulChrome: DecoratorFn = (Story) => (
+export const withStatefulChrome: Decorator = (Story) => (
   <StatefulChrome>
     <Story />
   </StatefulChrome>

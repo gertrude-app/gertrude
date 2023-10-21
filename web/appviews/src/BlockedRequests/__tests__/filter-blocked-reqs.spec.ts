@@ -1,7 +1,7 @@
 import { expect, it, describe } from 'vitest';
 import { filterVisibleRequests } from '../BlockedRequests';
 
-describe(`filterVisibleRequests())`, () => {
+describe(`filterVisibleRequests()`, () => {
   it(`removes tcp requests when tcpOnly true`, () => {
     const requests = [
       { protocol: `tcp` as const, searchableText: `tcp 1`, time: `1` },

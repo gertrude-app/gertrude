@@ -21,7 +21,7 @@ const NotConnectedActions: React.FC<Props> = ({
       <i className="fa-solid fa-chevron-left pr-2" />
       <span className="uppercase text-sm">back</span>
     </button>
-    <div className="flex flex-col gap-4 mt-4">
+    <div className="flex flex-col space-y-4 mt-4">
       {filterInstalled && (
         <Action
           label="Remove internet filter"

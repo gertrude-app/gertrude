@@ -40,11 +40,11 @@ const ExemptUsersScreen: React.FC<Props> = ({ users, emit }) => {
       <main className="p-4 flex-grow flex flex-col relative">
         <div className="mr-4">
           <p className="text-slate-500 dark:text-slate-400">
-            Gertrude's network filter has to make decisions about whether to allow or deny
+            Gertrude’s network filter has to make decisions about whether to allow or deny
             network requests from every user on this computer. For maximum internet
-            safety, it defaults to blocking all requests for users that it doesn't have
+            safety, it defaults to blocking all requests for users that it doesn’t have
             rules for. If this computer has another user or users who should have
-            unrestricted internet access (like a parent's admin account on a shared
+            unrestricted internet access (like a parent’s admin account on a shared
             computer), you can make that user{` `}
             <strong className="text-slate-700 dark:text-slate-200">
               exempt from filtering

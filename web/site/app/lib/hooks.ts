@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import type React from 'react';
 
 export function useInterval(callback: () => void, delay: number): void {
-  const savedCallback = React.useRef<() => void>();
+  const savedCallback = useRef<() => void>();
 
   useEffect(() => {
     savedCallback.current = callback;
