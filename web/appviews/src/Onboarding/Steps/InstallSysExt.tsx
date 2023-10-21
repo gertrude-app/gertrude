@@ -93,7 +93,7 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
             Hooray, we’ve confirmed the system extension is <em>ready to go!</em>
           </Onboarding.Text>
           <Callout type="info" heading="Good to know:">
-            You’re past all the hard parts, all that’s left it to briefly show you around
+            You’re past all the hard parts, all that’s left is to briefly show you around
             a bit.
           </Callout>
           <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" className="mt-8">
