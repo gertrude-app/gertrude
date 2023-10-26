@@ -46,8 +46,8 @@ const AddDeviceInstructions: React.FC<Props> = ({
         then install and launch the app.
       </ListStep>
       <ListStep index={2}>
-        When the Gertrude app asks for a <b>connection code</b>, come back here and click
-        the button below:
+        A few steps into the welcome wizard, when asked for a <b>connection code</b>, come
+        back here and click the button below:
       </ListStep>
       <Button
         size="large"
