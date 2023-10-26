@@ -85,11 +85,10 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
             label="Extra monitoring:"
             testId="select-extra-monitoring-option"
             options={[
-              { value: `off`, display: `Off` },
-              ...Object.entries(extraMonitoringOptions).map(([value, display]) => ({
-                value,
-                display,
-              })),
+              { value: `off`, display: `off` },
+              ...Object.entries(extraMonitoringOptions)
+                .sort(([a], [b]) => sortExtraMonitoringOpts(a, b))
+                .map(([value, display]) => ({ value, display })),
             ]}
             selectedOption={selectedExtraMonitoringOption ?? `off`}
             setSelected={setSelectedExtraMonitoringOption}
@@ -109,6 +108,30 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
 );
 
 export default SuspendFilterRequestForm;
+
+export function sortExtraMonitoringOpts(a: string, b: string): number {
+  if (a === b) {
+    return 0;
+  } else if (b === `k`) {
+    return a.includes(`k`) ? 1 : -1;
+  } else if (a === `k`) {
+    return b.includes(`k`) ? -1 : 1;
+  } else if (a.includes(`k`) && !b.includes(`k`)) {
+    return 1;
+  } else if (b.includes(`k`) && !a.includes(`k`)) {
+    return -1;
+  } else {
+    const matchA = a.match(/@(\d+)/);
+    const matchB = b.match(/@(\d+)/);
+    if (matchA && matchB) {
+      const numA = Number(matchA[1]);
+      const numB = Number(matchB[1]);
+      return numA === numB ? 0 : numA < numB ? -1 : 1;
+    } else {
+      return a === b ? 0 : a < b ? -1 : 1;
+    }
+  }
+}
 
 export const DURATION_OPTS = [
   { value: `180`, display: `3 minutes` },
