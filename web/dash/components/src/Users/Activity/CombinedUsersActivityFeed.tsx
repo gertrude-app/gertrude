@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@shared/components';
 import { posessive } from '@shared/string';
@@ -25,8 +25,26 @@ const CombinedUsersActivityFeed: React.FC<Props> = ({
   chunkSize = 100,
 }) => {
   const navigate = useNavigate();
-
+  const [initialSort, setInitialSort] = useState<Record<string, number> | null>(null);
   const items = activity.flatMap((user) => user.items);
+
+  activity.sort((a, b) => {
+    if (initialSort) {
+      return (initialSort[b.userName] || 0) - (initialSort[a.userName] || 0);
+    } else {
+      return a.items.length > b.items.length ? -1 : 1;
+    }
+  });
+
+  useEffect(() => {
+    if (initialSort) return;
+    setInitialSort(
+      activity.reduce<Record<string, number>>(
+        (acc, { userName, items }) => ({ ...acc, [userName]: items.length }),
+        {},
+      ),
+    );
+  }, [activity, initialSort]);
 
   return (
     <div className="-my-6 -mx-4 sm:-mx-6 md:my-0 md:mx-0">

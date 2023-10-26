@@ -48,7 +48,6 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
       date={date}
       activity={query.data
         .filter((user) => user.items.length > 0)
-        .sort((a, b) => (a.items.length > b.items.length ? -1 : 1))
         .map((user) => ({
           userName: user.userName,
           items: user.items.map(outputItemToActivityFeedItem),
