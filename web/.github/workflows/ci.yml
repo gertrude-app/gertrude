@@ -83,7 +83,7 @@ jobs:
       - name: create screenshots pr
         id: pr
         uses: peter-evans/create-pull-request@v4
-        if: env.RUN_ARGOS == 'true'
+        if: env.RUN_ARGOS == 'true' && github.event_name == 'pull_request'
         with:
           base: ${{ github.head_ref }}
           commit-message: '[automated] update screenshots from CI'
