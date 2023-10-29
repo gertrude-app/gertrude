@@ -31,16 +31,6 @@ export const liveClient = {
     >(input, `admin`, `ConfirmPendingNotificationMethod`);
   },
 
-  createBillingPortalSession(
-    input: T.CreateBillingPortalSession.Input,
-  ): Promise<T.Result<T.CreateBillingPortalSession.Output>> {
-    return query<T.CreateBillingPortalSession.Input, T.CreateBillingPortalSession.Output>(
-      input,
-      `admin`,
-      `CreateBillingPortalSession`,
-    );
-  },
-
   createPendingAppConnection(
     input: T.CreatePendingAppConnection.Input,
   ): Promise<T.Result<T.CreatePendingAppConnection.Output>> {
@@ -197,6 +187,26 @@ export const liveClient = {
     );
   },
 
+  handleCheckoutCancel(
+    input: T.HandleCheckoutCancel.Input,
+  ): Promise<T.Result<T.HandleCheckoutCancel.Output>> {
+    return query<T.HandleCheckoutCancel.Input, T.HandleCheckoutCancel.Output>(
+      input,
+      `admin`,
+      `HandleCheckoutCancel`,
+    );
+  },
+
+  handleCheckoutSuccess(
+    input: T.HandleCheckoutSuccess.Input,
+  ): Promise<T.Result<T.HandleCheckoutSuccess.Output>> {
+    return query<T.HandleCheckoutSuccess.Input, T.HandleCheckoutSuccess.Output>(
+      input,
+      `admin`,
+      `HandleCheckoutSuccess`,
+    );
+  },
+
   hollandTalkSubscription(
     input: T.HollandTalkSubscription.Input,
   ): Promise<T.Result<T.HollandTalkSubscription.Output>> {
@@ -293,6 +303,10 @@ export const liveClient = {
     return query<T.Signup.Input, T.Signup.Output>(input, `none`, `Signup`);
   },
 
+  stripeUrl(input: T.StripeUrl.Input): Promise<T.Result<T.StripeUrl.Output>> {
+    return query<T.StripeUrl.Input, T.StripeUrl.Output>(input, `admin`, `StripeUrl`);
+  },
+
   updateUnlockRequest(
     input: T.UpdateUnlockRequest.Input,
   ): Promise<T.Result<T.UpdateUnlockRequest.Output>> {
@@ -345,9 +359,6 @@ export const throwingClient: ApiClient = {
   },
   confirmPendingNotificationMethod: () => {
     throw new Error(`ApiClient.confirmPendingNotificationMethod() not implemented`);
-  },
-  createBillingPortalSession: () => {
-    throw new Error(`ApiClient.createBillingPortalSession() not implemented`);
   },
   createPendingAppConnection: () => {
     throw new Error(`ApiClient.createPendingAppConnection() not implemented`);
@@ -406,6 +417,12 @@ export const throwingClient: ApiClient = {
   getUserUnlockRequests: () => {
     throw new Error(`ApiClient.getUserUnlockRequests() not implemented`);
   },
+  handleCheckoutCancel: () => {
+    throw new Error(`ApiClient.handleCheckoutCancel() not implemented`);
+  },
+  handleCheckoutSuccess: () => {
+    throw new Error(`ApiClient.handleCheckoutSuccess() not implemented`);
+  },
   hollandTalkSubscription: () => {
     throw new Error(`ApiClient.hollandTalkSubscription() not implemented`);
   },
@@ -444,6 +461,9 @@ export const throwingClient: ApiClient = {
   },
   signup: () => {
     throw new Error(`ApiClient.signup() not implemented`);
+  },
+  stripeUrl: () => {
+    throw new Error(`ApiClient.stripeUrl() not implemented`);
   },
   updateUnlockRequest: () => {
     throw new Error(`ApiClient.updateUnlockRequest() not implemented`);

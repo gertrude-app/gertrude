@@ -16,17 +16,11 @@ export type AdminNotificationTrigger =
   | 'suspendFilterRequestSubmitted';
 
 export type AdminSubscriptionStatus =
-  | 'pendingEmailVerification'
-  | 'emailVerified'
-  | 'signupCanceled'
-  | 'complimentary'
-  | 'incomplete'
-  | 'incompleteExpired'
-  | 'trialing'
-  | 'active'
-  | 'pastDue'
-  | 'canceled'
-  | 'unpaid';
+  | { case: 'trialing'; daysLeft: number }
+  | { case: 'complimentary' }
+  | { case: 'paid' }
+  | { case: 'overdue' }
+  | { case: 'unpaid' };
 
 export type AppScope =
   | { type: 'unrestricted' }

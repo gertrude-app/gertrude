@@ -41,7 +41,7 @@ export async function query<Input, Output>(
     const ENDPOINT = Current.env.apiEndpoint();
     const res = await fetch(`${ENDPOINT}/pairql/dashboard/${operation}`, init);
     const json = await res.json();
-    if (res.status >= 300 || `__cyStubbedError` in json) {
+    if (res.status >= 300 || (typeof json === `object` && `__cyStubbedError` in json)) {
       return errorResult(toClientError(json));
     } else {
       return Result.success(json);

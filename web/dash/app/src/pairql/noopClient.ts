@@ -5,9 +5,6 @@ const noopClient: ApiClient = {
   confirmPendingNotificationMethod: async () => {
     return Result.success({ success: true });
   },
-  createBillingPortalSession: async () => {
-    return Result.success({ url: `` });
-  },
   createPendingAppConnection: async () => {
     return Result.success({ code: 0 });
   },
@@ -24,7 +21,7 @@ const noopClient: ApiClient = {
     return Result.success({
       id: ``,
       email: ``,
-      subscriptionStatus: `active`,
+      subscriptionStatus: { case: `paid` },
       notifications: [],
       verifiedNotificationMethods: [],
     });
@@ -120,6 +117,12 @@ const noopClient: ApiClient = {
       modelTitle: ``,
     });
   },
+  handleCheckoutCancel: async () => {
+    return Result.success({ success: true });
+  },
+  handleCheckoutSuccess: async () => {
+    return Result.success({ success: true });
+  },
   hollandTalkSubscription: async () => {
     return Result.success({ success: true });
   },
@@ -186,6 +189,9 @@ const noopClient: ApiClient = {
   },
   signup: async () => {
     return Result.success({ success: true });
+  },
+  stripeUrl: async () => {
+    return Result.success({ url: `/` });
   },
   updateUnlockRequest: async () => {
     return Result.success({ success: true });

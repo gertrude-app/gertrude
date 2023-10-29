@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+import { betsy } from '../fixtures/helpers';
 
 describe(`signup`, () => {
   // NB: we let as many requests go to origin for this flow as possible
@@ -43,5 +44,53 @@ describe(`signup`, () => {
       expect(localStorage.getItem(`admin_id`)).to.eq(`admin-123`);
       expect(localStorage.getItem(`admin_token`)).to.eq(`token-123`);
     });
+  });
+});
+
+describe(`payment`, () => {
+  it(`return from stripe success`, () => {
+    cy.simulateLoggedIn();
+    cy.interceptPql(`HandleCheckoutSuccess`, { success: true });
+
+    cy.visit(`/checkout-success?session_id=cs_test_123`);
+
+    cy.wait(`@HandleCheckoutSuccess`)
+      .its(`request.body`)
+      .should(`deep.eq`, { stripeCheckoutSessionId: `cs_test_123` });
+
+    cy.contains(`Payment setup complete`);
+  });
+
+  it(`return from stripe cancel`, () => {
+    cy.simulateLoggedIn();
+    cy.interceptPql(`HandleCheckoutCancel`, { success: true });
+
+    cy.visit(`/checkout-cancel?session_id=cs_test_123`);
+
+    cy.wait(`@HandleCheckoutCancel`)
+      .its(`request.body`)
+      .should(`deep.eq`, { stripeCheckoutSessionId: `cs_test_123` });
+
+    cy.contains(`Payment setup cancelled`);
+  });
+
+  it(`fetching stripe url`, () => {
+    cy.simulateLoggedIn();
+    cy.interceptPql(`GetAdmin`, {
+      id: betsy.id,
+      email: betsy.email,
+      subscriptionStatus: { case: `paid` },
+      notifications: [],
+      verifiedNotificationMethods: [],
+    });
+
+    // cypress misunderstands {url: string} type unless using req.reply
+    cy.intercept(`/pairql/dashboard/StripeUrl`, (req) =>
+      req.reply({ url: `/stripe-url` }),
+    );
+
+    cy.visit(`/settings`);
+    cy.contains(`Manage subscription`).click();
+    cy.contains(`Click here!`).should(`have.attr`, `href`, `/stripe-url`);
   });
 });

@@ -19,7 +19,7 @@ const AdminSettings: React.FC = () => {
     onReceive: (admin) => dispatch({ type: `receivedAdmin`, admin }),
   });
 
-  const createBillingPortalSession = useMutation(Current.api.createBillingPortalSession);
+  const getStripeUrl = useMutation(Current.api.stripeUrl);
 
   const deleteNotification = useConfirmableDelete(`adminNotification`, {
     invalidating: [Key.admin],
@@ -88,7 +88,7 @@ const AdminSettings: React.FC = () => {
     <Settings
       email={query.data.email}
       status={query.data.subscriptionStatus}
-      billingPortalRequest={ReqState.fromMutation(createBillingPortalSession)}
+      billingPortalRequest={ReqState.fromMutation(getStripeUrl)}
       methods={typesafe.objectValues(state.notificationMethods).map((method) => ({
         id: method.id,
         method: method.config.case,
@@ -105,7 +105,7 @@ const AdminSettings: React.FC = () => {
       updateNotification={(update) => dispatch({ type: `updateNotification`, update })}
       saveNotification={(id) => saveNotification.mutate(id)}
       createNotification={() => dispatch({ type: `notificationCreated`, id: uuid() })}
-      manageSubscription={() => createBillingPortalSession.mutate()}
+      manageSubscription={() => getStripeUrl.mutate()}
       newMethodEventHandler={(event) => {
         switch (event.type) {
           case `sendCodeClicked`:

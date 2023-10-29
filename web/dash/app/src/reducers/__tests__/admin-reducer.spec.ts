@@ -79,7 +79,7 @@ describe(`receiving admin from api`, () => {
   it(`.succeeded sets correctly massaged data on state slice`, () => {
     const apiData = mock.adminSettings({
       email: `blob@blob.com`,
-      subscriptionStatus: `trialing`,
+      subscriptionStatus: { case: `trialing`, daysLeft: 60 },
       verifiedNotificationMethods: [
         {
           id: `verifiedMethod1`,

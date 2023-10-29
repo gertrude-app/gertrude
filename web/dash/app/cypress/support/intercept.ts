@@ -14,10 +14,6 @@ export function interceptPql(
   output: T.ConfirmPendingNotificationMethod.Output,
 ): void;
 export function interceptPql(
-  slug: `CreateBillingPortalSession`,
-  output: T.CreateBillingPortalSession.Output,
-): void;
-export function interceptPql(
   slug: `CreatePendingAppConnection`,
   output: T.CreatePendingAppConnection.Output,
 ): void;
@@ -76,6 +72,14 @@ export function interceptPql(
   output: T.GetUserUnlockRequests.Output,
 ): void;
 export function interceptPql(
+  slug: `HandleCheckoutCancel`,
+  output: T.HandleCheckoutCancel.Output,
+): void;
+export function interceptPql(
+  slug: `HandleCheckoutSuccess`,
+  output: T.HandleCheckoutSuccess.Output,
+): void;
+export function interceptPql(
   slug: `HollandTalkSubscription`,
   output: T.HollandTalkSubscription.Output,
 ): void;
@@ -106,6 +110,7 @@ export function interceptPql(
   output: T.SendPasswordResetEmail.Output,
 ): void;
 export function interceptPql(slug: `Signup`, output: T.Signup.Output): void;
+export function interceptPql(slug: `StripeUrl`, output: T.StripeUrl.Output): void;
 export function interceptPql(
   slug: `UpdateUnlockRequest`,
   output: T.UpdateUnlockRequest.Output,
@@ -134,7 +139,6 @@ export function forcePqlErr(
     | 'CombinedUsersActivityFeed'
     | 'CombinedUsersActivitySummaries'
     | 'ConfirmPendingNotificationMethod'
-    | 'CreateBillingPortalSession'
     | 'CreatePendingAppConnection'
     | 'CreatePendingNotificationMethod'
     | 'DecideFilterSuspensionRequest'
@@ -154,6 +158,8 @@ export function forcePqlErr(
     | 'GetUser'
     | 'GetUsers'
     | 'GetUserUnlockRequests'
+    | 'HandleCheckoutCancel'
+    | 'HandleCheckoutSuccess'
     | 'HollandTalkSubscription'
     | 'LatestAppVersions'
     | 'Login'
@@ -167,6 +173,7 @@ export function forcePqlErr(
     | 'SaveUser'
     | 'SendPasswordResetEmail'
     | 'Signup'
+    | 'StripeUrl'
     | 'UpdateUnlockRequest'
     | 'UserActivityFeed'
     | 'UserActivitySummaries'
