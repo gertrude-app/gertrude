@@ -6,6 +6,8 @@ import Login from './components/routes/Login';
 import Logout from './components/routes/Logout';
 import MagicLink from './components/routes/MagicLink';
 import VerifySignupEmail from './components/routes/VerifySignupEmail';
+import CheckoutSuccess from './components/routes/CheckoutSuccess';
+import CheckoutCancel from './components/routes/CheckoutCancel';
 import SuspendFilter from './components/routes/SuspendFilter';
 import ReviewUnlockRequest from './components/routes/UnlockRequest/ReviewUnlockRequest';
 import FetchUnlockRequest from './components/routes/UnlockRequest/FetchUnlockRequest';
@@ -58,6 +60,8 @@ const App: React.FC = () => {
       {/* authed routes */}
       <Route path="/" element={<AuthedChrome />}>
         <Route index element={<Dashboard />} />
+        <Route path="/checkout-success" element={<CheckoutSuccess />} />
+        <Route path="/checkout-cancel" element={<CheckoutCancel />} />
         <Route path="settings" element={<AdminSettings />} />
         <Route path="unlock-requests" element={<UsersUnlockRequests />} />
 

@@ -19,7 +19,7 @@ describe(`dashboard onboarding nudges`, () => {
     cy.interceptPql(`GetAdmin`, {
       id: betsy.id,
       email: betsy.email,
-      subscriptionStatus: `active`,
+      subscriptionStatus: { case: `paid` },
       notifications: [],
       verifiedNotificationMethods: [],
     });

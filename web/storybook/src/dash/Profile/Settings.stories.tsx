@@ -23,7 +23,7 @@ const notificationProps = {
 // @screenshot: xs,md
 export const Default: Story = props({
   email: `johndoe@example.com`,
-  status: `active`,
+  status: { case: `paid` },
   methods: withIdsAnd({ deletable: false }, [
     { method: `email` as const, value: `me@example.com` },
     { method: `slack` as const, value: `#Gertrude` },

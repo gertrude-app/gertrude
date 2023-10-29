@@ -83,7 +83,12 @@ const Settings: React.FC<Props> = ({
         <h2 className="text-lg text-slate-900 mb-2">Email address:</h2>
         <TextInput type="email" label="" value={email} disabled setValue={() => {}} />
       </div>
-      <div className="p-8 bg-slate-100 rounded-xl lg:ml-8 lg:w-1/3 flex justify-between relative border border-slate-200 mt-4 lg:mt-0">
+      <div
+        className={cx(
+          `p-8 bg-slate-100 rounded-xl lg:ml-8 lg:w-1/3 flex justify-between relative border border-slate-200 mt-4 lg:mt-0`,
+          status.case === `trialing` && status.daysLeft < 10 && `pt-10`,
+        )}
+      >
         <div className="flex justify-end items-start flex-col mr-8">
           <h2 className="font-bold text-xl text-slate-700">Basic plan</h2>
           <h3 className="my-1">
@@ -93,10 +98,10 @@ const Settings: React.FC<Props> = ({
             <span className="text-slate-900 text-4xl font-bold">5</span>
             <span className="text-slate-600 text-lg font-medium">/month</span>
           </h3>
-          {status !== `complimentary` && (
+          {status.case !== `complimentary` && (
             <a
               {...(billingPortalRequest.state === `succeeded`
-                ? { href: billingPortalRequest.payload.url, target: `_blank` }
+                ? { href: billingPortalRequest.payload.url }
                 : {})}
               className={cx(
                 `mt-2 text-sm whitespace-nowrap cursor-pointer transition-[color] duration-100`,
@@ -106,7 +111,7 @@ const Settings: React.FC<Props> = ({
                 billingPortalRequest.state === `idle` ? manageSubscription : void 0
               }
             >
-              {manageSubscriptionText(billingPortalRequest)}
+              {manageSubscriptionText(billingPortalRequest, status)}
             </a>
           )}
         </div>
@@ -210,57 +215,65 @@ const AccountStatusBadge: React.FC<{ status: AdminSubscriptionStatus }> = ({
 function statusType(
   status: AdminSubscriptionStatus,
 ): React.ComponentProps<typeof PillBadge>['type'] {
-  switch (status) {
-    case `active`:
+  switch (status.case) {
     case `complimentary`:
-    case `emailVerified`:
-    case `pendingEmailVerification`:
-    case `trialing`:
+    case `paid`:
       return `ok`;
-    case `incomplete`:
-    case `incompleteExpired`:
-    case `pastDue`:
+    case `trialing`:
+      if (status.daysLeft < 10) {
+        return `warning`;
+      }
+      return `ok`;
+    case `overdue`:
       return `warning`;
-    case `canceled`:
-    case `signupCanceled`:
     case `unpaid`:
-    default:
       return `error`;
   }
 }
 
 function statusText(status: AdminSubscriptionStatus): string {
-  switch (status) {
-    case `active`:
-    case `canceled`:
+  switch (status.case) {
     case `complimentary`:
-    case `incomplete`:
+      return `complimentary`;
     case `trialing`:
-    case `unpaid`:
-      return status;
-    case `incompleteExpired`:
-      return `incomplete`;
-    case `emailVerified`:
-      return `email verified`;
-    case `pastDue`:
+      if (status.daysLeft === 1) {
+        return `1 day left in trial`;
+      }
+      if (status.daysLeft < 10) {
+        return `${status.daysLeft} days left in trial`;
+      }
+      return status.case;
+    case `paid`:
+      return `active`;
+    case `overdue`:
       return `past due`;
-    case `pendingEmailVerification`:
-      return `pending email verification`;
-    case `signupCanceled`:
-      return `signup canceled`;
+    case `unpaid`:
+      return `payment required`;
   }
 }
 
-function manageSubscriptionText(req: RequestState<unknown>): string {
+function manageSubscriptionText(
+  req: RequestState<unknown>,
+  status: AdminSubscriptionStatus,
+): string {
   switch (req.state) {
     case `idle`:
-      return `Manage subscription...`;
-    case `ongoing`:
-      return `Loading...`;
+      switch (status.case) {
+        case `complimentary`:
+        case `trialing`:
+          return `Start subscription...`;
+        case `paid`:
+          return `Manage subscription...`;
+        case `overdue`:
+        case `unpaid`:
+          return `Resolve payment status...`;
+      }
+    case `ongoing`: // eslint-disable-line no-fallthrough
+      return `Loading link...`;
     case `failed`:
       return `Failed to load`;
     case `succeeded`:
-      return `Click here`;
+      return `Click here!`;
   }
 }
 

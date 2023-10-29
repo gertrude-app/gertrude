@@ -20,7 +20,7 @@ export function adminSettings(override: Partial<Admin> = {}): Admin {
   return {
     id: uuid(),
     email: `you@example.com`,
-    subscriptionStatus: `active`,
+    subscriptionStatus: { case: `paid` },
     notifications: [],
     verifiedNotificationMethods: [],
     ...override,
