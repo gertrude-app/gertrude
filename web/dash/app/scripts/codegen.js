@@ -105,8 +105,8 @@ async function main() {
   cypressLines.push(`
     export function interceptPql(slug: string, output: any): void {
       // cypress chokes on the empty object, doesn't understand it should reply w/ it
-      const response = JSON.stringify(output) === \`{}\` ? \`{}\` : output;
-      cy.intercept(${path}, response).as(slug);
+      const res = JSON.stringify(output) === \`{}\` ? \`{}\` : output;
+      cy.intercept(${path}, (req) => req.reply(res)).as(slug);
     }
   `);
 

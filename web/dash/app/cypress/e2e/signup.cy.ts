@@ -3,7 +3,7 @@ import { betsy } from '../fixtures/helpers';
 
 describe(`signup`, () => {
   // NB: we let as many requests go to origin for this flow as possible
-  it(`handles signup flow, minus stripe redirect`, () => {
+  it(`handles signup flow`, () => {
     cy.visit(`/signup`);
     const email = `e2e-user-${Date.now()}@gertrude.app`;
     cy.get(`input[name=email]`).type(email);
@@ -84,10 +84,7 @@ describe(`payment`, () => {
       verifiedNotificationMethods: [],
     });
 
-    // cypress misunderstands {url: string} type unless using req.reply
-    cy.intercept(`/pairql/dashboard/StripeUrl`, (req) =>
-      req.reply({ url: `/stripe-url` }),
-    );
+    cy.interceptPql(`StripeUrl`, { url: `/stripe-url` });
 
     cy.visit(`/settings`);
     cy.contains(`Manage subscription`).click();
