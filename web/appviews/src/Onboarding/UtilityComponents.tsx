@@ -64,7 +64,9 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   <div
     className={cx(
       `flex`,
-      direction === `row` ? `flex-row space-x-4` : `flex-col space-y-4`,
+      direction === `row`
+        ? `flex-row-reverse space-x-reverse space-x-4`
+        : `flex-col space-y-4`,
       className,
     )}
   >

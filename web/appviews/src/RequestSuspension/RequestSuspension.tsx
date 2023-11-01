@@ -127,6 +127,7 @@ export const RequestSuspension: React.FC<Props> = ({
           comment={comment}
           dispatch={dispatch}
           duration={duration}
+          isActive={page === `comment`}
         />,
       ]}
       index={page === `duration` ? 0 : 1}
@@ -257,8 +258,8 @@ const DurationPage: React.FC<
 );
 
 const CommentPage: React.FC<
-  Pick<Props, 'comment' | 'dispatch' | 'duration' | 'emit'>
-> = ({ comment, dispatch, duration, emit }) => (
+  Pick<Props, 'comment' | 'dispatch' | 'duration' | 'emit'> & { isActive: boolean }
+> = ({ comment, dispatch, duration, emit, isActive }) => (
   <div className="flex flex-col bg-white dark:bg-slate-900 h-full">
     <div className="flex-grow flex flex-col justify-center items-center p-8">
       <h3 className="text-slate-900 text-lg font-bold mb-4 dark:text-slate-200">
@@ -266,6 +267,7 @@ const CommentPage: React.FC<
       </h3>
       <TextInput
         type="textarea"
+        disabled={!isActive} // disable to prevent early tab focus issue
         value={comment}
         setValue={(value) => dispatch({ type: `commentUpdated`, value })}
         placeholder="Super compelling reason"
