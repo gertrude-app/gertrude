@@ -16,9 +16,12 @@ const Download: NextPage = () => (
             Download Gertrude
           </h1>
           <p className="text-lg md:text-xl text-slate-500 mt-4 max-w-3xl text-center sm:text-left">
-            Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum
-            sint consectetur cupidatat. Lorem ipsum dolor sit amet, qui minim labore
-            adipisicing minim sint cillum sint consectetur cupidatat.
+            The Gertrude mac app is free to download, but requires a parent account to
+            start protecting a computer. If you don’t have parent account, you can start a
+            60 day trial with no credit card by{` `}
+            <a className="text-fuchsia-700 hover:underline" href="/start">
+              clicking here.
+            </a>
           </p>
           <a
             href="https://gertrude.nyc3.digitaloceanspaces.com/releases/Gertrude.dmg"
