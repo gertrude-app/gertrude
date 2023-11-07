@@ -21,6 +21,7 @@ const Navigation: React.FC<Props> = ({ navigation, className }) => {
                 <li key={link.href} className="relative">
                   <Link
                     href={link.href}
+                    locale={link.href.includes(`bloquear`) ? `es` : `en`}
                     className={cx(
                       `block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full`,
                       link.href === router.pathname

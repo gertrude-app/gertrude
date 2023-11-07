@@ -32,6 +32,10 @@ const navigation = [
         title: `No Removing Images GIF search in iOS 17`,
         href: `/docs/ios-17-cant-delete-messages-images`,
       },
+      {
+        title: `Guía Definitiva para Bloquear un iPhone`,
+        href: `/docs/guia-definitiva-para-bloquear-un-iphone`,
+      },
     ],
   },
   {

@@ -16,6 +16,7 @@ const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }
   const ogImage = pageProps.markdoc?.frontmatter.image ?? OgImage.src;
   const path = router.asPath === `/` ? `` : router.asPath;
   const canonicalUrl = (`https://gertrude.app` + path).split(`?`)[0];
+  let lang: `en` | `es` = `en`;
   let pageTitle = `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`;
   let description = `Protect your kids online with easy-to-use Mac internet filtering, internet blocking, and mac keylogging.`;
 
@@ -23,13 +24,18 @@ const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }
   if (pageProps.markdoc) {
     const title = pageProps.markdoc.frontmatter.title;
     if (!title) throw new Error(`Missing title in frontmatter for ${path}`);
-    pageTitle = `${title} | Gertrude Internet Filter & Parental Controls`;
+    lang = title.includes(`Bloquear`) ? `es` : `en`;
+    const gertrude =
+      lang === `en`
+        ? `Gertrude Internet Filter & Parental Controls`
+        : `Gertrude Filtro de Internet y Controles Parentales`;
+    pageTitle = `${title} | ${gertrude}`;
     description = pageProps.markdoc?.frontmatter.description;
     const tableOfContents = pageProps.markdoc?.content
       ? collectHeadings(pageProps.markdoc.content)
       : [];
     Main = (
-      <DocsLayout title={title} tableOfContents={tableOfContents}>
+      <DocsLayout lang={lang} title={title} tableOfContents={tableOfContents}>
         {Main}
       </DocsLayout>
     );
@@ -41,6 +47,7 @@ const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }
         <title>{pageTitle}</title>
         <meta name="description" content={description} />
         <meta name="og:image" content={ogImage} />
+        <meta httpEquiv="content-language" content={lang} />
         <link rel="icon" type="image/png" href={Favicon.src} />
         <link rel="canonical" href={canonicalUrl} />
       </Head>

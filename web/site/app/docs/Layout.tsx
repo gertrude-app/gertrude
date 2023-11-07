@@ -65,9 +65,10 @@ interface Props {
   children: React.ReactNode;
   tableOfContents: Array<Section>;
   title: string;
+  lang: 'en' | 'es';
 }
 
-const Layout: React.FC<Props> = ({ children, title, tableOfContents }) => {
+const Layout: React.FC<Props> = ({ children, title, tableOfContents, lang }) => {
   const router = useRouter();
   const allLinks = navigation.flatMap((section) => section.links);
   const linkIndex = allLinks.findIndex((link) => link.href === router.pathname);
@@ -104,7 +105,12 @@ const Layout: React.FC<Props> = ({ children, title, tableOfContents }) => {
             {(title || section) && (
               <header className="mb-9 space-y-1">
                 {section && (
-                  <p className="font-lexend text-sm font-medium text-violet-400">
+                  <p
+                    className={cx(
+                      `font-lexend text-sm font-medium text-violet-400`,
+                      lang === `es` && `hidden`,
+                    )}
+                  >
                     {section.title}
                   </p>
                 )}
@@ -155,7 +161,7 @@ const Layout: React.FC<Props> = ({ children, title, tableOfContents }) => {
                   id="on-this-page-title"
                   className="font-lexend text-sm font-medium text-white"
                 >
-                  On this page
+                  {lang === `en` ? `On this page` : `En esta página`}
                 </h2>
                 <ol className="mt-4 space-y-3 text-sm leading-snug">
                   {tableOfContents.map((section) => (

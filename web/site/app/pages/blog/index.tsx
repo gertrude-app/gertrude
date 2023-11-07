@@ -38,7 +38,7 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 const BlogPosts: React.FC<{ posts: Post[] }> = ({ posts }) => (
-  <DocsLayout title="Gertrude Engineering Blog" tableOfContents={[]}>
+  <DocsLayout lang="en" title="Gertrude Engineering Blog" tableOfContents={[]}>
     {posts
       .sort((a, b) => (a.date < b.date ? 1 : -1))
       .map((post) => (
