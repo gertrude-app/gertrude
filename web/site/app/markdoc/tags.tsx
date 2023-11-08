@@ -46,6 +46,12 @@ const tags = {
   'article-feedback-form': {
     attributes: {
       name: { type: String },
+      lang: {
+        type: String,
+        default: `en`,
+        matches: [`en`, `es`],
+        errorLevel: `critical`,
+      },
     },
     render: ArticleFeedbackForm,
   },

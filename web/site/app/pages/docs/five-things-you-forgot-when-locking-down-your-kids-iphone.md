@@ -370,4 +370,4 @@ If you haven't taken the time to carefully lock down your child's iPhone, we hav
 
 {% /callout %}
 
-{% article-feedback-form name="five-things" /%}
+{% article-feedback-form name="five-things" lang="en" /%}
