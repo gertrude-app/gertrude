@@ -44,6 +44,7 @@ const UserRoute: React.FC = () => {
         screenshotsEnabled: editableUser.draft.screenshotsEnabled,
         screenshotsFrequency: editableUser.draft.screenshotsFrequency,
         screenshotsResolution: editableUser.draft.screenshotsResolution,
+        showSuspensionActivity: true, // configurable in #209
         isNew: editableUser.isNew ?? false,
         keychainIds: editableUser.draft.keychains.map(({ id }) => id),
       }),

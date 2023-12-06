@@ -19,6 +19,7 @@ export function user(id: UUID): User {
     screenshotsEnabled: false,
     screenshotsResolution: 1000,
     screenshotsFrequency: 120,
+    showSuspensionActivity: false,
     keychains: [],
     devices: [],
     createdAt: new Date().toISOString(),
