@@ -18,6 +18,9 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           case `welcome`:
             setTimeout(() => setStep(`confirmGertrudeAccount`), 1000); // this is handled in the component, but need to simulate it here
             break;
+          case `appNotInApplicationsDir`:
+            setStep(`confirmGertrudeAccount`);
+            break;
           case `confirmGertrudeAccount`:
             setStep(`noGertrudeAccount`);
             break;
@@ -95,6 +98,10 @@ const OnboardingStatefulSwitcher: React.FC = () => {
     >
       <StepSwitcher ready>
         <OnboardingPage step="welcome" component={<Step.Welcome />} />
+        <OnboardingPage
+          step="appNotInApplicationsDir"
+          component={<Step.AppNotInApplicationsDir />}
+        />
         <OnboardingPage
           step="confirmGertrudeAccount"
           component={<Step.ConfirmGertrudeAccount />}

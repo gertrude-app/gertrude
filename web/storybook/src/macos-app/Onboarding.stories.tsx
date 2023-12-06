@@ -27,6 +27,11 @@ export const Welcome: Story = props({
   receivedAppState: true,
 });
 
+export const AppNotInApplicationsDir: Story = props({
+  ...Welcome.args,
+  step: `appNotInApplicationsDir`,
+});
+
 export const ConfirmGertrudeAcct: Story = props({
   ...Welcome.args,
   step: `confirmGertrudeAccount`,

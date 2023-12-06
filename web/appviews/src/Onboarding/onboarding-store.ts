@@ -10,6 +10,7 @@ export type RequestState<T = void, E = string> =
 // begin codegen
 export type OnboardingStep =
   | 'welcome'
+  | 'appNotInApplicationsDir'
   | 'confirmGertrudeAccount'
   | 'noGertrudeAccount'
   | 'macosUserAccountType'

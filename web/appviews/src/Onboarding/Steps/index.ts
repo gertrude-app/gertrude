@@ -1,4 +1,5 @@
 export { default as Welcome } from './Welcome';
+export { default as AppNotInApplicationsDir } from './AppNotInApplicationsDir';
 export { default as ConfirmGertrudeAccount } from './ConfirmGertrudeAccount';
 export { default as GetConnectionCode } from './GetConnectionCode';
 export { default as NoGertrudeAccount } from './NoGertrudeAccount';
