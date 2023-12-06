@@ -1,4 +1,5 @@
 export { default as Welcome } from './Welcome';
+export { default as AppNotInApplicationsDir } from './AppNotInApplicationsDir';
 export { default as ConfirmGertrudeAccount } from './ConfirmGertrudeAccount';
 export { default as GetConnectionCode } from './GetConnectionCode';
 export { default as NoGertrudeAccount } from './NoGertrudeAccount';
@@ -8,6 +9,7 @@ export { default as AllowScreenshots } from './AllowScreenshots';
 export { default as AllowNotifications } from './AllowNotifications';
 export { default as AllowKeylogging } from './AllowKeylogging';
 export { default as InstallSysExt } from './InstallSysExt';
+export { default as ExemptUsers } from './ExemptUsers';
 export { default as LocateMenuBarIcon } from './LocateMenuBarIcon';
 export { default as ViewHealthCheck } from './ViewHealthCheck';
 export { default as HowToUseGertrude } from './HowToUseGertrude';

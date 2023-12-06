@@ -18,6 +18,9 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           case `welcome`:
             setTimeout(() => setStep(`confirmGertrudeAccount`), 1000); // this is handled in the component, but need to simulate it here
             break;
+          case `appNotInApplicationsDir`:
+            setStep(`confirmGertrudeAccount`);
+            break;
           case `confirmGertrudeAccount`:
             setStep(`noGertrudeAccount`);
             break;
@@ -76,6 +79,9 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`installSysExt_success`);
             break;
           case `installSysExt_success`:
+            setStep(`exemptUsers`);
+            break;
+          case `exemptUsers`:
             setStep(`locateMenuBarIcon`);
             break;
           case `locateMenuBarIcon`:
@@ -95,6 +101,10 @@ const OnboardingStatefulSwitcher: React.FC = () => {
     >
       <StepSwitcher ready>
         <OnboardingPage step="welcome" component={<Step.Welcome />} />
+        <OnboardingPage
+          step="appNotInApplicationsDir"
+          component={<Step.AppNotInApplicationsDir />}
+        />
         <OnboardingPage
           step="confirmGertrudeAccount"
           component={<Step.ConfirmGertrudeAccount />}
@@ -186,6 +196,7 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           component={<Step.InstallSysExt step="installSysExt_success" />}
           confetti
         />
+        <OnboardingPage step="exemptUsers" component={<Step.ExemptUsers />} />
         <OnboardingPage step="locateMenuBarIcon" component={<Step.LocateMenuBarIcon />} />
         <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
         <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />

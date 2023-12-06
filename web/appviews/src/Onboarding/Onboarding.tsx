@@ -37,10 +37,15 @@ export const Onboarding: React.FC<Props> = ({
           os === `venturaOrLater` ? `System Settings` : `System Preferences`,
         emit,
         dispatch,
+        otherUsers: users.filter((user) => user.id !== currentUser?.id),
       }}
     >
       <StepSwitcher ready={receivedAppState}>
         <OnboardingPage step="welcome" component={<Step.Welcome />} />
+        <OnboardingPage
+          step="appNotInApplicationsDir"
+          component={<Step.AppNotInApplicationsDir />}
+        />
         <OnboardingPage
           step="confirmGertrudeAccount"
           component={<Step.ConfirmGertrudeAccount />}
@@ -130,6 +135,7 @@ export const Onboarding: React.FC<Props> = ({
           component={<Step.InstallSysExt step="installSysExt_success" />}
           confetti
         />
+        <OnboardingPage step="exemptUsers" component={<Step.ExemptUsers />} />
         <OnboardingPage step="locateMenuBarIcon" component={<Step.LocateMenuBarIcon />} />
         <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
         <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />
