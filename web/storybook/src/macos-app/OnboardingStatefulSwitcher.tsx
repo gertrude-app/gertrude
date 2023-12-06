@@ -79,6 +79,9 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`installSysExt_success`);
             break;
           case `installSysExt_success`:
+            setStep(`exemptUsers`);
+            break;
+          case `exemptUsers`:
             setStep(`locateMenuBarIcon`);
             break;
           case `locateMenuBarIcon`:
@@ -193,6 +196,7 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           component={<Step.InstallSysExt step="installSysExt_success" />}
           confetti
         />
+        <OnboardingPage step="exemptUsers" component={<Step.ExemptUsers />} />
         <OnboardingPage step="locateMenuBarIcon" component={<Step.LocateMenuBarIcon />} />
         <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
         <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />

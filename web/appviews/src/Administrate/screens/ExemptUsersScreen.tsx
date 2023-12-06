@@ -62,10 +62,11 @@ const ExemptUsersScreen: React.FC<Props> = ({ users, emit }) => {
         </div>
         <ul className="mt-4 space-y-2 flex-grow">
           {users.value.map((user) => (
-            <User
+            <ExemptUser
               key={user.id}
               name={user.name}
               isExempt={user.isExempt}
+              isAdmin={user.isAdmin}
               onToggle={() =>
                 emit({
                   case: `setUserExemption`,
@@ -93,31 +94,41 @@ const ExemptUsersScreen: React.FC<Props> = ({ users, emit }) => {
   );
 };
 
-interface UserProps {
+interface ExemptUserProps {
   name: string;
   isExempt: boolean;
   onToggle(): unknown;
+  isAdmin?: boolean;
 }
 
-const User: React.FC<UserProps> = ({ name, isExempt, onToggle }) => (
+export const ExemptUser: React.FC<ExemptUserProps> = ({
+  name,
+  isExempt,
+  isAdmin,
+  onToggle,
+}) => (
   <div
     onClick={onToggle}
-    className={cx(
-      `flex items-center justify-start rounded-xl p-2 pl-4`,
-      isExempt && `bg-red-50 dark:bg-red-500/10`,
-    )}
+    className={cx(`flex items-center justify-start rounded-xl p-2 pl-4`)}
   >
     <button
       className={cx(
         `w-5 h-5 rounded-full border-slate-300 dark:border-slate-700 border mr-4 flex justify-center items-center hover:scale-105 transition-[transform,border-color,border,background-color] duration-100`,
-        isExempt && `bg-red-500 !border-red-500 dark:border-red-500`,
+        isExempt && `bg-violet-500 !border-violet-500 dark:border-violet-500`,
       )}
     >
       <i className="fa-solid fa-check text-white dark:text-slate-900 text-xs" />
     </button>
-    <div className="flex items-center space-x-2 grow">
-      <h3 className="font-bold dark:text-white grow">{name}</h3>
-      <span className="text-red-500 dark:text-red-400 pr-2">
+    <div className="flex justify-between items-center space-x-2 flex-grow">
+      <div className="flex items-center">
+        <h3 className="font-bold dark:text-white grow mr-2">{name}</h3>
+        {isAdmin && (
+          <span className="text-fuchsia-500 font-medium uppercase text-xs bg-fuchsia-100 rounded-full px-2 py-0">
+            admin
+          </span>
+        )}
+      </div>
+      <span className="text-violet-500 dark:text-violet-400 pr-2 ml-4">
         {isExempt ? `exempt from filtering - unrestricted internet access` : ``}
       </span>
     </div>

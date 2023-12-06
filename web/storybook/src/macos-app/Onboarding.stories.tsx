@@ -19,6 +19,7 @@ export const Welcome: Story = props({
   keyloggingPermissionGranted: false,
   currentUser: { id: 502, name: `Suzy`, isAdmin: false },
   users: [
+    { id: 503, name: `Little Jimmy`, isAdmin: false },
     { id: 501, name: `Bob McParent`, isAdmin: true },
     { id: 502, name: `Suzy`, isAdmin: false },
   ],
@@ -184,6 +185,11 @@ export const InstallSysExtFail: Story = props({
 export const InstallSysExtSuccess: Story = props({
   ...Welcome.args,
   step: `installSysExt_success`,
+});
+
+export const ExemptUsers: Story = props({
+  ...Welcome.args,
+  step: `exemptUsers`,
 });
 
 export const LocateMenuBarIcon: Story = props({

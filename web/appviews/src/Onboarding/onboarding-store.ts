@@ -30,6 +30,7 @@ export type OnboardingStep =
   | 'installSysExt_allow'
   | 'installSysExt_failed'
   | 'installSysExt_success'
+  | 'exemptUsers'
   | 'locateMenuBarIcon'
   | 'viewHealthCheck'
   | 'howToUseGertrude'
