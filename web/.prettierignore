@@ -8,3 +8,5 @@ docs/app/.next
 docs/app/out
 appviews/dist
 appviews/src/main.tsx
+.nx/
+

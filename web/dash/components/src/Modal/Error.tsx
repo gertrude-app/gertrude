@@ -37,8 +37,8 @@ const Error: React.FC<Props> = ({
             action: () => (window.location.href = `https://gertrude.app/contact`),
           }
         : secondaryButton === null
-        ? undefined
-        : secondaryButton
+          ? undefined
+          : secondaryButton
     }
   >
     <div className="py-2">
