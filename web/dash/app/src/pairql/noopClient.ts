@@ -99,6 +99,7 @@ const noopClient: ApiClient = {
       screenshotsEnabled: false,
       screenshotsResolution: 1000,
       screenshotsFrequency: 90,
+      showSuspensionActivity: true,
       keychains: [],
       devices: [],
       createdAt: new Date().toISOString(),

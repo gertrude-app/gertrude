@@ -15,3 +15,4 @@ dash/app/cypress/screenshots
 **/out
 **/dist
 **/tsconfig.tsbuildinfo
+.nx/

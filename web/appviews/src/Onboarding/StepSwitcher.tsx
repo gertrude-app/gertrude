@@ -125,8 +125,8 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
         step === currentStep
           ? `left-0 z-10`
           : hasBeenVisited
-          ? `left-[-100%] opacity-0`
-          : `left-full opacity-0`,
+            ? `left-[-100%] opacity-0`
+            : `left-full opacity-0`,
         `absolute w-full h-full top-0 transition-[opacity,left] duration-700`,
       )}
     >

@@ -10,6 +10,7 @@ export namespace SaveUser {
     screenshotsEnabled: boolean;
     screenshotsResolution: number;
     screenshotsFrequency: number;
+    showSuspensionActivity: boolean;
     keychainIds: UUID[];
   }
 

@@ -142,6 +142,7 @@ export interface User {
   screenshotsEnabled: boolean;
   screenshotsResolution: number;
   screenshotsFrequency: number;
+  showSuspensionActivity: boolean;
   keychains: KeychainSummary[];
   devices: UserDevice[];
   createdAt: ISODateString;

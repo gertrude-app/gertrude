@@ -81,8 +81,8 @@ const Modal: React.FC<Props> = ({
           (secondary?.action
             ? secondary.action
             : type === `error`
-            ? primary.action
-            : () => {})
+              ? primary.action
+              : () => {})
         }
       >
         <Transition.Child
@@ -194,8 +194,8 @@ const Modal: React.FC<Props> = ({
                         type === `destructive`
                           ? `warning`
                           : type === `error`
-                          ? `secondary`
-                          : `primary`
+                            ? `secondary`
+                            : `primary`
                       }
                       className="w-[100%] sm:w-auto"
                       onClick={primary.action}

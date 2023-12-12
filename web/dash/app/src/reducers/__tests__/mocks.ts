@@ -75,6 +75,7 @@ export function user(override: Partial<User> = {}): User {
     screenshotsResolution: 1000,
     screenshotsFrequency: 60,
     keyloggingEnabled: true,
+    showSuspensionActivity: true,
     keychains: [],
     devices: [
       {

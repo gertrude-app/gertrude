@@ -43,11 +43,11 @@ const HealthCheckScreen: React.FC<Props> = ({
             {health.isChecking
               ? `Checking...`
               : health.failingChecksCount
-              ? `${health.failingChecksCount} ${inflect(
-                  `failing check`,
-                  health.failingChecksCount,
-                )}!`
-              : `Everything looks good!`}
+                ? `${health.failingChecksCount} ${inflect(
+                    `failing check`,
+                    health.failingChecksCount,
+                  )}!`
+                : `Everything looks good!`}
           </span>
         </div>
         <Button
