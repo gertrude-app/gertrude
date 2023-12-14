@@ -74,6 +74,7 @@ const IMAGE_FILENAMES = [
   `notifications.png`,
   `administrate.png`,
   `locate-menubar-icon.gif`,
+  `wrong-install-dir.gif`,
 ] as const;
 
 const OS_IMAGE_FILENAMES = [

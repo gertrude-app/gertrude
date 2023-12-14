@@ -16,7 +16,7 @@ const StepSwitcher: React.FC<Props> = ({ children, ready }) => {
   const progressStep = (() => {
     switch (currentStep) {
       case `welcome`:
-      case `appNotInApplicationsDir`:
+      case `wrongInstallDir`:
       case `confirmGertrudeAccount`:
       case `noGertrudeAccount`:
         return 1;

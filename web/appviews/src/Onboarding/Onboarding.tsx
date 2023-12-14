@@ -43,7 +43,7 @@ export const Onboarding: React.FC<Props> = ({
       <StepSwitcher ready={receivedAppState}>
         <OnboardingPage step="welcome" component={<Step.Welcome />} />
         <OnboardingPage
-          step="appNotInApplicationsDir"
+          step="wrongInstallDir"
           component={<Step.AppNotInApplicationsDir />}
         />
         <OnboardingPage
