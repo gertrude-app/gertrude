@@ -12,6 +12,7 @@ export namespace UserActivityFeed {
 
   export interface Output {
     userName: string;
+    showSuspensionActivity: boolean;
     numDeleted: number;
     items: UserActivityItem[];
   }

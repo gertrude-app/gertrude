@@ -44,7 +44,6 @@ const Keychain: React.FC = () => {
         id: keychain.draft.id,
         name: keychain.draft.name,
         description: keychain.draft.description,
-        isPublic: keychain.draft.isPublic,
       }),
     {
       onSuccess: () => dispatch({ type: `keychainSaved` }),

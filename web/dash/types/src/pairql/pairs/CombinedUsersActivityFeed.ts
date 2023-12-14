@@ -11,6 +11,7 @@ export namespace CombinedUsersActivityFeed {
 
   export type Output = Array<{
     userName: string;
+    showSuspensionActivity: boolean;
     numDeleted: number;
     items: UserActivityItem[];
   }>;
