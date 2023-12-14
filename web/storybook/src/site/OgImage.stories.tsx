@@ -2,6 +2,7 @@ import type { Meta } from '@storybook/react';
 import SiteOgImage from './SiteOgImage';
 import LockdownGuideOgImage from './LockdownGuideOgImage';
 import FiveThingsYouForgotOgImage from './FiveThingsYouForgotOgImage';
+import GifAppMessagesOgImage from './GifAppInMessagesOgImage';
 
 export default {
   title: 'Site/OgImages', // eslint-disable-line
@@ -26,3 +27,4 @@ export default {
 export const Site = () => <SiteOgImage />;
 export const LockdownGuide = () => <LockdownGuideOgImage />;
 export const FiveThingsYouForgot = () => <FiveThingsYouForgotOgImage />;
+export const GifAppMessages = () => <GifAppMessagesOgImage />;
