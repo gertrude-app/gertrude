@@ -4,6 +4,7 @@ const fs = require(`node:fs`);
 const exec = require(`x-exec`).default;
 
 const WEBVIEW_DIR = `${__dirname}/../../swift/macapp/Xcode/Gertrude/WebViews`;
+
 const MODULES = [
   `MenuBar`,
   `BlockedRequests`,
@@ -42,7 +43,9 @@ MODULES.forEach((module) => {
   const lightHtml = indexHtml.replace(`<body>`, `<body class="light">`);
   const darkHmtl = indexHtml.replace(`<body>`, `<body class="dark">`);
   fs.writeFileSync(`./dist/${module}/index.light.html`, lightHtml);
-  fs.writeFileSync(`./dist/${module}/index.dark.html`, darkHmtl);
+  if (module !== `Onboarding`) {
+    fs.writeFileSync(`./dist/${module}/index.dark.html`, darkHmtl);
+  }
   exec.out(`rm ./dist/${module}/index.html`, __dirname);
 
   exec.out(`rm -rf ${WEBVIEW_DIR}/${module}`, __dirname);

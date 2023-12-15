@@ -23,6 +23,8 @@ export const Welcome: Story = props({
     { id: 501, name: `Bob McParent`, isAdmin: true },
     { id: 502, name: `Suzy`, isAdmin: false },
   ],
+  exemptableUserIds: [501, 503],
+  exemptUserIds: [501],
   connectionCode: ``,
   didResume: false,
   receivedAppState: true,

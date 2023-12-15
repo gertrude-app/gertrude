@@ -196,7 +196,10 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           component={<Step.InstallSysExt step="installSysExt_success" />}
           confetti
         />
-        <OnboardingPage step="exemptUsers" component={<Step.ExemptUsers />} />
+        <OnboardingPage
+          step="exemptUsers"
+          component={<Step.ExemptUsers exemptUserIds={[]} exemptableUserIds={[501]} />}
+        />
         <OnboardingPage step="locateMenuBarIcon" component={<Step.LocateMenuBarIcon />} />
         <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
         <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />
