@@ -115,14 +115,14 @@ function websiteKeyToKeyRecord(state: EditKey.State): Key | null {
       if (!domainValid(address)) return null;
       key = {
         type: state.addressType === `standard` ? `anySubdomain` : `domain`,
-        domain: address,
+        domain: domain.removePort(address),
         scope: tmpScope,
       };
       break;
 
     case `ip`:
-      if (!ipAddressValid(address)) return null;
-      key = { type: `ipAddress`, ipAddress: address, scope: tmpScope };
+      if (!domain.isIpAddress(address)) return null;
+      key = { type: `ipAddress`, ipAddress: domain.removePort(address), scope: tmpScope };
       break;
 
     case `domainRegex`:
@@ -200,11 +200,4 @@ function singleAppScope(state: EditKey.State): SingleAppScope | null {
 
 function domainValid(domain: string): boolean {
   return domain.length > 3 && domain.includes(`.`);
-}
-
-function ipAddressValid(ipAddress: string): boolean {
-  return (
-    ipAddress.match(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/) !== null ||
-    ipAddress.match(/^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/) !== null
-  );
 }

@@ -30,6 +30,21 @@ export function domainKey(
   };
 }
 
+export function ipKey(
+  ipAddress = `192.168.0.1`,
+  scope: AppScope = { type: `webBrowsers` },
+): Key {
+  return {
+    id: `key-id`,
+    keychainId: `keychain-id`,
+    key: {
+      type: `ipAddress`,
+      ipAddress,
+      scope,
+    },
+  };
+}
+
 export function anySubdomainKey(
   domain = `example.com`,
   scope: AppScope = { type: `webBrowsers` },
