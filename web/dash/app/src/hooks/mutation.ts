@@ -58,7 +58,7 @@ export function useMutation<T, V>(
     onSettled() {
       if (options.invalidating) {
         options.invalidating.forEach((key) =>
-          queryClient.invalidateQueries(key.segments),
+          queryClient.invalidateQueries({ queryKey: key.segments }),
         );
       }
     },
@@ -79,7 +79,7 @@ export function useConfirmableDelete(
   entityType: DeleteEntity.Input['type'],
   options: MutationOptions<SuccessOutput> & { id?: UUID } = {},
 ): ConfirmableEntityAction<UUID | void> & {
-  state: 'idle' | 'loading' | 'error' | 'success';
+  state: 'idle' | 'pending' | 'error' | 'success';
 } {
   const [stateId, setStateId] = useState<UUID | undefined>();
   const mutation = useDeleteEntity(entityType, options);

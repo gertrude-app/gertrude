@@ -35,7 +35,7 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
     },
   );
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <Loading />;
   }
 

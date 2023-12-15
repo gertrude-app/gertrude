@@ -74,9 +74,9 @@ const AdminSettings: React.FC = () => {
     },
   );
 
-  const notificationProps = makeNotificationProps(state, saveNotification.isLoading);
+  const notificationProps = makeNotificationProps(state, saveNotification.isPending);
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <Loading />;
   }
 

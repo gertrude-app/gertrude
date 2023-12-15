@@ -110,7 +110,7 @@ const UserRoute: React.FC = () => {
       addDeviceRequest={ReqState.fromMutation(addDevice)}
       deleteDevice={deleteDevice}
       saveButtonDisabled={
-        !isDirty(state.user) || draft.name.trim() === `` || saveUser.isLoading
+        !isDirty(state.user) || draft.name.trim() === `` || saveUser.isPending
       }
       onSave={() => saveUser.mutate(user)}
       onAddKeychainClicked={() => dispatch({ type: `setAddingKeychain`, keychain: null })}

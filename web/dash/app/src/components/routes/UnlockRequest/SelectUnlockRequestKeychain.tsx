@@ -9,7 +9,7 @@ const SelectUnlockRequestKeychain: React.FC = () => {
   const navigate = useNavigate();
   const query = useZip(useSelectableKeychains(), useUser(userId));
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <LoadingModal />;
   }
 

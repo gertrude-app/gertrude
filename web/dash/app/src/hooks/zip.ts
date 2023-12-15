@@ -4,20 +4,20 @@ import type { QueryResult } from './query';
 type ZipQueryResult<T> =
   | {
       status: `loading`;
-      isLoading: true;
+      isPending: true;
       isError: false;
       isSuccess: false;
     }
   | {
       status: `error`;
-      isLoading: false;
+      isPending: false;
       isError: true;
       isSuccess: false;
       error: PqlError;
     }
   | {
       status: `success`;
-      isLoading: false;
+      isPending: false;
       isError: false;
       isSuccess: true;
       data: T;
@@ -48,7 +48,7 @@ export function useZip<T1, T2, T3>(
   if (query3?.isError) {
     return error(query3.error);
   }
-  if (query1.isLoading || query2.isLoading || query3?.isLoading) {
+  if (query1.isPending || query2.isPending || query3?.isPending) {
     return loading();
   }
   if (query3) {
@@ -61,7 +61,7 @@ export function useZip<T1, T2, T3>(
 export function loading(): ZipQueryResult<any> {
   return {
     status: `loading`,
-    isLoading: true,
+    isPending: true,
     isError: false,
     isSuccess: false,
   };
@@ -70,7 +70,7 @@ export function loading(): ZipQueryResult<any> {
 function error(error: PqlError): ZipQueryResult<any> {
   return {
     status: `error`,
-    isLoading: false,
+    isPending: false,
     isError: true,
     isSuccess: false,
     error,
@@ -80,7 +80,7 @@ function error(error: PqlError): ZipQueryResult<any> {
 function success<T>(data: T): ZipQueryResult<T> {
   return {
     status: `success`,
-    isLoading: false,
+    isPending: false,
     isError: false,
     isSuccess: true,
     data,

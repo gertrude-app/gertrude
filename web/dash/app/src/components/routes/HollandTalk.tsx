@@ -57,7 +57,7 @@ const HollandTalk: React.FC = () => {
         >
           Submit <i className="fas fa-arrow-right ml-2" />
         </Button>
-        {subscription.isLoading && <Loading className="mt-6" />}
+        {subscription.isPending && <Loading className="mt-6" />}
         {!emailValid && subscription.isIdle && (
           <Message
             heading="Invalid email address"

@@ -30,7 +30,7 @@ const MagicLink: React.FC = () => {
     return <FullscreenModalForm state="failed" error={error} />;
   }
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <FullscreenModalForm state="ongoing" />;
   }
 

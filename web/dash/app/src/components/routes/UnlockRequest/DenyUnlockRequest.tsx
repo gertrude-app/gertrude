@@ -23,7 +23,7 @@ const DenyUnlockRequest: React.FC = () => {
     });
   });
 
-  if (query.isLoading || deny.isLoading) {
+  if (query.isPending || deny.isPending) {
     return <LoadingModal />;
   }
 
