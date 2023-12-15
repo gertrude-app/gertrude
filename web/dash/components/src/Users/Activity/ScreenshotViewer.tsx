@@ -11,7 +11,6 @@ type Props = {
   onApprove(): unknown;
   date: Date;
   duringSuspension: boolean;
-  lazy?: boolean;
 };
 
 const ScreenshotViewer: React.FC<Props> = ({
@@ -22,7 +21,6 @@ const ScreenshotViewer: React.FC<Props> = ({
   height,
   onApprove,
   duringSuspension,
-  lazy = false,
 }) => (
   <div
     className={cx(
@@ -37,7 +35,7 @@ const ScreenshotViewer: React.FC<Props> = ({
         src={url}
         width={width}
         height={height}
-        loading={lazy && !isScreenshotTest() ? `lazy` : `eager`}
+        loading={isScreenshotTest() ? `eager` : `lazy`}
         alt="child screenshot"
       />
     </div>

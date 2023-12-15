@@ -92,7 +92,6 @@ export function deleteableChunks(
   chunkSize: number,
   deleteItems: (ids: UUID[]) => unknown,
 ): JSX.Element[] {
-  let numItemsRendered = 0;
   const ids: UUID[] = [];
   const elements: JSX.Element[] = [];
   const numChunks = Math.ceil(items.length / chunkSize);
@@ -112,7 +111,7 @@ export function deleteableChunks(
       bufferingSuspensionItems = item.duringSuspension;
 
       if (item.duringSuspension) {
-        buffer.push(renderItem(item, () => deleteItems([item.id]), numItemsRendered));
+        buffer.push(renderItem(item, () => deleteItems([item.id])));
       }
       if (finishingSuspension) {
         elements.push(
@@ -130,10 +129,9 @@ export function deleteableChunks(
         buffer = [];
       }
       if (!item.duringSuspension) {
-        elements.push(renderItem(item, () => deleteItems([item.id]), numItemsRendered));
+        elements.push(renderItem(item, () => deleteItems([item.id])));
       }
       ids.push(item.id);
-      numItemsRendered++;
     }
 
     if (chunkIndex < numChunks - 1) {
@@ -158,11 +156,7 @@ export function deleteableChunks(
   return elements;
 }
 
-function renderItem(
-  item: ActivityFeedItem,
-  deleteItem: () => unknown,
-  numRendered: number,
-): JSX.Element {
+function renderItem(item: ActivityFeedItem, deleteItem: () => unknown): JSX.Element {
   if (item.type === `Screenshot`) {
     return (
       <ScreenshotViewer
@@ -173,7 +167,6 @@ function renderItem(
         onApprove={deleteItem}
         date={new Date(item.date)}
         duringSuspension={item.duringSuspension}
-        lazy={numRendered > 10}
       />
     );
   } else {
