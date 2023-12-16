@@ -37,13 +37,18 @@ But the apps provided by Apple do not appear as options to disable.
 
 {% image src="lockdown-iphone/ios17-delete-3rd-party-imessage-apps.png" caption="Notably absent is the ability to delete <b>Apple's</b> iMessage apps" alt="Apple iMessage apps can't be removed in iOS 17" /%}
 
-## What Should Parents Do?
+{% callout title="<b class='text-2xl'>What should parents do?</b>" %}
 
-1. The simplest and most effective thing parents can do is **don't update, or let their
-   kids update to iOS 17** until (hopefully) Apple fixes this issue.
-2. If you've already updated, we recommend temporarily crippling the Messages app by
-   setting it to be allowed only for 1 minute each day, with ScreenTime's "App Limits"
-   feature.
-3. Help raise awareness of this issue by linking to or posting this article on social
-   media, opening support requests with Apple, or any other thing you can think of to make
-   Apple aware of how big a deal this is for parents.
+1. Please take **2 minutes** to file a
+   [bug report here](https://www.apple.com/feedback/messages-ios-ipados.html), letting
+   Apple know that this is a serious problem you care about. The more people who report
+   the issue, the sooner it will get fixed.
+2. Help raise awareness and increase the pressure on Apple by **sharing this article** on
+   social media.
+3. If your kids' iOS devices aren't updated to iOS 17 yet **don't update, stay on iOS 16**
+   until Apple fixes the issue. iOS 16 will work well for several years at least.
+4. If you've already updated, we recommend temporarily crippling the Messages app by
+   setting it to be allowed only for 1 minute each day, with ScreenTime's
+   [App Limits](/docs/definitive-guide-to-locking-down-an-iphone#app-limits) feature.
+
+{% /callout %}
