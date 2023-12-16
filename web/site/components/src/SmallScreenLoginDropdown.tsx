@@ -10,7 +10,7 @@ export const SmallScreenLoginDropdown: React.FC<Props> = ({ className }) => (
   <Menu as="div" className={cx(`relative text-left`, className)}>
     <div>
       <Menu.Button className="w-11 h-11 rounded-xl bg-white shadow-xl text-slate-400 hover:text-slate-500 transition-[transform,background-color] duration-100 hover:bg-violet-50 active:bg-violet-100 active:scale-95">
-        <i className="fa-solid fa-bars text-xl" />
+        <i aria-hidden className="fa-solid fa-bars text-xl" />
       </Menu.Button>
     </div>
 
