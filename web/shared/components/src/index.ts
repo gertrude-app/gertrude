@@ -7,5 +7,6 @@ export { default as SelectMenu } from './SelectMenu';
 export { default as Loading } from './Loading';
 export { default as AppIcon } from './AppIcon';
 export { default as PillBadge } from './PillBadge';
+export { trackEvent, trackNavigation } from './track';
 export * as env from './env';
 export * from './env';
