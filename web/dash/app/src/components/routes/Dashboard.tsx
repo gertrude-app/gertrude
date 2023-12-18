@@ -11,7 +11,7 @@ const DashboardRoute: React.FC = () => {
     Current.api.createPendingAppConnection({ userId }),
   );
 
-  if (widgetsQuery.isLoading) {
+  if (widgetsQuery.isPending) {
     return <Loading />;
   }
 

@@ -9,7 +9,7 @@ const Signup: React.FC = () => {
   const [password, setPassword] = useState(``);
   const signup = useMutation(() => Current.api.signup({ email, password }));
 
-  if (signup.isLoading) {
+  if (signup.isPending) {
     return <FullscreenModalForm state="ongoing" />;
   }
 

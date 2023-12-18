@@ -34,7 +34,7 @@ const Computer: React.FC = () => {
   const [releaseChannel, setReleaseChannel] = useState<ReleaseChannel>(`stable`);
 
   const zip = useZip(getComputer, latestAppVersions);
-  if (zip.isLoading) return <Loading />;
+  if (zip.isPending) return <Loading />;
   if (zip.isError) return <ApiErrorMessage error={zip.error} />;
   const [deviceData, appVersionsData] = zip.data;
 

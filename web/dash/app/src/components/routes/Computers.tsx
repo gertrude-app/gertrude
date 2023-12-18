@@ -6,7 +6,7 @@ import Current from '../../environment';
 const Computers: React.FC = () => {
   const query = useQuery(Key.devices, Current.api.getDevices);
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <Loading />;
   }
 

@@ -9,7 +9,7 @@ const CombinedUsersActivitySummariesRoute: React.FC = () => {
     Current.api.combinedUsersActivitySummaries(entireDays(14)),
   );
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <Loading />;
   }
 

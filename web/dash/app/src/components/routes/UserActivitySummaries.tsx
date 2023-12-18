@@ -12,7 +12,7 @@ const UserActivitySummariesRoute: React.FC = () => {
     Current.api.userActivitySummaries({ userId, dateRanges: entireDays(14) }),
   );
 
-  if (getSummaries.isLoading) {
+  if (getSummaries.isPending) {
     return <Loading />;
   }
 

@@ -39,7 +39,7 @@ export function useOptimism(): {
   return {
     update<T>(queryKey: QueryKey<T>, to: T) {
       // cancel already in-flight queries that would overwrite optimistic update
-      queryClient.cancelQueries(queryKey.segments);
+      queryClient.cancelQueries({ queryKey: queryKey.segments });
       // update the query data to the new value
       queryClient.setQueryData(queryKey.segments, to);
     },
@@ -63,7 +63,7 @@ export function useFireAndForget<T>(
     enabled: options.when,
     retry: false,
     retryOnMount: false,
-    cacheTime: Infinity,
+    gcTime: Infinity,
     retryDelay: Infinity,
     refetchOnMount: false,
     refetchOnWindowFocus: false,

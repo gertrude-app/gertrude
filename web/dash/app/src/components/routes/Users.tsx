@@ -13,7 +13,7 @@ const Users: React.FC = () => {
     Current.api.createPendingAppConnection({ userId }),
   );
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <Loading />;
   }
 

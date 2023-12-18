@@ -19,7 +19,7 @@ const ReviewUnlockRequestRoute: React.FC = () => {
   useUser(userId);
   useSelectableKeychains();
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <LoadingModal />;
   }
 

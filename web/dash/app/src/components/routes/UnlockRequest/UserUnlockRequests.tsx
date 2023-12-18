@@ -11,7 +11,7 @@ const UserUnlockRequests: React.FC = () => {
     useUser(id),
   );
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <Loading />;
   }
 

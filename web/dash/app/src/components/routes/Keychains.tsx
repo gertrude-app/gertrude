@@ -9,7 +9,7 @@ const Keychains: React.FC = () => {
     invalidating: [Key.adminKeychains],
   });
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <Loading />;
   }
 

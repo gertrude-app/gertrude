@@ -104,7 +104,7 @@ const Keychain: React.FC = () => {
       setDescription={(description) => dispatch({ type: `updateDesc`, description })}
       deleteKeychain={deleteKeychain}
       deleteKey={deleteKey}
-      saveButtonDisabled={saveKeychain.isLoading || !isDirty(editableKeychain)}
+      saveButtonDisabled={saveKeychain.isPending || !isDirty(editableKeychain)}
       onSave={() => saveKeychain.mutate(editableKeychain)}
       beginEditKey={(id) => dispatch({ type: `beginEditKey`, id })}
       updateEditingKey={(event) => dispatch({ type: `updateEditingKey`, event })}
@@ -112,7 +112,7 @@ const Keychain: React.FC = () => {
       onKeySave={() => saveKey.mutate(undefined)}
       onCreateNewKey={() => dispatch({ type: `createNewKey` })}
       keyModalSaveButtonDisabled={
-        toKeyRecord(state.editingKey) === null || saveKey.isLoading
+        toKeyRecord(state.editingKey) === null || saveKey.isPending
       }
     />
   );

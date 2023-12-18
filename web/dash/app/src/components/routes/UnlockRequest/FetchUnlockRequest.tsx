@@ -8,7 +8,7 @@ const FetchUnlockRequest: React.FC = () => {
   const navigate = useNavigate();
   const query = useUnlockRequest(id);
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <LoadingModal />;
   }
 

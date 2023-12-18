@@ -51,7 +51,7 @@ const SuspendFilter: React.FC = () => {
     { invalidating: [queryKey], toast: `update:suspend-filter-request` },
   );
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <Loading />;
   }
 
@@ -95,7 +95,7 @@ const SuspendFilter: React.FC = () => {
         label: `Grant`,
         action: () => update.mutate(`accepted`),
         disabled:
-          update.isLoading ||
+          update.isPending ||
           update.isSuccess ||
           (state.grantedDurationInSeconds === `custom` &&
             (Number.isNaN(Number(state.grantedCustomDurationInMinutes)) ||

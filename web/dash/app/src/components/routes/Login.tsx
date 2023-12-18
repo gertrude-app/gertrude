@@ -28,7 +28,7 @@ export const Login: React.FC = () => {
     return <Navigate to={redirectUrl ?? `/`} replace />;
   }
 
-  if (loginMutation.isLoading || requestMagicLink.isLoading) {
+  if (loginMutation.isPending || requestMagicLink.isPending) {
     return <FullscreenModalForm state="ongoing" />;
   }
 

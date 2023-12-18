@@ -37,7 +37,7 @@ const VerifySignupEmail: React.FC = () => {
     );
   }
 
-  if (verification.isLoading) {
+  if (verification.isPending) {
     return <FullscreenModalForm state="ongoing" />;
   }
 

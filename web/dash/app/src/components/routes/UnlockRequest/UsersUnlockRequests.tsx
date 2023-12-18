@@ -6,7 +6,7 @@ import { useQuery, Key } from '../../../hooks';
 const UsersUnlockRequests: React.FC = () => {
   const query = useQuery(Key.combinedUsersUnlockRequests, Current.api.getUnlockRequests);
 
-  if (query.isLoading) {
+  if (query.isPending) {
     return <Loading />;
   }
 

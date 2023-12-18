@@ -45,7 +45,7 @@ const EditUnlockRequestKey: React.FC = () => {
     return <ErrorModal error={query.error} />;
   }
 
-  if (query.isLoading || accept.isLoading || !key) {
+  if (query.isPending || accept.isPending || !key) {
     return <LoadingModal />;
   }
 
