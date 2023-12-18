@@ -1,31 +1,52 @@
-import { inflect } from '@shared/string';
 import React, { useContext } from 'react';
+import cx from 'classnames';
 import { ExemptUser } from '../../Administrate/screens/ExemptUsersScreen';
+import Callout from '../Callout';
 import OnboardingContext from '../OnboardingContext';
 import * as Onboarding from '../UtilityComponents';
 
-const ExemptUsers: React.FC = () => {
-  const { otherUsers } = useContext(OnboardingContext);
+interface Props {
+  exemptableUserIds: number[];
+  exemptUserIds: number[];
+}
+
+const ExemptUsers: React.FC<Props> = ({ exemptableUserIds, exemptUserIds }) => {
+  const { otherUsers, emit } = useContext(OnboardingContext);
   return (
     <Onboarding.Centered>
-      <Onboarding.Heading>Grant other users internet access</Onboarding.Heading>
+      <Onboarding.Heading>Unblock other Mac users</Onboarding.Heading>
       <Onboarding.Text centered className="max-w-3xl mt-4">
-        For safety, Gertrude will block all internet access for other users unless you
-        explicitly exempt them from filtering. You have {otherUsers.length} other{` `}
-        {inflect(`user`, otherUsers.length)} on this computer; if you want them to have
-        access to the internet, click the corresponding checkbox below. Make sure your
-        child doesn&apos;t know the password for these unpretected users.
+        For maximum safety, Gertrude blocks all internet for unknown users unless you
+        explicitly allow them access. Click below to exempt any users{` `}
+        <em>(like parent accounts)</em> that <b>should</b> have internet. You can always
+        change this later.
       </Onboarding.Text>
-      <div className="min-w-[660px] border border-slate-200 bg-white rounded-2xl mt-8">
-        {otherUsers.map((user) => (
-          <ExemptUser
-            name={user.name}
-            isExempt={true}
-            onToggle={() => alert(`TODO`)}
-            isAdmin={user.isAdmin}
-          />
-        ))}
+      <div className="min-w-[660px] border border-slate-200 bg-white rounded-2xl mt-8 py-1">
+        {otherUsers
+          .filter((user) => exemptableUserIds.includes(user.id))
+          .map((user) => (
+            <ExemptUser
+              name={user.name}
+              isExempt={exemptUserIds.includes(user.id) ?? false}
+              onToggle={() =>
+                emit({
+                  case: `setUserExemption`,
+                  userId: user.id,
+                  enabled: !exemptUserIds.includes(user.id),
+                })
+              }
+              isAdmin={user.isAdmin}
+            />
+          ))}
       </div>
+      <Callout
+        className={cx(`mt-8`, exemptUserIds.length === 0 && `opacity-0`)}
+        heading=""
+        type="warning"
+      >
+        Make sure your child <b className="underline">doesn’t know the password</b> for
+        any exempt users.
+      </Callout>
       <Onboarding.PrimaryButton className="mt-8">
         Continue
         <i className="fa-solid fa-arrow-right ml-3" />

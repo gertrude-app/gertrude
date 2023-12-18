@@ -1,5 +1,5 @@
 import { test, describe, expect } from 'vitest';
-import { registrable, sanitizeUserInput } from '../domain';
+import { registrable, removePort, sanitizeUserInput } from '../domain';
 
 describe(`registrable()`, () => {
   const cases: [string, string][] = [
@@ -28,5 +28,22 @@ describe(`sanitizeUserInput()`, () => {
   ];
   test.each(cases)(`sanitize user input %s -> %s`, (input, expected) => {
     expect(sanitizeUserInput(input)).toBe(expected);
+  });
+});
+
+describe(`removePort()`, () => {
+  const cases: [string, string][] = [
+    [`example.com`, `example.com`],
+    [`example.com:8080`, `example.com`],
+    [`192.168.2.1`, `192.168.2.1`],
+    [`http://192.168.2.1`, `http://192.168.2.1`],
+    [`http://192.168.2.1:8080`, `http://192.168.2.1`],
+    [`::1`, `::1`],
+    [`192.168.2.1:8080`, `192.168.2.1`],
+    [`2607:f8b0:4007:803::200a`, `2607:f8b0:4007:803::200a`],
+    [`2607:f8b0:4007:803::2001`, `2607:f8b0:4007:803::2001`],
+  ];
+  test.each(cases)(`removes port %s -> %s`, (input, expected) => {
+    expect(removePort(input)).toBe(expected);
   });
 });

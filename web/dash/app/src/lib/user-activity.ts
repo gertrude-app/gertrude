@@ -71,6 +71,7 @@ export function prepareUserActivityDelete(
     {
       userName: queryData.userName,
       items: remaining,
+      showSuspensionActivity: queryData.showSuspensionActivity,
       numDeleted: queryData.numDeleted + queryData.items.length - remaining.length,
     },
   ];

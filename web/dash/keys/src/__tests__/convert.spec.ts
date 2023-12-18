@@ -13,8 +13,28 @@ describe(`convert.toKeyRecord()`, () => {
       mock.keyState({ address: `https://example.com/with/path` }),
       mock.anySubdomainKey(`example.com`), // <-- is stripped
     ],
+    [
+      mock.keyState({ address: `https://example.com:8080` }),
+      mock.anySubdomainKey(`example.com`), // <-- port removed
+    ],
+    [
+      mock.keyState({ address: `2607:f8b0:4007:803::2001`, addressType: `ip` }),
+      mock.ipKey(`2607:f8b0:4007:803::2001`), // <-- doesn't strip ipv6 port-like suffix
+    ],
+    [
+      mock.keyState({ address: `10.0.1.22:8080`, addressType: `ip` }),
+      mock.ipKey(`10.0.1.22`), // <-- port removed
+    ],
+    [
+      mock.keyState({ address: `::1`, addressType: `ip` }),
+      mock.ipKey(`::1`), // <-- loopback ipv6
+    ],
+    [
+      mock.keyState({ address: `fe80::1ca8:ae3f:8128:c90b%en0`, addressType: `ip` }),
+      mock.ipKey(`fe80::1ca8:ae3f:8128:c90b%en0`), // <-- zone id `%en0` valid, preserved
+    ],
   ];
-  test.each(cases)(`convert key record %s -> %s`, (input, expected) => {
+  test.each(cases)(`convert key record %#`, (input, expected) => {
     const converted = convert.toKeyRecord(input);
     if (expected === null) {
       expect(converted).toBeNull();

@@ -23,14 +23,16 @@ export const Welcome: Story = props({
     { id: 501, name: `Bob McParent`, isAdmin: true },
     { id: 502, name: `Suzy`, isAdmin: false },
   ],
+  exemptableUserIds: [501, 503],
+  exemptUserIds: [501],
   connectionCode: ``,
   didResume: false,
   receivedAppState: true,
 });
 
-export const AppNotInApplicationsDir: Story = props({
+export const WrongInstallDir: Story = props({
   ...Welcome.args,
-  step: `appNotInApplicationsDir`,
+  step: `wrongInstallDir`,
 });
 
 export const ConfirmGertrudeAcct: Story = props({

@@ -7,7 +7,6 @@ export namespace SaveKeychain {
     id: UUID;
     name: string;
     description?: string;
-    isPublic: boolean;
   }
 
   export type Output = SuccessOutput;

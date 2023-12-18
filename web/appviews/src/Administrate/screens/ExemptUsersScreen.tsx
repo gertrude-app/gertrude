@@ -60,7 +60,7 @@ const ExemptUsersScreen: React.FC<Props> = ({ users, emit }) => {
             log in to that user at any time and also have unrestricted internet access.
           </p>
         </div>
-        <ul className="mt-4 space-y-2 flex-grow">
+        <ul className="mt-4 space-y-1 flex-grow ml-8 mr-16">
           {users.value.map((user) => (
             <ExemptUser
               key={user.id}
@@ -109,7 +109,7 @@ export const ExemptUser: React.FC<ExemptUserProps> = ({
 }) => (
   <div
     onClick={onToggle}
-    className={cx(`flex items-center justify-start rounded-xl p-2 pl-4`)}
+    className={cx(`flex items-center justify-start rounded-xl px-2 py-1.5 pl-4`)}
   >
     <button
       className={cx(
@@ -121,15 +121,23 @@ export const ExemptUser: React.FC<ExemptUserProps> = ({
     </button>
     <div className="flex justify-between items-center space-x-2 flex-grow">
       <div className="flex items-center">
-        <h3 className="font-bold dark:text-white grow mr-2">{name}</h3>
+        <h3 className="font-bold dark:text-white grow mr-3">{name}</h3>
         {isAdmin && (
-          <span className="text-fuchsia-500 font-medium uppercase text-xs bg-fuchsia-100 rounded-full px-2 py-0">
+          <span className="text-fuchsia-500 dark:text-fuchsia-800 font-medium uppercase text-xs bg-fuchsia-100 dark:bg-fuchsia-400 rounded-full px-2 py-0">
             admin
           </span>
         )}
       </div>
-      <span className="text-violet-500 dark:text-violet-400 pr-2 ml-4">
-        {isExempt ? `exempt from filtering - unrestricted internet access` : ``}
+      <span className="pr-2 ml-4 text-violet-500 dark:text-violet-400">
+        {isExempt ? (
+          <>
+            Exempt&mdash;<em>unrestricted</em> internet access
+          </>
+        ) : (
+          <>
+            Unknown user&mdash;<em>no</em> internet access
+          </>
+        )}
       </span>
     </div>
   </div>

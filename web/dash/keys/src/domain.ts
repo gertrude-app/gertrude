@@ -46,7 +46,7 @@ export function hostname(input: string): string | null {
 
 export function isIpAddress(input: string): boolean {
   const parseResult = parseDomain(
-    input.match(/^https?:\/\//) ? fromUrl(input) : input.replace(/:\d+/, ``),
+    input.match(/^https?:\/\//) ? fromUrl(input) : removePort(input),
   );
   switch (parseResult?.type) {
     case ParseResultType.Ip:
@@ -60,7 +60,7 @@ function parse(
   input: string,
 ): { domain: string; subdomain?: string; tld: string } | null {
   const parseResult = parseDomain(
-    input.match(/^https?:\/\//) ? fromUrl(input) : input.replace(/:\d+/, ``),
+    input.match(/^https?:\/\//) ? fromUrl(input) : removePort(input),
   );
   switch (parseResult?.type) {
     case ParseResultType.Listed: {
@@ -77,4 +77,12 @@ function parse(
     }
   }
   return null;
+}
+
+export function removePort(input: string): string {
+  if (input.includes(`::`) || (input.match(/:/g) || []).length > 2) {
+    // don't try to strip port from ipv6
+    return input;
+  }
+  return input.replace(/:\d+$/, ``);
 }

@@ -21,6 +21,8 @@ export const Onboarding: React.FC<Props> = ({
   users,
   receivedAppState,
   didResume,
+  exemptableUserIds,
+  exemptUserIds,
   os,
 }) => {
   // during testing, i was able to hear videos playing after
@@ -43,7 +45,7 @@ export const Onboarding: React.FC<Props> = ({
       <StepSwitcher ready={receivedAppState}>
         <OnboardingPage step="welcome" component={<Step.Welcome />} />
         <OnboardingPage
-          step="appNotInApplicationsDir"
+          step="wrongInstallDir"
           component={<Step.AppNotInApplicationsDir />}
         />
         <OnboardingPage
@@ -135,7 +137,15 @@ export const Onboarding: React.FC<Props> = ({
           component={<Step.InstallSysExt step="installSysExt_success" />}
           confetti
         />
-        <OnboardingPage step="exemptUsers" component={<Step.ExemptUsers />} />
+        <OnboardingPage
+          step="exemptUsers"
+          component={
+            <Step.ExemptUsers
+              exemptableUserIds={exemptableUserIds}
+              exemptUserIds={exemptUserIds}
+            />
+          }
+        />
         <OnboardingPage step="locateMenuBarIcon" component={<Step.LocateMenuBarIcon />} />
         <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
         <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />

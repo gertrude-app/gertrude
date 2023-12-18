@@ -227,7 +227,7 @@ const DurationPage: React.FC<
               type="button"
               onClick={() => dispatch({ type: `nextFromDurationPageClicked` })}
               color="secondary"
-              disabled={!duration.seconds}
+              disabled={!duration.seconds || (duration.seconds ?? 0) > 60 * 60 * 24 * 7}
             >
               Next
               <i className="ml-3 fa-solid fa-chevron-right" />

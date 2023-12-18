@@ -128,7 +128,12 @@ const noopClient: ApiClient = {
     return Result.success({ success: true });
   },
   userActivityFeed: async () => {
-    return Result.success({ numDeleted: 0, userName: ``, items: [] });
+    return Result.success({
+      numDeleted: 0,
+      userName: ``,
+      showSuspensionActivity: true,
+      items: [],
+    });
   },
   combinedUsersActivityFeed: async () => {
     return Result.success([]);

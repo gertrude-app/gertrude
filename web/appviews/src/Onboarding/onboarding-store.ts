@@ -10,7 +10,7 @@ export type RequestState<T = void, E = string> =
 // begin codegen
 export type OnboardingStep =
   | 'welcome'
-  | 'appNotInApplicationsDir'
+  | 'wrongInstallDir'
   | 'confirmGertrudeAccount'
   | 'noGertrudeAccount'
   | 'macosUserAccountType'
@@ -54,11 +54,14 @@ export interface AppState {
   currentUser?: MacOSUser;
   connectChildRequest: RequestState<string>;
   users: MacOSUser[];
+  exemptableUserIds: number[];
+  exemptUserIds: number[];
 }
 
 export type AppEvent =
   | { case: 'connectChildSubmitted'; code: number }
   | { case: 'infoModalOpened'; step: OnboardingStep; detail?: string }
+  | { case: 'setUserExemption'; userId: number; enabled: boolean }
   | { case: 'closeWindow' }
   | { case: 'primaryBtnClicked' }
   | { case: 'secondaryBtnClicked' }
@@ -86,6 +89,8 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
       connectChildRequest: { case: `idle` },
       currentUser: { id: 501, name: ``, isAdmin: false },
       users: [],
+      exemptableUserIds: [],
+      exemptUserIds: [],
       connectionCode: ``,
       receivedAppState: false,
       didResume: false,
