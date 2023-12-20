@@ -4,7 +4,7 @@ import { Button } from '@shared/components';
 import { posessive } from '@shared/string';
 import type { ActivityFeedItem } from './UserActivityFeed';
 import { FeedCaughtUp } from './UserActivityFeed';
-import { deleteableChunks } from './UserActivityFeed';
+import DeletableActivityChunks from './DeletableActivityChunks';
 import FeedHeader from './FeedHeader';
 import ReviewDayWrapper from './ReviewDayWrapper';
 import UserActivityHeader from './UserActivityHeader';
@@ -57,7 +57,11 @@ const CombinedUsersActivityFeed: React.FC<Props> = ({
               className="flex flex-col justify-center space-y-4 md:border md:border-slate-200 md:rounded-3xl md:pt-6 lg:pt-8 md:px-4 lg:px-8 md:pb-0 md:bg-white/50"
             >
               <UserActivityHeader>{userName}</UserActivityHeader>
-              {deleteableChunks(items, chunkSize, deleteItems)}
+              <DeletableActivityChunks
+                items={items}
+                chunkSize={chunkSize}
+                deleteItems={deleteItems}
+              />
               {items.length > 1 && (
                 <div className="flex justify-center pb-8">
                   <Button
