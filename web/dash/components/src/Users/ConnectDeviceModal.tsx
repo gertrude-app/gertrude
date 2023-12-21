@@ -19,7 +19,10 @@ const ConnectModal: React.FC<Props> = ({ dismissAddDevice, request }) => (
         <div>
           Enter the code below into the <i>Gertrude Mac App</i>:
         </div>
-        <code className="block text-3xl text-fuchsia-700 tracking-widest font-bold bg-fuchsia-50 w-fit self-center px-4 py-1 rounded-lg">
+        <code
+          data-test="connection-code"
+          className="block text-3xl text-fuchsia-700 tracking-widest font-bold bg-fuchsia-50 w-fit self-center px-4 py-1 rounded-lg"
+        >
           {payload.code}
         </code>
         <div>

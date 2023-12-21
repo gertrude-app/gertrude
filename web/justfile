@@ -61,6 +61,12 @@ cy-open:
 cy-run:
 	@pnpm cypress run --project dash/app
 
+smoke-open:
+	@pnpm cypress open --project smoke
+
+smoke-run:
+	@pnpm cypress run --project smoke
+
 test:
 	@pnpm vitest run
 

@@ -1,0 +1,56 @@
+name: smoke
+
+on:
+  push:
+  schedule:
+    # every 6 hours
+    - cron: 0 */6 * * *
+
+jobs:
+  smoke:
+    name: smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: test-slack
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: install pnpm
+        uses: pnpm/action-setup@v2
+      - name: get pnpm store path
+        id: pnpm-cache
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ~/.cache/Cypress
+          key: pnpm-cache-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: pnpm-cache-v1-
+      - name: install deps
+        run: pnpm --filter @gertie/smoke-tests install
+      - name: setup just
+        uses: extractions/setup-just@v1
+      - name: run smoke tests
+        run: just smoke-run
+      - name: upload-videos
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: smoke-videos
+          path: smoke/cypress/videos
+      - name: slack notify failure
+        if: failure()
+        run: |
+          curl -X POST \
+            -H "Content-type: application/json; charset=utf-8" \
+            -H "Authorization: Bearer $SLACK_API_TOKEN" \
+            -d "{\"channel\":\"G6007H2NM\",\"text\":\"Gertrude smoke test *FAILED*\", \
+                 \"username\":\"Gertrude Bot\",\"icon_emoji\":\":fire_engine:\"}" \
+            https://slack.com/api/chat.postMessage
+
+env:
+  CYPRESS_BASE_URL: https://parents.gertrude.app
+  CYPRESS_SMOKE_TEST_API_URL: https://api.gertrude.app
+  CYPRESS_SMOKE_TEST_EMAIL_INBOX_URL: ${{ secrets.SMOKE_TEST_EMAIL_INBOX_URL }}
+  SLACK_API_TOKEN: ${{ secrets.SLACK_API_TOKEN }}

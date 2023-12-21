@@ -1,0 +1,9 @@
+{
+  "name": "@gertie/smoke-tests",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "13.6.1"
+  }
+}
