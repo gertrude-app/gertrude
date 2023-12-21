@@ -9,6 +9,7 @@ appviews/src/main.tsx
 storybook/storybook-static/
 dash/app/build
 dash/app/cypress/screenshots
+smoke/cypress.env.json
 **/cypress/downloads
 **/cypress/videos
 **/.next
