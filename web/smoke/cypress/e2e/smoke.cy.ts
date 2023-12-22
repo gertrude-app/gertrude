@@ -9,7 +9,7 @@ describe(`Smoke test`, () => {
     cy.get(`input[name=email]`).type(email);
     cy.get(`input[name=password]`).type(`${password}{enter}`);
     cy.contains(`Verification email sent`);
-    cy.wait(Cypress.env(`CI`) ? 10000 : 2500);
+    cy.wait(Cypress.env(`CI`) ? 60000 : 5000);
 
     // verify email
     cy.request({ url: Cypress.env(`SMOKE_TEST_EMAIL_INBOX_URL`) }).then((response) => {

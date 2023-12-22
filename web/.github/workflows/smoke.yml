@@ -1,17 +1,17 @@
 name: smoke
 
 on:
-  push:
   schedule:
-    # every 6 hours
-    - cron: 0 */6 * * *
+    # mon-fri, every 3 hrs from 10am-7pm EST, 45 past hour
+    - cron: '45 15-23/3 * * 1-5'
 
 jobs:
-  smoke:
-    name: smoke
+  smoke-test:
+    name: smoke-test
     runs-on: ubuntu-latest
     steps:
-      - name: test-slack
+      - name: show date
+        run: date
       - name: checkout
         uses: actions/checkout@v3
       - name: install pnpm
