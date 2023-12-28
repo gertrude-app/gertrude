@@ -198,13 +198,14 @@ const ExpandableContent: React.FC<Props> = ({
                 >
                   <div
                     style={{
-                      width: `${currentStep === i ? 100 : 0}%`,
-                      transition: `width ${currentStep === i ? a.duration : 0}s ${
-                        currentStep === i ? `` : `200ms`
-                      } linear, opacity 200ms ease-in-out`,
+                      // animate-progress-right <- need this since it's never being used as a tailwind utility
+                      animation:
+                        currentStep === i
+                          ? `progress-right ${a.duration}s 0s linear infinite`
+                          : `none`,
                     }}
                     className={cx(
-                      `absolute left-0 top-0 h-full bg-violet-400`,
+                      `absolute left-0 top-0 w-2 h-full bg-violet-400`,
                       currentStep !== i && `opacity-0`,
                       expanded && `!bg-violet-500`,
                     )}
