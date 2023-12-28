@@ -1,8 +1,10 @@
 import type { OSGroup } from './onboarding-store';
 
-export interface CdnAsset {
+export type AssetType = 'video' | 'image';
+
+export interface CdnAsset<T extends AssetType = AssetType> {
   url: string;
-  type: 'video' | 'image';
+  type: T;
   render: boolean;
 }
 
@@ -11,19 +13,19 @@ class CdnAssets implements ExhaustiveAssets {
     return new OsCdnAssets(os);
   }
 
-  video(id: VideoId, render = false): CdnAsset {
+  video(id: VideoId, render = false): CdnAsset<'video'> {
     return { type: `video`, url: `${ENDPOINT}/common/${id}.mp4`, render };
   }
 
-  osVideo(os: OSGroup, id: OsVideoId, render = false): CdnAsset {
+  osVideo(os: OSGroup, id: OsVideoId, render = false): CdnAsset<'video'> {
     return new OsCdnAssets(os).video(id, render);
   }
 
-  img(filename: ImgFilename): CdnAsset {
+  img(filename: ImgFilename): CdnAsset<'image'> {
     return { type: `image`, url: `${ENDPOINT}/common/${filename}`, render: true };
   }
 
-  osImg(os: OSGroup, filename: OsImgFilename): CdnAsset {
+  osImg(os: OSGroup, filename: OsImgFilename): CdnAsset<'image'> {
     return new OsCdnAssets(os).img(filename);
   }
 
@@ -41,11 +43,11 @@ class CdnAssets implements ExhaustiveAssets {
 class OsCdnAssets implements ExhaustiveAssets {
   constructor(public readonly os: OSGroup) {}
 
-  video(id: OsVideoId, render = false): CdnAsset {
+  video(id: OsVideoId, render = false): CdnAsset<'video'> {
     return { type: `video`, url: `${ENDPOINT}/${this.os}/${id}.mp4`, render };
   }
 
-  img(filename: OsImgFilename): CdnAsset {
+  img(filename: OsImgFilename): CdnAsset<'image'> {
     return { type: `image`, url: `${ENDPOINT}/${this.os}/${filename}`, render: true };
   }
 
@@ -87,6 +89,7 @@ const OS_IMAGE_FILENAMES = [
 interface ExhaustiveAssets {
   all(): CdnAsset[];
 }
+
 type ImgFilename = (typeof IMAGE_FILENAMES)[number];
 type OsImgFilename = (typeof OS_IMAGE_FILENAMES)[number];
 type VideoId = (typeof VIDEO_IDS)[number];
