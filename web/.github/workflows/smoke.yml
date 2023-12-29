@@ -2,8 +2,8 @@ name: smoke
 
 on:
   schedule:
-    # mon-fri, every 3 hrs from 10am-7pm EST, 45 past hour
-    - cron: '45 15-23/3 * * 1-5'
+    # mon-fri, every 3 hrs from 10am-8pm EST, 45 past hour
+    - cron: '45 15-0/3 * * 1-5'
 
 jobs:
   smoke-test:

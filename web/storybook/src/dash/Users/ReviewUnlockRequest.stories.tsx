@@ -37,7 +37,6 @@ export const Default: Story = props({
   appName: `Safari Browser`,
   appCategories: [`browser`],
   appBundleId: `.com.apple.Safari`,
-  requestProtocol: `TCP`,
   detailsExpanded: false,
   setDetailsExpanded: () => {},
 });
