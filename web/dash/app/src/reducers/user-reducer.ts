@@ -15,6 +15,7 @@ export type Action =
   | { type: 'setScreenshotsResolution'; resolution: number }
   | { type: 'setScreenshotsFrequency'; frequency: number }
   | { type: 'setKeyloggingEnabled'; enabled: boolean }
+  | { type: 'setShowSuspensionActivity'; show: boolean }
   | { type: 'removeKeychain'; id: UUID }
   | { type: 'addKeychain'; keychain: KeychainSummary }
   | { type: 'setAddingKeychain'; keychain?: KeychainSummary | null };
@@ -49,6 +50,9 @@ function reducer(state: State, action: Action): State | undefined {
       return;
     case `setScreenshotsFrequency`:
       state.user.draft.screenshotsFrequency = action.frequency;
+      return;
+    case `setShowSuspensionActivity`:
+      state.user.draft.showSuspensionActivity = action.show;
       return;
     case `removeKeychain`:
       state.user.draft.keychains = state.user.draft.keychains.filter(

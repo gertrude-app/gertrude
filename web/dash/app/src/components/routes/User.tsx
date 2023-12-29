@@ -101,6 +101,10 @@ const UserRoute: React.FC = () => {
       setScreenshotsFrequency={(frequency) =>
         dispatch({ type: `setScreenshotsFrequency`, frequency })
       }
+      showSuspensionActivity={draft.showSuspensionActivity}
+      setShowSuspensionActivity={(show) =>
+        dispatch({ type: `setShowSuspensionActivity`, show })
+      }
       removeKeychain={(id) => dispatch({ type: `removeKeychain`, id })}
       keychains={draft.keychains}
       devices={original.devices.map(deviceProps)}
