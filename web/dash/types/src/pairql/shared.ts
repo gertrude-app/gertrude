@@ -131,7 +131,6 @@ export interface UnlockRequest {
   appSlug?: string;
   appBundleId?: string;
   appCategories: string[];
-  requestProtocol?: string;
   createdAt: ISODateString;
 }
 

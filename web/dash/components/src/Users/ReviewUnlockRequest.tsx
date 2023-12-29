@@ -19,7 +19,6 @@ const ReviewUnlockRequest: React.FC<Props> = ({
   appName,
   appCategories,
   appBundleId,
-  requestProtocol,
   detailsExpanded,
   setDetailsExpanded,
 }) => (
@@ -75,7 +74,6 @@ const ReviewUnlockRequest: React.FC<Props> = ({
           {appName && (
             <AppDetail expanded={detailsExpanded} label="Bundle ID" data={appBundleId} />
           )}
-          <AppDetail expanded={detailsExpanded} label="Protocol" data={requestProtocol} />
           <AppDetail expanded={detailsExpanded} label="URL" data={url} />
           <AppDetail expanded={detailsExpanded} label="Domain" data={domain} />
           <AppDetail expanded={detailsExpanded} label="IP Address" data={ipAddress} />

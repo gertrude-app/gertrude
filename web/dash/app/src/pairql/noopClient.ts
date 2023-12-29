@@ -84,7 +84,6 @@ const noopClient: ApiClient = {
       appSlug: ``,
       appBundleId: ``,
       appCategories: [],
-      requestProtocol: ``,
       createdAt: new Date().toISOString(),
     });
   },
