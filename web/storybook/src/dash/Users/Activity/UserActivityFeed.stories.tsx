@@ -16,6 +16,7 @@ export const Default: Story = props({
   date: new Date(time.stable()),
   items: activity[2]?.items ?? [],
   numDeleted: 0,
+  highlightSuspsensionActivity: true,
   deleteItems: () => {},
 });
 

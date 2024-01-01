@@ -8,7 +8,8 @@ const DeletableActivityChunks: React.FC<{
   items: ActivityFeedItem[];
   chunkSize: number;
   deleteItems: (ids: UUID[]) => unknown;
-}> = ({ items, deleteItems, chunkSize }) => (
+  highlightSuspensionActivity: boolean;
+}> = ({ items, deleteItems, chunkSize, highlightSuspensionActivity }) => (
   <>
     {chunkedRenderTasks(items, chunkSize)
       .flat(1)
@@ -23,14 +24,29 @@ const DeletableActivityChunks: React.FC<{
               />
             );
           case `suspension_group`:
-            return (
-              <div
-                key={`${item.items[0]?.id ?? ``}-suspension-group`}
-                className="ml-2 md:-ml-6 mt-4 pl-4 md:pl-5 rounded-l-3xl border-4 border-r-0 border-red-500/60"
-              >
-                <div className="bg-slate-100 md:bg-slate-50 -mt-4 pl-3 font-medium text-lg text-red-600">
-                  During filter suspension
+            if (highlightSuspensionActivity) {
+              return (
+                <div
+                  key={`${item.items[0]?.id ?? ``}-suspension-group`}
+                  className="ml-2 md:-ml-6 mt-4 pl-4 md:pl-5 rounded-l-3xl border-4 border-r-0 border-red-500/60"
+                >
+                  <div className="bg-slate-100 md:bg-slate-50 -mt-4 pl-3 font-medium text-lg text-red-600">
+                    During filter suspension
+                  </div>
+                  <div className="flex flex-col gap-8 pt-2 pb-4">
+                    {item.items.map((item) => (
+                      <Item
+                        key={item.id}
+                        item={item}
+                        deleteItem={() => deleteItems([item.id])}
+                      />
+                    ))}
+                  </div>
+                  <div className="bg-slate-100 md:bg-slate-50 h-2 -mb-1 ml-8"></div>
                 </div>
+              );
+            } else {
+              return (
                 <div className="flex flex-col gap-8 pt-2 pb-4">
                   {item.items.map((item) => (
                     <Item
@@ -40,9 +56,8 @@ const DeletableActivityChunks: React.FC<{
                     />
                   ))}
                 </div>
-                <div className="bg-slate-100 md:bg-slate-50 h-2 -mb-1 ml-8"></div>
-              </div>
-            );
+              );
+            }
           default: // @link https://github.com/typescript-eslint/typescript-eslint/issues/2841
             return (
               <div

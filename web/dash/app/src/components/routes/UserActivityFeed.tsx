@@ -51,6 +51,7 @@ const UserActivityFeedRoute: React.FC = () => {
       items={query.data.items
         .map(outputItemToActivityFeedItem)
         .filter((item) => !item.deleted)}
+      highlightSuspsensionActivity={query.data.showSuspensionActivity}
     />
   );
 };

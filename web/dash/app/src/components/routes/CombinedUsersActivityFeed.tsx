@@ -50,6 +50,7 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
         .filter((user) => user.items.length > 0)
         .map((user) => ({
           userName: user.userName,
+          highlightSuspensionActivity: user.showSuspensionActivity,
           items: user.items.map(outputItemToActivityFeedItem),
         }))}
       numDeleted={query.data.reduce((acc, user) => acc + user.numDeleted, 0)}
