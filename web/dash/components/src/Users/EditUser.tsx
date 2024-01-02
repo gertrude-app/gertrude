@@ -24,6 +24,8 @@ interface Props {
   setScreenshotsResolution(resolution: number): unknown;
   screenshotsFrequency: number;
   setScreenshotsFrequency(frequency: number): unknown;
+  showSuspensionActivity: boolean;
+  setShowSuspensionActivity(show: boolean): unknown;
   removeKeychain(id: UUID): unknown;
   keychains: Keychain[];
   devices: Subcomponents<typeof UserDevice>;
@@ -56,6 +58,8 @@ const EditUser: React.FC<Props> = ({
   setScreenshotsResolution,
   screenshotsFrequency,
   setScreenshotsFrequency,
+  showSuspensionActivity,
+  setShowSuspensionActivity,
   removeKeychain,
   keychains,
   devices,
@@ -184,8 +188,10 @@ const EditUser: React.FC<Props> = ({
               <h2 className="text-lg font-bold text-slate-700">Monitoring</h2>
               <div className="flex justify-between items-center bg-slate-100 my-3 p-4 sm:p-6 rounded-xl">
                 <div className="mr-3">
-                  <h3 className="font-medium text-slate-700">Enable keylogging</h3>
-                  <p className="text-slate-500 text-sm">
+                  <h3 className="font-medium text-slate-700 leading-tight">
+                    Enable keylogging
+                  </h3>
+                  <p className="text-slate-500 text-sm mt-1">
                     Sends reports of all keystrokes to your review
                   </p>
                 </div>
@@ -196,8 +202,10 @@ const EditUser: React.FC<Props> = ({
               >
                 <div className="flex justify-between items-center">
                   <div className="mr-3">
-                    <h3 className="font-medium text-slate-700">Enable screenshots</h3>
-                    <p className="text-slate-500 text-sm">
+                    <h3 className="font-medium text-slate-700 leading-tight">
+                      Enable screenshots
+                    </h3>
+                    <p className="text-slate-500 text-sm mt-1">
                       Periodically take a screenshot and upload for your review
                     </p>
                   </div>
@@ -228,7 +236,27 @@ const EditUser: React.FC<Props> = ({
                   />
                 </div>
               </div>
+              <div
+                className={cx(
+                  `flex justify-between items-center mt-4 p-6 bg-slate-100 rounded-xl transition-opacity duration-300`,
+                  !(screenshotsEnabled || keyloggingEnabled) && `!hidden`,
+                )}
+              >
+                <div className="mr-3">
+                  <h3 className="font-medium text-slate-700 leading-tight">
+                    Emphasize filter suspension activity
+                  </h3>
+                  <p className="text-slate-500 text-sm mt-1">
+                    Visually highlight activity that is recorded while filter is suspended
+                  </p>
+                </div>
+                <Toggle
+                  enabled={showSuspensionActivity}
+                  setEnabled={setShowSuspensionActivity}
+                />
+              </div>
             </div>
+
             <div className="mt-12 max-w-3xl">
               <h2 className="text-lg font-bold text-slate-700 mb-2">Keychains</h2>
               <div className="py-3 flex flex-col space-y-4">

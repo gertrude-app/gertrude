@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import cx from 'classnames';
 import { Button } from '@shared/components';
 import { posessive } from '@shared/string';
 import type { ActivityFeedItem } from './UserActivityFeed';
@@ -11,7 +12,11 @@ import UserActivityHeader from './UserActivityHeader';
 
 interface Props {
   date: Date;
-  activity: Array<{ userName: string; items: ActivityFeedItem[] }>;
+  activity: Array<{
+    userName: string;
+    highlightSuspensionActivity: boolean;
+    items: ActivityFeedItem[];
+  }>;
   numDeleted: number;
   deleteItems(ids: UUID[]): unknown;
   chunkSize?: number;
@@ -51,30 +56,34 @@ const CombinedUsersActivityFeed: React.FC<Props> = ({
       <FeedHeader date={date} numItems={items.length} numDeleted={numDeleted} />
       {items.length > 0 ? (
         <ReviewDayWrapper>
-          {activity.map(({ userName, items }) => (
+          {activity.map(({ userName, highlightSuspensionActivity, items }) => (
             <div
               key={userName}
               className="flex flex-col justify-center space-y-4 md:border md:border-slate-200 md:rounded-3xl md:pt-6 lg:pt-8 md:px-4 lg:px-8 md:pb-0 md:bg-white/50"
+              data-test="single-user-sub-feed"
             >
               <UserActivityHeader>{userName}</UserActivityHeader>
-              <DeletableActivityChunks
-                items={items}
-                chunkSize={chunkSize}
-                deleteItems={deleteItems}
-              />
-              {items.length > 1 && (
-                <div className="flex justify-center pb-8">
-                  <Button
-                    type="button"
-                    onClick={() => deleteItems(items.map((item) => item.id))}
-                    color="secondary"
-                    className="ScrollTop mt-4"
-                  >
-                    <i className="fa-solid fa-thumbs-up mr-2" />
-                    Approve all {posessive(userName)} activity
-                  </Button>
-                </div>
-              )}
+              <div className={cx(`flex flex-col gap-4`, items.length === 1 && `pb-2`)}>
+                <DeletableActivityChunks
+                  items={items}
+                  chunkSize={chunkSize}
+                  deleteItems={deleteItems}
+                  highlightSuspensionActivity={highlightSuspensionActivity}
+                />
+                {items.length > 1 && (
+                  <div className="flex justify-center pb-8">
+                    <Button
+                      type="button"
+                      onClick={() => deleteItems(items.map((item) => item.id))}
+                      color="secondary"
+                      className="ScrollTop mt-4"
+                    >
+                      <i className="fa-solid fa-thumbs-up mr-2" />
+                      Approve all {posessive(userName)} activity
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
           <Button

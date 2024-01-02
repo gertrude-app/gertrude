@@ -8,9 +8,10 @@ const DeletableActivityChunks: React.FC<{
   items: ActivityFeedItem[];
   chunkSize: number;
   deleteItems: (ids: UUID[]) => unknown;
-}> = ({ items, deleteItems, chunkSize }) => (
+  highlightSuspensionActivity: boolean;
+}> = ({ items, deleteItems, chunkSize, highlightSuspensionActivity }) => (
   <>
-    {chunkedRenderTasks(items, chunkSize)
+    {chunkedRenderTasks(items, chunkSize, highlightSuspensionActivity)
       .flat(1)
       .map((item) => {
         switch (item.type) {
@@ -110,6 +111,7 @@ type ActivityRenderTask<T extends Chunkable> =
 export function chunkedRenderTasks<T extends Chunkable>(
   items: T[],
   chunkSize: number,
+  highlightSuspensionActivity: boolean,
 ): Array<ActivityRenderTask<T>[]> {
   const ids: UUID[] = [];
   const chunkedTasks: Array<ActivityRenderTask<T>[]> = [];
@@ -129,11 +131,11 @@ export function chunkedRenderTasks<T extends Chunkable>(
         (!item.duringSuspension && suspensionBuffer.length > 0) ||
         (isLastItem && item.duringSuspension);
 
-      if (item.duringSuspension) {
+      if (item.duringSuspension && highlightSuspensionActivity) {
         suspensionBuffer.push(item);
       }
 
-      if (finishingSuspension) {
+      if (finishingSuspension && highlightSuspensionActivity) {
         if (shouldBeMergedIntoSuspensionGroup(item, chunkItems, i)) {
           item.duringSuspension = true;
           suspensionBuffer.push(item);
@@ -143,7 +145,7 @@ export function chunkedRenderTasks<T extends Chunkable>(
         }
       }
 
-      if (!item.duringSuspension) {
+      if (!item.duringSuspension || !highlightSuspensionActivity) {
         tasks.push({ type: `item`, item });
       }
 

@@ -33,17 +33,21 @@ describe(`activity screens`, () => {
   it(`activity feed displays items in correct order`, () => {
     cy.interceptPql(`CombinedUsersActivityFeed`, [
       {
+        showSuspensionActivity: false,
         userName: `Bob`,
         numDeleted: 0,
-        items: [mock.screenshotActivityItem({ id: `screenshot-123` })],
+        items: [
+          mock.screenshotActivityItem({ id: `screenshot-123`, duringSuspension: true }),
+        ],
       },
       {
+        showSuspensionActivity: true,
         userName: `Suzy`,
         numDeleted: 1,
         items: [
           mock.screenshotActivityItem({ id: `screenshot-234` }),
-          mock.screenshotActivityItem({ id: `screenshot-345` }),
-          mock.screenshotActivityItem({ id: `screenshot-456` }),
+          mock.screenshotActivityItem({ id: `screenshot-345`, duringSuspension: true }),
+          mock.screenshotActivityItem({ id: `screenshot-456`, duringSuspension: true }),
           mock.keystrokeActivityItem({
             id: `ks-1`,
             ids: [`ks-1`, `ks-2`, `ks-3`], // <-- aggregated ids
@@ -65,6 +69,13 @@ describe(`activity screens`, () => {
     // suzy has more items, so her activity should be first
     cy.testId(`page-heading`).first().should(`have.text`, `Suzy’s Activity`);
     cy.testId(`page-heading`).last().should(`have.text`, `Bob’s Activity`);
+
+    cy.testId(`single-user-sub-feed`).first().contains(`During filter suspension`);
+    // bob has `showSuspensionActivity: false`, so his feed should not have any highlighted suspension items
+    cy.testId(`single-user-sub-feed`)
+      .last()
+      .contains(`During filter suspension`)
+      .should(`not.exist`);
 
     cy.contains(`Approve all child activity`).click();
 
@@ -92,11 +103,13 @@ describe(`activity screens`, () => {
     );
     cy.interceptPql(`CombinedUsersActivityFeed`, [
       {
+        showSuspensionActivity: true,
         userName: `suzy`,
         numDeleted: 0,
         items: suzysItems,
       },
       {
+        showSuspensionActivity: true,
         userName: `jimmy`,
         numDeleted: 0,
         items: Array.from({ length: 130 }, (_, i) =>
@@ -117,11 +130,13 @@ describe(`activity screens`, () => {
 
     cy.interceptPql(`CombinedUsersActivityFeed`, [
       {
+        showSuspensionActivity: true,
         userName: `suzy`,
         numDeleted: 0,
         items: suzysItems,
       },
       {
+        showSuspensionActivity: true,
         userName: `jimmy`,
         numDeleted: 0,
         //                          vv -- only 30 remain

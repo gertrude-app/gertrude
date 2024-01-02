@@ -35,6 +35,7 @@ interface Props {
   numDeleted: number;
   deleteItems(ids: UUID[]): unknown;
   chunkSize?: number;
+  highlightSuspensionActivity: boolean;
 }
 
 const UserActivityFeed: React.FC<Props> = ({
@@ -43,6 +44,7 @@ const UserActivityFeed: React.FC<Props> = ({
   numDeleted,
   deleteItems,
   chunkSize = 100,
+  highlightSuspensionActivity,
 }) => {
   const navigate = useNavigate();
   return (
@@ -54,6 +56,7 @@ const UserActivityFeed: React.FC<Props> = ({
             items={items}
             chunkSize={chunkSize}
             deleteItems={deleteItems}
+            highlightSuspensionActivity={highlightSuspensionActivity}
           />
           <Button
             className="ScrollTop self-center"

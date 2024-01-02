@@ -9,6 +9,7 @@ describe(`dashboard onboarding nudges`, () => {
     screenshotsEnabled: false,
     screenshotsResolution: 1200,
     screenshotsFrequency: 30,
+    showSuspensionActivity: true,
     keychains: [],
     devices: [],
     createdAt: new Date().toISOString(),

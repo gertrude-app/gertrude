@@ -194,12 +194,13 @@ export const keychains = [
 export const activity = [
   {
     userName: `Little Jimmy`,
+    highlightSuspensionActivity: false,
     items: [
       keystrokeLine(
         `Xcode`,
         `importFoundationhereisareallylonglinethatwillcauseproblemspotentiallyblahblahblahlorem`,
       ),
-      screenshot(400, 600, true),
+      screenshot(400, 600, true, true), // during suspension, but not highlighted because of user setting
       keystrokeLine(`Brave`, `Hello world`),
       keystrokeLine(`Xcode`, `import Foundation`),
       screenshot(),
@@ -207,23 +208,25 @@ export const activity = [
   },
   {
     userName: `Henry`,
+    highlightSuspensionActivity: true,
     items: [
       keystrokeLine(`Firefox`, `turtles`),
-      screenshot(400, 600, true),
-      keystrokeLine(`Brave`, `Hello world`),
-      keystrokeLine(`Xcode`, `import Foundation`),
+      screenshot(400, 600, true, true),
+      keystrokeLine(`Brave`, `Hello world`, true),
+      keystrokeLine(`Xcode`, `import Foundation`, true),
       screenshot(),
       screenshot(),
-      keystrokeLine(`Messages`, `Sounds good, thanks`),
+      keystrokeLine(`Messages`, `Sounds good, thanks`, true),
       screenshot(),
     ],
   },
   {
     userName: `Sally`,
+    highlightSuspensionActivity: true,
     items: [
-      keystrokeLine(`Skype`, `No puedo nadar.`),
-      screenshot(800, 600, true),
-      keystrokeLine(`Brave`, `Hello world`),
+      keystrokeLine(`Skype`, `No puedo nadar.`, true),
+      screenshot(800, 600, true, true),
+      keystrokeLine(`Brave`, `Hello world`, true),
     ],
   },
 ];
