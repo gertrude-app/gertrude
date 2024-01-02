@@ -239,13 +239,12 @@ const EditUser: React.FC<Props> = ({
               <div
                 className={cx(
                   `flex justify-between items-center mt-4 p-6 bg-slate-100 rounded-xl transition-opacity duration-300`,
-                  !(screenshotsEnabled || keyloggingEnabled) &&
-                    `opacity-50 cursor-not-allowed pointer-events-none`,
+                  !(screenshotsEnabled || keyloggingEnabled) && `!hidden`,
                 )}
               >
                 <div className="mr-3">
                   <h3 className="font-medium text-slate-700 leading-tight">
-                    Highlight activity during filter suspensions
+                    Emphasize filter suspension activity
                   </h3>
                   <p className="text-slate-500 text-sm mt-1">
                     Visually highlight activity that is recorded while filter is suspended

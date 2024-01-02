@@ -11,7 +11,7 @@ const DeletableActivityChunks: React.FC<{
   highlightSuspensionActivity: boolean;
 }> = ({ items, deleteItems, chunkSize, highlightSuspensionActivity }) => (
   <>
-    {chunkedRenderTasks(items, chunkSize)
+    {chunkedRenderTasks(items, chunkSize, highlightSuspensionActivity)
       .flat(1)
       .map((item) => {
         switch (item.type) {
@@ -24,29 +24,14 @@ const DeletableActivityChunks: React.FC<{
               />
             );
           case `suspension_group`:
-            if (highlightSuspensionActivity) {
-              return (
-                <div
-                  key={`${item.items[0]?.id ?? ``}-suspension-group`}
-                  className="ml-2 md:-ml-6 mt-4 pl-4 md:pl-5 rounded-l-3xl border-4 border-r-0 border-red-500/60"
-                >
-                  <div className="bg-slate-100 md:bg-slate-50 -mt-4 pl-3 font-medium text-lg text-red-600">
-                    During filter suspension
-                  </div>
-                  <div className="flex flex-col gap-8 pt-2 pb-4">
-                    {item.items.map((item) => (
-                      <Item
-                        key={item.id}
-                        item={item}
-                        deleteItem={() => deleteItems([item.id])}
-                      />
-                    ))}
-                  </div>
-                  <div className="bg-slate-100 md:bg-slate-50 h-2 -mb-1 ml-8"></div>
+            return (
+              <div
+                key={`${item.items[0]?.id ?? ``}-suspension-group`}
+                className="ml-2 md:-ml-6 mt-4 pl-4 md:pl-5 rounded-l-3xl border-4 border-r-0 border-red-500/60"
+              >
+                <div className="bg-slate-100 md:bg-slate-50 -mt-4 pl-3 font-medium text-lg text-red-600">
+                  During filter suspension
                 </div>
-              );
-            } else {
-              return (
                 <div className="flex flex-col gap-8 pt-2 pb-4">
                   {item.items.map((item) => (
                     <Item
@@ -56,8 +41,9 @@ const DeletableActivityChunks: React.FC<{
                     />
                   ))}
                 </div>
-              );
-            }
+                <div className="bg-slate-100 md:bg-slate-50 h-2 -mb-1 ml-8"></div>
+              </div>
+            );
           default: // @link https://github.com/typescript-eslint/typescript-eslint/issues/2841
             return (
               <div
@@ -125,6 +111,7 @@ type ActivityRenderTask<T extends Chunkable> =
 export function chunkedRenderTasks<T extends Chunkable>(
   items: T[],
   chunkSize: number,
+  highlightSuspensionActivity: boolean,
 ): Array<ActivityRenderTask<T>[]> {
   const ids: UUID[] = [];
   const chunkedTasks: Array<ActivityRenderTask<T>[]> = [];
@@ -144,11 +131,11 @@ export function chunkedRenderTasks<T extends Chunkable>(
         (!item.duringSuspension && suspensionBuffer.length > 0) ||
         (isLastItem && item.duringSuspension);
 
-      if (item.duringSuspension) {
+      if (item.duringSuspension && highlightSuspensionActivity) {
         suspensionBuffer.push(item);
       }
 
-      if (finishingSuspension) {
+      if (finishingSuspension && highlightSuspensionActivity) {
         if (shouldBeMergedIntoSuspensionGroup(item, chunkItems, i)) {
           item.duringSuspension = true;
           suspensionBuffer.push(item);
@@ -158,7 +145,7 @@ export function chunkedRenderTasks<T extends Chunkable>(
         }
       }
 
-      if (!item.duringSuspension) {
+      if (!item.duringSuspension || !highlightSuspensionActivity) {
         tasks.push({ type: `item`, item });
       }
 

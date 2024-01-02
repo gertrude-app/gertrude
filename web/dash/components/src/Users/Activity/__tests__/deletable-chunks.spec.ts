@@ -9,6 +9,7 @@ describe(`chunkedRenderTasks()`, () => {
     const chunks = chunkedRenderTasks(
       [screenshot(), screenshot(), screenshot(), screenshot()],
       2,
+      true,
     );
     expect(simplify(chunks)).toMatchInlineSnapshot(`
       [
@@ -30,10 +31,33 @@ describe(`chunkedRenderTasks()`, () => {
         screenshot(),
       ],
       2,
+      true,
     );
     expect(simplify(chunks)).toMatchInlineSnapshot(`
       [
         "suspension_group(Screenshot, Screenshot)",
+        "delete_btn",
+        "item(Screenshot)",
+        "item(Screenshot)",
+      ]
+    `);
+  });
+
+  it(`should not highlight suspension activity when setting is off`, () => {
+    const chunks = chunkedRenderTasks(
+      [
+        screenshot({ duringSuspension: true }),
+        screenshot({ duringSuspension: true }),
+        screenshot(),
+        screenshot({ duringSuspension: true }),
+      ],
+      2,
+      false,
+    );
+    expect(simplify(chunks)).toMatchInlineSnapshot(`
+      [
+        "item(Screenshot)",
+        "item(Screenshot)",
         "delete_btn",
         "item(Screenshot)",
         "item(Screenshot)",
@@ -50,6 +74,7 @@ describe(`chunkedRenderTasks()`, () => {
         screenshot(),
       ],
       2,
+      true,
     );
     expect(simplify(chunks)).toMatchInlineSnapshot(`
       [
@@ -70,6 +95,7 @@ describe(`chunkedRenderTasks()`, () => {
         screenshot({ duringSuspension: true }),
       ],
       2,
+      true,
     );
     expect(simplify(chunks)).toMatchInlineSnapshot(`
       [
@@ -98,6 +124,7 @@ describe(`chunkedRenderTasks()`, () => {
         screenshot(),
       ],
       100,
+      true,
     );
     expect(simplify(chunks)).toMatchInlineSnapshot(`
       [
@@ -125,6 +152,7 @@ describe(`chunkedRenderTasks()`, () => {
         screenshot(),
       ],
       100,
+      true,
     );
     expect(simplify(chunks)).toMatchInlineSnapshot(`
       [
