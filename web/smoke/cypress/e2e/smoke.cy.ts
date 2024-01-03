@@ -3,13 +3,22 @@ describe(`Smoke test`, () => {
   const email = `82uii.smoke-test-${Date.now()}@inbox.testmail.app`;
   const password = `_pw_${Date.now()}`;
 
+  it(`verify download dmg is reachable`, () => {
+    cy.request({
+      method: `HEAD`,
+      url: `https://gertrude.nyc3.digitaloceanspaces.com/releases/Gertrude.dmg`,
+    })
+      .its(`status`)
+      .should(`eq`, 200);
+  });
+
   it(`critical flows`, () => {
     // signup
     cy.visit(`/signup`);
     cy.get(`input[name=email]`).type(email);
     cy.get(`input[name=password]`).type(`${password}{enter}`);
     cy.contains(`Verification email sent`);
-    cy.wait(Cypress.env(`CI`) ? 60000 : 5000);
+    cy.wait(Cypress.env(`CI`) ? 60000 : 7500);
 
     // verify email
     cy.request({ url: Cypress.env(`SMOKE_TEST_EMAIL_INBOX_URL`) }).then((response) => {
