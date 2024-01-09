@@ -41,7 +41,7 @@ const VerifySignupEmail: React.FC = () => {
     return <FullscreenModalForm state="ongoing" />;
   }
 
-  return <Navigate to="/" replace />;
+  return <Navigate to="/use-case" replace />;
 };
 
 export default VerifySignupEmail;

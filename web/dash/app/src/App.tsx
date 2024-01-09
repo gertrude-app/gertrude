@@ -31,6 +31,7 @@ import ChangePassword from './components/routes/ChangePassword';
 import Computers from './components/routes/Computers';
 import Computer from './components/routes/Computer';
 import HollandTalk from './components/routes/HollandTalk';
+import UseCaseSurvey from './components/routes/UseCaseSurvey';
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -53,6 +54,7 @@ const App: React.FC = () => {
       <Route path="/logout" element={<Logout />} />
       <Route path="/otp/:token" element={<MagicLink />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/use-case" element={<UseCaseSurvey />} />
       <Route path="/verify-signup-email/:token" element={<VerifySignupEmail />} />
       <Route path="/reset-password" element={<RequestPasswordReset />} />
       <Route path="/reset-password/:token" element={<ChangePassword />} />
