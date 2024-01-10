@@ -4,7 +4,7 @@ import type { CdnAsset } from './cdn-assets';
 import useWindowWidth from '../lib/hooks';
 
 interface Props {
-  asset: CdnAsset;
+  asset: CdnAsset | Array<{ duration: number; asset: CdnAsset<'image'> }>;
   width: number;
   height: number;
   lessRounded?: boolean;
@@ -23,13 +23,20 @@ const ExpandableContent: React.FC<Props> = ({
   const [expanded, setExpanded] = useState(false);
   const [frameCoords, setFrameCoords] = useState({ x: 0, y: 0 });
   const [hasBeenExpanded, setHasBeenExpanded] = useState(false);
+  const [currentStep, setCurrentStep] = useState(-1);
+  const [autoPlay, setAutoPlay] = useState(true);
   const contentRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const windowWidth = useWindowWidth();
 
   const aspectRatio = width / height;
-  const isImage = asset.type === `image`;
+  const isMultiPart = Array.isArray(asset);
+  const isImage = isMultiPart ? true : asset.type === `image`;
   const maxWidth = 800;
+
+  useEffect(() => {
+    setCurrentStep(0);
+  }, []);
 
   useEffect(() => {
     if (contentRef.current) {
@@ -38,6 +45,18 @@ const ExpandableContent: React.FC<Props> = ({
       setFrameCoords({ x, y });
     }
   }, [contentRef, windowWidth]);
+
+  useEffect(() => {
+    if (!isMultiPart || !autoPlay) return;
+    const currentAsset = asset[currentStep];
+    if (!currentAsset) return;
+
+    const timeoutId = setTimeout(() => {
+      setCurrentStep((currentStep + 1) % asset.length);
+    }, currentAsset.duration * 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [autoPlay, currentStep, asset, isMultiPart]);
 
   const style = {
     width: expanded
@@ -113,51 +132,89 @@ const ExpandableContent: React.FC<Props> = ({
           <span>Click to enlarge</span>
           <i className="fa-solid fa-chevron-down animate-bounce" />
         </div>
-        {contentRef.current && asset.type === `video` && (
-          <div
-            className={cx(classes, `bg-black`)}
-            style={style}
-            onClick={() => {
-              if (!expanded) {
-                setExpanded(true);
-                setHasBeenExpanded(true);
-                const video = videoRef.current;
-                if (video) {
-                  video.play();
-                  video.onended = () => setExpanded(false);
-                }
+        <div style={style} className="absolute">
+          {isImage && (
+            <img
+              className={classes}
+              src={
+                isMultiPart
+                  ? asset[currentStep === -1 ? 0 : currentStep]?.asset.url
+                  : asset.url
               }
-            }}
-          >
-            {asset.render && (
-              <video
-                ref={videoRef}
-                preload="auto"
-                className={cx(
-                  `transition-[width,height] duration-[250ms] cursor-pointer`,
-                  expanded ? `rounded-md` : `rounded-2xl pointer-events-none`,
-                )}
-                width={expanded ? style.width : width}
-                height={expanded ? style.height : height}
-                controls
-              >
-                <source src={asset.url} type="video/mp4" />
-              </video>
-            )}
-          </div>
-        )}
-        {contentRef.current && asset.type === `image` && (
-          <img
-            className={classes}
-            style={style}
-            src={asset.url}
-            alt=""
-            onClick={() => {
-              setExpanded(!expanded);
-              setHasBeenExpanded(true);
-            }}
-          />
-        )}
+              alt=""
+              onClick={() => {
+                setExpanded(!expanded);
+                setHasBeenExpanded(true);
+              }}
+            />
+          )}
+          {!isImage && !isMultiPart && (
+            <div
+              style={style}
+              onClick={() => {
+                if (!expanded) {
+                  setExpanded(true);
+                  setHasBeenExpanded(true);
+                  const video = videoRef.current;
+                  if (video) {
+                    video.play();
+                    video.onended = () => setExpanded(false);
+                  }
+                }
+              }}
+            >
+              {asset.render && (
+                <video
+                  ref={videoRef}
+                  preload="auto"
+                  className={cx(
+                    classes,
+                    `transition-[width,height] duration-[250ms] !cursor-pointer`,
+                    expanded ? `rounded-md` : `rounded-2xl pointer-events-none`,
+                  )}
+                  width={expanded ? style.width : width}
+                  height={expanded ? style.height : height}
+                  controls
+                >
+                  <source src={asset.url} type="video/mp4" />
+                </video>
+              )}
+            </div>
+          )}
+          {isMultiPart && (
+            <div className="rounded-full absolute w-full h-4 -bottom-8 flex justify-center items-center gap-2">
+              {asset.map((a, i) => (
+                <div
+                  key={a.asset.url}
+                  onClick={() => {
+                    setAutoPlay(false);
+                    setCurrentStep(i);
+                  }}
+                  className={cx(
+                    `h-3 rounded-full bg-slate-300 transition-[background-color,width,transform] duration-300 hover:scale-110 cursor-pointer relative overflow-hidden`,
+                    currentStep === i ? `w-12` : `w-3`,
+                    expanded && `!bg-slate-400/60`,
+                  )}
+                >
+                  <div
+                    style={{
+                      // animate-progress-right <- need this since it's never being used as a tailwind utility
+                      animation:
+                        currentStep === i
+                          ? `progress-right ${a.duration}s 0s linear infinite`
+                          : `none`,
+                    }}
+                    className={cx(
+                      `absolute left-0 top-0 w-2 h-full bg-violet-400`,
+                      currentStep !== i && `opacity-0`,
+                      expanded && `!bg-violet-500`,
+                    )}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

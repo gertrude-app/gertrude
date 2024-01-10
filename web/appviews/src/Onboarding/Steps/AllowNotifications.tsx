@@ -74,7 +74,33 @@ const AllowNotifications: React.FC<Props> = ({ step }) => {
             />
           </div>
           <ExpandableContent
-            asset={assets.os(os).img(`allow-notifications.gif`)}
+            // asset={assets.os(os).img(`allow-notifications.gif`)}
+            asset={[
+              {
+                duration: 5.73,
+                asset: {
+                  url: `http://localhost:3000/allow-notifs-1.gif`,
+                  type: `image`,
+                  render: true,
+                },
+              },
+              {
+                duration: 4.73,
+                asset: {
+                  url: `http://localhost:3000/allow-notifs-2.gif`,
+                  type: `image`,
+                  render: true,
+                },
+              },
+              {
+                duration: 3.73,
+                asset: {
+                  url: `http://localhost:3000/allow-notifs-3.gif`,
+                  type: `image`,
+                  render: true,
+                },
+              },
+            ]}
             width={800 / 2}
             height={600 / 2}
           />

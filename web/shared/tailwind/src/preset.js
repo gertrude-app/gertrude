@@ -17,6 +17,7 @@ module.exports = {
     extend: {
       animation: {
         'bounce-right': `bounce-right 0.5s linear infinite`,
+        'progress-right': `progress-right 1.5s ease-in-out infinite`,
       },
       keyframes: {
         'bounce-right': {
@@ -27,6 +28,14 @@ module.exports = {
           '50%': {
             transform: `translateX(10px)`,
             animationTimingFunction: `cubic-bezier(0, 0, 0.2, 1)`,
+          },
+        },
+        'progress-right': {
+          '0%': {
+            width: `0%`,
+          },
+          '100%': {
+            width: `100%`,
           },
         },
         'loader-bounce': {
