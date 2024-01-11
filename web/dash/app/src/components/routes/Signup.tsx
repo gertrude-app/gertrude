@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { FullscreenModalForm, EmailInputForm } from '@dash/components';
-import { trackEvent } from '@shared/components';
 import { Link } from 'react-router-dom';
 import { useMutation } from '../../hooks';
 import Current from '../../environment';
@@ -35,6 +34,7 @@ const Signup: React.FC = () => {
   return (
     <FullscreenModalForm state="idle">
       <EmailInputForm
+        id="signup"
         title="Signup"
         subTitle={
           <>
@@ -53,10 +53,7 @@ const Signup: React.FC = () => {
         setEmail={setEmail}
         password={password}
         setPassword={setPassword}
-        onSubmit={() => {
-          signup.mutate(undefined);
-          trackEvent(`conversion_event_signup_1`, { email });
-        }}
+        onSubmit={() => signup.mutate(undefined)}
       />
     </FullscreenModalForm>
   );

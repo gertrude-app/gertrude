@@ -12,6 +12,7 @@ const DocFooterCta: React.FC = () => (
         keylogging. $5/mo, with a 60 day free trial.
       </p>
       <a
+        id="docfooter-cta-signup"
         className="mt-2 inline-flex rounded-lg bg-white px-4 py-1.5 text-sm font-bold text-violet-500"
         href="https://parents.gertrude.app/signup"
       >

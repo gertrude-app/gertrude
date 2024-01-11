@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import cx from 'classnames';
 
 interface CommonProps {
+  id?: string;
   className?: string;
   color:
     | 'primary-on-violet-bg'
@@ -25,6 +26,7 @@ type Props =
   | ({ type: 'link'; to: string } & CommonProps);
 
 const Button: React.FC<Props> = ({
+  id,
   size = `medium`,
   fullWidth = false,
   testId,
@@ -84,6 +86,7 @@ const Button: React.FC<Props> = ({
   if (rendersAsButton) {
     return (
       <button
+        id={id}
         type={props.type}
         className={classes}
         disabled={disabled}
@@ -100,6 +103,7 @@ const Button: React.FC<Props> = ({
   if (props.type === `external`) {
     return (
       <a
+        id={id}
         className={classes}
         {...(testId ? { 'data-test': testId } : {})}
         {...(disabled
@@ -113,6 +117,7 @@ const Button: React.FC<Props> = ({
 
   return (
     <Link
+      id={id}
       className={classes}
       to={disabled ? `#` : props.to}
       {...(testId ? { 'data-test': testId } : {})}
