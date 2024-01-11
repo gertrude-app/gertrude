@@ -2,6 +2,7 @@ import React from 'react';
 import { Logo, TextInput, Button } from '@shared/components';
 
 type Props = {
+  id?: string;
   title: string;
   subTitle: React.ReactNode;
   email: string;
@@ -12,6 +13,7 @@ type Props = {
 };
 
 const EmailInputForm: React.FC<Props> = ({
+  id,
   title,
   subTitle,
   email,
@@ -21,6 +23,7 @@ const EmailInputForm: React.FC<Props> = ({
   setPassword,
 }) => (
   <form
+    id={id}
     className="flex flex-col items-center flex-grow"
     onSubmit={(event) => {
       event.preventDefault();
@@ -53,7 +56,13 @@ const EmailInputForm: React.FC<Props> = ({
         />
       )}
     </div>
-    <Button color="primary" type="submit" fullWidth size="large">
+    <Button
+      id={id ? `${id}--submit` : undefined}
+      color="primary"
+      type="submit"
+      fullWidth
+      size="large"
+    >
       Submit &rarr;
     </Button>
   </form>

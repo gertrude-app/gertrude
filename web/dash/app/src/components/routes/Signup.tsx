@@ -34,6 +34,7 @@ const Signup: React.FC = () => {
   return (
     <FullscreenModalForm state="idle">
       <EmailInputForm
+        id="signup"
         title="Signup"
         subTitle={
           <>
