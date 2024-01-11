@@ -11,6 +11,7 @@ const CTABlock: React.FC = () => (
     </h2>
     <div className="flex flex-col sm:flex-row items-center justify-center mt-8 gap-6">
       <a
+        id="cta-signup"
         className="text-white font-extrabold text-3xl bg-slate-800 px-10 py-4 rounded-xl shadow-xl hover:bg-slate-900 transition-[background-color] duration-150 flex items-center"
         href="https://parents.gertrude.app/signup"
       >
