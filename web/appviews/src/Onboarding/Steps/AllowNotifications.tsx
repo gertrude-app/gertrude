@@ -19,10 +19,11 @@ const AllowNotifications: React.FC<Props> = ({ step }) => {
     case `allowNotifications_start`:
       return (
         <Onboarding.Centered>
-          <Onboarding.Heading>Now let’s allow notifications</Onboarding.Heading>
-          <Onboarding.Text className="mt-2 mb-8 max-w-xl" centered>
-            Gertrude sends <b>a small number of important notifications</b>, so it’s
-            important that your child sees them.
+          <Onboarding.Heading>Now let’s allow parent messages</Onboarding.Heading>
+          <Onboarding.Text className="mt-3 mb-8 max-w-xl" centered>
+            When you take an action affecting your child’s computer we communicate your
+            decision to them using <b>notifications</b>, which need to be enabled, or they{` `}
+            <em>won’t see your messages.</em>
           </Onboarding.Text>
           <img
             src={assets.img(`notifications.png`).url}

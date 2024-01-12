@@ -35,7 +35,7 @@ export const SecondaryButton: React.FC<
       color="secondary"
       size="large"
       onClick={() => (onClick ? onClick() : emit({ case: `secondaryBtnClicked` }))}
-      className={cx(shadow && `shadow shadow-violet-200/80`, className)}
+      className={cx(shadow && `shadow shadow-violet-200/80 antialiased`, className)}
     >
       {children}
       {icon && <i className={cx(icon, `ml-3`)} />}
