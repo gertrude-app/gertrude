@@ -83,7 +83,7 @@ const AllowScreenshots: React.FC<Props> = ({ step }) => {
             </Onboarding.SecondaryButton>
           </div>
           <ExpandableContent
-            asset={assets.osImg(os, `allow-screen-recording.gif`)}
+            asset={assets.osImg(os, `allow-screen-recording`)}
             width={800 / 1.9}
             height={600 / 1.9}
           />

@@ -26,8 +26,8 @@ const AppNotInApplicationsDir: React.FC = () => (
     </div>
     <ExpandableContent
       asset={assets.img(`wrong-install-dir.gif`)}
-      width={800 / 2.4}
-      height={600 / 2.4}
+      width={800 / 2.1}
+      height={600 / 2.1}
     />
   </Onboarding.Centered>
 );

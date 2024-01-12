@@ -4,7 +4,7 @@ import type { CdnAsset } from './cdn-assets';
 import useWindowWidth from '../lib/hooks';
 
 interface Props {
-  asset: CdnAsset | Array<{ duration: number; asset: CdnAsset<'image'> }>;
+  asset: CdnAsset;
   width: number;
   height: number;
   lessRounded?: boolean;
@@ -23,20 +23,14 @@ const ExpandableContent: React.FC<Props> = ({
   const [expanded, setExpanded] = useState(false);
   const [frameCoords, setFrameCoords] = useState({ x: 0, y: 0 });
   const [hasBeenExpanded, setHasBeenExpanded] = useState(false);
-  const [currentStep, setCurrentStep] = useState(-1);
+  const [currentStep, setCurrentStep] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
   const contentRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const windowWidth = useWindowWidth();
 
   const aspectRatio = width / height;
-  const isMultiPart = Array.isArray(asset);
-  const isImage = isMultiPart ? true : asset.type === `image`;
   const maxWidth = 800;
-
-  useEffect(() => {
-    setCurrentStep(0);
-  }, []);
 
   useEffect(() => {
     if (contentRef.current) {
@@ -47,30 +41,30 @@ const ExpandableContent: React.FC<Props> = ({
   }, [contentRef, windowWidth]);
 
   useEffect(() => {
-    if (!isMultiPart || !autoPlay) return;
-    const currentAsset = asset[currentStep];
+    if (asset.type !== `images` || !autoPlay) return;
+    const currentAsset = asset.steps[currentStep];
     if (!currentAsset) return;
 
     const timeoutId = setTimeout(() => {
-      setCurrentStep((currentStep + 1) % asset.length);
+      setCurrentStep((currentStep + 1) % asset.steps.length);
     }, currentAsset.duration * 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [autoPlay, currentStep, asset, isMultiPart]);
+  }, [autoPlay, currentStep, asset]);
 
   const style = {
     width: expanded
-      ? isImage
+      ? asset.type !== `video`
         ? `min(90%, ${maxWidth}px)`
         : window.innerWidth
       : contentRef.current?.clientWidth,
     height: expanded
-      ? isImage
+      ? asset.type !== `video`
         ? `min(${90 / aspectRatio}vw, ${maxWidth / aspectRatio}px)`
         : window.innerWidth / aspectRatio
       : contentRef.current?.clientHeight,
     left: expanded
-      ? isImage
+      ? asset.type !== `video`
         ? Math.max(
             window.innerWidth / 2 - 0.45 * window.innerWidth,
             window.innerWidth / 2 - maxWidth / 2,
@@ -79,7 +73,9 @@ const ExpandableContent: React.FC<Props> = ({
       : frameCoords.x,
     top: expanded
       ? window.innerHeight / 2 -
-        (isImage ? Math.min(0.9 * window.innerWidth, maxWidth) : window.innerWidth) /
+        (asset.type !== `video`
+          ? Math.min(0.9 * window.innerWidth, maxWidth)
+          : window.innerWidth) /
           (aspectRatio * 2)
       : frameCoords.y,
     transitionProperty: `width, height, left, top, box-shadow`,
@@ -88,7 +84,7 @@ const ExpandableContent: React.FC<Props> = ({
 
   const classes = cx(
     `mb-6 cursor-pointer absolute`,
-    isImage && `object-cover object-center`,
+    asset.type === `image` && `object-cover object-center`,
     expanded ? `cursor-zoom-out shadow-2xl shadow-slate-500/50` : `cursor-zoom-in`,
     lessRounded ? `rounded-lg` : `rounded-3xl`,
   );
@@ -107,7 +103,7 @@ const ExpandableContent: React.FC<Props> = ({
           videoRef.current?.pause();
         }}
       >
-        {!isImage && (
+        {asset.type === `video` && (
           <div className="absolute top-4 right-4 text-slate-400/80 text-sm antialiased">
             <i className="fa-solid fa-times mr-1" />
             <span className="uppercase">Close</span>
@@ -133,12 +129,12 @@ const ExpandableContent: React.FC<Props> = ({
           <i className="fa-solid fa-chevron-down animate-bounce" />
         </div>
         <div style={style} className="absolute">
-          {isImage && (
+          {asset.type !== `video` && (
             <img
               className={classes}
               src={
-                isMultiPart
-                  ? asset[currentStep === -1 ? 0 : currentStep]?.asset.url
+                asset.type === `images`
+                  ? asset.steps[currentStep === -1 ? 0 : currentStep]?.url
                   : asset.url
               }
               alt=""
@@ -148,7 +144,7 @@ const ExpandableContent: React.FC<Props> = ({
               }}
             />
           )}
-          {!isImage && !isMultiPart && (
+          {asset.type === `video` && (
             <div
               style={style}
               onClick={() => {
@@ -181,33 +177,47 @@ const ExpandableContent: React.FC<Props> = ({
               )}
             </div>
           )}
-          {isMultiPart && (
+          {(asset.type === `images` || asset.type === `gif`) && (
             <div className="rounded-full absolute w-full h-4 -bottom-8 flex justify-center items-center gap-2">
-              {asset.map((a, i) => (
+              {(asset.type === `images`
+                ? asset.steps
+                : [{ url: asset.url, duration: asset.duration }]
+              ).map((step, i, steps) => (
                 <div
-                  key={a.asset.url}
+                  key={step.url}
                   onClick={() => {
-                    setAutoPlay(false);
-                    setCurrentStep(i);
+                    if (steps.length > 1) {
+                      setAutoPlay(false);
+                      setCurrentStep(i);
+                    }
                   }}
                   className={cx(
-                    `h-3 rounded-full bg-slate-300 transition-[background-color,width,transform] duration-300 hover:scale-110 cursor-pointer relative overflow-hidden`,
+                    `rounded-full bg-slate-300 transition-[background-color,width,transform] duration-300 relative overflow-hidden`,
                     currentStep === i ? `w-12` : `w-3`,
+                    steps.length > 1 &&
+                      (autoPlay || currentStep !== i) &&
+                      `hover:scale-110 cursor-pointer`,
+                    steps.length > 1 && currentStep !== i && `hover:!scale-125`,
+                    steps.length > 1 ? `h-3` : `h-2 -mt-3`,
                     expanded && `!bg-slate-400/60`,
                   )}
                 >
                   <div
                     style={{
-                      // animate-progress-right <- need this since it's never being used as a tailwind utility
+                      // purgeCSS: animate-progress-right
                       animation:
                         currentStep === i
-                          ? `progress-right ${a.duration}s 0s linear infinite`
+                          ? `progress-right ${step.duration}s 0s linear infinite`
                           : `none`,
                     }}
                     className={cx(
-                      `absolute left-0 top-0 w-2 h-full bg-violet-400`,
+                      `absolute left-0 top-0 w-2 h-full`,
                       currentStep !== i && `opacity-0`,
-                      expanded && `!bg-violet-500`,
+                      {
+                        'bg-violet-400': autoPlay && !expanded,
+                        'bg-violet-500': autoPlay && expanded,
+                        'bg-fuchsia-500/80': !autoPlay,
+                      },
                     )}
                   />
                 </div>

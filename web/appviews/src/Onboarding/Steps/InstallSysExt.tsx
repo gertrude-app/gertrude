@@ -50,7 +50,7 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
             />
           </div>
           <ExpandableContent
-            asset={assets.osImg(os, `install-sys-ext.gif`)}
+            asset={assets.osImg(os, `install-sys-ext`)}
             width={800 / 2}
             height={600 / 2}
           />

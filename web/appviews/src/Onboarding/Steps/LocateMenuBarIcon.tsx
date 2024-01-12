@@ -10,20 +10,17 @@ const LocateMenuBarIcon: React.FC = () => (
       From now on, you’ll click the <b>menu bar icon</b> whenever you or your child needs
       to <em>interact with the Gertrude app.</em>
     </Onboarding.Text>
-    <Onboarding.Text className="mb-6 max-w-2xl" centered>
+    <Onboarding.Text className="mb-8 max-w-2xl" centered>
       Look up in the top right corner of your screen to find it, and give it a click.
     </Onboarding.Text>
     <ExpandableContent
       asset={assets.img(`locate-menubar-icon.gif`)}
       lessRounded
       showInstructions={false}
-      width={798 / 1.9}
-      height={600 / 1.9}
+      width={798 / 2}
+      height={600 / 2}
     />
-    <Onboarding.PrimaryButton
-      icon="fa-solid fa-arrow-right"
-      className="mt-6 translate-y-2"
-    >
+    <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" className="translate-y-8">
       Found it, next
     </Onboarding.PrimaryButton>
   </Onboarding.Centered>
