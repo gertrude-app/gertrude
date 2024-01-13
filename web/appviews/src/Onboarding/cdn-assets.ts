@@ -39,12 +39,24 @@ class CdnAssets implements ExhaustiveAssets {
     return new OsCdnAssets(os).video(id, render);
   }
 
-  img(filename: ImgFilename): StaticImgAsset | SingleGifAsset {
-    const duration = IMAGE_DATA[filename];
-    if (duration) {
-      return { type: `gif`, url: `${ENDPOINT}/common/${filename}`, duration };
+  img(filename: CommonImgId): ImageAsset {
+    const data = COMMON_IMG_DATA[filename];
+    if (typeof data === `string`) {
+      return { type: `image`, url: `${ENDPOINT}/common/${filename}.${data}` };
+    } else if (data.length === 1) {
+      return {
+        type: `gif`,
+        url: `${ENDPOINT}/common/${filename}.gif`,
+        duration: data[0],
+      };
     } else {
-      return { type: `image`, url: `${ENDPOINT}/common/${filename}` };
+      return {
+        type: `images`,
+        steps: data.map((duration, index) => ({
+          url: `${ENDPOINT}/common/${filename}--pt-${index + 1}.gif`,
+          duration,
+        })),
+      };
     }
   }
 
@@ -55,7 +67,7 @@ class CdnAssets implements ExhaustiveAssets {
   all(): CdnAsset[] {
     return [
       ...VIDEO_IDS.map((id) => this.video(id)),
-      ...IMAGE_FILENAMES.map((filename) => this.img(filename)),
+      ...COMMON_IMG_IDS.map((filename) => this.img(filename)),
       ...new OsCdnAssets(`catalina`).all(),
       ...new OsCdnAssets(`bigSurOrMonterey`).all(),
       ...new OsCdnAssets(`venturaOrLater`).all(),
@@ -71,7 +83,14 @@ class OsCdnAssets implements ExhaustiveAssets {
   }
 
   img(id: OsImgId): ImageAsset {
-    const durations = OS_IMAGE_DATA[id][this.os];
+    const data = OS_IMAGE_DATA[id];
+    if (typeof data === `string`) {
+      return {
+        type: `image`,
+        url: `${ENDPOINT}/${this.os}/${id}.${data}`,
+      };
+    }
+    const durations = data[this.os];
     if (durations.length > 1) {
       return {
         type: `images`,
@@ -122,11 +141,11 @@ const OS_VIDEO_IDS = [
   `troubleshoot-sys-ext-install`,
 ] as const;
 
-const IMAGE_FILENAMES = [
-  `notifications.png`,
-  `administrate.png`,
-  `locate-menubar-icon.gif`,
-  `wrong-install-dir.gif`,
+const COMMON_IMG_IDS = [
+  `notifications`,
+  `administrate`,
+  `locate-menubar-icon`,
+  `wrong-install-dir`,
 ] as const;
 
 const OS_IMAGE_IDS = [
@@ -134,16 +153,21 @@ const OS_IMAGE_IDS = [
   `allow-notifications`,
   `allow-screen-recording`,
   `install-sys-ext`,
+  `sys-ext-install-trick`,
 ] as const;
 
-const IMAGE_DATA: Record<ImgFilename, number | null> = {
-  'notifications.png': null,
-  'administrate.png': null,
-  'locate-menubar-icon.gif': null,
-  'wrong-install-dir.gif': 10.8,
+const COMMON_IMG_DATA: Record<CommonImgId, string | [number, ...number[]]> = {
+  notifications: `png`,
+  administrate: `png`,
+  'locate-menubar-icon': `gif`,
+  'wrong-install-dir': [10.8],
 };
 
-const OS_IMAGE_DATA: Record<OsImgId, Record<OSGroup, [number, ...number[]]>> = {
+const OS_IMAGE_DATA: Record<
+  OsImgId,
+  string | Record<OSGroup, [number, number, ...number[]]>
+> = {
+  'sys-ext-install-trick': `png`,
   'allow-notifications': {
     catalina: [3.55, 3.93, 4.53],
     bigSurOrMonterey: [3.55, 3.93, 4.53],
@@ -170,7 +194,7 @@ interface ExhaustiveAssets {
   all(): CdnAsset[];
 }
 
-type ImgFilename = (typeof IMAGE_FILENAMES)[number];
+type CommonImgId = (typeof COMMON_IMG_IDS)[number];
 type OsImgId = (typeof OS_IMAGE_IDS)[number];
 type VideoId = (typeof VIDEO_IDS)[number];
 type OsVideoId = (typeof OS_VIDEO_IDS)[number];

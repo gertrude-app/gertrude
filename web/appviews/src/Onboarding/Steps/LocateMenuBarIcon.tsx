@@ -14,7 +14,7 @@ const LocateMenuBarIcon: React.FC = () => (
       Look up in the top right corner of your screen to find it, and give it a click.
     </Onboarding.Text>
     <ExpandableContent
-      asset={assets.img(`locate-menubar-icon.gif`)}
+      asset={assets.img(`locate-menubar-icon`)}
       lessRounded
       showInstructions={false}
       width={798 / 2}

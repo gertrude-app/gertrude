@@ -8,8 +8,8 @@ import OnboardingContext from '../OnboardingContext';
 interface Props {
   step:
     | 'installSysExt_explain'
+    | 'installSysExt_trick'
     | 'installSysExt_allow'
-    | 'installSysExt_allowFiltering'
     | 'installSysExt_failed'
     | 'installSysExt_success';
 }
@@ -32,6 +32,31 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
           <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" className="mt-8">
             Next
           </Onboarding.PrimaryButton>
+        </Onboarding.Centered>
+      );
+    case `installSysExt_trick`:
+      return (
+        <Onboarding.Centered className="space-x-12" direction="row">
+          <div className="flex flex-col">
+            <Onboarding.Heading className="mb-2">
+              <span className="text-4xl inline-block translate-y-1 mr-3">🥸</span>
+              <i className="hidden fas fa-exclamation-triangle text-yellow-600 mr-4" />
+              Don’t get tricked!
+            </Onboarding.Heading>
+            <Onboarding.Text className="my-4 max-w-xl">
+              Watch out! The <b>next step</b> is easy to mess up, because you should{` `}
+              <b className="underline">NOT</b> click the{` `}
+              <em>big, highlighted OK button.</em>
+            </Onboarding.Text>
+            <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" className="mt-8">
+              Got it, I’m ready
+            </Onboarding.PrimaryButton>
+          </div>
+          <ExpandableContent
+            asset={assets.osImg(os, `sys-ext-install-trick`)}
+            width={800 / 2}
+            height={600 / 2}
+          />
         </Onboarding.Centered>
       );
     case `installSysExt_allow`:

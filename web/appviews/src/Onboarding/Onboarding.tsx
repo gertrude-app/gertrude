@@ -125,6 +125,10 @@ export const Onboarding: React.FC<Props> = ({
           component={<Step.InstallSysExt step="installSysExt_explain" />}
         />
         <OnboardingPage
+          step="installSysExt_trick"
+          component={<Step.InstallSysExt step="installSysExt_trick" />}
+        />
+        <OnboardingPage
           step="installSysExt_allow"
           component={<Step.InstallSysExt step="installSysExt_allow" />}
         />
