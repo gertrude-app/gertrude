@@ -57,24 +57,9 @@ const StepSwitcher: React.FC<Props> = ({ children, ready }) => {
 
   return (
     <div className="w-screen h-screen relative overflow-hidden bg-slate-50">
-      <div
-        className={cx(
-          `absolute -left-96 -bottom-72 w-152 h-152 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
-          expandBlurs && `scale-[350%]`,
-        )}
-      />
-      <div
-        className={cx(
-          `absolute left-0 -bottom-96 w-152 h-152 [background:radial-gradient(#d946ef56_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
-          expandBlurs && `scale-[350%]`,
-        )}
-      />
-      <div
-        className={cx(
-          `absolute -right-80 -bottom-80 w-152 h-152 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
-          expandBlurs && `scale-[350%]`,
-        )}
-      />
+      <Blur position="-left-96 -bottom-72" expandBlurs={expandBlurs} />
+      <Blur position="left-0 -bottom-96" alt expandBlurs={expandBlurs} />
+      <Blur position="-right-80 -bottom-80" expandBlurs={expandBlurs} />
       {children}
       <div
         className={cx(
@@ -141,3 +126,20 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
     </div>
   );
 };
+
+const Blur: React.FC<{ position: string; expandBlurs: boolean; alt?: boolean }> = ({
+  position,
+  expandBlurs,
+  alt,
+}) => (
+  <div
+    className={cx(
+      `absolute w-152 h-152 transition-transform duration-[2s] ease-in`,
+      position,
+      alt
+        ? `[background:radial-gradient(#d946ef56_0%,transparent_70%,transparent)]`
+        : `[background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)]`,
+      expandBlurs && `scale-[350%]`,
+    )}
+  />
+);
