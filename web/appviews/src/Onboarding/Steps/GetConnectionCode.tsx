@@ -57,8 +57,8 @@ const GetConnectionCode: React.FC = () => {
           `get-connection-code`,
           currentStep === `getChildConnectionCode`,
         )}
-        width={640 * 0.5}
-        height={360 * 0.5}
+        width={640 * 0.6}
+        height={360 * 0.6}
       />
     </Onboarding.Centered>
   );

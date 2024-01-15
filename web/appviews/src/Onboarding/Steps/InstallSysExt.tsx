@@ -15,7 +15,7 @@ interface Props {
 }
 
 const InstallSysExt: React.FC<Props> = ({ step }) => {
-  const { systemSettingsName, os, currentStep } = useContext(OnboardingContext);
+  const { os, currentStep } = useContext(OnboardingContext);
   switch (step) {
     case `installSysExt_explain`:
       return (
@@ -40,7 +40,6 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
           <div className="flex flex-col">
             <Onboarding.Heading className="mb-2">
               <span className="text-4xl inline-block translate-y-1 mr-3">🥸</span>
-              <i className="hidden fas fa-exclamation-triangle text-yellow-600 mr-4" />
               Don’t get tricked!
             </Onboarding.Heading>
             <Onboarding.Text className="my-4 max-w-xl">
@@ -65,7 +64,7 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
           <div className="flex flex-col">
             <Onboarding.Heading>Allow system extension</Onboarding.Heading>
             <Onboarding.Text className="my-4 max-w-xl">
-              Next, in the {systemSettingsName} app follow the steps shown to allow the
+              You should see a system popup now. Follow the steps shown to allow the
               installation:
             </Onboarding.Text>
             <Onboarding.ButtonGroup

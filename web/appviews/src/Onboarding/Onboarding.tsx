@@ -79,6 +79,7 @@ export const Onboarding: React.FC<Props> = ({
           confetti={connectChildRequest.case === `succeeded`}
           confettiDeps={[connectChildRequest.case]}
         />
+        <OnboardingPage step="howToUseGifs" component={<Step.HowToUseGifs />} />
         <OnboardingPage
           step="allowNotifications_start"
           component={<Step.AllowNotifications step="allowNotifications_start" />}

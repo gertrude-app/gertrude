@@ -16,6 +16,7 @@ export type OnboardingStep =
   | 'macosUserAccountType'
   | 'getChildConnectionCode'
   | 'connectChild'
+  | 'howToUseGifs'
   | 'allowNotifications_start'
   | 'allowNotifications_grant'
   | 'allowNotifications_failed'

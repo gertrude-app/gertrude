@@ -119,6 +119,11 @@ export const ConnectChildSuccess: Story = props({
   connectChildRequest: { case: `succeeded`, payload: `Little Jimmy` },
 });
 
+export const HowToUseGifs: Story = props({
+  ...Welcome.args,
+  step: `howToUseGifs`,
+});
+
 export const AllowNotificationsStart: Story = props({
   ...Welcome.args,
   step: `allowNotifications_start`,

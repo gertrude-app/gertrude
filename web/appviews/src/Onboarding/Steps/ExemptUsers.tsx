@@ -26,6 +26,7 @@ const ExemptUsers: React.FC<Props> = ({ exemptableUserIds, exemptUserIds }) => {
           .filter((user) => exemptableUserIds.includes(user.id))
           .map((user) => (
             <ExemptUser
+              key={user.id}
               name={user.name}
               isExempt={exemptUserIds.includes(user.id) ?? false}
               onToggle={() =>
