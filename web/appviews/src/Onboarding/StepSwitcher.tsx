@@ -3,7 +3,7 @@ import ConfettiExplosion from 'react-confetti-explosion';
 import cx from 'classnames';
 import type { OnboardingStep } from './onboarding-store';
 import ProgressIndicator from './ProgressIndicator';
-import OnboardingContext from './OnboardingContext';
+import OnboardingContext, { WithinActiveStepContext } from './OnboardingContext';
 
 interface Props {
   children: React.ReactNode;
@@ -105,25 +105,27 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
   }, [step, currentStep, confettiDeps, confetti]);
 
   return (
-    <div
-      className={cx(
-        step === currentStep
-          ? `left-0 z-10`
-          : hasBeenVisited
-            ? `left-[-100%] opacity-0`
-            : `left-full opacity-0`,
-        `absolute w-full h-full top-0 transition-[opacity,left] duration-700`,
-      )}
-    >
-      {showConfetti && (
-        <ConfettiExplosion
-          particleCount={50}
-          colors={[`#8b5cf6`, `#d946ef`, `#6366f1`]}
-          className="left-[50vw] top-0 absolute"
-        />
-      )}
-      {component}
-    </div>
+    <WithinActiveStepContext.Provider value={step === currentStep}>
+      <div
+        className={cx(
+          step === currentStep
+            ? `left-0 z-10`
+            : hasBeenVisited
+              ? `left-[-100%] opacity-0`
+              : `left-full opacity-0`,
+          `absolute w-full h-full top-0 transition-[opacity,left] duration-700`,
+        )}
+      >
+        {showConfetti && (
+          <ConfettiExplosion
+            particleCount={50}
+            colors={[`#8b5cf6`, `#d946ef`, `#6366f1`]}
+            className="left-[50vw] top-0 absolute"
+          />
+        )}
+        {component}
+      </div>
+    </WithinActiveStepContext.Provider>
   );
 };
 

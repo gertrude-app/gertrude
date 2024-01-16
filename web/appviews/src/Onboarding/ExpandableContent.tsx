@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import cx from 'classnames';
 import type { CdnAsset } from './cdn-assets';
 import useWindowWidth from '../lib/hooks';
+import { WithinActiveStepContext } from './OnboardingContext';
 
 interface Props {
   asset: CdnAsset;
@@ -23,11 +24,12 @@ const ExpandableContent: React.FC<Props> = ({
   const [expanded, setExpanded] = useState(false);
   const [frameCoords, setFrameCoords] = useState({ x: 0, y: 0 });
   const [hasBeenExpanded, setHasBeenExpanded] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [multiGifIndex, setMultiGifIndex] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
   const contentRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const windowWidth = useWindowWidth();
+  const withinActiveStep = useContext(WithinActiveStepContext);
 
   const aspectRatio = width / height;
   const maxWidth = 800;
@@ -41,16 +43,25 @@ const ExpandableContent: React.FC<Props> = ({
   }, [contentRef, windowWidth]);
 
   useEffect(() => {
-    if (asset.type !== `images` || !autoPlay) return;
-    const currentAsset = asset.steps[currentStep];
+    if (asset.type !== `images` || !autoPlay || !withinActiveStep) return;
+    const currentAsset = asset.steps[multiGifIndex];
     if (!currentAsset) return;
 
     const timeoutId = setTimeout(() => {
-      setCurrentStep((currentStep + 1) % asset.steps.length);
+      setMultiGifIndex((multiGifIndex + 1) % asset.steps.length);
     }, currentAsset.duration * 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [autoPlay, currentStep, asset]);
+  }, [autoPlay, multiGifIndex, asset, withinActiveStep]);
+
+  // preload multi-gif steps
+  const stableUrls = stableMultiGifPreloadString(asset);
+  useEffect(() => {
+    for (const url of stableUrls.split(`,`).filter(Boolean)) {
+      const image = new Image();
+      image.src = url;
+    }
+  }, [stableUrls]);
 
   const style = {
     width: expanded
@@ -134,7 +145,12 @@ const ExpandableContent: React.FC<Props> = ({
               className={classes}
               src={
                 asset.type === `images`
-                  ? asset.steps[currentStep === -1 ? 0 : currentStep]?.url
+                  ? withinActiveStep
+                    ? asset.steps[multiGifIndex]?.url
+                    : // wait for step to become active BEFORE setting gif step img, so that we
+                      // start right at the beginning of step 0 when user first sees the screen
+                      // or else they might find image[0] mid-stream through it's loop
+                      undefined
                   : asset.url
               }
               alt=""
@@ -177,7 +193,8 @@ const ExpandableContent: React.FC<Props> = ({
               )}
             </div>
           )}
-          {(asset.type === `images` || asset.type === `gif`) && (
+          {/* don't render GIF nav till we're the active step, so progress starts at 0, in sync w/ img */}
+          {(asset.type === `images` || asset.type === `gif`) && withinActiveStep && (
             <div className="rounded-full absolute w-full h-4 -bottom-8 flex justify-center items-center gap-2">
               {(asset.type === `images`
                 ? asset.steps
@@ -188,16 +205,16 @@ const ExpandableContent: React.FC<Props> = ({
                   onClick={() => {
                     if (steps.length > 1) {
                       setAutoPlay(false);
-                      setCurrentStep(i);
+                      setMultiGifIndex(i);
                     }
                   }}
                   className={cx(
                     `rounded-full bg-slate-300 transition-[background-color,width,transform] duration-300 relative overflow-hidden`,
-                    currentStep === i ? `w-12` : `w-3`,
+                    multiGifIndex === i ? `w-12` : `w-3`,
                     steps.length > 1 &&
-                      (autoPlay || currentStep !== i) &&
+                      (autoPlay || multiGifIndex !== i) &&
                       `hover:scale-110 cursor-pointer`,
-                    steps.length > 1 && currentStep !== i && `hover:!scale-125`,
+                    steps.length > 1 && multiGifIndex !== i && `hover:!scale-125`,
                     steps.length > 1 ? `h-3` : `h-2 -mt-3`,
                     expanded && `!bg-slate-400/60`,
                   )}
@@ -206,13 +223,13 @@ const ExpandableContent: React.FC<Props> = ({
                     style={{
                       // purgeCSS: animate-progress-right
                       animation:
-                        currentStep === i
+                        multiGifIndex === i
                           ? `progress-right ${step.duration}s 0s linear infinite`
                           : `none`,
                     }}
                     className={cx(
                       `absolute left-0 top-0 w-2 h-full`,
-                      currentStep !== i && `opacity-0`,
+                      multiGifIndex !== i && `opacity-0`,
                       {
                         'bg-violet-400': autoPlay && !expanded,
                         'bg-violet-500': autoPlay && expanded,
@@ -231,3 +248,8 @@ const ExpandableContent: React.FC<Props> = ({
 };
 
 export default ExpandableContent;
+
+function stableMultiGifPreloadString(asset: CdnAsset): string {
+  if (asset.type !== `images`) return ``;
+  return asset.steps.map((step) => step.url).join(`,`);
+}
