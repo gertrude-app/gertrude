@@ -4,14 +4,20 @@ import assets from '../cdn-assets';
 test(
   `all cdn assets exist`,
   async () => {
+    const urls = assets.all().flatMap((asset) => {
+      switch (asset.type) {
+        case `video`:
+        case `image`:
+        case `gif`:
+          return [asset.url];
+        default:
+          return asset.steps.map((step) => step.url);
+      }
+    });
     const results = await Promise.all(
-      assets
-        .all()
-        .map((asset) =>
-          fetch(asset.url, { method: `HEAD` }).then((res) => [asset.url, res.status]),
-        ),
+      urls.map((url) => fetch(url, { method: `HEAD` }).then((res) => [url, res.status])),
     );
-    const expected = assets.all().map((asset) => [asset.url, 200]);
+    const expected = urls.map((url) => [url, 200]);
     expect(results).toEqual(expected);
   },
   { timeout: 20000 },

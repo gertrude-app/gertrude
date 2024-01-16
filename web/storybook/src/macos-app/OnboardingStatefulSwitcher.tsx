@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import StepSwitcher, {
   OnboardingPage,
 } from '@macos/appviews/src/Onboarding/StepSwitcher';
+import OnboardingContext from '@macos/appviews/src/Onboarding/OnboardingContext';
 import * as Step from '@macos/appviews/src/Onboarding/Steps';
 import type { OnboardingStep } from '@macos/appviews/src/Onboarding/onboarding-store';
 
@@ -99,112 +100,129 @@ const OnboardingStatefulSwitcher: React.FC = () => {
         }
       }}
     >
-      <StepSwitcher ready>
-        <OnboardingPage step="welcome" component={<Step.Welcome />} />
-        <OnboardingPage
-          step="wrongInstallDir"
-          component={<Step.AppNotInApplicationsDir />}
-        />
-        <OnboardingPage
-          step="confirmGertrudeAccount"
-          component={<Step.ConfirmGertrudeAccount />}
-        />
-        <OnboardingPage step="noGertrudeAccount" component={<Step.NoGertrudeAccount />} />
-        <OnboardingPage
-          step="macosUserAccountType"
-          component={
-            <Step.MacosUserAccountType
-              current={{ id: 502, name: `Suzy`, isAdmin: false }}
-              users={[
-                { id: 501, name: `Bob McParent`, isAdmin: true },
-                { id: 502, name: `Suzy`, isAdmin: false },
-              ]}
-            />
-          }
-          confetti
-        />
-        <OnboardingPage
-          step="getChildConnectionCode"
-          component={<Step.GetConnectionCode />}
-        />
-        <OnboardingPage
-          step="connectChild"
-          component={
-            <Step.ConnectChild
-              connectionCode={`123456`}
-              request={{ case: connectChildState, payload: `Suzy` }}
-            />
-          }
-          confetti={connectChildState === `succeeded`}
-          confettiDeps={[connectChildState]}
-        />
-        <OnboardingPage
-          step="allowNotifications_start"
-          component={<Step.AllowNotifications step="allowNotifications_start" />}
-        />
-        <OnboardingPage
-          step="allowNotifications_grant"
-          component={<Step.AllowNotifications step="allowNotifications_grant" />}
-        />
-        <OnboardingPage
-          step="allowNotifications_failed"
-          component={<Step.AllowNotifications step="allowNotifications_failed" />}
-        />
-        <OnboardingPage
-          step="allowScreenshots_required"
-          component={<Step.AllowScreenshots step="allowScreenshots_required" />}
-        />
-        <OnboardingPage
-          step="allowScreenshots_grantAndRestart"
-          component={<Step.AllowScreenshots step="allowScreenshots_grantAndRestart" />}
-        />
-        <OnboardingPage
-          step="allowScreenshots_success"
-          component={<Step.AllowScreenshots step="allowScreenshots_success" />}
-          confetti
-        />
-        <OnboardingPage
-          step="allowScreenshots_failed"
-          component={<Step.AllowScreenshots step="allowScreenshots_failed" />}
-        />
-        <OnboardingPage
-          step="allowKeylogging_required"
-          component={<Step.AllowKeylogging step="allowKeylogging_required" />}
-        />
-        <OnboardingPage
-          step="allowKeylogging_grant"
-          component={<Step.AllowKeylogging step="allowKeylogging_grant" />}
-        />
-        <OnboardingPage
-          step="allowKeylogging_failed"
-          component={<Step.AllowKeylogging step="allowKeylogging_failed" />}
-        />
-        <OnboardingPage
-          step="installSysExt_explain"
-          component={<Step.InstallSysExt step="installSysExt_explain" />}
-        />
-        <OnboardingPage
-          step="installSysExt_allow"
-          component={<Step.InstallSysExt step="installSysExt_allow" />}
-        />
-        <OnboardingPage
-          step="installSysExt_failed"
-          component={<Step.InstallSysExt step="installSysExt_failed" />}
-        />
-        <OnboardingPage
-          step="installSysExt_success"
-          component={<Step.InstallSysExt step="installSysExt_success" />}
-          confetti
-        />
-        <OnboardingPage
-          step="exemptUsers"
-          component={<Step.ExemptUsers exemptUserIds={[]} exemptableUserIds={[501]} />}
-        />
-        <OnboardingPage step="locateMenuBarIcon" component={<Step.LocateMenuBarIcon />} />
-        <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
-        <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />
-        <OnboardingPage step="finish" component={<Step.Finish />} />
-      </StepSwitcher>
+      <OnboardingContext.Provider
+        value={{
+          os: `venturaOrLater`,
+          currentStep: step,
+          systemSettingsName: `System Settings`,
+          emit() {},
+          dispatch() {},
+          otherUsers: [],
+        }}
+      >
+        <StepSwitcher ready>
+          <OnboardingPage step="welcome" component={<Step.Welcome />} />
+          <OnboardingPage
+            step="wrongInstallDir"
+            component={<Step.AppNotInApplicationsDir />}
+          />
+          <OnboardingPage
+            step="confirmGertrudeAccount"
+            component={<Step.ConfirmGertrudeAccount />}
+          />
+          <OnboardingPage
+            step="noGertrudeAccount"
+            component={<Step.NoGertrudeAccount />}
+          />
+          <OnboardingPage
+            step="macosUserAccountType"
+            component={
+              <Step.MacosUserAccountType
+                current={{ id: 502, name: `Suzy`, isAdmin: false }}
+                users={[
+                  { id: 501, name: `Bob McParent`, isAdmin: true },
+                  { id: 502, name: `Suzy`, isAdmin: false },
+                ]}
+              />
+            }
+            confetti
+          />
+          <OnboardingPage
+            step="getChildConnectionCode"
+            component={<Step.GetConnectionCode />}
+          />
+          <OnboardingPage
+            step="connectChild"
+            component={
+              <Step.ConnectChild
+                connectionCode={`123456`}
+                request={{ case: connectChildState, payload: `Suzy` }}
+              />
+            }
+            confetti={connectChildState === `succeeded`}
+            confettiDeps={[connectChildState]}
+          />
+          <OnboardingPage
+            step="allowNotifications_start"
+            component={<Step.AllowNotifications step="allowNotifications_start" />}
+          />
+          <OnboardingPage
+            step="allowNotifications_grant"
+            component={<Step.AllowNotifications step="allowNotifications_grant" />}
+          />
+          <OnboardingPage
+            step="allowNotifications_failed"
+            component={<Step.AllowNotifications step="allowNotifications_failed" />}
+          />
+          <OnboardingPage
+            step="allowScreenshots_required"
+            component={<Step.AllowScreenshots step="allowScreenshots_required" />}
+          />
+          <OnboardingPage
+            step="allowScreenshots_grantAndRestart"
+            component={<Step.AllowScreenshots step="allowScreenshots_grantAndRestart" />}
+          />
+          <OnboardingPage
+            step="allowScreenshots_success"
+            component={<Step.AllowScreenshots step="allowScreenshots_success" />}
+            confetti
+          />
+          <OnboardingPage
+            step="allowScreenshots_failed"
+            component={<Step.AllowScreenshots step="allowScreenshots_failed" />}
+          />
+          <OnboardingPage
+            step="allowKeylogging_required"
+            component={<Step.AllowKeylogging step="allowKeylogging_required" />}
+          />
+          <OnboardingPage
+            step="allowKeylogging_grant"
+            component={<Step.AllowKeylogging step="allowKeylogging_grant" />}
+          />
+          <OnboardingPage
+            step="allowKeylogging_failed"
+            component={<Step.AllowKeylogging step="allowKeylogging_failed" />}
+          />
+          <OnboardingPage
+            step="installSysExt_explain"
+            component={<Step.InstallSysExt step="installSysExt_explain" />}
+          />
+          <OnboardingPage
+            step="installSysExt_allow"
+            component={<Step.InstallSysExt step="installSysExt_allow" />}
+          />
+          <OnboardingPage
+            step="installSysExt_failed"
+            component={<Step.InstallSysExt step="installSysExt_failed" />}
+          />
+          <OnboardingPage
+            step="installSysExt_success"
+            component={<Step.InstallSysExt step="installSysExt_success" />}
+            confetti
+          />
+          <OnboardingPage
+            step="exemptUsers"
+            component={<Step.ExemptUsers exemptUserIds={[]} exemptableUserIds={[501]} />}
+          />
+          <OnboardingPage
+            step="locateMenuBarIcon"
+            component={<Step.LocateMenuBarIcon />}
+          />
+          <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
+          <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />
+          <OnboardingPage step="finish" component={<Step.Finish />} />
+        </StepSwitcher>
+      </OnboardingContext.Provider>
     </div>
   );
 };

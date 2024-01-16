@@ -15,17 +15,20 @@ interface Props {
 const AllowNotifications: React.FC<Props> = ({ step }) => {
   const [showModal, setShowModal] = useState(false);
   const { systemSettingsName, os, emit, currentStep } = useContext(OnboardingContext);
+  const asset = assets.img(`notifications`);
+  const imageUrl = asset.type === `image` ? asset.url : ``;
   switch (step) {
     case `allowNotifications_start`:
       return (
         <Onboarding.Centered>
-          <Onboarding.Heading>Now let’s allow notifications</Onboarding.Heading>
-          <Onboarding.Text className="mt-2 mb-8 max-w-xl" centered>
-            Gertrude sends <b>a small number of important notifications</b>, so it’s
-            important that your child sees them.
+          <Onboarding.Heading>Let’s allow notifications from parents</Onboarding.Heading>
+          <Onboarding.Text className="mt-3 mb-8 max-w-xl" centered>
+            When you take an action affecting your child’s computer we communicate it to
+            them using <b>notifications</b>, which need to be enabled, or they{` `}
+            <em>won’t see your messages.</em>
           </Onboarding.Text>
           <img
-            src={assets.img(`notifications.png`).url}
+            src={imageUrl}
             alt="Allow notifications"
             className="rounded-xl mb-8 w-[580px]"
           />
@@ -74,33 +77,7 @@ const AllowNotifications: React.FC<Props> = ({ step }) => {
             />
           </div>
           <ExpandableContent
-            // asset={assets.os(os).img(`allow-notifications.gif`)}
-            asset={[
-              {
-                duration: 5.73,
-                asset: {
-                  url: `http://localhost:3000/allow-notifs-1.gif`,
-                  type: `image`,
-                  render: true,
-                },
-              },
-              {
-                duration: 4.73,
-                asset: {
-                  url: `http://localhost:3000/allow-notifs-2.gif`,
-                  type: `image`,
-                  render: true,
-                },
-              },
-              {
-                duration: 3.73,
-                asset: {
-                  url: `http://localhost:3000/allow-notifs-3.gif`,
-                  type: `image`,
-                  render: true,
-                },
-              },
-            ]}
+            asset={assets.osImg(os, `allow-notifications`)}
             width={800 / 2}
             height={600 / 2}
           />

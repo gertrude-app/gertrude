@@ -3,7 +3,7 @@ import ConfettiExplosion from 'react-confetti-explosion';
 import cx from 'classnames';
 import type { OnboardingStep } from './onboarding-store';
 import ProgressIndicator from './ProgressIndicator';
-import OnboardingContext from './OnboardingContext';
+import OnboardingContext, { WithinActiveStepContext } from './OnboardingContext';
 
 interface Props {
   children: React.ReactNode;
@@ -57,24 +57,9 @@ const StepSwitcher: React.FC<Props> = ({ children, ready }) => {
 
   return (
     <div className="w-screen h-screen relative overflow-hidden bg-slate-50">
-      <div
-        className={cx(
-          `absolute -left-96 -bottom-72 w-152 h-152 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
-          expandBlurs && `scale-[350%]`,
-        )}
-      />
-      <div
-        className={cx(
-          `absolute left-0 -bottom-96 w-152 h-152 [background:radial-gradient(#d946ef56_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
-          expandBlurs && `scale-[350%]`,
-        )}
-      />
-      <div
-        className={cx(
-          `absolute -right-80 -bottom-80 w-152 h-152 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)] transition-transform duration-[2s] ease-in`,
-          expandBlurs && `scale-[350%]`,
-        )}
-      />
+      <Blur position="-left-96 -bottom-72" expandBlurs={expandBlurs} />
+      <Blur position="left-0 -bottom-96" alt expandBlurs={expandBlurs} />
+      <Blur position="-right-80 -bottom-80" expandBlurs={expandBlurs} />
       {children}
       <div
         className={cx(
@@ -120,24 +105,43 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
   }, [step, currentStep, confettiDeps, confetti]);
 
   return (
-    <div
-      className={cx(
-        step === currentStep
-          ? `left-0 z-10`
-          : hasBeenVisited
-            ? `left-[-100%] opacity-0`
-            : `left-full opacity-0`,
-        `absolute w-full h-full top-0 transition-[opacity,left] duration-700`,
-      )}
-    >
-      {showConfetti && (
-        <ConfettiExplosion
-          particleCount={50}
-          colors={[`#8b5cf6`, `#d946ef`, `#6366f1`]}
-          className="left-[50vw] top-0 absolute"
-        />
-      )}
-      {component}
-    </div>
+    <WithinActiveStepContext.Provider value={step === currentStep}>
+      <div
+        className={cx(
+          step === currentStep
+            ? `left-0 z-10`
+            : hasBeenVisited
+              ? `left-[-100%] opacity-0`
+              : `left-full opacity-0`,
+          `absolute w-full h-full top-0 transition-[opacity,left] duration-700`,
+        )}
+      >
+        {showConfetti && (
+          <ConfettiExplosion
+            particleCount={50}
+            colors={[`#8b5cf6`, `#d946ef`, `#6366f1`]}
+            className="left-[50vw] top-0 absolute"
+          />
+        )}
+        {component}
+      </div>
+    </WithinActiveStepContext.Provider>
   );
 };
+
+const Blur: React.FC<{ position: string; expandBlurs: boolean; alt?: boolean }> = ({
+  position,
+  expandBlurs,
+  alt,
+}) => (
+  <div
+    className={cx(
+      `absolute w-152 h-152 transition-transform duration-[2s] ease-in`,
+      position,
+      alt
+        ? `[background:radial-gradient(#d946ef56_0%,transparent_70%,transparent)]`
+        : `[background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)]`,
+      expandBlurs && `scale-[350%]`,
+    )}
+  />
+);

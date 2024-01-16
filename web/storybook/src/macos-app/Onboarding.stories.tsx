@@ -119,6 +119,11 @@ export const ConnectChildSuccess: Story = props({
   connectChildRequest: { case: `succeeded`, payload: `Little Jimmy` },
 });
 
+export const HowToUseGifs: Story = props({
+  ...Welcome.args,
+  step: `howToUseGifs`,
+});
+
 export const AllowNotificationsStart: Story = props({
   ...Welcome.args,
   step: `allowNotifications_start`,
@@ -172,6 +177,11 @@ export const AllowKeyloggingFailed: Story = props({
 export const InstallSysExtExplain: Story = props({
   ...Welcome.args,
   step: `installSysExt_explain`,
+});
+
+export const InstallSysExtAllowTrick: Story = props({
+  ...Welcome.args,
+  step: `installSysExt_trick`,
 });
 
 export const InstallSysExtAllowInstall: Story = props({

@@ -24,3 +24,5 @@ const OnboardingContext = createContext<{
 });
 
 export default OnboardingContext;
+
+export const WithinActiveStepContext = createContext(false);

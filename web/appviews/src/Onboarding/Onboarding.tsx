@@ -79,6 +79,7 @@ export const Onboarding: React.FC<Props> = ({
           confetti={connectChildRequest.case === `succeeded`}
           confettiDeps={[connectChildRequest.case]}
         />
+        <OnboardingPage step="howToUseGifs" component={<Step.HowToUseGifs />} />
         <OnboardingPage
           step="allowNotifications_start"
           component={<Step.AllowNotifications step="allowNotifications_start" />}
@@ -123,6 +124,10 @@ export const Onboarding: React.FC<Props> = ({
         <OnboardingPage
           step="installSysExt_explain"
           component={<Step.InstallSysExt step="installSysExt_explain" />}
+        />
+        <OnboardingPage
+          step="installSysExt_trick"
+          component={<Step.InstallSysExt step="installSysExt_trick" />}
         />
         <OnboardingPage
           step="installSysExt_allow"
