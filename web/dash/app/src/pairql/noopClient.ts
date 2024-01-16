@@ -168,6 +168,9 @@ const noopClient: ApiClient = {
   loginMagicLink: async () => {
     return Result.success({ token: ``, adminId: `` });
   },
+  logEvent: async () => {
+    return Result.success({ success: true });
+  },
   requestMagicLink: async () => {
     return Result.success({ success: true });
   },

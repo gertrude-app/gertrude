@@ -2,7 +2,8 @@
 import { betsy } from '../fixtures/helpers';
 
 describe(`signup`, () => {
-  beforeEach(() => {
+  // NB: we let as many requests go to origin for this flow as possible
+  it(`handles signup flow`, () => {
     cy.visit(`/signup`);
     const email = `e2e-user-${Date.now()}@gertrude.app`;
     cy.get(`input[name=email]`).type(email);
@@ -29,24 +30,19 @@ describe(`signup`, () => {
       numAdminNotifications: 0,
     });
 
-    cy.interceptPql(`GetAdmin`, {
-      id: betsy.id,
-      email: betsy.email,
-      subscriptionStatus: { case: `paid` },
-      notifications: [],
-      verifiedNotificationMethods: [],
-    });
-
     cy.visit(`/verify-signup-email/verify-token-123`);
 
     cy.wait(`@VerifySignupEmail`)
       .its(`request.body`)
       .should(`deep.eq`, { token: `verify-token-123` });
-  });
 
-  // NB: we let as many requests go to origin for this flow as possible
-  it(`handles signup flow for happy path`, () => {
-    cy.contains(`I'm a parent`).click();
+    cy.interceptPql(`LogEvent`, { success: true });
+
+    cy.contains(`I’m a parent`).click();
+
+    cy.wait(`@LogEvent`).then(({ request }) => {
+      expect(request.body.detail).to.contain(`PARENT-CHILD`);
+    });
 
     cy.wait(`@GetDashboardWidgets`)
       .its(`request.headers.${`X-AdminToken`.toLowerCase()}`)
@@ -59,12 +55,24 @@ describe(`signup`, () => {
   });
 
   it(`handles account deletion for wrong use case`, () => {
+    cy.interceptPql(`LogEvent`, { success: true });
     cy.interceptPql(`DeleteEntity`, { success: true });
+    cy.simulateLoggedIn();
+    cy.visit(`/use-case`);
 
-    cy.contains(`I'm trying to`).click();
+    cy.contains(`help myself`).click();
+
+    cy.wait(`@LogEvent`).then(({ request }) => {
+      expect(request.body.detail).to.contain(`SELF`);
+    });
+
     cy.contains(`Delete my account`).click();
 
-    cy.contains(`Welcome to the parent website!`);
+    cy.wait(`@DeleteEntity`)
+      .its(`request.body`)
+      .should(`deep.eq`, { id: betsy.id, type: `admin` });
+
+    cy.contains(`Account deleted!`);
   });
 });
 
