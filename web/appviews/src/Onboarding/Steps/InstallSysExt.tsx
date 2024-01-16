@@ -39,7 +39,9 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
         <Onboarding.Centered className="space-x-12" direction="row">
           <div className="flex flex-col">
             <Onboarding.Heading className="mb-2">
-              <span className="text-4xl inline-block translate-y-1 mr-3">🥸</span>
+              {os !== `catalina` && (
+                <span className="text-4xl inline-block translate-y-1 mr-3">🥸</span>
+              )}
               Don’t get tricked!
             </Onboarding.Heading>
             <Onboarding.Text className="my-4 max-w-xl">

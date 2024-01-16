@@ -195,7 +195,7 @@ const ExpandableContent: React.FC<Props> = ({
           )}
           {/* don't render GIF nav till we're the active step, so progress starts at 0, in sync w/ img */}
           {(asset.type === `images` || asset.type === `gif`) && withinActiveStep && (
-            <div className="rounded-full absolute w-full h-4 -bottom-8 flex justify-center items-center gap-2">
+            <div className="rounded-full absolute w-full h-4 -bottom-8 flex justify-center items-center space-x-2">
               {(asset.type === `images`
                 ? asset.steps
                 : [{ url: asset.url, duration: asset.duration }]
