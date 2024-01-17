@@ -43,9 +43,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
-      RUN_ARGOS:
-        ${{ contains(github.event.pull_request.labels.*.name, 'run-argos') ||
-        github.event_name == 'push' }}
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -71,19 +68,17 @@ jobs:
       - name: build storybook
         run: STORYBOOK_SCREENSHOT_TESTING=true just build-storybook
       - name: serve storybook
-        if: env.RUN_ARGOS == 'true'
         run: |
           mv -f storybook/storybook-static/{iframe,index}.html
           pnpm dlx serve@14.2.1 -l 4777 storybook/storybook-static &
       - name: screenshots
-        if: env.RUN_ARGOS == 'true'
         run: |
           just visual-test
           pnpm dlx @argos-ci/cli upload storybook/visual-tests/screenshots/argos || true
       - name: create screenshots pr
         id: pr
         uses: peter-evans/create-pull-request@v4
-        if: env.RUN_ARGOS == 'true' && github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
         with:
           base: ${{ github.head_ref }}
           commit-message: '[automated] update screenshots from CI'

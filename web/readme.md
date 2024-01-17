@@ -23,39 +23,25 @@
 
 ## Environment
 
-- `node` 16
-- `pnpm` 7
+- `node` 18
+- `pnpm` 8
+- `just` 1.9
 
 ## Usage
 
-Run `make` for an overview of the most commonly used dev commands. Check out the
-`Makefile` for even more.
-
-For watching typescript errors, the following monstrosity of a bash command filters out
-some of the duplicates/noise:
-
-```sh
-script -q /dev/null make ts-watch | grep -P " [^\.][^\.][^ ]+: (- )?error TS\d+|(?<=0 errors)"
-```
+Run `just` for an overview of the most commonly used dev commands. Check out the
+`justfile` for even more.
 
 ## Tips on adding a new package
 
 - `pnpm` requires that the lib be explicitly listed as a dependency, so in other apps/libs
   that need it, you'll need to run `pnpm --filter @some/pkg install @new/pkg`
 - if the lib has react components using tailwind, be sure to updated the `content` section
-  of the `tailwind.comfig.js` for the app consuming it, so that JIT works correctly.
-- if a next app is consuming it, edit the `next.config.js` file to transpile the module
-  (because we don't _build_ anything for consumption, we just deal with straight
-  typescript), and possibly add the path to the `package.json` `start` script (if using
-  `next-remote-watch`)
-- add the new package to the `Makefile` typechecking commands: `ts-check` and `ts-watch`
+  of the `tailwind.config.js` for the app consuming it, so that JIT works correctly.
+- add the new package to the `justfile` typechecking commands: `ts-check` and `ts-watch`
 
 ## Monorepo hacks/issues
 
-- to get `next dev` to HMR when something in a workspace dependency changes, i had to pull
-  in `next-remote-watch` to replace the standard `next-dev`
-- for next.js apps to directly consume un-transpiled typescript, we use
-  `with-transpiled-modules` in our `next.config.js`
 - netlify's pnpm+monorepo support isn't quite there yet, had to add
   `NETLIFY_USE_PNPM=true`
   ([see here](https://github.com/netlify/build/issues/4648#issuecomment-1288804297))
