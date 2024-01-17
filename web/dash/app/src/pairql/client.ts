@@ -227,6 +227,10 @@ export const liveClient = {
     );
   },
 
+  logEvent(input: T.LogEvent.Input): Promise<T.Result<T.LogEvent.Output>> {
+    return query<T.LogEvent.Input, T.LogEvent.Output>(input, `admin`, `LogEvent`);
+  },
+
   login(input: T.Login.Input): Promise<T.Result<T.Login.Output>> {
     return query<T.Login.Input, T.Login.Output>(input, `none`, `Login`);
   },
@@ -428,6 +432,9 @@ export const throwingClient: ApiClient = {
   },
   latestAppVersions: () => {
     throw new Error(`ApiClient.latestAppVersions() not implemented`);
+  },
+  logEvent: () => {
+    throw new Error(`ApiClient.logEvent() not implemented`);
   },
   login: () => {
     throw new Error(`ApiClient.login() not implemented`);

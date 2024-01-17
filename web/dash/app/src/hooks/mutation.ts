@@ -106,6 +106,7 @@ type MutationOptions<T> = {
 export type MutationResult<T, V> = UseMutationResult<T, PqlError, V>;
 
 type ToastId =
+  | 'delete:admin'
   | 'delete:user'
   | 'delete:computer'
   | 'delete:notification'
@@ -145,6 +146,9 @@ function getToast(toastId?: ToastId): { verb: string; entity: string } | undefin
     case `save:user`:
       return { verb, entity: `child` };
 
+    case `delete:admin`:
+      return { verb, entity: `account` };
+
     case `create:pending-notification-method`:
       return { verb: `send`, entity: `verification code` };
     case `confirm:pending-notification-method`:
@@ -156,6 +160,8 @@ function getToast(toastId?: ToastId): { verb: string; entity: string } | undefin
 
 function toastIdFromDeleteEntityType(type: DeleteEntity.Input['type']): ToastId {
   switch (type) {
+    case `admin`:
+      return `delete:user`;
     case `adminNotification`:
       return `delete:notification`;
     case `adminVerifiedNotificationMethod`:

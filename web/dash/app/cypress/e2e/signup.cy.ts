@@ -36,6 +36,14 @@ describe(`signup`, () => {
       .its(`request.body`)
       .should(`deep.eq`, { token: `verify-token-123` });
 
+    cy.interceptPql(`LogEvent`, { success: true });
+
+    cy.contains(`I’m a parent`).click();
+
+    cy.wait(`@LogEvent`).then(({ request }) => {
+      expect(request.body.detail).to.contain(`PARENT-CHILD`);
+    });
+
     cy.wait(`@GetDashboardWidgets`)
       .its(`request.headers.${`X-AdminToken`.toLowerCase()}`)
       .should(`eq`, `token-123`);
@@ -44,6 +52,27 @@ describe(`signup`, () => {
       expect(localStorage.getItem(`admin_id`)).to.eq(`admin-123`);
       expect(localStorage.getItem(`admin_token`)).to.eq(`token-123`);
     });
+  });
+
+  it(`handles account deletion for wrong use case`, () => {
+    cy.interceptPql(`LogEvent`, { success: true });
+    cy.interceptPql(`DeleteEntity`, { success: true });
+    cy.simulateLoggedIn();
+    cy.visit(`/use-case`);
+
+    cy.contains(`help myself`).click();
+
+    cy.wait(`@LogEvent`).then(({ request }) => {
+      expect(request.body.detail).to.contain(`SELF`);
+    });
+
+    cy.contains(`Delete my account`).click();
+
+    cy.wait(`@DeleteEntity`)
+      .its(`request.body`)
+      .should(`deep.eq`, { id: betsy.id, type: `admin` });
+
+    cy.contains(`Account deleted!`);
   });
 });
 

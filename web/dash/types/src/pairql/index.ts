@@ -27,6 +27,7 @@ export * from './pairs/HandleCheckoutCancel';
 export * from './pairs/HandleCheckoutSuccess';
 export * from './pairs/HollandTalkSubscription';
 export * from './pairs/LatestAppVersions';
+export * from './pairs/LogEvent';
 export * from './pairs/Login';
 export * from './pairs/LoginMagicLink';
 export * from './pairs/RequestMagicLink';

@@ -87,6 +87,7 @@ export function interceptPql(
   slug: `LatestAppVersions`,
   output: T.LatestAppVersions.Output,
 ): void;
+export function interceptPql(slug: `LogEvent`, output: T.LogEvent.Output): void;
 export function interceptPql(slug: `Login`, output: T.Login.Output): void;
 export function interceptPql(
   slug: `LoginMagicLink`,
@@ -162,6 +163,7 @@ export function forcePqlErr(
     | 'HandleCheckoutSuccess'
     | 'HollandTalkSubscription'
     | 'LatestAppVersions'
+    | 'LogEvent'
     | 'Login'
     | 'LoginMagicLink'
     | 'RequestMagicLink'

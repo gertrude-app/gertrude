@@ -5,6 +5,7 @@ export namespace DeleteEntity {
   export interface Input {
     id: UUID;
     type:
+      | 'admin'
       | 'adminNotification'
       | 'adminVerifiedNotificationMethod'
       | 'userDevice'
