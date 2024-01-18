@@ -35,6 +35,7 @@ describe(`Smoke test`, () => {
     cy.get(`@verifyLink`).then((verifyLink) => {
       cy.visit({ url: verifyLink as any });
     });
+    cy.contains(`I’m a parent`).click();
     cy.contains(`Welcome to the parent website!`);
 
     // log out, then back in w/ email/pass
