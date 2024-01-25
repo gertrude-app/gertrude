@@ -52,7 +52,7 @@ const TestimonialsBlock: React.FC = () => {
           }
         }}
       >
-        <i className="fa-solid fa-chevron-right" />
+        <i aria-hidden className="fa-solid fa-chevron-right" />
       </button>
       <button
         className="absolute w-12 h-12 bg-white rounded-full flex justify-center items-center border border-slate-200 text-slate-500 left-16 bottom-8 lg:bottom-auto hover:bg-slate-50 active:bg-slate-100 active:scale-95 transition-[transform,background-color] duration-50 z-20"
@@ -64,7 +64,7 @@ const TestimonialsBlock: React.FC = () => {
           }
         }}
       >
-        <i className="fa-solid fa-chevron-left" />
+        <i aria-hidden className="fa-solid fa-chevron-left" />
       </button>
     </section>
   );
