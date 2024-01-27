@@ -79,9 +79,18 @@ const Settings: React.FC<Props> = ({
     </div>
     <PageHeading icon="cog">Settings</PageHeading>
     <div className="flex flex-col lg:flex-row mt-8">
-      <div className="p-8 bg-slate-100 rounded-xl flex-grow lg:mr-2 border border-slate-200 lg:max-w-3xl">
+      <div className="p-8 bg-slate-100 rounded-xl flex-grow flex flex-col justify-end lg:mr-2 border border-slate-200 lg:max-w-3xl relative">
         <h2 className="text-lg text-slate-900 mb-2">Email address:</h2>
         <TextInput type="email" label="" value={email} disabled setValue={() => {}} />
+        <Button
+          type="link"
+          to="/reset-password"
+          color="tertiary"
+          size="small"
+          className="lg:absolute self-end mt-4 lg:mt-0 right-8 top-4"
+        >
+          Change password
+        </Button>
       </div>
       <div
         className={cx(
