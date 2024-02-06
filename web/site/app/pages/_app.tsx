@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
 import { useRouter } from 'next/router';
@@ -19,6 +19,8 @@ const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }
   let lang: `en` | `es` = `en`;
   let pageTitle = `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`;
   let description = `Protect your kids online with easy-to-use Mac internet filtering, internet blocking, and mac keylogging.`;
+
+  useEffect(storeGoogleClickId, []);
 
   // docs markdown pages
   if (pageProps.markdoc) {
@@ -61,3 +63,15 @@ const App: React.FC<AppProps<{ markdoc?: MarkDoc }>> = ({ Component, pageProps }
 };
 
 export default App;
+
+function storeGoogleClickId(): void {
+  const match = RegExp(`[?&]gclid=([^&]*)`).exec(window.location.search);
+  if (!match || !match[1]) {
+    return;
+  }
+  const gclid = match[1].replace(/\+/g, ` `);
+  const date = new Date();
+  date.setTime(date.getTime() + 90 * 24 * 60 * 60 * 1000); // 90 days
+  const domain = window.location.hostname;
+  document.cookie = `gclid=${gclid}; expires=${date.toUTCString()}; path=/; domain=${domain}`;
+}
