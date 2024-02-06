@@ -7,7 +7,9 @@ import Current from '../../environment';
 const Signup: React.FC = () => {
   const [email, setEmail] = useState(``);
   const [password, setPassword] = useState(``);
-  const signup = useMutation(() => Current.api.signup({ email, password }));
+  const signup = useMutation(() =>
+    Current.api.signup({ email, password, gclid: getCookieValue(`gclid`) }),
+  );
 
   if (signup.isPending) {
     return <FullscreenModalForm state="ongoing" />;
@@ -60,3 +62,7 @@ const Signup: React.FC = () => {
 };
 
 export default Signup;
+
+function getCookieValue(name: string): string | undefined {
+  return document.cookie.match(`(^|;)\\s*` + name + `\\s*=\\s*([^;]+)`)?.pop();
+}

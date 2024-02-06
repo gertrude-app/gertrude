@@ -5,11 +5,7 @@ import { useIntersectionObserver, useInterval } from '../../app/lib/hooks';
 const REF_DATE = new Date(2022, 8, 12).getTime();
 
 const WebsiteCounter: React.FC = () => {
-  const [totalWebsites, setTotalWebsites] = useState(() => {
-    const secondsSinceRefDate = Math.floor((Date.now() - REF_DATE) / 1000);
-    const newWebsitesSinceRefDate = secondsSinceRefDate * 3;
-    return 1_980_000_000 + newWebsitesSinceRefDate;
-  });
+  const [totalWebsites, setTotalWebsites] = useState(2_109_792_000);
   const [websitesThisHour, setWebsitesThisHour] = useState(3 * 60 * 60);
   const [websitesToday, setWebsitesToday] = useState(3 * 60 * 60 * 24);
   const [websitesThisWeek, setWebsitesThisWeek] = useState(3 * 60 * 60 * 24 * 7);
@@ -23,6 +19,10 @@ const WebsiteCounter: React.FC = () => {
 
   useEffect(() => {
     setWindowHeight(window.innerHeight);
+    // prevent hydration errors
+    const secondsSinceRefDate = Math.floor((Date.now() - REF_DATE) / 1000);
+    const newWebsitesSinceRefDate = secondsSinceRefDate * 3;
+    setTotalWebsites(1_980_000_000 + newWebsitesSinceRefDate);
   }, [windowHeight]);
 
   useInterval(() => {

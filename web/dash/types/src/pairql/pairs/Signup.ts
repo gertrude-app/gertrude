@@ -5,6 +5,7 @@ export namespace Signup {
   export interface Input {
     email: string;
     password: string;
+    gclid?: string;
   }
 
   export type Output = SuccessOutput;
