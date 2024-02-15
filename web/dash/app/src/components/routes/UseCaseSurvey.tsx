@@ -140,6 +140,7 @@ const Option: React.FC<OptionProps> = ({ children, type, description, setPage })
   const navigate = useNavigate();
   return (
     <button
+      data-track-conversion={type === `self` ? undefined : true}
       onClick={() => {
         Current.api.logEvent({
           eventId: `bc6213cb`,
