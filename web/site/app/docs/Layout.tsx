@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { MenuIcon } from 'lucide-react';
 import cx from 'classnames';
-import Sidebar from './components/Sidebar';
+import Sidebar from '../../components/docs/Sidebar';
 
 const DocsLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

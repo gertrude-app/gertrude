@@ -6,11 +6,11 @@ import React from 'react';
 import matter from 'gray-matter';
 import type { RenderableTreeNode } from '@markdoc/markdoc';
 import type { Metadata, NextPage } from 'next';
-import { components, config } from '../markdoc/config';
-import Prose from '../components/Prose';
-import articles from '../components/articles';
+import { components, config } from '../../../markdoc/config';
+import Prose from '../../../components/docs/Prose';
+import articles from '../articles';
 
-const ARTICLES_PATH = `app/docs/articles`;
+const ARTICLES_PATH = `markdoc/articles`;
 const POSTS_DIR = path.join(process.cwd(), ARTICLES_PATH);
 
 type Params = {
