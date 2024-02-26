@@ -19,7 +19,6 @@
     "@shared/datetime": "workspace:*",
     "@shared/tailwind": "workspace:*",
     "@shared/ts-utils": "workspace:*",
-    "@site/components": "workspace:*",
     "@storybook/addon-actions": "7.6.3",
     "@storybook/addon-backgrounds": "7.6.3",
     "@storybook/addon-essentials": "7.6.3",

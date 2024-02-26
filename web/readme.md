@@ -3,8 +3,7 @@
 ## Apps
 
 - `dash/app` - web admin dashboard (vite SPA)
-- `site/app` - main site: marketing and docs (next.js app)
-- `docs/app` - docs site (next.js app)
+- `@site/app` - main site: marketing and docs (next.js app)
 - `storybook` - storybook for all react components
 
 ## Packages
@@ -15,7 +14,6 @@
 - `dash/keys` - logic/domain knowledge around _keys_
 - `dash/types` - shared types (non-ambient) for dashboard
 - `dash/utils` - misc helpers (string, etc.) for dashboard
-- `site/components` - react components for site
 - `shared/components` - react components used by more than one app
 - `shared/datetime` - date/time fns used by more than one app
 - `shared/tailwind` - shared tailwind preset

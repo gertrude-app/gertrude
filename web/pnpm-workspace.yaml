@@ -1,8 +1,7 @@
 packages:
   - 'appviews'
   - 'dash/*'
-  - 'docs/*'
-  - 'site/*'
+  - 'site'
   - 'shared/*'
   - 'storybook'
   - 'smoke'

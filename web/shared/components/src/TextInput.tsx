@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useId, useState } from 'react';
 import cx from 'classnames';
 import { isoToDateInput } from '@shared/datetime';

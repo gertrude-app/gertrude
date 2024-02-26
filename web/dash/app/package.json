@@ -11,7 +11,6 @@
     "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
   },
   "dependencies": {
-    "@apollo/client": "^3.6.9",
     "@dash/components": "workspace:*",
     "@dash/datetime": "workspace:*",
     "@dash/keys": "workspace:*",
