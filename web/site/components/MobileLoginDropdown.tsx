@@ -8,15 +8,14 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
 const MobileLoginDropdown: React.FC<{ theme: `violet` | `white` }> = ({ theme }) => (
   <DropdownMenu.Root>
-    <DropdownMenu.Trigger className="sm:hidden block hover:scale-105 active:scale-95 transition-transform duration-200">
-      <button
-        className={cx(
-          `w-10 h-10 rounded-full flex justify-center items-center`,
-          theme === `white` ? `bg-violet-50 text-violet-400` : `bg-white text-slate-400`,
-        )}
-      >
-        <MenuIcon />
-      </button>
+    <DropdownMenu.Trigger
+      className={cx(
+        `sm:hidden block hover:scale-105 active:scale-95 transition-transform duration-200`,
+        `w-10 h-10 rounded-full flex justify-center items-center`,
+        theme === `white` ? `bg-violet-50 text-violet-400` : `bg-white text-slate-400`,
+      )}
+    >
+      <MenuIcon />
     </DropdownMenu.Trigger>
     <DropdownMenu.Portal>
       <DropdownMenu.Content

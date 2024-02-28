@@ -20,6 +20,7 @@ const MainHeader: React.FC<{ theme: 'violet' | 'white' }> = ({ theme }) => (
     <MobileLoginDropdown theme={theme} />
     <div className={cx(`gap-4 transition-opacity duration-500 hidden sm:flex`)}>
       <FancyLink
+        type="link"
         href="https://parents.gertrude.app"
         size="sm"
         color="secondary"
@@ -28,6 +29,7 @@ const MainHeader: React.FC<{ theme: 'violet' | 'white' }> = ({ theme }) => (
         Log in
       </FancyLink>
       <FancyLink
+        type="link"
         href="https://parents.gertrude.app/signup"
         size="sm"
         color="primary"

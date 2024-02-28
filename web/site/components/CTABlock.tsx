@@ -24,10 +24,15 @@ const CTABlock: React.FC = () => (
         60 day free trial.
       </h3>
       <div className="flex flex-col md:flex-row justify-center self-stretch md:items-center gap-6 md:gap-4 mt-12">
-        <FancyLink href="https://parents.gertrude.app/signup" Icon={RocketIcon}>
+        <FancyLink
+          type="link"
+          href="https://parents.gertrude.app/signup"
+          Icon={RocketIcon}
+        >
           Start free trial
         </FancyLink>
         <FancyLink
+          type="link"
           href="https://parents.gertrude.app/signup"
           Icon={RouteIcon}
           color="secondary"

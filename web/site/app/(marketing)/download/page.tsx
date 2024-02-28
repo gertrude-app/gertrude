@@ -10,11 +10,11 @@ import type { StaticImageData } from 'next/image';
 import FancyLink from '../../../components/FancyLink';
 import Computer from '../../../components/super-scroller-illustration/Computer';
 
-import Catalina from '../../public/supported-os/macos-catalina.png';
-import BigSur from '../../public/supported-os/macos-big-sur.png';
-import Monterey from '../../public/supported-os/macos-monterey.png';
-import Ventura from '../../public/supported-os/macos-ventura.png';
-import Sonoma from '../../public/supported-os/macos-sonoma.png';
+import Catalina from '../../../public/supported-os/macos-catalina.png';
+import BigSur from '../../../public/supported-os/macos-big-sur.png';
+import Monterey from '../../../public/supported-os/macos-monterey.png';
+import Ventura from '../../../public/supported-os/macos-ventura.png';
+import Sonoma from '../../../public/supported-os/macos-sonoma.png';
 
 const DownloadPage: NextPage = () => (
   <div className="flex justify-center items-center px-0 xs:px-6 sm:px-8 md:px-12 lg:px-20 py-20">
@@ -30,6 +30,7 @@ const DownloadPage: NextPage = () => (
           <Link href="https://gertrude.app/start">clicking here.</Link>
         </p>
         <FancyLink
+          type="link"
           href="https://gertrude.nyc3.digitaloceanspaces.com/releases/Gertrude.dmg"
           Icon={DownloadIcon}
           className="mt-8 mb-12"

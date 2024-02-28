@@ -42,10 +42,15 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <FancyLink href="https://parents.gertrude.app" size="sm" color="secondary">
+        <FancyLink
+          type="link"
+          href="https://parents.gertrude.app"
+          size="sm"
+          color="secondary"
+        >
           Log in
         </FancyLink>
-        <FancyLink href="https://parents.gertrude.app/signup" size="sm">
+        <FancyLink type="link" href="https://parents.gertrude.app/signup" size="sm">
           Sign up
         </FancyLink>
       </div>
