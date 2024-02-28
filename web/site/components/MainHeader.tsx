@@ -17,7 +17,7 @@ const MainHeader: React.FC<{ theme: 'violet' | 'white' }> = ({ theme }) => (
         type={theme === `violet` ? `inverted` : `default`}
       />
     </Link>
-    <MobileLoginDropdown />
+    <MobileLoginDropdown theme={theme} />
     <div className={cx(`gap-4 transition-opacity duration-500 hidden sm:flex`)}>
       <FancyLink
         href="https://parents.gertrude.app"
