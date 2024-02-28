@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { DotIcon } from 'lucide-react';
 import cx from 'classnames';
-import { Button, Logo } from '@shared/components';
+import { Logo } from '@shared/components';
 import { usePathname } from 'next/navigation';
 import FancyLink from 'components/FancyLink';
 
@@ -22,7 +22,9 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
   >
     <div className="bg-white rounded-3xl lg:rounded-r-none p-4 overflow-scroll py-8 shadow-lg lg:shadow-none flex-grow flex flex-col justify-between">
       <div>
-        <Logo className="ml-4" />
+        <Link href="/">
+          <Logo className="ml-4" />
+        </Link>
         <div className="mt-10 flex flex-col">
           <SidebarLink slug="getting-started" title="Getting Started" setOpen={setOpen} />
           <SidebarLink slug="faqs" title="Frequently Asked Questions" setOpen={setOpen} />

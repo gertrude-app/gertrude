@@ -36,7 +36,7 @@ const SuperScrollerIllustration: React.FC<Props> = ({ step }) => {
       case 2:
         setCurrentStep(`2-0_start`);
         scheduleEvent(`2-1_openMac`, 200);
-        scheduleEvent(`2-2_clickDownloadButton`, 2500);
+        scheduleEvent(`2-2_clickDownloadButton`, 2700);
         break;
       case 3:
         setCurrentStep(`3-0_start`);
@@ -60,6 +60,28 @@ const SuperScrollerIllustration: React.FC<Props> = ({ step }) => {
     };
   }, [step]);
 
+  let phoneLabelStatus: `hidden` | `subtle` | `prominent` = `hidden`;
+  let computerLabelStatus: `hidden` | `subtle` | `prominent` = `hidden`;
+
+  switch (step) {
+    case 0:
+      phoneLabelStatus = `hidden`;
+      computerLabelStatus = `hidden`;
+      break;
+    case 1:
+      phoneLabelStatus = `prominent`;
+      computerLabelStatus = `hidden`;
+      break;
+    case 2:
+      phoneLabelStatus = `subtle`;
+      computerLabelStatus = `prominent`;
+      break;
+    default:
+      phoneLabelStatus = `subtle`;
+      computerLabelStatus = `subtle`;
+      break;
+  }
+
   return (
     <div className="w-152 h-152 flex justify-center items-center relative scale-50 lg:scale-75 xl:scale-100 shrink-0">
       <Logo
@@ -74,6 +96,7 @@ const SuperScrollerIllustration: React.FC<Props> = ({ step }) => {
         size={160}
       />
       <Phone
+        labelStatus={phoneLabelStatus}
         className={cx(
           `absolute transition-[opacity,transform,bottom,right] duration-500`,
           {
@@ -100,13 +123,14 @@ const SuperScrollerIllustration: React.FC<Props> = ({ step }) => {
       <Envelope
         className={cx(`ransition-[opacity,transform,top,right]`, {
           'opacity-0 top-10 right-16 scale-50': !hasHappened(`4-1_clickUnlockRequest`),
-          'opacity-100 -top-36 right-16 duration-500 delay-300':
+          'opacity-100 -top-40 right-16 duration-500 delay-300':
             hasHappened(`4-1_clickUnlockRequest`) && step === 4,
           'opacity-100 top-4 right-16 duration-300 ease-in': step === 5,
           hidden: step === 6,
         })}
       />
       <Computer
+        labelStatus={computerLabelStatus}
         className={cx(`absolute transition-[opacity,transform,top,left] duration-500`, {
           'opacity-0 scale-0 translate-y-112 top-20': step === 0 || step === 1,
           'opacity-100 scale-100 left-12 top-8':

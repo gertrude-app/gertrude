@@ -1,11 +1,47 @@
 import React from 'react';
 import cx from 'classnames';
 
-const Computer: React.FC<{ children: React.ReactNode; className: string }> = ({
-  children,
-  className,
-}) => (
+interface ComputerProps {
+  children: React.ReactNode;
+  className: string;
+  labelStatus: 'hidden' | 'prominent' | 'subtle';
+}
+
+const Computer: React.FC<ComputerProps> = ({ children, className, labelStatus }) => (
   <div className={cx(`[perspective:1200px]`, className)}>
+    <div
+      className={cx(
+        `absolute flex justify-center items-center transition-all duration-700`,
+        {
+          '-top-20 opacity-0 w-0 h-12 xscale-0 rounded-full left-[252px]':
+            labelStatus === `hidden`,
+          '-top-20 w-56 h-12 rounded-full left-[140px] delay-500':
+            labelStatus === `prominent`,
+          '-top-10 w-52 h-7 rounded-full left-[148px]': labelStatus === `subtle`,
+        },
+      )}
+    >
+      <div
+        className={cx(
+          `w-4 h-4 absolute rotate-45 rounded transition-[bottom,background-color] duration-500`,
+          labelStatus === `prominent`
+            ? `-bottom-1.5 delay-700 bg-fuchsia-500 `
+            : `bottom-1 bg-fuchsia-100`,
+        )}
+      />
+      <span
+        className={cx(
+          `font-medium text-lg transition-all duration-300 text-center relative w-full h-full flex justify-center items-center rounded-full`,
+          {
+            'text-transparent bg-fuchsia-500': labelStatus === `hidden`,
+            'text-white delay-[800ms] bg-fuchsia-500': labelStatus === `prominent`,
+            'scale-90 bg-fuchsia-200 text-fuchsia-700': labelStatus === `subtle`,
+          },
+        )}
+      >
+        Your child's computer
+      </span>
+    </div>
     <div className="w-128 h-96 border-8 border-black rounded-t-3xl bg-black overflow-hidden">
       {children}
     </div>

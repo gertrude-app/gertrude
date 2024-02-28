@@ -1,13 +1,15 @@
 import React from 'react';
+import cx from 'classnames';
 
 type Props = {
   src: string;
+  small?: boolean;
   caption?: string;
   alt?: string;
 };
 
-const ArticleImage: React.FC<Props> = ({ src, caption, alt }) => (
-  <div className="mt-8 flex flex-col items-center">
+const ArticleImage: React.FC<Props> = ({ src, caption, alt, small }) => (
+  <div className={cx(`mt-8 flex flex-col items-center`, small && `max-w-lg mx-auto`)}>
     <img
       className="m-0 rounded-3xl border border-slate-300"
       src={`/docs/images/${src}`}

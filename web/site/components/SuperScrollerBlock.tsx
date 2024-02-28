@@ -90,11 +90,11 @@ const SuperScrollerBlock: React.FC = () => {
         <SuperScrollerIllustration step={step} />
         <div className="h-[50px] w-full top-0 lg:top-auto lg:bottom-0 flex justify-center items-center gap-2 absolute">
           <StepMarker index={1} step={step} duration={4400} />
-          <StepMarker index={2} step={step} duration={4900} />
-          <StepMarker index={3} step={step} duration={800} />
+          <StepMarker index={2} step={step} duration={5400} />
+          <StepMarker index={3} step={step} duration={600} />
           <StepMarker index={4} step={step} duration={2900} />
-          <StepMarker index={5} step={step} duration={1500} />
-          <StepMarker index={6} step={step} duration={1500} />
+          <StepMarker index={5} step={step} duration={2900} />
+          <StepMarker index={6} step={step} duration={3000} />
         </div>
       </div>
     </section>

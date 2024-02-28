@@ -20,7 +20,12 @@ const ClickToReveal: React.FC<Props> = ({ title, children }) => {
         <span className="text-xl font-semibold bg-gradient-to-r from-violet-700 to-fuchsia-600 bg-clip-text text-transparent">
           {title}
         </span>
-        <ChevronDownIcon className={cx(`text-slate-400`, revealed)} />
+        <ChevronDownIcon
+          className={cx(
+            `text-slate-400 transition-transform duration-200`,
+            revealed ? `-rotate-180` : `rotate-0`,
+          )}
+        />
       </button>
       <div
         className={cx(

@@ -20,6 +20,7 @@ const tags: Config['tags'] = {
       src: { type: String },
       caption: { type: String },
       alt: { type: String },
+      small: { type: Boolean },
     },
     render: `ArticleImage`,
   },

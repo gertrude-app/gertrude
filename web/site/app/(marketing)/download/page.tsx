@@ -59,6 +59,7 @@ const DownloadPage: NextPage = () => (
         />
         <div className="w-36 md+:w-64 xl:w-80 h-32 md+:h-52 flex justify-center items-end">
           <Computer
+            labelStatus="hidden"
             children={undefined}
             className={`scale-[20%] md+:scale-[35%] xl:scale-[40%] relative -bottom-28 md+:-bottom-12`}
           />

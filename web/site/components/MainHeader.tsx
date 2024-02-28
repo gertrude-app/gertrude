@@ -5,25 +5,33 @@ import { Logo } from '@shared/components';
 import FancyLink from './FancyLink';
 import MobileLoginDropdown from './MobileLoginDropdown';
 
-const MainHeader: React.FC = () => (
+const MainHeader: React.FC<{ theme: 'violet' | 'white' }> = ({ theme }) => (
   <header
     className={cx(
-      `flex justify-between items-center px-8 transition-[background-color,padding,margin,border-radius,box-shadow] duration-500 top-0 left-0 right-0 z-50 py-6 relative`,
+      `flex justify-between items-center px-6 xs:px-8 top-0 left-0 right-0 z-50 py-6 relative`,
     )}
   >
     <Link href="/">
-      <Logo className={cx(`transition-opacity duration-500`)} type="inverted" />
+      <Logo
+        className={cx(`transition-opacity duration-500`)}
+        type={theme === `violet` ? `inverted` : `default`}
+      />
     </Link>
     <MobileLoginDropdown />
     <div className={cx(`gap-4 transition-opacity duration-500 hidden sm:flex`)}>
-      <FancyLink href="https://parents.gertrude.app" size="sm" color="secondary" inverted>
+      <FancyLink
+        href="https://parents.gertrude.app"
+        size="sm"
+        color="secondary"
+        inverted={theme === `violet`}
+      >
         Log in
       </FancyLink>
       <FancyLink
         href="https://parents.gertrude.app/signup"
         size="sm"
         color="primary"
-        inverted
+        inverted={theme === `violet`}
       >
         Sign up
       </FancyLink>

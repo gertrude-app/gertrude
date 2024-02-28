@@ -1,10 +1,12 @@
 ---
 title: In iOS 17 Parents Can't Delete `#images` GIF search iMessage App
+date: '2023-09-19T04:00:00.000Z'
 image: /gif-images-og-image.jpg
 description:
   'Sadly, iOS 17 removes a vital parental control: the ability for parents to disable
   animated GIF searching through the #images iMessage app. This exposes children to
   thousands of extremely innappropriate images.'
+category: parental-controls
 ---
 
 {% .lead .mb-12 %} Until iOS 17, parents could remove the dangerous iMessage app called
@@ -15,13 +17,13 @@ Apple's texting app "Messages" comes with a feature that allows you to search fo
 GIFs to insert into texts, including **many images that are extremely innappropriate for
 children.**
 
-{% image src="lockdown-iphone/ios17-images-imessage-app.png" caption="This can no longer be removed by parents in iOS 16" alt="Apple's iMessage GIF search #images app can't be removed in iOS 17" /%}
+{% image src="lockdown-iphone/ios17-images-imessage-app.png" caption="This can no longer be removed by parents in iOS 17" alt="Apple's iMessage GIF search #images app can't be removed in iOS 17" small=true /%}
 
 If you've never tried it, this iMessage app allows searching for animated GIFs. In the
 image below, you can see the result of a search for `goats`, but a less innocent search
 would **fill the screen with images not suitable for children**.
 
-{% image src="lockdown-iphone/ios17-images-search-goats.png" caption="Imagine a search for something less innocent than <code>goats</code>..." alt="Kids can search for sexual images in iOS 17 Messages" /%}
+{% image src="lockdown-iphone/ios17-images-search-goats.png" caption="Imagine a search for something less innocent than <code>goats</code>..." alt="Kids can search for sexual images in iOS 17 Messages" small=true /%}
 
 {% callout title="How dangerous is it?" %}
 
@@ -35,7 +37,7 @@ skeptical, and remember that millions of children have iPhones.
 iOS 17 _does allow removing **third party** iMessage apps_ through a new Settings area.
 But the apps provided by Apple do not appear as options to disable.
 
-{% image src="lockdown-iphone/ios17-delete-3rd-party-imessage-apps.png" caption="Notably absent is the ability to delete <b>Apple's</b> iMessage apps" alt="Apple iMessage apps can't be removed in iOS 17" /%}
+{% image src="lockdown-iphone/ios17-delete-3rd-party-imessage-apps.png" caption="Notably absent is the ability to delete <b>Apple's</b> iMessage apps" alt="Apple iMessage apps can't be removed in iOS 17" small=true /%}
 
 {% callout title="<b class='text-2xl'>What should parents do?</b>" %}
 

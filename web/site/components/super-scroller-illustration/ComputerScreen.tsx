@@ -1,6 +1,8 @@
 import React from 'react';
 import cx from 'classnames';
 import { BanIcon, DownloadIcon } from 'lucide-react';
+import Image from 'next/image';
+import AppleLogo from '../../public/apple-logo.png';
 
 interface ComputerScreenProps {
   macOpened: boolean;
@@ -30,7 +32,7 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({
     {/* dock */}
     <div
       className={cx(
-        `bg-white/40 flex gap-2 px-2 py-1.5 rounded-xl transition-[transform] duration-500 delay-300`,
+        `bg-white/40 flex gap-2 px-2 py-1.5 rounded-xl transition-[transform] duration-500 delay-[1000ms]`,
         !macOpened && `translate-y-12`,
       )}
     >
@@ -52,7 +54,7 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({
     {/* browser window */}
     <div
       className={cx(
-        `absolute w-80 h-64 bg-white rounded-lg top-8 left-[calc(50%-160px)] transition-[transform,opacity] duration-500 delay-700 flex justify-center items-center`,
+        `absolute w-80 h-64 bg-white rounded-lg top-8 left-[calc(50%-160px)] transition-[transform,opacity] duration-500 delay-[1400ms] flex justify-center items-center`,
         !macOpened && `scale-0 translate-y-64 opacity-0`,
       )}
     >
@@ -82,7 +84,7 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({
         className={cx(
           `mt-4 transition-[transform,opacity] absolute`,
           !macOpened && `opacity-0 scale-75`,
-          newTabOpened ? `opacity-0 scale-75 duration-200` : `duration-500 delay-[1.2s]`,
+          newTabOpened ? `opacity-0 scale-75 duration-200` : `duration-500 delay-[1.8s]`,
         )}
       >
         {/* download button */}
@@ -160,7 +162,7 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({
     {/* first cursor */}
     <div
       className={cx(
-        `w-4 h-4 bg-black/30 rounded-full absolute transition[opacity,top,left] duration-500 delay-[1.8s]`,
+        `w-4 h-4 bg-black/30 rounded-full absolute transition-[opacity,top,left] duration-500 delay-[2.2s]`,
         macOpened ? `left-52 top-44` : `left-8 top-64 opacity-0`,
         downloadButtonClicked && `!opacity-0`,
       )}
@@ -186,10 +188,12 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({
     {/* black lock screen */}
     <div
       className={cx(
-        `bg-black absolute left-0 top-0 w-full h-full transition-opacity duration-500`,
+        `bg-black absolute left-0 top-0 w-full h-full transition-opacity delay-700 duration-500 flex justify-center items-center`,
         macOpened && `opacity-0`,
       )}
-    />
+    >
+      <Image src={AppleLogo} alt="Apple logo" className="w-16 h-16" />
+    </div>
   </div>
 );
 

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import React from 'react';
 
 const MainFooter: React.FC = () => (
-  <footer className="px-8 sm:px-12 lg:px-20 pt-20 pb-8 gap-20 relative border-t border-violet-400 flex flex-col">
+  <footer className="px-8 sm:px-12 lg:px-20 pt-20 pb-8 gap-20 relative border-t border-violet-400 flex flex-col bg-violet-500">
     <div className="flex flex-col sm:flex-row justify-between">
       <div className="self-center sm:self-start">
         <Link href="/">
@@ -21,7 +21,7 @@ const MainFooter: React.FC = () => (
           <FooterLink href="https://parents.gertrude.app/signup">Sign up</FooterLink>
           <FooterLink href="https://parents.gertrude.app">Log in</FooterLink>
           <FooterLink href="/docs">Documentation</FooterLink>
-          <FooterLink href="/blog">Dev blog</FooterLink>
+          <FooterLink href="/blog">Blog</FooterLink>
         </ul>
       </div>
     </div>

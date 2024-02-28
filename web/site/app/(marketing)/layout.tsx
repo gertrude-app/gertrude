@@ -1,17 +1,30 @@
+'use client';
+
 import React from 'react';
 import cx from 'classnames';
-import { roboto } from '../../lib/fonts';
+import { usePathname } from 'next/navigation';
 import MainHeader from '../../components/MainHeader';
 import MainFooter from '../../components/MainFooter';
 
-const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <html>
-    <body className={cx(`bg-violet-500 min-h-screen flex flex-col`, roboto)}>
-      <MainHeader />
-      <div className="flex-grow">{children}</div>
-      <MainFooter />
-    </body>
-  </html>
-);
+const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const path = usePathname();
+
+  const theme = path.includes(`blog`) ? `white` : `violet`;
+
+  return (
+    <html>
+      <body
+        className={cx(
+          `min-h-screen flex flex-col`,
+          theme === `violet` ? `bg-violet-500` : `bg-white`,
+        )}
+      >
+        <MainHeader theme={theme} />
+        <div className="flex-grow">{children}</div>
+        <MainFooter />
+      </body>
+    </html>
+  );
+};
 
 export default MarketingLayout;

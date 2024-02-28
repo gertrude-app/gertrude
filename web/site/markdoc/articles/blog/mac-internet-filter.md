@@ -1,8 +1,10 @@
 ---
 title: 'Gertrude: The Best Mac Internet Filter'
+date: '2023-07-01T04:00:00.000Z'
 description:
   To keep your kids protected online, you need a high-quality mac internet filter that
   blocks the entire internet to keep them exactly and only where you want them to be.
+category: parental-controls
 ---
 
 {% .lead %} More and more kids are using Mac computers for school these days. To keep your
