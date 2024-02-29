@@ -33,23 +33,8 @@ const axiformaFont = localFont({
       style: 'normal',
     },
     {
-      path: '../public/fonts/axiforma/Axiforma-Italic.woff2',
-      weight: '400',
-      style: 'italic',
-    },
-    {
-      path: '../public/fonts/axiforma/Axiforma-MediumItalic.woff2',
-      weight: '500',
-      style: 'italic',
-    },
-    {
       path: '../public/fonts/axiforma/Axiforma-SemiBoldItalic.woff2',
       weight: '600',
-      style: 'italic',
-    },
-    {
-      path: '../public/fonts/axiforma/axiforma-BoldItalic.woff2',
-      weight: '700',
       style: 'italic',
     },
   ],
