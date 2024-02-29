@@ -1,8 +1,8 @@
 import type { Meta } from '@storybook/react';
-import SiteOgImage from './SiteOgImage';
-import LockdownGuideOgImage from './LockdownGuideOgImage';
-import FiveThingsYouForgotOgImage from './FiveThingsYouForgotOgImage';
-import GifAppMessagesOgImage from './GifAppInMessagesOgImage';
+import SiteOgImage from './og-images/SiteOgImage';
+import LockdownGuideOgImage from './og-images/LockdownGuideOgImage';
+import FiveThingsYouForgotOgImage from './og-images/FiveThingsYouForgotOgImage';
+import GifAppMessagesOgImage from './og-images/GifAppInMessagesOgImage';
 
 export default {
   title: 'Site/OgImages', // eslint-disable-line

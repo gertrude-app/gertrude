@@ -1,10 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import cx from 'classnames';
 import { ArrowDownIcon, DownloadIcon } from 'lucide-react';
 import { AppIcon } from '@shared/components';
-import { axiforma } from 'lib/fonts';
 import type { NextPage } from 'next';
 import type { StaticImageData } from 'next/image';
 import FancyLink from '../../../components/FancyLink';
@@ -20,7 +18,7 @@ const DownloadPage: NextPage = () => (
   <div className="flex justify-center items-center px-0 xs:px-6 sm:px-8 md:px-12 lg:px-20 py-20">
     <div className="flex flex-col xl:flex-row bg-white/90 rounded-3xl overflow-hidden">
       <div className="xs:px-6 px-8 sm:px-12 md:px-16 py-12 sm:py-16 flex flex-col items-center w-full max-w-3xl bg-white">
-        <h1 className={cx(`text-4xl sm:text-5xl font-semibold text-center`, axiforma)}>
+        <h1 className="text-4xl sm:text-5xl font-semibold text-center">
           Download Gertrude
         </h1>
         <p className="text-lg sm:text-xl text-slate-500 max-w-2xl mt-4 text-center">

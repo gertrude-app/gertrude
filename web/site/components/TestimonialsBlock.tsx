@@ -1,6 +1,5 @@
 import React from 'react';
 import cx from 'classnames';
-import { axiforma } from '../lib/fonts';
 
 const TestimonialsBlock: React.FC = () => (
   <section className="xl:px-8 bg-gradient-to-b from-white to-violet-500">
@@ -60,14 +59,9 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
     )}
   >
     <p className="text-violet-100 text-xl text-center">{children}</p>
-    <h3
-      className={cx(
-        `text-xl font-semibold bg-gradient-to-r to-fuchsia-300 from-violet-200 bg-clip-text text-transparent mt-4`,
-        axiforma,
-      )}
-    >
+    <h3 className="font-axiforma text-xl font-semibold bg-gradient-to-r to-fuchsia-300 from-violet-200 bg-clip-text text-transparent mt-4">
       {name}
     </h3>
-    <h4 className={cx(`text-violet-300/60`, axiforma)}>{placeOfWork}</h4>
+    <h4 className="font-axiforma text-violet-300/60">{placeOfWork}</h4>
   </div>
 );

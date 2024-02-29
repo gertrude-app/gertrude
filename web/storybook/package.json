@@ -11,6 +11,7 @@
   "dependencies": {
     "@argos-ci/puppeteer": "0.0.2",
     "@dash/components": "workspace:*",
+    "site": "workspace:*",
     "@dash/keys": "workspace:*",
     "@dash/types": "workspace:*",
     "@headlessui/react": "^1.6.6",

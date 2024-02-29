@@ -559,6 +559,9 @@ importers:
       react-router-dom:
         specifier: ^6.3.0
         version: 6.4.3(react-dom@18.2.0)(react@18.2.0)
+      site:
+        specifier: workspace:*
+        version: link:../site
       storybook:
         specifier: 7.6.3
         version: 7.6.3

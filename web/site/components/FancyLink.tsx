@@ -2,7 +2,6 @@ import NextLink from 'next/link';
 import React from 'react';
 import cx from 'classnames';
 import type { ArrowUpIcon } from 'lucide-react';
-import { axiforma } from '../lib/fonts';
 
 type LucideIcon = typeof ArrowUpIcon;
 
@@ -25,7 +24,7 @@ interface SubmitProps {
 type FancyLinkProps = (LinkProps | SubmitProps) & CommonProps;
 
 const FancyLink: React.FC<FancyLinkProps> = (props) => {
-  const classes = cx(`relative group select-none block`, axiforma, props.className);
+  const classes = cx(`relative group select-none block font-axiforma`, props.className);
 
   let Element: React.FC<{ children: React.ReactNode }>;
 

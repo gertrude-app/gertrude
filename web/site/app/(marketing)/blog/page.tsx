@@ -4,7 +4,6 @@ import { Logo } from '@shared/components';
 import Link from 'next/link';
 import type { NextPage } from 'next';
 import { getArticle, getArticleSlugs } from '../../../markdoc/files';
-import { axiforma } from '../../../lib/fonts';
 
 const Blog: NextPage = async () => {
   const slugs = await getArticleSlugs(`blog`);
@@ -18,12 +17,7 @@ const Blog: NextPage = async () => {
           size={200}
           className="-ml-[52px] md:-ml-[32px] lg:ml-0 -mt-[16px] md:-mt-[20px] scale-[50%] md:scale-[70%] lg:scale-100"
         />
-        <h1
-          className={cx(
-            `-ml-12 md:-ml-6 lg:ml-0 text-7xl md:text-8xl lg:text-9xl text-slate-900 font-semibold`,
-            axiforma,
-          )}
-        >
+        <h1 className="font-axiforma -ml-12 md:-ml-6 lg:ml-0 text-7xl md:text-8xl lg:text-9xl text-slate-900 font-semibold">
           Blog
         </h1>
       </section>

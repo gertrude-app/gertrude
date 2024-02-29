@@ -1,6 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@900&display=swap');
 
+@import url('/fonts/axiforma/Axiforma-Regular.woff2');
+@import url('/fonts/axiforma/Axiforma-Medium.woff2');
+@import url('/fonts/axiforma/Axiforma-SemiBold.woff2');
+@import url('/fonts/axiforma/Axiforma-SemiBoldItalic.woff2');
+@import url('/fonts/axiforma/Axiforma-Bold.woff2');
+
 @import 'tailwindcss/base';
 @import './fonts.css';
 @import 'tailwindcss/components';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Logo } from '@shared/components';
-import BgImage from '../static/messages-screenshot.png';
+import BgImage from '../../static/messages-screenshot.png';
 
 const GifAppMessagesOgImage: React.FC = () => (
   <section

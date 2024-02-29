@@ -192,7 +192,13 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({
         macOpened && `opacity-0`,
       )}
     >
-      <Image src={AppleLogo} alt="Apple logo" className="w-16 h-16" />
+      <Image
+        src={AppleLogo}
+        alt="Apple logo"
+        className="w-16 h-16"
+        width={512}
+        height={512}
+      />
     </div>
   </div>
 );

@@ -1,10 +1,8 @@
 'use client';
 
 import React from 'react';
-import cx from 'classnames';
 import { RocketIcon, VideoIcon } from 'lucide-react';
 import { useIntersectionObserver, useScrollY, useWindowDimensions } from '../lib/hooks';
-import { axiforma } from '../lib/fonts';
 import WebsiteGraphic from './WebsiteGraphic';
 import FancyLink from './FancyLink';
 
@@ -28,12 +26,7 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
               : ``,
         }}
       >
-        <h1
-          className={cx(
-            `text-4xl xs:text-5xl md:text-6xl font-semibold text-white text-center min-[1450px]:text-left`,
-            axiforma,
-          )}
-        >
+        <h1 className="font-axiforma text-4xl xs:text-5xl md:text-6xl font-semibold text-white text-center min-[1450px]:text-left">
           Peace of mind for parents
         </h1>
         <p className="mt-8 text-white/80 text-lg xs:text-xl md:text-2xl leading-[1.5em] text-center min-[1450px]:text-left">

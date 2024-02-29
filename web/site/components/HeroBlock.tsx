@@ -4,7 +4,6 @@ import React from 'react';
 import cx from 'classnames';
 import { ChevronDownIcon } from 'lucide-react';
 import { useScrollY } from '../lib/hooks';
-import { axiforma } from '../lib/fonts';
 
 const HeroBlock: React.FC = () => {
   const scrollY = useScrollY();
@@ -12,10 +11,7 @@ const HeroBlock: React.FC = () => {
   return (
     <section className="bg-gradient-to-b from-violet-500 to-fuchsia-500 p-20 h-screen flex flex-col justify-center items-center relative snap-center -mt-20">
       <h1
-        className={cx(
-          `text-5xl xs:text-6xl sm:text-7xl text-center text-white font-semibold fixed px-12 xs:px-16 sm:px-20 !leading-[1.1em]`,
-          axiforma,
-        )}
+        className="text-5xl xs:text-6xl sm:text-7xl text-center text-white font-semibold fixed px-12 xs:px-16 sm:px-20 !leading-[1.1em] font-axiforma"
         style={{
           transform: `scale(${1 + scrollY / 500})`,
           filter: `blur(${scrollY / 30}px)`,

@@ -5,7 +5,6 @@ import cx from 'classnames';
 import { CheckIcon, Loader2Icon, SendIcon, XIcon } from 'lucide-react';
 import { Logo } from '@shared/components';
 import type { NextPage } from 'next';
-import { axiforma } from '../../../lib/fonts';
 import FancyLink from '../../../components/FancyLink';
 
 const ContactPage: NextPage = () => {
@@ -20,12 +19,7 @@ const ContactPage: NextPage = () => {
       <div className="bg-white p-8 xs:p-12 sm:p-16 lg:p-20 rounded-[40px] flex flex-col relative overflow-hidden">
         <Logo iconOnly className="absolute -top-40 right-6 opacity-10" size={400} />
         <Logo iconOnly className="absolute -bottom-56 left-6 opacity-10" size={400} />
-        <h1
-          className={cx(
-            `text-4xl font-semibold self-center lg:self-start relative`,
-            axiforma,
-          )}
-        >
+        <h1 className="font-axiforma text-4xl font-semibold self-center lg:self-start relative">
           Contact us
         </h1>
         <p className="text-xl mt-3 text-slate-500 max-w-2xl self-center lg:self-start text-center lg:text-left relative">
@@ -146,10 +140,7 @@ const TextInput: React.FC<TextInputProps> = ({
   );
   return (
     <div className="flex flex-col">
-      <label
-        htmlFor={name}
-        className={cx(`font-medium text-lg text-slate-400`, axiforma)}
-      >
+      <label htmlFor={name} className="font-axiforma font-medium text-lg text-slate-400">
         {label}
       </label>
       {textarea ? (

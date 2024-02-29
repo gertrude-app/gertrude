@@ -1,6 +1,6 @@
 import { Logo } from '@shared/components';
 import React from 'react';
-import BgImage from '../static/chained-iphone.png';
+import BgImage from '../../static/chained-iphone.png';
 
 const LockdownGuideOgImage: React.FC = () => (
   <section
