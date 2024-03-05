@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 
 const TestimonialsBlock: React.FC = () => (
-  <section className="xl:px-8 bg-gradient-to-b from-white to-violet-500">
+  <section className="xl:px-8 bg-gradient-to-b from-violet-100 to-violet-500">
     <div className="bg-slate-900 px-4 xs:px-8 sm:px-12 md:px-20 2xl:px-28 pt-0 md:pt-12 xl:pt-28 pb-40 relative flex xl:flex-row flex-col justify-center items-center overflow-hidden gap-8 xl:gap-0 2xl:gap-12">
       <TestimonialCard
         name="Jason Henderson"

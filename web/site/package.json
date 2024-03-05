@@ -22,7 +22,7 @@
     "@tailwindcss/typography": "^0.5.7",
     "classnames": "2.3.2",
     "lucide-react": "0.331.0",
-    "next": "14.1.0",
+    "next": "14.1.2",
     "prismjs": "1.29.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
