@@ -198,7 +198,7 @@ const Feature: React.FC<FeatureProps> = ({
               src={png}
               alt=""
               className={cx(
-                'w-full h-full object-center object-cover z-0',
+                `w-full h-full object-center object-cover z-0`,
                 animationStopped ? `relative` : `absolute`,
               )}
               priority

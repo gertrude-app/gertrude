@@ -1,4 +1,7 @@
 import React from 'react';
+import seedrandom from 'seedrandom';
+
+const rng = seedrandom(`moooooooooo`); // add or remove o's to change the star pattern
 
 interface StarsProps {
   className?: string;
@@ -6,12 +9,12 @@ interface StarsProps {
 }
 
 const stars = new Array(100).fill(0).map((_) => {
-  const top = Math.random() * 100;
-  const size = Math.random() * 6 - (top / 100) * 5;
+  const top = rng() * 100;
+  const size = rng() * 6 - (top / 100) * 5;
   return (
     <div
       style={{
-        left: `${Math.random() * 100}%`,
+        left: `${rng() * 100}%`,
         top: `${top}%`,
         width: `${size}px`,
         height: `${size}px`,
