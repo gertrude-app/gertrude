@@ -169,10 +169,11 @@ const Feature: React.FC<FeatureProps> = ({
         {
           'opacity-0 [transform:translateX(calc(-230*4px))_translateZ(-800px)_rotateY(-50deg)] blur':
             step < currentStep - 1,
-          'opacity-50 [transform:translateX(calc(-96*4px))_scale(75%)_rotateY(-35deg)]':
+          'opacity-50 [transform:translateX(calc(-60*4px))_scale(50%)_rotateY(-45deg)] sm:[transform:translateX(calc(-72*4px))_scale(75%)_rotateY(-45deg)] md:[transform:translateX(calc(-96*4px))_scale(75%)_rotateY(-35deg)]':
             step === currentStep - 1,
-          'opacity-100 [transform:translateZ(100px)]': step === currentStep,
-          'opacity-50 [transform:translateX(calc(96*4px))_scale(75%)_rotateY(35deg)]':
+          'opacity-100 [transform:translateZ(0px)_scale(85%)] sm:[transform:translateZ(0px)] md:[transform:translateZ(100px)]':
+            step === currentStep,
+          'opacity-50 [transform:translateX(calc(60*4px))_scale(50%)_rotateY(45deg)] sm:[transform:translateX(calc(70*4px))_scale(75%)_rotateY(45deg)] md:[transform:translateX(calc(96*4px))_scale(75%)_rotateY(35deg)]':
             step === currentStep + 1,
           'opacity-0 [transform:translateX(calc(230*4px))_translateZ(-800px)_rotateY(50deg)] blur':
             step > currentStep + 1,
@@ -196,28 +197,28 @@ const Feature: React.FC<FeatureProps> = ({
             <Image
               src={png}
               alt=""
-              className={cx("w-full h-full object-center object-cover z-0", animationStopped
-              ? `relative`: `absolute`)}
+              className={cx(
+                'w-full h-full object-center object-cover z-0',
+                animationStopped ? `relative` : `absolute`,
+              )}
               priority
             />
-            {
-              !animationStopped && (
-                <div className='bg-white relative z-10 w-full h-full flex justify-center items-center'>
-                  <div
-                    className={cx(
-                      `bg-violet-100 rounded-full transition-[opacity,width,height] duration-500 ease-out shrink-0 absolute`,
-                      highlighted ? `w-128 h-128 opacity-0` : `w-0 h-0`,
-                    )}
-                  />
-                  <Image
-                    src={gif}
-                    alt=""
-                    className="w-full h-full object-center object-cover relative"
-                    priority
-                  />
-               </div>
-              )
-            }
+            {!animationStopped && (
+              <div className="bg-white relative z-10 w-full h-full flex justify-center items-center">
+                <div
+                  className={cx(
+                    `bg-violet-100 rounded-full transition-[opacity,width,height] duration-500 ease-out shrink-0 absolute`,
+                    highlighted ? `w-128 h-128 opacity-0` : `w-0 h-0`,
+                  )}
+                />
+                <Image
+                  src={gif}
+                  alt=""
+                  className="w-full h-full object-center object-cover relative"
+                  priority
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
