@@ -1,3 +1,4 @@
+import FancyLink from 'components/FancyLink';
 import React from 'react';
 
 interface Props {
@@ -6,7 +7,7 @@ interface Props {
 }
 
 const ArticleFeedbackForm: React.FC<Props> = ({ name, lang }) => (
-  <div className="mt-16">
+  <div className="mt-24">
     <div className="flex gap-4">
       <span className="text-4xl" role="img" aria-label="thinking emoji">
         🤔
@@ -27,11 +28,12 @@ const ArticleFeedbackForm: React.FC<Props> = ({ name, lang }) => (
       <input type="hidden" name="form-name" value={name} />
       <div className="lg:flex lg:space-x-4">
         <fieldset className="lg:w-1/2">
-          <label className="block text-slate-300" htmlFor="name">
+          <label className="block text-slate-600 ml-3" htmlFor="name">
             {lang === `en` ? `Name:` : `Nombre:`}
           </label>
           <input
-            className="bg-slate-600 text-white rounded-md w-full max-w-sm"
+            className="bg-slate-100 text-slate-800 rounded-xl w-full max-w-sm border-none placeholder-slate-300"
+            placeholder="John Doe"
             type="text"
             name="name"
             id="name"
@@ -39,11 +41,11 @@ const ArticleFeedbackForm: React.FC<Props> = ({ name, lang }) => (
           />
         </fieldset>
         <fieldset className="lg:w-1/2 mt-4 lg:mt-0">
-          <label className="block text-slate-300" htmlFor="email">
+          <label className="block text-slate-600 ml-3" htmlFor="email">
             {lang === `en` ? `Email:` : `Correo electrónico:`}
           </label>
           <input
-            className="bg-slate-600 text-white rounded-md w-full max-w-sm"
+            className="bg-slate-100 text-slate-800 rounded-xl w-full max-w-sm border-none placeholder-slate-300"
             type="email"
             name="email"
             id="email"
@@ -53,11 +55,11 @@ const ArticleFeedbackForm: React.FC<Props> = ({ name, lang }) => (
         </fieldset>
       </div>
       <fieldset>
-        <label className="block text-slate-300" htmlFor="message">
+        <label className="block text-slate-600 ml-3" htmlFor="message">
           {lang === `en` ? `Message:` : `Mensaje:`}
         </label>
         <textarea
-          className="bg-slate-600 text-white rounded-md w-full"
+          className="bg-slate-100 text-slate-800 rounded-xl w-full border-none placeholder-slate-300"
           name="message"
           id="message"
           rows={5}
@@ -65,9 +67,9 @@ const ArticleFeedbackForm: React.FC<Props> = ({ name, lang }) => (
         />
       </fieldset>
       <fieldset>
-        <button className="bg-slate-600 rounded-lg px-5 py-0.5" type="submit">
+        <FancyLink type="submit" color="primary">
           {lang === `en` ? `Submit` : `Enviar`} →
-        </button>
+        </FancyLink>
       </fieldset>
     </form>
   </div>

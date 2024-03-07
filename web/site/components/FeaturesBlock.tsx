@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
 import Image from 'next/image';
-import { useIntersectionObserver } from 'lib/hooks';
 import type { StaticImageData } from 'next/image';
+import { useIntersectionObserver } from '../lib/hooks';
 import Waves from '../public/wavy-bg.svg';
 
 import LockAndChain from '../public/feature-cards/lock-and-chain.gif';
@@ -160,7 +160,7 @@ const Feature: React.FC<FeatureProps> = ({
       clearTimeout(id2);
       clearTimeout(id3);
     };
-  }, [currentStep, step, duration]);
+  }, [currentStep, step, duration, highlightTime]);
 
   return (
     <div

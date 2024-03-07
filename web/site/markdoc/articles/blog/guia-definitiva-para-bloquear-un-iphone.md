@@ -1,7 +1,7 @@
 ---
 title: Guía Definitiva para Bloquear un iPhone
 date: '2023-01-25T05:00:00.000Z'
-image: /lockdown-og-image.es.jpg
+image: /og-images/lockdown.es.jpg
 description:
   Una guía paso a paso para bloquear completamente un iPhone o iPad, para padres que
   realmente desean proteger a sus hijos de los peligros de la actividad en línea sin

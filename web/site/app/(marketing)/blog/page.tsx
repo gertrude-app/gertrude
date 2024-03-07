@@ -5,6 +5,23 @@ import Link from 'next/link';
 import type { NextPage } from 'next';
 import { getArticle, getArticleSlugs } from '../../../markdoc/files';
 
+export const metadata = {
+  title: `Blog | Gertrude Internet Filter and Parental Controls`,
+  description: `TODO: Add description`,
+  openGraph: {
+    title: `Blog | Gertrude Internet Filter and Parental Controls`,
+    description: `TODO: Add description`,
+    images: [
+      {
+        url: `/og-images/main.jpg`,
+        width: 1200,
+        height: 630,
+        alt: `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`,
+      },
+    ],
+  },
+};
+
 const Blog: NextPage = async () => {
   const slugs = await getArticleSlugs(`blog`);
   const articles = await Promise.all(slugs.map((slug) => getArticle(slug, `blog`)));

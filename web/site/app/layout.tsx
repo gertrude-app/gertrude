@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import '../styles/globals.css';
 
-const RootLayout: React.FC<{ children: React.FC }> = ({ children }) => {
+const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(storeGoogleClickId, []);
 
   return <>{children}</>;

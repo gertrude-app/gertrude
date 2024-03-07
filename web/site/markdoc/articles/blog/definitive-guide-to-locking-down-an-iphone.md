@@ -1,7 +1,7 @@
 ---
 title: The Definitive Guide to Locking Down an iPhone
 date: '2023-01-25T05:00:00.000Z'
-image: /lockdown-og-image.jpg
+image: /og-images/lockdown.en.jpg
 description:
   A step-by-step guide to completely locking down an iPhone or iPad, for parents who are
   serious about protecting their kids from the dangers of unrestricted online activity.

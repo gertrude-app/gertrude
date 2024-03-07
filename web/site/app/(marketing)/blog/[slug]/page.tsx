@@ -31,7 +31,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${title} | Gertrude Internet Filter and Parental Controls`,
     description,
-    openGraph: { description, images: [{ url: image ?? `` }] },
+    openGraph: {
+      title: `${title} | Gertrude Internet Filter and Parental Controls`,
+      description,
+      images: [{ url: image ?? `` }],
+    },
   };
 }
 

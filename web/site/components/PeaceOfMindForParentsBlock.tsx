@@ -41,10 +41,12 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
             href="https://parents.gertrude.app/signup"
             Icon={RocketIcon}
             inverted
+            color="primary"
+            size="lg"
           >
             Get started
           </FancyLink>
-          <FancyLink type="link" href="#" Icon={VideoIcon} color="secondary" inverted>
+          <FancyLink type="link" href="#" Icon={VideoIcon} inverted size="lg">
             Watch demo video
           </FancyLink>
         </div>

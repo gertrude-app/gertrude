@@ -14,6 +14,23 @@ import Monterey from '../../../public/supported-os/macos-monterey.png';
 import Ventura from '../../../public/supported-os/macos-ventura.png';
 import Sonoma from '../../../public/supported-os/macos-sonoma.png';
 
+export const metadata = {
+  title: `Download | Gertrude Internet Filter and Parental Controls`,
+  description: `TODO: Add description`,
+  openGraph: {
+    title: `Download | Gertrude Internet Filter and Parental Controls`,
+    description: `TODO: Add description`,
+    images: [
+      {
+        url: `/og-images/main.jpg`,
+        width: 1200,
+        height: 630,
+        alt: `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`,
+      },
+    ],
+  },
+};
+
 const DownloadPage: NextPage = () => (
   <div className="flex justify-center items-center px-0 xs:px-6 sm:px-8 md:px-12 lg:px-20 py-20">
     <div className="flex flex-col xl:flex-row bg-white/90 rounded-3xl overflow-hidden">

@@ -1,7 +1,7 @@
 ---
 title: Five Things You Forgot When Locking Down your Kid's iPhone
 date: '2023-02-08T05:00:00.000Z'
-image: /five-things-og-image.jpg
+image: /og-images/five-things.jpg
 description:
   The five things you probably forgot when locking down your kid's iPhone... and the
   bizarrely unintuitive steps it takes to fix them.

@@ -4,10 +4,8 @@
   command = """
   cd ../../ && \
 	pnpm --filter site build && \
-  pnpm --filter site export && \
   cp site/_redirects site/out
   """
-
 
 [[redirects]]
   from = "/support" # in case i entered the url wrong somewhere...

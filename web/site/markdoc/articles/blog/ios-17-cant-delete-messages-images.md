@@ -1,7 +1,7 @@
 ---
 title: In iOS 17 Parents Can't Delete `#images` GIF search iMessage App
 date: '2023-09-19T04:00:00.000Z'
-image: /gif-images-og-image.jpg
+image: /og-images/gif-images.jpg
 description:
   'Sadly, iOS 17 removes a vital parental control: the ability for parents to disable
   animated GIF searching through the #images iMessage app. This exposes children to

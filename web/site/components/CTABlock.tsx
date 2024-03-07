@@ -16,6 +16,8 @@ const CTABlock: React.FC = () => (
           type="link"
           href="https://parents.gertrude.app/signup"
           Icon={RocketIcon}
+          color="primary"
+          size="lg"
         >
           Start free trial
         </FancyLink>
@@ -23,8 +25,8 @@ const CTABlock: React.FC = () => (
           type="link"
           href="https://parents.gertrude.app/signup"
           Icon={RouteIcon}
-          color="secondary"
           inverted
+          size="lg"
         >
           Step-by-step guide
         </FancyLink>
