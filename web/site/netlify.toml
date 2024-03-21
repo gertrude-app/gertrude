@@ -1,10 +1,8 @@
 [build]
-  publish = "out/"
   ignore = "false"
   command = """
-  cd ../../ && \
-	pnpm --filter site build && \
-  cp site/_redirects site/out
+  cd ../ && \
+	pnpm --filter site build
   """
 
 [[redirects]]
@@ -13,7 +11,7 @@
   status = 200
 
 [build.environment]
-  NODE_VERSION = "16.17.1"
+  NODE_VERSION = "18.19.0"
 
 [[headers]]
   for = "/*"

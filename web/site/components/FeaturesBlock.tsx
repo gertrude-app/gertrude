@@ -121,8 +121,8 @@ interface FeatureProps {
   description: string;
   step: number;
   currentStep: number;
-  gif: StaticImageData;
-  png: StaticImageData;
+  gif: StaticImageData | string;
+  png: StaticImageData | string;
   duration: number; // milliseconds
   highlightTime: number; // milliseconds
 }
