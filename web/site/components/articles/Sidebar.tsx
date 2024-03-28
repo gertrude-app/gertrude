@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
 import { DotIcon } from 'lucide-react';
-import cx from 'classnames';
-import { Logo } from '@shared/components';
 import { usePathname } from 'next/navigation';
 import FancyLink from 'components/FancyLink';
+import React from 'react';
+import Link from 'next/link';
+import cx from 'classnames';
+import { Logo } from '@shared/components';
 
 interface Props {
   open: boolean;

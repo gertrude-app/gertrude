@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
-import cx from 'classnames';
 import { usePathname } from 'next/navigation';
+import cx from 'classnames';
+import React from 'react';
 import MainHeader from '../../components/MainHeader';
 import MainFooter from '../../components/MainFooter';
 

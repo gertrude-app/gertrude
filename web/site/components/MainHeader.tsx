@@ -2,8 +2,8 @@ import React from 'react';
 import cx from 'classnames';
 import Link from 'next/link';
 import { Logo } from '@shared/components';
-import FancyLink from './FancyLink';
 import MobileLoginDropdown from './MobileLoginDropdown';
+import FancyLink from './FancyLink';
 
 const MainHeader: React.FC<{ theme: 'violet' | 'white' }> = ({ theme }) => (
   <header

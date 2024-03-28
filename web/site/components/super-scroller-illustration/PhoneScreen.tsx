@@ -1,7 +1,7 @@
+import { ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react';
 import React from 'react';
 import cx from 'classnames';
 import { Logo } from '@shared/components';
-import { ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react';
 import ComputerScreen from './ComputerScreen';
 
 interface PhoneScreenProps {

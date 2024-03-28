@@ -1,7 +1,7 @@
 'use client'; // delicious donut component https://frontendatscale.com/blog/donut-components/
 
-import React, { useState } from 'react';
 import { MenuIcon } from 'lucide-react';
+import React, { useState } from 'react';
 import cx from 'classnames';
 import Sidebar from '../../components/articles/Sidebar';
 

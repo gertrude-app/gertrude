@@ -1,5 +1,5 @@
-import { Logo } from '@shared/components';
 import { GithubIcon, YoutubeIcon } from 'lucide-react';
+import { Logo } from '@shared/components';
 import Link from 'next/link';
 import React from 'react';
 

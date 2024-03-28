@@ -1,6 +1,6 @@
+import ContactForm from 'components/ContactForm';
 import React from 'react';
 import { Logo } from '@shared/components';
-import ContactForm from 'components/ContactForm';
 import type { NextPage } from 'next';
 
 export const metadata = {

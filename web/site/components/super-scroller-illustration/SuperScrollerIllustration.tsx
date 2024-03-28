@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import cx from 'classnames';
 import { Logo } from '@shared/components';
+import cx from 'classnames';
+import React, { useEffect, useState } from 'react';
 import { compareTo, initializeStep, type Step } from './utils';
 import Computer from './Computer';
 import ComputerScreen from './ComputerScreen';
