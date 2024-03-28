@@ -1,7 +1,0 @@
-[build]
-  publish = "storybook-static/"
-  command = "pnpm build"
-  ignore = "false"
-
-[build.environment]
-  NODE_VERSION = "16.17.1"

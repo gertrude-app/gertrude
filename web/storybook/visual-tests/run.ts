@@ -6,14 +6,16 @@ import type { StoryData } from './extract-screenshot-test';
 import { extractScreenshotTest } from './extract-screenshot-test';
 
 async function main(): Promise<void> {
-  const STORIES_JSON_PATH = `../storybook-static/stories.json`;
+  const STORIES_JSON_PATH = `../storybook-static/index.json`;
   if (!existsSync(STORIES_JSON_PATH)) {
-    throw new Error(`No stories.json file found. Did you run \`make build-storybook\`?`);
+    throw new Error(
+      `No build/index.json file found. Did you run \`just build-storybook\`?`,
+    );
   }
 
   const json = readFileSync(STORIES_JSON_PATH, `utf-8`);
   const storybook = JSON.parse(json);
-  const allStories: StoryData[] = Object.values(storybook.stories);
+  const allStories: StoryData[] = Object.values(storybook.entries);
 
   const tests = allStories
     .map((story) => [readFileSync(`../${story.importPath}`, `utf-8`), story] as const)
@@ -72,6 +74,7 @@ async function main(): Promise<void> {
             document.querySelector(`.sb-errordisplay`)?.textContent ??
             document.body.textContent,
         );
+        console.error(`error:`, error); // eslint-disable-line no-console
         console.error(errorText); // eslint-disable-line no-console
         process.exit(1);
       }

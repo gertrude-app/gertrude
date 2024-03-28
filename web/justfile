@@ -45,8 +45,6 @@ appviews isolate="":
 
 build-site:
 	@pnpm --filter site build
-	@pnpm --filter site export
-	@cp site/_redirects site/out
 
 build-storybook:
 	@pnpm --filter @storybook/app build

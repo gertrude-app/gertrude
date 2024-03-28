@@ -28,7 +28,7 @@ jobs:
       - name: install deps
         run: pnpm install
       - name: setup just
-        uses: extractions/setup-just@v1
+        uses: extractions/setup-just@v2
       - name: lint
         run: just lint
       - name: format
@@ -64,7 +64,7 @@ jobs:
       - name: install deps
         run: pnpm install
       - name: setup just
-        uses: extractions/setup-just@v1
+        uses: extractions/setup-just@v2
       - name: build storybook
         run: STORYBOOK_SCREENSHOT_TESTING=true just build-storybook
       - name: serve storybook
@@ -118,7 +118,7 @@ jobs:
       - name: install deps
         run: pnpm install
       - name: setup just
-        uses: extractions/setup-just@v1
+        uses: extractions/setup-just@v2
       - name: build dashboard
         run: just build-dash
       - name: cypress
@@ -153,6 +153,6 @@ jobs:
       - name: install deps
         run: pnpm install
       - name: setup just
-        uses: extractions/setup-just@v1
+        uses: extractions/setup-just@v2
       - name: build site
         run: just build-site
