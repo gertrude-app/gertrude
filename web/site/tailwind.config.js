@@ -11,7 +11,7 @@ module.exports = {
     `./app/**/*.tsx`,
     `./components/**/*.tsx`,
     `../components/**/*.tsx`,
-    `../../shared/components/**/*.tsx`,
+    `../shared/components/**/*.tsx`,
   ],
   theme: {
     extend: {

@@ -25,8 +25,18 @@ const MainFooter: React.FC = () => (
         </ul>
       </div>
     </div>
-    <div className="flex justify-between items-end">
-      <p className="text-white/70">© {new Date().getFullYear()} NetRivet Inc.</p>
+    <div className="flex flex-col xs:flex-row justify-between items-center xs:items-end gap-8">
+      <span className="text-white/70">© {new Date().getFullYear()} NetRivet Inc.</span>
+      <span className="text-white/70">
+        <span className="text-white">❤️</span> OSS •{' '}
+        <Link href="https://github.com/jaredh159/gertrude-web" className="underline">
+          Web
+        </Link>{' '}
+        •{' '}
+        <Link href="https://github.com/gertrude-app/swift" className="underline">
+          Swift
+        </Link>
+      </span>
       <div className="flex items-center gap-4 self-center">
         <Link
           href="https://www.youtube.com/@gertrudeapp"
