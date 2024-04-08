@@ -21,6 +21,10 @@ const navigation = [
         href: `/docs/five-things-you-forgot-when-locking-down-your-kids-iphone`,
       },
       {
+        title: `How much of the internet is Porn?`,
+        href: `/blog/how-much-of-the-internet-is-porn`,
+      },
+      {
         title: `Mac internet filtering/blocking`,
         href: `/docs/mac-internet-filter`,
       },
