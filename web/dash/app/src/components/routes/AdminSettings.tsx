@@ -4,6 +4,7 @@ import { ApiErrorMessage, Loading, Settings } from '@dash/components';
 import { capitalize } from '@shared/string';
 import { notNullish, typesafe } from '@shared/ts-utils';
 import { Result } from '@dash/types';
+import { parseE164 } from '@dash/utils';
 import type { VerifiedNotificationMethod } from '@dash/types';
 import type { State } from '../../reducers/admin-reducer';
 import { isDirty, Req } from '../../lib/helpers';
@@ -45,8 +46,14 @@ const AdminSettings: React.FC = () => {
 
   const createPendingNotificationMethod = useMutation(
     () => {
-      const method = state.pendingNotificationMethod;
+      let method = state.pendingNotificationMethod;
       if (!method) return Result.resolveUnexpected(`bc7511bb`);
+      if (method.case === `text`) {
+        const e164 = parseE164(method.phoneNumber);
+        if (!e164) return Result.resolveUnexpected(`707f8ce1`);
+        method = structuredClone(method);
+        method.phoneNumber = e164;
+      }
       dispatch(PendingMethod.createStarted);
       return Current.api.createPendingNotificationMethod(method);
     },

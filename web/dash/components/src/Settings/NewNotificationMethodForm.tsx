@@ -1,5 +1,6 @@
 import React from 'react';
 import { TextInput, Button, SelectMenu } from '@shared/components';
+import { parseE164 } from '@dash/utils';
 import type {
   PendingNotificationMethod,
   NewAdminNotificationMethodEvent as Event,
@@ -152,11 +153,7 @@ function methodValid(props: CreatePendingNotificationMethod.Input): boolean {
     case `email`:
       return props.email?.match(/^.+@.+$/) !== null;
     case `text`:
-      return (
-        props.phoneNumber !== undefined &&
-        props.phoneNumber.match(/\d{4}/) !== null &&
-        props.phoneNumber.match(/^(\d|\(|\)| |-|\+)+$/) !== null
-      );
+      return parseE164(props.phoneNumber) !== null;
     case `slack`:
       return (
         props.token?.startsWith(`xoxb-`) &&
