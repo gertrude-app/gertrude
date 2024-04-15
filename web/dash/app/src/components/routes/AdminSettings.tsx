@@ -4,7 +4,7 @@ import { ApiErrorMessage, Loading, Settings } from '@dash/components';
 import { capitalize } from '@shared/string';
 import { notNullish, typesafe } from '@shared/ts-utils';
 import { Result } from '@dash/types';
-import { parseE164 } from '@dash/utils';
+import { parseE164, prettyE164 } from '@dash/utils';
 import type { VerifiedNotificationMethod } from '@dash/types';
 import type { State } from '../../reducers/admin-reducer';
 import { isDirty, Req } from '../../lib/helpers';
@@ -138,11 +138,7 @@ function methodPrimaryValue(method: VerifiedNotificationMethod): string {
     case `slack`:
       return `#` + method.config.channelName.replace(/^#/, ``);
     case `text`: {
-      const number = method.config.phoneNumber;
-      if (number.match(/^\d{10}$/)) {
-        return `(${number.slice(0, 3)}) ${number.slice(3, 6)}-${number.slice(6, 10)}`;
-      }
-      return number;
+      return prettyE164(method.config.phoneNumber);
     }
   }
 }
