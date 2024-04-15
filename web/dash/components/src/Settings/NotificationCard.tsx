@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import cx from 'classnames';
+import { prettyE164 } from '@dash/utils';
 import { Button, SelectMenu } from '@shared/components';
 import { capitalize } from '@shared/string';
 import type { AdminNotificationTrigger, VerifiedNotificationMethod } from '@dash/types';
@@ -158,7 +159,7 @@ function methodTarget(method: VerifiedNotificationMethod): string {
     case `email`:
       return method.config.email;
     case `text`:
-      return method.config.phoneNumber;
+      return prettyE164(method.config.phoneNumber);
     case `slack`:
       return method.config.channelName;
   }

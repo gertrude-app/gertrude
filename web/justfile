@@ -26,16 +26,17 @@ component *args:
 # utility
 
 clean:
-	@rm -rf appviews/node_modules/.vite
-	@rm -rf dash/app/node_modules/.vite
-	@rm -rf storybook/node_modules/.cache/storybook
-	@rm -rf node_modules/.cache/nx
-	@rm -rf site/app/.next
-	@rm -rf site/app/out
-	@rm -rf dash/app/build
+  @rm -rf site/app/.next
+  @rm -rf site/app/out
+  @rm -rf dash/app/build
+  @find . -name "node_modules" -type d -prune -exec rm -rf {} + && pnpm i
 
 codegen:
 	@cd dash/app && node ./scripts/codegen.js
+
+nuke-node-modules:
+  @pnpm store prune
+  @find . -name "node_modules" -type d -prune -exec rm -rf {} + && pnpm i
 
 # build & deploy
 
