@@ -20,3 +20,7 @@
 /su-b https://youtu.be/jhufHnF6nEI 302 # swith to non-admin, monterey or earlier
 /su-c https://youtu.be/jhufHnF6nEI 302 # swith to non-admin, monterey or earlier
 /a-c https://parents.gertrude.app/children 302
+
+# inch conf redirects
+/inch https://parents.gertrude.app/conf-booth 302
+/workshop https://parents.gertrude.app/conf-workshop 302

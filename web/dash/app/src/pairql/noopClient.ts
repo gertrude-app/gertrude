@@ -123,9 +123,6 @@ const noopClient: ApiClient = {
   handleCheckoutSuccess: async () => {
     return Result.success({ success: true });
   },
-  hollandTalkSubscription: async () => {
-    return Result.success({ success: true });
-  },
   userActivityFeed: async () => {
     return Result.success({
       numDeleted: 0,
@@ -175,6 +172,9 @@ const noopClient: ApiClient = {
     return Result.success({ success: true });
   },
   resetPassword: async () => {
+    return Result.success({ success: true });
+  },
+  saveConferenceEmail: async () => {
     return Result.success({ success: true });
   },
   saveKey: async () => {
