@@ -207,16 +207,6 @@ export const liveClient = {
     );
   },
 
-  hollandTalkSubscription(
-    input: T.HollandTalkSubscription.Input,
-  ): Promise<T.Result<T.HollandTalkSubscription.Output>> {
-    return query<T.HollandTalkSubscription.Input, T.HollandTalkSubscription.Output>(
-      input,
-      `none`,
-      `HollandTalkSubscription`,
-    );
-  },
-
   latestAppVersions(
     input: T.LatestAppVersions.Input,
   ): Promise<T.Result<T.LatestAppVersions.Output>> {
@@ -260,6 +250,16 @@ export const liveClient = {
       input,
       `none`,
       `ResetPassword`,
+    );
+  },
+
+  saveConferenceEmail(
+    input: T.SaveConferenceEmail.Input,
+  ): Promise<T.Result<T.SaveConferenceEmail.Output>> {
+    return query<T.SaveConferenceEmail.Input, T.SaveConferenceEmail.Output>(
+      input,
+      `none`,
+      `SaveConferenceEmail`,
     );
   },
 
@@ -427,9 +427,6 @@ export const throwingClient: ApiClient = {
   handleCheckoutSuccess: () => {
     throw new Error(`ApiClient.handleCheckoutSuccess() not implemented`);
   },
-  hollandTalkSubscription: () => {
-    throw new Error(`ApiClient.hollandTalkSubscription() not implemented`);
-  },
   latestAppVersions: () => {
     throw new Error(`ApiClient.latestAppVersions() not implemented`);
   },
@@ -447,6 +444,9 @@ export const throwingClient: ApiClient = {
   },
   resetPassword: () => {
     throw new Error(`ApiClient.resetPassword() not implemented`);
+  },
+  saveConferenceEmail: () => {
+    throw new Error(`ApiClient.saveConferenceEmail() not implemented`);
   },
   saveDevice: () => {
     throw new Error(`ApiClient.saveDevice() not implemented`);

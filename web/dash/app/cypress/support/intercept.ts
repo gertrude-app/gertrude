@@ -80,10 +80,6 @@ export function interceptPql(
   output: T.HandleCheckoutSuccess.Output,
 ): void;
 export function interceptPql(
-  slug: `HollandTalkSubscription`,
-  output: T.HollandTalkSubscription.Output,
-): void;
-export function interceptPql(
   slug: `LatestAppVersions`,
   output: T.LatestAppVersions.Output,
 ): void;
@@ -98,6 +94,10 @@ export function interceptPql(
   output: T.RequestMagicLink.Output,
 ): void;
 export function interceptPql(slug: `ResetPassword`, output: T.ResetPassword.Output): void;
+export function interceptPql(
+  slug: `SaveConferenceEmail`,
+  output: T.SaveConferenceEmail.Output,
+): void;
 export function interceptPql(slug: `SaveDevice`, output: T.SaveDevice.Output): void;
 export function interceptPql(slug: `SaveKey`, output: T.SaveKey.Output): void;
 export function interceptPql(slug: `SaveKeychain`, output: T.SaveKeychain.Output): void;
@@ -161,13 +161,13 @@ export function forcePqlErr(
     | 'GetUserUnlockRequests'
     | 'HandleCheckoutCancel'
     | 'HandleCheckoutSuccess'
-    | 'HollandTalkSubscription'
     | 'LatestAppVersions'
     | 'LogEvent'
     | 'Login'
     | 'LoginMagicLink'
     | 'RequestMagicLink'
     | 'ResetPassword'
+    | 'SaveConferenceEmail'
     | 'SaveDevice'
     | 'SaveKey'
     | 'SaveKeychain'
