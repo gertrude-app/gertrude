@@ -97,7 +97,7 @@ const FancyLink: React.FC<FancyLinkProps> = (props) => {
           />
         )}
         <span
-          className={cx(`font-semibold`, {
+          className={cx(`font-semibold leading-6`, {
             'bg-gradient-to-r from-violet-600 to-fuchsia-500 bg-clip-text text-transparent':
               (!props.inverted && color === `secondary`) ||
               (props.inverted && color === `primary`),

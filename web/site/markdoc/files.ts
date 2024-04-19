@@ -52,8 +52,8 @@ export async function getArticleSlugs(category: 'docs' | 'blog'): Promise<string
   return filePaths.map((p) => path.basename(p, `.md`));
 }
 
-// if type === 'docs', you get a DocsArticle, if type === 'blog', you get a BlogArticle
-export async function getArticle<T extends 'docs' | 'blog'>(
+// if type === 'docs', you get a `DocsArticle`, if type === 'blog', you get a `BlogArticle`
+export async function getArticle<T extends ArticleType>(
   slug: string,
   type: T,
 ): Promise<ArticleOfType<T>> {

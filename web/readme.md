@@ -3,7 +3,7 @@
 ## Apps
 
 - `dash/app` - web admin dashboard (vite SPA)
-- `@site/app` - main site: marketing and docs (next.js app)
+- `site` - main site: marketing and docs (next.js app)
 - `storybook` - storybook for all react components
 
 ## Packages

@@ -76,7 +76,13 @@ const ContactForm: React.FC = () => {
       </div>
       <div></div>
       {state === `idle` && (
-        <FancyLink type="submit" className="self-end mt-8" Icon={SendIcon}>
+        <FancyLink
+          type="submit"
+          className="self-end mt-8"
+          Icon={SendIcon}
+          color="primary"
+          size="lg"
+        >
           Submit
         </FancyLink>
       )}

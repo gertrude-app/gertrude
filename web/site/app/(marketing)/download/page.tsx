@@ -45,6 +45,8 @@ const DownloadPage: NextPage = () => (
           <Link href="https://gertrude.app/start">clicking here.</Link>
         </p>
         <FancyLink
+          size="lg"
+          color="primary"
           type="link"
           href="https://gertrude.nyc3.digitaloceanspaces.com/releases/Gertrude.dmg"
           Icon={DownloadIcon}

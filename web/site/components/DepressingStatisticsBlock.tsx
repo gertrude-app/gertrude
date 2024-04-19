@@ -150,15 +150,18 @@ const TotalWebsitesCounter: React.FC = () => {
                 ? digit
                 : new Array(10).fill(0).map((_, i) => (
                     <div
-                      className={cx(`absolute transition-[top,opacity] duration-300`, {
-                        'left-0 top-0': i === Number(digit),
-                        'left-0 -top-24 opacity-0':
-                          i === Number(digit) + 1 || (i === 0 && Number(digit) === 9),
-                        'left-0 top-24 opacity-0':
-                          i !== Number(digit) &&
-                          i !== Number(digit) + 1 &&
-                          (i !== 0 || Number(digit) !== 9),
-                      })}
+                      className={cx(
+                        `absolute transition-[top,opacity,filter] duration-300`,
+                        {
+                          'left-0 top-0': i === Number(digit),
+                          'left-0 -top-24 opacity-0 blur-sm':
+                            i === Number(digit) + 1 || (i === 0 && Number(digit) === 9),
+                          'left-0 top-24 opacity-0 blur-sm':
+                            i !== Number(digit) &&
+                            i !== Number(digit) + 1 &&
+                            (i !== 0 || Number(digit) !== 9),
+                        },
+                      )}
                       key={i}
                     >
                       {i}

@@ -28,11 +28,15 @@ const MainFooter: React.FC = () => (
     <div className="flex flex-col xs:flex-row justify-between items-center xs:items-end gap-8">
       <span className="text-white/70">© {new Date().getFullYear()} NetRivet Inc.</span>
       <span className="text-white/70">
-        <span className="text-white">❤️</span> OSS •{' '}
+        <span className="text-white" role="img" aria-label="heart emoji">
+          ❤️
+        </span>
+        {` `}
+        OSS •{` `}
         <Link href="https://github.com/jaredh159/gertrude-web" className="underline">
           Web
-        </Link>{' '}
-        •{' '}
+        </Link>
+        {` `}•{` `}
         <Link href="https://github.com/gertrude-app/swift" className="underline">
           Swift
         </Link>

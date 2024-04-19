@@ -48,7 +48,7 @@ const FeaturesBlock: React.FC = () => {
 
   return (
     <section className="relative">
-      <div className="w-screen h-screen sticky top-0 flex flex-col justify-center items-center bg-white [perspective:1000px] overflow-hidden">
+      <div className="w-full h-screen sticky top-0 flex flex-col justify-center items-center bg-white [perspective:1000px] overflow-hidden">
         <div className="flex-grow" />
         <Image src={Waves} alt="Waves" className="w-full" />
         <div className="flex-grow-[3] bg-gradient-to-b from-violet-300 to-violet-100 self-stretch" />

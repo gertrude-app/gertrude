@@ -68,7 +68,7 @@ const Blog: NextPage = async () => {
                   <Link
                     href={`/blog/${article.slug}`}
                     className={cx(
-                      `w-screen xs:w-auto md:w-152 mb-10 p-3 -m-3 rounded-xl transition-colors duration-200 flex flex-col items-start`,
+                      `w-auto md:w-152 mb-10 p-3 -m-3 rounded-xl transition-colors duration-200 flex flex-col items-start`,
                       article.category === `engineering`
                         ? `hover:bg-fuchsia-50`
                         : `hover:bg-violet-50`,

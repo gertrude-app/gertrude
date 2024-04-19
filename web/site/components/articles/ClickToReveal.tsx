@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronRightIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import cx from 'classnames';
 
@@ -20,10 +20,10 @@ const ClickToReveal: React.FC<Props> = ({ title, children }) => {
         <span className="text-xl font-semibold bg-gradient-to-r from-violet-700 to-fuchsia-600 bg-clip-text text-transparent">
           {title}
         </span>
-        <ChevronDownIcon
+        <ChevronRightIcon
           className={cx(
             `text-slate-400 transition-transform duration-200`,
-            revealed ? `-rotate-180` : `rotate-0`,
+            revealed ? `rotate-90` : `rotate-0`,
           )}
         />
       </button>

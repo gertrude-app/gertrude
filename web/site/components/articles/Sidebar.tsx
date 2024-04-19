@@ -20,7 +20,7 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
       open ? `ml-0` : `-ml-96 lg:ml-0`,
     )}
   >
-    <div className="bg-white rounded-3xl lg:rounded-r-none p-4 overflow-scroll py-8 shadow-lg lg:shadow-none flex-grow flex flex-col justify-between">
+    <div className="bg-white rounded-3xl lg:rounded-r-none p-4 py-8 shadow-lg lg:shadow-none flex-grow flex flex-col justify-between">
       <div>
         <Link href="/">
           <Logo className="ml-4" />
