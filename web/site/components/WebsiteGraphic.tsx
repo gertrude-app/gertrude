@@ -1,6 +1,6 @@
-import { BanIcon, CheckIcon } from 'lucide-react';
 import React from 'react';
 import cx from 'classnames';
+import { BanIcon, CheckIcon } from 'lucide-react';
 
 interface Props {
   variant: 1 | 2 | 3;

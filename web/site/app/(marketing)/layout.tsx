@@ -8,9 +8,7 @@ import MainFooter from '../../components/MainFooter';
 
 const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const path = usePathname();
-
   const theme = path.includes(`blog`) ? `white` : `violet`;
-
   return (
     <html>
       <body

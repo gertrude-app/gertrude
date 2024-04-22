@@ -1,6 +1,6 @@
-import { ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react';
 import React from 'react';
 import cx from 'classnames';
+import { ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react';
 import { Logo } from '@shared/components';
 import ComputerScreen from './ComputerScreen';
 

@@ -1,7 +1,7 @@
-import ContactForm from 'components/ContactForm';
 import React from 'react';
 import { Logo } from '@shared/components';
 import type { NextPage } from 'next';
+import ContactForm from '../../../components/ContactForm';
 
 export const metadata = {
   title: `Contact | Gertrude Internet Filter and Parental Controls`,

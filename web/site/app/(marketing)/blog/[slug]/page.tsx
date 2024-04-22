@@ -1,13 +1,13 @@
 import path from 'path';
-import { getArticle, getArticlePaths } from 'markdoc/files';
+import React from 'react';
 import { ChevronLeftIcon } from 'lucide-react';
 import Link from 'next/link';
 import cx from 'classnames';
 import Markdoc from '@markdoc/markdoc';
-import React from 'react';
 import type { Metadata, NextPage } from 'next';
-import Prose from '../../../../components/articles/Prose';
+import { getArticle, getArticlePaths } from '../../../../markdoc/files';
 import { components } from '../../../../markdoc/config';
+import Prose from '../../../../components/articles/Prose';
 
 type Params = {
   slug: string;

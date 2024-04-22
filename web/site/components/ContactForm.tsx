@@ -1,8 +1,8 @@
 'use client';
 
-import { CheckIcon, Loader2Icon, SendIcon, XIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import cx from 'classnames';
+import { CheckIcon, Loader2Icon, SendIcon, XIcon } from 'lucide-react';
 import FancyLink from './FancyLink';
 
 const ContactForm: React.FC = () => {

@@ -1,8 +1,8 @@
 'use client';
 
-import { ChevronDownIcon } from 'lucide-react';
 import React from 'react';
 import cx from 'classnames';
+import { ChevronDownIcon } from 'lucide-react';
 import { useScrollY } from '../lib/hooks';
 
 const HeroBlock: React.FC = () => {

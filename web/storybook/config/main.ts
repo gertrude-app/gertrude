@@ -5,7 +5,6 @@ const config: StorybookConfig = {
   stories: [`../stories/**/*.stories.tsx`],
   addons: [`@storybook/addon-essentials`],
   framework: `@storybook/nextjs`,
-  typescript: { reactDocgen: false },
   staticDirs: [`../../dash/app/public`],
   webpackFinal: async (config) => {
     if (config.resolve) {

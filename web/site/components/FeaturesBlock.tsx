@@ -213,6 +213,7 @@ const Feature: React.FC<FeatureProps> = ({
                 />
                 <Image
                   src={gif}
+                  unoptimized
                   alt=""
                   className="w-full h-full object-center object-cover relative"
                   priority

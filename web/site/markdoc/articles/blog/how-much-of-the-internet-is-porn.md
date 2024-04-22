@@ -1,6 +1,7 @@
 ---
 title: 'How Much of the Internet is Porn? A Detective Story'
 date: '2024-04-08T20:28:22.670Z'
+image: /og-images/wicked.png
 description:
   'In February of 2024, I randomly sampled an exhaustive list of over 167 million .com
   registrable domains using a custom-built Rust app which used a combination of manual

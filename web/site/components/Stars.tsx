@@ -1,5 +1,5 @@
-import seedrandom from 'seedrandom';
 import React from 'react';
+import seedrandom from 'seedrandom';
 
 const rng = seedrandom(`moooooooooo`); // add or remove o's to change the star pattern
 

@@ -46,95 +46,30 @@ const Computer: React.FC<ComputerProps> = ({ children, className, labelStatus })
       {children}
     </div>
     <div className="w-[592px] h-96 bg-gradient-to-b from-slate-700 to-slate-600 [transform:rotateX(80deg)] absolute -left-[40px] top-[255px] flex flex-col p-8 pb-4 gap-1">
-      <div className="flex justify-center gap-1">
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-      </div>
+      <div className="flex justify-center gap-1">{keys(14)}</div>
       <div className="flex justify-center gap-1">
         <Key grow />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
+        {keys(12)}
         <Key grow />
       </div>
       <div className="flex justify-center gap-1">
         <Key grow />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
+        {keys(13)}
       </div>
       <div className="flex justify-center gap-1">
         <Key grow />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
+        {keys(11)}
         <Key grow />
       </div>
       <div className="flex justify-center gap-1">
         <Key grow />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
+        {keys(10)}
         <Key grow />
       </div>
       <div className="flex justify-center gap-1">
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
+        {keys(5)}
         <Key grow />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
-        <Key />
+        {keys(5)}
       </div>
       <div className="w-40 h-28 rounded-lg bg-slate-500 self-center mt-4" />
     </div>
@@ -150,5 +85,9 @@ const Key: React.FC<{ className?: string; grow?: boolean }> = ({ className, grow
     }}
   />
 );
+
+function keys(count: number): React.ReactNode[] {
+  return Array.from({ length: count }, (_, i) => <Key key={i} />);
+}
 
 export default Computer;

@@ -1,9 +1,9 @@
-'use client'; // delicious donut component https://frontendatscale.com/blog/donut-components/
+'use client';
 
-import { MenuIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import cx from 'classnames';
-import Sidebar from 'components/articles/Sidebar';
+import { MenuIcon } from 'lucide-react';
+import Sidebar from '../../../components/articles/Sidebar';
 
 const DocsLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

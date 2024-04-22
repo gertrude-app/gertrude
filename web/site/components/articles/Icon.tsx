@@ -1,5 +1,5 @@
-import cx from 'classnames';
 import { useId } from 'react';
+import cx from 'classnames';
 import PluginsIcon from './icons/PluginsIcon';
 import PresetsIcon from './icons/PresetsIcon';
 import WarningIcon from './icons/WarningIcon';

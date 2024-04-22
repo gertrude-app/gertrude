@@ -1,7 +1,7 @@
-import { GithubIcon, YoutubeIcon } from 'lucide-react';
-import { Logo } from '@shared/components';
-import Link from 'next/link';
 import React from 'react';
+import { GithubIcon, YoutubeIcon } from 'lucide-react';
+import Link from 'next/link';
+import { Logo } from '@shared/components';
 
 const MainFooter: React.FC = () => (
   <footer className="px-8 sm:px-12 lg:px-20 pt-20 pb-8 gap-20 relative border-t border-violet-400 flex flex-col bg-violet-500">

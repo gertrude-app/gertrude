@@ -1,9 +1,9 @@
 import path from 'path';
-import { getArticle, getArticlePaths } from 'markdoc/files';
 import React from 'react';
 import Markdoc from '@markdoc/markdoc';
 import type { Metadata, NextPage } from 'next';
 import { components } from '../../../markdoc/config';
+import { getArticle, getArticlePaths } from '../../../markdoc/files';
 import Prose from '../../../components/articles/Prose';
 
 type Params = {

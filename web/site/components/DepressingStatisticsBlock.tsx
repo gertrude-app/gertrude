@@ -129,6 +129,7 @@ const TotalWebsitesCounter: React.FC = () => {
   useInterval(() => {
     setTotalWebsites(totalWebsites + 1);
   }, 333);
+
   return (
     <div className="text-white text-5xl xs:text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-mono font-bold flex overflow-hidden">
       {totalWebsites

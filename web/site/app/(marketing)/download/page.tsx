@@ -1,8 +1,8 @@
 import { ArrowDownIcon, DownloadIcon } from 'lucide-react';
-import { AppIcon } from '@shared/components';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import { AppIcon } from '@shared/components';
 import type { NextPage } from 'next';
 import type { StaticImageData } from 'next/image';
 import FancyLink from '../../../components/FancyLink';

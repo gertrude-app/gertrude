@@ -11,7 +11,11 @@ const WickedProjectOgImage: React.FC = () => (
       </span>
       <span className="text-5xl text-white/50 italic mt-32">A detective story</span>
     </div>
-    <img src={Ferris.src} className="w-128 absolute right-20 bottom-12 -rotate-6" />
+    <img
+      src={Ferris.src}
+      className="w-128 absolute right-20 bottom-12 -rotate-6"
+      alt="ferris detective"
+    />
     <div className="absolute right-[170px] bottom-[170px] flex rotate-[-6deg]">
       <div className="rounded-b-[100px] rounded-tl-2xl bg-black w-40 h-24 px-6 py-3">
         <div className="w-12 h-4 bg-white rounded-lg" />

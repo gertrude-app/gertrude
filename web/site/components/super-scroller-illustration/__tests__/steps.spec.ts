@@ -13,7 +13,7 @@ describe(`parseStep()`, () => {
 });
 
 describe(`compareTo()`, () => {
-  it(`returns true if the step is before the comparison`, () => {
+  it(`returns true if the step is before the comparison, false if after`, () => {
     const hasHappened = compareTo(`2-1_openMac`);
     expect(hasHappened(`1-0_start`)).toBe(true);
     expect(hasHappened(`1-1_openLoginScreen`)).toBe(true);
