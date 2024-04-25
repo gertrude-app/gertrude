@@ -1,5 +1,5 @@
-import FancyLink from 'components/FancyLink';
 import React from 'react';
+import FancyLink from '@/components/FancyLink';
 
 interface Props {
   name: string;

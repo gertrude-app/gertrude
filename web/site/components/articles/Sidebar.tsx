@@ -6,7 +6,7 @@ import { DotIcon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Logo } from '@shared/components';
-import FancyLink from '../../components/FancyLink';
+import FancyLink from '@/components/FancyLink';
 
 interface Props {
   open: boolean;

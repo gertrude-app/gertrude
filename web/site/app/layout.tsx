@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import '../styles/globals.css';
+import '@/styles/globals.css';
 
 const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(storeGoogleClickId, []);

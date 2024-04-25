@@ -5,9 +5,9 @@ import Link from 'next/link';
 import cx from 'classnames';
 import Markdoc from '@markdoc/markdoc';
 import type { Metadata, NextPage } from 'next';
-import { getArticle, getArticlePaths } from '../../../../markdoc/files';
-import { components } from '../../../../markdoc/config';
-import Prose from '../../../../components/articles/Prose';
+import { getArticle, getArticlePaths } from '@/markdoc/files';
+import { components } from '@/markdoc/config';
+import Prose from '@/components/articles/Prose';
 
 type Params = {
   slug: string;

@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
-import { useIntersectionObserver } from '../lib/hooks';
 import SuperScrollerIllustration from './super-scroller-illustration/SuperScrollerIllustration';
+import { useIntersectionObserver } from '@/lib/hooks';
 
 const SuperScrollerBlock: React.FC = () => {
   const { ref: firstStepRef, intersected: firstStepIntersected } =

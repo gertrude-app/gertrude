@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { Logo } from '@shared/components';
 import Link from 'next/link';
 import type { NextPage } from 'next';
-import { getArticle, getArticleSlugs } from '../../../markdoc/files';
+import { getArticle, getArticleSlugs } from '@/markdoc/files';
 
 export const metadata = {
   title: `Blog | Gertrude Internet Filter and Parental Controls`,

@@ -106,7 +106,6 @@ module.exports = {
       fontFamily: {
         inter: [`Inter`, ...defaultTheme.fontFamily.sans],
         lato: [`lato`, ...defaultTheme.fontFamily.sans],
-        signature: [`Qwitcher Grypen`, ...defaultTheme.fontFamily.sans],
         axiforma: [`Axiforma`, ...defaultTheme.fontFamily.sans],
       },
     },

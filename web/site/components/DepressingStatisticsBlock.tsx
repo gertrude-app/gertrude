@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import cx from 'classnames';
-import { useInterval } from '../lib/hooks';
 import Stars from './Stars';
+import { useInterval } from '@/lib/hooks';
 
 const REF_DATE = new Date(2022, 8, 12).getTime();
 

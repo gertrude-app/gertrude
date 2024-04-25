@@ -5,14 +5,14 @@ import React from 'react';
 import { AppIcon } from '@shared/components';
 import type { NextPage } from 'next';
 import type { StaticImageData } from 'next/image';
-import FancyLink from '../../../components/FancyLink';
-import Computer from '../../../components/super-scroller-illustration/Computer';
+import FancyLink from '@/components/FancyLink';
+import Computer from '@/components/super-scroller-illustration/Computer';
 
-import Catalina from '../../../public/supported-os/macos-catalina.png';
-import BigSur from '../../../public/supported-os/macos-big-sur.png';
-import Monterey from '../../../public/supported-os/macos-monterey.png';
-import Ventura from '../../../public/supported-os/macos-ventura.png';
-import Sonoma from '../../../public/supported-os/macos-sonoma.png';
+import Catalina from '@/public/supported-os/macos-catalina.png';
+import BigSur from '@/public/supported-os/macos-big-sur.png';
+import Monterey from '@/public/supported-os/macos-monterey.png';
+import Ventura from '@/public/supported-os/macos-ventura.png';
+import Sonoma from '@/public/supported-os/macos-sonoma.png';
 
 export const metadata = {
   title: `Download | Gertrude Internet Filter and Parental Controls`,

@@ -3,8 +3,8 @@
 import { usePathname } from 'next/navigation';
 import cx from 'classnames';
 import React from 'react';
-import MainHeader from '../../components/MainHeader';
-import MainFooter from '../../components/MainFooter';
+import MainHeader from '@/components/MainHeader';
+import MainFooter from '@/components/MainFooter';
 
 const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const path = usePathname();

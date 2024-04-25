@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import Image from 'next/image';
 import { BanIcon, DownloadIcon } from 'lucide-react';
-import AppleLogo from '../../public/apple-logo.png';
+import AppleLogo from '@/public/apple-logo.png';
 
 interface ComputerScreenProps {
   macOpened: boolean;
