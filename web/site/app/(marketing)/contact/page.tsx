@@ -2,23 +2,13 @@ import React from 'react';
 import { Logo } from '@shared/components';
 import type { NextPage } from 'next';
 import ContactForm from '@/components/ContactForm';
+import { createMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: `Contact | Gertrude Internet Filter and Parental Controls`,
-  description: `TODO: Add description`,
-  openGraph: {
-    title: `Contact | Gertrude Internet Filter and Parental Controls`,
-    description: `TODO: Add description`,
-    images: [
-      {
-        url: `/og-images/main.jpg`,
-        width: 1200,
-        height: 630,
-        alt: `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`,
-      },
-    ],
-  },
-};
+export const metadata = createMetadata(
+  `Contact | Gertrude Internet Filter and Parental Controls`,
+  `TODO: Add description`,
+  `/og-images/main.jpg`,
+);
 
 const ContactPage: NextPage = () => (
   <div className="flex justify-center items-center px-0 xs:px-8 py-8 sm:px-12 sm:py-12 md:px-20 md:py-20">

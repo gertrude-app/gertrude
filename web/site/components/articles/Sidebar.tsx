@@ -16,7 +16,7 @@ interface Props {
 const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
   <nav
     className={cx(
-      `w-80 flex pl-4 py-4 h-screen fixed lg:bg-gradient-to-r lg:from-violet-200 lg:to-white z-10 transition-[margin-left] duration-300`,
+      `w-80 flex pl-4 py-4 h-[100dvh] fixed lg:bg-gradient-to-r lg:from-violet-200 lg:to-white z-10 transition-[margin-left] duration-300`,
       open ? `ml-0` : `-ml-96 lg:ml-0`,
     )}
   >

@@ -8,23 +8,13 @@ import FeaturesBlock from '@/components/FeaturesBlock';
 import DefenseInDepthBlock from '@/components/DefenseInDepthBlock';
 import TestimonialsBlock from '@/components/TestimonialsBlock';
 import CTABlock from '@/components/CTABlock';
+import { createMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`,
-  description: `Protect your kids online with easy-to-use Mac internet filtering, internet blocking, and mac keylogging.`,
-  openGraph: {
-    title: `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`,
-    description: `Protect your kids online with easy-to-use Mac internet filtering, internet blocking, and mac keylogging.`,
-    images: [
-      {
-        url: `/og-images/main.jpg`,
-        width: 1200,
-        height: 630,
-        alt: `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`,
-      },
-    ],
-  },
-};
+export const metadata = createMetadata(
+  `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`,
+  `Protect your kids online with easy-to-use Mac internet filtering, internet blocking, and mac keylogging`,
+  `/og-images/main.jpg`,
+);
 
 const HomePage: NextPage = () => (
   <main>

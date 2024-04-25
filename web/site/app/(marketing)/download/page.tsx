@@ -7,6 +7,7 @@ import type { NextPage } from 'next';
 import type { StaticImageData } from 'next/image';
 import FancyLink from '@/components/FancyLink';
 import Computer from '@/components/super-scroller-illustration/Computer';
+import { createMetadata } from '@/lib/seo';
 
 import Catalina from '@/public/supported-os/macos-catalina.png';
 import BigSur from '@/public/supported-os/macos-big-sur.png';
@@ -14,22 +15,11 @@ import Monterey from '@/public/supported-os/macos-monterey.png';
 import Ventura from '@/public/supported-os/macos-ventura.png';
 import Sonoma from '@/public/supported-os/macos-sonoma.png';
 
-export const metadata = {
-  title: `Download | Gertrude Internet Filter and Parental Controls`,
-  description: `TODO: Add description`,
-  openGraph: {
-    title: `Download | Gertrude Internet Filter and Parental Controls`,
-    description: `TODO: Add description`,
-    images: [
-      {
-        url: `/og-images/main.jpg`,
-        width: 1200,
-        height: 630,
-        alt: `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`,
-      },
-    ],
-  },
-};
+export const metadata = createMetadata(
+  `Download | Gertrude Internet Filter and Parental Controls`,
+  `TODO: Add description`,
+  `/og-images/main.jpg`,
+);
 
 const DownloadPage: NextPage = () => (
   <div className="flex justify-center items-center px-0 xs:px-6 sm:px-8 md:px-12 lg:px-20 py-20">

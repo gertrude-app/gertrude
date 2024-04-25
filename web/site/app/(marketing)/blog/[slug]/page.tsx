@@ -8,6 +8,7 @@ import type { Metadata, NextPage } from 'next';
 import { getArticle, getArticlePaths } from '@/markdoc/files';
 import { components } from '@/markdoc/config';
 import Prose from '@/components/articles/Prose';
+import { createMetadata } from '@/lib/seo';
 
 type Params = {
   slug: string;
@@ -28,15 +29,7 @@ export async function generateStaticParams(): Promise<Params[]> {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { title, description, image } = await getArticle(params.slug, `blog`);
-  return {
-    title: `${title} | Gertrude Internet Filter and Parental Controls`,
-    description,
-    openGraph: {
-      title: `${title} | Gertrude Internet Filter and Parental Controls`,
-      description,
-      images: [{ url: image ?? `` }],
-    },
-  };
+  return createMetadata(title, description, image);
 }
 
 const BlogArticle: NextPage<PageProps> = async ({ params: { slug } }) => {

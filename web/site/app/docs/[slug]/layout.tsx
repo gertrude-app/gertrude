@@ -9,19 +9,19 @@ const DocsLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <html>
-      <body className="bg-white flex relative overflow-x-hidden">
+      <body className="bg-white flex relative overflow-x-clip">
         <div className="absolute h-[100vw] w-screen -right-[50vh] -top-[50vw] [background:radial-gradient(#fae8ff,transparent_75%)]"></div>
         <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
         <main className="flex-grow lg:ml-80">
-          <header className="p-6 xs:p-8 flex justify-between lg:hidden">
+          <header className="p-6 xs:p-8 flex justify-between lg:hidden fixed top-0 z-20">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="bg-slate-100 w-12 h-12 rounded-full flex justify-center items-center text-slate-500"
+              className="bg-slate-200/80 backdrop-blur w-12 h-12 rounded-full flex justify-center items-center text-slate-500 relative"
             >
               <MenuIcon />
             </button>
           </header>
-          <div>{children}</div>
+          <div className="mt-16 lg:mt-0">{children}</div>
         </main>
         <div
           className={cx(
