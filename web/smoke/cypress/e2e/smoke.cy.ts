@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 describe(`Smoke test`, () => {
-  const email = `82uii.smoke-test-${Date.now()}@inbox.testmail.app`;
+  const namespace = Cypress.env(`SMOKE_TEST_TESTMAIL_NAMESPACE`);
+  const email = `${namespace}.smoke-test-${Date.now()}@inbox.testmail.app`;
   const password = `_pw_${Date.now()}`;
 
   it(`verify download dmg is reachable`, () => {
@@ -22,7 +23,7 @@ describe(`Smoke test`, () => {
 
     // verify email
     cy.request({ url: Cypress.env(`SMOKE_TEST_EMAIL_INBOX_URL`) }).then((response) => {
-      const body: string = response.body;
+      const body = JSON.stringify(response.body);
       if (!body.includes(email)) {
         throw new Error(`Expected to find email ${email} in ${body}`);
       }
