@@ -3,8 +3,8 @@ import { RocketIcon, RouteIcon } from 'lucide-react';
 import FancyLink from './FancyLink';
 
 const CTABlock: React.FC = () => (
-  <section className="bg-gradient-to-b from-violet-500 to-violet-500 xl:p-8 pb-0 relative">
-    <div className="px-4 xs:px-8 sm:px-12 lg:px-20 py-20 xs:py-24 md:py-40 rounded-t-[40px] xs:rounded-b-[40px] bg-slate-900 flex flex-col items-center -translate-y-40">
+  <section className="bg-gradient-to-b from-violet-500 to-violet-500 xl:p-8 relative">
+    <div className="px-4 xs:px-8 sm:px-12 lg:px-20 py-20 xs:py-24 md:py-40 rounded-t-[40px] xs:rounded-b-[40px] bg-slate-900 flex flex-col items-center -mb-40 xs:mb-0 -translate-y-40">
       <h2 className="font-axiforma text-4xl md:text-5xl font-semibold text-center !leading-[1.2em] text-white">
         $5 a month, for the whole family.
       </h2>
@@ -23,7 +23,7 @@ const CTABlock: React.FC = () => (
         </FancyLink>
         <FancyLink
           type="link"
-          href="https://parents.gertrude.app/signup"
+          href="/docs/getting-started"
           Icon={RouteIcon}
           inverted
           size="lg"

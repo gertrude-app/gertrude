@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import cx from 'classnames';
+import { useInterval } from '../lib/hooks';
 import Stars from './Stars';
-import { useInterval } from '@/lib/hooks';
 
 const REF_DATE = new Date(2022, 8, 12).getTime();
 
@@ -143,8 +143,8 @@ const TotalWebsitesCounter: React.FC = () => {
               className={cx(
                 `relative`,
                 isComma
-                  ? `!-left-2 xs:!-left-3 md:!-left-3 lg:!-left-2 w-4 xs:w-5 md:w-10 lg:w-14`
-                  : `w-[32px] xs:w-[40px] sm:w-[48px] md:w-[60px] lg:w-[72px]`,
+                  ? `!-left-1 xs:!-left-3 md:!-left-3 lg:!-left-2 w-4 xs:w-5 md:w-10 lg:w-14`
+                  : `w-[28px] xs:w-[40px] sm:w-[48px] md:w-[60px] lg:w-[72px]`,
               )}
             >
               {isComma

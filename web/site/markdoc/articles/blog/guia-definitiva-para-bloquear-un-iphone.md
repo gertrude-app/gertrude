@@ -116,7 +116,7 @@ explicamos a continuación.
 Tanto las aplicaciones de **Apple Maps** y **Google Maps** pueden utilizarse para ver
 **fotos de personas desnudas,** y deberían ser eliminadas. Para más detalles (incluyendo
 una recomendación de una aplicación que las reemplace),
-[ver aquí.](/docs/five-things-you-forgot-when-locking-down-your-kids-iphone#4-explicit-images-in-maps-apps).
+[ver aquí.](/blog/five-things-you-forgot-when-locking-down-your-kids-iphone#4-explicit-images-in-maps-apps).
 
 {% /callout %}
 
@@ -144,7 +144,7 @@ Luego desactiva todos los ajustes que se muestran a continuación:
 Es crítico que desactives **Mostrar en Consultar** y **Mostrar en Spotlight.** Estos
 ajustes son difíciles de entender y a menudo los padres los pasan por alto cuando bloquean
 el teléfono de sus hijos. Si no desactivas estos ajustes, tu hijo podrá
-[buscar y ver imágenes y contenidos](/docs/five-things-you-forgot-when-locking-down-your-kids-iphone)
+[buscar y ver imágenes y contenidos](/blog/five-things-you-forgot-when-locking-down-your-kids-iphone)
 de internet a través de las funciones de consulta y búsqueda de su teléfono.
 
 {% /callout %}
@@ -574,7 +574,7 @@ través del siguiente formulario, ¡me encantaría saber de ti!
 {% callout %}
 
 También te recomendamos revisar nuestro artículo sobre las
-[cosas que probablemente olvidaste bloquear](/docs/five-things-you-forgot-when-locking-down-your-kids-iphone).
+[cosas que probablemente olvidaste bloquear](/blog/five-things-you-forgot-when-locking-down-your-kids-iphone).
 
 {% /callout %}
 

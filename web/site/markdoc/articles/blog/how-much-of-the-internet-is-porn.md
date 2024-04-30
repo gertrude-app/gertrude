@@ -65,7 +65,7 @@ past the first dozen blocked websites before Google turned up some obscure or
 newly-created website not on the blocklist.
 
 This isn't just conjecture. When my kids (I have four) entered their teen years, I
-installed a [pihole](#https://pi-hole.net/) to do DNS-level blocking in our home network,
+installed a [pihole](https://pi-hole.net/) to do DNS-level blocking in our home network,
 and subscribed to the most up-to-date public block lists available. I literally erased
 millions of known pornographic domains from existing (at least from the perspective of my
 local network). But then I decided to test it. I turned off images in my browser, started

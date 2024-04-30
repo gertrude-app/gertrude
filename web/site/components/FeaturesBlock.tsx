@@ -4,7 +4,7 @@ import Image from 'next/image';
 import cx from 'classnames';
 import React, { useEffect, useState } from 'react';
 import type { StaticImageData } from 'next/image';
-import { useIntersectionObserver } from '@/lib/hooks';
+import { useIntersectionObserver } from '../lib/hooks';
 import Waves from '@/public/wavy-bg.svg';
 
 import LockAndChain from '@/public/feature-cards/lock-and-chain.gif';

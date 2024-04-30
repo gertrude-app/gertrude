@@ -106,7 +106,7 @@ below.
 
 Both the **Apple Maps** and **Google Maps** apps can be used to view **nude photos,** and
 should be deleted. For more details (including a recommendation for a replacement),
-[see here](/docs/five-things-you-forgot-when-locking-down-your-kids-iphone#4-explicit-images-in-maps-apps).
+[see here](/blog/five-things-you-forgot-when-locking-down-your-kids-iphone#4-explicit-images-in-maps-apps).
 
 {% /callout %}
 
@@ -134,7 +134,7 @@ Then disable all the settings shown below:
 It's critically important that you disable **Show in Look Up** and **Show in Spotlight**.
 These settings are hard to understand and often missed by parents when locking down a
 child's phone. If you don't disable these settings, your child will be able to
-[search for and view images and content](/docs/five-things-you-forgot-when-locking-down-your-kids-iphone)
+[search for and view images and content](/blog/five-things-you-forgot-when-locking-down-your-kids-iphone)
 from the internet through their phone's search and look up features.
 
 {% /callout %}
@@ -538,7 +538,7 @@ following this tutorial, I'd be happy to hear from you!
 {% callout %}
 
 We also recommend you check the items in our article about
-[things you probably forgot to lock down](/docs/five-things-you-forgot-when-locking-down-your-kids-iphone).
+[things you probably forgot to lock down](/blog/five-things-you-forgot-when-locking-down-your-kids-iphone).
 
 {% /callout %}
 

@@ -16,7 +16,10 @@ const DocsLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <header className="p-6 xs:p-8 flex justify-between lg:hidden fixed top-0 z-20">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="bg-slate-200/80 backdrop-blur w-12 h-12 rounded-full flex justify-center items-center text-slate-500 relative"
+              className={cx(
+                `bg-slate-200/80 backdrop-blur w-12 h-12 rounded-full flex justify-center items-center text-slate-500 relative transition-[margin-left,background-color] duration-300`,
+                sidebarOpen && `ml-80 !bg-slate-300`,
+              )}
             >
               <MenuIcon />
             </button>

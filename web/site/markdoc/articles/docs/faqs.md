@@ -79,7 +79,7 @@ their homework. I already had a very reliable way of keeping them safe on a
 phone&mdash;don't give them one. When I finally got my 16+ year old a phone, I protected
 it using the Apple Screen Time feature, which is very effective, although difficult to
 setup. Check out our
-[guide to locking down an iPhone](/docs/definitive-guide-to-locking-down-an-iphone) for
+[guide to locking down an iPhone](/blog/definitive-guide-to-locking-down-an-iphone) for
 more information.
 
 ## I can't access the internet on my admin user account

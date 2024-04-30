@@ -16,7 +16,7 @@ interface Props {
 const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
   <nav
     className={cx(
-      `w-80 flex pl-4 py-4 h-[100dvh] fixed lg:bg-gradient-to-r lg:from-violet-200 lg:to-white z-10 transition-[margin-left] duration-300`,
+      `w-80 flex pl-4 py-4 h-[100dvh] fixed lg:bg-gradient-to-r lg:from-violet-200 lg:to-white transition-[margin-left] duration-300 z-30`,
       open ? `ml-0` : `-ml-96 lg:ml-0`,
     )}
   >
@@ -41,8 +41,22 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
           />
         </div>
       </div>
-      <div className="flex flex-col gap-4">
-        <FancyLink type="link" href="https://parents.gertrude.app" size="sm">
+      <div className="flex flex-col">
+        <div className="flex justify-center gap-2 items-center">
+          <Link href="/contact" className="text-lg text-violet-500 font-medium">
+            Contact
+          </Link>
+          <span className="text-violet-400 text-xl">•</span>
+          <Link href="/blog" className="text-lg text-violet-500 font-medium">
+            Blog
+          </Link>
+        </div>
+        <FancyLink
+          type="link"
+          href="https://parents.gertrude.app"
+          size="sm"
+          className="flex-grow mb-4 mt-6"
+        >
           Log in
         </FancyLink>
         <FancyLink
@@ -50,6 +64,7 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
           href="https://parents.gertrude.app/signup"
           size="sm"
           color="primary"
+          className="flex-grow"
         >
           Sign up
         </FancyLink>

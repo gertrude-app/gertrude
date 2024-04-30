@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { RocketIcon, VideoIcon } from 'lucide-react';
+import { useIntersectionObserver, useScrollY, useWindowDimensions } from '../lib/hooks';
 import WebsiteGraphic from './WebsiteGraphic';
 import FancyLink from './FancyLink';
-import { useIntersectionObserver, useScrollY, useWindowDimensions } from '@/lib/hooks';
 
 const PeaceOfMindForParentsBlock: React.FC = () => {
   const { intersected, ref: illustration } = useIntersectionObserver({ threshold: 1 });
