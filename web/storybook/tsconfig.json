@@ -14,7 +14,7 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@/*": ["./src/*"],
+      "@/public/*": ["../site/public/*"],
       "@site/*": ["../site/*"]
     }
   },
