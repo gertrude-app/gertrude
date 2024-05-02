@@ -4,12 +4,11 @@ import { Logo } from '@shared/components';
 import Link from 'next/link';
 import type { NextPage } from 'next';
 import { getArticle, getArticleSlugs } from '@/markdoc/files';
-import { createMetadata } from '@/lib/seo';
+import * as seo from '@/lib/seo';
 
-export const metadata = createMetadata(
+export const metadata = seo.createMetadata(
   `Blog | Gertrude Internet Filter and Parental Controls`,
-  `TODO: Add description`,
-  `/og-images/main.jpg`,
+  seo.description(`Gertrude Blog`),
 );
 
 const Blog: NextPage = async () => {

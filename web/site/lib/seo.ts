@@ -17,3 +17,10 @@ export function createMetadata(
     },
   };
 }
+
+export function description(description: string): string {
+  if (description.length > 80) {
+    return description;
+  }
+  return `${description}. Protect your kids online with easy-to-use Mac internet filtering, internet blocking, and mac keylogging.`;
+}

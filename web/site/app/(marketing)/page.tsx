@@ -13,7 +13,6 @@ import { createMetadata } from '@/lib/seo';
 export const metadata = createMetadata(
   `Gertrude | Mac Internet Filter, Parental Controls and Activity Monitoring`,
   `Protect your kids online with easy-to-use Mac internet filtering, internet blocking, and mac keylogging`,
-  `/og-images/main.jpg`,
 );
 
 const HomePage: NextPage = () => (

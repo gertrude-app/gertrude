@@ -1,6 +1,7 @@
 ---
 title: Getting Started
-description: TODO
+description:
+  Everything you need to get started protecting your kids with Gertrude for macOS.
 ---
 
 There are a handful of things you need to do to get up and running with Gertrude. This
