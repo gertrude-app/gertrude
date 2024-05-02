@@ -19,8 +19,8 @@ const ContactPage: NextPage = () => (
         Contact us
       </h1>
       <p className="text-xl mt-3 text-slate-500 max-w-2xl self-center lg:self-start text-center lg:text-left relative">
-        Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint
-        consectetur cupidatat.
+        Have a question or need help? Fill out the form below and we’ll get back to you in
+        a jiffy.
       </p>
       <ContactForm />
     </div>
