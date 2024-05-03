@@ -10,7 +10,7 @@ const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const path = usePathname();
   const theme = path.includes(`blog`) ? `white` : `violet`;
   return (
-    <html>
+    <html lang="en">
       <body
         className={cx(
           `min-h-screen flex flex-col`,

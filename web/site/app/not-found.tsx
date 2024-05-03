@@ -2,8 +2,8 @@ import React from 'react';
 import { RatIcon } from 'lucide-react';
 import Link from 'next/link';
 import type { NextPage } from 'next';
-import MainHeader from '@/components/MainHeader';
 import MainFooter from '@/components/MainFooter';
+import MainHeader from '@/components/MainHeader';
 
 const NotFound: NextPage = () => (
   <html>

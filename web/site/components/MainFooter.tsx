@@ -45,12 +45,14 @@ const MainFooter: React.FC = () => (
         <Link
           href="https://www.youtube.com/@gertrudeapp"
           className="text-white/60 hover:text-white/80 transition-colors duration-200"
+          aria-label="YouTube channel"
         >
           <YoutubeIcon size={30} />
         </Link>
         <Link
           href="https://github.com/gertrude-app"
           className="text-white/60 hover:text-white/80 transition-colors duration-200"
+          aria-label="GitHub organization"
         >
           <GithubIcon size={30} />
         </Link>
