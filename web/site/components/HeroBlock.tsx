@@ -11,7 +11,7 @@ const HeroBlock: React.FC = () => {
   return (
     <section className="bg-gradient-to-b from-violet-500 to-fuchsia-500 p-20 h-screen flex flex-col justify-center items-center relative snap-center -mt-20">
       <h1
-        className="text-5xl xs:text-6xl sm:text-7xl text-center text-white font-bold fixed left-0 px-12 xs:px-16 sm:px-20 tracking-[0.02em] !leading-[1.1em] w-full"
+        className="text-5xl xs:text-6xl sm:text-7xl text-center text-white font-bold fixed px-12 xs:px-16 sm:px-20 tracking-[0.02em] !leading-[1.1em] w-full"
         style={{
           transform: `scale(${1 + scrollY / 500})`,
           filter: `blur(${scrollY / 30}px)`,
