@@ -51,6 +51,6 @@ But the apps provided by Apple do not appear as options to disable.
    until Apple fixes the issue. iOS 16 will work well for several years at least.
 4. If you've already updated, we recommend temporarily crippling the Messages app by
    setting it to be allowed only for 1 minute each day, with ScreenTime's
-   [App Limits](/docs/definitive-guide-to-locking-down-an-iphone#app-limits) feature.
+   [App Limits](/blog/definitive-guide-to-locking-down-an-iphone) feature.
 
 {% /callout %}

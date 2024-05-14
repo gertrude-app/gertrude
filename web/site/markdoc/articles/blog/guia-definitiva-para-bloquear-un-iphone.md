@@ -116,7 +116,7 @@ explicamos a continuación.
 Tanto las aplicaciones de **Apple Maps** y **Google Maps** pueden utilizarse para ver
 **fotos de personas desnudas,** y deberían ser eliminadas. Para más detalles (incluyendo
 una recomendación de una aplicación que las reemplace),
-[ver aquí.](/blog/five-things-you-forgot-when-locking-down-your-kids-iphone#4-explicit-images-in-maps-apps).
+[ver aquí.](/blog/five-things-you-forgot-when-locking-down-your-kids-iphone).
 
 {% /callout %}
 
