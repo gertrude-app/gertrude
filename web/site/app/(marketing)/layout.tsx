@@ -9,8 +9,9 @@ import MainFooter from '@/components/MainFooter';
 const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const path = usePathname();
   const theme = path.includes(`blog`) ? `white` : `violet`;
+  const lang = path.includes(`bloquear`) ? `es` : `en`;
   return (
-    <html lang="en">
+    <html lang={lang}>
       <body
         className={cx(
           `min-h-screen flex flex-col`,
