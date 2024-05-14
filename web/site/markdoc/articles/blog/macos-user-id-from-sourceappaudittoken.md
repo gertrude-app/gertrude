@@ -3,7 +3,7 @@ title: 'Get user id from NEFilterFlow.sourceAppAuditToken'
 date: '2021-04-19T12:55:43.000Z'
 slug: macos-user-id-from-sourceappaudittoken
 description:
-  When building a _Content Filter_ System extension for Mac OS, the instance of
+  When building a Content Filter System extension for Mac OS, the instance of
   `NEFilterFlow` you receive in your `NEFilterDataProvider` class doesn't have much
   information (apart from the not-to-be-relied-upon `flow.description` string). Deriving
   useful data from these objects is tricky, and poorly documented.

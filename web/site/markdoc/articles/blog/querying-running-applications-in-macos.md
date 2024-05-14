@@ -3,7 +3,7 @@ title: 'Querying Running Applications in MacOS'
 date: '2021-04-23T16:26:46Z'
 slug: 'querying-running-applications-in-macos'
 description:
-  If you want to list out all of the _currently running applications_ in a MacOS app, you
+  If you want to list out all of the currently running applications in a MacOS app, you
   can call `NSWorkspace.shared.runningApplications`, and filter down the ones you're
   interested in using the apps `.activationPolicy`.
 category: engineering

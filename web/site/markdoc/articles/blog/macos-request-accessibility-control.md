@@ -4,8 +4,8 @@ date: '2021-04-23T16:18:58Z'
 slug: macos-request-accessibility-control
 description:
   If you need your app to have access to global events (like keystrokes) which require
-  that the app is granted authorization to _control your computer_ in the _Security and
-  Privacy_ pane of system extensions, you can prompt the user for this privilege with the
+  that the app is granted authorization to control your computer in the Security and
+  Privacy pane of system extensions, you can prompt the user for this privilege with the
   below code
 category: engineering
 ---

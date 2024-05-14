@@ -3,7 +3,7 @@ title: 'Authenticate an Admin User in a MacOS App'
 date: '2021-04-19T11:28:05.000Z'
 slug: macos-authenticate-admin-user
 description:
-  I needed to challenge for an admin _user/password_ to protect an area of a MacOS app I'm
+  I needed to challenge for an admin user/password to protect an area of a MacOS app I'm
   developing. After much pain and sorrow navigating the incredibly lacking and confusing
   Apple documentation, I got the basic challenge working.
 category: engineering
