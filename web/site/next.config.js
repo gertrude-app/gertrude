@@ -23,6 +23,30 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // marketing site redesign
+      redir(`/docs/mac-internet-filter`, `/blog/mac-internet-filter`, 301),
+      redir(`/docs/mac-keylogger`, `/blog/mac-keylogger`, 301),
+      redir(
+        `/docs/ios-17-cant-delete-messages-images`,
+        `/blog/ios-17-cant-delete-messages-images`,
+        301,
+      ),
+      redir(
+        `/docs/definitive-guide-to-locking-down-an-iphone`,
+        `/blog/definitive-guide-to-locking-down-an-iphone`,
+        301,
+      ),
+      redir(
+        `/docs/five-things-you-forgot-when-locking-down-your-kids-iphone`,
+        `/blog/five-things-you-forgot-when-locking-down-your-kids-iphone`,
+        301,
+      ),
+      redir(
+        `/docs/guia-definitiva-para-bloquear-un-iphone`,
+        `/blog/guia-definitiva-para-bloquear-un-iphone`,
+        301,
+      ),
+      // misc
       redir(`/support`, `/contact`, 301),
       redir(`/docs/keeping-users-safe`, `/docs/keeping-children-safe`, 301), // parent rename
       redir(`/docs`, `/docs/getting-started`, 302),
