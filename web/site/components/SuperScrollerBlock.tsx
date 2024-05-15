@@ -40,49 +40,49 @@ const SuperScrollerBlock: React.FC = () => {
   return (
     <section className="bg-white flex flex-col-reverse lg:flex-row relative">
       <div className="lg:w-5/12 xl:w-2/5 2xl:w-1/2">
-        <Step index={1} title="Create an account" intersectionRef={firstStepRef}>
-          Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint
-          consectetur cupidatat.
+        <Step index={1} title="Create a parent account" intersectionRef={firstStepRef}>
+          Parents start by registering an account with their own phone or computer.
+          Parents can use any kind of phone or computer.
         </Step>
         <Step
           index={2}
           title="Install the Mac app on your child's computer"
           intersectionRef={secondStepRef}
         >
-          Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint
-          consectetur cupidatat.
+          The child being protected must be using a Mac computer. Download the app from
+          our site and launch to start the setup process.
         </Step>
         <Step
           index={3}
           title="You control what websites are allowed"
           intersectionRef={thirdStepRef}
         >
-          Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint
-          consectetur cupidatat.
+          Once installed, Gertrude blocks the <em>entire</em> internet for all browsers
+          and apps, except for the parts <em>you choose</em>.
         </Step>
         <Step
           index={4}
           title="Children can request sites to be unblocked..."
           intersectionRef={fourthStepRef}
         >
-          Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint
-          consectetur cupidatat.
+          If your child needs access to another site, they can see the blocked request and
+          click a button to request that you unblock it.
         </Step>
         <Step
           index={5}
-          title="...you revieve notifications and can respond from wherever you are"
+          title="... and you can decide from wherever you are"
           intersectionRef={fifthStepRef}
         >
-          Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint
-          consectetur cupidatat.
+          You'll receive a notification on your phone or computer, and you can respond
+          with a click to unblock the site or app if you feel it is safe.
         </Step>
         <Step
           index={6}
-          title="Review and monitor activity and keystrokes remotely"
+          title="Review and monitor screenshots and keystrokes remotely"
           intersectionRef={sixthStepRef}
         >
-          Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint
-          consectetur cupidatat.
+          Plus, you can review images of your child's screen, and review a log of
+          everything they've typed, all from your phone or computer.
         </Step>
       </div>
       <div className="lg:w-7/12 xl:w-3/5 2xl:w-1/2 sticky top-0 flex justify-center items-center h-[55vh] lg:h-screen overflow-hidden [background:linear-gradient(white_90%,transparent)] to-trasnsparent lg:bg-white">
