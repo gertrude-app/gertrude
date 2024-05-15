@@ -44,7 +44,6 @@ Por muy desagradable que pueda resultar, vale la pena que te familiarices con al
 - El grupo más grande de consumidores de pornografía son niños de 12 a 17 años
 - 22% de las adolescentes afirman haber publicado en internet fotos suyas desnudas o
   semi-desnudas
-- 37% del contenido de internet es pornografía
 
 {% /callout %}
 

@@ -40,7 +40,7 @@ As unpleasant as it might be, it's worth familiarizing yourself with some of the
   doing homework
 - the largest group of internet porn consumers is children ages 12-17
 - 22% of teenage girls say they have posted nude or semi-nude photos of themselves online
-- 37% of the internet is pornography
+- 10% of all material on the internet is porn
 
 {% /callout %}
 
