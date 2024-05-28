@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import cx from 'classnames';
+import Link from 'next/link';
 import { useInterval } from '../lib/hooks';
 import Stars from './Stars';
 
@@ -28,7 +29,7 @@ const DepressingStatisticsBlock: React.FC = () => {
 
   return (
     <section className="xl:p-8 bg-gradient-to-b from-fuchsia-500 to-white">
-      <div className="bg-slate-900 px-8 md:px-12 lg:px-20 py-24 md:py-32 lg:py-40 flex items-center flex-col gap-20 rounded-[40px] relative overflow-hidden">
+      <div className="bg-slate-900 px-8 md:px-12 lg:px-20 py-24 md:py-32 lg:py-40 flex items-center flex-col rounded-[40px] relative overflow-hidden">
         <Stars className="absolute left-0 top-0 w-full h-176" />
         <div className="[background:radial-gradient(#e879f944,transparent_70%)] w-176 h-176 absolute -right-80 -top-80" />
         <div className="[background:radial-gradient(#e879f944,transparent_70%)] w-176 h-176 absolute -left-80 -top-80" />
@@ -56,10 +57,11 @@ const DepressingStatisticsBlock: React.FC = () => {
             <TotalWebsitesCounter />
             <span className="text-violet-300 text-xl xs:text-2xl sm:text-3xl 2xl:self-end mt-1 xs:mt-2 sm:mt-4 2xl:mt-2">
               websites on the internet
+              <span className="text-white/50 ml-0.5">*</span>
             </span>
           </div>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 max-w-[1500px] -mx-6 xs:mx-0 z-10">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 max-w-[1500px] -mx-6 xs:mx-0 z-10 mt-20 mb-8">
           <Statistic
             statistic={websitesThisWeek}
             label={
@@ -70,10 +72,11 @@ const DepressingStatisticsBlock: React.FC = () => {
             className="lg:col-span-2"
           />
           <Statistic
-            statistic={`37%`}
+            statistic="10%"
             label={
               <span>
-                Of all websites on the internet <Bold>are porn</Bold>
+                Of all material on the internet <Bold>is porn</Bold>
+                <span className="text-white/50 ml-0.5">†</span>
               </span>
             }
             className="lg:row-span-2"
@@ -108,9 +111,39 @@ const DepressingStatisticsBlock: React.FC = () => {
             label={
               <span>
                 New websites created <Bold>every second</Bold>
+                <span className="text-white/50 ml-0.5">‡</span>
               </span>
             }
           />
+        </div>
+        <div className="flex flex-col self-stretch">
+          <span className="text-violet-200/80 flex gap-2">
+            *
+            <Link
+              href={`https://firstsiteguide.com/how-many-websites`}
+              className="text-violet-200/40 hover:text-violet-200/60"
+            >
+              https://firstsiteguide.com/how-many-websites
+            </Link>
+          </span>
+          <span className="text-violet-200/80 flex gap-2">
+            †
+            <Link
+              href={`https://firstsiteguide.com/how-many-websites`}
+              className="text-violet-200/40 hover:text-violet-200/60"
+            >
+              https://www.psychologytoday.com/us/blog/all-about-sex/201611/dueling-statistics-how-much-the-internet-is-porn
+            </Link>
+          </span>
+          <span className="text-violet-200/80 flex gap-2">
+            ‡
+            <Link
+              href={`https://firstsiteguide.com/how-many-websites`}
+              className="text-violet-200/40 hover:text-violet-200/60"
+            >
+              https://siteefy.com/how-many-websites-are-there
+            </Link>
+          </span>
         </div>
       </div>
     </section>
