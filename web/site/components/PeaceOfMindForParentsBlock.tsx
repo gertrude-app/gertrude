@@ -14,15 +14,15 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
   return (
     <div className="bg-fuchsia-500 px-6 sm:px-8 xs:px-12 md:px-20 py-28 pb-64 min-[1450px]:pb-48 flex flex-col min-[1450px]:flex-row gap-80 min-[1450px]:gap-16 items-center justify-center">
       <div
-        className="flex-grow max-w-3xl sticky top-[calc(50vh-200px)] min-[1450px]:top-0 min-[1450px]:relative flex flex-col items-center min-[1450px]:items-start"
+        className="flex-grow max-w-3xl sticky top-[calc(50vh-250px)] min-[1450px]:top-0 min-[1450px]:relative flex flex-col items-center min-[1450px]:items-start"
         style={{
           transform:
             windowWidth < 1450
-              ? `scale(${Math.max(2 - Math.max(scrollY / windowHeight, 1), 0.5)})`
+              ? `scale(${Math.max(2 - Math.max((scrollY - 200) / windowHeight, 1), 0.5)})`
               : ``,
           filter:
             windowWidth < 1450
-              ? `blur(${Math.max(0, scrollY - windowHeight) / 10}px)`
+              ? `blur(${Math.max(0, scrollY - 200 - windowHeight) / 10}px)`
               : ``,
         }}
       >
