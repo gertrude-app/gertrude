@@ -154,8 +154,10 @@ export default DepressingStatisticsBlock;
 
 const TotalWebsitesCounter: React.FC = () => {
   const [totalWebsites, setTotalWebsites] = useState(2_147_321_000);
+  const [clientLoaded, setClientLoaded] = useState(false);
 
   useEffect(() => {
+    setClientLoaded(true);
     // prevent hydration errors
     const secondsSinceRefDate = Math.floor((Date.now() - REF_DATE) / 1000);
     const newWebsitesSinceRefDate = secondsSinceRefDate * 3;
@@ -166,6 +168,10 @@ const TotalWebsitesCounter: React.FC = () => {
     setTotalWebsites(totalWebsites + 1);
   }, 333);
 
+  useEffect(() => {
+    setClientLoaded(true);
+  }, []);
+
   return (
     <div className="text-white text-5xl xs:text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-mono font-bold flex overflow-hidden">
       {totalWebsites
@@ -173,7 +179,7 @@ const TotalWebsitesCounter: React.FC = () => {
         .split(``)
         .map((digit, index) => {
           const isComma = digit === `,`;
-          return (
+          return clientLoaded ? (
             <div
               key={index}
               className={cx(
@@ -205,6 +211,16 @@ const TotalWebsitesCounter: React.FC = () => {
                     </div>
                   ))}
             </div>
+          ) : (
+            <div
+              key={index}
+              className={cx(
+                `relative h-32 bg-slate-800 animate-pulse`,
+                isComma
+                  ? `!-left-1 xs:!-left-3 md:!-left-3 lg:!-left-2 w-4 xs:w-5 md:w-10 lg:w-14`
+                  : `w-[28px] xs:w-[40px] sm:w-[48px] md:w-[60px] lg:w-[72px]`,
+              )}
+            ></div>
           );
         })}
     </div>
