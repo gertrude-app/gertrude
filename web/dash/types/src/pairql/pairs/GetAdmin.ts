@@ -14,5 +14,6 @@ export namespace GetAdmin {
     subscriptionStatus: AdminSubscriptionStatus;
     notifications: AdminNotification[];
     verifiedNotificationMethods: VerifiedNotificationMethod[];
+    hasAdminChild: boolean;
   }
 }

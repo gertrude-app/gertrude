@@ -81,8 +81,6 @@ const AdminSettings: React.FC = () => {
     },
   );
 
-  const notificationProps = makeNotificationProps(state, saveNotification.isPending);
-
   if (query.isPending) {
     return <Loading />;
   }
@@ -91,16 +89,23 @@ const AdminSettings: React.FC = () => {
     return <ApiErrorMessage error={query.error} />;
   }
 
+  const admin = query.data;
+  const notificationProps = makeNotificationProps(
+    state,
+    saveNotification.isPending,
+    admin.hasAdminChild,
+  );
+
   return (
     <Settings
-      email={query.data.email}
-      status={query.data.subscriptionStatus}
+      email={admin.email}
+      status={admin.subscriptionStatus}
       billingPortalRequest={ReqState.fromMutation(getStripeUrl)}
       methods={typesafe.objectValues(state.notificationMethods).map((method) => ({
         id: method.id,
         method: method.config.case,
         value: methodPrimaryValue(method),
-        deletable: methodDeletable(method, state.notifications, query.data.email),
+        deletable: methodDeletable(method, state.notifications, admin.email),
       }))}
       notifications={typesafe
         .objectValues(state.notifications)
@@ -162,6 +167,7 @@ function methodDeletable(
 function makeNotificationProps(
   state: State,
   savingNotification: boolean,
+  showSecurityEventOption: boolean,
 ): (
   editable: State['notifications'][number],
 ) => React.ComponentProps<typeof Settings>['notifications'][0] | null {
@@ -183,6 +189,7 @@ function makeNotificationProps(
       })),
       editing: editable.editing === true,
       isNew: editable.isNew === true,
+      showSecurityEventOption,
     };
   };
 }
