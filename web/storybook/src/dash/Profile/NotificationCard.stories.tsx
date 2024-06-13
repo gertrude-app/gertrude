@@ -18,11 +18,13 @@ export const Email: Story = props({
   saveButtonDisabled: false,
   editing: false,
   isNew: false,
+  onSave: () => {},
   onDelete: () => {},
   startEdit: () => {},
   cancelEdit: () => {},
   updateMethod: () => {},
   updateTrigger: () => {},
+  showSecurityEventOption: false,
   methodOptions: [
     { display: `Email foo@bar.com`, value: `1` },
     { display: `Text (555) 555-5555`, value: `2` },

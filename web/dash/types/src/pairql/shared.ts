@@ -13,7 +13,8 @@ export interface AdminNotification {
 
 export type AdminNotificationTrigger =
   | 'unlockRequestSubmitted'
-  | 'suspendFilterRequestSubmitted';
+  | 'suspendFilterRequestSubmitted'
+  | 'adminChildSecurityEvent';
 
 export type AdminSubscriptionStatus =
   | { case: 'trialing'; daysLeft: number }

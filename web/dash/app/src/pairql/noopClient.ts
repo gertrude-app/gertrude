@@ -24,6 +24,7 @@ const noopClient: ApiClient = {
       subscriptionStatus: { case: `paid` },
       notifications: [],
       verifiedNotificationMethods: [],
+      hasAdminChild: false,
     });
   },
   getAdminKeychain: async () => {

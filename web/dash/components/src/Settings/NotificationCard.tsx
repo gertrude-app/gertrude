@@ -19,6 +19,7 @@ type Props = {
   onSave(): unknown;
   saveButtonDisabled: boolean;
   isNew: boolean;
+  showSecurityEventOption: boolean;
 };
 
 const NotificationCard: React.FC<Props> = ({
@@ -33,6 +34,7 @@ const NotificationCard: React.FC<Props> = ({
   updateTrigger,
   onSave,
   saveButtonDisabled,
+  showSecurityEventOption,
   isNew,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -78,6 +80,14 @@ const NotificationCard: React.FC<Props> = ({
                 value: `unlockRequestSubmitted`,
                 display: `Unlock requests`,
               },
+              ...(showSecurityEventOption
+                ? [
+                    {
+                      value: `adminChildSecurityEvent`,
+                      display: `Admin-child security events`,
+                    },
+                  ]
+                : []),
             ]}
             selectedOption={trigger}
             setSelected={updateTrigger}
@@ -171,6 +181,8 @@ function triggerText(trigger: AdminNotificationTrigger): string {
       return `filter suspension requests`;
     case `unlockRequestSubmitted`:
       return `unlock requests`;
+    case `adminChildSecurityEvent`:
+      return `admin-child security events`;
   }
 }
 

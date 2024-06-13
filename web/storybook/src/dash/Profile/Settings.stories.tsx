@@ -18,6 +18,7 @@ const notificationProps = {
   updateMethod: CardStory.args?.updateMethod!,
   updateTrigger: CardStory.args?.updateTrigger!,
   saveButtonDisabled: false,
+  showSecurityEventOption: false,
 };
 
 // @screenshot: xs,md

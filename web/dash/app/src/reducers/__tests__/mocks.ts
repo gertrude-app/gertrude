@@ -23,6 +23,7 @@ export function adminSettings(override: Partial<Admin> = {}): Admin {
     subscriptionStatus: { case: `paid` },
     notifications: [],
     verifiedNotificationMethods: [],
+    hasAdminChild: false,
     ...override,
   };
 }

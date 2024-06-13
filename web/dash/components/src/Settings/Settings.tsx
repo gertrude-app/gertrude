@@ -156,7 +156,7 @@ const Settings: React.FC<Props> = ({
       <div className="xs:bg-white xs:border border-slate-200 p-2 xs:p-8 rounded-3xl">
         <h2 className="text-2xl font-bold text-slate-800">Notifications</h2>
         <p className="text-slate-500 mt-1 mb-2">
-          Custom notifications for different types of requests using one of your verified
+          Custom notifications for different types of events using one of your verified
           methods
         </p>
         {notifications.length > 0 ? (
