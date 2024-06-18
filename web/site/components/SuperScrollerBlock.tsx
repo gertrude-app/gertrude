@@ -117,9 +117,7 @@ const Step: React.FC<StepProps> = ({ children, title, index, intersectionRef }) 
     <div className="text-xl xs:text-2xl bg-violet-100 text-violet-500 font-bold w-8 xs:w-10 h-8 xs:h-10 rounded-full flex justify-center items-center">
       <span className="-mb-0.5">{index}</span>
     </div>
-    <h2 className="font-axiforma text-2xl xs:text-3xl sm:text-4xl font-bold mt-6 mb-4">
-      {title}
-    </h2>
+    <h2 className="text-2xl xs:text-3xl sm:text-4xl font-bold mt-6 mb-4">{title}</h2>
     <div className="text-lg xs:text-xl text-slate-500">{children}</div>
   </div>
 );

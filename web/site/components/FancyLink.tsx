@@ -24,7 +24,7 @@ interface SubmitProps {
 type FancyLinkProps = (LinkProps | SubmitProps) & CommonProps;
 
 const FancyLink: React.FC<FancyLinkProps> = (props) => {
-  const classes = cx(`relative group select-none block font-axiforma`, props.className);
+  const classes = cx(`relative group select-none block`, props.className);
 
   let Element: React.FC<{ children: React.ReactNode }>;
 

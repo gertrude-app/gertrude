@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import cx from 'classnames';
 import { useInterval } from '../lib/hooks';
 import Stars from './Stars';
@@ -35,7 +35,7 @@ const DepressingStatisticsBlock: React.FC = () => {
         <div className="[background:radial-gradient(#a78bfa44,transparent_70%)] w-176 h-176 absolute left-20 -top-96" />
         <div className="flex flex-col 2xl:flex-row justify-center items-center 2xl:items-start gap-12 lg:gap-20 relative">
           <div className="">
-            <h2 className="text-7xl font-axiforma md:text-8xl lg:text-[120px] lg:leading-[124px] font-bold w-fit [background-image:radial-gradient(at_top_left,white,transparent_50%),radial-gradient(at_center_150px,#d946ef,transparent_60%),linear-gradient(#8b5cf6,#8b5cf6)] bg-clip-text text-transparent text-center 2xl:text-left 2xl:max-w-xl">
+            <h2 className="text-7xl md:text-8xl lg:text-[120px] lg:leading-[124px] font-bold w-fit [background-image:radial-gradient(at_top_left,white,transparent_50%),radial-gradient(at_center_150px,#d946ef,transparent_60%),linear-gradient(#8b5cf6,#8b5cf6)] bg-clip-text text-transparent text-center 2xl:text-left 2xl:max-w-xl">
               A losing game
             </h2>
           </div>
@@ -120,11 +120,14 @@ const DepressingStatisticsBlock: React.FC = () => {
 export default DepressingStatisticsBlock;
 
 const TotalWebsitesCounter: React.FC = () => {
-  const [totalWebsites, setTotalWebsites] = React.useState(() => {
+  const [totalWebsites, setTotalWebsites] = useState(2_147_321_000);
+
+  useEffect(() => {
+    // prevent hydration errors
     const secondsSinceRefDate = Math.floor((Date.now() - REF_DATE) / 1000);
     const newWebsitesSinceRefDate = secondsSinceRefDate * 3;
-    return 1_980_000_000 + newWebsitesSinceRefDate;
-  });
+    setTotalWebsites(1_980_000_000 + newWebsitesSinceRefDate);
+  }, []);
 
   useInterval(() => {
     setTotalWebsites(totalWebsites + 1);
@@ -196,7 +199,7 @@ const Statistic: React.FC<StatisticProps> = ({ statistic, label, className }) =>
 );
 
 const Bold: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span className="font-axiforma font-semibold bg-gradient-to-r from-violet-100 to-fuchsia-300 bg-clip-text text-transparent italic">
+  <span className="font-semibold bg-gradient-to-r from-violet-100 to-fuchsia-300 bg-clip-text text-transparent italic">
     {children}
   </span>
 );
