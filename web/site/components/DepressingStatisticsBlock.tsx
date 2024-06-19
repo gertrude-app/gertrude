@@ -36,7 +36,7 @@ const DepressingStatisticsBlock: React.FC = () => {
         <div className="[background:radial-gradient(#a78bfa44,transparent_70%)] w-176 h-176 absolute left-20 -top-96" />
         <div className="flex flex-col 2xl:flex-row justify-center items-center 2xl:items-start gap-12 lg:gap-20 relative">
           <div className="">
-            <h2 className="text-7xl md:text-8xl lg:text-[120px] lg:leading-[124px] font-bold w-fit [background-image:radial-gradient(at_top_left,white,transparent_50%),radial-gradient(at_center_150px,#d946ef,transparent_60%),linear-gradient(#8b5cf6,#8b5cf6)] bg-clip-text text-transparent text-center 2xl:text-left 2xl:max-w-xl">
+            <h2 className="text-7xl pb-[0.1em] md:text-8xl lg:text-[120px] lg:leading-[134px] font-bold w-fit [background-image:radial-gradient(at_top_left,white,transparent_50%),radial-gradient(at_center_150px,#d946ef,transparent_60%),linear-gradient(#8b5cf6,#8b5cf6)] bg-clip-text text-transparent text-center 2xl:text-left 2xl:max-w-xl">
               A losing game
             </h2>
           </div>

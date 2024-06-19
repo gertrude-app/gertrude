@@ -28,12 +28,13 @@ const MainFooter: React.FC = () => (
     <div className="flex flex-col xs:flex-row justify-between items-center xs:items-end gap-8">
       <span className="text-white/70">© {new Date().getFullYear()} NetRivet Inc.</span>
       <span className="text-white/70">
-        <span className="text-white" role="img" aria-label="heart emoji">
+        <span className="text-white pr-1" role="img" aria-label="heart emoji">
           ❤️
         </span>
-        {` `}
-        OSS •{` `}
-        <Link href="https://github.com/jaredh159/gertrude-web" className="underline">
+        <span className="lg:hidden">OSS</span>
+        <span className="hidden lg:inline">Gertrude is open source</span>
+        {` `}•{` `}
+        <Link href="https://github.com/gertrude-app/web" className="underline">
           Web
         </Link>
         {` `}•{` `}

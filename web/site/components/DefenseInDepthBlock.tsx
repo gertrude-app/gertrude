@@ -3,7 +3,7 @@ import Stars from './Stars';
 
 const DefenseInDepthBlock: React.FC = () => (
   <section className="bg-violet-100 xl:p-8 xl:pb-0">
-    <div className="px-8 xs:px-12 lg:px-28 pt-16 md:pt-28 pb-12 lg:pb-20 bg-slate-900 rounded-t-[40px] flex flex-col items-center relative overflow-hidden">
+    <div className="px-8 xs:px-12 lg:px-28 pt-16 md:pt-28 pb-12 bg-slate-900 rounded-t-[40px] flex flex-col items-center relative overflow-hidden">
       <Stars className="absolute left-0 top-0 w-full h-128" />
       <div className="[background:radial-gradient(#e879f944,transparent_70%)] w-176 h-176 absolute -right-80 -top-80" />
       <div className="[background:radial-gradient(#e879f944,transparent_70%)] w-176 h-176 absolute -left-80 -top-80" />
