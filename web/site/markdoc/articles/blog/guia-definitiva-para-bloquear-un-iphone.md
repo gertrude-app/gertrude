@@ -44,7 +44,6 @@ Por muy desagradable que pueda resultar, vale la pena que te familiarices con al
 - El grupo más grande de consumidores de pornografía son niños de 12 a 17 años
 - 22% de las adolescentes afirman haber publicado en internet fotos suyas desnudas o
   semi-desnudas
-- 37% del contenido de internet es pornografía
 
 {% /callout %}
 
@@ -116,7 +115,7 @@ explicamos a continuación.
 Tanto las aplicaciones de **Apple Maps** y **Google Maps** pueden utilizarse para ver
 **fotos de personas desnudas,** y deberían ser eliminadas. Para más detalles (incluyendo
 una recomendación de una aplicación que las reemplace),
-[ver aquí.](/blog/five-things-you-forgot-when-locking-down-your-kids-iphone#4-explicit-images-in-maps-apps).
+[ver aquí.](/blog/five-things-you-forgot-when-locking-down-your-kids-iphone).
 
 {% /callout %}
 

@@ -89,7 +89,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ slug, title, setOpen }) => {
     <Link
       href={`/docs/${slug}`}
       className={cx(
-        `hover:bg-slate-50 rounded-2xl px-3 py-2 leading-snug flex items-start transition-colors duration-200 gap-1`,
+        `hover:bg-slate-50 rounded-2xl px-3 py-2 flex items-start transition-colors duration-200 gap-1`,
         active
           ? `text-slate-800 font-semibold bg-violet-50 hover:!bg-violet-100`
           : `text-slate-600 font-medium`,
@@ -100,7 +100,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ slug, title, setOpen }) => {
         strokeWidth={6}
         className={cx(`shrink-0 mt-[2px]`, active ? `text-violet-500` : `text-slate-300`)}
       />
-      <span className="text-lg">{title}</span>
+      <span className="text-lg/6">{title}</span>
     </Link>
   );
 };

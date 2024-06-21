@@ -131,7 +131,7 @@ const TextInput: React.FC<TextInputProps> = ({
   );
   return (
     <div className="flex flex-col">
-      <label htmlFor={name} className="font-axiforma font-medium text-lg text-slate-400">
+      <label htmlFor={name} className="font-medium text-lg text-slate-400">
         {label}
       </label>
       {textarea ? (

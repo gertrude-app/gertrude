@@ -31,7 +31,12 @@ const DownloadPage: NextPage = () => (
           The Gertrude mac app is free to download, but requires a parent account to start
           protecting a computer. If you don’t have a parent account, you can start a 60
           day trial with no credit card by{` `}
-          <Link href="https://gertrude.app/start">clicking here.</Link>
+          <Link
+            className="border-b border-dotted hover:text-slate-600"
+            href="https://gertrude.app/start"
+          >
+            clicking here.
+          </Link>
         </p>
         <FancyLink
           size="lg"

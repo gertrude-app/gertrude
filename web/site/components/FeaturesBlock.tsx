@@ -199,12 +199,12 @@ const Feature: React.FC<FeatureProps> = ({
               alt=""
               className={cx(
                 `w-full h-full object-center object-cover z-0`,
-                animationStopped ? `relative` : `absolute`,
+                animationStopped ? `opacity-100 relative` : `opacity-0 absolute`,
               )}
               priority
             />
             {!animationStopped && (
-              <div className="bg-white relative z-10 w-full h-full flex justify-center items-center">
+              <div className="relative z-10 w-full h-full flex justify-center items-center">
                 <div
                   className={cx(
                     `bg-violet-100 rounded-full transition-[opacity,width,height] duration-500 ease-out shrink-0 absolute`,
@@ -224,7 +224,7 @@ const Feature: React.FC<FeatureProps> = ({
         )}
       </div>
       <div className="flex flex-col items-center p-8">
-        <h3 className="font-axiforma text-2xl font-semibold text-slate-900">{title}</h3>
+        <h3 className="text-2xl font-semibold text-slate-900">{title}</h3>
         <p className="mt-2 text-slate-500 text-center">{description}</p>
       </div>
     </div>

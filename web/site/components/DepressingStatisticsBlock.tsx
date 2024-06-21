@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import cx from 'classnames';
+import Link from 'next/link';
 import { useInterval } from '../lib/hooks';
 import Stars from './Stars';
 
@@ -28,14 +29,14 @@ const DepressingStatisticsBlock: React.FC = () => {
 
   return (
     <section className="xl:p-8 bg-gradient-to-b from-fuchsia-500 to-white">
-      <div className="bg-slate-900 px-8 md:px-12 lg:px-20 py-24 md:py-32 lg:py-40 flex items-center flex-col gap-20 rounded-[40px] relative overflow-hidden">
+      <div className="bg-slate-900 px-8 md:px-12 lg:px-20 py-24 md:py-32 lg:py-40 flex items-center flex-col rounded-[40px] relative overflow-hidden">
         <Stars className="absolute left-0 top-0 w-full h-176" />
         <div className="[background:radial-gradient(#e879f944,transparent_70%)] w-176 h-176 absolute -right-80 -top-80" />
         <div className="[background:radial-gradient(#e879f944,transparent_70%)] w-176 h-176 absolute -left-80 -top-80" />
         <div className="[background:radial-gradient(#a78bfa44,transparent_70%)] w-176 h-176 absolute left-20 -top-96" />
         <div className="flex flex-col 2xl:flex-row justify-center items-center 2xl:items-start gap-12 lg:gap-20 relative">
           <div className="">
-            <h2 className="text-7xl font-axiforma md:text-8xl lg:text-[120px] lg:leading-[124px] font-bold w-fit [background-image:radial-gradient(at_top_left,white,transparent_50%),radial-gradient(at_center_150px,#d946ef,transparent_60%),linear-gradient(#8b5cf6,#8b5cf6)] bg-clip-text text-transparent text-center 2xl:text-left 2xl:max-w-xl">
+            <h2 className="text-7xl pb-[0.1em] md:text-8xl lg:text-[120px] lg:leading-[134px] font-bold w-fit [background-image:radial-gradient(at_top_left,white,transparent_50%),radial-gradient(at_center_150px,#d946ef,transparent_60%),linear-gradient(#8b5cf6,#8b5cf6)] bg-clip-text text-transparent text-center 2xl:text-left 2xl:max-w-xl">
               A losing game
             </h2>
           </div>
@@ -56,10 +57,11 @@ const DepressingStatisticsBlock: React.FC = () => {
             <TotalWebsitesCounter />
             <span className="text-violet-300 text-xl xs:text-2xl sm:text-3xl 2xl:self-end mt-1 xs:mt-2 sm:mt-4 2xl:mt-2">
               websites on the internet
+              <span className="text-white/50 ml-0.5">*</span>
             </span>
           </div>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 max-w-[1500px] -mx-6 xs:mx-0 z-10">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 max-w-[1500px] -mx-6 xs:mx-0 z-10 mt-20 mb-8">
           <Statistic
             statistic={websitesThisWeek}
             label={
@@ -70,10 +72,11 @@ const DepressingStatisticsBlock: React.FC = () => {
             className="lg:col-span-2"
           />
           <Statistic
-            statistic={`37%`}
+            statistic="10%"
             label={
               <span>
-                Of all websites on the internet <Bold>are porn</Bold>
+                Of all material on the internet <Bold>is porn</Bold>
+                <span className="text-white/50 ml-0.5">†</span>
               </span>
             }
             className="lg:row-span-2"
@@ -108,9 +111,39 @@ const DepressingStatisticsBlock: React.FC = () => {
             label={
               <span>
                 New websites created <Bold>every second</Bold>
+                <span className="text-white/50 ml-0.5">‡</span>
               </span>
             }
           />
+        </div>
+        <div className="flex flex-col self-stretch">
+          <span className="text-violet-200/80 flex gap-2">
+            *
+            <Link
+              href={`https://firstsiteguide.com/how-many-websites`}
+              className="text-violet-200/40 hover:text-violet-200/60"
+            >
+              https://firstsiteguide.com/how-many-websites
+            </Link>
+          </span>
+          <span className="text-violet-200/80 flex gap-2">
+            †
+            <Link
+              href={`https://firstsiteguide.com/how-many-websites`}
+              className="text-violet-200/40 hover:text-violet-200/60"
+            >
+              https://www.psychologytoday.com/us/blog/all-about-sex/201611/dueling-statistics-how-much-the-internet-is-porn
+            </Link>
+          </span>
+          <span className="text-violet-200/80 flex gap-2">
+            ‡
+            <Link
+              href={`https://firstsiteguide.com/how-many-websites`}
+              className="text-violet-200/40 hover:text-violet-200/60"
+            >
+              https://siteefy.com/how-many-websites-are-there
+            </Link>
+          </span>
         </div>
       </div>
     </section>
@@ -120,15 +153,24 @@ const DepressingStatisticsBlock: React.FC = () => {
 export default DepressingStatisticsBlock;
 
 const TotalWebsitesCounter: React.FC = () => {
-  const [totalWebsites, setTotalWebsites] = React.useState(() => {
+  const [totalWebsites, setTotalWebsites] = useState(2_147_321_000);
+  const [clientLoaded, setClientLoaded] = useState(false);
+
+  useEffect(() => {
+    setClientLoaded(true);
+    // prevent hydration errors
     const secondsSinceRefDate = Math.floor((Date.now() - REF_DATE) / 1000);
     const newWebsitesSinceRefDate = secondsSinceRefDate * 3;
-    return 1_980_000_000 + newWebsitesSinceRefDate;
-  });
+    setTotalWebsites(1_980_000_000 + newWebsitesSinceRefDate);
+  }, []);
 
   useInterval(() => {
     setTotalWebsites(totalWebsites + 1);
   }, 333);
+
+  useEffect(() => {
+    setClientLoaded(true);
+  }, []);
 
   return (
     <div className="text-white text-5xl xs:text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-mono font-bold flex overflow-hidden">
@@ -137,7 +179,7 @@ const TotalWebsitesCounter: React.FC = () => {
         .split(``)
         .map((digit, index) => {
           const isComma = digit === `,`;
-          return (
+          return clientLoaded ? (
             <div
               key={index}
               className={cx(
@@ -169,6 +211,16 @@ const TotalWebsitesCounter: React.FC = () => {
                     </div>
                   ))}
             </div>
+          ) : (
+            <div
+              key={index}
+              className={cx(
+                `relative h-32 bg-slate-800 animate-pulse`,
+                isComma
+                  ? `!-left-1 xs:!-left-3 md:!-left-3 lg:!-left-2 w-4 xs:w-5 md:w-10 lg:w-14`
+                  : `w-[28px] xs:w-[40px] sm:w-[48px] md:w-[60px] lg:w-[72px]`,
+              )}
+            ></div>
           );
         })}
     </div>
@@ -196,7 +248,7 @@ const Statistic: React.FC<StatisticProps> = ({ statistic, label, className }) =>
 );
 
 const Bold: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span className="font-axiforma font-semibold bg-gradient-to-r from-violet-100 to-fuchsia-300 bg-clip-text text-transparent italic">
+  <span className="font-semibold bg-gradient-to-r from-violet-100 to-fuchsia-300 bg-clip-text text-transparent italic">
     {children}
   </span>
 );

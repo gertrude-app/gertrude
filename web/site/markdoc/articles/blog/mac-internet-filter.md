@@ -16,7 +16,8 @@ and only where you want them to be.
 According to recent estimates, there are over **2 billion** websites on the internet, with
 over _250,000_ being created every day. There are a ton of innocent and educational
 websites out there, but sadly they are mixed in with a **tremendous amount of dangerous
-content**. Studies have indicated that perhaps **37% of the internet is pornography**.
+content**. Studies have indicated that perhaps **10% of material the internet is
+pornography**.
 
 ## An Illusion of Safety...
 
