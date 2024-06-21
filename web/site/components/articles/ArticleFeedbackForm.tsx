@@ -24,6 +24,7 @@ const ArticleFeedbackForm: React.FC<Props> = ({ name, lang }) => (
       data-netlify="true"
       name={name}
       method="POST"
+      action="/_netlify_forms.html"
     >
       <input type="hidden" name="form-name" value={name} />
       <div className="lg:flex lg:space-x-4">

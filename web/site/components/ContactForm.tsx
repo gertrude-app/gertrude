@@ -17,6 +17,7 @@ const ContactForm: React.FC = () => {
       className="flex flex-col relative"
       name="contact"
       data-netlify="true"
+      method="POST"
       onSubmit={(event) => {
         event.preventDefault();
         const params = new URLSearchParams();
@@ -27,7 +28,7 @@ const ContactForm: React.FC = () => {
         params.append(`message`, message);
         setState(`ongoing`);
         try {
-          fetch(`/`, {
+          fetch(`/_netlify_forms.html`, {
             method: `POST`,
             headers: { 'Content-Type': `application/x-www-form-urlencoded` },
             body: params.toString(),
