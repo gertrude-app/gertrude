@@ -7,5 +7,5 @@ export function isScreenshotTest(): boolean {
     return false;
   }
   // @ts-ignore
-  return process?.env?.STORYBOOK_SCREENSHOT_TESTING !== undefined;
+  return process.env.STORYBOOK_SCREENSHOT_TESTING === `true`;
 }

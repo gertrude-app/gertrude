@@ -39,7 +39,7 @@ const PLACEHOLDERS: Record<string, StaticImageData> = {
 
 export function testImgUrl(width: number, height: number): string {
   if (!env.isScreenshotTest()) {
-    return `https://placekitten.com/${width}/${height}`;
+    return `https://fakeimg.pl/${width}x${height}/3e2a73/ffffff`;
   }
 
   const key = `${width}x${height}`;
