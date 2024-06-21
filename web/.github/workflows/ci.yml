@@ -13,14 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
       - name: get pnpm store path
         id: pnpm-cache
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: pnpm-cache-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -28,7 +28,7 @@ jobs:
       - name: install deps
         run: pnpm install
       - name: setup just
-        uses: extractions/setup-just@v1
+        uses: extractions/setup-just@v2
       - name: lint
         run: just lint
       - name: format
@@ -45,16 +45,16 @@ jobs:
       ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - name: install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
       - name: get pnpm store path
         id: pnpm-cache
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -64,7 +64,7 @@ jobs:
       - name: install deps
         run: pnpm install
       - name: setup just
-        uses: extractions/setup-just@v1
+        uses: extractions/setup-just@v2
       - name: build storybook
         run: STORYBOOK_SCREENSHOT_TESTING=true just build-storybook
       - name: serve storybook
@@ -77,7 +77,7 @@ jobs:
           pnpm dlx @argos-ci/cli upload storybook/visual-tests/screenshots/argos || true
       - name: create screenshots pr
         id: pr
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v6
         if: github.event_name == 'pull_request'
         with:
           base: ${{ github.head_ref }}
@@ -101,14 +101,14 @@ jobs:
       - name: reset staging # cypress tests depend slightly on staging api state
         run: curl --silent ${{ secrets.STAGING_API_RESET_ROUTE  }}; true
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
       - name: get pnpm store path
         id: pnpm-cache
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -118,11 +118,11 @@ jobs:
       - name: install deps
         run: pnpm install
       - name: setup just
-        uses: extractions/setup-just@v1
+        uses: extractions/setup-just@v2
       - name: build dashboard
         run: just build-dash
       - name: cypress
-        uses: cypress-io/github-action@v4.2.0
+        uses: cypress-io/github-action@v6.6.0
         with:
           start: pnpm --filter @dash/app preview
           project: dash/app
@@ -138,14 +138,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
       - name: get pnpm store path
         id: pnpm-cache
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: pnpm-cache-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -153,6 +153,6 @@ jobs:
       - name: install deps
         run: pnpm install
       - name: setup just
-        uses: extractions/setup-just@v1
+        uses: extractions/setup-just@v2
       - name: build site
         run: just build-site

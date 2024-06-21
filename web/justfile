@@ -7,7 +7,7 @@ dash:
 	@pnpm --filter @dash/app start
 
 site:
-	@pnpm --filter @site/app start
+	@pnpm --filter site start
 
 storybook:
 	@pnpm --filter @storybook/app start
@@ -26,8 +26,8 @@ component *args:
 # utility
 
 clean:
-  @rm -rf site/app/.next
-  @rm -rf site/app/out
+  @rm -rf site/.next
+  @rm -rf site/out
   @rm -rf dash/app/build
   @find . -name "node_modules" -type d -prune -exec rm -rf {} + && pnpm i
 
@@ -44,9 +44,7 @@ appviews isolate="":
 	@cd appviews && pnpm typecheck && node generate.cjs {{isolate}}
 
 build-site:
-	@pnpm --filter @site/app build
-	@pnpm --filter @site/app export
-	@cp site/app/_redirects site/app/out
+	@pnpm --filter site build
 
 build-storybook:
 	@pnpm --filter @storybook/app build
