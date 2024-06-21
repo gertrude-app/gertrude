@@ -15,6 +15,8 @@ const ContactForm: React.FC = () => {
   return (
     <form
       className="flex flex-col relative"
+      name="contact"
+      data-netlify="true"
       onSubmit={(event) => {
         event.preventDefault();
         const params = new URLSearchParams();
