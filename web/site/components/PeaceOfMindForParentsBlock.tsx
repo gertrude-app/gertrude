@@ -1,15 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { RocketIcon, VideoIcon } from 'lucide-react';
 import { useIntersectionObserver, useScrollY, useWindowDimensions } from '../lib/hooks';
 import WebsiteGraphic from './WebsiteGraphic';
 import FancyLink from './FancyLink';
+import VideoModal from './VideoModal';
 
 const PeaceOfMindForParentsBlock: React.FC = () => {
   const { intersected, ref: illustration } = useIntersectionObserver({ threshold: 1 });
-  const scrollY = useScrollY();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const [showingVideo, setShowingVideo] = useState(false);
+  const scrollY = useScrollY();
 
   return (
     <div className="bg-fuchsia-500 px-6 sm:px-8 xs:px-12 md:px-20 py-28 pb-64 min-[1450px]:pb-48 flex flex-col min-[1450px]:flex-row gap-80 min-[1450px]:gap-16 items-center justify-center">
@@ -46,7 +48,13 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
           >
             Get started
           </FancyLink>
-          <FancyLink type="link" href="#" Icon={VideoIcon} inverted size="lg">
+          <FancyLink
+            type="button"
+            onClick={() => setShowingVideo(true)}
+            Icon={VideoIcon}
+            inverted
+            size="lg"
+          >
             Watch demo video
           </FancyLink>
         </div>
@@ -149,6 +157,9 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
           intersected={intersected}
         />
       </div>
+      {showingVideo && (
+        <VideoModal videoId="Mr8_ufrkDZs" onDismiss={() => setShowingVideo(false)} />
+      )}
     </div>
   );
 };

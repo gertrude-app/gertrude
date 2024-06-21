@@ -20,26 +20,40 @@ interface LinkProps {
 interface SubmitProps {
   type: 'submit';
 }
+interface ButtonProps {
+  type: 'button';
+  onClick(): unknown;
+}
 
-type FancyLinkProps = (LinkProps | SubmitProps) & CommonProps;
+type FancyLinkProps = (LinkProps | SubmitProps | ButtonProps) & CommonProps;
 
 const FancyLink: React.FC<FancyLinkProps> = (props) => {
   const classes = cx(`relative group select-none block`, props.className);
 
   let Element: React.FC<{ children: React.ReactNode }>;
 
-  if (props.type === `link`) {
-    Element = ({ children }) => (
-      <NextLink href={props.href} className={classes}>
-        {children}
-      </NextLink>
-    );
-  } else {
-    Element = ({ children }) => (
-      <button type="submit" className={classes}>
-        {children}
-      </button>
-    );
+  switch (props.type) {
+    case `link`:
+      Element = ({ children }) => (
+        <NextLink href={props.href} className={classes}>
+          {children}
+        </NextLink>
+      );
+      break;
+    case `submit`:
+      Element = ({ children }) => (
+        <button type="submit" className={classes}>
+          {children}
+        </button>
+      );
+      break;
+    case `button`:
+      Element = ({ children }) => (
+        <button type="button" onClick={props.onClick} className={classes}>
+          {children}
+        </button>
+      );
+      break;
   }
 
   const color = props.color ?? `secondary`;
