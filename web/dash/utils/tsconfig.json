@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "moduleResolution": "Bundler"
+    "skipLibCheck": true
   },
   "extends": "../../tsconfig.json"
 }
