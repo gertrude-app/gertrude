@@ -2,7 +2,7 @@
   "name": "@gertie/web-monorepo",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@8.11.0",
+  "packageManager": "pnpm@9.4.0",
   "devDependencies": {
     "@types/react": "^18.2.42",
     "@typescript-eslint/eslint-plugin": "^7.3.1",
