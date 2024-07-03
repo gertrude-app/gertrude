@@ -15,7 +15,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
       - name: get pnpm store path
         id: pnpm-cache
         run: |
