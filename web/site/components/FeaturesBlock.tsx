@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import cx from 'classnames';
 import React, { useEffect, useState } from 'react';
 import type { StaticImageData } from 'next/image';
@@ -50,7 +49,7 @@ const FeaturesBlock: React.FC = () => {
     <section className="relative">
       <div className="w-full h-screen sticky top-0 flex flex-col justify-center items-center bg-white [perspective:1000px] overflow-hidden">
         <div className="flex-grow" />
-        <Image src={Waves} alt="Waves" className="w-full" />
+        <img src={Waves} alt="Waves" className="w-full" />
         <div className="flex-grow-[3] bg-gradient-to-b from-violet-300 to-violet-100 self-stretch" />
         <Feature
           title="Take complete control"
@@ -121,8 +120,8 @@ interface FeatureProps {
   description: string;
   step: number;
   currentStep: number;
-  gif: StaticImageData | string;
-  png: StaticImageData | string;
+  gif: StaticImageData;
+  png: StaticImageData;
   duration: number; // milliseconds
   highlightTime: number; // milliseconds
 }
@@ -194,14 +193,13 @@ const Feature: React.FC<FeatureProps> = ({
               shown ? `opacity-100` : `opacity-0`,
             )}
           >
-            <Image
-              src={png}
+            <img
+              src={png.src}
               alt=""
               className={cx(
                 `w-full h-full object-center object-cover z-0`,
                 animationStopped ? `opacity-100 relative` : `opacity-0 absolute`,
               )}
-              priority
             />
             {!animationStopped && (
               <div className="relative z-10 w-full h-full flex justify-center items-center">
@@ -211,12 +209,10 @@ const Feature: React.FC<FeatureProps> = ({
                     highlighted ? `w-128 h-128 opacity-0` : `w-0 h-0`,
                   )}
                 />
-                <Image
-                  src={gif}
-                  unoptimized
+                <img
+                  src={gif.src}
                   alt=""
                   className="w-full h-full object-center object-cover relative"
-                  priority
                 />
               </div>
             )}
