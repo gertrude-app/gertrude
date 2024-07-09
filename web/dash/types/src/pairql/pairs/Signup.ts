@@ -6,6 +6,7 @@ export namespace Signup {
     email: string;
     password: string;
     gclid?: string;
+    abTestVariant?: string;
   }
 
   export type Output = SuccessOutput;

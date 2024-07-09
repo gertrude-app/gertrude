@@ -25,9 +25,6 @@ const TestimonialsBlock: React.FC = () => (
   </section>
 );
 
-// 👍 thursday jared, setup new netlify project, try to get deploying there
-// kill vercel deployment if possible, but check next image/bg image stuff, lighthouse
-
 export default TestimonialsBlock;
 
 interface TestimonialCardProps {
