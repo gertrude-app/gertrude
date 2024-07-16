@@ -28,9 +28,9 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
               : ``,
         }}
       >
-        <h1 className="text-4xl xs:text-5xl md:text-6xl font-semibold text-white text-center min-[1450px]:text-left">
+        <h2 className="text-4xl xs:text-5xl md:text-6xl font-semibold text-white text-center min-[1450px]:text-left">
           Peace of mind for parents
-        </h1>
+        </h2>
         <p className="mt-8 text-white/80 text-lg xs:text-xl md:text-2xl leading-[1.5em] text-center min-[1450px]:text-left">
           Gertrude lets you block the entire internet, only unlocking the portions you
           choose. Keep your kids only and exactly where you want them to be online. Plus,
