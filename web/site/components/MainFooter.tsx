@@ -20,7 +20,7 @@ const MainFooter: React.FC = () => (
         <ul className="flex flex-col items-center sm:items-start gap-1">
           <FooterLink href="https://parents.gertrude.app/signup">Sign up</FooterLink>
           <FooterLink href="https://parents.gertrude.app">Log in</FooterLink>
-          <FooterLink href="/docs">Documentation</FooterLink>
+          <FooterLink href="/docs/getting-started">Documentation</FooterLink>
           <FooterLink href="/blog">Blog</FooterLink>
         </ul>
       </div>
