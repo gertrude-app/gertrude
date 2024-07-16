@@ -542,4 +542,4 @@ We also recommend you check the items in our article about
 
 {% /callout %}
 
-{% article-feedback-form name="lockdown-iphone-guide" lang="en" /%}
+{% article-feedback-form name="lockdownGuide" lang="en" /%}

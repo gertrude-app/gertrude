@@ -577,4 +577,4 @@ También te recomendamos revisar nuestro artículo sobre las
 
 {% /callout %}
 
-{% article-feedback-form name="lockdown-iphone-guide" lang="es" /%}
+{% article-feedback-form name="lockdownGuide" lang="es" /%}
