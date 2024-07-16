@@ -18,14 +18,15 @@ type PageProps = {
   params: Params;
 };
 
-export const dynamicParams = false;
-
 export async function generateStaticParams(): Promise<Params[]> {
   const articlePaths = await getArticlePaths(`blog`);
   return articlePaths.map((postPath) => ({
     slug: path.basename(postPath, path.extname(postPath)),
   }));
 }
+
+// 👍 monday jared, redirects rewrites, then commit maybe
+// see list in things app
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { title, description, image } = await getArticle(params.slug, `blog`);

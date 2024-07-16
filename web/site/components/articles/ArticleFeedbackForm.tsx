@@ -24,9 +24,15 @@ const ArticleFeedbackForm: React.FC<Props> = ({ name, lang }) => (
       data-netlify="true"
       name={name}
       method="POST"
-      action="/_netlify_forms.html"
+      action={(() => {
+        const endpoint = process.env.NEXT_PUBLIC_FORMS_ENDPOINT;
+        if (!endpoint) {
+          throw new Error(`Missing NEXT_PUBLIC_FORMS_ENDPOINT`);
+        }
+        return endpoint;
+      })()}
     >
-      <input type="hidden" name="form-name" value={name} />
+      <input type="hidden" name="form" value={name} />
       <div className="lg:flex lg:space-x-4">
         <fieldset className="lg:w-1/2">
           <label className="block text-slate-600 ml-3" htmlFor="name">

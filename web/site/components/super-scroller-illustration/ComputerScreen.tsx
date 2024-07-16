@@ -1,6 +1,5 @@
 import React from 'react';
 import cx from 'classnames';
-import Image from 'next/image';
 import { BanIcon, DownloadIcon } from 'lucide-react';
 import AppleLogo from '@/public/apple-logo.png';
 
@@ -192,8 +191,8 @@ const ComputerScreen: React.FC<ComputerScreenProps> = ({
         macOpened && `opacity-0`,
       )}
     >
-      <Image
-        src={AppleLogo}
+      <img
+        src={AppleLogo.src}
         alt="Apple logo"
         className="w-16 h-16"
         width={512}

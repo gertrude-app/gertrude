@@ -12,6 +12,11 @@ const ContactForm: React.FC = () => {
   const [subject, setSubject] = useState(``);
   const [message, setMessage] = useState(``);
 
+  const endpoint = process.env.NEXT_PUBLIC_FORMS_ENDPOINT;
+  if (!endpoint) {
+    throw new Error(`Missing NEXT_PUBLIC_FORMS_ENDPOINT`);
+  }
+
   return (
     <form
       className="flex flex-col relative"
@@ -21,14 +26,14 @@ const ContactForm: React.FC = () => {
       onSubmit={(event) => {
         event.preventDefault();
         const params = new URLSearchParams();
-        params.append(`form-name`, `contact`);
+        params.append(`form`, `contact`);
         params.append(`name`, name);
-        params.append(`email_address`, emailAddress);
+        params.append(`email`, emailAddress);
         params.append(`subject`, subject);
         params.append(`message`, message);
         setState(`ongoing`);
         try {
-          fetch(`/_netlify_forms.html`, {
+          fetch(endpoint, {
             method: `POST`,
             headers: { 'Content-Type': `application/x-www-form-urlencoded` },
             body: params.toString(),

@@ -8,7 +8,12 @@ const Signup: React.FC = () => {
   const [email, setEmail] = useState(``);
   const [password, setPassword] = useState(``);
   const signup = useMutation(() =>
-    Current.api.signup({ email, password, gclid: getCookieValue(`gclid`) }),
+    Current.api.signup({
+      email,
+      password,
+      gclid: getCookieValue(`gclid`),
+      abTestVariant: `super_scroller`,
+    }),
   );
 
   if (signup.isPending) {

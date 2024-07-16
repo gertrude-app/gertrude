@@ -1,5 +1,4 @@
 import { ArrowDownIcon, DownloadIcon } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import { AppIcon } from '@shared/components';
@@ -88,7 +87,7 @@ const SupportedOSCard: React.FC<{ os: string; image: StaticImageData }> = ({
   image,
 }) => (
   <div className="flex flex-col items-center xs:w-40 py-4 bg-violet-50 sm:bg-white/80 rounded-3xl">
-    <Image src={image} alt={os} className="w-16 h-16" />
+    <img src={image.src} alt={os} className="w-16 h-16" />
     <span className="text-slate-400 text-sm mt-2">macOS</span>
     <span className="text-xl font-semibold">{os}</span>
   </div>
