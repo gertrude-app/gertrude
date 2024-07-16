@@ -136,6 +136,8 @@ jobs:
   site:
     name: site
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_FORMS_ENDPOINT: /not-real
     steps:
       - name: checkout
         uses: actions/checkout@v4
