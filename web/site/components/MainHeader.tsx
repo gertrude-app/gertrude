@@ -1,6 +1,5 @@
 import React from 'react';
 import cx from 'classnames';
-import Link from 'next/link';
 import { Logo } from '@shared/components';
 import MobileLoginDropdown from './MobileLoginDropdown';
 import FancyLink from './FancyLink';
@@ -11,12 +10,12 @@ const MainHeader: React.FC<{ theme: 'violet' | 'white' }> = ({ theme }) => (
       `flex justify-between items-center px-6 xs:px-8 top-0 left-0 right-0 z-50 py-6 relative`,
     )}
   >
-    <Link href="/">
+    <a href="/">
       <Logo
         className={cx(`transition-opacity duration-500`)}
         type={theme === `violet` ? `inverted` : `default`}
       />
-    </Link>
+    </a>
     <MobileLoginDropdown theme={theme} />
     <div className={cx(`gap-4 transition-opacity duration-500 hidden sm:flex`)}>
       <FancyLink
