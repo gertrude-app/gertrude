@@ -34,7 +34,12 @@ export const onRequest = async ({ request, next, env }) => {
 
   const asset = await env.ASSETS.fetch(url);
   const response = new Response(asset.body, asset);
-  response.headers.append(`Set-Cookie`, `ab_variant=${cohort}; path=/; max-age=1209600`);
+  const domain = url.hostname;
+  const twoWeeks = 1209600;
+  response.headers.append(
+    `Set-Cookie`,
+    `ab_variant=${cohort}; path=/; max-age=${twoWeeks}; domain=${domain}`,
+  );
   return response;
 };
 
