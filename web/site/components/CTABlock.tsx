@@ -14,7 +14,7 @@ const CTABlock: React.FC = () => (
       <div className="flex flex-col md:flex-row justify-center self-stretch md:items-center gap-6 md:gap-4 mt-12">
         <FancyLink
           type="link"
-          href="https://parents.gertrude.app/signup"
+          href="https://parents.gertrude.app/signup?v=new_site"
           Icon={RocketIcon}
           color="primary"
           size="lg"

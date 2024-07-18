@@ -12,7 +12,7 @@ const Signup: React.FC = () => {
       email,
       password,
       gclid: getCookieValue(`gclid`),
-      abTestVariant: `super_scroller`,
+      abTestVariant: getQueryParam(`v`) ?? getCookieValue(`ab_variant`),
     }),
   );
 
@@ -70,4 +70,9 @@ export default Signup;
 
 function getCookieValue(name: string): string | undefined {
   return document.cookie.match(`(^|;)\\s*` + name + `\\s*=\\s*([^;]+)`)?.pop();
+}
+
+function getQueryParam(name: string): string | undefined {
+  const url = new URL(window.location.href);
+  return url.searchParams.get(name) ?? undefined;
 }

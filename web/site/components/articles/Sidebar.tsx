@@ -22,9 +22,9 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
   >
     <div className="bg-white rounded-3xl lg:rounded-r-none p-4 py-8 shadow-lg lg:shadow-none flex-grow flex flex-col justify-between">
       <div>
-        <Link href="/">
+        <a href="/">
           <Logo className="ml-4" />
-        </Link>
+        </a>
         <div className="mt-10 flex flex-col">
           <SidebarLink slug="getting-started" title="Getting Started" setOpen={setOpen} />
           <SidebarLink slug="faqs" title="Frequently Asked Questions" setOpen={setOpen} />
@@ -43,9 +43,9 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
       </div>
       <div className="flex flex-col">
         <div className="flex justify-center gap-2 items-center">
-          <Link href="/contact" className="text-lg text-violet-500 font-medium">
+          <a href="/contact" className="text-lg text-violet-500 font-medium">
             Contact
-          </Link>
+          </a>
           <span className="text-violet-400 text-xl">•</span>
           <Link href="/blog" className="text-lg text-violet-500 font-medium">
             Blog

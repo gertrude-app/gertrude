@@ -24,7 +24,9 @@ const MobileLoginDropdown: React.FC<{ theme: `violet` | `white` }> = ({ theme })
           theme === `white` ? `bg-violet-100/50` : `bg-white`,
         )}
       >
-        <DropdownLink href="https://parents.gertrude.app/signup">Sign up</DropdownLink>
+        <DropdownLink href="https://parents.gertrude.app/signup?v=new_site">
+          Sign up
+        </DropdownLink>
         <DropdownLink href="https://parents.gertrude.app">Log in</DropdownLink>
       </DropdownMenu.Content>
     </DropdownMenu.Portal>

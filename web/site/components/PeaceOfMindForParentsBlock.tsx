@@ -40,7 +40,7 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-6 mt-12 self-stretch sm:self-center min-[1450px]:self-start">
           <FancyLink
             type="link"
-            href="https://parents.gertrude.app/signup"
+            href="https://parents.gertrude.app/signup?v=new_site"
             Icon={RocketIcon}
             inverted
             color="primary"
