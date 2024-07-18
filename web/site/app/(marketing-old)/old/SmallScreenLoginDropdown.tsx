@@ -37,7 +37,7 @@ export const SmallScreenLoginDropdown: React.FC<Props> = ({ className }) => (
           </Menu.Item>
           <Menu.Item>
             <a
-              href="https://parents.gertrude.app/signup"
+              href="https://parents.gertrude.app/signup?v=old_site"
               className="hover:bg-violet-100 rounded-lg hover:text-violet-700 text-slate-700 block px-4 py-2 text-base font-medium transition-colors duration-200"
             >
               Sign up

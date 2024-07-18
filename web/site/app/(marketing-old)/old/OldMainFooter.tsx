@@ -21,7 +21,9 @@ const MainFooter: React.FC = () => (
         </ul>
         <ul className="flex flex-col space-y-3 flex-grow">
           <li>
-            <FooterLink href="https://parents.gertrude.app/signup">Signup</FooterLink>
+            <FooterLink href="https://parents.gertrude.app/signup?v=old_site">
+              Signup
+            </FooterLink>
           </li>
           <li>
             <FooterLink href="https://parents.gertrude.app">Login</FooterLink>

@@ -29,7 +29,7 @@ const MainHeader: React.FC<{ theme: 'violet' | 'white' }> = ({ theme }) => (
       </FancyLink>
       <FancyLink
         type="link"
-        href="https://parents.gertrude.app/signup"
+        href="https://parents.gertrude.app/signup?v=new_site"
         size="sm"
         color="primary"
         inverted={theme === `violet`}

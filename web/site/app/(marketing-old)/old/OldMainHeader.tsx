@@ -18,7 +18,7 @@ const MainHeader: React.FC = () => (
       </Button>
       <Button
         type="external"
-        href="https://parents.gertrude.app/signup"
+        href="https://parents.gertrude.app/signup?v=old_site"
         color="primary-on-violet-bg"
       >
         Sign up

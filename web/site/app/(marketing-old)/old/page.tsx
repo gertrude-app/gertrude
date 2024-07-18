@@ -1,6 +1,5 @@
 import React from 'react';
 import type { NextPage } from 'next';
-import MainHeader from './home/OldMainHeader';
 import HeroBlock from './home/OldHeroBlock';
 import PeaceOfMindBlock from './home/OldPeaceOfMindBlock';
 import LosingGameBlock from './home/OldLosingGameBlock';
@@ -8,7 +7,6 @@ import SafeIsNowPossibleBlock from './home/OldSafeIsNowPossibleBlock';
 import DefenseInDepthBlock from './home/OldDefenseInDepthBlock';
 import TestimonialsBlock from './home/OldTestimonialsBlock';
 import CTABlock from './home/OldCTABlock';
-import MainFooter from './home/OldMainFooter';
 import { createMetadata } from '@/lib/seo';
 
 export const metadata = createMetadata(
@@ -17,8 +15,7 @@ export const metadata = createMetadata(
 );
 
 const HomePage: NextPage = () => (
-  <main className="overflow-hidden">
-    <MainHeader />
+  <>
     <HeroBlock />
     <PeaceOfMindBlock />
     <LosingGameBlock />
@@ -26,8 +23,7 @@ const HomePage: NextPage = () => (
     <DefenseInDepthBlock />
     <TestimonialsBlock />
     <CTABlock />
-    <MainFooter />
-  </main>
+  </>
 );
 
 export default HomePage;

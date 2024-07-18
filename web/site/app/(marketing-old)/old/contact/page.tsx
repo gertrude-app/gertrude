@@ -1,5 +1,6 @@
 import React from 'react';
 import type { NextPage } from 'next';
+import ContactForm from './OldContactForm';
 import * as seo from '@/lib/seo';
 
 export const metadata = seo.createMetadata(
@@ -7,10 +8,6 @@ export const metadata = seo.createMetadata(
   seo.description(`Contact us`),
 );
 
-const ContactPage: NextPage = () => (
-  <div className="flex justify-center items-center px-0 xs:px-8 py-8 sm:px-12 sm:py-12 md:px-20 md:py-20">
-    <h1>Contact Page: old</h1>
-  </div>
-);
+const ContactPage: NextPage = () => <ContactForm />;
 
 export default ContactPage;

@@ -13,7 +13,7 @@ const CTABlock: React.FC = () => (
       <a
         id="cta-signup"
         className="text-white font-extrabold text-3xl bg-slate-800 px-10 py-4 rounded-xl shadow-xl hover:bg-slate-900 transition-[background-color] duration-150 flex items-center"
-        href="https://parents.gertrude.app/signup"
+        href="https://parents.gertrude.app/signup?v=old_site"
       >
         <i aria-hidden className="fas fa-rocket mr-4 text-2xl" />
         <span className="whitespace-nowrap">Start free trial</span>
