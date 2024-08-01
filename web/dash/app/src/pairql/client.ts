@@ -293,6 +293,16 @@ export const liveClient = {
     return query<T.SaveUser.Input, T.SaveUser.Output>(input, `admin`, `SaveUser`);
   },
 
+  securityEventsFeed(
+    input: T.SecurityEventsFeed.Input,
+  ): Promise<T.Result<T.SecurityEventsFeed.Output>> {
+    return query<T.SecurityEventsFeed.Input, T.SecurityEventsFeed.Output>(
+      input,
+      `admin`,
+      `SecurityEventsFeed`,
+    );
+  },
+
   sendPasswordResetEmail(
     input: T.SendPasswordResetEmail.Input,
   ): Promise<T.Result<T.SendPasswordResetEmail.Output>> {
@@ -462,6 +472,9 @@ export const throwingClient: ApiClient = {
   },
   saveUser: () => {
     throw new Error(`ApiClient.saveUser() not implemented`);
+  },
+  securityEventsFeed: () => {
+    throw new Error(`ApiClient.securityEventsFeed() not implemented`);
   },
   sendPasswordResetEmail: () => {
     throw new Error(`ApiClient.sendPasswordResetEmail() not implemented`);

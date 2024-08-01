@@ -202,6 +202,9 @@ const noopClient: ApiClient = {
   stripeUrl: async () => {
     return Result.success({ url: `/` });
   },
+  securityEventsFeed: async () => {
+    return Result.success([]);
+  },
   updateUnlockRequest: async () => {
     return Result.success({ success: true });
   },

@@ -30,6 +30,7 @@ import RequestPasswordReset from './components/routes/RequestPasswordReset';
 import ChangePassword from './components/routes/ChangePassword';
 import Computers from './components/routes/Computers';
 import Computer from './components/routes/Computer';
+import SecurityEventsFeed from './components/routes/SecurityEventsFeed';
 import ConferenceEmailForm from './components/routes/ConferenceEmail';
 import UseCaseSurvey from './components/routes/UseCaseSurvey';
 
@@ -67,6 +68,7 @@ const App: React.FC = () => {
         <Route path="/checkout-cancel" element={<CheckoutCancel />} />
         <Route path="settings" element={<AdminSettings />} />
         <Route path="unlock-requests" element={<UsersUnlockRequests />} />
+        <Route path="security-events" element={<SecurityEventsFeed />} />
 
         <Route path="keychains">
           <Route index element={<Keychains />} />

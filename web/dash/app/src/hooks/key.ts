@@ -18,6 +18,7 @@ import type {
   GetDevices,
   GetDevice,
   LatestAppVersions,
+  SecurityEventsFeed,
 } from '@dash/types';
 
 export class QueryKey<T> {
@@ -120,6 +121,10 @@ export class Key extends QueryKey<never> {
 
   static get apps(): QueryKey<GetIdentifiedApps.Output> {
     return new QueryKey(`apps`, [`apps`]);
+  }
+
+  static get securityEventsFeed(): QueryKey<SecurityEventsFeed.Output> {
+    return new QueryKey(`securityEvents`, [`securityEvents`]);
   }
 
   private constructor() {
