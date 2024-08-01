@@ -12,6 +12,7 @@ interface CommonProps {
   Icon?: LucideIcon;
   inverted?: boolean;
   className?: string;
+  id?: string;
 }
 interface LinkProps {
   type: 'link';
@@ -35,21 +36,21 @@ const FancyLink: React.FC<FancyLinkProps> = (props) => {
   switch (props.type) {
     case `link`:
       Element = ({ children }) => (
-        <NextLink href={props.href} className={classes}>
+        <NextLink id={props.id} href={props.href} className={classes}>
           {children}
         </NextLink>
       );
       break;
     case `submit`:
       Element = ({ children }) => (
-        <button type="submit" className={classes}>
+        <button id={props.id} type="submit" className={classes}>
           {children}
         </button>
       );
       break;
     case `button`:
       Element = ({ children }) => (
-        <button type="button" onClick={props.onClick} className={classes}>
+        <button id={props.id} type="button" onClick={props.onClick} className={classes}>
           {children}
         </button>
       );
