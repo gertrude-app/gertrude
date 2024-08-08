@@ -9,6 +9,8 @@ export namespace SecurityEventsFeed {
         id: UUID;
         childId: UUID;
         deviceId: UUID;
+        childName: string;
+        deviceName: string;
         event: string;
         detail?: string;
         explanation: string;

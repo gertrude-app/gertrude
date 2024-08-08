@@ -23,6 +23,7 @@ import {
   MapPinIcon,
   PencilIcon,
   QuestionMarkCircleIcon,
+  ShieldCheckIcon,
   UserIcon,
   UserPlusIcon,
   UsersIcon,
@@ -64,6 +65,7 @@ export const ICONS = [
   `question`,
   `home`,
   `cog`,
+  `shield`,
 ] as const;
 
 export type IconType = (typeof ICONS)[number];
@@ -108,6 +110,7 @@ const CLASS_MAP: Record<IconType, HeroIcon | string> = {
   'thumbs-down': HandThumbDownIcon,
   stopwatch: `fa-solid fa-stopwatch`,
   cog: Cog6ToothIcon,
+  shield: ShieldCheckIcon,
 };
 
 const GradientIcon: React.FC<Props> = ({ icon, className, size }) => {
