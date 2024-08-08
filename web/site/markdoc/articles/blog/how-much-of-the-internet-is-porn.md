@@ -283,6 +283,6 @@ You'll also need a dump of `.com` domains obtained from
 [https://czds.icann.org](https://czds.icann.org). There is an application form that must
 be filled out before you're granted access, but I got approved in a few days by just
 telling the truth that I was doing research on the percentage of pornographic websites.
-More specific details on replication are in the projects
+More specific details on replication are in the project's
 [readme](https://github.com/jaredh159/wicked). If anyone attempts it and has any trouble,
 or finds the documentation hard to follow, please open an issue.
