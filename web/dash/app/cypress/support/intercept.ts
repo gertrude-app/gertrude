@@ -107,6 +107,10 @@ export function interceptPql(
 ): void;
 export function interceptPql(slug: `SaveUser`, output: T.SaveUser.Output): void;
 export function interceptPql(
+  slug: `SecurityEventsFeed`,
+  output: T.SecurityEventsFeed.Output,
+): void;
+export function interceptPql(
   slug: `SendPasswordResetEmail`,
   output: T.SendPasswordResetEmail.Output,
 ): void;
@@ -173,6 +177,7 @@ export function forcePqlErr(
     | 'SaveKeychain'
     | 'SaveNotification'
     | 'SaveUser'
+    | 'SecurityEventsFeed'
     | 'SendPasswordResetEmail'
     | 'Signup'
     | 'StripeUrl'

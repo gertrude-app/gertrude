@@ -11,6 +11,7 @@ import {
   KeyIcon,
   LifebuoyIcon,
   UsersIcon,
+  // ShieldCheckIcon,
 } from '@heroicons/react/24/solid';
 import { Logo } from '@shared/components';
 import { Link } from 'react-router-dom';
@@ -79,6 +80,15 @@ const SidebarNav: React.FC<Props> = ({
         >
           Keychains
         </SidebarOption>
+        {/* <SidebarOption */}
+        {/*   Icon={ShieldCheckIcon} */}
+        {/*   collapsed={collapsed} */}
+        {/*   to="/security-events" */}
+        {/*   onClick={onInternalLinkClick} */}
+        {/*   isSelected={urlPath.startsWith(`/security-events`)} */}
+        {/* > */}
+        {/*   Security */}
+        {/* </SidebarOption> */}
         <SidebarOption
           Icon={Cog6ToothIcon}
           collapsed={collapsed}
