@@ -9,6 +9,7 @@ import { getArticle, getArticlePaths } from '@/markdoc/files';
 import { components } from '@/markdoc/config';
 import Prose from '@/components/articles/Prose';
 import { createMetadata } from '@/lib/seo';
+import PageBottomCTA from '@/components/PageBottomCTA';
 
 type Params = {
   slug: string;
@@ -58,6 +59,7 @@ const BlogArticle: NextPage<PageProps> = async ({ params: { slug } }) => {
         </span>
         <h1 className="text-4xl font-bold mb-8 mt-2 break-words">{title}</h1>
         <Prose>{Markdoc.renderers.react(content, React, { components })}</Prose>
+        <PageBottomCTA clickId="blog-cta" />
       </div>
     </div>
   );

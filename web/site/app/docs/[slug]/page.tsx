@@ -6,6 +6,7 @@ import { components } from '@/markdoc/config';
 import { getArticle, getArticlePaths } from '@/markdoc/files';
 import Prose from '@/components/articles/Prose';
 import { createMetadata } from '@/lib/seo';
+import PageBottomCTA from '@/components/PageBottomCTA';
 
 type Params = {
   slug: string;
@@ -39,6 +40,7 @@ const DocumentationArticle: NextPage<PageProps> = async ({ params: { slug } }) =
       <div className="lg:max-w-3xl pt-12 lg:pt-36 relative mx-6 xs:mx-8 pb-20">
         <h1 className="text-4xl font-bold mb-8 mt-2">{title}</h1>
         <Prose>{Markdoc.renderers.react(content, React, { components })}</Prose>
+        <PageBottomCTA clickId="docs-cta" />
       </div>
     </div>
   );
