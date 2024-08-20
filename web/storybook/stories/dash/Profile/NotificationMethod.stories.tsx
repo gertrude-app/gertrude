@@ -13,6 +13,8 @@ export const Email: Story = props({
   method: `email`,
   value: `me@example.com`,
   deletable: true,
+  inUse: true,
+  createNotification: () => {},
   onDelete: () => {},
 });
 
@@ -26,6 +28,11 @@ export const Slack: Story = props({
   ...Email.args,
   method: `slack`,
   value: `#Gertrude`,
+});
+
+export const NotInUse: Story = props({
+  ...Email.args,
+  inUse: false,
 });
 
 export default meta;

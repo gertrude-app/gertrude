@@ -26,10 +26,10 @@ export const Default: Story = props({
   email: `johndoe@example.com`,
   status: { case: `paid` },
   methods: withIdsAnd({ deletable: false }, [
-    { method: `email` as const, value: `me@example.com` },
-    { method: `slack` as const, value: `#Gertrude` },
-    { method: `email` as const, value: `you@example.com` },
-    { method: `text` as const, value: `(123) 456-7890`, deletable: true },
+    { method: `email` as const, value: `me@example.com`, inUse: true },
+    { method: `slack` as const, value: `#Gertrude`, inUse: true },
+    { method: `email` as const, value: `you@example.com`, inUse: false },
+    { method: `text` as const, value: `(123) 456-7890`, deletable: true, inUse: true },
   ]),
   notifications: withIdsAnd(notificationProps, [
     {
@@ -60,7 +60,7 @@ export const Default: Story = props({
         id: `3`,
         config: {
           case: `text` as const,
-          phoneNumber: `(555) 555-5555`,
+          phoneNumber: `(123) 456-7890`,
         },
       },
       trigger: `suspendFilterRequestSubmitted` as const,
@@ -76,6 +76,12 @@ export const Default: Story = props({
   createNotification: () => {},
   manageSubscription: () => {},
   newMethodEventHandler: () => {},
+});
+
+// @screenshot: xs,md
+export const NoNotifications: Story = props({
+  ...Default.args,
+  notifications: [],
 });
 
 // @screenshot: xs,md

@@ -138,6 +138,7 @@ const Settings: React.FC<Props> = ({
             <NotificationMethod
               onDelete={() => deleteMethod.start(method.id)}
               key={method.id}
+              createNotification={createNotification}
               {...method}
             />
           ))}

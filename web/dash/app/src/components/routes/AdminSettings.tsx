@@ -106,6 +106,9 @@ const AdminSettings: React.FC = () => {
         method: method.config.case,
         value: methodPrimaryValue(method),
         deletable: methodDeletable(method, state.notifications, admin.email),
+        inUse: Object.values(state.notifications).some(
+          (notif) => notif.original.methodId === method.id,
+        ),
       }))}
       notifications={typesafe
         .objectValues(state.notifications)
