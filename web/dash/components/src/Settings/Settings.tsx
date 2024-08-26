@@ -10,7 +10,7 @@ import type {
   NewAdminNotificationMethodEvent,
   RequestState,
 } from '@dash/types';
-import { ConfirmDeleteEntity } from '../Modal';
+import Modal, { ConfirmDeleteEntity } from '../Modal';
 import EmptyState from '../EmptyState';
 import PageHeading from '../PageHeading';
 import NewNotificationMethodSidebar from './NewNotificationMethodForm';
@@ -24,6 +24,8 @@ export type NotificationUpdate = { id: UUID } & (
   | { type: 'changeMethod'; methodId: UUID }
 );
 
+export type NewMethod = { id: UUID; confirmed: boolean };
+
 interface Props {
   email: string;
   status: AdminSubscriptionStatus;
@@ -35,9 +37,11 @@ interface Props {
   deleteMethod: ConfirmableEntityAction;
   updateNotification(update: NotificationUpdate): unknown;
   saveNotification(id: UUID): unknown;
-  createNotification(): unknown;
+  createNotification(methodId?: string): unknown;
   manageSubscription(): unknown;
   newMethodEventHandler(event: NewAdminNotificationMethodEvent): unknown;
+  newMethodId?: NewMethod;
+  setNewMethodId(id: NewMethod | undefined): unknown;
 }
 
 const Settings: React.FC<Props> = ({
@@ -54,8 +58,26 @@ const Settings: React.FC<Props> = ({
   newMethodEventHandler,
   billingPortalRequest,
   manageSubscription,
+  newMethodId,
+  setNewMethodId,
 }) => (
   <div className="relative">
+    {newMethodId && newMethodId.confirmed && (
+      <Modal
+        title="Now let's create a notification!"
+        primaryButton={{
+          action: () => {
+            createNotification(newMethodId.id);
+            setNewMethodId(undefined);
+          },
+          label: `Create notification`,
+        }}
+        onDismiss={() => setNewMethodId(undefined)}
+      >
+        Now that you've created a new notification method, you'll need to create a
+        notification to use it.
+      </Modal>
+    )}
     <ConfirmDeleteEntity type="notification" action={deleteNotification} />
     <ConfirmDeleteEntity type="notification method" action={deleteMethod} />
     <div
@@ -66,7 +88,7 @@ const Settings: React.FC<Props> = ({
     />
     <div
       className={cx(
-        `fixed bg-white top-0 right-0 w-76 md:w-96 h-screen border-l border-slate-200 shadow-xl transition-[margin-right] z-30 flex flex-col justify-beween`,
+        `fixed bg-white top-0 right-0 w-76 md:w-96 h-full border-l rounded-l-xl border-slate-200 shadow-xl transition-[margin-right] z-30 flex flex-col justify-beween`,
         pendingMethod ? `mr-0` : `-mr-112`,
       )}
     >

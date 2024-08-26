@@ -1,10 +1,11 @@
 import { v4 as uuid } from 'uuid';
-import React, { useReducer } from 'react';
+import React, { useReducer, useState } from 'react';
 import { ApiErrorMessage, Loading, Settings } from '@dash/components';
 import { capitalize } from '@shared/string';
 import { notNullish, typesafe } from '@shared/ts-utils';
 import { Result } from '@dash/types';
 import { parseE164, prettyE164 } from '@dash/utils';
+import type { NewMethod } from '@dash/components/src/Settings/Settings';
 import type { VerifiedNotificationMethod } from '@dash/types';
 import type { State } from '../../reducers/admin-reducer';
 import { isDirty, Req } from '../../lib/helpers';
@@ -15,6 +16,7 @@ import reducer, { initialState } from '../../reducers/admin-reducer';
 
 const AdminSettings: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [newMethodId, setNewMethodId] = useState<NewMethod | undefined>(undefined);
 
   const query = useQuery(Key.admin, Current.api.getAdmin, {
     onReceive: (admin) => dispatch({ type: `receivedAdmin`, admin }),
@@ -58,7 +60,10 @@ const AdminSettings: React.FC = () => {
       return Current.api.createPendingNotificationMethod(method);
     },
     {
-      onSuccess: ({ methodId }) => dispatch(PendingMethod.createSucceeded(methodId)),
+      onSuccess: ({ methodId }) => {
+        setNewMethodId({ id: methodId, confirmed: false });
+        dispatch(PendingMethod.createSucceeded(methodId));
+      },
       onError: () => dispatch(PendingMethod.createFailed),
       toast: `create:pending-notification-method`,
       invalidating: [Key.admin],
@@ -74,7 +79,12 @@ const AdminSettings: React.FC = () => {
       });
     },
     {
-      onSuccess: () => dispatch(PendingMethod.confirmSucceeded),
+      onSuccess: () => {
+        dispatch(PendingMethod.confirmSucceeded);
+        if (newMethodId) {
+          setNewMethodId({ id: newMethodId.id, confirmed: true });
+        }
+      },
       onError: () => dispatch(PendingMethod.confirmFailed),
       toast: `confirm:pending-notification-method`,
       invalidating: [Key.admin],
@@ -98,6 +108,8 @@ const AdminSettings: React.FC = () => {
 
   return (
     <Settings
+      newMethodId={newMethodId}
+      setNewMethodId={setNewMethodId}
       email={admin.email}
       status={admin.subscriptionStatus}
       billingPortalRequest={ReqState.fromMutation(getStripeUrl)}
@@ -119,7 +131,9 @@ const AdminSettings: React.FC = () => {
       pendingMethod={state.pendingNotificationMethod}
       updateNotification={(update) => dispatch({ type: `updateNotification`, update })}
       saveNotification={(id) => saveNotification.mutate(id)}
-      createNotification={() => dispatch({ type: `notificationCreated`, id: uuid() })}
+      createNotification={(methodId) =>
+        dispatch({ type: `notificationCreated`, id: uuid(), methodId })
+      }
       manageSubscription={() => getStripeUrl.mutate()}
       newMethodEventHandler={(event) => {
         switch (event.type) {

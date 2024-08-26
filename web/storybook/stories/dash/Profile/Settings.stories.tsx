@@ -23,6 +23,8 @@ const notificationProps = {
 
 // @screenshot: xs,md
 export const Default: Story = props({
+  newMethodId: undefined,
+  setNewMethodId: () => {},
   email: `johndoe@example.com`,
   status: { case: `paid` },
   methods: withIdsAnd({ deletable: false }, [
@@ -105,6 +107,15 @@ export const AddingMethodVerifying: Story = props({
     sendCodeRequest: { state: `succeeded`, payload: `123456` },
     confirmationRequest: { state: `idle` },
     confirmationCode: `333234`,
+  },
+});
+
+// @screenshot: xs,md
+export const AfterNewMethodCreation: Story = props({
+  ...Default.args,
+  newMethodId: {
+    confirmed: true,
+    id: `1`,
   },
 });
 
