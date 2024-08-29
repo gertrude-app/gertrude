@@ -64,18 +64,24 @@ const Settings: React.FC<Props> = ({
   <div className="relative">
     {newMethodId && newMethodId.confirmed && (
       <Modal
-        title="Now let's create a notification!"
+        title="One more step!"
+        icon="bell"
         primaryButton={{
           action: () => {
             createNotification(newMethodId.id);
             setNewMethodId(undefined);
           },
-          label: `Create notification`,
+          label: (
+            <div>
+              <i className="fa fa-plus mr-3" />
+              <span>Create notification</span>
+            </div>
+          ),
         }}
         onDismiss={() => setNewMethodId(undefined)}
       >
-        Now that you've created a new notification method, you'll need to create a
-        notification to use it.
+        Now that you’ve confirmed this communication <b>method</b>, you’ll need to create
+        a <b>notification</b> that uses it.
       </Modal>
     )}
     <ConfirmDeleteEntity type="notification" action={deleteNotification} />
@@ -160,7 +166,7 @@ const Settings: React.FC<Props> = ({
             <NotificationMethod
               onDelete={() => deleteMethod.start(method.id)}
               key={method.id}
-              createNotification={createNotification}
+              createNotification={() => createNotification(method.id)}
               {...method}
             />
           ))}

@@ -29,6 +29,7 @@ import {
   UsersIcon,
   WindowIcon,
 } from '@heroicons/react/24/solid';
+import { BellIcon } from '@heroicons/react/24/outline';
 import type { HeroIcon } from '@dash/types';
 
 export const ICONS = [
@@ -66,6 +67,7 @@ export const ICONS = [
   `home`,
   `cog`,
   `shield`,
+  `bell`,
 ] as const;
 
 export type IconType = (typeof ICONS)[number];
@@ -111,6 +113,7 @@ const CLASS_MAP: Record<IconType, HeroIcon | string> = {
   stopwatch: `fa-solid fa-stopwatch`,
   cog: Cog6ToothIcon,
   shield: ShieldCheckIcon,
+  bell: BellIcon,
 };
 
 const GradientIcon: React.FC<Props> = ({ icon, className, size }) => {
