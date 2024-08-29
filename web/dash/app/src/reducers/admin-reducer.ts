@@ -22,7 +22,7 @@ export type State = {
 
 type Action =
   | { type: 'receivedAdmin'; admin: GetAdmin.Output }
-  | { type: 'notificationCreated'; id: UUID }
+  | { type: 'notificationCreated'; id: UUID; methodId?: UUID }
   | { type: `newNotificationMethodEvent`; event: NewAdminNotificationMethodEvent }
   | { type: `updateNotification`; update: NotificationUpdate };
 
@@ -46,13 +46,15 @@ export function reducer(state: State, action: Action): State | undefined {
 
     case `notificationCreated`: {
       const id = action.id;
+      const methodId =
+        action.methodId ?? typesafe.objectValues(state.notificationMethods)[0]?.id ?? ``;
       state.notifications[id] = {
         editing: true,
         ...editable(
           {
             id,
             trigger: `suspendFilterRequestSubmitted`,
-            methodId: typesafe.objectValues(state.notificationMethods)[0]?.id ?? ``,
+            methodId,
           },
           true,
         ),

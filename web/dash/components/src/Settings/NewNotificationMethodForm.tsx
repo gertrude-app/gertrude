@@ -18,7 +18,7 @@ const EditNotificationSidebar: React.FC<Props> = ({
   confirmationCode,
   ...props
 }) => (
-  <div className="p-8 flex flex-col grow h-full">
+  <div className="p-8 flex flex-col grow h-full items-stretch">
     <h2 className="text-2xl font-extrabold text-slate-700 mb-8">
       New notification method
     </h2>
@@ -136,8 +136,8 @@ const EditNotificationSidebar: React.FC<Props> = ({
       onClick={() => onEvent({ type: `cancelClicked` })}
       color="tertiary"
       fullWidth
-      className="mt-auto justify-end"
-      size="large"
+      className="mt-auto"
+      size="medium"
     >
       Cancel
     </Button>
