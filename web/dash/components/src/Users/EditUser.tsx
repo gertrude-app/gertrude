@@ -133,7 +133,7 @@ const EditUser: React.FC<Props> = ({
       />
       <ConfirmDeleteEntity type="device" action={deleteDevice} />
       <ConfirmDeleteEntity type="user" action={deleteUser} />
-      {devices.length > 0 && <PageHeading icon={`pen`}>Edit child</PageHeading>}
+      {devices.length > 0 && <PageHeading icon={`cog`}>Child settings</PageHeading>}
       <div className="mt-8">
         {devices.length === 0 && (
           <div className="-mt-6 bg-white rounded-3xl p-6 sm:p-8 shadow border-[0.5px] border-slate-200">
