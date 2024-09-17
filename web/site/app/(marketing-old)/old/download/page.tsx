@@ -6,6 +6,7 @@ import BigSur from '@/public/supported-os/macos-big-sur.png';
 import Monterey from '@/public/supported-os/macos-monterey.png';
 import Ventura from '@/public/supported-os/macos-ventura.png';
 import Sonoma from '@/public/supported-os/macos-sonoma.png';
+import Sequoia from '@/public/supported-os/macos-sequoia.png';
 import * as seo from '@/lib/seo';
 
 export const metadata = seo.createMetadata(
@@ -44,6 +45,7 @@ const Download: NextPage = () => (
           <OperatingSystem name={`Monterey`} img={Monterey.src} />
           <OperatingSystem name={`Ventura`} img={Ventura.src} />
           <OperatingSystem name={`Sonoma`} img={Sonoma.src} />
+          <OperatingSystem name={`Sequoia`} img={Sequoia.src} />
         </div>
       </div>
       <div className="flex-grow lg+:flex justify-center items-center p-12 xl:p-20 bg-violet-500/10 rounded-r-3xl hidden">
