@@ -15,7 +15,7 @@ interface Props {
 }
 
 const InstallSysExt: React.FC<Props> = ({ step }) => {
-  const { os, currentStep } = useContext(OnboardingContext);
+  const { osVersion, currentStep } = useContext(OnboardingContext);
   switch (step) {
     case `installSysExt_explain`:
       return (
@@ -39,7 +39,7 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
         <Onboarding.Centered className="space-x-12" direction="row">
           <div className="flex flex-col">
             <Onboarding.Heading className="mb-2">
-              {os !== `catalina` && (
+              {osVersion.name !== `catalina` && (
                 <span className="text-4xl inline-block translate-y-1 mr-3">🥸</span>
               )}
               Don’t get tricked!
@@ -54,7 +54,7 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
             </Onboarding.PrimaryButton>
           </div>
           <ExpandableContent
-            asset={assets.osImg(os, `sys-ext-install-trick`)}
+            asset={assets.osImg(osVersion.name, `sys-ext-install-trick`)}
             width={800 / 2}
             height={600 / 2}
           />
@@ -76,7 +76,7 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
             />
           </div>
           <ExpandableContent
-            asset={assets.osImg(os, `install-sys-ext`)}
+            asset={assets.osImg(osVersion.name, `install-sys-ext`)}
             width={800 / 2}
             height={600 / 2}
           />
@@ -97,7 +97,7 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
             width={640 * 0.8}
             height={360 * 0.8}
             asset={assets.osVideo(
-              os,
+              osVersion.name,
               `troubleshoot-sys-ext-install`,
               currentStep === `installSysExt_failed`,
             )}

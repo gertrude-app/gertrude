@@ -16,7 +16,8 @@ interface Props {
 
 const AllowScreenshots: React.FC<Props> = ({ step }) => {
   const [showModal, setShowModal] = useState(false);
-  const { systemSettingsName, os, currentStep, emit } = useContext(OnboardingContext);
+  const { systemSettingsName, osVersion, currentStep, emit } =
+    useContext(OnboardingContext);
   switch (step) {
     case `allowScreenshots_required`:
       return (
@@ -83,7 +84,7 @@ const AllowScreenshots: React.FC<Props> = ({ step }) => {
             </Onboarding.SecondaryButton>
           </div>
           <ExpandableContent
-            asset={assets.osImg(os, `allow-screen-recording`)}
+            asset={assets.osImg(osVersion.name, `allow-screen-recording`)}
             width={800 / 1.9}
             height={600 / 1.9}
           />
@@ -122,7 +123,7 @@ const AllowScreenshots: React.FC<Props> = ({ step }) => {
             width={640 * 0.8}
             height={360 * 0.8}
             asset={assets.osVideo(
-              os,
+              osVersion.name,
               `troubleshoot-screen-recording`,
               currentStep === `allowScreenshots_failed`,
             )}

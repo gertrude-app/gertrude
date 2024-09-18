@@ -12,7 +12,8 @@ interface Props {
 }
 
 const AllowKeylogging: React.FC<Props> = ({ step }) => {
-  const { systemSettingsName, os, currentStep, emit } = useContext(OnboardingContext);
+  const { systemSettingsName, osVersion, currentStep, emit } =
+    useContext(OnboardingContext);
   const [showModal, setShowModal] = useState(false);
   switch (step) {
     case `allowKeylogging_required`:
@@ -99,7 +100,7 @@ const AllowKeylogging: React.FC<Props> = ({ step }) => {
             />
           </div>
           <ExpandableContent
-            asset={assets.osImg(os, `allow-keylogging`)}
+            asset={assets.osImg(osVersion.name, `allow-keylogging`)}
             width={640 / 1.7}
             height={490 / 1.7}
           />
@@ -119,7 +120,7 @@ const AllowKeylogging: React.FC<Props> = ({ step }) => {
             width={640 * 0.8}
             height={360 * 0.8}
             asset={assets.osVideo(
-              os,
+              osVersion.name,
               `troubleshoot-keylogging`,
               currentStep === `allowKeylogging_failed`,
             )}

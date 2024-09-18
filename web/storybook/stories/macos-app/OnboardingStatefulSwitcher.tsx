@@ -102,7 +102,7 @@ const OnboardingStatefulSwitcher: React.FC = () => {
     >
       <OnboardingContext.Provider
         value={{
-          os: `venturaOrLater`,
+          osVersion: { name: `sequoia`, major: 15 },
           currentStep: step,
           systemSettingsName: `System Settings`,
           emit() {},
