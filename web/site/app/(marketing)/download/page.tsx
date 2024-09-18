@@ -13,6 +13,7 @@ import BigSur from '@/public/supported-os/macos-big-sur.png';
 import Monterey from '@/public/supported-os/macos-monterey.png';
 import Ventura from '@/public/supported-os/macos-ventura.png';
 import Sonoma from '@/public/supported-os/macos-sonoma.png';
+import Sequoia from '@/public/supported-os/macos-sequoia.png';
 
 export const metadata = seo.createMetadata(
   `Download | Gertrude Internet Filter and Parental Controls`,
@@ -57,6 +58,7 @@ const DownloadPage: NextPage = () => (
             <SupportedOSCard os="Monterey" image={Monterey} />
             <SupportedOSCard os="Ventura" image={Ventura} />
             <SupportedOSCard os="Sonoma" image={Sonoma} />
+            <SupportedOSCard os="Sequoia" image={Sequoia} />
           </div>
         </div>
       </div>
