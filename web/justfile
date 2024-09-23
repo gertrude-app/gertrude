@@ -9,6 +9,9 @@ dash:
 site:
 	@pnpm --filter site start
 
+hmr-docs:
+  @watchexec --watch site/markdoc --exts .md "just hmr-comment"
+
 storybook:
 	@pnpm --filter @storybook/app start
 
@@ -105,4 +108,7 @@ fix: format lint-fix
 
 check: lint format-check typecheck test
 
+[private]
+hmr-comment:
+  @bash -c "echo // $(date) >> './site/app/docs/[slug]/page.tsx'"
 
