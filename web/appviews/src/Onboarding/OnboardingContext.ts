@@ -3,21 +3,21 @@ import type {
   AppEvent,
   MacOSUser,
   OnboardingStep,
-  OSGroup,
+  MacOSVersion,
   ViewAction,
 } from './onboarding-store';
 
 const OnboardingContext = createContext<{
   otherUsers: MacOSUser[];
   currentStep: OnboardingStep;
-  os: OSGroup;
+  osVersion: MacOSVersion;
   systemSettingsName: string;
   emit(event: AppEvent): unknown;
   dispatch(event: ViewAction): unknown;
 }>({
   otherUsers: [],
   currentStep: `welcome`,
-  os: `venturaOrLater`,
+  osVersion: { name: `sequoia`, major: 15 },
   systemSettingsName: `System Settings`,
   emit() {},
   dispatch() {},

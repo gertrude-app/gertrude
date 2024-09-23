@@ -38,7 +38,10 @@ export type OnboardingStep =
   | 'howToUseGertrude'
   | 'finish';
 
-export type OSGroup = 'catalina' | 'bigSurOrMonterey' | 'venturaOrLater';
+export interface MacOSVersion {
+  name: 'catalina' | 'bigSur' | 'monterey' | 'ventura' | 'sonoma' | 'sequoia';
+  major: number;
+}
 
 export type UserRemediationStep = 'create' | 'switch' | 'demote' | 'choose';
 
@@ -49,7 +52,10 @@ export interface MacOSUser {
 }
 
 export interface AppState {
-  os: OSGroup;
+  osVersion: {
+    name: 'catalina' | 'bigSur' | 'monterey' | 'ventura' | 'sonoma' | 'sequoia';
+    major: number;
+  };
   windowOpen: boolean;
   step: OnboardingStep;
   userRemediationStep?: UserRemediationStep;
@@ -86,10 +92,10 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
   initializer(): AppState & ViewState {
     return {
       windowOpen: false,
-      os: `venturaOrLater`,
+      osVersion: { name: `sequoia`, major: 15 },
       step: `welcome`,
       connectChildRequest: { case: `idle` },
-      currentUser: { id: 501, name: ``, isAdmin: false },
+      currentUser: { id: 502, name: ``, isAdmin: false },
       users: [],
       exemptableUserIds: [],
       exemptUserIds: [],

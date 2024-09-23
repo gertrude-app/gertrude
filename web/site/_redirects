@@ -30,22 +30,63 @@
 # onboarding #
 ##############
 /start https://parents.gertrude.app/signup 302
-# create macos user, ventura or later
-/cu-v https://youtu.be/Z_kC6ZfXZDU 302
-# create macos user, big sur or monterey
-/cu-b https://youtu.be/FFFOF3BmSos 302
-# create macos user, catalina
+
+# CREATE MACOS USER (legacy: pre 2.5.0, when we had "groups")
+#  -> delete when noone should be onboarding from 2.4.0
+# `c` was "catalina",`b` was "bigSurOrMonterey", same video
 /cu-c https://youtu.be/FFFOF3BmSos 302
-# demote admin user, ventura or later
-/du-v https://youtu.be/Sq0baQ4Ze6o 302
-# demote admin user, big sur or monterey
-/du-b https://youtu.be/tT3wowZ3BZ8 302
-# demote admin user, catalina
+/cu-b https://youtu.be/FFFOF3BmSos 302
+# `v` was "venturaOrLater"
+/cu-v https://youtu.be/Z_kC6ZfXZDU 302
+
+# CREATE MACOS USER (current: 2.5.0+)
+# catalina, big sur, and monterey are same
+/cu-cl https://youtu.be/FFFOF3BmSos 302
+/cu-bs https://youtu.be/FFFOF3BmSos 302
+/cu-mr https://youtu.be/FFFOF3BmSos 302
+# ventura
+/cu-vt https://youtu.be/Z_kC6ZfXZDU 302
+# sonoma and sequoia are the same (i think)
+/cu-sn https://youtu.be/TODO 302 # 👋 <-- video not created
+/cu-sq https://youtu.be/TODO 302 # 👋 <-- video not created
+
+# DEMOTE MACOS USER (legacy: pre 2.5.0, when we had "groups")
+#  -> delete when noone should be onboarding from 2.4.0
+# `c` was "catalina",`b` was "bigSurOrMonterey", same video
 /du-c https://youtu.be/tT3wowZ3BZ8 302
-# switch to non-admin, ventura or later
-/su-v https://youtu.be/lAoeKEFy9Zw 302
-# switch to non-admin, big sur or monterey
-/su-b https://youtu.be/jhufHnF6nEI 302
-# switch to non-admin, catalina
+/du-b https://youtu.be/tT3wowZ3BZ8 302
+# `v` was "venturaOrLater"
+/du-v https://youtu.be/Sq0baQ4Ze6o 302
+
+# DEMOTE MACOS USER (current: 2.5.0+)
+# catalina, big sur, and monterey are same
+/du-cl https://youtu.be/tT3wowZ3BZ8 302
+/du-bs https://youtu.be/tT3wowZ3BZ8 302
+/du-mr https://youtu.be/tT3wowZ3BZ8 302
+# ventura
+/du-vt https://youtu.be/Sq0baQ4Ze6o 302
+# sonoma and sequoia are the same (i think)
+/du-sn https://youtu.be/TODO 302 # 👋 <-- video not created
+/du-sq https://youtu.be/TODO 302 # 👋 <-- video not created
+
+# SWITCH MACOS USER (legacy: pre 2.5.0, when we had "groups")
+#  -> delete when noone should be onboarding from 2.4.0
+# `c` was "catalina",`b` was "bigSurOrMonterey", same video
 /su-c https://youtu.be/jhufHnF6nEI 302
+/su-b https://youtu.be/jhufHnF6nEI 302
+# `v` was "venturaOrLater"
+/su-v https://youtu.be/lAoeKEFy9Zw 302
+
+# SWITCH MACOS USER (current: 2.5.0+)
+# catalina, big sur, and monterey are same
+/su-cl https://youtu.be/jhufHnF6nEI 302
+/su-bs https://youtu.be/jhufHnF6nEI 302
+/su-mr https://youtu.be/jhufHnF6nEI 302
+# ventura
+/su-vt https://youtu.be/lAoeKEFy9Zw 302
+# sonoma and sequoia are the same (i think)
+/du-sn https://youtu.be/TODO 302 # 👋 <-- video not created
+/du-sq https://youtu.be/TODO 302 # 👋 <-- video not created
+
+# edit children
 /a-c https://parents.gertrude.app/children 302

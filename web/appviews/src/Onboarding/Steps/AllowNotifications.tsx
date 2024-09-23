@@ -14,7 +14,8 @@ interface Props {
 
 const AllowNotifications: React.FC<Props> = ({ step }) => {
   const [showModal, setShowModal] = useState(false);
-  const { systemSettingsName, os, emit, currentStep } = useContext(OnboardingContext);
+  const { systemSettingsName, osVersion, emit, currentStep } =
+    useContext(OnboardingContext);
   const asset = assets.img(`notifications`);
   const imageUrl = asset.type === `image` ? asset.url : ``;
   switch (step) {
@@ -77,7 +78,7 @@ const AllowNotifications: React.FC<Props> = ({ step }) => {
             />
           </div>
           <ExpandableContent
-            asset={assets.osImg(os, `allow-notifications`)}
+            asset={assets.osImg(osVersion.name, `allow-notifications`)}
             width={800 / 2}
             height={600 / 2}
           />
@@ -97,7 +98,7 @@ const AllowNotifications: React.FC<Props> = ({ step }) => {
             width={640 * 0.8}
             height={360 * 0.8}
             asset={assets.osVideo(
-              os,
+              osVersion.name,
               `troubleshoot-notifications`,
               currentStep === `allowNotifications_failed`,
             )}

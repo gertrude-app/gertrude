@@ -1,4 +1,4 @@
-import type { OSGroup } from './onboarding-store';
+import type { MacOSVersion } from './onboarding-store';
 
 interface VideoAsset {
   type: 'video';
@@ -27,7 +27,7 @@ export type ImageAsset = StaticImgAsset | SingleGifAsset | MultiGifAsset;
 export type CdnAsset = VideoAsset | ImageAsset;
 
 class CdnAssets implements ExhaustiveAssets {
-  os(os: OSGroup): OsCdnAssets {
+  os(os: MacOSVersion['name']): OsCdnAssets {
     return new OsCdnAssets(os);
   }
 
@@ -35,7 +35,7 @@ class CdnAssets implements ExhaustiveAssets {
     return { type: `video`, url: `${ENDPOINT}/common/${id}.mp4`, render };
   }
 
-  osVideo(os: OSGroup, id: OsVideoId, render = false): VideoAsset {
+  osVideo(os: MacOSVersion['name'], id: OsVideoId, render = false): VideoAsset {
     return new OsCdnAssets(os).video(id, render);
   }
 
@@ -60,7 +60,7 @@ class CdnAssets implements ExhaustiveAssets {
     }
   }
 
-  osImg(os: OSGroup, filename: OsImgId): ImageAsset {
+  osImg(os: MacOSVersion['name'], filename: OsImgId): ImageAsset {
     return new OsCdnAssets(os).img(filename);
   }
 
@@ -69,14 +69,17 @@ class CdnAssets implements ExhaustiveAssets {
       ...VIDEO_IDS.map((id) => this.video(id)),
       ...COMMON_IMG_IDS.map((filename) => this.img(filename)),
       ...new OsCdnAssets(`catalina`).all(),
-      ...new OsCdnAssets(`bigSurOrMonterey`).all(),
-      ...new OsCdnAssets(`venturaOrLater`).all(),
+      ...new OsCdnAssets(`bigSur`).all(),
+      ...new OsCdnAssets(`monterey`).all(),
+      ...new OsCdnAssets(`ventura`).all(),
+      ...new OsCdnAssets(`sonoma`).all(),
+      ...new OsCdnAssets(`sequoia`).all(),
     ];
   }
 }
 
 class OsCdnAssets implements ExhaustiveAssets {
-  constructor(public readonly os: OSGroup) {}
+  constructor(public readonly os: MacOSVersion['name']) {}
 
   video(id: OsVideoId, render = false): VideoAsset {
     return { type: `video`, url: `${ENDPOINT}/${this.os}/${id}.mp4`, render };
@@ -130,7 +133,7 @@ class OsCdnAssets implements ExhaustiveAssets {
 
 export default new CdnAssets();
 
-const ENDPOINT = `https://gertrude-web-assets.nyc3.cdn.digitaloceanspaces.com/onboarding`;
+const ENDPOINT = `https://gertrude-web-assets.nyc3.cdn.digitaloceanspaces.com/onboarding-v2.5.0`;
 
 const VIDEO_IDS = [`post-onboarding-tour`, `get-connection-code`] as const;
 
@@ -167,28 +170,40 @@ const COMMON_IMG_DATA: Record<CommonImgId, string | [number, ...number[]]> = {
 
 const OS_IMAGE_DATA: Record<
   OsImgId,
-  string | Record<OSGroup, [number, number, ...number[]]>
+  string | Record<MacOSVersion['name'], [number, number, ...number[]]>
 > = {
   'sys-ext-install-trick': `png`,
   'allow-notifications': {
     catalina: [3.55, 3.93, 4.53],
-    bigSurOrMonterey: [3.55, 3.93, 4.53],
-    venturaOrLater: [5.63, 4.73, 3.73],
+    bigSur: [3.55, 3.93, 4.53],
+    monterey: [3.55, 3.93, 4.53],
+    ventura: [5.63, 4.73, 3.73],
+    sonoma: [5.63, 4.73, 3.73],
+    sequoia: [5.63, 4.73, 3.73],
   },
   'allow-screen-recording': {
     catalina: [3.03, 4.8, 3.06, 10.93, 4.8],
-    bigSurOrMonterey: [3.03, 5.09, 2.81, 3.2],
-    venturaOrLater: [3.27, 4.6, 3.73],
+    bigSur: [3.03, 5.09, 2.81, 3.2],
+    monterey: [3.03, 5.09, 2.81, 3.2],
+    ventura: [3.27, 4.6, 3.73],
+    sonoma: [3.27, 4.6, 3.73],
+    sequoia: [3.27, 4.6, 3.73],
   },
   'allow-keylogging': {
     catalina: [3.58, 4.18],
-    bigSurOrMonterey: [3.58, 4.18],
-    venturaOrLater: [3.94, 4.93],
+    bigSur: [3.58, 4.18],
+    monterey: [3.58, 4.18],
+    ventura: [3.94, 4.93],
+    sonoma: [3.94, 4.93],
+    sequoia: [3.94, 4.93],
   },
   'install-sys-ext': {
     catalina: [2.95, 3.16, 3.86, 3.33],
-    bigSurOrMonterey: [3.48, 5.48, 4.06, 4.2],
-    venturaOrLater: [3.1, 6.72, 5.22],
+    bigSur: [3.48, 5.48, 4.06, 4.2],
+    monterey: [3.48, 5.48, 4.06, 4.2],
+    ventura: [3.1, 6.72, 5.22],
+    sonoma: [3.1, 6.72, 5.22],
+    sequoia: [3.1, 6.72, 5.22], // 👋 <-- needs new version
   },
 };
 

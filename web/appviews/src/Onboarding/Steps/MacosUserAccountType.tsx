@@ -94,8 +94,23 @@ interface StartRemediationProps {
 }
 
 const StartRemediation: React.FC<StartRemediationProps> = ({ action }) => {
-  const { os } = useContext(OnboardingContext);
-  const osSuffix = os[0] ?? ``;
+  const { osVersion } = useContext(OnboardingContext);
+  const osSuffix = (() => {
+    switch (osVersion.name) {
+      case `catalina`:
+        return `cl`;
+      case `bigSur`:
+        return `bs`;
+      case `monterey`:
+        return `mr`;
+      case `ventura`:
+        return `vt`;
+      case `sonoma`:
+        return `sn`;
+      case `sequoia`:
+        return `sq`;
+    }
+  })();
   let lead: string;
   let tutorialSlug: string;
   switch (action) {

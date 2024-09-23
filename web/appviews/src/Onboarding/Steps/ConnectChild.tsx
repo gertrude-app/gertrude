@@ -11,15 +11,18 @@ interface Props {
 
 const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { currentStep, emit, dispatch, os } = useContext(OnboardingContext);
+  const { currentStep, emit, dispatch, osVersion } = useContext(OnboardingContext);
   const codeValid = connectionCode.match(/^\d{6}$/) !== null;
 
   useEffect(() => {
-    // catalina and big sur both showed wonky layout issues, caused by the focus
-    if (currentStep === `connectChild` && os === `venturaOrLater`) {
+    if (
+      // catalina and big sur both showed wonky layout issues, caused by the focus
+      currentStep === `connectChild` &&
+      osVersion.major > 11 /* 11 = big sur */
+    ) {
       inputRef.current?.focus({ preventScroll: true });
     }
-  }, [currentStep, os]);
+  }, [currentStep, osVersion]);
 
   useEffect(() => {
     const listener: (event: KeyboardEvent) => void = (event: KeyboardEvent) => {

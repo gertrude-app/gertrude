@@ -23,7 +23,7 @@ export const Onboarding: React.FC<Props> = ({
   didResume,
   exemptableUserIds,
   exemptUserIds,
-  os,
+  osVersion,
 }) => {
   // during testing, i was able to hear videos playing after
   // window was closed, showing that the dom was still in memory
@@ -33,10 +33,10 @@ export const Onboarding: React.FC<Props> = ({
   return (
     <OnboardingContext.Provider
       value={{
-        os,
+        osVersion,
         currentStep: step,
         systemSettingsName:
-          os === `venturaOrLater` ? `System Settings` : `System Preferences`,
+          osVersion.major < 13 ? `System Preferences` : `System Settings`,
         emit,
         dispatch,
         otherUsers: users.filter((user) => user.id !== currentUser?.id),
