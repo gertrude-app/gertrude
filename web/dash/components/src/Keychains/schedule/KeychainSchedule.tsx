@@ -5,7 +5,7 @@ import WhatDays from './WhatDays';
 import WhatTime from './WhatTime';
 
 export type Schedule = {
-  specifyingWhen: 'blocked' | 'allowed';
+  specifyingWhen: 'active' | 'inactive';
   days: {
     sunday: boolean;
     monday: boolean;
@@ -33,7 +33,7 @@ interface Props {
 }
 
 const KeychainSchedule: React.FC<Props> = ({ schedule, setSchedule }) => (
-  <div className="flex justify-center mt-2 self-center py-1 px-2 items-center bg-slate-200/50 rounded-lg hover:bg-transparent transition-colors duration-200">
+  <div className="flex justify-center self-center py-1 px-2 items-center bg-slate-200/50 rounded-lg hover:bg-transparent transition-colors duration-200">
     <ClockIcon className="w-4 mr-2 text-slate-400 shrink-0" strokeWidth={2.5} />
     <SpecifyingAllowedOrBlocked schedule={schedule} setSchedule={setSchedule} />
     <span className="text-slate-600 px-[3px]">on</span>

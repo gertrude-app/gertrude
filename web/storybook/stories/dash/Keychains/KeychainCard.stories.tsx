@@ -19,14 +19,17 @@ export const ListPublic: Story = props({
   onRemove: () => {},
   removeText: `Delete`,
   editUrl: `/`,
+  schedulable: false,
 });
 
 const NotDuringSchoolHours: Story = props({
   ...ListPublic.args,
+  editUrl: undefined,
+  removeText: `Remove`,
   name: `After-school games`,
   description: `For afternoons and weekends, not to be played during school hours`,
   schedule: {
-    specifyingWhen: `blocked`,
+    specifyingWhen: `inactive`,
     days: {
       sunday: false,
       monday: true,
@@ -47,13 +50,14 @@ const NotDuringSchoolHours: Story = props({
       },
     },
   },
+  schedulable: true,
 });
 const OnlyDuringSchoolHours: Story = props({
-  ...ListPublic.args,
+  ...NotDuringSchoolHours.args,
   name: `History class`,
   description: `Videos for history class, only needed during school hours`,
   schedule: {
-    specifyingWhen: `allowed`,
+    specifyingWhen: `active`,
     days: {
       sunday: false,
       monday: true,
@@ -76,11 +80,11 @@ const OnlyDuringSchoolHours: Story = props({
   },
 });
 const NotAtNight: Story = props({
-  ...ListPublic.args,
+  ...NotDuringSchoolHours.args,
   name: `Only daytime`,
   description: `For daytime use only, not to be used at night`,
   schedule: {
-    specifyingWhen: `allowed`,
+    specifyingWhen: `active`,
     days: {
       sunday: true,
       monday: true,
@@ -103,11 +107,11 @@ const NotAtNight: Story = props({
   },
 });
 const OnlyOnWeekends: Story = props({
-  ...ListPublic.args,
+  ...NotDuringSchoolHours.args,
   name: `Weekend fun`,
   description: `For weekends only, not to be used during the week`,
   schedule: {
-    specifyingWhen: `allowed`,
+    specifyingWhen: `active`,
     days: {
       sunday: true,
       monday: false,
@@ -130,11 +134,11 @@ const OnlyOnWeekends: Story = props({
   },
 });
 const Random: Story = props({
-  ...ListPublic.args,
+  ...NotDuringSchoolHours.args,
   name: `Seemingly random`,
   description: `Weird schedule, not sure who would use this`,
   schedule: {
-    specifyingWhen: `blocked`,
+    specifyingWhen: `inactive`,
     days: {
       sunday: false,
       monday: true,
@@ -157,11 +161,11 @@ const Random: Story = props({
   },
 });
 const Always: Story = props({
-  ...ListPublic.args,
-  name: `Always allowed`,
+  ...NotDuringSchoolHours.args,
+  name: `Always active`,
   description: `Not sure why you'd have this one scheduled...`,
   schedule: {
-    specifyingWhen: `allowed`,
+    specifyingWhen: `active`,
     days: {
       sunday: true,
       monday: true,
@@ -201,12 +205,14 @@ export const ListPrivateNoEdit: Story = props({
   isPublic: false,
   editUrl: undefined,
   removeText: `Remove`,
+  schedulable: true,
 });
 
 export const ListPublicNoEdit: Story = props({
   ...ListPublic.args,
   editUrl: undefined,
   removeText: `Remove`,
+  schedulable: true,
 });
 
 export const ListPrivate: Story = props({

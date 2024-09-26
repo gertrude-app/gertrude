@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import { Button, SelectMenu, TextInput } from '@shared/components';
 import { Link } from 'react-router-dom';
-import PillBadge from '@shared/components/src/PillBadge';
+import Badge from '@shared/components/src/Badge';
 import type { ReleaseChannel } from '@dash/types';
 import PageHeading from '../PageHeading';
 
@@ -92,13 +92,13 @@ const EditComputer: React.FC<Props> = ({
           <span className="font-bold text-slate-800 shrink-0">Gertrude {appVersion}</span>
         </div>
         {appVersion >= latestReleaseVersion ? (
-          <PillBadge type="green" size="small" className="shrink-0">
+          <Badge type="green" size="small" className="shrink-0">
             Up to date
-          </PillBadge>
+          </Badge>
         ) : (
-          <PillBadge type="yellow" size="small" className="shrink-0">
+          <Badge type="yellow" size="small" className="shrink-0">
             Updates available
-          </PillBadge>
+          </Badge>
         )}
       </div>
       <div className="flex items-center space-x-2 text-slate-500">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, PillBadge } from '@shared/components';
+import { Button, Badge } from '@shared/components';
 import cx from 'classnames';
 import type { AppEvent, ViewAction } from '../administrate-store';
 
@@ -92,12 +92,12 @@ const ActionsScreen: React.FC<Props> = ({
       </div>
       <div className="flex flex-col flex-grow">
         <div className="border border-slate-200 dark:border-slate-800 rounded-2xl relative flex flex-col justify-between mb-3.5">
-          <PillBadge
+          <Badge
             type={update.badgeColor}
             className="absolute right-2 top-2 w-36 !max-w-none"
           >
             {update.badgeText}
-          </PillBadge>
+          </Badge>
           <div className="p-4 pt-3">
             <h2 className="text-lg font-semibold text-slate-600 dark:text-slate-300">
               Currently running Gertrude version{` `}

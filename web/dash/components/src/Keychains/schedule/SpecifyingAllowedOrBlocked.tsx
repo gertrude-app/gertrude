@@ -11,7 +11,7 @@ const SpecifyingAllowedOrBlocked: React.FC<{
     onClick={() =>
       setSchedule({
         ...schedule,
-        specifyingWhen: schedule.specifyingWhen === `blocked` ? `allowed` : `blocked`,
+        specifyingWhen: schedule.specifyingWhen === `active` ? `inactive` : `active`,
       })
     }
   >

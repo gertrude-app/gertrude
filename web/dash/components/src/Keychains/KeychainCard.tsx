@@ -1,7 +1,9 @@
 import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@shared/string';
-import { Button, PillBadge } from '@shared/components';
+import { Button, Badge } from '@shared/components';
+import { ChevronDownIcon, ClockIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { UsersIcon } from '@heroicons/react/24/solid';
 import type { Schedule } from './schedule/KeychainSchedule';
 import GradientIcon from '../GradientIcon';
 import KeychainSchedule from './schedule/KeychainSchedule';
@@ -13,6 +15,7 @@ type Props =
       removeText: string;
       editUrl?: string;
       schedule?: Schedule;
+      schedulable: boolean;
     } & Common)
   | ({
       mode: 'select';
@@ -37,6 +40,7 @@ const KeychainCard: React.FC<Props> = ({
   const [schedule, setSchedule] = React.useState<Schedule | null>(
     props.mode === `list` ? props.schedule || null : null,
   );
+  const [showSchedule, setShowSchedule] = React.useState(false);
 
   return (
     <div
@@ -75,9 +79,9 @@ const KeychainCard: React.FC<Props> = ({
                 {inflect(`key`, numKeys)}
               </h4>
               {isSelect(props) && isPublic && (
-                <PillBadge size="small" type="green">
+                <Badge size="small" type="green">
                   Public
-                </PillBadge>
+                </Badge>
               )}
             </div>
           </div>
@@ -96,20 +100,81 @@ const KeychainCard: React.FC<Props> = ({
       {isSelect(props) || (
         <div
           className={cx(
-            `bg-slate-50 rounded-b-2xl w-full flex flex-col py-2`,
+            `w-full flex flex-col py-2 border-t border-slate-100`,
             isSelect(props) && props.selected && `bg-indigo-100/40`,
           )}
         >
           <div className="flex justify-between">
-            <PillBadge
+            <Badge
               type="green"
-              size="large"
-              className={cx(`border ml-3`, !isPublic && `opacity-0`)}
+              size="medium"
+              className={cx(`ml-3 self-center`, !isPublic && `opacity-0`)}
             >
-              <i className="fa-solid fa-users mr-2 text-sm" /> Public
-            </PillBadge>
+              {/* <i className="fa-solid fa-users mr-2 text-xs" /> Public */}
+              <UsersIcon className="w-3.5 h-3.5 mr-2 text-green-600" /> Public
+            </Badge>
             {props.mode === `list` && (
-              <div className="flex items-center pr-2 space-x-2">
+              <div className="flex items-center pr-2 gap-2">
+                {!schedule && props.schedulable && (
+                  <button
+                    onClick={() => {
+                      setSchedule({
+                        specifyingWhen: `active`,
+                        days: {
+                          sunday: true,
+                          monday: true,
+                          tuesday: true,
+                          wednesday: true,
+                          thursday: true,
+                          friday: true,
+                          saturday: true,
+                        },
+                        time: {
+                          start: { hour: 0, minute: 0 },
+                          end: { hour: 23, minute: 59 },
+                        },
+                      });
+                      setShowSchedule(true);
+                    }}
+                    className={cx(
+                      `flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300`,
+                    )}
+                  >
+                    <ClockIcon
+                      className={cx(`w-3.5 h-3.5 shrink-0 text-slate-500`)}
+                      strokeWidth={2.5}
+                    />
+                    <span className="text-sm text-slate-600 font-medium">
+                      Add schedule
+                    </span>
+                  </button>
+                )}
+                {schedule && (
+                  <button
+                    onClick={() => setShowSchedule(!showSchedule)}
+                    className={cx(
+                      `flex items-center px-2 py-1 rounded-lg transition-[background-color,transform] duration-200 active:scale-90`,
+                      showSchedule
+                        ? `bg-violet-100 hover:bg-violet-200 active:bg-violet-300`
+                        : `hover:bg-slate-200 active:bg-slate-300`,
+                    )}
+                  >
+                    <ClockIcon
+                      className={cx(
+                        `w-4 h-4 shrink-0`,
+                        showSchedule ? `text-violet-500` : `text-slate-500`,
+                      )}
+                      strokeWidth={2.5}
+                    />
+                    <ChevronDownIcon
+                      className={cx(
+                        `w-3 h-3 shrink-0 transition-transform duration-200`,
+                        showSchedule ? `-rotate-180 text-violet-400` : `text-slate-400`,
+                      )}
+                      strokeWidth={2.5}
+                    />
+                  </button>
+                )}
                 {props.editUrl && (
                   <Button
                     type="link"
@@ -133,7 +198,25 @@ const KeychainCard: React.FC<Props> = ({
               </div>
             )}
           </div>
-          {schedule && <KeychainSchedule schedule={schedule} setSchedule={setSchedule} />}
+          {schedule && (
+            <div
+              className={cx(
+                `flex justify-center items-center gap-2 transition-[height,filter,opacity] duration-300`,
+                showSchedule ? `h-9` : `h-0 opacity-0 blur-lg`,
+              )}
+            >
+              <KeychainSchedule schedule={schedule} setSchedule={setSchedule} />
+              <button
+                onClick={() => setSchedule(null)}
+                className="h-4 w-4 flex justify-center items-center rounded-full hover:scale-150 hover:bg-slate-200 transition-[transform,background-color] duration-200 group active:scale-100 active:bg-slate-300"
+              >
+                <XMarkIcon
+                  strokeWidth={3}
+                  className="w-4 h-4 text-slate-400 group-hover:scale-75 transition-transform duration-200"
+                />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
