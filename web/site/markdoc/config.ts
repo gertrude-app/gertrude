@@ -8,6 +8,7 @@ import Figure from '@/components/articles/Figure';
 import ClickToReveal from '@/components/articles/ClickToReveal';
 import ArticleFeedbackForm from '@/components/articles/ArticleFeedbackForm';
 import { QuickLink, QuickLinks } from '@/components/articles/QuickLinks';
+import EmbeddedVideo from '@/components/articles/EmbeddedVideo';
 
 export const config: Config = {
   nodes,
@@ -20,6 +21,7 @@ export const components = {
   Callout: Callout,
   ClickToReveal: ClickToReveal,
   CodeBlock: CodeBlock,
+  EmbeddedVideo: EmbeddedVideo,
   Figure: Figure,
   QuickLink: QuickLink,
   QuickLinks: QuickLinks,

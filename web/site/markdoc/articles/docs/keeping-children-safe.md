@@ -75,3 +75,10 @@ carefully about where and who your kids have access to, and consider making chan
 willing to have an awkward conversation requiring all phones and devices to be collected
 and removed before you kids can play with friends with unprotected or partially protected
 devices.
+
+## Internet Safety 101
+
+Below is a video of a talk I gave at a Christian homeschool conference in 2024, covering
+all aspects of internet safety for parents:
+
+{% video videoId="syC94X5LBIc" title="Gertrude | Internet Safety 101" /%}
