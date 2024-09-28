@@ -46,9 +46,9 @@
 /cu-mr https://youtu.be/FFFOF3BmSos 302
 # ventura
 /cu-vt https://youtu.be/Z_kC6ZfXZDU 302
-# sonoma and sequoia are the same (i think)
-/cu-sn https://youtu.be/TODO 302 # 👋 <-- video not created
-/cu-sq https://youtu.be/TODO 302 # 👋 <-- video not created
+# sonoma and sequoia are the same
+/cu-sn https://youtu.be/ntnFEW0bRVQ 302
+/cu-sq https://youtu.be/ntnFEW0bRVQ 302
 
 # DEMOTE MACOS USER (legacy: pre 2.5.0, when we had "groups")
 #  -> delete when noone should be onboarding from 2.4.0
@@ -65,9 +65,9 @@
 /du-mr https://youtu.be/tT3wowZ3BZ8 302
 # ventura
 /du-vt https://youtu.be/Sq0baQ4Ze6o 302
-# sonoma and sequoia are the same (i think)
-/du-sn https://youtu.be/TODO 302 # 👋 <-- video not created
-/du-sq https://youtu.be/TODO 302 # 👋 <-- video not created
+# sonoma and sequoia are the same
+/du-sn https://youtu.be/jn0Iv4brL94 302
+/du-sq https://youtu.be/jn0Iv4brL94 302
 
 # SWITCH MACOS USER (legacy: pre 2.5.0, when we had "groups")
 #  -> delete when noone should be onboarding from 2.4.0
@@ -84,9 +84,9 @@
 /su-mr https://youtu.be/jhufHnF6nEI 302
 # ventura
 /su-vt https://youtu.be/lAoeKEFy9Zw 302
-# sonoma and sequoia are the same (i think)
-/du-sn https://youtu.be/TODO 302 # 👋 <-- video not created
-/du-sq https://youtu.be/TODO 302 # 👋 <-- video not created
+# sonoma and sequoia are the same
+/su-sn https://youtu.be/CV8AqA5nTqs 302
+/su-sq https://youtu.be/CV8AqA5nTqs 302
 
 # edit children
 /a-c https://parents.gertrude.app/children 302
