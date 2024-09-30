@@ -55,26 +55,41 @@ right_. That's because web browsers try to do the best with what they've got. Th
 show you an error message if they can't load some of the code they need, they just show a
 partially working, or funny looking website.
 
-To make this more concrete, consider the website `how-to-type.com`, which we use as an
-example in our [getting started tutorial](/). If we only create a key for the main
-`how-to-type.com` domain, the website loads, but looks a little funny, as shown below:
+To make this more concrete, consider the _National Geographic Kids_ website at
+`kids.nationalgeographic.com`. If we only create a key for the main
+`nationalgeographic.com` domain, the website loads, but looks a little funny, as shown
+below:
 
-{% image src="allowed.png" caption="The site is loading, but if you look closely, all is not right..." /%}
+{% image src="nat-geo-partially-unblocked.png" caption="The site is loading, but if you look closely, all is not right..." /%}
 
-If we pull up the Gertrude network request window, we'll still see that multiple requests
-are being blocked when we try to visit the page:
+To get this site fully working, we'll need to figure out which other domains need to be
+unblocked, and create keys for them as well. To get started doing that, click the Gertrude
+menu icon and choose "View Network Requests". This screen shows all of the network
+requests as they are blocked by Gertrude. It's important to note that it will only show
+the blocked requests _since the window was opened_, so **we'll need to refresh the broken
+page** to see which domains are still being blocked. Once we do that, we see a list like
+this:
 
-{% image src="how-to-type-blocks.png" caption="After unblocking the domain, we still see all these blocked requests" /%}
+{% image src="nat-geo-blocks.png" caption="After unblocking the domain, we still see all these blocked requests" /%}
+
+If you see a _giant wall of requests_, don't worry&mdash;your computer makes tons of
+network requests, and Gertrude has to block them all and show them to you. Usually the
+vast majority of them are not important. To help you narrow down exactly the right
+requests, use the following 3-part strategy:
+
+1. **Filter** by app name to see requests from only the app you're using
+2. Click **Clear requests** to clear out all the old requests
+3. Refresh to retrigger the problem, and note which requests were blocked **right at that
+   instant.**
+
+{% image src="filter-and-clear-before-reload.png" caption="To find the important requests, 1) Filter, 2) Clear, and 3) Reload" /%}
 
 There is a bit of an art to figuring out which of these requests should be unlocked, but
-you'll get the knack of it. If you look closely at the image above, several of the domains
-are repeated twice, so there are really fewer domains to think about than it appears.
-Also, there are a couple things we can ignore. The blocked request from the
-`www.facebook.com` domain can (and _should_) be ignored&mdash;it's just a little embedded
-"like" button that won't prevent the site from working correctly. And the one from
-`google-analytics.com` is just a tracking website, its not necessary to unlock.
+you'll get the knack of it. If you look closely at the image above, two of them seem like
+they have to do with some kind of Google safe browsing feature, these probably aren't
+important. Let's ignore those and focus on the other three:
 
-{% image src="analyzing-blocks.png" caption="Ignoring facebook and google analytics, there are 3 domains to be unblocked" /%}
+{% image src="ignore-and-unblock.png" caption="Ignoring some google stuff, there seem to be 3 domains to be unblocked" /%}
 
 You can create an _unlock request_ for all three blocks at once:
 
@@ -82,7 +97,7 @@ You can create an _unlock request_ for all three blocks at once:
 
 Once these three domains are unlocked, the website loads!
 
-{% image src="how-to-type-unblocked.png" caption="Success! With all the keys created, the site loads fully" /%}
+{% image src="nat-geo-unblocked.png" caption="Success! With all the keys created, the site loads fully" /%}
 
 ### This sounds hard!
 
@@ -128,5 +143,8 @@ easier to find what to unblock is **isolate network activity:**
   of Gertrude's network activity screen. Usually part of the name of a website, or the app
   you're using are helpful. Click the _clear requests_ button and then refresh the page,
   or retry the activity that is not working.
+- **Retrigger the blocked activity** with the Blocked Requests window open, and focus on
+  the blocks that come in _exactly when you retrigger the problem._ Those are almost
+  always the ones that are causing the problem.
 
-{% image src="filter-requests.png" caption="Filter by a search phrase, and clear often" /%}
+{% image src="filter-requests.png" caption="Filter by a search phrase, clear often, and retrigger" /%}
