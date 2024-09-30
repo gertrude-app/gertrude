@@ -24,6 +24,14 @@ const tags: Config['tags'] = {
     },
     render: `ArticleImage`,
   },
+  video: {
+    selfClosing: true,
+    attributes: {
+      videoId: { type: String },
+      title: { type: String },
+    },
+    render: `EmbeddedVideo`,
+  },
   figure: {
     selfClosing: true,
     attributes: {

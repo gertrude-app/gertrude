@@ -111,22 +111,10 @@ class OsCdnAssets implements ExhaustiveAssets {
     }
   }
 
-  // these are legacy non-multipart images, only used before 2.1.3
-  // delete when no one should be onboarding with an old < 2.1.3 app
-  legacyImgs(): string[] {
-    return [
-      `${ENDPOINT}/${this.os}/allow-notifications.gif`,
-      `${ENDPOINT}/${this.os}/allow-screen-recording.gif`,
-      `${ENDPOINT}/${this.os}/allow-keylogging.gif`,
-      `${ENDPOINT}/${this.os}/install-sys-ext.gif`,
-    ];
-  }
-
   all(): CdnAsset[] {
     return [
       ...OS_VIDEO_IDS.map((id) => this.video(id)),
       ...OS_IMAGE_IDS.map((filename) => this.img(filename)),
-      ...this.legacyImgs().map((url) => ({ type: `image`, url }) as const),
     ];
   }
 }
@@ -203,7 +191,7 @@ const OS_IMAGE_DATA: Record<
     monterey: [3.48, 5.48, 4.06, 4.2],
     ventura: [3.1, 6.72, 5.22],
     sonoma: [3.1, 6.72, 5.22],
-    sequoia: [3.1, 6.72, 5.22], // 👋 <-- needs new version
+    sequoia: [3.26, 6.45, 5.26],
   },
 };
 
