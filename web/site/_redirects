@@ -19,7 +19,6 @@
 /docs/keeping-users-safe /docs/keeping-children-safe 301
 /docs /docs/getting-started 302
 
-
 #############
 # macos app #
 #############
@@ -90,3 +89,9 @@
 
 # edit children
 /a-c https://parents.gertrude.app/children 302
+
+###########
+# utility #
+###########
+/s3-bg https://gertrude.nyc3.digitaloceanspaces.com/gradient-bg.png
+/s3-testapp https://gertrude.nyc3.digitaloceanspaces.com/testapp.zip
