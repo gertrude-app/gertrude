@@ -23,7 +23,7 @@ describe(`children screen`, () => {
       cy.contains(`Save child`).click();
       cy.wait(`@SaveUser`);
 
-      cy.testId(`page-heading`).should(`have.text`, `Edit child`);
+      cy.testId(`page-heading`).should(`have.text`, `Child settings`);
       cy.contains(`Save child`).should(`be.disabled`);
 
       cy.testId(`user-name`).type(`az`);

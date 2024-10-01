@@ -8,8 +8,10 @@ import DropdownCustomizationPoint from './DropdownCustomizationPoint';
 const WhatDays: React.FC<{
   schedule: Schedule;
   setSchedule(schedule: Schedule): void;
-}> = ({ schedule, setSchedule }) => (
+  isTouchDevice: boolean;
+}> = ({ schedule, setSchedule, isTouchDevice }) => (
   <DropdownCustomizationPoint
+    isTouchDevice={isTouchDevice}
     text={(() => {
       switch (true) {
         case Object.values(schedule.days).every((value) => value):
@@ -40,7 +42,8 @@ const WhatDays: React.FC<{
               </span>
             ) : (
               <span key={day} className="capitalize">
-                {day.slice(0, 3)},{` `}
+                {day.slice(0, 3)}
+                {days.length === 2 ? ` ` : `, `}
               </span>
             ),
           );

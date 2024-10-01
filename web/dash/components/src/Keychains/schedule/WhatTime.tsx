@@ -7,7 +7,8 @@ import DropdownCustomizationPoint from './DropdownCustomizationPoint';
 const WhatTime: React.FC<{
   schedule: Schedule;
   setSchedule(schedule: Schedule): void;
-}> = ({ schedule, setSchedule }) => {
+  isTouchDevice: boolean;
+}> = ({ schedule, setSchedule, isTouchDevice }) => {
   const isInvalid = (() => {
     switch (true) {
       case schedule.time.start.hour > schedule.time.end.hour:
@@ -21,6 +22,7 @@ const WhatTime: React.FC<{
 
   return (
     <DropdownCustomizationPoint
+      isTouchDevice={isTouchDevice}
       text={
         <span className={cx(isInvalid && `!text-red-600`)}>
           {schedule.time.start.hour === 0 &&

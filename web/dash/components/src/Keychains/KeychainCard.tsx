@@ -110,8 +110,9 @@ const KeychainCard: React.FC<Props> = ({
               size="medium"
               className={cx(`ml-3 self-center`, !isPublic && `opacity-0`)}
             >
-              {/* <i className="fa-solid fa-users mr-2 text-xs" /> Public */}
-              <UsersIcon className="w-3.5 h-3.5 mr-2 text-green-600" /> Public
+              <UsersIcon className="w-3.5 h-3.5 mr-2 text-green-600 hidden min-[400px]:block" />
+              {` `}
+              Public
             </Badge>
             {props.mode === `list` && (
               <div className="flex items-center pr-2 gap-2">
@@ -201,10 +202,11 @@ const KeychainCard: React.FC<Props> = ({
           {schedule && (
             <div
               className={cx(
-                `flex justify-center items-center gap-2 transition-[height,filter,opacity] duration-300`,
-                showSchedule ? `h-9` : `h-0 opacity-0 blur-lg`,
+                `flex justify-center items-center gap-2 transition-[height,filter,opacity,margin] duration-300 px-4`,
+                showSchedule ? ` mt-2` : `h-0 opacity-0 blur-lg pointer-events-none mt-0`,
               )}
             >
+              <ClockIcon className="w-4 text-slate-400 shrink-0" strokeWidth={2.5} />
               <KeychainSchedule schedule={schedule} setSchedule={setSchedule} />
               <button
                 onClick={() => setSchedule(null)}

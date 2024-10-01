@@ -1,13 +1,20 @@
 import React from 'react';
+import cx from 'classnames';
 import { ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
 import type { Schedule } from './KeychainSchedule';
 
 const SpecifyingAllowedOrBlocked: React.FC<{
   schedule: Schedule;
   setSchedule(schedule: Schedule): void;
-}> = ({ schedule, setSchedule }) => (
+  isTouchDevice: boolean;
+}> = ({ schedule, setSchedule, isTouchDevice }) => (
   <button
-    className="capitalize font-medium flex items-center group hover:bg-slate-200 px-[3px] hover:px-2 py-0.5 rounded-lg active:scale-90 active:bg-slate-300 transition-[transform,background-color,margin,padding] duration-200"
+    className={cx(
+      `capitalize font-medium flex items-center group py-0.5 rounded-lg active:scale-90 active:bg-slate-300 transition-[transform,background-color,margin,padding] duration-200`,
+      isTouchDevice
+        ? `bg-slate-200/60 px-2`
+        : `bg-slate-200/60 hover:bg-slate-200 px-2 min-[672px]:px-[3px] min-[672px]:bg-transparent min-[672px]:hover:bg-slate-200 min-[672px]:hover:px-2`,
+    )}
     onClick={() =>
       setSchedule({
         ...schedule,
@@ -17,7 +24,12 @@ const SpecifyingAllowedOrBlocked: React.FC<{
   >
     <span className="text-slate-700">{schedule.specifyingWhen}</span>
     <ArrowsRightLeftIcon
-      className="shrink-0 w-0 ml-0 group-hover:w-4 group-hover:ml-2 transition-[width,margin-left,filter] text-slate-400 duration-200"
+      className={cx(
+        `shrink-0 transition-[width,margin-left,filter] text-slate-400 duration-200`,
+        isTouchDevice
+          ? `w-4 ml-2`
+          : `w-4 ml-2 min-[672px]:w-0 min-[672px]:ml-0 min-[672px]:group-hover:w-4 min-[672px]:group-hover:ml-2`,
+      )}
       strokeWidth={2.5}
     />
   </button>
