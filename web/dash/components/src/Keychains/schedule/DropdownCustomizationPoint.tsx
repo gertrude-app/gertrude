@@ -43,7 +43,7 @@ const DropdownCustomizationPoint: React.FC<DropdownCustomizationPointProps> = ({
         className={cx(
           `font-medium flex items-center group py-0.5 rounded-lg active:scale-90 active:bg-slate-300 transition-[transform,background-color,margin,padding,box-shadow] duration-200 relative`,
           open
-            ? `px-2 bg-white shadow-md`
+            ? `px-2 bg-white shadow-md pointer-events-none`
             : isTouchDevice
               ? `px-2 bg-slate-200/60`
               : `px-2 bg-slate-200/60 hover:bg-slate-200 min-[672px]:px-[3px] min-[672px]:hover:px-2 min-[672px]:bg-transparent min-[672px]:hover:bg-slate-200`,

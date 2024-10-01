@@ -262,7 +262,7 @@ const EditUser: React.FC<Props> = ({
               <div className="py-3 flex flex-col space-y-4">
                 {keychains.map((keychain) => (
                   <KeychainCard
-                    schedulable={false} // TODO
+                    schedulable={true} // TODO
                     mode="list"
                     key={keychain.id}
                     name={keychain.name}

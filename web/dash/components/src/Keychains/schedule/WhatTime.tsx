@@ -246,6 +246,7 @@ const NumberChanger: React.FC<NumberChangerProps> = ({
         </button>
       </div>
       <input
+        pattern="[0-9]*"
         className={cx(
           `bg-slate-100 rounded w-9 font-mono font-medium text-slate-800 px-1 pt-[3px] text-xl focus:bg-slate-200 outline-none border-b-2 border-b-transparent focus:border-b-violet-400 focus:rounded-b-none transition-[background-color,border-color,border-radius] duration-200`,
           type === `hour` && `text-right`,

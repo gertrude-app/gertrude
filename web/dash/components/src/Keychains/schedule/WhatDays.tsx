@@ -55,11 +55,19 @@ const WhatDays: React.FC<{
     <ul className="mt-2">
       {typesafe.objectKeys(schedule.days).map((day) => {
         const selected = schedule.days[day];
+        const isOnlyRemaining =
+          typesafe.objectEntries(schedule.days).filter(([, value]) => value).length ===
+            1 && selected;
+
         return (
           <li
             key={day}
-            className="flex items-center gap-2 cursor-pointer group"
+            className={cx(
+              `flex items-center gap-2 cursor-pointer group`,
+              isOnlyRemaining && `opacity-50 !cursor-not-allowed`,
+            )}
             onClick={() => {
+              if (isOnlyRemaining) return;
               setSchedule({
                 ...schedule,
                 days: {
@@ -71,8 +79,9 @@ const WhatDays: React.FC<{
           >
             <div
               className={cx(
-                `border w-3 h-3 rounded flex justify-center items-center transition-[background-color,border-color,transform] duration-200 group-hover:scale-125`,
+                `border w-3 h-3 rounded flex justify-center items-center transition-[background-color,border-color,transform] duration-200`,
                 selected ? `border-violet-500 bg-violet-500` : `border-slate-300`,
+                !isOnlyRemaining && `group-hover:scale-125`,
               )}
             >
               <CheckIcon
