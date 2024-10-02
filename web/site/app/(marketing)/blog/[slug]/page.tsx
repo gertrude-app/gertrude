@@ -57,7 +57,10 @@ const BlogArticle: NextPage<PageProps> = async ({ params: { slug } }) => {
         >
           {category.replace(`-`, ` `)}
         </span>
-        <h1 className="text-4xl font-bold mb-8 mt-2 break-words">{title}</h1>
+        <h1
+          className="text-4xl font-bold mb-8 mt-2 break-words"
+          dangerouslySetInnerHTML={{ __html: title }}
+        />
         <Prose>{Markdoc.renderers.react(content, React, { components })}</Prose>
         <PageBottomCTA clickId="blog-cta" />
       </div>
