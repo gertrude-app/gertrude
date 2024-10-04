@@ -1,10 +1,10 @@
 ---
-title: 'iOS 18 &amp; Screen Time: What Parents Should Know'
+title: 'iOS 18 & Screen Time: What Parents Should Know'
 date: '2024-10-02T20:00:45.219Z'
 description:
-  'Unfortunately, iOS18 seems to be another step backwards for parents. Here are the
-  changes you should know about, plus our current recommendations for keeping your kids
-  safe on iOS.'
+  'Unfortunately, iOS18 seems to be another step backwards for parents. #images GIF search
+  is still not preventable, and a new loophole with Spotlight searching has been found. We
+  recommend sticking with iOS 16 or 17 until fixes or workarounds are ready.'
 category: parental-controls
 ---
 
@@ -80,5 +80,7 @@ omission of VPN settings restrictions is glaring and seems intentional.
    social media.
 3. If your kids' iOS devices aren't updated to iOS 18 yet **don't update, stay on iOS
    16/17** until Apple fixes the issue.
+4. Keep an eye on this blog, we're hoping to release a free iOS app that patches these
+   shortcomings in the near future!
 
 {% /callout %}
