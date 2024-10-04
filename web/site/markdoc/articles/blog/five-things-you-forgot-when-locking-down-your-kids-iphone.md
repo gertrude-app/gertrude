@@ -16,12 +16,11 @@ these too._
 
 ## 1. `#images` iMessage App
 
-{% callout type="warning" title="iOS 17 Warning" %}
+{% callout type="warning" title="iOS 17/18 Warning" %}
 
-Apple recently released iOS version 17 (on 9/17/23). As of right now, the current version
-`17.0.0` **does not permit disabling the #images app.** There is currently no known
-workaround, but we are hopeful that Apple will release an update restoring control for
-parents. Until then **we recommend that you DO NOT UPDATE your child's device to iOS 17**.
+UPDATE: as of 9/17/23, this loophole is harder to patch in iOS 17, and not patchable (yet)
+in iOS 18. If your child is still on iOS 16, the directions below apply. If not,
+[see here](/blog/ios-17-cant-delete-messages-images) for known workarounds and updates.
 
 {% /callout %}
 
