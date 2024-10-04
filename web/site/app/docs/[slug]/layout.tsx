@@ -8,7 +8,7 @@ import Sidebar from '@/components/articles/Sidebar';
 const DocsLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <body className="bg-white flex relative overflow-x-clip">
         <div className="absolute h-[100vw] w-screen -right-[50vh] -top-[50vw] [background:radial-gradient(#fae8ff,transparent_75%)]"></div>
         <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
