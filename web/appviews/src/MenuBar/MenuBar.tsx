@@ -19,6 +19,7 @@ type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 export const MenuBar: React.FC<Props> = ({
   connectionCode,
   showingNotConnectedActions,
+  downtime,
   emit,
   dispatch,
   ...props
@@ -61,6 +62,7 @@ export const MenuBar: React.FC<Props> = ({
         recordingScreen={props.recordingScreen}
         recordingKeystrokes={props.recordingKeystrokes}
         adminAttentionRequired={props.adminAttentionRequired}
+        downtime={downtime}
       />
     );
   }
@@ -90,5 +92,7 @@ export const MenuBarSized: React.FC<{
   children: React.ReactNode;
   className?: string;
 }> = ({ children, className }) => (
-  <div className={cx(`w-[400px] h-[300px]`, className)}>{children}</div>
+  <div className={cx(`w-[400px] h-[300px] overflow-hidden relative`, className)}>
+    {children}
+  </div>
 );

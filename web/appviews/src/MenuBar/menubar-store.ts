@@ -42,6 +42,7 @@ export type AppEvent =
 export type ViewState = {
   connectionCode: string;
   showingNotConnectedActions: boolean;
+  downtime?: { until: string };
 };
 
 export type ViewAction =
