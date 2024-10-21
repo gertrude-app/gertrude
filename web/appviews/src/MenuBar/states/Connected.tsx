@@ -88,6 +88,8 @@ const Connected: React.FC<Props> = ({
                   filterState.case === `off`,
                 '[background:radial-gradient(#facc1550_0%,transparent_70%)] dark:[background:radial-gradient(#eab30840_0%,transparent_70%)]':
                   filterState.case === `suspended`,
+                '[background:radial-gradient(#e879f950_0%,transparent_70%)] dark:[background:radial-gradient(#d946ef40_0%,transparent_70%)]':
+                  filterState.case === `downtimePaused`,
               })}
             />
             <div className="relative">
@@ -100,9 +102,13 @@ const Connected: React.FC<Props> = ({
                       filterState.case === `off`,
                     'bg-yellow-400/50 text-yellow-950 dark:text-yellow-50':
                       filterState.case === `suspended`,
+                    'bg-fuchsia-400/50 text-fuchsia-950 dark:text-fuchsia-50':
+                      filterState.case === `downtimePaused`,
                   })}
                 >
-                  Filter {filterState.case}
+                  {filterState.case === `downtimePaused`
+                    ? `Downtime paused`
+                    : `Filter ${filterState.case}`}
                 </span>
                 {filterState.case === `off` && (
                   <VioletButton onClick={() => emit({ case: `turnOnFilterClicked` })}>
@@ -114,8 +120,14 @@ const Connected: React.FC<Props> = ({
                     Resume
                   </VioletButton>
                 )}
+                {filterState.case === `downtimePaused` && (
+                  <VioletButton onClick={() => alert(`TODO: resume downtime`)}>
+                    Resume
+                  </VioletButton>
+                )}
               </div>
-              {filterState.case === `suspended` && (
+              {(filterState.case === `suspended` ||
+                filterState.case === `downtimePaused`) && (
                 <p className="mt-1 text-sm text-black/60 dark:text-white/80">
                   Resuming {filterState.resuming}
                 </p>

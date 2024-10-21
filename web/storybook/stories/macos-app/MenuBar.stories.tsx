@@ -118,7 +118,7 @@ const BothThemes: React.FC<React.ComponentProps<typeof MenuBar>> = (props) => (
 
 const DifferentModesAcrossColrs: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
   const propOptions: Record<
-    'first' | 'second' | 'third' | 'fourth',
+    'first' | 'second' | 'third' | 'fourth' | 'fifth',
     React.ComponentProps<typeof MenuBarWrapper>
   > = {
     first: {
@@ -159,6 +159,15 @@ const DifferentModesAcrossColrs: React.FC<{ theme: 'light' | 'dark' }> = ({ them
       downtime: { until: `7:00am` },
       ...commonProps,
     },
+    fifth: {
+      colors: ``,
+      theme,
+      case: `connected`,
+      recordingKeystrokes: true,
+      recordingScreen: false,
+      filterState: { case: `downtimePaused`, resuming: `3 minutes from now` },
+      ...commonProps,
+    },
   };
   return (
     <div className="flex flex-row space-x-4">
@@ -179,6 +188,10 @@ const DifferentModesAcrossColrs: React.FC<{ theme: 'light' | 'dark' }> = ({ them
           {...propOptions.fourth}
           colors={theme === `light` ? `bg-[rgb(236,236,236)]` : `bg-[rgb(126,126,126)]`}
         />
+        <MenuBarWrapper
+          {...propOptions.fifth}
+          colors={theme === `light` ? `bg-[rgb(236,236,236)]` : `bg-[rgb(126,126,126)]`}
+        />
       </div>
       <div className="flex flex-col space-y-4">
         <MenuBarWrapper
@@ -213,6 +226,14 @@ const DifferentModesAcrossColrs: React.FC<{ theme: 'light' | 'dark' }> = ({ them
               : `bg-gradient-to-l from-[rgb(34,34,34)] to-[rgb(126,126,126)]`
           }
         />
+        <MenuBarWrapper
+          {...propOptions.fifth}
+          colors={
+            theme === `light`
+              ? `bg-gradient-to-l from-[rgb(149,149,149)] to-[rgb(236,236,236)]`
+              : `bg-gradient-to-l from-[rgb(34,34,34)] to-[rgb(126,126,126)]`
+          }
+        />
       </div>
       <div className="flex flex-col space-y-4">
         <MenuBarWrapper
@@ -229,6 +250,10 @@ const DifferentModesAcrossColrs: React.FC<{ theme: 'light' | 'dark' }> = ({ them
         />
         <MenuBarWrapper
           {...propOptions.fourth}
+          colors={theme === `light` ? `bg-[rgb(149,149,149)]` : `bg-[rgb(34,34,34)]`}
+        />
+        <MenuBarWrapper
+          {...propOptions.fifth}
           colors={theme === `light` ? `bg-[rgb(149,149,149)]` : `bg-[rgb(34,34,34)]`}
         />
       </div>
