@@ -1,5 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
+import type { TimeSpan } from '@dash/datetime';
 import SpecifyingAllowedOrBlocked from './SpecifyingAllowedOrBlocked';
 import WhatDays from './WhatDays';
 import WhatTime from './WhatTime';
@@ -15,16 +16,7 @@ export type Schedule = {
     friday: boolean;
     saturday: boolean;
   };
-  time: {
-    start: {
-      hour: number;
-      minute: number;
-    };
-    end: {
-      hour: number;
-      minute: number;
-    };
-  };
+  time: TimeSpan;
 };
 
 interface Props {

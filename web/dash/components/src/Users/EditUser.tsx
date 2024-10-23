@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import cx from 'classnames';
 import { inflect } from '@shared/string';
 import { TextInput, Button, Toggle, Label } from '@shared/components';
@@ -77,6 +77,8 @@ const EditUser: React.FC<Props> = ({
   selectingKeychain,
   onConfirmAddKeychain,
 }) => {
+  const [downtimeEnabled, setDownTimeEnabled] = useState(false);
+
   if (isNew) {
     return (
       <div className="-my-6 md:-my-7 py-6 md:py-7 min-h-[calc(100vh-64px)] md:min-h-screen flex flex-col">
@@ -184,9 +186,11 @@ const EditUser: React.FC<Props> = ({
                 Add a computer
               </button>
             </div>
+
+            {/* monitoring */}
             <div className="mt-4 max-w-3xl">
               <h2 className="text-lg font-bold text-slate-700">Monitoring</h2>
-              <div className="flex justify-between items-center bg-slate-100 my-3 p-4 sm:p-6 rounded-xl">
+              <div className="flex justify-between items-center bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl">
                 <div className="mr-3">
                   <h3 className="font-medium text-slate-700 leading-tight">
                     Enable keylogging
@@ -198,7 +202,7 @@ const EditUser: React.FC<Props> = ({
                 <Toggle enabled={keyloggingEnabled} setEnabled={setKeyloggingEnabled} />
               </div>
               <div
-                className={`bg-slate-100 my-3 p-4 sm:p-6 rounded-xl overflow-hidden relative`}
+                className={`bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl overflow-hidden relative`}
               >
                 <div className="flex justify-between items-center">
                   <div className="mr-3">
@@ -217,7 +221,7 @@ const EditUser: React.FC<Props> = ({
                 <div
                   className={cx(
                     `flex flex-col space-y-3 md:flex-row md:space-x-3 md:space-y-0 mt-5`,
-                    screenshotsEnabled ? `opacity-100` : `opacity-0 hidden`,
+                    screenshotsEnabled || `hidden`,
                   )}
                 >
                   <TextInput
@@ -238,7 +242,7 @@ const EditUser: React.FC<Props> = ({
               </div>
               <div
                 className={cx(
-                  `flex justify-between items-center mt-4 p-6 bg-slate-100 rounded-xl transition-opacity duration-300`,
+                  `flex justify-between items-center mt-3 p-6 bg-slate-100 rounded-xl transition-opacity duration-300`,
                   !(screenshotsEnabled || keyloggingEnabled) && `!hidden`,
                 )}
               >
@@ -257,6 +261,35 @@ const EditUser: React.FC<Props> = ({
               </div>
             </div>
 
+            {/* downtime */}
+            <div className="mt-12 max-w-3xl">
+              <h2 className="text-lg font-bold text-slate-700">Downtime</h2>
+              <div
+                className={`bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl overflow-hidden relative`}
+              >
+                <div className="flex justify-between items-center">
+                  <div className="mr-3">
+                    <h3 className="font-medium text-slate-700 leading-tight">
+                      Enable downtime
+                    </h3>
+                    <p className="text-slate-500 text-sm mt-1">
+                      Completely restrict all internet access during specified hours
+                    </p>
+                  </div>
+                  <Toggle enabled={downtimeEnabled} setEnabled={setDownTimeEnabled} />
+                </div>
+                <div
+                  className={cx(
+                    `flex justify-center items-center mt-4`,
+                    downtimeEnabled || `hidden`,
+                  )}
+                >
+                  <span>from</span>
+                </div>
+              </div>
+            </div>
+
+            {/* keychains */}
             <div className="mt-12 max-w-3xl">
               <h2 className="text-lg font-bold text-slate-700 mb-2">Keychains</h2>
               <div className="py-3 flex flex-col space-y-4">
