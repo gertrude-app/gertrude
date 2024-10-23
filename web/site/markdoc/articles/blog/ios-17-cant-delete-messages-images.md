@@ -15,17 +15,17 @@ graphic sexual content.
 
 {% callout title="UPDATES: 10/2024" %}
 
-1. A workaround for iOS 17 has been found&mdash;if you set a scheduled **Downtime** to be
+1. We've just released a free iOS app called
+   [Gertrude Blocker](https://apps.apple.com/us/app/gertrude-blocker/id6736368820) which
+   plugs this dangerous hole in Screen Time for both iOS 17 and 18. It is the only known
+   workaround for iOS 18.
+2. There is a workaround for iOS 17&mdash;if you set a scheduled **Downtime** to be
    essentially always on (by starting at 3:01am and ending at 3:00am), the #images GIF
    search will stop working. All other apps that the parent wants to allow then must be
    categorized as _Always Allowed_, and you lose the ability to use Downtime for its
-   intended purpose. (Note: test by searching with a brand new term, as previously loaded
-   and cached images will still be visible after the workaround is applied.)
-2. The iOS 17 Downtime workaround
-   [does not appear to work for iOS 18](/blog/ios18-screentime-what-parents-should-know).
-   Parents are urged to keep their children's devices on iOS 17 or earlier if possible.
-3. Check back for updates, as we're working on a free iOS app that will patch these
-   loopholes for parents. We hope to have the app ready by November 1, 2024.
+   intended purpose. For this reason we recommend using
+   [Gertrude Blocker](https://apps.apple.com/us/app/gertrude-blocker/id6736368820)
+   instead.
 
 {% /callout %}
 

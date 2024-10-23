@@ -9,7 +9,7 @@ const styles = {
   },
   warning: {
     title: `text-amber-600`,
-    body: `[--tw-prose-background:theme(colors.amber.50)] prose-a:text-amber-900 prose-strong:text-amber-950 prose-em:font-medium prose-em:text-amber-950 text-amber-950/60 [--tw-prose-underline:theme(colors.violet.700)] prose-code:text-amber-700`,
+    body: `[--tw-prose-background:theme(colors.amber.50)] prose-a:text-amber-900 prose-strong:text-amber-700 prose-em:font-normal prose-em:text-amber-800 text-amber-950/60 [--tw-prose-underline:theme(colors.violet.700)] prose-code:text-amber-700`,
   },
 };
 
