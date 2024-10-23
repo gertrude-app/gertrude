@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
@@ -35,7 +37,7 @@ const TimeInput: React.FC<Props> = ({ time, setTime }) => (
         });
       }}
     />
-    <span className="text-xl font-medium font-mono -mb-1.5">:</span>
+    <span className="text-xl font-medium font-mono">:</span>
     <NumberChanger
       type="minute"
       value={time.minute}
@@ -111,7 +113,7 @@ const NumberChanger: React.FC<NumberChangerProps> = ({
   }, [value, type]);
 
   return (
-    <div className={cx(`flex mt-2 gap-1`, type === `minute` && `flex-row-reverse`)}>
+    <div className={cx(`flex gap-1`, type === `minute` && `flex-row-reverse`)}>
       <div className="flex flex-col shrink-0 gap-1">
         <button
           onClick={onIncrement}
@@ -165,7 +167,7 @@ interface AmPmToggleProps {
 const AmPmToggle: React.FC<AmPmToggleProps> = ({ value, onClick }) => (
   <button
     onClick={onClick}
-    className="rounded-full hover:scale-110 hover:bg-slate-200 w-6 h-6 bg-slate-100 flex justify-center items-center ml-2 -mb-1.5 transition-[background-color,transform] active:scale-90 active:bg-slate-300 duration-200"
+    className="rounded-full hover:scale-110 hover:bg-slate-200 w-6 h-6 bg-slate-100 flex justify-center items-center ml-2 transition-[background-color,transform] active:scale-90 active:bg-slate-300 duration-200"
   >
     <span className="font-semibold text-slate-500 text-[10px] uppercase">{value}</span>
   </button>

@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import type { TimeSpan } from '@dash/datetime';
+import type { TimeSpan } from '@shared/datetime';
 import SpecifyingAllowedOrBlocked from './SpecifyingAllowedOrBlocked';
 import WhatDays from './WhatDays';
 import WhatTime from './WhatTime';

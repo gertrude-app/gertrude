@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
 import { inflect } from '@shared/string';
-import { TextInput, Button, Toggle, Label } from '@shared/components';
+import { TextInput, Button, Toggle, Label, TimeInput } from '@shared/components';
+import type { TimeSpan } from '@shared/datetime';
 import type { Subcomponents, ConfirmableEntityAction, RequestState } from '@dash/types';
 import type { KeychainSummary as Keychain } from '@dash/types';
 import KeychainCard from '../Keychains/KeychainCard';
@@ -78,6 +79,10 @@ const EditUser: React.FC<Props> = ({
   onConfirmAddKeychain,
 }) => {
   const [downtimeEnabled, setDownTimeEnabled] = useState(false);
+  const [downtimeTimeSpan, setDowntimeTimeSpan] = useState<TimeSpan>({
+    start: { hour: 21, minute: 0 },
+    end: { hour: 7, minute: 0 },
+  });
 
   if (isNew) {
     return (
@@ -280,11 +285,24 @@ const EditUser: React.FC<Props> = ({
                 </div>
                 <div
                   className={cx(
-                    `flex justify-center items-center mt-4`,
+                    `flex justify-center items-center mt-4 bg-white rounded-xl p-4 gap-4 flex-col sm:flex-row md:flex-col md+:flex-row border-[0.5px] border-slate-200 shadow shadow-slate-300/50`,
                     downtimeEnabled || `hidden`,
                   )}
                 >
-                  <span>from</span>
+                  <span className="text-slate-500 font-medium">From</span>
+                  <TimeInput
+                    time={downtimeTimeSpan.start}
+                    setTime={(time) =>
+                      setDowntimeTimeSpan((prev) => ({ ...prev, start: time }))
+                    }
+                  />
+                  <span className="text-slate-500 font-medium">to</span>
+                  <TimeInput
+                    time={downtimeTimeSpan.end}
+                    setTime={(time) =>
+                      setDowntimeTimeSpan((prev) => ({ ...prev, end: time }))
+                    }
+                  />
                 </div>
               </div>
             </div>

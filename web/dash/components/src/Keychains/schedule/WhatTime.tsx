@@ -37,7 +37,7 @@ const WhatTime: React.FC<{
       }
     >
       <div className="flex flex-col gap-4">
-        <div>
+        <div className="flex flex-col gap-1.5">
           <span className="text-xs text-slate-500">Start:</span>
           <TimeInput
             time={schedule.time.start}
@@ -52,7 +52,7 @@ const WhatTime: React.FC<{
             }
           />
         </div>
-        <div>
+        <div className="flex flex-col gap-1.5">
           <span className="text-xs text-slate-500">End:</span>
           <TimeInput
             time={schedule.time.end}
