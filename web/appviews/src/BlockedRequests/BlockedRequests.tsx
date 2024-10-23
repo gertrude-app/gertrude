@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import cx from 'classnames';
 import { Button, Loading, TextInput, Toggle } from '@shared/components';
 import type { AppState, ViewState, AppEvent, ViewAction } from './blockedrequests-store';
@@ -25,6 +25,8 @@ export const BlockedRequests: React.FC<Props> = ({
   adminAccountStatus,
   filterCommunicationConfirmed,
 }) => {
+  const [inflowPaused, setInflowPaused] = useState(false);
+
   const filteredRequests = filterVisibleRequests(requests, filterText, tcpOnly);
   if (adminAccountStatus === `inactive`) {
     return (
@@ -59,7 +61,7 @@ export const BlockedRequests: React.FC<Props> = ({
       <header className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center">
           <input
-            className="bg-slate-50 dark:bg-slate-800/50 dark:focus:bg-slate-800 rounded-xl px-4 py-2 w-80 transition-[background-color,box-shadow] duration-100 focus:bg-slate-50 focus:shadow-md outline-none border-[0.5px] dark:border-slate-700 placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
+            className="bg-slate-100 dark:bg-slate-800/50 dark:focus:bg-slate-800 rounded-xl px-4 py-2 w-80 transition-[background-color,box-shadow] duration-100 focus:bg-slate-50 focus:shadow-md outline-none border-[0.5px] dark:border-slate-700 placeholder:text-slate-500 dark:text-white dark:placeholder:text-slate-500"
             placeholder="Filter..."
             value={filterText}
             onChange={(e) => emit({ case: `filterTextUpdated`, text: e.target.value })}
@@ -88,15 +90,24 @@ export const BlockedRequests: React.FC<Props> = ({
             </span>
           </div>
         </div>
-        <Button
-          color="tertiary"
-          size="small"
-          type="button"
-          onClick={() => emit({ case: `clearRequestsClicked` })}
-        >
-          <i className="fa-solid fa-ban mr-2 text-red-400" />
-          Clear requests
-        </Button>
+        <div className="flex space-x-2">
+          <Button
+            color={inflowPaused ? `secondary` : `tertiary`}
+            size="small"
+            type="button"
+            onClick={() => setInflowPaused((paused) => !paused)}
+          >
+            <i className={cx(`fa-solid`, inflowPaused ? `fa-play` : `fa-pause`)} />
+          </Button>
+          <Button
+            color="tertiary"
+            size="small"
+            type="button"
+            onClick={() => emit({ case: `clearRequestsClicked` })}
+          >
+            <i className="fa-solid fa-ban" />
+          </Button>
+        </div>
       </header>
       <div className="flex flex-col p-4 flex-grow overflow-y-auto">
         {requests.length === 0 && (
