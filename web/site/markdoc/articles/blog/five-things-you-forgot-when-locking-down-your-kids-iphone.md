@@ -16,11 +16,20 @@ these too._
 
 ## 1. `#images` iMessage App
 
-{% callout type="warning" title="iOS 17/18 Warning" %}
+{% callout type="warning" title="iOS 17/18 Update" %}
 
-UPDATE: as of 9/17/23, this loophole is harder to patch in iOS 17, and not patchable (yet)
-in iOS 18. If your child is still on iOS 16, the directions below apply. If not,
-[see here](/blog/ios-17-cant-delete-messages-images) for known workarounds and updates.
+The instructions below only work for **iOS 16.** Starting with iOS 17, Apple removed the
+ability to disable this dangerous feature.
+
+For **iOS 18** the only way to disable this feature is to install the free
+[Gertrude Blocker iOS app](https://apps.apple.com/us/app/gertrude-blocker/id6736368820) we
+created specifically to close this and other loopholes in Screen Time.
+
+For **iOS 17**, you can either install the
+[Gertrude Blocker app](https://apps.apple.com/us/app/gertrude-blocker/id6736368820), or
+set your childs phone to always be in "Downtime" mode, by setting a schedule for Downtime
+from 3:01am until 3:00am every day. In doing so, you do lose the ability to use Downtime
+normally.
 
 {% /callout %}
 

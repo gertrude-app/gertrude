@@ -12,6 +12,15 @@ category: parental-controls
 making iOS harder for parents to lockdown safely for kids. If possible, we recommend
 **keeping your kids devices on iOS 16 or 17** until Apple fixes these issues.
 
+{% callout title="UPDATE: 10/2024" %}
+
+We've just released a free iOS app called
+[Gertrude Blocker](https://apps.apple.com/us/app/gertrude-blocker/id6736368820) which can
+disable GIF search and Spotlight image search in Screen Time for both iOS 17 and 18. It is
+the only known workaround for these issues on iOS 18.
+
+{% /callout %}
+
 ## Problem #1: #images GIF search still not deletable
 
 Well over a year ago, we reported that iOS 17 introduced a serious regression in parental
