@@ -45,7 +45,7 @@ const KeychainCard: React.FC<Props> = ({
   return (
     <div
       className={cx(
-        `rounded-2xl shadow-lg shadow-slate-300/50 border-[0.5px] border-slate-200 flex flex-col justify-between transition-[background-color,border-color] duration-100`,
+        `rounded-2xl shadow-md shadow-slate-300/40 border-[0.5px] border-slate-200 flex flex-col justify-between transition-[background-color,border-color] duration-100`,
         isSelect(props) && props.selected ? `bg-violet-50 border-violet-300` : `bg-white`,
         isSelect(props) && !props.selected && `hover:bg-slate-50 cursor-pointer`,
         isSelect(props) && `min-h-[77px]`,
@@ -88,8 +88,8 @@ const KeychainCard: React.FC<Props> = ({
           {isSelect(props) || (
             <p
               className={cx(
-                description ? `text-slate-600 leading-tight` : `text-slate-400 italic`,
-                `mt-1.5 mb-1`,
+                description ? `text-slate-500 leading-tight` : `text-slate-400/70 italic`,
+                `mt-1.5 mb-1 text-sm`,
               )}
             >
               {description || `No description`}

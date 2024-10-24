@@ -8,7 +8,7 @@ import type { KeychainSummary as Keychain } from '@dash/types';
 import KeychainCard from '../Keychains/KeychainCard';
 import { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
-import AddKeychainModal from './AddKeychainModal';
+import AddKeychainDrawer from './AddKeychainDrawer';
 import ConnectDeviceModal from './ConnectDeviceModal';
 import UserDevice from './UserDevice';
 import AddDeviceInstructions from './AddDeviceInstructions';
@@ -128,7 +128,7 @@ const EditUser: React.FC<Props> = ({
         request={addDeviceRequest}
         dismissAddDevice={dismissAddDevice}
       />
-      <AddKeychainModal
+      <AddKeychainDrawer
         request={fetchSelectableKeychainsRequest}
         onSelect={onSelectKeychainToAdd}
         onDismiss={onDismissAddKeychain}
