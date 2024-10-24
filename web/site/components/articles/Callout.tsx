@@ -5,7 +5,7 @@ import Icon from './Icon';
 const styles = {
   note: {
     title: `text-violet-600`,
-    body: `[--tw-prose-background:theme(colors.violet.50)] prose-a:text-violet-500 text-slate-500 prose-code:text-slate-500 prose-strong:text-slate-900 prose-em:text-slate-900`,
+    body: `[--tw-prose-background:theme(colors.violet.50)] prose-a:text-violet-500 text-slate-500 prose-code:text-slate-500 prose-strong:text-slate-900 prose-em:text-slate-600`,
   },
   warning: {
     title: `text-amber-600`,
