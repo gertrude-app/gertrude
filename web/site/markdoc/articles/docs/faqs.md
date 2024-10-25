@@ -48,11 +48,11 @@ more information.
 
 Due to the [increasing difficulty](/blog/ios18-screentime-what-parents-should-know) of
 locking down iPhones and iPads with the most recent versions of iOS, and due to numerous
-requests from Gertrude parents, we are currently _exploring building an iOS app_ that
-would provide similar functionality on phones and iPads. We're hoping to have an initial
-version which plugs [known loopholes](/blog/ios-17-cant-delete-messages-images) in Screen
-Time ready by November 1, 2024&mdash;with possible deeper integration with Gertrude to
-follow. Check [our blog](/blog) for updates.
+requests from Gertrude parents, we recently released the first version of a Gertrude
+[iOS app that blocks GIFs](/blog/how-parents-can-block-images-gif-search-ios-18) and
+closes other loopholes in Apple's Screen Time parental controls. We are exploring the
+possibility of growing this into a more full-featured complement to Gertrude on macOS in
+the months to come.
 
 {% /callout %}
 
