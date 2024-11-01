@@ -26,9 +26,6 @@ export async function generateStaticParams(): Promise<Params[]> {
   }));
 }
 
-// 👍 monday jared, redirects rewrites, then commit maybe
-// see list in things app
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { title, description, image } = await getArticle(params.slug, `blog`);
   return createMetadata(title, description, image);

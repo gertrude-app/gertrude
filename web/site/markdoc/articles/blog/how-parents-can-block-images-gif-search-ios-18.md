@@ -72,7 +72,7 @@ If you haven't created a Family Sharing group,
 
 ---
 
-## Step-by-step instructions:
+## Step-by-step instructions: {% id="step-by-step" %}
 
 {% callout title="We're here to help!" %}
 
