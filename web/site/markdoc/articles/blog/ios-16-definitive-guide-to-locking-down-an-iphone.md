@@ -341,7 +341,7 @@ Start by tapping to _enable restrictions:_
 
 ### iTunes &amp; App Store Purchases
 
-Then drill into the section labeled _iTunes &amp; App Store Purchases_, shown below:
+Then tap the section labeled _iTunes &amp; App Store Purchases_, shown below:
 
 {% image src="lockdown-iphone/itunes-app-store-purchases.png" caption="Tap to drill into iTunes & App Store next" alt="locking down an iPhone: Content & Privacy Restrictions > iTunes & App Store Purchases" /%}
 
