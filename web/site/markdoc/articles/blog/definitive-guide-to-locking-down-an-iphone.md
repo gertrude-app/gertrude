@@ -16,6 +16,16 @@ controls are scattered over an unintuitive hodge-podge of settings screens, ther
 several important loopholes that are easy to miss, and a few gotchas that require extra
 steps to patch. This tutorial will walk you step-by-step through the entire process.
 
+{% callout title="Using an older iOS version?" %}
+
+This guide is designed for _iOS 18_, which was released in September 2024. If your child
+is still on an older version of iOS, the steps are similar, but not identical. We continue
+to maintain guides for both
+[iOS 16](/blog/ios-16-definitive-guide-to-locking-down-an-iphone) and
+[iOS 17](/blog/ios-17-definitive-guide-to-locking-down-an-iphone).
+
+{% /callout %}
+
 ## What do you mean by _safe?_
 
 Many parents naively think that the primary danger posed by internet-connected devices is
