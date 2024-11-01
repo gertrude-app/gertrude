@@ -1,6 +1,6 @@
 ---
-title: The Definitive Guide to Locking Down an iPhone (iOS 18)
-date: '2024-11-01T17:49:26.487Z'
+title: The Definitive Guide to Locking Down an iPhone (iOS 17)
+date: '2023-10-01T17:49:26.487Z'
 image: /og-images/lockdown.en.jpg
 description:
   A step-by-step guide to completely locking down an iPhone or iPad for iOS 18, for
@@ -16,13 +16,13 @@ controls are scattered over an unintuitive hodge-podge of settings screens, ther
 several important loopholes that are easy to miss, and a few gotchas that require extra
 steps to patch. This tutorial will walk you step-by-step through the entire process.
 
-{% callout title="Using an older iOS version?" %}
+{% callout title="This guide is for an outdated version of iOS" %}
 
-This guide is designed for _iOS 18_, which was released in September 2024. If your child
-is still on an older version of iOS, the steps are similar, but not identical. We continue
-to maintain guides for both
-[iOS 16](/blog/ios-16-definitive-guide-to-locking-down-an-iphone) and
-[iOS 17](/blog/ios-17-definitive-guide-to-locking-down-an-iphone).
+This guide is designed for **iOS 17**, which was released in September 2023 and is one
+major version behind. Double-check your iOS version before continuing. If you're not
+running iOS 17, refer to one of our other guides for either
+[iOS 18](/blog/definitive-guide-to-locking-down-an-iphone) or
+[iOS 16](/blog/ios-16-definitive-guide-to-locking-down-an-iphone).
 
 {% /callout %}
 
@@ -88,63 +88,33 @@ an Android.
 
 {% /callout %}
 
-## Screen Time plus Gertrude
+## Prelude: A Loophole in Screen Time
 
-{% image src="lockdown-iphone/gertrude-and-screentime.png" alt="Gertrude + Screen Time gives parents complete control of their kids' iOS devices" /%}
+When iOS 17 was introduced in September of 2023, it shipped with a
+[major loophole](/blog/ios-17-cant-delete-messages-images) in its parental controls: there
+was no longer any way to block children from searching for animated GIFs, including sexual
+and violent images.
 
-In previous versions of iOS (iOS 16 and below), it was possible to completely lock down an
-iPhone using only the built in Apple Screen Time features. Sadly, in iOS 17, Apple
-introduced a [serious loophole in Screen Time](/blog/ios-17-cant-delete-messages-images)
-that has not been fixed in iOS 18, and iOS 18 introduced
-[another loophole](/blog/ios18-screentime-what-parents-should-know). Apple has been made
-aware of these issues many times, but seems to have no interest in fixing them.
+{% image src="images-gif-ios-18.png" caption="Image search in the Message app can't be disabled in iOS 17+" alt="The #images GIF search cant be deleted in iOS 18" /%}
 
-So, in October 2024, we [released an iOS app](/blog/gertrude-ios-released) specifically to
-close these loopholes. At the time of writing, we know of no other way to close these
-loopholes, so we recommend following the below steps to first install the Gertrude app,
-and then proceed with carefully locking down the rest of the device using the built-in
-Screen Time controls.
+{% image src="bikini-gifs-ios18.png" caption="...making it easy for kids to find explicit animated GIFs" alt="iOS 18 still hasn't given parents the ability to block the graphic animated GIFs in Messages" /%}
 
-## Step 1: Install Gertrude
+There are now **two known** workarounds for iOS 17:
 
-In order to use the Gertrude iOS app, you'll need to have **Family Sharing** set up using
-a parent's Apple Account. Because of limitations set by Apple, the Gertrude app can only
-be installed on a child's device if they are _under 18 and part of a Family Sharing
-group._ [See here](https://support.apple.com/en-us/108380) for instructions on how to set
-up Family Sharing if you haven't done so already.
+1. Exploiting a bug in iOS 17 to the **Downtime** feature to block these images, at the
+   cost of not being able to use Downtime normally.
+2. The free [Gertrude Blocker](/blog/how-parents-can-block-images-gif-search-ios-18) iOS
+   app we released.
 
-{% click-to-reveal title="What about people over 18?" %}
+If you'd like to close this loophole with Gertrude Blocker,
+[click here](/blog/how-parents-can-block-images-gif-search-ios-18) for detailed setup
+instructions. Once you've got the app installed, continue on with the tutorial from this
+point.
 
-If you're trying to lock down a phone for yourself, or a child over 18, you've got a few
-options:
+If you don't want to use Gertrude Blocker, take note of the section labled "Blocking
+#images GIFs with Downtime" in the section section covering **Downtime**.
 
-- Log their device into the Apple Account of a younger sibling
-- Alter the birthdate of their Apple Account if you feel comfortable with that
-- Proceed with the rest of the steps in this tutorial, without using Gertrude Blocker. The
-  device will still be much safer than it was before.
-
-You might also explore
-[supervised mode](https://www.techlockdown.com/blog/screen-time-alternative)&mdash; which
-give extra controls and works for any age. We're hoping to eventually make Gertrude
-Blocker compatible with supervised mode as well. For now it's not, but supervised mode
-does allow you to block the #images feature in Messages.
-
-{% /click-to-reveal %}
-
-Next, on your child's device, open the **App Store** and search for
-["Gertrude Blocker"](https://apps.apple.com/us/app/gertrude-blocker/id6736368820). Install
-the app, launch it, and follow the authorization instructions to install the internet
-filter. The parent will be prompted to authorize the app using their Apple ID/Account, as
-well as the child's device passcode. For detailed, step-by-step instructions on installing
-Gertrude Blocker,
-[see here](/blog/how-parents-can-block-images-gif-search-ios-18#step-by-step).
-
-Once you've got Gertrude Blocker running, you'll see this screen, and you can proceed to
-the next steps.
-
-{% image src="lockdown-iphone/gertrude-blocker-running.png" alt="Gertrude Blocker blocks #images GIFs and other Screen Time loopholes" /%}
-
-## Step 2: Delete apps
+## Step 1: Delete apps
 
 The iPhone comes with many built-in apps, and before you started working to lock down your
 child's phone, you or they may have installed more. Therefore, the first thing you should
@@ -178,12 +148,12 @@ should be deleted. For more details (including a recommendation for a replacemen
 
 {% /callout %}
 
-## Step 3: Disable Siri Integrations
+## Step 2: Disable Siri Integrations
 
-The next thing you need to do is take a moment to _disable Siri integration settings_.
-It's important to do this _before_ disabling Siri entirely via Screen Time (explained
-below) because once Siri is disabled, these options are no longer visible, but are still
-in effect.
+The next thing you need to do is take a moment to _disable some Siri integration
+settings_. It's important to do this _before_ disabling Siri entirely via Screen Time
+(explained below) because once Siri is disabled, these options are no longer visible, but
+are still in effect.
 
 {% callout title="Why disable Siri?" %}
 
@@ -198,36 +168,30 @@ Start by going to the main **Settings App**.
 
 {% image src="lockdown-iphone/main-settings-app.png" caption="Go to the main <b>Settings</b> app" alt="locking down an iPhone: the main Settings app" /%}
 
-Scroll down, and tap **Siri**.
+Scroll down, and tap **Siri & Search**.
 
-{% image src="lockdown-iphone/siri-settings-ios18.png" caption="Tap Siri" alt="locking down an iPhone: Siri settings" /%}
+{% image src="lockdown-iphone/siri-search-main.png" caption="Tap Siri & Search" alt="locking down an iPhone: Siri & Search settings" /%}
 
 Then **disable** all the settings shown below:
 
-{% image src="lockdown-iphone/disable-siri-1-ios18.png" caption="Turn these settings OFF..." alt="locking down an iPhone: disable all Siri system integrations for safety" /%}
+{% image src="lockdown-iphone/disable-siri-1-ios17.png" caption="Turn these settings OFF..." alt="locking down an iPhone: disable all Siri system integrations for safety" /%}
 
-{% image src="lockdown-iphone/disable-siri-2-ios18.png" caption="...and <b>all</b> of these settings OFF" alt="locking down an iPhone: disable all Siri system integrations for safety" /%}
+The next two settings are **the most important** in this part to disable:
 
-## Step 4: Disable Search Settings
+{% image src="lockdown-iphone/disable-content-from-apple-ios17.png" caption="Disabling <b>these two</b> settings is critical" alt="locking down an iPhone: disable all Siri system integrations for safety" /%}
 
-Next, take a moment to disable two search-related settings. These are often missed by
-parents, but enable your childs device to present images and content from the internet
-when searching their phone or looking up words from many apps. Sadly, these settings
-cannot be restricted by Screen Time, which means that your child can re-enable them if
-they know where to look. This is one of the loopholes closed by the
-[Gertrude Blocker](/blog/how-parents-can-block-images-gif-search-ios-18) app. But if you
-haven't installed it, it's still worth taking a moment to disable these, in hopes your
-child does not know how to re-enable them.
+{% callout type="warning" %}
 
-Start by going to the main Settings app once again, and this time choose **Search**:
+It's critically important that you disable **Show in Look Up** and **Show in Spotlight**
+as shown in the image above. These settings are hard to understand and often missed by
+parents when locking down a child's phone. If you don't disable these settings, your child
+will be able to
+[search for and view images and content](/blog/five-things-you-forgot-when-locking-down-your-kids-iphone)
+from the internet through their phone's search and look up features.
 
-{% image src="lockdown-iphone/search-settings-ios18.png" caption="Tap Search" alt="locking down an iPhone: Search settings" /%}
+{% /callout %}
 
-Then disable these two settings:
-
-{% image src="lockdown-iphone/disable-spotlight-ios18.png" caption="Disable both of these" alt="locking down an iPhone: Keep your child from looking up images and other internet content" /%}
-
-## Step 5: Enable All Screen Time Features
+## Step 3: Enable All Screen Time Features
 
 Now that we've got apps deleted and Siri integrations turned off, we'll turn our attention
 to **Screen Time**, which is the main tool Apple gives you to lock down an iOS device. You
@@ -248,12 +212,12 @@ already done this step. Skip to the next section.
 
 {% image src="lockdown-iphone/enable-app-website-activity-2-ios17.png" caption="Turning this on is required to access all the controls" alt="locking down an iPhone: Turn on App & Website Activity to access all of Screen Time's controls" /%}
 
-## Step 6: Set a Screen Time Passcode
+## Step 4: Set a Screen Time Passcode
 
 Next, scroll down and click **Lock Screen Time Settings.** You may not see this option if
 you've already done this, which is fine.
 
-{% image src="lockdown-iphone/lock-screentime-ios18.png" alt="locking down an iPhone: Lock Screen Time Settings" /%}
+{% image src="lockdown-iphone/lock-screentime-ios17.png" alt="locking down an iPhone: Lock Screen Time Settings" /%}
 
 Which will bring up _this screen_ where you should enter and confirm a _4 digit passcode:_
 
@@ -283,7 +247,7 @@ phone only inches from my chest when entering the numbers.
 
 {% /callout %}
 
-## Step 7: Downtime
+## Step 5: Downtime
 
 The Screen Time controls have five main sections. We'll work through them one by one,
 starting with **Downtime**, although we'll have the most to say about the fifth area,
@@ -309,7 +273,7 @@ helps encourage good sleep habits.
 Tap to enable a scheduled downtime, and set the schedule for a time that seems appropriate
 for your child.
 
-{% image src="lockdown-iphone/scheduled-downtime-ios18.png" caption="Enabled Scheduled Downtime" alt="locking down an iPhone: tap to enable scheduled Downtime" /%}
+{% image src="lockdown-iphone/scheduled-downtime.png" caption="Enabled Scheduled Downtime" alt="locking down an iPhone: tap to enable scheduled Downtime" /%}
 
 {% callout type="warning" %}
 
@@ -321,9 +285,22 @@ suggestion.
 
 {% image src="lockdown-iphone/block-at-downtime.png" caption="Turn on 'Block at Downtime'" alt="locking down an iPhone: be sure to turn on 'Block at Downtime', or else Downtime limits can be overridden by your child" /%}
 
-## Step 8: App Limits
+{% callout title="Blocking #images GIFs with Downtime" %}
 
-The next section in the main Screen Time settings area is for **App Limits**.
+If you didn't install
+[Gertrude Blocker](/blog/how-parents-can-block-images-gif-search-ios-18), you should use a
+workaround with Downtime to block the #images GIF search in the built-in texting app. Set
+up an every-day scheduled Downtime to be _always on_ by making it go from **3:00AM** to
+**2:59AM**. This will block the #images GIF search, but will require that you list every
+app you want your child to use as "Always Allowed" which is described in the section
+below. This basically prevents you from using the Downtime feature as intended, but the
+"App Limits" feature can still be used to limit app usage.
+
+{% /callout %}
+
+## Step 6: App Limits
+
+The next section on the main screen is for **App Limits**.
 
 {% image src="lockdown-iphone/app-limits-ios18.png" caption="App Limits" alt="locking down an iPhone: App Limits settings" /%}
 
@@ -336,26 +313,27 @@ In my opinion, web-browsing (Safari) and all social media apps should be _entire
 eliminated_ from your child's iPhone, not regulated with time limits. Phones should
 provide only tools for communication (email, phone, and texting), plus required safe apps
 for school and work, as needed. Web browsing should only be done on a computer, ideally in
-a public place, with a tool like [Gertrude for Mac](/) to restrict access and provide
-supervision.
+a public place, with a tool like [Gertrude](/) to restrict access and provide supervision.
 
-## Step 9: Communication Limits
+## Step 7: Communication Limits
 
-Similar to Downtime, but a bit further down, are **Communication Limits**.
+The next section on the main screen is for **Communication Limits**.
 
 {% image src="lockdown-iphone/communication-limits-ios18.png" caption="Communication Limits" alt="locking down an iPhone: Communication Limits settings" /%}
 
 The **Communication Limits** settings area (shown below) allows you to control who your
 child can communicate with.
 
+{% image src="lockdown-iphone/communication-limits-settings.png" caption="Communication Limits settings" alt="locking down an iPhone: the inner screen of settings for Screen Time Communication Limits" /%}
+
 Depending on your particular situation, it might be wise and appropriate to limit
 communication to specifically approved contacts, or prohibit communication during
 Downtime. But as this area is not usually critical for safety and is highly dependent on
 your child and unique context, we won't try to give any guidelines in this tutorial.
 
-## Step 10: Always Allowed
+## Step 8: Always Allowed
 
-The next main section in Screen Time settings is **Always Allowed**.
+The next section on the main screen is for **Always Allowed**.
 
 {% image src="lockdown-iphone/always-allowed-ios18.png" caption="Always Allowed" alt="locking down an iPhone: Always Allowed lets you specify apps not subject to Downtime" /%}
 
@@ -373,13 +351,13 @@ You can also add exemptions for certain contacts that can always be contacted, n
 what time it is. Used sparingly, these controls can provide a nice layer of needed
 customization on top of the Downtime restrictions.
 
-## Step 11: Content &amp; Privacy Restrictions
+## Step 9: Content &amp; Privacy Restrictions
 
 If your goal is to completely lock down your child's iPhone, making it a truly safe
 device, most of the controls you're going to need to set are in the section labeled
 **Content & Privacy Restrictions**:
 
-{% image src="lockdown-iphone/content-privacy-restrictions-ios18.png" caption="Most of your work will happen in this section" alt="locking down an iPhone: The Screen Time > Content & Privacy Restrictions area is where most of the important controls and settings live" /%}
+{% image src="lockdown-iphone/content-privacy-restrictions-ios18.png" caption="Most of your work will happen in this section" alt="locking down an iPhone: the Screen Time > Content & Privacy Restrictions area is where most of the important controls and settings live" /%}
 
 Start by tapping to _enable restrictions:_
 
@@ -560,7 +538,7 @@ Content:**
 
 Make sure you've got this set to **Don't Allow.**
 
-## Step 12: Testing it Out
+## Step 10: Testing it Out
 
 Once you've got all your settings dialed in, you'll need to spend a few minutes testing.
 Exit out of the Settings app, and start kicking the tires. Check and make sure that no
@@ -571,7 +549,7 @@ would immediately win $10,000 if you could find something inappropriate or dange
 Imagine you are a bored, impulsive, motivated teenager with a lot of persistence and time
 on their hands.
 
-## Step 13: Have the Right Mindset
+## Step 11: Have the Right Mindset
 
 I wish I could tell you that there's _"one simple trick"_ or some _silver-bullet
 technology_ to easily and perfectly protect your kids in this new world we live in.
