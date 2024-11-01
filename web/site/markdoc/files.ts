@@ -42,7 +42,7 @@ export async function getArticlePaths(
   const dirPath = category === `docs` ? DOCS_ARTICLES_DIR : BLOG_ARTICLES_DIR;
   const articlePaths = await glob(`${dirPath}/*.md`);
   if (slugs) {
-    return articlePaths.filter((p) => slugs.some((s) => p.includes(s)));
+    return articlePaths.filter((p) => slugs.some((s) => p.includes(`/${s}.md`)));
   }
   return articlePaths;
 }
