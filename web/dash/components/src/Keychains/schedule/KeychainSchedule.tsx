@@ -1,7 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import type { TimeSpan } from '@shared/datetime';
-import SpecifyingAllowedOrBlocked from './SpecifyingAllowedOrBlocked';
+import SpecifyingActiveOrInactive from './SpecifyingActiveOrInactive';
 import WhatDays from './WhatDays';
 import WhatTime from './WhatTime';
 
@@ -33,7 +33,7 @@ const KeychainSchedule: React.FC<Props> = ({ schedule, setSchedule }) => (
         : `bg-transparent gap-1 min-[672px]:gap-0 min-[672px]:bg-slate-200/50 min-[672px]:hover:bg-transparent`,
     )}
   >
-    <SpecifyingAllowedOrBlocked
+    <SpecifyingActiveOrInactive
       schedule={schedule}
       setSchedule={setSchedule}
       isTouchDevice={isTouchDevice()}

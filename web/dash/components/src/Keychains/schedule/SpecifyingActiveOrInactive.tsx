@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
 import type { Schedule } from './KeychainSchedule';
 
-const SpecifyingAllowedOrBlocked: React.FC<{
+const SpecifyingActiveOrInactive: React.FC<{
   schedule: Schedule;
   setSchedule(schedule: Schedule): void;
   isTouchDevice: boolean;
@@ -35,4 +35,4 @@ const SpecifyingAllowedOrBlocked: React.FC<{
   </button>
 );
 
-export default SpecifyingAllowedOrBlocked;
+export default SpecifyingActiveOrInactive;

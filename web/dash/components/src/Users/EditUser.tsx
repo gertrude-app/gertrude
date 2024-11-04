@@ -136,7 +136,6 @@ const EditUser: React.FC<Props> = ({
         selected={selectingKeychain ?? undefined}
         existingKeychains={keychains}
         userName={name}
-        userId={id}
       />
       <ConfirmDeleteEntity type="device" action={deleteDevice} />
       <ConfirmDeleteEntity type="user" action={deleteUser} />
