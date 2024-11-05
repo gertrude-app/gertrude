@@ -97,6 +97,7 @@ jobs:
     env:
       VITE_API_ENDPOINT: ${{ secrets.STAGING_API_ENDPOINT }}
       VITE_TEST_ADMIN_CREDS: ${{ secrets.TEST_ADMIN_CREDS }}
+      VITE_GTM_ID: not-real
     steps:
       - name: reset staging # cypress tests depend slightly on staging api state
         run: curl --silent ${{ secrets.STAGING_API_RESET_ROUTE  }}; true
