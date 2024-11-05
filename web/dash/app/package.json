@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "vite",
+    "start": "VITE_GTM_ID=not-real vite",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",

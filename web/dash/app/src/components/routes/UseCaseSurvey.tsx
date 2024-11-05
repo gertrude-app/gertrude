@@ -141,8 +141,8 @@ const Option: React.FC<OptionProps> = ({ children, type, description, setPage })
   return (
     <button
       data-track-conversion={type === `self` ? undefined : true}
-      onClick={() => {
-        Current.api.logEvent({
+      onClick={async () => {
+        await Current.api.logEvent({
           eventId: `bc6213cb`,
           detail: `signup use-case survey click: *${type.toUpperCase()}*`,
         });
