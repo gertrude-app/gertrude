@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { SuccessOutput } from '../shared';
+import type { SuccessOutput, PlainTimeWindow } from '../shared';
 
 export namespace SaveUser {
   export interface Input {
@@ -11,6 +11,7 @@ export namespace SaveUser {
     screenshotsResolution: number;
     screenshotsFrequency: number;
     showSuspensionActivity: boolean;
+    downtime?: PlainTimeWindow;
     keychainIds: UUID[];
   }
 

@@ -2,12 +2,12 @@ import React from 'react';
 import cx from 'classnames';
 import { typesafe } from '@shared/ts-utils';
 import { CheckIcon } from '@heroicons/react/24/outline';
-import type { Schedule } from './KeychainSchedule';
+import type { KeychainSchedule } from '@dash/types';
 import DropdownCustomizationPoint from './DropdownCustomizationPoint';
 
 const WhatDays: React.FC<{
-  schedule: Schedule;
-  setSchedule(schedule: Schedule): void;
+  schedule: KeychainSchedule;
+  setSchedule(schedule: KeychainSchedule): void;
   isTouchDevice: boolean;
 }> = ({ schedule, setSchedule, isTouchDevice }) => (
   <DropdownCustomizationPoint

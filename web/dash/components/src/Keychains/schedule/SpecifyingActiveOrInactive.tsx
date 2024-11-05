@@ -1,11 +1,11 @@
 import React from 'react';
 import cx from 'classnames';
 import { ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
-import type { Schedule } from './KeychainSchedule';
+import type { KeychainSchedule } from '@dash/types';
 
 const SpecifyingActiveOrInactive: React.FC<{
-  schedule: Schedule;
-  setSchedule(schedule: Schedule): void;
+  schedule: KeychainSchedule;
+  setSchedule(schedule: KeychainSchedule): void;
   isTouchDevice: boolean;
 }> = ({ schedule, setSchedule, isTouchDevice }) => (
   <button
@@ -18,11 +18,11 @@ const SpecifyingActiveOrInactive: React.FC<{
     onClick={() =>
       setSchedule({
         ...schedule,
-        specifyingWhen: schedule.specifyingWhen === `active` ? `inactive` : `active`,
+        mode: schedule.mode,
       })
     }
   >
-    <span className="text-slate-700">{schedule.specifyingWhen}</span>
+    <span className="text-slate-700">{schedule.mode}</span>
     <ArrowsRightLeftIcon
       className={cx(
         `shrink-0 transition-[width,margin-left,filter] text-slate-400 duration-200`,

@@ -60,6 +60,20 @@ export interface Key {
   key: SharedKey;
 }
 
+export interface KeychainSchedule {
+  mode: 'active' | 'inactive';
+  days: {
+    sunday: boolean;
+    monday: boolean;
+    tuesday: boolean;
+    wednesday: boolean;
+    thursday: boolean;
+    friday: boolean;
+    saturday: boolean;
+  };
+  window: PlainTimeWindow;
+}
+
 export interface KeychainSummary {
   id: UUID;
   authorId: UUID;
@@ -67,6 +81,16 @@ export interface KeychainSummary {
   description?: string;
   isPublic: boolean;
   numKeys: number;
+}
+
+export interface PlainTime {
+  hour: number;
+  minute: number;
+}
+
+export interface PlainTimeWindow {
+  start: PlainTime;
+  end: PlainTime;
 }
 
 export type ReleaseChannel = 'stable' | 'beta' | 'canary';
@@ -144,6 +168,7 @@ export interface User {
   screenshotsFrequency: number;
   showSuspensionActivity: boolean;
   keychains: KeychainSummary[];
+  downtime?: PlainTimeWindow;
   devices: UserDevice[];
   createdAt: ISODateString;
 }

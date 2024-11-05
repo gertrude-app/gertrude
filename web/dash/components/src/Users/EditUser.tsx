@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@shared/string';
-import { TextInput, Button, Toggle, Label, TimeInput } from '@shared/components';
-import type { TimeSpan } from '@shared/datetime';
+import { TextInput, Button, Toggle, Label } from '@shared/components';
+import type { PlainTimeWindow } from '@dash/types';
 import type { Subcomponents, ConfirmableEntityAction, RequestState } from '@dash/types';
 import type { KeychainSummary as Keychain } from '@dash/types';
 import KeychainCard from '../Keychains/KeychainCard';
 import { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
+import TimeInput from '../Forms/TimeInput';
 import AddKeychainDrawer from './AddKeychainDrawer';
 import ConnectDeviceModal from './ConnectDeviceModal';
 import UserDevice from './UserDevice';
@@ -27,6 +28,10 @@ interface Props {
   setScreenshotsFrequency(frequency: number): unknown;
   showSuspensionActivity: boolean;
   setShowSuspensionActivity(show: boolean): unknown;
+  setDowntimeEnabled(enabled: boolean): unknown;
+  downtimeEnabled: boolean;
+  setDowntime(window: PlainTimeWindow): unknown;
+  downtime: PlainTimeWindow;
   removeKeychain(id: UUID): unknown;
   keychains: Keychain[];
   devices: Subcomponents<typeof UserDevice>;
@@ -77,13 +82,11 @@ const EditUser: React.FC<Props> = ({
   fetchSelectableKeychainsRequest,
   selectingKeychain,
   onConfirmAddKeychain,
+  downtimeEnabled,
+  setDowntimeEnabled,
+  downtime,
+  setDowntime,
 }) => {
-  const [downtimeEnabled, setDownTimeEnabled] = useState(false);
-  const [downtimeTimeSpan, setDowntimeTimeSpan] = useState<TimeSpan>({
-    start: { hour: 21, minute: 0 },
-    end: { hour: 7, minute: 0 },
-  });
-
   if (isNew) {
     return (
       <div className="-my-6 md:-my-7 py-6 md:py-7 min-h-[calc(100vh-64px)] md:min-h-screen flex flex-col">
@@ -280,7 +283,7 @@ const EditUser: React.FC<Props> = ({
                       Completely restrict all internet access during specified hours
                     </p>
                   </div>
-                  <Toggle enabled={downtimeEnabled} setEnabled={setDownTimeEnabled} />
+                  <Toggle enabled={downtimeEnabled} setEnabled={setDowntimeEnabled} />
                 </div>
                 <div
                   className={cx(
@@ -290,17 +293,13 @@ const EditUser: React.FC<Props> = ({
                 >
                   <span className="text-slate-500 font-medium">From</span>
                   <TimeInput
-                    time={downtimeTimeSpan.start}
-                    setTime={(time) =>
-                      setDowntimeTimeSpan((prev) => ({ ...prev, start: time }))
-                    }
+                    time={downtime.start}
+                    setTime={(start) => setDowntime({ ...downtime, start })}
                   />
                   <span className="text-slate-500 font-medium">to</span>
                   <TimeInput
-                    time={downtimeTimeSpan.end}
-                    setTime={(time) =>
-                      setDowntimeTimeSpan((prev) => ({ ...prev, end: time }))
-                    }
+                    time={downtime.end}
+                    setTime={(end) => setDowntime({ ...downtime, end })}
                   />
                 </div>
               </div>

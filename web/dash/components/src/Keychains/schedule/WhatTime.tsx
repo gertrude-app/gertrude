@@ -1,19 +1,19 @@
 import React from 'react';
 import cx from 'classnames';
-import { TimeInput } from '@shared/components';
-import type { Schedule } from './KeychainSchedule';
+import type { KeychainSchedule } from '@dash/types';
+import TimeInput from '../../Forms/TimeInput';
 import DropdownCustomizationPoint from './DropdownCustomizationPoint';
 
 const WhatTime: React.FC<{
-  schedule: Schedule;
-  setSchedule(schedule: Schedule): void;
+  schedule: KeychainSchedule;
+  setSchedule(schedule: KeychainSchedule): void;
   isTouchDevice: boolean;
 }> = ({ schedule, setSchedule, isTouchDevice }) => {
   const isInvalid = (() => {
     switch (true) {
-      case schedule.time.start.hour > schedule.time.end.hour:
-      case schedule.time.start.hour === schedule.time.end.hour &&
-        schedule.time.start.minute >= schedule.time.end.minute:
+      case schedule.window.start.hour > schedule.window.end.hour:
+      case schedule.window.start.hour === schedule.window.end.hour &&
+        schedule.window.start.minute >= schedule.window.end.minute:
         return true;
       default:
         return false;
@@ -25,14 +25,14 @@ const WhatTime: React.FC<{
       isTouchDevice={isTouchDevice}
       text={
         <span className={cx(isInvalid && `!text-red-600`)}>
-          {schedule.time.start.hour === 0 &&
-          schedule.time.start.minute === 0 &&
-          schedule.time.end.hour === 23 &&
-          schedule.time.end.minute === 59
+          {schedule.window.start.hour === 0 &&
+          schedule.window.start.minute === 0 &&
+          schedule.window.end.hour === 23 &&
+          schedule.window.end.minute === 59
             ? `all day
           long`
-            : `${formatTime(schedule.time.start.hour, schedule.time.start.minute)} to
-          ${formatTime(schedule.time.end.hour, schedule.time.end.minute)}`}
+            : `${formatTime(schedule.window.start.hour, schedule.window.start.minute)} to
+          ${formatTime(schedule.window.end.hour, schedule.window.end.minute)}`}
         </span>
       }
     >
@@ -40,12 +40,12 @@ const WhatTime: React.FC<{
         <div className="flex flex-col gap-1.5">
           <span className="text-xs text-slate-500">Start:</span>
           <TimeInput
-            time={schedule.time.start}
+            time={schedule.window.start}
             setTime={(time) =>
               setSchedule({
                 ...schedule,
-                time: {
-                  ...schedule.time,
+                window: {
+                  ...schedule.window,
                   start: time,
                 },
               })
@@ -55,9 +55,9 @@ const WhatTime: React.FC<{
         <div className="flex flex-col gap-1.5">
           <span className="text-xs text-slate-500">End:</span>
           <TimeInput
-            time={schedule.time.end}
+            time={schedule.window.end}
             setTime={(time) =>
-              setSchedule({ ...schedule, time: { ...schedule.time, end: time } })
+              setSchedule({ ...schedule, window: { ...schedule.window, end: time } })
             }
           />
         </div>

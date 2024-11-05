@@ -1,15 +1,5 @@
 import { inflect } from '@shared/string';
 
-export interface Time {
-  hour: number;
-  minute: number;
-}
-
-export interface TimeSpan {
-  start: Time;
-  end: Time;
-}
-
 export function isoToDateInput(iso: string): string {
   return formatDate(new Date(iso), `dateInput`);
 }

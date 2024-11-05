@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
-import type { Time } from '@shared/datetime';
+import type { PlainTime } from '@dash/types';
 
 interface Props {
-  time: Time;
-  setTime(time: Time): void;
+  time: PlainTime;
+  setTime(time: PlainTime): void;
 }
 
 const TimeInput: React.FC<Props> = ({ time, setTime }) => (

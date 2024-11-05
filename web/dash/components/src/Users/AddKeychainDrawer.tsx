@@ -12,8 +12,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { Badge, Button, Loading } from '@shared/components';
 import { inflect } from '@shared/string';
-import type { KeychainSummary as Keychain, RequestState } from '@dash/types';
-import type { Schedule } from '../Keychains/schedule/KeychainSchedule';
+import { defaults, type KeychainSummary as Keychain } from '@dash/types';
+import type { KeychainSchedule as Schedule, RequestState } from '@dash/types';
 import KeychainSchedule from '../Keychains/schedule/KeychainSchedule';
 
 interface Props {
@@ -312,24 +312,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
               </>
             ) : (
               <button
-                onClick={() => {
-                  setSchedule({
-                    specifyingWhen: `active`,
-                    days: {
-                      sunday: true,
-                      monday: true,
-                      tuesday: true,
-                      wednesday: true,
-                      thursday: true,
-                      friday: true,
-                      saturday: true,
-                    },
-                    time: {
-                      start: { hour: 0, minute: 0 },
-                      end: { hour: 23, minute: 59 },
-                    },
-                  });
-                }}
+                onClick={() => setSchedule(defaults.keychainSchedule())}
                 className={cx(
                   `flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300`,
                 )}

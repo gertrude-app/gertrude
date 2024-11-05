@@ -1,27 +1,13 @@
 import React from 'react';
 import cx from 'classnames';
-import type { TimeSpan } from '@shared/datetime';
+import type { KeychainSchedule } from '@dash/types';
 import SpecifyingActiveOrInactive from './SpecifyingActiveOrInactive';
 import WhatDays from './WhatDays';
 import WhatTime from './WhatTime';
 
-export type Schedule = {
-  specifyingWhen: 'active' | 'inactive';
-  days: {
-    sunday: boolean;
-    monday: boolean;
-    tuesday: boolean;
-    wednesday: boolean;
-    thursday: boolean;
-    friday: boolean;
-    saturday: boolean;
-  };
-  time: TimeSpan;
-};
-
 interface Props {
-  schedule: Schedule;
-  setSchedule(schedule: Schedule): void;
+  schedule: KeychainSchedule;
+  setSchedule(schedule: KeychainSchedule): void;
 }
 
 const KeychainSchedule: React.FC<Props> = ({ schedule, setSchedule }) => (
@@ -44,10 +30,10 @@ const KeychainSchedule: React.FC<Props> = ({ schedule, setSchedule }) => (
       setSchedule={setSchedule}
       isTouchDevice={isTouchDevice()}
     />
-    {(schedule.time.start.hour !== 0 ||
-      schedule.time.start.minute !== 0 ||
-      schedule.time.end.hour !== 23 ||
-      schedule.time.end.minute !== 59) && (
+    {(schedule.window.start.hour !== 0 ||
+      schedule.window.start.minute !== 0 ||
+      schedule.window.end.hour !== 23 ||
+      schedule.window.end.minute !== 59) && (
       <span className="text-slate-600 px-[3px]">from</span>
     )}
     <WhatTime

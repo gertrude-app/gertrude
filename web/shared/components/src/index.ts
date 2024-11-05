@@ -7,6 +7,5 @@ export { default as SelectMenu } from './SelectMenu';
 export { default as Loading } from './Loading';
 export { default as AppIcon } from './AppIcon';
 export { default as Badge } from './Badge';
-export { default as TimeInput } from './TimeInput';
 export * as env from './env';
 export * from './env';

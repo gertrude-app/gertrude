@@ -3,7 +3,7 @@ import { Navigate, useParams } from 'react-router-dom';
 import { Loading, ApiErrorMessage } from '@dash/components';
 import React, { useEffect, useMemo, useReducer } from 'react';
 import { EditUser } from '@dash/components';
-import type { User } from '@dash/types';
+import { defaults, type User } from '@dash/types';
 import * as empty from '../../lib/empty';
 import { isDirty } from '../../lib/helpers';
 import Current from '../../environment';
@@ -45,6 +45,7 @@ const UserRoute: React.FC = () => {
         screenshotsFrequency: editableUser.draft.screenshotsFrequency,
         screenshotsResolution: editableUser.draft.screenshotsResolution,
         showSuspensionActivity: editableUser.draft.showSuspensionActivity,
+        downtime: editableUser.draft.downtime,
         isNew: editableUser.isNew ?? false,
         keychainIds: editableUser.draft.keychains.map(({ id }) => id),
       }),
@@ -112,6 +113,10 @@ const UserRoute: React.FC = () => {
       startAddDevice={() => addDevice.mutate(id)}
       dismissAddDevice={() => addDevice.reset()}
       addDeviceRequest={ReqState.fromMutation(addDevice)}
+      downtime={draft.downtime ?? defaults.timeWindow()}
+      downtimeEnabled={!!draft.downtime}
+      setDowntimeEnabled={(enabled) => dispatch({ type: `setDowntimeEnabled`, enabled })}
+      setDowntime={(downtime) => dispatch({ type: `setDowntime`, downtime })}
       deleteDevice={deleteDevice}
       saveButtonDisabled={
         !isDirty(state.user) || draft.name.trim() === `` || saveUser.isPending

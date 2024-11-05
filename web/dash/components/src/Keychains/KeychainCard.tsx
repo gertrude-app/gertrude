@@ -4,7 +4,7 @@ import { inflect } from '@shared/string';
 import { Button, Badge } from '@shared/components';
 import { ChevronDownIcon, ClockIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { UsersIcon } from '@heroicons/react/24/solid';
-import type { Schedule } from './schedule/KeychainSchedule';
+import { defaults, type KeychainSchedule as Schedule } from '@dash/types';
 import GradientIcon from '../GradientIcon';
 import KeychainSchedule from './schedule/KeychainSchedule';
 
@@ -119,22 +119,7 @@ const KeychainCard: React.FC<Props> = ({
                 {!schedule && props.schedulable && (
                   <button
                     onClick={() => {
-                      setSchedule({
-                        specifyingWhen: `active`,
-                        days: {
-                          sunday: true,
-                          monday: true,
-                          tuesday: true,
-                          wednesday: true,
-                          thursday: true,
-                          friday: true,
-                          saturday: true,
-                        },
-                        time: {
-                          start: { hour: 0, minute: 0 },
-                          end: { hour: 23, minute: 59 },
-                        },
-                      });
+                      setSchedule(defaults.keychainSchedule());
                       setShowSchedule(true);
                     }}
                     className={cx(

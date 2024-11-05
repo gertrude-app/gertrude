@@ -1,5 +1,6 @@
 import { produce } from 'immer';
-import type { KeychainSummary, User } from '@dash/types';
+import { defaults } from '@dash/types';
+import type { KeychainSummary, PlainTimeWindow, User } from '@dash/types';
 import { commit, editable } from '../lib/helpers';
 
 type State = {
@@ -15,6 +16,8 @@ export type Action =
   | { type: 'setScreenshotsResolution'; resolution: number }
   | { type: 'setScreenshotsFrequency'; frequency: number }
   | { type: 'setKeyloggingEnabled'; enabled: boolean }
+  | { type: 'setDowntimeEnabled'; enabled: boolean }
+  | { type: 'setDowntime'; downtime: PlainTimeWindow }
   | { type: 'setShowSuspensionActivity'; show: boolean }
   | { type: 'removeKeychain'; id: UUID }
   | { type: 'addKeychain'; keychain: KeychainSummary }
@@ -61,6 +64,12 @@ function reducer(state: State, action: Action): State | undefined {
       return;
     case `addKeychain`:
       state.user.draft.keychains.push(action.keychain);
+      return;
+    case `setDowntimeEnabled`:
+      state.user.draft.downtime = action.enabled ? defaults.timeWindow() : undefined;
+      return;
+    case `setDowntime`:
+      state.user.draft.downtime = action.downtime;
       return;
   }
 }
