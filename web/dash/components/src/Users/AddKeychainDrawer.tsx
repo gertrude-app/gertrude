@@ -19,9 +19,11 @@ import KeychainSchedule from '../Keychains/schedule/KeychainSchedule';
 interface Props {
   request?: RequestState<{ own: Keychain[]; public: Keychain[] }>;
   selected?: Keychain;
+  onSelect(keychain: Keychain): unknown;
+  schedule?: Schedule;
+  setSchedule(schedule?: Schedule): unknown;
   onDismiss(): unknown;
   onConfirm(): unknown;
-  onSelect(keychain: Keychain): unknown;
   existingKeychains: Keychain[];
   userName: string;
 }
@@ -34,6 +36,8 @@ const AddKeychainDrawer: React.FC<Props> = ({
   selected,
   existingKeychains,
   userName,
+  schedule,
+  setSchedule,
 }) => {
   const shown = request && request.state !== `idle`;
   const [whichKeychains, setWhichKeychains] = useState<'own' | 'public'>(`own`);
@@ -41,7 +45,6 @@ const AddKeychainDrawer: React.FC<Props> = ({
   const [page, setPage] = useState(1);
   const [prevSelected, setPrevSelected] = useState<Keychain | undefined>(undefined);
   const [showNew, setShowNew] = useState(false);
-  const [schedule, setSchedule] = useState<Schedule | null>(null);
 
   const keychainsToDisplay =
     request?.state === `succeeded`
@@ -157,7 +160,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
                 Add a keychain
               </h2>
               <span className="text-sm lg:text-base font-medium text-slate-500">
-                to child {userName}
+                to child <span className="text-violet-600">{userName}</span>
               </span>
             </div>
           </div>
@@ -253,6 +256,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
             {keychainsToDisplay.length > 0
               ? Array.from({ length: numPages }).map((_, i) => (
                   <div
+                    key={`index-${i}`}
                     className={cx(
                       `mt-5 px-16 flex flex-wrap gap-4 justify-center items-center content-start absolute w-full h-full transition-[opacity,transform] duration-300 max-[999px]:overflow-scroll`,
                       {
@@ -301,7 +305,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
               <>
                 <KeychainSchedule schedule={schedule} setSchedule={setSchedule} />
                 <button
-                  onClick={() => setSchedule(null)}
+                  onClick={() => setSchedule(undefined)}
                   className="h-4 w-4 flex justify-center items-center rounded-full hover:scale-150 hover:bg-slate-200 transition-[transform,background-color] duration-200 group active:scale-100 active:bg-slate-300"
                 >
                   <XMarkIcon
@@ -312,7 +316,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
               </>
             ) : (
               <button
-                onClick={() => setSchedule(defaults.keychainSchedule())}
+                onClick={() => selected && setSchedule(defaults.keychainSchedule())}
                 className={cx(
                   `flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300`,
                 )}

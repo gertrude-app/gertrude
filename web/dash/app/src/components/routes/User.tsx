@@ -36,18 +36,18 @@ const UserRoute: React.FC = () => {
   );
 
   const saveUser = useMutation(
-    (editableUser: Editable<User>) =>
+    (user: Editable<User>) =>
       Current.api.saveUser({
-        id: editableUser.draft.id,
-        name: editableUser.draft.name,
-        keyloggingEnabled: editableUser.draft.keyloggingEnabled,
-        screenshotsEnabled: editableUser.draft.screenshotsEnabled,
-        screenshotsFrequency: editableUser.draft.screenshotsFrequency,
-        screenshotsResolution: editableUser.draft.screenshotsResolution,
-        showSuspensionActivity: editableUser.draft.showSuspensionActivity,
-        downtime: editableUser.draft.downtime,
-        isNew: editableUser.isNew ?? false,
-        keychainIds: editableUser.draft.keychains.map(({ id }) => id),
+        id: user.draft.id,
+        isNew: user.isNew ?? false,
+        name: user.draft.name,
+        keyloggingEnabled: user.draft.keyloggingEnabled,
+        screenshotsEnabled: user.draft.screenshotsEnabled,
+        screenshotsFrequency: user.draft.screenshotsFrequency,
+        screenshotsResolution: user.draft.screenshotsResolution,
+        showSuspensionActivity: user.draft.showSuspensionActivity,
+        downtime: user.draft.downtime,
+        keychains: user.draft.keychains.map(({ id, schedule }) => ({ id, schedule })),
       }),
     {
       onSuccess: () => dispatch({ type: `userSaved` }),
@@ -136,9 +136,16 @@ const UserRoute: React.FC = () => {
       onDismissAddKeychain={() =>
         dispatch({ type: `setAddingKeychain`, keychain: undefined })
       }
-      selectingKeychain={addingKeychain}
+      addingKeychain={addingKeychain}
       fetchSelectableKeychainsRequest={
         addingKeychain === undefined ? undefined : ReqState.fromQuery(getKeychains)
+      }
+      keychainSchedule={addingKeychain?.schedule}
+      setAddingKeychainSchedule={(schedule) =>
+        dispatch({ type: `setAddingKeychainSchedule`, schedule })
+      }
+      setAssignedKeychainSchedule={(id, schedule) =>
+        dispatch({ type: `setKeychainSchedule`, id, schedule })
       }
     />
   );

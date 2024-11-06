@@ -43,6 +43,8 @@ export const Default: Story = props({
   downtime: { start: { hour: 0, minute: 0 }, end: { hour: 1, minute: 0 } },
   setDowntimeEnabled: () => {},
   setDowntime: () => {},
+  setAssignedKeychainSchedule: () => {},
+  setAddingKeychainSchedule: () => {},
   keychains: [
     keychainProps({ name: `HTC`, numKeys: 43, isPublic: true }),
     keychainProps({ name: `Public Speaking`, numKeys: 7, isPublic: false }),

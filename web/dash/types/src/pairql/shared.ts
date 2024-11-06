@@ -167,7 +167,7 @@ export interface User {
   screenshotsResolution: number;
   screenshotsFrequency: number;
   showSuspensionActivity: boolean;
-  keychains: KeychainSummary[];
+  keychains: UserKeychainSummary[];
   downtime?: PlainTimeWindow;
   devices: UserDevice[];
   createdAt: ISODateString;
@@ -203,6 +203,16 @@ export interface UserDevice {
   modelTitle: string;
   modelIdentifier: string;
   customName?: string;
+}
+
+export interface UserKeychainSummary {
+  id: UUID;
+  authorId: UUID;
+  name: string;
+  description?: string;
+  isPublic: boolean;
+  numKeys: number;
+  schedule?: KeychainSchedule;
 }
 
 export interface VerifiedNotificationMethod {

@@ -19,6 +19,9 @@ export function keychainSchedule(): KeychainSchedule {
       friday: true,
       saturday: true,
     },
-    window: timeWindow(),
+    window: {
+      start: { hour: 7, minute: 0 },
+      end: { hour: 17, minute: 0 },
+    },
   };
 }

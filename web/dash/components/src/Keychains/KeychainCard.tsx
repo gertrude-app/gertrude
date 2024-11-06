@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@shared/string';
 import { Button, Badge } from '@shared/components';
-import { ChevronDownIcon, ClockIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ClockIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { UsersIcon } from '@heroicons/react/24/solid';
 import { defaults, type KeychainSchedule as Schedule } from '@dash/types';
 import GradientIcon from '../GradientIcon';
@@ -10,12 +10,15 @@ import KeychainSchedule from './schedule/KeychainSchedule';
 
 type Props =
   | ({
-      mode: 'list';
+      mode: 'keychains_screen';
+      id: UUID;
       onRemove(): unknown;
-      removeText: string;
-      editUrl?: string;
+    } & Common)
+  | ({
+      mode: 'assign_to_child';
+      onRemove(): unknown;
       schedule?: Schedule;
-      schedulable: boolean;
+      setSchedule(schedule?: Schedule): unknown;
     } & Common)
   | ({
       mode: 'select';
@@ -37,11 +40,7 @@ const KeychainCard: React.FC<Props> = ({
   description,
   ...props
 }) => {
-  const [schedule, setSchedule] = React.useState<Schedule | null>(
-    props.mode === `list` ? props.schedule || null : null,
-  );
   const [showSchedule, setShowSchedule] = React.useState(false);
-
   return (
     <div
       className={cx(
@@ -114,12 +113,12 @@ const KeychainCard: React.FC<Props> = ({
               {` `}
               Public
             </Badge>
-            {props.mode === `list` && (
+            {props.mode !== `select` && (
               <div className="flex items-center pr-2 gap-2">
-                {!schedule && props.schedulable && (
+                {props.mode === `assign_to_child` && !props.schedule && (
                   <button
                     onClick={() => {
-                      setSchedule(defaults.keychainSchedule());
+                      props.setSchedule(defaults.keychainSchedule());
                       setShowSchedule(true);
                     }}
                     className={cx(
@@ -135,7 +134,7 @@ const KeychainCard: React.FC<Props> = ({
                     </span>
                   </button>
                 )}
-                {schedule && (
+                {props.mode === `assign_to_child` && props.schedule && (
                   <button
                     onClick={() => setShowSchedule(!showSchedule)}
                     className={cx(
@@ -161,12 +160,12 @@ const KeychainCard: React.FC<Props> = ({
                     />
                   </button>
                 )}
-                {props.editUrl && (
+                {props.mode === `keychains_screen` && (
                   <Button
                     type="link"
                     color="tertiary"
                     size="small"
-                    to={props.editUrl}
+                    to={`/keychains/${props.id}`}
                     testId="edit-keychain"
                   >
                     Edit
@@ -179,12 +178,12 @@ const KeychainCard: React.FC<Props> = ({
                   testId="remove-keychain"
                   size="small"
                 >
-                  {props.removeText}
+                  {props.mode === `keychains_screen` ? `Delete` : `Remove`}
                 </Button>
               </div>
             )}
           </div>
-          {schedule && (
+          {props.mode === `assign_to_child` && props.schedule && (
             <div
               className={cx(
                 `flex justify-center items-center gap-2 transition-[height,filter,opacity,margin] duration-300 px-4`,
@@ -192,14 +191,21 @@ const KeychainCard: React.FC<Props> = ({
               )}
             >
               <ClockIcon className="w-4 text-slate-400 shrink-0" strokeWidth={2.5} />
-              <KeychainSchedule schedule={schedule} setSchedule={setSchedule} />
+              <KeychainSchedule
+                schedule={props.schedule}
+                setSchedule={props.setSchedule}
+              />
               <button
-                onClick={() => setSchedule(null)}
-                className="h-4 w-4 flex justify-center items-center rounded-full hover:scale-150 hover:bg-slate-200 transition-[transform,background-color] duration-200 group active:scale-100 active:bg-slate-300"
+                onClick={() => {
+                  props.setSchedule(undefined);
+                  setShowSchedule(false);
+                }}
+                className="h-5 w-5 flex justify-center items-center rounded-full hover:scale-150 hover:bg-slate-100 transition-[transform,background-color] duration-200 group active:scale-100 active:bg-slate-300"
               >
-                <XMarkIcon
-                  strokeWidth={3}
-                  className="w-4 h-4 text-slate-400 group-hover:scale-75 transition-transform duration-200"
+                <TrashIcon
+                  title="Remove schedule from keychain"
+                  strokeWidth={2}
+                  className="w-4 h-4 text-red-500 group-hover:scale-75 transition-transform duration-200"
                 />
               </button>
             </div>

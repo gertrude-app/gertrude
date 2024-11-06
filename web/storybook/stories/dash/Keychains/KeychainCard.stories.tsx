@@ -11,7 +11,8 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 export const ListPublic: Story = props({
-  mode: `list`,
+  id: `1`,
+  mode: `keychains_screen`,
   name: `HTC`,
   numKeys: 43,
   isPublic: true,

@@ -18,7 +18,7 @@ const SpecifyingActiveOrInactive: React.FC<{
     onClick={() =>
       setSchedule({
         ...schedule,
-        mode: schedule.mode,
+        mode: schedule.mode === `active` ? `inactive` : `active`,
       })
     }
   >

@@ -20,12 +20,10 @@ const Keychains: React.FC = () => {
   return (
     <ListKeychains
       keychains={query.data.map((keychain) => ({
-        schedulable: false, // TODO
         id: keychain.summary.id,
         name: keychain.summary.name,
         isPublic: keychain.summary.isPublic,
-        mode: `list`,
-        removeText: `Delete`,
+        mode: `keychains_screen`,
         description: keychain.summary.description || undefined,
         numKeys: keychain.summary.numKeys,
       }))}

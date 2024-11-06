@@ -1,11 +1,16 @@
 import { produce } from 'immer';
 import { defaults } from '@dash/types';
-import type { KeychainSummary, PlainTimeWindow, User } from '@dash/types';
+import type {
+  UserKeychainSummary,
+  PlainTimeWindow,
+  User,
+  KeychainSchedule,
+} from '@dash/types';
 import { commit, editable } from '../lib/helpers';
 
 type State = {
   user?: Editable<User>;
-  addingKeychain?: KeychainSummary | null;
+  addingKeychain?: UserKeychainSummary | null;
 };
 
 export type Action =
@@ -20,8 +25,10 @@ export type Action =
   | { type: 'setDowntime'; downtime: PlainTimeWindow }
   | { type: 'setShowSuspensionActivity'; show: boolean }
   | { type: 'removeKeychain'; id: UUID }
-  | { type: 'addKeychain'; keychain: KeychainSummary }
-  | { type: 'setAddingKeychain'; keychain?: KeychainSummary | null };
+  | { type: 'setKeychainSchedule'; id: UUID; schedule?: KeychainSchedule }
+  | { type: 'addKeychain'; keychain: UserKeychainSummary }
+  | { type: 'setAddingKeychainSchedule'; schedule?: KeychainSchedule }
+  | { type: 'setAddingKeychain'; keychain?: UserKeychainSummary | null };
 
 function reducer(state: State, action: Action): State | undefined {
   if (action.type === `setUser`) {
@@ -38,7 +45,6 @@ function reducer(state: State, action: Action): State | undefined {
       state.user.isNew = false;
       state.user = commit(state.user);
       return;
-
     case `setName`:
       state.user.draft.name = action.name;
       return;
@@ -70,6 +76,22 @@ function reducer(state: State, action: Action): State | undefined {
       return;
     case `setDowntime`:
       state.user.draft.downtime = action.downtime;
+      return;
+    case `setKeychainSchedule`: {
+      const keychain = state.user.draft.keychains.find((k) => k.id === action.id);
+      if (keychain) {
+        keychain.schedule = action.schedule;
+      }
+      return;
+    }
+    case `setAddingKeychainSchedule`:
+      {
+        const addingKeychain = state.addingKeychain;
+        if (addingKeychain) {
+          addingKeychain.schedule = action.schedule;
+          state.addingKeychain = addingKeychain;
+        }
+      }
       return;
   }
 }

@@ -2,9 +2,9 @@ import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@shared/string';
 import { TextInput, Button, Toggle, Label } from '@shared/components';
-import type { PlainTimeWindow } from '@dash/types';
+import type { KeychainSchedule, PlainTimeWindow } from '@dash/types';
 import type { Subcomponents, ConfirmableEntityAction, RequestState } from '@dash/types';
-import type { KeychainSummary as Keychain } from '@dash/types';
+import type { UserKeychainSummary as Keychain } from '@dash/types';
 import KeychainCard from '../Keychains/KeychainCard';
 import { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
@@ -15,6 +15,7 @@ import UserDevice from './UserDevice';
 import AddDeviceInstructions from './AddDeviceInstructions';
 
 interface Props {
+  id: string;
   isNew: boolean;
   name: string;
   setName(name: string): unknown;
@@ -46,9 +47,11 @@ interface Props {
   onSelectKeychainToAdd(keychain: Keychain): unknown;
   onConfirmAddKeychain(): unknown;
   onDismissAddKeychain(): unknown;
-  selectingKeychain?: Keychain | null;
+  addingKeychain?: Keychain | null;
   fetchSelectableKeychainsRequest?: RequestState<{ own: Keychain[]; public: Keychain[] }>;
-  id: string;
+  keychainSchedule?: KeychainSchedule;
+  setAddingKeychainSchedule(schedule?: KeychainSchedule): unknown;
+  setAssignedKeychainSchedule(id: UUID, schedule?: KeychainSchedule): unknown;
 }
 
 const EditUser: React.FC<Props> = ({
@@ -80,12 +83,15 @@ const EditUser: React.FC<Props> = ({
   onSelectKeychainToAdd,
   onDismissAddKeychain,
   fetchSelectableKeychainsRequest,
-  selectingKeychain,
+  addingKeychain,
   onConfirmAddKeychain,
   downtimeEnabled,
   setDowntimeEnabled,
   downtime,
   setDowntime,
+  keychainSchedule,
+  setAddingKeychainSchedule,
+  setAssignedKeychainSchedule,
 }) => {
   if (isNew) {
     return (
@@ -136,9 +142,11 @@ const EditUser: React.FC<Props> = ({
         onSelect={onSelectKeychainToAdd}
         onDismiss={onDismissAddKeychain}
         onConfirm={onConfirmAddKeychain}
-        selected={selectingKeychain ?? undefined}
+        selected={addingKeychain ?? undefined}
         existingKeychains={keychains}
         userName={name}
+        schedule={keychainSchedule}
+        setSchedule={setAddingKeychainSchedule}
       />
       <ConfirmDeleteEntity type="device" action={deleteDevice} />
       <ConfirmDeleteEntity type="user" action={deleteUser} />
@@ -311,15 +319,17 @@ const EditUser: React.FC<Props> = ({
               <div className="py-3 flex flex-col space-y-4">
                 {keychains.map((keychain) => (
                   <KeychainCard
-                    schedulable={true} // TODO
-                    mode="list"
+                    mode="assign_to_child"
+                    schedule={keychain.schedule}
                     key={keychain.id}
                     name={keychain.name}
                     description={keychain.description}
                     numKeys={keychain.numKeys}
                     isPublic={keychain.isPublic}
                     onRemove={() => removeKeychain(keychain.id)}
-                    removeText="Remove"
+                    setSchedule={(schedule) =>
+                      setAssignedKeychainSchedule(keychain.id, schedule)
+                    }
                   />
                 ))}
                 <button
