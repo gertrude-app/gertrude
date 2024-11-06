@@ -1,7 +1,8 @@
 // begin codegen
 export type FilterState =
   | { case: 'suspended'; resuming: string }
-  | { case: 'downtimePaused'; resuming: string } // added manually
+  | { case: 'downtime'; ending: string }
+  | { case: 'downtimePaused'; resuming: string }
   | { case: 'off' }
   | { case: 'on' };
 

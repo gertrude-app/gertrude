@@ -155,8 +155,7 @@ const DifferentModesAcrossColrs: React.FC<{ theme: 'light' | 'dark' }> = ({ them
       case: `connected`,
       recordingKeystrokes: true,
       recordingScreen: true,
-      filterState: { case: `on` },
-      downtime: { until: `7:00am` },
+      filterState: { case: `downtime`, ending: `5 hours from nmow` },
       ...commonProps,
     },
     fifth: {
@@ -265,6 +264,7 @@ const commonProps = {
   connectionCode: `123456`,
   adminAttentionRequired: false,
   showingNotConnectedActions: false,
+  showingDowntimePauseDuration: false,
   emit: () => {},
   dispatch: () => {},
 };

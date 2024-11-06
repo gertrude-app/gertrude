@@ -19,7 +19,6 @@ type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 export const MenuBar: React.FC<Props> = ({
   connectionCode,
   showingNotConnectedActions,
-  downtime,
   emit,
   dispatch,
   ...props
@@ -58,11 +57,12 @@ export const MenuBar: React.FC<Props> = ({
     return (
       <Connected
         emit={emit}
+        dispatch={dispatch}
+        showingDowntimePauseDuration={props.showingDowntimePauseDuration}
         filterState={props.filterState}
         recordingScreen={props.recordingScreen}
         recordingKeystrokes={props.recordingKeystrokes}
         adminAttentionRequired={props.adminAttentionRequired}
-        downtime={downtime}
       />
     );
   }
