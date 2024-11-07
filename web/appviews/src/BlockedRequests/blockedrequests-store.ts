@@ -42,9 +42,12 @@ export type AppEvent =
 
 export type ViewState = {
   unlockRequestExplanation: string;
+  requestsPaused: boolean;
 };
 
-export type ViewAction = { type: 'explanationUpdated'; text: string };
+export type ViewAction =
+  | { type: 'requestsPausedToggled' }
+  | { type: 'explanationUpdated'; text: string };
 
 export type Action = ActionOf<AppState, AppEvent, ViewAction>;
 export type State = AppState & ViewState;
@@ -70,6 +73,7 @@ export class BlockedRequestsStore extends Store<
   viewState(): ViewState {
     return {
       unlockRequestExplanation: ``,
+      requestsPaused: false,
     };
   }
 
@@ -83,6 +87,9 @@ export class BlockedRequestsStore extends Store<
         const reqSucceeded =
           state.createUnlockRequests.case === `ongoing` &&
           action.appState.createUnlockRequests.case === `succeeded`;
+        if (state.requestsPaused) {
+          action.appState.requests = state.requests;
+        }
         return {
           ...state,
           ...action.appState,
@@ -91,6 +98,8 @@ export class BlockedRequestsStore extends Store<
       }
       case `explanationUpdated`:
         return { ...state, unlockRequestExplanation: action.text };
+      case `requestsPausedToggled`:
+        return { ...state, requestsPaused: !state.requestsPaused };
       case `appEventEmitted`:
         return state;
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import cx from 'classnames';
 import { Button, Loading, TextInput, Toggle } from '@shared/components';
 import type { AppState, ViewState, AppEvent, ViewAction } from './blockedrequests-store';
@@ -24,9 +24,8 @@ export const BlockedRequests: React.FC<Props> = ({
   selectedRequestIds,
   adminAccountStatus,
   filterCommunicationConfirmed,
+  requestsPaused,
 }) => {
-  const [inflowPaused, setInflowPaused] = useState(false);
-
   const filteredRequests = filterVisibleRequests(requests, filterText, tcpOnly);
   if (adminAccountStatus === `inactive`) {
     return (
@@ -92,12 +91,14 @@ export const BlockedRequests: React.FC<Props> = ({
         </div>
         <div className="flex space-x-2">
           <Button
-            color={inflowPaused ? `secondary` : `tertiary`}
+            color={requestsPaused ? `secondary` : `tertiary`}
             size="small"
             type="button"
-            onClick={() => setInflowPaused((paused) => !paused)}
+            className="relative"
+            onClick={() => dispatch({ type: `requestsPausedToggled` })}
           >
-            <i className={cx(`fa-solid`, inflowPaused ? `fa-play` : `fa-pause`)} />
+            {requestsPaused ? `Resume` : ``}
+            <i className={cx(`fa-solid`, requestsPaused ? `fa-play ml-2` : `fa-pause`)} />
           </Button>
           <Button
             color="tertiary"
@@ -105,10 +106,19 @@ export const BlockedRequests: React.FC<Props> = ({
             type="button"
             onClick={() => emit({ case: `clearRequestsClicked` })}
           >
-            <i className="fa-solid fa-ban" />
+            Clear
+            <i className="fa-solid fa-rotate-right ml-2" />
           </Button>
         </div>
       </header>
+      {requestsPaused && (
+        <div className="bg-violet-500/90 dark:bg-violet-900 p-2 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center justify-center text-white dark:text-slate-300">
+            <i className="fa fa-info-circle text-lg mr-2" />
+            <span>Requests are paused</span>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col p-4 flex-grow overflow-y-auto">
         {requests.length === 0 && (
           <div className="h-full flex justify-center items-center">
@@ -157,7 +167,12 @@ export const BlockedRequests: React.FC<Props> = ({
 
 type PanelProps = Omit<
   Props,
-  'requests' | 'filterText' | 'tcpOnly' | 'windowOpen' | 'adminAccountStatus'
+  | 'requests'
+  | 'filterText'
+  | 'tcpOnly'
+  | 'windowOpen'
+  | 'adminAccountStatus'
+  | 'requestsPaused'
 >;
 
 const BottomPanel: React.FC<PanelProps> = ({

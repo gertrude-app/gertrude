@@ -21,8 +21,15 @@ export const Default = props({
   selectedRequestIds: [],
   unlockRequestExplanation: ``,
   filterCommunicationConfirmed: undefined,
+  requestsPaused: false,
   emit: () => {},
   dispatch: () => {},
+});
+
+export const Paused = props({
+  ...Default.args,
+  requestsPaused: true,
+  requests: requests().slice(0, 4),
 });
 
 export const Wide = props({
