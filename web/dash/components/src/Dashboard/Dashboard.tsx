@@ -101,7 +101,7 @@ const Dashboard: React.FC<Props> = ({
           {` `}
           <b>add a child</b>
           {` `}
-          that you'd like to protect.
+          that you’d like to protect.
         </p>
         <div className="mt-12 flex flex-col gap-4">
           <OnboardingRecommendation
