@@ -15,7 +15,7 @@ getting started with Gertrude, [click here](https://youtu.be/nSgDq8uEFTk)._
 
 ---
 
-## Setting up your parent account
+## Set up your parent account
 
 To start out, if you haven't already created a **Gertrude account** you'll need to do that
 first. To create an account [click this link](https://parents.gertrude.app/signup) and
@@ -61,10 +61,10 @@ this code down somewhere; you'll be using it shortly.
 {% image src="get-connection-code.png" caption="Click <b>Get connection code</b>" /%}
 {% image src="got-connection-code.png" caption="Then copy down the code" /%}
 
-## Connecting a computer
+## Connect a Computer
 
-For the next part of the process you'll need to switch over to the computer that will be
-used by the child you're protecting. You might already be using that computer. But if
+For the next part of the process you'll need to switch over to **the computer that will be
+used by the child you're protecting.** You might already be using that computer. But if
 you're a parent working through this tutorial on your own computer and your child uses a
 _different computer_ you'll need that computer in front of you to do the next few steps of
 initial setup.
@@ -80,62 +80,48 @@ your child.
 
 {% /callout %}
 
-### Downloading the Gertrude macOS app
+### Downloading &amp; install the Gertrude macOS app
 
 On the computer that will be protected, login to the macOS user that you desire to
 protect, then open a web browser, visit the Gertrude website
-[download page](https://gertrude.app/download), and click the download link to download a
-copy of the most recent version of the Gertrude macOS app. Double-click on the downloaded
-file and then drag the Gertrude application into the applications folder.
+[download page](https://gertrude.app/download) **(www.gertrude.app/download)**, and click
+the download link to download a copy of the most recent version of the Gertrude macOS app.
+Double-click on the downloaded file and then drag the Gertrude application into the
+applications folder.
 
 {% image src="dmg.png" caption="Drag the Gertrude app into Applications" /%}
 
 Next, **double-click** on the Gertrude application icon in the applications folder to
-launch it for the first time. Once Gertrude is launched, the only visible difference
-you'll see is that _there will be a new icon in your menu bar,_ as shown below:
+launch it for the first time.
 
-{% image src="menu-bar-icon.png" caption="The Gertrude app menu bar icon in the upper right corner" /%}
+{% image src="launch-gertrude-from-applications.png" caption="Open 'Applications' and double-click to launch Gertrude for the first time" /%}
 
-The first time you click this icon, Gertrude will prompt you to enter a **connection
-code.** Enter the connection code that you wrote down earlier. When you submit the code
-you should receive a confirmation that the Gertrude Mac app is successfully connected.
+After you launch the app for the first time, you'll see the Gertrude **welcome wizard,**
+which will guide you through all of the necessary steps to get the app fully installed
+with the correct permissions from the operating system.
 
-{% image src="connect-to-user.png" caption="Click <b>Connect to child</b>" /%}
-{% image src="enter-connection-code.png" caption="And enter the connection code you got from the parents website" /%}
+{% image src="welcome-wizard.png" caption="The welcome window will appear and guide you through the setup process" /%}
 
-### Enabling the internet filter
+After a few clicks, you'll see the spot where you **should enter the connection code** you
+got in step 1:
 
-The next thing you need to do is to **turn on Gertrude's internet filter.** Getting the
-filter fully activated takes a couple of steps, because the _operating system wants to
-make very clear to you that Gertrude has your permission to filter all the internet
-traffic on this computer._ To begin the process of starting the filter, click the Gertrude
-icon again and then click the **"Turn on"** button as shown below:
+{% image src="connect-a-child.png" caption="The welcome window will appear and guide you through the setup process" /%}
 
-{% image src="enable-filter.png" caption="Click 'Turn on' to begin the process of enabling the filter" /%}
+Because Gertrude needs to do things like:
 
-At this point, the macOS operating system _will block Gertrude from installing a system
-extension._ Click the button labeled **"Open Security Preferences"**, or manually open up
-the System Preferences app, and choose _"Security & Privacy" > "General"._
+- Filter the internet
+- Send your child notifications when you unlock a site
+- Record screenshots of their activity
+- Record what they type
 
-{% image src="system-extension-blocked.png" caption="Click 'Open Security Preferences'" /%}
+We have to **request several special permissions** during the welcome and setup process.
+The welcome wizard will guide you through all the required permissions, but a few of them
+Apple has made **bizarrely unintuitive**, so be on guard and carefully follow the
+instructions provided!
 
-From the _"Security & Privacy" > "General"._ screen, click the _unlock_ icon to authorize,
-and then choose to **allow** the system extension from Gertrude.
+{% image src="dont-get-tricked.png" caption="A few of the permissions steps are unintuitive, so follow the directions closely!" /%}
 
-{% image src="security-allowance.png" caption="Allow Gertrude to install a system extension" /%}
-
-As a final step, you should now see a prompt asking you if Gertrude can filter network
-activity.
-
-{% image src="allow-filtering.png" caption="Allow Gertrude to filter network content" /%}
-
-**Congratulations!** Those steps are out of the way, and Gertrude has installed it's
-network filter. You won't have to repeat those steps again. If you click the Gertrude menu
-bar icon now, you should see that **the filter is enabled.**
-
-{% image src="filter-enabled.png" caption="The filter is now enabled" /%}
-
-## Monitoring child activity
+## Monitor child activity
 
 Now that you've got the Mac app installed on your child's computer, if you go back to the
 parents website and click to edit your child, you'll some new options have appeared:
