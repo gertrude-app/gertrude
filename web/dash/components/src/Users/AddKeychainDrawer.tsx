@@ -16,7 +16,6 @@ import { inflect } from '@shared/string';
 import { defaults, type KeychainSummary as Keychain } from '@dash/types';
 import type { KeychainSchedule as Schedule, RequestState } from '@dash/types';
 import KeychainSchedule from '../Keychains/schedule/KeychainSchedule';
-import './AddKeychainDrawer.css';
 
 interface Props {
   request?: RequestState<{ own: Keychain[]; public: Keychain[] }>;
@@ -102,7 +101,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
         keychainsToDisplay.length === 0:
         return (
           <div className="w-full h-full flex justify-center items-center">
-            <div className="flex flex-col items-center p-12 bg-slate-100 rounded-3xl">
+            <div className="flex flex-col items-center p-8 bg-slate-100 rounded-3xl">
               <div className="w-10 sm:w-14 h-10 sm:h-14 bg-slate-200 rounded-full flex justify-center items-center mb-4">
                 <i className="fa-solid fa-key text-xl sm:text-2xl text-slate-400" />
               </div>

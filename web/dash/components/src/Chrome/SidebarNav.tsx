@@ -12,7 +12,6 @@ import {
   LifebuoyIcon,
   UsersIcon,
   ShieldCheckIcon,
-  // ShieldCheckIcon,
 } from '@heroicons/react/24/solid';
 import { Logo } from '@shared/components';
 import { Link } from 'react-router-dom';
@@ -31,7 +30,10 @@ const SidebarNav: React.FC<Props> = ({
   urlPath,
   onInternalLinkClick,
 }) => (
-  <div className="flex flex-col justify-between h-full" data-test="sidebar-nav">
+  <div
+    className="flex flex-col justify-between h-full SidebarNav overflow-scroll"
+    data-test="sidebar-nav"
+  >
     <nav className={cx(`flex flex-col`, collapsed ? `py-4 px-2` : `px-4`)}>
       <a href="/">
         <Logo
@@ -44,7 +46,12 @@ const SidebarNav: React.FC<Props> = ({
           withForParents
         />
       </a>
-      <div className={cx(`pb-4`)}>
+      <div
+        className={cx(
+          `pb-4 flex flex-col LinkList`,
+          collapsed ? `collapsed` : `expanded`,
+        )}
+      >
         <SidebarOption
           Icon={HomeIcon}
           collapsed={collapsed}
@@ -101,7 +108,12 @@ const SidebarNav: React.FC<Props> = ({
         </SidebarOption>
       </div>
       <hr className="bg-indigo-200/10 border-0 h-0.5 mx-4" />
-      <div className={cx(`grow pt-4`)}>
+      <div
+        className={cx(
+          `grow pt-4 flex flex-col LinkList`,
+          collapsed ? `collapsed` : `expanded`,
+        )}
+      >
         <SidebarOption
           Icon={BookOpenIcon}
           collapsed={collapsed}
