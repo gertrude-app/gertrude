@@ -63,7 +63,7 @@ export const SeveralPages: Story = props({
     payload: {
       own: [
         keychainProps({ name: `Lorem`, numKeys: 43, isPublic: false, id: `1` }),
-        keychainProps({ name: `Ipsum`, numKeys: 43, isPublic: false }),
+        keychainProps({ name: `Ipsum`, numKeys: 43, isPublic: true }),
         keychainProps({ name: `Dolor`, numKeys: 43, isPublic: false }),
         keychainProps({ name: `Sit`, numKeys: 43, isPublic: false }),
         keychainProps({ name: `Amet`, numKeys: 43, isPublic: false }),
@@ -80,6 +80,22 @@ export const SeveralPages: Story = props({
 export const Selected: Story = props({
   ...SeveralPages.args,
   selected: keychainProps({ name: `Ipsum`, numKeys: 43, isPublic: false, id: `1` }),
+  schedule: {
+    mode: `active`,
+    days: {
+      sunday: true,
+      monday: true,
+      tuesday: true,
+      wednesday: true,
+      thursday: true,
+      friday: true,
+      saturday: true,
+    },
+    window: {
+      start: { hour: 8, minute: 0 },
+      end: { hour: 16, minute: 0 },
+    },
+  },
 });
 
 export default meta;

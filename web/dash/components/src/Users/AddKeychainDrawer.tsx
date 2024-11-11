@@ -8,6 +8,7 @@ import {
   ClockIcon,
   KeyIcon,
   MagnifyingGlassIcon,
+  TrashIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { Badge, Button, Loading } from '@shared/components';
@@ -15,6 +16,7 @@ import { inflect } from '@shared/string';
 import { defaults, type KeychainSummary as Keychain } from '@dash/types';
 import type { KeychainSchedule as Schedule, RequestState } from '@dash/types';
 import KeychainSchedule from '../Keychains/schedule/KeychainSchedule';
+import './AddKeychainDrawer.css';
 
 interface Props {
   request?: RequestState<{ own: Keychain[]; public: Keychain[] }>;
@@ -145,7 +147,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
     >
       <div
         className={cx(
-          `bg-white pb-12 rounded-3xl lg:rounded-t-[40px] shadow-2xl shadow-black/30 transition-transform duration-300 flex-grow max-w-[1000px]`,
+          `bg-white pb-12 rounded-3xl lg:rounded-t-[40px] shadow-2xl shadow-black/30 transition-transform duration-300 flex-grow max-w-[1000px] Drawer`,
           !shown ? `translate-y-[100%]` : `translate-y-12`,
         )}
         onClick={(e) => e.stopPropagation()}
@@ -172,10 +174,10 @@ const AddKeychainDrawer: React.FC<Props> = ({
           </button>
         </header>
         <main className="bg-slate-50 pt-4 lg:pt-8 pb-2">
-          <div className="flex justify-between px-4 lg:px-0 lg:justify-center items-center flex-col sm:flex-row lg:flex-col gap-4">
+          <div className="flex justify-between px-4 lg:px-0 lg:justify-center items-center flex-col sm:flex-row lg:flex-col SearchAndToggleContainer">
             <div className="relative flex-grow w-full xs:w-auto">
               <MagnifyingGlassIcon
-                className="absolute w-5 top-2 lg:top-2.5 left-3 text-slate-500"
+                className="absolute text-slate-500 Icon"
                 strokeWidth={2.5}
               />
               <input
@@ -185,13 +187,13 @@ const AddKeychainDrawer: React.FC<Props> = ({
                   setPage(1);
                 }}
                 placeholder="Search..."
-                className="w-full xs:w-[400px] sm:w-full md+:w-[400px] text-lg py-1 lg:py-1.5 rounded-full bg-slate-200 hover:bg-slate-300/80 pl-10 outline-transparent outline-offset-0 transition-[outline-color,outline-offset,background-color] duration-200 focus:outline-offset-4 focus:outline-violet-500 placeholder:text-slate-400"
+                className="w-full xs:w-[400px] sm:w-full md+:w-[400px] rounded-full bg-slate-200 hover:bg-slate-300/80 outline-transparent outline-offset-0 transition-[outline-color,outline-offset,background-color] duration-200 focus:outline-offset-4 focus:outline-violet-500 placeholder:text-slate-400"
               />
             </div>
-            <div className="bg-slate-200/70 rounded-xl">
+            <div className="bg-slate-200/70 Toggle">
               <button
                 className={cx(
-                  `px-4 py-1 rounded-xl border-[0.5px] font-medium transition-[background-color,color,box-shadow] duration-200`,
+                  `border-[0.5px] font-medium transition-[background-color,color,box-shadow] duration-200`,
                   whichKeychains === `own`
                     ? `bg-white shadow text-slate-600 hover:text-slate-600 border-slate-200`
                     : `text-slate-500 hover:bg-slate-200 hover:text-slate-600 border-transparent`,
@@ -205,7 +207,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
               </button>
               <button
                 className={cx(
-                  `px-4 py-1 rounded-xl border-[0.5px] font-medium transition-[background-color,color,box-shadow] duration-200`,
+                  `border-[0.5px] font-medium transition-[background-color,color,box-shadow] duration-200`,
                   whichKeychains === `public`
                     ? `bg-white shadow text-slate-600 hover:text-slate-600 border-slate-200`
                     : `text-slate-500 hover:bg-slate-200 hover:text-slate-600 border-transparent`,
@@ -219,7 +221,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
               </button>
             </div>
           </div>
-          <div className="flex sm:hidden w-screen overflow-scroll gap-4 p-4 pt-5 xs:pt-8 items-center">
+          <div className="flex sm:hidden w-screen overflow-x-scroll gap-4 items-center KeychainScroller">
             {keychainsToDisplay.length > 0
               ? keychainsToDisplay.map((k) => (
                   <SelectableKeychain
@@ -300,8 +302,8 @@ const AddKeychainDrawer: React.FC<Props> = ({
               ))}
           </div>
         </main>
-        <footer className="border-t border-slate-200 bg-white p-6 relative">
-          <div className="flex justify-start items-center gap-2 pb-4 sm:h-[52px]">
+        <footer className="border-t border-slate-200 bg-white relative">
+          <div className="flex justify-start items-center gap-2 sm:h-[52px] ScheduleContainer">
             {schedule ? (
               <>
                 <KeychainSchedule schedule={schedule} setSchedule={setSchedule} />
@@ -309,8 +311,8 @@ const AddKeychainDrawer: React.FC<Props> = ({
                   onClick={() => setSchedule(undefined)}
                   className="h-4 w-4 flex justify-center items-center rounded-full hover:scale-150 hover:bg-slate-200 transition-[transform,background-color] duration-200 group active:scale-100 active:bg-slate-300"
                 >
-                  <XMarkIcon
-                    strokeWidth={3}
+                  <TrashIcon
+                    strokeWidth={2.2}
                     className="w-4 h-4 text-slate-400 group-hover:scale-75 transition-transform duration-200"
                   />
                 </button>
@@ -437,7 +439,7 @@ const SelectableKeychain: React.FC<SelectableKeychainProps> = ({
     <div
       key={keychain.id}
       className={cx(
-        `bg-white rounded-xl border-[0.5px] shadow-md shadow-slate-300/50 w-[280px] hover:shadow-lg hover:scale-[102%] transition-[box-shadow,transform] duration-200 cursor-pointer hover:shadow-slate-300/50 active:shadow active:scale-[98%] relative sm:-translate-y-24 min-[1000px]:translate-y-0 shrink-0`,
+        `bg-white rounded-xl border-[0.5px] shadow-md shadow-slate-300/50 w-[280px] hover:shadow-lg hover:scale-[102%] transition-[box-shadow,transform] duration-200 cursor-pointer hover:shadow-slate-300/50 active:shadow active:scale-[98%] relative sm:-translate-y-24 min-[1000px]:translate-y-0 shrink-0 SelectableKeychain`,
         kIsSelected ? `outline outline-4 outline-violet-500` : `outline-transparent`,
       )}
       onClick={() => {
@@ -448,20 +450,20 @@ const SelectableKeychain: React.FC<SelectableKeychainProps> = ({
     >
       <div
         className={cx(
-          `w-8 h-8 rounded-full bg-violet-500 text-white flex justify-center items-center absolute z-10 -right-3 -top-4 transition-[transform,opacity] duration-100`,
+          `w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-violet-500 text-white flex justify-center items-center absolute z-10 right-1.5 sm:-right-3 top-1.5 sm:-top-4 transition-[transform,opacity] duration-100`,
           !kIsSelected && `scale-0`,
         )}
       >
-        <CheckIcon className="w-5" strokeWidth={3} />
+        <CheckIcon className="w-3 sm:w-5" strokeWidth={3} />
       </div>
       <div className="p-3 xs:p-4">
         <div className="relative overflow-hidden">
-          <h3 className="text-lg font-medium whitespace-nowrap">{keychain.name}</h3>
+          <h3 className="font-medium whitespace-nowrap KeychainName">{keychain.name}</h3>
           <div className="absolute h-full w-8 right-0 top-0 bg-gradient-to-r from-transparent to-white" />
         </div>
         {keychain.description ? (
           <div className="overflow-hidden relative">
-            <p className="text-sm text-slate-500 leading-tight whitespace-nowrap">
+            <p className="text-slate-500 leading-tight whitespace-nowrap KeychainDescription">
               {keychain.description}
             </p>
             <div className="absolute h-full w-8 right-0 top-0 bg-gradient-to-r from-transparent to-white" />

@@ -13,10 +13,10 @@ interface Props {
 const KeychainSchedule: React.FC<Props> = ({ schedule, setSchedule }) => (
   <div
     className={cx(
-      `flex justify-center self-center py-1 px-2 items-center rounded-lg transition-colors duration-200 flex-wrap text-sm md:text-base`,
+      `flex justify-center self-center items-center rounded-lg transition-colors duration-200 flex-wrap text-sm md:text-base`,
       isTouchDevice()
         ? `bg-transparent gap-1`
-        : `bg-transparent gap-1 min-[672px]:gap-0 min-[672px]:bg-slate-200/50 min-[672px]:hover:bg-transparent`,
+        : `bg-transparent gap-1 min-[672px]:gap-0 min-[672px]:bg-slate-200/50 min-[672px]:hover:bg-transparent py-1 px-2`,
     )}
   >
     <SpecifyingActiveOrInactive
