@@ -4,7 +4,6 @@ import type { AppState, ViewState, AppEvent, ViewAction } from './menubar-store'
 import type { PropsOf } from '../lib/store';
 import { containerize } from '../lib/store';
 import store from './menubar-store';
-import Connected from './states/Connected';
 import EnteringConnectionCode from './states/EnteringConnectionCode';
 import ConnectFailed from './states/ConnectFailed';
 import Throbbing from './states/Throbbing';
@@ -13,6 +12,7 @@ import ConnectSucceeded from './states/ConnectSucceeded';
 import UpdateNag from './states/UpdateNag';
 import UpdateRequired from './states/UpdateRequired';
 import NotConnectedActions from './states/NotConnectedActions';
+import Connected from './states/connected';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 

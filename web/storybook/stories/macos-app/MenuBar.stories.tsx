@@ -17,12 +17,12 @@ type MenuBarWrapperProps = {
 } & React.ComponentProps<typeof MenuBar>;
 
 const LightTemplate: StoryFn<typeof MenuBar> = () => (
-  <DifferentModesAcrossColrs theme="light" />
+  <DifferentModesAcrossColors theme="light" />
 );
 export const LightMode = LightTemplate.bind({});
 
 const DarkTemplate: StoryFn<typeof MenuBar> = () => (
-  <DifferentModesAcrossColrs theme="dark" />
+  <DifferentModesAcrossColors theme="dark" />
 );
 export const DarkMode = DarkTemplate.bind({});
 
@@ -116,9 +116,9 @@ const BothThemes: React.FC<React.ComponentProps<typeof MenuBar>> = (props) => (
   </div>
 );
 
-const DifferentModesAcrossColrs: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
+const DifferentModesAcrossColors: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
   const propOptions: Record<
-    'first' | 'second' | 'third' | 'fourth' | 'fifth',
+    'first' | 'second' | 'third' | 'fourth' | 'fifth' | 'sixth',
     React.ComponentProps<typeof MenuBarWrapper>
   > = {
     first: {
@@ -155,10 +155,20 @@ const DifferentModesAcrossColrs: React.FC<{ theme: 'light' | 'dark' }> = ({ them
       case: `connected`,
       recordingKeystrokes: true,
       recordingScreen: true,
-      filterState: { case: `downtime`, ending: `5 hours from nmow` },
+      filterState: { case: `downtime`, ending: `5 hours from now` },
       ...commonProps,
     },
     fifth: {
+      colors: ``,
+      theme,
+      case: `connected`,
+      recordingKeystrokes: true,
+      recordingScreen: true,
+      filterState: { case: `downtime`, ending: `5 hours from now` },
+      ...commonProps,
+      showingDowntimePauseDuration: true,
+    },
+    sixth: {
       colors: ``,
       theme,
       case: `connected`,
@@ -191,6 +201,10 @@ const DifferentModesAcrossColrs: React.FC<{ theme: 'light' | 'dark' }> = ({ them
           {...propOptions.fifth}
           colors={theme === `light` ? `bg-[rgb(236,236,236)]` : `bg-[rgb(126,126,126)]`}
         />
+        <MenuBarWrapper
+          {...propOptions.sixth}
+          colors={theme === `light` ? `bg-[rgb(236,236,236)]` : `bg-[rgb(126,126,126)]`}
+        />
       </div>
       <div className="flex flex-col space-y-4">
         <MenuBarWrapper
@@ -233,6 +247,14 @@ const DifferentModesAcrossColrs: React.FC<{ theme: 'light' | 'dark' }> = ({ them
               : `bg-gradient-to-l from-[rgb(34,34,34)] to-[rgb(126,126,126)]`
           }
         />
+        <MenuBarWrapper
+          {...propOptions.sixth}
+          colors={
+            theme === `light`
+              ? `bg-gradient-to-l from-[rgb(149,149,149)] to-[rgb(236,236,236)]`
+              : `bg-gradient-to-l from-[rgb(34,34,34)] to-[rgb(126,126,126)]`
+          }
+        />
       </div>
       <div className="flex flex-col space-y-4">
         <MenuBarWrapper
@@ -253,6 +275,10 @@ const DifferentModesAcrossColrs: React.FC<{ theme: 'light' | 'dark' }> = ({ them
         />
         <MenuBarWrapper
           {...propOptions.fifth}
+          colors={theme === `light` ? `bg-[rgb(149,149,149)]` : `bg-[rgb(34,34,34)]`}
+        />
+        <MenuBarWrapper
+          {...propOptions.sixth}
           colors={theme === `light` ? `bg-[rgb(149,149,149)]` : `bg-[rgb(34,34,34)]`}
         />
       </div>

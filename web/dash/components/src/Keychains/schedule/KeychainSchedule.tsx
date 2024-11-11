@@ -47,9 +47,5 @@ const KeychainSchedule: React.FC<Props> = ({ schedule, setSchedule }) => (
 export default KeychainSchedule;
 
 function isTouchDevice(): boolean {
-  return (
-    `ontouchstart` in window ||
-    navigator.maxTouchPoints > 0 ||
-    navigator.maxTouchPoints > 0
-  );
+  return `ontouchstart` in window || navigator.maxTouchPoints > 0;
 }

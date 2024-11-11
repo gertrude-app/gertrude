@@ -24,11 +24,15 @@ export const ListPublic: Story = props({
 });
 
 const NotDuringSchoolHours: Story = props({
-  ...ListPublic.args,
+  numKeys: 12,
+  isPublic: true,
+  onRemove: () => {},
   editUrl: undefined,
+  mode: `assign_to_child`,
   removeText: `Remove`,
   name: `After-school games`,
   description: `For afternoons and weekends, not to be played during school hours`,
+  setSchedule: () => {},
   schedule: {
     mode: `inactive`,
     days: {
@@ -45,8 +49,8 @@ const NotDuringSchoolHours: Story = props({
       end: { hour: 17, minute: 30 },
     },
   },
-  schedulable: true,
 });
+
 const OnlyDuringSchoolHours: Story = props({
   ...NotDuringSchoolHours.args,
   name: `History class`,
@@ -68,6 +72,7 @@ const OnlyDuringSchoolHours: Story = props({
     },
   },
 });
+
 const NotAtNight: Story = props({
   ...NotDuringSchoolHours.args,
   name: `Only daytime`,
@@ -95,6 +100,7 @@ const NotAtNight: Story = props({
     },
   },
 });
+
 const OnlyOnWeekends: Story = props({
   ...NotDuringSchoolHours.args,
   name: `Weekend fun`,
@@ -122,6 +128,7 @@ const OnlyOnWeekends: Story = props({
     },
   },
 });
+
 const Random: Story = props({
   ...NotDuringSchoolHours.args,
   name: `Seemingly random`,
@@ -143,6 +150,7 @@ const Random: Story = props({
     },
   },
 });
+
 const Always: Story = props({
   ...NotDuringSchoolHours.args,
   name: `Always active`,
@@ -205,6 +213,14 @@ export const ListPrivateNoDescription: Story = props({
   isPublic: false,
 });
 
+export const Schedulable: Story = props({
+  ...ListPrivateNoDescription.args,
+  isPublic: true,
+  mode: `assign_to_child`,
+  setSchedule: () => {},
+  onRemove: () => {},
+});
+
 export const SelectPrivate: Story = props({
   ...ListPrivate.args,
   mode: `select`,
@@ -241,6 +257,7 @@ export const Collection = () => (
       <KeychainCard {...(ListPrivate.args as any)} />
       <KeychainCard {...(ListPrivateNoEdit.args as any)} />
       <KeychainCard {...(ListPrivateNoDescription.args as any)} />
+      <KeychainCard {...(Schedulable.args as any)} />
       <KeychainCard {...(NotDuringSchoolHours.args as any)} />
       <KeychainCard {...(OnlyDuringSchoolHours.args as any)} />
       <KeychainCard {...(NotAtNight.args as any)} />

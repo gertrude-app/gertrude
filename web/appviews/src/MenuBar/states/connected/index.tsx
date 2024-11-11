@@ -1,8 +1,11 @@
 import React from 'react';
 import cx from 'classnames';
-import type { AppEvent, ViewAction } from '../menubar-store';
-import type { FilterState } from '../../lib/shared-types';
-import { MenuBarSized } from '../MenuBar';
+import type { AppEvent, ViewAction } from '../../menubar-store';
+import type { FilterState } from '../../../lib/shared-types';
+import { MenuBarSized } from '../../MenuBar';
+import WhiteButton from './WhiteButton';
+import PauseDowntimeModal from './PauseDowntimeModal';
+import VioletButton from './VioletButton';
 
 interface Props {
   emit(event: AppEvent): unknown;
@@ -24,54 +27,12 @@ const Connected: React.FC<Props> = ({
   showingDowntimePauseDuration,
 }) => (
   <MenuBarSized className={cx(`select-none flex justify-center items-center relative`)}>
-    {/* modal */}
-    <div
-      className={cx(
-        `bg-white/50 dark:bg-white/10 backdrop-blur shadow-lg absolute z-20 px-3 py-2 rounded-xl w-80 transition-[opacity,transform] duration-300`,
-        !showingDowntimePauseDuration &&
-          `pointer-events-none opacity-0 translate-y-32 scale-0 -translate-x-32`,
-      )}
-    >
-      <header className="flex justify-between">
-        <h2 className="font-medium text-lg dark:text-white">Pause downtime for</h2>
-        <button
-          className="cursor-default"
-          onClick={() => dispatch({ type: `toggleShowingDowntimePauseDuration` })}
-        >
-          <i className="fa fa-times text-black/40 dark:text-white/70 text-sm bg-black/10 dark:bg-white/10 w-5 h-5 rounded-full flex justify-center items-center hover:bg-black/20 dark:hover:bg-white/20 hover:scale-110 active:bg-black/30 dark:active:bg-white/30 active:scale-95 transition-[background-color,transform] duration-200" />
-        </button>
-      </header>
-      <div className="flex flex-wrap justify-center gap-2 py-4">
-        <WhiteButton
-          onClick={() => emit({ case: `pauseDowntimeClicked`, duration: `tenMinutes` })}
-        >
-          10 minutes
-        </WhiteButton>
-        <WhiteButton
-          onClick={() => emit({ case: `pauseDowntimeClicked`, duration: `oneHour` })}
-        >
-          1 hour
-        </WhiteButton>
-        <WhiteButton
-          onClick={() => emit({ case: `pauseDowntimeClicked`, duration: `oneDay` })}
-        >
-          Until next downtime
-        </WhiteButton>
-      </div>
-    </div>
-
-    {/* overlay */}
-    <div
-      className={cx(
-        `absolute w-full h-full top-0 left-0 z-10 transition-colors, duration-300`,
-        showingDowntimePauseDuration
-          ? `bg-black/[15%]`
-          : `bg-transparent pointer-events-none`,
-      )}
-      onClick={() => dispatch({ type: `toggleShowingDowntimePauseDuration` })}
+    <PauseDowntimeModal
+      open={showingDowntimePauseDuration}
+      emit={emit}
+      dispatch={dispatch}
     />
 
-    {/* main ui */}
     <div
       className={cx(
         `flex flex-col relative p-3 flex-grow transition-[filter,transform,opacity] duration-300 self-stretch`,
@@ -258,57 +219,3 @@ const Connected: React.FC<Props> = ({
 );
 
 export default Connected;
-
-interface VioletButtonProps {
-  onClick(): void;
-  children: React.ReactNode;
-}
-
-const VioletButton: React.FC<VioletButtonProps> = ({ onClick, children }) => (
-  <button
-    onClick={onClick}
-    className="bg-gradient-to-b from-violet-400 dark:from-violet-500 to-violet-500 dark:to-violet-700 px-2 py-1 rounded-lg text-white font-medium shadow border-t border-white/40 hover:scale-105 hover:shadow-md transition-[transform,box-shadow] duration-100 cursor-default active:scale-95"
-  >
-    {children}
-  </button>
-);
-
-interface WhiteButtonProps {
-  children?: React.ReactNode;
-  icon?: string;
-  onClick(): void;
-  pinging?: boolean;
-}
-
-const WhiteButton: React.FC<WhiteButtonProps> = ({
-  children,
-  icon,
-  onClick,
-  pinging,
-}) => (
-  <button
-    onClick={onClick}
-    className={cx(
-      `group bg-gradient-to-b from-white dark:from-black/50 to-white/70 dark:to-black font-medium rounded-xl group transition-[background-color,transform] active:bg-white/60 duration-100 shadow active:scale-95 cursor-default dark:text-white dark:shadow-black/50 dark:border-t dark:border-white/40 flex justify-center items-center relative`,
-      children && `px-4 py-1`,
-      icon && !children && `w-8 h-8`,
-    )}
-  >
-    {pinging && (
-      <>
-        <div className="absolute w-2 h-2 bg-red-400 top-0 right-0 rounded-full" />
-        <div className="absolute w-3 h-3 bg-red-400 -top-0.5 -right-0.5 rounded-full animate-ping" />
-      </>
-    )}
-    <span
-      className={cx(
-        `transition-transform duration-200 flex space-x-2 items-center`,
-        children && `group-hover:scale-105`,
-        icon && !children && `group-hover:scale-110`,
-      )}
-    >
-      {icon && <i className={icon} />}
-      {children && <span>{children}</span>}
-    </span>
-  </button>
-);

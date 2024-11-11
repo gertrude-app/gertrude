@@ -122,7 +122,7 @@ const KeychainCard: React.FC<Props> = ({
                       setShowSchedule(true);
                     }}
                     className={cx(
-                      `flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300`,
+                      `flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300 select-none`,
                     )}
                   >
                     <ClockIcon
@@ -130,34 +130,27 @@ const KeychainCard: React.FC<Props> = ({
                       strokeWidth={2.5}
                     />
                     <span className="text-sm text-slate-600 font-medium">
-                      Add schedule
+                      Always active
                     </span>
                   </button>
                 )}
                 {props.mode === `assign_to_child` && props.schedule && (
                   <button
-                    onClick={() => setShowSchedule(!showSchedule)}
+                    onClick={() => {
+                      setShowSchedule(!showSchedule);
+                    }}
                     className={cx(
-                      `flex items-center px-2 py-1 rounded-lg transition-[background-color,transform] duration-200 active:scale-90`,
-                      showSchedule
-                        ? `bg-violet-100 hover:bg-violet-200 active:bg-violet-300`
-                        : `hover:bg-slate-200 active:bg-slate-300`,
+                      `flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300 select-none`,
                     )}
                   >
-                    <ClockIcon
-                      className={cx(
-                        `w-4 h-4 shrink-0`,
-                        showSchedule ? `text-violet-500` : `text-slate-500`,
-                      )}
-                      strokeWidth={2.5}
-                    />
                     <ChevronDownIcon
                       className={cx(
-                        `w-3 h-3 shrink-0 transition-transform duration-200`,
-                        showSchedule ? `-rotate-180 text-violet-400` : `text-slate-400`,
+                        `w-3.5 h-3.5 shrink-0 text-slate-500 transition-transform duration-200`,
+                        showSchedule && `-rotate-180`,
                       )}
                       strokeWidth={2.5}
                     />
+                    <span className="text-sm text-slate-600 font-medium">Scheduled</span>
                   </button>
                 )}
                 {props.mode === `keychains_screen` && (
@@ -186,8 +179,8 @@ const KeychainCard: React.FC<Props> = ({
           {props.mode === `assign_to_child` && props.schedule && (
             <div
               className={cx(
-                `flex justify-center items-center gap-2 transition-[height,filter,opacity,margin] duration-300 px-4`,
-                showSchedule ? ` mt-2` : `h-0 opacity-0 blur-lg pointer-events-none mt-0`,
+                `flex justify-center items-center gap-2 px-4`,
+                showSchedule ? ` mt-2` : `h-0 opacity-0 pointer-events-none mt-0`,
               )}
             >
               <ClockIcon className="w-4 text-slate-400 shrink-0" strokeWidth={2.5} />
@@ -205,7 +198,7 @@ const KeychainCard: React.FC<Props> = ({
                 <TrashIcon
                   title="Remove schedule from keychain"
                   strokeWidth={2}
-                  className="w-4 h-4 text-red-500 group-hover:scale-75 transition-transform duration-200"
+                  className="w-4 h-4 text-slate-400 group-hover:scale-75 transition-transform duration-200"
                 />
               </button>
             </div>

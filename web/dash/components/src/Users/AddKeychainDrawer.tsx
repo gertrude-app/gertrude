@@ -49,7 +49,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
   const keychainsToDisplay =
     request?.state === `succeeded`
       ? request.payload[whichKeychains]
-          .filter((k) => !existingKeychains.includes(k))
+          .filter((k) => !existingKeychains.some((ek) => ek.id === k.id))
           .filter(
             (k) =>
               k.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -160,7 +160,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
                 Add a keychain
               </h2>
               <span className="text-sm lg:text-base font-medium text-slate-500">
-                to child <span className="text-violet-600">{userName}</span>
+                to child <span className="text-violet-500">{userName}</span>
               </span>
             </div>
           </div>
@@ -258,7 +258,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
                   <div
                     key={`index-${i}`}
                     className={cx(
-                      `mt-5 px-16 flex flex-wrap gap-4 justify-center items-center content-start absolute w-full h-full transition-[opacity,transform] duration-300 max-[999px]:overflow-scroll`,
+                      `mt-5 px-16 flex flex-wrap gap-4 justify-center items-center content-start absolute w-full h-full transition-[opacity,transform] duration-300 max-[999px]:overflow-y-scroll`,
                       {
                         '-translate-x-[100%] opacity-0': i + 1 < page,
                         'translate-x-0': i + 1 === page,
@@ -283,20 +283,21 @@ const AddKeychainDrawer: React.FC<Props> = ({
               : emptyState}
           </div>
           <div className="flex justify-center gap-4 pb-4 h-11 hidden sm:flex">
-            {Array.from({ length: numPages }).map((_, i) => (
-              <button
-                key={i}
-                className={cx(
-                  `rounded-full w-7 h-7 flex justify-center items-center font-medium hover:scale-110 transition-[background-color,transform] duration-150 active:scale-90`,
-                  i + 1 === page
-                    ? `bg-violet-200 text-violet-700`
-                    : `bg-slate-200/50 text-slate-400 hover:bg-slate-200 active:bg-slate-300`,
-                )}
-                onClick={() => setPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
+            {numPages > 1 &&
+              Array.from({ length: numPages }).map((_, i) => (
+                <button
+                  key={i}
+                  className={cx(
+                    `rounded-full w-7 h-7 flex justify-center items-center font-medium hover:scale-110 transition-[background-color,transform] duration-150 active:scale-90`,
+                    i + 1 === page
+                      ? `bg-violet-200 text-violet-700`
+                      : `bg-slate-200/50 text-slate-400 hover:bg-slate-200 active:bg-slate-300`,
+                  )}
+                  onClick={() => setPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
           </div>
         </main>
         <footer className="border-t border-slate-200 bg-white p-6 relative">
