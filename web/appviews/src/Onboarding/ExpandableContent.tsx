@@ -139,7 +139,10 @@ const ExpandableContent: React.FC<Props> = ({
           <span>Click to enlarge</span>
           <i className="fa-solid fa-chevron-down animate-bounce" />
         </div>
-        <div style={style} className="absolute">
+        <div
+          style={style}
+          className="absolute bg-gradient-to-b from-violet-500 to-fuchsia-600 rounded-3xl"
+        >
           {asset.type !== `video` && (
             <img
               className={classes}
@@ -163,6 +166,10 @@ const ExpandableContent: React.FC<Props> = ({
           {asset.type === `video` && (
             <div
               style={style}
+              className={cx(
+                `bg-black transition-[width,height] duration-[250ms]`,
+                expanded ? `rounded-md` : `rounded-3xl`,
+              )}
               onClick={() => {
                 if (!expanded) {
                   setExpanded(true);
