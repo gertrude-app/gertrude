@@ -1,13 +1,17 @@
 @media (max-width: 767px) {
   @media (max-height: 649px) {
     .LinkList {
-      gap: 0px;
+      gap: 2px;
+    }
+
+    .Logo {
+      margin-top: 1rem;
     }
 
     .SidebarNav .SidebarLink {
       padding-left: 8px;
-      padding-top: 6px;
-      padding-bottom: 6px;
+      padding-top: 8px;
+      padding-bottom: 8px;
     }
 
     .SidebarNav .SidebarLink .Icon {
@@ -18,6 +22,10 @@
   @media (max-height: 719px) and (min-height: 650px) {
     .LinkList {
       gap: 4px;
+    }
+
+    .Logo {
+      margin-top: 1rem;
     }
 
     .SidebarNav .SidebarLink {

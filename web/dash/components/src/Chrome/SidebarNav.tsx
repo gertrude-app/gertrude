@@ -31,14 +31,14 @@ const SidebarNav: React.FC<Props> = ({
   onInternalLinkClick,
 }) => (
   <div
-    className="flex flex-col justify-between h-full SidebarNav overflow-scroll"
+    className="flex flex-col justify-between h-full SidebarNav"
     data-test="sidebar-nav"
   >
     <nav className={cx(`flex flex-col`, collapsed ? `py-4 px-2` : `px-4`)}>
       <a href="/">
         <Logo
           className={cx(
-            `mb-4 sm:mb-6 scale-[0.8] sm:scale-100`,
+            `mb-4 sm:mb-6 scale-[0.8] sm:scale-100 Logo`,
             collapsed ? `mt-3 ml-[0.87em]` : `mt-8 -ml-2 sm:ml-4`,
           )}
           type="inverted"
