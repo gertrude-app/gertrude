@@ -41,6 +41,9 @@ async function main(): Promise<void> {
         * {
            transition: none !important;
            letter-spacing: -0.03em; /* sorta normalize CI fonts vs macOS  */
+        }
+        .Drawer.translate-y-\\[100\\%\\] {
+          display: none !important; /* hide offscren drawer */
         }`;
         document.querySelector(`head`)?.appendChild(style);
       },

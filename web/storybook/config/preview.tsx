@@ -1,4 +1,6 @@
 import './index.css';
+import '../../dash/app/src/css/SidebarNav.css';
+import '../../dash/app/src/css/AddKeychainDrawer.css';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import type { Preview, Decorator } from '@storybook/react';
