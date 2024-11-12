@@ -120,7 +120,7 @@ const UserCard: React.FC<Props> = ({
           testId="edit-user"
           className="flex-grow w-[100%] xs:w-auto"
         >
-          <i className="fa-solid fa-pen mr-2" /> Edit
+          <i className="fa-solid fa-cog mr-2" /> Settings
         </Button>
         <Button
           type="link"

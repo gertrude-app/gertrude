@@ -24,6 +24,7 @@ export type OnboardingStep =
   | 'allowScreenshots_grantAndRestart'
   | 'allowScreenshots_failed'
   | 'allowScreenshots_success'
+  | 'screenshotsPrivacyWarning'
   | 'allowKeylogging_required'
   | 'allowKeylogging_grant'
   | 'allowKeylogging_failed'

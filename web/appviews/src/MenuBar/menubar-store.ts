@@ -20,6 +20,7 @@ export type AppState =
 
 export type AppEvent =
   | { case: 'connectSubmit'; code: number }
+  | { case: 'pauseDowntimeClicked'; duration: 'tenMinutes' | 'oneHour' | 'oneDay' }
   | { case: 'menuBarIconClicked' }
   | { case: 'resumeFilterClicked' }
   | { case: 'suspendFilterClicked' }
@@ -36,16 +37,19 @@ export type AppEvent =
   | { case: 'updateNagUpdateClicked' }
   | { case: 'updateRequiredUpdateClicked' }
   | { case: 'quitForNowClicked' }
-  | { case: 'quitForUninstallClicked' };
+  | { case: 'quitForUninstallClicked' }
+  | { case: 'resumeDowntimeClicked' };
 // end codegen
 
 export type ViewState = {
   connectionCode: string;
   showingNotConnectedActions: boolean;
+  showingDowntimePauseDuration: boolean;
 };
 
 export type ViewAction =
   | { type: 'connectionCodeUpdated'; code: string }
+  | { type: 'toggleShowingDowntimePauseDuration' }
   | { type: 'toggleShowingNotConnectedActions' };
 
 export type Action = ActionOf<AppState, AppEvent, ViewAction>;
@@ -58,6 +62,7 @@ export class MenuBarStore extends Store<AppState, AppEvent, ViewState, ViewActio
       filterInstalled: false,
       connectionCode: ``,
       showingNotConnectedActions: false,
+      showingDowntimePauseDuration: false,
     };
   }
 
@@ -72,8 +77,15 @@ export class MenuBarStore extends Store<AppState, AppEvent, ViewState, ViewActio
           ...state,
           showingNotConnectedActions: !state.showingNotConnectedActions,
         };
+      case `toggleShowingDowntimePauseDuration`:
+        return {
+          ...state,
+          showingDowntimePauseDuration: !state.showingDowntimePauseDuration,
+        };
       case `appEventEmitted`:
         switch (action.event.case) {
+          case `pauseDowntimeClicked`:
+            return { ...state, showingDowntimePauseDuration: false };
           case `connectSubmit`:
             return { ...state, connectionCode: `` };
           default:

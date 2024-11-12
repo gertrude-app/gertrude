@@ -110,6 +110,10 @@ export const Onboarding: React.FC<Props> = ({
           component={<Step.AllowScreenshots step="allowScreenshots_failed" />}
         />
         <OnboardingPage
+          step="screenshotsPrivacyWarning"
+          component={<Step.BypassPrivacyWarning />}
+        />
+        <OnboardingPage
           step="allowKeylogging_required"
           component={<Step.AllowKeylogging step="allowKeylogging_required" />}
         />

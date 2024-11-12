@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { Button, PillBadge } from '@shared/components';
+import { Button, Badge } from '@shared/components';
 import type { GetDashboardWidgets } from '@dash/types';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
@@ -50,15 +50,15 @@ const UserOverview: React.FC<User> = ({ isOnline, name }) => (
   <div className="flex justify-between items-center rounded-xl py-4 px-4 even:bg-slate-50/50">
     <h3 className="font-medium text-slate-900">{name}</h3>
     {isOnline ? (
-      <PillBadge size="large" className="!px-4" type="green">
+      <Badge size="large" className="!px-4" type="green">
         <i className="mr-2 fa-solid fa-circle text-green-400 text-sm scale-50" />
         online
-      </PillBadge>
+      </Badge>
     ) : (
-      <PillBadge size="large" className="!px-4" type="yellow">
+      <Badge size="large" className="!px-4" type="yellow">
         <i className="mr-2 fa-solid fa-circle text-yellow-400 text-sm scale-50" />
         offline
-      </PillBadge>
+      </Badge>
     )}
   </div>
 );

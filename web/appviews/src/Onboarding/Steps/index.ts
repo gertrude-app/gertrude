@@ -12,6 +12,7 @@ export { default as InstallSysExt } from './InstallSysExt';
 export { default as ExemptUsers } from './ExemptUsers';
 export { default as LocateMenuBarIcon } from './LocateMenuBarIcon';
 export { default as ViewHealthCheck } from './ViewHealthCheck';
+export { default as BypassPrivacyWarning } from './BypassPrivacyWarning';
 export { default as HowToUseGertrude } from './HowToUseGertrude';
 export { default as HowToUseGifs } from './HowToUseGifs';
 export { default as Finish } from './Finish';

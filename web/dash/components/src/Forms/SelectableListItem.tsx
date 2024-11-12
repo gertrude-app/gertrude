@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { PillBadge } from '@shared/components';
+import { Badge } from '@shared/components';
 
 type Props = {
   title: string;
@@ -44,14 +44,9 @@ const SelectableListItem: React.FC<Props> = ({
       {badges && (
         <div className="flex mt-2 space-x-2">
           {badges.map((badge) => (
-            <PillBadge
-              key={badge.color}
-              size="small"
-              className="border"
-              type={badge.color}
-            >
+            <Badge key={badge.color} size="small" className="border" type={badge.color}>
               {badge.text}
-            </PillBadge>
+            </Badge>
           ))}
         </div>
       )}

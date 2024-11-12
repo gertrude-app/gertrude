@@ -15,6 +15,7 @@ export function user(id: UUID): User {
   return {
     id,
     name: ``,
+    canUseTimeFeatures: true,
     keyloggingEnabled: false,
     screenshotsEnabled: false,
     screenshotsResolution: 1000,

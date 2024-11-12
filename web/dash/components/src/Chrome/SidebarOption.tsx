@@ -24,19 +24,18 @@ const SidebarOption: React.FC<Props> = ({
     to={to}
     onClick={onClick}
     className={cx(
-      `ScrollTop flex justify-start items-center`,
+      `ScrollTop flex items-center SidebarLink`,
+      collapsed ? `collapsed justify-center` : `expanded justify-start`,
       `cursor-pointer transition-[background-color] duration-75 select-none rounded-xl`,
       `focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50`,
-      collapsed
-        ? `py-[1.2em] my-[0.3em] pl-[1em] flex justify-center items-center`
-        : `py-[10px] sm:py-[12px] md:py-[12px] px-5  my-1.5 md:my-3`,
       isSelected ? `bg-violet-500/20 hover:bg-violet-500/30` : `hover:bg-violet-500/10`,
     )}
   >
     <Icon
       aria-hidden="true"
       className={cx(
-        `mr-2.5 sm:mr-4 text-xl sm:text-2xl leading-none w-7`,
+        !collapsed && `mr-2.5 sm:mr-4`,
+        `Icon`,
         isSelected ? `fill-purple-400` : `text-violet-500`,
       )}
     />

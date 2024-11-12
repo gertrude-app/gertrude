@@ -23,8 +23,7 @@ const Keychains: React.FC = () => {
         id: keychain.summary.id,
         name: keychain.summary.name,
         isPublic: keychain.summary.isPublic,
-        mode: `list`,
-        removeText: `Delete`,
+        mode: `keychains_screen`,
         description: keychain.summary.description || undefined,
         numKeys: keychain.summary.numKeys,
       }))}

@@ -1,5 +1,5 @@
 import { expect, beforeEach, test, describe } from 'vitest';
-import type { Action, State } from '../blockedrequests-store';
+import type { Action, State, Request } from '../blockedrequests-store';
 import { BlockedRequestsStore } from '../blockedrequests-store';
 
 describe(`BlockedRequestsStore.reducer()`, () => {
@@ -43,4 +43,47 @@ describe(`BlockedRequestsStore.reducer()`, () => {
     const nextState = store.reducer(prevState, action);
     expect(nextState.unlockRequestExplanation).toEqual(``);
   });
+
+  test(`no new requests added to state when paused`, () => {
+    const prevState: State = { ...store.initializer() };
+
+    let action: Action = {
+      type: `receivedUpdatedAppState`,
+      appState: {
+        ...store.appState(),
+        requests: [request(`2`, `newsite.com`), request(`1`, `example.com`)],
+      },
+    };
+
+    let nextState = store.reducer(prevState, action);
+    expect(nextState.requests.map((r) => r.id)).toEqual([`2`, `1`]);
+
+    action = { type: `requestsPausedToggled` };
+    nextState = store.reducer(nextState, action);
+    expect(nextState.requestsPaused).toBe(true);
+
+    action = {
+      type: `receivedUpdatedAppState`,
+      appState: {
+        ...store.appState(),
+        requests: [
+          request(`3`, `happyfish.com`), // <-- came in while paused
+          request(`2`, `newsite.com`),
+          request(`1`, `example.com`),
+        ],
+      },
+    };
+    expect(nextState.requests.map((r) => r.id)).toEqual([`2`, `1`]);
+  });
 });
+
+function request(id: string, target: string): Request {
+  return {
+    id,
+    time: new Date().toISOString(),
+    target,
+    protocol: `tcp`,
+    searchableText: ``,
+    app: `com.widget.app`,
+  };
+}

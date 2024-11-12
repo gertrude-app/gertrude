@@ -156,6 +156,11 @@ export const AllowScreenshotsSuccess: Story = props({
   step: `allowScreenshots_success`,
 });
 
+export const BypassPrivacyWarning: Story = props({
+  ...Welcome.args,
+  step: `screenshotsPrivacyWarning`,
+});
+
 export const AllowScreenshotsFailed: Story = props({
   ...Welcome.args,
   step: `allowScreenshots_failed`,

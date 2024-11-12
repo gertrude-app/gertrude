@@ -72,6 +72,7 @@ export function user(override: Partial<User> = {}): User {
   return {
     id: uuid(),
     name: `Huck`,
+    canUseTimeFeatures: true,
     screenshotsEnabled: true,
     screenshotsResolution: 1000,
     screenshotsFrequency: 60,

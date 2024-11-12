@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import { TextInput, Button, PillBadge } from '@shared/components';
+import { TextInput, Button, Badge } from '@shared/components';
 import type {
   AdminSubscriptionStatus,
   AdminNotificationTrigger,
@@ -241,18 +241,14 @@ export default Settings;
 const AccountStatusBadge: React.FC<{ status: AdminSubscriptionStatus }> = ({
   status,
 }) => (
-  <PillBadge
-    type={statusType(status)}
-    size="large"
-    className="absolute right-2 top-2 border"
-  >
+  <Badge type={statusType(status)} size="large" className="absolute right-2 top-2 border">
     {statusText(status)}
-  </PillBadge>
+  </Badge>
 );
 
 function statusType(
   status: AdminSubscriptionStatus,
-): React.ComponentProps<typeof PillBadge>['type'] {
+): React.ComponentProps<typeof Badge>['type'] {
   switch (status.case) {
     case `complimentary`:
     case `paid`:

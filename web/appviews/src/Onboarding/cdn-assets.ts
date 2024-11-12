@@ -138,6 +138,7 @@ const COMMON_IMG_IDS = [
   `locate-menubar-icon`,
   `wrong-install-dir`,
   `how-to-use-gifs`,
+  `bypass-picker-warning`,
 ] as const;
 
 const OS_IMAGE_IDS = [
@@ -152,6 +153,7 @@ const COMMON_IMG_DATA: Record<CommonImgId, string | [number, ...number[]]> = {
   notifications: `png`,
   administrate: `png`,
   'locate-menubar-icon': `gif`,
+  'bypass-picker-warning': `png`,
   'wrong-install-dir': [10.8],
   'how-to-use-gifs': [4.88, 5.45],
 };

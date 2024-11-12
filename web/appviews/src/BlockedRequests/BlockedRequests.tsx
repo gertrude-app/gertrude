@@ -24,6 +24,7 @@ export const BlockedRequests: React.FC<Props> = ({
   selectedRequestIds,
   adminAccountStatus,
   filterCommunicationConfirmed,
+  requestsPaused,
 }) => {
   const filteredRequests = filterVisibleRequests(requests, filterText, tcpOnly);
   if (adminAccountStatus === `inactive`) {
@@ -59,7 +60,7 @@ export const BlockedRequests: React.FC<Props> = ({
       <header className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center">
           <input
-            className="bg-slate-50 dark:bg-slate-800/50 dark:focus:bg-slate-800 rounded-xl px-4 py-2 w-80 transition-[background-color,box-shadow] duration-100 focus:bg-slate-50 focus:shadow-md outline-none border-[0.5px] dark:border-slate-700 placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
+            className="bg-slate-100 dark:bg-slate-800/50 dark:focus:bg-slate-800 rounded-xl px-4 py-2 w-80 transition-[background-color,box-shadow] duration-100 focus:bg-slate-50 focus:shadow-md outline-none border-[0.5px] dark:border-slate-700 placeholder:text-slate-500 dark:text-white dark:placeholder:text-slate-500"
             placeholder="Filter..."
             value={filterText}
             onChange={(e) => emit({ case: `filterTextUpdated`, text: e.target.value })}
@@ -88,16 +89,36 @@ export const BlockedRequests: React.FC<Props> = ({
             </span>
           </div>
         </div>
-        <Button
-          color="tertiary"
-          size="small"
-          type="button"
-          onClick={() => emit({ case: `clearRequestsClicked` })}
-        >
-          <i className="fa-solid fa-ban mr-2 text-red-400" />
-          Clear requests
-        </Button>
+        <div className="flex space-x-2">
+          <Button
+            color={requestsPaused ? `secondary` : `tertiary`}
+            size="small"
+            type="button"
+            className="relative"
+            onClick={() => dispatch({ type: `requestsPausedToggled` })}
+          >
+            <i className={cx(`fa-solid`, requestsPaused ? `fa-play mr-2` : `fa-pause`)} />
+            {requestsPaused ? `Resume` : ``}
+          </Button>
+          <Button
+            color="tertiary"
+            size="small"
+            type="button"
+            onClick={() => emit({ case: `clearRequestsClicked` })}
+          >
+            <i className="fa-solid fa-rotate-right mr-2" />
+            Clear
+          </Button>
+        </div>
       </header>
+      {requestsPaused && (
+        <div className="bg-violet-100 dark:bg-violet-500/10 p-2 border-b border-slate-200 dark:border-slate-800 m-2 rounded-xl">
+          <div className="flex items-center justify-center text-violet-500 dark:text-violet-300">
+            <i className="fa fa-info-circle text-lg mr-2" />
+            <span>Requests are paused</span>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col p-4 flex-grow overflow-y-auto">
         {requests.length === 0 && (
           <div className="h-full flex justify-center items-center">
@@ -146,7 +167,12 @@ export const BlockedRequests: React.FC<Props> = ({
 
 type PanelProps = Omit<
   Props,
-  'requests' | 'filterText' | 'tcpOnly' | 'windowOpen' | 'adminAccountStatus'
+  | 'requests'
+  | 'filterText'
+  | 'tcpOnly'
+  | 'windowOpen'
+  | 'adminAccountStatus'
+  | 'requestsPaused'
 >;
 
 const BottomPanel: React.FC<PanelProps> = ({

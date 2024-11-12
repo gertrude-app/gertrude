@@ -3,7 +3,7 @@ import { Navigate, useParams } from 'react-router-dom';
 import { Loading, ApiErrorMessage } from '@dash/components';
 import React, { useEffect, useMemo, useReducer } from 'react';
 import { EditUser } from '@dash/components';
-import type { User } from '@dash/types';
+import { defaults, type User } from '@dash/types';
 import * as empty from '../../lib/empty';
 import { isDirty } from '../../lib/helpers';
 import Current from '../../environment';
@@ -36,17 +36,18 @@ const UserRoute: React.FC = () => {
   );
 
   const saveUser = useMutation(
-    (editableUser: Editable<User>) =>
+    (user: Editable<User>) =>
       Current.api.saveUser({
-        id: editableUser.draft.id,
-        name: editableUser.draft.name,
-        keyloggingEnabled: editableUser.draft.keyloggingEnabled,
-        screenshotsEnabled: editableUser.draft.screenshotsEnabled,
-        screenshotsFrequency: editableUser.draft.screenshotsFrequency,
-        screenshotsResolution: editableUser.draft.screenshotsResolution,
-        showSuspensionActivity: editableUser.draft.showSuspensionActivity,
-        isNew: editableUser.isNew ?? false,
-        keychainIds: editableUser.draft.keychains.map(({ id }) => id),
+        id: user.draft.id,
+        isNew: user.isNew ?? false,
+        name: user.draft.name,
+        keyloggingEnabled: user.draft.keyloggingEnabled,
+        screenshotsEnabled: user.draft.screenshotsEnabled,
+        screenshotsFrequency: user.draft.screenshotsFrequency,
+        screenshotsResolution: user.draft.screenshotsResolution,
+        showSuspensionActivity: user.draft.showSuspensionActivity,
+        downtime: user.draft.downtime,
+        keychains: user.draft.keychains.map(({ id, schedule }) => ({ id, schedule })),
       }),
     {
       onSuccess: () => dispatch({ type: `userSaved` }),
@@ -84,6 +85,7 @@ const UserRoute: React.FC = () => {
       isNew={state.user.isNew || false}
       name={draft.name}
       id={draft.id}
+      canUseTimeFeatures={draft.canUseTimeFeatures}
       setName={(name) => dispatch({ type: `setName`, name })}
       keyloggingEnabled={draft.keyloggingEnabled}
       setKeyloggingEnabled={(enabled) =>
@@ -112,6 +114,10 @@ const UserRoute: React.FC = () => {
       startAddDevice={() => addDevice.mutate(id)}
       dismissAddDevice={() => addDevice.reset()}
       addDeviceRequest={ReqState.fromMutation(addDevice)}
+      downtime={draft.downtime ?? defaults.timeWindow()}
+      downtimeEnabled={!!draft.downtime}
+      setDowntimeEnabled={(enabled) => dispatch({ type: `setDowntimeEnabled`, enabled })}
+      setDowntime={(downtime) => dispatch({ type: `setDowntime`, downtime })}
       deleteDevice={deleteDevice}
       saveButtonDisabled={
         !isDirty(state.user) || draft.name.trim() === `` || saveUser.isPending
@@ -131,9 +137,16 @@ const UserRoute: React.FC = () => {
       onDismissAddKeychain={() =>
         dispatch({ type: `setAddingKeychain`, keychain: undefined })
       }
-      selectingKeychain={addingKeychain}
+      addingKeychain={addingKeychain}
       fetchSelectableKeychainsRequest={
         addingKeychain === undefined ? undefined : ReqState.fromQuery(getKeychains)
+      }
+      keychainSchedule={addingKeychain?.schedule}
+      setAddingKeychainSchedule={(schedule) =>
+        dispatch({ type: `setAddingKeychainSchedule`, schedule })
+      }
+      setAssignedKeychainSchedule={(id, schedule) =>
+        dispatch({ type: `setKeychainSchedule`, id, schedule })
       }
     />
   );

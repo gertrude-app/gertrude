@@ -68,7 +68,7 @@ describe(`create keychain`, () => {
       cy.visit(`/children`);
       cy.testId(`edit-user`).click();
       cy.contains(`Add keychain`).click();
-      cy.contains(`No personal keychains`);
+      cy.contains(`Looks like you don't have any keychains`);
     });
   });
 });

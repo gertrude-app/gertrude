@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { formatDate } from '@dash/datetime';
-import { env, PillBadge } from '@shared/components';
+import { env, Badge } from '@shared/components';
 
 type Props = {
   date: Date;
@@ -65,9 +65,9 @@ const DaySummaryCard: React.FC<Props> = ({
             <span className="sm:hidden">{formatDate(date, `short`)}</span>
             <span className="hidden sm:inline">{formatDate(date, `medium`)}</span>
             {numCompleted === numItems && (
-              <PillBadge type="green" size="small" className="absolute right-0 top-0">
+              <Badge type="green" size="small" className="absolute right-0 top-0">
                 <i className="fa fa-check mr-1" /> Completed
-              </PillBadge>
+              </Badge>
             )}
           </h2>
         </div>

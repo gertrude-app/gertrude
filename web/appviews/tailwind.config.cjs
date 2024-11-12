@@ -8,7 +8,7 @@ module.exports = {
     `../shared/components/src/Toggle.tsx`,
     `../shared/components/src/Loading.tsx`,
     `../shared/components/src/SelectMenu.tsx`,
-    `../shared/components/src/PillBadge.tsx`,
+    `../shared/components/src/Badge.tsx`,
   ],
   darkMode: `class`,
 };
