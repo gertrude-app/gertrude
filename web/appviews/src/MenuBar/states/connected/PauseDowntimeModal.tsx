@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import type React from 'react';
 import type { AppEvent, ViewAction } from '../../menubar-store';
-import WhiteButton from './WhiteButton';
+import * as Btn from './Buttons';
 
 interface Props {
   open: boolean;
@@ -27,21 +27,21 @@ const PauseDowntimeModal: React.FC<Props> = ({ open, emit, dispatch }) => (
         </button>
       </header>
       <div className="flex flex-wrap justify-center gap-2 py-4">
-        <WhiteButton
+        <Btn.White
           onClick={() => emit({ case: `pauseDowntimeClicked`, duration: `tenMinutes` })}
         >
           10 minutes
-        </WhiteButton>
-        <WhiteButton
+        </Btn.White>
+        <Btn.White
           onClick={() => emit({ case: `pauseDowntimeClicked`, duration: `oneHour` })}
         >
           1 hour
-        </WhiteButton>
-        <WhiteButton
+        </Btn.White>
+        <Btn.White
           onClick={() => emit({ case: `pauseDowntimeClicked`, duration: `oneDay` })}
         >
           Until next downtime
-        </WhiteButton>
+        </Btn.White>
       </div>
     </div>
     <div

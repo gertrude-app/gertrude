@@ -3,9 +3,8 @@ import cx from 'classnames';
 import type { AppEvent, ViewAction } from '../../menubar-store';
 import type { FilterState } from '../../../lib/shared-types';
 import { MenuBarSized } from '../../MenuBar';
-import WhiteButton from './WhiteButton';
+import * as Btn from './Buttons';
 import PauseDowntimeModal from './PauseDowntimeModal';
-import VioletButton from './VioletButton';
 
 interface Props {
   emit(event: AppEvent): unknown;
@@ -88,19 +87,19 @@ const Connected: React.FC<Props> = ({
                   : `Filter ${filterState.case}`}
               </span>
               {filterState.case === `off` && (
-                <VioletButton onClick={() => emit({ case: `turnOnFilterClicked` })}>
+                <Btn.Violet onClick={() => emit({ case: `turnOnFilterClicked` })}>
                   Turn on
-                </VioletButton>
+                </Btn.Violet>
               )}
               {filterState.case === `suspended` && (
-                <VioletButton onClick={() => emit({ case: `resumeFilterClicked` })}>
+                <Btn.Violet onClick={() => emit({ case: `resumeFilterClicked` })}>
                   Resume
-                </VioletButton>
+                </Btn.Violet>
               )}
               {filterState.case === `downtimePaused` && (
-                <VioletButton onClick={() => emit({ case: `resumeDowntimeClicked` })}>
+                <Btn.Violet onClick={() => emit({ case: `resumeDowntimeClicked` })}>
                   Resume
-                </VioletButton>
+                </Btn.Violet>
               )}
             </div>
             {(filterState.case === `suspended` ||
@@ -111,30 +110,20 @@ const Connected: React.FC<Props> = ({
             )}
           </div>
           <div className="flex mt-3 space-x-3 relative">
-            <button
+            <Btn.Labeled
               onClick={() => emit({ case: `viewNetworkTrafficClicked` })}
-              disabled={filterState.case === `off`}
-              className={cx(
-                `flex-grow py-3 space-x-3.5 flex justify-center items-center flex-row bg-gradient-to-b from-white dark:from-black/50 to-white/20 dark:to-black dark:border-t dark:border-white/40 rounded-xl shadow dark:shadow-black/50 text-black/80 cursor-default hover:scale-[102%] active:scale-[98%] active:shadow hover:shadow-md transition-[transform,box-shadow] duration-100`,
-              )}
+              disabled={filterState.case === `off` || filterState.case === `suspended`}
+              iconClass="fa-tower-broadcast"
             >
-              <i className="fa fa-tower-broadcast text-lg shrink-0 text-black/70 dark:text-white/80" />
-              <p className="font-medium text-left dark:text-white leading-tight">
-                Blocked requests
-              </p>
-            </button>
-            <button
+              Blocked requests
+            </Btn.Labeled>
+            <Btn.Labeled
               onClick={() => emit({ case: `suspendFilterClicked` })}
-              disabled={filterState.case === `off`}
-              className={cx(
-                `flex-grow py-3 space-x-3.5 flex justify-center items-center flex-row bg-gradient-to-b from-white dark:from-black/50 to-white/20 dark:to-black dark:border-t dark:border-white/40 rounded-xl shadow dark:shadow-black/50 text-black/80 cursor-default hover:scale-[102%] active:scale-[98%] active:shadow hover:shadow-md transition-[transform,box-shadow] duration-100`,
-              )}
+              disabled={filterState.case === `off` || filterState.case === `suspended`}
+              iconClass="fa-clock-rotate-left"
             >
-              <i className="fa fa-clock-rotate-left text-lg shrink-0 text-black/70 dark:text-white/80" />
-              <p className="text-sm font-medium text-left leading-5 dark:text-white">
-                Suspend filter
-              </p>
-            </button>
+              Suspend filter
+            </Btn.Labeled>
           </div>
           <div className="mt-3 flex flex-col space-y-3 bg-white/20 dark:bg-black/20 p-3 rounded-xl">
             <div className="flex items-center space-x-3">
@@ -195,19 +184,19 @@ const Connected: React.FC<Props> = ({
         )}
       >
         {filterState.case === `downtime` && (
-          <WhiteButton
+          <Btn.White
             onClick={() => dispatch({ type: `toggleShowingDowntimePauseDuration` })}
             icon="fas fa-pause"
           >
             Pause
-          </WhiteButton>
+          </Btn.White>
         )}
         <div className="flex items-center space-x-2">
-          <WhiteButton
+          <Btn.White
             onClick={() => emit({ case: `refreshRulesClicked` })}
             icon="fa fa-arrows-rotate"
           />
-          <WhiteButton
+          <Btn.White
             onClick={() => emit({ case: `administrateClicked` })}
             icon="fa fa-cog"
             pinging={adminAttentionRequired}
