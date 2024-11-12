@@ -18,6 +18,7 @@ interface Props {
   id: string;
   isNew: boolean;
   name: string;
+  canUseTimeFeatures: boolean;
   setName(name: string): unknown;
   keyloggingEnabled: boolean;
   setKeyloggingEnabled(enabled: boolean): unknown;
@@ -92,6 +93,7 @@ const EditUser: React.FC<Props> = ({
   keychainSchedule,
   setAddingKeychainSchedule,
   setAssignedKeychainSchedule,
+  canUseTimeFeatures,
 }) => {
   if (isNew) {
     return (
@@ -139,6 +141,7 @@ const EditUser: React.FC<Props> = ({
       />
       <AddKeychainDrawer
         request={fetchSelectableKeychainsRequest}
+        supportsSchedule={canUseTimeFeatures}
         onSelect={onSelectKeychainToAdd}
         onDismiss={onDismissAddKeychain}
         onConfirm={onConfirmAddKeychain}
@@ -277,41 +280,43 @@ const EditUser: React.FC<Props> = ({
             </div>
 
             {/* downtime */}
-            <div className="mt-12 max-w-3xl">
-              <h2 className="text-lg font-bold text-slate-700">Downtime</h2>
-              <div
-                className={`bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl overflow-hidden relative`}
-              >
-                <div className="flex justify-between items-center">
-                  <div className="mr-3">
-                    <h3 className="font-medium text-slate-700 leading-tight">
-                      Enable downtime
-                    </h3>
-                    <p className="text-slate-500 text-sm mt-1">
-                      Completely restrict all internet access during specified hours
-                    </p>
-                  </div>
-                  <Toggle enabled={downtimeEnabled} setEnabled={setDowntimeEnabled} />
-                </div>
+            {canUseTimeFeatures && (
+              <div className="mt-12 max-w-3xl">
+                <h2 className="text-lg font-bold text-slate-700">Downtime</h2>
                 <div
-                  className={cx(
-                    `flex justify-center items-center mt-4 bg-white rounded-xl p-4 gap-4 flex-col sm:flex-row md:flex-col md+:flex-row border-[0.5px] border-slate-200 shadow shadow-slate-300/50`,
-                    downtimeEnabled || `hidden`,
-                  )}
+                  className={`bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl overflow-hidden relative`}
                 >
-                  <span className="text-slate-500 font-medium">From</span>
-                  <TimeInput
-                    time={downtime.start}
-                    setTime={(start) => setDowntime({ ...downtime, start })}
-                  />
-                  <span className="text-slate-500 font-medium">to</span>
-                  <TimeInput
-                    time={downtime.end}
-                    setTime={(end) => setDowntime({ ...downtime, end })}
-                  />
+                  <div className="flex justify-between items-center">
+                    <div className="mr-3">
+                      <h3 className="font-medium text-slate-700 leading-tight">
+                        Enable downtime
+                      </h3>
+                      <p className="text-slate-500 text-sm mt-1">
+                        Completely restrict all internet access during specified hours
+                      </p>
+                    </div>
+                    <Toggle enabled={downtimeEnabled} setEnabled={setDowntimeEnabled} />
+                  </div>
+                  <div
+                    className={cx(
+                      `flex justify-center items-center mt-4 bg-white rounded-xl p-4 gap-4 flex-col sm:flex-row md:flex-col md+:flex-row border-[0.5px] border-slate-200 shadow shadow-slate-300/50`,
+                      downtimeEnabled || `hidden`,
+                    )}
+                  >
+                    <span className="text-slate-500 font-medium">From</span>
+                    <TimeInput
+                      time={downtime.start}
+                      setTime={(start) => setDowntime({ ...downtime, start })}
+                    />
+                    <span className="text-slate-500 font-medium">to</span>
+                    <TimeInput
+                      time={downtime.end}
+                      setTime={(end) => setDowntime({ ...downtime, end })}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* keychains */}
             <div className="mt-12 max-w-3xl">
@@ -321,6 +326,7 @@ const EditUser: React.FC<Props> = ({
                   <KeychainCard
                     mode="assign_to_child"
                     schedule={keychain.schedule}
+                    supportsSchedule={canUseTimeFeatures}
                     key={keychain.id}
                     name={keychain.name}
                     description={keychain.description}

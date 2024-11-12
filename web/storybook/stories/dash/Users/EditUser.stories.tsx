@@ -19,6 +19,7 @@ export const Default: Story = props({
   name: `Little Jimmy`,
   keyloggingEnabled: true,
   screenshotsEnabled: true,
+  canUseTimeFeatures: true,
   setName: () => {},
   setKeyloggingEnabled: () => {},
   removeKeychain: () => {},

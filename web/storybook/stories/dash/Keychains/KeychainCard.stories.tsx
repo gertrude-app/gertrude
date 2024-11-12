@@ -26,6 +26,7 @@ export const ListPublic: Story = props({
 const NotDuringSchoolHours: Story = props({
   numKeys: 12,
   isPublic: true,
+  supportsSchedule: true,
   onRemove: () => {},
   editUrl: undefined,
   mode: `assign_to_child`,
@@ -217,6 +218,7 @@ export const Schedulable: Story = props({
   ...ListPrivateNoDescription.args,
   isPublic: true,
   mode: `assign_to_child`,
+  supportsSchedule: true,
   setSchedule: () => {},
   onRemove: () => {},
 });

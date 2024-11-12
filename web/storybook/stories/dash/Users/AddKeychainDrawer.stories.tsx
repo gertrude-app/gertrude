@@ -14,9 +14,8 @@ type Story = StoryObj<typeof meta>;
 
 // @screenshot: xs,md
 export const Loading: Story = props({
-  request: {
-    state: `ongoing`,
-  },
+  request: { state: `ongoing` },
+  supportsSchedule: true,
   selected: undefined,
   onSelect: () => {},
   schedule: undefined,

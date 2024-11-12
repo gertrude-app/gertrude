@@ -170,6 +170,7 @@ export interface User {
   keychains: UserKeychainSummary[];
   downtime?: PlainTimeWindow;
   devices: UserDevice[];
+  canUseTimeFeatures: boolean;
   createdAt: ISODateString;
 }
 

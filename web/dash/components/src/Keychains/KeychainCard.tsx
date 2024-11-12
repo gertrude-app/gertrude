@@ -17,6 +17,7 @@ type Props =
   | ({
       mode: 'assign_to_child';
       onRemove(): unknown;
+      supportsSchedule: boolean;
       schedule?: Schedule;
       setSchedule(schedule?: Schedule): unknown;
     } & Common)
@@ -115,25 +116,27 @@ const KeychainCard: React.FC<Props> = ({
             </Badge>
             {props.mode !== `select` && (
               <div className="flex items-center pr-2 gap-2">
-                {props.mode === `assign_to_child` && !props.schedule && (
-                  <button
-                    onClick={() => {
-                      props.setSchedule(defaults.keychainSchedule());
-                      setShowSchedule(true);
-                    }}
-                    className={cx(
-                      `flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300 select-none`,
-                    )}
-                  >
-                    <ClockIcon
-                      className={cx(`w-3.5 h-3.5 shrink-0 text-slate-500`)}
-                      strokeWidth={2.5}
-                    />
-                    <span className="text-sm text-slate-600 font-medium">
-                      Always active
-                    </span>
-                  </button>
-                )}
+                {props.mode === `assign_to_child` &&
+                  props.supportsSchedule &&
+                  !props.schedule && (
+                    <button
+                      onClick={() => {
+                        props.setSchedule(defaults.keychainSchedule());
+                        setShowSchedule(true);
+                      }}
+                      className={cx(
+                        `flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300 select-none`,
+                      )}
+                    >
+                      <ClockIcon
+                        className={cx(`w-3.5 h-3.5 shrink-0 text-slate-500`)}
+                        strokeWidth={2.5}
+                      />
+                      <span className="text-sm text-slate-600 font-medium">
+                        Always active
+                      </span>
+                    </button>
+                  )}
                 {props.mode === `assign_to_child` && props.schedule && (
                   <button
                     onClick={() => {
