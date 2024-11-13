@@ -24,8 +24,9 @@ const ViewHealthCheck: React.FC = () => (
     <ExpandableContent
       asset={assets.img(`administrate`)}
       lessRounded
-      width={800 * 0.45}
-      height={600 * 0.45}
+      width={758 * 0.48}
+      height={556 * 0.48}
+      maxWidth={700}
     />
   </Onboarding.Centered>
 );

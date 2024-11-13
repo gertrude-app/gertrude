@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import cx from 'classnames';
 import { TextInput, Logo, Button, Loading } from '@shared/components';
+import Turnstile from 'react-turnstile';
 import type { NextPage } from 'next';
 import ContactStatusMessage from './ContactStatusMessage';
+import * as env from '@/lib/env';
 
 const ContactForm: NextPage = () => {
   const [state, setState] = useState<'idle' | 'ongoing' | 'failed' | 'succeeded'>(`idle`);
@@ -12,11 +14,8 @@ const ContactForm: NextPage = () => {
   const [emailAddress, setEmailAddress] = useState(``);
   const [subject, setSubject] = useState(``);
   const [message, setMessage] = useState(``);
-
-  const endpoint = process.env.NEXT_PUBLIC_FORMS_ENDPOINT;
-  if (!endpoint) {
-    throw new Error(`Missing NEXT_PUBLIC_FORMS_ENDPOINT`);
-  }
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const { formsEndpoint, turnstileSitekey } = env.getPublicVars();
 
   return (
     <section className="bg-gradient-to-b from-violet-500 to-fuchsia-500 flex-grow flex flex-col justify-center items-center px-6 pt-8 sm:pt-16 pb-16">
@@ -52,16 +51,21 @@ const ContactForm: NextPage = () => {
           name="contact"
           onSubmit={(event) => {
             event.preventDefault();
+            if (!turnstileToken) {
+              setState(`failed`);
+              return;
+            }
             const params = new URLSearchParams();
             params.append(`form`, `contact`);
             params.append(`name`, name);
             params.append(`email`, emailAddress);
             params.append(`subject`, subject);
             params.append(`message`, message);
+            params.append(`turnstileToken`, turnstileToken);
             setState(`ongoing`);
             try {
               window
-                .fetch(endpoint, {
+                .fetch(formsEndpoint, {
                   method: `POST`,
                   headers: { 'Content-Type': `application/x-www-form-urlencoded` },
                   body: params.toString(),
@@ -108,6 +112,11 @@ const ContactForm: NextPage = () => {
             rows={4}
             value={message}
             setValue={setMessage}
+          />
+          <Turnstile
+            sitekey={turnstileSitekey}
+            refreshExpired="auto"
+            onVerify={setTurnstileToken}
           />
           <Button
             className="self-end relative z-10"

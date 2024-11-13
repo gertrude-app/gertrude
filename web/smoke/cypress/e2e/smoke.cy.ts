@@ -83,7 +83,7 @@ describe(`Smoke test`, () => {
     cy.contains(`MacBook Pro`);
 
     // edit the user
-    cy.contains(`Edit`).click();
+    cy.get(`[data-test="edit-user"]`).click();
     cy.get(`[data-test=user-name]`).clear().type(`Franny (edited)`);
     cy.contains(`Save child`).click();
     cy.contains(`Child saved`);
