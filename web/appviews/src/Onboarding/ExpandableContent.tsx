@@ -8,6 +8,7 @@ interface Props {
   asset: CdnAsset;
   width: number;
   height: number;
+  maxWidth?: number;
   lessRounded?: boolean;
   showInstructions?: boolean;
   className?: string;
@@ -20,6 +21,7 @@ const ExpandableContent: React.FC<Props> = ({
   showInstructions = true,
   lessRounded = false,
   className,
+  maxWidth = 800,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [frameCoords, setFrameCoords] = useState({ x: 0, y: 0 });
@@ -32,7 +34,6 @@ const ExpandableContent: React.FC<Props> = ({
   const withinActiveStep = useContext(WithinActiveStepContext);
 
   const aspectRatio = width / height;
-  const maxWidth = 800;
 
   useEffect(() => {
     if (contentRef.current) {
