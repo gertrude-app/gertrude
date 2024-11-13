@@ -3,7 +3,9 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
 import { CheckIcon, Loader2Icon, SendIcon, XIcon } from 'lucide-react';
+import Turnstile from 'react-turnstile';
 import FancyLink from './FancyLink';
+import * as env from '@/lib/env';
 
 const ContactForm: React.FC = () => {
   const [state, setState] = useState<'idle' | 'ongoing' | 'failed' | 'succeeded'>(`idle`);
@@ -11,11 +13,8 @@ const ContactForm: React.FC = () => {
   const [emailAddress, setEmailAddress] = useState(``);
   const [subject, setSubject] = useState(``);
   const [message, setMessage] = useState(``);
-
-  const endpoint = process.env.NEXT_PUBLIC_FORMS_ENDPOINT;
-  if (!endpoint) {
-    throw new Error(`Missing NEXT_PUBLIC_FORMS_ENDPOINT`);
-  }
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const { formsEndpoint, turnstileSitekey } = env.getPublicVars();
 
   return (
     <form
@@ -25,15 +24,20 @@ const ContactForm: React.FC = () => {
       method="POST"
       onSubmit={(event) => {
         event.preventDefault();
+        if (!turnstileToken) {
+          setState(`failed`);
+          return;
+        }
         const params = new URLSearchParams();
         params.append(`form`, `contact`);
         params.append(`name`, name);
         params.append(`email`, emailAddress);
         params.append(`subject`, subject);
         params.append(`message`, message);
+        params.append(`turnstileToken`, turnstileToken);
         setState(`ongoing`);
         try {
-          fetch(endpoint, {
+          fetch(formsEndpoint, {
             method: `POST`,
             headers: { 'Content-Type': `application/x-www-form-urlencoded` },
             body: params.toString(),
@@ -82,7 +86,11 @@ const ContactForm: React.FC = () => {
           required
         />
       </div>
-      <div></div>
+      <Turnstile
+        sitekey={turnstileSitekey}
+        refreshExpired="auto"
+        onVerify={setTurnstileToken}
+      />
       {state === `idle` && (
         <FancyLink
           type="submit"

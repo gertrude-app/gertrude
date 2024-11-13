@@ -139,6 +139,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_FORMS_ENDPOINT: /not-real
+      NEXT_PUBLIC_TURNSTILE_SITEKEY: not-real
     steps:
       - name: checkout
         uses: actions/checkout@v4
