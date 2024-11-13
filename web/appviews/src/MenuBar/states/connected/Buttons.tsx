@@ -35,15 +35,23 @@ interface WhiteBtnProps {
   icon?: string;
   onClick(): void;
   pinging?: boolean;
+  className?: string;
 }
 
-export const White: React.FC<WhiteBtnProps> = ({ children, icon, onClick, pinging }) => (
+export const White: React.FC<WhiteBtnProps> = ({
+  children,
+  icon,
+  onClick,
+  pinging,
+  className,
+}) => (
   <button
     onClick={onClick}
     className={cx(
       `group bg-gradient-to-b from-white dark:from-black/50 to-white/70 dark:to-black font-medium rounded-xl group transition-[background-color,transform] active:bg-white/60 duration-100 shadow active:scale-95 cursor-default dark:text-white dark:shadow-black/50 dark:border-t dark:border-white/40 flex justify-center items-center relative`,
       children && `px-4 py-1`,
       icon && !children && `w-8 h-8`,
+      className,
     )}
   >
     {pinging && (

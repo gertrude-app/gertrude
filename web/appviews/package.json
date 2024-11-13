@@ -33,6 +33,6 @@
     "x-exec": "^1.2.0"
   },
   "browserslist": [
-    "Safari > 14"
+    "Safari > 13"
   ]
 }
