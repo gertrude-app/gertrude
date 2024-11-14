@@ -48,7 +48,7 @@ export const BlockedRequests: React.FC<Props> = ({
       >
         Sorry, we’re having trouble communicating with the internet filter, so we can’t
         show you any blocked requests right now. If a parent is nearby, they can likely
-        fix the problem from the <b>Administrate screen.</b> If not,{` `}
+        fix the problem from the <b>Health Check screen.</b> If not,{` `}
         <b>restarting the computer</b> will fix the problem.
       </ErrorScreen>
     );
