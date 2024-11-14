@@ -75,27 +75,34 @@ this:
 If you see a _giant wall of requests_, don't worry&mdash;your computer makes tons of
 network requests, and Gertrude has to block them all and show them to you. Usually the
 vast majority of them are not important. To help you narrow down exactly the right
-requests, use the following 3-part strategy:
+requests, use the following 4-part strategy:
 
 1. **Filter** by app name to see requests from only the app you're using
-2. Click **Clear requests** to clear out all the old requests
-3. Refresh to retrigger the problem, and note which requests were blocked **right at that
-   instant.**
+2. **Clear requests** to remove all the old, unimportant blocks
+3. **Refresh** the broken webpage to _retrigger_ the problem
+4. **Pause** the requests after refreshing.
 
-{% image src="filter-and-clear-before-reload.png" caption="To find the important requests, 1) Filter, 2) Clear, and 3) Reload" /%}
+### Steps 1 & 2: Filter and Clear
 
-There is a bit of an art to figuring out which of these requests should be unlocked, but
-you'll get the knack of it. If you look closely at the image above, two of them seem like
-they have to do with some kind of Google safe browsing feature, these probably aren't
-important. Let's ignore those and focus on the other three:
+To make it easier to see the blocks **we actually care about**, type in a **filter** term
+to isolate requests just coming from the web browser Safari (or whatever browser you're
+using), and then press the **Clear** button to clear out old requests.
 
-{% image src="ignore-and-unblock.png" caption="Ignoring some google stuff, there seem to be 3 domains to be unblocked" /%}
+{% image src="filter-and-clear.png" caption="Filter by app name (like Safari), and <b>Clear</b> old requests to get a clean slate" /%}
 
-You can create an _unlock request_ for all three blocks at once:
+### Step 3: Reload & Pause
 
-{% image src="triple-unlock-request.png" caption="You can create an unlock request for all three requests at once" /%}
+Next, back in your web browser **RELOAD the broken website** so we can see just the blocks
+we care about. They should come in _at the same time we press refresh_. Once they do,
+click the **PAUSE** button to prevent any new requests from streaming in:
 
-Once these three domains are unlocked, the website loads!
+{% image src="paused-requests.png" caption="Much better! By REFRESHING then PAUSING, we isolated the important blocks" /%}
+
+Now we can select the blocked requests and **send an unlock request.**
+
+{% image src="send-unlock-request.png" caption="Select the blocked domains, and click 'Send unlock request'" /%}
+
+Once these two domains are unlocked, the website loads!
 
 {% image src="nat-geo-unblocked.png" caption="Success! With all the keys created, the site loads fully" /%}
 
@@ -123,28 +130,13 @@ the effort, but **there are several things that make this process easier:**
    won't have to repeat the process again.
 6. You can always [reach out to us](https://gertrude.app/support) if you're having trouble
    getting a site unlocked.
-7. We're exploring some ways to in the future try to _automatically discover and unlock_
+7. While you're getting the hang of unblocking sites, and before you've got everything set
+   the way you want it, feel free to use lots of **filter suspensions** to smooth your
+   transition to using Gertrude. If you've not disabled screenshot monitoring, there's
+   still a great deal of transparency and accountability, so this is much safer than
+   getting frustrated and uninstalling Gertrude. With a little bit of time, you'll find
+   you have their core websites unblocked and working well, and you can use fewer filter
+   suspensions.
+8. We're exploring some ways to in the future try to _automatically discover and unlock_
    some or all of these other supporting domains, so it's very likely this process will
    keep getting easier over time.
-
-## Isolate network activity
-
-Your computer is constantly making network requests to a myriad of websites and services.
-The vast majority of these don't cause you any noticeable problem, and don't need to be
-unblocked. But, all those requests can make it _hard to find out which request DOES need
-to be unblocked._ For this reason, probably the number one thing you can do to make it
-easier to find what to unblock is **isolate network activity:**
-
-- **Close every other app** except the one you're working with. This will greatly reduce
-  the number of network requests you'll have to consider.
-- **Close other tabs** if you're working with a web browser, this also substantially
-  eliminates noise and makes it easier to find the right request.
-- **Be sure to clear and filter requests**. Enter a _search phrase_ into the filter field
-  of Gertrude's network activity screen. Usually part of the name of a website, or the app
-  you're using are helpful. Click the _clear requests_ button and then refresh the page,
-  or retry the activity that is not working.
-- **Retrigger the blocked activity** with the Blocked Requests window open, and focus on
-  the blocks that come in _exactly when you retrigger the problem._ Those are almost
-  always the ones that are causing the problem.
-
-{% image src="filter-requests.png" caption="Filter by a search phrase, clear often, and retrigger" /%}

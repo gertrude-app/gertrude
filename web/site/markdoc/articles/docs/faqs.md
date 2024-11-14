@@ -197,9 +197,9 @@ expires.
 
 ## I just installed Gertrude, but it's not blocking anything. Why? {% id="not-blocking" %}
 
-Double-check that you got the **System Extension** installed by going to the
-_Administrate..._ screen after clicking the Gertrude menu bar icon. If the extension
-wasn't installed properly, click the button to install it.
+Double-check that you got the **System Extension** installed by going to the _Health
+Check_ screen clicking the Gertrude menu bar icon and then the gear icon ⚙️ . If the
+extension wasn't installed properly, click the button to install it.
 
 If for some reason it seems to be installed properly and the filter is still not blocking
 anything, it's very likely caused by a conflict with Apple's **Screen Time** website
@@ -211,8 +211,9 @@ at the same time as Gertrude.
 
 ## Why can't I access the internet on my admin user account? {% id="admin-internet" %}
 
-_TLDR_&mdash;Sign in as your child, go to the "Administrate" > "Exempt Users" screen, and
-click to allow unrestricted access for the admin user account.
+_TLDR_&mdash;Sign in as your child, open the "Health Check" screen, click the icon that
+looks like three people on the left-side of the window, then click to allow unrestricted
+access for the admin user account.
 
 {% image src="exempt-users.png" caption="Exempt an admin user from filtering" /%}
 
@@ -226,7 +227,7 @@ about.
 
 Therefore, you need to explicitly instruct the filter about macOS users who should be
 _exempt from filtering_. To do this, sign in as the macOS user being protected by
-Gertrude. Click the Gertrude menu bar icon, then click _Administrate..._ and choose the
+Gertrude. Click the Gertrude menu bar icon, then click the **gear icon** and choose the
 _Exempt Users_ option from the left sidebar, then click to exempt the user.
 
 {% callout type="warning" title="Be careful with exemptions!" %}

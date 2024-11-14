@@ -9,10 +9,10 @@ right with Gertrude.
 ## 1. Run the health-check
 
 The Gertrude app has a built-in _health-check_ feature that tries to diagnose and alert
-you of common issues with the app. To access it, click the **Administrate...** option from
-the Gertrude menu bar icon dropdown, as shown below:
+you of common issues with the app. To access it, click the **gear icon** ⚙️ from the
+Gertrude menu bar icon dropdown, as shown below:
 
-{% image src="administrate.png" caption="Click the 'Administrate...' link to reach the health check" /%}
+{% image src="administrate.png" caption="Click the gear icon ⚙️ to reach the health check" /%}
 
 The health check screen runs a series of tests on your Gertrude installation, and reports
 the results. You should have all _green check marks_, unless you're intentionally not
@@ -38,19 +38,15 @@ something you think should be unblocked is not,_ try these tips:
   noise and makes it easier to find the right request.
 - **Be sure to clear and filter requests**. Enter a _search phrase_ into the filter field
   of Gertrude's network activity screen. Usually part of the name of a website, or the app
-  you're using are helpful. Click the _clear requests_ button and then refresh the page,
-  or retry the activity that is not working.
+  you're using are helpful. Click the _clear requests_ button, then refresh the page, then
+  _pause_ the requests&mdash;you should see only the important blocked requests at that
+  point.
 
-{% image src="filter-requests.png" caption="Filter by a search phrase, and clear often" /%}
+{% image src="filter-requests.png" caption="<b>Filter</b> by a search phrase, </b>clear</b> often, and <b>pause</b> after refreshing" /%}
 
-- **Send debug data, and a support request.** If all else fails, open the _Actions_ screen
-  of the Administrate screen, and click _"Send debug data"_. Then, try again. Extra debug
-  data will be recorded for a few minutes. Then send us a
-  [support request](https://gertrude.app/contact) describing in detail what you're
-  struggling with. We'll be able to retrieve the debug data, which will give us extra
-  insight into what's happening on your computer.
 - For more detailed information on unblocking websites and apps, see our article on
   [unblocking](/docs/unblocking-guide)
+- Still struggling? [Contact us](https://gertrude.app/contact) for help.
 
 ## 3. Manually remove the filter
 
@@ -61,11 +57,9 @@ to communicate, and sometimes that communication breaks down. Usually the health
 screen can both diagnose and fix this sort of problem, but sometimes you'll need to
 manually remove the filter in order to get things working correctly again.
 
-To do this, go to _System Preferences_ &rarr; _Network_. You should see the Gertrude
-filter listed along the left side. Select it and click the _minus icon_ to remove the
-filter, as shown below:
-
-{% image src="remove-filter.png" caption="Remove the filter in System Prefs > Network, then restart it" /%}
+To do this, go to  -> _System Settings &rarr; Network_. Next, click _Filters_. You should
+see the Gertrude filter listed under "Filters &amp; Proxies." Select it and click the
+_minus icon_ to remove the filter.
 
 Once you've removed the filter, you should be able to restart it from the Gertrude app
 menu bar dropdown, and it's likely the connection and communication will be reestablished.
