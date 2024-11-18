@@ -41,6 +41,7 @@ const BypassPrivacyWarning: React.FC = () => {
           lessRounded
           width={617 * 0.62}
           height={445 * 0.62}
+          maxWidth={617}
         />
       </Onboarding.Centered>
       <InformationModal open={showModal} setOpen={setShowModal}>

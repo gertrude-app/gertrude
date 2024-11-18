@@ -11,7 +11,7 @@ practice using all of the core features of Gertrude. {% .lead %}
 ---
 
 _**NOTE:** If you'd prefer to watch a step-by-step **video** showing all aspects of
-getting started with Gertrude, [click here](https://youtu.be/nSgDq8uEFTk)._
+getting started with Gertrude, [click here](https://youtu.be/JbLjoR214kI)._
 
 ---
 
@@ -315,7 +315,7 @@ we'll use that example later in the tutorial. Click **Create key** to finish the
 {% image src="create-key.png" caption="Create your first key" /%}
 
 Next, back on your child's computer, try to visit
-[https://kids.nationalgeographic.com](kids.nationalgeographic.com). You may notice that it
+[kids.nationalgeographic.com](https://kids.nationalgeographic.com). You may notice that it
 is only **sort of** loading.
 
 {% image src="nat-geo-partially-unblocked.png" caption="The site is loading, but if you look closely, all is not right..." /%}
