@@ -95,7 +95,6 @@ const noopClient: ApiClient = {
     return Result.success({
       id: ``,
       name: ``,
-      canUseTimeFeatures: true,
       keyloggingEnabled: false,
       screenshotsEnabled: false,
       screenshotsResolution: 1000,

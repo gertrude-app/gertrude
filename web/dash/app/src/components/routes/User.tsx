@@ -85,7 +85,6 @@ const UserRoute: React.FC = () => {
       isNew={state.user.isNew || false}
       name={draft.name}
       id={draft.id}
-      canUseTimeFeatures={draft.canUseTimeFeatures}
       setName={(name) => dispatch({ type: `setName`, name })}
       keyloggingEnabled={draft.keyloggingEnabled}
       setKeyloggingEnabled={(enabled) =>

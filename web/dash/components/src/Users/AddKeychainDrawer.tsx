@@ -21,7 +21,6 @@ interface Props {
   request?: RequestState<{ own: Keychain[]; public: Keychain[] }>;
   selected?: Keychain;
   onSelect(keychain: Keychain): unknown;
-  supportsSchedule: boolean;
   schedule?: Schedule;
   setSchedule(schedule?: Schedule): unknown;
   onDismiss(): unknown;
@@ -40,7 +39,6 @@ const AddKeychainDrawer: React.FC<Props> = ({
   userName,
   schedule,
   setSchedule,
-  supportsSchedule,
 }) => {
   const shown = request && request.state !== `idle`;
   const [whichKeychains, setWhichKeychains] = useState<'own' | 'public'>(`own`);
@@ -304,37 +302,35 @@ const AddKeychainDrawer: React.FC<Props> = ({
           </div>
         </main>
         <footer className="border-t border-slate-200 bg-white relative">
-          {supportsSchedule && (
-            <div className="flex justify-start items-center gap-2 sm:h-[52px] ScheduleContainer">
-              {schedule ? (
-                <>
-                  <KeychainSchedule schedule={schedule} setSchedule={setSchedule} />
-                  <button
-                    onClick={() => setSchedule(undefined)}
-                    className="h-4 w-4 flex justify-center items-center rounded-full hover:scale-150 hover:bg-slate-200 transition-[transform,background-color] duration-200 group active:scale-100 active:bg-slate-300"
-                  >
-                    <TrashIcon
-                      strokeWidth={2.2}
-                      className="w-4 h-4 text-slate-400 group-hover:scale-75 transition-transform duration-200"
-                    />
-                  </button>
-                </>
-              ) : (
+          <div className="flex justify-start items-center gap-2 sm:h-[52px] ScheduleContainer">
+            {schedule ? (
+              <>
+                <KeychainSchedule schedule={schedule} setSchedule={setSchedule} />
                 <button
-                  onClick={() => selected && setSchedule(defaults.keychainSchedule())}
-                  className={cx(
-                    `flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300`,
-                  )}
+                  onClick={() => setSchedule(undefined)}
+                  className="h-4 w-4 flex justify-center items-center rounded-full hover:scale-150 hover:bg-slate-200 transition-[transform,background-color] duration-200 group active:scale-100 active:bg-slate-300"
                 >
-                  <ClockIcon
-                    className={cx(`w-3.5 h-3.5 shrink-0 text-slate-500`)}
-                    strokeWidth={2.5}
+                  <TrashIcon
+                    strokeWidth={2.2}
+                    className="w-4 h-4 text-slate-400 group-hover:scale-75 transition-transform duration-200"
                   />
-                  <span className="text-sm text-slate-600 font-medium">Add schedule</span>
                 </button>
-              )}
-            </div>
-          )}
+              </>
+            ) : (
+              <button
+                onClick={() => selected && setSchedule(defaults.keychainSchedule())}
+                className={cx(
+                  `flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300`,
+                )}
+              >
+                <ClockIcon
+                  className={cx(`w-3.5 h-3.5 shrink-0 text-slate-500`)}
+                  strokeWidth={2.5}
+                />
+                <span className="text-sm text-slate-600 font-medium">Add schedule</span>
+              </button>
+            )}
+          </div>
           <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 xs:gap-8">
             <div className="flex flex-col flex-grow">
               <div className="flex items-center gap-2">
