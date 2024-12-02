@@ -20,7 +20,7 @@ export const Default: Story = props({
   deleteItems: () => {},
 });
 
-// @screenshot: xs,md
+// @screenshot: md
 export const WithSuspensions: Story = props({
   ...Default.args,
   items: [
