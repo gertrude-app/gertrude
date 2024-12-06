@@ -1,5 +1,4 @@
 // auto-generated, do not edit
-import type { SuccessOutput } from '../shared';
 
 export namespace Signup {
   export interface Input {
@@ -9,5 +8,10 @@ export namespace Signup {
     abTestVariant?: string;
   }
 
-  export type Output = SuccessOutput;
+  export interface Output {
+    admin?: {
+      adminId: UUID;
+      token: UUID;
+    };
+  }
 }

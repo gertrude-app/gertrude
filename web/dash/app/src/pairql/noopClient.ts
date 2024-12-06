@@ -197,7 +197,7 @@ const noopClient: ApiClient = {
     return Result.success({ success: true });
   },
   signup: async () => {
-    return Result.success({ success: true });
+    return Result.success({});
   },
   stripeUrl: async () => {
     return Result.success({ url: `/` });

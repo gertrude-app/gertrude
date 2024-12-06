@@ -1,4 +1,6 @@
+import { useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import type { MutableRefObject } from 'react';
 import type {
   GetIdentifiedApps,
   GetUnlockRequest,
@@ -44,4 +46,30 @@ export function useUser(id: UUID): QueryResult<User> {
 
 export function useUnlockRequest(id: UUID): QueryResult<GetUnlockRequest.Output> {
   return useQuery(Key.unlockRequest(id), () => Current.api.getUnlockRequest(id));
+}
+
+export function useTimeout(
+  callback: () => unknown,
+  delay: number,
+  enabled?: boolean,
+): MutableRefObject<number | null> {
+  const timeoutRef = useRef<number | null>(null);
+  const savedCallback = useRef(callback);
+
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  useEffect(() => {
+    if (enabled === false) return () => {};
+    const tick: () => unknown = () => savedCallback.current();
+    if (typeof delay === `number`) {
+      timeoutRef.current = window.setTimeout(tick, delay);
+      return () => window.clearTimeout(timeoutRef.current ?? undefined);
+    } else {
+      return () => {};
+    }
+  }, [delay, enabled]);
+
+  return timeoutRef;
 }

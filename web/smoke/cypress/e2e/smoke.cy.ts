@@ -20,6 +20,7 @@ describe(`Smoke test`, () => {
     cy.get(`input[name=password]`).type(`${password}{enter}`);
     cy.contains(`Verification email sent`);
     cy.wait(Cypress.env(`CI`) ? 60000 : 7500);
+    cy.location(`pathname`).should(`eq`, `/login`);
 
     // verify email
     cy.request({ url: Cypress.env(`SMOKE_TEST_EMAIL_INBOX_URL`) }).then((response) => {
@@ -37,6 +38,14 @@ describe(`Smoke test`, () => {
       cy.visit({ url: verifyLink as any });
     });
     cy.contains(`I’m a parent`).click();
+    cy.contains(`Welcome to the parent website!`);
+
+    // log out, then attempt to re-signup
+    cy.contains(`Log out`).click();
+    cy.visit(`/signup`);
+    cy.get(`input[name=email]`).type(email);
+    cy.get(`input[name=password]`).type(`${password}{enter}`);
+    cy.location(`pathname`).should(`eq`, `/`);
     cy.contains(`Welcome to the parent website!`);
 
     // log out, then back in w/ email/pass
@@ -87,5 +96,11 @@ describe(`Smoke test`, () => {
     cy.get(`[data-test=user-name]`).clear().type(`Franny (edited)`);
     cy.contains(`Save child`).click();
     cy.contains(`Child saved`);
+
+    // verify visiting /login and /signup redirects to / if they're logged in
+    cy.visit(`/login`);
+    cy.location(`pathname`).should(`eq`, `/`);
+    cy.visit(`/signup`);
+    cy.location(`pathname`).should(`eq`, `/`);
   });
 });

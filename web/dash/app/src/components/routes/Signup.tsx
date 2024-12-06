@@ -1,20 +1,35 @@
 import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { FullscreenModalForm, EmailInputForm } from '@dash/components';
-import { Link } from 'react-router-dom';
-import { useMutation } from '../../hooks';
+import { Link, useNavigate } from 'react-router-dom';
+import { useMutation, useAuth, useTimeout } from '../../hooks';
 import Current from '../../environment';
 
 const Signup: React.FC = () => {
+  const { admin, login } = useAuth();
   const [email, setEmail] = useState(``);
   const [password, setPassword] = useState(``);
-  const signup = useMutation(() =>
-    Current.api.signup({
-      email,
-      password,
-      gclid: getCookieValue(`gclid`),
-      abTestVariant: getQueryParam(`v`) ?? getCookieValue(`ab_variant`),
-    }),
+  const navigate = useNavigate();
+  const signup = useMutation(
+    () =>
+      Current.api.signup({
+        email,
+        password,
+        gclid: getCookieValue(`gclid`),
+        abTestVariant: getQueryParam(`v`) ?? getCookieValue(`ab_variant`),
+      }),
+    { onSuccess: ({ admin }) => admin && login(admin.adminId, admin.token) },
   );
+
+  useTimeout(
+    () => navigate(`/login`),
+    7500,
+    signup.isSuccess && signup.data?.admin === undefined,
+  );
+
+  if (admin !== null || (signup.isSuccess && signup.data?.admin !== undefined)) {
+    return <Navigate to="/" replace />;
+  }
 
   if (signup.isPending) {
     return <FullscreenModalForm state="ongoing" />;
