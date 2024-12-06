@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { ApiErrorMessage, FullscreenModalForm, LoginForm } from '@dash/components';
 import { Navigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../../hooks/auth';
-import { useMutation, useLoginRedirect } from '../../hooks';
+import { useMutation, useLoginRedirect, useAuth } from '../../hooks';
 import Current from '../../environment';
 
 export const Login: React.FC = () => {

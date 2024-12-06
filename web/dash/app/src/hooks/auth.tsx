@@ -25,14 +25,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [admin, setAdmin] = useState<Admin | null>(getInitialAdmin());
 
   function login(id: UUID, token: UUID): void {
-    setAdmin({ id, token });
     Current.localStorage.setItem(`admin_id`, id);
     Current.localStorage.setItem(`admin_token`, token);
     Current.localStorage.removeItem(`dev_logged_out`);
+    setAdmin({ id, token });
   }
 
   function logout(): void {
-    setAdmin(null);
     Current.sessionStorage.removeItem(`admin_id`);
     Current.sessionStorage.removeItem(`admin_token`);
     Current.localStorage.removeItem(`admin_id`);
@@ -40,6 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!Current.env.isProd()) {
       Current.localStorage.setItem(`dev_logged_out`, `true`);
     }
+    setAdmin(null);
   }
 
   return (
