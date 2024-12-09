@@ -148,7 +148,11 @@ const EditUser: React.FC<Props> = ({
         schedule={keychainSchedule}
         setSchedule={setAddingKeychainSchedule}
       />
-      <ConfirmDeleteEntity type="device" action={deleteDevice} />
+      <ConfirmDeleteEntity
+        type="connection to computer"
+        action={deleteDevice}
+        text="Are you sure you want to delete the connection between this child and this computer?"
+      />
       <ConfirmDeleteEntity type="user" action={deleteUser} />
       {devices.length > 0 && <PageHeading icon={`cog`}>Child settings</PageHeading>}
       <div className="mt-8">
@@ -175,18 +179,19 @@ const EditUser: React.FC<Props> = ({
               {devices.length} {inflect(`computer`, devices.length)}:
             </h2>
             <div className="flex flex-col max-w-3xl">
-              {devices.map((device) => (
-                <div key={device.id} className="flex items-center mt-3">
+              {devices.map((userDevice) => (
+                <div key={userDevice.id} className="flex items-center mt-3">
                   <UserDevice
-                    modelTitle={device.modelTitle}
-                    modelIdentifier={device.modelIdentifier}
-                    id={device.id}
-                    name={device.name}
-                    status={device.status}
+                    modelTitle={userDevice.modelTitle}
+                    modelIdentifier={userDevice.modelIdentifier}
+                    id={userDevice.id}
+                    deviceId={userDevice.deviceId}
+                    name={userDevice.name}
+                    status={userDevice.status}
                     className="flex-grow mr-3"
                   />
                   <button
-                    onClick={() => deleteDevice.start(device.id)}
+                    onClick={() => deleteDevice.start(userDevice.id)}
                     className="transition-colors duration-100 flex justify-center items-center w-10 h-10 rounded-full hover:bg-slate-100 cursor-pointer text-slate-500 hover:text-red-500"
                   >
                     <i className="fa fa-trash" />

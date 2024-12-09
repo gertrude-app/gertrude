@@ -61,6 +61,7 @@ export function deviceProps(
 ): React.ComponentProps<typeof EditUser>['devices'][number] {
   return {
     id: apiDevice.id,
+    deviceId: apiDevice.deviceId,
     modelTitle: apiDevice.modelTitle,
     modelIdentifier: apiDevice.modelIdentifier,
     name: apiDevice.customName,

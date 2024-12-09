@@ -73,14 +73,15 @@ const UserCard: React.FC<Props> = ({
             </p>
           </div>
           <div className="flex flex-col mt-3 space-y-3 pt-3">
-            {devices.map((device) => (
+            {devices.map((userDevice) => (
               <UserDevice
-                key={device.id}
-                id={device.id}
-                modelTitle={device.modelTitle}
-                modelIdentifier={device.modelIdentifier}
-                name={device.name}
-                status={device.status}
+                key={userDevice.id}
+                id={userDevice.id}
+                deviceId={userDevice.deviceId}
+                modelTitle={userDevice.modelTitle}
+                modelIdentifier={userDevice.modelIdentifier}
+                name={userDevice.name}
+                status={userDevice.status}
               />
             ))}
           </div>

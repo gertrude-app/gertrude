@@ -42,6 +42,7 @@ export const Default: Story = props({
       devices: [
         {
           id: `1`,
+          deviceId: `1`,
           name: `Silvery`,
           modelIdentifier: `Mac14,10`,
           modelTitle: `16" MacBook Pro (2023)`,
@@ -59,6 +60,7 @@ export const Default: Story = props({
       devices: [
         {
           id: `2`,
+          deviceId: `2`,
           modelIdentifier: `Mac14,13`,
           name: `Lil' Studio`,
           modelTitle: `Mac Studio (2023)`,
@@ -66,6 +68,7 @@ export const Default: Story = props({
         },
         {
           id: `3`,
+          deviceId: `3`,
           modelIdentifier: `iMac21,2`,
           modelTitle: `27" iMac (2021)`,
           status: `online`,
