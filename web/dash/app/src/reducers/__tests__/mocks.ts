@@ -81,6 +81,7 @@ export function user(override: Partial<User> = {}): User {
     devices: [
       {
         id: `mac-123`,
+        deviceId: `d-mac-123`,
         modelFamily: `macBookAir`,
         modelTitle: `MacBook Air`,
         modelIdentifier: `MacBookAir8,1`,

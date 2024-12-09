@@ -3,24 +3,25 @@ import cx from 'classnames';
 import { Link } from 'react-router-dom';
 
 type Props = {
+  id: UUID;
+  deviceId: UUID;
   modelTitle: string;
   modelIdentifier: string;
   name?: string;
   status: 'online' | 'offline';
   className?: string;
-  id: string;
 };
 
 const UserDevice: React.FC<Props> = ({
+  deviceId,
   modelTitle,
   modelIdentifier,
   status,
   className,
   name,
-  id,
 }) => (
   <Link
-    to={`/computers/${id}`}
+    to={`/computers/${deviceId}`}
     className={cx(
       `rounded-2xl p-2 px-3 bg-white border border-slate-200 transition-[background-color] duration-100 hover:bg-slate-50 flex justify-between items-center gap-6`,
       className,

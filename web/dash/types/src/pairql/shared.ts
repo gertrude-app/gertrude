@@ -198,6 +198,7 @@ export type UserActivityItem =
 
 export interface UserDevice {
   id: UUID;
+  deviceId: UUID;
   isOnline: boolean;
   modelFamily: DeviceModelFamily;
   modelTitle: string;
