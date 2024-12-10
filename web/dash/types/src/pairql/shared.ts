@@ -28,6 +28,12 @@ export type AppScope =
   | { type: 'webBrowsers' }
   | { type: 'single'; single: SingleAppScope };
 
+export interface BlockedApp {
+  id: UUID;
+  identifier: string;
+  schedule?: RuleSchedule;
+}
+
 export type ClientAuth = 'none' | 'user' | 'admin' | 'superAdmin';
 
 export interface Device {
@@ -60,20 +66,6 @@ export interface Key {
   key: SharedKey;
 }
 
-export interface KeychainSchedule {
-  mode: 'active' | 'inactive';
-  days: {
-    sunday: boolean;
-    monday: boolean;
-    tuesday: boolean;
-    wednesday: boolean;
-    thursday: boolean;
-    friday: boolean;
-    saturday: boolean;
-  };
-  window: PlainTimeWindow;
-}
-
 export interface KeychainSummary {
   id: UUID;
   authorId: UUID;
@@ -96,6 +88,20 @@ export interface PlainTimeWindow {
 export type ReleaseChannel = 'stable' | 'beta' | 'canary';
 
 export type RequestStatus = 'pending' | 'accepted' | 'rejected';
+
+export interface RuleSchedule {
+  mode: 'active' | 'inactive';
+  days: {
+    sunday: boolean;
+    monday: boolean;
+    tuesday: boolean;
+    wednesday: boolean;
+    thursday: boolean;
+    friday: boolean;
+    saturday: boolean;
+  };
+  window: PlainTimeWindow;
+}
 
 export interface ServerPqlError {
   version: number;
@@ -170,6 +176,7 @@ export interface User {
   keychains: UserKeychainSummary[];
   downtime?: PlainTimeWindow;
   devices: UserDevice[];
+  blockedApps?: BlockedApp[];
   createdAt: ISODateString;
 }
 
@@ -213,7 +220,7 @@ export interface UserKeychainSummary {
   description?: string;
   isPublic: boolean;
   numKeys: number;
-  schedule?: KeychainSchedule;
+  schedule?: RuleSchedule;
 }
 
 export interface VerifiedNotificationMethod {

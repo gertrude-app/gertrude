@@ -48,6 +48,7 @@ const UserRoute: React.FC = () => {
         showSuspensionActivity: user.draft.showSuspensionActivity,
         downtime: user.draft.downtime,
         keychains: user.draft.keychains.map(({ id, schedule }) => ({ id, schedule })),
+        blockedApps: user.draft.blockedApps,
       }),
     {
       onSuccess: () => dispatch({ type: `userSaved` }),
@@ -147,6 +148,13 @@ const UserRoute: React.FC = () => {
       setAssignedKeychainSchedule={(id, schedule) =>
         dispatch({ type: `setKeychainSchedule`, id, schedule })
       }
+      blockedApps={draft.blockedApps}
+      newBlockedAppIdentifier={state.newBlockedAppIdentifier ?? ``}
+      updateNewBlockedAppIdentifier={(identifier) =>
+        dispatch({ type: `updateNewBlockedAppIdentifier`, identifier })
+      }
+      addNewBlockedApp={() => dispatch({ type: `addNewBlockedApp` })}
+      removeBlockedApp={(id) => dispatch({ type: `removeBlockedApp`, id })}
     />
   );
 };

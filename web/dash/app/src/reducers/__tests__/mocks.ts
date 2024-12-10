@@ -35,7 +35,7 @@ export function identifiedApp(
     id: uuid(),
     name: `Brave Browser`,
     slug: `brave`,
-    selectable: true,
+    launchable: true,
     bundleIds: [{ id: uuid(), bundleId: `com.brave.Browser` }],
     ...override,
   };

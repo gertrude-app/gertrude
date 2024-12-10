@@ -4,7 +4,7 @@ import { inflect } from '@shared/string';
 import { Button, Badge } from '@shared/components';
 import { ChevronDownIcon, ClockIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { UsersIcon } from '@heroicons/react/24/solid';
-import { defaults, type KeychainSchedule as Schedule } from '@dash/types';
+import { defaults, type RuleSchedule as Schedule } from '@dash/types';
 import GradientIcon from '../GradientIcon';
 import KeychainSchedule from './schedule/KeychainSchedule';
 
@@ -118,7 +118,7 @@ const KeychainCard: React.FC<Props> = ({
                 {props.mode === `assign_to_child` && !props.schedule && (
                   <button
                     onClick={() => {
-                      props.setSchedule(defaults.keychainSchedule());
+                      props.setSchedule(defaults.ruleSchedule());
                       setShowSchedule(true);
                     }}
                     className={cx(

@@ -10,7 +10,7 @@ describe(`create key flow`, () => {
         id: `app-123`,
         name: `Brave`,
         slug: `brave`,
-        selectable: true,
+        launchable: true,
         bundleIds: [],
       },
     ]);

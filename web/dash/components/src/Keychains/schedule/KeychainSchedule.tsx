@@ -1,13 +1,13 @@
 import React from 'react';
 import cx from 'classnames';
-import type { KeychainSchedule } from '@dash/types';
+import type { RuleSchedule } from '@dash/types';
 import SpecifyingActiveOrInactive from './SpecifyingActiveOrInactive';
 import WhatDays from './WhatDays';
 import WhatTime from './WhatTime';
 
 interface Props {
-  schedule: KeychainSchedule;
-  setSchedule(schedule: KeychainSchedule): void;
+  schedule: RuleSchedule;
+  setSchedule(schedule: RuleSchedule): void;
 }
 
 const KeychainSchedule: React.FC<Props> = ({ schedule, setSchedule }) => (

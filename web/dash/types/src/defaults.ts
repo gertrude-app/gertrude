@@ -1,4 +1,4 @@
-import type { PlainTimeWindow, KeychainSchedule } from './pairql/shared';
+import type { PlainTimeWindow, RuleSchedule } from './pairql/shared';
 
 export function timeWindow(): PlainTimeWindow {
   return {
@@ -7,7 +7,7 @@ export function timeWindow(): PlainTimeWindow {
   };
 }
 
-export function keychainSchedule(): KeychainSchedule {
+export function ruleSchedule(): RuleSchedule {
   return {
     mode: `active`,
     days: {
