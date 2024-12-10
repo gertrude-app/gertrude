@@ -34,7 +34,7 @@ jobs:
       - name: run smoke tests
         run: just smoke-run
       - name: upload-videos
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: smoke-videos
