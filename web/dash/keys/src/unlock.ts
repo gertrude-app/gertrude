@@ -49,4 +49,7 @@ const UNSAFE_DOMAINS = [
   `youtube.com`,
   `cloudfront.net`,
   `amazonaws.com`,
+  `herokuapp.com`,
+  `netlify.app`,
+  `pages.dev`,
 ];
