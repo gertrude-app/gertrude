@@ -71,12 +71,30 @@ const UseCaseSurvey: React.FC = () => {
         </Page>
         <Page type="self" current={page}>
           <div className="w-full h-full flex flex-col justify-center items-center xs:p-4">
-            <h1 className="text-4xl font-semibold text-white text-center mb-4">
-              Gertrude probably isn’t a good fit for you&hellip;
+            <h1 className="text-3xl font-semibold text-white text-center mb-4">
+              Gertrude may not be a good fit for you&hellip;
             </h1>
-            <p className="text-center text-xl xs:text-2xl [&>em]:underline [&>b]:text-white text-white/70 mb-8 mt-4">
+            <p className="text-left text-lg xs:text-xl [&>em]:underline [&>b]:text-white text-white/70 mb-5 mt-4">
               Gertrude requires two distinct <b>roles</b>&mdash;usually a parent and a
-              child. It is not designed to be used by one person alone.
+              child. If you have a trusted friend who could help you, have them sign up
+              and then they can act as the “parent” and you as the “child.”
+            </p>
+            <p className="text-left text-lg xs:text-xl [&>em]:underline [&>b]:text-white text-white/70 mb-8 mt-0">
+              Otherwise we recommend trying{` `}
+              <a
+                className="text-violet-700 font-bold"
+                href="https://pluckyfilter.com?ref=gertrude"
+              >
+                Plucky
+              </a>
+              {` `}or{` `}
+              <a
+                className="text-violet-700 font-bold"
+                href="https://techlockdown.com?ref=gertrude"
+              >
+                Tech Lockdown
+              </a>
+              {` `}which are designed for <b>self-management.</b>
             </p>
             <Button
               className="mb-4 inline-block"
@@ -153,7 +171,7 @@ const Option: React.FC<OptionProps> = ({ children, type, description, setPage })
         }
       }}
       className={cx(
-        `px-10 sm:px-6 py-6 bg-white/20 rounded-3xl flex flex-col md:flex-row items-center gap-4 cursor-pointer hover:bg-white/30 transition-[background-color,transform] duration-300 active:scale-95 md:pr-12 active:bg-white/40`,
+        `px-10 sm:px-6 py-6 bg-white/20 rounded-3xl flex flex-col md:flex-row items-center gap-4 cursor-pointer hover:bg-white/30 transition-[background-color,transform] duration-300 active:scale-95 md:pr-12 active:bg-white/40 ScrollTop`,
       )}
     >
       <div className="w-[60px] sm:w-[70px] h-[60px] sm:h-[70px] bg-white/20 rounded-full flex justify-center items-center [&>*]:scale-[90%]">
@@ -178,8 +196,9 @@ const Page: React.FC<PageProps> = ({ children, type, current, relative }) => (
   <div
     className={cx(
       type === current ? `opacity-100` : `opacity-0 translate-y-4 pointer-events-none`,
-      `transition-[opacity,transform] duration-300 px-6 xs:px-8 py-12 md:px-12`,
+      `transition-[opacity,transform] duration-300 px-6 xs:px-6 py-12 md:px-10`,
       relative ? `relative` : `absolute w-full h-full left-0 top-0`,
+      `max-[500px]:py-4`,
     )}
   >
     {children}
