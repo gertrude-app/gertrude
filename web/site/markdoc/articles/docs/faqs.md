@@ -69,8 +69,9 @@ given a [standard macOS user account](https://youtu.be/ntnFEW0bRVQ), (not an adm
 account), and their accountability partner should change the password of the admin
 account, keeping it a secret.
 
-Adults looking for solutions for self-managing their iOS devices should check out
-[Tech Lockdown](https://www.techlockdown.com).
+Adults looking for alternative solutions for self-management should check out
+[Plucky Filter](https://pluckyfilter.com?ref=gertrude-faqs) and
+[Tech Lockdown](https://www.techlockdown.com?ref=gertrude-faqs).
 
 ## Can two kids share a computer with different protections? {% id="share-computer" %}
 
