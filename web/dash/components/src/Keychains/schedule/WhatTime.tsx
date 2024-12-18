@@ -1,12 +1,12 @@
 import React from 'react';
 import cx from 'classnames';
-import type { KeychainSchedule } from '@dash/types';
+import type { RuleSchedule } from '@dash/types';
 import TimeInput from '../../Forms/TimeInput';
 import DropdownCustomizationPoint from './DropdownCustomizationPoint';
 
 const WhatTime: React.FC<{
-  schedule: KeychainSchedule;
-  setSchedule(schedule: KeychainSchedule): void;
+  schedule: RuleSchedule;
+  setSchedule(schedule: RuleSchedule): void;
   isTouchDevice: boolean;
 }> = ({ schedule, setSchedule, isTouchDevice }) => {
   const isInvalid = (() => {

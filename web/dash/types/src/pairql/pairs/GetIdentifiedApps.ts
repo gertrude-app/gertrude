@@ -7,7 +7,7 @@ export namespace GetIdentifiedApps {
     id: UUID;
     name: string;
     slug: string;
-    selectable: boolean;
+    launchable: boolean;
     bundleIds: Array<{
       id: UUID;
       bundleId: string;

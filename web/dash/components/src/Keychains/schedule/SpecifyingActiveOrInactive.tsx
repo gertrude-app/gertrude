@@ -1,11 +1,11 @@
 import React from 'react';
 import cx from 'classnames';
 import { ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
-import type { KeychainSchedule } from '@dash/types';
+import type { RuleSchedule } from '@dash/types';
 
 const SpecifyingActiveOrInactive: React.FC<{
-  schedule: KeychainSchedule;
-  setSchedule(schedule: KeychainSchedule): void;
+  schedule: RuleSchedule;
+  setSchedule(schedule: RuleSchedule): void;
   isTouchDevice: boolean;
 }> = ({ schedule, setSchedule, isTouchDevice }) => (
   <button

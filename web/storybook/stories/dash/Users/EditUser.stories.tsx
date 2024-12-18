@@ -43,6 +43,10 @@ export const Default: Story = props({
   downtime: { start: { hour: 0, minute: 0 }, end: { hour: 1, minute: 0 } },
   setDowntimeEnabled: () => {},
   setDowntime: () => {},
+  updateNewBlockedAppIdentifier: () => {},
+  addNewBlockedApp: () => {},
+  removeBlockedApp: () => {},
+  newBlockedAppIdentifier: ``,
   setAssignedKeychainSchedule: () => {},
   setAddingKeychainSchedule: () => {},
   keychains: [

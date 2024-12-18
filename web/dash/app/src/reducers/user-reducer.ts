@@ -1,16 +1,18 @@
+import { v4 as uuid } from 'uuid';
 import { produce } from 'immer';
 import { defaults } from '@dash/types';
 import type {
   UserKeychainSummary,
   PlainTimeWindow,
   User,
-  KeychainSchedule,
+  RuleSchedule,
 } from '@dash/types';
 import { commit, editable } from '../lib/helpers';
 
 type State = {
   user?: Editable<User>;
   addingKeychain?: UserKeychainSummary | null;
+  newBlockedAppIdentifier?: string;
 };
 
 export type Action =
@@ -25,9 +27,12 @@ export type Action =
   | { type: 'setDowntime'; downtime: PlainTimeWindow }
   | { type: 'setShowSuspensionActivity'; show: boolean }
   | { type: 'removeKeychain'; id: UUID }
-  | { type: 'setKeychainSchedule'; id: UUID; schedule?: KeychainSchedule }
+  | { type: 'updateNewBlockedAppIdentifier'; identifier: string }
+  | { type: 'removeBlockedApp'; id: UUID }
+  | { type: 'addNewBlockedApp' }
+  | { type: 'setKeychainSchedule'; id: UUID; schedule?: RuleSchedule }
   | { type: 'addKeychain'; keychain: UserKeychainSummary }
-  | { type: 'setAddingKeychainSchedule'; schedule?: KeychainSchedule }
+  | { type: 'setAddingKeychainSchedule'; schedule?: RuleSchedule }
   | { type: 'setAddingKeychain'; keychain?: UserKeychainSummary | null };
 
 function reducer(state: State, action: Action): State | undefined {
@@ -62,6 +67,23 @@ function reducer(state: State, action: Action): State | undefined {
       return;
     case `setShowSuspensionActivity`:
       state.user.draft.showSuspensionActivity = action.show;
+      return;
+    case `updateNewBlockedAppIdentifier`:
+      state.newBlockedAppIdentifier = action.identifier;
+      return;
+    case `addNewBlockedApp`:
+      if (state.newBlockedAppIdentifier) {
+        state.user.draft.blockedApps = [
+          ...(state.user.draft.blockedApps ?? []),
+          { id: uuid(), identifier: state.newBlockedAppIdentifier },
+        ];
+        state.newBlockedAppIdentifier = ``;
+      }
+      return;
+    case `removeBlockedApp`:
+      state.user.draft.blockedApps = state.user.draft.blockedApps?.filter(
+        (app) => app.id !== action.id,
+      );
       return;
     case `removeKeychain`:
       state.user.draft.keychains = state.user.draft.keychains.filter(

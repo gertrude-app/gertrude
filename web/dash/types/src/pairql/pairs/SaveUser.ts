@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { KeychainSchedule, SuccessOutput, PlainTimeWindow } from '../shared';
+import type { PlainTimeWindow, BlockedApp, SuccessOutput, RuleSchedule } from '../shared';
 
 export namespace SaveUser {
   export interface Input {
@@ -14,8 +14,9 @@ export namespace SaveUser {
     downtime?: PlainTimeWindow;
     keychains: Array<{
       id: UUID;
-      schedule?: KeychainSchedule;
+      schedule?: RuleSchedule;
     }>;
+    blockedApps?: BlockedApp[];
   }
 
   export type Output = SuccessOutput;

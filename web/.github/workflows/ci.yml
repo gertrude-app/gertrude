@@ -128,7 +128,7 @@ jobs:
           start: pnpm --filter @dash/app preview
           project: dash/app
       - name: upload-videos
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-videos

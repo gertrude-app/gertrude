@@ -14,7 +14,7 @@ import {
 import { Badge, Button, Loading } from '@shared/components';
 import { inflect } from '@shared/string';
 import { defaults, type KeychainSummary as Keychain } from '@dash/types';
-import type { KeychainSchedule as Schedule, RequestState } from '@dash/types';
+import type { RuleSchedule as Schedule, RequestState } from '@dash/types';
 import KeychainSchedule from '../Keychains/schedule/KeychainSchedule';
 
 interface Props {
@@ -318,7 +318,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
               </>
             ) : (
               <button
-                onClick={() => selected && setSchedule(defaults.keychainSchedule())}
+                onClick={() => selected && setSchedule(defaults.ruleSchedule())}
                 className={cx(
                   `flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300`,
                 )}

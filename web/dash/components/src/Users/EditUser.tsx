@@ -1,8 +1,8 @@
 import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@shared/string';
-import { TextInput, Button, Toggle, Label } from '@shared/components';
-import type { KeychainSchedule, PlainTimeWindow } from '@dash/types';
+import { TextInput, Button, Badge, Toggle, Label } from '@shared/components';
+import type { RuleSchedule, PlainTimeWindow, BlockedApp } from '@dash/types';
 import type { Subcomponents, ConfirmableEntityAction, RequestState } from '@dash/types';
 import type { UserKeychainSummary as Keychain } from '@dash/types';
 import KeychainCard from '../Keychains/KeychainCard';
@@ -49,9 +49,14 @@ interface Props {
   onDismissAddKeychain(): unknown;
   addingKeychain?: Keychain | null;
   fetchSelectableKeychainsRequest?: RequestState<{ own: Keychain[]; public: Keychain[] }>;
-  keychainSchedule?: KeychainSchedule;
-  setAddingKeychainSchedule(schedule?: KeychainSchedule): unknown;
-  setAssignedKeychainSchedule(id: UUID, schedule?: KeychainSchedule): unknown;
+  keychainSchedule?: RuleSchedule;
+  setAddingKeychainSchedule(schedule?: RuleSchedule): unknown;
+  setAssignedKeychainSchedule(id: UUID, schedule?: RuleSchedule): unknown;
+  blockedApps?: BlockedApp[];
+  newBlockedAppIdentifier: string;
+  updateNewBlockedAppIdentifier(identifier: string): unknown;
+  addNewBlockedApp(): unknown;
+  removeBlockedApp(id: UUID): unknown;
 }
 
 const EditUser: React.FC<Props> = ({
@@ -92,6 +97,11 @@ const EditUser: React.FC<Props> = ({
   keychainSchedule,
   setAddingKeychainSchedule,
   setAssignedKeychainSchedule,
+  blockedApps,
+  newBlockedAppIdentifier,
+  updateNewBlockedAppIdentifier,
+  addNewBlockedApp,
+  removeBlockedApp,
 }) => {
   if (isNew) {
     return (
@@ -317,6 +327,61 @@ const EditUser: React.FC<Props> = ({
                 </div>
               </div>
             </div>
+            {/* /downtime */}
+
+            {/* blocked apps */}
+            {blockedApps && (
+              <div className="mt-12 max-w-3xl mb-12">
+                <h2 className="text-lg font-bold text-slate-700 flex">
+                  Blocked Apps{` `}
+                  <Badge className="ml-2" size="small" type="green">
+                    Beta
+                  </Badge>
+                </h2>
+                {blockedApps.length === 0 ? (
+                  <p className="text-center italic hidden text-slate-500 text-sm antialiased mt-2 mb-4">
+                    No apps are currently blocked
+                  </p>
+                ) : (
+                  <div className="gap-1.5 my-2 flex flex-col">
+                    {blockedApps.map((app) => (
+                      <div
+                        className="text-slate-600 flex items-center font-bold px-3 py-2.5 border border-slate-200 bg-white rounded-lg"
+                        key={app.id}
+                      >
+                        <i className="fa text-red-500 fa-ban mr-2 p-1.5 bg-red-100/80 rounded-md" />
+                        <span className="grow">{app.identifier}</span>
+                        <i
+                          className="fa fa-trash text-slate-500 ml-2 mr-1 cursor-pointer hover:text-red-700"
+                          onClick={() => removeBlockedApp(app.id)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2 mt-4">
+                  <TextInput
+                    key={`new-blocked-app-${blockedApps.length}`}
+                    type="text"
+                    value={newBlockedAppIdentifier}
+                    setValue={updateNewBlockedAppIdentifier}
+                    placeholder="App name or bundle id"
+                  />
+                  <Button
+                    size="small"
+                    className="whitespace-nowrap"
+                    color="secondary"
+                    type="button"
+                    disabled={!newBlockedAppIdentifier}
+                    onClick={addNewBlockedApp}
+                  >
+                    <i className="fa fa-plus mr-2" />
+                    Add new
+                  </Button>
+                </div>
+              </div>
+            )}
+            {/* /blocked apps */}
 
             {/* keychains */}
             <div className="mt-12 max-w-3xl">
