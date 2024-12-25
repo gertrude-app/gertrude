@@ -6,6 +6,7 @@
   "license": "ISC",
   "dependencies": {
     "@tailwindcss/forms": "^0.5.3",
+    "@tailwindcss/container-queries": "0.1.1",
     "tailwindcss": "3.3.3"
   }
 }

@@ -1,7 +1,8 @@
 import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@shared/string';
-import { TextInput, Button, Badge, Toggle, Label } from '@shared/components';
+import { TextInput, Button, Toggle, Label } from '@shared/components';
+import { ClockIcon } from '@heroicons/react/24/outline';
 import type { RuleSchedule, PlainTimeWindow, BlockedApp } from '@dash/types';
 import type { Subcomponents, ConfirmableEntityAction, RequestState } from '@dash/types';
 import type { UserKeychainSummary as Keychain } from '@dash/types';
@@ -9,6 +10,8 @@ import KeychainCard from '../Keychains/KeychainCard';
 import { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
 import TimeInput from '../Forms/TimeInput';
+import BetaBadge from '../BetaBadge';
+import SchedulePicker from '../Keychains/schedule/SchedulePicker';
 import AddKeychainDrawer from './AddKeychainDrawer';
 import ConnectDeviceModal from './ConnectDeviceModal';
 import UserDevice from './UserDevice';
@@ -332,12 +335,10 @@ const EditUser: React.FC<Props> = ({
             {/* blocked apps */}
             {blockedApps && (
               <div className="mt-12 max-w-3xl mb-12">
-                <h2 className="text-lg font-bold text-slate-700 flex">
-                  Blocked Apps{` `}
-                  <Badge className="ml-2" size="small" type="green">
-                    Beta
-                  </Badge>
-                </h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-slate-700">Blocked apps{` `}</h2>
+                  <BetaBadge />
+                </div>
                 {blockedApps.length === 0 ? (
                   <p className="text-center italic hidden text-slate-500 text-sm antialiased mt-2 mb-4">
                     No apps are currently blocked
@@ -346,20 +347,75 @@ const EditUser: React.FC<Props> = ({
                   <div className="gap-1.5 my-2 flex flex-col">
                     {blockedApps.map((app) => (
                       <div
-                        className="text-slate-600 flex items-center font-bold px-3 py-2.5 border border-slate-200 bg-white rounded-lg"
+                        className={cx(
+                          `p-2.5 border border-slate-200 bg-white rounded-xl flex items-center @container/schedule`,
+                          app.schedule &&
+                            `flex-col min-[1070px]:flex-row gap-2 min-[1070px]:gap-0`,
+                        )}
                         key={app.id}
                       >
-                        <i className="fa text-red-500 fa-ban mr-2 p-1.5 bg-red-100/80 rounded-md" />
-                        <span className="grow">{app.identifier}</span>
-                        <i
-                          className="fa fa-trash text-slate-500 ml-2 mr-1 cursor-pointer hover:text-red-700"
-                          onClick={() => removeBlockedApp(app.id)}
-                        />
+                        <div
+                          className={cx(
+                            `flex items-center gap-3 flex-grow`,
+                            app.schedule && `self-stretch min-[1070px]:self-auto`,
+                          )}
+                        >
+                          <i className="fa text-red-500 fa-ban p-1.5 bg-red-100/80 rounded-md" />
+                          <div className="flex-grow overflow-hidden relative h-8 flex items-center">
+                            <span className="font-semibold text-slate-600 whitespace-nowrap absolute left-0">
+                              {app.identifier}
+                            </span>
+                            <div className="absolute right-0 top-0 h-full w-10 bg-gradient-to-r from-transparent to-white" />
+                          </div>
+                        </div>
+                        <div
+                          className={cx(
+                            `flex items-center gap-2 ml-2 shrink-0`,
+                            app.schedule && `self-end min-[1070px]:self-auto`,
+                          )}
+                        >
+                          {app.schedule ? (
+                            <SchedulePicker
+                              schedule={app.schedule}
+                              setSchedule={() => {
+                                alert(`todo`);
+                              }}
+                              small
+                            />
+                          ) : (
+                            <button
+                              onClick={() => {
+                                alert(`todo`);
+                              }}
+                              className="flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300 select-none"
+                            >
+                              <ClockIcon
+                                className={cx(`w-3.5 h-3.5 shrink-0 text-slate-500`)}
+                                strokeWidth={2.5}
+                              />
+                              <span className="text-sm text-slate-600 font-medium">
+                                Always active
+                              </span>
+                            </button>
+                          )}
+                          <button
+                            className="w-7 h-7 flex justify-center items-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-red-500 transition-colors duration-150 shrink-0"
+                            onClick={() => removeBlockedApp(app.id)}
+                          >
+                            <i className="fa fa-trash text-sm" />
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
-                <div className="flex gap-2 mt-4">
+                <form
+                  className="flex gap-2 mt-4"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    addNewBlockedApp();
+                  }}
+                >
                   <TextInput
                     key={`new-blocked-app-${blockedApps.length}`}
                     type="text"
@@ -371,14 +427,13 @@ const EditUser: React.FC<Props> = ({
                     size="small"
                     className="whitespace-nowrap"
                     color="secondary"
-                    type="button"
+                    type="submit"
                     disabled={!newBlockedAppIdentifier}
-                    onClick={addNewBlockedApp}
                   >
                     <i className="fa fa-plus mr-2" />
-                    Add new
+                    Add
                   </Button>
-                </div>
+                </form>
               </div>
             )}
             {/* /blocked apps */}

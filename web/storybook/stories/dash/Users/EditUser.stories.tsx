@@ -1,7 +1,7 @@
 import { EditUser } from '@dash/components';
 import type { StoryObj, Meta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { confirmableEntityAction, props, keychainProps } from '../../story-helpers';
+import { confirmableEntityAction, props, userKeychainProps } from '../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Users/EditUser', // eslint-disable-line
@@ -47,11 +47,92 @@ export const Default: Story = props({
   addNewBlockedApp: () => {},
   removeBlockedApp: () => {},
   newBlockedAppIdentifier: ``,
+  blockedApps: [
+    { id: `1`, identifier: `Notepad++` },
+    {
+      id: `2`,
+      identifier: `Xcode`,
+      schedule: {
+        mode: `active`,
+        days: {
+          sunday: true,
+          monday: true,
+          tuesday: true,
+          wednesday: true,
+          thursday: true,
+          friday: true,
+          saturday: true,
+        },
+        window: {
+          start: {
+            hour: 6,
+            minute: 0,
+          },
+          end: {
+            hour: 17,
+            minute: 30,
+          },
+        },
+      },
+    },
+    {
+      id: `3`,
+      identifier: `Really really long app name`,
+      schedule: {
+        mode: `active`,
+        days: {
+          sunday: true,
+          monday: true,
+          tuesday: true,
+          wednesday: true,
+          thursday: true,
+          friday: false,
+          saturday: true,
+        },
+        window: {
+          start: {
+            hour: 6,
+            minute: 0,
+          },
+          end: {
+            hour: 17,
+            minute: 30,
+          },
+        },
+      },
+    },
+  ],
   setAssignedKeychainSchedule: () => {},
   setAddingKeychainSchedule: () => {},
   keychains: [
-    keychainProps({ name: `HTC`, numKeys: 43, isPublic: true }),
-    keychainProps({ name: `Public Speaking`, numKeys: 7, isPublic: false }),
+    userKeychainProps({ name: `HTC`, numKeys: 43, isPublic: true }),
+    userKeychainProps({
+      name: `Public Speaking`,
+      numKeys: 7,
+      isPublic: false,
+      schedule: {
+        mode: `active`,
+        days: {
+          sunday: true,
+          monday: true,
+          tuesday: true,
+          wednesday: true,
+          thursday: true,
+          friday: false,
+          saturday: true,
+        },
+        window: {
+          start: {
+            hour: 0,
+            minute: 0,
+          },
+          end: {
+            hour: 23,
+            minute: 59,
+          },
+        },
+      },
+    }),
   ],
   devices: [
     {

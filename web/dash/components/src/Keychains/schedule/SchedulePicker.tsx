@@ -8,15 +8,17 @@ import WhatTime from './WhatTime';
 interface Props {
   schedule: RuleSchedule;
   setSchedule(schedule: RuleSchedule): void;
+  small?: boolean;
 }
 
-const KeychainSchedule: React.FC<Props> = ({ schedule, setSchedule }) => (
+const SchedulePicker: React.FC<Props> = ({ schedule, setSchedule, small }) => (
   <div
     className={cx(
-      `flex justify-center self-center items-center rounded-lg transition-colors duration-200 flex-wrap text-sm md:text-base`,
+      `flex justify-center self-center items-center rounded-lg transition-colors duration-200 flex-wrap`,
+      small ? `text-sm` : `text-sm @md/schedule:text-base`,
       isTouchDevice()
         ? `bg-transparent gap-1`
-        : `bg-transparent gap-1 min-[672px]:gap-0 min-[672px]:bg-slate-200/50 min-[672px]:hover:bg-transparent py-1 px-2`,
+        : `bg-transparent gap-1 @[672px]/schedule:gap-0 @[672px]/schedule:bg-slate-200/50 @[672px]/schedule:hover:bg-transparent py-1 px-2`,
     )}
   >
     <SpecifyingActiveOrInactive
@@ -44,7 +46,7 @@ const KeychainSchedule: React.FC<Props> = ({ schedule, setSchedule }) => (
   </div>
 );
 
-export default KeychainSchedule;
+export default SchedulePicker;
 
 function isTouchDevice(): boolean {
   return `ontouchstart` in window || navigator.maxTouchPoints > 0;

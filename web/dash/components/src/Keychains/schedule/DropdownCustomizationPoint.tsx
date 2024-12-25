@@ -46,9 +46,8 @@ const DropdownCustomizationPoint: React.FC<DropdownCustomizationPointProps> = ({
             ? `px-2 bg-white shadow-md pointer-events-none`
             : isTouchDevice
               ? `px-2 bg-slate-200/60`
-              : `px-2 bg-slate-200/60 hover:bg-slate-200 min-[672px]:px-[3px] min-[672px]:hover:px-2 min-[672px]:bg-transparent min-[672px]:hover:bg-slate-200`,
-
-          open && !isTouchDevice && `md:mx-4`,
+              : `px-2 bg-slate-200/60 hover:bg-slate-200 @[672px]/schedule:px-[3px] @[672px]/schedule:hover:px-2 @[672px]/schedule:bg-transparent @[672px]/schedule:hover:bg-slate-200`,
+          open && !isTouchDevice && `@md/schedule:mx-4`,
         )}
         onClick={() => setOpen(!open)}
       >
@@ -60,7 +59,7 @@ const DropdownCustomizationPoint: React.FC<DropdownCustomizationPointProps> = ({
               ? `w-4 ml-2 -rotate-180`
               : isTouchDevice
                 ? `w-4 ml-2`
-                : `w-4 ml-2 min-[672px]:w-0 min-[672px]:ml-0 min-[672px]:group-hover:w-4 min-[672px]:group-hover:ml-2`,
+                : `w-4 ml-2 @[672px]/schedule:w-0 @[672px]/schedule:ml-0 @[672px]/schedule:group-hover:w-4 @[672px]/schedule:group-hover:ml-2`,
           )}
           strokeWidth={2.5}
         />
