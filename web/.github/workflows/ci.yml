@@ -10,7 +10,7 @@ on:
 jobs:
   check:
     name: check
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-default
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
 
   storybook:
     name: storybook
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-default
     env:
       ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
     steps:
@@ -93,7 +93,7 @@ jobs:
 
   dashboard:
     name: dashboard
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-default
     env:
       VITE_API_ENDPOINT: ${{ secrets.STAGING_API_ENDPOINT }}
       VITE_TEST_ADMIN_CREDS: ${{ secrets.TEST_ADMIN_CREDS }}
@@ -136,7 +136,7 @@ jobs:
 
   site:
     name: site
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-default
     env:
       NEXT_PUBLIC_FORMS_ENDPOINT: /not-real
       NEXT_PUBLIC_TURNSTILE_SITEKEY: not-real
