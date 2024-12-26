@@ -2,20 +2,27 @@ import React from 'react';
 import cx from 'classnames';
 import { inflect } from '@shared/string';
 import { TextInput, Button, Toggle, Label } from '@shared/components';
-import { ClockIcon } from '@heroicons/react/24/outline';
-import type { RuleSchedule, PlainTimeWindow, BlockedApp } from '@dash/types';
-import type { Subcomponents, ConfirmableEntityAction, RequestState } from '@dash/types';
+import { type RuleSchedule, type PlainTimeWindow } from '@dash/types';
+import { Link } from 'react-router-dom';
+import { NoSymbolIcon } from '@heroicons/react/24/outline';
+import type {
+  Subcomponents,
+  ConfirmableEntityAction,
+  RequestState,
+  BlockedApp,
+} from '@dash/types';
 import type { UserKeychainSummary as Keychain } from '@dash/types';
 import KeychainCard from '../Keychains/KeychainCard';
 import { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
 import TimeInput from '../Forms/TimeInput';
 import BetaBadge from '../BetaBadge';
-import SchedulePicker from '../Keychains/schedule/SchedulePicker';
+import EmptyState from '../EmptyState';
 import AddKeychainDrawer from './AddKeychainDrawer';
 import ConnectDeviceModal from './ConnectDeviceModal';
 import UserDevice from './UserDevice';
 import AddDeviceInstructions from './AddDeviceInstructions';
+import BlockedAppCard from './BlockedAppCard';
 
 interface Props {
   id: string;
@@ -60,6 +67,7 @@ interface Props {
   updateNewBlockedAppIdentifier(identifier: string): unknown;
   addNewBlockedApp(): unknown;
   removeBlockedApp(id: UUID): unknown;
+  setBlockedAppSchedule(id: UUID, schedule?: RuleSchedule): unknown;
 }
 
 const EditUser: React.FC<Props> = ({
@@ -105,6 +113,7 @@ const EditUser: React.FC<Props> = ({
   updateNewBlockedAppIdentifier,
   addNewBlockedApp,
   removeBlockedApp,
+  setBlockedAppSchedule,
 }) => {
   if (isNew) {
     return (
@@ -340,72 +349,31 @@ const EditUser: React.FC<Props> = ({
                   <BetaBadge />
                 </div>
                 {blockedApps.length === 0 ? (
-                  <p className="text-center italic hidden text-slate-500 text-sm antialiased mt-2 mb-4">
-                    No apps are currently blocked
-                  </p>
+                  <div className="flex flex-col items-center justify-center p-8 bg-slate-100 mt-2 rounded-2xl shadow-inner">
+                    <NoSymbolIcon className="w-8 h-8 text-slate-300" strokeWidth={2} />
+                    <h3 className="text-lg font-semibold text-slate-700 mt-2 mb-1">
+                      No blocked apps
+                    </h3>
+                    <p className="text-slate-500 text-sm text-center">
+                      Read more about what blocked apps are{` `}
+                      <Link
+                        to="https://gertrude.app/docs/app-blocking"
+                        className="text-blue-500 font-medium underline"
+                      >
+                        here.
+                      </Link>
+                    </p>
+                  </div>
                 ) : (
                   <div className="gap-1.5 my-2 flex flex-col">
                     {blockedApps.map((app) => (
-                      <div
-                        className={cx(
-                          `p-2.5 border border-slate-200 bg-white rounded-xl flex items-center @container/schedule`,
-                          app.schedule &&
-                            `flex-col min-[1070px]:flex-row gap-2 min-[1070px]:gap-0`,
-                        )}
-                        key={app.id}
-                      >
-                        <div
-                          className={cx(
-                            `flex items-center gap-3 flex-grow`,
-                            app.schedule && `self-stretch min-[1070px]:self-auto`,
-                          )}
-                        >
-                          <i className="fa text-red-500 fa-ban p-1.5 bg-red-100/80 rounded-md" />
-                          <div className="flex-grow overflow-hidden relative h-8 flex items-center">
-                            <span className="font-semibold text-slate-600 whitespace-nowrap absolute left-0">
-                              {app.identifier}
-                            </span>
-                            <div className="absolute right-0 top-0 h-full w-10 bg-gradient-to-r from-transparent to-white" />
-                          </div>
-                        </div>
-                        <div
-                          className={cx(
-                            `flex items-center gap-2 ml-2 shrink-0`,
-                            app.schedule && `self-end min-[1070px]:self-auto`,
-                          )}
-                        >
-                          {app.schedule ? (
-                            <SchedulePicker
-                              schedule={app.schedule}
-                              setSchedule={() => {
-                                alert(`todo`);
-                              }}
-                              small
-                            />
-                          ) : (
-                            <button
-                              onClick={() => {
-                                alert(`todo`);
-                              }}
-                              className="flex items-center px-2 py-1 rounded-full transition-[background-color,transform] duration-200 active:scale-90 gap-1.5 bg-slate-200/50 hover:bg-slate-200 active:bg-slate-300 select-none"
-                            >
-                              <ClockIcon
-                                className={cx(`w-3.5 h-3.5 shrink-0 text-slate-500`)}
-                                strokeWidth={2.5}
-                              />
-                              <span className="text-sm text-slate-600 font-medium">
-                                Always active
-                              </span>
-                            </button>
-                          )}
-                          <button
-                            className="w-7 h-7 flex justify-center items-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-red-500 transition-colors duration-150 shrink-0"
-                            onClick={() => removeBlockedApp(app.id)}
-                          >
-                            <i className="fa fa-trash text-sm" />
-                          </button>
-                        </div>
-                      </div>
+                      <BlockedAppCard
+                        app={app}
+                        setSchedule={(schedule) =>
+                          setBlockedAppSchedule(app.id, schedule)
+                        }
+                        onDelete={() => removeBlockedApp(app.id)}
+                      />
                     ))}
                   </div>
                 )}
@@ -442,28 +410,42 @@ const EditUser: React.FC<Props> = ({
             <div className="mt-12 max-w-3xl">
               <h2 className="text-lg font-bold text-slate-700 mb-2">Keychains</h2>
               <div className="py-3 flex flex-col space-y-4">
-                {keychains.map((keychain) => (
-                  <KeychainCard
-                    mode="assign_to_child"
-                    schedule={keychain.schedule}
-                    key={keychain.id}
-                    name={keychain.name}
-                    description={keychain.description}
-                    numKeys={keychain.numKeys}
-                    isPublic={keychain.isPublic}
-                    onRemove={() => removeKeychain(keychain.id)}
-                    setSchedule={(schedule) =>
-                      setAssignedKeychainSchedule(keychain.id, schedule)
-                    }
+                {keychains.length === 0 ? (
+                  <EmptyState
+                    heading={`No keychains`}
+                    secondaryText={`By default, all internet access is blocked for this child until you assign a keychain.`}
+                    icon={`key`}
+                    buttonText={`Add keychain`}
+                    action={onAddKeychainClicked}
                   />
-                ))}
-                <button
-                  className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition-colors duration-100"
-                  onClick={onAddKeychainClicked}
-                >
-                  <i className="fa fa-plus mr-2" />
-                  Add keychain
-                </button>
+                ) : (
+                  <>
+                    {keychains.map((keychain) => (
+                      <KeychainCard
+                        mode="assign_to_child"
+                        schedule={keychain.schedule}
+                        key={keychain.id}
+                        name={keychain.name}
+                        description={keychain.description}
+                        numKeys={keychain.numKeys}
+                        isPublic={keychain.isPublic}
+                        onRemove={() => removeKeychain(keychain.id)}
+                        setSchedule={(schedule) =>
+                          setAssignedKeychainSchedule(keychain.id, schedule)
+                        }
+                      />
+                    ))}
+                    <Button
+                      type="button"
+                      onClick={onAddKeychainClicked}
+                      color="secondary"
+                      className="xs:self-end"
+                    >
+                      <i className="fa fa-plus mr-2" />
+                      Add keychain
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </>

@@ -1,4 +1,5 @@
 import { EditUser } from '@dash/components';
+import { defaults } from '@dash/types';
 import type { StoryObj, Meta } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { confirmableEntityAction, props, userKeychainProps } from '../../story-helpers';
@@ -47,33 +48,13 @@ export const Default: Story = props({
   addNewBlockedApp: () => {},
   removeBlockedApp: () => {},
   newBlockedAppIdentifier: ``,
+  setBlockedAppSchedule: () => {},
   blockedApps: [
     { id: `1`, identifier: `Notepad++` },
     {
       id: `2`,
       identifier: `Xcode`,
-      schedule: {
-        mode: `active`,
-        days: {
-          sunday: true,
-          monday: true,
-          tuesday: true,
-          wednesday: true,
-          thursday: true,
-          friday: true,
-          saturday: true,
-        },
-        window: {
-          start: {
-            hour: 6,
-            minute: 0,
-          },
-          end: {
-            hour: 17,
-            minute: 30,
-          },
-        },
-      },
+      schedule: defaults.ruleSchedule(),
     },
     {
       id: `3`,
@@ -110,28 +91,7 @@ export const Default: Story = props({
       name: `Public Speaking`,
       numKeys: 7,
       isPublic: false,
-      schedule: {
-        mode: `active`,
-        days: {
-          sunday: true,
-          monday: true,
-          tuesday: true,
-          wednesday: true,
-          thursday: true,
-          friday: false,
-          saturday: true,
-        },
-        window: {
-          start: {
-            hour: 0,
-            minute: 0,
-          },
-          end: {
-            hour: 23,
-            minute: 59,
-          },
-        },
-      },
+      schedule: defaults.ruleSchedule(),
     }),
   ],
   devices: [
@@ -151,6 +111,13 @@ export const Default: Story = props({
       status: `offline`,
     },
   ],
+});
+
+// @screenshot: xs,md
+export const EmptyStates: Story = props({
+  ...Default.args,
+  keychains: [],
+  blockedApps: [],
 });
 
 // @screenshot: xs,md
