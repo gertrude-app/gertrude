@@ -30,6 +30,7 @@ export type Action =
   | { type: 'updateNewBlockedAppIdentifier'; identifier: string }
   | { type: 'removeBlockedApp'; id: UUID }
   | { type: 'addNewBlockedApp' }
+  | { type: 'setBlockedAppSchedule'; id: UUID; schedule?: RuleSchedule }
   | { type: 'setKeychainSchedule'; id: UUID; schedule?: RuleSchedule }
   | { type: 'addKeychain'; keychain: UserKeychainSummary }
   | { type: 'setAddingKeychainSchedule'; schedule?: RuleSchedule }
@@ -85,6 +86,14 @@ function reducer(state: State, action: Action): State | undefined {
         (app) => app.id !== action.id,
       );
       return;
+    case `setBlockedAppSchedule`: {
+      if (!state.user.draft.blockedApps) return;
+      const blockedApp = state.user.draft.blockedApps.find((k) => k.id === action.id);
+      if (blockedApp) {
+        blockedApp.schedule = action.schedule;
+      }
+      return;
+    }
     case `removeKeychain`:
       state.user.draft.keychains = state.user.draft.keychains.filter(
         (keychain) => keychain.id !== action.id,

@@ -6,6 +6,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  interpolate-size: allow-keywords;
+}
+
 .undefined::after {
   content: 'Kiah you silly you forgot classnames again';
 }

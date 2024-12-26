@@ -15,7 +15,7 @@ import { Badge, Button, Loading } from '@shared/components';
 import { inflect } from '@shared/string';
 import { defaults, type KeychainSummary as Keychain } from '@dash/types';
 import type { RuleSchedule as Schedule, RequestState } from '@dash/types';
-import KeychainSchedule from '../Keychains/schedule/KeychainSchedule';
+import SchedulePicker from '../Keychains/schedule/SchedulePicker';
 
 interface Props {
   request?: RequestState<{ own: Keychain[]; public: Keychain[] }>;
@@ -302,10 +302,10 @@ const AddKeychainDrawer: React.FC<Props> = ({
           </div>
         </main>
         <footer className="border-t border-slate-200 bg-white relative">
-          <div className="flex justify-start items-center gap-2 sm:h-[52px] ScheduleContainer">
+          <div className="flex justify-start items-center gap-2 sm:h-[52px] ScheduleContainer @container/schedule">
             {schedule ? (
               <>
-                <KeychainSchedule schedule={schedule} setSchedule={setSchedule} />
+                <SchedulePicker schedule={schedule} setSchedule={setSchedule} />
                 <button
                   onClick={() => setSchedule(undefined)}
                   className="h-4 w-4 flex justify-center items-center rounded-full hover:scale-150 hover:bg-slate-200 transition-[transform,background-color] duration-200 group active:scale-100 active:bg-slate-300"

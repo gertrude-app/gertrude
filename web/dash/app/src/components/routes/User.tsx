@@ -155,6 +155,9 @@ const UserRoute: React.FC = () => {
       }
       addNewBlockedApp={() => dispatch({ type: `addNewBlockedApp` })}
       removeBlockedApp={(id) => dispatch({ type: `removeBlockedApp`, id })}
+      setBlockedAppSchedule={(id, schedule) =>
+        dispatch({ type: `setBlockedAppSchedule`, id, schedule })
+      }
     />
   );
 };

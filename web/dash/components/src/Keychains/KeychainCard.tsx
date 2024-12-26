@@ -6,7 +6,7 @@ import { ChevronDownIcon, ClockIcon, TrashIcon } from '@heroicons/react/24/outli
 import { UsersIcon } from '@heroicons/react/24/solid';
 import { defaults, type RuleSchedule as Schedule } from '@dash/types';
 import GradientIcon from '../GradientIcon';
-import KeychainSchedule from './schedule/KeychainSchedule';
+import SchedulePicker from './schedule/SchedulePicker';
 
 type Props =
   | ({
@@ -179,15 +179,12 @@ const KeychainCard: React.FC<Props> = ({
           {props.mode === `assign_to_child` && props.schedule && (
             <div
               className={cx(
-                `flex justify-center items-center gap-2 px-4`,
+                `flex justify-center items-center gap-2 px-4 @container/schedule`,
                 showSchedule ? ` mt-2` : `h-0 opacity-0 pointer-events-none mt-0`,
               )}
             >
               <ClockIcon className="w-4 text-slate-400 shrink-0" strokeWidth={2.5} />
-              <KeychainSchedule
-                schedule={props.schedule}
-                setSchedule={props.setSchedule}
-              />
+              <SchedulePicker schedule={props.schedule} setSchedule={props.setSchedule} />
               <button
                 onClick={() => {
                   props.setSchedule(undefined);

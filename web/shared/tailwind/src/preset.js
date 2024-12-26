@@ -1,7 +1,7 @@
 const defaultTheme = require(`tailwindcss/defaultTheme`);
 
 module.exports = {
-  plugins: [require(`@tailwindcss/forms`)],
+  plugins: [require(`@tailwindcss/forms`), require(`@tailwindcss/container-queries`)],
   darkMode: `class`,
   theme: {
     screens: {

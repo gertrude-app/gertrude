@@ -1,7 +1,12 @@
 import { env } from '@shared/components';
 import { time } from '@shared/datetime';
 import type { ActivityFeedItem } from '@dash/components';
-import type { ConfirmableEntityAction, KeychainSummary, Key } from '@dash/types';
+import type {
+  ConfirmableEntityAction,
+  KeychainSummary,
+  Key,
+  UserKeychainSummary,
+} from '@dash/types';
 import type { StaticImageData } from 'next/image';
 import Placeholder400x600 from './static/placeholder/400x600.png';
 import Placeholder300x200 from './static/placeholder/300x200.png';
@@ -22,6 +27,15 @@ export function keychainProps(override: Partial<KeychainSummary> = {}): Keychain
     description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
     numKeys: 232,
     authorId: `authorId-${Math.random()}`,
+    ...override,
+  };
+}
+
+export function userKeychainProps(
+  override: Partial<UserKeychainSummary> = {},
+): UserKeychainSummary {
+  return {
+    ...keychainProps(),
     ...override,
   };
 }
