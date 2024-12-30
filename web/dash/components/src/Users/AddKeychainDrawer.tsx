@@ -8,10 +8,11 @@ import {
   ClockIcon,
   KeyIcon,
   MagnifyingGlassIcon,
+  PaperAirplaneIcon,
   TrashIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { Badge, Button, Loading } from '@shared/components';
+import { Badge, Button, Loading, TextInput } from '@shared/components';
 import { inflect } from '@shared/string';
 import { defaults, type KeychainSummary as Keychain } from '@dash/types';
 import type { RuleSchedule as Schedule, RequestState } from '@dash/types';
@@ -46,6 +47,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
   const [page, setPage] = useState(1);
   const [prevSelected, setPrevSelected] = useState<Keychain | undefined>(undefined);
   const [showNew, setShowNew] = useState(false);
+  const [pubKeychainRequest, setPubKeychainRequest] = useState(``);
 
   const keychainsToDisplay =
     request?.state === `succeeded`
@@ -83,7 +85,9 @@ const AddKeychainDrawer: React.FC<Props> = ({
             <Loading />
           </div>
         );
-      case request?.state === `succeeded` && searchQuery.length > 0:
+      case request?.state === `succeeded` &&
+        searchQuery.length > 0 &&
+        whichKeychains === `own`:
         return (
           <div className="w-full h-full flex justify-center items-center">
             <div className="flex flex-col items-center p-6 sm:p-12 bg-slate-100 rounded-3xl">
@@ -94,6 +98,41 @@ const AddKeychainDrawer: React.FC<Props> = ({
                 Hmm, we couldn't find that keychain
               </h2>
             </div>
+          </div>
+        );
+      case request?.state === `succeeded` &&
+        searchQuery.length > 0 &&
+        whichKeychains === `public`:
+        return (
+          <div className="flex flex-col justify-end lg:justify-center lg:mt-4 xs:items-center h-full max-w-md mx-auto w-full">
+            <h2 className="text-xl font-semibold hidden sm:block">
+              Want to request a public keychain?
+            </h2>
+            <h3 className="text-slate-500 text-center mt-2 text-sm hidden sm:block">
+              It looks like we don't have a public keychain for{` `}
+              <b className="font-semibold text-slate-700">{searchQuery}</b>, but you can
+              request for it to be added.
+            </h3>
+            <h2 className="font-semibold sm:hidden text-center">
+              Looks like that keychain doesn't exist
+            </h2>
+            <TextInput
+              type="textarea"
+              value={pubKeychainRequest}
+              setValue={setPubKeychainRequest}
+              placeholder="Describe what you're looking for..."
+              rows={2}
+              className="my-2 xs:my-4"
+            />
+            <Button
+              type="button"
+              onClick={() => alert(`todo`)}
+              color="secondary"
+              size="small"
+            >
+              <i className="fa-solid fa-paper-plane mr-2" />
+              Request keychain
+            </Button>
           </div>
         );
       case request?.state === `succeeded` &&
