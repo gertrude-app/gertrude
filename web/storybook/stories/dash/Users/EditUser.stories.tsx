@@ -111,6 +111,8 @@ export const Default: Story = props({
       status: `offline`,
     },
   ],
+  requestPublicKeychainRequest: { state: `idle` },
+  onRequestPublicKeychain: () => {},
 });
 
 // @screenshot: xs,md

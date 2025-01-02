@@ -4,6 +4,7 @@ import { Loading, ApiErrorMessage } from '@dash/components';
 import React, { useEffect, useMemo, useReducer } from 'react';
 import { EditUser } from '@dash/components';
 import { defaults, type User } from '@dash/types';
+import type { RequestPublicKeychain } from '@dash/types';
 import * as empty from '../../lib/empty';
 import { isDirty } from '../../lib/helpers';
 import Current from '../../environment';
@@ -55,6 +56,13 @@ const UserRoute: React.FC = () => {
       invalidating: [queryKey],
       toast: `save:user`,
     },
+  );
+
+  const requestPublicKeychain = useMutation((input: RequestPublicKeychain.Input) =>
+    Current.api.requestPublicKeychain({
+      searchQuery: input.searchQuery,
+      description: input.description,
+    }),
   );
 
   const newUserId = useMemo(() => uuid(), []);
@@ -158,6 +166,10 @@ const UserRoute: React.FC = () => {
       setBlockedAppSchedule={(id, schedule) =>
         dispatch({ type: `setBlockedAppSchedule`, id, schedule })
       }
+      onRequestPublicKeychain={(searchQuery: string, description: string) =>
+        requestPublicKeychain.mutate({ searchQuery, description })
+      }
+      requestPublicKeychainRequest={ReqState.fromMutation(requestPublicKeychain)}
     />
   );
 };

@@ -30,6 +30,7 @@ export * from './pairs/LogEvent';
 export * from './pairs/Login';
 export * from './pairs/LoginMagicLink';
 export * from './pairs/RequestMagicLink';
+export * from './pairs/RequestPublicKeychain';
 export * from './pairs/ResetPassword';
 export * from './pairs/SaveConferenceEmail';
 export * from './pairs/SaveDevice';

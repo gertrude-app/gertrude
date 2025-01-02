@@ -211,6 +211,9 @@ const noopClient: ApiClient = {
   verifySignupEmail: async () => {
     return Result.success({ token: ``, adminId: `` });
   },
+  requestPublicKeychain: async () => {
+    return Result.success({ success: true });
+  },
 };
 
 export default noopClient;

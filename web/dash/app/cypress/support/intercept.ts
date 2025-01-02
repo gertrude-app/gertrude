@@ -93,6 +93,10 @@ export function interceptPql(
   slug: `RequestMagicLink`,
   output: T.RequestMagicLink.Output,
 ): void;
+export function interceptPql(
+  slug: `RequestPublicKeychain`,
+  output: T.RequestPublicKeychain.Output,
+): void;
 export function interceptPql(slug: `ResetPassword`, output: T.ResetPassword.Output): void;
 export function interceptPql(
   slug: `SaveConferenceEmail`,
@@ -170,6 +174,7 @@ export function forcePqlErr(
     | 'Login'
     | 'LoginMagicLink'
     | 'RequestMagicLink'
+    | 'RequestPublicKeychain'
     | 'ResetPassword'
     | 'SaveConferenceEmail'
     | 'SaveDevice'

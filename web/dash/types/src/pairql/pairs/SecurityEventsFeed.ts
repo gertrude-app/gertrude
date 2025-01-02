@@ -8,8 +8,8 @@ export namespace SecurityEventsFeed {
         case: 'child';
         id: UUID;
         childId: UUID;
-        deviceId: UUID;
         childName: string;
+        deviceId: UUID;
         deviceName: string;
         event: string;
         detail?: string;

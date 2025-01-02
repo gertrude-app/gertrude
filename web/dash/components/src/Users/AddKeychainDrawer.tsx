@@ -15,7 +15,7 @@ import {
 import { Badge, Button, Loading, TextInput } from '@shared/components';
 import { inflect } from '@shared/string';
 import { defaults, type KeychainSummary as Keychain } from '@dash/types';
-import type { RuleSchedule as Schedule, RequestState } from '@dash/types';
+import type { RuleSchedule as Schedule, RequestState, SuccessOutput } from '@dash/types';
 import SchedulePicker from '../Keychains/schedule/SchedulePicker';
 
 interface Props {
@@ -28,6 +28,8 @@ interface Props {
   onConfirm(): unknown;
   existingKeychains: Keychain[];
   userName: string;
+  onRequestPublicKeychain(searchQuery: string, description: string): unknown;
+  requestPublicKeychainRequest: RequestState<SuccessOutput>;
 }
 
 const AddKeychainDrawer: React.FC<Props> = ({
@@ -40,6 +42,8 @@ const AddKeychainDrawer: React.FC<Props> = ({
   userName,
   schedule,
   setSchedule,
+  onRequestPublicKeychain,
+  requestPublicKeychainRequest,
 }) => {
   const shown = request && request.state !== `idle`;
   const [whichKeychains, setWhichKeychains] = useState<'own' | 'public'>(`own`);
@@ -49,6 +53,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
   const [showNew, setShowNew] = useState(false);
   const [pubKeychainRequest, setPubKeychainRequest] = useState(``);
   const [showWarningModal, setShowWarningModal] = useState(false);
+  const [warning, setWarning] = useState<string | undefined>(undefined);
 
   const keychainsToDisplay =
     request?.state === `succeeded`
@@ -104,38 +109,74 @@ const AddKeychainDrawer: React.FC<Props> = ({
       case request?.state === `succeeded` &&
         searchQuery.length > 0 &&
         whichKeychains === `public`:
-        return (
-          <div className="flex flex-col justify-end lg:justify-center lg:mt-4 xs:items-center h-full max-w-md mx-auto w-full">
-            <h2 className="text-xl font-semibold hidden sm:block">
-              Want to request a public keychain?
-            </h2>
-            <h3 className="text-slate-500 text-center mt-2 text-sm hidden sm:block">
-              It looks like we don't have a public keychain for{` `}
-              <b className="font-semibold text-slate-700">{searchQuery}</b>, but you can
-              request for it to be added.
-            </h3>
-            <h2 className="font-semibold sm:hidden text-center">
-              Looks like that keychain doesn't exist
-            </h2>
-            <TextInput
-              type="textarea"
-              value={pubKeychainRequest}
-              setValue={setPubKeychainRequest}
-              placeholder="Describe what you're looking for..."
-              rows={2}
-              className="my-2 xs:my-4"
-            />
-            <Button
-              type="button"
-              onClick={() => alert(`todo`)}
-              color="secondary"
-              size="small"
-            >
-              <i className="fa-solid fa-paper-plane mr-2" />
-              Request keychain
-            </Button>
-          </div>
-        );
+        if (
+          requestPublicKeychainRequest.state === `idle` ||
+          requestPublicKeychainRequest.state === `ongoing`
+        ) {
+          return (
+            <div className="flex flex-col justify-end lg:justify-center lg:mt-4 xs:items-center h-full max-w-md mx-auto w-full">
+              <h2 className="text-xl font-semibold hidden sm:block">
+                Want to request a public keychain?
+              </h2>
+              <h3 className="text-slate-500 text-center mt-2 text-sm hidden sm:block">
+                It looks like we don't have a public keychain for{` `}
+                <b className="font-semibold text-slate-700">{searchQuery}</b>, but you can
+                request for it to be added.
+              </h3>
+              <h2 className="font-semibold sm:hidden text-center">
+                Looks like that keychain doesn't exist
+              </h2>
+              <TextInput
+                type="textarea"
+                value={pubKeychainRequest}
+                setValue={setPubKeychainRequest}
+                placeholder="Describe what you're looking for..."
+                rows={2}
+                className="my-2 xs:my-4"
+                noResize
+                disabled={requestPublicKeychainRequest.state === `ongoing`}
+              />
+              <div className="h-10 w-full flex justify-center">
+                {requestPublicKeychainRequest.state === `ongoing` ? (
+                  <i className="fa-solid fa-spinner animate-spin text-2xl text-slate-500" />
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      onRequestPublicKeychain(searchQuery, pubKeychainRequest)
+                    }
+                    color="secondary"
+                    size="small"
+                    disabled={!pubKeychainRequest}
+                    className="w-full"
+                  >
+                    <i className="fa-solid fa-paper-plane mr-2" />
+                    Request keychain
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
+        } else if (requestPublicKeychainRequest.state === `succeeded`) {
+          return (
+            <div className="w-full h-full flex justify-center items-center">
+              <div className="bg-green-100 text-green-700 p-6 rounded-2xl text-lg font-medium">
+                We received your request!
+              </div>
+            </div>
+          );
+        } else {
+          return (
+            <div className="w-full h-full flex justify-center items-center">
+              <div className="bg-red-100 p-6 rounded-2xl font-medium flex flex-col items-center">
+                <h2 className="text-lg text-red-700">Hmm, something went wrong</h2>
+                <p className="text-center text-red-700/70">
+                  Try refreshing the page and trying again.
+                </p>
+              </div>
+            </div>
+          );
+        }
       case request?.state === `succeeded` &&
         whichKeychains === `own` &&
         keychainsToDisplay.length === 0:
@@ -221,10 +262,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
                 className="w-7 h-7 text-red-500 shrink-0"
                 strokeWidth={2}
               />
-              <p className="text-red-600 font-medium">
-                This keychain is known to cause cancer and reproductive harm in
-                California.
-              </p>
+              <p className="text-red-600 font-medium">{warning}</p>
             </main>
           </div>
         </div>
@@ -304,10 +342,11 @@ const AddKeychainDrawer: React.FC<Props> = ({
                     key={k.id}
                     keychain={k}
                     selected={selected}
-                    warning="Known to cause cancer and reproductive harm in the state of California" // TODO: make this real
+                    warning={k.warning}
                     setPrevSelected={setPrevSelected}
                     setShowNew={setShowNew}
                     onSelect={onSelect}
+                    setWarning={setWarning}
                   />
                 ))
               : emptyState}
@@ -352,10 +391,11 @@ const AddKeychainDrawer: React.FC<Props> = ({
                         key={k.id}
                         keychain={k}
                         selected={selected}
-                        warning="Known to cause cancer and reproductive harm in the state of California" // TODO: make this real
+                        warning={k.warning}
                         setPrevSelected={setPrevSelected}
                         setShowNew={setShowNew}
                         onSelect={onSelect}
+                        setWarning={setWarning}
                       />
                     ))}
                   </div>
@@ -426,7 +466,8 @@ const AddKeychainDrawer: React.FC<Props> = ({
                   type="red"
                   className={cx(
                     `transition-[margin-right,transform,filter,opacity] duration-300`,
-                    !selected?.isPublic && `-translate-y-4 -mr-[110px] blur-sm opacity-0`, // TODO: `!selected?.isPublic` should be `!selected?.warning`
+                    !selected?.warning &&
+                      `-translate-y-4 -mr-[110px] blur-sm opacity-0 pointer-events-none`,
                   )}
                   onClick={() => setShowWarningModal(true)}
                 >
@@ -515,6 +556,7 @@ interface SelectableKeychainProps {
   setPrevSelected(prevSelected: Keychain | undefined): unknown;
   setShowNew(showNew: boolean): unknown;
   onSelect(keychain: Keychain): unknown;
+  setWarning(warning: string | undefined): unknown;
 }
 
 const SelectableKeychain: React.FC<SelectableKeychainProps> = ({
@@ -523,6 +565,7 @@ const SelectableKeychain: React.FC<SelectableKeychainProps> = ({
   warning,
   setPrevSelected,
   setShowNew,
+  setWarning,
   onSelect,
 }) => {
   const kIsSelected = selected?.id === keychain.id;
@@ -536,6 +579,7 @@ const SelectableKeychain: React.FC<SelectableKeychainProps> = ({
       onClick={() => {
         setPrevSelected(selected);
         setShowNew(false);
+        setWarning(warning);
         onSelect(keychain);
       }}
     >

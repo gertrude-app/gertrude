@@ -10,6 +10,7 @@ import type {
   ConfirmableEntityAction,
   RequestState,
   BlockedApp,
+  SuccessOutput,
 } from '@dash/types';
 import type { UserKeychainSummary as Keychain } from '@dash/types';
 import KeychainCard from '../Keychains/KeychainCard';
@@ -68,6 +69,8 @@ interface Props {
   addNewBlockedApp(): unknown;
   removeBlockedApp(id: UUID): unknown;
   setBlockedAppSchedule(id: UUID, schedule?: RuleSchedule): unknown;
+  onRequestPublicKeychain(searchQuery: string, description: string): unknown;
+  requestPublicKeychainRequest: RequestState<SuccessOutput>;
 }
 
 const EditUser: React.FC<Props> = ({
@@ -114,6 +117,8 @@ const EditUser: React.FC<Props> = ({
   addNewBlockedApp,
   removeBlockedApp,
   setBlockedAppSchedule,
+  onRequestPublicKeychain,
+  requestPublicKeychainRequest,
 }) => {
   if (isNew) {
     return (
@@ -169,6 +174,8 @@ const EditUser: React.FC<Props> = ({
         userName={name}
         schedule={keychainSchedule}
         setSchedule={setAddingKeychainSchedule}
+        onRequestPublicKeychain={onRequestPublicKeychain}
+        requestPublicKeychainRequest={requestPublicKeychainRequest}
       />
       <ConfirmDeleteEntity
         type="connection to computer"
