@@ -31,6 +31,7 @@ export default class HealthChecker {
       ...this.filterItems,
       this.screenRecordingPermission,
       this.keystrokeRecordingPermission,
+      this.fullDiskAccessPermission,
       this.notificationsPermission,
       this.macOsUserType,
       this.accountStatus,
@@ -130,6 +131,31 @@ export default class HealthChecker {
           icon: `cog`,
           label: `Fix permission`,
           action: `fixKeystrokeRecordingPermissionClicked`,
+        },
+      };
+    }
+  }
+
+  public get fullDiskAccessPermission(): ItemData | undefined {
+    if (this.data.fullDiskAccessPermissionOk === undefined) {
+      return {
+        title: `Full disk access permission`,
+        state: `checking`,
+      };
+    } else if (this.data.fullDiskAccessPermissionOk) {
+      return {
+        title: `Full disk access permission`,
+        state: `ok`,
+      };
+    } else {
+      return {
+        title: `Full disk access permission`,
+        state: `fail`,
+        message: `Gertrude needs permission to stop warnings when screenshots are taken`,
+        button: {
+          icon: `cog`,
+          label: `Grant permission`,
+          action: `fixFullDiskAccessPermissionClicked`,
         },
       };
     }
