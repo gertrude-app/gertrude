@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { SuccessOutput, ReleaseChannel } from '../shared';
+import type { ReleaseChannel, SuccessOutput } from '../shared';
 
 export namespace SaveDevice {
   export interface Input {

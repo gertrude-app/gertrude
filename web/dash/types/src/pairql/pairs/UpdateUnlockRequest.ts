@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { SuccessOutput, RequestStatus } from '../shared';
+import type { RequestStatus, SuccessOutput } from '../shared';
 
 export namespace UpdateUnlockRequest {
   export interface Input {

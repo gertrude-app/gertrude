@@ -8,13 +8,14 @@ import {
   ClockIcon,
   KeyIcon,
   MagnifyingGlassIcon,
+  ShieldExclamationIcon,
   TrashIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { Badge, Button, Loading } from '@shared/components';
+import { Badge, Button, Loading, TextInput } from '@shared/components';
 import { inflect } from '@shared/string';
 import { defaults, type KeychainSummary as Keychain } from '@dash/types';
-import type { RuleSchedule as Schedule, RequestState } from '@dash/types';
+import type { RuleSchedule as Schedule, RequestState, SuccessOutput } from '@dash/types';
 import SchedulePicker from '../Keychains/schedule/SchedulePicker';
 
 interface Props {
@@ -27,6 +28,8 @@ interface Props {
   onConfirm(): unknown;
   existingKeychains: Keychain[];
   userName: string;
+  onRequestPublicKeychain(searchQuery: string, description: string): unknown;
+  requestPublicKeychainRequest: RequestState<SuccessOutput>;
 }
 
 const AddKeychainDrawer: React.FC<Props> = ({
@@ -39,6 +42,8 @@ const AddKeychainDrawer: React.FC<Props> = ({
   userName,
   schedule,
   setSchedule,
+  onRequestPublicKeychain,
+  requestPublicKeychainRequest,
 }) => {
   const shown = request && request.state !== `idle`;
   const [whichKeychains, setWhichKeychains] = useState<'own' | 'public'>(`own`);
@@ -46,6 +51,9 @@ const AddKeychainDrawer: React.FC<Props> = ({
   const [page, setPage] = useState(1);
   const [prevSelected, setPrevSelected] = useState<Keychain | undefined>(undefined);
   const [showNew, setShowNew] = useState(false);
+  const [pubKeychainRequest, setPubKeychainRequest] = useState(``);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [warning, setWarning] = useState<string | undefined>(undefined);
 
   const keychainsToDisplay =
     request?.state === `succeeded`
@@ -83,7 +91,9 @@ const AddKeychainDrawer: React.FC<Props> = ({
             <Loading />
           </div>
         );
-      case request?.state === `succeeded` && searchQuery.length > 0:
+      case request?.state === `succeeded` &&
+        searchQuery.length > 0 &&
+        whichKeychains === `own`:
         return (
           <div className="w-full h-full flex justify-center items-center">
             <div className="flex flex-col items-center p-6 sm:p-12 bg-slate-100 rounded-3xl">
@@ -96,6 +106,77 @@ const AddKeychainDrawer: React.FC<Props> = ({
             </div>
           </div>
         );
+      case request?.state === `succeeded` &&
+        searchQuery.length > 0 &&
+        whichKeychains === `public`:
+        if (
+          requestPublicKeychainRequest.state === `idle` ||
+          requestPublicKeychainRequest.state === `ongoing`
+        ) {
+          return (
+            <div className="flex flex-col justify-end lg:justify-center lg:mt-4 xs:items-center h-full max-w-md mx-auto w-full">
+              <h2 className="text-xl font-semibold hidden sm:block">
+                Want to request a public keychain?
+              </h2>
+              <h3 className="text-slate-500 text-center mt-2 text-sm hidden sm:block">
+                It looks like we don't have a public keychain for{` `}
+                <b className="font-semibold text-slate-700">{searchQuery}</b>, but you can
+                request for it to be added.
+              </h3>
+              <h2 className="font-semibold sm:hidden text-center">
+                Looks like that keychain doesn't exist
+              </h2>
+              <TextInput
+                type="textarea"
+                value={pubKeychainRequest}
+                setValue={setPubKeychainRequest}
+                placeholder="Describe what you're looking for..."
+                rows={2}
+                className="my-2 xs:my-4"
+                noResize
+                disabled={requestPublicKeychainRequest.state === `ongoing`}
+              />
+              <div className="h-10 w-full flex justify-center">
+                {requestPublicKeychainRequest.state === `ongoing` ? (
+                  <i className="fa-solid fa-spinner animate-spin text-2xl text-slate-500" />
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      onRequestPublicKeychain(searchQuery, pubKeychainRequest)
+                    }
+                    color="secondary"
+                    size="small"
+                    disabled={!pubKeychainRequest}
+                    className="w-full"
+                  >
+                    <i className="fa-solid fa-paper-plane mr-2" />
+                    Request keychain
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
+        } else if (requestPublicKeychainRequest.state === `succeeded`) {
+          return (
+            <div className="w-full h-full flex justify-center items-center">
+              <div className="bg-green-100 text-green-700 p-6 rounded-2xl text-lg font-medium">
+                We received your request!
+              </div>
+            </div>
+          );
+        } else {
+          return (
+            <div className="w-full h-full flex justify-center items-center">
+              <div className="bg-red-100 p-6 rounded-2xl font-medium flex flex-col items-center">
+                <h2 className="text-lg text-red-700">Hmm, something went wrong</h2>
+                <p className="text-center text-red-700/70">
+                  Try refreshing the page and trying again.
+                </p>
+              </div>
+            </div>
+          );
+        }
       case request?.state === `succeeded` &&
         whichKeychains === `own` &&
         keychainsToDisplay.length === 0:
@@ -146,11 +227,45 @@ const AddKeychainDrawer: React.FC<Props> = ({
     >
       <div
         className={cx(
-          `bg-white pb-12 rounded-3xl lg:rounded-t-[40px] shadow-2xl shadow-black/30 transition-transform duration-300 flex-grow max-w-[1000px] Drawer`,
+          `bg-white pb-12 rounded-3xl lg:rounded-t-[40px] shadow-2xl shadow-black/30 transition-transform duration-300 flex-grow max-w-[1000px] Drawer relative overflow-hidden`,
           !shown ? `translate-y-[100%]` : `translate-y-12`,
         )}
         onClick={(e) => e.stopPropagation()}
       >
+        <div
+          className={cx(
+            `absolute w-full h-full left-0 top-0 z-50 flex justify-center items-center transition-[opacity,backdrop-filter] duration-200`,
+            showWarningModal
+              ? `bg-slate-200/60 backdrop-blur-sm`
+              : `pointer-events-none opacity-0`,
+          )}
+          onClick={() => setShowWarningModal(false)}
+        >
+          <div
+            className={cx(
+              `bg-white rounded-2xl border border-red-200 shadow-xl transition-transform duration-200 max-w-md overflow-hidden shadow-red-700/10 mx-3`,
+              !showWarningModal && `translate-y-4`,
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <header className="border-b border-red-200 p-2 flex justify-between items-center bg-red-100">
+              <span className="ml-2 font-medium text-red-600">Keychain warning</span>
+              <button
+                className="bg-red-200/80 w-6 h-6 rounded-full flex justify-center items-center hover:bg-red-300 transition-[background-color,transform] duration-150 active:bg-red-400/70 active:scale-90"
+                onClick={() => setShowWarningModal(false)}
+              >
+                <XMarkIcon className="w-4 h-4 text-red-500" strokeWidth={2} />
+              </button>
+            </header>
+            <main className="p-4 xs:p-6 sm:p-8 flex gap-4">
+              <ShieldExclamationIcon
+                className="w-7 h-7 text-red-500 shrink-0"
+                strokeWidth={2}
+              />
+              <p className="text-red-600 font-medium">{warning}</p>
+            </main>
+          </div>
+        </div>
         <header className="px-3.5 lg:px-5 py-2 lg:py-4 flex items-center justify-between border-b border-slate-200">
           <div className="flex items-center gap-4">
             <div className="w-8 lg:w-10 h-8 lg:h-10 rounded-full bg-slate-200 flex justify-center items-center border border-slate-300">
@@ -227,9 +342,11 @@ const AddKeychainDrawer: React.FC<Props> = ({
                     key={k.id}
                     keychain={k}
                     selected={selected}
+                    warning={k.warning}
                     setPrevSelected={setPrevSelected}
                     setShowNew={setShowNew}
                     onSelect={onSelect}
+                    setWarning={setWarning}
                   />
                 ))
               : emptyState}
@@ -274,9 +391,11 @@ const AddKeychainDrawer: React.FC<Props> = ({
                         key={k.id}
                         keychain={k}
                         selected={selected}
+                        warning={k.warning}
                         setPrevSelected={setPrevSelected}
                         setShowNew={setShowNew}
                         onSelect={onSelect}
+                        setWarning={setWarning}
                       />
                     ))}
                   </div>
@@ -333,7 +452,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
           </div>
           <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 xs:gap-8">
             <div className="flex flex-col flex-grow">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 z-10">
                 <Badge
                   type="green"
                   className={cx(
@@ -342,6 +461,18 @@ const AddKeychainDrawer: React.FC<Props> = ({
                   )}
                 >
                   Public
+                </Badge>
+                <Badge
+                  type="red"
+                  className={cx(
+                    `transition-[margin-right,transform,filter,opacity] duration-300`,
+                    !selected?.warning &&
+                      `-translate-y-4 -mr-[110px] blur-sm opacity-0 pointer-events-none`,
+                  )}
+                  onClick={() => setShowWarningModal(true)}
+                >
+                  <ShieldExclamationIcon className="w-4 mr-1" strokeWidth={2.5} />
+                  Warning
                 </Badge>
                 <span className="text-slate-500 text-sm sm:text-base">
                   {selected?.numKeys}
@@ -421,16 +552,20 @@ export default AddKeychainDrawer;
 interface SelectableKeychainProps {
   keychain: Keychain;
   selected: Keychain | undefined;
+  warning?: string;
   setPrevSelected(prevSelected: Keychain | undefined): unknown;
   setShowNew(showNew: boolean): unknown;
   onSelect(keychain: Keychain): unknown;
+  setWarning(warning: string | undefined): unknown;
 }
 
 const SelectableKeychain: React.FC<SelectableKeychainProps> = ({
   keychain,
   selected,
+  warning,
   setPrevSelected,
   setShowNew,
+  setWarning,
   onSelect,
 }) => {
   const kIsSelected = selected?.id === keychain.id;
@@ -444,6 +579,7 @@ const SelectableKeychain: React.FC<SelectableKeychainProps> = ({
       onClick={() => {
         setPrevSelected(selected);
         setShowNew(false);
+        setWarning(warning);
         onSelect(keychain);
       }}
     >
@@ -472,7 +608,17 @@ const SelectableKeychain: React.FC<SelectableKeychainProps> = ({
         )}
       </div>
       <div className="border-t border-slate-200 pl-1.5 py-1.5 pr-2 flex justify-between items-center">
-        {keychain.isPublic ? <Badge type="green">Public</Badge> : <div />}
+        <div className="flex items-center gap-2">
+          {keychain.isPublic && <Badge type="green">Public</Badge>}
+          {warning && (
+            <div className="w-[22px] h-[22px] bg-red-200/80 rounded-full flex justify-center items-center">
+              <ShieldExclamationIcon
+                className="w-[18px] h-[18px] text-red-500"
+                strokeWidth={2.5}
+              />
+            </div>
+          )}
+        </div>
         <span className="text-sm text-slate-400">
           {keychain.numKeys} {inflect(`key`, keychain.numKeys)}
         </span>

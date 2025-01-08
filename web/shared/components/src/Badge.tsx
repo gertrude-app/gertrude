@@ -6,9 +6,10 @@ type Props = {
   size?: 'large' | 'medium' | 'small';
   type: 'green' | 'ok' | 'warning' | 'yellow' | 'red' | 'error' | 'blue' | 'info';
   children: React.ReactNode;
+  onClick?: () => void;
 };
 
-const Badge: React.FC<Props> = ({ type, className, children, size }) => {
+const Badge: React.FC<Props> = ({ type, className, children, size, onClick }) => {
   let colors = ``;
   switch (type) {
     case `green`:
@@ -33,6 +34,7 @@ const Badge: React.FC<Props> = ({ type, className, children, size }) => {
     <div
       className={cx(
         `max-w-fit flex justify-center items-center font-medium`,
+        onClick && `cursor-pointer hover:scale-105 transition-transform duration-150`,
         {
           'text-xs px-[12px] py-[2px] rounded-md': size === `small`,
           'text-sm px-[14px] py-[2.5px] rounded-lg': size === `medium` || !size,
@@ -41,6 +43,7 @@ const Badge: React.FC<Props> = ({ type, className, children, size }) => {
         colors,
         className,
       )}
+      onClick={onClick}
     >
       {children}
     </div>

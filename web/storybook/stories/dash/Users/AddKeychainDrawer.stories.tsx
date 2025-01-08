@@ -23,6 +23,8 @@ export const Loading: Story = props({
   onConfirm: () => {},
   existingKeychains: [],
   userName: `Little Jimmy`,
+  requestPublicKeychainRequest: { state: `idle` },
+  onRequestPublicKeychain: () => {},
 });
 
 export const Failed: Story = props({

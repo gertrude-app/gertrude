@@ -245,6 +245,16 @@ export const liveClient = {
     );
   },
 
+  requestPublicKeychain(
+    input: T.RequestPublicKeychain.Input,
+  ): Promise<T.Result<T.RequestPublicKeychain.Output>> {
+    return query<T.RequestPublicKeychain.Input, T.RequestPublicKeychain.Output>(
+      input,
+      `admin`,
+      `RequestPublicKeychain`,
+    );
+  },
+
   resetPassword(input: T.ResetPassword.Input): Promise<T.Result<T.ResetPassword.Output>> {
     return query<T.ResetPassword.Input, T.ResetPassword.Output>(
       input,
@@ -451,6 +461,9 @@ export const throwingClient: ApiClient = {
   },
   requestMagicLink: () => {
     throw new Error(`ApiClient.requestMagicLink() not implemented`);
+  },
+  requestPublicKeychain: () => {
+    throw new Error(`ApiClient.requestPublicKeychain() not implemented`);
   },
   resetPassword: () => {
     throw new Error(`ApiClient.resetPassword() not implemented`);

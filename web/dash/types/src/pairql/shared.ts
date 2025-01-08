@@ -71,6 +71,7 @@ export interface KeychainSummary {
   authorId: UUID;
   name: string;
   description?: string;
+  warning?: string;
   isPublic: boolean;
   numKeys: number;
 }
