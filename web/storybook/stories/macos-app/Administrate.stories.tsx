@@ -136,6 +136,7 @@ export const Advanced: Story = props({
     pairqlEndpointDefault: `https://api.getrude.app/pairql`,
     websocketEndpointDefault: `https://api.getrude.app/websocket-app`,
     appcastEndpointDefault: `https://api.getrude.app/appcast.xml`,
+    webviewDebugging: false,
     appVersions: {
       '2.1.1': `2.1.1`,
       '2.2.0': `2.2.0 (beta)`,
