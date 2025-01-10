@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, Button, SelectMenu } from '@shared/components';
+import { TextInput, Button, SelectMenu, Toggle } from '@shared/components';
 import { typesafe } from '@shared/ts-utils';
 import type { AdvancedAction, AdvancedState } from '../administrate-store';
 
@@ -18,6 +18,7 @@ const HiddenAdvancedScreen: React.FC<Props> = ({
   appcastEndpointDefault,
   appcastEndpointOverride,
   appVersions,
+  webviewDebugging,
 }) => {
   const [pqlOverride, setPqlOverride] = useState(pairqlEndpointOverride ?? ``);
   const [wsOverride, setWsOverride] = useState(websocketEndpointOverride ?? ``);
@@ -146,6 +147,20 @@ const HiddenAdvancedScreen: React.FC<Props> = ({
         >
           Clear
         </Button>
+      </div>
+      <div className="flex justify-between items-center pt-2">
+        <div className="mr-3">
+          <h3 className="font-medium text-slate-700 leading-tight">
+            Webview debugging enabled:
+          </h3>
+          <p className="text-slate-500 text-sm mt-1">
+            Restart app to debug menu bar, use environment variable for onboarding
+          </p>
+        </div>
+        <Toggle
+          enabled={webviewDebugging}
+          setEnabled={(enabled) => emit({ case: `setWebviewDebugging`, enabled })}
+        />
       </div>
     </div>
   );

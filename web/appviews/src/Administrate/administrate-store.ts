@@ -53,12 +53,14 @@ export interface AdvancedState {
   appcastEndpointOverride?: string;
   appcastEndpointDefault: string;
   appVersions?: { [key: string]: string };
+  webviewDebugging: boolean;
 }
 
 export type AdvancedAction =
   | { case: 'pairqlEndpointSet'; url?: string }
   | { case: 'websocketEndpointSet'; url?: string }
   | { case: 'appcastEndpointSet'; url?: string }
+  | { case: 'setWebviewDebugging'; enabled: boolean }
   | { case: 'forceUpdateToSpecificVersionClicked'; version: string }
   | { case: 'deleteAllDeviceStorageClicked' };
 
