@@ -4,13 +4,13 @@ import { Button } from '@shared/components';
 
 interface Props {
   open: boolean;
-  setOpen: (open: boolean) => void;
+  onClose(): unknown;
   children: React.ReactNode;
 }
 
-const InformationModal: React.FC<Props> = ({ open, setOpen, children }) => (
+const InformationModal: React.FC<Props> = ({ open, onClose, children }) => (
   <div
-    onClick={() => setOpen(false)}
+    onClick={onClose}
     className={cx(
       `absolute left-0 top-0 w-full h-full bg-black/50 z-40 transition-[opacity,backdrop-filter] duration-300 flex justify-center items-center p-12`,
       open ? `opacity-100 backdrop-blur` : `opacity-0 pointer-events-none`,
@@ -25,12 +25,7 @@ const InformationModal: React.FC<Props> = ({ open, setOpen, children }) => (
     >
       <div className="max-w-3xl p-10 pb-6 text-slate-600 text-lg">{children}</div>
       <div className="flex justify-end p-4 pt-0 rounded-b-3xl">
-        <Button
-          color="tertiary"
-          size="medium"
-          type="button"
-          onClick={() => setOpen(false)}
-        >
+        <Button color="tertiary" size="medium" type="button" onClick={onClose}>
           Got it <i className="fa-solid fa-check ml-2" />
         </Button>
       </div>

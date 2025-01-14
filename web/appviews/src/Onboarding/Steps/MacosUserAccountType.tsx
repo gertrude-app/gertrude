@@ -167,7 +167,7 @@ const WarnUserIsAdmin: React.FC = () => {
   const { emit } = useContext(OnboardingContext);
   return (
     <Onboarding.Centered className="relative">
-      <InformationModal open={showModal} setOpen={setShowModal}>
+      <InformationModal open={showModal} onClose={() => setShowModal(false)}>
         <AboutUsers />
       </InformationModal>
       <Onboarding.Heading centered>
@@ -211,7 +211,7 @@ const HappyPath: React.FC<HappyPathProps> = ({ userName, adminUsers }) => {
   const { emit } = useContext(OnboardingContext);
   return (
     <Onboarding.Centered className="relative">
-      <InformationModal open={showModal} setOpen={setShowModal}>
+      <InformationModal open={showModal} onClose={() => setShowModal(false)}>
         <AboutUsers />
       </InformationModal>
       <Onboarding.Heading>Yay, you’ve got the right macOS user type!</Onboarding.Heading>

@@ -19,7 +19,7 @@ const AllowKeylogging: React.FC<Props> = ({ step }) => {
     case `allowKeylogging_required`:
       return (
         <Onboarding.Centered className="h-full flex flex-col justify-center items-center">
-          <InformationModal open={showModal} setOpen={setShowModal}>
+          <InformationModal open={showModal} onClose={() => setShowModal(false)}>
             Having a record of everything your child types can be a powerful form of
             accountability and oversight for you as the parent. We’ll only{` `}
             <b>
@@ -67,7 +67,7 @@ const AllowKeylogging: React.FC<Props> = ({ step }) => {
     case `allowKeylogging_grant`:
       return (
         <Onboarding.Centered className="space-x-12" direction="row">
-          <InformationModal open={showModal} setOpen={setShowModal}>
+          <InformationModal open={showModal} onClose={() => setShowModal(false)}>
             Try closing other applications, moving windows, and checking any additional
             desktops you may have open. Still can’t find it? No problem&mdash;click the
             Apple icon () in the far upper left corner of your screen, choose “
@@ -113,12 +113,12 @@ const AllowKeylogging: React.FC<Props> = ({ step }) => {
             <i className="fas fa-exclamation-triangle text-yellow-600 mr-4" />
             Keylogging permission not granted
           </Onboarding.Heading>
-          <Onboarding.Text className="max-w-2xl" centered>
+          <Onboarding.Text className="max-w-2xl my-2" centered>
             Watch the short video below for troubleshooting steps:
           </Onboarding.Text>
           <ExpandableContent
-            width={640 * 0.8}
-            height={360 * 0.8}
+            width={640 * 0.9}
+            height={360 * 0.9}
             asset={assets.osVideo(
               osVersion.name,
               `troubleshoot-keylogging`,
@@ -128,9 +128,9 @@ const AllowKeylogging: React.FC<Props> = ({ step }) => {
             showInstructions={false}
           />
           <Onboarding.ButtonGroup
+            direction="row"
             primary="Try recheck"
-            secondary={{ text: `Skip this for now...`, shadow: true }}
-            className="w-80"
+            secondary={{ text: `Skip for now...`, shadow: true }}
           />
         </Onboarding.Centered>
       );

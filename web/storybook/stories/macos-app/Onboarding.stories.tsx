@@ -28,6 +28,7 @@ export const Welcome: Story = props({
   connectionCode: ``,
   didResume: false,
   receivedAppState: true,
+  isUpgrade: false,
   emit: () => {},
   dispatch: () => {},
 });
@@ -141,6 +142,33 @@ export const AllowNotificationsFailed: Story = props({
   step: `allowNotifications_failed`,
 });
 
+export const AllowDiskAccessGrant: Story = props({
+  ...Welcome.args,
+  step: `allowFullDiskAccess_grantAndRestart`,
+});
+
+export const AllowDiskAccessSuccess: Story = props({
+  ...Welcome.args,
+  step: `allowFullDiskAccess_success`,
+});
+
+export const AllowDiskAccessFailed: Story = props({
+  ...Welcome.args,
+  step: `allowFullDiskAccess_failed`,
+});
+
+export const AllowDiskAccessGrantUpgrade: Story = props({
+  ...Welcome.args,
+  step: `allowFullDiskAccess_grantAndRestart`,
+  isUpgrade: true,
+});
+
+export const AllowDiskAccessSuccessUpgrade: Story = props({
+  ...Welcome.args,
+  step: `allowFullDiskAccess_success`,
+  isUpgrade: true,
+});
+
 export const AllowScreenshotsRequired: Story = props({
   ...Welcome.args,
   step: `allowScreenshots_required`,
@@ -154,11 +182,6 @@ export const AllowScreenshotsGrant: Story = props({
 export const AllowScreenshotsSuccess: Story = props({
   ...Welcome.args,
   step: `allowScreenshots_success`,
-});
-
-export const BypassPrivacyWarning: Story = props({
-  ...Welcome.args,
-  step: `screenshotsPrivacyWarning`,
 });
 
 export const AllowScreenshotsFailed: Story = props({

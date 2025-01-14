@@ -11,7 +11,7 @@ const GetConnectionCode: React.FC = () => {
   const { emit, currentStep } = useContext(OnboardingContext);
   return (
     <Onboarding.Centered direction="row" className="space-x-12">
-      <InformationModal open={showModal} setOpen={setShowModal}>
+      <InformationModal open={showModal} onClose={() => setShowModal(false)}>
         <div className="flex">
           <div className="space-y-4">
             <p>
