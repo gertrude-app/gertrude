@@ -91,6 +91,7 @@ const Welcome: React.FC = () => {
           )}
         >
           <button
+            tabIndex={-1}
             className={`bg-white px-10 py-5 rounded-2xl text-xl font-semibold shadow-lg hover:opacity-90 transiton-[opacity,transform] duration-200 active:scale-[98%] active:shadow-md`}
             onClick={() => {
               setFadeOut(true);

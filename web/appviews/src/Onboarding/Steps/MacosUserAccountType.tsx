@@ -273,6 +273,7 @@ const PossibleRemediation: React.FC<PossibleRemediationProps> = ({
         type="button"
         onClick={() => emit({ case: buttonAction })}
         className="self-end m-4 mt-0"
+        tabIndex={-1}
       >
         Show me how <i className="fa-solid fa-arrow-right ml-2" />
       </Button>

@@ -52,6 +52,7 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
             Contact us at at{` `}
             <a
               href="https://gertrude.app/contact"
+              tabIndex={-1}
               className="font-semibold text-slate-800 dark:text-slate-200 border-b-2 pb-1 border-transparent dark:border-transparent hover:border-slate-600 dark:hover:border-slate-100 hover:pb-0.5 duration-200 transition-[padding-bottom,border-color]"
             >
               https://gertrude.app/contact

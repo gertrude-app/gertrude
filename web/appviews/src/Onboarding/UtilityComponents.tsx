@@ -18,6 +18,7 @@ export const PrimaryButton: React.FC<ButtonProps> = ({ children, icon, className
       size="large"
       onClick={() => emit({ case: `primaryBtnClicked` })}
       className={className}
+      tabIndex={-1}
     >
       {children}
       {icon && <i className={cx(icon, `ml-3`)} />}
@@ -36,6 +37,7 @@ export const SecondaryButton: React.FC<
       size="large"
       onClick={() => (onClick ? onClick() : emit({ case: `secondaryBtnClicked` }))}
       className={cx(shadow && `shadow shadow-violet-200/80 antialiased`, className)}
+      tabIndex={-1}
     >
       {children}
       {icon && <i className={cx(icon, `ml-3`)} />}
@@ -98,6 +100,7 @@ export const TextButton: React.FC<{
     <button
       className="text-blue-700 hover:underline cursor-pointer"
       onClick={() => (onClick ? onClick() : emit({ case: `secondaryBtnClicked` }))}
+      tabIndex={-1}
     >
       {children}
     </button>
@@ -113,6 +116,7 @@ export const EscapeHatchButton: React.FC<{
     <button
       className="text-sm text-slate-600 hover:text-red-700 antialiased opacity-75 absolute bottom-6 right-6"
       onClick={() => (onClick ? onClick() : emit({ case: `secondaryBtnClicked` }))}
+      tabIndex={-1}
     >
       {children}
     </button>

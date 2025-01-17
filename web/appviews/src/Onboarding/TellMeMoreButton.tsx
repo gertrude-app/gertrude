@@ -9,6 +9,7 @@ interface Props {
 
 const TellMeMoreButton: React.FC<Props> = ({ onClick, children, size = `large` }) => (
   <button
+    tabIndex={-1}
     onClick={onClick}
     className={cx(
       `font-medium text-violet-500 hover:bg-violet-100 rounded-xl transition-[background-color,transform] duration-200 active:scale-[97%] active:bg-violet-200`,
