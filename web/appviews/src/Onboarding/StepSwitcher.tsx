@@ -8,9 +8,10 @@ import OnboardingContext, { WithinActiveStepContext } from './OnboardingContext'
 interface Props {
   children: React.ReactNode;
   ready: boolean;
+  isUpgrade: boolean;
 }
 
-const StepSwitcher: React.FC<Props> = ({ children, ready }) => {
+const StepSwitcher: React.FC<Props> = ({ children, ready, isUpgrade }) => {
   const [expandBlurs, setExpandBlurs] = useState(false);
   const { currentStep } = useContext(OnboardingContext);
   const progressStep = (() => {
@@ -68,7 +69,7 @@ const StepSwitcher: React.FC<Props> = ({ children, ready }) => {
             `-translate-y-16 opacity-0`,
         )}
       >
-        <ProgressIndicator step={progressStep} />
+        {!isUpgrade && <ProgressIndicator step={progressStep} />}
       </div>
     </div>
   );

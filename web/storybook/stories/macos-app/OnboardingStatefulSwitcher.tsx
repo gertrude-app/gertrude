@@ -110,7 +110,7 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           otherUsers: [],
         }}
       >
-        <StepSwitcher ready>
+        <StepSwitcher isUpgrade={false} ready>
           <OnboardingPage step="welcome" component={<Step.Welcome />} />
           <OnboardingPage
             step="wrongInstallDir"

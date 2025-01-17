@@ -185,6 +185,7 @@ const ExpandableContent: React.FC<Props> = ({
             >
               {asset.render && (
                 <video
+                  tabIndex={-1} // prevent autofocus, which can cause layout issues
                   ref={videoRef}
                   preload="auto"
                   className={cx(

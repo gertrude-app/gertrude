@@ -130,6 +130,7 @@ const OS_VIDEO_IDS = [
   `troubleshoot-screen-recording`,
   `troubleshoot-keylogging`,
   `troubleshoot-sys-ext-install`,
+  `troubleshoot-full-disk-access`,
 ] as const;
 
 const COMMON_IMG_IDS = [

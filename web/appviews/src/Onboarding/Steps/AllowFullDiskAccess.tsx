@@ -105,21 +105,40 @@ const AllowFullDiskAccess: React.FC<Props> = ({ step, isUpgrade }) => {
               when the screenshots are being taken.
             </p>
           </InformationModal>
-          <InformationModal
-            open={showModal === `help`}
-            onClose={() => setShowModal(false)}
-          >
-            When you clicked <b>Grant &rarr;</b> we <i>tried</i> to open the{` `}
-            <b>{systemSettingsName} app</b> to the right spot for you to grant full disk
-            access. If for some reason you can’t find the spot, try closing applications,
-            moving windows, and checking any additional desktops you may have open.
-            Failing that, click the Apple icon () in the far upper-left corner of your
-            screen, and choose “{systemSettingsName}...” then search for “Privacy &amp;
-            Security.” Once you’re in that area, scroll down and select “Full Disk Access”
-            then follow the steps shown in the animated image below this popup. If you’re
-            still stuck, it’s OK to skip this step for now and fix it later after
-            contacting us for help.
-          </InformationModal>
+          {osVersion.major > 12 ? (
+            <InformationModal
+              open={showModal === `help`}
+              onClose={() => setShowModal(false)}
+            >
+              When you clicked <b>Grant &rarr;</b> we <i>tried</i> to open the{` `}
+              <b>{systemSettingsName} app</b> to the right spot for you to grant full disk
+              access. If for some reason you can’t find the spot, try closing
+              applications, moving windows, and checking any additional desktops you may
+              have open. Failing that, click the Apple icon () in the far upper-left
+              corner of your screen, and choose “{systemSettingsName}...” then search for
+              “Privacy &amp; Security.” Once you’re in that area, select “Full Disk
+              Access” on the right side, then follow the steps shown in the animated image
+              below this popup. If Gertrude is not shown on the list, click the small plus
+              icon and select it from the Applications folder.
+            </InformationModal>
+          ) : (
+            <InformationModal
+              open={showModal === `help`}
+              onClose={() => setShowModal(false)}
+            >
+              When you clicked <b>Grant &rarr;</b> we <i>tried</i> to open the{` `}
+              <b>{systemSettingsName} app</b> to the right spot for you to grant full disk
+              access. If for some reason you can’t find the spot, try closing
+              applications, moving windows, and checking any additional desktops you may
+              have open. Failing that, click the Apple icon () in the far upper-left
+              corner of your screen, and choose “{systemSettingsName}...” then click the
+              icon labeled “Privacy &amp; Security.” Once you’re in that area, click the
+              “Privacy” tab in the upper right, then click “Full Disk Access” from the
+              list on the left, and finally follow the steps shown in the animated image
+              below this popup. If Gertrude is not shown on the list, click the small plus
+              icon and select it from the Applications folder.
+            </InformationModal>
+          )}
         </>
       );
     case `allowFullDiskAccess_success`:
@@ -160,8 +179,8 @@ const AllowFullDiskAccess: React.FC<Props> = ({ step, isUpgrade }) => {
             height={360 * 0.9}
             asset={assets.osVideo(
               osVersion.name,
-              `troubleshoot-screen-recording`,
-              currentStep === `allowScreenshots_failed`,
+              `troubleshoot-full-disk-access`,
+              currentStep === `allowFullDiskAccess_failed`,
             )}
             className="mt-4 mb-6"
             showInstructions={false}

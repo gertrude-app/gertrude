@@ -43,7 +43,7 @@ export const Onboarding: React.FC<Props> = ({
         otherUsers: users.filter((user) => user.id !== currentUser?.id),
       }}
     >
-      <StepSwitcher ready={receivedAppState}>
+      <StepSwitcher isUpgrade={isUpgrade} ready={receivedAppState}>
         <OnboardingPage step="welcome" component={<Step.Welcome />} />
         <OnboardingPage
           step="wrongInstallDir"
