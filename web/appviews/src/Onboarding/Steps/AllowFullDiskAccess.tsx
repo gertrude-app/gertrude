@@ -25,7 +25,7 @@ const AllowFullDiskAccess: React.FC<Props> = ({ step, isUpgrade }) => {
           <Onboarding.Centered direction="row" className="space-x-12">
             <ExpandableContent
               className="!ml-0"
-              asset={assets.img(`bypass-picker-warning`)} // TODO: create real asset
+              asset={assets.osImg(osVersion.name, `full-disk-access`)}
               width={800 / 1.9}
               height={600 / 1.9}
             />
