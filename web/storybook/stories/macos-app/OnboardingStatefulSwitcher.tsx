@@ -105,12 +105,13 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           osVersion: { name: `sequoia`, major: 15 },
           currentStep: step,
           systemSettingsName: `System Settings`,
+          isUpgrade: false,
           emit() {},
           dispatch() {},
           otherUsers: [],
         }}
       >
-        <StepSwitcher isUpgrade={false} ready>
+        <StepSwitcher ready>
           <OnboardingPage step="welcome" component={<Step.Welcome />} />
           <OnboardingPage
             step="wrongInstallDir"

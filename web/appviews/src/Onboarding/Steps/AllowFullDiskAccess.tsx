@@ -7,16 +7,15 @@ import InformationModal from '../InformationModal';
 import TellMeMoreButton from '../TellMeMoreButton';
 
 interface Props {
-  isUpgrade: boolean;
   step:
     | 'allowFullDiskAccess_grantAndRestart'
     | 'allowFullDiskAccess_failed'
     | 'allowFullDiskAccess_success';
 }
 
-const AllowFullDiskAccess: React.FC<Props> = ({ step, isUpgrade }) => {
+const AllowFullDiskAccess: React.FC<Props> = ({ step }) => {
   const [showModal, setShowModal] = useState<false | 'why' | 'help'>(false);
-  const { systemSettingsName, osVersion, currentStep, emit } =
+  const { systemSettingsName, osVersion, currentStep, emit, isUpgrade } =
     useContext(OnboardingContext);
   switch (step) {
     case `allowFullDiskAccess_grantAndRestart`:

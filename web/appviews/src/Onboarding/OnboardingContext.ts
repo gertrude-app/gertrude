@@ -12,6 +12,7 @@ const OnboardingContext = createContext<{
   currentStep: OnboardingStep;
   osVersion: MacOSVersion;
   systemSettingsName: string;
+  isUpgrade: boolean;
   emit(event: AppEvent): unknown;
   dispatch(event: ViewAction): unknown;
 }>({
@@ -19,6 +20,7 @@ const OnboardingContext = createContext<{
   currentStep: `welcome`,
   osVersion: { name: `sequoia`, major: 15 },
   systemSettingsName: `System Settings`,
+  isUpgrade: false,
   emit() {},
   dispatch() {},
 });
