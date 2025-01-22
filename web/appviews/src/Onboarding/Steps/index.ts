@@ -7,6 +7,7 @@ export { default as MacosUserAccountType } from './MacosUserAccountType';
 export { default as ConnectChild } from './ConnectChild';
 export { default as AllowScreenshots } from './AllowScreenshots';
 export { default as AllowFullDiskAccess } from './AllowFullDiskAccess';
+export { default as EncourageFilterSuspensions } from './EncourageFilterSuspensions';
 export { default as AllowNotifications } from './AllowNotifications';
 export { default as AllowKeylogging } from './AllowKeylogging';
 export { default as InstallSysExt } from './InstallSysExt';
