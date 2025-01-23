@@ -18,7 +18,7 @@ const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
     if (
       // catalina and big sur both showed wonky layout issues, caused by the focus
       currentStep === `connectChild` &&
-      osVersion.major > 11 /* 11 = big sur */
+      osVersion.major > 12 /* 12 = monterey */
     ) {
       inputRef.current?.focus({ preventScroll: true });
     }
@@ -61,6 +61,7 @@ const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
             placeholder="******"
           />
           <button
+            tabIndex={-1}
             onClick={() =>
               codeValid &&
               emit({ case: `connectChildSubmitted`, code: Number(connectionCode) })

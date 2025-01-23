@@ -105,6 +105,7 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           osVersion: { name: `sequoia`, major: 15 },
           currentStep: step,
           systemSettingsName: `System Settings`,
+          isUpgrade: false,
           emit() {},
           dispatch() {},
           otherUsers: [],

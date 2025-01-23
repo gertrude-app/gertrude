@@ -20,11 +20,13 @@ export type OnboardingStep =
   | 'allowNotifications_start'
   | 'allowNotifications_grant'
   | 'allowNotifications_failed'
+  | 'allowFullDiskAccess_grantAndRestart'
+  | 'allowFullDiskAccess_failed'
+  | 'allowFullDiskAccess_success'
   | 'allowScreenshots_required'
   | 'allowScreenshots_grantAndRestart'
   | 'allowScreenshots_failed'
   | 'allowScreenshots_success'
-  | 'screenshotsPrivacyWarning'
   | 'allowKeylogging_required'
   | 'allowKeylogging_grant'
   | 'allowKeylogging_failed'
@@ -65,6 +67,7 @@ export interface AppState {
   users: MacOSUser[];
   exemptableUserIds: number[];
   exemptUserIds: number[];
+  isUpgrade: boolean;
 }
 
 export type AppEvent =
@@ -103,6 +106,7 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
       connectionCode: ``,
       receivedAppState: false,
       didResume: false,
+      isUpgrade: false,
     };
   }
 

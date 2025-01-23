@@ -19,11 +19,18 @@ export abstract class Store<AppState, AppEvent, ViewState, ViewAction> {
   ): void {
     window.updateAppState = (appState: AppState) => {
       dispatch({ type: `receivedUpdatedAppState`, appState });
+      console.log(new Date().toISOString(), `received updated app state:`, appState); // eslint-disable-line
     };
     window.updateColorScheme = (colorScheme: 'light' | 'dark') => {
       try {
         document.body.classList.remove(`light`, `dark`);
         document.body.classList.add(colorScheme);
+        // eslint-disable-next-line
+        console.log(
+          new Date().toISOString(),
+          `received updated color scheme:`,
+          colorScheme,
+        );
       } catch {
         // ¯\_(ツ)_/¯
       }
@@ -37,9 +44,11 @@ export abstract class Store<AppState, AppEvent, ViewState, ViewAction> {
     return (event: AppEvent | '__APPVIEW_READY__') => {
       if (event === `__APPVIEW_READY__`) {
         window.webkit.messageHandlers.appView.postMessage(event);
+        console.log(new Date().toISOString(), `emit: __APPVIEW_READY__`); // eslint-disable-line
       } else {
         dispatch({ type: `appEventEmitted`, event });
         window.webkit.messageHandlers.appView.postMessage(JSON.stringify(event));
+        console.log(new Date().toISOString(), `emit app event:`, event); // eslint-disable-line
       }
     };
   }
@@ -68,7 +77,7 @@ export function containerize<AppState, AppEvent, ViewState, ViewAction>(
     useEffect(() => {
       store.bind(window, dispatch);
       emit(`__APPVIEW_READY__`);
-    }, [emit]);
+    }, []); // eslint-disable-line
 
     const props = { ...state, emit, dispatch };
     return component(props);

@@ -130,6 +130,7 @@ const OS_VIDEO_IDS = [
   `troubleshoot-screen-recording`,
   `troubleshoot-keylogging`,
   `troubleshoot-sys-ext-install`,
+  `troubleshoot-full-disk-access`,
 ] as const;
 
 const COMMON_IMG_IDS = [
@@ -138,11 +139,11 @@ const COMMON_IMG_IDS = [
   `locate-menubar-icon`,
   `wrong-install-dir`,
   `how-to-use-gifs`,
-  `bypass-picker-warning`,
 ] as const;
 
 const OS_IMAGE_IDS = [
   `allow-keylogging`,
+  `full-disk-access`,
   `allow-notifications`,
   `allow-screen-recording`,
   `install-sys-ext`,
@@ -153,7 +154,6 @@ const COMMON_IMG_DATA: Record<CommonImgId, string | [number, ...number[]]> = {
   notifications: `png`,
   administrate: `png`,
   'locate-menubar-icon': `gif`,
-  'bypass-picker-warning': `png`,
   'wrong-install-dir': [10.8],
   'how-to-use-gifs': [4.88, 5.45],
 };
@@ -163,6 +163,14 @@ const OS_IMAGE_DATA: Record<
   string | Record<MacOSVersion['name'], [number, number, ...number[]]>
 > = {
   'sys-ext-install-trick': `png`,
+  'full-disk-access': {
+    catalina: [4.26, 4.15, 4.08],
+    bigSur: [4.26, 4.15, 4.08],
+    monterey: [4.26, 4.15, 4.08],
+    ventura: [3.28, 4.08, 4.01],
+    sonoma: [3.28, 4.08, 4.01],
+    sequoia: [3.28, 4.08, 4.01],
+  },
   'allow-notifications': {
     catalina: [3.55, 3.93, 4.53],
     bigSur: [3.55, 3.93, 4.53],

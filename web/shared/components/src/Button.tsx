@@ -19,6 +19,7 @@ interface CommonProps {
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   testId?: string;
+  tabIndex?: number;
 }
 
 type Props =
@@ -35,6 +36,7 @@ const Button: React.FC<Props> = ({
   color,
   className,
   disabled = false,
+  tabIndex,
   ...props
 }) => {
   let colors = ``;
@@ -92,6 +94,7 @@ const Button: React.FC<Props> = ({
         type={props.type}
         className={classes}
         disabled={disabled}
+        {...(tabIndex ? { tabIndex } : {})}
         {...(testId ? { 'data-test': testId } : {})}
         {...(props.type === `button`
           ? { onClick: disabled ? () => {} : () => props.onClick() }
@@ -107,6 +110,7 @@ const Button: React.FC<Props> = ({
       <a
         id={id}
         className={classes}
+        {...(tabIndex ? { tabIndex } : {})}
         {...(testId ? { 'data-test': testId } : {})}
         {...(disabled
           ? { onClick: (event) => event.preventDefault() }
@@ -122,6 +126,7 @@ const Button: React.FC<Props> = ({
       id={id}
       className={classes}
       to={disabled ? `#` : props.to}
+      {...(tabIndex ? { tabIndex } : {})}
       {...(testId ? { 'data-test': testId } : {})}
       onClick={
         disabled

@@ -12,36 +12,8 @@ interface Props {
 
 const StepSwitcher: React.FC<Props> = ({ children, ready }) => {
   const [expandBlurs, setExpandBlurs] = useState(false);
-  const { currentStep } = useContext(OnboardingContext);
-  const progressStep = (() => {
-    switch (currentStep) {
-      case `welcome`:
-      case `wrongInstallDir`:
-      case `confirmGertrudeAccount`:
-      case `noGertrudeAccount`:
-        return 1;
-      case `macosUserAccountType`:
-        return 2;
-      case `getChildConnectionCode`:
-      case `connectChild`:
-        return 3;
-      case `allowNotifications_start`:
-      case `allowNotifications_grant`:
-      case `allowNotifications_failed`:
-        return 4;
-      case `allowScreenshots_required`:
-      case `allowScreenshots_grantAndRestart`:
-      case `allowScreenshots_success`:
-      case `allowScreenshots_failed`:
-        return 5;
-      case `allowKeylogging_required`:
-      case `allowKeylogging_grant`:
-      case `allowKeylogging_failed`:
-        return 6;
-      default:
-        return 7;
-    }
-  })();
+  const { currentStep, isUpgrade } = useContext(OnboardingContext);
+  const progressStep = getProgressStep(currentStep);
 
   useEffect(() => {
     if (currentStep === `finish`) {
@@ -68,7 +40,7 @@ const StepSwitcher: React.FC<Props> = ({ children, ready }) => {
             `-translate-y-16 opacity-0`,
         )}
       >
-        <ProgressIndicator step={progressStep} />
+        {!isUpgrade && <ProgressIndicator step={progressStep} />}
       </div>
     </div>
   );
@@ -89,7 +61,7 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
   confetti,
   confettiDeps,
 }) => {
-  const { currentStep } = useContext(OnboardingContext);
+  const { currentStep, isUpgrade } = useContext(OnboardingContext);
   const [hasBeenVisited, setHasBeenVisited] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -103,6 +75,19 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
       }
     }
   }, [step, currentStep, confettiDeps, confetti]);
+
+  if (
+    isUpgrade &&
+    [
+      `allowFullDiskAccess_grantAndRestart`,
+      `allowFullDiskAccess_success`,
+      `allowFullDiskAccess_failed`,
+    ].includes(step) === false
+  ) {
+    // NB: rendering the bare minimum screens for an upgrade flow decreases
+    // chance that a focus state in an irrelevant screen causes layout shift
+    return null;
+  }
 
   return (
     <WithinActiveStepContext.Provider value={step === currentStep}>
@@ -145,3 +130,46 @@ const Blur: React.FC<{ position: string; expandBlurs: boolean; alt?: boolean }> 
     )}
   />
 );
+
+function getProgressStep(currentStep: OnboardingStep): number {
+  switch (currentStep) {
+    case `welcome`:
+    case `wrongInstallDir`:
+    case `confirmGertrudeAccount`:
+    case `noGertrudeAccount`:
+    case `macosUserAccountType`:
+      return 1;
+    case `getChildConnectionCode`:
+    case `connectChild`:
+      return 2;
+    case `howToUseGifs`:
+    case `allowNotifications_start`:
+    case `allowNotifications_grant`:
+    case `allowNotifications_failed`:
+      return 3;
+    case `allowFullDiskAccess_grantAndRestart`:
+    case `allowFullDiskAccess_failed`:
+    case `allowFullDiskAccess_success`:
+      return 4;
+    case `allowScreenshots_required`:
+    case `allowScreenshots_grantAndRestart`:
+    case `allowScreenshots_failed`:
+    case `allowScreenshots_success`:
+      return 5;
+    case `allowKeylogging_required`:
+    case `allowKeylogging_grant`:
+    case `allowKeylogging_failed`:
+      return 6;
+    case `installSysExt_explain`:
+    case `installSysExt_trick`:
+    case `installSysExt_allow`:
+    case `installSysExt_failed`:
+    case `installSysExt_success`:
+    case `exemptUsers`:
+    case `locateMenuBarIcon`:
+    case `viewHealthCheck`:
+    case `howToUseGertrude`:
+    case `finish`:
+      return 7;
+  }
+}

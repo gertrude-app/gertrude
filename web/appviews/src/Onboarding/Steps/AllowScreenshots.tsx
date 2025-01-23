@@ -45,7 +45,7 @@ const AllowScreenshots: React.FC<Props> = ({ step }) => {
     case `allowScreenshots_grantAndRestart`:
       return (
         <Onboarding.Centered direction="row" className="space-x-12">
-          <InformationModal open={showModal} setOpen={setShowModal}>
+          <InformationModal open={showModal} onClose={() => setShowModal(false)}>
             If you can’t find the <b>{systemSettingsName} app</b>, try closing
             applications, moving windows, and checking any additional desktops you may
             have open. Failing that, click the Apple icon () in the far upper left corner
@@ -116,12 +116,12 @@ const AllowScreenshots: React.FC<Props> = ({ step }) => {
             <i className="fas fa-exclamation-triangle text-yellow-600 mr-4" />
             Screen recording permission not granted
           </Onboarding.Heading>
-          <Onboarding.Text className="mt-2">
+          <Onboarding.Text className="my-2">
             Watch the short video below for more troubleshooting steps.
           </Onboarding.Text>
           <ExpandableContent
-            width={640 * 0.8}
-            height={360 * 0.8}
+            width={640 * 0.9}
+            height={360 * 0.9}
             asset={assets.osVideo(
               osVersion.name,
               `troubleshoot-screen-recording`,
@@ -131,9 +131,9 @@ const AllowScreenshots: React.FC<Props> = ({ step }) => {
             showInstructions={false}
           />
           <Onboarding.ButtonGroup
+            direction="row"
             primary="Try again"
             secondary={{ text: `Skip for now`, shadow: true }}
-            className="w-80"
           />
         </Onboarding.Centered>
       );

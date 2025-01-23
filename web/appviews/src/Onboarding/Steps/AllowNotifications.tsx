@@ -43,7 +43,7 @@ const AllowNotifications: React.FC<Props> = ({ step }) => {
     case `allowNotifications_grant`:
       return (
         <Onboarding.Centered className="space-x-12" direction="row">
-          <InformationModal open={showModal} setOpen={setShowModal}>
+          <InformationModal open={showModal} onClose={() => setShowModal(false)}>
             If you can’t find the <b>{systemSettingsName} app</b>, try closing
             applications, moving windows, and checking any additional desktops you may
             have open. Failing that, click the Apple icon () in the far upper left corner

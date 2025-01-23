@@ -24,6 +24,7 @@ export const Onboarding: React.FC<Props> = ({
   exemptableUserIds,
   exemptUserIds,
   osVersion,
+  isUpgrade,
 }) => {
   // during testing, i was able to hear videos playing after
   // window was closed, showing that the dom was still in memory
@@ -37,6 +38,7 @@ export const Onboarding: React.FC<Props> = ({
         currentStep: step,
         systemSettingsName:
           osVersion.major < 13 ? `System Preferences` : `System Settings`,
+        isUpgrade,
         emit,
         dispatch,
         otherUsers: users.filter((user) => user.id !== currentUser?.id),
@@ -93,6 +95,21 @@ export const Onboarding: React.FC<Props> = ({
           component={<Step.AllowNotifications step="allowNotifications_failed" />}
         />
         <OnboardingPage
+          step="allowFullDiskAccess_grantAndRestart"
+          component={
+            <Step.AllowFullDiskAccess step="allowFullDiskAccess_grantAndRestart" />
+          }
+        />
+        <OnboardingPage
+          step="allowFullDiskAccess_success"
+          component={<Step.AllowFullDiskAccess step="allowFullDiskAccess_success" />}
+          confetti
+        />
+        <OnboardingPage
+          step="allowFullDiskAccess_failed"
+          component={<Step.AllowFullDiskAccess step="allowFullDiskAccess_failed" />}
+        />
+        <OnboardingPage
           step="allowScreenshots_required"
           component={<Step.AllowScreenshots step="allowScreenshots_required" />}
         />
@@ -108,10 +125,6 @@ export const Onboarding: React.FC<Props> = ({
         <OnboardingPage
           step="allowScreenshots_failed"
           component={<Step.AllowScreenshots step="allowScreenshots_failed" />}
-        />
-        <OnboardingPage
-          step="screenshotsPrivacyWarning"
-          component={<Step.BypassPrivacyWarning />}
         />
         <OnboardingPage
           step="allowKeylogging_required"

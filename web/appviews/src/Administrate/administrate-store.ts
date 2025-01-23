@@ -19,6 +19,7 @@ export interface HealthCheck {
   accountStatus?: Failable<AdminAccountStatus>;
   screenRecordingPermissionOk?: boolean;
   keystrokeRecordingPermissionOk?: boolean;
+  fullDiskAccessPermissionOk?: boolean;
   macOsUserType?:
     | { case: 'ok'; value: 'admin' | 'standard' }
     | { case: 'error'; message?: string };
@@ -41,6 +42,7 @@ export type HealthCheckAction =
   | 'repairOutOfDateFilterClicked'
   | 'fixScreenRecordingPermissionClicked'
   | 'fixKeystrokeRecordingPermissionClicked'
+  | 'fixFullDiskAccessPermissionClicked'
   | 'removeUserAdminPrivilegeClicked'
   | 'fixNotificationPermissionClicked'
   | 'zeroKeysRefreshRulesClicked';
