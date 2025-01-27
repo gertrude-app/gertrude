@@ -170,6 +170,10 @@ export const Onboarding: React.FC<Props> = ({
         />
         <OnboardingPage step="locateMenuBarIcon" component={<Step.LocateMenuBarIcon />} />
         <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
+        <OnboardingPage
+          step="encourageFilterSuspensions"
+          component={<Step.EncourageFilterSuspensions />}
+        />
         <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />
         <OnboardingPage step="finish" component={<Step.Finish />} />
       </StepSwitcher>

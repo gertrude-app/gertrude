@@ -244,6 +244,11 @@ export const ViewHealthCheck: Story = props({
   step: `viewHealthCheck`,
 });
 
+export const EasyMode: Story = props({
+  ...Welcome.args,
+  step: `encourageFilterSuspensions`,
+});
+
 export const HowToUseGertrude: Story = props({
   ...Welcome.args,
   step: `howToUseGertrude`,

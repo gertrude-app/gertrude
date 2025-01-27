@@ -139,6 +139,7 @@ const COMMON_IMG_IDS = [
   `locate-menubar-icon`,
   `wrong-install-dir`,
   `how-to-use-gifs`,
+  `encourage-filter-suspensions`,
 ] as const;
 
 const OS_IMAGE_IDS = [
@@ -153,6 +154,7 @@ const OS_IMAGE_IDS = [
 const COMMON_IMG_DATA: Record<CommonImgId, string | [number, ...number[]]> = {
   notifications: `png`,
   administrate: `png`,
+  'encourage-filter-suspensions': `png`,
   'locate-menubar-icon': `gif`,
   'wrong-install-dir': [10.8],
   'how-to-use-gifs': [4.88, 5.45],

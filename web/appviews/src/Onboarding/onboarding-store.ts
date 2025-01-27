@@ -38,6 +38,7 @@ export type OnboardingStep =
   | 'exemptUsers'
   | 'locateMenuBarIcon'
   | 'viewHealthCheck'
+  | 'encourageFilterSuspensions'
   | 'howToUseGertrude'
   | 'finish';
 
