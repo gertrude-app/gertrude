@@ -65,6 +65,6 @@ export function deviceProps(
     modelTitle: apiDevice.modelTitle,
     modelIdentifier: apiDevice.modelIdentifier,
     name: apiDevice.customName,
-    status: apiDevice.isOnline ? `online` : `offline`,
+    status: apiDevice.status,
   };
 }

@@ -1,4 +1,5 @@
 // auto-generated, do not edit
+import type { ChildComputerStatus } from '../shared';
 
 export namespace GetDashboardWidgets {
   export type Input = void;
@@ -7,7 +8,7 @@ export namespace GetDashboardWidgets {
     users: Array<{
       id: UUID;
       name: string;
-      isOnline: boolean;
+      status: ChildComputerStatus;
       numDevices: number;
     }>;
     userActivitySummaries: Array<{

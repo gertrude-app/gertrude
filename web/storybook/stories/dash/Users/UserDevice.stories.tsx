@@ -15,13 +15,13 @@ export const Online: Story = props({
   modelTitle: `15" Macbook Pro (2023)`,
   modelIdentifier: `Mac14,10`,
   icon: `laptop`,
-  status: `online`,
+  status: { case: `filterOn` },
   name: `Silvery`,
 });
 
 export const Offline: Story = props({
   ...Online.args,
-  status: `offline`,
+  status: { case: `offline` },
 });
 
 export const NoName: Story = props({

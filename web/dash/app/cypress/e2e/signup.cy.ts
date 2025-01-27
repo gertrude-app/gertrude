@@ -111,6 +111,7 @@ describe(`payment`, () => {
       subscriptionStatus: { case: `paid` },
       notifications: [],
       verifiedNotificationMethods: [],
+      hasAdminChild: false,
     });
 
     cy.interceptPql(`StripeUrl`, { url: `/stripe-url` });

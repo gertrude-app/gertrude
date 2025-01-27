@@ -27,12 +27,12 @@ export const Default: Story = props({
     {
       name: `Sally`,
       id: `456`,
-      isOnline: false,
+      status: { case: `offline` },
     },
     {
       name: `Little Jimmy`,
       id: `123`,
-      isOnline: true,
+      status: { case: `filterOn` },
     },
   ],
   saveButtonDisabled: false,

@@ -46,10 +46,10 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
 
 export default UsersOverview;
 
-const UserOverview: React.FC<User> = ({ isOnline, name }) => (
+const UserOverview: React.FC<User> = ({ status, name }) => (
   <div className="flex justify-between items-center rounded-xl py-4 px-4 even:bg-slate-50/50">
     <h3 className="font-medium text-slate-900">{name}</h3>
-    {isOnline ? (
+    {status.case !== `offline` ? (
       <Badge size="large" className="!px-4" type="green">
         <i className="mr-2 fa-solid fa-circle text-green-400 text-sm scale-50" />
         online

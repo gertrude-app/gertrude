@@ -34,13 +34,21 @@ export interface BlockedApp {
   schedule?: RuleSchedule;
 }
 
+export type ChildComputerStatus =
+  | { case: 'filterSuspended'; resuming?: ISODateString }
+  | { case: 'downtime'; ending?: ISODateString }
+  | { case: 'downtimePaused'; resuming?: ISODateString }
+  | { case: 'offline' }
+  | { case: 'filterOff' }
+  | { case: 'filterOn' };
+
 export type ClientAuth = 'none' | 'user' | 'admin' | 'superAdmin';
 
 export interface Device {
   id: UUID;
   name?: string;
   releaseChannel: ReleaseChannel;
-  users: Array<{ id: UUID; name: string; isOnline: boolean }>;
+  users: Array<{ id: UUID; name: string; status: ChildComputerStatus }>;
   appVersion: string;
   serialNumber: string;
   modelIdentifier: string;
@@ -207,7 +215,7 @@ export type UserActivityItem =
 export interface UserDevice {
   id: UUID;
   deviceId: UUID;
-  isOnline: boolean;
+  status: ChildComputerStatus;
   modelFamily: DeviceModelFamily;
   modelTitle: string;
   modelIdentifier: string;

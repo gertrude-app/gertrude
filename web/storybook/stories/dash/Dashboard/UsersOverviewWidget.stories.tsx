@@ -11,9 +11,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = props({
   users: withIds([
-    { name: `Little Jimmy`, isOnline: true, numDevices: 1 },
-    { name: `Sally`, isOnline: true, numDevices: 2 },
-    { name: `Henry`, isOnline: false, numDevices: 0 },
+    { name: `Little Jimmy`, status: { case: `filterOn` }, numDevices: 1 },
+    { name: `Sally`, status: { case: `filterOn` }, numDevices: 2 },
+    { name: `Henry`, status: { case: `offline` }, numDevices: 0 },
   ]),
 });
 
