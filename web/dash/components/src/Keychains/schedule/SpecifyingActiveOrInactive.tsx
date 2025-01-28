@@ -7,7 +7,8 @@ const SpecifyingActiveOrInactive: React.FC<{
   schedule: RuleSchedule;
   setSchedule(schedule: RuleSchedule): void;
   isTouchDevice: boolean;
-}> = ({ schedule, setSchedule, isTouchDevice }) => (
+  text?: Record<RuleSchedule['mode'], string>;
+}> = ({ schedule, setSchedule, isTouchDevice, text = {} }) => (
   <button
     className={cx(
       `capitalize font-medium flex items-center group py-0.5 rounded-lg active:scale-90 active:bg-slate-300 transition-[transform,background-color,margin,padding] duration-200`,
@@ -22,7 +23,7 @@ const SpecifyingActiveOrInactive: React.FC<{
       })
     }
   >
-    <span className="text-slate-700">{schedule.mode}</span>
+    <span className="text-slate-700">{text[schedule.mode] ?? schedule.mode}</span>
     <ArrowsRightLeftIcon
       className={cx(
         `shrink-0 transition-[width,margin-left,filter] text-slate-400 duration-200`,
