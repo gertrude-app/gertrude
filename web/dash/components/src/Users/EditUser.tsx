@@ -364,7 +364,7 @@ const EditUser: React.FC<Props> = ({
                     <p className="text-slate-500 text-sm text-center">
                       Read more about what blocked apps are{` `}
                       <Link
-                        to="https://gertrude.app/docs/app-blocking"
+                        to="https://gertrude.app/docs/block-mac-apps"
                         className="text-blue-500 font-medium underline"
                       >
                         here.
