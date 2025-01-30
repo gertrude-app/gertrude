@@ -43,9 +43,9 @@ export const Default: Story = props({
     },
   ]),
   users: withIds([
-    { name: `Little Jimmy`, isOnline: true, numDevices: 1 },
-    { name: `Sally`, isOnline: true, numDevices: 2 },
-    { name: `Henry`, isOnline: false, numDevices: 0 },
+    { name: `Little Jimmy`, status: { case: `filterOn` }, numDevices: 1 },
+    { name: `Sally`, status: { case: `filterOn` }, numDevices: 2 },
+    { name: `Henry`, status: { case: `offline` }, numDevices: 0 },
   ]),
   userActivitySummaries: withIdsAnd({ numReviewed: 0 }, [
     { name: `Little Jimmy`, numUnreviewed: 245 },
@@ -98,7 +98,7 @@ export const NoUsers: Story = props({
 // @screenshot: xs,lg
 export const NoDevices: Story = props({
   ...Default.args,
-  users: withIds([{ name: `Little Jimmy`, isOnline: true, numDevices: 0 }]),
+  users: withIds([{ name: `Little Jimmy`, status: { case: `filterOn` }, numDevices: 0 }]),
 });
 
 // @screenshot: xs,lg

@@ -1,6 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import { Link } from 'react-router-dom';
+import type { ChildComputerStatus } from '@dash/types';
 
 type Props = {
   id: UUID;
@@ -8,7 +9,7 @@ type Props = {
   modelTitle: string;
   modelIdentifier: string;
   name?: string;
-  status: 'online' | 'offline';
+  status: ChildComputerStatus;
   className?: string;
 };
 
@@ -42,7 +43,7 @@ const UserDevice: React.FC<Props> = ({
         {name && <h4 className="text-sm text-slate-500 line-clamp-1">{modelTitle}</h4>}
       </div>
     </div>
-    {status === `online` && (
+    {status.case !== `offline` && (
       <>
         <div className="flex items-center gap-2 mr-2">
           <span className={`text-sm text-slate-500 hidden xs:block`}>online</span>

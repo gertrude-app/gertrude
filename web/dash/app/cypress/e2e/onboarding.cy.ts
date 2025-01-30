@@ -23,6 +23,7 @@ describe(`dashboard onboarding nudges`, () => {
       subscriptionStatus: { case: `paid` },
       notifications: [],
       verifiedNotificationMethods: [],
+      hasAdminChild: false,
     });
     cy.interceptPql(`CreatePendingAppConnection`, { code: 123456 });
     cy.interceptPql(`GetUser`, leopold);
@@ -55,8 +56,14 @@ describe(`dashboard onboarding nudges`, () => {
 
   it(`connect device from dashboard nudge`, () => {
     cy.interceptPql(`GetDashboardWidgets`, {
-      // we have a child, but no devices
-      users: [{ name: leopold.name, id: leopold.id, isOnline: true, numDevices: 0 }],
+      users: [
+        {
+          name: leopold.name,
+          id: leopold.id,
+          status: { case: `filterOn` },
+          numDevices: 0, // <- child, but no devices
+        },
+      ],
       unlockRequests: [],
       userActivitySummaries: [],
       recentScreenshots: [],
@@ -71,7 +78,14 @@ describe(`dashboard onboarding nudges`, () => {
 
   it(`recommends that you add a notification if there aren't any`, () => {
     cy.interceptPql(`GetDashboardWidgets`, {
-      users: [{ name: leopold.name, id: leopold.id, isOnline: true, numDevices: 1 }],
+      users: [
+        {
+          name: leopold.name,
+          id: leopold.id,
+          status: { case: `filterOn` },
+          numDevices: 1,
+        },
+      ],
       unlockRequests: [],
       userActivitySummaries: [],
       recentScreenshots: [],

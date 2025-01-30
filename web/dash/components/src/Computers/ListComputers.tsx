@@ -26,7 +26,7 @@ const ListComputers: React.FC<Props> = ({ devices }) => (
     )}
     <div className="mt-8 grid grid-cols-1 lg+:grid-cols-2 2xl:grid-cols-3 gap-8">
       {devices.map((device) => {
-        const onlineUser = device.users.find((user) => user.isOnline);
+        const onlineUser = device.users.find((user) => user.status.case !== `offline`);
         return (
           <ComputerCard
             key={device.id}

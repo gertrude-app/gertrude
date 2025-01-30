@@ -85,7 +85,7 @@ export function user(override: Partial<User> = {}): User {
         modelFamily: `macBookAir`,
         modelTitle: `MacBook Air`,
         modelIdentifier: `MacBookAir8,1`,
-        isOnline: true,
+        status: { case: `filterOn` },
       },
     ],
     createdAt: new Date().toISOString(),
@@ -101,7 +101,7 @@ export function userDevice(override: Partial<Device> = {}): Device {
       {
         name: `Little Jimmy`,
         id: uuid(),
-        isOnline: true,
+        status: { case: `filterOn` },
       },
     ],
     modelIdentifier: `MacBookAir8,1`,

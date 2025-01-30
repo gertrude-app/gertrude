@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { Button, SelectMenu, TextInput } from '@shared/components';
 import { Link } from 'react-router-dom';
 import Badge from '@shared/components/src/Badge';
-import type { ReleaseChannel } from '@dash/types';
+import type { ChildComputerStatus, ReleaseChannel } from '@dash/types';
 import PageHeading from '../PageHeading';
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
   users: Array<{
     name: string;
     id: string;
-    isOnline: boolean;
+    status: ChildComputerStatus;
   }>;
   saveButtonDisabled: boolean;
   onSave(): unknown;
@@ -146,25 +146,28 @@ export default EditComputer;
 interface ComputerUserProps {
   name: string;
   id: string;
-  isOnline: boolean;
+  status: ChildComputerStatus;
 }
 
-const ComputerUser: React.FC<ComputerUserProps> = ({ name, id, isOnline }) => (
-  <Link
-    to={`/children/${id}`}
-    className="flex justify-between items-center odd:bg-slate-50 hover:bg-slate-100 transition-[background-color] duration-100 px-4 py-3 rounded-xl"
-  >
-    <h4 className="text-slate-700 font-semibold sm:text-lg">{name}</h4>
-    <div className="flex items-center gap-2">
-      <span className={cx(`text-sm`, isOnline ? `text-slate-600` : `text-slate-400`)}>
-        {isOnline ? `online` : `offline`}
-      </span>
-      <div
-        className={cx(
-          `w-3 h-3 rounded-full`,
-          isOnline ? `bg-green-400` : ` shadow-inner bg-slate-100`,
-        )}
-      />
-    </div>
-  </Link>
-);
+const ComputerUser: React.FC<ComputerUserProps> = ({ name, id, status }) => {
+  const isOnline = status.case !== `offline`;
+  return (
+    <Link
+      to={`/children/${id}`}
+      className="flex justify-between items-center odd:bg-slate-50 hover:bg-slate-100 transition-[background-color] duration-100 px-4 py-3 rounded-xl"
+    >
+      <h4 className="text-slate-700 font-semibold sm:text-lg">{name}</h4>
+      <div className="flex items-center gap-2">
+        <span className={cx(`text-sm`, isOnline ? `text-slate-600` : `text-slate-400`)}>
+          {isOnline ? `online` : `offline`}
+        </span>
+        <div
+          className={cx(
+            `w-3 h-3 rounded-full`,
+            isOnline ? `bg-green-400` : ` shadow-inner bg-slate-100`,
+          )}
+        />
+      </div>
+    </Link>
+  );
+};

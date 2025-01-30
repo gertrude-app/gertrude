@@ -10,7 +10,7 @@ describe(`computers`, () => {
     modelFamily: `macBookPro`,
     modelIdentifier: `Mac14,10`,
     appVersion: `2.0.12`,
-    users: [{ name: `Little Jimmy`, id: `user-1`, isOnline: true }],
+    users: [{ name: `Little Jimmy`, id: `user-1`, status: { case: `filterOn` } }],
     serialNumber: `C02Z12345678`,
     releaseChannel: `stable`,
   };
