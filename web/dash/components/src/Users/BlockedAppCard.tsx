@@ -72,7 +72,11 @@ const BlockedAppCard: React.FC<Props> = ({ app, setSchedule, onDelete }) => {
           )}
         >
           <ClockIcon className="w-4 text-slate-400 shrink-0" strokeWidth={2.5} />
-          <SchedulePicker schedule={app.schedule} setSchedule={setSchedule} />
+          <SchedulePicker
+            schedule={app.schedule}
+            setSchedule={setSchedule}
+            activeText={{ active: `Blocked`, inactive: `Allowed` }}
+          />
           <button
             onClick={() => {
               setSchedule(undefined);

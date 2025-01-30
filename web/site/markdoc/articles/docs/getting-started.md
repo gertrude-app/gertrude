@@ -223,7 +223,7 @@ suspension** button.
 
 {% /callout %}
 
-## Step 5: Add a Public Keychain
+## Step 5: Add a Public Keychain {% id="add-public-keychain" %}
 
 With Gertrude, the way you allow access to parts of the internet is with **keys**. Keys
 _unlock_ parts of the internet. Gertrude's filter works by blocking the _entire internet_,

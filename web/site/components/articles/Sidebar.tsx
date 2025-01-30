@@ -39,6 +39,11 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
             title="Keeping Children Safe"
             setOpen={setOpen}
           />
+          <SidebarLink
+            slug="block-mac-apps"
+            title="Blocking Mac Apps"
+            setOpen={setOpen}
+          />
         </div>
       </div>
       <div className="flex flex-col">

@@ -9,9 +9,15 @@ interface Props {
   schedule: RuleSchedule;
   setSchedule(schedule: RuleSchedule): void;
   small?: boolean;
+  activeText?: Record<RuleSchedule['mode'], string>;
 }
 
-const SchedulePicker: React.FC<Props> = ({ schedule, setSchedule, small }) => (
+const SchedulePicker: React.FC<Props> = ({
+  schedule,
+  setSchedule,
+  small,
+  activeText = { active: `active`, inactive: `inactive` },
+}) => (
   <div
     className={cx(
       `flex justify-center self-center items-center rounded-lg transition-colors duration-200 flex-wrap`,
@@ -25,6 +31,7 @@ const SchedulePicker: React.FC<Props> = ({ schedule, setSchedule, small }) => (
       schedule={schedule}
       setSchedule={setSchedule}
       isTouchDevice={isTouchDevice()}
+      text={activeText}
     />
     <span className="text-slate-600 px-[3px]">on</span>
     <WhatDays
