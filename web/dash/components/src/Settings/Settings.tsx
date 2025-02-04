@@ -29,6 +29,7 @@ export type NewMethod = { id: UUID; confirmed: boolean };
 interface Props {
   email: string;
   status: AdminSubscriptionStatus;
+  monthlyPriceInDollars: number;
   billingPortalRequest: RequestState<{ url: string }>;
   pendingMethod?: PendingNotificationMethod;
   methods: Subcomponents<typeof NotificationMethod>;
@@ -49,6 +50,7 @@ const Settings: React.FC<Props> = ({
   status,
   methods,
   notifications,
+  monthlyPriceInDollars,
   updateNotification,
   saveNotification,
   deleteNotification,
@@ -132,7 +134,9 @@ const Settings: React.FC<Props> = ({
             <span className="text-slate-600 font-medium text-lg relative bottom-3">
               $
             </span>
-            <span className="text-slate-900 text-4xl font-bold">5</span>
+            <span className="text-slate-900 text-4xl font-bold">
+              {monthlyPriceInDollars}
+            </span>
             <span className="text-slate-600 text-lg font-medium">/month</span>
           </h3>
           {status.case !== `complimentary` && (

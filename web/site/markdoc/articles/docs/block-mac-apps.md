@@ -12,7 +12,7 @@ to block any macOS app&mdash;either on a schedule, or all the time.
 ## How does it work?
 
 If you don't already have a Gertrude account, start by signing up for a
-[60 day free trial here](https://parents.gertrude.app/signup). Once you've got a parent
+[21 day free trial here](https://parents.gertrude.app/signup). Once you've got a parent
 account, and at least one child with the Gertrude app installed on their Mac, navigate to
 the **Settings** screen for that child, and scroll down to the area labeled **Blocked
 apps**, then type the name of an app you want to block.

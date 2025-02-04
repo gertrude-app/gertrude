@@ -112,6 +112,7 @@ const AdminSettings: React.FC = () => {
       setNewMethodId={setNewMethodId}
       email={admin.email}
       status={admin.subscriptionStatus}
+      monthlyPriceInDollars={admin.monthlyPriceInDollars}
       billingPortalRequest={ReqState.fromMutation(getStripeUrl)}
       methods={typesafe.objectValues(state.notificationMethods).map((method) => ({
         id: method.id,

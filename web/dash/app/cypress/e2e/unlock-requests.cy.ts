@@ -11,7 +11,7 @@ describe(`unlock request flow`, () => {
 
     keychain = mock.keychainSummary({
       id: `keychain-id`,
-      authorId: betsy.id,
+      parentId: betsy.id,
       name: `Music Theory`,
     });
 
@@ -158,7 +158,7 @@ describe(`unlock request flow`, () => {
 
   it(`only shows keychains attached to a child`, () => {
     const keychain2 = mock.keychainSummary({
-      authorId: betsy.id,
+      parentId: betsy.id,
       name: `Misc McStandard Keys`,
     });
 
@@ -178,7 +178,7 @@ describe(`unlock request flow`, () => {
   it(`includes public keychains by parent`, () => {
     const htc = mock.keychainSummary({
       isPublic: true,
-      authorId: betsy.id, // <--  parent owns the public keychain
+      parentId: betsy.id, // <--  parent owns the public keychain
       name: `HTC`,
     });
 

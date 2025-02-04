@@ -15,7 +15,7 @@ describe(`create keychain`, () => {
 
   it(`doesn't allow selection of recently deleted keychains`, () => {
     const existing: AdminKeychain = {
-      summary: mock.keychainSummary({ name: `Existing`, authorId: betsy.id }),
+      summary: mock.keychainSummary({ name: `Existing`, parentId: betsy.id }),
       keys: [],
     };
 
@@ -37,7 +37,7 @@ describe(`create keychain`, () => {
 
   it(`(the keychain picker) shows empty state when child already has all personal keychains`, () => {
     const existing: AdminKeychain = {
-      summary: mock.keychainSummary({ name: `Test keychain`, authorId: betsy.id }),
+      summary: mock.keychainSummary({ name: `Test keychain`, parentId: betsy.id }),
       keys: [],
     };
 

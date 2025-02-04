@@ -93,7 +93,7 @@ const FeaturesBlock: React.FC = () => {
         />
         <Feature
           title="Protect the whole family"
-          description="Manage all your kids with one account, sharing lists of safelisted sites when it makes sense. Only $5/month for the whole family."
+          description="Manage all your kids with one account, sharing lists of safelisted sites when it makes sense. Only $15/month for the whole family."
           step={5}
           currentStep={currentStep}
           gif={Family}

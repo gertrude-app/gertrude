@@ -29,7 +29,7 @@ const DownloadPage: NextPage = () => (
         </h1>
         <p className="text-lg sm:text-xl text-slate-500 max-w-2xl mt-4 text-center">
           The Gertrude mac app is free to download, but requires a parent account to start
-          protecting a computer. If you don’t have a parent account, you can start a 60
+          protecting a computer. If you don’t have a parent account, you can start a 21
           day trial with no credit card by{` `}
           <Link
             className="border-b border-dotted hover:text-slate-600"

@@ -18,7 +18,7 @@ describe(`create key flow`, () => {
       summary: {
         id: `123`,
         name: `Betsy's Keychain`,
-        authorId: `admin-123`,
+        parentId: `admin-123`,
         isPublic: false,
         numKeys: 0,
       },
@@ -63,7 +63,7 @@ describe(`create key flow`, () => {
       summary: {
         id: `123`,
         name: `Betsy's Keychain`,
-        authorId: `admin-123`,
+        parentId: `admin-123`,
         isPublic: false,
         numKeys: 1,
       },

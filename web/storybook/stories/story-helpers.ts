@@ -26,7 +26,7 @@ export function keychainProps(override: Partial<KeychainSummary> = {}): Keychain
     name: `HTC`,
     description: `Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore laudantium velit assumenda nemo exercitationem.`,
     numKeys: 232,
-    authorId: `authorId-${Math.random()}`,
+    parentId: `parentId-${Math.random()}`,
     ...override,
   };
 }

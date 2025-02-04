@@ -46,7 +46,7 @@ const SafeIsNowPossibleBlock: React.FC = () => (
           </Feature>
           <Feature heading="Protect the whole family" side="left" icon="users">
             Manage all your kids with one account, sharing lists of safelisted sites when
-            it makes sense. Only $5/month for the whole family.
+            it makes sense. Only $15/month for the whole family.
           </Feature>
         </div>
       </div>
