@@ -24,6 +24,7 @@ export function adminSettings(override: Partial<Admin> = {}): Admin {
     notifications: [],
     verifiedNotificationMethods: [],
     hasAdminChild: false,
+    monthlyPriceInDollars: 15,
     ...override,
   };
 }
@@ -121,7 +122,7 @@ export function keychainSummary(
     name: `HTC`,
     description: ``,
     isPublic: false,
-    authorId: uuid(),
+    parentId: uuid(),
     numKeys: 0,
     ...override,
   };

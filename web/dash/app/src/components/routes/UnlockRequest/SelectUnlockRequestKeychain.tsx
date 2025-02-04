@@ -21,7 +21,7 @@ const SelectUnlockRequestKeychain: React.FC = () => {
   const userKeychainIds = user.keychains.map((keychain) => keychain.id);
   const selectableKeychains = keychains.own
     .filter((kc) => userKeychainIds.includes(kc.id))
-    .concat(keychains.public.filter((kc) => kc.authorId === keychains.own[0]?.authorId));
+    .concat(keychains.public.filter((kc) => kc.parentId === keychains.own[0]?.parentId));
 
   return (
     <Modal

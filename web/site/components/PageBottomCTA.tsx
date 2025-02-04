@@ -17,7 +17,7 @@ const PageBottomCTA: React.FC<Props> = ({ clickId }) => (
       The Gertrude mac app helps you <b>protect your kids</b> online with{` `}
       <b>strict internet filtering</b> that you can manage from your{` `}
       <b>own computer or phone,</b> plus remote monitoring of screenshots and keylogging.
-      $5/mo, with a 60 day free trial.
+      $15/mo, with a 21 day free trial.
     </p>
     <FancyLink
       type="link"

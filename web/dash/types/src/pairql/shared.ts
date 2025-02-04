@@ -76,7 +76,7 @@ export interface Key {
 
 export interface KeychainSummary {
   id: UUID;
-  authorId: UUID;
+  parentId: UUID;
   name: string;
   description?: string;
   warning?: string;
@@ -224,7 +224,7 @@ export interface UserDevice {
 
 export interface UserKeychainSummary {
   id: UUID;
-  authorId: UUID;
+  parentId: UUID;
   name: string;
   description?: string;
   isPublic: boolean;

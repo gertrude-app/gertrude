@@ -19,7 +19,7 @@ getting started with Gertrude, [click here](https://youtu.be/JbLjoR214kI)._
 
 To start out, if you haven't already created a **Gertrude account** you'll need to do that
 first. To create an account [click this link](https://parents.gertrude.app/signup) and
-follow the sign-up instructions. No credit card is required, the first 60 days are
+follow the sign-up instructions. No credit card is required, the first 21 days are
 _totally free, and you can cancel at any time._
 
 ### Adding your first child

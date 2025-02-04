@@ -6,7 +6,7 @@ export function keychain(id: UUID, adminId: UUID): KeychainSummary {
     name: ``,
     description: ``,
     isPublic: false,
-    authorId: adminId,
+    parentId: adminId,
     numKeys: 0,
   };
 }
