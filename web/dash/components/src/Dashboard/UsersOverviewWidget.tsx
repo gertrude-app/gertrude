@@ -1,7 +1,8 @@
 import React from 'react';
 import cx from 'classnames';
-import { Button, Badge } from '@shared/components';
+import { Button } from '@shared/components';
 import type { GetDashboardWidgets } from '@dash/types';
+import UserStatus from '../UserStatus';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
@@ -22,9 +23,11 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
             All children
           </Button>
         </div>
-        {users.map((user) => (
-          <UserOverview key={user.id} {...user} />
-        ))}
+        <div className="flex flex-col gap-2 @container">
+          {users.map((user) => (
+            <UserStatus key={user.id} {...user} />
+          ))}
+        </div>
       </DashboardWidget>
     );
   return (
@@ -45,20 +48,3 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
 };
 
 export default UsersOverview;
-
-const UserOverview: React.FC<User> = ({ status, name }) => (
-  <div className="flex justify-between items-center rounded-xl py-4 px-4 even:bg-slate-50/50">
-    <h3 className="font-medium text-slate-900">{name}</h3>
-    {status.case !== `offline` ? (
-      <Badge size="large" className="!px-4" type="green">
-        <i className="mr-2 fa-solid fa-circle text-green-400 text-sm scale-50" />
-        online
-      </Badge>
-    ) : (
-      <Badge size="large" className="!px-4" type="yellow">
-        <i className="mr-2 fa-solid fa-circle text-yellow-400 text-sm scale-50" />
-        offline
-      </Badge>
-    )}
-  </div>
-);

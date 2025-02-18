@@ -24,6 +24,35 @@ export const Offline: Story = props({
   status: { case: `offline` },
 });
 
+export const Suspended: Story = props({
+  ...Online.args,
+  status: {
+    case: `filterSuspended`,
+    resuming: new Date(new Date().getTime() + 7 * 60 * 1000).toISOString(),
+  },
+});
+
+export const Downtime: Story = props({
+  ...Online.args,
+  status: {
+    case: `downtime`,
+    ending: new Date(new Date().getTime() + 60 * 60 * 1000).toISOString(),
+  },
+});
+
+export const DowntimePaused: Story = props({
+  ...Online.args,
+  status: {
+    case: `downtimePaused`,
+    resuming: new Date(new Date().getTime() + 5 * 60 * 1000).toISOString(),
+  },
+});
+
+export const FilterOff: Story = props({
+  ...Online.args,
+  status: { case: `filterOff` },
+});
+
 export const NoName: Story = props({
   ...Online.args,
   name: undefined,

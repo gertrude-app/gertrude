@@ -30,7 +30,7 @@ const UserCard: React.FC<Props> = ({
     className="rounded-3xl border-[0.5px] border-slate-200 flex flex-col justify-between shadow-lg shadow-slate-300/50 bg-white sm:min-w-[400px]"
     data-test="user-card"
   >
-    <div className="p-6">
+    <div className="p-4 xs:p-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-extrabold text-slate-700 mr-3">{name}</h2>
         <div className="flex items-center space-x-4">
@@ -72,7 +72,7 @@ const UserCard: React.FC<Props> = ({
               {inflect(`computer`, devices.length)}:
             </p>
           </div>
-          <div className="flex flex-col mt-3 space-y-3 pt-3">
+          <div className="flex flex-col mt-3 gap-3 pt-3">
             {devices.map((userDevice) => (
               <UserDevice
                 key={userDevice.id}

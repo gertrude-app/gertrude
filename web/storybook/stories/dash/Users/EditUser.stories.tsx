@@ -101,7 +101,10 @@ export const Default: Story = props({
       name: `Silvery`,
       modelIdentifier: `Mac14,10`,
       modelTitle: `16" MacBook Pro (2023)`,
-      status: { case: `filterOn` },
+      status: {
+        case: `filterSuspended`,
+        resuming: new Date(new Date().getTime() + 1000 * 60 * 12).toISOString(),
+      },
     },
     {
       id: `2`,

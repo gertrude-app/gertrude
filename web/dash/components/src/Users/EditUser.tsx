@@ -17,7 +17,6 @@ import KeychainCard from '../Keychains/KeychainCard';
 import { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
 import TimeInput from '../Forms/TimeInput';
-import BetaBadge from '../BetaBadge';
 import EmptyState from '../EmptyState';
 import AddKeychainDrawer from './AddKeychainDrawer';
 import ConnectDeviceModal from './ConnectDeviceModal';
@@ -207,7 +206,7 @@ const EditUser: React.FC<Props> = ({
             <h2 className="mt-5 text-lg font-bold text-slate-700">
               {devices.length} {inflect(`computer`, devices.length)}:
             </h2>
-            <div className="flex flex-col max-w-3xl">
+            <div className="flex flex-col max-w-3xl -mx-2 xs:mx-0">
               {devices.map((userDevice) => (
                 <div key={userDevice.id} className="flex items-center mt-3">
                   <UserDevice
@@ -217,11 +216,11 @@ const EditUser: React.FC<Props> = ({
                     deviceId={userDevice.deviceId}
                     name={userDevice.name}
                     status={userDevice.status}
-                    className="flex-grow mr-3"
+                    className="flex-grow mr-1 xs:mr-3"
                   />
                   <button
                     onClick={() => deleteDevice.start(userDevice.id)}
-                    className="transition-colors duration-100 flex justify-center items-center w-10 h-10 rounded-full hover:bg-slate-100 cursor-pointer text-slate-500 hover:text-red-500"
+                    className="transition-colors duration-100 flex justify-center items-center w-6 xs:w-10 h-6 xs:h-10 rounded-full hover:bg-slate-200/50 cursor-pointer text-slate-500 hover:text-red-500"
                   >
                     <i className="fa fa-trash" />
                   </button>
@@ -351,10 +350,7 @@ const EditUser: React.FC<Props> = ({
             {/* blocked apps */}
             {blockedApps && (
               <div className="mt-12 max-w-3xl mb-12">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-slate-700">Blocked apps{` `}</h2>
-                  <BetaBadge />
-                </div>
+                <h2 className="text-lg font-bold text-slate-700">Blocked apps{` `}</h2>
                 {blockedApps.length === 0 ? (
                   <div className="flex flex-col items-center justify-center p-8 bg-slate-100 mt-2 rounded-2xl shadow-inner">
                     <NoSymbolIcon className="w-8 h-8 text-slate-300" strokeWidth={2} />
