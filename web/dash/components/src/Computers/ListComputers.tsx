@@ -34,7 +34,7 @@ const ListComputers: React.FC<Props> = ({ devices }) => (
             id={device.id}
             modelTitle={device.modelTitle}
             modelIdentifier={device.modelIdentifier}
-            onlineUser={onlineUser?.name}
+            user={onlineUser}
           />
         );
       })}

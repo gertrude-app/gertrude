@@ -1,25 +1,34 @@
 import React from 'react';
-import cx from 'classnames';
 import { Button } from '@shared/components';
+import type { ChildComputerStatus } from '@dash/types';
+import UserStatus from '../UserStatus';
 
 interface Props {
   name?: string;
   id: string;
   modelTitle: string;
   modelIdentifier: string;
-  onlineUser?: string;
+  user?: {
+    name: string;
+    status: ChildComputerStatus;
+  };
 }
 
 const ComputerCard: React.FC<Props> = ({
   name,
   modelTitle,
-  onlineUser,
+  user,
   modelIdentifier,
   id,
 }) => (
   <div className="border-[0.5px] border-slate-200 rounded-3xl shadow-lg shadow-slate-300/50 bg-white">
     <div className="p-6 flex justify-between items-center gap-4">
       <div>
+        {user?.name && (
+          <h3 className="text-sm font-semibold text-slate-500">
+            {user.name} is using{!name && ` the`}
+          </h3>
+        )}
         <h2 className="text-2xl font-bold">{name || modelTitle}</h2>
         {name && <h3 className="text-sm text-slate-500">{modelTitle}</h3>}
       </div>
@@ -31,18 +40,8 @@ const ComputerCard: React.FC<Props> = ({
         />
       </div>
     </div>
-    <div className="p-4 bg-slate-50 rounded-b-3xl flex justify-between items-center">
-      <div className="flex justify-end items-center gap-2 ml-2">
-        <div
-          className={cx(
-            `w-3 h-3 rounded-full`,
-            onlineUser ? `bg-green-400` : `bg-slate-100 shadow-inner`,
-          )}
-        />
-        <span className="text-xs text-slate-400">
-          {onlineUser ? `${onlineUser} is online` : `offline`}
-        </span>
-      </div>
+    <div className="py-3 pl-3 pr-5 border-t border-slate-200 rounded-b-3xl flex justify-between items-center @container">
+      <UserStatus status={user?.status || { case: `offline` }} />
       <Button type="link" to={`/computers/${id}`} color="tertiary" size="small">
         <i className="fa-solid fa-pen mr-2" />
         Edit

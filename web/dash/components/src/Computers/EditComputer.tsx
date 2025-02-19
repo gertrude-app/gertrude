@@ -1,10 +1,9 @@
 import React from 'react';
-import cx from 'classnames';
 import { Button, SelectMenu, TextInput } from '@shared/components';
-import { Link } from 'react-router-dom';
 import Badge from '@shared/components/src/Badge';
 import type { ChildComputerStatus, ReleaseChannel } from '@dash/types';
 import PageHeading from '../PageHeading';
+import UserStatus from '../UserStatus';
 
 interface Props {
   name: string;
@@ -118,9 +117,9 @@ const EditComputer: React.FC<Props> = ({
     </div>
     <div className="border border-slate-200 mt-4 sm:mt-6 rounded-3xl bg-white p-6 sm:p-8">
       <h3 className="text-xl font-bold text-slate-900">Children using this computer:</h3>
-      <div className="mt-6">
+      <div className="mt-4 flex flex-col gap-2">
         {users.map((user) => (
-          <ComputerUser key={user.id} {...user} />
+          <UserStatus key={user.id} {...user} />
         ))}
       </div>
     </div>
@@ -142,32 +141,3 @@ const EditComputer: React.FC<Props> = ({
 );
 
 export default EditComputer;
-
-interface ComputerUserProps {
-  name: string;
-  id: string;
-  status: ChildComputerStatus;
-}
-
-const ComputerUser: React.FC<ComputerUserProps> = ({ name, id, status }) => {
-  const isOnline = status.case !== `offline`;
-  return (
-    <Link
-      to={`/children/${id}`}
-      className="flex justify-between items-center odd:bg-slate-50 hover:bg-slate-100 transition-[background-color] duration-100 px-4 py-3 rounded-xl"
-    >
-      <h4 className="text-slate-700 font-semibold sm:text-lg">{name}</h4>
-      <div className="flex items-center gap-2">
-        <span className={cx(`text-sm`, isOnline ? `text-slate-600` : `text-slate-400`)}>
-          {isOnline ? `online` : `offline`}
-        </span>
-        <div
-          className={cx(
-            `w-3 h-3 rounded-full`,
-            isOnline ? `bg-green-400` : ` shadow-inner bg-slate-100`,
-          )}
-        />
-      </div>
-    </Link>
-  );
-};

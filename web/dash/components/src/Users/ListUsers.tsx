@@ -25,7 +25,7 @@ const Users: React.FC<Props> = ({
     <div className="mt-8 flex flex-col">
       {users.length > 0 ? (
         <>
-          <div className="mb-16 grid grid-cols-1 lg+:grid-cols-2 gap-10 lg+:gap-8 xl:gap-10 2xl:grid-cols-3">
+          <div className="mb-16 grid grid-cols-1 xl:grid-cols-2 gap-10 lg+:gap-8 xl:gap-10 2xl:grid-cols-3">
             {users.map((user) => (
               <UserCard
                 key={user.id}

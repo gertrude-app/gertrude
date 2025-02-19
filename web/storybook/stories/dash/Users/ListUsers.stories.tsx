@@ -73,6 +73,16 @@ export const Default: Story = props({
           modelTitle: `27" iMac (2021)`,
           status: { case: `filterOn` },
         },
+        {
+          id: `4`,
+          deviceId: `3`,
+          modelIdentifier: `iMac21,2`,
+          modelTitle: `27" iMac (2021)`,
+          status: {
+            case: `filterSuspended`,
+            resuming: new Date(new Date().getTime() + 1000 * 60 * 12).toISOString(),
+          },
+        },
       ],
     },
   ],

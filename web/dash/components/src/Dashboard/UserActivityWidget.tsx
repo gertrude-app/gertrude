@@ -49,8 +49,8 @@ const UserActivityWidget: React.FC<Props> = ({ userActivity, className }) => {
     );
 
   return (
-    <DashboardWidget className={cx(`!p-0 !sm:p-0`, className)}>
-      <div className="p-3 sm:p-4 pb-2 sm:pb-2">
+    <DashboardWidget className={cx(`!p-0 !sm:p-0 flex flex-col`, className)}>
+      <div className="p-3 sm:p-4 pb-2 sm:pb-2 flex-grow">
         <WidgetTitle icon="binoculars" text="Activity" />
         <div className="mb-4 flex flex-col space-y-2">
           {writable(userActivity)
