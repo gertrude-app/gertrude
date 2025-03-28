@@ -30,6 +30,7 @@ const noopClient: ApiClient = {
   },
   getAdminKeychain: async () => {
     return Result.success({
+      children: [],
       summary: {
         id: ``,
         parentId: ``,
@@ -42,7 +43,7 @@ const noopClient: ApiClient = {
     });
   },
   getAdminKeychains: async () => {
-    return Result.success([]);
+    return Result.success({ children: [], keychains: [] });
   },
   getDashboardWidgets: async () => {
     return Result.success({
@@ -205,6 +206,9 @@ const noopClient: ApiClient = {
   },
   securityEventsFeed: async () => {
     return Result.success([]);
+  },
+  toggleChildKeychain: async () => {
+    return Result.success({ success: true });
   },
   updateUnlockRequest: async () => {
     return Result.success({ success: true });

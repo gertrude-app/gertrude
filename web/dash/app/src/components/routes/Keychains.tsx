@@ -1,31 +1,49 @@
 import React from 'react';
 import { Loading, ListKeychains, ApiErrorMessage } from '@dash/components';
-import { useQuery, useConfirmableDelete, Key } from '../../hooks';
+import { useQuery, useConfirmableDelete, Key, useMutation } from '../../hooks';
 import Current from '../../environment';
 
 const Keychains: React.FC = () => {
-  const query = useQuery(Key.adminKeychains, Current.api.getAdminKeychains);
+  const adminKeychainsQuery = useQuery(Key.adminKeychains, Current.api.getAdminKeychains);
   const deleteKeychain = useConfirmableDelete(`keychain`, {
     invalidating: [Key.adminKeychains],
   });
+  const toggleChildKeychain = useMutation(
+    (data: { childId: string; keychainId: string }) =>
+      Current.api.toggleChildKeychain(data),
+    {
+      toast: 'save:user',
+      onSuccess: () => {
+        adminKeychainsQuery.refetch();
+      },
+    },
+  );
 
-  if (query.isPending) {
+  if (adminKeychainsQuery.isPending) {
     return <Loading />;
   }
 
-  if (query.isError) {
-    return <ApiErrorMessage error={query.error} />;
+  if (adminKeychainsQuery.isError) {
+    return <ApiErrorMessage error={adminKeychainsQuery.error} />;
   }
 
   return (
     <ListKeychains
-      keychains={query.data.map((keychain) => ({
+      keychains={adminKeychainsQuery.data.keychains.map((keychain) => ({
         id: keychain.summary.id,
         name: keychain.summary.name,
+        assignedChildren: keychain.children,
+        allChildren: adminKeychainsQuery.data.children,
         isPublic: keychain.summary.isPublic,
         mode: `keychains_screen`,
         description: keychain.summary.description || undefined,
         numKeys: keychain.summary.numKeys,
+        toggleChild: (childId: string) => {
+          toggleChildKeychain.mutate({
+            childId,
+            keychainId: keychain.summary.id,
+          });
+        },
       }))}
       remove={deleteKeychain}
     />

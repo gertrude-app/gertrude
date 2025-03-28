@@ -3,5 +3,12 @@ import type { AdminKeychain } from '../shared';
 
 export namespace GetAdminKeychains {
   export type Input = void;
-  export type Output = AdminKeychain[];
+
+  export interface Output {
+    keychains: AdminKeychain[];
+    children: Array<{
+      id: UUID;
+      name: string;
+    }>;
+  }
 }

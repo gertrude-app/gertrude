@@ -121,6 +121,10 @@ export function interceptPql(
 export function interceptPql(slug: `Signup`, output: T.Signup.Output): void;
 export function interceptPql(slug: `StripeUrl`, output: T.StripeUrl.Output): void;
 export function interceptPql(
+  slug: `ToggleChildKeychain`,
+  output: T.ToggleChildKeychain.Output,
+): void;
+export function interceptPql(
   slug: `UpdateUnlockRequest`,
   output: T.UpdateUnlockRequest.Output,
 ): void;
@@ -186,6 +190,7 @@ export function forcePqlErr(
     | 'SendPasswordResetEmail'
     | 'Signup'
     | 'StripeUrl'
+    | 'ToggleChildKeychain'
     | 'UpdateUnlockRequest'
     | 'UserActivityFeed'
     | 'UserActivitySummaries'

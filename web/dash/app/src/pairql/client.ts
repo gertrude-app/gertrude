@@ -331,6 +331,16 @@ export const liveClient = {
     return query<T.StripeUrl.Input, T.StripeUrl.Output>(input, `admin`, `StripeUrl`);
   },
 
+  toggleChildKeychain(
+    input: T.ToggleChildKeychain.Input,
+  ): Promise<T.Result<T.ToggleChildKeychain.Output>> {
+    return query<T.ToggleChildKeychain.Input, T.ToggleChildKeychain.Output>(
+      input,
+      `admin`,
+      `ToggleChildKeychain`,
+    );
+  },
+
   updateUnlockRequest(
     input: T.UpdateUnlockRequest.Input,
   ): Promise<T.Result<T.UpdateUnlockRequest.Output>> {
@@ -497,6 +507,9 @@ export const throwingClient: ApiClient = {
   },
   stripeUrl: () => {
     throw new Error(`ApiClient.stripeUrl() not implemented`);
+  },
+  toggleChildKeychain: () => {
+    throw new Error(`ApiClient.toggleChildKeychain() not implemented`);
   },
   updateUnlockRequest: () => {
     throw new Error(`ApiClient.updateUnlockRequest() not implemented`);
