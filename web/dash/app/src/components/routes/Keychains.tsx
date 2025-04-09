@@ -12,7 +12,7 @@ const Keychains: React.FC = () => {
     (data: { childId: string; keychainId: string }) =>
       Current.api.toggleChildKeychain(data),
     {
-      toast: 'save:user',
+      toast: `save:user`,
       onSuccess: () => {
         adminKeychainsQuery.refetch();
       },

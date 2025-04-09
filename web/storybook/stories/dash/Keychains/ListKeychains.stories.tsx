@@ -15,7 +15,18 @@ type Story = StoryObj<typeof meta>;
 // @screenshot: md
 export const Default: Story = props({
   keychains: withIdsAnd(
-    { mode: `list` as const, removeText: `Delete`, schedulable: false },
+    {
+      mode: `keychains_page` as const,
+      removeText: `Delete`,
+      schedulable: false,
+      toggleChild: () => {},
+      assignedChildren: [`123`, `456`],
+      allChildren: [
+        { name: `Little Jimmy`, id: `123` },
+        { name: `Sally`, id: `456` },
+        { name: `Franny`, id: `789` },
+      ],
+    },
     [
       keychainProps({ name: `HTC`, numKeys: 232, isPublic: true }),
       keychainProps({ name: `Jimmy's Music Theory`, numKeys: 7 }),
