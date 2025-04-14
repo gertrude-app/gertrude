@@ -8,10 +8,17 @@
 /docs/five-things-you-forgot-when-locking-down-your-kids-iphone /blog/five-things-you-forgot-when-locking-down-your-kids-iphone 301
 /docs/guia-definitiva-para-bloquear-un-iphone /blog/guia-definitiva-para-bloquear-un-iphone 301
 
+###################
+# temp conference #
+###################
+/ghc https://parents.gertrude.app/conf-booth 302
+/workshop https://parents.gertrude.app/conf-workshop 302
+
 ########
 # misc #
 ########
 /support /contact 301
+/lockdown /blog/definitive-guide-to-locking-down-an-iphone 302
 
 #################
 # parent rename #
