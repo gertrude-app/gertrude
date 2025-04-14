@@ -20,7 +20,7 @@ const ConferenceEmailForm: React.FC<{ source: 'workshop' | 'booth' }> = ({ sourc
               <span className="text-slate-800">Gertrude</span>
             </span>
             <span className="bg-gradient-to-r from-indigo-500 to-fuchsia-600 bg-clip-text [-webkit-background-clip:text] text-transparent w-fit text-base uppercase font-semibold -mt-1 tracking-wide">
-              Live at INCH 2024
+              Live at GHC 2025
             </span>
           </div>
         </div>
