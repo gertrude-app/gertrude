@@ -2,6 +2,7 @@
 
 export interface AdminKeychain {
   summary: KeychainSummary;
+  children: UUID[];
   keys: Key[];
 }
 

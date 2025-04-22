@@ -10,16 +10,22 @@ type Props = {
   keychains: Array<{
     id: UUID;
     name: string;
+    assignedChildren: UUID[];
+    allChildren: Array<{
+      name: string;
+      id: UUID;
+    }>;
     description?: string;
     numKeys: number;
     isPublic: boolean;
+    toggleChild(childId: string): void;
   }>;
   remove: ConfirmableEntityAction;
 };
 
 const ListKeychains: React.FC<Props> = ({ keychains, remove }) => (
   <div>
-    <PageHeading icon="key">Keychains</PageHeading>
+    <PageHeading icon="key">Your keychains</PageHeading>
     <p className="mt-8 text-base font-medium antialiased text-slate-600">
       Keychains are clusters of related individual "keys" for selectively unlocking
       internet access. They can be organized however you like—per use, by application, for
@@ -29,18 +35,32 @@ const ListKeychains: React.FC<Props> = ({ keychains, remove }) => (
     {keychains.length > 0 ? (
       <>
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 lg+:gap-8 2xl:grid-cols-3 mt-10 bg-slate-100/50 border border-slate-200 p-4 xs:p-8 rounded-3xl">
-          {keychains.map(({ id, isPublic, name, description, numKeys }) => (
-            <KeychainCard
-              mode="keychains_screen"
-              key={id}
-              id={id}
-              isPublic={isPublic}
-              name={name}
-              numKeys={numKeys}
-              description={description}
-              onRemove={() => remove.start(id)}
-            />
-          ))}
+          {keychains.map(
+            ({
+              id,
+              isPublic,
+              name,
+              description,
+              numKeys,
+              assignedChildren,
+              allChildren,
+              toggleChild,
+            }) => (
+              <KeychainCard
+                mode="keychains_screen"
+                key={id}
+                id={id}
+                assignedChildren={assignedChildren}
+                allChildren={allChildren}
+                isPublic={isPublic}
+                name={name}
+                numKeys={numKeys}
+                description={description}
+                onRemove={() => remove.start(id)}
+                toggleChild={toggleChild}
+              />
+            ),
+          )}
         </div>
         <div className="mt-10 flex justify-end">
           <Button size="large" type="link" to="/keychains/new" color="primary">

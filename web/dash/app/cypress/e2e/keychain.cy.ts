@@ -17,9 +17,10 @@ describe(`create keychain`, () => {
     const existing: AdminKeychain = {
       summary: mock.keychainSummary({ name: `Existing`, parentId: betsy.id }),
       keys: [],
+      children: [],
     };
 
-    cy.interceptPql(`GetAdminKeychains`, [existing]);
+    cy.interceptPql(`GetAdminKeychains`, { keychains: [existing], children: [] });
     cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
 
     cy.visit(`/keychains`);
@@ -39,9 +40,10 @@ describe(`create keychain`, () => {
     const existing: AdminKeychain = {
       summary: mock.keychainSummary({ name: `Test keychain`, parentId: betsy.id }),
       keys: [],
+      children: [],
     };
 
-    cy.interceptPql(`GetAdminKeychains`, [existing]);
+    cy.interceptPql(`GetAdminKeychains`, { keychains: [existing], children: [] });
     cy.interceptPql(`GetSelectableKeychains`, {
       own: [existing.summary],
       public: [],
@@ -59,7 +61,7 @@ describe(`create keychain`, () => {
   describe(`no keychains to start`, () => {
     beforeEach(() => {
       // parent starts with no keychains
-      cy.interceptPql(`GetAdminKeychains`, []);
+      cy.interceptPql(`GetAdminKeychains`, { keychains: [], children: [] });
       // and no prior selectable keychains
       cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
     });

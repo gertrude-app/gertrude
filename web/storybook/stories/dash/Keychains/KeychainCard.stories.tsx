@@ -11,6 +11,13 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 export const ListPublic: Story = props({
+  assignedChildren: [`123`, `789`],
+  allChildren: [
+    { id: `123`, name: `Little Jimmy` },
+    { id: `456`, name: `Sally` },
+    { id: `789`, name: `Franny` },
+  ],
+  toggleChild: () => {},
   id: `1`,
   mode: `keychains_screen`,
   name: `HTC`,
@@ -28,7 +35,8 @@ const NotDuringSchoolHours: Story = props({
   isPublic: true,
   onRemove: () => {},
   editUrl: undefined,
-  mode: `assign_to_child`,
+  mode: `assigned_to_child`,
+  keychainId: `123`,
   removeText: `Remove`,
   name: `After-school games`,
   description: `For afternoons and weekends, not to be played during school hours`,
@@ -215,8 +223,12 @@ export const ListPrivateNoDescription: Story = props({
 
 export const Schedulable: Story = props({
   ...ListPrivateNoDescription.args,
+  id: ``,
+  assignedChildren: [],
+  allChildren: [{ id: `123`, name: `Little Jimmy` }],
+  toggleChild: () => {},
   isPublic: true,
-  mode: `assign_to_child`,
+  mode: `keychains_screen`,
   setSchedule: () => {},
   onRemove: () => {},
 });

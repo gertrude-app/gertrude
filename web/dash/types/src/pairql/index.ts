@@ -42,6 +42,7 @@ export * from './pairs/SecurityEventsFeed';
 export * from './pairs/SendPasswordResetEmail';
 export * from './pairs/Signup';
 export * from './pairs/StripeUrl';
+export * from './pairs/ToggleChildKeychain';
 export * from './pairs/UpdateUnlockRequest';
 export * from './pairs/UserActivityFeed';
 export * from './pairs/UserActivitySummaries';

@@ -425,7 +425,8 @@ const EditUser: React.FC<Props> = ({
                   <>
                     {keychains.map((keychain) => (
                       <KeychainCard
-                        mode="assign_to_child"
+                        mode="assigned_to_child"
+                        keychainId={keychain.id}
                         schedule={keychain.schedule}
                         key={keychain.id}
                         name={keychain.name}
