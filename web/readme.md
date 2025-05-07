@@ -2,7 +2,7 @@
 
 ## Apps
 
-- `dash/app` - web admin dashboard (vite SPA)
+- `dash/app` - web admin dashboard (Vite Single Page Application)
 - `site` - main site: marketing and docs (next.js app)
 - `storybook` - storybook for all react components
 
@@ -24,6 +24,17 @@
 - `node` 18
 - `pnpm` 8
 - `just` 1.9
+
+## Quick Start
+
+Clone the `gertrude-app/swift` repository. Follow the instructions in the `api/readme.md`.
+From the `api` directory of that repository, execute `just run-api` Next, create a file
+called `.env.local` in the `dash/app` directory. The file should have a line with
+`VITE_API_ENDPOINT=http://127.0.0.1:8080` Once you've installed the above node and pnpm
+environment dependencies, run `pnpm i` from the `web` directory. Then run `just dash` to
+run the dashboard. Create a test parent account email in the parents table of the
+database. If running in debug mode, the password `good` will login. Login via
+http://localhost:8081
 
 ## Usage
 
