@@ -1,13 +1,14 @@
 import React from 'react';
 import cx from 'classnames';
-import { Button } from '@shared/components';
-import ActivityItemTime from './ActivityItemTime';
+import ActivityItemBtns from './ActivityItemBtns';
 
 type Props = {
   className?: string;
   strokes: string;
+  flagged: boolean;
   date: Date;
   onApprove(): unknown;
+  onFlag(): unknown;
   application: string;
   duringSuspension: boolean;
 };
@@ -17,7 +18,9 @@ const KeystrokesViewer: React.FC<Props> = ({
   strokes,
   date,
   application,
+  flagged,
   onApprove,
+  onFlag,
   duringSuspension,
 }) => (
   <div
@@ -35,12 +38,13 @@ const KeystrokesViewer: React.FC<Props> = ({
         <p key={`line-${idx}`}>{line}</p>
       ))}
     </div>
-    <div className="p-4 pt-0 flex justify-between items-center">
-      <ActivityItemTime date={date} />
-      <Button color="tertiary" type="button" onClick={onApprove}>
-        Approve
-      </Button>
-    </div>
+    <ActivityItemBtns
+      className="p-4 pt-0"
+      flagged={flagged}
+      date={date}
+      onApprove={onApprove}
+      onFlag={onFlag}
+    />
   </div>
 );
 

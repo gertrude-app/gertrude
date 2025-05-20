@@ -21,6 +21,7 @@ export const Default: Story = props({
       numItems: 330,
       index: 0,
       numDays: 3,
+      numFlagged: 0,
       numCompleted: 0,
     },
     {
@@ -28,6 +29,7 @@ export const Default: Story = props({
       numItems: 117,
       index: 1,
       numDays: 3,
+      numFlagged: 0,
       numCompleted: 64,
     },
     {
@@ -35,7 +37,16 @@ export const Default: Story = props({
       numItems: 89,
       index: 2,
       numDays: 3,
+      numFlagged: 0,
       numCompleted: 89,
+    },
+    {
+      date: new Date(time.stable()),
+      numItems: 43,
+      index: 2,
+      numDays: 3,
+      numFlagged: 1,
+      numCompleted: 43,
     },
   ],
 });
@@ -49,6 +60,7 @@ export const Single: Story = props({
       index: 0,
       numDays: 3,
       numCompleted: 330,
+      numFlagged: 0,
     },
   ],
 });

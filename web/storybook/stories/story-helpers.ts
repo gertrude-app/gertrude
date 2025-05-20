@@ -267,6 +267,7 @@ export function keystrokeLine(
     appName,
     line,
     deleted,
+    flagged: false,
     duringSuspension: duringSuspension || false,
   };
 }
@@ -284,6 +285,7 @@ export function screenshot(
     width,
     height,
     deleted,
+    flagged: false,
     duringSuspension: duringSuspension || false,
   };
 }

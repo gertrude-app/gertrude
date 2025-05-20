@@ -129,13 +129,15 @@ export function keychainSummary(
 }
 
 export function userActivitySummary(
-  totalItems = 0,
+  numTotal = 0,
   numApproved = 0,
+  numFlagged = 0,
   start = new Date().toISOString(),
 ): UserActivitySummaries.Output['days'][number] {
   return {
     date: start,
-    totalItems,
+    numTotal,
+    numFlagged,
     numApproved,
   };
 }
@@ -152,6 +154,7 @@ type KeystrokeActivityItem = {
   ids: UUID[];
   appName: string;
   line: string;
+  flagged: boolean;
   createdAt: ISODateString;
   deletedAt?: ISODateString;
   duringSuspension: boolean;
@@ -169,6 +172,7 @@ export function keystrokeActivityItem(
     line: `line-${Math.random()}`,
     createdAt: new Date().toISOString(),
     duringSuspension: false,
+    flagged: false,
     ...override,
   };
 }
@@ -181,6 +185,7 @@ type ScreenshotActivityItem = {
   width: number;
   height: number;
   duringSuspension: boolean;
+  flagged: boolean;
   createdAt: ISODateString;
   deletedAt?: ISODateString;
 };
@@ -200,6 +205,7 @@ export function screenshotActivityItem(
     height,
     createdAt: new Date().toISOString(),
     duringSuspension: false,
+    flagged: false,
     ...override,
   };
 }
@@ -216,6 +222,7 @@ export function keystrokeLine(
     line: `line-${Math.random()}`,
     date: new Date().toISOString(),
     duringSuspension: false,
+    flagged: false,
     ...override,
     type: `KeystrokeLine`,
   };

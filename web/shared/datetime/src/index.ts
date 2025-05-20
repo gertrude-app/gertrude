@@ -6,9 +6,18 @@ export function isoToDateInput(iso: string): string {
 
 export function formatDate(
   date: Date,
-  style: 'long' | 'medium' | 'short' | 'url' | 'dateInput',
+  style: 'long' | 'medium' | 'short' | 'm/d/yyyy' | 'url' | 'dateInput',
 ): string {
   if (style === `short`) {
+    return [
+      date.toLocaleDateString(`en-US`, { weekday: `long` }),
+      `, `,
+      date.toLocaleDateString(`en-US`, { month: `short` }),
+      ` `,
+      date.getDate(),
+    ].join(``);
+  }
+  if (style === `m/d/yyyy`) {
     return date.toLocaleDateString();
   }
 

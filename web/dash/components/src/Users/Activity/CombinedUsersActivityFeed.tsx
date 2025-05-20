@@ -19,6 +19,7 @@ interface Props {
   }>;
   numDeleted: number;
   deleteItems(ids: UUID[]): unknown;
+  flagItem(id: UUID): unknown;
   chunkSize?: number;
 }
 
@@ -26,12 +27,14 @@ const CombinedUsersActivityFeed: React.FC<Props> = ({
   date,
   activity,
   numDeleted,
+  flagItem,
   deleteItems,
   chunkSize = 100,
 }) => {
   const navigate = useNavigate();
   const [initialSort, setInitialSort] = useState<Record<string, number> | null>(null);
   const items = activity.flatMap((user) => user.items);
+  const hasFlagged = items.some((item) => item.flagged);
 
   activity.sort((a, b) => {
     if (initialSort) {
@@ -68,6 +71,7 @@ const CombinedUsersActivityFeed: React.FC<Props> = ({
                   items={items}
                   chunkSize={chunkSize}
                   deleteItems={deleteItems}
+                  flagItem={flagItem}
                   highlightSuspensionActivity={highlightSuspensionActivity}
                 />
                 {items.length > 1 && (
@@ -77,9 +81,11 @@ const CombinedUsersActivityFeed: React.FC<Props> = ({
                       onClick={() => deleteItems(items.map((item) => item.id))}
                       color="secondary"
                       className="ScrollTop mt-4"
+                      disabled={items.every((item) => item.flagged)}
                     >
                       <i className="fa-solid fa-thumbs-up mr-2" />
-                      Approve all {posessive(userName)} activity
+                      Delete all {posessive(userName)}
+                      {items.some((i) => i.flagged) ? ` unflagged` : ` activity`}
                     </Button>
                   </div>
                 )}
@@ -88,16 +94,20 @@ const CombinedUsersActivityFeed: React.FC<Props> = ({
           ))}
           <Button
             className="ScrollTop self-center"
+            disabled={items.every((item) => item.flagged)}
             type="button"
             onClick={() => {
               deleteItems(items.map((item) => item.id));
-              setTimeout(() => navigate(`..`, { replace: true }), 100);
+              setTimeout(
+                () => navigate(`..`, { replace: true }),
+                hasFlagged ? 2000 : 200,
+              );
             }}
             color="primary"
             size="large"
           >
             <i className="fa-solid fa-thumbs-up mr-2" />
-            Approve all child activity
+            Delete {hasFlagged ? `unflagged` : `all`} activity
           </Button>
         </ReviewDayWrapper>
       ) : (

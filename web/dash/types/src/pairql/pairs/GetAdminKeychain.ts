@@ -1,7 +1,11 @@
 // auto-generated, do not edit
-import type { AdminKeychain } from '../shared';
+import type { KeychainSummary, Key } from '../shared';
 
 export namespace GetAdminKeychain {
   export type Input = UUID;
-  export type Output = AdminKeychain;
+
+  export interface Output {
+    summary: KeychainSummary;
+    keys: Key[];
+  }
 }

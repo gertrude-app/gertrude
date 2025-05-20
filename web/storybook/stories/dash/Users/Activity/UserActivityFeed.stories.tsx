@@ -18,6 +18,7 @@ export const Default: Story = props({
   numDeleted: 0,
   highlightSuspensionActivity: true,
   deleteItems: () => {},
+  flagItem: () => {},
 });
 
 // @screenshot: md

@@ -15,6 +15,8 @@ export const Default: Story = props({
   height: 600,
   duringSuspension: false,
   date: new Date(time.stable()),
+  flagged: false,
+  onFlag: () => {},
   onApprove: () => {},
 });
 

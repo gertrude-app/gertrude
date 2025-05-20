@@ -31,7 +31,7 @@
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.3.0",
     "react-router-dom": "6.22.3",
-    "react-tooltip": "5.8.3",
+    "react-tooltip": "5.28.1",
     "uuid": "9.0.0"
   },
   "devDependencies": {

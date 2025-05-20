@@ -8,6 +8,7 @@ type Props = {
   date: Date;
   numItems: number;
   numCompleted: number;
+  numFlagged: number;
   index: number;
   numDays: number;
 };
@@ -15,6 +16,7 @@ type Props = {
 const DaySummaryCard: React.FC<Props> = ({
   date,
   numCompleted,
+  numFlagged,
   numItems,
   index,
   numDays,
@@ -64,9 +66,22 @@ const DaySummaryCard: React.FC<Props> = ({
           <h2 className="text-slate-700 grow text-lg font-bold relative">
             <span className="sm:hidden">{formatDate(date, `short`)}</span>
             <span className="hidden sm:inline">{formatDate(date, `medium`)}</span>
-            {numCompleted === numItems && (
-              <Badge type="green" size="small" className="absolute right-0 top-0">
-                <i className="fa fa-check mr-1" /> Completed
+            {(numCompleted === numItems || numFlagged > 0) && (
+              <Badge
+                type={numFlagged > 0 ? `warning` : `green`}
+                size="small"
+                className="absolute right-0 top-0"
+              >
+                {numFlagged === 0 ? (
+                  <>
+                    <i className="fa fa-check mr-1" /> Completed
+                  </>
+                ) : (
+                  <>
+                    <i className="fa fa-flag mr-1.5" />
+                    Flagged
+                  </>
+                )}
               </Badge>
             )}
           </h2>
@@ -80,6 +95,11 @@ const DaySummaryCard: React.FC<Props> = ({
         <p className="mt-2 text-slate-600">
           <span className="text-lg font-bold">{numCompleted}</span> out of{` `}
           <span className="text-lg font-bold">{numItems}</span> items reviewed
+          {numFlagged > 0 && (
+            <>
+              , <b>{numFlagged}</b> flagged
+            </>
+          )}
         </p>
       </Link>
     </div>

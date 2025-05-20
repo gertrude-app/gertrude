@@ -18,7 +18,7 @@ const FeedHeader: React.FC<Props> = ({ date, numItems, numDeleted }) => (
         <i className="fa fa-chevron-left mr-2" aria-hidden /> Back
       </Link>
       <h1 className="font-bold text-slate-800 block xs:hidden">
-        {formatDate(date, `short`)}
+        {formatDate(date, `m/d/yyyy`)}
       </h1>
       <h1 className="font-bold text-slate-800 hidden xs:block">
         {formatDate(date, `medium`)}

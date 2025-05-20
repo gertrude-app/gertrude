@@ -15,12 +15,14 @@ describe(`activity screens`, () => {
       {
         date: time.subtracting({ days: 1 }),
         numApproved: 5,
-        totalItems: 1234,
+        numTotal: 1234,
+        numFlagged: 0,
       },
       {
         date: time.now(),
         numApproved: 6,
-        totalItems: 26,
+        numTotal: 26,
+        numFlagged: 0,
       },
     ]);
 
@@ -77,7 +79,7 @@ describe(`activity screens`, () => {
       .contains(`During filter suspension`)
       .should(`not.exist`);
 
-    cy.contains(`Approve all child activity`).click();
+    cy.contains(`Delete all activity`).click();
 
     cy.wait(`@DeleteActivityItems_v2`)
       .its(`request.body`)
@@ -152,7 +154,7 @@ describe(`activity screens`, () => {
     ]);
 
     // delete jimmy's first 100 items...
-    cy.contains(`Approve previous 100 items`).click();
+    cy.contains(`Delete previous 100 items`).click();
 
     // ...and the rest of jimmy's activity should still be first, though outnumbered
     cy.testId(`page-heading`).first().should(`have.text`, `jimmy’s Activity`);

@@ -11,17 +11,6 @@ export function entireDay(date: Date): DateRangeInput {
   };
 }
 
-export function entireDays(numDays: number): DateRangeInput[] {
-  const now = new Date();
-  const ranges: DateRangeInput[] = [];
-  for (let i = 0; i < numDays; i++) {
-    const day = new Date(now.getTime());
-    day.setDate(now.getDate() - i);
-    ranges.push(entireDay(day));
-  }
-  return ranges;
-}
-
 function mutateToDayEnd(date: Date): void {
   date.setHours(23);
   date.setMinutes(59);

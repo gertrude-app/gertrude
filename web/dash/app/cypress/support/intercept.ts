@@ -30,6 +30,10 @@ export function interceptPql(
   output: T.DeleteActivityItems_v2.Output,
 ): void;
 export function interceptPql(slug: `DeleteEntity`, output: T.DeleteEntity.Output): void;
+export function interceptPql(
+  slug: `FlagActivityItems`,
+  output: T.FlagActivityItems.Output,
+): void;
 export function interceptPql(slug: `GetAdmin`, output: T.GetAdmin.Output): void;
 export function interceptPql(
   slug: `GetAdminKeychain`,
@@ -157,6 +161,7 @@ export function forcePqlErr(
     | 'DecideFilterSuspensionRequest'
     | 'DeleteActivityItems_v2'
     | 'DeleteEntity'
+    | 'FlagActivityItems'
     | 'GetAdmin'
     | 'GetAdminKeychain'
     | 'GetAdminKeychains'

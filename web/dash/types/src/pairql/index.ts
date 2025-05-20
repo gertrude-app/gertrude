@@ -9,6 +9,7 @@ export * from './pairs/CreatePendingNotificationMethod';
 export * from './pairs/DecideFilterSuspensionRequest';
 export * from './pairs/DeleteActivityItems_v2';
 export * from './pairs/DeleteEntity';
+export * from './pairs/FlagActivityItems';
 export * from './pairs/GetAdmin';
 export * from './pairs/GetAdminKeychain';
 export * from './pairs/GetAdminKeychains';
