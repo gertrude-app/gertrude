@@ -14,6 +14,8 @@ export const Basic: Story = props({
   date: new Date(time.stable()),
   application: `Notes`,
   duringSuspension: false,
+  flagged: false,
+  onFlag: () => {},
   onApprove: () => {},
 });
 

@@ -24,6 +24,13 @@ ReactDOM.createRoot(document.getElementById(`root`)!).render(
           className="shadow-lg max-w-sm text-center z-50"
           style={{ borderRadius: `10px`, color: `#475569` }}
         />
+        <Tooltip
+          id="flag-activity"
+          variant="light"
+          className="shadow-lg max-w-sm text-center z-50"
+          style={{ borderRadius: `10px`, color: `#475569` }}
+          opacity={1}
+        />
       </QueryClientProvider>
     </AuthProvider>
   </React.StrictMode>,

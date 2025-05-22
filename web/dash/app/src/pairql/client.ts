@@ -77,6 +77,16 @@ export const liveClient = {
     );
   },
 
+  flagActivityItems(
+    input: T.FlagActivityItems.Input,
+  ): Promise<T.Result<T.FlagActivityItems.Output>> {
+    return query<T.FlagActivityItems.Input, T.FlagActivityItems.Output>(
+      input,
+      `admin`,
+      `FlagActivityItems`,
+    );
+  },
+
   getAdmin(input: T.GetAdmin.Input): Promise<T.Result<T.GetAdmin.Output>> {
     return query<T.GetAdmin.Input, T.GetAdmin.Output>(input, `admin`, `GetAdmin`);
   },
@@ -408,6 +418,9 @@ export const throwingClient: ApiClient = {
   },
   deleteEntity: () => {
     throw new Error(`ApiClient.deleteEntity() not implemented`);
+  },
+  flagActivityItems: () => {
+    throw new Error(`ApiClient.flagActivityItems() not implemented`);
   },
   getAdmin: () => {
     throw new Error(`ApiClient.getAdmin() not implemented`);

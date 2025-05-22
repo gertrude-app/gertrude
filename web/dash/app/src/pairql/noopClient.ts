@@ -17,6 +17,9 @@ const noopClient: ApiClient = {
   deleteEntity: async () => {
     return Result.success({ success: true });
   },
+  flagActivityItems: async () => {
+    return Result.success({ success: true });
+  },
   getAdmin: async () => {
     return Result.success({
       id: ``,

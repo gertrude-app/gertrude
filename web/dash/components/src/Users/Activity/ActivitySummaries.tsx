@@ -3,11 +3,11 @@ import { posessive } from '@shared/string';
 import type { ComponentProps } from 'react';
 import PageHeading from '../../PageHeading';
 import EmptyState from '../../EmptyState';
-import ReviewSummaryCard from './DaySummaryCard';
+import DaySummaryCard from './DaySummaryCard';
 
 type Props = {
   userName?: string;
-  days: Array<ComponentProps<typeof ReviewSummaryCard>>;
+  days: Array<ComponentProps<typeof DaySummaryCard>>;
 };
 
 const ActivitySummaries: React.FC<Props> = ({ userName, days }) => (
@@ -18,7 +18,7 @@ const ActivitySummaries: React.FC<Props> = ({ userName, days }) => (
     {days.length > 0 ? (
       <div className="my-8">
         {days.map((day, index) => (
-          <ReviewSummaryCard
+          <DaySummaryCard
             key={`${day.date}`}
             {...day}
             index={index}

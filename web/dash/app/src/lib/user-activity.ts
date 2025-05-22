@@ -21,6 +21,21 @@ export function outputItemToActivityFeedItem(item: UserActivityItem): ActivityFe
   }
 }
 
+export function itemFromRootId(
+  rootId: UUID,
+  queryData?: CombinedUsersActivityFeed.Output,
+): UserActivityItem | null {
+  if (!queryData) return null;
+  for (const childChunk of queryData) {
+    for (const item of childChunk.items) {
+      if (item.ids.includes(rootId)) {
+        return item;
+      }
+    }
+  }
+  return null;
+}
+
 export function prepareCombinedUsersActivityDelete(
   itemRootIds: UUID[],
   queryData: CombinedUsersActivityFeed.Output,
@@ -48,6 +63,7 @@ export function prepareCombinedUsersActivityDelete(
 export function prepareUserActivityDelete(
   itemRootIds: UUID[],
   queryData: UserActivityFeed.Output,
+  flagged: UUID[] = [],
 ): [
   input: { keystrokeLineIds: UUID[]; screenshotIds: UUID[] },
   optimisticUpdate: UserActivityFeed.Output,
@@ -56,7 +72,7 @@ export function prepareUserActivityDelete(
   const screenshotIds: UUID[] = [];
   // impure filter function, but prevents iterating twice
   const remaining = queryData.items.filter((item) => {
-    if (itemRootIds.includes(item.id)) {
+    if (itemRootIds.includes(item.id) && !flagged.includes(item.id)) {
       if (item.case === `keystrokeLine`) {
         keystrokeLineIds = [...keystrokeLineIds, ...item.ids];
       } else {

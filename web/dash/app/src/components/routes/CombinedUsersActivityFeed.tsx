@@ -9,6 +9,7 @@ import { entireDay } from '../../lib/days';
 import {
   outputItemToActivityFeedItem,
   prepareCombinedUsersActivityDelete,
+  itemFromRootId,
 } from '../../lib/user-activity';
 
 const CombinedUsersActivityFeedRoute: React.FC = () => {
@@ -35,6 +36,22 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
     },
   );
 
+  const flagItem = useMutation(
+    (rootId: UUID) => {
+      const item = itemFromRootId(rootId, query.data);
+      return Current.api.flagActivityItems(item?.ids ?? []);
+    },
+    {
+      invalidating: [Key.combinedUsersActivitySummaries],
+      toast: (id) => {
+        if (!id) return;
+        return itemFromRootId(id, query.data)?.flagged
+          ? `unflag:activity-item`
+          : `flag:activity-item`;
+      },
+    },
+  );
+
   if (query.isPending) {
     return <Loading />;
   }
@@ -55,6 +72,7 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
         }))}
       numDeleted={query.data.reduce((acc, user) => acc + user.numDeleted, 0)}
       deleteItems={(rootIds) => deleteItems.mutate(rootIds)}
+      flagItem={(rootId) => flagItem.mutate(rootId)}
     />
   );
 };

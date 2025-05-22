@@ -14,6 +14,7 @@ export const Default: Story = props({
   index: 0,
   numDays: 2,
   numItems: 36,
+  numFlagged: 0,
   numCompleted: 24,
 });
 
@@ -27,6 +28,11 @@ export const Completed: Story = props({
   ...Default.args,
   numItems: 77,
   numCompleted: 77,
+});
+
+export const Flagged: Story = props({
+  ...Completed.args,
+  numFlagged: 2,
 });
 
 export default meta;

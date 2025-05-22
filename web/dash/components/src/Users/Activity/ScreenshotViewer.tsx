@@ -1,14 +1,16 @@
 import React from 'react';
 import cx from 'classnames';
-import { Button, isScreenshotTest } from '@shared/components';
-import ActivityItemTime from './ActivityItemTime';
+import { isScreenshotTest } from '@shared/components';
+import ActivityItemBtns from './ActivityItemBtns';
 
 type Props = {
   className?: string;
   url: string;
   width: number;
   height: number;
+  flagged: boolean;
   onApprove(): unknown;
+  onFlag(): unknown;
   date: Date;
   duringSuspension: boolean;
 };
@@ -19,6 +21,8 @@ const ScreenshotViewer: React.FC<Props> = ({
   date,
   width,
   height,
+  flagged,
+  onFlag,
   onApprove,
   duringSuspension,
 }) => (
@@ -39,12 +43,13 @@ const ScreenshotViewer: React.FC<Props> = ({
         alt="child screenshot"
       />
     </div>
-    <div className="px-4 py-3 sm:py-4 pt-0 flex justify-between items-center">
-      <ActivityItemTime date={date} />
-      <Button color="tertiary" type="button" onClick={onApprove}>
-        Approve
-      </Button>
-    </div>
+    <ActivityItemBtns
+      className="px-4 py-3 sm:py-4 pt-0"
+      flagged={flagged}
+      date={date}
+      onApprove={onApprove}
+      onFlag={onFlag}
+    />
   </div>
 );
 

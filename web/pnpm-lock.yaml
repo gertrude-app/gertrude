@@ -186,8 +186,8 @@ importers:
         specifier: 6.22.3
         version: 6.22.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-tooltip:
-        specifier: 5.8.3
-        version: 5.8.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        specifier: 5.28.1
+        version: 5.28.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       uuid:
         specifier: 9.0.0
         version: 9.0.0
@@ -1844,17 +1844,17 @@ packages:
   '@fal-works/esbuild-plugin-global-externals@2.1.2':
     resolution: {integrity: sha512-cEee/Z+I12mZcFJshKcCqC8tuX5hG3s+d+9nZ3LabqKF1vKdF41B92pJVCBggjAGORAeOzyyDDKrZwIkLffeOQ==}
 
-  '@floating-ui/core@1.2.2':
-    resolution: {integrity: sha512-FaO9KVLFnxknZaGWGmNtjD2CVFuc0u4yeGEofoyXO2wgRA7fLtkngT6UB0vtWQWuhH3iMTZZ/Y89CMeyGfn8pA==}
-
   '@floating-ui/core@1.4.1':
     resolution: {integrity: sha512-jk3WqquEJRlcyu7997NtR5PibI+y5bi+LS3hPmguVClypenMsCY3CBa3LAQnozRCtCrYWSEtAdiskpamuJRFOQ==}
 
-  '@floating-ui/dom@1.1.1':
-    resolution: {integrity: sha512-TpIO93+DIujg3g7SykEAGZMDtbJRrmnYRCNYSjJlvIbGhBjRSNTLVbNeDQBrzy9qDgUbiWdc7KA0uZHZ2tJmiw==}
+  '@floating-ui/core@1.7.0':
+    resolution: {integrity: sha512-FRdBLykrPPA6P76GGGqlex/e7fbe0F1ykgxHYNXQsH/iTEtjMj/f9bpY5oQqbjt5VgZvgz/uKXbGuROijh3VLA==}
 
   '@floating-ui/dom@1.5.1':
     resolution: {integrity: sha512-KwvVcPSXg6mQygvA1TjbN/gh///36kKtllIF8SUm0qpFj8+rvYrpvlYdL1JoA71SHpDqgSSdGOSoQ0Mp3uY5aw==}
+
+  '@floating-ui/dom@1.7.0':
+    resolution: {integrity: sha512-lGTor4VlXcesUMh1cupTUTDoCxMb0V6bm3CnxHzQcw8Eaf1jQbgQX4i02fYgT0vJ82tb5MZ4CZk1LRGkktJCzg==}
 
   '@floating-ui/react-dom@2.0.1':
     resolution: {integrity: sha512-rZtAmSht4Lry6gdhAJDrCp/6rKN7++JnL1/Anbr/DdeyYXQPxvg/ivrbYvJulbRf4vL8b212suwMM2lxbv+RQA==}
@@ -1864,6 +1864,9 @@ packages:
 
   '@floating-ui/utils@0.1.1':
     resolution: {integrity: sha512-m0G6wlnhm/AX0H12IOWtK8gASEMffnX08RtKkCgTdHb9JpHKGloI7icFfLg9ZmQeavcvR0PKmzxClyuFPSjKWw==}
+
+  '@floating-ui/utils@0.2.9':
+    resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
   '@headlessui/react@1.7.11':
     resolution: {integrity: sha512-EaDbVgcyiylhtskZZf4Qb/JiiByY7cYbd0qgZ9xm2pm2X7hKojG0P4TaQYKgPOV3vojPhd/pZyQh3nmRkkcSyw==}
@@ -6352,8 +6355,8 @@ packages:
       '@types/react':
         optional: true
 
-  react-tooltip@5.8.3:
-    resolution: {integrity: sha512-h7maAlm2Xeymc14gWKhhrzsENeB83N65EzZ+AcQIGrOpNE0yefVRJIHhNcWHEJ0FEtf7VZXxtsj5glVXKxEtvA==}
+  react-tooltip@5.28.1:
+    resolution: {integrity: sha512-ZA4oHwoIIK09TS7PvSLFcRlje1wGZaxw6xHvfrzn6T82UcMEfEmHVCad16Gnr4NDNDh93HyN037VK4HDi5odfQ==}
     peerDependencies:
       react: '>=16.14.0'
       react-dom: '>=16.14.0'
@@ -9067,20 +9070,23 @@ snapshots:
 
   '@fal-works/esbuild-plugin-global-externals@2.1.2': {}
 
-  '@floating-ui/core@1.2.2': {}
-
   '@floating-ui/core@1.4.1':
     dependencies:
       '@floating-ui/utils': 0.1.1
 
-  '@floating-ui/dom@1.1.1':
+  '@floating-ui/core@1.7.0':
     dependencies:
-      '@floating-ui/core': 1.2.2
+      '@floating-ui/utils': 0.2.9
 
   '@floating-ui/dom@1.5.1':
     dependencies:
       '@floating-ui/core': 1.4.1
       '@floating-ui/utils': 0.1.1
+
+  '@floating-ui/dom@1.7.0':
+    dependencies:
+      '@floating-ui/core': 1.7.0
+      '@floating-ui/utils': 0.2.9
 
   '@floating-ui/react-dom@2.0.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
@@ -9089,6 +9095,8 @@ snapshots:
       react-dom: 18.2.0(react@18.2.0)
 
   '@floating-ui/utils@0.1.1': {}
+
+  '@floating-ui/utils@0.2.9': {}
 
   '@headlessui/react@1.7.11(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
@@ -14692,9 +14700,9 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.2.42
 
-  react-tooltip@5.8.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+  react-tooltip@5.28.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
-      '@floating-ui/dom': 1.1.1
+      '@floating-ui/dom': 1.7.0
       classnames: 2.3.2
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)

@@ -199,6 +199,7 @@ export type UserActivityItem =
       width: number;
       height: number;
       duringSuspension: boolean;
+      flagged: boolean;
       createdAt: ISODateString;
       deletedAt?: ISODateString;
     }
@@ -209,6 +210,7 @@ export type UserActivityItem =
       appName: string;
       line: string;
       duringSuspension: boolean;
+      flagged: boolean;
       createdAt: ISODateString;
       deletedAt?: ISODateString;
     };

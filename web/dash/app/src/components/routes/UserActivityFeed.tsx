@@ -35,6 +35,20 @@ const UserActivityFeedRoute: React.FC = () => {
     },
   );
 
+  const flagItem = useMutation(
+    (rootId: UUID) => {
+      const ids = query.data?.items.find((item) => item.ids.includes(rootId))?.ids;
+      return Current.api.flagActivityItems(ids ?? [rootId]);
+    },
+    {
+      invalidating: [queryKey, Key.userActivitySummaries(userId), Key.dashboard],
+      toast: (rootId) =>
+        query.data?.items.find((item) => item.ids.includes(rootId ?? ``))?.flagged
+          ? `unflag:activity-item`
+          : `flag:activity-item`,
+    },
+  );
+
   if (query.isPending) {
     return <Loading />;
   }
@@ -48,6 +62,7 @@ const UserActivityFeedRoute: React.FC = () => {
       date={date}
       numDeleted={query.data.numDeleted}
       deleteItems={(rootIds) => deleteItems.mutate(rootIds)}
+      flagItem={(rootId) => flagItem.mutate(rootId)}
       items={query.data.items
         .map(outputItemToActivityFeedItem)
         .filter((item) => !item.deleted)}

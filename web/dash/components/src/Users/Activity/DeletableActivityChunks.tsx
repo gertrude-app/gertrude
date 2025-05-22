@@ -8,8 +8,9 @@ const DeletableActivityChunks: React.FC<{
   items: ActivityFeedItem[];
   chunkSize: number;
   deleteItems: (ids: UUID[]) => unknown;
+  flagItem: (id: UUID) => unknown;
   highlightSuspensionActivity: boolean;
-}> = ({ items, deleteItems, chunkSize, highlightSuspensionActivity }) => (
+}> = ({ items, deleteItems, flagItem, chunkSize, highlightSuspensionActivity }) => (
   <>
     {chunkedRenderTasks(items, chunkSize, highlightSuspensionActivity)
       .flat(1)
@@ -20,6 +21,7 @@ const DeletableActivityChunks: React.FC<{
               <Item
                 key={item.item.id}
                 item={item.item}
+                flagItem={() => flagItem(item.item.id)}
                 deleteItem={() => deleteItems([item.item.id])}
               />
             );
@@ -37,6 +39,7 @@ const DeletableActivityChunks: React.FC<{
                     <Item
                       key={item.id}
                       item={item}
+                      flagItem={() => flagItem(item.id)}
                       deleteItem={() => deleteItems([item.id])}
                     />
                   ))}
@@ -56,7 +59,7 @@ const DeletableActivityChunks: React.FC<{
                   className="ScrollTop"
                   onClick={() => deleteItems(item.ids)}
                 >
-                  Approve previous {item.ids.length} items
+                  Delete previous {item.ids.length} items
                 </Button>
               </div>
             );
@@ -70,7 +73,8 @@ export default DeletableActivityChunks;
 const Item: React.FC<{
   item: ActivityFeedItem;
   deleteItem: () => unknown;
-}> = ({ item, deleteItem }) => {
+  flagItem: () => unknown;
+}> = ({ item, deleteItem, flagItem }) => {
   if (item.type === `Screenshot`) {
     return (
       <ScreenshotViewer
@@ -78,6 +82,8 @@ const Item: React.FC<{
         width={item.width}
         height={item.height}
         onApprove={deleteItem}
+        onFlag={flagItem}
+        flagged={item.flagged}
         date={new Date(item.date)}
         duringSuspension={item.duringSuspension}
       />
@@ -89,6 +95,8 @@ const Item: React.FC<{
         application={item.appName}
         onApprove={deleteItem}
         duringSuspension={item.duringSuspension}
+        onFlag={flagItem}
+        flagged={item.flagged}
         date={new Date(item.date)}
       />
     );
