@@ -20,9 +20,7 @@ export function useMutation<T, V>(
 ): MutationResult<T, V> {
   const [entityId, setEntityId] = useState<UUID | undefined>(undefined);
   const queryClient = useQueryClient();
-  const toastId =
-    typeof options.toast === `function` ? options.toast(entityId) : options.toast;
-  const toasting = getToast(toastId);
+  const toasting = getToast(options.toast);
   return useLibMutation({
     mutationFn: (arg) => fn(arg).then((result) => result.valueOrThrow()),
     onMutate(arg) {
@@ -99,7 +97,7 @@ export function useConfirmableDelete(
 }
 
 type MutationOptions<T> = {
-  toast?: ToastId | ((entityId?: UUID) => ToastId | undefined);
+  toast?: ToastId;
   invalidating?: QueryKey<unknown>[];
   onSuccess?: (payload: T, entityId?: UUID) => unknown;
   onError?: (error: PqlError, entityId?: UUID) => unknown;
@@ -117,7 +115,6 @@ type ToastId =
   | 'delete:key'
   | 'delete:activity-items'
   | 'flag:activity-item'
-  | 'unflag:activity-item'
   | 'update:suspend-filter-request'
   | 'create:pending-notification-method'
   | 'confirm:pending-notification-method'
@@ -147,10 +144,7 @@ function getToast(toastId?: ToastId): { verb: string; entity: string } | undefin
       return { verb, entity };
 
     case `flag:activity-item`:
-      return { verb: `flagg`, entity: `activity` };
-
-    case `unflag:activity-item`:
-      return { verb: `un-flagg`, entity: `activity` };
+      return { verb: `update`, entity: `item` };
 
     case `delete:user`:
     case `save:user`:

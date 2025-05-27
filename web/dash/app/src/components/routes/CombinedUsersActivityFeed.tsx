@@ -6,11 +6,7 @@ import React from 'react';
 import { useOptimism, Key, useMutation, useQuery } from '../../hooks';
 import Current from '../../environment';
 import { entireDay } from '../../lib/days';
-import {
-  outputItemToActivityFeedItem,
-  prepareCombinedUsersActivityDelete,
-  itemFromRootId,
-} from '../../lib/user-activity';
+import * as lib from '../../lib/user-activity';
 
 const CombinedUsersActivityFeedRoute: React.FC = () => {
   const { urlDate = `` } = useParams<{ urlDate: string }>();
@@ -26,7 +22,7 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
     (rootIds: UUID[]) => {
       const data = query.data;
       if (!data) return Result.resolveUnexpected(`af6a2372`);
-      const [input, nextState] = prepareCombinedUsersActivityDelete(rootIds, data);
+      const [input, nextState] = lib.prepareCombinedUsersActivityDelete(rootIds, data);
       optimistic.update(queryKey, nextState);
       return Current.api.deleteActivityItems(input);
     },
@@ -38,17 +34,15 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
 
   const flagItem = useMutation(
     (rootId: UUID) => {
-      const item = itemFromRootId(rootId, query.data);
-      return Current.api.flagActivityItems(item?.ids ?? []);
+      const data = query.data;
+      if (!data) return Result.resolveUnexpected(`07d2dbbf`);
+      const [input, nextState] = lib.flagCombinedActivityFeedItem(rootId, data);
+      optimistic.update(queryKey, nextState);
+      return Current.api.flagActivityItems(input);
     },
     {
       invalidating: [Key.combinedUsersActivitySummaries],
-      toast: (id) => {
-        if (!id) return;
-        return itemFromRootId(id, query.data)?.flagged
-          ? `unflag:activity-item`
-          : `flag:activity-item`;
-      },
+      toast: `flag:activity-item`,
     },
   );
 
@@ -68,7 +62,7 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
         .map((user) => ({
           userName: user.userName,
           highlightSuspensionActivity: user.showSuspensionActivity,
-          items: user.items.map(outputItemToActivityFeedItem),
+          items: user.items.map(lib.outputItemToActivityFeedItem),
         }))}
       numDeleted={query.data.reduce((acc, user) => acc + user.numDeleted, 0)}
       deleteItems={(rootIds) => deleteItems.mutate(rootIds)}
