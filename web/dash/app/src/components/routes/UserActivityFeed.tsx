@@ -6,10 +6,7 @@ import { Result } from '@dash/types';
 import Current from '../../environment';
 import { useQuery, Key, useMutation, useOptimism } from '../../hooks';
 import { entireDay } from '../../lib/days';
-import {
-  outputItemToActivityFeedItem,
-  prepareUserActivityDelete,
-} from '../../lib/user-activity';
+import * as lib from '../../lib/user-activity';
 
 const UserActivityFeedRoute: React.FC = () => {
   const { userId = ``, urlDate = `` } = useParams<{ userId: string; urlDate: string }>();
@@ -25,7 +22,7 @@ const UserActivityFeedRoute: React.FC = () => {
     (rootIds: UUID[]) => {
       const data = query.data;
       if (!data) return Result.resolveUnexpected(`c86706e8`);
-      const [input, nextState] = prepareUserActivityDelete(rootIds, data);
+      const [input, nextState] = lib.prepareUserActivityDelete(rootIds, data);
       optimistic.update(queryKey, nextState);
       return Current.api.deleteActivityItems(input);
     },
@@ -37,15 +34,15 @@ const UserActivityFeedRoute: React.FC = () => {
 
   const flagItem = useMutation(
     (rootId: UUID) => {
-      const ids = query.data?.items.find((item) => item.ids.includes(rootId))?.ids;
-      return Current.api.flagActivityItems(ids ?? [rootId]);
+      const data = query.data;
+      if (!data) return Result.resolveUnexpected(`816ec66f`);
+      const [input, nextState] = lib.flagUserActivityFeedItem(rootId, data);
+      optimistic.update(queryKey, nextState);
+      return Current.api.flagActivityItems(input);
     },
     {
       invalidating: [queryKey, Key.userActivitySummaries(userId), Key.dashboard],
-      toast: (rootId) =>
-        query.data?.items.find((item) => item.ids.includes(rootId ?? ``))?.flagged
-          ? `unflag:activity-item`
-          : `flag:activity-item`,
+      toast: `flag:activity-item`,
     },
   );
 
@@ -64,7 +61,7 @@ const UserActivityFeedRoute: React.FC = () => {
       deleteItems={(rootIds) => deleteItems.mutate(rootIds)}
       flagItem={(rootId) => flagItem.mutate(rootId)}
       items={query.data.items
-        .map(outputItemToActivityFeedItem)
+        .map(lib.outputItemToActivityFeedItem)
         .filter((item) => !item.deleted)}
       highlightSuspensionActivity={query.data.showSuspensionActivity}
     />
