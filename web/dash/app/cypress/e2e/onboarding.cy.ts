@@ -24,6 +24,7 @@ describe(`dashboard onboarding nudges`, () => {
       notifications: [],
       verifiedNotificationMethods: [],
       hasAdminChild: false,
+      monthlyPriceInDollars: 10,
     });
     cy.interceptPql(`CreatePendingAppConnection`, { code: 123456 });
     cy.interceptPql(`GetUser`, leopold);
@@ -33,13 +34,13 @@ describe(`dashboard onboarding nudges`, () => {
   });
 
   it(`create first user from dashboard nudge`, () => {
-    cy.interceptPql(`GetDashboardWidgets`, {
+    cy.interceptPql(`DashboardWidgets`, {
       // no users OR devices, so should see create first user prompt
-      users: [],
+      children: [],
       unlockRequests: [],
-      userActivitySummaries: [],
+      childActivitySummaries: [],
       recentScreenshots: [],
-      numAdminNotifications: 0,
+      numParentNotifications: 0,
     });
 
     cy.visit(`/`);
@@ -55,8 +56,8 @@ describe(`dashboard onboarding nudges`, () => {
   });
 
   it(`connect device from dashboard nudge`, () => {
-    cy.interceptPql(`GetDashboardWidgets`, {
-      users: [
+    cy.interceptPql(`DashboardWidgets`, {
+      children: [
         {
           name: leopold.name,
           id: leopold.id,
@@ -65,9 +66,9 @@ describe(`dashboard onboarding nudges`, () => {
         },
       ],
       unlockRequests: [],
-      userActivitySummaries: [],
+      childActivitySummaries: [],
       recentScreenshots: [],
-      numAdminNotifications: 0,
+      numParentNotifications: 0,
     });
 
     cy.visit(`/`);
@@ -77,8 +78,8 @@ describe(`dashboard onboarding nudges`, () => {
   });
 
   it(`recommends that you add a notification if there aren't any`, () => {
-    cy.interceptPql(`GetDashboardWidgets`, {
-      users: [
+    cy.interceptPql(`DashboardWidgets`, {
+      children: [
         {
           name: leopold.name,
           id: leopold.id,
@@ -87,9 +88,9 @@ describe(`dashboard onboarding nudges`, () => {
         },
       ],
       unlockRequests: [],
-      userActivitySummaries: [],
+      childActivitySummaries: [],
       recentScreenshots: [],
-      numAdminNotifications: 0, // <-- no notifications
+      numParentNotifications: 0, // <-- no notifications
     });
 
     cy.visit(`/settings`);

@@ -1,13 +1,13 @@
 import React from 'react';
 import { writable, newestFirst } from '@dash/utils';
 import { relativeTime } from '@dash/datetime';
-import type { GetDashboardWidgets } from '@dash/types';
+import type { DashboardWidgets } from '@dash/types';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
 type Props = {
   className?: string;
-  screenshots: GetDashboardWidgets.Output['recentScreenshots'];
+  screenshots: DashboardWidgets.Output['recentScreenshots'];
 };
 
 const UserScreenshotsWidget: React.FC<Props> = ({ className, screenshots }) => (
@@ -22,7 +22,7 @@ const UserScreenshotsWidget: React.FC<Props> = ({ className, screenshots }) => (
             className="p-2 pl-4 rounded-2xl flex justify-between items-center h-24 sm:h-32 even:bg-slate-50"
           >
             <div>
-              <h3 className="font-bold">{screenshot.userName}</h3>
+              <h3 className="font-bold">{screenshot.childName}</h3>
               <p className="text-sm text-slate-500 italic">
                 {relativeTime(new Date(screenshot.createdAt))}
               </p>

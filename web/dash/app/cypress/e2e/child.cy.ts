@@ -6,7 +6,7 @@ describe(`children screen`, () => {
     cy.simulateLoggedIn();
     cy.interceptPql(`SaveUser`, { success: true });
     cy.interceptPql(`GetUsers`, [mock.user({ id: `user-123` })]);
-    cy.interceptPql(`DeleteEntity`, { success: true });
+    cy.interceptPql(`DeleteEntity_v2`, { success: true });
   });
 
   describe(`new child creation`, () => {

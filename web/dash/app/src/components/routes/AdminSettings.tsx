@@ -24,11 +24,11 @@ const AdminSettings: React.FC = () => {
 
   const getStripeUrl = useMutation(Current.api.stripeUrl);
 
-  const deleteNotification = useConfirmableDelete(`adminNotification`, {
+  const deleteNotification = useConfirmableDelete(`parentNotification`, {
     invalidating: [Key.admin],
   });
 
-  const deleteMethod = useConfirmableDelete(`adminVerifiedNotificationMethod`, {
+  const deleteMethod = useConfirmableDelete(`parentVerifiedNotificationMethod`, {
     invalidating: [Key.admin],
   });
 

@@ -4,7 +4,7 @@ import { useMutation as useLibMutation, useQueryClient } from '@tanstack/react-q
 import { capitalize, pastTense } from '@shared/string';
 import type {
   ConfirmableEntityAction,
-  DeleteEntity,
+  DeleteEntity_v2,
   PqlError,
   SuccessOutput,
   Result,
@@ -66,7 +66,7 @@ export function useMutation<T, V>(
 }
 
 export function useDeleteEntity(
-  type: DeleteEntity.Input['type'],
+  type: DeleteEntity_v2.Input['type'],
   options: MutationOptions<SuccessOutput> = {},
 ): MutationResult<SuccessOutput, UUID> {
   return useMutation((id: UUID) => Current.api.deleteEntity({ type, id }), {
@@ -76,7 +76,7 @@ export function useDeleteEntity(
 }
 
 export function useConfirmableDelete(
-  entityType: DeleteEntity.Input['type'],
+  entityType: DeleteEntity_v2.Input['type'],
   options: MutationOptions<SuccessOutput> & { id?: UUID } = {},
 ): ConfirmableEntityAction<UUID | void> & {
   state: 'idle' | 'pending' | 'error' | 'success';
@@ -162,21 +162,25 @@ function getToast(toastId?: ToastId): { verb: string; entity: string } | undefin
   }
 }
 
-function toastIdFromDeleteEntityType(type: DeleteEntity.Input['type']): ToastId {
+function toastIdFromDeleteEntityType(
+  type: DeleteEntity_v2.Input['type'],
+): ToastId | undefined {
   switch (type) {
-    case `admin`:
-      return `delete:user`;
-    case `adminNotification`:
+    case `parent`:
+      return undefined;
+    case `parentNotification`:
       return `delete:notification`;
-    case `adminVerifiedNotificationMethod`:
+    case `parentVerifiedNotificationMethod`:
       return `delete:notification-method`;
-    case `userDevice`:
+    case `computerUser`:
       return `delete:computer`;
     case `key`:
       return `delete:key`;
     case `keychain`:
       return `delete:keychain`;
-    case `user`:
+    case `child`:
       return `delete:user`;
+    case `announcement`:
+      return undefined;
   }
 }

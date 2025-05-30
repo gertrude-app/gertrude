@@ -12,17 +12,17 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = props({
   screenshots: withIds([
     {
-      userName: `Little Jimmy`,
+      childName: `Little Jimmy`,
       url: testImgUrl(300, 200),
       createdAt: time.now(),
     },
     {
-      userName: `Sally`,
+      childName: `Sally`,
       url: testImgUrl(400, 200),
       createdAt: time.subtracting({ minutes: 2 }),
     },
     {
-      userName: `Henry`,
+      childName: `Henry`,
       url: testImgUrl(500, 300),
       createdAt: time.subtracting({ minutes: 4 }),
     },
@@ -32,17 +32,17 @@ export const Default: Story = props({
 export const WithWideDisplay: Story = props({
   screenshots: withIds([
     {
-      userName: `Little Jimmy`,
+      childName: `Little Jimmy`,
       url: testImgUrl(700, 200),
       createdAt: time.now(),
     },
     {
-      userName: `Sally`,
+      childName: `Sally`,
       url: testImgUrl(400, 200),
       createdAt: time.subtracting({ minutes: 2 }),
     },
     {
-      userName: `Henry`,
+      childName: `Henry`,
       url: testImgUrl(500, 300),
       createdAt: time.subtracting({ minutes: 4 }),
     },

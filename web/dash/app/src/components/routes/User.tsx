@@ -24,8 +24,10 @@ const UserRoute: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, {});
   const queryKey = Key.user(id);
   const getKeychains = useSelectableKeychains();
-  const deleteUser = useConfirmableDelete(`user`, { id });
-  const deleteDevice = useConfirmableDelete(`userDevice`, { invalidating: [queryKey] });
+  const deleteChild = useConfirmableDelete(`child`, { id });
+  const deleteComputerUser = useConfirmableDelete(`computerUser`, {
+    invalidating: [queryKey],
+  });
 
   const getUser = useQuery(queryKey, () => Current.api.getUser(id), {
     onReceive: (user) => dispatch({ type: `setUser`, user }),
@@ -74,7 +76,7 @@ const UserRoute: React.FC = () => {
     return <Navigate to={`/children/${newUserId}`} replace />;
   }
 
-  if (deleteUser.state === `success`) {
+  if (deleteChild.state === `success`) {
     return <Navigate to="/children" />;
   }
 
@@ -118,7 +120,7 @@ const UserRoute: React.FC = () => {
       removeKeychain={(id) => dispatch({ type: `removeKeychain`, id })}
       keychains={draft.keychains}
       devices={original.devices.map(deviceProps)}
-      deleteUser={deleteUser}
+      deleteUser={deleteChild}
       startAddDevice={() => addDevice.mutate(id)}
       dismissAddDevice={() => addDevice.reset()}
       addDeviceRequest={ReqState.fromMutation(addDevice)}
@@ -126,7 +128,7 @@ const UserRoute: React.FC = () => {
       downtimeEnabled={!!draft.downtime}
       setDowntimeEnabled={(enabled) => dispatch({ type: `setDowntimeEnabled`, enabled })}
       setDowntime={(downtime) => dispatch({ type: `setDowntime`, downtime })}
-      deleteDevice={deleteDevice}
+      deleteDevice={deleteComputerUser}
       saveButtonDisabled={
         !isDirty(state.user) || draft.name.trim() === `` || saveUser.isPending
       }

@@ -2,11 +2,12 @@ import { Loading, ApiErrorMessage } from '@dash/components';
 import React from 'react';
 import { Dashboard } from '@dash/components';
 import Current from '../../environment';
-import { useQuery, Key, useMutation } from '../../hooks';
+import { useQuery, Key, useMutation, useDeleteEntity } from '../../hooks';
 import ReqState from '../../lib/ReqState';
 
 const DashboardRoute: React.FC = () => {
-  const widgetsQuery = useQuery(Key.dashboard, Current.api.getDashboardWidgets);
+  const widgetsQuery = useQuery(Key.dashboard, Current.api.dashboardWidgets);
+  const deleteAnnouncement = useDeleteEntity(`announcement`);
   const addDevice = useMutation((userId: UUID) =>
     Current.api.createPendingAppConnection({ userId }),
   );
@@ -21,10 +22,16 @@ const DashboardRoute: React.FC = () => {
 
   return (
     <Dashboard
-      startAddDevice={(userId) => addDevice.mutate(userId)}
-      dismissAddDevice={() => addDevice.reset()}
+      startAddDevice={addDevice.mutate}
+      dismissAddDevice={addDevice.reset}
       addDeviceRequest={ReqState.fromMutation(addDevice)}
-      {...widgetsQuery.data}
+      dismissAnnouncement={deleteAnnouncement.mutate}
+      unlockRequests={widgetsQuery.data.unlockRequests}
+      childData={widgetsQuery.data.children}
+      childActivitySummaries={widgetsQuery.data.childActivitySummaries}
+      recentScreenshots={widgetsQuery.data.recentScreenshots}
+      numParentNotifications={widgetsQuery.data.numParentNotifications}
+      announcement={widgetsQuery.data.announcement}
     />
   );
 };
