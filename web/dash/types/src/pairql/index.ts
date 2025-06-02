@@ -1,8 +1,8 @@
 // auto-generated, do not edit
 export { default as Result } from './Result';
 export * from './shared';
+export * from './pairs/ChildActivitySummaries';
 export * from './pairs/CombinedUsersActivityFeed';
-export * from './pairs/CombinedUsersActivitySummaries';
 export * from './pairs/ConfirmPendingNotificationMethod';
 export * from './pairs/CreatePendingAppConnection';
 export * from './pairs/CreatePendingNotificationMethod';
@@ -10,6 +10,7 @@ export * from './pairs/DashboardWidgets';
 export * from './pairs/DecideFilterSuspensionRequest';
 export * from './pairs/DeleteActivityItems_v2';
 export * from './pairs/DeleteEntity_v2';
+export * from './pairs/FamilyActivitySummaries';
 export * from './pairs/FlagActivityItems';
 export * from './pairs/GetAdmin';
 export * from './pairs/GetAdminKeychain';
@@ -46,5 +47,4 @@ export * from './pairs/StripeUrl';
 export * from './pairs/ToggleChildKeychain';
 export * from './pairs/UpdateUnlockRequest';
 export * from './pairs/UserActivityFeed';
-export * from './pairs/UserActivitySummaries';
 export * from './pairs/VerifySignupEmail';

@@ -1,11 +1,11 @@
 import type {
   GetUsers,
   GetUser,
-  UserActivitySummaries,
+  ChildActivitySummaries,
   UserActivityFeed,
   GetSelectableKeychains,
   DashboardWidgets,
-  CombinedUsersActivitySummaries,
+  FamilyActivitySummaries,
   CombinedUsersActivityFeed,
   GetAdminKeychains,
   GetIdentifiedApps,
@@ -61,7 +61,7 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`computers/:id`, [`computers`, id], id);
   }
 
-  static userActivitySummaries(id: UUID): QueryKey<UserActivitySummaries.Output> {
+  static childActivitySummaries(id: UUID): QueryKey<ChildActivitySummaries.Output> {
     return new QueryKey(`users/:id/activity`, [`users`, id, `activity`], id);
   }
 
@@ -77,7 +77,7 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`dashboard`, [`dashboard`]);
   }
 
-  static get combinedUsersActivitySummaries(): QueryKey<CombinedUsersActivitySummaries.Output> {
+  static get familyActivitySummaries(): QueryKey<FamilyActivitySummaries.Output> {
     return new QueryKey(`users/activity`, [`users`, `activity`]);
   }
 

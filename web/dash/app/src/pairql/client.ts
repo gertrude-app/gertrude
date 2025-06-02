@@ -3,6 +3,16 @@ import type * as T from '@dash/types';
 import { query } from './query';
 
 export const liveClient = {
+  childActivitySummaries(
+    input: T.ChildActivitySummaries.Input,
+  ): Promise<T.Result<T.ChildActivitySummaries.Output>> {
+    return query<T.ChildActivitySummaries.Input, T.ChildActivitySummaries.Output>(
+      input,
+      `admin`,
+      `ChildActivitySummaries`,
+    );
+  },
+
   combinedUsersActivityFeed(
     input: T.CombinedUsersActivityFeed.Input,
   ): Promise<T.Result<T.CombinedUsersActivityFeed.Output>> {
@@ -11,15 +21,6 @@ export const liveClient = {
       `admin`,
       `CombinedUsersActivityFeed`,
     );
-  },
-
-  combinedUsersActivitySummaries(
-    input: T.CombinedUsersActivitySummaries.Input,
-  ): Promise<T.Result<T.CombinedUsersActivitySummaries.Output>> {
-    return query<
-      T.CombinedUsersActivitySummaries.Input,
-      T.CombinedUsersActivitySummaries.Output
-    >(input, `admin`, `CombinedUsersActivitySummaries`);
   },
 
   confirmPendingNotificationMethod(
@@ -86,6 +87,16 @@ export const liveClient = {
       input,
       `admin`,
       `DeleteEntity_v2`,
+    );
+  },
+
+  familyActivitySummaries(
+    input: T.FamilyActivitySummaries.Input,
+  ): Promise<T.Result<T.FamilyActivitySummaries.Output>> {
+    return query<T.FamilyActivitySummaries.Input, T.FamilyActivitySummaries.Output>(
+      input,
+      `admin`,
+      `FamilyActivitySummaries`,
     );
   },
 
@@ -373,16 +384,6 @@ export const liveClient = {
     );
   },
 
-  userActivitySummaries(
-    input: T.UserActivitySummaries.Input,
-  ): Promise<T.Result<T.UserActivitySummaries.Output>> {
-    return query<T.UserActivitySummaries.Input, T.UserActivitySummaries.Output>(
-      input,
-      `admin`,
-      `UserActivitySummaries`,
-    );
-  },
-
   verifySignupEmail(
     input: T.VerifySignupEmail.Input,
   ): Promise<T.Result<T.VerifySignupEmail.Output>> {
@@ -397,11 +398,11 @@ export const liveClient = {
 export type ApiClient = typeof liveClient;
 
 export const throwingClient: ApiClient = {
+  childActivitySummaries: () => {
+    throw new Error(`ApiClient.childActivitySummaries() not implemented`);
+  },
   combinedUsersActivityFeed: () => {
     throw new Error(`ApiClient.combinedUsersActivityFeed() not implemented`);
-  },
-  combinedUsersActivitySummaries: () => {
-    throw new Error(`ApiClient.combinedUsersActivitySummaries() not implemented`);
   },
   confirmPendingNotificationMethod: () => {
     throw new Error(`ApiClient.confirmPendingNotificationMethod() not implemented`);
@@ -423,6 +424,9 @@ export const throwingClient: ApiClient = {
   },
   deleteEntity: () => {
     throw new Error(`ApiClient.deleteEntity() not implemented`);
+  },
+  familyActivitySummaries: () => {
+    throw new Error(`ApiClient.familyActivitySummaries() not implemented`);
   },
   flagActivityItems: () => {
     throw new Error(`ApiClient.flagActivityItems() not implemented`);
@@ -531,9 +535,6 @@ export const throwingClient: ApiClient = {
   },
   userActivityFeed: () => {
     throw new Error(`ApiClient.userActivityFeed() not implemented`);
-  },
-  userActivitySummaries: () => {
-    throw new Error(`ApiClient.userActivitySummaries() not implemented`);
   },
   verifySignupEmail: () => {
     throw new Error(`ApiClient.verifySignupEmail() not implemented`);

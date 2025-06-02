@@ -1,7 +1,9 @@
 // auto-generated, do not edit
 
-export namespace CombinedUsersActivitySummaries {
-  export type Input = void;
+export namespace FamilyActivitySummaries {
+  export interface Input {
+    jsTimezoneOffsetMinutes: number;
+  }
 
   export type Output = Array<{
     date: ISODateString;

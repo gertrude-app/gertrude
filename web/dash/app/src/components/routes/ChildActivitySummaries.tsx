@@ -4,11 +4,14 @@ import { ApiErrorMessage, Loading, ActivitySummaries } from '@dash/components';
 import { useQuery, Key } from '../../hooks';
 import Current from '../../environment';
 
-const UserActivitySummariesRoute: React.FC = () => {
+const ChildActivitySummariesRoute: React.FC = () => {
   const { userId = `` } = useParams<{ userId: string }>();
 
-  const getSummaries = useQuery(Key.userActivitySummaries(userId), () =>
-    Current.api.userActivitySummaries(userId),
+  const getSummaries = useQuery(Key.childActivitySummaries(userId), () =>
+    Current.api.childActivitySummaries({
+      childId: userId,
+      jsTimezoneOffsetMinutes: new Date().getTimezoneOffset(),
+    }),
   );
 
   if (getSummaries.isPending) {
@@ -23,7 +26,7 @@ const UserActivitySummariesRoute: React.FC = () => {
 
   return (
     <ActivitySummaries
-      userName={summaries.userName}
+      userName={summaries.childName}
       days={summaries.days
         .filter((day) => day.numTotal > 0)
         .sort((a, b) => (a.date < b.date ? 1 : -1))
@@ -39,4 +42,4 @@ const UserActivitySummariesRoute: React.FC = () => {
   );
 };
 
-export default UserActivitySummariesRoute;
+export default ChildActivitySummariesRoute;

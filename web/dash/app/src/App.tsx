@@ -19,11 +19,11 @@ import UsersUnlockRequests from './components/routes/UnlockRequest/UsersUnlockRe
 import AdminSettings from './components/routes/AdminSettings';
 import Keychain from './components/routes/Keychain';
 import Users from './components/routes/Users';
-import UserActivitySummaries from './components/routes/UserActivitySummaries';
+import ChildActivitySummaries from './components/routes/ChildActivitySummaries';
 import Keychains from './components/routes/Keychains';
 import Signup from './components/routes/Signup';
 import UserRoute from './components/routes/User';
-import CombinedUsersActivitySummaries from './components/routes/CombinedUsersActivitySummaries';
+import FamilyActivitySummaries from './components/routes/FamilyActivitySummaries';
 import CombinedUsersActivityFeedRoute from './components/routes/CombinedUsersActivityFeed';
 import UserActivityFeed from './components/routes/UserActivityFeed';
 import RequestPasswordReset from './components/routes/RequestPasswordReset';
@@ -84,7 +84,7 @@ const App: React.FC = () => {
           <Route index element={<Users />} />
 
           <Route path="activity">
-            <Route index element={<CombinedUsersActivitySummaries />} />
+            <Route index element={<FamilyActivitySummaries />} />
             <Route path=":urlDate" element={<CombinedUsersActivityFeedRoute />} />
           </Route>
 
@@ -105,7 +105,7 @@ const App: React.FC = () => {
             </Route>
 
             <Route path="activity">
-              <Route index element={<UserActivitySummaries />} />
+              <Route index element={<ChildActivitySummaries />} />
               <Route path=":urlDate" element={<UserActivityFeed />} />
             </Route>
           </Route>

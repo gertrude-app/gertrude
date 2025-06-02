@@ -27,7 +27,7 @@ const UserActivityFeedRoute: React.FC = () => {
       return Current.api.deleteActivityItems(input);
     },
     {
-      invalidating: [queryKey, Key.userActivitySummaries(userId), Key.dashboard],
+      invalidating: [queryKey, Key.childActivitySummaries(userId), Key.dashboard],
       toast: `delete:activity-items`,
     },
   );
@@ -41,7 +41,7 @@ const UserActivityFeedRoute: React.FC = () => {
       return Current.api.flagActivityItems(input);
     },
     {
-      invalidating: [queryKey, Key.userActivitySummaries(userId), Key.dashboard],
+      invalidating: [queryKey, Key.childActivitySummaries(userId), Key.dashboard],
       toast: `flag:activity-item`,
     },
   );

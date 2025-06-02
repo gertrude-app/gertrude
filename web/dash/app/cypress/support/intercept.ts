@@ -2,12 +2,12 @@
 import type * as T from '@dash/types';
 
 export function interceptPql(
-  slug: `CombinedUsersActivityFeed`,
-  output: T.CombinedUsersActivityFeed.Output,
+  slug: `ChildActivitySummaries`,
+  output: T.ChildActivitySummaries.Output,
 ): void;
 export function interceptPql(
-  slug: `CombinedUsersActivitySummaries`,
-  output: T.CombinedUsersActivitySummaries.Output,
+  slug: `CombinedUsersActivityFeed`,
+  output: T.CombinedUsersActivityFeed.Output,
 ): void;
 export function interceptPql(
   slug: `ConfirmPendingNotificationMethod`,
@@ -36,6 +36,10 @@ export function interceptPql(
 export function interceptPql(
   slug: `DeleteEntity_v2`,
   output: T.DeleteEntity_v2.Output,
+): void;
+export function interceptPql(
+  slug: `FamilyActivitySummaries`,
+  output: T.FamilyActivitySummaries.Output,
 ): void;
 export function interceptPql(
   slug: `FlagActivityItems`,
@@ -140,10 +144,6 @@ export function interceptPql(
   output: T.UserActivityFeed.Output,
 ): void;
 export function interceptPql(
-  slug: `UserActivitySummaries`,
-  output: T.UserActivitySummaries.Output,
-): void;
-export function interceptPql(
   slug: `VerifySignupEmail`,
   output: T.VerifySignupEmail.Output,
 ): void;
@@ -156,8 +156,8 @@ export function interceptPql(slug: string, output: any): void {
 
 export function forcePqlErr(
   slug:
+    | 'ChildActivitySummaries'
     | 'CombinedUsersActivityFeed'
-    | 'CombinedUsersActivitySummaries'
     | 'ConfirmPendingNotificationMethod'
     | 'CreatePendingAppConnection'
     | 'CreatePendingNotificationMethod'
@@ -165,6 +165,7 @@ export function forcePqlErr(
     | 'DecideFilterSuspensionRequest'
     | 'DeleteActivityItems_v2'
     | 'DeleteEntity_v2'
+    | 'FamilyActivitySummaries'
     | 'FlagActivityItems'
     | 'GetAdmin'
     | 'GetAdminKeychain'
@@ -201,7 +202,6 @@ export function forcePqlErr(
     | 'ToggleChildKeychain'
     | 'UpdateUnlockRequest'
     | 'UserActivityFeed'
-    | 'UserActivitySummaries'
     | 'VerifySignupEmail',
   details: Record<string, any> = {},
 ): void {

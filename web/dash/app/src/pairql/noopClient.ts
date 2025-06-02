@@ -140,10 +140,10 @@ const noopClient: ApiClient = {
   combinedUsersActivityFeed: async () => {
     return Result.success([]);
   },
-  userActivitySummaries: async () => {
-    return Result.success({ userName: ``, days: [] });
+  childActivitySummaries: async () => {
+    return Result.success({ childName: ``, days: [] });
   },
-  combinedUsersActivitySummaries: async () => {
+  familyActivitySummaries: async () => {
     return Result.success([]);
   },
   getUsers: async () => {

@@ -11,7 +11,7 @@ describe(`activity screens`, () => {
   });
 
   it(`summary page displays aggregate totals in correct order`, () => {
-    cy.interceptPql(`CombinedUsersActivitySummaries`, [
+    cy.interceptPql(`FamilyActivitySummaries`, [
       {
         date: time.subtracting({ days: 1 }),
         numApproved: 5,
@@ -66,7 +66,7 @@ describe(`activity screens`, () => {
       .its(`request.body`)
       .should(`deep.equal`, { range: entireDay(dateFromUrl(`03-06-2023`)) });
 
-    cy.interceptPql(`CombinedUsersActivitySummaries`, []);
+    cy.interceptPql(`FamilyActivitySummaries`, []);
 
     // suzy has more items, so her activity should be first
     cy.testId(`page-heading`).first().should(`have.text`, `Suzy’s Activity`);
