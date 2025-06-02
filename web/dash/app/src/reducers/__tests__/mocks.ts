@@ -5,10 +5,10 @@ import type {
   GetAdmin,
   Device,
   KeychainSummary,
-  UserActivitySummaries,
+  ChildActivitySummaries,
   SuspendFilterRequest,
   GetIdentifiedApps,
-  CombinedUsersActivitySummaries,
+  FamilyActivitySummaries,
   AdminNotification,
 } from '@dash/types';
 import type { ActivityFeedItem } from '@dash/components';
@@ -128,12 +128,12 @@ export function keychainSummary(
   };
 }
 
-export function userActivitySummary(
+export function childActivitySummary(
   numTotal = 0,
   numApproved = 0,
   numFlagged = 0,
   start = new Date().toISOString(),
-): UserActivitySummaries.Output['days'][number] {
+): ChildActivitySummaries.Output['days'][number] {
   return {
     date: start,
     numTotal,
@@ -142,10 +142,10 @@ export function userActivitySummary(
   };
 }
 
-export function combinedUsersActivitySummary(
-  override: Partial<CombinedUsersActivitySummaries.Output[number]> = {},
-): CombinedUsersActivitySummaries.Output[number] {
-  return { ...userActivitySummary(1, 1), ...override };
+export function familyActivitySummary(
+  override: Partial<FamilyActivitySummaries.Output[number]> = {},
+): FamilyActivitySummaries.Output[number] {
+  return { ...childActivitySummary(1, 1), ...override };
 }
 
 type KeystrokeActivityItem = {

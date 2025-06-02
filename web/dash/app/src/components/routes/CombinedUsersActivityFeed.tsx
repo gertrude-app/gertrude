@@ -27,7 +27,7 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
       return Current.api.deleteActivityItems(input);
     },
     {
-      invalidating: [Key.combinedUsersActivitySummaries],
+      invalidating: [Key.familyActivitySummaries],
       toast: `delete:activity-items`,
     },
   );
@@ -41,7 +41,7 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
       return Current.api.flagActivityItems(input);
     },
     {
-      invalidating: [Key.combinedUsersActivitySummaries],
+      invalidating: [Key.familyActivitySummaries],
       toast: `flag:activity-item`,
     },
   );
