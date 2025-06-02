@@ -2,14 +2,14 @@ import React from 'react';
 import { Button } from '@shared/components';
 import { writable, newestFirst } from '@dash/utils';
 import { inflect } from '@shared/string';
-import type { GetDashboardWidgets } from '@dash/types';
+import type { DashboardWidgets } from '@dash/types';
 import UnlockRequestCard from '../UnlockRequestCard';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
 type Props = {
   className?: string;
-  unlockRequests: GetDashboardWidgets.Output['unlockRequests'];
+  unlockRequests: DashboardWidgets.Output['unlockRequests'];
 };
 
 const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) => (
@@ -23,8 +23,8 @@ const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) =>
           <UnlockRequestCard
             key={req.id}
             id={req.id}
-            userId={req.userId}
-            userName={req.userName}
+            userId={req.childId}
+            userName={req.childName}
             comment={req.comment ?? undefined}
             status="pending"
             createdAt={req.createdAt}

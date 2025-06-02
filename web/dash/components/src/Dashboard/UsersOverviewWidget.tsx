@@ -1,16 +1,16 @@
 import React from 'react';
 import cx from 'classnames';
 import { Button } from '@shared/components';
-import type { GetDashboardWidgets } from '@dash/types';
+import type { DashboardWidgets } from '@dash/types';
 import UserStatus from '../UserStatus';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
-type User = GetDashboardWidgets.Output['users'][number];
+type Child = DashboardWidgets.Output['children'][number];
 
 type Props = {
   className?: string;
-  users: User[];
+  users: Child[];
 };
 
 const UsersOverview: React.FC<Props> = ({ className, users }) => {

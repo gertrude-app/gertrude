@@ -13,7 +13,7 @@ const UseCaseSurvey: React.FC = () => {
   const { admin, logout } = useAuth();
 
   const deleteAdmin = useMutation(
-    (id: UUID) => Current.api.deleteEntity({ type: `admin`, id }),
+    (id: UUID) => Current.api.deleteEntity({ type: `parent`, id }),
     { onSuccess: () => setTimeout(() => logout(), 3000) },
   );
 

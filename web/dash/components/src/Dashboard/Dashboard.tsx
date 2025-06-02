@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import cx from 'classnames';
 import type {
   CreatePendingAppConnection,
-  GetDashboardWidgets,
+  DashboardWidgets,
   RequestState,
 } from '@dash/types';
 import { UndoMainPadding } from '../Chrome/Chrome';
@@ -19,25 +19,30 @@ import CreateFirstNotificationWidget from './CreateFirstNotificationWidget';
 
 type Props = {
   date?: Date;
-  startAddDevice: (userId: UUID) => void;
-  dismissAddDevice: () => void;
+  startAddDevice(childId: UUID): unknown;
+  dismissAddDevice(): unknown;
+  dismissAnnouncement(id: UUID): unknown;
   addDeviceRequest: RequestState<CreatePendingAppConnection.Output>;
-} & GetDashboardWidgets.Output;
+  childData: DashboardWidgets.Output['children'];
+} & Omit<DashboardWidgets.Output, 'children'>;
 
 const Dashboard: React.FC<Props> = ({
   unlockRequests,
-  users,
-  userActivitySummaries,
+  childData,
+  childActivitySummaries,
   recentScreenshots,
   date = new Date(),
   startAddDevice,
   dismissAddDevice,
+  dismissAnnouncement,
   addDeviceRequest,
-  numAdminNotifications,
+  numParentNotifications,
+  announcement,
 }) => {
-  const hasNotifications = numAdminNotifications > 0;
-  const firstUser = users[0];
-  if (firstUser && users.reduce((acc, cur) => acc + cur.numDevices, 0) === 0) {
+  const [announcementDismissed, setAnnouncementDismissed] = useState(false);
+  const hasNotifications = numParentNotifications > 0;
+  const firstUser = childData[0];
+  if (firstUser && childData.reduce((acc, cur) => acc + cur.numDevices, 0) === 0) {
     return (
       <>
         <ConnectDeviceModal
@@ -58,15 +63,52 @@ const Dashboard: React.FC<Props> = ({
     );
   }
 
-  if (users.length > 0) {
+  if (childData.length > 0) {
     return (
-      <>
+      <div className="@container">
         <PageHeading icon="home">Dashboard</PageHeading>
+        {announcement && !announcementDismissed && (
+          <div className="bg-violet-100 shadow-md border-violet-400 p-4 mt-5 flex flex-col @xl:flex-row @xl:items-start items-center gap-3 rounded-lg">
+            <i
+              className={cx(
+                `text-violet-600 text-3xl mt-1`,
+                announcement.icon ?? `fa fa-bolt`,
+              )}
+            />
+            <div className="flex flex-col @4xl:flex-row @4xl:items-start gap-3 @xl:gap-2 @4xl:gap-6">
+              <p
+                className="text-violet-800 text-center @xl:text-left"
+                dangerouslySetInnerHTML={{ __html: announcement.html }}
+              />
+              <div className="flex gap-2 justify-center @xl:justify-end whitespace-nowrap">
+                {announcement.learnMoreUrl && (
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href={announcement.learnMoreUrl}
+                    className="text-violet-500 hover:text-violet-800 px-3 py-1 rounded-md border border-violet-400"
+                  >
+                    Learn more
+                  </a>
+                )}
+                <button
+                  onClick={() => {
+                    dismissAnnouncement(announcement.id);
+                    setAnnouncementDismissed(true);
+                  }}
+                  className="bg-violet-600 text-white hover:text-violet-800 px-3 py-1 rounded-md border border-violet-600 @4xl:mr-1"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="pt-6 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8">
           {!hasNotifications && <CreateFirstNotificationWidget className="-order-10" />}
-          <UserActivityWidget userActivity={userActivitySummaries} />
+          <UserActivityWidget userActivity={childActivitySummaries} />
           <UserOverviewWidget
-            users={users}
+            users={childData}
             className={cx(!hasNotifications && `lg:col-span-2 2xl:col-span-1`)}
           />
           {recentScreenshots.length !== 0 && (
@@ -86,7 +128,7 @@ const Dashboard: React.FC<Props> = ({
           )}
           <QuickActionsWidget date={date} className="xl:row-span-2 lg:-order-9" />
         </div>
-      </>
+      </div>
     );
   }
 

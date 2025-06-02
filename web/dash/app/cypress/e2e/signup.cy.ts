@@ -22,12 +22,12 @@ describe(`signup`, () => {
       token: `token-123`,
     });
 
-    cy.interceptPql(`GetDashboardWidgets`, {
-      users: [],
+    cy.interceptPql(`DashboardWidgets`, {
+      children: [],
       unlockRequests: [],
-      userActivitySummaries: [],
+      childActivitySummaries: [],
       recentScreenshots: [],
-      numAdminNotifications: 0,
+      numParentNotifications: 0,
     });
 
     cy.visit(`/verify-signup-email/verify-token-123`);
@@ -44,7 +44,7 @@ describe(`signup`, () => {
       expect(request.body.detail).to.contain(`PARENT-CHILD`);
     });
 
-    cy.wait(`@GetDashboardWidgets`)
+    cy.wait(`@DashboardWidgets`)
       .its(`request.headers.${`X-AdminToken`.toLowerCase()}`)
       .should(`eq`, `token-123`);
 
@@ -56,7 +56,7 @@ describe(`signup`, () => {
 
   it(`handles account deletion for wrong use case`, () => {
     cy.interceptPql(`LogEvent`, { success: true });
-    cy.interceptPql(`DeleteEntity`, { success: true });
+    cy.interceptPql(`DeleteEntity_v2`, { success: true });
     cy.simulateLoggedIn();
     cy.visit(`/use-case`);
 
@@ -68,9 +68,9 @@ describe(`signup`, () => {
 
     cy.contains(`Delete my account`).click();
 
-    cy.wait(`@DeleteEntity`)
+    cy.wait(`@DeleteEntity_v2`)
       .its(`request.body`)
-      .should(`deep.eq`, { id: betsy.id, type: `admin` });
+      .should(`deep.eq`, { id: betsy.id, type: `parent` });
 
     cy.contains(`Account deleted!`);
   });

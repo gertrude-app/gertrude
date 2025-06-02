@@ -1,17 +1,17 @@
 // auto-generated, do not edit
 import type { ChildComputerStatus } from '../shared';
 
-export namespace GetDashboardWidgets {
+export namespace DashboardWidgets {
   export type Input = void;
 
   export interface Output {
-    users: Array<{
+    children: Array<{
       id: UUID;
       name: string;
       status: ChildComputerStatus;
       numDevices: number;
     }>;
-    userActivitySummaries: Array<{
+    childActivitySummaries: Array<{
       id: UUID;
       name: string;
       numUnreviewed: number;
@@ -19,18 +19,24 @@ export namespace GetDashboardWidgets {
     }>;
     unlockRequests: Array<{
       id: UUID;
-      userId: UUID;
-      userName: string;
+      childId: UUID;
+      childName: string;
       target: string;
       comment?: string;
       createdAt: ISODateString;
     }>;
     recentScreenshots: Array<{
       id: UUID;
-      userName: string;
+      childName: string;
       url: string;
       createdAt: ISODateString;
     }>;
-    numAdminNotifications: number;
+    numParentNotifications: number;
+    announcement?: {
+      id: UUID;
+      icon?: string;
+      html: string;
+      learnMoreUrl?: string;
+    };
   }
 }

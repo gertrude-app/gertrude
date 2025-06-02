@@ -50,6 +50,16 @@ export const liveClient = {
     >(input, `admin`, `CreatePendingNotificationMethod`);
   },
 
+  dashboardWidgets(
+    input: T.DashboardWidgets.Input,
+  ): Promise<T.Result<T.DashboardWidgets.Output>> {
+    return query<T.DashboardWidgets.Input, T.DashboardWidgets.Output>(
+      input,
+      `admin`,
+      `DashboardWidgets`,
+    );
+  },
+
   decideFilterSuspensionRequest(
     input: T.DecideFilterSuspensionRequest.Input,
   ): Promise<T.Result<T.DecideFilterSuspensionRequest.Output>> {
@@ -69,11 +79,13 @@ export const liveClient = {
     );
   },
 
-  deleteEntity(input: T.DeleteEntity.Input): Promise<T.Result<T.DeleteEntity.Output>> {
-    return query<T.DeleteEntity.Input, T.DeleteEntity.Output>(
+  deleteEntity(
+    input: T.DeleteEntity_v2.Input,
+  ): Promise<T.Result<T.DeleteEntity_v2.Output>> {
+    return query<T.DeleteEntity_v2.Input, T.DeleteEntity_v2.Output>(
       input,
       `admin`,
-      `DeleteEntity`,
+      `DeleteEntity_v2`,
     );
   },
 
@@ -108,16 +120,6 @@ export const liveClient = {
       input,
       `admin`,
       `GetAdminKeychains`,
-    );
-  },
-
-  getDashboardWidgets(
-    input: T.GetDashboardWidgets.Input,
-  ): Promise<T.Result<T.GetDashboardWidgets.Output>> {
-    return query<T.GetDashboardWidgets.Input, T.GetDashboardWidgets.Output>(
-      input,
-      `admin`,
-      `GetDashboardWidgets`,
     );
   },
 
@@ -410,6 +412,9 @@ export const throwingClient: ApiClient = {
   createPendingNotificationMethod: () => {
     throw new Error(`ApiClient.createPendingNotificationMethod() not implemented`);
   },
+  dashboardWidgets: () => {
+    throw new Error(`ApiClient.dashboardWidgets() not implemented`);
+  },
   decideFilterSuspensionRequest: () => {
     throw new Error(`ApiClient.decideFilterSuspensionRequest() not implemented`);
   },
@@ -430,9 +435,6 @@ export const throwingClient: ApiClient = {
   },
   getAdminKeychains: () => {
     throw new Error(`ApiClient.getAdminKeychains() not implemented`);
-  },
-  getDashboardWidgets: () => {
-    throw new Error(`ApiClient.getDashboardWidgets() not implemented`);
   },
   getDevice: () => {
     throw new Error(`ApiClient.getDevice() not implemented`);

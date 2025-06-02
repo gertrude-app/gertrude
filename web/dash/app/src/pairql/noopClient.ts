@@ -48,13 +48,13 @@ const noopClient: ApiClient = {
   getAdminKeychains: async () => {
     return Result.success({ children: [], keychains: [] });
   },
-  getDashboardWidgets: async () => {
+  dashboardWidgets: async () => {
     return Result.success({
-      users: [],
-      userActivitySummaries: [],
+      children: [],
+      childActivitySummaries: [],
       unlockRequests: [],
       recentScreenshots: [],
-      numAdminNotifications: 0,
+      numParentNotifications: 0,
     });
   },
   getIdentifiedApps: async () => {

@@ -17,32 +17,33 @@ export const Default: Story = props({
   date: new Date(time.stable()),
   startAddDevice: () => {},
   dismissAddDevice: () => {},
+  dismissAnnouncement: () => {},
   addDeviceRequest: { state: `idle` },
-  unlockRequests: withIdsAnd({ userId: `user1` }, [
+  unlockRequests: withIdsAnd({ childId: `user1` }, [
     {
       target: `gitlab.io`,
-      userName: `Little Jimmy`,
+      childName: `Little Jimmy`,
       comment: `Super cool thing I want`,
       createdAt: time.now(),
     },
     {
       target: `goats.com`,
-      userName: `Henry`,
+      childName: `Henry`,
       createdAt: time.subtracting({ minutes: 2 }),
     },
     {
       target: `github.com`,
-      userName: `Little Jimmy`,
+      childName: `Little Jimmy`,
       createdAt: time.subtracting({ days: 1 }),
     },
     {
       target: `magicschoolbus.com`,
-      userName: `Sally`,
+      childName: `Sally`,
       comment: `For science class, thanks ❤️`,
       createdAt: time.subtracting({ days: 14 }),
     },
   ]),
-  users: withIds([
+  childData: withIds([
     {
       name: `Little Jimmy`,
       status: {
@@ -71,29 +72,29 @@ export const Default: Story = props({
     { name: `Hon`, status: { case: `filterOff` }, numDevices: 5 },
     { name: `Hilda`, status: { case: `filterOn` }, numDevices: 5 },
   ]),
-  userActivitySummaries: withIdsAnd({ numReviewed: 0 }, [
+  childActivitySummaries: withIdsAnd({ numReviewed: 0 }, [
     { name: `Little Jimmy`, numUnreviewed: 245 },
     { name: `Sally`, numUnreviewed: 0 },
     { name: `Henry`, numUnreviewed: 23 },
   ]),
   recentScreenshots: withIds([
     {
-      userName: `Little Jimmy`,
+      childName: `Little Jimmy`,
       url: testImgUrl(300, 200),
       createdAt: time.now(),
     },
     {
-      userName: `Sally`,
+      childName: `Sally`,
       url: testImgUrl(400, 200),
       createdAt: time.subtracting({ minutes: 2 }),
     },
     {
-      userName: `Henry`,
+      childName: `Henry`,
       url: testImgUrl(500, 300),
       createdAt: time.subtracting({ minutes: 6 }),
     },
   ]),
-  numAdminNotifications: 2,
+  numParentNotifications: 2,
 });
 
 export const NoUnlockRequests: Story = props({
@@ -103,32 +104,34 @@ export const NoUnlockRequests: Story = props({
 
 export const NoUserActivity: Story = props({
   ...Default.args,
-  userActivitySummaries: [],
+  childActivitySummaries: [],
 });
 
 // @screenshot: lg
 export const NoUserActivityOrUnlockRequests: Story = props({
   ...Default.args,
-  userActivitySummaries: [],
+  childActivitySummaries: [],
   unlockRequests: [],
 });
 
 // @screenshot: xs,lg
 export const NoUsers: Story = props({
   ...Default.args,
-  users: [],
+  childData: [],
 });
 
 // @screenshot: xs,lg
 export const NoDevices: Story = props({
   ...Default.args,
-  users: withIds([{ name: `Little Jimmy`, status: { case: `filterOn` }, numDevices: 0 }]),
+  childData: withIds([
+    { name: `Little Jimmy`, status: { case: `filterOn` }, numDevices: 0 },
+  ]),
 });
 
 // @screenshot: xs,lg
 export const NoNotifications: Story = props({
   ...Default.args,
-  numAdminNotifications: 0,
+  numParentNotifications: 0,
 });
 
 export default meta;

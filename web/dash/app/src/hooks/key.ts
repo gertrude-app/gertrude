@@ -4,7 +4,7 @@ import type {
   UserActivitySummaries,
   UserActivityFeed,
   GetSelectableKeychains,
-  GetDashboardWidgets,
+  DashboardWidgets,
   CombinedUsersActivitySummaries,
   CombinedUsersActivityFeed,
   GetAdminKeychains,
@@ -73,7 +73,7 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`selectable-keychains`, [`selectable-keychains`]);
   }
 
-  static get dashboard(): QueryKey<GetDashboardWidgets.Output> {
+  static get dashboard(): QueryKey<DashboardWidgets.Output> {
     return new QueryKey(`dashboard`, [`dashboard`]);
   }
 

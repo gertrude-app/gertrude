@@ -22,6 +22,10 @@ export function interceptPql(
   output: T.CreatePendingNotificationMethod.Output,
 ): void;
 export function interceptPql(
+  slug: `DashboardWidgets`,
+  output: T.DashboardWidgets.Output,
+): void;
+export function interceptPql(
   slug: `DecideFilterSuspensionRequest`,
   output: T.DecideFilterSuspensionRequest.Output,
 ): void;
@@ -29,7 +33,10 @@ export function interceptPql(
   slug: `DeleteActivityItems_v2`,
   output: T.DeleteActivityItems_v2.Output,
 ): void;
-export function interceptPql(slug: `DeleteEntity`, output: T.DeleteEntity.Output): void;
+export function interceptPql(
+  slug: `DeleteEntity_v2`,
+  output: T.DeleteEntity_v2.Output,
+): void;
 export function interceptPql(
   slug: `FlagActivityItems`,
   output: T.FlagActivityItems.Output,
@@ -42,10 +49,6 @@ export function interceptPql(
 export function interceptPql(
   slug: `GetAdminKeychains`,
   output: T.GetAdminKeychains.Output,
-): void;
-export function interceptPql(
-  slug: `GetDashboardWidgets`,
-  output: T.GetDashboardWidgets.Output,
 ): void;
 export function interceptPql(slug: `GetDevice`, output: T.GetDevice.Output): void;
 export function interceptPql(slug: `GetDevices`, output: T.GetDevices.Output): void;
@@ -158,14 +161,14 @@ export function forcePqlErr(
     | 'ConfirmPendingNotificationMethod'
     | 'CreatePendingAppConnection'
     | 'CreatePendingNotificationMethod'
+    | 'DashboardWidgets'
     | 'DecideFilterSuspensionRequest'
     | 'DeleteActivityItems_v2'
-    | 'DeleteEntity'
+    | 'DeleteEntity_v2'
     | 'FlagActivityItems'
     | 'GetAdmin'
     | 'GetAdminKeychain'
     | 'GetAdminKeychains'
-    | 'GetDashboardWidgets'
     | 'GetDevice'
     | 'GetDevices'
     | 'GetIdentifiedApps'

@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { Button } from '@shared/components';
 import { writable } from '@dash/utils';
-import type { GetDashboardWidgets } from '@dash/types';
+import type { DashboardWidgets } from '@dash/types';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
 type Props = {
-  userActivity: GetDashboardWidgets.Output['userActivitySummaries'];
+  userActivity: DashboardWidgets.Output['childActivitySummaries'];
   className?: string;
 };
 
