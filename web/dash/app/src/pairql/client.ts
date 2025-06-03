@@ -8,7 +8,7 @@ export const liveClient = {
   ): Promise<T.Result<T.ChildActivitySummaries.Output>> {
     return query<T.ChildActivitySummaries.Input, T.ChildActivitySummaries.Output>(
       input,
-      `admin`,
+      `parent`,
       `ChildActivitySummaries`,
     );
   },
@@ -18,7 +18,7 @@ export const liveClient = {
   ): Promise<T.Result<T.CombinedUsersActivityFeed.Output>> {
     return query<T.CombinedUsersActivityFeed.Input, T.CombinedUsersActivityFeed.Output>(
       input,
-      `admin`,
+      `parent`,
       `CombinedUsersActivityFeed`,
     );
   },
@@ -29,7 +29,7 @@ export const liveClient = {
     return query<
       T.ConfirmPendingNotificationMethod.Input,
       T.ConfirmPendingNotificationMethod.Output
-    >(input, `admin`, `ConfirmPendingNotificationMethod`);
+    >(input, `parent`, `ConfirmPendingNotificationMethod`);
   },
 
   createPendingAppConnection(
@@ -37,7 +37,7 @@ export const liveClient = {
   ): Promise<T.Result<T.CreatePendingAppConnection.Output>> {
     return query<T.CreatePendingAppConnection.Input, T.CreatePendingAppConnection.Output>(
       input,
-      `admin`,
+      `parent`,
       `CreatePendingAppConnection`,
     );
   },
@@ -48,7 +48,7 @@ export const liveClient = {
     return query<
       T.CreatePendingNotificationMethod.Input,
       T.CreatePendingNotificationMethod.Output
-    >(input, `admin`, `CreatePendingNotificationMethod`);
+    >(input, `parent`, `CreatePendingNotificationMethod`);
   },
 
   dashboardWidgets(
@@ -56,7 +56,7 @@ export const liveClient = {
   ): Promise<T.Result<T.DashboardWidgets.Output>> {
     return query<T.DashboardWidgets.Input, T.DashboardWidgets.Output>(
       input,
-      `admin`,
+      `parent`,
       `DashboardWidgets`,
     );
   },
@@ -67,7 +67,7 @@ export const liveClient = {
     return query<
       T.DecideFilterSuspensionRequest.Input,
       T.DecideFilterSuspensionRequest.Output
-    >(input, `admin`, `DecideFilterSuspensionRequest`);
+    >(input, `parent`, `DecideFilterSuspensionRequest`);
   },
 
   deleteActivityItems(
@@ -75,7 +75,7 @@ export const liveClient = {
   ): Promise<T.Result<T.DeleteActivityItems_v2.Output>> {
     return query<T.DeleteActivityItems_v2.Input, T.DeleteActivityItems_v2.Output>(
       input,
-      `admin`,
+      `parent`,
       `DeleteActivityItems_v2`,
     );
   },
@@ -85,7 +85,7 @@ export const liveClient = {
   ): Promise<T.Result<T.DeleteEntity_v2.Output>> {
     return query<T.DeleteEntity_v2.Input, T.DeleteEntity_v2.Output>(
       input,
-      `admin`,
+      `parent`,
       `DeleteEntity_v2`,
     );
   },
@@ -95,7 +95,7 @@ export const liveClient = {
   ): Promise<T.Result<T.FamilyActivitySummaries.Output>> {
     return query<T.FamilyActivitySummaries.Input, T.FamilyActivitySummaries.Output>(
       input,
-      `admin`,
+      `parent`,
       `FamilyActivitySummaries`,
     );
   },
@@ -105,13 +105,13 @@ export const liveClient = {
   ): Promise<T.Result<T.FlagActivityItems.Output>> {
     return query<T.FlagActivityItems.Input, T.FlagActivityItems.Output>(
       input,
-      `admin`,
+      `parent`,
       `FlagActivityItems`,
     );
   },
 
   getAdmin(input: T.GetAdmin.Input): Promise<T.Result<T.GetAdmin.Output>> {
-    return query<T.GetAdmin.Input, T.GetAdmin.Output>(input, `admin`, `GetAdmin`);
+    return query<T.GetAdmin.Input, T.GetAdmin.Output>(input, `parent`, `GetAdmin`);
   },
 
   getAdminKeychain(
@@ -119,7 +119,7 @@ export const liveClient = {
   ): Promise<T.Result<T.GetAdminKeychain.Output>> {
     return query<T.GetAdminKeychain.Input, T.GetAdminKeychain.Output>(
       input,
-      `admin`,
+      `parent`,
       `GetAdminKeychain`,
     );
   },
@@ -129,17 +129,17 @@ export const liveClient = {
   ): Promise<T.Result<T.GetAdminKeychains.Output>> {
     return query<T.GetAdminKeychains.Input, T.GetAdminKeychains.Output>(
       input,
-      `admin`,
+      `parent`,
       `GetAdminKeychains`,
     );
   },
 
   getDevice(input: T.GetDevice.Input): Promise<T.Result<T.GetDevice.Output>> {
-    return query<T.GetDevice.Input, T.GetDevice.Output>(input, `admin`, `GetDevice`);
+    return query<T.GetDevice.Input, T.GetDevice.Output>(input, `parent`, `GetDevice`);
   },
 
   getDevices(input: T.GetDevices.Input): Promise<T.Result<T.GetDevices.Output>> {
-    return query<T.GetDevices.Input, T.GetDevices.Output>(input, `admin`, `GetDevices`);
+    return query<T.GetDevices.Input, T.GetDevices.Output>(input, `parent`, `GetDevices`);
   },
 
   getIdentifiedApps(
@@ -147,7 +147,7 @@ export const liveClient = {
   ): Promise<T.Result<T.GetIdentifiedApps.Output>> {
     return query<T.GetIdentifiedApps.Input, T.GetIdentifiedApps.Output>(
       input,
-      `admin`,
+      `parent`,
       `GetIdentifiedApps`,
     );
   },
@@ -157,7 +157,7 @@ export const liveClient = {
   ): Promise<T.Result<T.GetSelectableKeychains.Output>> {
     return query<T.GetSelectableKeychains.Input, T.GetSelectableKeychains.Output>(
       input,
-      `admin`,
+      `parent`,
       `GetSelectableKeychains`,
     );
   },
@@ -167,7 +167,7 @@ export const liveClient = {
   ): Promise<T.Result<T.GetSuspendFilterRequest.Output>> {
     return query<T.GetSuspendFilterRequest.Input, T.GetSuspendFilterRequest.Output>(
       input,
-      `admin`,
+      `parent`,
       `GetSuspendFilterRequest`,
     );
   },
@@ -177,7 +177,7 @@ export const liveClient = {
   ): Promise<T.Result<T.GetUnlockRequest.Output>> {
     return query<T.GetUnlockRequest.Input, T.GetUnlockRequest.Output>(
       input,
-      `admin`,
+      `parent`,
       `GetUnlockRequest`,
     );
   },
@@ -187,17 +187,17 @@ export const liveClient = {
   ): Promise<T.Result<T.GetUnlockRequests.Output>> {
     return query<T.GetUnlockRequests.Input, T.GetUnlockRequests.Output>(
       input,
-      `admin`,
+      `parent`,
       `GetUnlockRequests`,
     );
   },
 
   getUser(input: T.GetUser.Input): Promise<T.Result<T.GetUser.Output>> {
-    return query<T.GetUser.Input, T.GetUser.Output>(input, `admin`, `GetUser`);
+    return query<T.GetUser.Input, T.GetUser.Output>(input, `parent`, `GetUser`);
   },
 
   getUsers(input: T.GetUsers.Input): Promise<T.Result<T.GetUsers.Output>> {
-    return query<T.GetUsers.Input, T.GetUsers.Output>(input, `admin`, `GetUsers`);
+    return query<T.GetUsers.Input, T.GetUsers.Output>(input, `parent`, `GetUsers`);
   },
 
   getUserUnlockRequests(
@@ -205,7 +205,7 @@ export const liveClient = {
   ): Promise<T.Result<T.GetUserUnlockRequests.Output>> {
     return query<T.GetUserUnlockRequests.Input, T.GetUserUnlockRequests.Output>(
       input,
-      `admin`,
+      `parent`,
       `GetUserUnlockRequests`,
     );
   },
@@ -215,7 +215,7 @@ export const liveClient = {
   ): Promise<T.Result<T.HandleCheckoutCancel.Output>> {
     return query<T.HandleCheckoutCancel.Input, T.HandleCheckoutCancel.Output>(
       input,
-      `admin`,
+      `parent`,
       `HandleCheckoutCancel`,
     );
   },
@@ -225,7 +225,7 @@ export const liveClient = {
   ): Promise<T.Result<T.HandleCheckoutSuccess.Output>> {
     return query<T.HandleCheckoutSuccess.Input, T.HandleCheckoutSuccess.Output>(
       input,
-      `admin`,
+      `parent`,
       `HandleCheckoutSuccess`,
     );
   },
@@ -235,13 +235,13 @@ export const liveClient = {
   ): Promise<T.Result<T.LatestAppVersions.Output>> {
     return query<T.LatestAppVersions.Input, T.LatestAppVersions.Output>(
       input,
-      `admin`,
+      `parent`,
       `LatestAppVersions`,
     );
   },
 
   logEvent(input: T.LogEvent.Input): Promise<T.Result<T.LogEvent.Output>> {
-    return query<T.LogEvent.Input, T.LogEvent.Output>(input, `admin`, `LogEvent`);
+    return query<T.LogEvent.Input, T.LogEvent.Output>(input, `parent`, `LogEvent`);
   },
 
   login(input: T.Login.Input): Promise<T.Result<T.Login.Output>> {
@@ -273,7 +273,7 @@ export const liveClient = {
   ): Promise<T.Result<T.RequestPublicKeychain.Output>> {
     return query<T.RequestPublicKeychain.Input, T.RequestPublicKeychain.Output>(
       input,
-      `admin`,
+      `parent`,
       `RequestPublicKeychain`,
     );
   },
@@ -297,17 +297,17 @@ export const liveClient = {
   },
 
   saveDevice(input: T.SaveDevice.Input): Promise<T.Result<T.SaveDevice.Output>> {
-    return query<T.SaveDevice.Input, T.SaveDevice.Output>(input, `admin`, `SaveDevice`);
+    return query<T.SaveDevice.Input, T.SaveDevice.Output>(input, `parent`, `SaveDevice`);
   },
 
   saveKey(input: T.SaveKey.Input): Promise<T.Result<T.SaveKey.Output>> {
-    return query<T.SaveKey.Input, T.SaveKey.Output>(input, `admin`, `SaveKey`);
+    return query<T.SaveKey.Input, T.SaveKey.Output>(input, `parent`, `SaveKey`);
   },
 
   saveKeychain(input: T.SaveKeychain.Input): Promise<T.Result<T.SaveKeychain.Output>> {
     return query<T.SaveKeychain.Input, T.SaveKeychain.Output>(
       input,
-      `admin`,
+      `parent`,
       `SaveKeychain`,
     );
   },
@@ -317,13 +317,13 @@ export const liveClient = {
   ): Promise<T.Result<T.SaveNotification.Output>> {
     return query<T.SaveNotification.Input, T.SaveNotification.Output>(
       input,
-      `admin`,
+      `parent`,
       `SaveNotification`,
     );
   },
 
   saveUser(input: T.SaveUser.Input): Promise<T.Result<T.SaveUser.Output>> {
-    return query<T.SaveUser.Input, T.SaveUser.Output>(input, `admin`, `SaveUser`);
+    return query<T.SaveUser.Input, T.SaveUser.Output>(input, `parent`, `SaveUser`);
   },
 
   securityEventsFeed(
@@ -331,7 +331,7 @@ export const liveClient = {
   ): Promise<T.Result<T.SecurityEventsFeed.Output>> {
     return query<T.SecurityEventsFeed.Input, T.SecurityEventsFeed.Output>(
       input,
-      `admin`,
+      `parent`,
       `SecurityEventsFeed`,
     );
   },
@@ -351,7 +351,7 @@ export const liveClient = {
   },
 
   stripeUrl(input: T.StripeUrl.Input): Promise<T.Result<T.StripeUrl.Output>> {
-    return query<T.StripeUrl.Input, T.StripeUrl.Output>(input, `admin`, `StripeUrl`);
+    return query<T.StripeUrl.Input, T.StripeUrl.Output>(input, `parent`, `StripeUrl`);
   },
 
   toggleChildKeychain(
@@ -359,7 +359,7 @@ export const liveClient = {
   ): Promise<T.Result<T.ToggleChildKeychain.Output>> {
     return query<T.ToggleChildKeychain.Input, T.ToggleChildKeychain.Output>(
       input,
-      `admin`,
+      `parent`,
       `ToggleChildKeychain`,
     );
   },
@@ -369,7 +369,7 @@ export const liveClient = {
   ): Promise<T.Result<T.UpdateUnlockRequest.Output>> {
     return query<T.UpdateUnlockRequest.Input, T.UpdateUnlockRequest.Output>(
       input,
-      `admin`,
+      `parent`,
       `UpdateUnlockRequest`,
     );
   },
@@ -379,7 +379,7 @@ export const liveClient = {
   ): Promise<T.Result<T.UserActivityFeed.Output>> {
     return query<T.UserActivityFeed.Input, T.UserActivityFeed.Output>(
       input,
-      `admin`,
+      `parent`,
       `UserActivityFeed`,
     );
   },
