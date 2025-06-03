@@ -9,7 +9,7 @@ export async function query<Input, Output>(
 ): Promise<Result<Output>> {
   const headers: Record<string, string> = { 'Content-Type': `application/json` };
 
-  if (auth === `admin`) {
+  if (auth === `parent`) {
     const token =
       Current.localStorage.getItem(`admin_token`) ??
       Current.sessionStorage.getItem(`admin_token`);

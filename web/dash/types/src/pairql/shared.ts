@@ -43,7 +43,7 @@ export type ChildComputerStatus =
   | { case: 'filterOff' }
   | { case: 'filterOn' };
 
-export type ClientAuth = 'none' | 'user' | 'admin' | 'superAdmin';
+export type ClientAuth = 'none' | 'child' | 'parent' | 'superAdmin';
 
 export interface Device {
   id: UUID;
@@ -127,7 +127,7 @@ export interface ServerPqlError {
     | 'magicLinkTokenNotFound'
     | 'slackVerificationFailed'
     | 'emailAlreadyVerified';
-  appTag?: 'userTokenNotFound' | 'connectionCodeNotFound';
+  appTag?: 'userTokenNotFound' | 'connectionCodeNotFound' | 'iosDeviceTokenNotFound';
   statusCode: number;
 }
 
