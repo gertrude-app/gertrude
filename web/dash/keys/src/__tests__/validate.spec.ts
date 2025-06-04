@@ -17,6 +17,6 @@ describe(`validate.address()`, () => {
   ];
 
   test.each(cases)(`%s:%s valid=%s`, (address, type, expected) => {
-    expect(validate.address(address, type)).toMatchObject(expected);
+    expect(validate.address(address, type)).toEqual(expected);
   });
 });
