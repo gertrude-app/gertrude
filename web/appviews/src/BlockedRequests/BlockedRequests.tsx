@@ -1,13 +1,13 @@
-import React from 'react';
-import cx from 'classnames';
 import { Button, Loading, TextInput, Toggle } from '@shared/components';
-import type { AppState, ViewState, AppEvent, ViewAction } from './blockedrequests-store';
+import cx from 'classnames';
+import React from 'react';
+import type { AppEvent, AppState, ViewAction, ViewState } from './blockedrequests-store';
 import type { PropsOf } from '../lib/store';
-import { containerize } from '../lib/store';
-import ErrorScreen from '../ErrorScreen';
 import ErrorBlock from '../ErrorBlock';
-import InactiveAccountScreen from '../components/InactiveAccountBlock';
+import ErrorScreen from '../ErrorScreen';
 import AccountPastDueBanner from '../components/AccountPastDueBanner';
+import InactiveAccountScreen from '../components/InactiveAccountBlock';
+import { containerize } from '../lib/store';
 import BlockedRequest from './BlockedRequest';
 import store from './blockedrequests-store';
 
@@ -167,12 +167,12 @@ export const BlockedRequests: React.FC<Props> = ({
 
 type PanelProps = Omit<
   Props,
-  | 'requests'
-  | 'filterText'
-  | 'tcpOnly'
-  | 'windowOpen'
-  | 'adminAccountStatus'
-  | 'requestsPaused'
+  | `requests`
+  | `filterText`
+  | `tcpOnly`
+  | `windowOpen`
+  | `adminAccountStatus`
+  | `requestsPaused`
 >;
 
 const BottomPanel: React.FC<PanelProps> = ({
@@ -280,7 +280,7 @@ export default containerize<AppState, AppEvent, ViewState, ViewAction>(
 export function filterVisibleRequests<
   R extends {
     searchableText: string;
-    protocol: 'tcp' | 'udp' | 'other';
+    protocol: `tcp` | `udp` | `other`;
     time: ISODateString;
   },
 >(requests: R[], userFilterText: string, tcpOnly: boolean): R[] {

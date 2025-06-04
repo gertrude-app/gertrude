@@ -1,21 +1,21 @@
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import type { MutableRefObject } from 'react';
+import type { QueryResult } from './query';
 import type {
   GetIdentifiedApps,
   GetUnlockRequest,
   KeychainSummary,
   User,
 } from '@dash/types';
-import type { QueryResult } from './query';
+import type { MutableRefObject } from 'react';
 import Current from '../environment';
-import { useQuery } from './query';
-import { Key } from './key';
 import { useAuth } from './auth';
+import { Key } from './key';
+import { useQuery } from './query';
 
 export { useFireAndForget, useOptimism } from './query';
-export { useMutation, useDeleteEntity, useConfirmableDelete } from './mutation';
-export { useQuery, useAuth, Key };
+export { useConfirmableDelete, useDeleteEntity, useMutation } from './mutation';
+export { Key, useAuth, useQuery };
 export { useZip } from './zip';
 export { default as useWindowWidth } from './window-width';
 export { default as useObservedReducer } from './observed-reducer';

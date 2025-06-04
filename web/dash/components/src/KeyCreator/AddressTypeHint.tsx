@@ -1,10 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import cx from 'classnames';
 import { domain, validate } from '@dash/keys';
 import { notNullish } from '@shared/ts-utils';
+import cx from 'classnames';
+import React, { useCallback, useEffect, useState } from 'react';
 
 interface Props {
-  type: 'strict' | 'standard' | 'ip' | 'domainRegex';
+  type: `strict` | `standard` | `ip` | `domainRegex`;
   unsanitizedAddress: string;
 }
 

@@ -1,8 +1,8 @@
-import React, { useContext, useRef, useEffect } from 'react';
 import cx from 'classnames';
+import React, { useContext, useEffect, useRef } from 'react';
 import type { RequestState } from '../onboarding-store';
-import * as Onboarding from '../UtilityComponents';
 import OnboardingContext from '../OnboardingContext';
+import * as Onboarding from '../UtilityComponents';
 
 interface Props {
   connectionCode: string;

@@ -1,12 +1,12 @@
-import React from 'react';
-import { TextInput } from '@shared/components';
 import { EditKey } from '@dash/keys';
+import { TextInput } from '@shared/components';
+import React from 'react';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';
 
 interface Props {
-  mode: 'edit' | 'create';
+  mode: `edit` | `create`;
   activeStep: EditKey.Step;
   comment?: string;
   update(event: EditKey.Event): unknown;

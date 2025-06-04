@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
 import { ApiErrorMessage, FullscreenModalForm, LoginForm } from '@dash/components';
+import React, { useState } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
-import { useMutation, useLoginRedirect, useAuth } from '../../hooks';
 import Current from '../../environment';
+import { useAuth, useLoginRedirect, useMutation } from '../../hooks';
 
 export const Login: React.FC = () => {
   const { admin, login } = useAuth();

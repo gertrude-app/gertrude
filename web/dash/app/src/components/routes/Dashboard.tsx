@@ -1,8 +1,8 @@
-import { Loading, ApiErrorMessage } from '@dash/components';
-import React from 'react';
+import { ApiErrorMessage, Loading } from '@dash/components';
 import { Dashboard } from '@dash/components';
+import React from 'react';
 import Current from '../../environment';
-import { useQuery, Key, useMutation, useDeleteEntity } from '../../hooks';
+import { Key, useDeleteEntity, useMutation, useQuery } from '../../hooks';
 import ReqState from '../../lib/ReqState';
 
 const DashboardRoute: React.FC = () => {

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button } from '@shared/components';
 import { ComputerDesktopIcon } from '@heroicons/react/24/solid';
+import { Button } from '@shared/components';
+import React from 'react';
 import { OnboardingRecommendation } from '../Dashboard/Dashboard';
 import ListStep from './ListStep';
 

@@ -1,5 +1,5 @@
-import React from 'react';
 import { Button } from '@shared/components';
+import React from 'react';
 import type { ActivityFeedItem } from './UserActivityFeed';
 import KeystrokesViewer from './KeystrokesViewer';
 import ScreenshotViewer from './ScreenshotViewer';
@@ -105,15 +105,15 @@ const Item: React.FC<{
 
 export type Chunkable = {
   id: UUID;
-  type: 'Screenshot' | 'KeystrokeLine';
+  type: `Screenshot` | `KeystrokeLine`;
   duringSuspension: boolean;
   date: ISODateString;
 };
 
 type ActivityRenderTask<T extends Chunkable> =
-  | { type: 'item'; item: T }
-  | { type: 'suspension_group'; items: T[] }
-  | { type: 'delete_btn'; ids: UUID[] };
+  | { type: `item`; item: T }
+  | { type: `suspension_group`; items: T[] }
+  | { type: `delete_btn`; ids: UUID[] };
 
 // an extraction of core logic without rendering for testability
 export function chunkedRenderTasks<T extends Chunkable>(

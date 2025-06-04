@@ -1,11 +1,11 @@
+import { ErrorModal, LoadingModal, Modal, ReviewUnlockRequest } from '@dash/components';
 import React, { useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { ErrorModal, LoadingModal, Modal, ReviewUnlockRequest } from '@dash/components';
 import {
-  useUser,
   useApps,
   useSelectableKeychains,
   useUnlockRequest,
+  useUser,
 } from '../../../hooks';
 
 const ReviewUnlockRequestRoute: React.FC = () => {

@@ -1,10 +1,10 @@
+import { ApiErrorMessage, Loading, UserActivityFeed } from '@dash/components';
+import { dateFromUrl } from '@dash/datetime';
+import { Result } from '@dash/types';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { dateFromUrl } from '@dash/datetime';
-import { ApiErrorMessage, Loading, UserActivityFeed } from '@dash/components';
-import { Result } from '@dash/types';
 import Current from '../../environment';
-import { useQuery, Key, useMutation, useOptimism } from '../../hooks';
+import { Key, useMutation, useOptimism, useQuery } from '../../hooks';
 import { entireDay } from '../../lib/days';
 import * as lib from '../../lib/user-activity';
 

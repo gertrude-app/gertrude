@@ -1,24 +1,24 @@
 import type { MacOSVersion } from './onboarding-store';
 
 interface VideoAsset {
-  type: 'video';
+  type: `video`;
   url: string;
   render: boolean;
 }
 
 interface StaticImgAsset {
-  type: 'image';
+  type: `image`;
   url: string;
 }
 
 interface SingleGifAsset {
-  type: 'gif';
+  type: `gif`;
   url: string;
   duration: number;
 }
 
 interface MultiGifAsset {
-  type: 'images';
+  type: `images`;
   steps: Array<{ url: string; duration: number }>;
 }
 
@@ -27,7 +27,7 @@ export type ImageAsset = StaticImgAsset | SingleGifAsset | MultiGifAsset;
 export type CdnAsset = VideoAsset | ImageAsset;
 
 class CdnAssets implements ExhaustiveAssets {
-  os(os: MacOSVersion['name']): OsCdnAssets {
+  os(os: MacOSVersion[`name`]): OsCdnAssets {
     return new OsCdnAssets(os);
   }
 
@@ -35,7 +35,7 @@ class CdnAssets implements ExhaustiveAssets {
     return { type: `video`, url: `${ENDPOINT}/common/${id}.mp4`, render };
   }
 
-  osVideo(os: MacOSVersion['name'], id: OsVideoId, render = false): VideoAsset {
+  osVideo(os: MacOSVersion[`name`], id: OsVideoId, render = false): VideoAsset {
     return new OsCdnAssets(os).video(id, render);
   }
 
@@ -60,7 +60,7 @@ class CdnAssets implements ExhaustiveAssets {
     }
   }
 
-  osImg(os: MacOSVersion['name'], filename: OsImgId): ImageAsset {
+  osImg(os: MacOSVersion[`name`], filename: OsImgId): ImageAsset {
     return new OsCdnAssets(os).img(filename);
   }
 
@@ -79,7 +79,7 @@ class CdnAssets implements ExhaustiveAssets {
 }
 
 class OsCdnAssets implements ExhaustiveAssets {
-  constructor(public readonly os: MacOSVersion['name']) {}
+  constructor(public readonly os: MacOSVersion[`name`]) {}
 
   video(id: OsVideoId, render = false): VideoAsset {
     return { type: `video`, url: `${ENDPOINT}/${this.os}/${id}.mp4`, render };
@@ -162,7 +162,7 @@ const COMMON_IMG_DATA: Record<CommonImgId, string | [number, ...number[]]> = {
 
 const OS_IMAGE_DATA: Record<
   OsImgId,
-  string | Record<MacOSVersion['name'], [number, number, ...number[]]>
+  string | Record<MacOSVersion[`name`], [number, number, ...number[]]>
 > = {
   'sys-ext-install-trick': `png`,
   'full-disk-access': {

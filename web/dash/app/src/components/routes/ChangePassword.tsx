@@ -1,11 +1,11 @@
+import { FullscreenGradientBg } from '@dash/components';
+import { ErrorMessage } from '@dash/components';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+import { Button, TextInput } from '@shared/components';
 import React, { useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
-import { FullscreenGradientBg } from '@dash/components';
-import { Button, TextInput } from '@shared/components';
-import { ErrorMessage } from '@dash/components';
-import { useMutation } from '../../hooks';
 import Current from '../../environment';
+import { useMutation } from '../../hooks';
 
 const ChangePassword: React.FC = () => {
   const { token = `` } = useParams<{ token: UUID }>();

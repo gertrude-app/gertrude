@@ -1,16 +1,16 @@
-import { v4 as uuid } from 'uuid';
+import { ApiErrorMessage, Loading } from '@dash/components';
+import { EditKeychain } from '@dash/components';
+import { toKeyRecord } from '@dash/keys';
+import { Result } from '@dash/types';
 import React, { useEffect, useMemo, useReducer } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
-import { Loading, ApiErrorMessage } from '@dash/components';
-import { toKeyRecord } from '@dash/keys';
-import { EditKeychain } from '@dash/components';
-import { Result } from '@dash/types';
+import { v4 as uuid } from 'uuid';
 import type { KeychainSummary } from '@dash/types';
-import { isDirty } from '../../lib/helpers';
-import { Key, useMutation, useQuery, useConfirmableDelete } from '../../hooks';
 import Current from '../../environment';
-import reducer from '../../reducers/edit-keychain-reducer';
+import { Key, useConfirmableDelete, useMutation, useQuery } from '../../hooks';
 import { useAuth } from '../../hooks/auth';
+import { isDirty } from '../../lib/helpers';
+import reducer from '../../reducers/edit-keychain-reducer';
 
 const Keychain: React.FC = () => {
   const { keychainId: id = `` } = useParams<{ keychainId: string }>();
@@ -24,12 +24,13 @@ const Keychain: React.FC = () => {
 
   const newKeychainId = useMemo(() => uuid(), []);
   useEffect(() => {
-    id === `new` &&
+    if (id === `new`) {
       dispatch({
         type: `createNewKeychain`,
         id: newKeychainId,
         adminId: admin?.id ?? ``,
       });
+    }
   }, [newKeychainId, id, admin, dispatch]);
 
   const keychainQuery = useQuery(queryKey, () => Current.api.getAdminKeychain(id), {

@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
-import cx from 'classnames';
-import { inflect } from '@shared/string';
-import { Button, Badge } from '@shared/components';
+import { type RuleSchedule as Schedule, defaults } from '@dash/types';
 import { ChevronDownIcon, ClockIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { UsersIcon } from '@heroicons/react/24/solid';
-import { defaults, type RuleSchedule as Schedule } from '@dash/types';
+import { Badge, Button } from '@shared/components';
+import { inflect } from '@shared/string';
+import cx from 'classnames';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import GradientIcon from '../GradientIcon';
 import SchedulePicker from './schedule/SchedulePicker';
 
 type Props =
   | ({
-      mode: 'keychains_screen';
+      mode: `keychains_screen`;
       id: UUID;
       assignedChildren: UUID[];
       allChildren: Array<{
@@ -22,14 +22,14 @@ type Props =
       toggleChild(userId: string): void;
     } & Common)
   | ({
-      mode: 'assigned_to_child';
+      mode: `assigned_to_child`;
       keychainId: UUID;
       onRemove(): unknown;
       schedule?: Schedule;
       setSchedule(schedule?: Schedule): unknown;
     } & Common)
   | ({
-      mode: 'select';
+      mode: `select`;
       selected: boolean;
       onSelect(): unknown;
     } & Common);
@@ -348,8 +348,8 @@ const KeychainCard: React.FC<Props> = ({
 
 export default KeychainCard;
 
-function isSelect(props: { mode: Props['mode'] }): props is {
-  mode: 'select';
+function isSelect(props: { mode: Props[`mode`] }): props is {
+  mode: `select`;
 } & Common {
   return props.mode === `select`;
 }

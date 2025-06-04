@@ -1,5 +1,5 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 import type { RuleSchedule } from '@dash/types';
 import SpecifyingActiveOrInactive from './SpecifyingActiveOrInactive';
 import WhatDays from './WhatDays';
@@ -9,7 +9,7 @@ interface Props {
   schedule: RuleSchedule;
   setSchedule(schedule: RuleSchedule): void;
   small?: boolean;
-  activeText?: Record<RuleSchedule['mode'], string>;
+  activeText?: Record<RuleSchedule[`mode`], string>;
 }
 
 const SchedulePicker: React.FC<Props> = ({

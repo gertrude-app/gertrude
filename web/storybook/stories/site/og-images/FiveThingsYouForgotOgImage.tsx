@@ -1,5 +1,5 @@
-import React from 'react';
 import { Logo } from '@shared/components';
+import React from 'react';
 import BgImage from '../../static/chained-iphone2.png';
 
 const FiveThingsYouForgotOgImage: React.FC = () => (

@@ -1,9 +1,9 @@
-import React from 'react';
 import { Logo } from '@shared/components';
-import Gradient from '../../static/purple-gradient.png';
+import React from 'react';
 import Blocked from '../../static/blocked-requests.png';
-import DashUnlockRequest from '../../static/unlock-request.png';
 import DashProtectFamily from '../../static/protect-family.png';
+import Gradient from '../../static/purple-gradient.png';
+import DashUnlockRequest from '../../static/unlock-request.png';
 
 export const ProtectFamily: React.FC = () => (
   <GradientWrap>

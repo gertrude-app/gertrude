@@ -1,7 +1,7 @@
 import AddKeychainDrawer from '@dash/components/src/Users/AddKeychainDrawer';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { props, keychainProps } from '../../story-helpers';
+import { keychainProps, props } from '../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Users/AddKeychainDrawer', // eslint-disable-line

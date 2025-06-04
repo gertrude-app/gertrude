@@ -7,7 +7,7 @@ import * as env from '@/lib/env';
 
 interface Props {
   name: string;
-  lang: 'en' | 'es';
+  lang: `en` | `es`;
 }
 
 const ArticleFeedbackForm: React.FC<Props> = ({ name, lang }) => {

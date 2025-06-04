@@ -1,5 +1,5 @@
 import DefenseInDepthBlock from '@site/components/DefenseInDepthBlock';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
   title: 'Site/DefenseInDepthBlock', // eslint-disable-line

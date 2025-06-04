@@ -1,20 +1,20 @@
 import React, { useContext, useState } from 'react';
 import ExpandableContent from '../ExpandableContent';
+import InformationModal from '../InformationModal';
+import OnboardingContext from '../OnboardingContext';
+import TellMeMoreButton from '../TellMeMoreButton';
 import * as Onboarding from '../UtilityComponents';
 import assets from '../cdn-assets';
-import OnboardingContext from '../OnboardingContext';
-import InformationModal from '../InformationModal';
-import TellMeMoreButton from '../TellMeMoreButton';
 
 interface Props {
   step:
-    | 'allowFullDiskAccess_grantAndRestart'
-    | 'allowFullDiskAccess_failed'
-    | 'allowFullDiskAccess_success';
+    | `allowFullDiskAccess_grantAndRestart`
+    | `allowFullDiskAccess_failed`
+    | `allowFullDiskAccess_success`;
 }
 
 const AllowFullDiskAccess: React.FC<Props> = ({ step }) => {
-  const [showModal, setShowModal] = useState<false | 'why' | 'help'>(false);
+  const [showModal, setShowModal] = useState<false | `why` | `help`>(false);
   const { systemSettingsName, osVersion, currentStep, emit, isUpgrade } =
     useContext(OnboardingContext);
   switch (step) {

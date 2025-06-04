@@ -10,3 +10,5 @@ appviews/dist
 appviews/src/main.tsx
 .nx/
 
+
+/.nx/workspace-data

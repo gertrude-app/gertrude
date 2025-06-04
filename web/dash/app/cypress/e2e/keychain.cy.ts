@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 import type { AdminKeychain } from '@dash/types';
-import { betsy } from '../fixtures/helpers';
 import * as mock from '../../src/reducers/__tests__/mocks';
+import { betsy } from '../fixtures/helpers';
 
 describe(`create keychain`, () => {
   beforeEach(() => {

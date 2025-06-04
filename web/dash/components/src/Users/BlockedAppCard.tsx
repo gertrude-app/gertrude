@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import cx from 'classnames';
 import { defaults } from '@dash/types';
 import { ChevronDownIcon, ClockIcon, TrashIcon } from '@heroicons/react/24/outline';
-import type { RuleSchedule, BlockedApp } from '@dash/types';
+import cx from 'classnames';
+import React, { useState } from 'react';
+import type { BlockedApp, RuleSchedule } from '@dash/types';
 import SchedulePicker from '../Keychains/schedule/SchedulePicker';
 
 interface Props {

@@ -2,7 +2,7 @@ import { DarkMode, Gradient, LightMode } from '../Icon';
 
 interface Props {
   id: string;
-  color: 'blue' | 'amber';
+  color: `blue` | `amber`;
 }
 
 const ThemingIcon: React.FC<Props> = ({ id, color }) => (

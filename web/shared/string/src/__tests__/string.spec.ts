@@ -1,4 +1,4 @@
-import { test, describe, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { pastTense } from '../';
 
 describe(`pastTense())`, () => {

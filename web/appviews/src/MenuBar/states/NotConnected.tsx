@@ -1,5 +1,5 @@
-import React from 'react';
 import { Logo } from '@shared/components';
+import React from 'react';
 import type { AppEvent } from '../menubar-store';
 import { MenuBarSized } from '../MenuBar';
 

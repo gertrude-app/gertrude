@@ -1,11 +1,11 @@
-import { v4 as uuid } from 'uuid';
-import { produce } from 'immer';
 import { convert, newKeyState } from '@dash/keys';
+import { produce } from 'immer';
+import { v4 as uuid } from 'uuid';
 import type { EditKey } from '@dash/keys';
 import type { GetAdminKeychain, Key, KeychainSummary } from '@dash/types';
+import * as empty from '../lib/empty';
 import { commit, editable } from '../lib/helpers';
 import editKeyReducer from '../reducers/edit-key-reducer';
-import * as empty from '../lib/empty';
 
 type EditKeychainState = {
   keychain?: Editable<KeychainSummary>;
@@ -14,16 +14,16 @@ type EditKeychainState = {
 };
 
 type EditKeychainAction =
-  | { type: 'receivedKeychain'; keychain: GetAdminKeychain.Output }
-  | { type: 'createNewKeychain'; id: UUID; adminId: UUID }
-  | { type: 'beginEditKey'; id: UUID }
-  | { type: 'keychainSaved' }
-  | { type: 'keySaved' }
-  | { type: 'cancelEditKey' }
-  | { type: 'createNewKey' }
-  | { type: 'updateEditingKey'; event: EditKey.Event }
-  | { type: 'updateName'; name: string }
-  | { type: 'updateDesc'; description: string };
+  | { type: `receivedKeychain`; keychain: GetAdminKeychain.Output }
+  | { type: `createNewKeychain`; id: UUID; adminId: UUID }
+  | { type: `beginEditKey`; id: UUID }
+  | { type: `keychainSaved` }
+  | { type: `keySaved` }
+  | { type: `cancelEditKey` }
+  | { type: `createNewKey` }
+  | { type: `updateEditingKey`; event: EditKey.Event }
+  | { type: `updateName`; name: string }
+  | { type: `updateDesc`; description: string };
 
 function reducer(
   state: EditKeychainState,

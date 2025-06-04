@@ -1,12 +1,12 @@
 import React from 'react';
 import type { Device } from '@dash/types';
-import PageHeading from '../PageHeading';
 import EmptyState from '../EmptyState';
+import PageHeading from '../PageHeading';
 import ComputerCard from './ComputerCard';
 
 interface Props {
   devices: Array<
-    Pick<Device, 'name' | 'id' | 'modelIdentifier' | 'modelTitle' | 'users'>
+    Pick<Device, `name` | `id` | `modelIdentifier` | `modelTitle` | `users`>
   >;
 }
 

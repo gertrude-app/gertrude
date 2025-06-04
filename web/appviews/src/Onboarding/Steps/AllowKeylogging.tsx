@@ -1,14 +1,14 @@
 import React, { useContext, useState } from 'react';
 import Callout from '../Callout';
 import ExpandableContent from '../ExpandableContent';
+import InformationModal from '../InformationModal';
+import OnboardingContext from '../OnboardingContext';
+import TellMeMoreButton from '../TellMeMoreButton';
 import * as Onboarding from '../UtilityComponents';
 import assets from '../cdn-assets';
-import OnboardingContext from '../OnboardingContext';
-import InformationModal from '../InformationModal';
-import TellMeMoreButton from '../TellMeMoreButton';
 
 interface Props {
-  step: 'allowKeylogging_required' | 'allowKeylogging_grant' | 'allowKeylogging_failed';
+  step: `allowKeylogging_required` | `allowKeylogging_grant` | `allowKeylogging_failed`;
 }
 
 const AllowKeylogging: React.FC<Props> = ({ step }) => {

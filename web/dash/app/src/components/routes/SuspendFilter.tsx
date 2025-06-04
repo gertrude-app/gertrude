@@ -1,20 +1,20 @@
-import React from 'react';
-import { isOlderThan } from '@dash/datetime';
 import {
-  Modal,
+  ErrorModal,
   Loading,
+  Modal,
   SuspendFilterRequestForm,
   UserInputText,
-  ErrorModal,
 } from '@dash/components';
+import { isOlderThan } from '@dash/datetime';
+import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import Current from '../../environment';
+import { Key, useMutation, useObservedReducer, useQuery } from '../../hooks';
 import reducer, {
   durationInSeconds,
-  userInitialState,
   useUserObserver,
+  userInitialState,
 } from '../../reducers/suspend-filter-request-reducer';
-import { useQuery, useMutation, useObservedReducer, Key } from '../../hooks';
-import Current from '../../environment';
 
 const SuspendFilter: React.FC = () => {
   const { userId = ``, id = `` } = useParams<{ userId: UUID; id: UUID }>();
@@ -35,7 +35,7 @@ const SuspendFilter: React.FC = () => {
   );
 
   const update = useMutation(
-    (status: 'accepted' | 'rejected') =>
+    (status: `accepted` | `rejected`) =>
       Current.api.decideFilterSuspensionRequest({
         id,
         decision:

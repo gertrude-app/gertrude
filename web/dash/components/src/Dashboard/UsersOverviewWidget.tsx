@@ -1,12 +1,12 @@
-import React from 'react';
-import cx from 'classnames';
 import { Button } from '@shared/components';
+import cx from 'classnames';
+import React from 'react';
 import type { DashboardWidgets } from '@dash/types';
 import UserStatus from '../UserStatus';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
-type Child = DashboardWidgets.Output['children'][number];
+type Child = DashboardWidgets.Output[`children`][number];
 
 type Props = {
   className?: string;

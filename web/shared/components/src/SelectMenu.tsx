@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
-import cx from 'classnames';
-import { Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
+import cx from 'classnames';
+import React from 'react';
+import { Fragment } from 'react';
 import Label from './Label';
 
 interface Props<Value extends string> {
@@ -11,7 +11,7 @@ interface Props<Value extends string> {
   selectedOption: Value;
   setSelected(value: Value): void;
   label?: string;
-  size?: 'small' | 'medium' | 'large';
+  size?: `small` | `medium` | `large`;
   testId?: string;
   disabled?: boolean;
 }

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import cx from 'classnames';
 import { FullscreenGradientBg } from '@dash/components';
 import { Button } from '@shared/components';
+import cx from 'classnames';
+import React, { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { useAuth, useMutation } from '../../hooks';
 import Current from '../../environment';
+import { useAuth, useMutation } from '../../hooks';
 
-type PageType = 'start' | 'adult-peer' | 'self';
+type PageType = `start` | `adult-peer` | `self`;
 
 const UseCaseSurvey: React.FC = () => {
   const [page, setPage] = useState<PageType>(`start`);
@@ -148,7 +148,7 @@ const UseCaseSurvey: React.FC = () => {
 export default UseCaseSurvey;
 
 type OptionProps = {
-  type: 'parent-child' | 'adult-peer' | 'self';
+  type: `parent-child` | `adult-peer` | `self`;
   children: React.ReactNode;
   description: string;
   setPage(page: PageType): unknown;

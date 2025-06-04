@@ -1,16 +1,16 @@
-import React from 'react';
 import { EditKey } from '@dash/keys';
 import { TextInput } from '@shared/components';
-import { RadioGroup, Combobox } from '../Forms';
+import React from 'react';
+import { Combobox, RadioGroup } from '../Forms';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';
 
 interface Props {
-  keyType: 'app' | 'website';
-  mode: 'edit' | 'create';
+  keyType: `app` | `website`;
+  mode: `edit` | `create`;
   activeStep: EditKey.Step;
-  appIdentificationType: 'bundleId' | 'slug';
+  appIdentificationType: `bundleId` | `slug`;
   appSlug?: string;
   appBundleId?: string;
   apps: Array<{ slug: string; name: string }>;
@@ -45,7 +45,7 @@ const ChooseAppStep: React.FC<Props> = (props) => {
       }
     >
       <div>
-        <RadioGroup<'bundleId' | 'slug'>
+        <RadioGroup<`bundleId` | `slug`>
           options={[
             { value: `slug`, display: `Choose from common apps` },
             { value: `bundleId`, display: `By bundle ID` },
@@ -81,7 +81,7 @@ const ChooseAppStep: React.FC<Props> = (props) => {
 
 export default ChooseAppStep;
 
-function selectedApp({ apps, appSlug }: Pick<Props, 'apps' | 'appSlug'>): {
+function selectedApp({ apps, appSlug }: Pick<Props, `apps` | `appSlug`>): {
   value: string;
   display: string;
 } {
@@ -93,7 +93,7 @@ function selectedApp({ apps, appSlug }: Pick<Props, 'apps' | 'appSlug'>): {
 }
 
 function canAdvance(
-  props: Pick<Props, 'appIdentificationType' | 'appSlug' | 'appBundleId'>,
+  props: Pick<Props, `appIdentificationType` | `appSlug` | `appBundleId`>,
 ): boolean {
   if (props.appIdentificationType === `slug`) {
     return !!props.appSlug;
@@ -118,7 +118,7 @@ const Title: React.FC<Props> = ({
     <UserInputText>
       {appIdentificationType === `bundleId`
         ? appBundleId
-        : apps.find((app) => app.slug === appSlug)?.name ?? appBundleId}
+        : (apps.find((app) => app.slug === appSlug)?.name ?? appBundleId)}
     </UserInputText>
   </h2>
 );

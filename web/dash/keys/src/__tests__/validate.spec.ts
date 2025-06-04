@@ -1,4 +1,4 @@
-import { test, describe, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import type { AddressType } from '../edit';
 import * as validate from '../validate';
 
@@ -17,6 +17,6 @@ describe(`validate.address()`, () => {
   ];
 
   test.each(cases)(`%s:%s valid=%s`, (address, type, expected) => {
-    expect(validate.address(address, type)).toMatchObject(expected);
+    expect(validate.address(address, type)).toEqual(expected);
   });
 });

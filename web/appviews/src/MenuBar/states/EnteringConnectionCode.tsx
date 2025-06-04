@@ -1,5 +1,5 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 import type { AppEvent, ViewAction } from '../menubar-store';
 import { MenuBarSized } from '../MenuBar';
 

@@ -1,5 +1,5 @@
-import { expect, beforeEach, test, describe } from 'vitest';
-import type { Action, State, Request } from '../blockedrequests-store';
+import { beforeEach, describe, expect, test } from 'vitest';
+import type { Action, Request, State } from '../blockedrequests-store';
 import { BlockedRequestsStore } from '../blockedrequests-store';
 
 describe(`BlockedRequestsStore.reducer()`, () => {

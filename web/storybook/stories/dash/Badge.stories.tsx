@@ -1,5 +1,5 @@
 import { Badge } from '@shared/components';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 const Badges: React.FC = () => (
   <div className="space-y-6">

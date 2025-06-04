@@ -1,10 +1,10 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 
 interface ComputerProps {
   children: React.ReactNode;
   className: string;
-  labelStatus: 'hidden' | 'prominent' | 'subtle';
+  labelStatus: `hidden` | `prominent` | `subtle`;
 }
 
 const Computer: React.FC<ComputerProps> = ({ children, className, labelStatus }) => (

@@ -1,10 +1,10 @@
-import React from 'react';
-import cx from 'classnames';
 import { Logo } from '@shared/components';
-import MobileLoginDropdown from './MobileLoginDropdown';
+import cx from 'classnames';
+import React from 'react';
 import FancyLink from './FancyLink';
+import MobileLoginDropdown from './MobileLoginDropdown';
 
-const MainHeader: React.FC<{ theme: 'violet' | 'white' }> = ({ theme }) => (
+const MainHeader: React.FC<{ theme: `violet` | `white` }> = ({ theme }) => (
   <header
     className={cx(
       `flex justify-between items-center px-6 xs:px-8 top-0 left-0 right-0 z-50 py-6 relative`,

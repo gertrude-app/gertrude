@@ -1,5 +1,5 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 import type { Key as KeyType } from '@dash/types';
 import Key from './KeyListKey';
 
@@ -7,7 +7,7 @@ type Props = {
   keys: KeyType[];
   editKey(id: UUID): unknown;
   deleteKey(id: UUID): unknown;
-  viewMode: 'list' | 'table';
+  viewMode: `list` | `table`;
 };
 
 const KeyList: React.FC<Props> = ({ keys, editKey, deleteKey, viewMode }) => (

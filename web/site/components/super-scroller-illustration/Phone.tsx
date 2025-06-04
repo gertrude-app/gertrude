@@ -1,10 +1,10 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 
 interface PhoneProps {
   children: React.ReactNode;
   className: string;
-  labelStatus: 'hidden' | 'prominent' | 'subtle';
+  labelStatus: `hidden` | `prominent` | `subtle`;
 }
 
 const Phone: React.FC<PhoneProps> = ({ children, className, labelStatus }) => (

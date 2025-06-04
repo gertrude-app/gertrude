@@ -1,5 +1,5 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 import Icon from './Icon';
 
 const styles = {
@@ -23,7 +23,7 @@ const icons = {
 };
 
 interface Props {
-  type: 'note' | 'warning';
+  type: `note` | `warning`;
   alt?: boolean;
   title?: string;
   children: React.ReactNode;

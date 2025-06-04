@@ -1,15 +1,15 @@
 import React, { useContext, useState } from 'react';
 import ExpandableContent from '../ExpandableContent';
-import * as Onboarding from '../UtilityComponents';
-import OnboardingContext from '../OnboardingContext';
-import assets from '../cdn-assets';
 import InformationModal from '../InformationModal';
+import OnboardingContext from '../OnboardingContext';
+import * as Onboarding from '../UtilityComponents';
+import assets from '../cdn-assets';
 
 interface Props {
   step:
-    | 'allowNotifications_start'
-    | 'allowNotifications_grant'
-    | 'allowNotifications_failed';
+    | `allowNotifications_start`
+    | `allowNotifications_grant`
+    | `allowNotifications_failed`;
 }
 
 const AllowNotifications: React.FC<Props> = ({ step }) => {

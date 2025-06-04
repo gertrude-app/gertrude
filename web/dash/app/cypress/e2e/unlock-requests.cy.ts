@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 import type { KeychainSummary } from '@dash/types';
-import { betsy } from '../fixtures/helpers';
 import * as mock from '../../src/reducers/__tests__/mocks';
+import { betsy } from '../fixtures/helpers';
 
 describe(`unlock request flow`, () => {
   let keychain: KeychainSummary;

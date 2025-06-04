@@ -1,6 +1,6 @@
-import React from 'react';
 import { Button } from '@shared/components';
-import type { Subcomponents, RequestState } from '@dash/types';
+import React from 'react';
+import type { RequestState, Subcomponents } from '@dash/types';
 import EmptyState from '../EmptyState';
 import PageHeading from '../PageHeading';
 import ConnectModal from './ConnectDeviceModal';

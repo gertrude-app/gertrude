@@ -1,29 +1,29 @@
-import type { ActionOf } from '../lib/store';
 import type { Failable } from '../lib/failable';
 import type { AdminAccountStatus, FilterState } from '../lib/shared-types';
+import type { ActionOf } from '../lib/store';
 import { Store } from '../lib/store';
 
 // begin codegen
-export type Screen = 'healthCheck' | 'actions' | 'exemptUsers' | 'advanced';
+export type Screen = `healthCheck` | `actions` | `exemptUsers` | `advanced`;
 
 export interface HealthCheck {
-  latestAppVersion?: { case: 'ok'; value: string } | { case: 'error'; message?: string };
+  latestAppVersion?: { case: `ok`; value: string } | { case: `error`; message?: string };
   filterStatus?:
-    | { case: 'communicationBroken'; repairing: boolean }
-    | { case: 'installed'; version: string; numUserKeys: number }
-    | { case: 'installing' }
-    | { case: 'installTimeout' }
-    | { case: 'notInstalled' }
-    | { case: 'disabled' }
-    | { case: 'unexpected' };
+    | { case: `communicationBroken`; repairing: boolean }
+    | { case: `installed`; version: string; numUserKeys: number }
+    | { case: `installing` }
+    | { case: `installTimeout` }
+    | { case: `notInstalled` }
+    | { case: `disabled` }
+    | { case: `unexpected` };
   accountStatus?: Failable<AdminAccountStatus>;
   screenRecordingPermissionOk?: boolean;
   keystrokeRecordingPermissionOk?: boolean;
   fullDiskAccessPermissionOk?: boolean;
   macOsUserType?:
-    | { case: 'ok'; value: 'admin' | 'standard' }
-    | { case: 'error'; message?: string };
-  notificationsSetting?: 'none' | 'banner' | 'alert';
+    | { case: `ok`; value: `admin` | `standard` }
+    | { case: `error`; message?: string };
+  notificationsSetting?: `none` | `banner` | `alert`;
 }
 
 export interface ExemptableUser {
@@ -34,18 +34,18 @@ export interface ExemptableUser {
 }
 
 export type HealthCheckAction =
-  | 'recheckClicked'
-  | 'upgradeAppClicked'
-  | 'installFilterClicked'
-  | 'enableFilterClicked'
-  | 'repairFilterCommunicationClicked'
-  | 'repairOutOfDateFilterClicked'
-  | 'fixScreenRecordingPermissionClicked'
-  | 'fixKeystrokeRecordingPermissionClicked'
-  | 'fixFullDiskAccessPermissionClicked'
-  | 'removeUserAdminPrivilegeClicked'
-  | 'fixNotificationPermissionClicked'
-  | 'zeroKeysRefreshRulesClicked';
+  | `recheckClicked`
+  | `upgradeAppClicked`
+  | `installFilterClicked`
+  | `enableFilterClicked`
+  | `repairFilterCommunicationClicked`
+  | `repairOutOfDateFilterClicked`
+  | `fixScreenRecordingPermissionClicked`
+  | `fixKeystrokeRecordingPermissionClicked`
+  | `fixFullDiskAccessPermissionClicked`
+  | `removeUserAdminPrivilegeClicked`
+  | `fixNotificationPermissionClicked`
+  | `zeroKeysRefreshRulesClicked`;
 
 export interface AdvancedState {
   pairqlEndpointOverride?: string;
@@ -59,12 +59,12 @@ export interface AdvancedState {
 }
 
 export type AdvancedAction =
-  | { case: 'pairqlEndpointSet'; url?: string }
-  | { case: 'websocketEndpointSet'; url?: string }
-  | { case: 'appcastEndpointSet'; url?: string }
-  | { case: 'setWebviewDebugging'; enabled: boolean }
-  | { case: 'forceUpdateToSpecificVersionClicked'; version: string }
-  | { case: 'deleteAllDeviceStorageClicked' };
+  | { case: `pairqlEndpointSet`; url?: string }
+  | { case: `websocketEndpointSet`; url?: string }
+  | { case: `appcastEndpointSet`; url?: string }
+  | { case: `setWebviewDebugging`; enabled: boolean }
+  | { case: `forceUpdateToSpecificVersionClicked`; version: string }
+  | { case: `deleteAllDeviceStorageClicked` };
 
 export interface AppState {
   windowOpen: boolean;
@@ -78,37 +78,37 @@ export interface AppState {
   };
   availableAppUpdate?: { semver: string; required: boolean };
   installedAppVersion: string;
-  releaseChannel: 'stable' | 'beta' | 'canary';
+  releaseChannel: `stable` | `beta` | `canary`;
   quitting: boolean;
   exemptableUsers?: Failable<ExemptableUser[]>;
   advanced?: AdvancedState;
 }
 
 export type AppEvent =
-  | { case: 'healthCheck'; action: HealthCheckAction }
-  | { case: 'advanced'; action: AdvancedAction }
-  | { case: 'gotoScreenClicked'; screen: Screen }
-  | { case: 'setUserExemption'; userId: number; enabled: boolean }
-  | { case: 'closeWindow' }
-  | { case: 'confirmStopFilterClicked' }
-  | { case: 'confirmQuitAppClicked' }
-  | { case: 'disconnectUserClicked' }
-  | { case: 'administrateOSUserAccountsClicked' }
-  | { case: 'updateAppNowClicked' }
-  | { case: 'inactiveAccountRecheckClicked' }
-  | { case: 'inactiveAccountDisconnectAppClicked' };
+  | { case: `healthCheck`; action: HealthCheckAction }
+  | { case: `advanced`; action: AdvancedAction }
+  | { case: `gotoScreenClicked`; screen: Screen }
+  | { case: `setUserExemption`; userId: number; enabled: boolean }
+  | { case: `closeWindow` }
+  | { case: `confirmStopFilterClicked` }
+  | { case: `confirmQuitAppClicked` }
+  | { case: `disconnectUserClicked` }
+  | { case: `administrateOSUserAccountsClicked` }
+  | { case: `updateAppNowClicked` }
+  | { case: `inactiveAccountRecheckClicked` }
+  | { case: `inactiveAccountDisconnectAppClicked` };
 // end codegen
 
 export type ViewState = {
   filterSuspensionDurationInSeconds: string;
-  dangerZoneModal: 'hidden' | 'stopFilter' | 'quitApp';
+  dangerZoneModal: `hidden` | `stopFilter` | `quitApp`;
 };
 
 export type ViewAction =
-  | { type: 'filterSuspensionDurationInSecondsChanged'; value: string }
-  | { type: 'dangerZoneModalDismissed' }
-  | { type: 'dangerZoneStopFilterClicked' }
-  | { type: 'dangerZoneQuitAppClicked' };
+  | { type: `filterSuspensionDurationInSecondsChanged`; value: string }
+  | { type: `dangerZoneModalDismissed` }
+  | { type: `dangerZoneStopFilterClicked` }
+  | { type: `dangerZoneQuitAppClicked` };
 
 export type Action = ActionOf<AppState, AppEvent, ViewAction>;
 export type State = AppState & ViewState;

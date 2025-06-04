@@ -1,10 +1,10 @@
-import React from 'react';
-import cx from 'classnames';
 import { prettyE164 } from '@dash/utils';
 import { Button, isScreenshotTest } from '@shared/components';
+import cx from 'classnames';
+import React from 'react';
 
 type Props = {
-  method: 'email' | 'slack' | 'text';
+  method: `email` | `slack` | `text`;
   value: string;
   deletable: boolean;
   onDelete(): unknown;

@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
 import { Button, TextInput, Toggle } from '@shared/components';
 import { inflect } from '@shared/string';
-import type { ConfirmableEntityAction, Key } from '@dash/types';
+import React, { useState } from 'react';
 import type { EditKey } from '@dash/keys';
-import Modal, { ConfirmDeleteEntity } from '../Modal';
-import PageHeading from '../PageHeading';
+import type { ConfirmableEntityAction, Key } from '@dash/types';
+import EmptyState from '../EmptyState';
 import KeyCreator from '../KeyCreator/KeyCreator';
 import KeyList from '../Keychains/KeyList';
-import EmptyState from '../EmptyState';
+import Modal, { ConfirmDeleteEntity } from '../Modal';
+import PageHeading from '../PageHeading';
 
 type Props = {
   isNew: boolean;
@@ -27,7 +27,7 @@ type Props = {
   onKeySave(): unknown;
   onCreateNewKey(): unknown;
   keyModalSaveButtonDisabled: boolean;
-  apps: React.ComponentProps<typeof KeyCreator>['apps'];
+  apps: React.ComponentProps<typeof KeyCreator>[`apps`];
 };
 
 const EditKeychain: React.FC<Props> = ({
@@ -50,7 +50,7 @@ const EditKeychain: React.FC<Props> = ({
   keyModalSaveButtonDisabled,
   apps,
 }) => {
-  const [viewMode, setViewMode] = useState<'list' | 'table'>(`list`);
+  const [viewMode, setViewMode] = useState<`list` | `table`>(`list`);
   return (
     <div className="relative max-w-6xl">
       <Modal

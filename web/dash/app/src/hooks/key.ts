@@ -1,24 +1,24 @@
 import type {
-  GetUsers,
-  GetUser,
   ChildActivitySummaries,
-  UserActivityFeed,
-  GetSelectableKeychains,
+  CombinedUsersActivityFeed,
   DashboardWidgets,
   FamilyActivitySummaries,
-  CombinedUsersActivityFeed,
-  GetAdminKeychains,
-  GetIdentifiedApps,
-  GetAdminKeychain,
-  GetUnlockRequest,
-  GetUserUnlockRequests,
-  GetUnlockRequests,
-  GetSuspendFilterRequest,
   GetAdmin,
-  GetDevices,
+  GetAdminKeychain,
+  GetAdminKeychains,
   GetDevice,
+  GetDevices,
+  GetIdentifiedApps,
+  GetSelectableKeychains,
+  GetSuspendFilterRequest,
+  GetUnlockRequest,
+  GetUnlockRequests,
+  GetUser,
+  GetUserUnlockRequests,
+  GetUsers,
   LatestAppVersions,
   SecurityEventsFeed,
+  UserActivityFeed,
 } from '@dash/types';
 
 export class QueryKey<T> {
@@ -132,4 +132,4 @@ export class Key extends QueryKey<never> {
   }
 }
 
-export type QueryKeyData = Omit<QueryKey<any>, 'data' | '__taint' | 'phantom'>;
+export type QueryKeyData = Omit<QueryKey<any>, `data` | `__taint` | `phantom`>;

@@ -1,6 +1,6 @@
-import React from 'react';
-import cx from 'classnames';
 import { Button } from '@shared/components';
+import cx from 'classnames';
+import React from 'react';
 import type { ItemData as HealthCheckItemData } from '../HealthChecker';
 import type { HealthCheckAction } from '../administrate-store';
 

@@ -1,21 +1,21 @@
-import { v4 as uuid } from 'uuid';
-import { Navigate, useParams } from 'react-router-dom';
-import { Loading, ApiErrorMessage } from '@dash/components';
-import React, { useEffect, useMemo, useReducer } from 'react';
+import { ApiErrorMessage, Loading } from '@dash/components';
 import { EditUser } from '@dash/components';
-import { defaults, type User } from '@dash/types';
+import { type User, defaults } from '@dash/types';
+import React, { useEffect, useMemo, useReducer } from 'react';
+import { Navigate, useParams } from 'react-router-dom';
+import { v4 as uuid } from 'uuid';
 import type { RequestPublicKeychain } from '@dash/types';
-import * as empty from '../../lib/empty';
-import { isDirty } from '../../lib/helpers';
 import Current from '../../environment';
 import {
-  useMutation,
   Key,
+  useConfirmableDelete,
+  useMutation,
   useQuery,
   useSelectableKeychains,
-  useConfirmableDelete,
 } from '../../hooks';
 import ReqState from '../../lib/ReqState';
+import * as empty from '../../lib/empty';
+import { isDirty } from '../../lib/helpers';
 import reducer from '../../reducers/user-reducer';
 import { deviceProps } from './Users';
 
@@ -69,7 +69,9 @@ const UserRoute: React.FC = () => {
 
   const newUserId = useMemo(() => uuid(), []);
   useEffect(() => {
-    id === `new` && dispatch({ type: `setUser`, user: empty.user(newUserId), new: true });
+    if (id === `new`) {
+      dispatch({ type: `setUser`, user: empty.user(newUserId), new: true });
+    }
   }, [id, newUserId]);
 
   if (id === `new`) {
@@ -141,7 +143,9 @@ const UserRoute: React.FC = () => {
         })
       }
       onConfirmAddKeychain={() => {
-        addingKeychain && dispatch({ type: `addKeychain`, keychain: addingKeychain });
+        if (addingKeychain) {
+          dispatch({ type: `addKeychain`, keychain: addingKeychain });
+        }
         dispatch({ type: `setAddingKeychain`, keychain: undefined });
       }}
       onDismissAddKeychain={() =>

@@ -1,5 +1,5 @@
-import React from 'react';
 import { Logo } from '@shared/components';
+import React from 'react';
 import BgImage from '../../static/messages-screenshot.png';
 
 const GifAppMessagesOgImage: React.FC = () => (

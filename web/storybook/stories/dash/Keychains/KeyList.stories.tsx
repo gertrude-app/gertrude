@@ -1,5 +1,5 @@
 import { KeyList } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { keyExamples, props } from '../../story-helpers';
 
 const meta = {

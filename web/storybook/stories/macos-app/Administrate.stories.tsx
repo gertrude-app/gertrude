@@ -1,6 +1,6 @@
 import { Administrate } from '@macos/appviews';
 import type { Meta, StoryObj } from '@storybook/react';
-import { props, appWindow } from '../story-helpers';
+import { appWindow, props } from '../story-helpers';
 
 const meta = {
   title: 'MacOS App/Administrate', // eslint-disable-line

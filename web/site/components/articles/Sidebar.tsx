@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
+import { Logo } from '@shared/components';
 import cx from 'classnames';
 import { DotIcon } from 'lucide-react';
-import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Logo } from '@shared/components';
+import { usePathname } from 'next/navigation';
+import React from 'react';
 import FancyLink from '@/components/FancyLink';
 
 interface Props {

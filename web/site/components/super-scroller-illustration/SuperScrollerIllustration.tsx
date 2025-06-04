@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import cx from 'classnames';
 import { Logo } from '@shared/components';
-import { compareTo, initializeStep, type Step } from './utils';
+import cx from 'classnames';
+import React, { useEffect, useState } from 'react';
 import Computer from './Computer';
 import ComputerScreen from './ComputerScreen';
+import Envelope from './Envelope';
 import Phone from './Phone';
 import PhoneScreen from './PhoneScreen';
-import Envelope from './Envelope';
+import { type Step, compareTo, initializeStep } from './utils';
 
 interface Props {
   step: number;

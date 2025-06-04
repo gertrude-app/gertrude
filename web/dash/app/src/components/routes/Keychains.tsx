@@ -1,7 +1,7 @@
+import { ApiErrorMessage, ListKeychains, Loading } from '@dash/components';
 import React from 'react';
-import { Loading, ListKeychains, ApiErrorMessage } from '@dash/components';
-import { useQuery, useConfirmableDelete, Key, useMutation } from '../../hooks';
 import Current from '../../environment';
+import { Key, useConfirmableDelete, useMutation, useQuery } from '../../hooks';
 
 const Keychains: React.FC = () => {
   const adminKeychainsQuery = useQuery(Key.adminKeychains, Current.api.getAdminKeychains);

@@ -1,8 +1,8 @@
-import React from 'react';
-import cx from 'classnames';
 import { Button } from '@shared/components';
-import type { AppEvent, ExemptableUser } from '../administrate-store';
+import cx from 'classnames';
+import React from 'react';
 import type { Failable } from '../../lib/failable';
+import type { AppEvent, ExemptableUser } from '../administrate-store';
 import ErrorBlock from '../../ErrorBlock';
 
 interface Props {

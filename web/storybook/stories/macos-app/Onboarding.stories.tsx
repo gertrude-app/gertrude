@@ -1,6 +1,6 @@
 import { Onboarding } from '@macos/appviews';
-import type { StoryObj, Meta } from '@storybook/react';
-import { props, appWindow } from '../story-helpers';
+import type { Meta, StoryObj } from '@storybook/react';
+import { appWindow, props } from '../story-helpers';
 
 const meta = {
   title: 'MacOS App/Onboarding', // eslint-disable-line

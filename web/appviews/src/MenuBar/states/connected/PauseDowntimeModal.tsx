@@ -1,6 +1,6 @@
 import cx from 'classnames';
-import type React from 'react';
 import type { AppEvent, ViewAction } from '../../menubar-store';
+import type React from 'react';
 import * as Btn from './Buttons';
 
 interface Props {

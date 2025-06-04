@@ -1,5 +1,5 @@
-import React from 'react';
 import { Logo } from '@shared/components';
+import React from 'react';
 import type { NextPage } from 'next';
 import ContactForm from '@/components/ContactForm';
 import * as seo from '@/lib/seo';

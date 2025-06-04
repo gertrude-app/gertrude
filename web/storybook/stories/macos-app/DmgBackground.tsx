@@ -1,5 +1,5 @@
-import React from 'react';
 import { Logo } from '@shared/components';
+import React from 'react';
 
 const DmgBackground: React.FC = () => (
   <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-violet-500 to-fuchsia-500">

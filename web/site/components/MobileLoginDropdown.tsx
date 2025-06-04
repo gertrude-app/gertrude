@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
-import cx from 'classnames';
-import Link from 'next/link';
-import { MenuIcon } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import cx from 'classnames';
+import { MenuIcon } from 'lucide-react';
+import Link from 'next/link';
+import React from 'react';
 
 const MobileLoginDropdown: React.FC<{ theme: `violet` | `white` }> = ({ theme }) => (
   <DropdownMenu.Root>

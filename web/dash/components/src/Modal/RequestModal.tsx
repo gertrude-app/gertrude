@@ -1,6 +1,6 @@
 import React from 'react';
-import type { RequestState } from '@dash/types';
 import type { IconType } from '../GradientIcon';
+import type { RequestState } from '@dash/types';
 import Modal from './Modal';
 import { ErrorModal } from '.';
 
@@ -9,7 +9,7 @@ interface Props<Payload> {
   successTitle: string;
   successType?: `default` | `container`;
   errorTitle?: string;
-  primaryButton: React.ComponentProps<typeof Modal>['primaryButton'];
+  primaryButton: React.ComponentProps<typeof Modal>[`primaryButton`];
   withPayload: (payload: Payload) => React.ReactNode;
   onDismiss(): unknown;
   icon?: IconType;

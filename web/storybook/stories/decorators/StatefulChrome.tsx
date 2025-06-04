@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import { Chrome } from '@dash/components';
+import React, { useState } from 'react';
 import type { Decorator } from '@storybook/react';
 
 const StatefulChrome: React.FC<{ children: React.ReactNode }> = ({ children }) => {

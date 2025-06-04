@@ -1,12 +1,12 @@
 import React from 'react';
 import type { EditKey } from '@dash/keys';
 import AddressStep from './AddressStep';
-import WebsiteKeyAppScopeStep from './WebsiteKeyAppScopeStep';
-import ExpirationStep from './ExpirationStep';
-import ChooseAppStep from './ChooseAppStep';
 import AppScopeStep from './AppScopeStep';
-import KeyTypeStep from './KeyTypeStep';
+import ChooseAppStep from './ChooseAppStep';
 import CommentStep from './CommentStep';
+import ExpirationStep from './ExpirationStep';
+import KeyTypeStep from './KeyTypeStep';
+import WebsiteKeyAppScopeStep from './WebsiteKeyAppScopeStep';
 
 type Props = EditKey.State & {
   update(event: EditKey.Event): unknown;

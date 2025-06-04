@@ -4,18 +4,18 @@ import cx from 'classnames';
 import React, { useEffect, useState } from 'react';
 import type { StaticImageData } from 'next/image';
 import { useIntersectionObserver } from '../lib/hooks';
-import Waves from '@/public/wavy-bg.svg';
 
-import LockAndChain from '@/public/feature-cards/lock-and-chain.gif';
-import StaticLockAndChain from '@/public/feature-cards/lock-and-chain-final.png';
-import Bell from '@/public/feature-cards/bell.gif';
 import StaticBell from '@/public/feature-cards/bell-final.png';
-import Family from '@/public/feature-cards/family.gif';
+import Bell from '@/public/feature-cards/bell.gif';
 import StaticFamily from '@/public/feature-cards/family-final.png';
-import StopWatch from '@/public/feature-cards/stopwatch.gif';
-import StaticStopWatch from '@/public/feature-cards/stopwatch-final.png';
-import Phone from '@/public/feature-cards/phone.gif';
+import Family from '@/public/feature-cards/family.gif';
+import StaticLockAndChain from '@/public/feature-cards/lock-and-chain-final.png';
+import LockAndChain from '@/public/feature-cards/lock-and-chain.gif';
 import StaticPhone from '@/public/feature-cards/phone-final.png';
+import Phone from '@/public/feature-cards/phone.gif';
+import StaticStopWatch from '@/public/feature-cards/stopwatch-final.png';
+import StopWatch from '@/public/feature-cards/stopwatch.gif';
+import Waves from '@/public/wavy-bg.svg';
 
 const FeaturesBlock: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);

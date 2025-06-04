@@ -1,5 +1,5 @@
 import { isoFromDateInput } from '@dash/datetime';
-import { domain, EditKey } from '@dash/keys';
+import { EditKey, domain } from '@dash/keys';
 
 export default function reducer(state: EditKey.State, action: EditKey.Event): void {
   if (action.type === `nextStepClicked`) {

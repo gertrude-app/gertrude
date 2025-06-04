@@ -1,5 +1,5 @@
 import { UserActivityWidget } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { props, withIdsAnd } from '../../story-helpers';
 
 const meta = {

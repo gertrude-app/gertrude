@@ -1,5 +1,5 @@
 import isEqual from 'lodash.isequal';
-import type { RequestState, PqlError } from '@dash/types';
+import type { PqlError, RequestState } from '@dash/types';
 
 export class Req {
   static succeed<T>(payload: T): RequestState<T> {

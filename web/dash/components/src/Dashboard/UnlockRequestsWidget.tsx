@@ -1,7 +1,7 @@
-import React from 'react';
+import { newestFirst, writable } from '@dash/utils';
 import { Button } from '@shared/components';
-import { writable, newestFirst } from '@dash/utils';
 import { inflect } from '@shared/string';
+import React from 'react';
 import type { DashboardWidgets } from '@dash/types';
 import UnlockRequestCard from '../UnlockRequestCard';
 import DashboardWidget from './DashboardWidget';
@@ -9,7 +9,7 @@ import WidgetTitle from './WidgetTitle';
 
 type Props = {
   className?: string;
-  unlockRequests: DashboardWidgets.Output['unlockRequests'];
+  unlockRequests: DashboardWidgets.Output[`unlockRequests`];
 };
 
 const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) => (

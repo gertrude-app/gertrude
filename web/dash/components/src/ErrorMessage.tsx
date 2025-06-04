@@ -1,6 +1,6 @@
-import React from 'react';
-import cx from 'classnames';
 import { ExclamationCircleIcon } from '@heroicons/react/24/solid';
+import cx from 'classnames';
+import React from 'react';
 
 type Props = {
   className?: string;

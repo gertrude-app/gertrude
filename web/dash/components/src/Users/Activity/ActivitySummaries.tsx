@@ -1,8 +1,8 @@
-import React from 'react';
 import { posessive } from '@shared/string';
+import React from 'react';
 import type { ComponentProps } from 'react';
-import PageHeading from '../../PageHeading';
 import EmptyState from '../../EmptyState';
+import PageHeading from '../../PageHeading';
 import DaySummaryCard from './DaySummaryCard';
 
 type Props = {

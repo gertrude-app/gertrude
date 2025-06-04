@@ -1,4 +1,4 @@
-type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type Size = `xs` | `sm` | `md` | `lg` | `xl`;
 
 export const SIZES = {
   xs: { width: 375, height: 812 },
@@ -26,7 +26,7 @@ function isSize(value: string): value is Size {
 
 export function extractScreenshotTest(
   fileContent: string,
-  storyData: Omit<StoryData, 'importPath'>,
+  storyData: Omit<StoryData, `importPath`>,
 ): ScreenshotTest | null {
   const namedExport = storyData.name.replace(/\s/g, ``);
   if (!fileContent.includes(namedExport)) {
@@ -48,12 +48,12 @@ export function extractScreenshotTest(
   return null;
 }
 
-export function parseTestSizes(sizeStr?: string): ScreenshotTest['sizes'] {
+export function parseTestSizes(sizeStr?: string): ScreenshotTest[`sizes`] {
   if (!sizeStr) {
     return [SIZES.xs];
   }
 
-  const sizes: ScreenshotTest['sizes'] = [];
+  const sizes: ScreenshotTest[`sizes`] = [];
   const parts = sizeStr.split(`,`);
   for (const part of parts) {
     if (isSize(part)) {

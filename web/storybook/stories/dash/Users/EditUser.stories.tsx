@@ -1,6 +1,6 @@
 import { EditUser } from '@dash/components';
 import { defaults } from '@dash/types';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { confirmableEntityAction, props, userKeychainProps } from '../../story-helpers';
 

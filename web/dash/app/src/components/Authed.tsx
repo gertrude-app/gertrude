@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, useLocation, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/auth';
 import Chrome from './Chrome';
 

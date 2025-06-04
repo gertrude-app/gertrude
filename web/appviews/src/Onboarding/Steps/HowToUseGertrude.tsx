@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import ExpandableContent from '../ExpandableContent';
-import * as Onboarding from '../UtilityComponents';
 import OnboardingContext from '../OnboardingContext';
+import * as Onboarding from '../UtilityComponents';
 import assets from '../cdn-assets';
 
 const HowToUseGertrude: React.FC = () => {

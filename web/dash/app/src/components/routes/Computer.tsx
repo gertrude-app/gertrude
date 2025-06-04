@@ -2,8 +2,8 @@ import { ApiErrorMessage, EditComputer, Loading } from '@dash/components';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { ReleaseChannel } from '@dash/types';
-import { Key, useMutation, useQuery, useZip } from '../../hooks';
 import Current from '../../environment';
+import { Key, useMutation, useQuery, useZip } from '../../hooks';
 
 const Computer: React.FC = () => {
   const { computerId: id = `` } = useParams<{ computerId: string }>();

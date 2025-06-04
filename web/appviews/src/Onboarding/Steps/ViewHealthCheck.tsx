@@ -1,6 +1,6 @@
 import React from 'react';
-import ExpandableContent from '../ExpandableContent';
 import Callout from '../Callout';
+import ExpandableContent from '../ExpandableContent';
 import * as Onboarding from '../UtilityComponents';
 import assets from '../cdn-assets';
 

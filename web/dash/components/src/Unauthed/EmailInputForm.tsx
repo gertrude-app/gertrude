@@ -1,5 +1,5 @@
+import { Button, Logo, TextInput } from '@shared/components';
 import React from 'react';
-import { Logo, TextInput, Button } from '@shared/components';
 
 type Props = {
   id?: string;

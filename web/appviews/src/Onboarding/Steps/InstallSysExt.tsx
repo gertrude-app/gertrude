@@ -1,17 +1,17 @@
 import React, { useContext } from 'react';
 import Callout from '../Callout';
 import ExpandableContent from '../ExpandableContent';
+import OnboardingContext from '../OnboardingContext';
 import * as Onboarding from '../UtilityComponents';
 import assets from '../cdn-assets';
-import OnboardingContext from '../OnboardingContext';
 
 interface Props {
   step:
-    | 'installSysExt_explain'
-    | 'installSysExt_trick'
-    | 'installSysExt_allow'
-    | 'installSysExt_failed'
-    | 'installSysExt_success';
+    | `installSysExt_explain`
+    | `installSysExt_trick`
+    | `installSysExt_allow`
+    | `installSysExt_failed`
+    | `installSysExt_success`;
 }
 
 const InstallSysExt: React.FC<Props> = ({ step }) => {

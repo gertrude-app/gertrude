@@ -1,6 +1,6 @@
-import { describe, expect, beforeEach, it } from 'vitest';
 import { time } from '@shared/datetime';
-import { chunkedRenderTasks, type Chunkable } from '../DeletableActivityChunks';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { type Chunkable, chunkedRenderTasks } from '../DeletableActivityChunks';
 
 describe(`chunkedRenderTasks()`, () => {
   beforeEach(resetId);
@@ -184,7 +184,7 @@ function simplify(chunks: ReturnType<typeof chunkedRenderTasks>): string[] {
     .flat(1);
 }
 
-function screenshot(config: Partial<Omit<Chunkable, 'type'>> = {}): Chunkable {
+function screenshot(config: Partial<Omit<Chunkable, `type`>> = {}): Chunkable {
   return {
     type: `Screenshot`,
     id: nextId(),
@@ -194,7 +194,7 @@ function screenshot(config: Partial<Omit<Chunkable, 'type'>> = {}): Chunkable {
   };
 }
 
-function keystroke(config: Partial<Omit<Chunkable, 'type'>> = {}): Chunkable {
+function keystroke(config: Partial<Omit<Chunkable, `type`>> = {}): Chunkable {
   return {
     type: `KeystrokeLine`,
     id: nextId(),

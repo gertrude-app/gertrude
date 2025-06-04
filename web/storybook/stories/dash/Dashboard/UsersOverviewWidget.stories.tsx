@@ -1,6 +1,6 @@
 import { UsersOverviewWidget } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
-import { withIds, props } from '../../story-helpers';
+import type { Meta, StoryObj } from '@storybook/react';
+import { props, withIds } from '../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Dashboard/Widgets/UserOverview', // eslint-disable-line

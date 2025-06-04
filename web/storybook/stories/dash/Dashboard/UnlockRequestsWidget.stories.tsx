@@ -1,6 +1,6 @@
 import { UnlockRequestsWidget } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
-import { time, withIdsAnd, props } from '../../story-helpers';
+import type { Meta, StoryObj } from '@storybook/react';
+import { props, time, withIdsAnd } from '../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Dashboard/Widgets/UnlockRequests', // eslint-disable-line

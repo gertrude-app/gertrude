@@ -1,11 +1,11 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 import { BrowserRouter } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from './hooks/auth';
 import App from './App';
+import { AuthProvider } from './hooks/auth';
 
 const queryClient = new QueryClient();
 

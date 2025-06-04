@@ -1,14 +1,14 @@
-import React from 'react';
 import { EditKey } from '@dash/keys';
 import { capitalize } from '@shared/string';
+import React from 'react';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';
 import KeyTypeOption from './KeyTypeOption';
 
 interface Props {
-  mode: 'create' | 'edit';
-  keyType?: 'website' | 'app';
+  mode: `create` | `edit`;
+  keyType?: `website` | `app`;
   activeStep: EditKey.Step;
   update(event: EditKey.Event): unknown;
 }

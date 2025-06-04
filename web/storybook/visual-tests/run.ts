@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
-import puppeteer from 'puppeteer';
 import { argosScreenshot } from '@argos-ci/puppeteer';
 import { notNullish } from '@shared/ts-utils';
+import puppeteer from 'puppeteer';
 import type { StoryData } from './extract-screenshot-test';
 import { extractScreenshotTest } from './extract-screenshot-test';
 

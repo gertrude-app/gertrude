@@ -1,7 +1,7 @@
-import React from 'react';
-import cx from 'classnames';
-import { inflect } from '@shared/string';
 import { Button } from '@shared/components';
+import { inflect } from '@shared/string';
+import cx from 'classnames';
+import React from 'react';
 import type { Subcomponents } from '@dash/types';
 import UserDevice from './UserDevice';
 

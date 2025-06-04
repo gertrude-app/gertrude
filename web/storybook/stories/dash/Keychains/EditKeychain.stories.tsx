@@ -1,6 +1,6 @@
 import { EditKeychain } from '@dash/components';
 import { newKeyState } from '@dash/keys';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { confirmableEntityAction, props } from '../../story-helpers';
 
 const meta = {

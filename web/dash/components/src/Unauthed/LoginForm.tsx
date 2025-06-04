@@ -1,6 +1,6 @@
+import { Button, Logo, TextInput } from '@shared/components';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Logo, TextInput, Button } from '@shared/components';
 
 type Props = {
   password: string;

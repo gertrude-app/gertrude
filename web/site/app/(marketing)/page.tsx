@@ -1,13 +1,13 @@
 import React from 'react';
 import type { NextPage } from 'next';
+import CTABlock from '@/components/CTABlock';
+import DefenseInDepthBlock from '@/components/DefenseInDepthBlock';
+import DepressingStatisticsBlock from '@/components/DepressingStatisticsBlock';
+import FeaturesBlock from '@/components/FeaturesBlock';
 import HeroBlock from '@/components/HeroBlock';
 import PeaceOfMindForParentsBlock from '@/components/PeaceOfMindForParentsBlock';
-import DepressingStatisticsBlock from '@/components/DepressingStatisticsBlock';
 import SuperScrollerBlock from '@/components/SuperScrollerBlock';
-import FeaturesBlock from '@/components/FeaturesBlock';
-import DefenseInDepthBlock from '@/components/DefenseInDepthBlock';
 import TestimonialsBlock from '@/components/TestimonialsBlock';
-import CTABlock from '@/components/CTABlock';
 import { createMetadata } from '@/lib/seo';
 
 export const metadata = createMetadata(

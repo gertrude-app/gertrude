@@ -1,7 +1,7 @@
 import { ListUnlockRequests } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { withIdsAnd, props, time } from '../../story-helpers';
+import { props, time, withIdsAnd } from '../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Users/ListUnlockRequests', // eslint-disable-line

@@ -1,7 +1,7 @@
 // auto-generated, do not edit
 import type {
-  AdminSubscriptionStatus,
   AdminNotification,
+  AdminSubscriptionStatus,
   VerifiedNotificationMethod,
 } from '../shared';
 

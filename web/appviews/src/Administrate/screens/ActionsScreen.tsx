@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button, Badge } from '@shared/components';
+import { Badge, Button } from '@shared/components';
 import cx from 'classnames';
+import React from 'react';
 import type { AppEvent, ViewAction } from '../administrate-store';
 
 interface Props {
@@ -8,9 +8,9 @@ interface Props {
   installedAppVersion: string;
   availableAppUpdate?: { semver: string; required: boolean };
   userName?: string;
-  releaseChannel: 'stable' | 'beta' | 'canary';
+  releaseChannel: `stable` | `beta` | `canary`;
   quitting: boolean;
-  dangerZoneModal: 'hidden' | 'stopFilter' | 'quitApp';
+  dangerZoneModal: `hidden` | `stopFilter` | `quitApp`;
   emit(event: AppEvent): unknown;
   dispatch(action: ViewAction): unknown;
 }
@@ -194,7 +194,7 @@ const ActionsScreen: React.FC<Props> = ({
 export default ActionsScreen;
 
 function updateData(available?: { semver: string; required: boolean }): {
-  badgeColor: 'green' | 'yellow' | 'red';
+  badgeColor: `green` | `yellow` | `red`;
   badgeText: string;
   versionMessage: React.ReactNode;
 } {

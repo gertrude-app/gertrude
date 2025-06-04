@@ -1,12 +1,12 @@
-import React, { useState, useContext } from 'react';
 import { Button } from '@shared/components';
+import React, { useContext, useState } from 'react';
 import type { MacOSUser, UserRemediationStep } from '../onboarding-store';
-import TellMeMoreButton from '../TellMeMoreButton';
-import InformationModal from '../InformationModal';
-import QRCode from '../QRCode';
 import Callout from '../Callout';
-import * as Onboarding from '../UtilityComponents';
+import InformationModal from '../InformationModal';
 import OnboardingContext from '../OnboardingContext';
+import QRCode from '../QRCode';
+import TellMeMoreButton from '../TellMeMoreButton';
+import * as Onboarding from '../UtilityComponents';
 
 interface Props {
   users: Array<MacOSUser>;
@@ -90,7 +90,7 @@ const ChooseRemediation: React.FC<ChooseRemediationProps> = ({
 };
 
 interface StartRemediationProps {
-  action: 'create' | 'switch' | 'demote';
+  action: `create` | `switch` | `demote`;
 }
 
 const StartRemediation: React.FC<StartRemediationProps> = ({ action }) => {
@@ -253,9 +253,9 @@ const HappyPath: React.FC<HappyPathProps> = ({ userName, adminUsers }) => {
 
 type PossibleRemediationProps = {
   buttonAction:
-    | 'chooseCreateNonAdminClicked'
-    | 'chooseSwitchToNonAdminUserClicked'
-    | 'chooseDemoteAdminClicked';
+    | `chooseCreateNonAdminClicked`
+    | `chooseSwitchToNonAdminUserClicked`
+    | `chooseDemoteAdminClicked`;
   children: React.ReactNode;
 };
 

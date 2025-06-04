@@ -1,6 +1,6 @@
 import { KeyCreator } from '@dash/components';
 import { EditKey } from '@dash/keys';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { props, time } from '../../story-helpers';
 
 const meta = {

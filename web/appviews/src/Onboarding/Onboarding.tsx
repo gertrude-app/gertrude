@@ -1,11 +1,11 @@
 import React from 'react';
-import type { AppState, ViewState, AppEvent, ViewAction } from './onboarding-store';
+import type { AppEvent, AppState, ViewAction, ViewState } from './onboarding-store';
 import type { PropsOf } from '../lib/store';
 import { containerize } from '../lib/store';
-import store from './onboarding-store';
-import * as Step from './Steps';
 import OnboardingContext from './OnboardingContext';
 import StepSwitcher, { OnboardingPage } from './StepSwitcher';
+import * as Step from './Steps';
+import store from './onboarding-store';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 

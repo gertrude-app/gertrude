@@ -1,4 +1,4 @@
-import { expect, it, test, describe } from 'vitest';
+import { describe, expect, it, test } from 'vitest';
 import type { HealthCheck } from '../../administrate-store';
 import HealthChecker from '../../HealthChecker';
 

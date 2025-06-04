@@ -1,6 +1,6 @@
 import { NewNotificationMethodForm } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
-import { props, fixedViewport } from '../../story-helpers';
+import type { Meta, StoryObj } from '@storybook/react';
+import { fixedViewport, props } from '../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Settings/NewNotificationMethodForm', // eslint-disable-line

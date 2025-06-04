@@ -1,9 +1,9 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 
 interface Props {
   children: React.ReactNode;
-  severity: 'warning' | 'error';
+  severity: `warning` | `error`;
   withoutBorder?: boolean;
   className?: string;
 }

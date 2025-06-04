@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { KeychainSummary, Key } from '../shared';
+import type { Key, KeychainSummary } from '../shared';
 
 export namespace GetAdminKeychain {
   export type Input = UUID;

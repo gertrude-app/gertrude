@@ -1,6 +1,6 @@
-import type { RequestState } from '@dash/types';
-import type { QueryResult } from '../hooks/query';
 import type { MutationResult } from '../hooks/mutation';
+import type { QueryResult } from '../hooks/query';
+import type { RequestState } from '@dash/types';
 import { ensurePqlError } from '../pairql/query';
 
 export default class ReqState {

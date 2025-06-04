@@ -1,5 +1,5 @@
 import { UserActivityFeed } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
 import { activity, keystrokeLine, props, screenshot, time } from '../../../story-helpers';
 

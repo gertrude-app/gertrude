@@ -1,21 +1,21 @@
-import React from 'react';
 import {
-  formatDate,
-  utcToLocal,
   daysFromNow,
+  formatDate,
   isoToDateInput,
   isoToLocal,
   isoToTimeInput,
   relativeTime,
+  utcToLocal,
 } from '@dash/datetime';
 import { EditKey } from '@dash/keys';
 import { TextInput, Toggle } from '@shared/components';
-import UserInputText from '../UserInputText';
+import React from 'react';
 import GradientIcon from '../GradientIcon';
+import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';
 
 interface Props {
-  mode: 'edit' | 'create';
+  mode: `edit` | `create`;
   expiration?: string;
   update(event: EditKey.Event): unknown;
   activeStep: EditKey.Step;

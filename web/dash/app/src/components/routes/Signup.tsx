@@ -1,9 +1,9 @@
+import { EmailInputForm, FullscreenModalForm } from '@dash/components';
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { FullscreenModalForm, EmailInputForm } from '@dash/components';
 import { Link, useNavigate } from 'react-router-dom';
-import { useMutation, useAuth, useTimeout } from '../../hooks';
 import Current from '../../environment';
+import { useAuth, useMutation, useTimeout } from '../../hooks';
 
 const Signup: React.FC = () => {
   const { admin, login } = useAuth();

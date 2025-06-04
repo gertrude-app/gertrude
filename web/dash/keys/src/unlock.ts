@@ -1,9 +1,9 @@
-import type { UnlockRequestCreateKeyData, SharedKey } from '@dash/types';
+import type { SharedKey, UnlockRequestCreateKeyData } from '@dash/types';
 import * as domain from './domain';
 
 export function keyForUnlockRequest(request: UnlockRequestCreateKeyData): SharedKey {
-  let scope: SharedKey['scope'] = { type: `webBrowsers` };
-  let type: 'domain' | 'ipAddress' | 'anySubdomain' = `domain`;
+  let scope: SharedKey[`scope`] = { type: `webBrowsers` };
+  let type: `domain` | `ipAddress` | `anySubdomain` = `domain`;
   let value = ``;
 
   if (request.url && !request.domain) {

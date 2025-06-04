@@ -1,15 +1,15 @@
-import React from 'react';
-import cx from 'classnames';
 import { target, toState } from '@dash/keys';
-import { Button } from '@shared/components';
 import { ClockIcon } from '@heroicons/react/24/solid';
+import { Button } from '@shared/components';
+import cx from 'classnames';
+import React from 'react';
 import type { Key as KeyType } from '@dash/types';
 
 interface Props {
   record: KeyType;
   onClick(): unknown;
   onDelete(): unknown;
-  type: 'list' | 'table';
+  type: `list` | `table`;
 }
 
 const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import cx from 'classnames';
 import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
 import { useInterval } from '../lib/hooks';
 import Stars from './Stars';
 

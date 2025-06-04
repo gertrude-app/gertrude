@@ -1,5 +1,5 @@
-import type { AppScope, Key } from '@dash/types';
 import type * as EditKey from '../edit';
+import type { AppScope, Key } from '@dash/types';
 import { newKeyState } from '..';
 
 export function key(overrides: Partial<Key> = {}): Key {

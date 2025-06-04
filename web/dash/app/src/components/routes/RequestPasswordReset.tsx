@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import cx from 'classnames';
-import { Button, TextInput } from '@shared/components';
 import { FullscreenGradientBg } from '@dash/components';
 import { GradientIcon } from '@dash/components';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/solid';
-import { useMutation } from '../../hooks';
+import { Button, TextInput } from '@shared/components';
+import cx from 'classnames';
+import React, { useState } from 'react';
 import Current from '../../environment';
+import { useMutation } from '../../hooks';
 
 const RequestPasswordReset: React.FC = () => {
   const [emailAddress, setEmailAddress] = useState(``);
-  const [page, setPage] = useState<'form' | 'confirmation'>(`form`);
+  const [page, setPage] = useState<`form` | `confirmation`>(`form`);
   const sendEmail = useMutation((email: string) =>
     Current.api.sendPasswordResetEmail({ email }),
   );

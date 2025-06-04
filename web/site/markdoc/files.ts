@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import Markdoc from '@markdoc/markdoc';
 import { glob } from 'glob';
 import matter from 'gray-matter';
-import Markdoc from '@markdoc/markdoc';
 import type { RenderableTreeNode } from '@markdoc/markdoc';
 import { config } from './config';
 
@@ -11,7 +11,7 @@ const BLOG_ARTICLES_PATH = `markdoc/articles/blog`;
 export const DOCS_ARTICLES_DIR = path.join(process.cwd(), DOCS_ARTICLES_PATH);
 export const BLOG_ARTICLES_DIR = path.join(process.cwd(), BLOG_ARTICLES_PATH);
 
-type ArticleType = 'docs' | 'blog';
+type ArticleType = `docs` | `blog`;
 
 export interface Article {
   type: ArticleType;
@@ -23,20 +23,20 @@ export interface Article {
 }
 
 export interface DocsArticle extends Article {
-  type: 'docs';
+  type: `docs`;
 }
 
 export interface BlogArticle extends Article {
-  type: 'blog';
+  type: `blog`;
   date: string;
-  category: 'engineering' | 'parental-controls';
+  category: `engineering` | `parental-controls`;
 }
 
-type ArticleOfType<T extends ArticleType> = T extends 'docs' ? DocsArticle : BlogArticle;
+type ArticleOfType<T extends ArticleType> = T extends `docs` ? DocsArticle : BlogArticle;
 
 // returns all paths by default unless certain slugs are specified
 export async function getArticlePaths(
-  category: 'docs' | 'blog',
+  category: `docs` | `blog`,
   slugs?: string[],
 ): Promise<string[]> {
   const dirPath = category === `docs` ? DOCS_ARTICLES_DIR : BLOG_ARTICLES_DIR;
@@ -47,7 +47,7 @@ export async function getArticlePaths(
   return articlePaths;
 }
 
-export async function getArticleSlugs(category: 'docs' | 'blog'): Promise<string[]> {
+export async function getArticleSlugs(category: `docs` | `blog`): Promise<string[]> {
   const filePaths = await getArticlePaths(category);
   return filePaths.map((p) => path.basename(p, `.md`));
 }

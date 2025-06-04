@@ -1,5 +1,5 @@
-import React from 'react';
 import { Button } from '@shared/components';
+import React from 'react';
 import type { ChildComputerStatus } from '@dash/types';
 import UserStatus from '../UserStatus';
 

@@ -1,10 +1,10 @@
-import React from 'react';
-import cx from 'classnames';
 import { Logo } from '@shared/components';
+import cx from 'classnames';
 import Link from 'next/link';
+import React from 'react';
 import type { NextPage } from 'next';
-import { getArticle, getArticleSlugs } from '@/markdoc/files';
 import * as seo from '@/lib/seo';
+import { getArticle, getArticleSlugs } from '@/markdoc/files';
 
 export const metadata = seo.createMetadata(
   `Blog | Gertrude Internet Filter and Parental Controls`,

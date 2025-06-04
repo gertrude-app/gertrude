@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
 import { Chrome } from '@dash/components';
-import useWindowWidth from '../hooks/window-width';
+import React, { useState } from 'react';
 import Current from '../environment';
+import useWindowWidth from '../hooks/window-width';
 
 interface Props {
   children: React.ReactNode;

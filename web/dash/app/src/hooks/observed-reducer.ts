@@ -1,6 +1,6 @@
-import { useReducer, useCallback } from 'react';
+import { useCallback, useReducer } from 'react';
 import type { ReadOnly } from '@shared/ts-utils';
-import type { Dispatch, Reducer, ReducerState, ReducerAction } from 'react';
+import type { Dispatch, Reducer, ReducerAction, ReducerState } from 'react';
 
 export default function useObservedReducer<R extends Reducer<any, any>>(
   reducer: R,

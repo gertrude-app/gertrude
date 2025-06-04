@@ -1,19 +1,19 @@
-import React from 'react';
-import cx from 'classnames';
-import { time } from '@shared/datetime';
 import { Button, Loading, TextInput } from '@shared/components';
+import { time } from '@shared/datetime';
+import cx from 'classnames';
+import React from 'react';
 import type {
-  AppState,
-  ViewState,
   AppEvent,
+  AppState,
   ViewAction,
+  ViewState,
 } from './requestsuspension-store';
 import type { PropsOf } from '../lib/store';
-import { containerize } from '../lib/store';
 import ErrorScreen from '../ErrorScreen';
-import InactiveAccountScreen from '../components/InactiveAccountBlock';
 import AccountPastDueBanner from '../components/AccountPastDueBanner';
 import FullScreenSlider from '../components/FullScreenSlider';
+import InactiveAccountScreen from '../components/InactiveAccountBlock';
+import { containerize } from '../lib/store';
 import store, { STANDARD_DURATION_OPTIONS } from './requestsuspension-store';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
@@ -136,7 +136,7 @@ export const RequestSuspension: React.FC<Props> = ({
 };
 
 const DurationPage: React.FC<
-  Pick<Props, 'duration' | 'dispatch' | 'emit' | 'adminAccountStatus'>
+  Pick<Props, `duration` | `dispatch` | `emit` | `adminAccountStatus`>
 > = ({ duration, dispatch, emit, adminAccountStatus }) => (
   <div className="flex flex-col bg-white dark:bg-slate-900 h-full relative">
     <div className="flex flex-col justify-start items-center flex-grow p-10 mb-20">
@@ -258,7 +258,7 @@ const DurationPage: React.FC<
 );
 
 const CommentPage: React.FC<
-  Pick<Props, 'comment' | 'dispatch' | 'duration' | 'emit'> & { isActive: boolean }
+  Pick<Props, `comment` | `dispatch` | `duration` | `emit`> & { isActive: boolean }
 > = ({ comment, dispatch, duration, emit, isActive }) => (
   <div className="flex flex-col bg-white dark:bg-slate-900 h-full">
     <div className="flex-grow flex flex-col justify-center items-center p-8">

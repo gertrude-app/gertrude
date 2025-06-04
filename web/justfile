@@ -21,11 +21,6 @@ dev:
   -c cyan.dim,magenta.dim,green.dim \
   "just dash" "just site" "just storybook"
 
-# scaffold
-
-component *args:
-	@node ./make-component.js {{args}}
-
 # utility
 
 clean:
@@ -34,7 +29,7 @@ clean:
   @rm -rf dash/app/build
   @find . -name "node_modules" -type d -prune -exec rm -rf {} + && pnpm i
 
-codegen:
+codegen: && lint-fix format
 	@cd dash/app && node ./scripts/codegen.js
 
 nuke-node-modules:
@@ -87,9 +82,6 @@ format:
 
 format-check:
 	@pnpm prettier --config ./.prettierrc.json --log-level warn --check .
-
-format-codegen:
-	@pnpm prettier --config ./.prettierrc.json --log-level warn --write "appviews/**/*-{store,types}.ts"
 
 lint:
 	@pnpm eslint .

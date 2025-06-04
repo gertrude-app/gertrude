@@ -1,4 +1,4 @@
-import { parseDomain, fromUrl, ParseResultType } from 'parse-domain';
+import { ParseResultType, fromUrl, parseDomain } from 'parse-domain';
 export { fromUrl };
 
 export function sanitizeUserInput(input: string): string {

@@ -1,5 +1,5 @@
-import type { StoryObj, Meta } from '@storybook/react';
-import { props, appWindow } from '../story-helpers';
+import type { Meta, StoryObj } from '@storybook/react';
+import { appWindow, props } from '../story-helpers';
 import OnboardingStatefulSwitcher from './OnboardingStatefulSwitcher';
 
 const meta = {

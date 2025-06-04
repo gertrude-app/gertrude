@@ -1,10 +1,10 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 
 interface Props {
   children: React.ReactNode;
   heading: string;
-  type: 'info' | 'warning';
+  type: `info` | `warning`;
   className?: string;
 }
 

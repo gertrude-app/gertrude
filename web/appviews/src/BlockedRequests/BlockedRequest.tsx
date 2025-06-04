@@ -1,9 +1,9 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 
 interface Props {
   time: ISODateString;
-  protocol: 'udp' | 'tcp' | 'other';
+  protocol: `udp` | `tcp` | `other`;
   target: string;
   app: string;
   selected: boolean;

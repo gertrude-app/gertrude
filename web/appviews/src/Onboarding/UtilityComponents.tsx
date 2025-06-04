@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
-import cx from 'classnames';
 import { Button } from '@shared/components';
+import cx from 'classnames';
+import React, { useContext } from 'react';
 import OnboardingContext from './OnboardingContext';
 
 interface ButtonProps {
@@ -53,7 +53,7 @@ interface ButtonGroupProps {
     shadow?: boolean;
     onClick?: () => void;
   };
-  direction?: 'row' | 'column';
+  direction?: `row` | `column`;
   className?: string;
 }
 
@@ -155,7 +155,7 @@ export const Text: React.FC<TextProps> = ({ children, centered, className }) => 
 
 interface CenteredProps {
   children: React.ReactNode;
-  direction?: 'row' | 'column';
+  direction?: `row` | `column`;
   className?: string;
 }
 

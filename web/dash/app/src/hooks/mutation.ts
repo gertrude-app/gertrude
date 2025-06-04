@@ -1,16 +1,16 @@
+import { capitalize, pastTense } from '@shared/string';
+import { useMutation as useLibMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useMutation as useLibMutation, useQueryClient } from '@tanstack/react-query';
-import { capitalize, pastTense } from '@shared/string';
+import type { QueryKey } from './key';
 import type {
   ConfirmableEntityAction,
   DeleteEntity_v2,
   PqlError,
-  SuccessOutput,
   Result,
+  SuccessOutput,
 } from '@dash/types';
 import type { UseMutationResult } from '@tanstack/react-query';
-import type { QueryKey } from './key';
 import Current from '../environment';
 import { isEditable, isUUID } from '../lib/helpers';
 
@@ -66,7 +66,7 @@ export function useMutation<T, V>(
 }
 
 export function useDeleteEntity(
-  type: DeleteEntity_v2.Input['type'],
+  type: DeleteEntity_v2.Input[`type`],
   options: MutationOptions<SuccessOutput> = {},
 ): MutationResult<SuccessOutput, UUID> {
   return useMutation((id: UUID) => Current.api.deleteEntity({ type, id }), {
@@ -76,10 +76,10 @@ export function useDeleteEntity(
 }
 
 export function useConfirmableDelete(
-  entityType: DeleteEntity_v2.Input['type'],
+  entityType: DeleteEntity_v2.Input[`type`],
   options: MutationOptions<SuccessOutput> & { id?: UUID } = {},
 ): ConfirmableEntityAction<UUID | void> & {
-  state: 'idle' | 'pending' | 'error' | 'success';
+  state: `idle` | `pending` | `error` | `success`;
 } {
   const [stateId, setStateId] = useState<UUID | undefined>();
   const mutation = useDeleteEntity(entityType, options);
@@ -106,23 +106,23 @@ type MutationOptions<T> = {
 export type MutationResult<T, V> = UseMutationResult<T, PqlError, V>;
 
 type ToastId =
-  | 'delete:admin'
-  | 'delete:user'
-  | 'delete:computer'
-  | 'delete:notification'
-  | 'delete:notification-method'
-  | 'delete:keychain'
-  | 'delete:key'
-  | 'delete:activity-items'
-  | 'flag:activity-item'
-  | 'update:suspend-filter-request'
-  | 'create:pending-notification-method'
-  | 'confirm:pending-notification-method'
-  | 'save:user'
-  | 'save:keychain'
-  | 'save:key'
-  | 'save:computer'
-  | 'save:notification';
+  | `delete:admin`
+  | `delete:user`
+  | `delete:computer`
+  | `delete:notification`
+  | `delete:notification-method`
+  | `delete:keychain`
+  | `delete:key`
+  | `delete:activity-items`
+  | `flag:activity-item`
+  | `update:suspend-filter-request`
+  | `create:pending-notification-method`
+  | `confirm:pending-notification-method`
+  | `save:user`
+  | `save:keychain`
+  | `save:key`
+  | `save:computer`
+  | `save:notification`;
 
 function getToast(toastId?: ToastId): { verb: string; entity: string } | undefined {
   if (!toastId) {
@@ -163,7 +163,7 @@ function getToast(toastId?: ToastId): { verb: string; entity: string } | undefin
 }
 
 function toastIdFromDeleteEntityType(
-  type: DeleteEntity_v2.Input['type'],
+  type: DeleteEntity_v2.Input[`type`],
 ): ToastId | undefined {
   switch (type) {
     case `parent`:

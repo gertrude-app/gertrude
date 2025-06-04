@@ -1,4 +1,4 @@
-import { test, describe, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import type { SharedKey } from '@dash/types';
 import { keyForUnlockRequest } from '../unlock';
 

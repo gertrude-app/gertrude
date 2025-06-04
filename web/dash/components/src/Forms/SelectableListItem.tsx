@@ -1,12 +1,12 @@
-import React from 'react';
-import cx from 'classnames';
 import { Badge } from '@shared/components';
+import cx from 'classnames';
+import React from 'react';
 
 type Props = {
   title: string;
   description: string;
   selected: boolean;
-  badges?: { text: string; color: 'green' | 'red' | 'yellow' | 'blue' }[];
+  badges?: { text: string; color: `green` | `red` | `yellow` | `blue` }[];
   onClick(): void;
 };
 

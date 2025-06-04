@@ -1,5 +1,5 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 import type { RuleSchedule } from '@dash/types';
 import TimeInput from '../../Forms/TimeInput';
 import DropdownCustomizationPoint from './DropdownCustomizationPoint';

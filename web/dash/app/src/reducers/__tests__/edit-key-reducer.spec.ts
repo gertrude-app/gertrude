@@ -1,5 +1,5 @@
-import { expect, test, describe, beforeEach } from 'vitest';
-import { newKeyState, EditKey, convert } from '@dash/keys';
+import { EditKey, convert, newKeyState } from '@dash/keys';
+import { beforeEach, describe, expect, test } from 'vitest';
 import reducer from '../edit-key-reducer';
 
 describe(`editKeyReducer()`, () => {
@@ -37,7 +37,7 @@ describe(`editKeyReducer()`, () => {
     expect(state.keyType).toBe(`app`);
   });
 
-  const nextPrevCases: Array<[string, 'next' | 'prev', EditKey.Step, () => void]> = [
+  const nextPrevCases: Array<[string, `next` | `prev`, EditKey.Step, () => void]> = [
     [
       `back from normal website key expiration`,
       `prev`,

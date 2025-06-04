@@ -1,10 +1,10 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 
 type Props = {
   className?: string;
-  size?: 'large' | 'medium' | 'small';
-  type: 'green' | 'ok' | 'warning' | 'yellow' | 'red' | 'error' | 'blue' | 'info';
+  size?: `large` | `medium` | `small`;
+  type: `green` | `ok` | `warning` | `yellow` | `red` | `error` | `blue` | `info`;
   children: React.ReactNode;
   onClick?: () => void;
 };

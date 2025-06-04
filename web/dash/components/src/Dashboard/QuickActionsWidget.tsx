@@ -1,4 +1,3 @@
-import React from 'react';
 import { timeOfDay } from '@dash/datetime';
 import {
   BookOpenIcon,
@@ -6,6 +5,7 @@ import {
   LifebuoyIcon,
   UserPlusIcon,
 } from '@heroicons/react/24/solid';
+import React from 'react';
 import type { HeroIcon } from '@dash/types';
 import Action from '../Action';
 import DashboardWidget from './DashboardWidget';

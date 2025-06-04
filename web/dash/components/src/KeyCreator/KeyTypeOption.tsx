@@ -1,5 +1,5 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 import type { IconType } from '../GradientIcon';
 import GradientIcon from '../GradientIcon';
 

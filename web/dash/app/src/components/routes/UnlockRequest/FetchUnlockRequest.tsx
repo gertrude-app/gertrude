@@ -1,6 +1,6 @@
+import { ErrorModal, LoadingModal, Modal, UserInputText } from '@dash/components';
 import React from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { ErrorModal, LoadingModal, Modal, UserInputText } from '@dash/components';
 import { useUnlockRequest } from '../../../hooks';
 
 const FetchUnlockRequest: React.FC = () => {

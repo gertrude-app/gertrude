@@ -1,8 +1,8 @@
-import { useCallback } from 'react';
-import { produce } from 'immer';
 import { DURATION_OPTS } from '@dash/components';
-import type { SuspendFilterRequest } from '@dash/types';
+import { produce } from 'immer';
+import { useCallback } from 'react';
 import type { ReducerObserver } from '../hooks/observed-reducer';
+import type { SuspendFilterRequest } from '@dash/types';
 import Current from '../environment';
 
 export type State = {
@@ -14,11 +14,11 @@ export type State = {
 };
 
 type Action =
-  | { type: 'receivedRequest'; request: SuspendFilterRequest }
-  | { type: 'updateComment'; comment: string }
-  | { type: 'updateCustomDuration'; custom: string }
-  | { type: 'updateDuration'; duration: string }
-  | { type: 'updateExtraMonitoring'; extraMonitoring?: string };
+  | { type: `receivedRequest`; request: SuspendFilterRequest }
+  | { type: `updateComment`; comment: string }
+  | { type: `updateCustomDuration`; custom: string }
+  | { type: `updateDuration`; duration: string }
+  | { type: `updateExtraMonitoring`; extraMonitoring?: string };
 
 export function reducer(state: State, action: Action): State | undefined {
   switch (action.type) {

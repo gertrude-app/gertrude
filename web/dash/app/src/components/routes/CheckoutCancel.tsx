@@ -1,8 +1,8 @@
+import { Modal } from '@dash/components';
 import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Modal } from '@dash/components';
-import { useFireAndForget } from '../../hooks';
 import Current from '../../environment';
+import { useFireAndForget } from '../../hooks';
 
 const CheckoutCancel: React.FC = () => {
   const [params] = useSearchParams();

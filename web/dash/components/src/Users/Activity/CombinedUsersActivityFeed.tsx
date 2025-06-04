@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import cx from 'classnames';
 import { Button } from '@shared/components';
 import { posessive } from '@shared/string';
+import cx from 'classnames';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { ActivityFeedItem } from './UserActivityFeed';
-import { FeedCaughtUp } from './UserActivityFeed';
 import DeletableActivityChunks from './DeletableActivityChunks';
 import FeedHeader from './FeedHeader';
 import ReviewDayWrapper from './ReviewDayWrapper';
+import { FeedCaughtUp } from './UserActivityFeed';
 import UserActivityHeader from './UserActivityHeader';
 
 interface Props {

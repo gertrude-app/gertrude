@@ -1,6 +1,6 @@
-import React from 'react';
 import { Button, SelectMenu, TextInput } from '@shared/components';
 import Badge from '@shared/components/src/Badge';
+import React from 'react';
 import type { ChildComputerStatus, ReleaseChannel } from '@dash/types';
 import PageHeading from '../PageHeading';
 import UserStatus from '../UserStatus';

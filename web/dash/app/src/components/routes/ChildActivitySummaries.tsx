@@ -1,8 +1,8 @@
+import { ActivitySummaries, ApiErrorMessage, Loading } from '@dash/components';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { ApiErrorMessage, Loading, ActivitySummaries } from '@dash/components';
-import { useQuery, Key } from '../../hooks';
 import Current from '../../environment';
+import { Key, useQuery } from '../../hooks';
 
 const ChildActivitySummariesRoute: React.FC = () => {
   const { userId = `` } = useParams<{ userId: string }>();

@@ -1,8 +1,8 @@
 import type { Meta } from '@storybook/react';
-import SiteOgImage from './og-images/SiteOgImage';
-import LockdownGuideOgImage from './og-images/LockdownGuideOgImage';
 import FiveThingsYouForgotOgImage from './og-images/FiveThingsYouForgotOgImage';
 import GifAppMessagesOgImage from './og-images/GifAppInMessagesOgImage';
+import LockdownGuideOgImage from './og-images/LockdownGuideOgImage';
+import SiteOgImage from './og-images/SiteOgImage';
 import WickedProjectOgImage from './og-images/WickedProjectOgImage';
 
 export default {

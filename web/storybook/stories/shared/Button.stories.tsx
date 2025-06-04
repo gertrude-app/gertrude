@@ -1,5 +1,5 @@
 import { Button } from '@shared/components';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
   title: 'Shared/Button', // eslint-disable-line
@@ -23,7 +23,7 @@ export const SecondaryOnVioletBg: Story = {
 
 // helpers
 
-type ButtonColor = React.ComponentProps<typeof Button>['color'];
+type ButtonColor = React.ComponentProps<typeof Button>[`color`];
 
 function bgColor(color: ButtonColor): string {
   return color.includes(`on-violet-bg`) ? `bg-violet-500` : `bg-white`;
