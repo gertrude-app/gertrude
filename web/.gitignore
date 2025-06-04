@@ -15,3 +15,5 @@ smoke/cypress.env.json
 **/dist
 **/tsconfig.tsbuildinfo
 .nx/
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md

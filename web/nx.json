@@ -4,5 +4,9 @@
       "cache": true
     }
   },
-  "defaultBase": "master"
+  "defaultBase": "master",
+  "useInferencePlugins": false,
+  "tui": {
+    "enabled": false
+  }
 }
