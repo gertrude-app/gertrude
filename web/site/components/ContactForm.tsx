@@ -8,7 +8,7 @@ import FancyLink from './FancyLink';
 import * as env from '@/lib/env';
 
 const ContactForm: React.FC = () => {
-  const [state, setState] = useState<'idle' | 'ongoing' | 'failed' | 'succeeded'>(`idle`);
+  const [state, setState] = useState<`idle` | `ongoing` | `failed` | `succeeded`>(`idle`);
   const [name, setName] = useState(``);
   const [emailAddress, setEmailAddress] = useState(``);
   const [subject, setSubject] = useState(``);
@@ -126,7 +126,7 @@ export default ContactForm;
 interface TextInputProps {
   name: string;
   label: string;
-  type: 'text' | 'email';
+  type: `text` | `email`;
   value: string;
   setValue: (value: string) => void;
   textarea?: boolean;

@@ -7,11 +7,11 @@ import GradientIcon from '../GradientIcon';
 import KeyCreationStep from './KeyCreationStep';
 
 interface Props {
-  mode: 'edit' | 'create';
+  mode: `edit` | `create`;
   activeStep: EditKey.Step;
-  addressScope: 'webBrowsers' | 'unrestricted' | 'singleApp';
+  addressScope: `webBrowsers` | `unrestricted` | `singleApp`;
   showAdvancedAddressScopeOptions: boolean;
-  appIdentificationType: 'bundleId' | 'slug';
+  appIdentificationType: `bundleId` | `slug`;
   apps: Array<{ slug: string; name: string }>;
   update(event: EditKey.Event): unknown;
 }
@@ -83,7 +83,7 @@ const WebsiteKeyAppScopeStep: React.FC<Props> = ({
 export default WebsiteKeyAppScopeStep;
 
 const Title: React.FC<{
-  addressScope: 'webBrowsers' | 'unrestricted' | 'singleApp';
+  addressScope: `webBrowsers` | `unrestricted` | `singleApp`;
 }> = ({ addressScope }) => {
   switch (addressScope) {
     case `webBrowsers`:

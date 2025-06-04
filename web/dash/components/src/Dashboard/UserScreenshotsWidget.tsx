@@ -7,7 +7,7 @@ import WidgetTitle from './WidgetTitle';
 
 type Props = {
   className?: string;
-  screenshots: DashboardWidgets.Output['recentScreenshots'];
+  screenshots: DashboardWidgets.Output[`recentScreenshots`];
 };
 
 const UserScreenshotsWidget: React.FC<Props> = ({ className, screenshots }) => (

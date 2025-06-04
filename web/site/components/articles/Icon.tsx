@@ -24,7 +24,7 @@ const iconStyles = {
 type Props = {
   icon: keyof typeof icons;
   className?: string;
-  color: 'amber' | 'blue';
+  color: `amber` | `blue`;
 };
 
 const Icon: React.FC<Props> = ({ icon, className, color }) => {
@@ -58,7 +58,7 @@ const gradients = {
 
 type GradientProps = {
   id: string;
-  color: 'blue' | 'amber';
+  color: `blue` | `amber`;
   gradientTransform: string;
 };
 
@@ -85,8 +85,8 @@ export const LightMode: React.FC<{ children: React.ReactNode }> = ({ children })
 export const DarkMode: React.FC<{
   children: React.ReactNode;
   strokeWidth?: number;
-  strokeLinecap?: 'round' | 'butt' | 'square' | 'inherit';
-  strokeLinejoin?: 'round' | 'miter' | 'bevel' | 'inherit';
+  strokeLinecap?: `round` | `butt` | `square` | `inherit`;
+  strokeLinejoin?: `round` | `miter` | `bevel` | `inherit`;
   fill?: string;
 }> = ({ children, ...props }) => (
   <g className="inline" {...props}>

@@ -18,10 +18,10 @@ import NotificationCard from './NotificationCard';
 import NotificationMethod from './NotificationMethod';
 
 export type NotificationUpdate = { id: UUID } & (
-  | { type: 'startEditing' }
-  | { type: 'cancelEditing' }
-  | { type: 'changeTrigger'; trigger: AdminNotificationTrigger }
-  | { type: 'changeMethod'; methodId: UUID }
+  | { type: `startEditing` }
+  | { type: `cancelEditing` }
+  | { type: `changeTrigger`; trigger: AdminNotificationTrigger }
+  | { type: `changeMethod`; methodId: UUID }
 );
 
 export type NewMethod = { id: UUID; confirmed: boolean };
@@ -252,7 +252,7 @@ const AccountStatusBadge: React.FC<{ status: AdminSubscriptionStatus }> = ({
 
 function statusType(
   status: AdminSubscriptionStatus,
-): React.ComponentProps<typeof Badge>['type'] {
+): React.ComponentProps<typeof Badge>[`type`] {
   switch (status.case) {
     case `complimentary`:
     case `paid`:

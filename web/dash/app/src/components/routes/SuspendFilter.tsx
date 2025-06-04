@@ -35,7 +35,7 @@ const SuspendFilter: React.FC = () => {
   );
 
   const update = useMutation(
-    (status: 'accepted' | 'rejected') =>
+    (status: `accepted` | `rejected`) =>
       Current.api.decideFilterSuspensionRequest({
         id,
         decision:

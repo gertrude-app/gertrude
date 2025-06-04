@@ -136,7 +136,7 @@ export const RequestSuspension: React.FC<Props> = ({
 };
 
 const DurationPage: React.FC<
-  Pick<Props, 'duration' | 'dispatch' | 'emit' | 'adminAccountStatus'>
+  Pick<Props, `duration` | `dispatch` | `emit` | `adminAccountStatus`>
 > = ({ duration, dispatch, emit, adminAccountStatus }) => (
   <div className="flex flex-col bg-white dark:bg-slate-900 h-full relative">
     <div className="flex flex-col justify-start items-center flex-grow p-10 mb-20">
@@ -258,7 +258,7 @@ const DurationPage: React.FC<
 );
 
 const CommentPage: React.FC<
-  Pick<Props, 'comment' | 'dispatch' | 'duration' | 'emit'> & { isActive: boolean }
+  Pick<Props, `comment` | `dispatch` | `duration` | `emit`> & { isActive: boolean }
 > = ({ comment, dispatch, duration, emit, isActive }) => (
   <div className="flex flex-col bg-white dark:bg-slate-900 h-full">
     <div className="flex-grow flex flex-col justify-center items-center p-8">

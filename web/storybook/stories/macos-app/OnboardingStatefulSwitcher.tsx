@@ -9,7 +9,7 @@ import type { OnboardingStep } from '@macos/appviews/src/Onboarding/onboarding-s
 const OnboardingStatefulSwitcher: React.FC = () => {
   const [step, setStep] = useState<OnboardingStep>(`welcome`);
   const [connectChildState, setConnectChildState] = useState<
-    'idle' | 'ongoing' | 'failed' | 'succeeded'
+    `idle` | `ongoing` | `failed` | `succeeded`
   >(`idle`);
 
   return (

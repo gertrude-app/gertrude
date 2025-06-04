@@ -132,4 +132,4 @@ export class Key extends QueryKey<never> {
   }
 }
 
-export type QueryKeyData = Omit<QueryKey<any>, 'data' | '__taint' | 'phantom'>;
+export type QueryKeyData = Omit<QueryKey<any>, `data` | `__taint` | `phantom`>;

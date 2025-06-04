@@ -1,17 +1,17 @@
 export type Step =
-  | '1-0_start'
-  | '1-1_openLoginScreen'
-  | '1-2_logIn'
-  | '2-0_start'
-  | '2-1_openMac'
-  | '2-2_clickDownloadButton'
-  | '3-0_start'
-  | '4-0_start'
-  | '4-1_clickUnlockRequest'
-  | '5-0_start'
-  | '5-1_clickNotification'
-  | '5-2_clickAcceptRequest'
-  | '6-0_start';
+  | `1-0_start`
+  | `1-1_openLoginScreen`
+  | `1-2_logIn`
+  | `2-0_start`
+  | `2-1_openMac`
+  | `2-2_clickDownloadButton`
+  | `3-0_start`
+  | `4-0_start`
+  | `4-1_clickUnlockRequest`
+  | `5-0_start`
+  | `5-1_clickNotification`
+  | `5-2_clickAcceptRequest`
+  | `6-0_start`;
 
 export function parseStep(stepInQuestion: Step): [number, number] | null {
   const numberPart = stepInQuestion.split(`_`)[0];

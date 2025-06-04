@@ -6,7 +6,7 @@ import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';
 
 interface Props {
-  mode: 'edit' | 'create';
+  mode: `edit` | `create`;
   activeStep: EditKey.Step;
   comment?: string;
   update(event: EditKey.Event): unknown;

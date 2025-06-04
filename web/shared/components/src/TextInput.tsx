@@ -30,17 +30,17 @@ type InputProps = {
 };
 
 type InputType =
-  | 'email'
-  | 'text'
-  | 'url'
-  | 'positiveInteger'
-  | 'password'
-  | 'date'
-  | 'time';
+  | `email`
+  | `text`
+  | `url`
+  | `positiveInteger`
+  | `password`
+  | `date`
+  | `time`;
 
 type Props =
   | ({ type: InputType } & InputProps & CommonProps)
-  | ({ type: 'textarea' } & TextAreaProps & CommonProps);
+  | ({ type: `textarea` } & TextAreaProps & CommonProps);
 
 const TextInput: React.FC<Props> = ({
   label,
@@ -139,7 +139,7 @@ function isPositiveInteger(value: string): boolean {
   );
 }
 
-function isInput(props: { type: Props['type'] }): props is {
+function isInput(props: { type: Props[`type`] }): props is {
   type: InputType;
 } & InputProps {
   return props.type !== `textarea`;

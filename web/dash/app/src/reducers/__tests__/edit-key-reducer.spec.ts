@@ -37,7 +37,7 @@ describe(`editKeyReducer()`, () => {
     expect(state.keyType).toBe(`app`);
   });
 
-  const nextPrevCases: Array<[string, 'next' | 'prev', EditKey.Step, () => void]> = [
+  const nextPrevCases: Array<[string, `next` | `prev`, EditKey.Step, () => void]> = [
     [
       `back from normal website key expiration`,
       `prev`,

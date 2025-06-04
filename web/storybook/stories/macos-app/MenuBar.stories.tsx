@@ -13,7 +13,7 @@ export default {
 
 type MenuBarWrapperProps = {
   colors: string;
-  theme: 'light' | 'dark';
+  theme: `light` | `dark`;
 } & React.ComponentProps<typeof MenuBar>;
 
 const LightTemplate: StoryFn<typeof MenuBar> = () => (
@@ -116,9 +116,9 @@ const BothThemes: React.FC<React.ComponentProps<typeof MenuBar>> = (props) => (
   </div>
 );
 
-const DifferentModesAcrossColors: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
+const DifferentModesAcrossColors: React.FC<{ theme: `light` | `dark` }> = ({ theme }) => {
   const propOptions: Record<
-    'first' | 'second' | 'third' | 'fourth' | 'fifth' | 'sixth',
+    `first` | `second` | `third` | `fourth` | `fifth` | `sixth`,
     React.ComponentProps<typeof MenuBarWrapper>
   > = {
     first: {

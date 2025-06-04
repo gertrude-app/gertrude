@@ -9,7 +9,7 @@ import Current from '../../environment';
 
 const RequestPasswordReset: React.FC = () => {
   const [emailAddress, setEmailAddress] = useState(``);
-  const [page, setPage] = useState<'form' | 'confirmation'>(`form`);
+  const [page, setPage] = useState<`form` | `confirmation`>(`form`);
   const sendEmail = useMutation((email: string) =>
     Current.api.sendPasswordResetEmail({ email }),
   );

@@ -6,7 +6,7 @@ import ComputerCard from './ComputerCard';
 
 interface Props {
   devices: Array<
-    Pick<Device, 'name' | 'id' | 'modelIdentifier' | 'modelTitle' | 'users'>
+    Pick<Device, `name` | `id` | `modelIdentifier` | `modelTitle` | `users`>
   >;
 }
 

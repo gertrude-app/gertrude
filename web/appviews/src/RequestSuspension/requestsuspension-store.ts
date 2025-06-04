@@ -6,41 +6,41 @@ import { Store } from '../lib/store';
 export interface AppState {
   windowOpen: boolean;
   request:
-    | { case: 'failed'; error: string }
-    | { case: 'idle' }
-    | { case: 'ongoing' }
-    | { case: 'succeeded' };
+    | { case: `failed`; error: string }
+    | { case: `idle` }
+    | { case: `ongoing` }
+    | { case: `succeeded` };
   adminAccountStatus: AdminAccountStatus;
   internetConnected: boolean;
   filterCommunicationConfirmed?: boolean;
 }
 
 export type AppEvent =
-  | { case: 'requestSubmitted'; durationInSeconds: number; comment?: string }
-  | { case: 'grantSuspensionClicked'; durationInSeconds: number }
-  | { case: 'closeWindow' }
-  | { case: 'requestFailedTryAgainClicked' }
-  | { case: 'inactiveAccountRecheckClicked' }
-  | { case: 'inactiveAccountDisconnectAppClicked' }
-  | { case: 'noFilterCommunicationAdministrateClicked' };
+  | { case: `requestSubmitted`; durationInSeconds: number; comment?: string }
+  | { case: `grantSuspensionClicked`; durationInSeconds: number }
+  | { case: `closeWindow` }
+  | { case: `requestFailedTryAgainClicked` }
+  | { case: `inactiveAccountRecheckClicked` }
+  | { case: `inactiveAccountDisconnectAppClicked` }
+  | { case: `noFilterCommunicationAdministrateClicked` };
 // end codegen
 
 export type ViewState = {
   comment: string;
-  page: 'duration' | 'comment';
+  page: `duration` | `comment`;
   duration:
     | { mode: `standard`; seconds: StandardDuration | null }
     | { mode: `custom`; seconds: number | null };
 };
 
 export type ViewAction =
-  | { type: 'commentUpdated'; value: string }
-  | { type: 'standardDurationClicked'; seconds: StandardDuration }
-  | { type: 'customDurationUpdated'; seconds: number }
-  | { type: 'chooseCustomDurationClicked' }
-  | { type: 'closeCustomDurationDrawer' }
-  | { type: 'nextFromDurationPageClicked' }
-  | { type: 'backFromCommentPageClicked' };
+  | { type: `commentUpdated`; value: string }
+  | { type: `standardDurationClicked`; seconds: StandardDuration }
+  | { type: `customDurationUpdated`; seconds: number }
+  | { type: `chooseCustomDurationClicked` }
+  | { type: `closeCustomDurationDrawer` }
+  | { type: `nextFromDurationPageClicked` }
+  | { type: `backFromCommentPageClicked` };
 
 export const STANDARD_DURATION_OPTIONS = [300, 600, 1200, 1800, 3600, 7200] as const;
 export type StandardDuration = (typeof STANDARD_DURATION_OPTIONS)[number];

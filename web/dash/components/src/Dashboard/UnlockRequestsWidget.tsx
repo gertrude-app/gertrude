@@ -9,7 +9,7 @@ import WidgetTitle from './WidgetTitle';
 
 type Props = {
   className?: string;
-  unlockRequests: DashboardWidgets.Output['unlockRequests'];
+  unlockRequests: DashboardWidgets.Output[`unlockRequests`];
 };
 
 const UnlockRequestsWidget: React.FC<Props> = ({ className, unlockRequests }) => (

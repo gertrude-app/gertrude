@@ -4,7 +4,7 @@ import cx from 'classnames';
 interface Props {
   onClick(): unknown;
   children: React.ReactNode;
-  size?: 'small' | 'large';
+  size?: `small` | `large`;
 }
 
 const TellMeMoreButton: React.FC<Props> = ({ onClick, children, size = `large` }) => (

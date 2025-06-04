@@ -4,7 +4,7 @@ import cx from 'classnames';
 interface ComputerProps {
   children: React.ReactNode;
   className: string;
-  labelStatus: 'hidden' | 'prominent' | 'subtle';
+  labelStatus: `hidden` | `prominent` | `subtle`;
 }
 
 const Computer: React.FC<ComputerProps> = ({ children, className, labelStatus }) => (

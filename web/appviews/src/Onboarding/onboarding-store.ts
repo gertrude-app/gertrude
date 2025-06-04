@@ -2,52 +2,52 @@ import type { ActionOf } from '../lib/store';
 import { Store } from '../lib/store';
 
 export type RequestState<T = void, E = string> =
-  | { case: 'idle' }
-  | { case: 'ongoing' }
-  | { case: 'failed'; error?: E }
-  | { case: 'succeeded'; payload: T };
+  | { case: `idle` }
+  | { case: `ongoing` }
+  | { case: `failed`; error?: E }
+  | { case: `succeeded`; payload: T };
 
 // begin codegen
 export type OnboardingStep =
-  | 'welcome'
-  | 'wrongInstallDir'
-  | 'confirmGertrudeAccount'
-  | 'noGertrudeAccount'
-  | 'macosUserAccountType'
-  | 'getChildConnectionCode'
-  | 'connectChild'
-  | 'howToUseGifs'
-  | 'allowNotifications_start'
-  | 'allowNotifications_grant'
-  | 'allowNotifications_failed'
-  | 'allowFullDiskAccess_grantAndRestart'
-  | 'allowFullDiskAccess_failed'
-  | 'allowFullDiskAccess_success'
-  | 'allowScreenshots_required'
-  | 'allowScreenshots_grantAndRestart'
-  | 'allowScreenshots_failed'
-  | 'allowScreenshots_success'
-  | 'allowKeylogging_required'
-  | 'allowKeylogging_grant'
-  | 'allowKeylogging_failed'
-  | 'installSysExt_explain'
-  | 'installSysExt_trick'
-  | 'installSysExt_allow'
-  | 'installSysExt_failed'
-  | 'installSysExt_success'
-  | 'exemptUsers'
-  | 'locateMenuBarIcon'
-  | 'viewHealthCheck'
-  | 'encourageFilterSuspensions'
-  | 'howToUseGertrude'
-  | 'finish';
+  | `welcome`
+  | `wrongInstallDir`
+  | `confirmGertrudeAccount`
+  | `noGertrudeAccount`
+  | `macosUserAccountType`
+  | `getChildConnectionCode`
+  | `connectChild`
+  | `howToUseGifs`
+  | `allowNotifications_start`
+  | `allowNotifications_grant`
+  | `allowNotifications_failed`
+  | `allowFullDiskAccess_grantAndRestart`
+  | `allowFullDiskAccess_failed`
+  | `allowFullDiskAccess_success`
+  | `allowScreenshots_required`
+  | `allowScreenshots_grantAndRestart`
+  | `allowScreenshots_failed`
+  | `allowScreenshots_success`
+  | `allowKeylogging_required`
+  | `allowKeylogging_grant`
+  | `allowKeylogging_failed`
+  | `installSysExt_explain`
+  | `installSysExt_trick`
+  | `installSysExt_allow`
+  | `installSysExt_failed`
+  | `installSysExt_success`
+  | `exemptUsers`
+  | `locateMenuBarIcon`
+  | `viewHealthCheck`
+  | `encourageFilterSuspensions`
+  | `howToUseGertrude`
+  | `finish`;
 
 export interface MacOSVersion {
-  name: 'catalina' | 'bigSur' | 'monterey' | 'ventura' | 'sonoma' | 'sequoia';
+  name: `catalina` | `bigSur` | `monterey` | `ventura` | `sonoma` | `sequoia`;
   major: number;
 }
 
-export type UserRemediationStep = 'create' | 'switch' | 'demote' | 'choose';
+export type UserRemediationStep = `create` | `switch` | `demote` | `choose`;
 
 export interface MacOSUser {
   id: number;
@@ -57,7 +57,7 @@ export interface MacOSUser {
 
 export interface AppState {
   osVersion: {
-    name: 'catalina' | 'bigSur' | 'monterey' | 'ventura' | 'sonoma' | 'sequoia';
+    name: `catalina` | `bigSur` | `monterey` | `ventura` | `sonoma` | `sequoia`;
     major: number;
   };
   windowOpen: boolean;
@@ -72,15 +72,15 @@ export interface AppState {
 }
 
 export type AppEvent =
-  | { case: 'connectChildSubmitted'; code: number }
-  | { case: 'infoModalOpened'; step: OnboardingStep; detail?: string }
-  | { case: 'setUserExemption'; userId: number; enabled: boolean }
-  | { case: 'closeWindow' }
-  | { case: 'primaryBtnClicked' }
-  | { case: 'secondaryBtnClicked' }
-  | { case: 'chooseSwitchToNonAdminUserClicked' }
-  | { case: 'chooseCreateNonAdminClicked' }
-  | { case: 'chooseDemoteAdminClicked' };
+  | { case: `connectChildSubmitted`; code: number }
+  | { case: `infoModalOpened`; step: OnboardingStep; detail?: string }
+  | { case: `setUserExemption`; userId: number; enabled: boolean }
+  | { case: `closeWindow` }
+  | { case: `primaryBtnClicked` }
+  | { case: `secondaryBtnClicked` }
+  | { case: `chooseSwitchToNonAdminUserClicked` }
+  | { case: `chooseCreateNonAdminClicked` }
+  | { case: `chooseDemoteAdminClicked` };
 // end codegen
 
 export type ViewState = {
@@ -88,7 +88,7 @@ export type ViewState = {
   receivedAppState: boolean;
   didResume: boolean;
 };
-export type ViewAction = { type: 'connectionCodeUpdated'; code: string };
+export type ViewAction = { type: `connectionCodeUpdated`; code: string };
 
 export type Action = ActionOf<AppState, AppEvent, ViewAction>;
 export type State = AppState & ViewState;

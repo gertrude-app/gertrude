@@ -184,7 +184,7 @@ function simplify(chunks: ReturnType<typeof chunkedRenderTasks>): string[] {
     .flat(1);
 }
 
-function screenshot(config: Partial<Omit<Chunkable, 'type'>> = {}): Chunkable {
+function screenshot(config: Partial<Omit<Chunkable, `type`>> = {}): Chunkable {
   return {
     type: `Screenshot`,
     id: nextId(),
@@ -194,7 +194,7 @@ function screenshot(config: Partial<Omit<Chunkable, 'type'>> = {}): Chunkable {
   };
 }
 
-function keystroke(config: Partial<Omit<Chunkable, 'type'>> = {}): Chunkable {
+function keystroke(config: Partial<Omit<Chunkable, `type`>> = {}): Chunkable {
   return {
     type: `KeystrokeLine`,
     id: nextId(),

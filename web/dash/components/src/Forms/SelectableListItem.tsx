@@ -6,7 +6,7 @@ type Props = {
   title: string;
   description: string;
   selected: boolean;
-  badges?: { text: string; color: 'green' | 'red' | 'yellow' | 'blue' }[];
+  badges?: { text: string; color: `green` | `red` | `yellow` | `blue` }[];
   onClick(): void;
 };
 

@@ -7,22 +7,22 @@ type LucideIcon = typeof ArrowUpIcon;
 
 interface CommonProps {
   children: React.ReactNode;
-  size?: 'lg' | 'sm';
-  color?: 'primary' | 'secondary';
+  size?: `lg` | `sm`;
+  color?: `primary` | `secondary`;
   Icon?: LucideIcon;
   inverted?: boolean;
   className?: string;
   id?: string;
 }
 interface LinkProps {
-  type: 'link';
+  type: `link`;
   href: string;
 }
 interface SubmitProps {
-  type: 'submit';
+  type: `submit`;
 }
 interface ButtonProps {
-  type: 'button';
+  type: `button`;
   onClick(): unknown;
 }
 

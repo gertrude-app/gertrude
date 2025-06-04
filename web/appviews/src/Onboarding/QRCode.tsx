@@ -6,7 +6,7 @@ interface Props {
 }
 
 const QRCode: React.FC<Props> = ({ url }) => {
-  const [side, setSide] = useState<'image' | 'url'>(`image`);
+  const [side, setSide] = useState<`image` | `url`>(`image`);
   const [codeClicked, setCodeClicked] = useState(false);
   const img = `${IMG_ENDPOINT}/${url.replace(/\//g, `__`)}.png`;
   return (

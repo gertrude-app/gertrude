@@ -7,8 +7,8 @@ import KeyCreationStep from './KeyCreationStep';
 import KeyTypeOption from './KeyTypeOption';
 
 interface Props {
-  mode: 'create' | 'edit';
-  keyType?: 'website' | 'app';
+  mode: `create` | `edit`;
+  keyType?: `website` | `app`;
   activeStep: EditKey.Step;
   update(event: EditKey.Event): unknown;
 }

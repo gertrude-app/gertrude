@@ -5,7 +5,7 @@ import EmptyState from '../EmptyState';
 import KeychainCard from './KeychainCard';
 
 type Props = {
-  mode: 'addToUser' | 'forUnlockRequestKey';
+  mode: `addToUser` | `forUnlockRequestKey`;
   hasNoOwnKeychains: boolean;
   selectableOwnKeychains: Keychain[];
   selectablePublicKeychains: Keychain[];

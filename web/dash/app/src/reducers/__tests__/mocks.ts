@@ -133,7 +133,7 @@ export function childActivitySummary(
   numApproved = 0,
   numFlagged = 0,
   start = new Date().toISOString(),
-): ChildActivitySummaries.Output['days'][number] {
+): ChildActivitySummaries.Output[`days`][number] {
   return {
     date: start,
     numTotal,
@@ -149,7 +149,7 @@ export function familyActivitySummary(
 }
 
 type KeystrokeActivityItem = {
-  case: 'keystrokeLine';
+  case: `keystrokeLine`;
   id: UUID;
   ids: UUID[];
   appName: string;
@@ -178,7 +178,7 @@ export function keystrokeActivityItem(
 }
 
 type ScreenshotActivityItem = {
-  case: 'screenshot';
+  case: `screenshot`;
   id: UUID;
   ids: UUID[];
   url: string;

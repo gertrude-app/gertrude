@@ -7,7 +7,7 @@ const SpecifyingActiveOrInactive: React.FC<{
   schedule: RuleSchedule;
   setSchedule(schedule: RuleSchedule): void;
   isTouchDevice: boolean;
-  text?: Record<RuleSchedule['mode'], string>;
+  text?: Record<RuleSchedule[`mode`], string>;
 }> = ({ schedule, setSchedule, isTouchDevice, text = {} }) => (
   <button
     className={cx(

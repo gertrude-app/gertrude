@@ -6,9 +6,9 @@ type Props = {
   className?: string;
   children: React.ReactNode;
 } & (
-  | { type: 'button'; onClick(): unknown }
-  | { type: 'external'; href: string; target?: '_blank' | '_self' }
-  | { type: 'link'; to: string }
+  | { type: `button`; onClick(): unknown }
+  | { type: `external`; href: string; target?: `_blank` | `_self` }
+  | { type: `link`; to: string }
 );
 
 const Action: React.FC<Props> = ({ className, children, ...props }) => {

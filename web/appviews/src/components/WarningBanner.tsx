@@ -3,7 +3,7 @@ import cx from 'classnames';
 
 interface Props {
   children: React.ReactNode;
-  severity: 'warning' | 'error';
+  severity: `warning` | `error`;
   withoutBorder?: boolean;
   className?: string;
 }

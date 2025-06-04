@@ -16,25 +16,25 @@ type State = {
 };
 
 export type Action =
-  | { type: 'setUser'; user: User; new?: boolean }
-  | { type: 'setName'; name: string }
-  | { type: 'userSaved' }
-  | { type: 'setScreenshotsEnabled'; enabled: boolean }
-  | { type: 'setScreenshotsResolution'; resolution: number }
-  | { type: 'setScreenshotsFrequency'; frequency: number }
-  | { type: 'setKeyloggingEnabled'; enabled: boolean }
-  | { type: 'setDowntimeEnabled'; enabled: boolean }
-  | { type: 'setDowntime'; downtime: PlainTimeWindow }
-  | { type: 'setShowSuspensionActivity'; show: boolean }
-  | { type: 'removeKeychain'; id: UUID }
-  | { type: 'updateNewBlockedAppIdentifier'; identifier: string }
-  | { type: 'removeBlockedApp'; id: UUID }
-  | { type: 'addNewBlockedApp' }
-  | { type: 'setBlockedAppSchedule'; id: UUID; schedule?: RuleSchedule }
-  | { type: 'setKeychainSchedule'; id: UUID; schedule?: RuleSchedule }
-  | { type: 'addKeychain'; keychain: UserKeychainSummary }
-  | { type: 'setAddingKeychainSchedule'; schedule?: RuleSchedule }
-  | { type: 'setAddingKeychain'; keychain?: UserKeychainSummary | null };
+  | { type: `setUser`; user: User; new?: boolean }
+  | { type: `setName`; name: string }
+  | { type: `userSaved` }
+  | { type: `setScreenshotsEnabled`; enabled: boolean }
+  | { type: `setScreenshotsResolution`; resolution: number }
+  | { type: `setScreenshotsFrequency`; frequency: number }
+  | { type: `setKeyloggingEnabled`; enabled: boolean }
+  | { type: `setDowntimeEnabled`; enabled: boolean }
+  | { type: `setDowntime`; downtime: PlainTimeWindow }
+  | { type: `setShowSuspensionActivity`; show: boolean }
+  | { type: `removeKeychain`; id: UUID }
+  | { type: `updateNewBlockedAppIdentifier`; identifier: string }
+  | { type: `removeBlockedApp`; id: UUID }
+  | { type: `addNewBlockedApp` }
+  | { type: `setBlockedAppSchedule`; id: UUID; schedule?: RuleSchedule }
+  | { type: `setKeychainSchedule`; id: UUID; schedule?: RuleSchedule }
+  | { type: `addKeychain`; keychain: UserKeychainSummary }
+  | { type: `setAddingKeychainSchedule`; schedule?: RuleSchedule }
+  | { type: `setAddingKeychain`; keychain?: UserKeychainSummary | null };
 
 function reducer(state: State, action: Action): State | undefined {
   if (action.type === `setUser`) {

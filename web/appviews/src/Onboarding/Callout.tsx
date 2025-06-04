@@ -4,7 +4,7 @@ import cx from 'classnames';
 interface Props {
   children: React.ReactNode;
   heading: string;
-  type: 'info' | 'warning';
+  type: `info` | `warning`;
   className?: string;
 }
 

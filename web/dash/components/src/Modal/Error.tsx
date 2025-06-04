@@ -7,12 +7,12 @@ import Modal from './Modal';
 interface Props {
   title?: string;
   secondaryButton?:
-    | 'contactSupport'
+    | `contactSupport`
     | null
-    | React.ComponentProps<typeof Modal>['secondaryButton'];
+    | React.ComponentProps<typeof Modal>[`secondaryButton`];
   error?: PqlError;
   onDismiss?(): unknown;
-  primaryButton?: React.ComponentProps<typeof Modal>['primaryButton'];
+  primaryButton?: React.ComponentProps<typeof Modal>[`primaryButton`];
   icon?: IconType;
 }
 

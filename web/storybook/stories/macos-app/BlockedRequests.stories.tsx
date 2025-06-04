@@ -85,7 +85,7 @@ export const AccountInactive = props({
 
 // helpers
 
-function requests(): Array<Story['args']['requests'][number]> {
+function requests(): Array<Story[`args`][`requests`][number]> {
   return withIdsAnd({ searchableText: `` }, [
     {
       time: `2023-04-20T19:29:59.262Z`,

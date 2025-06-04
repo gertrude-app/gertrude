@@ -4,41 +4,41 @@ import { Store } from '../lib/store';
 
 // begin codegen
 export type AppState =
-  | { case: 'notConnected'; filterInstalled: boolean }
-  | { case: 'connectionFailed'; error: string }
-  | { case: 'connectionSucceded'; userName: string }
+  | { case: `notConnected`; filterInstalled: boolean }
+  | { case: `connectionFailed`; error: string }
+  | { case: `connectionSucceded`; userName: string }
   | {
-      case: 'connected';
+      case: `connected`;
       filterState: FilterState;
       recordingScreen: boolean;
       recordingKeystrokes: boolean;
       adminAttentionRequired: boolean;
-      updateStatus?: 'available' | 'nag' | 'require';
+      updateStatus?: `available` | `nag` | `require`;
     }
-  | { case: 'enteringConnectionCode' }
-  | { case: 'connecting' };
+  | { case: `enteringConnectionCode` }
+  | { case: `connecting` };
 
 export type AppEvent =
-  | { case: 'connectSubmit'; code: number }
-  | { case: 'pauseDowntimeClicked'; duration: 'tenMinutes' | 'oneHour' | 'oneDay' }
-  | { case: 'menuBarIconClicked' }
-  | { case: 'resumeFilterClicked' }
-  | { case: 'suspendFilterClicked' }
-  | { case: 'refreshRulesClicked' }
-  | { case: 'administrateClicked' }
-  | { case: 'viewNetworkTrafficClicked' }
-  | { case: 'connectClicked' }
-  | { case: 'retryConnectClicked' }
-  | { case: 'removeFilterClicked' }
-  | { case: 'connectFailedHelpClicked' }
-  | { case: 'welcomeAdminClicked' }
-  | { case: 'turnOnFilterClicked' }
-  | { case: 'updateNagDismissClicked' }
-  | { case: 'updateNagUpdateClicked' }
-  | { case: 'updateRequiredUpdateClicked' }
-  | { case: 'quitForNowClicked' }
-  | { case: 'quitForUninstallClicked' }
-  | { case: 'resumeDowntimeClicked' };
+  | { case: `connectSubmit`; code: number }
+  | { case: `pauseDowntimeClicked`; duration: `tenMinutes` | `oneHour` | `oneDay` }
+  | { case: `menuBarIconClicked` }
+  | { case: `resumeFilterClicked` }
+  | { case: `suspendFilterClicked` }
+  | { case: `refreshRulesClicked` }
+  | { case: `administrateClicked` }
+  | { case: `viewNetworkTrafficClicked` }
+  | { case: `connectClicked` }
+  | { case: `retryConnectClicked` }
+  | { case: `removeFilterClicked` }
+  | { case: `connectFailedHelpClicked` }
+  | { case: `welcomeAdminClicked` }
+  | { case: `turnOnFilterClicked` }
+  | { case: `updateNagDismissClicked` }
+  | { case: `updateNagUpdateClicked` }
+  | { case: `updateRequiredUpdateClicked` }
+  | { case: `quitForNowClicked` }
+  | { case: `quitForUninstallClicked` }
+  | { case: `resumeDowntimeClicked` };
 // end codegen
 
 export type ViewState = {
@@ -48,9 +48,9 @@ export type ViewState = {
 };
 
 export type ViewAction =
-  | { type: 'connectionCodeUpdated'; code: string }
-  | { type: 'toggleShowingDowntimePauseDuration' }
-  | { type: 'toggleShowingNotConnectedActions' };
+  | { type: `connectionCodeUpdated`; code: string }
+  | { type: `toggleShowingDowntimePauseDuration` }
+  | { type: `toggleShowingNotConnectedActions` };
 
 export type Action = ActionOf<AppState, AppEvent, ViewAction>;
 export type State = AppState & ViewState;

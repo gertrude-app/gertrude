@@ -4,7 +4,7 @@ import GradientIcon from '../GradientIcon';
 
 type Props = {
   text: string;
-  icon: React.ComponentProps<typeof GradientIcon>['icon'];
+  icon: React.ComponentProps<typeof GradientIcon>[`icon`];
   className?: string;
 };
 

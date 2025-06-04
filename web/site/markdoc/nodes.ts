@@ -1,7 +1,7 @@
 import { nodes as markdocNodes } from '@markdoc/markdoc';
 import type { Config } from '@markdoc/markdoc';
 
-const nodes: Config['nodes'] = {
+const nodes: Config[`nodes`] = {
   document: {
     render: undefined,
   },

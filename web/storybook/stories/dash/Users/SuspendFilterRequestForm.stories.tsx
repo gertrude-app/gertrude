@@ -48,7 +48,7 @@ export const Default: Story = {
   play: async () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
     const button = document.querySelector(`button[aria-haspopup="listbox"]`);
-    button instanceof HTMLElement && button.click();
+    if (button instanceof HTMLElement) button.click();
   },
 };
 

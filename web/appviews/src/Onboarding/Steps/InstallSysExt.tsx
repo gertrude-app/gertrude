@@ -7,11 +7,11 @@ import OnboardingContext from '../OnboardingContext';
 
 interface Props {
   step:
-    | 'installSysExt_explain'
-    | 'installSysExt_trick'
-    | 'installSysExt_allow'
-    | 'installSysExt_failed'
-    | 'installSysExt_success';
+    | `installSysExt_explain`
+    | `installSysExt_trick`
+    | `installSysExt_allow`
+    | `installSysExt_failed`
+    | `installSysExt_success`;
 }
 
 const InstallSysExt: React.FC<Props> = ({ step }) => {

@@ -6,7 +6,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth, useMutation } from '../../hooks';
 import Current from '../../environment';
 
-type PageType = 'start' | 'adult-peer' | 'self';
+type PageType = `start` | `adult-peer` | `self`;
 
 const UseCaseSurvey: React.FC = () => {
   const [page, setPage] = useState<PageType>(`start`);
@@ -148,7 +148,7 @@ const UseCaseSurvey: React.FC = () => {
 export default UseCaseSurvey;
 
 type OptionProps = {
-  type: 'parent-child' | 'adult-peer' | 'self';
+  type: `parent-child` | `adult-peer` | `self`;
   children: React.ReactNode;
   description: string;
   setPage(page: PageType): unknown;

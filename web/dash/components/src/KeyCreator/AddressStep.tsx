@@ -7,11 +7,11 @@ import KeyCreationStep from './KeyCreationStep';
 import AddressTypeHint from './AddressTypeHint';
 
 interface Props {
-  keyType: 'app' | 'website';
-  mode: 'edit' | 'create';
+  keyType: `app` | `website`;
+  mode: `edit` | `create`;
   activeStep: EditKey.Step;
   address: string;
-  addressType: 'strict' | 'standard' | 'ip' | 'domainRegex';
+  addressType: `strict` | `standard` | `ip` | `domainRegex`;
   showAdvancedAddressOptions: boolean;
   unlockRequestSource?: string;
   update(event: EditKey.Event): unknown;

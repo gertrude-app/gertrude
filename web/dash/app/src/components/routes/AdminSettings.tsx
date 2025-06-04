@@ -168,7 +168,7 @@ function methodPrimaryValue(method: VerifiedNotificationMethod): string {
 
 function methodDeletable(
   method: VerifiedNotificationMethod,
-  notifications: State['notifications'],
+  notifications: State[`notifications`],
   adminEmail: string,
 ): boolean {
   const methodBeingUsed = typesafe
@@ -187,8 +187,8 @@ function makeNotificationProps(
   savingNotification: boolean,
   showSecurityEventOption: boolean,
 ): (
-  editable: State['notifications'][number],
-) => React.ComponentProps<typeof Settings>['notifications'][0] | null {
+  editable: State[`notifications`][number],
+) => React.ComponentProps<typeof Settings>[`notifications`][0] | null {
   return (editable) => {
     const { id, ...notification } = editable.draft;
     const methods = state.notificationMethods;

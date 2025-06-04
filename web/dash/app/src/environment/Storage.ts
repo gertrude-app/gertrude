@@ -22,7 +22,7 @@ export class LiveStorage implements StorageClient {
 }
 
 export class ThrowingStorage implements StorageClient {
-  public constructor(private type: 'local' | 'session') {}
+  public constructor(private type: `local` | `session`) {}
   public getItem(_key: string): string | null {
     throw new Error(`StorageClient<${this.type}>.getItem() not implemented`);
   }

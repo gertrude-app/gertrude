@@ -7,9 +7,9 @@ import InformationModal from '../InformationModal';
 
 interface Props {
   step:
-    | 'allowNotifications_start'
-    | 'allowNotifications_grant'
-    | 'allowNotifications_failed';
+    | `allowNotifications_start`
+    | `allowNotifications_grant`
+    | `allowNotifications_failed`;
 }
 
 const AllowNotifications: React.FC<Props> = ({ step }) => {

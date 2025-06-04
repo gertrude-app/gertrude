@@ -6,7 +6,7 @@ interface Props {
   title: string;
   description: string;
   href: string;
-  icon: React.ComponentProps<typeof Icon>['icon'];
+  icon: React.ComponentProps<typeof Icon>[`icon`];
 }
 
 export const QuickLink: React.FC<Props> = ({ title, description, href, icon }) => (

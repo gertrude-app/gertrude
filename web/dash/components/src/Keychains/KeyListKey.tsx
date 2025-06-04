@@ -9,7 +9,7 @@ interface Props {
   record: KeyType;
   onClick(): unknown;
   onDelete(): unknown;
-  type: 'list' | 'table';
+  type: `list` | `table`;
 }
 
 const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {

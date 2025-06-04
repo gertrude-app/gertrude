@@ -46,7 +46,7 @@ const AddKeychainDrawer: React.FC<Props> = ({
   requestPublicKeychainRequest,
 }) => {
   const shown = request && request.state !== `idle`;
-  const [whichKeychains, setWhichKeychains] = useState<'own' | 'public'>(`own`);
+  const [whichKeychains, setWhichKeychains] = useState<`own` | `public`>(`own`);
   const [searchQuery, setSearchQuery] = useState(``);
   const [page, setPage] = useState(1);
   const [prevSelected, setPrevSelected] = useState<Keychain | undefined>(undefined);

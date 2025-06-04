@@ -18,30 +18,30 @@ export interface ConfirmableEntityAction<StartArg = UUID> {
 
 export type UnlockRequestCreateKeyData = Pick<
   UnlockRequest,
-  'url' | 'domain' | 'ipAddress' | 'appCategories' | 'appBundleId' | 'appSlug'
+  `url` | `domain` | `ipAddress` | `appCategories` | `appBundleId` | `appSlug`
 >;
 
 export type PqlError = Omit<
   ServerPqlError,
-  | 'requestId'
-  | 'version'
-  | 'statusCode'
-  | 'showContactSupport'
-  | 'type'
-  | 'dashboardTag'
-  | 'appTag'
+  | `requestId`
+  | `version`
+  | `statusCode`
+  | `showContactSupport`
+  | `type`
+  | `dashboardTag`
+  | `appTag`
 > & {
   isPqlError: true;
-  type: ServerPqlError['type'] | 'clientError';
-  tag?: ServerPqlError['dashboardTag'];
+  type: ServerPqlError[`type`] | `clientError`;
+  tag?: ServerPqlError[`dashboardTag`];
   showContactSupport?: boolean;
   serverRequestId?: string;
   clientRequestId?: string;
 };
 
 export type RequestState<T = void, E = PqlError> =
-  | { state: 'idle' }
-  | { state: 'ongoing' }
-  | { state: 'failed'; error?: E }
-  | { state: 'succeeded'; payload: T };
+  | { state: `idle` }
+  | { state: `ongoing` }
+  | { state: `failed`; error?: E }
+  | { state: `succeeded`; payload: T };
 // TODO: can i make error non-optional?

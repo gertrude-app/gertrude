@@ -58,7 +58,7 @@ export function familyToIcon(family: DeviceModelFamily): `laptop` | `desktop` {
 
 export function deviceProps(
   apiDevice: UserDevice,
-): React.ComponentProps<typeof EditUser>['devices'][number] {
+): React.ComponentProps<typeof EditUser>[`devices`][number] {
   return {
     id: apiDevice.id,
     deviceId: apiDevice.deviceId,

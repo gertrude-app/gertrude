@@ -1,0 +1,292 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import tsParser from '@typescript-eslint/parser';
+import typescriptEslint from '@typescript-eslint/eslint-plugin';
+import noOnlyTests from 'eslint-plugin-no-only-tests';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import jsxA11Y from 'eslint-plugin-jsx-a11y';
+import _import from 'eslint-plugin-import';
+import stylistic from '@stylistic/eslint-plugin';
+import { fixupPluginRules } from '@eslint/compat';
+import js from '@eslint/js';
+import { FlatCompat } from '@eslint/eslintrc';
+
+const compat = new FlatCompat({
+  baseDirectory: path.dirname(fileURLToPath(import.meta.url)),
+  recommendedConfig: js.configs.recommended,
+  allConfig: js.configs.all,
+});
+
+export default defineConfig([
+  {
+    languageOptions: {
+      parser: tsParser,
+      ecmaVersion: 2020,
+      sourceType: `module`,
+
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+
+    plugins: {
+      '@typescript-eslint': typescriptEslint,
+      'no-only-tests': noOnlyTests,
+      '@stylistic': stylistic,
+      react,
+      'react-hooks': fixupPluginRules(reactHooks),
+      'jsx-a11y': jsxA11Y,
+      import: fixupPluginRules(_import),
+    },
+
+    extends: compat.extends(
+      `eslint:recommended`,
+      `plugin:@typescript-eslint/recommended`,
+      `prettier`,
+    ),
+
+    rules: {
+      'no-var': `off`,
+      'no-console': `error`,
+      'prefer-const': [`error`, { destructuring: `all` }],
+      'default-case': `off`,
+      'no-only-tests/no-only-tests': `error`,
+      'no-useless-constructor': `off`,
+      '@typescript-eslint/no-non-null-assertion': `error`,
+      '@typescript-eslint/no-namespace': `off`,
+      '@typescript-eslint/no-empty-function': `off`,
+      '@typescript-eslint/ban-ts-comment': `off`,
+      '@typescript-eslint/consistent-type-imports': `error`,
+      '@typescript-eslint/no-useless-constructor': `error`,
+      '@typescript-eslint/no-explicit-any': `off`,
+      '@typescript-eslint/no-this-alias': `off`,
+      '@typescript-eslint/no-angle-bracket-type-assertion': `off`,
+      '@typescript-eslint/no-use-before-define': `off`,
+      '@typescript-eslint/explicit-module-boundary-types': [
+        `error`,
+        { allowArgumentsExplicitlyTypedAsAny: true },
+      ],
+      '@typescript-eslint/no-parameter-properties': `off`,
+      '@typescript-eslint/no-unused-vars': [`error`, { argsIgnorePattern: `^_` }],
+      'no-unused-vars': `off`,
+      'no-undef': `off`,
+      camelcase: `off`,
+      '@stylistic/quotes': [`error`, `backtick`],
+      '@typescript-eslint/explicit-function-return-type': [
+        `error`,
+        {
+          allowExpressions: true,
+          allowTypedFunctionExpressions: true,
+          allowHigherOrderFunctions: true,
+        },
+      ],
+      'no-unreachable-loop': `error`,
+      'no-useless-backreference': `error`,
+      'require-atomic-updates': `error`,
+      'array-callback-return': `error`,
+      'dot-location': [`error`, `property`],
+      eqeqeq: [`error`, `smart`],
+      'new-parens': `error`,
+      'no-array-constructor': `error`,
+      'no-caller': `error`,
+      'no-cond-assign': [`error`, `except-parens`],
+      'no-const-assign': `error`,
+      'no-control-regex': `error`,
+      'no-delete-var': `error`,
+      'no-dupe-args': `error`,
+      'no-dupe-class-members': `error`,
+      'no-dupe-keys': `error`,
+      'no-duplicate-case': `error`,
+      'no-empty-character-class': `error`,
+      'no-empty-pattern': `error`,
+      'no-eval': `error`,
+      'no-ex-assign': `error`,
+      'no-extend-native': `error`,
+      'no-extra-bind': `error`,
+      'no-extra-label': `error`,
+      'no-fallthrough': `error`,
+      'no-func-assign': `error`,
+      'no-implied-eval': `error`,
+      'no-invalid-regexp': `error`,
+      'no-iterator': `error`,
+      'no-label-var': `error`,
+      'no-labels': [`error`, { allowLoop: true, allowSwitch: false }],
+      'no-lone-blocks': `error`,
+      'no-mixed-operators': [
+        `error`,
+        {
+          groups: [
+            [`&`, `|`, `^`, `~`, `<<`, `>>`, `>>>`],
+            [`==`, `!=`, `===`, `!==`, `>`, `>=`, `<`, `<=`],
+            [`&&`, `||`],
+            [`in`, `instanceof`],
+          ],
+          allowSamePrecedence: false,
+        },
+      ],
+      'no-multi-str': `error`,
+      'no-native-reassign': `error`,
+      'no-negated-in-lhs': `error`,
+      'no-new-func': `error`,
+      'no-new-object': `error`,
+      'no-new-symbol': `error`,
+      'no-new-wrappers': `error`,
+      'no-obj-calls': `error`,
+      'no-octal': `error`,
+      'no-octal-escape': `error`,
+      'no-regex-spaces': `error`,
+      'no-restricted-syntax': [`error`, `WithStatement`],
+      'no-script-url': `error`,
+      'no-self-assign': `error`,
+      'no-self-compare': `error`,
+      'no-sequences': `error`,
+      'no-shadow-restricted-names': `error`,
+      'no-sparse-arrays': `error`,
+      'no-template-curly-in-string': `error`,
+      'no-this-before-super': `error`,
+      'no-throw-literal': `error`,
+      'no-unreachable': `error`,
+      'no-unused-expressions': [
+        `error`,
+        { allowShortCircuit: true, allowTernary: true, allowTaggedTemplates: true },
+      ],
+      'no-unused-labels': `error`,
+      'no-useless-computed-key': `error`,
+      'no-useless-concat': `error`,
+      'no-useless-escape': `error`,
+      'no-useless-rename': [
+        `error`,
+        { ignoreDestructuring: false, ignoreImport: false, ignoreExport: false },
+      ],
+      'no-with': `error`,
+      'no-whitespace-before-property': `error`,
+      'react-hooks/exhaustive-deps': `error`,
+      'require-yield': `error`,
+      'rest-spread-spacing': [`error`, `never`],
+      strict: [`error`, `never`],
+      'unicode-bom': [`error`, `never`],
+      'use-isnan': `error`,
+      'valid-typeof': `error`,
+      'getter-return': `error`,
+      'import/order': [
+        `error`,
+        { groups: [`builtin`, `external`, `type`, `parent`, `sibling`, `index`] },
+      ],
+      'import/first': `error`,
+      'import/no-amd': `error`,
+      'import/no-webpack-loader-syntax': `error`,
+      'react/forbid-foreign-prop-types': [`error`, { allowInPropTypes: true }],
+      'react/jsx-no-comment-textnodes': `error`,
+      'react/jsx-no-duplicate-props': `error`,
+      'react/jsx-no-target-blank': `error`,
+      'react/jsx-no-undef': `error`,
+      'react/jsx-pascal-case': [`error`, { allowAllCaps: true, ignore: [] }],
+      'jsx-quotes': [`error`, `prefer-double`],
+      'react/jsx-uses-react': `error`,
+      'react/jsx-uses-vars': `error`,
+      'react/no-danger-with-children': `error`,
+      'react/no-deprecated': `error`,
+      'react/no-direct-mutation-state': `error`,
+      'react/no-is-mounted': `error`,
+      'react/no-typos': `error`,
+      'react/require-render-return': `error`,
+      'react/style-prop-object': `error`,
+      'react-hooks/rules-of-hooks': `error`,
+      'jsx-a11y/accessible-emoji': `error`,
+      'jsx-a11y/alt-text': `error`,
+      'jsx-a11y/anchor-has-content': `error`,
+      'jsx-a11y/anchor-is-valid': [`error`, { aspects: [`noHref`, `invalidHref`] }],
+      'jsx-a11y/aria-activedescendant-has-tabindex': `error`,
+      'jsx-a11y/aria-props': `error`,
+      'jsx-a11y/aria-proptypes': `error`,
+      'jsx-a11y/aria-role': [`error`, { ignoreNonDOM: true }],
+      'jsx-a11y/aria-unsupported-elements': `error`,
+      'jsx-a11y/heading-has-content': `error`,
+      'jsx-a11y/iframe-has-title': `error`,
+      'jsx-a11y/img-redundant-alt': `error`,
+      'jsx-a11y/no-access-key': `error`,
+      'jsx-a11y/no-distracting-elements': `error`,
+      'jsx-a11y/no-redundant-roles': `error`,
+      'jsx-a11y/role-has-required-aria-props': `error`,
+      'jsx-a11y/role-supports-aria-props': `error`,
+      'jsx-a11y/scope': `error`,
+    },
+    settings: {
+      react: {
+        version: `999.999.999`,
+      },
+    },
+  },
+  globalIgnores([
+    `**/dist/*`,
+    `**/public/*`,
+    `**/.cache/*`,
+    `**/storybook-static/*`,
+    `**/out/*`,
+    `**/.next/*`,
+    `**/build/*`,
+  ]),
+  {
+    files: [`**/*.tsx`],
+    rules: {
+      'arrow-body-style': [`error`, `as-needed`],
+    },
+  },
+  {
+    files: [`appviews/**/*.tsx`],
+    rules: {
+      'jsx-a11y/accessible-emoji': `off`,
+      'react/no-unescaped-entities': `error`,
+    },
+  },
+  {
+    files: [
+      `appviews/tailwind.config.cjs`,
+      `dash/app/tailwind.config.cjs`,
+      `site/tailwind.config.js`,
+      `storybook/tailwind.config.ts`,
+      `shared/tailwind/src/preset.js`,
+    ],
+    rules: {
+      '@typescript-eslint/no-require-imports': `off`,
+    },
+  },
+  {
+    files: [`**/*.stories.tsx`, `**/cypress/**/*.cy.ts`],
+    rules: {
+      '@typescript-eslint/explicit-module-boundary-types': `off`,
+      '@typescript-eslint/explicit-function-return-type': `off`,
+      '@typescript-eslint/no-non-null-asserted-optional-chain': `off`,
+      '@typescript-eslint/no-non-null-assertion': `off`,
+    },
+  },
+  {
+    files: [`**/*.js`],
+    rules: {
+      '@typescript-eslint/no-var-requires': `off`,
+      '@typescript-eslint/explicit-module-boundary-types': `off`,
+      '@typescript-eslint/explicit-function-return-type': `off`,
+    },
+  },
+  {
+    files: [`**/__tests__/**`],
+    rules: {
+      'no-throw-literal': `off`,
+      '@typescript-eslint/consistent-type-assertions': `off`,
+      '@typescript-eslint/explicit-function-return-type': `off`,
+      '@typescript-eslint/no-non-null-asserted-optional-chain': `off`,
+      '@typescript-eslint/no-non-null-assertion': `off`,
+    },
+  },
+  globalIgnores([
+    `storybook/storybook-static/`,
+    `dash/app/build`,
+    `site/app/.next`,
+    `site/app/out`,
+    `appviews/src/main.tsx`,
+  ]),
+]);

@@ -10,11 +10,11 @@ type ItemButton = {
 };
 
 export type ItemData = { title: string } & (
-  | { state: 'checking' }
-  | { state: 'ok'; message?: string }
-  | { state: 'warn'; message: string; button?: ItemButton }
-  | { state: 'fail'; message: string; button?: ItemButton }
-  | { state: 'unexpected'; message?: string }
+  | { state: `checking` }
+  | { state: `ok`; message?: string }
+  | { state: `warn`; message: string; button?: ItemButton }
+  | { state: `fail`; message: string; button?: ItemButton }
+  | { state: `unexpected`; message?: string }
 );
 
 export default class HealthChecker {

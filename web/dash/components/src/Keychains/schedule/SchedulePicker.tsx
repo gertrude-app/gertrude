@@ -9,7 +9,7 @@ interface Props {
   schedule: RuleSchedule;
   setSchedule(schedule: RuleSchedule): void;
   small?: boolean;
-  activeText?: Record<RuleSchedule['mode'], string>;
+  activeText?: Record<RuleSchedule[`mode`], string>;
 }
 
 const SchedulePicker: React.FC<Props> = ({

@@ -8,7 +8,7 @@ import type { IconType } from '../GradientIcon';
 import GradientIcon from '../GradientIcon';
 
 interface Props {
-  type?: 'destructive' | 'default' | 'container' | 'error';
+  type?: `destructive` | `default` | `container` | `error`;
   title: string;
   isOpen?: boolean;
   loading?: boolean;

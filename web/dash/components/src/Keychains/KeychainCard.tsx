@@ -11,7 +11,7 @@ import SchedulePicker from './schedule/SchedulePicker';
 
 type Props =
   | ({
-      mode: 'keychains_screen';
+      mode: `keychains_screen`;
       id: UUID;
       assignedChildren: UUID[];
       allChildren: Array<{
@@ -22,14 +22,14 @@ type Props =
       toggleChild(userId: string): void;
     } & Common)
   | ({
-      mode: 'assigned_to_child';
+      mode: `assigned_to_child`;
       keychainId: UUID;
       onRemove(): unknown;
       schedule?: Schedule;
       setSchedule(schedule?: Schedule): unknown;
     } & Common)
   | ({
-      mode: 'select';
+      mode: `select`;
       selected: boolean;
       onSelect(): unknown;
     } & Common);
@@ -348,8 +348,8 @@ const KeychainCard: React.FC<Props> = ({
 
 export default KeychainCard;
 
-function isSelect(props: { mode: Props['mode'] }): props is {
-  mode: 'select';
+function isSelect(props: { mode: Props[`mode`] }): props is {
+  mode: `select`;
 } & Common {
   return props.mode === `select`;
 }

@@ -27,7 +27,7 @@ type Props = {
   onKeySave(): unknown;
   onCreateNewKey(): unknown;
   keyModalSaveButtonDisabled: boolean;
-  apps: React.ComponentProps<typeof KeyCreator>['apps'];
+  apps: React.ComponentProps<typeof KeyCreator>[`apps`];
 };
 
 const EditKeychain: React.FC<Props> = ({
@@ -50,7 +50,7 @@ const EditKeychain: React.FC<Props> = ({
   keyModalSaveButtonDisabled,
   apps,
 }) => {
-  const [viewMode, setViewMode] = useState<'list' | 'table'>(`list`);
+  const [viewMode, setViewMode] = useState<`list` | `table`>(`list`);
   return (
     <div className="relative max-w-6xl">
       <Modal

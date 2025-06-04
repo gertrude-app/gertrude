@@ -11,7 +11,7 @@ interface Props<Value extends string> {
   selectedOption: Value;
   setSelected(value: Value): void;
   label?: string;
-  size?: 'small' | 'medium' | 'large';
+  size?: `small` | `medium` | `large`;
   testId?: string;
   disabled?: boolean;
 }

@@ -29,7 +29,7 @@ export default ProgressIndicator;
 
 interface StepProps {
   number: number;
-  status: 'complete' | 'current' | 'incomplete';
+  status: `complete` | `current` | `incomplete`;
 }
 
 const Step: React.FC<StepProps> = ({ status, number }) => (

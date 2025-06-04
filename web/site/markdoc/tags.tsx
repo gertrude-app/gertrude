@@ -1,6 +1,6 @@
 import type { Config } from '@markdoc/markdoc';
 
-const tags: Config['tags'] = {
+const tags: Config[`tags`] = {
   callout: {
     attributes: {
       alt: { type: Boolean },

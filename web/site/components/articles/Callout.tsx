@@ -23,7 +23,7 @@ const icons = {
 };
 
 interface Props {
-  type: 'note' | 'warning';
+  type: `note` | `warning`;
   alt?: boolean;
   title?: string;
   children: React.ReactNode;

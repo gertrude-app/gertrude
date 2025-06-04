@@ -167,12 +167,12 @@ export const BlockedRequests: React.FC<Props> = ({
 
 type PanelProps = Omit<
   Props,
-  | 'requests'
-  | 'filterText'
-  | 'tcpOnly'
-  | 'windowOpen'
-  | 'adminAccountStatus'
-  | 'requestsPaused'
+  | `requests`
+  | `filterText`
+  | `tcpOnly`
+  | `windowOpen`
+  | `adminAccountStatus`
+  | `requestsPaused`
 >;
 
 const BottomPanel: React.FC<PanelProps> = ({
@@ -280,7 +280,7 @@ export default containerize<AppState, AppEvent, ViewState, ViewAction>(
 export function filterVisibleRequests<
   R extends {
     searchableText: string;
-    protocol: 'tcp' | 'udp' | 'other';
+    protocol: `tcp` | `udp` | `other`;
     time: ISODateString;
   },
 >(requests: R[], userFilterText: string, tcpOnly: boolean): R[] {

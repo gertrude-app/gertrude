@@ -186,7 +186,7 @@ function triggerText(trigger: AdminNotificationTrigger): string {
   }
 }
 
-function methodIcon(method: VerifiedNotificationMethod): 'email' | 'slack' | 'phone' {
+function methodIcon(method: VerifiedNotificationMethod): `email` | `slack` | `phone` {
   switch (method.config.case) {
     case `text`:
       return `phone`;

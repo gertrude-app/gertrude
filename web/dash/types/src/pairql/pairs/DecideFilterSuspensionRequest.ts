@@ -6,12 +6,12 @@ export namespace DecideFilterSuspensionRequest {
     id: UUID;
     decision:
       | {
-          case: 'accepted';
+          case: `accepted`;
           durationInSeconds: number;
           extraMonitoring?: string;
         }
       | {
-          case: 'rejected';
+          case: `rejected`;
         };
     responseComment?: string;
   }

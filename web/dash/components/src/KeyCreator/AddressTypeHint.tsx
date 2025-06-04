@@ -4,7 +4,7 @@ import { domain, validate } from '@dash/keys';
 import { notNullish } from '@shared/ts-utils';
 
 interface Props {
-  type: 'strict' | 'standard' | 'ip' | 'domainRegex';
+  type: `strict` | `standard` | `ip` | `domainRegex`;
   unsanitizedAddress: string;
 }
 

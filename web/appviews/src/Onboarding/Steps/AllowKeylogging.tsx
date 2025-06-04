@@ -8,7 +8,7 @@ import InformationModal from '../InformationModal';
 import TellMeMoreButton from '../TellMeMoreButton';
 
 interface Props {
-  step: 'allowKeylogging_required' | 'allowKeylogging_grant' | 'allowKeylogging_failed';
+  step: `allowKeylogging_required` | `allowKeylogging_grant` | `allowKeylogging_failed`;
 }
 
 const AllowKeylogging: React.FC<Props> = ({ step }) => {

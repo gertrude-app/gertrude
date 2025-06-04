@@ -5,16 +5,16 @@ interface Props {
   size?: number;
   iconOnly?: boolean;
   className?: string;
-  type?: 'default' | 'inverted';
-  withForParents?: boolean | 'condensed';
+  type?: `default` | `inverted`;
+  withForParents?: boolean | `condensed`;
   textSize?:
-    | 'text-base'
-    | 'text-lg'
-    | 'text-xl'
-    | 'text-2xl'
-    | 'text-3xl'
-    | 'text-4xl'
-    | 'text-5xl'
+    | `text-base`
+    | `text-lg`
+    | `text-xl`
+    | `text-2xl`
+    | `text-3xl`
+    | `text-4xl`
+    | `text-5xl`
     | string;
 }
 

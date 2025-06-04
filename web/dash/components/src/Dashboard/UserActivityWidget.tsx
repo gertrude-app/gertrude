@@ -8,7 +8,7 @@ import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
 type Props = {
-  userActivity: DashboardWidgets.Output['childActivitySummaries'];
+  userActivity: DashboardWidgets.Output[`childActivitySummaries`];
   className?: string;
 };
 

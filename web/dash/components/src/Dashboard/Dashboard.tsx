@@ -23,8 +23,8 @@ type Props = {
   dismissAddDevice(): unknown;
   dismissAnnouncement(id: UUID): unknown;
   addDeviceRequest: RequestState<CreatePendingAppConnection.Output>;
-  childData: DashboardWidgets.Output['children'];
-} & Omit<DashboardWidgets.Output, 'children'>;
+  childData: DashboardWidgets.Output[`children`];
+} & Omit<DashboardWidgets.Output, `children`>;
 
 const Dashboard: React.FC<Props> = ({
   unlockRequests,

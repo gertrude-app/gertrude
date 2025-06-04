@@ -14,16 +14,16 @@ type EditKeychainState = {
 };
 
 type EditKeychainAction =
-  | { type: 'receivedKeychain'; keychain: GetAdminKeychain.Output }
-  | { type: 'createNewKeychain'; id: UUID; adminId: UUID }
-  | { type: 'beginEditKey'; id: UUID }
-  | { type: 'keychainSaved' }
-  | { type: 'keySaved' }
-  | { type: 'cancelEditKey' }
-  | { type: 'createNewKey' }
-  | { type: 'updateEditingKey'; event: EditKey.Event }
-  | { type: 'updateName'; name: string }
-  | { type: 'updateDesc'; description: string };
+  | { type: `receivedKeychain`; keychain: GetAdminKeychain.Output }
+  | { type: `createNewKeychain`; id: UUID; adminId: UUID }
+  | { type: `beginEditKey`; id: UUID }
+  | { type: `keychainSaved` }
+  | { type: `keySaved` }
+  | { type: `cancelEditKey` }
+  | { type: `createNewKey` }
+  | { type: `updateEditingKey`; event: EditKey.Event }
+  | { type: `updateName`; name: string }
+  | { type: `updateDesc`; description: string };
 
 function reducer(
   state: EditKeychainState,

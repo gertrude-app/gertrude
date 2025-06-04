@@ -15,7 +15,7 @@ import GradientIcon from '../GradientIcon';
 import KeyCreationStep from './KeyCreationStep';
 
 interface Props {
-  mode: 'edit' | 'create';
+  mode: `edit` | `create`;
   expiration?: string;
   update(event: EditKey.Event): unknown;
   activeStep: EditKey.Step;

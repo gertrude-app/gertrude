@@ -8,7 +8,7 @@ import ReviewDayWrapper from './ReviewDayWrapper';
 import DeletableActivityChunks from './DeletableActivityChunks';
 
 interface Screenshot {
-  type: 'Screenshot';
+  type: `Screenshot`;
   width: number;
   height: number;
   url: string;
@@ -17,7 +17,7 @@ interface Screenshot {
 }
 
 interface KeystrokeLine {
-  type: 'KeystrokeLine';
+  type: `KeystrokeLine`;
   appName: string;
   line: string;
   flagged: boolean;

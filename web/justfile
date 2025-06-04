@@ -21,11 +21,6 @@ dev:
   -c cyan.dim,magenta.dim,green.dim \
   "just dash" "just site" "just storybook"
 
-# scaffold
-
-component *args:
-	@node ./make-component.js {{args}}
-
 # utility
 
 clean:

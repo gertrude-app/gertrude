@@ -21,8 +21,8 @@ export type State = {
 };
 
 type Action =
-  | { type: 'receivedAdmin'; admin: GetAdmin.Output }
-  | { type: 'notificationCreated'; id: UUID; methodId?: UUID }
+  | { type: `receivedAdmin`; admin: GetAdmin.Output }
+  | { type: `notificationCreated`; id: UUID; methodId?: UUID }
   | { type: `newNotificationMethodEvent`; event: NewAdminNotificationMethodEvent }
   | { type: `updateNotification`; update: NotificationUpdate };
 

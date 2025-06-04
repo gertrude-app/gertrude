@@ -7,7 +7,7 @@ type Props = {
   keys: KeyType[];
   editKey(id: UUID): unknown;
   deleteKey(id: UUID): unknown;
-  viewMode: 'list' | 'table';
+  viewMode: `list` | `table`;
 };
 
 const KeyList: React.FC<Props> = ({ keys, editKey, deleteKey, viewMode }) => (

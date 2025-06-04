@@ -11,7 +11,7 @@ type Props = {
   children: React.ReactNode;
   ownStep: EditKey.Step;
   activeStep: EditKey.Step;
-  mode: 'edit' | 'create';
+  mode: `edit` | `create`;
   canAdvance?: boolean;
   update(event: EditKey.Event): unknown;
 };

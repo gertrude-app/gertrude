@@ -69,7 +69,9 @@ const UserRoute: React.FC = () => {
 
   const newUserId = useMemo(() => uuid(), []);
   useEffect(() => {
-    id === `new` && dispatch({ type: `setUser`, user: empty.user(newUserId), new: true });
+    if (id === `new`) {
+      dispatch({ type: `setUser`, user: empty.user(newUserId), new: true });
+    }
   }, [id, newUserId]);
 
   if (id === `new`) {
@@ -141,7 +143,9 @@ const UserRoute: React.FC = () => {
         })
       }
       onConfirmAddKeychain={() => {
-        addingKeychain && dispatch({ type: `addKeychain`, keychain: addingKeychain });
+        if (addingKeychain) {
+          dispatch({ type: `addKeychain`, keychain: addingKeychain });
+        }
         dispatch({ type: `setAddingKeychain`, keychain: undefined });
       }}
       onDismissAddKeychain={() =>

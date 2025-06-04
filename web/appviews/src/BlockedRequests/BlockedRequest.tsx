@@ -3,7 +3,7 @@ import cx from 'classnames';
 
 interface Props {
   time: ISODateString;
-  protocol: 'udp' | 'tcp' | 'other';
+  protocol: `udp` | `tcp` | `other`;
   target: string;
   app: string;
   selected: boolean;

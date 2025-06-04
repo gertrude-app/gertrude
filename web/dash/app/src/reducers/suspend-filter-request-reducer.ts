@@ -14,11 +14,11 @@ export type State = {
 };
 
 type Action =
-  | { type: 'receivedRequest'; request: SuspendFilterRequest }
-  | { type: 'updateComment'; comment: string }
-  | { type: 'updateCustomDuration'; custom: string }
-  | { type: 'updateDuration'; duration: string }
-  | { type: 'updateExtraMonitoring'; extraMonitoring?: string };
+  | { type: `receivedRequest`; request: SuspendFilterRequest }
+  | { type: `updateComment`; comment: string }
+  | { type: `updateCustomDuration`; custom: string }
+  | { type: `updateDuration`; duration: string }
+  | { type: `updateExtraMonitoring`; extraMonitoring?: string };
 
 export function reducer(state: State, action: Action): State | undefined {
   switch (action.type) {

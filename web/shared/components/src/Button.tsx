@@ -8,25 +8,25 @@ interface CommonProps {
   id?: string;
   className?: string;
   color:
-    | 'primary-on-violet-bg'
-    | 'secondary-on-violet-bg'
-    | 'primary'
-    | 'secondary'
-    | 'tertiary'
-    | 'warning';
+    | `primary-on-violet-bg`
+    | `secondary-on-violet-bg`
+    | `primary`
+    | `secondary`
+    | `tertiary`
+    | `warning`;
   children: React.ReactNode;
   fullWidth?: boolean;
-  size?: 'small' | 'medium' | 'large';
+  size?: `small` | `medium` | `large`;
   disabled?: boolean;
   testId?: string;
   tabIndex?: number;
 }
 
 type Props =
-  | ({ type: 'submit' } & CommonProps)
-  | ({ type: 'button'; onClick(): void } & CommonProps)
-  | ({ type: 'external'; href: string } & CommonProps)
-  | ({ type: 'link'; to: string } & CommonProps);
+  | ({ type: `submit` } & CommonProps)
+  | ({ type: `button`; onClick(): void } & CommonProps)
+  | ({ type: `external`; href: string } & CommonProps)
+  | ({ type: `link`; to: string } & CommonProps);
 
 const Button: React.FC<Props> = ({
   id,

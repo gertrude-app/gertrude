@@ -90,7 +90,7 @@ const ChooseRemediation: React.FC<ChooseRemediationProps> = ({
 };
 
 interface StartRemediationProps {
-  action: 'create' | 'switch' | 'demote';
+  action: `create` | `switch` | `demote`;
 }
 
 const StartRemediation: React.FC<StartRemediationProps> = ({ action }) => {
@@ -253,9 +253,9 @@ const HappyPath: React.FC<HappyPathProps> = ({ userName, adminUsers }) => {
 
 type PossibleRemediationProps = {
   buttonAction:
-    | 'chooseCreateNonAdminClicked'
-    | 'chooseSwitchToNonAdminUserClicked'
-    | 'chooseDemoteAdminClicked';
+    | `chooseCreateNonAdminClicked`
+    | `chooseSwitchToNonAdminUserClicked`
+    | `chooseDemoteAdminClicked`;
   children: React.ReactNode;
 };
 

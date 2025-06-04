@@ -6,7 +6,7 @@ export function isoToDateInput(iso: string): string {
 
 export function formatDate(
   date: Date,
-  style: 'long' | 'medium' | 'short' | 'm/d/yyyy' | 'url' | 'dateInput',
+  style: `long` | `medium` | `short` | `m/d/yyyy` | `url` | `dateInput`,
 ): string {
   if (style === `short`) {
     return [

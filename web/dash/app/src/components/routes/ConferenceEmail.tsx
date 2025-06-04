@@ -5,7 +5,7 @@ import { Button, Loading, Logo, TextInput } from '@shared/components';
 import { useMutation } from '../../hooks';
 import Current from '../../environment';
 
-const ConferenceEmailForm: React.FC<{ source: 'workshop' | 'booth' }> = ({ source }) => {
+const ConferenceEmailForm: React.FC<{ source: `workshop` | `booth` }> = ({ source }) => {
   const [email, setEmail] = React.useState(``);
   const [emailValid, setEmailValid] = React.useState(true);
   const submit = useMutation(() => Current.api.saveConferenceEmail({ email, source }));

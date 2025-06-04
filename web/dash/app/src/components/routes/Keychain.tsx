@@ -24,12 +24,13 @@ const Keychain: React.FC = () => {
 
   const newKeychainId = useMemo(() => uuid(), []);
   useEffect(() => {
-    id === `new` &&
+    if (id === `new`) {
       dispatch({
         type: `createNewKeychain`,
         id: newKeychainId,
         adminId: admin?.id ?? ``,
       });
+    }
   }, [newKeychainId, id, admin, dispatch]);
 
   const keychainQuery = useQuery(queryKey, () => Current.api.getAdminKeychain(id), {

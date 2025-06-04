@@ -4,7 +4,7 @@ import { prettyE164 } from '@dash/utils';
 import { Button, isScreenshotTest } from '@shared/components';
 
 type Props = {
-  method: 'email' | 'slack' | 'text';
+  method: `email` | `slack` | `text`;
   value: string;
   deletable: boolean;
   onDelete(): unknown;

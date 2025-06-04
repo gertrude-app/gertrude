@@ -2,7 +2,7 @@ import { GradientIcon, GRADIENT_ICONS } from '@dash/components';
 import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../story-helpers';
 
-const GradientGrid: React.FC<{ size: 'small' | 'medium' | 'large' }> = ({ size }) => (
+const GradientGrid: React.FC<{ size: `small` | `medium` | `large` }> = ({ size }) => (
   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
     {GRADIENT_ICONS.map((icon) => (
       <div

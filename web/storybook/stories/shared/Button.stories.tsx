@@ -23,7 +23,7 @@ export const SecondaryOnVioletBg: Story = {
 
 // helpers
 
-type ButtonColor = React.ComponentProps<typeof Button>['color'];
+type ButtonColor = React.ComponentProps<typeof Button>[`color`];
 
 function bgColor(color: ButtonColor): string {
   return color.includes(`on-violet-bg`) ? `bg-violet-500` : `bg-white`;

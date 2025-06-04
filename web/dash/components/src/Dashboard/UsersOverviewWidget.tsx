@@ -6,7 +6,7 @@ import UserStatus from '../UserStatus';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
-type Child = DashboardWidgets.Output['children'][number];
+type Child = DashboardWidgets.Output[`children`][number];
 
 type Props = {
   className?: string;
