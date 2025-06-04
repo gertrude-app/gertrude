@@ -1,6 +1,6 @@
-import React from 'react';
-import cx from 'classnames';
 import { Button, Loading } from '@shared/components';
+import cx from 'classnames';
+import React from 'react';
 import GradientIcon from '../GradientIcon';
 import FullscreenGradientBg from './FullscreenGradientBg';
 

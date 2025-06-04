@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
 import { RocketIcon, VideoIcon } from 'lucide-react';
+import React, { useState } from 'react';
 import { useIntersectionObserver, useScrollY, useWindowDimensions } from '../lib/hooks';
-import WebsiteGraphic from './WebsiteGraphic';
 import FancyLink from './FancyLink';
 import VideoModal from './VideoModal';
+import WebsiteGraphic from './WebsiteGraphic';
 
 const PeaceOfMindForParentsBlock: React.FC = () => {
   const { intersected, ref: illustration } = useIntersectionObserver({ threshold: 1 });

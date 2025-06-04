@@ -1,19 +1,19 @@
-import React from 'react';
-import cx from 'classnames';
 import {
   ArrowRightOnRectangleIcon,
   BookOpenIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  ComputerDesktopIcon,
   Cog6ToothIcon,
+  ComputerDesktopIcon,
   HomeIcon,
   KeyIcon,
   LifebuoyIcon,
-  UsersIcon,
   ShieldCheckIcon,
+  UsersIcon,
 } from '@heroicons/react/24/solid';
 import { Logo } from '@shared/components';
+import cx from 'classnames';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import SidebarOption from './SidebarOption';
 

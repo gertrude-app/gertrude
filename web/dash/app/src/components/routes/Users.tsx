@@ -1,9 +1,9 @@
+import { ApiErrorMessage, ListUsers, Loading } from '@dash/components';
 import React from 'react';
-import { Loading, ListUsers, ApiErrorMessage } from '@dash/components';
 import type { EditUser } from '@dash/components';
-import type { UserDevice, DeviceModelFamily } from '@dash/types';
+import type { DeviceModelFamily, UserDevice } from '@dash/types';
 import Current from '../../environment';
-import { useQuery, Key, useMutation } from '../../hooks';
+import { Key, useMutation, useQuery } from '../../hooks';
 import ReqState from '../../lib/ReqState';
 
 const Users: React.FC = () => {

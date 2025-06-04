@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
 import { ErrorModal, LoadingModal, Modal } from '@dash/components';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { TextInput } from '@shared/components';
-import { useMutation, useOptimism, Key, useUnlockRequest } from '../../../hooks';
+import React, { useState } from 'react';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import Current from '../../../environment';
+import { Key, useMutation, useOptimism, useUnlockRequest } from '../../../hooks';
 
 const DenyUnlockRequest: React.FC = () => {
   const { id = `` } = useParams<{ id: string }>();

@@ -1,10 +1,10 @@
 import { Button } from '@shared/components';
+import { inflect } from '@shared/string';
 import cx from 'classnames';
 import React from 'react';
-import { inflect } from '@shared/string';
 import type { HealthCheck, HealthCheckAction } from '../administrate-store';
-import HealthCheckItem from '../subcomponents/HealthCheckItem';
 import HealthChecker from '../HealthChecker';
+import HealthCheckItem from '../subcomponents/HealthCheckItem';
 
 type Props = HealthCheck & {
   screenshotMonitoringEnabled: boolean;

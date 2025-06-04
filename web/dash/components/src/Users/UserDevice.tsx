@@ -1,5 +1,5 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import type { ChildComputerStatus } from '@dash/types';
 import UserStatus from '../UserStatus';

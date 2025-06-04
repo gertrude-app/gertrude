@@ -1,10 +1,10 @@
-import React from 'react';
-import { TextInput, Button, SelectMenu } from '@shared/components';
 import { parseE164 } from '@dash/utils';
+import { Button, SelectMenu, TextInput } from '@shared/components';
+import React from 'react';
 import type {
-  PendingNotificationMethod,
-  NewAdminNotificationMethodEvent as Event,
   CreatePendingNotificationMethod,
+  NewAdminNotificationMethodEvent as Event,
+  PendingNotificationMethod,
 } from '@dash/types';
 
 type Props = PendingNotificationMethod & {

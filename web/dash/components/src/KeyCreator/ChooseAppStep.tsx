@@ -1,7 +1,7 @@
-import React from 'react';
 import { EditKey } from '@dash/keys';
 import { TextInput } from '@shared/components';
-import { RadioGroup, Combobox } from '../Forms';
+import React from 'react';
+import { Combobox, RadioGroup } from '../Forms';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';

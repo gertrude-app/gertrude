@@ -1,7 +1,7 @@
 import { ApiErrorMessage, ListComputers, Loading } from '@dash/components';
 import React from 'react';
-import { Key, useQuery } from '../../hooks';
 import Current from '../../environment';
+import { Key, useQuery } from '../../hooks';
 
 const Computers: React.FC = () => {
   const query = useQuery(Key.devices, Current.api.getDevices);

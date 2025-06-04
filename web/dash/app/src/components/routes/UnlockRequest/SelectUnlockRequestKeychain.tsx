@@ -1,7 +1,7 @@
+import { ErrorModal, KeychainPicker, LoadingModal, Modal } from '@dash/components';
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Modal, KeychainPicker, LoadingModal, ErrorModal } from '@dash/components';
-import { useZip, useSelectableKeychains, useUser } from '../../../hooks';
+import { useSelectableKeychains, useUser, useZip } from '../../../hooks';
 
 const SelectUnlockRequestKeychain: React.FC = () => {
   const { userId = `` } = useParams<{ id: UUID; userId: UUID }>();

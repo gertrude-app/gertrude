@@ -1,8 +1,8 @@
-import React from 'react';
-import cx from 'classnames';
 import { Logo } from '@shared/components';
-import MobileLoginDropdown from './MobileLoginDropdown';
+import cx from 'classnames';
+import React from 'react';
 import FancyLink from './FancyLink';
+import MobileLoginDropdown from './MobileLoginDropdown';
 
 const MainHeader: React.FC<{ theme: `violet` | `white` }> = ({ theme }) => (
   <header

@@ -1,4 +1,4 @@
-import { GradientIcon, GRADIENT_ICONS } from '@dash/components';
+import { GRADIENT_ICONS, GradientIcon } from '@dash/components';
 import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../story-helpers';
 

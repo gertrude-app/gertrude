@@ -1,7 +1,7 @@
-import { test, it, describe, expect } from 'vitest';
+import { describe, expect, it, test } from 'vitest';
+import type * as EditKey from '../edit';
 import type { UnlockRequestCreateKeyData } from '@dash/types';
 import type { Key } from '@dash/types';
-import type * as EditKey from '../edit';
 import { convert } from '..';
 import * as mock from './mocks';
 

@@ -1,5 +1,5 @@
-import { produce } from 'immer';
 import { typesafe } from '@shared/ts-utils';
+import { produce } from 'immer';
 import type { NotificationUpdate } from '@dash/components';
 import type {
   AdminNotification,
@@ -8,7 +8,7 @@ import type {
   PendingNotificationMethod,
   VerifiedNotificationMethod,
 } from '@dash/types';
-import { editable, Req, revert } from '../lib/helpers';
+import { Req, editable, revert } from '../lib/helpers';
 
 export type State = {
   notifications: Record<UUID, Editable<AdminNotification> & { editing?: boolean }>;

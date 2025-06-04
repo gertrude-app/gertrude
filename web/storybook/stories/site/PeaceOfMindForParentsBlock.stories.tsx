@@ -1,5 +1,5 @@
 import PeaceOfMindForParentsBlock from '@site/components/PeaceOfMindForParentsBlock';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
   title: 'Site/PeaceOfMindForParentsBlock', // eslint-disable-line

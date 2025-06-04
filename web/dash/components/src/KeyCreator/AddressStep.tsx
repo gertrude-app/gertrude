@@ -1,10 +1,10 @@
-import React from 'react';
 import { EditKey, validate } from '@dash/keys';
-import { Label, TextInput, Toggle, SelectMenu } from '@shared/components';
+import { Label, SelectMenu, TextInput, Toggle } from '@shared/components';
+import React from 'react';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
-import KeyCreationStep from './KeyCreationStep';
 import AddressTypeHint from './AddressTypeHint';
+import KeyCreationStep from './KeyCreationStep';
 
 interface Props {
   keyType: `app` | `website`;

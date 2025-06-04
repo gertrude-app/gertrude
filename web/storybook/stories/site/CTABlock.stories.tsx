@@ -1,5 +1,5 @@
 import CTABlock from '@site/components/CTABlock';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
   title: 'Site/CTABlock', // eslint-disable-line

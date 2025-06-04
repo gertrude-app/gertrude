@@ -1,9 +1,9 @@
+import cx from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
 import ConfettiExplosion from 'react-confetti-explosion';
-import cx from 'classnames';
 import type { OnboardingStep } from './onboarding-store';
-import ProgressIndicator from './ProgressIndicator';
 import OnboardingContext, { WithinActiveStepContext } from './OnboardingContext';
+import ProgressIndicator from './ProgressIndicator';
 
 interface Props {
   children: React.ReactNode;

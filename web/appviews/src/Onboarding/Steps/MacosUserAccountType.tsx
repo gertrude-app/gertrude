@@ -1,12 +1,12 @@
-import React, { useState, useContext } from 'react';
 import { Button } from '@shared/components';
+import React, { useContext, useState } from 'react';
 import type { MacOSUser, UserRemediationStep } from '../onboarding-store';
-import TellMeMoreButton from '../TellMeMoreButton';
-import InformationModal from '../InformationModal';
-import QRCode from '../QRCode';
 import Callout from '../Callout';
-import * as Onboarding from '../UtilityComponents';
+import InformationModal from '../InformationModal';
 import OnboardingContext from '../OnboardingContext';
+import QRCode from '../QRCode';
+import TellMeMoreButton from '../TellMeMoreButton';
+import * as Onboarding from '../UtilityComponents';
 
 interface Props {
   users: Array<MacOSUser>;

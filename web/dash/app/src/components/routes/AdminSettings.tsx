@@ -1,17 +1,17 @@
-import { v4 as uuid } from 'uuid';
-import React, { useReducer, useState } from 'react';
 import { ApiErrorMessage, Loading, Settings } from '@dash/components';
-import { capitalize } from '@shared/string';
-import { notNullish, typesafe } from '@shared/ts-utils';
 import { Result } from '@dash/types';
 import { parseE164, prettyE164 } from '@dash/utils';
+import { capitalize } from '@shared/string';
+import { notNullish, typesafe } from '@shared/ts-utils';
+import React, { useReducer, useState } from 'react';
+import { v4 as uuid } from 'uuid';
+import type { State } from '../../reducers/admin-reducer';
 import type { NewMethod } from '@dash/components/src/Settings/Settings';
 import type { VerifiedNotificationMethod } from '@dash/types';
-import type { State } from '../../reducers/admin-reducer';
-import { isDirty, Req } from '../../lib/helpers';
-import { useQuery, Key, useMutation, useConfirmableDelete } from '../../hooks';
 import Current from '../../environment';
+import { Key, useConfirmableDelete, useMutation, useQuery } from '../../hooks';
 import ReqState from '../../lib/ReqState';
+import { Req, isDirty } from '../../lib/helpers';
 import reducer, { initialState } from '../../reducers/admin-reducer';
 
 const AdminSettings: React.FC = () => {

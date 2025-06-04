@@ -1,7 +1,7 @@
 import { Settings } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { withIdsAnd, confirmableEntityAction, props } from '../../story-helpers';
+import { confirmableEntityAction, props, withIdsAnd } from '../../story-helpers';
 import { Email as CardStory } from './NotificationCard.stories';
 
 const meta = {

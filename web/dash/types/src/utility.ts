@@ -1,5 +1,5 @@
-import type { JSXElementConstructor, ComponentProps } from 'react';
-import type { UnlockRequest, ServerPqlError } from './pairql';
+import type { ServerPqlError, UnlockRequest } from './pairql';
+import type { ComponentProps, JSXElementConstructor } from 'react';
 
 type RemoveFns<T> = {
   [K in keyof T as T[K] extends (...args: any) => any ? never : K]: T[K];

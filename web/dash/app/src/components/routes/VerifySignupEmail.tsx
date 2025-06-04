@@ -1,9 +1,9 @@
-import React from 'react';
 import { FullscreenModalForm } from '@dash/components';
-import { Navigate, useParams } from 'react-router-dom';
 import { Button } from '@shared/components';
-import { useAuth, useFireAndForget } from '../../hooks';
+import React from 'react';
+import { Navigate, useParams } from 'react-router-dom';
 import Current from '../../environment';
+import { useAuth, useFireAndForget } from '../../hooks';
 
 const VerifySignupEmail: React.FC = () => {
   const { token = `` } = useParams<{ token: UUID }>();

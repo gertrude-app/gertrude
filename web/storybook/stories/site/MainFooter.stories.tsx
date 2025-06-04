@@ -1,5 +1,5 @@
 import MainFooter from '@site/components/MainFooter';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
   title: 'Site/MainFooter', // eslint-disable-line

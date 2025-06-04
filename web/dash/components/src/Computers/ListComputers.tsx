@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Device } from '@dash/types';
-import PageHeading from '../PageHeading';
 import EmptyState from '../EmptyState';
+import PageHeading from '../PageHeading';
 import ComputerCard from './ComputerCard';
 
 interface Props {

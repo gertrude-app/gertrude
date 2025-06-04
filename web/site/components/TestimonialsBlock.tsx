@@ -1,5 +1,5 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 
 const TestimonialsBlock: React.FC = () => (
   <section className="xl:px-8 bg-gradient-to-b from-violet-100 to-violet-500">

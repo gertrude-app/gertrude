@@ -1,6 +1,6 @@
+import cx from 'classnames';
 import NextLink from 'next/link';
 import React from 'react';
-import cx from 'classnames';
 import type { ArrowUpIcon } from 'lucide-react';
 
 type LucideIcon = typeof ArrowUpIcon;

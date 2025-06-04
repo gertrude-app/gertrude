@@ -1,11 +1,11 @@
+import { Button } from '@shared/components';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@shared/components';
 import { UndoMainPadding } from '../../Chrome/Chrome';
 import EmptyState from '../../EmptyState';
+import DeletableActivityChunks from './DeletableActivityChunks';
 import FeedHeader from './FeedHeader';
 import ReviewDayWrapper from './ReviewDayWrapper';
-import DeletableActivityChunks from './DeletableActivityChunks';
 
 interface Screenshot {
   type: `Screenshot`;

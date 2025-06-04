@@ -1,5 +1,4 @@
-import React from 'react';
-import cx from 'classnames';
+import { BellIcon } from '@heroicons/react/24/outline';
 import {
   Bars3Icon,
   BoltIcon,
@@ -29,7 +28,8 @@ import {
   UsersIcon,
   WindowIcon,
 } from '@heroicons/react/24/solid';
-import { BellIcon } from '@heroicons/react/24/outline';
+import cx from 'classnames';
+import React from 'react';
 import type { HeroIcon } from '@dash/types';
 
 export const ICONS = [

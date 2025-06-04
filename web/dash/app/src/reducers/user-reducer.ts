@@ -1,11 +1,11 @@
-import { v4 as uuid } from 'uuid';
-import { produce } from 'immer';
 import { defaults } from '@dash/types';
+import { produce } from 'immer';
+import { v4 as uuid } from 'uuid';
 import type {
-  UserKeychainSummary,
   PlainTimeWindow,
-  User,
   RuleSchedule,
+  User,
+  UserKeychainSummary,
 } from '@dash/types';
 import { commit, editable } from '../lib/helpers';
 

@@ -1,5 +1,5 @@
-import React from 'react';
 import { Logo } from '@shared/components';
+import React from 'react';
 import Ferris from '../../static/ferris.svg';
 
 const WickedProjectOgImage: React.FC = () => (

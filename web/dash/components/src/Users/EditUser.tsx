@@ -1,28 +1,28 @@
-import React from 'react';
-import cx from 'classnames';
-import { inflect } from '@shared/string';
-import { TextInput, Button, Toggle, Label } from '@shared/components';
-import { type RuleSchedule, type PlainTimeWindow } from '@dash/types';
-import { Link } from 'react-router-dom';
+import { type PlainTimeWindow, type RuleSchedule } from '@dash/types';
 import { NoSymbolIcon } from '@heroicons/react/24/outline';
+import { Button, Label, TextInput, Toggle } from '@shared/components';
+import { inflect } from '@shared/string';
+import cx from 'classnames';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import type {
-  Subcomponents,
+  BlockedApp,
   ConfirmableEntityAction,
   RequestState,
-  BlockedApp,
+  Subcomponents,
   SuccessOutput,
 } from '@dash/types';
 import type { UserKeychainSummary as Keychain } from '@dash/types';
+import EmptyState from '../EmptyState';
+import TimeInput from '../Forms/TimeInput';
 import KeychainCard from '../Keychains/KeychainCard';
 import { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
-import TimeInput from '../Forms/TimeInput';
-import EmptyState from '../EmptyState';
+import AddDeviceInstructions from './AddDeviceInstructions';
 import AddKeychainDrawer from './AddKeychainDrawer';
+import BlockedAppCard from './BlockedAppCard';
 import ConnectDeviceModal from './ConnectDeviceModal';
 import UserDevice from './UserDevice';
-import AddDeviceInstructions from './AddDeviceInstructions';
-import BlockedAppCard from './BlockedAppCard';
 
 interface Props {
   id: string;

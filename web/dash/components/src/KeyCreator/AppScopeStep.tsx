@@ -1,6 +1,6 @@
-import React from 'react';
 import { EditKey } from '@dash/keys';
 import { Label } from '@shared/components';
+import React from 'react';
 import { SelectableListItem } from '../Forms';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';

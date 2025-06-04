@@ -1,7 +1,7 @@
 import { ListKeychains } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
-import { keychainProps, props, withIdsAnd } from '../../story-helpers';
+import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
+import { keychainProps, props, withIdsAnd } from '../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Keychains/ListKeychains', // eslint-disable-line

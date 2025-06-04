@@ -1,6 +1,6 @@
-import type { ActionOf } from '../lib/store';
 import type { Failable } from '../lib/failable';
 import type { AdminAccountStatus, FilterState } from '../lib/shared-types';
+import type { ActionOf } from '../lib/store';
 import { Store } from '../lib/store';
 
 // begin codegen

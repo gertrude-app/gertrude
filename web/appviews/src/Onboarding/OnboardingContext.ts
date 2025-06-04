@@ -2,8 +2,8 @@ import { createContext } from 'react';
 import type {
   AppEvent,
   MacOSUser,
-  OnboardingStep,
   MacOSVersion,
+  OnboardingStep,
   ViewAction,
 } from './onboarding-store';
 

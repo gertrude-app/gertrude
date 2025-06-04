@@ -1,7 +1,7 @@
-import React from 'react';
 import cx from 'classnames';
-import type { AppEvent, ViewAction } from '../../menubar-store';
+import React from 'react';
 import type { FilterState } from '../../../lib/shared-types';
+import type { AppEvent, ViewAction } from '../../menubar-store';
 import { MenuBarSized } from '../../MenuBar';
 import * as Btn from './Buttons';
 import PauseDowntimeModal from './PauseDowntimeModal';

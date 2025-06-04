@@ -1,8 +1,8 @@
 /// <reference types="cypress" />
 import { dateFromUrl } from '@dash/datetime';
 import { time } from '@shared/datetime';
-import * as mock from '../../src/reducers/__tests__/mocks';
 import { entireDay } from '../../src/lib/days';
+import * as mock from '../../src/reducers/__tests__/mocks';
 
 describe(`activity screens`, () => {
   beforeEach(() => {

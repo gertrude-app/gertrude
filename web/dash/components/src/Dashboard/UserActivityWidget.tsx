@@ -1,8 +1,8 @@
+import { writable } from '@dash/utils';
+import { Button } from '@shared/components';
+import cx from 'classnames';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import cx from 'classnames';
-import { Button } from '@shared/components';
-import { writable } from '@dash/utils';
 import type { DashboardWidgets } from '@dash/types';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';

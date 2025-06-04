@@ -1,6 +1,6 @@
 import React from 'react';
-import type { PqlError } from '@dash/types';
 import type { IconType } from '../GradientIcon';
+import type { PqlError } from '@dash/types';
 import ApiErrorMessage from '../ApiErrorMessage';
 import Modal from './Modal';
 

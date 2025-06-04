@@ -1,7 +1,7 @@
 import { Dashboard } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { withIds, time, withIdsAnd, testImgUrl, props } from '../../story-helpers';
+import { props, testImgUrl, time, withIds, withIdsAnd } from '../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Dashboard/Screen', // eslint-disable-line

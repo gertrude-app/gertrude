@@ -1,4 +1,4 @@
-import { test, describe, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { parseE164, prettyE164 } from '../phone-numbers';
 
 describe(`parseE164()`, () => {

@@ -1,5 +1,5 @@
-import React from 'react';
 import { RocketIcon, RouteIcon } from 'lucide-react';
+import React from 'react';
 import FancyLink from './FancyLink';
 
 const CTABlock: React.FC = () => (

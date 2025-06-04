@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import cx from 'classnames';
 import { env } from '@shared/components';
+import cx from 'classnames';
+import React, { useEffect } from 'react';
 
 interface Props {
   children: React.ReactNode;

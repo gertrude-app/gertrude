@@ -1,5 +1,5 @@
-import { expect, it, test, describe } from 'vitest';
-import { extractScreenshotTest, SIZES, parseTestSizes } from '../extract-screenshot-test';
+import { describe, expect, it, test } from 'vitest';
+import { SIZES, extractScreenshotTest, parseTestSizes } from '../extract-screenshot-test';
 
 describe(`parseTestSizes()`, () => {
   const cases: Array<[string | undefined, Array<{ width: number; height: number }>]> = [

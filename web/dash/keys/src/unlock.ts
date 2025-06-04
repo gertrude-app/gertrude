@@ -1,4 +1,4 @@
-import type { UnlockRequestCreateKeyData, SharedKey } from '@dash/types';
+import type { SharedKey, UnlockRequestCreateKeyData } from '@dash/types';
 import * as domain from './domain';
 
 export function keyForUnlockRequest(request: UnlockRequestCreateKeyData): SharedKey {

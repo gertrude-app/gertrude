@@ -1,12 +1,12 @@
-import cx from 'classnames';
 import { EmptyState, PageHeading } from '@dash/components';
+import { ApiErrorMessage, Loading } from '@dash/components';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import cx from 'classnames';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ApiErrorMessage, Loading } from '@dash/components';
 import type { SecurityEventsFeed } from '@dash/types';
-import { Key, useQuery } from '../../hooks';
 import Current from '../../environment';
+import { Key, useQuery } from '../../hooks';
 
 const SecurityEventsFeed: React.FC = () => {
   const getFeed = useQuery(Key.securityEventsFeed, Current.api.securityEventsFeed);

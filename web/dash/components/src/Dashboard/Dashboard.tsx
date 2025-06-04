@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import cx from 'classnames';
+import React, { useState } from 'react';
 import type {
   CreatePendingAppConnection,
   DashboardWidgets,
@@ -8,14 +8,14 @@ import type {
 import { UndoMainPadding } from '../Chrome/Chrome';
 import PageHeading from '../PageHeading';
 import SmartLink from '../SmartLink';
-import ConnectDeviceModal from '../Users/ConnectDeviceModal';
 import AddDeviceInstructions from '../Users/AddDeviceInstructions';
+import ConnectDeviceModal from '../Users/ConnectDeviceModal';
+import CreateFirstNotificationWidget from './CreateFirstNotificationWidget';
 import QuickActionsWidget from './QuickActionsWidget';
 import UnlockRequestsWidget from './UnlockRequestsWidget';
-import UserOverviewWidget from './UsersOverviewWidget';
 import UserActivityWidget from './UserActivityWidget';
 import UserScreenshotsWidget from './UserScreenshotsWidget';
-import CreateFirstNotificationWidget from './CreateFirstNotificationWidget';
+import UserOverviewWidget from './UsersOverviewWidget';
 
 type Props = {
   date?: Date;

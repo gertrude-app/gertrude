@@ -1,7 +1,7 @@
 import { Logo } from '@shared/components';
+import { ArrowRightIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
-import { ArrowRightIcon } from 'lucide-react';
 import FancyLink from './FancyLink';
 
 interface Props {

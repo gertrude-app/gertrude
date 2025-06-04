@@ -1,7 +1,7 @@
+import { ActivitySummaries, ApiErrorMessage, Loading } from '@dash/components';
 import React from 'react';
-import { ApiErrorMessage, Loading, ActivitySummaries } from '@dash/components';
-import { useQuery, Key } from '../../hooks';
 import Current from '../../environment';
+import { Key, useQuery } from '../../hooks';
 
 const FamilyActivitySummariesRoute: React.FC = () => {
   const query = useQuery(Key.familyActivitySummaries, () =>

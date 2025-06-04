@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import cx from 'classnames';
+import React, { useState } from 'react';
 import type { Screen } from '../administrate-store';
 
 interface Props {

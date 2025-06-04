@@ -1,5 +1,5 @@
-import type { ActionOf } from '../lib/store';
 import type { FilterState } from '../lib/shared-types';
+import type { ActionOf } from '../lib/store';
 import { Store } from '../lib/store';
 
 // begin codegen

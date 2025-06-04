@@ -1,6 +1,6 @@
-import React from 'react';
-import cx from 'classnames';
 import { relativeTime } from '@dash/datetime';
+import cx from 'classnames';
+import React from 'react';
 import type { UnlockRequest } from '@dash/types';
 import UserInputText from '../UserInputText';
 

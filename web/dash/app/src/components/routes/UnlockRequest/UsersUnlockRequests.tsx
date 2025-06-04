@@ -1,7 +1,7 @@
+import { ApiErrorMessage, ListUnlockRequests, Loading } from '@dash/components';
 import React from 'react';
-import { Loading, ListUnlockRequests, ApiErrorMessage } from '@dash/components';
 import Current from '../../../environment';
-import { useQuery, Key } from '../../../hooks';
+import { Key, useQuery } from '../../../hooks';
 
 const UsersUnlockRequests: React.FC = () => {
   const query = useQuery(Key.combinedUsersUnlockRequests, Current.api.getUnlockRequests);

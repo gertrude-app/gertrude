@@ -1,11 +1,11 @@
-import { useId } from 'react';
 import cx from 'classnames';
-import PluginsIcon from './icons/PluginsIcon';
-import PresetsIcon from './icons/PresetsIcon';
-import WarningIcon from './icons/WarningIcon';
+import { useId } from 'react';
 import InstallationIcon from './icons/InstallationIcon';
 import LightbulbIcon from './icons/LightbulbIcon';
+import PluginsIcon from './icons/PluginsIcon';
+import PresetsIcon from './icons/PresetsIcon';
 import ThemingIcon from './icons/ThemingIcon';
+import WarningIcon from './icons/WarningIcon';
 
 const icons = {
   installation: InstallationIcon,

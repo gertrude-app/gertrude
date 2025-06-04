@@ -1,6 +1,6 @@
-import React from 'react';
-import cx from 'classnames';
 import { isScreenshotTest } from '@shared/components';
+import cx from 'classnames';
+import React from 'react';
 import ActivityItemBtns from './ActivityItemBtns';
 
 type Props = {

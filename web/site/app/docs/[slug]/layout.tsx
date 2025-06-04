@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
 import cx from 'classnames';
 import { MenuIcon } from 'lucide-react';
+import React, { useState } from 'react';
 import Sidebar from '@/components/articles/Sidebar';
 
 const DocsLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {

@@ -1,6 +1,6 @@
 import { ScreenshotViewer } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
-import { testImgUrl, time, props } from '../../../story-helpers';
+import type { Meta, StoryObj } from '@storybook/react';
+import { props, testImgUrl, time } from '../../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Users/Activity/ScreenshotViewer', // eslint-disable-line

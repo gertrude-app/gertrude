@@ -1,6 +1,6 @@
+import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import cx from 'classnames';
 import React, { useState } from 'react';
-import { Combobox as HeadlessCombobox } from '@headlessui/react';
 
 interface Props<Value extends string = string> {
   options: Array<{ value: Value; display: string }>;

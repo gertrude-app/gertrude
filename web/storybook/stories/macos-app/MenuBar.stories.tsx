@@ -1,7 +1,7 @@
-import React from 'react';
-import cx from 'classnames';
 import { MenuBar } from '@macos/appviews';
-import type { StoryFn, Meta } from '@storybook/react';
+import cx from 'classnames';
+import React from 'react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 export default {
   title: 'MacOS App/MenuBar', // eslint-disable-line

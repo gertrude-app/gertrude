@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
-import cx from 'classnames';
 import { Button } from '@shared/components';
+import cx from 'classnames';
+import React, { useContext } from 'react';
 import OnboardingContext from './OnboardingContext';
 
 interface ButtonProps {

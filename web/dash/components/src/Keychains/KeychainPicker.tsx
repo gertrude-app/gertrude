@@ -1,5 +1,5 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 import type { KeychainSummary as Keychain } from '@dash/types';
 import EmptyState from '../EmptyState';
 import KeychainCard from './KeychainCard';

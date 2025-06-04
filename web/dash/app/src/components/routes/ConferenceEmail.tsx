@@ -1,9 +1,9 @@
-import React from 'react';
-import cx from 'classnames';
 import { FullscreenModalForm } from '@dash/components';
 import { Button, Loading, Logo, TextInput } from '@shared/components';
-import { useMutation } from '../../hooks';
+import cx from 'classnames';
+import React from 'react';
 import Current from '../../environment';
+import { useMutation } from '../../hooks';
 
 const ConferenceEmailForm: React.FC<{ source: `workshop` | `booth` }> = ({ source }) => {
   const [email, setEmail] = React.useState(``);

@@ -1,8 +1,8 @@
 import { ApiErrorMessage, FullscreenModalForm } from '@dash/components';
-import { Navigate, Link, useLocation, useParams } from 'react-router-dom';
 import React from 'react';
-import { useFireAndForget, useLoginRedirect } from '../../hooks';
+import { Link, Navigate, useLocation, useParams } from 'react-router-dom';
 import Current from '../../environment';
+import { useFireAndForget, useLoginRedirect } from '../../hooks';
 import { useAuth } from '../../hooks/auth';
 
 const MagicLink: React.FC = () => {

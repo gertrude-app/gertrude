@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import cx from 'classnames';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import cx from 'classnames';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface DropdownCustomizationPointProps {
   text: React.ReactNode;

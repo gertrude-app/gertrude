@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
+import React, { useEffect, useState } from 'react';
 import { useIntersectionObserver } from '../lib/hooks';
 import SuperScrollerIllustration from './super-scroller-illustration/SuperScrollerIllustration';
 

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState, useContext } from 'react';
 import cx from 'classnames';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import type { CdnAsset } from './cdn-assets';
 import useWindowWidth from '../lib/hooks';
 import { WithinActiveStepContext } from './OnboardingContext';

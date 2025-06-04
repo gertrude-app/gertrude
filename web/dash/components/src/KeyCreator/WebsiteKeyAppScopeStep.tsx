@@ -1,9 +1,9 @@
-import React from 'react';
 import { EditKey } from '@dash/keys';
 import { Toggle } from '@shared/components';
+import React from 'react';
 import { SelectableListItem } from '../Forms';
-import UserInputText from '../UserInputText';
 import GradientIcon from '../GradientIcon';
+import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';
 
 interface Props {

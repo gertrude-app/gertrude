@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import cx from 'classnames';
-import { inflect } from '@shared/string';
-import { Button, Badge } from '@shared/components';
+import { type RuleSchedule as Schedule, defaults } from '@dash/types';
 import { ChevronDownIcon, ClockIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { UsersIcon } from '@heroicons/react/24/solid';
-import { defaults, type RuleSchedule as Schedule } from '@dash/types';
+import { Badge, Button } from '@shared/components';
+import { inflect } from '@shared/string';
+import cx from 'classnames';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import GradientIcon from '../GradientIcon';
 import SchedulePicker from './schedule/SchedulePicker';

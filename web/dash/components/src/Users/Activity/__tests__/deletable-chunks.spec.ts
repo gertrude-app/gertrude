@@ -1,6 +1,6 @@
-import { describe, expect, beforeEach, it } from 'vitest';
 import { time } from '@shared/datetime';
-import { chunkedRenderTasks, type Chunkable } from '../DeletableActivityChunks';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { type Chunkable, chunkedRenderTasks } from '../DeletableActivityChunks';
 
 describe(`chunkedRenderTasks()`, () => {
   beforeEach(resetId);

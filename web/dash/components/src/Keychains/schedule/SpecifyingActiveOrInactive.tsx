@@ -1,6 +1,6 @@
-import React from 'react';
-import cx from 'classnames';
 import { ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
+import cx from 'classnames';
+import React from 'react';
 import type { RuleSchedule } from '@dash/types';
 
 const SpecifyingActiveOrInactive: React.FC<{

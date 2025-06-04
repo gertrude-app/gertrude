@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
-import cx from 'classnames';
 import { Switch } from '@headlessui/react';
+import cx from 'classnames';
+import React from 'react';
 
 interface Props {
   enabled: boolean;

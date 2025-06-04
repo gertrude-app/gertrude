@@ -1,16 +1,16 @@
-import React from 'react';
 import cx from 'classnames';
-import type { AppEvent, AppState, ViewState, ViewAction } from './administrate-store';
+import React from 'react';
+import type { AppEvent, AppState, ViewAction, ViewState } from './administrate-store';
 import type { PropsOf } from '../lib/store';
+import InactiveAccountScreen from '../components/InactiveAccountBlock';
 import { valueOf } from '../lib/failable';
 import { containerize } from '../lib/store';
-import InactiveAccountScreen from '../components/InactiveAccountBlock';
-import SidebarNav from './subcomponents/SidebarNav';
-import ActionsScreen from './screens/ActionsScreen';
-import HealthCheckScreen from './screens/HealthCheckScreen';
-import ExemptUsersScreen from './screens/ExemptUsersScreen';
-import HiddenAdvancedScreen from './screens/HiddenAdvancedScreen';
 import store from './administrate-store';
+import ActionsScreen from './screens/ActionsScreen';
+import ExemptUsersScreen from './screens/ExemptUsersScreen';
+import HealthCheckScreen from './screens/HealthCheckScreen';
+import HiddenAdvancedScreen from './screens/HiddenAdvancedScreen';
+import SidebarNav from './subcomponents/SidebarNav';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;
 

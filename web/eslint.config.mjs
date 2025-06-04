@@ -1,17 +1,17 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { defineConfig, globalIgnores } from 'eslint/config';
-import tsParser from '@typescript-eslint/parser';
+import { fixupPluginRules } from '@eslint/compat';
+import { FlatCompat } from '@eslint/eslintrc';
+import js from '@eslint/js';
+import stylistic from '@stylistic/eslint-plugin';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import _import from 'eslint-plugin-import';
+import jsxA11Y from 'eslint-plugin-jsx-a11y';
 import noOnlyTests from 'eslint-plugin-no-only-tests';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
-import jsxA11Y from 'eslint-plugin-jsx-a11y';
-import _import from 'eslint-plugin-import';
-import stylistic from '@stylistic/eslint-plugin';
-import { fixupPluginRules } from '@eslint/compat';
-import js from '@eslint/js';
-import { FlatCompat } from '@eslint/eslintrc';
 
 const compat = new FlatCompat({
   baseDirectory: path.dirname(fileURLToPath(import.meta.url)),
@@ -174,7 +174,11 @@ export default defineConfig([
       'getter-return': `error`,
       'import/order': [
         `error`,
-        { groups: [`builtin`, `external`, `type`, `parent`, `sibling`, `index`] },
+        {
+          named: true,
+          alphabetize: { order: `asc` },
+          groups: [`builtin`, `external`, `type`, `parent`, `sibling`, `index`],
+        },
       ],
       'import/first': `error`,
       'import/no-amd': `error`,

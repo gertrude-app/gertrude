@@ -1,8 +1,8 @@
 'use client';
 
+import cx from 'classnames';
 import { ChevronRightIcon } from 'lucide-react';
 import React, { useState } from 'react';
-import cx from 'classnames';
 
 type Props = {
   title: string;

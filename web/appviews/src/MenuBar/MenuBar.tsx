@@ -1,17 +1,17 @@
-import React from 'react';
 import cx from 'classnames';
-import type { AppState, ViewState, AppEvent, ViewAction } from './menubar-store';
+import React from 'react';
+import type { AppEvent, AppState, ViewAction, ViewState } from './menubar-store';
 import type { PropsOf } from '../lib/store';
 import { containerize } from '../lib/store';
 import store from './menubar-store';
-import EnteringConnectionCode from './states/EnteringConnectionCode';
 import ConnectFailed from './states/ConnectFailed';
-import Throbbing from './states/Throbbing';
-import NotConnected from './states/NotConnected';
 import ConnectSucceeded from './states/ConnectSucceeded';
+import EnteringConnectionCode from './states/EnteringConnectionCode';
+import NotConnected from './states/NotConnected';
+import NotConnectedActions from './states/NotConnectedActions';
+import Throbbing from './states/Throbbing';
 import UpdateNag from './states/UpdateNag';
 import UpdateRequired from './states/UpdateRequired';
-import NotConnectedActions from './states/NotConnectedActions';
 import Connected from './states/connected';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;

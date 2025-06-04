@@ -1,5 +1,5 @@
 import { UserActivityHeader } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
   title: 'Dashboard/Users/Activity/UserActivityHeader', // eslint-disable-line

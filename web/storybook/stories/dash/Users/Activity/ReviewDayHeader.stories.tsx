@@ -1,6 +1,6 @@
 import { FeedHeader } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
-import { time, props } from '../../../story-helpers';
+import type { Meta, StoryObj } from '@storybook/react';
+import { props, time } from '../../../story-helpers';
 
 const meta: Meta = {
   title: 'Dashboard/Users/Activity/FeedHeader', // eslint-disable-line

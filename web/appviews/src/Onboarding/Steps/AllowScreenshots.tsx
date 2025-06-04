@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react';
 import Callout from '../Callout';
 import ExpandableContent from '../ExpandableContent';
+import InformationModal from '../InformationModal';
+import OnboardingContext from '../OnboardingContext';
 import * as Onboarding from '../UtilityComponents';
 import assets from '../cdn-assets';
-import OnboardingContext from '../OnboardingContext';
-import InformationModal from '../InformationModal';
 
 interface Props {
   step:

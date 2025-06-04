@@ -1,12 +1,12 @@
 import path from 'path';
-import React from 'react';
 import Markdoc from '@markdoc/markdoc';
+import React from 'react';
 import type { Metadata, NextPage } from 'next';
-import { components } from '@/markdoc/config';
-import { getArticle, getArticlePaths } from '@/markdoc/files';
+import PageBottomCTA from '@/components/PageBottomCTA';
 import Prose from '@/components/articles/Prose';
 import { createMetadata } from '@/lib/seo';
-import PageBottomCTA from '@/components/PageBottomCTA';
+import { components } from '@/markdoc/config';
+import { getArticle, getArticlePaths } from '@/markdoc/files';
 
 type Params = {
   slug: string;

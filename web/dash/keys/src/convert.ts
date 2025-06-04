@@ -5,8 +5,8 @@ import type {
   SingleAppScope,
   UnlockRequestCreateKeyData,
 } from '@dash/types';
-import * as EditKey from './edit';
 import * as domain from './domain';
+import * as EditKey from './edit';
 import { keyForUnlockRequest, newKeyState } from '.';
 
 export function unlockRequestToState(

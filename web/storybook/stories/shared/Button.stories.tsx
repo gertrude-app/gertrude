@@ -1,5 +1,5 @@
 import { Button } from '@shared/components';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
   title: 'Shared/Button', // eslint-disable-line

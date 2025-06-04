@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import ExpandableContent from '../ExpandableContent';
-import * as Onboarding from '../UtilityComponents';
-import OnboardingContext from '../OnboardingContext';
-import assets from '../cdn-assets';
 import InformationModal from '../InformationModal';
+import OnboardingContext from '../OnboardingContext';
 import QRCode from '../QRCode';
+import * as Onboarding from '../UtilityComponents';
+import assets from '../cdn-assets';
 
 const GetConnectionCode: React.FC = () => {
   const [showModal, setShowModal] = useState(false);

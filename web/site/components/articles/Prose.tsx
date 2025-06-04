@@ -1,5 +1,5 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 
 const Prose: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div

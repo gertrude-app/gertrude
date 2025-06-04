@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import cx from 'classnames';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import cx from 'classnames';
+import React, { useEffect, useState } from 'react';
 import type { PlainTime } from '@dash/types';
 
 interface Props {

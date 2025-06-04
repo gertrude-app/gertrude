@@ -1,5 +1,5 @@
-import { Modal, KeychainPicker } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
+import { KeychainPicker, Modal } from '@dash/components';
+import type { Meta, StoryObj } from '@storybook/react';
 import { keychainProps, keychains, props } from '../../story-helpers';
 
 const meta = {

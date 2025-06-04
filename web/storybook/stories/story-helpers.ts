@@ -3,19 +3,19 @@ import { time } from '@shared/datetime';
 import type { ActivityFeedItem } from '@dash/components';
 import type {
   ConfirmableEntityAction,
-  KeychainSummary,
   Key,
+  KeychainSummary,
   UserKeychainSummary,
 } from '@dash/types';
 import type { StaticImageData } from 'next/image';
-import Placeholder400x600 from './static/placeholder/400x600.png';
+import Placeholder1200x400 from './static/placeholder/1200x400.png';
 import Placeholder300x200 from './static/placeholder/300x200.png';
 import Placeholder400x200 from './static/placeholder/400x200.png';
+import Placeholder400x600 from './static/placeholder/400x600.png';
 import Placeholder500x300 from './static/placeholder/500x300.png';
 import Placeholder700x200 from './static/placeholder/700x200.png';
 import Placeholder800x600 from './static/placeholder/800x600.png';
 import Placeholder800x900 from './static/placeholder/800x900.png';
-import Placeholder1200x400 from './static/placeholder/1200x400.png';
 
 export { time };
 

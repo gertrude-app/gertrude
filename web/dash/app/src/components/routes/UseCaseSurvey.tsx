@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import cx from 'classnames';
 import { FullscreenGradientBg } from '@dash/components';
 import { Button } from '@shared/components';
+import cx from 'classnames';
+import React, { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { useAuth, useMutation } from '../../hooks';
 import Current from '../../environment';
+import { useAuth, useMutation } from '../../hooks';
 
 type PageType = `start` | `adult-peer` | `self`;
 

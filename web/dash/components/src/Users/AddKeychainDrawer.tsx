@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
-import cx from 'classnames';
+import { type KeychainSummary as Keychain, defaults } from '@dash/types';
 import {
   CheckIcon,
   ChevronLeftIcon,
@@ -14,8 +12,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { Badge, Button, Loading, TextInput } from '@shared/components';
 import { inflect } from '@shared/string';
-import { defaults, type KeychainSummary as Keychain } from '@dash/types';
-import type { RuleSchedule as Schedule, RequestState, SuccessOutput } from '@dash/types';
+import cx from 'classnames';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import type { RequestState, RuleSchedule as Schedule, SuccessOutput } from '@dash/types';
 import SchedulePicker from '../Keychains/schedule/SchedulePicker';
 
 interface Props {

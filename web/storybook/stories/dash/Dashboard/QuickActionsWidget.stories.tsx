@@ -1,5 +1,5 @@
 import { QuickActionsWidget } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
   title: 'Dashboard/Dashboard/Widgets/QuickActionsWidget', // eslint-disable-line

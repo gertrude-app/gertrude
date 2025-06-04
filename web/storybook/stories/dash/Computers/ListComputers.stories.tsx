@@ -1,7 +1,7 @@
 import { ListComputers } from '@dash/components';
-import type { StoryObj, Meta } from '@storybook/react';
-import { props } from '../../story-helpers';
+import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
+import { props } from '../../story-helpers';
 
 const meta = {
   title: 'Dashboard/Computers/ListComputers', // eslint-disable-line

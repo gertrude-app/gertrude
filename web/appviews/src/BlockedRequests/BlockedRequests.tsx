@@ -1,13 +1,13 @@
-import React from 'react';
-import cx from 'classnames';
 import { Button, Loading, TextInput, Toggle } from '@shared/components';
-import type { AppState, ViewState, AppEvent, ViewAction } from './blockedrequests-store';
+import cx from 'classnames';
+import React from 'react';
+import type { AppEvent, AppState, ViewAction, ViewState } from './blockedrequests-store';
 import type { PropsOf } from '../lib/store';
-import { containerize } from '../lib/store';
-import ErrorScreen from '../ErrorScreen';
 import ErrorBlock from '../ErrorBlock';
-import InactiveAccountScreen from '../components/InactiveAccountBlock';
+import ErrorScreen from '../ErrorScreen';
 import AccountPastDueBanner from '../components/AccountPastDueBanner';
+import InactiveAccountScreen from '../components/InactiveAccountBlock';
+import { containerize } from '../lib/store';
 import BlockedRequest from './BlockedRequest';
 import store from './blockedrequests-store';
 

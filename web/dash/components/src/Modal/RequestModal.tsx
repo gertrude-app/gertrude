@@ -1,6 +1,6 @@
 import React from 'react';
-import type { RequestState } from '@dash/types';
 import type { IconType } from '../GradientIcon';
+import type { RequestState } from '@dash/types';
 import Modal from './Modal';
 import { ErrorModal } from '.';
 

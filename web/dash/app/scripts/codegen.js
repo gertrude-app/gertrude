@@ -118,12 +118,6 @@ async function main() {
   cypressLines.push(`}`);
 
   fs.writeFileSync(`${CY_DIR}/intercept.ts`, cypressLines.join(`\n`));
-
-  // prettier the codegen'd files
-  exec.exit(`${PRETTIER_FORMAT} ${APP_DIR}/*.ts`);
-  exec.exit(`${PRETTIER_FORMAT} ${CY_DIR}/intercept.ts`);
-  exec.exit(`${PRETTIER_FORMAT} ${PKG_DIR}/*.ts`);
-  exec.exit(`${PRETTIER_FORMAT} ${PKG_DIR}/pairs/*.ts`);
 }
 
 function clean() {
@@ -197,12 +191,5 @@ const CWD = process.cwd();
 const APP_DIR = `${CWD}/src/pairql`;
 const PKG_DIR = `${CWD}/../types/src/pairql`;
 const CY_DIR = `${CWD}/cypress/support`;
-
-const PRETTIER_FORMAT = [
-  `${CWD}/../../node_modules/.bin/prettier`,
-  `--config`,
-  `${CWD}/../../.prettierrc.json`,
-  `--write`,
-].join(` `);
 
 main();

@@ -1,9 +1,9 @@
-import React, { Fragment } from 'react';
-import cx from 'classnames';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
-import SidebarNav from './SidebarNav';
+import cx from 'classnames';
+import React, { Fragment } from 'react';
 import MobileStickyHeader from './MobileStickyHeader';
+import SidebarNav from './SidebarNav';
 
 interface Props {
   children: React.ReactNode;

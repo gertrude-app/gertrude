@@ -1,8 +1,8 @@
 'use client';
 
+import cx from 'classnames';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import cx from 'classnames';
 
 interface CommonProps {
   id?: string;

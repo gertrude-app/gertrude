@@ -1,5 +1,5 @@
-import { expect, test, describe, beforeEach } from 'vitest';
-import { newKeyState, EditKey, convert } from '@dash/keys';
+import { EditKey, convert, newKeyState } from '@dash/keys';
+import { beforeEach, describe, expect, test } from 'vitest';
 import reducer from '../edit-key-reducer';
 
 describe(`editKeyReducer()`, () => {

@@ -1,19 +1,19 @@
-import React from 'react';
-import cx from 'classnames';
-import { time } from '@shared/datetime';
 import { Button, Loading, TextInput } from '@shared/components';
+import { time } from '@shared/datetime';
+import cx from 'classnames';
+import React from 'react';
 import type {
-  AppState,
-  ViewState,
   AppEvent,
+  AppState,
   ViewAction,
+  ViewState,
 } from './requestsuspension-store';
 import type { PropsOf } from '../lib/store';
-import { containerize } from '../lib/store';
 import ErrorScreen from '../ErrorScreen';
-import InactiveAccountScreen from '../components/InactiveAccountBlock';
 import AccountPastDueBanner from '../components/AccountPastDueBanner';
 import FullScreenSlider from '../components/FullScreenSlider';
+import InactiveAccountScreen from '../components/InactiveAccountBlock';
+import { containerize } from '../lib/store';
 import store, { STANDARD_DURATION_OPTIONS } from './requestsuspension-store';
 
 type Props = PropsOf<AppState, ViewState, AppEvent, ViewAction>;

@@ -1,6 +1,6 @@
-import React from 'react';
-import cx from 'classnames';
 import { Badge } from '@shared/components';
+import cx from 'classnames';
+import React from 'react';
 
 type Props = {
   title: string;

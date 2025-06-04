@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-import type { interceptPql, forcePqlErr } from './intercept';
+import type { forcePqlErr, interceptPql } from './intercept';
 
 declare global {
   namespace Cypress {

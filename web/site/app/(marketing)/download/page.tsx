@@ -1,19 +1,19 @@
+import { AppIcon } from '@shared/components';
 import { ArrowDownIcon, DownloadIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
-import { AppIcon } from '@shared/components';
-import type { StaticImageData } from 'next/image';
 import type { NextPage } from 'next';
+import type { StaticImageData } from 'next/image';
 import FancyLink from '@/components/FancyLink';
 import Computer from '@/components/super-scroller-illustration/Computer';
 import * as seo from '@/lib/seo';
 
-import Catalina from '@/public/supported-os/macos-catalina.png';
 import BigSur from '@/public/supported-os/macos-big-sur.png';
+import Catalina from '@/public/supported-os/macos-catalina.png';
 import Monterey from '@/public/supported-os/macos-monterey.png';
-import Ventura from '@/public/supported-os/macos-ventura.png';
-import Sonoma from '@/public/supported-os/macos-sonoma.png';
 import Sequoia from '@/public/supported-os/macos-sequoia.png';
+import Sonoma from '@/public/supported-os/macos-sonoma.png';
+import Ventura from '@/public/supported-os/macos-ventura.png';
 
 export const metadata = seo.createMetadata(
   `Download | Gertrude Internet Filter and Parental Controls`,

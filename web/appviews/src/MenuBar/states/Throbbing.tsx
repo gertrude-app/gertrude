@@ -1,5 +1,5 @@
-import React from 'react';
 import { Loading } from '@shared/components';
+import React from 'react';
 import { MenuBarSized } from '../MenuBar';
 
 const Throbbing: React.FC = () => (

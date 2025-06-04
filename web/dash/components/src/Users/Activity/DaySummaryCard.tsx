@@ -1,8 +1,8 @@
+import { formatDate } from '@dash/datetime';
+import { Badge, env } from '@shared/components';
+import cx from 'classnames';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import cx from 'classnames';
-import { formatDate } from '@dash/datetime';
-import { env, Badge } from '@shared/components';
 
 type Props = {
   date: Date;

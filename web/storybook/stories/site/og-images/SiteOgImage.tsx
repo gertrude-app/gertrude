@@ -1,5 +1,5 @@
-import React from 'react';
 import { Logo } from '@shared/components';
+import React from 'react';
 
 const OgImage: React.FC = () => (
   <section className="bg-gradient-to-tr from-fuchsia-500 to-violet-500 flex justify-center items-stretch flex-col w-[1200px] h-[627px]">

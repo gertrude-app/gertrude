@@ -1,7 +1,7 @@
 import { BlockedRequests } from '@macos/appviews';
 import type { Meta, StoryObj } from '@storybook/react';
 import { withIdsAnd } from '../story-helpers';
-import { props, appWindow } from '../story-helpers';
+import { appWindow, props } from '../story-helpers';
 
 const meta = {
   title: 'MacOS App/Blocked Requests', // eslint-disable-line

@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
-import cx from 'classnames';
-import { Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
+import cx from 'classnames';
+import React from 'react';
+import { Fragment } from 'react';
 import Label from './Label';
 
 interface Props<Value extends string> {

@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import Markdoc from '@markdoc/markdoc';
 import { glob } from 'glob';
 import matter from 'gray-matter';
-import Markdoc from '@markdoc/markdoc';
 import type { RenderableTreeNode } from '@markdoc/markdoc';
 import { config } from './config';
 

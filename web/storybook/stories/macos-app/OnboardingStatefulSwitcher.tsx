@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import OnboardingContext from '@macos/appviews/src/Onboarding/OnboardingContext';
 import StepSwitcher, {
   OnboardingPage,
 } from '@macos/appviews/src/Onboarding/StepSwitcher';
-import OnboardingContext from '@macos/appviews/src/Onboarding/OnboardingContext';
 import * as Step from '@macos/appviews/src/Onboarding/Steps';
+import React, { useState } from 'react';
 import type { OnboardingStep } from '@macos/appviews/src/Onboarding/onboarding-store';
 
 const OnboardingStatefulSwitcher: React.FC = () => {

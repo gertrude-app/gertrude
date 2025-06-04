@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
-import cx from 'classnames';
 import { prettyE164 } from '@dash/utils';
 import { Button, SelectMenu } from '@shared/components';
 import { capitalize } from '@shared/string';
+import cx from 'classnames';
+import React, { useEffect, useRef } from 'react';
 import type { AdminNotificationTrigger, VerifiedNotificationMethod } from '@dash/types';
 import GradientIcon from '../GradientIcon';
 

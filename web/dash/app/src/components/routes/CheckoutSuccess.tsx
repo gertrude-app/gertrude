@@ -1,9 +1,9 @@
-import React from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 import { RequestModal } from '@dash/components';
 import { Result } from '@dash/types';
-import { useFireAndForget } from '../../hooks';
+import React from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Current from '../../environment';
+import { useFireAndForget } from '../../hooks';
 import ReqState from '../../lib/ReqState';
 
 const CheckoutSuccess: React.FC = () => {

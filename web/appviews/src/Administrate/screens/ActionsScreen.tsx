@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button, Badge } from '@shared/components';
+import { Badge, Button } from '@shared/components';
 import cx from 'classnames';
+import React from 'react';
 import type { AppEvent, ViewAction } from '../administrate-store';
 
 interface Props {

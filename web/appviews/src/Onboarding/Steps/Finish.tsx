@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
 import cx from 'classnames';
+import React, { useContext, useEffect, useState } from 'react';
 import OnboardingContext from '../OnboardingContext';
 
 const Finish: React.FC = () => {

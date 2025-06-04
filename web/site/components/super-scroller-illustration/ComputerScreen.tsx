@@ -1,6 +1,6 @@
-import React from 'react';
 import cx from 'classnames';
 import { BanIcon, DownloadIcon } from 'lucide-react';
+import React from 'react';
 import AppleLogo from '@/public/apple-logo.png';
 
 interface ComputerScreenProps {

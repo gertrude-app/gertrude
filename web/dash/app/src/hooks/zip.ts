@@ -1,5 +1,5 @@
-import type { PqlError } from '@dash/types';
 import type { QueryResult } from './query';
+import type { PqlError } from '@dash/types';
 
 type ZipQueryResult<T> =
   | {

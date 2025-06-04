@@ -1,5 +1,5 @@
-import React from 'react';
 import { Button } from '@shared/components';
+import React from 'react';
 import type { ActivityFeedItem } from './UserActivityFeed';
 import KeystrokesViewer from './KeystrokesViewer';
 import ScreenshotViewer from './ScreenshotViewer';

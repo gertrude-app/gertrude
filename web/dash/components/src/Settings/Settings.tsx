@@ -1,17 +1,17 @@
-import React from 'react';
+import { Badge, Button, TextInput } from '@shared/components';
 import cx from 'classnames';
-import { TextInput, Button, Badge } from '@shared/components';
+import React from 'react';
 import type {
-  AdminSubscriptionStatus,
   AdminNotificationTrigger,
-  PendingNotificationMethod,
-  Subcomponents,
+  AdminSubscriptionStatus,
   ConfirmableEntityAction,
   NewAdminNotificationMethodEvent,
+  PendingNotificationMethod,
   RequestState,
+  Subcomponents,
 } from '@dash/types';
-import Modal, { ConfirmDeleteEntity } from '../Modal';
 import EmptyState from '../EmptyState';
+import Modal, { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
 import NewNotificationMethodSidebar from './NewNotificationMethodForm';
 import NotificationCard from './NotificationCard';

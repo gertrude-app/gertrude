@@ -1,9 +1,9 @@
+import type { ActivityFeedItem } from '@dash/components';
 import type {
   CombinedUsersActivityFeed,
   UserActivityFeed,
   UserActivityItem,
 } from '@dash/types';
-import type { ActivityFeedItem } from '@dash/components';
 
 export function outputItemToActivityFeedItem(item: UserActivityItem): ActivityFeedItem {
   if (item.case === `keystrokeLine`) {

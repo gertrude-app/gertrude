@@ -1,16 +1,16 @@
+import { capitalize, pastTense } from '@shared/string';
+import { useMutation as useLibMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useMutation as useLibMutation, useQueryClient } from '@tanstack/react-query';
-import { capitalize, pastTense } from '@shared/string';
+import type { QueryKey } from './key';
 import type {
   ConfirmableEntityAction,
   DeleteEntity_v2,
   PqlError,
-  SuccessOutput,
   Result,
+  SuccessOutput,
 } from '@dash/types';
 import type { UseMutationResult } from '@tanstack/react-query';
-import type { QueryKey } from './key';
 import Current from '../environment';
 import { isEditable, isUUID } from '../lib/helpers';
 

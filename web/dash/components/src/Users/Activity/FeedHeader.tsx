@@ -1,6 +1,6 @@
+import { formatDate } from '@dash/datetime';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { formatDate } from '@dash/datetime';
 
 interface Props {
   date: Date;

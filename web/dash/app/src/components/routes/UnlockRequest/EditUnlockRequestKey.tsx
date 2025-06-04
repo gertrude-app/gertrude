@@ -1,12 +1,12 @@
-import { v4 as uuid } from 'uuid';
-import React, { useState } from 'react';
 import { ErrorModal, KeyCreator, LoadingModal, Modal } from '@dash/components';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { convert, toKeyRecord } from '@dash/keys';
 import { Result } from '@dash/types';
+import React, { useState } from 'react';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { v4 as uuid } from 'uuid';
 import type { EditKey } from '@dash/keys';
 import Current from '../../../environment';
-import { useQuery, Key, useZip, useMutation, useApps } from '../../../hooks';
+import { Key, useApps, useMutation, useQuery, useZip } from '../../../hooks';
 import editKeyReducer from '../../../reducers/edit-key-reducer';
 
 const EditUnlockRequestKey: React.FC = () => {
