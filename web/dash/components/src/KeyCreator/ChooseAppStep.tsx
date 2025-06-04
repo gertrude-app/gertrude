@@ -118,7 +118,7 @@ const Title: React.FC<Props> = ({
     <UserInputText>
       {appIdentificationType === `bundleId`
         ? appBundleId
-        : apps.find((app) => app.slug === appSlug)?.name ?? appBundleId}
+        : (apps.find((app) => app.slug === appSlug)?.name ?? appBundleId)}
     </UserInputText>
   </h2>
 );
