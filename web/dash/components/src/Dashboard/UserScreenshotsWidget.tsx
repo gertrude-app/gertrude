@@ -13,7 +13,7 @@ type Props = {
 const UserScreenshotsWidget: React.FC<Props> = ({ className, screenshots }) => (
   <DashboardWidget className={className}>
     <WidgetTitle icon="clock" text="Recent screenshots" />
-    <div className="space-y-3">
+    <div className="space-y-3 @container">
       {writable(screenshots)
         .sort(newestFirst)
         .map((screenshot) => (
@@ -30,7 +30,7 @@ const UserScreenshotsWidget: React.FC<Props> = ({ className, screenshots }) => (
             <img
               src={screenshot.url}
               alt="Child screenshot"
-              className="block rounded-lg object-cover h-full w-52 ml-2"
+              className="block rounded-lg object-cover h-full w-36 @sm:w-52 ml-2"
             />
           </div>
         ))}
