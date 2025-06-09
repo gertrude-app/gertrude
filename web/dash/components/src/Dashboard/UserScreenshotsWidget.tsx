@@ -19,7 +19,7 @@ const UserScreenshotsWidget: React.FC<Props> = ({ className, screenshots }) => (
         .map((screenshot) => (
           <div
             key={screenshot.id}
-            className="p-2 pl-4 rounded-2xl flex justify-between items-center h-24 sm:h-32 even:bg-slate-50"
+            className="p-2 pl-4 rounded-2xl flex justify-between items-center h-24 sm:h-32 even:bg-slate-50 overflow-hidden"
           >
             <div>
               <h3 className="font-bold">{screenshot.childName}</h3>
@@ -30,7 +30,7 @@ const UserScreenshotsWidget: React.FC<Props> = ({ className, screenshots }) => (
             <img
               src={screenshot.url}
               alt="Child screenshot"
-              className="block rounded-lg w-32 sm:h-full sm:w-auto md:h-auto md:w-48 lg:w-40 xl:w-36 ml-2"
+              className="block rounded-lg object-cover h-full w-52 ml-2"
             />
           </div>
         ))}

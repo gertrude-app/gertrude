@@ -104,29 +104,31 @@ const Dashboard: React.FC<Props> = ({
             </div>
           </div>
         )}
-        <div className="pt-6 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-8">
-          {!hasNotifications && <CreateFirstNotificationWidget className="-order-10" />}
+        <div className="pt-6 grid grid-cols-1 @3xl:grid-cols-2 @6xl:grid-cols-3 gap-4 @3xl:gap-6 @6xl:gap-8">
+          {!hasNotifications && (
+            <CreateFirstNotificationWidget className="@3xl:-order-10" />
+          )}
           <UserActivityWidget userActivity={childActivitySummaries} />
           <UserOverviewWidget
             users={childData}
-            className={cx(!hasNotifications && `lg:col-span-2 2xl:col-span-1`)}
+            className={cx(!hasNotifications && `@3xl:col-span-2 @6xl:col-span-1`)}
           />
           {recentScreenshots.length !== 0 && (
             <UserScreenshotsWidget
               screenshots={recentScreenshots}
-              className="xl:row-span-2 lg:-order-8"
+              className="@3xl:-order-9 @6xl:row-span-2"
             />
           )}
           {unlockRequests.length !== 0 && (
             <UnlockRequestsWidget
               className={cx(
-                `row-span-2 lg:-order-7`,
-                hasNotifications && `2xl:row-span-3`,
+                `row-span-2 @3xl:-order-8`,
+                hasNotifications && `@6xl:row-span-3`,
               )}
               unlockRequests={unlockRequests}
             />
           )}
-          <QuickActionsWidget date={date} className="xl:row-span-2 lg:-order-9" />
+          <QuickActionsWidget date={date} className="@3xl:-order-10 @6xl:row-span-2" />
         </div>
       </div>
     );
