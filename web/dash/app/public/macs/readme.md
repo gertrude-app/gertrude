@@ -12,6 +12,9 @@ the model identifier.
 
 I ended up using images from ipsw.me, like: https://ipsw.dev/img/devices/webp/Mac15,5.webp
 -- these seem to follow a strict convention of using the model identifiers as the
-filename, I just cropped each one tIght and converted it to .png in Snagit.
+filename, I just cropped each one tight and converted it to .png in Snagit.
 
 There may be a better source somewhere.
+
+NB: adding images should go hand in hand with updating
+`swift/api/Sources/Api/Models/Parent/Computer+Model.swift`
