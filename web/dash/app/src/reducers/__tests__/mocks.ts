@@ -193,14 +193,31 @@ type ScreenshotActivityItem = {
 export function screenshotActivityItem(
   override: Partial<ScreenshotActivityItem> = {},
 ): ScreenshotActivityItem {
+  // @see storybook/stories/story-helpers.ts
+  const VALID_SIZES = [
+    `400x600`,
+    `300x200`,
+    `400x200`,
+    `500x300`,
+    `700x200`,
+    `800x600`,
+    `800x900`,
+    `1200x400`,
+  ];
   const id = override.id ?? uuid();
-  const width = override.width ?? 600;
-  const height = override.height ?? 400;
+  const width = override.width ?? 500;
+  const height = override.height ?? 300;
+  const size = `${width}x${height}`;
+  if (!VALID_SIZES.includes(size)) {
+    throw new Error(
+      `No deterministic placeholder image for size \`${size}\`. Use an existing supported size, or add a new one.`,
+    );
+  }
   return {
     case: `screenshot`,
     id,
     ids: [id],
-    url: `https://fakeimg.pl/${width}x${height}/3e2a73/ffffff`,
+    url: `https://gertrude-web-assets.nyc3.digitaloceanspaces.com/placeholders-imgs/${size}.png`,
     width,
     height,
     createdAt: new Date().toISOString(),

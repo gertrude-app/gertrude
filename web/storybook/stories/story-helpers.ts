@@ -1,4 +1,3 @@
-import { env } from '@shared/components';
 import { time } from '@shared/datetime';
 import type { ActivityFeedItem } from '@dash/components';
 import type {
@@ -40,6 +39,7 @@ export function userKeychainProps(
   };
 }
 
+// @see dash/app/src/reducers/__tests__/mocks.ts
 const PLACEHOLDERS: Record<string, StaticImageData> = {
   '400x600': Placeholder400x600,
   '300x200': Placeholder300x200,
@@ -52,10 +52,6 @@ const PLACEHOLDERS: Record<string, StaticImageData> = {
 };
 
 export function testImgUrl(width: number, height: number): string {
-  if (!env.isScreenshotTest()) {
-    return `https://fakeimg.pl/${width}x${height}/3e2a73/ffffff`;
-  }
-
   const key = `${width}x${height}`;
   const placeholder = PLACEHOLDERS[key];
   if (!placeholder) {
