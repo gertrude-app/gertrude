@@ -112,6 +112,7 @@ describe(`payment`, () => {
       notifications: [],
       verifiedNotificationMethods: [],
       hasAdminChild: false,
+      monthlyPriceInDollars: 10,
     });
 
     cy.interceptPql(`StripeUrl`, { url: `/stripe-url` });
