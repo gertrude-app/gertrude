@@ -36,7 +36,7 @@ export function itemFromRootId(
   return null;
 }
 
-export function flagUserActivityFeedItem(
+export function flagChildActivityFeedItem(
   rootId: UUID,
   queryData: UserActivityFeed.Output,
 ): [input: UUID[], optimisticUpdate: UserActivityFeed.Output] {

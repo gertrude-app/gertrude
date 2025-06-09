@@ -1,6 +1,6 @@
 import { Button } from '@shared/components';
 import React from 'react';
-import type { ActivityFeedItem } from './UserActivityFeed';
+import type { ActivityFeedItem } from './ChildActivityFeed';
 import KeystrokesViewer from './KeystrokesViewer';
 import ScreenshotViewer from './ScreenshotViewer';
 

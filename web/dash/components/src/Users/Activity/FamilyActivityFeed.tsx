@@ -3,11 +3,11 @@ import { posessive } from '@shared/string';
 import cx from 'classnames';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { ActivityFeedItem } from './UserActivityFeed';
+import type { ActivityFeedItem } from './ChildActivityFeed';
+import { FeedCaughtUp } from './ChildActivityFeed';
 import DeletableActivityChunks from './DeletableActivityChunks';
 import FeedHeader from './FeedHeader';
 import ReviewDayWrapper from './ReviewDayWrapper';
-import { FeedCaughtUp } from './UserActivityFeed';
 import UserActivityHeader from './UserActivityHeader';
 
 interface Props {
@@ -23,7 +23,7 @@ interface Props {
   chunkSize?: number;
 }
 
-const CombinedUsersActivityFeed: React.FC<Props> = ({
+const FamilyActivityFeed: React.FC<Props> = ({
   date,
   activity,
   numDeleted,
@@ -117,4 +117,4 @@ const CombinedUsersActivityFeed: React.FC<Props> = ({
   );
 };
 
-export default CombinedUsersActivityFeed;
+export default FamilyActivityFeed;

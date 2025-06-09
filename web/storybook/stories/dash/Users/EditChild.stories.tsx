@@ -1,15 +1,15 @@
-import { EditUser } from '@dash/components';
+import { EditChild } from '@dash/components';
 import { defaults } from '@dash/types';
 import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { confirmableEntityAction, props, userKeychainProps } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/EditUser', // eslint-disable-line
-  component: EditUser,
+  title: 'Dashboard/Users/EditChild', // eslint-disable-line
+  component: EditChild,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },
-} satisfies Meta<typeof EditUser>;
+} satisfies Meta<typeof EditChild>;
 
 type Story = StoryObj<typeof meta>;
 

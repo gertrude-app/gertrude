@@ -8,7 +8,7 @@ describe(`create keychain`, () => {
     cy.simulateLoggedIn();
     cy.interceptPql(`GetIdentifiedApps`, []);
     cy.interceptPql(`SaveKeychain`, { success: true });
-    cy.interceptPql(`DeleteEntity`, { success: true });
+    cy.interceptPql(`DeleteEntity_v2`, { success: true });
     cy.interceptPql(`GetUsers`, [mock.user()]);
     cy.interceptPql(`GetUser`, mock.user());
   });

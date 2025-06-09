@@ -1,11 +1,11 @@
-import { UserDevice } from '@dash/components';
+import { Computer } from '@dash/components';
 import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/UserDevice', // eslint-disable-line
-  component: UserDevice,
-} satisfies Meta<typeof UserDevice>;
+  title: 'Dashboard/Users/Computer', // eslint-disable-line
+  component: Computer,
+} satisfies Meta<typeof Computer>;
 
 type Story = StoryObj<typeof meta>;
 

@@ -1,11 +1,11 @@
-import { UserCard } from '@dash/components';
+import { ChildCard } from '@dash/components';
 import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/UserCard', // eslint-disable-line
-  component: UserCard,
-} satisfies Meta<typeof UserCard>;
+  title: 'Dashboard/Users/ChildCard', // eslint-disable-line
+  component: ChildCard,
+} satisfies Meta<typeof ChildCard>;
 
 type Story = StoryObj<typeof meta>;
 

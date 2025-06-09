@@ -14,7 +14,7 @@ type Props = {
   className?: string;
 };
 
-const UserDevice: React.FC<Props> = ({
+const Computer: React.FC<Props> = ({
   deviceId,
   modelTitle,
   modelIdentifier,
@@ -48,4 +48,4 @@ const UserDevice: React.FC<Props> = ({
   </Link>
 );
 
-export default UserDevice;
+export default Computer;

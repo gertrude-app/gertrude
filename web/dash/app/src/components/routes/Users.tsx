@@ -1,6 +1,6 @@
-import { ApiErrorMessage, ListUsers, Loading } from '@dash/components';
+import { ApiErrorMessage, ListChildren, Loading } from '@dash/components';
 import React from 'react';
-import type { EditUser } from '@dash/components';
+import type { EditChild } from '@dash/components';
 import type { DeviceModelFamily, UserDevice } from '@dash/types';
 import Current from '../../environment';
 import { Key, useMutation, useQuery } from '../../hooks';
@@ -22,7 +22,7 @@ const Users: React.FC = () => {
   }
 
   return (
-    <ListUsers
+    <ListChildren
       users={query.data.map((user) => ({
         id: user.id,
         name: user.name,
@@ -58,7 +58,7 @@ export function familyToIcon(family: DeviceModelFamily): `laptop` | `desktop` {
 
 export function deviceProps(
   apiDevice: UserDevice,
-): React.ComponentProps<typeof EditUser>[`devices`][number] {
+): React.ComponentProps<typeof EditChild>[`devices`][number] {
   return {
     id: apiDevice.id,
     deviceId: apiDevice.deviceId,

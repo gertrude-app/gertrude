@@ -3,17 +3,17 @@ import React from 'react';
 import type { RequestState, Subcomponents } from '@dash/types';
 import EmptyState from '../EmptyState';
 import PageHeading from '../PageHeading';
+import ChildCard from './ChildCard';
 import ConnectModal from './ConnectDeviceModal';
-import UserCard from './UserCard';
 
 type Props = {
-  users: Subcomponents<typeof UserCard>;
+  users: Subcomponents<typeof ChildCard>;
   addDeviceRequest?: RequestState<{ code: number }>;
   startAddDevice(userId: UUID): unknown;
   dismissAddDevice(): unknown;
 };
 
-const Users: React.FC<Props> = ({
+const ListChildren: React.FC<Props> = ({
   users,
   addDeviceRequest,
   startAddDevice,
@@ -27,7 +27,7 @@ const Users: React.FC<Props> = ({
         <>
           <div className="mb-16 grid grid-cols-1 xl:grid-cols-2 gap-10 lg+:gap-8 xl:gap-10 2xl:grid-cols-3">
             {users.map((user) => (
-              <UserCard
+              <ChildCard
                 key={user.id}
                 addDevice={() => startAddDevice(user.id)}
                 {...user}
@@ -60,4 +60,4 @@ const Users: React.FC<Props> = ({
   </div>
 );
 
-export default Users;
+export default ListChildren;
