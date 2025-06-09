@@ -1,14 +1,14 @@
-import { ListUsers } from '@dash/components';
+import { ListChildren } from '@dash/components';
 import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/ListUsers', // eslint-disable-line
-  component: ListUsers,
+  title: 'Dashboard/Users/ListChildren', // eslint-disable-line
+  component: ListChildren,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
-} satisfies Meta<typeof ListUsers>;
+} satisfies Meta<typeof ListChildren>;
 
 type Story = StoryObj<typeof meta>;
 

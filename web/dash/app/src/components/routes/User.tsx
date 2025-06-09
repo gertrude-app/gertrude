@@ -1,5 +1,4 @@
-import { ApiErrorMessage, Loading } from '@dash/components';
-import { EditUser } from '@dash/components';
+import { ApiErrorMessage, EditChild, Loading } from '@dash/components';
 import { type User, defaults } from '@dash/types';
 import React, { useEffect, useMemo, useReducer } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
@@ -94,7 +93,7 @@ const UserRoute: React.FC = () => {
   const { draft, original } = user;
 
   return (
-    <EditUser
+    <EditChild
       isNew={state.user.isNew || false}
       name={draft.name}
       id={draft.id}

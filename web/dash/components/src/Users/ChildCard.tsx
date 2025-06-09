@@ -3,20 +3,20 @@ import { inflect } from '@shared/string';
 import cx from 'classnames';
 import React from 'react';
 import type { Subcomponents } from '@dash/types';
-import UserDevice from './UserDevice';
+import Computer from './Computer';
 
 type Props = {
   id: string;
   name: string;
   numKeys: number;
   numKeychains: number;
-  devices: Subcomponents<typeof UserDevice>;
+  devices: Subcomponents<typeof Computer>;
   screenshotsEnabled: boolean;
   keystrokesEnabled: boolean;
   addDevice(): unknown;
 };
 
-const UserCard: React.FC<Props> = ({
+const ChildCard: React.FC<Props> = ({
   id,
   name,
   numKeys,
@@ -73,15 +73,15 @@ const UserCard: React.FC<Props> = ({
             </p>
           </div>
           <div className="flex flex-col mt-3 gap-3 pt-3">
-            {devices.map((userDevice) => (
-              <UserDevice
-                key={userDevice.id}
-                id={userDevice.id}
-                deviceId={userDevice.deviceId}
-                modelTitle={userDevice.modelTitle}
-                modelIdentifier={userDevice.modelIdentifier}
-                name={userDevice.name}
-                status={userDevice.status}
+            {devices.map((computer) => (
+              <Computer
+                key={computer.id}
+                id={computer.id}
+                deviceId={computer.deviceId}
+                modelTitle={computer.modelTitle}
+                modelIdentifier={computer.modelIdentifier}
+                name={computer.name}
+                status={computer.status}
               />
             ))}
           </div>
@@ -138,4 +138,4 @@ const UserCard: React.FC<Props> = ({
   </div>
 );
 
-export default UserCard;
+export default ChildCard;

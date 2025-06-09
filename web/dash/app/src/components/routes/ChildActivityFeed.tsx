@@ -1,4 +1,4 @@
-import { ApiErrorMessage, CombinedUsersActivityFeed, Loading } from '@dash/components';
+import { ApiErrorMessage, ChildActivityFeed, Loading } from '@dash/components';
 import { dateFromUrl } from '@dash/datetime';
 import { Result } from '@dash/types';
 import React from 'react';
@@ -8,26 +8,26 @@ import { Key, useMutation, useOptimism, useQuery } from '../../hooks';
 import { entireDay } from '../../lib/days';
 import * as lib from '../../lib/user-activity';
 
-const CombinedUsersActivityFeedRoute: React.FC = () => {
-  const { urlDate = `` } = useParams<{ urlDate: string }>();
+const ChildActivityFeedRoute: React.FC = () => {
+  const { userId = ``, urlDate = `` } = useParams<{ userId: string; urlDate: string }>();
   const date = dateFromUrl(urlDate);
   const optimistic = useOptimism();
-  const queryKey = Key.combinedUsersActivityFeed(urlDate);
+  const queryKey = Key.userActivityFeed(userId, urlDate);
 
   const query = useQuery(queryKey, () =>
-    Current.api.combinedUsersActivityFeed({ range: entireDay(date) }),
+    Current.api.userActivityFeed({ userId, range: entireDay(date) }),
   );
 
   const deleteItems = useMutation(
     (rootIds: UUID[]) => {
       const data = query.data;
-      if (!data) return Result.resolveUnexpected(`af6a2372`);
-      const [input, nextState] = lib.prepareCombinedUsersActivityDelete(rootIds, data);
+      if (!data) return Result.resolveUnexpected(`c86706e8`);
+      const [input, nextState] = lib.prepareUserActivityDelete(rootIds, data);
       optimistic.update(queryKey, nextState);
       return Current.api.deleteActivityItems(input);
     },
     {
-      invalidating: [Key.familyActivitySummaries],
+      invalidating: [queryKey, Key.childActivitySummaries(userId), Key.dashboard],
       toast: `delete:activity-items`,
     },
   );
@@ -35,13 +35,13 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
   const flagItem = useMutation(
     (rootId: UUID) => {
       const data = query.data;
-      if (!data) return Result.resolveUnexpected(`07d2dbbf`);
-      const [input, nextState] = lib.flagCombinedActivityFeedItem(rootId, data);
+      if (!data) return Result.resolveUnexpected(`816ec66f`);
+      const [input, nextState] = lib.flagChildActivityFeedItem(rootId, data);
       optimistic.update(queryKey, nextState);
       return Current.api.flagActivityItems(input);
     },
     {
-      invalidating: [Key.familyActivitySummaries],
+      invalidating: [queryKey, Key.childActivitySummaries(userId), Key.dashboard],
       toast: `flag:activity-item`,
     },
   );
@@ -55,20 +55,17 @@ const CombinedUsersActivityFeedRoute: React.FC = () => {
   }
 
   return (
-    <CombinedUsersActivityFeed
+    <ChildActivityFeed
       date={date}
-      activity={query.data
-        .filter((user) => user.items.length > 0)
-        .map((user) => ({
-          userName: user.userName,
-          highlightSuspensionActivity: user.showSuspensionActivity,
-          items: user.items.map(lib.outputItemToActivityFeedItem),
-        }))}
-      numDeleted={query.data.reduce((acc, user) => acc + user.numDeleted, 0)}
+      numDeleted={query.data.numDeleted}
       deleteItems={(rootIds) => deleteItems.mutate(rootIds)}
       flagItem={(rootId) => flagItem.mutate(rootId)}
+      items={query.data.items
+        .map(lib.outputItemToActivityFeedItem)
+        .filter((item) => !item.deleted)}
+      highlightSuspensionActivity={query.data.showSuspensionActivity}
     />
   );
 };
 
-export default CombinedUsersActivityFeedRoute;
+export default ChildActivityFeedRoute;

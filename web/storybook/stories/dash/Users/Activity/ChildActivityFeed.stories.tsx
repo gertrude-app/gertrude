@@ -1,14 +1,14 @@
-import { UserActivityFeed } from '@dash/components';
+import { ChildActivityFeed } from '@dash/components';
 import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../../decorators/StatefulChrome';
 import { activity, keystrokeLine, props, screenshot, time } from '../../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/Activity/UserActivityReviewDay', // eslint-disable-line
-  component: UserActivityFeed,
+  title: 'Dashboard/Users/Activity/ChildActivityFeed', // eslint-disable-line
+  component: ChildActivityFeed,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
-} satisfies Meta<typeof UserActivityFeed>;
+} satisfies Meta<typeof ChildActivityFeed>;
 
 type Story = StoryObj<typeof meta>;
 

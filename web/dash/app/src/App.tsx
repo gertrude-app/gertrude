@@ -5,12 +5,13 @@ import AdminSettings from './components/routes/AdminSettings';
 import ChangePassword from './components/routes/ChangePassword';
 import CheckoutCancel from './components/routes/CheckoutCancel';
 import CheckoutSuccess from './components/routes/CheckoutSuccess';
+import ChildActivityFeed from './components/routes/ChildActivityFeed';
 import ChildActivitySummaries from './components/routes/ChildActivitySummaries';
-import CombinedUsersActivityFeedRoute from './components/routes/CombinedUsersActivityFeed';
 import Computer from './components/routes/Computer';
 import Computers from './components/routes/Computers';
 import ConferenceEmailForm from './components/routes/ConferenceEmail';
 import Dashboard from './components/routes/Dashboard';
+import FamilyActivityFeedRoute from './components/routes/FamilyActivityFeed';
 import FamilyActivitySummaries from './components/routes/FamilyActivitySummaries';
 import Keychain from './components/routes/Keychain';
 import Keychains from './components/routes/Keychains';
@@ -30,7 +31,6 @@ import UserUnlockRequests from './components/routes/UnlockRequest/UserUnlockRequ
 import UsersUnlockRequests from './components/routes/UnlockRequest/UsersUnlockRequests';
 import UseCaseSurvey from './components/routes/UseCaseSurvey';
 import UserRoute from './components/routes/User';
-import UserActivityFeed from './components/routes/UserActivityFeed';
 import Users from './components/routes/Users';
 import VerifySignupEmail from './components/routes/VerifySignupEmail';
 
@@ -85,7 +85,7 @@ const App: React.FC = () => {
 
           <Route path="activity">
             <Route index element={<FamilyActivitySummaries />} />
-            <Route path=":urlDate" element={<CombinedUsersActivityFeedRoute />} />
+            <Route path=":urlDate" element={<FamilyActivityFeedRoute />} />
           </Route>
 
           <Route path=":userId">
@@ -106,7 +106,7 @@ const App: React.FC = () => {
 
             <Route path="activity">
               <Route index element={<ChildActivitySummaries />} />
-              <Route path=":urlDate" element={<UserActivityFeed />} />
+              <Route path=":urlDate" element={<ChildActivityFeed />} />
             </Route>
           </Route>
         </Route>

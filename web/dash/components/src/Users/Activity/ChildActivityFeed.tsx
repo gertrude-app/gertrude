@@ -41,7 +41,7 @@ interface Props {
   highlightSuspensionActivity: boolean;
 }
 
-const UserActivityFeed: React.FC<Props> = ({
+const ChildActivityFeed: React.FC<Props> = ({
   date,
   items,
   numDeleted,
@@ -89,7 +89,7 @@ const UserActivityFeed: React.FC<Props> = ({
   );
 };
 
-export default UserActivityFeed;
+export default ChildActivityFeed;
 
 export const FeedCaughtUp: React.FC = () => (
   <EmptyState

@@ -21,8 +21,8 @@ import PageHeading from '../PageHeading';
 import AddDeviceInstructions from './AddDeviceInstructions';
 import AddKeychainDrawer from './AddKeychainDrawer';
 import BlockedAppCard from './BlockedAppCard';
+import Computer from './Computer';
 import ConnectDeviceModal from './ConnectDeviceModal';
-import UserDevice from './UserDevice';
 
 interface Props {
   id: string;
@@ -45,7 +45,7 @@ interface Props {
   downtime: PlainTimeWindow;
   removeKeychain(id: UUID): unknown;
   keychains: Keychain[];
-  devices: Subcomponents<typeof UserDevice>;
+  devices: Subcomponents<typeof Computer>;
   deleteUser: ConfirmableEntityAction<void>;
   startAddDevice(): unknown;
   dismissAddDevice(): unknown;
@@ -72,7 +72,7 @@ interface Props {
   requestPublicKeychainRequest: RequestState<SuccessOutput>;
 }
 
-const EditUser: React.FC<Props> = ({
+const EditChild: React.FC<Props> = ({
   isNew,
   name,
   id,
@@ -207,19 +207,19 @@ const EditUser: React.FC<Props> = ({
               {devices.length} {inflect(`computer`, devices.length)}:
             </h2>
             <div className="flex flex-col max-w-3xl -mx-2 xs:mx-0">
-              {devices.map((userDevice) => (
-                <div key={userDevice.id} className="flex items-center mt-3">
-                  <UserDevice
-                    modelTitle={userDevice.modelTitle}
-                    modelIdentifier={userDevice.modelIdentifier}
-                    id={userDevice.id}
-                    deviceId={userDevice.deviceId}
-                    name={userDevice.name}
-                    status={userDevice.status}
+              {devices.map((computer) => (
+                <div key={computer.id} className="flex items-center mt-3">
+                  <Computer
+                    modelTitle={computer.modelTitle}
+                    modelIdentifier={computer.modelIdentifier}
+                    id={computer.id}
+                    deviceId={computer.deviceId}
+                    name={computer.name}
+                    status={computer.status}
                     className="flex-grow mr-1 xs:mr-3"
                   />
                   <button
-                    onClick={() => deleteDevice.start(userDevice.id)}
+                    onClick={() => deleteDevice.start(computer.id)}
                     className="transition-colors duration-100 flex justify-center items-center w-6 xs:w-10 h-6 xs:h-10 rounded-full hover:bg-slate-200/50 cursor-pointer text-slate-500 hover:text-red-500"
                   >
                     <i className="fa fa-trash" />
@@ -480,4 +480,4 @@ const EditUser: React.FC<Props> = ({
   );
 };
 
-export default EditUser;
+export default EditChild;
