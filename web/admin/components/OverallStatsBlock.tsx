@@ -10,8 +10,13 @@ const OverallStatsBlock: React.FC<{ admins: AdminData[] }> = ({ admins }) => {
   const computerCount = admins
     .flatMap((admin) => admin.children)
     .reduce((acc, child) => acc + child.installations.length, 0);
-  const annualRevenue =
-    admins.filter((a) => a.subscriptionStatus === `paid`).length * 5 * 12;
+  const annualRevenue = admins.reduce((total, admin) => {
+    if (admin.subscriptionStatus === `paid`) {
+      return total + admin.monthlyPriceInDollars * 12;
+    } else {
+      return total;
+    }
+  }, 0);
   const payingAdmins = admins.filter((a) => a.subscriptionStatus === `paid`);
   const payingAdminCount = payingAdmins.length;
   const activelyProtectedChildrenCount = admins
