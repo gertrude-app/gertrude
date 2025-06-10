@@ -4,6 +4,6 @@
   "main": "src/index.ts",
   "license": "ISC",
   "devDependencies": {
-    "cypress": "13.6.1"
+    "cypress": "14.4.1"
   }
 }
