@@ -1,7 +1,16 @@
 packages:
-  - 'appviews'
-  - 'dash/*'
-  - 'site'
-  - 'shared/*'
-  - 'storybook'
-  - 'smoke'
+  - appviews
+  - dash/*
+  - site
+  - shared/*
+  - storybook
+  - smoke
+  - admin
+
+onlyBuiltDependencies:
+  - core-js-pure
+  - cypress
+  - esbuild
+  - nx
+  - puppeteer
+  - sharp

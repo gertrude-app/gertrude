@@ -9,6 +9,9 @@ dash:
 site:
 	@pnpm --filter site start
 
+admin:
+	@pnpm --filter admin start
+
 hmr-docs:
   @watchexec --watch site/markdoc --exts .md "just hmr-comment"
 
