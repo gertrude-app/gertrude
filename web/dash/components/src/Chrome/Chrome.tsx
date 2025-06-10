@@ -120,12 +120,13 @@ const Chrome: React.FC<Props> = ({
       />
       <main
         // simplify this when react supports `inert` properly
-        ref={(node) =>
-          node &&
-          (usingMobileView && mobileSidebarOpen
-            ? node.setAttribute(`inert`, ``)
-            : node.removeAttribute(`inert`))
-        }
+        ref={(node) => {
+          if (usingMobileView && mobileSidebarOpen) {
+            node?.setAttribute(`inert`, ``);
+          } else {
+            node?.removeAttribute(`inert`);
+          }
+        }}
       >
         <div className={`[min-height:calc(100vh-64px)] md:min-h-screen`}>
           <PaddedMain>{children}</PaddedMain>

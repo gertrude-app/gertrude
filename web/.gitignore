@@ -1,6 +1,7 @@
 .DS_Store
 *.swp
-**/.env*
+**/.env
+**/.env.local
 Session.vim*
 node_modules/
 appviews/src/main.tsx
