@@ -13,11 +13,11 @@ const OnboardingSuccessStatBlock: React.FC<{ admins: AdminData[] }> = ({ admins 
         style={{ width: `${successRate}%` }}
       >
         <span className="text-white text-2xl font-semibold text-center !leading-[1em]">
-          {successRate}% of signups successfully onboard
+          {successRate}% onboard
         </span>
       </div>
       <div className="flex-grow flex justify-center items-center bg-slate-100 text-xl font-medium text-slate-400 rounded-2xl ml-2">
-        <span>{100 - successRate}% don't</span>
+        <span>{100 - successRate}% don’t</span>
       </div>
     </div>
   );
