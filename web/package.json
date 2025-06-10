@@ -2,7 +2,7 @@
   "name": "@gertie/web-monorepo",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@9.4.0",
+  "packageManager": "pnpm@10.12.1",
   "devDependencies": {
     "@eslint/compat": "1.2.9",
     "@eslint/eslintrc": "3.3.1",
