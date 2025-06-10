@@ -3,7 +3,6 @@ import AppVersionBlock from '@/components/AppVersionBlock';
 import OnboardingSuccessStatBlock from '@/components/OnboardingSuccessStatBlock';
 import OverallStatsBlock from '@/components/OverallStatsBlock';
 import SignupGraph from '@/components/SignupGraph';
-import UseCaseBlock from '@/components/UseCaseBlock';
 import getAdminData from '@/lib/get-data';
 
 const Home: NextPage = async () => {
@@ -18,7 +17,6 @@ const Home: NextPage = async () => {
       <SignupGraph data={adminData.data} />
       <OnboardingSuccessStatBlock admins={adminData.data} />
       <div className="flex gap-8">
-        <UseCaseBlock admins={adminData.data} />
         <AppVersionBlock admins={adminData.data} type="app" key="app" />
         <AppVersionBlock admins={adminData.data} type="filter" key="filter" />
       </div>

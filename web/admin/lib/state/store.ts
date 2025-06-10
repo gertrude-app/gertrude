@@ -5,7 +5,7 @@ export interface State {
 }
 
 export const initialState: State = {
-  graphTimespan: `week`,
+  graphTimespan: `month`,
 };
 
 export type Action = {

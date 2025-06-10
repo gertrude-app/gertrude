@@ -30,6 +30,7 @@ export interface AdminData {
   abTestVariant?: string;
   email: string;
   subscriptionId?: string; // could theoretically link to stripe dashboard
+  monthlyPriceInDollars: number;
   subscriptionStatus:
     | `pendingEmailVerification`
     | `trialing`

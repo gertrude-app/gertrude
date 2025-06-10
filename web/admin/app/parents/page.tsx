@@ -12,11 +12,11 @@ const AdminsPage: NextPage = async () => {
 
   return (
     <div className="p-12 flex flex-col">
-      <h1 className="text-4xl font-semibold">Gertrude admins</h1>
+      <h1 className="text-4xl font-semibold">Gertrude Parents</h1>
       <p className="mb-4 mt-2 text-xl font-medium text-slate-600">
         <span className="font-mono font-bold text-black">{admins.data.length}</span>
         {` `}
-        admins,{` `}
+        parent accounts,{` `}
         <span className="font-mono font-bold text-black">
           {admins.data.filter(isActive).length}
         </span>

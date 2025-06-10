@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import React from 'react';
 import type { AdminData } from '@/lib/types';
 
@@ -42,7 +43,12 @@ const AppVersionBlock: React.FC<{
                 className="w-40 rounded"
               ></div>
               <div className="w-12 h-1 bg-slate-200 rounded-r-full" />
-              <span className="h-0 -translate-y-3 text-slate-400 ml-2">
+              <span
+                className={cx(
+                  `h-0 -translate-y-3 text-slate-400 ml-2`,
+                  percentage < 2.5 ? `text-[9px]` : null,
+                )}
+              >
                 <span className="font-bold text-slate-700">{version}</span>:{` `}
                 {versionDownloads}
                 {` `}({Math.round(percentage)}%)
