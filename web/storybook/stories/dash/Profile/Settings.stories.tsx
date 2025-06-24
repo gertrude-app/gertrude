@@ -27,7 +27,7 @@ export const Default: Story = props({
   setNewMethodId: () => {},
   email: `johndoe@example.com`,
   status: { case: `paid` },
-  monthlyPriceInDollars: 15,
+  monthlyPriceInDollars: 10,
   methods: withIdsAnd({ deletable: false }, [
     { method: `email` as const, value: `me@example.com`, inUse: true },
     { method: `slack` as const, value: `#Gertrude`, inUse: true },

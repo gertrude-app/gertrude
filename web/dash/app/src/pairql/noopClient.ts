@@ -28,7 +28,7 @@ const noopClient: ApiClient = {
       notifications: [],
       verifiedNotificationMethods: [],
       hasAdminChild: false,
-      monthlyPriceInDollars: 15,
+      monthlyPriceInDollars: 10,
     });
   },
   getAdminKeychain: async () => {
