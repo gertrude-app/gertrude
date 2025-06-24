@@ -24,7 +24,7 @@ export function adminSettings(override: Partial<Admin> = {}): Admin {
     notifications: [],
     verifiedNotificationMethods: [],
     hasAdminChild: false,
-    monthlyPriceInDollars: 15,
+    monthlyPriceInDollars: 10,
     ...override,
   };
 }

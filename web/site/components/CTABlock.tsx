@@ -6,7 +6,7 @@ const CTABlock: React.FC = () => (
   <section className="bg-gradient-to-b from-violet-500 to-violet-500 xl:p-8 relative">
     <div className="px-4 xs:px-8 sm:px-12 lg:px-20 py-20 xs:py-24 md:py-40 rounded-t-[40px] xs:rounded-b-[40px] bg-slate-900 flex flex-col items-center -mb-40 xs:mb-0 -translate-y-40">
       <h2 className="text-4xl md:text-5xl font-semibold text-center !leading-[1.2em] text-white">
-        $15 a month, for the whole family.
+        $10 a month, for the whole family.
       </h2>
       <h3 className="text-3xl md:text-4xl font-semibold mt-4 bg-gradient-to-r from-white to-violet-200 bg-clip-text text-transparent">
         21 day free trial.
