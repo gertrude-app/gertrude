@@ -1,3 +1,4 @@
+import Core
 import SwiftUI
 
 @main
@@ -15,7 +16,7 @@ struct ContentView: View {
       Image(systemName: "globe")
         .imageScale(.large)
         .foregroundStyle(.tint)
-      Text("Hello, world!")
+      Text(Foo().sayHello())
     }
     .padding()
     .ignoresSafeArea()

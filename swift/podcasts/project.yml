@@ -2,6 +2,7 @@ name: GertiePodcasts
 options:
   deploymentTarget:
     iOS: "18.0"
+
 targets:
   App:
     type: application
@@ -10,6 +11,8 @@ targets:
     sources:
       - path: app/sources
         group: app
+    dependencies:
+      - package: Core
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.podcasts"
       DEVELOPMENT_TEAM: "WFN83LM943"
@@ -34,4 +37,8 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         UIRequiresFullScreen: true
         UILaunchStoryboardName: LaunchScreen
+
+packages:
+  Core:
+    path: ./lib-core
 
