@@ -1,0 +1,37 @@
+name: GertiePodcasts
+options:
+  deploymentTarget:
+    iOS: "18.0"
+targets:
+  App:
+    type: application
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: app/sources
+        group: app
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.podcasts"
+      DEVELOPMENT_TEAM: "WFN83LM943"
+      CODE_SIGN_STYLE: Automatic
+      INFOPLIST_FILE: app/Info.plist
+      MARKETING_VERSION: 0.0.1
+    info:
+      path: app/Info.plist
+      properties:
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundleDisplayName: Gertrude Casts
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIRequiresFullScreen: true
+        UILaunchStoryboardName: LaunchScreen
+
