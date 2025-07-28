@@ -12,7 +12,9 @@ targets:
       - path: app/sources
         group: app
     dependencies:
-      - package: Core
+      - package: LibCore
+      - package: LibViews
+      - package: LibTCA
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.podcasts"
       DEVELOPMENT_TEAM: "WFN83LM943"
@@ -39,6 +41,9 @@ targets:
         UILaunchStoryboardName: LaunchScreen
 
 packages:
-  Core:
+  LibCore:
     path: ./lib-core
-
+  LibViews:
+    path: ./lib-views
+  LibTCA:
+    path: ./lib-tca

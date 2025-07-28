@@ -1,7 +1,6 @@
-public struct Foo {
+public struct AppReducer {
   public init() {}
-
   public func hello() -> String {
-    "Hello from Foo"
+    "Hello from LibTCA"
   }
 }

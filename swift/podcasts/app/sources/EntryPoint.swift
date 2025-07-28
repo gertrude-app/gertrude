@@ -1,4 +1,6 @@
-import Core
+import LibCore
+import LibTCA
+import LibViews
 import SwiftUI
 
 @main
@@ -16,7 +18,9 @@ struct ContentView: View {
       Image(systemName: "globe")
         .imageScale(.large)
         .foregroundStyle(.tint)
-      Text(Foo().sayHello())
+      Text(Foo().hello())
+      Text(CoolView().hello())
+      Text(AppReducer().hello())
     }
     .padding()
     .ignoresSafeArea()
