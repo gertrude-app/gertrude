@@ -6,12 +6,14 @@ interface Props<Value extends string = string> {
   options: Array<{ value: Value; display: string }>;
   selected: { value: Value; display: string };
   setSelected(selected: Value): void;
+  className?: string;
 }
 
 function Combobox<Value extends string = string>({
   options,
   selected,
   setSelected,
+  className,
 }: Props<Value>): JSX.Element {
   const [query, setQuery] = useState(``);
   const filteredOptions =
@@ -23,6 +25,7 @@ function Combobox<Value extends string = string>({
 
   return (
     <HeadlessCombobox
+      className={className}
       as="div"
       value={selected}
       onChange={(option: { value: Value }) => setSelected(option.value)}

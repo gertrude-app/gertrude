@@ -12,7 +12,8 @@ export namespace DeleteEntity_v2 {
       | `parentNotification`
       | `parentVerifiedNotificationMethod`
       | `key`
-      | `keychain`;
+      | `keychain`
+      | `blockRule`;
   }
 
   export type Output = SuccessOutput;

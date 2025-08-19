@@ -8,6 +8,7 @@
     "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
   },
   "dependencies": {
+    "@dash/block-rules": "workspace:*",
     "@dash/datetime": "workspace:*",
     "@dash/keys": "workspace:*",
     "@dash/types": "workspace:*",

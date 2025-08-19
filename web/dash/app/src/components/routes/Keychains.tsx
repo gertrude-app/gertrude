@@ -4,7 +4,10 @@ import Current from '../../environment';
 import { Key, useConfirmableDelete, useMutation, useQuery } from '../../hooks';
 
 const Keychains: React.FC = () => {
-  const adminKeychainsQuery = useQuery(Key.adminKeychains, Current.api.getAdminKeychains);
+  const parentKeychainsQuery = useQuery(
+    Key.adminKeychains,
+    Current.api.getAdminKeychains,
+  );
   const deleteKeychain = useConfirmableDelete(`keychain`, {
     invalidating: [Key.adminKeychains],
   });
@@ -14,26 +17,26 @@ const Keychains: React.FC = () => {
     {
       toast: `save:user`,
       onSuccess: () => {
-        adminKeychainsQuery.refetch();
+        parentKeychainsQuery.refetch();
       },
     },
   );
 
-  if (adminKeychainsQuery.isPending) {
+  if (parentKeychainsQuery.isPending) {
     return <Loading />;
   }
 
-  if (adminKeychainsQuery.isError) {
-    return <ApiErrorMessage error={adminKeychainsQuery.error} />;
+  if (parentKeychainsQuery.isError) {
+    return <ApiErrorMessage error={parentKeychainsQuery.error} />;
   }
 
   return (
     <ListKeychains
-      keychains={adminKeychainsQuery.data.keychains.map((keychain) => ({
+      keychains={parentKeychainsQuery.data.keychains.map((keychain) => ({
         id: keychain.summary.id,
         name: keychain.summary.name,
         assignedChildren: keychain.children,
-        allChildren: adminKeychainsQuery.data.children,
+        allChildren: parentKeychainsQuery.data.children,
         isPublic: keychain.summary.isPublic,
         mode: `keychains_screen`,
         description: keychain.summary.description || undefined,

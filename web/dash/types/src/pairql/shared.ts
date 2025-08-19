@@ -35,6 +35,17 @@ export interface BlockedApp {
   schedule?: RuleSchedule;
 }
 
+export type BlockRule =
+  | { case: `bundleIdContains`; value: string }
+  | { case: `urlContains`; value: string }
+  | { case: `hostnameContains`; value: string }
+  | { case: `hostnameEquals`; value: string }
+  | { case: `hostnameEndsWith`; value: string }
+  | { case: `targetContains`; value: string }
+  | { case: `flowTypeIs`; value: `browser` | `socket` }
+  | { case: `both`; a: BlockRule; b: BlockRule }
+  | { case: `unless`; rule: BlockRule; negatedBy: BlockRule[] };
+
 export type ChildComputerStatus =
   | { case: `filterSuspended`; resuming?: ISODateString }
   | { case: `downtime`; ending?: ISODateString }
@@ -242,3 +253,10 @@ export interface VerifiedNotificationMethod {
     | { case: `email`; email: string }
     | { case: `text`; phoneNumber: string };
 }
+
+export type WebPolicy =
+  | `allowAll`
+  | `blockAdult`
+  | `blockAdultAnd`
+  | `blockAllExcept`
+  | `blockAll`;

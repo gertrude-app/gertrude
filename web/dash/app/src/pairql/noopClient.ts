@@ -129,6 +129,21 @@ const noopClient: ApiClient = {
   handleCheckoutSuccess: async () => {
     return Result.success({ success: true });
   },
+  iOSDevices: async () => {
+    return Result.success([]);
+  },
+  getIOSDevice: async () => {
+    return Result.success({
+      childName: `Little Jimmy`,
+      deviceType: `iPhone`,
+      osVersion: `18.1.0`,
+      allBlockGroups: [],
+      enabledBlockGroups: [],
+      webPolicy: `blockAllExcept`,
+      webPolicyDomains: [],
+      customBlockRules: [],
+    });
+  },
   userActivityFeed: async () => {
     return Result.success({
       numDeleted: 0,
@@ -216,10 +231,16 @@ const noopClient: ApiClient = {
   updateUnlockRequest: async () => {
     return Result.success({ success: true });
   },
+  upsertBlockRule: async () => {
+    return Result.success(``);
+  },
   verifySignupEmail: async () => {
     return Result.success({ token: ``, adminId: `` });
   },
   requestPublicKeychain: async () => {
+    return Result.success({ success: true });
+  },
+  updateIOSDevice: async () => {
     return Result.success({ success: true });
   },
 };

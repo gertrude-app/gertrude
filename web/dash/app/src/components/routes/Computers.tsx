@@ -4,7 +4,7 @@ import Current from '../../environment';
 import { Key, useQuery } from '../../hooks';
 
 const Computers: React.FC = () => {
-  const query = useQuery(Key.devices, Current.api.getDevices);
+  const query = useQuery(Key.computers, Current.api.getDevices);
 
   if (query.isPending) {
     return <Loading />;

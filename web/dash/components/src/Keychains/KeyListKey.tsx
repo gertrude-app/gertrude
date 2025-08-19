@@ -4,6 +4,7 @@ import { Button } from '@shared/components';
 import cx from 'classnames';
 import React from 'react';
 import type { Key as KeyType } from '@dash/types';
+import { TrashBtn } from '../Forms';
 
 interface Props {
   record: KeyType;
@@ -87,15 +88,7 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
               <i className="fa-solid fa-message" />
             </div>
           )}
-          <button
-            onClick={(event) => {
-              event.stopPropagation();
-              onDelete();
-            }}
-            className="text-slate-400 flex justify-center items-center rounded-full w-8 h-8 bg-transparent hover:bg-red-50 hover:text-red-500 shrink-0 ml-1"
-          >
-            <i className="fa-solid fa-trash" />
-          </button>
+          <TrashBtn onClick={onDelete} />
         </div>
       </div>
     );

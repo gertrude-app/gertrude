@@ -56,7 +56,7 @@ export function useFireAndForget<T>(
   // works, and the query key generated from the function string just
   // ensures that each fire and forget is cached uniquely, so we don't
   // have to pass in some sort of key/id at the call site. all of the
-  // retry/cache stuff are set so these will run once, and neve refetch.
+  // retry/cache stuff are set so these will run once, and never refetch.
   // struggled with naming, perhaps `useDeclarativeMutation` is better?
   return useQueryResult([`fire-and-forget`, fn.toString()], fn, {
     ...options,

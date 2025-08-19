@@ -8,6 +8,7 @@ import type {
   GetAdminKeychains,
   GetDevice,
   GetDevices,
+  GetIOSDevice,
   GetIdentifiedApps,
   GetSelectableKeychains,
   GetSuspendFilterRequest,
@@ -16,6 +17,7 @@ import type {
   GetUser,
   GetUserUnlockRequests,
   GetUsers,
+  IOSDevices,
   LatestAppVersions,
   SecurityEventsFeed,
   UserActivityFeed,
@@ -49,16 +51,24 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`users/:id`, [`users`, id], id);
   }
 
-  static get devices(): QueryKey<GetDevices.Output> {
-    return new QueryKey(`computers`, [`computers`]);
-  }
-
   static get latestAppVersions(): QueryKey<LatestAppVersions.Output> {
     return new QueryKey(`latest-app-versions`, [`latest-app-versions`]);
   }
 
-  static device(id: UUID): QueryKey<GetDevice.Output> {
+  static get computers(): QueryKey<GetDevices.Output> {
+    return new QueryKey(`computers`, [`computers`]);
+  }
+
+  static computer(id: UUID): QueryKey<GetDevice.Output> {
     return new QueryKey(`computers/:id`, [`computers`, id], id);
+  }
+
+  static get iOSDevices(): QueryKey<IOSDevices.Output> {
+    return new QueryKey(`ios-devices`, [`ios-devices`]);
+  }
+
+  static iOSDevice(id: UUID): QueryKey<GetIOSDevice.Output> {
+    return new QueryKey(`ios-devices/:id`, [`ios-devices`, id], id);
   }
 
   static childActivitySummaries(id: UUID): QueryKey<ChildActivitySummaries.Output> {

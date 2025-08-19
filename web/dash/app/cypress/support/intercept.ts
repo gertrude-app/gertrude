@@ -60,6 +60,7 @@ export function interceptPql(
   slug: `GetIdentifiedApps`,
   output: T.GetIdentifiedApps.Output,
 ): void;
+export function interceptPql(slug: `GetIOSDevice`, output: T.GetIOSDevice.Output): void;
 export function interceptPql(
   slug: `GetSelectableKeychains`,
   output: T.GetSelectableKeychains.Output,
@@ -90,6 +91,7 @@ export function interceptPql(
   slug: `HandleCheckoutSuccess`,
   output: T.HandleCheckoutSuccess.Output,
 ): void;
+export function interceptPql(slug: `IOSDevices`, output: T.IOSDevices.Output): void;
 export function interceptPql(
   slug: `LatestAppVersions`,
   output: T.LatestAppVersions.Output,
@@ -136,8 +138,16 @@ export function interceptPql(
   output: T.ToggleChildKeychain.Output,
 ): void;
 export function interceptPql(
+  slug: `UpdateIOSDevice`,
+  output: T.UpdateIOSDevice.Output,
+): void;
+export function interceptPql(
   slug: `UpdateUnlockRequest`,
   output: T.UpdateUnlockRequest.Output,
+): void;
+export function interceptPql(
+  slug: `UpsertBlockRule`,
+  output: T.UpsertBlockRule.Output,
 ): void;
 export function interceptPql(
   slug: `UserActivityFeed`,
@@ -173,6 +183,7 @@ export function forcePqlErr(
     | `GetDevice`
     | `GetDevices`
     | `GetIdentifiedApps`
+    | `GetIOSDevice`
     | `GetSelectableKeychains`
     | `GetSuspendFilterRequest`
     | `GetUnlockRequest`
@@ -182,6 +193,7 @@ export function forcePqlErr(
     | `GetUserUnlockRequests`
     | `HandleCheckoutCancel`
     | `HandleCheckoutSuccess`
+    | `IOSDevices`
     | `LatestAppVersions`
     | `LogEvent`
     | `Login`
@@ -200,7 +212,9 @@ export function forcePqlErr(
     | `Signup`
     | `StripeUrl`
     | `ToggleChildKeychain`
+    | `UpdateIOSDevice`
     | `UpdateUnlockRequest`
+    | `UpsertBlockRule`
     | `UserActivityFeed`
     | `VerifySignupEmail`,
   details: Record<string, any> = {},

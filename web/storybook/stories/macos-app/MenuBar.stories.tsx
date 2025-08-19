@@ -6,9 +6,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 export default {
   title: 'MacOS App/MenuBar', // eslint-disable-line
   component: MenuBar,
-  parameters: {
-    layout: `centered`,
-  },
+  parameters: { layout: `centered` },
 } satisfies Meta<typeof MenuBar>;
 
 type MenuBarWrapperProps = {

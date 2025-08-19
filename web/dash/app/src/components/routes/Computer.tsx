@@ -8,7 +8,7 @@ import { Key, useMutation, useQuery, useZip } from '../../hooks';
 const Computer: React.FC = () => {
   const { computerId: id = `` } = useParams<{ computerId: string }>();
 
-  const getComputer = useQuery(Key.device(id), () => Current.api.getDevice(id), {
+  const getComputer = useQuery(Key.computer(id), () => Current.api.getDevice(id), {
     onReceive: (data) => {
       setName(data.name || ``);
       setReleaseChannel(data.releaseChannel);
@@ -25,7 +25,7 @@ const Computer: React.FC = () => {
         releaseChannel: releaseChannel,
       }),
     {
-      invalidating: [Key.device(id)],
+      invalidating: [Key.computer(id)],
       toast: `save:computer`,
     },
   );

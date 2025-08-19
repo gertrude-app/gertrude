@@ -456,7 +456,7 @@ const EditChild: React.FC<Props> = ({
         )}
         <div
           className={cx(
-            `flex mt-8 justify-end border-slate-200 *pt-8 space-x-5`,
+            `flex mt-8 justify-end border-slate-200 space-x-5`,
             devices.length > 0 && `pt-8 border-t-2`,
           )}
         >

@@ -1,10 +1,10 @@
 import { EditKey } from '@dash/keys';
 import { capitalize } from '@shared/string';
 import React from 'react';
+import { BlockOption } from '../Forms';
 import GradientIcon from '../GradientIcon';
 import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';
-import KeyTypeOption from './KeyTypeOption';
 
 interface Props {
   mode: `create` | `edit`;
@@ -35,7 +35,7 @@ const KeyTypeStep: React.FC<Props> = ({ mode, keyType, activeStep, update }) => 
     update={update}
   >
     <div className="flex flex-col sm:flex-row -mt-4">
-      <KeyTypeOption
+      <BlockOption
         icon="globe"
         selected={keyType === `website`}
         onClick={() => update({ type: `setKeyType`, to: `website` })}
@@ -43,7 +43,7 @@ const KeyTypeStep: React.FC<Props> = ({ mode, keyType, activeStep, update }) => 
         description="Grant access to a specific website"
         className="sm:w-1/2 sm:mr-2 mb-3 sm:mb-0"
       />
-      <KeyTypeOption
+      <BlockOption
         icon="hamburger"
         selected={keyType === `app`}
         onClick={() => update({ type: `setKeyType`, to: `app` })}

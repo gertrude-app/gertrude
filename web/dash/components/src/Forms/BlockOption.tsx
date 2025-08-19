@@ -12,7 +12,7 @@ type Props = {
   description: string;
 };
 
-const KeyTypeOption: React.FC<Props> = ({
+const BlockOption: React.FC<Props> = ({
   className,
   icon,
   selected,
@@ -39,4 +39,4 @@ const KeyTypeOption: React.FC<Props> = ({
   </button>
 );
 
-export default KeyTypeOption;
+export default BlockOption;

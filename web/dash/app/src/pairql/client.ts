@@ -152,6 +152,14 @@ export const liveClient = {
     );
   },
 
+  getIOSDevice(input: T.GetIOSDevice.Input): Promise<T.Result<T.GetIOSDevice.Output>> {
+    return query<T.GetIOSDevice.Input, T.GetIOSDevice.Output>(
+      input,
+      `parent`,
+      `GetIOSDevice`,
+    );
+  },
+
   getSelectableKeychains(
     input: T.GetSelectableKeychains.Input,
   ): Promise<T.Result<T.GetSelectableKeychains.Output>> {
@@ -228,6 +236,10 @@ export const liveClient = {
       `parent`,
       `HandleCheckoutSuccess`,
     );
+  },
+
+  iOSDevices(input: T.IOSDevices.Input): Promise<T.Result<T.IOSDevices.Output>> {
+    return query<T.IOSDevices.Input, T.IOSDevices.Output>(input, `parent`, `IOSDevices`);
   },
 
   latestAppVersions(
@@ -364,6 +376,16 @@ export const liveClient = {
     );
   },
 
+  updateIOSDevice(
+    input: T.UpdateIOSDevice.Input,
+  ): Promise<T.Result<T.UpdateIOSDevice.Output>> {
+    return query<T.UpdateIOSDevice.Input, T.UpdateIOSDevice.Output>(
+      input,
+      `parent`,
+      `UpdateIOSDevice`,
+    );
+  },
+
   updateUnlockRequest(
     input: T.UpdateUnlockRequest.Input,
   ): Promise<T.Result<T.UpdateUnlockRequest.Output>> {
@@ -371,6 +393,16 @@ export const liveClient = {
       input,
       `parent`,
       `UpdateUnlockRequest`,
+    );
+  },
+
+  upsertBlockRule(
+    input: T.UpsertBlockRule.Input,
+  ): Promise<T.Result<T.UpsertBlockRule.Output>> {
+    return query<T.UpsertBlockRule.Input, T.UpsertBlockRule.Output>(
+      input,
+      `parent`,
+      `UpsertBlockRule`,
     );
   },
 
@@ -449,6 +481,9 @@ export const throwingClient: ApiClient = {
   getIdentifiedApps: () => {
     throw new Error(`ApiClient.getIdentifiedApps() not implemented`);
   },
+  getIOSDevice: () => {
+    throw new Error(`ApiClient.getIOSDevice() not implemented`);
+  },
   getSelectableKeychains: () => {
     throw new Error(`ApiClient.getSelectableKeychains() not implemented`);
   },
@@ -475,6 +510,9 @@ export const throwingClient: ApiClient = {
   },
   handleCheckoutSuccess: () => {
     throw new Error(`ApiClient.handleCheckoutSuccess() not implemented`);
+  },
+  iOSDevices: () => {
+    throw new Error(`ApiClient.iOSDevices() not implemented`);
   },
   latestAppVersions: () => {
     throw new Error(`ApiClient.latestAppVersions() not implemented`);
@@ -530,8 +568,14 @@ export const throwingClient: ApiClient = {
   toggleChildKeychain: () => {
     throw new Error(`ApiClient.toggleChildKeychain() not implemented`);
   },
+  updateIOSDevice: () => {
+    throw new Error(`ApiClient.updateIOSDevice() not implemented`);
+  },
   updateUnlockRequest: () => {
     throw new Error(`ApiClient.updateUnlockRequest() not implemented`);
+  },
+  upsertBlockRule: () => {
+    throw new Error(`ApiClient.upsertBlockRule() not implemented`);
   },
   userActivityFeed: () => {
     throw new Error(`ApiClient.userActivityFeed() not implemented`);
