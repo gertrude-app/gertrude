@@ -5,13 +5,17 @@ import Security
 
 @DependencyClient
 struct PasscodeClient: Sendable {
-  public var load: @Sendable () -> Int?
-  public var save: @Sendable (Int) -> Void
+  var load: @Sendable () -> Int?
+  var save: @Sendable (Int) -> Void
 }
 
 extension PasscodeClient {
-  public func verify(_ input: Int) -> Bool {
+  func verify(_ input: Int) -> Bool {
     self.load() == input
+  }
+
+  func saved() -> Bool {
+    self.load() != nil
   }
 }
 

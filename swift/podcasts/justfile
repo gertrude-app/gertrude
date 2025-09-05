@@ -22,12 +22,15 @@ dev:
 build-views:
   @cd lib-views && swift build
 
-format:
+format: clean
   @swiftformat .
 
 build:
   xcodebuild -workspace GertiePodcasts.xcodeproj/project.xcworkspace \
     -scheme App -configuration Debug build 
+
+clean:
+  find lib-tca lib-core lib-views -type f \( -name '*.o' -o -name '*.d' -o -name '*.swiftdeps' -o -name '*.swiftdeps~' \) -delete
 
 # previews
 

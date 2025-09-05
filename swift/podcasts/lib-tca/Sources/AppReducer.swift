@@ -1,38 +1,38 @@
 import ComposableArchitecture
 
 @Reducer
-public struct AppReducer {
+struct AppReducer {
   @ObservableState
-  public struct State: Equatable {
-    public var screen: Screen = .launching
-    public init() {}
+  struct State: Equatable {
+    @Presents var mode: Mode.State?
   }
 
-  public enum Action: Equatable {
+  @Reducer(state: .equatable, action: .equatable)
+  enum Mode {
+    case podcasts(PodcastsFeature)
+    case onboarding(OnboardingFeature)
+  }
+
+  enum Action: Equatable {
     case appDidLaunch
+    case mode(PresentationAction<Mode.Action>)
   }
 
-  public var body: some Reducer<State, Action> {
+  @Dependency(\.passcode) var passcode
+
+  var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
       case .appDidLaunch:
-        // print(saveToken("foobar", for: "gertie"))
-        // print(loadToken(for: "gertie") ?? "no token")
-        .none
+        state.mode = self.passcode.saved() ? .podcasts(.init()) : .onboarding(.init())
+        return .none
+      case .mode(.presented(.onboarding(.lastBtnTapped))):
+        state.mode = .podcasts(.init())
+        return .none
+      case .mode:
+        return .none
       }
     }
+    .ifLet(\.$mode, action: \.mode)
   }
-
-  public init() {}
-}
-
-public enum Screen: Equatable {
-  case launching
-  case onboarding
-}
-
-public enum OnboardingScreen: Equatable {
-  case hiThere
-  case areYouTheParent
-  case explainSetPin
 }

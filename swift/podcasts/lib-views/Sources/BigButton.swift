@@ -88,12 +88,12 @@ struct BigButton: View {
     case primary
     case secondary
   }
+}
 
-  enum ButtonType {
-    case button(@Sendable () -> Void)
-    case link(URL)
-    case share(String)
-  }
+public enum ButtonType: Sendable {
+  case button(@Sendable () -> Void)
+  case link(URL)
+  case share(String)
 }
 
 #Preview(".button") {

@@ -8,6 +8,7 @@ let package = Package(
   dependencies: [
     .package(path: "../lib-core"),
     .package(path: "../lib-views"),
+    .package(url: "https://github.com/pointfreeco/sharing-grdb", exact: "0.5.1"),
     .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.0.0"),
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.0.0"),
   ],
@@ -15,6 +16,7 @@ let package = Package(
     .target(
       name: "LibTCA",
       dependencies: [
+        .product(name: "SharingGRDB", package: "sharing-grdb"),
         .product(name: "LibCore", package: "lib-core"),
         .product(name: "LibViews", package: "lib-views"),
         .product(name: "Dependencies", package: "swift-dependencies"),

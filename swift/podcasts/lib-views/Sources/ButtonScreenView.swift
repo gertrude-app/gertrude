@@ -1,17 +1,17 @@
 import SwiftUI
 
-struct ButtonScreenView: View {
+public struct ButtonScreenView: View {
   @Environment(\.colorScheme) var cs
 
-  struct Config {
+  public struct Config: Sendable {
     var text: String
-    var type: BigButton.ButtonType
+    var type: ButtonType
     var animate: Bool
     var asyncAction: Bool
 
-    init(
+    public init(
       text: String,
-      type: BigButton.ButtonType,
+      type: ButtonType,
       animate: Bool = true,
       asyncAction: Bool = false
     ) {
@@ -21,7 +21,7 @@ struct ButtonScreenView: View {
       self.asyncAction = asyncAction
     }
 
-    init(
+    public init(
       _ text: String,
       animate: Bool = true,
       asyncAction: Bool = false,
@@ -60,7 +60,7 @@ struct ButtonScreenView: View {
     }
   }
 
-  init(
+  public init(
     text: String,
     primary: Config? = nil,
     secondary: Config? = nil,
@@ -80,7 +80,7 @@ struct ButtonScreenView: View {
     self.primaryLooksLikeSecondary = primaryLooksLikeSecondary
   }
 
-  var body: some View {
+  public var body: some View {
     ZStack {
       Rectangle()
         .fill(
@@ -224,12 +224,11 @@ struct ButtonScreenView: View {
   }
 
   func withOrWithoutVanishingAnimations(
-    type: BigButton.ButtonType,
+    type: ButtonType,
     animate: Bool,
     asyncAction: Bool,
     isLoading: Binding<Bool>
-  )
-    -> BigButton.ButtonType {
+  ) -> ButtonType {
     switch type {
     case .link(let url):
       .link(url)
@@ -288,7 +287,7 @@ struct ButtonScreenView: View {
     }
   }
 
-  enum ScreenType {
+  public enum ScreenType {
     case info
     case question
     case error

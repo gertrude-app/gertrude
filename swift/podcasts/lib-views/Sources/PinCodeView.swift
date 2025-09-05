@@ -1,11 +1,21 @@
 import SwiftUI
 
-struct PinCodeView: View {
+public struct PinCodeView: View {
   @Environment(\.colorScheme) var cs
 
   let mode: Mode
-  let onComplete: @Sendable (String) -> Void
+  let onComplete: @Sendable (Int) -> Void
   let onCancel: (() -> Void)?
+
+  public init(
+    mode: Mode,
+    onComplete: @escaping @Sendable (Int) -> Void,
+    onCancel: (() -> Void)? = nil
+  ) {
+    self.mode = mode
+    self.onComplete = onComplete
+    self.onCancel = onCancel
+  }
 
   @State private var pin = ""
   @State private var confirmPin = ""
@@ -13,24 +23,22 @@ struct PinCodeView: View {
   @State private var errorMessage: String?
   @State private var isShaking = false
 
-  var body: some View {
+  public var body: some View {
     VStack(spacing: 30) {
       VStack(spacing: 8) {
         Text(self.titleText)
           .font(.system(size: 28, weight: .bold))
           .multilineTextAlignment(.center)
 
-        if let subtitle = self.subtitleText {
+        if let errorMessage = self.errorMessage {
+          Text(errorMessage)
+            .font(.system(size: 16, weight: .medium))
+            .foregroundStyle(.red)
+            .multilineTextAlignment(.center)
+        } else if let subtitle = self.subtitleText {
           Text(subtitle)
             .font(.system(size: 16, weight: .medium))
             .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-        }
-
-        if let errorMessage = self.errorMessage {
-          Text(errorMessage)
-            .font(.system(size: 14, weight: .medium))
-            .foregroundStyle(.red)
             .multilineTextAlignment(.center)
         }
       }
@@ -101,6 +109,11 @@ struct PinCodeView: View {
     .onChange(of: self.pin) { _, newPin in
       if newPin.count == 6 {
         self.handlePinComplete(newPin)
+      }
+    }
+    .onChange(of: self.confirmPin) { _, newConfirmPin in
+      if newConfirmPin.count == 6 {
+        self.handlePinComplete(newConfirmPin)
       }
     }
   }
@@ -174,7 +187,7 @@ struct PinCodeView: View {
     case .set:
       if self.showingConfirmation {
         if completedPin == self.pin {
-          self.onComplete(completedPin)
+          self.onComplete(Int(completedPin)!)
         } else {
           self.showPinMismatchError()
         }
@@ -183,7 +196,7 @@ struct PinCodeView: View {
         self.confirmPin = ""
       }
     case .verify:
-      self.onComplete(completedPin)
+      self.onComplete(Int(completedPin)!)
     }
   }
 
@@ -202,7 +215,7 @@ struct PinCodeView: View {
     }
   }
 
-  enum Mode {
+  public enum Mode {
     case set
     case verify
   }

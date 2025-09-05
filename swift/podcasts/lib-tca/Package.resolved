@@ -1,5 +1,5 @@
 {
-  "originHash" : "4324a6aab078a7f443789441e68619cabbea5a24630bcebf805d8038c5af1b73",
+  "originHash" : "688cf48c4a9c1b7cc75fe45ad3e8655d2aefe9277a864dd48402d55bf70d3e2a",
   "pins" : [
     {
       "identity" : "combine-schedulers",
@@ -8,6 +8,24 @@
       "state" : {
         "revision" : "5928286acce13def418ec36d05a001a9641086f2",
         "version" : "1.0.3"
+      }
+    },
+    {
+      "identity" : "grdb.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/groue/GRDB.swift",
+      "state" : {
+        "revision" : "8ba1bc9a96afc731a000fd4136dd13a5a46297bd",
+        "version" : "7.6.1"
+      }
+    },
+    {
+      "identity" : "sharing-grdb",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/sharing-grdb",
+      "state" : {
+        "revision" : "f7f388be7a4b1f277b308c1090f90233e632e88e",
+        "version" : "0.5.1"
       }
     },
     {
@@ -107,6 +125,24 @@
       "state" : {
         "revision" : "75e846ee3159dc75b3a29bfc24b6ce5a557ddca9",
         "version" : "2.5.2"
+      }
+    },
+    {
+      "identity" : "swift-snapshot-testing",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-snapshot-testing",
+      "state" : {
+        "revision" : "d7e40607dcd6bc26543f5d9433103f06e0b28f8f",
+        "version" : "1.18.6"
+      }
+    },
+    {
+      "identity" : "swift-structured-queries",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-structured-queries",
+      "state" : {
+        "revision" : "1115d2b5d3f1e8e368a69fe4da5fa442836517a4",
+        "version" : "0.17.1"
       }
     },
     {
