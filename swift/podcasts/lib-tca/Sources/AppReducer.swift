@@ -12,6 +12,17 @@ public struct AppReducer {
     case appDidLaunch
   }
 
+  public var body: some Reducer<State, Action> {
+    Reduce { state, action in
+      switch action {
+      case .appDidLaunch:
+        // print(saveToken("foobar", for: "gertie"))
+        // print(loadToken(for: "gertie") ?? "no token")
+        .none
+      }
+    }
+  }
+
   public init() {}
 }
 
