@@ -19,10 +19,15 @@ dev:
   "just --justfile {{justfile()}} watch-build lib-tca" \
   "just --justfile {{justfile()}} sync-previews"
 
+build-views:
+  @cd lib-views && swift build
+
+format:
+  @swiftformat .
+
 # previews
 
 gen-previews:
-  @rm -rf previews
   @mkdir -p previews/sources
   @rsync -rc lib-views/Sources/ previews/sources
   @xcodegen -s previews.yml --project previews
