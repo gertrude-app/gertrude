@@ -7,7 +7,7 @@ public struct CoolView: View {
 
   public var body: some View {
     VStack {
-      Text("Cool View")
+      Text("Super Cool View")
         .font(.largeTitle)
         .padding()
 
@@ -36,4 +36,8 @@ public struct CoolView: View {
   public func hello() -> String {
     "Hello from CoolView"
   }
+}
+
+#Preview {
+  CoolView()
 }

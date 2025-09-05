@@ -7,6 +7,29 @@ gen:
 xcode:
   @open GertiePodcasts.xcodeproj
 
+previews:
+  @open previews/GertiePodcastsPreviews.xcodeproj
+
+dev:
+  pnpm concurrently --raw \
+  -n lv,lc,lt,sp \
+  -c cyan.dim,magenta.dim,green.dim,yellow.dim \
+  "just --justfile {{justfile()}} watch-build lib-views" \
+  "just --justfile {{justfile()}} watch-build lib-core" \
+  "just --justfile {{justfile()}} watch-build lib-tca" \
+  "just --justfile {{justfile()}} sync-previews"
+
+# previews
+
+gen-previews:
+  @rm -rf previews
+  @mkdir -p previews/sources
+  @rsync -rc lib-views/Sources/ previews/sources
+  @xcodegen -s previews.yml --project previews
+
+sync-previews:
+  just watch-swift lib-views/Sources '"rsync -rc lib-views/Sources/ previews/sources"'
+
 # utility
 
 [private]

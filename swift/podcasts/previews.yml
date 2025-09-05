@@ -1,0 +1,19 @@
+name: GertiePodcastsPreviews
+targets:
+  App:
+    type: application
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: previews/sources
+    settings:
+      GENERATE_INFOPLIST_FILE: YES
+      PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.podcasts.previews"
+      DEVELOPMENT_TEAM: "WFN83LM943"
+      CODE_SIGN_STYLE: Automatic
+schemes:
+  App:
+    build:
+      targets:
+        App: all
+
