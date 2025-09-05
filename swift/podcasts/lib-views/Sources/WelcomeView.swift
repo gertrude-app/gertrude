@@ -1,8 +1,7 @@
 import SwiftUI
 
-struct WelcomeView: View {
+public struct WelcomeView: View {
   let onPrimaryBtnTap: () -> Void
-
   let greeting = "Hi there!"
 
   @State private var showButton = false
@@ -13,7 +12,11 @@ struct WelcomeView: View {
 
   @Environment(\.colorScheme) var cs
 
-  var body: some View {
+  public init(onPrimaryBtnTap: @escaping () -> Void) {
+    self.onPrimaryBtnTap = onPrimaryBtnTap
+  }
+
+  public var body: some View {
     ZStack {
       Background()
         .opacity(self.showBg ? 1 : 0)
@@ -49,7 +52,7 @@ struct WelcomeView: View {
           }
         }
 
-        Text("Gertrude blocks unwanted stuff, like GIFs, from your device.")
+        Text("Gertrude Podcasts lets parents give access to only selected, approved podcasts.")
           .font(.system(size: 16, weight: .medium))
           .multilineTextAlignment(self.deviceType() == .pad ? .center : .leading)
           .swooshIn(

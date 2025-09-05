@@ -1,32 +1,24 @@
-import LibCore
+import ComposableArchitecture
 import LibTCA
-import LibViews
 import SwiftUI
 
 @main
-struct EntryPoint: App {
+struct IOSAppEntry: App {
+  let store: StoreOf<AppReducer>
+
+  init() {
+    self.store = Store(
+      initialState: AppReducer.State(),
+      reducer: { AppReducer()._printChanges() }
+    )
+  }
+
   var body: some Scene {
     WindowGroup {
-      ContentView()
+      AppView(store: self.store)
+        .onAppear {
+          self.store.send(.appDidLaunch)
+        }
     }
   }
-}
-
-struct ContentView: View {
-  var body: some View {
-    VStack {
-      Image(systemName: "globe")
-        .imageScale(.large)
-        .foregroundStyle(.tint)
-      Text(Foo().hello())
-      Text(CoolView().hello())
-      Text(AppReducer().hello())
-    }
-    .padding()
-    .ignoresSafeArea()
-  }
-}
-
-#Preview {
-  ContentView()
 }

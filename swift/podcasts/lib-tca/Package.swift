@@ -7,6 +7,7 @@ let package = Package(
   products: [.library(name: "LibTCA", targets: ["LibTCA"])],
   dependencies: [
     .package(path: "../lib-core"),
+    .package(path: "../lib-views"),
     .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.0.0"),
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.0.0"),
   ],
@@ -15,6 +16,7 @@ let package = Package(
       name: "LibTCA",
       dependencies: [
         .product(name: "LibCore", package: "lib-core"),
+        .product(name: "LibViews", package: "lib-views"),
         .product(name: "Dependencies", package: "swift-dependencies"),
         .product(name: "DependenciesMacros", package: "swift-dependencies"),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),

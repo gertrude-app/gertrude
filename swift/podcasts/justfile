@@ -17,7 +17,7 @@ dev:
   "just --justfile {{justfile()}} watch-build lib-views" \
   "just --justfile {{justfile()}} watch-build lib-core" \
   "just --justfile {{justfile()}} watch-build lib-tca" \
-  "just --justfile {{justfile()}} sync-previews"
+  "just --justfile {{justfile()}} watch-sync-previews"
 
 build-views:
   @cd lib-views && swift build
@@ -25,14 +25,21 @@ build-views:
 format:
   @swiftformat .
 
+build:
+  xcodebuild -workspace GertiePodcasts.xcodeproj/project.xcworkspace \
+    -scheme App -configuration Debug build 
+
 # previews
 
 gen-previews:
   @mkdir -p previews/sources
-  @rsync -rc lib-views/Sources/ previews/sources
+  @just sync-previews
   @xcodegen -s previews.yml --project previews
 
 sync-previews:
+  @rsync -rc lib-views/Sources/ previews/sources
+
+watch-sync-previews:
   just watch-swift lib-views/Sources '"rsync -rc lib-views/Sources/ previews/sources"'
 
 # utility
