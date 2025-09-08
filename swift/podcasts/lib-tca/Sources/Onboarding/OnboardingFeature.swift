@@ -44,10 +44,11 @@ struct OnboardingFeature {
         state.showingPinSheet = false
         return .none
       case (_, .pinSet(let pin)):
-        self.passcode.save(pin)
         state.screen = .pinSet
         state.showingPinSheet = false
-        return .none
+        return .run { _ in
+          await self.passcode.save(pin)
+        }
       case (.pinSet, .lastBtnTapped):
         return .none // handled by root reducer
       default:

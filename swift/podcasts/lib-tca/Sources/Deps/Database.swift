@@ -26,7 +26,23 @@ public func appDatabase() throws -> any DatabaseWriter {
   }
 
   var migrator = DatabaseMigrator()
-  migrator.registerMigration("createPodcast") { db in
+  #if DEBUG
+    migrator.eraseDatabaseOnSchemaChange = true
+  #endif
+  migrator.registerMigration("pre-release") { db in
+    try #sql(
+      """
+       CREATE TABLE shows (
+         id INTEGER PRIMARY KEY NOT NULL,
+         name TEXT NOT NULL,
+         feedURL TEXT NOT NULL,
+         artworkURL TEXT,
+         showEpisodeArtwork INTEGER NOT NULL DEFAULT 0
+           CHECK (showEpisodeArtwork IN (0, 1)),
+         createdAt TEXT NOT NULL
+       ) STRICT;
+      """
+    ).execute(db)
     try #sql(
       """
       CREATE TABLE events (

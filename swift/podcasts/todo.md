@@ -1,0 +1,2 @@
+- [ ] migration for show table
+- [ ] query for shows

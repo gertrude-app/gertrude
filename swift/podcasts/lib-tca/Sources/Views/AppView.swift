@@ -13,16 +13,16 @@ struct AppView: View {
             state: \.mode?.onboarding,
             action: \.mode.onboarding
           )
-        ) { onboardingStore in
-          OnboardingView(store: onboardingStore)
+        ) { store in
+          OnboardingView(store: store)
         }
         .navigationDestination(
           item: self.$store.scope(
             state: \.mode?.podcasts,
             action: \.mode.podcasts
           )
-        ) { _ in
-          Text("Podcasts")
+        ) { store in
+          PodcastsView(store: store)
         }
     }
   }
