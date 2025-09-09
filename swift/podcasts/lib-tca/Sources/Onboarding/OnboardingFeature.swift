@@ -6,18 +6,16 @@ struct OnboardingFeature {
   @ObservableState
   struct State: Equatable {
     var screen: OnboardingScreen = .hiThere
-    var showingPinSheet: Bool = false
+    var showingPasscodeSheet: Bool = false
   }
 
   enum Action: Equatable {
     case primaryBtnTapped
     case secondaryBtnTapped
-    case lastBtnTapped
-    case setShowingPinSheet(Bool)
-    case pinSet(Int)
+    case finished(Int)
+    case setShowingPasscodeSheet(Bool)
+    case passcodeSet(Int)
   }
-
-  @Dependency(\.passcode) var passcode
 
   var body: some Reducer<State, Action> {
     Reduce { state, action in
@@ -26,7 +24,7 @@ struct OnboardingFeature {
         state.screen = .areYouTheParent
         return .none
       case (.areYouTheParent, .primaryBtnTapped):
-        state.screen = .explainSetPin
+        state.screen = .explainSetPasscode
         return .none
       case (.areYouTheParent, .secondaryBtnTapped):
         state.screen = .parentRequired
@@ -34,22 +32,20 @@ struct OnboardingFeature {
       case (.parentRequired, .primaryBtnTapped):
         state.screen = .hiThere
         return .none
-      case (.explainSetPin, .primaryBtnTapped):
-        state.screen = .strongPin
+      case (.explainSetPasscode, .primaryBtnTapped):
+        state.screen = .strongPasscode
         return .none
-      case (.strongPin, .primaryBtnTapped):
-        state.showingPinSheet = true
+      case (.strongPasscode, .primaryBtnTapped):
+        state.showingPasscodeSheet = true
         return .none
-      case (_, .setShowingPinSheet(false)):
-        state.showingPinSheet = false
+      case (_, .setShowingPasscodeSheet(false)):
+        state.showingPasscodeSheet = false
         return .none
-      case (_, .pinSet(let pin)):
-        state.screen = .pinSet
-        state.showingPinSheet = false
-        return .run { _ in
-          await self.passcode.save(pin)
-        }
-      case (.pinSet, .lastBtnTapped):
+      case (_, .passcodeSet(let passcode)):
+        state.screen = .passcodeSet(passcode)
+        state.showingPasscodeSheet = false
+        return .none
+      case (.passcodeSet, .finished):
         return .none // handled by root reducer
       default:
         #if DEBUG
@@ -66,7 +62,7 @@ enum OnboardingScreen: Equatable {
   case hiThere
   case areYouTheParent
   case parentRequired
-  case explainSetPin
-  case strongPin
-  case pinSet
+  case explainSetPasscode
+  case strongPasscode
+  case passcodeSet(Int)
 }

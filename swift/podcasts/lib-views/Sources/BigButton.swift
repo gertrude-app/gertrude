@@ -91,7 +91,7 @@ struct BigButton: View {
 }
 
 public enum ButtonType: Sendable {
-  case button(@Sendable () -> Void)
+  case button(@MainActor @Sendable () -> Void)
   case link(URL)
   case share(String)
 }

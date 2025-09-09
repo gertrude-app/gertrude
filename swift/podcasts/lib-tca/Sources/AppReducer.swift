@@ -14,9 +14,7 @@ struct AppReducer {
   }
 
   enum Action: Equatable {
-    case appDidLaunch
     case mode(PresentationAction<Mode.Action>)
-    case setMode(Mode.State)
   }
 
   @Dependency(\.passcode) var passcode
@@ -24,20 +22,11 @@ struct AppReducer {
   var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
-      case .appDidLaunch:
-        return .run { send in
-          if await self.passcode.saved() {
-            await send(.setMode(.podcasts(.init())))
-          } else {
-            await send(.setMode(.onboarding(.init())))
-          }
+      case .mode(.presented(.onboarding(.finished(let passcode)))):
+        state.mode = .podcasts(.init(passcode: passcode))
+        return .run { _ in
+          self.passcode.save(passcode)
         }
-      case .setMode(let mode):
-        state.mode = mode
-        return .none
-      case .mode(.presented(.onboarding(.lastBtnTapped))):
-        state.mode = .podcasts(.init())
-        return .none
       case .mode:
         return .none
       }

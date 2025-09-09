@@ -49,7 +49,16 @@ public func appDatabase() throws -> any DatabaseWriter {
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         detail TEXT,
-        created_at TEXT NOT NULL
+        createdAt TEXT NOT NULL
+      ) STRICT;
+      """
+    ).execute(db)
+    try #sql(
+      """
+      CREATE TABLE pinAttempts (
+        id INTEGER PRIMARY KEY,
+        success INTEGER NOT NULL CHECK (success IN (0, 1)),
+        createdAt TEXT NOT NULL
       ) STRICT;
       """
     ).execute(db)

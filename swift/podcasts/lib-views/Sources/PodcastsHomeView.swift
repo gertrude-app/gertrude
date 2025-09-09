@@ -16,13 +16,13 @@ public struct PodcastsHomeView: View {
   }
 
   let shows: [PodcastShow]
-  let onAddShowTap: @Sendable () -> Void
-  let onShowTap: @Sendable (PodcastShow) -> Void
+  let onAddShowTap: @MainActor @Sendable () -> Void
+  let onShowTap: @MainActor @Sendable (PodcastShow) -> Void
 
   public init(
     shows: [PodcastShow],
-    onAddShowTap: @escaping @Sendable () -> Void,
-    onShowTap: @escaping @Sendable (PodcastShow) -> Void = { _ in }
+    onAddShowTap: @MainActor @escaping @Sendable () -> Void,
+    onShowTap: @MainActor @escaping @Sendable (PodcastShow) -> Void = { _ in }
   ) {
     self.shows = shows
     self.onAddShowTap = onAddShowTap

@@ -6,15 +6,38 @@ public struct EntryPoint: View {
 
   public init() {
     let db = try! appDatabase()
-    prepareDependencies { $0.defaultDatabase = db }
+    prepareDependencies {
+      $0.defaultDatabase = db
+      #if targetEnvironment(simulator)
+        $0.passcode.load = { 111_111 }
+      #endif
+    }
     self.store = Store(
-      initialState: AppReducer.State(),
+      initialState: initialState,
       reducer: { AppReducer()._printChanges() }
     )
   }
 
   public var body: some View {
     AppView(store: self.store)
-      .onAppear { self.store.send(.appDidLaunch) }
   }
+}
+
+private var initialState: AppReducer.State {
+  var state = AppReducer.State()
+  #if !targetEnvironment(simulator)
+    @Dependency(\.passcode) var passcode
+    if let passcode = passcode.load() {
+      state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
+    } else {
+      state.mode = .onboarding(OnboardingFeature.State())
+    }
+  #else
+    state.mode = .podcasts(PodcastsFeature.State(
+      passcode: 111_111,
+      shows: [],
+      destination: .addShow(.init(passcode: 111_111))
+    ))
+  #endif
+  return state
 }

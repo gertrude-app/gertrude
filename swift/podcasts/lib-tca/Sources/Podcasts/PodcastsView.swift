@@ -8,7 +8,18 @@ struct PodcastsView: View {
   var body: some View {
     PodcastsHomeView(shows: self.store.shows.map {
       .init(id: $0.id, title: $0.name, artworkURL: $0.artworkURL)
-    }, onAddShowTap: {})
-      .navigationBarBackButtonHidden(true)
+    }) {
+      self.store.send(.addShowTapped)
+    }
+    .navigationBarBackButtonHidden(true)
+    .sheet(
+      item: self.$store.scope(
+        state: \.destination?.addShow,
+        action: \.destination.addShow
+      ),
+      content: { store in
+        AddShowView(store: store)
+      }
+    )
   }
 }

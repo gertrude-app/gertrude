@@ -4,16 +4,13 @@ public struct PinCodeView: View {
   @Environment(\.colorScheme) var cs
 
   let mode: Mode
-  let onComplete: @Sendable (Int) -> Void
-  let onCancel: (() -> Void)?
+  let onCancel: (@MainActor @Sendable () -> Void)?
 
   public init(
     mode: Mode,
-    onComplete: @escaping @Sendable (Int) -> Void,
-    onCancel: (() -> Void)? = nil
+    onCancel: (@MainActor @Sendable () -> Void)? = nil
   ) {
     self.mode = mode
-    self.onComplete = onComplete
     self.onCancel = onCancel
   }
 
@@ -22,98 +19,166 @@ public struct PinCodeView: View {
   @State private var showingConfirmation = false
   @State private var errorMessage: String?
   @State private var isShaking = false
+  @State private var currentTime = Date()
+  @State private var lockoutTimer: Timer?
 
   public var body: some View {
-    VStack(spacing: 30) {
-      VStack(spacing: 8) {
-        Text(self.titleText)
-          .font(.system(size: 28, weight: .bold))
-          .multilineTextAlignment(.center)
+    Group {
+      if self.isLockedOut {
+        self.lockoutView
+      } else {
+        VStack(spacing: 30) {
+          VStack(spacing: 8) {
+            Text(self.titleText)
+              .font(.system(size: 28, weight: .bold))
+              .multilineTextAlignment(.center)
 
-        if let errorMessage = self.errorMessage {
-          Text(errorMessage)
-            .font(.system(size: 16, weight: .medium))
-            .foregroundStyle(.red)
-            .multilineTextAlignment(.center)
-        } else if let subtitle = self.subtitleText {
-          Text(subtitle)
-            .font(.system(size: 16, weight: .medium))
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-        }
-      }
+            if let errorMessage = self.errorMessage {
+              Text(errorMessage)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(.red)
+                .multilineTextAlignment(.center)
+            } else if let subtitle = self.subtitleText {
+              Text(subtitle)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            }
+          }
 
-      HStack(spacing: 16) {
-        ForEach(0 ..< 6, id: \.self) { index in
-          Circle()
-            .fill(self.dotColor(for: index))
-            .frame(width: 16, height: 16)
-            .overlay(
-              Circle()
-                .stroke(.tertiary, lineWidth: 1)
-            )
-        }
-      }
-      .offset(x: self.isShaking ? 10 : 0)
-      .animation(
-        .easeInOut(duration: 0.1).repeatCount(4, autoreverses: true),
-        value: self.isShaking
-      )
-
-      VStack(spacing: 16) {
-        ForEach(0 ..< 3, id: \.self) { row in
           HStack(spacing: 16) {
-            ForEach(1 ... 3, id: \.self) { col in
-              let number = row * 3 + col
-              NumberButton(String(number)) {
-                self.addDigit(String(number))
+            ForEach(0 ..< 6, id: \.self) { index in
+              Circle()
+                .fill(self.dotColor(for: index))
+                .frame(width: 16, height: 16)
+                .overlay(
+                  Circle()
+                    .stroke(.tertiary, lineWidth: 1)
+                )
+            }
+          }
+          .offset(x: self.isShaking ? 10 : 0)
+          .animation(
+            .easeInOut(duration: 0.1).repeatCount(4, autoreverses: true),
+            value: self.isShaking
+          )
+
+          VStack(spacing: 16) {
+            ForEach(0 ..< 3, id: \.self) { row in
+              HStack(spacing: 16) {
+                ForEach(1 ... 3, id: \.self) { col in
+                  let number = row * 3 + col
+                  NumberButton(String(number)) {
+                    self.addDigit(String(number))
+                  }
+                }
+              }
+            }
+
+            HStack(spacing: 16) {
+              Button {
+                if let onCancel = self.onCancel {
+                  onCancel()
+                } else {
+                  self.clearPin()
+                }
+              } label: {
+                Text(self.onCancel != nil ? "Cancel" : "Clear")
+                  .font(.system(size: 18, weight: .medium))
+                  .foregroundStyle(.secondary)
+                  .frame(width: 80, height: 80)
+                  .background(Color(self.cs, light: .violet100, dark: .violet900))
+                  .clipShape(Circle())
+              }
+
+              NumberButton("0") {
+                self.addDigit("0")
+              }
+
+              Button {
+                self.removeDigit()
+              } label: {
+                Image(systemName: "delete.backward")
+                  .font(.system(size: 24, weight: .medium))
+                  .foregroundStyle(.secondary)
+                  .frame(width: 80, height: 80)
+                  .background(Color(self.cs, light: .violet100, dark: .violet900))
+                  .clipShape(Circle())
               }
             }
           }
         }
-
-        HStack(spacing: 16) {
-          Button {
-            if let onCancel = self.onCancel {
-              onCancel()
-            } else {
-              self.clearPin()
-            }
-          } label: {
-            Text(self.onCancel != nil ? "Cancel" : "Clear")
-              .font(.system(size: 18, weight: .medium))
-              .foregroundStyle(.secondary)
-              .frame(width: 80, height: 80)
-              .background(Color(self.cs, light: .violet100, dark: .violet900))
-              .clipShape(Circle())
+        .padding(30)
+        .onChange(of: self.pin) { _, newPin in
+          if newPin.count == 6 {
+            self.handlePinComplete(newPin)
           }
-
-          NumberButton("0") {
-            self.addDigit("0")
-          }
-
-          Button {
-            self.removeDigit()
-          } label: {
-            Image(systemName: "delete.backward")
-              .font(.system(size: 24, weight: .medium))
-              .foregroundStyle(.secondary)
-              .frame(width: 80, height: 80)
-              .background(Color(self.cs, light: .violet100, dark: .violet900))
-              .clipShape(Circle())
+        }
+        .onChange(of: self.confirmPin) { _, newConfirmPin in
+          if newConfirmPin.count == 6 {
+            self.handlePinComplete(newConfirmPin)
           }
         }
       }
     }
-    .padding(30)
-    .onChange(of: self.pin) { _, newPin in
-      if newPin.count == 6 {
-        self.handlePinComplete(newPin)
+    .onAppear {
+      self.startLockoutTimer()
+    }
+    .onDisappear {
+      self.stopLockoutTimer()
+    }
+  }
+
+  private var isLockedOut: Bool {
+    switch self.mode {
+    case .set:
+      return false
+    case .verify(_, let lockout, _, _):
+      guard let lockout else { return false }
+      return self.currentTime < lockout
+    }
+  }
+
+  private var lockoutView: some View {
+    VStack(spacing: 24) {
+      Spacer()
+
+      if let lockoutMessage = self.lockoutMessage {
+        Text(lockoutMessage)
+          .font(.system(size: 18, weight: .medium))
+          .foregroundStyle(.secondary)
+          .multilineTextAlignment(.center)
+          .padding(.horizontal, 60)
+      }
+
+      Spacer()
+
+      if let onCancel = self.onCancel {
+        BigButton(
+          "Cancel",
+          type: .button(onCancel),
+          variant: .secondary
+        )
+        .padding(.horizontal, 30)
+        .padding(.bottom, 30)
       }
     }
-    .onChange(of: self.confirmPin) { _, newConfirmPin in
-      if newConfirmPin.count == 6 {
-        self.handlePinComplete(newConfirmPin)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color(self.cs, light: .white, dark: .black))
+  }
+
+  private var lockoutMessage: String? {
+    switch self.mode {
+    case .set:
+      return nil
+    case .verify(_, let lockout, _, _):
+      guard let lockout else { return "" }
+      let timeRemaining = lockout.timeIntervalSince(self.currentTime)
+      let minutes = Int(floor(timeRemaining / 60))
+      if minutes <= 1 {
+        return "Too many failed attempts. Please wait a moment before trying again."
+      } else {
+        return "Too many failed attempts. You must wait \(minutes) minutes before trying again."
       }
     }
   }
@@ -184,10 +249,10 @@ public struct PinCodeView: View {
 
   private func handlePinComplete(_ completedPin: String) {
     switch self.mode {
-    case .set:
+    case .set(let onComplete):
       if self.showingConfirmation {
         if completedPin == self.pin {
-          self.onComplete(Int(completedPin)!)
+          onComplete(Int(completedPin)!)
         } else {
           self.showPinMismatchError()
         }
@@ -195,8 +260,14 @@ public struct PinCodeView: View {
         self.showingConfirmation = true
         self.confirmPin = ""
       }
-    case .verify:
-      self.onComplete(Int(completedPin)!)
+    case .verify(let expectedPin, _, let onVerify, let onFail):
+      let enteredPin = Int(completedPin)!
+      if enteredPin == expectedPin {
+        onVerify()
+      } else {
+        onFail()
+        self.showIncorrectPinError()
+      }
     }
   }
 
@@ -215,9 +286,49 @@ public struct PinCodeView: View {
     }
   }
 
+  private func showIncorrectPinError() {
+    self.errorMessage = "Incorrect PIN. Try again."
+    self.isShaking = true
+
+    Task {
+      try? await Task.sleep(for: .milliseconds(500))
+      await MainActor.run {
+        self.isShaking = false
+        self.pin = ""
+        self.confirmPin = ""
+      }
+    }
+  }
+
+  private func startLockoutTimer() {
+    guard case .verify(_, let lockout, _, _) = self.mode,
+          let lockout,
+          lockout > Date() else { return }
+
+    self.lockoutTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+      Task { @MainActor in
+        self.currentTime = Date()
+
+        if self.currentTime >= lockout {
+          self.stopLockoutTimer()
+        }
+      }
+    }
+  }
+
+  private func stopLockoutTimer() {
+    self.lockoutTimer?.invalidate()
+    self.lockoutTimer = nil
+  }
+
   public enum Mode {
-    case set
-    case verify
+    case set(onComplete: @MainActor @Sendable (Int) -> Void)
+    case verify(
+      Int,
+      lockout: Date? = nil,
+      onVerify: @MainActor @Sendable () -> Void,
+      onFail: @MainActor @Sendable () -> Void
+    )
   }
 }
 
@@ -245,31 +356,62 @@ private struct NumberButton: View {
 }
 
 #Preview("Set PIN") {
-  PinCodeView(mode: .set, onComplete: { pin in
+  PinCodeView(mode: .set(onComplete: { pin in
     print("PIN set: \(pin)")
-  }, onCancel: nil)
+  }), onCancel: nil)
 }
 
 #Preview("Verify PIN") {
-  PinCodeView(mode: .verify, onComplete: { pin in
-    print("PIN entered: \(pin)")
-  }, onCancel: {
+  PinCodeView(mode: .verify(123_456, onVerify: {
+    print("PIN verified")
+  }, onFail: {
+    print("PIN incorrect")
+  }), onCancel: {
     print("Cancelled")
   })
 }
 
 #Preview("Set PIN - Dark") {
-  PinCodeView(mode: .set, onComplete: { pin in
+  PinCodeView(mode: .set(onComplete: { pin in
     print("PIN set: \(pin)")
-  }, onCancel: nil)
+  }), onCancel: nil)
     .preferredColorScheme(.dark)
 }
 
 #Preview("Verify PIN - Dark") {
-  PinCodeView(mode: .verify, onComplete: { pin in
-    print("PIN entered: \(pin)")
-  }, onCancel: {
+  PinCodeView(mode: .verify(123_456, onVerify: {
+    print("PIN verified")
+  }, onFail: {
+    print("PIN incorrect")
+  }), onCancel: {
     print("Cancelled")
   })
+  .preferredColorScheme(.dark)
+}
+
+#Preview("Lockout Screen") {
+  PinCodeView(
+    mode: .verify(123_456, lockout: Date().addingTimeInterval(300), onVerify: {
+      print("PIN verified")
+    }, onFail: {
+      print("PIN incorrect")
+    }),
+    onCancel: {
+      print("Cancelled")
+    }
+  )
+}
+
+#Preview("Lockout Screen - Dark") {
+  PinCodeView(
+    mode: .verify(123_456, lockout: Date().addingTimeInterval(300), onVerify: {
+      print("PIN verified")
+    }, onFail: {
+      print("PIN incorrect")
+    }),
+    onCancel: {
+      print("Cancelled")
+    }
+  )
   .preferredColorScheme(.dark)
 }
