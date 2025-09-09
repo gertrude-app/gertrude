@@ -12,12 +12,12 @@ struct PodcastsView: View {
       self.store.send(.addShowTapped)
     }
     .navigationBarBackButtonHidden(true)
-    .sheet(
+    .navigationDestination(
       item: self.$store.scope(
         state: \.destination?.addShow,
         action: \.destination.addShow
       ),
-      content: { store in
+      destination: { store in
         AddShowView(store: store)
       }
     )

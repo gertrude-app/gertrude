@@ -62,9 +62,7 @@ struct OnboardingView: View {
     action: OnboardingFeature.Action
   ) -> ButtonScreenView.Config {
     .init(text, animate: animate) {
-      Task { @MainActor in
-        self.store.send(action)
-      }
+      self.store.send(action)
     }
   }
 }

@@ -25,7 +25,6 @@ struct PodcastsFeature {
     Reduce { state, action in
       switch action {
       case .addShowTapped:
-
         state.destination = .addShow(.init(passcode: state.passcode))
         return .none
 

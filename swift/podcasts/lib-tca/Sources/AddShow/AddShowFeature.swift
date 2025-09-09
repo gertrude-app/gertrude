@@ -6,27 +6,54 @@ import SwiftUI
 struct AddShowFeature {
   @ObservableState
   struct State: Equatable {
+    enum Screen {
+      case enteringPin
+      case choosingMethod
+      case searching
+      case addingByUrl
+    }
+
     var passcode: Int
-    var authorized = false
+    var screen: Screen = .enteringPin
     var lockout: Date? = .pinLockout()
+    var searchText: String = ""
   }
 
   enum Action: Equatable {
     case passcodeVerified
     case passcodeFailed
     case passcodeCancelled
+    case selectSearchTapped
+    case selectAddByUrlTapped
+    case setSearchText(String)
+    case searchSetDebounced
   }
 
   @Dependency(\.dismiss) var dismiss
   @Dependency(\.defaultDatabase) var db
   @Dependency(\.date.now) var now
 
+  private enum CancelID { case search }
+
   var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
+      case .setSearchText(let text):
+        state.searchText = text
+        return .none
+
+      case .searchSetDebounced:
+        guard !state.searchText.isEmpty else {
+          return .none
+        }
+        return .run { [text = state.searchText] send in
+          print("hit the api, searching for \(text)")
+        }
+        .cancellable(id: CancelID.search)
+
       case .passcodeVerified:
-        state.authorized = true
         self.insertAttempt(success: true)
+        state.screen = .choosingMethod
         state.lockout = .pinLockout()
         return .none
 
@@ -39,6 +66,14 @@ struct AddShowFeature {
         return .run { _ in
           await self.dismiss()
         }
+
+      case .selectSearchTapped:
+        state.screen = .searching
+        return .none
+
+      case .selectAddByUrlTapped:
+        state.screen = .addingByUrl
+        return .none
       }
     }
   }

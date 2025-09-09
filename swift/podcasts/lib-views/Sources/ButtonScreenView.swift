@@ -25,7 +25,7 @@ public struct ButtonScreenView: View {
       _ text: String,
       animate: Bool = true,
       asyncAction: Bool = false,
-      _ action: @escaping @Sendable () -> Void
+      _ action: @MainActor @escaping @Sendable () -> Void
     ) {
       self.init(
         text: text,

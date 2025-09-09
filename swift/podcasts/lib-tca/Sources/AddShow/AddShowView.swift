@@ -7,7 +7,8 @@ struct AddShowView: View {
 
   var body: some View {
     Group {
-      if !self.store.authorized {
+      switch self.store.screen {
+      case .enteringPin:
         PinCodeView(
           mode: .verify(
             self.store.passcode,
@@ -17,8 +18,26 @@ struct AddShowView: View {
           ),
           onCancel: { self.store.send(.passcodeCancelled) },
         )
-      } else {
-        Text("Authorized")
+      case .choosingMethod:
+        ButtonScreenView(
+          text: "How would you like to add a podcast?",
+          primary: .init("Search") { self.store.send(.selectSearchTapped) },
+          secondary: .init("Add by URL") { self.store.send(.selectAddByUrlTapped) },
+        )
+      case .searching:
+        SearchShowView(
+          searchText: self.$store.searchText.sending(\.setSearchText),
+          results: [],
+          onResultTap: { _ in }
+        )
+        .task(id: self.store.searchText) {
+          do {
+            try await Task.sleep(for: .milliseconds(500))
+            self.store.send(.searchSetDebounced)
+          } catch {}
+        }
+      case .addingByUrl:
+        Text("adding by URL")
       }
     }
   }
