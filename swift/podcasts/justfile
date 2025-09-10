@@ -11,21 +11,35 @@ previews:
   @open previews/GertiePodcastsPreviews.xcodeproj
 
 dev:
-  pnpm concurrently --raw \
-  -n lv,lc,lt,sp \
-  -c cyan.dim,magenta.dim,green.dim,yellow.dim \
-  "just --justfile {{justfile()}} watch-build lib-views" \
-  "just --justfile {{justfile()}} watch-build lib-core" \
-  "just --justfile {{justfile()}} watch-build lib-tca" \
-  "just --justfile {{justfile()}} watch-sync-previews"
+  @pnpm concurrently --raw \
+    -n lv,lc,lt,sp \
+    -c cyan.dim,magenta.dim,green.dim,yellow.dim \
+    "just --justfile {{justfile()}} watch-build lib-views" \
+    "just --justfile {{justfile()}} watch-build lib-core" \
+    "just --justfile {{justfile()}} watch-build lib-tca" \
+    "just --justfile {{justfile()}} watch-sync-previews"
 
 build-views:
   @cd lib-views && swift build
 
+build-core:
+  @cd lib-core && swift build
+
+build-tca:
+  @cd lib-tca && swift build
+
+build:
+  @just build-tca
+  @just build-core
+  @just build-views
+
+test:
+  @cd lib-tca && SWIFT_DETERMINISTIC_HASHING=1 swift test --enable-experimental-prebuilts
+
 format: clean
   @swiftformat .
 
-build:
+build-app:
   xcodebuild -workspace GertiePodcasts.xcodeproj/project.xcworkspace \
     -scheme App -configuration Debug build 
 

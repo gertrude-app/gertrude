@@ -6,12 +6,12 @@ public struct PodcastsHomeView: View {
   public struct PodcastShow: Identifiable, Sendable {
     public let id: Int
     public let title: String
-    public let artworkURL: String?
+    public let artworkUrl: String?
 
-    public init(id: Int, title: String, artworkURL: String? = nil) {
+    public init(id: Int, title: String, artworkUrl: String? = nil) {
       self.id = id
       self.title = title
-      self.artworkURL = artworkURL
+      self.artworkUrl = artworkUrl
     }
   }
 
@@ -136,7 +136,7 @@ public struct PodcastsHomeView: View {
 
   private func showArtwork(_ show: PodcastShow) -> some View {
     Group {
-      if let artworkURL = show.artworkURL, let url = URL(string: artworkURL) {
+      if let artworkUrl = show.artworkUrl, let url = URL(string: artworkUrl) {
         AsyncImage(url: url) { image in
           image
             .resizable()
@@ -160,12 +160,12 @@ public struct PodcastsHomeView: View {
       PodcastsHomeView.PodcastShow(
         id: 1,
         title: "The Ancient Path",
-        artworkURL: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
+        artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
       ),
       PodcastsHomeView.PodcastShow(
         id: 2,
         title: "The Secret Sombrero",
-        artworkURL: "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
+        artworkUrl: "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
       ),
       PodcastsHomeView.PodcastShow(
         id: 3,
@@ -189,12 +189,12 @@ public struct PodcastsHomeView: View {
       PodcastsHomeView.PodcastShow(
         id: 1,
         title: "The Ancient Path",
-        artworkURL: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
+        artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
       ),
       PodcastsHomeView.PodcastShow(
         id: 2,
         title: "The Secret Sombrero",
-        artworkURL: "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
+        artworkUrl: "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
       ),
       PodcastsHomeView.PodcastShow(
         id: 3,

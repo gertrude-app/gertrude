@@ -1,7 +1,0 @@
-public struct Foo {
-  public init() {}
-
-  public func hello() -> String {
-    "Hello from Foo"
-  }
-}

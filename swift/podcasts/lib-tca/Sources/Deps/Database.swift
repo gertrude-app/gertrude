@@ -35,11 +35,36 @@ public func appDatabase() throws -> any DatabaseWriter {
        CREATE TABLE shows (
          id INTEGER PRIMARY KEY NOT NULL,
          name TEXT NOT NULL,
-         feedURL TEXT NOT NULL,
-         artworkURL TEXT,
-         showEpisodeArtwork INTEGER NOT NULL DEFAULT 0
-           CHECK (showEpisodeArtwork IN (0, 1)),
+         author TEXT,
+         description TEXT,
+         feedUrl TEXT NOT NULL,
+         websiteUrl TEXT,
+         artworkUrl TEXT,
+         showArtwork INTEGER NOT NULL CHECK (showArtwork IN (0, 1)),
+         iTunesId INTEGER,
          createdAt TEXT NOT NULL
+       ) STRICT;
+      """
+    ).execute(db)
+    try #sql(
+      """
+       CREATE TABLE episodes (
+         id INTEGER PRIMARY KEY NOT NULL,
+         showId INTEGER NOT NULL,
+         title TEXT NOT NULL,
+         description TEXT,
+         websiteUrl TEXT,
+         audioUrl TEXT NOT NULL,
+         artworkUrl TEXT,
+         duration INTEGER NOT NULL,
+         audioType TEXT NOT NULL CHECK (audioType IN ('audio/mpeg', 'audio/x-m4a')),
+         guid TEXT NOT NULL,
+         pubDate TEXT NOT NULL,
+         progress INTEGER NOT NULL DEFAULT 0,
+         lastPlayedAt TEXT,
+         updatedAt TEXT NOT NULL,
+         createdAt TEXT NOT NULL,
+         FOREIGN KEY (showId) REFERENCES shows (id) ON DELETE CASCADE
        ) STRICT;
       """
     ).execute(db)

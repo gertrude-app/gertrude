@@ -18,16 +18,18 @@ struct AddShowView: View {
           ),
           onCancel: { self.store.send(.passcodeCancelled) },
         )
+
       case .choosingMethod:
         ButtonScreenView(
           text: "How would you like to add a podcast?",
           primary: .init("Search") { self.store.send(.selectSearchTapped) },
           secondary: .init("Add by URL") { self.store.send(.selectAddByUrlTapped) },
         )
+
       case .searching:
         SearchShowView(
           searchText: self.$store.searchText.sending(\.setSearchText),
-          results: [],
+          results: self.store.searchResults,
           onResultTap: { _ in }
         )
         .task(id: self.store.searchText) {
@@ -36,6 +38,10 @@ struct AddShowView: View {
             self.store.send(.searchSetDebounced)
           } catch {}
         }
+
+      case .chooseArtworkPolicy:
+        Text("choose artwork policy")
+
       case .addingByUrl:
         Text("adding by URL")
       }

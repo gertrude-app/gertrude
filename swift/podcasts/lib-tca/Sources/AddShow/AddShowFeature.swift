@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import LibCore
 import SharingGRDB
 import SwiftUI
 
@@ -6,17 +7,19 @@ import SwiftUI
 struct AddShowFeature {
   @ObservableState
   struct State: Equatable {
-    enum Screen {
+    enum Screen: Equatable {
       case enteringPin
       case choosingMethod
       case searching
       case addingByUrl
+      case chooseArtworkPolicy(SearchResult)
     }
 
     var passcode: Int
     var screen: Screen = .enteringPin
     var lockout: Date? = .pinLockout()
     var searchText: String = ""
+    var searchResults: [SearchResult] = []
   }
 
   enum Action: Equatable {
@@ -25,13 +28,17 @@ struct AddShowFeature {
     case passcodeCancelled
     case selectSearchTapped
     case selectAddByUrlTapped
+    case selectAllowArtworkTapped
+    case selectDontAllowArtworkTapped
     case setSearchText(String)
     case searchSetDebounced
+    case setSearchResults([SearchResult])
   }
 
   @Dependency(\.dismiss) var dismiss
   @Dependency(\.defaultDatabase) var db
   @Dependency(\.date.now) var now
+  @Dependency(\.search) var search
 
   private enum CancelID { case search }
 
@@ -47,9 +54,15 @@ struct AddShowFeature {
           return .none
         }
         return .run { [text = state.searchText] send in
-          print("hit the api, searching for \(text)")
+          // TODO: handle errors
+          let results = try await self.search.search(text)
+          await send(.setSearchResults(results))
         }
         .cancellable(id: CancelID.search)
+
+      case .setSearchResults(let results):
+        state.searchResults = results
+        return .none
 
       case .passcodeVerified:
         self.insertAttempt(success: true)
@@ -73,6 +86,20 @@ struct AddShowFeature {
 
       case .selectAddByUrlTapped:
         state.screen = .addingByUrl
+        return .none
+
+      case .selectAllowArtworkTapped:
+        guard case .chooseArtworkPolicy(let show) = state.screen else {
+          reportIssue("Unexpected action \(action) in state \(state)")
+          return .none
+        }
+        return .none
+
+      case .selectDontAllowArtworkTapped:
+        guard case .chooseArtworkPolicy(let show) = state.screen else {
+          reportIssue("Unexpected action \(action) in state \(state)")
+          return .none
+        }
         return .none
       }
     }

@@ -1,32 +1,8 @@
+import LibCore
 import SwiftUI
 
 public struct SearchShowView: View {
   @Environment(\.colorScheme) var cs
-
-  public struct SearchResult: Identifiable, Sendable {
-    public let id: Int
-    public let title: String
-    public let description: String
-    public let artworkURL: String?
-    public let episodeCount: Int
-    public let isExplicit: Bool
-
-    public init(
-      id: Int,
-      title: String,
-      description: String,
-      artworkURL: String? = nil,
-      episodeCount: Int,
-      isExplicit: Bool = false
-    ) {
-      self.id = id
-      self.title = title
-      self.description = description
-      self.artworkURL = artworkURL
-      self.episodeCount = episodeCount
-      self.isExplicit = isExplicit
-    }
-  }
 
   @Binding var searchText: String
   let results: [SearchResult]
@@ -136,7 +112,7 @@ public struct SearchShowView: View {
           }
         }
 
-        Text(result.description)
+        Text(result.artistName)
           .font(.system(size: 14, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
           .multilineTextAlignment(.leading)
@@ -173,7 +149,7 @@ public struct SearchShowView: View {
 
   private func showArtwork(_ result: SearchResult) -> some View {
     Group {
-      if let artworkURL = result.artworkURL, let url = URL(string: artworkURL) {
+      if let artworkURL = result.artworkUrl, let url = URL(string: artworkURL) {
         AsyncImage(url: url) { image in
           image
             .resizable()
@@ -216,25 +192,25 @@ public struct SearchShowView: View {
     SearchShowView(
       searchText: .constant("tech"),
       results: [
-        SearchShowView.SearchResult(
+        SearchResult(
           id: 1,
           title: "The Tech Talk Show",
-          description: "A weekly show about the latest in technology, gadgets, and digital trends that shape our world.",
+          artistName: "Tech Media Network",
           artworkURL: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
           episodeCount: 147,
           isExplicit: false
         ),
-        SearchShowView.SearchResult(
+        SearchResult(
           id: 2,
           title: "Explicit Tech News",
-          description: "Uncensored discussions about technology controversies and industry drama.",
+          artistName: "Uncensored Media",
           episodeCount: 89,
           isExplicit: true
         ),
-        SearchShowView.SearchResult(
+        SearchResult(
           id: 3,
           title: "StartupLife",
-          description: "Stories from the trenches of building technology companies from the ground up.",
+          artistName: "Entrepreneur Stories",
           episodeCount: 203
         ),
       ],
@@ -272,25 +248,25 @@ public struct SearchShowView: View {
     SearchShowView(
       searchText: .constant("tech"),
       results: [
-        SearchShowView.SearchResult(
+        SearchResult(
           id: 1,
           title: "The Tech Talk Show",
-          description: "A weekly show about the latest in technology, gadgets, and digital trends that shape our world.",
+          artistName: "Tech Media Network",
           artworkURL: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
           episodeCount: 147,
           isExplicit: false
         ),
-        SearchShowView.SearchResult(
+        SearchResult(
           id: 2,
           title: "Explicit Tech News",
-          description: "Uncensored discussions about technology controversies and industry drama.",
+          artistName: "Uncensored Media",
           episodeCount: 89,
           isExplicit: true
         ),
-        SearchShowView.SearchResult(
+        SearchResult(
           id: 3,
           title: "StartupLife",
-          description: "Stories from the trenches of building technology companies from the ground up.",
+          artistName: "Entrepreneur Stories",
           episodeCount: 203
         ),
       ],
