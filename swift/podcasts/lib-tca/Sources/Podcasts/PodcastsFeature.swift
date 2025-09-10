@@ -18,6 +18,7 @@ struct PodcastsFeature {
 
   enum Action: Equatable {
     case addShowTapped
+    case showTapped(Int)
     case destination(PresentationAction<Destination.Action>)
   }
 
@@ -26,6 +27,14 @@ struct PodcastsFeature {
       switch action {
       case .addShowTapped:
         state.destination = .addShow(.init(passcode: state.passcode))
+        return .none
+
+      case .showTapped(let showId):
+        return .none
+
+      case .destination(.presented(.addShow(.subscribed(let show)))):
+        state.shows.append(show)
+        state.destination = nil
         return .none
 
       case .destination:

@@ -37,7 +37,7 @@ public func appDatabase() throws -> any DatabaseWriter {
          name TEXT NOT NULL,
          author TEXT,
          description TEXT,
-         feedUrl TEXT NOT NULL,
+         feedUrl TEXT NOT NULL UNIQUE,
          websiteUrl TEXT,
          artworkUrl TEXT,
          showArtwork INTEGER NOT NULL CHECK (showArtwork IN (0, 1)),

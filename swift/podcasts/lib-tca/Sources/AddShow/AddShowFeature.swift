@@ -13,6 +13,8 @@ struct AddShowFeature {
       case searching
       case addingByUrl
       case chooseArtworkPolicy(SearchResult)
+      case subscribing
+      case subscribeError
     }
 
     var passcode: Int
@@ -32,13 +34,16 @@ struct AddShowFeature {
     case selectDontAllowArtworkTapped
     case setSearchText(String)
     case searchSetDebounced
+    case selectShow(SearchResult)
     case setSearchResults([SearchResult])
+    case setScreen(State.Screen)
+    case subscribed(Show)
   }
 
   @Dependency(\.dismiss) var dismiss
   @Dependency(\.defaultDatabase) var db
   @Dependency(\.date.now) var now
-  @Dependency(\.search) var search
+  @Dependency(\.podcasts) var podcasts
 
   private enum CancelID { case search }
 
@@ -49,13 +54,17 @@ struct AddShowFeature {
         state.searchText = text
         return .none
 
+      case .setScreen(let screen):
+        state.screen = screen
+        return .none
+
       case .searchSetDebounced:
         guard !state.searchText.isEmpty else {
           return .none
         }
         return .run { [text = state.searchText] send in
           // TODO: handle errors
-          let results = try await self.search.search(text)
+          let results = try await self.podcasts.search(text)
           await send(.setSearchResults(results))
         }
         .cancellable(id: CancelID.search)
@@ -88,19 +97,45 @@ struct AddShowFeature {
         state.screen = .addingByUrl
         return .none
 
-      case .selectAllowArtworkTapped:
-        guard case .chooseArtworkPolicy(let show) = state.screen else {
-          reportIssue("Unexpected action \(action) in state \(state)")
-          return .none
-        }
+      case .selectShow(let show):
+        state.screen = .chooseArtworkPolicy(show)
         return .none
 
-      case .selectDontAllowArtworkTapped:
+      case .selectDontAllowArtworkTapped, .selectAllowArtworkTapped:
         guard case .chooseArtworkPolicy(let show) = state.screen else {
           reportIssue("Unexpected action \(action) in state \(state)")
           return .none
         }
+        state.screen = .subscribing
+        return self.subscribe(to: show, artwork: action == .selectAllowArtworkTapped)
+
+      case .subscribed:
         return .none
+      }
+    }
+  }
+
+  func subscribe(to show: SearchResult, artwork withArtwork: Bool) -> Effect<Action> {
+    .run { send in
+      do {
+        let feed = try await self.podcasts.getFeed(show.feedUrl)
+        let show = try await self.db.write { db in
+          try Show
+            .insert { feed.show.toShowDraft(feedUrl: show.feedUrl, showArtwork: withArtwork) }
+            .returning(\.self)
+            .fetchOne(db)
+        }
+        guard let show else {
+          await send(.setScreen(.subscribeError))
+          return
+        }
+        let episodes = feed.episodes.map { $0.toEpisodeDraft(showId: show.id) }
+        try await self.db.write { db in
+          try Episode.insert { episodes }.execute(db)
+        }
+        await send(.subscribed(show))
+      } catch {
+        await send(.setScreen(.subscribeError))
       }
     }
   }

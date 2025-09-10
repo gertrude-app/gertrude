@@ -17,12 +17,12 @@ public struct PodcastsHomeView: View {
 
   let shows: [PodcastShow]
   let onAddShowTap: @MainActor @Sendable () -> Void
-  let onShowTap: @MainActor @Sendable (PodcastShow) -> Void
+  let onShowTap: @MainActor @Sendable (Int) -> Void
 
   public init(
     shows: [PodcastShow],
     onAddShowTap: @MainActor @escaping @Sendable () -> Void,
-    onShowTap: @MainActor @escaping @Sendable (PodcastShow) -> Void = { _ in }
+    onShowTap: @MainActor @escaping @Sendable (Int) -> Void = { _ in }
   ) {
     self.shows = shows
     self.onAddShowTap = onAddShowTap
@@ -83,7 +83,7 @@ public struct PodcastsHomeView: View {
       LazyVStack(spacing: 0) {
         ForEach(self.shows) { show in
           Button {
-            self.onShowTap(show)
+            self.onShowTap(show.id)
           } label: {
             self.showRow(show)
           }

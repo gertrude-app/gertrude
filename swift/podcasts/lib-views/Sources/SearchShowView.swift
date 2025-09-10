@@ -129,8 +129,8 @@ public struct SearchShowView: View {
         .font(.system(size: 24, weight: .medium))
         .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
     }
-    .padding(.horizontal, 30)
-    .padding(.vertical, 16)
+    .padding(.horizontal, 24)
+    .padding(.vertical, 12)
     .background(
       Color(self.cs, light: .clear, dark: .clear)
         .contentShape(Rectangle())
@@ -197,6 +197,7 @@ public struct SearchShowView: View {
           title: "The Tech Talk Show",
           artistName: "Tech Media Network",
           artworkURL: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
+          feedUrl: "",
           episodeCount: 147,
           isExplicit: false
         ),
@@ -204,6 +205,7 @@ public struct SearchShowView: View {
           id: 2,
           title: "Explicit Tech News",
           artistName: "Uncensored Media",
+          feedUrl: "",
           episodeCount: 89,
           isExplicit: true
         ),
@@ -211,6 +213,7 @@ public struct SearchShowView: View {
           id: 3,
           title: "StartupLife",
           artistName: "Entrepreneur Stories",
+          feedUrl: "",
           episodeCount: 203
         ),
       ],
@@ -253,6 +256,7 @@ public struct SearchShowView: View {
           title: "The Tech Talk Show",
           artistName: "Tech Media Network",
           artworkURL: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
+          feedUrl: "",
           episodeCount: 147,
           isExplicit: false
         ),
@@ -260,6 +264,7 @@ public struct SearchShowView: View {
           id: 2,
           title: "Explicit Tech News",
           artistName: "Uncensored Media",
+          feedUrl: "",
           episodeCount: 89,
           isExplicit: true
         ),
@@ -267,6 +272,7 @@ public struct SearchShowView: View {
           id: 3,
           title: "StartupLife",
           artistName: "Entrepreneur Stories",
+          feedUrl: "",
           episodeCount: 203
         ),
       ],

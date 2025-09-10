@@ -5,7 +5,7 @@ public struct SearchResult: Identifiable, Sendable, Equatable {
   public let title: String
   public let artistName: String
   public let artworkUrl: String?
-  public let feedUrl: String?
+  public let feedUrl: String
   public let episodeCount: Int
   public let isExplicit: Bool
 
@@ -14,7 +14,7 @@ public struct SearchResult: Identifiable, Sendable, Equatable {
     title: String,
     artistName: String,
     artworkURL: String? = nil,
-    feedUrl: String? = nil,
+    feedUrl: String,
     episodeCount: Int,
     isExplicit: Bool = false
   ) {

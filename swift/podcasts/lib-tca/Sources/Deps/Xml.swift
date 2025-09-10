@@ -1,7 +1,6 @@
 import Foundation
 
-func parsePodcastFeed(_ xmlString: String) throws
-  -> (show: Show.FeedData, episodes: [Episode.FeedData]) {
+func parsePodcastFeed(_ xmlString: String) throws -> Feed {
   guard let xmlData = xmlString.data(using: .utf8) else {
     throw XMLParseError.invalidUtf8
   }
@@ -22,7 +21,7 @@ func parsePodcastFeed(_ xmlString: String) throws
     throw XMLParseError.missingRequiredData
   }
 
-  return (show: show, episodes: delegate.episodes)
+  return Feed(show: show, episodes: delegate.episodes)
 }
 
 enum XMLParseError: Error, Sendable {
@@ -95,6 +94,10 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
       self.showArtworkUrl = attributeDict["href"]
     }
 
+    if elementName == "itunes:image", !self.isInItem {
+      self.showArtworkUrl = attributeDict["href"]
+    }
+
     if elementName == "image", self.isInItem {
       self.episodeArtworkUrl = attributeDict["href"]
     }
@@ -105,7 +108,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
   }
 
   func parser(_ parser: XMLParser, foundCharacters string: String) {
-    self.currentText += string.trimmingCharacters(in: .whitespacesAndNewlines)
+    self.currentText += string
   }
 
   func parser(
@@ -125,7 +128,8 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
 
       let episode = Episode.FeedData(
         title: self.episodeTitle,
-        description: self.episodeDescription?.isEmpty == false ? self.episodeDescription : nil,
+        description: self.episodeDescription?.isEmpty == false ? self
+          .stripHTML(self.episodeDescription ?? "") : nil,
         websiteUrl: self.episodeWebsiteUrl?.isEmpty == false ? self.episodeWebsiteUrl : nil,
         audioUrl: self.episodeAudioUrl,
         artworkUrl: self.episodeArtworkUrl?.isEmpty == false ? self.episodeArtworkUrl : nil,
@@ -249,5 +253,36 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
       // Assume it's already in seconds
       return Int(durationString) ?? 0
     }
+  }
+
+  private func stripHTML(_ html: String) -> String {
+    // Remove HTML tags using regex
+    let regex = try! NSRegularExpression(pattern: "<[^>]+>", options: [])
+    let range = NSRange(location: 0, length: html.utf16.count)
+    let stripped = regex.stringByReplacingMatches(
+      in: html,
+      options: [],
+      range: range,
+      withTemplate: ""
+    )
+
+    // Clean up extra whitespace and decode HTML entities
+    let cleaned = stripped
+      .replacingOccurrences(of: "&amp;", with: "&")
+      .replacingOccurrences(of: "&lt;", with: "<")
+      .replacingOccurrences(of: "&gt;", with: ">")
+      .replacingOccurrences(of: "&quot;", with: "\"")
+      .replacingOccurrences(of: "&#39;", with: "'")
+      .replacingOccurrences(of: "&nbsp;", with: " ")
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+
+    // Remove multiple spaces and clean up
+    let finalCleaned = cleaned.replacingOccurrences(
+      of: "\\s+",
+      with: " ",
+      options: .regularExpression
+    )
+
+    return finalCleaned
   }
 }

@@ -36,7 +36,11 @@ private var initialState: AppReducer.State {
     state.mode = .podcasts(PodcastsFeature.State(
       passcode: 111_111,
       shows: [],
-      destination: .addShow(.init(passcode: 111_111, screen: .searching))
+      destination: .addShow(.init(
+        passcode: 111_111,
+        screen: .searching,
+        searchText: "henderson ancient path",
+      ))
     ))
   #endif
   return state

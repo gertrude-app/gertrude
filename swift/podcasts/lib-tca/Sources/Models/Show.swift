@@ -1,3 +1,4 @@
+import Dependencies
 import Foundation
 import SharingGRDB
 
@@ -23,5 +24,20 @@ extension Show {
     var websiteUrl: String?
     var artworkUrl: String?
     var iTunesId: Int?
+
+    func toShowDraft(feedUrl: String, showArtwork: Bool) -> Show.Draft {
+      @Dependency(\.date.now) var now
+      return .init(
+        name: self.name,
+        author: self.author,
+        description: self.description,
+        feedUrl: feedUrl,
+        websiteUrl: self.websiteUrl,
+        artworkUrl: self.artworkUrl,
+        showArtwork: showArtwork,
+        iTunesId: self.iTunesId,
+        createdAt: now
+      )
+    }
   }
 }

@@ -30,7 +30,7 @@ struct AddShowView: View {
         SearchShowView(
           searchText: self.$store.searchText.sending(\.setSearchText),
           results: self.store.searchResults,
-          onResultTap: { _ in }
+          onResultTap: { self.store.send(.selectShow($0)) }
         )
         .task(id: self.store.searchText) {
           do {
@@ -40,7 +40,27 @@ struct AddShowView: View {
         }
 
       case .chooseArtworkPolicy:
-        Text("choose artwork policy")
+        ButtonScreenView(
+          text: "Show podcast and episode images?",
+          primary: .init("Yes, allow images") { self.store.send(.selectAllowArtworkTapped) },
+          secondary: .init("No images") { self.store.send(.selectDontAllowArtworkTapped) },
+        )
+
+      case .subscribing:
+        // TODO: move to lib views, dark mode, previews
+        VStack(spacing: 16) {
+          ProgressView()
+            .progressViewStyle(.circular)
+            .scaleEffect(1.5)
+          Text("Subscribing...")
+            .font(.system(size: 18, weight: .medium))
+        }
+
+      case .subscribeError:
+        Text("Adding show failed. Please try again.")
+          .font(.system(size: 18, weight: .medium))
+          .multilineTextAlignment(.center)
+          .padding()
 
       case .addingByUrl:
         Text("adding by URL")

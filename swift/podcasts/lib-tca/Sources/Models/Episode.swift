@@ -36,5 +36,23 @@ extension Episode {
     var audioType: AudioType
     var guid: String
     var pubDate: Date
+
+    func toEpisodeDraft(showId: Int) -> Episode.Draft {
+      @Dependency(\.date.now) var now
+      return .init(
+        showId: showId,
+        title: self.title,
+        description: self.description,
+        websiteUrl: self.websiteUrl,
+        audioUrl: self.audioUrl,
+        artworkUrl: self.artworkUrl,
+        duration: self.duration,
+        audioType: self.audioType,
+        guid: self.guid,
+        pubDate: self.pubDate,
+        updatedAt: now,
+        createdAt: now,
+      )
+    }
   }
 }
