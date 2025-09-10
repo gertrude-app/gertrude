@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import LibCore
+import LibViews
 import SharingGRDB
 import SwiftUI
 

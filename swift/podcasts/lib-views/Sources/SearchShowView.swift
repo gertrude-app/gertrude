@@ -1,4 +1,3 @@
-import LibCore
 import SwiftUI
 
 public struct SearchShowView: View {
@@ -162,7 +161,7 @@ public struct SearchShowView: View {
       }
     }
     .frame(width: 64, height: 64)
-    .cornerRadius(12)
+    .cornerRadius(6)
     .clipped()
   }
 }

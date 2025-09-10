@@ -149,7 +149,7 @@ public struct PodcastsHomeView: View {
       }
     }
     .frame(width: 56, height: 56)
-    .cornerRadius(12)
+    .cornerRadius(6)
     .clipped()
   }
 }

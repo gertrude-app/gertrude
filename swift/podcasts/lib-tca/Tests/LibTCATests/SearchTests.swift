@@ -1,4 +1,4 @@
-import LibCore
+import LibViews
 import Testing
 
 @testable import LibTCA
