@@ -24,15 +24,16 @@ public struct EntryPoint: View {
 }
 
 private var initialState: AppReducer.State {
+  @Dependency(\.passcode) var passcode
   var state = AppReducer.State()
   #if !targetEnvironment(simulator)
-    @Dependency(\.passcode) var passcode
     if let passcode = passcode.load() {
       state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
     } else {
       state.mode = .onboarding(OnboardingFeature.State())
     }
   #else
+    passcode.delete()
     state.mode = .podcasts(PodcastsFeature.State(
       passcode: 111_111,
       shows: [],

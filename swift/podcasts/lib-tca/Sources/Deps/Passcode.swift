@@ -7,6 +7,7 @@ import Security
 struct PasscodeClient: Sendable {
   var load: @Sendable () -> Int?
   var save: @Sendable (Int) -> Void
+  var delete: @Sendable () -> Void
 }
 
 extension PasscodeClient {
@@ -50,6 +51,13 @@ extension PasscodeClient: DependencyKey {
         // important to remove old item if exists, prevent error
         SecItemDelete(query as CFDictionary)
         SecItemAdd(query as CFDictionary, nil)
+      },
+      delete: {
+        let query: [String: Any] = [
+          kSecClass as String: kSecClassGenericPassword,
+          kSecAttrAccount as String: "passcode",
+        ]
+        SecItemDelete(query as CFDictionary)
       }
     )
   }
