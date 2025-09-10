@@ -13,7 +13,8 @@ let package = Package(
       name: "LibViews",
       dependencies: [
         .product(name: "LibCore", package: "lib-core"),
-      ]
+      ],
+      exclude: ["FakeEntry.swift"]
     ),
   ]
 )

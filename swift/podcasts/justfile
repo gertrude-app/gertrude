@@ -48,6 +48,11 @@ clean:
 
 # previews
 
+regen-previews:
+  @rm -rf previews
+  @just gen-previews
+  @just previews
+
 gen-previews:
   @mkdir -p previews/sources
   @just sync-previews

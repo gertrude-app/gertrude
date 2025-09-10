@@ -1,5 +1,6 @@
 import Dependencies
 import Foundation
+import LibViews
 import SharingGRDB
 
 @Table
@@ -39,5 +40,17 @@ extension Show {
         createdAt: now
       )
     }
+  }
+}
+
+extension ShowData {
+  init(from show: Show) {
+    self.init(
+      id: show.id,
+      title: show.name,
+      author: show.author,
+      description: show.description,
+      artworkUrl: show.showArtwork ? show.artworkUrl : nil
+    )
   }
 }

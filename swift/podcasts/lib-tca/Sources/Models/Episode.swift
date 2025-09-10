@@ -1,4 +1,5 @@
 import Foundation
+import LibViews
 import SharingGRDB
 
 @Table
@@ -54,5 +55,18 @@ extension Episode {
         createdAt: now,
       )
     }
+  }
+}
+
+extension EpisodeData {
+  init(from episode: Episode) {
+    self.init(
+      id: episode.id,
+      title: episode.title,
+      description: episode.description,
+      relativeTime: formatRelativeDate(episode.pubDate),
+      duration: formatDuration(episode.duration),
+      isDownloaded: false // TODO: Implement download tracking
+    )
   }
 }
