@@ -8,6 +8,7 @@ struct PodcastsFeature {
   struct State: Equatable {
     var passcode: Int
     var shows: [Show]
+    var downloadQueue: [Episode] = []
     @Presents var destination: Destination.State?
   }
 
@@ -19,11 +20,14 @@ struct PodcastsFeature {
 
   enum Action: Equatable {
     case addShowTapped
+    case startNextDownload
     case showTapped(Int)
     case destination(PresentationAction<Destination.Action>)
   }
 
   @Dependency(\.defaultDatabase) var db
+  @Dependency(\.podcasts) var podcasts
+  @Dependency(\.date) var date
 
   var body: some Reducer<State, Action> {
     Reduce { state, action in
@@ -37,20 +41,44 @@ struct PodcastsFeature {
           reportIssue("Show with id \(showId) not found")
           return .none
         }
-        let episodes = withErrorReporting {
-          try self.db.read {
-            try Episode.all
-              .where { $0.showId == show.id }
-              .fetchAll($0)
-          }
+        let episodes = self.db.tryRead {
+          try Episode.all
+            .where { $0.showId == show.id }
+            .order { ($0.episodeNumber.desc(), $0.pubDate.desc()) }
+            .fetchAll($0)
         }
-        state.destination = .show(.init(show: show, episodes: episodes ?? []))
+        state.destination = .show(.init(show: show, episodes: episodes))
         return .none
 
       case .destination(.presented(.addShow(.subscribed(let show)))):
         state.shows.append(show)
         state.destination = nil
-        return .none
+        state.downloadQueue += self.db.tryRead {
+          try Episode.all
+            .where { $0.showId == show.id }
+            .order { ($0.episodeNumber.desc(), $0.pubDate.desc()) }
+            .limit(3)
+            .fetchAll($0)
+        }.reversed()
+        return .send(.startNextDownload)
+
+      case .startNextDownload:
+        guard let episode = state.downloadQueue.popLast() else {
+          return .none
+        }
+        return .run { send in
+          // TODO: handle errors
+          let success = await self.podcasts.download(episode: episode)
+          if success {
+            self.db.tryWrite { db in
+              try Episode
+                .update { $0.downloadedAt = self.date.now }
+                .where { $0.id == episode.id }
+                .execute(db)
+            }
+          }
+          await send(.startNextDownload)
+        }
 
       case .destination:
         return .none
@@ -63,15 +91,7 @@ struct PodcastsFeature {
 extension PodcastsFeature.State {
   init(passcode: Int) {
     @Dependency(\.defaultDatabase) var db
-
-    var shows: [Show] = []
-    withErrorReporting {
-      try db.read {
-        shows = try Show.all.fetchAll($0)
-      }
-    }
-
-    self.shows = shows
+    self.shows = db.tryRead { try Show.all.fetchAll($0) }
     self.passcode = passcode
   }
 }

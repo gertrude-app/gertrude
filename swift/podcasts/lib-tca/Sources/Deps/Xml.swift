@@ -31,6 +31,7 @@ enum XMLParseError: Error, Sendable {
   case invalidDate
   case invalidDuration
   case invalidAudioType
+  case missingEpisodeSize
 }
 
 private class PodcastFeedParser: NSObject, XMLParserDelegate {
@@ -58,9 +59,11 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
   private var episodeAudioUrl = ""
   private var episodeArtworkUrl: String?
   private var episodeDuration = 0
+  private var episodeSize = 0
   private var episodeAudioType = AudioType.mp3
   private var episodeGuid = ""
   private var episodePubDate = Date()
+  private var episodeNumber: Int?
 
   private var isInItem = false
   private var itemElementCount = 0
@@ -88,6 +91,8 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
       self.episodeAudioUrl = attributeDict["url"] ?? ""
       let typeString = attributeDict["type"] ?? ""
       self.episodeAudioType = AudioType(rawValue: typeString) ?? .mp3
+      let lengthString = attributeDict["length"] ?? "0"
+      self.episodeSize = Int(lengthString) ?? 0
     }
 
     if elementName == "image", !self.isInItem {
@@ -126,6 +131,11 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
         return
       }
 
+      guard self.episodeSize > 0 else {
+        self.parseError = .missingEpisodeSize
+        return
+      }
+
       let episode = Episode.FeedData(
         title: self.episodeTitle,
         description: self.episodeDescription?.isEmpty == false ? self
@@ -134,9 +144,11 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
         audioUrl: self.episodeAudioUrl,
         artworkUrl: self.episodeArtworkUrl?.isEmpty == false ? self.episodeArtworkUrl : nil,
         duration: self.episodeDuration,
+        sizeInBytes: self.episodeSize,
         audioType: self.episodeAudioType,
         guid: self.episodeGuid,
-        pubDate: self.episodePubDate
+        pubDate: self.episodePubDate,
+        episodeNumber: self.episodeNumber
       )
       self.episodes.append(episode)
       self.isInItem = false
@@ -178,6 +190,8 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
         self.episodePubDate = self.parseDate(trimmedText) ?? Date()
       case "itunes:duration":
         self.episodeDuration = self.parseDuration(trimmedText)
+      case "itunes:episode":
+        self.episodeNumber = Int(trimmedText)
       case "url" where self.parentElement == "image":
         self.episodeArtworkUrl = trimmedText
       default:
@@ -205,9 +219,11 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
     self.episodeAudioUrl = ""
     self.episodeArtworkUrl = nil
     self.episodeDuration = 0
+    self.episodeSize = 0
     self.episodeAudioType = .mp3
     self.episodeGuid = ""
     self.episodePubDate = Date()
+    self.episodeNumber = nil
   }
 
   private func parseDate(_ dateString: String) -> Date? {

@@ -18,6 +18,20 @@ struct Show: Equatable {
 }
 
 extension Show {
+  var localAudioDir: URL {
+    .localShowAudiosDir(showId: self.id)
+  }
+}
+
+extension URL {
+  static func localShowAudiosDir(showId: Int) -> URL {
+    URL.documentsDirectory
+      .appending(component: "audio")
+      .appending(component: "show-\(showId)")
+  }
+}
+
+extension Show {
   struct FeedData: Equatable {
     var name: String
     var author: String?

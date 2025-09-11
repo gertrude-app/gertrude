@@ -2,6 +2,22 @@ import Foundation
 import OSLog
 import SharingGRDB
 
+extension DatabaseReader {
+  func tryRead<T>(_ block: (Database) throws -> [T]) -> [T] {
+    withErrorReporting { try self.read { try block($0) } } ?? []
+  }
+
+  func tryRead<T>(_ block: (Database) throws -> T) -> T? {
+    withErrorReporting { try self.read { try block($0) } }
+  }
+}
+
+public extension DatabaseWriter {
+  func tryWrite<T>(_ updates: (Database) throws -> T) -> T {
+    withErrorReporting { try self.write { try updates($0) } }!
+  }
+}
+
 public func appDatabase() throws -> any DatabaseWriter {
   @Dependency(\.context) var context
   let database: any DatabaseWriter
@@ -51,17 +67,20 @@ public func appDatabase() throws -> any DatabaseWriter {
        CREATE TABLE episodes (
          id INTEGER PRIMARY KEY NOT NULL,
          showId INTEGER NOT NULL,
+         episodeNumber INTEGER,
          title TEXT NOT NULL,
          description TEXT,
          websiteUrl TEXT,
          audioUrl TEXT NOT NULL,
          artworkUrl TEXT,
          duration INTEGER NOT NULL,
+         sizeInBytes INTEGER NOT NULL,
          audioType TEXT NOT NULL CHECK (audioType IN ('audio/mpeg', 'audio/x-m4a')),
          guid TEXT NOT NULL,
          pubDate TEXT NOT NULL,
          progress REAL NOT NULL DEFAULT 0.0,
          lastPlayedAt TEXT,
+         downloadedAt TEXT,
          updatedAt TEXT NOT NULL,
          createdAt TEXT NOT NULL,
          FOREIGN KEY (showId) REFERENCES shows (id) ON DELETE CASCADE

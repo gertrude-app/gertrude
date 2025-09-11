@@ -7,6 +7,7 @@ import LibViews
 struct PodcastClient: Sendable {
   var getFeed: @Sendable (_ feedUrl: String) async throws -> Feed
   var search: @Sendable (_ query: String) async throws -> [SearchResult]
+  var download: @Sendable (_ episode: Episode) async -> Bool = { _ in false }
 }
 
 extension PodcastClient: DependencyKey {
@@ -17,6 +18,9 @@ extension PodcastClient: DependencyKey {
       },
       search: { query in
         try await searchPodcastsLive(query: query)
+      },
+      download: { episode in
+        await downloadEpisodeLive(episode: episode)
       }
     )
   }
@@ -127,4 +131,30 @@ enum SearchError: Error, Sendable {
   case invalidURL
   case networkError
   case decodingError
+}
+
+@Sendable
+func downloadEpisodeLive(episode: Episode) async -> Bool {
+  guard let sourceUrl = URL(string: episode.audioUrl) else {
+    return false
+  }
+
+  do {
+    try FileManager.default.createDirectory(
+      at: episode.localAudioUrl.deletingLastPathComponent(),
+      withIntermediateDirectories: true,
+      attributes: nil
+    )
+
+    let (data, response) = try await URLSession.shared.data(from: sourceUrl)
+    guard let httpResponse = response as? HTTPURLResponse,
+          httpResponse.statusCode == 200 else {
+      return false
+    }
+
+    try data.write(to: episode.localAudioUrl)
+    return true
+  } catch {
+    return false
+  }
 }

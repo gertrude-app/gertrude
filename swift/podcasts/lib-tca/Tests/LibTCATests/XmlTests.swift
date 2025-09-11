@@ -62,6 +62,8 @@ func testParsePodcastFeedBasic() throws {
   #expect(episode1.artworkUrl == "https://example.com/episode1-artwork.jpg")
   #expect(episode1.guid == "episode-1")
   #expect(episode1.duration == 5025)
+  #expect(episode1.sizeInBytes == 50_000_000)
+  #expect(episode1.episodeNumber == nil)
 
   // Check pubDates
   let formatter = DateFormatter()
@@ -76,6 +78,7 @@ func testParsePodcastFeedBasic() throws {
   #expect(episode2.audioType == .m4a)
   #expect(episode2.artworkUrl == "https://example.com/episode2-artwork.jpg")
   #expect(episode2.duration == 2730)
+  #expect(episode2.sizeInBytes == 30_000_000)
 }
 
 @Test
@@ -314,6 +317,7 @@ func testParseRealWorldFeed() throws {
   #expect(episode.audioType == .mp3)
   #expect(episode.artworkUrl == "https://example.com/episode-artwork.jpg")
   #expect(episode.guid == "real-world-1")
+  #expect(episode.sizeInBytes == 36_828_271)
 
   // Test CDATA description parsing
   #expect(
@@ -399,6 +403,7 @@ func testParseSpanishPodcastFeed() throws {
   #expect(episode.guid == "446c5533-344f-4d28-a8c0-a61cc15b8a29")
   #expect(episode.websiteUrl == "https://lcspodcast.com/148")
   #expect(episode.duration == 1919) // 31:59 in seconds
+  #expect(episode.episodeNumber == 148)
 
   // Test HTML tag removal from description
   #expect(
@@ -416,4 +421,5 @@ func testParseSpanishPodcastFeed() throws {
 
   let episode2 = result.episodes[1]
   #expect(episode2.title == "12: What Is “Is” in Spanish?")
+  #expect(episode2.episodeNumber == 11)
 }

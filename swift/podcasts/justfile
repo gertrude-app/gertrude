@@ -46,6 +46,18 @@ build-app:
 clean:
   find lib-tca lib-core lib-views -type f \( -name '*.o' -o -name '*.d' -o -name '*.swiftdeps' -o -name '*.swiftdeps~' \) -delete
 
+sim-db:
+  @harlequin {{sim-docs-dir}}/db.sqlite
+
+sim-db-delete:
+  @rm -f {{sim-docs-dir}}/db.*
+
+sim-fs-open:
+  @open {{sim-docs-dir}}
+
+sim-fs-tree:
+  @tree {{sim-docs-dir}}
+
 # previews
 
 regen-previews:
@@ -79,3 +91,6 @@ watch-test dir isolate="":
   @just watch-swift {{dir}} '"cd {{dir}} && \
   SWIFT_DETERMINISTIC_HASHING=1 swift test --enable-experimental-prebuilts \
   {{ if isolate != "" { "--filter " + isolate } else { "" } }} "'
+
+sim-docs-dir := `ls -dt ~/Library/Developer/CoreSimulator/Devices/*/data/Containers/Data/Application/*/Documents | head -1`
+

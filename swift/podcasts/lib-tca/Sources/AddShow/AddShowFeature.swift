@@ -131,7 +131,9 @@ struct AddShowFeature {
         }
         let episodes = feed.episodes.map { $0.toEpisodeDraft(showId: show.id) }
         try await self.db.write { db in
-          try Episode.insert { episodes }.execute(db)
+          try Episode
+            .insert { episodes }
+            .execute(db)
         }
         await send(.subscribed(show))
       } catch {
