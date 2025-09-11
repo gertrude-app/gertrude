@@ -10,49 +10,60 @@ public struct EpisodeView: View {
   }
 
   public var body: some View {
-    HStack(spacing: 12) {
-      VStack(alignment: .leading, spacing: 6) {
-        HStack {
+    ZStack {
+      HStack(spacing: 12) {
+        VStack(alignment: .leading, spacing: 4) {
           Text(self.episode.relativeTime)
             .font(.system(size: 12, weight: .semibold))
             .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+            .opacity(0.8)
 
+          Text(self.episode.title)
+            .font(.system(size: 16, weight: .semibold))
+            .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
+            .multilineTextAlignment(.leading)
+            .lineLimit(2)
+
+          if let description = episode.description {
+            Text(description)
+              .font(.system(size: 14, weight: .regular))
+              .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
+              .multilineTextAlignment(.leading)
+              .lineLimit(3)
+          }
+        }
+
+        Spacer(minLength: 60)
+      }
+
+      VStack {
+        HStack {
           Spacer()
-
           Text(self.episode.duration)
             .font(.system(size: 12, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+            .padding(.top, 4)
         }
-
-        Text(self.episode.title)
-          .font(.system(size: 16, weight: .semibold))
-          .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
-          .multilineTextAlignment(.leading)
-          .lineLimit(2)
-
-        if let description = episode.description {
-          Text(description)
-            .font(.system(size: 14, weight: .regular))
-            .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
-            .multilineTextAlignment(.leading)
-            .lineLimit(3)
-        }
+        Spacer()
       }
 
       VStack {
         Spacer()
-
-        Image(
-          systemName: self.episode
-            .isDownloaded ? "arrow.down.circle.fill" : "arrow.down.circle"
-        )
-        .font(.system(size: 20, weight: .medium))
-        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+        HStack {
+          Spacer()
+          Image(
+            systemName: self.episode
+              .isDownloaded ? "arrow.down.circle.fill" : "arrow.down.circle"
+          )
+          .font(.system(size: 16, weight: .medium))
+          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+        }
       }
     }
+    .frame(maxWidth: .infinity, alignment: .leading)
     .padding(.horizontal, 20)
     .padding(.top, 12)
-    .padding(.bottom, 16)
+    .padding(.bottom, 20)
   }
 }
 

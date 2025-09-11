@@ -15,7 +15,7 @@ struct Episode: Equatable {
   var audioType: AudioType
   var guid: String
   var pubDate: Date
-  var progress: Int = 0
+  var progress: Double = 0.0
   var lastPlayedAt: Date? = nil
   var updatedAt: Date
   var createdAt: Date

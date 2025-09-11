@@ -23,5 +23,14 @@ struct PodcastsView: View {
         AddShowView(store: store)
       }
     )
+    .navigationDestination(
+      item: self.$store.scope(
+        state: \.destination?.show,
+        action: \.destination.show
+      ),
+      destination: { store in
+        ShowViewContainer(store: store)
+      }
+    )
   }
 }

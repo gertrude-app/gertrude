@@ -60,7 +60,7 @@ public func appDatabase() throws -> any DatabaseWriter {
          audioType TEXT NOT NULL CHECK (audioType IN ('audio/mpeg', 'audio/x-m4a')),
          guid TEXT NOT NULL,
          pubDate TEXT NOT NULL,
-         progress INTEGER NOT NULL DEFAULT 0,
+         progress REAL NOT NULL DEFAULT 0.0,
          lastPlayedAt TEXT,
          updatedAt TEXT NOT NULL,
          createdAt TEXT NOT NULL,

@@ -7,5 +7,6 @@ struct ShowFeature {
   @ObservableState
   struct State: Equatable {
     var show: Show
+    var episodes: [Episode]
   }
 }

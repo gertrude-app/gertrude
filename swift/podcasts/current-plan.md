@@ -42,3 +42,11 @@ heading part for now
       cap it to 3 lines
 - [x] less space below the heading description, and a tiny bit more padding on the bottom
       of each episode
+- [x] even more padding at the bottom of each episode
+- [x] i don't like where the duration is displayed, make it float all the way to the right
+      of the episode view, above the download icon
+- [x] make the "3H AGO" text a lighter by decreasing opacity by 20%, also move it down
+      closer to the title a smidge
+- [x] download icons smaller
+- [x] change the progress field of Episode model in lib-tca to be a Double instead of an
+      int, update the migration in the Database.swift file

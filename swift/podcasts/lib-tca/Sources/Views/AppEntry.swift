@@ -20,29 +20,30 @@ public struct EntryPoint: View {
 
   public var body: some View {
     AppView(store: self.store)
+      .tint(.violet500)
   }
 }
 
 private var initialState: AppReducer.State {
   @Dependency(\.passcode) var passcode
   var state = AppReducer.State()
-  #if !targetEnvironment(simulator)
-    if let passcode = passcode.load() {
-      state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
-    } else {
-      state.mode = .onboarding(OnboardingFeature.State())
-    }
-  #else
-    passcode.delete()
-    state.mode = .podcasts(PodcastsFeature.State(
-      passcode: 111_111,
-      shows: [],
-      destination: .addShow(.init(
-        passcode: 111_111,
-        screen: .searching,
-        searchText: "henderson ancient path",
-      ))
-    ))
-  #endif
+  // #if !targetEnvironment(simulator)
+  if let passcode = passcode.load() {
+    state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
+  } else {
+    state.mode = .onboarding(OnboardingFeature.State())
+  }
+  // #else
+  //   passcode.delete()
+  //   state.mode = .podcasts(PodcastsFeature.State(
+  //     passcode: 111_111,
+  //     shows: [],
+  //     destination: .addShow(.init(
+  //       passcode: 111_111,
+  //       screen: .searching,
+  //       searchText: "henderson ancient path",
+  //     ))
+  //   ))
+  // #endif
   return state
 }

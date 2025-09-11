@@ -14,6 +14,7 @@ struct PodcastsFeature {
   @Reducer(state: .equatable, action: .equatable)
   enum Destination {
     case addShow(AddShowFeature)
+    case show(ShowFeature)
   }
 
   enum Action: Equatable {
@@ -21,6 +22,8 @@ struct PodcastsFeature {
     case showTapped(Int)
     case destination(PresentationAction<Destination.Action>)
   }
+
+  @Dependency(\.defaultDatabase) var db
 
   var body: some Reducer<State, Action> {
     Reduce { state, action in
@@ -30,6 +33,18 @@ struct PodcastsFeature {
         return .none
 
       case .showTapped(let showId):
+        guard let show = state.shows.first(where: { $0.id == showId }) else {
+          reportIssue("Show with id \(showId) not found")
+          return .none
+        }
+        let episodes = withErrorReporting {
+          try self.db.read {
+            try Episode.all
+              .where { $0.showId == show.id }
+              .fetchAll($0)
+          }
+        }
+        state.destination = .show(.init(show: show, episodes: episodes ?? []))
         return .none
 
       case .destination(.presented(.addShow(.subscribed(let show)))):

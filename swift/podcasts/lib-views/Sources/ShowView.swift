@@ -49,7 +49,7 @@ public struct ShowView: View {
             .font(.system(size: 14, weight: .regular))
             .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
             .multilineTextAlignment(.center)
-            .lineLimit(nil)
+            .lineLimit(3)
             .padding(.top, 8)
         }
       }
