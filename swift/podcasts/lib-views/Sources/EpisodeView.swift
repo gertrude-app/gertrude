@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct EpisodeView: View {
   @Environment(\.colorScheme) var cs
+  @State private var rotationAngle: Double = 0
 
   let episode: EpisodeData
 
@@ -51,12 +52,28 @@ public struct EpisodeView: View {
         Spacer()
         HStack {
           Spacer()
-          Image(
-            systemName: self.episode
-              .isDownloaded ? "arrow.down.circle.fill" : "arrow.down.circle"
-          )
-          .font(.system(size: 16, weight: .medium))
-          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+          Group {
+            switch self.episode.downloadState {
+            case .downloaded:
+              Image(systemName: "arrow.down.circle.fill")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+            case .downloading:
+              Image(systemName: "arrow.2.circlepath")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+                .rotationEffect(.degrees(self.rotationAngle))
+                .onAppear {
+                  withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
+                    self.rotationAngle = 360
+                  }
+                }
+            case .notDownloaded:
+              Image(systemName: "arrow.down.circle")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+            }
+          }
         }
       }
     }
@@ -84,7 +101,7 @@ public struct EpisodeView: View {
     description: "Deep dive into MVVM, VIPER, and TCA architecture patterns for iOS applications.",
     relativeTime: "2D AGO",
     duration: "45m",
-    isDownloaded: true
+    downloadState: .downloaded
   ))
 }
 
@@ -114,7 +131,18 @@ public struct EpisodeView: View {
     description: "Best practices for designing interfaces that work well in both light and dark modes.",
     relativeTime: "3H AGO",
     duration: "52m",
-    isDownloaded: true
+    downloadState: .downloaded
   ))
   .preferredColorScheme(.dark)
+}
+
+#Preview("Episode - Downloading") {
+  EpisodeView(episode: EpisodeData(
+    id: 6,
+    title: "Swift Concurrency Deep Dive",
+    description: "Learn about async/await, actors, and structured concurrency in Swift.",
+    relativeTime: "JUST NOW",
+    duration: "1h 20m",
+    downloadState: .downloading
+  ))
 }

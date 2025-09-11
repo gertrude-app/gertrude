@@ -1,12 +1,18 @@
 import Foundation
 
+public enum DownloadState: Sendable, Equatable {
+  case notDownloaded
+  case downloading
+  case downloaded
+}
+
 public struct EpisodeData: Identifiable, Sendable, Equatable {
   public let id: Int
   public let title: String
   public let description: String?
   public let relativeTime: String
   public let duration: String
-  public let isDownloaded: Bool
+  public let downloadState: DownloadState
 
   public init(
     id: Int,
@@ -14,13 +20,13 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
     description: String? = nil,
     relativeTime: String,
     duration: String,
-    isDownloaded: Bool = false
+    downloadState: DownloadState = .notDownloaded
   ) {
     self.id = id
     self.title = title
     self.description = description
     self.relativeTime = relativeTime
     self.duration = duration
-    self.isDownloaded = isDownloaded
+    self.downloadState = downloadState
   }
 }

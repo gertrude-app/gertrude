@@ -31,7 +31,15 @@ enum AudioType: String, Equatable, QueryBindable {
 
 extension Episode {
   var downloaded: Bool {
-    self.downloadedAt != nil
+    @Dependency(\.date.now) var now
+    guard let downloadedAt = self.downloadedAt else { return false }
+    return downloadedAt <= now
+  }
+
+  var downloading: Bool {
+    @Dependency(\.date.now) var now
+    guard let downloadedAt = self.downloadedAt else { return false }
+    return downloadedAt > now
   }
 
   var localAudioUrl: URL {
@@ -85,7 +93,9 @@ extension EpisodeData {
       description: episode.description,
       relativeTime: formatRelativeDate(episode.pubDate),
       duration: formatDuration(episode.duration),
-      isDownloaded: episode.downloaded
+      downloadState: episode.downloaded
+        ? .downloaded
+        : episode.downloading ? .downloading : .notDownloaded
     )
   }
 }

@@ -154,7 +154,8 @@ private let sampleEpisodes = [
     title: "Walking in Truth",
     description: "How to discern truth from error in today's confusing world and walk confidently in biblical wisdom.",
     relativeTime: "3H AGO",
-    duration: "45m"
+    duration: "45m",
+    downloadState: .downloading,
   ),
   EpisodeData(
     id: 2,
@@ -162,7 +163,7 @@ private let sampleEpisodes = [
     description: "Jesus spoke of the narrow path that leads to life. What does this mean for believers today?",
     relativeTime: "1D AGO",
     duration: "52m",
-    isDownloaded: true
+    downloadState: .downloaded
   ),
   EpisodeData(
     id: 3,
@@ -177,7 +178,7 @@ private let sampleEpisodes = [
     description: "A comprehensive overview of all the new features and improvements in Swift 6.0.",
     relativeTime: "JUST NOW",
     duration: "1h 15m",
-    isDownloaded: true
+    downloadState: .downloaded
   ),
   EpisodeData(
     id: 5,
