@@ -5,16 +5,16 @@ public struct ShowView: View {
 
   let show: ShowData
   let episodes: [EpisodeData]
-  let onEpisodeTap: @MainActor @Sendable (Int) -> Void
+  let onEpisodeEvent: @MainActor @Sendable (Int, EpisodeView.Event) -> Void
 
   public init(
     show: ShowData,
     episodes: [EpisodeData] = [],
-    onEpisodeTap: @MainActor @Sendable @escaping (Int) -> Void = { _ in }
+    onEpisodeEvent: @MainActor @Sendable @escaping (Int, EpisodeView.Event) -> Void = { _, _ in }
   ) {
     self.show = show
     self.episodes = episodes
-    self.onEpisodeTap = onEpisodeTap
+    self.onEpisodeEvent = onEpisodeEvent
   }
 
   public var body: some View {
@@ -98,8 +98,8 @@ public struct ShowView: View {
   private var episodesList: some View {
     LazyVStack(spacing: 1) {
       ForEach(self.episodes) { episode in
-        EpisodeView(episode: episode) {
-          self.onEpisodeTap($0.id)
+        EpisodeView(episode: episode) { event in
+          self.onEpisodeEvent(episode.id, event)
         }
         .background(Color(self.cs, light: .white, dark: .black))
       }
@@ -164,6 +164,7 @@ private let sampleEpisodes = [
     relativeTime: "3H AGO",
     duration: "45m",
     downloadState: .downloading,
+    isPlaying: true
   ),
   EpisodeData(
     id: 2,

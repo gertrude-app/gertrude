@@ -13,6 +13,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
   public let relativeTime: String
   public let duration: String
   public let downloadState: DownloadState
+  public let isPlaying: Bool
 
   public init(
     id: Int,
@@ -20,7 +21,8 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
     description: String? = nil,
     relativeTime: String,
     duration: String,
-    downloadState: DownloadState = .notDownloaded
+    downloadState: DownloadState = .notDownloaded,
+    isPlaying: Bool = false
   ) {
     self.id = id
     self.title = title
@@ -28,5 +30,6 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
     self.relativeTime = relativeTime
     self.duration = duration
     self.downloadState = downloadState
+    self.isPlaying = isPlaying
   }
 }

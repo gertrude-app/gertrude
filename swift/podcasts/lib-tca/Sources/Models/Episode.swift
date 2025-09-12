@@ -95,7 +95,8 @@ extension EpisodeData {
       duration: formatDuration(episode.duration),
       downloadState: episode.downloaded
         ? .downloaded
-        : episode.downloading ? .downloading : .notDownloaded
+        : episode.downloading ? .downloading : .notDownloaded,
+      isPlaying: false // TODO: Implement playing state tracking
     )
   }
 }

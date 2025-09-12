@@ -9,8 +9,8 @@ struct ShowViewContainer: View {
     ShowView(
       show: .init(from: self.store.show),
       episodes: self.store.episodes.map { .init(from: $0) }
-    ) {
-      self.store.send(.episodeTapped($0))
+    ) { _, _ in
+      // TODO:
     }
   }
 }
