@@ -5,9 +5,14 @@ public struct EpisodeView: View {
   @State private var rotationAngle: Double = 0
 
   let episode: EpisodeData
+  let onTap: @MainActor @Sendable (EpisodeData) -> Void
 
-  public init(episode: EpisodeData) {
+  public init(
+    episode: EpisodeData,
+    onTap: @MainActor @Sendable @escaping (EpisodeData) -> Void = { _ in }
+  ) {
     self.episode = episode
+    self.onTap = onTap
   }
 
   public var body: some View {
@@ -81,6 +86,9 @@ public struct EpisodeView: View {
     .padding(.horizontal, 20)
     .padding(.top, 12)
     .padding(.bottom, 20)
+    .onTapGesture {
+      self.onTap(self.episode)
+    }
   }
 }
 

@@ -5,10 +5,16 @@ public struct ShowView: View {
 
   let show: ShowData
   let episodes: [EpisodeData]
+  let onEpisodeTap: @MainActor @Sendable (Int) -> Void
 
-  public init(show: ShowData, episodes: [EpisodeData] = []) {
+  public init(
+    show: ShowData,
+    episodes: [EpisodeData] = [],
+    onEpisodeTap: @MainActor @Sendable @escaping (Int) -> Void = { _ in }
+  ) {
     self.show = show
     self.episodes = episodes
+    self.onEpisodeTap = onEpisodeTap
   }
 
   public var body: some View {
@@ -92,8 +98,10 @@ public struct ShowView: View {
   private var episodesList: some View {
     LazyVStack(spacing: 1) {
       ForEach(self.episodes) { episode in
-        EpisodeView(episode: episode)
-          .background(Color(self.cs, light: .white, dark: .black))
+        EpisodeView(episode: episode) {
+          self.onEpisodeTap($0.id)
+        }
+        .background(Color(self.cs, light: .white, dark: .black))
       }
     }
     .padding(.top, 12)

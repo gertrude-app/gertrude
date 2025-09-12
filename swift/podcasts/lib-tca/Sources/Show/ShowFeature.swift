@@ -23,4 +23,24 @@ struct ShowFeature {
       )
     }
   }
+
+  enum Action: Equatable {
+    case episodeTapped(Int)
+  }
+
+  @Dependency(\.audioPlayer) var audioPlayer
+
+  var body: some ReducerOf<Self> {
+    Reduce { state, action in
+      switch action {
+      case .episodeTapped(let episodeId):
+        guard let episode = state.episodes.first(where: { $0.id == episodeId }) else {
+          return .none
+        }
+        return .run { _ in
+          try await self.audioPlayer.playEpisodeAudio(episode: episode)
+        }
+      }
+    }
+  }
 }
