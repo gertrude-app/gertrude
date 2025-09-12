@@ -100,3 +100,23 @@ extension EpisodeData {
     )
   }
 }
+
+extension Episode {
+  static var mock: Self {
+    .init(
+      id: 1,
+      showId: 1,
+      episodeNumber: 1,
+      title: "Grace Must Reign",
+      audioUrl: "https://example.com/episode1.mp3",
+      duration: 3600,
+      sizeInBytes: 50_000_000,
+      audioType: .mp3,
+      guid: "episode-1-guid",
+      pubDate: Date(),
+      progress: 0.5,
+      updatedAt: Date(),
+      createdAt: Date(),
+    )
+  }
+}

@@ -4,6 +4,7 @@ import ComposableArchitecture
 struct AppReducer {
   @ObservableState
   struct State: Equatable {
+    var nowPlaying: NowPlayingFeature.State?
     @Presents var mode: Mode.State?
   }
 
@@ -14,6 +15,7 @@ struct AppReducer {
   }
 
   enum Action: Equatable {
+    case nowPlaying(NowPlayingFeature.Action)
     case mode(PresentationAction<Mode.Action>)
   }
 
@@ -27,10 +29,22 @@ struct AppReducer {
         return .run { _ in
           self.passcode.save(passcode)
         }
+      case .nowPlaying:
+        return .none
       case .mode:
         return .none
       }
     }
     .ifLet(\.$mode, action: \.mode)
+    .ifLet(\.nowPlaying, action: \.nowPlaying) {
+      NowPlayingFeature()
+    }
   }
+}
+
+struct NowPlaying: Equatable {
+  var episode: Episode
+  var show: Show
+  var isPlaying: Bool
+  var minimized: Bool
 }

@@ -1,44 +1,39 @@
 import SwiftUI
 
-public struct EpisodePlaying: View {
+public struct NowPlayingView: View {
   @Environment(\.colorScheme) var cs
-
-  public enum DisplayMode {
-    case mini
-    case expanded
-  }
 
   let episode: EpisodeData
   let show: ShowData
-  let mode: DisplayMode
+  let minimized: Bool
   let emit: @MainActor @Sendable (Event) -> Void
 
-  public enum Event {
+  public enum Event: Equatable {
     case playPauseTapped
-    case skipBackward
-    case skipForward
+    case skipBackwardTapped
+    case skipForwardTapped
     case dismissed
-    case expandTapped
+    case miniPlayerTapped
+    case skipTo(Double)
   }
 
   public init(
     episode: EpisodeData,
     show: ShowData,
-    mode: DisplayMode = .mini,
-    emit: @MainActor @Sendable @escaping (Event) -> Void = { _ in }
+    minimized: Bool = true,
+    emit: @MainActor @Sendable @escaping (Event) -> Void
   ) {
     self.episode = episode
+    self.minimized = minimized
     self.show = show
-    self.mode = mode
     self.emit = emit
   }
 
   public var body: some View {
-    switch self.mode {
-    case .mini:
+    if self.minimized {
       self.miniPlayer
         .transition(.move(edge: .bottom).combined(with: .opacity))
-    case .expanded:
+    } else {
       self.expandedPlayer
         .transition(.move(edge: .bottom).combined(with: .opacity))
     }
@@ -92,8 +87,10 @@ public struct EpisodePlaying: View {
     .padding(.vertical, 8)
     .background(Color(self.cs, light: .white, dark: .black))
     .cornerRadius(8)
+    .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: -3)
+    .padding(.horizontal, 16)
     .onTapGesture {
-      self.emit(.expandTapped)
+      self.emit(.miniPlayerTapped)
     }
   }
 
@@ -177,19 +174,35 @@ public struct EpisodePlaying: View {
 
       Spacer()
 
-      // Progress bar placeholder
+      // Progress bar with draggable thumb
       VStack(spacing: 8) {
-        RoundedRectangle(cornerRadius: 2)
-          .fill(Color(self.cs, light: .violet200, dark: .violet700))
-          .frame(height: 4)
-          .overlay(
-            HStack {
-              RoundedRectangle(cornerRadius: 2)
-                .fill(Color(self.cs, light: .violet500, dark: .violet400))
-                .frame(width: 80)
-              Spacer()
-            }
-          )
+        GeometryReader { geometry in
+          ZStack(alignment: .leading) {
+            // Background track
+            RoundedRectangle(cornerRadius: 2)
+              .fill(Color(self.cs, light: .violet200, dark: .violet700))
+              .frame(height: 4)
+
+            // Progress fill
+            RoundedRectangle(cornerRadius: 2)
+              .fill(Color(self.cs, light: .violet500, dark: .violet400))
+              .frame(width: 80, height: 4)
+
+            // Draggable thumb
+            Circle()
+              .fill(Color(self.cs, light: .violet500, dark: .violet400))
+              .frame(width: 12, height: 12)
+              .offset(x: 80 - 6) // Center the thumb on progress position
+              .gesture(
+                DragGesture()
+                  .onChanged { value in
+                    let progress = max(0, min(1, value.location.x / geometry.size.width))
+                    self.emit(.skipTo(progress))
+                  }
+              )
+          }
+        }
+        .frame(height: 12)
 
         HStack {
           Text("2:34")
@@ -208,7 +221,7 @@ public struct EpisodePlaying: View {
       // Controls
       HStack(spacing: 40) {
         Button(action: {
-          self.emit(.skipBackward)
+          self.emit(.skipBackwardTapped)
         }) {
           Image(systemName: "gobackward.15")
             .font(.system(size: 24, weight: .medium))
@@ -224,7 +237,7 @@ public struct EpisodePlaying: View {
         }
 
         Button(action: {
-          self.emit(.skipForward)
+          self.emit(.skipForwardTapped)
         }) {
           Image(systemName: "goforward.30")
             .font(.system(size: 24, weight: .medium))
@@ -243,14 +256,14 @@ public struct EpisodePlaying: View {
       .fill(Color(self.cs, light: .violet200, dark: .violet800))
       .overlay(
         Image(systemName: "mic")
-          .font(.system(size: self.mode == .mini ? 20 : 80, weight: .medium))
+          .font(.system(size: self.minimized ? 20 : 80, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet500))
       )
   }
 }
 
 #Preview("Mini Player") {
-  EpisodePlaying(
+  NowPlayingView(
     episode: EpisodeData(
       id: 1,
       title: "Understanding SwiftUI State Management",
@@ -267,14 +280,15 @@ public struct EpisodePlaying: View {
       description: "Weekly Swift discussions",
       artworkUrl: nil
     ),
-    mode: .mini
+    minimized: true,
+    emit: { _ in }
   )
   .padding()
   .background(Color.gray.opacity(0.1))
 }
 
 #Preview("Expanded Player") {
-  EpisodePlaying(
+  NowPlayingView(
     episode: EpisodeData(
       id: 1,
       title: "Understanding SwiftUI State Management",
@@ -291,12 +305,13 @@ public struct EpisodePlaying: View {
       description: "Weekly Swift discussions",
       artworkUrl: nil
     ),
-    mode: .expanded
+    minimized: false,
+    emit: { _ in }
   )
 }
 
 #Preview("Mini Player - Playing") {
-  EpisodePlaying(
+  NowPlayingView(
     episode: EpisodeData(
       id: 1,
       title: "Advanced iOS Architecture Patterns That Scale",
@@ -312,7 +327,8 @@ public struct EpisodePlaying: View {
       author: "Dave Verwer",
       description: "Weekly iOS development discussions"
     ),
-    mode: .mini
+    minimized: false,
+    emit: { _ in }
   )
   .padding()
   .background(Color.gray.opacity(0.1))
@@ -351,7 +367,7 @@ public struct EpisodePlaying: View {
         if !isExpanded {
           VStack {
             Spacer()
-            EpisodePlaying(
+            NowPlayingView(
               episode: EpisodeData(
                 id: 1,
                 title: "SwiftUI Animation Masterclass",
@@ -368,9 +384,9 @@ public struct EpisodePlaying: View {
                 description: "Advanced Swift programming",
                 artworkUrl: "https://example.com/artwork.jpg"
               ),
-              mode: .mini
+              minimized: true,
             ) { event in
-              if event == .expandTapped {
+              if event == .miniPlayerTapped {
                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                   isExpanded = true
                 }
@@ -384,7 +400,7 @@ public struct EpisodePlaying: View {
 
         // Expanded player (full screen)
         if isExpanded {
-          EpisodePlaying(
+          NowPlayingView(
             episode: EpisodeData(
               id: 1,
               title: "SwiftUI Animation Masterclass",
@@ -401,7 +417,7 @@ public struct EpisodePlaying: View {
               description: "Advanced Swift programming",
               artworkUrl: "https://example.com/artwork.jpg"
             ),
-            mode: .expanded
+            minimized: false,
           ) { event in
             if event == .dismissed {
               withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {

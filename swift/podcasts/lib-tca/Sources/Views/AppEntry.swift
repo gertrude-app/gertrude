@@ -28,22 +28,24 @@ private var initialState: AppReducer.State {
   @Dependency(\.passcode) var passcode
   var state = AppReducer.State()
   // #if !targetEnvironment(simulator)
-  if let passcode = passcode.load() {
-    state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
-  } else {
-    state.mode = .onboarding(OnboardingFeature.State())
-  }
+  // if let passcode = passcode.load() {
+  //   state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
+  // } else {
+  //   state.mode = .onboarding(OnboardingFeature.State())
+  // }
   // #else
   //   passcode.delete()
-  //   state.mode = .podcasts(PodcastsFeature.State(
-  //     passcode: 111_111,
-  //     shows: [],
-  //     destination: .addShow(.init(
-  //       passcode: 111_111,
-  //       screen: .searching,
-  //       searchText: "henderson ancient path",
-  //     ))
-  //   ))
+  state.nowPlaying = .init(
+    episode: .mock,
+    show: .mock,
+    isPlaying: true,
+    minimized: true,
+  )
+  state.mode = .podcasts(PodcastsFeature.State(
+    passcode: 111_111,
+    shows: [.mock],
+    destination: .show(.init(show: .mock)),
+  ))
   // #endif
   return state
 }
