@@ -42,6 +42,7 @@ public struct ShowView: View {
           .font(.system(size: 24, weight: .bold))
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
           .multilineTextAlignment(.center)
+          .lineLimit(2)
 
         if let author = show.author {
           Text(author)
