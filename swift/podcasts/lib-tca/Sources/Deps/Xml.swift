@@ -95,10 +95,6 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
       self.episodeSize = Int(lengthString) ?? 0
     }
 
-    if elementName == "image", !self.isInItem {
-      self.showArtworkUrl = attributeDict["href"]
-    }
-
     if elementName == "itunes:image", !self.isInItem {
       self.showArtworkUrl = attributeDict["href"]
     }
@@ -131,8 +127,10 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
         return
       }
 
-      guard self.episodeSize > 0 else {
-        self.parseError = .missingEpisodeSize
+      // Skip episode if it has neither size nor duration
+      guard self.episodeSize > 0 || self.episodeDuration > 0 else {
+        // Skip this episode, don't add it to the episodes array
+        self.isInItem = false
         return
       }
 
