@@ -37,7 +37,7 @@ test:
   @cd lib-tca && SWIFT_DETERMINISTIC_HASHING=1 swift test --enable-experimental-prebuilts
 
 format: clean
-  @swiftformat .
+  @swiftformat --exclude '**/.build' .
 
 build-app:
   xcodebuild -workspace GertiePodcasts.xcodeproj/project.xcworkspace \

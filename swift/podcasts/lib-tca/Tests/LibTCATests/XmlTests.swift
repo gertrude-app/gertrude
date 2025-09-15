@@ -423,3 +423,50 @@ func testParseSpanishPodcastFeed() throws {
   #expect(episode2.title == "12: What Is “Is” in Spanish?")
   #expect(episode2.episodeNumber == 11)
 }
+
+@Test
+func testStripsHtmlTags() throws {
+  let xmlString = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+    <channel>
+      <title>Test Podcast</title>
+      <description><![CDATA[%INPUT%]]></description>
+      <author>Test Author</author>
+      <link>https://example.com</link>
+      <image>
+        <url>https://example.com/artwork.jpg</url>
+      </image>
+      <item>
+        <title>Episode 1</title>
+        <description><![CDATA[%INPUT%]]></description>
+        <link>https://example.com/episode1</link>
+        <guid>episode-1</guid>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <itunes:duration>1:23:45</itunes:duration>
+        <itunes:image href="https://example.com/episode1-artwork.jpg"/>
+        <enclosure url="https://example.com/episode1.mp3" type="audio/mpeg" length="50000000"/>
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let cases = [
+    ("<p>Description</p>", "Description"),
+    ("<p>Desc <a href=\"\">Link</a></p>", "Desc Link"),
+    ("<p>First</p><p>Second</p>", "First Second"),
+    (
+      "<p>Send email to <a href=\"mailto:a@b.com\"><strong>a.b.com</strong></a>, or call us.</p>",
+      "Send email to a.b.com, or call us."
+    ),
+    ("<p>Description\nwith\n\nnewline\n\n\nmore</p>", "Description with newline more"),
+    ("<p>Line1</p>\n<p>Line2</p>", "Line1 Line2"),
+  ]
+
+  for (input, expected) in cases {
+    let testXml = xmlString.replacingOccurrences(of: "%INPUT%", with: input)
+    let feed = try parsePodcastFeed(testXml)
+    #expect(feed.show.description == expected)
+    #expect(feed.episodes[0].description == expected)
+  }
+}

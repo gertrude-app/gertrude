@@ -204,7 +204,8 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
       self.show = Show.FeedData(
         name: self.showTitle,
         author: self.showAuthor,
-        description: self.showDescription,
+        description: self.showDescription?.isEmpty == false ? self
+          .stripHTML(self.showDescription ?? "") : nil,
         websiteUrl: self.showWebsiteUrl,
         artworkUrl: self.showArtworkUrl,
         iTunesId: self.iTunesId
@@ -272,14 +273,14 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
   }
 
   private func stripHTML(_ html: String) -> String {
-    // Remove HTML tags using regex
+    // Remove HTML tags using regex, replacing with space to preserve word separation
     let regex = try! NSRegularExpression(pattern: "<[^>]+>", options: [])
     let range = NSRange(location: 0, length: html.utf16.count)
     let stripped = regex.stringByReplacingMatches(
       in: html,
       options: [],
       range: range,
-      withTemplate: ""
+      withTemplate: " "
     )
 
     // Clean up extra whitespace and decode HTML entities
@@ -293,9 +294,16 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
       .trimmingCharacters(in: .whitespacesAndNewlines)
 
     // Remove multiple spaces and clean up
-    let finalCleaned = cleaned.replacingOccurrences(
+    let withoutExtraSpaces = cleaned.replacingOccurrences(
       of: "\\s+",
       with: " ",
+      options: .regularExpression
+    )
+
+    // Remove spaces before punctuation
+    let finalCleaned = withoutExtraSpaces.replacingOccurrences(
+      of: "\\s+([.,;:!?])",
+      with: "$1",
       options: .regularExpression
     )
 
