@@ -1,9 +1,10 @@
+import Dependencies
 import Foundation
 import LibViews
 import SharingGRDB
 
 @Table
-struct Episode: Equatable {
+struct Episode: Equatable, Hashable {
   let id: Int
   let showId: Int
   var episodeNumber: Int? = nil
@@ -20,7 +21,7 @@ struct Episode: Equatable {
   var progress: Double = 0.0
   var downloadedAt: Date? = nil
   var lastPlayedAt: Date? = nil
-  var updatedAt: Date
+  var updatedAt: Date = .init()
   var createdAt: Date
 }
 
@@ -78,7 +79,6 @@ extension Episode {
         audioType: self.audioType,
         guid: self.guid,
         pubDate: self.pubDate,
-        updatedAt: now,
         createdAt: now,
       )
     }
@@ -86,7 +86,7 @@ extension Episode {
 }
 
 extension EpisodeData {
-  init(from episode: Episode) {
+  init(from episode: Episode, isPlaying: Bool) {
     self.init(
       id: episode.id,
       title: episode.title,
@@ -96,7 +96,21 @@ extension EpisodeData {
       downloadState: episode.downloaded
         ? .downloaded
         : episode.downloading ? .downloading : .notDownloaded,
-      isPlaying: false // TODO: Implement playing state tracking
+      isPlaying: isPlaying
+    )
+  }
+
+  init(nowPlaying: NowPlaying.Data) {
+    self.init(
+      id: nowPlaying.episode.id,
+      title: nowPlaying.episode.title,
+      description: nowPlaying.episode.description,
+      relativeTime: formatRelativeDate(nowPlaying.episode.pubDate),
+      duration: formatDuration(nowPlaying.episode.duration),
+      downloadState: nowPlaying.episode.downloaded
+        ? .downloaded
+        : nowPlaying.episode.downloading ? .downloading : .notDownloaded,
+      isPlaying: nowPlaying.state.isPlaying
     )
   }
 }

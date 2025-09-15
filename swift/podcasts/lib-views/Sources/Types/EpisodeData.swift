@@ -8,12 +8,12 @@ public enum DownloadState: Sendable, Equatable {
 
 public struct EpisodeData: Identifiable, Sendable, Equatable {
   public let id: Int
-  public let title: String
-  public let description: String?
-  public let relativeTime: String
-  public let duration: String
-  public let downloadState: DownloadState
-  public let isPlaying: Bool
+  public var title: String
+  public var description: String?
+  public var relativeTime: String
+  public var duration: String
+  public var downloadState: DownloadState
+  public var isPlaying: Bool
 
   public init(
     id: Int,

@@ -1,9 +1,10 @@
 import ComposableArchitecture
+import LibViews
 import SharingGRDB
 import SwiftUI
 
 @Reducer
-struct ShowFeature {
+struct ShowFeature: Downloader {
   @ObservableState
   struct State: Equatable {
     var showId: Int
@@ -25,21 +26,38 @@ struct ShowFeature {
   }
 
   enum Action: Equatable {
-    case episodeTapped(Int)
+    enum DelegateAction: Equatable {
+      case episodePlayPauseTapped(Episode, Show)
+    }
+
+    case episodeView(Int, EpisodeView.Event)
+    case delegate(DelegateAction)
   }
 
-  @Dependency(\.audioPlayer) var audioPlayer
+  @Dependency(\.defaultDatabase) var db
+  @Dependency(\.podcasts) var podcasts
+  @Dependency(\.date) var date
 
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
-      case .episodeTapped(let episodeId):
+      case .episodeView(let episodeId, let episodeAction):
         guard let episode = state.episodes.first(where: { $0.id == episodeId }) else {
+          reportIssue("Episode with id \(episodeId) not found")
           return .none
         }
-        return .run { _ in
-          try await self.audioPlayer.playEpisodeAudio(episode: episode)
+        switch episodeAction {
+        case .downloadTapped:
+          return .run { _ in
+            await self.trackedDownload(episode: episode)
+          }
+        case .playPauseTapped:
+          return .send(.delegate(.episodePlayPauseTapped(episode, state.show)))
+        default:
+          return .none
         }
+      case .delegate:
+        return .none
       }
     }
   }

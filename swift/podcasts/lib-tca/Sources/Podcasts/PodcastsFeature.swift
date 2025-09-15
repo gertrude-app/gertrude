@@ -3,7 +3,7 @@ import SharingGRDB
 import SwiftUI
 
 @Reducer
-struct PodcastsFeature {
+struct PodcastsFeature: Downloader {
   @ObservableState
   struct State: Equatable {
     var passcode: Int
@@ -61,29 +61,7 @@ struct PodcastsFeature {
           return .none
         }
         return .run { send in
-          self.db.tryWrite { db in
-            try Episode
-              .update { $0.downloadedAt = .distantFuture }
-              .where { $0.id == episode.id }
-              .execute(db)
-          }
-          // TODO: handle errors
-          let success = await self.podcasts.download(episode: episode)
-          if success {
-            self.db.tryWrite { db in
-              try Episode
-                .update { $0.downloadedAt = self.date.now }
-                .where { $0.id == episode.id }
-                .execute(db)
-            }
-          } else {
-            self.db.tryWrite { db in
-              try Episode
-                .update { $0.downloadedAt = nil }
-                .where { $0.id == episode.id }
-                .execute(db)
-            }
-          }
+          await self.trackedDownload(episode: episode)
           await send(.startNextDownload)
         }
 

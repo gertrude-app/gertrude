@@ -1,18 +1,21 @@
 import ComposableArchitecture
 import LibViews
+import SharingGRDB
 import SwiftUI
 
 struct PodcastsView: View {
   @Bindable var store: StoreOf<PodcastsFeature>
+  @Fetch(AnyNowPlaying()) var nowPlayingShowing: Bool = false
 
   var body: some View {
-    PodcastsHomeView(shows: self.store.shows.map {
-      .init(id: $0.id, title: $0.name, artworkUrl: $0.artworkUrl)
-    }, onAddShowTap: {
-      self.store.send(.addShowTapped)
-    }, onShowTap: { showId in
-      self.store.send(.showTapped(showId))
-    })
+    PodcastsHomeView(
+      shows: self.store.shows.map {
+        .init(id: $0.id, title: $0.name, artworkUrl: $0.artworkUrl)
+      },
+      nowPlayingShowing: self.nowPlayingShowing,
+      onAddShowTap: { self.store.send(.addShowTapped) },
+      onShowTap: { self.store.send(.showTapped($0)) }
+    )
     .navigationBarBackButtonHidden(true)
     .navigationDestination(
       item: self.$store.scope(

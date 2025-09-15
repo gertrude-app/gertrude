@@ -58,6 +58,7 @@ public func appDatabase() throws -> any DatabaseWriter {
          artworkUrl TEXT,
          showArtwork INTEGER NOT NULL CHECK (showArtwork IN (0, 1)),
          iTunesId INTEGER,
+         updatedAt TEXT NOT NULL,
          createdAt TEXT NOT NULL
        ) STRICT;
       """
@@ -89,6 +90,17 @@ public func appDatabase() throws -> any DatabaseWriter {
     ).execute(db)
     try #sql(
       """
+      CREATE TABLE miscs (
+        id TEXT PRIMARY KEY NOT NULL,
+        value TEXT NOT NULL,
+        rowId INTEGER,
+        updatedAt TEXT NOT NULL,
+        createdAt TEXT NOT NULL
+      ) STRICT;
+      """
+    ).execute(db)
+    try #sql(
+      """
       CREATE TABLE events (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
@@ -108,6 +120,18 @@ public func appDatabase() throws -> any DatabaseWriter {
     ).execute(db)
   }
   try migrator.migrate(database)
+
+  try database.write { db in
+    try Misc
+      .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
+      .execute(db)
+    try Episode
+      .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
+      .execute(db)
+    try Show
+      .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
+      .execute(db)
+  }
 
   return database
 }

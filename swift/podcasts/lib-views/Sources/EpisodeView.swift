@@ -65,9 +65,6 @@ public struct EpisodeView: View {
                         self.rotationAngle = 360
                       }
                     }
-                    .onTapGesture {
-                      self.emit(.downloadTapped)
-                    }
                 case .notDownloaded:
                   Image(systemName: "arrow.down.circle")
                     .font(.system(size: 12, weight: .medium))

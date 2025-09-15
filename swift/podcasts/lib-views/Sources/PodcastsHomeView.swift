@@ -8,7 +8,7 @@ public struct PodcastsHomeView: View {
     public let title: String
     public let artworkUrl: String?
 
-    public init(id: Int, title: String, artworkUrl: String? = nil) {
+    public init(id: Int, title: String, artworkUrl: String? = nil,) {
       self.id = id
       self.title = title
       self.artworkUrl = artworkUrl
@@ -16,17 +16,20 @@ public struct PodcastsHomeView: View {
   }
 
   let shows: [PodcastShow]
+  let nowPlayingShowing: Bool
   let onAddShowTap: @MainActor @Sendable () -> Void
   let onShowTap: @MainActor @Sendable (Int) -> Void
 
   public init(
     shows: [PodcastShow],
+    nowPlayingShowing: Bool = false,
     onAddShowTap: @MainActor @escaping @Sendable () -> Void,
     onShowTap: @MainActor @escaping @Sendable (Int) -> Void = { _ in }
   ) {
     self.shows = shows
     self.onAddShowTap = onAddShowTap
     self.onShowTap = onShowTap
+    self.nowPlayingShowing = nowPlayingShowing
   }
 
   // https://itunes.apple.com/search?term=ancient+path&media=podcast&limit=25
@@ -51,6 +54,7 @@ public struct PodcastsHomeView: View {
       .padding(.bottom, 30)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .padding(.bottom, self.nowPlayingShowing ? 55 : 0)
     .background(Color(self.cs, light: .white, dark: .black))
   }
 

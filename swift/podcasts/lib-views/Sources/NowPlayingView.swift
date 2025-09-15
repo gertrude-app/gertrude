@@ -30,16 +30,35 @@ public struct NowPlayingView: View {
   }
 
   public var body: some View {
-    if self.minimized {
-      self.miniPlayer
-        .transition(.move(edge: .bottom).combined(with: .opacity))
-    } else {
-      self.expandedPlayer
-        .transition(.move(edge: .bottom).combined(with: .opacity))
+    ZStack {
+      // Background only for expanded mode
+      if !self.minimized {
+        Color(self.cs, light: .violet100, dark: .violet900)
+          .ignoresSafeArea(.all)
+          .offset(y: self.minimized ? 300 : 0)
+      }
+
+      // Expanded player content (behind)
+      self.expandedPlayerContent
+        .opacity(self.minimized ? 0 : 1)
+        .scaleEffect(self.minimized ? 0.9 : 1.0)
+        .offset(y: self.minimized ? 300 : 0)
+
+      // Mini player (in front when minimized)
+      if self.minimized {
+        VStack {
+          Spacer()
+          self.miniPlayerContent
+        }
+        .opacity(self.minimized ? 1 : 0)
+        .offset(y: self.minimized ? 0 : 20)
+      }
     }
+    .frame(maxWidth: .infinity, maxHeight: self.minimized ? nil : .infinity)
+    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: self.minimized)
   }
 
-  private var miniPlayer: some View {
+  private var miniPlayerContent: some View {
     HStack(spacing: 12) {
       Group {
         if let artworkUrl = show.artworkUrl, let url = URL(string: artworkUrl) {
@@ -81,6 +100,7 @@ public struct NowPlayingView: View {
           .font(.system(size: 20, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
       }
+      .padding(.trailing, 4)
     }
     .padding(.leading, 8)
     .padding(.trailing, 12)
@@ -94,7 +114,7 @@ public struct NowPlayingView: View {
     }
   }
 
-  private var expandedPlayer: some View {
+  private var expandedPlayerContent: some View {
     VStack(spacing: 0) {
       // Header
       HStack {
@@ -247,8 +267,6 @@ public struct NowPlayingView: View {
       .padding(.top, 32)
       .padding(.bottom, 40)
     }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color(self.cs, light: .violet100, dark: .violet900))
   }
 
   private var artworkPlaceholder: some View {
@@ -319,7 +337,7 @@ public struct NowPlayingView: View {
       relativeTime: "JUST NOW",
       duration: "1h 20m",
       downloadState: .downloaded,
-      isPlaying: false
+      isPlaying: true
     ),
     show: ShowData(
       id: 2,
@@ -327,16 +345,66 @@ public struct NowPlayingView: View {
       author: "Dave Verwer",
       description: "Weekly iOS development discussions"
     ),
-    minimized: false,
+    minimized: true,
     emit: { _ in }
   )
   .padding()
   .background(Color.gray.opacity(0.1))
 }
 
+#Preview("Mini Player - Dark") {
+  NowPlayingView(
+    episode: EpisodeData(
+      id: 1,
+      title: "Understanding SwiftUI State Management",
+      description: "Deep dive into @State, @Binding, and @ObservableObject",
+      relativeTime: "2H AGO",
+      duration: "45m",
+      downloadState: .downloaded,
+      isPlaying: true
+    ),
+    show: ShowData(
+      id: 1,
+      title: "Swift Talk",
+      author: "objc.io",
+      description: "Weekly Swift discussions",
+      artworkUrl: nil
+    ),
+    minimized: true,
+    emit: { _ in }
+  )
+  .padding()
+  .background(Color.gray.opacity(0.1))
+  .preferredColorScheme(.dark)
+}
+
+#Preview("Expanded Player - Dark") {
+  NowPlayingView(
+    episode: EpisodeData(
+      id: 1,
+      title: "Understanding SwiftUI State Management",
+      description: "Deep dive into @State, @Binding, and @ObservableObject",
+      relativeTime: "2H AGO",
+      duration: "45m",
+      downloadState: .downloaded,
+      isPlaying: true
+    ),
+    show: ShowData(
+      id: 1,
+      title: "Swift Talk",
+      author: "objc.io",
+      description: "Weekly Swift discussions",
+      artworkUrl: nil
+    ),
+    minimized: false,
+    emit: { _ in }
+  )
+  .preferredColorScheme(.dark)
+}
+
 #Preview("Animated Transition") {
   struct AnimatedPreview: View {
-    @State private var isExpanded = false
+    @State private var isMinimized = true
 
     var body: some View {
       ZStack {
@@ -362,70 +430,35 @@ public struct NowPlayingView: View {
             .frame(height: 80)
         }
         .padding()
+        .opacity(isMinimized ? 1 : 0.3)
 
-        // Mini player positioned at bottom
-        if !isExpanded {
-          VStack {
-            Spacer()
-            NowPlayingView(
-              episode: EpisodeData(
-                id: 1,
-                title: "SwiftUI Animation Masterclass",
-                description: "Learn advanced animation techniques",
-                relativeTime: "1H AGO",
-                duration: "52m",
-                downloadState: .downloaded,
-                isPlaying: true
-              ),
-              show: ShowData(
-                id: 1,
-                title: "Swift Tutorials",
-                author: "iOS Academy",
-                description: "Advanced Swift programming",
-                artworkUrl: "https://example.com/artwork.jpg"
-              ),
-              minimized: true,
-            ) { event in
-              if event == .miniPlayerTapped {
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                  isExpanded = true
-                }
-              }
-            }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 8)
-            .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: -2)
-          }
-        }
-
-        // Expanded player (full screen)
-        if isExpanded {
-          NowPlayingView(
-            episode: EpisodeData(
-              id: 1,
-              title: "SwiftUI Animation Masterclass",
-              description: "Learn advanced animation techniques",
-              relativeTime: "1H AGO",
-              duration: "52m",
-              downloadState: .downloaded,
-              isPlaying: true
-            ),
-            show: ShowData(
-              id: 1,
-              title: "Swift Tutorials",
-              author: "iOS Academy",
-              description: "Advanced Swift programming",
-              artworkUrl: "https://example.com/artwork.jpg"
-            ),
-            minimized: false,
-          ) { event in
-            if event == .dismissed {
-              withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                isExpanded = false
-              }
+        // Single NowPlayingView that handles its own transitions
+        NowPlayingView(
+          episode: EpisodeData(
+            id: 1,
+            title: "SwiftUI Animation Masterclass",
+            description: "Learn advanced animation techniques",
+            relativeTime: "1H AGO",
+            duration: "52m",
+            downloadState: .downloaded,
+            isPlaying: true
+          ),
+          show: ShowData(
+            id: 1,
+            title: "Swift Tutorials",
+            author: "iOS Academy",
+            description: "Advanced Swift programming",
+            artworkUrl: "https://example.com/artwork.jpg"
+          ),
+          minimized: isMinimized,
+          emit: { event in
+            if event == .miniPlayerTapped {
+              isMinimized = false
+            } else if event == .dismissed {
+              isMinimized = true
             }
           }
-        }
+        )
       }
       .background(Color.gray.opacity(0.1))
     }

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import LibViews
+import SharingGRDB
 import SwiftUI
 
 struct AppView: View {
@@ -26,19 +27,20 @@ struct AppView: View {
         }
     }
     .overlay(alignment: .bottom) {
-      if let nowPlaying = self.store.nowPlaying {
+      if let nowPlaying = self.store.nowPlaying.data {
         NowPlayingView(
-          episode: .init(from: nowPlaying.episode),
+          episode: .init(nowPlaying: nowPlaying),
           show: .init(from: nowPlaying.show),
-          minimized: nowPlaying.minimized,
+          minimized: nowPlaying.state.minimized,
           emit: { event in
             self.store.send(
               .nowPlaying(.view(event)),
               animation: event == .miniPlayerTapped || event == .dismissed
-                ? .spring(response: 0.6, dampingFraction: 0.8) : .default
+                ? .spring(response: 0.6, dampingFraction: 0.8) : nil
             )
           }
         )
+        .opacity(self.store.addingShow ? 0 : 1)
       }
     }
   }

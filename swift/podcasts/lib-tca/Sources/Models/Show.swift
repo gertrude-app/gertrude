@@ -4,7 +4,7 @@ import LibViews
 import SharingGRDB
 
 @Table
-struct Show: Equatable {
+struct Show: Equatable, Hashable {
   let id: Int
   var name: String
   var author: String?
@@ -14,6 +14,7 @@ struct Show: Equatable {
   var artworkUrl: String?
   var showArtwork: Bool
   var iTunesId: Int?
+  var updatedAt: Date = .init()
   var createdAt: Date
 }
 
