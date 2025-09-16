@@ -4,7 +4,7 @@ import SharingGRDB
 import SwiftUI
 
 @Reducer
-struct NowPlayingFeature {
+struct NowPlayingFeature: Downloader {
   @ObservableState
   struct State: Equatable {
     @Fetch(NowPlaying()) var data: NowPlaying.Value = nil
@@ -15,32 +15,42 @@ struct NowPlayingFeature {
     case episodePlayPauseTapped(Episode, Show)
   }
 
+  @Dependency(\.defaultDatabase) var db
+  @Dependency(\.podcasts) var podcasts
+  @Dependency(\.date) var date
+
   var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
-      case .view(.miniPlayerTapped), .view(.dismissed):
-        return .run { [state] _ in
-          try state.data?.updateState { $0.minimized.toggle() }
+      case .view(let viewAction):
+        guard let nowPlaying = state.data else {
+          return .none
         }
-      case .view(.playPauseTapped):
-        return .run { [state] _ in
-          try state.data?.updateState { $0.isPlaying.toggle() }
+        switch viewAction {
+        case .miniPlayerTapped, .dismissed:
+          return .run { _ in
+            try nowPlaying.updateState { $0.minimized.toggle() }
+          }
+        case .playPauseTapped:
+          return .run { _ in
+            try nowPlaying.updateState { $0.isPlaying.toggle() }
+          }
+        default:
+          return .none
         }
       case .episodePlayPauseTapped(let episode, let show):
-        if state.data?.episode.id == episode.id {
-          return .run { [state] _ in
+        return .run { [state] _ in
+          await self.ensureDownloaded(episode: episode)
+          if state.data?.episode.id == episode.id {
             try state.data?.updateState { $0.isPlaying.toggle() }
+          } else {
+            try NowPlaying.set(
+              episode: episode,
+              show: show,
+              state: .init(isPlaying: true, minimized: true)
+            )
           }
         }
-        return .run { _ in
-          try NowPlaying.set(
-            episode: episode,
-            show: show,
-            state: .init(isPlaying: true, minimized: true)
-          )
-        }
-      default:
-        return .none
       }
     }
   }

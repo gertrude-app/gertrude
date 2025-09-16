@@ -10,6 +10,12 @@ extension DatabaseReader {
   func tryRead<T>(_ block: (Database) throws -> T) -> T? {
     withErrorReporting { try self.read { try block($0) } }
   }
+
+  func episodeWithShow(_ episodeId: Episode.ID) -> (Episode, Show)? {
+    self.tryRead { db in
+      try EpisodeWithShow(episodeId: episodeId).fetch(db)
+    }.flatMap(\.self)
+  }
 }
 
 public extension DatabaseWriter {
@@ -29,6 +35,18 @@ public func appDatabase() throws -> any DatabaseWriter {
         logger.debug("\($0.expandedDescription)")
       }
     #endif
+    db.add(function: .init("nowPlayingUpdate", argumentCount: 4, pure: false) { args in
+      let oldEpisodeId = Int.fromDatabaseValue(args[0]).flatMap { Episode.ID(rawValue: $0) }
+      let newEpisodeId = Int.fromDatabaseValue(args[2]).flatMap { Episode.ID(rawValue: $0) }
+      let oldState = String.fromDatabaseValue(args[1])
+        .flatMap { try? JSON.decode($0, as: NowPlaying.State.self) }
+      let newState = String.fromDatabaseValue(args[3])
+        .flatMap { try? JSON.decode($0, as: NowPlaying.State.self) }
+      Task {
+        try await NowPlaying.dispatchUpdate(oldEpisodeId, oldState, newEpisodeId, newState)
+      }
+      return nil
+    })
   }
   switch context {
   case .live:
@@ -130,6 +148,36 @@ public func appDatabase() throws -> any DatabaseWriter {
       .execute(db)
     try Show
       .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
+      .execute(db)
+
+    // ensure nowPlaying is always paused and minimized on app start, before triggers
+    try Misc
+      .find(id: .nowPlaying)
+      .update { $0.value = try! JSON.encode(NowPlaying.State(isPlaying: false, minimized: true)) }
+      .execute(db)
+
+    try Misc
+      .createTemporaryTrigger(after: .update {
+        ($0.value, $0.rowId)
+      } forEachRow: {
+        #sql("SELECT nowPlayingUpdate(\($0.rowId), \($0.value), \($1.rowId), \($1.value))")
+      } when: { old, _ in
+        old.id == Misc.ID.nowPlaying
+      })
+      .execute(db)
+    try Misc
+      .createTemporaryTrigger(after: .delete {
+        #sql("SELECT nowPlayingUpdate(\($0.rowId), \($0.value), NULL, NULL)")
+      } when: {
+        $0.id == Misc.ID.nowPlaying
+      })
+      .execute(db)
+    try Misc
+      .createTemporaryTrigger(after: .insert {
+        #sql("SELECT nowPlayingUpdate(NULL, NULL, \($0.rowId), \($0.value))")
+      } when: {
+        $0.id == Misc.ID.nowPlaying
+      })
       .execute(db)
   }
 

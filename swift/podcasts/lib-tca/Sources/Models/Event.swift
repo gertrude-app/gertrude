@@ -1,9 +1,11 @@
 import Foundation
 import SharingGRDB
+import Tagged
 
 @Table
 struct Event {
-  let id: Int
+  typealias ID = Tagged<Self, Int>
+  let id: ID
   let name: String
   let detail: String?
   let createdAt: Date

@@ -34,4 +34,13 @@ extension Downloader {
     }
     return success
   }
+
+  @discardableResult
+  func ensureDownloaded(episode: Episode) async -> Bool {
+    if episode.downloaded {
+      true
+    } else {
+      await self.trackedDownload(episode: episode)
+    }
+  }
 }

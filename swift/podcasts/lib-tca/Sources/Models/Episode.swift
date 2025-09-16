@@ -2,11 +2,13 @@ import Dependencies
 import Foundation
 import LibViews
 import SharingGRDB
+import Tagged
 
 @Table
 struct Episode: Equatable, Hashable {
-  let id: Int
-  let showId: Int
+  typealias ID = Tagged<Self, Int>
+  let id: ID
+  let showId: Show.ID
   var episodeNumber: Int? = nil
   var title: String
   var description: String?
@@ -64,7 +66,7 @@ extension Episode {
     var pubDate: Date
     var episodeNumber: Int?
 
-    func toEpisodeDraft(showId: Int) -> Episode.Draft {
+    func toEpisodeDraft(showId: Show.ID) -> Episode.Draft {
       @Dependency(\.date.now) var now
       return .init(
         showId: showId,
@@ -88,7 +90,7 @@ extension Episode {
 extension EpisodeData {
   init(from episode: Episode, isPlaying: Bool) {
     self.init(
-      id: episode.id,
+      id: episode.id.rawValue,
       title: episode.title,
       description: episode.description,
       relativeTime: formatRelativeDate(episode.pubDate),
@@ -102,7 +104,7 @@ extension EpisodeData {
 
   init(nowPlaying: NowPlaying.Data) {
     self.init(
-      id: nowPlaying.episode.id,
+      id: nowPlaying.episode.id.rawValue,
       title: nowPlaying.episode.title,
       description: nowPlaying.episode.description,
       relativeTime: formatRelativeDate(nowPlaying.episode.pubDate),
@@ -132,5 +134,17 @@ extension Episode {
       updatedAt: Date(),
       createdAt: Date(),
     )
+  }
+}
+
+struct EpisodeWithShow: FetchKeyRequest {
+  typealias Value = (Episode, Show)?
+  let episodeId: Episode.ID
+
+  func fetch(_ db: Database) throws -> Value {
+    try Episode
+      .where { $0.id == self.episodeId }
+      .join(Show.all) { $0.showId == $1.id }
+      .fetchOne(db)
   }
 }

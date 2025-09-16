@@ -2,10 +2,12 @@ import Dependencies
 import Foundation
 import LibViews
 import SharingGRDB
+import Tagged
 
 @Table
 struct Show: Equatable, Hashable {
-  let id: Int
+  typealias ID = Tagged<Self, Int>
+  let id: ID
   var name: String
   var author: String?
   var description: String?
@@ -25,7 +27,7 @@ extension Show {
 }
 
 extension URL {
-  static func localShowAudiosDir(showId: Int) -> URL {
+  static func localShowAudiosDir(showId: Show.ID) -> URL {
     URL.documentsDirectory
       .appending(component: "audio")
       .appending(component: "show-\(showId)")
@@ -61,7 +63,7 @@ extension Show {
 extension ShowData {
   init(from show: Show) {
     self.init(
-      id: show.id,
+      id: show.id.rawValue,
       title: show.name,
       author: show.author,
       description: show.description,

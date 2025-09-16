@@ -7,7 +7,7 @@ import SwiftUI
 struct ShowFeature: Downloader {
   @ObservableState
   struct State: Equatable {
-    var showId: Int
+    var showId: Show.ID
     @FetchOne var show: Show
     @FetchAll var episodes: [Episode]
 
@@ -30,7 +30,7 @@ struct ShowFeature: Downloader {
       case episodePlayPauseTapped(Episode, Show)
     }
 
-    case episodeView(Int, EpisodeView.Event)
+    case episodeView(Episode.ID, EpisodeView.Event)
     case delegate(DelegateAction)
   }
 

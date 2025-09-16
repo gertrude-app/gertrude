@@ -21,7 +21,7 @@ struct PodcastsFeature: Downloader {
   enum Action: Equatable {
     case addShowTapped
     case startNextDownload
-    case showTapped(Int)
+    case showTapped(Show.ID)
     case destination(PresentationAction<Destination.Action>)
   }
 
@@ -38,7 +38,7 @@ struct PodcastsFeature: Downloader {
 
       case .showTapped(let showId):
         guard let show = state.shows.first(where: { $0.id == showId }) else {
-          reportIssue("Show with id \(showId) not found")
+          unexpected(id: "301842f2")
           return .none
         }
         state.destination = .show(.init(show: show))

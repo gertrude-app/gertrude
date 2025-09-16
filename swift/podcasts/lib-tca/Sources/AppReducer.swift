@@ -59,3 +59,13 @@ extension AppReducer.State {
     return false
   }
 }
+
+func unexpected(
+  id: String,
+  fileID: StaticString = #fileID,
+  filePath: StaticString = #filePath,
+  line: UInt = #line,
+  column: UInt = #column
+) {
+  reportIssue("Unexpected \(id)", fileID: fileID, filePath: filePath, line: line, column: column)
+}

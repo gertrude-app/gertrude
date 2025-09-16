@@ -15,7 +15,7 @@ struct ShowViewContainer: View {
         isPlaying: self.nowPlaying?.isPlaying(episodeId: $0.id) ?? false,
       ) }
     ) { episodeId, event in
-      self.store.send(.episodeView(episodeId, event))
+      self.store.send(.episodeView(.init(episodeId), event))
     }
   }
 }
