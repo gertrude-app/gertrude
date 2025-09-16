@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct NowPlayingView: View {
   @Environment(\.colorScheme) var cs
+  @State private var dragOffset: CGFloat = 0
 
   let episode: EpisodeData
   let show: ShowData
@@ -42,7 +43,7 @@ public struct NowPlayingView: View {
       self.expandedPlayerContent
         .opacity(self.minimized ? 0 : 1)
         .scaleEffect(self.minimized ? 0.9 : 1.0)
-        .offset(y: self.minimized ? 300 : 0)
+        .offset(y: self.minimized ? 300 : max(0, self.dragOffset))
 
       // Mini player (in front when minimized)
       if self.minimized {
@@ -56,6 +57,25 @@ public struct NowPlayingView: View {
     }
     .frame(maxWidth: .infinity, maxHeight: self.minimized ? nil : .infinity)
     .animation(.spring(response: 0.3, dampingFraction: 0.8), value: self.minimized)
+    .gesture(
+      DragGesture()
+        .onChanged { value in
+          // Only respond to downward drags when expanded
+          if !self.minimized, value.translation.height > 0 {
+            self.dragOffset = value.translation.height
+          }
+        }
+        .onEnded { value in
+          // Dismiss if dragged down more than 100 points
+          if !self.minimized, value.translation.height > 100 {
+            self.emit(.dismissed)
+          }
+          // Reset drag offset with animation
+          withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            self.dragOffset = 0
+          }
+        }
+    )
   }
 
   private var miniPlayerContent: some View {
