@@ -129,6 +129,7 @@ struct AddShowFeature {
           await send(.setScreen(.subscribeError))
           return
         }
+        await self.podcasts.downloadArtwork(for: show)
         let episodes = feed.episodes.map { $0.toEpisodeDraft(showId: show.id) }
         try await self.db.write { db in
           try Episode

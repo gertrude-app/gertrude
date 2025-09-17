@@ -7,7 +7,8 @@ import LibViews
 struct PodcastClient: Sendable {
   var getFeed: @Sendable (_ feedUrl: String) async throws -> Feed
   var search: @Sendable (_ query: String) async throws -> [SearchResult]
-  var download: @Sendable (_ episode: Episode) async -> Bool = { _ in false }
+  var downloadAudio: @Sendable (_ episode: Episode) async -> Bool = { _ in false }
+  var downloadArtwork: @Sendable (_ show: Show) async -> Void = { _ in }
 }
 
 extension PodcastClient: DependencyKey {
@@ -19,10 +20,23 @@ extension PodcastClient: DependencyKey {
       search: { query in
         try await searchPodcastsLive(query: query)
       },
-      download: { episode in
+      downloadAudio: { episode in
         await downloadEpisodeLive(episode: episode)
+      },
+      downloadArtwork: { show in
+        await downloadArtworkLive(show: show)
       }
     )
+  }
+}
+
+extension PodcastClient {
+  func downloadAudio(for episode: Episode) async -> Bool {
+    await self.downloadAudio(episode)
+  }
+
+  func downloadArtwork(for show: Show) async {
+    await self._downloadArtwork(show)
   }
 }
 
@@ -156,5 +170,46 @@ func downloadEpisodeLive(episode: Episode) async -> Bool {
     return true
   } catch {
     return false
+  }
+}
+
+@Sendable
+func downloadArtworkLive(show: Show) async {
+  guard let artworkUrlString = show.artworkUrl else {
+    return
+  }
+
+  guard let artworkUrl = URL(string: artworkUrlString) else {
+    unexpected(id: "be3f7267", "URL: \(artworkUrlString)")
+    return
+  }
+
+  do {
+    try FileManager.default.createDirectory(
+      at: .localFilesDir(showId: show.id),
+      withIntermediateDirectories: true,
+      attributes: nil
+    )
+
+    let (data, response) = try await URLSession.shared.data(from: artworkUrl)
+    guard let httpResponse = response as? HTTPURLResponse,
+          httpResponse.statusCode == 200 else {
+      return
+    }
+
+    try data.write(to: .localArtworkPath(showId: show.id))
+
+    #if DEBUG
+      if let img = UIImage(data: data),
+         let jpegData = img.jpegData(compressionQuality: 1.0) {
+        try jpegData
+          .write(
+            to: .localFilesDir(showId: show.id)
+              .appending(component: "artwork-show-\(show.id).jpg")
+          )
+      }
+    #endif
+  } catch {
+    return
   }
 }

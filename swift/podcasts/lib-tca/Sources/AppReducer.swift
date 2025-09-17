@@ -62,10 +62,12 @@ extension AppReducer.State {
 
 func unexpected(
   id: String,
+  _ detail: String? = nil,
   fileID: StaticString = #fileID,
   filePath: StaticString = #filePath,
   line: UInt = #line,
   column: UInt = #column
 ) {
-  reportIssue("Unexpected \(id)", fileID: fileID, filePath: filePath, line: line, column: column)
+  let message = "Unexpected \(id)" + (detail.map { ": \($0)" } ?? "")
+  reportIssue(message, fileID: fileID, filePath: filePath, line: line, column: column)
 }

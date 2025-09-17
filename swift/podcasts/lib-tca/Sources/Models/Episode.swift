@@ -47,7 +47,7 @@ extension Episode {
 
   var localAudioUrl: URL {
     let ext = self.audioType == .mp3 ? "mp3" : "m4a"
-    return URL.localShowAudiosDir(showId: self.showId)
+    return URL.localFilesDir(showId: self.showId)
       .appending(component: "show-\(self.showId)-ep-\(self.id).\(ext)")
   }
 }

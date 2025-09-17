@@ -31,14 +31,12 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
-          - UIInterfaceOrientationLandscapeLeft
-          - UIInterfaceOrientationLandscapeRight
         UISupportedInterfaceOrientations~ipad:
           - UIInterfaceOrientationPortrait
-          - UIInterfaceOrientationLandscapeLeft
-          - UIInterfaceOrientationLandscapeRight
         UIRequiresFullScreen: true
         UILaunchStoryboardName: LaunchScreen
+        UIBackgroundModes:
+          - audio
 
 packages:
   LibCore:

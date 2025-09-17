@@ -16,7 +16,7 @@ extension Downloader {
         .execute(db)
     }
     // TODO: handle errors
-    let success = await self.podcasts.download(episode: episode)
+    let success = await self.podcasts.downloadAudio(for: episode)
     if success {
       self.db.tryWrite { db in
         try Episode

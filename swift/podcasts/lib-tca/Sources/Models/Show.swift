@@ -3,6 +3,9 @@ import Foundation
 import LibViews
 import SharingGRDB
 import Tagged
+#if canImport(UIKit)
+  import UIKit
+#endif
 
 @Table
 struct Show: Equatable, Hashable {
@@ -21,16 +24,28 @@ struct Show: Equatable, Hashable {
 }
 
 extension Show {
-  var localAudioDir: URL {
-    .localShowAudiosDir(showId: self.id)
+  var localFilesDir: URL {
+    .localFilesDir(showId: self.id)
+  }
+
+  var localArtworkImage: UIImage? {
+    guard let data = try? Data(contentsOf: .localArtworkPath(showId: self.id)) else {
+      return nil
+    }
+    return UIImage(data: data)
   }
 }
 
 extension URL {
-  static func localShowAudiosDir(showId: Show.ID) -> URL {
+  static func localFilesDir(showId: Show.ID) -> URL {
     URL.documentsDirectory
-      .appending(component: "audio")
+      .appending(component: "shows")
       .appending(component: "show-\(showId)")
+  }
+
+  static func localArtworkPath(showId: Show.ID) -> URL {
+    self.localFilesDir(showId: showId)
+      .appending(component: "artwork-show-\(showId).bin")
   }
 }
 

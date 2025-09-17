@@ -2,6 +2,8 @@ import AVFoundation
 import Dependencies
 import DependenciesMacros
 import Foundation
+import MediaPlayer
+import Synchronization
 
 @DependencyClient
 struct AudioPlayer: Sendable {
@@ -13,44 +15,69 @@ extension AudioPlayer: DependencyKey {
   public static var liveValue: AudioPlayer {
     AudioPlayer(
       play: { episode, show in
-        try await Player.shared.play(episode: episode)
+        try sharedPlayer.withLock { try $0.play(episode, show) }
       },
       pause: {
-        await Player.shared.pause()
+        sharedPlayer.withLock { $0.pause() }
       },
     )
   }
 }
 
-private actor Player {
-  static let shared = Player()
+private let sharedPlayer = Mutex(Player())
+
+private class Player {
   private var player: AVAudioPlayer?
   private var episode: Episode?
 
   init() {
-    #if os(iOS)
-      try? AVAudioSession.sharedInstance().setCategory(
-        .playback,
-        mode: .spokenAudio,
-        options: [.allowBluetooth, .allowAirPlay]
-      )
-      try? AVAudioSession.sharedInstance().setActive(true)
-    #endif
+    let session = AVAudioSession.sharedInstance()
+    try? session.setCategory(.playback)
+    try? session.setMode(.spokenAudio)
+    try? session.setActive(true)
   }
 
-  func play(episode: Episode) throws {
+  func play(_ episode: Episode, _ show: Show) throws {
     if self.episode?.id == episode.id {
       self.player?.play()
     } else {
       self.player = try AVAudioPlayer(contentsOf: episode.localAudioUrl)
-      self.player?.prepareToPlay() // necessary?
+      self.player?.prepareToPlay()
       self.player?.play()
     }
     self.episode = episode
+    self.updateNowPlayingInfo(episode: episode, show: show)
   }
 
   func pause() {
     self.player?.pause()
+  }
+
+  private func updateNowPlayingInfo(episode: Episode, show: Show) {
+    var nowPlayingInfo: [String: Any] = [
+      MPMediaItemPropertyTitle: episode.title,
+      MPMediaItemPropertyAlbumTitle: show.name,
+      MPMediaItemPropertyPlaybackDuration: episode.duration,
+      MPNowPlayingInfoPropertyElapsedPlaybackTime: self.player?.currentTime ?? 0,
+      MPNowPlayingInfoPropertyPlaybackRate: self.player?.isPlaying == true ? 1.0 : 0.0,
+    ]
+    if let artwork = show.localArtworkImage {
+      nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork.mediaItemArtwork
+    }
+    MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    self.setupRemoteCommands()
+  }
+
+  private func setupRemoteCommands() {
+    let commands = MPRemoteCommandCenter.shared()
+    commands.playCommand.addTarget { [weak self] _ in
+      self?.player?.play()
+      return .success
+    }
+    commands.pauseCommand.addTarget { [weak self] _ in
+      self?.player?.pause()
+      return .success
+    }
   }
 }
 

@@ -53,7 +53,15 @@ extension NowPlaying {
   }
 
   private static func onCreate(episodeId: Episode.ID, state: State) async throws {
-    fatalError("ON CREATE")
+    if !state.isPlaying {
+      return
+    }
+    let deps = Deps()
+    guard let (episode, show) = deps.db.episodeWithShow(episodeId) else {
+      unexpected(id: "1e83d193")
+      return
+    }
+    try await deps.audio.play(episode: episode, show: show)
   }
 
   private static func onDelete(prevEpisodeId: Episode.ID, prevState: State) async throws {

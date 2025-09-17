@@ -38,6 +38,7 @@ test:
 
 format: clean
   @swiftformat --exclude '**/.build' .
+  @xml-lint --fix app/Info.plist
 
 build-app:
   xcodebuild -workspace GertiePodcasts.xcodeproj/project.xcworkspace \
