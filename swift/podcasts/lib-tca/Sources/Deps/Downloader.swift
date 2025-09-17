@@ -65,9 +65,3 @@ extension Downloader {
     return Int(duration)
   }
 }
-
-//
-// let url = URL(fileURLWithPath: "path/to/file.mp3")
-// let asset = AVURLAsset(url: url)
-// let duration = CMTimeGetSeconds(asset.duration)
-// print(duration)

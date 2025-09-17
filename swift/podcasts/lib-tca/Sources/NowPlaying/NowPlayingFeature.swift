@@ -12,6 +12,7 @@ struct NowPlayingFeature: Downloader {
 
   enum Action: Equatable {
     case view(NowPlayingView.Event)
+    case external(AudioPlayer.ExternalEvent)
     case episodePlayPauseTapped(Episode, Show)
   }
 
@@ -24,6 +25,7 @@ struct NowPlayingFeature: Downloader {
       switch action {
       case .view(let viewAction):
         guard let nowPlaying = state.data else {
+          unexpected(id: "70012cf6")
           return .none
         }
         switch viewAction {
@@ -37,6 +39,24 @@ struct NowPlayingFeature: Downloader {
           }
         default:
           return .none
+        }
+      case .external(let event):
+        guard let nowPlaying = state.data else {
+          unexpected(id: "9faa5b69")
+          return .none
+        }
+        return .run { _ in
+          switch event {
+          case .play(let time):
+            try nowPlaying.updateState { $0.isPlaying = true }
+            time.map { nowPlaying.setProgress($0) }
+          case .pause(let time):
+            try nowPlaying.updateState { $0.isPlaying = false }
+            time.map { nowPlaying.setProgress($0) }
+          case .scrubbedTo(let time), .progressUpdated(let time),
+               .skippedBackward(let time), .skippedForward(let time):
+            nowPlaying.setProgress(time)
+          }
         }
       case .episodePlayPauseTapped(let episode, let show):
         return .run { [state] _ in

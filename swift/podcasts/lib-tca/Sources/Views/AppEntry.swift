@@ -21,6 +21,9 @@ public struct EntryPoint: View {
   public var body: some View {
     AppView(store: self.store)
       .tint(.violet500)
+      .onAppear {
+        self.store.send(.appDidLaunch)
+      }
   }
 }
 

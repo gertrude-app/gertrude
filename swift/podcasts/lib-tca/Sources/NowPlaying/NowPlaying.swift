@@ -135,6 +135,15 @@ extension NowPlaying.Data {
     try NowPlaying.set(episode: self.episode, show: self.show, state: newState)
   }
 
+  func setProgress(_ progress: Double) {
+    Deps().db.tryWrite { db in
+      try Episode
+        .where { $0.id == self.episode.id }
+        .update { $0.progress = progress }
+        .execute(db)
+    }
+  }
+
   func isPlaying(episodeId: Episode.ID) -> Bool {
     self.episode.id == episodeId && self.state.isPlaying
   }

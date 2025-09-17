@@ -16,11 +16,14 @@ struct AppReducer {
   }
 
   enum Action: Equatable {
+    case appDidLaunch
     case nowPlaying(NowPlayingFeature.Action)
     case mode(PresentationAction<Mode.Action>)
   }
 
   @Dependency(\.passcode) var passcode
+  @Dependency(\.audioPlayer) var audio
+  @Dependency(\.mainQueue) var mainQueue
 
   var body: some Reducer<State, Action> {
     Scope(state: \.nowPlaying, action: \.nowPlaying) {
@@ -28,6 +31,12 @@ struct AppReducer {
     }
     Reduce { state, action in
       switch action {
+      case .appDidLaunch:
+        return .publisher {
+          self.audio.externalEvents()
+            .map { .nowPlaying(.external($0)) }
+            .receive(on: self.mainQueue)
+        }
       case .mode(.presented(.onboarding(.finished(let passcode)))):
         state.mode = .podcasts(.init(passcode: passcode))
         return .run { _ in
