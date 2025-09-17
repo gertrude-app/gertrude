@@ -18,6 +18,7 @@ struct NowPlayingFeature: Downloader {
 
   @Dependency(\.defaultDatabase) var db
   @Dependency(\.podcasts) var podcasts
+  @Dependency(\.audioPlayer) var audioPlayer
   @Dependency(\.date) var date
 
   var body: some Reducer<State, Action> {
@@ -64,6 +65,10 @@ struct NowPlayingFeature: Downloader {
           if state.data?.episode.id == episode.id {
             try state.data?.updateState { $0.isPlaying.toggle() }
           } else {
+            if state.data?.state.isPlaying == true,
+               let finalPosition = await self.audioPlayer.getPlayingPosition() {
+              state.data?.setProgress(finalPosition)
+            }
             try NowPlaying.set(
               episode: episode,
               show: show,

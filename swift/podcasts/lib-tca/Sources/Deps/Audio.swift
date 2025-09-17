@@ -8,6 +8,15 @@ import Synchronization
 
 @DependencyClient
 struct AudioPlayer: Sendable {
+  var play: @Sendable (_ episode: Episode, _ show: Show) async throws -> Void
+  var pause: @Sendable () async throws -> Void
+  var getPlayingPosition: @Sendable () async -> Double?
+  var externalEvents: @Sendable () -> AnyPublisher<ExternalEvent, Never> = {
+    Empty().eraseToAnyPublisher()
+  }
+}
+
+extension AudioPlayer {
   enum ExternalEvent: Equatable, Sendable {
     case play(Double?)
     case pause(Double?)
@@ -15,12 +24,6 @@ struct AudioPlayer: Sendable {
     case progressUpdated(Double)
     case skippedForward(Double)
     case skippedBackward(Double)
-  }
-
-  var play: @Sendable (_ episode: Episode, _ show: Show) async throws -> Void
-  var pause: @Sendable () async throws -> Void
-  var externalEvents: @Sendable () -> AnyPublisher<ExternalEvent, Never> = {
-    Empty().eraseToAnyPublisher()
   }
 }
 
@@ -33,6 +36,9 @@ extension AudioPlayer: DependencyKey {
       pause: {
         sharedPlayer.withLock { $0.pause() }
       },
+      getPlayingPosition: {
+        sharedPlayer.withLock { $0.player.currentTime }
+      },
       externalEvents: {
         sharedPlayer.withLock { $0.events() }
       }
@@ -42,8 +48,18 @@ extension AudioPlayer: DependencyKey {
 
 private let sharedPlayer = Mutex(Player())
 
+class AVPlayerData {
+  let player: AVPlayer
+  var timer: Any?
+
+  init(player: AVPlayer, timer: Any? = nil) {
+    self.player = player
+    self.timer = timer
+  }
+}
+
 private final class Player: Sendable {
-  private let player: Mutex<AVPlayer?> = Mutex(nil)
+  fileprivate let player: Mutex<AVPlayerData?> = Mutex(nil)
   private let episode: Mutex<Episode?> = Mutex(nil)
   private let timer: Mutex<Any?> = Mutex(nil)
   private let subject = Mutex(PassthroughSubject<AudioPlayer.ExternalEvent, Never>())
@@ -57,15 +73,14 @@ private final class Player: Sendable {
   }
 
   deinit {
-    self.stopTimeUpdates()
+    self.player.stopTimeUpdates()
   }
 
   func play(_ episode: Episode, _ show: Show) throws {
     if self.episode.withLock({ $0?.id }) == episode.id {
       self.player.play()
     } else {
-      self.player.withLock { $0 = AVPlayer(url: episode.localAudioUrl) }
-      self.player.play()
+      self.player.play(new: episode)
     }
     self.episode.withLock { $0 = episode }
     self.updateNowPlayingInfo(episode: episode, show: show)
@@ -74,7 +89,7 @@ private final class Player: Sendable {
 
   func pause() {
     self.player.pause()
-    self.stopTimeUpdates()
+    self.player.stopTimeUpdates()
   }
 
   func events() -> AnyPublisher<AudioPlayer.ExternalEvent, Never> {
@@ -125,7 +140,7 @@ private final class Player: Sendable {
   private func setupRemotePauseCommand() {
     MPRemoteCommandCenter.shared().pauseCommand.addTarget { [weak self] _ in
       let position = self?.player.pause()
-      self?.stopTimeUpdates()
+      self?.player.stopTimeUpdates()
       self?.subject.withLock { $0.send(.pause(position)) }
       return .success
     }
@@ -140,10 +155,7 @@ private final class Player: Sendable {
         return .commandFailed
       }
 
-      self.player.withLock {
-        $0?.seek(to: CMTime(seconds: positionEvent.positionTime, preferredTimescale: 30))
-      }
-
+      self.player.seek(to: positionEvent.positionTime)
       self.subject.withLock {
         $0.send(.scrubbedTo(positionEvent.positionTime))
       }
@@ -163,10 +175,7 @@ private final class Player: Sendable {
       }
 
       let newTime = max(0, currentTime - 15)
-      self.player.withLock {
-        $0?.seek(to: CMTime(seconds: newTime, preferredTimescale: 30))
-      }
-
+      self.player.seek(to: newTime)
       self.subject.withLock {
         $0.send(.skippedBackward(newTime))
       }
@@ -189,11 +198,7 @@ private final class Player: Sendable {
         self.episode.withLock { $0 }?.duration.flatMap { Double($0) } ?? .infinity,
         currentTime + 30
       )
-
-      self.player.withLock {
-        $0?.seek(to: CMTime(seconds: newTime, preferredTimescale: 30))
-      }
-
+      self.player.seek(to: newTime)
       self.subject.withLock {
         $0.send(.skippedForward(newTime))
       }
@@ -204,30 +209,17 @@ private final class Player: Sendable {
   }
 
   private func startTimeUpdates() {
-    self.stopTimeUpdates()
-    let token: Any? = self.player.withLock {
-      guard let player = $0 else { return nil }
-      return player.addPeriodicTimeObserver(
+    self.player.stopTimeUpdates()
+    self.player.withLock {
+      guard let data = $0 else { return }
+      let token = data.player.addPeriodicTimeObserver(
         forInterval: CMTime(seconds: 5.0, preferredTimescale: 1),
         queue: .main
       ) { [weak self] time in
         self?.subject.withLock { $0.send(.progressUpdated(time.seconds)) }
         self?.updateElapsedTime()
       }
-    }
-    self.setTimer(token: token)
-  }
-
-  private func setTimer(token: sending Any?) {
-    // HACK: https://forums.swift.org/t/mutex-error/76653/3
-    let workaround = { token }
-    self.timer.withLock { $0 = workaround() }
-  }
-
-  private func stopTimeUpdates() {
-    if let token = self.timer.withLock({ $0 }) {
-      self.player.withLock { $0?.removeTimeObserver(token) }
-      self.setTimer(token: nil)
+      $0?.timer = token
     }
   }
 
@@ -239,11 +231,11 @@ private final class Player: Sendable {
   }
 }
 
-extension Mutex<AVPlayer?> {
+extension Mutex<AVPlayerData?> {
   @discardableResult
   func play() -> Double? {
     self.withLock {
-      guard let player = $0 else { return nil }
+      guard let player = $0?.player else { return nil }
       player.play()
       return player.currentTime().seconds
     }
@@ -252,18 +244,48 @@ extension Mutex<AVPlayer?> {
   @discardableResult
   func pause() -> Double? {
     self.withLock {
-      guard let player = $0 else { return nil }
+      guard let player = $0?.player else { return nil }
       player.pause()
       return player.currentTime().seconds
     }
   }
 
+  func seek(to time: Double) {
+    self.withLock {
+      $0?.player.seek(to: CMTime(seconds: time, preferredTimescale: 30))
+    }
+  }
+
+  func play(new episode: Episode) {
+    self.withLock {
+      if let current = $0, let token = current.timer {
+        current.player.removeTimeObserver(token)
+      }
+      $0 = nil
+      let player = AVPlayer(url: episode.localAudioUrl)
+      if episode.progress > 0.0 {
+        player.seek(to: CMTime(seconds: episode.progress, preferredTimescale: 30))
+      }
+      $0 = AVPlayerData(player: player)
+      player.play()
+    }
+  }
+
+  func stopTimeUpdates() {
+    self.withLock {
+      guard let data = $0,
+            let token = data.timer else { return }
+      data.player.removeTimeObserver(token)
+      data.timer = nil
+    }
+  }
+
   var isPlaying: Bool {
-    self.withLock { $0?.timeControlStatus == .playing }
+    self.withLock { $0?.player.timeControlStatus == .playing }
   }
 
   var currentTime: TimeInterval? {
-    self.withLock { $0?.currentTime().seconds }
+    self.withLock { $0?.player.currentTime().seconds }
   }
 }
 
