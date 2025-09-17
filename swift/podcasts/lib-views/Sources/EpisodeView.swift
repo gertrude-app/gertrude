@@ -78,7 +78,7 @@ public struct EpisodeView: View {
               }
             }
 
-            Text(self.episode.duration)
+            Text(self.episode.duration ?? "")
               .font(.system(size: 12, weight: .medium))
               .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
           }

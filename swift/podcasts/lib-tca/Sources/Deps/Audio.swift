@@ -57,10 +57,12 @@ private class Player {
     var nowPlayingInfo: [String: Any] = [
       MPMediaItemPropertyTitle: episode.title,
       MPMediaItemPropertyAlbumTitle: show.name,
-      MPMediaItemPropertyPlaybackDuration: episode.duration,
       MPNowPlayingInfoPropertyElapsedPlaybackTime: self.player?.currentTime ?? 0,
       MPNowPlayingInfoPropertyPlaybackRate: self.player?.isPlaying == true ? 1.0 : 0.0,
     ]
+    if let duration = episode.duration {
+      nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration
+    }
     if let artwork = show.localArtworkImage {
       nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork.mediaItemArtwork
     }

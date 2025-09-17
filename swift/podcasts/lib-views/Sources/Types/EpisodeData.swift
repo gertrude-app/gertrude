@@ -11,7 +11,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
   public var title: String
   public var description: String?
   public var relativeTime: String
-  public var duration: String
+  public var duration: String?
   public var downloadState: DownloadState
   public var isPlaying: Bool
 
@@ -20,7 +20,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
     title: String,
     description: String? = nil,
     relativeTime: String,
-    duration: String,
+    duration: String? = nil,
     downloadState: DownloadState = .notDownloaded,
     isPlaying: Bool = false
   ) {

@@ -15,7 +15,7 @@ struct Episode: Equatable, Hashable {
   var websiteUrl: String?
   var audioUrl: String
   var artworkUrl: String?
-  var duration: Int
+  var duration: Int?
   var sizeInBytes: Int
   var audioType: AudioType
   var guid: String
@@ -59,7 +59,7 @@ extension Episode {
     var websiteUrl: String?
     var audioUrl: String
     var artworkUrl: String?
-    var duration: Int
+    var duration: Int?
     var sizeInBytes: Int
     var audioType: AudioType
     var guid: String
@@ -94,7 +94,7 @@ extension EpisodeData {
       title: episode.title,
       description: episode.description,
       relativeTime: formatRelativeDate(episode.pubDate),
-      duration: formatDuration(episode.duration),
+      duration: episode.duration.map { formatDuration($0) },
       downloadState: episode.downloaded
         ? .downloaded
         : episode.downloading ? .downloading : .notDownloaded,
@@ -108,7 +108,7 @@ extension EpisodeData {
       title: nowPlaying.episode.title,
       description: nowPlaying.episode.description,
       relativeTime: formatRelativeDate(nowPlaying.episode.pubDate),
-      duration: formatDuration(nowPlaying.episode.duration),
+      duration: nowPlaying.episode.duration.map { formatDuration($0) },
       downloadState: nowPlaying.episode.downloaded
         ? .downloaded
         : nowPlaying.episode.downloading ? .downloading : .notDownloaded,

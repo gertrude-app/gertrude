@@ -251,7 +251,8 @@ public struct NowPlayingView: View {
 
           Spacer()
 
-          Text(self.episode.duration)
+          // TODO: handle no duration (temp, before download only)
+          Text(self.episode.duration ?? "")
             .font(.system(size: 12, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
         }

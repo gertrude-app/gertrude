@@ -113,7 +113,7 @@ func testParsePodcastFeedMinimal() throws {
   #expect(episode.description == nil)
   #expect(episode.websiteUrl == nil)
   #expect(episode.audioUrl == "https://example.com/simple.mp3")
-  #expect(episode.duration == 0)
+  #expect(episode.duration == nil)
 
   // Check pubDate
   let formatter = DateFormatter()
@@ -1072,4 +1072,25 @@ func testHoyHablamosArtwork() throws {
       .artworkUrl ==
       "https://www.hoyhablamos.com/wp-content/uploads/2024/03/logo-rrss-hoyhablamos-basico.jpg"
   )
+}
+
+@Test
+func testEpisodeWithoutDurationIsNil() throws {
+  let xmlString = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0">
+    <channel>
+      <title>Test Podcast</title>
+      <item>
+        <title>Episode Without Duration</title>
+        <guid>episode-without-duration</guid>
+        <pubDate>Wed, 11 Sep 2024 06:00:00 +0000</pubDate>
+        <enclosure url="https://example.com/episode.mp3" length="5242880" type="audio/mpeg" />
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let feed = try parsePodcastFeed(xmlString)
+  #expect(feed.episodes[0].duration == nil)
 }

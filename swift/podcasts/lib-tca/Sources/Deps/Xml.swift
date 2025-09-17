@@ -58,7 +58,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
   private var episodeWebsiteUrl: String?
   private var episodeAudioUrl = ""
   private var episodeArtworkUrl: String?
-  private var episodeDuration = 0
+  private var episodeDuration: Int? = nil
   private var episodeSize = 0
   private var episodeAudioType = AudioType.mp3
   private var episodeGuid = ""
@@ -128,7 +128,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
       }
 
       // Skip episode if it has neither size nor duration
-      guard self.episodeSize > 0 || self.episodeDuration > 0 else {
+      guard self.episodeSize > 0 || (self.episodeDuration ?? 0) > 0 else {
         // Skip this episode, don't add it to the episodes array
         self.isInItem = false
         return
@@ -217,7 +217,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
     self.episodeWebsiteUrl = nil
     self.episodeAudioUrl = ""
     self.episodeArtworkUrl = nil
-    self.episodeDuration = 0
+    self.episodeDuration = nil
     self.episodeSize = 0
     self.episodeAudioType = .mp3
     self.episodeGuid = ""
@@ -250,7 +250,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
     return nil
   }
 
-  private func parseDuration(_ durationString: String) -> Int {
+  private func parseDuration(_ durationString: String) -> Int? {
     // Handle formats like "1:23:45" or "3600" (seconds)
     if durationString.contains(":") {
       let components = durationString.split(separator: ":").compactMap { Int($0) }
@@ -262,11 +262,11 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
       case 1: // SS
         return components[0]
       default:
-        return 0
+        return nil
       }
     } else {
       // Assume it's already in seconds
-      return Int(durationString) ?? 0
+      return Int(durationString)
     }
   }
 

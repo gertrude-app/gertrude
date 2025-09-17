@@ -92,7 +92,7 @@ public func appDatabase() throws -> any DatabaseWriter {
          websiteUrl TEXT,
          audioUrl TEXT NOT NULL,
          artworkUrl TEXT,
-         duration INTEGER NOT NULL,
+         duration INTEGER,
          sizeInBytes INTEGER NOT NULL,
          audioType TEXT NOT NULL CHECK (audioType IN ('audio/mpeg', 'audio/x-m4a')),
          guid TEXT NOT NULL,
