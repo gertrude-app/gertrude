@@ -1,6 +1,7 @@
 import AVFoundation
 import Foundation
 import MediaPlayer
+import SwiftUI
 
 #if !os(iOS)
   import AppKit
@@ -35,6 +36,12 @@ import MediaPlayer
     public static let didBecomeActiveNotification = Notification.Name("")
     public static let NOT_REAL_CHECK_XCODE = ""
   }
+
+  public extension Image {
+    init(uiImage: UIImage) {
+      self.init(systemName: "photo")
+    }
+  }
 #else
   import UIKit
 
@@ -46,5 +53,4 @@ import MediaPlayer
       .init(boundsSize: self.size) { _ in self }
     }
   }
-
 #endif

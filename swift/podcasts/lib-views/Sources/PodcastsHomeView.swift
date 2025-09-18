@@ -3,25 +3,13 @@ import SwiftUI
 public struct PodcastsHomeView: View {
   @Environment(\.colorScheme) var cs
 
-  public struct PodcastShow: Identifiable, Sendable {
-    public let id: Int
-    public let title: String
-    public let artworkUrl: String?
-
-    public init(id: Int, title: String, artworkUrl: String? = nil,) {
-      self.id = id
-      self.title = title
-      self.artworkUrl = artworkUrl
-    }
-  }
-
-  let shows: [PodcastShow]
+  let shows: [ShowData]
   let nowPlayingShowing: Bool
   let onAddShowTap: @MainActor @Sendable () -> Void
   let onShowTap: @MainActor @Sendable (Int) -> Void
 
   public init(
-    shows: [PodcastShow],
+    shows: [ShowData],
     nowPlayingShowing: Bool = false,
     onAddShowTap: @MainActor @escaping @Sendable () -> Void,
     onShowTap: @MainActor @escaping @Sendable (Int) -> Void = { _ in }
@@ -98,7 +86,7 @@ public struct PodcastsHomeView: View {
     }
   }
 
-  private func showRow(_ show: PodcastShow) -> some View {
+  private func showRow(_ show: ShowData) -> some View {
     HStack(spacing: 16) {
       self.showArtwork(show)
 
@@ -128,30 +116,12 @@ public struct PodcastsHomeView: View {
     )
   }
 
-  private var artworkPlaceholder: some View {
-    Rectangle()
-      .fill(Color(self.cs, light: .violet200, dark: .violet800))
-      .overlay(
-        Image(systemName: "mic")
-          .font(.system(size: 20, weight: .medium))
-          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet500))
-      )
-  }
-
-  private func showArtwork(_ show: PodcastShow) -> some View {
-    Group {
-      if let artworkUrl = show.artworkUrl, let url = URL(string: artworkUrl) {
-        AsyncImage(url: url) { image in
-          image
-            .resizable()
-            .aspectRatio(contentMode: .fill)
-        } placeholder: {
-          self.artworkPlaceholder
-        }
-      } else {
-        self.artworkPlaceholder
-      }
-    }
+  private func showArtwork(_ show: ShowData) -> some View {
+    ArtworkView(
+      artworkImage: show.artworkImage,
+      artworkUrl: show.artworkUrl,
+      placeholderIconSize: 20
+    )
     .frame(width: 56, height: 56)
     .cornerRadius(6)
     .clipped()
@@ -161,17 +131,17 @@ public struct PodcastsHomeView: View {
 #Preview("With Shows") {
   PodcastsHomeView(
     shows: [
-      PodcastsHomeView.PodcastShow(
+      .init(
         id: 1,
         title: "The Ancient Path",
         artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
       ),
-      PodcastsHomeView.PodcastShow(
+      .init(
         id: 2,
         title: "The Secret Sombrero",
         artworkUrl: "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
       ),
-      PodcastsHomeView.PodcastShow(
+      .init(
         id: 3,
         title: "This American Life"
       ),
@@ -190,17 +160,17 @@ public struct PodcastsHomeView: View {
 #Preview("With Shows (Dark)") {
   PodcastsHomeView(
     shows: [
-      PodcastsHomeView.PodcastShow(
+      .init(
         id: 1,
         title: "The Ancient Path",
         artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
       ),
-      PodcastsHomeView.PodcastShow(
+      .init(
         id: 2,
         title: "The Secret Sombrero",
         artworkUrl: "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
       ),
-      PodcastsHomeView.PodcastShow(
+      .init(
         id: 3,
         title: "This American Life"
       ),

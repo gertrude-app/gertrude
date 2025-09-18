@@ -80,19 +80,11 @@ public struct NowPlayingView: View {
 
   private var miniPlayerContent: some View {
     HStack(spacing: 12) {
-      Group {
-        if let artworkUrl = show.artworkUrl, let url = URL(string: artworkUrl) {
-          AsyncImage(url: url) { image in
-            image
-              .resizable()
-              .aspectRatio(contentMode: .fill)
-          } placeholder: {
-            self.artworkPlaceholder
-          }
-        } else {
-          self.artworkPlaceholder
-        }
-      }
+      ArtworkView(
+        artworkImage: self.show.artworkImage,
+        artworkUrl: self.show.artworkUrl,
+        placeholderIconSize: 20
+      )
       .frame(width: 44, height: 44)
       .cornerRadius(4)
       .clipped()
@@ -179,23 +171,15 @@ public struct NowPlayingView: View {
       // Large artwork
       GeometryReader { geometry in
         let artworkSize = min(500, geometry.size.width * 0.85)
-        Group {
-          if let artworkUrl = show.artworkUrl, let url = URL(string: artworkUrl) {
-            AsyncImage(url: url) { image in
-              image
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-            } placeholder: {
-              self.artworkPlaceholder
-            }
-          } else {
-            self.artworkPlaceholder
-          }
-        }
+        ArtworkView(
+          artworkImage: self.show.artworkImage,
+          artworkUrl: self.show.artworkUrl,
+          placeholderIconSize: 80
+        )
         .frame(width: artworkSize, height: artworkSize)
         .cornerRadius(8)
         .clipped()
-        .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
+        .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
       .aspectRatio(1, contentMode: .fit)
@@ -297,16 +281,6 @@ public struct NowPlayingView: View {
       .padding(.top, 32)
       .padding(.bottom, 40)
     }
-  }
-
-  private var artworkPlaceholder: some View {
-    Rectangle()
-      .fill(Color(self.cs, light: .violet200, dark: .violet800))
-      .overlay(
-        Image(systemName: "mic")
-          .font(.system(size: self.minimized ? 20 : 80, weight: .medium))
-          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet500))
-      )
   }
 }
 

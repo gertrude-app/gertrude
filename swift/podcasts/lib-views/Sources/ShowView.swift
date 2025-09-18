@@ -68,32 +68,14 @@ public struct ShowView: View {
   }
 
   private var showArtwork: some View {
-    Group {
-      if let artworkUrl = show.artworkUrl, let url = URL(string: artworkUrl) {
-        AsyncImage(url: url) { image in
-          image
-            .resizable()
-            .aspectRatio(contentMode: .fill)
-        } placeholder: {
-          self.artworkPlaceholder
-        }
-      } else {
-        self.artworkPlaceholder
-      }
-    }
+    ArtworkView(
+      artworkImage: self.show.artworkImage,
+      artworkUrl: self.show.artworkUrl,
+      placeholderIconSize: 60
+    )
     .frame(width: 200, height: 200)
     .cornerRadius(6)
     .clipped()
-  }
-
-  private var artworkPlaceholder: some View {
-    Rectangle()
-      .fill(Color(self.cs, light: .violet200, dark: .violet800))
-      .overlay(
-        Image(systemName: "mic")
-          .font(.system(size: 60, weight: .medium))
-          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet500))
-      )
   }
 
   private var episodesList: some View {

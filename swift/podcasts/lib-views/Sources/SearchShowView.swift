@@ -136,30 +136,11 @@ public struct SearchShowView: View {
     )
   }
 
-  private var artworkPlaceholder: some View {
-    Rectangle()
-      .fill(Color(self.cs, light: .violet200, dark: .violet800))
-      .overlay(
-        Image(systemName: "mic")
-          .font(.system(size: 20, weight: .medium))
-          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet500))
-      )
-  }
-
   private func showArtwork(_ result: SearchResult) -> some View {
-    Group {
-      if let artworkURL = result.artworkUrl, let url = URL(string: artworkURL) {
-        AsyncImage(url: url) { image in
-          image
-            .resizable()
-            .aspectRatio(contentMode: .fill)
-        } placeholder: {
-          self.artworkPlaceholder
-        }
-      } else {
-        self.artworkPlaceholder
-      }
-    }
+    ArtworkView(
+      artworkUrl: result.artworkUrl,
+      placeholderIconSize: 20
+    )
     .frame(width: 64, height: 64)
     .cornerRadius(6)
     .clipped()

@@ -9,9 +9,7 @@ struct PodcastsView: View {
 
   var body: some View {
     PodcastsHomeView(
-      shows: self.store.shows.map {
-        .init(id: $0.id.rawValue, title: $0.name, artworkUrl: $0.artworkUrl)
-      },
+      shows: self.store.shows.map { .init(from: $0) },
       nowPlayingShowing: self.nowPlayingShowing,
       onAddShowTap: { self.store.send(.addShowTapped) },
       onShowTap: { self.store.send(.showTapped(.init($0))) }
