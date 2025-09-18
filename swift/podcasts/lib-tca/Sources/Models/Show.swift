@@ -1,11 +1,9 @@
 import Dependencies
 import Foundation
+import LibCore
 import LibViews
 import SharingGRDB
 import Tagged
-#if canImport(UIKit)
-  import UIKit
-#endif
 
 @Table
 struct Show: Equatable, Hashable {

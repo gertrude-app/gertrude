@@ -177,23 +177,29 @@ public struct NowPlayingView: View {
       Spacer()
 
       // Large artwork
-      Group {
-        if let artworkUrl = show.artworkUrl, let url = URL(string: artworkUrl) {
-          AsyncImage(url: url) { image in
-            image
-              .resizable()
-              .aspectRatio(contentMode: .fill)
-          } placeholder: {
+      GeometryReader { geometry in
+        let artworkSize = min(500, geometry.size.width * 0.85)
+        Group {
+          if let artworkUrl = show.artworkUrl, let url = URL(string: artworkUrl) {
+            AsyncImage(url: url) { image in
+              image
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+            } placeholder: {
+              self.artworkPlaceholder
+            }
+          } else {
             self.artworkPlaceholder
           }
-        } else {
-          self.artworkPlaceholder
         }
+        .frame(width: artworkSize, height: artworkSize)
+        .cornerRadius(8)
+        .clipped()
+        .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
-      .frame(width: 280, height: 280)
-      .cornerRadius(8)
-      .clipped()
-      .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
+      .aspectRatio(1, contentMode: .fit)
+      .frame(maxWidth: 400, maxHeight: 400)
 
       Spacer()
 
@@ -268,7 +274,7 @@ public struct NowPlayingView: View {
           self.emit(.skipBackwardTapped)
         }) {
           Image(systemName: "gobackward.15")
-            .font(.system(size: 24, weight: .medium))
+            .font(.system(size: 36, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
         }
 
@@ -276,7 +282,7 @@ public struct NowPlayingView: View {
           self.emit(.playPauseTapped)
         }) {
           Image(systemName: self.episode.isPlaying ? "pause.circle.fill" : "play.circle.fill")
-            .font(.system(size: 64, weight: .medium))
+            .font(.system(size: 80, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
         }
 
@@ -284,7 +290,7 @@ public struct NowPlayingView: View {
           self.emit(.skipForwardTapped)
         }) {
           Image(systemName: "goforward.30")
-            .font(.system(size: 24, weight: .medium))
+            .font(.system(size: 36, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
         }
       }

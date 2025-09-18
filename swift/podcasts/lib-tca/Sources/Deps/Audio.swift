@@ -3,6 +3,7 @@ import Combine
 import Dependencies
 import DependenciesMacros
 import Foundation
+import LibCore
 import MediaPlayer
 import Synchronization
 
