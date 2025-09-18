@@ -95,6 +95,13 @@ extension EpisodeData {
       description: episode.description,
       relativeTime: formatRelativeDate(episode.pubDate),
       duration: episode.duration.map { formatDuration($0) },
+      durationSeconds: episode.duration,
+      progress: episode.progress,
+      currentTimeString: formatTime(Int(episode.progress)),
+      remainingTimeString: formatRemainingTime(
+        progress: episode.progress,
+        durationSeconds: episode.duration
+      ),
       downloadState: episode.downloaded
         ? .downloaded
         : episode.downloading ? .downloading : .notDownloaded,
@@ -103,17 +110,7 @@ extension EpisodeData {
   }
 
   init(nowPlaying: NowPlaying.Data) {
-    self.init(
-      id: nowPlaying.episode.id.rawValue,
-      title: nowPlaying.episode.title,
-      description: nowPlaying.episode.description,
-      relativeTime: formatRelativeDate(nowPlaying.episode.pubDate),
-      duration: nowPlaying.episode.duration.map { formatDuration($0) },
-      downloadState: nowPlaying.episode.downloaded
-        ? .downloaded
-        : nowPlaying.episode.downloading ? .downloading : .notDownloaded,
-      isPlaying: nowPlaying.state.isPlaying
-    )
+    self.init(from: nowPlaying.episode, isPlaying: nowPlaying.state.isPlaying)
   }
 }
 

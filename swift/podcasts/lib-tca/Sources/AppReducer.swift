@@ -33,8 +33,8 @@ struct AppReducer {
       switch action {
       case .appDidLaunch:
         return .publisher {
-          self.audio.externalEvents()
-            .map { .nowPlaying(.external($0)) }
+          self.audio.systemEvents()
+            .map { .nowPlaying(.system($0)) }
             .receive(on: self.mainQueue)
         }
       case .mode(.presented(.onboarding(.finished(let passcode)))):

@@ -38,9 +38,12 @@ struct NowPlaying: FetchKeyRequest {
 }
 
 extension NowPlaying {
-  static func set(episode: Episode, show: Show, state: State) throws {
+  static func set(episode: Episode, show: Show, state: State) {
+    guard let value = try? JSON.encode(state) else {
+      unexpected(id: "eb1d1800")
+      return
+    }
     let deps = Deps()
-    let value = try JSON.encode(state)
     deps.db.tryWrite { db in
       try Misc.upsert { Misc(
         id: .nowPlaying,
@@ -129,10 +132,10 @@ extension NowPlaying {
 }
 
 extension NowPlaying.Data {
-  func updateState(_ update: (inout NowPlaying.State) -> Void) throws {
+  func updateState(_ update: (inout NowPlaying.State) -> Void) {
     var newState = self.state
     update(&newState)
-    try NowPlaying.set(episode: self.episode, show: self.show, state: newState)
+    NowPlaying.set(episode: self.episode, show: self.show, state: newState)
   }
 
   func setProgress(_ progress: Double) {

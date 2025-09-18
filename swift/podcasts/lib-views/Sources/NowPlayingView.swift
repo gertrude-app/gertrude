@@ -15,7 +15,7 @@ public struct NowPlayingView: View {
     case skipForwardTapped
     case dismissed
     case miniPlayerTapped
-    case skipTo(Double)
+    case scrubbed(to: Double)
   }
 
   public init(
@@ -156,6 +156,7 @@ public struct NowPlayingView: View {
           Text(self.show.title)
             .font(.system(size: 12, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
+            .padding(.horizontal, 40)
             .lineLimit(1)
         }
 
@@ -204,7 +205,7 @@ public struct NowPlayingView: View {
           .multilineTextAlignment(.center)
           .lineLimit(2)
 
-        Text(self.show.author ?? "Unknown Author")
+        Text(self.show.author ?? self.show.title)
           .font(.system(size: 16, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
           .lineLimit(1)
@@ -224,20 +225,21 @@ public struct NowPlayingView: View {
               .frame(height: 4)
 
             // Progress fill
+            let progressWidth = geometry.size.width * self.episode.progressRatio
             RoundedRectangle(cornerRadius: 2)
               .fill(Color(self.cs, light: .violet500, dark: .violet400))
-              .frame(width: 80, height: 4)
+              .frame(width: progressWidth, height: 4)
 
             // Draggable thumb
             Circle()
               .fill(Color(self.cs, light: .violet500, dark: .violet400))
               .frame(width: 12, height: 12)
-              .offset(x: 80 - 6) // Center the thumb on progress position
+              .offset(x: progressWidth - 6) // Center the thumb on progress position
               .gesture(
                 DragGesture()
                   .onChanged { value in
                     let progress = max(0, min(1, value.location.x / geometry.size.width))
-                    self.emit(.skipTo(progress))
+                    self.emit(.scrubbed(to: progress))
                   }
               )
           }
@@ -245,14 +247,13 @@ public struct NowPlayingView: View {
         .frame(height: 12)
 
         HStack {
-          Text("2:34")
+          Text(self.episode.currentTimeString)
             .font(.system(size: 12, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
 
           Spacer()
 
-          // TODO: handle no duration (temp, before download only)
-          Text(self.episode.duration ?? "")
+          Text(self.episode.remainingTimeString)
             .font(.system(size: 12, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
         }
@@ -309,6 +310,10 @@ public struct NowPlayingView: View {
       description: "Deep dive into @State, @Binding, and @ObservableObject",
       relativeTime: "2H AGO",
       duration: "45m",
+      durationSeconds: 2700,
+      progress: 760,
+      currentTimeString: "12:40",
+      remainingTimeString: "-32:20",
       downloadState: .downloaded,
       isPlaying: true
     ),
@@ -334,6 +339,10 @@ public struct NowPlayingView: View {
       description: "Deep dive into @State, @Binding, and @ObservableObject",
       relativeTime: "2H AGO",
       duration: "45m",
+      durationSeconds: 2700,
+      progress: 760,
+      currentTimeString: "12:40",
+      remainingTimeString: "-32:20",
       downloadState: .downloaded,
       isPlaying: true
     ),
@@ -357,6 +366,10 @@ public struct NowPlayingView: View {
       description: "MVVM, VIPER, TCA and more",
       relativeTime: "JUST NOW",
       duration: "1h 20m",
+      durationSeconds: 4800,
+      progress: 1200,
+      currentTimeString: "20:00",
+      remainingTimeString: "-1:00:00",
       downloadState: .downloaded,
       isPlaying: true
     ),
@@ -381,6 +394,10 @@ public struct NowPlayingView: View {
       description: "Deep dive into @State, @Binding, and @ObservableObject",
       relativeTime: "2H AGO",
       duration: "45m",
+      durationSeconds: 2700,
+      progress: 760,
+      currentTimeString: "12:40",
+      remainingTimeString: "-32:20",
       downloadState: .downloaded,
       isPlaying: true
     ),
@@ -407,6 +424,10 @@ public struct NowPlayingView: View {
       description: "Deep dive into @State, @Binding, and @ObservableObject",
       relativeTime: "2H AGO",
       duration: "45m",
+      durationSeconds: 2700,
+      progress: 760,
+      currentTimeString: "12:40",
+      remainingTimeString: "-32:20",
       downloadState: .downloaded,
       isPlaying: true
     ),
@@ -461,6 +482,10 @@ public struct NowPlayingView: View {
             description: "Learn advanced animation techniques",
             relativeTime: "1H AGO",
             duration: "52m",
+            durationSeconds: 3120,
+            progress: 1560,
+            currentTimeString: "26:00",
+            remainingTimeString: "-26:00",
             downloadState: .downloaded,
             isPlaying: true
           ),

@@ -100,3 +100,56 @@ func testFormatRelativeDateOldDates() {
   #expect(formatRelativeDate(augustDate) == "AUG 13")
   #expect(formatRelativeDate(decemberDate) == "DEC 25")
 }
+
+@Test
+func testFormatTimeSecondsOnly() {
+  #expect(formatTime(0) == "0:00")
+  #expect(formatTime(5) == "0:05")
+  #expect(formatTime(30) == "0:30")
+  #expect(formatTime(59) == "0:59")
+}
+
+@Test
+func testFormatTimeMinutesAndSeconds() {
+  #expect(formatTime(60) == "1:00")
+  #expect(formatTime(65) == "1:05")
+  #expect(formatTime(125) == "2:05")
+  #expect(formatTime(599) == "9:59")
+  #expect(formatTime(600) == "10:00")
+  #expect(formatTime(3599) == "59:59")
+}
+
+@Test
+func testFormatTimeHoursMinutesSeconds() {
+  #expect(formatTime(3600) == "1:00:00")
+  #expect(formatTime(3605) == "1:00:05")
+  #expect(formatTime(3665) == "1:01:05")
+  #expect(formatTime(7265) == "2:01:05")
+  #expect(formatTime(36005) == "10:00:05")
+  #expect(formatTime(359_999) == "99:59:59")
+}
+
+@Test
+func testFormatRemainingTimeWithValidDuration() {
+  #expect(formatRemainingTime(progress: 0, durationSeconds: 3600) == "-1:00:00")
+  #expect(formatRemainingTime(progress: 30, durationSeconds: 3600) == "-59:30")
+  #expect(formatRemainingTime(progress: 3570, durationSeconds: 3600) == "-0:30")
+  #expect(formatRemainingTime(progress: 3599, durationSeconds: 3600) == "-0:01")
+  #expect(formatRemainingTime(progress: 3600, durationSeconds: 3600) == "-0:00")
+}
+
+@Test
+func testFormatRemainingTimeWithNilDuration() {
+  #expect(formatRemainingTime(progress: 0, durationSeconds: nil) == "0:00")
+  #expect(formatRemainingTime(progress: 1000, durationSeconds: nil) == "0:00")
+  #expect(formatRemainingTime(progress: 3665, durationSeconds: nil) == "0:00")
+}
+
+@Test
+func testFormatRemainingTimeEdgeCases() {
+  #expect(formatRemainingTime(progress: -10, durationSeconds: 3600) == "-1:00:00")
+  #expect(formatRemainingTime(progress: 0, durationSeconds: 0) == "0:00")
+  #expect(formatRemainingTime(progress: 0, durationSeconds: -100) == "0:00")
+  #expect(formatRemainingTime(progress: 760, durationSeconds: 2700) == "-32:20")
+  #expect(formatRemainingTime(progress: 4000, durationSeconds: 3600) == "-0:00")
+}

@@ -10,20 +10,21 @@ import Synchronization
 struct AudioPlayer: Sendable {
   var play: @Sendable (_ episode: Episode, _ show: Show) async throws -> Void
   var pause: @Sendable () async throws -> Void
+  var seek: @Sendable (_ to: Double) async -> Void = { _ in }
   var getPlayingPosition: @Sendable () async -> Double?
-  var externalEvents: @Sendable () -> AnyPublisher<ExternalEvent, Never> = {
+  var systemEvents: @Sendable () -> AnyPublisher<SystemEvent, Never> = {
     Empty().eraseToAnyPublisher()
   }
 }
 
 extension AudioPlayer {
-  enum ExternalEvent: Equatable, Sendable {
+  enum SystemEvent: Equatable, Sendable {
     case play(Double?)
     case pause(Double?)
-    case scrubbedTo(Double)
+    case scrubbed(to: Double)
     case progressUpdated(Double)
-    case skippedForward(Double)
-    case skippedBackward(Double)
+    case skippedForward(from: Double, amount: Double)
+    case skippedBackward(from: Double, amount: Double)
   }
 }
 
@@ -36,10 +37,13 @@ extension AudioPlayer: DependencyKey {
       pause: {
         sharedPlayer.withLock { $0.pause() }
       },
+      seek: { time in
+        sharedPlayer.withLock { $0.seek(to: time) }
+      },
       getPlayingPosition: {
         sharedPlayer.withLock { $0.player.currentTime }
       },
-      externalEvents: {
+      systemEvents: {
         sharedPlayer.withLock { $0.events() }
       }
     )
@@ -62,7 +66,7 @@ private final class Player: Sendable {
   fileprivate let player: Mutex<AVPlayerData?> = Mutex(nil)
   private let episode: Mutex<Episode?> = Mutex(nil)
   private let timer: Mutex<Any?> = Mutex(nil)
-  private let subject = Mutex(PassthroughSubject<AudioPlayer.ExternalEvent, Never>())
+  private let subject = Mutex(PassthroughSubject<AudioPlayer.SystemEvent, Never>())
 
   init() {
     let session = AVAudioSession.sharedInstance()
@@ -92,7 +96,12 @@ private final class Player: Sendable {
     self.player.stopTimeUpdates()
   }
 
-  func events() -> AnyPublisher<AudioPlayer.ExternalEvent, Never> {
+  func seek(to time: Double) {
+    self.player.seek(to: time)
+    self.updateElapsedTime()
+  }
+
+  func events() -> AnyPublisher<AudioPlayer.SystemEvent, Never> {
     self.subject.withLock { $0.eraseToAnyPublisher() }
   }
 
@@ -123,16 +132,16 @@ private final class Player: Sendable {
 
     self.setupRemotePlayCommand()
     self.setupRemotePauseCommand()
-    self.setupRemotePositionCommand()
     self.setupRemoteSkipBackwardCommand()
     self.setupRemoteSkipForwardCommand()
+    self.setupRemoteScrubCommand()
   }
 
   private func setupRemotePlayCommand() {
     MPRemoteCommandCenter.shared().playCommand.addTarget { [weak self] _ in
       let position = self?.player.play()
       self?.startTimeUpdates()
-      self?.subject.withLock { $0.send(.play(position)) }
+      self?.emit(.play(position))
       return .success
     }
   }
@@ -141,12 +150,12 @@ private final class Player: Sendable {
     MPRemoteCommandCenter.shared().pauseCommand.addTarget { [weak self] _ in
       let position = self?.player.pause()
       self?.player.stopTimeUpdates()
-      self?.subject.withLock { $0.send(.pause(position)) }
+      self?.emit(.pause(position))
       return .success
     }
   }
 
-  private func setupRemotePositionCommand() {
+  private func setupRemoteScrubCommand() {
     let commands = MPRemoteCommandCenter.shared()
     commands.changePlaybackPositionCommand.isEnabled = true
     commands.changePlaybackPositionCommand.addTarget { [weak self] event in
@@ -154,13 +163,7 @@ private final class Player: Sendable {
             let positionEvent = event as? MPChangePlaybackPositionCommandEvent else {
         return .commandFailed
       }
-
-      self.player.seek(to: positionEvent.positionTime)
-      self.subject.withLock {
-        $0.send(.scrubbedTo(positionEvent.positionTime))
-      }
-
-      self.updateElapsedTime()
+      self.emit(.scrubbed(to: positionEvent.positionTime))
       return .success
     }
   }
@@ -169,18 +172,12 @@ private final class Player: Sendable {
     let commands = MPRemoteCommandCenter.shared()
     commands.skipBackwardCommand.isEnabled = true
     commands.skipBackwardCommand.preferredIntervals = [NSNumber(value: 15)]
-    commands.skipBackwardCommand.addTarget { [weak self] _ in
-      guard let self, let currentTime = self.player.currentTime else {
+    commands.skipBackwardCommand.addTarget { [weak self] event in
+      guard let self, let currentTime = self.player.currentTime,
+            let skipEvent = event as? MPSkipIntervalCommandEvent else {
         return .commandFailed
       }
-
-      let newTime = max(0, currentTime - 15)
-      self.player.seek(to: newTime)
-      self.subject.withLock {
-        $0.send(.skippedBackward(newTime))
-      }
-
-      self.updateElapsedTime()
+      self.emit(.skippedBackward(from: currentTime, amount: skipEvent.interval))
       return .success
     }
   }
@@ -189,21 +186,12 @@ private final class Player: Sendable {
     let commands = MPRemoteCommandCenter.shared()
     commands.skipForwardCommand.isEnabled = true
     commands.skipForwardCommand.preferredIntervals = [NSNumber(value: 30)]
-    commands.skipForwardCommand.addTarget { [weak self] _ in
-      guard let self, let currentTime = self.player.currentTime else {
+    commands.skipForwardCommand.addTarget { [weak self] event in
+      guard let self, let currentTime = self.player.currentTime,
+            let skipEvent = event as? MPSkipIntervalCommandEvent else {
         return .commandFailed
       }
-
-      let newTime = min(
-        self.episode.withLock { $0 }?.duration.flatMap { Double($0) } ?? .infinity,
-        currentTime + 30
-      )
-      self.player.seek(to: newTime)
-      self.subject.withLock {
-        $0.send(.skippedForward(newTime))
-      }
-
-      self.updateElapsedTime()
+      self.emit(.skippedForward(from: currentTime, amount: skipEvent.interval))
       return .success
     }
   }
@@ -216,7 +204,7 @@ private final class Player: Sendable {
         forInterval: CMTime(seconds: 5.0, preferredTimescale: 1),
         queue: .main
       ) { [weak self] time in
-        self?.subject.withLock { $0.send(.progressUpdated(time.seconds)) }
+        self?.emit(.progressUpdated(time.seconds))
         self?.updateElapsedTime()
       }
       $0?.timer = token
@@ -228,6 +216,10 @@ private final class Player: Sendable {
     nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = self.player.isPlaying ? 1.0 : 0.0
     nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = self.player.currentTime ?? 0.0
     MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+  }
+
+  private func emit(_ event: AudioPlayer.SystemEvent) {
+    self.subject.withLock { $0.send(event) }
   }
 }
 

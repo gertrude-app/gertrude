@@ -43,3 +43,22 @@ func formatRelativeDate(_ date: Date) -> String {
   formatter.locale = Locale(identifier: "en_US_POSIX")
   return formatter.string(from: date).uppercased()
 }
+
+public func formatTime(_ seconds: Int) -> String {
+  let hours = seconds / 3600
+  let minutes = (seconds % 3600) / 60
+  let secs = seconds % 60
+
+  if hours > 0 {
+    return String(format: "%d:%02d:%02d", hours, minutes, secs)
+  } else {
+    return String(format: "%d:%02d", minutes, secs)
+  }
+}
+
+public func formatRemainingTime(progress: Double, durationSeconds: Int?) -> String {
+  guard let durationSeconds, durationSeconds > 0 else { return "0:00" }
+  let currentSeconds = max(0, Int(progress))
+  let remainingSeconds = max(0, durationSeconds - currentSeconds)
+  return "-" + formatTime(remainingSeconds)
+}

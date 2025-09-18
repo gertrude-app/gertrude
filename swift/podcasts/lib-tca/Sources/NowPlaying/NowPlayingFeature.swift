@@ -12,7 +12,7 @@ struct NowPlayingFeature: Downloader {
 
   enum Action: Equatable {
     case view(NowPlayingView.Event)
-    case external(AudioPlayer.ExternalEvent)
+    case system(AudioPlayer.SystemEvent)
     case episodePlayPauseTapped(Episode, Show)
   }
 
@@ -31,45 +31,53 @@ struct NowPlayingFeature: Downloader {
         }
         switch viewAction {
         case .miniPlayerTapped, .dismissed:
-          return .run { _ in
-            try nowPlaying.updateState { $0.minimized.toggle() }
-          }
-        case .playPauseTapped:
-          return .run { _ in
-            try nowPlaying.updateState { $0.isPlaying.toggle() }
-          }
-        default:
+          nowPlaying.updateState { $0.minimized.toggle() }
           return .none
+        case .playPauseTapped:
+          nowPlaying.updateState { $0.isPlaying.toggle() }
+          return .none
+        case .scrubbed(to: let position):
+          return self.scrub(nowPlaying, to: position)
+        case .skipBackwardTapped:
+          return self.skip(nowPlaying, .backward, amount: 15)
+        case .skipForwardTapped:
+          return self.skip(nowPlaying, .forward, amount: 30)
         }
-      case .external(let event):
+      case .system(let event):
         guard let nowPlaying = state.data else {
           unexpected(id: "9faa5b69")
           return .none
         }
-        return .run { _ in
-          switch event {
-          case .play(let time):
-            try nowPlaying.updateState { $0.isPlaying = true }
-            time.map { nowPlaying.setProgress($0) }
-          case .pause(let time):
-            try nowPlaying.updateState { $0.isPlaying = false }
-            time.map { nowPlaying.setProgress($0) }
-          case .scrubbedTo(let time), .progressUpdated(let time),
-               .skippedBackward(let time), .skippedForward(let time):
-            nowPlaying.setProgress(time)
-          }
+        switch event {
+        case .play(let time):
+          nowPlaying.updateState { $0.isPlaying = true }
+          time.map { nowPlaying.setProgress($0) }
+          return .none
+        case .pause(let time):
+          nowPlaying.updateState { $0.isPlaying = false }
+          time.map { nowPlaying.setProgress($0) }
+          return .none
+        case .progressUpdated(let time):
+          nowPlaying.setProgress(time)
+          return .none
+        case .scrubbed(to: let position):
+          return self.scrub(nowPlaying, to: position)
+        case .skippedBackward(from: let location, amount: let amount):
+          return self.skip(nowPlaying, .backward, amount: amount, from: location)
+        case .skippedForward(from: let location, amount: let amount):
+          return self.skip(nowPlaying, .forward, amount: amount, from: location)
         }
       case .episodePlayPauseTapped(let episode, let show):
         return .run { [state] _ in
           await self.ensureDownloaded(episode: episode)
           if state.data?.episode.id == episode.id {
-            try state.data?.updateState { $0.isPlaying.toggle() }
+            state.data?.updateState { $0.isPlaying.toggle() }
           } else {
             if state.data?.state.isPlaying == true,
                let finalPosition = await self.audioPlayer.getPlayingPosition() {
               state.data?.setProgress(finalPosition)
             }
-            try NowPlaying.set(
+            NowPlaying.set(
               episode: episode,
               show: show,
               state: .init(isPlaying: true, minimized: true)
@@ -77,6 +85,40 @@ struct NowPlayingFeature: Downloader {
           }
         }
       }
+    }
+  }
+
+  enum SkipDirection {
+    case forward
+    case backward
+  }
+
+  func skip(
+    _ nowPlaying: NowPlaying.Data,
+    _ direction: SkipDirection,
+    amount: Double,
+    from location: Double? = nil,
+  ) -> Effect<Action> {
+    .run { _ in
+      var currentLoc = location ?? -1.0
+      if currentLoc < 0 {
+        currentLoc = await self.audioPlayer.getPlayingPosition() ?? nowPlaying.episode.progress
+      }
+      let newTime = switch direction {
+      case .forward:
+        min(Double(nowPlaying.episode.duration ?? .max), currentLoc + amount)
+      case .backward:
+        max(0, currentLoc - amount)
+      }
+      await self.audioPlayer.seek(to: newTime)
+      nowPlaying.setProgress(newTime)
+    }
+  }
+
+  func scrub(_ nowPlaying: NowPlaying.Data, to newTime: Double) -> Effect<Action> {
+    .run { _ in
+      await self.audioPlayer.seek(to: newTime)
+      nowPlaying.setProgress(newTime)
     }
   }
 }
