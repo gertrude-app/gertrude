@@ -238,8 +238,10 @@ public struct NowPlayingView: View {
               .gesture(
                 DragGesture()
                   .onChanged { value in
-                    let progress = max(0, min(1, value.location.x / geometry.size.width))
-                    self.emit(.scrubbed(to: progress))
+                    guard let duration = self.episode.durationSeconds else { return }
+                    let percentage = max(0, min(1, value.location.x / geometry.size.width))
+                    let location = percentage * Double(duration)
+                    self.emit(.scrubbed(to: location))
                   }
               )
           }
