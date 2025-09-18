@@ -21,6 +21,7 @@ struct NowPlayingFeature: Downloader {
   @Dependency(\.podcasts) var podcasts
   @Dependency(\.audioPlayer) var audioPlayer
   @Dependency(\.date) var date
+  @Dependency(\.haptics) var haptics
 
   var body: some Reducer<State, Action> {
     Reduce { state, action in
@@ -31,12 +32,19 @@ struct NowPlayingFeature: Downloader {
           return .none
         }
         switch viewAction {
-        case .miniPlayerTapped, .dismissed:
+        case .miniPlayerTapped:
+          nowPlaying.updateState { $0.minimized.toggle() }
+          return .run { _ in
+            await self.haptics.prepare()
+          }
+        case .dismissed:
           nowPlaying.updateState { $0.minimized.toggle() }
           return .none
         case .playPauseTapped:
-          nowPlaying.updateState { $0.isPlaying.toggle() }
-          return .none
+          return .run { _ in
+            await self.haptics.impact(.light)
+            nowPlaying.updateState { $0.isPlaying.toggle() }
+          }
         case .scrubbed(to: let position):
           return self.scrub(nowPlaying, to: position)
         case .skipBackwardTapped:

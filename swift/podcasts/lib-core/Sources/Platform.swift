@@ -42,11 +42,46 @@ import SwiftUI
       self.init(systemName: "photo")
     }
   }
+
+  public struct UIImpactFeedbackGenerator {
+    public enum FeedbackStyle {
+      case light, medium, heavy, soft, rigid
+      public var NOT_REAL_CHECK_XCODE: String { "" }
+    }
+
+    public init(style: FeedbackStyle) {}
+    public init() {}
+    public func impactOccurred() {}
+    public func prepare() {}
+    public var NOT_REAL_CHECK_XCODE: String { "" }
+  }
+
+  public struct UINotificationFeedbackGenerator {
+    public enum FeedbackType {
+      case success, warning, error
+      public var NOT_REAL_CHECK_XCODE: String { "" }
+    }
+
+    public init() {}
+    public func notificationOccurred(_ type: FeedbackType) {}
+    public func prepare() {}
+    public var NOT_REAL_CHECK_XCODE: String { "" }
+  }
+
+  public struct UISelectionFeedbackGenerator {
+    public init() {}
+    public func selectionChanged() {}
+    public func prepare() {}
+    public var NOT_REAL_CHECK_XCODE: String { "" }
+  }
 #else
   import UIKit
 
   public typealias UIImage = UIKit.UIImage
   public typealias UIApplication = UIKit.UIApplication
+  public typealias UIImpactFeedbackGenerator = UIKit.UIImpactFeedbackGenerator
+  public typealias UINotificationFeedbackGenerator = UIKit.UINotificationFeedbackGenerator
+  public typealias UISelectionFeedbackGenerator = UIKit.UISelectionFeedbackGenerator
 
   public extension UIImage {
     var mediaItemArtwork: MPMediaItemArtwork {
