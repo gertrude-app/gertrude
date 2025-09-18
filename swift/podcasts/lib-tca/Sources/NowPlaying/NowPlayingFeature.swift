@@ -8,6 +8,7 @@ struct NowPlayingFeature: Downloader {
   @ObservableState
   struct State: Equatable {
     @Fetch(NowPlaying()) var data: NowPlaying.Value = nil
+    @Shared(.appInForeground) var appInForeground
   }
 
   enum Action: Equatable {
@@ -58,7 +59,9 @@ struct NowPlayingFeature: Downloader {
           time.map { nowPlaying.setProgress($0) }
           return .none
         case .progressUpdated(let time):
-          nowPlaying.setProgress(time)
+          if state.appInForeground || time.truncatingRemainder(dividingBy: 5) < 0.1 {
+            nowPlaying.setProgress(time)
+          }
           return .none
         case .scrubbed(to: let position):
           return self.scrub(nowPlaying, to: position)

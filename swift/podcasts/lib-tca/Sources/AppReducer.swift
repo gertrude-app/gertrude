@@ -7,6 +7,7 @@ struct AppReducer {
   struct State: Equatable {
     @Presents var mode: Mode.State?
     var nowPlaying = NowPlayingFeature.State()
+    @Shared(.appInForeground) var appInForeground
   }
 
   @Reducer(state: .equatable, action: .equatable)
@@ -17,6 +18,7 @@ struct AppReducer {
 
   enum Action: Equatable {
     case appDidLaunch
+    case appInForegroundChanged(Bool)
     case nowPlaying(NowPlayingFeature.Action)
     case mode(PresentationAction<Mode.Action>)
   }
@@ -24,6 +26,7 @@ struct AppReducer {
   @Dependency(\.passcode) var passcode
   @Dependency(\.audioPlayer) var audio
   @Dependency(\.mainQueue) var mainQueue
+  @Dependency(\.notificationCenter) var notificationCenter
 
   var body: some Reducer<State, Action> {
     Scope(state: \.nowPlaying, action: \.nowPlaying) {
@@ -32,11 +35,21 @@ struct AppReducer {
     Reduce { state, action in
       switch action {
       case .appDidLaunch:
-        return .publisher {
-          self.audio.systemEvents()
-            .map { .nowPlaying(.system($0)) }
-            .receive(on: self.mainQueue)
-        }
+        return .merge(
+          .publisher {
+            self.audio.systemEvents()
+              .map { .nowPlaying(.system($0)) }
+              .receive(on: self.mainQueue)
+          },
+          .publisher {
+            self.notificationCenter.appForegroundingEvents()
+              .map { .appInForegroundChanged($0) }
+              .receive(on: self.mainQueue)
+          }
+        )
+      case .appInForegroundChanged(let foregrounded):
+        state.$appInForeground.withLock { $0 = foregrounded }
+        return .none
       case .mode(.presented(.onboarding(.finished(let passcode)))):
         state.mode = .podcasts(.init(passcode: passcode))
         return .run { _ in
@@ -79,4 +92,10 @@ func unexpected(
 ) {
   let message = "Unexpected \(id)" + (detail.map { ": \($0)" } ?? "")
   reportIssue(message, fileID: fileID, filePath: filePath, line: line, column: column)
+}
+
+extension SharedKey where Self == InMemoryKey<Bool>.Default {
+  static var appInForeground: Self {
+    Self[.inMemory("appInForeground"), default: true]
+  }
 }

@@ -201,7 +201,7 @@ private final class Player: Sendable {
     self.player.withLock {
       guard let data = $0 else { return }
       let token = data.player.addPeriodicTimeObserver(
-        forInterval: CMTime(seconds: 5.0, preferredTimescale: 1),
+        forInterval: CMTime(seconds: 1.0, preferredTimescale: 1),
         queue: .main
       ) { [weak self] time in
         self?.emit(.progressUpdated(time.seconds))
