@@ -44,6 +44,7 @@ struct AddShowFeature {
   @Dependency(\.defaultDatabase) var db
   @Dependency(\.date.now) var now
   @Dependency(\.podcasts) var podcasts
+  @Dependency(\.haptics) var haptics
 
   private enum CancelID { case search }
 
@@ -77,12 +78,16 @@ struct AddShowFeature {
         self.insertAttempt(success: true)
         state.screen = .choosingMethod
         state.lockout = .pinLockout()
-        return .none
+        return .run { _ in
+          await self.haptics.notification(.success)
+        }
 
       case .passcodeFailed:
         self.insertAttempt(success: false)
         state.lockout = .pinLockout()
-        return .none
+        return .run { _ in
+          await self.haptics.notification(.error)
+        }
 
       case .passcodeCancelled:
         return .run { _ in

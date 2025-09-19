@@ -46,7 +46,7 @@ struct NowPlayingFeature: Downloader {
             nowPlaying.updateState { $0.isPlaying.toggle() }
           }
         case .scrubbed(to: let position):
-          return self.scrub(nowPlaying, to: position)
+          return self.scrub(nowPlaying, to: position, haptics: true)
         case .skipBackwardTapped:
           return self.skip(nowPlaying, .backward, amount: 15)
         case .skipForwardTapped:
@@ -72,7 +72,7 @@ struct NowPlayingFeature: Downloader {
           }
           return .none
         case .scrubbed(to: let position):
-          return self.scrub(nowPlaying, to: position)
+          return self.scrub(nowPlaying, to: position, haptics: false)
         case .skippedBackward(from: let location, amount: let amount):
           return self.skip(nowPlaying, .backward, amount: amount, from: location)
         case .skippedForward(from: let location, amount: let amount):
@@ -126,10 +126,17 @@ struct NowPlayingFeature: Downloader {
     }
   }
 
-  func scrub(_ nowPlaying: NowPlaying.Data, to newTime: Double) -> Effect<Action> {
+  func scrub(
+    _ nowPlaying: NowPlaying.Data,
+    to newTime: Double,
+    haptics: Bool = false
+  ) -> Effect<Action> {
     .run { _ in
-      await self.audioPlayer.seek(to: newTime)
       nowPlaying.setProgress(newTime)
+      if haptics {
+        await self.haptics.selection()
+      }
+      await self.audioPlayer.seek(to: newTime)
     }
   }
 }
