@@ -1,5 +1,10 @@
-import LibCore
 import SwiftUI
+
+#if canImport(UIKit)
+  import UIKit
+#else
+  import LibCore
+#endif
 
 public struct ArtworkView: View {
   @Environment(\.colorScheme) var cs

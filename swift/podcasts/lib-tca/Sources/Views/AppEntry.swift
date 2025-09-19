@@ -47,7 +47,12 @@ private var initialState: AppReducer.State {
   // state.mode = .podcasts(PodcastsFeature.State(
   //   passcode: 111_111,
   //   shows: [.mock],
-  //   destination: .show(.init(show: .mock)),
+  //   destination: .addShow(.init(
+  //     passcode: 111_111,
+  //     screen: .choosingMethod,
+  //     searchText: "",
+  //     searchResults: [],
+  //   ))
   // ))
   // #endif
   return state

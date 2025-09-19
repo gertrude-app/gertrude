@@ -1,5 +1,10 @@
 import Foundation
-import LibCore
+
+#if canImport(UIKit)
+  import UIKit
+#else
+  import LibCore
+#endif
 
 public struct ShowData: Identifiable {
   public let id: Int

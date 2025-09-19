@@ -3,6 +3,22 @@ import SwiftUI
 public struct ButtonScreenView: View {
   @Environment(\.colorScheme) var cs
 
+  public struct UrlInputConfig: Sendable {
+    var placeholder: String
+    var buttonText: String
+    var onSubmit: @MainActor @Sendable (String) -> Void
+
+    public init(
+      placeholder: String = "Enter URL",
+      buttonText: String = "Submit",
+      onSubmit: @MainActor @escaping @Sendable (String) -> Void
+    ) {
+      self.placeholder = placeholder
+      self.buttonText = buttonText
+      self.onSubmit = onSubmit
+    }
+  }
+
   public struct Config: Sendable {
     var text: String
     var type: ButtonType
@@ -44,6 +60,7 @@ public struct ButtonScreenView: View {
   let listItems: [String]?
   let image: String?
   let screenType: ScreenType
+  let urlInputConfig: UrlInputConfig?
 
   @State private var showBg = false
   @State private var iconOffset = Vector(x: 0, y: -20)
@@ -51,6 +68,8 @@ public struct ButtonScreenView: View {
   @State private var primaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
   @State private var secondaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
   @State private var tertiaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
+  @State private var urlText = ""
+  @State private var urlInputOffset = Vector(x: 0, y: 20)
 
   var icon: String {
     switch self.screenType {
@@ -68,7 +87,8 @@ public struct ButtonScreenView: View {
     listItems: [String]? = nil,
     image: String? = nil,
     screenType: ScreenType = .info,
-    primaryLooksLikeSecondary: Bool = false
+    primaryLooksLikeSecondary: Bool = false,
+    urlInput: UrlInputConfig? = nil
   ) {
     self.text = text
     self.screenType = screenType
@@ -78,6 +98,7 @@ public struct ButtonScreenView: View {
     self.secondaryButtonConfig = secondary
     self.tertiaryButtonConfig = tertiary
     self.primaryLooksLikeSecondary = primaryLooksLikeSecondary
+    self.urlInputConfig = urlInput
   }
 
   public var body: some View {
@@ -136,6 +157,43 @@ public struct ButtonScreenView: View {
           }
           .padding(.bottom, 20)
           .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))
+        }
+
+        if let urlConfig = self.urlInputConfig {
+          VStack(spacing: 40) {
+            TextField(urlConfig.placeholder, text: self.$urlText)
+              .font(.system(size: 22, weight: .medium))
+              .textContentType(.URL)
+              .padding(.horizontal, 16)
+              .padding(.vertical, 14)
+              .background(
+                RoundedRectangle(cornerRadius: 8)
+                  .fill(Color(self.cs, light: .white, dark: .black))
+              )
+              .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                  .stroke(
+                    Color(self.cs, light: .gray.opacity(0.3), dark: .gray.opacity(0.5)),
+                    lineWidth: 1
+                  )
+              )
+
+            BigButton(
+              urlConfig.buttonText,
+              type: .button {
+                urlConfig.onSubmit(self.urlText)
+              },
+              variant: .primary,
+              disabled: self.urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            )
+          }
+          .swooshIn(
+            tracking: self.$urlInputOffset,
+            to: .zero,
+            after: .milliseconds(100),
+            for: .milliseconds(800)
+          )
+          .padding(.bottom, 20)
         }
 
         if let config = self.primaryButtonConfig {
@@ -274,6 +332,7 @@ public struct ButtonScreenView: View {
       Task { @MainActor in
         withAnimation {
           self.primaryButtonStatus.offset.y = 20
+          self.urlInputOffset.y = 20
         }
       }
     }
@@ -383,5 +442,34 @@ public struct ButtonScreenView: View {
     text: "Lorem ipsum dolor sit amet consectetur adipiscing elit.",
     primary: ButtonScreenView.Config(text: "Do something", type: .button {}, animate: true),
     image: "AllowContentFilter"
+  )
+}
+
+#Preview("URL input") {
+  ButtonScreenView(
+    text: "Enter a podcast RSS feed URL to add to your library:",
+    urlInput: ButtonScreenView.UrlInputConfig(
+      placeholder: "https://example.com/feed.rss",
+      buttonText: "Add Feed"
+    ) { url in
+      print("Submitted URL: \(url)")
+    }
+  )
+}
+
+#Preview("URL input with button") {
+  ButtonScreenView(
+    text: "Add a new podcast feed or browse our recommendations:",
+    primary: ButtonScreenView.Config(
+      text: "Browse Recommendations",
+      type: .button {},
+      animate: true
+    ),
+    urlInput: ButtonScreenView.UrlInputConfig(
+      placeholder: "https://example.com/feed.rss",
+      buttonText: "Add Feed"
+    ) { url in
+      print("Submitted URL: \(url)")
+    }
   )
 }

@@ -47,23 +47,21 @@ struct AddShowView: View {
         )
 
       case .subscribing:
-        // TODO: move to lib views, dark mode, previews
-        VStack(spacing: 16) {
-          ProgressView()
-            .progressViewStyle(.circular)
-            .scaleEffect(1.5)
-          Text("Subscribing...")
-            .font(.system(size: 18, weight: .medium))
-        }
+        LoadingScreenView(text: "Subscribing...")
 
       case .subscribeError:
-        Text("Adding show failed. Please try again.")
-          .font(.system(size: 18, weight: .medium))
-          .multilineTextAlignment(.center)
-          .padding()
+        ErrorView(text: "Adding show failed. Please try again.")
 
       case .addingByUrl:
-        Text("adding by URL")
+        ButtonScreenView(
+          text: "Enter a podcast RSS feed URL:",
+          urlInput: .init(
+            placeholder: "https://show.com/feed.rss",
+            buttonText: "Subscribe"
+          ) { url in
+            self.store.send(.addByUrlSubmitted(url))
+          }
+        )
       }
     }
   }

@@ -67,7 +67,7 @@ struct NowPlayingFeature: Downloader {
           time.map { nowPlaying.setProgress($0) }
           return .none
         case .progressUpdated(let time):
-          if state.appInForeground || time.truncatingRemainder(dividingBy: 5) < 0.1 {
+          if state.expandedViewVisible || time.truncatingRemainder(dividingBy: 5) < 0.1 {
             nowPlaying.setProgress(time)
           }
           return .none
@@ -139,4 +139,9 @@ struct NowPlayingFeature: Downloader {
       await self.audioPlayer.seek(to: newTime)
     }
   }
+}
+
+extension NowPlayingFeature.State {
+  var viewExpanded: Bool { self.data?.state.minimized == false }
+  var expandedViewVisible: Bool { self.viewExpanded && self.appInForeground }
 }

@@ -12,7 +12,7 @@ struct AddShowFeature {
       case choosingMethod
       case searching
       case addingByUrl
-      case chooseArtworkPolicy(SearchResult)
+      case chooseArtworkPolicy(String)
       case subscribing
       case subscribeError
     }
@@ -38,6 +38,7 @@ struct AddShowFeature {
     case setSearchResults([SearchResult])
     case setScreen(State.Screen)
     case subscribed(Show)
+    case addByUrlSubmitted(String)
   }
 
   @Dependency(\.dismiss) var dismiss
@@ -103,16 +104,20 @@ struct AddShowFeature {
         return .none
 
       case .selectShow(let show):
-        state.screen = .chooseArtworkPolicy(show)
+        state.screen = .chooseArtworkPolicy(show.feedUrl)
+        return .none
+
+      case .addByUrlSubmitted(let feedUrl):
+        state.screen = .chooseArtworkPolicy(feedUrl)
         return .none
 
       case .selectDontAllowArtworkTapped, .selectAllowArtworkTapped:
-        guard case .chooseArtworkPolicy(let show) = state.screen else {
+        guard case .chooseArtworkPolicy(let feedUrl) = state.screen else {
           reportIssue("Unexpected action \(action) in state \(state)")
           return .none
         }
         state.screen = .subscribing
-        return self.subscribe(to: show, artwork: action == .selectAllowArtworkTapped)
+        return self.subscribe(to: feedUrl, artwork: action == .selectAllowArtworkTapped)
 
       case .subscribed:
         return .none
@@ -120,13 +125,13 @@ struct AddShowFeature {
     }
   }
 
-  func subscribe(to show: SearchResult, artwork withArtwork: Bool) -> Effect<Action> {
+  func subscribe(to feedUrl: String, artwork withArtwork: Bool) -> Effect<Action> {
     .run { send in
       do {
-        let feed = try await self.podcasts.getFeed(show.feedUrl)
-        let show = try await self.db.write { db in
+        let feed = try await self.podcasts.getFeed(feedUrl)
+        let show = self.db.tryWrite { db in
           try Show
-            .insert { feed.show.toShowDraft(feedUrl: show.feedUrl, showArtwork: withArtwork) }
+            .insert { feed.show.toShowDraft(feedUrl: feedUrl, showArtwork: withArtwork) }
             .returning(\.self)
             .fetchOne(db)
         }
