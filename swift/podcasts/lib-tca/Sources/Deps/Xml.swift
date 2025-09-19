@@ -1,12 +1,12 @@
 import Foundation
 
-func parsePodcastFeed(_ xmlString: String) throws -> Feed {
+func parsePodcastFeed(_ xmlString: String, source: String) throws -> Feed {
   guard let xmlData = xmlString.data(using: .utf8) else {
     throw XMLParseError.invalidUtf8
   }
 
   let parser = XMLParser(data: xmlData)
-  let delegate = PodcastFeedParser()
+  let delegate = PodcastFeedParser(source: source)
   parser.delegate = delegate
 
   guard parser.parse() else {
@@ -35,6 +35,7 @@ enum XMLParseError: Error, Sendable {
 }
 
 private class PodcastFeedParser: NSObject, XMLParserDelegate {
+  var source: String
   var show: Show.FeedData?
   var episodes: [Episode.FeedData] = []
   var parseError: XMLParseError?
@@ -67,6 +68,10 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
 
   private var isInItem = false
   private var itemElementCount = 0
+
+  init(source: String) {
+    self.source = source
+  }
 
   func parser(
     _ parser: XMLParser,
@@ -200,6 +205,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
     // Create show object when we finish parsing the channel
     if elementName == "channel", self.show == nil {
       self.show = Show.FeedData(
+        sourceUrl: self.source,
         name: self.showTitle,
         author: self.showAuthor,
         description: self.showDescription?.isEmpty == false ? self

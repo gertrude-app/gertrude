@@ -32,6 +32,8 @@ enum AudioType: String, Equatable, QueryBindable {
   case m4a = "audio/x-m4a"
 }
 
+extension Episode.Draft: Equatable {}
+
 extension Episode {
   var downloaded: Bool {
     @Dependency(\.date.now) var now

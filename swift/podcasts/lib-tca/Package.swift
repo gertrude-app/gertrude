@@ -11,6 +11,7 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/sharing-grdb", exact: "0.5.1"),
     .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.0.0"),
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.0.0"),
+    .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.0.0"),
     .package(
       url: "https://github.com/pointfreeco/swift-structured-queries",
       from: "0.17.0",
@@ -31,7 +32,10 @@ let package = Package(
     ),
     .testTarget(
       name: "LibTCATests",
-      dependencies: ["LibTCA"]
+      dependencies: [
+        "LibTCA",
+        .product(name: "CustomDump", package: "swift-custom-dump"),
+      ]
     ),
   ]
 )

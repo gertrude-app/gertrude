@@ -65,7 +65,7 @@ func getPodcastFeedLive(feedUrl: String) async throws -> Feed {
   }
 
   do {
-    return try parsePodcastFeed(xmlString)
+    return try parsePodcastFeed(xmlString, source: feedUrl)
   } catch let error as XMLParseError {
     throw PodcastFeedError.parseError(error)
   }

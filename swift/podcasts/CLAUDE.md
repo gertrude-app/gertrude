@@ -19,3 +19,7 @@ Architecture (TCA) and SQLite for data persistence.
 - run `just build` to build all 3 main modules
 - run `just format` whenever you finish a task, it may change the code, so you might need
   to re-read
+
+## misc
+
+- unless it's a SwiftUI view, NEVER LEAVE COMMENTS

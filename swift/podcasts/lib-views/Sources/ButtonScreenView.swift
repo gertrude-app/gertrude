@@ -180,9 +180,7 @@ public struct ButtonScreenView: View {
 
             BigButton(
               urlConfig.buttonText,
-              type: .button {
-                urlConfig.onSubmit(self.urlText)
-              },
+              type: .button { urlConfig.onSubmit(self.urlText) },
               variant: .primary,
               disabled: self.urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             )

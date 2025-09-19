@@ -131,7 +131,7 @@ struct AddShowFeature {
         let feed = try await self.podcasts.getFeed(feedUrl)
         let show = self.db.tryWrite { db in
           try Show
-            .insert { feed.show.toShowDraft(feedUrl: feedUrl, showArtwork: withArtwork) }
+            .insert { feed.show.toShowDraft(showArtwork: withArtwork) }
             .returning(\.self)
             .fetchOne(db)
         }

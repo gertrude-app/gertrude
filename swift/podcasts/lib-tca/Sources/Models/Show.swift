@@ -34,6 +34,8 @@ extension Show {
   }
 }
 
+extension Show.Draft: Equatable {}
+
 extension URL {
   static func localFilesDir(showId: Show.ID) -> URL {
     URL.documentsDirectory
@@ -49,6 +51,7 @@ extension URL {
 
 extension Show {
   struct FeedData: Equatable {
+    var sourceUrl: String
     var name: String
     var author: String?
     var description: String?
@@ -56,13 +59,13 @@ extension Show {
     var artworkUrl: String?
     var iTunesId: Int?
 
-    func toShowDraft(feedUrl: String, showArtwork: Bool) -> Show.Draft {
+    func toShowDraft(showArtwork: Bool) -> Show.Draft {
       @Dependency(\.date.now) var now
       return .init(
         name: self.name,
         author: self.author,
         description: self.description,
-        feedUrl: feedUrl,
+        feedUrl: self.sourceUrl,
         websiteUrl: self.websiteUrl,
         artworkUrl: self.artworkUrl,
         showArtwork: showArtwork,

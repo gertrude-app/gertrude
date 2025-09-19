@@ -41,7 +41,7 @@ func testParsePodcastFeedBasic() throws {
   </rss>
   """
 
-  let result = try parsePodcastFeed(xmlString)
+  let result = try parsePodcastFeed(xmlString, source: "")
 
   // show
   #expect(result.show.name == "Test Podcast")
@@ -99,7 +99,7 @@ func testParsePodcastFeedMinimal() throws {
   </rss>
   """
 
-  let result = try parsePodcastFeed(xmlString)
+  let result = try parsePodcastFeed(xmlString, source: "")
 
   #expect(result.show.name == "Minimal Podcast")
   #expect(result.show.author == nil)
@@ -158,7 +158,7 @@ func testParseDurationFormats() throws {
   </rss>
   """
 
-  let result = try parsePodcastFeed(xmlString)
+  let result = try parsePodcastFeed(xmlString, source: "")
 
   #expect(result.episodes.count == 3)
   #expect(result.episodes[0].duration == 8130)
@@ -180,7 +180,7 @@ func testParseInvalidXML() {
   let invalidXml = "This is not XML"
 
   #expect(throws: XMLParseError.self) {
-    try parsePodcastFeed(invalidXml)
+    try parsePodcastFeed(invalidXml, source: "")
   }
 }
 
@@ -196,7 +196,7 @@ func testParseEmptyFeed() {
   """
 
   #expect(throws: XMLParseError.missingRequiredData) {
-    try parsePodcastFeed(emptyXml)
+    try parsePodcastFeed(emptyXml, source: "")
   }
 }
 
@@ -218,7 +218,7 @@ func testParseMissingGuid() {
   """
 
   #expect(throws: XMLParseError.missingRequiredData) {
-    try parsePodcastFeed(xmlString)
+    try parsePodcastFeed(xmlString, source: "")
   }
 }
 
@@ -256,7 +256,7 @@ func testParseAudioTypes() throws {
   </rss>
   """
 
-  let result = try parsePodcastFeed(xmlString)
+  let result = try parsePodcastFeed(xmlString, source: "")
 
   #expect(result.episodes.count == 3)
   #expect(result.episodes[0].audioType == .mp3)
@@ -302,7 +302,7 @@ func testParseRealWorldFeed() throws {
   </rss>
   """
 
-  let result = try parsePodcastFeed(xmlString)
+  let result = try parsePodcastFeed(xmlString, source: "")
 
   // Test show artwork from itunes:image
   #expect(result.show.name == "Test Real World Podcast")
@@ -384,7 +384,7 @@ func testParseSpanishPodcastFeed() throws {
   </rss>
   """
 
-  let result = try parsePodcastFeed(xmlString)
+  let result = try parsePodcastFeed(xmlString, source: "")
 
   // Test show
   #expect(result.show.name == "Spanish Learning Podcast")
@@ -465,7 +465,7 @@ func testStripsHtmlTags() throws {
 
   for (input, expected) in cases {
     let testXml = xmlString.replacingOccurrences(of: "%INPUT%", with: input)
-    let feed = try parsePodcastFeed(testXml)
+    let feed = try parsePodcastFeed(testXml, source: "")
     #expect(feed.show.description == expected)
     #expect(feed.episodes[0].description == expected)
   }
@@ -829,7 +829,7 @@ func testParseTALFeed() throws {
   </rss>
   """
 
-  let feed = try parsePodcastFeed(xmlString)
+  let feed = try parsePodcastFeed(xmlString, source: "")
 
   // Test show properties
   #expect(feed.show.name == "This American Life")
@@ -997,7 +997,7 @@ func testSkipsInvalidEpisodes() throws {
   </rss>
   """
 
-  let feed = try parsePodcastFeed(xmlString)
+  let feed = try parsePodcastFeed(xmlString, source: "")
   #expect(feed.episodes.count == 1) // one episode should be dropped, no length
 }
 
@@ -1029,7 +1029,7 @@ func testFailsOnNoValidEpisodes() throws {
   """
 
   #expect(throws: (any Error).self) {
-    _ = try parsePodcastFeed(xmlString)
+    _ = try parsePodcastFeed(xmlString, source: "")
   }
 }
 
@@ -1064,7 +1064,7 @@ func testHoyHablamosArtwork() throws {
   </rss>
   """
 
-  let feed = try parsePodcastFeed(xmlString)
+  let feed = try parsePodcastFeed(xmlString, source: "")
 
   // This should have the artwork URL from either itunes:image or image/url
   #expect(
@@ -1091,6 +1091,6 @@ func testEpisodeWithoutDurationIsNil() throws {
   </rss>
   """
 
-  let feed = try parsePodcastFeed(xmlString)
+  let feed = try parsePodcastFeed(xmlString, source: "")
   #expect(feed.episodes[0].duration == nil)
 }
