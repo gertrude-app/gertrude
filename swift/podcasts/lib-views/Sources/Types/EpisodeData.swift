@@ -11,6 +11,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
   public var title: String
   public var description: String?
   public var relativeTime: String
+  public var artworkUrl: String? = nil
   public var duration: String?
   public var durationSeconds: Int?
   public var progress: Double
@@ -24,6 +25,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
     title: String,
     description: String? = nil,
     relativeTime: String,
+    artworkUrl: String? = nil,
     duration: String? = nil,
     durationSeconds: Int? = nil,
     progress: Double = 0.0,
@@ -36,6 +38,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
     self.title = title
     self.description = description
     self.relativeTime = relativeTime
+    self.artworkUrl = artworkUrl
     self.duration = duration
     self.durationSeconds = durationSeconds
     self.progress = progress

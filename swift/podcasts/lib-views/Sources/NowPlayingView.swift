@@ -30,6 +30,16 @@ public struct NowPlayingView: View {
     self.emit = emit
   }
 
+  var useEpisodeArtwork: Bool {
+    self.episode.artworkUrl != nil && self.show.showArtwork
+  }
+
+  var artworkUrl: String? {
+    self.show.showArtwork
+      ? (self.episode.artworkUrl ?? self.show.artworkUrl)
+      : nil
+  }
+
   public var body: some View {
     ZStack {
       // Background only for expanded mode
@@ -81,8 +91,9 @@ public struct NowPlayingView: View {
   private var miniPlayerContent: some View {
     HStack(spacing: 12) {
       ArtworkView(
+        preferRemote: self.useEpisodeArtwork,
         artworkImage: self.show.artworkImage,
-        artworkUrl: self.show.artworkUrl,
+        artworkUrl: self.artworkUrl,
         placeholderIconSize: 20
       )
       .frame(width: 44, height: 44)
@@ -172,8 +183,9 @@ public struct NowPlayingView: View {
       GeometryReader { geometry in
         let artworkSize = min(500, geometry.size.width * 0.85)
         ArtworkView(
+          preferRemote: self.useEpisodeArtwork,
           artworkImage: self.show.artworkImage,
-          artworkUrl: self.show.artworkUrl,
+          artworkUrl: self.artworkUrl,
           placeholderIconSize: 80
         )
         .frame(width: artworkSize, height: artworkSize)
@@ -305,6 +317,7 @@ public struct NowPlayingView: View {
       title: "Swift Talk",
       author: "objc.io",
       description: "Weekly Swift discussions",
+      showArtwork: true,
       artworkUrl: nil
     ),
     minimized: true,
@@ -334,6 +347,7 @@ public struct NowPlayingView: View {
       title: "Swift Talk",
       author: "objc.io",
       description: "Weekly Swift discussions",
+      showArtwork: true,
       artworkUrl: nil
     ),
     minimized: false,
@@ -360,7 +374,8 @@ public struct NowPlayingView: View {
       id: 2,
       title: "iOS Dev Weekly Podcast",
       author: "Dave Verwer",
-      description: "Weekly iOS development discussions"
+      description: "Weekly iOS development discussions",
+      showArtwork: true,
     ),
     minimized: true,
     emit: { _ in }
@@ -389,6 +404,7 @@ public struct NowPlayingView: View {
       title: "Swift Talk",
       author: "objc.io",
       description: "Weekly Swift discussions",
+      showArtwork: true,
       artworkUrl: nil
     ),
     minimized: true,
@@ -419,6 +435,7 @@ public struct NowPlayingView: View {
       title: "Swift Talk",
       author: "objc.io",
       description: "Weekly Swift discussions",
+      showArtwork: true,
       artworkUrl: nil
     ),
     minimized: false,
@@ -477,6 +494,7 @@ public struct NowPlayingView: View {
             title: "Swift Tutorials",
             author: "iOS Academy",
             description: "Advanced Swift programming",
+            showArtwork: true,
             artworkUrl: "https://example.com/artwork.jpg"
           ),
           minimized: isMinimized,

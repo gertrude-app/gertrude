@@ -83,6 +83,7 @@ extension ShowData {
       title: show.name,
       author: show.author,
       description: show.description,
+      showArtwork: show.showArtwork,
       artworkImage: show.showArtwork ? show.localArtworkImage : nil,
       artworkUrl: show.showArtwork ? show.artworkUrl : nil
     )

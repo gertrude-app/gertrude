@@ -9,15 +9,18 @@ import SwiftUI
 public struct ArtworkView: View {
   @Environment(\.colorScheme) var cs
 
+  let preferRemote: Bool
   let artworkImage: UIImage?
   let artworkUrl: String?
   let placeholderIconSize: CGFloat
 
   public init(
+    preferRemote: Bool = false,
     artworkImage: UIImage? = nil,
     artworkUrl: String? = nil,
     placeholderIconSize: CGFloat = 20
   ) {
+    self.preferRemote = preferRemote
     self.artworkImage = artworkImage
     self.artworkUrl = artworkUrl
     self.placeholderIconSize = placeholderIconSize
@@ -25,20 +28,36 @@ public struct ArtworkView: View {
 
   public var body: some View {
     Group {
-      if let artworkImage {
-        Image(uiImage: artworkImage)
-          .resizable()
-          .aspectRatio(contentMode: .fill)
-      } else if let artworkUrl, let url = URL(string: artworkUrl) {
+      if self.preferRemote, let artworkUrl, let url = URL(string: artworkUrl) {
         AsyncImage(url: url) { image in
           image
             .resizable()
             .aspectRatio(contentMode: .fill)
         } placeholder: {
-          self.artworkPlaceholder
+          if let artworkImage {
+            Image(uiImage: artworkImage)
+              .resizable()
+              .aspectRatio(contentMode: .fill)
+          } else {
+            self.artworkPlaceholder
+          }
         }
       } else {
-        self.artworkPlaceholder
+        if let artworkImage {
+          Image(uiImage: artworkImage)
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+        } else if let artworkUrl, let url = URL(string: artworkUrl) {
+          AsyncImage(url: url) { image in
+            image
+              .resizable()
+              .aspectRatio(contentMode: .fill)
+          } placeholder: {
+            self.artworkPlaceholder
+          }
+        } else {
+          self.artworkPlaceholder
+        }
       }
     }
   }

@@ -98,6 +98,7 @@ public struct ShowView: View {
       title: "The Ancient Path",
       author: "Jason Henderson",
       description: "A podcast about walking in the ancient paths of biblical wisdom and truth. Join us as we explore the timeless principles that guide us in righteousness.",
+      showArtwork: true,
       artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg"
     ),
     episodes: sampleEpisodes
@@ -111,6 +112,7 @@ public struct ShowView: View {
       title: "The Ancient Path",
       author: "Jason Henderson",
       description: "A podcast about walking in the ancient paths of biblical wisdom and truth. Join us as we explore the timeless principles that guide us in righteousness.",
+      showArtwork: true,
       artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg"
     ),
     episodes: sampleEpisodes
@@ -123,7 +125,8 @@ public struct ShowView: View {
     id: 2,
     title: "Tech Talk Weekly",
     author: "Tech Media Network",
-    description: "Weekly discussions about the latest in technology, programming, and digital innovation."
+    description: "Weekly discussions about the latest in technology, programming, and digital innovation.",
+    showArtwork: true,
   ))
 }
 
@@ -133,7 +136,8 @@ public struct ShowView: View {
       id: 3,
       title: "Swift Weekly Brief",
       author: "Jesse Squires",
-      description: "A weekly podcast about Swift development, news, and community updates."
+      description: "A weekly podcast about Swift development, news, and community updates.",
+      showArtwork: true,
     ),
     episodes: sampleEpisodes
   )

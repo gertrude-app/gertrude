@@ -11,6 +11,7 @@ public struct ShowData: Identifiable {
   public let title: String
   public let author: String?
   public let description: String?
+  public let showArtwork: Bool
   public let artworkImage: UIImage?
   public let artworkUrl: String?
 
@@ -19,6 +20,7 @@ public struct ShowData: Identifiable {
     title: String,
     author: String? = nil,
     description: String? = nil,
+    showArtwork: Bool,
     artworkImage: UIImage? = nil,
     artworkUrl: String? = nil
   ) {
@@ -26,6 +28,7 @@ public struct ShowData: Identifiable {
     self.title = title
     self.author = author
     self.description = description
+    self.showArtwork = showArtwork
     self.artworkImage = artworkImage
     self.artworkUrl = artworkUrl
   }

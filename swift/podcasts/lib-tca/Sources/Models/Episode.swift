@@ -96,6 +96,7 @@ extension EpisodeData {
       title: episode.title,
       description: episode.description,
       relativeTime: formatRelativeDate(episode.pubDate),
+      artworkUrl: episode.artworkUrl,
       duration: episode.duration.map { formatDuration($0) },
       durationSeconds: episode.duration,
       progress: episode.progress,

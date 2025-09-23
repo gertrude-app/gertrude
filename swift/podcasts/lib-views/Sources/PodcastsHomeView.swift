@@ -134,16 +134,19 @@ public struct PodcastsHomeView: View {
       .init(
         id: 1,
         title: "The Ancient Path",
+        showArtwork: true,
         artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
       ),
       .init(
         id: 2,
         title: "The Secret Sombrero",
+        showArtwork: true,
         artworkUrl: "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
       ),
       .init(
         id: 3,
-        title: "This American Life"
+        title: "This American Life",
+        showArtwork: true,
       ),
     ],
     onAddShowTap: {}
@@ -163,16 +166,19 @@ public struct PodcastsHomeView: View {
       .init(
         id: 1,
         title: "The Ancient Path",
+        showArtwork: true,
         artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
       ),
       .init(
         id: 2,
         title: "The Secret Sombrero",
+        showArtwork: true,
         artworkUrl: "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
       ),
       .init(
         id: 3,
-        title: "This American Life"
+        title: "This American Life",
+        showArtwork: true,
       ),
     ],
     onAddShowTap: {}
