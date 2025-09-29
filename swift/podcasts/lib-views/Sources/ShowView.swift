@@ -144,50 +144,49 @@ public struct ShowView: View {
 }
 
 private let sampleEpisodes = [
-  EpisodeData(
-    id: 1,
-    title: "Walking in Truth",
-    description: "How to discern truth from error in today's confusing world and walk confidently in biblical wisdom.",
-    relativeTime: "3H AGO",
-    duration: "45m",
-    downloadState: .downloading,
-    isPlaying: true
-  ),
-  EpisodeData(
-    id: 2,
-    title: "The Narrow Path",
-    description: "Jesus spoke of the narrow path that leads to life. What does this mean for believers today?",
-    relativeTime: "1D AGO",
-    duration: "52m",
-    downloadState: .downloaded
-  ),
-  EpisodeData(
-    id: 3,
-    title: "Guarding Your Heart",
-    description: "It is wisdom, and not legalism, to guard your heart, and to pay attention to what is filling your thoughts, your affections and your time.",
-    relativeTime: "3D AGO",
-    duration: "38m"
-  ),
-  EpisodeData(
-    id: 4,
-    title: "Swift 6.0 Release Notes",
-    description: "A comprehensive overview of all the new features and improvements in Swift 6.0.",
-    relativeTime: "JUST NOW",
-    duration: "1h 15m",
-    downloadState: .downloaded
-  ),
-  EpisodeData(
-    id: 5,
-    title: "Concurrency Best Practices",
-    description: "Essential patterns and practices for writing safe, efficient concurrent code in Swift using async/await and actors.",
-    relativeTime: "2H AGO",
-    duration: "42m"
-  ),
-  EpisodeData(
-    id: 6,
-    title: "Performance Optimization Tips",
-    description: "Learn how to optimize your Swift code for better performance and memory usage.",
-    relativeTime: "4D AGO",
-    duration: "47m"
-  ),
+  episode(id: 1) {
+    $0.title = "Walking in Truth"
+    $0
+      .description =
+      "How to discern truth from error in today's confusing world and walk confidently in biblical wisdom."
+    $0.downloadState = .downloading
+    $0.isPlaying = true
+  },
+  episode(id: 2) {
+    $0.title = "The Narrow Path"
+    $0
+      .description =
+      "Jesus spoke of the narrow path that leads to life. What does this mean for believers today?"
+    $0.durationSeconds = 3120
+    $0.downloadState = .downloaded
+  },
+  episode(id: 3) {
+    $0.title = "Guarding Your Heart"
+    $0
+      .description =
+      "It is wisdom, and not legalism, to guard your heart, and to pay attention to what is filling your thoughts, your affections and your time."
+    $0.durationSeconds = 2280
+  },
+  episode(id: 4) {
+    $0.title = "Swift 6.0 Release Notes"
+    $0
+      .description =
+      "A comprehensive overview of all the new features and improvements in Swift 6.0."
+    $0.durationSeconds = 4500
+    $0.downloadState = .downloaded
+  },
+  episode(id: 5) {
+    $0.title = "Concurrency Best Practices"
+    $0
+      .description =
+      "Essential patterns and practices for writing safe, efficient concurrent code in Swift using async/await and actors."
+    $0.durationSeconds = 2520
+  },
+  episode(id: 6) {
+    $0.title = "Performance Optimization Tips"
+    $0
+      .description =
+      "Learn how to optimize your Swift code for better performance and memory usage."
+    $0.durationSeconds = 2820
+  },
 ]

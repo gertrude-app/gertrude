@@ -35,6 +35,7 @@ build:
 
 test:
   @cd lib-tca && SWIFT_DETERMINISTIC_HASHING=1 swift test --enable-experimental-prebuilts
+  @cd lib-views && SWIFT_DETERMINISTIC_HASHING=1 swift test --enable-experimental-prebuilts
 
 format: clean
   @swiftformat --exclude '**/.build' .

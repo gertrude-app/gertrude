@@ -99,19 +99,13 @@ extension EpisodeData {
       id: episode.id.rawValue,
       title: episode.title,
       description: episode.description,
-      relativeTime: formatRelativeDate(episode.pubDate),
       artworkUrl: episode.artworkUrl,
-      duration: episode.duration.map { formatDuration($0) },
       durationSeconds: episode.duration,
       progress: episode.progress,
-      currentTimeString: formatTime(Int(episode.progress)),
-      remainingTimeString: formatRemainingTime(
-        progress: episode.progress,
-        durationSeconds: episode.duration
-      ),
       downloadState: episode.downloaded
         ? .downloaded
         : episode.downloading ? .downloading : .notDownloaded,
+      pubDate: episode.pubDate,
       isPlaying: isPlaying
     )
   }

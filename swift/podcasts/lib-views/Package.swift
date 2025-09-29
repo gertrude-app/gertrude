@@ -7,6 +7,7 @@ let package = Package(
   products: [.library(name: "LibViews", targets: ["LibViews"])],
   dependencies: [
     .package(path: "../lib-core"),
+    .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.0.0"),
   ],
   targets: [
     .target(
@@ -15,6 +16,13 @@ let package = Package(
         .product(name: "LibCore", package: "lib-core"),
       ],
       exclude: ["FakeEntry.swift"]
+    ),
+    .testTarget(
+      name: "LibViewsTests",
+      dependencies: [
+        "LibViews",
+        .product(name: "CustomDump", package: "swift-custom-dump"),
+      ]
     ),
   ]
 )

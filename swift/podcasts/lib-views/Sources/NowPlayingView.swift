@@ -107,7 +107,7 @@ public struct NowPlayingView: View {
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
           .lineLimit(1)
 
-        Text(self.episode.relativeTime)
+        Text(self.episode.pubDateRelative)
           .font(.system(size: 12, weight: .regular))
           .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
           .lineLimit(1)
@@ -252,13 +252,13 @@ public struct NowPlayingView: View {
         .frame(height: 12)
 
         HStack {
-          Text(self.episode.currentTimeString)
+          Text(self.episode.currentPlayerTimeString)
             .font(.system(size: 12, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
 
           Spacer()
 
-          Text(self.episode.remainingTimeString)
+          Text(self.episode.remainingPlayerTimeString)
             .font(.system(size: 12, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
         }
@@ -299,19 +299,13 @@ public struct NowPlayingView: View {
 
 #Preview("Mini Player") {
   NowPlayingView(
-    episode: EpisodeData(
-      id: 1,
-      title: "Understanding SwiftUI State Management",
-      description: "Deep dive into @State, @Binding, and @ObservableObject",
-      relativeTime: "2H AGO",
-      duration: "45m",
-      durationSeconds: 2700,
-      progress: 760,
-      currentTimeString: "12:40",
-      remainingTimeString: "-32:20",
-      downloadState: .downloaded,
-      isPlaying: true
-    ),
+    episode: episode {
+      $0.title = "Understanding SwiftUI State Management"
+      $0.description = "Deep dive into @State, @Binding, and @ObservableObject"
+      $0.durationSeconds = 2700
+      $0.progress = 760
+      $0.isPlaying = true
+    },
     show: ShowData(
       id: 1,
       title: "Swift Talk",
@@ -329,19 +323,13 @@ public struct NowPlayingView: View {
 
 #Preview("Expanded Player") {
   NowPlayingView(
-    episode: EpisodeData(
-      id: 1,
-      title: "Understanding SwiftUI State Management",
-      description: "Deep dive into @State, @Binding, and @ObservableObject",
-      relativeTime: "2H AGO",
-      duration: "45m",
-      durationSeconds: 2700,
-      progress: 760,
-      currentTimeString: "12:40",
-      remainingTimeString: "-32:20",
-      downloadState: .downloaded,
-      isPlaying: true
-    ),
+    episode: episode {
+      $0.title = "Understanding SwiftUI State Management"
+      $0.description = "Deep dive into @State, @Binding, and @ObservableObject"
+      $0.durationSeconds = 2700
+      $0.progress = 760
+      $0.isPlaying = true
+    },
     show: ShowData(
       id: 1,
       title: "Swift Talk",
@@ -357,25 +345,19 @@ public struct NowPlayingView: View {
 
 #Preview("Mini Player - Playing") {
   NowPlayingView(
-    episode: EpisodeData(
-      id: 1,
-      title: "Advanced iOS Architecture Patterns That Scale",
-      description: "MVVM, VIPER, TCA and more",
-      relativeTime: "JUST NOW",
-      duration: "1h 20m",
-      durationSeconds: 4800,
-      progress: 1200,
-      currentTimeString: "20:00",
-      remainingTimeString: "-1:00:00",
-      downloadState: .downloaded,
-      isPlaying: true
-    ),
+    episode: episode {
+      $0.title = "Advanced iOS Architecture Patterns That Scale"
+      $0.description = "MVVM, VIPER, TCA and more"
+      $0.durationSeconds = 4800
+      $0.progress = 1200
+      $0.isPlaying = true
+    },
     show: ShowData(
       id: 2,
       title: "iOS Dev Weekly Podcast",
       author: "Dave Verwer",
       description: "Weekly iOS development discussions",
-      showArtwork: true,
+      showArtwork: true
     ),
     minimized: true,
     emit: { _ in }
@@ -386,19 +368,13 @@ public struct NowPlayingView: View {
 
 #Preview("Mini Player - Dark") {
   NowPlayingView(
-    episode: EpisodeData(
-      id: 1,
-      title: "Understanding SwiftUI State Management",
-      description: "Deep dive into @State, @Binding, and @ObservableObject",
-      relativeTime: "2H AGO",
-      duration: "45m",
-      durationSeconds: 2700,
-      progress: 760,
-      currentTimeString: "12:40",
-      remainingTimeString: "-32:20",
-      downloadState: .downloaded,
-      isPlaying: true
-    ),
+    episode: episode {
+      $0.title = "Understanding SwiftUI State Management"
+      $0.description = "Deep dive into @State, @Binding, and @ObservableObject"
+      $0.durationSeconds = 2700
+      $0.progress = 760
+      $0.isPlaying = true
+    },
     show: ShowData(
       id: 1,
       title: "Swift Talk",
@@ -417,19 +393,13 @@ public struct NowPlayingView: View {
 
 #Preview("Expanded Player - Dark") {
   NowPlayingView(
-    episode: EpisodeData(
-      id: 1,
-      title: "Understanding SwiftUI State Management",
-      description: "Deep dive into @State, @Binding, and @ObservableObject",
-      relativeTime: "2H AGO",
-      duration: "45m",
-      durationSeconds: 2700,
-      progress: 760,
-      currentTimeString: "12:40",
-      remainingTimeString: "-32:20",
-      downloadState: .downloaded,
-      isPlaying: true
-    ),
+    episode: episode {
+      $0.title = "Understanding SwiftUI State Management"
+      $0.description = "Deep dive into @State, @Binding, and @ObservableObject"
+      $0.durationSeconds = 2700
+      $0.progress = 760
+      $0.isPlaying = true
+    },
     show: ShowData(
       id: 1,
       title: "Swift Talk",
@@ -476,19 +446,13 @@ public struct NowPlayingView: View {
 
         // Single NowPlayingView that handles its own transitions
         NowPlayingView(
-          episode: EpisodeData(
-            id: 1,
-            title: "SwiftUI Animation Masterclass",
-            description: "Learn advanced animation techniques",
-            relativeTime: "1H AGO",
-            duration: "52m",
-            durationSeconds: 3120,
-            progress: 1560,
-            currentTimeString: "26:00",
-            remainingTimeString: "-26:00",
-            downloadState: .downloaded,
-            isPlaying: true
-          ),
+          episode: episode {
+            $0.title = "SwiftUI Animation Masterclass"
+            $0.description = "Learn advanced animation techniques"
+            $0.durationSeconds = 3120
+            $0.progress = 1560
+            $0.isPlaying = true
+          },
           show: ShowData(
             id: 1,
             title: "Swift Tutorials",

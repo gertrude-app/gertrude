@@ -14,17 +14,33 @@ public struct PlayBubble: View {
     self.onTap = onTap
   }
 
-  private var isFullyListened: Bool {
-    self.episode.progress >= 0.99
+  var isFullyListened: Bool {
+    guard let durationSeconds = episode.durationSeconds, durationSeconds > 0 else {
+      return false
+    }
+    return self.episode.progress >= Double(durationSeconds) * 0.99
   }
 
-  private var hasProgress: Bool {
-    self.episode.progress > 0.01 && !self.isFullyListened
+  var hasProgress: Bool {
+    self.episode.progress > 3.0 && !self.isFullyListened
+  }
+
+  var progressRatio: Double {
+    guard let durationSeconds = episode.durationSeconds, durationSeconds > 0 else {
+      return 0.0
+    }
+    return min(self.episode.progress / Double(durationSeconds), 1.0)
+  }
+
+  var timeText: String? {
+    self.hasProgress
+      ? self.episode.remainingDurationShortString
+      : self.episode.durationShortString
   }
 
   public var body: some View {
     Button(action: self.onTap) {
-      HStack(spacing: 8) {
+      HStack(spacing: 6) {
         Image(
           systemName: self
             .isFullyListened ? "arrow.counterclockwise" :
@@ -34,7 +50,7 @@ public struct PlayBubble: View {
         .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
 
         if self.hasProgress {
-          ProgressView(value: self.episode.progress)
+          ProgressView(value: self.progressRatio)
             .progressViewStyle(LinearProgressViewStyle(
               tint: Color(self.cs, light: .violet600, dark: .violet400)
             ))
@@ -43,26 +59,39 @@ public struct PlayBubble: View {
               light: .violet300.opacity(0.3),
               dark: .violet500.opacity(0.2)
             ))
-            .frame(width: 20, height: 2)
-            .scaleEffect(y: 2.0)
+            .frame(width: 24, height: 4)
             .clipShape(Capsule())
         }
 
-        if let duration = episode.duration {
-          Text(duration)
+        if let time = self.timeText {
+          Text(time)
             .font(.system(size: 12, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
         }
       }
-      .padding(.horizontal, 12)
+      .padding(.horizontal, 11)
       .padding(.vertical, 6)
       .background(
         Color(self.cs, light: .violet100, dark: .violet900.opacity(0.3))
       )
-      .cornerRadius(20)
+      .cornerRadius(16)
     }
     .buttonStyle(PlainButtonStyle())
   }
+}
+
+func episode(id: Int = 1, _ modify: (inout EpisodeData) -> Void = { _ in }) -> EpisodeData {
+  var episode = EpisodeData(
+    id: id,
+    title: "Test Episode",
+    durationSeconds: 1980,
+    progress: 0.0,
+    downloadState: .downloaded,
+    pubDate: Date(),
+    isPlaying: false
+  )
+  modify(&episode)
+  return episode
 }
 
 #Preview("All States") {
@@ -70,115 +99,50 @@ public struct PlayBubble: View {
     HStack {
       Text("Unlistened:")
       Spacer()
-      PlayBubble(
-        episode: EpisodeData(
-          id: 1,
-          title: "Test Episode",
-          relativeTime: "2 hours ago",
-          duration: "33m",
-          durationSeconds: 1980,
-          progress: 0.0,
-          currentTimeString: "0:00",
-          remainingTimeString: "33:00",
-          downloadState: .downloaded,
-          isPlaying: false
-        )
-      )
+      PlayBubble(episode: episode())
     }
 
     HStack {
       Text("Partial (25%):")
       Spacer()
-      PlayBubble(
-        episode: EpisodeData(
-          id: 2,
-          title: "Test Episode",
-          relativeTime: "2 hours ago",
-          duration: "33m",
-          durationSeconds: 1980,
-          progress: 0.25,
-          currentTimeString: "8:15",
-          remainingTimeString: "24:45",
-          downloadState: .downloaded,
-          isPlaying: false
-        )
-      )
+      PlayBubble(episode: episode {
+        $0.progress = 495.0
+      })
     }
 
     HStack {
       Text("Partial (85%):")
       Spacer()
-      PlayBubble(
-        episode: EpisodeData(
-          id: 3,
-          title: "Almost Done",
-          relativeTime: "3 days ago",
-          duration: "60m",
-          durationSeconds: 3600,
-          progress: 0.85,
-          currentTimeString: "51:00",
-          remainingTimeString: "9:00",
-          downloadState: .downloaded,
-          isPlaying: false
-        )
-      )
+      PlayBubble(episode: episode {
+        $0.durationSeconds = 3600
+        $0.progress = 3060.0
+      })
     }
 
     HStack {
       Text("Complete:")
       Spacer()
-      PlayBubble(
-        episode: EpisodeData(
-          id: 4,
-          title: "Complete Episode",
-          relativeTime: "2 hours ago",
-          duration: "33m",
-          durationSeconds: 1980,
-          progress: 1.0,
-          currentTimeString: "33:00",
-          remainingTimeString: "0:00",
-          downloadState: .downloaded,
-          isPlaying: false
-        )
-      )
+      PlayBubble(episode: episode {
+        $0.progress = 1980.0
+      })
     }
 
     HStack {
       Text("No duration:")
       Spacer()
-      PlayBubble(
-        episode: EpisodeData(
-          id: 5,
-          title: "Unknown Duration",
-          relativeTime: "2 hours ago",
-          duration: nil,
-          durationSeconds: nil,
-          progress: 0.0,
-          currentTimeString: "0:00",
-          remainingTimeString: "unknown",
-          downloadState: .downloaded,
-          isPlaying: false
-        )
-      )
+      PlayBubble(episode: episode {
+        $0.durationSeconds = nil
+      })
     }
 
     HStack {
       Text("Playing:")
       Spacer()
-      PlayBubble(
-        episode: EpisodeData(
-          id: 6,
-          title: "Currently Playing",
-          relativeTime: "now",
-          duration: "45m",
-          durationSeconds: 2700,
-          progress: 0.4,
-          currentTimeString: "18:00",
-          remainingTimeString: "27:00",
-          downloadState: .downloaded,
-          isPlaying: true
-        )
-      )
+      PlayBubble(episode: episode {
+        $0.durationSeconds = 2700
+        $0.progress = 1080.0
+        $0.isPlaying = true
+      })
     }
   }
   .padding(20)
@@ -189,115 +153,50 @@ public struct PlayBubble: View {
     HStack {
       Text("Unlistened:")
       Spacer()
-      PlayBubble(
-        episode: EpisodeData(
-          id: 1,
-          title: "Test Episode",
-          relativeTime: "2 hours ago",
-          duration: "33m",
-          durationSeconds: 1980,
-          progress: 0.0,
-          currentTimeString: "0:00",
-          remainingTimeString: "33:00",
-          downloadState: .downloaded,
-          isPlaying: false
-        )
-      )
+      PlayBubble(episode: episode())
     }
 
     HStack {
       Text("Partial (25%):")
       Spacer()
-      PlayBubble(
-        episode: EpisodeData(
-          id: 2,
-          title: "Test Episode",
-          relativeTime: "2 hours ago",
-          duration: "33m",
-          durationSeconds: 1980,
-          progress: 0.25,
-          currentTimeString: "8:15",
-          remainingTimeString: "24:45",
-          downloadState: .downloaded,
-          isPlaying: false
-        )
-      )
+      PlayBubble(episode: episode {
+        $0.progress = 495.0
+      })
     }
 
     HStack {
       Text("Partial (85%):")
       Spacer()
-      PlayBubble(
-        episode: EpisodeData(
-          id: 3,
-          title: "Almost Done",
-          relativeTime: "3 days ago",
-          duration: "60m",
-          durationSeconds: 3600,
-          progress: 0.85,
-          currentTimeString: "51:00",
-          remainingTimeString: "9:00",
-          downloadState: .downloaded,
-          isPlaying: false
-        )
-      )
+      PlayBubble(episode: episode {
+        $0.durationSeconds = 3600
+        $0.progress = 3060.0
+      })
     }
 
     HStack {
       Text("Complete:")
       Spacer()
-      PlayBubble(
-        episode: EpisodeData(
-          id: 4,
-          title: "Complete Episode",
-          relativeTime: "2 hours ago",
-          duration: "33m",
-          durationSeconds: 1980,
-          progress: 1.0,
-          currentTimeString: "33:00",
-          remainingTimeString: "0:00",
-          downloadState: .downloaded,
-          isPlaying: false
-        )
-      )
+      PlayBubble(episode: episode {
+        $0.progress = 1980.0
+      })
     }
 
     HStack {
       Text("No duration:")
       Spacer()
-      PlayBubble(
-        episode: EpisodeData(
-          id: 5,
-          title: "Unknown Duration",
-          relativeTime: "2 hours ago",
-          duration: nil,
-          durationSeconds: nil,
-          progress: 0.0,
-          currentTimeString: "0:00",
-          remainingTimeString: "unknown",
-          downloadState: .downloaded,
-          isPlaying: false
-        )
-      )
+      PlayBubble(episode: episode {
+        $0.durationSeconds = nil
+      })
     }
 
     HStack {
       Text("Playing:")
       Spacer()
-      PlayBubble(
-        episode: EpisodeData(
-          id: 6,
-          title: "Currently Playing",
-          relativeTime: "now",
-          duration: "45m",
-          durationSeconds: 2700,
-          progress: 0.4,
-          currentTimeString: "18:00",
-          remainingTimeString: "27:00",
-          downloadState: .downloaded,
-          isPlaying: true
-        )
-      )
+      PlayBubble(episode: episode {
+        $0.durationSeconds = 2700
+        $0.progress = 1080.0
+        $0.isPlaying = true
+      })
     }
   }
   .padding(20)

@@ -24,7 +24,7 @@ public struct EpisodeView: View {
   public var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       VStack(alignment: .leading, spacing: 2) {
-        Text(self.episode.relativeTime)
+        Text(self.episode.pubDateRelative)
           .font(.system(size: 12, weight: .semibold))
           .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
           .opacity(0.8)
