@@ -8,7 +8,7 @@ targets:
       - path: previews/sources
     settings:
       GENERATE_INFOPLIST_FILE: YES
-      PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.podcasts.previews"
+      PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.am.previews"
       DEVELOPMENT_TEAM: "WFN83LM943"
       CODE_SIGN_STYLE: Automatic
 schemes:

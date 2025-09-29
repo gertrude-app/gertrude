@@ -151,8 +151,8 @@ final class BgDownloadEpisodesOperation: AsyncOperation, Downloader, @unchecked 
 
 // NB: keep in sync with project.yml
 enum BgTaskId: String {
-  case refreshFeed = "com.netrivet.gertrude.podcasts.refresh-feed"
-  case downloadEpisodes = "com.netrivet.gertrude.podcasts.download-episodes"
+  case refreshFeed = "com.netrivet.gertrude.am.refresh-feed"
+  case downloadEpisodes = "com.netrivet.gertrude.am.download-episodes"
 }
 
 class AsyncOperation: Operation, @unchecked Sendable {

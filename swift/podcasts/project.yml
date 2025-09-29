@@ -18,7 +18,7 @@ targets:
       - package: LibViews
       - package: LibTCA
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.podcasts"
+      PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.am"
       DEVELOPMENT_TEAM: "WFN83LM943"
       CODE_SIGN_STYLE: Automatic
       INFOPLIST_FILE: app/Info.plist
@@ -44,8 +44,8 @@ targets:
           - background-processing
         BGTaskSchedulerPermittedIdentifiers:
           # NB: keep in sync with keys in BackgroundTasks.swift
-          - com.netrivet.gertrude.podcasts.refresh-feed
-          - com.netrivet.gertrude.podcasts.download-episodes
+          - com.netrivet.gertrude.am.refresh-feed
+          - com.netrivet.gertrude.am.download-episodes
 
 packages:
   LibCore:
