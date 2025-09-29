@@ -22,87 +22,63 @@ public struct EpisodeView: View {
   }
 
   public var body: some View {
-    ZStack {
-      HStack(spacing: 12) {
-        VStack(alignment: .leading, spacing: 4) {
-          Text(self.episode.relativeTime)
-            .font(.system(size: 12, weight: .semibold))
-            .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-            .opacity(0.8)
+    VStack(alignment: .leading, spacing: 8) {
+      VStack(alignment: .leading, spacing: 2) {
+        Text(self.episode.relativeTime)
+          .font(.system(size: 12, weight: .semibold))
+          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+          .opacity(0.8)
+          .padding(.top, 2)
 
-          Text(self.episode.title)
-            .font(.system(size: 16, weight: .semibold))
-            .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
-            .multilineTextAlignment(.leading)
-            .lineLimit(2)
-
-          if let description = episode.description {
-            Text(description)
-              .font(.system(size: 14, weight: .regular))
-              .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
-              .multilineTextAlignment(.leading)
-              .lineLimit(3)
-          }
-        }
-
-        Spacer(minLength: 60)
+        Text(self.episode.title)
+          .font(.system(size: 16, weight: .semibold))
+          .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
+          .multilineTextAlignment(.leading)
+          .lineLimit(2)
+          .frame(maxWidth: .infinity, alignment: .leading)
       }
 
-      VStack {
-        HStack {
-          Spacer()
-          HStack(spacing: 8) {
-            if self.episode.downloadState != .downloaded {
-              Group {
-                switch self.episode.downloadState {
-                case .downloading:
-                  Image(systemName: "arrow.2.circlepath")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-                    .rotationEffect(.degrees(self.rotationAngle))
-                    .onAppear {
-                      withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
-                        self.rotationAngle = 360
-                      }
-                    }
-                case .notDownloaded:
-                  Image(systemName: "arrow.down.circle")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-                    .onTapGesture {
-                      self.emit(.downloadTapped)
-                    }
-                case .downloaded:
-                  EmptyView()
+      if let description = episode.description {
+        Text(description)
+          .font(.system(size: 14, weight: .regular))
+          .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
+          .multilineTextAlignment(.leading)
+          .lineLimit(3)
+          .frame(maxWidth: .infinity, alignment: .leading)
+      }
+
+      HStack {
+        PlayBubble(episode: self.episode) {
+          self.emit(.playPauseTapped)
+        }
+
+        Spacer()
+
+        if self.episode.downloadState != .downloaded {
+          switch self.episode.downloadState {
+          case .downloading:
+            Image(systemName: "arrow.2.circlepath")
+              .font(.system(size: 11, weight: .medium))
+              .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+              .rotationEffect(.degrees(self.rotationAngle))
+              .onAppear {
+                withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
+                  self.rotationAngle = 360
                 }
               }
-            }
-
-            Text(self.episode.duration ?? "")
+          case .notDownloaded:
+            Image(systemName: "arrow.down.circle")
               .font(.system(size: 12, weight: .medium))
               .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+              .onTapGesture {
+                self.emit(.downloadTapped)
+              }
+          case .downloaded:
+            EmptyView()
           }
-          .padding(.top, 4)
-          .padding(.trailing, 8)
         }
-        Spacer()
       }
-
-      VStack {
-        Spacer()
-        HStack {
-          Spacer()
-          Button(action: {
-            self.emit(.playPauseTapped)
-          }) {
-            Image(systemName: self.episode.isPlaying ? "pause.circle.fill" : "play.circle")
-              .font(.system(size: 28, weight: self.episode.isPlaying ? .medium : .thin))
-              .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-          }
-          .padding(.trailing, 4)
-        }
-        .padding(.bottom, 8)
-      }
+      .padding(.top, 4)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(.horizontal, 20)
