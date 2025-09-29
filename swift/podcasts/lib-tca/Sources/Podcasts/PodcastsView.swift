@@ -33,5 +33,8 @@ struct PodcastsView: View {
         ShowViewContainer(store: store)
       }
     )
+    .onAppear {
+      self.store.send(.onAppear)
+    }
   }
 }

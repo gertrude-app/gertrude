@@ -40,7 +40,7 @@ struct NowPlaying: FetchKeyRequest {
 extension NowPlaying {
   static func set(episode: Episode, show: Show, state: State) {
     guard let value = try? JSON.encode(state) else {
-      unexpected(id: "eb1d1800")
+      unexpected(id: "eb1d1800", assert: true)
       return
     }
     let deps = Deps()
@@ -61,7 +61,7 @@ extension NowPlaying {
     }
     let deps = Deps()
     guard let (episode, show) = deps.db.episodeWithShow(episodeId) else {
-      unexpected(id: "1e83d193")
+      unexpected(id: "1e83d193", assert: true)
       return
     }
     try await deps.audio.play(episode: episode, show: show)
@@ -82,7 +82,7 @@ extension NowPlaying {
       return
     }
     guard let (episode, show) = deps.db.episodeWithShow(episodeId) else {
-      unexpected(id: "20df6265")
+      unexpected(id: "20df6265", assert: true)
       return
     }
     try await deps.audio.play(episode: episode, show: show)
@@ -96,7 +96,7 @@ extension NowPlaying {
   ) async throws {
     let deps = Deps()
     guard let (episode, show) = deps.db.episodeWithShow(episodeId) else {
-      unexpected(id: "c13211b3")
+      unexpected(id: "c13211b3", assert: true)
       return
     }
     if state.isPlaying {
@@ -126,7 +126,7 @@ extension NowPlaying {
       where oldEpId == newEpId && oldState == newState:
       break
     default:
-      unexpected(id: "e975479b")
+      unexpected(id: "e975479b", assert: true)
     }
   }
 }

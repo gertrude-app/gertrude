@@ -2,6 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+      <string>com.netrivet.gertrude.podcasts.refresh-feed</string>
+      <string>com.netrivet.gertrude.podcasts.download-episodes</string>
+    </array>
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
@@ -23,6 +28,8 @@
     <key>UIBackgroundModes</key>
     <array>
       <string>audio</string>
+      <string>background-fetch</string>
+      <string>background-processing</string>
     </array>
     <key>UILaunchStoryboardName</key>
     <string>LaunchScreen</string>

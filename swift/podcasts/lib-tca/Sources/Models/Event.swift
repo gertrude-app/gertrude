@@ -6,7 +6,7 @@ import Tagged
 struct Event {
   typealias ID = Tagged<Self, Int>
   let id: ID
-  let name: String
-  let detail: String?
-  let createdAt: Date
+  var name: String
+  var detail: String?
+  var createdAt: Date = .init()
 }

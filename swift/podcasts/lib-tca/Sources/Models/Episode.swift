@@ -52,10 +52,14 @@ extension Episode {
     return URL.localFilesDir(showId: self.showId)
       .appending(component: "show-\(self.showId)-ep-\(self.id).\(ext)")
   }
+
+  func removeLocalAudioFile() {
+    try? FileManager.default.removeItem(at: self.localAudioUrl)
+  }
 }
 
 extension Episode {
-  struct FeedData: Equatable {
+  struct FeedData: Equatable, Hashable {
     var title: String
     var description: String?
     var websiteUrl: String?
@@ -68,9 +72,8 @@ extension Episode {
     var pubDate: Date
     var episodeNumber: Int?
 
-    func toEpisodeDraft(showId: Show.ID) -> Episode.Draft {
-      @Dependency(\.date.now) var now
-      return .init(
+    func toEpisodeDraft(showId: Show.ID, now: Date) -> Episode.Draft {
+      .init(
         showId: showId,
         episodeNumber: self.episodeNumber,
         title: self.title,
@@ -83,6 +86,7 @@ extension Episode {
         audioType: self.audioType,
         guid: self.guid,
         pubDate: self.pubDate,
+        updatedAt: now,
         createdAt: now,
       )
     }

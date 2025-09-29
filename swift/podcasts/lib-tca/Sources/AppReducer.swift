@@ -1,8 +1,10 @@
 import ComposableArchitecture
+import Foundation
+import LibCore
 import SharingGRDB
 
 @Reducer
-struct AppReducer {
+struct AppReducer: Sendable, Downloader {
   @ObservableState
   struct State: Equatable {
     @Presents var mode: Mode.State?
@@ -23,9 +25,12 @@ struct AppReducer {
     case mode(PresentationAction<Mode.Action>)
   }
 
+  @Dependency(\.defaultDatabase) var database
   @Dependency(\.passcode) var passcode
+  @Dependency(\.podcasts) var podcasts
   @Dependency(\.audioPlayer) var audio
   @Dependency(\.mainQueue) var mainQueue
+  @Dependency(\.date) var date
   @Dependency(\.notificationCenter) var notificationCenter
 
   var body: some Reducer<State, Action> {
@@ -35,6 +40,11 @@ struct AppReducer {
     Reduce { state, action in
       switch action {
       case .appDidLaunch:
+        if let passcode = self.passcode.load() {
+          state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
+        } else {
+          state.mode = .onboarding(OnboardingFeature.State())
+        }
         return .merge(
           .publisher {
             self.audio.systemEvents()
@@ -45,6 +55,21 @@ struct AppReducer {
             self.notificationCenter.appForegroundingEvents()
               .map { .appInForegroundChanged($0) }
               .receive(on: self.mainQueue)
+          },
+          .run { _ in
+            #if DEBUG
+              try await self.mainQueue.sleep(for: .seconds(1))
+              let events = self.database.tryRead { db in
+                try Event.order { $0.createdAt.asc() }.fetchAll(db)
+              }
+              if events.isEmpty {
+                print("EVENTS: (none)")
+              } else {
+                for event in events {
+                  print("EVENT: \(event.createdAt): \(event.name) \(event.detail ?? "")")
+                }
+              }
+            #endif
           }
         )
       case .appInForegroundChanged(let foregrounded):
@@ -82,9 +107,19 @@ extension AppReducer.State {
   }
 }
 
+extension AppReducer.Mode {
+  var isPodcasts: Bool {
+    if case .podcasts = self {
+      return true
+    }
+    return false
+  }
+}
+
 func unexpected(
   id: String,
   _ detail: String? = nil,
+  assert: Bool = false,
   fileID: StaticString = #fileID,
   filePath: StaticString = #filePath,
   file: StaticString = #file,
@@ -94,7 +129,9 @@ func unexpected(
   let message = "Unexpected \(id)" + (detail.map { ": \($0)" } ?? "")
   reportIssue(message, fileID: fileID, filePath: filePath, line: line, column: column)
   #if DEBUG
-    assertionFailure(message, file: file, line: line)
+    if assert {
+      assertionFailure(message, file: file, line: line)
+    }
   #endif
 }
 

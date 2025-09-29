@@ -7,8 +7,12 @@ extension DatabaseReader {
     withErrorReporting { try self.read { try block($0) } } ?? []
   }
 
-  func tryRead<T>(_ block: (Database) throws -> T) -> T? {
-    withErrorReporting { try self.read { try block($0) } }
+  func tryRead<T>(_ block: (Database) throws -> T?) -> T? {
+    if let value = withErrorReporting(catching: { try self.read { try block($0) } }) {
+      value
+    } else {
+      nil
+    }
   }
 
   func episodeWithShow(_ episodeId: Episode.ID) -> (Episode, Show)? {
@@ -21,6 +25,14 @@ extension DatabaseReader {
 public extension DatabaseWriter {
   func tryWrite<T>(_ updates: (Database) throws -> T) -> T {
     withErrorReporting { try self.write { try updates($0) } }!
+  }
+
+  func insertEvent(name: String, detail: String? = nil) {
+    self.tryWrite { db in
+      try Event
+        .insert { Event.Draft(name: name, detail: detail) }
+        .execute(db)
+    }
   }
 }
 

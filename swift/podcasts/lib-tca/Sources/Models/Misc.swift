@@ -9,7 +9,7 @@ struct Misc: Equatable, Hashable, Identifiable {
   var value: String
   var rowId: Int?
   var updatedAt: Date = .init()
-  var createdAt: Date
+  var createdAt: Date = .init()
 }
 
 extension Misc {

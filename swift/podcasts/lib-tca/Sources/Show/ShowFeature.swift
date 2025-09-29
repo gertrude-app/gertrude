@@ -34,7 +34,7 @@ struct ShowFeature: Downloader {
     case delegate(DelegateAction)
   }
 
-  @Dependency(\.defaultDatabase) var db
+  @Dependency(\.defaultDatabase) var database
   @Dependency(\.podcasts) var podcasts
   @Dependency(\.date) var date
 

@@ -6,6 +6,18 @@ import SwiftUI
 #if !os(iOS)
   import AppKit
 
+  public enum TextInputAutocapitalization {
+    case never, words, sentences, allCharacters
+  }
+
+  public extension View {
+    nonisolated
+    func textInputAutocapitalization(_ autocapitalization: TextInputAutocapitalization?)
+      -> some View {
+      EmptyView()
+    }
+  }
+
   public struct UIImage {
     public init?(data: Data) {}
     public var size: CGSize { CGSize(width: 100, height: 100) }
@@ -74,7 +86,58 @@ import SwiftUI
     public func prepare() {}
     public var NOT_REAL_CHECK_XCODE: String { "" }
   }
+
+  public class BGTask: Equatable {
+    public var identifier: String
+    public var expirationHandler: (() -> Void)? = nil
+
+    public func setTaskCompleted(success: Bool) {}
+    public init(identifier: String? = nil) {
+      self.identifier = identifier ?? UUID().uuidString
+    }
+
+    public static func == (lhs: BGTask, rhs: BGTask) -> Bool {
+      lhs.identifier == rhs.identifier
+    }
+  }
+
+  public class BGAppRefreshTask: BGTask {}
+  public class BGProcessingTask: BGTask {}
+
+  public final class BGTaskScheduler {
+    public nonisolated(unsafe) static let shared = BGTaskScheduler()
+
+    @discardableResult
+    public func register(
+      forTaskWithIdentifier identifier: String,
+      using queue: DispatchQueue?,
+      launchHandler: @escaping (BGTask) -> Void
+    ) -> Bool {
+      true
+    }
+
+    public func submit(_ request: BGTaskRequest) throws {}
+
+    public var NOT_REAL_CHECK_XCODE: String { "" }
+  }
+
+  public class BGTaskRequest {
+    public var identifier: String
+    public var earliestBeginDate: Date?
+    public var NOT_REAL_CHECK_XCODE: String { "" }
+    public init(identifier: String) {
+      self.identifier = identifier
+    }
+  }
+
+  public class BGAppRefreshTaskRequest: BGTaskRequest {}
+  public class BGProcessingTaskRequest: BGTaskRequest {
+    public var requiresNetworkConnectivity: Bool = false
+    public var requiresExternalPower: Bool = false
+  }
+
 #else
+  import BackgroundTasks
   import UIKit
 
   public typealias UIImage = UIKit.UIImage
@@ -82,6 +145,13 @@ import SwiftUI
   public typealias UIImpactFeedbackGenerator = UIKit.UIImpactFeedbackGenerator
   public typealias UINotificationFeedbackGenerator = UIKit.UINotificationFeedbackGenerator
   public typealias UISelectionFeedbackGenerator = UIKit.UISelectionFeedbackGenerator
+  public typealias BGTask = BackgroundTasks.BGTask
+  public typealias BGAppRefreshTask = BackgroundTasks.BGAppRefreshTask
+  public typealias BGProcessingTask = BackgroundTasks.BGProcessingTask
+  public typealias BGTaskScheduler = BackgroundTasks.BGTaskScheduler
+  public typealias BGTaskRequest = BackgroundTasks.BGTaskRequest
+  public typealias BGAppRefreshTaskRequest = BackgroundTasks.BGAppRefreshTaskRequest
+  public typealias BGProcessingTaskRequest = BackgroundTasks.BGProcessingTaskRequest
 
   public extension UIImage {
     var mediaItemArtwork: MPMediaItemArtwork {

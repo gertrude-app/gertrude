@@ -1,3 +1,4 @@
+import LibCore
 import SwiftUI
 
 public struct ButtonScreenView: View {
@@ -162,8 +163,10 @@ public struct ButtonScreenView: View {
         if let urlConfig = self.urlInputConfig {
           VStack(spacing: 40) {
             TextField(urlConfig.placeholder, text: self.$urlText)
+              .textInputAutocapitalization(.never)
               .font(.system(size: 22, weight: .medium))
               .textContentType(.URL)
+              .disableAutocorrection(true)
               .padding(.horizontal, 16)
               .padding(.vertical, 14)
               .background(

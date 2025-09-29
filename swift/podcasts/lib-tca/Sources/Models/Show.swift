@@ -50,7 +50,7 @@ extension URL {
 }
 
 extension Show {
-  struct FeedData: Equatable {
+  struct FeedData: Equatable, Hashable {
     var sourceUrl: String
     var name: String
     var author: String?

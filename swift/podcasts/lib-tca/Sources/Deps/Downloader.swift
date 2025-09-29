@@ -2,7 +2,7 @@ import AVFoundation
 import SharingGRDB
 
 protocol Downloader {
-  var db: any DatabaseWriter { get }
+  var database: any DatabaseWriter { get }
   var podcasts: PodcastClient { get }
   var date: DateGenerator { get }
 }
@@ -10,7 +10,7 @@ protocol Downloader {
 extension Downloader {
   @discardableResult
   func trackedDownload(episode: Episode) async -> Bool {
-    self.db.tryWrite { db in
+    self.database.tryWrite { db in
       try Episode
         .update { $0.downloadedAt = .distantFuture }
         .where { $0.id == episode.id }
@@ -19,14 +19,14 @@ extension Downloader {
     // TODO: handle errors
     let success = await self.podcasts.downloadAudio(for: episode)
     if success {
-      self.db.tryWrite { db in
+      self.database.tryWrite { db in
         try Episode
           .update { $0.downloadedAt = self.date.now }
           .where { $0.id == episode.id }
           .execute(db)
       }
       if let duration = try? await self.determineMissingDuration(for: episode) {
-        self.db.tryWrite { db in
+        self.database.tryWrite { db in
           try Episode
             .update { $0.duration = duration }
             .where { $0.id == episode.id }
@@ -34,7 +34,7 @@ extension Downloader {
         }
       }
     } else {
-      self.db.tryWrite { db in
+      self.database.tryWrite { db in
         try Episode
           .update { $0.downloadedAt = nil }
           .where { $0.id == episode.id }

@@ -37,6 +37,12 @@ targets:
         UILaunchStoryboardName: LaunchScreen
         UIBackgroundModes:
           - audio
+          - background-fetch
+          - background-processing
+        BGTaskSchedulerPermittedIdentifiers:
+          # NB: keep in sync with keys in BackgroundTasks.swift
+          - com.netrivet.gertrude.podcasts.refresh-feed
+          - com.netrivet.gertrude.podcasts.download-episodes
 
 packages:
   LibCore:

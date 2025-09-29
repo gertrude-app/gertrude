@@ -107,7 +107,8 @@ struct AddShowFeature {
         state.screen = .chooseArtworkPolicy(show.feedUrl)
         return .none
 
-      case .addByUrlSubmitted(let feedUrl):
+      case .addByUrlSubmitted(let input):
+        let feedUrl = input.starts(with: "http") ? input : "https://\(input)"
         state.screen = .chooseArtworkPolicy(feedUrl)
         return .none
 
@@ -140,7 +141,7 @@ struct AddShowFeature {
           return
         }
         await self.podcasts.downloadArtwork(for: show)
-        let episodes = feed.episodes.map { $0.toEpisodeDraft(showId: show.id) }
+        let episodes = feed.episodes.map { $0.toEpisodeDraft(showId: show.id, now: self.now) }
         try await self.db.write { db in
           try Episode
             .insert { episodes }

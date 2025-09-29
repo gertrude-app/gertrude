@@ -17,7 +17,7 @@ struct NowPlayingFeature: Downloader {
     case episodePlayPauseTapped(Episode, Show)
   }
 
-  @Dependency(\.defaultDatabase) var db
+  @Dependency(\.defaultDatabase) var database
   @Dependency(\.podcasts) var podcasts
   @Dependency(\.audioPlayer) var audioPlayer
   @Dependency(\.date) var date
@@ -28,7 +28,7 @@ struct NowPlayingFeature: Downloader {
       switch action {
       case .view(let viewAction):
         guard let nowPlaying = state.data else {
-          unexpected(id: "70012cf6")
+          unexpected(id: "70012cf6", assert: true)
           return .none
         }
         switch viewAction {
@@ -54,7 +54,7 @@ struct NowPlayingFeature: Downloader {
         }
       case .system(let event):
         guard let nowPlaying = state.data else {
-          unexpected(id: "9faa5b69")
+          unexpected(id: "9faa5b69", assert: true)
           return .none
         }
         switch event {

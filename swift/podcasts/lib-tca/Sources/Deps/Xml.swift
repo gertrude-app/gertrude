@@ -169,7 +169,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
         self.showAuthor = trimmedText
       case "link":
         self.showWebsiteUrl = trimmedText
-      case "url" where self.parentElement == "image":
+      case "url" where self.parentElement == "image" && !self.isInItem:
         self.showArtworkUrl = trimmedText
       case "itunes:image":
         // iTunes image is handled in attributes
@@ -195,7 +195,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
         self.episodeDuration = self.parseDuration(trimmedText)
       case "itunes:episode":
         self.episodeNumber = Int(trimmedText)
-      case "url" where self.parentElement == "image":
+      case "url" where self.parentElement == "image" && self.isInItem:
         self.episodeArtworkUrl = trimmedText
       default:
         break

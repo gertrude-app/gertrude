@@ -55,7 +55,7 @@ sim-db-delete:
 
 sim-reset:
   @just sim-db-delete
-  @rm -rf {{sim-docs-dir}}/audio
+  @rm -rf {{sim-docs-dir}}/shows
 
 sim-fs-open:
   @open {{sim-docs-dir}}

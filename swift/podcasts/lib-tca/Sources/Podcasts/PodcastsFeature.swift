@@ -19,26 +19,37 @@ struct PodcastsFeature: Downloader {
   }
 
   enum Action: Equatable {
+    case onAppear
     case addShowTapped
     case startNextDownload
+    case addToDownloadQueue([Episode])
     case showTapped(Show.ID)
     case destination(PresentationAction<Destination.Action>)
   }
 
-  @Dependency(\.defaultDatabase) var db
+  @Dependency(\.defaultDatabase) var database
   @Dependency(\.podcasts) var podcasts
+  @Dependency(\.continuousClock) var clock
   @Dependency(\.date) var date
 
   var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
+      case .onAppear:
+        return .run { send in
+          await send(.addToDownloadQueue(updateFeeds()))
+          for await _ in self.clock.timer(interval: .seconds(60 * 5)) {
+            await send(.addToDownloadQueue(updateFeeds()))
+          }
+        }
+
       case .addShowTapped:
         state.destination = .addShow(.init(passcode: state.passcode))
         return .none
 
       case .showTapped(let showId):
         guard let show = state.shows.first(where: { $0.id == showId }) else {
-          unexpected(id: "301842f2")
+          unexpected(id: "301842f2", assert: true)
           return .none
         }
         state.destination = .show(.init(show: show))
@@ -47,7 +58,7 @@ struct PodcastsFeature: Downloader {
       case .destination(.presented(.addShow(.subscribed(let show)))):
         state.shows.append(show)
         state.destination = nil
-        state.downloadQueue += self.db.tryRead {
+        state.downloadQueue += self.database.tryRead {
           try Episode.all
             .where { $0.showId == show.id }
             .order { ($0.episodeNumber.desc(), $0.pubDate.desc()) }
@@ -55,6 +66,10 @@ struct PodcastsFeature: Downloader {
             .fetchAll($0)
         }.reversed()
         return .send(.startNextDownload)
+
+      case .addToDownloadQueue(let episodes):
+        state.downloadQueue += episodes
+        return state.downloadQueue.isEmpty ? .none : .send(.startNextDownload)
 
       case .startNextDownload:
         guard let episode = state.downloadQueue.popLast() else {
