@@ -111,6 +111,7 @@ public func appDatabase() throws -> any DatabaseWriter {
          pubDate TEXT NOT NULL,
          progress REAL NOT NULL DEFAULT 0.0,
          lastPlayedAt TEXT,
+         completedAt TEXT,
          downloadedAt TEXT,
          updatedAt TEXT NOT NULL,
          createdAt TEXT NOT NULL,
@@ -152,45 +153,14 @@ public func appDatabase() throws -> any DatabaseWriter {
   try migrator.migrate(database)
 
   try database.write { db in
-    try Misc
-      .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
-      .execute(db)
-    try Episode
-      .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
-      .execute(db)
-    try Show
-      .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
-      .execute(db)
-
     // ensure nowPlaying is always paused and minimized on app start, before triggers
+    let state = try JSON.encode(NowPlaying.State(isPlaying: false, minimized: true))
     try Misc
       .find(id: .nowPlaying)
-      .update { $0.value = try! JSON.encode(NowPlaying.State(isPlaying: false, minimized: true)) }
+      .update { $0.value = state }
       .execute(db)
 
-    try Misc
-      .createTemporaryTrigger(after: .update {
-        ($0.value, $0.rowId)
-      } forEachRow: {
-        #sql("SELECT nowPlayingUpdate(\($0.rowId), \($0.value), \($1.rowId), \($1.value))")
-      } when: { old, _ in
-        old.id == Misc.ID.nowPlaying
-      })
-      .execute(db)
-    try Misc
-      .createTemporaryTrigger(after: .delete {
-        #sql("SELECT nowPlayingUpdate(\($0.rowId), \($0.value), NULL, NULL)")
-      } when: {
-        $0.id == Misc.ID.nowPlaying
-      })
-      .execute(db)
-    try Misc
-      .createTemporaryTrigger(after: .insert {
-        #sql("SELECT nowPlayingUpdate(NULL, NULL, \($0.rowId), \($0.value))")
-      } when: {
-        $0.id == Misc.ID.nowPlaying
-      })
-      .execute(db)
+    try createDatabaseTriggers(db)
   }
 
   return database

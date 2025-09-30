@@ -44,7 +44,7 @@ extension NowPlaying {
       return
     }
     let deps = Deps()
-    deps.db.tryWrite { db in
+    deps.database.tryWrite { db in
       try Misc.upsert { Misc(
         id: .nowPlaying,
         value: value,
@@ -60,7 +60,7 @@ extension NowPlaying {
       return
     }
     let deps = Deps()
-    guard let (episode, show) = deps.db.episodeWithShow(episodeId) else {
+    guard let (episode, show) = deps.database.episodeWithShow(episodeId) else {
       unexpected(id: "1e83d193", assert: true)
       return
     }
@@ -81,7 +81,7 @@ extension NowPlaying {
       try await deps.audio.pause()
       return
     }
-    guard let (episode, show) = deps.db.episodeWithShow(episodeId) else {
+    guard let (episode, show) = deps.database.episodeWithShow(episodeId) else {
       unexpected(id: "20df6265", assert: true)
       return
     }
@@ -95,7 +95,7 @@ extension NowPlaying {
     _ prevState: State,
   ) async throws {
     let deps = Deps()
-    guard let (episode, show) = deps.db.episodeWithShow(episodeId) else {
+    guard let (episode, show) = deps.database.episodeWithShow(episodeId) else {
       unexpected(id: "c13211b3", assert: true)
       return
     }
@@ -139,7 +139,8 @@ extension NowPlaying.Data {
   }
 
   func setProgress(_ progress: Double) {
-    Deps().db.tryWrite { db in
+    let deps = Deps()
+    deps.database.tryWrite { db in
       try Episode
         .where { $0.id == self.episode.id }
         .update { $0.progress = progress }
@@ -165,7 +166,7 @@ struct AnyNowPlaying: FetchKeyRequest {
 }
 
 private struct Deps {
-  @Dependency(\.defaultDatabase) var db
+  @Dependency(\.defaultDatabase) var database
   @Dependency(\.date) var date
   @Dependency(\.audioPlayer) var audio
 }

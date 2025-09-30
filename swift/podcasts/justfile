@@ -3,6 +3,7 @@ _default:
 
 gen:
   @xcodegen -s project.yml
+  @xml-lint --fix app/Info.plist
 
 xcode:
   @open GertiePodcasts.xcodeproj

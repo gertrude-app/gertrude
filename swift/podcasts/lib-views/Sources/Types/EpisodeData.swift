@@ -15,6 +15,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
   public var progress: Double
   public var downloadState: DownloadState
   public var pubDate: Date
+  public var isCompleted: Bool
   public var isPlaying: Bool
 
   public init(
@@ -26,6 +27,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
     progress: Double = 0.0,
     downloadState: DownloadState = .notDownloaded,
     pubDate: Date,
+    isCompleted: Bool = false,
     isPlaying: Bool = false
   ) {
     self.id = id
@@ -36,6 +38,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
     self.progress = progress
     self.downloadState = downloadState
     self.pubDate = pubDate
+    self.isCompleted = isCompleted
     self.isPlaying = isPlaying
   }
 }
@@ -57,7 +60,13 @@ public extension EpisodeData {
   var remainingDurationShortString: String? {
     guard let durationSeconds = self.durationSeconds else { return nil }
     let remainingSeconds = max(0, durationSeconds - Int(self.progress))
-    return formatShortDuration(remainingSeconds)
+    return remainingSeconds > 59
+      ? formatShortDuration(remainingSeconds)
+      : formatRemainingPlayerTime(
+        progress: self.progress,
+        durationSeconds: durationSeconds,
+        withMinus: false
+      )
   }
 
   var currentPlayerTimeString: String {

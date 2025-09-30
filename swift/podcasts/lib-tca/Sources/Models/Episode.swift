@@ -23,6 +23,7 @@ struct Episode: Equatable, Hashable {
   var progress: Double = 0.0
   var downloadedAt: Date? = nil
   var lastPlayedAt: Date? = nil
+  var completedAt: Date? = nil
   var updatedAt: Date = .init()
   var createdAt: Date
 }
@@ -106,6 +107,7 @@ extension EpisodeData {
         ? .downloaded
         : episode.downloading ? .downloading : .notDownloaded,
       pubDate: episode.pubDate,
+      isCompleted: episode.completedAt != nil,
       isPlaying: isPlaying
     )
   }

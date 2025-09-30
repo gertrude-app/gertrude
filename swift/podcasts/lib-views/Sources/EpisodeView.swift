@@ -47,35 +47,36 @@ public struct EpisodeView: View {
           .frame(maxWidth: .infinity, alignment: .leading)
       }
 
-      HStack {
+      HStack(alignment: .bottom) {
         PlayBubble(episode: self.episode) {
           self.emit(.playPauseTapped)
         }
 
         Spacer()
 
-        if self.episode.downloadState != .downloaded {
-          switch self.episode.downloadState {
-          case .downloading:
-            Image(systemName: "arrow.2.circlepath")
-              .font(.system(size: 11, weight: .medium))
-              .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-              .rotationEffect(.degrees(self.rotationAngle))
-              .onAppear {
-                withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
-                  self.rotationAngle = 360
-                }
-              }
-          case .notDownloaded:
-            Image(systemName: "arrow.down.circle")
-              .font(.system(size: 12, weight: .medium))
-              .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-              .onTapGesture {
-                self.emit(.downloadTapped)
-              }
-          case .downloaded:
-            EmptyView()
+        switch self.episode.downloadState {
+        case .notDownloaded, .downloaded:
+          Image(
+            systemName: self.episode
+              .downloadState == .downloaded ? "arrow.down.circle.fill" : "arrow.down.circle"
+          )
+          .font(.system(size: 12, weight: .medium))
+          .foregroundStyle(Color(self.cs, light: .violet400, dark: .violet400))
+          .onTapGesture {
+            self.emit(.downloadTapped)
           }
+          .padding(.bottom, 2)
+        case .downloading:
+          Image(systemName: "arrow.2.circlepath")
+            .font(.system(size: 11, weight: .medium))
+            .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+            .rotationEffect(.degrees(self.rotationAngle))
+            .onAppear {
+              withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
+                self.rotationAngle = 360
+              }
+            }
+            .padding(.bottom, 2)
         }
       }
       .padding(.top, 4)

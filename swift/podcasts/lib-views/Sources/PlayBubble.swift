@@ -14,15 +14,12 @@ public struct PlayBubble: View {
     self.onTap = onTap
   }
 
-  var isFullyListened: Bool {
-    guard let durationSeconds = episode.durationSeconds, durationSeconds > 0 else {
-      return false
-    }
-    return self.episode.progress >= Double(durationSeconds) * 0.99
+  var hasProgress: Bool {
+    self.episode.progress > 3.0 && (self.episode.isPlaying || !self.episode.isCompleted)
   }
 
-  var hasProgress: Bool {
-    self.episode.progress > 3.0 && !self.isFullyListened
+  var showsReplayArrow: Bool {
+    self.episode.isCompleted && !self.episode.isPlaying
   }
 
   var progressRatio: Double {
@@ -42,9 +39,9 @@ public struct PlayBubble: View {
     Button(action: self.onTap) {
       HStack(spacing: 6) {
         Image(
-          systemName: self
-            .isFullyListened ? "arrow.counterclockwise" :
-            (self.episode.isPlaying ? "pause.fill" : "play.fill")
+          systemName: self.showsReplayArrow
+            ? "arrow.counterclockwise"
+            : (self.episode.isPlaying ? "pause.fill" : "play.fill")
         )
         .font(.system(size: 12, weight: .medium))
         .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))

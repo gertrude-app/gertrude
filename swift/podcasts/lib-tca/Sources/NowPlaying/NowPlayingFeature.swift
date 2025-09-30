@@ -43,6 +43,9 @@ struct NowPlayingFeature: Downloader {
         case .playPauseTapped:
           return .run { _ in
             await self.haptics.impact(.light)
+            if let time = await self.audioPlayer.getPlayingPosition() {
+              nowPlaying.setProgress(time)
+            }
             nowPlaying.updateState { $0.isPlaying.toggle() }
           }
         case .scrubbed(to: let position):
@@ -67,9 +70,7 @@ struct NowPlayingFeature: Downloader {
           time.map { nowPlaying.setProgress($0) }
           return .none
         case .progressUpdated(let time):
-          if state.expandedViewVisible || time.truncatingRemainder(dividingBy: 5) < 0.1 {
-            nowPlaying.setProgress(time)
-          }
+          nowPlaying.setProgress(time)
           return .none
         case .scrubbed(to: let position):
           return self.scrub(nowPlaying, to: position, haptics: false)

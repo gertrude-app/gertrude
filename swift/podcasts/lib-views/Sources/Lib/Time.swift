@@ -56,11 +56,15 @@ public func formatPlayerTime(_ seconds: Int) -> String {
   }
 }
 
-public func formatRemainingPlayerTime(progress: Double, durationSeconds: Int?) -> String {
+public func formatRemainingPlayerTime(
+  progress: Double,
+  durationSeconds: Int?,
+  withMinus: Bool = true
+) -> String {
   guard let durationSeconds, durationSeconds > 0 else { return "0:00" }
   let currentSeconds = max(0, Int(progress))
   let remainingSeconds = max(0, durationSeconds - currentSeconds)
-  return "-" + formatPlayerTime(remainingSeconds)
+  return (withMinus ? "-" : "") + formatPlayerTime(remainingSeconds)
 }
 
 extension TimeInterval {
