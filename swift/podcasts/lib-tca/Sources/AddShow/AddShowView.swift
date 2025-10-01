@@ -4,6 +4,7 @@ import SwiftUI
 
 struct AddShowView: View {
   @Bindable var store: StoreOf<AddShowFeature>
+  @Dependency(\.haptics) var haptics
 
   var body: some View {
     Group {
@@ -17,6 +18,7 @@ struct AddShowView: View {
             onFail: { self.store.send(.passcodeFailed) },
           ),
           onCancel: { self.store.send(.passcodeCancelled) },
+          onPrepHaptics: self.haptics.prepare,
         )
 
       case .choosingMethod:

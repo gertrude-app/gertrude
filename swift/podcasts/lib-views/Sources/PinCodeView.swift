@@ -5,13 +5,16 @@ public struct PinCodeView: View {
 
   let mode: Mode
   let onCancel: (@MainActor @Sendable () -> Void)?
+  let onPrepHaptics: () -> Void
 
   public init(
     mode: Mode,
-    onCancel: (@MainActor @Sendable () -> Void)? = nil
+    onCancel: (@MainActor @Sendable () -> Void)? = nil,
+    onPrepHaptics: (() -> Void)? = nil
   ) {
     self.mode = mode
     self.onCancel = onCancel
+    self.onPrepHaptics = onPrepHaptics ?? {}
   }
 
   @State private var pin = ""
@@ -215,9 +218,15 @@ public struct PinCodeView: View {
       if self.confirmPin.count < 6 {
         self.confirmPin += digit
       }
+      if self.confirmPin.count == 4 {
+        self.onPrepHaptics()
+      }
     } else {
       if self.pin.count < 6 {
         self.pin += digit
+      }
+      if self.pin.count == 4 {
+        self.onPrepHaptics()
       }
     }
 
@@ -249,11 +258,12 @@ public struct PinCodeView: View {
 
   private func handlePinComplete(_ completedPin: String) {
     switch self.mode {
-    case .set(let onComplete):
+    case .set(let onComplete, let onConfirmFail):
       if self.showingConfirmation {
         if completedPin == self.pin {
           onComplete(Int(completedPin)!)
         } else {
+          onConfirmFail()
           self.showPinMismatchError()
         }
       } else {
@@ -322,12 +332,15 @@ public struct PinCodeView: View {
   }
 
   public enum Mode {
-    case set(onComplete: @MainActor @Sendable (Int) -> Void)
+    case set(
+      onComplete: @MainActor @Sendable (Int) -> Void,
+      onConfirmFail: () -> Void,
+    )
     case verify(
       Int,
       lockout: Date? = nil,
       onVerify: @MainActor @Sendable () -> Void,
-      onFail: @MainActor @Sendable () -> Void
+      onFail: @MainActor @Sendable () -> Void,
     )
   }
 }
@@ -356,62 +369,46 @@ private struct NumberButton: View {
 }
 
 #Preview("Set PIN") {
-  PinCodeView(mode: .set(onComplete: { pin in
-    print("PIN set: \(pin)")
-  }), onCancel: nil)
+  PinCodeView(
+    mode: .set(onComplete: { _ in }, onConfirmFail: {}),
+    onCancel: nil
+  )
 }
 
 #Preview("Verify PIN") {
-  PinCodeView(mode: .verify(123_456, onVerify: {
-    print("PIN verified")
-  }, onFail: {
-    print("PIN incorrect")
-  }), onCancel: {
-    print("Cancelled")
-  })
+  PinCodeView(
+    mode: .verify(123_456, onVerify: {}, onFail: {}),
+    onCancel: {}
+  )
 }
 
 #Preview("Set PIN - Dark") {
-  PinCodeView(mode: .set(onComplete: { pin in
-    print("PIN set: \(pin)")
-  }), onCancel: nil)
-    .preferredColorScheme(.dark)
+  PinCodeView(
+    mode: .set(onComplete: { _ in }, onConfirmFail: {}),
+    onCancel: nil
+  )
+  .preferredColorScheme(.dark)
 }
 
 #Preview("Verify PIN - Dark") {
-  PinCodeView(mode: .verify(123_456, onVerify: {
-    print("PIN verified")
-  }, onFail: {
-    print("PIN incorrect")
-  }), onCancel: {
-    print("Cancelled")
-  })
+  PinCodeView(
+    mode: .verify(123_456, onVerify: {}, onFail: {}),
+    onCancel: {}
+  )
   .preferredColorScheme(.dark)
 }
 
 #Preview("Lockout Screen") {
   PinCodeView(
-    mode: .verify(123_456, lockout: Date().addingTimeInterval(300), onVerify: {
-      print("PIN verified")
-    }, onFail: {
-      print("PIN incorrect")
-    }),
-    onCancel: {
-      print("Cancelled")
-    }
+    mode: .verify(123_456, lockout: .now + .minutes(5), onVerify: {}, onFail: {}),
+    onCancel: {}
   )
 }
 
 #Preview("Lockout Screen - Dark") {
   PinCodeView(
-    mode: .verify(123_456, lockout: Date().addingTimeInterval(300), onVerify: {
-      print("PIN verified")
-    }, onFail: {
-      print("PIN incorrect")
-    }),
-    onCancel: {
-      print("Cancelled")
-    }
+    mode: .verify(123_456, lockout: .now + .minutes(5), onVerify: {}, onFail: {}),
+    onCancel: {}
   )
   .preferredColorScheme(.dark)
 }

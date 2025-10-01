@@ -15,7 +15,10 @@ struct OnboardingFeature {
     case finished(Int)
     case setShowingPasscodeSheet(Bool)
     case passcodeSet(Int)
+    case passcodeConfirmFailed
   }
+
+  @Dependency(\.haptics) var haptics
 
   var body: some Reducer<State, Action> {
     Reduce { state, action in
@@ -41,10 +44,16 @@ struct OnboardingFeature {
       case (_, .setShowingPasscodeSheet(false)):
         state.showingPasscodeSheet = false
         return .none
+      case (_, .passcodeConfirmFailed):
+        return .run { _ in
+          await self.haptics.notification(.error)
+        }
       case (_, .passcodeSet(let passcode)):
         state.screen = .passcodeSet(passcode)
         state.showingPasscodeSheet = false
-        return .none
+        return .run { _ in
+          await self.haptics.notification(.success)
+        }
       case (.passcodeSet, .finished):
         return .none // handled by root reducer
       default:

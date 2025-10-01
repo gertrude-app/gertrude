@@ -4,6 +4,7 @@ import SwiftUI
 
 struct OnboardingView: View {
   @Bindable var store: StoreOf<OnboardingFeature>
+  @Dependency(\.haptics) var haptics
 
   var body: some View {
     Group {
@@ -50,8 +51,12 @@ struct OnboardingView: View {
       self.store.send(.setShowingPasscodeSheet(false))
     } content: {
       PinCodeView(
-        mode: .set(onComplete: { self.store.send(.passcodeSet($0)) }),
+        mode: .set(
+          onComplete: { self.store.send(.passcodeSet($0)) },
+          onConfirmFail: { self.store.send(.passcodeConfirmFailed) }
+        ),
         onCancel: { self.store.send(.setShowingPasscodeSheet(false)) },
+        onPrepHaptics: self.haptics.prepare
       )
     }
   }
