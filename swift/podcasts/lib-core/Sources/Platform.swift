@@ -29,10 +29,40 @@ import SwiftUI
     public var NOT_REAL_CHECK_XCODE: String { "" }
   }
 
+  public let AVAudioSessionInterruptionOptionKey = ""
+  public let AVAudioSessionInterruptionTypeKey = ""
+
   public struct AVAudioSession {
     public enum Category { case playback, NOT_REAL_CHECK_XCODE }
     public enum Mode { case spokenAudio, NOT_REAL_CHECK_XCODE }
+    public enum InterruptionType {
+      case began
+      case ended
+
+      public init?(rawValue: UInt) {
+        switch rawValue {
+        case 1: self = .began
+        case 0: self = .ended
+        default: return nil
+        }
+      }
+    }
+
+    public struct InterruptionOptions: OptionSet {
+      public let rawValue: UInt
+      public nonisolated(unsafe) static let shouldResume = InterruptionOptions(rawValue: 1 << 0)
+      public init(rawValue: UInt) {
+        self.rawValue = rawValue
+      }
+
+      public var NOT_REAL_CHECK_XCODE: String { "" }
+    }
+
     public var NOT_REAL_CHECK_XCODE: String { "" }
+
+    public static var interruptionNotification: Notification.Name {
+      Notification.Name("")
+    }
 
     public static func sharedInstance() -> AVAudioSession {
       AVAudioSession()

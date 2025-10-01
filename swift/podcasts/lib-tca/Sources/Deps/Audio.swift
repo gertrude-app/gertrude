@@ -29,6 +29,8 @@ extension AudioPlayer {
     case headphonesDoubleClickReceived(position: Double?)
     case headphonesTripleClickReceived(position: Double?)
     case completed
+    case interruptionBegan(position: Double?)
+    case interruptionEnded(shouldResume: Bool, from: Double?)
   }
 }
 
@@ -72,6 +74,7 @@ private final class Player: Sendable {
   private let timer: Mutex<Any?> = Mutex(nil)
   private let subject = Mutex(PassthroughSubject<AudioPlayer.SystemEvent, Never>())
   private let completionObserver: Locked<Any?> = Locked(nil)
+  private let interruptionObserver: Locked<Any?> = Locked(nil)
 
   init() {
     let session = AVAudioSession.sharedInstance()
@@ -79,11 +82,13 @@ private final class Player: Sendable {
     try? session.setMode(.spokenAudio)
     try? session.setActive(true)
     self.setupRemoteCommands()
+    self.setupInterruptionObserver()
   }
 
   deinit {
     self.player.stopTimeUpdates()
     self.removeCompletionObserver()
+    self.removeInterruptionObserver()
   }
 
   func play(_ episode: Episode, _ show: Show) throws {
@@ -268,6 +273,49 @@ private final class Player: Sendable {
       }
     }
     self.completionObserver.replace(with: nil)
+  }
+
+  private func setupInterruptionObserver() {
+    let observer = NotificationCenter.default.addObserver(
+      forName: AVAudioSession.interruptionNotification,
+      object: AVAudioSession.sharedInstance(),
+      queue: .main
+    ) { [weak self] notification in
+      guard let userInfo = notification.userInfo,
+            let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+            let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+        return
+      }
+
+      switch type {
+      case .began:
+        self?.emit(.interruptionBegan(position: self?.player.currentTime))
+      case .ended:
+        let shouldResume: Bool
+        if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
+          let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+          shouldResume = options.contains(.shouldResume)
+        } else {
+          shouldResume = false
+        }
+        self?.emit(.interruptionEnded(
+          shouldResume: shouldResume,
+          from: self?.player.currentTime
+        ))
+      @unknown default:
+        break
+      }
+    }
+    self.interruptionObserver.replace(with: observer)
+  }
+
+  private func removeInterruptionObserver() {
+    self.interruptionObserver.withValue {
+      if let observer = $0 {
+        NotificationCenter.default.removeObserver(observer)
+      }
+    }
+    self.interruptionObserver.replace(with: nil)
   }
 }
 

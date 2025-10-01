@@ -102,6 +102,19 @@ struct NowPlayingFeature: Downloader {
           return self.skip(nowPlaying, .forward, amount: 30, from: position)
         case .headphonesTripleClickReceived(let position):
           return self.skip(nowPlaying, .backward, amount: 15, from: position)
+        case .interruptionBegan:
+          nowPlaying.updateState { $0.isPlaying = false }
+          return .none
+        case .interruptionEnded(shouldResume: true, let position):
+          return .run { _ in
+            if let position, position >= 5.0 {
+              nowPlaying.setProgress(position - 3.0)
+              await self.audioPlayer.seek(to: position - 3.0)
+              nowPlaying.updateState { $0.isPlaying = true }
+            }
+          }
+        case .interruptionEnded(shouldResume: false, _):
+          return .none
         }
       case .episodePlayPauseTapped(let episode, let show):
         return .run { [state] _ in
