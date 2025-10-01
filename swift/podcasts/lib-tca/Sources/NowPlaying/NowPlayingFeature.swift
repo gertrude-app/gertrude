@@ -95,13 +95,13 @@ struct NowPlayingFeature: Downloader {
             NowPlaying.set(
               episode: next.episode,
               show: next.show,
-              state: .init(
-                isPlaying: true,
-                minimized: nowPlaying.state.minimized,
-                nextDownloaded: false
-              )
+              state: .init(isPlaying: true, minimized: nowPlaying.state.minimized,)
             )
           }
+        case .headphonesDoubleClickReceived(let position):
+          return self.skip(nowPlaying, .forward, amount: 30, from: position)
+        case .headphonesTripleClickReceived(let position):
+          return self.skip(nowPlaying, .backward, amount: 15, from: position)
         }
       case .episodePlayPauseTapped(let episode, let show):
         return .run { [state] _ in

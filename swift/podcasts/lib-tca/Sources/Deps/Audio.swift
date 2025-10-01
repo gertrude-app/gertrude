@@ -26,6 +26,8 @@ extension AudioPlayer {
     case progressUpdated(Double)
     case skippedForward(from: Double, amount: Double)
     case skippedBackward(from: Double, amount: Double)
+    case headphonesDoubleClickReceived(position: Double?)
+    case headphonesTripleClickReceived(position: Double?)
     case completed
   }
 }
@@ -134,12 +136,15 @@ private final class Player: Sendable {
     commands.changePlaybackPositionCommand.removeTarget(nil)
     commands.skipBackwardCommand.removeTarget(nil)
     commands.skipForwardCommand.removeTarget(nil)
+    commands.nextTrackCommand.removeTarget(nil)
+    commands.previousTrackCommand.removeTarget(nil)
 
     self.setupRemotePlayCommand()
     self.setupRemotePauseCommand()
     self.setupRemoteSkipBackwardCommand()
     self.setupRemoteSkipForwardCommand()
     self.setupRemoteScrubCommand()
+    self.setupHeadphoneCommands()
   }
 
   private func setupRemotePlayCommand() {
@@ -197,6 +202,22 @@ private final class Player: Sendable {
         return .commandFailed
       }
       self.emit(.skippedForward(from: currentTime, amount: skipEvent.interval))
+      return .success
+    }
+  }
+
+  private func setupHeadphoneCommands() {
+    let commands = MPRemoteCommandCenter.shared()
+
+    commands.nextTrackCommand.isEnabled = true
+    commands.nextTrackCommand.addTarget { [weak self] _ in
+      self?.emit(.headphonesDoubleClickReceived(position: self?.player.currentTime))
+      return .success
+    }
+
+    commands.previousTrackCommand.isEnabled = true
+    commands.previousTrackCommand.addTarget { [weak self] _ in
+      self?.emit(.headphonesTripleClickReceived(position: self?.player.currentTime))
       return .success
     }
   }
