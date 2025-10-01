@@ -26,6 +26,7 @@ extension AudioPlayer {
     case progressUpdated(Double)
     case skippedForward(from: Double, amount: Double)
     case skippedBackward(from: Double, amount: Double)
+    case completed
   }
 }
 
@@ -68,6 +69,7 @@ private final class Player: Sendable {
   private let episode: Mutex<Episode?> = Mutex(nil)
   private let timer: Mutex<Any?> = Mutex(nil)
   private let subject = Mutex(PassthroughSubject<AudioPlayer.SystemEvent, Never>())
+  private let completionObserver: Locked<Any?> = Locked(nil)
 
   init() {
     let session = AVAudioSession.sharedInstance()
@@ -79,6 +81,7 @@ private final class Player: Sendable {
 
   deinit {
     self.player.stopTimeUpdates()
+    self.removeCompletionObserver()
   }
 
   func play(_ episode: Episode, _ show: Show) throws {
@@ -86,6 +89,7 @@ private final class Player: Sendable {
       self.player.play()
     } else {
       self.player.play(new: episode)
+      self.setupCompletionObserver()
     }
     self.episode.withLock { $0 = episode }
     self.updateNowPlayingInfo(episode: episode, show: show)
@@ -222,6 +226,28 @@ private final class Player: Sendable {
   private func emit(_ event: AudioPlayer.SystemEvent) {
     self.subject.withLock { $0.send(event) }
   }
+
+  private func setupCompletionObserver() {
+    self.removeCompletionObserver()
+    guard let playerItem = self.player.withLock({ $0?.player.currentItem }) else { return }
+    let observer = NotificationCenter.default.addObserver(
+      forName: .AVPlayerItemDidPlayToEndTime,
+      object: playerItem,
+      queue: .main
+    ) { [weak self] _ in
+      self?.emit(.completed)
+    }
+    self.completionObserver.replace(with: observer)
+  }
+
+  private func removeCompletionObserver() {
+    self.completionObserver.withValue {
+      if let observer = $0 {
+        NotificationCenter.default.removeObserver(observer)
+      }
+    }
+    self.completionObserver.replace(with: nil)
+  }
 }
 
 extension Mutex<AVPlayerData?> {
@@ -286,5 +312,35 @@ extension DependencyValues {
   var audioPlayer: AudioPlayer {
     get { self[AudioPlayer.self] }
     set { self[AudioPlayer.self] = newValue }
+  }
+}
+
+private class Locked<T>: @unchecked Sendable {
+  private var _value: T
+  private let lock = NSLock()
+
+  init(_ value: T) {
+    self._value = value
+  }
+
+  func withValue<R: Sendable>(_ closure: (T) throws -> R) rethrows -> R {
+    self.lock.lock()
+    defer { lock.unlock() }
+    return try closure(self._value)
+  }
+
+  func replace(_ closure: @Sendable () -> T) {
+    self.lock.lock()
+    defer { lock.unlock() }
+    self._value = closure()
+  }
+
+  @discardableResult
+  func replace(with value: T) -> T {
+    self.lock.lock()
+    defer { lock.unlock() }
+    let previous = self._value
+    self._value = value
+    return previous
   }
 }

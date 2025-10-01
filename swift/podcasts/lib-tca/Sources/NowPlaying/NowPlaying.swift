@@ -14,6 +14,7 @@ struct NowPlaying: FetchKeyRequest {
   struct State: Equatable, Codable {
     var isPlaying: Bool
     var minimized: Bool
+    var nextDownloaded = false
   }
 
   func fetch(_ db: Database) throws -> Value {
@@ -150,6 +151,11 @@ extension NowPlaying.Data {
 
   func isPlaying(episodeId: Episode.ID) -> Bool {
     self.episode.id == episodeId && self.state.isPlaying
+  }
+
+  func shouldDownloadNext(at progress: Double) -> Bool {
+    !self.state.nextDownloaded &&
+      progress > (Double(self.episode.duration ?? .max) - 120.0)
   }
 }
 

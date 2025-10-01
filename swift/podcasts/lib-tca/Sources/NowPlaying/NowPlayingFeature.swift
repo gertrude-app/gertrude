@@ -22,6 +22,8 @@ struct NowPlayingFeature: Downloader {
   @Dependency(\.audioPlayer) var audioPlayer
   @Dependency(\.date) var date
   @Dependency(\.haptics) var haptics
+  @Dependency(\.network) var network
+  @Dependency(\.continuousClock) var clock
 
   var body: some Reducer<State, Action> {
     Reduce { state, action in
@@ -69,15 +71,37 @@ struct NowPlayingFeature: Downloader {
           nowPlaying.updateState { $0.isPlaying = false }
           time.map { nowPlaying.setProgress($0) }
           return .none
-        case .progressUpdated(let time):
-          nowPlaying.setProgress(time)
-          return .none
+        case .progressUpdated(let progress):
+          nowPlaying.setProgress(progress)
+          return .run { _ in
+            if nowPlaying.shouldDownloadNext(at: progress) {
+              nowPlaying.updateState { $0.nextDownloaded = true }
+              await AutoQueue.downloadNextEpisode(after: nowPlaying)
+            }
+          }
         case .scrubbed(to: let position):
           return self.scrub(nowPlaying, to: position, haptics: false)
         case .skippedBackward(from: let location, amount: let amount):
           return self.skip(nowPlaying, .backward, amount: amount, from: location)
         case .skippedForward(from: let location, amount: let amount):
           return self.skip(nowPlaying, .forward, amount: amount, from: location)
+        case .completed:
+          nowPlaying.updateState { $0.isPlaying = false }
+          guard let next = AutoQueue.nextDownloadedEpisode(after: nowPlaying) else {
+            return .none
+          }
+          return .run { _ in
+            try? await self.clock.sleep(for: .seconds(3))
+            NowPlaying.set(
+              episode: next.episode,
+              show: next.show,
+              state: .init(
+                isPlaying: true,
+                minimized: nowPlaying.state.minimized,
+                nextDownloaded: false
+              )
+            )
+          }
         }
       case .episodePlayPauseTapped(let episode, let show):
         return .run { [state] _ in
