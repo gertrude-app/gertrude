@@ -20,6 +20,7 @@ import SwiftUI
 
   public struct UIImage {
     public init?(data: Data) {}
+    public init?(named name: String) {}
     public var size: CGSize { CGSize(width: 100, height: 100) }
     public var mediaItemArtwork: MPMediaItemArtwork {
       .init(boundsSize: self.size) { _ in .init() }

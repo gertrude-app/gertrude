@@ -63,13 +63,9 @@ public struct ArtworkView: View {
   }
 
   private var artworkPlaceholder: some View {
-    Rectangle()
-      .fill(Color(self.cs, light: .violet200, dark: .violet800))
-      .overlay(
-        Image(systemName: "mic")
-          .font(.system(size: self.placeholderIconSize, weight: .medium))
-          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet500))
-      )
+    Image("artwork")
+      .resizable()
+      .aspectRatio(contentMode: .fill)
   }
 }
 

@@ -6,6 +6,7 @@ targets:
     deploymentTarget: "18.0"
     sources:
       - path: previews/sources
+      - path: previews/Assets.xcassets
     settings:
       GENERATE_INFOPLIST_FILE: YES
       PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.am.previews"

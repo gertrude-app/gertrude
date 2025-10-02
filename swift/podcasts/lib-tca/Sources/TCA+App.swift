@@ -6,9 +6,8 @@ extension _ReducerPrinter<AppReducer.State, AppReducer.Action> {
     Self { action, oldState, newState in
       var target = ""
       switch action {
-      case .nowPlaying(.system(.progressUpdated(let position))):
-        let shortPos = (position * 10000).rounded() / 10000
-        target.write("received action: .nowPlaying(.system(.progressUpdated(\(shortPos))))")
+      case .nowPlaying(.system):
+        target.write("received action: .\(simplifyAction("\(action)"))")
         target.write(diff(oldState, newState).map { "\($0)\n" } ?? " (no change)")
       default:
         target.write("received action:\n")
@@ -31,4 +30,27 @@ extension Show: CustomDumpStringConvertible {
   var customDumpDescription: String {
     "Show(\(self.id), name: \"\(self.name.prefix(35))\", ...)"
   }
+}
+
+func simplifyAction(_ input: String) -> String {
+  let pattern = #"([().])"#
+  let parts = input
+    .replacingOccurrences(of: pattern, with: " $1 ", options: .regularExpression)
+    .split(separator: " ")
+    .map(String.init)
+
+  var result: [String] = []
+  for part in parts {
+    if ["(", ")", "."].contains(part) {
+      result.append(part)
+    } else if let first = part.first, !first.isUppercase {
+      result.append(part)
+    }
+  }
+
+  var joined = result.joined()
+  while joined.contains("..") {
+    joined = joined.replacingOccurrences(of: "..", with: ".")
+  }
+  return joined
 }

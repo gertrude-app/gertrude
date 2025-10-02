@@ -41,6 +41,7 @@ test:
 format: clean
   @swiftformat --exclude '**/.build' .
   @xml-lint --fix app/Info.plist
+  @prettier --write '**/*.json' 
 
 build-app:
   xcodebuild -workspace GertiePodcasts.xcodeproj/project.xcworkspace \
@@ -79,9 +80,14 @@ gen-previews:
 
 sync-previews:
   @rsync -rc lib-views/Sources/ previews/sources
+  @rsync -rc app/Assets.xcassets/ previews/Assets.xcassets
 
 watch-sync-previews:
-  just watch-swift lib-views/Sources '"rsync -rc lib-views/Sources/ previews/sources"'
+  @watchexec --project-origin . --clear --restart \
+    --watch lib-views/Sources --watch app/Assets.xcassets --exts swift,html,png,json \
+    --ignore '**/.build/*/**' --ignore '**/index.html' \
+    'rsync -rc lib-views/Sources/ previews/sources && rsync -rc app/Assets.xcassets/ previews/Assets.xcassets && printf "synced: " && date'
+
 
 # utility
 
