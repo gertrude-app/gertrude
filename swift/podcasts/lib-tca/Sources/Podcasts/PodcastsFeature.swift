@@ -23,8 +23,10 @@ struct PodcastsFeature: Downloader {
       LEFT JOIN \(Episode.self) ON \(Episode.col.showId) = \(Show.col.id)
       GROUP BY \(Show.col.id), \(Show.col.name), \(Show.col.author), \(Show.col.artworkUrl)
       ORDER BY mostRecentPubDate DESC;
-      """)
-    ) var shows: [ShowInfo]
+      """),
+      animation: .default
+    )
+    var shows: [ShowInfo]
   }
 
   @Selection
@@ -44,6 +46,7 @@ struct PodcastsFeature: Downloader {
   enum Destination {
     case addShow(AddShowFeature)
     case show(ShowFeature)
+    case confirmDeleteShow(ConfirmationDialogState<ConfirmDeleteAction>)
   }
 
   enum Action: Equatable {
@@ -52,7 +55,12 @@ struct PodcastsFeature: Downloader {
     case startNextDownload
     case addToDownloadQueue([Episode])
     case showTapped(Show.ID)
+    case deleteShowTapped(Show.ID)
     case destination(PresentationAction<Destination.Action>)
+  }
+
+  enum ConfirmDeleteAction: Equatable {
+    case confirmDelete(Show.ID)
   }
 
   @Dependency(\.defaultDatabase) var database
@@ -83,6 +91,23 @@ struct PodcastsFeature: Downloader {
         state.destination = .show(.init(show: show))
         return .none
 
+      case .deleteShowTapped(let showId):
+        state.destination = .confirmDeleteShow(
+          .init(titleVisibility: .visible) {
+            TextState("Delete this show and all its episodes?")
+          } actions: {
+            ButtonState(role: .destructive, action: .confirmDelete(showId)) {
+              TextState("Delete")
+            }
+            ButtonState(role: .cancel) {
+              TextState("Cancel")
+            }
+          } message: {
+            TextState("This action cannot be undone.")
+          }
+        )
+        return .none
+
       case .destination(.presented(.addShow(.subscribed(let show)))):
         state.destination = nil
         state.downloadQueue += self.database.tryRead {
@@ -93,6 +118,15 @@ struct PodcastsFeature: Downloader {
             .fetchAll($0)
         }.reversed()
         return .send(.startNextDownload)
+
+      case .destination(.presented(.confirmDeleteShow(.confirmDelete(let showId)))):
+        state.destination = nil
+        return .run { _ in
+          removeShowLocalFilesDir(id: showId)
+          self.database.tryWrite { db in
+            try Show.find(showId).delete().execute(db)
+          }
+        }
 
       case .addToDownloadQueue(let episodes):
         state.downloadQueue += episodes

@@ -10,7 +10,8 @@ struct PodcastsView: View {
     PodcastsHomeView(
       shows: self.store.shows.map { .init(from: $0) },
       onAddShowTap: { self.store.send(.addShowTapped) },
-      onShowTap: { self.store.send(.showTapped(.init($0))) }
+      onShowTap: { self.store.send(.showTapped(.init($0))) },
+      onDeleteShow: { self.store.send(.deleteShowTapped(.init($0))) }
     )
     .navigationBarBackButtonHidden(true)
     .navigationDestination(
@@ -31,6 +32,10 @@ struct PodcastsView: View {
         ShowViewContainer(store: store)
       }
     )
+    .confirmationDialog(self.$store.scope(
+      state: \.destination?.confirmShowDelete,
+      action: \.destination.confirmShowDelete,
+    ))
     .onAppear {
       self.store.send(.onAppear)
     }

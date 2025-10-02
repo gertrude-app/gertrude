@@ -31,15 +31,18 @@ public struct PodcastsHomeView: View {
   let shows: [ShowDataWithStats]
   let onAddShowTap: @MainActor @Sendable () -> Void
   let onShowTap: @MainActor @Sendable (Int) -> Void
+  let onDeleteShow: @MainActor @Sendable (Int) -> Void
 
   public init(
     shows: [ShowDataWithStats],
     onAddShowTap: @MainActor @escaping @Sendable () -> Void,
-    onShowTap: @MainActor @escaping @Sendable (Int) -> Void = { _ in }
+    onShowTap: @MainActor @escaping @Sendable (Int) -> Void = { _ in },
+    onDeleteShow: @MainActor @escaping @Sendable (Int) -> Void = { _ in }
   ) {
     self.shows = shows
     self.onAddShowTap = onAddShowTap
     self.onShowTap = onShowTap
+    self.onDeleteShow = onDeleteShow
   }
 
   public var body: some View {
@@ -55,37 +58,45 @@ public struct PodcastsHomeView: View {
   }
 
   private var showsList: some View {
-    ScrollView {
-      LazyVStack(spacing: 0) {
-        ForEach(self.shows, id: \.data.id) { show in
-          Button {
-            self.onShowTap(show.data.id)
-          } label: {
-            self.showRow(show)
-          }
-          .buttonStyle(PlainButtonStyle())
+    List {
+      ForEach(self.shows, id: \.data.id) { show in
+        Button {
+          self.onShowTap(show.data.id)
+        } label: {
+          self.showRow(show)
         }
-
-        HStack {
-          Spacer()
-          Button {
-            self.onAddShowTap()
+        .buttonStyle(PlainButtonStyle())
+        .listRowInsets(EdgeInsets())
+        .listRowSeparator(.hidden)
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+          Button(role: .destructive) {
+            self.onDeleteShow(show.data.id)
           } label: {
-            HStack(spacing: 6) {
-              Image(systemName: "plus")
-                .font(.system(size: 13, weight: .semibold))
-              Text("Add Show")
-                .font(.system(size: 15, weight: .medium))
-            }
-            .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
+            Label("Delete", systemImage: "trash")
           }
+          .tint(.red)
         }
-        .padding(.horizontal, 30)
-        .padding(.top, 12)
-        .padding(.bottom, 30)
       }
-      .padding(.top, 20)
+
+      HStack {
+        Spacer()
+        Button {
+          self.onAddShowTap()
+        } label: {
+          HStack(spacing: 6) {
+            Image(systemName: "plus")
+              .font(.system(size: 13, weight: .semibold))
+            Text("Add Show")
+              .font(.system(size: 15, weight: .medium))
+          }
+          .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
+        }
+      }
+      .listRowInsets(EdgeInsets(top: 12, leading: 30, bottom: 30, trailing: 30))
+      .listRowSeparator(.hidden)
     }
+    .listStyle(.plain)
+    .scrollContentBackground(.hidden)
   }
 
   private func showInfoText(_ show: ShowDataWithStats) -> String {

@@ -29,6 +29,14 @@ extension Show {
   var localArtworkImage: UIImage? {
     showLocalArtworkImage(showId: self.id)
   }
+
+  func removeLocalFilesDir() {
+    removeShowLocalFilesDir(id: self.id)
+  }
+}
+
+func removeShowLocalFilesDir(id: Show.ID) {
+  try? FileManager.default.removeItem(at: .localFilesDir(showId: id))
 }
 
 func showLocalArtworkImage(showId: Show.ID) -> UIImage? {
