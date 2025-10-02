@@ -4,70 +4,29 @@ public struct PodcastsHomeView: View {
   @Environment(\.colorScheme) var cs
 
   let shows: [ShowData]
-  let nowPlayingShowing: Bool
   let onAddShowTap: @MainActor @Sendable () -> Void
   let onShowTap: @MainActor @Sendable (Int) -> Void
 
   public init(
     shows: [ShowData],
-    nowPlayingShowing: Bool = false,
     onAddShowTap: @MainActor @escaping @Sendable () -> Void,
     onShowTap: @MainActor @escaping @Sendable (Int) -> Void = { _ in }
   ) {
     self.shows = shows
     self.onAddShowTap = onAddShowTap
     self.onShowTap = onShowTap
-    self.nowPlayingShowing = nowPlayingShowing
   }
 
-  // https://itunes.apple.com/search?term=ancient+path&media=podcast&limit=25
-
   public var body: some View {
-    VStack(spacing: 0) {
+    ZStack {
       if self.shows.isEmpty {
-        self.emptyState
+        PodcastsEmptyState(onAddShowTap: self.onAddShowTap)
       } else {
         self.showsList
       }
-
-      Spacer()
-
-      BigButton(
-        "Add Show",
-        type: .button(self.onAddShowTap),
-        variant: .primary,
-        icon: "plus"
-      )
-      .padding(.horizontal, 30)
-      .padding(.bottom, 30)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .padding(.bottom, self.nowPlayingShowing ? 55 : 0)
     .background(Color(self.cs, light: .white, dark: .black))
-  }
-
-  private var emptyState: some View {
-    VStack(spacing: 24) {
-      Spacer()
-
-      Image(systemName: "waveform.and.mic")
-        .font(.system(size: 64, weight: .light))
-        .foregroundStyle(Color(self.cs, light: .violet300, dark: .violet700))
-
-      VStack(spacing: 12) {
-        Text("No Shows Yet")
-          .font(.system(size: 28, weight: .bold))
-          .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
-
-        Text("Add your first podcast show to get started listening to approved content.")
-          .font(.system(size: 16, weight: .medium))
-          .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
-          .multilineTextAlignment(.center)
-          .padding(.horizontal, 40)
-      }
-
-      Spacer()
-    }
   }
 
   private var showsList: some View {
@@ -81,6 +40,24 @@ public struct PodcastsHomeView: View {
           }
           .buttonStyle(PlainButtonStyle())
         }
+
+        HStack {
+          Spacer()
+          Button {
+            self.onAddShowTap()
+          } label: {
+            HStack(spacing: 6) {
+              Image(systemName: "plus")
+                .font(.system(size: 13, weight: .semibold))
+              Text("Add Show")
+                .font(.system(size: 15, weight: .medium))
+            }
+            .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
+          }
+        }
+        .padding(.horizontal, 30)
+        .padding(.top, 12)
+        .padding(.bottom, 30)
       }
       .padding(.top, 20)
     }
@@ -153,13 +130,6 @@ public struct PodcastsHomeView: View {
   )
 }
 
-#Preview("Empty State") {
-  PodcastsHomeView(
-    shows: [],
-    onAddShowTap: {}
-  )
-}
-
 #Preview("With Shows (Dark)") {
   PodcastsHomeView(
     shows: [
@@ -181,14 +151,6 @@ public struct PodcastsHomeView: View {
         showArtwork: true,
       ),
     ],
-    onAddShowTap: {}
-  )
-  .preferredColorScheme(.dark)
-}
-
-#Preview("Empty State (Dark)") {
-  PodcastsHomeView(
-    shows: [],
     onAddShowTap: {}
   )
   .preferredColorScheme(.dark)

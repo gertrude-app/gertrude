@@ -5,12 +5,10 @@ import SwiftUI
 
 struct PodcastsView: View {
   @Bindable var store: StoreOf<PodcastsFeature>
-  @Fetch(AnyNowPlaying()) var nowPlayingShowing: Bool = false
 
   var body: some View {
     PodcastsHomeView(
       shows: self.store.shows.map { .init(from: $0) },
-      nowPlayingShowing: self.nowPlayingShowing,
       onAddShowTap: { self.store.send(.addShowTapped) },
       onShowTap: { self.store.send(.showTapped(.init($0))) }
     )
