@@ -36,3 +36,22 @@ struct PodcastsView: View {
     }
   }
 }
+
+extension PodcastsHomeView.ShowDataWithStats {
+  init(from showInfo: PodcastsFeature.ShowInfo) {
+    self.init(
+      data: .init(
+        id: showInfo.id.rawValue,
+        name: showInfo.name,
+        author: showInfo.author,
+        description: showInfo.description,
+        showArtwork: showInfo.showArtwork,
+        artworkImage: showLocalArtworkImage(showId: showInfo.id),
+        artworkUrl: showInfo.artworkUrl
+      ),
+      totalEpisodes: showInfo.totalEpisodes,
+      unplayedEpisodes: showInfo.unplayedEpisodes,
+      mostRecentPubDate: showInfo.mostRecentPubDate,
+    )
+  }
+}

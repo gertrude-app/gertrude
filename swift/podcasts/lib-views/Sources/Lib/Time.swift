@@ -20,28 +20,28 @@ func formatRelativeDate(_ date: Date) -> String {
   let timeInterval = now.timeIntervalSince(date)
 
   if timeInterval < 60 {
-    return "JUST NOW"
+    return "just now"
   }
 
   if timeInterval < 3600 {
     let minutes = Int(timeInterval / 60)
-    return "\(minutes)M AGO"
+    return "\(minutes)m ago"
   }
 
   if timeInterval < 86400 {
     let hours = Int(timeInterval / 3600)
-    return "\(hours)H AGO"
+    return "\(hours)h ago"
   }
 
   if timeInterval < 604_800 {
     let days = Int(timeInterval / 86400)
-    return "\(days)D AGO"
+    return "\(days)d ago"
   }
 
   let formatter = DateFormatter()
   formatter.dateFormat = "MMM d"
   formatter.locale = Locale(identifier: "en_US_POSIX")
-  return formatter.string(from: date).uppercased()
+  return formatter.string(from: date)
 }
 
 public func formatPlayerTime(_ seconds: Int) -> String {

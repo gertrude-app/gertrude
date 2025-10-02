@@ -20,6 +20,12 @@ extension DatabaseReader {
       try EpisodeWithShow(episodeId: episodeId).fetch(db)
     }.flatMap(\.self)
   }
+
+  func show(id: Show.ID) -> Show? {
+    self.tryRead { db in
+      try Show.find(id).fetchOne(db)
+    }
+  }
 }
 
 public extension DatabaseWriter {
@@ -43,7 +49,7 @@ public func appDatabase() throws -> any DatabaseWriter {
   configuration.foreignKeysEnabled = true
   configuration.prepareDatabase { db in
     #if DEBUG
-      // db.trace(options: .profile) { logger.debug("\($0.expandedDescription)") }
+      db.trace(options: .profile) { logger.debug("\($0.expandedDescription)") }
     #endif
     db.add(function: .init("nowPlayingUpdate", argumentCount: 4, pure: false) { args in
       let oldEpisodeId = Int.fromDatabaseValue(args[0]).flatMap { Episode.ID(rawValue: $0) }

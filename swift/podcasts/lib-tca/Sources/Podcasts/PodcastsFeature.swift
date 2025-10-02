@@ -7,9 +7,37 @@ struct PodcastsFeature: Downloader {
   @ObservableState
   struct State: Equatable {
     var passcode: Int
-    var shows: [Show]
     var downloadQueue: [Episode] = []
     @Presents var destination: Destination.State?
+
+    @FetchAll(
+      #sql("""
+      SELECT
+        \(Show.col.id), \(Show.col.name), \(Show.col.author),
+        \(Show.col.description), \(Show.col.showArtwork), \(Show.col.artworkUrl),
+        COALESCE(COUNT(\(Episode.col.id)), 0) AS totalEpisodes,
+        COALESCE(SUM(CASE WHEN \(Episode.col.completedAt) IS NULL
+          THEN 1 ELSE 0 END), 0) AS unplayedEpisodes,
+        MAX(\(Episode.col.pubDate)) AS mostRecentPubDate
+      FROM \(Show.self)
+      LEFT JOIN \(Episode.self) ON \(Episode.col.showId) = \(Show.col.id)
+      GROUP BY \(Show.col.id), \(Show.col.name), \(Show.col.author), \(Show.col.artworkUrl)
+      ORDER BY mostRecentPubDate DESC;
+      """)
+    ) var shows: [ShowInfo]
+  }
+
+  @Selection
+  struct ShowInfo: Equatable {
+    let id: Show.ID
+    let name: String
+    let author: String?
+    let description: String?
+    let showArtwork: Bool
+    let artworkUrl: String?
+    let totalEpisodes: Int
+    let unplayedEpisodes: Int
+    let mostRecentPubDate: Date?
   }
 
   @Reducer(state: .equatable, action: .equatable)
@@ -48,15 +76,14 @@ struct PodcastsFeature: Downloader {
         return .none
 
       case .showTapped(let showId):
-        guard let show = state.shows.first(where: { $0.id == showId }) else {
-          unexpected(id: "301842f2", assert: true)
+        guard let show = self.database.show(id: showId) else {
+          unexpected(id: "62c1d0f4", assert: true)
           return .none
         }
         state.destination = .show(.init(show: show))
         return .none
 
       case .destination(.presented(.addShow(.subscribed(let show)))):
-        state.shows.append(show)
         state.destination = nil
         state.downloadQueue += self.database.tryRead {
           try Episode.all
@@ -85,13 +112,5 @@ struct PodcastsFeature: Downloader {
       }
     }
     .ifLet(\.$destination, action: \.destination)
-  }
-}
-
-extension PodcastsFeature.State {
-  init(passcode: Int) {
-    @Dependency(\.defaultDatabase) var db
-    self.shows = db.tryRead { try Show.all.fetchAll($0) }
-    self.passcode = passcode
   }
 }

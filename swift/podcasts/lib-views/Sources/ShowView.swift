@@ -38,7 +38,7 @@ public struct ShowView: View {
       self.showArtwork
 
       VStack(spacing: 8) {
-        Text(self.show.title)
+        Text(self.show.name)
           .font(.system(size: 24, weight: .bold))
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
           .multilineTextAlignment(.center)
@@ -95,7 +95,7 @@ public struct ShowView: View {
   ShowView(
     show: ShowData(
       id: 1,
-      title: "The Ancient Path",
+      name: "The Ancient Path",
       author: "Jason Henderson",
       description: "A podcast about walking in the ancient paths of biblical wisdom and truth. Join us as we explore the timeless principles that guide us in righteousness.",
       showArtwork: true,
@@ -109,7 +109,7 @@ public struct ShowView: View {
   ShowView(
     show: ShowData(
       id: 1,
-      title: "The Ancient Path",
+      name: "The Ancient Path",
       author: "Jason Henderson",
       description: "A podcast about walking in the ancient paths of biblical wisdom and truth. Join us as we explore the timeless principles that guide us in righteousness.",
       showArtwork: true,
@@ -123,7 +123,7 @@ public struct ShowView: View {
 #Preview("Show View - No Episodes") {
   ShowView(show: ShowData(
     id: 2,
-    title: "Tech Talk Weekly",
+    name: "Tech Talk Weekly",
     author: "Tech Media Network",
     description: "Weekly discussions about the latest in technology, programming, and digital innovation.",
     showArtwork: true,
@@ -134,7 +134,7 @@ public struct ShowView: View {
   ShowView(
     show: ShowData(
       id: 3,
-      title: "Swift Weekly Brief",
+      name: "Swift Weekly Brief",
       author: "Jesse Squires",
       description: "A weekly podcast about Swift development, news, and community updates.",
       showArtwork: true,

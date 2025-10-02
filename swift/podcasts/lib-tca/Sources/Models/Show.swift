@@ -27,11 +27,15 @@ extension Show {
   }
 
   var localArtworkImage: UIImage? {
-    guard let data = try? Data(contentsOf: .localArtworkPath(showId: self.id)) else {
-      return nil
-    }
-    return UIImage(data: data)
+    showLocalArtworkImage(showId: self.id)
   }
+}
+
+func showLocalArtworkImage(showId: Show.ID) -> UIImage? {
+  guard let data = try? Data(contentsOf: .localArtworkPath(showId: showId)) else {
+    return nil
+  }
+  return UIImage(data: data)
 }
 
 extension Show.Draft: Equatable {}
@@ -74,13 +78,15 @@ extension Show {
       )
     }
   }
+
+  static var col: TableColumns { Show.columns }
 }
 
 extension ShowData {
   init(from show: Show) {
     self.init(
       id: show.id.rawValue,
-      title: show.name,
+      name: show.name,
       author: show.author,
       description: show.description,
       showArtwork: show.showArtwork,

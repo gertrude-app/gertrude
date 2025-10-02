@@ -1,14 +1,39 @@
 import SwiftUI
 
+#if canImport(UIKit)
+  import UIKit
+#else
+  import LibCore
+#endif
+
 public struct PodcastsHomeView: View {
   @Environment(\.colorScheme) var cs
 
-  let shows: [ShowData]
+  public struct ShowDataWithStats {
+    public var data: ShowData
+    public var totalEpisodes: Int
+    public var unplayedEpisodes: Int
+    public var mostRecentPubDate: Date?
+
+    public init(
+      data: ShowData,
+      totalEpisodes: Int,
+      unplayedEpisodes: Int,
+      mostRecentPubDate: Date? = nil
+    ) {
+      self.data = data
+      self.totalEpisodes = totalEpisodes
+      self.unplayedEpisodes = unplayedEpisodes
+      self.mostRecentPubDate = mostRecentPubDate
+    }
+  }
+
+  let shows: [ShowDataWithStats]
   let onAddShowTap: @MainActor @Sendable () -> Void
   let onShowTap: @MainActor @Sendable (Int) -> Void
 
   public init(
-    shows: [ShowData],
+    shows: [ShowDataWithStats],
     onAddShowTap: @MainActor @escaping @Sendable () -> Void,
     onShowTap: @MainActor @escaping @Sendable (Int) -> Void = { _ in }
   ) {
@@ -32,9 +57,9 @@ public struct PodcastsHomeView: View {
   private var showsList: some View {
     ScrollView {
       LazyVStack(spacing: 0) {
-        ForEach(self.shows) { show in
+        ForEach(self.shows, id: \.data.id) { show in
           Button {
-            self.onShowTap(show.id)
+            self.onShowTap(show.data.id)
           } label: {
             self.showRow(show)
           }
@@ -63,20 +88,39 @@ public struct PodcastsHomeView: View {
     }
   }
 
-  private func showRow(_ show: ShowData) -> some View {
+  private func showInfoText(_ show: ShowDataWithStats) -> String {
+    var parts: [String] = []
+
+    if let pubDate = show.mostRecentPubDate {
+      parts.append(formatRelativeDate(pubDate))
+    }
+
+    if show.unplayedEpisodes > 0 {
+      if show.unplayedEpisodes < 12 {
+        parts.append("\(show.unplayedEpisodes) new")
+      } else {
+        parts.append("\(show.totalEpisodes) episodes")
+      }
+    }
+
+    return parts.joined(separator: " • ")
+  }
+
+  private func showRow(_ show: ShowDataWithStats) -> some View {
     HStack(spacing: 16) {
-      self.showArtwork(show)
+      self.showArtwork(show.data)
 
       VStack(alignment: .leading, spacing: 4) {
-        Text(show.title)
+        Text(show.data.name)
           .font(.system(size: 18, weight: .semibold))
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
           .multilineTextAlignment(.leading)
           .lineLimit(2)
 
-        Text("Subscribed")
-          .font(.system(size: 14, weight: .medium))
+        Text(self.showInfoText(show))
+          .font(.system(size: 13, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+          .lineLimit(1)
       }
 
       Spacer()
@@ -105,26 +149,46 @@ public struct PodcastsHomeView: View {
   }
 }
 
+// previews
+
+func showWithStats(
+  id: Int = 1,
+  _ modify: (inout PodcastsHomeView.ShowDataWithStats) -> Void = { _ in }
+) -> PodcastsHomeView.ShowDataWithStats {
+  var show = PodcastsHomeView.ShowDataWithStats(
+    data: ShowData(id: id, name: "Test Show", showArtwork: true),
+    totalEpisodes: 0,
+    unplayedEpisodes: 0
+  )
+  modify(&show)
+  return show
+}
+
 #Preview("With Shows") {
   PodcastsHomeView(
     shows: [
-      .init(
-        id: 1,
-        title: "The Ancient Path",
-        showArtwork: true,
-        artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
-      ),
-      .init(
-        id: 2,
-        title: "The Secret Sombrero",
-        showArtwork: true,
-        artworkUrl: "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
-      ),
-      .init(
-        id: 3,
-        title: "This American Life",
-        showArtwork: true,
-      ),
+      showWithStats(id: 1) {
+        $0.data.name = "The Ancient Path"
+        $0.data
+          .artworkUrl =
+          "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg"
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.hours(8))
+        $0.unplayedEpisodes = 3
+        $0.totalEpisodes = 125
+      },
+      showWithStats(id: 2) {
+        $0.data.name = "The Secret Sombrero"
+        $0.data.artworkUrl = "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(2))
+        $0.unplayedEpisodes = 15
+        $0.totalEpisodes = 87
+      },
+      showWithStats(id: 3) {
+        $0.data.name = "This American Life"
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(5))
+        $0.unplayedEpisodes = 0
+        $0.totalEpisodes = 542
+      },
     ],
     onAddShowTap: {}
   )
@@ -133,23 +197,28 @@ public struct PodcastsHomeView: View {
 #Preview("With Shows (Dark)") {
   PodcastsHomeView(
     shows: [
-      .init(
-        id: 1,
-        title: "The Ancient Path",
-        showArtwork: true,
-        artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
-      ),
-      .init(
-        id: 2,
-        title: "The Secret Sombrero",
-        showArtwork: true,
-        artworkUrl: "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
-      ),
-      .init(
-        id: 3,
-        title: "This American Life",
-        showArtwork: true,
-      ),
+      showWithStats(id: 1) {
+        $0.data.name = "The Ancient Path"
+        $0.data
+          .artworkUrl =
+          "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg"
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.hours(8))
+        $0.unplayedEpisodes = 3
+        $0.totalEpisodes = 125
+      },
+      showWithStats(id: 2) {
+        $0.data.name = "The Secret Sombrero"
+        $0.data.artworkUrl = "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(2))
+        $0.unplayedEpisodes = 15
+        $0.totalEpisodes = 87
+      },
+      showWithStats(id: 3) {
+        $0.data.name = "This American Life"
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(5))
+        $0.unplayedEpisodes = 0
+        $0.totalEpisodes = 542
+      },
     ],
     onAddShowTap: {}
   )

@@ -107,7 +107,7 @@ public struct NowPlayingView: View {
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
           .lineLimit(1)
 
-        Text(self.episode.pubDateRelative)
+        Text(self.episode.pubDateRelative.uppercased())
           .font(.system(size: 12, weight: .regular))
           .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
           .lineLimit(1)
@@ -156,7 +156,7 @@ public struct NowPlayingView: View {
             .font(.system(size: 10, weight: .bold))
             .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
 
-          Text(self.show.title)
+          Text(self.show.name)
             .font(.system(size: 12, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
             .padding(.horizontal, 40)
@@ -207,7 +207,7 @@ public struct NowPlayingView: View {
           .multilineTextAlignment(.center)
           .lineLimit(2)
 
-        Text(self.show.author ?? self.show.title)
+        Text(self.show.author ?? self.show.name)
           .font(.system(size: 16, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
           .lineLimit(1)
@@ -308,7 +308,7 @@ public struct NowPlayingView: View {
     },
     show: ShowData(
       id: 1,
-      title: "Swift Talk",
+      name: "Swift Talk",
       author: "objc.io",
       description: "Weekly Swift discussions",
       showArtwork: true,
@@ -332,7 +332,7 @@ public struct NowPlayingView: View {
     },
     show: ShowData(
       id: 1,
-      title: "Swift Talk",
+      name: "Swift Talk",
       author: "objc.io",
       description: "Weekly Swift discussions",
       showArtwork: true,
@@ -354,7 +354,7 @@ public struct NowPlayingView: View {
     },
     show: ShowData(
       id: 2,
-      title: "iOS Dev Weekly Podcast",
+      name: "iOS Dev Weekly Podcast",
       author: "Dave Verwer",
       description: "Weekly iOS development discussions",
       showArtwork: true
@@ -377,7 +377,7 @@ public struct NowPlayingView: View {
     },
     show: ShowData(
       id: 1,
-      title: "Swift Talk",
+      name: "Swift Talk",
       author: "objc.io",
       description: "Weekly Swift discussions",
       showArtwork: true,
@@ -402,7 +402,7 @@ public struct NowPlayingView: View {
     },
     show: ShowData(
       id: 1,
-      title: "Swift Talk",
+      name: "Swift Talk",
       author: "objc.io",
       description: "Weekly Swift discussions",
       showArtwork: true,
@@ -455,7 +455,7 @@ public struct NowPlayingView: View {
           },
           show: ShowData(
             id: 1,
-            title: "Swift Tutorials",
+            name: "Swift Tutorials",
             author: "iOS Academy",
             description: "Advanced Swift programming",
             showArtwork: true,
