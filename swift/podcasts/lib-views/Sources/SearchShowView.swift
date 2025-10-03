@@ -139,11 +139,8 @@ public struct SearchShowView: View {
   private func showArtwork(_ result: SearchResult) -> some View {
     ArtworkView(
       artworkUrl: result.artworkUrl,
-      placeholderIconSize: 20
+      size: 64
     )
-    .frame(width: 64, height: 64)
-    .cornerRadius(6)
-    .clipped()
   }
 }
 
@@ -176,7 +173,7 @@ public struct SearchShowView: View {
           id: 1,
           title: "The Tech Talk Show",
           artistName: "Tech Media Network",
-          artworkURL: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
+          artworkURL: .ancientPath,
           feedUrl: "",
           episodeCount: 147,
           isExplicit: false
@@ -235,7 +232,7 @@ public struct SearchShowView: View {
           id: 1,
           title: "The Tech Talk Show",
           artistName: "Tech Media Network",
-          artworkURL: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
+          artworkURL: .ancientPath,
           feedUrl: "",
           episodeCount: 147,
           isExplicit: false

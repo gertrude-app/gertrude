@@ -91,6 +91,12 @@ func episode(id: Int = 1, _ modify: (inout EpisodeData) -> Void = { _ in }) -> E
   return episode
 }
 
+func show(id: Int = 1, _ modify: (inout ShowData) -> Void = { _ in }) -> ShowData {
+  var show = ShowData(id: id, name: "Test Show", showArtwork: true)
+  modify(&show)
+  return show
+}
+
 #Preview("All States") {
   VStack(spacing: 16) {
     HStack {

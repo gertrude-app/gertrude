@@ -17,5 +17,14 @@ struct ShowViewContainer: View {
     ) { episodeId, event in
       self.store.send(.episodeView(.init(episodeId), event))
     }
+    .navigationDestination(
+      item: self.$store.scope(
+        state: \.destination?.episode,
+        action: \.destination.episode
+      ),
+      destination: { store in
+        EpisodeViewContainer(store: store)
+      }
+    )
   }
 }

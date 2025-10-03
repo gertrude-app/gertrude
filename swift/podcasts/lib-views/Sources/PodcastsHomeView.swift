@@ -9,23 +9,12 @@ import SwiftUI
 public struct PodcastsHomeView: View {
   @Environment(\.colorScheme) var cs
 
+  @dynamicMemberLookup
   public struct ShowDataWithStats {
     public var data: ShowData
     public var totalEpisodes: Int
     public var unplayedEpisodes: Int
     public var mostRecentPubDate: Date?
-
-    public init(
-      data: ShowData,
-      totalEpisodes: Int,
-      unplayedEpisodes: Int,
-      mostRecentPubDate: Date? = nil
-    ) {
-      self.data = data
-      self.totalEpisodes = totalEpisodes
-      self.unplayedEpisodes = unplayedEpisodes
-      self.mostRecentPubDate = mostRecentPubDate
-    }
   }
 
   let shows: [ShowDataWithStats]
@@ -59,9 +48,9 @@ public struct PodcastsHomeView: View {
 
   private var showsList: some View {
     List {
-      ForEach(self.shows, id: \.data.id) { show in
+      ForEach(self.shows, id: \.id) { show in
         Button {
-          self.onShowTap(show.data.id)
+          self.onShowTap(show.id)
         } label: {
           self.showRow(show)
         }
@@ -70,7 +59,7 @@ public struct PodcastsHomeView: View {
         .listRowSeparator(.hidden)
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
           Button(role: .destructive) {
-            self.onDeleteShow(show.data.id)
+            self.onDeleteShow(show.id)
           } label: {
             Label("Delete", systemImage: "trash")
           }
@@ -122,7 +111,7 @@ public struct PodcastsHomeView: View {
       self.showArtwork(show.data)
 
       VStack(alignment: .leading, spacing: 4) {
-        Text(show.data.name)
+        Text(show.name)
           .font(.system(size: 18, weight: .semibold))
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
           .multilineTextAlignment(.leading)
@@ -152,11 +141,26 @@ public struct PodcastsHomeView: View {
     ArtworkView(
       artworkImage: show.artworkImage,
       artworkUrl: show.artworkUrl,
-      placeholderIconSize: 20
+      size: 56
     )
-    .frame(width: 56, height: 56)
-    .cornerRadius(6)
-    .clipped()
+  }
+}
+
+public extension PodcastsHomeView.ShowDataWithStats {
+  init(
+    show: ShowData,
+    totalEpisodes: Int,
+    unplayedEpisodes: Int,
+    mostRecentPubDate: Date? = nil
+  ) {
+    self.data = show
+    self.totalEpisodes = totalEpisodes
+    self.unplayedEpisodes = unplayedEpisodes
+    self.mostRecentPubDate = mostRecentPubDate
+  }
+
+  subscript<T>(dynamicMember keyPath: KeyPath<ShowData, T>) -> T {
+    self.data[keyPath: keyPath]
   }
 }
 
@@ -180,16 +184,14 @@ func showWithStats(
     shows: [
       showWithStats(id: 1) {
         $0.data.name = "The Ancient Path"
-        $0.data
-          .artworkUrl =
-          "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg"
+        $0.data.artworkUrl = .ancientPath
         $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.hours(8))
         $0.unplayedEpisodes = 3
         $0.totalEpisodes = 125
       },
       showWithStats(id: 2) {
         $0.data.name = "The Secret Sombrero"
-        $0.data.artworkUrl = "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
+        $0.data.artworkUrl = .sombrero
         $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(2))
         $0.unplayedEpisodes = 15
         $0.totalEpisodes = 87
@@ -210,16 +212,14 @@ func showWithStats(
     shows: [
       showWithStats(id: 1) {
         $0.data.name = "The Ancient Path"
-        $0.data
-          .artworkUrl =
-          "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg"
+        $0.data.artworkUrl = .ancientPath
         $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.hours(8))
         $0.unplayedEpisodes = 3
         $0.totalEpisodes = 125
       },
       showWithStats(id: 2) {
         $0.data.name = "The Secret Sombrero"
-        $0.data.artworkUrl = "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
+        $0.data.artworkUrl = .sombrero
         $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(2))
         $0.unplayedEpisodes = 15
         $0.totalEpisodes = 87
@@ -234,4 +234,10 @@ func showWithStats(
     onAddShowTap: {}
   )
   .preferredColorScheme(.dark)
+}
+
+extension String {
+  static let ancientPath =
+    "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg"
+  static let sombrero = "https://spanish-7cbc3de5.nyc3.digitaloceanspaces.com/sombrero.jpg"
 }

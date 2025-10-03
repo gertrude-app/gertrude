@@ -12,18 +12,21 @@ public struct ArtworkView: View {
   let preferRemote: Bool
   let artworkImage: UIImage?
   let artworkUrl: String?
-  let placeholderIconSize: CGFloat
+  let size: CGFloat
+  let cornerRadius: CGFloat
 
   public init(
     preferRemote: Bool = false,
     artworkImage: UIImage? = nil,
     artworkUrl: String? = nil,
-    placeholderIconSize: CGFloat = 20
+    size: CGFloat,
+    cornerRadius: CGFloat = 6
   ) {
     self.preferRemote = preferRemote
     self.artworkImage = artworkImage
     self.artworkUrl = artworkUrl
-    self.placeholderIconSize = placeholderIconSize
+    self.size = size
+    self.cornerRadius = cornerRadius
   }
 
   public var body: some View {
@@ -60,6 +63,9 @@ public struct ArtworkView: View {
         }
       }
     }
+    .frame(width: self.size, height: self.size)
+    .cornerRadius(self.cornerRadius)
+    .clipped()
   }
 
   private var artworkPlaceholder: some View {
@@ -69,24 +75,48 @@ public struct ArtworkView: View {
   }
 }
 
+@MainActor
+protocol EpisodeArtworkProvider {
+  var episode: EpisodeData { get }
+  var show: ShowData { get }
+}
+
+extension EpisodeArtworkProvider {
+  var useEpisodeArtwork: Bool {
+    self.episode.artworkUrl != nil && self.show.showArtwork
+  }
+
+  var artworkUrl: String? {
+    self.show.showArtwork
+      ? (self.episode.artworkUrl ?? self.show.artworkUrl)
+      : nil
+  }
+}
+
+extension ArtworkView {
+  init(provider: some EpisodeArtworkProvider, size: CGFloat, cornerRadius: CGFloat = 6) {
+    self.init(
+      preferRemote: provider.useEpisodeArtwork,
+      artworkImage: provider.show.showArtwork ? provider.show.artworkImage : nil,
+      artworkUrl: provider.show.showArtwork ? provider.artworkUrl : nil,
+      size: size,
+      cornerRadius: cornerRadius
+    )
+  }
+}
+
 #Preview("With URL") {
   ArtworkView(
     artworkUrl: "https://example.com/artwork.jpg",
-    placeholderIconSize: 40
+    size: 100
   )
-  .frame(width: 100, height: 100)
-  .cornerRadius(8)
 }
 
 #Preview("Placeholder") {
-  ArtworkView(placeholderIconSize: 40)
-    .frame(width: 100, height: 100)
-    .cornerRadius(8)
+  ArtworkView(size: 100)
 }
 
 #Preview("Dark Mode") {
-  ArtworkView(placeholderIconSize: 40)
-    .frame(width: 100, height: 100)
-    .cornerRadius(8)
+  ArtworkView(size: 100)
     .preferredColorScheme(.dark)
 }

@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct NowPlayingView: View {
+public struct NowPlayingView: View, EpisodeArtworkProvider {
   @Environment(\.colorScheme) var cs
   @State private var dragOffset: CGFloat = 0
 
@@ -28,16 +28,6 @@ public struct NowPlayingView: View {
     self.minimized = minimized
     self.show = show
     self.emit = emit
-  }
-
-  var useEpisodeArtwork: Bool {
-    self.episode.artworkUrl != nil && self.show.showArtwork
-  }
-
-  var artworkUrl: String? {
-    self.show.showArtwork
-      ? (self.episode.artworkUrl ?? self.show.artworkUrl)
-      : nil
   }
 
   public var body: some View {
@@ -90,15 +80,7 @@ public struct NowPlayingView: View {
 
   private var miniPlayerContent: some View {
     HStack(spacing: 12) {
-      ArtworkView(
-        preferRemote: self.useEpisodeArtwork,
-        artworkImage: self.show.artworkImage,
-        artworkUrl: self.artworkUrl,
-        placeholderIconSize: 20
-      )
-      .frame(width: 44, height: 44)
-      .cornerRadius(4)
-      .clipped()
+      ArtworkView(provider: self, size: 44, cornerRadius: 4)
 
       // Episode info
       VStack(alignment: .leading, spacing: 2) {
@@ -186,11 +168,9 @@ public struct NowPlayingView: View {
           preferRemote: self.useEpisodeArtwork,
           artworkImage: self.show.artworkImage,
           artworkUrl: self.artworkUrl,
-          placeholderIconSize: 80
+          size: artworkSize,
+          cornerRadius: 8
         )
-        .frame(width: artworkSize, height: artworkSize)
-        .cornerRadius(8)
-        .clipped()
         .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
       }

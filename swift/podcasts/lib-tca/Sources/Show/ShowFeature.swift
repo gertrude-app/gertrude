@@ -10,19 +10,12 @@ struct ShowFeature: Downloader {
     var showId: Show.ID
     @FetchOne var show: Show
     @FetchAll var episodes: [Episode]
+    @Presents var destination: Destination.State?
+  }
 
-    init(show: Show) {
-      self.showId = show.id
-      self._show = FetchOne(
-        wrappedValue: show,
-        Show.where { $0.id == show.id }
-      )
-      self._episodes = FetchAll(
-        Episode
-          .where { $0.showId == show.id }
-          .order { ($0.episodeNumber.desc(), $0.pubDate.desc()) }
-      )
-    }
+  @Reducer(state: .equatable, action: .equatable)
+  enum Destination {
+    case episode(EpisodeFeature)
   }
 
   enum Action: Equatable {
@@ -32,6 +25,7 @@ struct ShowFeature: Downloader {
 
     case episodeView(Episode.ID, EpisodeView.Event)
     case delegate(DelegateAction)
+    case destination(PresentationAction<Destination.Action>)
   }
 
   @Dependency(\.defaultDatabase) var database
@@ -43,7 +37,7 @@ struct ShowFeature: Downloader {
       switch action {
       case .episodeView(let episodeId, let episodeAction):
         guard let episode = state.episodes.first(where: { $0.id == episodeId }) else {
-          reportIssue("Episode with id \(episodeId) not found")
+          unexpected(id: "60324a0d", assert: true)
           return .none
         }
         switch episodeAction {
@@ -53,12 +47,31 @@ struct ShowFeature: Downloader {
           }
         case .playPauseTapped:
           return .send(.delegate(.episodePlayPauseTapped(episode, state.show)))
-        default:
+        case .episodeTapped:
+          state.destination = .episode(.init(episode: episode, show: state.show))
           return .none
         }
+      case .destination:
+        return .none
       case .delegate:
         return .none
       }
     }
+    .ifLet(\.$destination, action: \.destination)
+  }
+}
+
+extension ShowFeature.State {
+  init(show: Show) {
+    self.showId = show.id
+    self._show = FetchOne(
+      wrappedValue: show,
+      Show.where { $0.id == show.id }
+    )
+    self._episodes = FetchAll(
+      Episode
+        .where { $0.showId == show.id }
+        .order { ($0.episodeNumber.desc(), $0.pubDate.desc()) }
+    )
   }
 }

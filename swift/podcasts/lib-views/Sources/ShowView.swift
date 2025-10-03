@@ -71,11 +71,8 @@ public struct ShowView: View {
     ArtworkView(
       artworkImage: self.show.artworkImage,
       artworkUrl: self.show.artworkUrl,
-      placeholderIconSize: 60
+      size: 200
     )
-    .frame(width: 200, height: 200)
-    .cornerRadius(6)
-    .clipped()
   }
 
   private var episodesList: some View {
@@ -99,7 +96,7 @@ public struct ShowView: View {
       author: "Jason Henderson",
       description: "A podcast about walking in the ancient paths of biblical wisdom and truth. Join us as we explore the timeless principles that guide us in righteousness.",
       showArtwork: true,
-      artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg"
+      artworkUrl: .ancientPath
     ),
     episodes: sampleEpisodes
   )
@@ -113,7 +110,7 @@ public struct ShowView: View {
       author: "Jason Henderson",
       description: "A podcast about walking in the ancient paths of biblical wisdom and truth. Join us as we explore the timeless principles that guide us in righteousness.",
       showArtwork: true,
-      artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg"
+      artworkUrl: .ancientPath
     ),
     episodes: sampleEpisodes
   )

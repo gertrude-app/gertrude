@@ -56,16 +56,17 @@ public struct EpisodeView: View {
 
         switch self.episode.downloadState {
         case .notDownloaded, .downloaded:
-          Image(
-            systemName: self.episode
-              .downloadState == .downloaded ? "arrow.down.circle.fill" : "arrow.down.circle"
-          )
-          .font(.system(size: 12, weight: .medium))
-          .foregroundStyle(Color(self.cs, light: .violet400, dark: .violet400))
-          .onTapGesture {
+          Button {
             self.emit(.downloadTapped)
+          } label: {
+            Image(
+              systemName: self.episode
+                .downloadState == .downloaded ? "arrow.down.circle.fill" : "arrow.down.circle"
+            )
+            .font(.system(size: 12, weight: .medium))
+            .foregroundStyle(Color(self.cs, light: .violet400, dark: .violet400))
+            .padding(.bottom, 2)
           }
-          .padding(.bottom, 2)
         case .downloading:
           Image(systemName: "arrow.2.circlepath")
             .font(.system(size: 11, weight: .medium))
@@ -85,6 +86,7 @@ public struct EpisodeView: View {
     .padding(.horizontal, 20)
     .padding(.top, 12)
     .padding(.bottom, 20)
+    .contentShape(Rectangle())
     .onTapGesture {
       self.emit(.episodeTapped)
     }

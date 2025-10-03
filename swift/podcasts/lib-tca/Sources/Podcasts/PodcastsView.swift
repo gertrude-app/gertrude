@@ -45,7 +45,7 @@ struct PodcastsView: View {
 extension PodcastsHomeView.ShowDataWithStats {
   init(from showInfo: PodcastsFeature.ShowInfo) {
     self.init(
-      data: .init(
+      show: .init(
         id: showInfo.id.rawValue,
         name: showInfo.name,
         author: showInfo.author,

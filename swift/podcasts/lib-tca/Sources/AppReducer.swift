@@ -83,13 +83,17 @@ struct AppReducer: Sendable, Downloader {
         return .run { _ in
           self.passcode.save(passcode)
         }
-      case .mode(
-        .presented(.podcasts(.destination(.presented(.show(.delegate(.episodePlayPauseTapped(
-          let episode,
-          let show
-        )))))))
-      ):
-        return .send(.nowPlaying(.episodePlayPauseTapped(episode, show)))
+      case .mode(.presented(.podcasts(.destination(.presented(.show(let showAction)))))):
+        switch showAction {
+        case .delegate(.episodePlayPauseTapped(let episode, let show)),
+             .destination(.presented(.episode(.delegate(.episodePlayPauseTapped(
+               let episode,
+               let show
+             ))))):
+          return .send(.nowPlaying(.episodePlayPauseTapped(episode, show)))
+        default:
+          return .none
+        }
       case .nowPlaying:
         return .none
       case .mode:
