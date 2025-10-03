@@ -143,7 +143,10 @@ final class BgDownloadEpisodesOperation: AsyncOperation, Downloader, @unchecked 
         await group.waitForAll()
       }
 
-      self.database.insertEvent(name: "bg-download-episodes->end")
+      self.database.insertEvent(
+        name: "bg-download-episodes->end",
+        detail: "downloaded \(episodes.count) episodes"
+      )
       self.finish()
     }
   }
