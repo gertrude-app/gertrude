@@ -120,14 +120,14 @@ final class BgDownloadEpisodesOperation: AsyncOperation, Downloader, @unchecked 
           """
           WITH RankedEpisodes AS (
             SELECT *, ROW_NUMBER() OVER(
-              PARTITION BY \(Episode.cols.showId)
-              ORDER BY \(Episode.cols.pubDate) DESC
+              PARTITION BY \(Episode.col.showId)
+              ORDER BY \(Episode.col.pubDate) DESC
             ) AS rn
             FROM \(Episode.self)
           )
-          SELECT \(Episode.cols)
+          SELECT \(Episode.columns)
           FROM RankedEpisodes as \(Episode.self)
-          WHERE rn <= 3 AND \(Episode.cols.downloadedAt) IS NULL;
+          WHERE rn <= 3 AND \(Episode.col.downloadedAt) IS NULL;
           """,
           as: Episode.self
         )

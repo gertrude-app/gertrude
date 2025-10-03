@@ -86,19 +86,19 @@ enum AutoQueue {
         FROM \(Episode.self)
         INNER JOIN (
           SELECT 
-            \(Episode.cols.showId),
-            MAX(\(Episode.cols.lastPlayedAt)) as mostRecentPlay
+            \(Episode.col.showId),
+            MAX(\(Episode.col.lastPlayedAt)) as mostRecentPlay
           FROM \(Episode.self)
           WHERE
-            \(Episode.cols.lastPlayedAt) IS NOT NULL
+            \(Episode.col.lastPlayedAt) IS NOT NULL
               AND
-            \(Episode.cols.showId) != \(raw: show.id)
-          GROUP BY \(Episode.cols.showId)
+            \(Episode.col.showId) != \(raw: show.id)
+          GROUP BY \(Episode.col.showId)
         ) recent ON
-          \(Episode.cols.showId) = recent.\(raw: Episode.cols.showId.name)
+          \(Episode.col.showId) = recent.\(raw: Episode.col.showId.name)
             AND
-          \(Episode.cols.lastPlayedAt) = recent.mostRecentPlay
-        ORDER BY \(Episode.columns.lastPlayedAt) DESC
+          \(Episode.col.lastPlayedAt) = recent.mostRecentPlay
+        ORDER BY \(Episode.col.lastPlayedAt) DESC
         """,
         as: Episode.self
       )

@@ -22,8 +22,8 @@ targets:
       DEVELOPMENT_TEAM: "WFN83LM943"
       CODE_SIGN_STYLE: Automatic
       INFOPLIST_FILE: app/Info.plist
-      MARKETING_VERSION: 0.0.2
-      CURRENT_PROJECT_VERSION: 2
+      MARKETING_VERSION: 0.0.3
+      CURRENT_PROJECT_VERSION: 3
       ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     info:
       path: app/Info.plist

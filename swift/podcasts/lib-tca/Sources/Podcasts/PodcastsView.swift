@@ -33,8 +33,8 @@ struct PodcastsView: View {
       }
     )
     .confirmationDialog(self.$store.scope(
-      state: \.destination?.confirmShowDelete,
-      action: \.destination.confirmShowDelete,
+      state: \.destination?.confirmDeleteShow,
+      action: \.destination.confirmDeleteShow,
     ))
     .onAppear {
       self.store.send(.onAppear)
