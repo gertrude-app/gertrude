@@ -2,7 +2,7 @@ import ConcurrencyExtras
 import Dependencies
 import Foundation
 import LibCore
-import SharingGRDB
+import SQLiteData
 
 func initBgTasks() {
   registerBgTasks()

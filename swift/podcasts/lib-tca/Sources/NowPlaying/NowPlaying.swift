@@ -1,5 +1,5 @@
 import Foundation
-import SharingGRDB
+import SQLiteData
 
 struct NowPlaying: FetchKeyRequest {
   typealias Value = Data?

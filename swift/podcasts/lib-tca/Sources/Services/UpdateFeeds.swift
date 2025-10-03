@@ -1,6 +1,6 @@
 import Dependencies
 import Foundation
-import SharingGRDB
+import SQLiteData
 
 struct FeedUpdateInputData: Equatable {
   var feeds: [Feed] = []

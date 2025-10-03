@@ -1,5 +1,5 @@
 import AVFoundation
-import SharingGRDB
+import SQLiteData
 
 protocol Downloader {
   var database: any DatabaseWriter { get }

@@ -8,13 +8,13 @@ let package = Package(
   dependencies: [
     .package(path: "../lib-core"),
     .package(path: "../lib-views"),
-    .package(url: "https://github.com/pointfreeco/sharing-grdb", exact: "0.5.1"),
-    .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.0.0"),
-    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.0.0"),
-    .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.0.0"),
+    .package(url: "https://github.com/pointfreeco/sqlite-data", exact: "1.1.0"),
+    .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.10.0"),
+    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.22.3"),
+    .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
     .package(
       url: "https://github.com/pointfreeco/swift-structured-queries",
-      from: "0.17.0",
+      from: "0.22.0",
       traits: ["StructuredQueriesTagged"],
     ),
   ],
@@ -22,7 +22,7 @@ let package = Package(
     .target(
       name: "LibTCA",
       dependencies: [
-        .product(name: "SharingGRDB", package: "sharing-grdb"),
+        .product(name: "SQLiteData", package: "sqlite-data"),
         .product(name: "LibCore", package: "lib-core"),
         .product(name: "LibViews", package: "lib-views"),
         .product(name: "Dependencies", package: "swift-dependencies"),

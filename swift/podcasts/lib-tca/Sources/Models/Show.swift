@@ -2,7 +2,7 @@ import Dependencies
 import Foundation
 import LibCore
 import LibViews
-import SharingGRDB
+import SQLiteData
 import Tagged
 
 @Table

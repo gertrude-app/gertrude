@@ -1,5 +1,5 @@
 import Dependencies
-import SharingGRDB
+import SQLiteData
 
 enum AutoQueue {
   static func nextDownloadedEpisode(

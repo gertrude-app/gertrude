@@ -1,6 +1,6 @@
 import Foundation
 import OSLog
-import SharingGRDB
+import SQLiteData
 
 extension DatabaseReader {
   func tryRead<T>(_ block: (Database) throws -> [T]) -> [T] {

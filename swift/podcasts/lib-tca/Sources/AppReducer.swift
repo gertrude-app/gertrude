@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import Foundation
 import LibCore
-import SharingGRDB
+import SQLiteData
 
 @Reducer
 struct AppReducer: Sendable, Downloader {

@@ -1,5 +1,5 @@
 {
-  "originHash" : "688cf48c4a9c1b7cc75fe45ad3e8655d2aefe9277a864dd48402d55bf70d3e2a",
+  "originHash" : "6d89011521bd2769552542da0c17fcbd19b47a07d211842cd384acf63736105e",
   "pins" : [
     {
       "identity" : "combine-schedulers",
@@ -15,17 +15,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/groue/GRDB.swift",
       "state" : {
-        "revision" : "8ba1bc9a96afc731a000fd4136dd13a5a46297bd",
-        "version" : "7.6.1"
+        "revision" : "18497b68fdbb3a09528d260a0a0e1e7e61c8c53d",
+        "version" : "7.8.0"
       }
     },
     {
-      "identity" : "sharing-grdb",
+      "identity" : "sqlite-data",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/sharing-grdb",
+      "location" : "https://github.com/pointfreeco/sqlite-data",
       "state" : {
-        "revision" : "f7f388be7a4b1f277b308c1090f90233e632e88e",
-        "version" : "0.5.1"
+        "revision" : "4069be900a3c40e4fcad30518fc3b9be797ad786",
+        "version" : "1.1.0"
       }
     },
     {
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "6574de2396319a58e86e2178577268cb4aeccc30",
-        "version" : "1.20.2"
+        "revision" : "2d60d4082dfb4978974307acf0f00dfa20e5f621",
+        "version" : "1.22.3"
       }
     },
     {
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-dependencies",
       "state" : {
-        "revision" : "4c90d6b2b9bf0911af87b103bb40f41771891596",
-        "version" : "1.9.2"
+        "revision" : "a10f9feeb214bc72b5337b6ef6d5a029360db4cc",
+        "version" : "1.10.0"
       }
     },
     {
@@ -141,8 +141,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-structured-queries",
       "state" : {
-        "revision" : "1115d2b5d3f1e8e368a69fe4da5fa442836517a4",
-        "version" : "0.17.1"
+        "revision" : "49ce85d88f3b39fa8b9bc07de437af83358cbc74",
+        "version" : "0.22.0"
       }
     },
     {

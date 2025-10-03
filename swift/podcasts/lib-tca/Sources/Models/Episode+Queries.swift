@@ -1,5 +1,5 @@
 import Foundation
-import SharingGRDB
+import SQLiteData
 
 extension Episode {
   static func whereDownloadCanBeDeleted(

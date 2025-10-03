@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import LibViews
-import SharingGRDB
+import SQLiteData
 import SwiftUI
 
 struct AppView: View {

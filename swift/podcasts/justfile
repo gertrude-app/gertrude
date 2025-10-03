@@ -21,13 +21,13 @@ dev:
     "just --justfile {{justfile()}} watch-sync-previews"
 
 build-views:
-  @cd lib-views && swift build
+  @cd lib-views && swift build --enable-experimental-prebuilts
 
 build-core:
-  @cd lib-core && swift build
+  @cd lib-core && swift build --enable-experimental-prebuilts
 
 build-tca:
-  @cd lib-tca && swift build
+  @cd lib-tca && swift build --enable-experimental-prebuilts
 
 build:
   @just build-tca
