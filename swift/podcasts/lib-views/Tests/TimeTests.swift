@@ -48,9 +48,9 @@ func testFormatRelativeDateJustNow() {
   let thirtySecondsAgo = now.addingTimeInterval(-30)
   let fiftyNineSecondsAgo = now.addingTimeInterval(-59)
 
-  #expect(formatRelativeDate(now) == "JUST NOW")
-  #expect(formatRelativeDate(thirtySecondsAgo) == "JUST NOW")
-  #expect(formatRelativeDate(fiftyNineSecondsAgo) == "JUST NOW")
+  #expect(formatRelativeDate(now) == "just now")
+  #expect(formatRelativeDate(thirtySecondsAgo) == "just now")
+  #expect(formatRelativeDate(fiftyNineSecondsAgo) == "just now")
 }
 
 @Test
@@ -60,9 +60,9 @@ func testFormatRelativeDateMinutes() {
   let fiveMinutesAgo = now.addingTimeInterval(-300)
   let fiftyNineMinutesAgo = now.addingTimeInterval(-3540)
 
-  #expect(formatRelativeDate(oneMinuteAgo) == "1M AGO")
-  #expect(formatRelativeDate(fiveMinutesAgo) == "5M AGO")
-  #expect(formatRelativeDate(fiftyNineMinutesAgo) == "59M AGO")
+  #expect(formatRelativeDate(oneMinuteAgo) == "1m ago")
+  #expect(formatRelativeDate(fiveMinutesAgo) == "5m ago")
+  #expect(formatRelativeDate(fiftyNineMinutesAgo) == "59m ago")
 }
 
 @Test
@@ -72,9 +72,9 @@ func testFormatRelativeDateHours() {
   let threeHoursAgo = now.addingTimeInterval(-10800)
   let twentyThreeHoursAgo = now.addingTimeInterval(-82800)
 
-  #expect(formatRelativeDate(oneHourAgo) == "1H AGO")
-  #expect(formatRelativeDate(threeHoursAgo) == "3H AGO")
-  #expect(formatRelativeDate(twentyThreeHoursAgo) == "23H AGO")
+  #expect(formatRelativeDate(oneHourAgo) == "1h ago")
+  #expect(formatRelativeDate(threeHoursAgo) == "3h ago")
+  #expect(formatRelativeDate(twentyThreeHoursAgo) == "23h ago")
 }
 
 @Test
@@ -84,9 +84,9 @@ func testFormatRelativeDateDays() {
   let fiveDaysAgo = now.addingTimeInterval(-432_000)
   let sixDaysAgo = now.addingTimeInterval(-518_400)
 
-  #expect(formatRelativeDate(oneDayAgo) == "1D AGO")
-  #expect(formatRelativeDate(fiveDaysAgo) == "5D AGO")
-  #expect(formatRelativeDate(sixDaysAgo) == "6D AGO")
+  #expect(formatRelativeDate(oneDayAgo) == "1d ago")
+  #expect(formatRelativeDate(fiveDaysAgo) == "5d ago")
+  #expect(formatRelativeDate(sixDaysAgo) == "6d ago")
 }
 
 @Test
@@ -97,8 +97,8 @@ func testFormatRelativeDateOldDates() {
   let components2 = DateComponents(year: 2024, month: 12, day: 25, hour: 12, minute: 0)
   let decemberDate = calendar.date(from: components2)!
 
-  #expect(formatRelativeDate(augustDate) == "AUG 13")
-  #expect(formatRelativeDate(decemberDate) == "DEC 25")
+  #expect(formatRelativeDate(augustDate) == "Aug 13")
+  #expect(formatRelativeDate(decemberDate) == "Dec 25")
 }
 
 @Test
