@@ -13,6 +13,8 @@ targets:
         group: app
       - path: app/Assets.xcassets
         group: app
+      - path: app/LaunchScreen.storyboard
+        group: app
     dependencies:
       - package: LibCore
       - package: LibViews

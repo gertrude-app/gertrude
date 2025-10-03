@@ -40,7 +40,7 @@ test:
 
 format: clean
   @swiftformat --exclude '**/.build' .
-  @xml-lint --fix app/Info.plist
+  @xml-lint --fix app/Info.plist app/LaunchScreen.storyboard
   @prettier --write '**/*.json' 
 
 build-app:
