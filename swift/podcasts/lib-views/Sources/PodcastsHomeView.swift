@@ -139,8 +139,8 @@ public struct PodcastsHomeView: View {
 
   private func showArtwork(_ show: ShowData) -> some View {
     ArtworkView(
-      artworkImage: show.artworkImage,
-      artworkUrl: show.artworkUrl,
+      artworkImage: show.showArtwork ? show.artworkImage : nil,
+      artworkUrl: show.showArtwork ? show.artworkUrl : nil,
       size: 56
     )
   }
