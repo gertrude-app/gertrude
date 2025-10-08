@@ -1,7 +1,7 @@
 import SQLiteData
 
 enum Migrations {
-  @Sendable static func nowPlayingSingleton(_ db: Database) throws {
+  @Sendable static func m2025_10_07(_ db: Database) throws {
     try #sql(
       """
       DROP TABLE miscs;
@@ -16,6 +16,17 @@ enum Migrations {
         isPlaying INTEGER NOT NULL CHECK (isPlaying IN (0, 1)),
         nextDownloaded INTEGER NOT NULL CHECK (nextDownloaded IN (0, 1)),
         updatedAt TEXT NOT NULL
+      ) STRICT;
+      """
+    ).execute(db)
+    try #sql(
+      """
+      CREATE TABLE records (
+        id TEXT PRIMARY KEY NOT NULL,
+        value TEXT NOT NULL,
+        detail TEXT,
+        updatedAt TEXT NOT NULL,
+        createdAt TEXT NOT NULL
       ) STRICT;
       """
     ).execute(db)

@@ -32,7 +32,7 @@ struct AppReducer: Sendable {
   }
 
   @Dependency(\.db) var database
-  @Dependency(\.passcode) var passcode
+  @Dependency(\.keychain) var keychain
   @Dependency(\.audio) var audio
   @Dependency(\.mainQueue) var mainQueue
   @Dependency(\.date) var date
@@ -45,7 +45,23 @@ struct AppReducer: Sendable {
     Reduce { state, action in
       switch action {
       case .appDidLaunch:
-        if let passcode = self.passcode.load() {
+        if self.keychain.isFirstLaunch() {
+          let installDate = self.date.now
+          self.keychain.save(installDate: installDate)
+          self.database.insertRecord(id: .installDate)
+
+          let installId = UUID()
+          self.keychain.save(installId: installId)
+          self.database.insertRecord(id: .deviceId, value: "\(installId)")
+
+          // temp delete
+          if let legacyPin = dep(\.passcode).load() {
+            self.keychain.save(pincode: legacyPin)
+            self.database.insertEvent(name: "migrated legacy pin to keychain dep")
+          }
+        }
+
+        if let passcode = self.keychain.loadPincode() {
           state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
         } else {
           state.mode = .onboarding(OnboardingFeature.State())
@@ -63,19 +79,6 @@ struct AppReducer: Sendable {
               .receive(on: self.mainQueue)
           },
           .run { _ in
-            #if DEBUG
-              try await self.mainQueue.sleep(for: .seconds(1))
-              let events = self.database.tryRead { db in
-                try Event.order { $0.createdAt.asc() }.fetchAll(db)
-              }
-              if events.isEmpty {
-                print("EVENTS: (none)")
-              } else {
-                for event in events {
-                  print("EVENT: \(event.createdAt): \(event.name) \(event.detail ?? "")")
-                }
-              }
-            #endif
             try await self.mainQueue.sleep(for: .seconds(10))
             self.autoPruneDownloads(nowPlayingId)
           }
@@ -83,10 +86,13 @@ struct AppReducer: Sendable {
       case .appInForegroundChanged(let foregrounded):
         state.$appInForeground.withLock { $0 = foregrounded }
         return .none
-      case .mode(.presented(.onboarding(.finished(let passcode)))):
-        state.mode = .podcasts(.init(passcode: passcode))
+      case .mode(.presented(.onboarding(.finished(let pincode)))):
+        state.mode = .podcasts(.init(passcode: pincode))
         return .run { _ in
-          self.passcode.save(passcode)
+          self.keychain.save(pincode: pincode)
+          self.database.insertEvent(name: "saved pincode")
+          self.database.insertRecord(id: .onboardingFinished)
+          // TODO: log api
         }
       case .mode(.presented(.podcasts(.destination(.presented(.show(let showAction)))))):
         switch showAction {
@@ -108,6 +114,20 @@ struct AppReducer: Sendable {
       case .nowPlaying(.delegate(.error(let message))):
         state.alert = .init { TextState(message) }
         return .none
+      case .mode(.presented(.onboarding(.delegate(.shouldNotBeOnboarding)))):
+        if let passcode = self.keychain.loadPincode() {
+          state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
+          return .run { _ in
+            self.database.insertEvent(name: "unexpected-73430b7b")
+            // TODO: log api
+          }
+        } else {
+          return .run { _ in
+            self.database.insertEvent(name: "unexpected-9f4d7c2d")
+            // TODO: await log api
+            preconditionFailure("unreachable-9f4d7c2d")
+          }
+        }
       case .alert:
         return .none
       case .nowPlaying:
@@ -138,18 +158,11 @@ struct AppReducer: Sendable {
 }
 
 extension AppReducer.State {
-  var addingShow: Bool {
+  var hideNowPlaying: Bool {
     if case .some(.podcasts(let podcasts)) = self.mode,
        case .some(.addShow) = podcasts.destination {
       return true
-    }
-    return false
-  }
-}
-
-extension AppReducer.Mode {
-  var isPodcasts: Bool {
-    if case .podcasts = self {
+    } else if case .some(.onboarding) = self.mode {
       return true
     }
     return false

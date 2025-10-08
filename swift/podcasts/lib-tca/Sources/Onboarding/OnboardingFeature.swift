@@ -10,14 +10,21 @@ struct OnboardingFeature {
   }
 
   enum Action: Equatable {
+    enum DelegateAction: Equatable {
+      case shouldNotBeOnboarding
+    }
+
     case primaryBtnTapped
     case secondaryBtnTapped
     case finished(Int)
     case setShowingPasscodeSheet(Bool)
     case passcodeSet(Int)
     case passcodeConfirmFailed
+    case delegate(DelegateAction)
   }
 
+  @Dependency(\.db) var database
+  @Dependency(\.keychain) var keychain
   @Dependency(\.haptics) var haptics
 
   var body: some Reducer<State, Action> {
@@ -25,7 +32,7 @@ struct OnboardingFeature {
       switch (state.screen, action) {
       case (.hiThere, .primaryBtnTapped):
         state.screen = .areYouTheParent
-        return .none
+        return self.shouldNotBeOnboarding() ? .send(.delegate(.shouldNotBeOnboarding)) : .none
       case (.areYouTheParent, .primaryBtnTapped):
         state.screen = .explainSetPasscode
         return .none
@@ -56,6 +63,8 @@ struct OnboardingFeature {
         }
       case (.passcodeSet, .finished):
         return .none // handled by root reducer
+      case (_, .delegate):
+        return .none
       default:
         #if DEBUG
           fatalError("Unhandled state-action pair: \(state.screen) - \(action)")
@@ -64,6 +73,25 @@ struct OnboardingFeature {
         #endif
       }
     }
+  }
+
+  func shouldNotBeOnboarding() -> Bool {
+    if self.keychain.loadPincode() != nil {
+      return true
+    }
+    let previouslyCompleted = self.database.tryRead { db in
+      try Record.find(id: .onboardingFinished).fetchOne(db) != nil
+    }
+    if previouslyCompleted == true {
+      return true
+    }
+    let numShows = self.database.tryRead { db in
+      try Show.count().fetchOne(db)
+    }
+    if (numShows ?? 0) > 0 {
+      return true
+    }
+    return false
   }
 }
 

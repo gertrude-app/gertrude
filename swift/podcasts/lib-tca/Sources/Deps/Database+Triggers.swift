@@ -71,4 +71,7 @@ private func touchUpdatedAtCols(_ db: Database) throws {
   try Show
     .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
     .execute(db)
+  try Record
+    .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
+    .execute(db)
 }

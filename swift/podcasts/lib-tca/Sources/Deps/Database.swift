@@ -46,6 +46,14 @@ extension DatabaseWriter {
         .execute(db)
     }
   }
+
+  func insertRecord(id: Record.ID, value: String = "", detail: String? = nil) {
+    self.tryWrite { db in
+      try Record
+        .insert { Record.Draft(id: id, value: value, detail: detail) }
+        .execute(db)
+    }
+  }
 }
 
 public func appDatabase(
@@ -89,8 +97,8 @@ public func appDatabase(
   migrator.registerMigration("pre-release") {
     try Migrations.preRelease($0)
   }
-  migrator.registerMigration("now-playing-singleton") {
-    try Migrations.nowPlayingSingleton($0)
+  migrator.registerMigration("m_2025-10-07") {
+    try Migrations.m2025_10_07($0)
   }
   try migrator.migrate(database)
 

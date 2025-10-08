@@ -41,7 +41,7 @@ struct AppView: View {
             )
           }
         )
-        .opacity(self.store.addingShow ? 0 : 1)
+        .opacity(self.store.hideNowPlaying ? 0 : 1)
       }
     }
   }
