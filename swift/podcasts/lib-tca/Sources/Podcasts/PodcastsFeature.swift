@@ -3,7 +3,7 @@ import SQLiteData
 import SwiftUI
 
 @Reducer
-struct PodcastsFeature: Downloader {
+struct PodcastsFeature {
   @ObservableState
   struct State: Equatable {
     var passcode: Int
@@ -47,10 +47,8 @@ struct PodcastsFeature: Downloader {
     case confirmDelete(Show.ID)
   }
 
-  @Dependency(\.defaultDatabase) var database
-  @Dependency(\.podcasts) var podcasts
+  @Dependency(\.db) var database
   @Dependency(\.continuousClock) var clock
-  @Dependency(\.date) var date
 
   var body: some Reducer<State, Action> {
     Reduce { state, action in
@@ -121,7 +119,7 @@ struct PodcastsFeature: Downloader {
           return .none
         }
         return .run { send in
-          await self.trackedDownload(episode: episode)
+          _ = await trackedDownload(episode: episode)
           await send(.startNextDownload)
         }
 

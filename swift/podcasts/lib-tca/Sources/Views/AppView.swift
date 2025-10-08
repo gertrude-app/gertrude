@@ -25,13 +25,14 @@ struct AppView: View {
         ) { store in
           PodcastsView(store: store)
         }
+        .alert(self.$store.scope(state: \.alert, action: \.alert))
     }
     .overlay(alignment: .bottom) {
       if let nowPlaying = self.store.nowPlaying.data {
         NowPlayingView(
           episode: .init(nowPlaying: nowPlaying),
           show: .init(from: nowPlaying.show),
-          minimized: nowPlaying.state.minimized,
+          minimized: nowPlaying.minimized,
           emit: { event in
             self.store.send(
               .nowPlaying(.view(event)),

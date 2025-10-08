@@ -89,7 +89,7 @@ func scheduleEpisodeDownloads() {
 
 final class BgRefreshFeedsOperation: AsyncOperation, @unchecked Sendable {
   private var task: Task<Void, Never>?
-  @Dependency(\.defaultDatabase) private var database
+  @Dependency(\.db) private var database
 
   override func main() {
     self.task = Task {
@@ -104,12 +104,10 @@ final class BgRefreshFeedsOperation: AsyncOperation, @unchecked Sendable {
   }
 }
 
-final class BgDownloadEpisodesOperation: AsyncOperation, Downloader, @unchecked Sendable {
+final class BgDownloadEpisodesOperation: AsyncOperation, @unchecked Sendable {
   private var task: Task<Void, Never>?
 
-  @Dependency(\.date) var date
-  @Dependency(\.podcasts) var podcasts
-  @Dependency(\.defaultDatabase) var database
+  @Dependency(\.db) var database
 
   override func main() {
     self.task = Task {
@@ -137,7 +135,7 @@ final class BgDownloadEpisodesOperation: AsyncOperation, Downloader, @unchecked 
       await withTaskGroup(of: Void.self) { group in
         for episode in episodes {
           group.addTask {
-            await self.trackedDownload(episode: episode)
+            _ = await trackedDownload(episode: episode)
           }
         }
         await group.waitForAll()

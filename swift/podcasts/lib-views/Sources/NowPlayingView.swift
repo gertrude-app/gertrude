@@ -3,6 +3,7 @@ import SwiftUI
 public struct NowPlayingView: View, EpisodeArtworkProvider {
   @Environment(\.colorScheme) var cs
   @State private var dragOffset: CGFloat = 0
+  @State private var rotationAngle: Double = 0
 
   let episode: EpisodeData
   let show: ShowData
@@ -89,23 +90,44 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
           .lineLimit(1)
 
-        Text(self.episode.pubDateRelative.uppercased())
-          .font(.system(size: 12, weight: .regular))
-          .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
-          .lineLimit(1)
+        if self.episode.downloadState == .downloading {
+          Text("Downloading...")
+            .font(.system(size: 12, weight: .regular))
+            .italic()
+            .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
+            .lineLimit(1)
+        } else {
+          Text(self.episode.pubDateRelative.uppercased())
+            .font(.system(size: 12, weight: .regular))
+            .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
+            .lineLimit(1)
+        }
       }
 
       Spacer()
 
-      // Play/pause button
-      Button(action: {
-        self.emit(.playPauseTapped)
-      }) {
-        Image(systemName: self.episode.isPlaying ? "pause.fill" : "play.fill")
-          .font(.system(size: 20, weight: .medium))
+      // Play/pause or downloading button
+      if self.episode.downloadState == .downloading {
+        Image(systemName: "arrow.2.circlepath")
+          .font(.system(size: 18, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+          .rotationEffect(.degrees(self.rotationAngle))
+          .onAppear {
+            withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
+              self.rotationAngle = 360
+            }
+          }
+          .padding(.trailing, 4)
+      } else {
+        Button(action: {
+          self.emit(.playPauseTapped)
+        }) {
+          Image(systemName: self.episode.isPlaying ? "pause.fill" : "play.fill")
+            .font(.system(size: 20, weight: .medium))
+            .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+        }
+        .padding(.trailing, 4)
       }
-      .padding(.trailing, 4)
     }
     .padding(.leading, 8)
     .padding(.trailing, 12)
@@ -391,6 +413,57 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
     minimized: false,
     emit: { _ in }
   )
+  .preferredColorScheme(.dark)
+}
+
+#Preview("Mini Player - Downloading") {
+  NowPlayingView(
+    episode: episode {
+      $0.title = "Understanding SwiftUI State Management"
+      $0.description = "Deep dive into @State, @Binding, and @ObservableObject"
+      $0.durationSeconds = 2700
+      $0.progress = 0
+      $0.downloadState = .downloading
+      $0.isPlaying = false
+    },
+    show: ShowData(
+      id: 1,
+      name: "Swift Talk",
+      author: "objc.io",
+      description: "Weekly Swift discussions",
+      showArtwork: true,
+      artworkUrl: nil
+    ),
+    minimized: true,
+    emit: { _ in }
+  )
+  .padding()
+  .background(Color.gray.opacity(0.1))
+}
+
+#Preview("Mini Player - Downloading (Dark)") {
+  NowPlayingView(
+    episode: episode {
+      $0.title = "Understanding SwiftUI State Management"
+      $0.description = "Deep dive into @State, @Binding, and @ObservableObject"
+      $0.durationSeconds = 2700
+      $0.progress = 0
+      $0.downloadState = .downloading
+      $0.isPlaying = false
+    },
+    show: ShowData(
+      id: 1,
+      name: "Swift Talk",
+      author: "objc.io",
+      description: "Weekly Swift discussions",
+      showArtwork: true,
+      artworkUrl: nil
+    ),
+    minimized: true,
+    emit: { _ in }
+  )
+  .padding()
+  .background(Color.gray.opacity(0.1))
   .preferredColorScheme(.dark)
 }
 

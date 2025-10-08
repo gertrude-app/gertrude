@@ -38,32 +38,39 @@ public struct PlayBubble: View {
   public var body: some View {
     Button(action: self.onTap) {
       HStack(spacing: 6) {
-        Image(
-          systemName: self.showsReplayArrow
-            ? "arrow.counterclockwise"
-            : (self.episode.isPlaying ? "pause.fill" : "play.fill")
-        )
-        .font(.system(size: 12, weight: .medium))
-        .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
-
-        if self.hasProgress {
-          ProgressView(value: self.progressRatio)
-            .progressViewStyle(LinearProgressViewStyle(
-              tint: Color(self.cs, light: .violet600, dark: .violet400)
-            ))
-            .background(Color(
-              self.cs,
-              light: .violet300.opacity(0.3),
-              dark: .violet500.opacity(0.2)
-            ))
-            .frame(width: 24, height: 4)
-            .clipShape(Capsule())
-        }
-
-        if let time = self.timeText {
-          Text(time)
+        if self.episode.downloadState == .downloading {
+          Text("Downloading...")
             .font(.system(size: 12, weight: .medium))
+            .italic()
             .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
+        } else {
+          Image(
+            systemName: self.showsReplayArrow
+              ? "arrow.counterclockwise"
+              : (self.episode.isPlaying ? "pause.fill" : "play.fill")
+          )
+          .font(.system(size: 12, weight: .medium))
+          .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
+
+          if self.hasProgress {
+            ProgressView(value: self.progressRatio)
+              .progressViewStyle(LinearProgressViewStyle(
+                tint: Color(self.cs, light: .violet600, dark: .violet400)
+              ))
+              .background(Color(
+                self.cs,
+                light: .violet300.opacity(0.3),
+                dark: .violet500.opacity(0.2)
+              ))
+              .frame(width: 24, height: 4)
+              .clipShape(Capsule())
+          }
+
+          if let time = self.timeText {
+            Text(time)
+              .font(.system(size: 12, weight: .medium))
+              .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
+          }
         }
       }
       .padding(.horizontal, 11)
@@ -147,6 +154,14 @@ func show(id: Int = 1, _ modify: (inout ShowData) -> Void = { _ in }) -> ShowDat
         $0.isPlaying = true
       })
     }
+
+    HStack {
+      Text("Downloading:")
+      Spacer()
+      PlayBubble(episode: episode {
+        $0.downloadState = .downloading
+      })
+    }
   }
   .padding(20)
 }
@@ -199,6 +214,14 @@ func show(id: Int = 1, _ modify: (inout ShowData) -> Void = { _ in }) -> ShowDat
         $0.durationSeconds = 2700
         $0.progress = 1080.0
         $0.isPlaying = true
+      })
+    }
+
+    HStack {
+      Text("Downloading:")
+      Spacer()
+      PlayBubble(episode: episode {
+        $0.downloadState = .downloading
       })
     }
   }

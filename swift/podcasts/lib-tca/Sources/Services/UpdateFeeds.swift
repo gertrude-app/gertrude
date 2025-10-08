@@ -38,7 +38,7 @@ func updateFeeds(showIds: [Show.ID]? = nil) async -> [Episode] {
 }
 
 func prepareFeedUpdateInputData(showIds: [Show.ID]? = nil) async -> FeedUpdateInputData {
-  @Dependency(\.defaultDatabase) var db
+  @Dependency(\.db) var db
   @Dependency(\.date) var date
   @Dependency(\.podcasts) var podcasts
   @Fetch(NowPlaying()) var nowPlaying: NowPlaying.Value = nil
@@ -150,7 +150,7 @@ func feedUpdates(input: FeedUpdateInputData) -> FeedUpdates {
 
 func performFeedUpdates(_ updates: FeedUpdates) async -> [Episode] {
   guard !updates.isEmpty else { return [] }
-  @Dependency(\.defaultDatabase) var database
+  @Dependency(\.db) var database
   @Dependency(\.podcasts) var podcasts
 
   if !updates.deleteEpisodes.isEmpty {

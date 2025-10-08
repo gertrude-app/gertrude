@@ -115,7 +115,7 @@ extension EpisodeData {
   }
 
   init(nowPlaying: NowPlaying.Data) {
-    self.init(from: nowPlaying.episode, isPlaying: nowPlaying.state.isPlaying)
+    self.init(from: nowPlaying.episode, isPlaying: nowPlaying.isPlaying)
   }
 }
 

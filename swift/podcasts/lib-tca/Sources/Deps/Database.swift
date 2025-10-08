@@ -26,9 +26,15 @@ extension DatabaseReader {
       try Show.find(id).fetchOne(db)
     }
   }
+
+  func nowPlaying() -> NowPlaying.Data? {
+    self.tryRead { db in
+      try NowPlaying().fetch(db)
+    }
+  }
 }
 
-public extension DatabaseWriter {
+extension DatabaseWriter {
   func tryWrite<T>(_ updates: (Database) throws -> T) -> T {
     withErrorReporting { try self.write { try updates($0) } }!
   }
@@ -42,7 +48,9 @@ public extension DatabaseWriter {
   }
 }
 
-public func appDatabase() throws -> any DatabaseWriter {
+public func appDatabase(
+  beforeTriggersHook: ((Database) throws -> Void)? = nil
+) throws -> any DatabaseWriter {
   @Dependency(\.context) var context
   let database: any DatabaseWriter
   var configuration = Configuration()
@@ -54,12 +62,10 @@ public func appDatabase() throws -> any DatabaseWriter {
     db.add(function: .init("nowPlayingUpdate", argumentCount: 4, pure: false) { args in
       let oldEpisodeId = Int.fromDatabaseValue(args[0]).flatMap { Episode.ID(rawValue: $0) }
       let newEpisodeId = Int.fromDatabaseValue(args[2]).flatMap { Episode.ID(rawValue: $0) }
-      let oldState = String.fromDatabaseValue(args[1])
-        .flatMap { try? JSON.decode($0, as: NowPlaying.State.self) }
-      let newState = String.fromDatabaseValue(args[3])
-        .flatMap { try? JSON.decode($0, as: NowPlaying.State.self) }
+      let oldWasPlaying = Bool.fromDatabaseValue(args[1])
+      let newIsPlaying = Bool.fromDatabaseValue(args[3])
       Task {
-        try await NowPlaying.dispatchUpdate(oldEpisodeId, oldState, newEpisodeId, newState)
+        try await NowPlaying.dispatchUpdate(oldEpisodeId, oldWasPlaying, newEpisodeId, newIsPlaying)
       }
       return nil
     })
@@ -79,95 +85,47 @@ public func appDatabase() throws -> any DatabaseWriter {
   #if DEBUG
     migrator.eraseDatabaseOnSchemaChange = true
   #endif
-  migrator.registerMigration("pre-release") { db in
-    try #sql(
-      """
-       CREATE TABLE shows (
-         id INTEGER PRIMARY KEY NOT NULL,
-         name TEXT NOT NULL,
-         author TEXT,
-         description TEXT,
-         feedUrl TEXT NOT NULL UNIQUE,
-         websiteUrl TEXT,
-         artworkUrl TEXT,
-         showArtwork INTEGER NOT NULL CHECK (showArtwork IN (0, 1)),
-         iTunesId INTEGER,
-         updatedAt TEXT NOT NULL,
-         createdAt TEXT NOT NULL
-       ) STRICT;
-      """
-    ).execute(db)
-    try #sql(
-      """
-       CREATE TABLE episodes (
-         id INTEGER PRIMARY KEY NOT NULL,
-         showId INTEGER NOT NULL,
-         episodeNumber INTEGER,
-         title TEXT NOT NULL,
-         description TEXT,
-         websiteUrl TEXT,
-         audioUrl TEXT NOT NULL,
-         artworkUrl TEXT,
-         duration INTEGER,
-         sizeInBytes INTEGER NOT NULL,
-         audioType TEXT NOT NULL CHECK (audioType IN ('audio/mpeg', 'audio/x-m4a')),
-         guid TEXT NOT NULL,
-         pubDate TEXT NOT NULL,
-         progress REAL NOT NULL DEFAULT 0.0,
-         lastPlayedAt TEXT,
-         completedAt TEXT,
-         downloadedAt TEXT,
-         updatedAt TEXT NOT NULL,
-         createdAt TEXT NOT NULL,
-         FOREIGN KEY (showId) REFERENCES shows (id) ON DELETE CASCADE
-       ) STRICT;
-      """
-    ).execute(db)
-    try #sql(
-      """
-      CREATE TABLE miscs (
-        id TEXT PRIMARY KEY NOT NULL,
-        value TEXT NOT NULL,
-        rowId INTEGER,
-        updatedAt TEXT NOT NULL,
-        createdAt TEXT NOT NULL
-      ) STRICT;
-      """
-    ).execute(db)
-    try #sql(
-      """
-      CREATE TABLE events (
-        id INTEGER PRIMARY KEY,
-        name TEXT NOT NULL,
-        detail TEXT,
-        createdAt TEXT NOT NULL
-      ) STRICT;
-      """
-    ).execute(db)
-    try #sql(
-      """
-      CREATE TABLE pinAttempts (
-        id INTEGER PRIMARY KEY,
-        success INTEGER NOT NULL CHECK (success IN (0, 1)),
-        createdAt TEXT NOT NULL
-      ) STRICT;
-      """
-    ).execute(db)
+
+  migrator.registerMigration("pre-release") {
+    try Migrations.preRelease($0)
+  }
+  migrator.registerMigration("now-playing-singleton") {
+    try Migrations.nowPlayingSingleton($0)
   }
   try migrator.migrate(database)
 
   try database.write { db in
-    // ensure nowPlaying is always paused and minimized on app start, before triggers
-    let state = try JSON.encode(NowPlaying.State(isPlaying: false, minimized: true))
-    try Misc
-      .find(id: .nowPlaying)
-      .update { $0.value = state }
-      .execute(db)
-
+    try alwaysBeforeTriggersCreated(db)
+    try beforeTriggersHook?(db)
     try createDatabaseTriggers(db)
   }
 
   return database
 }
 
+func alwaysBeforeTriggersCreated(_ db: Database) throws {
+  // initialize now playing before triggers
+  try NowPlayingModel
+    .update {
+      $0.isPlaying = false
+      $0.minimized = true
+    }
+    .execute(db)
+
+  // clean up stuck downloads
+  let stuckDownloads = try Episode
+    .where { $0.downloadedAt > #sql("datetime('now', '+100 years')") }
+    .delete()
+    .returning(\.self)
+    .fetchAll(db)
+  stuckDownloads.forEach { $0.removeLocalAudioFile() }
+}
+
 private let logger = Logger(subsystem: "GertiePodcasts", category: "DB")
+
+extension DependencyValues {
+  var db: any DatabaseWriter {
+    get { self[keyPath: \.defaultDatabase] }
+    set { self[keyPath: \.defaultDatabase] = newValue }
+  }
+}

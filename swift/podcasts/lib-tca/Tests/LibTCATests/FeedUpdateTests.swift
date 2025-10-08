@@ -133,7 +133,7 @@ import Testing
       }
     }
   } operation: {
-    @Dependency(\.defaultDatabase) var database
+    @Dependency(\.db) var database
     try await database.write { db in
       try Show
         .insert { [

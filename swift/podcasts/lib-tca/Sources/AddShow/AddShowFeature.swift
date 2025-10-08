@@ -42,7 +42,7 @@ struct AddShowFeature {
   }
 
   @Dependency(\.dismiss) var dismiss
-  @Dependency(\.defaultDatabase) var db
+  @Dependency(\.db) var db
   @Dependency(\.date.now) var now
   @Dependency(\.podcasts) var podcasts
   @Dependency(\.haptics) var haptics
@@ -167,7 +167,7 @@ struct AddShowFeature {
 
 extension Date {
   static func pinLockout() -> Date? {
-    @Dependency(\.defaultDatabase) var db
+    @Dependency(\.db) var db
     @Dependency(\.date.now) var now
 
     let attempts: [Date] = withErrorReporting {
@@ -185,7 +185,6 @@ extension Date {
       return nil
     }
 
-    print(attempts, last, now, attempts.count)
     // 5 minute lockout for 5-10 failed attempts, 20 minute lockout for more than 10
     let lockout = last.addingTimeInterval(60 * 5 * (attempts.count > 10 ? 4 : 1))
     return lockout > now ? lockout : nil

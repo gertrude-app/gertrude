@@ -37,35 +37,32 @@ private func episodeLastPlayedAt(_ db: Database) throws {
     .execute(db)
 }
 
-/// observe special nowPlaying misc row, call swift callback
+/// observe special nowPlaying row, call swift callback
 private func dispatchNowPlayingUpdates(_ db: Database) throws {
-  try Misc
-    .createTemporaryTrigger(after: .update {
-      ($0.value, $0.rowId)
-    } forEachRow: {
-      #sql("SELECT nowPlayingUpdate(\($0.rowId), \($0.value), \($1.rowId), \($1.value))")
-    } when: { old, _ in
-      old.id == Misc.ID.nowPlaying
-    })
+  try NowPlayingModel
+    .createTemporaryTrigger(
+      after: .update { ($0.episodeId, $0.isPlaying) }
+        forEachRow: {
+          #sql(
+            "SELECT nowPlayingUpdate(\($0.episodeId), \($0.isPlaying), \($1.episodeId), \($1.isPlaying))"
+          )
+        }
+    )
     .execute(db)
-  try Misc
+  try NowPlayingModel
     .createTemporaryTrigger(after: .delete {
-      #sql("SELECT nowPlayingUpdate(\($0.rowId), \($0.value), NULL, NULL)")
-    } when: {
-      $0.id == Misc.ID.nowPlaying
+      #sql("SELECT nowPlayingUpdate(\($0.episodeId), \($0.isPlaying), NULL, NULL)")
     })
     .execute(db)
-  try Misc
+  try NowPlayingModel
     .createTemporaryTrigger(after: .insert {
-      #sql("SELECT nowPlayingUpdate(NULL, NULL, \($0.rowId), \($0.value))")
-    } when: {
-      $0.id == Misc.ID.nowPlaying
+      #sql("SELECT nowPlayingUpdate(NULL, NULL, \($0.episodeId), \($0.isPlaying))")
     })
     .execute(db)
 }
 
 private func touchUpdatedAtCols(_ db: Database) throws {
-  try Misc
+  try NowPlayingModel
     .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
     .execute(db)
   try Episode

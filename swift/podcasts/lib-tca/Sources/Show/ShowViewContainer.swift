@@ -12,7 +12,7 @@ struct ShowViewContainer: View {
       show: .init(from: self.store.show),
       episodes: self.store.episodes.map { .init(
         from: $0,
-        isPlaying: self.nowPlaying?.isPlaying(episodeId: $0.id) ?? false,
+        isPlaying: self.nowPlaying.isPlaying(episodeId: $0.id),
       ) }
     ) { episodeId, event in
       self.store.send(.episodeView(.init(episodeId), event))

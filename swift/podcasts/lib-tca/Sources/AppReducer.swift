@@ -4,12 +4,13 @@ import LibCore
 import SQLiteData
 
 @Reducer
-struct AppReducer: Sendable, Downloader {
+struct AppReducer: Sendable {
   @ObservableState
   struct State: Equatable {
     @Presents var mode: Mode.State?
     var nowPlaying = NowPlayingFeature.State()
     @Shared(.appInForeground) var appInForeground
+    @Presents var alert: AlertState<AlertAction>?
   }
 
   @Reducer(state: .equatable, action: .equatable)
@@ -23,12 +24,16 @@ struct AppReducer: Sendable, Downloader {
     case appInForegroundChanged(Bool)
     case nowPlaying(NowPlayingFeature.Action)
     case mode(PresentationAction<Mode.Action>)
+    case alert(PresentationAction<AlertAction>)
   }
 
-  @Dependency(\.defaultDatabase) var database
+  enum AlertAction: Equatable {
+    case dismiss
+  }
+
+  @Dependency(\.db) var database
   @Dependency(\.passcode) var passcode
-  @Dependency(\.podcasts) var podcasts
-  @Dependency(\.audioPlayer) var audio
+  @Dependency(\.audio) var audio
   @Dependency(\.mainQueue) var mainQueue
   @Dependency(\.date) var date
   @Dependency(\.notificationCenter) var notificationCenter
@@ -91,9 +96,20 @@ struct AppReducer: Sendable, Downloader {
                let show
              ))))):
           return .send(.nowPlaying(.episodePlayPauseTapped(episode, show)))
+        case .delegate(.error(let message)):
+          state.alert = .init { TextState(message) }
+          return .none
         default:
           return .none
         }
+      case .alert(.presented(.dismiss)):
+        state.alert = nil
+        return .none
+      case .nowPlaying(.delegate(.error(let message))):
+        state.alert = .init { TextState(message) }
+        return .none
+      case .alert:
+        return .none
       case .nowPlaying:
         return .none
       case .mode:
@@ -101,6 +117,7 @@ struct AppReducer: Sendable, Downloader {
       }
     }
     .ifLet(\.$mode, action: \.mode)
+    .ifLet(\.$alert, action: \.alert)
   }
 
   func autoPruneDownloads(_ nowPlaying: Episode.ID?) {

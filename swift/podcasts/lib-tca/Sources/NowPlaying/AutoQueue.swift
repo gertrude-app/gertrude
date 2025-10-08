@@ -10,7 +10,7 @@ enum AutoQueue {
       return nil
     }
 
-    @Dependency(\.defaultDatabase) var database
+    @Dependency(\.db) var database
     return database.episodeWithShow(episode.id)
   }
 
@@ -25,8 +25,7 @@ enum AutoQueue {
       return
     }
 
-    let downloader = DownloadDeps()
-    await downloader.trackedDownload(episode: next)
+    _ = await trackedDownload(episode: next)
   }
 
   static func episodeQueue(after nowPlaying: NowPlaying.Data) -> [Episode] {
@@ -46,7 +45,7 @@ enum AutoQueue {
     }
 
     // finally, just queue up unplayed episodes from any show
-    @Dependency(\.defaultDatabase) var database
+    @Dependency(\.db) var database
     return database.tryRead { db in
       try Episode
         .where { $0.lastPlayedAt.is(nil) }
@@ -56,7 +55,7 @@ enum AutoQueue {
   }
 
   static func episodeQueue(within show: Show.ID, after episode: Episode) -> [Episode] {
-    @Dependency(\.defaultDatabase) var database
+    @Dependency(\.db) var database
     let episodes: [Episode] = database.tryRead { db in
       let newerEpisodes = try Episode
         .where { $0.showId.eq(show) }
@@ -78,7 +77,7 @@ enum AutoQueue {
   }
 
   static func mostRecentlyListenedEpisodePerShow(excluding show: Show) -> [Episode] {
-    @Dependency(\.defaultDatabase) var database
+    @Dependency(\.db) var database
     let episodes: [Episode] = database.tryRead { db in
       try #sql(
         """
@@ -106,10 +105,4 @@ enum AutoQueue {
     }
     return episodes
   }
-}
-
-private struct DownloadDeps: Downloader {
-  @Dependency(\.defaultDatabase) var database
-  @Dependency(\.date) var date
-  @Dependency(\.podcasts) var podcasts
 }

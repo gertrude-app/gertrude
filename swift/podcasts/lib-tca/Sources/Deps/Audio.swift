@@ -379,7 +379,7 @@ extension Mutex<AVPlayerData?> {
 }
 
 extension DependencyValues {
-  var audioPlayer: AudioPlayer {
+  var audio: AudioPlayer {
     get { self[AudioPlayer.self] }
     set { self[AudioPlayer.self] = newValue }
   }

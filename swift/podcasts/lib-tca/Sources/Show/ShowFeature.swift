@@ -4,7 +4,7 @@ import SQLiteData
 import SwiftUI
 
 @Reducer
-struct ShowFeature: Downloader {
+struct ShowFeature {
   @ObservableState
   struct State: Equatable {
     var showId: Show.ID
@@ -21,16 +21,13 @@ struct ShowFeature: Downloader {
   enum Action: Equatable {
     enum DelegateAction: Equatable {
       case episodePlayPauseTapped(Episode, Show)
+      case error(String)
     }
 
     case episodeView(Episode.ID, EpisodeView.Event)
     case delegate(DelegateAction)
     case destination(PresentationAction<Destination.Action>)
   }
-
-  @Dependency(\.defaultDatabase) var database
-  @Dependency(\.podcasts) var podcasts
-  @Dependency(\.date) var date
 
   var body: some ReducerOf<Self> {
     Reduce { state, action in
@@ -42,8 +39,10 @@ struct ShowFeature: Downloader {
         }
         switch episodeAction {
         case .downloadTapped:
-          return .run { _ in
-            await self.trackedDownload(episode: episode)
+          return .run { send in
+            if let error = await ensureDownloaded(episode: episode).error {
+              await send(.delegate(.error(error.message)))
+            }
           }
         case .playPauseTapped:
           return .send(.delegate(.episodePlayPauseTapped(episode, state.show)))
