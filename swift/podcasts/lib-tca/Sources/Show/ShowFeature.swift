@@ -29,6 +29,9 @@ struct ShowFeature {
     case destination(PresentationAction<Destination.Action>)
   }
 
+  @Dependency(\.db) var database
+  @Dependency(\.date) var date
+
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
@@ -49,6 +52,25 @@ struct ShowFeature {
         case .episodeTapped:
           state.destination = .episode(.init(episode: episode, show: state.show))
           return .none
+        case .removeDownloadTapped:
+          return .run { _ in
+            episode.removeLocalAudioFile()
+            self.database.tryWrite { db in
+              try Episode
+                .update { $0.downloadedAt = nil }
+                .where { $0.id == episode.id }
+                .execute(db)
+            }
+          }
+        case .toggleCompletedTapped:
+          return .run { _ in
+            self.database.tryWrite { db in
+              try Episode
+                .update { $0.completedAt = episode.completedAt == nil ? self.date.now : nil }
+                .where { $0.id == episode.id }
+                .execute(db)
+            }
+          }
         }
       case .destination:
         return .none

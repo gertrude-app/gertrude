@@ -8,6 +8,8 @@ public struct EpisodeView: View {
     case playPauseTapped
     case downloadTapped
     case episodeTapped
+    case removeDownloadTapped
+    case toggleCompletedTapped
   }
 
   let episode: EpisodeData
@@ -54,31 +56,68 @@ public struct EpisodeView: View {
 
         Spacer()
 
-        switch self.episode.downloadState {
-        case .notDownloaded, .downloaded:
-          Button {
-            self.emit(.downloadTapped)
-          } label: {
-            Image(
-              systemName: self.episode
-                .downloadState == .downloaded ? "arrow.down.circle.fill" : "arrow.down.circle"
-            )
-            .font(.system(size: 12, weight: .medium))
-            .foregroundStyle(Color(self.cs, light: .violet400, dark: .violet400))
-            .padding(.bottom, 2)
-          }
-        case .downloading:
-          Image(systemName: "arrow.2.circlepath")
-            .font(.system(size: 11, weight: .medium))
-            .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-            .rotationEffect(.degrees(self.rotationAngle))
-            .onAppear {
-              withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
-                self.rotationAngle = 360
-              }
+        HStack(alignment: .center, spacing: 9) {
+          switch self.episode.downloadState {
+          case .notDownloaded, .downloaded:
+            Button {
+              self.emit(.downloadTapped)
+            } label: {
+              Image(
+                systemName: self.episode
+                  .downloadState == .downloaded ? "arrow.down.circle.fill" : "arrow.down.circle"
+              )
+              .font(.system(size: 13, weight: .medium))
+              .foregroundStyle(Color(self.cs, light: .violet400, dark: .violet400))
             }
-            .padding(.bottom, 2)
+          case .downloading:
+            Image(systemName: "arrow.2.circlepath")
+              .font(.system(size: 12, weight: .medium))
+              .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+              .rotationEffect(.degrees(self.rotationAngle))
+              .onAppear {
+                withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
+                  self.rotationAngle = 360
+                }
+              }
+          }
+
+          Menu {
+            if self.episode.downloadState == .downloaded {
+              Button(role: .destructive) {
+                self.emit(.removeDownloadTapped)
+              } label: {
+                Label("Remove download", systemImage: "trash")
+              }
+              .tint(.red)
+            } else {
+              Button {
+                self.emit(.downloadTapped)
+              } label: {
+                Label("Download episode", systemImage: "arrow.down.circle")
+              }
+              .tint(.primary)
+            }
+
+            Button {
+              self.emit(.toggleCompletedTapped)
+            } label: {
+              Label(
+                self.episode.isCompleted ? "Mark as unplayed" : "Mark as played",
+                systemImage: self.episode.isCompleted ? "arrow.counterclockwise" : "arrow.clockwise"
+              )
+            }
+            .tint(.primary)
+          } label: {
+            Image(systemName: "ellipsis")
+              .font(.system(size: 14, weight: .heavy))
+              .foregroundStyle(Color(self.cs, light: .violet400, dark: .violet400))
+              .padding(12)
+              .opacity(0.8)
+          }
+          .offset(x: -4)
+          .buttonStyle(.plain)
         }
+        .offset(x: 8, y: 5)
       }
       .padding(.top, 4)
     }
