@@ -37,14 +37,6 @@ public struct ShowView: View {
     self.onEvent = onEvent
   }
 
-  var newestFirstLabel: String {
-    self.sortNewestToOldest ? "✓  Sort newest first" : "     Sort newest first"
-  }
-
-  var oldestFirstLabel: String {
-    self.sortNewestToOldest ? "     Sort oldest first" : "✓  Sort oldest first"
-  }
-
   public var body: some View {
     List {
       self.showHeader
@@ -70,7 +62,6 @@ public struct ShowView: View {
               Text(episode.isArchived ? "Unarchive" : "Archive")
                 .font(.system(size: 10))
             }
-            .padding(.horizontal, 6)
           }
           .tint(.blue)
 
@@ -86,7 +77,6 @@ public struct ShowView: View {
                     .font(.system(size: 10, weight: .thin))
                     .multilineTextAlignment(.center)
                 }
-                .padding(.horizontal, 6)
               }
               .tint(.red)
             } else if episode.downloadState == .notDownloaded {
@@ -99,7 +89,6 @@ public struct ShowView: View {
                   Text("Download")
                     .font(.system(size: 10))
                 }
-                .padding(.horizontal, 6)
               }
               .tint(Color(self.cs, light: .violet600, dark: .violet400))
             }
@@ -116,27 +105,28 @@ public struct ShowView: View {
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
         Menu {
-          Button {
-            self.onEvent(.sortNewestToOldest)
-          } label: {
-            Label(self.newestFirstLabel, systemImage: "arrow.up")
+          Picker("Sort Order", selection: Binding(
+            get: { self.sortNewestToOldest },
+            set: { newValue in self.onEvent(newValue ? .sortNewestToOldest : .sortOldestToNewest) }
+          )) {
+            Label("Sort newest first", systemImage: "arrow.up").tag(true)
+            Label("Sort oldest first", systemImage: "arrow.down").tag(false)
           }
-          Button {
-            self.onEvent(.sortOldestToNewest)
-          } label: {
-            Label(self.oldestFirstLabel, systemImage: "arrow.down")
-          }
+          .pickerStyle(.inline)
+
           if self.episodes.contains(where: \.isArchived) {
             Divider()
-            Button {
-              self.onEvent(.toggleShowArchivedTapped)
-            } label: {
-              Label(self.archivedButtonTitle, systemImage: "archivebox")
+            Toggle(isOn: Binding(
+              get: { self.showArchivedEpisodes },
+              set: { _ in self.onEvent(.toggleShowArchivedTapped) }
+            )) {
+              Label("Show archived (\(self.archivedCount))", systemImage: "archivebox")
             }
+
             Button {
               self.onEvent(.unarchiveAllTapped)
             } label: {
-              Label("     Unarchive all", systemImage: "arrow.2.circlepath")
+              Label("Unarchive all", systemImage: "arrow.2.circlepath")
             }
           }
         } label: {
@@ -152,10 +142,6 @@ public struct ShowView: View {
 
   private var archivedCount: Int {
     self.episodes.filter(\.isArchived).count
-  }
-
-  private var archivedButtonTitle: String {
-    "\(self.showArchivedEpisodes ? "✓" : " ")    Show archived (\(self.archivedCount))"
   }
 
   private var showHeader: some View {
@@ -290,7 +276,7 @@ private let sampleEpisodes = [
       .description =
       "A comprehensive overview of all the new features and improvements in Swift 6.0."
     $0.durationSeconds = 4500
-    $0.downloadState = .downloaded
+    $0.downloadState = .notDownloaded
   },
   episode(id: 5) {
     $0.title = "Concurrency Best Practices"

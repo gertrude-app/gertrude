@@ -39,7 +39,7 @@ public struct EpisodeView: View {
           .multilineTextAlignment(.leading)
           .lineLimit(2)
           .frame(maxWidth: .infinity, alignment: .leading)
-          .opacity(self.episode.isArchived ? 0.9 : 1.0)
+          .opacity(self.episode.isArchived ? 0.8 : 1.0)
       }
 
       if let description = episode.description {
@@ -47,7 +47,7 @@ public struct EpisodeView: View {
           .font(.system(size: 14, weight: .regular))
           .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
           .multilineTextAlignment(.leading)
-          .lineLimit(self.episode.isArchived ? 1 : 3)
+          .lineLimit(3)
           .frame(maxWidth: .infinity, alignment: .leading)
       }
 
@@ -62,10 +62,13 @@ public struct EpisodeView: View {
               .font(.system(size: 12, weight: .medium))
               .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
           }
+          .padding(.top, 21)
+          .padding(.bottom, 4)
         } else {
           PlayBubble(episode: self.episode) {
             self.emit(.playPauseTapped)
           }
+          .transaction { $0.animation = nil }
         }
 
         Spacer()
@@ -84,6 +87,10 @@ public struct EpisodeView: View {
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(Color(self.cs, light: .violet400, dark: .violet400))
               }
+              .buttonStyle(.plain)
+              .padding(12)
+              .contentShape(Rectangle())
+              .offset(x: 12)
             case .downloading:
               Image(systemName: "arrow.2.circlepath")
                 .font(.system(size: 12, weight: .medium))
@@ -94,6 +101,8 @@ public struct EpisodeView: View {
                     self.rotationAngle = 360
                   }
                 }
+                .padding(12)
+                .offset(x: 12)
             }
           }
 
@@ -106,6 +115,7 @@ public struct EpisodeView: View {
                   Label("Remove download", systemImage: "trash")
                 }
                 .tint(.red)
+                .transaction { $0.animation = nil }
               } else {
                 Button {
                   self.emit(.downloadTapped)
@@ -113,6 +123,7 @@ public struct EpisodeView: View {
                   Label("Download episode", systemImage: "arrow.down.circle")
                 }
                 .tint(.primary)
+                .transaction { $0.animation = nil }
               }
 
               Button {
@@ -125,6 +136,7 @@ public struct EpisodeView: View {
                 )
               }
               .tint(.primary)
+              .transaction { $0.animation = nil }
             }
 
             Button {
@@ -145,16 +157,16 @@ public struct EpisodeView: View {
           }
           .offset(x: -4)
           .buttonStyle(.plain)
+          .transaction { $0.animation = nil }
         }
         .offset(x: 8, y: 5)
       }
       .padding(.top, 4)
-      .offset(y: self.episode.isArchived ? -14 : 0)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(.horizontal, 20)
     .padding(.top, 12)
-    .padding(.bottom, self.episode.isArchived ? 4 : 20)
+    .padding(.bottom, 20)
     .contentShape(Rectangle())
     .onTapGesture {
       self.emit(.episodeTapped)
