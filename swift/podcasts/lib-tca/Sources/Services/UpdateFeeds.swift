@@ -216,6 +216,7 @@ extension Show {
       artworkUrl: feedData.artworkUrl,
       showArtwork: self.showArtwork,
       iTunesId: feedData.iTunesId,
+      sort: self.sort,
       updatedAt: self.updatedAt,
       createdAt: self.createdAt,
     )
@@ -237,10 +238,12 @@ extension Episode {
       sizeInBytes: feedData.sizeInBytes,
       audioType: feedData.audioType,
       guid: feedData.guid,
+      isArchived: self.isArchived,
       pubDate: feedData.pubDate,
       progress: self.progress,
       downloadedAt: self.downloadedAt,
       lastPlayedAt: self.lastPlayedAt,
+      completedAt: self.completedAt,
       updatedAt: self.updatedAt,
       createdAt: self.createdAt
     )

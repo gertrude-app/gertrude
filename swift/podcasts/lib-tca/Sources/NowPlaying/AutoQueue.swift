@@ -62,6 +62,7 @@ enum AutoQueue {
         .where { $0.id.neq(episode.id) }
         .where { $0.pubDate.gt(episode.pubDate) }
         .where { $0.progress.lt(2.0) }
+        .where { $0.completedAt.is(nil) }
         .order { $0.pubDate.asc() }
         .fetchAll(db)
       let olderEpisodes = try Episode
@@ -69,6 +70,7 @@ enum AutoQueue {
         .where { $0.id.neq(episode.id) }
         .where { $0.pubDate.lt(episode.pubDate) }
         .where { $0.progress.lt(2.0) }
+        .where { $0.completedAt.is(nil) }
         .order { $0.pubDate.desc() }
         .fetchAll(db)
       return newerEpisodes + olderEpisodes
@@ -79,29 +81,19 @@ enum AutoQueue {
   static func mostRecentlyListenedEpisodePerShow(excluding show: Show) -> [Episode] {
     @Dependency(\.db) var database
     let episodes: [Episode] = database.tryRead { db in
-      try #sql(
-        """
-        SELECT *
-        FROM \(Episode.self)
-        INNER JOIN (
-          SELECT 
-            \(Episode.col.showId),
-            MAX(\(Episode.col.lastPlayedAt)) as mostRecentPlay
-          FROM \(Episode.self)
-          WHERE
-            \(Episode.col.lastPlayedAt) IS NOT NULL
-              AND
-            \(Episode.col.showId) != \(raw: show.id)
-          GROUP BY \(Episode.col.showId)
-        ) recent ON
-          \(Episode.col.showId) = recent.\(raw: Episode.col.showId.name)
-            AND
-          \(Episode.col.lastPlayedAt) = recent.mostRecentPlay
-        ORDER BY \(Episode.col.lastPlayedAt) DESC
-        """,
-        as: Episode.self
-      )
-      .fetchAll(db)
+      try Episode
+        .where {
+          $0.showId.neq(show.id) && $0.lastPlayedAt.is(#sql(
+            """
+            (SELECT MAX(\(raw: Episode.col.lastPlayedAt.name))
+             FROM \(Episode.self) e2
+             WHERE e2.\(raw: Episode.col.showId.name) = \(Episode.col.showId)
+               AND e2.\(raw: Episode.col.lastPlayedAt.name) IS NOT NULL)
+            """
+          ))
+        }
+        .order { $0.lastPlayedAt.desc() }
+        .fetchAll(db)
     }
     return episodes
   }

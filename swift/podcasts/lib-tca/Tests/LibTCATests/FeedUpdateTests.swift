@@ -218,6 +218,7 @@ extension Show {
       artworkUrl: "https://mock\(id).com/artwork.jpg",
       showArtwork: true,
       iTunesId: 123_456_789,
+      sort: .newestToOldest,
       updatedAt: .reference,
       createdAt: .reference,
     )
@@ -243,6 +244,7 @@ extension Episode {
       sizeInBytes: 50_000_000,
       audioType: .mp3,
       guid: "e\(id)-s\(showId)",
+      isArchived: false,
       pubDate: .reference,
       progress: 0,
       updatedAt: .reference,
@@ -292,7 +294,12 @@ extension Episode.Draft {
       sizeInBytes: episode.sizeInBytes,
       audioType: episode.audioType,
       guid: episode.guid,
+      isArchived: episode.isArchived,
       pubDate: episode.pubDate,
+      progress: episode.progress,
+      downloadedAt: episode.downloadedAt,
+      lastPlayedAt: episode.lastPlayedAt,
+      completedAt: episode.completedAt,
       updatedAt: .reference,
       createdAt: .reference
     )

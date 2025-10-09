@@ -76,7 +76,7 @@ public struct PlayBubble: View {
       .padding(.horizontal, 11)
       .padding(.vertical, 6)
       .background(
-        Color(self.cs, light: .violet100, dark: .violet900.opacity(0.3))
+        Color(self.cs, light: .violet100, dark: .violet900.opacity(0.5))
       )
       .cornerRadius(16)
     }
@@ -92,7 +92,8 @@ func episode(id: Int = 1, _ modify: (inout EpisodeData) -> Void = { _ in }) -> E
     progress: 0.0,
     downloadState: .downloaded,
     pubDate: Date(),
-    isPlaying: false
+    isPlaying: false,
+    isArchived: false,
   )
   modify(&episode)
   return episode

@@ -17,11 +17,17 @@ struct Show: Equatable, Hashable {
   var artworkUrl: String?
   var showArtwork: Bool
   var iTunesId: Int?
+  var sort: SortOrder
   var updatedAt: Date = .init()
   var createdAt: Date
 }
 
 extension Show {
+  enum SortOrder: String, QueryBindable {
+    case oldestToNewest
+    case newestToOldest
+  }
+
   var localFilesDir: URL {
     .localFilesDir(showId: self.id)
   }
@@ -82,6 +88,7 @@ extension Show {
         artworkUrl: self.artworkUrl,
         showArtwork: showArtwork,
         iTunesId: self.iTunesId,
+        sort: .newestToOldest,
         createdAt: now
       )
     }
@@ -114,6 +121,7 @@ extension Show {
       feedUrl: "",
       artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
       showArtwork: true,
+      sort: .newestToOldest,
       createdAt: Date()
     )
   }

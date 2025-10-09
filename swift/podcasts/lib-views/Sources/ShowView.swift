@@ -1,20 +1,47 @@
 import SwiftUI
 
+#if !canImport(UIKit)
+  import LibCore
+#endif
+
 public struct ShowView: View {
   @Environment(\.colorScheme) var cs
 
+  public enum Event: Equatable, Sendable {
+    case sortOldestToNewest
+    case sortNewestToOldest
+    case toggleShowArchivedTapped
+  }
+
   let show: ShowData
   let episodes: [EpisodeData]
+  let showArchivedEpisodes: Bool
+  let sortNewestToOldest: Bool
   let onEpisodeEvent: @MainActor @Sendable (Int, EpisodeView.Event) -> Void
+  let onEvent: @MainActor @Sendable (Event) -> Void
 
   public init(
     show: ShowData,
     episodes: [EpisodeData] = [],
-    onEpisodeEvent: @MainActor @Sendable @escaping (Int, EpisodeView.Event) -> Void = { _, _ in }
+    showArchivedEpisodes: Bool = false,
+    sortNewestToOldest: Bool = true,
+    onEpisodeEvent: @MainActor @Sendable @escaping (Int, EpisodeView.Event) -> Void = { _, _ in },
+    onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in }
   ) {
     self.show = show
     self.episodes = episodes
+    self.showArchivedEpisodes = showArchivedEpisodes
+    self.sortNewestToOldest = sortNewestToOldest
     self.onEpisodeEvent = onEpisodeEvent
+    self.onEvent = onEvent
+  }
+
+  var newestFirstLabel: String {
+    self.sortNewestToOldest ? "✓  Sort newest first" : "     Sort newest first"
+  }
+
+  var oldestFirstLabel: String {
+    self.sortNewestToOldest ? "     Sort oldest first" : "✓  Sort oldest first"
   }
 
   public var body: some View {
@@ -31,6 +58,44 @@ public struct ShowView: View {
       Color(self.cs, light: .violet100, dark: .violet900)
         .ignoresSafeArea(.all)
     )
+    .toolbar {
+      ToolbarItem(placement: .navigationBarTrailing) {
+        Menu {
+          Button {
+            self.onEvent(.sortNewestToOldest)
+          } label: {
+            Label(self.newestFirstLabel, systemImage: "arrow.up")
+          }
+          Button {
+            self.onEvent(.sortOldestToNewest)
+          } label: {
+            Label(self.oldestFirstLabel, systemImage: "arrow.down")
+          }
+          if self.episodes.contains(where: \.isArchived) {
+            Divider()
+            Button {
+              self.onEvent(.toggleShowArchivedTapped)
+            } label: {
+              Label(self.archivedButtonTitle, systemImage: "archivebox")
+            }
+          }
+        } label: {
+          Text("•••")
+            .font(.system(size: 14, weight: .bold))
+            .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet400))
+            .padding(.trailing, 8)
+            .opacity(0.9)
+        }
+      }
+    }
+  }
+
+  private var archivedCount: Int {
+    self.episodes.filter(\.isArchived).count
+  }
+
+  private var archivedButtonTitle: String {
+    "\(self.showArchivedEpisodes ? "✓" : " ")   Show archived (\(self.archivedCount))"
   }
 
   private var showHeader: some View {
@@ -77,7 +142,7 @@ public struct ShowView: View {
 
   private var episodesList: some View {
     LazyVStack(spacing: 1) {
-      ForEach(self.episodes) { episode in
+      ForEach(self.episodes.filter { !$0.isArchived || self.showArchivedEpisodes }) { episode in
         EpisodeView(episode: episode) { event in
           self.onEpisodeEvent(episode.id, event)
         }
@@ -89,32 +154,38 @@ public struct ShowView: View {
 }
 
 #Preview("Show View - Light") {
-  ShowView(
-    show: ShowData(
-      id: 1,
-      name: "The Ancient Path",
-      author: "Jason Henderson",
-      description: "A podcast about walking in the ancient paths of biblical wisdom and truth. Join us as we explore the timeless principles that guide us in righteousness.",
-      showArtwork: true,
-      artworkUrl: .ancientPath
-    ),
-    episodes: sampleEpisodes
-  )
+  NavigationView {
+    ShowView(
+      show: ShowData(
+        id: 1,
+        name: "The Ancient Path",
+        author: "Jason Henderson",
+        description: "A podcast about walking in the ancient paths of biblical wisdom and truth. Join us as we explore the timeless principles that guide us in righteousness.",
+        showArtwork: true,
+        artworkUrl: .ancientPath
+      ),
+      episodes: sampleEpisodes,
+      showArchivedEpisodes: true,
+    )
+  }
 }
 
 #Preview("Show View - Dark") {
-  ShowView(
-    show: ShowData(
-      id: 1,
-      name: "The Ancient Path",
-      author: "Jason Henderson",
-      description: "A podcast about walking in the ancient paths of biblical wisdom and truth. Join us as we explore the timeless principles that guide us in righteousness.",
-      showArtwork: true,
-      artworkUrl: .ancientPath
-    ),
-    episodes: sampleEpisodes
-  )
-  .preferredColorScheme(.dark)
+  NavigationView {
+    ShowView(
+      show: ShowData(
+        id: 1,
+        name: "The Ancient Path",
+        author: "Jason Henderson",
+        description: "A podcast about walking in the ancient paths of biblical wisdom and truth. Join us as we explore the timeless principles that guide us in righteousness.",
+        showArtwork: true,
+        artworkUrl: .ancientPath
+      ),
+      episodes: sampleEpisodes,
+      showArchivedEpisodes: true,
+    )
+    .preferredColorScheme(.dark)
+  }
 }
 
 #Preview("Show View - No Episodes") {
@@ -163,6 +234,7 @@ private let sampleEpisodes = [
       .description =
       "It is wisdom, and not legalism, to guard your heart, and to pay attention to what is filling your thoughts, your affections and your time."
     $0.durationSeconds = 2280
+    $0.isArchived = true
   },
   episode(id: 4) {
     $0.title = "Swift 6.0 Release Notes"

@@ -8,6 +8,7 @@ struct ShowFeature {
   @ObservableState
   struct State: Equatable {
     var showId: Show.ID
+    @Shared var showArchivedEpisodes: Bool
     @FetchOne var show: Show
     @FetchAll var episodes: [Episode]
     @Presents var destination: Destination.State?
@@ -25,6 +26,7 @@ struct ShowFeature {
     }
 
     case episodeView(Episode.ID, EpisodeView.Event)
+    case showView(ShowView.Event)
     case delegate(DelegateAction)
     case destination(PresentationAction<Destination.Action>)
   }
@@ -71,6 +73,46 @@ struct ShowFeature {
                 .execute(db)
             }
           }
+        case .toggleArchivedTapped:
+          return .run { [state] _ in
+            if !episode.isArchived {
+              episode.removeLocalAudioFile()
+            }
+            self.database.tryWrite { db in
+              try Episode
+                .update {
+                  $0.isArchived.toggle()
+                  $0.downloadedAt = nil
+                  $0.progress = 0
+                  $0.completedAt = nil
+                }
+                .where { $0.id == episode.id }
+                .execute(db)
+            }
+            try await state.$episodes.load(state.selectEpisodes, animation: .default)
+          }
+        }
+      case .showView(let event):
+        switch event {
+        case .sortOldestToNewest, .sortNewestToOldest:
+          return .run { [state] _ in
+            let sortOrder: Show.SortOrder = event == .sortNewestToOldest
+              ? .newestToOldest : .oldestToNewest
+            self.database.tryWrite { db in
+              try Show
+                .update { $0.sort = sortOrder }
+                .where { $0.id == state.showId }
+                .execute(db)
+            }
+            try await state.$episodes.load(
+              episodeQuery(showId: state.showId, sortOrder: sortOrder),
+            )
+          }
+        case .toggleShowArchivedTapped:
+          withAnimation(.default) {
+            state.$showArchivedEpisodes.withLock { $0.toggle() }
+          }
+          return .none
         }
       case .destination:
         return .none
@@ -82,17 +124,40 @@ struct ShowFeature {
   }
 }
 
+func episodeQuery(
+  showId: Show.ID,
+  sortOrder: Show.SortOrder,
+) -> some SelectStatementOf<Episode> {
+  Episode
+    .where { $0.showId == showId }
+    .order {
+      switch sortOrder {
+      case .newestToOldest:
+        ($0.pubDate.desc(), $0.episodeNumber.desc())
+      case .oldestToNewest:
+        ($0.pubDate.asc(), $0.episodeNumber.asc())
+      }
+    }
+}
+
 extension ShowFeature.State {
+  var selectEpisodes: some SelectStatementOf<Episode> {
+    episodeQuery(showId: self.showId, sortOrder: self.show.sort)
+  }
+
   init(show: Show) {
     self.showId = show.id
+    self._showArchivedEpisodes = Shared(
+      wrappedValue: false,
+      .inMemory("show-archived-\(show.id)")
+    )
     self._show = FetchOne(
       wrappedValue: show,
       Show.where { $0.id == show.id }
     )
     self._episodes = FetchAll(
-      Episode
-        .where { $0.showId == show.id }
-        .order { ($0.episodeNumber.desc(), $0.pubDate.desc()) }
+      episodeQuery(showId: show.id, sortOrder: show.sort),
+      animation: .default
     )
   }
 }

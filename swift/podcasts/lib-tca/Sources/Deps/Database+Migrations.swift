@@ -1,6 +1,23 @@
 import SQLiteData
 
 enum Migrations {
+  @Sendable static func m2025_10_08(_ db: Database) throws {
+    try #sql(
+      """
+      ALTER TABLE episodes
+      ADD COLUMN isArchived INTEGER NOT NULL
+        CHECK (isArchived IN (0, 1)) DEFAULT 0;
+      """
+    ).execute(db)
+    try #sql(
+      """
+      ALTER TABLE shows
+      ADD COLUMN sort TEXT NOT NULL
+        CHECK (sort IN ('newestToOldest', 'oldestToNewest')) DEFAULT 'newestToOldest';
+      """
+    ).execute(db)
+  }
+
   @Sendable static func m2025_10_07(_ db: Database) throws {
     try #sql(
       """

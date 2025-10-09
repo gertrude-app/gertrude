@@ -13,10 +13,16 @@ struct ShowViewContainer: View {
       episodes: self.store.episodes.map { .init(
         from: $0,
         isPlaying: self.nowPlaying.isPlaying(episodeId: $0.id),
-      ) }
-    ) { episodeId, event in
-      self.store.send(.episodeView(.init(episodeId), event))
-    }
+      ) },
+      showArchivedEpisodes: self.store.showArchivedEpisodes,
+      sortNewestToOldest: self.store.show.sort == .newestToOldest,
+      onEpisodeEvent: { episodeId, event in
+        self.store.send(.episodeView(.init(episodeId), event))
+      },
+      onEvent: { event in
+        self.store.send(.showView(event))
+      }
+    )
     .navigationDestination(
       item: self.$store.scope(
         state: \.destination?.episode,

@@ -19,11 +19,12 @@ struct Episode: Equatable, Hashable {
   var sizeInBytes: Int
   var audioType: AudioType
   var guid: String
+  var isArchived: Bool
   var pubDate: Date
-  var progress: Double = 0.0
-  var downloadedAt: Date? = nil
-  var lastPlayedAt: Date? = nil
-  var completedAt: Date? = nil
+  var progress: Double
+  var downloadedAt: Date?
+  var lastPlayedAt: Date?
+  var completedAt: Date?
   var updatedAt: Date = .init()
   var createdAt: Date
 }
@@ -88,7 +89,12 @@ extension Episode {
         sizeInBytes: self.sizeInBytes,
         audioType: self.audioType,
         guid: self.guid,
+        isArchived: false,
         pubDate: self.pubDate,
+        progress: 0.0,
+        downloadedAt: nil,
+        lastPlayedAt: nil,
+        completedAt: nil,
         updatedAt: now,
         createdAt: now,
       )
@@ -110,7 +116,8 @@ extension EpisodeData {
         : episode.downloading ? .downloading : .notDownloaded,
       pubDate: episode.pubDate,
       isCompleted: episode.completedAt != nil,
-      isPlaying: isPlaying
+      isPlaying: isPlaying,
+      isArchived: episode.isArchived,
     )
   }
 
@@ -131,6 +138,7 @@ extension Episode {
       sizeInBytes: 50_000_000,
       audioType: .mp3,
       guid: "episode-1-guid",
+      isArchived: false,
       pubDate: Date(),
       progress: 0.5,
       updatedAt: Date(),

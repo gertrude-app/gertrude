@@ -17,6 +17,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
   public var pubDate: Date
   public var isCompleted: Bool
   public var isPlaying: Bool
+  public var isArchived: Bool
 
   public init(
     id: Int,
@@ -28,7 +29,8 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
     downloadState: DownloadState = .notDownloaded,
     pubDate: Date,
     isCompleted: Bool = false,
-    isPlaying: Bool = false
+    isPlaying: Bool = false,
+    isArchived: Bool
   ) {
     self.id = id
     self.title = title
@@ -40,6 +42,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
     self.pubDate = pubDate
     self.isCompleted = isCompleted
     self.isPlaying = isPlaying
+    self.isArchived = isArchived
   }
 }
 
