@@ -113,6 +113,16 @@ struct ShowFeature {
             state.$showArchivedEpisodes.withLock { $0.toggle() }
           }
           return .none
+        case .unarchiveAllTapped:
+          return .run { [state] _ in
+            self.database.tryWrite { db in
+              try Episode
+                .update { $0.isArchived = false }
+                .where { $0.showId == state.showId }
+                .execute(db)
+            }
+            try await state.$episodes.load(state.selectEpisodes, animation: .default)
+          }
         }
       case .destination:
         return .none

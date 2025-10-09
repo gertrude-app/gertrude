@@ -11,6 +11,7 @@ public struct ShowView: View {
     case sortOldestToNewest
     case sortNewestToOldest
     case toggleShowArchivedTapped
+    case unarchiveAllTapped
   }
 
   let show: ShowData
@@ -78,12 +79,17 @@ public struct ShowView: View {
             } label: {
               Label(self.archivedButtonTitle, systemImage: "archivebox")
             }
+            Button {
+              self.onEvent(.unarchiveAllTapped)
+            } label: {
+              Label("     Unarchive all", systemImage: "arrow.2.circlepath")
+            }
           }
         } label: {
           Text("•••")
             .font(.system(size: 14, weight: .bold))
             .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet400))
-            .padding(.trailing, 8)
+            .padding(.trailing, 4)
             .opacity(0.9)
         }
       }
@@ -95,7 +101,7 @@ public struct ShowView: View {
   }
 
   private var archivedButtonTitle: String {
-    "\(self.showArchivedEpisodes ? "✓" : " ")   Show archived (\(self.archivedCount))"
+    "\(self.showArchivedEpisodes ? "✓" : " ")    Show archived (\(self.archivedCount))"
   }
 
   private var showHeader: some View {
