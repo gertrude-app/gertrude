@@ -46,19 +46,73 @@ public struct ShowView: View {
   }
 
   public var body: some View {
-    ScrollView {
-      VStack(spacing: 0) {
-        self.showHeader
+    List {
+      self.showHeader
+        .listRowInsets(EdgeInsets())
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
 
-        if !self.episodes.isEmpty {
-          self.episodesList
+      ForEach(self.episodes.filter { !$0.isArchived || self.showArchivedEpisodes }) { episode in
+        EpisodeView(episode: episode) { event in
+          self.onEpisodeEvent(episode.id, event)
+        }
+        .listRowInsets(EdgeInsets())
+        .listRowSeparator(.visible)
+        .listRowSeparatorTint(Color(self.cs, light: .violet200, dark: .violet800))
+        .listRowBackground(Color(self.cs, light: .white, dark: .black))
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+          Button {
+            self.onEpisodeEvent(episode.id, .toggleArchivedTapped)
+          } label: {
+            VStack(spacing: 4) {
+              Image(systemName: "archivebox")
+                .font(.system(size: 14))
+              Text(episode.isArchived ? "Unarchive" : "Archive")
+                .font(.system(size: 10))
+            }
+            .padding(.horizontal, 6)
+          }
+          .tint(.blue)
+
+          if !episode.isArchived {
+            if episode.downloadState == .downloaded {
+              Button {
+                self.onEpisodeEvent(episode.id, .removeDownloadTapped)
+              } label: {
+                VStack(spacing: 4) {
+                  Image(systemName: "trash")
+                    .font(.system(size: 14))
+                  Text("Remove\ndownload")
+                    .font(.system(size: 10, weight: .thin))
+                    .multilineTextAlignment(.center)
+                }
+                .padding(.horizontal, 6)
+              }
+              .tint(.red)
+            } else if episode.downloadState == .notDownloaded {
+              Button {
+                self.onEpisodeEvent(episode.id, .downloadTapped)
+              } label: {
+                VStack(spacing: 4) {
+                  Image(systemName: "arrow.down")
+                    .font(.system(size: 14))
+                  Text("Download")
+                    .font(.system(size: 10))
+                }
+                .padding(.horizontal, 6)
+              }
+              .tint(Color(self.cs, light: .violet600, dark: .violet400))
+            }
+          }
         }
       }
     }
+    .listStyle(.plain)
     .background(
       Color(self.cs, light: .violet100, dark: .violet900)
         .ignoresSafeArea(.all)
     )
+    .scrollContentBackground(.hidden)
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
         Menu {
@@ -144,18 +198,6 @@ public struct ShowView: View {
       artworkUrl: self.show.artworkUrl,
       size: 200
     )
-  }
-
-  private var episodesList: some View {
-    LazyVStack(spacing: 1) {
-      ForEach(self.episodes.filter { !$0.isArchived || self.showArchivedEpisodes }) { episode in
-        EpisodeView(episode: episode) { event in
-          self.onEpisodeEvent(episode.id, event)
-        }
-        .background(Color(self.cs, light: .white, dark: .black))
-      }
-    }
-    .padding(.top, 12)
   }
 }
 
