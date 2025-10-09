@@ -5,8 +5,8 @@ import Security
 
 @DependencyClient
 struct KeychainClient: Sendable {
-  var load: @Sendable (_ key: Key) -> Data?
-  var save: @Sendable (_ key: Key, _ data: Data) -> Void
+  var _load: @Sendable (_ key: Key) -> Data?
+  var _save: @Sendable (_ key: Key, _ data: Data) -> Void
   var delete: @Sendable (_ key: Key) -> Void
 }
 
@@ -15,6 +15,16 @@ extension KeychainClient {
     case pincode
     case installId
     case installDate
+
+    #if !DEBUG
+      var secAttrAccount: String {
+        "gertrude.am.\(self.rawValue)"
+      }
+    #else
+      var secAttrAccount: String {
+        "gertrude.am.\(self.rawValue).dev"
+      }
+    #endif
   }
 }
 
@@ -25,11 +35,11 @@ extension KeychainClient {
 
   func save(installDate: Date) {
     let data = "\(installDate.timeIntervalSince1970)".data(using: .utf8)!
-    self.save(.installDate, data)
+    self._save(.installDate, data)
   }
 
   func loadInstallDate() -> Date? {
-    if let data = self.load(.installDate),
+    if let data = self._load(.installDate),
        let string = String(data: data, encoding: .utf8),
        let timeInterval = TimeInterval(string) {
       Date(timeIntervalSince1970: timeInterval)
@@ -39,7 +49,7 @@ extension KeychainClient {
   }
 
   func loadDeviceId() -> UUID? {
-    if let data = self.load(.installId),
+    if let data = self._load(.installId),
        let string = String(data: data, encoding: .utf8),
        let uuid = UUID(uuidString: string) {
       uuid
@@ -50,11 +60,11 @@ extension KeychainClient {
 
   func save(installId: UUID) {
     let data = installId.uuidString.data(using: .utf8)!
-    self.save(.installId, data)
+    self._save(.installId, data)
   }
 
   func loadPincode() -> Int? {
-    if let data = self.load(.pincode),
+    if let data = self._load(.pincode),
        let string = String(data: data, encoding: .utf8),
        let pincode = Int(string) {
       pincode
@@ -65,17 +75,17 @@ extension KeychainClient {
 
   func save(pincode: Int) {
     let data = "\(pincode)".data(using: .utf8)!
-    self.save(.pincode, data)
+    self._save(.pincode, data)
   }
 }
 
 extension KeychainClient: DependencyKey {
   static var liveValue: KeychainClient {
     .init(
-      load: { key in
+      _load: { key in
         let query: [String: Any] = [
           kSecClass as String: kSecClassGenericPassword,
-          kSecAttrAccount as String: "gertrude.am.\(key.rawValue)",
+          kSecAttrAccount as String: key.secAttrAccount,
           kSecReturnData as String: true,
           kSecMatchLimit as String: kSecMatchLimitOne,
         ]
@@ -87,10 +97,10 @@ extension KeychainClient: DependencyKey {
           return nil
         }
       },
-      save: { key, data in
+      _save: { key, data in
         let query: [String: Any] = [
           kSecClass as String: kSecClassGenericPassword,
-          kSecAttrAccount as String: "gertrude.am.\(key.rawValue)",
+          kSecAttrAccount as String: key.secAttrAccount,
           kSecValueData as String: data,
           kSecAttrAccessible as String: accessibleAttr(),
         ]
@@ -101,7 +111,7 @@ extension KeychainClient: DependencyKey {
       delete: { key in
         let query: [String: Any] = [
           kSecClass as String: kSecClassGenericPassword,
-          kSecAttrAccount as String: "gertrude.am.\(key.rawValue)",
+          kSecAttrAccount as String: key.secAttrAccount,
         ]
         SecItemDelete(query as CFDictionary)
       }
