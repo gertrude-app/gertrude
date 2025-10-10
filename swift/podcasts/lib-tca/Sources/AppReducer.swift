@@ -45,6 +45,9 @@ struct AppReducer: Sendable {
     Reduce { state, action in
       switch action {
       case .appDidLaunch:
+        // TEMP: remove
+        self.keychain.migrateAccessibility()
+
         if self.keychain.isFirstLaunch() {
           let installDate = self.date.now
           self.keychain.save(installDate: installDate)

@@ -77,6 +77,30 @@ extension KeychainClient {
     let data = "\(pincode)".data(using: .utf8)!
     self._save(.pincode, data)
   }
+
+  // TEMP: remove
+  func migrateAccessibility() {
+    let database = dep(\.db)
+    guard let pincode = self.loadPincode() else {
+      database.insertEvent(name: "migrateAccessibility skipped, no pincode")
+      return
+    }
+    let installDate = self.loadInstallDate()
+    let installId = self.loadDeviceId()
+
+    self.delete(.pincode)
+    self.delete(.installDate)
+    self.delete(.installId)
+
+    self.save(pincode: pincode)
+    if let installDate {
+      self.save(installDate: installDate)
+    }
+    if let installId {
+      self.save(installId: installId)
+    }
+    database.insertEvent(name: "migrateAccessibility complete")
+  }
 }
 
 extension KeychainClient: DependencyKey {
@@ -102,7 +126,7 @@ extension KeychainClient: DependencyKey {
           kSecClass as String: kSecClassGenericPassword,
           kSecAttrAccount as String: key.secAttrAccount,
           kSecValueData as String: data,
-          kSecAttrAccessible as String: accessibleAttr(),
+          kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
         ]
         // important to remove old item if exists, prevent error
         SecItemDelete(query as CFDictionary)
@@ -117,14 +141,6 @@ extension KeychainClient: DependencyKey {
       }
     )
   }
-}
-
-private func accessibleAttr() -> CFString {
-  #if DEBUG
-    return kSecAttrAccessibleWhenUnlocked
-  #else
-    return kSecAttrAccessibleAlways
-  #endif
 }
 
 extension DependencyValues {
