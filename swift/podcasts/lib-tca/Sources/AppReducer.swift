@@ -57,8 +57,10 @@ struct AppReducer: Sendable {
 
         if let passcode = self.keychain.loadPincode() {
           state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
+          self.database.insertEvent(name: "appDidLaunch with passcode")
         } else {
           state.mode = .onboarding(OnboardingFeature.State())
+          self.database.insertEvent(name: "appDidLaunch without passcode")
         }
         let nowPlayingId = state.nowPlaying.data?.episode.id
         return .merge(
@@ -74,7 +76,7 @@ struct AppReducer: Sendable {
           },
           .run { _ in
             try await self.mainQueue.sleep(for: .seconds(10))
-            self.autoPruneDownloads(nowPlayingId)
+            self.cleanupTasks(nowPlayingId)
           }
         )
       case .appInForegroundChanged(let foregrounded):
@@ -132,6 +134,16 @@ struct AppReducer: Sendable {
     }
     .ifLet(\.$mode, action: \.mode)
     .ifLet(\.$alert, action: \.alert)
+  }
+
+  func cleanupTasks(_ nowPlaying: Episode.ID?) {
+    self.autoPruneDownloads(nowPlaying)
+    self.database.tryWrite { db in
+      try Event
+        .where { $0.createdAt.lt(self.date.now - .days(30)) }
+        .delete()
+        .execute(db)
+    }
   }
 
   func autoPruneDownloads(_ nowPlaying: Episode.ID?) {

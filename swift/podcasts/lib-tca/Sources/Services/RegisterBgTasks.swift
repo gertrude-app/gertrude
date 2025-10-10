@@ -93,12 +93,14 @@ final class BgRefreshFeedsOperation: AsyncOperation, @unchecked Sendable {
 
   override func main() {
     self.task = Task {
-      self.database.insertEvent(name: "bg-feed-refresh->start")
+      let start = Date()
       let newEpisodes = await updateFeeds()
       if !newEpisodes.isEmpty {
         scheduleEpisodeDownloads()
       }
-      self.database.insertEvent(name: "bg-feed-refresh->end")
+      let duration = Date().timeIntervalSince(start)
+      let detail = "time: \(String(format: "%.1f", duration))s"
+      self.database.insertEvent(name: "bg-feed-refresh", detail: detail)
       self.finish()
     }
   }
@@ -111,8 +113,7 @@ final class BgDownloadEpisodesOperation: AsyncOperation, @unchecked Sendable {
 
   override func main() {
     self.task = Task {
-      self.database.insertEvent(name: "bg-download-episodes->start")
-
+      let start = Date()
       let episodes = self.database.tryRead { db in
         try #sql(
           """
@@ -141,9 +142,11 @@ final class BgDownloadEpisodesOperation: AsyncOperation, @unchecked Sendable {
         await group.waitForAll()
       }
 
+      let duration = Date().timeIntervalSince(start)
+      let timing = "in: \(String(format: "%.1f", duration))s"
       self.database.insertEvent(
-        name: "bg-download-episodes->end",
-        detail: "downloaded \(episodes.count) episodes"
+        name: "bg-download-episodes -> end",
+        detail: "downloaded \(episodes.count) episodes \(timing)"
       )
       self.finish()
     }
