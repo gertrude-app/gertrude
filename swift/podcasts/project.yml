@@ -19,6 +19,9 @@ targets:
         group: app
       - path: app/LaunchScreen.storyboard
         group: app
+      - path: app/StoreConfig.storekit
+        buildPhase: none
+        group: app
     dependencies:
       - package: LibCore
       - package: LibViews
@@ -37,6 +40,8 @@ targets:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.am.dev"
           ASSETCATALOG_COMPILER_APPICON_NAME: AppIconDev
+    scheme:
+      storeKitConfiguration: "app/StoreConfig.storekit"
     info:
       path: app/Info.plist
       properties:
