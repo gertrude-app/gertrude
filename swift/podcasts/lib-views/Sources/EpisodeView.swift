@@ -73,7 +73,7 @@ public struct EpisodeView: View {
 
         Spacer()
 
-        HStack(alignment: .center, spacing: 9) {
+        HStack(alignment: .center, spacing: 10) {
           if !self.episode.isArchived {
             switch self.episode.downloadState {
             case .notDownloaded, .downloaded:
@@ -162,14 +162,14 @@ public struct EpisodeView: View {
           .buttonStyle(.plain)
           .transaction { $0.animation = nil }
         }
-        .offset(x: 8, y: 5)
+        .offset(x: 11, y: 7)
       }
       .padding(.top, 4)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(.horizontal, 20)
     .padding(.top, 12)
-    .padding(.bottom, 20)
+    .padding(.bottom, 16)
     .contentShape(Rectangle())
     .onTapGesture {
       self.emit(.episodeTapped)
