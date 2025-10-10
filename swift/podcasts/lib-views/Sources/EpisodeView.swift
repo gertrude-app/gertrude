@@ -96,13 +96,16 @@ public struct EpisodeView: View {
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
                 .rotationEffect(.degrees(self.rotationAngle))
-                .onAppear {
+                .padding(12)
+                .offset(x: 12)
+                .task {
                   withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
                     self.rotationAngle = 360
                   }
                 }
-                .padding(12)
-                .offset(x: 12)
+                .onDisappear {
+                  self.rotationAngle = 0
+                }
             }
           }
 
