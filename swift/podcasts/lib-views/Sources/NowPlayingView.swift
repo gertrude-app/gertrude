@@ -185,7 +185,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
 
       // Large artwork
       GeometryReader { geometry in
-        let artworkSize = min(500, geometry.size.width * 0.85)
+        let artworkSize = min(500, geometry.size.width * 0.9)
         ArtworkView(
           preferRemote: self.useEpisodeArtwork,
           artworkImage: self.show.artworkImage,
@@ -197,7 +197,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
       .aspectRatio(1, contentMode: .fit)
-      .frame(maxWidth: 400, maxHeight: 400)
+      .frame(maxWidth: 450, maxHeight: 450)
 
       Spacer()
 
@@ -215,7 +215,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
           .lineLimit(1)
       }
       .padding(.horizontal, 40)
-      .padding(.top, 40)
+      .padding(.top, 24)
       .padding(.bottom, 20)
 
       Spacer()
@@ -268,7 +268,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
       .padding(.horizontal, 40)
 
       // Controls
-      HStack(spacing: 40) {
+      HStack(spacing: 32) {
         Button(action: {
           self.emit(.skipBackwardTapped)
         }) {
@@ -281,7 +281,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
           self.emit(.playPauseTapped)
         }) {
           Image(systemName: self.episode.isPlaying ? "pause.circle.fill" : "play.circle.fill")
-            .font(.system(size: 80, weight: .medium))
+            .font(.system(size: 100, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
         }
 
