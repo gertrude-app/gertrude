@@ -53,12 +53,6 @@ struct AppReducer: Sendable {
           let installId = UUID()
           self.keychain.save(installId: installId)
           self.database.insertRecord(id: .deviceId, value: "\(installId)")
-
-          // temp delete
-          if let legacyPin = dep(\.passcode).load() {
-            self.keychain.save(pincode: legacyPin)
-            self.database.insertEvent(name: "migrated legacy pin to keychain dep")
-          }
         }
 
         if let passcode = self.keychain.loadPincode() {
