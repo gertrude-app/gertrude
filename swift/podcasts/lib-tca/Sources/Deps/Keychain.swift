@@ -30,7 +30,7 @@ extension KeychainClient {
 
 extension KeychainClient {
   func isFirstLaunch() -> Bool {
-    self.loadInstallDate() == nil || self.loadDeviceId() == nil
+    self.loadInstallDate() == nil || self.loadInstallId() == nil
   }
 
   func save(installDate: Date) {
@@ -48,7 +48,7 @@ extension KeychainClient {
     }
   }
 
-  func loadDeviceId() -> UUID? {
+  func loadInstallId() -> UUID? {
     if let data = self._load(.installId),
        let string = String(data: data, encoding: .utf8),
        let uuid = UUID(uuidString: string) {
@@ -76,30 +76,6 @@ extension KeychainClient {
   func save(pincode: Int) {
     let data = "\(pincode)".data(using: .utf8)!
     self._save(.pincode, data)
-  }
-
-  // TEMP: remove
-  func migrateAccessibility() {
-    let database = dep(\.db)
-    guard let pincode = self.loadPincode() else {
-      database.insertEvent(name: "migrateAccessibility skipped, no pincode")
-      return
-    }
-    let installDate = self.loadInstallDate()
-    let installId = self.loadDeviceId()
-
-    self.delete(.pincode)
-    self.delete(.installDate)
-    self.delete(.installId)
-
-    self.save(pincode: pincode)
-    if let installDate {
-      self.save(installDate: installDate)
-    }
-    if let installId {
-      self.save(installId: installId)
-    }
-    database.insertEvent(name: "migrateAccessibility complete")
   }
 }
 

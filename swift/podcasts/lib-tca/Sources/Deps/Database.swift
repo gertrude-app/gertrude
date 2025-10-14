@@ -39,10 +39,10 @@ extension DatabaseWriter {
     withErrorReporting { try self.write { try updates($0) } }!
   }
 
-  func insertEvent(name: String, detail: String? = nil) {
+  func insertEvent(kind: String, label: String, detail: String? = nil, apiId: String? = nil) {
     self.tryWrite { db in
       try Event
-        .insert { Event.Draft(name: name, detail: detail) }
+        .insert { Event.Draft(kind: kind, label: label, detail: detail, apiId: apiId) }
         .execute(db)
     }
   }
@@ -102,6 +102,9 @@ public func appDatabase(
   }
   migrator.registerMigration("m_2025-10-08") {
     try Migrations.m2025_10_08($0)
+  }
+  migrator.registerMigration("m_2025-10-13") {
+    try Migrations.m2025_10_13($0)
   }
   try migrator.migrate(database)
 

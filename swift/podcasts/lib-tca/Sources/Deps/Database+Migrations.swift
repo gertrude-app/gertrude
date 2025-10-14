@@ -1,6 +1,29 @@
 import SQLiteData
 
 enum Migrations {
+  @Sendable static func m2025_10_13(_ db: Database) throws {
+    try #sql(
+      """
+      ALTER TABLE events
+      ADD COLUMN apiId TEXT;
+      """
+    ).execute(db)
+    try #sql(
+      """
+      ALTER TABLE events
+      ADD COLUMN kind TEXT NOT NULL
+        CHECK (kind IN ('error', 'unexpected', 'info', 'debug', 'subscription'))
+        DEFAULT 'debug';
+      """
+    ).execute(db)
+    try #sql(
+      """
+      ALTER TABLE events
+      RENAME COLUMN name TO label;
+      """
+    ).execute(db)
+  }
+
   @Sendable static func m2025_10_08(_ db: Database) throws {
     try #sql(
       """

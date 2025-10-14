@@ -45,9 +45,6 @@ struct AppReducer: Sendable {
     Reduce { state, action in
       switch action {
       case .appDidLaunch:
-        // TEMP: remove
-        self.keychain.migrateAccessibility()
-
         if self.keychain.isFirstLaunch() {
           let installDate = self.date.now
           self.keychain.save(installDate: installDate)
@@ -56,14 +53,15 @@ struct AppReducer: Sendable {
           let installId = UUID()
           self.keychain.save(installId: installId)
           self.database.insertRecord(id: .deviceId, value: "\(installId)")
+          log(.info("27c4f26a"), "firstLaunch")
         }
 
         if let passcode = self.keychain.loadPincode() {
           state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
-          self.database.insertEvent(name: "appDidLaunch with passcode")
+          log(.debug, "appDidLaunch with passcode")
         } else {
           state.mode = .onboarding(OnboardingFeature.State())
-          self.database.insertEvent(name: "appDidLaunch without passcode")
+          log(.debug, "appDidLaunch without passcode")
         }
         let nowPlayingId = state.nowPlaying.data?.episode.id
         return .merge(
@@ -89,9 +87,8 @@ struct AppReducer: Sendable {
         state.mode = .podcasts(.init(passcode: pincode))
         return .run { _ in
           self.keychain.save(pincode: pincode)
-          self.database.insertEvent(name: "saved pincode")
           self.database.insertRecord(id: .onboardingFinished)
-          // TODO: log api
+          log(.info("ba182b20"), "onboarding finished, saved pincode")
         }
       case .mode(.presented(.podcasts(.destination(.presented(.show(let showAction)))))):
         switch showAction {
@@ -116,14 +113,11 @@ struct AppReducer: Sendable {
       case .mode(.presented(.onboarding(.delegate(.shouldNotBeOnboarding)))):
         if let passcode = self.keychain.loadPincode() {
           state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
-          return .run { _ in
-            self.database.insertEvent(name: "unexpected-73430b7b")
-            // TODO: log api
-          }
+          log(.unexpected("73430b7b"), "false onboarding")
+          return .none
         } else {
           return .run { _ in
-            self.database.insertEvent(name: "unexpected-9f4d7c2d")
-            // TODO: await log api
+            await log(.unexpected("9f4d7c2d"), "false onboarding").value
             preconditionFailure("unreachable-9f4d7c2d")
           }
         }
@@ -189,11 +183,15 @@ func unexpected(
   column: UInt = #column
 ) {
   let message = "Unexpected \(id)" + (detail.map { ": \($0)" } ?? "")
-  reportIssue(message, fileID: fileID, filePath: filePath, line: line, column: column)
   #if DEBUG
+    reportIssue(message, fileID: fileID, filePath: filePath, line: line, column: column)
     if assert {
       assertionFailure(message, file: file, line: line)
     }
+  #endif
+  dep(\.db).insertEvent(kind: "error", label: id, detail: detail)
+  #if !DEBUG
+    Task { try? await dep(\.api).logEvent(id, "unexpected", detail) }
   #endif
 }
 

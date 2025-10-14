@@ -66,9 +66,9 @@ struct AddShowFeature {
           return .none
         }
         return .run { [text = state.searchText] send in
-          // TODO: handle errors
-          let results = try await self.podcasts.search(text)
-          await send(.setSearchResults(results))
+          if let results = try? await self.podcasts.search(text) {
+            await send(.setSearchResults(results))
+          }
         }
         .cancellable(id: CancelID.search)
 
@@ -79,16 +79,21 @@ struct AddShowFeature {
       case .passcodeVerified:
         self.insertAttempt(success: true)
         state.screen = .choosingMethod
+        let wasLockedOut = state.lockout != nil
         state.lockout = .pinLockout()
         return .run { _ in
           await self.haptics.notification(.success)
+          if wasLockedOut { log(.info("c6f27bad"), "pin lockout cleared") }
         }
 
       case .passcodeFailed:
         self.insertAttempt(success: false)
-        state.lockout = .pinLockout()
+        let lockout = Date.pinLockout()
+        let newlyLockedOut = lockout != nil && state.lockout == nil
+        state.lockout = lockout
         return .run { _ in
           await self.haptics.notification(.error)
+          if newlyLockedOut { log(.info("7e312b0f"), "pin lockout set") }
         }
 
       case .passcodeCancelled:
@@ -110,8 +115,10 @@ struct AddShowFeature {
 
       case .addByUrlSubmitted(let input):
         if let special = self.handleSpecialAction(input: input) {
+          log(.info("2c229d59"), "special action", detail: input)
           return special
         }
+        log(.info("8524413f"), "add by url", detail: input)
         let feedUrl = input.starts(with: "http") ? input : "https://\(input)"
         state.screen = .chooseArtworkPolicy(feedUrl)
         return .none
@@ -133,6 +140,7 @@ struct AddShowFeature {
   func subscribe(to feedUrl: String, artwork withArtwork: Bool) -> Effect<Action> {
     .run { send in
       do {
+        log(.info("7785c87b"), "subscribe", detail: "\(feedUrl), artwork: \(withArtwork)")
         let feed = try await self.podcasts.getFeed(feedUrl)
         let show = self.db.tryWrite { db in
           try Show
@@ -141,6 +149,7 @@ struct AddShowFeature {
             .fetchOne(db)
         }
         guard let show else {
+          log(.error("98916a65"), "subscribe fail")
           await send(.setScreen(.subscribeError))
           return
         }
@@ -153,6 +162,7 @@ struct AddShowFeature {
         }
         await send(.subscribed(show))
       } catch {
+        log(.error("8c5abff7"), "subscribe fail")
         await send(.setScreen(.subscribeError))
       }
     }

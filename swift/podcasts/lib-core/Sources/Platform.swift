@@ -23,6 +23,18 @@ import SwiftUI
     static var navigationBarTrailing: Self { .automatic }
   }
 
+  @MainActor
+  public class UIDevice {
+    public enum UserInterfaceIdiom {
+      case phone, pad, tv, carPlay, mac, unspecified
+    }
+
+    public static let current = UIDevice()
+    public var userInterfaceIdiom: UserInterfaceIdiom { .phone }
+    public var NOT_REAL_CHECK_XCODE: String { "" }
+    public var systemVersion: String { "26.1.2" }
+  }
+
   public struct UIImage {
     public init?(data: Data) {}
     public init?(named name: String) {}
@@ -176,6 +188,7 @@ import SwiftUI
   import BackgroundTasks
   import UIKit
 
+  public typealias UIDevice = UIKit.UIDevice
   public typealias UIImage = UIKit.UIImage
   public typealias UIApplication = UIKit.UIApplication
   public typealias UIImpactFeedbackGenerator = UIKit.UIImpactFeedbackGenerator
