@@ -13,64 +13,6 @@ struct ApiClient: Sendable {
   ) async throws -> Void
 }
 
-enum EventKind {
-  case error(String? = nil)
-  case unexpected(String? = nil)
-  case info(String? = nil)
-  case subscription(String? = nil)
-  case debug
-
-  var apiId: String? {
-    switch self {
-    case .error(let id), .unexpected(let id), .info(let id), .subscription(let id):
-      id
-    default: nil
-    }
-  }
-
-  var string: String {
-    switch self {
-    case .error: "error"
-    case .unexpected: "unexpected"
-    case .info: "info"
-    case .debug: "debug"
-    case .subscription: "subscription"
-    }
-  }
-}
-
-@discardableResult
-func log(
-  _ kind: EventKind,
-  _ label: String,
-  detail: String? = nil,
-  fileID: StaticString = #fileID,
-  filePath: StaticString = #filePath,
-  file: StaticString = #file,
-  line: UInt = #line
-) -> Task<Void, Never> {
-  Task {
-    do {
-      if let apiId = kind.apiId {
-        try await dep(\.api).logEvent(apiId, kind, label, detail)
-      }
-      dep(\.db).insertEvent(
-        kind: kind.string,
-        label: label,
-        detail: detail,
-        apiId: kind.apiId,
-      )
-    } catch {
-      reportIssue(
-        "Failed to log event kind \(kind), label: \(label), detail: \(detail ?? "nil"): \(error)",
-        fileID: fileID,
-        filePath: filePath,
-        line: line
-      )
-    }
-  }
-}
-
 extension ApiClient {
   struct LogEventInput: Codable {
     var eventId: String
@@ -133,6 +75,85 @@ extension ApiClient: DependencyKey {
 extension ApiClient {
   enum ApiError: Error {
     case requestFailed
+  }
+}
+
+enum EventKind {
+  case error(String? = nil)
+  case unexpected(String? = nil)
+  case info(String? = nil)
+  case subscription(String? = nil)
+  case debug
+
+  var apiId: String? {
+    switch self {
+    case .error(let id),
+         .unexpected(let id),
+         .info(let id),
+         .subscription(let id):
+      id
+    default: nil
+    }
+  }
+
+  var string: String {
+    switch self {
+    case .error: "error"
+    case .unexpected: "unexpected"
+    case .info: "info"
+    case .debug: "debug"
+    case .subscription: "subscription"
+    }
+  }
+
+  enum Db: String {
+    case error
+    case unexpected
+    case info
+    case debug
+    case subscription
+  }
+
+  var toDb: EventKind.Db {
+    switch self {
+    case .error: .error
+    case .unexpected: .unexpected
+    case .info: .info
+    case .debug: .debug
+    case .subscription: .subscription
+    }
+  }
+}
+
+@discardableResult
+func log(
+  _ kind: EventKind,
+  _ label: String,
+  detail: String? = nil,
+  fileID: StaticString = #fileID,
+  filePath: StaticString = #filePath,
+  file: StaticString = #file,
+  line: UInt = #line
+) -> Task<Void, Never> {
+  Task {
+    do {
+      if let apiId = kind.apiId {
+        try await dep(\.api).logEvent(apiId, kind, label, detail)
+      }
+      dep(\.db).insertEvent(
+        kind: kind.toDb,
+        label: label,
+        detail: detail,
+        apiId: kind.apiId,
+      )
+    } catch {
+      reportIssue(
+        "Failed to log event kind \(kind), label: \(label), detail: \(detail ?? "nil"): \(error)",
+        fileID: fileID,
+        filePath: filePath,
+        line: line
+      )
+    }
   }
 }
 

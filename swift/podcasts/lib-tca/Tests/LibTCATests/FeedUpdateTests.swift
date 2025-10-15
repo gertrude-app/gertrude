@@ -7,7 +7,7 @@ import Testing
 @testable import LibTCA
 
 @Test func simpleFeedUpdate() {
-  let updates = feedUpdates(input: .init(
+  let updates = _feedUpdates(input: .init(
     feeds: [
       Feed(show: .mock(1), episodes: []),
       Feed(show: .mock(2) { $0.name = "After" }, episodes: []),
@@ -18,7 +18,7 @@ import Testing
 }
 
 @Test func artworkUrlChanged() {
-  let updates = feedUpdates(input: .init(
+  let updates = _feedUpdates(input: .init(
     feeds: [Feed(show: .mock(1) { $0.artworkUrl = "https://a.com/new.jpg" }, episodes: [])],
     shows: [.mock(1) { $0.artworkUrl = "https://a.com/old.jpg" }],
   ))
@@ -30,7 +30,7 @@ import Testing
 }
 
 @Test func newEpisodeAdded() {
-  let updates = feedUpdates(input: .init(
+  let updates = _feedUpdates(input: .init(
     feeds: [Feed(show: .mock(1), episodes: [.mock(1, showId: 1), .mock(2, showId: 1)])],
     shows: [.mock(1)],
     episodes: [.mock(1, showId: 1)],
@@ -43,7 +43,7 @@ import Testing
 }
 
 @Test func episodeDeleted() {
-  let updates = feedUpdates(input: .init(
+  let updates = _feedUpdates(input: .init(
     feeds: [Feed(show: .mock(1), episodes: [.mock(1, showId: 1)])],
     shows: [.mock(1)],
     episodes: [.mock(1, showId: 1), .mock(2, showId: 1)],
@@ -53,7 +53,7 @@ import Testing
 }
 
 @Test func episodeTitleChanged() {
-  let updates = feedUpdates(input: .init(
+  let updates = _feedUpdates(input: .init(
     feeds: [Feed(
       show: .mock(1),
       episodes: [.mock(1, showId: 1) { $0.title = "Updated Title" }]
@@ -71,7 +71,7 @@ import Testing
 }
 
 @Test func episodeAudioPropertiesChanged() {
-  let updates = feedUpdates(input: .init(
+  let updates = _feedUpdates(input: .init(
     feeds: [Feed(
       show: .mock(1),
       episodes: [
@@ -152,7 +152,7 @@ import Testing
         .execute(db)
     }
 
-    let inputData = await prepareFeedUpdateInputData()
+    let inputData = await _prepareFeedUpdateInputData()
     expectNoDifference(Set(inputData.feeds), Set([fetchedFeed1, fetchedFeed2]))
     expectNoDifference(Set(inputData.shows), Set([
       Show.mock(1) { $0.name = "Feed One (old name)" },
@@ -166,7 +166,7 @@ import Testing
     expectNoDifference(inputData.nowPlaying, nil)
     expectNoDifference(inputData.now, .reference)
 
-    let updates = feedUpdates(input: inputData)
+    let updates = _feedUpdates(input: inputData)
     expectNoDifference(Set(updates.showUpdates), Set([
       Show.mock(1) { $0.name = "Feed One (new name)" },
       Show.mock(2) { $0.artworkUrl = "https://new.com/artwork2.jpg" },

@@ -125,3 +125,22 @@ extension DependencyValues {
     set { self[KeychainClient.self] = newValue }
   }
 }
+
+#if DEBUG
+  extension KeychainClient {
+    static let mock = KeychainClient(
+      _load: { key in
+        switch key {
+        case .pincode:
+          "111111".data(using: .utf8)!
+        case .installDate:
+          "1760103425".data(using: .utf8)!
+        case .installId:
+          "DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF".data(using: .utf8)!
+        }
+      },
+      _save: { _, _ in },
+      delete: { _ in }
+    )
+  }
+#endif

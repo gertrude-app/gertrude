@@ -11,6 +11,7 @@ struct AppReducer: Sendable {
     var nowPlaying = NowPlayingFeature.State()
     @Shared(.appInForeground) var appInForeground
     @Presents var alert: AlertState<AlertAction>?
+    @Fetch(CurrentSubscription()) var subscription: Subscription = .fallback
   }
 
   @Reducer(state: .equatable, action: .equatable)
@@ -22,6 +23,7 @@ struct AppReducer: Sendable {
   enum Action: Equatable {
     case appDidLaunch
     case appInForegroundChanged(Bool)
+    case processStoreKitTransaction(TransactionData, update: Bool)
     case nowPlaying(NowPlayingFeature.Action)
     case mode(PresentationAction<Mode.Action>)
     case alert(PresentationAction<AlertAction>)
@@ -37,6 +39,7 @@ struct AppReducer: Sendable {
   @Dependency(\.mainQueue) var mainQueue
   @Dependency(\.date) var date
   @Dependency(\.notificationCenter) var notificationCenter
+  @Dependency(\.storekit) var storekit
 
   var body: some Reducer<State, Action> {
     Scope(state: \.nowPlaying, action: \.nowPlaying) {
@@ -75,11 +78,50 @@ struct AppReducer: Sendable {
               .map { .appInForegroundChanged($0) }
               .receive(on: self.mainQueue)
           },
+          .run { send in
+            for txn in try await self.storekit.verifiedCurrentEntitlements() {
+              await send(.processStoreKitTransaction(txn, update: false))
+            }
+          },
+          .run { send in
+            for try await update in try await self.storekit.transactionUpdates() {
+              await send(.processStoreKitTransaction(update, update: true))
+            }
+          },
           .run { _ in
             try await self.mainQueue.sleep(for: .seconds(10))
             self.cleanupTasks(nowPlayingId)
-          }
+          },
         )
+      case .processStoreKitTransaction(let txn, let isUpdate):
+        return .run { [priorStatus = state.subscription.status] _ in
+          if let revokedAt = txn.revocationDate {
+            try CurrentSubscription.set(
+              status: .unpaid,
+              expiringAt: revokedAt < self.date.now ? revokedAt : self.date.now
+            )
+            if priorStatus != .unpaid || isUpdate {
+              log(.subscription("19620bda"), "subscription revoked", detail: "\(txn)")
+            }
+          } else if (txn.expirationDate ?? .distantFuture) < self.date.now {
+            try CurrentSubscription.set(
+              status: .unpaid,
+              expiringAt: txn.expirationDate ?? self.date.now
+            )
+            if priorStatus != .unpaid || isUpdate {
+              log(.subscription("5c74457c"), "subscription expired", detail: "\(txn)")
+            }
+          } else {
+            try CurrentSubscription.set(
+              status: .active,
+              expiringAt: txn.expirationDate ?? self.date.now + .days(365)
+            )
+            if priorStatus != .active || isUpdate {
+              log(.subscription("a72104d7"), "subscription activated", detail: "\(txn)")
+            }
+          }
+          await self.storekit.finishTransaction(txn.id)
+        }
       case .appInForegroundChanged(let foregrounded):
         state.$appInForeground.withLock { $0 = foregrounded }
         return .none
@@ -138,6 +180,7 @@ struct AppReducer: Sendable {
     self.database.tryWrite { db in
       try Event
         .where { $0.createdAt.lt(self.date.now - .days(30)) }
+        .where { $0.kind.in(["debug", "info", "error"]) }
         .delete()
         .execute(db)
     }
@@ -150,13 +193,13 @@ struct AppReducer: Sendable {
         .fetchAll(db)
     }
     if episodes.isEmpty { return }
-    episodes.forEach { $0.removeLocalAudioFile() }
     self.database.tryWrite { db in
       try Episode
         .update { $0.downloadedAt = nil }
         .where { $0.id.in(episodes.map(\.id)) }
         .execute(db)
     }
+    episodes.forEach { $0.removeLocalAudioFile() }
   }
 }
 
@@ -189,7 +232,7 @@ func unexpected(
       assertionFailure(message, file: file, line: line)
     }
   #endif
-  dep(\.db).insertEvent(kind: "error", label: id, detail: detail)
+  dep(\.db).insertEvent(kind: .error, label: id, detail: detail)
   #if !DEBUG
     Task { try? await dep(\.api).logEvent(id, "unexpected", detail) }
   #endif

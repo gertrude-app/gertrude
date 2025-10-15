@@ -32,12 +32,14 @@ struct FeedUpdates: Equatable {
 }
 
 func updateFeeds(showIds: [Show.ID]? = nil) async -> [Episode] {
-  let input = await prepareFeedUpdateInputData(showIds: showIds)
-  let updates = feedUpdates(input: input)
-  return await performFeedUpdates(updates)
+  if dep(\.db).subscription().status == .unpaid { return [] }
+  let input = await _prepareFeedUpdateInputData(showIds: showIds)
+  let updates = _feedUpdates(input: input)
+  return await _performFeedUpdates(updates)
 }
 
-func prepareFeedUpdateInputData(showIds: [Show.ID]? = nil) async -> FeedUpdateInputData {
+// NB: internal for tests, but should not be used directly, skips subscription check
+func _prepareFeedUpdateInputData(showIds: [Show.ID]? = nil) async -> FeedUpdateInputData {
   @Dependency(\.db) var db
   @Dependency(\.date) var date
   @Dependency(\.podcasts) var podcasts
@@ -85,7 +87,8 @@ func prepareFeedUpdateInputData(showIds: [Show.ID]? = nil) async -> FeedUpdateIn
   )
 }
 
-func feedUpdates(input: FeedUpdateInputData) -> FeedUpdates {
+// NB: internal for tests, but should not be used directly, skips subscription check
+func _feedUpdates(input: FeedUpdateInputData) -> FeedUpdates {
   var updates = FeedUpdates()
   let showMap = Dictionary(uniqueKeysWithValues: input.shows.map { ($0.feedUrl, $0) })
 
@@ -148,7 +151,8 @@ func feedUpdates(input: FeedUpdateInputData) -> FeedUpdates {
   return updates
 }
 
-func performFeedUpdates(_ updates: FeedUpdates) async -> [Episode] {
+// NB: internal for tests, but should not be used directly, skips subscription check
+func _performFeedUpdates(_ updates: FeedUpdates) async -> [Episode] {
   guard !updates.isEmpty else { return [] }
   @Dependency(\.db) var database
   @Dependency(\.podcasts) var podcasts

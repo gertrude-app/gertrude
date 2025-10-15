@@ -11,6 +11,7 @@ struct PodcastsFeature {
     @Presents var destination: Destination.State?
     @FetchAll(Show.orderedWithInfo, animation: .default)
     var shows: [ShowInfo]
+    @Fetch(CurrentSubscription()) var subscription: Subscription = .fallback
   }
 
   @Selection
@@ -30,12 +31,14 @@ struct PodcastsFeature {
   enum Destination {
     case addShow(AddShowFeature)
     case show(ShowFeature)
+    case settings(SettingsFeature)
     case confirmDeleteShow(ConfirmationDialogState<ConfirmDeleteAction>)
   }
 
   enum Action: Equatable {
     case onAppear
     case addShowTapped
+    case settingsTapped
     case startNextDownload
     case addToDownloadQueue([Episode])
     case showTapped(Show.ID)
@@ -62,7 +65,15 @@ struct PodcastsFeature {
         }
 
       case .addShowTapped:
-        state.destination = .addShow(.init(passcode: state.passcode))
+        if state.subscription.status == .unpaid {
+          state.destination = .settings(.init())
+        } else {
+          state.destination = .addShow(.init(passcode: state.passcode))
+        }
+        return .none
+
+      case .settingsTapped:
+        state.destination = .settings(.init())
         return .none
 
       case .showTapped(let showId):

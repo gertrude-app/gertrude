@@ -8,6 +8,7 @@ import SwiftUI
 
 public struct PodcastsHomeView: View {
   @Environment(\.colorScheme) var cs
+  @State private var pulseOpacity: Double = 1.0
 
   @dynamicMemberLookup
   public struct ShowDataWithStats {
@@ -21,29 +22,69 @@ public struct PodcastsHomeView: View {
   let onAddShowTap: @MainActor @Sendable () -> Void
   let onShowTap: @MainActor @Sendable (Int) -> Void
   let onDeleteShow: @MainActor @Sendable (Int) -> Void
+  let onSettingsTap: @MainActor @Sendable () -> Void
+  let showSettingsAlert: Bool
 
   public init(
     shows: [ShowDataWithStats],
     onAddShowTap: @MainActor @escaping @Sendable () -> Void,
     onShowTap: @MainActor @escaping @Sendable (Int) -> Void = { _ in },
-    onDeleteShow: @MainActor @escaping @Sendable (Int) -> Void = { _ in }
+    onDeleteShow: @MainActor @escaping @Sendable (Int) -> Void = { _ in },
+    onSettingsTap: @MainActor @escaping @Sendable () -> Void = {},
+    showSettingsAlert: Bool = false
   ) {
     self.shows = shows
     self.onAddShowTap = onAddShowTap
     self.onShowTap = onShowTap
     self.onDeleteShow = onDeleteShow
+    self.onSettingsTap = onSettingsTap
+    self.showSettingsAlert = showSettingsAlert
   }
 
   public var body: some View {
-    ZStack {
-      if self.shows.isEmpty {
-        PodcastsEmptyState(onAddShowTap: self.onAddShowTap)
-      } else {
-        self.showsList
+    VStack(spacing: 0) {
+      HStack {
+        Text("Shows")
+          .font(.largeTitle)
+          .fontWeight(.bold)
+        Spacer()
+        Button {
+          self.onSettingsTap()
+        } label: {
+          ZStack(alignment: .topTrailing) {
+            Image(systemName: "radio.fill")
+              .font(.title3)
+            if self.showSettingsAlert {
+              Circle()
+                .fill(Color(red: 0.8, green: 0.0, blue: 0.0))
+                .frame(width: 9, height: 9)
+                .offset(x: 0, y: -1)
+                .opacity(self.pulseOpacity)
+            }
+          }
+        }
+      }
+      .padding(.horizontal, 20)
+      .padding(.top, 8)
+      .padding(.bottom, 8)
+
+      ZStack {
+        if self.shows.isEmpty {
+          PodcastsEmptyState(onAddShowTap: self.onAddShowTap)
+        } else {
+          self.showsList
+        }
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .background(Color(self.cs, light: .white, dark: .black))
+    }
+    .onAppear {
+      if self.showSettingsAlert {
+        withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+          self.pulseOpacity = 0.3
+        }
       }
     }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color(self.cs, light: .white, dark: .black))
   }
 
   private var showsList: some View {
@@ -234,6 +275,22 @@ func showWithStats(
     onAddShowTap: {}
   )
   .preferredColorScheme(.dark)
+}
+
+#Preview("With Alert Badge") {
+  PodcastsHomeView(
+    shows: [
+      showWithStats(id: 1) {
+        $0.data.name = "The Ancient Path"
+        $0.data.artworkUrl = .ancientPath
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.hours(8))
+        $0.unplayedEpisodes = 3
+        $0.totalEpisodes = 125
+      },
+    ],
+    onAddShowTap: {},
+    showSettingsAlert: true
+  )
 }
 
 extension String {

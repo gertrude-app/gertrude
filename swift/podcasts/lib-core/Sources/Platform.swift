@@ -21,6 +21,7 @@ import SwiftUI
   public extension ToolbarItemPlacement {
     static var navigationBarLeading: Self { .automatic }
     static var navigationBarTrailing: Self { .automatic }
+    static var topBarTrailing: Self { .automatic }
   }
 
   @MainActor

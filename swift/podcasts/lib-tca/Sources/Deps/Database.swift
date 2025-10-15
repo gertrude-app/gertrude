@@ -32,6 +32,12 @@ extension DatabaseReader {
       try NowPlaying().fetch(db)
     }
   }
+
+  func subscription() -> Subscription {
+    self.tryRead { db in
+      try CurrentSubscription().fetch(db)
+    } ?? .fallback
+  }
 }
 
 extension DatabaseWriter {
@@ -39,10 +45,15 @@ extension DatabaseWriter {
     withErrorReporting { try self.write { try updates($0) } }!
   }
 
-  func insertEvent(kind: String, label: String, detail: String? = nil, apiId: String? = nil) {
+  func insertEvent(
+    kind: EventKind.Db,
+    label: String,
+    detail: String? = nil,
+    apiId: String? = nil
+  ) {
     self.tryWrite { db in
       try Event
-        .insert { Event.Draft(kind: kind, label: label, detail: detail, apiId: apiId) }
+        .insert { Event.Draft(kind: kind.rawValue, label: label, detail: detail, apiId: apiId) }
         .execute(db)
     }
   }

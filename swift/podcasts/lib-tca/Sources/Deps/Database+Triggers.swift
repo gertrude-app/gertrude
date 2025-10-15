@@ -5,6 +5,7 @@ func createDatabaseTriggers(_ db: Database) throws {
   try episodeCompletedAt(db)
   try dispatchNowPlayingUpdates(db)
   try touchUpdatedAtCols(db)
+  try subscriptionRequired(db)
 }
 
 /// mark episode complete when progress within 45 sec of duration
@@ -61,6 +62,14 @@ private func dispatchNowPlayingUpdates(_ db: Database) throws {
     .execute(db)
 }
 
+private func subscriptionRequired(_ db: Database) throws {
+  try Subscription
+    .createTemporaryTrigger(after: .delete { _ in
+      #sql("SELECT RAISE(ABORT, 'subscription record is required')")
+    })
+    .execute(db)
+}
+
 private func touchUpdatedAtCols(_ db: Database) throws {
   try NowPlayingModel
     .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
@@ -72,6 +81,9 @@ private func touchUpdatedAtCols(_ db: Database) throws {
     .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
     .execute(db)
   try Record
+    .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
+    .execute(db)
+  try Subscription
     .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
     .execute(db)
 }

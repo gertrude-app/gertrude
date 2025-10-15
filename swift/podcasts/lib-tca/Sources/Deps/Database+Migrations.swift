@@ -22,6 +22,38 @@ enum Migrations {
       RENAME COLUMN name TO label;
       """
     ).execute(db)
+    try #sql(
+      """
+      CREATE TABLE subscription (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        status TEXT NOT NULL
+          CHECK (status IN ('trialing', 'active', 'complimentary', 'unpaid')),
+        purchasePendingSince TEXT,
+        expiresAt TEXT NOT NULL,
+        updatedAt TEXT NOT NULL,
+        createdAt TEXT NOT NULL
+      ) STRICT;
+      """
+    ).execute(db)
+    try #sql(
+      """
+      INSERT INTO subscription (
+        id,
+        status,
+        purchasePendingSince,
+        expiresAt,
+        updatedAt,
+        createdAt
+      ) VALUES (
+        1,
+        'trialing',
+        NULL,
+        strftime('%Y-%m-%d %H:%M:%f', 'now', '+30 days'),
+        datetime('subsec'),
+        datetime('subsec')
+      );
+      """
+    ).execute(db)
   }
 
   @Sendable static func m2025_10_08(_ db: Database) throws {
