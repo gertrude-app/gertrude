@@ -52,7 +52,7 @@ public struct WelcomeView: View {
           }
         }
 
-        Text("Gertrude Podcasts lets parents give access to only selected, approved podcasts.")
+        Text("Gertrude AM lets parents give access to only selected, approved podcasts.")
           .font(.system(size: 16, weight: .medium))
           .multilineTextAlignment(self.deviceType() == .pad ? .center : .leading)
           .swooshIn(

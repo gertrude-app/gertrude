@@ -241,7 +241,12 @@ func unexpected(
   #endif
   dep(\.db).insertEvent(kind: .error, label: id, detail: detail)
   #if !DEBUG
-    Task { try? await dep(\.api).logEvent(id, "unexpected", detail) }
+    Task { try? await dep(\.api).logEvent(
+      id: id,
+      kind: .unexpected(nil),
+      label: "\(file):\(line)",
+      detail: detail
+    ) }
   #endif
 }
 

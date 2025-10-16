@@ -17,13 +17,13 @@ struct OnboardingView: View {
       case .areYouTheParent:
         ButtonScreenView(
           text: "For the initial setup, we need the parent for a few minutes. Are you the parent?",
-          primary: self.btn("Yes, I'm the parent", action: .primaryBtnTapped),
-          secondary: self.btn("No, I'm the child", action: .secondaryBtnTapped)
+          primary: self.btn("Yes, I’m the parent", action: .primaryBtnTapped),
+          secondary: self.btn("No, I’m the child", action: .secondaryBtnTapped)
         )
 
       case .parentRequired:
         ButtonScreenView(
-          text: "You'll need your parent to set this up, go get them and click continue.",
+          text: "You’ll need your parent to set this up, go get them and click continue.",
           primary: self.btn("Continue", action: .primaryBtnTapped)
         )
 
@@ -36,12 +36,12 @@ struct OnboardingView: View {
       case .strongPasscode:
         ButtonScreenView(
           text: "Make sure your PIN is not something you've used before, and never let your child watch you enter it. Write it down somewhere because there's no way to recover it if you forget it.",
-          primary: self.btn("OK, let's go", animate: false, action: .primaryBtnTapped)
+          primary: self.btn("OK, let’s go", animate: false, action: .primaryBtnTapped)
         )
 
       case .passcodeSet(let passcode):
         ButtonScreenView(
-          text: "All set! You'll need that PIN whenever you want to add new podcasts. In the free mode, you can subscribe to 1 podcast. To get unlimited subscriptions, upgrade for less than $1 per month.",
+          text: "All set! You’ll need that PIN whenever you want to add new podcasts. Gertrude AM will work unrestricted for 30 days, then requires a yearly subscription of less than $1 dollar per month.",
           primary: self.btn("Got it, next", action: .finished(passcode))
         )
       }
