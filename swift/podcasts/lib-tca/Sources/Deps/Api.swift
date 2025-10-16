@@ -11,6 +11,8 @@ struct ApiClient: Sendable {
     _ label: String,
     _ detail: String?
   ) async throws -> Void
+  var podcastProducts: @Sendable () async throws -> [String]
+  var createDatabaseUpload: @Sendable (_ installId: UUID) async throws -> URL
 }
 
 extension ApiClient {
@@ -24,16 +26,20 @@ extension ApiClient {
     var appVersion: String
     var iosVersion: String
   }
+
+  struct CreateDatabaseUploadInput: Codable {
+    var installId: UUID
+  }
+
+  struct CreateDatabaseUploadOutput: Codable {
+    var uploadUrl: URL
+  }
 }
 
 extension ApiClient: DependencyKey {
   static var liveValue: ApiClient {
-    let apiEndpoint = Bundle.main.infoDictionary?["API_ENDPOINT"] as? String
-      ?? "https://api.gertrude.app"
-
-    return .init(
+    .init(
       logEvent: { id, kind, label, detail in
-
         let (iosVersion, deviceType) = await MainActor.run { (
           UIDevice.current.systemVersion,
           UIDevice.current.userInterfaceIdiom == .pad ? "iPad" : "iPhone"
@@ -50,27 +56,55 @@ extension ApiClient: DependencyKey {
           installId: dep(\.keychain).loadInstallId(),
           deviceType: deviceType,
           appVersion: appVersion,
-          iosVersion: iosVersion,
+          iosVersion: iosVersion
         )
 
-        var request =
-          URLRequest(url: URL(string: "\(apiEndpoint)/pairql/gertrude-am/LogPodcastEvent")!)
-        request.httpMethod = "POST"
-        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        request.timeoutInterval = 10
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(input)
-
-        let (_, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200 ... 299).contains(httpResponse.statusCode) else {
-          throw ApiError.requestFailed
-        }
+        let _: Empty = try await pairql("LogPodcastEvent", input: input)
+      },
+      podcastProducts: {
+        try await pairql("PodcastProducts")
+      },
+      createDatabaseUpload: { installId in
+        let input = CreateDatabaseUploadInput(installId: installId)
+        let output: CreateDatabaseUploadOutput = try await pairql(
+          "CreateDatabaseUpload",
+          input: input
+        )
+        return output.uploadUrl
       }
     )
   }
 }
+
+@MainActor
+func pairql<Output: Decodable>(
+  _ operation: String,
+  input: (some Encodable)? = nil as Empty?
+) async throws -> Output {
+  let apiEndpoint = Bundle.main.infoDictionary?["API_ENDPOINT"] as? String
+    ?? "https://api.gertrude.app"
+
+  var request = URLRequest(url: URL(string: "\(apiEndpoint)/pairql/gertrude-am/\(operation)")!)
+  request.httpMethod = "POST"
+  request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+  request.timeoutInterval = 10
+  request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+  if let input {
+    request.httpBody = try JSONEncoder().encode(input)
+  }
+
+  let (data, response) = try await URLSession.shared.data(for: request)
+
+  guard let httpResponse = response as? HTTPURLResponse,
+        (200 ... 299).contains(httpResponse.statusCode) else {
+    throw ApiClient.ApiError.requestFailed
+  }
+
+  return try JSONDecoder().decode(Output.self, from: data)
+}
+
+private struct Empty: Codable {}
 
 extension ApiClient {
   enum ApiError: Error {

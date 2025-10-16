@@ -97,9 +97,8 @@ public func appDatabase(
   }
   switch context {
   case .live:
-    let path = URL.documentsDirectory
-      .appending(component: "db.sqlite")
-      .path()
+    replaceLocalDbWithDownloadedDb()
+    let path = URL.localDb.path
     logger.info("open \(path)")
     database = try DatabasePool(path: path, configuration: configuration)
   case .preview, .test:
@@ -158,5 +157,32 @@ extension DependencyValues {
   var db: any DatabaseWriter {
     get { self[keyPath: \.defaultDatabase] }
     set { self[keyPath: \.defaultDatabase] = newValue }
+  }
+}
+
+extension URL {
+  static var localDb: URL {
+    documentsDirectory.appending(component: "db.sqlite")
+  }
+
+  static var localDbWal: URL {
+    documentsDirectory.appending(component: "db.sqlite-wal")
+  }
+
+  static var localDbShm: URL {
+    documentsDirectory.appending(component: "db.sqlite-shm")
+  }
+
+  static var tempDb: URL {
+    documentsDirectory.appending(component: "tmp.sqlite")
+  }
+}
+
+func replaceLocalDbWithDownloadedDb() {
+  if FileManager.default.fileExists(atPath: URL.tempDb.path) {
+    try? FileManager.default.removeItem(at: .localDbWal)
+    try? FileManager.default.removeItem(at: .localDbShm)
+    _ = try? FileManager.default.replaceItemAt(.localDb, withItemAt: .tempDb)
+    log(.info("3c4e2f29"), "replaced local db w/ downloaded")
   }
 }

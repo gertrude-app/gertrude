@@ -154,6 +154,11 @@ struct AppReducer: Sendable {
       case .nowPlaying(.delegate(.error(let message))):
         state.alert = .init { TextState(message) }
         return .none
+      case .mode(
+        .presented(.podcasts(.destination(.presented(.addShow(.delegate(.error(let message)))))))
+      ):
+        state.alert = .init { TextState(message) }
+        return .none
       case .mode(.presented(.onboarding(.delegate(.shouldNotBeOnboarding)))):
         if let passcode = self.keychain.loadPincode() {
           state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
