@@ -8,7 +8,7 @@ struct SettingsViewContainer: View {
 
   var body: some View {
     SettingsView(
-      status: self.store.subscription.viewStatus,
+      status: self.store.subscription.settingsViewStatus,
       expiresAt: self.store.subscription.expiresAt,
       onEvent: { self.store.send(.view($0)) }
     )

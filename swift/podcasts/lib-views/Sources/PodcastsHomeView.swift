@@ -9,6 +9,12 @@ import SwiftUI
 public struct PodcastsHomeView: View {
   @Environment(\.colorScheme) var cs
 
+  public enum SubscriptionStatus {
+    case ok
+    case trialEndingSoon
+    case unpaid
+  }
+
   @dynamicMemberLookup
   public struct ShowDataWithStats {
     public var data: ShowData
@@ -22,7 +28,7 @@ public struct PodcastsHomeView: View {
   let onShowTap: @MainActor @Sendable (Int) -> Void
   let onDeleteShow: @MainActor @Sendable (Int) -> Void
   let onSettingsTap: @MainActor @Sendable () -> Void
-  let showSettingsAlert: Bool
+  let subscriptionStatus: SubscriptionStatus
 
   public init(
     shows: [ShowDataWithStats],
@@ -30,14 +36,14 @@ public struct PodcastsHomeView: View {
     onShowTap: @MainActor @escaping @Sendable (Int) -> Void = { _ in },
     onDeleteShow: @MainActor @escaping @Sendable (Int) -> Void = { _ in },
     onSettingsTap: @MainActor @escaping @Sendable () -> Void = {},
-    showSettingsAlert: Bool = false
+    subscriptionStatus: SubscriptionStatus = .ok
   ) {
     self.shows = shows
     self.onAddShowTap = onAddShowTap
     self.onShowTap = onShowTap
     self.onDeleteShow = onDeleteShow
     self.onSettingsTap = onSettingsTap
-    self.showSettingsAlert = showSettingsAlert
+    self.subscriptionStatus = subscriptionStatus
   }
 
   public var body: some View {
@@ -53,7 +59,8 @@ public struct PodcastsHomeView: View {
           ZStack(alignment: .topTrailing) {
             Image(systemName: "person.crop.circle")
               .font(.title3)
-            if self.showSettingsAlert {
+              .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
+            if self.subscriptionStatus != .ok {
               TimelineView(.animation) { context in
                 let opacity = 0.65 + 0.35 * sin(context.date.timeIntervalSinceReferenceDate * .pi)
                 Circle()
@@ -70,6 +77,10 @@ public struct PodcastsHomeView: View {
       .padding(.top, 8)
       .padding(.bottom, 8)
 
+      if self.subscriptionStatus == .unpaid {
+        self.unpaidBanner
+      }
+
       ZStack {
         if self.shows.isEmpty {
           PodcastsEmptyState(onAddShowTap: self.onAddShowTap)
@@ -80,6 +91,27 @@ public struct PodcastsHomeView: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color(self.cs, light: .white, dark: .black))
     }
+  }
+
+  private var unpaidBanner: some View {
+    Button {
+      self.onSettingsTap()
+    } label: {
+      HStack(spacing: 12) {
+        Image(systemName: "exclamationmark.triangle.fill")
+          .font(.system(size: 16, weight: .semibold))
+          .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
+        Text("Subscription required to add or update shows.")
+          .font(.system(size: 14, weight: .medium))
+          .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
+        Spacer()
+      }
+      .padding(.horizontal, 20)
+      .padding(.vertical, 24)
+      .background(Color(self.cs, light: .violet100, dark: .violet950))
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(PlainButtonStyle())
   }
 
   private var showsList: some View {
@@ -272,7 +304,7 @@ func showWithStats(
   .preferredColorScheme(.dark)
 }
 
-#Preview("With Alert Badge") {
+#Preview("Trial Ending Soon") {
   PodcastsHomeView(
     shows: [
       showWithStats(id: 1) {
@@ -284,8 +316,55 @@ func showWithStats(
       },
     ],
     onAddShowTap: {},
-    showSettingsAlert: true
+    subscriptionStatus: .trialEndingSoon
   )
+}
+
+#Preview("Unpaid") {
+  PodcastsHomeView(
+    shows: [
+      showWithStats(id: 1) {
+        $0.data.name = "The Ancient Path"
+        $0.data.artworkUrl = .ancientPath
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.hours(8))
+        $0.unplayedEpisodes = 3
+        $0.totalEpisodes = 125
+      },
+      showWithStats(id: 2) {
+        $0.data.name = "The Secret Sombrero"
+        $0.data.artworkUrl = .sombrero
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(2))
+        $0.unplayedEpisodes = 15
+        $0.totalEpisodes = 87
+      },
+    ],
+    onAddShowTap: {},
+    subscriptionStatus: .unpaid
+  )
+}
+
+#Preview("Unpaid (Dark)") {
+  PodcastsHomeView(
+    shows: [
+      showWithStats(id: 1) {
+        $0.data.name = "The Ancient Path"
+        $0.data.artworkUrl = .ancientPath
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.hours(8))
+        $0.unplayedEpisodes = 3
+        $0.totalEpisodes = 125
+      },
+      showWithStats(id: 2) {
+        $0.data.name = "The Secret Sombrero"
+        $0.data.artworkUrl = .sombrero
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(2))
+        $0.unplayedEpisodes = 15
+        $0.totalEpisodes = 87
+      },
+    ],
+    onAddShowTap: {},
+    subscriptionStatus: .unpaid
+  )
+  .preferredColorScheme(.dark)
 }
 
 extension String {

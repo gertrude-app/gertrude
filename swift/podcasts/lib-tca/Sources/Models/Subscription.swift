@@ -22,15 +22,6 @@ extension Subscription {
     case unpaid
   }
 
-  var viewStatus: SettingsView.SubscriptionStatus {
-    switch self.status {
-    case .trialing: .trialing(purchasePending: self.purchasePendingSince != nil)
-    case .active: .active
-    case .complimentary: .complimentary
-    case .unpaid: .unpaid(purchasePending: self.purchasePendingSince != nil)
-    }
-  }
-
   // TODO: fetch from api is better
   enum ProductId: String, CaseIterable {
     case yearly = "gertrude.am.yearly.permanent.access"
@@ -51,6 +42,25 @@ extension Subscription {
     updatedAt: .now,
     createdAt: .now
   )
+
+  var settingsViewStatus: SettingsView.SubscriptionStatus {
+    switch self.status {
+    case .trialing: .trialing(purchasePending: self.purchasePendingSince != nil)
+    case .active: .active
+    case .complimentary: .complimentary
+    case .unpaid: .unpaid(purchasePending: self.purchasePendingSince != nil)
+    }
+  }
+
+  var homeViewStatus: PodcastsHomeView.SubscriptionStatus {
+    if self.status == .unpaid {
+      .unpaid
+    } else if self.trialEndingSoon() {
+      .trialEndingSoon
+    } else {
+      .ok
+    }
+  }
 }
 
 struct CurrentSubscription: FetchKeyRequest {
