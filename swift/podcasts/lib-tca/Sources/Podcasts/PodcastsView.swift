@@ -13,6 +13,7 @@ struct PodcastsView: View {
       onShowTap: { self.store.send(.showTapped(.init($0))) },
       onDeleteShow: { self.store.send(.deleteShowTapped(.init($0))) },
       onSettingsTap: { self.store.send(.settingsTapped) },
+      onDebugMenuTap: { self.store.send(.debugMenuTapped($0)) },
       subscriptionStatus: self.store.subscription.homeViewStatus,
     )
     .navigationBarBackButtonHidden(true)

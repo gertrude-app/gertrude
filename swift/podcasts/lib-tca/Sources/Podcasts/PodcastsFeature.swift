@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import LibViews
 import SQLiteData
 import SwiftUI
 
@@ -39,6 +40,7 @@ struct PodcastsFeature {
     case onAppear
     case addShowTapped
     case settingsTapped
+    case debugMenuTapped(PodcastsHomeView.DebugMenuAction)
     case startNextDownload
     case addToDownloadQueue([Episode])
     case showTapped(Show.ID)
@@ -78,6 +80,9 @@ struct PodcastsFeature {
       case .settingsTapped:
         state.destination = .settings(.init())
         return .none
+
+      case .debugMenuTapped(let action):
+        return self.handleDebugMenu(action)
 
       case .showTapped(let showId):
         guard let show = self.database.show(id: showId) else {
@@ -179,6 +184,23 @@ struct PodcastsFeature {
     let downloads = await updateFeeds()
     if !downloads.isEmpty {
       send(.addToDownloadQueue(downloads))
+    }
+  }
+
+  func handleDebugMenu(_ action: PodcastsHomeView.DebugMenuAction) -> Effect<Action> {
+    switch action {
+    case .setTrialExpiringSoon:
+      .run { _ in
+        try CurrentSubscription.set(status: .trialing, expiringAt: self.date.now + .days(3))
+      }
+    case .setUnpaid:
+      .run { _ in
+        try CurrentSubscription.set(status: .unpaid, expiringAt: self.date.now - .days(3))
+      }
+    case .setActive:
+      .run { _ in
+        try CurrentSubscription.set(status: .active, expiringAt: self.date.now + .days(186))
+      }
     }
   }
 }

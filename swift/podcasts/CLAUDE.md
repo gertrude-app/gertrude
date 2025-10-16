@@ -17,8 +17,6 @@ Architecture (TCA) and SQLite for data persistence.
 - run `just build-views` to build/compile swiftui views after any changes
 - run `just build-tca` to build/compile main logic after any changes
 - run `just build` to build all 3 main modules
-- run `just format` whenever you finish a task, it may change the code, so you might need
-  to re-read
 
 ## misc
 

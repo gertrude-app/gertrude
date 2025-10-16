@@ -28,7 +28,14 @@ public struct PodcastsHomeView: View {
   let onShowTap: @MainActor @Sendable (Int) -> Void
   let onDeleteShow: @MainActor @Sendable (Int) -> Void
   let onSettingsTap: @MainActor @Sendable () -> Void
+  let onDebugMenuTap: @MainActor @Sendable (DebugMenuAction) -> Void
   let subscriptionStatus: SubscriptionStatus
+
+  public enum DebugMenuAction {
+    case setTrialExpiringSoon
+    case setUnpaid
+    case setActive
+  }
 
   public init(
     shows: [ShowDataWithStats],
@@ -36,6 +43,7 @@ public struct PodcastsHomeView: View {
     onShowTap: @MainActor @escaping @Sendable (Int) -> Void = { _ in },
     onDeleteShow: @MainActor @escaping @Sendable (Int) -> Void = { _ in },
     onSettingsTap: @MainActor @escaping @Sendable () -> Void = {},
+    onDebugMenuTap: @MainActor @escaping @Sendable (DebugMenuAction) -> Void = { _ in },
     subscriptionStatus: SubscriptionStatus = .ok
   ) {
     self.shows = shows
@@ -43,6 +51,7 @@ public struct PodcastsHomeView: View {
     self.onShowTap = onShowTap
     self.onDeleteShow = onDeleteShow
     self.onSettingsTap = onSettingsTap
+    self.onDebugMenuTap = onDebugMenuTap
     self.subscriptionStatus = subscriptionStatus
   }
 
@@ -53,6 +62,24 @@ public struct PodcastsHomeView: View {
           .font(.largeTitle)
           .fontWeight(.bold)
         Spacer()
+        #if DEBUG
+          Menu {
+            Button("Set trial expiring soon") {
+              self.onDebugMenuTap(.setTrialExpiringSoon)
+            }
+            Button("Set unpaid") {
+              self.onDebugMenuTap(.setUnpaid)
+            }
+            Button("Set active") {
+              self.onDebugMenuTap(.setActive)
+            }
+          } label: {
+            Image(systemName: "flask")
+              .font(.title3)
+              .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
+          }
+          .padding(.trailing, 8)
+        #endif
         Button {
           self.onSettingsTap()
         } label: {
