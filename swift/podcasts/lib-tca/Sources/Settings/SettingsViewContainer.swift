@@ -10,7 +10,7 @@ struct SettingsViewContainer: View {
     SettingsView(
       status: self.store.subscription.viewStatus,
       expiresAt: self.store.subscription.expiresAt,
-      onSubscribeNow: { self.store.send(.subscribeNowTapped) }
+      onEvent: { self.store.send(.view($0)) }
     )
   }
 }

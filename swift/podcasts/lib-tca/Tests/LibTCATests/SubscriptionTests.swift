@@ -4,7 +4,6 @@ import Dependencies
 import LibViews
 import SQLiteData
 import StoreKit
-import StoreKitTest
 import Testing
 
 @testable import LibTCA
@@ -34,7 +33,7 @@ import Testing
       #expect(sub.status == .trialing)
       #expect(sub.expiresAt == .reference + .days(30))
 
-      await store.send(.subscribeNowTapped)
+      await store.send(.view(.subscribeNowTapped))
 
       sub = dep(\.db).subscription()
       #expect(sub.status == .active)
@@ -78,7 +77,9 @@ import Testing
       }
 
       await store.send(
-        .mode(.presented(.podcasts(.destination(.presented(.settings(.subscribeNowTapped))))))
+        .mode(
+          .presented(.podcasts(.destination(.presented(.settings(.view(.subscribeNowTapped))))))
+        )
       )
 
       sub = dep(\.db).subscription()
@@ -180,7 +181,7 @@ import Testing
       sub = dep(\.db).subscription()
       #expect(sub.status == .active)
       #expect(sub.expiresAt == .reference + .days(365))
-      #expect(finishedTxns.value == [1])
+      #expect(finishedTxns.value == []) // we don't finish currentEntitlements
 
       transactions.continuation.finish()
       await store.finish()

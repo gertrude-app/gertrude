@@ -32,7 +32,7 @@ struct PodcastsFeature {
     case addShow(AddShowFeature)
     case show(ShowFeature)
     case settings(SettingsFeature)
-    case confirmDeleteShow(ConfirmationDialogState<ConfirmDeleteAction>)
+    case confirm(ConfirmationDialogState<ConfirmAction>)
   }
 
   enum Action: Equatable {
@@ -46,21 +46,24 @@ struct PodcastsFeature {
     case destination(PresentationAction<Destination.Action>)
   }
 
-  enum ConfirmDeleteAction: Equatable {
-    case confirmDelete(Show.ID)
+  enum ConfirmAction: Equatable {
+    case confirmDelete(show: Show.ID)
+    case confirmTrialEnding
   }
 
   @Dependency(\.db) var database
   @Dependency(\.continuousClock) var clock
+  @Dependency(\.date) var date
 
   var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
       case .onAppear:
+        self.maybeShowTrialEndingDialogue(state: &state)
         return .run { send in
-          await send(.addToDownloadQueue(updateFeeds()))
+          await self.updateFeedsAndDownload(with: send)
           for await _ in self.clock.timer(interval: .seconds(60 * 5)) {
-            await send(.addToDownloadQueue(updateFeeds()))
+            await self.updateFeedsAndDownload(with: send)
           }
         }
 
@@ -85,11 +88,11 @@ struct PodcastsFeature {
         return .none
 
       case .deleteShowTapped(let showId):
-        state.destination = .confirmDeleteShow(
+        state.destination = .confirm(
           .init(titleVisibility: .visible) {
             TextState("Delete this show and all its episodes?")
           } actions: {
-            ButtonState(role: .destructive, action: .confirmDelete(showId)) {
+            ButtonState(role: .destructive, action: .confirmDelete(show: showId)) {
               TextState("Delete")
             }
             ButtonState(role: .cancel) {
@@ -112,7 +115,7 @@ struct PodcastsFeature {
         }.reversed()
         return .send(.startNextDownload)
 
-      case .destination(.presented(.confirmDeleteShow(.confirmDelete(let showId)))):
+      case .destination(.presented(.confirm(.confirmDelete(show: let showId)))):
         state.destination = nil
         return .run { _ in
           removeShowLocalFilesDir(id: showId)
@@ -120,6 +123,10 @@ struct PodcastsFeature {
             try Show.find(showId).delete().execute(db)
           }
         }
+
+      case .destination(.presented(.confirm(.confirmTrialEnding))):
+        state.destination = .settings(.init())
+        return .none
 
       case .addToDownloadQueue(let episodes):
         state.downloadQueue += episodes
@@ -139,5 +146,39 @@ struct PodcastsFeature {
       }
     }
     .ifLet(\.$destination, action: \.destination)
+  }
+
+  func maybeShowTrialEndingDialogue(state: inout State) {
+    if state.subscription.status == .trialing,
+       state.subscription.expiresAt.timeIntervalSince(self.date.now) <= .days(5),
+       self.database.record(id: .trialEndingAlertShown) == nil {
+      state.destination = .confirm(
+        .init(titleVisibility: .visible) {
+          TextState("Your free trial is ending soon!")
+        } actions: {
+          ButtonState(action: .confirmTrialEnding) {
+            TextState("Subscribe now")
+          }
+          ButtonState(role: .cancel) {
+            TextState("Dismiss")
+          }
+        } message: {
+          TextState("Subscribe to continue using the app.")
+        }
+      )
+      self.database.tryWrite { db in
+        try Record
+          .insert { Record(id: .trialEndingAlertShown, value: "true") }
+          .execute(db)
+      }
+    }
+  }
+
+  @MainActor
+  func updateFeedsAndDownload(with send: Send<Action>) async {
+    let downloads = await updateFeeds()
+    if !downloads.isEmpty {
+      send(.addToDownloadQueue(downloads))
+    }
   }
 }

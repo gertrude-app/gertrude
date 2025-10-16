@@ -38,6 +38,12 @@ extension DatabaseReader {
       try CurrentSubscription().fetch(db)
     } ?? .fallback
   }
+
+  func record(id: Record.ID) -> Record? {
+    self.tryRead { db in
+      try Record.find(id: id).fetchOne(db)
+    }
+  }
 }
 
 extension DatabaseWriter {

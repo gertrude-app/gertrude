@@ -120,7 +120,9 @@ struct AppReducer: Sendable {
               log(.subscription("a72104d7"), "subscription activated", detail: "\(txn)")
             }
           }
-          await self.storekit.finishTransaction(txn.id)
+          if isUpdate {
+            await self.storekit.finishTransaction(txn.id)
+          }
         }
       case .appInForegroundChanged(let foregrounded):
         state.$appInForeground.withLock { $0 = foregrounded }

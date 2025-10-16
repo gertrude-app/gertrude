@@ -35,6 +35,11 @@ extension Subscription {
   enum ProductId: String, CaseIterable {
     case yearly = "gertrude.am.yearly.permanent.access"
   }
+
+  func trialEndingSoon(now: Date = .init()) -> Bool {
+    guard self.status == .trialing else { return false }
+    return self.expiresAt <= now + .days(5)
+  }
 }
 
 extension Subscription {

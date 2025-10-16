@@ -57,7 +57,7 @@ extension StoreKitClient: DependencyKey {
         let productIds = Set(Subscription.ProductId.allCases.map(\.rawValue))
         let products = try await Product.products(for: productIds)
         guard let product = products.first else {
-          log(.unexpected("c8f3e1b4"), "No products found")
+          log(.unexpected("a07a7825"), "No products found")
           throw Error.productNotFound
         }
         let productPurchaseResult = try await product.purchase()

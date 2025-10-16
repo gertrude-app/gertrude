@@ -12,7 +12,8 @@ struct PodcastsView: View {
       onAddShowTap: { self.store.send(.addShowTapped) },
       onShowTap: { self.store.send(.showTapped(.init($0))) },
       onDeleteShow: { self.store.send(.deleteShowTapped(.init($0))) },
-      onSettingsTap: { self.store.send(.settingsTapped) }
+      onSettingsTap: { self.store.send(.settingsTapped) },
+      showSettingsAlert: self.store.subscription.trialEndingSoon()
     )
     .navigationBarBackButtonHidden(true)
     .navigationDestination(
@@ -43,8 +44,8 @@ struct PodcastsView: View {
       }
     )
     .confirmationDialog(self.$store.scope(
-      state: \.destination?.confirmDeleteShow,
-      action: \.destination.confirmDeleteShow,
+      state: \.destination?.confirm,
+      action: \.destination.confirm,
     ))
     .onAppear {
       self.store.send(.onAppear)

@@ -3,6 +3,11 @@ import SwiftUI
 public struct SettingsView: View {
   @Environment(\.colorScheme) var cs
 
+  public enum Event: Equatable, Sendable {
+    case subscribeNowTapped
+    case manageSubscriptionTapped
+  }
+
   public enum SubscriptionStatus: Equatable {
     case trialing(purchasePending: Bool = false)
     case active
@@ -51,16 +56,16 @@ public struct SettingsView: View {
 
   let status: SubscriptionStatus
   let expiresAt: Date
-  let onSubscribeNow: () -> Void
+  let onEvent: @MainActor @Sendable (Event) -> Void
 
   public init(
     status: SubscriptionStatus,
     expiresAt: Date,
-    onSubscribeNow: @escaping () -> Void = {}
+    onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in }
   ) {
     self.status = status
     self.expiresAt = expiresAt
-    self.onSubscribeNow = onSubscribeNow
+    self.onEvent = onEvent
   }
 
   public var body: some View {
@@ -154,13 +159,14 @@ public struct SettingsView: View {
         .background(Color(self.cs, light: .violet100, dark: .violet900))
         .cornerRadius(12)
 
-        if self.status.isTrialing || self.status.isUnpaid {
+        if self.status.isTrialing || self.status.isUnpaid || self.status == .active {
           VStack(spacing: 16) {
             VStack(spacing: 8) {
               Button {
-                self.onSubscribeNow()
+                self
+                  .onEvent(self.status == .active ? .manageSubscriptionTapped : .subscribeNowTapped)
               } label: {
-                Text("Subscribe Now")
+                Text(self.status == .active ? "Manage Subscription" : "Subscribe Now")
                   .font(.headline)
                   .foregroundColor(.white)
                   .frame(maxWidth: .infinity)
@@ -169,13 +175,15 @@ public struct SettingsView: View {
                   .cornerRadius(10)
               }
 
-              Text("$10/year")
-                .font(.subheadline)
-                .foregroundColor(Color(
-                  self.cs,
-                  light: .black.opacity(0.6),
-                  dark: .white.opacity(0.6)
-                ))
+              if self.status != .active {
+                Text("$10/year")
+                  .font(.subheadline)
+                  .foregroundColor(Color(
+                    self.cs,
+                    light: .black.opacity(0.6),
+                    dark: .white.opacity(0.6)
+                  ))
+              }
             }
 
             if self.status.isUnpaid {
@@ -217,22 +225,6 @@ public struct SettingsView: View {
     } else {
       return "in \(days) days"
     }
-  }
-}
-
-struct PulsingDot: View {
-  @State private var pulseOpacity: Double = 1.0
-
-  var body: some View {
-    Circle()
-      .fill(Color(red: 0.8, green: 0.0, blue: 0.0))
-      .frame(width: 9, height: 9)
-      .opacity(self.pulseOpacity)
-      .onAppear {
-        withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-          self.pulseOpacity = 0.3
-        }
-      }
   }
 }
 

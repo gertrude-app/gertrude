@@ -8,7 +8,6 @@ import SwiftUI
 
 public struct PodcastsHomeView: View {
   @Environment(\.colorScheme) var cs
-  @State private var pulseOpacity: Double = 1.0
 
   @dynamicMemberLookup
   public struct ShowDataWithStats {
@@ -52,14 +51,17 @@ public struct PodcastsHomeView: View {
           self.onSettingsTap()
         } label: {
           ZStack(alignment: .topTrailing) {
-            Image(systemName: "radio.fill")
+            Image(systemName: "person.crop.circle")
               .font(.title3)
             if self.showSettingsAlert {
-              Circle()
-                .fill(Color(red: 0.8, green: 0.0, blue: 0.0))
-                .frame(width: 9, height: 9)
-                .offset(x: 0, y: -1)
-                .opacity(self.pulseOpacity)
+              TimelineView(.animation) { context in
+                let opacity = 0.65 + 0.35 * sin(context.date.timeIntervalSinceReferenceDate * .pi)
+                Circle()
+                  .fill(Color(red: 0.8, green: 0.0, blue: 0.0))
+                  .frame(width: 9, height: 9)
+                  .opacity(opacity)
+                  .offset(x: 0, y: -1)
+              }
             }
           }
         }
@@ -77,13 +79,6 @@ public struct PodcastsHomeView: View {
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color(self.cs, light: .white, dark: .black))
-    }
-    .onAppear {
-      if self.showSettingsAlert {
-        withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-          self.pulseOpacity = 0.3
-        }
-      }
     }
   }
 

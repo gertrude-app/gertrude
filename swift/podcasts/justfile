@@ -51,7 +51,7 @@ clean:
   @find lib-tca lib-core lib-views -type f \( -name '*.o' -o -name '*.d' -o -name '*.swiftdeps' -o -name '*.swiftdeps~' \) -delete
 
 sim-db:
-  @harlequin {{sim-docs-dir}}/db.sqlite
+  @sqlite3 -box {{sim-docs-dir}}/db.sqlite
 
 sim-db-delete:
   @rm -f {{sim-docs-dir}}/db.*
