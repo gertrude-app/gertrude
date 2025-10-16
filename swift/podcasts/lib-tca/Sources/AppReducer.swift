@@ -142,7 +142,7 @@ struct AppReducer: Sendable {
                let show
              ))))):
           return .send(.nowPlaying(.episodePlayPauseTapped(episode, show)))
-        case .delegate(.error(let message)):
+        case .delegate(.alert(let message)):
           state.alert = .init { TextState(message) }
           return .none
         default:
@@ -151,11 +151,11 @@ struct AppReducer: Sendable {
       case .alert(.presented(.dismiss)):
         state.alert = nil
         return .none
-      case .nowPlaying(.delegate(.error(let message))):
+      case .nowPlaying(.delegate(.alert(let message))):
         state.alert = .init { TextState(message) }
         return .none
       case .mode(
-        .presented(.podcasts(.destination(.presented(.addShow(.delegate(.error(let message)))))))
+        .presented(.podcasts(.destination(.presented(.addShow(.delegate(.alert(let message)))))))
       ):
         state.alert = .init { TextState(message) }
         return .none

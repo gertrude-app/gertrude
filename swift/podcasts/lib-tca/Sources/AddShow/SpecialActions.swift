@@ -75,11 +75,11 @@ extension AddShowFeature {
         guard let httpResponse = response as? HTTPURLResponse,
               (200 ... 299).contains(httpResponse.statusCode) else {
           log(.error("b4c8d7e2"), "upload db fail: unexpected response")
-          await send(.delegate(.error("DB upload failed, unexpected response")))
+          await send(.delegate(.alert("DB upload failed, unexpected response")))
           return
         }
         log(.info("a5f6b9c3"), "upload db success")
-        await send(.delegate(.error("DB upload success: \(installId)")))
+        await send(.delegate(.alert("DB upload success: \(installId)")))
       }
     }
 
@@ -87,7 +87,7 @@ extension AddShowFeature {
       let urlString = String(input.dropFirst("am: download db 660b2f93 ".count))
       guard let url = URL(string: urlString) else {
         log(.error("d8e9f1a2"), "download db fail: invalid url")
-        return .send(.delegate(.error("DB download failed, invalid URL")))
+        return .send(.delegate(.alert("DB download failed, invalid URL")))
       }
 
       return .run { send in
@@ -95,12 +95,20 @@ extension AddShowFeature {
         guard let httpResponse = response as? HTTPURLResponse,
               (200 ... 299).contains(httpResponse.statusCode) else {
           log(.error("e9f1a2b3"), "download db fail: bad response")
-          await send(.delegate(.error("DB download failed, bad response")))
+          await send(.delegate(.alert("DB download failed, bad response")))
           return
         }
         try data.write(to: .tempDb)
         log(.info("f1a2b3c4"), "download db success")
-        await send(.delegate(.error("DB download success, restart app")))
+        await send(.delegate(.alert("DB download success, restart app")))
+      }
+    }
+
+    if input == "am: c731abbfe9d" {
+      return .run { send in
+        try CurrentSubscription.set(status: .complimentary, expiringAt: .distantFuture)
+        log(.info("111b15d5"), "set subscription to complimentary")
+        await send(.delegate(.alert("Subscription set to complimentary :)")))
       }
     }
 

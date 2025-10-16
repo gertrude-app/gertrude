@@ -22,7 +22,7 @@ struct ShowFeature {
   enum Action: Equatable {
     enum DelegateAction: Equatable {
       case episodePlayPauseTapped(Episode, Show)
-      case error(String)
+      case alert(String)
     }
 
     case episodeView(Episode.ID, EpisodeView.Event)
@@ -46,7 +46,7 @@ struct ShowFeature {
         case .downloadTapped:
           return .run { send in
             if let error = await ensureDownloaded(episode: episode).error {
-              await send(.delegate(.error(error.message)))
+              await send(.delegate(.alert(error.message)))
             }
           }
         case .playPauseTapped:

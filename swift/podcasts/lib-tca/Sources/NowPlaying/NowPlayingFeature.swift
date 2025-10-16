@@ -13,7 +13,7 @@ struct NowPlayingFeature {
 
   enum Action: Equatable {
     enum DelegateAction: Equatable {
-      case error(String)
+      case alert(String)
     }
 
     case view(NowPlayingView.Event)
@@ -156,7 +156,7 @@ struct NowPlayingFeature {
       NowPlaying.set(.init(episodeId: episode.id, isPlaying: false, minimized: true))
       await testAssertCheckpoint("now playing set, initialize to paused")
       if let error = await ensureDownloaded(episode: episode).error {
-        await send(.delegate(.error(error.message)))
+        await send(.delegate(.alert(error.message)))
         // TODO: delete now playing, i think
       } else {
         NowPlaying.update { $0.isPlaying = true }

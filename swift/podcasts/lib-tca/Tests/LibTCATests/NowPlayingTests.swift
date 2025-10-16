@@ -213,7 +213,7 @@ import Testing
 
       await clock.advance(by: .seconds(1))
 
-      await store.receive(.delegate(.error("Failed to download episode, try again later")))
+      await store.receive(.delegate(.alert("Failed to download episode, try again later")))
 
       nowPlaying = dep(\.db).nowPlaying()
       #expect(nowPlaying?.episode.id == 4 && nowPlaying?.isPlaying == false)

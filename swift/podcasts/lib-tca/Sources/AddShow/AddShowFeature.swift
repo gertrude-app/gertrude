@@ -26,7 +26,7 @@ struct AddShowFeature {
 
   enum Action: Equatable {
     enum DelegateAction: Equatable {
-      case error(String)
+      case alert(String)
     }
 
     case passcodeVerified
