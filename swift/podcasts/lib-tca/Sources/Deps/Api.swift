@@ -11,7 +11,7 @@ struct ApiClient: Sendable {
     _ label: String,
     _ detail: String?
   ) async throws -> Void
-  var podcastProducts: @Sendable () async throws -> [String]
+  var productIds: @Sendable () async throws -> [String]
   var createDatabaseUpload: @Sendable (_ installId: UUID) async throws -> URL
 }
 
@@ -61,7 +61,7 @@ extension ApiClient: DependencyKey {
 
         let _: Empty = try await pairql("LogPodcastEvent", input: input)
       },
-      podcastProducts: {
+      productIds: {
         try await pairql("PodcastProducts")
       },
       createDatabaseUpload: { installId in

@@ -13,9 +13,10 @@ import Testing
     let finishedTxns = LockIsolated<[Transaction.ID]>([])
     try await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
+      $0.api.productIds = { ["cool.product"] }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
-      $0.storekit.purchaseSubscription = { .success(.mock) }
+      $0.storekit.purchaseSubscription = { _ in .success(.mock) }
       $0.storekit.finishTransaction = { id in
         finishedTxns.withValue { $0.append(id) }
       }
@@ -47,6 +48,7 @@ import Testing
     let transactions = AsyncStream<TransactionData>.makeStream()
     try await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
+      $0.api.productIds = { ["cool.product"] }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
       $0.keychain = .mock
@@ -56,7 +58,7 @@ import Testing
       $0.storekit.transactionUpdates = { transactions.stream }
       $0.storekit.finishTransaction = { id in finishedTxns.withValue { $0.append(id) } }
       $0.storekit.verifiedCurrentEntitlements = { [] }
-      $0.storekit.purchaseSubscription = { .pending } // <-- purchase attempt results in pending
+      $0.storekit.purchaseSubscription = { _ in .pending } // <-- attempt results in pending
     } operation: {
       try CurrentSubscription.set(status: .trialing, expiringAt: .reference + .days(30))
       var sub = dep(\.db).subscription()

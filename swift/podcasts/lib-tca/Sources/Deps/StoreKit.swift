@@ -8,7 +8,7 @@ import Synchronization
 
 @DependencyClient
 struct StoreKitClient: Sendable {
-  var purchaseSubscription: @Sendable () async throws -> PurchaseResult
+  var purchaseSubscription: @Sendable (_ productIds: [String]) async throws -> PurchaseResult
   var finishTransaction: @Sendable (_ id: Transaction.ID) async -> Void
   var verifiedCurrentEntitlements: @Sendable () async throws -> [TransactionData]
   var transactionUpdates: @Sendable () async throws -> any AsyncSequence<TransactionData, Never>
@@ -53,9 +53,8 @@ extension StoreKitClient {
 extension StoreKitClient: DependencyKey {
   static var liveValue: StoreKitClient {
     .init(
-      purchaseSubscription: {
-        let productIds = Set(Subscription.ProductId.allCases.map(\.rawValue))
-        let products = try await Product.products(for: productIds)
+      purchaseSubscription: { productIds in
+        let products = try await Product.products(for: Set(productIds))
         guard let product = products.first else {
           log(.unexpected("a07a7825"), "No products found")
           throw Error.productNotFound
