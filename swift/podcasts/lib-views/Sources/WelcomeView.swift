@@ -52,15 +52,17 @@ public struct WelcomeView: View {
           }
         }
 
-        Text("Gertrude AM lets parents give access to only selected, approved podcasts.")
-          .font(.system(size: 16, weight: .medium))
-          .multilineTextAlignment(self.deviceType() == .pad ? .center : .leading)
-          .swooshIn(
-            tracking: self.$subtitleOffset,
-            to: .zero,
-            after: .seconds(1.0),
-            for: .milliseconds(800)
-          )
+        Text(
+          "Gertrude AM lets parents or accountability partners give access to only selected, approved podcasts."
+        )
+        .font(.system(size: 16, weight: .medium))
+        .multilineTextAlignment(self.deviceType() == .pad ? .center : .leading)
+        .swooshIn(
+          tracking: self.$subtitleOffset,
+          to: .zero,
+          after: .seconds(1.0),
+          for: .milliseconds(800)
+        )
 
         BigButton("Get started", type: .button {
           Task { @MainActor in

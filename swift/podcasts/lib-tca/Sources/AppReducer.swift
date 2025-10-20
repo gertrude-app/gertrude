@@ -55,16 +55,17 @@ struct AppReducer: Sendable {
 
           let installId = UUID()
           self.keychain.save(installId: installId)
-          self.database.insertRecord(id: .deviceId, value: "\(installId)")
+          self.database.insertRecord(id: .installId, value: "\(installId)")
           log(.info("27c4f26a"), "firstLaunch")
+        } else {
+          let updated = self.defeatRepeatFreeTrialAttempt(state.subscription)
+          self.expireFreeTrial(updated ?? state.subscription)
         }
 
         if let passcode = self.keychain.loadPincode() {
           state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
-          log(.debug, "appDidLaunch with passcode")
         } else {
           state.mode = .onboarding(OnboardingFeature.State())
-          log(.debug, "appDidLaunch without passcode")
         }
         let nowPlayingId = state.nowPlaying.data?.episode.id
         return .merge(
@@ -180,6 +181,35 @@ struct AppReducer: Sendable {
     }
     .ifLet(\.$mode, action: \.mode)
     .ifLet(\.$alert, action: \.alert)
+  }
+
+  func defeatRepeatFreeTrialAttempt(_ subscription: Subscription) -> Subscription? {
+    guard subscription.status == .trialing,
+          subscription.expiresAt > self.date.now + .days(29) else {
+      return nil
+    }
+    guard let installDate = self.keychain.loadInstallDate(),
+          installDate < self.date.now - .days(3) else {
+      return nil
+    }
+
+    log(.subscription("1ace9aa6"), "defeated repeat free trial attempt")
+    return try? CurrentSubscription.set(
+      status: .trialing,
+      expiringAt: installDate + .days(30)
+    )
+  }
+
+  func expireFreeTrial(_ subscription: Subscription) {
+    guard subscription.status == .trialing,
+          subscription.expiresAt <= self.date.now else {
+      return
+    }
+    log(.subscription("456c9362"), "free trial expired")
+    _ = try? CurrentSubscription.set(
+      status: .unpaid,
+      expiringAt: subscription.expiresAt
+    )
   }
 
   func cleanupTasks(_ nowPlaying: Episode.ID?) {

@@ -65,6 +65,11 @@ enum Migrations {
       ALTER TABLE nowPlaying_new RENAME TO nowPlaying;
       """
     ).execute(db)
+    try #sql(
+      """
+      UPDATE records set id = 'installId' where id = 'deviceId';
+      """
+    ).execute(db)
   }
 
   @Sendable static func m2025_10_13(_ db: Database) throws {

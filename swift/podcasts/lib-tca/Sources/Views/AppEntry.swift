@@ -25,18 +25,6 @@ public struct AppStore {
     let db = try! appDatabase()
     prepareDependencies {
       $0.defaultDatabase = db
-      #if targetEnvironment(simulator)
-        $0.keychain._load = { key in
-          switch key {
-          case .pincode:
-            "111111".data(using: .utf8)!
-          case .installDate:
-            "1760103425".data(using: .utf8)!
-          case .installId:
-            "DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF".data(using: .utf8)!
-          }
-        }
-      #endif
     }
     self.inner = Store(
       initialState: .init(),

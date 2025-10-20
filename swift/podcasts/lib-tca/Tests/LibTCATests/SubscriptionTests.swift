@@ -189,6 +189,48 @@ import Testing
       await store.finish()
     }
   }
+
+  @Test func defeatRepeatFreeTrialAttempt() async throws {
+    await withDependencies {
+      $0.api.logEvent = { _, _, _, _ in }
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase {
+        try Subscription
+          .update {
+            $0.createdAt = .reference
+            $0.expiresAt = .reference + .days(30)
+            $0.status = .trialing
+          }
+          .execute($0)
+      }
+      $0.storekit = .testValue
+      $0.mainQueue = .immediate
+      $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
+      $0.notificationCenter.appForegroundingEvents = { Empty().eraseToAnyPublisher() }
+      $0.keychain._load = { key in
+        switch key {
+        case .pincode:
+          "123456".data(using: .utf8)
+        case .installId:
+          "\(UUID())".data(using: .utf8)
+        case .installDate:
+          "\(Date.reference.advanced(by: -.days(35)).timeIntervalSince1970)".data(using: .utf8)
+        }
+      }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: AppReducer.init)
+      store.exhaustivity = .off
+      var sub = dep(\.db).subscription()
+      #expect(sub.status == .trialing)
+      #expect(sub.expiresAt == .reference + .days(30))
+
+      await store.send(.appDidLaunch)
+
+      sub = dep(\.db).subscription()
+      #expect(sub.status == .unpaid)
+      #expect(sub.expiresAt == .reference - .days(5))
+    }
+  }
 }
 
 extension TransactionData {

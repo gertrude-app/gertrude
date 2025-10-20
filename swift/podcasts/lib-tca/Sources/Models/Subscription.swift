@@ -72,11 +72,12 @@ struct CurrentSubscription: FetchKeyRequest {
     return subscription
   }
 
+  @discardableResult
   static func set(
     status: Subscription.Status,
     purchasePendingSince: Date? = nil,
     expiringAt: Date
-  ) throws {
+  ) throws -> Subscription {
     dep(\.db).tryWrite { db in
       try Subscription
         .find(Subscription.ID(1))
@@ -85,7 +86,8 @@ struct CurrentSubscription: FetchKeyRequest {
           $0.purchasePendingSince = purchasePendingSince
           $0.expiresAt = expiringAt
         }
-        .execute(db)
-    }
+        .returning { $0.self }
+        .fetchOne(db)
+    } ?? .fallback
   }
 }

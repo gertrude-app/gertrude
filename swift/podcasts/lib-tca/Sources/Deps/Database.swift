@@ -137,7 +137,7 @@ public func appDatabase(
 }
 
 func alwaysBeforeTriggersCreated(_ db: Database) throws {
-  // initialize now playing before triggers
+  // initialize now playing
   try NowPlayingModel
     .update {
       $0.isPlaying = false

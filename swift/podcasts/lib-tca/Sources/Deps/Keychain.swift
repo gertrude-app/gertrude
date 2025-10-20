@@ -20,6 +20,11 @@ extension KeychainClient {
       var secAttrAccount: String {
         "gertrude.am.\(self.rawValue)"
       }
+
+    #elseif targetEnvironment(simulator)
+      var secAttrAccount: String {
+        "gertrude.am.\(self.rawValue).sim.4"
+      }
     #else
       var secAttrAccount: String {
         "gertrude.am.\(self.rawValue).dev"
