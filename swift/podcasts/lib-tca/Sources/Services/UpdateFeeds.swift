@@ -32,7 +32,16 @@ struct FeedUpdates: Equatable {
 }
 
 func updateFeeds(showIds: [Show.ID]? = nil) async -> [Episode] {
-  if dep(\.db).subscription().status == .unpaid { return [] }
+  let database = dep(\.db)
+  guard database.subscription().status != .unpaid else {
+    return []
+  }
+
+  guard takeUpdateLock(database) else {
+    return []
+  }
+  defer { releaseUpdateLock(database) }
+
   let input = await _prepareFeedUpdateInputData(showIds: showIds)
   let updates = _feedUpdates(input: input)
   return await _performFeedUpdates(updates)
@@ -106,8 +115,9 @@ func _feedUpdates(input: FeedUpdateInputData) -> FeedUpdates {
       updates.actions.append(.replaceShowArtwork(showId: show.id, artworkUrl: newUrl))
     }
 
+    let showEpisodes = input.episodes.filter { $0.showId == show.id }
     let feedEpisodeGuids = Set(feed.episodes.map(\.guid))
-    let existingEpisodeGuids = Set(input.episodes.filter { $0.showId == show.id }.map(\.guid))
+    let existingEpisodeGuids = Set(showEpisodes.map(\.guid))
 
     let newEpisodesGuids = feedEpisodeGuids.subtracting(existingEpisodeGuids)
     for newEpisodeGuid in newEpisodesGuids {
@@ -120,7 +130,7 @@ func _feedUpdates(input: FeedUpdateInputData) -> FeedUpdates {
 
     let deletedEpisodeGuids = existingEpisodeGuids.subtracting(feedEpisodeGuids)
     for deletedEpisodeGuid in deletedEpisodeGuids {
-      guard let episode = input.episodes.first(where: { $0.guid == deletedEpisodeGuid }) else {
+      guard let episode = showEpisodes.first(where: { $0.guid == deletedEpisodeGuid }) else {
         unexpected(id: "e1ebff9a", assert: true)
         continue
       }
@@ -131,7 +141,7 @@ func _feedUpdates(input: FeedUpdateInputData) -> FeedUpdates {
 
     let commonEpisodeGuids = feedEpisodeGuids.intersection(existingEpisodeGuids)
     for commonEpisodeGuid in commonEpisodeGuids {
-      guard let existingEpisode = input.episodes.first(where: { $0.guid == commonEpisodeGuid }),
+      guard let existingEpisode = showEpisodes.first(where: { $0.guid == commonEpisodeGuid }),
             let feedEpisodeData = feed.episodes.first(where: { $0.guid == commonEpisodeGuid })
       else {
         unexpected(id: "a8b1cc45", assert: true)
@@ -258,5 +268,27 @@ extension Episode {
       self.duration != feedData.duration ||
       self.sizeInBytes != feedData.sizeInBytes ||
       self.audioType != feedData.audioType
+  }
+}
+
+private func takeUpdateLock(_ database: any DatabaseWriter) -> Bool {
+  do {
+    try database.write { db in
+      try Record
+        .insert { Record(id: .feedUpdatesLock, value: "") }
+        .execute(db)
+    }
+    return true
+  } catch {
+    return false
+  }
+}
+
+private func releaseUpdateLock(_ database: any DatabaseWriter) {
+  database.tryWrite { db in
+    try Record
+      .find(id: .feedUpdatesLock)
+      .delete()
+      .execute(db)
   }
 }

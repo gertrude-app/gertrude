@@ -1,6 +1,72 @@
 import SQLiteData
 
 enum Migrations {
+  @Sendable static func m2025_10_20(_ db: Database) throws {
+    try #sql(
+      """
+      DELETE FROM episodes
+      WHERE id NOT IN (
+        SELECT id FROM (
+          SELECT id,
+                 ROW_NUMBER() OVER (
+                   PARTITION BY guid
+                   ORDER BY lastPlayedAt DESC NULLS LAST, createdAt ASC
+                 ) AS rn
+          FROM episodes
+        )
+        WHERE rn = 1
+      );
+      """
+    ).execute(db)
+    try #sql(
+      """
+      CREATE UNIQUE INDEX idx_episodes_showId_guid ON episodes(showId, guid);
+      """
+    ).execute(db)
+    try #sql(
+      """
+      CREATE INDEX idx_episodes_showId ON episodes(showId);
+      """
+    ).execute(db)
+    try #sql(
+      """
+      CREATE INDEX idx_episodes_pubDate ON episodes(pubDate);
+      """
+    ).execute(db)
+    try #sql(
+      """
+      DELETE FROM nowPlaying WHERE episodeId IS NULL OR episodeId NOT IN (SELECT id FROM episodes);
+      """
+    ).execute(db)
+    try #sql(
+      """
+      CREATE TABLE nowPlaying_new (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        episodeId INTEGER NOT NULL REFERENCES episodes(id) ON DELETE CASCADE,
+        minimized INTEGER NOT NULL CHECK (minimized IN (0, 1)),
+        isPlaying INTEGER NOT NULL CHECK (isPlaying IN (0, 1)),
+        nextDownloaded INTEGER NOT NULL CHECK (nextDownloaded IN (0, 1)),
+        updatedAt TEXT NOT NULL
+      ) STRICT;
+      """
+    ).execute(db)
+    try #sql(
+      """
+      INSERT INTO nowPlaying_new SELECT * FROM nowPlaying WHERE episodeId IS NOT NULL;
+      """
+    ).execute(db)
+    try #sql(
+      """
+      DROP TABLE nowPlaying;
+      """
+    ).execute(db)
+    try #sql(
+      """
+      ALTER TABLE nowPlaying_new RENAME TO nowPlaying;
+      """
+    ).execute(db)
+  }
+
   @Sendable static func m2025_10_13(_ db: Database) throws {
     try #sql(
       """

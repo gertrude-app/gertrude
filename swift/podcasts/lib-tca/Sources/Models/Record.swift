@@ -23,4 +23,5 @@ extension Record.ID {
   static let deviceId = Record.ID(rawValue: "deviceId")
   static let onboardingFinished = Record.ID(rawValue: "onboardingFinished")
   static let trialEndingAlertShown = Record.ID(rawValue: "trialEndingAlertShown")
+  static let feedUpdatesLock = Record.ID(rawValue: "feedUpdatesLock")
 }

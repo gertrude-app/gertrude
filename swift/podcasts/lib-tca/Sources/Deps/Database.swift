@@ -122,6 +122,9 @@ public func appDatabase(
   migrator.registerMigration("m_2025-10-13") {
     try Migrations.m2025_10_13($0)
   }
+  migrator.registerMigration("m_2025-10-20") {
+    try Migrations.m2025_10_20($0)
+  }
   try migrator.migrate(database)
 
   try database.write { db in
@@ -149,6 +152,12 @@ func alwaysBeforeTriggersCreated(_ db: Database) throws {
     .returning(\.self)
     .fetchAll(db)
   stuckDownloads.forEach { $0.removeLocalAudioFile() }
+
+  // stale feed updates lock
+  try Record
+    .find(id: .feedUpdatesLock)
+    .delete()
+    .execute(db)
 }
 
 private let logger = Logger(subsystem: "GertiePodcasts", category: "DB")
