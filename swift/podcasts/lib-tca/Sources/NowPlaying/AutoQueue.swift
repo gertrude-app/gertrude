@@ -63,6 +63,7 @@ enum AutoQueue {
         .where { $0.pubDate.gt(episode.pubDate) }
         .where { $0.progress.lt(2.0) }
         .where { $0.completedAt.is(nil) }
+        .where { $0.isArchived == false }
         .order { $0.pubDate.asc() }
         .fetchAll(db)
       let olderEpisodes = try Episode
@@ -71,6 +72,7 @@ enum AutoQueue {
         .where { $0.pubDate.lt(episode.pubDate) }
         .where { $0.progress.lt(2.0) }
         .where { $0.completedAt.is(nil) }
+        .where { $0.isArchived == false }
         .order { $0.pubDate.desc() }
         .fetchAll(db)
       return newerEpisodes + olderEpisodes
