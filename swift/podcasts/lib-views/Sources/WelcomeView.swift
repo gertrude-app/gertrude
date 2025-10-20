@@ -24,12 +24,12 @@ public struct WelcomeView: View {
         .offset(y: self.showBg ? 0 : -440)
         .ignoresSafeArea()
         .onAppear {
-          withAnimation(.smooth(duration: 1)) {
+          withAnimation(.backgroundFadeSmoothLong) {
             self.showBg = true
           }
         }
         .onDisappear {
-          withAnimation(.smooth(duration: 1)) {
+          withAnimation(.backgroundFadeSmoothLong) {
             self.showBg = false
           }
         }

@@ -119,7 +119,7 @@ public struct ButtonScreenView: View {
         .ignoresSafeArea()
         .opacity(self.showBg ? 1 : 0)
         .onAppear {
-          withAnimation(.smooth(duration: 0.7)) {
+          withAnimation(.backgroundFadeSmooth) {
             self.showBg = true
           }
         }

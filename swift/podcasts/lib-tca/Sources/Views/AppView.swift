@@ -37,7 +37,7 @@ struct AppView: View {
             self.store.send(
               .nowPlaying(.view(event)),
               animation: event == .miniPlayerTapped || event == .dismissed
-                ? .spring(response: 0.6, dampingFraction: 0.8) : nil
+                ? .nowPlayingSpring : nil
             )
           }
         )

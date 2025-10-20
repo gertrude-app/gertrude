@@ -2,7 +2,6 @@ import SwiftUI
 
 public struct EpisodeView: View {
   @Environment(\.colorScheme) var cs
-  @State private var rotationAngle: Double = 0
 
   public enum Event {
     case playPauseTapped
@@ -95,17 +94,9 @@ public struct EpisodeView: View {
               Image(systemName: "arrow.2.circlepath")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-                .rotationEffect(.degrees(self.rotationAngle))
+                .rotatingDownloadIcon()
                 .padding(12)
                 .offset(x: 12)
-                .task {
-                  withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
-                    self.rotationAngle = 360
-                  }
-                }
-                .onDisappear {
-                  self.rotationAngle = 0
-                }
             }
           }
 

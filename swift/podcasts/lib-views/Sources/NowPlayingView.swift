@@ -3,7 +3,6 @@ import SwiftUI
 public struct NowPlayingView: View, EpisodeArtworkProvider {
   @Environment(\.colorScheme) var cs
   @State private var dragOffset: CGFloat = 0
-  @State private var rotationAngle: Double = 0
 
   let episode: EpisodeData
   let show: ShowData
@@ -57,7 +56,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: self.minimized ? nil : .infinity)
-    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: self.minimized)
+    .animation(.nowPlayingSpring, value: self.minimized)
     .gesture(
       DragGesture()
         .onChanged { value in
@@ -72,7 +71,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
             self.emit(.dismissed)
           }
           // Reset drag offset with animation
-          withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+          withAnimation(.nowPlayingSpring) {
             self.dragOffset = 0
           }
         }
@@ -111,12 +110,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
         Image(systemName: "arrow.2.circlepath")
           .font(.system(size: 18, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-          .rotationEffect(.degrees(self.rotationAngle))
-          .onAppear {
-            withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
-              self.rotationAngle = 360
-            }
-          }
+          .rotatingDownloadIcon()
           .padding(.trailing, 4)
       } else {
         Button(action: {
