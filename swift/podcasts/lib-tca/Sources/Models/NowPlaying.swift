@@ -63,6 +63,31 @@ struct NowPlaying: FetchKeyRequest {
   }
 }
 
+struct EpisodePlaying: FetchKeyRequest {
+  typealias Value = Data?
+
+  struct Data: Equatable {
+    var episodeId: Episode.ID
+    var isPlaying: Bool
+  }
+
+  func fetch(_ db: Database) throws -> Value {
+    let data = try NowPlayingModel
+      // NB: minimal query prevents unnecessary extra fetches on progress updates
+      .select { ($0.episodeId, $0.isPlaying) }
+      .where { $0.id == NowPlayingModel.ID(1) }
+      .fetchOne(db)
+    guard let data else { return nil }
+    return .init(episodeId: data.0, isPlaying: data.1)
+  }
+}
+
+extension EpisodePlaying.Value {
+  func isPlaying(episodeId: Episode.ID) -> Bool {
+    self?.episodeId == episodeId && self?.isPlaying == true
+  }
+}
+
 extension NowPlaying.Value {
   func isPlaying(episodeId: Episode.ID) -> Bool {
     self?.episode.id == episodeId && self?.isPlaying == true

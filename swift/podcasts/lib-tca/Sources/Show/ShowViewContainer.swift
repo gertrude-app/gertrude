@@ -5,7 +5,7 @@ import SwiftUI
 
 struct ShowViewContainer: View {
   @Bindable var store: StoreOf<ShowFeature>
-  @Fetch(NowPlaying()) var nowPlaying: NowPlaying.Value = nil
+  @Fetch(EpisodePlaying()) var nowPlaying: EpisodePlaying.Value = nil
 
   var body: some View {
     ShowView(
