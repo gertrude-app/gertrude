@@ -89,7 +89,7 @@ struct ShowFeature {
                 .where { $0.id == episode.id }
                 .execute(db)
             }
-            try await state.$episodes.load(state.selectEpisodes, animation: .default)
+            try await state.$episodes.load(state.selectEpisodes)
           }
         }
       case .showView(let event):
@@ -121,7 +121,7 @@ struct ShowFeature {
                 .where { $0.showId == state.showId }
                 .execute(db)
             }
-            try await state.$episodes.load(state.selectEpisodes, animation: .default)
+            try await state.$episodes.load(state.selectEpisodes)
           }
         }
       case .destination:
@@ -166,8 +166,7 @@ extension ShowFeature.State {
       Show.where { $0.id == show.id }
     )
     self._episodes = FetchAll(
-      episodeQuery(showId: show.id, sortOrder: show.sort),
-      animation: .default
+      episodeQuery(showId: show.id, sortOrder: show.sort)
     )
   }
 }
