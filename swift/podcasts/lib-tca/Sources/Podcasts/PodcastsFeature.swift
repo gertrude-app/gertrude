@@ -133,7 +133,7 @@ struct PodcastsFeature {
         state.downloadQueue += self.database.tryRead {
           try Episode.all
             .where { $0.showId == show.id }
-            .order { ($0.episodeNumber.desc(), $0.pubDate.desc()) }
+            .order { ($0.pubDate.desc(), $0.episodeNumber.desc()) }
             .limit(3)
             .fetchAll($0)
         }.reversed()
