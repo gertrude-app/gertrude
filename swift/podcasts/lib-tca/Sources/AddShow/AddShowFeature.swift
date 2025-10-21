@@ -14,7 +14,6 @@ struct AddShowFeature {
       case addingByUrl
       case chooseArtworkPolicy(String)
       case subscribing
-      case subscribeError
     }
 
     var passcode: Int
@@ -159,7 +158,8 @@ struct AddShowFeature {
         }
         guard let show else {
           log(.error("98916a65"), "subscribe fail")
-          await send(.setScreen(.subscribeError))
+          await send(.setScreen(.choosingMethod))
+          await send(.delegate(.alert("Error adding show, please try again.")))
           return
         }
         await self.podcasts.downloadArtwork(for: show)
@@ -172,7 +172,8 @@ struct AddShowFeature {
         await send(.subscribed(show))
       } catch {
         log(.error("8c5abff7"), "subscribe fail")
-        await send(.setScreen(.subscribeError))
+        await send(.setScreen(.choosingMethod))
+        await send(.delegate(.alert("Error adding show, please try again.")))
       }
     }
   }

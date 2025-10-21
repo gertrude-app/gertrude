@@ -51,9 +51,6 @@ struct AddShowView: View {
       case .subscribing:
         LoadingScreenView(text: "Subscribing...")
 
-      case .subscribeError:
-        ErrorView(text: "Adding show failed. Please try again.")
-
       case .addingByUrl:
         ButtonScreenView(
           text: "Enter a podcast RSS feed URL:",
