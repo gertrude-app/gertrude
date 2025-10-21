@@ -74,6 +74,9 @@ struct NowPlayingFeature {
           time.map { nowPlaying.setProgress($0) }
           return .none
         case .progressUpdated(let progress):
+          if !state.appInForeground, progress.remainder(dividingBy: 5.0) < 0.1 {
+            return .none
+          }
           nowPlaying.setProgress(progress)
           return .run { _ in
             if nowPlaying.shouldDownloadNext(at: progress) {
@@ -105,7 +108,8 @@ struct NowPlayingFeature {
           return self.skip(nowPlaying, .forward, amount: 30, from: position)
         case .headphonesTripleClickReceived(let position):
           return self.skip(nowPlaying, .backward, amount: 15, from: position)
-        case .interruptionBegan:
+        case .interruptionBegan(let position):
+          position.map { nowPlaying.setProgress($0) }
           NowPlaying.update { $0.isPlaying = false }
           return .none
         case .interruptionEnded(shouldResume: true, let position):

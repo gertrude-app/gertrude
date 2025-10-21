@@ -67,24 +67,13 @@ public struct EpisodeDetailView: View {
         }
         .padding(.top, 20)
 
-        Button(action: { self.emit(.playPauseTapped) }) {
-          HStack(spacing: 12) {
-            Image(systemName: self.episode.isPlaying ? "pause.fill" : "play.fill")
-              .font(.system(size: 20, weight: .semibold))
-
-            Text(
-              self.episode.isPlaying
-                ? "Pause"
-                : (self.episode.progress >= 2.0 && !self.episode.isCompleted ? "Resume" : "Play")
-            )
-            .font(.system(size: 18, weight: .semibold))
-          }
-          .foregroundStyle(.white)
-          .frame(width: 240)
-          .padding(.vertical, 16)
-          .background(Color(self.cs, light: .violet600, dark: .violet500))
-          .cornerRadius(12)
-        }
+        PlayPauseButton(
+          text: self.episode.isPlaying
+            ? "Pause"
+            : (self.episode.progress >= 2.0 && !self.episode.isCompleted ? "Resume" : "Play"),
+          isPlaying: self.episode.isPlaying,
+          onTap: { self.emit(.playPauseTapped) }
+        )
 
         if let description = self.episode.description {
           VStack(alignment: .leading, spacing: 8) {

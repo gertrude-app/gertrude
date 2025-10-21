@@ -16,6 +16,7 @@ struct ShowViewContainer: View {
       ) },
       showArchivedEpisodes: self.store.showArchivedEpisodes,
       sortNewestToOldest: self.store.show.sort == .newestToOldest,
+      headerPlayButtonState: self.store.headerPlayButtonState.viewState,
       onEpisodeEvent: { episodeId, event in
         self.store.send(.episodeView(.init(episodeId), event))
       },
@@ -32,5 +33,18 @@ struct ShowViewContainer: View {
         EpisodeViewContainer(store: store)
       }
     )
+  }
+}
+
+extension ShowFeature.State.HeaderPlayButtonState {
+  var viewState: ShowView.HeaderPlayButtonState {
+    switch self {
+    case .resume(let episode, let isPlaying):
+      .resume(episodeTitle: episode.title, isPlaying: isPlaying)
+    case .playLatest(_, let isPlaying):
+      .playLatest(isPlaying: isPlaying)
+    case .none:
+      .none
+    }
   }
 }

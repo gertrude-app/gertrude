@@ -12,12 +12,20 @@ public struct ShowView: View {
     case sortNewestToOldest
     case toggleShowArchivedTapped
     case unarchiveAllTapped
+    case headerPlayButtonTapped
+  }
+
+  public enum HeaderPlayButtonState: Equatable {
+    case resume(episodeTitle: String, isPlaying: Bool)
+    case playLatest(isPlaying: Bool)
+    case none
   }
 
   let show: ShowData
   let episodes: [EpisodeData]
   let showArchivedEpisodes: Bool
   let sortNewestToOldest: Bool
+  let headerPlayButtonState: HeaderPlayButtonState
   let onEpisodeEvent: @MainActor @Sendable (Int, EpisodeView.Event) -> Void
   let onEvent: @MainActor @Sendable (Event) -> Void
 
@@ -26,6 +34,7 @@ public struct ShowView: View {
     episodes: [EpisodeData] = [],
     showArchivedEpisodes: Bool = false,
     sortNewestToOldest: Bool = true,
+    headerPlayButtonState: HeaderPlayButtonState = .none,
     onEpisodeEvent: @MainActor @Sendable @escaping (Int, EpisodeView.Event) -> Void = { _, _ in },
     onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in }
   ) {
@@ -33,6 +42,7 @@ public struct ShowView: View {
     self.episodes = episodes
     self.showArchivedEpisodes = showArchivedEpisodes
     self.sortNewestToOldest = sortNewestToOldest
+    self.headerPlayButtonState = headerPlayButtonState
     self.onEpisodeEvent = onEpisodeEvent
     self.onEvent = onEvent
   }
@@ -170,6 +180,8 @@ public struct ShowView: View {
             .lineLimit(3)
             .padding(.top, 8)
         }
+
+        self.headerPlayButton
       }
       .padding(.horizontal, 32)
     }
@@ -184,6 +196,41 @@ public struct ShowView: View {
       artworkUrl: self.show.artworkUrl,
       size: 200
     )
+  }
+
+  @ViewBuilder
+  private var headerPlayButton: some View {
+    switch self.headerPlayButtonState {
+    case .resume(let episodeTitle, let isPlaying):
+      VStack(spacing: 8) {
+        PlayPauseButton(
+          text: isPlaying ? "Pause" : "Resume",
+          isPlaying: isPlaying,
+          onTap: { self.onEvent(.headerPlayButtonTapped) }
+        )
+
+        Text(episodeTitle)
+          .padding(.horizontal, 24)
+          .font(.system(size: 12, weight: .regular))
+          .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
+          .lineLimit(1)
+      }
+      .padding(.top, 16)
+
+    case .playLatest(let isPlaying):
+      VStack(spacing: 8) {
+        PlayPauseButton(
+          text: isPlaying ? "Pause" : "Play Latest",
+          isPlaying: isPlaying,
+          onTap: { self.onEvent(.headerPlayButtonTapped) }
+        )
+      }
+      .padding(.top, 16)
+      .padding(.bottom, 16)
+
+    case .none:
+      EmptyView()
+    }
   }
 }
 
