@@ -90,6 +90,7 @@ struct NowPlayingFeature {
         case .completed:
           NowPlaying.update { $0.isPlaying = false }
           guard let next = AutoQueue.nextDownloadedEpisode(after: nowPlaying) else {
+            NowPlaying.delete()
             return .none
           }
           return .run { _ in

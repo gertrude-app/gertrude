@@ -93,6 +93,14 @@ extension NowPlaying {
     }
   }
 
+  static func delete() {
+    dep(\.db).tryWrite { db in
+      try NowPlayingModel
+        .delete()
+        .execute(db)
+    }
+  }
+
   static func update(_ update: (inout NowPlayingModel) -> Void) {
     let database = dep(\.db)
     let model = database.tryRead { db in
@@ -145,7 +153,7 @@ extension NowPlaying {
   }
 
   private static func onDelete(prevEpisodeId: Episode.ID, wasPlaying: Bool) async throws {
-    fatalError("ON DELETE")
+    try await dep(\.audio).pause()
   }
 
   private static func episodeChanged(_ episodeId: Episode.ID, _ isPlaying: Bool,) async throws {
