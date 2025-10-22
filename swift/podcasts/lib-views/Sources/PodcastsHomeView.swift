@@ -80,25 +80,25 @@ public struct PodcastsHomeView: View {
           }
           .padding(.trailing, 8)
         #endif
-        // Button {
-        //   self.onSettingsTap()
-        // } label: {
-        //   ZStack(alignment: .topTrailing) {
-        //     Image(systemName: "person.crop.circle")
-        //       .font(.title3)
-        //       .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
-        //     if self.subscriptionStatus != .ok {
-        //       TimelineView(.animation) { context in
-        //         let opacity = 0.65 + 0.35 * sin(context.date.timeIntervalSinceReferenceDate * .pi)
-        //         Circle()
-        //           .fill(Color(red: 0.8, green: 0.0, blue: 0.0))
-        //           .frame(width: 9, height: 9)
-        //           .opacity(opacity)
-        //           .offset(x: 0, y: -1)
-        //       }
-        //     }
-        //   }
-        // }
+        Button {
+          self.onSettingsTap()
+        } label: {
+          ZStack(alignment: .topTrailing) {
+            Image(systemName: "person.crop.circle")
+              .font(.title3)
+              .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
+            if self.subscriptionStatus != .ok {
+              TimelineView(.animation) { context in
+                let opacity = 0.65 + 0.35 * sin(context.date.timeIntervalSinceReferenceDate * .pi)
+                Circle()
+                  .fill(Color(red: 0.8, green: 0.0, blue: 0.0))
+                  .frame(width: 9, height: 9)
+                  .opacity(opacity)
+                  .offset(x: 0, y: -1)
+              }
+            }
+          }
+        }
       }
       .padding(.horizontal, 20)
       .padding(.top, 8)
