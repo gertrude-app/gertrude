@@ -37,12 +37,12 @@ struct NowPlayingFeature {
         }
         switch viewAction {
         case .miniPlayerTapped:
-          NowPlaying.update { $0.minimized.toggle() }
+          NowPlaying.updateSyncingProgress { $0.minimized.toggle() }
           return .run { _ in
             await self.haptics.prepare()
           }
         case .dismissed:
-          NowPlaying.update { $0.minimized.toggle() }
+          NowPlaying.updateSyncingProgress { $0.minimized.toggle() }
           return .none
         case .playPauseTapped:
           return .run { _ in
@@ -50,7 +50,7 @@ struct NowPlayingFeature {
             if let time = await self.audio.getPlayingPosition() {
               nowPlaying.setProgress(time)
             }
-            NowPlaying.update { $0.isPlaying.toggle() }
+            NowPlaying.updateSyncingProgress { $0.isPlaying.toggle() }
           }
         case .scrubbed(to: let position):
           return self.scrub(nowPlaying, to: position, from: .appUi)
@@ -66,11 +66,11 @@ struct NowPlayingFeature {
         }
         switch event {
         case .play(let time):
-          NowPlaying.update { $0.isPlaying = true }
+          NowPlaying.updateSyncingProgress { $0.isPlaying = true }
           time.map { nowPlaying.setProgress($0) }
           return .none
         case .pause(let time):
-          NowPlaying.update { $0.isPlaying = false }
+          NowPlaying.updateSyncingProgress { $0.isPlaying = false }
           time.map { nowPlaying.setProgress($0) }
           return .none
         case .progressUpdated(let progress):
@@ -81,7 +81,7 @@ struct NowPlayingFeature {
           nowPlaying.setProgress(progress, sync: oneOutOfTen)
           return .run { _ in
             if nowPlaying.shouldDownloadNext(at: progress) {
-              NowPlaying.update { $0.nextDownloaded = true }
+              NowPlaying.updateSyncingProgress { $0.nextDownloaded = true }
               await AutoQueue.downloadNextEpisode(after: nowPlaying)
             }
           }
@@ -92,7 +92,7 @@ struct NowPlayingFeature {
         case .skippedForward(from: let location, amount: let amount):
           return self.skip(nowPlaying, .forward, amount: amount, from: location)
         case .completed:
-          NowPlaying.update { $0.isPlaying = false }
+          NowPlaying.updateSyncingProgress { $0.isPlaying = false }
           guard let next = AutoQueue.nextDownloadedEpisode(after: nowPlaying) else {
             NowPlaying.delete()
             return .none
@@ -111,14 +111,14 @@ struct NowPlayingFeature {
           return self.skip(nowPlaying, .backward, amount: 15, from: position)
         case .interruptionBegan(let position):
           position.map { nowPlaying.setProgress($0) }
-          NowPlaying.update { $0.isPlaying = false }
+          NowPlaying.updateSyncingProgress { $0.isPlaying = false }
           return .none
         case .interruptionEnded(shouldResume: true, let position):
           return .run { _ in
             if let position, position >= 5.0 {
               nowPlaying.setProgress(position - 3.0)
               await self.audio.seek(to: position - 3.0)
-              NowPlaying.update { $0.isPlaying = true }
+              NowPlaying.updateSyncingProgress { $0.isPlaying = true }
             }
           }
         case .interruptionEnded(shouldResume: false, _):
@@ -146,7 +146,7 @@ struct NowPlayingFeature {
 
   func toggle(nowPlaying: NowPlaying.Data) -> Effect<Action> {
     if nowPlaying.isPlaying || nowPlaying.episode.downloaded {
-      .run { _ in NowPlaying.update { $0.isPlaying.toggle() } }
+      .run { _ in NowPlaying.updateSyncingProgress { $0.isPlaying.toggle() } }
     } else {
       self.play(episode: nowPlaying.episode, previous: nowPlaying)
     }
@@ -156,7 +156,7 @@ struct NowPlayingFeature {
     .run { send in
       if previous != nil {
         // write pause to current, to make sure playback stops
-        NowPlaying.update { $0.isPlaying = false }
+        NowPlaying.updateSyncingProgress { $0.isPlaying = false }
       }
       // initialize new episode to paused, so we can handle possible download
       NowPlaying.set(.init(episodeId: episode.id, isPlaying: false, minimized: true))
@@ -165,7 +165,7 @@ struct NowPlayingFeature {
         await send(.delegate(.alert(error.message)))
         // TODO: delete now playing, i think
       } else {
-        NowPlaying.update { $0.isPlaying = true }
+        NowPlaying.updateSyncingProgress { $0.isPlaying = true }
       }
     }
   }

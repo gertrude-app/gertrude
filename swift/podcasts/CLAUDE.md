@@ -21,3 +21,5 @@ Architecture (TCA) and SQLite for data persistence.
 ## misc
 
 - unless it's a SwiftUI view, NEVER LEAVE COMMENTS
+- if i ask you do do anything with the database or custom queries, read the schema from
+  `lib-tca/Deps/Database+Migrations.swift`

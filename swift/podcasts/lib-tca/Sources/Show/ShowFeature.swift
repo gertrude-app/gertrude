@@ -11,6 +11,8 @@ struct ShowFeature {
     @Shared var showArchivedEpisodes: Bool
     @FetchOne var show: Show
     @FetchAll var episodes: [Episode]
+    @FetchOne var lastPlayedEpisode: Episode?
+    @FetchOne var latestUncompletedEpisode: Episode?
     @Fetch(NowPlaying()) var nowPlaying: NowPlaying.Value = nil
     @Presents var destination: Destination.State?
   }
@@ -168,24 +170,14 @@ extension ShowFeature.State {
   }
 
   var headerPlayButtonState: HeaderPlayButtonState {
-    let lastPlayed = self.episodes
-      .filter { $0.lastPlayedAt != nil && $0.completedAt == nil && !$0.isArchived }
-      .sorted { ($0.lastPlayedAt ?? .distantPast) > ($1.lastPlayedAt ?? .distantPast) }
-      .first
-
-    if let lastPlayed {
+    if let lastPlayed = self.lastPlayedEpisode {
       return .resume(
         lastPlayed,
         isPlaying: self.nowPlaying.isPlaying(episodeId: lastPlayed.id)
       )
     }
 
-    let latestUncompleted = self.episodes
-      .filter { $0.completedAt == nil && !$0.isArchived }
-      .sorted { $0.pubDate > $1.pubDate }
-      .first
-
-    if let latestUncompleted {
+    if let latestUncompleted = self.latestUncompletedEpisode {
       return .playLatest(
         latestUncompleted,
         isPlaying: self.nowPlaying.isPlaying(episodeId: latestUncompleted.id)
@@ -211,6 +203,12 @@ extension ShowFeature.State {
     )
     self._episodes = FetchAll(
       episodeQuery(showId: show.id, sortOrder: show.sort)
+    )
+    self._lastPlayedEpisode = FetchOne(
+      Episode.lastPlayedFor(showId: show.id)
+    )
+    self._latestUncompletedEpisode = FetchOne(
+      Episode.latestUncompletedFor(showId: show.id)
     )
   }
 }

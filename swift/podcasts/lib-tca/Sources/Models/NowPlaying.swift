@@ -116,7 +116,10 @@ extension NowPlaying {
     }
   }
 
-  static func update(_ update: (inout NowPlayingModel) -> Void) {
+  /// also syncs buffered progress to episode.progress, which can cause
+  /// db fetch triggers, so should not be used to update only progress
+  /// use NowPlaying.setProgress(_:Double,sync:Bool) for that
+  static func updateSyncingProgress(update: (inout NowPlayingModel) -> Void) {
     let database = dep(\.db)
     let model = database.tryRead { db in
       try NowPlayingModel.find(NowPlayingModel.ID(1)).fetchOne(db)
@@ -129,6 +132,12 @@ extension NowPlaying {
     update(&model)
     database.tryWrite { db in
       try NowPlayingModel.update(model).execute(db)
+      if let buffered = model.bufferedProgress {
+        try Episode
+          .where { $0.id == model.episodeId }
+          .update { $0.progress = buffered }
+          .execute(db)
+      }
     }
   }
 

@@ -22,4 +22,23 @@ extension Episode {
           (#sql("\($0.downloadedAt) < \(now - .days(90))") && $0.lastPlayedAt.is(nil))
       }
   }
+
+  static func lastPlayedFor(showId: Show.ID) -> some SelectStatementOf<Episode> {
+    Episode
+      .where { $0.showId == showId }
+      .where { $0.lastPlayedAt.isNot(nil) }
+      .where { $0.completedAt.is(nil) }
+      .where { $0.isArchived == false }
+      .order { $0.lastPlayedAt.desc() }
+      .limit(1)
+  }
+
+  static func latestUncompletedFor(showId: Show.ID) -> some SelectStatementOf<Episode> {
+    Episode
+      .where { $0.showId == showId }
+      .where { $0.completedAt.is(nil) }
+      .where { $0.isArchived == false }
+      .order { ($0.pubDate.desc(), $0.episodeNumber.desc()) }
+      .limit(1)
+  }
 }
