@@ -53,7 +53,7 @@ struct NowPlayingFeature {
             NowPlaying.update { $0.isPlaying.toggle() }
           }
         case .scrubbed(to: let position):
-          return self.scrub(nowPlaying, to: position, haptics: true)
+          return self.scrub(nowPlaying, to: position, from: .appUi)
         case .skipBackwardTapped:
           return self.skip(nowPlaying, .backward, amount: 15)
         case .skipForwardTapped:
@@ -74,10 +74,11 @@ struct NowPlayingFeature {
           time.map { nowPlaying.setProgress($0) }
           return .none
         case .progressUpdated(let progress):
-          if !state.appInForeground, progress.remainder(dividingBy: 5.0) < 0.1 {
+          let oneOutOfTen = progress.truncatingRemainder(dividingBy: 10.0) < 0.1
+          if !state.appInForeground, !oneOutOfTen {
             return .none
           }
-          nowPlaying.setProgress(progress)
+          nowPlaying.setProgress(progress, sync: oneOutOfTen)
           return .run { _ in
             if nowPlaying.shouldDownloadNext(at: progress) {
               NowPlaying.update { $0.nextDownloaded = true }
@@ -85,7 +86,7 @@ struct NowPlayingFeature {
             }
           }
         case .scrubbed(to: let position):
-          return self.scrub(nowPlaying, to: position, haptics: false)
+          return self.scrub(nowPlaying, to: position, from: .lockScreen)
         case .skippedBackward(from: let location, amount: let amount):
           return self.skip(nowPlaying, .backward, amount: amount, from: location)
         case .skippedForward(from: let location, amount: let amount):
@@ -174,6 +175,11 @@ struct NowPlayingFeature {
     case backward
   }
 
+  enum ScrubSource {
+    case lockScreen
+    case appUi
+  }
+
   func skip(
     _ nowPlaying: NowPlaying.Data,
     _ direction: SkipDirection,
@@ -199,11 +205,11 @@ struct NowPlayingFeature {
   func scrub(
     _ nowPlaying: NowPlaying.Data,
     to newTime: Double,
-    haptics: Bool = false
+    from source: ScrubSource
   ) -> Effect<Action> {
     .run { _ in
-      nowPlaying.setProgress(newTime)
-      if haptics {
+      nowPlaying.setProgress(newTime, sync: source == .lockScreen)
+      if source == .appUi {
         await self.haptics.selection()
       }
       await self.audio.seek(to: newTime)

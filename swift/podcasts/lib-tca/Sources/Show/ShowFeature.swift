@@ -11,7 +11,7 @@ struct ShowFeature {
     @Shared var showArchivedEpisodes: Bool
     @FetchOne var show: Show
     @FetchAll var episodes: [Episode]
-    @Fetch(EpisodePlaying()) var nowPlaying: EpisodePlaying.Value = nil
+    @Fetch(NowPlaying()) var nowPlaying: NowPlaying.Value = nil
     @Presents var destination: Destination.State?
   }
 

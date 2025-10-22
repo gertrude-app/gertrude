@@ -8,23 +8,11 @@ struct PodcastsFeature {
   @ObservableState
   struct State: Equatable {
     var passcode: Int
-    // NB: not a @FetchAll - observations would trigger every playback pos update
+    @FetchAll(Show.orderedWithInfo, animation: .default)
     var shows: [ShowInfo]
     var downloadQueue: [Episode] = []
     @Presents var destination: Destination.State?
     @Fetch(CurrentSubscription()) var subscription: Subscription = .fallback
-
-    init(
-      passcode: Int,
-      shows: [ShowInfo]? = nil,
-      destination: Destination.State? = nil
-    ) {
-      self.passcode = passcode
-      self.shows = shows ?? dep(\.db).tryRead {
-        try Show.orderedWithInfo.fetchAll($0)
-      }
-      self.destination = destination
-    }
   }
 
   @Selection
@@ -58,7 +46,6 @@ struct PodcastsFeature {
     case showTapped(Show.ID)
     case deleteShowTapped(Show.ID)
     case destination(PresentationAction<Destination.Action>)
-    case setShows([ShowInfo])
   }
 
   enum ConfirmAction: Equatable {
@@ -78,14 +65,9 @@ struct PodcastsFeature {
         return .run { send in
           await self.updateFeedsAndDownload(with: send)
           for await _ in self.clock.timer(interval: .seconds(60 * 5)) {
-            await send(.setShows(self.queryShows()))
             await self.updateFeedsAndDownload(with: send)
           }
         }
-
-      case .setShows(let shows):
-        state.shows = shows
-        return .none
 
       case .addShowTapped:
         if state.subscription.status == .unpaid {
@@ -129,7 +111,6 @@ struct PodcastsFeature {
 
       case .destination(.presented(.addShow(.subscribed(let show)))):
         state.destination = nil
-        state.shows = self.queryShows()
         state.downloadQueue += self.database.tryRead {
           try Episode.all
             .where { $0.showId == show.id }
@@ -146,7 +127,6 @@ struct PodcastsFeature {
           self.database.tryWrite { db in
             try Show.find(showId).delete().execute(db)
           }
-          await send(.setShows(self.queryShows()))
         }
 
       case .destination(.presented(.confirm(.confirmTrialEnding))):

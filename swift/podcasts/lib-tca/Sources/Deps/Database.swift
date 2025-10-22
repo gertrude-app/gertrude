@@ -125,6 +125,9 @@ public func appDatabase(
   migrator.registerMigration("m_2025-10-20") {
     try Migrations.m2025_10_20($0)
   }
+  migrator.registerMigration("m_2025-10-22") {
+    try Migrations.m2025_10_22($0)
+  }
   try migrator.migrate(database)
 
   try database.write { db in

@@ -12,7 +12,8 @@ struct EpisodeViewContainer: View {
       episode: .init(
         episode: .init(
           from: self.store.episode,
-          isPlaying: self.store.nowPlaying.isPlaying(episodeId: self.store.episode.id)
+          isPlaying: self.store.nowPlaying.isPlaying(episodeId: self.store.episode.id),
+          bufferedProgress: nil
         ),
         websiteUrl: self.store.show.websiteUrl.flatMap(URL.init(string:)),
         sizeInBytes: self.store.episode.sizeInBytes,

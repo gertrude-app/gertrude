@@ -103,14 +103,14 @@ extension Episode {
 }
 
 extension EpisodeData {
-  init(from episode: Episode, isPlaying: Bool) {
+  init(from episode: Episode, isPlaying: Bool, bufferedProgress: Double?) {
     self.init(
       id: episode.id.rawValue,
       title: episode.title,
       description: episode.description,
       artworkUrl: episode.artworkUrl,
       durationSeconds: episode.duration,
-      progress: episode.progress,
+      progress: bufferedProgress ?? episode.progress,
       downloadState: episode.downloaded
         ? .downloaded
         : episode.downloading ? .downloading : .notDownloaded,
@@ -122,7 +122,11 @@ extension EpisodeData {
   }
 
   init(nowPlaying: NowPlaying.Data) {
-    self.init(from: nowPlaying.episode, isPlaying: nowPlaying.isPlaying)
+    self.init(
+      from: nowPlaying.episode,
+      isPlaying: nowPlaying.isPlaying,
+      bufferedProgress: nowPlaying.bufferedProgress
+    )
   }
 }
 

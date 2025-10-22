@@ -10,6 +10,7 @@ struct NowPlayingModel {
   var isPlaying: Bool = false
   var minimized: Bool = true
   var nextDownloaded: Bool = false
+  var bufferedProgress: Double?
   var updatedAt: Date = .init()
 
   init(
@@ -18,6 +19,7 @@ struct NowPlayingModel {
     isPlaying: Bool = false,
     minimized: Bool = true,
     nextDownloaded: Bool = false,
+    progress: Double? = nil,
     updatedAt: Date = .init()
   ) {
     self.id = id
@@ -25,6 +27,7 @@ struct NowPlayingModel {
     self.isPlaying = isPlaying
     self.minimized = minimized
     self.nextDownloaded = nextDownloaded
+    self.bufferedProgress = progress
     self.updatedAt = updatedAt
   }
 }
@@ -36,6 +39,7 @@ struct NowPlaying: FetchKeyRequest {
     var isPlaying: Bool
     var minimized: Bool
     var nextDownloaded: Bool
+    var bufferedProgress: Double?
     var episode: Episode
     var show: Show
   }
@@ -57,34 +61,10 @@ struct NowPlaying: FetchKeyRequest {
       isPlaying: model.isPlaying,
       minimized: model.minimized,
       nextDownloaded: model.nextDownloaded,
+      bufferedProgress: model.bufferedProgress,
       episode: episode,
       show: show
     )
-  }
-}
-
-struct EpisodePlaying: FetchKeyRequest {
-  typealias Value = Data?
-
-  struct Data: Equatable {
-    var episodeId: Episode.ID
-    var isPlaying: Bool
-  }
-
-  func fetch(_ db: Database) throws -> Value {
-    let data = try NowPlayingModel
-      // NB: minimal query prevents unnecessary extra fetches on progress updates
-      .select { ($0.episodeId, $0.isPlaying) }
-      .where { $0.id == NowPlayingModel.ID(1) }
-      .fetchOne(db)
-    guard let data else { return nil }
-    return .init(episodeId: data.0, isPlaying: data.1)
-  }
-}
-
-extension EpisodePlaying.Value {
-  func isPlaying(episodeId: Episode.ID) -> Bool {
-    self?.episodeId == episodeId && self?.isPlaying == true
   }
 }
 
@@ -92,15 +72,25 @@ extension NowPlaying.Value {
   func isPlaying(episodeId: Episode.ID) -> Bool {
     self?.episode.id == episodeId && self?.isPlaying == true
   }
+
+  func bufferedProgress(episodeId: Episode.ID) -> Double? {
+    guard self?.episode.id == episodeId else { return nil }
+    return self?.bufferedProgress
+  }
 }
 
 extension NowPlaying.Data {
-  func setProgress(_ progress: Double) {
+  func setProgress(_ progress: Double, sync: Bool = true) {
     dep(\.db).tryWrite { db in
-      try Episode
-        .where { $0.id == self.episode.id }
-        .update { $0.progress = progress }
+      try NowPlayingModel
+        .update { $0.bufferedProgress = progress }
         .execute(db)
+      if sync {
+        try Episode
+          .where { $0.id == self.episode.id }
+          .update { $0.progress = progress }
+          .execute(db)
+      }
     }
   }
 

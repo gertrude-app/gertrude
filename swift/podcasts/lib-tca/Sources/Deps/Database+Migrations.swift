@@ -1,6 +1,15 @@
 import SQLiteData
 
 enum Migrations {
+  @Sendable static func m2025_10_22(_ db: Database) throws {
+    try #sql(
+      """
+      ALTER TABLE nowPlaying
+      ADD COLUMN bufferedProgress REAL
+      """
+    ).execute(db)
+  }
+
   @Sendable static func m2025_10_20(_ db: Database) throws {
     try #sql(
       """

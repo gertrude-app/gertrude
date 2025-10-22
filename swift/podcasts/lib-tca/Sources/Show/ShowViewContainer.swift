@@ -5,7 +5,7 @@ import SwiftUI
 
 struct ShowViewContainer: View {
   @Bindable var store: StoreOf<ShowFeature>
-  @Fetch(EpisodePlaying()) var nowPlaying: EpisodePlaying.Value = nil
+  @Fetch(NowPlaying()) var nowPlaying: NowPlaying.Value = nil
 
   var body: some View {
     ShowView(
@@ -13,6 +13,7 @@ struct ShowViewContainer: View {
       episodes: self.store.episodes.map { .init(
         from: $0,
         isPlaying: self.nowPlaying.isPlaying(episodeId: $0.id),
+        bufferedProgress: self.nowPlaying.bufferedProgress(episodeId: $0.id),
       ) },
       showArchivedEpisodes: self.store.showArchivedEpisodes,
       sortNewestToOldest: self.store.show.sort == .newestToOldest,
