@@ -60,7 +60,7 @@ import Testing
       $0.continuousClock = TestClock()
     } operation: {
       try CurrentSubscription.set(status: .trialing, expiringAt: .reference + .days(4))
-      dep(\.db).insertRecord(id: .trialEndingAlertShown, value: "true")
+      dep(\.db).insertRecord(id: .trialEndingAlertShown)
 
       let store = TestStore(initialState: .init(passcode: 111_111), reducer: PodcastsFeature.init)
       store.exhaustivity = .off

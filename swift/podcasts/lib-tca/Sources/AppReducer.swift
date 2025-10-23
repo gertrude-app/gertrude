@@ -199,6 +199,16 @@ struct AppReducer: Sendable {
     }
 
     log(.subscription("1ace9aa6"), "defeated repeat free trial attempt")
+    let installId = self.keychain.loadInstallId() ?? .init()
+    try? self.database.write { db in
+      try Record
+        .insert { [
+          Record(id: .installDate, createdAt: installDate),
+          Record(id: .installId, value: "\(installId)", createdAt: installDate),
+          Record(id: .onboardingFinished, createdAt: installDate),
+        ] }
+        .execute(db)
+    }
     return try? CurrentSubscription.set(
       status: .trialing,
       expiringAt: installDate + .days(30)

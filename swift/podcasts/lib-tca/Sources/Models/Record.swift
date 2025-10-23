@@ -6,7 +6,7 @@ import Tagged
 struct Record {
   typealias ID = Tagged<Self, String>
   let id: ID
-  var value: String
+  var value: String = ""
   var detail: String?
   var updatedAt: Date = .init()
   var createdAt: Date = .init()

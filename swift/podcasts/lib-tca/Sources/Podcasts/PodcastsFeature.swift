@@ -124,11 +124,7 @@ struct PodcastsFeature {
           await send(.startNextDownload)
           guard self.database.tryRead({ try Show.count().fetchOne($0) }) == 2,
                 self.database.record(id: .promptedReview) == nil else { return }
-          self.database.tryWrite { db in
-            try Record
-              .insert { Record(id: .promptedReview, value: "true") }
-              .execute(db)
-          }
+          self.database.insertRecord(id: .promptedReview)
           try? await self.clock.sleep(for: .seconds(1.5))
           await send(.promptReview)
         }
@@ -194,11 +190,7 @@ struct PodcastsFeature {
           TextState("Subscribe to continue using the app.")
         }
       )
-      self.database.tryWrite { db in
-        try Record
-          .insert { Record(id: .trialEndingAlertShown, value: "true") }
-          .execute(db)
-      }
+      self.database.insertRecord(id: .trialEndingAlertShown)
     }
   }
 
