@@ -110,23 +110,8 @@ public func appDatabase(
     migrator.eraseDatabaseOnSchemaChange = true
   #endif
 
-  migrator.registerMigration("pre-release") {
-    try Migrations.preRelease($0)
-  }
-  migrator.registerMigration("m_2025-10-07") {
-    try Migrations.m2025_10_07($0)
-  }
-  migrator.registerMigration("m_2025-10-08") {
-    try Migrations.m2025_10_08($0)
-  }
-  migrator.registerMigration("m_2025-10-13") {
-    try Migrations.m2025_10_13($0)
-  }
-  migrator.registerMigration("m_2025-10-20") {
-    try Migrations.m2025_10_20($0)
-  }
-  migrator.registerMigration("m_2025-10-22") {
-    try Migrations.m2025_10_22($0)
+  migrator.registerMigration("release") {
+    try Migrations.release($0)
   }
   try migrator.migrate(database)
 
