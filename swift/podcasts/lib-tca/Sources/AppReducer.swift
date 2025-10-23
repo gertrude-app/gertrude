@@ -40,6 +40,7 @@ struct AppReducer: Sendable {
   @Dependency(\.date) var date
   @Dependency(\.notificationCenter) var notificationCenter
   @Dependency(\.storekit) var storekit
+  @Dependency(\.locale) var locale
 
   var body: some Reducer<State, Action> {
     Scope(state: \.nowPlaying, action: \.nowPlaying) {
@@ -56,7 +57,11 @@ struct AppReducer: Sendable {
           let installId = UUID()
           self.keychain.save(installId: installId)
           self.database.insertRecord(id: .installId, value: "\(installId)")
-          log(.info("27c4f26a"), "firstLaunch")
+          log(
+            .info("27c4f26a"),
+            "firstLaunch",
+            detail: "region: `\(self.locale.region?.identifier ?? "(nil)")`"
+          )
         } else {
           let updated = self.defeatRepeatFreeTrialAttempt(state.subscription)
           self.expireFreeTrial(updated ?? state.subscription)
