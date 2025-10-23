@@ -8,7 +8,7 @@ extension Show {
         \(Show.col.id), \(Show.col.name), \(Show.col.author),
         \(Show.col.description), \(Show.col.showArtwork), \(Show.col.artworkUrl),
         COALESCE(COUNT(\(Episode.col.id)), 0) AS totalEpisodes,
-        COALESCE(SUM(CASE WHEN \(Episode.col.completedAt) IS NULL
+        COALESCE(SUM(CASE WHEN \(Episode.col.lastPlayedAt) IS NULL
           THEN 1 ELSE 0 END), 0) AS unplayedEpisodes,
         MAX(\(Episode.col.pubDate)) AS mostRecentPubDate
       FROM \(Show.self)
