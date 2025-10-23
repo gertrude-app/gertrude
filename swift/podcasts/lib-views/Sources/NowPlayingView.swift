@@ -128,7 +128,10 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
     .padding(.vertical, 8)
     .background(Color(self.cs, light: .white, dark: .black))
     .cornerRadius(8)
-    .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: -3)
+    .shadow(
+      color: Color(self.cs, light: .black, dark: .violet400).opacity(0.2),
+      radius: 10, x: 0, y: -3
+    )
     .padding(.horizontal, 16)
     .onTapGesture {
       self.emit(.miniPlayerTapped)
