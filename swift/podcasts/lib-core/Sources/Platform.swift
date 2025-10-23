@@ -92,11 +92,22 @@ import SwiftUI
     public func setActive(_ active: Bool) throws {}
   }
 
-  public enum UIApplication {
+  public struct UIApplication {
     public static let willResignActiveNotification = Notification.Name("")
     public static let didBecomeActiveNotification = Notification.Name("")
     public static let NOT_REAL_CHECK_XCODE = ""
+
+    public static var shared: UIApplication {
+      UIApplication()
+    }
+
+    public var connectedScenes: [UIScene] { get async { [] }}
+
+    public func open(_ url: URL) async {}
   }
+
+  public class UIScene {}
+  public class UIWindowScene: UIScene {}
 
   public extension Image {
     init(uiImage: UIImage) {

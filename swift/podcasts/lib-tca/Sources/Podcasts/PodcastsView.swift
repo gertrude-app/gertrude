@@ -44,6 +44,20 @@ struct PodcastsView: View {
         SettingsViewContainer(store: store)
       }
     )
+    .sheet(
+      item: self.$store.scope(
+        state: \.destination?.requestReview,
+        action: \.destination.requestReview,
+      ),
+      content: { store in
+        ButtonScreenView(
+          text: "Will you help us protect more kids and support the development of more apps like this by leaving a rating or review on the App Store? We won’t ask again.",
+          primary: .init("Give a rating", animate: false) { store.send(.leaveRating) },
+          secondary: .init("Leave a review", animate: false) { store.send(.leaveReview) },
+          tertiary: .init("No thanks", animate: false) { store.send(.noThanks) },
+        )
+      }
+    )
     .confirmationDialog(self.$store.scope(
       state: \.destination?.confirm,
       action: \.destination.confirm,

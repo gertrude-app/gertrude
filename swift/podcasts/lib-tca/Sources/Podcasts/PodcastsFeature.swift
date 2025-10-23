@@ -34,12 +34,14 @@ struct PodcastsFeature {
     case show(ShowFeature)
     case settings(SettingsFeature)
     case confirm(ConfirmationDialogState<ConfirmAction>)
+    case requestReview(RequestReviewFeature)
   }
 
   enum Action: Equatable {
     case onAppear
     case addShowTapped
     case settingsTapped
+    case promptReview
     case debugMenuTapped(PodcastsHomeView.DebugMenuAction)
     case startNextDownload
     case addToDownloadQueue([Episode])
@@ -118,7 +120,18 @@ struct PodcastsFeature {
             .limit(3)
             .fetchAll($0)
         }.reversed()
-        return .send(.startNextDownload)
+        return .run { send in
+          await send(.startNextDownload)
+          guard self.database.tryRead({ try Show.count().fetchOne($0) }) == 2,
+                self.database.record(id: .promptedReview) == nil else { return }
+          self.database.tryWrite { db in
+            try Record
+              .insert { Record(id: .promptedReview, value: "true") }
+              .execute(db)
+          }
+          try? await self.clock.sleep(for: .seconds(1.5))
+          await send(.promptReview)
+        }
 
       case .destination(.presented(.confirm(.confirmDelete(show: let showId)))):
         state.destination = nil
@@ -145,6 +158,10 @@ struct PodcastsFeature {
           _ = await trackedDownload(episode: episode)
           await send(.startNextDownload)
         }
+
+      case .promptReview:
+        state.destination = .requestReview(.init())
+        return .none
 
       case .destination:
         return .none

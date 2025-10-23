@@ -12,6 +12,8 @@ struct StoreKitClient: Sendable {
   var finishTransaction: @Sendable (_ id: Transaction.ID) async -> Void
   var verifiedCurrentEntitlements: @Sendable () async throws -> [TransactionData]
   var transactionUpdates: @Sendable () async throws -> any AsyncSequence<TransactionData, Never>
+  var requestRating: @Sendable () async -> Void
+  var requestReview: @Sendable () async -> Void
 }
 
 enum PurchaseResult {
@@ -115,6 +117,21 @@ extension StoreKitClient: DependencyKey {
             return transaction.data
           } else {
             return nil
+          }
+        }
+      },
+      requestRating: {
+        if let scene = await UIApplication.shared.connectedScenes.first as? UIWindowScene {
+          #if os(iOS)
+            await SKStoreReviewController.requestReview(in: scene)
+          #endif
+        }
+      },
+      requestReview: {
+        let url = "https://apps.apple.com/app/id6753187429?action=write-review"
+        if let writeReviewURL = URL(string: url) {
+          Task { @MainActor in
+            await UIApplication.shared.open(writeReviewURL)
           }
         }
       }
