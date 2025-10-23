@@ -56,15 +56,18 @@ public struct SettingsView: View {
 
   let status: SubscriptionStatus
   let expiresAt: Date
+  let purchaseInProgress: Bool
   let onEvent: @MainActor @Sendable (Event) -> Void
 
   public init(
     status: SubscriptionStatus,
     expiresAt: Date,
+    purchaseInProgress: Bool = false,
     onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in }
   ) {
     self.status = status
     self.expiresAt = expiresAt
+    self.purchaseInProgress = purchaseInProgress
     self.onEvent = onEvent
   }
 
@@ -171,11 +174,29 @@ public struct SettingsView: View {
                   .foregroundColor(.white)
                   .frame(maxWidth: .infinity)
                   .padding(.vertical, 12)
-                  .background(Color(red: 0.4, green: 0.3, blue: 0.8))
+                  .background(
+                    self.purchaseInProgress
+                      ? Color(red: 0.4, green: 0.3, blue: 0.8).opacity(0.5)
+                      : Color(red: 0.4, green: 0.3, blue: 0.8)
+                  )
                   .cornerRadius(10)
               }
+              .disabled(self.purchaseInProgress)
 
-              if self.status != .active {
+              if self.purchaseInProgress {
+                HStack(spacing: 4) {
+                  ProgressView()
+                    .scaleEffect(0.7)
+                  Text("one moment...")
+                    .font(.caption)
+                    .italic()
+                }
+                .foregroundColor(Color(
+                  self.cs,
+                  light: .black.opacity(0.5),
+                  dark: .white.opacity(0.5)
+                ))
+              } else if self.status != .active {
                 Text("$10/year")
                   .font(.subheadline)
                   .foregroundColor(Color(
@@ -316,5 +337,21 @@ public struct SettingsView: View {
   SettingsView(
     status: .unpaid(purchasePending: true),
     expiresAt: Date().addingTimeInterval(.days(-5))
+  )
+}
+
+#Preview("Trialing (Purchase In Progress)") {
+  SettingsView(
+    status: .trialing(purchasePending: false),
+    expiresAt: Date().addingTimeInterval(.days(25)),
+    purchaseInProgress: true
+  )
+}
+
+#Preview("Unpaid (Purchase In Progress)") {
+  SettingsView(
+    status: .unpaid(purchasePending: false),
+    expiresAt: Date().addingTimeInterval(.days(-5)),
+    purchaseInProgress: true
   )
 }

@@ -8,10 +8,12 @@ struct SettingsFeature {
   @ObservableState
   struct State: Equatable {
     @Fetch(CurrentSubscription()) var subscription: Subscription = .fallback
+    var purchaseInProgress: Bool = false
   }
 
   enum Action: Equatable {
     case view(SettingsView.Event)
+    case finishPurchase
   }
 
   @Dependency(\.date) var date
@@ -24,8 +26,9 @@ struct SettingsFeature {
       switch action {
       case .view(.subscribeNowTapped),
            .view(.manageSubscriptionTapped):
+        state.purchaseInProgress = true
         let manage = action == .view(.manageSubscriptionTapped) ? "(manage) " : ""
-        return .run { [state] _ in
+        return .run { [state] send in
           let productIds = try await self.api.productIds()
           switch try await self.storekit.purchaseSubscription(productIds: productIds) {
           case .success(let txn):
@@ -50,7 +53,11 @@ struct SettingsFeature {
           case .unknown:
             log(.unexpected("54078374"), "\(manage)purchase unknown result")
           }
+          await send(.finishPurchase)
         }
+      case .finishPurchase:
+        state.purchaseInProgress = false
+        return .none
       }
     }
   }

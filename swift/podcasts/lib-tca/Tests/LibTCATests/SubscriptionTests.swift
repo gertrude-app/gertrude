@@ -34,7 +34,13 @@ import Testing
       #expect(sub.status == .trialing)
       #expect(sub.expiresAt == .reference + .days(30))
 
-      await store.send(.view(.subscribeNowTapped))
+      await store.send(.view(.subscribeNowTapped)) {
+        $0.purchaseInProgress = true
+      }
+
+      await store.receive(.finishPurchase) {
+        $0.purchaseInProgress = false
+      }
 
       sub = dep(\.db).subscription()
       #expect(sub.status == .active)
@@ -82,7 +88,12 @@ import Testing
         .mode(
           .presented(.podcasts(.destination(.presented(.settings(.view(.subscribeNowTapped))))))
         )
-      )
+      ) {
+        $0.mode = .podcasts(.init(
+          passcode: 111_111,
+          destination: .settings(.init(purchaseInProgress: true))
+        ))
+      }
 
       sub = dep(\.db).subscription()
       #expect(sub.status == .trialing)
@@ -90,6 +101,15 @@ import Testing
       #expect(sub.purchasePendingSince == .reference)
 
       transactions.continuation.yield(.mock)
+
+      await store.receive(
+        .mode(.presented(.podcasts(.destination(.presented(.settings(.finishPurchase))))))
+      ) {
+        $0.mode = .podcasts(.init(
+          passcode: 111_111,
+          destination: .settings(.init(purchaseInProgress: false))
+        ))
+      }
 
       await store.receive(.processStoreKitTransaction(.mock, update: true))
 
