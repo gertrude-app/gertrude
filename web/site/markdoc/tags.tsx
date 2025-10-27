@@ -21,6 +21,7 @@ const tags: Config[`tags`] = {
       caption: { type: String },
       alt: { type: String },
       small: { type: Boolean },
+      noBorder: { type: Boolean },
     },
     render: `ArticleImage`,
   },
