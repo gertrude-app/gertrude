@@ -67,15 +67,16 @@ public struct ButtonScreenView: View {
   let image: String?
   let screenType: ScreenType
   let urlInputConfig: UrlInputConfig?
+  let ignoreKeyboard: Bool
 
   @State private var showBg = false
-  @State private var iconOffset = Vector(x: 0, y: -20)
-  @State private var textOffset = Vector(x: 0, y: 20)
-  @State private var primaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
-  @State private var secondaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
-  @State private var tertiaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
+  @State private var iconOffset: Vector
+  @State private var textOffset: Vector
+  @State private var primaryButtonStatus: (offset: Vector, isLoading: Bool)
+  @State private var secondaryButtonStatus: (offset: Vector, isLoading: Bool)
+  @State private var tertiaryButtonStatus: (offset: Vector, isLoading: Bool)
   @State private var urlText = ""
-  @State private var urlInputOffset = Vector(x: 0, y: 20)
+  @State private var urlInputOffset: Vector
   @FocusState private var isUrlFieldFocused: Bool
 
   var icon: String {
@@ -95,7 +96,9 @@ public struct ButtonScreenView: View {
     image: String? = nil,
     screenType: ScreenType = .info,
     primaryLooksLikeSecondary: Bool = false,
-    urlInput: UrlInputConfig? = nil
+    urlInput: UrlInputConfig? = nil,
+    animateBtnEntry: Bool = true,
+    ignoreKeyboard: Bool = false
   ) {
     self.text = text
     self.screenType = screenType
@@ -106,6 +109,23 @@ public struct ButtonScreenView: View {
     self.tertiaryButtonConfig = tertiary
     self.primaryLooksLikeSecondary = primaryLooksLikeSecondary
     self.urlInputConfig = urlInput
+    self.ignoreKeyboard = ignoreKeyboard
+
+    self._iconOffset = State(initialValue: animateBtnEntry ? Vector(x: 0, y: -20) : .zero)
+    self._textOffset = State(initialValue: animateBtnEntry ? Vector(x: 0, y: 20) : .zero)
+    self._urlInputOffset = State(initialValue: animateBtnEntry ? Vector(x: 0, y: 20) : .zero)
+    self._primaryButtonStatus = State(initialValue: (
+      offset: animateBtnEntry ? Vector(x: 0, y: 20) : .zero,
+      isLoading: false
+    ))
+    self._secondaryButtonStatus = State(initialValue: (
+      offset: animateBtnEntry ? Vector(x: 0, y: 20) : .zero,
+      isLoading: false
+    ))
+    self._tertiaryButtonStatus = State(initialValue: (
+      offset: animateBtnEntry ? Vector(x: 0, y: 20) : .zero,
+      isLoading: false
+    ))
   }
 
   public var body: some View {
@@ -281,6 +301,7 @@ public struct ButtonScreenView: View {
       .padding(30)
       .padding(.top, 50)
     }
+    .ignoresSafeArea(self.ignoreKeyboard ? .keyboard : [], edges: .bottom)
   }
 
   var LoadingButton: some View {

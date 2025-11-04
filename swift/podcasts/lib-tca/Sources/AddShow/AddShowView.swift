@@ -46,6 +46,7 @@ struct AddShowView: View {
           text: "Show podcast and episode images?",
           primary: .init("Yes, allow images") { self.store.send(.selectAllowArtworkTapped) },
           secondary: .init("No images") { self.store.send(.selectDontAllowArtworkTapped) },
+          ignoreKeyboard: true
         )
 
       case .subscribing:
@@ -59,7 +60,8 @@ struct AddShowView: View {
             buttonText: "Subscribe"
           ) { url in
             self.store.send(.addByUrlSubmitted(url))
-          }
+          },
+          animateBtnEntry: false
         )
       }
     }
