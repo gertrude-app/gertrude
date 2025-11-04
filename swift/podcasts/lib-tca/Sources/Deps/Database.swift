@@ -65,6 +65,10 @@ extension DatabaseWriter {
   }
 
   func insertRecord(id: Record.ID, value: String = "", detail: String? = nil) {
+    if let existing = self.record(id: id) {
+      log(.unexpected("c59c4548"), "duplicate record \(id) insert", detail: "\(existing)")
+      return
+    }
     self.tryWrite { db in
       try Record
         .insert { Record.Draft(id: id, value: value, detail: detail) }
