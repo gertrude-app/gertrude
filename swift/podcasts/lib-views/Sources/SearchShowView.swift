@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct SearchShowView: View {
   @Environment(\.colorScheme) var cs
+  @FocusState private var isSearchFocused: Bool
 
   @Binding var searchText: String
   let results: [SearchResult]
@@ -28,6 +29,10 @@ public struct SearchShowView: View {
       }
     }
     .searchable(text: self.$searchText, prompt: "Search for podcasts...")
+    .searchFocused(self.$isSearchFocused)
+    .onAppear {
+      self.isSearchFocused = true
+    }
   }
 
   private var emptyState: some View {
