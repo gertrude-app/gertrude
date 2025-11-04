@@ -27,6 +27,7 @@ struct AppView: View {
         }
         .alert(self.$store.scope(state: \.alert, action: \.alert))
     }
+    .environment(\.miniNowPlayingVisible, self.miniNowPlayingVisible)
     .overlay(alignment: .bottom) {
       if let nowPlaying = self.store.nowPlaying.data {
         NowPlayingView(
@@ -44,6 +45,10 @@ struct AppView: View {
         .opacity(self.store.hideNowPlaying ? 0 : 1)
       }
     }
+  }
+
+  private var miniNowPlayingVisible: Bool {
+    self.store.nowPlaying.data?.minimized == true && !self.store.hideNowPlaying
   }
 
   init(store: StoreOf<AppReducer>) {

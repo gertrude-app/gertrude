@@ -8,6 +8,7 @@ import SwiftUI
 
 public struct PodcastsHomeView: View {
   @Environment(\.colorScheme) var cs
+  @Environment(\.miniNowPlayingVisible) var miniNowPlayingVisible
 
   public enum SubscriptionStatus {
     case ok
@@ -63,23 +64,33 @@ public struct PodcastsHomeView: View {
           .fontWeight(.bold)
         Spacer()
         #if DEBUG
-          Menu {
-            Button("Set trial expiring soon") {
-              self.onDebugMenuTap(.setTrialExpiringSoon)
+          if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" {
+            Menu {
+              Button("Set trial expiring soon") {
+                self.onDebugMenuTap(.setTrialExpiringSoon)
+              }
+              Button("Set unpaid") {
+                self.onDebugMenuTap(.setUnpaid)
+              }
+              Button("Set active") {
+                self.onDebugMenuTap(.setActive)
+              }
+            } label: {
+              Image(systemName: "flask")
+                .font(.title3)
+                .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
             }
-            Button("Set unpaid") {
-              self.onDebugMenuTap(.setUnpaid)
-            }
-            Button("Set active") {
-              self.onDebugMenuTap(.setActive)
-            }
-          } label: {
-            Image(systemName: "flask")
-              .font(.title3)
-              .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
+            .padding(.trailing, 8)
           }
-          .padding(.trailing, 8)
         #endif
+        Button {
+          self.onAddShowTap()
+        } label: {
+          Image(systemName: "plus")
+            .font(.title3)
+            .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
+        }
+        .padding(.trailing, 8)
         Button {
           self.onSettingsTap()
         } label: {
@@ -181,6 +192,11 @@ public struct PodcastsHomeView: View {
     }
     .listStyle(.plain)
     .scrollContentBackground(.hidden)
+    .safeAreaInset(edge: .bottom) {
+      if self.miniNowPlayingVisible {
+        Color.clear.frame(height: 70)
+      }
+    }
   }
 
   private func showInfoText(_ show: ShowDataWithStats) -> String {
@@ -392,6 +408,85 @@ func showWithStats(
     subscriptionStatus: .unpaid
   )
   .preferredColorScheme(.dark)
+}
+
+#Preview("Empty State") {
+  PodcastsHomeView(
+    shows: [],
+    onAddShowTap: {}
+  )
+}
+
+#Preview("Many Shows") {
+  PodcastsHomeView(
+    shows: [
+      showWithStats(id: 1) {
+        $0.data.name = "The Ancient Path"
+        $0.data.artworkUrl = .ancientPath
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.hours(2))
+        $0.unplayedEpisodes = 5
+        $0.totalEpisodes = 145
+      },
+      showWithStats(id: 2) {
+        $0.data.name = "The Secret Sombrero"
+        $0.data.artworkUrl = .sombrero
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(1))
+        $0.unplayedEpisodes = 12
+        $0.totalEpisodes = 87
+      },
+      showWithStats(id: 3) {
+        $0.data.name = "This American Life"
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(3))
+        $0.unplayedEpisodes = 2
+        $0.totalEpisodes = 542
+      },
+      showWithStats(id: 4) {
+        $0.data.name = "Swift Talk"
+        $0.data.artworkUrl = .ancientPath
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(5))
+        $0.unplayedEpisodes = 0
+        $0.totalEpisodes = 234
+      },
+      showWithStats(id: 5) {
+        $0.data.name = "Tech Weekly"
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(7))
+        $0.unplayedEpisodes = 8
+        $0.totalEpisodes = 156
+      },
+      showWithStats(id: 6) {
+        $0.data.name = "History Podcast"
+        $0.data.artworkUrl = .sombrero
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(8))
+        $0.unplayedEpisodes = 3
+        $0.totalEpisodes = 89
+      },
+      showWithStats(id: 7) {
+        $0.data.name = "Developer Life"
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(10))
+        $0.unplayedEpisodes = 0
+        $0.totalEpisodes = 67
+      },
+      showWithStats(id: 8) {
+        $0.data.name = "Science Today"
+        $0.data.artworkUrl = .ancientPath
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(12))
+        $0.unplayedEpisodes = 6
+        $0.totalEpisodes = 201
+      },
+    ],
+    onAddShowTap: {}
+  )
+}
+
+public struct NowPlayingVisibleKey: EnvironmentKey {
+  public static let defaultValue: Bool = false
+}
+
+public extension EnvironmentValues {
+  var miniNowPlayingVisible: Bool {
+    get { self[NowPlayingVisibleKey.self] }
+    set { self[NowPlayingVisibleKey.self] = newValue }
+  }
 }
 
 extension String {
