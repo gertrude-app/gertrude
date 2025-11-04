@@ -52,6 +52,7 @@ struct AddShowFeature {
   @Dependency(\.haptics) var haptics
   @Dependency(\.api) var api
   @Dependency(\.keychain) var keychain
+  @Dependency(\.continuousClock) var clock
 
   private enum CancelID { case search }
 
@@ -150,7 +151,19 @@ struct AddShowFeature {
       do {
         log(.info("7785c87b"), "subscribe", detail: "\(feedUrl), artwork: \(withArtwork)")
         let feed = try await self.podcasts.getFeed(feedUrl)
-        let show = self.db.tryWrite { db in
+        let existingShow = try await self.db.read { db in
+          try Show
+            .where { $0.feedUrl == feedUrl }
+            .fetchOne(db)
+        }
+        if existingShow != nil {
+          log(.info("b8139e22"), "duplicate subscribe")
+          await send(.delegate(.alert("You are already subscribed to this show.")))
+          try? await self.clock.sleep(for: .seconds(2))
+          await self.dismiss()
+          return
+        }
+        let show = try await self.db.write { db in
           try Show
             .insert { feed.show.toShowDraft(showArtwork: withArtwork) }
             .returning(\.self)
