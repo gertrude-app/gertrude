@@ -76,6 +76,7 @@ public struct ButtonScreenView: View {
   @State private var tertiaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
   @State private var urlText = ""
   @State private var urlInputOffset = Vector(x: 0, y: 20)
+  @FocusState private var isUrlFieldFocused: Bool
 
   var icon: String {
     switch self.screenType {
@@ -172,6 +173,7 @@ public struct ButtonScreenView: View {
               .font(.system(size: 22, weight: .medium))
               .textContentType(.URL)
               .disableAutocorrection(true)
+              .focused(self.$isUrlFieldFocused)
               .padding(.horizontal, 16)
               .padding(.vertical, 14)
               .background(
@@ -185,6 +187,9 @@ public struct ButtonScreenView: View {
                     lineWidth: 1
                   )
               )
+              .onAppear {
+                self.isUrlFieldFocused = true
+              }
 
             BigButton(
               urlConfig.buttonText,
