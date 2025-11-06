@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct NowPlayingView: View, EpisodeArtworkProvider {
   @Environment(\.colorScheme) var cs
+  @Environment(\.lang) var lang
   @State private var dragOffset: CGFloat = 0
 
   let episode: EpisodeData
@@ -22,7 +23,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
     episode: EpisodeData,
     show: ShowData,
     minimized: Bool = true,
-    emit: @MainActor @Sendable @escaping (Event) -> Void
+    emit: @MainActor @Sendable @escaping (Event) -> Void,
   ) {
     self.episode = episode
     self.minimized = minimized
@@ -90,13 +91,13 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
           .lineLimit(1)
 
         if self.episode.downloadState == .downloading {
-          Text("Downloading...")
+          Text(lstr(.episodeDownloading))
             .font(.system(size: 12, weight: .regular))
             .italic()
             .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
             .lineLimit(1)
         } else {
-          Text(self.episode.pubDateRelative.uppercased())
+          Text(self.episode.pubDateRelative(lang: self.lang).uppercased())
             .font(.system(size: 12, weight: .regular))
             .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
             .lineLimit(1)
@@ -153,7 +154,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
         Spacer()
 
         VStack(spacing: 2) {
-          Text("NOW PLAYING")
+          Text(lstr(.nowPlayingTitle))
             .font(.system(size: 10, weight: .bold))
             .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
 

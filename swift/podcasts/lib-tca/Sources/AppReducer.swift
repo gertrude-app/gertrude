@@ -53,15 +53,10 @@ struct AppReducer: Sendable {
           let installDate = self.date.now
           self.keychain.save(installDate: installDate)
           self.database.insertRecord(id: .installDate)
-
           let installId = UUID()
           self.keychain.save(installId: installId)
           self.database.insertRecord(id: .installId, value: "\(installId)")
-          log(
-            .info("27c4f26a"),
-            "firstLaunch",
-            detail: "region: `\(self.locale.region?.identifier ?? "(nil)")`"
-          )
+          self.logFirstLaunch()
         } else {
           let updated = self.defeatRepeatFreeTrialAttempt(state.subscription)
           self.expireFreeTrial(updated ?? state.subscription)
@@ -252,6 +247,12 @@ struct AppReducer: Sendable {
         .execute(db)
     }
     episodes.forEach { $0.removeLocalAudioFile() }
+  }
+
+  func logFirstLaunch() {
+    let region = self.locale.region?.identifier ?? "(nil)"
+    let lang = self.locale.language.languageCode?.identifier ?? "(nil)"
+    log(.info("27c4f26a"), "firstLaunch", detail: "region: `\(region)`, language: `\(lang)`")
   }
 }
 

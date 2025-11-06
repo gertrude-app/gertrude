@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct EpisodeView: View {
   @Environment(\.colorScheme) var cs
+  @Environment(\.lang) var lang
 
   public enum Event {
     case playPauseTapped
@@ -17,7 +18,7 @@ public struct EpisodeView: View {
 
   public init(
     episode: EpisodeData,
-    emit: @MainActor @Sendable @escaping (Event) -> Void = { _ in }
+    emit: @MainActor @Sendable @escaping (Event) -> Void = { _ in },
   ) {
     self.episode = episode
     self.emit = emit
@@ -26,7 +27,7 @@ public struct EpisodeView: View {
   public var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       VStack(alignment: .leading, spacing: 2) {
-        Text(self.episode.pubDateRelative.uppercased())
+        Text(self.episode.pubDateRelative(lang: self.lang).uppercased())
           .font(.system(size: 12, weight: .semibold))
           .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
           .opacity(0.8)
@@ -106,7 +107,7 @@ public struct EpisodeView: View {
                 Button(role: .destructive) {
                   self.emit(.removeDownloadTapped)
                 } label: {
-                  Label("Remove download", systemImage: "trash")
+                  Label(lstr(.episodeRemoveDownload), systemImage: "trash")
                 }
                 .tint(.red)
                 .transaction { $0.animation = nil }
@@ -114,7 +115,7 @@ public struct EpisodeView: View {
                 Button {
                   self.emit(.downloadTapped)
                 } label: {
-                  Label("Download episode", systemImage: "arrow.down.circle")
+                  Label(lstr(.episodeDownloadEpisode), systemImage: "arrow.down.circle")
                 }
                 .tint(.primary)
                 .transaction { $0.animation = nil }
@@ -124,7 +125,9 @@ public struct EpisodeView: View {
                 self.emit(.toggleCompletedTapped)
               } label: {
                 Label(
-                  self.episode.isCompleted ? "Mark as unplayed" : "Mark as played",
+                  self.episode.isCompleted
+                    ? lstr(.episodeMarkAsUnplayed)
+                    : lstr(.episodeMarkAsPlayed),
                   systemImage: self.episode
                     .isCompleted ? "arrow.counterclockwise" : "arrow.clockwise"
                 )
@@ -137,7 +140,9 @@ public struct EpisodeView: View {
               self.emit(.toggleArchivedTapped)
             } label: {
               Label(
-                self.episode.isArchived ? "Unarchive episode" : "Archive episode",
+                self.episode.isArchived
+                  ? lstr(.episodeUnarchiveEpisode)
+                  : lstr(.episodeArchiveEpisode),
                 systemImage: self.episode.isArchived ? "tray.and.arrow.up" : "archivebox"
               )
             }

@@ -6,6 +6,7 @@ import SwiftUI
 
 public struct ShowView: View {
   @Environment(\.colorScheme) var cs
+  @Environment(\.lang) var lang
 
   public enum Event: Equatable, Sendable {
     case sortOldestToNewest
@@ -36,7 +37,7 @@ public struct ShowView: View {
     sortNewestToOldest: Bool = true,
     headerPlayButtonState: HeaderPlayButtonState = .none,
     onEpisodeEvent: @MainActor @Sendable @escaping (Int, EpisodeView.Event) -> Void = { _, _ in },
-    onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in }
+    onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in },
   ) {
     self.show = show
     self.episodes = episodes
@@ -69,7 +70,7 @@ public struct ShowView: View {
             VStack(spacing: 4) {
               Image(systemName: "archivebox")
                 .font(.system(size: 14))
-              Text(episode.isArchived ? "Unarchive" : "Archive")
+              Text(lstr(episode.isArchived ? .showUnarchive : .showArchive))
                 .font(.system(size: 10))
             }
           }
@@ -83,7 +84,7 @@ public struct ShowView: View {
                 VStack(spacing: 4) {
                   Image(systemName: "trash")
                     .font(.system(size: 14))
-                  Text("Remove\ndownload")
+                  Text(lstr(.showRemoveDownload))
                     .font(.system(size: 10, weight: .thin))
                     .multilineTextAlignment(.center)
                 }
@@ -96,7 +97,7 @@ public struct ShowView: View {
                 VStack(spacing: 4) {
                   Image(systemName: "arrow.down")
                     .font(.system(size: 14))
-                  Text("Download")
+                  Text(lstr(.showDownload))
                     .font(.system(size: 10))
                 }
               }
@@ -119,8 +120,8 @@ public struct ShowView: View {
             get: { self.sortNewestToOldest },
             set: { newValue in self.onEvent(newValue ? .sortNewestToOldest : .sortOldestToNewest) }
           )) {
-            Label("Sort newest first", systemImage: "arrow.up").tag(true)
-            Label("Sort oldest first", systemImage: "arrow.down").tag(false)
+            Label(lstr(.showSortNewestFirst), systemImage: "arrow.up").tag(true)
+            Label(lstr(.showSortOldestFirst), systemImage: "arrow.down").tag(false)
           }
           .pickerStyle(.inline)
 
@@ -130,13 +131,19 @@ public struct ShowView: View {
               get: { self.showArchivedEpisodes },
               set: { _ in self.onEvent(.toggleShowArchivedTapped) }
             )) {
-              Label("Show archived (\(self.archivedCount))", systemImage: "archivebox")
+              Label(
+                String(format: lstr(.showShowArchived), self.archivedCount),
+                systemImage: "archivebox"
+              )
             }
 
             Button {
               self.onEvent(.unarchiveAllTapped)
             } label: {
-              Label("Unarchive all", systemImage: "arrow.2.circlepath")
+              Label(
+                lstr(.showUnarchiveAll),
+                systemImage: "arrow.2.circlepath"
+              )
             }
           }
         } label: {
@@ -204,7 +211,7 @@ public struct ShowView: View {
     case .resume(let episodeTitle, let isPlaying):
       VStack(spacing: 8) {
         PlayPauseButton(
-          text: isPlaying ? "Pause" : "Resume",
+          text: isPlaying ? lstr(.showPause) : lstr(.showResume),
           isPlaying: isPlaying,
           onTap: { self.onEvent(.headerPlayButtonTapped) }
         )
@@ -220,7 +227,7 @@ public struct ShowView: View {
     case .playLatest(let isPlaying):
       VStack(spacing: 8) {
         PlayPauseButton(
-          text: isPlaying ? "Pause" : "Play Latest",
+          text: isPlaying ? lstr(.showPause) : lstr(.showPlayLatest),
           isPlaying: isPlaying,
           onTap: { self.onEvent(.headerPlayButtonTapped) }
         )

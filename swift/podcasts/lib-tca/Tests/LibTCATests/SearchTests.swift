@@ -1,3 +1,4 @@
+import Foundation
 import LibViews
 import Testing
 
@@ -5,7 +6,10 @@ import Testing
 
 @Test
 func testSearchPodcastsWithValidQuery() async throws {
-  let results = try await searchPodcastsLive(query: "this american life")
+  let results = try await searchPodcastsLive(
+    query: "this american life",
+    locale: Locale(identifier: "en_US")
+  )
 
   #expect(!results.isEmpty)
 

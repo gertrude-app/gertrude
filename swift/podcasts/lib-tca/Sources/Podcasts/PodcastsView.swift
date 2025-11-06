@@ -51,10 +51,19 @@ struct PodcastsView: View {
       ),
       content: { store in
         ButtonScreenView(
-          text: "Will you help us protect more kids and support the development of more apps like this by leaving a rating or review on the App Store? We won’t ask again.",
-          primary: .init("Give a rating", animate: false) { store.send(.leaveRating) },
-          secondary: .init("Leave a review", animate: false) { store.send(.leaveReview) },
-          tertiary: .init("No thanks", animate: false) { store.send(.noThanks) },
+          text: lstr(.podcastsRequestReviewMessage),
+          primary: .init(
+            lstr(.podcastsRequestReviewGiveRating),
+            animate: false
+          ) { store.send(.leaveRating) },
+          secondary: .init(
+            lstr(.podcastsRequestReviewLeaveReview),
+            animate: false
+          ) { store.send(.leaveReview) },
+          tertiary: .init(
+            lstr(.podcastsRequestReviewNoThanks),
+            animate: false
+          ) { store.send(.noThanks) },
         )
       }
     )

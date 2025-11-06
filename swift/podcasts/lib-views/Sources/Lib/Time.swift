@@ -1,46 +1,47 @@
 import Foundation
 
-func formatShortDuration(_ seconds: Int) -> String {
+func formatShortDuration(_ seconds: Int, lang: Lang) -> String {
   let hours = seconds / 3600
   let minutes = (seconds % 3600) / 60
+  let minuteUnit = lang == .spanish ? "min" : "m"
 
   if hours > 0 {
     if minutes > 0 {
-      return "\(hours)h \(minutes)m"
+      return "\(hours)h \(minutes)\(minuteUnit)"
     } else {
       return "\(hours)h"
     }
   } else {
-    return "\(minutes)m"
+    return "\(minutes)\(minuteUnit)"
   }
 }
 
-func formatRelativeDate(_ date: Date) -> String {
+func formatRelativeDate(_ date: Date, lang: Lang) -> String {
   let now = Date()
   let timeInterval = now.timeIntervalSince(date)
 
   if timeInterval < 60 {
-    return "just now"
+    return lang == .spanish ? "justo ahora" : "just now"
   }
 
   if timeInterval < 3600 {
     let minutes = Int(timeInterval / 60)
-    return "\(minutes)m ago"
+    return lang == .spanish ? "\(minutes) min" : "\(minutes)m ago"
   }
 
   if timeInterval < 86400 {
     let hours = Int(timeInterval / 3600)
-    return "\(hours)h ago"
+    return lang == .spanish ? "hace \(hours)h" : "\(hours)h ago"
   }
 
   if timeInterval < 604_800 {
     let days = Int(timeInterval / 86400)
-    return "\(days)d ago"
+    return lang == .spanish ? "hace \(days)d" : "\(days)d ago"
   }
 
   let formatter = DateFormatter()
   formatter.dateFormat = "MMM d"
-  formatter.locale = Locale(identifier: "en_US_POSIX")
+  formatter.locale = Locale.current
   return formatter.string(from: date)
 }
 

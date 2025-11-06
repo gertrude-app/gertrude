@@ -18,11 +18,11 @@ public struct PodcastsEmptyState: View {
         .foregroundStyle(Color(self.cs, light: .violet300, dark: .violet700))
 
       VStack(spacing: 12) {
-        Text("No Shows Yet")
+        Text(lstr(.showsEmptyTitle))
           .font(.system(size: 28, weight: .bold))
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
 
-        Text("Add your first podcast show to get started listening to approved content.")
+        Text(lstr(.showsEmptyMessage))
           .font(.system(size: 16, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
           .multilineTextAlignment(.center)
@@ -32,7 +32,7 @@ public struct PodcastsEmptyState: View {
       Spacer()
 
       BigButton(
-        "Add Show",
+        lstr(.showsAddShow),
         type: .button(self.onAddShowTap),
         variant: .primary,
         icon: "plus"

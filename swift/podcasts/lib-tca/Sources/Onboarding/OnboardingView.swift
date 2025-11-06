@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 import LibViews
 import SwiftUI
 
@@ -16,33 +17,33 @@ struct OnboardingView: View {
 
       case .areYouTheParent:
         ButtonScreenView(
-          text: "For the initial setup, we need the parent for a few minutes. Are you the parent?",
-          primary: self.btn("Yes, I’m the parent", action: .primaryBtnTapped),
-          secondary: self.btn("No, I’m the child", action: .secondaryBtnTapped)
+          text: lstr(.onboardingAreYouParent),
+          primary: self.btn(lstr(.onboardingYesParent), action: .primaryBtnTapped),
+          secondary: self.btn(lstr(.onboardingNoChild), action: .secondaryBtnTapped)
         )
 
       case .parentRequired:
         ButtonScreenView(
-          text: "You’ll need your parent to set this up, go get them and click continue.",
-          primary: self.btn("Continue", action: .primaryBtnTapped)
+          text: lstr(.onboardingParentRequired),
+          primary: self.btn(lstr(.onboardingContinue), action: .primaryBtnTapped)
         )
 
       case .explainSetPasscode:
         ButtonScreenView(
-          text: "The way this works is you create a PIN that only you (the parent) know. Searching for and subscribing to new podcasts will require this PIN.",
-          primary: self.btn("Got it, next", action: .primaryBtnTapped)
+          text: lstr(.onboardingExplainPin),
+          primary: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped)
         )
 
       case .strongPasscode:
         ButtonScreenView(
-          text: "Make sure your PIN is not something you've used before, and never let your child watch you enter it. Write it down somewhere because there's no way to recover it if you forget it.",
-          primary: self.btn("OK, let’s go", animate: false, action: .primaryBtnTapped)
+          text: lstr(.onboardingStrongPin),
+          primary: self.btn(lstr(.onboardingOkLetsGo), animate: false, action: .primaryBtnTapped)
         )
 
       case .passcodeSet(let passcode):
         ButtonScreenView(
-          text: "All set! You’ll need that PIN whenever you want to add new podcasts. Gertrude AM will work unrestricted for 30 days, then requires a yearly subscription of less than $1 dollar per month.",
-          primary: self.btn("Got it, next", action: .finished(passcode))
+          text: lstr(.onboardingAllSet),
+          primary: self.btn(lstr(.onboardingGotItNext), action: .finished(passcode))
         )
       }
     }

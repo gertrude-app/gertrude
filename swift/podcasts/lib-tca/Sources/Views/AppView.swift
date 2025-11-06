@@ -1,10 +1,12 @@
 import ComposableArchitecture
+import Dependencies
 import LibViews
 import SQLiteData
 import SwiftUI
 
 struct AppView: View {
   @Bindable var store: StoreOf<AppReducer>
+  @Dependency(\.locale) var locale
 
   var body: some View {
     NavigationStack {
@@ -27,7 +29,6 @@ struct AppView: View {
         }
         .alert(self.$store.scope(state: \.alert, action: \.alert))
     }
-    .environment(\.miniNowPlayingVisible, self.miniNowPlayingVisible)
     .overlay(alignment: .bottom) {
       if let nowPlaying = self.store.nowPlaying.data {
         NowPlayingView(
@@ -40,11 +41,13 @@ struct AppView: View {
               animation: event == .miniPlayerTapped || event == .dismissed
                 ? .nowPlayingSpring : nil
             )
-          }
+          },
         )
         .opacity(self.store.hideNowPlaying ? 0 : 1)
       }
     }
+    .environment(\.miniNowPlayingVisible, self.miniNowPlayingVisible)
+    .environment(\.lang, Lang(locale: self.locale))
   }
 
   private var miniNowPlayingVisible: Bool {

@@ -2,6 +2,11 @@ name: GertiePodcasts
 options:
   deploymentTarget:
     iOS: "18.0"
+  developmentLanguage: en
+  knownRegions:
+    - en
+    - es
+    - Base
 
 configs:
   Debug: debug
@@ -52,6 +57,9 @@ targets:
         CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleLocalizations:
+          - en
+          - es
         API_ENDPOINT: $(API_ENDPOINT)
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait

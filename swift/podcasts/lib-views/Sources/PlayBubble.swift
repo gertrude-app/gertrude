@@ -2,13 +2,14 @@ import SwiftUI
 
 public struct PlayBubble: View {
   @Environment(\.colorScheme) var cs
+  @Environment(\.lang) var lang
 
   let episode: EpisodeData
   let onTap: @MainActor @Sendable () -> Void
 
   public init(
     episode: EpisodeData,
-    onTap: @MainActor @Sendable @escaping () -> Void = {}
+    onTap: @MainActor @Sendable @escaping () -> Void = {},
   ) {
     self.episode = episode
     self.onTap = onTap
@@ -31,15 +32,15 @@ public struct PlayBubble: View {
 
   var timeText: String? {
     self.hasProgress
-      ? self.episode.remainingDurationShortString
-      : self.episode.durationShortString
+      ? self.episode.remainingDurationShortString(lang: self.lang)
+      : self.episode.durationShortString(lang: self.lang)
   }
 
   public var body: some View {
     Button(action: self.onTap) {
       HStack(spacing: 6) {
         if self.episode.downloadState == .downloading {
-          Text("Downloading...")
+          Text(lstr(.episodeDownloading))
             .font(.system(size: 12, weight: .medium))
             .italic()
             .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))

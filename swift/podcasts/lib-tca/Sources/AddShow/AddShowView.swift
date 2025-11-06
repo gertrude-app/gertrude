@@ -23,9 +23,13 @@ struct AddShowView: View {
 
       case .choosingMethod:
         ButtonScreenView(
-          text: "How would you like to add a podcast?",
-          primary: .init("Search") { self.store.send(.selectSearchTapped) },
-          secondary: .init("Add by URL") { self.store.send(.selectAddByUrlTapped) },
+          text: lstr(.addShowHowToAdd),
+          primary: .init(lstr(.addShowSearch)) {
+            self.store.send(.selectSearchTapped)
+          },
+          secondary: .init(lstr(.addShowAddByUrl)) {
+            self.store.send(.selectAddByUrlTapped)
+          },
         )
 
       case .searching:
@@ -43,21 +47,25 @@ struct AddShowView: View {
 
       case .chooseArtworkPolicy:
         ButtonScreenView(
-          text: "Show podcast and episode images?",
-          primary: .init("Yes, allow images") { self.store.send(.selectAllowArtworkTapped) },
-          secondary: .init("No images") { self.store.send(.selectDontAllowArtworkTapped) },
+          text: lstr(.addShowShowArtworkQuestion),
+          primary: .init(lstr(.addShowAllowImages)) {
+            self.store.send(.selectAllowArtworkTapped)
+          },
+          secondary: .init(lstr(.addShowNoImages)) {
+            self.store.send(.selectDontAllowArtworkTapped)
+          },
           ignoreKeyboard: true
         )
 
       case .subscribing:
-        LoadingScreenView(text: "Subscribing...")
+        LoadingScreenView(text: lstr(.addShowSubscribing))
 
       case .addingByUrl:
         ButtonScreenView(
-          text: "Enter a podcast RSS feed URL:",
+          text: lstr(.addShowEnterUrl),
           urlInput: .init(
-            placeholder: "https://show.com/feed.rss",
-            buttonText: "Subscribe"
+            placeholder: "https://site.com/feed.xml",
+            buttonText: lstr(.addShowSubscribe)
           ) { url in
             self.store.send(.addByUrlSubmitted(url))
           },

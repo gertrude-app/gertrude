@@ -15,7 +15,8 @@ let package = Package(
       dependencies: [
         .product(name: "LibCore", package: "lib-core"),
       ],
-      exclude: ["FakeEntry.swift"]
+      exclude: ["FakeEntry.swift"],
+      resources: [.process("Resources")]
     ),
     .testTarget(
       name: "LibViewsTests",

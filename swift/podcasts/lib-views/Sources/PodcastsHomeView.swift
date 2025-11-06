@@ -9,6 +9,7 @@ import SwiftUI
 public struct PodcastsHomeView: View {
   @Environment(\.colorScheme) var cs
   @Environment(\.miniNowPlayingVisible) var miniNowPlayingVisible
+  @Environment(\.lang) var lang
 
   public enum SubscriptionStatus {
     case ok
@@ -40,12 +41,12 @@ public struct PodcastsHomeView: View {
 
   public init(
     shows: [ShowDataWithStats],
-    onAddShowTap: @MainActor @escaping @Sendable () -> Void,
+    onAddShowTap: @MainActor @escaping @Sendable () -> Void = {},
     onShowTap: @MainActor @escaping @Sendable (Int) -> Void = { _ in },
     onDeleteShow: @MainActor @escaping @Sendable (Int) -> Void = { _ in },
     onSettingsTap: @MainActor @escaping @Sendable () -> Void = {},
     onDebugMenuTap: @MainActor @escaping @Sendable (DebugMenuAction) -> Void = { _ in },
-    subscriptionStatus: SubscriptionStatus = .ok
+    subscriptionStatus: SubscriptionStatus = .ok,
   ) {
     self.shows = shows
     self.onAddShowTap = onAddShowTap
@@ -59,7 +60,7 @@ public struct PodcastsHomeView: View {
   public var body: some View {
     VStack(spacing: 0) {
       HStack {
-        Text("Shows")
+        Text(lstr(.showsTitle))
           .font(.largeTitle)
           .fontWeight(.bold)
         Spacer()
@@ -139,7 +140,7 @@ public struct PodcastsHomeView: View {
         Image(systemName: "exclamationmark.triangle.fill")
           .font(.system(size: 16, weight: .semibold))
           .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
-        Text("Subscription required to add or update shows.")
+        Text(lstr(.showsSubscriptionRequired))
           .font(.system(size: 14, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
         Spacer()
@@ -167,7 +168,7 @@ public struct PodcastsHomeView: View {
           Button(role: .destructive) {
             self.onDeleteShow(show.id)
           } label: {
-            Label("Delete", systemImage: "trash")
+            Label(lstr(.showsDelete), systemImage: "trash")
           }
           .tint(.red)
         }
@@ -181,7 +182,7 @@ public struct PodcastsHomeView: View {
           HStack(spacing: 6) {
             Image(systemName: "plus")
               .font(.system(size: 13, weight: .semibold))
-            Text("Add Show")
+            Text(lstr(.showsAddShow))
               .font(.system(size: 15, weight: .medium))
           }
           .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
@@ -203,14 +204,16 @@ public struct PodcastsHomeView: View {
     var parts: [String] = []
 
     if let pubDate = show.mostRecentPubDate {
-      parts.append(formatRelativeDate(pubDate))
+      parts.append(formatRelativeDate(pubDate, lang: self.lang))
     }
 
     if show.unplayedEpisodes > 0 {
       if show.unplayedEpisodes < 12 {
-        parts.append("\(show.unplayedEpisodes) new")
+        let format = lstr(.showsNewCount)
+        parts.append(String(format: format, show.unplayedEpisodes))
       } else {
-        parts.append("\(show.totalEpisodes) episodes")
+        let format = lstr(.showsEpisodeCount)
+        parts.append(String(format: format, show.totalEpisodes))
       }
     }
 
@@ -314,7 +317,6 @@ func showWithStats(
         $0.totalEpisodes = 542
       },
     ],
-    onAddShowTap: {}
   )
 }
 
@@ -342,7 +344,6 @@ func showWithStats(
         $0.totalEpisodes = 542
       },
     ],
-    onAddShowTap: {}
   )
   .preferredColorScheme(.dark)
 }
@@ -358,7 +359,6 @@ func showWithStats(
         $0.totalEpisodes = 125
       },
     ],
-    onAddShowTap: {},
     subscriptionStatus: .trialEndingSoon
   )
 }
@@ -381,7 +381,6 @@ func showWithStats(
         $0.totalEpisodes = 87
       },
     ],
-    onAddShowTap: {},
     subscriptionStatus: .unpaid
   )
 }
@@ -404,17 +403,13 @@ func showWithStats(
         $0.totalEpisodes = 87
       },
     ],
-    onAddShowTap: {},
     subscriptionStatus: .unpaid
   )
   .preferredColorScheme(.dark)
 }
 
 #Preview("Empty State") {
-  PodcastsHomeView(
-    shows: [],
-    onAddShowTap: {}
-  )
+  PodcastsHomeView(shows: [])
 }
 
 #Preview("Many Shows") {
@@ -474,7 +469,6 @@ func showWithStats(
         $0.totalEpisodes = 201
       },
     ],
-    onAddShowTap: {}
   )
 }
 

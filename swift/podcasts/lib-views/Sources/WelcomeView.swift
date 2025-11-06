@@ -2,13 +2,13 @@ import SwiftUI
 
 public struct WelcomeView: View {
   let onPrimaryBtnTap: () -> Void
-  let greeting = "Hi there!"
 
   @State private var showButton = false
   @State private var showBg = false
-  @State private var lettersOffset = Array(repeating: Vector(x: 0, y: 40), count: "Hi there!".count)
+  @State private var lettersOffset: [Vector] = []
   @State private var subtitleOffset = Vector(x: 0, y: 20)
   @State private var buttonOffset = Vector(x: 0, y: 20)
+  @State private var greeting = ""
 
   @Environment(\.colorScheme) var cs
 
@@ -52,19 +52,17 @@ public struct WelcomeView: View {
           }
         }
 
-        Text(
-          "Gertrude AM lets parents or accountability partners give access to only selected, approved podcasts."
-        )
-        .font(.system(size: 16, weight: .medium))
-        .multilineTextAlignment(self.deviceType() == .pad ? .center : .leading)
-        .swooshIn(
-          tracking: self.$subtitleOffset,
-          to: .zero,
-          after: .seconds(1.0),
-          for: .milliseconds(800)
-        )
+        Text(lstr(.welcomeDescription))
+          .font(.system(size: 16, weight: .medium))
+          .multilineTextAlignment(self.deviceType() == .pad ? .center : .leading)
+          .swooshIn(
+            tracking: self.$subtitleOffset,
+            to: .zero,
+            after: .seconds(1.0),
+            for: .milliseconds(800)
+          )
 
-        BigButton("Get started", type: .button {
+        BigButton(lstr(.welcomeGetStarted), type: .button {
           Task { @MainActor in
             self.vanishingAnimations()
           }
@@ -84,6 +82,10 @@ public struct WelcomeView: View {
       }
       .padding(30)
       .frame(maxWidth: 500)
+    }
+    .onAppear {
+      self.greeting = lstr(.welcomeGreeting)
+      self.lettersOffset = Array(repeating: Vector(x: 0, y: 40), count: self.greeting.count)
     }
   }
 

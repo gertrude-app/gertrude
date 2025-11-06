@@ -14,12 +14,13 @@ struct PodcastClient: Sendable {
 
 extension PodcastClient: DependencyKey {
   static var liveValue: PodcastClient {
-    .init(
+    @Dependency(\.locale) var locale
+    return .init(
       getFeed: { feedUrl in
         try await getPodcastFeedLive(feedUrl: feedUrl)
       },
       search: { query in
-        try await searchPodcastsLive(query: query)
+        try await searchPodcastsLive(query: query, locale: locale)
       },
       downloadAudio: { episode in
         await downloadEpisodeLive(episode: episode)
@@ -79,7 +80,7 @@ enum PodcastFeedError: Error, Sendable {
 }
 
 @Sendable
-func searchPodcastsLive(query: String) async throws -> [SearchResult] {
+func searchPodcastsLive(query: String, locale: Locale) async throws -> [SearchResult] {
   guard !query.isEmpty else { return [] }
 
   guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
@@ -87,7 +88,9 @@ func searchPodcastsLive(query: String) async throws -> [SearchResult] {
     throw SearchError.invalidQuery
   }
 
-  let urlString = "https://itunes.apple.com/search?term=\(encodedQuery)&media=podcast&limit=25"
+  let country = locale.region?.identifier ?? "US"
+  let urlString =
+    "https://itunes.apple.com/search?term=\(encodedQuery)&media=podcast&limit=25&country=\(country)"
   guard let url = URL(string: urlString) else {
     throw SearchError.invalidURL
   }

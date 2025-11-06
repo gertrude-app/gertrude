@@ -52,19 +52,19 @@ public extension EpisodeData {
     return self.progress / Double(durationSeconds)
   }
 
-  var pubDateRelative: String {
-    formatRelativeDate(self.pubDate)
+  func pubDateRelative(lang: Lang) -> String {
+    formatRelativeDate(self.pubDate, lang: lang)
   }
 
-  var durationShortString: String? {
-    self.durationSeconds.map { formatShortDuration($0) }
+  func durationShortString(lang: Lang) -> String? {
+    self.durationSeconds.map { formatShortDuration($0, lang: lang) }
   }
 
-  var remainingDurationShortString: String? {
+  func remainingDurationShortString(lang: Lang) -> String? {
     guard let durationSeconds = self.durationSeconds else { return nil }
     let remainingSeconds = max(0, durationSeconds - Int(self.progress))
     return remainingSeconds > 59
-      ? formatShortDuration(remainingSeconds)
+      ? formatShortDuration(remainingSeconds, lang: lang)
       : formatRemainingPlayerTime(
         progress: self.progress,
         durationSeconds: durationSeconds,

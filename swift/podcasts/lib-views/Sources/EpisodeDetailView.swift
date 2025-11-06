@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct EpisodeDetailView: View {
   @Environment(\.colorScheme) var cs
+  @Environment(\.lang) var lang
 
   public enum Event {
     case playPauseTapped
@@ -21,7 +22,7 @@ public struct EpisodeDetailView: View {
   public init(
     episode: EpisodeDetail,
     show: ShowData,
-    emit: @MainActor @Sendable @escaping (Event) -> Void = { _ in }
+    emit: @MainActor @Sendable @escaping (Event) -> Void = { _ in },
   ) {
     self.episodeDetail = episode
     self.show = show
@@ -49,12 +50,12 @@ public struct EpisodeDetailView: View {
               .padding(.horizontal, 24)
 
             HStack(spacing: 6) {
-              Text(self.episode.pubDateRelative)
+              Text(self.episode.pubDateRelative(lang: self.lang))
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
                 .textCase(.uppercase)
 
-              if let duration = self.episode.durationShortString {
+              if let duration = self.episode.durationShortString(lang: self.lang) {
                 Text("•")
                   .foregroundStyle(Color(self.cs, light: .violet400, dark: .violet500))
                 Text(duration)
@@ -69,15 +70,15 @@ public struct EpisodeDetailView: View {
 
         PlayPauseButton(
           text: self.episode.isPlaying
-            ? "Pause"
-            : (self.episode.progress >= 2.0 && !self.episode.isCompleted ? "Resume" : "Play"),
+            ? lstr(.showPause)
+            : (self.episode.progress >= 2.0 && !self.episode.isCompleted ? lstr(.showResume) : lstr(.showPlay)),
           isPlaying: self.episode.isPlaying,
           onTap: { self.emit(.playPauseTapped) }
         )
 
         if let description = self.episode.description {
           VStack(alignment: .leading, spacing: 8) {
-            Text("Description:")
+            Text(lstr(.episodeDetailDescription))
               .font(.system(size: 18, weight: .semibold))
               .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
 
@@ -92,43 +93,43 @@ public struct EpisodeDetailView: View {
         }
 
         VStack(alignment: .leading, spacing: 12) {
-          Text("Episode Info:")
+          Text(lstr(.episodeDetailEpisodeInfo))
             .font(.system(size: 18, weight: .semibold))
             .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
             .padding(.bottom, 4)
 
           self.infoRow(
-            label: "Published",
+            label: lstr(.episodeDetailPublished),
             value: self.formatPublishDate(self.episode.pubDate)
           )
 
           if let duration = self.episode.durationSeconds {
             self.infoRow(
-              label: "Duration",
+              label: lstr(.episodeDetailDuration),
               value: formatPlayerTime(duration)
             )
           }
 
           self.infoRow(
-            label: "Size",
+            label: lstr(.episodeDetailSize),
             value: formatFileSize(self.episodeDetail.sizeInBytes)
           )
 
           self.infoRow(
-            label: "Status",
-            value: self.episode.downloadState == .downloaded ? "Downloaded" : "Not Downloaded"
+            label: lstr(.settingsSubscriptionStatus),
+            value: self.episode.downloadState == .downloaded ? lstr(.episodeDetailDownloaded) : lstr(.episodeDetailNotDownloaded)
           )
 
           if let websiteUrl = self.episodeDetail.websiteUrl {
             Link(destination: websiteUrl) {
               HStack(spacing: 8) {
-                Text("EPISODE WEBSITE")
+                Text(lstr(.episodeDetailEpisodeWebsite))
                   .font(.system(size: 14, weight: .semibold))
                   .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet500))
                   .tracking(0.5)
                 Spacer()
                 HStack(spacing: 4) {
-                  Text("View")
+                  Text(lstr(.episodeDetailView))
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(Color(self.cs, light: .violet800, dark: .violet200))
                   Image(systemName: "arrow.up.right")

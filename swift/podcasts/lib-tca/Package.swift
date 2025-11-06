@@ -28,7 +28,8 @@ let package = Package(
         .product(name: "Dependencies", package: "swift-dependencies"),
         .product(name: "DependenciesMacros", package: "swift-dependencies"),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-      ]
+      ],
+      resources: [.process("Resources")]
     ),
     .testTarget(
       name: "LibTCATests",

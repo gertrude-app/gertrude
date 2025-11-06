@@ -97,16 +97,16 @@ struct PodcastsFeature {
       case .deleteShowTapped(let showId):
         state.destination = .confirm(
           .init(titleVisibility: .visible) {
-            TextState("Delete this show and all its episodes?")
+            TextState(lstr(.podcastsDeleteConfirm))
           } actions: {
             ButtonState(role: .destructive, action: .confirmDelete(show: showId)) {
-              TextState("Delete")
+              TextState(lstr(.showsDelete))
             }
             ButtonState(role: .cancel) {
-              TextState("Cancel")
+              TextState(lstr(.pinCancel))
             }
           } message: {
-            TextState("This action cannot be undone.")
+            TextState(lstr(.podcastsDeleteWarning))
           }
         )
         return .none

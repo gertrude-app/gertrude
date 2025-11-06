@@ -16,10 +16,10 @@ public struct SettingsView: View {
 
     var displayName: String {
       switch self {
-      case .trialing: "Free trial"
-      case .active: "Subscription active"
-      case .complimentary: "Free forever"
-      case .unpaid: "Subscription unpaid"
+      case .trialing: lstr(.settingsSubscriptionStatusFreeTrial)
+      case .active: lstr(.settingsSubscriptionStatusActive)
+      case .complimentary: lstr(.settingsSubscriptionStatusFreeForever)
+      case .unpaid: lstr(.settingsSubscriptionStatusUnpaid)
       }
     }
 
@@ -73,7 +73,7 @@ public struct SettingsView: View {
 
   public var body: some View {
     VStack(spacing: 20) {
-      Text("Settings")
+      Text(lstr(.settingsTitle))
         .font(.largeTitle)
         .fontWeight(.bold)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -82,7 +82,7 @@ public struct SettingsView: View {
         HStack(spacing: 6) {
           Image(systemName: "creditcard")
             .font(.subheadline)
-          Text("SUBSCRIPTION")
+          Text(lstr(.settingsSubscriptionHeader))
             .font(.subheadline)
             .fontWeight(.medium)
         }
@@ -91,8 +91,12 @@ public struct SettingsView: View {
 
         VStack(spacing: 12) {
           HStack(alignment: .top) {
-            Text(self.status == .complimentary ? "Subscription" : "Status")
-              .font(.headline)
+            Text(lstr(
+              self.status == .complimentary
+                ? .settingsSubscriptionLabel
+                : .settingsSubscriptionStatus
+            ))
+            .font(.headline)
             Spacer()
             VStack(alignment: .trailing, spacing: 4) {
               HStack(spacing: 6) {
@@ -120,7 +124,7 @@ public struct SettingsView: View {
                 HStack(spacing: 4) {
                   ProgressView()
                     .scaleEffect(0.7)
-                  Text("purchase pending")
+                  Text(lstr(.settingsSubscriptionPurchasePending))
                     .font(.caption)
                     .italic()
                 }
@@ -134,7 +138,7 @@ public struct SettingsView: View {
           }
 
           if self.status == .complimentary {
-            Text("You are officially one of Jared’s friends 😊")
+            Text(lstr(.settingsSubscriptionFriendMessage))
               .font(.subheadline)
               .foregroundColor(Color(self.cs, light: .gray, dark: .gray))
               .multilineTextAlignment(.center)
@@ -166,20 +170,27 @@ public struct SettingsView: View {
           VStack(spacing: 16) {
             VStack(spacing: 8) {
               Button {
-                self
-                  .onEvent(self.status == .active ? .manageSubscriptionTapped : .subscribeNowTapped)
+                self.onEvent(
+                  self.status == .active
+                    ? .manageSubscriptionTapped
+                    : .subscribeNowTapped
+                )
               } label: {
-                Text(self.status == .active ? "Manage Subscription" : "Subscribe Now")
-                  .font(.headline)
-                  .foregroundColor(.white)
-                  .frame(maxWidth: .infinity)
-                  .padding(.vertical, 12)
-                  .background(
-                    self.purchaseInProgress
-                      ? Color(red: 0.4, green: 0.3, blue: 0.8).opacity(0.5)
-                      : Color(red: 0.4, green: 0.3, blue: 0.8)
-                  )
-                  .cornerRadius(10)
+                Text(lstr(
+                  self.status == .active
+                    ? .settingsSubscriptionManageSubscription
+                    : .settingsSubscriptionSubscribeNow
+                ))
+                .font(.headline)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                  self.purchaseInProgress
+                    ? Color(red: 0.4, green: 0.3, blue: 0.8).opacity(0.5)
+                    : Color(red: 0.4, green: 0.3, blue: 0.8)
+                )
+                .cornerRadius(10)
               }
               .disabled(self.purchaseInProgress)
 
@@ -187,7 +198,7 @@ public struct SettingsView: View {
                 HStack(spacing: 4) {
                   ProgressView()
                     .scaleEffect(0.7)
-                  Text("one moment...")
+                  Text(lstr(.settingsSubscriptionOneMoment))
                     .font(.caption)
                     .italic()
                 }
@@ -197,7 +208,7 @@ public struct SettingsView: View {
                   dark: .white.opacity(0.5)
                 ))
               } else if self.status != .active {
-                Text("$10/year")
+                Text(lstr(.settingsSubscriptionPrice))
                   .font(.subheadline)
                   .foregroundColor(Color(
                     self.cs,
@@ -208,12 +219,10 @@ public struct SettingsView: View {
             }
 
             if self.status.isUnpaid {
-              Text(
-                "Shows will not update and you may not add new shows while your subscription is unpaid"
-              )
-              .font(.subheadline)
-              .foregroundColor(Color(red: 0.8, green: 0.2, blue: 0.2))
-              .multilineTextAlignment(.center)
+              Text(lstr(.settingsSubscriptionUnpaidWarning))
+                .font(.subheadline)
+                .foregroundColor(Color(red: 0.8, green: 0.2, blue: 0.2))
+                .multilineTextAlignment(.center)
             }
           }
         }
@@ -226,9 +235,9 @@ public struct SettingsView: View {
 
   private var expirationLabel: String {
     switch self.status {
-    case .unpaid: "Expired"
-    case .active: "Renews automatically"
-    case .trialing, .complimentary: "Expires"
+    case .unpaid: lstr(.settingsSubscriptionExpired)
+    case .active: lstr(.settingsSubscriptionRenewsAutomatically)
+    case .trialing, .complimentary: lstr(.settingsSubscriptionExpires)
     }
   }
 
@@ -238,13 +247,15 @@ public struct SettingsView: View {
     let days = Int(interval / 86400)
 
     if days < 0 {
-      return "\(-days) days ago"
+      let format = lstr(.settingsExpirationDaysAgo)
+      return String(format: format, -days)
     } else if days == 0 {
-      return "Today"
+      return lstr(.settingsExpirationToday)
     } else if days == 1 {
-      return "Tomorrow"
+      return lstr(.settingsExpirationTomorrow)
     } else {
-      return "in \(days) days"
+      let format = lstr(.settingsExpirationInDays)
+      return String(format: format, days)
     }
   }
 }

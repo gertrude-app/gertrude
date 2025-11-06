@@ -28,7 +28,7 @@ public struct SearchShowView: View {
         self.resultsList
       }
     }
-    .searchable(text: self.$searchText, prompt: "Search for podcasts...")
+    .searchable(text: self.$searchText, prompt: Text(lstr(.searchPrompt)))
     .searchFocused(self.$isSearchFocused)
     .onAppear {
       self.isSearchFocused = true
@@ -43,7 +43,7 @@ public struct SearchShowView: View {
         .font(.system(size: 64, weight: .light))
         .foregroundStyle(Color(self.cs, light: .violet300, dark: .violet700))
 
-      Text("Enter a search term to find podcasts you'd like to add.")
+      Text(lstr(.searchEmptyMessage))
         .font(.system(size: 16, weight: .medium))
         .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
         .multilineTextAlignment(.center)
@@ -62,11 +62,11 @@ public struct SearchShowView: View {
         .foregroundStyle(Color(self.cs, light: .violet300, dark: .violet700))
 
       VStack(spacing: 12) {
-        Text("No Results")
+        Text(lstr(.searchNoResultsTitle))
           .font(.system(size: 28, weight: .bold))
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
 
-        Text("No podcasts found for \"\(self.searchText)\". Try a different search term.")
+        Text(String(format: lstr(.searchNoResultsMessage), self.searchText))
           .font(.system(size: 16, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
           .multilineTextAlignment(.center)

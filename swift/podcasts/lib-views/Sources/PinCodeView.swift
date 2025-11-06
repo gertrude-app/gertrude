@@ -86,7 +86,7 @@ public struct PinCodeView: View {
                   self.clearPin()
                 }
               } label: {
-                Text(self.onCancel != nil ? "Cancel" : "Clear")
+                Text(self.onCancel != nil ? lstr(.pinCancel) : lstr(.pinClear))
                   .font(.system(size: 18, weight: .medium))
                   .foregroundStyle(.secondary)
                   .frame(width: 80, height: 80)
@@ -158,7 +158,7 @@ public struct PinCodeView: View {
 
       if let onCancel = self.onCancel {
         BigButton(
-          "Cancel",
+          lstr(.pinCancel),
           type: .button(onCancel),
           variant: .secondary
         )
@@ -179,9 +179,10 @@ public struct PinCodeView: View {
       let timeRemaining = lockout.timeIntervalSince(self.currentTime)
       let minutes = Int(floor(timeRemaining / 60))
       if minutes <= 1 {
-        return "Too many failed attempts. Please wait a moment before trying again."
+        return lstr(.pinLockoutWaitMoment)
       } else {
-        return "Too many failed attempts. You must wait \(minutes) minutes before trying again."
+        let format = lstr(.pinLockoutWaitMinutes)
+        return String(format: format, minutes)
       }
     }
   }
@@ -189,18 +190,18 @@ public struct PinCodeView: View {
   private var titleText: String {
     switch self.mode {
     case .set:
-      self.showingConfirmation ? "Confirm PIN" : "Set PIN"
+      self.showingConfirmation ? lstr(.pinConfirmPin) : lstr(.pinSetPin)
     case .verify:
-      "Enter PIN"
+      lstr(.pinEnterPin)
     }
   }
 
   private var subtitleText: String? {
     switch self.mode {
     case .set:
-      self.showingConfirmation ? "Enter your PIN again to confirm" : "Choose a 6-digit PIN"
+      self.showingConfirmation ? lstr(.pinEnterAgainToConfirm) : lstr(.pinChoose6Digit)
     case .verify:
-      "Enter your PIN to continue"
+      lstr(.pinEnterToContinue)
     }
   }
 
@@ -282,7 +283,7 @@ public struct PinCodeView: View {
   }
 
   private func showPinMismatchError() {
-    self.errorMessage = "PINs don't match. Try again."
+    self.errorMessage = lstr(.pinDontMatch)
     self.isShaking = true
 
     Task {
@@ -297,7 +298,7 @@ public struct PinCodeView: View {
   }
 
   private func showIncorrectPinError() {
-    self.errorMessage = "Incorrect PIN. Try again."
+    self.errorMessage = lstr(.pinIncorrect)
     self.isShaking = true
 
     Task {
