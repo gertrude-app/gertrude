@@ -7,6 +7,7 @@ import SwiftUI
 public struct ShowView: View {
   @Environment(\.colorScheme) var cs
   @Environment(\.lang) var lang
+  @Environment(\.miniNowPlayingVisible) var miniNowPlayingVisible
 
   public enum Event: Equatable, Sendable {
     case sortOldestToNewest
@@ -113,6 +114,11 @@ public struct ShowView: View {
         .ignoresSafeArea(.all)
     )
     .scrollContentBackground(.hidden)
+    .safeAreaInset(edge: .bottom) {
+      if self.miniNowPlayingVisible {
+        Color.clear.frame(height: 75)
+      }
+    }
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
         Menu {
