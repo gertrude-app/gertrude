@@ -17,7 +17,7 @@ extension Show {
         \(Show.col.id), \(Show.col.name),
         \(Show.col.author), \(Show.col.artworkUrl)
       ORDER BY mostRecentPubDate DESC;
-      """
+      """,
     )
   }
 }

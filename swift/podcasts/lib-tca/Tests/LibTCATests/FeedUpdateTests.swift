@@ -25,7 +25,7 @@ import Testing
 
   expectNoDifference(updates, .init(
     showUpdates: [Show.mock(1) { $0.artworkUrl = "https://a.com/new.jpg" }],
-    actions: [.replaceShowArtwork(showId: Show.ID(1), artworkUrl: "https://a.com/new.jpg")]
+    actions: [.replaceShowArtwork(showId: Show.ID(1), artworkUrl: "https://a.com/new.jpg")],
   ))
 }
 
@@ -34,11 +34,11 @@ import Testing
     feeds: [Feed(show: .mock(1), episodes: [.mock(1, showId: 1), .mock(2, showId: 1)])],
     shows: [.mock(1)],
     episodes: [.mock(1, showId: 1)],
-    now: .reference
+    now: .reference,
   ))
 
   expectNoDifference(updates, .init(
-    addEpisodes: [.mock(2, showId: 1)]
+    addEpisodes: [.mock(2, showId: 1)],
   ))
 }
 
@@ -56,17 +56,17 @@ import Testing
   let updates = _feedUpdates(input: .init(
     feeds: [Feed(
       show: .mock(1),
-      episodes: [.mock(1, showId: 1) { $0.title = "Updated Title" }]
+      episodes: [.mock(1, showId: 1) { $0.title = "Updated Title" }],
     )],
     shows: [.mock(1)],
     episodes: [.mock(1, showId: 1) { $0.title = "Original Title" }],
-    now: .reference
+    now: .reference,
   ))
 
   expectNoDifference(updates, .init(
     episodeUpdates: [.mock(1, showId: 1) { $0.title = "Updated Title"
       $0.updatedAt = .reference
-    }]
+    }],
   ))
 }
 
@@ -80,7 +80,7 @@ import Testing
         .mock(3, showId: 1) { $0.sizeInBytes = 100_000_000 },
         .mock(4, showId: 1) { $0.audioType = .m4a },
         .mock(5, showId: 1) { $0.title = "Only title changed" },
-      ]
+      ],
     )],
     shows: [.mock(1)],
     episodes: [
@@ -110,14 +110,14 @@ import Testing
     episodes: [
       .mock(1, showId: 1),
       .mock(2, showId: 1) { $0.title = "Episode Two Updated" },
-    ]
+    ],
   )
   let fetchedFeed2 = Feed(
     show: .mock(2) { $0.artworkUrl = "https://new.com/artwork2.jpg" },
     episodes: [
       .mock(3, showId: 2),
       .mock(4, showId: 2), // new episode
-    ]
+    ],
   )
   try await withDependencies {
     $0.defaultDatabase = try! appDatabase()
@@ -197,7 +197,7 @@ extension Show.FeedData {
       description: "Mock Description \(id)",
       websiteUrl: "https://mock\(id).com",
       artworkUrl: "https://mock\(id).com/artwork.jpg",
-      iTunesId: 123_456_789
+      iTunesId: 123_456_789,
     )
     update(&mock)
     return mock
@@ -270,7 +270,7 @@ extension Episode.FeedData {
       audioType: .mp3,
       guid: "e\(id)-s\(showId)",
       pubDate: .reference,
-      episodeNumber: id
+      episodeNumber: id,
     )
     update(&mock)
     return mock
@@ -301,7 +301,7 @@ extension Episode.Draft {
       lastPlayedAt: episode.lastPlayedAt,
       completedAt: episode.completedAt,
       updatedAt: .reference,
-      createdAt: .reference
+      createdAt: .reference,
     )
     update(&mock)
     return mock

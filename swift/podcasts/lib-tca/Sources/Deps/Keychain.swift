@@ -123,7 +123,7 @@ extension KeychainClient: DependencyKey {
           kSecAttrAccount as String: key.secAttrAccount,
         ]
         SecItemDelete(query as CFDictionary)
-      }
+      },
     )
   }
 }
@@ -149,7 +149,7 @@ extension DependencyValues {
         }
       },
       _save: { _, _ in },
-      delete: { _ in }
+      delete: { _ in },
     )
   }
 #endif

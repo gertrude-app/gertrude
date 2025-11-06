@@ -99,7 +99,7 @@ struct AppReducer: Sendable {
           if let revokedAt = txn.revocationDate {
             try CurrentSubscription.set(
               status: .unpaid,
-              expiringAt: revokedAt < self.date.now ? revokedAt : self.date.now
+              expiringAt: revokedAt < self.date.now ? revokedAt : self.date.now,
             )
             if priorStatus != .unpaid || isUpdate {
               log(.subscription("19620bda"), "subscription revoked", detail: "\(txn)")
@@ -107,7 +107,7 @@ struct AppReducer: Sendable {
           } else if (txn.expirationDate ?? .distantFuture) < self.date.now {
             try CurrentSubscription.set(
               status: .unpaid,
-              expiringAt: txn.expirationDate ?? self.date.now
+              expiringAt: txn.expirationDate ?? self.date.now,
             )
             if priorStatus != .unpaid || isUpdate {
               log(.subscription("5c74457c"), "subscription expired", detail: "\(txn)")
@@ -115,7 +115,7 @@ struct AppReducer: Sendable {
           } else {
             try CurrentSubscription.set(
               status: .active,
-              expiringAt: txn.expirationDate ?? self.date.now + .days(365)
+              expiringAt: txn.expirationDate ?? self.date.now + .days(365),
             )
             if priorStatus != .active || isUpdate {
               log(.subscription("a72104d7"), "subscription activated", detail: "\(txn)")
@@ -140,7 +140,7 @@ struct AppReducer: Sendable {
         case .delegate(.episodePlayPauseTapped(let episode, let show)),
              .destination(.presented(.episode(.delegate(.episodePlayPauseTapped(
                let episode,
-               let show
+               let show,
              ))))):
           return .send(.nowPlaying(.episodePlayPauseTapped(episode, show)))
         case .delegate(.alert(let message)):
@@ -156,7 +156,7 @@ struct AppReducer: Sendable {
         state.alert = .init { TextState(message) }
         return .none
       case .mode(
-        .presented(.podcasts(.destination(.presented(.addShow(.delegate(.alert(let message)))))))
+        .presented(.podcasts(.destination(.presented(.addShow(.delegate(.alert(let message))))))),
       ):
         state.alert = .init { TextState(message) }
         return .none
@@ -206,7 +206,7 @@ struct AppReducer: Sendable {
     }
     return try? CurrentSubscription.set(
       status: .trialing,
-      expiringAt: installDate + .days(30)
+      expiringAt: installDate + .days(30),
     )
   }
 
@@ -218,7 +218,7 @@ struct AppReducer: Sendable {
     log(.subscription("456c9362"), "free trial expired")
     _ = try? CurrentSubscription.set(
       status: .unpaid,
-      expiringAt: subscription.expiresAt
+      expiringAt: subscription.expiresAt,
     )
   }
 
@@ -276,7 +276,7 @@ func unexpected(
   filePath: StaticString = #filePath,
   file: StaticString = #file,
   line: UInt = #line,
-  column: UInt = #column
+  column: UInt = #column,
 ) {
   let message = "Unexpected \(id)" + (detail.map { ": \($0)" } ?? "")
   #if DEBUG
@@ -291,7 +291,7 @@ func unexpected(
       id: id,
       kind: .unexpected(nil),
       label: "\(file):\(line)",
-      detail: detail
+      detail: detail,
     ) }
   #endif
 }

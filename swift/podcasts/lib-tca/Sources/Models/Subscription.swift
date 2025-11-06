@@ -35,7 +35,7 @@ extension Subscription {
     purchasePendingSince: nil,
     expiresAt: .now + .days(10),
     updatedAt: .now,
-    createdAt: .now
+    createdAt: .now,
   )
 
   var settingsViewStatus: SettingsView.SubscriptionStatus {
@@ -76,7 +76,7 @@ struct CurrentSubscription: FetchKeyRequest {
   static func set(
     status: Subscription.Status,
     purchasePendingSince: Date? = nil,
-    expiringAt: Date
+    expiringAt: Date,
   ) throws -> Subscription {
     dep(\.db).tryWrite { db in
       try Subscription

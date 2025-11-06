@@ -106,7 +106,7 @@ struct PodcastsFeature {
             }
           } message: {
             TextState(lstr(.podcastsDeleteWarning))
-          }
+          },
         )
         return .none
 
@@ -187,7 +187,7 @@ struct PodcastsFeature {
           }
         } message: {
           TextState("Subscribe to continue using the app.")
-        }
+        },
       )
       self.database.insertRecord(id: .trialEndingAlertShown)
     }

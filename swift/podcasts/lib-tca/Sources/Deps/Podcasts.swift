@@ -27,7 +27,7 @@ extension PodcastClient: DependencyKey {
       },
       downloadArtwork: { show in
         await downloadArtworkLive(show: show)
-      }
+      },
     )
   }
 }
@@ -112,7 +112,7 @@ func searchPodcastsLive(query: String, locale: Locale) async throws -> [SearchRe
         artworkURL: podcast.artworkUrl600,
         feedUrl: podcast.feedUrl,
         episodeCount: podcast.trackCount,
-        isExplicit: podcast.contentAdvisoryRating == "Explicit"
+        isExplicit: podcast.contentAdvisoryRating == "Explicit",
       )
     }
   } catch {
@@ -161,7 +161,7 @@ func downloadEpisodeLive(episode: Episode) async -> Bool {
     try FileManager.default.createDirectory(
       at: episode.localAudioUrl.deletingLastPathComponent(),
       withIntermediateDirectories: true,
-      attributes: nil
+      attributes: nil,
     )
 
     let (data, response) = try await URLSession.shared.data(from: sourceUrl)
@@ -192,7 +192,7 @@ func downloadArtworkLive(show: Show) async {
     try FileManager.default.createDirectory(
       at: .localFilesDir(showId: show.id),
       withIntermediateDirectories: true,
-      attributes: nil
+      attributes: nil,
     )
 
     let (data, response) = try await URLSession.shared.data(from: artworkUrl)
@@ -209,7 +209,7 @@ func downloadArtworkLive(show: Show) async {
         try jpegData
           .write(
             to: .localFilesDir(showId: show.id)
-              .appending(component: "artwork-show-\(show.id).jpg")
+              .appending(component: "artwork-show-\(show.id).jpg"),
           )
       }
     #endif

@@ -111,7 +111,7 @@ public struct ShowView: View {
     .listStyle(.plain)
     .background(
       Color(self.cs, light: .violet100, dark: .violet900)
-        .ignoresSafeArea(.all)
+        .ignoresSafeArea(.all),
     )
     .scrollContentBackground(.hidden)
     .safeAreaInset(edge: .bottom) {
@@ -124,7 +124,7 @@ public struct ShowView: View {
         Menu {
           Picker("Sort Order", selection: Binding(
             get: { self.sortNewestToOldest },
-            set: { newValue in self.onEvent(newValue ? .sortNewestToOldest : .sortOldestToNewest) }
+            set: { newValue in self.onEvent(newValue ? .sortNewestToOldest : .sortOldestToNewest) },
           )) {
             Label(lstr(.showSortNewestFirst), systemImage: "arrow.up").tag(true)
             Label(lstr(.showSortOldestFirst), systemImage: "arrow.down").tag(false)
@@ -135,11 +135,11 @@ public struct ShowView: View {
             Divider()
             Toggle(isOn: Binding(
               get: { self.showArchivedEpisodes },
-              set: { _ in self.onEvent(.toggleShowArchivedTapped) }
+              set: { _ in self.onEvent(.toggleShowArchivedTapped) },
             )) {
               Label(
                 String(format: lstr(.showShowArchived), self.archivedCount),
-                systemImage: "archivebox"
+                systemImage: "archivebox",
               )
             }
 
@@ -148,7 +148,7 @@ public struct ShowView: View {
             } label: {
               Label(
                 lstr(.showUnarchiveAll),
-                systemImage: "arrow.2.circlepath"
+                systemImage: "arrow.2.circlepath",
               )
             }
           }
@@ -207,7 +207,7 @@ public struct ShowView: View {
     ArtworkView(
       artworkImage: self.show.artworkImage,
       artworkUrl: self.show.artworkUrl,
-      size: 200
+      size: 200,
     )
   }
 
@@ -219,7 +219,7 @@ public struct ShowView: View {
         PlayPauseButton(
           text: isPlaying ? lstr(.showPause) : lstr(.showResume),
           isPlaying: isPlaying,
-          onTap: { self.onEvent(.headerPlayButtonTapped) }
+          onTap: { self.onEvent(.headerPlayButtonTapped) },
         )
 
         Text(episodeTitle)
@@ -235,7 +235,7 @@ public struct ShowView: View {
         PlayPauseButton(
           text: isPlaying ? lstr(.showPause) : lstr(.showPlayLatest),
           isPlaying: isPlaying,
-          onTap: { self.onEvent(.headerPlayButtonTapped) }
+          onTap: { self.onEvent(.headerPlayButtonTapped) },
         )
       }
       .padding(.top, 16)
@@ -256,7 +256,7 @@ public struct ShowView: View {
         author: "Jason Henderson",
         description: "A podcast about walking in the ancient paths of biblical wisdom and truth. Join us as we explore the timeless principles that guide us in righteousness.",
         showArtwork: true,
-        artworkUrl: .ancientPath
+        artworkUrl: .ancientPath,
       ),
       episodes: sampleEpisodes,
       showArchivedEpisodes: true,
@@ -273,7 +273,7 @@ public struct ShowView: View {
         author: "Jason Henderson",
         description: "A podcast about walking in the ancient paths of biblical wisdom and truth. Join us as we explore the timeless principles that guide us in righteousness.",
         showArtwork: true,
-        artworkUrl: .ancientPath
+        artworkUrl: .ancientPath,
       ),
       episodes: sampleEpisodes,
       showArchivedEpisodes: true,
@@ -301,7 +301,7 @@ public struct ShowView: View {
       description: "A weekly podcast about Swift development, news, and community updates.",
       showArtwork: true,
     ),
-    episodes: sampleEpisodes
+    episodes: sampleEpisodes,
   )
 }
 

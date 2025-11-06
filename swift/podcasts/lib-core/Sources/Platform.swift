@@ -149,7 +149,7 @@ import SwiftUI
 
   public class BGTask: Equatable {
     public var identifier: String
-    public var expirationHandler: (() -> Void)? = nil
+    public var expirationHandler: (() -> Void)?
 
     public func setTaskCompleted(success: Bool) {}
     public init(identifier: String? = nil) {
@@ -171,7 +171,7 @@ import SwiftUI
     public func register(
       forTaskWithIdentifier identifier: String,
       using queue: DispatchQueue?,
-      launchHandler: @escaping (BGTask) -> Void
+      launchHandler: @escaping (BGTask) -> Void,
     ) -> Bool {
       true
     }

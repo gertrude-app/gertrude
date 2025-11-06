@@ -10,7 +10,7 @@ public struct PinCodeView: View {
   public init(
     mode: Mode,
     onCancel: (@MainActor @Sendable () -> Void)? = nil,
-    onPrepHaptics: (() -> Void)? = nil
+    onPrepHaptics: (() -> Void)? = nil,
   ) {
     self.mode = mode
     self.onCancel = onCancel
@@ -56,14 +56,14 @@ public struct PinCodeView: View {
                 .frame(width: 16, height: 16)
                 .overlay(
                   Circle()
-                    .stroke(.tertiary, lineWidth: 1)
+                    .stroke(.tertiary, lineWidth: 1),
                 )
             }
           }
           .offset(x: self.isShaking ? 10 : 0)
           .animation(
             .easeInOut(duration: 0.1).repeatCount(4, autoreverses: true),
-            value: self.isShaking
+            value: self.isShaking,
           )
 
           VStack(spacing: 16) {
@@ -160,7 +160,7 @@ public struct PinCodeView: View {
         BigButton(
           lstr(.pinCancel),
           type: .button(onCancel),
-          variant: .secondary
+          variant: .secondary,
         )
         .padding(.horizontal, 30)
         .padding(.bottom, 30)
@@ -372,21 +372,21 @@ private struct NumberButton: View {
 #Preview("Set PIN") {
   PinCodeView(
     mode: .set(onComplete: { _ in }, onConfirmFail: {}),
-    onCancel: nil
+    onCancel: nil,
   )
 }
 
 #Preview("Verify PIN") {
   PinCodeView(
     mode: .verify(123_456, onVerify: {}, onFail: {}),
-    onCancel: {}
+    onCancel: {},
   )
 }
 
 #Preview("Set PIN - Dark") {
   PinCodeView(
     mode: .set(onComplete: { _ in }, onConfirmFail: {}),
-    onCancel: nil
+    onCancel: nil,
   )
   .preferredColorScheme(.dark)
 }
@@ -394,7 +394,7 @@ private struct NumberButton: View {
 #Preview("Verify PIN - Dark") {
   PinCodeView(
     mode: .verify(123_456, onVerify: {}, onFail: {}),
-    onCancel: {}
+    onCancel: {},
   )
   .preferredColorScheme(.dark)
 }
@@ -402,14 +402,14 @@ private struct NumberButton: View {
 #Preview("Lockout Screen") {
   PinCodeView(
     mode: .verify(123_456, lockout: .now + .minutes(5), onVerify: {}, onFail: {}),
-    onCancel: {}
+    onCancel: {},
   )
 }
 
 #Preview("Lockout Screen - Dark") {
   PinCodeView(
     mode: .verify(123_456, lockout: .now + .minutes(5), onVerify: {}, onFail: {}),
-    onCancel: {}
+    onCancel: {},
   )
   .preferredColorScheme(.dark)
 }

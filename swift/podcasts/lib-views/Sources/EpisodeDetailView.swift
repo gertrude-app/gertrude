@@ -77,7 +77,7 @@ public struct EpisodeDetailView: View {
                 : lstr(.showPlay)
             ),
           isPlaying: self.episode.isPlaying,
-          onTap: { self.emit(.playPauseTapped) }
+          onTap: { self.emit(.playPauseTapped) },
         )
 
         if let description = self.episode.description {
@@ -104,26 +104,26 @@ public struct EpisodeDetailView: View {
 
           self.infoRow(
             label: lstr(.episodeDetailPublished),
-            value: self.formatPublishDate(self.episode.pubDate)
+            value: self.formatPublishDate(self.episode.pubDate),
           )
 
           if let duration = self.episode.durationSeconds {
             self.infoRow(
               label: lstr(.episodeDetailDuration),
-              value: formatPlayerTime(duration)
+              value: formatPlayerTime(duration),
             )
           }
 
           self.infoRow(
             label: lstr(.episodeDetailSize),
-            value: formatFileSize(self.episodeDetail.sizeInBytes)
+            value: formatFileSize(self.episodeDetail.sizeInBytes),
           )
 
           self.infoRow(
             label: lstr(.settingsSubscriptionStatus),
             value: self.episode.downloadState == .downloaded
               ? lstr(.episodeDetailDownloaded)
-              : lstr(.episodeDetailNotDownloaded)
+              : lstr(.episodeDetailNotDownloaded),
           )
 
           if let websiteUrl = self.episodeDetail.websiteUrl {
@@ -152,7 +152,7 @@ public struct EpisodeDetailView: View {
     }
     .background(
       Color(self.cs, light: .violet100, dark: .violet900)
-        .ignoresSafeArea(.all)
+        .ignoresSafeArea(.all),
     )
   }
 
@@ -207,13 +207,13 @@ extension EpisodeDetailView.EpisodeDetail {
         $0.pubDate = .now - .days(2)
       },
       websiteUrl: URL(string: "https://example.com/episode/1"),
-      sizeInBytes: 50_000_000
+      sizeInBytes: 50_000_000,
     ),
     show: show {
       $0.name = "The Ancient Path"
       $0.author = "Jason Henderson"
       $0.artworkUrl = .ancientPath
-    }
+    },
   )
 }
 
@@ -229,13 +229,13 @@ extension EpisodeDetailView.EpisodeDetail {
         $0.pubDate = .now - .days(5)
       },
       websiteUrl: nil,
-      sizeInBytes: 35_000_000
+      sizeInBytes: 35_000_000,
     ),
     show: show {
       $0.name = "The Ancient Path"
       $0.author = "Jason Henderson"
       $0.artworkUrl = .ancientPath
-    }
+    },
   )
   .preferredColorScheme(.dark)
 }
@@ -254,13 +254,13 @@ extension EpisodeDetailView.EpisodeDetail {
         $0.isPlaying = true
       },
       websiteUrl: URL(string: "https://example.com/episode/3"),
-      sizeInBytes: 28_500_000
+      sizeInBytes: 28_500_000,
     ),
     show: show {
       $0.name = "The Ancient Path"
       $0.author = "Jason Henderson"
       $0.artworkUrl = .ancientPath
-    }
+    },
   )
 }
 
@@ -276,12 +276,12 @@ extension EpisodeDetailView.EpisodeDetail {
         $0.pubDate = .now - .days(3)
       },
       websiteUrl: URL(string: "https://example.com/episode/4"),
-      sizeInBytes: 32_000_000
+      sizeInBytes: 32_000_000,
     ),
     show: show {
       $0.name = "The Ancient Path"
       $0.author = "Jason Henderson"
       $0.artworkUrl = .ancientPath
-    }
+    },
   )
 }

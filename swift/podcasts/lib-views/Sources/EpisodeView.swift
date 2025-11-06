@@ -82,7 +82,7 @@ public struct EpisodeView: View {
               } label: {
                 Image(
                   systemName: self.episode
-                    .downloadState == .downloaded ? "arrow.down.circle.fill" : "arrow.down.circle"
+                    .downloadState == .downloaded ? "arrow.down.circle.fill" : "arrow.down.circle",
                 )
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(Color(self.cs, light: .violet400, dark: .violet400))
@@ -129,7 +129,7 @@ public struct EpisodeView: View {
                     ? lstr(.episodeMarkAsUnplayed)
                     : lstr(.episodeMarkAsPlayed),
                   systemImage: self.episode
-                    .isCompleted ? "arrow.counterclockwise" : "arrow.clockwise"
+                    .isCompleted ? "arrow.counterclockwise" : "arrow.clockwise",
                 )
               }
               .tint(.primary)
@@ -143,7 +143,7 @@ public struct EpisodeView: View {
                 self.episode.isArchived
                   ? lstr(.episodeUnarchiveEpisode)
                   : lstr(.episodeArchiveEpisode),
-                systemImage: self.episode.isArchived ? "tray.and.arrow.up" : "archivebox"
+                systemImage: self.episode.isArchived ? "tray.and.arrow.up" : "archivebox",
               )
             }
             .tint(.primary)

@@ -63,7 +63,7 @@ public struct SettingsView: View {
     status: SubscriptionStatus,
     expiresAt: Date,
     purchaseInProgress: Bool = false,
-    onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in }
+    onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in },
   ) {
     self.status = status
     self.expiresAt = expiresAt
@@ -94,7 +94,7 @@ public struct SettingsView: View {
             Text(lstr(
               self.status == .complimentary
                 ? .settingsSubscriptionLabel
-                : .settingsSubscriptionStatus
+                : .settingsSubscriptionStatus,
             ))
             .font(.headline)
             Spacer()
@@ -131,7 +131,7 @@ public struct SettingsView: View {
                 .foregroundColor(Color(
                   self.cs,
                   light: .black.opacity(0.5),
-                  dark: .white.opacity(0.5)
+                  dark: .white.opacity(0.5),
                 ))
               }
             }
@@ -153,7 +153,7 @@ public struct SettingsView: View {
                   .foregroundColor(Color(
                     self.cs,
                     light: .black.opacity(0.6),
-                    dark: .white.opacity(0.6)
+                    dark: .white.opacity(0.6),
                   ))
                 if self.status.isTrialing, self.expiresAt.timeIntervalSinceNow < .days(5) {
                   PulsingDot()
@@ -173,13 +173,13 @@ public struct SettingsView: View {
                 self.onEvent(
                   self.status == .active
                     ? .manageSubscriptionTapped
-                    : .subscribeNowTapped
+                    : .subscribeNowTapped,
                 )
               } label: {
                 Text(lstr(
                   self.status == .active
                     ? .settingsSubscriptionManageSubscription
-                    : .settingsSubscriptionSubscribeNow
+                    : .settingsSubscriptionSubscribeNow,
                 ))
                 .font(.headline)
                 .foregroundColor(.white)
@@ -188,7 +188,7 @@ public struct SettingsView: View {
                 .background(
                   self.purchaseInProgress
                     ? Color(red: 0.4, green: 0.3, blue: 0.8).opacity(0.5)
-                    : Color(red: 0.4, green: 0.3, blue: 0.8)
+                    : Color(red: 0.4, green: 0.3, blue: 0.8),
                 )
                 .cornerRadius(10)
               }
@@ -205,7 +205,7 @@ public struct SettingsView: View {
                 .foregroundColor(Color(
                   self.cs,
                   light: .black.opacity(0.5),
-                  dark: .white.opacity(0.5)
+                  dark: .white.opacity(0.5),
                 ))
               } else if self.status != .active {
                 Text(lstr(.settingsSubscriptionPrice))
@@ -213,7 +213,7 @@ public struct SettingsView: View {
                   .foregroundColor(Color(
                     self.cs,
                     light: .black.opacity(0.6),
-                    dark: .white.opacity(0.6)
+                    dark: .white.opacity(0.6),
                   ))
               }
             }
@@ -265,14 +265,14 @@ public struct SettingsView: View {
 #Preview("Trialing") {
   SettingsView(
     status: .trialing(purchasePending: false),
-    expiresAt: Date().addingTimeInterval(.days(25))
+    expiresAt: Date().addingTimeInterval(.days(25)),
   )
 }
 
 #Preview("Trialing (Dark)") {
   SettingsView(
     status: .trialing(purchasePending: false),
-    expiresAt: Date().addingTimeInterval(.days(25))
+    expiresAt: Date().addingTimeInterval(.days(25)),
   )
   .preferredColorScheme(.dark)
 }
@@ -280,14 +280,14 @@ public struct SettingsView: View {
 #Preview("Active") {
   SettingsView(
     status: .active,
-    expiresAt: Date().addingTimeInterval(.days(180))
+    expiresAt: Date().addingTimeInterval(.days(180)),
   )
 }
 
 #Preview("Active (Dark)") {
   SettingsView(
     status: .active,
-    expiresAt: Date().addingTimeInterval(.days(180))
+    expiresAt: Date().addingTimeInterval(.days(180)),
   )
   .preferredColorScheme(.dark)
 }
@@ -295,14 +295,14 @@ public struct SettingsView: View {
 #Preview("Complimentary") {
   SettingsView(
     status: .complimentary,
-    expiresAt: Date().addingTimeInterval(.days(365))
+    expiresAt: Date().addingTimeInterval(.days(365)),
   )
 }
 
 #Preview("Complimentary (Dark)") {
   SettingsView(
     status: .complimentary,
-    expiresAt: Date().addingTimeInterval(.days(365))
+    expiresAt: Date().addingTimeInterval(.days(365)),
   )
   .preferredColorScheme(.dark)
 }
@@ -310,14 +310,14 @@ public struct SettingsView: View {
 #Preview("Trial Expiring Soon") {
   SettingsView(
     status: .trialing(purchasePending: false),
-    expiresAt: Date().addingTimeInterval(.days(3))
+    expiresAt: Date().addingTimeInterval(.days(3)),
   )
 }
 
 #Preview("Trial Expiring Soon (Dark)") {
   SettingsView(
     status: .trialing(purchasePending: false),
-    expiresAt: Date().addingTimeInterval(.days(3))
+    expiresAt: Date().addingTimeInterval(.days(3)),
   )
   .preferredColorScheme(.dark)
 }
@@ -325,14 +325,14 @@ public struct SettingsView: View {
 #Preview("Unpaid") {
   SettingsView(
     status: .unpaid(purchasePending: false),
-    expiresAt: Date().addingTimeInterval(.days(-5))
+    expiresAt: Date().addingTimeInterval(.days(-5)),
   )
 }
 
 #Preview("Unpaid (Dark)") {
   SettingsView(
     status: .unpaid(purchasePending: false),
-    expiresAt: Date().addingTimeInterval(.days(-5))
+    expiresAt: Date().addingTimeInterval(.days(-5)),
   )
   .preferredColorScheme(.dark)
 }
@@ -340,14 +340,14 @@ public struct SettingsView: View {
 #Preview("Trialing (Purchase Pending)") {
   SettingsView(
     status: .trialing(purchasePending: true),
-    expiresAt: Date().addingTimeInterval(.days(25))
+    expiresAt: Date().addingTimeInterval(.days(25)),
   )
 }
 
 #Preview("Unpaid (Purchase Pending)") {
   SettingsView(
     status: .unpaid(purchasePending: true),
-    expiresAt: Date().addingTimeInterval(.days(-5))
+    expiresAt: Date().addingTimeInterval(.days(-5)),
   )
 }
 
@@ -355,7 +355,7 @@ public struct SettingsView: View {
   SettingsView(
     status: .trialing(purchasePending: false),
     expiresAt: Date().addingTimeInterval(.days(25)),
-    purchaseInProgress: true
+    purchaseInProgress: true,
   )
 }
 
@@ -363,6 +363,6 @@ public struct SettingsView: View {
   SettingsView(
     status: .unpaid(purchasePending: false),
     expiresAt: Date().addingTimeInterval(.days(-5)),
-    purchaseInProgress: true
+    purchaseInProgress: true,
   )
 }

@@ -14,16 +14,16 @@ struct AppView: View {
         .navigationDestination(
           item: self.$store.scope(
             state: \.mode?.onboarding,
-            action: \.mode.onboarding
-          )
+            action: \.mode.onboarding,
+          ),
         ) { store in
           OnboardingView(store: store)
         }
         .navigationDestination(
           item: self.$store.scope(
             state: \.mode?.podcasts,
-            action: \.mode.podcasts
-          )
+            action: \.mode.podcasts,
+          ),
         ) { store in
           PodcastsView(store: store)
         }
@@ -39,7 +39,7 @@ struct AppView: View {
             self.store.send(
               .nowPlaying(.view(event)),
               animation: event == .miniPlayerTapped || event == .dismissed
-                ? .nowPlayingSpring : nil
+                ? .nowPlayingSpring : nil,
             )
           },
         )

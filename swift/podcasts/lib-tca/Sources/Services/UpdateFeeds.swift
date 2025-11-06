@@ -259,7 +259,7 @@ extension Episode {
       lastPlayedAt: self.lastPlayedAt,
       completedAt: self.completedAt,
       updatedAt: self.updatedAt,
-      createdAt: self.createdAt
+      createdAt: self.createdAt,
     )
   }
 

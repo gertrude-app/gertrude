@@ -247,7 +247,7 @@ public struct PodcastsHomeView: View {
     .padding(.vertical, 16)
     .background(
       Color(self.cs, light: .clear, dark: .clear)
-        .contentShape(Rectangle())
+        .contentShape(Rectangle()),
     )
   }
 
@@ -255,7 +255,7 @@ public struct PodcastsHomeView: View {
     ArtworkView(
       artworkImage: show.showArtwork ? show.artworkImage : nil,
       artworkUrl: show.showArtwork ? show.artworkUrl : nil,
-      size: 56
+      size: 56,
     )
   }
 }
@@ -265,7 +265,7 @@ public extension PodcastsHomeView.ShowDataWithStats {
     show: ShowData,
     totalEpisodes: Int,
     unplayedEpisodes: Int,
-    mostRecentPubDate: Date? = nil
+    mostRecentPubDate: Date? = nil,
   ) {
     self.data = show
     self.totalEpisodes = totalEpisodes
@@ -282,12 +282,12 @@ public extension PodcastsHomeView.ShowDataWithStats {
 
 func showWithStats(
   id: Int = 1,
-  _ modify: (inout PodcastsHomeView.ShowDataWithStats) -> Void = { _ in }
+  _ modify: (inout PodcastsHomeView.ShowDataWithStats) -> Void = { _ in },
 ) -> PodcastsHomeView.ShowDataWithStats {
   var show = PodcastsHomeView.ShowDataWithStats(
     data: ShowData(id: id, name: "Test Show", showArtwork: true),
     totalEpisodes: 0,
-    unplayedEpisodes: 0
+    unplayedEpisodes: 0,
   )
   modify(&show)
   return show
@@ -359,7 +359,7 @@ func showWithStats(
         $0.totalEpisodes = 125
       },
     ],
-    subscriptionStatus: .trialEndingSoon
+    subscriptionStatus: .trialEndingSoon,
   )
 }
 
@@ -381,7 +381,7 @@ func showWithStats(
         $0.totalEpisodes = 87
       },
     ],
-    subscriptionStatus: .unpaid
+    subscriptionStatus: .unpaid,
   )
 }
 
@@ -403,7 +403,7 @@ func showWithStats(
         $0.totalEpisodes = 87
       },
     ],
-    subscriptionStatus: .unpaid
+    subscriptionStatus: .unpaid,
   )
   .preferredColorScheme(.dark)
 }
@@ -472,15 +472,8 @@ func showWithStats(
   )
 }
 
-public struct NowPlayingVisibleKey: EnvironmentKey {
-  public static let defaultValue: Bool = false
-}
-
 public extension EnvironmentValues {
-  var miniNowPlayingVisible: Bool {
-    get { self[NowPlayingVisibleKey.self] }
-    set { self[NowPlayingVisibleKey.self] = newValue }
-  }
+  @Entry var miniNowPlayingVisible: Bool = false
 }
 
 extension String {

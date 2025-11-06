@@ -59,7 +59,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
   private var episodeWebsiteUrl: String?
   private var episodeAudioUrl = ""
   private var episodeArtworkUrl: String?
-  private var episodeDuration: Int? = nil
+  private var episodeDuration: Int?
   private var episodeSize = 0
   private var episodeAudioType = AudioType.mp3
   private var episodeGuid = ""
@@ -78,7 +78,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
     didStartElement elementName: String,
     namespaceURI: String?,
     qualifiedName qName: String?,
-    attributes attributeDict: [String: String] = [:]
+    attributes attributeDict: [String: String] = [:],
   ) {
     self.parentElement = self.currentElement
     self.currentElement = elementName
@@ -121,7 +121,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
     _ parser: XMLParser,
     didEndElement elementName: String,
     namespaceURI: String?,
-    qualifiedName qName: String?
+    qualifiedName qName: String?,
   ) {
     let trimmedText = self.currentText.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -151,7 +151,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
         audioType: self.episodeAudioType,
         guid: self.episodeGuid,
         pubDate: self.episodePubDate,
-        episodeNumber: self.episodeNumber
+        episodeNumber: self.episodeNumber,
       )
       self.episodes.append(episode)
       self.isInItem = false
@@ -212,7 +212,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
           .stripHTML(self.showDescription ?? "") : nil,
         websiteUrl: self.showWebsiteUrl,
         artworkUrl: self.showArtworkUrl,
-        iTunesId: self.iTunesId
+        iTunesId: self.iTunesId,
       )
     }
   }
@@ -284,7 +284,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
       in: html,
       options: [],
       range: range,
-      withTemplate: " "
+      withTemplate: " ",
     )
 
     // Clean up extra whitespace and decode HTML entities
@@ -301,14 +301,14 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
     let withoutExtraSpaces = cleaned.replacingOccurrences(
       of: "\\s+",
       with: " ",
-      options: .regularExpression
+      options: .regularExpression,
     )
 
     // Remove spaces before punctuation
     let finalCleaned = withoutExtraSpaces.replacingOccurrences(
       of: "\\s+([.,;:!?])",
       with: "$1",
-      options: .regularExpression
+      options: .regularExpression,
     )
 
     return finalCleaned

@@ -83,11 +83,11 @@ import Testing
 
       await store.send(
         .mode(
-          .presented(.podcasts(.destination(.presented(.settings(.view(.subscribeNowTapped))))))
-        )
+          .presented(.podcasts(.destination(.presented(.settings(.view(.subscribeNowTapped)))))),
+        ),
       ) {
         $0.mode = .podcasts(.init(
-          destination: .settings(.init(purchaseInProgress: true))
+          destination: .settings(.init(purchaseInProgress: true)),
         ))
       }
 
@@ -99,10 +99,10 @@ import Testing
       transactions.continuation.yield(.mock)
 
       await store.receive(
-        .mode(.presented(.podcasts(.destination(.presented(.settings(.finishPurchase))))))
+        .mode(.presented(.podcasts(.destination(.presented(.settings(.finishPurchase)))))),
       ) {
         $0.mode = .podcasts(.init(
-          destination: .settings(.init(purchaseInProgress: false))
+          destination: .settings(.init(purchaseInProgress: false)),
         ))
       }
 
@@ -255,6 +255,6 @@ extension TransactionData {
     originalID: 1,
     purchaseDate: .reference,
     expirationDate: .reference + .days(365),
-    revocationDate: nil
+    revocationDate: nil,
   )
 }

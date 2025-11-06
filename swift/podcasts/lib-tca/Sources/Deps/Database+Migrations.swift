@@ -20,7 +20,7 @@ enum Migrations {
         updatedAt TEXT NOT NULL,
         createdAt TEXT NOT NULL
       ) STRICT;
-      """
+      """,
     ).execute(db)
     try #sql(
       """
@@ -47,22 +47,22 @@ enum Migrations {
         createdAt TEXT NOT NULL,
         FOREIGN KEY (showId) REFERENCES shows (id) ON DELETE CASCADE
       ) STRICT;
-      """
+      """,
     ).execute(db)
     try #sql(
       """
       CREATE UNIQUE INDEX idx_episodes_showId_guid ON episodes(showId, guid);
-      """
+      """,
     ).execute(db)
     try #sql(
       """
       CREATE INDEX idx_episodes_showId ON episodes(showId);
-      """
+      """,
     ).execute(db)
     try #sql(
       """
       CREATE INDEX idx_episodes_pubDate ON episodes(pubDate);
-      """
+      """,
     ).execute(db)
     try #sql(
       """
@@ -71,7 +71,7 @@ enum Migrations {
         success INTEGER NOT NULL CHECK (success IN (0, 1)),
         createdAt TEXT NOT NULL
       ) STRICT;
-      """
+      """,
     ).execute(db)
     try #sql(
       """
@@ -84,7 +84,7 @@ enum Migrations {
         updatedAt TEXT NOT NULL,
         createdAt TEXT NOT NULL
       ) STRICT;
-      """
+      """,
     ).execute(db)
     try #sql(
       """
@@ -95,7 +95,7 @@ enum Migrations {
         updatedAt TEXT NOT NULL,
         createdAt TEXT NOT NULL
       ) STRICT;
-      """
+      """,
     ).execute(db)
     try #sql(
       """
@@ -109,7 +109,7 @@ enum Migrations {
         detail TEXT,
         createdAt TEXT NOT NULL
       ) STRICT;
-      """
+      """,
     ).execute(db)
     try #sql(
       """
@@ -122,7 +122,7 @@ enum Migrations {
         bufferedProgress REAL,
         updatedAt TEXT NOT NULL
       ) STRICT;
-      """
+      """,
     ).execute(db)
     try #sql(
       """
@@ -141,7 +141,7 @@ enum Migrations {
         datetime('subsec'),
         datetime('subsec')
       );
-      """
+      """,
     ).execute(db)
   }
 }

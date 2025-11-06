@@ -28,7 +28,7 @@ public struct AppStore {
     }
     self.inner = Store(
       initialState: .init(),
-      reducer: { AppReducer()._printChanges(.custom) }
+      reducer: { AppReducer()._printChanges(.custom) },
     )
   }
 

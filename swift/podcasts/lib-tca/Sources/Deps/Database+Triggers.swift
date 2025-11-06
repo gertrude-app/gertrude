@@ -45,9 +45,9 @@ private func dispatchNowPlayingUpdates(_ db: Database) throws {
       after: .update { ($0.episodeId, $0.isPlaying) }
         forEachRow: {
           #sql(
-            "SELECT nowPlayingUpdate(\($0.episodeId), \($0.isPlaying), \($1.episodeId), \($1.isPlaying))"
+            "SELECT nowPlayingUpdate(\($0.episodeId), \($0.isPlaying), \($1.episodeId), \($1.isPlaying))",
           )
-        }
+        },
     )
     .execute(db)
   try NowPlayingModel

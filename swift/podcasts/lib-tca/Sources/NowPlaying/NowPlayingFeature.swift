@@ -102,7 +102,7 @@ struct NowPlayingFeature {
             NowPlaying.set(.init(
               episodeId: next.episode.id,
               isPlaying: true,
-              minimized: nowPlaying.minimized
+              minimized: nowPlaying.minimized,
             ))
           }
         case .headphonesDoubleClickReceived(let position):
@@ -205,7 +205,7 @@ struct NowPlayingFeature {
   func scrub(
     _ nowPlaying: NowPlaying.Data,
     to newTime: Double,
-    from source: ScrubSource
+    from source: ScrubSource,
   ) -> Effect<Action> {
     .run { _ in
       nowPlaying.setProgress(newTime, sync: source == .lockScreen)

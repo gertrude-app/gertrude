@@ -10,7 +10,7 @@ public struct PlayPauseButton: View {
   public init(
     text: String,
     isPlaying: Bool,
-    onTap: @MainActor @Sendable @escaping () -> Void
+    onTap: @MainActor @Sendable @escaping () -> Void,
   ) {
     self.text = text
     self.isPlaying = isPlaying

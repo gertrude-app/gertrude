@@ -86,7 +86,7 @@ struct SwooshIn: ViewModifier {
           Task { @MainActor in
             withAnimation(self.animation == .bouncy ? .bouncy(
               duration: self.duration.inMilliseconds / 1000,
-              extraBounce: 0.3
+              extraBounce: 0.3,
             ) : .smooth(duration: self.duration.inMilliseconds / 1000)) {
               self.vec.x = self.destination.x
               self.vec.y = self.destination.y
@@ -112,14 +112,14 @@ extension View {
     to destination: Vector,
     after delay: Duration,
     for duration: Duration,
-    via animation: SwooshIn.AnimationType = .bouncy
+    via animation: SwooshIn.AnimationType = .bouncy,
   ) -> some View {
     self.modifier(SwooshIn(
       vec: vec,
       destination: destination,
       delay: delay,
       duration: duration,
-      animation: animation
+      animation: animation,
     ))
   }
 }

@@ -17,7 +17,7 @@ public struct ButtonScreenView: View {
     public init(
       placeholder: String = "Enter URL",
       buttonText: String = "Submit",
-      onSubmit: @MainActor @escaping @Sendable (String) -> Void
+      onSubmit: @MainActor @escaping @Sendable (String) -> Void,
     ) {
       self.placeholder = placeholder
       self.buttonText = buttonText
@@ -35,7 +35,7 @@ public struct ButtonScreenView: View {
       text: String,
       type: ButtonType,
       animate: Bool = true,
-      asyncAction: Bool = false
+      asyncAction: Bool = false,
     ) {
       self.text = text
       self.type = type
@@ -47,13 +47,13 @@ public struct ButtonScreenView: View {
       _ text: String,
       animate: Bool = true,
       asyncAction: Bool = false,
-      _ action: @MainActor @escaping @Sendable () -> Void
+      _ action: @MainActor @escaping @Sendable () -> Void,
     ) {
       self.init(
         text: text,
         type: .button(action),
         animate: animate,
-        asyncAction: asyncAction
+        asyncAction: asyncAction,
       )
     }
   }
@@ -98,7 +98,7 @@ public struct ButtonScreenView: View {
     primaryLooksLikeSecondary: Bool = false,
     urlInput: UrlInputConfig? = nil,
     animateBtnEntry: Bool = true,
-    ignoreKeyboard: Bool = false
+    ignoreKeyboard: Bool = false,
   ) {
     self.text = text
     self.screenType = screenType
@@ -116,15 +116,15 @@ public struct ButtonScreenView: View {
     self._urlInputOffset = State(initialValue: animateBtnEntry ? Vector(x: 0, y: 20) : .zero)
     self._primaryButtonStatus = State(initialValue: (
       offset: animateBtnEntry ? Vector(x: 0, y: 20) : .zero,
-      isLoading: false
+      isLoading: false,
     ))
     self._secondaryButtonStatus = State(initialValue: (
       offset: animateBtnEntry ? Vector(x: 0, y: 20) : .zero,
-      isLoading: false
+      isLoading: false,
     ))
     self._tertiaryButtonStatus = State(initialValue: (
       offset: animateBtnEntry ? Vector(x: 0, y: 20) : .zero,
-      isLoading: false
+      isLoading: false,
     ))
   }
 
@@ -135,7 +135,7 @@ public struct ButtonScreenView: View {
           Gradient(colors: [
             Color(self.cs, light: .violet200, dark: .violet950.opacity(0.7)),
             .clear,
-          ])
+          ]),
         )
         .ignoresSafeArea()
         .opacity(self.showBg ? 1 : 0)
@@ -198,14 +198,14 @@ public struct ButtonScreenView: View {
               .padding(.vertical, 14)
               .background(
                 RoundedRectangle(cornerRadius: 8)
-                  .fill(Color(self.cs, light: .white, dark: .black))
+                  .fill(Color(self.cs, light: .white, dark: .black)),
               )
               .overlay(
                 RoundedRectangle(cornerRadius: 8)
                   .stroke(
                     Color(self.cs, light: .gray.opacity(0.3), dark: .gray.opacity(0.5)),
-                    lineWidth: 1
-                  )
+                    lineWidth: 1,
+                  ),
               )
               .onAppear {
                 self.isUrlFieldFocused = true
@@ -215,14 +215,14 @@ public struct ButtonScreenView: View {
               urlConfig.buttonText,
               type: .button { urlConfig.onSubmit(self.urlText) },
               variant: .primary,
-              disabled: self.urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+              disabled: self.urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
             )
           }
           .swooshIn(
             tracking: self.$urlInputOffset,
             to: .zero,
             after: .milliseconds(100),
-            for: .milliseconds(800)
+            for: .milliseconds(800),
           )
           .padding(.bottom, 20)
         }
@@ -237,15 +237,15 @@ public struct ButtonScreenView: View {
                 type: config.type,
                 animate: config.animate,
                 asyncAction: config.asyncAction,
-                isLoading: self.$primaryButtonStatus.isLoading
+                isLoading: self.$primaryButtonStatus.isLoading,
               ),
-              variant: self.primaryLooksLikeSecondary ? .secondary : .primary
+              variant: self.primaryLooksLikeSecondary ? .secondary : .primary,
             )
             .swooshIn(
               tracking: self.$primaryButtonStatus.offset,
               to: .zero,
               after: .milliseconds(150),
-              for: .milliseconds(800)
+              for: .milliseconds(800),
             )
             .padding(.top, 12)
           }
@@ -261,15 +261,15 @@ public struct ButtonScreenView: View {
                 type: config.type,
                 animate: config.animate,
                 asyncAction: config.asyncAction,
-                isLoading: self.$secondaryButtonStatus.isLoading
+                isLoading: self.$secondaryButtonStatus.isLoading,
               ),
-              variant: .secondary
+              variant: .secondary,
             )
             .swooshIn(
               tracking: self.$secondaryButtonStatus.offset,
               to: .zero,
               after: .milliseconds(300),
-              for: .milliseconds(800)
+              for: .milliseconds(800),
             )
           }
         }
@@ -284,15 +284,15 @@ public struct ButtonScreenView: View {
                 type: config.type,
                 animate: config.animate,
                 asyncAction: config.asyncAction,
-                isLoading: self.$tertiaryButtonStatus.isLoading
+                isLoading: self.$tertiaryButtonStatus.isLoading,
               ),
-              variant: .secondary
+              variant: .secondary,
             )
             .swooshIn(
               tracking: self.$tertiaryButtonStatus.offset,
               to: .zero,
               after: .milliseconds(450),
-              for: .milliseconds(800)
+              for: .milliseconds(800),
             )
           }
         }
@@ -317,7 +317,7 @@ public struct ButtonScreenView: View {
     type: ButtonType,
     animate: Bool,
     asyncAction: Bool,
-    isLoading: Binding<Bool>
+    isLoading: Binding<Bool>,
   ) -> ButtonType {
     switch type {
     case .link(let url):
@@ -388,14 +388,14 @@ public struct ButtonScreenView: View {
 #Preview("No button") {
   ButtonScreenView(
     text: "Lorem ipsum dolor sit amet consectetur adipiscing elit.",
-    screenType: .error
+    screenType: .error,
   )
 }
 
 #Preview("1 button") {
   ButtonScreenView(
     text: "Lorem ipsum dolor sit amet consectetur adipiscing elit.",
-    primary: ButtonScreenView.Config(text: "Next", type: .button {}, animate: true)
+    primary: ButtonScreenView.Config(text: "Next", type: .button {}, animate: true),
   )
 }
 
@@ -403,8 +403,8 @@ public struct ButtonScreenView: View {
   ButtonScreenView(
     text: "Lorem ipsum dolor sit amet consectetur adipiscing elit.",
     primary: ButtonScreenView.Config(
-      text: "Next", type: .button {}, animate: false, asyncAction: true
-    )
+      text: "Next", type: .button {}, animate: false, asyncAction: true,
+    ),
   )
 }
 
@@ -412,7 +412,7 @@ public struct ButtonScreenView: View {
   ButtonScreenView(
     text: "Lorem ipsum dolor sit amet consectetur adipiscing elit.",
     primary: ButtonScreenView.Config(text: "Do something", type: .button {}, animate: true),
-    secondary: ButtonScreenView.Config(text: "Do something else", type: .button {}, animate: true)
+    secondary: ButtonScreenView.Config(text: "Do something else", type: .button {}, animate: true),
   )
 }
 
@@ -421,7 +421,7 @@ public struct ButtonScreenView: View {
     text: "Lorem ipsum dolor sit amet consectetur adipiscing elit.",
     primary: ButtonScreenView.Config(text: "Do something", type: .button {}, animate: true),
     secondary: ButtonScreenView.Config(text: "Do something else", type: .button {}, animate: true),
-    primaryLooksLikeSecondary: true
+    primaryLooksLikeSecondary: true,
   )
 }
 
@@ -430,7 +430,7 @@ public struct ButtonScreenView: View {
     text: "Lorem ipsum dolor sit amet consectetur adipiscing elit.",
     primary: ButtonScreenView.Config(text: "Do something", type: .button {}, animate: true),
     secondary: ButtonScreenView.Config(text: "Do something else", type: .button {}, animate: true),
-    tertiary: ButtonScreenView.Config(text: "Do another thing", type: .button {}, animate: true)
+    tertiary: ButtonScreenView.Config(text: "Do another thing", type: .button {}, animate: true),
   )
 }
 
@@ -438,7 +438,7 @@ public struct ButtonScreenView: View {
   ButtonScreenView(
     text: "Lorem ipsum dolor sit amet consectetur adipiscing elit:",
     primary: ButtonScreenView.Config(text: "Do something", type: .button {}, animate: true),
-    listItems: ["Lorem ipsum dolor", "Sit amet consectetur adipiscing elit"]
+    listItems: ["Lorem ipsum dolor", "Sit amet consectetur adipiscing elit"],
   )
 }
 
@@ -451,7 +451,7 @@ public struct ButtonScreenView: View {
       "Lorem ipsum dolor",
       "Sit amet consectetur adipiscing elit",
       "Jimmy Carter died recently and there was a national day of morning",
-    ]
+    ],
   )
 }
 
@@ -465,7 +465,7 @@ public struct ButtonScreenView: View {
       "Lorem ipsum dolor",
       "Sit amet consectetur adipiscing elit",
       "Jimmy Carter died recently and there was a national day of morning",
-    ]
+    ],
   )
 }
 
@@ -473,7 +473,7 @@ public struct ButtonScreenView: View {
   ButtonScreenView(
     text: "Lorem ipsum dolor sit amet consectetur adipiscing elit.",
     primary: ButtonScreenView.Config(text: "Do something", type: .button {}, animate: true),
-    image: "AllowContentFilter"
+    image: "AllowContentFilter",
   )
 }
 
@@ -482,10 +482,10 @@ public struct ButtonScreenView: View {
     text: "Enter a podcast RSS feed URL to add to your library:",
     urlInput: ButtonScreenView.UrlInputConfig(
       placeholder: "https://example.com/feed.rss",
-      buttonText: "Add Feed"
+      buttonText: "Add Feed",
     ) { url in
       print("Submitted URL: \(url)")
-    }
+    },
   )
 }
 
@@ -495,13 +495,13 @@ public struct ButtonScreenView: View {
     primary: ButtonScreenView.Config(
       text: "Browse Recommendations",
       type: .button {},
-      animate: true
+      animate: true,
     ),
     urlInput: ButtonScreenView.UrlInputConfig(
       placeholder: "https://example.com/feed.rss",
-      buttonText: "Add Feed"
+      buttonText: "Add Feed",
     ) { url in
       print("Submitted URL: \(url)")
-    }
+    },
   )
 }

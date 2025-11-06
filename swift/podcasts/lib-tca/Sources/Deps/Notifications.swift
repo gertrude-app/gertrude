@@ -12,7 +12,7 @@ struct NotificationsClient: Sendable {
 }
 
 extension NotificationsClient: DependencyKey {
-  public static var liveValue: NotificationsClient {
+  static var liveValue: NotificationsClient {
     NotificationsClient(
       appForegroundingEvents: {
         NotificationCenter.default
@@ -21,10 +21,10 @@ extension NotificationsClient: DependencyKey {
           .merge(
             with: NotificationCenter.default
               .publisher(for: UIApplication.didBecomeActiveNotification)
-              .map { _ in true }
+              .map { _ in true },
           )
           .eraseToAnyPublisher()
-      }
+      },
     )
   }
 }

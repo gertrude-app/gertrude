@@ -3,7 +3,7 @@ import SQLiteData
 
 enum AutoQueue {
   static func nextDownloadedEpisode(
-    after nowPlaying: NowPlaying.Data
+    after nowPlaying: NowPlaying.Data,
   ) -> (episode: Episode, show: Show)? {
     guard let episode = self.episodeQueue(after: nowPlaying)
       .first(where: { $0.downloaded }) else {
@@ -91,7 +91,7 @@ enum AutoQueue {
              FROM \(Episode.self) e2
              WHERE e2.\(raw: Episode.col.showId.name) = \(Episode.col.showId)
                AND e2.\(raw: Episode.col.lastPlayedAt.name) IS NOT NULL)
-            """
+            """,
           ))
         }
         .order { $0.lastPlayedAt.desc() }

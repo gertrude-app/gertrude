@@ -47,7 +47,7 @@ public struct WelcomeView: View {
                 tracking: self.$lettersOffset[index],
                 to: .zero,
                 after: .seconds(Double(index) / 15.0 + 0.5),
-                for: .milliseconds(600)
+                for: .milliseconds(600),
               )
           }
         }
@@ -59,7 +59,7 @@ public struct WelcomeView: View {
             tracking: self.$subtitleOffset,
             to: .zero,
             after: .seconds(1.0),
-            for: .milliseconds(800)
+            for: .milliseconds(800),
           )
 
         BigButton(lstr(.welcomeGetStarted), type: .button {
@@ -76,7 +76,7 @@ public struct WelcomeView: View {
             tracking: self.$buttonOffset,
             to: .zero,
             after: .seconds(1.3),
-            for: .milliseconds(800)
+            for: .milliseconds(800),
           )
           .padding(.top, 20)
       }

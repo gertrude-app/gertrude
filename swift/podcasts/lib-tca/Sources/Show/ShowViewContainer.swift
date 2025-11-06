@@ -22,16 +22,16 @@ struct ShowViewContainer: View {
       },
       onEvent: { event in
         self.store.send(.showView(event))
-      }
+      },
     )
     .navigationDestination(
       item: self.$store.scope(
         state: \.destination?.episode,
-        action: \.destination.episode
+        action: \.destination.episode,
       ),
       destination: { store in
         EpisodeViewContainer(store: store)
-      }
+      },
     )
   }
 }

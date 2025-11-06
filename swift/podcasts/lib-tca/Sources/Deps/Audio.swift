@@ -35,7 +35,7 @@ extension AudioPlayer {
 }
 
 extension AudioPlayer: DependencyKey {
-  public static var liveValue: AudioPlayer {
+  static var liveValue: AudioPlayer {
     AudioPlayer(
       play: { episode, show in
         try sharedPlayer.withLock { try $0.play(episode, show) }
@@ -51,7 +51,7 @@ extension AudioPlayer: DependencyKey {
       },
       systemEvents: {
         sharedPlayer.withLock { $0.events() }
-      }
+      },
     )
   }
 }
@@ -234,7 +234,7 @@ private final class Player: Sendable {
       guard let data = $0 else { return }
       let token = data.player.addPeriodicTimeObserver(
         forInterval: CMTime(seconds: 1.0, preferredTimescale: 1),
-        queue: .main
+        queue: .main,
       ) { [weak self] time in
         self?.emit(.progressUpdated(time.seconds))
         self?.updateElapsedTime()
@@ -260,7 +260,7 @@ private final class Player: Sendable {
     let observer = NotificationCenter.default.addObserver(
       forName: .AVPlayerItemDidPlayToEndTime,
       object: playerItem,
-      queue: .main
+      queue: .main,
     ) { [weak self] _ in
       self?.emit(.completed)
     }
@@ -280,7 +280,7 @@ private final class Player: Sendable {
     let observer = NotificationCenter.default.addObserver(
       forName: AVAudioSession.interruptionNotification,
       object: AVAudioSession.sharedInstance(),
-      queue: .main
+      queue: .main,
     ) { [weak self] notification in
       guard let userInfo = notification.userInfo,
             let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
@@ -301,7 +301,7 @@ private final class Player: Sendable {
         }
         self?.emit(.interruptionEnded(
           shouldResume: shouldResume,
-          from: self?.player.currentTime
+          from: self?.player.currentTime,
         ))
       @unknown default:
         break

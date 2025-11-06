@@ -20,7 +20,7 @@ public struct ArtworkView: View {
     artworkImage: UIImage? = nil,
     artworkUrl: String? = nil,
     size: CGFloat,
-    cornerRadius: CGFloat = 6
+    cornerRadius: CGFloat = 6,
   ) {
     self.preferRemote = preferRemote
     self.artworkImage = artworkImage
@@ -100,7 +100,7 @@ extension ArtworkView {
       artworkImage: provider.show.showArtwork ? provider.show.artworkImage : nil,
       artworkUrl: provider.show.showArtwork ? provider.artworkUrl : nil,
       size: size,
-      cornerRadius: cornerRadius
+      cornerRadius: cornerRadius,
     )
   }
 }
@@ -108,7 +108,7 @@ extension ArtworkView {
 #Preview("With URL") {
   ArtworkView(
     artworkUrl: "https://example.com/artwork.jpg",
-    size: 100
+    size: 100,
   )
 }
 

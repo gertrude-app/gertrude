@@ -26,7 +26,7 @@ import Testing
     } operation: {
       let store = TestStore(
         initialState: .init(screen: .chooseArtworkPolicy(dupeFeed)),
-        reducer: AddShowFeature.init
+        reducer: AddShowFeature.init,
       )
       store.exhaustivity = .off
 
@@ -66,7 +66,7 @@ import Testing
     } operation: {
       let store = TestStore(
         initialState: .init(screen: .addingByUrl),
-        reducer: AddShowFeature.init
+        reducer: AddShowFeature.init,
       )
       store.exhaustivity = .off
 

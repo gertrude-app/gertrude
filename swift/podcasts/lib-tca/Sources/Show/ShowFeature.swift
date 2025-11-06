@@ -173,14 +173,14 @@ extension ShowFeature.State {
     if let lastPlayed = self.lastPlayedEpisode {
       return .resume(
         lastPlayed,
-        isPlaying: self.nowPlaying.isPlaying(episodeId: lastPlayed.id)
+        isPlaying: self.nowPlaying.isPlaying(episodeId: lastPlayed.id),
       )
     }
 
     if let latestUncompleted = self.latestUncompletedEpisode {
       return .playLatest(
         latestUncompleted,
-        isPlaying: self.nowPlaying.isPlaying(episodeId: latestUncompleted.id)
+        isPlaying: self.nowPlaying.isPlaying(episodeId: latestUncompleted.id),
       )
     }
 
@@ -195,20 +195,20 @@ extension ShowFeature.State {
     self.showId = show.id
     self._showArchivedEpisodes = Shared(
       wrappedValue: false,
-      .inMemory("show-archived-\(show.id)")
+      .inMemory("show-archived-\(show.id)"),
     )
     self._show = FetchOne(
       wrappedValue: show,
-      Show.where { $0.id == show.id }
+      Show.where { $0.id == show.id },
     )
     self._episodes = FetchAll(
-      episodeQuery(showId: show.id, sortOrder: show.sort)
+      episodeQuery(showId: show.id, sortOrder: show.sort),
     )
     self._lastPlayedEpisode = FetchOne(
-      Episode.lastPlayedFor(showId: show.id)
+      Episode.lastPlayedFor(showId: show.id),
     )
     self._latestUncompletedEpisode = FetchOne(
-      Episode.latestUncompletedFor(showId: show.id)
+      Episode.latestUncompletedFor(showId: show.id),
     )
   }
 }

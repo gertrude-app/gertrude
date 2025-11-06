@@ -22,7 +22,7 @@ public struct ShowData: Identifiable {
     description: String? = nil,
     showArtwork: Bool,
     artworkImage: UIImage? = nil,
-    artworkUrl: String? = nil
+    artworkUrl: String? = nil,
   ) {
     self.id = id
     self.name = name
