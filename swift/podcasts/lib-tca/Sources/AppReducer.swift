@@ -62,10 +62,10 @@ struct AppReducer: Sendable {
           self.expireFreeTrial(updated ?? state.subscription)
         }
 
-        if let passcode = self.keychain.loadPincode() {
-          state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
+        if self.keychain.hasPincode() {
+          state.mode = .podcasts(.init())
         } else {
-          state.mode = .onboarding(OnboardingFeature.State())
+          state.mode = .onboarding(.init())
         }
         let nowPlayingId = state.nowPlaying.data?.episode.id
         return .merge(
@@ -129,11 +129,11 @@ struct AppReducer: Sendable {
         state.$appInForeground.withLock { $0 = foregrounded }
         return .none
       case .mode(.presented(.onboarding(.finished(let pincode)))):
-        state.mode = .podcasts(.init(passcode: pincode))
+        state.mode = .podcasts(.init())
         return .run { _ in
           self.keychain.save(pincode: pincode)
           self.database.insertRecord(id: .onboardingFinished)
-          log(.info("ba182b20"), "onboarding finished, saved pincode")
+          log(.info("ba182b20"), "set pincode", detail: "\(pincode.redacted)")
         }
       case .mode(.presented(.podcasts(.destination(.presented(.show(let showAction)))))):
         switch showAction {
@@ -161,8 +161,8 @@ struct AppReducer: Sendable {
         state.alert = .init { TextState(message) }
         return .none
       case .mode(.presented(.onboarding(.delegate(.shouldNotBeOnboarding)))):
-        if let passcode = self.keychain.loadPincode() {
-          state.mode = .podcasts(PodcastsFeature.State(passcode: passcode))
+        if self.keychain.hasPincode() {
+          state.mode = .podcasts(.init())
           log(.unexpected("73430b7b"), "false onboarding")
           return .none
         } else {

@@ -51,7 +51,7 @@ func trackedDownload(episode: Episode) async -> Result<Void, AppError> {
 
     await testAssertCheckpoint("trackedDownload: failure, did set ep.downloadedAt = nil")
 
-    return .failure(.init(message: "Failed to download episode, try again later"))
+    return .failure(.init(message: lstr(.episodeDownloadFailed)))
   }
 }
 
@@ -59,7 +59,7 @@ func ensureDownloaded(episode: Episode) async -> Result<Void, AppError> {
   if episode.downloaded {
     .success(())
   } else if dep(\.network).isConnected() == false {
-    .failure(.init(message: "No internet connection to download episode"))
+    .failure(.init(message: lstr(.episodeDownloadNoInternet)))
   } else {
     await trackedDownload(episode: episode)
   }

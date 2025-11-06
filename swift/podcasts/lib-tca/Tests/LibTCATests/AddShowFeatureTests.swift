@@ -25,7 +25,7 @@ import Testing
       $0.api.logEvent = { _, _, _, _ in }
     } operation: {
       let store = TestStore(
-        initialState: .init(passcode: 111_111, screen: .chooseArtworkPolicy(dupeFeed)),
+        initialState: .init(screen: .chooseArtworkPolicy(dupeFeed)),
         reducer: AddShowFeature.init
       )
       store.exhaustivity = .off
@@ -37,7 +37,7 @@ import Testing
         $0.screen = .subscribing
       }
 
-      await store.receive(.delegate(.alert("You are already subscribed to this show.")))
+      await store.receive(.delegate(.alert(lstr(.addShowAlreadySubscribed))))
       #expect(dismissed.value == false)
       await clock.advance(by: .seconds(2))
       #expect(dismissed.value == true)
@@ -46,6 +46,60 @@ import Testing
         try Show.all.fetchAll($0)
       }
       #expect(allShows.map(\.id) == [Show.ID(1)])
+    }
+  }
+
+  @Test func pinChangeFlow() async throws {
+    let keySaved = LockIsolated<[(KeychainClient.Key, Data)]>([])
+    let clock = TestClock()
+    let dismissed = LockIsolated(false)
+    await withDependencies {
+      $0.defaultDatabase = try! appDatabase()
+      $0.date = .constant(.reference)
+      $0.dismiss = .init { dismissed.setValue(true) }
+      $0.api.logEvent = { _, _, _, _ in }
+      $0.haptics.notification = { _ in }
+      $0.continuousClock = clock
+      $0.keychain._save = { key, data in
+        keySaved.setValue(keySaved.value + [(key, data)])
+      }
+    } operation: {
+      let store = TestStore(
+        initialState: .init(screen: .addingByUrl),
+        reducer: AddShowFeature.init
+      )
+      store.exhaustivity = .off
+
+      await store.send(.addByUrlSubmitted("am: change pin"))
+
+      await store.receive(.setScreen(.changePinInstructions)) {
+        $0.screen = .changePinInstructions
+      }
+
+      await store.send(.changePinInstructionsOkTapped) {
+        $0.screen = .enteringPin
+        $0.resettingPin = true
+      }
+
+      await store.send(.pincodeVerified) {
+        $0.screen = .settingNewPin
+      }
+
+      #expect(keySaved.value.isEmpty)
+
+      await store.send(.newPinSubmitted(222_222)) {
+        $0.resettingPin = false
+      }
+
+      #expect(keySaved.value.count == 1)
+      #expect(keySaved.value.first?.0 == .pincode)
+      #expect(keySaved.value.first?.1 == Data("\(222_222)".utf8))
+
+      await store.receive(.delegate(.alert(lstr(.pinChangeSuccess))))
+
+      #expect(dismissed.value == false)
+      await clock.advance(by: .seconds(2))
+      #expect(dismissed.value == true)
     }
   }
 }

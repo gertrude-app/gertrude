@@ -73,15 +73,12 @@ import Testing
       let store = TestStore(initialState: .init(), reducer: AppReducer.init)
 
       await store.send(.appDidLaunch) {
-        $0.mode = .podcasts(.init(passcode: 111_111))
+        $0.mode = .podcasts(.init())
       }
 
       // go to settings screen
       await store.send(.mode(.presented(.podcasts(.settingsTapped)))) {
-        $0.mode = .podcasts(.init(
-          passcode: 111_111,
-          destination: .settings(.init())
-        ))
+        $0.mode = .podcasts(.init(destination: .settings(.init())))
       }
 
       await store.send(
@@ -90,7 +87,6 @@ import Testing
         )
       ) {
         $0.mode = .podcasts(.init(
-          passcode: 111_111,
           destination: .settings(.init(purchaseInProgress: true))
         ))
       }
@@ -106,7 +102,6 @@ import Testing
         .mode(.presented(.podcasts(.destination(.presented(.settings(.finishPurchase))))))
       ) {
         $0.mode = .podcasts(.init(
-          passcode: 111_111,
           destination: .settings(.init(purchaseInProgress: false))
         ))
       }
@@ -195,7 +190,7 @@ import Testing
       let store = TestStore(initialState: .init(), reducer: AppReducer.init)
 
       await store.send(.appDidLaunch) {
-        $0.mode = .podcasts(.init(passcode: 111_111))
+        $0.mode = .podcasts(.init())
       }
 
       await store.receive(.processStoreKitTransaction(.mock, update: false))

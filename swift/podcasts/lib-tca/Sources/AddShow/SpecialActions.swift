@@ -5,58 +5,8 @@ import SQLiteData
 
 extension AddShowFeature {
   func handleSpecialAction(input: String) -> Effect<Action>? {
-    if input.starts(with: "am: log db ") {
-      let table = String(input.dropFirst("am: log db ".count))
-      switch table {
-      case "shows":
-        let shows = self.db.tryRead { try Show.all.fetchAll($0) }
-        for show in shows {
-          os_log(
-            "[G•] Show %{public}d: %{public}@",
-            show.id.rawValue,
-            String(describing: show)
-          )
-        }
-      case "episodes":
-        let episodes = self.db.tryRead { try Episode.all.fetchAll($0) }
-        for episode in episodes {
-          os_log(
-            "[G•] Episode %{public}d: %{public}@",
-            episode.id.rawValue,
-            String(describing: episode)
-          )
-        }
-      case "pinAttempts":
-        let attempts = self.db.tryRead { try PinAttempt.all.fetchAll($0) }
-        for attempt in attempts {
-          os_log(
-            "[G•] PinAttempt %{public}d: %{public}@",
-            attempt.id.rawValue,
-            String(describing: attempt)
-          )
-        }
-      case "records":
-        let records = self.db.tryRead { try Record.all.fetchAll($0) }
-        for record in records {
-          os_log(
-            "[G•] Record %{public}d: %{public}@",
-            record.id.rawValue,
-            String(describing: record)
-          )
-        }
-      case "events":
-        let events = self.db.tryRead { try Event.all.fetchAll($0) }
-        for event in events {
-          os_log(
-            "[G•] Event %{public}d: %{public}@",
-            event.id.rawValue,
-            String(describing: event)
-          )
-        }
-      default:
-        break
-      }
-      return .send(.setScreen(.choosingMethod))
+    if input == "am: change pin" {
+      return .send(.setScreen(.changePinInstructions))
     }
 
     if input == "am: upload db" {
@@ -110,6 +60,60 @@ extension AddShowFeature {
         log(.info("111b15d5"), "set subscription to complimentary")
         await send(.delegate(.alert("Subscription set to complimentary :)")))
       }
+    }
+
+    if input.starts(with: "am: log db ") {
+      let table = String(input.dropFirst("am: log db ".count))
+      switch table {
+      case "shows":
+        let shows = self.db.tryRead { try Show.all.fetchAll($0) }
+        for show in shows {
+          os_log(
+            "[G•] Show %{public}d: %{public}@",
+            show.id.rawValue,
+            String(describing: show)
+          )
+        }
+      case "episodes":
+        let episodes = self.db.tryRead { try Episode.all.fetchAll($0) }
+        for episode in episodes {
+          os_log(
+            "[G•] Episode %{public}d: %{public}@",
+            episode.id.rawValue,
+            String(describing: episode)
+          )
+        }
+      case "pinAttempts":
+        let attempts = self.db.tryRead { try PinAttempt.all.fetchAll($0) }
+        for attempt in attempts {
+          os_log(
+            "[G•] PinAttempt %{public}d: %{public}@",
+            attempt.id.rawValue,
+            String(describing: attempt)
+          )
+        }
+      case "records":
+        let records = self.db.tryRead { try Record.all.fetchAll($0) }
+        for record in records {
+          os_log(
+            "[G•] Record %{public}d: %{public}@",
+            record.id.rawValue,
+            String(describing: record)
+          )
+        }
+      case "events":
+        let events = self.db.tryRead { try Event.all.fetchAll($0) }
+        for event in events {
+          os_log(
+            "[G•] Event %{public}d: %{public}@",
+            event.id.rawValue,
+            String(describing: event)
+          )
+        }
+      default:
+        break
+      }
+      return .send(.setScreen(.choosingMethod))
     }
 
     return nil

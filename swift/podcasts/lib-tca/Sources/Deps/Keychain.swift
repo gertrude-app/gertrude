@@ -78,6 +78,10 @@ extension KeychainClient {
     }
   }
 
+  func hasPincode() -> Bool {
+    self.loadPincode() != nil
+  }
+
   func save(pincode: Int) {
     let data = "\(pincode)".data(using: .utf8)!
     self._save(.pincode, data)

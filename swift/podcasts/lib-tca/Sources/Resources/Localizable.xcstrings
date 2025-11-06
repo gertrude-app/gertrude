@@ -324,6 +324,40 @@
         }
       }
     },
+    "episode.downloadFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to download episode, try again later"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al descargar el episodio, intenta de nuevo más tarde"
+          }
+        }
+      }
+    },
+    "episode.downloadNoInternet" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No internet connection to download episode"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay conexión a internet para descargar el episodio"
+          }
+        }
+      }
+    },
     "addShow.alreadySubscribed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -490,6 +524,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancelar"
+          }
+        }
+      }
+    },
+    "pin.changeSuccess" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin successfully changed."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN cambiado exitosamente."
+          }
+        }
+      }
+    },
+    "pin.changeProceed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Got it"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entendido"
+          }
+        }
+      }
+    },
+    "pin.changeInstructions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To change your pin, confirm the current pin once, then create a new one"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para cambiar tu PIN, confirma el PIN actual una vez, luego crea uno nuevo"
           }
         }
       }

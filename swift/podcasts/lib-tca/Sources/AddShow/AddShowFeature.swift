@@ -9,6 +9,8 @@ struct AddShowFeature {
   struct State: Equatable {
     enum Screen: Equatable {
       case enteringPin
+      case changePinInstructions
+      case settingNewPin
       case choosingMethod
       case searching
       case addingByUrl
@@ -16,9 +18,9 @@ struct AddShowFeature {
       case subscribing
     }
 
-    var passcode: Int
     var screen: Screen = .enteringPin
     var lockout: Date? = .pinLockout()
+    var resettingPin: Bool = false
     var searchText: String = ""
     var searchResults: [SearchResult] = []
   }
@@ -28,9 +30,11 @@ struct AddShowFeature {
       case alert(String)
     }
 
-    case passcodeVerified
-    case passcodeFailed
-    case passcodeCancelled
+    case pincodeVerified
+    case pincodeFailed
+    case pincodeCancelled
+    case changePinInstructionsOkTapped
+    case newPinSubmitted(Int)
     case selectSearchTapped
     case selectAddByUrlTapped
     case selectAllowArtworkTapped
@@ -82,9 +86,9 @@ struct AddShowFeature {
         state.searchResults = results
         return .none
 
-      case .passcodeVerified:
+      case .pincodeVerified:
         self.insertAttempt(success: true)
-        state.screen = .choosingMethod
+        state.screen = state.resettingPin ? .settingNewPin : .choosingMethod
         let wasLockedOut = state.lockout != nil
         state.lockout = .pinLockout()
         return .run { _ in
@@ -92,7 +96,7 @@ struct AddShowFeature {
           if wasLockedOut { log(.info("c6f27bad"), "pin lockout cleared") }
         }
 
-      case .passcodeFailed:
+      case .pincodeFailed:
         self.insertAttempt(success: false)
         let lockout = Date.pinLockout()
         let newlyLockedOut = lockout != nil && state.lockout == nil
@@ -102,8 +106,23 @@ struct AddShowFeature {
           if newlyLockedOut { log(.info("7e312b0f"), "pin lockout set") }
         }
 
-      case .passcodeCancelled:
+      case .pincodeCancelled:
         return .run { _ in
+          await self.dismiss()
+        }
+
+      case .changePinInstructionsOkTapped:
+        state.resettingPin = true
+        state.screen = .enteringPin
+        return .none
+
+      case .newPinSubmitted(let pin):
+        state.resettingPin = false
+        return .run { send in
+          self.keychain.save(pincode: pin)
+          log(.info("0c045f6c"), "pin changed", detail: "to: \(pin.redacted)")
+          await send(.delegate(.alert(lstr(.pinChangeSuccess))))
+          try? await self.clock.sleep(for: .seconds(2))
           await self.dismiss()
         }
 
@@ -158,7 +177,7 @@ struct AddShowFeature {
         }
         if existingShow != nil {
           log(.info("b8139e22"), "duplicate subscribe")
-          await send(.delegate(.alert("You are already subscribed to this show.")))
+          await send(.delegate(.alert(lstr(.addShowAlreadySubscribed))))
           try? await self.clock.sleep(for: .seconds(2))
           await self.dismiss()
           return
@@ -172,7 +191,7 @@ struct AddShowFeature {
         guard let show else {
           log(.error("98916a65"), "subscribe fail")
           await send(.setScreen(.choosingMethod))
-          await send(.delegate(.alert("Error adding show, please try again.")))
+          await send(.delegate(.alert(lstr(.addShowError))))
           return
         }
         await self.podcasts.downloadArtwork(for: show)
@@ -186,7 +205,7 @@ struct AddShowFeature {
       } catch {
         log(.error("8c5abff7"), "subscribe fail")
         await send(.setScreen(.choosingMethod))
-        await send(.delegate(.alert("Error adding show, please try again.")))
+        await send(.delegate(.alert(lstr(.addShowError))))
       }
     }
   }

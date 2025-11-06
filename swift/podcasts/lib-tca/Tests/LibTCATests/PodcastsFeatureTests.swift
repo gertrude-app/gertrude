@@ -20,7 +20,7 @@ import Testing
       var record = dep(\.db).record(id: .trialEndingAlertShown)
       #expect(record == nil)
 
-      let store = TestStore(initialState: .init(passcode: 111_111), reducer: PodcastsFeature.init)
+      let store = TestStore(initialState: .init(), reducer: PodcastsFeature.init)
       store.exhaustivity = .off
 
       await store.send(.onAppear) {
@@ -62,7 +62,7 @@ import Testing
       try CurrentSubscription.set(status: .trialing, expiringAt: .reference + .days(4))
       dep(\.db).insertRecord(id: .trialEndingAlertShown)
 
-      let store = TestStore(initialState: .init(passcode: 111_111), reducer: PodcastsFeature.init)
+      let store = TestStore(initialState: .init(), reducer: PodcastsFeature.init)
       store.exhaustivity = .off
 
       await store.send(.onAppear) {

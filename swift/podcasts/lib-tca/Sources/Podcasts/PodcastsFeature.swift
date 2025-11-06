@@ -7,7 +7,6 @@ import SwiftUI
 struct PodcastsFeature {
   @ObservableState
   struct State: Equatable {
-    var passcode: Int
     @FetchAll(Show.orderedWithInfo, animation: .default)
     var shows: [ShowInfo]
     var downloadQueue: [Episode] = []
@@ -75,7 +74,7 @@ struct PodcastsFeature {
         if state.subscription.status == .unpaid {
           state.destination = .settings(.init())
         } else {
-          state.destination = .addShow(.init(passcode: state.passcode))
+          state.destination = .addShow(.init())
         }
         return .none
 

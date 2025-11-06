@@ -5,6 +5,7 @@ import SwiftUI
 struct AddShowView: View {
   @Bindable var store: StoreOf<AddShowFeature>
   @Dependency(\.haptics) var haptics
+  @Dependency(\.keychain) var keychain
 
   var body: some View {
     Group {
@@ -12,13 +13,32 @@ struct AddShowView: View {
       case .enteringPin:
         PinCodeView(
           mode: .verify(
-            self.store.passcode,
+            self.pincode,
             lockout: self.store.lockout,
-            onVerify: { self.store.send(.passcodeVerified) },
-            onFail: { self.store.send(.passcodeFailed) },
+            onVerify: { self.store.send(.pincodeVerified) },
+            onFail: { self.store.send(.pincodeFailed) },
           ),
-          onCancel: { self.store.send(.passcodeCancelled) },
+          onCancel: { self.store.send(.pincodeCancelled) },
           onPrepHaptics: self.haptics.prepare,
+        )
+
+      case .changePinInstructions:
+        ButtonScreenView(
+          text: lstr(.pinChangeInstructions),
+          primary: .init(lstr(.pinChangeProceed)) {
+            self.store.send(.changePinInstructionsOkTapped)
+          },
+          ignoreKeyboard: true,
+        )
+
+      case .settingNewPin:
+        PinCodeView(
+          mode: .set(
+            onComplete: { self.store.send(.newPinSubmitted($0)) },
+            onConfirmFail: { self.store.send(.pincodeCancelled) }
+          ),
+          onCancel: { self.store.send(.pincodeCancelled) },
+          onPrepHaptics: self.haptics.prepare
         )
 
       case .choosingMethod:
@@ -72,6 +92,15 @@ struct AddShowView: View {
           animateBtnEntry: false
         )
       }
+    }
+  }
+
+  var pincode: Int {
+    if let pin = self.keychain.loadPincode() {
+      return pin
+    } else {
+      log(.error("17cb36cc"), "missing pincode")
+      return Int.random(in: 100_000 ... 999_999)
     }
   }
 }
