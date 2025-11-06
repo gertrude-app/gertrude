@@ -61,7 +61,7 @@ struct NowPlayingFeature {
         }
       case .system(let event):
         guard let nowPlaying = state.data else {
-          unexpected(id: "9faa5b69", assert: true)
+          unexpected(id: "9faa5b69", "\(event)", assert: true)
           return .none
         }
         switch event {
