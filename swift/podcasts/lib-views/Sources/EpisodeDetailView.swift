@@ -71,7 +71,11 @@ public struct EpisodeDetailView: View {
         PlayPauseButton(
           text: self.episode.isPlaying
             ? lstr(.showPause)
-            : (self.episode.progress >= 2.0 && !self.episode.isCompleted ? lstr(.showResume) : lstr(.showPlay)),
+            : (
+              self.episode.progress >= 2.0 && !self.episode.isCompleted
+                ? lstr(.showResume)
+                : lstr(.showPlay)
+            ),
           isPlaying: self.episode.isPlaying,
           onTap: { self.emit(.playPauseTapped) }
         )
@@ -117,7 +121,9 @@ public struct EpisodeDetailView: View {
 
           self.infoRow(
             label: lstr(.settingsSubscriptionStatus),
-            value: self.episode.downloadState == .downloaded ? lstr(.episodeDetailDownloaded) : lstr(.episodeDetailNotDownloaded)
+            value: self.episode.downloadState == .downloaded
+              ? lstr(.episodeDetailDownloaded)
+              : lstr(.episodeDetailNotDownloaded)
           )
 
           if let websiteUrl = self.episodeDetail.websiteUrl {
