@@ -23,11 +23,11 @@ extension KeychainClient {
 
     #elseif targetEnvironment(simulator)
       var secAttrAccount: String {
-        "gertrude.am.\(self.rawValue).sim.4"
+        "gertrude.am.\(self.rawValue).sim.6"
       }
     #else
       var secAttrAccount: String {
-        "gertrude.am.\(self.rawValue).dev"
+        "gertrude.am.\(self.rawValue).dev.2"
       }
     #endif
   }

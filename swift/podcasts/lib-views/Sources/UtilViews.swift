@@ -28,7 +28,7 @@ struct BaseScreenView<Content: View>: View {
           }
         }
 
-      VStack(spacing: 32) {
+      VStack(spacing: 20) {
         self.content
       }
       .frame(maxWidth: 500)
