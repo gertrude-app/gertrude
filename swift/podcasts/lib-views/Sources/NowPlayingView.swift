@@ -75,7 +75,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
           withAnimation(.nowPlayingSpring) {
             self.dragOffset = 0
           }
-        }
+        },
     )
   }
 
@@ -131,7 +131,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
     .cornerRadius(8)
     .shadow(
       color: Color(self.cs, light: .black, dark: .violet400).opacity(0.2),
-      radius: 10, x: 0, y: -3
+      radius: 10, x: 0, y: -3,
     )
     .padding(.horizontal, 16)
     .onTapGesture {
@@ -189,7 +189,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
           artworkImage: self.show.artworkImage,
           artworkUrl: self.artworkUrl,
           size: artworkSize,
-          cornerRadius: 8
+          cornerRadius: 8,
         )
         .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -245,7 +245,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
                     let percentage = max(0, min(1, value.location.x / geometry.size.width))
                     let location = percentage * Double(duration)
                     self.emit(.scrubbed(to: location))
-                  }
+                  },
               )
           }
         }
@@ -312,10 +312,10 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
       author: "objc.io",
       description: "Weekly Swift discussions",
       showArtwork: true,
-      artworkUrl: nil
+      artworkUrl: nil,
     ),
     minimized: true,
-    emit: { _ in }
+    emit: { _ in },
   )
   .padding()
   .background(Color.gray.opacity(0.1))
@@ -336,10 +336,10 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
       author: "objc.io",
       description: "Weekly Swift discussions",
       showArtwork: true,
-      artworkUrl: nil
+      artworkUrl: nil,
     ),
     minimized: false,
-    emit: { _ in }
+    emit: { _ in },
   )
 }
 
@@ -357,10 +357,10 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
       name: "iOS Dev Weekly Podcast",
       author: "Dave Verwer",
       description: "Weekly iOS development discussions",
-      showArtwork: true
+      showArtwork: true,
     ),
     minimized: true,
-    emit: { _ in }
+    emit: { _ in },
   )
   .padding()
   .background(Color.gray.opacity(0.1))
@@ -381,10 +381,10 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
       author: "objc.io",
       description: "Weekly Swift discussions",
       showArtwork: true,
-      artworkUrl: nil
+      artworkUrl: nil,
     ),
     minimized: true,
-    emit: { _ in }
+    emit: { _ in },
   )
   .padding()
   .background(Color.gray.opacity(0.1))
@@ -406,10 +406,10 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
       author: "objc.io",
       description: "Weekly Swift discussions",
       showArtwork: true,
-      artworkUrl: nil
+      artworkUrl: nil,
     ),
     minimized: false,
-    emit: { _ in }
+    emit: { _ in },
   )
   .preferredColorScheme(.dark)
 }
@@ -430,10 +430,10 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
       author: "objc.io",
       description: "Weekly Swift discussions",
       showArtwork: true,
-      artworkUrl: nil
+      artworkUrl: nil,
     ),
     minimized: true,
-    emit: { _ in }
+    emit: { _ in },
   )
   .padding()
   .background(Color.gray.opacity(0.1))
@@ -455,10 +455,10 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
       author: "objc.io",
       description: "Weekly Swift discussions",
       showArtwork: true,
-      artworkUrl: nil
+      artworkUrl: nil,
     ),
     minimized: true,
-    emit: { _ in }
+    emit: { _ in },
   )
   .padding()
   .background(Color.gray.opacity(0.1))
@@ -482,7 +482,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
             .frame(height: 200)
             .overlay(
               Text("Your app content here")
-                .foregroundColor(.secondary)
+                .foregroundColor(.secondary),
             )
 
           Spacer()
@@ -510,7 +510,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
             author: "iOS Academy",
             description: "Advanced Swift programming",
             showArtwork: true,
-            artworkUrl: "https://example.com/artwork.jpg"
+            artworkUrl: "https://example.com/artwork.jpg",
           ),
           minimized: isMinimized,
           emit: { event in
@@ -519,7 +519,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
             } else if event == .dismissed {
               isMinimized = true
             }
-          }
+          },
         )
       }
       .background(Color.gray.opacity(0.1))

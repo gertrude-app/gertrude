@@ -6,12 +6,12 @@ import SwiftUI
 struct AppEntryPoint: App {
   private let store: AppStore
 
-  public init() {
+  init() {
     self.store = AppStore()
     self.store.setupBackgroundTasks()
   }
 
-  public var body: some Scene {
+  var body: some Scene {
     WindowGroup {
       EntryPoint(store: self.store)
     }

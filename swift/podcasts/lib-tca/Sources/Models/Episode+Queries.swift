@@ -4,7 +4,7 @@ import SQLiteData
 extension Episode {
   static func whereDownloadCanBeDeleted(
     nowPlaying: Episode.ID?,
-    now: Date
+    now: Date,
   ) throws -> Where<Episode> {
     Episode
       .where {

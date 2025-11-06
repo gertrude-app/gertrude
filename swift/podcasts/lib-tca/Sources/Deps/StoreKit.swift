@@ -41,7 +41,7 @@ extension Transaction {
       originalID: self.originalID,
       purchaseDate: self.purchaseDate,
       expirationDate: self.expirationDate,
-      revocationDate: self.revocationDate
+      revocationDate: self.revocationDate,
     )
   }
 }
@@ -69,7 +69,7 @@ extension StoreKitClient: DependencyKey {
             Task { dep(\.db).insertEvent(
               kind: .subscription,
               label: "purchase success",
-              detail: "\(transaction)"
+              detail: "\(transaction)",
             ) }
             _transactions.withLock { $0[transaction.id] = transaction }
             return .success(transaction.data)
@@ -77,7 +77,7 @@ extension StoreKitClient: DependencyKey {
             Task { dep(\.db).insertEvent(
               kind: .subscription,
               label: "unverified transaction",
-              detail: "\(transaction), error: \(error.localizedDescription)"
+              detail: "\(transaction), error: \(error.localizedDescription)",
             ) }
             return .unverified(transaction.data, error.localizedDescription)
           }
@@ -110,7 +110,7 @@ extension StoreKitClient: DependencyKey {
           Task { dep(\.db).insertEvent(
             kind: .subscription,
             label: "received transaction update",
-            detail: "\(result)"
+            detail: "\(result)",
           ) }
           if case .verified(let transaction) = result {
             _transactions.withLock { $0[transaction.id] = transaction }
@@ -134,7 +134,7 @@ extension StoreKitClient: DependencyKey {
             await UIApplication.shared.open(writeReviewURL)
           }
         }
-      }
+      },
     )
   }
 }

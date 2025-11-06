@@ -4,7 +4,7 @@ import XCTest
 @testable import LibTCA
 
 @Test
-func testParsePodcastFeedBasic() throws {
+func parsePodcastFeedBasic() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -82,7 +82,7 @@ func testParsePodcastFeedBasic() throws {
 }
 
 @Test
-func testParsePodcastFeedMinimal() throws {
+func parsePodcastFeedMinimal() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
@@ -124,7 +124,7 @@ func testParsePodcastFeedMinimal() throws {
 }
 
 @Test
-func testParseDurationFormats() throws {
+func parseDurationFormats() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
@@ -176,7 +176,7 @@ func testParseDurationFormats() throws {
 }
 
 @Test
-func testParseInvalidXML() {
+func parseInvalidXML() {
   let invalidXml = "This is not XML"
 
   #expect(throws: XMLParseError.self) {
@@ -185,7 +185,7 @@ func testParseInvalidXML() {
 }
 
 @Test
-func testParseEmptyFeed() {
+func parseEmptyFeed() {
   let emptyXml = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
@@ -201,7 +201,7 @@ func testParseEmptyFeed() {
 }
 
 @Test
-func testParseMissingGuid() {
+func parseMissingGuid() {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
@@ -223,7 +223,7 @@ func testParseMissingGuid() {
 }
 
 @Test
-func testParseAudioTypes() throws {
+func parseAudioTypes() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
@@ -277,7 +277,7 @@ func testParseAudioTypes() throws {
 }
 
 @Test
-func testParseRealWorldFeed() throws {
+func parseRealWorldFeed() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -323,7 +323,7 @@ func testParseRealWorldFeed() throws {
   #expect(
     episode
       .description ==
-      "It is wisdom, and not legalism, to guard your heart, and to pay attention to what is filling your thoughts, your affections and your time."
+      "It is wisdom, and not legalism, to guard your heart, and to pay attention to what is filling your thoughts, your affections and your time.",
   )
 
   // Test pubDate
@@ -335,7 +335,7 @@ func testParseRealWorldFeed() throws {
 }
 
 @Test
-func testParseSpanishPodcastFeed() throws {
+func parseSpanishPodcastFeed() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/">
@@ -397,7 +397,7 @@ func testParseSpanishPodcastFeed() throws {
   #expect(
     episode
       .audioUrl ==
-      "https://traffic.libsyn.com/secure/dfa45e84-e725-48d9-855e-11a263a101d3/1756505423974_148_148__Right_in_Spanish__Correcto_derecha_derecho.mp3?dest-id=3943362"
+      "https://traffic.libsyn.com/secure/dfa45e84-e725-48d9-855e-11a263a101d3/1756505423974_148_148__Right_in_Spanish__Correcto_derecha_derecho.mp3?dest-id=3943362",
   )
   #expect(episode.audioType == .mp3)
   #expect(episode.guid == "446c5533-344f-4d28-a8c0-a61cc15b8a29")
@@ -409,7 +409,7 @@ func testParseSpanishPodcastFeed() throws {
   #expect(
     episode
       .description ==
-      "How do you say \"right\" in Spanish? Is it \"derecha\", \"derecho\", or \"correcto\"? Today we'll explore a bunch of important adjectives in Spanish, and we'll get lots of practice choosing the right one. Practice all of today's Spanish for free at LCSPodcast.com/148"
+      "How do you say \"right\" in Spanish? Is it \"derecha\", \"derecho\", or \"correcto\"? Today we'll explore a bunch of important adjectives in Spanish, and we'll get lots of practice choosing the right one. Practice all of today's Spanish for free at LCSPodcast.com/148",
   )
 
   // Test pubDate - this is a future date: Wed, 10 Sep 2025
@@ -425,7 +425,7 @@ func testParseSpanishPodcastFeed() throws {
 }
 
 @Test
-func testStripsHtmlTags() throws {
+func stripsHtmlTags() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -472,7 +472,7 @@ func testStripsHtmlTags() throws {
 }
 
 @Test
-func testParseTALFeed() throws {
+func parseTALFeed() throws {
   let xmlString = """
   <?xml version="1.0" encoding="utf-8"?>
   <rss version="2.0" xml:base="https://www.thisamericanlife.org/podcast/rss.xml"  xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/">
@@ -838,7 +838,7 @@ func testParseTALFeed() throws {
   #expect(
     feed.show
       .artworkUrl ==
-      "https://thisamericanlife.org/sites/all/themes/thislife/img/tal-logo-3000x3000.png"
+      "https://thisamericanlife.org/sites/all/themes/thislife/img/tal-logo-3000x3000.png",
   )
 
   // Test episodes count (should be 12 based on actual parsing)
@@ -851,13 +851,13 @@ func testParseTALFeed() throws {
   #expect(
     episode1
       .audioUrl ==
-      "https://pfx.vpixl.com/6qj4J/dts.podtrac.com/redirect.mp3/chrt.fm/track/138C95/pdst.fm/e/prefix.up.audio/s/traffic.megaphone.fm/NPR2581159385.mp3"
+      "https://pfx.vpixl.com/6qj4J/dts.podtrac.com/redirect.mp3/chrt.fm/track/138C95/pdst.fm/e/prefix.up.audio/s/traffic.megaphone.fm/NPR2581159385.mp3",
   )
   #expect(episode1.audioType == .mp3)
   #expect(
     episode1
       .artworkUrl ==
-      "https://www.thisamericanlife.org/sites/default/files/styles/rss_image/public/images/rss/tal-867-welcomeback-sq.jpg?itok=0yOLJPiF"
+      "https://www.thisamericanlife.org/sites/default/files/styles/rss_image/public/images/rss/tal-867-welcomeback-sq.jpg?itok=0yOLJPiF",
   )
   #expect(episode1.guid == "45952 at https://www.thisamericanlife.org")
   #expect(episode1.websiteUrl == "https://www.thisamericanlife.org/867/college-disorientation")
@@ -889,7 +889,7 @@ func testParseTALFeed() throws {
   #expect(episode3.duration == 3631) // 01:00:31 = 1*3600 + 0*60 + 31 = 3631 seconds
   #expect(
     episode3.description?
-      .contains("Jorge Just, who thought he'd started over successfully") == true
+      .contains("Jorge Just, who thought he'd started over successfully") == true,
   )
   #expect(episode3.description?.contains("He'd moved to New York") == true)
 
@@ -913,7 +913,7 @@ func testParseTALFeed() throws {
   #expect(
     episode6
       .artworkUrl ==
-      "https://www.thisamericanlife.org/sites/default/files/styles/rss_image/public/images/rss/this_american_life_partners_-_teal.jpg?itok=mZBuUS4l"
+      "https://www.thisamericanlife.org/sites/default/files/styles/rss_image/public/images/rss/this_american_life_partners_-_teal.jpg?itok=mZBuUS4l",
   )
 
   // Test seventh episode (Championship Window) - itunes:duration is 00:58:00
@@ -930,9 +930,9 @@ func testParseTALFeed() throws {
   #expect(
     episode8.description?
       .contains(
-        "On his first day in office, President Trump decided to freeze all U.S. foreign aid"
+        "On his first day in office, President Trump decided to freeze all U.S. foreign aid",
       ) ==
-      true
+      true,
   )
 
   // Test ninth episode (Group Chat) - itunes:duration is 01:01:22
@@ -961,7 +961,7 @@ func testParseTALFeed() throws {
 }
 
 @Test
-func testSkipsInvalidEpisodes() throws {
+func skipsInvalidEpisodes() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -1002,7 +1002,7 @@ func testSkipsInvalidEpisodes() throws {
 }
 
 @Test
-func testFailsOnNoValidEpisodes() throws {
+func failsOnNoValidEpisodes() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -1034,7 +1034,7 @@ func testFailsOnNoValidEpisodes() throws {
 }
 
 @Test
-func testHoyHablamosArtwork() throws {
+func hoyHablamosArtwork() throws {
   // Test with real feed content that has both itunes:image and image/url
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
@@ -1070,12 +1070,12 @@ func testHoyHablamosArtwork() throws {
   #expect(
     feed.show
       .artworkUrl ==
-      "https://www.hoyhablamos.com/wp-content/uploads/2024/03/logo-rrss-hoyhablamos-basico.jpg"
+      "https://www.hoyhablamos.com/wp-content/uploads/2024/03/logo-rrss-hoyhablamos-basico.jpg",
   )
 }
 
 @Test
-func testEpisodeWithoutDurationIsNil() throws {
+func episodeWithoutDurationIsNil() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">

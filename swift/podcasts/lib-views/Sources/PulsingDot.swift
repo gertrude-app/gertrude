@@ -12,7 +12,7 @@ public struct PulsingDot: View {
       .opacity(self.isAnimating ? 0.3 : 1.0)
       .animation(
         .easeInOut(duration: 1.0).repeatForever(autoreverses: true),
-        value: self.isAnimating
+        value: self.isAnimating,
       )
       .allowsHitTesting(false)
       .onAppear {

@@ -16,14 +16,14 @@ let package = Package(
         .product(name: "LibCore", package: "lib-core"),
       ],
       exclude: ["FakeEntry.swift"],
-      resources: [.process("Resources")]
+      resources: [.process("Resources")],
     ),
     .testTarget(
       name: "LibViewsTests",
       dependencies: [
         "LibViews",
         .product(name: "CustomDump", package: "swift-custom-dump"),
-      ]
+      ],
     ),
-  ]
+  ],
 )

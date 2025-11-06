@@ -16,7 +16,7 @@ public struct SearchResult: Identifiable, Sendable, Equatable {
     artworkURL: String? = nil,
     feedUrl: String,
     episodeCount: Int,
-    isExplicit: Bool = false
+    isExplicit: Bool = false,
   ) {
     self.id = id
     self.title = title

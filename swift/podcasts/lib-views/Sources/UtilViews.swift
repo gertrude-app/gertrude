@@ -18,7 +18,7 @@ struct BaseScreenView<Content: View>: View {
           Gradient(colors: [
             Color(self.cs, light: .violet200, dark: .violet950.opacity(0.7)),
             .clear,
-          ])
+          ]),
         )
         .ignoresSafeArea()
         .opacity(self.showBg ? 1 : 0)
@@ -89,7 +89,7 @@ public struct ErrorView: View {
 
 #Preview("Loading - Long text") {
   LoadingScreenView(
-    text: "Please wait while we fetch and validate your podcast feed. This may take a moment."
+    text: "Please wait while we fetch and validate your podcast feed. This may take a moment.",
   )
 }
 
@@ -99,6 +99,6 @@ public struct ErrorView: View {
 
 #Preview("Error - Long text") {
   ErrorView(
-    text: "Unable to connect to the podcast server. Please check your internet connection and try again."
+    text: "Unable to connect to the podcast server. Please check your internet connection and try again.",
   )
 }

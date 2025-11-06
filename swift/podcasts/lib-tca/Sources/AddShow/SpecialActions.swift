@@ -71,7 +71,7 @@ extension AddShowFeature {
           os_log(
             "[G•] Show %{public}d: %{public}@",
             show.id.rawValue,
-            String(describing: show)
+            String(describing: show),
           )
         }
       case "episodes":
@@ -80,7 +80,7 @@ extension AddShowFeature {
           os_log(
             "[G•] Episode %{public}d: %{public}@",
             episode.id.rawValue,
-            String(describing: episode)
+            String(describing: episode),
           )
         }
       case "pinAttempts":
@@ -89,7 +89,7 @@ extension AddShowFeature {
           os_log(
             "[G•] PinAttempt %{public}d: %{public}@",
             attempt.id.rawValue,
-            String(describing: attempt)
+            String(describing: attempt),
           )
         }
       case "records":
@@ -98,7 +98,7 @@ extension AddShowFeature {
           os_log(
             "[G•] Record %{public}d: %{public}@",
             record.id.rawValue,
-            String(describing: record)
+            String(describing: record),
           )
         }
       case "events":
@@ -107,7 +107,7 @@ extension AddShowFeature {
           os_log(
             "[G•] Event %{public}d: %{public}@",
             event.id.rawValue,
-            String(describing: event)
+            String(describing: event),
           )
         }
       default:

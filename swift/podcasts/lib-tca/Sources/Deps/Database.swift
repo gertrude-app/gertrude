@@ -55,7 +55,7 @@ extension DatabaseWriter {
     kind: EventKind.Db,
     label: String,
     detail: String? = nil,
-    apiId: String? = nil
+    apiId: String? = nil,
   ) {
     self.tryWrite { db in
       try Event
@@ -78,7 +78,7 @@ extension DatabaseWriter {
 }
 
 public func appDatabase(
-  beforeTriggersHook: ((Database) throws -> Void)? = nil
+  beforeTriggersHook: ((Database) throws -> Void)? = nil,
 ) throws -> any DatabaseWriter {
   @Dependency(\.context) var context
   let database: any DatabaseWriter

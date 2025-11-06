@@ -35,10 +35,10 @@ struct AddShowView: View {
         PinCodeView(
           mode: .set(
             onComplete: { self.store.send(.newPinSubmitted($0)) },
-            onConfirmFail: { self.store.send(.pincodeCancelled) }
+            onConfirmFail: { self.store.send(.pincodeCancelled) },
           ),
           onCancel: { self.store.send(.pincodeCancelled) },
-          onPrepHaptics: self.haptics.prepare
+          onPrepHaptics: self.haptics.prepare,
         )
 
       case .choosingMethod:
@@ -56,7 +56,7 @@ struct AddShowView: View {
         SearchShowView(
           searchText: self.$store.searchText.sending(\.setSearchText),
           results: self.store.searchResults,
-          onResultTap: { self.store.send(.selectShow($0)) }
+          onResultTap: { self.store.send(.selectShow($0)) },
         )
         .task(id: self.store.searchText) {
           do {
@@ -74,7 +74,7 @@ struct AddShowView: View {
           secondary: .init(lstr(.addShowNoImages)) {
             self.store.send(.selectDontAllowArtworkTapped)
           },
-          ignoreKeyboard: true
+          ignoreKeyboard: true,
         )
 
       case .subscribing:
@@ -85,11 +85,11 @@ struct AddShowView: View {
           text: lstr(.addShowEnterUrl),
           urlInput: .init(
             placeholder: "https://site.com/feed.xml",
-            buttonText: lstr(.addShowSubscribe)
+            buttonText: lstr(.addShowSubscribe),
           ) { url in
             self.store.send(.addByUrlSubmitted(url))
           },
-          animateBtnEntry: false
+          animateBtnEntry: false,
         )
       }
     }

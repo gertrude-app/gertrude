@@ -42,7 +42,7 @@ extension ApiClient: DependencyKey {
       logEvent: { id, kind, label, detail in
         let (iosVersion, deviceType) = await MainActor.run { (
           UIDevice.current.systemVersion,
-          UIDevice.current.userInterfaceIdiom == .pad ? "iPad" : "iPhone"
+          UIDevice.current.userInterfaceIdiom == .pad ? "iPad" : "iPhone",
         ) }
 
         let appVersion = Bundle.main
@@ -56,7 +56,7 @@ extension ApiClient: DependencyKey {
           installId: dep(\.keychain).loadInstallId(),
           deviceType: deviceType,
           appVersion: appVersion,
-          iosVersion: iosVersion
+          iosVersion: iosVersion,
         )
 
         let _: Empty = try await pairql("LogPodcastEvent", input: input)
@@ -68,10 +68,10 @@ extension ApiClient: DependencyKey {
         let input = CreateDatabaseUploadInput(installId: installId)
         let output: CreateDatabaseUploadOutput = try await pairql(
           "CreateDatabaseUpload",
-          input: input
+          input: input,
         )
         return output.uploadUrl
-      }
+      },
     )
   }
 }
@@ -79,7 +79,7 @@ extension ApiClient: DependencyKey {
 @MainActor
 func pairql<Output: Decodable>(
   _ operation: String,
-  input: (some Encodable)? = nil as Empty?
+  input: (some Encodable)? = nil as Empty?,
 ) async throws -> Output {
   let apiEndpoint = Bundle.main.infoDictionary?["API_ENDPOINT"] as? String
     ?? "https://api.gertrude.app"
@@ -167,7 +167,7 @@ func log(
   fileID: StaticString = #fileID,
   filePath: StaticString = #filePath,
   file: StaticString = #file,
-  line: UInt = #line
+  line: UInt = #line,
 ) -> Task<Void, Never> {
   Task {
     do {
@@ -185,7 +185,7 @@ func log(
         "Failed to log event kind \(kind), label: \(label), detail: \(detail ?? "nil"): \(error)",
         fileID: fileID,
         filePath: filePath,
-        line: line
+        line: line,
       )
     }
   }

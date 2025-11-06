@@ -89,7 +89,7 @@ extension Show {
         showArtwork: showArtwork,
         iTunesId: self.iTunesId,
         sort: .newestToOldest,
-        createdAt: now
+        createdAt: now,
       )
     }
   }
@@ -106,7 +106,7 @@ extension ShowData {
       description: show.description,
       showArtwork: show.showArtwork,
       artworkImage: show.showArtwork ? show.localArtworkImage : nil,
-      artworkUrl: show.showArtwork ? show.artworkUrl : nil
+      artworkUrl: show.showArtwork ? show.artworkUrl : nil,
     )
   }
 }
@@ -122,7 +122,7 @@ extension Show {
       artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
       showArtwork: true,
       sort: .newestToOldest,
-      createdAt: Date()
+      createdAt: Date(),
     )
   }
 }

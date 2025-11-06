@@ -11,7 +11,7 @@ struct SettingsViewContainer: View {
       status: self.store.subscription.settingsViewStatus,
       expiresAt: self.store.subscription.expiresAt,
       purchaseInProgress: self.store.purchaseInProgress,
-      onEvent: { self.store.send(.view($0)) }
+      onEvent: { self.store.send(.view($0)) },
     )
   }
 }

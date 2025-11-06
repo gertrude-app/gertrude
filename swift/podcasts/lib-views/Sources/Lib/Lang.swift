@@ -19,13 +19,6 @@ public extension Lang {
   }
 }
 
-public struct LangEnvKey: EnvironmentKey {
-  public static let defaultValue: Lang = .english
-}
-
 public extension EnvironmentValues {
-  var lang: Lang {
-    get { self[LangEnvKey.self] }
-    set { self[LangEnvKey.self] = newValue }
-  }
+  @Entry var lang: Lang = .english
 }

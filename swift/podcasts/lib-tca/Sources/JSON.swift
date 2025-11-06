@@ -20,7 +20,7 @@ enum JSON {
   static func decode<T: Decodable>(
     _ json: String,
     as type: T.Type,
-    _ options: DecodeOptions = []
+    _ options: DecodeOptions = [],
   ) throws -> T {
     let decoder = decoder(from: options)
     guard let data = json.data(using: .utf8) else {
@@ -32,7 +32,7 @@ enum JSON {
   static func decode<T: Decodable>(
     _ data: Data,
     as type: T.Type,
-    _ options: DecodeOptions = []
+    _ options: DecodeOptions = [],
   ) throws -> T {
     let decoder = decoder(from: options)
     return try decoder.decode(type, from: data)
@@ -40,7 +40,7 @@ enum JSON {
 
   static func encode(
     _ value: some Encodable,
-    _ options: EncodeOptions = []
+    _ options: EncodeOptions = [],
   ) throws -> String {
     let data = try data(value, options)
     guard let json = String(data: data, encoding: .utf8) else {
@@ -51,7 +51,7 @@ enum JSON {
 
   static func data(
     _ value: some Encodable,
-    _ options: EncodeOptions = []
+    _ options: EncodeOptions = [],
   ) throws -> Data {
     let encoder = JSONEncoder()
     if options.contains(.isoDates) {

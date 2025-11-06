@@ -10,7 +10,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
   public let id: Int
   public var title: String
   public var description: String?
-  public var artworkUrl: String? = nil
+  public var artworkUrl: String?
   public var durationSeconds: Int?
   public var progress: Double
   public var downloadState: DownloadState
@@ -30,7 +30,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
     pubDate: Date,
     isCompleted: Bool = false,
     isPlaying: Bool = false,
-    isArchived: Bool
+    isArchived: Bool,
   ) {
     self.id = id
     self.title = title
@@ -68,7 +68,7 @@ public extension EpisodeData {
       : formatRemainingPlayerTime(
         progress: self.progress,
         durationSeconds: durationSeconds,
-        withMinus: false
+        withMinus: false,
       )
   }
 
@@ -79,7 +79,7 @@ public extension EpisodeData {
   var remainingPlayerTimeString: String {
     formatRemainingPlayerTime(
       progress: self.progress,
-      durationSeconds: self.durationSeconds
+      durationSeconds: self.durationSeconds,
     )
   }
 }

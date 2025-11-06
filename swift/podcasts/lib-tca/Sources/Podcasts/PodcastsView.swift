@@ -20,29 +20,29 @@ struct PodcastsView: View {
     .navigationDestination(
       item: self.$store.scope(
         state: \.destination?.addShow,
-        action: \.destination.addShow
+        action: \.destination.addShow,
       ),
       destination: { store in
         AddShowView(store: store)
-      }
+      },
     )
     .navigationDestination(
       item: self.$store.scope(
         state: \.destination?.show,
-        action: \.destination.show
+        action: \.destination.show,
       ),
       destination: { store in
         ShowViewContainer(store: store)
-      }
+      },
     )
     .sheet(
       item: self.$store.scope(
         state: \.destination?.settings,
-        action: \.destination.settings
+        action: \.destination.settings,
       ),
       content: { store in
         SettingsViewContainer(store: store)
-      }
+      },
     )
     .sheet(
       item: self.$store.scope(
@@ -54,18 +54,18 @@ struct PodcastsView: View {
           text: lstr(.podcastsRequestReviewMessage),
           primary: .init(
             lstr(.podcastsRequestReviewGiveRating),
-            animate: false
+            animate: false,
           ) { store.send(.leaveRating) },
           secondary: .init(
             lstr(.podcastsRequestReviewLeaveReview),
-            animate: false
+            animate: false,
           ) { store.send(.leaveReview) },
           tertiary: .init(
             lstr(.podcastsRequestReviewNoThanks),
-            animate: false
+            animate: false,
           ) { store.send(.noThanks) },
         )
-      }
+      },
     )
     .confirmationDialog(self.$store.scope(
       state: \.destination?.confirm,
@@ -87,7 +87,7 @@ extension PodcastsHomeView.ShowDataWithStats {
         description: showInfo.description,
         showArtwork: showInfo.showArtwork,
         artworkImage: showLocalArtworkImage(showId: showInfo.id),
-        artworkUrl: showInfo.artworkUrl
+        artworkUrl: showInfo.artworkUrl,
       ),
       totalEpisodes: showInfo.totalEpisodes,
       unplayedEpisodes: showInfo.unplayedEpisodes,

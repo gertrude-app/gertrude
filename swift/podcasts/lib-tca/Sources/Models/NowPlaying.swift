@@ -20,7 +20,7 @@ struct NowPlayingModel {
     minimized: Bool = true,
     nextDownloaded: Bool = false,
     progress: Double? = nil,
-    updatedAt: Date = .init()
+    updatedAt: Date = .init(),
   ) {
     self.id = id
     self.episodeId = episodeId
@@ -63,7 +63,7 @@ struct NowPlaying: FetchKeyRequest {
       nextDownloaded: model.nextDownloaded,
       bufferedProgress: model.bufferedProgress,
       episode: episode,
-      show: show
+      show: show,
     )
   }
 }
@@ -145,7 +145,7 @@ extension NowPlaying {
     _ oldEpisodeId: Episode.ID?,
     _ oldWasPlaying: Bool?,
     _ newEpisodeId: Episode.ID?,
-    _ newIsPlaying: Bool?
+    _ newIsPlaying: Bool?,
   ) async throws {
     switch (oldEpisodeId, oldWasPlaying, newEpisodeId, newIsPlaying) {
     case (nil, nil, .some(let episodeId), .some(let isPlaying)):
@@ -180,7 +180,7 @@ extension NowPlaying {
     try await dep(\.audio).pause()
   }
 
-  private static func episodeChanged(_ episodeId: Episode.ID, _ isPlaying: Bool,) async throws {
+  private static func episodeChanged(_ episodeId: Episode.ID, _ isPlaying: Bool) async throws {
     guard let (episode, show) = dep(\.db).episodeWithShow(episodeId) else {
       unexpected(id: "c13211b3", assert: true)
       return

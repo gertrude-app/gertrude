@@ -9,7 +9,7 @@ struct Episode: Equatable, Hashable {
   typealias ID = Tagged<Self, Int>
   let id: ID
   let showId: Show.ID
-  var episodeNumber: Int? = nil
+  var episodeNumber: Int?
   var title: String
   var description: String?
   var websiteUrl: String?
@@ -125,7 +125,7 @@ extension EpisodeData {
     self.init(
       from: nowPlaying.episode,
       isPlaying: nowPlaying.isPlaying,
-      bufferedProgress: nowPlaying.bufferedProgress
+      bufferedProgress: nowPlaying.bufferedProgress,
     )
   }
 }

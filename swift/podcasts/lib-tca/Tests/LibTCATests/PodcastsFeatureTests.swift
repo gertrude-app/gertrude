@@ -36,7 +36,7 @@ import Testing
             }
           } message: {
             TextState("Subscribe to continue using the app.")
-          }
+          },
         )
       }
 

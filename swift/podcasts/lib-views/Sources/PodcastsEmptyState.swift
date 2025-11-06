@@ -35,7 +35,7 @@ public struct PodcastsEmptyState: View {
         lstr(.showsAddShow),
         type: .button(self.onAddShowTap),
         variant: .primary,
-        icon: "plus"
+        icon: "plus",
       )
       .padding(.horizontal, 30)
       .padding(.bottom, 30)

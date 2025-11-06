@@ -15,14 +15,14 @@ func registerBgTasks() {
     using: nil,
     launchHandler: { task in
       bgRefreshFeeds(task: task as! BGAppRefreshTask)
-    }
+    },
   )
   BGTaskScheduler.shared.register(
     forTaskWithIdentifier: BgTaskId.downloadEpisodes.rawValue,
     using: nil,
     launchHandler: { task in
       bgDownloadEpisodes(task: task as! BGProcessingTask)
-    }
+    },
   )
 }
 
@@ -128,7 +128,7 @@ final class BgDownloadEpisodesOperation: AsyncOperation, @unchecked Sendable {
           FROM RankedEpisodes as \(Episode.self)
           WHERE rn <= 3 AND \(Episode.col.downloadedAt) IS NULL;
           """,
-          as: Episode.self
+          as: Episode.self,
         )
         .fetchAll(db)
       }
@@ -147,7 +147,7 @@ final class BgDownloadEpisodesOperation: AsyncOperation, @unchecked Sendable {
       self.database.insertEvent(
         kind: .debug,
         label: "bg-download-episodes -> end",
-        detail: "downloaded \(episodes.count) episodes \(timing)"
+        detail: "downloaded \(episodes.count) episodes \(timing)",
       )
       self.finish()
     }

@@ -11,7 +11,7 @@ public struct SearchShowView: View {
   public init(
     searchText: Binding<String>,
     results: [SearchResult],
-    onResultTap: @MainActor @escaping @Sendable (SearchResult) -> Void
+    onResultTap: @MainActor @escaping @Sendable (SearchResult) -> Void,
   ) {
     self._searchText = searchText
     self.results = results
@@ -137,14 +137,14 @@ public struct SearchShowView: View {
     .padding(.vertical, 12)
     .background(
       Color(self.cs, light: .clear, dark: .clear)
-        .contentShape(Rectangle())
+        .contentShape(Rectangle()),
     )
   }
 
   private func showArtwork(_ result: SearchResult) -> some View {
     ArtworkView(
       artworkUrl: result.artworkUrl,
-      size: 64
+      size: 64,
     )
   }
 }
@@ -154,7 +154,7 @@ public struct SearchShowView: View {
     SearchShowView(
       searchText: .constant(""),
       results: [],
-      onResultTap: { _ in }
+      onResultTap: { _ in },
     )
   }
 }
@@ -164,7 +164,7 @@ public struct SearchShowView: View {
     SearchShowView(
       searchText: .constant("nonexistent podcast"),
       results: [],
-      onResultTap: { _ in }
+      onResultTap: { _ in },
     )
   }
 }
@@ -181,7 +181,7 @@ public struct SearchShowView: View {
           artworkURL: .ancientPath,
           feedUrl: "",
           episodeCount: 147,
-          isExplicit: false
+          isExplicit: false,
         ),
         SearchResult(
           id: 2,
@@ -189,19 +189,19 @@ public struct SearchShowView: View {
           artistName: "Uncensored Media",
           feedUrl: "",
           episodeCount: 89,
-          isExplicit: true
+          isExplicit: true,
         ),
         SearchResult(
           id: 3,
           title: "StartupLife",
           artistName: "Entrepreneur Stories",
           feedUrl: "",
-          episodeCount: 203
+          episodeCount: 203,
         ),
       ],
       onResultTap: { result in
         print("Tapped: \(result.title)")
-      }
+      },
     )
   }
 }
@@ -211,7 +211,7 @@ public struct SearchShowView: View {
     SearchShowView(
       searchText: .constant(""),
       results: [],
-      onResultTap: { _ in }
+      onResultTap: { _ in },
     )
   }
   .preferredColorScheme(.dark)
@@ -222,7 +222,7 @@ public struct SearchShowView: View {
     SearchShowView(
       searchText: .constant("nonexistent podcast"),
       results: [],
-      onResultTap: { _ in }
+      onResultTap: { _ in },
     )
   }
   .preferredColorScheme(.dark)
@@ -240,7 +240,7 @@ public struct SearchShowView: View {
           artworkURL: .ancientPath,
           feedUrl: "",
           episodeCount: 147,
-          isExplicit: false
+          isExplicit: false,
         ),
         SearchResult(
           id: 2,
@@ -248,19 +248,19 @@ public struct SearchShowView: View {
           artistName: "Uncensored Media",
           feedUrl: "",
           episodeCount: 89,
-          isExplicit: true
+          isExplicit: true,
         ),
         SearchResult(
           id: 3,
           title: "StartupLife",
           artistName: "Entrepreneur Stories",
           feedUrl: "",
-          episodeCount: 203
+          episodeCount: 203,
         ),
       ],
       onResultTap: { result in
         print("Tapped: \(result.title)")
-      }
+      },
     )
   }
   .preferredColorScheme(.dark)

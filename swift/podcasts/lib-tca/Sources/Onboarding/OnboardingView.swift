@@ -19,31 +19,31 @@ struct OnboardingView: View {
         ButtonScreenView(
           text: lstr(.onboardingAreYouParent),
           primary: self.btn(lstr(.onboardingYesParent), action: .primaryBtnTapped),
-          secondary: self.btn(lstr(.onboardingNoChild), action: .secondaryBtnTapped)
+          secondary: self.btn(lstr(.onboardingNoChild), action: .secondaryBtnTapped),
         )
 
       case .parentRequired:
         ButtonScreenView(
           text: lstr(.onboardingParentRequired),
-          primary: self.btn(lstr(.onboardingContinue), action: .primaryBtnTapped)
+          primary: self.btn(lstr(.onboardingContinue), action: .primaryBtnTapped),
         )
 
       case .explainSetPasscode:
         ButtonScreenView(
           text: lstr(.onboardingExplainPin),
-          primary: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped)
+          primary: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped),
         )
 
       case .strongPasscode:
         ButtonScreenView(
           text: lstr(.onboardingStrongPin),
-          primary: self.btn(lstr(.onboardingOkLetsGo), animate: false, action: .primaryBtnTapped)
+          primary: self.btn(lstr(.onboardingOkLetsGo), animate: false, action: .primaryBtnTapped),
         )
 
       case .passcodeSet(let passcode):
         ButtonScreenView(
           text: lstr(.onboardingAllSet),
-          primary: self.btn(lstr(.onboardingGotItNext), action: .finished(passcode))
+          primary: self.btn(lstr(.onboardingGotItNext), action: .finished(passcode)),
         )
       }
     }
@@ -54,10 +54,10 @@ struct OnboardingView: View {
       PinCodeView(
         mode: .set(
           onComplete: { self.store.send(.passcodeSet($0)) },
-          onConfirmFail: { self.store.send(.passcodeConfirmFailed) }
+          onConfirmFail: { self.store.send(.passcodeConfirmFailed) },
         ),
         onCancel: { self.store.send(.setShowingPasscodeSheet(false)) },
-        onPrepHaptics: self.haptics.prepare
+        onPrepHaptics: self.haptics.prepare,
       )
     }
   }
@@ -65,7 +65,7 @@ struct OnboardingView: View {
   func btn(
     _ text: String,
     animate: Bool = false,
-    action: OnboardingFeature.Action
+    action: OnboardingFeature.Action,
   ) -> ButtonScreenView.Config {
     .init(text, animate: animate) {
       self.store.send(action)

@@ -48,7 +48,7 @@ public struct PlayBubble: View {
           Image(
             systemName: self.showsReplayArrow
               ? "arrow.counterclockwise"
-              : (self.episode.isPlaying ? "pause.fill" : "play.fill")
+              : (self.episode.isPlaying ? "pause.fill" : "play.fill"),
           )
           .font(.system(size: 12, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
@@ -56,12 +56,12 @@ public struct PlayBubble: View {
           if self.hasProgress {
             ProgressView(value: self.progressRatio)
               .progressViewStyle(LinearProgressViewStyle(
-                tint: Color(self.cs, light: .violet600, dark: .violet400)
+                tint: Color(self.cs, light: .violet600, dark: .violet400),
               ))
               .background(Color(
                 self.cs,
                 light: .violet300.opacity(0.3),
-                dark: .violet500.opacity(0.2)
+                dark: .violet500.opacity(0.2),
               ))
               .frame(width: 24, height: 4)
               .clipShape(Capsule())
@@ -77,7 +77,7 @@ public struct PlayBubble: View {
       .padding(.horizontal, 11)
       .padding(.vertical, 6)
       .background(
-        Color(self.cs, light: .violet100, dark: .violet900.opacity(0.5))
+        Color(self.cs, light: .violet100, dark: .violet900.opacity(0.5)),
       )
       .cornerRadius(16)
     }
