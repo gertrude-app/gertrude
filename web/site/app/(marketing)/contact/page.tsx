@@ -17,7 +17,7 @@ const ContactPage: NextPage = () => (
       <h1 className="text-4xl font-semibold self-center lg:self-start relative">
         Contact us
       </h1>
-      <p className="text-xl mt-3 text-slate-500 max-w-2xl self-center lg:self-start text-center lg:text-left relative">
+      <p className="text-xl mt-3 text-slate-500 self-center lg:self-start text-center lg:text-left relative">
         Have a question or need help? Fill out the form below and we’ll get back to you in
         a jiffy.
       </p>

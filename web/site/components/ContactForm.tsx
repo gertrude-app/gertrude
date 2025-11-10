@@ -11,6 +11,7 @@ const ContactForm: React.FC = () => {
   const [state, setState] = useState<`idle` | `ongoing` | `failed` | `succeeded`>(`idle`);
   const [name, setName] = useState(``);
   const [emailAddress, setEmailAddress] = useState(``);
+  const [app, setApp] = useState(``);
   const [subject, setSubject] = useState(``);
   const [message, setMessage] = useState(``);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -20,7 +21,6 @@ const ContactForm: React.FC = () => {
     <form
       className="flex flex-col relative"
       name="contact"
-      data-netlify="true"
       method="POST"
       onSubmit={(event) => {
         event.preventDefault();
@@ -32,6 +32,7 @@ const ContactForm: React.FC = () => {
         params.append(`form`, `contact`);
         params.append(`name`, name);
         params.append(`email`, emailAddress);
+        params.append(`app`, app);
         params.append(`subject`, subject);
         params.append(`message`, message);
         params.append(`turnstileToken`, turnstileToken);
@@ -50,7 +51,7 @@ const ContactForm: React.FC = () => {
       }}
     >
       <div className="flex flex-col lg:flex-row gap-8 mt-8">
-        <div className=" flex flex-col gap-8">
+        <div className="flex-1 min-w-0 flex flex-col gap-8">
           <TextInput
             name="name"
             label="Name"
@@ -58,6 +59,7 @@ const ContactForm: React.FC = () => {
             value={name}
             setValue={setName}
             required
+            autoFocus
           />
           <TextInput
             name="email"
@@ -65,6 +67,20 @@ const ContactForm: React.FC = () => {
             type="email"
             value={emailAddress}
             setValue={setEmailAddress}
+            required
+          />
+          <SelectInput
+            name="app"
+            label="Which Gertrude product?"
+            value={app}
+            setValue={setApp}
+            options={[
+              { value: ``, label: `Please select...` },
+              { value: `mac`, label: `Gertrude for Mac` },
+              { value: `ios`, label: `Gertrude Blocker for iPhone/iPad` },
+              { value: `podcasts`, label: `Gertrude AM (Podcasts)` },
+              { value: `unsure`, label: `I’m not sure / something else` },
+            ]}
             required
           />
           <TextInput
@@ -76,15 +92,17 @@ const ContactForm: React.FC = () => {
             required
           />
         </div>
-        <TextInput
-          textarea
-          name="message"
-          label="Message"
-          type="text"
-          value={message}
-          setValue={setMessage}
-          required
-        />
+        <div className="flex-1 min-w-0">
+          <TextInput
+            textarea
+            name="message"
+            label="Message"
+            type="text"
+            value={message}
+            setValue={setMessage}
+            required
+          />
+        </div>
       </div>
       <Turnstile
         sitekey={turnstileSitekey}
@@ -131,6 +149,7 @@ interface TextInputProps {
   setValue: (value: string) => void;
   textarea?: boolean;
   required?: boolean;
+  autoFocus?: boolean;
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -141,12 +160,13 @@ const TextInput: React.FC<TextInputProps> = ({
   value,
   setValue,
   required,
+  autoFocus,
 }) => {
   const classes = cx(
-    `rounded-2xl bg-slate-100 py-4 px-4 text-xl w-full lg:w-96 xl:w-112 outline-none focus:ring-0 focus:outline-2 focus:outline-violet-400 border-none`,
+    `rounded-2xl bg-slate-100 py-4 px-4 text-xl w-full outline-none focus:ring-0 focus:outline-2 focus:outline-violet-400 border-none`,
   );
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full gap-1">
       <label htmlFor={name} className="font-medium text-lg text-slate-400">
         {label}
       </label>
@@ -158,6 +178,7 @@ const TextInput: React.FC<TextInputProps> = ({
           id={name}
           className={cx(classes, `h-full`)}
           required={required}
+          autoFocus={autoFocus}
         />
       ) : (
         <input
@@ -168,8 +189,47 @@ const TextInput: React.FC<TextInputProps> = ({
           type={type}
           className={classes}
           required={required}
+          autoFocus={autoFocus}
         />
       )}
     </div>
   );
 };
+
+interface SelectInputProps {
+  name: string;
+  label: string;
+  value: string;
+  setValue: (value: string) => void;
+  options: Array<{ value: string; label: string }>;
+  required?: boolean;
+}
+
+const SelectInput: React.FC<SelectInputProps> = ({
+  name,
+  label,
+  value,
+  setValue,
+  options,
+  required,
+}) => (
+  <div className="flex flex-col gap-1">
+    <label htmlFor={name} className="font-medium text-lg text-slate-400">
+      {label}
+    </label>
+    <select
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      name={name}
+      id={name}
+      className="rounded-2xl bg-slate-100 py-4 px-4 text-xl w-full outline-none focus:ring-0 focus:outline-2 focus:outline-violet-400 border-none"
+      required={required}
+    >
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  </div>
+);
