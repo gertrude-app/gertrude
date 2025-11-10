@@ -13,6 +13,7 @@ interface CommonProps {
   inverted?: boolean;
   className?: string;
   id?: string;
+  disabled?: boolean;
 }
 interface LinkProps {
   type: `link`;
@@ -29,7 +30,11 @@ interface ButtonProps {
 type FancyLinkProps = (LinkProps | SubmitProps | ButtonProps) & CommonProps;
 
 const FancyLink: React.FC<FancyLinkProps> = (props) => {
-  const classes = cx(`relative group select-none block`, props.className);
+  const classes = cx(
+    `relative group select-none block`,
+    { 'opacity-50 cursor-not-allowed': props.disabled },
+    props.className,
+  );
 
   let Element: React.FC<{ children: React.ReactNode }>;
 
@@ -43,14 +48,20 @@ const FancyLink: React.FC<FancyLinkProps> = (props) => {
       break;
     case `submit`:
       Element = ({ children }) => (
-        <button id={props.id} type="submit" className={classes}>
+        <button id={props.id} type="submit" className={classes} disabled={props.disabled}>
           {children}
         </button>
       );
       break;
     case `button`:
       Element = ({ children }) => (
-        <button id={props.id} type="button" onClick={props.onClick} className={classes}>
+        <button
+          id={props.id}
+          type="button"
+          onClick={props.onClick}
+          className={classes}
+          disabled={props.disabled}
+        >
           {children}
         </button>
       );
@@ -76,21 +87,21 @@ const FancyLink: React.FC<FancyLinkProps> = (props) => {
         className={cx(
           `flex items-center justify-center relative transition-[transform,background-color] duration-200 overflow-hidden`,
           {
-            'group-hover:-translate-y-0.5': color === `primary`,
-            'group-active:translate-y-0.5': color === `primary`,
+            'group-hover:-translate-y-0.5': color === `primary` && !props.disabled,
+            'group-active:translate-y-0.5': color === `primary` && !props.disabled,
             'bg-white': props.inverted && color === `primary`,
             'bg-white/10 group-hover:bg-white/20 group-active:bg-white/30 group-active:scale-[98%]':
-              props.inverted && color === `secondary`,
+              props.inverted && color === `secondary` && !props.disabled,
             'bg-gradient-to-r from-violet-500 to-fuchsia-500':
               !props.inverted && color === `primary`,
             'bg-violet-100 group-hover:bg-violet-200 group-active:bg-violet-300 group-active:scale-[98%]':
-              !props.inverted && color === `secondary`,
+              !props.inverted && color === `secondary` && !props.disabled,
             'px-8 py-4 rounded-3xl gap-3': size === `lg`,
             'px-6 py-3 rounded-2xl gap-2': size === `sm`,
           },
         )}
       >
-        {color === `primary` && (
+        {color === `primary` && !props.disabled && (
           <div
             className={cx(
               `absolute -left-16 group-hover:left-20 -top-5 rotate-12 h-24 w-32 bg-gradient-to-r from-transparent to-transparent transition-[left,opacity] duration-200 group-active:opacity-0`,
