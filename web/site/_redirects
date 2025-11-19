@@ -102,3 +102,13 @@
 ###########
 /s3-bg https://gertrude.nyc3.digitaloceanspaces.com/gradient-bg.png
 /s3-testapp https://gertrude.nyc3.digitaloceanspaces.com/testapp.zip
+
+
+###########
+# ios app #
+###########
+/iosapp-contact https://gertrude.app/contact 302
+/iosapp-supervise https://gertrude.app/blog/gertrude-ios-supervised-mode 302
+/iosapp-apple-fam https://support.apple.com/en-us/108380 302
+/iosapp-main https://gertrude.app 302
+/iosapp-connect https://gertrude.app/blog/gertrude-ios-account-connection 302
