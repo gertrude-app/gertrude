@@ -9,10 +9,10 @@ import Computer from '@/components/super-scroller-illustration/Computer';
 import * as seo from '@/lib/seo';
 
 import BigSur from '@/public/supported-os/macos-big-sur.png';
-import Catalina from '@/public/supported-os/macos-catalina.png';
 import Monterey from '@/public/supported-os/macos-monterey.png';
 import Sequoia from '@/public/supported-os/macos-sequoia.png';
 import Sonoma from '@/public/supported-os/macos-sonoma.png';
+import Tahoe from '@/public/supported-os/macos-tahoe.png';
 import Ventura from '@/public/supported-os/macos-ventura.png';
 
 export const metadata = seo.createMetadata(
@@ -53,12 +53,12 @@ const DownloadPage: NextPage = () => (
             Supported operating systems:
           </h2>
           <div className="flex flex-col xs:flex-row flex-wrap justify-center gap-4">
-            <SupportedOSCard os="Catalina" image={Catalina} />
             <SupportedOSCard os="Big Sur" image={BigSur} />
             <SupportedOSCard os="Monterey" image={Monterey} />
             <SupportedOSCard os="Ventura" image={Ventura} />
             <SupportedOSCard os="Sonoma" image={Sonoma} />
             <SupportedOSCard os="Sequoia" image={Sequoia} />
+            <SupportedOSCard os="Tahoe" image={Tahoe} />
           </div>
         </div>
       </div>
