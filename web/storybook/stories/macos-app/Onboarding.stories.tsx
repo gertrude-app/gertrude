@@ -12,7 +12,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Welcome: Story = props({
   windowOpen: true,
-  osVersion: { name: `sequoia`, major: 15 },
+  osVersion: { name: `tahoe`, major: 26 },
   step: `welcome`,
   connectChildRequest: { case: `idle` },
   screenRecordingPermissionGranted: false,

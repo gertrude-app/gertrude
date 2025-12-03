@@ -101,8 +101,8 @@ const AllowKeylogging: React.FC<Props> = ({ step }) => {
           </div>
           <ExpandableContent
             asset={assets.osImg(osVersion.name, `allow-keylogging`)}
-            width={640 / 1.7}
-            height={490 / 1.7}
+            width={800 / 1.9}
+            height={600 / 1.9}
           />
         </Onboarding.Centered>
       );

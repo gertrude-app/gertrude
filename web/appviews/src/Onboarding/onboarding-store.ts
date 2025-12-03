@@ -43,7 +43,7 @@ export type OnboardingStep =
   | `finish`;
 
 export interface MacOSVersion {
-  name: `catalina` | `bigSur` | `monterey` | `ventura` | `sonoma` | `sequoia`;
+  name: `catalina` | `bigSur` | `monterey` | `ventura` | `sonoma` | `sequoia` | `tahoe`;
   major: number;
 }
 
@@ -57,7 +57,7 @@ export interface MacOSUser {
 
 export interface AppState {
   osVersion: {
-    name: `catalina` | `bigSur` | `monterey` | `ventura` | `sonoma` | `sequoia`;
+    name: `catalina` | `bigSur` | `monterey` | `ventura` | `sonoma` | `sequoia` | `tahoe`;
     major: number;
   };
   windowOpen: boolean;

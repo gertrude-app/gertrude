@@ -160,6 +160,7 @@ const COMMON_IMG_DATA: Record<CommonImgId, string | [number, ...number[]]> = {
   'how-to-use-gifs': [4.88, 5.45],
 };
 
+// NB: use https://onlinegiftools.com/analyze-gif to get frame durations
 const OS_IMAGE_DATA: Record<
   OsImgId,
   string | Record<MacOSVersion[`name`], [number, number, ...number[]]>
@@ -172,6 +173,7 @@ const OS_IMAGE_DATA: Record<
     ventura: [3.28, 4.08, 4.01],
     sonoma: [3.28, 4.08, 4.01],
     sequoia: [3.28, 4.08, 4.01],
+    tahoe: [3.71, 3.91, 4.51],
   },
   'allow-notifications': {
     catalina: [3.55, 3.93, 4.53],
@@ -180,6 +182,7 @@ const OS_IMAGE_DATA: Record<
     ventura: [5.63, 4.73, 3.73],
     sonoma: [5.63, 4.73, 3.73],
     sequoia: [5.63, 4.73, 3.73],
+    tahoe: [4.64, 3.51, 4.51],
   },
   'allow-screen-recording': {
     catalina: [3.03, 4.8, 3.06, 10.93, 4.8],
@@ -188,6 +191,7 @@ const OS_IMAGE_DATA: Record<
     ventura: [3.27, 4.6, 3.73],
     sonoma: [3.27, 4.6, 3.73],
     sequoia: [3.27, 4.6, 3.73],
+    tahoe: [3.64, 4.64, 3.51],
   },
   'allow-keylogging': {
     catalina: [3.58, 4.18],
@@ -196,6 +200,7 @@ const OS_IMAGE_DATA: Record<
     ventura: [3.94, 4.93],
     sonoma: [3.94, 4.93],
     sequoia: [3.94, 4.93],
+    tahoe: [3.84, 4.98],
   },
   'install-sys-ext': {
     catalina: [2.95, 3.16, 3.86, 3.33],
@@ -204,6 +209,7 @@ const OS_IMAGE_DATA: Record<
     ventura: [3.1, 6.72, 5.22],
     sonoma: [3.1, 6.72, 5.22],
     sequoia: [3.26, 6.45, 5.26],
+    tahoe: [3.91, 7.44, 4.51],
   },
 };
 
