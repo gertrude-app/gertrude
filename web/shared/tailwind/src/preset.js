@@ -1,7 +1,14 @@
 const defaultTheme = require(`tailwindcss/defaultTheme`);
+const plugin = require(`tailwindcss/plugin`);
 
 module.exports = {
-  plugins: [require(`@tailwindcss/forms`), require(`@tailwindcss/container-queries`)],
+  plugins: [
+    require(`@tailwindcss/forms`),
+    require(`@tailwindcss/container-queries`),
+    plugin(({ addVariant }) => {
+      addVariant(`os-gte-14`, `.appview-os-gte-14 &`);
+    }),
+  ],
   darkMode: `class`,
   theme: {
     screens: {

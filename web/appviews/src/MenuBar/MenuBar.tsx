@@ -85,14 +85,20 @@ export const MenuBar: React.FC<Props> = ({
   );
 };
 
-// not sure why i have to specify the generics here... 🤔
 export default containerize<AppState, AppEvent, ViewState, ViewAction>(store, MenuBar);
 
 export const MenuBarSized: React.FC<{
   children: React.ReactNode;
   className?: string;
 }> = ({ children, className }) => (
-  <div className={cx(`w-[400px] h-[300px] overflow-hidden relative`, className)}>
+  <div
+    className={cx(
+      `overflow-hidden relative`,
+      `w-[400px] h-[300px]`,
+      `os-gte-14:w-[428px] os-gte-14:h-[328px] os-gte-14:p-[14px]`,
+      className,
+    )}
+  >
     {children}
   </div>
 );
