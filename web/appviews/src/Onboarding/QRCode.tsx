@@ -49,4 +49,4 @@ const QRCode: React.FC<Props> = ({ url }) => {
 
 export default QRCode;
 
-const IMG_ENDPOINT = `https://gertrude-web-assets.nyc3.cdn.digitaloceanspaces.com/onboarding/qr-codes`;
+const IMG_ENDPOINT = `https://gertrude-web-assets.nyc3.cdn.digitaloceanspaces.com/onboarding-v2.5.0/qr-codes`;

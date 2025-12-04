@@ -37,14 +37,6 @@
 ##############
 /start https://parents.gertrude.app/signup 302
 
-# CREATE MACOS USER (legacy: pre 2.5.0, when we had "groups")
-#  -> delete when noone should be onboarding from 2.4.0
-# `c` was "catalina",`b` was "bigSurOrMonterey", same video
-/cu-c https://youtu.be/FFFOF3BmSos 302
-/cu-b https://youtu.be/FFFOF3BmSos 302
-# `v` was "venturaOrLater"
-/cu-v https://youtu.be/Z_kC6ZfXZDU 302
-
 # CREATE MACOS USER (current: 2.5.0+)
 # catalina, big sur, and monterey are same
 /cu-cl https://youtu.be/FFFOF3BmSos 302
@@ -55,14 +47,8 @@
 # sonoma and sequoia are the same
 /cu-sn https://youtu.be/ntnFEW0bRVQ 302
 /cu-sq https://youtu.be/ntnFEW0bRVQ 302
-
-# DEMOTE MACOS USER (legacy: pre 2.5.0, when we had "groups")
-#  -> delete when noone should be onboarding from 2.4.0
-# `c` was "catalina",`b` was "bigSurOrMonterey", same video
-/du-c https://youtu.be/tT3wowZ3BZ8 302
-/du-b https://youtu.be/tT3wowZ3BZ8 302
-# `v` was "venturaOrLater"
-/du-v https://youtu.be/Sq0baQ4Ze6o 302
+# tahoe
+/cu-th https://youtu.be/eFbbe3pBpH4 302
 
 # DEMOTE MACOS USER (current: 2.5.0+)
 # catalina, big sur, and monterey are same
@@ -74,14 +60,8 @@
 # sonoma and sequoia are the same
 /du-sn https://youtu.be/jn0Iv4brL94 302
 /du-sq https://youtu.be/jn0Iv4brL94 302
-
-# SWITCH MACOS USER (legacy: pre 2.5.0, when we had "groups")
-#  -> delete when noone should be onboarding from 2.4.0
-# `c` was "catalina",`b` was "bigSurOrMonterey", same video
-/su-c https://youtu.be/jhufHnF6nEI 302
-/su-b https://youtu.be/jhufHnF6nEI 302
-# `v` was "venturaOrLater"
-/su-v https://youtu.be/lAoeKEFy9Zw 302
+# tahoe
+/du-th https://youtu.be/ceKliUSDvR4 302
 
 # SWITCH MACOS USER (current: 2.5.0+)
 # catalina, big sur, and monterey are same
@@ -93,6 +73,8 @@
 # sonoma and sequoia are the same
 /su-sn https://youtu.be/CV8AqA5nTqs 302
 /su-sq https://youtu.be/CV8AqA5nTqs 302
+# tahoe
+/su-th https://youtu.be/mjI6l_Hx-CU 302
 
 # edit children
 /a-c https://parents.gertrude.app/children 302
@@ -102,7 +84,6 @@
 ###########
 /s3-bg https://gertrude.nyc3.digitaloceanspaces.com/gradient-bg.png
 /s3-testapp https://gertrude.nyc3.digitaloceanspaces.com/testapp.zip
-
 
 ###########
 # ios app #

@@ -56,9 +56,20 @@ const AllowNotifications: React.FC<Props> = ({ step }) => {
           <div className="flex flex-col !ml-0">
             <Onboarding.Heading>Set notifications to “Alerts”</Onboarding.Heading>
             <Onboarding.Text className="mt-4 max-w-xl">
-              We just opened the {systemSettingsName} app. Set Gertrude’s notifications to
-              {` `}
-              <b>Alerts</b> as shown in the image to the right.
+              {osVersion.major >= 26 ? (
+                <>
+                  We just opened the {systemSettingsName} app. Enable notifications for
+                  Gertrude and set the <b>Alert Style</b> to <b>Persistent</b> as shown in
+                  the image to the right.
+                </>
+              ) : (
+                <>
+                  We just opened the {systemSettingsName} app. Set Gertrude’s
+                  notifications to
+                  {` `}
+                  <b>Alerts</b> as shown in the image to the right.
+                </>
+              )}
             </Onboarding.Text>
             <Onboarding.ButtonGroup
               primary="Done"
