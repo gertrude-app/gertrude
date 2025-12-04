@@ -53,9 +53,6 @@ Run `just` for an overview of the most commonly used dev commands. Check out the
 
 - the "next" devDependency in the monorepo root is required for typechecking the shared
   storybook instance
-- netlify's pnpm+monorepo support isn't quite there yet, had to add
-  `NETLIFY_USE_PNPM=true`
-  ([see here](https://github.com/netlify/build/issues/4648#issuecomment-1288804297))
 
 ## Typescript project references failure
 

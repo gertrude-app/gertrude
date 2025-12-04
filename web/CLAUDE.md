@@ -3,6 +3,10 @@
 Parental controls apps web monorepo. **Tech:** pnpm workspaces, nx, TypeScript, React,
 Next.js, Vite, Tailwind.
 
+## Notes
+
+- Never leave comments in code, unless something is extremely non-obvious.
+
 ## Main Apps
 
 - **`site/`** — Marketing site + docs (Next.js, port varies)
