@@ -1,3 +1,5 @@
+const COUNTRY_CODES_WITH_TRUNK_PREFIX = [`33`, `44`, `49`, `81`];
+
 export function parseE164(phoneNumber: string | undefined): string | null {
   if (!phoneNumber) {
     return null;
@@ -9,7 +11,14 @@ export function parseE164(phoneNumber: string | undefined): string | null {
   } else if (digits.length < 7 || digits.length > 15) {
     return null;
   } else {
-    return `+${digits}`;
+    let result = `+${digits}`;
+    for (const countryCode of COUNTRY_CODES_WITH_TRUNK_PREFIX) {
+      if (result.startsWith(`+${countryCode}0`)) {
+        result = `+${countryCode}${result.slice(countryCode.length + 2)}`;
+        break;
+      }
+    }
+    return result;
   }
 }
 
