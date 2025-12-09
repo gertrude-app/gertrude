@@ -16,7 +16,7 @@ const NotConnectedActions: React.FC<Props> = ({
   <MenuBarSized className="flex flex-col justify-center items-center relative">
     <button
       onClick={onBackClicked}
-      className="flex items-center text-md cursor-pointer absolute top-4 left-4 text-black/20 hover:text-black/40 dark:text-white/20 hover:dark:text-white/40 transition-colors"
+      className="flex items-center text-md cursor-pointer absolute top-4 left-4 os-gte-14:m-[14px] text-black/20 hover:text-black/40 dark:text-white/20 hover:dark:text-white/40 transition-colors"
     >
       <i className="fa-solid fa-chevron-left pr-2" />
       <span className="uppercase text-sm">back</span>
