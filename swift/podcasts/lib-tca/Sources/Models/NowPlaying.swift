@@ -125,7 +125,8 @@ extension NowPlaying {
       try NowPlayingModel.find(NowPlayingModel.ID(1)).fetchOne(db)
     }
     guard var model else {
-      unexpected(id: "8de8f996", assert: true)
+      // NB: used to log `8de8f996` here, but i got 34 during first 2 months
+      // i think because the system sometimes sends errant or delayed events
       return
     }
 

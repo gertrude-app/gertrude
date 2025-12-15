@@ -61,7 +61,8 @@ struct NowPlayingFeature {
         }
       case .system(let event):
         guard let nowPlaying = state.data else {
-          unexpected(id: "9faa5b69", "\(event)", assert: true)
+          // NB: I used to log `9faa5b69`, but in first 2 months, got about 100 of
+          // them, seems that the system sometimes sends errant or delayed events
           return .none
         }
         switch event {
