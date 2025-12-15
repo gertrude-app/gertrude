@@ -14,7 +14,7 @@ struct AppReducer: Sendable {
     @Fetch(CurrentSubscription()) var subscription: Subscription = .fallback
   }
 
-  @Reducer(state: .equatable, action: .equatable)
+  @Reducer
   enum Mode {
     case podcasts(PodcastsFeature)
     case onboarding(OnboardingFeature)
@@ -301,3 +301,6 @@ extension SharedKey where Self == InMemoryKey<Bool>.Default {
     Self[.inMemory("appInForeground"), default: true]
   }
 }
+
+extension AppReducer.Mode.State: Equatable {}
+extension AppReducer.Mode.Action: Equatable {}

@@ -27,7 +27,7 @@ struct PodcastsFeature {
     let mostRecentPubDate: Date?
   }
 
-  @Reducer(state: .equatable, action: .equatable)
+  @Reducer
   enum Destination {
     case addShow(AddShowFeature)
     case show(ShowFeature)
@@ -218,3 +218,6 @@ struct PodcastsFeature {
     }
   }
 }
+
+extension PodcastsFeature.Destination.State: Equatable {}
+extension PodcastsFeature.Destination.Action: Equatable {}

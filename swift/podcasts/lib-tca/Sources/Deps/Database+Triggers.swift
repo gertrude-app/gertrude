@@ -72,18 +72,18 @@ private func subscriptionRequired(_ db: Database) throws {
 
 private func touchUpdatedAtCols(_ db: Database) throws {
   try NowPlayingModel
-    .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
+    .createTemporaryTrigger(after: .update(touch: \.updatedAt))
     .execute(db)
   try Episode
-    .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
+    .createTemporaryTrigger(after: .update(touch: \.updatedAt))
     .execute(db)
   try Show
-    .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
+    .createTemporaryTrigger(after: .update(touch: \.updatedAt))
     .execute(db)
   try Record
-    .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
+    .createTemporaryTrigger(after: .update(touch: \.updatedAt))
     .execute(db)
   try Subscription
-    .createTemporaryTrigger(afterUpdateTouch: \.updatedAt)
+    .createTemporaryTrigger(after: .update(touch: \.updatedAt))
     .execute(db)
 }

@@ -4,7 +4,7 @@ import SQLiteData
 import Tagged
 
 @Table("subscription")
-struct Subscription {
+struct Subscription: Equatable {
   typealias ID = Tagged<Self, Int>
   let id: ID
   var status: Status

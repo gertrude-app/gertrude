@@ -17,7 +17,7 @@ struct ShowFeature {
     @Presents var destination: Destination.State?
   }
 
-  @Reducer(state: .equatable, action: .equatable)
+  @Reducer
   enum Destination {
     case episode(EpisodeFeature)
   }
@@ -212,3 +212,6 @@ extension ShowFeature.State {
     )
   }
 }
+
+extension ShowFeature.Destination.State: Equatable {}
+extension ShowFeature.Destination.Action: Equatable {}
