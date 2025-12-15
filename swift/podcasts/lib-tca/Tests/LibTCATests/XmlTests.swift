@@ -457,7 +457,7 @@ func stripsHtmlTags() throws {
     ("<p>First</p><p>Second</p>", "First Second"),
     (
       "<p>Send email to <a href=\"mailto:a@b.com\"><strong>a.b.com</strong></a>, or call us.</p>",
-      "Send email to a.b.com, or call us."
+      "Send email to a.b.com, or call us.",
     ),
     ("<p>Description\nwith\n\nnewline\n\n\nmore</p>", "Description with newline more"),
     ("<p>Line1</p>\n<p>Line2</p>", "Line1 Line2"),

@@ -26,7 +26,6 @@
 --enable emptyExtensions
 --enable environmentEntry
 --enable genericExtensions
---enable isEmpty
 --enable linebreakAtEndOfFile
 --enable noForceTryInTests
 --enable opaqueGenericParameters
@@ -37,3 +36,4 @@
 --enable todos
 --enable urlMacro
 --self insert
+
