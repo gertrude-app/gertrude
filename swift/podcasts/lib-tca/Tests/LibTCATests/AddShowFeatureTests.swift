@@ -7,7 +7,7 @@ import Testing
 @testable import LibTCA
 
 @MainActor struct AddShowFeatureTests {
-  @Test func duplicateShowSubscriptionFailsGracefully() async throws {
+  @Test func `duplicate show subscription fails gracefully`() async throws {
     let dupeFeed = "https://example.com/feed.rss"
     let clock = TestClock()
     let dismissed = LockIsolated(false)
@@ -49,7 +49,7 @@ import Testing
     }
   }
 
-  @Test func pinChangeFlow() async throws {
+  @Test func `pin change flow`() async throws {
     let keySaved = LockIsolated<[(KeychainClient.Key, Data)]>([])
     let clock = TestClock()
     let dismissed = LockIsolated(false)

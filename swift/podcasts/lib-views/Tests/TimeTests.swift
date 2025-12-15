@@ -4,7 +4,7 @@ import Testing
 @testable import LibViews
 
 @Test
-func formatDurationMinutesOnly() {
+func `format duration minutes only`() {
   #expect(formatShortDuration(0, lang: .english) == "0m")
   #expect(formatShortDuration(30, lang: .english) == "0m")
   #expect(formatShortDuration(60, lang: .english) == "1m")
@@ -14,7 +14,7 @@ func formatDurationMinutesOnly() {
 }
 
 @Test
-func formatDurationHoursAndMinutes() {
+func `format duration hours and minutes`() {
   #expect(formatShortDuration(3600, lang: .english) == "1h")
   #expect(formatShortDuration(3660, lang: .english) == "1h 1m")
   #expect(formatShortDuration(3900, lang: .english) == "1h 5m")
@@ -24,7 +24,7 @@ func formatDurationHoursAndMinutes() {
 }
 
 @Test
-func formatDurationLargeValues() {
+func `format duration large values`() {
   #expect(formatShortDuration(10800, lang: .english) == "3h")
   #expect(formatShortDuration(14400, lang: .english) == "4h")
   #expect(formatShortDuration(18000, lang: .english) == "5h")
@@ -34,7 +34,7 @@ func formatDurationLargeValues() {
 }
 
 @Test
-func formatDurationEdgeCases() {
+func `format duration edge cases`() {
   #expect(formatShortDuration(59, lang: .english) == "0m")
   #expect(formatShortDuration(61, lang: .english) == "1m")
   #expect(formatShortDuration(3599, lang: .english) == "59m")
@@ -43,7 +43,7 @@ func formatDurationEdgeCases() {
 }
 
 @Test
-func formatRelativeDateJustNow() {
+func `format relative date just now`() {
   let now = Date()
   let thirtySecondsAgo = now.addingTimeInterval(-30)
   let fiftyNineSecondsAgo = now.addingTimeInterval(-59)
@@ -54,7 +54,7 @@ func formatRelativeDateJustNow() {
 }
 
 @Test
-func formatRelativeDateMinutes() {
+func `format relative date minutes`() {
   let now = Date()
   let oneMinuteAgo = now.addingTimeInterval(-60)
   let fiveMinutesAgo = now.addingTimeInterval(-300)
@@ -66,7 +66,7 @@ func formatRelativeDateMinutes() {
 }
 
 @Test
-func formatRelativeDateHours() {
+func `format relative date hours`() {
   let now = Date()
   let oneHourAgo = now.addingTimeInterval(-3600)
   let threeHoursAgo = now.addingTimeInterval(-10800)
@@ -78,7 +78,7 @@ func formatRelativeDateHours() {
 }
 
 @Test
-func formatRelativeDateDays() {
+func `format relative date days`() {
   let now = Date()
   let oneDayAgo = now.addingTimeInterval(-86400)
   let fiveDaysAgo = now.addingTimeInterval(-432_000)
@@ -90,7 +90,7 @@ func formatRelativeDateDays() {
 }
 
 @Test
-func formatRelativeDateOldDates() {
+func `format relative date old dates`() {
   let calendar = Calendar.current
   let components = DateComponents(year: 2024, month: 8, day: 13, hour: 12, minute: 0)
   let augustDate = calendar.date(from: components)!
@@ -102,7 +102,7 @@ func formatRelativeDateOldDates() {
 }
 
 @Test
-func formatRelativeDateSpanish() {
+func `format relative date spanish`() {
   let now = Date()
   #expect(formatRelativeDate(now, lang: .spanish) == "justo ahora")
   #expect(formatRelativeDate(now.addingTimeInterval(-30), lang: .spanish) == "justo ahora")
@@ -115,7 +115,7 @@ func formatRelativeDateSpanish() {
 }
 
 @Test
-func formatShortDurationSpanish() {
+func `format short duration spanish`() {
   #expect(formatShortDuration(0, lang: .spanish) == "0min")
   #expect(formatShortDuration(60, lang: .spanish) == "1min")
   #expect(formatShortDuration(150, lang: .spanish) == "2min")
@@ -125,7 +125,7 @@ func formatShortDurationSpanish() {
 }
 
 @Test
-func formatRelativeDateOldDatesWithLocale() {
+func `format relative date old dates with locale`() {
   let calendar = Calendar.current
   let components = DateComponents(year: 2024, month: 8, day: 13, hour: 12, minute: 0)
   let augustDate = calendar.date(from: components)!
@@ -135,7 +135,7 @@ func formatRelativeDateOldDatesWithLocale() {
 }
 
 @Test
-func formatTimeSecondsOnly() {
+func `format time seconds only`() {
   #expect(formatPlayerTime(0) == "0:00")
   #expect(formatPlayerTime(5) == "0:05")
   #expect(formatPlayerTime(30) == "0:30")
@@ -143,7 +143,7 @@ func formatTimeSecondsOnly() {
 }
 
 @Test
-func formatTimeMinutesAndSeconds() {
+func `format time minutes and seconds`() {
   #expect(formatPlayerTime(60) == "1:00")
   #expect(formatPlayerTime(65) == "1:05")
   #expect(formatPlayerTime(125) == "2:05")
@@ -153,7 +153,7 @@ func formatTimeMinutesAndSeconds() {
 }
 
 @Test
-func formatTimeHoursMinutesSeconds() {
+func `format time hours minutes seconds`() {
   #expect(formatPlayerTime(3600) == "1:00:00")
   #expect(formatPlayerTime(3605) == "1:00:05")
   #expect(formatPlayerTime(3665) == "1:01:05")
@@ -163,7 +163,7 @@ func formatTimeHoursMinutesSeconds() {
 }
 
 @Test
-func formatRemainingTimeWithValidDuration() {
+func `format remaining time with valid duration`() {
   #expect(formatRemainingPlayerTime(progress: 0, durationSeconds: 3600) == "-1:00:00")
   #expect(formatRemainingPlayerTime(progress: 30, durationSeconds: 3600) == "-59:30")
   #expect(formatRemainingPlayerTime(progress: 3570, durationSeconds: 3600) == "-0:30")
@@ -172,14 +172,14 @@ func formatRemainingTimeWithValidDuration() {
 }
 
 @Test
-func formatRemainingTimeWithNilDuration() {
+func `format remaining time with nil duration`() {
   #expect(formatRemainingPlayerTime(progress: 0, durationSeconds: nil) == "0:00")
   #expect(formatRemainingPlayerTime(progress: 1000, durationSeconds: nil) == "0:00")
   #expect(formatRemainingPlayerTime(progress: 3665, durationSeconds: nil) == "0:00")
 }
 
 @Test
-func formatRemainingTimeEdgeCases() {
+func `format remaining time edge cases`() {
   #expect(formatRemainingPlayerTime(progress: -10, durationSeconds: 3600) == "-1:00:00")
   #expect(formatRemainingPlayerTime(progress: 0, durationSeconds: 0) == "0:00")
   #expect(formatRemainingPlayerTime(progress: 0, durationSeconds: -100) == "0:00")

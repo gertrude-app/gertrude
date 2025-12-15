@@ -8,7 +8,7 @@ import Testing
 @testable import LibTCA
 
 @MainActor struct PodcastsFeatureTests {
-  @Test func showsTrialConfirmDialogue() async throws {
+  @Test func `shows trial confirm dialogue`() async throws {
     let clock = TestClock()
     try await withDependencies {
       $0.date = .constant(.reference)
@@ -53,7 +53,7 @@ import Testing
     }
   }
 
-  @Test func doesNotShowTrialDialogueWhenAlreadyShown() async throws {
+  @Test func `does not show trial dialogue when already shown`() async throws {
     try await withDependencies {
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()

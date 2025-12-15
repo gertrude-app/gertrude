@@ -9,7 +9,7 @@ import Testing
 @testable import LibTCA
 
 @MainActor struct NowPlayingTests {
-  @Test func pauseAndResumeCurrentPlayingEpisode() async throws {
+  @Test func `pause and resume current playing episode`() async throws {
     let pauseInvocations = LockIsolated(0)
     let playInvocations = LockIsolated<[Episode.ID]>([])
     await withDependencies {
@@ -43,7 +43,7 @@ import Testing
     }
   }
 
-  @Test func playCurrentPlayingEpisodeWhenNotDownloaded() async throws {
+  @Test func `play current playing episode when not downloaded`() async throws {
     let clock = TestClock()
     let playInvocations = LockIsolated<[Episode.ID]>([])
     let downloadInvocations = LockIsolated<[Episode.ID]>([])
@@ -106,7 +106,7 @@ import Testing
     }
   }
 
-  @Test func playCurrentPlayingEpisodeWhenNotDownloadedAndNoNetwork() async throws {
+  @Test func `play current playing episode when not downloaded and no network`() async throws {
     let clock = TestClock()
     let playInvocations = LockIsolated<[Episode.ID]>([])
     let downloadInvocations = LockIsolated<[Episode.ID]>([])
@@ -169,7 +169,7 @@ import Testing
     }
   }
 
-  @Test func downloadError() async throws {
+  @Test func `download error`() async throws {
     let clock = TestClock()
     // let playInvocations = LockIsolated<[Episode.ID]>([])
     let downloadInvocations = LockIsolated<[Episode.ID]>([])
@@ -221,7 +221,7 @@ import Testing
     }
   }
 
-  @Test func preemptNowPlayingWithNotDownloaded() async throws {
+  @Test func `preempt now playing with not downloaded`() async throws {
     let clock = TestClock()
     let playInvocations = LockIsolated<[Episode.ID]>([])
     let downloadInvocations = LockIsolated<[Episode.ID]>([])
@@ -287,7 +287,7 @@ import Testing
     }
   }
 
-  @Test func preemptNowPlayingWithDownloaded() async throws {
+  @Test func `preempt now playing with downloaded`() async throws {
     let clock = TestClock()
     let playInvocations = LockIsolated<[Episode.ID]>([])
     let pauseInvocations = LockIsolated(0)

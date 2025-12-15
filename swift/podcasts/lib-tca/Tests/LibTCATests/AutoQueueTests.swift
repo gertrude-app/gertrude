@@ -14,7 +14,7 @@ import Testing
   }
 })
 struct AutoQueueTests {
-  @Test func episodeQueueReturnsEpisodesInReverseOrder() async throws {
+  @Test func `episode queue gives episodes in reverse order`() async throws {
     @Dependency(\.db) var database
     let current = Episode.mock(3, showId: 1) { $0.pubDate += .days(2) }
     try await database.write { db in
@@ -41,7 +41,7 @@ struct AutoQueueTests {
     expectNoDifference([4, 5, 2, 1], queue.map(\.episodeNumber))
   }
 
-  @Test func episodeQueueRespectsOldestFirstSortOrder() async throws {
+  @Test func `episode queue respects oldest first sort order`() async throws {
     @Dependency(\.db) var database
     let show = Show.mock(1) { $0.sort = .oldestToNewest }
     let current = Episode.mock(3, showId: 1) { $0.pubDate += .days(2) }
@@ -74,7 +74,7 @@ struct AutoQueueTests {
     expectNoDifference([4, 5, 2, 1], queue.map(\.episodeNumber))
   }
 
-  @Test func episodeQueueOutsideReturnsMostRecentlyPlayedPerShow() async throws {
+  @Test func `episode queue outside gives most recently played per show`() async throws {
     @Dependency(\.db) var database
     try await database.write { db in
       try Episode

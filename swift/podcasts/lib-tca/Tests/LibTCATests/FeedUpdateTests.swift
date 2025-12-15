@@ -6,7 +6,7 @@ import Testing
 
 @testable import LibTCA
 
-@Test func simpleFeedUpdate() {
+@Test func `simple feed update`() {
   let updates = _feedUpdates(input: .init(
     feeds: [
       Feed(show: .mock(1), episodes: []),
@@ -17,7 +17,7 @@ import Testing
   expectNoDifference(updates, .init(showUpdates: [.mock(2) { $0.name = "After" }]))
 }
 
-@Test func artworkUrlChanged() {
+@Test func `artwork url changed`() {
   let updates = _feedUpdates(input: .init(
     feeds: [Feed(show: .mock(1) { $0.artworkUrl = "https://a.com/new.jpg" }, episodes: [])],
     shows: [.mock(1) { $0.artworkUrl = "https://a.com/old.jpg" }],
@@ -29,7 +29,7 @@ import Testing
   ))
 }
 
-@Test func newEpisodeAdded() {
+@Test func `new episode added`() {
   let updates = _feedUpdates(input: .init(
     feeds: [Feed(show: .mock(1), episodes: [.mock(1, showId: 1), .mock(2, showId: 1)])],
     shows: [.mock(1)],
@@ -42,7 +42,7 @@ import Testing
   ))
 }
 
-@Test func episodeDeleted() {
+@Test func `episode deleted`() {
   let updates = _feedUpdates(input: .init(
     feeds: [Feed(show: .mock(1), episodes: [.mock(1, showId: 1)])],
     shows: [.mock(1)],
@@ -52,7 +52,7 @@ import Testing
   expectNoDifference(updates, .init(deleteEpisodes: [.init(2)]))
 }
 
-@Test func episodeTitleChanged() {
+@Test func `episode title changed`() {
   let updates = _feedUpdates(input: .init(
     feeds: [Feed(
       show: .mock(1),
@@ -70,7 +70,7 @@ import Testing
   ))
 }
 
-@Test func episodeAudioPropertiesChanged() {
+@Test func `episode audio properties changed`() {
   let updates = _feedUpdates(input: .init(
     feeds: [Feed(
       show: .mock(1),
