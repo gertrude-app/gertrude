@@ -178,6 +178,16 @@ func _performFeedUpdates(_ updates: FeedUpdates) async -> [Episode] {
     }
   }
 
+  for action in updates.actions {
+    if case .invalidateEpisodeAudio(let episodeId) = action {
+      database.tryRead { db in
+        if let episode = try Episode.find(episodeId).fetchOne(db) {
+          episode.removeLocalAudioFile()
+        }
+      }
+    }
+  }
+
   let addedEpisodes = database.tryWrite { db in
     if !updates.showUpdates.isEmpty {
       try Show.upsert { updates.showUpdates }.execute(db)
@@ -198,16 +208,9 @@ func _performFeedUpdates(_ updates: FeedUpdates) async -> [Episode] {
   }
 
   for action in updates.actions {
-    switch action {
-    case .invalidateEpisodeAudio(let episodeId):
-      database.tryRead { db in
-        if let episode = try Episode.find(episodeId).fetchOne(db) {
-          episode.removeLocalAudioFile()
-        }
-      }
-    case .replaceShowArtwork(let showId, let artworkUrl):
+    if case .replaceShowArtwork(let showId, let artworkUrl) = action {
       if var show = database.tryRead({ try Show.find(showId).fetchOne($0) }) {
-        show.artworkUrl = artworkUrl // should be unnecessary, but allows reordering
+        show.artworkUrl = artworkUrl
         await podcasts.downloadArtwork(for: show)
       }
     }

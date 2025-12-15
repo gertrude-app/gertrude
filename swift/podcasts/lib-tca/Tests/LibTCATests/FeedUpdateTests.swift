@@ -185,6 +185,45 @@ import Testing
   }
 }
 
+@Test func `audio invalidation removes file with old audioType`() async throws {
+  let fetchedFeed = Feed(
+    show: .mock(1),
+    episodes: [.mock(1, showId: 1) { $0.audioType = .m4a }],
+  )
+
+  let removedUrls = LockIsolated<[URL]>([])
+
+  try await withDependencies {
+    $0.defaultDatabase = try! appDatabase()
+    $0.date = .constant(.reference)
+    $0.podcasts.getFeed = { _ in fetchedFeed }
+    $0.podcasts.downloadArtwork = { _ in }
+    $0.fileSystem.removeItem = { url in removedUrls.withValue { $0.append(url) } }
+  } operation: {
+    @Dependency(\.db) var database
+
+    try await database.write { db in
+      try Show.insert { [Show.mock(1)] }.execute(db)
+      try Episode
+        .insert { [Episode.mock(1, showId: 1) {
+          $0.audioType = .mp3 // <-- old audio type
+          $0.downloadedAt = .reference
+        }] }
+        .execute(db)
+    }
+
+    _ = await _performFeedUpdates(_feedUpdates(input: _prepareFeedUpdateInputData()))
+
+    #expect(removedUrls.value.count == 1)
+    #expect(removedUrls.value[0].lastPathComponent == "show-1-ep-1.mp3")
+
+    let retrieved = database.tryRead { try Episode.find(Episode.ID(1)).fetchOne($0) }
+    #expect(retrieved?.audioType == .m4a)
+    #expect(retrieved!.downloadedAt == nil)
+    #expect(retrieved?.localAudioUrl.lastPathComponent == "show-1-ep-1.m4a")
+  }
+}
+
 @Test func `audio invalidation should clear downloadedAt`() async throws {
   let fetchedFeed = Feed(
     show: .mock(1),
