@@ -71,7 +71,15 @@ struct ShowFeature {
           return .run { _ in
             self.database.tryWrite { db in
               try Episode
-                .update { $0.completedAt = episode.completedAt == nil ? self.date.now : nil }
+                .update {
+                  if episode.completedAt == nil {
+                    $0.completedAt = self.date.now
+                  } else {
+                    $0.completedAt = nil
+                    $0.progress = 0
+                    $0.lastPlayedAt = nil
+                  }
+                }
                 .where { $0.id == episode.id }
                 .execute(db)
             }

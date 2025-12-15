@@ -34,6 +34,8 @@ private func episodeLastPlayedAt(_ db: Database) throws {
       Episode
         .find(new.id)
         .update { $0.lastPlayedAt = #sql("datetime('subsec')") }
+    } when: { _, new in
+      new.progress > 0
     })
     .execute(db)
 }
