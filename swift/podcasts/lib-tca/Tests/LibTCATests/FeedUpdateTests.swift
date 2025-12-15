@@ -192,7 +192,6 @@ import Testing
   )
 
   let removedUrls = LockIsolated<[URL]>([])
-
   try await withDependencies {
     $0.defaultDatabase = try! appDatabase()
     $0.date = .constant(.reference)

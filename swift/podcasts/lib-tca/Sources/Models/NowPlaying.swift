@@ -173,11 +173,11 @@ extension NowPlaying {
       unexpected(id: "1e83d193", assert: true)
       return
     }
-    try await dep(\.audio).play(episode: episode, show: show)
+    try await _play(episode: episode, show: show)
   }
 
   private static func onDelete(prevEpisodeId: Episode.ID, wasPlaying: Bool) async throws {
-    try await dep(\.audio).pause()
+    await dep(\.audio).pause()
   }
 
   private static func episodeChanged(_ episodeId: Episode.ID, _ isPlaying: Bool) async throws {
@@ -186,7 +186,7 @@ extension NowPlaying {
       return
     }
     if isPlaying {
-      try await dep(\.audio).play(episode: episode, show: show)
+      try await _play(episode: episode, show: show)
     }
   }
 
@@ -195,13 +195,21 @@ extension NowPlaying {
     _ wasPlaying: Bool,
   ) async throws {
     if wasPlaying {
-      try await dep(\.audio).pause()
+      await dep(\.audio).pause()
       return
     }
     guard let (episode, show) = dep(\.db).episodeWithShow(episodeId) else {
       unexpected(id: "20df6265", assert: true)
       return
     }
+    try await _play(episode: episode, show: show)
+  }
+}
+
+private func _play(episode: Episode, show: Show) async throws {
+  if dep(\.fileSystem).fileExists(at: episode.localAudioUrl) {
     try await dep(\.audio).play(episode: episode, show: show)
+  } else {
+    unexpected(id: "eeaa7b30", "episode play without local file")
   }
 }

@@ -74,7 +74,7 @@ import Testing
   }
 
   @Test func `settings change pin delegate presents add show with change pin screen`() async throws {
-    try await withDependencies {
+    await withDependencies {
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
       $0.continuousClock = TestClock()

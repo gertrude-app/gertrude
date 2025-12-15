@@ -10,7 +10,7 @@ import Synchronization
 @DependencyClient
 struct AudioPlayer: Sendable {
   var play: @Sendable (_ episode: Episode, _ show: Show) async throws -> Void
-  var pause: @Sendable () async throws -> Void
+  var pause: @Sendable () async -> Void
   var seek: @Sendable (_ to: Double) async -> Void = { _ in }
   var getPlayingPosition: @Sendable () async -> Double?
   var systemEvents: @Sendable () -> AnyPublisher<SystemEvent, Never> = {
@@ -95,7 +95,7 @@ private final class Player: Sendable {
     if self.episode.withLock({ $0?.id }) == episode.id {
       self.player.play()
     } else {
-      self.player.play(new: episode)
+      try self.player.play(new: episode)
       self.setupCompletionObserver()
     }
     self.episode.withLock { $0 = episode }
@@ -345,7 +345,7 @@ extension Mutex<AVPlayerData?> {
     }
   }
 
-  func play(new episode: Episode) {
+  func play(new episode: Episode) throws {
     self.withLock {
       if let current = $0, let token = current.timer {
         current.player.removeTimeObserver(token)
