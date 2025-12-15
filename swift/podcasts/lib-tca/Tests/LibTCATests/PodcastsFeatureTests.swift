@@ -8,7 +8,7 @@ import Testing
 @testable import LibTCA
 
 @MainActor struct PodcastsFeatureTests {
-  @Test func showsTrialConfirmDialogue() async throws {
+  @Test func `shows trial confirm dialogue`() async throws {
     let clock = TestClock()
     try await withDependencies {
       $0.date = .constant(.reference)
@@ -53,7 +53,7 @@ import Testing
     }
   }
 
-  @Test func doesNotShowTrialDialogueWhenAlreadyShown() async throws {
+  @Test func `does not show trial dialogue when already shown`() async throws {
     try await withDependencies {
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
@@ -70,6 +70,24 @@ import Testing
       }
 
       await store.finish()
+    }
+  }
+
+  @Test func `settings change pin delegate presents add show with change pin screen`() async throws {
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase()
+      $0.continuousClock = TestClock()
+    } operation: {
+      var state = PodcastsFeature.State()
+      state.destination = .settings(.init())
+
+      let store = TestStore(initialState: state, reducer: PodcastsFeature.init)
+      store.exhaustivity = .off
+
+      await store.send(.destination(.presented(.settings(.delegate(.changePinRequested))))) {
+        $0.destination = .addShow(.init(screen: .changePinInstructions))
+      }
     }
   }
 }

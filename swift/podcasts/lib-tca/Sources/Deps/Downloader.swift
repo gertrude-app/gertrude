@@ -57,12 +57,21 @@ func trackedDownload(episode: Episode) async -> Result<Void, AppError> {
 
 func ensureDownloaded(episode: Episode) async -> Result<Void, AppError> {
   if episode.downloaded {
-    .success(())
-  } else if dep(\.network).isConnected() == false {
-    .failure(.init(message: lstr(.episodeDownloadNoInternet)))
-  } else {
-    await trackedDownload(episode: episode)
+    if dep(\.fileSystem).fileExists(at: episode.localAudioUrl) {
+      return .success(())
+    }
+    dep(\.db).tryWrite { db in
+      try Episode
+        .update { $0.downloadedAt = nil }
+        .where { $0.id == episode.id }
+        .execute(db)
+    }
+    unexpected(id: "45692a47", "missing file for downloaded episode")
   }
+  if dep(\.network).isConnected() == false {
+    return .failure(.init(message: lstr(.episodeDownloadNoInternet)))
+  }
+  return await trackedDownload(episode: episode)
 }
 
 private func determineMissingDuration(for episode: Episode) async throws -> Int? {

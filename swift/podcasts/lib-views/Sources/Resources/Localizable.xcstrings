@@ -270,6 +270,40 @@
         }
       }
     },
+    "settings.security.header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SECURITY"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SEGURIDAD"
+          }
+        }
+      }
+    },
+    "settings.changePin" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change PIN"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar PIN"
+          }
+        }
+      }
+    },
     "settings.subscription.header" : {
       "extractionState" : "manual",
       "localizations" : {

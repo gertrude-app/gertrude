@@ -14,6 +14,11 @@ struct SettingsFeature {
   enum Action: Equatable {
     case view(SettingsView.Event)
     case finishPurchase
+    case delegate(DelegateAction)
+  }
+
+  enum DelegateAction: Equatable {
+    case changePinRequested
   }
 
   @Dependency(\.date) var date
@@ -55,8 +60,15 @@ struct SettingsFeature {
           }
           await send(.finishPurchase)
         }
+
+      case .view(.changePinTapped):
+        return .send(.delegate(.changePinRequested))
+
       case .finishPurchase:
         state.purchaseInProgress = false
+        return .none
+
+      case .delegate:
         return .none
       }
     }

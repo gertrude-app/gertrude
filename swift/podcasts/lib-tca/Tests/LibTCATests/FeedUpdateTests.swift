@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import CustomDump
 import Dependencies
 import DependenciesTestSupport
@@ -6,7 +7,7 @@ import Testing
 
 @testable import LibTCA
 
-@Test func simpleFeedUpdate() {
+@Test func `simple feed update`() {
   let updates = _feedUpdates(input: .init(
     feeds: [
       Feed(show: .mock(1), episodes: []),
@@ -17,7 +18,7 @@ import Testing
   expectNoDifference(updates, .init(showUpdates: [.mock(2) { $0.name = "After" }]))
 }
 
-@Test func artworkUrlChanged() {
+@Test func `artwork url changed`() {
   let updates = _feedUpdates(input: .init(
     feeds: [Feed(show: .mock(1) { $0.artworkUrl = "https://a.com/new.jpg" }, episodes: [])],
     shows: [.mock(1) { $0.artworkUrl = "https://a.com/old.jpg" }],
@@ -29,7 +30,7 @@ import Testing
   ))
 }
 
-@Test func newEpisodeAdded() {
+@Test func `new episode added`() {
   let updates = _feedUpdates(input: .init(
     feeds: [Feed(show: .mock(1), episodes: [.mock(1, showId: 1), .mock(2, showId: 1)])],
     shows: [.mock(1)],
@@ -42,7 +43,7 @@ import Testing
   ))
 }
 
-@Test func episodeDeleted() {
+@Test func `episode deleted`() {
   let updates = _feedUpdates(input: .init(
     feeds: [Feed(show: .mock(1), episodes: [.mock(1, showId: 1)])],
     shows: [.mock(1)],
@@ -52,7 +53,7 @@ import Testing
   expectNoDifference(updates, .init(deleteEpisodes: [.init(2)]))
 }
 
-@Test func episodeTitleChanged() {
+@Test func `episode title changed`() {
   let updates = _feedUpdates(input: .init(
     feeds: [Feed(
       show: .mock(1),
@@ -70,7 +71,7 @@ import Testing
   ))
 }
 
-@Test func episodeAudioPropertiesChanged() {
+@Test func `episode audio properties changed`() {
   let updates = _feedUpdates(input: .init(
     feeds: [Feed(
       show: .mock(1),
@@ -181,6 +182,93 @@ import Testing
     expectNoDifference(Set(updates.actions), Set([
       .replaceShowArtwork(showId: 2, artworkUrl: "https://new.com/artwork2.jpg"),
     ]))
+  }
+}
+
+@Test func `audio invalidation removes file with old audioType`() async throws {
+  let fetchedFeed = Feed(
+    show: .mock(1),
+    episodes: [.mock(1, showId: 1) { $0.audioType = .m4a }],
+  )
+
+  let removedUrls = LockIsolated<[URL]>([])
+  try await withDependencies {
+    $0.defaultDatabase = try! appDatabase()
+    $0.date = .constant(.reference)
+    $0.podcasts.getFeed = { _ in fetchedFeed }
+    $0.podcasts.downloadArtwork = { _ in }
+    $0.fileSystem.removeItem = { url in removedUrls.withValue { $0.append(url) } }
+  } operation: {
+    @Dependency(\.db) var database
+
+    try await database.write { db in
+      try Show.insert { [Show.mock(1)] }.execute(db)
+      try Episode
+        .insert { [Episode.mock(1, showId: 1) {
+          $0.audioType = .mp3 // <-- old audio type
+          $0.downloadedAt = .reference
+        }] }
+        .execute(db)
+    }
+
+    _ = await _performFeedUpdates(_feedUpdates(input: _prepareFeedUpdateInputData()))
+
+    #expect(removedUrls.value.count == 1)
+    #expect(removedUrls.value[0].lastPathComponent == "show-1-ep-1.mp3")
+
+    let retrieved = database.tryRead { try Episode.find(Episode.ID(1)).fetchOne($0) }
+    #expect(retrieved?.audioType == .m4a)
+    #expect(retrieved!.downloadedAt == nil)
+    #expect(retrieved?.localAudioUrl.lastPathComponent == "show-1-ep-1.m4a")
+  }
+}
+
+@Test func `audio invalidation should clear downloadedAt`() async throws {
+  let fetchedFeed = Feed(
+    show: .mock(1),
+    episodes: [
+      .mock(1, showId: 1) { $0.duration = 7200 },
+    ],
+  )
+
+  let removedUrls = LockIsolated<[URL]>([])
+
+  try await withDependencies {
+    $0.defaultDatabase = try! appDatabase()
+    $0.date = .constant(.reference)
+    $0.podcasts.getFeed = { _ in fetchedFeed }
+    $0.podcasts.downloadArtwork = { _ in }
+    $0.fileSystem.removeItem = { url in removedUrls.withValue { $0.append(url) } }
+  } operation: {
+    @Dependency(\.db) var database
+
+    try await database.write { db in
+      try Show.insert { [Show.mock(1)] }.execute(db)
+      try Episode
+        .insert { [Episode.mock(1, showId: 1) {
+          $0.duration = 7301 // <- different from updated feed
+          $0.downloadedAt = .reference
+        }] }
+        .execute(db)
+    }
+
+    let episodeBefore = database.tryRead { db in
+      try Episode.find(Episode.ID(1)).fetchOne(db)
+    }
+    #expect(episodeBefore?.downloadedAt == .reference)
+
+    let updates = await _feedUpdates(input: _prepareFeedUpdateInputData())
+    #expect(updates.actions == [.invalidateEpisodeAudio(1)])
+
+    _ = await _performFeedUpdates(updates)
+
+    let episodeAfter = database.tryRead { db in
+      try Episode.find(Episode.ID(1)).fetchOne(db)
+    }
+
+    #expect(episodeAfter?.downloadedAt == nil)
+    #expect(episodeAfter?.duration == 7200)
+    #expect(removedUrls.value.count == 1)
   }
 }
 

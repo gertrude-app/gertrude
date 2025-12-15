@@ -5,7 +5,7 @@ import Testing
 @testable import LibTCA
 
 @Test
-func searchPodcastsWithValidQuery() async throws {
+func `search podcasts with valid query`() async throws {
   let results = try await searchPodcastsLive(
     query: "this american life",
     locale: Locale(identifier: "en_US"),

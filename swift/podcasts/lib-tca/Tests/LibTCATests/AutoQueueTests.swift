@@ -14,7 +14,7 @@ import Testing
   }
 })
 struct AutoQueueTests {
-  @Test func episodeQueueReturnsEpisodesInReverseOrder() async throws {
+  @Test func `episode queue gives episodes in reverse order`() async throws {
     @Dependency(\.db) var database
     let current = Episode.mock(3, showId: 1) { $0.pubDate += .days(2) }
     try await database.write { db in
@@ -41,7 +41,40 @@ struct AutoQueueTests {
     expectNoDifference([4, 5, 2, 1], queue.map(\.episodeNumber))
   }
 
-  @Test func episodeQueueOutsideReturnsMostRecentlyPlayedPerShow() async throws {
+  @Test func `episode queue respects oldest first sort order`() async throws {
+    @Dependency(\.db) var database
+    let show = Show.mock(1) { $0.sort = .oldestToNewest }
+    let current = Episode.mock(3, showId: 1) { $0.pubDate += .days(2) }
+    try await database.write { db in
+      try Show.update { $0.sort = .oldestToNewest }
+        .where { $0.id.eq(show.id) }
+        .execute(db)
+      try Episode
+        .insert { [
+          .mock(6, showId: 1) {
+            $0.pubDate += .days(5)
+            $0.progress = 10.2
+          },
+          .mock(5, showId: 1) { $0.pubDate += .days(4) },
+          .mock(4, showId: 1) { $0.pubDate += .days(3) },
+          current,
+          .mock(2, showId: 1) { $0.pubDate += .days(1) },
+          .mock(1, showId: 1) { $0.pubDate = .reference },
+        ] }
+        .execute(db)
+      try NowPlayingModel.insert {
+        NowPlayingModel(episodeId: 3, isPlaying: true)
+      }.execute(db)
+    }
+
+    let nowPlaying = try await database.read { try NowPlaying().fetch($0)! }
+
+    let queue = AutoQueue.episodeQueue(after: nowPlaying)
+
+    expectNoDifference([4, 5, 2, 1], queue.map(\.episodeNumber))
+  }
+
+  @Test func `episode queue outside gives most recently played per show`() async throws {
     @Dependency(\.db) var database
     try await database.write { db in
       try Episode

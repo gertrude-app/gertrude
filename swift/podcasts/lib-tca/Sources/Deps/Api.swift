@@ -9,7 +9,7 @@ struct ApiClient: Sendable {
     _ id: String,
     _ kind: EventKind,
     _ label: String,
-    _ detail: String?
+    _ detail: String?,
   ) async throws -> Void
   var productIds: @Sendable () async throws -> [String]
   var createDatabaseUpload: @Sendable (_ installId: UUID) async throws -> URL

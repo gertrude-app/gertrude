@@ -4,7 +4,7 @@ import XCTest
 @testable import LibTCA
 
 @Test
-func parsePodcastFeedBasic() throws {
+func `parse podcast feed basic`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -82,7 +82,7 @@ func parsePodcastFeedBasic() throws {
 }
 
 @Test
-func parsePodcastFeedMinimal() throws {
+func `parse podcast feed minimal`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
@@ -124,7 +124,7 @@ func parsePodcastFeedMinimal() throws {
 }
 
 @Test
-func parseDurationFormats() throws {
+func `parse duration formats`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
@@ -176,7 +176,7 @@ func parseDurationFormats() throws {
 }
 
 @Test
-func parseInvalidXML() {
+func `parse invalid XML`() {
   let invalidXml = "This is not XML"
 
   #expect(throws: XMLParseError.self) {
@@ -185,7 +185,7 @@ func parseInvalidXML() {
 }
 
 @Test
-func parseEmptyFeed() {
+func `parse empty feed`() {
   let emptyXml = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
@@ -201,7 +201,7 @@ func parseEmptyFeed() {
 }
 
 @Test
-func parseMissingGuid() {
+func `parse missing guid`() {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
@@ -223,7 +223,7 @@ func parseMissingGuid() {
 }
 
 @Test
-func parseAudioTypes() throws {
+func `parse audio types`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
@@ -277,7 +277,7 @@ func parseAudioTypes() throws {
 }
 
 @Test
-func parseRealWorldFeed() throws {
+func `parse real world feed`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -335,7 +335,7 @@ func parseRealWorldFeed() throws {
 }
 
 @Test
-func parseSpanishPodcastFeed() throws {
+func `parse spanish podcast feed`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/">
@@ -425,7 +425,7 @@ func parseSpanishPodcastFeed() throws {
 }
 
 @Test
-func stripsHtmlTags() throws {
+func `strips html tags`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -457,7 +457,7 @@ func stripsHtmlTags() throws {
     ("<p>First</p><p>Second</p>", "First Second"),
     (
       "<p>Send email to <a href=\"mailto:a@b.com\"><strong>a.b.com</strong></a>, or call us.</p>",
-      "Send email to a.b.com, or call us."
+      "Send email to a.b.com, or call us.",
     ),
     ("<p>Description\nwith\n\nnewline\n\n\nmore</p>", "Description with newline more"),
     ("<p>Line1</p>\n<p>Line2</p>", "Line1 Line2"),
@@ -472,7 +472,7 @@ func stripsHtmlTags() throws {
 }
 
 @Test
-func parseTALFeed() throws {
+func `parse TAL feed`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="utf-8"?>
   <rss version="2.0" xml:base="https://www.thisamericanlife.org/podcast/rss.xml"  xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/">
@@ -961,7 +961,7 @@ func parseTALFeed() throws {
 }
 
 @Test
-func skipsInvalidEpisodes() throws {
+func `skips invalid episodes`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -1002,7 +1002,7 @@ func skipsInvalidEpisodes() throws {
 }
 
 @Test
-func failsOnNoValidEpisodes() throws {
+func `fails on no valid episodes`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -1034,7 +1034,7 @@ func failsOnNoValidEpisodes() throws {
 }
 
 @Test
-func hoyHablamosArtwork() throws {
+func `hoy hablamos artwork`() throws {
   // Test with real feed content that has both itunes:image and image/url
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
@@ -1075,7 +1075,7 @@ func hoyHablamosArtwork() throws {
 }
 
 @Test
-func episodeWithoutDurationIsNil() throws {
+func `episode without duration is nil`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">

@@ -48,6 +48,7 @@ build-app:
     -scheme App -configuration Debug build 
 
 clean:
+  @rm -rf lib-tca/.build lib-core/.build lib-views/.build
   @find lib-tca lib-core lib-views -type f \( -name '*.o' -o -name '*.d' -o -name '*.swiftdeps' -o -name '*.swiftdeps~' \) -delete
 
 sim-db:

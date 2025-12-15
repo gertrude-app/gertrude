@@ -27,7 +27,7 @@ struct PodcastsFeature {
     let mostRecentPubDate: Date?
   }
 
-  @Reducer(state: .equatable, action: .equatable)
+  @Reducer
   enum Destination {
     case addShow(AddShowFeature)
     case show(ShowFeature)
@@ -141,6 +141,10 @@ struct PodcastsFeature {
         state.destination = .settings(.init())
         return .none
 
+      case .destination(.presented(.settings(.delegate(.changePinRequested)))):
+        state.destination = .addShow(.init(screen: .changePinInstructions))
+        return .none
+
       case .addToDownloadQueue(let episodes):
         state.downloadQueue += episodes
         return state.downloadQueue.isEmpty ? .none : .send(.startNextDownload)
@@ -218,3 +222,6 @@ struct PodcastsFeature {
     }
   }
 }
+
+extension PodcastsFeature.Destination.State: Equatable {}
+extension PodcastsFeature.Destination.Action: Equatable {}

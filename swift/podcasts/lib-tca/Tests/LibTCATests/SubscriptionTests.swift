@@ -9,7 +9,7 @@ import Testing
 @testable import LibTCA
 
 @MainActor struct SubscriptionTests {
-  @Test func purchaseSubscriptionDuringTrial() async throws {
+  @Test func `purchase subscription during trial`() async throws {
     let finishedTxns = LockIsolated<[Transaction.ID]>([])
     try await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
@@ -49,7 +49,7 @@ import Testing
     }
   }
 
-  @Test func resolvePendingTransaction_fullIntegration() async throws {
+  @Test func `resolve pending transaction full integration`() async throws {
     let finishedTxns = LockIsolated<[Transaction.ID]>([])
     let transactions = AsyncStream<TransactionData>.makeStream()
     try await withDependencies {
@@ -119,7 +119,7 @@ import Testing
     }
   }
 
-  @Test func transactionRevoked() async throws {
+  @Test func `transaction revoked`() async throws {
     let finishedTxns = LockIsolated<[Transaction.ID]>([])
     try await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
@@ -143,7 +143,7 @@ import Testing
     }
   }
 
-  @Test func transactionExpires() async throws {
+  @Test func `transaction expires`() async throws {
     let finishedTxns = LockIsolated<[Transaction.ID]>([])
     try await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
@@ -167,7 +167,7 @@ import Testing
     }
   }
 
-  @Test func familySharingSubscription() async throws {
+  @Test func `family sharing subscription`() async throws {
     let transactions = AsyncStream<TransactionData>.makeStream()
     let finishedTxns = LockIsolated<[Transaction.ID]>([])
     try await withDependencies {
@@ -205,7 +205,7 @@ import Testing
     }
   }
 
-  @Test func defeatRepeatFreeTrialAttempt() async throws {
+  @Test func `defeat repeat free trial attempt`() async throws {
     await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
       $0.date = .constant(.reference)
