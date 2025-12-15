@@ -6,6 +6,7 @@ public struct SettingsView: View {
   public enum Event: Equatable, Sendable {
     case subscribeNowTapped
     case manageSubscriptionTapped
+    case changePinTapped
   }
 
   public enum SubscriptionStatus: Equatable {
@@ -226,6 +227,39 @@ public struct SettingsView: View {
             }
           }
         }
+      }
+
+      VStack(spacing: 12) {
+        HStack(spacing: 6) {
+          Image(systemName: "key")
+            .font(.subheadline)
+          Text(lstr(.settingsSecurityHeader))
+            .font(.subheadline)
+            .fontWeight(.medium)
+        }
+        .foregroundColor(Color(self.cs, light: .black.opacity(0.6), dark: .white.opacity(0.6)))
+        .frame(maxWidth: .infinity, alignment: .leading)
+
+        Button {
+          self.onEvent(.changePinTapped)
+        } label: {
+          HStack {
+            Text(lstr(.settingsChangePin))
+              .font(.headline)
+            Spacer()
+            Image(systemName: "chevron.right")
+              .font(.subheadline)
+              .foregroundColor(Color(
+                self.cs,
+                light: .black.opacity(0.4),
+                dark: .white.opacity(0.4),
+              ))
+          }
+          .padding(16)
+          .background(Color(self.cs, light: .violet100, dark: .violet900))
+          .cornerRadius(12)
+        }
+        .buttonStyle(.plain)
       }
 
       Spacer()

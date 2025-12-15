@@ -65,16 +65,10 @@ import Testing
       }
     } operation: {
       let store = TestStore(
-        initialState: .init(screen: .addingByUrl),
+        initialState: .init(screen: .changePinInstructions),
         reducer: AddShowFeature.init,
       )
       store.exhaustivity = .off
-
-      await store.send(.addByUrlSubmitted("am: change pin"))
-
-      await store.receive(.setScreen(.changePinInstructions)) {
-        $0.screen = .changePinInstructions
-      }
 
       await store.send(.changePinInstructionsOkTapped) {
         $0.screen = .enteringPin

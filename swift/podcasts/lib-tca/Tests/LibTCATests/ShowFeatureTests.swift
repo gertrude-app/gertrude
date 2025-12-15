@@ -8,7 +8,8 @@ import Testing
 @testable import LibTCA
 
 @MainActor struct ShowFeatureTests {
-  @Test func `marking completed episode as unplayed clears progress and lastPlayedAt`() async throws {
+  @Test func `marking completed episode as unplayed clears progress and lastPlayedAt`(
+  ) async throws {
     let now = Date.reference
     try await withDependencies {
       $0.date = .constant(now)

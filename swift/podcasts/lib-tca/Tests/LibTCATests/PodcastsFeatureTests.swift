@@ -72,4 +72,22 @@ import Testing
       await store.finish()
     }
   }
+
+  @Test func `settings change pin delegate presents add show with change pin screen`() async throws {
+    try await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase()
+      $0.continuousClock = TestClock()
+    } operation: {
+      var state = PodcastsFeature.State()
+      state.destination = .settings(.init())
+
+      let store = TestStore(initialState: state, reducer: PodcastsFeature.init)
+      store.exhaustivity = .off
+
+      await store.send(.destination(.presented(.settings(.delegate(.changePinRequested))))) {
+        $0.destination = .addShow(.init(screen: .changePinInstructions))
+      }
+    }
+  }
 }

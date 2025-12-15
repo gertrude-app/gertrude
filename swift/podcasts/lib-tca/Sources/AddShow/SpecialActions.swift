@@ -5,10 +5,6 @@ import SQLiteData
 
 extension AddShowFeature {
   func handleSpecialAction(input: String) -> Effect<Action>? {
-    if input == "am: change pin" {
-      return .send(.setScreen(.changePinInstructions))
-    }
-
     if input == "am: upload db" {
       return .run { send in
         guard let installId = self.keychain.loadInstallId() else { return }
