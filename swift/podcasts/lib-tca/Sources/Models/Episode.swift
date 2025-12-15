@@ -56,7 +56,7 @@ extension Episode {
   }
 
   func removeLocalAudioFile() {
-    try? FileManager.default.removeItem(at: self.localAudioUrl)
+    try? dep(\.fileSystem).removeItem(at: self.localAudioUrl)
   }
 
   static var col: TableColumns { Episode.columns }

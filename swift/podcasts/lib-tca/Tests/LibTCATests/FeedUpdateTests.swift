@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import CustomDump
 import Dependencies
 import DependenciesTestSupport
@@ -181,6 +182,55 @@ import Testing
     expectNoDifference(Set(updates.actions), Set([
       .replaceShowArtwork(showId: 2, artworkUrl: "https://new.com/artwork2.jpg"),
     ]))
+  }
+}
+
+@Test func `audio invalidation should clear downloadedAt`() async throws {
+  let fetchedFeed = Feed(
+    show: .mock(1),
+    episodes: [
+      .mock(1, showId: 1) { $0.duration = 7200 },
+    ],
+  )
+
+  let removedUrls = LockIsolated<[URL]>([])
+
+  try await withDependencies {
+    $0.defaultDatabase = try! appDatabase()
+    $0.date = .constant(.reference)
+    $0.podcasts.getFeed = { _ in fetchedFeed }
+    $0.podcasts.downloadArtwork = { _ in }
+    $0.fileSystem.removeItem = { url in removedUrls.withValue { $0.append(url) } }
+  } operation: {
+    @Dependency(\.db) var database
+
+    try await database.write { db in
+      try Show.insert { [Show.mock(1)] }.execute(db)
+      try Episode
+        .insert { [Episode.mock(1, showId: 1) {
+          $0.duration = 7301 // <- different from updated feed
+          $0.downloadedAt = .reference
+        }] }
+        .execute(db)
+    }
+
+    let episodeBefore = database.tryRead { db in
+      try Episode.find(Episode.ID(1)).fetchOne(db)
+    }
+    #expect(episodeBefore?.downloadedAt == .reference)
+
+    let updates = await _feedUpdates(input: _prepareFeedUpdateInputData())
+    #expect(updates.actions == [.invalidateEpisodeAudio(1)])
+
+    _ = await _performFeedUpdates(updates)
+
+    let episodeAfter = database.tryRead { db in
+      try Episode.find(Episode.ID(1)).fetchOne(db)
+    }
+
+    #expect(episodeAfter?.downloadedAt == nil)
+    #expect(episodeAfter?.duration == 7200)
+    #expect(removedUrls.value.count == 1)
   }
 }
 

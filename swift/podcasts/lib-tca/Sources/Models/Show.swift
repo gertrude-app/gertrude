@@ -42,7 +42,7 @@ extension Show {
 }
 
 func removeShowLocalFilesDir(id: Show.ID) {
-  try? FileManager.default.removeItem(at: .localFilesDir(showId: id))
+  try? dep(\.fileSystem).removeItem(at: .localFilesDir(showId: id))
 }
 
 func showLocalArtworkImage(showId: Show.ID) -> UIImage? {

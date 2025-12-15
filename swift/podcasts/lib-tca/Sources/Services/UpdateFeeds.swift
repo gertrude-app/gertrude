@@ -147,13 +147,13 @@ func _feedUpdates(input: FeedUpdateInputData) -> FeedUpdates {
         unexpected(id: "a8b1cc45", assert: true)
         continue
       }
-      let updatedEpisode = existingEpisode.updated(from: feedEpisodeData)
+      var updatedEpisode = existingEpisode.updated(from: feedEpisodeData)
       if updatedEpisode != existingEpisode {
-        updates.episodeUpdates.append(updatedEpisode)
-
         if existingEpisode.audioChanged(from: feedEpisodeData) {
+          updatedEpisode.downloadedAt = nil
           updates.actions.append(.invalidateEpisodeAudio(existingEpisode.id))
         }
+        updates.episodeUpdates.append(updatedEpisode)
       }
     }
   }
