@@ -23,25 +23,14 @@ const MainHeader: React.FC<{
       overlay ? `absolute` : `relative`,
     )}
   >
-    <a href="/" className="flex items-center gap-3">
+    <a href="/">
       <Logo
         className={cx(`transition-opacity duration-500`)}
         type={theme === `violet` ? `inverted` : `default`}
+        badge={badge}
       />
-      {badge && (
-        <span
-          className={cx(
-            `text-xs font-bold px-2 py-1 rounded`,
-            theme === `violet`
-              ? `bg-white/15 text-white border border-white/40 backdrop-blur-sm`
-              : `bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white`,
-          )}
-        >
-          {badge}
-        </span>
-      )}
     </a>
-    {showAuthButtons && <MobileLoginDropdown theme={theme} />}
+    <MobileLoginDropdown theme={theme} alwaysShow={!showAuthButtons} />
     {showAuthButtons && (
       <div className={cx(`gap-4 transition-opacity duration-500 hidden sm:flex`)}>
         <FancyLink

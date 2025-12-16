@@ -12,9 +12,12 @@ const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const isHomePage = path === `/`;
   const theme = path.includes(`blog`) || isHomePage ? `white` : `violet`;
   const lang = path.includes(`bloquear`) ? `es` : `en`;
-  const showAuthButtons = path !== `/`;
-  const badge = path === `/mac` ? `For Mac` : undefined;
-  const linkVariant = path === `/mac` ? `flat` : `default`;
+  const showAuthButtons =
+    path !== `/` && path !== `/contact` && !path.startsWith(`/blog`);
+  const isMacPage =
+    path === `/mac` || path === `/download-mac-app` || path.startsWith(`/docs`);
+  const badge = isMacPage ? `For Mac` : undefined;
+  const linkVariant = isMacPage ? `flat` : `default`;
   return (
     <html lang={lang}>
       <GoogleTagManager gtmId="GTM-KRRP8HFW" />

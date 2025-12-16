@@ -84,10 +84,10 @@ your child.
 
 On the computer that will be protected, login to the macOS user that you desire to
 protect, then open a web browser, visit the Gertrude website
-[download page](https://gertrude.app/download) **(www.gertrude.app/download)**, and click
-the download link to get the most recent version of the Gertrude macOS app. Double-click
-on the downloaded file and then drag the Gertrude application into the applications
-folder.
+[download page](https://gertrude.app/download-mac-app)
+**(www.gertrude.app/download-mac-app)**, and click the download link to get the most
+recent version of the Gertrude macOS app. Double-click on the downloaded file and then
+drag the Gertrude application into the applications folder.
 
 {% image src="dmg.png" caption="Drag the Gertrude app into Applications" /%}
 

@@ -23,7 +23,7 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
     <div className="bg-white rounded-3xl lg:rounded-r-none p-4 py-8 shadow-lg lg:shadow-none flex-grow flex flex-col justify-between">
       <div>
         <a href="/">
-          <Logo className="ml-4" />
+          <Logo className="ml-4" badge="For Mac" />
         </a>
         <div className="mt-10 flex flex-col">
           <SidebarLink slug="getting-started" title="Getting Started" setOpen={setOpen} />
