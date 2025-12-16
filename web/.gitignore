@@ -11,6 +11,7 @@ dash/app/cypress/screenshots
 smoke/cypress.env.json
 **/cypress/downloads
 **/cypress/videos
+.playwright-mcp/
 **/.next
 **/out
 **/dist

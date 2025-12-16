@@ -6,6 +6,54 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+@keyframes glow-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 20px rgba(253, 186, 116, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 45px rgba(253, 186, 116, 1));
+  }
+}
+
+@keyframes waggle-arrow {
+  0%,
+  100% {
+    transform: rotate(150deg);
+  }
+  20% {
+    transform: rotate(142deg);
+  }
+  40% {
+    transform: rotate(158deg);
+  }
+  60% {
+    transform: rotate(145deg);
+  }
+  80% {
+    transform: rotate(155deg);
+  }
+}
+
+@keyframes waggle-badge {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-8deg);
+  }
+  40% {
+    transform: rotate(8deg);
+  }
+  60% {
+    transform: rotate(-5deg);
+  }
+  80% {
+    transform: rotate(5deg);
+  }
+}
+
 /* tighten up lists inside of markdown docs */
 .prose :where(ul > li):not(:where([class~='not-prose'] *)) {
   font-size: 95%;

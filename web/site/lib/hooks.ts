@@ -103,3 +103,66 @@ export function useScrollY(): number {
 
   return scrollY;
 }
+
+export function useIntersectionVisibility(
+  ref: React.RefObject<HTMLElement | null>,
+  threshold = 0.5,
+): boolean {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold },
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [ref, threshold]);
+
+  return isVisible;
+}
+
+export function useScrollProgress(
+  wrapperRef: React.RefObject<HTMLElement | null>,
+): number {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = (): void => {
+      if (!wrapperRef.current) return;
+      const rect = wrapperRef.current.getBoundingClientRect();
+      const wrapperHeight = wrapperRef.current.offsetHeight;
+      const viewportHeight = window.innerHeight;
+      const scrollableDistance = wrapperHeight - viewportHeight;
+      const scrolled = -rect.top;
+      const newProgress = Math.max(0, Math.min(1, scrolled / scrollableDistance));
+      setProgress(newProgress);
+    };
+
+    window.addEventListener(`scroll`, handleScroll);
+    return () => window.removeEventListener(`scroll`, handleScroll);
+  }, [wrapperRef]);
+
+  return progress;
+}
+
+export function useDelayedVisibility(delay: number): boolean {
+  const [isVisible, setIsVisible] = useState(delay === 0);
+
+  useEffect(() => {
+    if (delay > 0) {
+      const timer = setTimeout(() => setIsVisible(true), delay);
+      return () => clearTimeout(timer);
+    }
+  }, [delay]);
+
+  return isVisible;
+}
