@@ -6,7 +6,7 @@ description:
   Una guía paso a paso para bloquear completamente un iPhone o iPad, para padres que
   realmente desean proteger a sus hijos de los peligros de la actividad en línea sin
   restricciones.
-category: parental-controls
+category: ios
 ---
 
 {% .lead %} Con un poco de esfuerzo, es posible bloquear completamente un iPhone o un iPad

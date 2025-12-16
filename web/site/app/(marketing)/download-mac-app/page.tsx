@@ -16,8 +16,8 @@ import Tahoe from '@/public/supported-os/macos-tahoe.png';
 import Ventura from '@/public/supported-os/macos-ventura.png';
 
 export const metadata = seo.createMetadata(
-  `Download | Gertrude Internet Filter and Parental Controls`,
-  seo.description(`Download Gertrude`),
+  `Download Mac App | Gertrude Internet Filter and Parental Controls`,
+  seo.description(`Download Gertrude for Mac`),
 );
 
 const DownloadPage: NextPage = () => (

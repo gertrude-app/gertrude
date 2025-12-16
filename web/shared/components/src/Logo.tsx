@@ -7,6 +7,7 @@ interface Props {
   className?: string;
   type?: `default` | `inverted`;
   withForParents?: boolean | `condensed`;
+  badge?: string;
   textSize?:
     | `text-base`
     | `text-lg`
@@ -25,6 +26,7 @@ const Logo: React.FC<Props> = ({
   type = `default`,
   textSize = `text-4xl`,
   withForParents = false,
+  badge,
 }) => {
   let color = ``;
 
@@ -63,15 +65,29 @@ const Logo: React.FC<Props> = ({
       </div>
       {!iconOnly && (
         <div className="flex flex-col ml-2.5">
-          <span
-            className={cx(
-              `font-lato whitespace-nowrap`,
-              type === `inverted` ? `text-white` : `text-slate-700`,
-              textSize,
+          <div className="flex items-center gap-3">
+            <span
+              className={cx(
+                `font-lato whitespace-nowrap`,
+                type === `inverted` ? `text-white` : `text-slate-700`,
+                textSize,
+              )}
+            >
+              Gertrude
+            </span>
+            {badge && (
+              <span
+                className={cx(
+                  `text-xs font-bold px-2 py-1 rounded whitespace-nowrap`,
+                  type === `inverted`
+                    ? `bg-white/15 text-white border border-white/40 backdrop-blur-sm`
+                    : `bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white`,
+                )}
+              >
+                {badge}
+              </span>
             )}
-          >
-            Gertrude
-          </span>
+          </div>
           {withForParents && (
             <span
               className={cx(

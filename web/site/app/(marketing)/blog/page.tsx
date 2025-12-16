@@ -58,21 +58,22 @@ const Blog: NextPage = async () => {
                     href={`/blog/${article.slug}`}
                     className={cx(
                       `w-auto md:w-152 mb-10 p-3 -m-3 rounded-xl transition-colors duration-200 flex flex-col items-start`,
-                      article.category === `engineering`
-                        ? `hover:bg-fuchsia-50`
-                        : `hover:bg-violet-50`,
+                      article.category === `engineering` && `hover:bg-amber-50`,
+                      article.category === `mac` && `hover:bg-violet-50`,
+                      article.category === `ios` && `hover:bg-fuchsia-50`,
                     )}
                   >
                     <div className="flex items-center gap-2">
                       <span
                         className={cx(
-                          `capitalize font-medium text-sm px-3 py-0.5 rounded-full`,
-                          article.category === `engineering`
-                            ? `bg-fuchsia-100 text-fuchsia-600`
-                            : `bg-violet-100 text-violet-600`,
+                          `font-medium text-sm px-3 py-0.5 rounded-full`,
+                          article.category === `engineering` &&
+                            `bg-amber-100 text-amber-600`,
+                          article.category === `mac` && `bg-violet-100 text-violet-600`,
+                          article.category === `ios` && `bg-fuchsia-100 text-fuchsia-600`,
                         )}
                       >
-                        {article.category.replace(`-`, ` `)}
+                        {article.category === `ios` ? `iOS` : article.category}
                       </span>
                       <span className="text-sm xs:text-base text-slate-500 block lg:hidden">
                         {formatedDate}

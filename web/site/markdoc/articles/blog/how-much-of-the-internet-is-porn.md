@@ -8,7 +8,7 @@ description:
   hueristics and machine learning to test each for pornographic content. I was able to
   test a statistically significant sample size of 103,676 (0.1957%) reachable websites,
   and found 0.64% of them were porn.'
-category: parental-controls
+category: engineering
 ---
 
 {% .lead %} **TL;DR**&mdash;In February of 2024, I randomly sampled an exhaustive list of

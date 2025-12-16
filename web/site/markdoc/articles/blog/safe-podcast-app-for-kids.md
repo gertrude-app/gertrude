@@ -5,7 +5,7 @@ image: /docs/images/gertrude-am-3.png
 description:
   A kid-friendly podcast app with parental controls that lets parents approve shows with a
   PIN code, preventing kids from searching for and subscribing to inappropriate content.
-category: parental-controls
+category: ios
 ---
 
 {% .lead .mb-12 %} Today we're excited to announce the release of

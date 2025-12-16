@@ -15,6 +15,10 @@ Next.js, Vite, Tailwind.
 - **`admin/`** — Internal reporting/admin backend (Next.js, port 4242)
 - **`storybook/`** — Component library/documentation
 
+## Marketing Site
+
+- When working on design-related tasks, read `./site/docs/design.md`.
+
 ## Key Packages
 
 - **`dash/*`** — Dashboard-specific libs (components, types, datetime, keys, utils,

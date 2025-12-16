@@ -5,7 +5,7 @@ image: /og-images/five-things.jpg
 description:
   The five things you probably forgot when locking down your kid's iPhone... and the
   bizarrely unintuitive steps it takes to fix them.
-category: parental-controls
+category: ios
 ---
 
 {% .lead .mb-12 %} I consider myself pretty tech-savvy&mdash;I've been a software

@@ -6,7 +6,7 @@ description:
   A step-by-step guide to completely locking down an iPhone or iPad for iOS 18, for
   parents who are serious about protecting their kids from the dangers of unrestricted
   online activity.
-category: parental-controls
+category: ios
 ---
 
 {% .lead %} With a little hard work, it's possible to entirely lock down an iPhone or iPad

@@ -5,7 +5,7 @@ description:
   Using Gertrude is the cornerstone of keeping your kids safe online, but it can't prevent
   every kind of problem. Take a few minutes to review this list of tips and common
   mistakes.
-category: parental-controls
+category: mac
 ---
 
 {% .lead %} With an internet increasingly filled with dangerous, inappopriate and damaging

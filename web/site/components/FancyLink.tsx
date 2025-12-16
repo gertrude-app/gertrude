@@ -14,6 +14,7 @@ interface CommonProps {
   className?: string;
   id?: string;
   disabled?: boolean;
+  variant?: `default` | `flat`;
 }
 interface LinkProps {
   type: `link`;
@@ -70,6 +71,7 @@ const FancyLink: React.FC<FancyLinkProps> = (props) => {
 
   const color = props.color ?? `secondary`;
   const size = props.size ?? `sm`;
+  const variant = props.variant ?? `default`;
 
   return (
     <Element>
@@ -83,18 +85,34 @@ const FancyLink: React.FC<FancyLinkProps> = (props) => {
           })}
         ></div>
       )}
+      {color === `secondary` && variant === `default` && (
+        <div
+          className={cx(`absolute w-full h-full transition-colors duration-200`, {
+            'bg-violet-200 group-hover:bg-violet-300': !props.inverted,
+            'bg-white/30 group-hover:bg-white/40': props.inverted,
+            'rounded-3xl translate-y-2': size === `lg`,
+            'rounded-2xl translate-y-1.5': size === `sm`,
+          })}
+        ></div>
+      )}
       <div
         className={cx(
           `flex items-center justify-center relative transition-[transform,background-color] duration-200 overflow-hidden`,
           {
-            'group-hover:-translate-y-0.5': color === `primary` && !props.disabled,
-            'group-active:translate-y-0.5': color === `primary` && !props.disabled,
+            'group-hover:-translate-y-0.5':
+              (color === `primary` || (color === `secondary` && variant === `default`)) &&
+              !props.disabled,
+            'group-active:translate-y-0.5':
+              (color === `primary` || (color === `secondary` && variant === `default`)) &&
+              !props.disabled,
+            'group-active:scale-[98%]':
+              color === `secondary` && variant === `flat` && !props.disabled,
             'bg-white': props.inverted && color === `primary`,
-            'bg-white/10 group-hover:bg-white/20 group-active:bg-white/30 group-active:scale-[98%]':
+            'bg-white/10 group-hover:bg-white/20 group-active:bg-white/30':
               props.inverted && color === `secondary` && !props.disabled,
             'bg-gradient-to-r from-violet-500 to-fuchsia-500':
               !props.inverted && color === `primary`,
-            'bg-violet-100 group-hover:bg-violet-200 group-active:bg-violet-300 group-active:scale-[98%]':
+            'bg-violet-100 group-hover:bg-violet-200 group-active:bg-violet-300':
               !props.inverted && color === `secondary` && !props.disabled,
             'px-8 py-4 rounded-3xl gap-3': size === `lg`,
             'px-6 py-3 rounded-2xl gap-2': size === `sm`,

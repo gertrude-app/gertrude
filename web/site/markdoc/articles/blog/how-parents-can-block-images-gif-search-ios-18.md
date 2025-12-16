@@ -6,7 +6,7 @@ description:
   'A new, free iOS app called “Gertrude Blocker” gives parents what Apple has refused for
   over a year: the ability block inappropriate GIFs searchable by kids in the Messages
   texting app for both iOS 17 and iOS 18.'
-category: parental-controls
+category: ios
 ---
 
 Apple's built-in `#images` iMessage app for GIF search, built directly into the Messages

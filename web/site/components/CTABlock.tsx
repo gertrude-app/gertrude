@@ -28,6 +28,7 @@ const CTABlock: React.FC = () => (
           Icon={RouteIcon}
           inverted
           size="lg"
+          variant="flat"
         >
           Step-by-step guide
         </FancyLink>

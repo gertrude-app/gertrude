@@ -32,10 +32,10 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
           Peace of mind for parents
         </h2>
         <p className="mt-8 text-white/80 text-lg xs:text-xl md:text-2xl leading-[1.5em] text-center min-[1450px]:text-left">
-          Gertrude lets you block the entire internet, only unlocking the portions you
-          choose. Keep your kids only and exactly where you want them to be online. Plus,
-          review screenshots and keystrokes of their activity from your own computer or
-          phone. Mac parental controls have never been this good.
+          Gertrude for Mac lets you block the entire internet, only unlocking the portions
+          you choose. Keep your kids only and exactly where you want them to be online.
+          Plus, review screenshots and keystrokes of their activity from your own computer
+          or phone. Mac parental controls have never been this good.
         </p>
         <div className="flex flex-col md:flex-row gap-6 mt-12 self-stretch sm:self-center min-[1450px]:self-start">
           <FancyLink
@@ -55,6 +55,7 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
             Icon={VideoIcon}
             inverted
             size="lg"
+            variant="flat"
           >
             Watch demo video
           </FancyLink>

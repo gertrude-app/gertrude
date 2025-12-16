@@ -5,7 +5,7 @@ image: /og-images/five-things.jpg
 description:
   Las cinco cosas que probablemente olvidaste al asegurar el iPhone de tu hijo... y los
   pasos extrañamente poco intuitivos que se necesitan para solucionarlas.
-category: parental-controls
+category: ios
 ---
 
 {% .lead .mb-12 %} Yo me considero bastante experto en tecnología&mdash;he sido

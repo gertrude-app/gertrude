@@ -1,6 +1,7 @@
 ###########################
 # marketing site redesign #
 ###########################
+/download /download-mac-app 301
 /docs/mac-internet-filter /blog/mac-internet-filter 301
 /docs/mac-keylogger /blog/mac-keylogger 301
 /docs/ios-17-cant-delete-messages-images /blog/ios-17-cant-delete-messages-images 301

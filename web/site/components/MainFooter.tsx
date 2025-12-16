@@ -4,35 +4,42 @@ import Link from 'next/link';
 import React from 'react';
 
 const MainFooter: React.FC = () => (
-  <footer className="px-8 sm:px-12 lg:px-20 pt-20 pb-8 gap-20 relative border-t border-violet-400 flex flex-col bg-violet-500">
+  <footer className="px-8 sm:px-12 lg:px-20 pt-14 pb-8 gap-20 relative border-t border-violet-400 flex flex-col bg-violet-500">
     <div className="flex flex-col sm:flex-row justify-between">
       <div className="self-center sm:self-start">
         <a href="/">
           <Logo type="inverted" />
         </a>
       </div>
-      <div className="flex gap-12 mt-12 sm:mt-0 self-center sm:self-start">
-        <ul className="flex flex-col items-center sm:items-start gap-1">
-          <FooterLink href="/">Home</FooterLink>
-          <FooterLink href="/download">Download</FooterLink>
-          <FooterLink href="/contact">Contact</FooterLink>
-        </ul>
-        <ul className="flex flex-col items-center sm:items-start gap-1">
-          <FooterLink href="https://parents.gertrude.app/signup?v=new_site">
-            Sign up
-          </FooterLink>
-          <FooterLink href="https://parents.gertrude.app">Log in</FooterLink>
-          <FooterLink href="/docs/getting-started">Documentation</FooterLink>
-          <FooterLink href="/blog">Blog</FooterLink>
-        </ul>
+      <div className="flex gap-12 sm:gap-16 mt-12 sm:mt-0 self-center sm:self-start">
+        <div className="flex flex-col items-center sm:items-start gap-2">
+          <h4 className="text-white/40 text-sm font-medium uppercase tracking-wider mb-1">
+            General
+          </h4>
+          <ul className="flex flex-col items-center sm:items-start gap-1">
+            <FooterLink href="/">Home</FooterLink>
+            <FooterLink href="/contact">Contact</FooterLink>
+            <FooterLink href="/blog">Blog</FooterLink>
+          </ul>
+        </div>
+        <div className="flex flex-col items-center sm:items-start gap-2">
+          <h4 className="text-white/40 text-sm font-medium uppercase tracking-wider mb-1">
+            Mac App
+          </h4>
+          <ul className="flex flex-col items-center sm:items-start gap-1">
+            <FooterLink href="https://parents.gertrude.app/signup?v=new_site">
+              Sign up
+            </FooterLink>
+            <FooterLink href="https://parents.gertrude.app">Log in</FooterLink>
+            <FooterLink href="/download-mac-app">Download</FooterLink>
+            <FooterLink href="/docs/getting-started">Docs</FooterLink>
+          </ul>
+        </div>
       </div>
     </div>
     <div className="flex flex-col xs:flex-row justify-between items-center xs:items-end gap-8">
       <span className="text-white/70">© {new Date().getFullYear()} NetRivet Inc.</span>
       <span className="text-white/70">
-        <span className="text-white pr-1" role="img" aria-label="heart emoji">
-          ❤️
-        </span>
         <span className="lg:hidden">OSS</span>
         <span className="hidden lg:inline">Gertrude is open source</span>
         {` `}•{` `}
@@ -72,7 +79,7 @@ interface FooterLinkProps {
 }
 
 const FooterLink: React.FC<FooterLinkProps> = ({ children, href }) => {
-  const Element = [`/contact`, `/download`, `/`].includes(href) ? `a` : Link;
+  const Element = [`/contact`, `/download-mac-app`, `/`].includes(href) ? `a` : Link;
   return (
     <li>
       <Element

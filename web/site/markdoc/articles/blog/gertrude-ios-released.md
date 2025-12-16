@@ -5,7 +5,7 @@ description:
   'The first version of Gertrude for iOS has been released, focused on fixing several
   glaring holes in Apple’s Screen Time parental controls - most importantly it is the only
   known way to block #images GIF search in Messages. Available today in the App store!'
-category: parental-controls
+category: ios
 ---
 
 {% image src="lockdown-iphone/gertrude-blocker-ios-app.png" alt="Gertrude Blocker free iOS app allows parents to block unwanted GIFs in #images texting app" /%}

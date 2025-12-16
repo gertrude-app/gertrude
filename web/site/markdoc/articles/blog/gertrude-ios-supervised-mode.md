@@ -5,7 +5,7 @@ description:
   'Apple only allows internet content filtering on iOS devices owned by children under 18,
   or devices in Supervised Mode. This tutorial explains how to set up Supervised Mode in
   order to use the Gertrude iOS app on an iPhone or iPad.'
-category: parental-controls
+category: ios
 ---
 
 {% image src="lockdown-iphone/gertrude-blocker-ios-app.png" alt="Gertrude Blocker free iOS app allows parents to block unwanted GIFs in #images texting app" /%}
