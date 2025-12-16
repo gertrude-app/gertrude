@@ -5,7 +5,7 @@ description:
   'Today we are releasing version 2.7.0 of the Gertrude macOS app, which includes a new
   ability to block Mac apps, updates for changes in macOS Sequoia, safety improvements,
   and more.'
-category: parental-controls
+category: mac
 ---
 
 {% .lead .mb-12 %} Today we're releasing another big update to the Gertrude app, which

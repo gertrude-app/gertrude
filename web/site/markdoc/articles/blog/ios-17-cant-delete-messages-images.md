@@ -6,7 +6,7 @@ description:
   'Sadly, iOS 17 removes a vital parental control: the ability for parents to disable
   animated GIF searching through the #images iMessage app. This exposes children to
   thousands of extremely innappropriate images.'
-category: parental-controls
+category: ios
 ---
 
 {% .lead .mb-12 %} Until iOS 17, parents could remove the dangerous iMessage app called

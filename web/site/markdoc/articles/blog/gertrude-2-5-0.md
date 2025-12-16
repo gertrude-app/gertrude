@@ -4,7 +4,7 @@ date: '2024-12-02T18:29:21.510Z'
 description:
   'Today we are releasing version 2.5.0 of the Gertrude macOS app, with some of your top
   requested features, including scheduled keychains and downtime.'
-category: parental-controls
+category: mac
 ---
 
 {% .lead .mb-12 %} Today we're releasing **version 2.5.0**, a big update to the Gertrude

@@ -48,11 +48,13 @@ const BlogArticle: NextPage<PageProps> = async ({ params: { slug } }) => {
       <div className="max-w-[calc(100vw-48px)] xs:max-w-[calc(100vw-64px)] md+:max-w-3xl pt-12 md:pt-28 relative mx-6 xs:mx-8 pb-32">
         <span
           className={cx(
-            `capitalize text-lg font-medium`,
-            category === `engineering` ? `text-fuchsia-500` : `text-violet-500`,
+            `font-medium text-sm px-3 py-0.5 rounded-full`,
+            category === `engineering` && `bg-amber-100 text-amber-600`,
+            category === `mac` && `bg-violet-100 text-violet-600`,
+            category === `ios` && `bg-fuchsia-100 text-fuchsia-600`,
           )}
         >
-          {category.replace(`-`, ` `)}
+          {category === `ios` ? `iOS` : category}
         </span>
         <h1
           className="text-4xl font-bold mb-8 mt-2 break-words"

@@ -5,7 +5,7 @@ description:
   'Unfortunately, iOS18 seems to be another step backwards for parents. #images GIF search
   is still not preventable, and a new loophole with Spotlight searching has been found. We
   recommend sticking with iOS 16 or 17 until fixes or workarounds are ready.'
-category: parental-controls
+category: ios
 ---
 
 {% .lead .mb-12 %} iOS 18, released in September 2024, continues the discouraging trend of

@@ -29,7 +29,7 @@ export interface DocsArticle extends Article {
 export interface BlogArticle extends Article {
   type: `blog`;
   date: string;
-  category: `engineering` | `parental-controls`;
+  category: `engineering` | `mac` | `ios`;
 }
 
 type ArticleOfType<T extends ArticleType> = T extends `docs` ? DocsArticle : BlogArticle;
@@ -93,7 +93,7 @@ export async function getArticle<T extends ArticleType>(
   if (
     !category ||
     typeof category !== `string` ||
-    ![`engineering`, `parental-controls`].includes(category)
+    ![`engineering`, `mac`, `ios`].includes(category)
   )
     throw new Error(`Missing or invalid category in ${slug}.md`);
   return {
