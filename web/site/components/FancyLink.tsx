@@ -14,6 +14,7 @@ interface CommonProps {
   className?: string;
   id?: string;
   disabled?: boolean;
+  variant?: `default` | `flat`;
 }
 interface LinkProps {
   type: `link`;
@@ -70,6 +71,7 @@ const FancyLink: React.FC<FancyLinkProps> = (props) => {
 
   const color = props.color ?? `secondary`;
   const size = props.size ?? `sm`;
+  const variant = props.variant ?? `default`;
 
   return (
     <Element>
@@ -83,7 +85,7 @@ const FancyLink: React.FC<FancyLinkProps> = (props) => {
           })}
         ></div>
       )}
-      {color === `secondary` && (
+      {color === `secondary` && variant === `default` && (
         <div
           className={cx(`absolute w-full h-full transition-colors duration-200`, {
             'bg-violet-200 group-hover:bg-violet-300': !props.inverted,
@@ -98,9 +100,13 @@ const FancyLink: React.FC<FancyLinkProps> = (props) => {
           `flex items-center justify-center relative transition-[transform,background-color] duration-200 overflow-hidden`,
           {
             'group-hover:-translate-y-0.5':
-              (color === `primary` || color === `secondary`) && !props.disabled,
+              (color === `primary` || (color === `secondary` && variant === `default`)) &&
+              !props.disabled,
             'group-active:translate-y-0.5':
-              (color === `primary` || color === `secondary`) && !props.disabled,
+              (color === `primary` || (color === `secondary` && variant === `default`)) &&
+              !props.disabled,
+            'group-active:scale-[98%]':
+              color === `secondary` && variant === `flat` && !props.disabled,
             'bg-white': props.inverted && color === `primary`,
             'bg-white/10 group-hover:bg-white/20 group-active:bg-white/30':
               props.inverted && color === `secondary` && !props.disabled,

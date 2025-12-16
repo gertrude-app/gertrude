@@ -13,6 +13,8 @@ const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const theme = path.includes(`blog`) || isHomePage ? `white` : `violet`;
   const lang = path.includes(`bloquear`) ? `es` : `en`;
   const showAuthButtons = path !== `/`;
+  const badge = path === `/mac` ? `For Mac` : undefined;
+  const linkVariant = path === `/mac` ? `flat` : `default`;
   return (
     <html lang={lang}>
       <GoogleTagManager gtmId="GTM-KRRP8HFW" />
@@ -26,6 +28,8 @@ const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
           theme={theme}
           showAuthButtons={showAuthButtons}
           overlay={isHomePage}
+          badge={badge}
+          linkVariant={linkVariant}
         />
         <div className="flex-grow">{children}</div>
         <MainFooter />
