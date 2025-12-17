@@ -77,9 +77,15 @@ const HiImJared: React.FC = () => {
               style={{ transitionDelay: isVisible ? `600ms` : `0ms` }}
             >
               I&rsquo;m a Christian, a homeschool dad, and a computer programmer. I built
-              all the Gertrude apps first to protect my own kids. I care a ton about
-              helping provide simple, strict, and reliable tools to protect the hearts of
-              the next generation.
+              all the Gertrude apps (with help from{` `}
+              <a
+                href="https://github.com/kiahjh/"
+                className="text-violet-400 hover:underline hover:text-violet-500"
+              >
+                Kiah
+              </a>
+              ) first to protect my own kids. I care a ton about helping provide simple,
+              strict, and reliable tools to protect the hearts of the next generation.
             </p>
             <div
               className={`mt-10 flex flex-col gap-3 text-left transition-all duration-500 ${
