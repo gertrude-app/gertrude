@@ -2,6 +2,7 @@ import { EmailInputForm, FullscreenModalForm } from '@dash/components';
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
+import Turnstile from 'react-turnstile';
 import Current from '../../environment';
 import { useAuth, useMutation, useTimeout } from '../../hooks';
 
@@ -9,6 +10,7 @@ const Signup: React.FC = () => {
   const { admin, login } = useAuth();
   const [email, setEmail] = useState(``);
   const [password, setPassword] = useState(``);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const navigate = useNavigate();
   const signup = useMutation(
     () =>
@@ -17,6 +19,7 @@ const Signup: React.FC = () => {
         password,
         gclid: getCookieValue(`gclid`),
         abTestVariant: getQueryParam(`v`) ?? getCookieValue(`ab_variant`),
+        turnstileToken: turnstileToken ?? undefined,
       }),
     { onSuccess: ({ admin }) => admin && login(admin.adminId, admin.token) },
   );
@@ -76,6 +79,12 @@ const Signup: React.FC = () => {
         password={password}
         setPassword={setPassword}
         onSubmit={() => signup.mutate(undefined)}
+      />
+      <Turnstile
+        sitekey={Current.env.turnstileSitekey()}
+        size="invisible"
+        refreshExpired="auto"
+        onVerify={setTurnstileToken}
       />
     </FullscreenModalForm>
   );

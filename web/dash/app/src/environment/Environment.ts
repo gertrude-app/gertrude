@@ -13,10 +13,12 @@ export enum OptionalVar {
 
 export enum RequiredVar {
   ApiEndpoint,
+  TurnstileSitekey,
 }
 
 export interface EnvironmentClient {
   apiEndpoint(): string;
+  turnstileSitekey(): string;
   mode(): Mode;
   isDev(): boolean;
   isStaging(): boolean;
@@ -35,6 +37,10 @@ export class LiveEnvironment implements EnvironmentClient {
 
   public apiEndpoint(): string {
     return this.requiredVar(RequiredVar.ApiEndpoint);
+  }
+
+  public turnstileSitekey(): string {
+    return this.requiredVar(RequiredVar.TurnstileSitekey);
   }
 
   public mode(): Mode {
@@ -67,6 +73,12 @@ export class LiveEnvironment implements EnvironmentClient {
           RequiredVar.ApiEndpoint,
           `VITE_API_ENDPOINT`,
         );
+      case RequiredVar.TurnstileSitekey:
+        return requireVar(
+          import.meta.env.VITE_TURNSTILE_SITEKEY,
+          RequiredVar.TurnstileSitekey,
+          `VITE_TURNSTILE_SITEKEY`,
+        );
       default:
         throw new Error(`Unhandled check for required var \`${RequiredVar[varName]}\``);
     }
@@ -85,6 +97,9 @@ export class LiveEnvironment implements EnvironmentClient {
 export class ThrowingEnvironment implements EnvironmentClient {
   public apiEndpoint(): string {
     throw new Error(`EnvironmentClient.graphQLEndpoint() not implemented.`);
+  }
+  public turnstileSitekey(): string {
+    throw new Error(`EnvironmentClient.turnstileSitekey() not implemented.`);
   }
   public mode(): Mode {
     throw new Error(`EnvironmentClient.mode() not implemented.`);
@@ -108,6 +123,9 @@ export class ThrowingEnvironment implements EnvironmentClient {
 
 export class NoopEnvironment implements EnvironmentClient {
   public apiEndpoint(): string {
+    return ``;
+  }
+  public turnstileSitekey(): string {
     return ``;
   }
   public mode(): Mode {
