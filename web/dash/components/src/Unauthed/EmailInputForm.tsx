@@ -40,6 +40,7 @@ const EmailInputForm: React.FC<Props> = ({
         label="Email address:"
         placeholder="you@example.com"
         autoFocus={window.location.href.includes(`gertrude.app`)}
+        autoComplete="username"
         required
         value={email}
         setValue={setEmail}
@@ -50,6 +51,7 @@ const EmailInputForm: React.FC<Props> = ({
           name="password"
           label="Password:"
           className="mb-6"
+          autoComplete="new-password"
           required
           value={password ?? ``}
           setValue={setPassword}

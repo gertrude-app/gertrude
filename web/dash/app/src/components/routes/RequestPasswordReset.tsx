@@ -40,6 +40,7 @@ const RequestPasswordReset: React.FC = () => {
               value={emailAddress}
               setValue={setEmailAddress}
               placeholder="me@example.com"
+              autoComplete="username"
             />
             <div className="flex flex-col xs:flex-row justify-between gap-4 mt-8">
               <Button type="link" color="tertiary" to="/login" className="flex-grow">
