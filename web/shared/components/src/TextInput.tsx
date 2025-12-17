@@ -17,6 +17,7 @@ type CommonProps = {
   disabled?: boolean;
   name?: string;
   testId?: string;
+  autoComplete?: string;
 };
 
 type TextAreaProps = {
@@ -54,6 +55,7 @@ const TextInput: React.FC<Props> = ({
   disabled,
   name,
   testId,
+  autoComplete,
   ...props
 }) => {
   const [localValue, setLocalValue] = useState(value);
@@ -86,6 +88,7 @@ const TextInput: React.FC<Props> = ({
           placeholder={placeholder}
           disabled={disabled}
           name={name}
+          autoComplete={autoComplete}
           {...(testId ? { 'data-test': testId } : {})}
           {...(props.type === `url`
             ? { autoCapitalize: `none`, autoCorrect: `off` }

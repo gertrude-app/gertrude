@@ -57,6 +57,7 @@ const LoginForm: React.FC<Props> = ({
         label="Email address:"
         placeholder="you@example.com"
         autoFocus={window.location.href.includes(`gertrude.app`)}
+        autoComplete="username"
         required
         value={email}
         setValue={setEmail}
@@ -65,6 +66,7 @@ const LoginForm: React.FC<Props> = ({
         type="password"
         name="password"
         label="Password:"
+        autoComplete="current-password"
         required
         value={password}
         setValue={setPassword}

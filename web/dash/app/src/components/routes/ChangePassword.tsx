@@ -48,6 +48,7 @@ const ChangePassword: React.FC = () => {
               value={password}
               setValue={setPassword}
               type={passwordVisible ? `text` : `password`}
+              autoComplete="new-password"
             />
             <button
               className="ml-4 rounded-full w-10 h-10 shrink-0 flex justify-center items-center text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition-colors duration-200"
