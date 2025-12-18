@@ -1,5 +1,4 @@
 // auto-generated, do not edit
-
 export namespace LatestAppVersions {
   export type Input = void;
 

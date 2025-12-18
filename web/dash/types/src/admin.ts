@@ -1,4 +1,4 @@
-import type { CreatePendingNotificationMethod } from './';
+import type { CreatePendingNotificationMethod } from './pairql';
 import type { RequestState } from './utility';
 
 export type NewAdminNotificationMethodEvent =

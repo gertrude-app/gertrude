@@ -56,11 +56,11 @@ export function interceptPql(
 ): void;
 export function interceptPql(slug: `GetDevice`, output: T.GetDevice.Output): void;
 export function interceptPql(slug: `GetDevices`, output: T.GetDevices.Output): void;
+export function interceptPql(slug: `GetIOSDevice`, output: T.GetIOSDevice.Output): void;
 export function interceptPql(
   slug: `GetIdentifiedApps`,
   output: T.GetIdentifiedApps.Output,
 ): void;
-export function interceptPql(slug: `GetIOSDevice`, output: T.GetIOSDevice.Output): void;
 export function interceptPql(
   slug: `GetSelectableKeychains`,
   output: T.GetSelectableKeychains.Output,
@@ -78,11 +78,11 @@ export function interceptPql(
   output: T.GetUnlockRequests.Output,
 ): void;
 export function interceptPql(slug: `GetUser`, output: T.GetUser.Output): void;
-export function interceptPql(slug: `GetUsers`, output: T.GetUsers.Output): void;
 export function interceptPql(
   slug: `GetUserUnlockRequests`,
   output: T.GetUserUnlockRequests.Output,
 ): void;
+export function interceptPql(slug: `GetUsers`, output: T.GetUsers.Output): void;
 export function interceptPql(
   slug: `HandleCheckoutCancel`,
   output: T.HandleCheckoutCancel.Output,
@@ -182,15 +182,15 @@ export function forcePqlErr(
     | `GetAdminKeychains`
     | `GetDevice`
     | `GetDevices`
-    | `GetIdentifiedApps`
     | `GetIOSDevice`
+    | `GetIdentifiedApps`
     | `GetSelectableKeychains`
     | `GetSuspendFilterRequest`
     | `GetUnlockRequest`
     | `GetUnlockRequests`
     | `GetUser`
-    | `GetUsers`
     | `GetUserUnlockRequests`
+    | `GetUsers`
     | `HandleCheckoutCancel`
     | `HandleCheckoutSuccess`
     | `IOSDevices`

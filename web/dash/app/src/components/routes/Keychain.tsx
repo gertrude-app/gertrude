@@ -1,7 +1,7 @@
 import { ApiErrorMessage, Loading } from '@dash/components';
 import { EditKeychain } from '@dash/components';
 import { toKeyRecord } from '@dash/keys';
-import { Result } from '@dash/types';
+import { Result } from '@shared/pairql';
 import React, { useEffect, useMemo, useReducer } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';

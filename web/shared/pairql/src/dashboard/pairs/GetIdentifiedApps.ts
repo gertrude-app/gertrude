@@ -1,5 +1,4 @@
 // auto-generated, do not edit
-
 export namespace GetIdentifiedApps {
   export type Input = void;
 

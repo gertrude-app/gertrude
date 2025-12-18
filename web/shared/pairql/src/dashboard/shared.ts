@@ -1,4 +1,5 @@
 // auto-generated, do not edit
+export type { ServerPqlError } from '../PqlError';
 
 export interface AdminKeychain {
   summary: KeychainSummary;
@@ -122,24 +123,6 @@ export interface RuleSchedule {
     saturday: boolean;
   };
   window: PlainTimeWindow;
-}
-
-export interface ServerPqlError {
-  version: number;
-  id: string;
-  requestId: string;
-  type: `notFound` | `badRequest` | `serverError` | `unauthorized` | `loggedOut`;
-  userMessage?: string;
-  userAction?: string;
-  debugMessage: string;
-  entityName?: string;
-  showContactSupport: boolean;
-  dashboardTag?:
-    | `magicLinkTokenNotFound`
-    | `slackVerificationFailed`
-    | `emailAlreadyVerified`;
-  appTag?: `userTokenNotFound` | `connectionCodeNotFound` | `iosDeviceTokenNotFound`;
-  statusCode: number;
 }
 
 export type SharedKey =

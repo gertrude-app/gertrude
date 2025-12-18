@@ -1,6 +1,6 @@
 import { ApiErrorMessage, ChildActivityFeed, Loading } from '@dash/components';
 import { dateFromUrl } from '@dash/datetime';
-import { Result } from '@dash/types';
+import { Result } from '@shared/pairql';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import Current from '../../environment';

@@ -1,4 +1,4 @@
-import type { PlainTimeWindow, RuleSchedule } from './pairql/shared';
+import type { PlainTimeWindow, RuleSchedule } from './pairql';
 
 export function timeWindow(): PlainTimeWindow {
   return {

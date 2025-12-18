@@ -1,11 +1,9 @@
 // auto-generated, do not edit
-
-export namespace LoginMagicLink {
+export namespace RequestAdminMagicLink {
   export interface Input {
-    token: UUID;
+    email: string;
   }
   export interface Output {
-    token: UUID;
-    adminId: UUID;
+    success: boolean;
   }
 }

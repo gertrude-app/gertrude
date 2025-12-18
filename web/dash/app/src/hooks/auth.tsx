@@ -1,5 +1,5 @@
 import { env } from '@shared/components';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 import type { StorageClient } from '../environment/Storage';
 import Current from '../environment';
 import { OptionalVar as Optional } from '../environment/Environment';
@@ -24,14 +24,14 @@ const AuthContext = createContext<Auth>({
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [admin, setAdmin] = useState<Admin | null>(getInitialAdmin());
 
-  function login(id: UUID, token: UUID): void {
+  const login = useCallback((id: UUID, token: UUID): void => {
     Current.localStorage.setItem(`admin_id`, id);
     Current.localStorage.setItem(`admin_token`, token);
     Current.localStorage.removeItem(`dev_logged_out`);
     setAdmin({ id, token });
-  }
+  }, []);
 
-  function logout(): void {
+  const logout = useCallback((): void => {
     Current.sessionStorage.removeItem(`admin_id`);
     Current.sessionStorage.removeItem(`admin_token`);
     Current.localStorage.removeItem(`admin_id`);
@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       Current.localStorage.setItem(`dev_logged_out`, `true`);
     }
     setAdmin(null);
-  }
+  }, []);
 
   return (
     <AuthContext.Provider value={{ admin, login, logout }}>

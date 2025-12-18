@@ -1,4 +1,4 @@
-import { Result } from '@dash/types';
+import { Result } from '@shared/pairql';
 import type { ApiClient } from './client';
 
 const noopClient: ApiClient = {

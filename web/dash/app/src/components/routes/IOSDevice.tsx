@@ -8,9 +8,9 @@ import {
 } from '@dash/components';
 import { ApiErrorMessage, ConfirmDeleteEntity } from '@dash/components';
 import { Modal, SelectableListItem } from '@dash/components';
-import { Result } from '@dash/types';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import { Button, SelectMenu } from '@shared/components';
+import { Result } from '@shared/pairql';
 import { notNullish } from '@shared/ts-utils';
 import isEqual from 'lodash.isequal';
 import React, { useReducer } from 'react';

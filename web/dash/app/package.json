@@ -16,6 +16,7 @@
     "@dash/datetime": "workspace:*",
     "@dash/keys": "workspace:*",
     "@dash/utils": "workspace:*",
+    "@shared/pairql": "workspace:*",
     "@headlessui/react": "^1.6.6",
     "@heroicons/react": "2.0.17",
     "@shared/components": "workspace:*",

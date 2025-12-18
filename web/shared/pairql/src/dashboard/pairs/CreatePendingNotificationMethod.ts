@@ -1,5 +1,4 @@
 // auto-generated, do not edit
-
 export namespace CreatePendingNotificationMethod {
   export type Input =
     | {
