@@ -1,4 +1,6 @@
 // auto-generated, do not edit
+import type { DeviceModelFamily } from '../shared';
+
 export namespace ParentDetail {
   export interface Input {
     id: UUID;
@@ -23,15 +25,7 @@ export namespace ParentDetail {
         filterVersion?: string;
         osVersion?: string;
         modelIdentifier: string;
-        modelFamily:
-          | `macBook`
-          | `macBookAir`
-          | `macBookPro`
-          | `mini`
-          | `iMac`
-          | `studio`
-          | `pro`
-          | `unknown`;
+        modelFamily: DeviceModelFamily;
         modelTitle: string;
         createdAt: ISODateString;
       }>;

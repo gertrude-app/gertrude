@@ -2,3 +2,13 @@
 export type { ServerPqlError } from '../PqlError';
 
 export type ClientAuth = `none` | `child` | `parent` | `superAdmin`;
+
+export type DeviceModelFamily =
+  | `macBook`
+  | `macBookAir`
+  | `macBookPro`
+  | `mini`
+  | `iMac`
+  | `studio`
+  | `pro`
+  | `unknown`;

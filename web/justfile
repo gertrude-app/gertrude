@@ -12,9 +12,6 @@ site:
 admin:
   @pnpm --filter admin start
 
-admin-new:
-  @pnpm --filter admin-new start
-
 hmr-docs:
   @watchexec --watch site/markdoc --exts .md "just hmr-comment"
 
