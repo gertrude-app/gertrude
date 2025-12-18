@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import Phone from './super-scroller-illustration/Phone';
-import { useDelayedVisibility, useIntersectionVisibility } from '@/lib/hooks';
+import { useIntersectionVisibility } from '@/lib/hooks';
 
 const PodcastsBlock: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -35,7 +35,7 @@ const PodcastsBlock: React.FC = () => {
               className={`flex items-center justify-center gap-3 xs:mb-6 transition-all duration-500 ${
                 isVisible ? `translate-x-0 opacity-100` : `-translate-x-16 opacity-0`
               }`}
-              style={{ transitionDelay: isVisible ? `800ms` : `0ms` }}
+              style={{ transitionDelay: isVisible ? `200ms` : `0ms` }}
             >
               <PodcastIcon className="size-10 xs:size-12 md:size-14 text-orange-300 drop-shadow-[0_0_12px_rgba(253,186,116,0.5)]" />
               <h2 className="text-[2.75rem] xs:text-5xl md:text-7xl font-bold">
@@ -47,22 +47,12 @@ const PodcastsBlock: React.FC = () => {
                   AM
                 </span>
               </h2>
-              <img
-                src="/docs/images/gertrude-am-radio.png"
-                alt="Vintage radio representing Gertrude AM podcast app"
-                width={80}
-                height={80}
-                className={`w-20 rounded-xl hidden md:block shadow-[0_8px_30px_rgba(0,0,0,0.4)] ml-5 transition-all duration-500 ${
-                  isVisible ? `scale-100 opacity-100` : `scale-75 opacity-0`
-                }`}
-                style={{ transitionDelay: isVisible ? `600ms` : `0ms` }}
-              />
             </div>
             <p
               className={`text-lg xs:text-xl md:text-3xl font-medium -mt-3 xs:-mt-1 md:mt-0 mb-3 transition-all duration-500 ${
                 isVisible ? `translate-x-0 opacity-100` : `translate-x-16 opacity-0`
               }`}
-              style={{ transitionDelay: isVisible ? `1000ms` : `0ms` }}
+              style={{ transitionDelay: isVisible ? `300ms` : `0ms` }}
             >
               <span className="text-white/90">A Safe</span>
               {` `}
@@ -76,7 +66,7 @@ const PodcastsBlock: React.FC = () => {
               className={`hidden xs:block text-sm xs:text-base md:text-lg text-fuchsia-100/90 max-w-2xl mx-auto leading-snug transition-all duration-500 ${
                 isVisible ? `translate-x-0 opacity-100` : `-translate-x-12 opacity-0`
               }`}
-              style={{ transitionDelay: isVisible ? `1200ms` : `0ms` }}
+              style={{ transitionDelay: isVisible ? `400ms` : `0ms` }}
             >
               PIN-protected content control. Kids only listen to shows you approve.
             </p>
@@ -87,7 +77,7 @@ const PodcastsBlock: React.FC = () => {
               className={`flex items-center justify-center mb-0 xs:mb-4 md:mb-0 -my-24 xs:-my-12 md:-my-10 lg:my-0 transition-opacity duration-500 ${
                 isVisible ? `opacity-100` : `opacity-0`
               }`}
-              style={{ transitionDelay: isVisible ? `700ms` : `0ms` }}
+              style={{ transitionDelay: isVisible ? `100ms` : `0ms` }}
             >
               <div className="relative scale-[0.55] xs:scale-75 md:scale-100">
                 <div
@@ -96,7 +86,7 @@ const PodcastsBlock: React.FC = () => {
                       ? `translate-x-0 translate-y-0`
                       : `-translate-x-12 translate-y-8`
                   }`}
-                  style={{ transitionDelay: isVisible ? `900ms` : `0ms` }}
+                  style={{ transitionDelay: isVisible ? `200ms` : `0ms` }}
                 >
                   <Tablet>
                     <PodcastPlayerScreen />
@@ -108,7 +98,7 @@ const PodcastsBlock: React.FC = () => {
                       ? `translate-x-0 translate-y-0`
                       : `translate-x-12 translate-y-8`
                   }`}
-                  style={{ transitionDelay: isVisible ? `1100ms` : `0ms` }}
+                  style={{ transitionDelay: isVisible ? `350ms` : `0ms` }}
                 >
                   <Phone className="shadow-2xl scale-[0.47]" labelStatus="hidden">
                     <PincodeScreen isVisible={isVisible} />
@@ -117,26 +107,24 @@ const PodcastsBlock: React.FC = () => {
               </div>
             </div>
 
-            <div
-              className={`space-y-3 md:space-y-6 -mt-[7.5rem] xs:-mt-12 md:mt-0 transition-all duration-500 ${
-                isVisible ? `translate-x-0 opacity-100` : `translate-x-16 opacity-0`
-              }`}
-              style={{ transitionDelay: isVisible ? `1300ms` : `0ms` }}
-            >
+            <div className="space-y-3 md:space-y-6 -mt-[7.5rem] xs:-mt-12 md:mt-0">
               <FeatureCard
                 icon={LockKeyholeIcon}
                 title="Parents set PIN on first install"
-                delay={isVisible ? 1400 : 0}
+                isVisible={isVisible}
+                delay={450}
               />
               <FeatureCard
                 icon={SearchXIcon}
                 title="PIN required search or add shows"
-                delay={isVisible ? 1600 : 0}
+                isVisible={isVisible}
+                delay={550}
               />
               <FeatureCard
                 icon={HeadphonesIcon}
                 title="Approved shows always available"
-                delay={isVisible ? 1800 : 0}
+                isVisible={isVisible}
+                delay={650}
               />
             </div>
           </div>
@@ -149,7 +137,7 @@ const PodcastsBlock: React.FC = () => {
           className={`hidden md:flex flex-col items-center justify-center gap-1.5 my-8 md:mt-12 md:mb-16 text-white/50 text-sm hover:text-white/70 transition-all duration-500 antialiased relative z-10 ${
             isVisible ? `translate-y-0 opacity-100` : `translate-y-8 opacity-0`
           }`}
-          style={{ transitionDelay: isVisible ? `2000ms` : `0ms` }}
+          style={{ transitionDelay: isVisible ? `750ms` : `0ms` }}
         >
           <div
             className="flex items-center gap-1"
@@ -170,7 +158,7 @@ const PodcastsBlock: React.FC = () => {
           className={`flex flex-col sm:flex-row items-center justify-center gap-6 sm:mt-8 md:mt-0 transition-all duration-500 ${
             isVisible ? `translate-y-0 opacity-100` : `translate-y-12 opacity-0`
           }`}
-          style={{ transitionDelay: isVisible ? `2200ms` : `0ms` }}
+          style={{ transitionDelay: isVisible ? `850ms` : `0ms` }}
         >
           <a
             href="https://apps.apple.com/us/app/gertrude-am/id6753187429"
@@ -183,7 +171,7 @@ const PodcastsBlock: React.FC = () => {
               alt="Download on the App Store"
               width={168}
               height={56}
-              className="h-10 xs:h-12 md:h-14"
+              className="h-9 xs:h-11 md:h-12"
             />
           </a>
           <div className="text-center sm:text-left">
@@ -334,28 +322,31 @@ const PincodeScreen: React.FC<PincodeScreenProps> = ({ isVisible }) => {
 interface FeatureCardProps {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
+  isVisible: boolean;
   delay: number;
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ icon: Icon, title, delay }) => {
-  const isVisible = useDelayedVisibility(delay);
-
-  return (
-    <div
-      className={`bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl xs:rounded-2xl p-3 xs:p-4 md:p-6 transition-all duration-500 hover:bg-white/15 hover:border-white/30 ${
-        isVisible ? `opacity-100 translate-x-0` : `opacity-0 translate-x-8`
-      }`}
-    >
-      <div className="flex items-center gap-2.5 xs:gap-3 md:gap-4">
-        <div className="flex-shrink-0 w-9 h-9 xs:w-10 xs:h-10 md:w-12 md:h-12 rounded-lg xs:rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-          <Icon className="size-4 xs:size-5 md:size-6 text-white" />
-        </div>
-        <h3 className="text-sm xs:text-base md:text-lg md:leading-tight font-normal text-white leading-tight">
-          {title}
-        </h3>
+const FeatureCard: React.FC<FeatureCardProps> = ({
+  icon: Icon,
+  title,
+  isVisible,
+  delay,
+}) => (
+  <div
+    className={`bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl xs:rounded-2xl p-3 xs:p-4 md:p-6 transition-all duration-500 hover:bg-white/15 hover:border-white/30 ${
+      isVisible ? `opacity-100 translate-x-0` : `opacity-0 translate-x-8`
+    }`}
+    style={{ transitionDelay: isVisible ? `${delay}ms` : `0ms` }}
+  >
+    <div className="flex items-center gap-2.5 xs:gap-3 md:gap-4">
+      <div className="flex-shrink-0 w-9 h-9 xs:w-10 xs:h-10 md:w-12 md:h-12 rounded-lg xs:rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+        <Icon className="size-4 xs:size-5 md:size-6 text-white" />
       </div>
+      <h3 className="text-sm xs:text-base md:text-lg md:leading-tight font-normal text-white leading-tight">
+        {title}
+      </h3>
     </div>
-  );
-};
+  </div>
+);
 
 export default PodcastsBlock;

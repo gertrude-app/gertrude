@@ -42,9 +42,10 @@ const GertrudeForIOS: React.FC = () => {
           }}
         >
           <div
-            className="max-w-2xl mx-4 pointer-events-auto relative"
+            className="max-w-2xl mx-4 relative"
             style={{
               transform: `translateY(${Math.max(0, 1 - (exitProgress - 0.22) / 0.1) * 60}px)`,
+              pointerEvents: exitProgress > 0.22 ? `auto` : `none`,
             }}
           >
             <div className="text-center mb-6 xs:mb-12">
