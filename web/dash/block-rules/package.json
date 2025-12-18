@@ -10,6 +10,6 @@
   "devDependencies": {
     "@dash/types": "workspace:*",
     "@types/dash-ambient": "workspace:*",
-    "@types/node": "18.11.9"
+    "@types/node": "22.19.3"
   }
 }

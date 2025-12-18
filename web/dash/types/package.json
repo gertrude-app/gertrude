@@ -10,6 +10,7 @@
   "dependencies": {
     "@dash/utils": "workspace:*",
     "@heroicons/react": "2.0.17",
+    "@shared/pairql": "workspace:*",
     "@types/dash-ambient": "workspace:*"
   }
 }

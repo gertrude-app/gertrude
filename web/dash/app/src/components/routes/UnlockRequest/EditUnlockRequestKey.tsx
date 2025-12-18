@@ -1,6 +1,6 @@
 import { ErrorModal, KeyCreator, LoadingModal, Modal } from '@dash/components';
 import { convert, toKeyRecord } from '@dash/keys';
-import { Result } from '@dash/types';
+import { Result } from '@shared/pairql';
 import React, { useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';

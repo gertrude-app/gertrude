@@ -1,8 +1,8 @@
 import { env } from '@shared/components';
 import { useQuery as useLibQuery, useQueryClient } from '@tanstack/react-query';
 import type { QueryKey } from './key';
-import type { Result } from '@dash/types';
 import type { PqlError } from '@dash/types';
+import type { Result } from '@shared/pairql';
 import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 
 export function useQuery<T>(

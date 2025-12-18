@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 import { configDefaults, defineConfig } from 'vitest/config';
 
-process.env.VITE_API_ENDPOINT = ``;
+process.env.VITE_API_ENDPOINT = `https://not-real-api.com`;
 process.env.VITE_TURNSTILE_SITEKEY = ``;
 
 export default defineConfig({

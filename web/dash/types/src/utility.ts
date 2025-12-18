@@ -1,4 +1,5 @@
-import type { ServerPqlError, UnlockRequest } from './pairql';
+import type { UnlockRequest } from './pairql';
+import type { PqlError as SharedPqlError } from '@shared/pairql/src/PqlError';
 import type { ComponentProps, JSXElementConstructor } from 'react';
 
 export type RemoveFns<T> = {
@@ -21,27 +22,10 @@ export type UnlockRequestCreateKeyData = Pick<
   `url` | `domain` | `ipAddress` | `appCategories` | `appBundleId` | `appSlug`
 >;
 
-export type PqlError = Omit<
-  ServerPqlError,
-  | `requestId`
-  | `version`
-  | `statusCode`
-  | `showContactSupport`
-  | `type`
-  | `dashboardTag`
-  | `appTag`
-> & {
-  isPqlError: true;
-  type: ServerPqlError[`type`] | `clientError`;
-  tag?: ServerPqlError[`dashboardTag`];
-  showContactSupport?: boolean;
-  serverRequestId?: string;
-  clientRequestId?: string;
-};
+export type PqlError = SharedPqlError;
 
 export type RequestState<T = void, E = PqlError> =
   | { state: `idle` }
   | { state: `ongoing` }
   | { state: `failed`; error?: E }
   | { state: `succeeded`; payload: T };
-// TODO: can i make error non-optional?

@@ -7,9 +7,9 @@ import type {
   ConfirmableEntityAction,
   DeleteEntity_v2,
   PqlError,
-  Result,
   SuccessOutput,
 } from '@dash/types';
+import type { Result } from '@shared/pairql';
 import type { UseMutationResult } from '@tanstack/react-query';
 import Current from '../environment';
 import { isEditable, isUUID } from '../lib/helpers';

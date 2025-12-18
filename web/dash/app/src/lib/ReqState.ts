@@ -1,7 +1,7 @@
+import { ensurePqlError } from '@shared/pairql/src/PqlError';
 import type { MutationResult } from '../hooks/mutation';
 import type { QueryResult } from '../hooks/query';
 import type { RequestState } from '@dash/types';
-import { ensurePqlError } from '../pairql/query';
 
 export default class ReqState {
   static fromQuery<T>(query: QueryResult<T>): RequestState<T> {

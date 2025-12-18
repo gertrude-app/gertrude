@@ -8,6 +8,7 @@
     "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
   },
   "dependencies": {
+    "@shared/pairql": "workspace:*",
     "@types/dash-ambient": "workspace:*"
   }
 }

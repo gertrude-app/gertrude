@@ -1,5 +1,5 @@
 import { RequestModal } from '@dash/components';
-import { Result } from '@dash/types';
+import { Result } from '@shared/pairql';
 import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Current from '../../environment';

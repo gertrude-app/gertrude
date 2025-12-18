@@ -1,6 +1,6 @@
 import { ApiErrorMessage, Loading, Settings } from '@dash/components';
-import { Result } from '@dash/types';
 import { parseE164, prettyE164 } from '@dash/utils';
+import { Result } from '@shared/pairql';
 import { capitalize } from '@shared/string';
 import { notNullish, typesafe } from '@shared/ts-utils';
 import React, { useReducer, useState } from 'react';
