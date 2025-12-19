@@ -106,6 +106,7 @@ export interface IOSOverviewOutput {
 export interface PodcastOverviewOutput {
   totalInstalls: number;
   successfulSubscriptions: number;
+  conversionRate: number;
 }
 
 export interface ParentsListOutput {

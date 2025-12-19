@@ -363,10 +363,6 @@ interface PodcastSectionProps {
 }
 
 const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {
-  const conversionRate =
-    data.totalInstalls > 0
-      ? ((data.successfulSubscriptions / data.totalInstalls) * 100).toFixed(1)
-      : `0.0`;
   const yearlyRevenue = Math.round(data.successfulSubscriptions * 10 * 0.85);
 
   return (
@@ -397,7 +393,7 @@ const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {
           </div>
           <div className="bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl p-4">
             <div className="text-2xl font-display font-semibold text-white">
-              {conversionRate}%
+              {data.conversionRate}%
             </div>
             <div className="text-sm mt-1 text-white/80">Conversion</div>
           </div>

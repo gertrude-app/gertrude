@@ -5,5 +5,6 @@ export namespace PodcastOverview {
   export interface Output {
     totalInstalls: number;
     successfulSubscriptions: number;
+    conversionRate: number;
   }
 }
