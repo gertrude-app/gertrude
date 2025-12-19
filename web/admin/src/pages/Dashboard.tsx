@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import client, {
-  type IOSOverviewOutput,
-  type MacOverviewOutput,
-  type PodcastOverviewOutput,
-} from '../api/client';
+import type { T } from '@shared/pairql/admin';
+import client from '../api/client';
 import SignupGraph from '../components/SignupGraph';
 
 interface IconProps {
@@ -96,9 +93,9 @@ const LoadingSpinner: React.FC<IconProps> = ({ className = `` }) => (
 );
 
 const Dashboard: React.FC = () => {
-  const [macData, setMacData] = useState<MacOverviewOutput | null>(null);
-  const [iosData, setIosData] = useState<IOSOverviewOutput | null>(null);
-  const [podcastData, setPodcastData] = useState<PodcastOverviewOutput | null>(null);
+  const [macData, setMacData] = useState<T.MacOverview.Output | null>(null);
+  const [iosData, setIosData] = useState<T.IOSOverview.Output | null>(null);
+  const [podcastData, setPodcastData] = useState<T.PodcastOverview.Output | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -176,7 +173,7 @@ const Dashboard: React.FC = () => {
 };
 
 interface MacSectionProps {
-  data: MacOverviewOutput;
+  data: T.MacOverview.Output;
 }
 
 const MacSection: React.FC<MacSectionProps> = ({ data }) => {
@@ -248,7 +245,7 @@ const MacSection: React.FC<MacSectionProps> = ({ data }) => {
 };
 
 interface IOSSectionProps {
-  data: IOSOverviewOutput;
+  data: T.IOSOverview.Output;
 }
 
 const IOSSection: React.FC<IOSSectionProps> = ({ data }) => {
@@ -359,7 +356,7 @@ const FunnelBar: React.FC<FunnelBarProps> = ({ label, value, count, gradient }) 
 );
 
 interface PodcastSectionProps {
-  data: PodcastOverviewOutput;
+  data: T.PodcastOverview.Output;
 }
 
 const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {

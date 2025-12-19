@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import client, { type ParentDetailOutput } from '../api/client';
+import type { T } from '@shared/pairql/admin';
+import client from '../api/client';
 
 interface IconProps {
   className?: string;
@@ -233,7 +234,7 @@ const LoadingSpinner: React.FC<IconProps> = ({ className = `` }) => (
 
 const ParentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [data, setData] = useState<ParentDetailOutput | null>(null);
+  const [data, setData] = useState<T.ParentDetail.Output | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
