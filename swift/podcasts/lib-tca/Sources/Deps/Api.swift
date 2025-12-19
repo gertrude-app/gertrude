@@ -13,6 +13,8 @@ struct ApiClient: Sendable {
   ) async throws -> Void
   var productIds: @Sendable () async throws -> [String]
   var createDatabaseUpload: @Sendable (_ installId: UUID) async throws -> URL
+  var verifyPromoCode: @Sendable (_ installId: UUID, _ code: String) async throws -> Bool
+  var verifyDbDownload: @Sendable (_ installId: UUID, _ downloadUrl: String) async throws -> Bool
 }
 
 extension ApiClient {
@@ -33,6 +35,20 @@ extension ApiClient {
 
   struct CreateDatabaseUploadOutput: Codable {
     var uploadUrl: URL
+  }
+
+  struct VerifyPromoCodeInput: Codable {
+    var installId: UUID
+    var code: String
+  }
+
+  struct VerifyDbDownloadInput: Codable {
+    var installId: UUID
+    var downloadUrl: String
+  }
+
+  struct SuccessOutput: Codable {
+    var success: Bool
   }
 }
 
@@ -71,6 +87,16 @@ extension ApiClient: DependencyKey {
           input: input,
         )
         return output.uploadUrl
+      },
+      verifyPromoCode: { installId, code in
+        let input = VerifyPromoCodeInput(installId: installId, code: code)
+        let output: SuccessOutput = try await pairql("VerifyPromoCode", input: input)
+        return output.success
+      },
+      verifyDbDownload: { installId, downloadUrl in
+        let input = VerifyDbDownloadInput(installId: installId, downloadUrl: downloadUrl)
+        let output: SuccessOutput = try await pairql("VerifyDbDownload", input: input)
+        return output.success
       },
     )
   }
