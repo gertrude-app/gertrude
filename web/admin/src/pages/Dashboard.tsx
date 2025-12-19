@@ -261,7 +261,7 @@ const IOSSection: React.FC<IOSSectionProps> = ({ data }) => {
     { label: `Auth Successes`, value: data.authorizationSuccesses.toLocaleString() },
     { label: `Filter Installs`, value: data.filterInstallSuccesses.toLocaleString() },
     {
-      label: `Conversion Rate`,
+      label: `Success Rate`,
       value: `${data.conversionRate.toFixed(1)}%`,
       highlight: true,
     },
