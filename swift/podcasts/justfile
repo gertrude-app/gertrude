@@ -1,0 +1,110 @@
+_default:
+  @just --choose
+
+gen:
+  @xcodegen -s project.yml
+  @xml-lint --fix app/Info.plist
+
+xcode:
+  @open GertiePodcasts.xcodeproj
+
+previews:
+  @open previews/GertiePodcastsPreviews.xcodeproj
+
+dev:
+  @pnpm concurrently --raw \
+    -n lv,lc,lt,sp \
+    -c cyan.dim,magenta.dim,green.dim,yellow.dim \
+    "just --justfile {{justfile()}} watch-build lib-views" \
+    "just --justfile {{justfile()}} watch-build lib-core" \
+    "just --justfile {{justfile()}} watch-build lib-tca" \
+    "just --justfile {{justfile()}} watch-sync-previews"
+
+build-views:
+  @cd lib-views && swift build
+
+build-core:
+  @cd lib-core && swift build
+
+build-tca:
+  @cd lib-tca && swift build
+
+build:
+  @just build-tca
+  @just build-core
+  @just build-views
+
+test:
+  @cd lib-tca && SWIFT_DETERMINISTIC_HASHING=1 swift test
+  @cd lib-views && SWIFT_DETERMINISTIC_HASHING=1 swift test
+
+format: clean
+  @swiftformat --exclude '**/.build' .
+  @xml-lint --fix app/Info.plist app/LaunchScreen.storyboard
+  @prettier --write '**/*.json' 
+
+build-app:
+  xcodebuild -workspace GertiePodcasts.xcodeproj/project.xcworkspace \
+    -scheme App -configuration Debug build 
+
+clean:
+  @rm -rf lib-tca/.build lib-core/.build lib-views/.build
+  @find lib-tca lib-core lib-views -type f \( -name '*.o' -o -name '*.d' -o -name '*.swiftdeps' -o -name '*.swiftdeps~' \) -delete
+
+sim-db:
+  @sqlite3 -box {{sim-docs-dir}}/db.sqlite
+
+sim-db-delete:
+  @rm -f {{sim-docs-dir}}/db.*
+
+sim-reset:
+  @just sim-db-delete
+  @rm -rf {{sim-docs-dir}}/shows
+
+sim-fs-open:
+  @open {{sim-docs-dir}}
+
+sim-fs-tree:
+  @tree {{sim-docs-dir}}
+
+# previews
+
+regen-previews:
+  @rm -rf previews
+  @just gen-previews
+  @just previews
+
+gen-previews:
+  @mkdir -p previews/sources
+  @just sync-previews
+  @xcodegen -s previews.yml --project previews
+
+sync-previews:
+  @rsync -rc lib-views/Sources/ previews/sources
+  @rsync -rc app/Assets.xcassets/ previews/Assets.xcassets
+
+watch-sync-previews:
+  @watchexec --project-origin . --clear --restart \
+    --watch lib-views/Sources --watch app/Assets.xcassets --exts swift,html,png,json \
+    --ignore '**/.build/*/**' --ignore '**/index.html' \
+    'rsync -rc lib-views/Sources/ previews/sources && rsync -rc app/Assets.xcassets/ previews/Assets.xcassets && printf "synced: " && date'
+
+
+# utility
+
+[private]
+watch-swift dir cmd ignore1="•" ignore2="•":
+  @watchexec --project-origin . --clear --restart --watch {{dir}} --exts swift,html \
+  --ignore '**/.build/*/**' --ignore '**/index.html' --ignore '{{ignore1}}' --ignore '{{ignore2}}' \
+  {{cmd}}
+
+watch-build dir:
+  @just watch-swift {{dir}} '"cd {{dir}} && swift build"'
+
+watch-test dir isolate="":
+  @just watch-swift {{dir}} '"cd {{dir}} && \
+  SWIFT_DETERMINISTIC_HASHING=1 swift test \
+  {{ if isolate != "" { "--filter " + isolate } else { "" } }} "'
+
+sim-docs-dir := `ls -dt ~/Library/Developer/CoreSimulator/Devices/*/data/Containers/Data/Application/*/Documents | head -1`
+
