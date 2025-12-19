@@ -29,14 +29,24 @@ extension AddShowFeature {
       }
     }
 
-    if input.starts(with: "am: download db 660b2f93 ") {
-      let urlString = String(input.dropFirst("am: download db 660b2f93 ".count))
+    if input.starts(with: "am: download db ") {
+      let urlString = String(input.dropFirst("am: download db ".count))
       guard let url = URL(string: urlString) else {
         log(.error("d8e9f1a2"), "download db fail: invalid url")
         return .send(.delegate(.alert("DB download failed, invalid URL")))
       }
 
       return .run { send in
+        guard let installId = self.keychain.loadInstallId() else {
+          await send(.delegate(.alert("DB download failed: no install id")))
+          return
+        }
+        let allowed = try await self.api.verifyDbDownload(installId, urlString)
+        guard allowed else {
+          log(.info("c3b2a1f0"), "download db not allowed")
+          await send(.delegate(.alert("DB download not allowed")))
+          return
+        }
         let (data, response) = try await URLSession.shared.data(from: url)
         guard let httpResponse = response as? HTTPURLResponse,
               (200 ... 299).contains(httpResponse.statusCode) else {
@@ -50,11 +60,22 @@ extension AddShowFeature {
       }
     }
 
-    if input == "am: c731abbfe9d" {
+    if input.starts(with: "am: promo ") {
+      let code = String(input.dropFirst("am: promo ".count))
       return .run { send in
-        try CurrentSubscription.set(status: .complimentary, expiringAt: .distantFuture)
-        log(.info("111b15d5"), "set subscription to complimentary")
-        await send(.delegate(.alert("Subscription set to complimentary :)")))
+        guard let installId = self.keychain.loadInstallId() else {
+          await send(.delegate(.alert("Promo failed: no install id")))
+          return
+        }
+        let verified = try await self.api.verifyPromoCode(installId, code)
+        if verified {
+          try CurrentSubscription.set(status: .complimentary, expiringAt: .distantFuture)
+          log(.info("111b15d5"), "set subscription to complimentary")
+          await send(.delegate(.alert("Subscription set to complimentary :)")))
+        } else {
+          log(.info("9a7c3e21"), "promo code verification failed")
+          await send(.delegate(.alert("Invalid promo code")))
+        }
       }
     }
 
