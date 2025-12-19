@@ -1,0 +1,37 @@
+{
+  "name": "@storybook/app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "storybook dev --port 6006 --config-dir ./config --ci --disable-telemetry",
+    "build": "storybook build --config-dir ./config --disable-telemetry",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@argos-ci/puppeteer": "0.0.2",
+    "@dash/components": "workspace:*",
+    "@dash/keys": "workspace:*",
+    "@dash/types": "workspace:*",
+    "@macos/appviews": "workspace:*",
+    "@shared/components": "workspace:*",
+    "@shared/datetime": "workspace:*",
+    "@shared/tailwind": "workspace:*",
+    "@shared/ts-utils": "workspace:*",
+    "@storybook/addon-essentials": "8.0.5",
+    "@storybook/nextjs": "8.0.5",
+    "@storybook/react": "8.0.5",
+    "@types/dash-ambient": "workspace:*",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "autoprefixer": "10.4.14",
+    "classnames": "2.5.1",
+    "postcss": "^8",
+    "puppeteer": "19.2.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.22.3",
+    "storybook": "8.0.5",
+    "tailwindcss": "3.4.17",
+    "ts-node": "10.9.1"
+  }
+}

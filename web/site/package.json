@@ -1,0 +1,45 @@
+{
+  "name": "site",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "next dev",
+    "build": "next build && cp _redirects _headers ./out",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
+  },
+  "dependencies": {
+    "@docsearch/react": "^3.2.1",
+    "@headlessui/react": "^1.6.6",
+    "@markdoc/markdoc": "0.4.0",
+    "@next/third-parties": "14.2.4",
+    "@radix-ui/react-dropdown-menu": "2.0.6",
+    "@shared/components": "workspace:*",
+    "@shared/datetime": "workspace:*",
+    "@shared/string": "workspace:*",
+    "@shared/tailwind": "workspace:*",
+    "@sindresorhus/slugify": "^2.1.0",
+    "@tailwindcss/typography": "^0.5.7",
+    "classnames": "2.5.1",
+    "lucide-react": "0.427.0",
+    "next": "14.1.4",
+    "prismjs": "1.29.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-turnstile": "1.1.4"
+  },
+  "devDependencies": {
+    "@types/glob": "8.1.0",
+    "@types/js-yaml": "4.0.5",
+    "@types/node": "22.19.3",
+    "@types/prismjs": "1.26.0",
+    "@types/seedrandom": "3.0.8",
+    "autoprefixer": "10.4.14",
+    "glob": "10.3.10",
+    "gray-matter": "4.0.3",
+    "js-yaml": "4.1.0",
+    "next-transpile-modules": "^10.0.0",
+    "seedrandom": "3.0.5",
+    "tailwindcss": "3.4.17"
+  }
+}

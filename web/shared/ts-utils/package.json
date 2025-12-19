@@ -1,0 +1,10 @@
+{
+  "name": "@shared/ts-utils",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "ISC",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
+  }
+}

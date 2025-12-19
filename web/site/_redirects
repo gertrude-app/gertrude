@@ -1,0 +1,97 @@
+###########################
+# marketing site redesign #
+###########################
+/download /download-mac-app 301
+/docs/mac-internet-filter /blog/mac-internet-filter 301
+/docs/mac-keylogger /blog/mac-keylogger 301
+/docs/ios-17-cant-delete-messages-images /blog/ios-17-cant-delete-messages-images 301
+/docs/definitive-guide-to-locking-down-an-iphone /blog/definitive-guide-to-locking-down-an-iphone 301
+/docs/five-things-you-forgot-when-locking-down-your-kids-iphone /blog/five-things-you-forgot-when-locking-down-your-kids-iphone 301
+/docs/guia-definitiva-para-bloquear-un-iphone /blog/guia-definitiva-para-bloquear-un-iphone 301
+
+###################
+# temp conference #
+###################
+/ghc https://parents.gertrude.app/conf-booth 302
+/workshop https://parents.gertrude.app/conf-workshop 302
+
+########
+# misc #
+########
+/support /contact 301
+/lockdown /blog/definitive-guide-to-locking-down-an-iphone 302
+
+#################
+# parent rename #
+#################
+/docs/keeping-users-safe /docs/keeping-children-safe 301
+/docs /docs/getting-started 302
+
+#############
+# macos app #
+#############
+/app-redir/connect/more-info /docs/getting-started 301
+/app-redir/connect/contact-support /contact 301
+
+##############
+# onboarding #
+##############
+/start https://parents.gertrude.app/signup 302
+
+# CREATE MACOS USER (current: 2.5.0+)
+# catalina, big sur, and monterey are same
+/cu-cl https://youtu.be/FFFOF3BmSos 302
+/cu-bs https://youtu.be/FFFOF3BmSos 302
+/cu-mr https://youtu.be/FFFOF3BmSos 302
+# ventura
+/cu-vt https://youtu.be/Z_kC6ZfXZDU 302
+# sonoma and sequoia are the same
+/cu-sn https://youtu.be/ntnFEW0bRVQ 302
+/cu-sq https://youtu.be/ntnFEW0bRVQ 302
+# tahoe
+/cu-th https://youtu.be/eFbbe3pBpH4 302
+
+# DEMOTE MACOS USER (current: 2.5.0+)
+# catalina, big sur, and monterey are same
+/du-cl https://youtu.be/tT3wowZ3BZ8 302
+/du-bs https://youtu.be/tT3wowZ3BZ8 302
+/du-mr https://youtu.be/tT3wowZ3BZ8 302
+# ventura
+/du-vt https://youtu.be/Sq0baQ4Ze6o 302
+# sonoma and sequoia are the same
+/du-sn https://youtu.be/jn0Iv4brL94 302
+/du-sq https://youtu.be/jn0Iv4brL94 302
+# tahoe
+/du-th https://youtu.be/ceKliUSDvR4 302
+
+# SWITCH MACOS USER (current: 2.5.0+)
+# catalina, big sur, and monterey are same
+/su-cl https://youtu.be/jhufHnF6nEI 302
+/su-bs https://youtu.be/jhufHnF6nEI 302
+/su-mr https://youtu.be/jhufHnF6nEI 302
+# ventura
+/su-vt https://youtu.be/lAoeKEFy9Zw 302
+# sonoma and sequoia are the same
+/su-sn https://youtu.be/CV8AqA5nTqs 302
+/su-sq https://youtu.be/CV8AqA5nTqs 302
+# tahoe
+/su-th https://youtu.be/mjI6l_Hx-CU 302
+
+# edit children
+/a-c https://parents.gertrude.app/children 302
+
+###########
+# utility #
+###########
+/s3-bg https://gertrude.nyc3.digitaloceanspaces.com/gradient-bg.png
+/s3-testapp https://gertrude.nyc3.digitaloceanspaces.com/testapp.zip
+
+###########
+# ios app #
+###########
+/iosapp-contact https://gertrude.app/contact 302
+/iosapp-supervise https://gertrude.app/blog/gertrude-ios-supervised-mode 302
+/iosapp-apple-fam https://support.apple.com/en-us/108380 302
+/iosapp-main https://gertrude.app 302
+/iosapp-connect https://gertrude.app/blog/gertrude-ios-account-connection 302
+/iosapp-connect-help https://gertrude.app/docs/ios-account-connection-help 302

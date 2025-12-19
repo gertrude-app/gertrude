@@ -1,0 +1,12 @@
+{
+  "targetDefaults": {
+    "typecheck": {
+      "cache": true
+    }
+  },
+  "defaultBase": "master",
+  "useInferencePlugins": false,
+  "tui": {
+    "enabled": false
+  }
+}

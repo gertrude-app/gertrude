@@ -1,0 +1,38 @@
+{
+  "name": "@macos/appviews",
+  "version": "1.0.0",
+  "main": "./src/exports.ts",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
+  },
+  "dependencies": {
+    "@dash/components": "workspace:*",
+    "@headlessui/react": "1.7.12",
+    "@shared/components": "workspace:*",
+    "@shared/datetime": "workspace:*",
+    "@shared/string": "workspace:*",
+    "@shared/tailwind": "workspace:*",
+    "@shared/ts-utils": "workspace:*",
+    "@vitejs/plugin-react": "3.1.0",
+    "react": "18.2.0",
+    "react-confetti-explosion": "2.1.2",
+    "react-dom": "18.2.0",
+    "typescript": "5.8.3",
+    "vite": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "autoprefixer": "10.4.14",
+    "classnames": "2.5.1",
+    "x-exec": "^1.2.0"
+  },
+  "browserslist": [
+    "Safari > 13"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@dash/types",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "ISC",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
+  },
+  "dependencies": {
+    "@dash/utils": "workspace:*",
+    "@heroicons/react": "2.0.17",
+    "@shared/pairql": "workspace:*",
+    "@types/dash-ambient": "workspace:*"
+  }
+}

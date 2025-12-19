@@ -1,0 +1,33 @@
+{
+  "name": "@dash/components",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "ISC",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
+  },
+  "dependencies": {
+    "@dash/block-rules": "workspace:*",
+    "@dash/datetime": "workspace:*",
+    "@dash/keys": "workspace:*",
+    "@dash/types": "workspace:*",
+    "@dash/utils": "workspace:*",
+    "@headlessui/react": "^1.7.3",
+    "@heroicons/react": "2.0.17",
+    "@shared/components": "workspace:*",
+    "@shared/string": "workspace:*",
+    "@shared/ts-utils": "workspace:*",
+    "@types/dash-ambient": "workspace:*",
+    "classnames": "2.5.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.22.3",
+    "uuid": "9.0.0"
+  },
+  "devDependencies": {
+    "@shared/datetime": "workspace:*",
+    "@types/react-dom": "18.3.1",
+    "@types/uuid": "8.3.4"
+  }
+}

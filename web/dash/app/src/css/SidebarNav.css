@@ -1,0 +1,146 @@
+@media (max-width: 767px) {
+  @media (max-height: 649px) {
+    .LinkList {
+      gap: 2px;
+    }
+
+    .Logo {
+      margin-top: 1rem;
+    }
+
+    .SidebarNav .SidebarLink {
+      padding-left: 8px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    .SidebarNav .SidebarLink .Icon {
+      width: 24px;
+    }
+  }
+
+  @media (max-height: 719px) and (min-height: 650px) {
+    .LinkList {
+      gap: 4px;
+    }
+
+    .Logo {
+      margin-top: 1rem;
+    }
+
+    .SidebarNav .SidebarLink {
+      padding-left: 10px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    .SidebarNav .SidebarLink .Icon {
+      width: 24px;
+    }
+  }
+
+  @media (min-height: 720px) {
+    .LinkList {
+      gap: 8px;
+    }
+
+    .SidebarNav .SidebarLink {
+      padding-left: 12px;
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
+    .SidebarNav .SidebarLink .Icon {
+      width: 28px;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  @media (max-height: 649px) {
+    .LinkList.expanded {
+      gap: 0px;
+    }
+
+    .SidebarNav .SidebarLink.expanded {
+      padding-left: 8px;
+      padding-top: 6px;
+      padding-bottom: 6px;
+    }
+
+    .SidebarNav .SidebarLink.expanded .Icon {
+      width: 24px;
+    }
+
+    .LinkList.collapsed {
+      gap: 0px;
+    }
+
+    .SidebarNav .SidebarLink.collapsed {
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    .SidebarNav .SidebarLink.collapsed .Icon {
+      width: 24px;
+    }
+  }
+
+  @media (max-height: 719px) and (min-height: 650px) {
+    .LinkList.expanded {
+      gap: 4px;
+    }
+
+    .SidebarNav .SidebarLink.expanded {
+      padding-left: 10px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    .SidebarNav .SidebarLink.expanded .Icon {
+      width: 24px;
+    }
+
+    .LinkList.collapsed {
+      gap: 2px;
+    }
+
+    .SidebarNav .SidebarLink.collapsed {
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
+    .SidebarNav .SidebarLink.collapsed .Icon {
+      width: 24px;
+    }
+  }
+
+  @media (min-height: 720px) {
+    .LinkList.expanded {
+      gap: 8px;
+    }
+
+    .SidebarNav .SidebarLink.expanded {
+      padding-left: 12px;
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
+    .SidebarNav .SidebarLink.expanded .Icon {
+      width: 28px;
+    }
+
+    .LinkList.collapsed {
+      gap: 0px;
+    }
+
+    .SidebarNav .SidebarLink.collapsed {
+      padding-top: 1em;
+      padding-bottom: 1em;
+    }
+
+    .SidebarNav .SidebarLink.collapsed .Icon {
+      width: 28px;
+    }
+  }
+}

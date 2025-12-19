@@ -1,0 +1,101 @@
+.Drawer footer {
+  padding: 12px;
+}
+
+.Drawer .ScheduleContainer {
+  padding-bottom: 4px;
+}
+
+.Drawer .SelectableKeychain .KeychainName {
+  font-size: 16px;
+}
+
+.Drawer .SelectableKeychain .KeychainDescription {
+  font-size: 13px;
+}
+
+.Drawer .KeychainScroller {
+  padding: 14px 12px 6px 12px;
+}
+
+.Drawer .Toggle {
+  border-radius: 8px;
+}
+
+.Drawer .Toggle button {
+  font-size: 14px;
+  padding: 1px 12px;
+  border-radius: 8px;
+}
+
+.Drawer .SearchAndToggleContainer {
+  gap: 8px;
+}
+
+.Drawer .SearchAndToggleContainer input {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 32px;
+  font-size: 14px;
+}
+
+.Drawer .SearchAndToggleContainer .Icon {
+  top: 6px;
+  left: 10px;
+  width: 16px;
+}
+
+@media (min-height: 650px) {
+  .Drawer footer {
+    padding: 16px;
+  }
+
+  .Drawer .KeychainScroller {
+    padding: 20px 16px 10px 16px;
+  }
+
+  .Drawer .Toggle {
+    border-radius: 12px;
+  }
+
+  .Drawer .Toggle button {
+    font-size: 16px;
+    padding: 4px 16px;
+    border-radius: 12px;
+  }
+
+  .Drawer .SearchAndToggleContainer {
+    gap: 16px;
+  }
+
+  .Drawer .SearchAndToggleContainer input {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 40px;
+    font-size: 16px;
+  }
+
+  .Drawer .SearchAndToggleContainer .Icon {
+    top: 8px;
+    left: 12px;
+    width: 20px;
+  }
+}
+
+@media (min-height: 750px) {
+  .Drawer footer {
+    padding: 24px;
+  }
+
+  .Drawer .ScheduleContainer {
+    padding-bottom: 16px;
+  }
+
+  .Drawer .SelectableKeychain .KeychainName {
+    font-size: 18px;
+  }
+
+  .Drawer .SelectableKeychain .KeychainDescription {
+    font-size: 14px;
+  }
+}

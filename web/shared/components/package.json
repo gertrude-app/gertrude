@@ -1,0 +1,19 @@
+{
+  "name": "@shared/components",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "ISC",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
+  },
+  "dependencies": {
+    "@headlessui/react": "1.7.11",
+    "@heroicons/react": "2.0.17",
+    "@shared/datetime": "workspace:*",
+    "classnames": "2.5.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.22.3"
+  }
+}
