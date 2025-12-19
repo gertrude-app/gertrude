@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import client, { type ParentsListOutput } from '../api/client';
+import type { T } from '@shared/pairql/admin';
+import client from '../api/client';
 
 interface IconProps {
   className?: string;
@@ -77,7 +78,7 @@ const ParentsList: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get(`page`) ?? `1`, 10);
 
-  const [data, setData] = useState<ParentsListOutput | null>(null);
+  const [data, setData] = useState<T.ParentsList.Output | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

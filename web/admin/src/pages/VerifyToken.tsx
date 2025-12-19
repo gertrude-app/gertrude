@@ -58,7 +58,7 @@ const VerifyToken: React.FC<VerifyTokenProps> = ({ onLogin }) => {
     }
 
     const verifyToken = async (): Promise<void> => {
-      const result = await client.verifyMagicLink({ token });
+      const result = await client.verifyAdminMagicLink({ token });
 
       if (result.isSuccess && result.value) {
         onLogin(result.value.token);

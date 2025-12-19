@@ -101,7 +101,7 @@ const Login: React.FC = () => {
     setStatus(`loading`);
     setErrorMsg(``);
 
-    const result = await client.requestMagicLink({ email });
+    const result = await client.requestAdminMagicLink({ email });
 
     if (result.isSuccess) {
       setStatus(`sent`);

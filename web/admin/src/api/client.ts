@@ -1,5 +1,6 @@
-import { Client, type PqlError } from '@shared/pairql';
-import type { Result } from '@shared/pairql';
+import AdminClient from '@shared/pairql/admin';
+import type { PqlError } from '@shared/pairql';
+import type { ClientAuth } from '@shared/pairql/src/admin';
 
 function getEndpoint(): string {
   const href =
@@ -17,10 +18,11 @@ function getEndpoint(): string {
   }
 }
 
-type Auth = `superAdmin` | `none`;
-
-function createPrepareRequest(): (init: RequestInit, auth: Auth) => PqlError | null {
-  return (init: RequestInit, auth: Auth): PqlError | null => {
+function createPrepareRequest(): (
+  init: RequestInit,
+  auth: ClientAuth,
+) => PqlError | null {
+  return (init: RequestInit, auth: ClientAuth): PqlError | null => {
     const headers = init.headers as Record<string, string>;
 
     if (auth === `superAdmin`) {
@@ -38,126 +40,6 @@ function createPrepareRequest(): (init: RequestInit, auth: Auth) => PqlError | n
 
     return null;
   };
-}
-
-class AdminClient extends Client<Auth> {
-  constructor(
-    endpoint: string,
-    prepareRequest: (init: RequestInit, auth: Auth) => PqlError | null,
-  ) {
-    super(endpoint, `admin`, prepareRequest);
-  }
-
-  async requestMagicLink(input: {
-    email: string;
-  }): Promise<Result<{ success: boolean }>> {
-    return this.query<{ success: boolean }>(input, `RequestAdminMagicLink`, `none`);
-  }
-
-  async verifyMagicLink(input: { token: string }): Promise<Result<{ token: string }>> {
-    return this.query<{ token: string }>(input, `VerifyAdminMagicLink`, `none`);
-  }
-
-  async macOverview(): Promise<Result<MacOverviewOutput>> {
-    return this.query<MacOverviewOutput>(undefined, `MacOverview`, `superAdmin`);
-  }
-
-  async iOSOverview(): Promise<Result<IOSOverviewOutput>> {
-    return this.query<IOSOverviewOutput>(undefined, `IOSOverview`, `superAdmin`);
-  }
-
-  async podcastOverview(): Promise<Result<PodcastOverviewOutput>> {
-    return this.query<PodcastOverviewOutput>(undefined, `PodcastOverview`, `superAdmin`);
-  }
-
-  async parentsList(input: {
-    page: number;
-    pageSize?: number;
-  }): Promise<Result<ParentsListOutput>> {
-    return this.query<ParentsListOutput>(input, `ParentsList`, `superAdmin`);
-  }
-
-  async parentDetail(input: { id: string }): Promise<Result<ParentDetailOutput>> {
-    return this.query<ParentDetailOutput>(input, `ParentDetail`, `superAdmin`);
-  }
-}
-
-export interface MacOverviewOutput {
-  annualRevenue: number;
-  payingParents: number;
-  activeParents: number;
-  childrenOfActiveParents: number;
-  allTimeChildren: number;
-  allTimeAppInstallations: number;
-  recentSignups: Array<{
-    date: string;
-    status: string;
-    email: string;
-  }>;
-}
-
-export interface IOSOverviewOutput {
-  firstLaunches: number;
-  authorizationSuccesses: number;
-  filterInstallSuccesses: number;
-  conversionRate: number;
-}
-
-export interface PodcastOverviewOutput {
-  totalInstalls: number;
-  successfulSubscriptions: number;
-}
-
-export interface ParentsListOutput {
-  parents: Array<{
-    id: string;
-    email: string;
-    createdAt: string;
-    subscriptionStatus: string;
-    numChildren: number;
-    numKeychains: number;
-    numNotifications: number;
-    status: string;
-  }>;
-  totalCount: number;
-  page: number;
-  totalPages: number;
-}
-
-export interface ParentDetailOutput {
-  id: string;
-  email: string;
-  subscriptionStatus: string;
-  subscriptionId?: string;
-  monthlyPriceInCents: number;
-  createdAt: string;
-  children: Array<{
-    id: string;
-    name: string;
-    keyloggingEnabled: boolean;
-    screenshotsEnabled: boolean;
-    createdAt: string;
-    installations: Array<{
-      id: string;
-      appVersion: string;
-      filterVersion?: string;
-      osVersion?: string;
-      modelIdentifier: string;
-      modelFamily: string;
-      modelTitle: string;
-      createdAt: string;
-    }>;
-  }>;
-  keychains: Array<{
-    id: string;
-    name: string;
-    numKeys: number;
-    isPublic: boolean;
-  }>;
-  notifications: Array<{
-    id: string;
-    trigger: string;
-  }>;
 }
 
 const client = new AdminClient(getEndpoint(), createPrepareRequest());
