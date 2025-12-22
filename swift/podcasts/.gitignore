@@ -1,8 +1,0 @@
-.DS_Store
-*.swp
-node_modules/
-.env
-GertiePodcasts.xcodeproj/
-previews/
-**/.build/
-**/.swiftpm/

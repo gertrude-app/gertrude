@@ -1,0 +1,41 @@
+# OS
+.DS_Store
+
+# Editors
+*.swp
+.vscode/*
+.nvim/*
+Session.vim*
+.cursor/
+
+# Environment
+.env
+**/.env
+**/.env.local
+swift/api/.env*
+
+# Node
+node_modules/
+
+# Swift
+**/.build/
+**/.swiftpm/
+**/xcuserdata/
+buildServer.json
+*.sql
+index.html
+
+# Web/TypeScript
+**/.next
+**/out
+**/dist
+**/tsconfig.tsbuildinfo
+.nx/
+web/appviews/src/main.tsx
+web/storybook/storybook-static/
+web/dash/app/build
+web/dash/app/cypress/screenshots
+web/smoke/cypress.env.json
+**/cypress/downloads
+**/cypress/videos
+.playwright-mcp/

@@ -1,10 +1,16 @@
-name: ci
+name: podcasts-ci
 
 on:
   push:
     branches:
       - master
+    paths:
+      - 'swift/podcasts/**'
+      - '.github/workflows/podcasts-ci.yml'
   pull_request:
+    paths:
+      - 'swift/podcasts/**'
+      - '.github/workflows/podcasts-ci.yml'
 
 jobs:
   main:
@@ -19,17 +25,17 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: |
-            lib-tca/.build
-            lib-core/.build
-            lib-views/.build
-          key: podcasts-xc26.1.1-${{ hashFiles('lib-tca/Package.resolved', 'lib-core/Package.resolved', 'lib-views/Package.resolved') }}
+            swift/podcasts/lib-tca/.build
+            swift/podcasts/lib-core/.build
+            swift/podcasts/lib-views/.build
+          key: podcasts-xc26.1.1-${{ hashFiles('swift/podcasts/lib-tca/Package.resolved', 'swift/podcasts/lib-core/Package.resolved', 'swift/podcasts/lib-views/Package.resolved') }}
           restore-keys: podcasts-xc26.1.1-
       - name: setup just
         uses: extractions/setup-just@v2
       - name: build
-        run: just build
+        run: cd swift/podcasts && just build
       - name: test
-        run: just test
+        run: cd swift/podcasts && just test
         env:
           SWIFT_DETERMINISTIC_HASHING: 1
 
@@ -46,8 +52,8 @@ jobs:
           cp ./.build/debug/swiftformat /usr/local/bin
           cd ../ && rm -rf SwiftFormat/
       - name: swiftlint
-        run: /usr/local/bin/swiftformat . --lint
+        run: cd swift/podcasts && /usr/local/bin/swiftformat . --lint
 
 concurrency:
-  group: ${{ github.ref }}-ci
+  group: ${{ github.ref }}-podcasts-ci
   cancel-in-progress: true

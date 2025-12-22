@@ -1,11 +1,17 @@
-name: ci
+name: web-ci
 
 on:
   push:
     branches:
       - master
+    paths:
+      - 'web/**'
+      - '.github/workflows/web-ci.yml'
   pull_request:
     types: [opened, synchronize, labeled]
+    paths:
+      - 'web/**'
+      - '.github/workflows/web-ci.yml'
 
 jobs:
   check:
@@ -17,17 +23,17 @@ jobs:
       - name: install pnpm
         uses: pnpm/action-setup@v4
       - name: install deps
-        run: pnpm install
+        run: cd web && pnpm install
       - name: setup just
         uses: extractions/setup-just@v2
       - name: lint
-        run: just lint
+        run: cd web && just lint
       - name: format
-        run: just format-check
+        run: cd web && just format-check
       - name: typecheck
-        run: just typecheck
+        run: cd web && just typecheck
       - name: test
-        run: just test
+        run: cd web && just test
 
   storybook:
     name: storybook
@@ -42,17 +48,19 @@ jobs:
       - name: install pnpm
         uses: pnpm/action-setup@v4
       - name: install deps
-        run: pnpm install
+        run: cd web && pnpm install
       - name: setup just
         uses: extractions/setup-just@v2
       - name: build storybook
-        run: STORYBOOK_SCREENSHOT_TESTING=true just build-storybook
+        run: cd web && STORYBOOK_SCREENSHOT_TESTING=true just build-storybook
       - name: serve storybook
         run: |
+          cd web
           mv -f storybook/storybook-static/{iframe,index}.html
           pnpm dlx serve@14.2.1 -l 4777 storybook/storybook-static &
       - name: screenshots
         run: |
+          cd web
           just visual-test
           pnpm dlx @argos-ci/cli upload storybook/visual-tests/screenshots/argos || true
       - name: create screenshots pr
@@ -80,29 +88,30 @@ jobs:
       VITE_TURNSTILE_SITEKEY: ${{ secrets.DASH_TURNSTILE_SITEKEY }}
       VITE_GTM_ID: not-real
     steps:
-      - name: reset staging # cypress tests depend slightly on staging api state
+      - name: reset staging
         run: curl --silent ${{ secrets.STAGING_API_RESET_ROUTE  }}; true
       - name: checkout
         uses: actions/checkout@v4
       - name: install pnpm
         uses: pnpm/action-setup@v4
       - name: install deps
-        run: pnpm install
+        run: cd web && pnpm install
       - name: setup just
         uses: extractions/setup-just@v2
       - name: build dashboard
-        run: just build-dash
+        run: cd web && just build-dash
       - name: cypress
         uses: cypress-io/github-action@v6.6.0
         with:
           start: pnpm --filter @dash/app preview
-          project: dash/app
+          project: web/dash/app
+          working-directory: web
       - name: upload-videos
         uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-videos
-          path: dash/app/cypress/videos
+          path: web/dash/app/cypress/videos
 
   files-changed:
     runs-on: namespace-profile-default
@@ -117,7 +126,7 @@ jobs:
         with:
           filters: |
             appviews:
-              - appviews/**
+              - web/appviews/**
 
   appviews-comment:
     needs: files-changed
@@ -146,8 +155,8 @@ jobs:
       - name: install pnpm
         uses: pnpm/action-setup@v4
       - name: install deps
-        run: pnpm install
+        run: cd web && pnpm install
       - name: setup just
         uses: extractions/setup-just@v2
       - name: build site
-        run: just build-site
+        run: cd web && just build-site

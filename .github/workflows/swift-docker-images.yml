@@ -1,11 +1,11 @@
-name: docker-images
+name: swift-docker-images
 
 on:
   push:
     branches:
       - master
     paths:
-      - 'api/Dockerfile.ci'
+      - 'swift/api/Dockerfile.ci'
 
 jobs:
   build-ci-image:
@@ -19,7 +19,7 @@ jobs:
       - name: extract swift version
         id: swift-version
         run: |
-          VERSION=$(grep "swiftly install" api/Dockerfile.ci | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+          VERSION=$(grep "swiftly install" swift/api/Dockerfile.ci | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: login to registry
         uses: docker/login-action@v3
@@ -39,8 +39,8 @@ jobs:
       - name: build and push ci image
         uses: docker/build-push-action@v5
         with:
-          context: ./api
-          file: ./api/Dockerfile.ci
+          context: ./swift/api
+          file: ./swift/api/Dockerfile.ci
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

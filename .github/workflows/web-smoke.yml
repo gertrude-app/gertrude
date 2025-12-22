@@ -1,4 +1,4 @@
-name: smoke
+name: web-smoke
 
 on:
   schedule:
@@ -25,20 +25,20 @@ jobs:
           path: |
             ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             ~/.cache/Cypress
-          key: pnpm-cache-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: pnpm-cache-v1-${{ hashFiles('web/**/pnpm-lock.yaml') }}
           restore-keys: pnpm-cache-v1-
       - name: install deps
-        run: pnpm --filter @gertie/smoke-tests install
+        run: cd web && pnpm --filter @gertie/smoke-tests install
       - name: setup just
         uses: extractions/setup-just@v1
       - name: run smoke tests
-        run: just smoke-run
+        run: cd web && just smoke-run
       - name: upload-videos
         uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: smoke-videos
-          path: smoke/cypress/videos
+          path: web/smoke/cypress/videos
       - name: slack notify failure
         if: failure()
         run: |
