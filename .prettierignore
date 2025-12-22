@@ -1,0 +1,13 @@
+**/node_modules/
+**/.build/
+pnpm-lock.yaml
+web/storybook/storybook-static/
+web/dash/app/build
+web/site/app/.next
+web/site/app/out
+web/docs/app/.next
+web/docs/app/out
+web/appviews/dist
+web/appviews/src/main.tsx
+.nx/
+.claude/
