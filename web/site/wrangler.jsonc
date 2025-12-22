@@ -3,14 +3,11 @@
   "name": "marketing",
   "compatibility_date": "2025-12-22",
   "build": {
-    "command": "pnpm build",
-    "cwd": "site",
+    "command": "cd .. && pnpm install --frozen-lockfile && cd site && pnpm build",
+    "cwd": "."
   },
   "assets": {
-    "directory": "./site/out",
+    "directory": "./out",
     "html_handling": "drop-trailing-slash"
-  },
-  "vars": {
-    "CYPRESS_INSTALL_BINARY": "0"
   }
 }

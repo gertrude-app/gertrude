@@ -3,12 +3,12 @@
   "name": "parents",
   "compatibility_date": "2025-12-22",
   "build": {
-    "command": "pnpm build",
-    "cwd": "dash/app",
+    "command": "cd ../.. && pnpm install --frozen-lockfile && cd dash/app && pnpm build",
+    "cwd": "."
   },
   "assets": {
-    "directory": "./dash/app/build",
+    "directory": "./build",
     "html_handling": "drop-trailing-slash",
     "not_found_handling": "single-page-application"
-  },
+  }
 }
