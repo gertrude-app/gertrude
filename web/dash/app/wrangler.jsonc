@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "parents",
+  "compatibility_date": "2025-12-22",
+  "assets": {
+    "directory": "./dash/app/build",
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "single-page-application"
+  },
+  "build": {
+    "command": "pnpm build",
+    "cwd": "dash/app",
+  }
+}
