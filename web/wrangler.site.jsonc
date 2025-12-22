@@ -1,0 +1,13 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "marketing",
+  "compatibility_date": "2025-12-22",
+  "build": {
+    "command": "pnpm build",
+    "cwd": "site",
+  },
+  "assets": {
+    "directory": "./site/out",
+    "html_handling": "drop-trailing-slash"
+  }
+}
