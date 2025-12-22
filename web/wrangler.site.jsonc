@@ -4,10 +4,13 @@
   "compatibility_date": "2025-12-22",
   "build": {
     "command": "pnpm build",
-    "cwd": "site/app",
+    "cwd": "site",
   },
   "assets": {
-    "directory": "./site/app/out",
-    "html_handling": "drop-trailing-slash",
+    "directory": "./site/out",
+    "html_handling": "drop-trailing-slash"
+  },
+  "vars": {
+    "CYPRESS_INSTALL_BINARY": "0"
   }
 }
