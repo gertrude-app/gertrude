@@ -90,4 +90,59 @@ import Testing
       }
     }
   }
+
+  @Test func `review prompt shown after fourth subscribe`() async throws {
+    let clock = TestClock()
+    try await withDependencies {
+      $0.date = .constant(.reference)
+      $0.continuousClock = clock
+      $0.defaultDatabase = try! appDatabase {
+        try Show.insert { [.mock(1), .mock(2), .mock(3)] }.execute($0)
+      }
+    } operation: {
+      var state = PodcastsFeature.State()
+      state.destination = .addShow(.init())
+
+      let store = TestStore(initialState: state, reducer: PodcastsFeature.init)
+      store.exhaustivity = .off
+
+      // 3rd show add does not trigger prompt
+      #expect(dep(\.db).record(id: .promptedReview) == nil)
+      await store.send(.destination(.presented(.addShow(.subscribed(.mock(3)))))) {
+        $0.destination = nil
+      }
+      await clock.advance(by: .seconds(2))
+      #expect(dep(\.db).record(id: .promptedReview) == nil)
+
+      // 4th show add does trigger prompt
+      dep(\.db).tryWrite { try Show.insert { [.mock(4)] }.execute($0) }
+      await store.send(.addShowTapped) {
+        $0.destination = .addShow(.init())
+      }
+      await store.send(.destination(.presented(.addShow(.subscribed(.mock(4)))))) {
+        $0.destination = nil
+      }
+      await clock.advance(by: .seconds(1.5))
+      await store.receive(.promptReview) {
+        $0.destination = .requestReview(.init())
+      }
+      #expect(dep(\.db).record(id: .promptedReview) != nil)
+      var numShows = try await dep(\.db).read { try Show.count().fetchOne($0) }
+      #expect(numShows == 4)
+
+      // deleting and then re-adding 4th show does not re-trigger prompt
+      dep(\.db).tryWrite { try Show.find(Show.ID(1)).delete().execute($0) }
+      await store.send(.addShowTapped) {
+        $0.destination = .addShow(.init())
+      }
+      dep(\.db).tryWrite { try Show.insert { [.mock(5)] }.execute($0) }
+      await store.send(.destination(.presented(.addShow(.subscribed(.mock(5)))))) {
+        $0.destination = nil
+      }
+      await clock.advance(by: .seconds(1.5))
+      numShows = try await dep(\.db).read { try Show.count().fetchOne($0) }
+      #expect(numShows == 4)
+      store.assert { $0.destination = nil }
+    }
+  }
 }
