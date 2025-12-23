@@ -1075,6 +1075,33 @@ func `hoy hablamos artwork`() throws {
 }
 
 @Test
+func `parses simple date-only format`() throws {
+  let xmlString = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0">
+    <channel>
+      <title>Test Podcast</title>
+      <item>
+        <title>Episode with simple date</title>
+        <guid>simple-date-ep</guid>
+        <pubDate>2024-03-15</pubDate>
+        <enclosure url="https://example.com/episode.mp3" length="5242880" type="audio/mpeg" />
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  let episode = feed.episodes[0]
+
+  let formatter = DateFormatter()
+  formatter.dateFormat = "yyyy-MM-dd"
+  formatter.locale = Locale(identifier: "en_US_POSIX")
+  let expectedDate = formatter.date(from: "2024-03-15")!
+  #expect(episode.pubDate == expectedDate)
+}
+
+@Test
 func `episode without duration is nil`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
