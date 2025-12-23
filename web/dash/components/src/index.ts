@@ -58,6 +58,6 @@ export { default as ComputerCard } from './Computers/ComputerCard';
 export { default as ListComputers } from './Computers/ListComputers';
 export { default as EditComputer } from './Computers/EditComputer';
 export { DURATION_OPTS } from './Users/SuspendFilterRequestForm';
-export type { NotificationUpdate } from './Settings/Settings';
+export type { NewMethod, NotificationUpdate } from './Settings/Settings';
 export type { ActivityFeedItem } from './Users/Activity/ChildActivityFeed';
 export { default as BlockRuleEditor } from './iOS/BlockRuleEditor';

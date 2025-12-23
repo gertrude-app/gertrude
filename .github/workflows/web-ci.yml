@@ -104,7 +104,7 @@ jobs:
         uses: cypress-io/github-action@v6.6.0
         with:
           start: pnpm --filter @dash/app preview
-          project: web/dash/app
+          project: dash/app
           working-directory: web
       - name: upload-videos
         uses: actions/upload-artifact@v4

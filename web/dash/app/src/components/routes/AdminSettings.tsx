@@ -6,7 +6,7 @@ import { notNullish, typesafe } from '@shared/ts-utils';
 import React, { useReducer, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import type { State } from '../../reducers/admin-reducer';
-import type { NewMethod } from '@dash/components/src/Settings/Settings';
+import type { NewMethod } from '@dash/components';
 import type { VerifiedNotificationMethod } from '@dash/types';
 import Current from '../../environment';
 import { Key, useConfirmableDelete, useMutation, useQuery } from '../../hooks';
