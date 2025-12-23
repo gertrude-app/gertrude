@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "marketing",
+  "compatibility_date": "2025-12-22",
+  "build": {
+    // --ignore-scripts prevents long postinstall scripts like cypress, puppeteer
+    "command": "cd .. && pnpm install --frozen-lockfile --ignore-scripts && cd site && pnpm build",
+    "cwd": ".",
+  },
+  "assets": {
+    "directory": "./out",
+    "html_handling": "drop-trailing-slash",
+  },
+  // without this cloudflare complains when building for marketing-preview
+  "env": {
+    "preview": {},
+  },
+}

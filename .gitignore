@@ -1,31 +1,16 @@
-# OS
 .DS_Store
-
-# Editors
 *.swp
-.vscode/*
-.nvim/*
 Session.vim*
-.cursor/
-
-# Environment
 .env
 **/.env
 **/.env.local
 swift/api/.env*
-
-# Node
 node_modules/
-
-# Swift
 **/.build/
 **/.swiftpm/
 **/xcuserdata/
 buildServer.json
 *.sql
-index.html
-
-# Web/TypeScript
 **/.next
 **/out
 **/dist

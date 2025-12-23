@@ -1,0 +1,11 @@
+**/node_modules/
+**/.build/
+**/pnpm-lock.yaml
+**/.nx/
+**/.claude/
+**/storybook/storybook-static/
+**/dash/app/build
+**/site/.next
+**/site/out
+**/appviews/dist
+**/appviews/src/main.tsx

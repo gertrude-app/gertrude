@@ -1,4 +1,4 @@
-import { ErrorModal } from '@dash/components/src/Modal';
+import { ErrorModal } from '@dash/components';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 

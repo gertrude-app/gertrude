@@ -12,7 +12,7 @@ const meta: Meta = {
 
 type Story = StoryObj<typeof meta>;
 
-// @screenshot: xs,md
+// @screenshot: md
 export const Default: Story = props({
   date: new Date(time.stable()),
   chunkSize: 3,
