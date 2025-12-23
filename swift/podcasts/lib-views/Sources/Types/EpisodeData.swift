@@ -49,7 +49,7 @@ public struct EpisodeData: Identifiable, Sendable, Equatable {
 public extension EpisodeData {
   var progressRatio: Double {
     guard let durationSeconds = self.durationSeconds, durationSeconds > 0 else { return 0.0 }
-    return self.progress / Double(durationSeconds)
+    return min(1.0, max(0.0, self.progress / Double(durationSeconds)))
   }
 
   func pubDateRelative(lang: Lang) -> String {
