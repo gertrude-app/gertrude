@@ -13,6 +13,8 @@
   },
   // without this cloudflare complains when building for marketing-preview
   "env": {
-    "preview": {},
+    "preview": {
+      "vars": {},
+    },
   },
 }

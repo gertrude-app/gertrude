@@ -14,6 +14,8 @@
   },
   // without this cloudflare complains when building for parents-preview
   "env": {
-    "preview": {},
+    "preview": {
+      "vars": {},
+    },
   },
 }
