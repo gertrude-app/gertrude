@@ -171,5 +171,6 @@ xmlfiles := """
 ./macapp/Xcode/GertrudeFilterExtension/Info.plist \
 ./macapp/Xcode/Gertrude/Gertrude.entitlements \
 ./macapp/Xcode/Gertrude/Info.plist \
-./macapp/Xcode/GertrudeRelauncher/GertrudeRelauncher.entitlements
+./macapp/Xcode/GertrudeRelauncher/GertrudeRelauncher.entitlements \
+./podcasts/app/Info.plist
 """

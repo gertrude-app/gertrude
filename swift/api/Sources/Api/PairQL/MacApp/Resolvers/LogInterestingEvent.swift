@@ -98,14 +98,15 @@ func githubSearch(_ eventId: String, repo: String = "swift") -> String {
   )
 }
 
-func getParentLink(from computerUser: ComputerUser?, in context: Context) async -> String {
+func getParentLink(from computerUser: ComputerUser?, in ctx: Context) async -> String {
   guard let computerUser,
-        let child = try? await computerUser.child(in: context.db),
-        let parent = try? await child.parent(in: context.db) else {
+        let child = try? await computerUser.child(in: ctx.db),
+        let parent = try? await child.parent(in: ctx.db) else {
     return ""
   }
+  let adminUrl = ctx.env.get("ADMIN_SITE_URL") ?? "http://localhost:4243"
   return "\n  -> " + Slack.link(
-    to: "\(context.env.analyticsSiteUrl)/admins/\(parent.id.lowercased)",
+    to: "\(adminUrl)/parents/\(parent.id.lowercased)",
     withText: "\(parent.email), \(child.name)",
   )
 }
