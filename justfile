@@ -26,13 +26,9 @@ check:
   @cd swift && just check
   @cd web && just check
 
-lint-fix:
+fix:
   @cd swift && just fix
-  @cd web && just lint-fix
-
-format:
-  @cd swift && just fix
-  @cd web && just format
+  @cd web && just fix
 
 # codegen
 

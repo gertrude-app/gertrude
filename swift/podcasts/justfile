@@ -1,3 +1,5 @@
+import '../watch-helpers.just'
+
 _default:
   @just --choose
 
@@ -38,7 +40,15 @@ test:
   @cd lib-tca && SWIFT_DETERMINISTIC_HASHING=1 swift test
   @cd lib-views && SWIFT_DETERMINISTIC_HASHING=1 swift test
 
-format: clean
+lint:
+  @swiftformat --exclude '**/.build' --lint .
+
+check:
+  @just build
+  @just test
+  @just lint
+
+fix:
   @swiftformat --exclude '**/.build' .
   @xml-lint --fix app/Info.plist app/LaunchScreen.storyboard
   @prettier --write '**/*.json' 
@@ -89,22 +99,6 @@ watch-sync-previews:
     --ignore '**/.build/*/**' --ignore '**/index.html' \
     'rsync -rc lib-views/Sources/ previews/sources && rsync -rc app/Assets.xcassets/ previews/Assets.xcassets && printf "synced: " && date'
 
-
-# utility
-
-[private]
-watch-swift dir cmd ignore1="•" ignore2="•":
-  @watchexec --project-origin . --clear --restart --watch {{dir}} --exts swift,html \
-  --ignore '**/.build/*/**' --ignore '**/index.html' --ignore '{{ignore1}}' --ignore '{{ignore2}}' \
-  {{cmd}}
-
-watch-build dir:
-  @just watch-swift {{dir}} '"cd {{dir}} && swift build"'
-
-watch-test dir isolate="":
-  @just watch-swift {{dir}} '"cd {{dir}} && \
-  SWIFT_DETERMINISTIC_HASHING=1 swift test \
-  {{ if isolate != "" { "--filter " + isolate } else { "" } }} "'
 
 sim-docs-dir := `ls -dt ~/Library/Developer/CoreSimulator/Devices/*/data/Containers/Data/Application/*/Documents | head -1`
 
