@@ -48,7 +48,7 @@ extension GetDevice: Resolver {
       }
     }
 
-    if computer.model.identifier == "unknown" {
+    if computer.model.identifier == "unknown", computer.modelIdentifier != "VirtualMac2,1" {
       await with(dependency: \.slack)
         .error("unknown mac model identifier `\(computer.modelIdentifier)`")
     }
