@@ -50,21 +50,22 @@ struct SubscriptionManager: AsyncScheduledJob {
         parent.subscriptionStatus = status
         parent.subscriptionStatusExpiration = expiration
         try await self.db.update(parent)
-        logs.append("Updated admin \(parent.email) to `.\(status)` until \(expiration)")
+        let link = self.adminLink(for: parent)
+        logs.append("Updated parent \(link) to `.\(status)` until \(expiration)")
 
       case .delete(let reason):
         try await self.db.create(DeletedEntity(
-          type: "Admin",
+          type: "Parent",
           reason: reason,
           data: JSON.encode(parent, [.isoDates]),
         ))
         try await self.db.delete(parent)
-        logs.append("Deleted admin \(parent.email) reason: \(reason)")
+        logs.append("Deleted parent \(self.adminLink(for: parent)) reason: \(reason)")
       }
 
       if let event = update.email {
         try await self.postmark.send(template: email(event, to: parent.email))
-        logs.append("Sent `.\(event)` email to admin \(parent.email)")
+        logs.append("Sent `.\(event)` email to parent \(self.adminLink(for: parent))")
       }
     }
 
@@ -165,6 +166,11 @@ struct SubscriptionManager: AsyncScheduledJob {
       )
     }
     return nil
+  }
+
+  func adminLink(for parent: Parent) -> String {
+    let adminUrl = self.env.get("ADMIN_SITE_URL") ?? "http://localhost:4243"
+    return "<a href=\"\(adminUrl)/parents/\(parent.id.lowercased)\">\(parent.email)</a>"
   }
 }
 
