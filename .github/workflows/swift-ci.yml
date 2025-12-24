@@ -14,7 +14,8 @@ on:
 
 jobs:
   linux-build-libs-1:
-    if: github.event_name == 'pull_request'
+    needs: files-changed
+    if: needs.files-changed.outputs.libs == 'true'
     runs-on: ubuntu-latest
     container: ghcr.io/gertrude-app/api-ci-build:6.2.1
     steps:
@@ -28,7 +29,8 @@ jobs:
         run: cd swift/pairql-macapp && swift build
 
   linux-build-libs-2:
-    if: github.event_name == 'pull_request'
+    needs: files-changed
+    if: needs.files-changed.outputs.libs == 'true'
     runs-on: ubuntu-latest
     container: ghcr.io/gertrude-app/api-ci-build:6.2.1
     steps:
@@ -52,7 +54,8 @@ jobs:
         run: cd swift/x-stripe && swift build
 
   linux-lib-test-libs-1:
-    if: github.event_name == 'pull_request'
+    needs: files-changed
+    if: needs.files-changed.outputs.libs == 'true'
     runs-on: ubuntu-latest
     container: ghcr.io/gertrude-app/api-ci-build:6.2.1
     steps:
@@ -64,7 +67,8 @@ jobs:
         run: cd swift/pairql-macapp && swift test
 
   linux-lib-test-libs-2:
-    if: github.event_name == 'pull_request'
+    needs: files-changed
+    if: needs.files-changed.outputs.libs == 'true'
     runs-on: ubuntu-latest
     container: ghcr.io/gertrude-app/api-ci-build:6.2.1
     steps:
@@ -82,6 +86,8 @@ jobs:
         run: cd swift/x-slack && swift test
 
   linux-api-build:
+    needs: files-changed
+    if: needs.files-changed.outputs.api == 'true'
     runs-on: ubuntu-latest
     container: ghcr.io/gertrude-app/api-ci-build:6.2.1
     steps:
@@ -154,7 +160,8 @@ jobs:
             https://slack.com/api/chat.postMessage
 
   linux-api-test:
-    if: github.event_name == 'pull_request'
+    needs: files-changed
+    if: needs.files-changed.outputs.api == 'true'
     runs-on: ubuntu-latest
     container: ghcr.io/gertrude-app/api-ci-build:6.2.1
     env:
@@ -178,31 +185,6 @@ jobs:
           restore-keys: api-test-v3-
       - name: test-api
         run: cd swift/api && swift test
-
-  files-changed:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    outputs:
-      macapp: ${{ steps.changes.outputs.macapp }}
-      iosapp: ${{ steps.changes.outputs.iosapp }}
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            macapp:
-              - swift/macapp/App/**
-              - swift/pairql-macapp/**
-              - swift/gertie/**
-              - swift/x-kit/**
-              - swift/ts-interop/**
-            iosapp:
-              - swift/iosapp/lib-ios/**
-              - swift/pairql-iosapp/**
-              - swift/gertie/**
-              - swift/x-kit/**
 
   macapp-lib:
     needs: files-changed
@@ -246,8 +228,35 @@ jobs:
       - name: test
         run: cd swift/iosapp/lib-ios && swift test
 
+  podcasts-lib:
+    needs: files-changed
+    if: needs.files-changed.outputs.podcasts == 'true'
+    runs-on: macos-15
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 26.1.1
+      - uses: actions/cache@v4
+        with:
+          path: |
+            swift/podcasts/lib-tca/.build
+            swift/podcasts/lib-core/.build
+            swift/podcasts/lib-views/.build
+          key: podcasts-xc26.1.1-${{ hashFiles('swift/podcasts/lib-tca/Package.resolved', 'swift/podcasts/lib-core/Package.resolved', 'swift/podcasts/lib-views/Package.resolved') }}
+          restore-keys: podcasts-xc26.1.1-
+      - name: setup just
+        uses: extractions/setup-just@v2
+      - name: build
+        run: cd swift/podcasts && just build
+      - name: test
+        run: cd swift/podcasts && just test
+
   swift-lint:
-    if: github.event_name == 'pull_request'
+    needs: files-changed
+    if: needs.files-changed.outputs.swift == 'true'
     runs-on: ubuntu-latest
     container: ghcr.io/gertrude-app/api-ci-build:6.2.1
     steps:
@@ -264,7 +273,8 @@ jobs:
 
 
   xml-lint:
-    if: github.event_name == 'pull_request'
+    needs: files-changed
+    if: needs.files-changed.outputs.swift == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -275,6 +285,72 @@ jobs:
         run: cargo install xml-lint
       - name: xml-lint
         run: cd swift && just lint-xml
+
+  files-changed:
+    runs-on: ubuntu-latest
+    outputs:
+      macapp: ${{ steps.changes.outputs.macapp }}
+      iosapp: ${{ steps.changes.outputs.iosapp }}
+      podcasts: ${{ steps.changes.outputs.podcasts }}
+      libs: ${{ steps.changes.outputs.libs }}
+      api: ${{ steps.changes.outputs.api }}
+      swift: ${{ steps.changes.outputs.swift }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            macapp:
+              - swift/macapp/App/**
+              - swift/pairql-macapp/**
+              - swift/pairql/**
+              - swift/gertie/**
+              - swift/x-kit/**
+              - swift/ts-interop/**
+            iosapp:
+              - swift/iosapp/lib-ios/**
+              - swift/pairql-iosapp/**
+              - swift/pairql/**
+              - swift/gertie/**
+              - swift/x-kit/**
+            podcasts:
+              - swift/podcasts/**
+              - swift/pairql/**
+              - swift/pairql-podcasts/**
+              - swift/api/Sources/Api/PairQL/Podcast/**
+            libs:
+              - swift/duet/**
+              - swift/pairql/**
+              - swift/pairql-macapp/**
+              - swift/gertie/**
+              - swift/ts-interop/**
+              - swift/x-expect/**
+              - swift/x-http/**
+              - swift/x-kit/**
+              - swift/x-postmark/**
+              - swift/x-slack/**
+              - swift/x-stripe/**
+              - swift/x-aws/**
+            api:
+              - swift/api/**
+              - swift/duet/**
+              - swift/pairql/**
+              - swift/pairql-macapp/**
+              - swift/pairql-iosapp/**
+              - swift/pairql-podcasts/**
+              - swift/gertie/**
+              - swift/ts-interop/**
+              - swift/x-expect/**
+              - swift/x-http/**
+              - swift/x-kit/**
+              - swift/x-postmark/**
+              - swift/x-slack/**
+              - swift/x-stripe/**
+              - swift/x-aws/**
+            swift:
+              - swift/**
 
 env:
   DATABASE_NAME: vapor_database
@@ -292,7 +368,6 @@ env:
   TWILIO_FROM_PHONE_US: not-real
   TWILIO_FROM_PHONE_UK: not-real
   DASHBOARD_URL: /dashboard
-  ANALYTICS_SITE_URL: /analytics
   POSTMARK_API_KEY: not-real
   POSTMARK_SERVER_ID: 12345
   PRIMARY_SUPPORT_EMAIL: not-real

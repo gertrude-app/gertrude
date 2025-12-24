@@ -6,11 +6,13 @@ on:
       - master
     paths:
       - 'web/**'
+      - 'swift/api/Sources/Api/PairQL/Dashboard/**'
       - '.github/workflows/web-ci.yml'
   pull_request:
     types: [opened, synchronize, labeled]
     paths:
       - 'web/**'
+      - 'swift/api/Sources/Api/PairQL/Dashboard/**'
       - '.github/workflows/web-ci.yml'
 
 jobs:
@@ -37,6 +39,8 @@ jobs:
 
   storybook:
     name: storybook
+    needs: files-changed
+    if: needs.files-changed.outputs.storybook == 'true'
     runs-on: namespace-profile-default
     env:
       ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
@@ -81,6 +85,8 @@ jobs:
 
   dashboard:
     name: dashboard
+    needs: files-changed
+    if: needs.files-changed.outputs.dashboard == 'true'
     runs-on: namespace-profile-default
     env:
       VITE_API_ENDPOINT: ${{ secrets.STAGING_API_ENDPOINT }}
@@ -118,6 +124,9 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     outputs:
       appviews: ${{ steps.changes.outputs.appviews }}
+      dashboard: ${{ steps.changes.outputs.dashboard }}
+      site: ${{ steps.changes.outputs.site }}
+      storybook: ${{ steps.changes.outputs.storybook }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -127,6 +136,17 @@ jobs:
           filters: |
             appviews:
               - web/appviews/**
+            dashboard:
+              - web/dash/**
+              - web/shared/**
+              - swift/api/Sources/Api/PairQL/Dashboard/**
+            site:
+              - web/site/**
+              - web/shared/**
+            storybook:
+              - web/storybook/**
+              - web/shared/**
+              - web/dash/components/**
 
   appviews-comment:
     needs: files-changed
@@ -145,6 +165,8 @@ jobs:
 
   site:
     name: site
+    needs: files-changed
+    if: needs.files-changed.outputs.site == 'true'
     runs-on: namespace-profile-default
     env:
       NEXT_PUBLIC_FORMS_ENDPOINT: /not-real

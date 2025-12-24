@@ -121,7 +121,7 @@ struct PodcastsFeature {
         }.reversed()
         return .run { send in
           await send(.startNextDownload)
-          guard self.database.tryRead({ try Show.count().fetchOne($0) }) == 2,
+          guard self.database.tryRead({ try Show.count().fetchOne($0) }) == 4,
                 self.database.record(id: .promptedReview) == nil else { return }
           self.database.insertRecord(id: .promptedReview)
           try? await self.clock.sleep(for: .seconds(1.5))

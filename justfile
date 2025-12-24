@@ -10,7 +10,7 @@ swift *args:
   @cd swift && just {{args}}
 
 podcasts *args:
-  @cd podcasts && just {{args}}
+  @cd swift/podcasts && just {{args}}
 
 # api shortcuts
 

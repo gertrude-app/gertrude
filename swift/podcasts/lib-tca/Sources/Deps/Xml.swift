@@ -242,6 +242,8 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
       // Additional common formats
       "dd MMM yyyy HH:mm:ss Z",
       "yyyy-MM-dd HH:mm:ss Z",
+      // Simple date-only format (non-spec but sometimes seen)
+      "yyyy-MM-dd",
     ]
 
     for formatString in formatters {

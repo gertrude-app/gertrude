@@ -12,7 +12,6 @@ public struct Env: Sendable {
   public var stripe: Stripe
   public var primarySupportEmail: String
   public var superAdminEmail: String
-  public var analyticsSiteUrl: String
   public var cloudflareSecret: String
   public var get: @Sendable (String) -> String?
 
@@ -122,7 +121,6 @@ extension Env: DependencyKey {
       stripe: Stripe(secretKey: processEnv("STRIPE_SECRET_KEY")),
       primarySupportEmail: processEnv("PRIMARY_SUPPORT_EMAIL"),
       superAdminEmail: processEnv("SUPER_ADMIN_EMAIL"),
-      analyticsSiteUrl: processEnv("ANALYTICS_SITE_URL"),
       cloudflareSecret: processEnv("CLOUDFLARE_SECRET"),
       get: { ProcessInfo.processInfo.environment[$0] },
     )
