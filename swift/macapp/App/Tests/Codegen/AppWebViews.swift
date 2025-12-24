@@ -4,16 +4,16 @@ import TypeScriptInterop
 
 @testable import App
 
-struct AppWebViews: AggregateCodeGenerator {
+struct AppWebViewStoreTypes: AggregateCodeGenerator {
   var generators: [CodeGenerator] = [
-    AppviewStore(
+    AppWebViewStore(
       at: "lib/shared-types.ts",
       namedTypes: [
         .init(FilterState.WithRelativeTimes.self, as: "FilterState"),
         .init(AdminAccountStatus.self),
       ],
     ),
-    AppviewStore(
+    AppWebViewStore(
       at: "MenuBar/menubar-store.ts",
       types: [
         .init(MenuBarFeature.State.View.self, as: "AppState"),
@@ -21,7 +21,7 @@ struct AppWebViews: AggregateCodeGenerator {
       ],
       localAliases: [(FilterState.WithRelativeTimes.self, "FilterState")],
     ),
-    AppviewStore(
+    AppWebViewStore(
       at: "BlockedRequests/blockedrequests-store.ts",
       namedTypes: [
         .init(BlockedRequestsFeature.State.View.Request.self),
@@ -35,7 +35,7 @@ struct AppWebViews: AggregateCodeGenerator {
         (AdminAccountStatus.self, "AdminAccountStatus"),
       ],
     ),
-    AppviewStore(
+    AppWebViewStore(
       at: "Administrate/administrate-store.ts",
       namedTypes: [
         .init(AdminWindowFeature.Screen.self),
@@ -66,7 +66,7 @@ struct AppWebViews: AggregateCodeGenerator {
         (Failable<AdminAccountStatus>.self, "Failable<AdminAccountStatus>"),
       ],
     ),
-    AppviewStore(
+    AppWebViewStore(
       at: "RequestSuspension/requestsuspension-store.ts",
       types: [
         .init(RequestSuspensionFeature.State.View.self, as: "AppState"),
@@ -76,7 +76,7 @@ struct AppWebViews: AggregateCodeGenerator {
         (AdminAccountStatus.self, "AdminAccountStatus"),
       ],
     ),
-    AppviewStore(
+    AppWebViewStore(
       at: "Onboarding/onboarding-store.ts",
       namedTypes: [
         .init(OnboardingFeature.State.Step.self, as: "OnboardingStep"),
@@ -96,12 +96,4 @@ struct AppWebViews: AggregateCodeGenerator {
       ],
     ),
   ]
-
-  func format() throws {
-    let proc = Process()
-    proc.executableURL = URL(fileURLWithPath: "/opt/homebrew/bin/just")
-    proc.currentDirectoryURL = URL(fileURLWithPath: "/Users/jared/gertie/web")
-    proc.arguments = ["format-codegen"]
-    try proc.run()
-  }
 }

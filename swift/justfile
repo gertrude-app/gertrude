@@ -1,3 +1,5 @@
+import 'watch-helpers.just'
+
 _default:
   @just --choose
 
@@ -5,18 +7,6 @@ _default:
 
 bump version:
   @node macapp/bump.mjs {{version}}
-
-codegen-swift:
-  @cd macapp/App && CODEGEN_SWIFT=1 swift test --filter Codegen
-  @cd api && CODEGEN_SWIFT=1 swift test --filter Codegen
-
-codegen-swift-unimplemented:
-  @cd macapp/App && CODEGEN_SWIFT=1 CODEGEN_UNIMPLEMENTED=1 swift test --filter Codegen
-
-codegen-typescript:
-  @cd macapp/App && CODEGEN_TYPESCRIPT=1 swift test --filter Codegen
-
-codegen: codegen-typescript codegen-swift
 
 macapp:
   @open macapp/Xcode/Gertrude.xcodeproj
@@ -101,7 +91,7 @@ test:
 lint-swift:
   @swiftformat . --lint
 
-lint-swift-fix:
+format:
   @swiftformat .
 
 lint-xml:
@@ -114,9 +104,9 @@ lint:
   @just lint-swift
   @just lint-xml
 
-lint-fix:
-  @just lint-swift-fix
+fix:
   @just lint-xml-fix
+  @just format
 
 check:
   @just build
@@ -143,20 +133,6 @@ exec-api cmd *args:
 [private]
 nx-run-many targets:
   @pnpm exec nx run-many --parallel=10 --targets={{targets}}
-
-[private]
-watch-swift dir cmd ignore1="•" ignore2="•":
-  @watchexec --project-origin . --clear --restart --watch {{dir}} --exts swift,html \
-  --ignore '**/.build/*/**' --ignore '**/index.html' --ignore '{{ignore1}}' --ignore '{{ignore2}}' \
-  {{cmd}}
-
-watch-build dir:
-  @just watch-swift {{dir}} '"cd {{dir}} && swift build"'
-
-watch-test dir isolate="":
-  @just watch-swift {{dir}} '"cd {{dir}} && \
-  SWIFT_DETERMINISTIC_HASHING=1 swift test \
-  {{ if isolate != "" { "--filter " + isolate } else { "" } }} "'
 
 # variables
 

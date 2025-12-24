@@ -97,20 +97,6 @@ public extension EnumCodableGen.EnumType {
     }
     """
   }
-
-  func unimplementedConformance(public: Bool = false) -> String {
-    """
-    \(`public` ? "public " : "")extension \(name) {
-      func encode(to encoder: Encoder) throws {
-        fatalError("Not implemented")
-      }
-
-      init(from decoder: Decoder) throws {
-        fatalError("Not implemented")
-      }
-    }
-    """
-  }
 }
 
 extension EnumCodableGen.EnumType.Case {

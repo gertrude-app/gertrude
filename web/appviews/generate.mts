@@ -1,9 +1,14 @@
-/* eslint-disable */
-// @ts-check
-const fs = require(`node:fs`);
+#!/usr/bin/env node
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const require = createRequire(import.meta.url);
 const exec = require(`x-exec`).default;
 
-const WEBVIEW_DIR = `${__dirname}/../../swift/macapp/Xcode/Gertrude/WebViews`;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const WEBVIEW_DIR = path.resolve(__dirname, `../../swift/macapp/Xcode/Gertrude/WebViews`);
 
 const MODULES = [
   `MenuBar`,
