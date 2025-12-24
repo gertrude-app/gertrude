@@ -60,7 +60,7 @@ Supports all 3 apps, plus dashboard and admin websites
 ## Git operations
 
 - only make git commits when explicity instructed
-- only commit after running format, linting, and check scripts
+- only commit after running `just fix` and relevant test scripts
 - when making git commits, read last 10 commits to match style
 - all lowercase commits, with a short prefix, e.g. `dash: fix bug in xyz`
 - when opening PRs, make title match commit style, and create with EMPTY body
