@@ -170,7 +170,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     }
     await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
       action: .delete(reason: "email never verified"),
-      email: .deleteEmailUnverified,
+      email: nil,
     ))
   }
 
