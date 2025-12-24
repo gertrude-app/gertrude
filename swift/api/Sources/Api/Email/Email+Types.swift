@@ -17,7 +17,6 @@ enum TemplateEmail {
   case overdueToUnpaid(to: String, model: AccountLifecycle.OverdueToUnpaid)
   case paidToOverdue(to: String, model: AccountLifecycle.PaidToOverdue)
   case unpaidToPendingDelete(to: String, model: AccountLifecycle.UnpaidToPendingDelete)
-  case deleteEmailUnverified(to: String, model: AccountLifecycle.DeleteEmailUnverified)
 }
 
 enum EmailLayout: String, CaseIterable {
@@ -72,7 +71,6 @@ extension TemplateEmail {
     case .overdueToUnpaid(_, let model): model
     case .paidToOverdue(_, let model): model
     case .unpaidToPendingDelete(_, let model): model
-    case .deleteEmailUnverified(_, let model): model
     case .passwordReset(_, let model): model
     case .passwordResetNoAccount(_, let model): model
     case .magicLink(_, let model): model

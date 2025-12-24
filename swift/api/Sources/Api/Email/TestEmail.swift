@@ -129,9 +129,6 @@ import Vapor
       case "admin-unpaid-to-pending-delete":
         try await postmark.send(template: .unpaidToPendingDelete(to: to, model: .init()))
 
-      case "admin-delete-email-unverified":
-        try await postmark.send(template: .deleteEmailUnverified(to: to, model: .init()))
-
       default:
         throw Abort(.badRequest, reason: "unknown template email")
       }
@@ -175,8 +172,6 @@ import Vapor
         return write(template: AccountLifecycle.PaidToOverdue.self)
       case "admin-unpaid-to-pending-delete":
         return write(template: AccountLifecycle.UnpaidToPendingDelete.self)
-      case "admin-delete-email-unverified":
-        return write(template: AccountLifecycle.DeleteEmailUnverified.self)
       default:
         throw Abort(.badRequest, reason: "unknown template email")
       }

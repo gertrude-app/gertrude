@@ -122,10 +122,6 @@ enum AccountLifecycle {
   struct UnpaidToPendingDelete: TemplateEmailModel {
     static var subject: String { "[action required] Gertrude account will be deleted" }
   }
-
-  struct DeleteEmailUnverified: TemplateEmailModel {
-    static var subject: String { "Gertrude unverified account deleted" }
-  }
 }
 
 let EMAIL_NOTIFICATION_FALLBACK = """

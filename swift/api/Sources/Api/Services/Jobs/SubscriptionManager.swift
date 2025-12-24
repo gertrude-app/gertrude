@@ -12,7 +12,6 @@ enum SubscriptionEmail: Equatable {
   case overdueToUnpaid
   case paidToOverdue
   case unpaidToPendingDelete
-  case deleteEmailUnverified
 }
 
 struct SubscriptionUpdate: Equatable {
@@ -88,7 +87,7 @@ struct SubscriptionManager: AsyncScheduledJob {
     case .pendingEmailVerification:
       return .init(
         action: .delete(reason: "email never verified"),
-        email: .deleteEmailUnverified,
+        email: nil,
       )
 
     case .trialing where parent.trialPeriodDays == 60: // <-- legacy 60-day trial
@@ -196,7 +195,5 @@ func email(_ event: SubscriptionEmail, to address: EmailAddress) -> TemplateEmai
     .paidToOverdue(to: address.rawValue, model: .init())
   case .unpaidToPendingDelete:
     .unpaidToPendingDelete(to: address.rawValue, model: .init())
-  case .deleteEmailUnverified:
-    .deleteEmailUnverified(to: address.rawValue, model: .init())
   }
 }
