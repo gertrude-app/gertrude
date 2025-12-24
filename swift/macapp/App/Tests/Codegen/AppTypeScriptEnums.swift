@@ -5,6 +5,14 @@ import TypeScriptInterop
 @testable import App
 
 struct AppTypeScriptEnums: AggregateCodeGenerator {
+  static let repoRoot: String = {
+    var url = URL(fileURLWithPath: #filePath)
+    while url.lastPathComponent != "swift" {
+      url = url.deletingLastPathComponent()
+    }
+    return url.deletingLastPathComponent().path
+  }()
+
   var generators: [CodeGenerator] = [
     EnumCodableGen.EnumsGenerator(
       name: "MenuBarFeature",
@@ -41,24 +49,12 @@ struct AppTypeScriptEnums: AggregateCodeGenerator {
       ],
     ),
   ]
-
-  func format() throws {
-    let proc = Process()
-    proc.executableURL = URL(fileURLWithPath: "/opt/homebrew/bin/swiftformat")
-    proc.arguments = self.generators.compactMap { generator in
-      (generator as? EnumCodableGen.EnumsGenerator)?.path
-    }
-    try proc.run()
-  }
 }
-
-// extensions
 
 extension EnumCodableGen.EnumsGenerator {
   init(name: String, imports: [String: String] = [:], types: [Any.Type]) {
     self.init(
-      path:
-      "/Users/jared/gertie/swift/macapp/App/Sources/App/Generated/\(name)+Codable.swift",
+      path: "\(AppTypeScriptEnums.repoRoot)/swift/macapp/App/Sources/App/Generated/\(name)+Codable.swift",
       types: types.map { ($0, $0 == FilterState.WithRelativeTimes.self) },
       imports: ["ReleaseChannel": "Gertie", "FilterState": "Gertie"],
     )

@@ -8,7 +8,9 @@ import XCTest
 
 final class Codegen: XCTestCase {
   func test_codegenSwift() throws {
-    if self.envVarSet("CODEGEN_SWIFT") {
+    if self.envVarSet("CODEGEN_API")
+      || self.envVarSet("CODEGEN_TS_CODABLE_ENUMS")
+      || self.envVarSet("CODEGEN_SWIFT") {
       try ApiTypeScriptEnumsCodableGenerator().write()
     }
   }
@@ -19,9 +21,17 @@ final class Codegen: XCTestCase {
 }
 
 struct ApiTypeScriptEnumsCodableGenerator: AggregateCodeGenerator {
+  static let repoRoot: String = {
+    var url = URL(fileURLWithPath: #filePath)
+    while url.lastPathComponent != "swift" {
+      url = url.deletingLastPathComponent()
+    }
+    return url.deletingLastPathComponent().path
+  }()
+
   var generators: [CodeGenerator] = [
     EnumCodableGen.EnumsGenerator(
-      path: "/Users/jared/gertie/swift/api/Sources/Api/Extend/Enums+Codable.swift",
+      path: "\(repoRoot)/swift/api/Sources/Api/Extend/Enums+Codable.swift",
       types: [
         (Parent.NotificationMethod.Config.self, false),
         (DecideFilterSuspensionRequest.Decision.self, false),
@@ -39,17 +49,8 @@ struct ApiTypeScriptEnumsCodableGenerator: AggregateCodeGenerator {
       ],
     ),
     EnumCodableGen.EnumsGenerator(
-      path: "/Users/jared/gertie/swift/gertie/Sources/GertieIOS/Enums+Codable.swift",
+      path: "\(repoRoot)/swift/gertie/Sources/GertieIOS/Enums+Codable.swift",
       types: [(GertieIOS.BlockRule.self, true)],
     ),
   ]
-
-  func format() throws {
-    let proc = Process()
-    proc.executableURL = URL(fileURLWithPath: "/opt/homebrew/bin/swiftformat")
-    proc.arguments = self.generators.compactMap { generator in
-      (generator as? EnumCodableGen.EnumsGenerator)?.path
-    }
-    try proc.run()
-  }
 }

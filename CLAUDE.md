@@ -2,7 +2,8 @@
 
 Apps and supporting libraries for Gertrude parental controls.
 
-Depending on the task, read sub CLAUDE.md files as noted below.
+Depending on the task, read relevant sub CLAUDE.md files or other doc files as noted
+below.
 
 ## Production Apps:
 
@@ -68,6 +69,12 @@ Supports all 3 apps, plus dashboard and admin websites
 
 - shared libraries for swift apps/api are in `./swift/`
 - shared libraries for web apps are in `./web/shared`.
+
+## Code generation
+
+- project uses code generation for swift/typescript interop, pairql typescript clients,
+  macapp webviews
+- read `./docs/codegen.md`
 
 ## Comment policy
 

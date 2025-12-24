@@ -30,11 +30,7 @@ extension EnumCodableGen.EnumsGenerator: CodeGenerator {
   public func write() throws {
     let decls = try self.types.map { type, is_public in
       let enumType = try EnumCodableGen.EnumType(from: type)
-      if ProcessInfo.processInfo.environment["CODEGEN_UNIMPLEMENTED"] != nil {
-        return enumType.unimplementedConformance()
-      } else {
-        return enumType.codableConformance(public: is_public)
-      }
+      return enumType.codableConformance(public: is_public)
     }
 
     let fileBody = decls.joined(separator: "\n\n")

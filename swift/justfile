@@ -6,18 +6,6 @@ _default:
 bump version:
   @node macapp/bump.mjs {{version}}
 
-codegen-swift:
-  @cd macapp/App && CODEGEN_SWIFT=1 swift test --filter Codegen
-  @cd api && CODEGEN_SWIFT=1 swift test --filter Codegen
-
-codegen-swift-unimplemented:
-  @cd macapp/App && CODEGEN_SWIFT=1 CODEGEN_UNIMPLEMENTED=1 swift test --filter Codegen
-
-codegen-typescript:
-  @cd macapp/App && CODEGEN_TYPESCRIPT=1 swift test --filter Codegen
-
-codegen: codegen-typescript codegen-swift
-
 macapp:
   @open macapp/Xcode/Gertrude.xcodeproj
 
@@ -101,7 +89,7 @@ test:
 lint-swift:
   @swiftformat . --lint
 
-lint-swift-fix:
+format:
   @swiftformat .
 
 lint-xml:
@@ -114,9 +102,9 @@ lint:
   @just lint-swift
   @just lint-xml
 
-lint-fix:
-  @just lint-swift-fix
+fix:
   @just lint-xml-fix
+  @just format
 
 check:
   @just build

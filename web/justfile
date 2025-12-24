@@ -32,20 +32,11 @@ clean:
   @rm -rf dash/app/build
   @find . -name "node_modules" -type d -prune -exec rm -rf {} + && pnpm i
 
-codegen:
-  @cd shared/pairql && pnpm codegen
-  @printf "\nRunning 'lint-fix' and 'format' after codegen...\n"
-  @just lint-fix
-  @just format
-
 nuke-node-modules:
   @pnpm store prune
   @find . -name "node_modules" -type d -prune -exec rm -rf {} + && pnpm i
 
 # build & deploy
-
-appviews isolate="":
-  @cd appviews && pnpm typecheck && node generate.cjs {{isolate}}
 
 build-site:
   @pnpm --filter site build

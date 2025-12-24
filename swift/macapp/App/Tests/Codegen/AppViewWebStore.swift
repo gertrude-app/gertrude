@@ -1,7 +1,7 @@
 import Foundation
 import TypeScriptInterop
 
-struct AppviewStore {
+struct AppWebViewStore {
   struct SwiftType {
     let type: Any.Type
     let alias: String?
@@ -35,7 +35,15 @@ struct AppviewStore {
 
 // extensions
 
-extension AppviewStore: CodeGenerator {
+extension AppWebViewStore: CodeGenerator {
+  static let repoRoot: String = {
+    var url = URL(fileURLWithPath: #filePath)
+    while url.lastPathComponent != "swift" {
+      url = url.deletingLastPathComponent()
+    }
+    return url.deletingLastPathComponent().path
+  }()
+
   var decls: [String] {
     get throws {
       // generate named/extracted decls without all aliases
@@ -62,7 +70,7 @@ extension AppviewStore: CodeGenerator {
   }
 
   func write() throws {
-    let url = URL(fileURLWithPath: "/Users/jared/gertie/web/appviews/src/\(path)")
+    let url = URL(fileURLWithPath: "\(Self.repoRoot)/web/appviews/src/\(self.path)")
     let file = try String(data: Data(contentsOf: url), encoding: .utf8)!
     let lines = file.components(separatedBy: "\n")
     guard lines.contains("// begin codegen"), lines.contains("// end codegen") else {
