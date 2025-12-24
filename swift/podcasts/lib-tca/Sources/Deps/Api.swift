@@ -2,6 +2,8 @@ import Dependencies
 import DependenciesMacros
 import Foundation
 import LibCore
+import PairQL
+import PodcastRoute
 
 @DependencyClient
 struct ApiClient: Sendable {
@@ -17,41 +19,6 @@ struct ApiClient: Sendable {
   var verifyDbDownload: @Sendable (_ installId: UUID, _ downloadUrl: String) async throws -> Bool
 }
 
-extension ApiClient {
-  struct LogEventInput: Codable {
-    var eventId: String
-    var kind: String
-    var label: String
-    var detail: String?
-    var installId: UUID?
-    var deviceType: String
-    var appVersion: String
-    var iosVersion: String
-  }
-
-  struct CreateDatabaseUploadInput: Codable {
-    var installId: UUID
-  }
-
-  struct CreateDatabaseUploadOutput: Codable {
-    var uploadUrl: URL
-  }
-
-  struct VerifyPromoCodeInput: Codable {
-    var installId: UUID
-    var code: String
-  }
-
-  struct VerifyDbDownloadInput: Codable {
-    var installId: UUID
-    var downloadUrl: String
-  }
-
-  struct SuccessOutput: Codable {
-    var success: Bool
-  }
-}
-
 extension ApiClient: DependencyKey {
   static var liveValue: ApiClient {
     .init(
@@ -64,7 +31,7 @@ extension ApiClient: DependencyKey {
         let appVersion = Bundle.main
           .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
 
-        let input = LogEventInput(
+        let input = LogPodcastEvent.Input(
           eventId: id,
           kind: kind.string,
           label: label,
@@ -81,20 +48,20 @@ extension ApiClient: DependencyKey {
         try await pairql("PodcastProducts")
       },
       createDatabaseUpload: { installId in
-        let input = CreateDatabaseUploadInput(installId: installId)
-        let output: CreateDatabaseUploadOutput = try await pairql(
+        let input = CreateDatabaseUpload.Input(installId: installId)
+        let output: CreateDatabaseUpload.Output = try await pairql(
           "CreateDatabaseUpload",
           input: input,
         )
         return output.uploadUrl
       },
       verifyPromoCode: { installId, code in
-        let input = VerifyPromoCodeInput(installId: installId, code: code)
+        let input = VerifyPromoCode.Input(installId: installId, code: code)
         let output: SuccessOutput = try await pairql("VerifyPromoCode", input: input)
         return output.success
       },
       verifyDbDownload: { installId, downloadUrl in
-        let input = VerifyDbDownloadInput(installId: installId, downloadUrl: downloadUrl)
+        let input = VerifyDbDownload.Input(installId: installId, downloadUrl: downloadUrl)
         let output: SuccessOutput = try await pairql("VerifyDbDownload", input: input)
         return output.success
       },

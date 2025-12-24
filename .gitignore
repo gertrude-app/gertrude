@@ -24,4 +24,5 @@ web/smoke/cypress.env.json
 **/cypress/downloads
 **/cypress/videos
 .playwright-mcp/
+swift/podcasts/GertiePodcasts.xcodeproj/
 tasks.md
