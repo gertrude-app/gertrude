@@ -150,13 +150,27 @@ jobs:
             pm2 start staging > /dev/null
       - name: slack api prod deploy
         if: github.event_name != 'pull_request'
+        env:
+          PR_NUMBER: ${{ steps.meta.outputs.pull_request_number }}
+          PR_TITLE: ${{ steps.meta.outputs.pull_request_title }}
         run: |
-          apt-get update && apt-get install -y curl
+          apt-get update && apt-get install -y curl jq
+          if [ -n "$PR_NUMBER" ] && [ -n "$PR_TITLE" ]; then
+            PR_LINK="<https://github.com/gertrude-app/gertrude/pull/${PR_NUMBER}|${PR_TITLE}>"
+            MESSAGE="Gertrude api *DEPLOY READY* ${PR_LINK}"
+          else
+            MESSAGE="Gertrude api *DEPLOY READY*"
+          fi
+          PAYLOAD=$(jq -n --arg text "$MESSAGE" '{
+            channel: "C08GLK13HAB",
+            text: $text,
+            username: "Gertrude Bot",
+            icon_emoji: ":robot_face:"
+          }')
           curl -X POST \
             -H "Content-type: application/json; charset=utf-8" \
             -H "Authorization: Bearer $SLACK_API_TOKEN" \
-            -d "{\"channel\":\"C08GLK13HAB\",\"text\":\"Gertrude api *DEPLOY READY*\", \
-                 \"username\":\"Gertrude Bot\",\"icon_emoji\":\":robot_face:\"}" \
+            -d "$PAYLOAD" \
             https://slack.com/api/chat.postMessage
 
   linux-api-test:
