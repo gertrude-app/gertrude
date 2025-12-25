@@ -292,5 +292,6 @@ export default defineConfig([
     `site/app/.next`,
     `site/app/out`,
     `appviews/src/main.tsx`,
+    `**/next-env.d.ts`,
   ]),
 ]);
