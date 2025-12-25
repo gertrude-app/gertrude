@@ -16,7 +16,7 @@ type Params = {
 };
 
 type PageProps = {
-  params: Params;
+  params: Promise<Params>;
 };
 
 export async function generateStaticParams(): Promise<Params[]> {
@@ -27,11 +27,13 @@ export async function generateStaticParams(): Promise<Params[]> {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { title, description, image } = await getArticle(params.slug, `blog`);
+  const { slug } = await params;
+  const { title, description, image } = await getArticle(slug, `blog`);
   return createMetadata(title, description, image);
 }
 
-const BlogArticle: NextPage<PageProps> = async ({ params: { slug } }) => {
+const BlogArticle: NextPage<PageProps> = async (props) => {
+  const { slug } = await props.params;
   const { title, content, category } = await getArticle(slug, `blog`);
 
   return (
