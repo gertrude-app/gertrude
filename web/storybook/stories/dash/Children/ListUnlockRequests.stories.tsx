@@ -4,7 +4,7 @@ import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { props, time, withIdsAnd } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/ListUnlockRequests', // eslint-disable-line
+  title: 'Dashboard/Children/ListUnlockRequests', // eslint-disable-line
   component: ListUnlockRequests,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
@@ -14,7 +14,7 @@ type Story = StoryObj<typeof meta>;
 
 // @screenshot: xs,md
 export const Default: Story = props({
-  requests: withIdsAnd({ userId: `user1` }, [
+  requests: withIdsAnd({ userId: `child1` }, [
     {
       userName: `Huck`,
       url: `khanacademy.org`,

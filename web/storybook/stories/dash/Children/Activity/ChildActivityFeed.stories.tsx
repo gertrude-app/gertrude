@@ -4,7 +4,7 @@ import { withStatefulChrome } from '../../../decorators/StatefulChrome';
 import { activity, keystrokeLine, props, screenshot, time } from '../../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/Activity/ChildActivityFeed', // eslint-disable-line
+  title: 'Dashboard/Children/Activity/ChildActivityFeed', // eslint-disable-line
   component: ChildActivityFeed,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],

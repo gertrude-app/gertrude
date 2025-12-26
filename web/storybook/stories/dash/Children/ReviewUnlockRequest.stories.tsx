@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props, time } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/ReviewUnlockRequest', // eslint-disable-line
+  title: 'Dashboard/Children/ReviewUnlockRequest', // eslint-disable-line
   component: ReviewUnlockRequest,
   decorators: [
     (Story) => (
@@ -26,7 +26,7 @@ type Story = StoryObj<typeof meta>;
 // @screenshot: xs,md
 export const Default: Story = props({
   id: `1`,
-  userId: `user1`,
+  userId: `child1`,
   status: `pending`,
   userName: `Winfield`,
   requestComment: `schedule mayra appointments`,

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props, time } from '../../../story-helpers';
 
 const meta: Meta = {
-  title: 'Dashboard/Users/Activity/FeedHeader', // eslint-disable-line
+  title: 'Dashboard/Children/Activity/FeedHeader', // eslint-disable-line
   component: FeedHeader,
 } satisfies Meta<typeof FeedHeader>;
 

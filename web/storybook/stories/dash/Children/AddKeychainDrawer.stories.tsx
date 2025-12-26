@@ -4,7 +4,7 @@ import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { keychainProps, props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/AddKeychainDrawer', // eslint-disable-line
+  title: 'Dashboard/Children/AddKeychainDrawer', // eslint-disable-line
   component: AddKeychainDrawer,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },
