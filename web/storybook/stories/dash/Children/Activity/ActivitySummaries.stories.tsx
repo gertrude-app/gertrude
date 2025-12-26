@@ -4,7 +4,7 @@ import { withStatefulChrome } from '../../../decorators/StatefulChrome';
 import { props, time } from '../../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/Activity/ActivitySummaries', // eslint-disable-line
+  title: 'Dashboard/Children/Activity/ActivitySummaries', // eslint-disable-line
   component: ActivitySummaries,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
@@ -70,7 +70,7 @@ export const Empty: Story = props({
   days: [],
 });
 
-export const AllUsers: Story = props({
+export const AllChildren: Story = props({
   ...Default.args,
   userName: undefined,
 });

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props, withIdsAnd } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Dashboard/Widgets/UserActivity', // eslint-disable-line
+  title: 'Dashboard/Dashboard/Widgets/ChildActivity', // eslint-disable-line
   component: UserActivityWidget,
 } satisfies Meta<typeof UserActivityWidget>;
 
@@ -26,7 +26,7 @@ export const AllCaughtUp: Story = props({
   ]),
 });
 
-export const NoUsers: Story = props({
+export const NoChildren: Story = props({
   userActivity: [],
 });
 

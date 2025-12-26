@@ -10,7 +10,7 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = props({
-  unlockRequests: withIdsAnd({ childId: `user1` }, [
+  unlockRequests: withIdsAnd({ childId: `child1` }, [
     {
       target: `gitlab.io`,
       childName: `Little Jimmy`,
@@ -40,7 +40,7 @@ export const JustOne: Story = props({
   unlockRequests: [
     {
       id: `1`,
-      childId: `user1`,
+      childId: `child1`,
       target: `gitlab.io`,
       childName: `Little Jimmy`,
       comment: `Super cool thing I want`,
@@ -50,7 +50,7 @@ export const JustOne: Story = props({
 });
 
 export const JustTwo: Story = props({
-  unlockRequests: withIdsAnd({ childId: `user1` }, [
+  unlockRequests: withIdsAnd({ childId: `child1` }, [
     {
       target: `gitlab.io`,
       childName: `Little Jimmy`,
@@ -67,7 +67,7 @@ export const JustTwo: Story = props({
 });
 
 export const Lots: Story = props({
-  unlockRequests: withIdsAnd({ childId: `user1` }, [
+  unlockRequests: withIdsAnd({ childId: `child1` }, [
     {
       target: `gitlab.io`,
       childName: `Little Jimmy`,

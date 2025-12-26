@@ -28,7 +28,7 @@ const publicKeychains = [
 ];
 
 // @screenshot: xs/1300,lg/900
-export const AddToUserHappyPath: Story = props({
+export const AddToChildHappyPath: Story = props({
   mode: `addToUser`,
   userName: `Little Jimmy`,
   userId: `1234`,
@@ -39,15 +39,15 @@ export const AddToUserHappyPath: Story = props({
 });
 
 // @screenshot: xs/1000,lg
-export const AddToUserNoOwnKeychains: Story = props({
-  ...AddToUserHappyPath.args,
+export const AddToChildNoOwnKeychains: Story = props({
+  ...AddToChildHappyPath.args,
   hasNoOwnKeychains: true,
   selectableOwnKeychains: [],
 });
 
 // @screenshot: xs/1000,lg
-export const AddToUserHasAllPersonalKeychains: Story = props({
-  ...AddToUserHappyPath.args,
+export const AddToChildHasAllPersonalKeychains: Story = props({
+  ...AddToChildHappyPath.args,
   hasNoOwnKeychains: false,
   selectableOwnKeychains: [],
   userName: `Little Jimmy`,
@@ -73,7 +73,7 @@ export const ForUnlockRequestNoPersonalKeychains: Story = props({
 });
 
 // @screenshot: xs
-export const ForUnlockRequestUserNeedsAKeychain: Story = props({
+export const ForUnlockRequestChildNeedsAKeychain: Story = props({
   ...ForUnlockRequestHappyPath.args,
   mode: `forUnlockRequestKey`,
   hasNoOwnKeychains: false,

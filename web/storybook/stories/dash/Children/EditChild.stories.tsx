@@ -2,10 +2,10 @@ import { EditChild } from '@dash/components';
 import { defaults } from '@dash/types';
 import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
-import { confirmableEntityAction, props, userKeychainProps } from '../../story-helpers';
+import { childKeychainProps, confirmableEntityAction, props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/EditChild', // eslint-disable-line
+  title: 'Dashboard/Children/EditChild', // eslint-disable-line
   component: EditChild,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },
@@ -86,8 +86,8 @@ export const Default: Story = props({
   setAssignedKeychainSchedule: () => {},
   setAddingKeychainSchedule: () => {},
   keychains: [
-    userKeychainProps({ name: `HTC`, numKeys: 43, isPublic: true }),
-    userKeychainProps({
+    childKeychainProps({ name: `HTC`, numKeys: 43, isPublic: true }),
+    childKeychainProps({
       name: `Public Speaking`,
       numKeys: 7,
       isPublic: false,
