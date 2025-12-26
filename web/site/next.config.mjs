@@ -10,7 +10,6 @@ const nextConfig = {
   outputFileTracingRoot: path.join(__dirname, `..`),
   reactStrictMode: true,
   pageExtensions: [`tsx`, `md`],
-  eslint: { ignoreDuringBuilds: true },
   transpilePackages: [
     `@shared/datetime`,
     `@shared/string`,

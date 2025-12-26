@@ -72,7 +72,11 @@ const ExpirationStep: React.FC<Props> = ({ mode, update, activeStep, expiration 
 
 export default ExpirationStep;
 
-function TitleText({ expiration }: { expiration: string | undefined }): JSX.Element {
+function TitleText({
+  expiration,
+}: {
+  expiration: string | undefined;
+}): React.JSX.Element {
   return (
     <span>
       {expiration ? (

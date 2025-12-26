@@ -1,7 +1,7 @@
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import cx from 'classnames';
-import React, { Fragment } from 'react';
+import React from 'react';
 import MobileStickyHeader from './MobileStickyHeader';
 import SidebarNav from './SidebarNav';
 
@@ -30,65 +30,45 @@ const Chrome: React.FC<Props> = ({
 }) => (
   <div className="Chrome bg-slate-50">
     {/* mark: begin mobile menu */}
-    <Transition.Root show={mobileSidebarOpen} as={Fragment}>
+    <Transition show={mobileSidebarOpen}>
       <Dialog as="div" className="relative z-40 md:hidden" onClose={onMobileSidebarClose}>
-        <Transition.Child
-          as={Fragment}
-          enter="transition-opacity ease-linear duration-200"
-          enterFrom="opacity-0"
-          enterTo=""
-          leave="transition-opacity ease-linear duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          {/* mark: semi transparent overlay */}
-          <div className="fixed inset-0 bg-white bg-opacity-50 backdrop-blur-xl" />
-        </Transition.Child>
+        {/* mark: semi transparent overlay */}
+        <TransitionChild
+          as="div"
+          aria-hidden="true"
+          className="fixed inset-0 bg-white bg-opacity-50 backdrop-blur-xl transition-opacity duration-200 ease-linear data-[closed]:opacity-0"
+        />
 
         <div className="fixed inset-0 flex z-40">
-          <Transition.Child
-            as={Fragment}
-            enter="transition-transform ease-in-out duration-200 transform"
-            enterFrom="-translate-x-full"
-            enterTo="translate-x-0"
-            leave="transition-[transform] ease-in-out duration-200 transform"
-            leaveFrom="translate-x-0"
-            leaveTo="-translate-x-full"
+          {/* mark: begin mobile sidebar wrapper */}
+          <TransitionChild
+            as={DialogPanel}
+            className="relative flex flex-col w-72 bg-slate-900 bg-gradient-to-b from-transparent to-violet-900/20 rounded-xl shadow-lg shadow-black/30 m-2 transition-transform duration-200 ease-in-out data-[closed]:-translate-x-full"
           >
-            {/* mark: begin mobile sidebar wrapper */}
-            <Dialog.Panel className="relative flex flex-col w-72 bg-slate-900 bg-gradient-to-b from-transparent to-violet-900/20 rounded-xl shadow-lg shadow-black/30 m-2">
-              {/* mark: begin floating mobile overlay close 'X' button */}
-              <Transition.Child
-                as={Fragment}
-                enter="ease-in-out duration-200"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="ease-in-out duration-200"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
+            {/* mark: begin floating mobile overlay close 'X' button */}
+            <TransitionChild
+              as="div"
+              className="absolute top-0 right-0 -mr-12 pt-4 transition-opacity duration-200 ease-in-out data-[closed]:opacity-0"
+            >
+              <button
+                type="button"
+                className="shadow-lg shadow-black/30 text-slate-400 hover:text-slate-300 flex items-center justify-center h-10 w-10 bg-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50"
+                onClick={onMobileSidebarClose}
               >
-                <div className="absolute top-0 right-0 -mr-12 pt-4">
-                  <button
-                    type="button"
-                    className="shadow-lg shadow-black/30 text-slate-400 hover:text-slate-300 flex items-center justify-center h-10 w-10 bg-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500/50"
-                    onClick={onMobileSidebarClose}
-                  >
-                    <span className="sr-only">Close sidebar</span>
-                    <XMarkIcon className="h-6 leading-none" />
-                  </button>
-                </div>
-              </Transition.Child>
-              {/* mark: end floating mobile overlay close 'X' button */}
-              <SidebarNav onInternalLinkClick={onInternalLinkClick} urlPath={urlPath} />
-            </Dialog.Panel>
-            {/* mark: end mobile sidebar wrapper */}
-          </Transition.Child>
+                <span className="sr-only">Close sidebar</span>
+                <XMarkIcon className="h-6 leading-none" />
+              </button>
+            </TransitionChild>
+            {/* mark: end floating mobile overlay close 'X' button */}
+            <SidebarNav onInternalLinkClick={onInternalLinkClick} urlPath={urlPath} />
+          </TransitionChild>
+          {/* mark: end mobile sidebar wrapper */}
           <div className="flex-shrink-0 w-14" aria-hidden="true">
             {/* Dummy element to force sidebar to shrink to fit close icon */}
           </div>
         </div>
       </Dialog>
-    </Transition.Root>
+    </Transition>
     {/* mark: end mobile menu */}
 
     {/* Static sidebar for desktop */}

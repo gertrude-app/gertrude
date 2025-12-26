@@ -286,38 +286,62 @@ export function screenshot(
   };
 }
 
-export function appWindow(width = 900, height = 600): Record<string, any> {
+export function appWindow(
+  width = 900,
+  height = 600,
+): {
+  parameters: Record<string, any>;
+  globals: Record<string, any>;
+} {
+  const viewportKey = `appWindow_${width}x${height}`;
   return {
-    layout: `fullscreen`,
-    viewport: {
-      viewports: {
-        appWindow: {
-          name: `AppWindow`,
-          styles: {
-            width: `${width}px`,
-            height: `${height}px`,
+    parameters: {
+      layout: `fullscreen`,
+      viewport: {
+        options: {
+          [viewportKey]: {
+            name: `AppWindow ${width}x${height}`,
+            styles: {
+              height: `${height}px`,
+              width: `${width}px`,
+            },
+            type: `desktop` as const,
           },
         },
       },
-      defaultViewport: `appWindow`,
+    },
+    globals: {
+      viewport: { value: viewportKey, isRotated: false },
     },
   };
 }
 
-export function fixedViewport(width: number, height: number): Record<string, any> {
+export function fixedViewport(
+  width: number,
+  height: number,
+): {
+  parameters: Record<string, any>;
+  globals: Record<string, any>;
+} {
+  const viewportKey = `fixed_${width}x${height}`;
   return {
-    layout: `fullscreen`,
-    viewport: {
-      viewports: {
-        fixed: {
-          name: `Fixed`,
-          styles: {
-            width: `${width}px`,
-            height: `${height}px`,
+    parameters: {
+      layout: `fullscreen`,
+      viewport: {
+        options: {
+          [viewportKey]: {
+            name: `Fixed ${width}x${height}`,
+            styles: {
+              height: `${height}px`,
+              width: `${width}px`,
+            },
+            type: `desktop` as const,
           },
         },
       },
-      defaultViewport: `fixed`,
+    },
+    globals: {
+      viewport: { value: viewportKey, isRotated: false },
     },
   };
 }

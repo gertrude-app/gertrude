@@ -29,7 +29,7 @@ export const Administrate: React.FC<Props> = ({
   emit,
   dispatch,
 }) => {
-  let pageElement: JSX.Element;
+  let pageElement: React.JSX.Element;
 
   switch (screen) {
     case `healthCheck`:

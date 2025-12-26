@@ -1,9 +1,12 @@
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { StorybookConfig } from '@storybook/nextjs';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const config: StorybookConfig = {
   stories: [`../stories/**/*.stories.tsx`],
-  addons: [`@storybook/addon-essentials`],
+  addons: [],
   framework: `@storybook/nextjs`,
   staticDirs: [`../../dash/app/public`],
   webpackFinal: async (config) => {

@@ -51,9 +51,9 @@ function reducer(state: State, action: Action): void {
       state.webPolicyDomains = state.webPolicyDomains.filter((d) => d !== action.domain);
       return;
     case `receiveData`:
-      state.enabledBlockGroups = action.data.enabledBlockGroups;
+      state.enabledBlockGroups = [...action.data.enabledBlockGroups];
       state.webPolicy = action.data.webPolicy;
-      state.webPolicyDomains = action.data.webPolicyDomains;
+      state.webPolicyDomains = [...action.data.webPolicyDomains];
       return;
     case `addBlockRule`:
       state.editingBlockRule = {

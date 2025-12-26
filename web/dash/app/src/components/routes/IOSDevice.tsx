@@ -54,9 +54,9 @@ const IOSDevice: React.FC = () => {
     () =>
       Current.api.updateIOSDevice({
         deviceId: id,
-        enabledBlockGroups: state.enabledBlockGroups,
+        enabledBlockGroups: [...state.enabledBlockGroups],
         webPolicy: state.webPolicy,
-        webPolicyDomains: state.webPolicyDomains,
+        webPolicyDomains: [...state.webPolicyDomains],
       }),
     { toast: `save:ios-device`, invalidating: [Key.iOSDevice(id)] },
   );

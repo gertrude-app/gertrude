@@ -8,12 +8,12 @@
     "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
   },
   "dependencies": {
-    "@headlessui/react": "1.7.11",
+    "@headlessui/react": "2.2.9",
     "@heroicons/react": "2.0.17",
     "@shared/datetime": "workspace:*",
     "classnames": "2.5.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-router-dom": "6.22.3"
   }
 }
