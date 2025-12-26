@@ -4,7 +4,7 @@ import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Users/ListChildren', // eslint-disable-line
+  title: 'Dashboard/Children/ListChildren', // eslint-disable-line
   component: ListChildren,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],
@@ -24,7 +24,7 @@ export const Default: Story = props({
   ...Empty.args,
   users: [
     {
-      id: `user-4`,
+      id: `child-4`,
       name: `Lil Suzy`,
       numKeys: 33,
       numKeychains: 55,
@@ -33,7 +33,7 @@ export const Default: Story = props({
       devices: [],
     },
     {
-      id: `user-1`,
+      id: `child-1`,
       name: `John Doe`,
       numKeys: 33,
       numKeychains: 55,
@@ -51,7 +51,7 @@ export const Default: Story = props({
       ],
     },
     {
-      id: `user-2`,
+      id: `child-2`,
       name: `Jane Doe`,
       numKeys: 55,
       numKeychains: 2,

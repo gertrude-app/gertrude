@@ -22,7 +22,7 @@ async function main(): Promise<void> {
     .map(([file, story]) => extractScreenshotTest(file, story))
     .filter(notNullish);
 
-  if (!tests.some((t) => t.id === `dashboard-users-suspendfilterrequestform--default`)) {
+  if (!tests.some((t) => t.id === `dashboard-children-suspendfilterrequestform--default`)) {
     throw new Error(`story w/ custom wait not found, possibly renamed`);
   }
 
@@ -54,7 +54,7 @@ async function main(): Promise<void> {
   // ensure fonts loaded
   await page.goto(`${url}?id=dashboard-core-gradienticon--grid`);
   await new Promise((resolve) => setTimeout(resolve, 350));
-  await page.goto(`${url}?id=dashboard-dashboard-screen--no-users`);
+  await page.goto(`${url}?id=dashboard-dashboard-screen--no-children`);
   await new Promise((resolve) => setTimeout(resolve, 350));
 
   for (const test of tests) {
@@ -69,7 +69,7 @@ async function main(): Promise<void> {
         } catch {
           await page.waitForSelector(`#headlessui-portal-root > *`, { timeout: 2000 });
         }
-        if (test.id === `dashboard-users-suspendfilterrequestform--default`) {
+        if (test.id === `dashboard-children-suspendfilterrequestform--default`) {
           await page.waitForSelector(`div[role="listbox"]`, { timeout: 2000 });
         }
         // wait 50ms to allow focus hooks from modals

@@ -30,7 +30,7 @@ export function keychainProps(override: Partial<KeychainSummary> = {}): Keychain
   };
 }
 
-export function userKeychainProps(
+export function childKeychainProps(
   override: Partial<UserKeychainSummary> = {},
 ): UserKeychainSummary {
   return {

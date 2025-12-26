@@ -19,7 +19,7 @@ export const Default: Story = props({
   dismissAddDevice: () => {},
   dismissAnnouncement: () => {},
   addDeviceRequest: { state: `idle` },
-  unlockRequests: withIdsAnd({ childId: `user1` }, [
+  unlockRequests: withIdsAnd({ childId: `child1` }, [
     {
       target: `gitlab.io`,
       childName: `Little Jimmy`,
@@ -102,20 +102,20 @@ export const NoUnlockRequests: Story = props({
   unlockRequests: [],
 });
 
-export const NoUserActivity: Story = props({
+export const NoChildActivity: Story = props({
   ...Default.args,
   childActivitySummaries: [],
 });
 
 // @screenshot: lg
-export const NoUserActivityOrUnlockRequests: Story = props({
+export const NoChildActivityOrUnlockRequests: Story = props({
   ...Default.args,
   childActivitySummaries: [],
   unlockRequests: [],
 });
 
 // @screenshot: xs,lg
-export const NoUsers: Story = props({
+export const NoChildren: Story = props({
   ...Default.args,
   childData: [],
 });
