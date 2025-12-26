@@ -14,7 +14,7 @@ function Combobox<Value extends string = string>({
   selected,
   setSelected,
   className,
-}: Props<Value>): JSX.Element {
+}: Props<Value>): React.JSX.Element {
   const [query, setQuery] = useState(``);
   const filteredOptions =
     query === ``
@@ -28,7 +28,7 @@ function Combobox<Value extends string = string>({
       className={className}
       as="div"
       value={selected}
-      onChange={(option: { value: Value }) => setSelected(option.value)}
+      onChange={(option: { value: Value } | null) => option && setSelected(option.value)}
     >
       <div className="relative mt-1 rounded-lg border border-slate-200">
         <HeadlessCombobox.Input

@@ -6,7 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 import type { Decorator, Preview } from '@storybook/react';
 
 export const decorators: [Decorator] = [
-  (Story: React.FC): JSX.Element => (
+  (Story: React.FC): React.JSX.Element => (
     <MemoryRouter>
       <Story />
     </MemoryRouter>

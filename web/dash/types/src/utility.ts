@@ -1,5 +1,6 @@
 import type { UnlockRequest } from './pairql';
 import type { PqlError as SharedPqlError } from '@shared/pairql/src/PqlError';
+import type React from 'react';
 import type { ComponentProps, JSXElementConstructor } from 'react';
 
 export type RemoveFns<T> = {
@@ -7,7 +8,7 @@ export type RemoveFns<T> = {
 };
 
 export type Subcomponents<
-  T extends keyof JSX.IntrinsicElements | JSXElementConstructor<any>,
+  T extends keyof React.JSX.IntrinsicElements | JSXElementConstructor<any>,
 > = Array<RemoveFns<ComponentProps<T>> & { id: string }>;
 
 export interface ConfirmableEntityAction<StartArg = UUID> {

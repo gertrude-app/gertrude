@@ -1,9 +1,8 @@
 'use client';
 
-import { Listbox, Transition } from '@headlessui/react';
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
 import cx from 'classnames';
 import React from 'react';
-import { Fragment } from 'react';
 import Label from './Label';
 
 interface Props<Value extends string> {
@@ -54,7 +53,7 @@ function SelectMenu<Value extends string = string>({
                       ?.display ?? `make a selection...`}
                   </p>
                 </div>
-                <Listbox.Button
+                <ListboxButton
                   className={cx(
                     `relative inline-flex items-center px-4 rounded-l-none rounded-r-xl text-sm font-medium focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-50 focus:ring-indigo-500 transition-[outline,background-color] duration-100`,
                     buttonStyles,
@@ -68,54 +67,47 @@ function SelectMenu<Value extends string = string>({
                     }`}
                     aria-hidden="true"
                   />
-                </Listbox.Button>
+                </ListboxButton>
               </div>
             </div>
 
-            <Transition
-              show={open}
-              as={Fragment}
-              leave="transition-[opacity,transform] ease-in duration-100"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0 -translate-y-1"
-              enter="transition-[opacity,transform] ease-in duration-100"
-              enterFrom="opacity-0 -translate-y-1"
-              enterTo="opacity-100"
+            <ListboxOptions
+              anchor="bottom end"
+              transition
+              className="origin-top-right absolute z-20 right-0 mt-2 p-2 w-72 rounded-xl shadow-lg overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none flex flex-col transition-[opacity,transform] duration-100 ease-in data-[closed]:opacity-0 data-[closed]:-translate-y-1"
             >
-              <Listbox.Options className="origin-top-right absolute z-20 right-0 mt-2 p-2 w-72 rounded-xl shadow-lg overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none flex flex-col">
-                {options.map(({ value, display }) => (
-                  <Listbox.Option
-                    key={value}
-                    className={({ active }) =>
-                      cx(
-                        active
-                          ? `bg-violet-100 text-slate-900 dark:text-slate-200`
-                          : `text-slate-900 dark:text-slate-300`,
-                        `cursor-pointer select-none relative rounded-xl transition-[background-color] duration-75`,
-                        size === `small` ? `py-2 px-3` : `p-3.5 text-md`,
-                        size === `small` && active && `bg-slate-50 dark:bg-slate-700/50`,
-                      )
-                    }
-                    value={value}
-                  >
-                    {({ selected }) => (
-                      <div className="flex flex-col">
-                        <div className="flex justify-between">
-                          <p className={selected ? `font-semibold` : `font-normal`}>
-                            {display}
-                          </p>
-                          {selected ? (
-                            <span className={`text-violet-700`}>
-                              <i className="fa fa-check h-5 w-5" aria-hidden="true" />
-                            </span>
-                          ) : null}
-                        </div>
+              {options.map(({ value, display }) => (
+                <ListboxOption
+                  key={value}
+                  className={({ focus }) =>
+                    cx(
+                      focus
+                        ? `bg-violet-100 text-slate-900 dark:text-slate-200`
+                        : `text-slate-900 dark:text-slate-300`,
+                      `cursor-pointer select-none relative rounded-xl transition-[background-color] duration-75`,
+                      size === `small` ? `py-2 px-3` : `p-3.5 text-md`,
+                      size === `small` && focus && `bg-slate-50 dark:bg-slate-700/50`,
+                    )
+                  }
+                  value={value}
+                >
+                  {({ selected }) => (
+                    <div className="flex flex-col">
+                      <div className="flex justify-between">
+                        <p className={selected ? `font-semibold` : `font-normal`}>
+                          {display}
+                        </p>
+                        {selected ? (
+                          <span className={`text-violet-700`}>
+                            <i className="fa fa-check h-5 w-5" aria-hidden="true" />
+                          </span>
+                        ) : null}
                       </div>
-                    )}
-                  </Listbox.Option>
-                ))}
-              </Listbox.Options>
-            </Transition>
+                    </div>
+                  )}
+                </ListboxOption>
+              ))}
+            </ListboxOptions>
           </div>
         </div>
       )}

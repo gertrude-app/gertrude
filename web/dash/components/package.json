@@ -13,21 +13,21 @@
     "@dash/keys": "workspace:*",
     "@dash/types": "workspace:*",
     "@dash/utils": "workspace:*",
-    "@headlessui/react": "^1.7.3",
+    "@headlessui/react": "2.2.9",
     "@heroicons/react": "2.0.17",
     "@shared/components": "workspace:*",
     "@shared/string": "workspace:*",
     "@shared/ts-utils": "workspace:*",
     "@types/dash-ambient": "workspace:*",
     "classnames": "2.5.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-router-dom": "6.22.3",
     "uuid": "9.0.0"
   },
   "devDependencies": {
     "@shared/datetime": "workspace:*",
-    "@types/react-dom": "18.3.1",
+    "@types/react-dom": "19.1.6",
     "@types/uuid": "8.3.4"
   }
 }

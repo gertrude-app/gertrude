@@ -19,7 +19,7 @@ const MacOSUserAccountType: React.FC<Props> = ({ users, current, remediationStep
   const nonAdmins = users.filter((u) => !u.isAdmin).map((u) => u.name);
   const demotable = admins.length > 1 ? [...admins] : [];
 
-  let body: JSX.Element;
+  let body: React.JSX.Element;
   if (current?.isAdmin === false) {
     body = <HappyPath adminUsers={admins} userName={current.name} />;
   } else {
