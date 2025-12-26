@@ -5,7 +5,7 @@ import { appWindow, props } from '../story-helpers';
 const meta = {
   title: 'MacOS App/Onboarding', // eslint-disable-line
   component: Onboarding,
-  parameters: appWindow(900, 700),
+  ...appWindow(900, 700),
 } satisfies Meta<typeof Onboarding>;
 
 type Story = StoryObj<typeof meta>;

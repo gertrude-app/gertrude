@@ -72,7 +72,6 @@ function SelectMenu<Value extends string = string>({
             </div>
 
             <ListboxOptions
-              anchor="bottom end"
               transition
               className="origin-top-right absolute z-20 right-0 mt-2 p-2 w-72 rounded-xl shadow-lg overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none flex flex-col transition-[opacity,transform] duration-100 ease-in data-[closed]:opacity-0 data-[closed]:-translate-y-1"
             >

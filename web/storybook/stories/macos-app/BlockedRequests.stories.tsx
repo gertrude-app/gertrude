@@ -6,7 +6,7 @@ import { appWindow, props } from '../story-helpers';
 const meta = {
   title: 'MacOS App/Blocked Requests', // eslint-disable-line
   component: BlockedRequests,
-  parameters: appWindow(),
+  ...appWindow(),
 } satisfies Meta<typeof BlockedRequests>;
 
 type Story = StoryObj<typeof meta>;

@@ -95,7 +95,7 @@ typecheck-watch:
 
 fix: format lint-fix
 
-check: lint format-check typecheck test
+check: lint format-check typecheck test build-storybook
 
 [private]
 hmr-comment:

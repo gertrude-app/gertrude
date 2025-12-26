@@ -64,10 +64,16 @@ async function main(): Promise<void> {
     for (const size of test.sizes) {
       await page.setViewport({ width: size.width, height: size.height });
       try {
-        await page.waitForSelector(`#storybook-root > *`);
-        if (test.id === `dashboard-users-suspendfilterrequestform--default`) {
-          await page.waitForSelector(`ul[role="listbox"]`);
+        try {
+          await page.waitForSelector(`#storybook-root > *`, { timeout: 2000 });
+        } catch {
+          await page.waitForSelector(`#headlessui-portal-root > *`, { timeout: 2000 });
         }
+        if (test.id === `dashboard-users-suspendfilterrequestform--default`) {
+          await page.waitForSelector(`div[role="listbox"]`, { timeout: 2000 });
+        }
+        // wait 50ms to allow focus hooks from modals
+        await new Promise((resolve) => setTimeout(resolve, 50));
         await argosScreenshot(page, `${test.id}--w${size.width}`, {
           fullPage: true,
         });

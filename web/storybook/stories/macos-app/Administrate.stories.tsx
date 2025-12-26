@@ -5,7 +5,7 @@ import { appWindow, props } from '../story-helpers';
 const meta = {
   title: 'MacOS App/Administrate', // eslint-disable-line
   component: Administrate,
-  parameters: appWindow(900, 660),
+  ...appWindow(900, 660),
 } satisfies Meta<typeof Administrate>;
 
 type Story = StoryObj<typeof meta>;

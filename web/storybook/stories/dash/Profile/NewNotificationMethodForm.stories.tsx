@@ -5,7 +5,7 @@ import { fixedViewport, props } from '../../story-helpers';
 const meta = {
   title: 'Dashboard/Settings/NewNotificationMethodForm', // eslint-disable-line
   component: NewNotificationMethodForm,
-  parameters: fixedViewport(385, 812),
+  ...fixedViewport(385, 812),
 } satisfies Meta<typeof NewNotificationMethodForm>;
 
 type Story = StoryObj<typeof meta>;

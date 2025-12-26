@@ -5,7 +5,7 @@ import { appWindow, props } from '../story-helpers';
 const meta = {
   title: 'MacOS App/RequestSuspension', // eslint-disable-line
   component: RequestSuspension,
-  parameters: appWindow(680, 360),
+  ...appWindow(680, 360),
 } satisfies Meta<typeof RequestSuspension>;
 
 type Story = StoryObj<typeof meta>;
