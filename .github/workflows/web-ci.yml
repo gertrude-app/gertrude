@@ -18,7 +18,7 @@ on:
 jobs:
   check:
     name: check
-    runs-on: namespace-profile-default
+    runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -41,7 +41,7 @@ jobs:
     name: storybook
     needs: files-changed
     if: needs.files-changed.outputs.storybook == 'true'
-    runs-on: namespace-profile-default
+    runs-on: ubuntu-latest
     env:
       ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}
     steps:
@@ -87,7 +87,7 @@ jobs:
     name: dashboard
     needs: files-changed
     if: needs.files-changed.outputs.dashboard == 'true'
-    runs-on: namespace-profile-default
+    runs-on: ubuntu-latest
     env:
       VITE_API_ENDPOINT: ${{ secrets.STAGING_API_ENDPOINT }}
       VITE_TEST_ADMIN_CREDS: ${{ secrets.TEST_ADMIN_CREDS }}
@@ -120,7 +120,7 @@ jobs:
           path: web/dash/app/cypress/videos
 
   files-changed:
-    runs-on: namespace-profile-default
+    runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
     outputs:
       appviews: ${{ steps.changes.outputs.appviews }}
@@ -151,7 +151,7 @@ jobs:
   appviews-comment:
     needs: files-changed
     if: needs.files-changed.outputs.appviews == 'true'
-    runs-on: namespace-profile-default
+    runs-on: ubuntu-latest
     steps:
       - name: pr comment
         uses: mshick/add-pr-comment@v2
@@ -167,7 +167,7 @@ jobs:
     name: site
     needs: files-changed
     if: needs.files-changed.outputs.site == 'true'
-    runs-on: namespace-profile-default
+    runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_FORMS_ENDPOINT: /not-real
       NEXT_PUBLIC_TURNSTILE_SITEKEY: not-real

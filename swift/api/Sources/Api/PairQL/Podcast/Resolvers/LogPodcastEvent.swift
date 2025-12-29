@@ -1,4 +1,5 @@
 import Dependencies
+import DuetSQL
 import PodcastRoute
 
 extension LogPodcastEvent: Resolver {
@@ -23,6 +24,21 @@ extension LogPodcastEvent: Resolver {
       let search = githubSearch(input.eventId, repo: "gertrude-am")
       let message = "Podcast app event: \(search) \(msg)"
       await slack.internal(.podcasts, message)
+
+      if input.eventId == "a72104d7", let installId = input.installId {
+        let subscriptionCount = try await PodcastEvent.query()
+          .where(.installId == installId)
+          .where(.eventId == "a72104d7")
+          .count(in: context.db)
+        if subscriptionCount == 1 {
+          await slack.internal(.info, "*FIRST Podcast Subscription* `\(input.deviceType)`")
+          await slack.internal(.podcasts, "*FIRST Podcast Subscription* `\(input.deviceType)`")
+          get(dependency: \.postmark).toSuperAdmin(
+            "FIRST Podcast Subscription",
+            "device: \(input.deviceType)",
+          )
+        }
+      }
     }
 
     return .success
