@@ -88,7 +88,7 @@ jobs:
   linux-api-build:
     needs: files-changed
     if: needs.files-changed.outputs.api == 'true'
-    runs-on: namespace-profile-default
+    runs-on: ubuntu-latest
     container: ghcr.io/gertrude-app/api-ci-build:6.2.1
     steps:
       - name: checkout
@@ -176,7 +176,7 @@ jobs:
   linux-api-test:
     needs: files-changed
     if: needs.files-changed.outputs.api == 'true'
-    runs-on: namespace-profile-default
+    runs-on: ubuntu-latest
     container: ghcr.io/gertrude-app/api-ci-build:6.2.1
     env:
       DATABASE_HOST: postgres
