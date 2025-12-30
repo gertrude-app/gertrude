@@ -14,6 +14,8 @@ extension LogIOSEvent: Resolver {
     var detail = input.detail
     if detail?.hasPrefix("[onboarding]: ") == true {
       detail = String(detail!.dropFirst("[onboarding]: ".count))
+    } else if detail?.hasPrefix("[onboarding] ") == true {
+      detail = String(detail!.dropFirst("[onboarding] ".count))
     }
 
     try await context.db.create(IOSEvent(
