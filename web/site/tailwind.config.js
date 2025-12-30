@@ -36,10 +36,25 @@ module.exports = {
           '0%': { opacity: `0`, transform: `translateY(100px)` },
           '100%': { opacity: `1`, transform: `translateY(0)` },
         },
+        'spin-slow': {
+          from: { transform: `rotate(0deg)` },
+          to: { transform: `rotate(360deg)` },
+        },
+        marquee: {
+          '0%': { transform: `translateY(0)` },
+          '100%': { transform: `translateY(calc(-50% - 1rem))` },
+        },
+        'fade-in': {
+          from: { opacity: `0` },
+          to: { opacity: `1` },
+        },
       },
       animation: {
         blink: `blink 1s step-end infinite`,
         fadeIn: `fadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)`,
+        'spin-slow': `spin-slow 30s linear infinite`,
+        marquee: `marquee var(--marquee-duration, 30s) linear infinite`,
+        'fade-in': `fade-in 0.5s ease-out forwards`,
       },
     },
   },

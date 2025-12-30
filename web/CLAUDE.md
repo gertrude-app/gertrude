@@ -6,6 +6,7 @@ Next.js, Vite, Tailwind.
 ## Notes
 
 - Never leave comments in code, unless something is extremely non-obvious.
+- Use `const ComponentName: React.FC<Props> = () => ...` pattern for React components.
 
 ## Main Apps
 

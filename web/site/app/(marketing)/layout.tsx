@@ -10,27 +10,33 @@ import MainHeader from '@/components/MainHeader';
 const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const path = usePathname();
   const isHomePage = path === `/`;
+  const isIOSPage = path === `/iphone-and-ipad`;
   const theme = path.includes(`blog`) || isHomePage ? `white` : `violet`;
   const lang = path.includes(`bloquear`) ? `es` : `en`;
   const showAuthButtons =
-    path !== `/` && path !== `/contact` && !path.startsWith(`/blog`);
+    path !== `/` && path !== `/contact` && !path.startsWith(`/blog`) && !isIOSPage;
   const isMacPage =
     path === `/mac` || path === `/download-mac-app` || path.startsWith(`/docs`);
-  const badge = isMacPage ? `For Mac` : undefined;
-  const linkVariant = isMacPage ? `flat` : `default`;
+  const badge = isMacPage ? `For Mac` : isIOSPage ? `For iOS` : undefined;
+  const linkVariant = isMacPage || isIOSPage ? `flat` : `default`;
+  const overlay = isHomePage || isIOSPage;
   return (
     <html lang={lang}>
       <GoogleTagManager gtmId="GTM-KRRP8HFW" />
       <body
         className={cx(
           `min-h-screen flex flex-col`,
-          isHomePage ? `bg-white` : theme === `violet` ? `bg-violet-500` : `bg-white`,
+          isHomePage || isIOSPage
+            ? `bg-white`
+            : theme === `violet`
+              ? `bg-violet-500`
+              : `bg-white`,
         )}
       >
         <MainHeader
           theme={theme}
           showAuthButtons={showAuthButtons}
-          overlay={isHomePage}
+          overlay={overlay}
           badge={badge}
           linkVariant={linkVariant}
         />
