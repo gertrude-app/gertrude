@@ -20,6 +20,7 @@ const MainFooter: React.FC = () => (
             <FooterLink href="/">Home</FooterLink>
             <FooterLink href="/contact">Contact</FooterLink>
             <FooterLink href="/blog">Blog</FooterLink>
+            <FooterLink href="/iphone-and-ipad">iOS</FooterLink>
           </ul>
         </div>
         <div className="flex flex-col items-center sm:items-start gap-2">

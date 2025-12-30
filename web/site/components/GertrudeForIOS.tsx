@@ -311,7 +311,7 @@ const GertrudeForIOS: React.FC = () => {
                   </FancyLink>
                   <FancyLink
                     type="link"
-                    href="/blog/how-parents-can-block-images-gif-search-ios-18"
+                    href="/iphone-and-ipad"
                     size="sm"
                     color="secondary"
                     className="xs:hidden"
@@ -320,7 +320,7 @@ const GertrudeForIOS: React.FC = () => {
                   </FancyLink>
                   <FancyLink
                     type="link"
-                    href="/blog/how-parents-can-block-images-gif-search-ios-18"
+                    href="/iphone-and-ipad"
                     size="lg"
                     color="secondary"
                     className="hidden xs:inline-flex"
