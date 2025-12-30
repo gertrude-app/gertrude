@@ -45,6 +45,13 @@ describe(`parseE164()`, () => {
     [`+39 06 1234 5678`, `+390612345678`],
     [`+39 (0)6 1234 5678`, `+390612345678`],
     [`+390612345678`, `+390612345678`],
+    // US numbers with invalid area codes (must start with 2-9, not 0 or 1)
+    [`0621063916`, null],
+    [`(062) 106-3916`, null],
+    [`+10621063916`, null],
+    [`+1 (062) 106-3916`, null],
+    [`1621063916`, null],
+    [`+11621063916`, null],
   ];
   test.each(cases)(`%s to I.164 -> %s`, (input, expected) => {
     expect(parseE164(input)).toBe(expected);

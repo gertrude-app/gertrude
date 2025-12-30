@@ -7,6 +7,9 @@ export function parseE164(phoneNumber: string | undefined): string | null {
   const hadPlus = phoneNumber.match(/^\s?\+/) !== null;
   const digits = phoneNumber.replace(/\D/g, ``);
   if (digits.length === 10 && !hadPlus) {
+    if (!validUsAreaCode(digits[0])) {
+      return null;
+    }
     return `+1${digits}`;
   } else if (digits.length < 7 || digits.length > 15) {
     return null;
@@ -18,8 +21,17 @@ export function parseE164(phoneNumber: string | undefined): string | null {
         break;
       }
     }
+    if (result.length === 12 && result.startsWith(`+1`)) {
+      if (!validUsAreaCode(result[2])) {
+        return null;
+      }
+    }
     return result;
   }
+}
+
+function validUsAreaCode(firstDigit: string | undefined): boolean {
+  return firstDigit !== undefined && firstDigit >= `2` && firstDigit <= `9`;
 }
 
 export function prettyE164(phoneNumber: string): string {
