@@ -11,6 +11,29 @@ enum Reset {
       .where(.id != Parent.Id.stagingPublicKeychainOwner)
       .delete(in: db)
     try await AdminBetsy.create()
+    try await self.createIOSEvents()
+  }
+
+  static func createIOSEvents() async throws {
+    @Dependency(\.db) var db
+    let vendorId = UUID()
+    try await db.create([
+      IOSEvent(
+        eventId: "8d35f043",
+        kind: .onboarding,
+        detail: "region: `US`",
+        vendorId: vendorId,
+        deviceType: "iPhone",
+        iosVersion: "26.1",
+      ),
+      IOSEvent(
+        eventId: "cdb31095",
+        kind: .onboarding,
+        vendorId: vendorId,
+        deviceType: "iPhone",
+        iosVersion: "26.1",
+      ),
+    ])
   }
 
   static func ensurePublicKeychainOwner() async throws {
