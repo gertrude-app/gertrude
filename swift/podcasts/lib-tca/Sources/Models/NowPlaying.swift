@@ -211,6 +211,24 @@ private func _play(episode: Episode, show: Show) async throws {
   if dep(\.fileSystem).fileExists(at: episode.localAudioUrl) {
     try await dep(\.audio).play(episode: episode, show: show)
   } else {
-    unexpected(id: "eeaa7b30", "episode play without local file")
+    NowPlaying.updateSyncingProgress { $0.isPlaying = false }
+    dep(\.db).tryWrite { db in
+      try Episode
+        .update { $0.downloadedAt = nil }
+        .where { $0.id == episode.id }
+        .execute(db)
+    }
+    if dep(\.network).isConnected() {
+      if case .success = await trackedDownload(episode: episode) {
+        try await dep(\.audio).play(episode: episode, show: show)
+        NowPlaying.updateSyncingProgress { $0.isPlaying = true }
+        unexpected(id: "ba664a9f", "episode play without local file, recovered")
+      } else {
+        NowPlaying.delete()
+        unexpected(id: "4fa186eb", "episode play without local file, dl failed")
+      }
+    } else {
+      NowPlaying.delete()
+    }
   }
 }
