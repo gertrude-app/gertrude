@@ -98,6 +98,7 @@ final class BgRefreshFeedsOperation: AsyncOperation, @unchecked Sendable {
       if !newEpisodes.isEmpty {
         scheduleEpisodeDownloads()
       }
+      autoPruneDownloads()
       let duration = Date().timeIntervalSince(start)
       let detail = "time: \(String(format: "%.1f", duration))s"
       self.database.insertEvent(kind: .debug, label: "bg-feed-refresh", detail: detail)

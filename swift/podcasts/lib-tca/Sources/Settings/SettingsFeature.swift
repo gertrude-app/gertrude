@@ -9,10 +9,12 @@ struct SettingsFeature {
   struct State: Equatable {
     @Fetch(CurrentSubscription()) var subscription: Subscription = .fallback
     var purchaseInProgress: Bool = false
+    var reclaimableBytes: Int = 0
   }
 
   enum Action: Equatable {
     case view(SettingsView.Event)
+    case onAppear
     case finishPurchase
     case delegate(DelegateAction)
   }
@@ -29,6 +31,15 @@ struct SettingsFeature {
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
+      case .onAppear:
+        state.reclaimableBytes = self.calculateReclaimableBytes()
+        return .none
+
+      case .view(.reclaimStorageTapped):
+        self.reclaimAllDownloads()
+        state.reclaimableBytes = 0
+        return .none
+
       case .view(.subscribeNowTapped),
            .view(.manageSubscriptionTapped):
         state.purchaseInProgress = true
@@ -72,5 +83,38 @@ struct SettingsFeature {
         return .none
       }
     }
+  }
+
+  func calculateReclaimableBytes() -> Int {
+    let nowPlayingId = self.database.nowPlaying()?.episode.id
+    let now = self.date.now
+    let episodes = self.database.tryRead { db in
+      try Episode
+        .where { $0.downloadedAt.isNot(nil) }
+        .where { #sql("\($0.downloadedAt) < \(now)") }
+        .where { if let id = nowPlayingId { $0.id.neq(id) } }
+        .fetchAll(db)
+    }
+    return episodes.reduce(0) { $0 + $1.sizeInBytes }
+  }
+
+  func reclaimAllDownloads() {
+    let nowPlayingId = self.database.nowPlaying()?.episode.id
+    let now = self.date.now
+    let episodes = self.database.tryRead { db in
+      try Episode
+        .where { $0.downloadedAt.isNot(nil) }
+        .where { #sql("\($0.downloadedAt) < \(now)") }
+        .where { if let id = nowPlayingId { $0.id.neq(id) } }
+        .fetchAll(db)
+    }
+    if episodes.isEmpty { return }
+    self.database.tryWrite { db in
+      try Episode
+        .update { $0.downloadedAt = nil }
+        .where { $0.id.in(episodes.map(\.id)) }
+        .execute(db)
+    }
+    episodes.forEach { $0.removeLocalAudioFile() }
   }
 }

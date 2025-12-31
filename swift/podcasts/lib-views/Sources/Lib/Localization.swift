@@ -40,6 +40,8 @@ enum LocalizedStringKey: String {
   case settingsExpirationToday = "settings.expiration.today"
   case settingsExpirationTomorrow = "settings.expiration.tomorrow"
   case settingsSecurityHeader = "settings.security.header"
+  case settingsStorageHeader = "settings.storage.header"
+  case settingsStorageReclaim = "settings.storage.reclaim"
   case settingsSubscriptionExpired = "settings.subscription.expired"
   case settingsSubscriptionExpires = "settings.subscription.expires"
   case settingsSubscriptionFriendMessage = "settings.subscription.friendMessage"

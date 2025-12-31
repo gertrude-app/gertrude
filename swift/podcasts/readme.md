@@ -2,6 +2,10 @@
 
 ## Releases
 
+- `1.3.0` (12/31/2025)
+  - add button to reclaim storage space
+  - more aggressive cleanup of downloaded episodes
+  - more recovery and prevention of missing local audio files
 - `1.2.0` (12/16/2025)
   - mark unplayed bugfix, set progress to 0
   - expose button in settings to change pin, remove special action

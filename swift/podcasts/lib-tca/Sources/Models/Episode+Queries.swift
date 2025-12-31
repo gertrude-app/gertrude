@@ -18,8 +18,11 @@ extension Episode {
       .where {
         // finished listening more than 7 days ago
         #sql("\($0.completedAt) < \(now - .days(7))") ||
-          // ... or downloaded more than 90 days ago and never started
-          (#sql("\($0.downloadedAt) < \(now - .days(90))") && $0.lastPlayedAt.is(nil))
+          // ... or downloaded more than 45 days ago and never started
+          (#sql("\($0.downloadedAt) < \(now - .days(45))") && $0.lastPlayedAt.is(nil)) ||
+          // ... or downloaded more than 60 days ago and last played more than 30 days ago
+          (#sql("\($0.downloadedAt) < \(now - .days(60))") &&
+            #sql("\($0.lastPlayedAt) < \(now - .days(30))") && $0.completedAt.is(nil))
       }
   }
 
