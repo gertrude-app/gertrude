@@ -67,7 +67,6 @@ struct AppReducer: Sendable {
         } else {
           state.mode = .onboarding(.init())
         }
-        let nowPlayingId = state.nowPlaying.data?.episode.id
         return .merge(
           .publisher {
             self.audio.systemEvents()
@@ -91,7 +90,7 @@ struct AppReducer: Sendable {
           },
           .run { _ in
             try await self.mainQueue.sleep(for: .seconds(10))
-            self.cleanupTasks(nowPlayingId)
+            self.cleanupTasks()
           },
         )
       case .processStoreKitTransaction(let txn, let isUpdate):
@@ -222,8 +221,9 @@ struct AppReducer: Sendable {
     )
   }
 
-  func cleanupTasks(_ nowPlaying: Episode.ID?) {
-    self.autoPruneDownloads(nowPlaying)
+  func cleanupTasks() {
+    let currentNowPlaying = self.database.nowPlaying()?.episode.id
+    self.autoPruneDownloads(currentNowPlaying)
     self.database.tryWrite { db in
       try Event
         .where { $0.createdAt.lt(self.date.now - .days(30)) }
