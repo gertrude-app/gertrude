@@ -1,0 +1,588 @@
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import type { T } from '@shared/pairql/admin';
+import client from '../api/client';
+
+interface IconProps {
+  className?: string;
+}
+
+const ArrowLeftIcon: React.FC<IconProps> = ({ className = `` }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M19 12H5" />
+    <path d="m12 19-7-7 7-7" />
+  </svg>
+);
+
+const SmartphoneIcon: React.FC<IconProps> = ({ className = `` }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+    <line x1="12" x2="12.01" y1="18" y2="18" />
+  </svg>
+);
+
+const LoadingSpinner: React.FC<IconProps> = ({ className = `` }) => (
+  <svg className={`animate-spin ${className}`} viewBox="0 0 24 24" fill="none">
+    <circle
+      className="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="3"
+    />
+    <path
+      className="opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+    />
+  </svg>
+);
+
+const StatCard: React.FC<{
+  label: string;
+  value: string | number;
+  subvalue?: string;
+  highlight?: `blue` | `green` | `red` | `amber`;
+}> = ({ label, value, subvalue, highlight }) => {
+  const bgClass = highlight
+    ? {
+        blue: `bg-gradient-to-br from-sky-400 to-blue-500`,
+        green: `bg-gradient-to-br from-emerald-400 to-green-500`,
+        red: `bg-gradient-to-br from-red-400 to-red-500`,
+        amber: `bg-gradient-to-br from-amber-400 to-amber-500`,
+      }[highlight]
+    : `bg-slate-50 border border-slate-100`;
+
+  const textClass = highlight ? `text-white` : `text-slate-900`;
+  const subClass = highlight ? `text-white/80` : `text-slate-500`;
+
+  return (
+    <div className={`rounded-xl p-4 ${bgClass}`}>
+      <div className={`text-2xl font-display font-semibold ${textClass}`}>
+        {typeof value === `number` ? value.toLocaleString() : value}
+      </div>
+      {subvalue && <div className={`text-sm ${subClass}`}>{subvalue}</div>}
+      <div className={`text-sm mt-1 ${subClass}`}>{label}</div>
+    </div>
+  );
+};
+
+const Section: React.FC<{ title: string; children: React.ReactNode }> = ({
+  title,
+  children,
+}) => (
+  <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
+    <div className="px-6 py-4 border-b border-slate-100">
+      <h2 className="font-display font-semibold text-slate-900 text-lg">{title}</h2>
+    </div>
+    <div className="p-6">{children}</div>
+  </section>
+);
+
+const IOSStats: React.FC = () => {
+  const [data, setData] = useState<T.IOSDetailedStats.Output | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async (): Promise<void> => {
+      setLoading(true);
+      setError(null);
+
+      const result = await client.iOSDetailedStats();
+
+      if (result.isError) {
+        setError(result.error?.debugMessage ?? `Failed to load iOS stats`);
+        setLoading(false);
+        return;
+      }
+
+      setData(result.value ?? null);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center mb-4 shadow-lg shadow-sky-500/20">
+          <LoadingSpinner className="w-6 h-6 text-white" />
+        </div>
+        <p className="text-slate-500 font-medium">Loading iOS stats...</p>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="bg-red-50 border border-red-100 rounded-2xl p-6">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center flex-shrink-0">
+            <svg
+              className="w-5 h-5 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v4M12 16h.01" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="font-display font-semibold text-red-900">
+              Failed to load iOS stats
+            </h3>
+            <p className="mt-1 text-red-700">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const formatDateRange = (): string => {
+    const start = new Date(data.dateRange.start);
+    const end = new Date(data.dateRange.end);
+    const options: Intl.DateTimeFormatOptions = {
+      year: `numeric`,
+      month: `long`,
+      day: `numeric`,
+    };
+    return `${start.toLocaleDateString(`en-US`, options)} – ${end.toLocaleDateString(`en-US`, options)}`;
+  };
+
+  const total18Plus =
+    data.outcomes.stuckIn18Plus.count + data.installFailures.invalidAccountType;
+  const total18PlusPct =
+    data.overview.firstLaunches > 0
+      ? ((total18Plus / data.overview.firstLaunches) * 100).toFixed(1)
+      : `0`;
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-center gap-4">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all group"
+        >
+          <ArrowLeftIcon className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          <span>Back</span>
+        </Link>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
+            <SmartphoneIcon className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="font-display font-semibold text-slate-900 text-2xl">
+              iOS App Stats
+            </h1>
+            <p className="text-sm text-slate-500">{formatDateRange()}</p>
+          </div>
+        </div>
+      </div>
+
+      <Section title="Overview">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard label="First Launches" value={data.overview.firstLaunches} />
+          <StatCard label="Parent False Starts" value={data.overview.parentFalseStarts} />
+          <StatCard
+            label="Adjusted Launches"
+            value={data.overview.adjustedLaunches}
+            highlight="blue"
+          />
+          <StatCard
+            label="Total Success"
+            value={data.overview.totalSuccess}
+            subvalue={`${data.overview.successPct}%`}
+            highlight="green"
+          />
+        </div>
+      </Section>
+
+      <Section title="Outcomes">
+        <div className="space-y-3">
+          {[
+            {
+              label: `Success`,
+              count: data.outcomes.success.count,
+              pct: data.outcomes.success.pct,
+              color: `bg-green-500`,
+            },
+            {
+              label: `Problem: Stuck in 18+/major path`,
+              count: data.outcomes.stuckIn18Plus.count,
+              pct: data.outcomes.stuckIn18Plus.pct,
+              color: `bg-red-400`,
+            },
+            {
+              label: `Problem: Full install failed`,
+              count: data.outcomes.fullInstallFailed.count,
+              pct: data.outcomes.fullInstallFailed.pct,
+              color: `bg-amber-400`,
+            },
+            {
+              label: `False start: Parent device`,
+              count: data.outcomes.parentDevice.count,
+              pct: data.outcomes.parentDevice.pct,
+              color: `bg-slate-300`,
+            },
+            {
+              label: `False start: Child onboarding issue`,
+              count: data.outcomes.childOnboardingIssue.count,
+              pct: data.outcomes.childOnboardingIssue.pct,
+              color: `bg-slate-300`,
+            },
+            {
+              label: `Unknown: Quit early without error`,
+              count: data.outcomes.earlyDrop.count,
+              pct: data.outcomes.earlyDrop.pct,
+              color: `bg-slate-300`,
+            },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-4">
+              <div className="w-64 text-sm text-slate-700">{item.label}</div>
+              <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  className={`h-full ${item.color} rounded-full`}
+                  style={{ width: `${item.pct}%` }}
+                />
+              </div>
+              <div className="flex gap-2">
+                <div className="w-14 text-right text-sm font-medium text-slate-900">
+                  {item.count.toLocaleString()}
+                </div>
+                <div className="w-12 text-right text-sm text-slate-400">{item.pct}%</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Success Breakdown">
+        <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
+          <div className="flex justify-between items-baseline mb-3">
+            <h3 className="font-display font-medium text-slate-900">Types</h3>
+            <span className="text-sm text-slate-500">
+              {data.overview.totalSuccess.toLocaleString()} total
+            </span>
+          </div>
+          <div className="h-6 bg-slate-200 rounded-full overflow-hidden flex">
+            <div
+              className="h-full bg-gradient-to-r from-sky-400 to-blue-500"
+              style={{ width: `${data.successBreakdown.screenTime.pctOfSuccess}%` }}
+            />
+            <div
+              className="h-full bg-gradient-to-r from-emerald-400 to-green-500"
+              style={{ width: `${data.successBreakdown.supervision.pctOfSuccess}%` }}
+            />
+          </div>
+          <div className="flex justify-between mt-3 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-sky-400 to-blue-500" />
+              <span className="text-slate-600">
+                Screen Time ({data.successBreakdown.screenTime.count.toLocaleString()} ·
+                {` `}
+                {data.successBreakdown.screenTime.pctOfSuccess}%)
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-400 to-green-500" />
+              <span className="text-slate-600">
+                Supervision ({data.successBreakdown.supervision.count.toLocaleString()} ·
+                {` `}
+                {data.successBreakdown.supervision.pctOfSuccess}%)
+              </span>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="18+ Account Impact">
+        <div className="grid grid-cols-3 gap-4 mb-4">
+          <StatCard
+            label="Stuck in Major Path"
+            value={data.outcomes.stuckIn18Plus.count}
+            subvalue="Never succeeded"
+          />
+          <StatCard
+            label="Auth Failed (Invalid Account)"
+            value={data.installFailures.invalidAccountType}
+            subvalue="18+ account type"
+          />
+          <StatCard
+            label="Total Affected"
+            value={total18Plus}
+            subvalue={`${total18PlusPct}% of launches`}
+            highlight="red"
+          />
+        </div>
+      </Section>
+
+      <Section title="Install Failures">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard
+            label="Invalid Account Type"
+            value={data.installFailures.invalidAccountType}
+          />
+          <StatCard label="Auth Canceled" value={data.installFailures.authCanceled} />
+          <StatCard label="Auth Restricted" value={data.installFailures.authRestricted} />
+          <StatCard
+            label="Filter Install Failed"
+            value={data.installFailures.filterInstallFailed}
+          />
+        </div>
+      </Section>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Section title="Device Types">
+          <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
+            <div className="flex justify-between items-baseline mb-3">
+              <h3 className="font-display font-medium text-slate-900">Distribution</h3>
+              <span className="text-sm text-slate-500">
+                {(data.devices.iphone.count + data.devices.ipad.count).toLocaleString()}
+                {` `}
+                total
+              </span>
+            </div>
+            <div className="h-6 bg-slate-200 rounded-full overflow-hidden flex">
+              <div
+                className="h-full bg-gradient-to-r from-emerald-400 to-green-500"
+                style={{ width: `${data.devices.iphone.pct}%` }}
+              />
+              <div
+                className="h-full bg-gradient-to-r from-blue-500 to-sky-400"
+                style={{ width: `${data.devices.ipad.pct}%` }}
+              />
+            </div>
+            <div className="flex justify-between mt-3 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-400 to-green-500" />
+                <span className="text-slate-600">
+                  iPhone ({data.devices.iphone.count.toLocaleString()} ·{` `}
+                  {data.devices.iphone.pct}%)
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-sky-400" />
+                <span className="text-slate-600">
+                  iPad ({data.devices.ipad.count.toLocaleString()} ·{` `}
+                  {data.devices.ipad.pct}%)
+                </span>
+              </div>
+            </div>
+          </div>
+        </Section>
+
+        <Section title="Top Regions">
+          <div className="space-y-2">
+            {(() => {
+              const totalCount = data.topRegions.reduce((sum, r) => sum + r.count, 0);
+              return data.topRegions.map((r) => {
+                const pct = ((r.count / totalCount) * 100).toFixed(1);
+                return (
+                  <div
+                    key={r.region}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span className="text-slate-700">
+                      {r.name} <span className="text-slate-400">({r.region})</span>
+                    </span>
+                    <span>
+                      <span className="font-medium text-slate-900">
+                        {r.count.toLocaleString()}
+                      </span>
+                      <span className="text-slate-400"> ({pct}%)</span>
+                    </span>
+                  </div>
+                );
+              });
+            })()}
+          </div>
+        </Section>
+      </div>
+
+      <Section title="Top iOS Versions">
+        <div className="space-y-3">
+          {(() => {
+            const totalCount = data.topIOSVersions.reduce((sum, v) => sum + v.count, 0);
+            return data.topIOSVersions.map((v) => {
+              const pct = (v.count / totalCount) * 100;
+              return (
+                <div key={v.version} className="flex items-center gap-4">
+                  <div className="w-20 text-sm font-medium text-slate-700">
+                    iOS {v.version}
+                  </div>
+                  <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-sky-400 to-blue-500 rounded-full"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <div className="w-28 text-right text-sm font-medium text-slate-900">
+                    {v.count.toLocaleString()} ({pct.toFixed(1)}%)
+                  </div>
+                </div>
+              );
+            });
+          })()}
+        </div>
+      </Section>
+
+      <Section title="Successful Install Events">
+        <div className="space-y-2">
+          {data.funnelEvents.map((e, i) => {
+            const prevCount =
+              i > 0 ? (data.funnelEvents[i - 1]?.count ?? e.count) : e.count;
+            const dropoff = prevCount > 0 ? ((prevCount - e.count) / prevCount) * 100 : 0;
+            return (
+              <div key={e.id} className="flex items-center gap-4">
+                <code className="text-xs text-slate-400 w-20">{e.id}</code>
+                <div className="flex-1 text-sm text-slate-700">{e.name}</div>
+                <div className="w-24 text-right text-sm font-medium text-slate-900">
+                  {e.count.toLocaleString()}
+                </div>
+                {i > 0 && dropoff > 0 && (
+                  <div className="w-20 text-right text-xs text-red-500">
+                    -{dropoff.toFixed(1)}%
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </Section>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Section title="Drop-off Events">
+          <div className="space-y-2">
+            {[...data.dropoffEvents]
+              .sort((a, b) => b.count - a.count)
+              .map((e) => (
+                <div key={e.id} className="flex items-center gap-4">
+                  <code className="text-xs text-slate-400 w-20">{e.id}</code>
+                  <div className="flex-1 text-sm text-slate-700">{e.name}</div>
+                  <div className="w-20 text-right text-sm font-medium text-slate-900">
+                    {e.count.toLocaleString()}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </Section>
+
+        <Section title="Error Events">
+          <div className="space-y-2">
+            {[...data.errorEvents]
+              .sort((a, b) => b.count - a.count)
+              .map((e) => (
+                <div key={e.id} className="flex items-center gap-4">
+                  <code className="text-xs text-slate-400 w-20">{e.id}</code>
+                  <div className="flex-1 text-sm text-slate-700">{e.name}</div>
+                  <div className="w-20 text-right text-sm font-medium text-red-500">
+                    {e.count.toLocaleString()}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </Section>
+      </div>
+
+      <Section title="Cache Clearing">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <StatCard label="Started" value={data.cacheClearing.started} />
+          <StatCard
+            label="Completed"
+            value={data.cacheClearing.completed}
+            highlight="green"
+          />
+          <StatCard label="Success Rate" value={`${data.cacheClearing.successRate}%`} />
+          <StatCard label="Errors" value={data.cacheClearing.errors} />
+        </div>
+        <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
+          <div className="flex justify-between items-baseline mb-3">
+            <h3 className="font-display font-medium text-slate-900">By Context</h3>
+            <span className="text-sm text-slate-500">
+              {data.cacheClearing.started.toLocaleString()} total started
+            </span>
+          </div>
+          <div className="h-6 bg-slate-200 rounded-full overflow-hidden flex">
+            {(() => {
+              const onboardingPct =
+                data.cacheClearing.started > 0
+                  ? (data.cacheClearing.onboardingStarted / data.cacheClearing.started) *
+                    100
+                  : 0;
+              const infoPct =
+                data.cacheClearing.started > 0
+                  ? (data.cacheClearing.infoStarted / data.cacheClearing.started) * 100
+                  : 0;
+              return (
+                <>
+                  <div
+                    className="h-full bg-gradient-to-r from-violet-400 to-purple-500"
+                    style={{ width: `${onboardingPct}%` }}
+                  />
+                  <div
+                    className="h-full bg-gradient-to-r from-amber-400 to-orange-500"
+                    style={{ width: `${infoPct}%` }}
+                  />
+                </>
+              );
+            })()}
+          </div>
+          <div className="flex justify-between mt-3 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-violet-400 to-purple-500" />
+              <span className="text-slate-600">
+                Onboarding ({data.cacheClearing.onboardingStarted} ·{` `}
+                {data.cacheClearing.started > 0
+                  ? (
+                      (data.cacheClearing.onboardingStarted /
+                        data.cacheClearing.started) *
+                      100
+                    ).toFixed(1)
+                  : 0}
+                %)
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-amber-400 to-orange-500" />
+              <span className="text-slate-600">
+                Info Screen ({data.cacheClearing.infoStarted} ·{` `}
+                {data.cacheClearing.started > 0
+                  ? (
+                      (data.cacheClearing.infoStarted / data.cacheClearing.started) *
+                      100
+                    ).toFixed(1)
+                  : 0}
+                %)
+              </span>
+            </div>
+          </div>
+        </div>
+      </Section>
+    </div>
+  );
+};
+
+export default IOSStats;
