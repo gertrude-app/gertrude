@@ -2,235 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
-
-interface IconProps {
-  className?: string;
-}
-
-const CopyIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-  </svg>
-);
-
-const CheckIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M20 6 9 17l-5-5" />
-  </svg>
-);
-
-interface CopyButtonProps {
-  text: string;
-}
-
-const CopyButton: React.FC<CopyButtonProps> = ({ text }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async (): Promise<void> => {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
-      title="Copy to clipboard"
-    >
-      {copied ? (
-        <CheckIcon className="w-4 h-4 text-emerald-500" />
-      ) : (
-        <CopyIcon className="w-4 h-4" />
-      )}
-    </button>
-  );
-};
-
-const LinkIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-  </svg>
-);
-
-interface CopyLinkButtonProps {
-  childId: string;
-}
-
-const CopyLinkButton: React.FC<CopyLinkButtonProps> = ({ childId }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async (): Promise<void> => {
-    const url = `https://parents.gertrude.app/children/${childId.toLowerCase()}`;
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors text-xs"
-      title="Copy child settings link"
-    >
-      {copied ? (
-        <>
-          <CheckIcon className="w-3.5 h-3.5 text-emerald-500" />
-          <span className="text-emerald-600 font-medium">Child settings link copied</span>
-        </>
-      ) : (
-        <LinkIcon className="w-3.5 h-3.5" />
-      )}
-    </button>
-  );
-};
-
-const ArrowLeftIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="m12 19-7-7 7-7" />
-    <path d="M19 12H5" />
-  </svg>
-);
-
-const UserIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <circle cx="12" cy="8" r="5" />
-    <path d="M20 21a8 8 0 0 0-16 0" />
-  </svg>
-);
-
-const UsersIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-    <circle cx="9" cy="7" r="4" />
-    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-  </svg>
-);
-
-const KeyIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <circle cx="7.5" cy="15.5" r="5.5" />
-    <path d="m21 2-9.6 9.6" />
-    <path d="m15.5 7.5 3 3L22 7l-3-3" />
-  </svg>
-);
-
-const BellIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-  </svg>
-);
-
-const MonitorIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <rect width="20" height="14" x="2" y="3" rx="2" />
-    <line x1="8" x2="16" y1="21" y2="21" />
-    <line x1="12" x2="12" y1="17" y2="21" />
-  </svg>
-);
-
-const LoadingSpinner: React.FC<IconProps> = ({ className = `` }) => (
-  <svg className={`animate-spin ${className}`} viewBox="0 0 24 24" fill="none">
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="3"
-    />
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    />
-  </svg>
-);
+import { SubscriptionBadge } from '../components/Badge';
+import { CopyButton, CopyLinkButton } from '../components/CopyButton';
+import ErrorState from '../components/ErrorState';
+import {
+  ArrowLeftIcon,
+  BellIcon,
+  KeyIcon,
+  MonitorIcon,
+  UserIcon,
+  UsersIcon,
+} from '../components/Icons';
+import LoadingState from '../components/LoadingState';
+import { formatDate, unCamelCase } from '../lib/format';
 
 const ParentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -261,41 +45,11 @@ const ParentDetail: React.FC = () => {
   }, [id]);
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-violet to-brand-fuchsia flex items-center justify-center mb-4 shadow-lg shadow-brand-violet/20">
-          <LoadingSpinner className="w-6 h-6 text-white" />
-        </div>
-        <p className="text-slate-500 font-medium">Loading parent details...</p>
-      </div>
-    );
+    return <LoadingState context="parent details" />;
   }
 
   if (error) {
-    return (
-      <div className="bg-red-50 border border-red-100 rounded-2xl p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center flex-shrink-0">
-            <svg
-              className="w-5 h-5 text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v4M12 16h.01" />
-            </svg>
-          </div>
-          <div>
-            <h3 className="font-display font-semibold text-red-900">
-              Failed to load parent
-            </h3>
-            <p className="mt-1 text-red-700">{error}</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <ErrorState context="parent" error={error} />;
   }
 
   if (!data) {
@@ -335,7 +89,7 @@ const ParentDetail: React.FC = () => {
               </div>
             </div>
           </div>
-          <SubscriptionBadge status={data.subscriptionStatus} />
+          <SubscriptionBadge status={data.subscriptionStatus} size="md" />
         </div>
 
         <div className="p-6">
@@ -573,56 +327,5 @@ const InfoCard: React.FC<InfoCardProps> = ({ label, value, highlight = false }) 
     </div>
   </div>
 );
-
-interface SubscriptionBadgeProps {
-  status: string;
-}
-
-const SubscriptionBadge: React.FC<SubscriptionBadgeProps> = ({ status }) => {
-  const styles: Record<string, string> = {
-    paid: `bg-emerald-50 text-emerald-700 ring-emerald-600/20`,
-    trialing: `bg-sky-50 text-sky-700 ring-sky-600/20`,
-    overdue: `bg-amber-50 text-amber-700 ring-amber-600/20`,
-    unpaid: `bg-red-50 text-red-700 ring-red-600/20`,
-    pendingEmailVerification: `bg-slate-50 text-slate-600 ring-slate-500/20`,
-    complimentary: `bg-violet-50 text-violet-700 ring-violet-600/20`,
-  };
-
-  const labels: Record<string, string> = {
-    paid: `Paid`,
-    trialing: `Trial`,
-    overdue: `Overdue`,
-    unpaid: `Unpaid`,
-    pendingEmailVerification: `Pending`,
-    complimentary: `Complimentary`,
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium ring-1 ring-inset ${
-        styles[status] ?? `bg-slate-50 text-slate-600 ring-slate-500/20`
-      }`}
-    >
-      {labels[status] ?? status}
-    </span>
-  );
-};
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString(`en-US`, {
-    year: `numeric`,
-    month: `short`,
-    day: `numeric`,
-  });
-}
-
-function unCamelCase(str: string): string {
-  return str
-    .replace(/([a-z])([A-Z])/g, `$1 $2`)
-    .replace(/([A-Z]+)([A-Z][a-z])/g, `$1 $2`)
-    .toLowerCase()
-    .replace(/^\w/, (c) => c.toUpperCase());
-}
 
 export default ParentDetail;

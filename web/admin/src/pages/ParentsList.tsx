@@ -2,76 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
-
-interface IconProps {
-  className?: string;
-}
-
-const UsersIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-    <circle cx="9" cy="7" r="4" />
-    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-  </svg>
-);
-
-const ChevronLeftIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="m15 18-6-6 6-6" />
-  </svg>
-);
-
-const ChevronRightIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="m9 18 6-6-6-6" />
-  </svg>
-);
-
-const LoadingSpinner: React.FC<IconProps> = ({ className = `` }) => (
-  <svg className={`animate-spin ${className}`} viewBox="0 0 24 24" fill="none">
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="3"
-    />
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    />
-  </svg>
-);
+import { StatusBadge, SubscriptionBadge } from '../components/Badge';
+import ErrorState from '../components/ErrorState';
+import { UsersIcon } from '../components/Icons';
+import LoadingState from '../components/LoadingState';
+import Pagination from '../components/Pagination';
+import { formatDate } from '../lib/format';
 
 const ParentsList: React.FC = () => {
   const navigate = useNavigate();
@@ -107,41 +43,11 @@ const ParentsList: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-violet to-brand-fuchsia flex items-center justify-center mb-4 shadow-lg shadow-brand-violet/20">
-          <LoadingSpinner className="w-6 h-6 text-white" />
-        </div>
-        <p className="text-slate-500 font-medium">Loading parents...</p>
-      </div>
-    );
+    return <LoadingState context="parents" />;
   }
 
   if (error) {
-    return (
-      <div className="bg-red-50 border border-red-100 rounded-2xl p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center flex-shrink-0">
-            <svg
-              className="w-5 h-5 text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v4M12 16h.01" />
-            </svg>
-          </div>
-          <div>
-            <h3 className="font-display font-semibold text-red-900">
-              Failed to load parents
-            </h3>
-            <p className="mt-1 text-red-700">{error}</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <ErrorState context="parents" error={error} />;
   }
 
   if (!data) {
@@ -256,138 +162,5 @@ const ParentsList: React.FC = () => {
     </div>
   );
 };
-
-interface BadgeProps {
-  status: string;
-}
-
-const StatusBadge: React.FC<BadgeProps> = ({ status }) => {
-  const styles: Record<string, string> = {
-    active: `bg-emerald-50 text-emerald-700 ring-emerald-600/20`,
-    onboarded: `bg-sky-50 text-sky-700 ring-sky-600/20`,
-    no_action: `bg-slate-50 text-slate-400 ring-slate-300/20 opacity-60`,
-    unknown: `bg-slate-50 text-slate-600 ring-slate-500/20`,
-  };
-
-  const labels: Record<string, string> = {
-    active: `Active`,
-    onboarded: `Onboarded`,
-    no_action: `No Action`,
-    unknown: `Unknown`,
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ring-1 ring-inset ${styles[status] ?? styles.unknown}`}
-    >
-      {labels[status] ?? status}
-    </span>
-  );
-};
-
-const SubscriptionBadge: React.FC<BadgeProps> = ({ status }) => {
-  const styles: Record<string, string> = {
-    paid: `bg-emerald-50 text-emerald-700 ring-emerald-600/20`,
-    trialing: `bg-sky-50 text-sky-700 ring-sky-600/20`,
-    trialExpiringSoon: `bg-amber-50 text-amber-700 ring-amber-600/20`,
-    overdue: `bg-amber-50 text-amber-700 ring-amber-600/20`,
-    unpaid: `bg-red-50 text-red-700 ring-red-600/20`,
-    pendingEmailVerification: `bg-slate-50 text-slate-600 ring-slate-500/20`,
-    complimentary: `bg-violet-50 text-violet-700 ring-violet-600/20`,
-  };
-
-  const labels: Record<string, string> = {
-    paid: `Paid`,
-    trialing: `Trial`,
-    trialExpiringSoon: `Trial Expiring Soon`,
-    overdue: `Overdue`,
-    unpaid: `Unpaid`,
-    pendingEmailVerification: `Pending`,
-    complimentary: `Complimentary`,
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ring-1 ring-inset ${styles[status] ?? `bg-slate-50 text-slate-600 ring-slate-500/20`}`}
-    >
-      {labels[status] ?? status}
-    </span>
-  );
-};
-
-interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}
-
-const Pagination: React.FC<PaginationProps> = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-}) => (
-  <div className="flex items-center gap-1">
-    <button
-      onClick={() => onPageChange(currentPage - 1)}
-      disabled={currentPage <= 1}
-      className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-    >
-      <ChevronLeftIcon className="w-5 h-5" />
-    </button>
-    <div className="flex items-center gap-1 px-2">
-      {getPageNumbers(currentPage, totalPages).map((pageNum, idx) =>
-        pageNum === `...` ? (
-          <span key={`ellipsis-${idx}`} className="px-2 text-slate-400">
-            ...
-          </span>
-        ) : (
-          <button
-            key={pageNum}
-            onClick={() => onPageChange(pageNum as number)}
-            className={`min-w-[36px] h-9 px-3 rounded-lg text-sm font-medium transition-all ${
-              pageNum === currentPage
-                ? `bg-gradient-to-r from-brand-violet to-brand-fuchsia text-white shadow-sm`
-                : `text-slate-600 hover:bg-slate-100`
-            }`}
-          >
-            {pageNum}
-          </button>
-        ),
-      )}
-    </div>
-    <button
-      onClick={() => onPageChange(currentPage + 1)}
-      disabled={currentPage >= totalPages}
-      className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-    >
-      <ChevronRightIcon className="w-5 h-5" />
-    </button>
-  </div>
-);
-
-function getPageNumbers(current: number, total: number): (number | string)[] {
-  if (total <= 7) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-
-  if (current <= 3) {
-    return [1, 2, 3, 4, 5, `...`, total];
-  }
-
-  if (current >= total - 2) {
-    return [1, `...`, total - 4, total - 3, total - 2, total - 1, total];
-  }
-
-  return [1, `...`, current - 1, current, current + 1, `...`, total];
-}
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString(`en-US`, {
-    year: `numeric`,
-    month: `short`,
-    day: `numeric`,
-  });
-}
 
 export default ParentsList;
