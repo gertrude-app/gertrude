@@ -222,8 +222,7 @@ struct AppReducer: Sendable {
   }
 
   func cleanupTasks() {
-    let currentNowPlaying = self.database.nowPlaying()?.episode.id
-    self.autoPruneDownloads(currentNowPlaying)
+    autoPruneDownloads()
     self.database.tryWrite { db in
       try Event
         .where { $0.createdAt.lt(self.date.now - .days(30)) }
@@ -231,22 +230,6 @@ struct AppReducer: Sendable {
         .delete()
         .execute(db)
     }
-  }
-
-  func autoPruneDownloads(_ nowPlaying: Episode.ID?) {
-    let episodes = self.database.tryRead { db in
-      try Episode
-        .whereDownloadCanBeDeleted(nowPlaying: nowPlaying, now: self.date.now)
-        .fetchAll(db)
-    }
-    if episodes.isEmpty { return }
-    self.database.tryWrite { db in
-      try Episode
-        .update { $0.downloadedAt = nil }
-        .where { $0.id.in(episodes.map(\.id)) }
-        .execute(db)
-    }
-    episodes.forEach { $0.removeLocalAudioFile() }
   }
 
   func logFirstLaunch() {
