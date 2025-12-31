@@ -2,95 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
+import ErrorState from '../components/ErrorState';
+import {
+  ArrowRightIcon,
+  MicIcon,
+  MonitorIcon,
+  SmartphoneIcon,
+} from '../components/Icons';
+import LoadingState from '../components/LoadingState';
 import SignupGraph from '../components/SignupGraph';
-
-interface IconProps {
-  className?: string;
-}
-
-const MonitorIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <rect width="20" height="14" x="2" y="3" rx="2" />
-    <line x1="8" x2="16" y1="21" y2="21" />
-    <line x1="12" x2="12" y1="17" y2="21" />
-  </svg>
-);
-
-const SmartphoneIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
-    <line x1="12" x2="12.01" y1="18" y2="18" />
-  </svg>
-);
-
-const MicIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-    <line x1="12" x2="12" y1="19" y2="22" />
-  </svg>
-);
-
-const ArrowRightIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M5 12h14" />
-    <path d="m12 5 7 7-7 7" />
-  </svg>
-);
-
-const LoadingSpinner: React.FC<IconProps> = ({ className = `` }) => (
-  <svg className={`animate-spin ${className}`} viewBox="0 0 24 24" fill="none">
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="3"
-    />
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    />
-  </svg>
-);
 
 const Dashboard: React.FC = () => {
   const [macData, setMacData] = useState<T.MacOverview.Output | null>(null);
@@ -126,41 +46,11 @@ const Dashboard: React.FC = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-violet to-brand-fuchsia flex items-center justify-center mb-4 shadow-lg shadow-brand-violet/20">
-          <LoadingSpinner className="w-6 h-6 text-white" />
-        </div>
-        <p className="text-slate-500 font-medium">Loading dashboard...</p>
-      </div>
-    );
+    return <LoadingState context="dashboard" />;
   }
 
   if (error) {
-    return (
-      <div className="bg-red-50 border border-red-100 rounded-2xl p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center flex-shrink-0">
-            <svg
-              className="w-5 h-5 text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v4M12 16h.01" />
-            </svg>
-          </div>
-          <div>
-            <h3 className="font-display font-semibold text-red-900">
-              Failed to load dashboard
-            </h3>
-            <p className="mt-1 text-red-700">{error}</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <ErrorState context="dashboard" error={error} />;
   }
 
   return (

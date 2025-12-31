@@ -2,101 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
-
-interface IconProps {
-  className?: string;
-}
-
-const ArrowLeftIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M19 12H5" />
-    <path d="m12 19-7-7 7-7" />
-  </svg>
-);
-
-const SmartphoneIcon: React.FC<IconProps> = ({ className = `` }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
-    <line x1="12" x2="12.01" y1="18" y2="18" />
-  </svg>
-);
-
-const LoadingSpinner: React.FC<IconProps> = ({ className = `` }) => (
-  <svg className={`animate-spin ${className}`} viewBox="0 0 24 24" fill="none">
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="3"
-    />
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    />
-  </svg>
-);
-
-const StatCard: React.FC<{
-  label: string;
-  value: string | number;
-  subvalue?: string;
-  highlight?: `blue` | `green` | `red` | `amber`;
-}> = ({ label, value, subvalue, highlight }) => {
-  const bgClass = highlight
-    ? {
-        blue: `bg-gradient-to-br from-sky-400 to-blue-500`,
-        green: `bg-gradient-to-br from-emerald-400 to-green-500`,
-        red: `bg-gradient-to-br from-red-400 to-red-500`,
-        amber: `bg-gradient-to-br from-amber-400 to-amber-500`,
-      }[highlight]
-    : `bg-slate-50 border border-slate-100`;
-
-  const textClass = highlight ? `text-white` : `text-slate-900`;
-  const subClass = highlight ? `text-white/80` : `text-slate-500`;
-
-  return (
-    <div className={`rounded-xl p-4 ${bgClass}`}>
-      <div className={`text-2xl font-display font-semibold ${textClass}`}>
-        {typeof value === `number` ? value.toLocaleString() : value}
-      </div>
-      {subvalue && <div className={`text-sm ${subClass}`}>{subvalue}</div>}
-      <div className={`text-sm mt-1 ${subClass}`}>{label}</div>
-    </div>
-  );
-};
-
-const Section: React.FC<{ title: string; children: React.ReactNode }> = ({
-  title,
-  children,
-}) => (
-  <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-    <div className="px-6 py-4 border-b border-slate-100">
-      <h2 className="font-display font-semibold text-slate-900 text-lg">{title}</h2>
-    </div>
-    <div className="p-6">{children}</div>
-  </section>
-);
+import ErrorState from '../components/ErrorState';
+import { ArrowLeftIcon, SmartphoneIcon } from '../components/Icons';
+import LoadingState from '../components/LoadingState';
+import Section from '../components/Section';
+import StatCard from '../components/StatCard';
 
 const IOSStats: React.FC = () => {
   const [data, setData] = useState<T.IOSDetailedStats.Output | null>(null);
@@ -124,41 +34,11 @@ const IOSStats: React.FC = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center mb-4 shadow-lg shadow-sky-500/20">
-          <LoadingSpinner className="w-6 h-6 text-white" />
-        </div>
-        <p className="text-slate-500 font-medium">Loading iOS stats...</p>
-      </div>
-    );
+    return <LoadingState context="iOS stats" gradient="blue" />;
   }
 
   if (error || !data) {
-    return (
-      <div className="bg-red-50 border border-red-100 rounded-2xl p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center flex-shrink-0">
-            <svg
-              className="w-5 h-5 text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v4M12 16h.01" />
-            </svg>
-          </div>
-          <div>
-            <h3 className="font-display font-semibold text-red-900">
-              Failed to load iOS stats
-            </h3>
-            <p className="mt-1 text-red-700">{error}</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <ErrorState context="iOS stats" error={error ?? `Unknown error`} />;
   }
 
   const formatDateRange = (): string => {
