@@ -10,6 +10,12 @@ export default class AdminClient extends Client<Auth> {
     super(endpoint, `admin`, prepareRequest);
   }
 
+  public iOSDetailedStats = (
+    input: P.IOSDetailedStats.Input,
+  ): Promise<Result<P.IOSDetailedStats.Output>> => {
+    return this.query<P.IOSDetailedStats.Output>(input, `IOSDetailedStats`, `superAdmin`);
+  };
+
   public iOSOverview = (
     input: P.IOSOverview.Input,
   ): Promise<Result<P.IOSOverview.Output>> => {

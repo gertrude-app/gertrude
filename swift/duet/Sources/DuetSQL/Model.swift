@@ -56,3 +56,9 @@ public extension Model where ColumnName: RawRepresentable, ColumnName.RawValue =
 extension Model where IdValue: RawRepresentable, IdValue.RawValue == UUID {
   var uuidId: UUID { id.rawValue }
 }
+
+public extension String.StringInterpolation {
+  mutating func appendInterpolation<M: Model>(table _: M.Type) {
+    appendLiteral(M.qualifiedTableName)
+  }
+}

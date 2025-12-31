@@ -4,6 +4,7 @@ import Vapor
 enum AuthedAdminRoute: PairRoute {
   case macOverview
   case iOSOverview
+  case iOSDetailedStats
   case podcastOverview
   case parentsList(ParentsList.Input)
   case parentDetail(ParentDetail.Input)
@@ -14,6 +15,9 @@ enum AuthedAdminRoute: PairRoute {
     }
     Route(.case(Self.iOSOverview)) {
       Operation(IOSOverview.self)
+    }
+    Route(.case(Self.iOSDetailedStats)) {
+      Operation(IOSDetailedStats.self)
     }
     Route(.case(Self.podcastOverview)) {
       Operation(PodcastOverview.self)
@@ -37,6 +41,9 @@ extension AuthedAdminRoute: RouteResponder {
       return try await self.respond(with: output)
     case .iOSOverview:
       let output = try await IOSOverview.resolve(in: context)
+      return try await self.respond(with: output)
+    case .iOSDetailedStats:
+      let output = try await IOSDetailedStats.resolve(in: context)
       return try await self.respond(with: output)
     case .podcastOverview:
       let output = try await PodcastOverview.resolve(in: context)

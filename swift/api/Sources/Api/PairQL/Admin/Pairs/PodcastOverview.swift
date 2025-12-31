@@ -13,38 +13,36 @@ struct PodcastOverview: Pair {
 
 extension PodcastOverview: NoInputResolver {
   static func resolve(in context: Context) async throws -> Output {
-    let installs = try await context.db.customQuery(
+    let totalInstalls = try await context.db.count(
       DistinctDeviceEventCount.self,
       withBindings: [.string("27c4f26a")],
     )
-    let subscriptions = try await context.db.customQuery(
+    let subscriptionCount = try await context.db.count(
       DistinctDeviceEventCount.self,
       withBindings: [.string("a72104d7")],
     )
-    let pastTrial = try await context.db.customQuery(
+    let pastTrialInstallCount = try await context.db.count(
       PastTrialInstallCount.self,
       withBindings: [.string("27c4f26a")],
     )
 
-    let pastTrialInstallCount = pastTrial.first?.count ?? 0
-    let subscriptionCount = subscriptions.first?.count ?? 0
     let rate = pastTrialInstallCount > 0
       ? (Double(subscriptionCount) / Double(pastTrialInstallCount) * 1000).rounded() / 10
       : 0.0
 
     return .init(
-      totalInstalls: installs.first?.count ?? 0,
+      totalInstalls: totalInstalls,
       successfulSubscriptions: subscriptionCount,
       conversionRate: rate,
     )
   }
 }
 
-private struct DistinctDeviceEventCount: CustomQueryable {
+private struct DistinctDeviceEventCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     var stmt = SQL.Statement("""
     SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.installId))) AS count
-    FROM \(PodcastEvent.qualifiedTableName)
+    FROM \(table: PodcastEvent.self)
     WHERE \(PodcastEvent.columnName(.eventId)) =
     """)
     if let eventId = bindings.first {
@@ -56,11 +54,11 @@ private struct DistinctDeviceEventCount: CustomQueryable {
   var count: Int
 }
 
-private struct PastTrialInstallCount: CustomQueryable {
+private struct PastTrialInstallCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     var stmt = SQL.Statement("""
     SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.installId))) AS count
-    FROM \(PodcastEvent.qualifiedTableName)
+    FROM \(table: PodcastEvent.self)
     WHERE
       \(PodcastEvent.columnName(.createdAt)) < NOW() - INTERVAL '30 days'
       AND \(PodcastEvent.columnName(.eventId)) =

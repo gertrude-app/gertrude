@@ -1,5 +1,6 @@
 // auto-generated, do not edit
 export * from './shared';
+export * from './pairs/IOSDetailedStats';
 export * from './pairs/IOSOverview';
 export * from './pairs/MacOverview';
 export * from './pairs/ParentDetail';

@@ -28,6 +28,7 @@ enum AdminTsCodegenRoute {
       VerifyAdminMagicLink.self,
       MacOverview.self,
       IOSOverview.self,
+      IOSDetailedStats.self,
       PodcastOverview.self,
       ParentsList.self,
       ParentDetail.self,

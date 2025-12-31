@@ -5,6 +5,10 @@ public protocol CustomQueryable: Decodable, Sendable {
   static func decode(from rows: [SQLRow]) throws -> [Self]
 }
 
+public protocol CustomCountable: CustomQueryable {
+  var count: Int { get }
+}
+
 public extension CustomQueryable {
   static func decode(from rows: [SQLRow]) throws -> [Self] {
     try rows.compactMap { row in

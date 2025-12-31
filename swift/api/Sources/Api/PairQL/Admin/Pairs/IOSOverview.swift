@@ -5,36 +5,130 @@ struct IOSOverview: Pair {
   static let auth: ClientAuth = .superAdmin
 
   struct Output: PairOutput {
-    var firstLaunches: Int
-    var authorizationSuccesses: Int
-    var filterInstallSuccesses: Int
-    var conversionRate: Double
+    var adjustedLaunches: Int
+    var parentFalseStarts: Int
+    var totalSuccess: Int
+    var standardSuccess: Int
+    var supervisedSuccess: Int
+    var stuckIn18PlusPath: Int
+    var successRate: Double
   }
 }
 
 extension IOSOverview: NoInputResolver {
   static func resolve(in context: Context) async throws -> Output {
-    let firstLaunchCount = try await IOSEvent.query()
-      .where(.eventId == "8d35f043")
-      .count(in: context.db)
+    let firstLaunches = try await context.db.count(
+      DistinctVendorCount.self,
+      withBindings: [.string("8d35f043")],
+    )
 
-    let authCount = try await IOSEvent.query()
-      .where(.eventId == "4a0c585f")
-      .count(in: context.db)
+    let totalSuccess = try await context.db.count(
+      DistinctVendorCount.self,
+      withBindings: [.string("cdb31095")],
+    )
 
-    let installCount = try await IOSEvent.query()
-      .where(.eventId == "adced334")
-      .count(in: context.db)
+    let standardSuccess = try await context.db.count(StandardSuccessCount.self)
+    let supervisedSuccess = try await context.db.count(SupervisedSuccessCount.self)
+    let stuckIn18PlusPath = try await context.db.count(StuckIn18PlusCount.self)
+    let parentFalseStarts = try await context.db.count(ParentDeviceDropoffCount.self)
 
-    let conversionRate = firstLaunchCount > 0
-      ? Double(installCount) / Double(firstLaunchCount) * 100
-      : 0
+    let adjustedLaunches = firstLaunches - parentFalseStarts
+    let successRate = adjustedLaunches > 0
+      ? (Double(totalSuccess) / Double(adjustedLaunches) * 1000).rounded() / 10
+      : 0.0
 
     return .init(
-      firstLaunches: firstLaunchCount,
-      authorizationSuccesses: authCount,
-      filterInstallSuccesses: installCount,
-      conversionRate: conversionRate,
+      adjustedLaunches: adjustedLaunches,
+      parentFalseStarts: parentFalseStarts,
+      totalSuccess: totalSuccess,
+      standardSuccess: standardSuccess,
+      supervisedSuccess: supervisedSuccess,
+      stuckIn18PlusPath: stuckIn18PlusPath,
+      successRate: successRate,
     )
   }
+}
+
+private struct DistinctVendorCount: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    var stmt = SQL.Statement("""
+    SELECT COUNT(DISTINCT \(IOSEvent.columnName(.vendorId))) AS count
+    FROM \(table: IOSEvent.self)
+    WHERE \(IOSEvent.columnName(.vendorId)) IS NOT NULL
+      AND \(IOSEvent.columnName(.eventId)) =
+    """)
+    if let eventId = bindings.first {
+      stmt.components.append(.binding(eventId))
+    }
+    return stmt
+  }
+
+  var count: Int
+}
+
+private struct StandardSuccessCount: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    SQL.Statement("""
+    SELECT COUNT(DISTINCT vendor_id) AS count
+    FROM \(table: IOSEvent.self)
+    WHERE vendor_id IS NOT NULL
+      AND event_id = 'cdb31095'
+      AND vendor_id IN (
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = '4a0c585f'
+      )
+      AND vendor_id NOT IN (
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'bad8adcc'
+      )
+    """)
+  }
+
+  var count: Int
+}
+
+private struct SupervisedSuccessCount: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    SQL.Statement("""
+    SELECT COUNT(DISTINCT vendor_id) AS count
+    FROM \(table: IOSEvent.self)
+    WHERE vendor_id IS NOT NULL
+      AND event_id = 'cdb31095'
+      AND vendor_id IN (
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'bad8adcc'
+      )
+    """)
+  }
+
+  var count: Int
+}
+
+private struct StuckIn18PlusCount: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    SQL.Statement("""
+    SELECT COUNT(DISTINCT vendor_id) AS count
+    FROM \(table: IOSEvent.self)
+    WHERE vendor_id IS NOT NULL
+      AND event_id = 'a21c9040'
+      AND vendor_id NOT IN (
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'cdb31095'
+      )
+    """)
+  }
+
+  var count: Int
+}
+
+private struct ParentDeviceDropoffCount: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    SQL.Statement("""
+    SELECT COUNT(DISTINCT vendor_id) AS count
+    FROM \(table: IOSEvent.self)
+    WHERE vendor_id IS NOT NULL
+      AND event_id = '30fac4e6'
+      AND vendor_id NOT IN (
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'cdb31095'
+      )
+    """)
+  }
+
+  var count: Int
 }
