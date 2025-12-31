@@ -20,6 +20,9 @@ struct UpsertBlockRule: Pair {
 
 extension UpsertBlockRule: Resolver {
   static func resolve(with input: Input, in ctx: ParentContext) async throws -> Output {
+    let device = try await ctx.db.find(input.deviceId)
+    try await ctx.verifiedChild(from: device.childId)
+
     if let id = input.id {
       var blockRule = try await ctx.db.find(id)
       if blockRule.deviceId != input.deviceId {

@@ -25,7 +25,7 @@ extension GetSuspendFilterRequest: Resolver {
   static func resolve(with id: Input, in context: ParentContext) async throws -> Output {
     let request = try await context.db.find(id)
     let userDevice = try await request.computerUser(in: context.db)
-    let user = try await userDevice.child(in: context.db)
+    let user = try await context.verifiedChild(from: userDevice.childId)
     var extraMonitoringOptions: [String: String] = [:]
     if Semver(userDevice.appVersion)! >= .init("2.1.0")! {
       extraMonitoringOptions = user.extraMonitoringOptions.mapKeys(\.magicString)
