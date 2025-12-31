@@ -149,7 +149,8 @@ func _feedUpdates(input: FeedUpdateInputData) -> FeedUpdates {
       }
       var updatedEpisode = existingEpisode.updated(from: feedEpisodeData)
       if updatedEpisode != existingEpisode {
-        if existingEpisode.audioChanged(from: feedEpisodeData) {
+        let isNowPlaying = existingEpisode.id == input.nowPlaying
+        if existingEpisode.audioChanged(from: feedEpisodeData), !isNowPlaying {
           updatedEpisode.downloadedAt = nil
           updates.actions.append(.invalidateEpisodeAudio(existingEpisode.id))
         }

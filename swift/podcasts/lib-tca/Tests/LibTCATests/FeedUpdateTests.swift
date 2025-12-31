@@ -223,6 +223,30 @@ import Testing
   }
 }
 
+@Test func `audio invalidation skips now playing episode`() throws {
+  let updates = _feedUpdates(input: .init(
+    feeds: [Feed(
+      show: .mock(1),
+      episodes: [
+        .mock(1, showId: 1) { $0.audioUrl = "https://new.com/episode1.mp3" },
+        .mock(2, showId: 1) { $0.audioUrl = "https://new.com/episode2.mp3" },
+      ],
+    )],
+    shows: [.mock(1)],
+    episodes: [
+      .mock(1, showId: 1) { $0.downloadedAt = .reference },
+      .mock(2, showId: 1) { $0.downloadedAt = .reference },
+    ],
+    nowPlaying: Episode.ID(1),
+    now: .reference,
+  ))
+
+  #expect(updates.episodeUpdates.count == 2)
+  #expect(updates.actions == [.invalidateEpisodeAudio(2)])
+  #expect(updates.episodeUpdates.first(where: { $0.id == 1 })?.downloadedAt == .reference)
+  #expect(updates.episodeUpdates.first(where: { $0.id == 2 })?.downloadedAt == nil)
+}
+
 @Test func `audio invalidation should clear downloadedAt`() async throws {
   let fetchedFeed = Feed(
     show: .mock(1),

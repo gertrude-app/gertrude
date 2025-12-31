@@ -25,6 +25,7 @@ struct NowPlayingFeature {
   @Dependency(\.db) var database
   @Dependency(\.audio) var audio
   @Dependency(\.haptics) var haptics
+  @Dependency(\.fileSystem) var fileSystem
   @Dependency(\.continuousClock) var clock
 
   var body: some Reducer<State, Action> {
@@ -94,7 +95,8 @@ struct NowPlayingFeature {
           return self.skip(nowPlaying, .forward, amount: amount, from: location)
         case .completed:
           NowPlaying.updateSyncingProgress { $0.isPlaying = false }
-          guard let next = AutoQueue.nextDownloadedEpisode(after: nowPlaying) else {
+          guard let next = AutoQueue.nextDownloadedEpisode(after: nowPlaying),
+                self.fileSystem.fileExists(at: next.episode.localAudioUrl) else {
             NowPlaying.delete()
             return .none
           }
