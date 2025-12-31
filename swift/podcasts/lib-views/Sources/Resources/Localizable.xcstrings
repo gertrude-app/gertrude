@@ -270,6 +270,40 @@
         }
       }
     },
+    "settings.storage.header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "STORAGE"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ALMACENAMIENTO"
+          }
+        }
+      }
+    },
+    "settings.storage.reclaim" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reclaim %.1fGB Storage"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recuperar %.1fGB"
+          }
+        }
+      }
+    },
     "settings.security.header" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -7,6 +7,7 @@ public struct SettingsView: View {
     case subscribeNowTapped
     case manageSubscriptionTapped
     case changePinTapped
+    case reclaimStorageTapped
   }
 
   public enum SubscriptionStatus: Equatable {
@@ -58,17 +59,20 @@ public struct SettingsView: View {
   let status: SubscriptionStatus
   let expiresAt: Date
   let purchaseInProgress: Bool
+  let reclaimableStorageGb: Double?
   let onEvent: @MainActor @Sendable (Event) -> Void
 
   public init(
     status: SubscriptionStatus,
     expiresAt: Date,
     purchaseInProgress: Bool = false,
+    reclaimableStorageGb: Double? = nil,
     onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in },
   ) {
     self.status = status
     self.expiresAt = expiresAt
     self.purchaseInProgress = purchaseInProgress
+    self.reclaimableStorageGb = reclaimableStorageGb
     self.onEvent = onEvent
   }
 
@@ -262,6 +266,36 @@ public struct SettingsView: View {
         .buttonStyle(.plain)
       }
 
+      if let gb = self.reclaimableStorageGb {
+        VStack(spacing: 12) {
+          HStack(spacing: 6) {
+            Image(systemName: "internaldrive")
+              .font(.subheadline)
+            Text(lstr(.settingsStorageHeader))
+              .font(.subheadline)
+              .fontWeight(.medium)
+          }
+          .foregroundColor(Color(self.cs, light: .black.opacity(0.6), dark: .white.opacity(0.6)))
+          .frame(maxWidth: .infinity, alignment: .leading)
+
+          Button {
+            self.onEvent(.reclaimStorageTapped)
+          } label: {
+            HStack {
+              Image(systemName: "trash")
+                .font(.subheadline)
+              Text(String(format: lstr(.settingsStorageReclaim), gb))
+                .font(.headline)
+              Spacer()
+            }
+            .padding(16)
+            .background(Color(self.cs, light: .violet100, dark: .violet900))
+            .cornerRadius(12)
+          }
+          .buttonStyle(.plain)
+        }
+      }
+
       Spacer()
     }
     .padding(20)
@@ -399,4 +433,21 @@ public struct SettingsView: View {
     expiresAt: Date().addingTimeInterval(.days(-5)),
     purchaseInProgress: true,
   )
+}
+
+#Preview("With Reclaimable Storage") {
+  SettingsView(
+    status: .active,
+    expiresAt: Date().addingTimeInterval(.days(180)),
+    reclaimableStorageGb: 3.3,
+  )
+}
+
+#Preview("With Reclaimable Storage (Dark)") {
+  SettingsView(
+    status: .active,
+    expiresAt: Date().addingTimeInterval(.days(180)),
+    reclaimableStorageGb: 3.3,
+  )
+  .preferredColorScheme(.dark)
 }
