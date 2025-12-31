@@ -81,7 +81,7 @@ struct UpsertUnidentifiedApps: CustomQueryable {
 struct IdentifiedBundleIds: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     .init("""
-    SELECT \(AppBundleId.columnName(.bundleId)) FROM \(AppBundleId.qualifiedTableName)
+    SELECT \(AppBundleId.columnName(.bundleId)) FROM \(table: AppBundleId.self)
     """)
   }
 

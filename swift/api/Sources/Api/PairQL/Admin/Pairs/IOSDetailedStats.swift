@@ -109,67 +109,52 @@ extension IOSDetailedStats: NoInputResolver {
   static func resolve(in context: Context) async throws -> Output {
     let firstLaunches = try await distinctVendorCount(for: "8d35f043", in: context)
     let totalSuccess = try await distinctVendorCount(for: "cdb31095", in: context)
-    let parentFalseStarts = try await context.db.customQuery(
-      ParentDeviceDropoffCount.self,
-    ).first?.count ?? 0
-    let stuckIn18Plus = try await context.db.customQuery(
-      StuckIn18PlusCount.self,
-    ).first?.count ?? 0
-    let standardSuccess = try await context.db.customQuery(
-      StandardSuccessCount.self,
-    ).first?.count ?? 0
-    let supervisedSuccess = try await context.db.customQuery(
-      SupervisedSuccessCount.self,
-    ).first?.count ?? 0
-    let childOnboardingIssue = try await context.db.customQuery(
-      ChildOnboardingIssueCount.self,
-    ).first?.count ?? 0
+    let parentFalseStarts = try await context.db.count(ParentDeviceDropoffCount.self)
+    let stuckIn18Plus = try await context.db.count(StuckIn18PlusCount.self)
+    let standardSuccess = try await context.db.count(StandardSuccessCount.self)
+    let supervisedSuccess = try await context.db.count(SupervisedSuccessCount.self)
+    let childOnboardingIssue = try await context.db.count(ChildOnboardingIssueCount.self)
 
     let invalidAccountType = try await authFailureCount(for: "2bcf3d96", in: context)
     let authCanceled = try await authFailureCount(for: "e220a765", in: context)
     let authRestricted = try await authFailureCount(for: "6f0a66e4", in: context)
-    let filterInstallFailed = try await context.db.customQuery(
-      FilterInstallFailedCount.self,
-    ).first?.count ?? 0
-
-    let fullInstallFailedUnique = try await context.db.customQuery(
-      CombinedInstallFailureCount.self,
-    ).first?.count ?? 0
+    let filterInstallFailed = try await context.db.count(FilterInstallFailedCount.self)
+    let fullInstallFailedUnique = try await context.db.count(CombinedInstallFailureCount.self)
 
     let adjustedLaunches = firstLaunches - parentFalseStarts
     let earlyDrop = firstLaunches - totalSuccess - parentFalseStarts
       - childOnboardingIssue - stuckIn18Plus - fullInstallFailedUnique
     let earlyDropClamped = max(0, earlyDrop)
 
-    let cacheStartedOnboarding = try await context.db.customQuery(
+    let cacheStartedOnboarding = try await context.db.count(
       CacheEventCount.self,
       withBindings: [.string("ea3f9c37"), .string("%onboarding%")],
-    ).first?.count ?? 0
-    let cacheStartedInfo = try await context.db.customQuery(
+    )
+    let cacheStartedInfo = try await context.db.count(
       CacheEventCount.self,
       withBindings: [.string("ea3f9c37"), .string("%info%")],
-    ).first?.count ?? 0
-    let cacheCompletedOnboarding = try await context.db.customQuery(
+    )
+    let cacheCompletedOnboarding = try await context.db.count(
       CacheEventCount.self,
       withBindings: [.string("cb9cf096"), .string("%onboarding%")],
-    ).first?.count ?? 0
-    let cacheCompletedInfo = try await context.db.customQuery(
+    )
+    let cacheCompletedInfo = try await context.db.count(
       CacheEventCount.self,
       withBindings: [.string("cb9cf096"), .string("%info%")],
-    ).first?.count ?? 0
+    )
     let cacheErrors = try await distinctVendorCount(for: "ae941213", in: context)
 
     let cacheStarted = cacheStartedOnboarding + cacheStartedInfo
     let cacheCompleted = cacheCompletedOnboarding + cacheCompletedInfo
 
-    let iphoneCount = try await context.db.customQuery(
+    let iphoneCount = try await context.db.count(
       DeviceTypeCount.self,
       withBindings: [.string("iPhone%")],
-    ).first?.count ?? 0
-    let ipadCount = try await context.db.customQuery(
+    )
+    let ipadCount = try await context.db.count(
       DeviceTypeCount.self,
       withBindings: [.string("iPad%")],
-    ).first?.count ?? 0
+    )
     let totalDevices = iphoneCount + ipadCount
 
     let topRegions = try await context.db.customQuery(TopRegionsQuery.self)
@@ -344,20 +329,17 @@ extension IOSDetailedStats: NoInputResolver {
     for eventId: String,
     in context: Context,
   ) async throws -> Int {
-    try await context.db.customQuery(
-      DistinctVendorCountQuery.self,
-      withBindings: [.string(eventId)],
-    ).first?.count ?? 0
+    try await context.db.count(DistinctVendorCountQuery.self, withBindings: [.string(eventId)])
   }
 
   private static func authFailureCount(
     for eventId: String,
     in context: Context,
   ) async throws -> Int {
-    try await context.db.customQuery(
+    try await context.db.count(
       AuthFailureCountExcludingSuccess.self,
       withBindings: [.string(eventId)],
-    ).first?.count ?? 0
+    )
   }
 
   private static func regionName(for code: String) -> String {
@@ -419,11 +401,11 @@ extension IOSDetailedStats: NoInputResolver {
   }
 }
 
-private struct DistinctVendorCountQuery: CustomQueryable {
+private struct DistinctVendorCountQuery: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     var stmt = SQL.Statement("""
     SELECT COUNT(DISTINCT \(IOSEvent.columnName(.vendorId))) AS count
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE \(IOSEvent.columnName(.vendorId)) IS NOT NULL
       AND \(IOSEvent.columnName(.eventId)) =
     """)
@@ -436,24 +418,24 @@ private struct DistinctVendorCountQuery: CustomQueryable {
   var count: Int
 }
 
-private struct AuthFailureCountExcludingSuccess: CustomQueryable {
+private struct AuthFailureCountExcludingSuccess: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     guard let eventId = bindings.first else {
       return SQL.Statement("SELECT 0 AS count WHERE FALSE")
     }
     var stmt = SQL.Statement("""
     SELECT COUNT(DISTINCT vendor_id) AS count
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE vendor_id IS NOT NULL
       AND event_id =
     """)
     stmt.components.append(.binding(eventId))
     stmt.components.append(.sql("""
      AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = 'cdb31095'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'cdb31095'
       )
       AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = '30fac4e6'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = '30fac4e6'
       )
     """))
     return stmt
@@ -462,18 +444,18 @@ private struct AuthFailureCountExcludingSuccess: CustomQueryable {
   var count: Int
 }
 
-private struct CombinedInstallFailureCount: CustomQueryable {
+private struct CombinedInstallFailureCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     SQL.Statement("""
     SELECT COUNT(DISTINCT vendor_id) AS count
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE vendor_id IS NOT NULL
       AND event_id IN ('2bcf3d96', 'e220a765', '6f0a66e4', '004d0d89')
       AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = 'cdb31095'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'cdb31095'
       )
       AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = '30fac4e6'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = '30fac4e6'
       )
     """)
   }
@@ -481,18 +463,18 @@ private struct CombinedInstallFailureCount: CustomQueryable {
   var count: Int
 }
 
-private struct StandardSuccessCount: CustomQueryable {
+private struct StandardSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     SQL.Statement("""
     SELECT COUNT(DISTINCT vendor_id) AS count
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE vendor_id IS NOT NULL
       AND event_id = 'cdb31095'
       AND vendor_id IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = '4a0c585f'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = '4a0c585f'
       )
       AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = 'bad8adcc'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'bad8adcc'
       )
     """)
   }
@@ -500,15 +482,15 @@ private struct StandardSuccessCount: CustomQueryable {
   var count: Int
 }
 
-private struct SupervisedSuccessCount: CustomQueryable {
+private struct SupervisedSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     SQL.Statement("""
     SELECT COUNT(DISTINCT vendor_id) AS count
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE vendor_id IS NOT NULL
       AND event_id = 'cdb31095'
       AND vendor_id IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = 'bad8adcc'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'bad8adcc'
       )
     """)
   }
@@ -516,18 +498,18 @@ private struct SupervisedSuccessCount: CustomQueryable {
   var count: Int
 }
 
-private struct StuckIn18PlusCount: CustomQueryable {
+private struct StuckIn18PlusCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     SQL.Statement("""
     SELECT COUNT(DISTINCT vendor_id) AS count
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE vendor_id IS NOT NULL
       AND event_id = 'a21c9040'
       AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = 'cdb31095'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'cdb31095'
       )
       AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName)
+        SELECT vendor_id FROM \(table: IOSEvent.self)
         WHERE event_id IN ('2bcf3d96', 'e220a765', '6f0a66e4', '9a3f1e5b')
       )
     """)
@@ -536,15 +518,15 @@ private struct StuckIn18PlusCount: CustomQueryable {
   var count: Int
 }
 
-private struct ParentDeviceDropoffCount: CustomQueryable {
+private struct ParentDeviceDropoffCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     SQL.Statement("""
     SELECT COUNT(DISTINCT vendor_id) AS count
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE vendor_id IS NOT NULL
       AND event_id = '30fac4e6'
       AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = 'cdb31095'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'cdb31095'
       )
     """)
   }
@@ -552,21 +534,21 @@ private struct ParentDeviceDropoffCount: CustomQueryable {
   var count: Int
 }
 
-private struct ChildOnboardingIssueCount: CustomQueryable {
+private struct ChildOnboardingIssueCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     SQL.Statement("""
     SELECT COUNT(DISTINCT vendor_id) AS count
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE vendor_id IS NOT NULL
       AND event_id = '3c4772ad'
       AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = 'cdb31095'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'cdb31095'
       )
       AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = 'a21c9040'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'a21c9040'
       )
       AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName)
+        SELECT vendor_id FROM \(table: IOSEvent.self)
         WHERE event_id IN ('2bcf3d96', 'e220a765', '6f0a66e4', '9a3f1e5b')
       )
     """)
@@ -575,18 +557,18 @@ private struct ChildOnboardingIssueCount: CustomQueryable {
   var count: Int
 }
 
-private struct FilterInstallFailedCount: CustomQueryable {
+private struct FilterInstallFailedCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     SQL.Statement("""
     SELECT COUNT(DISTINCT vendor_id) AS count
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE vendor_id IS NOT NULL
       AND event_id = '004d0d89'
       AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = 'cdb31095'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = 'cdb31095'
       )
       AND vendor_id NOT IN (
-        SELECT vendor_id FROM \(IOSEvent.qualifiedTableName) WHERE event_id = '30fac4e6'
+        SELECT vendor_id FROM \(table: IOSEvent.self) WHERE event_id = '30fac4e6'
       )
     """)
   }
@@ -594,11 +576,11 @@ private struct FilterInstallFailedCount: CustomQueryable {
   var count: Int
 }
 
-private struct CacheEventCount: CustomQueryable {
+private struct CacheEventCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     var stmt = SQL.Statement("""
     SELECT COUNT(DISTINCT vendor_id) AS count
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE vendor_id IS NOT NULL
       AND event_id =
     """)
@@ -615,15 +597,18 @@ private struct CacheEventCount: CustomQueryable {
   var count: Int
 }
 
-private struct DeviceTypeCount: CustomQueryable {
+private struct DeviceTypeCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     guard let pattern = bindings.first else {
       return SQL.Statement("SELECT 0 AS count WHERE FALSE")
     }
-    var stmt = SQL
-      .Statement(
-        "SELECT COUNT(DISTINCT vendor_id) AS count FROM \(IOSEvent.qualifiedTableName) WHERE vendor_id IS NOT NULL AND event_id = '8d35f043' AND device_type LIKE ",
-      )
+    var stmt = SQL.Statement("""
+    SELECT COUNT(DISTINCT vendor_id) AS count
+    FROM \(table: IOSEvent.self)
+    WHERE vendor_id IS NOT NULL
+      AND event_id = '8d35f043'
+      AND device_type LIKE\(" ")
+    """)
     stmt.components.append(.binding(pattern))
     return stmt
   }
@@ -637,7 +622,7 @@ private struct TopRegionsQuery: CustomQueryable {
     SELECT
       COALESCE(SUBSTRING(detail FROM 'region: `([A-Z]{2})`'), 'Unknown') AS region,
       COUNT(DISTINCT vendor_id) AS count
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE vendor_id IS NOT NULL
       AND event_id = '8d35f043'
       AND detail IS NOT NULL
@@ -657,7 +642,7 @@ private struct TopVersionsQuery: CustomQueryable {
     SELECT
       ios_version AS version,
       COUNT(DISTINCT vendor_id) AS count
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE vendor_id IS NOT NULL
       AND event_id = '8d35f043'
     GROUP BY ios_version
@@ -679,7 +664,7 @@ private struct DateRangeQuery: CustomQueryable {
     SELECT
       MIN(created_at) AS min_date,
       MAX(created_at) AS max_date
-    FROM \(IOSEvent.qualifiedTableName)
+    FROM \(table: IOSEvent.self)
     WHERE event_id = '8d35f043'
     """)
   }

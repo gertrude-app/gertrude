@@ -200,7 +200,7 @@ struct UpsertNamedApps: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     typealias UA = UnidentifiedApp
     var stmt = SQL.Statement("""
-      INSERT INTO \(UA.qualifiedTableName) (
+      INSERT INTO \(table: UA.self) (
         id,
         \(UA.columnName(.bundleId)),
         \(UA.columnName(.bundleName)),

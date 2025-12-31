@@ -247,6 +247,13 @@ public extension Client {
     let rows = try await self.execute(statement: statement)
     return try Custom.decode(from: rows)
   }
+
+  func count(
+    _ Custom: (some CustomCountable).Type,
+    withBindings bindings: [Postgres.Data] = [],
+  ) async throws -> Int {
+    try await self.customQuery(Custom, withBindings: bindings).first?.count ?? 0
+  }
 }
 
 private struct Count: Decodable {
