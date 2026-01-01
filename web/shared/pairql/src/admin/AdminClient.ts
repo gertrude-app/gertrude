@@ -52,6 +52,26 @@ export default class AdminClient extends Client<Auth> {
     return this.query<P.ParentsList.Output>(input, `ParentsList`, `superAdmin`);
   };
 
+  public podcastInstallDetail = (
+    input: P.PodcastInstallDetail.Input,
+  ): Promise<Result<P.PodcastInstallDetail.Output>> => {
+    return this.query<P.PodcastInstallDetail.Output>(
+      input,
+      `PodcastInstallDetail`,
+      `superAdmin`,
+    );
+  };
+
+  public podcastInstallsList = (
+    input: P.PodcastInstallsList.Input,
+  ): Promise<Result<P.PodcastInstallsList.Output>> => {
+    return this.query<P.PodcastInstallsList.Output>(
+      input,
+      `PodcastInstallsList`,
+      `superAdmin`,
+    );
+  };
+
   public podcastOverview = (
     input: P.PodcastOverview.Input,
   ): Promise<Result<P.PodcastOverview.Output>> => {

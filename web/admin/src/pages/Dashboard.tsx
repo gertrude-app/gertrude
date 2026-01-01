@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
+import BreakdownBar from '../components/BreakdownBar';
 import ErrorState from '../components/ErrorState';
 import {
   ArrowRightIcon,
@@ -138,110 +139,85 @@ interface IOSSectionProps {
   data: T.IOSOverview.Output;
 }
 
-const IOSSection: React.FC<IOSSectionProps> = ({ data }) => {
-  const standardPctOfSuccess =
-    data.totalSuccess > 0 ? (data.standardSuccess / data.totalSuccess) * 100 : 0;
-  const supervisedPctOfSuccess =
-    data.totalSuccess > 0 ? (data.supervisedSuccess / data.totalSuccess) * 100 : 0;
-
-  return (
-    <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-      <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
-            <SmartphoneIcon className="w-5 h-5 text-white" />
-          </div>
-          <h2 className="font-display font-semibold text-slate-900 text-xl">iOS App</h2>
+const IOSSection: React.FC<IOSSectionProps> = ({ data }) => (
+  <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
+    <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
+          <SmartphoneIcon className="w-5 h-5 text-white" />
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            to="/ios-devices"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
-          >
-            <span>View Devices</span>
-            <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-          <Link
-            to="/ios-stats"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
-          >
-            <span>View Stats</span>
-            <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
+        <h2 className="font-display font-semibold text-slate-900 text-xl">iOS App</h2>
+      </div>
+      <div className="flex items-center gap-2">
+        <Link
+          to="/ios-devices"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
+        >
+          <span>View Devices</span>
+          <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+        <Link
+          to="/ios-stats"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
+        >
+          <span>View Stats</span>
+          <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+      </div>
+    </div>
+    <div className="p-6 space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+          <div className="text-2xl font-display font-semibold text-slate-900">
+            {data.adjustedLaunches.toLocaleString()}
+          </div>
+          <div className="text-sm mt-1 text-slate-500">Adjusted Launches</div>
+        </div>
+        <div className="bg-gradient-to-br from-sky-400 to-blue-500 rounded-xl p-4">
+          <div className="text-2xl font-display font-semibold text-white">
+            {data.totalSuccess.toLocaleString()}
+          </div>
+          <div className="text-sm mt-1 text-white/80">Total Success</div>
+        </div>
+        <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+          <div className="text-2xl font-display font-semibold text-slate-900">
+            {data.successRate}%
+          </div>
+          <div className="text-sm mt-1 text-slate-500">Success Rate</div>
+        </div>
+        <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+          <div className="text-2xl font-display font-semibold text-red-500">
+            {data.stuckIn18PlusPath.toLocaleString()}
+          </div>
+          <div className="text-sm mt-1 text-slate-500">18+ Failures</div>
+        </div>
+        <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+          <div className="text-2xl font-display font-semibold text-slate-900">
+            {data.parentFalseStarts.toLocaleString()}
+          </div>
+          <div className="text-sm mt-1 text-slate-500">Parent False Starts</div>
         </div>
       </div>
-      <div className="p-6 space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
-            <div className="text-2xl font-display font-semibold text-slate-900">
-              {data.adjustedLaunches.toLocaleString()}
-            </div>
-            <div className="text-sm mt-1 text-slate-500">Adjusted Launches</div>
-          </div>
-          <div className="bg-gradient-to-br from-sky-400 to-blue-500 rounded-xl p-4">
-            <div className="text-2xl font-display font-semibold text-white">
-              {data.totalSuccess.toLocaleString()}
-            </div>
-            <div className="text-sm mt-1 text-white/80">Total Success</div>
-          </div>
-          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
-            <div className="text-2xl font-display font-semibold text-slate-900">
-              {data.successRate}%
-            </div>
-            <div className="text-sm mt-1 text-slate-500">Success Rate</div>
-          </div>
-          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
-            <div className="text-2xl font-display font-semibold text-red-500">
-              {data.stuckIn18PlusPath.toLocaleString()}
-            </div>
-            <div className="text-sm mt-1 text-slate-500">18+ Failures</div>
-          </div>
-          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
-            <div className="text-2xl font-display font-semibold text-slate-900">
-              {data.parentFalseStarts.toLocaleString()}
-            </div>
-            <div className="text-sm mt-1 text-slate-500">Parent False Starts</div>
-          </div>
-        </div>
 
-        <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
-          <div className="flex justify-between items-baseline mb-3">
-            <h3 className="font-display font-medium text-slate-900">Success Breakdown</h3>
-            <span className="text-sm text-slate-500">
-              {data.totalSuccess.toLocaleString()} total
-            </span>
-          </div>
-          <div className="h-4 bg-slate-200 rounded-full overflow-hidden flex">
-            <div
-              className="h-full bg-gradient-to-r from-sky-400 to-blue-500"
-              style={{ width: `${standardPctOfSuccess}%` }}
-            />
-            <div
-              className="h-full bg-gradient-to-r from-emerald-400 to-green-500"
-              style={{ width: `${supervisedPctOfSuccess}%` }}
-            />
-          </div>
-          <div className="flex justify-between mt-3 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-sky-400 to-blue-500" />
-              <span className="text-slate-600">
-                Screen Time ({data.standardSuccess.toLocaleString()} ·{` `}
-                {standardPctOfSuccess.toFixed(1)}%)
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-400 to-green-500" />
-              <span className="text-slate-600">
-                Supervision ({data.supervisedSuccess.toLocaleString()} ·{` `}
-                {supervisedPctOfSuccess.toFixed(1)}%)
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
+      <BreakdownBar
+        title="Success Breakdown"
+        total={data.totalSuccess}
+        segments={[
+          {
+            label: `Screen Time`,
+            value: data.standardSuccess,
+            gradient: `from-sky-400 to-blue-500`,
+          },
+          {
+            label: `Supervision`,
+            value: data.supervisedSuccess,
+            gradient: `from-emerald-400 to-green-500`,
+          },
+        ]}
+      />
+    </div>
+  </section>
+);
 
 interface PodcastSectionProps {
   data: T.PodcastOverview.Output;
@@ -252,7 +228,7 @@ const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {
 
   return (
     <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-      <div className="px-6 py-5 border-b border-slate-100">
+      <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
             <MicIcon className="w-5 h-5 text-white" />
@@ -261,8 +237,15 @@ const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {
             Podcast App
           </h2>
         </div>
+        <Link
+          to="/podcasts"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-all group"
+        >
+          <span>View Installs</span>
+          <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
       </div>
-      <div className="p-6">
+      <div className="p-6 space-y-6">
         <div className="grid grid-cols-4 gap-4">
           <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
             <div className="text-2xl font-display font-semibold text-slate-900">
@@ -289,6 +272,23 @@ const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {
             <div className="text-sm mt-1 text-slate-500">Yearly Revenue</div>
           </div>
         </div>
+
+        <BreakdownBar
+          title="Device Breakdown"
+          total={data.totalInstalls}
+          segments={[
+            {
+              label: `iPhone`,
+              value: data.iPhoneInstalls,
+              gradient: `from-emerald-400 to-green-500`,
+            },
+            {
+              label: `iPad`,
+              value: data.iPadInstalls,
+              gradient: `from-violet-400 to-purple-500`,
+            },
+          ]}
+        />
       </div>
     </section>
   );
