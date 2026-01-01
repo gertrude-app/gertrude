@@ -1,12 +1,4 @@
 {
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "nx/tasks-runners/default",
-      "options": {
-        "cacheableOperations": ["test", "build"]
-      }
-    }
-  },
   "namedInputs": {
     "sources": ["{projectRoot}/Sources/**/*.swift", "{projectRoot}/Package.swift"],
     "tests": [
@@ -17,11 +9,17 @@
   },
   "targetDefaults": {
     "build": {
+      "cache": true,
       "inputs": ["sources", "^sources"]
     },
     "test": {
+      "cache": true,
       "inputs": ["tests", "^sources"]
     }
   },
-  "defaultBase": "master"
+  "defaultBase": "master",
+  "useInferencePlugins": false,
+  "tui": {
+    "enabled": false
+  }
 }

@@ -15,6 +15,7 @@ buildServer.json
 **/out
 **/dist
 **/tsconfig.tsbuildinfo
+.eslintcache
 .nx/
 web/appviews/src/main.tsx
 web/storybook/storybook-static/
