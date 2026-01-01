@@ -27,26 +27,13 @@ extension LogIOSEvent: Resolver {
       iosVersion: input.iOSVersion,
     ))
 
-    if context.env.mode != .prod {
-      return .success
-    }
-    let slack = get(dependency: \.slack)
-    let slackDetail = [
-      input.detail,
-      "device: `\(input.deviceType)`",
-      "iOS: `\(input.iOSVersion)`",
-      "vendorId: `\(input.vendorId?.lowercased ?? "(nil)")`",
-    ].compactMap(\.self).joined(separator: ", ")
-    let message = "iOS app event: \(githubSearch(input.eventId)) \(slackDetail)"
-    if kind == .onboarding
-      || input.eventId == "8d35f043" // first launch
-      || input.eventId == "4a0c585f" // auth success
-      || input.eventId == "adced334" { // filter install success
-      await slack.internal(.iosOnboarding, message)
-    } else if input.eventId == "00ec3909" || input.eventId == "8e23bea2" {
-      await slack.internal(.debug, message)
-    } else {
-      await slack.internal(.iosLogs, message)
+    if context.env.mode == .prod,
+       input.eventId == "8d35f043",
+       let vendorId = input.vendorId {
+      let adminUrl = context.env.get("ADMIN_SITE_URL") ?? "http://localhost:4243"
+      let adminLink = "\(adminUrl)/ios/\(vendorId.lowercased)/events"
+      let message = "iOS first launch: \(adminLink)"
+      await get(dependency: \.slack).internal(.iosOnboarding, message)
     }
 
     return .success

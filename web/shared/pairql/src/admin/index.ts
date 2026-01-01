@@ -1,7 +1,7 @@
 // auto-generated, do not edit
 export * from './shared';
 export * from './pairs/IOSDetailedStats';
-export * from './pairs/IOSDeviceJourney';
+export * from './pairs/IOSDeviceEvents';
 export * from './pairs/IOSDevicesList';
 export * from './pairs/IOSOverview';
 export * from './pairs/MacOverview';

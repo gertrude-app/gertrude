@@ -2,7 +2,7 @@ import DuetSQL
 import PairQL
 import Vapor
 
-struct IOSDeviceJourney: Pair {
+struct IOSDeviceEvents: Pair {
   static let auth: ClientAuth = .superAdmin
 
   struct Input: PairInput {
@@ -28,7 +28,7 @@ struct IOSDeviceJourney: Pair {
   }
 }
 
-extension IOSDeviceJourney: Resolver {
+extension IOSDeviceEvents: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let events = try await IOSEvent.query()
       .where(.vendorId == input.vendorId)

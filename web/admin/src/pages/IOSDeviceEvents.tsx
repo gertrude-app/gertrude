@@ -6,9 +6,9 @@ import ErrorState from '../components/ErrorState';
 import { ArrowLeftIcon, ChevronRightIcon, SmartphoneIcon } from '../components/Icons';
 import LoadingState from '../components/LoadingState';
 
-const IOSDeviceJourney: React.FC = () => {
+const IOSDeviceEvents: React.FC = () => {
   const { vendorId } = useParams<{ vendorId: string }>();
-  const [data, setData] = useState<T.IOSDeviceJourney.Output | null>(null);
+  const [data, setData] = useState<T.IOSDeviceEvents.Output | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
@@ -32,10 +32,10 @@ const IOSDeviceJourney: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const result = await client.iOSDeviceJourney({ vendorId });
+      const result = await client.iOSDeviceEvents({ vendorId });
 
       if (result.isError) {
-        setError(result.error?.debugMessage ?? `Failed to load device journey`);
+        setError(result.error?.debugMessage ?? `Failed to load device events`);
         setLoading(false);
         return;
       }
@@ -48,11 +48,11 @@ const IOSDeviceJourney: React.FC = () => {
   }, [vendorId]);
 
   if (loading) {
-    return <LoadingState context="device journey" gradient="blue" />;
+    return <LoadingState context="device events" gradient="blue" />;
   }
 
   if (error) {
-    return <ErrorState context="device journey" error={error} />;
+    return <ErrorState context="device events" error={error} />;
   }
 
   if (!data) {
@@ -96,7 +96,7 @@ const IOSDeviceJourney: React.FC = () => {
     });
   };
 
-  type Event = T.IOSDeviceJourney.Output[`events`][number];
+  type Event = T.IOSDeviceEvents.Output[`events`][number];
 
   const groupEventsByDate = (events: Event[]): Map<string, Event[]> => {
     const groups = new Map<string, Event[]>();
@@ -173,7 +173,7 @@ const IOSDeviceJourney: React.FC = () => {
           </div>
           <div>
             <h1 className="font-display font-semibold text-slate-900 text-2xl">
-              Device Journey
+              Device Events
             </h1>
             <p className="text-sm text-slate-500">
               <code className="font-mono">{data.vendorId.slice(0, 8).toLowerCase()}</code>
@@ -270,4 +270,4 @@ const IOSDeviceJourney: React.FC = () => {
   );
 };
 
-export default IOSDeviceJourney;
+export default IOSDeviceEvents;

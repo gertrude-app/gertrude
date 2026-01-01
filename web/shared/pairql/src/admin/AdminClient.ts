@@ -16,10 +16,10 @@ export default class AdminClient extends Client<Auth> {
     return this.query<P.IOSDetailedStats.Output>(input, `IOSDetailedStats`, `superAdmin`);
   };
 
-  public iOSDeviceJourney = (
-    input: P.IOSDeviceJourney.Input,
-  ): Promise<Result<P.IOSDeviceJourney.Output>> => {
-    return this.query<P.IOSDeviceJourney.Output>(input, `IOSDeviceJourney`, `superAdmin`);
+  public iOSDeviceEvents = (
+    input: P.IOSDeviceEvents.Input,
+  ): Promise<Result<P.IOSDeviceEvents.Output>> => {
+    return this.query<P.IOSDeviceEvents.Output>(input, `IOSDeviceEvents`, `superAdmin`);
   };
 
   public iOSDevicesList = (
