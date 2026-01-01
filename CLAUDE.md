@@ -14,6 +14,10 @@ Planning docs:
 - `supervision-onboarding-recommendations.md` - detailed recommendations and analysis
 - `supervision-flow-script.md` - role-play script of complete happy path (Ben + Luke scenario)
 
+Implementation tasks:
+
+- [`subtasks/README.md`](./subtasks/README.md) - 21 implementation tasks with dependencies and ordering
+
 ---
 
 Apps and supporting libraries for Gertrude parental controls.
