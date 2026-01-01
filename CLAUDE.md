@@ -1,5 +1,20 @@
 # Gertrude monorepo
 
+## Current Task: iOS Account Onboarding & Supervision
+
+This directory is for high-level planning of the iOS supervision onboarding feature. This
+is a large multi-phase feature spanning iOS app, API, dashboard, and supervision tool.
+Implementation tasks will be spun out to separate branches/PRs.
+
+Planning docs:
+
+- `tasks.md` - initial context and goals
+- `next.md` - brainstorming prompt and constraints
+- `ios-onboarding-flow.md` - current iOS onboarding state machine reference
+- `supervision-onboarding-recommendations.md` - detailed recommendations and analysis
+
+---
+
 Apps and supporting libraries for Gertrude parental controls.
 
 Depending on the task, read relevant sub CLAUDE.md files or other doc files as noted
