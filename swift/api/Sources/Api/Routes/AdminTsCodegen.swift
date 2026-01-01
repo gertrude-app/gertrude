@@ -30,7 +30,7 @@ enum AdminTsCodegenRoute {
       IOSOverview.self,
       IOSDetailedStats.self,
       IOSDevicesList.self,
-      IOSDeviceJourney.self,
+      IOSDeviceEvents.self,
       PodcastOverview.self,
       ParentsList.self,
       ParentDetail.self,

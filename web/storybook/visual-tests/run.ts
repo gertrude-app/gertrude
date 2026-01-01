@@ -28,7 +28,11 @@ async function main(): Promise<void> {
     throw new Error(`story w/ custom wait not found, possibly renamed`);
   }
 
-  const browser = await puppeteer.launch({ headless: true, product: `chrome` });
+  const browser = await puppeteer.launch({
+    headless: true,
+    product: `chrome`,
+    args: process.env.CI ? [`--no-sandbox`, `--disable-setuid-sandbox`] : [],
+  });
   const page = await browser.newPage();
   const url = `http://localhost:4777/${process.env.CI ? `` : `iframe.html`}`;
 

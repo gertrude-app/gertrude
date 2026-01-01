@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-export namespace IOSDeviceJourney {
+export namespace IOSDeviceEvents {
   export interface Input {
     vendorId: UUID;
   }
