@@ -86,7 +86,7 @@ jobs:
   dashboard:
     name: dashboard
     needs: files-changed
-    if: needs.files-changed.outputs.dashboard == 'true'
+    if: github.event_name == 'pull_request' && needs.files-changed.outputs.dashboard == 'true'
     runs-on: ubuntu-latest
     env:
       VITE_API_ENDPOINT: ${{ secrets.STAGING_API_ENDPOINT }}
@@ -121,7 +121,6 @@ jobs:
 
   files-changed:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
     outputs:
       appviews: ${{ steps.changes.outputs.appviews }}
       dashboard: ${{ steps.changes.outputs.dashboard }}
@@ -150,7 +149,7 @@ jobs:
 
   appviews-comment:
     needs: files-changed
-    if: needs.files-changed.outputs.appviews == 'true'
+    if: github.event_name == 'pull_request' && needs.files-changed.outputs.appviews == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: pr comment
@@ -166,7 +165,7 @@ jobs:
   site:
     name: site
     needs: files-changed
-    if: needs.files-changed.outputs.site == 'true'
+    if: github.event_name == 'pull_request' && needs.files-changed.outputs.site == 'true'
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_FORMS_ENDPOINT: /not-real
