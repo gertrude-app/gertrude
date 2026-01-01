@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iOS Onboarding Flow - Gertrude</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #4fc3f7;
+    }
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .tab {
+      padding: 10px 20px;
+      background: #2d2d44;
+      border: none;
+      border-radius: 8px;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .tab:hover { background: #3d3d54; }
+    .tab.active {
+      background: #4fc3f7;
+      color: #1a1a2e;
+      font-weight: 600;
+    }
+    .diagram-container {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 20px;
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+    .hidden { visibility: hidden; height: 0; overflow: hidden; }
+    .legend {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-box {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+    }
+    .legend-box.screen { background: #4fc3f7; }
+    .legend-box.decision { background: #ffd54f; }
+    .legend-box.error { background: #ef5350; }
+    .legend-box.success { background: #66bb6a; }
+    .legend-box.subflow { background: #ba68c8; }
+    .stats {
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Gertrude iOS Onboarding Flow</h1>
+  <p class="subtitle">Visual representation of all onboarding paths, states, and transitions</p>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-box screen"></div> Screen</div>
+    <div class="legend-item"><div class="legend-box decision"></div> Decision Point</div>
+    <div class="legend-item"><div class="legend-box error"></div> Error State</div>
+    <div class="legend-item"><div class="legend-box success"></div> Success State</div>
+    <div class="legend-item"><div class="legend-box subflow"></div> Sub-flow Entry</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showDiagram('main')">Main Happy Path</button>
+    <button class="tab" onclick="showDiagram('auth-errors')">Auth Errors</button>
+    <button class="tab" onclick="showDiagram('install-errors')">Install Errors</button>
+    <button class="tab" onclick="showDiagram('apple-family')">Apple Family Flow</button>
+    <button class="tab" onclick="showDiagram('major')">18+ User Flow</button>
+    <button class="tab" onclick="showDiagram('supervision')">Supervision Flow</button>
+    <button class="tab" onclick="showDiagram('account')">Account Connection</button>
+    <button class="tab" onclick="showDiagram('overview')">Full Overview</button>
+  </div>
+
+  <!-- Main Happy Path -->
+  <div id="main" class="diagram-container">
+    <pre class="mermaid">
+flowchart TD
+    subgraph happyPath["HAPPY PATH - Standard Child Device"]
+        A[hiThere<br/><i>Welcome screen</i>]
+        B[timeExpectation<br/><i>5-7 min setup</i>]
+        C{confirmChildsDevice<br/><i>Is this the device<br/>to protect?</i>}
+        D[explainMinorOrSupervised<br/><i>Apple requirements</i>]
+        E{confirmMinorDevice<br/><i>Under 18?</i>}
+        F{confirmParentIsOnboarding<br/><i>Are you the parent?</i>}
+        G{confirmInAppleFamily<br/><i>In Apple Family?</i>}
+        H[explainTwoInstallSteps<br/><i>2-step process</i>]
+        I[explainAuthWithParentAppleAccount<br/><i>Use parent Apple ID</i>]
+        J[dontGetTrickedPreAuth<br/><i>Click Continue!</i>]
+        K[explainInstallWithDevicePasscode<br/><i>Use device passcode</i>]
+        L[dontGetTrickedPreInstall<br/><i>Click Allow!</i>]
+        M[offerAccountConnect<br/><i>Connect to Gertrude?</i>]
+        N[optOutBlockGroups<br/><i>Choose what to block</i>]
+        O[promptClearCache<br/><i>Clear browsing cache?</i>]
+        P[requestAppStoreRating<br/><i>Rate the app?</i>]
+        Q[doneQuit<br/><i>All set!</i>]
+    end
+
+    A -->|Primary| B
+    B -->|Primary| C
+    C -->|"Yes"| D
+    C -->|"No"| ERR1[onParentDeviceFail]
+    D -->|Primary| E
+    E -->|"Yes, under 18"| F
+    E -->|"No"| MAJOR[major.explainHarderButPossible]
+    F -->|"Yes"| G
+    F -->|"No"| ERR2[childIsOnboardingFail]
+    G -->|"Yes, in family"| H
+    G -->|"No"| AF1[appleFamily.explainRequiredForFiltering]
+    G -->|"Not sure"| AF2[appleFamily.explainWhatIsAppleFamily]
+    H -->|Primary| I
+    I -->|Primary| J
+    J -->|"System Auth"| AUTH{Authorization<br/>Result}
+    AUTH -->|Success| K
+    AUTH -->|Failure| AUTHERR[authFail.*]
+    K -->|Primary| L
+    L -->|"Filter Install"| INST{Install<br/>Result}
+    INST -->|Success| M
+    INST -->|Failure| INSTERR[installFail.*]
+    M -->|"Skip"| N
+    M -->|"Connect"| CONN[ConnectAccount Modal]
+    CONN -->|Success| CSUC[connectSuccess]
+    CSUC --> O
+    N --> O
+    O -->|"Clear cache"| CACHE[ClearCacheFeature]
+    O -->|"Skip"| P
+    CACHE --> P
+    P --> Q
+    Q --> RUNNING[Running State]
+
+    style A fill:#4fc3f7,color:#000
+    style B fill:#4fc3f7,color:#000
+    style D fill:#4fc3f7,color:#000
+    style H fill:#4fc3f7,color:#000
+    style I fill:#4fc3f7,color:#000
+    style J fill:#4fc3f7,color:#000
+    style K fill:#4fc3f7,color:#000
+    style L fill:#4fc3f7,color:#000
+    style M fill:#4fc3f7,color:#000
+    style N fill:#4fc3f7,color:#000
+    style O fill:#4fc3f7,color:#000
+    style P fill:#4fc3f7,color:#000
+    style Q fill:#66bb6a,color:#000
+    style RUNNING fill:#66bb6a,color:#000
+    style CSUC fill:#66bb6a,color:#000
+    style C fill:#ffd54f,color:#000
+    style E fill:#ffd54f,color:#000
+    style F fill:#ffd54f,color:#000
+    style G fill:#ffd54f,color:#000
+    style AUTH fill:#ffd54f,color:#000
+    style INST fill:#ffd54f,color:#000
+    style ERR1 fill:#ef5350,color:#fff
+    style ERR2 fill:#ef5350,color:#fff
+    style AUTHERR fill:#ef5350,color:#fff
+    style INSTERR fill:#ef5350,color:#fff
+    style MAJOR fill:#ba68c8,color:#000
+    style AF1 fill:#ba68c8,color:#000
+    style AF2 fill:#ba68c8,color:#000
+    style CONN fill:#ba68c8,color:#000
+    style CACHE fill:#ba68c8,color:#000
+    </pre>
+  </div>
+
+  <!-- Auth Errors -->
+  <div id="auth-errors" class="diagram-container" style="visibility:hidden;height:0;overflow:hidden">
+    <pre class="mermaid">
+flowchart TD
+    subgraph authErrors["AUTHORIZATION ERROR FLOWS"]
+        TRIGGER[dontGetTrickedPreAuth<br/><i>System authorization fails</i>]
+
+        subgraph invalidAccount["Invalid Account Type"]
+            IA1[letsFigureThisOut<br/><i>Account type issue</i>]
+            IA2{confirmInAppleFamily<br/><i>In Apple Family?</i>}
+            IA3{confirmIsMinor<br/><i>Account age?</i>}
+            IA4[unexpected<br/><i>Unknown error</i>]
+        end
+
+        AC[authCanceled<br/><i>User clicked wrong button</i>]
+        RE[restricted<br/><i>MDM restriction</i>]
+        CO[authConflict<br/><i>Another parental app</i>]
+        NE[networkError<br/><i>No internet</i>]
+        PC[passcodeRequired<br/><i>No device passcode</i>]
+        UN[unexpected<br/><i>Unknown error</i>]
+    end
+
+    TRIGGER -->|invalidAccountType| IA1
+    TRIGGER -->|authorizationCanceled| AC
+    TRIGGER -->|restricted| RE
+    TRIGGER -->|authorizationConflict| CO
+    TRIGGER -->|networkError| NE
+    TRIGGER -->|passcodeRequired| PC
+    TRIGGER -->|other| UN
+
+    IA1 --> IA2
+    IA2 -->|"Yes"| IA3
+    IA2 -->|"No"| AF[appleFamily.explainRequiredForFiltering]
+    IA2 -->|"Not sure"| AF2[appleFamily.checkIfInAppleFamily]
+    IA3 -->|"18+"| MAJ[major.explainHarderButPossible]
+    IA3 -->|"Under 18"| IA4
+    IA4 -->|Support| SUPPORT[Contact Support]
+
+    AC -->|"Try again"| RETRY[explainTwoInstallSteps]
+    RE -->|"Try again"| RETRY
+    CO -->|"Try again"| RETRY
+    NE -->|"Try again"| RETRY
+    PC -->|"Try again"| RETRY
+    UN -->|"Try again"| RETRY
+
+    style TRIGGER fill:#4fc3f7,color:#000
+    style IA1 fill:#ef5350,color:#fff
+    style IA2 fill:#ffd54f,color:#000
+    style IA3 fill:#ffd54f,color:#000
+    style IA4 fill:#ef5350,color:#fff
+    style AC fill:#ef5350,color:#fff
+    style RE fill:#ef5350,color:#fff
+    style CO fill:#ef5350,color:#fff
+    style NE fill:#ef5350,color:#fff
+    style PC fill:#ef5350,color:#fff
+    style UN fill:#ef5350,color:#fff
+    style RETRY fill:#66bb6a,color:#000
+    style AF fill:#ba68c8,color:#000
+    style AF2 fill:#ba68c8,color:#000
+    style MAJ fill:#ba68c8,color:#000
+    </pre>
+  </div>
+
+  <!-- Install Errors -->
+  <div id="install-errors" class="diagram-container" style="visibility:hidden;height:0;overflow:hidden">
+    <pre class="mermaid">
+flowchart TD
+    subgraph installErrors["INSTALLATION ERROR FLOWS"]
+        TRIGGER[dontGetTrickedPreInstall<br/><i>Filter installation fails</i>]
+
+        PD[permissionDenied<br/><i>Clicked wrong button</i>]
+        OT[other<br/><i>Unknown error</i>]
+
+        RETRY[explainInstallWithDevicePasscode<br/><i>Try again</i>]
+    end
+
+    TRIGGER -->|configurationPermissionDenied| PD
+    TRIGGER -->|other errors| OT
+
+    PD -->|"Try again"| RETRY
+    OT -->|"Try again"| RETRY
+
+    RETRY --> L[dontGetTrickedPreInstall]
+    L -->|Success| SUCCESS[offerAccountConnect]
+
+    style TRIGGER fill:#4fc3f7,color:#000
+    style PD fill:#ef5350,color:#fff
+    style OT fill:#ef5350,color:#fff
+    style RETRY fill:#4fc3f7,color:#000
+    style L fill:#4fc3f7,color:#000
+    style SUCCESS fill:#66bb6a,color:#000
+    </pre>
+  </div>
+
+  <!-- Apple Family Flow -->
+  <div id="apple-family" class="diagram-container" style="visibility:hidden;height:0;overflow:hidden">
+    <pre class="mermaid">
+flowchart TD
+    subgraph appleFamily["APPLE FAMILY DIVERSION FLOW"]
+        direction TB
+
+        ENTRY1[From: confirmInAppleFamily<br/><i>Secondary: Not in family</i>]
+        ENTRY2[From: confirmInAppleFamily<br/><i>Tertiary: Not sure</i>]
+        ENTRY3[From: authFail.invalidAccount]
+
+        AF1[explainRequiredForFiltering<br/><i>Apple requires family</i>]
+        AF2[explainSetupFreeAndEasy<br/><i>Setup is free & easy</i>]
+        AF3[howToSetupAppleFamily<br/><i>Instructions + links</i>]
+
+        AF4[explainWhatIsAppleFamily<br/><i>What is Apple Family?</i>]
+        AF5{checkIfInAppleFamily<br/><i>See Family in Settings?</i>}
+
+        RETURN[Return to<br/>confirmInAppleFamily]
+    end
+
+    ENTRY1 --> AF1
+    ENTRY2 --> AF4
+    ENTRY3 --> AF1
+
+    AF1 --> AF2
+    AF2 --> AF3
+    AF3 -->|"Done"| RETURN
+
+    AF4 --> AF5
+    AF5 -->|"Yes, in family"| RETURN
+    AF5 -->|"Not yet"| AF1
+
+    style ENTRY1 fill:#ba68c8,color:#000
+    style ENTRY2 fill:#ba68c8,color:#000
+    style ENTRY3 fill:#ba68c8,color:#000
+    style AF1 fill:#4fc3f7,color:#000
+    style AF2 fill:#4fc3f7,color:#000
+    style AF3 fill:#4fc3f7,color:#000
+    style AF4 fill:#4fc3f7,color:#000
+    style AF5 fill:#ffd54f,color:#000
+    style RETURN fill:#66bb6a,color:#000
+    </pre>
+  </div>
+
+  <!-- Major (18+) Flow -->
+  <div id="major" class="diagram-container" style="visibility:hidden;height:0;overflow:hidden">
+    <pre class="mermaid">
+flowchart TD
+    subgraph majorFlow["18+ USER FLOW (Major)"]
+        ENTRY[From: confirmMinorDevice<br/><i>Secondary: Not under 18</i>]
+
+        M1[explainHarderButPossible<br/><i>Harder but possible</i>]
+        M2{askSelfOrOtherIsOnboarding<br/><i>Who is setting up?</i>}
+        M3{askIfOtherIsParent<br/><i>Is helper a parent?</i>}
+        M4[explainFixAccountTypeEasyWay<br/><i>Easiest solution</i>]
+        M5{askIfOwnsMac<br/><i>Own a Mac?</i>}
+        M6{askIfInAppleFamily<br/><i>In Apple Family?</i>}
+        M7[explainAppleFamily<br/><i>Sheet modal</i>]
+
+        SUP[supervision.intro]
+        MINOR[confirmMinorDevice<br/><i>Try with minor account</i>]
+    end
+
+    ENTRY --> M1
+    M1 --> M2
+    M2 -->|"Helping someone"| M3
+    M2 -->|"This is my device"| M6
+
+    M3 -->|"Yes"| M4
+    M3 -->|"No"| M5
+
+    M4 -->|"Done"| MINOR
+    M4 -->|"Another way?"| M5
+
+    M5 -->|"Yes"| SUP
+    M5 -->|"No"| SUP
+
+    M6 -->|"Yes"| M4
+    M6 -->|"No"| SUP
+    M6 -->|"What's that?"| M7
+    M7 -->|Dismiss| M6
+
+    style ENTRY fill:#ba68c8,color:#000
+    style M1 fill:#4fc3f7,color:#000
+    style M2 fill:#ffd54f,color:#000
+    style M3 fill:#ffd54f,color:#000
+    style M4 fill:#4fc3f7,color:#000
+    style M5 fill:#ffd54f,color:#000
+    style M6 fill:#ffd54f,color:#000
+    style M7 fill:#4fc3f7,color:#000
+    style SUP fill:#ba68c8,color:#000
+    style MINOR fill:#66bb6a,color:#000
+    </pre>
+  </div>
+
+  <!-- Supervision Flow -->
+  <div id="supervision" class="diagram-container" style="visibility:hidden;height:0;overflow:hidden">
+    <pre class="mermaid">
+flowchart TD
+    subgraph supervisionFlow["SUPERVISION FLOW"]
+        ENTRY[From: major flow<br/><i>Not in Apple Family / No Mac</i>]
+
+        S1[intro<br/><i>Introduce supervised mode</i>]
+        S2[explainSupervision<br/><i>What is supervised mode?</i>]
+        S3[explainNeedFriendWithMac<br/><i>Need trusted Mac friend</i>]
+        S4[explainRequiresEraseAndSetup<br/><i>Device erase required</i>]
+        S5[instructions<br/><i>Tutorial + video links</i>]
+        S6[sorryNoOtherWay<br/><i>Dead end</i>]
+    end
+
+    ENTRY --> S1
+    S1 --> S2
+    S2 -->|"no Mac OR self"| S3
+    S2 -->|"has Mac, helping other"| S4
+
+    S3 -->|"Got someone"| S4
+    S3 -->|"No one"| S6
+
+    S4 -->|"Show me how"| S5
+    S4 -->|"No thanks"| S6
+
+    S6 -->|"Support"| SUPPORT[Contact Support]
+    S6 -->|"Start over"| RESTART[hiThere]
+
+    style ENTRY fill:#ba68c8,color:#000
+    style S1 fill:#4fc3f7,color:#000
+    style S2 fill:#4fc3f7,color:#000
+    style S3 fill:#4fc3f7,color:#000
+    style S4 fill:#4fc3f7,color:#000
+    style S5 fill:#4fc3f7,color:#000
+    style S6 fill:#ef5350,color:#fff
+    style SUPPORT fill:#ef5350,color:#fff
+    style RESTART fill:#66bb6a,color:#000
+    </pre>
+  </div>
+
+  <!-- Account Connection -->
+  <div id="account" class="diagram-container" style="visibility:hidden;height:0;overflow:hidden">
+    <pre class="mermaid">
+flowchart TD
+    subgraph accountConnect["ACCOUNT CONNECTION FLOW"]
+        ENTRY[From: offerAccountConnect<br/><i>Secondary: Connect</i>]
+
+        A1[enteringCode<br/><i>6-digit code input</i>]
+        A2[connecting<br/><i>Loading state</i>]
+        A3[connected<br/><i>Success + child name</i>]
+        A4[connectionFailed<br/><i>Error message</i>]
+
+        RETURN[connectSuccess<br/><i>Back to main flow</i>]
+    end
+
+    ENTRY -->|"Sheet modal"| A1
+    A1 -->|"Submit code"| A2
+    A2 -->|Success| A3
+    A2 -->|Failure| A4
+    A3 -->|Done| RETURN
+    A4 -->|"Try again"| A1
+
+    style ENTRY fill:#ba68c8,color:#000
+    style A1 fill:#4fc3f7,color:#000
+    style A2 fill:#4fc3f7,color:#000
+    style A3 fill:#66bb6a,color:#000
+    style A4 fill:#ef5350,color:#fff
+    style RETURN fill:#66bb6a,color:#000
+    </pre>
+  </div>
+
+  <!-- Full Overview -->
+  <div id="overview" class="diagram-container" style="visibility:hidden;height:0;overflow:hidden">
+    <pre class="mermaid">
+flowchart TB
+    subgraph LAUNCH["APP LAUNCH"]
+        START[appDidLaunch]
+    end
+
+    subgraph MAIN["MAIN HAPPY PATH - 19 screens"]
+        HP["hiThere, timeExpectation, confirmChildsDevice..."]
+        HP2["...dontGetTrickedPreAuth, dontGetTrickedPreInstall..."]
+        HP3["...offerAccountConnect, optOutBlockGroups, done"]
+    end
+
+    subgraph BRANCHES["BRANCH FLOWS"]
+        AF[Apple Family Flow<br/><i>5 screens</i>]
+        MAJ[Major 18+ Flow<br/><i>7 screens</i>]
+        SUP[Supervision Flow<br/><i>6 screens</i>]
+        CONN[Account Connect<br/><i>4 states</i>]
+    end
+
+    subgraph ERRORS["ERROR STATES"]
+        AE[Auth Errors<br/><i>7 types</i>]
+        IE[Install Errors<br/><i>2 types</i>]
+        OE[Other Errors<br/><i>2 types</i>]
+    end
+
+    subgraph END["END STATES"]
+        RUN[Running - Connected]
+        RUNNC[Running - Not Connected]
+        DEAD[Dead End - sorryNoOtherWay]
+    end
+
+    START --> MAIN
+    HP --> HP2 --> HP3
+
+    MAIN -->|"Not in family"| AF
+    MAIN -->|"Not under 18"| MAJ
+    MAJ -->|"No Mac / Not in family"| SUP
+    MAIN -->|"Connect account"| CONN
+
+    MAIN -->|"Auth fails"| AE
+    MAIN -->|"Install fails"| IE
+    MAIN -->|"Wrong device/person"| OE
+
+    AF -->|Return| MAIN
+    SUP -->|"Dead end"| DEAD
+
+    MAIN -->|Success + connected| RUN
+    MAIN -->|Success + skipped| RUNNC
+    CONN -->|Success| RUN
+
+    style START fill:#4fc3f7,color:#000
+    style HP fill:#4fc3f7,color:#000
+    style HP2 fill:#4fc3f7,color:#000
+    style HP3 fill:#4fc3f7,color:#000
+    style AF fill:#ba68c8,color:#000
+    style MAJ fill:#ba68c8,color:#000
+    style SUP fill:#ba68c8,color:#000
+    style CONN fill:#ba68c8,color:#000
+    style AE fill:#ef5350,color:#fff
+    style IE fill:#ef5350,color:#fff
+    style OE fill:#ef5350,color:#fff
+    style RUN fill:#66bb6a,color:#000
+    style RUNNC fill:#66bb6a,color:#000
+    style DEAD fill:#ef5350,color:#fff
+    </pre>
+  </div>
+
+  <div class="stats">
+    <strong>Total Screens:</strong> ~40 |
+    <strong>Decision Points:</strong> ~12 |
+    <strong>Error States:</strong> ~11 |
+    <strong>Sub-flows:</strong> 4 (Apple Family, Major, Supervision, Account Connect)
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    function showDiagram(id) {
+      document.querySelectorAll('.diagram-container').forEach(d => {
+        d.style.visibility = 'hidden';
+        d.style.height = '0';
+        d.style.overflow = 'hidden';
+      });
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      const target = document.getElementById(id);
+      target.style.visibility = 'visible';
+      target.style.height = 'auto';
+      target.style.overflow = 'visible';
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>
