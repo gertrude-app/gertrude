@@ -117,6 +117,38 @@ export const SmartphoneIcon: React.FC<IconProps> = ({ className = `` }) => (
   </svg>
 );
 
+export const IPhoneIcon: React.FC<IconProps> = ({ className = `` }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect width="12" height="20" x="6" y="2" rx="2" />
+    <line x1="12" x2="12.01" y1="18" y2="18" />
+  </svg>
+);
+
+export const IPadIcon: React.FC<IconProps> = ({ className = `` }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect width="16" height="20" x="4" y="2" rx="2" />
+    <line x1="12" x2="12.01" y1="18" y2="18" />
+  </svg>
+);
+
 export const MicIcon: React.FC<IconProps> = ({ className = `` }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

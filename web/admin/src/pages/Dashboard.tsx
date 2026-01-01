@@ -153,13 +153,22 @@ const IOSSection: React.FC<IOSSectionProps> = ({ data }) => {
           </div>
           <h2 className="font-display font-semibold text-slate-900 text-xl">iOS App</h2>
         </div>
-        <Link
-          to="/ios-stats"
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
-        >
-          <span>View Details</span>
-          <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/ios-devices"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
+          >
+            <span>View Devices</span>
+            <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <Link
+            to="/ios-stats"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
+          >
+            <span>View Stats</span>
+            <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </div>
       </div>
       <div className="p-6 space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

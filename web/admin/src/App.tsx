@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
+import IOSDeviceJourney from './pages/IOSDeviceJourney';
+import IOSDevicesList from './pages/IOSDevicesList';
 import IOSStats from './pages/IOSStats';
 import Login from './pages/Login';
 import ParentDetail from './pages/ParentDetail';
@@ -45,6 +47,8 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/ios-stats" element={<IOSStats />} />
+        <Route path="/ios-devices" element={<IOSDevicesList />} />
+        <Route path="/ios/:vendorId/journey" element={<IOSDeviceJourney />} />
         <Route path="/parents" element={<ParentsList />} />
         <Route path="/parents/:id" element={<ParentDetail />} />
         <Route path="*" element={<Navigate to="/" replace />} />
