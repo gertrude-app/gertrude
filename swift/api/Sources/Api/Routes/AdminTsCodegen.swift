@@ -29,6 +29,8 @@ enum AdminTsCodegenRoute {
       MacOverview.self,
       IOSOverview.self,
       IOSDetailedStats.self,
+      IOSDevicesList.self,
+      IOSDeviceJourney.self,
       PodcastOverview.self,
       ParentsList.self,
       ParentDetail.self,
