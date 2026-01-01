@@ -12,6 +12,13 @@ struct IOSOverview: Pair {
     var supervisedSuccess: Int
     var stuckIn18PlusPath: Int
     var successRate: Double
+    var recentInstalls: [RecentInstall]
+  }
+
+  struct RecentInstall: PairNestable {
+    var date: Date
+    var status: String
+    var deviceType: String
   }
 }
 
@@ -37,6 +44,15 @@ extension IOSOverview: NoInputResolver {
       ? (Double(totalSuccess) / Double(adjustedLaunches) * 1000).rounded() / 10
       : 0.0
 
+    let recentInstalls = try await context.db.customQuery(RecentInstallsQuery.self)
+      .map { row in
+        RecentInstall(
+          date: row.date,
+          status: row.succeeded ? "success" : "incomplete",
+          deviceType: row.deviceType,
+        )
+      }
+
     return .init(
       adjustedLaunches: adjustedLaunches,
       parentFalseStarts: parentFalseStarts,
@@ -45,6 +61,7 @@ extension IOSOverview: NoInputResolver {
       supervisedSuccess: supervisedSuccess,
       stuckIn18PlusPath: stuckIn18PlusPath,
       successRate: successRate,
+      recentInstalls: recentInstalls,
     )
   }
 }
@@ -139,4 +156,35 @@ private struct ParentDeviceDropoffCount: CustomCountable {
   }
 
   var count: Int
+}
+
+private struct RecentInstallsQuery: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    let vendorId = IOSEvent.columnName(.vendorId)
+    let eventId = IOSEvent.columnName(.eventId)
+    let createdAt = IOSEvent.columnName(.createdAt)
+    let deviceType = IOSEvent.columnName(.deviceType)
+    return SQL.Statement("""
+    SELECT
+      first_launch.\(createdAt) AS date,
+      first_launch.\(deviceType) AS device_type,
+      CASE WHEN success.\(vendorId) IS NOT NULL THEN TRUE ELSE FALSE END AS succeeded
+    FROM (
+      SELECT DISTINCT ON (\(vendorId)) \(vendorId), \(createdAt), \(deviceType)
+      FROM \(table: IOSEvent.self)
+      WHERE \(vendorId) IS NOT NULL AND \(eventId) = '8d35f043'
+      ORDER BY \(vendorId), \(createdAt)
+    ) first_launch
+    LEFT JOIN (
+      SELECT DISTINCT \(vendorId)
+      FROM \(table: IOSEvent.self)
+      WHERE \(vendorId) IS NOT NULL AND \(eventId) = 'cdb31095'
+    ) success ON first_launch.\(vendorId) = success.\(vendorId)
+    ORDER BY first_launch.\(createdAt) DESC
+    """)
+  }
+
+  var date: Date
+  var deviceType: String
+  var succeeded: Bool
 }

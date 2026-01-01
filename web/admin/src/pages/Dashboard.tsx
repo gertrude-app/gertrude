@@ -10,6 +10,7 @@ import {
   MonitorIcon,
   SmartphoneIcon,
 } from '../components/Icons';
+import InstallsGraph from '../components/InstallsGraph';
 import LoadingState from '../components/LoadingState';
 import SignupGraph from '../components/SignupGraph';
 
@@ -215,6 +216,11 @@ const IOSSection: React.FC<IOSSectionProps> = ({ data }) => (
           },
         ]}
       />
+
+      <div>
+        <h3 className="font-display font-medium text-slate-900 mb-3">Recent Installs</h3>
+        <InstallsGraph installs={data.recentInstalls} />
+      </div>
     </div>
   </section>
 );
