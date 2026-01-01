@@ -42,7 +42,7 @@ build-site:
   @pnpm --filter site build
 
 build-storybook:
-  @pnpm --filter @storybook/app build
+  @pnpm exec nx run @storybook/app:build
 
 build-dash:
   @pnpm --filter @dash/app build
@@ -81,10 +81,10 @@ format-check:
   @pnpm prettier --config ../.prettierrc.json --ignore-path ../.prettierignore --log-level warn --check .
 
 lint:
-  @pnpm eslint .
+  @pnpm eslint . --cache
 
 lint-fix:
-  @pnpm eslint . --fix
+  @pnpm eslint . --fix --cache
 
 typecheck:
   @pnpm exec nx run-many --parallel=10 --target=typecheck
