@@ -48,7 +48,7 @@ const App: React.FC = () => {
         <Route path="/" element={<Dashboard />} />
         <Route path="/ios-stats" element={<IOSStats />} />
         <Route path="/ios-devices" element={<IOSDevicesList />} />
-        <Route path="/ios/:vendorId/journey" element={<IOSDeviceJourney />} />
+        <Route path="/ios/:vendorId/events" element={<IOSDeviceJourney />} />
         <Route path="/parents" element={<ParentsList />} />
         <Route path="/parents/:id" element={<ParentDetail />} />
         <Route path="*" element={<Navigate to="/" replace />} />

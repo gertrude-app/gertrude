@@ -114,7 +114,7 @@ const IOSDevicesList: React.FC = () => {
             {data.devices.map((device) => (
               <tr
                 key={device.vendorId}
-                onClick={() => navigate(`/ios/${device.vendorId.toLowerCase()}/journey`)}
+                onClick={() => navigate(`/ios/${device.vendorId.toLowerCase()}/events`)}
                 className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
               >
                 <td className="pl-5 pr-4 py-4">
