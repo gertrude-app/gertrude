@@ -57,6 +57,12 @@ Supports all 3 apps, plus dashboard and admin websites
 - generated typesscript clients for websites
 - when working on tasks related to pairql, always read `./swift/docs/pairql.md`
 
+## Templated Emails
+
+- Postmark-based email system for transactional emails
+- templates stored in `./swift/api/Sources/Api/Email/Templates/`
+- when working on email templates, read `./docs/templated-emails.md`
+
 ## Git operations
 
 - only make git commits when explicity instructed
