@@ -10,5 +10,10 @@ export namespace IOSOverview {
     supervisedSuccess: number;
     stuckIn18PlusPath: number;
     successRate: number;
+    recentInstalls: Array<{
+      date: ISODateString;
+      status: string;
+      deviceType: string;
+    }>;
   }
 }
