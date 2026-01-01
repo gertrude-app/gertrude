@@ -32,6 +32,8 @@ enum AdminTsCodegenRoute {
       IOSDevicesList.self,
       IOSDeviceEvents.self,
       PodcastOverview.self,
+      PodcastInstallsList.self,
+      PodcastInstallDetail.self,
       ParentsList.self,
       ParentDetail.self,
     ]

@@ -21,7 +21,7 @@ extension LogPodcastEvent: Resolver {
       if let detail = input.detail {
         msg += " - \(detail)"
       }
-      let search = githubSearch(input.eventId, repo: "gertrude-am")
+      let search = githubSearch(input.eventId)
       let message = "Podcast app event: \(search) \(msg)"
       await slack.internal(.podcasts, message)
 

@@ -8,6 +8,8 @@ enum AuthedAdminRoute: PairRoute {
   case iOSDevicesList(IOSDevicesList.Input)
   case iOSDeviceEvents(IOSDeviceEvents.Input)
   case podcastOverview
+  case podcastInstallsList(PodcastInstallsList.Input)
+  case podcastInstallDetail(PodcastInstallDetail.Input)
   case parentsList(ParentsList.Input)
   case parentDetail(ParentDetail.Input)
 
@@ -31,6 +33,14 @@ enum AuthedAdminRoute: PairRoute {
     }
     Route(.case(Self.podcastOverview)) {
       Operation(PodcastOverview.self)
+    }
+    Route(.case(Self.podcastInstallsList)) {
+      Operation(PodcastInstallsList.self)
+      Body(.input(PodcastInstallsList.self))
+    }
+    Route(.case(Self.podcastInstallDetail)) {
+      Operation(PodcastInstallDetail.self)
+      Body(.input(PodcastInstallDetail.self))
     }
     Route(.case(Self.parentsList)) {
       Operation(ParentsList.self)
@@ -63,6 +73,12 @@ extension AuthedAdminRoute: RouteResponder {
       return try await self.respond(with: output)
     case .podcastOverview:
       let output = try await PodcastOverview.resolve(in: context)
+      return try await self.respond(with: output)
+    case .podcastInstallsList(let input):
+      let output = try await PodcastInstallsList.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .podcastInstallDetail(let input):
+      let output = try await PodcastInstallDetail.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .parentsList(let input):
       let output = try await ParentsList.resolve(with: input, in: context)

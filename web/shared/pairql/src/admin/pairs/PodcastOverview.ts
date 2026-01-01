@@ -6,5 +6,7 @@ export namespace PodcastOverview {
     totalInstalls: number;
     successfulSubscriptions: number;
     conversionRate: number;
+    iPhoneInstalls: number;
+    iPadInstalls: number;
   }
 }

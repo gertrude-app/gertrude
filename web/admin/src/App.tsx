@@ -8,6 +8,8 @@ import IOSStats from './pages/IOSStats';
 import Login from './pages/Login';
 import ParentDetail from './pages/ParentDetail';
 import ParentsList from './pages/ParentsList';
+import PodcastInstallDetail from './pages/PodcastInstallDetail';
+import PodcastInstallsList from './pages/PodcastInstallsList';
 import VerifyToken from './pages/VerifyToken';
 
 const App: React.FC = () => {
@@ -49,6 +51,8 @@ const App: React.FC = () => {
         <Route path="/ios-stats" element={<IOSStats />} />
         <Route path="/ios-devices" element={<IOSDevicesList />} />
         <Route path="/ios/:vendorId/events" element={<IOSDeviceEvents />} />
+        <Route path="/podcasts" element={<PodcastInstallsList />} />
+        <Route path="/podcasts/:installId/detail" element={<PodcastInstallDetail />} />
         <Route path="/parents" element={<ParentsList />} />
         <Route path="/parents/:id" element={<ParentDetail />} />
         <Route path="*" element={<Navigate to="/" replace />} />

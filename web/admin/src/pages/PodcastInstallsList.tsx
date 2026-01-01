@@ -3,17 +3,17 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
 import ErrorState from '../components/ErrorState';
-import { IPadIcon, IPhoneIcon, SmartphoneIcon } from '../components/Icons';
+import { IPadIcon, IPhoneIcon, MicIcon } from '../components/Icons';
 import LoadingState from '../components/LoadingState';
 import Pagination from '../components/Pagination';
 import { formatDateTime } from '../lib/format';
 
-const IOSDevicesList: React.FC = () => {
+const PodcastInstallsList: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get(`page`) ?? `1`, 10);
 
-  const [data, setData] = useState<T.IOSDevicesList.Output | null>(null);
+  const [data, setData] = useState<T.PodcastInstallsList.Output | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,10 +22,10 @@ const IOSDevicesList: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const result = await client.iOSDevicesList({ page, pageSize: 30 });
+      const result = await client.podcastInstallsList({ page, pageSize: 30 });
 
       if (result.isError) {
-        setError(result.error?.debugMessage ?? `Failed to load iOS devices`);
+        setError(result.error?.debugMessage ?? `Failed to load podcast installs`);
         setLoading(false);
         return;
       }
@@ -42,11 +42,11 @@ const IOSDevicesList: React.FC = () => {
   };
 
   if (loading) {
-    return <LoadingState context="iOS devices" gradient="blue" />;
+    return <LoadingState context="podcast installs" gradient="green" />;
   }
 
   if (error) {
-    return <ErrorState context="iOS devices" error={error} />;
+    return <ErrorState context="podcast installs" error={error} />;
   }
 
   if (!data) {
@@ -57,15 +57,15 @@ const IOSDevicesList: React.FC = () => {
     <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
-            <SmartphoneIcon className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <MicIcon className="w-5 h-5 text-white" />
           </div>
           <div>
             <h1 className="text-2xl font-display font-semibold text-slate-900 tracking-tight">
-              iOS Devices
+              Podcast Installs
             </h1>
             <p className="text-sm text-slate-500">
-              {data.totalCount.toLocaleString()} unique devices
+              {data.totalCount.toLocaleString()} unique installs
             </p>
           </div>
         </div>
@@ -81,10 +81,13 @@ const IOSDevicesList: React.FC = () => {
           <thead>
             <tr className="border-b border-slate-100">
               <th className="text-left pl-5 pr-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-28">
-                Vendor ID
+                Install ID
               </th>
-              <th className="text-left px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-24">
+              <th className="text-left px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-20">
                 Status
+              </th>
+              <th className="text-left px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-16">
+                Feeds
               </th>
               <th className="text-left px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-20">
                 Events
@@ -101,48 +104,57 @@ const IOSDevicesList: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {data.devices.map((device) => (
+            {data.installs.map((install) => (
               <tr
-                key={device.vendorId}
-                onClick={() => navigate(`/ios/${device.vendorId.toLowerCase()}/events`)}
+                key={install.installId}
+                onClick={() =>
+                  navigate(`/podcasts/${install.installId.toLowerCase()}/detail`)
+                }
                 className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
               >
                 <td className="pl-5 pr-4 py-4">
-                  <code className="text-sky-600 group-hover:text-blue-600 font-mono text-sm transition-colors">
-                    {device.vendorId.slice(0, 8).toLowerCase()}
+                  <code className="text-emerald-600 group-hover:text-green-600 font-mono text-sm transition-colors">
+                    {install.installId.slice(0, 8).toLowerCase()}
                   </code>
                 </td>
                 <td className="px-4 py-4">
-                  {device.reachedOptOut ? (
+                  {install.isPaid ? (
                     <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                      Success
+                      Paid
                     </span>
                   ) : (
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
-                      Incomplete
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                      Free
                     </span>
                   )}
                 </td>
                 <td className="px-4 py-4">
                   <span
-                    className={`inline-flex items-center justify-center w-8 h-7 rounded-lg text-sm font-medium ${device.eventCount > 10 ? `bg-violet-100 text-violet-700` : `bg-slate-100 text-slate-500`}`}
+                    className={`inline-flex items-center justify-center w-8 h-7 rounded-lg text-sm font-medium ${install.feedCount > 0 ? `bg-emerald-100 text-emerald-700` : `bg-slate-100 text-slate-500`}`}
                   >
-                    {device.eventCount}
+                    {install.feedCount}
                   </span>
                 </td>
-                <td className="px-4 py-4 text-sm text-slate-500">{device.iosVersion}</td>
+                <td className="px-4 py-4">
+                  <span
+                    className={`inline-flex items-center justify-center w-8 h-7 rounded-lg text-sm font-medium ${install.eventCount > 10 ? `bg-violet-100 text-violet-700` : `bg-slate-100 text-slate-500`}`}
+                  >
+                    {install.eventCount}
+                  </span>
+                </td>
+                <td className="px-4 py-4 text-sm text-slate-500">{install.iosVersion}</td>
                 <td className="px-4 py-4 text-sm text-slate-700">
                   <span className="inline-flex items-center gap-1.5">
-                    {device.deviceType.toLowerCase().includes(`ipad`) ? (
+                    {install.deviceType.toLowerCase().includes(`ipad`) ? (
                       <IPadIcon className="w-4 h-4 text-violet-400" />
                     ) : (
-                      <IPhoneIcon className="w-4 h-4 text-sky-400" />
+                      <IPhoneIcon className="w-4 h-4 text-emerald-400" />
                     )}
-                    {device.deviceType}
+                    {install.deviceType}
                   </span>
                 </td>
                 <td className="pl-4 pr-5 py-4 text-sm text-slate-500 text-right whitespace-nowrap">
-                  {formatDateTime(device.firstLaunch)}
+                  {formatDateTime(install.firstLaunch)}
                 </td>
               </tr>
             ))}
@@ -161,4 +173,4 @@ const IOSDevicesList: React.FC = () => {
   );
 };
 
-export default IOSDevicesList;
+export default PodcastInstallsList;

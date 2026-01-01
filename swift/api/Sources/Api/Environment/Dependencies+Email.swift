@@ -117,7 +117,7 @@ extension PostmarkClient {
   }
 
   func unexpected(_ id: String, _ detail: String = "") {
-    let search = "https://github.com/search?q=repo%3Agertrude-app%2Fswift%20\(id)&type=code"
+    let search = "https://github.com/search?q=repo%3Agertrude-app%2Fgertrude%20\(id)&type=code"
     return self.toSuperAdmin(.init(
       to: get(dependency: \.env).superAdminEmail,
       from: "Gertrude App <noreply@gertrude.app>",

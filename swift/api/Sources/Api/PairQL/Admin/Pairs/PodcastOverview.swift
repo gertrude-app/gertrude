@@ -8,6 +8,8 @@ struct PodcastOverview: Pair {
     var totalInstalls: Int
     var successfulSubscriptions: Int
     var conversionRate: Double
+    var iPhoneInstalls: Int
+    var iPadInstalls: Int
   }
 }
 
@@ -25,6 +27,14 @@ extension PodcastOverview: NoInputResolver {
       PastTrialInstallCount.self,
       withBindings: [.string("27c4f26a")],
     )
+    let iPhoneInstalls = try await context.db.count(
+      DeviceTypeInstallCount.self,
+      withBindings: [.string("27c4f26a"), .string("%iPhone%")],
+    )
+    let iPadInstalls = try await context.db.count(
+      DeviceTypeInstallCount.self,
+      withBindings: [.string("27c4f26a"), .string("%iPad%")],
+    )
 
     let rate = pastTrialInstallCount > 0
       ? (Double(subscriptionCount) / Double(pastTrialInstallCount) * 1000).rounded() / 10
@@ -34,6 +44,8 @@ extension PodcastOverview: NoInputResolver {
       totalInstalls: totalInstalls,
       successfulSubscriptions: subscriptionCount,
       conversionRate: rate,
+      iPhoneInstalls: iPhoneInstalls,
+      iPadInstalls: iPadInstalls,
     )
   }
 }
@@ -66,6 +78,27 @@ private struct PastTrialInstallCount: CustomCountable {
     if let eventId = bindings.first {
       stmt.components.append(.binding(eventId))
     }
+    return stmt
+  }
+
+  var count: Int
+}
+
+private struct DeviceTypeInstallCount: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    guard bindings.count == 2 else {
+      return SQL.Statement("SELECT 0 AS count")
+    }
+    let eventId = bindings[0]
+    let devicePattern = bindings[1]
+    var stmt = SQL.Statement("""
+    SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.installId))) AS count
+    FROM \(table: PodcastEvent.self)
+    WHERE \(PodcastEvent.columnName(.eventId)) =\(" ")
+    """)
+    stmt.components.append(.binding(eventId))
+    stmt.components.append(.sql(" AND \(PodcastEvent.columnName(.deviceType)) LIKE "))
+    stmt.components.append(.binding(devicePattern))
     return stmt
   }
 
