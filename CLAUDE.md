@@ -12,6 +12,7 @@ Planning docs:
 - `next.md` - brainstorming prompt and constraints
 - `ios-onboarding-flow.md` - current iOS onboarding state machine reference
 - `supervision-onboarding-recommendations.md` - detailed recommendations and analysis
+- `supervision-flow-script.md` - role-play script of complete happy path (Ben + Luke scenario)
 
 ---
 
