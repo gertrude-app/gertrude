@@ -639,3 +639,23 @@ extension IOSEvent {
     case createdAt
   }
 }
+
+extension IOSApp.PendingSupervision: Duet.Identifiable {
+  typealias Id = Tagged<IOSApp.PendingSupervision, UUID>
+}
+
+extension IOSApp.PendingSupervision {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case code
+    case vendorId
+    case deviceType
+    case iosVersion
+    case appVersion
+    case claimedByParentId
+    case childId
+    case expiresAt
+    case createdAt
+    case updatedAt
+  }
+}

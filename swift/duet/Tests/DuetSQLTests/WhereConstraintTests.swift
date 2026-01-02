@@ -43,6 +43,10 @@ final class WhereConstraintTests: XCTestCase {
         #"("optional_string" IS NULL OR "int" = $1)"#,
         [3],
       ),
+      (.createdAt > .currentTime, #""created_at" > $1"#, [.currentTimestamp]),
+      (.createdAt >= .currentTime, #""created_at" >= $1"#, [.currentTimestamp]),
+      (.createdAt < .currentTime, #""created_at" < $1"#, [.currentTimestamp]),
+      (.createdAt <= .currentTime, #""created_at" <= $1"#, [.currentTimestamp]),
     ]
 
     for (constraint, expectedSQL, expectedParams) in cases {
