@@ -91,3 +91,11 @@ Supports all 3 apps, plus dashboard and admin websites
 
 - never add comments when writing code
 - never remove comments when refactoring code
+
+## Dev "task" concept
+
+Local dev for this monorepo takes place in individual "task" branches with separate
+directories, similar in concept to **git worktrees.** If I refer to another "task", it
+means another directory. You can list out other tasks by `ls`-ing the directory above your
+cwd. You may read data from any other task, but you may not modify code outside your
+current task unless explicity instructed.
