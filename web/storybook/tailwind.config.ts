@@ -8,6 +8,7 @@ const config: Config = {
     `../site/components/**/*.tsx`,
     `../shared/components/src/**/*.tsx`,
     `../appviews/src/**/*.tsx`,
+    `../supervise/src/**/*.tsx`,
   ],
   presets: [require(`@shared/tailwind`)],
 };

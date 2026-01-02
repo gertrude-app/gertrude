@@ -254,6 +254,7 @@ export default defineConfig([
       `site/tailwind.config.js`,
       `storybook/tailwind.config.ts`,
       `shared/tailwind/src/preset.js`,
+      `supervise/tailwind.config.cjs`,
     ],
     rules: {
       '@typescript-eslint/no-require-imports': `off`,

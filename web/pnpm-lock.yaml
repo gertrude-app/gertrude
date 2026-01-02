@@ -614,6 +614,9 @@ importers:
       '@storybook/react':
         specifier: 10.1.10
         version: 10.1.10(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@10.1.10(@testing-library/dom@10.4.0)(prettier@3.5.3)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.3)
+      '@supervise/ui':
+        specifier: workspace:*
+        version: link:../supervise
       '@types/dash-ambient':
         specifier: workspace:*
         version: link:../dash/ambient
@@ -653,6 +656,34 @@ importers:
       ts-node:
         specifier: 10.9.1
         version: 10.9.1(@types/node@22.19.3)(typescript@5.8.3)
+
+  supervise:
+    dependencies:
+      '@shared/components':
+        specifier: workspace:*
+        version: link:../shared/components
+      '@shared/tailwind':
+        specifier: workspace:*
+        version: link:../shared/tailwind
+      classnames:
+        specifier: 2.5.1
+        version: 2.5.1
+      react:
+        specifier: 19.1.0
+        version: 19.1.0
+      react-dom:
+        specifier: 19.1.0
+        version: 19.1.0(react@19.1.0)
+    devDependencies:
+      '@types/react':
+        specifier: 19.1.8
+        version: 19.1.8
+      '@types/react-dom':
+        specifier: 19.1.6
+        version: 19.1.6(@types/react@19.1.8)
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
 
 packages:
 
