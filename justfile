@@ -18,6 +18,7 @@ api:
   @cd swift && just run-api
 
 watch-api:
+  @lsof -ti:8080 | xargs -r kill -9
   @cd swift && just watch-api
 
 # combined commands

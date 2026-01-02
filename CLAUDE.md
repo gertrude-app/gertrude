@@ -54,6 +54,7 @@ Supports all 3 apps, plus dashboard and admin websites
 - `./swift/api`
 - swift vapor api webapp + postgresskil
 - if relevant, read `./swift/CLAUDE.md`
+- the correct way to start the local API is `just watch-api` from the root dir
 
 ## PairQL
 
@@ -99,3 +100,7 @@ directories, similar in concept to **git worktrees.** If I refer to another "tas
 means another directory. You can list out other tasks by `ls`-ing the directory above your
 cwd. You may read data from any other task, but you may not modify code outside your
 current task unless explicity instructed.
+
+## Task-specific instructions (may not be present)
+
+- @./claude.task.md
