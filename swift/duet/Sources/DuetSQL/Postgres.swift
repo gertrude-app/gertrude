@@ -144,3 +144,7 @@ extension Postgres.Data: ExpressibleByBooleanLiteral {
     self = .bool(value)
   }
 }
+
+public extension Postgres.Data {
+  static var currentTime: Self { .currentTimestamp }
+}

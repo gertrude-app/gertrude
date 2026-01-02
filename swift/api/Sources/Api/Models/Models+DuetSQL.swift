@@ -1134,3 +1134,41 @@ extension SuperAdminToken: Model {
     ]
   }
 }
+
+extension IOSApp.PendingSupervision: Model {
+  public static let schemaName = "iosapp"
+  public static let tableName = "pending_supervisions"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .code: .int(self.code)
+    case .vendorId: .uuid(self.vendorId)
+    case .deviceType: .string(self.deviceType)
+    case .iosVersion: .string(self.iosVersion)
+    case .appVersion: .string(self.appVersion)
+    case .claimedByParentId: .uuid(self.claimedByParentId)
+    case .childId: .uuid(self.childId)
+    case .expiresAt: .date(self.expiresAt)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .code: .int(self.code),
+      .vendorId: .uuid(self.vendorId),
+      .deviceType: .string(self.deviceType),
+      .iosVersion: .string(self.iosVersion),
+      .appVersion: .string(self.appVersion),
+      .claimedByParentId: .uuid(self.claimedByParentId),
+      .childId: .uuid(self.childId),
+      .expiresAt: .date(self.expiresAt),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}

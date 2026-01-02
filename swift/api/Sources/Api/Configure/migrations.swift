@@ -55,6 +55,7 @@ extension Configure {
     app.migrations.add(ReleaseMinVersion())
     app.migrations.add(SuperAdminTokens())
     app.migrations.add(IOSEvents())
+    app.migrations.add(PendingSupervisions())
   }
 }
 

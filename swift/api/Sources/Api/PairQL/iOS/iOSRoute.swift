@@ -16,6 +16,9 @@ extension IOSRoute: RouteResponder {
       case .connectDevice(let input):
         let output = try await ConnectDevice.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .createPendingSupervision(let input):
+        let output = try await CreatePendingSupervision.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       case .defaultBlockRules(let input):
         let output = try await DefaultBlockRules.resolve(with: input, in: context)
         return try await self.respond(with: output)

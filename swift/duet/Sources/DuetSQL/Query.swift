@@ -168,4 +168,8 @@ public struct DuetQuery<M: Model>: Sendable {
   public func count(in db: any DuetSQL.Client) async throws -> Int {
     try await db.count(M.self, where: self.constraint, withSoftDeleted: self._withSoftDeleted)
   }
+
+  public func exists(in db: any DuetSQL.Client) async throws -> Bool {
+    try await self.count(in: db) > 0
+  }
 }
