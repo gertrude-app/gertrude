@@ -31,8 +31,11 @@ extension LogIOSEvent: Resolver {
        input.eventId == "8d35f043",
        let vendorId = input.vendorId {
       let adminUrl = context.env.get("ADMIN_SITE_URL") ?? "http://localhost:4243"
-      let adminLink = "\(adminUrl)/ios/\(vendorId.lowercased)/events"
-      let message = "iOS first launch: \(adminLink)"
+      let eventLink = "\(adminUrl)/ios/\(vendorId.lowercased)/events"
+      let events = Slack.link(to: eventLink, withText: "events")
+      let region = detail?.split(separator: "").last.map { String($0) } ?? "`unknown`"
+      let stats = "region: \(region), device: \(input.deviceType), ios: \(input.iOSVersion)"
+      let message = "*iOS First Launch*, \(stats) \(events)"
       await get(dependency: \.slack).internal(.iosOnboarding, message)
     }
 
