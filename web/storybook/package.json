@@ -13,6 +13,7 @@
     "@dash/keys": "workspace:*",
     "@dash/types": "workspace:*",
     "@macos/appviews": "workspace:*",
+    "@supervise/ui": "workspace:*",
     "@shared/components": "workspace:*",
     "@shared/datetime": "workspace:*",
     "@shared/tailwind": "workspace:*",
