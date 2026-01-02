@@ -7,6 +7,7 @@
 ## Pre-Implementation Assessment
 
 - [00_dashboard-ios-routes-assessment.md](./00_dashboard-ios-routes-assessment.md) - Analysis of existing hidden `/ios-devices` routes and recommendations for feature gating
+- [00_profile-removal-prevention.md](./00_profile-removal-prevention.md) - Research on `PayloadRemovalDisallowed` and profile replacement mechanisms for locked profiles
 
 ## Legend
 

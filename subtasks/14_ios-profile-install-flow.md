@@ -10,12 +10,12 @@ Implement profile download and installation guidance screens.
 
 ## Dependencies
 
-**Blocked by:** Task 07 (profile serving API), Task 11 (state machine)
-**Blocks:** Nothing
+**Blocked by:** Task 07 (profile serving API), Task 11 (state machine) **Blocks:** Nothing
 
 ## Details
 
-Build the screens that guide users through downloading and installing the configuration profile that enables content filtering.
+Build the screens that guide users through downloading and installing the configuration
+profile that enables content filtering.
 
 ### Screen 1: Prompt Install Profile (`promptInstallProfile`)
 
@@ -55,6 +55,7 @@ Build the screens that guide users through downloading and installing the config
 ### Screen 3: Installing Profile (`installingProfile`)
 
 On "Got it":
+
 1. Get profile URL from API
 2. Open Safari WebView to profile URL
 3. Profile auto-downloads
@@ -87,6 +88,7 @@ Implementation: Use `ASWebAuthenticationSession` or `SFSafariViewController`
 ### Screen 5: Verifying (`verifyingProfileInstall`)
 
 After user returns from Settings:
+
 1. Poll/check if filter is now running
 2. Show loading spinner
 3. If running → success
@@ -119,3 +121,9 @@ After user returns from Settings:
 - Follow existing pattern from `dontGetTrickedPreAuth` screens
 - Consider: what if user cancels in Safari? Retry option
 - Consider: what if profile already downloaded but not installed?
+
+### Related Research
+
+- [00_profile-removal-prevention.md](./00_profile-removal-prevention.md) -
+  `PayloadRemovalDisallowed`, profile replacement mechanism, and recommended
+  update/removal flows
