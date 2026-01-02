@@ -47,9 +47,39 @@ struct PendingSupervisions: GertieMigration {
       FOREIGN KEY (child_id)
       REFERENCES parent.children(id) ON DELETE SET NULL;
     """)
+
+    try await sql.execute("""
+      ALTER TABLE child.ios_devices
+      ADD COLUMN supervised_at TIMESTAMPTZ;
+    """)
+
+    try await sql.execute("""
+      ALTER TABLE child.ios_devices
+      ADD COLUMN udid TEXT;
+    """)
+
+    try await sql.execute("""
+      ALTER TABLE child.ios_devices
+      ADD COLUMN profile_first_installed_at TIMESTAMPTZ;
+    """)
   }
 
   func down(sql: SQLDatabase) async throws {
+    try await sql.execute("""
+      ALTER TABLE child.ios_devices
+      DROP COLUMN profile_first_installed_at;
+    """)
+
+    try await sql.execute("""
+      ALTER TABLE child.ios_devices
+      DROP COLUMN udid;
+    """)
+
+    try await sql.execute("""
+      ALTER TABLE child.ios_devices
+      DROP COLUMN supervised_at;
+    """)
+
     try await sql.execute("""
       DROP TABLE iosapp.pending_supervisions;
     """)

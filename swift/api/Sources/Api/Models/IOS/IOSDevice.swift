@@ -10,6 +10,9 @@ extension IOSApp {
     var appVersion: String
     var iosVersion: String
     var webPolicy: String
+    var supervisedAt: Date?
+    var udid: String?
+    var profileFirstInstalledAt: Date?
     var createdAt = Date()
     var updatedAt = Date()
 
@@ -21,6 +24,9 @@ extension IOSApp {
       appVersion: String,
       iosVersion: String,
       webPolicy: String = "blockAll",
+      supervisedAt: Date? = nil,
+      udid: String? = nil,
+      profileFirstInstalledAt: Date? = nil,
     ) {
       self.id = id ?? .init(get(dependency: \.uuid)())
       self.childId = childId
@@ -29,6 +35,9 @@ extension IOSApp {
       self.appVersion = appVersion
       self.iosVersion = iosVersion
       self.webPolicy = webPolicy
+      self.supervisedAt = supervisedAt
+      self.udid = udid
+      self.profileFirstInstalledAt = profileFirstInstalledAt
     }
   }
 }

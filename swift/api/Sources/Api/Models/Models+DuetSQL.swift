@@ -136,6 +136,9 @@ extension IOSApp.Device: Model {
     case .appVersion: .string(self.appVersion)
     case .iosVersion: .string(self.iosVersion)
     case .webPolicy: .string(self.webPolicy)
+    case .supervisedAt: .date(self.supervisedAt)
+    case .udid: .string(self.udid)
+    case .profileFirstInstalledAt: .date(self.profileFirstInstalledAt)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -150,6 +153,9 @@ extension IOSApp.Device: Model {
       .appVersion: .string(self.appVersion),
       .iosVersion: .string(self.iosVersion),
       .webPolicy: .string(self.webPolicy),
+      .supervisedAt: .date(self.supervisedAt),
+      .udid: .string(self.udid),
+      .profileFirstInstalledAt: .date(self.profileFirstInstalledAt),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

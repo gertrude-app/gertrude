@@ -103,6 +103,9 @@ extension IOSApp.Device {
     case appVersion
     case iosVersion
     case webPolicy
+    case supervisedAt
+    case udid
+    case profileFirstInstalledAt
     case createdAt
     case updatedAt
   }
