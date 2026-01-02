@@ -8,5 +8,10 @@ export namespace PodcastOverview {
     conversionRate: number;
     iPhoneInstalls: number;
     iPadInstalls: number;
+    recentInstalls: Array<{
+      date: ISODateString;
+      deviceType: string;
+      isPaid: boolean;
+    }>;
   }
 }

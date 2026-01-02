@@ -12,6 +12,7 @@ import {
 } from '../components/Icons';
 import InstallsGraph from '../components/InstallsGraph';
 import LoadingState from '../components/LoadingState';
+import PodcastInstallsGraph from '../components/PodcastInstallsGraph';
 import SignupGraph from '../components/SignupGraph';
 
 const Dashboard: React.FC = () => {
@@ -295,6 +296,13 @@ const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {
             },
           ]}
         />
+
+        <div>
+          <h3 className="font-display font-medium text-slate-900 mb-3">
+            Recent Installs
+          </h3>
+          <PodcastInstallsGraph installs={data.recentInstalls} />
+        </div>
       </div>
     </section>
   );

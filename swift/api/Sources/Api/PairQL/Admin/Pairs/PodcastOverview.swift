@@ -10,6 +10,13 @@ struct PodcastOverview: Pair {
     var conversionRate: Double
     var iPhoneInstalls: Int
     var iPadInstalls: Int
+    var recentInstalls: [RecentInstall]
+  }
+
+  struct RecentInstall: PairNestable {
+    var date: Date
+    var deviceType: String
+    var isPaid: Bool
   }
 }
 
@@ -40,12 +47,22 @@ extension PodcastOverview: NoInputResolver {
       ? (Double(subscriptionCount) / Double(pastTrialInstallCount) * 1000).rounded() / 10
       : 0.0
 
+    let recentInstalls = try await context.db.customQuery(RecentInstallsQuery.self)
+      .map { row in
+        RecentInstall(
+          date: row.date,
+          deviceType: row.deviceType,
+          isPaid: row.isPaid,
+        )
+      }
+
     return .init(
       totalInstalls: totalInstalls,
       successfulSubscriptions: subscriptionCount,
       conversionRate: rate,
       iPhoneInstalls: iPhoneInstalls,
       iPadInstalls: iPadInstalls,
+      recentInstalls: recentInstalls,
     )
   }
 }
@@ -103,4 +120,35 @@ private struct DeviceTypeInstallCount: CustomCountable {
   }
 
   var count: Int
+}
+
+private struct RecentInstallsQuery: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    let installId = PodcastEvent.columnName(.installId)
+    let eventId = PodcastEvent.columnName(.eventId)
+    let createdAt = PodcastEvent.columnName(.createdAt)
+    let deviceType = PodcastEvent.columnName(.deviceType)
+    return SQL.Statement("""
+    SELECT
+      first_launch.\(createdAt) AS date,
+      first_launch.\(deviceType) AS device_type,
+      CASE WHEN paid.\(installId) IS NOT NULL THEN TRUE ELSE FALSE END AS is_paid
+    FROM (
+      SELECT DISTINCT ON (\(installId)) \(installId), \(createdAt), \(deviceType)
+      FROM \(table: PodcastEvent.self)
+      WHERE \(installId) IS NOT NULL AND \(eventId) = '27c4f26a'
+      ORDER BY \(installId), \(createdAt)
+    ) first_launch
+    LEFT JOIN (
+      SELECT DISTINCT \(installId)
+      FROM \(table: PodcastEvent.self)
+      WHERE \(installId) IS NOT NULL AND \(eventId) = 'a72104d7'
+    ) paid ON first_launch.\(installId) = paid.\(installId)
+    ORDER BY first_launch.\(createdAt) DESC
+    """)
+  }
+
+  var date: Date
+  var deviceType: String
+  var isPaid: Bool
 }
