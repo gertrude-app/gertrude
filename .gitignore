@@ -1,30 +1,54 @@
+# OS and editor files
 .DS_Store
 *.swp
+*.log
 Session.vim*
+
+# Environment files
 .env
 **/.env
 **/.env.local
 swift/api/.env*
+
+# Dependencies
 node_modules/
+
+# Swift build artifacts
 **/.build/
 **/.swiftpm/
 **/xcuserdata/
+**/DerivedData/
 buildServer.json
+
+# SQL dumps
 *.sql
+
+# Web build artifacts
 **/.next
 **/out
 **/dist
 **/tsconfig.tsbuildinfo
 .eslintcache
 .nx/
+
+# Generated files
 web/appviews/src/main.tsx
+
+# Build output directories
 web/storybook/storybook-static/
 web/dash/app/build
+
+# Test artifacts
 web/dash/app/cypress/screenshots
 web/smoke/cypress.env.json
 **/cypress/downloads
 **/cypress/videos
 .playwright-mcp/
+
+# Podcasts app
 swift/podcasts/GertiePodcasts.xcodeproj/
 swift/podcasts/previews
+
+# Local task files
 tasks.md
+claude.task.md

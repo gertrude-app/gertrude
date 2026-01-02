@@ -1,7 +1,5 @@
-lib-ios/.build
+# Xcode
 /Packages
-xcuserdata/
-DerivedData/
-**/.swiftpm
-*.pbxuser
+
+# Local config
 config/Local.xcconfig

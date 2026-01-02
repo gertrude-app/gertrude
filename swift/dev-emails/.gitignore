@@ -1,5 +1,4 @@
-
-dist
+# SolidJS/Vinxi build artifacts
 .solid
 .output
 .vercel
@@ -7,23 +6,9 @@ dist
 .vinxi
 app.config.timestamp_*.js
 
-# Environment
-.env
-.env*.local
-
-# dependencies
-/node_modules
-
-# IDEs and editors
+# IDE files (not covered by root)
 /.idea
 .project
 .classpath
 *.launch
 .settings/
-
-# Temp
-gitignore
-
-# System Files
-.DS_Store
-Thumbs.db
