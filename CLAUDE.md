@@ -54,6 +54,7 @@ Supports all 3 apps, plus dashboard and admin websites
 - `./swift/api`
 - swift vapor api webapp + postgresskil
 - if relevant, read `./swift/CLAUDE.md`
+- the correct way to start the local API is `just watch-api` from the root dir
 
 ## PairQL
 
