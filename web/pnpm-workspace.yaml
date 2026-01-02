@@ -6,6 +6,7 @@ packages:
   - storybook
   - smoke
   - admin
+  - supervise
 
 onlyBuiltDependencies:
   - core-js-pure

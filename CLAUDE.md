@@ -30,35 +30,41 @@ below.
 ### Mac App
 
 - `./swift/macapp`
-- read `./swift/CLAUDE.md`
+- if relevant, read `./swift/CLAUDE.md`
 - UI is implemented with webviews and embedded react apps from `./web/appviews`
 
 ### iOS App
 
 - `./swift/iosapp`
-- read `./swift/CLAUDE.md`
+- if relevant, read `./swift/CLAUDE.md`
+
+### Supervision Tool
+
+- UI only for cross-platform (Windows/Mac) ios device supervision tool
+- `./web/supervise/`
+- if relevant, read `./web/supervise/CLAUDE.md`
 
 ### Podcast app (Gertrude AM)
 
 - `./swift/podcasts`
-- read `./swift/podcasts/CLAUDE.md`
+- if relevant, read `./swift/podcasts/CLAUDE.md`
 
 ## Production Websites:
 
 ### Dashboard (Gertrude for Parents)
 
 - `./web/dash`
-- read `./web/CLAUDE.md`
+- if relevant, read `./web/CLAUDE.md`
 
 ### Marketing Site
 
 - `./web/site`
-- read `./web/CLAUDE.md`
+- if relevant, read `./web/CLAUDE.md`
 
 ### Admin Site
 
 - `./web/admin`
-- read `./web/CLAUDE.md`
+- if relevant, read `./web/CLAUDE.md`
 - only used by Gertrude staff
 
 ## API
@@ -67,9 +73,9 @@ Supports all 3 apps, plus dashboard and admin websites
 
 - `./swift/api`
 - swift vapor api webapp + postgresskil
-- read `./swift/CLAUDE.md`
+- if relevant, read `./swift/CLAUDE.md`
 
-## Pairql
+## PairQL
 
 - typesafe remote procedure call framework used by the apps, websites and api
 - implemented in `./swift/api` and `./swift/pairql*` packages
@@ -80,7 +86,6 @@ Supports all 3 apps, plus dashboard and admin websites
 ## Templated Emails
 
 - Postmark-based email system for transactional emails
-- templates stored in `./swift/api/Sources/Api/Email/Templates/`
 - when working on email templates, read `./docs/templated-emails.md`
 
 ## Git operations
@@ -100,7 +105,7 @@ Supports all 3 apps, plus dashboard and admin websites
 
 - project uses code generation for swift/typescript interop, pairql typescript clients,
   macapp webviews
-- read `./docs/codegen.md`
+- if relevant, read `./docs/codegen.md`
 
 ## Comment policy
 
