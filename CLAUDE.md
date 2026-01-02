@@ -18,6 +18,10 @@ Implementation tasks:
 
 - [`subtasks/README.md`](./subtasks/README.md) - 21 implementation tasks with dependencies and ordering
 
+Workflow:
+
+- [`task-spinoff-instructions.md`](./task-spinoff-instructions.md) - how to spin out implementation tasks from this planning directory
+
 ---
 
 Apps and supporting libraries for Gertrude parental controls.
