@@ -10,7 +10,7 @@ Create `gertrude.app/s/{code}` landing page with auth and tool download.
 
 ## Dependencies
 
-**Blocked by:** Tasks 03, 04 (CreatePendingSupervision, ClaimSupervisionCode APIs)
+**Blocked by:** Tasks 01, 04 (CreatePendingSupervision, ClaimSupervisionCode APIs)
 **Blocks:** Nothing
 
 ## Details

@@ -2,7 +2,7 @@
 
 ## Overview
 
-21 tasks to implement supervised device onboarding for 18+ users. This enables adults to use Gertrude on their iOS devices without requiring Apple Configurator or device erasure.
+20 tasks to implement supervised device onboarding for 18+ users. This enables adults to use Gertrude on their iOS devices without requiring Apple Configurator or device erasure.
 
 ## Pre-Implementation Assessment
 
@@ -23,7 +23,7 @@
 
 | # | Task | Type | Blocks |
 |---|------|------|--------|
-| 01 | [ios-pending-supervision-model](./01_ios-pending-supervision-model.md) | 🔒 📦 | Tasks 03-08 |
+| 01 | [ios-pending-supervision-model](./01_ios-pending-supervision-model.md) | 🔒 📦 | Tasks 04-08, 12, 17, 20 |
 | 02 | [ios-device-supervision-fields](./02_ios-device-supervision-fields.md) | 🔒 📦 | Tasks 04, 06, 08 |
 
 **Can run in parallel:** Tasks 01 and 02
@@ -36,14 +36,15 @@
 
 | # | Task | Type | Blocked By | Blocks |
 |---|------|------|------------|--------|
-| 03 | [api-create-pending-supervision](./03_api-create-pending-supervision.md) | ⚡ 📦 | 01 | 12, 17, 20 |
 | 04 | [api-claim-supervision-code](./04_api-claim-supervision-code.md) | ⚡ 📦 | 01, 02 | 09, 20 |
 | 05 | [api-check-supervision-status](./05_api-check-supervision-status.md) | ⚡ 📦 | 01 | 13 |
 | 06 | [api-mark-supervision-complete](./06_api-mark-supervision-complete.md) | ⚡ 📦 | 01, 02 | 18 |
 | 07 | [api-supervision-profile](./07_api-supervision-profile.md) | ⚡ 📦 | 01 | 14 |
 | 08 | [api-mark-setup-complete](./08_api-mark-setup-complete.md) | ⚡ 📦 | 01, 02 | 15 |
 
-**Maximum parallelism:** 6 concurrent tasks
+**Maximum parallelism:** 5 concurrent tasks
+
+Note: Task 03 (api-create-pending-supervision) was merged into Task 01.
 
 ---
 
@@ -63,7 +64,7 @@
 | # | Task | Type | Blocked By |
 |---|------|------|------------|
 | 11 | [ios-supervision-state-machine](./11_ios-supervision-state-machine.md) | ⚡ | None (start now!) |
-| 12 | [ios-pre-supervision-screens](./12_ios-pre-supervision-screens.md) | ⚡ | 03, 11 |
+| 12 | [ios-pre-supervision-screens](./12_ios-pre-supervision-screens.md) | ⚡ | 01, 11 |
 | 13 | [ios-post-supervision-detection](./13_ios-post-supervision-detection.md) | ⚡ | 05, 11 |
 | 14 | [ios-profile-install-flow](./14_ios-profile-install-flow.md) | ⚡ | 07, 11 |
 | 15 | [ios-connection-verified-flow](./15_ios-connection-verified-flow.md) | ⚡ | 08, 11 |
@@ -75,7 +76,7 @@
 
 | # | Task | Type | Blocked By |
 |---|------|------|------------|
-| 17 | [supervise-code-entry-screen](./17_supervise-code-entry-screen.md) | ⚡ 📦 | 03 |
+| 17 | [supervise-code-entry-screen](./17_supervise-code-entry-screen.md) | ⚡ 📦 | 01 |
 | 18 | [supervise-completion-reporting](./18_supervise-completion-reporting.md) | ⚡ 📦 | 06, 17 |
 | 19 | [supervise-ux-improvements](./19_supervise-ux-improvements.md) | ⚡ 📦 | 17 |
 
@@ -83,7 +84,7 @@
 
 | # | Task | Type | Blocked By |
 |---|------|------|------------|
-| 20 | [web-supervision-landing-page](./20_web-supervision-landing-page.md) | ⚡ 📦 | 03, 04 |
+| 20 | [web-supervision-landing-page](./20_web-supervision-landing-page.md) | ⚡ 📦 | 01, 04 |
 
 ---
 
@@ -99,12 +100,11 @@
 
 ```
 Phase 1 (Foundation):
-  01 ─────┬─→ Phase 2
+  01 ─────┬─→ Phase 2 + some Phase 3 (12, 17, 20)
   02 ─────┘
 
 Phase 2 (API - all parallel):
-  03 ──┬──→ Phase 3
-  04 ──┤
+  04 ──┬──→ Phase 3
   05 ──┤
   06 ──┤
   07 ──┤

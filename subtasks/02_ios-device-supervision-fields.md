@@ -21,7 +21,7 @@ Extend the existing `IOSDevice` model with fields to track supervision status.
 
 ```swift
 // Add to existing IOSDevice model
-var isSupervised: Bool = false
+var supervisedAt: Date?                // When supervision completed
 var supervisionMethod: SupervisionMethod?
 var udid: String?                      // Captured by supervision tool
 var profileInstalledAt: Date?
@@ -36,7 +36,7 @@ enum SupervisionMethod: String, Codable {
 
 ### Migration
 
-- Add `is_supervised` boolean column (default false)
+- Add `supervised_at` timestamp column (nullable)
 - Add `supervision_method` enum/string column (nullable)
 - Add `udid` string column (nullable)
 - Add `profile_installed_at` timestamp column (nullable)

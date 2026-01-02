@@ -2,10 +2,23 @@
 
 This document describes how to spin out implementation tasks from this planning directory.
 
+## Branch Naming Convention
+
+All task branches for this iOS supervision feature use the prefix:
+
+```
+superios-task-{NN}-<short-description>
+```
+
+Examples:
+- `superios-task-01-pending-supervision`
+- `superios-task-02-device-supervision-fields`
+- `superios-task-11-supervision-state-machine`
+
 ## Workflow
 
 1. User requests a task be created (e.g., "spin this out", "create a task for this")
-2. Propose a branch slug for approval (e.g., `ios-pending-supervision-model`)
+2. Propose a branch slug following the naming convention above
 3. Wait for user approval or rename request
 4. Once approved, run: `gtask <slug>`
 5. Create `claude.task.md` in the new task directory (see below)
@@ -22,7 +35,7 @@ Use the current date to locate the newly created directory.
 
 ## Creating claude.task.md
 
-After running `gtask`, create `claude.task.md` in the new task directory with three sections:
+After running `gtask`, create `claude.task.md` in the new task directory with four sections:
 
 ### 1. Context (~10 lines)
 
@@ -49,6 +62,12 @@ Do NOT use @ imports. Just list the absolute paths with guidance to read as need
 A concise summary of what this specific task accomplishes. Pull from the corresponding
 subtask markdown file in `subtasks/`.
 
+### 4. Full Task Document
+
+Append the complete contents of the subtask markdown file from `subtasks/`. This ensures
+the implementing agent has all the detailed specifications, implementation notes, and
+decisions directly in the task file without needing to read external documents.
+
 ## Example claude.task.md
 
 ```markdown
@@ -68,7 +87,13 @@ For additional context, read these files as needed:
 
 # Task Summary
 
-Create the IosPendingSupervisedDevice database model to track supervision requests initiated
-from the iOS app. This table links a parent's account to a pending device via a short code,
-enabling the supervision tool to claim and supervise the device.
+Create the PendingSupervision database model and CreatePendingSupervision API endpoint to
+track supervision requests initiated from the iOS app. This table links a parent's account
+to a pending device via a 6-digit code.
+
+---
+
+# Task Details
+
+(Full contents of the subtask markdown file go here...)
 ```

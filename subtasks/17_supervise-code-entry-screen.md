@@ -10,7 +10,7 @@ Add code entry screen to supervision tool that fetches context from API.
 
 ## Dependencies
 
-**Blocked by:** Task 03 (CreatePendingSupervision - need a way to look up codes)
+**Blocked by:** Task 01 (CreatePendingSupervision - need a way to look up codes)
 **Blocks:** Task 18
 
 ## Details

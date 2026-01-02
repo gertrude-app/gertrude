@@ -10,7 +10,7 @@ Implement pre-supervision UI screens: account check, code generation, and handof
 
 ## Dependencies
 
-**Blocked by:** Task 03 (CreatePendingSupervision API), Task 11 (state machine)
+**Blocked by:** Task 01 (CreatePendingSupervision API), Task 11 (state machine)
 **Blocks:** Nothing
 
 ## Details
