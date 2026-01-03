@@ -323,7 +323,7 @@ public struct IOSReducer {
 
     case (.onboarding(.major(.askIfInAppleFamily)), .secondary):
       self.deps.log(state.screen, action, "0fa6bc2a")
-      state.screen = .onboarding(.supervision(.intro))
+      state.screen = .onboarding(.supervision(.setup(.harderButPossible)))
       return .none
 
     case (.onboarding(.major(.askIfInAppleFamily)), .tertiary):
@@ -344,13 +344,13 @@ public struct IOSReducer {
     case (.onboarding(.major(.askIfOwnsMac)), .primary):
       self.deps.log(state.screen, action, "219ba991")
       state.onboarding.ownsMac = true
-      state.screen = .onboarding(.supervision(.intro))
+      state.screen = .onboarding(.supervision(.setup(.harderButPossible)))
       return .none
 
     case (.onboarding(.major(.askIfOwnsMac)), .secondary):
       self.deps.log(state.screen, action, "c1f63c92")
       state.onboarding.ownsMac = false
-      state.screen = .onboarding(.supervision(.intro))
+      state.screen = .onboarding(.supervision(.setup(.harderButPossible)))
       return .none
 
       // MARK: - apple family
@@ -387,46 +387,155 @@ public struct IOSReducer {
       state.screen = .onboarding(.appleFamily(.checkIfInAppleFamily))
       return .none
 
-      // MARK: - supervision
+      // MARK: - supervision setup
 
-    case (.onboarding(.supervision(.intro)), .primary):
-      self.deps.log(state.screen, action, "ad77fbb6")
-      state.screen = .onboarding(.supervision(.explainSupervision))
+    case (.onboarding(.supervision(.setup(.harderButPossible))), .primary):
+      self.deps.log(state.screen, action, "261ba66b")
+      state.screen = .onboarding(.supervision(.setup(.explainSupervisionConcept)))
       return .none
 
-    case (.onboarding(.supervision(.explainSupervision)), .primary):
-      if state.onboarding.ownsMac != true || state.onboarding.majorOnboarder == .self {
-        self.deps.log(state.screen, action, "896bc216", extra: "NEEDS friend w/ mac")
-        state.screen = .onboarding(.supervision(.explainNeedFriendWithMac))
-      } else {
-        self.deps.log(state.screen, action, "25a77e6a", extra: "HAS friend w/ mac")
-        state.screen = .onboarding(.supervision(.explainRequiresEraseAndSetup))
-      }
+    case (.onboarding(.supervision(.setup(.explainSupervisionConcept))), .primary):
+      self.deps.log(state.screen, action, "a0f78c2c")
+      state.screen = .onboarding(.supervision(.setup(.explainSupervisionOptions)))
       return .none
 
-    case (.onboarding(.supervision(.explainNeedFriendWithMac)), .primary):
-      self.deps.log(state.screen, action, "0c5bdbdd")
-      state.screen = .onboarding(.supervision(.explainRequiresEraseAndSetup))
+    case (.onboarding(.supervision(.setup(.explainSupervisionOptions))), .primary):
+      self.deps.log(state.screen, action, "7023c325")
+      state.screen = .onboarding(.supervision(.setup(.offerWorkaround)))
       return .none
 
-    case (.onboarding(.supervision(.explainNeedFriendWithMac)), .secondary):
-      self.deps.log(state.screen, action, "d858eaf8")
-      state.screen = .onboarding(.supervision(.sorryNoOtherWay))
+    case (.onboarding(.supervision(.setup(.offerWorkaround))), .primary):
+      self.deps.log(state.screen, action, "422d0980")
+      state.screen = .onboarding(.supervision(.setup(.explainSiblingWorkaround)))
       return .none
 
-    case (.onboarding(.supervision(.explainRequiresEraseAndSetup)), .primary):
-      self.deps.log(state.screen, action, "dc1521e6")
-      state.screen = .onboarding(.supervision(.instructions))
+    case (.onboarding(.supervision(.setup(.explainSiblingWorkaround))), .primary):
+      self.deps.log(state.screen, action, "a5229ef2")
+      state.screen = .onboarding(.supervision(.setup(.siblingWorkaroundInstructions)))
       return .none
 
-    case (.onboarding(.supervision(.explainRequiresEraseAndSetup)), .secondary):
-      self.deps.log(state.screen, action, "bee80538")
-      state.screen = .onboarding(.supervision(.sorryNoOtherWay))
+    case (.onboarding(.supervision(.setup(.explainSiblingWorkaround))), .secondary):
+      self.deps.log(state.screen, action, "ed672bfe")
+      state.screen = .onboarding(.supervision(.setup(.explainBirthdayWorkaround)))
       return .none
 
-    case (.onboarding(.supervision(.sorryNoOtherWay)), .secondary):
-      self.deps.log(state.screen, action, "f3b3f3b6")
+    case (.onboarding(.supervision(.setup(.siblingWorkaroundInstructions))), .primary):
+      self.deps.log(state.screen, action, "7bbba656")
+      state.screen = .onboarding(.happyPath(.confirmMinorDevice))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.explainBirthdayWorkaround))), .primary):
+      self.deps.log(state.screen, action, "4c9db46e")
+      state.screen = .onboarding(.supervision(.setup(.birthdayWorkaroundInstructions)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.explainBirthdayWorkaround))), .secondary):
+      self.deps.log(state.screen, action, "359543af")
+      state.screen = .onboarding(.supervision(.setup(.chooseSupervisionPath)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.birthdayWorkaroundInstructions))), .primary):
+      self.deps.log(state.screen, action, "d567937a")
+      state.screen = .onboarding(.happyPath(.confirmMinorDevice))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.chooseSupervisionPath))), .primary):
+      self.deps.log(state.screen, action, "a6b17fd9")
+      state.screen = .onboarding(.supervision(.setup(.askHasProtector)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.chooseSupervisionPath))), .secondary):
+      self.deps.log(state.screen, action, "5cdeb42b")
+      state.screen = .onboarding(.supervision(.setup(.appleConfiguratorInstructions)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.appleConfiguratorInstructions))), _):
+      self.deps.log(state.screen, action, "8c2ed1a5")
       state.screen = .onboarding(.happyPath(.hiThere))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.askHasProtector))), .primary):
+      self.deps.log(state.screen, action, "76a87283")
+      state.screen = .onboarding(.supervision(.setup(.generateSetupCode)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.askHasProtector))), .secondary):
+      self.deps.log(state.screen, action, "f0a2d33c")
+      state.screen = .onboarding(.supervision(.setup(.selfManagementPlaceholder)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.selfManagementPlaceholder))), .primary):
+      self.deps.log(state.screen, action, "84555fc8")
+      state.screen = .onboarding(.happyPath(.hiThere))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.generateSetupCode))), .primary):
+      self.deps.log(state.screen, action, "bc1fd4c0")
+      state.screen = .onboarding(.supervision(.setup(.instructionsForProtector)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.instructionsForProtector))), .primary):
+      self.deps.log(state.screen, action, "0aea6b12")
+      state.screen = .onboarding(.supervision(.setup(.waitingForSupervision)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.waitingForSupervision))), _):
+      self.deps.log(state.screen, action, "65dc5864")
+      return .none
+
+      // MARK: - supervision resume
+
+    case (.onboarding(.supervision(.resume(.supervisionDetected))), .primary):
+      self.deps.log(state.screen, action, "b3462a4a")
+      state.screen = .onboarding(.supervision(.resume(.verifyingConnection)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.verifyingConnection))), _):
+      self.deps.log(state.screen, action, "0eedc6db")
+      return .none
+
+    case (.onboarding(.supervision(.resume(.connectionVerified))), .primary):
+      self.deps.log(state.screen, action, "f6ee934d")
+      state.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.codeNotClaimed))), .primary):
+      self.deps.log(state.screen, action, "ad87c533")
+      state.screen = .onboarding(.supervision(.resume(.verifyingConnection)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.promptInstallProfile))), .primary):
+      self.deps.log(state.screen, action, "7b5b4726")
+      state.screen = .onboarding(.supervision(.resume(.explainProfileDownload)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.explainProfileDownload))), .primary):
+      self.deps.log(state.screen, action, "0cc9747d")
+      state.screen = .onboarding(.supervision(.resume(.installingProfile)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.installingProfile))), _):
+      self.deps.log(state.screen, action, "f2e0454e")
+      state.screen = .onboarding(.supervision(.resume(.explainProfileInstall)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.explainProfileInstall))), .primary):
+      self.deps.log(state.screen, action, "ee2f2b76")
+      state.screen = .onboarding(.supervision(.resume(.verifyingProfileInstall)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.verifyingProfileInstall))), _):
+      self.deps.log(state.screen, action, "d0d44fe4")
+      return .none
+
+    case (.onboarding(.supervision(.resume(.profileInstalled))), .primary):
+      self.deps.log(state.screen, action, "4af7783e")
+      state.screen = .onboarding(.supervision(.resume(.setupComplete)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.setupComplete))), .primary):
+      self.deps.log(state.screen, action, "6ed43005")
+      state.screen = .running(state: .notConnected)
       return .none
 
     // MARK: - error paths

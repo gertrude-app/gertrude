@@ -72,7 +72,7 @@ final class IOSReducerTestsMajor: XCTestCase {
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.intro))
+      $0.screen = .onboarding(.supervision(.setup(.harderButPossible)))
       $0.onboarding.ownsMac = true
     }
   }
@@ -87,7 +87,7 @@ final class IOSReducerTestsMajor: XCTestCase {
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
-      $0.screen = .onboarding(.supervision(.intro))
+      $0.screen = .onboarding(.supervision(.setup(.harderButPossible)))
     }
   }
 
@@ -96,80 +96,71 @@ final class IOSReducerTestsMajor: XCTestCase {
     let store = store(starting: .onboarding(.major(.askIfOwnsMac)))
 
     await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
-      $0.screen = .onboarding(.supervision(.intro))
+      $0.screen = .onboarding(.supervision(.setup(.harderButPossible)))
       $0.onboarding.ownsMac = false
     }
   }
 
+  // TODO: superios re-enable after flow stabilizes
+  // The supervision flow has been completely restructured with new states.
+  // These tests will be rewritten in Task 21 after all iOS tasks complete.
+
   @MainActor
-  func testSupervisionHappiestPath() async throws {
+  func testSupervisionSetupFlow() async throws {
     let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.intro)),
+      screen: .onboarding(.supervision(.setup(.harderButPossible))),
       onboarding: .init(majorOnboarder: .other, ownsMac: true),
     )) {
       IOSReducer()
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.explainSupervision))
+      $0.screen = .onboarding(.supervision(.setup(.explainSupervisionConcept)))
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.explainRequiresEraseAndSetup))
+      $0.screen = .onboarding(.supervision(.setup(.explainSupervisionOptions)))
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.instructions))
+      $0.screen = .onboarding(.supervision(.setup(.offerWorkaround)))
     }
   }
 
   @MainActor
-  func testSupervisionNeedsFriendHasFriendPath() async throws {
+  func testSupervisionWorkaroundPath() async throws {
     let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.intro)),
+      screen: .onboarding(.supervision(.setup(.explainSiblingWorkaround))),
       onboarding: .init(majorOnboarder: .self, ownsMac: true),
     )) {
       IOSReducer()
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.explainSupervision))
+      $0.screen = .onboarding(.supervision(.setup(.siblingWorkaroundInstructions)))
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.explainNeedFriendWithMac))
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) { // <-- "i have a friend"
-      $0.screen = .onboarding(.supervision(.explainRequiresEraseAndSetup))
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
-      $0.screen = .onboarding(.supervision(.sorryNoOtherWay))
+      $0.screen = .onboarding(.happyPath(.confirmMinorDevice))
     }
   }
 
   @MainActor
-  func testSupervisionNeedsFriendNoFriendPath() async throws {
+  func testSupervisionChooseGertrudeTool() async throws {
     let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.intro)),
+      screen: .onboarding(.supervision(.setup(.chooseSupervisionPath))),
       onboarding: .init(majorOnboarder: .self, ownsMac: false),
     )) {
       IOSReducer()
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.explainSupervision))
+      $0.screen = .onboarding(.supervision(.setup(.askHasProtector)))
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.explainNeedFriendWithMac))
+      $0.screen = .onboarding(.supervision(.setup(.generateSetupCode)))
     }
-
-    await store
-      .send(.interactive(.onboardingBtnTapped(.secondary, ""))) { // <-- "don't have a friend"
-        $0.screen = .onboarding(.supervision(.sorryNoOtherWay))
-      }
   }
 
   @MainActor
@@ -186,7 +177,7 @@ final class IOSReducerTestsMajor: XCTestCase {
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
-      $0.screen = .onboarding(.supervision(.intro))
+      $0.screen = .onboarding(.supervision(.setup(.harderButPossible)))
       $0.onboarding.ownsMac = false
     }
   }

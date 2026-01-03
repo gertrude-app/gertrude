@@ -366,36 +366,82 @@ struct AppView: View {
             secondary: self.btn(text: "Not in a family yet", .secondary),
           )
 
-        case .onboarding(.supervision(.intro)):
-          ButtonScreenView(
-            text: "The other way to get Gertrude working is to put this device into “supervised mode.”",
-            primary: self.btn(text: "What’s that?", .primary),
-          )
+        // supervision setup
 
-        case .onboarding(.supervision(.explainSupervision)):
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.harderButPossible))):
           ButtonScreenView(
-            text: "Supervised mode is most often used for devices owned by schools or businesses, and it enables many additional options and restrictions.",
+            text: "Getting this working on a device for someone 18 or older is harder, but we have some options. Let's walk through them.",
             primary: self.btn(text: "Next", .primary),
           )
 
-        case .onboarding(.supervision(.explainNeedFriendWithMac)):
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.explainSupervisionConcept))):
           ButtonScreenView(
-            text:
-            "For supervised mode, you’ll need a trusted friend with a Mac computer to be your administrator. They don’t have to live with you, but they will need physical access to your device to set it up and from time to time after that.",
-            primary: self.btn(text: "I’ve got someone", .primary),
-            secondary: self.btn(text: "I don’t have anyone", .secondary),
+            text: "The solution is to put your device into \"supervised mode.\" This is a special mode that gives an administrator more control over the device.",
+            primary: self.btn(text: "Next", .primary),
           )
 
-        case .onboarding(.supervision(.explainRequiresEraseAndSetup)):
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.explainSupervisionOptions))):
           ButtonScreenView(
-            text: "Setting up supervised mode requires temporarily erasing the device, an administrator with a Mac computer, and about an hour of work. You can restore the content and settings afterwards.",
-            primary: self.btn(text: "Show me how", .primary),
-            secondary: self.btn(text: "No thanks", .secondary),
+            text: "There are two ways to supervise your device: using our Gertrude tool ($10/year, easier), or Apple Configurator (free, but requires erasing your device).",
+            primary: self.btn(text: "Next", .primary),
           )
 
-        case .onboarding(.supervision(.instructions)):
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.offerWorkaround))):
           ButtonScreenView(
-            text: "We have a tutorial and a step-by-step video to guide you through the process.",
+            text: "But wait—there might be an easier way that doesn't require supervision at all.",
+            primary: self.btn(text: "Tell me more", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.explainSiblingWorkaround))):
+          ButtonScreenView(
+            text: "If you have a younger sibling (under 18) whose Apple Account is in your Apple Family, you could sign into their account on this device. Gertrude would then work without supervision.",
+            primary: self.btn(text: "That would work for me", .primary),
+            secondary: self.btn(text: "What else?", .secondary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.siblingWorkaroundInstructions))):
+          ButtonScreenView(
+            text: "To switch accounts: Go to Settings, tap your name at the top, scroll down and tap Sign Out. Then sign in with your family member's Apple ID and come back to this app.",
+            primary: self.btn(text: "I've switched accounts", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.explainBirthdayWorkaround))):
+          ButtonScreenView(
+            text: "Apple allows changing your Apple ID birthday one time. If you changed it to under 18, Gertrude would work without supervision.",
+            primary: self.btn(text: "That would work for me", .primary),
+            secondary: self.btn(text: "Neither works for me", .secondary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.birthdayWorkaroundInstructions))):
+          ButtonScreenView(
+            text: "To change your birthday: Go to Settings, tap your name, then Personal Information, then Birthday. Change it so you're under 18, then come back to this app.",
+            primary: self.btn(text: "I've updated my birthday", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.chooseSupervisionPath))):
+          ButtonScreenView(
+            text: "Choose how you'd like to supervise your device:",
+            primary: self.btn(text: "Use Gertrude tool ($10/yr)", .primary),
+            secondary: self.btn(text: "Use Apple Configurator (free)", .secondary),
+            listItems: [
+              "Gertrude tool: Easier, no device erase, $10/year",
+              "Apple Configurator: Free, but requires Mac and device erase",
+            ],
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.appleConfiguratorInstructions))):
+          ButtonScreenView(
+            text: "We have a tutorial and a step-by-step video to guide you through the Apple Configurator process.",
             primary: .init(text: "Instructions", type: .link(.supervisionTutorial), animate: false),
             secondary: .init(
               text: "Send the link",
@@ -404,12 +450,120 @@ struct AppView: View {
             ),
           )
 
-        case .onboarding(.supervision(.sorryNoOtherWay)):
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.askHasProtector))):
           ButtonScreenView(
-            text: "Sorry, looks like Gertrude won’t be able to help you with this device. Unfortunately we can only install the content blocker when Apple allows us, which is only for a child’s device or a supervised device.",
-            primary: .init(text: "Contact support", type: .link(.support), animate: false),
-            secondary: self.btn(text: "Start over", .secondary),
-            primaryLooksLikeSecondary: true,
+            text: "Do you have someone who can help manage your device? This could be a parent, spouse, friend, or accountability partner.",
+            primary: self.btn(text: "Yes, I have someone", .primary),
+            secondary: self.btn(text: "No, I want to manage myself", .secondary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.selfManagementPlaceholder))):
+          ButtonScreenView(
+            text: "Self-management is coming soon! For now, you'll need someone else to help supervise your device. We're working on a solution for self-management.",
+            primary: self.btn(text: "Start over", .primary),
+            secondary: .init(text: "Contact support", type: .link(.support), animate: false),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.generateSetupCode))):
+          ButtonScreenView(
+            text: "Generating your setup code...",
+            primary: self.btn(text: "Next", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.instructionsForProtector))):
+          ButtonScreenView(
+            text: "Share this code with your protector. They'll need to go to gertrude.app/supervise on their computer to complete the setup.",
+            primary: self.btn(text: "Next", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.waitingForSupervision))):
+          ButtonScreenView(
+            text: "Waiting for your protector to complete the supervision process. Once they're done, your device will restart and you can continue setup here.",
+            primary: self.btn(text: "Refresh", .primary),
+          )
+
+        // supervision resume
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.resume(.supervisionDetected))):
+          ButtonScreenView(
+            text: "Great news! Your device is now supervised. Let's finish setting up Gertrude.",
+            primary: self.btn(text: "Next", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.resume(.verifyingConnection))):
+          ButtonScreenView(
+            text: "Verifying your connection to your protector...",
+            primary: self.btn(text: "Retry", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.resume(.connectionVerified))):
+          ButtonScreenView(
+            text: "Connection verified. Your protector can now manage your device settings.",
+            primary: self.btn(text: "Next", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.resume(.codeNotClaimed))):
+          ButtonScreenView(
+            text: "Your setup code hasn't been claimed yet. Make sure your protector has entered the code at gertrude.app/supervise.",
+            primary: self.btn(text: "Check again", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.resume(.promptInstallProfile))):
+          ButtonScreenView(
+            text: "One more step: we need to install a configuration profile to enable content filtering.",
+            primary: self.btn(text: "Next", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.resume(.explainProfileDownload))):
+          ButtonScreenView(
+            text: "Safari will open to download the profile. After it downloads, you'll see a prompt to install it.",
+            primary: self.btn(text: "Open Safari", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.resume(.installingProfile))):
+          ButtonScreenView(
+            text: "Installing profile... Please follow the prompts in Safari and Settings.",
+            primary: self.btn(text: "Continue", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.resume(.explainProfileInstall))):
+          ButtonScreenView(
+            text: "Open the Settings app, tap 'Profile Downloaded', then tap 'Install' and enter your passcode.",
+            primary: self.btn(text: "I've installed it", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.resume(.verifyingProfileInstall))):
+          ButtonScreenView(
+            text: "Verifying that the content filter is active...",
+            primary: self.btn(text: "Retry", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.resume(.profileInstalled))):
+          ButtonScreenView(
+            text: "Profile installed successfully! Content filtering is now active.",
+            primary: self.btn(text: "Next", .primary),
+          )
+
+        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.resume(.setupComplete))):
+          ButtonScreenView(
+            text: "You're all set! Gertrude is now protecting your device.",
+            primary: self.btn(text: "Done", .primary),
           )
 
         case .supervisionSuccessFirstLaunch:

@@ -111,12 +111,40 @@ extension IOSReducer {
     }
 
     public enum Supervision: Equatable {
-      case intro
-      case explainSupervision
-      case explainNeedFriendWithMac
-      case explainRequiresEraseAndSetup
-      case instructions
-      case sorryNoOtherWay
+      case setup(Setup)
+      case resume(Resume)
+
+      public enum Setup: Equatable {
+        case harderButPossible
+        case explainSupervisionConcept
+        case explainSupervisionOptions
+        case offerWorkaround
+        case explainSiblingWorkaround
+        case siblingWorkaroundInstructions
+        case explainBirthdayWorkaround
+        case birthdayWorkaroundInstructions
+        case chooseSupervisionPath
+        case appleConfiguratorInstructions
+        case askHasProtector
+        case selfManagementPlaceholder
+        case generateSetupCode
+        case instructionsForProtector
+        case waitingForSupervision
+      }
+
+      public enum Resume: Equatable {
+        case supervisionDetected
+        case verifyingConnection
+        case connectionVerified
+        case codeNotClaimed
+        case promptInstallProfile
+        case explainProfileDownload
+        case installingProfile
+        case explainProfileInstall
+        case verifyingProfileInstall
+        case profileInstalled
+        case setupComplete
+      }
     }
 
     public enum AuthFail: Equatable {
