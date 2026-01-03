@@ -1154,8 +1154,7 @@ extension IOSApp.PendingSupervision: Model {
     case .deviceType: .string(self.deviceType)
     case .iosVersion: .string(self.iosVersion)
     case .appVersion: .string(self.appVersion)
-    case .claimedByParentId: .uuid(self.claimedByParentId)
-    case .childId: .uuid(self.childId)
+    case .claimedChildId: .uuid(self.claimedChildId)
     case .expiresAt: .date(self.expiresAt)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
@@ -1170,8 +1169,7 @@ extension IOSApp.PendingSupervision: Model {
       .deviceType: .string(self.deviceType),
       .iosVersion: .string(self.iosVersion),
       .appVersion: .string(self.appVersion),
-      .claimedByParentId: .uuid(self.claimedByParentId),
-      .childId: .uuid(self.childId),
+      .claimedChildId: .uuid(self.claimedChildId),
       .expiresAt: .date(self.expiresAt),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,

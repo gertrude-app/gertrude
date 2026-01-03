@@ -3,6 +3,7 @@ import PairQL
 public enum UnauthedRoute: PairRoute {
   case blockRules(BlockRules.Input)
   case blockRules_v2(BlockRules_v2.Input)
+  case checkSupervisionStatus(CheckSupervisionStatus.Input)
   case connectDevice(ConnectDevice.Input)
   case createPendingSupervision(CreatePendingSupervision.Input)
   case defaultBlockRules(DefaultBlockRules.Input)
@@ -20,6 +21,10 @@ public extension UnauthedRoute {
     Route(.case(Self.blockRules_v2)) {
       Operation(BlockRules_v2.self)
       Body(.json(BlockRules_v2.Input.self))
+    }
+    Route(.case(Self.checkSupervisionStatus)) {
+      Operation(CheckSupervisionStatus.self)
+      Body(.json(CheckSupervisionStatus.Input.self))
     }
     Route(.case(Self.connectDevice)) {
       Operation(ConnectDevice.self)

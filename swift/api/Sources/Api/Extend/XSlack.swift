@@ -12,6 +12,7 @@ extension XSlack.Slack.Client {
     case macosOnboarding = "macos-onboarding"
     case macosLogs = "macos-logs"
     case iosOnboarding = "ios-onboarding"
+    case iosLogs = "ios-logs"
     case unexpectedErrors = "unexpected-errors"
     case expectedErrors = "expected-errors"
     case stripe
