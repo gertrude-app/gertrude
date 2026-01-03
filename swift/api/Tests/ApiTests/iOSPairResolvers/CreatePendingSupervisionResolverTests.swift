@@ -37,8 +37,7 @@ final class CreatePendingSupervisionResolverTests: ApiTestCase, @unchecked Senda
     expect(pending.deviceType).toEqual("iPhone")
     expect(pending.iosVersion).toEqual("18.2")
     expect(pending.appVersion).toEqual("1.0.0")
-    expect(pending.claimedByParentId).toBeNil()
-    expect(pending.childId).toBeNil()
+    expect(pending.claimedChildId).toBeNil()
 
     let secondOutput = try await withDependencies {
       $0.verificationCode = .init(generate: { Int.random(in: 100_000 ... 999_999) })

@@ -8,8 +8,7 @@ extension IOSApp {
     var deviceType: String
     var iosVersion: String
     var appVersion: String
-    var claimedByParentId: Parent.Id?
-    var childId: Child.Id?
+    var claimedChildId: Child.Id?
     var expiresAt: Date
     var createdAt = Date()
     var updatedAt = Date()
@@ -21,8 +20,7 @@ extension IOSApp {
       deviceType: String,
       iosVersion: String,
       appVersion: String,
-      claimedByParentId: Parent.Id? = nil,
-      childId: Child.Id? = nil,
+      claimedChildId: Child.Id? = nil,
       expiresAt: Date,
     ) {
       self.id = id ?? .init(get(dependency: \.uuid)())
@@ -31,8 +29,7 @@ extension IOSApp {
       self.deviceType = deviceType
       self.iosVersion = iosVersion
       self.appVersion = appVersion
-      self.claimedByParentId = claimedByParentId
-      self.childId = childId
+      self.claimedChildId = claimedChildId
       self.expiresAt = expiresAt
     }
   }

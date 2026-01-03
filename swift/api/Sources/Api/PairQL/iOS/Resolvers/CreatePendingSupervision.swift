@@ -34,8 +34,6 @@ extension CreatePendingSupervision: Resolver {
         deviceType: input.deviceType,
         iosVersion: input.iosVersion,
         appVersion: input.appVersion,
-        claimedByParentId: nil,
-        childId: nil,
         expiresAt: now + .days(7),
       ))
       return Output(code: model.code, expiresAt: model.expiresAt)

@@ -655,8 +655,7 @@ extension IOSApp.PendingSupervision {
     case deviceType
     case iosVersion
     case appVersion
-    case claimedByParentId
-    case childId
+    case claimedChildId
     case expiresAt
     case createdAt
     case updatedAt
