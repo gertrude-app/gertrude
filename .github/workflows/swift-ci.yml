@@ -242,6 +242,24 @@ jobs:
       - name: test
         run: cd swift/iosapp/lib-ios && swift test
 
+  iosapp-build:
+    needs: files-changed
+    if: needs.files-changed.outputs.iosapp == 'true' && github.event_name == 'pull_request'
+    runs-on: macos-15
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 26.1.1
+      - name: build
+        run: |
+          cd swift/iosapp
+          touch config/Local.xcconfig
+          xcodebuild -project Gertrude-iOS.xcodeproj -scheme Gertrude-iOS \
+            -skipMacroValidation -destination 'generic/platform=iOS Simulator' build
+
   podcasts-lib:
     needs: files-changed
     if: needs.files-changed.outputs.podcasts == 'true' && github.event_name == 'pull_request'
@@ -324,7 +342,7 @@ jobs:
               - swift/x-kit/**
               - swift/ts-interop/**
             iosapp:
-              - swift/iosapp/lib-ios/**
+              - swift/iosapp/**
               - swift/pairql-iosapp/**
               - swift/pairql/**
               - swift/gertie/**

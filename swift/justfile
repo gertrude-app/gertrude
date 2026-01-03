@@ -19,6 +19,9 @@ watch-ios:
 iosapp:
   @open iosapp/Gertrude-iOS.xcodeproj
 
+iosapp-xcode-build:
+  @pnpm exec nx run iosapp:xcode-build
+
 iosconfig:
   @echo "LOCAL_API_URL = https:/\$()/REPLACE.ngrok-free.app" > iosapp/config/Local.xcconfig
 
@@ -110,6 +113,7 @@ fix:
 
 check:
   @just build
+  @just iosapp-xcode-build
   @just test
   @just lint
 
