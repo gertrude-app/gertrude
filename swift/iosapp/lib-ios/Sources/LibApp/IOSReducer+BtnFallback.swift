@@ -100,21 +100,85 @@ extension IOSReducer.Onboarding.InstallFail {
 
 extension IOSReducer.Onboarding.Supervision {
   func fallbackDestination(from btn: OnboardingBtn) -> IOSReducer.Screen {
+    switch self {
+    case .setup(let setup):
+      setup.fallbackDestination(from: btn)
+    case .resume(let resume):
+      resume.fallbackDestination(from: btn)
+    }
+  }
+}
+
+extension IOSReducer.Onboarding.Supervision.Setup {
+  func fallbackDestination(from btn: OnboardingBtn) -> IOSReducer.Screen {
     switch (self, btn) {
-    case (.explainNeedFriendWithMac, _):
-      .onboarding(.supervision(.explainRequiresEraseAndSetup))
-    case (.explainRequiresEraseAndSetup, .primary):
-      .onboarding(.supervision(.instructions))
-    case (.explainRequiresEraseAndSetup, _):
-      .onboarding(.supervision(.sorryNoOtherWay))
-    case (.explainSupervision, _):
-      .onboarding(.supervision(.explainNeedFriendWithMac))
-    case (.instructions, _):
+    case (.harderButPossible, _):
+      .onboarding(.supervision(.setup(.explainSupervisionConcept)))
+    case (.explainSupervisionConcept, _):
+      .onboarding(.supervision(.setup(.explainSupervisionOptions)))
+    case (.explainSupervisionOptions, _):
+      .onboarding(.supervision(.setup(.offerWorkaround)))
+    case (.offerWorkaround, _):
+      .onboarding(.supervision(.setup(.explainSiblingWorkaround)))
+    case (.explainSiblingWorkaround, .primary):
+      .onboarding(.supervision(.setup(.siblingWorkaroundInstructions)))
+    case (.explainSiblingWorkaround, _):
+      .onboarding(.supervision(.setup(.explainBirthdayWorkaround)))
+    case (.siblingWorkaroundInstructions, _):
+      .onboarding(.happyPath(.confirmMinorDevice))
+    case (.explainBirthdayWorkaround, .primary):
+      .onboarding(.supervision(.setup(.birthdayWorkaroundInstructions)))
+    case (.explainBirthdayWorkaround, _):
+      .onboarding(.supervision(.setup(.chooseSupervisionPath)))
+    case (.birthdayWorkaroundInstructions, _):
+      .onboarding(.happyPath(.confirmMinorDevice))
+    case (.chooseSupervisionPath, .primary):
+      .onboarding(.supervision(.setup(.askHasProtector)))
+    case (.chooseSupervisionPath, _):
+      .onboarding(.supervision(.setup(.appleConfiguratorInstructions)))
+    case (.appleConfiguratorInstructions, _):
       .onboarding(.happyPath(.hiThere))
-    case (.intro, _):
-      .onboarding(.supervision(.explainSupervision))
-    case (.sorryNoOtherWay, _):
+    case (.askHasProtector, .primary):
+      .onboarding(.supervision(.setup(.generateSetupCode)))
+    case (.askHasProtector, _):
+      .onboarding(.supervision(.setup(.selfManagementPlaceholder)))
+    case (.selfManagementPlaceholder, _):
       .onboarding(.happyPath(.hiThere))
+    case (.generateSetupCode, _):
+      .onboarding(.supervision(.setup(.instructionsForProtector)))
+    case (.instructionsForProtector, _):
+      .onboarding(.supervision(.setup(.waitingForSupervision)))
+    case (.waitingForSupervision, _):
+      .onboarding(.supervision(.setup(.waitingForSupervision)))
+    }
+  }
+}
+
+extension IOSReducer.Onboarding.Supervision.Resume {
+  func fallbackDestination(from btn: OnboardingBtn) -> IOSReducer.Screen {
+    switch (self, btn) {
+    case (.supervisionDetected, _):
+      .onboarding(.supervision(.resume(.verifyingConnection)))
+    case (.verifyingConnection, _):
+      .onboarding(.supervision(.resume(.verifyingConnection)))
+    case (.connectionVerified, _):
+      .onboarding(.supervision(.resume(.promptInstallProfile)))
+    case (.codeNotClaimed, _):
+      .onboarding(.supervision(.resume(.verifyingConnection)))
+    case (.promptInstallProfile, _):
+      .onboarding(.supervision(.resume(.explainProfileDownload)))
+    case (.explainProfileDownload, _):
+      .onboarding(.supervision(.resume(.installingProfile)))
+    case (.installingProfile, _):
+      .onboarding(.supervision(.resume(.explainProfileInstall)))
+    case (.explainProfileInstall, _):
+      .onboarding(.supervision(.resume(.verifyingProfileInstall)))
+    case (.verifyingProfileInstall, _):
+      .onboarding(.supervision(.resume(.profileInstalled)))
+    case (.profileInstalled, _):
+      .onboarding(.supervision(.resume(.setupComplete)))
+    case (.setupComplete, _):
+      .running(state: .notConnected)
     }
   }
 }
@@ -125,7 +189,7 @@ extension IOSReducer.Onboarding.Major {
     case (.askIfInAppleFamily, .primary):
       .onboarding(.major(.explainFixAccountTypeEasyWay))
     case (.askIfInAppleFamily, .secondary):
-      .onboarding(.supervision(.intro))
+      .onboarding(.supervision(.setup(.harderButPossible)))
     case (.askIfInAppleFamily, .tertiary):
       .onboarding(.major(.explainAppleFamily))
     case (.askIfOtherIsParent, .primary):
@@ -133,7 +197,7 @@ extension IOSReducer.Onboarding.Major {
     case (.askIfOtherIsParent, _):
       .onboarding(.major(.askIfOwnsMac))
     case (.askIfOwnsMac, _):
-      .onboarding(.supervision(.intro))
+      .onboarding(.supervision(.setup(.harderButPossible)))
     case (.askSelfOrOtherIsOnboarding, .tertiary):
       .onboarding(.major(.askIfInAppleFamily))
     case (.askSelfOrOtherIsOnboarding, _):
