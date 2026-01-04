@@ -2,14 +2,19 @@ import ComposableArchitecture
 import LibApp
 import SwiftUI
 
-struct AppView: View {
+public struct AppView: View {
   @Bindable var store: StoreOf<IOSReducer>
   let osMajorVersion: Int
+
+  public init(store: StoreOf<IOSReducer>, osMajorVersion: Int) {
+    self.store = store
+    self.osMajorVersion = osMajorVersion
+  }
 
   @Environment(\.colorScheme) var cs
   @Environment(\.openURL) var openLink
 
-  var body: some View {
+  public var body: some View {
     Group {
       if let clearCacheStore = self.store.scope(
         state: \.onboarding.clearCache,

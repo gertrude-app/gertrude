@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import LibApp
+import LibViews
 import SwiftUI
 
 @main

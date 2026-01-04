@@ -1,9 +1,16 @@
 import Foundation
+import LibCore
 import SwiftUI
+#if os(iOS)
+  import UIKit
+#endif
 
-func delayed(by delay: Duration, _ callback: @escaping () -> Void) {
+@MainActor
+func delayed(by delay: Duration, _ callback: @escaping @MainActor () -> Void) {
   DispatchQueue.main.asyncAfter(deadline: .now() + delay.inMilliseconds / 1000) {
-    callback()
+    MainActor.assumeIsolated {
+      callback()
+    }
   }
 }
 
@@ -100,9 +107,15 @@ struct SwooshIn: ViewModifier {
 }
 
 extension View {
-  func deviceType() -> UIUserInterfaceIdiom {
-    UIDevice.current.userInterfaceIdiom
-  }
+  #if os(iOS)
+    func deviceType() -> UIUserInterfaceIdiom {
+      UIDevice.current.userInterfaceIdiom
+    }
+  #else
+    func deviceType() -> UIDevice.UserInterfaceIdiom {
+      UIDevice.current.userInterfaceIdiom
+    }
+  #endif
 
   func swooshIn(
     tracking vec: Binding<Vector>,

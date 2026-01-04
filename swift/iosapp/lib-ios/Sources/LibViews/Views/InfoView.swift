@@ -2,8 +2,8 @@ import ComposableArchitecture
 import Dependencies
 import IOSRoute
 import LibApp
+import LibCore
 import SwiftUI
-import UIKit
 
 struct InfoView: View {
   @Bindable var store: StoreOf<InfoFeature>
