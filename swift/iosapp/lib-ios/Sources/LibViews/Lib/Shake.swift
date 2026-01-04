@@ -1,10 +1,8 @@
+import LibCore
 import SwiftUI
 
 #if os(iOS)
-  extension UIDevice {
-    static let deviceDidShakeNotification =
-      Notification.Name(rawValue: "deviceDidShakeNotification")
-  }
+  import UIKit
 
   extension UIWindow {
     override open func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
@@ -19,16 +17,11 @@ struct DeviceShakeViewModifier: ViewModifier {
   let action: () -> Void
 
   func body(content: Content) -> some View {
-    #if os(iOS)
-      let notification = NotificationCenter.default
-        .publisher(for: UIDevice.deviceDidShakeNotification)
-    #else
-      let notification = NotificationCenter.default
-        .publisher(for: Notification.Name("unreachable"))
-    #endif
     content
       .onAppear()
-      .onReceive(notification) { _ in
+      .onReceive(
+        NotificationCenter.default.publisher(for: UIDevice.deviceDidShakeNotification),
+      ) { _ in
         self.action()
       }
   }

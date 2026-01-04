@@ -1,3 +1,4 @@
+import LibCore
 import SwiftUI
 
 struct FairiesView: View {
@@ -41,8 +42,8 @@ struct FairiesView: View {
       for _ in 0 ..< 30 {
         self.sparkles.append(Sparkle(
           position: Vector(
-            x: Double.random(in: 0 ... UIScreen.main.bounds.width),
-            y: Double.random(in: 0 ... UIScreen.main.bounds.height),
+            x: Double.random(in: 0 ... Double(UIScreen.main.bounds.width)),
+            y: Double.random(in: 0 ... Double(UIScreen.main.bounds.height)),
           ),
           velocity: Vector(
             x: Double.random(in: -1 ... 1),
@@ -64,17 +65,17 @@ struct FairiesView: View {
     ) { _ in
       for index in self.sparkles.indices {
         self.sparkles[index].update()
-        if self.sparkles[index].position.y > UIScreen.main.bounds.height + 10 {
+        if self.sparkles[index].position.y > Double(UIScreen.main.bounds.height) + 10 {
           self.sparkles[index].position.y = -10
         }
         if self.sparkles[index].position.y < -10 {
-          self.sparkles[index].position.y = UIScreen.main.bounds.height + 10
+          self.sparkles[index].position.y = Double(UIScreen.main.bounds.height) + 10
         }
-        if self.sparkles[index].position.x > UIScreen.main.bounds.width + 10 {
+        if self.sparkles[index].position.x > Double(UIScreen.main.bounds.width) + 10 {
           self.sparkles[index].position.x = -10
         }
         if self.sparkles[index].position.x < -10 {
-          self.sparkles[index].position.x = UIScreen.main.bounds.width + 10
+          self.sparkles[index].position.x = Double(UIScreen.main.bounds.width) + 10
         }
       }
     }

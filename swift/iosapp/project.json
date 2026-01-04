@@ -1,0 +1,27 @@
+{
+  "root": "iosapp",
+  "projectType": "application",
+  "implicitDependencies": ["lib-ios"],
+  "namedInputs": {
+    "xcode-sources": [
+      "{projectRoot}/app/**/*.swift",
+      "{projectRoot}/app/**/*.plist",
+      "{projectRoot}/app/**/*.entitlements",
+      "{projectRoot}/controller/**/*.swift",
+      "{projectRoot}/controller/**/*.plist",
+      "{projectRoot}/controller/**/*.entitlements",
+      "{projectRoot}/filter/**/*.swift",
+      "{projectRoot}/filter/**/*.plist",
+      "{projectRoot}/filter/**/*.entitlements",
+      "{projectRoot}/config/**/*.xcconfig",
+      "{projectRoot}/Gertrude-iOS.xcodeproj/**/*"
+    ]
+  },
+  "targets": {
+    "xcode-build": {
+      "cache": true,
+      "inputs": ["xcode-sources", "^sources"],
+      "command": "cd iosapp && xcodebuild -project Gertrude-iOS.xcodeproj -scheme Gertrude-iOS -skipMacroValidation -destination 'generic/platform=iOS Simulator' build"
+    }
+  }
+}

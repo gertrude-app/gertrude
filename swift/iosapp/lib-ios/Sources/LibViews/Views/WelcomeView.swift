@@ -109,7 +109,7 @@ struct Background: View {
   @Environment(\.colorScheme) var cs
 
   var body: some View {
-    if #available(iOS 18.0, *) {
+    if #available(iOS 18.0, macOS 15.0, *) {
       MeshGradient(width: 3, height: 6, points: [
         .init(0, 0), .init(0.5, 0), .init(1, 0),
         .init(0, 0.25), .init(0.5, 0.25), .init(1, 0.25),
