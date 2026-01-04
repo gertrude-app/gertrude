@@ -5,13 +5,13 @@ import PostgresKit
 
 extension LogFilterEvents: Resolver {
   static func resolve(with input: Input, in context: MacApp.ChildContext) async throws -> Output {
-    let computerUserId = try await context.computerUser().id
+    let computerUser = try await context.computerUser()
     let events = try await context.db.create(input.events.map { event, count in
       InterestingEvent(
         eventId: event.id,
         kind: "event",
         context: "macapp-filter",
-        computerUserId: computerUserId,
+        computerUserId: computerUser.id,
         parentId: nil,
         detail: [event.detail, count > 1 ? "(\(count)x)" : nil]
           .compactMap(\.self)
@@ -20,10 +20,11 @@ extension LogFilterEvents: Resolver {
     })
 
     let slack = get(dependency: \.slack)
+    let contextInfo = await filterEventContext(context, computerUser)
     for event in events {
       await slack.internal(
         .info,
-        "Macapp *filter* event: \(githubSearch(event.eventId)) \(event.detail ?? "")",
+        "Macapp *filter* event: \(githubSearch(event.eventId)) \(event.detail ?? "")\(contextInfo)",
       )
     }
 
@@ -86,4 +87,20 @@ struct IdentifiedBundleIds: CustomQueryable {
   }
 
   var bundleId: String
+}
+
+private func filterEventContext(
+  _ context: MacApp.ChildContext,
+  _ computerUser: ComputerUser,
+) async -> String {
+  guard let computer = try? await computerUser.computer(in: context.db),
+        let parent = try? await context.child.parent(in: context.db) else {
+    return ""
+  }
+  let computerName = computer.customName ?? computer.modelIdentifier
+  let adminUrl = context.env.get("ADMIN_SITE_URL") ?? "http://localhost:4243"
+  return "\n  -> " + Slack.link(
+    to: "\(adminUrl)/parents/\(parent.id.lowercased)",
+    withText: "\(parent.email), \(context.child.name), \(computerName)",
+  )
 }
