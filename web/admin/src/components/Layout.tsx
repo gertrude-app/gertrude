@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { GertrudeLogo, HomeIcon, LogoutIcon, UsersIcon } from './Icons';
 
 interface LayoutProps {
@@ -9,6 +9,17 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [emailSearch, setEmailSearch] = useState(``);
+
+  const handleEmailSearch = (e: React.FormEvent): void => {
+    e.preventDefault();
+    const trimmed = emailSearch.trim();
+    if (trimmed) {
+      navigate(`/parents?email=${encodeURIComponent(trimmed)}`);
+      setEmailSearch(``);
+    }
+  };
 
   const navLinks = [
     { to: `/`, label: `Home`, icon: HomeIcon },
@@ -56,13 +67,24 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
                 })}
               </div>
             </div>
-            <button
-              onClick={onLogout}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all"
-            >
-              <LogoutIcon className="w-4 h-4" />
-              Logout
-            </button>
+            <div className="flex items-center gap-4">
+              <form onSubmit={handleEmailSearch} className="relative">
+                <input
+                  type="text"
+                  value={emailSearch}
+                  onChange={(e) => setEmailSearch(e.target.value)}
+                  placeholder="Search parent by email..."
+                  className="w-64 px-3 py-1.5 text-sm bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-violet focus:ring-1 focus:ring-brand-violet"
+                />
+              </form>
+              <button
+                onClick={onLogout}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all"
+              >
+                <LogoutIcon className="w-4 h-4" />
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </nav>
