@@ -2,6 +2,54 @@
 import Foundation
 import Tagged
 
+extension ClaimSupervisionCode.ChildAssignment {
+  private struct _NamedCase: Codable {
+    var `case`: String
+    static func extract(from decoder: Decoder) throws -> String {
+      let container = try decoder.singleValueContainer()
+      return try container.decode(_NamedCase.self).case
+    }
+  }
+
+  private struct _TypeScriptDecodeError: Error {
+    var message: String
+  }
+
+  private struct _CaseNewChild: Codable {
+    var `case` = "newChild"
+    var name: String
+  }
+
+  private struct _CaseExistingChild: Codable {
+    var `case` = "existingChild"
+    var id: Tagged<Api.Child, UUID>
+  }
+
+  func encode(to encoder: Encoder) throws {
+    switch self {
+    case .newChild(let name):
+      try _CaseNewChild(name: name).encode(to: encoder)
+    case .existingChild(let id):
+      try _CaseExistingChild(id: id).encode(to: encoder)
+    }
+  }
+
+  init(from decoder: Decoder) throws {
+    let caseName = try _NamedCase.extract(from: decoder)
+    let container = try decoder.singleValueContainer()
+    switch caseName {
+    case "newChild":
+      let value = try container.decode(_CaseNewChild.self)
+      self = .newChild(name: value.name)
+    case "existingChild":
+      let value = try container.decode(_CaseExistingChild.self)
+      self = .existingChild(id: value.id)
+    default:
+      throw _TypeScriptDecodeError(message: "Unexpected case name: `\(caseName)`")
+    }
+  }
+}
+
 extension Parent.NotificationMethod.Config {
   private struct _NamedCase: Codable {
     var `case`: String
