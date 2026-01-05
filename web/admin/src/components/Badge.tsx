@@ -1,7 +1,8 @@
 import React from 'react';
 
-interface BadgeProps {
+interface StatusBadgeProps {
   status: string;
+  size?: `sm` | `md`;
 }
 
 const statusStyles: Record<string, string> = {
@@ -18,13 +19,17 @@ const statusLabels: Record<string, string> = {
   unknown: `Unknown`,
 };
 
-export const StatusBadge: React.FC<BadgeProps> = ({ status }) => (
-  <span
-    className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ring-1 ring-inset ${statusStyles[status] ?? statusStyles.unknown}`}
-  >
-    {statusLabels[status] ?? status}
-  </span>
-);
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = `sm` }) => {
+  const sizeClass =
+    size === `md` ? `px-3 py-1.5 text-sm` : `px-2.5 py-1 rounded-lg text-xs`;
+  return (
+    <span
+      className={`inline-flex items-center rounded-lg font-medium ring-1 ring-inset ${sizeClass} ${statusStyles[status] ?? statusStyles.unknown}`}
+    >
+      {statusLabels[status] ?? status}
+    </span>
+  );
+};
 
 const subscriptionStyles: Record<string, string> = {
   paid: `bg-emerald-50 text-emerald-700 ring-emerald-600/20`,
@@ -65,3 +70,7 @@ export const SubscriptionBadge: React.FC<SubscriptionBadgeProps> = ({
     </span>
   );
 };
+
+export function getSubscriptionLabel(status: string): string {
+  return subscriptionLabels[status] ?? status;
+}

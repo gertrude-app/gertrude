@@ -14,6 +14,7 @@ struct ParentDetail: Pair {
   struct Output: PairOutput {
     var id: Parent.Id
     var email: String
+    var status: String
     var subscriptionStatus: String
     var subscriptionId: String?
     var monthlyPriceInCents: Int
@@ -128,9 +129,14 @@ extension ParentDetail: Resolver {
         )
       }
 
+    let analyticsData = try await AnalyticsQuery.shared.data()
+    let parentData = analyticsData.parents[parent.id]
+    let status = parentData?.status.rawValue ?? "unknown"
+
     return .init(
       id: parent.id,
       email: parent.email.rawValue,
+      status: status,
       subscriptionStatus: parent.subscriptionStatus.rawValue,
       subscriptionId: parent.subscriptionId?.rawValue,
       monthlyPriceInCents: parent.monthlyPrice.rawValue,
