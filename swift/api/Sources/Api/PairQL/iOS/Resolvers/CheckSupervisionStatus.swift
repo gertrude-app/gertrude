@@ -15,12 +15,12 @@ extension CheckSupervisionStatus: Resolver {
     }
 
     if pendingSupervision.vendorId != input.vendorId {
-      log("233c41a8", "vendorId mismatch, c=\(input.code), v=\(input.vendorId)", in: ctx)
+      logIOSUnusual("233c41a8", "vendorId mismatch, c=\(input.code), v=\(input.vendorId)")
       return .notFound
     }
 
     if pendingSupervision.expiresAt < get(dependency: \.date.now) {
-      log("92fe7bb1", "expired, code=\(input.code)", in: ctx)
+      logIOSUnusual("92fe7bb1", "expired, code=\(input.code)")
       return .expired
     }
 
@@ -34,7 +34,7 @@ extension CheckSupervisionStatus: Resolver {
       .first(in: ctx.db)
 
     guard let device else {
-      logUnexpected("05444534", "c=\(input.code), v=\(input.vendorId)", in: ctx)
+      logIOSUnexpected("05444534", "c=\(input.code), v=\(input.vendorId)")
       return .notFound
     }
 
@@ -65,22 +65,23 @@ extension CheckSupervisionStatus: Resolver {
   }
 }
 
-private func log(_ id: String, _ detail: String, in ctx: Context) {
-  guard ctx.env.mode == .prod else { return }
-  let db = ctx.db
+func logIOSUnusual(_ id: String, _ detail: String) {
+  guard get(dependency: \.env.mode) == .prod else { return }
   Task.detached {
-    _ = try? await db.create(InterestingEvent(
+    _ = try? await get(dependency: \.db).create(InterestingEvent(
       eventId: id,
       kind: "event",
       context: "iosapp",
       detail: detail,
     ))
-    await get(dependency: \.slack).internal(.iosLogs, "unusual ios event: `\(id)` \(detail)")
+    await get(dependency: \.slack)
+      .internal(.iosLogs, "unusual iOS event: `\(id)` \(detail)")
   }
 }
 
-private func logUnexpected(_ id: String, _ detail: String, in ctx: Context) {
-  guard ctx.env.mode == .prod else { return }
-  log(id, detail, in: ctx)
-  get(dependency: \.postmark).toSuperAdmin("UNEXPECTED supervision state", "\(id), \(detail)")
+func logIOSUnexpected(_ id: String, _ detail: String) {
+  guard get(dependency: \.env.mode) == .prod else { return }
+  logIOSUnusual(id, detail)
+  get(dependency: \.postmark)
+    .toSuperAdmin("UNEXPECTED iOS event", "\(id), \(detail)")
 }
