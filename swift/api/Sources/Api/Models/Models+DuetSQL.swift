@@ -132,7 +132,7 @@ extension IOSApp.Device: Model {
     case .id: .id(self)
     case .childId: .uuid(self.childId)
     case .vendorId: .uuid(self.vendorId)
-    case .deviceType: .string(self.deviceType)
+    case .modelIdentifier: .string(self.modelIdentifier)
     case .appVersion: .string(self.appVersion)
     case .iosVersion: .string(self.iosVersion)
     case .webPolicy: .string(self.webPolicy)
@@ -149,7 +149,7 @@ extension IOSApp.Device: Model {
       .id: .id(self),
       .childId: .uuid(self.childId),
       .vendorId: .uuid(self.vendorId),
-      .deviceType: .string(self.deviceType),
+      .modelIdentifier: .string(self.modelIdentifier),
       .appVersion: .string(self.appVersion),
       .iosVersion: .string(self.iosVersion),
       .webPolicy: .string(self.webPolicy),
@@ -1060,7 +1060,7 @@ extension PodcastEvent: Model {
     case .eventId: .string(self.eventId)
     case .kind: .string(self.kind.rawValue)
     case .label: .string(self.label)
-    case .deviceType: .string(self.deviceType)
+    case .modelIdentifier: .string(self.modelIdentifier)
     case .appVersion: .string(self.appVersion)
     case .iosVersion: .string(self.iosVersion)
     case .installId: .uuid(self.installId)
@@ -1075,7 +1075,7 @@ extension PodcastEvent: Model {
       .eventId: .string(self.eventId),
       .kind: .string(self.kind.rawValue),
       .label: .string(self.label),
-      .deviceType: .string(self.deviceType),
+      .modelIdentifier: .string(self.modelIdentifier),
       .appVersion: .string(self.appVersion),
       .iosVersion: .string(self.iosVersion),
       .installId: .uuid(self.installId),
@@ -1097,7 +1097,7 @@ extension IOSEvent: Model {
     case .kind: .string(self.kind.rawValue)
     case .detail: .string(self.detail)
     case .vendorId: .uuid(self.vendorId)
-    case .deviceType: .string(self.deviceType)
+    case .modelIdentifier: .string(self.modelIdentifier)
     case .iosVersion: .string(self.iosVersion)
     case .createdAt: .date(self.createdAt)
     }
@@ -1110,7 +1110,7 @@ extension IOSEvent: Model {
       .kind: .string(self.kind.rawValue),
       .detail: .string(self.detail),
       .vendorId: .uuid(self.vendorId),
-      .deviceType: .string(self.deviceType),
+      .modelIdentifier: .string(self.modelIdentifier),
       .iosVersion: .string(self.iosVersion),
       .createdAt: .currentTimestamp,
     ]
@@ -1151,7 +1151,7 @@ extension IOSApp.PendingSupervision: Model {
     case .id: .id(self)
     case .code: .int(self.code)
     case .vendorId: .uuid(self.vendorId)
-    case .deviceType: .string(self.deviceType)
+    case .modelIdentifier: .string(self.modelIdentifier)
     case .iosVersion: .string(self.iosVersion)
     case .appVersion: .string(self.appVersion)
     case .claimedChildId: .uuid(self.claimedChildId)
@@ -1166,7 +1166,7 @@ extension IOSApp.PendingSupervision: Model {
       .id: .id(self),
       .code: .int(self.code),
       .vendorId: .uuid(self.vendorId),
-      .deviceType: .string(self.deviceType),
+      .modelIdentifier: .string(self.modelIdentifier),
       .iosVersion: .string(self.iosVersion),
       .appVersion: .string(self.appVersion),
       .claimedChildId: .uuid(self.claimedChildId),

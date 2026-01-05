@@ -12,19 +12,19 @@ final class LogPodcastEventResolverTests: ApiTestCase, @unchecked Sendable {
     let kind = "info"
     let label = "The Daily"
     let detail = "Started playing episode 1234"
-    let deviceType = "iPhone"
+    let modelIdentifier = "iPhone15,2"
     let appVersion = "1.0.0"
     let iosVersion = "18.0.1"
     let installId = UUID()
 
-    _ = try await LogPodcastEvent.resolve(
+    _ = try await LogPodcastEvent_v2.resolve(
       with: .init(
         eventId: eventId,
         kind: kind,
         label: label,
         detail: detail,
         installId: installId,
-        deviceType: deviceType,
+        modelIdentifier: modelIdentifier,
         appVersion: appVersion,
         iosVersion: iosVersion,
       ),
@@ -38,7 +38,7 @@ final class LogPodcastEventResolverTests: ApiTestCase, @unchecked Sendable {
     expect(retrieved.eventId).toEqual(eventId)
     expect(retrieved.kind).toEqual(.info)
     expect(retrieved.label).toEqual(label)
-    expect(retrieved.deviceType).toEqual(deviceType)
+    expect(retrieved.modelIdentifier).toEqual(modelIdentifier)
     expect(retrieved.appVersion).toEqual(appVersion)
     expect(retrieved.iosVersion).toEqual(iosVersion)
     expect(retrieved.installId).toEqual(installId)

@@ -6,13 +6,13 @@ public struct CreatePendingSupervision: Pair {
 
   public struct Input: PairInput {
     public var vendorId: UUID
-    public var deviceType: String
+    public var modelIdentifier: String
     public var iosVersion: String
     public var appVersion: String
 
-    public init(vendorId: UUID, deviceType: String, iosVersion: String, appVersion: String) {
+    public init(vendorId: UUID, modelIdentifier: String, iosVersion: String, appVersion: String) {
       self.vendorId = vendorId
-      self.deviceType = deviceType
+      self.modelIdentifier = modelIdentifier
       self.iosVersion = iosVersion
       self.appVersion = appVersion
     }

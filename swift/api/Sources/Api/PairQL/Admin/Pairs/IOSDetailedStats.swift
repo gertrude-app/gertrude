@@ -623,7 +623,7 @@ private struct DeviceTypeCount: CustomCountable {
     FROM \(table: IOSEvent.self)
     WHERE \(IOSEvent.columnName(.vendorId)) IS NOT NULL
       AND \(IOSEvent.columnName(.eventId)) = '8d35f043'
-      AND \(IOSEvent.columnName(.deviceType)) LIKE\(" ")
+      AND \(IOSEvent.columnName(.modelIdentifier)) LIKE\(" ")
     """)
     stmt.components.append(.binding(pattern))
     return stmt

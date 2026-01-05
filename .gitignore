@@ -50,5 +50,5 @@ swift/podcasts/GertiePodcasts.xcodeproj/
 swift/podcasts/previews
 
 # Local task files
-tasks.md
 claude.task.md
+claude.ledger.*

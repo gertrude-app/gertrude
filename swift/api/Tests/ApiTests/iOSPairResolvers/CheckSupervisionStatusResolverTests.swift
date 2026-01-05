@@ -11,7 +11,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let pending = try await self.db.create(IOSApp.PendingSupervision(
       code: Int.random(in: 100_000 ... 999_999),
       vendorId: UUID(), // <-- different vendorId...
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
       appVersion: "1.0.0",
       expiresAt: .reference + .days(7),
@@ -36,7 +36,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let pending = try await self.db.create(IOSApp.PendingSupervision(
       code: Int.random(in: 100_000 ... 999_999),
       vendorId: vendorId,
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
       appVersion: "1.0.0",
       expiresAt: .reference + .days(7),
@@ -58,7 +58,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let pending = try await self.db.create(IOSApp.PendingSupervision(
       code: Int.random(in: 100_000 ... 999_999),
       vendorId: vendorId,
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
       appVersion: "1.0.0",
       expiresAt: .reference - .days(1),
@@ -82,7 +82,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     _ = try await self.db.create(IOSApp.Device(
       childId: child.id,
       vendorId: .init(vendorId),
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
       supervisedAt: nil, // <-- not yet supervised
@@ -90,7 +90,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let pending = try await self.db.create(IOSApp.PendingSupervision(
       code: Int.random(in: 100_000 ... 999_999),
       vendorId: vendorId,
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
       appVersion: "1.0.0",
       claimedChildId: child.id,
@@ -115,7 +115,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let device = try await self.db.create(IOSApp.Device(
       childId: child.id,
       vendorId: .init(vendorId),
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
       supervisedAt: .reference, // <-- supervised...
@@ -124,7 +124,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let pending = try await self.db.create(IOSApp.PendingSupervision(
       code: Int.random(in: 100_000 ... 999_999),
       vendorId: vendorId,
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
       appVersion: "1.0.0",
       claimedChildId: child.id,
@@ -161,7 +161,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     _ = try await self.db.create(IOSApp.Device(
       childId: child.id,
       vendorId: .init(vendorId),
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
       supervisedAt: .reference,
@@ -170,7 +170,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let pending = try await self.db.create(IOSApp.PendingSupervision(
       code: Int.random(in: 100_000 ... 999_999),
       vendorId: vendorId,
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
       appVersion: "1.0.0",
       claimedChildId: child.id,

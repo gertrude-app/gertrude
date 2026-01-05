@@ -23,14 +23,14 @@ enum Reset {
         kind: .onboarding,
         detail: "region: `US`",
         vendorId: vendorId,
-        deviceType: "iPhone",
+        modelIdentifier: "iPhone15,2",
         iosVersion: "26.1",
       ),
       IOSEvent(
         eventId: "cdb31095",
         kind: .onboarding,
         vendorId: vendorId,
-        deviceType: "iPhone",
+        modelIdentifier: "iPhone15,2",
         iosVersion: "26.1",
       ),
     ])

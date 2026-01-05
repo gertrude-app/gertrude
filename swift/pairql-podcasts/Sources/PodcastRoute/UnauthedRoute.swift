@@ -2,6 +2,7 @@ import PairQL
 
 public enum UnauthedRoute: PairRoute {
   case logPodcastEvent(LogPodcastEvent.Input)
+  case logPodcastEvent_v2(LogPodcastEvent_v2.Input)
   case podcastProducts
   case createDatabaseUpload(CreateDatabaseUpload.Input)
   case verifyPromoCode(VerifyPromoCode.Input)
@@ -13,6 +14,10 @@ public extension UnauthedRoute {
     Route(.case(Self.logPodcastEvent)) {
       Operation(LogPodcastEvent.self)
       Body(.json(LogPodcastEvent.Input.self))
+    }
+    Route(.case(Self.logPodcastEvent_v2)) {
+      Operation(LogPodcastEvent_v2.self)
+      Body(.json(LogPodcastEvent_v2.Input.self))
     }
     Route(.case(Self.podcastProducts)) {
       Operation(PodcastProducts.self)

@@ -33,6 +33,32 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
   func testLogIOSEvent() async throws {
     let eventId = UUID().uuidString
     let vendorId = UUID()
+    _ = try await LogIOSEvent_v2.resolve(
+      with: .init(
+        eventId: eventId,
+        kind: "event",
+        modelIdentifier: "iPhone18,2",
+        iOSVersion: "18.0.1",
+        vendorId: vendorId,
+        detail: "first launch",
+      ),
+      in: .mock,
+    )
+
+    let retrieved = try await IOSEvent.query()
+      .where(.eventId == eventId)
+      .first(in: self.db)
+
+    expect(retrieved.kind).toEqual(.info)
+    expect(retrieved.modelIdentifier).toEqual("iPhone18,2")
+    expect(retrieved.iosVersion).toEqual("18.0.1")
+    expect(retrieved.vendorId).toEqual(vendorId)
+    expect(retrieved.detail).toEqual("first launch")
+  }
+
+  func testLogIOSEvent_legacy() async throws {
+    let eventId = UUID().uuidString
+    let vendorId = UUID()
     _ = try await LogIOSEvent.resolve(
       with: .init(
         eventId: eventId,
@@ -50,7 +76,7 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
       .first(in: self.db)
 
     expect(retrieved.kind).toEqual(.info)
-    expect(retrieved.deviceType).toEqual("iPhone")
+    expect(retrieved.modelIdentifier).toEqual("iPhone,unknown")
     expect(retrieved.iosVersion).toEqual("18.0.1")
     expect(retrieved.vendorId).toEqual(vendorId)
     expect(retrieved.detail).toEqual("first launch")

@@ -2,41 +2,27 @@ import Foundation
 import GertieIOS
 import PairQL
 
-public struct ChildIOSDeviceData: PairOutput {
-  public var childId: UUID
-  public var token: UUID
-  public var deviceId: UUID
-  public var childName: String
-
-  public init(childId: UUID, token: UUID, deviceId: UUID, childName: String) {
-    self.childId = childId
-    self.token = token
-    self.deviceId = deviceId
-    self.childName = childName
-  }
-}
-
-/// deprecated: v1.5.0
-public struct ConnectDevice: Pair {
+/// in use: v1.7.x - present
+public struct ConnectDevice_v2: Pair {
   public static let auth: ClientAuth = .none
 
   public struct Input: PairInput {
     public var verificationCode: Int
     public var vendorId: UUID
-    public var deviceType: String
+    public var modelIdentifier: String
     public var appVersion: String
     public var iosVersion: String
 
     public init(
       verificationCode: Int,
       vendorId: UUID,
-      deviceType: String,
+      modelIdentifier: String,
       appVersion: String,
       iosVersion: String,
     ) {
       self.verificationCode = verificationCode
       self.vendorId = vendorId
-      self.deviceType = deviceType
+      self.modelIdentifier = modelIdentifier
       self.appVersion = appVersion
       self.iosVersion = iosVersion
     }

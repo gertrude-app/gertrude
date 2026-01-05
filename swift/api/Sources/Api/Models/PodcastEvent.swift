@@ -7,7 +7,7 @@ struct PodcastEvent: Codable, Sendable {
   var label: String
   var detail: String?
   var installId: UUID?
-  var deviceType: String
+  var modelIdentifier: String
   var appVersion: String
   var iosVersion: String
   var createdAt = Date()
@@ -19,7 +19,7 @@ struct PodcastEvent: Codable, Sendable {
     label: String,
     detail: String? = nil,
     installId: UUID? = nil,
-    deviceType: String,
+    modelIdentifier: String,
     appVersion: String,
     iosVersion: String,
   ) {
@@ -29,7 +29,7 @@ struct PodcastEvent: Codable, Sendable {
     self.label = label
     self.detail = detail
     self.installId = installId
-    self.deviceType = deviceType
+    self.modelIdentifier = modelIdentifier
     self.appVersion = appVersion
     self.iosVersion = iosVersion
   }

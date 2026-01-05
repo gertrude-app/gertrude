@@ -23,26 +23,24 @@ extension ApiClient: DependencyKey {
   static var liveValue: ApiClient {
     .init(
       logEvent: { id, kind, label, detail in
-        let (iosVersion, deviceType) = await MainActor.run { (
-          UIDevice.current.systemVersion,
-          UIDevice.current.userInterfaceIdiom == .pad ? "iPad" : "iPhone",
-        ) }
+        let iosVersion = await MainActor.run { UIDevice.current.systemVersion }
+        let modelIdentifier = getModelIdentifier()
 
         let appVersion = Bundle.main
           .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
 
-        let input = LogPodcastEvent.Input(
+        let input = LogPodcastEvent_v2.Input(
           eventId: id,
           kind: kind.string,
           label: label,
           detail: detail,
           installId: dep(\.keychain).loadInstallId(),
-          deviceType: deviceType,
+          modelIdentifier: modelIdentifier,
           appVersion: appVersion,
           iosVersion: iosVersion,
         )
 
-        let _: Empty = try await pairql("LogPodcastEvent", input: input)
+        let _: Empty = try await pairql("LogPodcastEvent_v2", input: input)
       },
       productIds: {
         try await pairql("PodcastProducts")
@@ -98,6 +96,18 @@ func pairql<Output: Decodable>(
 }
 
 private struct Empty: Codable {}
+
+// NB: currently duplicated, grep: af6ce6fd
+private func getModelIdentifier() -> String {
+  var systemInfo = utsname()
+  uname(&systemInfo)
+  let mirror = Mirror(reflecting: systemInfo.machine)
+  let identifier = mirror.children.reduce("") { identifier, element in
+    guard let value = element.value as? Int8, value != 0 else { return identifier }
+    return identifier + String(UnicodeScalar(UInt8(value)))
+  }
+  return identifier
+}
 
 extension ApiClient {
   enum ApiError: Error {

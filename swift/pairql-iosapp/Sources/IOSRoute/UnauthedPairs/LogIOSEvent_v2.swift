@@ -1,29 +1,29 @@
 import Foundation
 import PairQL
 
-/// deprecated: v1.0.0 - v1.5.x
-public struct LogIOSEvent: Pair {
+/// in use: v1.7.x - present
+public struct LogIOSEvent_v2: Pair {
   public static let auth: ClientAuth = .none
 
   public struct Input: PairInput {
     public var eventId: String
     public var kind: String
-    public var deviceType: String // "iPhone" | "iPad"
-    public var iOSVersion: String // "18.0.1"
+    public var modelIdentifier: String
+    public var iOSVersion: String
     public var vendorId: UUID?
     public var detail: String?
 
     public init(
       eventId: String,
       kind: String,
-      deviceType: String,
+      modelIdentifier: String,
       iOSVersion: String,
       vendorId: UUID? = nil,
       detail: String? = nil,
     ) {
       self.eventId = eventId
       self.kind = kind
-      self.deviceType = deviceType
+      self.modelIdentifier = modelIdentifier
       self.iOSVersion = iOSVersion
       self.vendorId = vendorId
       self.detail = detail

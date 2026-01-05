@@ -9,6 +9,9 @@ extension PodcastRoute: RouteResponder {
       case .logPodcastEvent(let input):
         let output = try await LogPodcastEvent.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .logPodcastEvent_v2(let input):
+        let output = try await LogPodcastEvent_v2.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       case .podcastProducts:
         let output = try await PodcastProducts.resolve(in: context)
         return try await self.respond(with: output)

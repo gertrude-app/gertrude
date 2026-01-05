@@ -41,7 +41,7 @@ extension GetIOSDevice: Resolver {
     let blockRules = try await device.blockRules(in: ctx.db)
     return .init(
       childName: child.name,
-      deviceType: device.deviceType,
+      deviceType: ModelIdentifier.deviceType(from: device.modelIdentifier),
       osVersion: device.iosVersion,
       allBlockGroups: allBlockGroups.map { .init(id: $0.id, name: $0.name) },
       enabledBlockGroups: enabledBlockGroups.map(\.id),

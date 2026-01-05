@@ -2,6 +2,7 @@ import PairQL
 
 public enum AuthedRoute: PairRoute {
   case connectedRules(ConnectedRules.Input)
+  case connectedRules_v2(ConnectedRules_v2.Input)
   case createSuspendFilterRequest(CreateSuspendFilterRequest.Input)
   case pollFilterSuspensionDecision(PollFilterSuspensionDecision.Input)
   case screenshotUploadUrl(ScreenshotUploadUrl.Input)
@@ -12,6 +13,10 @@ public extension AuthedRoute {
     Route(.case(Self.connectedRules)) {
       Operation(ConnectedRules.self)
       Body(.json(ConnectedRules.Input.self))
+    }
+    Route(.case(Self.connectedRules_v2)) {
+      Operation(ConnectedRules_v2.self)
+      Body(.json(ConnectedRules_v2.Input.self))
     }
     Route(.case(Self.createSuspendFilterRequest)) {
       Operation(CreateSuspendFilterRequest.self)

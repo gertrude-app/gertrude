@@ -18,7 +18,7 @@ final class CreatePendingSupervisionResolverTests: ApiTestCase, @unchecked Senda
       try await CreatePendingSupervision.resolve(
         with: .init(
           vendorId: vendorId,
-          deviceType: "iPhone",
+          modelIdentifier: "iPhone18,2",
           iosVersion: "18.2",
           appVersion: "1.0.0",
         ),
@@ -34,7 +34,7 @@ final class CreatePendingSupervisionResolverTests: ApiTestCase, @unchecked Senda
 
     expect(pending.code).toEqual(fixedCode)
     expect(pending.vendorId).toEqual(vendorId)
-    expect(pending.deviceType).toEqual("iPhone")
+    expect(pending.modelIdentifier).toEqual("iPhone18,2")
     expect(pending.iosVersion).toEqual("18.2")
     expect(pending.appVersion).toEqual("1.0.0")
     expect(pending.claimedChildId).toBeNil()
@@ -46,7 +46,7 @@ final class CreatePendingSupervisionResolverTests: ApiTestCase, @unchecked Senda
       try await CreatePendingSupervision.resolve(
         with: .init(
           vendorId: vendorId,
-          deviceType: "iPhone",
+          modelIdentifier: "iPhone18,2",
           iosVersion: "18.2",
           appVersion: "1.0.0",
         ),
@@ -70,7 +70,7 @@ final class CreatePendingSupervisionResolverTests: ApiTestCase, @unchecked Senda
     let expired = try await self.db.create(IOSApp.PendingSupervision(
       code: Int.random(in: 100_000 ... 999_999),
       vendorId: vendorId,
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone18,2",
       iosVersion: "17.0",
       appVersion: "0.9.0",
       expiresAt: expiredDate,
@@ -84,7 +84,7 @@ final class CreatePendingSupervisionResolverTests: ApiTestCase, @unchecked Senda
       try await CreatePendingSupervision.resolve(
         with: .init(
           vendorId: vendorId,
-          deviceType: "iPad",
+          modelIdentifier: "iPhone18,2",
           iosVersion: "18.2",
           appVersion: "1.0.0",
         ),
