@@ -9,6 +9,7 @@ export namespace ParentDetail {
   export interface Output {
     id: UUID;
     email: string;
+    status: string;
     subscriptionStatus: string;
     subscriptionId?: string;
     monthlyPriceInCents: number;

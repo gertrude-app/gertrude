@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
-import { SubscriptionBadge } from '../components/Badge';
+import { StatusBadge, getSubscriptionLabel } from '../components/Badge';
 import { CopyButton, CopyLinkButton } from '../components/CopyButton';
 import ErrorState from '../components/ErrorState';
 import {
@@ -89,12 +89,15 @@ const ParentDetail: React.FC = () => {
               </div>
             </div>
           </div>
-          <SubscriptionBadge status={data.subscriptionStatus} size="md" />
+          <StatusBadge status={data.status} size="md" />
         </div>
 
         <div className="p-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <InfoCard label="Subscription" value={data.subscriptionStatus} />
+            <InfoCard
+              label="Subscription"
+              value={getSubscriptionLabel(data.subscriptionStatus)}
+            />
             <InfoCard
               label="Monthly Price"
               value={`$${(data.monthlyPriceInCents / 100).toFixed(2)}`}
