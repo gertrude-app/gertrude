@@ -78,16 +78,6 @@ export default class AdminClient extends Client<Auth> {
     return this.query<P.PodcastOverview.Output>(input, `PodcastOverview`, `superAdmin`);
   };
 
-  public searchParentByEmail = (
-    input: P.SearchParentByEmail.Input,
-  ): Promise<Result<P.SearchParentByEmail.Output>> => {
-    return this.query<P.SearchParentByEmail.Output>(
-      input,
-      `SearchParentByEmail`,
-      `superAdmin`,
-    );
-  };
-
   public requestAdminMagicLink = (
     input: P.RequestAdminMagicLink.Input,
   ): Promise<Result<P.RequestAdminMagicLink.Output>> => {
@@ -95,6 +85,16 @@ export default class AdminClient extends Client<Auth> {
       input,
       `RequestAdminMagicLink`,
       `none`,
+    );
+  };
+
+  public searchParentByEmail = (
+    input: P.SearchParentByEmail.Input,
+  ): Promise<Result<P.SearchParentByEmail.Output>> => {
+    return this.query<P.SearchParentByEmail.Output>(
+      input,
+      `SearchParentByEmail`,
+      `superAdmin`,
     );
   };
 
