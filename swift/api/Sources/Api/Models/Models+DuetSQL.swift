@@ -1176,3 +1176,91 @@ extension IOSApp.PendingSupervision: Model {
     ]
   }
 }
+
+extension AppStore.Review: Model {
+  public static let schemaName = "appstore"
+  public static let tableName = "reviews"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .appleId: .string(self.appleId)
+    case .app: .string(self.app.rawValue)
+    case .rating: .int(self.rating)
+    case .title: .string(self.title)
+    case .body: .string(self.body)
+    case .reviewerNickname: .string(self.reviewerNickname)
+    case .territory: .varchar(self.territory)
+    case .reviewCreatedAt: .date(self.reviewCreatedAt)
+    case .createdAt: .date(self.createdAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .appleId: .string(self.appleId),
+      .app: .string(self.app.rawValue),
+      .rating: .int(self.rating),
+      .title: .string(self.title),
+      .body: .string(self.body),
+      .reviewerNickname: .string(self.reviewerNickname),
+      .territory: .varchar(self.territory),
+      .reviewCreatedAt: .date(self.reviewCreatedAt),
+      .createdAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension AppStore.RatingSnapshot: Model {
+  public static let schemaName = "appstore"
+  public static let tableName = "rating_snapshots"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .app: .string(self.app.rawValue)
+    case .averageRating: .double(self.averageRating)
+    case .totalCount: .int(self.totalCount)
+    case .reviewCount: .int(self.reviewCount)
+    case .createdAt: .date(self.createdAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .app: .string(self.app.rawValue),
+      .averageRating: .double(self.averageRating),
+      .totalCount: .int(self.totalCount),
+      .reviewCount: .int(self.reviewCount),
+      .createdAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension AppStore.RatingEvent: Model {
+  public static let schemaName = "appstore"
+  public static let tableName = "rating_events"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .app: .string(self.app.rawValue)
+    case .stars: .int(self.stars)
+    case .createdAt: .date(self.createdAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .app: .string(self.app.rawValue),
+      .stars: .int(self.stars),
+      .createdAt: .currentTimestamp,
+    ]
+  }
+}

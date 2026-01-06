@@ -11,6 +11,10 @@ public extension Configure {
     app.queues.schedule(DiskSpaceJob()).hourly().at(0)
     app.queues.schedule(CrashReporterJob()).hourly().at(25)
 
+    // sync job runs twice hourly to preserve inferred new rating granularity
+    app.queues.schedule(AppStoreSyncJob()).hourly().at(05)
+    app.queues.schedule(AppStoreSyncJob()).hourly().at(35)
+
     for offset in stride(from: 0, to: 60, by: 10) {
       app.queues.schedule(AnalyticsJob()).hourly().at(.init(integerLiteral: offset))
     }

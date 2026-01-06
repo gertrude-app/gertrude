@@ -10,6 +10,7 @@ public struct Env: Sendable {
   public var dashboardUrl: String
   public var twilio: Twilio
   public var stripe: Stripe
+  public var appStoreConnect: AppStoreConnect
   public var primarySupportEmail: String
   public var superAdminEmail: String
   public var cloudflareSecret: String
@@ -50,6 +51,12 @@ public struct Env: Sendable {
     public var authToken: String
     public var fromPhoneUS: String
     public var fromPhoneUK: String
+  }
+
+  public struct AppStoreConnect: Sendable {
+    public var issuerId: String
+    public var keyId: String
+    public var privateKey: String
   }
 }
 
@@ -119,6 +126,11 @@ extension Env: DependencyKey {
         fromPhoneUK: processEnv("TWILIO_FROM_PHONE_UK"),
       ),
       stripe: Stripe(secretKey: processEnv("STRIPE_SECRET_KEY")),
+      appStoreConnect: AppStoreConnect(
+        issuerId: processEnv("APPSTORE_ISSUER_ID"),
+        keyId: processEnv("APPSTORE_KEY_ID"),
+        privateKey: processEnv("APPSTORE_PRIVATE_KEY"),
+      ),
       primarySupportEmail: processEnv("PRIMARY_SUPPORT_EMAIL"),
       superAdminEmail: processEnv("SUPER_ADMIN_EMAIL"),
       cloudflareSecret: processEnv("CLOUDFLARE_SECRET"),
