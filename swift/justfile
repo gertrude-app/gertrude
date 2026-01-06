@@ -11,6 +11,9 @@ bump version:
 macapp:
   @open macapp/Xcode/Gertrude.xcodeproj
 
+macapp-xcode-build:
+  @pnpm exec nx run macapp:xcode-build
+
 # ios
 
 watch-ios:
@@ -113,6 +116,7 @@ fix:
 
 check:
   @just build
+  @just macapp-xcode-build
   @just iosapp-xcode-build
   @just test
   @just lint

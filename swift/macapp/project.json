@@ -1,0 +1,26 @@
+{
+  "root": "macapp",
+  "projectType": "application",
+  "implicitDependencies": ["App"],
+  "namedInputs": {
+    "xcode-sources": [
+      "{projectRoot}/Xcode/Gertrude/**/*.swift",
+      "{projectRoot}/Xcode/Gertrude/**/*.plist",
+      "{projectRoot}/Xcode/Gertrude/**/*.entitlements",
+      "{projectRoot}/Xcode/GertrudeFilterExtension/**/*.swift",
+      "{projectRoot}/Xcode/GertrudeFilterExtension/**/*.plist",
+      "{projectRoot}/Xcode/GertrudeFilterExtension/**/*.entitlements",
+      "{projectRoot}/Xcode/GertrudeRelauncher/**/*.swift",
+      "{projectRoot}/Xcode/GertrudeRelauncher/**/*.plist",
+      "{projectRoot}/Xcode/GertrudeRelauncher/**/*.entitlements",
+      "{projectRoot}/Xcode/Gertrude.xcodeproj/**/*"
+    ]
+  },
+  "targets": {
+    "xcode-build": {
+      "cache": true,
+      "inputs": ["xcode-sources", "^sources"],
+      "command": "cd macapp/Xcode && xcodebuild -project Gertrude.xcodeproj -scheme Gertrude -skipMacroValidation -destination 'generic/platform=macOS' CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO build"
+    }
+  }
+}
