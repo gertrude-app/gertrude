@@ -221,6 +221,24 @@ jobs:
       - name: test
         run: cd swift/macapp/App && swift test
 
+  macapp-build:
+    needs: files-changed
+    if: needs.files-changed.outputs.macapp == 'true' && github.event_name == 'pull_request'
+    runs-on: macos-15
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 26.1.1
+      - name: build
+        run: |
+          cd swift/macapp/Xcode
+          xcodebuild -project Gertrude.xcodeproj -scheme Gertrude \
+            -skipMacroValidation -destination 'generic/platform=macOS' \
+            CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO build
+
   iosapp-lib:
     needs: files-changed
     if: needs.files-changed.outputs.iosapp == 'true'
@@ -335,7 +353,7 @@ jobs:
         with:
           filters: |
             macapp:
-              - swift/macapp/App/**
+              - swift/macapp/**
               - swift/pairql-macapp/**
               - swift/pairql/**
               - swift/gertie/**
