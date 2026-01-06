@@ -57,6 +57,7 @@ extension Configure {
     app.migrations.add(IOSEvents())
     app.migrations.add(PendingSupervisions())
     app.migrations.add(UpdatePendingSupervision())
+    app.migrations.add(AppStoreReviews())
   }
 }
 

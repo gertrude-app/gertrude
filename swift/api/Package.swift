@@ -7,6 +7,7 @@ let package = Package(
   dependencies: [
     .package("vapor/vapor@4.119.1"),
     .package("vapor/fluent@4.11.0"),
+    .package("vapor/jwt@5.1.2"),
     .package("vapor/fluent-postgres-driver@2.9.2"),
     .package("onevcat/Rainbow@4.0.1"),
     .package("jaredh159/swift-tagged@0.8.2"),
@@ -53,6 +54,7 @@ let package = Package(
         .product(name: "XPostmark", package: "x-postmark"),
         .product(name: "XSlack", package: "x-slack"),
         .product(name: "XStripe", package: "x-stripe"),
+        .product(name: "JWT", package: "jwt"),
         "Rainbow",
       ],
       exclude: ["Email/Templates/", "Email/Layouts/"],

@@ -661,3 +661,50 @@ extension IOSApp.PendingSupervision {
     case updatedAt
   }
 }
+
+extension AppStore.Review: Duet.Identifiable {
+  typealias Id = Tagged<AppStore.Review, UUID>
+}
+
+extension AppStore.Review {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case appleId
+    case app
+    case rating
+    case title
+    case body
+    case reviewerNickname
+    case territory
+    case reviewCreatedAt
+    case createdAt
+  }
+}
+
+extension AppStore.RatingSnapshot: Duet.Identifiable {
+  typealias Id = Tagged<AppStore.RatingSnapshot, UUID>
+}
+
+extension AppStore.RatingSnapshot {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case app
+    case averageRating
+    case totalCount
+    case reviewCount
+    case createdAt
+  }
+}
+
+extension AppStore.RatingEvent: Duet.Identifiable {
+  typealias Id = Tagged<AppStore.RatingEvent, UUID>
+}
+
+extension AppStore.RatingEvent {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case app
+    case stars
+    case createdAt
+  }
+}
