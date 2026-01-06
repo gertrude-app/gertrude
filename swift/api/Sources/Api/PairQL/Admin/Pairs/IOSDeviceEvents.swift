@@ -77,10 +77,10 @@ extension IOSDeviceEvents: Resolver {
     switch eventId {
     case "8d35f043": "🚀 First launch"
     case "6f97eb1b": #"Hi There → "Get Started""#
-    case "762bf9bf": #"Time Expectation → "Continue""#
+    case "762bf9bf": #"Time Expectation → "Next""#
     case "666d5e0f": #"Is This Child's Device? → "Yes""#
     case "30fac4e6": #"Is This Child's Device? → "No, it's mine""#
-    case "6bc91c73": #"Minor or Supervised? → "Continue""#
+    case "6bc91c73": #"Only minors/supervised → "Next""#
     case "e17137b0": #"Is Device Minor? → "Yes""#
     case "a21c9040": #"Is Device Minor? → "No, 18+""#
     case "51611498": #"Parent Onboarding? → "Yes, I'm the parent""#
@@ -88,46 +88,46 @@ extension IOSDeviceEvents: Resolver {
     case "7d0fd46e": #"In Apple Family? → "Yes""#
     case "daa8c7fd": #"In Apple Family? → "No""#
     case "232fb200": #"In Apple Family? → "What's that?""#
-    case "6582656c": #"Two Install Steps → "Continue""#
-    case "5d3a5ba2": #"Auth With Parent Account → "Continue""#
+    case "6582656c": #"Two Install Steps → "Next""#
+    case "5d3a5ba2": #"Auth With Parent Account → "Next""#
     case "87601352": #"Pre-Auth Warning → "Got it, next""#
     case "4a0c585f": "✓ Authorization succeeded"
     case "e2e02460": "✗ Authorization failed"
-    case "5dcaa641": #"Install With Passcode → "Continue""#
+    case "5dcaa641": #"Install With Passcode → "Next""#
     case "47bee21e": #"Pre-Install Warning → "Got it, next""#
     case "adced334": "✓ Filter install succeeded"
     case "004d0d89": "✗ Filter install failed"
-    case "62b6a262": #"Connect Account? → "Skip""#
+    case "62b6a262": #"Connect Account? → "No thanks""#
     case "b93bb543": #"Connect Account? → "Connect""#
-    case "f4986227": #"Connect Account? → "What's this?""#
+    case "f4986227": #"Connect Account? → "Tell me more""#
     case "0d00951c": #"Explain Account Connect → "Back""#
-    case "63d34e4c": #"Connect Success → "Continue""#
+    case "63d34e4c": #"Connect Success → "Next""#
     case "cdb31095": "✓ Block Groups → Continue (SUCCESS)"
     case "8a8a3033": #"Clear Cache? → "Yes""#
     case "1221f1a3": #"Clear Cache? → "Skip""#
     case "4fc0b1bf": #"Rate App? → "Rate""#
-    case "a9480aa2": #"Rate App? → "Write Review""#
+    case "a9480aa2": #"Rate App? → "Leave a review""#
     case "0dddc87c": #"Rate App? → "No thanks""#
     case "02976f9b": "Block group toggled"
-    case "085eb5a6": #"18+ Harder But Possible → "Continue""#
+    case "085eb5a6": #"18+ Harder But Possible → "Next""#
     case "6d88421b": #"Who's Onboarding? → "Someone else""#
     case "bbc0dac1": #"Who's Onboarding? → "I am (self)""#
     case "e0605ab9": #"Is Helper a Parent? → "Yes""#
     case "db2a8c0b": #"Is Helper a Parent? → "No""#
-    case "1ed887e0": #"Fix Account Easy Way → "OK""#
-    case "fd166517": #"Fix Account Easy Way → "Can't do that""#
+    case "1ed887e0": #"Fix Account Easy Way → "Done""#
+    case "fd166517": #"Fix Account Easy Way → "Another way?""#
     case "605151b9": #"In Apple Family? (18+) → "Yes""#
     case "0fa6bc2a": #"In Apple Family? (18+) → "No""#
     case "d17b9ef6": #"In Apple Family? (18+) → "What's that?""#
-    case "62f783e1": #"Explain Apple Family → "Back""#
+    case "62f783e1": #"Explain Apple Family → "Continue""#
     case "219ba991": #"Own a Mac? → "Yes""#
     case "c1f63c92": #"Own a Mac? → "No""#
-    case "97a57eb2": #"Family Required → "Continue""#
-    case "2badbcb8": #"Family Setup Easy → "Continue""#
-    case "07cac029": #"Check In Apple Family? → "Yes, I'm in""#
-    case "b311a78a": #"Check In Apple Family? → "No, need help""#
-    case "548e81b6": #"How To Setup Family → "Quit""#
-    case "1c495932": #"What Is Apple Family? → "Continue""#
+    case "97a57eb2": #"Family Required → "Next""#
+    case "2badbcb8": #"Family Setup Easy → "Next""#
+    case "07cac029": #"Check In Apple Family? → "Yes, in a family""#
+    case "b311a78a": #"Check In Apple Family? → "Not in a family yet""#
+    case "548e81b6": #"How To Setup Family → "Done, continue""#
+    case "1c495932": #"What Is Apple Family? → "Next""#
     case "ad77fbb6": #"Supervision Intro → "Continue""#
     case "896bc216": "Supervision Explain → needs friend w/ Mac"
     case "25a77e6a": "Supervision Explain → has Mac access"
@@ -136,7 +136,7 @@ extension IOSDeviceEvents: Resolver {
     case "dc1521e6": #"Requires Erase & Setup → "OK""#
     case "bee80538": #"Requires Erase & Setup → "No way""#
     case "f3b3f3b6": #"Sorry No Other Way → "Start over""#
-    case "285efafb": #"Invalid Account → "Let's figure it out""#
+    case "285efafb": #"Invalid Account → "Next""#
     case "e90ff997": #"Invalid: In Family? → "Yes""#
     case "39c52acf": #"Invalid: In Family? → "No""#
     case "a9cbe4fe": #"Invalid: In Family? → "Not sure""#
@@ -167,7 +167,7 @@ extension IOSDeviceEvents: Resolver {
     case "c98b9525": "⚠ Install succeeded (unexpected screen)"
     case "93958bd1": "⚠ Install failed (unexpected screen)"
     case "bad8adcc": "🎉 Supervision success first launch"
-    case "aa563df6": #"Supervision Success → "Continue""#
+    case "aa563df6": #"Supervision Success → "Next""#
     case "ea3f9c37": "⏳ Starting cache clear..."
     case "cb9cf096": "✓ Cache cleared"
     case "ae941213": "✗ Error creating cache fill dir"
