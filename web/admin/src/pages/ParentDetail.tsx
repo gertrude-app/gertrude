@@ -1,26 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
 import { StatusBadge, getSubscriptionLabel } from '../components/Badge';
 import { CopyButton, CopyLinkButton } from '../components/CopyButton';
 import ErrorState from '../components/ErrorState';
 import {
+  AlertCircleIcon,
   ArrowLeftIcon,
   BellIcon,
   KeyIcon,
+  LoadingSpinner,
   MonitorIcon,
+  TrashIcon,
   UserIcon,
   UsersIcon,
+  XIcon,
 } from '../components/Icons';
 import LoadingState from '../components/LoadingState';
 import { formatDate, unCamelCase } from '../lib/format';
 
 const ParentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [data, setData] = useState<T.ParentDetail.Output | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [confirmEmail, setConfirmEmail] = useState(``);
+  const [deleteReason, setDeleteReason] = useState(``);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -333,6 +343,148 @@ const ParentDetail: React.FC = () => {
           )}
         </div>
       </section>
+
+      <section className="bg-white rounded-2xl border border-red-200 shadow-sm overflow-hidden">
+        <div className="px-6 py-5 border-b border-red-100">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-red-100 flex items-center justify-center">
+              <AlertCircleIcon className="w-5 h-5 text-red-600" />
+            </div>
+            <h2 className="font-display font-semibold text-red-900 text-xl">
+              Danger Zone
+            </h2>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-slate-900">Delete this parent</h3>
+              <p className="text-sm text-slate-500 mt-1">
+                Once deleted, this parent and all associated data will be permanently
+                removed.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors"
+            >
+              <TrashIcon className="w-4 h-4" />
+              Delete Parent
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+              <h2 className="font-display font-semibold text-slate-900 text-lg">
+                Delete Parent
+              </h2>
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setConfirmEmail(``);
+                  setDeleteReason(``);
+                  setDeleteError(null);
+                }}
+                className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <XIcon className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-sm text-red-800">
+                  This action cannot be undone. This will permanently delete the parent
+                  account for <span className="font-semibold">{data.email}</span> and all
+                  associated data.
+                </p>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="confirm-email"
+                  className="block text-sm font-medium text-slate-700 mb-1.5"
+                >
+                  Type <span className="font-mono text-slate-900">{data.email}</span> to
+                  confirm
+                </label>
+                <input
+                  id="confirm-email"
+                  type="text"
+                  value={confirmEmail}
+                  onChange={(e) => setConfirmEmail(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  placeholder="Enter email address"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="delete-reason"
+                  className="block text-sm font-medium text-slate-700 mb-1.5"
+                >
+                  Reason for deletion
+                </label>
+                <input
+                  id="delete-reason"
+                  type="text"
+                  value={deleteReason}
+                  onChange={(e) => setDeleteReason(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  placeholder="e.g., User requested account deletion"
+                />
+              </div>
+
+              {deleteError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <p className="text-sm text-red-700">{deleteError}</p>
+                </div>
+              )}
+            </div>
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setConfirmEmail(``);
+                  setDeleteReason(``);
+                  setDeleteError(null);
+                }}
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  setDeleting(true);
+                  setDeleteError(null);
+                  const result = await client.deleteParent({
+                    parentId: data.id,
+                    reason: deleteReason,
+                  });
+                  setDeleting(false);
+                  if (result.isError) {
+                    setDeleteError(
+                      result.error?.debugMessage ?? `Failed to delete parent`,
+                    );
+                  } else {
+                    navigate(`/parents`);
+                  }
+                }}
+                disabled={
+                  confirmEmail !== data.email || deleteReason.trim() === `` || deleting
+                }
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed rounded-lg transition-colors"
+              >
+                {deleting && <LoadingSpinner className="w-4 h-4" />}
+                Delete Parent
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

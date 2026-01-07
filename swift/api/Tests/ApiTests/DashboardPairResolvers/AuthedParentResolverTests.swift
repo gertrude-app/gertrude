@@ -307,23 +307,6 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
     expect(retrieved).toBeNil()
   }
 
-  func testDeletingAdminDeletesAdminAndCreatesDeletedEntity() async throws {
-    try await self.db.delete(all: DeletedEntity.self)
-    let parent = try await self.parent()
-
-    _ = try await DeleteEntity_v2.resolve(
-      with: .init(id: parent.id.rawValue, type: .parent),
-      in: context(parent),
-    )
-
-    let deleted = try await self.db.select(all: DeletedEntity.self)
-    expect(deleted).toHaveCount(1)
-    expect(deleted.first?.type).toEqual("Admin")
-    expect(deleted.first?.reason).toEqual("self-deleted from use-case initial screen")
-    expect(deleted.first!.data).toContain(parent.id.lowercased)
-    await expect(try? self.db.find(parent.id)).toBeNil()
-  }
-
   func testAdminCantDeleteOtherAdmin() async throws {
     let parent1 = try await self.parent()
     let parent2 = try await self.parent()

@@ -1,5 +1,6 @@
 // auto-generated, do not edit
 export * from './shared';
+export * from './pairs/DeleteParent';
 export * from './pairs/IOSDetailedStats';
 export * from './pairs/IOSDeviceEvents';
 export * from './pairs/IOSDevicesList';

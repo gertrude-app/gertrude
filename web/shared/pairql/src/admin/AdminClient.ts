@@ -10,6 +10,12 @@ export default class AdminClient extends Client<Auth> {
     super(endpoint, `admin`, prepareRequest);
   }
 
+  public deleteParent = (
+    input: P.DeleteParent.Input,
+  ): Promise<Result<P.DeleteParent.Output>> => {
+    return this.query<P.DeleteParent.Output>(input, `DeleteParent`, `superAdmin`);
+  };
+
   public iOSDetailedStats = (
     input: P.IOSDetailedStats.Input,
   ): Promise<Result<P.IOSDetailedStats.Output>> => {

@@ -43,7 +43,7 @@ extension DeleteEntity_v2: Resolver {
         throw Abort(.unauthorized)
       }
       try await context.db.create(DeletedEntity(
-        type: "Admin",
+        type: "Parent",
         reason: "self-deleted from use-case initial screen",
         data: JSON.encode(context.parent, [.isoDates]),
       ))
