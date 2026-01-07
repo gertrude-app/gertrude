@@ -172,7 +172,7 @@ const ParentDetail: React.FC = () => {
                   </div>
 
                   {child.installations.length > 0 && (
-                    <div>
+                    <div className="mb-4">
                       <div className="flex items-center gap-2 mb-3">
                         <MonitorIcon className="w-4 h-4 text-slate-400" />
                         <h4 className="text-sm font-medium text-slate-700">
@@ -217,6 +217,37 @@ const ParentDetail: React.FC = () => {
                                 )}
                               </div>
                             </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {child.keychains.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <KeyIcon className="w-4 h-4 text-slate-400" />
+                        <h4 className="text-sm font-medium text-slate-700">
+                          Keychains ({child.keychains.length})
+                        </h4>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {child.keychains.map((keychain) => (
+                          <div
+                            key={keychain.id}
+                            className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-100 flex items-center gap-2"
+                          >
+                            <span className="text-sm font-medium text-slate-700">
+                              {keychain.name}
+                            </span>
+                            <span className="text-xs text-slate-400">
+                              ({keychain.numKeys} keys)
+                            </span>
+                            {keychain.isPublic && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-200 text-slate-600">
+                                Public
+                              </span>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -324,7 +355,9 @@ const InfoCard: React.FC<InfoCardProps> = ({ label, value, highlight = false }) 
       {label}
     </div>
     <div
-      className={`text-lg font-display font-semibold mt-1 ${highlight ? `text-white` : `text-slate-900`}`}
+      className={`text-lg font-display font-semibold mt-1 ${
+        highlight ? `text-white` : `text-slate-900`
+      }`}
     >
       {value}
     </div>
