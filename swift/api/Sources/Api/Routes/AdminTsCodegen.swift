@@ -36,6 +36,7 @@ enum AdminTsCodegenRoute {
       PodcastInstallDetail.self,
       ParentsList.self,
       ParentDetail.self,
+      DeleteParent.self,
       SearchParentByEmail.self,
     ]
   }
