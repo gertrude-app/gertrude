@@ -95,3 +95,4 @@
 /iosapp-main https://gertrude.app 302
 /iosapp-connect https://gertrude.app/blog/gertrude-ios-account-connection 302
 /iosapp-connect-help https://gertrude.app/docs/ios-account-connection-help 302
+/s/:code https://api.gertrude.app/claim-pending-supervision/:code 302

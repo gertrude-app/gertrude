@@ -1,4 +1,23 @@
 import Foundation
+import IOSRoute
+import PodcastRoute
+
+protocol IOSModelIdentifiable {
+  var modelIdentifier: String { get }
+}
+
+extension IOSModelIdentifiable {
+  var modelName: String {
+    ModelIdentifier.marketingName(for: self.modelIdentifier)
+  }
+}
+
+extension PodcastEvent: IOSModelIdentifiable {}
+extension IOSApp.PendingSupervision: IOSModelIdentifiable {}
+extension IOSApp.Device: IOSModelIdentifiable {}
+extension IOSEvent: IOSModelIdentifiable {}
+extension LogPodcastEvent_v2.Input: IOSModelIdentifiable {}
+extension LogIOSEvent_v2.Input: IOSModelIdentifiable {}
 
 enum ModelIdentifier {
   static func fromLegacyDeviceType(_ value: String) -> String {

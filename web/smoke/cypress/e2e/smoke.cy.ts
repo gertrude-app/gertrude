@@ -103,4 +103,16 @@ describe(`Smoke test`, () => {
     cy.visit(`/signup`);
     cy.location(`pathname`).should(`eq`, `/`);
   });
+
+  it(`supervision redirect chain returns error for unknown code`, () => {
+    cy.request({
+      url: `https://gertrude.app/s/999999`,
+      followRedirect: true,
+    }).then((response) => {
+      expect(response.redirects).to.have.length.greaterThan(0);
+      const finalUrl = (response.redirects ?? [])[(response.redirects?.length ?? 0) - 1];
+      expect(finalUrl).to.include(`parents.gertrude.app/login`);
+      expect(finalUrl).to.include(`error=invalid_code`);
+    });
+  });
 });
