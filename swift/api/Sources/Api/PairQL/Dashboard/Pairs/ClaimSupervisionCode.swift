@@ -56,7 +56,7 @@ extension ClaimSupervisionCode: Resolver {
 
         return .init(
           childName: child.name,
-          deviceType: device.deviceType,
+          deviceType: ModelIdentifier.deviceType(from: device.modelIdentifier),
           iosVersion: device.iosVersion,
           code: input.code,
         )
@@ -88,7 +88,7 @@ extension ClaimSupervisionCode: Resolver {
       try await context.db.update(pendingSupervision)
       return .init(
         childName: prevChild.name,
-        deviceType: prevDevice.deviceType,
+        deviceType: ModelIdentifier.deviceType(from: prevDevice.modelIdentifier),
         iosVersion: prevDevice.iosVersion,
         code: input.code,
       )
@@ -104,7 +104,7 @@ extension ClaimSupervisionCode: Resolver {
     let device = try await context.db.create(IOSApp.Device(
       childId: child.id,
       vendorId: .init(pendingSupervision.vendorId),
-      deviceType: pendingSupervision.deviceType,
+      modelIdentifier: pendingSupervision.modelIdentifier,
       appVersion: pendingSupervision.appVersion,
       iosVersion: pendingSupervision.iosVersion,
     ))
@@ -120,7 +120,7 @@ extension ClaimSupervisionCode: Resolver {
 
     return .init(
       childName: child.name,
-      deviceType: device.deviceType,
+      deviceType: ModelIdentifier.deviceType(from: device.modelIdentifier),
       iosVersion: device.iosVersion,
       code: input.code,
     )

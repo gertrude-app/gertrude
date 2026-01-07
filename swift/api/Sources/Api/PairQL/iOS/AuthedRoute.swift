@@ -19,6 +19,9 @@ extension AuthedRoute: RouteResponder {
     case .connectedRules(let input):
       let output = try await ConnectedRules.resolve(with: input, in: ctx)
       return try await self.respond(with: output)
+    case .connectedRules_v2(let input):
+      let output = try await ConnectedRules_v2.resolve(with: input, in: ctx)
+      return try await self.respond(with: output)
     case .createSuspendFilterRequest(let input):
       let output = try await CreateSuspendFilterRequest.resolve(with: input, in: ctx)
       return try await self.respond(with: output)

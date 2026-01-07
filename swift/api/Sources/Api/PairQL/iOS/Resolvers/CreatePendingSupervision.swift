@@ -31,11 +31,14 @@ extension CreatePendingSupervision: Resolver {
       let model = try await ctx.db.create(IOSApp.PendingSupervision(
         code: code,
         vendorId: input.vendorId,
-        deviceType: input.deviceType,
+        modelIdentifier: input.modelIdentifier,
         iosVersion: input.iosVersion,
         appVersion: input.appVersion,
         expiresAt: now + .days(7),
       ))
+
+      ModelIdentifier.alertIfUnknown(input.modelIdentifier)
+
       return Output(code: model.code, expiresAt: model.expiresAt)
     }
 

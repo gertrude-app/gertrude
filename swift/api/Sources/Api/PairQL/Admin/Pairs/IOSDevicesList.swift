@@ -44,7 +44,7 @@ extension IOSDevicesList: Resolver {
       devices: devices.map { row in
         DeviceSummary(
           vendorId: row.vendorId,
-          deviceType: row.deviceType,
+          deviceType: ModelIdentifier.deviceType(from: row.modelIdentifier),
           iosVersion: row.iosVersion,
           firstLaunch: row.firstLaunch,
           eventCount: row.eventCount,
@@ -79,21 +79,21 @@ private struct DeviceSummaryQuery: CustomQueryable {
     let limit = bindings[0]
     let offset = bindings[1]
     let vendorId = IOSEvent.columnName(.vendorId)
-    let deviceType = IOSEvent.columnName(.deviceType)
+    let modelIdentifier = IOSEvent.columnName(.modelIdentifier)
     let iosVersion = IOSEvent.columnName(.iosVersion)
     let createdAt = IOSEvent.columnName(.createdAt)
     let eventId = IOSEvent.columnName(.eventId)
     var stmt = SQL.Statement("""
     SELECT
       first_launch.vendor_id,
-      first_launch.device_type,
+      first_launch.model_identifier,
       first_launch.ios_version,
       first_launch.created_at AS first_launch,
       event_counts.event_count,
       CASE WHEN opt_out.vendor_id IS NOT NULL THEN true ELSE false END AS reached_opt_out
     FROM (
       SELECT DISTINCT ON (\(vendorId))
-        \(vendorId), \(deviceType), \(iosVersion), \(createdAt)
+        \(vendorId), \(modelIdentifier), \(iosVersion), \(createdAt)
       FROM \(table: IOSEvent.self)
       WHERE \(vendorId) IS NOT NULL
         AND \(eventId) = '8d35f043'
@@ -120,7 +120,7 @@ private struct DeviceSummaryQuery: CustomQueryable {
   }
 
   var vendorId: UUID
-  var deviceType: String
+  var modelIdentifier: String
   var iosVersion: String
   var firstLaunch: Date
   var eventCount: Int

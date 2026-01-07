@@ -6,7 +6,7 @@ extension IOSApp {
     var id: Id
     var childId: Child.Id
     var vendorId: VendorId
-    var deviceType: String
+    var modelIdentifier: String
     var appVersion: String
     var iosVersion: String
     var webPolicy: String
@@ -20,7 +20,7 @@ extension IOSApp {
       id: Id? = nil,
       childId: Child.Id,
       vendorId: VendorId,
-      deviceType: String,
+      modelIdentifier: String,
       appVersion: String,
       iosVersion: String,
       webPolicy: String = "blockAll",
@@ -31,7 +31,7 @@ extension IOSApp {
       self.id = id ?? .init(get(dependency: \.uuid)())
       self.childId = childId
       self.vendorId = vendorId
-      self.deviceType = deviceType
+      self.modelIdentifier = modelIdentifier
       self.appVersion = appVersion
       self.iosVersion = iosVersion
       self.webPolicy = webPolicy

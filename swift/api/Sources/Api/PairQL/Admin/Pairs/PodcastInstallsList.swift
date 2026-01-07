@@ -46,7 +46,7 @@ extension PodcastInstallsList: Resolver {
       installs: installs.map { row in
         InstallSummary(
           installId: row.installId,
-          deviceType: row.deviceType,
+          deviceType: ModelIdentifier.deviceType(from: row.modelIdentifier),
           iosVersion: row.iosVersion,
           appVersion: row.appVersion,
           firstLaunch: row.firstLaunch,
@@ -85,7 +85,7 @@ private struct InstallSummaryQuery: CustomQueryable {
     let limit = bindings[0]
     let offset = bindings[1]
     let installId = PodcastEvent.columnName(.installId)
-    let deviceType = PodcastEvent.columnName(.deviceType)
+    let modelIdentifier = PodcastEvent.columnName(.modelIdentifier)
     let iosVersion = PodcastEvent.columnName(.iosVersion)
     let appVersion = PodcastEvent.columnName(.appVersion)
     let createdAt = PodcastEvent.columnName(.createdAt)
@@ -93,7 +93,7 @@ private struct InstallSummaryQuery: CustomQueryable {
     var stmt = SQL.Statement("""
     SELECT
       first_launch.install_id,
-      first_launch.device_type,
+      first_launch.model_identifier,
       first_launch.ios_version,
       first_launch.app_version,
       first_launch.created_at AS first_launch,
@@ -102,7 +102,7 @@ private struct InstallSummaryQuery: CustomQueryable {
       CASE WHEN paid.install_id IS NOT NULL THEN true ELSE false END AS is_paid
     FROM (
       SELECT DISTINCT ON (\(installId))
-        \(installId), \(deviceType), \(iosVersion), \(appVersion), \(createdAt)
+        \(installId), \(modelIdentifier), \(iosVersion), \(appVersion), \(createdAt)
       FROM \(table: PodcastEvent.self)
       WHERE \(installId) IS NOT NULL
         AND \(eventId) = '27c4f26a'
@@ -136,7 +136,7 @@ private struct InstallSummaryQuery: CustomQueryable {
   }
 
   var installId: UUID
-  var deviceType: String
+  var modelIdentifier: String
   var iosVersion: String
   var appVersion: String
   var firstLaunch: Date

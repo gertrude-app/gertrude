@@ -13,7 +13,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     let pending = try await self.db.create(IOSApp.PendingSupervision(
       code: code,
       vendorId: vendorId,
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone18,1",
       iosVersion: "18.2",
       appVersion: "1.5.0",
       expiresAt: .reference + .days(7),
@@ -43,7 +43,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
       .where(.vendorId == vendorId)
       .first(in: self.db)
     expect(device.childId).toEqual(children[0].id)
-    expect(device.deviceType).toEqual("iPhone")
+    expect(device.modelIdentifier).toEqual("iPhone18,1")
     expect(device.iosVersion).toEqual("18.2")
     expect(device.supervisedAt).toBeNil()
 
@@ -69,7 +69,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     try await self.db.create(IOSApp.PendingSupervision(
       code: code,
       vendorId: vendorId,
-      deviceType: "iPad",
+      modelIdentifier: "iPad14,8",
       iosVersion: "26.1",
       appVersion: "1.5.0",
       expiresAt: .reference + .days(7),
@@ -115,7 +115,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     try await self.db.create(IOSApp.PendingSupervision(
       code: code,
       vendorId: UUID(),
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone18,1",
       iosVersion: "18.0",
       appVersion: "1.0.0",
       expiresAt: .reference - .days(1),
@@ -140,7 +140,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     try await self.db.create(IOSApp.PendingSupervision(
       code: code,
       vendorId: UUID(),
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone18,2",
       iosVersion: "18.0",
       appVersion: "1.0.0",
       claimedChildId: otherChild.id, // <-- already claimed by other parent
@@ -168,7 +168,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     try await self.db.create(IOSApp.PendingSupervision(
       code: code,
       vendorId: UUID(),
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone18,2",
       iosVersion: "18.0",
       appVersion: "1.0.0",
       expiresAt: .reference + .days(7),
@@ -197,7 +197,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     let existingDevice = try await self.db.create(IOSApp.Device(
       childId: existingChild.id,
       vendorId: .init(vendorId),
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone18,2",
       appVersion: "1.5.1",
       iosVersion: "17.0",
     ))
@@ -205,7 +205,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     try await self.db.create(IOSApp.PendingSupervision(
       code: code,
       vendorId: vendorId, // <-- we already have a device with this vendorId...
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone18,2",
       iosVersion: "18.0",
       appVersion: "1.4.9",
       expiresAt: .reference + .days(7),
@@ -239,14 +239,14 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     try await self.db.create(IOSApp.Device(
       childId: child.id,
       vendorId: .init(vendorId),
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone18,2",
       appVersion: "1.0.0",
       iosVersion: "18.0",
     ))
     try await self.db.create(IOSApp.PendingSupervision(
       code: code,
       vendorId: vendorId,
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone18,2",
       iosVersion: "18.0",
       appVersion: "1.0.0",
       claimedChildId: child.id, // <-- already claimed, expiration doesn't matter

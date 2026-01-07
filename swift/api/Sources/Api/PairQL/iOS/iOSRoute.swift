@@ -19,6 +19,9 @@ extension IOSRoute: RouteResponder {
       case .connectDevice(let input):
         let output = try await ConnectDevice.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .connectDevice_v2(let input):
+        let output = try await ConnectDevice_v2.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       case .createPendingSupervision(let input):
         let output = try await CreatePendingSupervision.resolve(with: input, in: context)
         return try await self.respond(with: output)
@@ -28,8 +31,14 @@ extension IOSRoute: RouteResponder {
       case .logIOSEvent(let input):
         let output = try await LogIOSEvent.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .logIOSEvent_v2(let input):
+        let output = try await LogIOSEvent_v2.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       case .recoveryDirective(let input):
         let output = try await RecoveryDirective.resolve(with: input, in: context)
+        return try await self.respond(with: output)
+      case .recoveryDirective_v2(let input):
+        let output = try await RecoveryDirective_v2.resolve(with: input, in: context)
         return try await self.respond(with: output)
       case .connectAccountFeatureFlag:
         let output = try await ConnectAccountFeatureFlag.resolve(in: context)

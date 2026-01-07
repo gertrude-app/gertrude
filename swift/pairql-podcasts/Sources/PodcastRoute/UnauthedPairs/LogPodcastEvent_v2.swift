@@ -1,8 +1,8 @@
 import Foundation
 import PairQL
 
-/// deprecated: v1.0.0 - v1.3.x
-public struct LogPodcastEvent: Pair {
+/// in use: v1.4.x - present
+public struct LogPodcastEvent_v2: Pair {
   public static let auth: ClientAuth = .none
 
   public struct Input: PairInput {
@@ -11,7 +11,7 @@ public struct LogPodcastEvent: Pair {
     public var label: String
     public var detail: String?
     public var installId: UUID?
-    public var deviceType: String
+    public var modelIdentifier: String
     public var appVersion: String
     public var iosVersion: String
 
@@ -21,7 +21,7 @@ public struct LogPodcastEvent: Pair {
       label: String,
       detail: String? = nil,
       installId: UUID? = nil,
-      deviceType: String,
+      modelIdentifier: String,
       appVersion: String,
       iosVersion: String,
     ) {
@@ -30,7 +30,7 @@ public struct LogPodcastEvent: Pair {
       self.label = label
       self.detail = detail
       self.installId = installId
-      self.deviceType = deviceType
+      self.modelIdentifier = modelIdentifier
       self.appVersion = appVersion
       self.iosVersion = iosVersion
     }

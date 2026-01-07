@@ -49,7 +49,7 @@ extension IOSOverview: NoInputResolver {
         RecentInstall(
           date: row.date,
           status: row.succeeded ? "success" : "incomplete",
-          deviceType: row.deviceType,
+          deviceType: ModelIdentifier.deviceType(from: row.modelIdentifier),
         )
       }
 
@@ -163,14 +163,14 @@ private struct RecentInstallsQuery: CustomQueryable {
     let vendorId = IOSEvent.columnName(.vendorId)
     let eventId = IOSEvent.columnName(.eventId)
     let createdAt = IOSEvent.columnName(.createdAt)
-    let deviceType = IOSEvent.columnName(.deviceType)
+    let modelIdentifier = IOSEvent.columnName(.modelIdentifier)
     return SQL.Statement("""
     SELECT
       first_launch.\(createdAt) AS date,
-      first_launch.\(deviceType) AS device_type,
+      first_launch.\(modelIdentifier) AS model_identifier,
       CASE WHEN success.\(vendorId) IS NOT NULL THEN TRUE ELSE FALSE END AS succeeded
     FROM (
-      SELECT DISTINCT ON (\(vendorId)) \(vendorId), \(createdAt), \(deviceType)
+      SELECT DISTINCT ON (\(vendorId)) \(vendorId), \(createdAt), \(modelIdentifier)
       FROM \(table: IOSEvent.self)
       WHERE \(vendorId) IS NOT NULL AND \(eventId) = '8d35f043'
       ORDER BY \(vendorId), \(createdAt)
@@ -185,6 +185,6 @@ private struct RecentInstallsQuery: CustomQueryable {
   }
 
   var date: Date
-  var deviceType: String
+  var modelIdentifier: String
   var succeeded: Bool
 }

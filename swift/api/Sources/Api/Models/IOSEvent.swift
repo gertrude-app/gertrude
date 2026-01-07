@@ -6,7 +6,7 @@ struct IOSEvent: Codable, Sendable {
   var kind: Kind
   var detail: String?
   var vendorId: UUID?
-  var deviceType: String
+  var modelIdentifier: String
   var iosVersion: String
   var createdAt = Date()
 
@@ -16,7 +16,7 @@ struct IOSEvent: Codable, Sendable {
     kind: Kind,
     detail: String? = nil,
     vendorId: UUID? = nil,
-    deviceType: String,
+    modelIdentifier: String,
     iosVersion: String,
   ) {
     self.id = id
@@ -24,7 +24,7 @@ struct IOSEvent: Codable, Sendable {
     self.kind = kind
     self.detail = detail
     self.vendorId = vendorId
-    self.deviceType = deviceType
+    self.modelIdentifier = modelIdentifier
     self.iosVersion = iosVersion
   }
 }

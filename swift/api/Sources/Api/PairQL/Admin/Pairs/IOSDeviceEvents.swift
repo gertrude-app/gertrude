@@ -41,7 +41,8 @@ extension IOSDeviceEvents: Resolver {
 
     let firstLaunch = events.first { $0.eventId == "8d35f043" }
     let reachedOptOut = events.contains { $0.eventId == "cdb31095" }
-    let deviceType = firstLaunch?.deviceType ?? events.first?.deviceType ?? "Unknown"
+    let modelIdentifier = firstLaunch?.modelIdentifier ?? events.first?.modelIdentifier ?? "Unknown"
+    let deviceType = ModelIdentifier.deviceType(from: modelIdentifier)
     let iosVersion = firstLaunch?.iosVersion ?? events.first?.iosVersion ?? "Unknown"
 
     var outputEvents: [Event] = []

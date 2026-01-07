@@ -7,7 +7,7 @@ extension IOSApp.Device: RandomMocked {
     .init(
       childId: .init(),
       vendorId: .init(),
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone15,2",
       appVersion: "1.5.0",
       iosVersion: "18.4.0",
     )
@@ -17,7 +17,7 @@ extension IOSApp.Device: RandomMocked {
     .init(
       childId: .init(),
       vendorId: .init(),
-      deviceType: "iPhone",
+      modelIdentifier: "iPhone15,2",
       appVersion: "1.5.0",
       iosVersion: "18.4.0",
     )
@@ -27,7 +27,7 @@ extension IOSApp.Device: RandomMocked {
     .init(
       childId: .init(),
       vendorId: .init(),
-      deviceType: Bool.random() ? "iPhone" : "iPad",
+      modelIdentifier: Bool.random() ? "iPhone15,2" : "iPad14,1",
       appVersion: "1.5.\(Int.random(in: 0 ... 100))",
       iosVersion: "18.4.\(Int.random(in: 0 ... 100))",
     )

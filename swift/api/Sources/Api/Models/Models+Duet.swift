@@ -99,7 +99,7 @@ extension IOSApp.Device {
     case id
     case childId
     case vendorId
-    case deviceType
+    case modelIdentifier
     case appVersion
     case iosVersion
     case webPolicy
@@ -617,7 +617,7 @@ extension PodcastEvent {
     case eventId
     case kind
     case label
-    case deviceType
+    case modelIdentifier
     case appVersion
     case iosVersion
     case installId
@@ -637,7 +637,7 @@ extension IOSEvent {
     case kind
     case detail
     case vendorId
-    case deviceType
+    case modelIdentifier
     case iosVersion
     case createdAt
   }
@@ -652,7 +652,7 @@ extension IOSApp.PendingSupervision {
     case id
     case code
     case vendorId
-    case deviceType
+    case modelIdentifier
     case iosVersion
     case appVersion
     case claimedChildId

@@ -51,7 +51,7 @@ extension PodcastOverview: NoInputResolver {
       .map { row in
         RecentInstall(
           date: row.date,
-          deviceType: row.deviceType,
+          deviceType: ModelIdentifier.deviceType(from: row.modelIdentifier),
           isPaid: row.isPaid,
         )
       }
@@ -114,7 +114,7 @@ private struct DeviceTypeInstallCount: CustomCountable {
     WHERE \(PodcastEvent.columnName(.eventId)) =\(" ")
     """)
     stmt.components.append(.binding(eventId))
-    stmt.components.append(.sql(" AND \(PodcastEvent.columnName(.deviceType)) LIKE "))
+    stmt.components.append(.sql(" AND \(PodcastEvent.columnName(.modelIdentifier)) LIKE "))
     stmt.components.append(.binding(devicePattern))
     return stmt
   }
@@ -127,14 +127,14 @@ private struct RecentInstallsQuery: CustomQueryable {
     let installId = PodcastEvent.columnName(.installId)
     let eventId = PodcastEvent.columnName(.eventId)
     let createdAt = PodcastEvent.columnName(.createdAt)
-    let deviceType = PodcastEvent.columnName(.deviceType)
+    let modelIdentifier = PodcastEvent.columnName(.modelIdentifier)
     return SQL.Statement("""
     SELECT
       first_launch.\(createdAt) AS date,
-      first_launch.\(deviceType) AS device_type,
+      first_launch.\(modelIdentifier) AS model_identifier,
       CASE WHEN paid.\(installId) IS NOT NULL THEN TRUE ELSE FALSE END AS is_paid
     FROM (
-      SELECT DISTINCT ON (\(installId)) \(installId), \(createdAt), \(deviceType)
+      SELECT DISTINCT ON (\(installId)) \(installId), \(createdAt), \(modelIdentifier)
       FROM \(table: PodcastEvent.self)
       WHERE \(installId) IS NOT NULL AND \(eventId) = '27c4f26a'
       ORDER BY \(installId), \(createdAt)
@@ -149,6 +149,6 @@ private struct RecentInstallsQuery: CustomQueryable {
   }
 
   var date: Date
-  var deviceType: String
+  var modelIdentifier: String
   var isPaid: Bool
 }
