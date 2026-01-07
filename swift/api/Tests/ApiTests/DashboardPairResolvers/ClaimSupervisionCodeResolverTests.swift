@@ -226,7 +226,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     expect(devices.map(\.id)).toEqual([existingDevice.id]) // ...so we reuse it
 
     let updatedPending = try await IOSApp.PendingSupervision.query()
-      .where(.code == .int(code))
+      .where(.code == code)
       .first(in: self.db)
     expect(updatedPending.claimedChildId).toEqual(existingChild.id)
   }

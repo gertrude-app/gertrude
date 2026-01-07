@@ -36,7 +36,7 @@ struct ClaimSupervisionCode: Pair {
 extension ClaimSupervisionCode: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     let pendingSupervision = try? await IOSApp.PendingSupervision.query()
-      .where(.code == .int(input.code))
+      .where(.code == input.code)
       .first(in: context.db)
 
     guard var pendingSupervision else {

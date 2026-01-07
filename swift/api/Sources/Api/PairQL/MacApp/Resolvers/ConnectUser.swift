@@ -30,7 +30,7 @@ extension ConnectUser: Resolver {
     if let computer {
       existingComputerUser = try? await ComputerUser.query()
         .where(.computerId == computer.id)
-        .where(.numericId == .int(input.numericId))
+        .where(.numericId == input.numericId)
         .first(in: context.db)
     }
 

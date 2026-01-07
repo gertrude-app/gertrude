@@ -23,7 +23,7 @@ extension CreatePendingSupervision: Resolver {
     for _ in 1 ... 20 {
       let code = generator.generate()
       let exists = try await IOSApp.PendingSupervision.query()
-        .where(.code == .int(code))
+        .where(.code == code)
         .exists(in: ctx.db)
       if exists {
         continue
