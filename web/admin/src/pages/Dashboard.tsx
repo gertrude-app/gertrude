@@ -165,6 +165,13 @@ const IOSSection: React.FC<IOSSectionProps> = ({ data }) => (
           <span>View Stats</span>
           <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
         </Link>
+        <Link
+          to="/ratings/blocker"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
+        >
+          <span>View Ratings</span>
+          <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
       </div>
     </div>
     <div className="p-6 space-y-6">
@@ -244,13 +251,22 @@ const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {
             Podcast App
           </h2>
         </div>
-        <Link
-          to="/podcasts"
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-all group"
-        >
-          <span>View Installs</span>
-          <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/podcasts"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-all group"
+          >
+            <span>View Installs</span>
+            <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <Link
+            to="/ratings/podcasts"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-all group"
+          >
+            <span>View Ratings</span>
+            <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </div>
       </div>
       <div className="p-6 space-y-6">
         <div className="grid grid-cols-4 gap-4">

@@ -12,3 +12,5 @@ export type DeviceModelFamily =
   | `studio`
   | `pro`
   | `unknown`;
+
+export type GertrudeApp = `blocker` | `podcasts`;
