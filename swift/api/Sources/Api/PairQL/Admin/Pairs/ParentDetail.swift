@@ -31,6 +31,14 @@ struct ParentDetail: Pair {
     var screenshotsEnabled: Bool
     var createdAt: Date
     var installations: [InstallationOutput]
+    var keychains: [ChildKeychainOutput]
+  }
+
+  struct ChildKeychainOutput: PairNestable {
+    var id: Keychain.Id
+    var name: String
+    var numKeys: Int
+    var isPublic: Bool
   }
 
   struct InstallationOutput: PairNestable {
@@ -98,6 +106,20 @@ extension ParentDetail: Resolver {
         ))
       }
 
+      let childKeychains = try await child.keychains(in: context.db)
+      var childKeychainOutputs: [ChildKeychainOutput] = []
+      for keychain in childKeychains {
+        let keyCount = try await Key.query()
+          .where(.keychainId == keychain.id)
+          .count(in: context.db)
+        childKeychainOutputs.append(ChildKeychainOutput(
+          id: keychain.id,
+          name: keychain.name,
+          numKeys: keyCount,
+          isPublic: keychain.isPublic,
+        ))
+      }
+
       childOutputs.append(ChildOutput(
         id: child.id,
         name: child.name,
@@ -105,6 +127,7 @@ extension ParentDetail: Resolver {
         screenshotsEnabled: child.screenshotsEnabled,
         createdAt: child.createdAt,
         installations: installations,
+        keychains: childKeychainOutputs,
       ))
     }
 

@@ -30,6 +30,12 @@ export namespace ParentDetail {
         modelTitle: string;
         createdAt: ISODateString;
       }>;
+      keychains: Array<{
+        id: UUID;
+        name: string;
+        numKeys: number;
+        isPublic: boolean;
+      }>;
     }>;
     keychains: Array<{
       id: UUID;
