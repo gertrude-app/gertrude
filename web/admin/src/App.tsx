@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
+import AppRatings from './pages/AppRatings';
 import Dashboard from './pages/Dashboard';
 import IOSDeviceEvents from './pages/IOSDeviceEvents';
 import IOSDevicesList from './pages/IOSDevicesList';
@@ -53,6 +54,7 @@ const App: React.FC = () => {
         <Route path="/ios/:vendorId/events" element={<IOSDeviceEvents />} />
         <Route path="/podcasts" element={<PodcastInstallsList />} />
         <Route path="/podcasts/:installId/detail" element={<PodcastInstallDetail />} />
+        <Route path="/ratings/:app" element={<AppRatings />} />
         <Route path="/parents" element={<ParentsList />} />
         <Route path="/parents/:id" element={<ParentDetail />} />
         <Route path="*" element={<Navigate to="/" replace />} />

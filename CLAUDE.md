@@ -93,6 +93,11 @@ Supports all 3 apps, plus dashboard and admin websites
 - never add comments when writing code
 - never remove comments when refactoring code
 
+## Database access
+
+- if i ask you to read from the database, or you need to for your task, always read the
+  database skill file at `./.claude/skills/database/SKILL.md`
+
 ## Dev "task" concept
 
 Local dev for this monorepo takes place in individual "task" branches with separate

@@ -45,9 +45,7 @@ struct AppStoreSyncJob: AsyncScheduledJob {
             reviewCreatedAt: review.createdDate,
           )
           try await self.db.create(newReview)
-
-          // TODO: send Slack notification for new review
-          // await self.notifyNewReview(newReview)
+          await self.notifyNewReview(newReview)
         }
       }
 
@@ -108,8 +106,7 @@ struct AppStoreSyncJob: AsyncScheduledJob {
           for _ in 0 ..< inferred.count {
             let event = AppStore.RatingEvent(app: app, stars: roundedStars)
             try await self.db.create(event)
-            // TODO: send Slack notification for inferred rating-only submission
-            // await self.notifyInferredRating(app: app, stars: roundedStars)
+            await self.notifyInferredRating(app: app, stars: roundedStars)
           }
         }
       }

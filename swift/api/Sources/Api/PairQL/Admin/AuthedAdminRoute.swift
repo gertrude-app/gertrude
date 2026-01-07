@@ -14,6 +14,7 @@ enum AuthedAdminRoute: PairRoute {
   case parentDetail(ParentDetail.Input)
   case deleteParent(DeleteParent.Input)
   case searchParentByEmail(SearchParentByEmail.Input)
+  case appRatings(AppRatings.Input)
 
   nonisolated(unsafe) static let router = OneOf {
     Route(.case(Self.macOverview)) {
@@ -60,6 +61,10 @@ enum AuthedAdminRoute: PairRoute {
       Operation(SearchParentByEmail.self)
       Body(.input(SearchParentByEmail.self))
     }
+    Route(.case(Self.appRatings)) {
+      Operation(AppRatings.self)
+      Body(.input(AppRatings.self))
+    }
   }
 }
 
@@ -101,6 +106,9 @@ extension AuthedAdminRoute: RouteResponder {
       return try await self.respond(with: output)
     case .searchParentByEmail(let input):
       let output = try await SearchParentByEmail.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .appRatings(let input):
+      let output = try await AppRatings.resolve(with: input, in: context)
       return try await self.respond(with: output)
     }
   }

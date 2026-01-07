@@ -19,6 +19,7 @@ enum AdminTsCodegenRoute {
       ("ServerPqlError", PqlError.self),
       ("ClientAuth", ClientAuth.self),
       ("DeviceModelFamily", DeviceModelFamily.self),
+      ("GertrudeApp", AppStore.GertrudeApp.self),
     ]
   }
 
@@ -38,6 +39,7 @@ enum AdminTsCodegenRoute {
       ParentDetail.self,
       DeleteParent.self,
       SearchParentByEmail.self,
+      AppRatings.self,
     ]
   }
 

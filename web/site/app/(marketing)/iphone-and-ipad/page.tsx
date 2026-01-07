@@ -155,6 +155,12 @@ const REVIEWS = [
   ],
   [
     {
+      title: `Not easy… but worth it!!!`,
+      body: `Probably the best app out there for those wanting to walk in sexual purity.`,
+      author: `Jesus Is My Reward 510!`,
+      date: `Dec 31, 2025`,
+    },
+    {
       title: `THANK YOU!!!`,
       body: `Saved my young son from looking at porn through the maps app. You are a lifesaver.`,
       author: `GratefulMom55`,
