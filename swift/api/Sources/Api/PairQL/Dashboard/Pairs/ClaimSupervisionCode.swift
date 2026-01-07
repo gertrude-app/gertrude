@@ -18,9 +18,7 @@ struct ClaimSupervisionCode: Pair {
 
   struct Output: PairOutput {
     let childName: String
-    // TODO: superios - must change when we do modelIdentifier -> marketing name
-    // should become `deviceModelMarketingName` or similar, w/ `iPhone 16 Pro` etc
-    let deviceType: String
+    let modelName: String
     let iosVersion: String
     let code: Int
   }
@@ -56,7 +54,7 @@ extension ClaimSupervisionCode: Resolver {
 
         return .init(
           childName: child.name,
-          deviceType: ModelIdentifier.deviceType(from: device.modelIdentifier),
+          modelName: device.modelName,
           iosVersion: device.iosVersion,
           code: input.code,
         )
@@ -88,7 +86,7 @@ extension ClaimSupervisionCode: Resolver {
       try await context.db.update(pendingSupervision)
       return .init(
         childName: prevChild.name,
-        deviceType: ModelIdentifier.deviceType(from: prevDevice.modelIdentifier),
+        modelName: prevDevice.modelName,
         iosVersion: prevDevice.iosVersion,
         code: input.code,
       )
@@ -120,7 +118,7 @@ extension ClaimSupervisionCode: Resolver {
 
     return .init(
       childName: child.name,
-      deviceType: ModelIdentifier.deviceType(from: device.modelIdentifier),
+      modelName: device.modelName,
       iosVersion: device.iosVersion,
       code: input.code,
     )
