@@ -59,7 +59,7 @@ struct AppStoreSyncJob: AsyncScheduledJob {
 
   // app store connect api doesn't give great data about rating-only submissions
   // only aggregate data, so we store snapshots in order to infer events
-  private func syncRatings(for app: AppStore.GertrudeApp) async {
+  func syncRatings(for app: AppStore.GertrudeApp) async {
     do {
       let ratings = try await self.appStoreConnect.fetchRatings(app)
 
@@ -71,6 +71,16 @@ struct AppStoreSyncJob: AsyncScheduledJob {
         .where(.app == app.rawValue)
         .orderBy(.createdAt, .desc)
         .first(in: self.db)
+
+      let snapshotValuesUnchanged = prevSnapshot.map { prev in
+        prev.averageRating == ratings.averageUserRating
+          && prev.totalCount == ratings.userRatingCount
+          && prev.reviewCount == reviewCount
+      } ?? false
+
+      if snapshotValuesUnchanged {
+        return
+      }
 
       let newSnapshot = try await self.db.create(AppStore.RatingSnapshot(
         app: app,

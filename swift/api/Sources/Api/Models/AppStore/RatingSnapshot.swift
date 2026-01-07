@@ -7,7 +7,7 @@ extension AppStore {
     var averageRating: Double
     var totalCount: Int
     var reviewCount: Int
-    var createdAt: Date = .init()
+    var createdAt = Date()
 
     init(
       id: Id = .init(),
