@@ -36,8 +36,7 @@ extension LogIOSEvent_v2: Resolver {
       let eventLink = "\(adminUrl)/ios/\(vendorId.lowercased)/events"
       let events = Slack.link(to: eventLink, withText: "see events")
       let region = detail?.split(separator: "`").dropFirst().first.map { "`\($0)`" } ?? "`unknown`"
-      let deviceDisplay = ModelIdentifier.marketingName(for: input.modelIdentifier)
-      let stats = "region: \(region), device: `\(deviceDisplay)`, iOS: `\(input.iOSVersion)`,"
+      let stats = "region: \(region), device: `\(input.modelName)`, iOS: `\(input.iOSVersion)`,"
       let message = "*iOS First Launch*, \(stats) \(events)"
       await get(dependency: \.slack).internal(.iosOnboarding, message)
     }

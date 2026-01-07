@@ -33,12 +33,11 @@ extension LogPodcastEvent_v2: Resolver {
           .where(.eventId == "a72104d7")
           .count(in: context.db)
         if subscriptionCount == 1 {
-          let deviceDisplay = ModelIdentifier.marketingName(for: input.modelIdentifier)
-          await slack.internal(.info, "*FIRST Podcast Subscription* `\(deviceDisplay)`")
-          await slack.internal(.podcasts, "*FIRST Podcast Subscription* `\(deviceDisplay)`")
+          await slack.internal(.info, "*FIRST Podcast Subscription* `\(input.modelName)`")
+          await slack.internal(.podcasts, "*FIRST Podcast Subscription* `\(input.modelName)`")
           get(dependency: \.postmark).toSuperAdmin(
             "FIRST Podcast Subscription",
-            "device: \(deviceDisplay)",
+            "device: \(input.modelName)",
           )
         }
       }

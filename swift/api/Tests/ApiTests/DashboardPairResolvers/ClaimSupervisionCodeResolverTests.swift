@@ -29,7 +29,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     }
 
     expect(output.childName).toEqual("Luke")
-    expect(output.deviceType).toEqual("iPhone")
+    expect(output.modelName).toEqual("iPhone 17 Pro")
     expect(output.iosVersion).toEqual("18.2")
     expect(output.code).toEqual(code)
 
@@ -85,7 +85,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     }
 
     expect(output.childName).toEqual(existingChild.name)
-    expect(output.deviceType).toEqual("iPad")
+    expect(output.modelName).toEqual("iPad Air 11-inch (M2)")
 
     let device = try await IOSApp.Device.query()
       .where(.vendorId == vendorId)
@@ -226,7 +226,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     expect(devices.map(\.id)).toEqual([existingDevice.id]) // ...so we reuse it
 
     let updatedPending = try await IOSApp.PendingSupervision.query()
-      .where(.code == .int(code))
+      .where(.code == code)
       .first(in: self.db)
     expect(updatedPending.claimedChildId).toEqual(existingChild.id)
   }

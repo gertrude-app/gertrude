@@ -80,5 +80,10 @@ public extension Configure {
       "test-inbox",
       use: TestEmailInboxRoute.handler(_:),
     )
+
+    app.get(
+      "claim-pending-supervision", ":code",
+      use: ClaimSupervisionRedirectRoute.handler(_:),
+    )
   }
 }

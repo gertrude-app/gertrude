@@ -197,6 +197,13 @@ public func == <M: Model>(
   .equals(lhs, .string(rhs))
 }
 
+public func == <M: Model>(
+  lhs: M.ColumnName,
+  rhs: Int,
+) -> SQL.WhereConstraint<M> {
+  .equals(lhs, .int(rhs))
+}
+
 public func != <M: Model>(
   lhs: M.ColumnName,
   rhs: Postgres.Data,
