@@ -98,9 +98,6 @@ private func filterEventContext(
     return ""
   }
   let computerName = computer.customName ?? computer.modelIdentifier
-  let adminUrl = context.env.get("ADMIN_SITE_URL") ?? "http://localhost:4243"
-  return "\n  -> " + Slack.link(
-    to: "\(adminUrl)/parents/\(parent.id.lowercased)",
-    withText: "\(parent.email), \(context.child.name), \(computerName)",
-  )
+  let text = "\(parent.email), \(context.child.name), \(computerName)"
+  return "\n  -> " + AdminLink().slack(to: .parent(parent.id), text: text)
 }

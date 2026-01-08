@@ -62,10 +62,9 @@ private func sendVerification(
         message: "Your verification code is \(code)",
       ))
     } catch {
-      let adminUrl = context.env.get("ADMIN_SITE_URL") ?? "http://localhost:4243"
-      let parentLink = Slack.link(
-        to: "\(adminUrl)/parents/\(context.parent.id.lowercased)",
-        withText: context.parent.email.rawValue,
+      let parentLink = AdminLink().slack(
+        to: .parent(context.parent.id),
+        text: context.parent.email.rawValue,
       )
       await with(dependency: \.slack)
         .error("Failed to send SMS verification to \(phoneNumber) (\(parentLink)): \(error)")
