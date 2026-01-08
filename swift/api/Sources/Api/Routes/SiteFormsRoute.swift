@@ -1,3 +1,4 @@
+import DuetSQL
 import Vapor
 import XCore
 
@@ -31,6 +32,10 @@ private struct FormData: Codable {
   var message: String
   var turnstileToken: String
   var subject: String?
+
+  var normalizedEmail: String {
+    self.email.lowercased().trimmingCharacters(in: .whitespaces)
+  }
 }
 
 enum SiteFormsRoute {
@@ -45,20 +50,24 @@ enum SiteFormsRoute {
       try await spamChallenge(data)
     }
 
+    let parent = try? await Parent.query()
+      .where(.email == data.normalizedEmail)
+      .first(in: req.context.db)
+
     Task {
-      await with(dependency: \.slack).internal(.contactForm, data.slackText)
+      await with(dependency: \.slack).internal(.contactForm, data.slackText(parent: parent))
       try await with(dependency: \.postmark).send(
         to: req.env.primarySupportEmail,
         replyTo: data.email,
         subject: data.form.name + " Submission",
-        html: data.emailBody,
+        html: data.emailBody(parent: parent),
       )
       if let backupEmail = req.env.get("BACKUP_SUPPORT_EMAIL") {
         try await with(dependency: \.postmark).send(
           to: backupEmail,
           replyTo: data.email,
           subject: data.form.name + " Submission",
-          html: data.emailBody,
+          html: data.emailBody(parent: parent),
         )
       }
     }
@@ -114,9 +123,16 @@ private func spamChallenge(_ data: FormData) async throws {
 // extensions
 
 extension FormData {
-  var emailBody: String {
-    """
-    From: \(self.name), \(self.email)<br />
+  func emailBody(parent: Parent?) -> String {
+    let fromLine: String
+    if let parent {
+      let link = AdminLink().email(to: .parent(parent.id), text: self.normalizedEmail)
+      fromLine = "From: \(self.name), \(link) [has account]<br />"
+    } else {
+      fromLine = "From: \(self.name), \(self.email)<br />"
+    }
+    return """
+    \(fromLine)
     \(self.subject.map { "Subject: \($0)<br />" } ?? "")
     \(self.app.map { "App: \($0.display)<br />" } ?? "")
     Message:
@@ -124,10 +140,17 @@ extension FormData {
     """
   }
 
-  var slackText: String {
-    """
+  func slackText(parent: Parent?) -> String {
+    let fromLine: String
+    if let parent {
+      let link = AdminLink().slack(to: .parent(parent.id), text: self.normalizedEmail)
+      fromLine = "_From:_ `\(self.name)`, \(link) _[has account]_"
+    } else {
+      fromLine = "_From:_ `\(self.name), \(self.email)`"
+    }
+    return """
     *\(self.form.name) Submission*
-    _From:_ `\(self.name), \(self.email)`
+    \(fromLine)
     \(self.subject.map { "_Subject:_ \($0)" } ?? "")
     \(self.app.map { "_App:_ `\($0.display)`" } ?? "")
     _Message:_

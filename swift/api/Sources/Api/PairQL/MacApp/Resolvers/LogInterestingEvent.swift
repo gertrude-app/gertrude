@@ -104,9 +104,8 @@ func getParentLink(from computerUser: ComputerUser?, in ctx: Context) async -> S
         let parent = try? await child.parent(in: ctx.db) else {
     return ""
   }
-  let adminUrl = ctx.env.get("ADMIN_SITE_URL") ?? "http://localhost:4243"
-  return "\n  -> " + Slack.link(
-    to: "\(adminUrl)/parents/\(parent.id.lowercased)",
-    withText: "\(parent.email), \(child.name)",
+  return "\n  -> " + AdminLink().slack(
+    to: .parent(parent.id),
+    text: "\(parent.email), \(child.name)",
   )
 }

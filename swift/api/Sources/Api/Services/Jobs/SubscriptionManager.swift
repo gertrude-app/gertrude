@@ -169,8 +169,7 @@ struct SubscriptionManager: AsyncScheduledJob {
   }
 
   func adminLink(for parent: Parent) -> String {
-    let adminUrl = self.env.get("ADMIN_SITE_URL") ?? "http://localhost:4243"
-    return "<a href=\"\(adminUrl)/parents/\(parent.id.lowercased)\">\(parent.email)</a>"
+    AdminLink().email(to: .parent(parent.id), text: parent.email.rawValue)
   }
 }
 
