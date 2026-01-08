@@ -203,12 +203,12 @@ Check_ screen clicking the Gertrude menu bar icon and then the gear icon ⚙️ 
 extension wasn't installed properly, click the button to install it.
 
 If for some reason it seems to be installed properly and the filter is still not blocking
-anything, it's very likely caused by a conflict with Apple's **Screen Time** website
-blocker. For some reason, when Apple is trying to filter websites on a Mac using it's own
-Screen Time functionality, it bypasses Gertrude's filter. To fix it, you just need to
-disable Screen Time on the Mac computer, in the System Settings app. Don't worry, you can
-keep using Screen Time for your kids' iPhones and iPads, it just can't be used on the Mac
-at the same time as Gertrude.
+anything, it's very likely caused by a conflict with Apple's **Screen Time** web content
+filter. When Screen Time's web filtering is enabled on the same Mac as Gertrude, it can
+bypass Gertrude's filter. The fix is simple: you just need to disable the web content
+filtering portion of Screen Time (not all of Screen Time). See our
+[detailed guide to fixing this issue](/blog/screen-time-web-filter-conflict) for
+step-by-step instructions.
 
 ## Why can't I access the internet on my admin user account? {% id="admin-internet" %}
 
