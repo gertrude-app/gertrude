@@ -6,17 +6,17 @@ extension DuetSQL.Client {
       return
     }
 
-    let prev = try? await InterestingEvent.query()
+    let numDeleted = await (try? InterestingEvent.query()
       .where(.eventId == event)
       .where(.kind == "deprecation")
       .where(.context == "active")
-      .deleteOne(in: self)
+      .delete(in: self)) ?? 0
     _ = try? await self.create(InterestingEvent(
       eventId: event,
       kind: "deprecation",
       context: "active",
     ))
-    if prev == nil {
+    if numDeleted == 0 {
       with(dependency: \.postmark)
         .toSuperAdmin("deprecation starting", event)
     }
