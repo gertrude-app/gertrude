@@ -7,6 +7,7 @@ struct RequestAdminMagicLink: Pair {
 
   struct Input: PairInput {
     var email: String
+    var overrideAdminUrl: String?
   }
 
   struct Output: PairOutput {
@@ -33,8 +34,7 @@ extension RequestAdminMagicLink: Resolver {
 
     let postmark = get(dependency: \.postmark)
     let token = await with(dependency: \.ephemeral).createSuperAdminToken(email)
-    let adminUrl = context.env.get("ADMIN_SITE_URL") ?? "http://localhost:4243"
-    let url = "\(adminUrl)/verify/\(token.uuidString.lowercased())"
+    let url = AdminLink(input.overrideAdminUrl).url(to: .verify(token: token))
     get(dependency: \.logger).info("Admin magic link requested for `\(email)`")
 
     if context.env.mode == .dev {
