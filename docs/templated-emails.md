@@ -19,25 +19,28 @@ swift/api/Sources/Api/Email/
 ## Updating a Template
 
 1. Edit the template files in `Templates/{TemplateName}/`:
+
    - `template.html` for HTML content
    - `template.md` for plain text content
 
 2. If changing the subject or variables, update `TemplateEmails.swift`
 
 3. Preview changes locally:
+
    ```bash
-   just api                              # start the API server
-   just web-email admin-{template-name}  # preview in browser
+   just swift api                              # start the API server
+   just swift web-email admin-{template-name}  # preview in browser
    ```
 
 4. Test sending:
+
    ```bash
-   just send-email admin-{template-name}  # sends to TEST_EMAIL_RECIPIENT
+   just swift send-email admin-{template-name}  # sends to TEST_EMAIL_RECIPIENT
    ```
 
 5. Sync to Postmark:
    ```bash
-   just sync-email-templates
+   just swift sync-email-templates
    ```
 
 ## Template Variables
@@ -47,11 +50,11 @@ Templates use Postmark's `{{variable}}` syntax. Variables are defined in the Swi
 
 ## Available Test Commands
 
-| Command                                 | Purpose                    |
-| --------------------------------------- | -------------------------- |
-| `just send-email admin-{template}`      | Send test email            |
-| `just web-email admin-{template}`       | Preview HTML in browser    |
-| `just sync-email-templates`             | Sync all templates         |
+| Command                                  | Purpose                 |
+| ---------------------------------------- | ----------------------- |
+| `just swift send-email admin-{template}` | Send test email         |
+| `just swift web-email admin-{template}`  | Preview HTML in browser |
+| `just swift sync-email-templates`        | Sync all templates      |
 
 ## Adding a New Template
 
@@ -59,4 +62,9 @@ Templates use Postmark's `{{variable}}` syntax. Variables are defined in the Swi
 2. Add Swift model struct to `TemplateEmails.swift`
 3. Add case to `Email+Types.swift`
 4. Add test alias to `TestEmail.swift`
-5. Run `just sync-email-templates`
+5. Create the template in Postmark web UI first (the sync tool only updates, doesn't
+   create):
+   - Go to Templates → New Template
+   - Set the alias to match (e.g. `screen-time-warning`)
+   - No layout, no content needed—first sync will set everything correctly
+6. Run `just swift sync-email-templates`

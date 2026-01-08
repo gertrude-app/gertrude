@@ -29,6 +29,7 @@ import XHttp
       await self.syncTemplate(AccountLifecycle.OverdueToUnpaid.self)
       await self.syncTemplate(AccountLifecycle.PaidToOverdue.self)
       await self.syncTemplate(AccountLifecycle.UnpaidToPendingDelete.self)
+      await self.syncTemplate(ScreenTimeWarning.self)
     }
 
     func syncLayout(_ layout: EmailLayout) async {

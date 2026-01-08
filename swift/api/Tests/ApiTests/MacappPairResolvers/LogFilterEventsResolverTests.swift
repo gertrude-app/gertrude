@@ -64,4 +64,25 @@ final class LogFilterEventsResolverTests: ApiTestCase, @unchecked Sendable {
     let output = try await LogFilterEvents.resolve(with: input2, in: child.context)
     expect(output).toEqual(.success)
   }
+
+  func testScreenTimeWarningEmailSentOncePerComputer() async throws {
+    let child = try await self.childWithComputer()
+    let input = FilterLogs(
+      bundleIds: [:],
+      events: [.init(id: "933aa385", detail: "Screen Time web filter detected"): 1],
+    )
+
+    _ = try await LogFilterEvents.resolve(with: input, in: child.context)
+
+    expect(self.sent.emails.count).toEqual(1)
+    expect(self.sent.emails[0].template).toEqual("screen-time-warning")
+    expect(self.sent.emails[0].to).toEqual(child.parent.model.email.rawValue)
+    expect(self.sent.emails[0].templateModel["childName"]).toEqual(child.model.name)
+    expect(self.sent.emails[0].templateModel["computerName"]).not.toBeNil()
+
+    _ = try await LogFilterEvents.resolve(with: input, in: child.context)
+    _ = try await LogFilterEvents.resolve(with: input, in: child.context)
+
+    expect(self.sent.emails.count).toEqual(1)
+  }
 }
