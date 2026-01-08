@@ -18,7 +18,11 @@ const Login: React.FC = () => {
     setStatus(`loading`);
     setErrorMsg(``);
 
-    const result = await client.requestAdminMagicLink({ email });
+    const origin = window.location.origin;
+    const isProduction = origin === `https://admin.gertrude.app`;
+    const overrideAdminUrl = isProduction ? undefined : origin;
+
+    const result = await client.requestAdminMagicLink({ email, overrideAdminUrl });
 
     if (result.isSuccess) {
       setStatus(`sent`);

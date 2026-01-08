@@ -21,7 +21,7 @@ struct AdminLink {
 
   private let baseUrl: String
 
-  init(overrideAdminUrl: String? = nil) {
+  init(_ overrideAdminUrl: String? = nil) {
     if let override = overrideAdminUrl, !override.isEmpty {
       self.baseUrl = override
     } else {
