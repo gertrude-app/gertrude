@@ -94,6 +94,19 @@ struct V2_7_0_Announce: TemplateEmailModel {
   static var subject: String { "Gertrude v2.7.0 is here!" }
 }
 
+struct ScreenTimeWarning: TemplateEmailModel {
+  static var subject: String {
+    "Action needed: Gertrude may not be fully protecting {{childName}}’s computer"
+  }
+
+  var childName: String
+  var computerName: String
+  var templateModel: [String: String] { [
+    "childName": self.childName,
+    "computerName": self.computerName,
+  ] }
+}
+
 enum AccountLifecycle {
   struct TrialEndingSoon: TemplateEmailModel {
     static var subject: String { "[action required] Gertrude trial ending soon" }

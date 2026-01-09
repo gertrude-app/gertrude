@@ -68,16 +68,27 @@ const Dashboard: React.FC<Props> = ({
       <div className="@container">
         <PageHeading icon="home">Dashboard</PageHeading>
         {announcement && !announcementDismissed && (
-          <div className="bg-violet-100 shadow-md border-violet-400 p-4 mt-5 flex flex-col @xl:flex-row @xl:items-start items-center gap-3 rounded-lg">
+          <div
+            className={cx(
+              `shadow-md p-4 mt-5 flex flex-col @xl:flex-row @xl:items-start items-center gap-3 rounded-lg`,
+              announcement.kind === `warning`
+                ? `bg-amber-50 border-2 border-amber-500`
+                : `bg-violet-100 border border-violet-400`,
+            )}
+          >
             <i
               className={cx(
-                `text-violet-600 text-3xl mt-1`,
+                `text-3xl mt-1`,
+                announcement.kind === `warning` ? `text-amber-600` : `text-violet-600`,
                 announcement.icon ?? `fa fa-bolt`,
               )}
             />
             <div className="flex flex-col @4xl:flex-row @4xl:items-start gap-3 @xl:gap-2 @4xl:gap-6">
               <p
-                className="text-violet-800 text-center @xl:text-left"
+                className={cx(
+                  `text-center @xl:text-left`,
+                  announcement.kind === `warning` ? `text-amber-900` : `text-violet-800`,
+                )}
                 dangerouslySetInnerHTML={{ __html: announcement.html }}
               />
               <div className="flex gap-2 justify-center @xl:justify-end whitespace-nowrap">
@@ -86,7 +97,12 @@ const Dashboard: React.FC<Props> = ({
                     target="_blank"
                     rel="noreferrer"
                     href={announcement.learnMoreUrl}
-                    className="text-violet-500 hover:text-violet-800 px-3 py-1 rounded-md border border-violet-400"
+                    className={cx(
+                      `px-3 py-1 rounded-md border`,
+                      announcement.kind === `warning`
+                        ? `text-amber-600 hover:text-amber-800 border-amber-400`
+                        : `text-violet-500 hover:text-violet-800 border-violet-400`,
+                    )}
                   >
                     Learn more
                   </a>
@@ -96,7 +112,12 @@ const Dashboard: React.FC<Props> = ({
                     dismissAnnouncement(announcement.id);
                     setAnnouncementDismissed(true);
                   }}
-                  className="bg-violet-600 text-white hover:text-violet-800 px-3 py-1 rounded-md border border-violet-600 @4xl:mr-1"
+                  className={cx(
+                    `text-white px-3 py-1 rounded-md border @4xl:mr-1`,
+                    announcement.kind === `warning`
+                      ? `bg-amber-600 border-amber-600 hover:bg-amber-700`
+                      : `bg-violet-600 border-violet-600 hover:text-violet-800`,
+                  )}
                 >
                   Dismiss
                 </button>

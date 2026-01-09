@@ -70,7 +70,8 @@ extension PostmarkClient {
          .notifySuspendFilter(let recipient, _),
          .notifyUnlockRequest(let recipient, _),
          .notifySecurityEvent(let recipient, _),
-         .verifyNotificationEmail(let recipient, _):
+         .verifyNotificationEmail(let recipient, _),
+         .screenTimeWarning(let recipient, _):
       templateEmail.to = recipient
       templateEmail.templateModel["subjref"] = "".withEmailSubjectDisambiguator
       try await self._sendTemplateEmail(templateEmail)

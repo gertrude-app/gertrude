@@ -11,6 +11,7 @@ extension DashAnnouncement: Model {
     switch column {
     case .id: .id(self)
     case .parentId: .uuid(self.parentId)
+    case .kind: .string(self.kind.rawValue)
     case .icon: .varchar(self.icon)
     case .html: .string(self.html)
     case .learnMoreUrl: .varchar(self.learnMoreUrl)
@@ -23,6 +24,7 @@ extension DashAnnouncement: Model {
     [
       .id: .id(self),
       .parentId: .uuid(self.parentId),
+      .kind: .string(self.kind.rawValue),
       .icon: .varchar(self.icon),
       .html: .string(self.html),
       .learnMoreUrl: .varchar(self.learnMoreUrl),

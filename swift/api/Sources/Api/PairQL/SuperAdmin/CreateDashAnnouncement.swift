@@ -6,6 +6,7 @@ struct CreateDashAnnouncement: Pair {
   static let auth: ClientAuth = .superAdmin
 
   struct Input: PairInput {
+    let kind: DashAnnouncement.Kind
     let icon: String? // default: `fa fa-bolt` in web
     let html: String
     let learnMoreUrl: String?
@@ -23,6 +24,7 @@ extension CreateDashAnnouncement: Resolver {
     try await context.db.create(parents.map {
       DashAnnouncement(
         parentId: $0.id,
+        kind: input.kind,
         icon: input.icon,
         html: input.html,
         learnMoreUrl: input.learnMoreUrl,

@@ -129,6 +129,12 @@ import Vapor
       case "admin-unpaid-to-pending-delete":
         try await postmark.send(template: .unpaidToPendingDelete(to: to, model: .init()))
 
+      case "screen-time-warning":
+        try await postmark.send(template: .screenTimeWarning(
+          to: to,
+          model: .init(childName: "Billy", computerName: "Test MacBook Pro"),
+        ))
+
       default:
         throw Abort(.badRequest, reason: "unknown template email")
       }
@@ -172,6 +178,8 @@ import Vapor
         return write(template: AccountLifecycle.PaidToOverdue.self)
       case "admin-unpaid-to-pending-delete":
         return write(template: AccountLifecycle.UnpaidToPendingDelete.self)
+      case "screen-time-warning":
+        return write(template: ScreenTimeWarning.self)
       default:
         throw Abort(.badRequest, reason: "unknown template email")
       }

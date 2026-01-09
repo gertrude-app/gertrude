@@ -34,6 +34,7 @@ export namespace DashboardWidgets {
     numParentNotifications: number;
     announcement?: {
       id: UUID;
+      kind: `news` | `warning`;
       icon?: string;
       html: string;
       learnMoreUrl?: string;

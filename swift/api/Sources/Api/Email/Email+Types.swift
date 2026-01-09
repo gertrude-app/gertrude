@@ -17,6 +17,7 @@ enum TemplateEmail {
   case overdueToUnpaid(to: String, model: AccountLifecycle.OverdueToUnpaid)
   case paidToOverdue(to: String, model: AccountLifecycle.PaidToOverdue)
   case unpaidToPendingDelete(to: String, model: AccountLifecycle.UnpaidToPendingDelete)
+  case screenTimeWarning(to: String, model: ScreenTimeWarning)
 }
 
 enum EmailLayout: String, CaseIterable {
@@ -79,6 +80,7 @@ extension TemplateEmail {
     case .notifyUnlockRequest(_, let model): model
     case .notifySecurityEvent(_, let model): model
     case .verifyNotificationEmail(_, let model): model
+    case .screenTimeWarning(_, let model): model
     }
   }
 }
