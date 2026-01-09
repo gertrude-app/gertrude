@@ -49,6 +49,7 @@ extension DashAnnouncement {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case parentId
+    case kind
     case icon
     case html
     case learnMoreUrl

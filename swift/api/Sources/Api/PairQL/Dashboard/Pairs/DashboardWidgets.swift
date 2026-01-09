@@ -38,6 +38,7 @@ struct DashboardWidgets: Pair {
 
   struct Announcement: PairNestable {
     var id: DashAnnouncement.Id
+    var kind: DashAnnouncement.Kind
     var icon: String?
     var html: String
     var learnMoreUrl: String?
@@ -132,6 +133,7 @@ extension DashboardWidgets: NoInputResolver {
       numParentNotifications: notifications.count,
       announcement: announcement.map { .init(
         id: $0.id,
+        kind: $0.kind,
         icon: $0.icon,
         html: $0.html,
         learnMoreUrl: $0.learnMoreUrl,

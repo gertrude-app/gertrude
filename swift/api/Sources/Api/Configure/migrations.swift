@@ -59,6 +59,7 @@ extension Configure {
     app.migrations.add(UpdatePendingSupervision())
     app.migrations.add(AppStoreReviews())
     app.migrations.add(IOSModelIdentifiers())
+    app.migrations.add(DashAnnouncementKind())
   }
 }
 

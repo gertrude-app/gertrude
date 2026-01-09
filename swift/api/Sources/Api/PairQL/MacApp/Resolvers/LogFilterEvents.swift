@@ -21,7 +21,7 @@ extension LogFilterEvents: Resolver {
 
     let bgTask = Task {
       await logEventsToSlack(events, context: context, computerUser: computerUser)
-      await screenTimeWarningEmail(input, context: context, computerUser: computerUser)
+      await screenTimeWarnings(input, context: context, computerUser: computerUser)
       try await storeUnidentifiedApps(input.bundleIds, in: context)
     }
 
@@ -85,7 +85,7 @@ private func logEventsToSlack(
   }
 }
 
-private func screenTimeWarningEmail(
+private func screenTimeWarnings(
   _ input: LogFilterEvents.Input,
   context: MacApp.ChildContext,
   computerUser: ComputerUser,
@@ -116,6 +116,26 @@ private func screenTimeWarningEmail(
       computerUserId: computerUser.id,
       detail: "Screen Time warning email sent",
     ))
+
+    let existingAnnouncement = try? await DashAnnouncement.query()
+      .where(.parentId == parent.id)
+      .where(.kind == "warning")
+      .first(in: context.db)
+
+    if existingAnnouncement == nil {
+      try await context.db.create(DashAnnouncement(
+        parentId: parent.id,
+        kind: .warning,
+        icon: "fa-solid fa-triangle-exclamation",
+        html: """
+        <b>Action needed:</b> We detected that Screen Time web filtering is enabled \
+        on <b>\(context.child.name)’s</b> mac computer, which can interfere with \
+        Gertrude’s ability to protect your child. \
+        Disable Screen Time’s “Restrictions” &rarr; “Content &amp; Privacy” section to fix.
+        """,
+        learnMoreUrl: "https://gertrude.app/blog/screen-time-web-filter-conflict",
+      ))
+    }
 
     let parentLink = AdminLink().slack(
       to: .parent(parent.id),
