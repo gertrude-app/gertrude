@@ -6,20 +6,23 @@ extension DuetSQL.Client {
       return
     }
 
-    let numDeleted = await (try? InterestingEvent.query()
+    if var existing = try? await InterestingEvent.query()
       .where(.eventId == event)
       .where(.kind == "deprecation")
       .where(.context == "active")
-      .delete(in: self)) ?? 0
+      .first(in: self) {
+      existing.createdAt = Date()
+      _ = try? await self.update(existing)
+      return
+    }
+
     _ = try? await self.create(InterestingEvent(
       eventId: event,
       kind: "deprecation",
       context: "active",
     ))
-    if numDeleted == 0 {
-      with(dependency: \.postmark)
-        .toSuperAdmin("deprecation starting", event)
-    }
+    with(dependency: \.postmark)
+      .toSuperAdmin("deprecation starting", event)
   }
 
   func notifyDeprecationComplete(
