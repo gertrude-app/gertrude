@@ -35,6 +35,10 @@ const DOMAINS: DomainConfig[] = [
     domain: `admin`,
     clientName: `AdminClient`,
   },
+  {
+    domain: `supervise`,
+    clientName: `SuperviseClient`,
+  },
 ];
 
 async function main(): Promise<void> {
