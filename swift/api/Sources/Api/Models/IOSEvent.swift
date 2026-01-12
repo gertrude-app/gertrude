@@ -6,6 +6,7 @@ struct IOSEvent: Codable, Sendable {
   var kind: Kind
   var detail: String?
   var vendorId: UUID?
+  var iosDeviceId: IOSApp.Device.Id?
   var modelIdentifier: String
   var iosVersion: String
   var createdAt = Date()
@@ -16,6 +17,7 @@ struct IOSEvent: Codable, Sendable {
     kind: Kind,
     detail: String? = nil,
     vendorId: UUID? = nil,
+    iosDeviceId: IOSApp.Device.Id? = nil,
     modelIdentifier: String,
     iosVersion: String,
   ) {
@@ -24,6 +26,7 @@ struct IOSEvent: Codable, Sendable {
     self.kind = kind
     self.detail = detail
     self.vendorId = vendorId
+    self.iosDeviceId = iosDeviceId
     self.modelIdentifier = modelIdentifier
     self.iosVersion = iosVersion
   }
@@ -35,5 +38,6 @@ extension IOSEvent {
     case onboarding
     case filter
     case error
+    case supervision
   }
 }

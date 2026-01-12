@@ -85,7 +85,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      supervisedAt: nil, // <-- not yet supervised
+      isSupervised: false, // <-- not yet supervised
     ))
     let pending = try await self.db.create(IOSApp.PendingSupervision(
       code: Int.random(in: 100_000 ... 999_999),
@@ -118,8 +118,8 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      supervisedAt: .reference, // <-- supervised...
-      profileFirstInstalledAt: nil, // <-- but profile not yet installed
+      isSupervised: true, // <-- supervised...
+      isProfileInstalled: false, // <-- but profile not yet installed
     ))
     let pending = try await self.db.create(IOSApp.PendingSupervision(
       code: Int.random(in: 100_000 ... 999_999),
@@ -164,8 +164,8 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      supervisedAt: .reference,
-      profileFirstInstalledAt: .reference,
+      isSupervised: true,
+      isProfileInstalled: true,
     ))
     let pending = try await self.db.create(IOSApp.PendingSupervision(
       code: Int.random(in: 100_000 ... 999_999),

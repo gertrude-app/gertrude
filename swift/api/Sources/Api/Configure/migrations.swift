@@ -60,6 +60,7 @@ extension Configure {
     app.migrations.add(AppStoreReviews())
     app.migrations.add(IOSModelIdentifiers())
     app.migrations.add(DashAnnouncementKind())
+    app.migrations.add(SupervisionStateBooleans())
   }
 }
 

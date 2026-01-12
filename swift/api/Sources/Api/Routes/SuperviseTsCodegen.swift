@@ -22,14 +22,19 @@ enum SuperviseTsCodegenRoute {
 
   static var pairqlPairs: [any PairQL.Pair.Type] {
     [
-      SuperviseNoop.self,
+      GetPendingSupervision.self,
+      MarkSupervisionVerified.self,
+      RecordDeviceConnection.self,
+      ReportSupervisionFailed.self,
     ]
   }
 
   @Sendable static func handler(_ request: Request) async throws -> Response {
+    request.logger.notice("TS codegen: \("Supervise".magenta.bold)")
     var shared: [String: String] = [:]
     var sharedAliases: [Config.Alias] = [
       .init(NoInput.self, as: "void"),
+      .init(Infallible.self, as: "void"),
       .init(Date.self, as: "ISODateString"),
     ]
     var config = Config(compact: true, aliasing: sharedAliases)

@@ -104,9 +104,9 @@ extension IOSApp.Device {
     case appVersion
     case iosVersion
     case webPolicy
-    case supervisedAt
+    case isSupervised
     case udid
-    case profileFirstInstalledAt
+    case isProfileInstalled
     case createdAt
     case updatedAt
   }
@@ -638,6 +638,7 @@ extension IOSEvent {
     case kind
     case detail
     case vendorId
+    case iosDeviceId
     case modelIdentifier
     case iosVersion
     case createdAt

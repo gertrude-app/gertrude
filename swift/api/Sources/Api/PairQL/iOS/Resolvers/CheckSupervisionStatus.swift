@@ -39,11 +39,11 @@ extension CheckSupervisionStatus: Resolver {
     }
 
     let child = try await ctx.db.find(childId)
-    if device.supervisedAt == nil {
+    if !device.isSupervised {
       return .claimed(.init(childName: child.name))
     }
 
-    if device.profileFirstInstalledAt == nil {
+    if !device.isProfileInstalled {
       let token: IOSApp.Token
       let existingToken = try? await IOSApp.Token.query()
         .where(.deviceId == device.id)

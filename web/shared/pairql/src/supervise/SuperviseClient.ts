@@ -10,10 +10,44 @@ export default class SuperviseClient extends Client<Auth> {
     super(endpoint, `supervise`, prepareRequest);
   }
 
-  public superviseNoop = (
-    input: P.SuperviseNoop.Input,
-  ): Promise<Result<P.SuperviseNoop.Output>> => {
-    return this.query<P.SuperviseNoop.Output>(input, `SuperviseNoop`, `none`);
+  public getPendingSupervision = (
+    input: P.GetPendingSupervision.Input,
+  ): Promise<Result<P.GetPendingSupervision.Output>> => {
+    return this.query<P.GetPendingSupervision.Output>(
+      input,
+      `GetPendingSupervision`,
+      `none`,
+    );
+  };
+
+  public markSupervisionVerified = (
+    input: P.MarkSupervisionVerified.Input,
+  ): Promise<Result<P.MarkSupervisionVerified.Output>> => {
+    return this.query<P.MarkSupervisionVerified.Output>(
+      input,
+      `MarkSupervisionVerified`,
+      `none`,
+    );
+  };
+
+  public recordDeviceConnection = (
+    input: P.RecordDeviceConnection.Input,
+  ): Promise<Result<P.RecordDeviceConnection.Output>> => {
+    return this.query<P.RecordDeviceConnection.Output>(
+      input,
+      `RecordDeviceConnection`,
+      `none`,
+    );
+  };
+
+  public reportSupervisionFailed = (
+    input: P.ReportSupervisionFailed.Input,
+  ): Promise<Result<P.ReportSupervisionFailed.Output>> => {
+    return this.query<P.ReportSupervisionFailed.Output>(
+      input,
+      `ReportSupervisionFailed`,
+      `none`,
+    );
   };
 }
 
