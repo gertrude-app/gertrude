@@ -33,6 +33,7 @@ struct AdminWindowFeature: Feature {
       var fullDiskAccessPermissionOk: Bool?
       var macOsUserType: Failable<MacOSUserType>?
       var notificationsSetting: NotificationsSetting?
+      var screenTimeWebFilterActive: Bool?
     }
 
     var windowOpen = false
@@ -104,6 +105,7 @@ struct AdminWindowFeature: Feature {
         case removeUserAdminPrivilegeClicked
         case fixNotificationPermissionClicked
         case zeroKeysRefreshRulesClicked
+        case openScreenTimeSettingsClicked
       }
 
       enum AdvancedAction: Equatable, Sendable, Codable {
@@ -140,6 +142,7 @@ struct AdminWindowFeature: Feature {
     case setFullDiskAccessPermissionOk(Bool)
     case setNotificationsSetting(NotificationsSetting)
     case setMacOsUserType(Failable<MacOSUserType>)
+    case setScreenTimeWebFilterActive(Bool)
     case setFilterStatus(State.HealthCheck.FilterStatus)
     case setExemptionData(Failable<[MacOSUser]>, Failable<FilterUserTypes>)
     case receivedRecentAppVersions([String: String])
@@ -282,6 +285,13 @@ extension AdminWindowFeature.RootReducer {
           await self.device.openSystemPrefs(.notifications)
         }
 
+      case .webview(.healthCheck(.openScreenTimeSettingsClicked)):
+        return .exec { _ in
+          let url =
+            URL(string: "x-apple.systempreferences:com.apple.Screen-Time-Settings.extension")!
+          await self.device.openWebUrl(url)
+        }
+
       case .webview(.healthCheck(.repairOutOfDateFilterClicked)):
         return adminAuthenticated(action)
 
@@ -356,6 +366,10 @@ extension AdminWindowFeature.RootReducer {
       case .setMacOsUserType(let userType):
         state.adminWindow.healthCheck.macOsUserType = userType
         return state.adminWindow.healthCheck.checkCompletionEffect
+
+      case .setScreenTimeWebFilterActive(let active):
+        state.adminWindow.healthCheck.screenTimeWebFilterActive = active
+        return .none
 
       case .setFilterStatus(let filterStatus):
         state.adminWindow.healthCheck.filterStatus = filterStatus
@@ -487,6 +501,10 @@ extension AdminWindowFeature.RootReducer {
           : .failure(NetworkClient.NotConnected()),
         reason: .healthCheck,
       ))
+
+      await send(.adminWindow(.setScreenTimeWebFilterActive(
+        self.device.screenTimeWebFilterActive(),
+      )))
 
       await send(.adminWindow(.setKeystrokeRecordingPermissionOk(
         keyloggingEnabled ? self.monitoring.keystrokeRecordingPermissionGranted() : true,

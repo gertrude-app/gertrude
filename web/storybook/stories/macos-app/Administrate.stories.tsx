@@ -109,6 +109,7 @@ export const HealthCheckError: Story = props({
     macOsUserType: { case: `error`, message: `Check the specs on the rotary girder` },
     notificationsSetting: `none`,
     accountStatus: { case: `error` },
+    screenTimeWebFilterActive: true,
   },
 });
 
