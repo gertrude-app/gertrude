@@ -138,9 +138,9 @@ extension IOSApp.Device: Model {
     case .appVersion: .string(self.appVersion)
     case .iosVersion: .string(self.iosVersion)
     case .webPolicy: .string(self.webPolicy)
-    case .supervisedAt: .date(self.supervisedAt)
+    case .isSupervised: .bool(self.isSupervised)
     case .udid: .string(self.udid)
-    case .profileFirstInstalledAt: .date(self.profileFirstInstalledAt)
+    case .isProfileInstalled: .bool(self.isProfileInstalled)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -155,9 +155,9 @@ extension IOSApp.Device: Model {
       .appVersion: .string(self.appVersion),
       .iosVersion: .string(self.iosVersion),
       .webPolicy: .string(self.webPolicy),
-      .supervisedAt: .date(self.supervisedAt),
+      .isSupervised: .bool(self.isSupervised),
       .udid: .string(self.udid),
-      .profileFirstInstalledAt: .date(self.profileFirstInstalledAt),
+      .isProfileInstalled: .bool(self.isProfileInstalled),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]
@@ -1099,6 +1099,7 @@ extension IOSEvent: Model {
     case .kind: .string(self.kind.rawValue)
     case .detail: .string(self.detail)
     case .vendorId: .uuid(self.vendorId)
+    case .iosDeviceId: .uuid(self.iosDeviceId)
     case .modelIdentifier: .string(self.modelIdentifier)
     case .iosVersion: .string(self.iosVersion)
     case .createdAt: .date(self.createdAt)
@@ -1112,6 +1113,7 @@ extension IOSEvent: Model {
       .kind: .string(self.kind.rawValue),
       .detail: .string(self.detail),
       .vendorId: .uuid(self.vendorId),
+      .iosDeviceId: .uuid(self.iosDeviceId),
       .modelIdentifier: .string(self.modelIdentifier),
       .iosVersion: .string(self.iosVersion),
       .createdAt: .currentTimestamp,

@@ -27,7 +27,7 @@ struct ClaimSupervisionCode: Pair {
 // resolver
 
 // this pair runs when a parent/accountability partner "claims" a pending ios supervision
-// by having been redirected to a dashboard /login screen, and prompted to create an account
+// by having been redirected to a dashboard /signup screen, and prompted to create an account
 // and by means of query params, we detect that they are claiming a device and prompt them to
 // either a) create a child by just entering a name (most common), or b) choose from an
 // existing child if they already had a gertrude account
@@ -66,7 +66,7 @@ extension ClaimSupervisionCode: Resolver {
     }
 
     guard pendingSupervision.expiresAt > get(dependency: \.date.now) else {
-      logIOSUnusual("25bef9db", "pending supervision code not found")
+      logIOSUnusual("25bef9db", "pending supervision code expired")
       let msg = "This code has expired. Open the Gertrude app on the device to get a new one."
       throw context.error("25bef9db", .badRequest, user: msg)
     }

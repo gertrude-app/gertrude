@@ -44,6 +44,7 @@ enum AdminTsCodegenRoute {
   }
 
   @Sendable static func handler(_ request: Request) async throws -> Response {
+    request.logger.notice("TS codegen: \("Admin".red)")
     var shared: [String: String] = [:]
     var sharedAliases: [Config.Alias] = [
       .init(NoInput.self, as: "void"),

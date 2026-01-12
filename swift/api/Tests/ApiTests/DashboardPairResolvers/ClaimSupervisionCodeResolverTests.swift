@@ -45,7 +45,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     expect(device.childId).toEqual(children[0].id)
     expect(device.modelIdentifier).toEqual("iPhone18,1")
     expect(device.iosVersion).toEqual("18.2")
-    expect(device.supervisedAt).toBeNil()
+    expect(device.isSupervised).toEqual(false)
 
     let deviceBlockGroups = try await IOSApp.DeviceBlockGroup.query()
       .where(.deviceId == device.id)
@@ -111,22 +111,16 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
 
   func testCodeExpired_throwsError() async throws {
     let parent = try await self.parent()
-    let code = Int.random(in: 100_000 ... 999_999)
-    try await self.db.create(IOSApp.PendingSupervision(
-      code: code,
-      vendorId: UUID(),
-      modelIdentifier: "iPhone18,1",
-      iosVersion: "18.0",
-      appVersion: "1.0.0",
-      expiresAt: .reference - .days(1),
-    ))
+    let pending = try await self.db.create(IOSApp.PendingSupervision.random {
+      $0.expiresAt = .reference - .days(1)
+    })
 
     try await expectErrorFrom {
       try await withDependencies {
         $0.date = .constant(.reference)
       } operation: {
         try await ClaimSupervisionCode.resolve(
-          with: .init(code: code, child: .newChild(name: "Test")),
+          with: .init(code: pending.code, child: .newChild(name: "Test")),
           in: parent.context,
         )
       }
@@ -136,16 +130,9 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
   func testCodeAlreadyClaimedByOtherParent_throwsError() async throws {
     let otherParent = try await self.parent()
     let otherChild = try await self.db.create(Child.random { $0.parentId = otherParent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    try await self.db.create(IOSApp.PendingSupervision(
-      code: code,
-      vendorId: UUID(),
-      modelIdentifier: "iPhone18,2",
-      iosVersion: "18.0",
-      appVersion: "1.0.0",
-      claimedChildId: otherChild.id, // <-- already claimed by other parent
-      expiresAt: .reference + .days(7),
-    ))
+    let pending = try await self.db.create(IOSApp.PendingSupervision.random {
+      $0.claimedChildId = otherChild.id // <-- already claimed by other parent
+    })
 
     let parent = try await self.parent()
 
@@ -154,7 +141,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
         $0.date = .constant(.reference)
       } operation: {
         try await ClaimSupervisionCode.resolve(
-          with: .init(code: code, child: .newChild(name: "Test")),
+          with: .init(code: pending.code, child: .newChild(name: "Test")),
           in: parent.context,
         )
       }
@@ -164,16 +151,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
   func testExistingChildBelongsToOtherParent_throwsError() async throws {
     let otherParent = try await self.parent()
     let otherChild = try await self.db.create(Child.random { $0.parentId = otherParent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    try await self.db.create(IOSApp.PendingSupervision(
-      code: code,
-      vendorId: UUID(),
-      modelIdentifier: "iPhone18,2",
-      iosVersion: "18.0",
-      appVersion: "1.0.0",
-      expiresAt: .reference + .days(7),
-    ))
-
+    let pending = try await self.db.create(IOSApp.PendingSupervision.random)
     let parent = try await self.parent()
 
     try await expectErrorFrom {
@@ -181,7 +159,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
         $0.date = .constant(.reference)
       } operation: {
         try await ClaimSupervisionCode.resolve(
-          with: .init(code: code, child: .existingChild(id: otherChild.id)),
+          with: .init(code: pending.code, child: .existingChild(id: otherChild.id)),
           in: parent.context,
         )
       }
