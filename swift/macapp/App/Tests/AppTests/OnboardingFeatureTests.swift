@@ -356,6 +356,7 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.device.boottime = { .reference - 60 }
     let preventScreenCaptureNag = mock(always: Result<Void, StringError>.success(()))
     store.deps.app.preventScreenCaptureNag = preventScreenCaptureNag.fn
+    store.deps.device.screenTimeWebFilterActive = { false }
 
     // ✅ section: exempt users and wrap-up
 
@@ -420,7 +421,8 @@ final class OnboardingFeatureTests: XCTestCase {
     }
 
     // they click "Next" on the encourage filter suspensions screen
-    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+    await store.send(.onboarding(.webview(.primaryBtnClicked)))
+    await store.receive(.onboarding(.setStep(.howToUseGertrude))) {
       $0.onboarding.step = .howToUseGertrude // ...and go to how to use
     }
 
@@ -1479,8 +1481,31 @@ final class OnboardingFeatureTests: XCTestCase {
     ])
   }
 
-  // helpers
+  @MainActor
+  func testScreenTimeConflictShownWhenDetected() async {
+    let store = onboardingFeatureStore {
+      $0.step = .encourageFilterSuspensions
+    }
+    store.deps.device.screenTimeWebFilterActive = { true }
+    let openUrl = spy(on: URL.self, returning: ())
+    store.deps.device.openWebUrl = openUrl.fn
+
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.setStep(.screenTimeConflict))
+
+    await store.send(.webview(.primaryBtnClicked))
+
+    await expect(openUrl.calls).toEqual([
+      URL(string: "x-apple.systempreferences:com.apple.Screen-Time-Settings.extension")!,
+    ])
+
+    await store.send(.webview(.secondaryBtnClicked)) {
+      $0.step = .howToUseGertrude
+    }
+  }
 }
+
+// helpers
 
 func onboardingFeatureStore(
   mutateState: @escaping (inout OnboardingFeature.State) -> Void = { _ in },

@@ -149,6 +149,7 @@ const OS_IMAGE_IDS = [
   `allow-screen-recording`,
   `install-sys-ext`,
   `sys-ext-install-trick`,
+  `screentime-conflict`,
 ] as const;
 
 const COMMON_IMG_DATA: Record<CommonImgId, string | [number, ...number[]]> = {
@@ -210,6 +211,15 @@ const OS_IMAGE_DATA: Record<
     sonoma: [3.1, 6.72, 5.22],
     sequoia: [3.26, 6.45, 5.26],
     tahoe: [3.91, 7.44, 4.51],
+  },
+  'screentime-conflict': {
+    catalina: [5.88, 5.31],
+    bigSur: [5.88, 5.31],
+    monterey: [5.88, 5.31],
+    ventura: [5.88, 5.31],
+    sonoma: [5.88, 5.31],
+    sequoia: [5.88, 5.31],
+    tahoe: [5.88, 5.31],
   },
 };
 

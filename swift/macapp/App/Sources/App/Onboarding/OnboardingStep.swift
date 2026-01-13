@@ -55,6 +55,7 @@ extension OnboardingFeature.State {
     case locateMenuBarIcon
     case viewHealthCheck
     case encourageFilterSuspensions
+    case screenTimeConflict
     case howToUseGertrude
     case finish
   }
@@ -122,6 +123,8 @@ extension OnboardingFeature.State.Step {
     case .viewHealthCheck:
       .encourageFilterSuspensions
     case .encourageFilterSuspensions:
+      .howToUseGertrude
+    case .screenTimeConflict:
       .howToUseGertrude
     case .howToUseGertrude:
       .finish
@@ -192,6 +195,8 @@ extension OnboardingFeature.State.Step {
       .locateMenuBarIcon
     case .encourageFilterSuspensions:
       .viewHealthCheck
+    case .screenTimeConflict:
+      .encourageFilterSuspensions
     case .howToUseGertrude:
       .encourageFilterSuspensions
     case .finish:
@@ -237,6 +242,7 @@ extension OnboardingFeature.State.Step: Comparable {
     case .locateMenuBarIcon: 110
     case .viewHealthCheck: 115
     case .encourageFilterSuspensions: 117
+    case .screenTimeConflict: 118
     case .howToUseGertrude: 120
     case .finish: 125
     }
