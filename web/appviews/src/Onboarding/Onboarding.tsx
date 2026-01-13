@@ -160,6 +160,10 @@ export const Onboarding: React.FC<Props> = ({
           confetti
         />
         <OnboardingPage
+          step="screenTimeConflict"
+          component={<Step.ScreenTimeConflict />}
+        />
+        <OnboardingPage
           step="exemptUsers"
           component={
             <Step.ExemptUsers

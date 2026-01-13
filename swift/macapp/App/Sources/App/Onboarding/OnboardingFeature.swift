@@ -565,6 +565,19 @@ struct OnboardingFeature: Feature {
           await send(.delegate(.onboardingConfigComplete))
         }
 
+      case .webview(.primaryBtnClicked) where step == .screenTimeConflict:
+        log(step, action, "c2cfc834")
+        return .exec { _ in
+          await self.device.openWebUrl(
+            URL(string: "x-apple.systempreferences:com.apple.Screen-Time-Settings.extension")!,
+          )
+        }
+
+      case .webview(.secondaryBtnClicked) where step == .screenTimeConflict:
+        log(step, action, "6eab4506")
+        state.step = .howToUseGertrude
+        return .none
+
       case .webview(.setUserExemption(userId: let userId, enabled: let enabled)):
         log(step, action, "1e34d6d0")
         if enabled {
@@ -593,8 +606,13 @@ struct OnboardingFeature: Feature {
 
       case .webview(.primaryBtnClicked) where step == .encourageFilterSuspensions:
         log(step, action, "363f2d44")
-        state.step = .howToUseGertrude
-        return .none
+        return .exec { send in
+          if await self.device.screenTimeWebFilterActive() {
+            await send(.setStep(.screenTimeConflict))
+          } else {
+            await send(.setStep(.howToUseGertrude))
+          }
+        }
 
       case .webview(.primaryBtnClicked) where step == .howToUseGertrude:
         log(step, action, "eb044990")

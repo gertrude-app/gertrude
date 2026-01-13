@@ -229,6 +229,11 @@ export const InstallSysExtSuccess: Story = props({
   step: `installSysExt_success`,
 });
 
+export const ScreenTimeConflict: Story = props({
+  ...Welcome.args,
+  step: `screenTimeConflict`,
+});
+
 export const ExemptUsers: Story = props({
   ...Welcome.args,
   step: `exemptUsers`,

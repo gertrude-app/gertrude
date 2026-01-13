@@ -39,6 +39,7 @@ export type OnboardingStep =
   | `locateMenuBarIcon`
   | `viewHealthCheck`
   | `encourageFilterSuspensions`
+  | `screenTimeConflict`
   | `howToUseGertrude`
   | `finish`;
 
