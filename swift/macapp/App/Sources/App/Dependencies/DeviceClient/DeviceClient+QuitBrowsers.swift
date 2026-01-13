@@ -4,12 +4,34 @@ import Gertie
 import MacAppRoute
 
 @Sendable func quitAllBrowsers(_ browsers: [BrowserMatch]) async {
+  await quitBrowsers(browsers, excludeSafari: false)
+}
+
+@Sendable func quitAllNonSafariBrowsers(_ browsers: [BrowserMatch]) async {
+  await quitBrowsers(browsers, excludeSafari: true)
+}
+
+func isNonSafariBrowser(_ app: RunningApp, _ browsers: [BrowserMatch]) -> Bool {
+  if app.bundleId == "com.apple.Safari" { return false }
+  if app.name == "Safari" { return false }
+  let names = Set(browsers.compactMap(\.name) + hardcodedNames)
+  let bundleIds = Set(browsers.compactMap(\.bundleId))
+  if bundleIds.contains(app.bundleId) { return true }
+  if let name = app.name, names.contains(name) { return true }
+  return false
+}
+
+@Sendable private func quitBrowsers(_ browsers: [BrowserMatch], excludeSafari: Bool) async {
   @Dependency(\.mainQueue) var mainQueue
   let names = Set(browsers.compactMap(\.name) + hardcodedNames)
   let bundleIds = Set(browsers.compactMap(\.bundleId))
   var newBrowsers: ReportBrowsers.Input = []
 
   for app in NSWorkspace.shared.runningApplications {
+    if excludeSafari {
+      if app.bundleIdentifier == "com.apple.Safari" { continue }
+      if app.localizedName == "Safari" { continue }
+    }
     if let bundleId = app.bundleIdentifier {
       if bundleIds.contains(bundleId) {
         await terminate(app: app, on: mainQueue)
@@ -54,6 +76,9 @@ private let hardcodedNames = [
   "Brave Browser",
   "Brave Browser Beta",
   "Brave Browser Nightly",
+  "ChatGPT Atlas",
+  "Comet",
+  "Dia",
   "Safari",
   "Google Chrome",
   "Google Chrome Beta",

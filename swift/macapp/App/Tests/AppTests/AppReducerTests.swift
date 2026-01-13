@@ -141,6 +141,19 @@ final class AppReducerTests: XCTestCase {
   }
 
   @MainActor
+  func testScreenTimeConflictDetectedDoesNotRepeatOnSubsequentDetections() async {
+    let (store, _) = AppReducer.testStore {
+      $0.screenTimeConflictDetected = true
+    }
+    let quitNonSafariBrowsers = spy(on: [BrowserMatch].self, returning: ())
+    store.deps.device.quitNonSafariBrowsers = quitNonSafariBrowsers.fn
+
+    await store.send(.setScreenTimeConflictDetected(true))
+
+    await expect(quitNonSafariBrowsers.calls.count).toEqual(0)
+  }
+
+  @MainActor
   func testHeartbeatClearSuspensionFallback() async {
     let now = Date()
     let (store, scheduler) = AppReducer.testStore {

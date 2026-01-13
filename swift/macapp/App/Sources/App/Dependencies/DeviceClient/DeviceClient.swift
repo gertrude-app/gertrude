@@ -19,6 +19,7 @@ struct DeviceClient: Sendable {
   var openWebUrl: @Sendable (URL) async -> Void
   var osVersion: @Sendable () -> MacOSVersion
   var quitBrowsers: @Sendable ([BrowserMatch]) async -> Void
+  var quitNonSafariBrowsers: @Sendable ([BrowserMatch]) async -> Void
   var requestNotificationAuthorization: @Sendable () async -> Void
   var runningAppFromPid: @Sendable (pid_t) -> RunningApp?
   var screenTimeWebFilterActive: @Sendable () async -> Bool
@@ -52,6 +53,7 @@ extension DeviceClient: DependencyKey {
     openWebUrl: { NSWorkspace.shared.open($0) },
     osVersion: { macOSVersion() },
     quitBrowsers: quitAllBrowsers,
+    quitNonSafariBrowsers: quitAllNonSafariBrowsers,
     requestNotificationAuthorization: requestNotificationAuth,
     runningAppFromPid: { .init(pid: $0) },
     screenTimeWebFilterActive: isScreenTimeWebFilterActive,
@@ -95,6 +97,7 @@ extension DeviceClient: TestDependencyKey {
       placeholder: .init(major: 15, minor: 0, patch: 0),
     ),
     quitBrowsers: unimplemented("DeviceClient.quitBrowsers"),
+    quitNonSafariBrowsers: unimplemented("DeviceClient.quitNonSafariBrowsers"),
     requestNotificationAuthorization: unimplemented(
       "DeviceClient.requestNotificationAuthorization",
     ),
@@ -132,6 +135,7 @@ extension DeviceClient: TestDependencyKey {
     openWebUrl: { _ in },
     osVersion: { .init(major: 14, minor: 0, patch: 0) },
     quitBrowsers: { _ in },
+    quitNonSafariBrowsers: { _ in },
     requestNotificationAuthorization: {},
     runningAppFromPid: { _ in nil },
     screenTimeWebFilterActive: { false },

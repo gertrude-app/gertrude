@@ -124,12 +124,15 @@ extension ApplicationFeature.RootReducer: RootReducing {
       }
 
     case .application(.appLaunched(let pid)):
-      guard let blockedApps = state.user.data?.blockedApps, !blockedApps.isEmpty else {
+      let blockedApps = state.user.data?.blockedApps ?? []
+      let screenTimeConflict = state.screenTimeConflictDetected
+      let browsers = state.browsers
+      guard !blockedApps.isEmpty || screenTimeConflict else {
         return .none
       }
       return .exec { _ in
-        if let app = self.device.runningAppFromPid(pid),
-           blockedApps.blocks(app: app, at: self.now, in: self.calendar) {
+        guard let app = self.device.runningAppFromPid(pid) else { return }
+        if blockedApps.blocks(app: app, at: self.now, in: self.calendar) {
           await self.device.terminateApp(app)
           await self.device.notify(
             "Application blocked",
@@ -139,6 +142,9 @@ extension ApplicationFeature.RootReducer: RootReducing {
             .blockedAppLaunchAttempted,
             "app: \(app.name ?? app.bundleId)",
           )
+        } else if screenTimeConflict, isNonSafariBrowser(app, browsers) {
+          await self.device.terminateApp(app)
+          await self.device.notifyScreenTimeConflict()
         }
       }
 

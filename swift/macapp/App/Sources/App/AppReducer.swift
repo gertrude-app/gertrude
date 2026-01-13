@@ -230,9 +230,10 @@ struct AppReducer: Reducer, Sendable {
         let wasDetected = state.screenTimeConflictDetected
         state.screenTimeConflictDetected = detected
         if detected, !wasDetected {
-          // TODO: kill non-Safari browsers and show notification
-          // "You'll need to use Safari until your parent can fix an issue with Gertrude"
-          return .none
+          return .exec { [browsers = state.browsers] _ in
+            await self.device.quitNonSafariBrowsers(browsers)
+            await self.device.notifyScreenTimeConflict()
+          }
         }
         return .none
 
