@@ -24,7 +24,7 @@ seems to remain blocked (by either Gertrude or Screen Time).
 
 ## How to fix it
 
-You just need to disable Screen Time's Content & Privacy on the Mac.
+You just need to disable Screen Time's Content & Privacy on the Mac and restart.
 
 ### Step 1: Open System Settings &rarr; Screen Time
 
@@ -39,8 +39,6 @@ Toggle off completely the setting labeled **Content & Privacy**.
 
 {% image src="mac-screentime-disable.jpg" alt="Disable Content & Privacy in Screen Time" caption="Toggle off Content & Privacy to prevent the conflict with Gertrude" /%}
 
-That's it. Gertrude's filter will now work correctly.
-
 {% callout title="Two important things to know" %}
 
 1. **You do NOT need to disable ALL of Screen Time**—only the Content & Privacy section.
@@ -50,6 +48,15 @@ That's it. Gertrude's filter will now work correctly.
    kids' iPhones or iPads.
 
 {% /callout %}
+
+### Step 3: Restart the Mac
+
+{% image src="restart-mac.jpg" alt="Restart the Mac from the Apple menu" caption="You need to restart the computer for the change to take effect" /%}
+
+Finally, **restart the computer.** The change will not take effect until the Mac is fully
+restarted.
+
+That's it. Gertrude's filter will now work correctly.
 
 ## How to verify it's working
 
