@@ -131,6 +131,7 @@ extension CheckInFeature.RootReducer {
 
   func checkIn(reason: CheckIn.Reason, state: State) -> Effect<Action> {
     .exec { send in
+      let screentimeDetected = await self.device.screenTimeWebFilterActive()
       if !network.isConnected() {
         if reason == .userRefreshedRules {
           await self.device.notifyNoInternet()
@@ -140,6 +141,7 @@ extension CheckInFeature.RootReducer {
           result: TaskResult {
             try await api.appCheckIn(
               state.filter.version,
+              screenTimeConflictDetected: screentimeDetected,
               pendingFilterSuspension: state.requestSuspension.pending?.id,
               pendingUnlockRequests: state.blockedRequests.pendingUnlockRequests.map(\.id),
               sendNamedApps: reason == .heartbeat,
@@ -147,6 +149,9 @@ extension CheckInFeature.RootReducer {
           },
           reason: reason,
         ))
+      }
+      if screentimeDetected {
+        await send(.setScreenTimeConflictDetected(true))
       }
     }
   }

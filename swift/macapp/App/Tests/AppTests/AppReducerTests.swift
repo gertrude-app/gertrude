@@ -47,6 +47,7 @@ final class AppReducerTests: XCTestCase {
 
     await store.receive(.startProtecting(user: .mock))
     await store.receive(.networkConnectionChanged(connected: true))
+    await store.receive(.setScreenTimeConflictDetected(false))
     await store.receive(.websocket(.connectedSuccessfully))
 
     await expect(setUserToken.calls).toEqual([UserData.mock.token])

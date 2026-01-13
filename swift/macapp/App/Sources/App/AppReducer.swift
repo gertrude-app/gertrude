@@ -30,6 +30,7 @@ struct AppReducer: Reducer, Sendable {
     var onboarding = OnboardingFeature.State()
     var monitoring = MonitoringFeature.State()
     var requestSuspension = RequestSuspensionFeature.State()
+    var screenTimeConflictDetected = false
     var user = UserFeature.State()
     var timestamp: TrustedTimestamp?
 
@@ -77,6 +78,7 @@ struct AppReducer: Reducer, Sendable {
     case websocket(WebSocketFeature.Action)
     case setTrustedTimestamp(TrustedTimestamp)
     case networkConnectionChanged(connected: Bool)
+    case setScreenTimeConflictDetected(Bool)
 
     indirect case adminAuthed(Action)
   }
@@ -176,6 +178,11 @@ struct AppReducer: Reducer, Sendable {
           .exec { _ in
             await self.preventScreenCaptureNag()
           },
+
+          .exec { send in
+            let detected = await self.device.screenTimeWebFilterActive()
+            await send(.setScreenTimeConflictDetected(detected))
+          },
         )
 
       case .heartbeat(.everySixHours):
@@ -217,6 +224,16 @@ struct AppReducer: Reducer, Sendable {
 
       case .setTrustedTimestamp(let timestamp):
         state.timestamp = timestamp
+        return .none
+
+      case .setScreenTimeConflictDetected(let detected):
+        let wasDetected = state.screenTimeConflictDetected
+        state.screenTimeConflictDetected = detected
+        if detected, !wasDetected {
+          // TODO: kill non-Safari browsers and show notification
+          // "You'll need to use Safari until your parent can fix an issue with Gertrude"
+          return .none
+        }
         return .none
 
       case .networkConnectionChanged(connected: true):

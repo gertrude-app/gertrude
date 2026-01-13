@@ -312,4 +312,40 @@ final class CheckInFeatureTests: XCTestCase {
     await expect(checkIn.calls[0].namedApps)
       .toEqual([.init(bundleId: "com.foo", bundleName: "Foo widget")])
   }
+
+  @MainActor
+  func testScreenTimeConflictDetectedSentToApi() async {
+    let (store, _) = AppReducer.testStore()
+    store.deps.userDefaults.getInt = { _ in 2 }
+    store.deps.device.screenTimeWebFilterActive = { true } // <-- conflict detected
+    let checkIn = spy(on: CheckIn_v2.Input.self, returning: CheckIn_v2.Output.mock)
+    store.deps.api.checkIn = checkIn.fn
+
+    await store.send(.heartbeat(.everyTwentyMinutes))
+
+    await expect(checkIn.calls.count).toEqual(1)
+    await expect(checkIn.calls[0].screentimeConflictDetected).toEqual(true)
+
+    await store.receive(.checkIn(result: .success(.mock), reason: .heartbeat))
+    await store.receive(.setScreenTimeConflictDetected(true)) {
+      $0.screenTimeConflictDetected = true
+    }
+  }
+
+  @MainActor
+  func testScreenTimeConflictNotDetectedDoesNotSendAction() async {
+    let (store, _) = AppReducer.testStore()
+    store.deps.userDefaults.getInt = { _ in 2 }
+    store.deps.device.screenTimeWebFilterActive = { false } // <-- no conflict
+    let checkIn = spy(on: CheckIn_v2.Input.self, returning: CheckIn_v2.Output.mock)
+    store.deps.api.checkIn = checkIn.fn
+
+    await store.send(.heartbeat(.everyTwentyMinutes))
+
+    await expect(checkIn.calls.count).toEqual(1)
+    await expect(checkIn.calls[0].screentimeConflictDetected).toEqual(false)
+
+    await store.receive(.checkIn(result: .success(.mock), reason: .heartbeat))
+    expect(store.state.screenTimeConflictDetected).toEqual(false)
+  }
 }

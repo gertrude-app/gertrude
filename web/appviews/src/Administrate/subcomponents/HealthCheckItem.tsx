@@ -40,7 +40,10 @@ const HealthCheckItem: React.FC<Props> = (props) => {
   return (
     <div className="flex items-start p-2 rounded-xl bg-slate-50 dark:bg-slate-800/30">
       <div
-        className={cx(`w-6 h-6 shrink-0 rounded-full flex justify-center items-center`, iconColor)}
+        className={cx(
+          `w-6 h-6 shrink-0 rounded-full flex justify-center items-center`,
+          iconColor,
+        )}
       >
         <i className={cx(`text-white dark:text-slate-900`, icon)} />
       </div>
