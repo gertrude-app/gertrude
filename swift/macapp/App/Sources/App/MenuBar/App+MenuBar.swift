@@ -97,13 +97,13 @@ extension AppReducer.State {
   }
 
   var somethingRequiresAdminAttention: Bool {
-    if admin.accountStatus != .active {
+    if self.admin.accountStatus != .active {
       return true
     }
 
-    let health = adminWindow.healthCheck
+    let health = self.adminWindow.healthCheck
     if case .ok(value: let latest) = health.latestAppVersion,
-       latest != appUpdates.installedVersion {
+       latest != self.appUpdates.installedVersion {
       return false
     }
 
@@ -112,7 +112,7 @@ extension AppReducer.State {
          .some(.unexpected):
       return true
     case .some(.installed(let version, let numUserKeys)):
-      if version != appUpdates.installedVersion || numUserKeys == 0 {
+      if version != self.appUpdates.installedVersion || numUserKeys == 0 {
         return true
       }
     default:
@@ -135,6 +135,10 @@ extension AppReducer.State {
     }
 
     if health.keystrokeRecordingPermissionOk == false {
+      return true
+    }
+
+    if self.screenTimeConflictDetected {
       return true
     }
 
