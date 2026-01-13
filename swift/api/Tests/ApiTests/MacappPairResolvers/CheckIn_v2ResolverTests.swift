@@ -241,6 +241,62 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     )
     expect(notRequested.resolvedUnlockRequests).toBeNil()
   }
+
+  func testScreentimeConflictDetectedTrue_SendsEmailAndCreatesAnnouncement() async throws {
+    let child = try await self.childWithComputer()
+
+    _ = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "2.8.0", filterVersion: nil, screentimeConflictDetected: true),
+      in: child.context,
+    )
+
+    expect(self.sent.emails.count).toEqual(1)
+    expect(self.sent.emails[0].template).toEqual("screen-time-warning")
+    expect(self.sent.emails[0].to).toEqual(child.parent.model.email.rawValue)
+
+    let announcements = try await DashAnnouncement.query()
+      .where(.parentId == child.parent.model.id)
+      .all(in: self.db)
+    expect(announcements.count).toEqual(1)
+    expect(announcements[0].kind).toEqual(DashAnnouncement.Kind.warning)
+
+    let proactiveEvents = try await InterestingEvent.query()
+      .where(.eventId == "3c86deaa")
+      .where(.computerUserId == child.computerUser.id)
+      .all(in: self.db)
+    expect(proactiveEvents.count).toEqual(1)
+
+    _ = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "2.8.0", filterVersion: nil, screentimeConflictDetected: true),
+      in: child.context,
+    )
+
+    expect(self.sent.emails.count).toEqual(1)
+  }
+
+  func testScreentimeConflictDetectedFalse_ClearsAnnouncement() async throws {
+    let child = try await self.childWithComputer()
+    try await self.db.create(DashAnnouncement(
+      parentId: child.parent.model.id,
+      kind: .warning,
+      html: "Screen Time warning",
+    ))
+
+    let before = try await DashAnnouncement.query()
+      .where(.parentId == child.parent.model.id)
+      .all(in: self.db)
+    expect(before.count).toEqual(1)
+
+    _ = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "2.8.0", filterVersion: nil, screentimeConflictDetected: false),
+      in: child.context,
+    )
+
+    let after = try await DashAnnouncement.query()
+      .where(.parentId == child.parent.model.id)
+      .all(in: self.db)
+    expect(after.count).toEqual(0)
+  }
 }
 
 extension CheckIn_v2.Output {

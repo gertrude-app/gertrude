@@ -110,9 +110,17 @@ extension CheckIn_v2: Resolver {
     }
 
     if input.screentimeConflictDetected == true {
-      // TODO: parent notification, banner, etc.
+      let bgTask = await logScreenTimeConflict(computerUser: computerUser, in: context)
+      if context.env.mode == .test {
+        await bgTask.value
+      }
     } else if input.screentimeConflictDetected == false {
-      // TODO: remove banner, database state
+      let bgTask = Task {
+        await clearScreenTimeAnnouncement(computerUserId: computerUser.id, in: context)
+      }
+      if context.env.mode == .test {
+        await bgTask.value
+      }
     }
 
     return try await Output(
@@ -257,5 +265,104 @@ extension RunningApp {
     if self.localizedName != nil, self.localizedName == self.bundleName {
       self.localizedName = nil
     }
+  }
+}
+
+func logScreenTimeConflict(
+  computerUser: ComputerUser,
+  in context: MacApp.ChildContext,
+) async -> Task<Void, Never> {
+  let bgTask = Task {
+    let fourteenDaysAgo = get(dependency: \.date.now) - .days(14)
+    let recentEvents = try? await InterestingEvent.query()
+      .where(.eventId == "3c86deaa")
+      .where(.computerUserId == computerUser.id)
+      .where(.createdAt >= fourteenDaysAgo)
+      .all(in: context.db)
+
+    if recentEvents?.isEmpty == true,
+       let computer = try? await computerUser.computer(in: context.db),
+       let parent = try? await context.child.parent(in: context.db) {
+      let computerName = computer.customName ?? computer.modelIdentifier
+      let parentLink = AdminLink().slack(to: .parent(parent.id), text: parent.email.rawValue)
+      let msg = "New Screen Time conflict detected for \(parentLink), child: `\(context.child.name)`, computer: `\(computerName)`"
+      await get(dependency: \.slack).internal(.info, msg)
+    }
+
+    _ = try? await context.db.create(InterestingEvent(
+      eventId: "3c86deaa",
+      kind: "event",
+      context: "macapp",
+      computerUserId: computerUser.id,
+      detail: "screentime conflict reported in check in",
+    ))
+    await notifyScreenTimeConflict(computerUser: computerUser, in: context)
+  }
+  return bgTask
+}
+
+struct ParentWarningAnnouncement: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    var stmt = SQL.Statement("""
+      SELECT da.id, c.\(Child.columnName(.parentId))
+      FROM \(DashAnnouncement.tableName) da
+      JOIN \(Child.tableName) c
+        ON c.\(Child.columnName(.parentId)) = da.\(DashAnnouncement.columnName(.parentId))
+      WHERE c.id =
+    """)
+    stmt.components.append(.binding(bindings[0]))
+    stmt.components
+      .append(.sql(" AND da.\(DashAnnouncement.columnName(.kind)) = 'warning' LIMIT 1"))
+    return stmt
+  }
+
+  var id: DashAnnouncement.Id
+  var parentId: Parent.Id
+}
+
+func clearScreenTimeAnnouncement(
+  computerUserId: ComputerUser.Id,
+  in context: MacApp.ChildContext,
+) async {
+  do {
+    let results = try await context.db.customQuery(
+      ParentWarningAnnouncement.self,
+      withBindings: [.uuid(context.child.id.rawValue)],
+    )
+
+    guard let result = results.first else {
+      // no announcement to clear, bail
+      return
+    }
+
+    let children = try await Child.query()
+      .where(.parentId == result.parentId)
+      .all(in: context.db)
+
+    let otherComputerUserIds = try await children
+      .concurrentMap { try await $0.computerUsers(in: context.db) }
+      .flatMap(\.self)
+      .map(\.id)
+      .filter { $0 != computerUserId }
+
+    if !otherComputerUserIds.isEmpty {
+      let oneDayAgo = get(dependency: \.date.now) - .days(1)
+      let numRecentConflictEvents = try await InterestingEvent.query()
+        .where(.computerUserId |=| otherComputerUserIds)
+        .where(.eventId |=| ["3c86deaa", "933aa385"])
+        .where(.createdAt >= oneDayAgo)
+        .count(in: context.db)
+
+      if numRecentConflictEvents > 0 {
+        // likely another child/computer has the problem, don't clear
+        return
+      }
+    }
+
+    try await context.db.delete(DashAnnouncement.self, byId: result.id)
+  } catch {
+    await get(dependency: \.slack).error(
+      "Failed to clear Screen Time conflict announcement: \(error)",
+    )
   }
 }

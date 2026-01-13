@@ -21,7 +21,9 @@ extension LogFilterEvents: Resolver {
 
     let bgTask = Task {
       await logEventsToSlack(events, context: context, computerUser: computerUser)
-      await screenTimeWarnings(input, context: context, computerUser: computerUser)
+      if input.events.contains(where: { $0.0.id == "933aa385" }) {
+        await notifyScreenTimeConflict(computerUser: computerUser, in: context)
+      }
       try await storeUnidentifiedApps(input.bundleIds, in: context)
     }
 
@@ -85,12 +87,10 @@ private func logEventsToSlack(
   }
 }
 
-private func screenTimeWarnings(
-  _ input: LogFilterEvents.Input,
-  context: MacApp.ChildContext,
+func notifyScreenTimeConflict(
   computerUser: ComputerUser,
+  in context: MacApp.ChildContext,
 ) async {
-  guard input.events.contains(where: { $0.0.id == "933aa385" }) else { return }
   do {
     let existing = try await InterestingEvent.query()
       .where(.eventId == "screentime-email-sent")
