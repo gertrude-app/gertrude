@@ -362,14 +362,25 @@ final class OnboardingFeatureTests: XCTestCase {
 
     // they click "Next" on the install sys ext success screen
     // NB: this actually kicks off the `.startProtecting` sequence
-    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
-      $0.onboarding.step = .exemptUsers // ...and go to exempt users
+    await store.send(.onboarding(.webview(.primaryBtnClicked)))
+
+    await store.receive(.onboarding(.receivedDeviceData(
+      currentUserId: 502,
+      users: [
+        .init(id: 501, name: "Dad", type: .admin),
+        .init(id: 502, name: "liljimmy", type: .standard),
+      ],
+    )))
+
+    await store.receive(.onboarding(.delegate(.onboardingConfigComplete)))
+
+    await store.receive(.onboarding(.setStep(.exemptUsers))) {
+      $0.onboarding.step = .exemptUsers
     }
 
     // this proves that we turned on all monitoring
     await expect(stopLoggingKeystrokes.calls.count).toEqual(1)
 
-    await store.receive(.onboarding(.delegate(.onboardingConfigComplete)))
     await store.receive(.startProtecting(user: user))
     await store.receive(.networkConnectionChanged(connected: true))
     await store.receive(.setScreenTimeConflictDetected(false))
@@ -464,30 +475,29 @@ final class OnboardingFeatureTests: XCTestCase {
   func testSingleUserOnlySkipsExemptUserScreen() async {
     let store = onboardingFeatureStore {
       $0.step = .installSysExt_success
-      $0.users = [.init(id: 501, name: "Dad", isAdmin: true)]
       $0.filterUsers = .init(exempt: [], protected: [])
     }
+    store.deps.device.currentUserId = { 501 }
+    store.deps.device.listMacOSUsers = { [.init(id: 501, name: "Dad", type: .admin)] }
 
-    await store.send(.webview(.primaryBtnClicked)) {
-      $0.step = .locateMenuBarIcon
-    }
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.setStep(.locateMenuBarIcon))
   }
 
   @MainActor
   func testDoesntSkipExemptScreenIfOtherUsers() async {
     let store = onboardingFeatureStore {
       $0.step = .installSysExt_success
-      $0.currentUser = .init(id: 502, name: "Lil jimmy", isAdmin: false)
-      $0.users = [
-        .init(id: 501, name: "Dad", isAdmin: true),
-        .init(id: 502, name: "Lil jimmy", isAdmin: false),
-      ]
       $0.filterUsers = .init(exempt: [], protected: [501]) // <-- Dad is protected
     }
+    store.deps.device.currentUserId = { 502 }
+    store.deps.device.listMacOSUsers = { [
+      .init(id: 501, name: "Dad", type: .admin),
+      .init(id: 502, name: "Lil jimmy", type: .standard),
+    ] }
 
-    await store.send(.webview(.primaryBtnClicked)) {
-      $0.step = .exemptUsers // <-- but we still show him
-    }
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.setStep(.exemptUsers)) // ... but we still show exempt screen
   }
 
   @MainActor
@@ -752,7 +762,7 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.send(.webview(.primaryBtnClicked))
     await store.receive(.setStep(.allowKeylogging_required)) // we always stop here
     await store.send(.webview(.primaryBtnClicked))
-    await store.receive(.setStep(.locateMenuBarIcon))
+    await store.receive(.setStep(.exemptUsers))
   }
 
   @MainActor
@@ -866,9 +876,8 @@ final class OnboardingFeatureTests: XCTestCase {
   @MainActor
   func testClickingSkipSecondaryFromInstallSysExtFailed() async {
     let store = onboardingFeatureStore { $0.step = .installSysExt_failed }
-    await store.send(.webview(.secondaryBtnClicked)) {
-      $0.step = .locateMenuBarIcon
-    }
+    await store.send(.webview(.secondaryBtnClicked))
+    await store.receive(.setStep(.exemptUsers))
   }
 
   @MainActor
@@ -982,7 +991,7 @@ final class OnboardingFeatureTests: XCTestCase {
     let store = onboardingFeatureStore { $0.step = .allowKeylogging_required }
     store.deps.filterExtension.state = { .installedAndRunning }
     await store.send(.webview(.secondaryBtnClicked))
-    await store.receive(.setStep(.locateMenuBarIcon))
+    await store.receive(.setStep(.exemptUsers))
   }
 
   @MainActor
@@ -1412,9 +1421,8 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.receive(.setStep(.installSysExt_failed))
 
     // they click to skip the install from the fail screen
-    await store.send(.webview(.secondaryBtnClicked)) {
-      $0.step = .locateMenuBarIcon
-    }
+    await store.send(.webview(.secondaryBtnClicked))
+    await store.receive(.setStep(.exemptUsers))
 
     // and then, the install times out...
     timedOut.setValue(true)
@@ -1422,7 +1430,7 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.skipReceivedActions()
 
     store.assert {
-      $0.step = .locateMenuBarIcon // ...and they should NOT be brought back to fail
+      $0.step = .exemptUsers // ...and they should NOT be brought back to fail
     }
   }
 
@@ -1503,6 +1511,44 @@ final class OnboardingFeatureTests: XCTestCase {
       $0.step = .howToUseGertrude
     }
   }
+
+  @MainActor
+  func testExemptUsersScreenShownAfterResumingFromFullDiskAccess() async {
+    let (store, _) = AppReducer.testStore()
+
+    store.deps.device.currentUserId = { 502 }
+    store.deps.device.listMacOSUsers = { [
+      .init(id: 501, name: "Dad", type: .admin),
+      .init(id: 502, name: "liljimmy", type: .standard),
+    ] }
+
+    store.deps.app.hasFullDiskAccess = { true }
+    store.deps.monitoring.screenRecordingPermissionGranted = { true }
+    store.deps.monitoring.keystrokeRecordingPermissionGranted = { true }
+    store.deps.filterExtension.state = { .installedAndRunning }
+
+    store.deps.storage.loadPersistentState = { .mock {
+      $0.user = .mock
+      $0.resumeOnboarding = .checkingFullDiskAccessPermission(upgrade: false)
+    }}
+
+    await store.send(.application(.didFinishLaunching))
+    await store.skipReceivedActions()
+
+    store.assert {
+      $0.onboarding.step = .allowFullDiskAccess_success
+    }
+
+    await store.send(.onboarding(.webview(.primaryBtnClicked)))
+    await store.receive(.onboarding(.setStep(.allowKeylogging_required)))
+
+    await store.send(.onboarding(.webview(.primaryBtnClicked)))
+    await store.skipReceivedActions()
+
+    store.assert {
+      $0.onboarding.step = .exemptUsers
+    }
+  }
 }
 
 // helpers
@@ -1519,5 +1565,10 @@ func onboardingFeatureStore(
   store.exhaustivity = .off
   store.deps.app.installLocation = { .inApplicationsDir }
   store.deps.device.osVersion = { .sequoia }
+  store.deps.device.currentUserId = { 502 }
+  store.deps.device.listMacOSUsers = { [
+    .init(id: 501, name: "Dad", type: .admin),
+    .init(id: 502, name: "liljimmy", type: .standard),
+  ] }
   return store
 }
