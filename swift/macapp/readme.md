@@ -2,6 +2,9 @@
 
 ## Release notes
 
+- `2.8.0` (beta 1/14/26)
+  - detect and mitigate screentime conflict
+  - fix onboarding bug, not showing exempt user screen
 - `2.7.5` (beta 12/8/25, new downloads only)
   - fix tahoe menu bar bug from 2.7.4
 - `2.7.4` (beta 12/3/25 for new downloads only, to prevent upgrade)
