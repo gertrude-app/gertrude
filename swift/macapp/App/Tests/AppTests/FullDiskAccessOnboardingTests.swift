@@ -29,6 +29,7 @@ final class FullDiskAccessOnboardingTests: XCTestCase {
       $0.trustedTime = Date.reference.timeIntervalSince1970
     }
     store.deps.api.checkIn = { _ in checkInResult }
+    store.deps.device.screenTimeWebFilterActive = { false }
 
     let startLoggingKeystrokes = mock(always: ())
     store.deps.monitoring.startLoggingKeystrokes = startLoggingKeystrokes.fn
@@ -62,6 +63,7 @@ final class FullDiskAccessOnboardingTests: XCTestCase {
 
     await store.receive(.startProtecting(user: .monitored))
     await store.receive(.networkConnectionChanged(connected: true))
+    await store.receive(.setScreenTimeConflictDetected(false))
     await store.receive(.websocket(.connectedSuccessfully))
 
     // we're "onboarding", but since it's an upgrade make sure we're monitoring
@@ -134,6 +136,7 @@ final class FullDiskAccessOnboardingTests: XCTestCase {
     }
     setOnboardingAncillaryFDAMocks(resumeStore)
     resumeStore.deps.device.boottime = { nil }
+    resumeStore.deps.device.screenTimeWebFilterActive = { false }
     resumeStore.deps.app.hasFullDiskAccess = { true } // <-- now they have it
     resumeStore.deps.api.checkIn = { _ in checkInResult }
     resumeStore.deps.monitoring.stopLoggingKeystrokes = {}
@@ -182,6 +185,7 @@ final class FullDiskAccessOnboardingTests: XCTestCase {
         $0.onboarding.upgrade = true
       }
 
+    await resumeStore.receive(.setScreenTimeConflictDetected(false))
     await resumeStore.receive(.websocket(.connectedSuccessfully))
 
     await resumeStore.receive(.checkIn(result: .success(checkInResult), reason: .startProtecting)) {

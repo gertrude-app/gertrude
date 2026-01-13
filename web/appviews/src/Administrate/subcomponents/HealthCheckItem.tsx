@@ -38,9 +38,12 @@ const HealthCheckItem: React.FC<Props> = (props) => {
   const message = getMessage(props);
 
   return (
-    <div className="flex items-center p-2 rounded-xl bg-slate-50 dark:bg-slate-800/30">
+    <div className="flex items-start p-2 rounded-xl bg-slate-50 dark:bg-slate-800/30">
       <div
-        className={cx(`w-6 h-6 rounded-full flex justify-center items-center`, iconColor)}
+        className={cx(
+          `w-6 h-6 shrink-0 rounded-full flex justify-center items-center`,
+          iconColor,
+        )}
       >
         <i className={cx(`text-white dark:text-slate-900`, icon)} />
       </div>
@@ -59,6 +62,7 @@ const HealthCheckItem: React.FC<Props> = (props) => {
           onClick={() => props.emit(button.action)}
           color="tertiary"
           size="small"
+          className="shrink-0 whitespace-nowrap"
         >
           <i className={`fa-solid fa-${button.icon} mr-2`} />
           {button.label}

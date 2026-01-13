@@ -312,4 +312,48 @@ final class CheckInFeatureTests: XCTestCase {
     await expect(checkIn.calls[0].namedApps)
       .toEqual([.init(bundleId: "com.foo", bundleName: "Foo widget")])
   }
+
+  @MainActor
+  func testScreenTimeConflictDetectedSentToApi() async {
+    let (store, _) = AppReducer.testStore()
+    store.deps.userDefaults.getInt = { _ in 2 }
+    store.deps.device.screenTimeWebFilterActive = { true } // <-- conflict detected
+    let checkIn = spy(on: CheckIn_v2.Input.self, returning: CheckIn_v2.Output.mock)
+    store.deps.api.checkIn = checkIn.fn
+    let quitNonSafariBrowsers = spy(on: [BrowserMatch].self, returning: ())
+    store.deps.device.quitNonSafariBrowsers = quitNonSafariBrowsers.fn
+    let showNotification = spy2(on: (String.self, String.self), returning: ())
+    store.deps.device.showNotification = showNotification.fn
+
+    await store.send(.heartbeat(.everyTwentyMinutes))
+
+    await expect(checkIn.calls.count).toEqual(1)
+    await expect(checkIn.calls[0].screentimeConflictDetected).toEqual(true)
+
+    await store.receive(.checkIn(result: .success(.mock), reason: .heartbeat))
+    await store.receive(.setScreenTimeConflictDetected(true)) {
+      $0.screenTimeConflictDetected = true
+    }
+
+    await expect(quitNonSafariBrowsers.calls).toEqual([CheckIn_v2.Output.mock.browsers])
+    await expect(showNotification.calls.count).toEqual(1)
+    await expect(showNotification.calls[0].b).toContain("use Safari until")
+  }
+
+  @MainActor
+  func testScreenTimeConflictNotDetectedDoesNotSendAction() async {
+    let (store, _) = AppReducer.testStore()
+    store.deps.userDefaults.getInt = { _ in 2 }
+    store.deps.device.screenTimeWebFilterActive = { false } // <-- no conflict
+    let checkIn = spy(on: CheckIn_v2.Input.self, returning: CheckIn_v2.Output.mock)
+    store.deps.api.checkIn = checkIn.fn
+
+    await store.send(.heartbeat(.everyTwentyMinutes))
+
+    await expect(checkIn.calls.count).toEqual(1)
+    await expect(checkIn.calls[0].screentimeConflictDetected).toEqual(false)
+
+    await store.receive(.checkIn(result: .success(.mock), reason: .heartbeat))
+    expect(store.state.screenTimeConflictDetected).toEqual(false)
+  }
 }

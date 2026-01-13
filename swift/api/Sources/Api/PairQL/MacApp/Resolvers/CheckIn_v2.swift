@@ -109,6 +109,12 @@ extension CheckIn_v2: Resolver {
       }
     }
 
+    if input.screentimeConflictDetected == true {
+      // TODO: parent notification, banner, etc.
+    } else if input.screentimeConflictDetected == false {
+      // TODO: remove banner, database state
+    }
+
     return try await Output(
       adminAccountStatus: parent.accountStatus,
       appManifest: appManifest,

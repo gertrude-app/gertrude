@@ -61,6 +61,13 @@ extension DeviceClient {
     )
   }
 
+  func notifyScreenTimeConflict() async {
+    await showNotification(
+      "⚠️ Browser problem detected",
+      "You'll need to use Safari until your parent can fix an issue with Gertrude.",
+    )
+  }
+
   func notifyFilterSuspensionDenied(with comment: String?) async {
     await showNotification(
       "⛔️ Suspend filter request DENIED",

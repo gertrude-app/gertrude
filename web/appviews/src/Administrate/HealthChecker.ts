@@ -29,6 +29,7 @@ export default class HealthChecker {
     return [
       this.appVersion,
       ...this.filterItems,
+      this.screenTimeConflict,
       this.screenRecordingPermission,
       this.keystrokeRecordingPermission,
       this.fullDiskAccessPermission,
@@ -260,6 +261,22 @@ export default class HealthChecker {
           message: `Log in to the Gertrude parents website to resolve`,
         };
     }
+  }
+
+  public get screenTimeConflict(): ItemData | null {
+    if (this.data.screenTimeWebFilterActive !== true) {
+      return null;
+    }
+    return {
+      title: `Screen Time conflict`,
+      state: `fail`,
+      message: `Apple’s Screen Time web filter is enabled, which is not necessary, and stops Gertrude from blocking websites. To fix it, you need to toggle off just the <b>Content&nbsp;&amp;&nbsp;Privacy</b> section of Screen Time and then <b>restart this computer</b>. Until the setting is disabled and the Mac has restarted, we are preventing access to affected web browsers for your child’s safety.`,
+      button: {
+        icon: `gear`,
+        label: `Fix setting`,
+        action: `openScreenTimeSettingsClicked`,
+      },
+    };
   }
 
   public get filterItems(): ItemData[] {

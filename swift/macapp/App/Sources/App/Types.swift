@@ -61,6 +61,7 @@ struct PendingRequest: Equatable, Codable {
 public extension ApiClient {
   func appCheckIn(
     _ filterVersion: String?,
+    screenTimeConflictDetected: Bool? = nil,
     pendingFilterSuspension: UUID? = nil,
     pendingUnlockRequests: [UUID]? = nil,
     sendNamedApps: Bool = false,
@@ -76,6 +77,7 @@ public extension ApiClient {
         pendingFilterSuspension: pendingFilterSuspension,
         pendingUnlockRequests: pendingUnlockRequests,
         namedApps: sendNamedApps ? device.listRunningApps().filter(\.hasName) : nil,
+        screentimeConflictDetected: screenTimeConflictDetected,
       ),
     )
   }

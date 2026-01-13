@@ -77,6 +77,41 @@ final class ApplicationFeatureTests: XCTestCase {
   }
 
   @MainActor
+  func testScreenTimeConflictBlocksNonSafariBrowserLaunch() async {
+    let (store, _) = AppReducer.testStore {
+      $0.screenTimeConflictDetected = true
+      $0.browsers = [.bundleId("com.google.Chrome")]
+    }
+
+    store.deps.device.runningAppFromPid = { pid in
+      switch pid {
+      case 100:
+        .init(pid: 100, bundleId: "com.google.Chrome", bundleName: "Google Chrome")
+      case 200:
+        .init(pid: 200, bundleId: "com.apple.Safari", bundleName: "Safari")
+      case 300:
+        .init(pid: 300, bundleId: "com.example.Notes", bundleName: "Notes")
+      default:
+        nil
+      }
+    }
+    let terminateApp = spy(on: RunningApp.self, returning: ())
+    store.deps.device.terminateApp = terminateApp.fn
+    let notification = spy2(on: (String.self, String.self), returning: ())
+    store.deps.device.showNotification = notification.fn
+
+    await store.send(.application(.appLaunched(pid: 100)))
+    await expect(terminateApp.calls.count).toEqual(1)
+    await expect(notification.calls[0].b).toContain("use Safari until")
+
+    await store.send(.application(.appLaunched(pid: 200)))
+    await expect(terminateApp.calls.count).toEqual(1)
+
+    await store.send(.application(.appLaunched(pid: 300)))
+    await expect(terminateApp.calls.count).toEqual(1)
+  }
+
+  @MainActor
   func testSendsFilterAliveOnWake() async {
     let (store, _) = AppReducer.testStore()
     let alive = mock(once: Result<Bool, XPCErr>.success(true))

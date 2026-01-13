@@ -28,6 +28,7 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.device.currentUserId = { 502 }
     store.deps.device.listMacOSUsers = DeviceClient.mock.listMacOSUsers
     store.deps.device.notificationsSetting = { .none }
+    store.deps.device.screenTimeWebFilterActive = { false }
 
     store.deps.storage.loadPersistentState = { nil } // <-- first boot
     let saveState = spy(on: Persistent.State.self, returning: ())
@@ -370,6 +371,7 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.receive(.onboarding(.delegate(.onboardingConfigComplete)))
     await store.receive(.startProtecting(user: user))
     await store.receive(.networkConnectionChanged(connected: true))
+    await store.receive(.setScreenTimeConflictDetected(false))
     await store.receive(.websocket(.connectedSuccessfully))
 
     await store.receive(.checkIn(result: .success(checkInResult), reason: .startProtecting)) {

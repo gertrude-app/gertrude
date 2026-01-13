@@ -15,6 +15,8 @@ public struct CheckIn_v2: Pair {
     public var pendingUnlockRequests: [UUID]?
     /// added in v2.6.0
     public var namedApps: [RunningApp]?
+    /// added in v2.8.0
+    public var screentimeConflictDetected: Bool?
 
     public init(
       appVersion: String,
@@ -24,6 +26,7 @@ public struct CheckIn_v2: Pair {
       pendingFilterSuspension: UUID? = nil,
       pendingUnlockRequests: [UUID]? = nil,
       namedApps: [RunningApp]? = nil,
+      screentimeConflictDetected: Bool? = nil,
     ) {
       self.appVersion = appVersion
       self.filterVersion = filterVersion
@@ -32,6 +35,7 @@ public struct CheckIn_v2: Pair {
       self.pendingFilterSuspension = pendingFilterSuspension
       self.pendingUnlockRequests = pendingUnlockRequests
       self.namedApps = namedApps
+      self.screentimeConflictDetected = screentimeConflictDetected
     }
   }
 

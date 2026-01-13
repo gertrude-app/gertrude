@@ -19,8 +19,10 @@ struct DeviceClient: Sendable {
   var openWebUrl: @Sendable (URL) async -> Void
   var osVersion: @Sendable () -> MacOSVersion
   var quitBrowsers: @Sendable ([BrowserMatch]) async -> Void
+  var quitNonSafariBrowsers: @Sendable ([BrowserMatch]) async -> Void
   var requestNotificationAuthorization: @Sendable () async -> Void
   var runningAppFromPid: @Sendable (pid_t) -> RunningApp?
+  var screenTimeWebFilterActive: @Sendable () async -> Bool
   var screensaverRunning: @Sendable () -> Bool
   var showNotification: @Sendable (String, String) async -> Void
   var serialNumber: @Sendable () -> String?
@@ -51,8 +53,10 @@ extension DeviceClient: DependencyKey {
     openWebUrl: { NSWorkspace.shared.open($0) },
     osVersion: { macOSVersion() },
     quitBrowsers: quitAllBrowsers,
+    quitNonSafariBrowsers: quitAllNonSafariBrowsers,
     requestNotificationAuthorization: requestNotificationAuth,
     runningAppFromPid: { .init(pid: $0) },
+    screenTimeWebFilterActive: isScreenTimeWebFilterActive,
     screensaverRunning: {
       let currentApp = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
       return currentApp == "com.apple.ScreenSaver.Engine" || currentApp == "com.apple.loginwindow"
@@ -93,10 +97,15 @@ extension DeviceClient: TestDependencyKey {
       placeholder: .init(major: 15, minor: 0, patch: 0),
     ),
     quitBrowsers: unimplemented("DeviceClient.quitBrowsers"),
+    quitNonSafariBrowsers: unimplemented("DeviceClient.quitNonSafariBrowsers"),
     requestNotificationAuthorization: unimplemented(
       "DeviceClient.requestNotificationAuthorization",
     ),
     runningAppFromPid: unimplemented("DeviceClient.runningAppFromPid", placeholder: nil),
+    screenTimeWebFilterActive: unimplemented(
+      "DeviceClient.screenTimeWebFilterActive",
+      placeholder: false,
+    ),
     screensaverRunning: unimplemented("DeviceClient.screensaverRunning", placeholder: false),
     showNotification: unimplemented("DeviceClient.showNotification"),
     serialNumber: unimplemented("DeviceClient.serialNumber", placeholder: ""),
@@ -126,8 +135,10 @@ extension DeviceClient: TestDependencyKey {
     openWebUrl: { _ in },
     osVersion: { .init(major: 14, minor: 0, patch: 0) },
     quitBrowsers: { _ in },
+    quitNonSafariBrowsers: { _ in },
     requestNotificationAuthorization: {},
     runningAppFromPid: { _ in nil },
+    screenTimeWebFilterActive: { false },
     screensaverRunning: { false },
     showNotification: { _, _ in },
     serialNumber: { "test-serial-number" },
@@ -174,3 +185,20 @@ private func platform(_ key: String, format: Format) -> String? {
 }
 
 // https://di-api.reincubate.com/v1/apple-serials/C07D92QVPJJ9/
+
+@Sendable private func isScreenTimeWebFilterActive() async -> Bool {
+  await Task {
+    let proc = Process()
+    proc.executableURL = URL(fileURLWithPath: "/usr/bin/pgrep")
+    proc.arguments = ["-x", "webfilterproxyd"]
+    proc.standardOutput = FileHandle.nullDevice
+    proc.standardError = FileHandle.nullDevice
+    do {
+      try proc.run()
+      proc.waitUntilExit()
+      return proc.terminationStatus == 0
+    } catch {
+      return false
+    }
+  }.value
+}

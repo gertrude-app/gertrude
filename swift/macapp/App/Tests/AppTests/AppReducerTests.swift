@@ -47,6 +47,7 @@ final class AppReducerTests: XCTestCase {
 
     await store.receive(.startProtecting(user: .mock))
     await store.receive(.networkConnectionChanged(connected: true))
+    await store.receive(.setScreenTimeConflictDetected(false))
     await store.receive(.websocket(.connectedSuccessfully))
 
     await expect(setUserToken.calls).toEqual([UserData.mock.token])
@@ -137,6 +138,19 @@ final class AppReducerTests: XCTestCase {
 
     await store.send(.application(.didFinishLaunching))
     await store.receive(.loadedPersistentState(nil))
+  }
+
+  @MainActor
+  func testScreenTimeConflictDetectedDoesNotRepeatOnSubsequentDetections() async {
+    let (store, _) = AppReducer.testStore {
+      $0.screenTimeConflictDetected = true
+    }
+    let quitNonSafariBrowsers = spy(on: [BrowserMatch].self, returning: ())
+    store.deps.device.quitNonSafariBrowsers = quitNonSafariBrowsers.fn
+
+    await store.send(.setScreenTimeConflictDetected(true))
+
+    await expect(quitNonSafariBrowsers.calls.count).toEqual(0)
   }
 
   @MainActor
