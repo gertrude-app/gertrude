@@ -24,11 +24,6 @@ public enum Configure {
 private struct ApiLifecyle: LifecycleHandler {
   func didBootAsync(_ app: Application) async throws {
     await with(dependency: \.ephemeral).restoreStorage()
-    if app.env.mode != .prod {
-      // syncing db from prod/staging does not keep search paths
-      let db: SQLDatabase = app.db(.psql) as! SQLDatabase
-      try await SearchPaths().up(sql: db)
-    }
   }
 
   // NB: 7/2025 - as far as i can tell, this is not running ever

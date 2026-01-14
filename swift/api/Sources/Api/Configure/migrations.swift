@@ -61,6 +61,7 @@ extension Configure {
     app.migrations.add(IOSModelIdentifiers())
     app.migrations.add(DashAnnouncementKind())
     app.migrations.add(SupervisionStateBooleans())
+    app.migrations.add(LoginSearchPathTrigger())
   }
 }
 
@@ -102,3 +103,4 @@ struct AddReleaseRequirementPace: DeletedMigration {}
 struct SecurityEvents: DeletedMigration {}
 // @see https://github.com/gertrude-app/swift/tree/57c4073a
 struct MultipleSchemas: DeletedMigration {}
+struct SearchPaths: DeletedMigration {}
