@@ -560,9 +560,8 @@ struct OnboardingFeature: Feature {
       case .webview(.primaryBtnClicked) where step == .installSysExt_success,
            .webview(.secondaryBtnClicked) where step == .installSysExt_failed:
         log(step, action, "78bded66")
-        state.step = state.exemptableUsers.isEmpty ? .locateMenuBarIcon : .exemptUsers
         return .exec { send in
-          await send(.delegate(.onboardingConfigComplete))
+          await self.finishOnboardingConfig(send)
         }
 
       case .webview(.primaryBtnClicked) where step == .screenTimeConflict:
@@ -730,9 +729,16 @@ struct OnboardingFeature: Feature {
       }
 
       log("sys ext already installed and running, skipping stage", "b0e6e683")
+      await self.finishOnboardingConfig(send)
+    }
 
+    func finishOnboardingConfig(_ send: Send<Action>) async {
+      let currentUserId = self.device.currentUserId()
+      let users = await (try? self.device.listMacOSUsers()) ?? []
+      await send(.receivedDeviceData(currentUserId: currentUserId, users: users))
       await send(.delegate(.onboardingConfigComplete))
-      await send(.setStep(.locateMenuBarIcon))
+      let hasExemptableUsers = users.count(where: { $0.id != currentUserId }) > 0
+      await send(.setStep(hasExemptableUsers ? .exemptUsers : .locateMenuBarIcon))
     }
   }
 }
