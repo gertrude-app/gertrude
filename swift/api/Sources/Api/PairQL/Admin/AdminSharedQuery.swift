@@ -171,11 +171,11 @@ extension ParentData {
 struct NonEmptyKeychains: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     .init("""
-    SELECT kc.parent_id, COUNT(k.id) AS key_count
-    FROM keychains kc
-    LEFT JOIN keys k ON k.keychain_id = kc.id
-    WHERE kc.is_public = false
-    GROUP BY kc.id, kc.parent_id
+    SELECT kc.\(Keychain.columnName(.parentId)), COUNT(k.id) AS key_count
+    FROM \(table: Keychain.self) kc
+    LEFT JOIN \(table: Key.self) k ON k.\(Key.columnName(.keychainId)) = kc.id
+    WHERE kc.\(Keychain.columnName(.isPublic)) = false
+    GROUP BY kc.id, kc.\(Keychain.columnName(.parentId))
     HAVING COUNT(k.id) > 0;
     """)
   }
@@ -188,8 +188,8 @@ struct ChildCount: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     .init("""
     SELECT p.id AS parent_id, COUNT(c.id) AS child_count
-    FROM parents p
-    LEFT JOIN children c ON c.parent_id = p.id
+    FROM \(table: Parent.self) p
+    LEFT JOIN \(table: Child.self) c ON c.\(Child.columnName(.parentId)) = p.id
     GROUP BY p.id;
     """)
   }
@@ -202,8 +202,9 @@ struct NotificationsCount: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     .init("""
     SELECT p.id AS parent_id, COUNT(c.id) AS notifications_count
-    FROM parents p
-    LEFT JOIN notifications c ON c.parent_id = p.id
+    FROM \(table: Parent.self) p
+    LEFT JOIN \(table: Parent.Notification.self) c
+      ON c.\(Parent.Notification.columnName(.parentId)) = p.id
     GROUP BY p.id;
     """)
   }
@@ -216,9 +217,11 @@ struct ComputerUserCount: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     .init("""
     SELECT p.id AS parent_id, COUNT(DISTINCT cu.id) AS computer_user_count
-    FROM parents p
-    JOIN computers c ON c.parent_id = p.id
-    JOIN computer_users cu ON cu.computer_id = c.id
+    FROM \(table: Parent.self) p
+    JOIN \(table: Computer.self) c
+      ON c.\(Computer.columnName(.parentId)) = p.id
+    JOIN \(table: ComputerUser.self) cu
+      ON cu.\(ComputerUser.columnName(.computerId)) = c.id
     GROUP BY p.id;
     """)
   }
@@ -231,24 +234,28 @@ struct ActivityCounts: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     .init("""
     WITH ss_counts AS (
-      SELECT cu.computer_id, COUNT(*) AS screenshot_count
-      FROM screenshots ss
-      JOIN computer_users cu ON ss.computer_user_id = cu.id
-      GROUP BY cu.computer_id
+      SELECT cu.\(ComputerUser.columnName(.computerId)), COUNT(*) AS screenshot_count
+      FROM \(table: Screenshot.self) ss
+      JOIN \(table: ComputerUser.self) cu
+        ON ss.\(Screenshot.columnName(.computerUserId)) = cu.id
+      GROUP BY cu.\(ComputerUser.columnName(.computerId))
     ),
     kl_counts AS (
-      SELECT cu.computer_id, COUNT(*) AS keystroke_line_count
-      FROM keystroke_lines kl
-      JOIN computer_users cu ON kl.computer_user_id = cu.id
-      GROUP BY cu.computer_id
+      SELECT cu.\(ComputerUser.columnName(.computerId)), COUNT(*) AS keystroke_line_count
+      FROM \(table: KeystrokeLine.self) kl
+      JOIN \(table: ComputerUser.self) cu
+        ON kl.\(KeystrokeLine.columnName(.computerUserId)) = cu.id
+      GROUP BY cu.\(ComputerUser.columnName(.computerId))
     )
     SELECT p.id AS parent_id,
            COALESCE(SUM(ss.screenshot_count), 0)::int AS screenshot_count,
            COALESCE(SUM(kl.keystroke_line_count), 0)::int AS keystroke_line_count
-    FROM parents p
-    JOIN computers c ON c.parent_id = p.id
-    LEFT JOIN ss_counts ss ON ss.computer_id = c.id
-    LEFT JOIN kl_counts kl ON kl.computer_id = c.id
+    FROM \(table: Parent.self) p
+    JOIN \(table: Computer.self) c ON c.\(Computer.columnName(.parentId)) = p.id
+    LEFT JOIN ss_counts ss
+      ON ss.\(ComputerUser.columnName(.computerId)) = c.id
+    LEFT JOIN kl_counts kl
+      ON kl.\(ComputerUser.columnName(.computerId)) = c.id
     GROUP BY p.id;
     """)
   }
