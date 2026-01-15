@@ -404,9 +404,9 @@ extension IOSDetailedStats: NoInputResolver {
 private struct DistinctVendorCountQuery: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     var stmt = SQL.Statement("""
-    SELECT COUNT(DISTINCT \(IOSEvent.columnName(.vendorId))) AS count
+    SELECT COUNT(DISTINCT \(IOSEvent.columnName(.deviceId))) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(IOSEvent.columnName(.vendorId)) IS NOT NULL
+    WHERE \(IOSEvent.columnName(.deviceId)) IS NOT NULL
       AND \(IOSEvent.columnName(.eventId)) =
     """)
     if let eventId = bindings.first {
@@ -423,21 +423,21 @@ private struct AuthFailureCountExcludingSuccess: CustomCountable {
     guard let eventIdBinding = bindings.first else {
       return SQL.Statement("SELECT 0 AS count WHERE FALSE")
     }
-    let vendorId = IOSEvent.columnName(.vendorId)
+    let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
     var stmt = SQL.Statement("""
-    SELECT COUNT(DISTINCT \(vendorId)) AS count
+    SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(vendorId) IS NOT NULL
+    WHERE \(deviceId) IS NOT NULL
       AND \(eventId) =
     """)
     stmt.components.append(.binding(eventIdBinding))
     stmt.components.append(.sql("""
-     AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'cdb31095'
+     AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'cdb31095'
       )
-      AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = '30fac4e6'
+      AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = '30fac4e6'
       )
     """))
     return stmt
@@ -448,18 +448,18 @@ private struct AuthFailureCountExcludingSuccess: CustomCountable {
 
 private struct CombinedInstallFailureCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    let vendorId = IOSEvent.columnName(.vendorId)
+    let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
     return SQL.Statement("""
-    SELECT COUNT(DISTINCT \(vendorId)) AS count
+    SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(vendorId) IS NOT NULL
+    WHERE \(deviceId) IS NOT NULL
       AND \(eventId) IN ('2bcf3d96', 'e220a765', '6f0a66e4', '004d0d89')
-      AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'cdb31095'
+      AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'cdb31095'
       )
-      AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = '30fac4e6'
+      AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = '30fac4e6'
       )
     """)
   }
@@ -469,18 +469,18 @@ private struct CombinedInstallFailureCount: CustomCountable {
 
 private struct StandardSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    let vendorId = IOSEvent.columnName(.vendorId)
+    let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
     return SQL.Statement("""
-    SELECT COUNT(DISTINCT \(vendorId)) AS count
+    SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(vendorId) IS NOT NULL
+    WHERE \(deviceId) IS NOT NULL
       AND \(eventId) = 'cdb31095'
-      AND \(vendorId) IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = '4a0c585f'
+      AND \(deviceId) IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = '4a0c585f'
       )
-      AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
+      AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
       )
     """)
   }
@@ -490,15 +490,15 @@ private struct StandardSuccessCount: CustomCountable {
 
 private struct SupervisedSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    let vendorId = IOSEvent.columnName(.vendorId)
+    let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
     return SQL.Statement("""
-    SELECT COUNT(DISTINCT \(vendorId)) AS count
+    SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(vendorId) IS NOT NULL
+    WHERE \(deviceId) IS NOT NULL
       AND \(eventId) = 'cdb31095'
-      AND \(vendorId) IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
+      AND \(deviceId) IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
       )
     """)
   }
@@ -508,18 +508,18 @@ private struct SupervisedSuccessCount: CustomCountable {
 
 private struct StuckIn18PlusCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    let vendorId = IOSEvent.columnName(.vendorId)
+    let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
     return SQL.Statement("""
-    SELECT COUNT(DISTINCT \(vendorId)) AS count
+    SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(vendorId) IS NOT NULL
+    WHERE \(deviceId) IS NOT NULL
       AND \(eventId) = 'a21c9040'
-      AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'cdb31095'
+      AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'cdb31095'
       )
-      AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self)
+      AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self)
         WHERE \(eventId) IN ('2bcf3d96', 'e220a765', '6f0a66e4', '9a3f1e5b')
       )
     """)
@@ -530,15 +530,15 @@ private struct StuckIn18PlusCount: CustomCountable {
 
 private struct ParentDeviceDropoffCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    let vendorId = IOSEvent.columnName(.vendorId)
+    let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
     return SQL.Statement("""
-    SELECT COUNT(DISTINCT \(vendorId)) AS count
+    SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(vendorId) IS NOT NULL
+    WHERE \(deviceId) IS NOT NULL
       AND \(eventId) = '30fac4e6'
-      AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'cdb31095'
+      AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'cdb31095'
       )
     """)
   }
@@ -548,21 +548,21 @@ private struct ParentDeviceDropoffCount: CustomCountable {
 
 private struct ChildOnboardingIssueCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    let vendorId = IOSEvent.columnName(.vendorId)
+    let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
     return SQL.Statement("""
-    SELECT COUNT(DISTINCT \(vendorId)) AS count
+    SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(vendorId) IS NOT NULL
+    WHERE \(deviceId) IS NOT NULL
       AND \(eventId) = '3c4772ad'
-      AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'cdb31095'
+      AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'cdb31095'
       )
-      AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'a21c9040'
+      AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'a21c9040'
       )
-      AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self)
+      AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self)
         WHERE \(eventId) IN ('2bcf3d96', 'e220a765', '6f0a66e4', '9a3f1e5b')
       )
     """)
@@ -573,18 +573,18 @@ private struct ChildOnboardingIssueCount: CustomCountable {
 
 private struct FilterInstallFailedCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    let vendorId = IOSEvent.columnName(.vendorId)
+    let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
     return SQL.Statement("""
-    SELECT COUNT(DISTINCT \(vendorId)) AS count
+    SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(vendorId) IS NOT NULL
+    WHERE \(deviceId) IS NOT NULL
       AND \(eventId) = '004d0d89'
-      AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'cdb31095'
+      AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'cdb31095'
       )
-      AND \(vendorId) NOT IN (
-        SELECT \(vendorId) FROM \(table: IOSEvent.self) WHERE \(eventId) = '30fac4e6'
+      AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = '30fac4e6'
       )
     """)
   }
@@ -595,9 +595,9 @@ private struct FilterInstallFailedCount: CustomCountable {
 private struct CacheEventCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     var stmt = SQL.Statement("""
-    SELECT COUNT(DISTINCT \(IOSEvent.columnName(.vendorId))) AS count
+    SELECT COUNT(DISTINCT \(IOSEvent.columnName(.deviceId))) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(IOSEvent.columnName(.vendorId)) IS NOT NULL
+    WHERE \(IOSEvent.columnName(.deviceId)) IS NOT NULL
       AND \(IOSEvent.columnName(.eventId)) =
     """)
     if let eventId = bindings.first {
@@ -619,9 +619,9 @@ private struct DeviceTypeCount: CustomCountable {
       return SQL.Statement("SELECT 0 AS count WHERE FALSE")
     }
     var stmt = SQL.Statement("""
-    SELECT COUNT(DISTINCT \(IOSEvent.columnName(.vendorId))) AS count
+    SELECT COUNT(DISTINCT \(IOSEvent.columnName(.deviceId))) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(IOSEvent.columnName(.vendorId)) IS NOT NULL
+    WHERE \(IOSEvent.columnName(.deviceId)) IS NOT NULL
       AND \(IOSEvent.columnName(.eventId)) = '8d35f043'
       AND \(IOSEvent.columnName(.modelIdentifier)) LIKE\(" ")
     """)
@@ -638,9 +638,9 @@ private struct TopRegionsQuery: CustomQueryable {
     SELECT
       COALESCE(SUBSTRING(\(IOSEvent
       .columnName(.detail)) FROM 'region: `([A-Z]{2})`'), 'Unknown') AS region,
-      COUNT(DISTINCT \(IOSEvent.columnName(.vendorId))) AS count
+      COUNT(DISTINCT \(IOSEvent.columnName(.deviceId))) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(IOSEvent.columnName(.vendorId)) IS NOT NULL
+    WHERE \(IOSEvent.columnName(.deviceId)) IS NOT NULL
       AND \(IOSEvent.columnName(.eventId)) = '8d35f043'
       AND \(IOSEvent.columnName(.detail)) IS NOT NULL
     GROUP BY region
@@ -659,9 +659,9 @@ private struct TopVersionsQuery: CustomQueryable {
     return SQL.Statement("""
     SELECT
       \(iosVersion) AS version,
-      COUNT(DISTINCT \(IOSEvent.columnName(.vendorId))) AS count
+      COUNT(DISTINCT \(IOSEvent.columnName(.deviceId))) AS count
     FROM \(table: IOSEvent.self)
-    WHERE \(IOSEvent.columnName(.vendorId)) IS NOT NULL
+    WHERE \(IOSEvent.columnName(.deviceId)) IS NOT NULL
       AND \(IOSEvent.columnName(.eventId)) = '8d35f043'
     GROUP BY \(iosVersion)
     ORDER BY

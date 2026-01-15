@@ -18,11 +18,22 @@ extension LogIOSEvent_v2: Resolver {
       detail = String(detail!.dropFirst("[onboarding] ".count))
     }
 
+    var deviceId: IOSApp.Device.Id?
+    if let vendorId = input.vendorId {
+      deviceId = .init(vendorId)
+      try await IOSApp.Device.ensureExists(
+        id: deviceId!,
+        modelIdentifier: input.modelIdentifier,
+        iosVersion: input.iOSVersion,
+        in: context.db,
+      )
+    }
+
     try await context.db.create(IOSEvent(
       eventId: input.eventId,
       kind: kind,
       detail: detail,
-      vendorId: input.vendorId,
+      deviceId: deviceId,
       modelIdentifier: input.modelIdentifier,
       iosVersion: input.iOSVersion,
     ))

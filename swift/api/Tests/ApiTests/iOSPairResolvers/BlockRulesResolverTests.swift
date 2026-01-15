@@ -8,15 +8,31 @@ import XExpect
 final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
   func testBlockRules() async throws {
     let vendorId = UUID()
+    let otherVendorId = UUID()
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSApp.Device(
+      id: .init(vendorId),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      appVersion: "1.0.0",
+      iosVersion: "18.0",
+    ))
+    let device2 = try await self.db.create(IOSApp.Device(
+      id: .init(otherVendorId),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      appVersion: "1.0.0",
+      iosVersion: "18.0",
+    ))
     let gifs = CreateBlockGroups.GroupIds().gifs
     let ads = CreateBlockGroups.GroupIds().ads
     try await self.db.delete(all: IOSApp.BlockRule.self)
     try await self.db.create([
       IOSApp.BlockRule(rule: .urlContains(value: "bad"), groupId: .init(gifs)),
-      IOSApp.BlockRule(rule: .urlContains(value: "cat"), groupId: .init(ads)),
-      // <-- skip, disabled group
-      IOSApp.BlockRule(vendorId: .init(vendorId), rule: .urlContains(value: "x1")), // <-- include
-      IOSApp.BlockRule(vendorId: .init(), rule: .urlContains(value: "x2")),
+      IOSApp.BlockRule(rule: .urlContains(value: "cat"), groupId: .init(ads)), // <-- skip, disabled
+      IOSApp.BlockRule(deviceId: device.id, rule: .urlContains(value: "x1")), // <-- include
+      IOSApp.BlockRule(deviceId: device2.id, rule: .urlContains(value: "x2")), // <-- skip, other
       IOSApp.BlockRule(rule: .urlContains(value: "nope"), groupId: nil),
     ])
 
@@ -32,11 +48,20 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     // my understanding is that it just means the vendorId is set to zero, so we don't want
     // to ever consider these vendor ids for customizations
     let zeroVid = UUID("00000000-0000-0000-0000-000000000000")!
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSApp.Device(
+      id: .init(zeroVid),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      appVersion: "1.0.0",
+      iosVersion: "18.0",
+    ))
     let gifs = CreateBlockGroups.GroupIds().gifs
     try await self.db.delete(all: IOSApp.BlockRule.self)
     try await self.db.create([
       IOSApp.BlockRule(rule: .urlContains(value: "bad"), groupId: .init(gifs)),
-      IOSApp.BlockRule(vendorId: .init(zeroVid), rule: .urlContains(value: "x1")), // <-- skip
+      IOSApp.BlockRule(deviceId: device.id, rule: .urlContains(value: "x1")), // <-- skip, b/c 0
     ])
 
     let rules = try await BlockRules_v2.resolve(

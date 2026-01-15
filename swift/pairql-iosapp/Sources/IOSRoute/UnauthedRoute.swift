@@ -6,7 +6,7 @@ public enum UnauthedRoute: PairRoute {
   case checkSupervisionStatus(CheckSupervisionStatus.Input)
   case connectDevice(ConnectDevice.Input)
   case connectDevice_v2(ConnectDevice_v2.Input)
-  case createPendingSupervision(CreatePendingSupervision.Input)
+  case createSupervisionCode(CreateSupervisionCode.Input)
   case defaultBlockRules(DefaultBlockRules.Input)
   case logIOSEvent(LogIOSEvent.Input)
   case logIOSEvent_v2(LogIOSEvent_v2.Input)
@@ -37,9 +37,9 @@ public extension UnauthedRoute {
       Operation(ConnectDevice_v2.self)
       Body(.json(ConnectDevice_v2.Input.self))
     }
-    Route(.case(Self.createPendingSupervision)) {
-      Operation(CreatePendingSupervision.self)
-      Body(.json(CreatePendingSupervision.Input.self))
+    Route(.case(Self.createSupervisionCode)) {
+      Operation(CreateSupervisionCode.self)
+      Body(.json(CreateSupervisionCode.Input.self))
     }
     Route(.case(Self.defaultBlockRules)) {
       Operation(DefaultBlockRules.self)

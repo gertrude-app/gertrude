@@ -97,6 +97,7 @@ Supports all 3 apps, plus dashboard and admin websites
 
 - if i ask you to read from the database, or you need to for your task, always read the
   database skill file at `./.claude/skills/database/SKILL.md`
+- for local development we use a local postgres, NOT docker
 
 ## Dev "task" concept
 

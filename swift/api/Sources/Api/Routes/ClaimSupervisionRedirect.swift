@@ -11,22 +11,23 @@ enum ClaimSupervisionRedirectRoute {
       return request.redirect(to: "\(login)?error=invalid_code", redirectType: .temporary)
     }
 
-    guard let pendingSupervision = try? await IOSApp.PendingSupervision.query()
-      .where(.code == code)
+    guard let device = try? await IOSApp.Device.query()
+      .where(.supervisionClaimCode == code)
       .first(in: request.context.db) else {
       return request.redirect(to: "\(login)?error=missing_code", redirectType: .temporary)
     }
 
-    if pendingSupervision.claimedChildId == nil,
-       pendingSupervision.expiresAt <= get(dependency: \.date.now) {
+    if device.childId == nil,
+       let expiresAt = device.claimCodeExpiresAt,
+       expiresAt <= get(dependency: \.date.now) {
       return request.redirect(to: "\(login)?error=expired_code", redirectType: .temporary)
     }
 
     var components = URLComponents()
     components.queryItems = [
       .init(name: "claimPendingSupervision", value: "\(code)"),
-      .init(name: "modelName", value: pendingSupervision.modelName),
-      .init(name: "iosVersion", value: pendingSupervision.iosVersion),
+      .init(name: "modelName", value: device.modelName),
+      .init(name: "iosVersion", value: device.iosVersion),
     ]
     return request.redirect(to: "\(login)\(components.string ?? "")", redirectType: .temporary)
   }

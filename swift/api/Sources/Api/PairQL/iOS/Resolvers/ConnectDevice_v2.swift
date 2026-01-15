@@ -19,8 +19,8 @@ extension ConnectDevice_v2: Resolver {
 
     let child = try await ctx.db.find(childId)
     let device = try await ctx.db.create(IOSApp.Device(
+      id: .init(input.vendorId),
       childId: childId,
-      vendorId: .init(input.vendorId),
       modelIdentifier: input.modelIdentifier,
       appVersion: input.appVersion,
       iosVersion: input.iosVersion,

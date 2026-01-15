@@ -15,6 +15,8 @@ allowed-tools:
 
 You have read-only access to the Gertrude PostgreSQL database for querying and analysis.
 
+Important: although this repo has some docker-related files, all local development goes through a local install of postgres and NOT through docker. Never use `docker` commands when dealing with the database.
+
 ## Connection Information
 
 - **Database name**: `gertrude`

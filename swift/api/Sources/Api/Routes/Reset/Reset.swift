@@ -16,20 +16,26 @@ enum Reset {
 
   static func createIOSEvents() async throws {
     @Dependency(\.db) var db
-    let vendorId = UUID()
+    let deviceId = IOSApp.Device.Id()
+    try await db.create(IOSApp.Device(
+      id: deviceId,
+      modelIdentifier: "iPhone15,2",
+      appVersion: "1.0.0",
+      iosVersion: "26.1",
+    ))
     try await db.create([
       IOSEvent(
         eventId: "8d35f043",
         kind: .onboarding,
         detail: "region: `US`",
-        vendorId: vendorId,
+        deviceId: deviceId,
         modelIdentifier: "iPhone15,2",
         iosVersion: "26.1",
       ),
       IOSEvent(
         eventId: "cdb31095",
         kind: .onboarding,
-        vendorId: vendorId,
+        deviceId: deviceId,
         modelIdentifier: "iPhone15,2",
         iosVersion: "26.1",
       ),

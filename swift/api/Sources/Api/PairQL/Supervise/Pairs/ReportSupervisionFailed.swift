@@ -25,19 +25,13 @@ extension ReportSupervisionFailed: Resolver {
       in: context,
     )
 
-    let device = try? await IOSApp.Device.query()
-      .where(.childId == validated.claimedChildId)
-      .where(.vendorId == validated.pendingSupervision.vendorId)
-      .first(in: context.db)
-
     try await context.db.create(IOSEvent(
       eventId: "df3914fa",
       kind: .supervision,
       detail: "supervision_failed: code=\(input.code)",
-      vendorId: validated.pendingSupervision.vendorId,
-      iosDeviceId: device?.id,
-      modelIdentifier: validated.pendingSupervision.modelIdentifier,
-      iosVersion: validated.pendingSupervision.iosVersion,
+      deviceId: validated.device.id,
+      modelIdentifier: validated.device.modelIdentifier,
+      iosVersion: validated.device.iosVersion,
     ))
 
     return .success

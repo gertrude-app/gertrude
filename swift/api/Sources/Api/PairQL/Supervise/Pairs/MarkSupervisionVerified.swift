@@ -20,13 +20,13 @@ extension MarkSupervisionVerified: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let validated = try await SuperviseRoute.validatedSupervisionCode(
       code: input.code,
-      baseId: "1f768983", // 1f768983-1, 1f768983-2, 1f768983-3
+      baseId: "1f768983", // 1f768983-1, 1f768983-2, 1f768983-3, 1f768983-4
       in: context,
     )
 
     var device = try await IOSApp.Device.query()
       .where(.childId == validated.claimedChildId)
-      .where(.vendorId == validated.pendingSupervision.vendorId)
+      .where(.id == validated.device.id)
       .first(in: context.db)
 
     device.isSupervised = true
@@ -36,10 +36,9 @@ extension MarkSupervisionVerified: Resolver {
       eventId: "09748184",
       kind: .supervision,
       detail: "supervision_verified: code=\(input.code)",
-      vendorId: validated.pendingSupervision.vendorId,
-      iosDeviceId: device.id,
+      deviceId: device.id,
       modelIdentifier: device.modelIdentifier,
-      iosVersion: validated.pendingSupervision.iosVersion,
+      iosVersion: validated.device.iosVersion,
     ))
 
     return .success

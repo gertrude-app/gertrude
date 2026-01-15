@@ -31,7 +31,7 @@ struct IOSDeviceEvents: Pair {
 extension IOSDeviceEvents: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let events = try await IOSEvent.query()
-      .where(.vendorId == input.vendorId)
+      .where(.deviceId == input.vendorId)
       .orderBy(.createdAt, .asc)
       .all(in: context.db)
 

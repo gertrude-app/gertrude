@@ -8,6 +8,7 @@ import XExpect
 final class ConnectDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testConnectIOSDeviceHappyPath() async throws {
     let child = try await self.child()
+    let vendorId = UUID()
     let data = try await withDependencies {
       $0.verificationCode = .liveValue
       $0.uuid = .incrementing
@@ -17,7 +18,7 @@ final class ConnectDeviceResolverTests: ApiTestCase, @unchecked Sendable {
       return try await ConnectDevice.resolve(
         with: .init(
           verificationCode: code,
-          vendorId: .init(),
+          vendorId: vendorId,
           deviceType: "iPhone",
           appVersion: "1.5.0",
           iosVersion: "18.4.0",
@@ -28,8 +29,8 @@ final class ConnectDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
     expect(data).toEqual(.init(
       childId: child.id.rawValue,
-      token: .init(2),
-      deviceId: .init(0),
+      token: .init(1),
+      deviceId: vendorId,
       childName: child.name,
     ))
   }

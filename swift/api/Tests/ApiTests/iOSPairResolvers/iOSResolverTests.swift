@@ -52,8 +52,14 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
     expect(retrieved.kind).toEqual(.info)
     expect(retrieved.modelIdentifier).toEqual("iPhone18,2")
     expect(retrieved.iosVersion).toEqual("18.0.1")
-    expect(retrieved.vendorId).toEqual(vendorId)
+    expect(retrieved.deviceId).toEqual(.init(vendorId))
     expect(retrieved.detail).toEqual("first launch")
+
+    let device = try await IOSApp.Device.query()
+      .where(.id == vendorId)
+      .first(in: self.db)
+    expect(device.modelIdentifier).toEqual("iPhone18,2")
+    expect(device.iosVersion).toEqual("18.0.1")
   }
 
   func testLogIOSEvent_legacy() async throws {
@@ -78,7 +84,12 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
     expect(retrieved.kind).toEqual(.info)
     expect(retrieved.modelIdentifier).toEqual("iPhone,unknown")
     expect(retrieved.iosVersion).toEqual("18.0.1")
-    expect(retrieved.vendorId).toEqual(vendorId)
+    expect(retrieved.deviceId).toEqual(.init(vendorId))
     expect(retrieved.detail).toEqual("first launch")
+
+    let device = try await IOSApp.Device.query()
+      .where(.id == vendorId)
+      .first(in: self.db)
+    expect(device.modelIdentifier).toEqual("iPhone,unknown")
   }
 }

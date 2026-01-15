@@ -1,17 +1,17 @@
 import Foundation
 import PairQL
 
-public struct CreatePendingSupervision: Pair {
+public struct CreateSupervisionCode: Pair {
   public static let auth: ClientAuth = .none
 
   public struct Input: PairInput {
-    public var vendorId: UUID
+    public var deviceId: UUID
     public var modelIdentifier: String
     public var iosVersion: String
     public var appVersion: String
 
-    public init(vendorId: UUID, modelIdentifier: String, iosVersion: String, appVersion: String) {
-      self.vendorId = vendorId
+    public init(deviceId: UUID, modelIdentifier: String, iosVersion: String, appVersion: String) {
+      self.deviceId = deviceId
       self.modelIdentifier = modelIdentifier
       self.iosVersion = iosVersion
       self.appVersion = appVersion

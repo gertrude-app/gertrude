@@ -15,10 +15,11 @@ extension BlockRules_v2: Resolver {
     }
 
     let disabledGroupIds = disabledGroups.map { Postgres.Data.uuid($0.blockGroupId) }
+    let deviceId: IOSApp.Device.Id? = input.vendorId == .init(.zero) ? nil : .init(input.vendorId)
     return try await IOSApp.BlockRule.query()
       .where(.or(
         .not(.isNull(.groupId)) .&& .groupId |!=| disabledGroupIds,
-        .vendorId == (input.vendorId == .init(.zero) ? .init() : input.vendorId),
+        deviceId.map { .deviceId == $0 } ?? .never,
       ))
       .orderBy(.id, .asc)
       .all(in: ctx.db)

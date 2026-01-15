@@ -8,13 +8,15 @@ import XExpect
 
 final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendable {
   func testNotFound_vendorIdMismatch() async throws {
-    let pending = try await self.db.create(IOSApp.PendingSupervision(
-      code: Int.random(in: 100_000 ... 999_999),
-      vendorId: UUID(), // <-- different vendorId...
+    let deviceId = UUID()
+    try await self.db.create(IOSApp.Device(
+      id: .init(deviceId),
+      childId: nil,
       modelIdentifier: "iPhone15,2",
-      iosVersion: "18.2",
       appVersion: "1.0.0",
-      expiresAt: .reference + .days(7),
+      iosVersion: "18.2",
+      supervisionClaimCode: Int.random(in: 100_000 ... 999_999),
+      claimCodeExpiresAt: .reference + .days(7),
     ))
 
     let output = try await withDependencies {
@@ -22,8 +24,8 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     } operation: {
       try await CheckSupervisionStatus.resolve(
         with: .init(
-          vendorId: UUID(), // <-- from this
-          code: pending.code,
+          vendorId: UUID(), // <-- different from device id
+          code: Int.random(in: 100_000 ... 999_999),
         ),
         in: .mock,
       )
@@ -32,21 +34,23 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
   }
 
   func testPending_codeExistsNotClaimed() async throws {
-    let vendorId = UUID()
-    let pending = try await self.db.create(IOSApp.PendingSupervision(
-      code: Int.random(in: 100_000 ... 999_999),
-      vendorId: vendorId,
+    let deviceId = UUID()
+    let code = Int.random(in: 100_000 ... 999_999)
+    try await self.db.create(IOSApp.Device(
+      id: .init(deviceId),
+      childId: nil,
       modelIdentifier: "iPhone15,2",
-      iosVersion: "18.2",
       appVersion: "1.0.0",
-      expiresAt: .reference + .days(7),
+      iosVersion: "18.2",
+      supervisionClaimCode: code,
+      claimCodeExpiresAt: .reference + .days(7),
     ))
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
       try await CheckSupervisionStatus.resolve(
-        with: .init(vendorId: vendorId, code: pending.code),
+        with: .init(vendorId: deviceId, code: code),
         in: .mock,
       )
     }
@@ -54,21 +58,23 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
   }
 
   func testExpired() async throws {
-    let vendorId = UUID()
-    let pending = try await self.db.create(IOSApp.PendingSupervision(
-      code: Int.random(in: 100_000 ... 999_999),
-      vendorId: vendorId,
+    let deviceId = UUID()
+    let code = Int.random(in: 100_000 ... 999_999)
+    try await self.db.create(IOSApp.Device(
+      id: .init(deviceId),
+      childId: nil,
       modelIdentifier: "iPhone15,2",
-      iosVersion: "18.2",
       appVersion: "1.0.0",
-      expiresAt: .reference - .days(1),
+      iosVersion: "18.2",
+      supervisionClaimCode: code,
+      claimCodeExpiresAt: .reference - .days(1),
     ))
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
       try await CheckSupervisionStatus.resolve(
-        with: .init(vendorId: vendorId, code: pending.code),
+        with: .init(vendorId: deviceId, code: code),
         in: .mock,
       )
     }
@@ -76,32 +82,26 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
   }
 
   func testClaimed_notYetSupervised() async throws {
-    let vendorId = UUID()
+    let deviceId = UUID()
+    let code = Int.random(in: 100_000 ... 999_999)
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    _ = try await self.db.create(IOSApp.Device(
+    try await self.db.create(IOSApp.Device(
+      id: .init(deviceId),
       childId: child.id,
-      vendorId: .init(vendorId),
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      isSupervised: false, // <-- not yet supervised
-    ))
-    let pending = try await self.db.create(IOSApp.PendingSupervision(
-      code: Int.random(in: 100_000 ... 999_999),
-      vendorId: vendorId,
-      modelIdentifier: "iPhone15,2",
-      iosVersion: "18.2",
-      appVersion: "1.0.0",
-      claimedChildId: child.id,
-      expiresAt: .reference + .days(7),
+      isSupervised: false,
+      supervisionClaimCode: code,
+      claimCodeExpiresAt: .reference + .days(7),
     ))
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
       try await CheckSupervisionStatus.resolve(
-        with: .init(vendorId: vendorId, code: pending.code),
+        with: .init(vendorId: deviceId, code: code),
         in: .mock,
       )
     }
@@ -109,33 +109,27 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
   }
 
   func testSupervised_notYetProfileInstalled() async throws {
-    let vendorId = UUID()
+    let deviceId = UUID()
+    let code = Int.random(in: 100_000 ... 999_999)
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSApp.Device(
+      id: .init(deviceId),
       childId: child.id,
-      vendorId: .init(vendorId),
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      isSupervised: true, // <-- supervised...
-      isProfileInstalled: false, // <-- but profile not yet installed
-    ))
-    let pending = try await self.db.create(IOSApp.PendingSupervision(
-      code: Int.random(in: 100_000 ... 999_999),
-      vendorId: vendorId,
-      modelIdentifier: "iPhone15,2",
-      iosVersion: "18.2",
-      appVersion: "1.0.0",
-      claimedChildId: child.id,
-      expiresAt: .reference + .days(7),
+      isSupervised: true,
+      isProfileInstalled: false,
+      supervisionClaimCode: code,
+      claimCodeExpiresAt: .reference + .days(7),
     ))
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
       try await CheckSupervisionStatus.resolve(
-        with: .init(vendorId: vendorId, code: pending.code),
+        with: .init(vendorId: deviceId, code: code),
         in: .mock,
       )
     }
@@ -155,33 +149,27 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
   }
 
   func testComplete_allFieldsSet() async throws {
-    let vendorId = UUID()
+    let deviceId = UUID()
+    let code = Int.random(in: 100_000 ... 999_999)
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    _ = try await self.db.create(IOSApp.Device(
+    try await self.db.create(IOSApp.Device(
+      id: .init(deviceId),
       childId: child.id,
-      vendorId: .init(vendorId),
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
       isSupervised: true,
       isProfileInstalled: true,
-    ))
-    let pending = try await self.db.create(IOSApp.PendingSupervision(
-      code: Int.random(in: 100_000 ... 999_999),
-      vendorId: vendorId,
-      modelIdentifier: "iPhone15,2",
-      iosVersion: "18.2",
-      appVersion: "1.0.0",
-      claimedChildId: child.id,
-      expiresAt: .reference + .days(7),
+      supervisionClaimCode: code,
+      claimCodeExpiresAt: .reference + .days(7),
     ))
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
       try await CheckSupervisionStatus.resolve(
-        with: .init(vendorId: vendorId, code: pending.code),
+        with: .init(vendorId: deviceId, code: code),
         in: .mock,
       )
     }

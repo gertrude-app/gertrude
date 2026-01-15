@@ -5,40 +5,29 @@ import Vapor
 
 extension CheckSupervisionStatus: Resolver {
   static func resolve(with input: Input, in ctx: Context) async throws -> Output {
-    let pendingSupervision = try? await IOSApp.PendingSupervision
-      .query()
-      .where(.code == input.code)
+    let device = try? await IOSApp.Device.query()
+      .where(.supervisionClaimCode == input.code)
       .first(in: ctx.db)
 
-    guard let pendingSupervision else {
+    guard let device else {
       return .notFound
     }
 
-    if pendingSupervision.vendorId != input.vendorId {
+    if device.id.rawValue != input.vendorId {
       logIOSUnusual("233c41a8", "vendorId mismatch, c=\(input.code), v=\(input.vendorId)")
       return .notFound
     }
 
-    if pendingSupervision.expiresAt < get(dependency: \.date.now) {
-      logIOSUnusual("92fe7bb1", "expired, code=\(input.code)")
-      return .expired
-    }
-
-    guard let childId = pendingSupervision.claimedChildId else {
+    guard let childId = device.childId else {
+      if let expiresAt = device.claimCodeExpiresAt, expiresAt < get(dependency: \.date.now) {
+        logIOSUnusual("92fe7bb1", "expired, code=\(input.code)")
+        return .expired
+      }
       return .pending
     }
 
-    let device = try? await IOSApp.Device.query()
-      .where(.childId == childId)
-      .where(.vendorId == input.vendorId)
-      .first(in: ctx.db)
-
-    guard let device else {
-      logIOSUnexpected("05444534", "c=\(input.code), v=\(input.vendorId)")
-      return .notFound
-    }
-
     let child = try await ctx.db.find(childId)
+
     if !device.isSupervised {
       return .claimed(.init(childName: child.name))
     }
