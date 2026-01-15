@@ -9,14 +9,14 @@ import XExpect
 final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable {
   func testValidCode_redirectsWithDeviceInfo() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
-    try await self.db.create(IOSApp.PendingSupervision(
-      code: code,
-      vendorId: UUID(),
+    try await self.db.create(IOSApp.Device(
+      id: .init(),
+      childId: nil,
       modelIdentifier: "iPad14,1",
-      iosVersion: "17.5",
       appVersion: "1.0.0",
-      claimedChildId: nil,
-      expiresAt: Date.reference + .days(7),
+      iosVersion: "17.5",
+      supervisionClaimCode: code,
+      claimCodeExpiresAt: Date.reference + .days(7),
     ))
 
     try await app.test(
@@ -37,14 +37,14 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
   func testExpiredButClaimedCode_stillRedirectsWithDeviceInfo() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
     let child = try await self.child()
-    try await self.db.create(IOSApp.PendingSupervision(
-      code: code,
-      vendorId: UUID(),
+    try await self.db.create(IOSApp.Device(
+      id: .init(),
+      childId: child.id,
       modelIdentifier: "iPhone17,1",
-      iosVersion: "18.0",
       appVersion: "1.0.0",
-      claimedChildId: child.id,
-      expiresAt: Date.reference - .days(30),
+      iosVersion: "18.0",
+      supervisionClaimCode: code,
+      claimCodeExpiresAt: Date.reference - .days(30),
     ))
 
     try await app.test(
@@ -88,14 +88,14 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
 
   func testExpiredUnclaimedCode_redirectsWithExpiredCodeError() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
-    try await self.db.create(IOSApp.PendingSupervision(
-      code: code,
-      vendorId: UUID(),
+    try await self.db.create(IOSApp.Device(
+      id: .init(),
+      childId: nil,
       modelIdentifier: "iPhone15,2",
-      iosVersion: "18.2",
       appVersion: "1.0.0",
-      claimedChildId: nil,
-      expiresAt: Date.reference - .days(1),
+      iosVersion: "18.2",
+      supervisionClaimCode: code,
+      claimCodeExpiresAt: Date.reference - .days(1),
     ))
 
     try await app.test(

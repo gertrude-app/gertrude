@@ -22,8 +22,8 @@ extension IOSRoute: RouteResponder {
       case .connectDevice_v2(let input):
         let output = try await ConnectDevice_v2.resolve(with: input, in: context)
         return try await self.respond(with: output)
-      case .createPendingSupervision(let input):
-        let output = try await CreatePendingSupervision.resolve(with: input, in: context)
+      case .createSupervisionCode(let input):
+        let output = try await CreateSupervisionCode.resolve(with: input, in: context)
         return try await self.respond(with: output)
       case .defaultBlockRules(let input):
         let output = try await DefaultBlockRules.resolve(with: input, in: context)
@@ -57,7 +57,14 @@ extension IOSRoute: RouteResponder {
 
       // TODO(perf): this is a fairly hot path, should probably join here
       let device = try await token.device(in: context.db)
-      let child = try await device.child(in: context.db)
+      guard let child = try await device.child(in: context.db) else {
+        throw context.error(
+          id: "7d4e8f21",
+          type: .unauthorized,
+          debugMessage: "device has no associated child",
+          appTag: .iosDeviceTokenNotFound,
+        )
+      }
 
       let childContext = IOSApp.ChildContext(
         requestId: context.requestId,

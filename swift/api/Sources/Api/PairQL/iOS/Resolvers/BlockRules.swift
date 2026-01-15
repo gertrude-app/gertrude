@@ -19,7 +19,7 @@ extension BlockRules: Resolver {
        version >= Semver(major: 1, minor: 2, patch: 0) {
       logger.info("1.2.x app")
       return try await IOSApp.BlockRule.query()
-        .where(.isNull(.vendorId) .|| input.vendorId.map { .vendorId == $0 } ?? .never)
+        .where(.isNull(.deviceId) .|| input.vendorId.map { .deviceId == $0 } ?? .never)
         .all(in: context.db)
         .map(\.rule.legacy)
     }

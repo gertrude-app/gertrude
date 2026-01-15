@@ -43,7 +43,6 @@ extension IOSApp.BlockRule: Model {
     switch column {
     case .id: .id(self)
     case .deviceId: .uuid(self.deviceId)
-    case .vendorId: .uuid(self.vendorId)
     case .rule: .json(self.rule.toPostgresJson)
     case .groupId: .uuid(self.groupId)
     case .comment: .string(self.comment)
@@ -56,7 +55,6 @@ extension IOSApp.BlockRule: Model {
     [
       .id: .id(self),
       .deviceId: .uuid(self.deviceId),
-      .vendorId: .uuid(self.vendorId),
       .rule: .json(self.rule.toPostgresJson),
       .groupId: .uuid(self.groupId),
       .comment: .string(self.comment),
@@ -133,7 +131,6 @@ extension IOSApp.Device: Model {
     switch column {
     case .id: .id(self)
     case .childId: .uuid(self.childId)
-    case .vendorId: .uuid(self.vendorId)
     case .modelIdentifier: .string(self.modelIdentifier)
     case .appVersion: .string(self.appVersion)
     case .iosVersion: .string(self.iosVersion)
@@ -141,6 +138,8 @@ extension IOSApp.Device: Model {
     case .isSupervised: .bool(self.isSupervised)
     case .udid: .string(self.udid)
     case .isProfileInstalled: .bool(self.isProfileInstalled)
+    case .supervisionClaimCode: .int(self.supervisionClaimCode)
+    case .claimCodeExpiresAt: .date(self.claimCodeExpiresAt)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -150,7 +149,6 @@ extension IOSApp.Device: Model {
     [
       .id: .id(self),
       .childId: .uuid(self.childId),
-      .vendorId: .uuid(self.vendorId),
       .modelIdentifier: .string(self.modelIdentifier),
       .appVersion: .string(self.appVersion),
       .iosVersion: .string(self.iosVersion),
@@ -158,6 +156,8 @@ extension IOSApp.Device: Model {
       .isSupervised: .bool(self.isSupervised),
       .udid: .string(self.udid),
       .isProfileInstalled: .bool(self.isProfileInstalled),
+      .supervisionClaimCode: .int(self.supervisionClaimCode),
+      .claimCodeExpiresAt: .date(self.claimCodeExpiresAt),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]
@@ -1098,8 +1098,7 @@ extension IOSEvent: Model {
     case .eventId: .string(self.eventId)
     case .kind: .string(self.kind.rawValue)
     case .detail: .string(self.detail)
-    case .vendorId: .uuid(self.vendorId)
-    case .iosDeviceId: .uuid(self.iosDeviceId)
+    case .deviceId: .uuid(self.deviceId?.rawValue)
     case .modelIdentifier: .string(self.modelIdentifier)
     case .iosVersion: .string(self.iosVersion)
     case .createdAt: .date(self.createdAt)
@@ -1112,8 +1111,7 @@ extension IOSEvent: Model {
       .eventId: .string(self.eventId),
       .kind: .string(self.kind.rawValue),
       .detail: .string(self.detail),
-      .vendorId: .uuid(self.vendorId),
-      .iosDeviceId: .uuid(self.iosDeviceId),
+      .deviceId: .uuid(self.deviceId?.rawValue),
       .modelIdentifier: .string(self.modelIdentifier),
       .iosVersion: .string(self.iosVersion),
       .createdAt: .currentTimestamp,
@@ -1141,42 +1139,6 @@ extension SuperAdminToken: Model {
       .value: .uuid(self.value),
       .createdAt: .currentTimestamp,
       .deletedAt: .date(self.deletedAt),
-    ]
-  }
-}
-
-extension IOSApp.PendingSupervision: Model {
-  public static let schemaName = "iosapp"
-  public static let tableName = "pending_supervisions"
-  public typealias ColumnName = CodingKeys
-
-  public func postgresData(for column: ColumnName) -> Postgres.Data {
-    switch column {
-    case .id: .id(self)
-    case .code: .int(self.code)
-    case .vendorId: .uuid(self.vendorId)
-    case .modelIdentifier: .string(self.modelIdentifier)
-    case .iosVersion: .string(self.iosVersion)
-    case .appVersion: .string(self.appVersion)
-    case .claimedChildId: .uuid(self.claimedChildId)
-    case .expiresAt: .date(self.expiresAt)
-    case .createdAt: .date(self.createdAt)
-    case .updatedAt: .date(self.updatedAt)
-    }
-  }
-
-  public var insertValues: [ColumnName: Postgres.Data] {
-    [
-      .id: .id(self),
-      .code: .int(self.code),
-      .vendorId: .uuid(self.vendorId),
-      .modelIdentifier: .string(self.modelIdentifier),
-      .iosVersion: .string(self.iosVersion),
-      .appVersion: .string(self.appVersion),
-      .claimedChildId: .uuid(self.claimedChildId),
-      .expiresAt: .date(self.expiresAt),
-      .createdAt: .currentTimestamp,
-      .updatedAt: .currentTimestamp,
     ]
   }
 }

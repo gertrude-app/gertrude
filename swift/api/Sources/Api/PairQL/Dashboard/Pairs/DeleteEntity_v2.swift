@@ -100,8 +100,8 @@ extension DeleteEntity_v2: Resolver {
       guard let device = try await blockRule.device(in: context.db) else {
         throw Abort(.unauthorized)
       }
-      let child = try await device.child(in: context.db)
-      if child.parentId != context.parent.id {
+      guard let child = try await device.child(in: context.db),
+            child.parentId == context.parent.id else {
         throw Abort(.unauthorized)
       }
       try await context.db.delete(blockRule)

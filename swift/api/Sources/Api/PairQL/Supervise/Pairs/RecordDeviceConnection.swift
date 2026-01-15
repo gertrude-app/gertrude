@@ -22,18 +22,18 @@ extension RecordDeviceConnection: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let validated = try await SuperviseRoute.validatedSupervisionCode(
       code: input.code,
-      baseId: "421f7e7d", // 421f7e7d-1, 421f7e7d-2, 421f7e7d-3
+      baseId: "421f7e7d", // 421f7e7d-1, 421f7e7d-2, 421f7e7d-3, 421f7e7d-4
       in: context,
     )
 
-    guard input.modelIdentifier == validated.pendingSupervision.modelIdentifier else {
+    guard input.modelIdentifier == validated.device.modelIdentifier else {
       logIOSUnexpected("d78fbde0", "model identifier mismatch")
       throw context.error("d78fbde0", .badRequest, user: "Unexpected error")
     }
 
     var device = try await IOSApp.Device.query()
       .where(.childId == validated.claimedChildId)
-      .where(.vendorId == validated.pendingSupervision.vendorId)
+      .where(.id == validated.device.id)
       .first(in: context.db)
 
     if let existingUdid = device.udid, existingUdid != input.udid {
@@ -48,10 +48,9 @@ extension RecordDeviceConnection: Resolver {
       eventId: "86af13a9",
       kind: .supervision,
       detail: "tool_connected: code=\(input.code), udid=\(input.udid), model=\(input.modelIdentifier)",
-      vendorId: validated.pendingSupervision.vendorId,
-      iosDeviceId: device.id,
+      deviceId: device.id,
       modelIdentifier: input.modelIdentifier,
-      iosVersion: validated.pendingSupervision.iosVersion,
+      iosVersion: validated.device.iosVersion,
     ))
     return .success
   }

@@ -4,8 +4,7 @@ import GertieIOS
 extension IOSApp {
   struct Device: Codable, Sendable, Equatable {
     var id: Id
-    var childId: Child.Id
-    var vendorId: VendorId
+    var childId: Child.Id?
     var modelIdentifier: String
     var appVersion: String
     var iosVersion: String
@@ -13,13 +12,14 @@ extension IOSApp {
     var isSupervised: Bool
     var udid: String?
     var isProfileInstalled: Bool
+    var supervisionClaimCode: Int?
+    var claimCodeExpiresAt: Date?
     var createdAt = Date()
     var updatedAt = Date()
 
     init(
-      id: Id? = nil,
-      childId: Child.Id,
-      vendorId: VendorId,
+      id: Id,
+      childId: Child.Id? = nil,
       modelIdentifier: String,
       appVersion: String,
       iosVersion: String,
@@ -27,10 +27,11 @@ extension IOSApp {
       isSupervised: Bool = false,
       udid: String? = nil,
       isProfileInstalled: Bool = false,
+      supervisionClaimCode: Int? = nil,
+      claimCodeExpiresAt: Date? = nil,
     ) {
-      self.id = id ?? .init(get(dependency: \.uuid)())
+      self.id = id
       self.childId = childId
-      self.vendorId = vendorId
       self.modelIdentifier = modelIdentifier
       self.appVersion = appVersion
       self.iosVersion = iosVersion
@@ -38,6 +39,28 @@ extension IOSApp {
       self.isSupervised = isSupervised
       self.udid = udid
       self.isProfileInstalled = isProfileInstalled
+      self.supervisionClaimCode = supervisionClaimCode
+      self.claimCodeExpiresAt = claimCodeExpiresAt
+    }
+  }
+}
+
+extension IOSApp.Device {
+  static func ensureExists(
+    id: Id,
+    modelIdentifier: String,
+    iosVersion: String,
+    appVersion: String = "0.0.0",
+    in db: any DuetSQL.Client,
+  ) async throws {
+    let existing = try? await db.find(id)
+    if existing == nil {
+      try await db.create(Self(
+        id: id,
+        modelIdentifier: modelIdentifier,
+        appVersion: appVersion,
+        iosVersion: iosVersion,
+      ))
     }
   }
 }
@@ -45,9 +68,10 @@ extension IOSApp {
 // loaders
 
 extension IOSApp.Device {
-  func child(in db: any DuetSQL.Client) async throws -> Child {
-    try await Child.query()
-      .where(.id == self.childId)
+  func child(in db: any DuetSQL.Client) async throws -> Child? {
+    guard let childId = self.childId else { return nil }
+    return try await Child.query()
+      .where(.id == childId)
       .first(in: db)
   }
 

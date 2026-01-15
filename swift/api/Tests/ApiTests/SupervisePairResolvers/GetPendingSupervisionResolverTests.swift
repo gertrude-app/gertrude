@@ -9,21 +9,25 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
   func testHappyPath_validClaimedCode_returnsChildAndDeviceInfo() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let pending = try await self.db.create(IOSApp.PendingSupervision.random {
-      $0.claimedChildId = child.id
-      $0.expiresAt = .reference + .days(7)
+    let device = try await self.db.create(IOSApp.Device.random {
+      $0.childId = child.id
+      $0.supervisionClaimCode = .random(in: 100_000 ... 999_999)
+      $0.claimCodeExpiresAt = .reference + .days(7)
     })
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
-      try await GetPendingSupervision.resolve(with: .init(code: pending.code), in: .mock)
+      try await GetPendingSupervision.resolve(
+        with: .init(code: device.supervisionClaimCode!),
+        in: .mock,
+      )
     }
 
     expect(output.childName).toEqual(child.name)
-    expect(output.modelIdentifier).toEqual(pending.modelIdentifier)
-    expect(output.modelName).toEqual(pending.modelName)
-    expect(output.iosVersion).toEqual(pending.iosVersion)
+    expect(output.modelIdentifier).toEqual(device.modelIdentifier)
+    expect(output.modelName).toEqual(device.modelName)
+    expect(output.iosVersion).toEqual(device.iosVersion)
   }
 
   func testCodeNotFound_throwsError() async throws {
@@ -36,15 +40,20 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
   }
 
   func testCodeNotClaimed_throwsSameErrorAsNotFound() async throws {
-    let pending = try await self.db.create(IOSApp.PendingSupervision.random {
-      $0.claimedChildId = nil // <-- not claimed
+    let device = try await self.db.create(IOSApp.Device.random {
+      $0.childId = nil // <-- not claimed
+      $0.supervisionClaimCode = .random(in: 100_000 ... 999_999)
+      $0.claimCodeExpiresAt = .reference + .days(7)
     })
 
     try await expectErrorFrom {
       try await withDependencies {
         $0.date = .constant(.reference)
       } operation: {
-        try await GetPendingSupervision.resolve(with: .init(code: pending.code), in: .mock)
+        try await GetPendingSupervision.resolve(
+          with: .init(code: device.supervisionClaimCode!),
+          in: .mock,
+        )
       }
     }.toContain("not found")
   }
@@ -52,16 +61,20 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
   func testCodeExpired_throwsExpiredError() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let pending = try await self.db.create(IOSApp.PendingSupervision.random {
-      $0.claimedChildId = child.id
-      $0.expiresAt = .reference - .days(1) // <-- expired
+    let device = try await self.db.create(IOSApp.Device.random {
+      $0.childId = child.id
+      $0.supervisionClaimCode = .random(in: 100_000 ... 999_999)
+      $0.claimCodeExpiresAt = .reference - .days(1) // <-- expired
     })
 
     try await expectErrorFrom {
       try await withDependencies {
         $0.date = .constant(.reference)
       } operation: {
-        try await GetPendingSupervision.resolve(with: .init(code: pending.code), in: .mock)
+        try await GetPendingSupervision.resolve(
+          with: .init(code: device.supervisionClaimCode!),
+          in: .mock,
+        )
       }
     }.toContain("expired")
   }

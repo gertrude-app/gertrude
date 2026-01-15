@@ -31,9 +31,19 @@ struct UpdatePendingSupervision: GertieMigration {
   }
 
   func down(sql: SQLDatabase) async throws {
+    let rows = try await sql.execute("""
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = 'iosapp'
+      AND table_name = 'pending_supervisions'
+      AND column_name = 'claimed_child_id'
+    """)
+    guard rows.first != nil else {
+      return
+    }
+
     try await sql.execute("""
       ALTER TABLE iosapp.pending_supervisions
-      DROP CONSTRAINT fk_pending_supervisions_claimed_child_id;
+      DROP CONSTRAINT IF EXISTS fk_pending_supervisions_claimed_child_id;
     """)
 
     try await sql.execute("""

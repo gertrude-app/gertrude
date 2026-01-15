@@ -5,7 +5,6 @@ extension IOSApp {
   struct BlockRule: Codable, Sendable {
     var id: Id
     var deviceId: Device.Id?
-    var vendorId: VendorId?
     var rule: GertieIOS.BlockRule
     var groupId: BlockGroup.Id?
     var comment: String?
@@ -15,14 +14,12 @@ extension IOSApp {
     init(
       id: Id = .init(),
       deviceId: Device.Id? = nil,
-      vendorId: VendorId? = nil,
       rule: GertieIOS.BlockRule,
       groupId: BlockGroup.Id? = nil,
       comment: String? = nil,
     ) {
       self.id = id
       self.deviceId = deviceId
-      self.vendorId = vendorId
       self.rule = rule
       self.groupId = groupId
       self.comment = comment

@@ -9,14 +9,10 @@ final class RecordDeviceConnectionResolverTests: ApiTestCase, @unchecked Sendabl
   func testHappyPath_setsUdidAndInsertsEvent() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let pending = try await self.db.create(IOSApp.PendingSupervision.random {
-      $0.claimedChildId = child.id
-      $0.expiresAt = .reference + .days(7)
-    })
     let device = try await self.db.create(IOSApp.Device.random {
       $0.childId = child.id
-      $0.vendorId = .init(pending.vendorId)
-      $0.modelIdentifier = pending.modelIdentifier
+      $0.supervisionClaimCode = .random(in: 100_000 ... 999_999)
+      $0.claimCodeExpiresAt = .reference + .days(7)
     })
 
     _ = try await withDependencies {
@@ -24,9 +20,9 @@ final class RecordDeviceConnectionResolverTests: ApiTestCase, @unchecked Sendabl
     } operation: {
       try await RecordDeviceConnection.resolve(
         with: .init(
-          code: pending.code,
+          code: device.supervisionClaimCode!,
           udid: "00008030-001234567890802E",
-          modelIdentifier: pending.modelIdentifier,
+          modelIdentifier: device.modelIdentifier,
         ),
         in: .mock,
       )
@@ -36,11 +32,11 @@ final class RecordDeviceConnectionResolverTests: ApiTestCase, @unchecked Sendabl
     expect(updatedDevice.udid).toEqual("00008030-001234567890802E")
 
     let events = try await IOSEvent.query()
-      .where(.iosDeviceId == device.id)
+      .where(.deviceId == device.id)
       .all(in: self.db)
     expect(events).toHaveCount(1)
     expect(events[0].detail!).toContain("tool_connected")
-    expect(events[0].kind).toEqual(.supervision)
+    expect(events[0].kind).toEqual(IOSEvent.Kind.supervision)
   }
 
   func testCodeNotFound_throwsError() async throws {
@@ -59,9 +55,10 @@ final class RecordDeviceConnectionResolverTests: ApiTestCase, @unchecked Sendabl
   func testCodeExpired_throwsError() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let pending = try await self.db.create(IOSApp.PendingSupervision.random {
-      $0.claimedChildId = child.id
-      $0.expiresAt = .reference - .days(1) // <-- expired
+    let device = try await self.db.create(IOSApp.Device.random {
+      $0.childId = child.id
+      $0.supervisionClaimCode = .random(in: 100_000 ... 999_999)
+      $0.claimCodeExpiresAt = .reference - .days(1) // <-- expired
     })
 
     try await expectErrorFrom {
@@ -70,9 +67,9 @@ final class RecordDeviceConnectionResolverTests: ApiTestCase, @unchecked Sendabl
       } operation: {
         try await RecordDeviceConnection.resolve(
           with: .init(
-            code: pending.code,
+            code: device.supervisionClaimCode!,
             udid: "fake-udid",
-            modelIdentifier: pending.modelIdentifier,
+            modelIdentifier: device.modelIdentifier,
           ),
           in: .mock,
         )

@@ -92,14 +92,12 @@ extension IOSApp.Token {
 
 extension IOSApp.Device: Duet.Identifiable {
   typealias Id = Tagged<IOSApp.Device, UUID>
-  typealias VendorId = Tagged<(t: IOSApp.Device, vendorId: ()), UUID>
 }
 
 extension IOSApp.Device {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case childId
-    case vendorId
     case modelIdentifier
     case appVersion
     case iosVersion
@@ -107,6 +105,8 @@ extension IOSApp.Device {
     case isSupervised
     case udid
     case isProfileInstalled
+    case supervisionClaimCode
+    case claimCodeExpiresAt
     case createdAt
     case updatedAt
   }
@@ -114,14 +114,12 @@ extension IOSApp.Device {
 
 extension IOSApp.BlockRule: Duet.Identifiable {
   typealias Id = Tagged<IOSApp.BlockRule, UUID>
-  typealias VendorId = Tagged<(t: IOSApp.BlockRule, vendorId: ()), UUID>
 }
 
 extension IOSApp.BlockRule {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case deviceId
-    case vendorId
     case rule
     case groupId
     case comment
@@ -637,30 +635,10 @@ extension IOSEvent {
     case eventId
     case kind
     case detail
-    case vendorId
-    case iosDeviceId
+    case deviceId
     case modelIdentifier
     case iosVersion
     case createdAt
-  }
-}
-
-extension IOSApp.PendingSupervision: Duet.Identifiable {
-  typealias Id = Tagged<IOSApp.PendingSupervision, UUID>
-}
-
-extension IOSApp.PendingSupervision {
-  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
-    case id
-    case code
-    case vendorId
-    case modelIdentifier
-    case iosVersion
-    case appVersion
-    case claimedChildId
-    case expiresAt
-    case createdAt
-    case updatedAt
   }
 }
 

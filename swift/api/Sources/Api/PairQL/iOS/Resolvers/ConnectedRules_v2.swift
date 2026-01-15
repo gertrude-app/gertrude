@@ -14,7 +14,6 @@ extension ConnectedRules_v2: Resolver {
       .map(\.rule)
 
     var device = ctx.device
-    device.vendorId = .init(input.vendorId)
     device.modelIdentifier = input.modelIdentifier
     device.appVersion = input.appVersion
     device.iosVersion = input.iosVersion
