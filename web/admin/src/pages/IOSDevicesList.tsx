@@ -55,7 +55,7 @@ const IOSDevicesList: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
             <SmartphoneIcon className="w-5 h-5 text-white" />
@@ -81,7 +81,7 @@ const IOSDevicesList: React.FC = () => {
           <thead>
             <tr className="border-b border-slate-100">
               <th className="text-left pl-5 pr-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-28">
-                Vendor ID
+                Device ID
               </th>
               <th className="text-left px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-24">
                 Status
@@ -125,7 +125,11 @@ const IOSDevicesList: React.FC = () => {
                 </td>
                 <td className="px-4 py-4">
                   <span
-                    className={`inline-flex items-center justify-center w-8 h-7 rounded-lg text-sm font-medium ${device.eventCount > 10 ? `bg-violet-100 text-violet-700` : `bg-slate-100 text-slate-500`}`}
+                    className={`inline-flex items-center justify-center w-8 h-7 rounded-lg text-sm font-medium ${
+                      device.eventCount > 10
+                        ? `bg-violet-100 text-violet-700`
+                        : `bg-slate-100 text-slate-500`
+                    }`}
                   >
                     {device.eventCount}
                   </span>

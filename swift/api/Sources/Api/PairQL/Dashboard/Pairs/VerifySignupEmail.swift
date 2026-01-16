@@ -45,7 +45,10 @@ extension VerifySignupEmail: Resolver {
 
       if context.env.mode == .prod, !isTestAddress(parent.email.rawValue) {
         with(dependency: \.postmark)
-          .toSuperAdmin("signup completed", parent.email.rawValue)
+          .toSuperAdmin(
+            "signup completed",
+            AdminLink().email(to: .parent(parent.id), text: parent.email.rawValue),
+          )
         await with(dependency: \.slack)
           .internal(.signups, "email verified: `\(parent.email.rawValue)`")
       }
