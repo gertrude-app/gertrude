@@ -90,5 +90,10 @@ public extension Configure {
       "claim-pending-supervision", ":code",
       use: ClaimSupervisionRedirectRoute.handler(_:),
     )
+
+    app.get(
+      "ios-profile", ":deviceId",
+      use: ProfileDownloadRoute.handler(_:),
+    )
   }
 }
