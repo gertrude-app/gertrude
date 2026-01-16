@@ -55,7 +55,7 @@ const PodcastInstallsList: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
             <MicIcon className="w-5 h-5 text-white" />
@@ -130,14 +130,22 @@ const PodcastInstallsList: React.FC = () => {
                 </td>
                 <td className="px-4 py-4">
                   <span
-                    className={`inline-flex items-center justify-center w-8 h-7 rounded-lg text-sm font-medium ${install.feedCount > 0 ? `bg-emerald-100 text-emerald-700` : `bg-slate-100 text-slate-500`}`}
+                    className={`inline-flex items-center justify-center w-8 h-7 rounded-lg text-sm font-medium ${
+                      install.feedCount > 0
+                        ? `bg-emerald-100 text-emerald-700`
+                        : `bg-slate-100 text-slate-500`
+                    }`}
                   >
                     {install.feedCount}
                   </span>
                 </td>
                 <td className="px-4 py-4">
                   <span
-                    className={`inline-flex items-center justify-center w-8 h-7 rounded-lg text-sm font-medium ${install.eventCount > 10 ? `bg-violet-100 text-violet-700` : `bg-slate-100 text-slate-500`}`}
+                    className={`inline-flex items-center justify-center w-8 h-7 rounded-lg text-sm font-medium ${
+                      install.eventCount > 10
+                        ? `bg-violet-100 text-violet-700`
+                        : `bg-slate-100 text-slate-500`
+                    }`}
                   >
                     {install.eventCount}
                   </span>
