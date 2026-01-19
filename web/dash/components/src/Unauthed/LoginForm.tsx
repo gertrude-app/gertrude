@@ -10,6 +10,8 @@ type Props = {
   onSubmit(): unknown;
   onSendMagicLink(): unknown;
   fromPasswordReset?: boolean;
+  signupUrl?: string;
+  beforeInputs?: React.ReactNode;
 };
 
 const LoginForm: React.FC<Props> = ({
@@ -20,6 +22,8 @@ const LoginForm: React.FC<Props> = ({
   password,
   onSendMagicLink,
   fromPasswordReset = false,
+  signupUrl = `/signup`,
+  beforeInputs,
 }) => (
   <form
     className="flex flex-col items-center max-w-sm"
@@ -42,7 +46,7 @@ const LoginForm: React.FC<Props> = ({
         your email address. Or,{` `}
         <Link
           className="text-violet-700 border-b border-dotted border-violet-700 hover:text-violet-900 transition-[color]"
-          to="/signup"
+          to={signupUrl}
         >
           signup
         </Link>
@@ -50,6 +54,7 @@ const LoginForm: React.FC<Props> = ({
         if you don&rsquo;t have an account yet.
       </p>
     )}
+    {beforeInputs && <div className="mt-4 self-stretch">{beforeInputs}</div>}
     <div className="self-stretch mt-5 sm:mt-7 space-y-3">
       <TextInput
         type="email"

@@ -95,5 +95,10 @@ public extension Configure {
       "ios-profile", ":deviceId",
       use: ProfileDownloadRoute.handler(_:),
     )
+
+    app.get(
+      "download-supervision-app", ":code", "platform", ":platform",
+      use: SupervisionToolDownloadRoute.handler(_:),
+    )
   }
 }

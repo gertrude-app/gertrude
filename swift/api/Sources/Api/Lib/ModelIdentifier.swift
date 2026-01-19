@@ -10,6 +10,10 @@ extension IOSModelIdentifiable {
   var modelName: String {
     ModelIdentifier.marketingName(for: self.modelIdentifier)
   }
+
+  var deviceType: String {
+    ModelIdentifier.deviceType(from: self.modelIdentifier)
+  }
 }
 
 extension PodcastEvent: IOSModelIdentifiable {}

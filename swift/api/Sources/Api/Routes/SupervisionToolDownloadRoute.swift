@@ -1,0 +1,54 @@
+import Dependencies
+import DuetSQL
+import Vapor
+
+enum SupervisionToolDownloadRoute {
+  @Sendable static func handler(_ request: Request) async throws -> Response {
+    guard let code = Int(request.parameters.get("code") ?? ""),
+          code >= 100_000, code <= 999_999 else {
+      throw Abort(.badRequest, reason: "Invalid claim code")
+    }
+
+    guard let platformParam = request.parameters.get("platform"),
+          let platform = Platform(rawValue: platformParam) else {
+      throw Abort(.badRequest, reason: "Invalid platform (must be 'mac' or 'windows')")
+    }
+
+    guard let device = try? await IOSApp.Device.query()
+      .where(.supervisionClaimCode == code)
+      .first(in: request.context.db) else {
+      throw Abort(.notFound, reason: "Device not found for claim code")
+    }
+
+    let task = Task {
+      try await request.context.db.create(IOSEvent(
+        eventId: "7d644b4d",
+        kind: .supervision,
+        detail: "supervision_tool_download: platform=\(platform.rawValue)",
+        deviceId: device.id,
+        modelIdentifier: device.modelIdentifier,
+        iosVersion: device.iosVersion,
+      ))
+    }
+
+    if request.context.env.mode == .test {
+      _ = try await task.value
+    }
+
+    return request.redirect(to: platform.downloadUrl, redirectType: .temporary)
+  }
+
+  enum Platform: String {
+    case mac
+    case windows
+
+    var downloadUrl: String {
+      switch self {
+      case .mac:
+        "http://gertrude.nyc3.digitaloceanspaces.com/releases/supervision/GertrudeSupervisor.dmg"
+      case .windows:
+        "http://gertrude.nyc3.digitaloceanspaces.com/releases/supervision/GertrudeSupervisor.exe"
+      }
+    }
+  }
+}

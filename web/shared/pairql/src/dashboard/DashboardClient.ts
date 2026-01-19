@@ -20,6 +20,16 @@ export default class DashboardClient extends Client<Auth> {
     );
   };
 
+  public claimSupervisionCode = (
+    input: P.ClaimSupervisionCode.Input,
+  ): Promise<Result<P.ClaimSupervisionCode.Output>> => {
+    return this.query<P.ClaimSupervisionCode.Output>(
+      input,
+      `ClaimSupervisionCode`,
+      `parent`,
+    );
+  };
+
   public combinedUsersActivityFeed = (
     input: P.CombinedUsersActivityFeed.Input,
   ): Promise<Result<P.CombinedUsersActivityFeed.Output>> => {
@@ -124,6 +134,12 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetAdminKeychains.Output>(input, `GetAdminKeychains`, `parent`);
   };
 
+  public getClaimDeviceData = (
+    input: P.GetClaimDeviceData.Input,
+  ): Promise<Result<P.GetClaimDeviceData.Output>> => {
+    return this.query<P.GetClaimDeviceData.Output>(input, `GetClaimDeviceData`, `parent`);
+  };
+
   public getDevice = (input: P.GetDevice.Input): Promise<Result<P.GetDevice.Output>> => {
     return this.query<P.GetDevice.Output>(input, `GetDevice`, `parent`);
   };
@@ -152,6 +168,16 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetSelectableKeychains.Output>(
       input,
       `GetSelectableKeychains`,
+      `parent`,
+    );
+  };
+
+  public getSupervisionDeviceStatus = (
+    input: P.GetSupervisionDeviceStatus.Input,
+  ): Promise<Result<P.GetSupervisionDeviceStatus.Output>> => {
+    return this.query<P.GetSupervisionDeviceStatus.Output>(
+      input,
+      `GetSupervisionDeviceStatus`,
       `parent`,
     );
   };

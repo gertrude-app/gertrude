@@ -48,6 +48,22 @@ const noopClient: ApiClient = {
   getAdminKeychains: async () => {
     return Result.success({ children: [], keychains: [] });
   },
+  getClaimDeviceData: async () => {
+    return Result.success({
+      children: [],
+      modelName: `iPhone 15 Pro`,
+      deviceType: `iPhone`,
+      iosVersion: `26.2`,
+    });
+  },
+  claimSupervisionCode: async () => {
+    return Result.success({
+      childName: `Luke`,
+      modelName: `iPhone 15 Pro`,
+      iosVersion: `18.2`,
+      code: 123456,
+    });
+  },
   dashboardWidgets: async () => {
     return Result.success({
       children: [],
@@ -62,6 +78,17 @@ const noopClient: ApiClient = {
   },
   getSelectableKeychains: async () => {
     return Result.success({ own: [], public: [] });
+  },
+  getSupervisionDeviceStatus: async () => {
+    return Result.success({
+      deviceId: `device-123`,
+      childId: `child-456`,
+      childName: `Luke`,
+      modelName: `iPhone 15 Pro`,
+      deviceType: `iPhone`,
+      iosVersion: `18.2`,
+      supervisionStatus: `awaitingSupervision` as const,
+    });
   },
   getSuspendFilterRequest: async () => {
     return Result.success({

@@ -67,8 +67,7 @@ extension SuperviseRoute {
 
     if expiresAt < get(dependency: \.date.now) {
       logIOSUnusual("\(baseId)-4", "supervision code expired")
-      let deviceType = ModelIdentifier.deviceType(from: device.modelIdentifier)
-      let msg = "This code has expired. Open the Gertrude app on the \(deviceType) to get a new code."
+      let msg = "This code has expired. Open the Gertrude app on the \(device.deviceType) to get a new code."
       throw context.error("\(baseId)-4", .badRequest, user: msg)
     }
 

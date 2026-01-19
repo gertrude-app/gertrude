@@ -76,6 +76,7 @@ Supports all 3 apps, plus dashboard and admin websites
 - when making git commits, read last 10 commits to match style
 - all lowercase commits, with a short prefix, e.g. `dash: fix bug in xyz`
 - when opening PRs, make title match commit style, and create with EMPTY body
+- commit messages MUST BE all lowercase
 
 ## Libraries
 

@@ -47,6 +47,8 @@ enum AuthedParentRoute: PairRoute {
   case upsertBlockRule(UpsertBlockRule.Input)
   case updateIOSDevice(UpdateIOSDevice.Input)
   case claimSupervisionCode(ClaimSupervisionCode.Input)
+  case getClaimDeviceData(GetClaimDeviceData.Input)
+  case getSupervisionDeviceStatus(GetSupervisionDeviceStatus.Input)
 }
 
 extension AuthedParentRoute {
@@ -216,6 +218,14 @@ extension AuthedParentRoute {
         Operation(ClaimSupervisionCode.self)
         Body(.dashboardInput(ClaimSupervisionCode.self))
       }
+      Route(.case(Self.getClaimDeviceData)) {
+        Operation(GetClaimDeviceData.self)
+        Body(.dashboardInput(GetClaimDeviceData.self))
+      }
+      Route(.case(Self.getSupervisionDeviceStatus)) {
+        Operation(GetSupervisionDeviceStatus.self)
+        Body(.dashboardInput(GetSupervisionDeviceStatus.self))
+      }
     }
     .eraseToAnyParserPrinter()
 }
@@ -354,6 +364,12 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .claimSupervisionCode(let input):
       let output = try await ClaimSupervisionCode.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getClaimDeviceData(let input):
+      let output = try await GetClaimDeviceData.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getSupervisionDeviceStatus(let input):
+      let output = try await GetSupervisionDeviceStatus.resolve(with: input, in: context)
       return try await self.respond(with: output)
     }
   }

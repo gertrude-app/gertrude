@@ -6,6 +6,7 @@ import Vapor
 struct AdminAuth: PairOutput {
   var token: Parent.DashToken.Value
   var adminId: Parent.Id
+  var claimCode: String?
 }
 
 struct VerifySignupEmail: Pair {
@@ -25,11 +26,11 @@ extension VerifySignupEmail: Resolver {
     switch await with(dependency: \.ephemeral).parentIdFromToken(input.token) {
 
     // happy path: verification is successful
-    case .notExpired(let parentId):
+    case .notExpired(let parentId, let claimCode):
       var parent = try await context.db.find(parentId)
       let token = try await context.db.create(Parent.DashToken(parentId: parent.id))
       if parent.subscriptionStatus != .pendingEmailVerification {
-        return .init(token: token.value, adminId: parent.id)
+        return .init(token: token.value, adminId: parent.id, claimCode: claimCode)
       }
 
       parent.subscriptionStatusExpiration = get(dependency: \.date.now) + .days(21 - 3)
@@ -53,7 +54,7 @@ extension VerifySignupEmail: Resolver {
           .internal(.signups, "email verified: `\(parent.email.rawValue)`")
       }
 
-      return Output(token: token.value, adminId: parent.id)
+      return Output(token: token.value, adminId: parent.id, claimCode: claimCode)
 
     case .notFound:
       throw Abort(.notFound)

@@ -4,6 +4,7 @@ const config: Config = {
   content: [
     `./stories/**/*.tsx`,
     `../dash/components/src/**/*.tsx`,
+    `../dash/app/src/**/*.tsx`,
     `../site/app/**/*.tsx`,
     `../site/components/**/*.tsx`,
     `../shared/components/src/**/*.tsx`,

@@ -12,6 +12,7 @@
     "@dash/components": "workspace:*",
     "@dash/keys": "workspace:*",
     "@dash/types": "workspace:*",
+    "@dash/utils": "workspace:*",
     "@macos/appviews": "workspace:*",
     "@supervise/ui": "workspace:*",
     "@shared/components": "workspace:*",

@@ -1,4 +1,9 @@
-import { ApiErrorMessage, FullscreenModalForm, LoginForm } from '@dash/components';
+import {
+  ApiErrorMessage,
+  DeviceContextBanner,
+  FullscreenModalForm,
+  LoginForm,
+} from '@dash/components';
 import React, { useState } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import Current from '../../environment';
@@ -6,11 +11,14 @@ import { useAuth, useLoginRedirect, useMutation } from '../../hooks';
 
 export const Login: React.FC = () => {
   const { admin, login } = useAuth();
-  const redirectUrl = useLoginRedirect();
+  const redirectUrl = useLoginRedirect() ?? `/`;
   const [email, setEmail] = useState(``);
   const [password, setPassword] = useState(``);
   const [searchParams] = useSearchParams();
   const fromPage = searchParams.get(`from`);
+  const claimCode = searchParams.get(`claimPendingSupervision`);
+  const modelName = searchParams.get(`modelName`);
+  const iosVersion = searchParams.get(`iosVersion`);
 
   const requestMagicLink = useMutation(() =>
     Current.api.requestMagicLink({
@@ -24,7 +32,7 @@ export const Login: React.FC = () => {
   });
 
   if (admin !== null || loginMutation.isSuccess) {
-    return <Navigate to={redirectUrl ?? `/`} replace />;
+    return <Navigate to={redirectUrl} replace />;
   }
 
   if (loginMutation.isPending || requestMagicLink.isPending) {
@@ -64,6 +72,16 @@ export const Login: React.FC = () => {
         onSubmit={() => loginMutation.mutate(undefined)}
         onSendMagicLink={() => requestMagicLink.mutate(undefined)}
         fromPasswordReset={fromPage === `reset`}
+        signupUrl={`/signup${window.location.search}`}
+        beforeInputs={
+          claimCode && modelName ? (
+            <DeviceContextBanner
+              modelName={modelName}
+              iosVersion={iosVersion ?? undefined}
+              label="Login to supervise:"
+            />
+          ) : undefined
+        }
       />
     </FullscreenModalForm>
   );

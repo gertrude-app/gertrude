@@ -60,8 +60,7 @@ extension ClaimSupervisionCode: Resolver {
 
     if let expiresAt = device.claimCodeExpiresAt, expiresAt <= get(dependency: \.date.now) {
       logIOSUnusual("25bef9db", "supervision code expired")
-      let deviceType = ModelIdentifier.deviceType(from: device.modelIdentifier)
-      let msg = "This code has expired. Open the Gertrude app on the \(deviceType) to get a new one."
+      let msg = "This code has expired. Open the Gertrude app on the \(device.deviceType) to get a new one."
       throw context.error("25bef9db", .badRequest, user: msg)
     }
 

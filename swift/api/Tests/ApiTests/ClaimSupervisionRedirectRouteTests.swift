@@ -25,10 +25,11 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/login")
+        expect(location).toContain("\(self.env.dashboardUrl)/signup")
         expect(location).toContain("claimPendingSupervision=\(code)")
         expect(location).toContain("modelName=iPad%20mini%20(6th%20gen)")
         expect(location).toContain("iosVersion=17.5")
+        expect(location).toContain("redirect=/supervise-device/\(code)/claim")
         expect(location).not.toContain("error=")
       },
     )
@@ -55,6 +56,7 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
         let location = res.headers.first(name: .location)!
         expect(location).toContain("claimPendingSupervision=\(code)")
         expect(location).toContain("modelName=iPhone%2016%20Pro")
+        expect(location).toContain("redirect=/supervise-device/\(code)/claim")
         expect(location).not.toContain("error=")
       },
     )
@@ -67,7 +69,7 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/login")
+        expect(location).toContain("\(self.env.dashboardUrl)/signup")
         expect(location).toContain("error=invalid_code")
       },
     )
@@ -80,7 +82,7 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/login")
+        expect(location).toContain("\(self.env.dashboardUrl)/signup")
         expect(location).toContain("error=missing_code")
       },
     )
@@ -104,7 +106,7 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/login")
+        expect(location).toContain("\(self.env.dashboardUrl)/signup")
         expect(location).toContain("error=expired_code")
       },
     )
