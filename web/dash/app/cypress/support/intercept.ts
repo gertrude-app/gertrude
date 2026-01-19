@@ -6,6 +6,10 @@ export function interceptPql(
   output: T.ChildActivitySummaries.Output,
 ): void;
 export function interceptPql(
+  slug: `ClaimSupervisionCode`,
+  output: T.ClaimSupervisionCode.Output,
+): void;
+export function interceptPql(
   slug: `CombinedUsersActivityFeed`,
   output: T.CombinedUsersActivityFeed.Output,
 ): void;
@@ -54,6 +58,10 @@ export function interceptPql(
   slug: `GetAdminKeychains`,
   output: T.GetAdminKeychains.Output,
 ): void;
+export function interceptPql(
+  slug: `GetClaimDeviceData`,
+  output: T.GetClaimDeviceData.Output,
+): void;
 export function interceptPql(slug: `GetDevice`, output: T.GetDevice.Output): void;
 export function interceptPql(slug: `GetDevices`, output: T.GetDevices.Output): void;
 export function interceptPql(slug: `GetIOSDevice`, output: T.GetIOSDevice.Output): void;
@@ -64,6 +72,10 @@ export function interceptPql(
 export function interceptPql(
   slug: `GetSelectableKeychains`,
   output: T.GetSelectableKeychains.Output,
+): void;
+export function interceptPql(
+  slug: `GetSupervisionDeviceStatus`,
+  output: T.GetSupervisionDeviceStatus.Output,
 ): void;
 export function interceptPql(
   slug: `GetSuspendFilterRequest`,
@@ -167,6 +179,7 @@ export function interceptPql(slug: string, output: any): void {
 export function forcePqlErr(
   slug:
     | `ChildActivitySummaries`
+    | `ClaimSupervisionCode`
     | `CombinedUsersActivityFeed`
     | `ConfirmPendingNotificationMethod`
     | `CreatePendingAppConnection`
@@ -180,11 +193,13 @@ export function forcePqlErr(
     | `GetAdmin`
     | `GetAdminKeychain`
     | `GetAdminKeychains`
+    | `GetClaimDeviceData`
     | `GetDevice`
     | `GetDevices`
     | `GetIOSDevice`
     | `GetIdentifiedApps`
     | `GetSelectableKeychains`
+    | `GetSupervisionDeviceStatus`
     | `GetSuspendFilterRequest`
     | `GetUnlockRequest`
     | `GetUnlockRequests`

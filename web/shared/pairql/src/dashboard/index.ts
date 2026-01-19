@@ -1,6 +1,7 @@
 // auto-generated, do not edit
 export * from './shared';
 export * from './pairs/ChildActivitySummaries';
+export * from './pairs/ClaimSupervisionCode';
 export * from './pairs/CombinedUsersActivityFeed';
 export * from './pairs/ConfirmPendingNotificationMethod';
 export * from './pairs/CreatePendingAppConnection';
@@ -14,11 +15,13 @@ export * from './pairs/FlagActivityItems';
 export * from './pairs/GetAdmin';
 export * from './pairs/GetAdminKeychain';
 export * from './pairs/GetAdminKeychains';
+export * from './pairs/GetClaimDeviceData';
 export * from './pairs/GetDevice';
 export * from './pairs/GetDevices';
 export * from './pairs/GetIdentifiedApps';
 export * from './pairs/GetIOSDevice';
 export * from './pairs/GetSelectableKeychains';
+export * from './pairs/GetSupervisionDeviceStatus';
 export * from './pairs/GetSuspendFilterRequest';
 export * from './pairs/GetUnlockRequest';
 export * from './pairs/GetUnlockRequests';

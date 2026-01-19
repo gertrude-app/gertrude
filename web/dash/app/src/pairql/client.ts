@@ -95,6 +95,12 @@ export const throwingClient: ApiClient = {
   getAdminKeychains: () => {
     throw new Error(`ApiClient.getAdminKeychains() not implemented`);
   },
+  getClaimDeviceData: () => {
+    throw new Error(`ApiClient.getClaimDeviceData() not implemented`);
+  },
+  claimSupervisionCode: () => {
+    throw new Error(`ApiClient.claimSupervisionCode() not implemented`);
+  },
   getDevice: () => {
     throw new Error(`ApiClient.getDevice() not implemented`);
   },
@@ -109,6 +115,9 @@ export const throwingClient: ApiClient = {
   },
   getSelectableKeychains: () => {
     throw new Error(`ApiClient.getSelectableKeychains() not implemented`);
+  },
+  getSupervisionDeviceStatus: () => {
+    throw new Error(`ApiClient.getSupervisionDeviceStatus() not implemented`);
   },
   getSuspendFilterRequest: () => {
     throw new Error(`ApiClient.getSuspendFilterRequest() not implemented`);

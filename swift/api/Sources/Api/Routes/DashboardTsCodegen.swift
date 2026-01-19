@@ -106,6 +106,9 @@ enum DashboardTsCodegenRoute {
       GetIOSDevice.self,
       UpsertBlockRule.self,
       UpdateIOSDevice.self,
+      GetClaimDeviceData.self,
+      ClaimSupervisionCode.self,
+      GetSupervisionDeviceStatus.self,
     ]
   }
 

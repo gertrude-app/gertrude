@@ -9,7 +9,7 @@ class EphemeralTests: DependencyTestCase {
     let parent = Parent.mock
     let token = await ephemeral.createParentIdToken(parent.id)
     let retrieved = await ephemeral.parentIdFromToken(token)
-    expect(retrieved).toEqual(.notExpired(parent.id))
+    expect(retrieved).toEqual(.notExpired(parent.id, claimCode: nil))
     let retrievedAgain = await ephemeral.parentIdFromToken(token)
     expect(retrievedAgain).toEqual(.previouslyRetrieved(parent.id))
   }

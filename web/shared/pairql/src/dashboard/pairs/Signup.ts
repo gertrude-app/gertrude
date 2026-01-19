@@ -6,6 +6,7 @@ export namespace Signup {
     gclid?: string;
     abTestVariant?: string;
     turnstileToken?: string;
+    claimCode?: string;
   }
 
   export interface Output {

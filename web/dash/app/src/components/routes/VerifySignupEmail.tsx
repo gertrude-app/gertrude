@@ -41,7 +41,9 @@ const VerifySignupEmail: React.FC = () => {
     return <FullscreenModalForm state="ongoing" />;
   }
 
-  return <Navigate to="/use-case" replace />;
+  const claimCode = verification.data?.claimCode;
+  const redirectTo = claimCode ? `/supervise-device/${claimCode}/claim` : `/use-case`;
+  return <Navigate to={redirectTo} replace />;
 };
 
 export default VerifySignupEmail;

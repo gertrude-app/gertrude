@@ -593,6 +593,9 @@ importers:
       '@dash/types':
         specifier: workspace:*
         version: link:../dash/types
+      '@dash/utils':
+        specifier: workspace:*
+        version: link:../dash/utils
       '@macos/appviews':
         specifier: workspace:*
         version: link:../appviews

@@ -9,3 +9,4 @@
 **/site/out
 **/appviews/dist
 **/appviews/src/main.tsx
+**/next-env.d.ts

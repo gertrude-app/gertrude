@@ -15,6 +15,7 @@ actor Ephemeral {
     struct ParentId: Codable {
       var parentId: Parent.Id
       var expiration: Date
+      var claimCode: String?
     }
 
     struct ChildId: Codable {
@@ -36,6 +37,7 @@ actor Ephemeral {
     struct RetrievedParentId: Codable {
       var parentId: Parent.Id
       var retrievedAt: Date
+      var claimCode: String?
     }
 
     var parentIds: [UUID: ParentId] = [:]
@@ -49,12 +51,12 @@ actor Ephemeral {
 
   enum ParentId: Equatable {
     case notFound
-    case notExpired(Parent.Id)
+    case notExpired(Parent.Id, claimCode: String?)
     case expired(Parent.Id)
     case previouslyRetrieved(Parent.Id)
 
     var notExpired: Parent.Id? {
-      guard case .notExpired(let parentId) = self else { return nil }
+      guard case .notExpired(let parentId, _) = self else { return nil }
       return parentId
     }
   }
@@ -62,19 +64,21 @@ actor Ephemeral {
   func createParentIdToken(
     _ parentId: Parent.Id,
     expiration: Date? = nil,
+    claimCode: String? = nil,
   ) -> UUID {
     defer { Task { await self.persistStorage() } }
     let token = self.uuid()
     self.storage.parentIds[token] = .init(
       parentId: parentId,
       expiration: expiration ?? self.now + .minutes(60),
+      claimCode: claimCode,
     )
     return token
   }
 
   func unexpiredParentIdFromToken(_ token: UUID) -> Parent.Id? {
     switch self.parentIdFromToken(token) {
-    case .notExpired(let parentId):
+    case .notExpired(let parentId, _):
       parentId
     case .expired, .notFound, .previouslyRetrieved:
       nil
@@ -88,8 +92,9 @@ actor Ephemeral {
         self.storage.retrievedParentIds[token] = .init(
           parentId: stored.parentId,
           retrievedAt: self.now,
+          claimCode: stored.claimCode,
         )
-        return .notExpired(stored.parentId)
+        return .notExpired(stored.parentId, claimCode: stored.claimCode)
       } else {
         // put back, so if they try again, they know it's expired, not missing
         self.storage.parentIds[token] = stored

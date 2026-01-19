@@ -1,17 +1,26 @@
-import { EmailInputForm, FullscreenModalForm } from '@dash/components';
+import {
+  DeviceContextBanner,
+  EmailInputForm,
+  FullscreenModalForm,
+} from '@dash/components';
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import Turnstile from 'react-turnstile';
 import Current from '../../environment';
-import { useAuth, useMutation, useTimeout } from '../../hooks';
+import { useAuth, useLoginRedirect, useMutation, useTimeout } from '../../hooks';
 
 const Signup: React.FC = () => {
   const { admin, login } = useAuth();
+  const redirectUrl = useLoginRedirect() ?? `/`;
   const [email, setEmail] = useState(``);
   const [password, setPassword] = useState(``);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const navigate = useNavigate();
+  const queryString = window.location.search;
+  const claimCode = getQueryParam(`claimPendingSupervision`);
+  const modelName = getQueryParam(`modelName`);
+  const iosVersion = getQueryParam(`iosVersion`);
   const signup = useMutation(
     () =>
       Current.api.signup({
@@ -20,18 +29,19 @@ const Signup: React.FC = () => {
         gclid: getCookieValue(`gclid`),
         abTestVariant: getQueryParam(`v`) ?? getCookieValue(`ab_variant`),
         turnstileToken: turnstileToken ?? undefined,
+        claimCode,
       }),
     { onSuccess: ({ admin }) => admin && login(admin.adminId, admin.token) },
   );
 
   useTimeout(
-    () => navigate(`/login`),
+    () => navigate(`/login${queryString}`),
     7500,
     signup.isSuccess && signup.data?.admin === undefined,
   );
 
   if (admin !== null || (signup.isSuccess && signup.data?.admin !== undefined)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={redirectUrl} replace />;
   }
 
   if (signup.isPending) {
@@ -66,13 +76,18 @@ const Signup: React.FC = () => {
             Got an account?{` `}
             <Link
               className="text-violet-700 border-b border-dotted border-violet-700"
-              to="/login"
+              to={`/login${queryString}`}
             >
               Login
             </Link>
             {` `}
             instead.
           </>
+        }
+        beforeInputs={
+          claimCode && modelName ? (
+            <DeviceContextBanner modelName={modelName} iosVersion={iosVersion} />
+          ) : undefined
         }
         email={email}
         setEmail={setEmail}

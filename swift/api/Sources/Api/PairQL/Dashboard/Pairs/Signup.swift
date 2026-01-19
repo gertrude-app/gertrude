@@ -13,6 +13,7 @@ struct Signup: Pair {
     var gclid: String?
     var abTestVariant: String?
     var turnstileToken: String?
+    var claimCode: String?
   }
 
   struct Output: PairOutput {
@@ -55,7 +56,7 @@ extension Signup: Resolver {
       }
 
       if existing.isPendingEmailVerification {
-        try await sendVerificationEmail(to: existing, in: context)
+        try await sendVerificationEmail(to: existing, in: context, claimCode: input.claimCode)
       } else {
         try await postmark.send(template: .reSignup(
           to: email,
@@ -84,18 +85,23 @@ extension Signup: Resolver {
       """)
     }
 
-    try await sendVerificationEmail(to: parent, in: context)
+    try await sendVerificationEmail(to: parent, in: context, claimCode: input.claimCode)
     return .init(admin: nil)
   }
 }
 
 // helpers
 
-func sendVerificationEmail(to admin: Parent, in context: Context) async throws {
+func sendVerificationEmail(
+  to admin: Parent,
+  in context: Context,
+  claimCode: String? = nil,
+) async throws {
   let token = await with(dependency: \.ephemeral)
     .createParentIdToken(
       admin.id,
       expiration: get(dependency: \.date.now) + .hours(24),
+      claimCode: claimCode,
     )
 
   try await with(dependency: \.postmark)

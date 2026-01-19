@@ -23,6 +23,11 @@ import MagicLink from './components/routes/MagicLink';
 import RequestPasswordReset from './components/routes/RequestPasswordReset';
 import SecurityEventsFeed from './components/routes/SecurityEventsFeed';
 import Signup from './components/routes/Signup';
+import SuperviseDevice from './components/routes/SuperviseDevice';
+import SuperviseDeviceClaim from './components/routes/SuperviseDevice/Claim';
+import SuperviseDeviceDone from './components/routes/SuperviseDevice/Done';
+import SuperviseDeviceDownloadHelper from './components/routes/SuperviseDevice/DownloadHelper';
+import SuperviseDeviceSupervise from './components/routes/SuperviseDevice/Supervise';
 import SuspendFilter from './components/routes/SuspendFilter';
 import DenyUnlockRequest from './components/routes/UnlockRequest/DenyUnlockRequest';
 import EditUnlockRequestKey from './components/routes/UnlockRequest/EditUnlockRequestKey';
@@ -66,6 +71,13 @@ const App: React.FC = () => {
       {/* authed routes */}
       <Route path="/" element={<AuthedChrome />}>
         <Route index element={<Dashboard />} />
+
+        <Route path="supervise-device/:code" element={<SuperviseDevice />}>
+          <Route path="claim" element={<SuperviseDeviceClaim />} />
+          <Route path="download-helper" element={<SuperviseDeviceDownloadHelper />} />
+          <Route path="supervise" element={<SuperviseDeviceSupervise />} />
+          <Route path="done" element={<SuperviseDeviceDone />} />
+        </Route>
         <Route path="/checkout-success" element={<CheckoutSuccess />} />
         <Route path="/checkout-cancel" element={<CheckoutCancel />} />
         <Route path="settings" element={<AdminSettings />} />
