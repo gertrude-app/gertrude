@@ -455,9 +455,26 @@ public struct IOSReducer {
       return .none
 
     case (.onboarding(.supervision(.setup(.askHasProtector))), .primary):
-      self.deps.log(state.screen, action, "76a87283")
-      state.screen = .onboarding(.supervision(.setup(.generateSetupCode)))
-      return .none
+      self.deps.log(state.screen, action, "39d56d1a")
+      return .run { [deps = self.deps] send in
+        if let data = deps.sharedStorage.loadSupervisionCode(),
+           data.expiresAt > deps.now {
+          await send(.programmatic(.setScreen(.onboarding(
+            .supervision(.setup(.instructionsForProtector(code: data.code))),
+          ))))
+        } else {
+          await send(.programmatic(.setScreen(.onboarding(
+            .supervision(.setup(.generateSetupCode())),
+          ))))
+          do {
+            let data = try await deps.api.createSupervisionCode()
+            deps.sharedStorage.saveSupervisionCode(data)
+            await send(.programmatic(.supervisionCodeGenerated(code: data.code)))
+          } catch {
+            await send(.programmatic(.supervisionCodeGenerationFailed))
+          }
+        }
+      }
 
     case (.onboarding(.supervision(.setup(.askHasProtector))), .secondary):
       self.deps.log(state.screen, action, "f0a2d33c")
@@ -469,14 +486,22 @@ public struct IOSReducer {
       state.screen = .onboarding(.happyPath(.hiThere))
       return .none
 
-    case (.onboarding(.supervision(.setup(.generateSetupCode))), .primary):
-      self.deps.log(state.screen, action, "bc1fd4c0")
-      state.screen = .onboarding(.supervision(.setup(.instructionsForProtector)))
-      return .none
+    // the only button on this screen is `retry` for a failure case
+    case (.onboarding(.supervision(.setup(.generateSetupCode(_)))), .primary):
+      self.deps.log(state.screen, action, "b530239d")
+      return .run { [deps = self.deps] send in
+        do {
+          let data = try await deps.api.createSupervisionCode()
+          deps.sharedStorage.saveSupervisionCode(data)
+          await send(.programmatic(.supervisionCodeGenerated(code: data.code)))
+        } catch {
+          await send(.programmatic(.supervisionCodeGenerationFailed))
+        }
+      }
 
-    case (.onboarding(.supervision(.setup(.instructionsForProtector))), .primary):
+    case (.onboarding(.supervision(.setup(.instructionsForProtector(let code)))), .primary):
       self.deps.log(state.screen, action, "0aea6b12")
-      state.screen = .onboarding(.supervision(.setup(.waitingForSupervision)))
+      state.screen = .onboarding(.supervision(.setup(.waitingForSupervision(code: code))))
       return .none
 
     case (.onboarding(.supervision(.setup(.waitingForSupervision))), _):
@@ -793,6 +818,16 @@ public struct IOSReducer {
 
     case .receivedConnectAccountFeatureFlag(let feature):
       state.onboarding.connectFeature = feature
+      return .none
+
+    case .supervisionCodeGenerated(let code):
+      self.deps.log(action, "fcba8692")
+      state.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
+      return .none
+
+    case .supervisionCodeGenerationFailed:
+      self.deps.log(action, "498796d3")
+      state.screen = .onboarding(.supervision(.setup(.generateSetupCode(didError: true))))
       return .none
     }
   }

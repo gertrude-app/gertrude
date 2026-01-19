@@ -35,6 +35,8 @@ public extension IOSReducer {
       case installSucceeded
       case installFailed(FilterInstallError)
       case receivedConnectAccountFeatureFlag(ConnectAccountFeatureFlag.Output)
+      case supervisionCodeGenerated(code: Int)
+      case supervisionCodeGenerationFailed
     }
   }
 }

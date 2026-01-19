@@ -472,25 +472,22 @@ public struct AppView: View {
           )
 
         // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.generateSetupCode))):
-          ButtonScreenView(
-            text: "Generating your setup code...",
-            primary: self.btn(text: "Next", .primary),
+        case .onboarding(.supervision(.setup(.generateSetupCode(let didError)))):
+          GenerateSetupCodeView(
+            isError: didError,
+            onRetry: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Retry"))) },
           )
 
         // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.instructionsForProtector))):
-          ButtonScreenView(
-            text: "Share this code with your protector. They'll need to go to gertrude.app/supervise on their computer to complete the setup.",
-            primary: self.btn(text: "Next", .primary),
+        case .onboarding(.supervision(.setup(.instructionsForProtector(let code)))):
+          InstructionsForProtectorView(
+            code: code,
+            onNext: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Next"))) },
           )
 
         // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.waitingForSupervision))):
-          ButtonScreenView(
-            text: "Waiting for your protector to complete the supervision process. Once they're done, your device will restart and you can continue setup here.",
-            primary: self.btn(text: "Refresh", .primary),
-          )
+        case .onboarding(.supervision(.setup(.waitingForSupervision(let code)))):
+          WaitingForSupervisionView(code: code)
 
         // supervision resume
 

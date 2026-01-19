@@ -127,9 +127,9 @@ extension IOSReducer {
         case appleConfiguratorInstructions
         case askHasProtector
         case selfManagementPlaceholder
-        case generateSetupCode
-        case instructionsForProtector
-        case waitingForSupervision
+        case generateSetupCode(didError: Bool = false)
+        case instructionsForProtector(code: Int)
+        case waitingForSupervision(code: Int)
       }
 
       public enum Resume: Equatable {
