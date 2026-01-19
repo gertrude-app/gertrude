@@ -152,15 +152,26 @@ final class IOSReducerTestsMajor: XCTestCase {
       onboarding: .init(majorOnboarder: .self, ownsMac: false),
     )) {
       IOSReducer()
+    } withDependencies: {
+      $0.sharedStorage.loadSupervisionCode = { nil }
+      $0.api.createSupervisionCode = { .init(code: 123_123, expiresAt: .reference) }
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.supervision(.setup(.askHasProtector)))
     }
 
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.generateSetupCode)))
-    }
+    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
+
+    await store
+      .receive(.programmatic(.setScreen(.onboarding(.supervision(.setup(.generateSetupCode())))))) {
+        $0.screen = .onboarding(.supervision(.setup(.generateSetupCode())))
+      }
+
+    await store
+      .receive(.programmatic(.supervisionCodeGenerated(code: 123_123))) {
+        $0.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: 123_123))))
+      }
   }
 
   @MainActor

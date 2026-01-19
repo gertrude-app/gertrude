@@ -139,17 +139,17 @@ extension IOSReducer.Onboarding.Supervision.Setup {
     case (.appleConfiguratorInstructions, _):
       .onboarding(.happyPath(.hiThere))
     case (.askHasProtector, .primary):
-      .onboarding(.supervision(.setup(.generateSetupCode)))
+      .onboarding(.supervision(.setup(.generateSetupCode())))
     case (.askHasProtector, _):
       .onboarding(.supervision(.setup(.selfManagementPlaceholder)))
     case (.selfManagementPlaceholder, _):
       .onboarding(.happyPath(.hiThere))
-    case (.generateSetupCode, _):
-      .onboarding(.supervision(.setup(.instructionsForProtector)))
-    case (.instructionsForProtector, _):
-      .onboarding(.supervision(.setup(.waitingForSupervision)))
-    case (.waitingForSupervision, _):
-      .onboarding(.supervision(.setup(.waitingForSupervision)))
+    case (.generateSetupCode(_), _):
+      .onboarding(.supervision(.setup(.generateSetupCode(didError: true))))
+    case (.instructionsForProtector(let code), _):
+      .onboarding(.supervision(.setup(.waitingForSupervision(code: code))))
+    case (.waitingForSupervision(let code), _):
+      .onboarding(.supervision(.setup(.waitingForSupervision(code: code))))
     }
   }
 }

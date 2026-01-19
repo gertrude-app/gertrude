@@ -23,6 +23,7 @@ public struct ApiClient: Sendable {
   public var setAuthToken: @Sendable (UUID?) async -> Void
   public var connectAccountFeatureFlag: @Sendable ()
     async throws -> ConnectAccountFeatureFlag.Output
+  public var createSupervisionCode: @Sendable () async throws -> CreateSupervisionCode.Output
 }
 
 extension ApiClient: TestDependencyKey {
@@ -126,6 +127,21 @@ extension ApiClient: DependencyKey {
           withUnauthed: .connectAccountFeatureFlag,
         )
       },
+      createSupervisionCode: {
+        @Dependency(\.device) var device
+        guard let vendorId = await device.vendorId() else {
+          throw ApiClient.Error.missingVendorId
+        }
+        return try await output(
+          from: CreateSupervisionCode.self,
+          withUnauthed: .createSupervisionCode(.init(
+            deviceId: vendorId,
+            modelIdentifier: device.modelIdentifier(),
+            iosVersion: device.iOSVersion(),
+            appVersion: version,
+          )),
+        )
+      },
     )
   }
 }
@@ -169,6 +185,7 @@ func output<T: Pair>(
 
 public extension ApiClient {
   enum Error: Swift.Error {
+    case missingVendorId
     case missingAuthToken
     case missingDataOrResponse
     case unexpectedError(statusCode: Int)

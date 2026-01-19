@@ -23,6 +23,9 @@ public struct SharedStorageClient: Sendable {
   public var loadDebugLogs: @Sendable () -> [String]?
   public var saveDebugLogs: @Sendable ([String]) -> Void
 
+  public var loadSupervisionCode: @Sendable () -> CreateSupervisionCode.Output?
+  public var saveSupervisionCode: @Sendable (CreateSupervisionCode.Output) -> Void
+
   public var migrateLegacyData: @Sendable () async -> Bool = { false }
 }
 
@@ -43,6 +46,7 @@ private enum Key: String {
   case disabledBlockGroups = "disabledBlockGroups.v1.3.0"
   case legacyV1StorageKey = "blockRules.v1"
   case firstLaunchDate
+  case supervisionCode = "v1.7.0--supervision-code"
 }
 
 extension SharedStorageClient: DependencyKey {
@@ -59,6 +63,8 @@ extension SharedStorageClient: DependencyKey {
       saveFirstLaunchDate: { saveDate($0, forKey: .firstLaunchDate) },
       loadDebugLogs: reader.loadDebugLogs,
       saveDebugLogs: { saveCodable($0, forKey: .debugLogs) },
+      loadSupervisionCode: { loadCodable(forKey: .supervisionCode) },
+      saveSupervisionCode: { saveCodable($0, forKey: .supervisionCode) },
       migrateLegacyData: { await migrateLegacyStorage() },
     )
   }
