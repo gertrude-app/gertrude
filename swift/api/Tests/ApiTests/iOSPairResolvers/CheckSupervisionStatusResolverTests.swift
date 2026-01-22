@@ -86,6 +86,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let code = Int.random(in: 100_000 ... 999_999)
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let uuids = MockUUIDs()
     try await self.db.create(IOSApp.Device(
       id: .init(deviceId),
       childId: child.id,
@@ -99,13 +100,21 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
+      $0.uuid = .mock(uuids)
     } operation: {
       try await CheckSupervisionStatus.resolve(
         with: .init(vendorId: deviceId, code: code),
         in: .mock,
       )
     }
-    expect(output).toEqual(.claimed(.init(childName: child.name)))
+
+    expect(output).toEqual(.claimed(.init(
+      childId: child.id.rawValue,
+      token: uuids[1],
+      deviceId: deviceId,
+      childName: child.name,
+      supervised: .byGertrude(claimCode: code),
+    )))
   }
 
   func testSupervised_notYetProfileInstalled() async throws {
@@ -134,7 +143,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
       )
     }
 
-    guard case .supervised(let data) = output else {
+    guard case .missingProfile(let data) = output else {
       XCTFail("Expected .supervised, got \(output)")
       return
     }
@@ -145,7 +154,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let token = try await IOSApp.Token.query()
       .where(.deviceId == device.id)
       .first(in: self.db)
-    expect(data.deviceToken).toEqual(token.value.rawValue)
+    expect(data.token).toEqual(token.value.rawValue)
   }
 
   func testComplete_allFieldsSet() async throws {
@@ -153,6 +162,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let code = Int.random(in: 100_000 ... 999_999)
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let uuids = MockUUIDs()
     try await self.db.create(IOSApp.Device(
       id: .init(deviceId),
       childId: child.id,
@@ -167,12 +177,20 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
+      $0.uuid = .mock(uuids)
     } operation: {
       try await CheckSupervisionStatus.resolve(
         with: .init(vendorId: deviceId, code: code),
         in: .mock,
       )
     }
-    expect(output).toEqual(.complete)
+
+    expect(output).toEqual(.complete(.init(
+      childId: child.id.rawValue,
+      token: uuids[1],
+      deviceId: deviceId,
+      childName: child.name,
+      supervised: .byGertrude(claimCode: code),
+    )))
   }
 }

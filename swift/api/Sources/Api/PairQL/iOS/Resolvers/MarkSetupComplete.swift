@@ -23,6 +23,6 @@ extension MarkSetupComplete: NoInputResolver {
       ))
     }
 
-    return Output(childName: ctx.child.name)
+    return .success
   }
 }

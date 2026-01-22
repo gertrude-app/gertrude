@@ -7,6 +7,7 @@ public enum AuthedRoute: PairRoute {
   case markSetupComplete
   case pollFilterSuspensionDecision(PollFilterSuspensionDecision.Input)
   case screenshotUploadUrl(ScreenshotUploadUrl.Input)
+  case selfReportSupervision(SelfReportSupervision.Input)
 }
 
 public extension AuthedRoute {
@@ -33,6 +34,10 @@ public extension AuthedRoute {
     Route(.case(Self.screenshotUploadUrl)) {
       Operation(ScreenshotUploadUrl.self)
       Body(.json(ScreenshotUploadUrl.Input.self))
+    }
+    Route(.case(Self.selfReportSupervision)) {
+      Operation(SelfReportSupervision.self)
+      Body(.json(SelfReportSupervision.Input.self))
     }
   }
   .eraseToAnyParserPrinter()

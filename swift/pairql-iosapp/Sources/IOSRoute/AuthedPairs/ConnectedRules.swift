@@ -2,7 +2,7 @@ import Foundation
 import GertieIOS
 import PairQL
 
-/// deprecated: v1.5.0
+/// deprecated: v1.5.0, only used by harriet, remove quickly
 public struct ConnectedRules: Pair {
   public static let auth: ClientAuth = .child
 

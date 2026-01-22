@@ -4,7 +4,6 @@ public enum UnauthedRoute: PairRoute {
   case blockRules(BlockRules.Input)
   case blockRules_v2(BlockRules_v2.Input)
   case checkSupervisionStatus(CheckSupervisionStatus.Input)
-  case connectDevice(ConnectDevice.Input)
   case connectDevice_v2(ConnectDevice_v2.Input)
   case createSupervisionCode(CreateSupervisionCode.Input)
   case defaultBlockRules(DefaultBlockRules.Input)
@@ -28,10 +27,6 @@ public extension UnauthedRoute {
     Route(.case(Self.checkSupervisionStatus)) {
       Operation(CheckSupervisionStatus.self)
       Body(.json(CheckSupervisionStatus.Input.self))
-    }
-    Route(.case(Self.connectDevice)) {
-      Operation(ConnectDevice.self)
-      Body(.json(ConnectDevice.Input.self))
     }
     Route(.case(Self.connectDevice_v2)) {
       Operation(ConnectDevice_v2.self)

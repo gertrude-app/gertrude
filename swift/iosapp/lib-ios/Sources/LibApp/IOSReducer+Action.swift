@@ -28,6 +28,8 @@ public extension IOSReducer {
     public enum Programmatic: Equatable {
       case appDidLaunch
       case appWillTerminate
+      case appDidEnterForeground
+      case appDidEnterBackground
       case setFirstLaunch(Date)
       case setScreen(Screen)
       case authorizationSucceeded
@@ -37,6 +39,8 @@ public extension IOSReducer {
       case receivedConnectAccountFeatureFlag(ConnectAccountFeatureFlag.Output)
       case supervisionCodeGenerated(code: Int)
       case supervisionCodeGenerationFailed
+      case filterVerified
+      case filterVerificationFailed
     }
   }
 }

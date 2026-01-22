@@ -473,7 +473,9 @@ public struct AppView: View {
 
         // TODO: superios finalize screen text
         case .onboarding(.supervision(.setup(.generateSetupCode(let didError)))):
-          GenerateSetupCodeView(
+          SpinnerErrorView(
+            loadingText: "Generating your setup code...",
+            errorText: "Something went wrong generating your setup code. Please try again.",
             isError: didError,
             onRetry: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Retry"))) },
           )
@@ -491,32 +493,31 @@ public struct AppView: View {
 
         // supervision resume
 
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.resume(.supervisionDetected))):
+        case .onboarding(.supervision(.resume(.codeClaimedNotSupervised(let regainedFocus)))):
           ButtonScreenView(
-            text: "Great news! Your device is now supervised. Let's finish setting up Gertrude.",
-            primary: self.btn(text: "Next", .primary),
+            text: "Hmmm... We're not sure if this device is supervised yet. Open the Settings app and check if it says at the top of the main screen that the device is supervised, then come back here.",
+            primary: self.btn(text: "Yes, it says supervised", .primary, disabled: !regainedFocus),
+            secondary: self.btn(
+              text: "No, I don't see anything",
+              .secondary,
+              disabled: !regainedFocus,
+            ),
+            screenType: .question,
+            primaryLooksLikeSecondary: true,
           )
 
         // TODO: superios finalize screen text
-        case .onboarding(.supervision(.resume(.verifyingConnection))):
+        case .onboarding(.supervision(.resume(.retrySupervision))):
           ButtonScreenView(
-            text: "Verifying your connection to your protector...",
-            primary: self.btn(text: "Retry", .primary),
-          )
-
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.resume(.connectionVerified))):
-          ButtonScreenView(
-            text: "Connection verified. Your protector can now manage your device settings.",
+            text: "No worries. Let's try setting up supervision again.",
             primary: self.btn(text: "Next", .primary),
           )
 
         // TODO: superios finalize screen text
         case .onboarding(.supervision(.resume(.codeNotClaimed))):
           ButtonScreenView(
-            text: "Your setup code hasn't been claimed yet. Make sure your protector has entered the code at gertrude.app/supervise.",
-            primary: self.btn(text: "Check again", .primary),
+            text: "Hmmm... your supervision setup code hasn't been claimed yet. Let's try again.",
+            primary: self.btn(text: "Next", .primary),
           )
 
         // TODO: superios finalize screen text
@@ -529,29 +530,35 @@ public struct AppView: View {
         // TODO: superios finalize screen text
         case .onboarding(.supervision(.resume(.explainProfileDownload))):
           ButtonScreenView(
-            text: "Safari will open to download the profile. After it downloads, you'll see a prompt to install it.",
-            primary: self.btn(text: "Open Safari", .primary),
+            text: "When the browser opens, tap \"Allow\" to download the profile.",
+            primary: self.btn(text: "Got it", .primary),
           )
 
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.resume(.installingProfile))):
+        case .onboarding(.supervision(.resume(.installingProfile(let profileUrl)))):
+          ProfileDownloadView(profileUrl: profileUrl, osMajorVersion: self.osMajorVersion) {
+            self.store.send(.interactive(.onboardingBtnTapped(.primary, "Safari dismissed")))
+          }
+
+        // TODO: superios finalize screen text + add graphic asset
+        case .onboarding(.supervision(.resume(.explainProfileInstall(let regainedFocus)))):
           ButtonScreenView(
-            text: "Installing profile... Please follow the prompts in Safari and Settings.",
-            primary: self.btn(text: "Continue", .primary),
+            text: "Now, open the Settings app:",
+            primary: self.btn(text: "Done, continue", .primary, disabled: !regainedFocus),
+            listItems: [
+              "Tap \"Profile Downloaded\" at top",
+              "Tap \"Install\"",
+              "Enter your passcode",
+              "Come back to this app",
+            ],
           )
 
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.resume(.explainProfileInstall))):
-          ButtonScreenView(
-            text: "Open the Settings app, tap 'Profile Downloaded', then tap 'Install' and enter your passcode.",
-            primary: self.btn(text: "I've installed it", .primary),
-          )
-
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.resume(.verifyingProfileInstall))):
-          ButtonScreenView(
-            text: "Verifying that the content filter is active...",
-            primary: self.btn(text: "Retry", .primary),
+        case .onboarding(.supervision(.resume(.verifyingProfileInstall(let didError)))):
+          // TODO: superios finalize screen text
+          SpinnerErrorView(
+            loadingText: "Verifying profile installation...",
+            errorText: "Profile not detected. Make sure you installed the profile in Settings.",
+            isError: didError,
+            onRetry: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Retry"))) },
           )
 
         // TODO: superios finalize screen text
@@ -611,8 +618,9 @@ public struct AppView: View {
     _ type: ButtonType,
     animate: Bool = true,
     async: Bool = false,
+    disabled: Bool = false,
   ) -> ButtonScreenView.Config {
-    .init(text, animate: animate, asyncAction: async) {
+    .init(text, animate: animate, asyncAction: async, disabled: disabled) {
       switch type {
       case .primary:
         self.store.send(.interactive(.onboardingBtnTapped(.primary, text)))
@@ -645,6 +653,74 @@ extension URL {
 #Preview {
   AppView(
     store: Store(initialState: IOSReducer.State()) {
+      IOSReducer()
+    },
+    osMajorVersion: 26,
+  )
+}
+
+#Preview("Profile Flow: Prompt Install") {
+  AppView(
+    store: Store(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.promptInstallProfile))),
+    )) {
+      IOSReducer()
+    },
+    osMajorVersion: 26,
+  )
+}
+
+#Preview("Profile Flow: Explain Download") {
+  AppView(
+    store: Store(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.explainProfileDownload))),
+    )) {
+      IOSReducer()
+    },
+    osMajorVersion: 26,
+  )
+}
+
+#Preview("Profile Flow: Installing") {
+  AppView(
+    store: Store(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.installingProfile(
+        profileUrl: URL(string: "https://api.gertrude.app/ios-device-profile/test-id")!,
+      )))),
+    )) {
+      IOSReducer()
+    },
+    osMajorVersion: 26,
+  )
+}
+
+#Preview("Profile Flow: Explain Install") {
+  AppView(
+    store: Store(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.explainProfileInstall()))),
+    )) {
+      IOSReducer()
+    },
+    osMajorVersion: 26,
+  )
+}
+
+#Preview("Profile Flow: Verifying") {
+  AppView(
+    store: Store(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.verifyingProfileInstall()))),
+    )) {
+      IOSReducer()
+    },
+    osMajorVersion: 26,
+  )
+}
+
+#Preview("Profile Flow: Verifying Error") {
+  AppView(
+    store: Store(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.verifyingProfileInstall(didError: true)))),
+    )) {
       IOSReducer()
     },
     osMajorVersion: 26,

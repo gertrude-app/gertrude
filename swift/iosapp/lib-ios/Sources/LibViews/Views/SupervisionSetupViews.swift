@@ -2,62 +2,6 @@ import SwiftUI
 
 // TODO: superios finalize screen text
 
-struct GenerateSetupCodeView: View {
-  @Environment(\.colorScheme) var cs
-
-  let isError: Bool
-  let onRetry: () -> Void
-
-  @State private var showBg = false
-
-  var body: some View {
-    ZStack {
-      Rectangle()
-        .fill(
-          Gradient(colors: [
-            Color(self.cs, light: .violet200, dark: .violet950.opacity(0.7)),
-            .clear,
-          ]),
-        )
-        .ignoresSafeArea()
-        .opacity(self.showBg ? 1 : 0)
-        .onAppear {
-          withAnimation(.smooth(duration: 0.7)) {
-            self.showBg = true
-          }
-        }
-
-      VStack(spacing: 24) {
-        Spacer()
-
-        if self.isError {
-          Image(systemName: "exclamationmark.triangle")
-            .font(.system(size: 50, weight: .light))
-            .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-
-          Text("Something went wrong generating your setup code. Please try again.")
-            .font(.system(size: 18, weight: .medium))
-            .multilineTextAlignment(.center)
-
-          BigButton("Retry", type: .button { self.onRetry() }, variant: .primary)
-            .padding(.top, 12)
-        } else {
-          ProgressView()
-            .scaleEffect(1.5)
-            .tint(Color(self.cs, light: .violet500, dark: .violet400))
-
-          Text("Generating your setup code...")
-            .font(.system(size: 18, weight: .medium))
-        }
-
-        Spacer()
-      }
-      .frame(maxWidth: 500)
-      .padding(30)
-    }
-  }
-}
-
 struct InstructionsForProtectorView: View {
   @Environment(\.colorScheme) var cs
 
@@ -199,14 +143,6 @@ struct WaitingForSupervisionView: View {
       .padding(.top, 50)
     }
   }
-}
-
-#Preview("GenerateSetupCode - Loading") {
-  GenerateSetupCodeView(isError: false, onRetry: {})
-}
-
-#Preview("GenerateSetupCode - Error") {
-  GenerateSetupCodeView(isError: true, onRetry: {})
 }
 
 #Preview("InstructionsForProtector") {
