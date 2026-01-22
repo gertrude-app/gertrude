@@ -8,26 +8,36 @@ struct ButtonScreenView: View {
     var type: BigButton.ButtonType
     var animate: Bool
     var asyncAction: Bool
+    var disabled: Bool
 
     init(
       text: String,
       type: BigButton.ButtonType,
       animate: Bool = true,
       asyncAction: Bool = false,
+      disabled: Bool = false,
     ) {
       self.text = text
       self.type = type
       self.animate = animate
       self.asyncAction = asyncAction
+      self.disabled = disabled
     }
 
     init(
       _ text: String,
       animate: Bool = true,
       asyncAction: Bool = false,
+      disabled: Bool = false,
       _ action: @escaping () -> Void,
     ) {
-      self.init(text: text, type: .button(action), animate: animate, asyncAction: asyncAction)
+      self.init(
+        text: text,
+        type: .button(action),
+        animate: animate,
+        asyncAction: asyncAction,
+        disabled: disabled,
+      )
     }
   }
 
@@ -147,6 +157,7 @@ struct ButtonScreenView: View {
                 isLoading: self.$primaryButtonStatus.isLoading,
               ),
               variant: self.primaryLooksLikeSecondary ? .secondary : .primary,
+              disabled: config.disabled,
             )
             .swooshIn(
               tracking: self.$primaryButtonStatus.offset,
@@ -171,6 +182,7 @@ struct ButtonScreenView: View {
                 isLoading: self.$secondaryButtonStatus.isLoading,
               ),
               variant: .secondary,
+              disabled: config.disabled,
             )
             .swooshIn(
               tracking: self.$secondaryButtonStatus.offset,
@@ -194,6 +206,7 @@ struct ButtonScreenView: View {
                 isLoading: self.$tertiaryButtonStatus.isLoading,
               ),
               variant: .secondary,
+              disabled: config.disabled,
             )
             .swooshIn(
               tracking: self.$tertiaryButtonStatus.offset,

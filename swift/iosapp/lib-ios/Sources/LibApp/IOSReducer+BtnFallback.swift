@@ -157,24 +157,24 @@ extension IOSReducer.Onboarding.Supervision.Setup {
 extension IOSReducer.Onboarding.Supervision.Resume {
   func fallbackDestination(from btn: OnboardingBtn) -> IOSReducer.Screen {
     switch (self, btn) {
-    case (.supervisionDetected, _):
-      .onboarding(.supervision(.resume(.verifyingConnection)))
-    case (.verifyingConnection, _):
-      .onboarding(.supervision(.resume(.verifyingConnection)))
-    case (.connectionVerified, _):
+    case (.codeNotClaimed(let code), _):
+      .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
+    case (.codeClaimedNotSupervised(_), .primary):
       .onboarding(.supervision(.resume(.promptInstallProfile)))
-    case (.codeNotClaimed, _):
-      .onboarding(.supervision(.resume(.verifyingConnection)))
+    case (.codeClaimedNotSupervised(_), _):
+      .onboarding(.supervision(.setup(.askHasProtector)))
+    case (.retrySupervision, _):
+      .onboarding(.supervision(.setup(.askHasProtector)))
     case (.promptInstallProfile, _):
       .onboarding(.supervision(.resume(.explainProfileDownload)))
     case (.explainProfileDownload, _):
-      .onboarding(.supervision(.resume(.installingProfile)))
-    case (.installingProfile, _):
-      .onboarding(.supervision(.resume(.explainProfileInstall)))
+      .onboarding(.supervision(.resume(.promptInstallProfile)))
+    case (.installingProfile(_), _):
+      .onboarding(.supervision(.resume(.explainProfileInstall())))
     case (.explainProfileInstall, _):
-      .onboarding(.supervision(.resume(.verifyingProfileInstall)))
-    case (.verifyingProfileInstall, _):
-      .onboarding(.supervision(.resume(.profileInstalled)))
+      .onboarding(.supervision(.resume(.verifyingProfileInstall())))
+    case (.verifyingProfileInstall(didError: _), _):
+      .onboarding(.supervision(.resume(.explainProfileInstall())))
     case (.profileInstalled, _):
       .onboarding(.supervision(.resume(.setupComplete)))
     case (.setupComplete, _):

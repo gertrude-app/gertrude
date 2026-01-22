@@ -1,6 +1,7 @@
 import ConcurrencyExtras
 import Dependencies
 import GertieIOS
+import IOSRoute
 import LibCore
 import NetworkExtension
 import Testing
@@ -19,7 +20,7 @@ struct ControllerProxyTest {
   let loadProtectionModeCalls: LockIsolated<Int> = .init(0)
   let savedProtectionModes: LockIsolated<[ProtectionMode]> = .init([])
   let fetchBlockRulesCalls: LockIsolated<[Both<UUID, [BlockGroup]>]> = .init([])
-  let connectedRulesCalls: LockIsolated<[UUID]> = .init([])
+  let connectedRulesCalls: LockIsolated<Int> = .init(0)
   let setAuthTokenCalls: LockIsolated<[UUID?]> = .init([])
 
   let _proxy: LockIsolated<ControllerProxy?> = .init(nil)
@@ -63,12 +64,12 @@ func setup(
       test.fetchBlockRulesCalls.withValue { $0.append(Both(vendorId, disabledGroups)) }
       return apiNormalRules
     }
-    $0.api.connectedRules = { vendorId in
-      test.connectedRulesCalls.withValue { $0.append(vendorId) }
+    $0.api.connectedRules = {
+      test.connectedRulesCalls.withValue { $0 += 1 }
       return .init(blockRules: apiConnectedRules, webPolicy: apiWebPolicy)
     }
-    $0.api.setAuthToken = { token in
-      test.setAuthTokenCalls.withValue { $0.append(token) }
+    $0.api.setAccountConnection = { conn in
+      test.setAuthTokenCalls.withValue { $0.append(conn?.token) }
     }
     $0.sharedStorage.loadDisabledBlockGroups = {
       test.loadDisabledBlockGroupsCalls.withValue { $0 += 1 }
@@ -80,11 +81,12 @@ func setup(
     }
     $0.sharedStorage.loadAccountConnection = {
       test.loadAccountConnectionCalled.withValue { $0 += 1 }
-      return !accountConnected ? nil : .init(
+      return !accountConnected ? nil : ChildIOSDeviceData_v2(
         childId: UUID(),
         token: UUID(2),
         deviceId: UUID(),
         childName: "Little Jimmy",
+        supervised: nil,
       )
     }
     $0.sharedStorage.saveProtectionMode = { mode in
@@ -221,7 +223,7 @@ func setup(
 
   #expect(refreshed == true)
   #expect(test.setAuthTokenCalls.value == [UUID(2)])
-  #expect(test.connectedRulesCalls.value == [UUID(1)])
+  #expect(test.connectedRulesCalls.value == 1)
   #expect(test.savedProtectionModes.value == [
     .connected([.targetContains(value: "connected.com")], .blockAll),
   ])

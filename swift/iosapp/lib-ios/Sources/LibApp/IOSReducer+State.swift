@@ -132,16 +132,16 @@ extension IOSReducer {
         case waitingForSupervision(code: Int)
       }
 
+      // these states occur after rebooting into supervision
       public enum Resume: Equatable {
-        case supervisionDetected
-        case verifyingConnection
-        case connectionVerified
-        case codeNotClaimed
+        case codeNotClaimed(code: Int)
+        case codeClaimedNotSupervised(regainedFocus: Bool = false)
+        case retrySupervision
         case promptInstallProfile
         case explainProfileDownload
-        case installingProfile
-        case explainProfileInstall
-        case verifyingProfileInstall
+        case installingProfile(profileUrl: URL)
+        case explainProfileInstall(regainedFocus: Bool = false)
+        case verifyingProfileInstall(didError: Bool = false)
         case profileInstalled
         case setupComplete
       }

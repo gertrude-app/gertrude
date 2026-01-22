@@ -28,29 +28,39 @@ extension CheckSupervisionStatus: Resolver {
 
     let child = try await ctx.db.find(childId)
 
+    // NB: this invariant will be going a way soon, when we move supervision to join
+    guard let claimCode = device.supervisionClaimCode else {
+      logIOSUnexpected("d4f5e6c2", "deviceId=\(device.id)")
+      throw Abort(.internalServerError)
+    }
+
+    let token: IOSApp.Token
+    let existingToken = try? await IOSApp.Token.query()
+      .where(.deviceId == device.id)
+      .first(in: ctx.db)
+    if let existingToken {
+      token = existingToken
+    } else {
+      token = try await ctx.db.create(IOSApp.Token(deviceId: device.id))
+    }
+
+    let data = ChildIOSDeviceData_v2(
+      childId: child.id.rawValue,
+      token: token.value.rawValue,
+      deviceId: device.id.rawValue,
+      childName: child.name,
+      supervised: .byGertrude(claimCode: claimCode),
+    )
+
     if !device.isSupervised {
-      return .claimed(.init(childName: child.name))
+      return .claimed(data)
     }
 
     if !device.isProfileInstalled {
-      let token: IOSApp.Token
-      let existingToken = try? await IOSApp.Token.query()
-        .where(.deviceId == device.id)
-        .first(in: ctx.db)
-      if let existingToken {
-        token = existingToken
-      } else {
-        token = try await ctx.db.create(IOSApp.Token(deviceId: device.id))
-      }
-      return .supervised(.init(
-        childName: child.name,
-        deviceToken: token.value.rawValue,
-        // TODO: superios task 07 will handle this
-        profileUrl: "https://todo.com/future/task/",
-      ))
+      return .missingProfile(data)
     }
 
-    return .complete
+    return .complete(data)
   }
 }
 

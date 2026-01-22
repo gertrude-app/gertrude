@@ -12,8 +12,7 @@ final class MarkSetupCompleteResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.db.update(child.device)
 
     let output = try await MarkSetupComplete.resolve(in: child.context)
-
-    expect(output.childName).toEqual(child.name)
+    expect(output).toEqual(.success)
 
     let updated = try await self.db.find(child.device.id)
     expect(updated.isProfileInstalled).toEqual(true)
@@ -34,7 +33,7 @@ final class MarkSetupCompleteResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await MarkSetupComplete.resolve(in: child.context)
 
-    expect(output.childName).toEqual(child.name)
+    expect(output).toEqual(.success)
   }
 
   func testNotSupervised_throwsError() async throws {

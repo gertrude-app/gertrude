@@ -15,11 +15,11 @@ final class ConnectDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     } operation: {
       let code = await with(dependency: \.ephemeral)
         .createPendingAppConnection(child.id)
-      return try await ConnectDevice.resolve(
+      return try await ConnectDevice_v2.resolve(
         with: .init(
           verificationCode: code,
           vendorId: vendorId,
-          deviceType: "iPhone",
+          modelIdentifier: "iPhone14,2",
           appVersion: "1.5.0",
           iosVersion: "18.4.0",
         ),

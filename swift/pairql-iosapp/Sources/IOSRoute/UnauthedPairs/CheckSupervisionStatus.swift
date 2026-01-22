@@ -16,30 +16,10 @@ public struct CheckSupervisionStatus: Pair {
 
   public enum Output: PairOutput {
     case pending
-    case claimed(ClaimedData)
-    case supervised(SupervisedData)
-    case complete
     case expired
     case notFound
-
-    public struct ClaimedData: Codable, Equatable, Sendable {
-      public var childName: String
-
-      public init(childName: String) {
-        self.childName = childName
-      }
-    }
-
-    public struct SupervisedData: Codable, Equatable, Sendable {
-      public var childName: String
-      public var deviceToken: UUID
-      public var profileUrl: String
-
-      public init(childName: String, deviceToken: UUID, profileUrl: String) {
-        self.childName = childName
-        self.deviceToken = deviceToken
-        self.profileUrl = profileUrl
-      }
-    }
+    case claimed(ChildIOSDeviceData_v2)
+    case missingProfile(ChildIOSDeviceData_v2)
+    case complete(ChildIOSDeviceData_v2)
   }
 }

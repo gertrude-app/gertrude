@@ -105,7 +105,7 @@ struct InfoView: View {
     return "\(enabled)/\(total) groups enabled"
   }
 
-  func connectedView(connection: ChildIOSDeviceData) -> some View {
+  func connectedView(connection: ChildIOSDeviceData_v2) -> some View {
     GeometryReader { geometry in
       ScrollView {
         VStack(spacing: 24) {

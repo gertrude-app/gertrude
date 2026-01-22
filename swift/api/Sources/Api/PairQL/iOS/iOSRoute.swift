@@ -16,9 +16,6 @@ extension IOSRoute: RouteResponder {
       case .checkSupervisionStatus(let input):
         let output = try await CheckSupervisionStatus.resolve(with: input, in: context)
         return try await self.respond(with: output)
-      case .connectDevice(let input):
-        let output = try await ConnectDevice.resolve(with: input, in: context)
-        return try await self.respond(with: output)
       case .connectDevice_v2(let input):
         let output = try await ConnectDevice_v2.resolve(with: input, in: context)
         return try await self.respond(with: output)

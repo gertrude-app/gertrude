@@ -7,6 +7,7 @@ import SwiftUI
 struct IOSAppEntry: App {
   let store: StoreOf<IOSReducer>
   @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+  @Environment(\.scenePhase) private var scenePhase
 
   var osMajorVersion: Int {
     ProcessInfo.processInfo.operatingSystemVersion.majorVersion
@@ -27,6 +28,18 @@ struct IOSAppEntry: App {
       AppView(store: self.store, osMajorVersion: self.osMajorVersion)
         .onAppear {
           self.store.send(.programmatic(.appDidLaunch))
+        }
+        .onChange(of: self.scenePhase) { _, newPhase in
+          switch newPhase {
+          case .active:
+            self.store.send(.programmatic(.appDidEnterForeground))
+          case .background:
+            self.store.send(.programmatic(.appDidEnterBackground))
+          case .inactive:
+            break
+          @unknown default:
+            break
+          }
         }
     }
   }
