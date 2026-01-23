@@ -20,24 +20,20 @@ extension MarkSupervisionVerified: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let validated = try await SuperviseRoute.validatedSupervisionCode(
       code: input.code,
-      baseId: "1f768983", // 1f768983-1, 1f768983-2, 1f768983-3, 1f768983-4
+      baseId: "1f768983", // 1f768983-1, 1f768983-2, 1f768983-3
       in: context,
     )
 
-    var device = try await IOSApp.Device.query()
-      .where(.childId == validated.claimedChildId)
-      .where(.id == validated.device.id)
-      .first(in: context.db)
-
-    device.isSupervised = true
-    try await context.db.update(device)
+    var supervision = validated.supervision
+    supervision.supervisedAt = get(dependency: \.date.now)
+    try await context.db.update(supervision)
 
     try await context.db.create(IOSEvent(
       eventId: "09748184",
       kind: .supervision,
       detail: "supervision_verified: code=\(input.code)",
-      deviceId: device.id,
-      modelIdentifier: device.modelIdentifier,
+      deviceId: validated.device.id,
+      modelIdentifier: validated.device.modelIdentifier,
       iosVersion: validated.device.iosVersion,
     ))
 

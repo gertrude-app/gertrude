@@ -25,17 +25,19 @@ struct GetClaimDeviceData: Pair {
 
 extension GetClaimDeviceData: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    let device = try? await IOSApp.Device.query()
-      .where(.supervisionClaimCode == input.code)
+    let supervision = try? await IOSApp.Supervision.query()
+      .where(.claimCode == input.code)
       .first(in: context.db)
 
-    guard let device else {
+    guard let supervision else {
       logIOSUnusual("7e7fb536", "supervision code not found")
       let msg = "Code not found. Double-check and try again."
       throw context.error("7e7fb536", .notFound, user: msg)
     }
 
-    if (device.claimCodeExpiresAt ?? .distantPast) < get(dependency: \.date.now) {
+    let device = try await supervision.device(in: context.db)
+
+    if supervision.claimCodeExpiresAt < get(dependency: \.date.now) {
       logIOSUnusual("87a02411", "supervision code expired")
       let msg = "This code has expired. Please generate a new one."
       throw context.error("87a02411", .badRequest, user: msg)

@@ -8,14 +8,17 @@ import XExpect
 
 final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendable {
   func testNotFound_vendorIdMismatch() async throws {
-    let deviceId = UUID()
-    try await self.db.create(IOSApp.Device(
-      id: .init(deviceId),
+    let code = Int.random(in: 100_000 ... 999_999)
+    let device = try await self.db.create(IOSApp.Device(
+      id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      supervisionClaimCode: Int.random(in: 100_000 ... 999_999),
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
     ))
 
@@ -25,7 +28,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
       try await CheckSupervisionStatus.resolve(
         with: .init(
           vendorId: UUID(), // <-- different from device id
-          code: Int.random(in: 100_000 ... 999_999),
+          code: code,
         ),
         in: .mock,
       )
@@ -34,15 +37,17 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
   }
 
   func testPending_codeExistsNotClaimed() async throws {
-    let deviceId = UUID()
     let code = Int.random(in: 100_000 ... 999_999)
-    try await self.db.create(IOSApp.Device(
-      id: .init(deviceId),
+    let device = try await self.db.create(IOSApp.Device(
+      id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      supervisionClaimCode: code,
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
     ))
 
@@ -50,7 +55,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
       $0.date = .constant(.reference)
     } operation: {
       try await CheckSupervisionStatus.resolve(
-        with: .init(vendorId: deviceId, code: code),
+        with: .init(vendorId: device.id.rawValue, code: code),
         in: .mock,
       )
     }
@@ -58,15 +63,17 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
   }
 
   func testExpired() async throws {
-    let deviceId = UUID()
     let code = Int.random(in: 100_000 ... 999_999)
-    try await self.db.create(IOSApp.Device(
-      id: .init(deviceId),
+    let device = try await self.db.create(IOSApp.Device(
+      id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      supervisionClaimCode: code,
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: code,
       claimCodeExpiresAt: .reference - .days(1),
     ))
 
@@ -74,7 +81,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
       $0.date = .constant(.reference)
     } operation: {
       try await CheckSupervisionStatus.resolve(
-        with: .init(vendorId: deviceId, code: code),
+        with: .init(vendorId: device.id.rawValue, code: code),
         in: .mock,
       )
     }
@@ -82,20 +89,22 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
   }
 
   func testClaimed_notYetSupervised() async throws {
-    let deviceId = UUID()
     let code = Int.random(in: 100_000 ... 999_999)
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let uuids = MockUUIDs()
-    try await self.db.create(IOSApp.Device(
-      id: .init(deviceId),
+    let device = try await self.db.create(IOSApp.Device(
+      id: .init(),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      isSupervised: false,
-      supervisionClaimCode: code,
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
+      claimedAt: .reference,
     ))
 
     let output = try await withDependencies {
@@ -103,7 +112,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
       $0.uuid = .mock(uuids)
     } operation: {
       try await CheckSupervisionStatus.resolve(
-        with: .init(vendorId: deviceId, code: code),
+        with: .init(vendorId: device.id.rawValue, code: code),
         in: .mock,
       )
     }
@@ -111,45 +120,45 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     expect(output).toEqual(.claimed(.init(
       childId: child.id.rawValue,
       token: uuids[1],
-      deviceId: deviceId,
+      deviceId: device.id.rawValue,
       childName: child.name,
       supervised: .byGertrude(claimCode: code),
     )))
   }
 
   func testSupervised_notYetProfileInstalled() async throws {
-    let deviceId = UUID()
     let code = Int.random(in: 100_000 ... 999_999)
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSApp.Device(
-      id: .init(deviceId),
+      id: .init(),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      isSupervised: true,
-      isProfileInstalled: false,
-      supervisionClaimCode: code,
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
+      claimedAt: .reference,
+      supervisedAt: .reference,
     ))
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
       try await CheckSupervisionStatus.resolve(
-        with: .init(vendorId: deviceId, code: code),
+        with: .init(vendorId: device.id.rawValue, code: code),
         in: .mock,
       )
     }
 
     guard case .missingProfile(let data) = output else {
-      XCTFail("Expected .supervised, got \(output)")
+      XCTFail("Expected .missingProfile, got \(output)")
       return
     }
     expect(data.childName).toEqual(child.name)
-    // TODO: superios task 07 will handle this
-    // expect(data.profileUrl).toEqual(???)
 
     let token = try await IOSApp.Token.query()
       .where(.deviceId == device.id)
@@ -158,21 +167,24 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
   }
 
   func testComplete_allFieldsSet() async throws {
-    let deviceId = UUID()
     let code = Int.random(in: 100_000 ... 999_999)
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let uuids = MockUUIDs()
-    try await self.db.create(IOSApp.Device(
-      id: .init(deviceId),
+    let device = try await self.db.create(IOSApp.Device(
+      id: .init(),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      isSupervised: true,
-      isProfileInstalled: true,
-      supervisionClaimCode: code,
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
+      claimedAt: .reference,
+      supervisedAt: .reference,
+      profileInstalledAt: .reference,
     ))
 
     let output = try await withDependencies {
@@ -180,7 +192,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
       $0.uuid = .mock(uuids)
     } operation: {
       try await CheckSupervisionStatus.resolve(
-        with: .init(vendorId: deviceId, code: code),
+        with: .init(vendorId: device.id.rawValue, code: code),
         in: .mock,
       )
     }
@@ -188,7 +200,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     expect(output).toEqual(.complete(.init(
       childId: child.id.rawValue,
       token: uuids[1],
-      deviceId: deviceId,
+      deviceId: device.id.rawValue,
       childName: child.name,
       supervised: .byGertrude(claimCode: code),
     )))

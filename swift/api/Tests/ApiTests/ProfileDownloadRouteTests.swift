@@ -8,9 +8,14 @@ import XExpect
 
 final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
   func testSupervisedDevice_returnsProfileWithCorrectHeaders() async throws {
-    let device = try await self.db.create(IOSApp.Device.mock {
-      $0.isSupervised = true // <-- supervised
-    })
+    let device = try await self.db.create(IOSApp.Device.mock)
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: .random(in: 100_000 ... 999_999),
+      claimCodeExpiresAt: .reference + .days(7),
+      claimedAt: .reference,
+      supervisedAt: .reference,
+    ))
 
     try await app.test(
       .GET,
@@ -28,9 +33,7 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testNonSupervisedDevice_returns404() async throws {
-    let device = try await self.db.create(IOSApp.Device.mock {
-      $0.isSupervised = false // <-- non-supervised
-    })
+    let device = try await self.db.create(IOSApp.Device.mock)
 
     try await app.test(
       .GET,

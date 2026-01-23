@@ -5,13 +5,14 @@ import Vapor
 
 extension CheckSupervisionStatus: Resolver {
   static func resolve(with input: Input, in ctx: Context) async throws -> Output {
-    let device = try? await IOSApp.Device.query()
-      .where(.supervisionClaimCode == input.code)
+    let supervision = try? await IOSApp.Supervision.query()
+      .where(.claimCode == input.code)
       .first(in: ctx.db)
 
-    guard let device else {
+    guard let supervision else {
       return .notFound
     }
+    let device = try await supervision.device(in: ctx.db)
 
     if device.id.rawValue != input.vendorId {
       logIOSUnusual("233c41a8", "vendorId mismatch, c=\(input.code), v=\(input.vendorId)")
@@ -19,7 +20,7 @@ extension CheckSupervisionStatus: Resolver {
     }
 
     guard let childId = device.childId else {
-      if let expiresAt = device.claimCodeExpiresAt, expiresAt < get(dependency: \.date.now) {
+      if supervision.claimCodeExpiresAt < get(dependency: \.date.now) {
         logIOSUnusual("92fe7bb1", "expired, code=\(input.code)")
         return .expired
       }
@@ -27,13 +28,6 @@ extension CheckSupervisionStatus: Resolver {
     }
 
     let child = try await ctx.db.find(childId)
-
-    // NB: this invariant will be going a way soon, when we move supervision to join
-    guard let claimCode = device.supervisionClaimCode else {
-      logIOSUnexpected("d4f5e6c2", "deviceId=\(device.id)")
-      throw Abort(.internalServerError)
-    }
-
     let token: IOSApp.Token
     let existingToken = try? await IOSApp.Token.query()
       .where(.deviceId == device.id)
@@ -49,14 +43,14 @@ extension CheckSupervisionStatus: Resolver {
       token: token.value.rawValue,
       deviceId: device.id.rawValue,
       childName: child.name,
-      supervised: .byGertrude(claimCode: claimCode),
+      supervised: .byGertrude(claimCode: supervision.claimCode),
     )
 
-    if !device.isSupervised {
+    if supervision.supervisedAt == nil {
       return .claimed(data)
     }
 
-    if !device.isProfileInstalled {
+    if supervision.profileInstalledAt == nil {
       return .missingProfile(data)
     }
 

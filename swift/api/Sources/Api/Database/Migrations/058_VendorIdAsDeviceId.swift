@@ -160,12 +160,20 @@ struct VendorIdAsDeviceId: GertieMigration {
 
     // 11. re-add fk constraints
     try await sql.execute("""
+      DELETE FROM iosapp.block_rules
+      WHERE device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
+    try await sql.execute("""
       ALTER TABLE iosapp.block_rules
       ADD CONSTRAINT fk_block_rules_device_id
       FOREIGN KEY (device_id)
       REFERENCES child.ios_devices(id) ON DELETE CASCADE;
     """)
 
+    try await sql.execute("""
+      DELETE FROM iosapp.device_block_groups
+      WHERE device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
     try await sql.execute("""
       ALTER TABLE iosapp.device_block_groups
       ADD CONSTRAINT fk_device_block_groups_device_id
@@ -174,12 +182,20 @@ struct VendorIdAsDeviceId: GertieMigration {
     """)
 
     try await sql.execute("""
+      DELETE FROM child.iosapp_tokens
+      WHERE device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
+    try await sql.execute("""
       ALTER TABLE child.iosapp_tokens
       ADD CONSTRAINT fk_iosapp_tokens_ios_device_id
       FOREIGN KEY (device_id)
       REFERENCES child.ios_devices(id) ON DELETE CASCADE;
     """)
 
+    try await sql.execute("""
+      DELETE FROM child.screenshots
+      WHERE ios_device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
     try await sql.execute("""
       ALTER TABLE child.screenshots
       ADD CONSTRAINT fk_screenshots_ios_device_id
@@ -188,12 +204,20 @@ struct VendorIdAsDeviceId: GertieMigration {
     """)
 
     try await sql.execute("""
+      DELETE FROM iosapp.suspend_filter_requests
+      WHERE device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
+    try await sql.execute("""
       ALTER TABLE iosapp.suspend_filter_requests
       ADD CONSTRAINT fk_suspend_filter_requests_iosapp_device_id
       FOREIGN KEY (device_id)
       REFERENCES child.ios_devices(id) ON DELETE CASCADE;
     """)
 
+    try await sql.execute("""
+      DELETE FROM iosapp.web_policy_domains
+      WHERE device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
     try await sql.execute("""
       ALTER TABLE iosapp.web_policy_domains
       ADD CONSTRAINT fk_web_policy_domains_device_id
@@ -208,6 +232,10 @@ struct VendorIdAsDeviceId: GertieMigration {
     """)
 
     // 13. add fk on events.device_id -> ios_devices.id
+    try await sql.execute("""
+      DELETE FROM iosapp.events
+      WHERE device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
     try await sql.execute("""
       ALTER TABLE iosapp.events
       ADD CONSTRAINT fk_events_device_id
@@ -375,12 +403,20 @@ struct VendorIdAsDeviceId: GertieMigration {
 
     // re-add fk constraints
     try await sql.execute("""
+      DELETE FROM iosapp.block_rules
+      WHERE device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
+    try await sql.execute("""
       ALTER TABLE iosapp.block_rules
       ADD CONSTRAINT fk_block_rules_device_id
       FOREIGN KEY (device_id)
       REFERENCES child.ios_devices(id) ON DELETE CASCADE;
     """)
 
+    try await sql.execute("""
+      DELETE FROM iosapp.device_block_groups
+      WHERE device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
     try await sql.execute("""
       ALTER TABLE iosapp.device_block_groups
       ADD CONSTRAINT fk_device_block_groups_device_id
@@ -389,12 +425,20 @@ struct VendorIdAsDeviceId: GertieMigration {
     """)
 
     try await sql.execute("""
+      DELETE FROM child.iosapp_tokens
+      WHERE device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
+    try await sql.execute("""
       ALTER TABLE child.iosapp_tokens
       ADD CONSTRAINT fk_iosapp_tokens_ios_device_id
       FOREIGN KEY (device_id)
       REFERENCES child.ios_devices(id) ON DELETE CASCADE;
     """)
 
+    try await sql.execute("""
+      DELETE FROM child.screenshots
+      WHERE ios_device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
     try await sql.execute("""
       ALTER TABLE child.screenshots
       ADD CONSTRAINT fk_screenshots_ios_device_id
@@ -403,12 +447,20 @@ struct VendorIdAsDeviceId: GertieMigration {
     """)
 
     try await sql.execute("""
+      DELETE FROM iosapp.suspend_filter_requests
+      WHERE device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
+    try await sql.execute("""
       ALTER TABLE iosapp.suspend_filter_requests
       ADD CONSTRAINT fk_suspend_filter_requests_iosapp_device_id
       FOREIGN KEY (device_id)
       REFERENCES child.ios_devices(id) ON DELETE CASCADE;
     """)
 
+    try await sql.execute("""
+      DELETE FROM iosapp.web_policy_domains
+      WHERE device_id NOT IN (SELECT id FROM child.ios_devices);
+    """)
     try await sql.execute("""
       ALTER TABLE iosapp.web_policy_domains
       ADD CONSTRAINT fk_web_policy_domains_device_id

@@ -22,7 +22,7 @@ extension RecordDeviceConnection: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let validated = try await SuperviseRoute.validatedSupervisionCode(
       code: input.code,
-      baseId: "421f7e7d", // 421f7e7d-1, 421f7e7d-2, 421f7e7d-3, 421f7e7d-4
+      baseId: "421f7e7d", // 421f7e7d-1, 421f7e7d-2, 421f7e7d-3
       in: context,
     )
 
@@ -31,18 +31,16 @@ extension RecordDeviceConnection: Resolver {
       throw context.error("d78fbde0", .badRequest, user: "Unexpected error")
     }
 
-    var device = try await IOSApp.Device.query()
-      .where(.childId == validated.claimedChildId)
-      .where(.id == validated.device.id)
-      .first(in: context.db)
+    var supervision = validated.supervision
+    let device = validated.device
 
-    if let existingUdid = device.udid, existingUdid != input.udid {
+    if let existingUdid = supervision.udid, existingUdid != input.udid {
       logIOSUnexpected("6eaabffb", "udid mismatch")
       throw context.error("6eaabffb", .badRequest, user: "Unexpected error")
     }
 
-    device.udid = input.udid
-    try await context.db.update(device)
+    supervision.udid = input.udid
+    try await context.db.update(supervision)
 
     try await context.db.create(IOSEvent(
       eventId: "86af13a9",

@@ -25,6 +25,7 @@ extension LogIOSEvent_v2: Resolver {
         id: deviceId!,
         modelIdentifier: input.modelIdentifier,
         iosVersion: input.iOSVersion,
+        appVersion: input.appVersion,
         in: context.db,
       )
     }

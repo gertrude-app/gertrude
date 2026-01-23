@@ -14,13 +14,14 @@ enum SupervisionToolDownloadRoute {
       throw Abort(.badRequest, reason: "Invalid platform (must be 'mac' or 'windows')")
     }
 
-    guard let device = try? await IOSApp.Device.query()
-      .where(.supervisionClaimCode == code)
+    guard let supervision = try? await IOSApp.Supervision.query()
+      .where(.claimCode == code)
       .first(in: request.context.db) else {
       throw Abort(.notFound, reason: "Device not found for claim code")
     }
 
     let task = Task {
+      let device = try await supervision.device(in: request.context.db)
       try await request.context.db.create(IOSEvent(
         eventId: "7d644b4d",
         kind: .supervision,

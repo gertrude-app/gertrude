@@ -9,11 +9,6 @@ extension IOSApp {
     var appVersion: String
     var iosVersion: String
     var webPolicy: String
-    var isSupervised: Bool
-    var udid: String?
-    var isProfileInstalled: Bool
-    var supervisionClaimCode: Int?
-    var claimCodeExpiresAt: Date?
     var createdAt = Date()
     var updatedAt = Date()
 
@@ -24,11 +19,6 @@ extension IOSApp {
       appVersion: String,
       iosVersion: String,
       webPolicy: String = "blockAll",
-      isSupervised: Bool = false,
-      udid: String? = nil,
-      isProfileInstalled: Bool = false,
-      supervisionClaimCode: Int? = nil,
-      claimCodeExpiresAt: Date? = nil,
     ) {
       self.id = id
       self.childId = childId
@@ -36,32 +26,28 @@ extension IOSApp {
       self.appVersion = appVersion
       self.iosVersion = iosVersion
       self.webPolicy = webPolicy
-      self.isSupervised = isSupervised
-      self.udid = udid
-      self.isProfileInstalled = isProfileInstalled
-      self.supervisionClaimCode = supervisionClaimCode
-      self.claimCodeExpiresAt = claimCodeExpiresAt
     }
   }
 }
 
 extension IOSApp.Device {
+  @discardableResult
   static func ensureExists(
     id: Id,
     modelIdentifier: String,
     iosVersion: String,
-    appVersion: String = "0.0.0",
+    appVersion: String,
     in db: any DuetSQL.Client,
-  ) async throws {
-    let existing = try? await db.find(id)
-    if existing == nil {
-      try await db.create(Self(
-        id: id,
-        modelIdentifier: modelIdentifier,
-        appVersion: appVersion,
-        iosVersion: iosVersion,
-      ))
+  ) async throws -> IOSApp.Device {
+    if let existing = try? await db.find(id) {
+      return existing
     }
+    return try await db.create(IOSApp.Device(
+      id: id,
+      modelIdentifier: modelIdentifier,
+      appVersion: appVersion,
+      iosVersion: iosVersion,
+    ))
   }
 }
 
@@ -94,6 +80,12 @@ extension IOSApp.Device {
     try await IOSApp.WebPolicyDomain.query()
       .where(.deviceId == self.id)
       .all(in: db)
+  }
+
+  func supervision(in db: any DuetSQL.Client) async throws -> IOSApp.Supervision? {
+    try? await IOSApp.Supervision.query()
+      .where(.deviceId == self.id)
+      .first(in: db)
   }
 
   func webContentFilterPolicy(

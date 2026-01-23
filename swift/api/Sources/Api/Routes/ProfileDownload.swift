@@ -16,7 +16,8 @@ enum ProfileDownloadRoute {
       throw Abort(.notFound)
     }
 
-    guard device.isSupervised else {
+    guard let supervision = try await device.supervision(in: req.context.db),
+          supervision.supervised else {
       logIOSUnusual("2b761bf2", "device not supervised: \(deviceId.lowercased)")
       throw Abort(.notFound)
     }

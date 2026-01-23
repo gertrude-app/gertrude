@@ -3,7 +3,6 @@ import DuetSQL
 import Gertie
 import GertieIOS
 import IOSRoute
-import Vapor
 
 extension ConnectDevice_v2: Resolver {
   static func resolve(with input: Input, in ctx: Context) async throws -> Output {
@@ -19,13 +18,13 @@ extension ConnectDevice_v2: Resolver {
     }
 
     let child = try await ctx.db.find(childId)
-    let device = try await ctx.db.create(IOSApp.Device(
+    let device = try await IOSApp.Device.ensureExists(
       id: .init(input.vendorId),
-      childId: childId,
       modelIdentifier: input.modelIdentifier,
-      appVersion: input.appVersion,
       iosVersion: input.iosVersion,
-    ))
+      appVersion: input.appVersion,
+      in: ctx.db,
+    )
     let token = try await ctx.db.create(IOSApp.Token(deviceId: device.id))
 
     let groups = try await IOSApp.BlockGroup.query().all(in: ctx.db)
@@ -35,14 +34,10 @@ extension ConnectDevice_v2: Resolver {
 
     ModelIdentifier.alertIfUnknown(input.modelIdentifier)
 
+    let supervision = try await device.supervision(in: ctx.db)
     var supervised: ChildIOSDeviceData_v2.Supervised? = nil
-    if device.isSupervised {
-      guard let claimCode = device.supervisionClaimCode else {
-        // NB: going away w/ supervision join table, remove vapor import
-        logIOSUnexpected("979dd459", "deviceId=\(device.id)")
-        throw Abort(.internalServerError)
-      }
-      supervised = .byGertrude(claimCode: claimCode)
+    if let supervision {
+      supervised = .byGertrude(claimCode: supervision.claimCode)
     } else if try await IOSEvent.query()
       .where(.deviceId == device.id)
       .where(.eventId == "bad8adcc")

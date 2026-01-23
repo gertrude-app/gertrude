@@ -102,12 +102,13 @@ extension ApiClient: DependencyKey {
         let deviceData = await device.data()
         do {
           _ = try await output(
-            from: LogIOSEvent.self,
-            withUnauthed: .logIOSEvent(.init(
+            from: LogIOSEvent_v2.self,
+            withUnauthed: .logIOSEvent_v2(.init(
               eventId: id,
               kind: "ios",
-              deviceType: deviceData.type.rawValue,
+              modelIdentifier: deviceData.modelIdentifier,
               iOSVersion: deviceData.iOSVersion,
+              appVersion: version,
               vendorId: deviceData.vendorId,
               detail: detail,
             )),

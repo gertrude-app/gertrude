@@ -32,12 +32,14 @@ final class CreateSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable
       .where(.id == deviceId)
       .first(in: self.db)
 
-    expect(device.supervisionClaimCode).toEqual(fixedCode)
     expect(device.id.rawValue).toEqual(deviceId)
     expect(device.modelIdentifier).toEqual("iPhone18,2")
     expect(device.iosVersion).toEqual("18.2")
     expect(device.appVersion).toEqual("1.0.0")
     expect(device.childId).toBeNil()
+
+    let supervision = try await device.supervision(in: self.db)!
+    expect(supervision.claimCode).toEqual(fixedCode)
 
     let secondOutput = try await withDependencies {
       $0.verificationCode = .init(generate: { Int.random(in: 100_000 ... 999_999) })
@@ -65,15 +67,16 @@ final class CreateSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable
 
   func testExpiredCode_createsNewCode() async throws {
     let deviceId = UUID()
-    let expiredDate = Date.reference - .days(8)
-
-    try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSApp.Device(
       id: .init(deviceId),
       modelIdentifier: "iPhone18,2",
       appVersion: "0.9.0",
       iosVersion: "17.0",
-      supervisionClaimCode: 111_111,
-      claimCodeExpiresAt: expiredDate,
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: 111_111,
+      claimCodeExpiresAt: .reference - .days(8),
     ))
 
     let newCode = Int.random(in: 100_000 ... 999_999)
@@ -95,22 +98,13 @@ final class CreateSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable
     expect(output.code).toEqual(newCode)
     expect(output.code).not.toEqual(111_111)
 
-    let devices = try await IOSApp.Device.query()
-      .where(.id == deviceId)
-      .all(in: self.db)
-    expect(devices).toHaveCount(1)
-
-    let device = devices[0]
-    expect(device.supervisionClaimCode).toEqual(newCode)
-    expect(device.iosVersion).toEqual("18.2")
-    expect(device.appVersion).toEqual("1.0.0")
+    let supervision = try await device.supervision(in: self.db)!
+    expect(supervision.claimCode).toEqual(newCode)
   }
 
-  func testExistingDevice_noCode_getsCodeAdded() async throws {
-    let deviceId = UUID()
-
-    try await self.db.create(IOSApp.Device(
-      id: .init(deviceId),
+  func testExistingDevice_noSupervision_getsSupervisionCreated() async throws {
+    let device = try await self.db.create(IOSApp.Device(
+      id: .init(),
       modelIdentifier: "iPhone17,1",
       appVersion: "0.8.0",
       iosVersion: "17.0",
@@ -123,7 +117,7 @@ final class CreateSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable
     } operation: {
       try await CreateSupervisionCode.resolve(
         with: .init(
-          deviceId: deviceId,
+          deviceId: device.id.rawValue,
           modelIdentifier: "iPhone18,2",
           iosVersion: "18.2",
           appVersion: "1.0.0",
@@ -134,10 +128,7 @@ final class CreateSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable
 
     expect(output.code).toEqual(newCode)
 
-    let device = try await self.db.find(IOSApp.Device.Id(deviceId))
-    expect(device.supervisionClaimCode).toEqual(newCode)
-    expect(device.claimCodeExpiresAt).not.toBeNil()
-    expect(device.modelIdentifier).toEqual("iPhone18,2")
-    expect(device.iosVersion).toEqual("18.2")
+    let supervision = try await device.supervision(in: self.db)!
+    expect(supervision.claimCodeExpiresAt).not.toBeNil()
   }
 }
