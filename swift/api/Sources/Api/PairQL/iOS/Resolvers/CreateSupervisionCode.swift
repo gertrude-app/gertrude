@@ -5,59 +5,53 @@ import Vapor
 
 extension CreateSupervisionCode: Resolver {
   static func resolve(with input: Input, in ctx: Context) async throws -> Output {
+    ModelIdentifier.alertIfUnknown(input.modelIdentifier)
     let now = get(dependency: \.date.now)
     let generator = get(dependency: \.verificationCode)
     let deviceId = IOSApp.Device.Id(input.deviceId)
 
-    let existing = try? await ctx.db.find(deviceId)
+    let device = try await IOSApp.Device.ensureExists(
+      id: deviceId,
+      modelIdentifier: input.modelIdentifier,
+      iosVersion: input.iosVersion,
+      appVersion: input.appVersion,
+      in: ctx.db,
+    )
 
-    if let existing, let code = existing.supervisionClaimCode,
-       let expiresAt = existing.claimCodeExpiresAt {
-      if expiresAt > now {
-        return Output(code: code, expiresAt: expiresAt)
-      } else {
-        var updated = existing
-        updated.supervisionClaimCode = nil
-        updated.claimCodeExpiresAt = nil
-        try await ctx.db.update(updated)
-      }
+    let existing = try await device.supervision(in: ctx.db)
+    if let existing, existing.claimCodeExpiresAt > now {
+      return Output(code: existing.claimCode, expiresAt: existing.claimCodeExpiresAt)
+    } else if let existing, existing.claimed {
+      return Output(code: existing.claimCode, expiresAt: .distantFuture)
     }
 
     for _ in 1 ... 20 {
       let code = generator.generate()
-      let codeExists = try await IOSApp.Device.query()
-        .where(.supervisionClaimCode == code)
+      let codeExists = try await IOSApp.Supervision.query()
+        .where(.claimCode == code)
         .exists(in: ctx.db)
       if codeExists {
         continue
       }
 
-      let expiresAt = now + .days(7)
-
-      if var device = existing {
-        device.supervisionClaimCode = code
-        device.claimCodeExpiresAt = expiresAt
-        device.modelIdentifier = input.modelIdentifier
-        device.iosVersion = input.iosVersion
-        device.appVersion = input.appVersion
-        try await ctx.db.update(device)
+      let supervision: IOSApp.Supervision
+      if var existing { // refresh expired supervision
+        existing.claimCode = code
+        existing.claimCodeExpiresAt = now + .days(7)
+        supervision = existing
+        try await ctx.db.update(supervision)
       } else {
-        try await ctx.db.create(IOSApp.Device(
-          id: deviceId,
-          modelIdentifier: input.modelIdentifier,
-          appVersion: input.appVersion,
-          iosVersion: input.iosVersion,
-          supervisionClaimCode: code,
-          claimCodeExpiresAt: expiresAt,
+        supervision = try await ctx.db.create(IOSApp.Supervision(
+          deviceId: device.id,
+          claimCode: code,
+          claimCodeExpiresAt: now + .days(7),
         ))
       }
 
-      ModelIdentifier.alertIfUnknown(input.modelIdentifier)
-
-      return Output(code: code, expiresAt: expiresAt)
+      return Output(code: code, expiresAt: supervision.claimCodeExpiresAt)
     }
 
-    let msg = "Unexpected collision failure creating supervision code"
+    let msg = "Unexpected collision failure creating supervision"
     await get(dependency: \.slack).error(msg)
     get(dependency: \.postmark).toSuperAdmin("Unexpected error", msg)
 

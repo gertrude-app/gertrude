@@ -9,6 +9,7 @@ extension LogIOSEvent: Resolver {
       kind: input.kind,
       modelIdentifier: ModelIdentifier.fromLegacyDeviceType(input.deviceType),
       iOSVersion: input.iOSVersion,
+      appVersion: "0.0.0", // unknown in v1
       vendorId: input.vendorId,
       detail: input.detail,
     )

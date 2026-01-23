@@ -10,6 +10,7 @@ public struct LogIOSEvent_v2: Pair {
     public var kind: String
     public var modelIdentifier: String
     public var iOSVersion: String
+    public var appVersion: String
     public var vendorId: UUID?
     public var detail: String?
 
@@ -18,6 +19,7 @@ public struct LogIOSEvent_v2: Pair {
       kind: String,
       modelIdentifier: String,
       iOSVersion: String,
+      appVersion: String,
       vendorId: UUID? = nil,
       detail: String? = nil,
     ) {
@@ -25,6 +27,7 @@ public struct LogIOSEvent_v2: Pair {
       self.kind = kind
       self.modelIdentifier = modelIdentifier
       self.iOSVersion = iOSVersion
+      self.appVersion = appVersion
       self.vendorId = vendorId
       self.detail = detail
     }

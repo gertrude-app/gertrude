@@ -39,6 +39,7 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
         kind: "event",
         modelIdentifier: "iPhone18,2",
         iOSVersion: "18.0.1",
+        appVersion: "1.5.0",
         vendorId: vendorId,
         detail: "first launch",
       ),
@@ -60,6 +61,7 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
       .first(in: self.db)
     expect(device.modelIdentifier).toEqual("iPhone18,2")
     expect(device.iosVersion).toEqual("18.0.1")
+    expect(device.appVersion).toEqual("1.5.0")
   }
 
   func testLogIOSEvent_legacy() async throws {

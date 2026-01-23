@@ -102,11 +102,25 @@ extension IOSApp.Device {
     case appVersion
     case iosVersion
     case webPolicy
-    case isSupervised
-    case udid
-    case isProfileInstalled
-    case supervisionClaimCode
+    case createdAt
+    case updatedAt
+  }
+}
+
+extension IOSApp.Supervision: Duet.Identifiable {
+  typealias Id = Tagged<IOSApp.Supervision, UUID>
+}
+
+extension IOSApp.Supervision {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case deviceId
+    case claimCode
     case claimCodeExpiresAt
+    case udid
+    case claimedAt
+    case supervisedAt
+    case profileInstalledAt
     case createdAt
     case updatedAt
   }

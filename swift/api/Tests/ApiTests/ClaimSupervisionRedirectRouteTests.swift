@@ -9,14 +9,17 @@ import XExpect
 final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable {
   func testValidCode_redirectsWithDeviceInfo() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
-    try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSApp.Device(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPad14,1",
       appVersion: "1.0.0",
       iosVersion: "17.5",
-      supervisionClaimCode: code,
-      claimCodeExpiresAt: Date.reference + .days(7),
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: code,
+      claimCodeExpiresAt: .reference + .days(7),
     ))
 
     try await app.test(
@@ -38,14 +41,18 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
   func testExpiredButClaimedCode_stillRedirectsWithDeviceInfo() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
     let child = try await self.child()
-    try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSApp.Device(
       id: .init(),
       childId: child.id,
       modelIdentifier: "iPhone17,1",
       appVersion: "1.0.0",
       iosVersion: "18.0",
-      supervisionClaimCode: code,
-      claimCodeExpiresAt: Date.reference - .days(30),
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: code,
+      claimCodeExpiresAt: .reference - .days(30),
+      claimedAt: .reference - .days(30),
     ))
 
     try await app.test(
@@ -90,14 +97,17 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
 
   func testExpiredUnclaimedCode_redirectsWithExpiredCodeError() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
-    try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSApp.Device(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      supervisionClaimCode: code,
-      claimCodeExpiresAt: Date.reference - .days(1),
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: code,
+      claimCodeExpiresAt: .reference - .days(1),
     ))
 
     try await app.test(

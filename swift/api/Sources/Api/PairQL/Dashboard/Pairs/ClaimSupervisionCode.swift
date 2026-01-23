@@ -33,16 +33,17 @@ struct ClaimSupervisionCode: Pair {
 // existing child if they already had a gertrude account
 extension ClaimSupervisionCode: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    let device = try? await IOSApp.Device.query()
-      .where(.supervisionClaimCode == input.code)
+    let supervision = try? await IOSApp.Supervision.query()
+      .where(.claimCode == input.code)
       .first(in: context.db)
 
-    guard var device else {
+    guard var supervision else {
       logIOSUnusual("4083a77f", "supervision code not found")
       let msg = "Code not found. Double-check and try again."
       throw context.error("4083a77f", .notFound, user: msg)
     }
 
+    var device = try await supervision.device(in: context.db)
     if let childId = device.childId {
       if let child = try? await context.verifiedChild(from: childId) {
         return .init(
@@ -58,7 +59,7 @@ extension ClaimSupervisionCode: Resolver {
       }
     }
 
-    if let expiresAt = device.claimCodeExpiresAt, expiresAt <= get(dependency: \.date.now) {
+    if supervision.claimCodeExpiresAt <= get(dependency: \.date.now) {
       logIOSUnusual("25bef9db", "supervision code expired")
       let msg = "This code has expired. Open the Gertrude app on the \(device.deviceType) to get a new one."
       throw context.error("25bef9db", .badRequest, user: msg)
@@ -73,6 +74,8 @@ extension ClaimSupervisionCode: Resolver {
 
     device.childId = child.id
     try await context.db.update(device)
+    supervision.claimedAt = get(dependency: \.date.now)
+    try await context.db.update(supervision)
 
     // start with ALL block groups, parent controls from web ui
     let groups = try await IOSApp.BlockGroup.query().all(in: context.db)

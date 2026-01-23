@@ -8,15 +8,17 @@ import XExpect
 final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable {
   func testValidDownload_redirectsAndLogsEvent() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
-    let deviceId = IOSApp.Device.Id()
-    try await self.db.create(IOSApp.Device(
-      id: deviceId,
+    let device = try await self.db.create(IOSApp.Device(
+      id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
-      supervisionClaimCode: code,
-      claimCodeExpiresAt: Date.reference + .days(7),
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: code,
+      claimCodeExpiresAt: .reference + .days(7),
     ))
 
     try await app.test(
@@ -40,7 +42,7 @@ final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable 
     )
 
     let events = try await IOSEvent.query()
-      .where(.deviceId == deviceId)
+      .where(.deviceId == device.id)
       .all(in: self.db)
     expect(events.count).toEqual(2)
     expect(events[0].kind).toEqual(.supervision)

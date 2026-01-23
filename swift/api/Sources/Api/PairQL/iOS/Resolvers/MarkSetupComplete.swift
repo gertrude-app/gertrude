@@ -3,23 +3,22 @@ import Vapor
 
 extension MarkSetupComplete: NoInputResolver {
   static func resolve(in ctx: IOSApp.ChildContext) async throws -> Output {
-    guard ctx.device.isSupervised else {
-      logIOSUnexpected("e2c4cfbd", "mark setup complete on unsupervised")
+    guard var supervision = try await ctx.device.supervision(in: ctx.db) else {
+      logIOSUnexpected("d3b4f6e2", "mark setup complete without supervision")
       throw Abort(.badRequest)
     }
 
-    if !ctx.device.isProfileInstalled {
-      var device = ctx.device
-      device.isProfileInstalled = true
-      try await ctx.db.update(device)
+    if !supervision.profileInstalled {
+      supervision.profileInstalledAt = get(dependency: \.date.now)
+      try await ctx.db.update(supervision)
 
       try await ctx.db.create(IOSEvent(
         eventId: "1c6f6ca8",
         kind: .supervision,
         detail: "profile_installed_confirmed",
-        deviceId: device.id,
-        modelIdentifier: device.modelIdentifier,
-        iosVersion: device.iosVersion,
+        deviceId: ctx.device.id,
+        modelIdentifier: ctx.device.modelIdentifier,
+        iosVersion: ctx.device.iosVersion,
       ))
     }
 

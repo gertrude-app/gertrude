@@ -6,16 +6,21 @@ import XExpect
 @testable import Api
 
 final class MarkSetupCompleteResolverTests: ApiTestCase, @unchecked Sendable {
-  func testHappyPath_marksProfileInstalledAndReturnsChildName() async throws {
-    var child = try await self.childWithIOSDevice()
-    child.device.isSupervised = true
-    try await self.db.update(child.device)
+  func testHappyPath_marksProfileInstalledAndReturnsSuccess() async throws {
+    let child = try await self.childWithIOSDevice()
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: child.device.id,
+      claimCode: .random(in: 100_000 ... 999_999),
+      claimCodeExpiresAt: .reference + .days(7),
+      claimedAt: .reference,
+      supervisedAt: .reference,
+    ))
 
     let output = try await MarkSetupComplete.resolve(in: child.context)
     expect(output).toEqual(.success)
 
-    let updated = try await self.db.find(child.device.id)
-    expect(updated.isProfileInstalled).toEqual(true)
+    let supervision = try await child.device.supervision(in: self.db)!
+    expect(supervision.profileInstalledAt).not.toBeNil()
 
     let events = try await IOSEvent.query()
       .where(.deviceId == child.device.id)
@@ -26,19 +31,22 @@ final class MarkSetupCompleteResolverTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testIdempotent_alreadyCompleteReturnsSuccess() async throws {
-    var child = try await self.childWithIOSDevice()
-    child.device.isSupervised = true
-    child.device.isProfileInstalled = true
-    try await self.db.update(child.device)
+    let child = try await self.childWithIOSDevice()
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: child.device.id,
+      claimCode: .random(in: 100_000 ... 999_999),
+      claimCodeExpiresAt: .reference + .days(7),
+      claimedAt: .reference,
+      supervisedAt: .reference,
+      profileInstalledAt: .reference,
+    ))
 
     let output = try await MarkSetupComplete.resolve(in: child.context)
-
     expect(output).toEqual(.success)
   }
 
-  func testNotSupervised_throwsError() async throws {
+  func testNoSupervision_throwsError() async throws {
     let child = try await self.childWithIOSDevice()
-
     try await expectErrorFrom { try await MarkSetupComplete.resolve(in: child.context) }
       .toContain("400")
   }

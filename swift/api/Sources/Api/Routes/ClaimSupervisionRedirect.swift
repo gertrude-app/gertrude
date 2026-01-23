@@ -11,15 +11,16 @@ enum ClaimSupervisionRedirectRoute {
       return request.redirect(to: "\(signup)?error=invalid_code", redirectType: .temporary)
     }
 
-    guard let device = try? await IOSApp.Device.query()
-      .where(.supervisionClaimCode == code)
+    guard let supervision = try? await IOSApp.Supervision.query()
+      .where(.claimCode == code)
       .first(in: request.context.db) else {
       return request.redirect(to: "\(signup)?error=missing_code", redirectType: .temporary)
     }
 
+    let device = try await supervision.device(in: request.context.db)
+
     if device.childId == nil,
-       let expiresAt = device.claimCodeExpiresAt,
-       expiresAt <= get(dependency: \.date.now) {
+       supervision.claimCodeExpiresAt <= get(dependency: \.date.now) {
       return request.redirect(to: "\(signup)?error=expired_code", redirectType: .temporary)
     }
 

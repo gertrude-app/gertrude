@@ -135,11 +135,6 @@ extension IOSApp.Device: Model {
     case .appVersion: .string(self.appVersion)
     case .iosVersion: .string(self.iosVersion)
     case .webPolicy: .string(self.webPolicy)
-    case .isSupervised: .bool(self.isSupervised)
-    case .udid: .string(self.udid)
-    case .isProfileInstalled: .bool(self.isProfileInstalled)
-    case .supervisionClaimCode: .int(self.supervisionClaimCode)
-    case .claimCodeExpiresAt: .date(self.claimCodeExpiresAt)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -153,11 +148,42 @@ extension IOSApp.Device: Model {
       .appVersion: .string(self.appVersion),
       .iosVersion: .string(self.iosVersion),
       .webPolicy: .string(self.webPolicy),
-      .isSupervised: .bool(self.isSupervised),
-      .udid: .string(self.udid),
-      .isProfileInstalled: .bool(self.isProfileInstalled),
-      .supervisionClaimCode: .int(self.supervisionClaimCode),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension IOSApp.Supervision: Model {
+  public static let schemaName = "iosapp"
+  public static let tableName = "supervisions"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .deviceId: .uuid(self.deviceId)
+    case .claimCode: .int(self.claimCode)
+    case .claimCodeExpiresAt: .date(self.claimCodeExpiresAt)
+    case .udid: .string(self.udid)
+    case .claimedAt: .date(self.claimedAt)
+    case .supervisedAt: .date(self.supervisedAt)
+    case .profileInstalledAt: .date(self.profileInstalledAt)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .deviceId: .uuid(self.deviceId),
+      .claimCode: .int(self.claimCode),
       .claimCodeExpiresAt: .date(self.claimCodeExpiresAt),
+      .udid: .string(self.udid),
+      .claimedAt: .date(self.claimedAt),
+      .supervisedAt: .date(self.supervisedAt),
+      .profileInstalledAt: .date(self.profileInstalledAt),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]
