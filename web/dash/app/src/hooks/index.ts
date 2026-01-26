@@ -2,10 +2,10 @@ import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { QueryResult } from './query';
 import type {
+  Child,
   GetIdentifiedApps,
   GetUnlockRequest,
   KeychainSummary,
-  User,
 } from '@dash/types';
 import type { MutableRefObject } from 'react';
 import Current from '../environment';
@@ -40,9 +40,11 @@ export function useLoginRedirect(): string | null {
   return null;
 }
 
-export function useUser(id: UUID): QueryResult<User> {
-  return useQuery(Key.user(id), () => Current.api.getUser(id));
+export function useChild(id: UUID): QueryResult<Child> {
+  return useQuery(Key.child(id), () => Current.api.getChild(id));
 }
+
+export { useChild as useUser };
 
 export function useUnlockRequest(id: UUID): QueryResult<GetUnlockRequest.Output> {
   return useQuery(Key.unlockRequest(id), () => Current.api.getUnlockRequest(id));

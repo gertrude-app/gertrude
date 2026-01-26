@@ -5,7 +5,7 @@ describe(`children screen`, () => {
   beforeEach(() => {
     cy.simulateLoggedIn();
     cy.interceptPql(`SaveUser`, { success: true });
-    cy.interceptPql(`GetUsers`, [mock.user({ id: `user-123` })]);
+    cy.interceptPql(`GetChildren`, [mock.child({ id: `user-123` })]);
     cy.interceptPql(`DeleteEntity_v2`, { success: true });
   });
 
@@ -16,8 +16,8 @@ describe(`children screen`, () => {
 
       // simulate freshly saved user from server
       cy.intercept(
-        `/pairql/dashboard/GetUser`,
-        mock.user({ name: `Bo`, id: `user-123` }),
+        `/pairql/dashboard/GetChild`,
+        mock.child({ name: `Bo`, id: `user-123` }),
       );
 
       cy.contains(`Save child`).click();
@@ -46,7 +46,7 @@ describe(`children screen`, () => {
 
   describe(`child deletion`, () => {
     it(`redirects to /children path`, () => {
-      cy.interceptPql(`GetUser`, mock.user({ id: `user-123` }));
+      cy.interceptPql(`GetChild`, mock.child({ id: `user-123` }));
       cy.visit(`/children/user-123`);
 
       cy.contains(`Delete child`).click();

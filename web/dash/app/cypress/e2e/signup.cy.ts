@@ -28,6 +28,7 @@ describe(`signup`, () => {
       childActivitySummaries: [],
       recentScreenshots: [],
       numParentNotifications: 0,
+      pendingIOSDevices: [],
     });
 
     cy.visit(`/verify-signup-email/verify-token-123`);

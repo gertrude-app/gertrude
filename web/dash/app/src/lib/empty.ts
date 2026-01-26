@@ -1,4 +1,4 @@
-import type { KeychainSummary, UnlockRequest, User } from '@dash/types';
+import type { Child, KeychainSummary, UnlockRequest } from '@dash/types';
 
 export function keychain(id: UUID, adminId: UUID): KeychainSummary {
   return {
@@ -11,7 +11,7 @@ export function keychain(id: UUID, adminId: UUID): KeychainSummary {
   };
 }
 
-export function user(id: UUID): User {
+export function child(id: UUID): Child {
   return {
     id,
     name: ``,
@@ -21,7 +21,8 @@ export function user(id: UUID): User {
     screenshotsFrequency: 120,
     showSuspensionActivity: false,
     keychains: [],
-    devices: [],
+    computers: [],
+    iosDevices: [],
     createdAt: new Date().toISOString(),
   };
 }

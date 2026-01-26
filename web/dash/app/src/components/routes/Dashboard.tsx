@@ -32,6 +32,7 @@ const DashboardRoute: React.FC = () => {
       recentScreenshots={widgetsQuery.data.recentScreenshots}
       numParentNotifications={widgetsQuery.data.numParentNotifications}
       announcement={widgetsQuery.data.announcement}
+      pendingIosDevices={widgetsQuery.data.pendingIOSDevices}
     />
   );
 };

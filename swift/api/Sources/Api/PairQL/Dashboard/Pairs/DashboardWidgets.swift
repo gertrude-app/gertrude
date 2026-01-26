@@ -44,6 +44,12 @@ struct DashboardWidgets: Pair {
     var learnMoreUrl: String?
   }
 
+  struct PendingIOSDevice: PairNestable {
+    var childName: String
+    var modelName: String
+    var claimCode: Int
+  }
+
   struct Output: PairOutput {
     var children: [Child]
     var childActivitySummaries: [ChildActivitySummary]
@@ -51,6 +57,7 @@ struct DashboardWidgets: Pair {
     var recentScreenshots: [RecentScreenshot]
     var numParentNotifications: Int
     var announcement: Announcement?
+    var pendingIOSDevices: [PendingIOSDevice]
   }
 }
 
@@ -70,6 +77,7 @@ extension DashboardWidgets: NoInputResolver {
         recentScreenshots: [],
         numParentNotifications: 0,
         announcement: nil,
+        pendingIOSDevices: [],
       )
     }
 
@@ -108,6 +116,11 @@ extension DashboardWidgets: NoInputResolver {
       .orderBy(.createdAt, .asc)
       .first(in: context.db)
 
+    async let pendingDeviceRows = context.db.customQuery(
+      PendingIOSDeviceRow.self,
+      withBindings: [.uuid(context.parent.id)],
+    )
+
     return try await .init(
       children: children.concurrentMap { user in try await .init(
         id: user.id,
@@ -137,6 +150,11 @@ extension DashboardWidgets: NoInputResolver {
         icon: $0.icon,
         html: $0.html,
         learnMoreUrl: $0.learnMoreUrl,
+      ) },
+      pendingIOSDevices: pendingDeviceRows.map { row in .init(
+        childName: row.childName,
+        modelName: ModelIdentifier.marketingName(for: row.modelIdentifier),
+        claimCode: row.claimCode,
       ) },
     )
   }
@@ -194,4 +212,31 @@ private func childActivitySummaries(
       ).count,
     )
   }
+}
+
+struct PendingIOSDeviceRow: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    var stmt = SQL.Statement("""
+    SELECT
+      c.\(Child.columnName(.name)) AS child_name,
+      d.\(IOSApp.Device.columnName(.modelIdentifier)) AS model_identifier,
+      s.\(IOSApp.Supervision.columnName(.claimCode)) AS claim_code
+    FROM \(table: IOSApp.Supervision.self) s
+    JOIN \(table: IOSApp.Device.self) d
+      ON d.id = s.\(IOSApp.Supervision.columnName(.deviceId))
+    JOIN \(table: Child.self) c
+      ON c.id = d.\(IOSApp.Device.columnName(.childId))
+    WHERE c.\(Child.columnName(.parentId)) =\(" ")
+    """)
+    stmt.components.append(.binding(bindings[0]))
+    stmt.components.append(.sql("""
+      AND s.\(IOSApp.Supervision.columnName(.claimedAt)) IS NOT NULL
+      AND s.\(IOSApp.Supervision.columnName(.supervisedAt)) IS NULL
+    """))
+    return stmt
+  }
+
+  var childName: String
+  var modelIdentifier: String
+  var claimCode: Int
 }

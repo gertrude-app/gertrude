@@ -1,13 +1,12 @@
 import { ApiErrorMessage, ListChildren, Loading } from '@dash/components';
 import React from 'react';
-import type { EditChild } from '@dash/components';
-import type { DeviceModelFamily, UserDevice } from '@dash/types';
+import type { DeviceModelFamily } from '@dash/types';
 import Current from '../../environment';
 import { Key, useMutation, useQuery } from '../../hooks';
 import ReqState from '../../lib/ReqState';
 
 const Users: React.FC = () => {
-  const query = useQuery(Key.users, Current.api.getUsers);
+  const query = useQuery(Key.children, Current.api.getChildren);
 
   const addDevice = useMutation((userId: UUID) =>
     Current.api.createPendingAppConnection({ userId }),
@@ -23,14 +22,15 @@ const Users: React.FC = () => {
 
   return (
     <ListChildren
-      users={query.data.map((user) => ({
-        id: user.id,
-        name: user.name,
-        numKeychains: user.keychains.length,
-        numKeys: user.keychains.reduce((acc, keychain) => acc + keychain.numKeys, 0),
-        devices: user.devices.map(deviceProps),
-        screenshotsEnabled: user.screenshotsEnabled,
-        keystrokesEnabled: user.keyloggingEnabled,
+      users={query.data.map((child) => ({
+        id: child.id,
+        name: child.name,
+        numKeychains: child.keychains.length,
+        numKeys: child.keychains.reduce((acc, keychain) => acc + keychain.numKeys, 0),
+        computers: child.computers,
+        iosDevices: child.iosDevices,
+        screenshotsEnabled: child.screenshotsEnabled,
+        keystrokesEnabled: child.keyloggingEnabled,
       }))}
       startAddDevice={(userId) => addDevice.mutate(userId)}
       dismissAddDevice={() => addDevice.reset()}
@@ -54,17 +54,4 @@ export function familyToIcon(family: DeviceModelFamily): `laptop` | `desktop` {
     case `unknown`:
       return `laptop`;
   }
-}
-
-export function deviceProps(
-  apiDevice: UserDevice,
-): React.ComponentProps<typeof EditChild>[`devices`][number] {
-  return {
-    id: apiDevice.id,
-    deviceId: apiDevice.deviceId,
-    modelTitle: apiDevice.modelTitle,
-    modelIdentifier: apiDevice.modelIdentifier,
-    name: apiDevice.customName,
-    status: apiDevice.status,
-  };
 }

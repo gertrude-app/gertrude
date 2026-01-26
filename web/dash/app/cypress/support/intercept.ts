@@ -58,6 +58,8 @@ export function interceptPql(
   slug: `GetAdminKeychains`,
   output: T.GetAdminKeychains.Output,
 ): void;
+export function interceptPql(slug: `GetChild`, output: T.GetChild.Output): void;
+export function interceptPql(slug: `GetChildren`, output: T.GetChildren.Output): void;
 export function interceptPql(
   slug: `GetClaimDeviceData`,
   output: T.GetClaimDeviceData.Output,
@@ -89,12 +91,10 @@ export function interceptPql(
   slug: `GetUnlockRequests`,
   output: T.GetUnlockRequests.Output,
 ): void;
-export function interceptPql(slug: `GetUser`, output: T.GetUser.Output): void;
 export function interceptPql(
   slug: `GetUserUnlockRequests`,
   output: T.GetUserUnlockRequests.Output,
 ): void;
-export function interceptPql(slug: `GetUsers`, output: T.GetUsers.Output): void;
 export function interceptPql(
   slug: `HandleCheckoutCancel`,
   output: T.HandleCheckoutCancel.Output,
@@ -193,6 +193,8 @@ export function forcePqlErr(
     | `GetAdmin`
     | `GetAdminKeychain`
     | `GetAdminKeychains`
+    | `GetChild`
+    | `GetChildren`
     | `GetClaimDeviceData`
     | `GetDevice`
     | `GetDevices`
@@ -203,9 +205,7 @@ export function forcePqlErr(
     | `GetSuspendFilterRequest`
     | `GetUnlockRequest`
     | `GetUnlockRequests`
-    | `GetUser`
     | `GetUserUnlockRequests`
-    | `GetUsers`
     | `HandleCheckoutCancel`
     | `HandleCheckoutSuccess`
     | `IOSDevices`

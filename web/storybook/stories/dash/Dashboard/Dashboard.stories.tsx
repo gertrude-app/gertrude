@@ -134,4 +134,49 @@ export const NoNotifications: Story = props({
   numParentNotifications: 0,
 });
 
+export const WithPendingIosDevice: Story = props({
+  ...Default.args,
+  pendingIosDevices: [
+    {
+      childName: `Little Jimmy`,
+      modelName: `iPhone 14`,
+      claimCode: 847293,
+    },
+  ],
+});
+
+export const WithPendingIosDeviceAndAnnouncement: Story = props({
+  ...Default.args,
+  pendingIosDevices: [
+    {
+      childName: `Little Jimmy`,
+      modelName: `iPhone 14`,
+      claimCode: 847293,
+    },
+  ],
+  announcement: {
+    id: `e60c0317-2af6-409a-bc6b-ee7c0d724d27`,
+    kind: `warning`,
+    icon: `fa-solid fa-triangle-exclamation`,
+    html: `<b>Action needed:</b> We detected that Screen Time web filtering is enabled on <b>Yeshua\u2019s</b> mac computer, which can interfere with Gertrude\u2019s ability to protect your child. Disable Screen Time\u2019s \u201cRestrictions\u201d &rarr; \u201cContent &amp; Privacy\u201d section to fix.`,
+    learnMoreUrl: `https://gertrude.app/blog/screen-time-web-filter-conflict`,
+  },
+});
+
+export const WithMultiplePendingIosDevices: Story = props({
+  ...Default.args,
+  pendingIosDevices: [
+    {
+      childName: `Little Jimmy`,
+      modelName: `iPhone 14`,
+      claimCode: 847293,
+    },
+    {
+      childName: `Sally`,
+      modelName: `iPhone 15 Pro`,
+      claimCode: 192837,
+    },
+  ],
+});
+
 export default meta;

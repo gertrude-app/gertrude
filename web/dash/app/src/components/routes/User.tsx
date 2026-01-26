@@ -1,5 +1,5 @@
 import { ApiErrorMessage, EditChild, Loading } from '@dash/components';
-import { type User, defaults } from '@dash/types';
+import { type Child, defaults } from '@dash/types';
 import React, { useEffect, useMemo, useReducer } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
@@ -16,44 +16,43 @@ import ReqState from '../../lib/ReqState';
 import * as empty from '../../lib/empty';
 import { isDirty } from '../../lib/helpers';
 import reducer from '../../reducers/user-reducer';
-import { deviceProps } from './Users';
 
 const UserRoute: React.FC = () => {
   const { userId: id = `` } = useParams<{ userId: string }>();
   const [state, dispatch] = useReducer(reducer, {});
-  const queryKey = Key.user(id);
+  const queryKey = Key.child(id);
   const getKeychains = useSelectableKeychains();
   const deleteChild = useConfirmableDelete(`child`, { id });
   const deleteComputerUser = useConfirmableDelete(`computerUser`, {
     invalidating: [queryKey],
   });
 
-  const getUser = useQuery(queryKey, () => Current.api.getUser(id), {
-    onReceive: (user) => dispatch({ type: `setUser`, user }),
-    enabled: id !== `new` && state.user?.isNew !== true,
+  const getChildQuery = useQuery(queryKey, () => Current.api.getChild(id), {
+    onReceive: (child) => dispatch({ type: `setChild`, child }),
+    enabled: id !== `new` && state.child?.isNew !== true,
   });
 
   const addDevice = useMutation((userId: UUID) =>
     Current.api.createPendingAppConnection({ userId }),
   );
 
-  const saveUser = useMutation(
-    (user: Editable<User>) =>
+  const saveChild = useMutation(
+    (child: Editable<Child>) =>
       Current.api.saveUser({
-        id: user.draft.id,
-        isNew: user.isNew ?? false,
-        name: user.draft.name,
-        keyloggingEnabled: user.draft.keyloggingEnabled,
-        screenshotsEnabled: user.draft.screenshotsEnabled,
-        screenshotsFrequency: user.draft.screenshotsFrequency,
-        screenshotsResolution: user.draft.screenshotsResolution,
-        showSuspensionActivity: user.draft.showSuspensionActivity,
-        downtime: user.draft.downtime,
-        keychains: user.draft.keychains.map(({ id, schedule }) => ({ id, schedule })),
-        blockedApps: user.draft.blockedApps,
+        id: child.draft.id,
+        isNew: child.isNew ?? false,
+        name: child.draft.name,
+        keyloggingEnabled: child.draft.keyloggingEnabled,
+        screenshotsEnabled: child.draft.screenshotsEnabled,
+        screenshotsFrequency: child.draft.screenshotsFrequency,
+        screenshotsResolution: child.draft.screenshotsResolution,
+        showSuspensionActivity: child.draft.showSuspensionActivity,
+        downtime: child.draft.downtime,
+        keychains: child.draft.keychains.map(({ id, schedule }) => ({ id, schedule })),
+        blockedApps: child.draft.blockedApps,
       }),
     {
-      onSuccess: () => dispatch({ type: `userSaved` }),
+      onSuccess: () => dispatch({ type: `childSaved` }),
       invalidating: [queryKey],
       toast: `save:user`,
     },
@@ -66,35 +65,35 @@ const UserRoute: React.FC = () => {
     }),
   );
 
-  const newUserId = useMemo(() => uuid(), []);
+  const newChildId = useMemo(() => uuid(), []);
   useEffect(() => {
     if (id === `new`) {
-      dispatch({ type: `setUser`, user: empty.user(newUserId), new: true });
+      dispatch({ type: `setChild`, child: empty.child(newChildId), new: true });
     }
-  }, [id, newUserId]);
+  }, [id, newChildId]);
 
   if (id === `new`) {
-    return <Navigate to={`/children/${newUserId}`} replace />;
+    return <Navigate to={`/children/${newChildId}`} replace />;
   }
 
   if (deleteChild.state === `success`) {
     return <Navigate to="/children" />;
   }
 
-  if (getUser.isError) {
-    return <ApiErrorMessage error={getUser.error} />;
+  if (getChildQuery.isError) {
+    return <ApiErrorMessage error={getChildQuery.error} />;
   }
 
-  if (!state.user) {
+  if (!state.child) {
     return <Loading />;
   }
 
-  const { user, addingKeychain } = state;
-  const { draft, original } = user;
+  const { child, addingKeychain } = state;
+  const { draft, original } = child;
 
   return (
     <EditChild
-      isNew={state.user.isNew || false}
+      isNew={state.child.isNew || false}
       name={draft.name}
       id={draft.id}
       setName={(name) => dispatch({ type: `setName`, name })}
@@ -120,7 +119,8 @@ const UserRoute: React.FC = () => {
       }
       removeKeychain={(id) => dispatch({ type: `removeKeychain`, id })}
       keychains={draft.keychains}
-      devices={original.devices.map(deviceProps)}
+      computers={original.computers}
+      iosDevices={original.iosDevices}
       deleteUser={deleteChild}
       startAddDevice={() => addDevice.mutate(id)}
       dismissAddDevice={() => addDevice.reset()}
@@ -131,9 +131,9 @@ const UserRoute: React.FC = () => {
       setDowntime={(downtime) => dispatch({ type: `setDowntime`, downtime })}
       deleteDevice={deleteComputerUser}
       saveButtonDisabled={
-        !isDirty(state.user) || draft.name.trim() === `` || saveUser.isPending
+        !isDirty(state.child) || draft.name.trim() === `` || saveChild.isPending
       }
-      onSave={() => saveUser.mutate(user)}
+      onSave={() => saveChild.mutate(child)}
       onAddKeychainClicked={() => dispatch({ type: `setAddingKeychain`, keychain: null })}
       onSelectKeychainToAdd={(keychain) =>
         dispatch({

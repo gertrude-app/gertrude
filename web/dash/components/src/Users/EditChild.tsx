@@ -1,4 +1,3 @@
-import { type PlainTimeWindow, type RuleSchedule } from '@dash/types';
 import { NoSymbolIcon } from '@heroicons/react/24/outline';
 import { Button, Label, TextInput, Toggle } from '@shared/components';
 import { inflect } from '@shared/string';
@@ -7,12 +6,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import type {
   BlockedApp,
+  ChildComputer,
+  ChildIOSDevice,
   ConfirmableEntityAction,
+  PlainTimeWindow,
   RequestState,
-  Subcomponents,
+  RuleSchedule,
   SuccessOutput,
+  UserKeychainSummary as Keychain,
 } from '@dash/types';
-import type { UserKeychainSummary as Keychain } from '@dash/types';
 import EmptyState from '../EmptyState';
 import TimeInput from '../Forms/TimeInput';
 import KeychainCard from '../Keychains/KeychainCard';
@@ -21,8 +23,8 @@ import PageHeading from '../PageHeading';
 import AddDeviceInstructions from './AddDeviceInstructions';
 import AddKeychainDrawer from './AddKeychainDrawer';
 import BlockedAppCard from './BlockedAppCard';
-import Computer from './Computer';
 import ConnectDeviceModal from './ConnectDeviceModal';
+import DeviceCard from './DeviceCard';
 
 interface Props {
   id: string;
@@ -45,7 +47,8 @@ interface Props {
   downtime: PlainTimeWindow;
   removeKeychain(id: UUID): unknown;
   keychains: Keychain[];
-  devices: Subcomponents<typeof Computer>;
+  computers: ChildComputer[];
+  iosDevices: ChildIOSDevice[];
   deleteUser: ConfirmableEntityAction<void>;
   startAddDevice(): unknown;
   dismissAddDevice(): unknown;
@@ -89,7 +92,8 @@ const EditChild: React.FC<Props> = ({
   setShowSuspensionActivity,
   removeKeychain,
   keychains,
-  devices,
+  computers,
+  iosDevices,
   deleteDevice,
   deleteUser,
   saveButtonDisabled,
@@ -182,9 +186,11 @@ const EditChild: React.FC<Props> = ({
         text="Are you sure you want to delete the connection between this child and this computer?"
       />
       <ConfirmDeleteEntity type="user" action={deleteUser} />
-      {devices.length > 0 && <PageHeading icon={`cog`}>Child settings</PageHeading>}
+      {(computers.length > 0 || iosDevices.length > 0) && (
+        <PageHeading icon={`cog`}>Child settings</PageHeading>
+      )}
       <div className="mt-8">
-        {devices.length === 0 && (
+        {computers.length === 0 && iosDevices.length === 0 && (
           <div className="-mt-6 bg-white rounded-3xl p-6 sm:p-8 shadow border-[0.5px] border-slate-200">
             <AddDeviceInstructions
               userName={name}
@@ -193,7 +199,7 @@ const EditChild: React.FC<Props> = ({
             />
           </div>
         )}
-        {devices.length > 0 && (
+        {(computers.length > 0 || iosDevices.length > 0) && (
           <>
             <TextInput
               type="text"
@@ -204,23 +210,56 @@ const EditChild: React.FC<Props> = ({
               className="max-w-xl"
             />
             <h2 className="mt-5 text-lg font-bold text-slate-700">
-              {devices.length} {inflect(`computer`, devices.length)}:
+              {computers.length + iosDevices.length}
+              {` `}
+              {inflect(
+                iosDevices.length > 0 ? `device` : `computer`,
+                computers.length + iosDevices.length,
+              )}
+              :
             </h2>
             <div className="flex flex-col max-w-3xl -mx-2 xs:mx-0">
-              {devices.map((computer) => (
+              {computers.map((computer) => (
                 <div key={computer.id} className="flex items-center mt-3">
-                  <Computer
-                    modelTitle={computer.modelTitle}
-                    modelIdentifier={computer.modelIdentifier}
-                    id={computer.id}
-                    deviceId={computer.deviceId}
-                    name={computer.name}
-                    status={computer.status}
+                  <DeviceCard
+                    to={`/computers/${computer.computerId}`}
+                    imageSrc={`/macs/${computer.modelIdentifier}.png`}
+                    imageAlt={computer.modelTitle}
+                    title={computer.customName || computer.modelTitle}
+                    subtitle={computer.customName ? computer.modelTitle : undefined}
+                    status={{ case: `computerStatus`, status: computer.status }}
                     className="flex-grow mr-1 xs:mr-3"
                   />
                   <button
                     onClick={() => deleteDevice.start(computer.id)}
                     className="transition-colors duration-100 flex justify-center items-center w-6 xs:w-10 h-6 xs:h-10 rounded-full hover:bg-slate-200/50 cursor-pointer text-slate-500 hover:text-red-500"
+                  >
+                    <i className="fa fa-trash" />
+                  </button>
+                </div>
+              ))}
+              {iosDevices.map((device) => (
+                <div key={device.id} className="flex items-center mt-3">
+                  <DeviceCard
+                    to={
+                      device.pendingClaimCode === undefined
+                        ? `/ios-devices/${device.id}`
+                        : `/supervise-device/${device.pendingClaimCode}/download-helper`
+                    }
+                    imageSrc={`/ios/${device.deviceType}.png`}
+                    imageAlt={device.modelName}
+                    title={device.modelName}
+                    subtitle={device.iosVersion}
+                    status={
+                      device.pendingClaimCode !== undefined
+                        ? { case: `pendingSetup` }
+                        : undefined
+                    }
+                    className="flex-grow mr-1 xs:mr-3"
+                  />
+                  <button
+                    disabled
+                    className="flex justify-center items-center w-6 xs:w-10 h-6 xs:h-10 rounded-full text-slate-300 cursor-not-allowed"
                   >
                     <i className="fa fa-trash" />
                   </button>
@@ -457,13 +496,13 @@ const EditChild: React.FC<Props> = ({
         <div
           className={cx(
             `flex mt-8 justify-end border-slate-200 space-x-5`,
-            devices.length > 0 && `pt-8 border-t-2`,
+            (computers.length > 0 || iosDevices.length > 0) && `pt-8 border-t-2`,
           )}
         >
           <Button type="button" onClick={deleteUser.start} color="warning">
             Delete child
           </Button>
-          {devices.length > 0 && (
+          {(computers.length > 0 || iosDevices.length > 0) && (
             <Button
               className="ScrollTop"
               type="button"

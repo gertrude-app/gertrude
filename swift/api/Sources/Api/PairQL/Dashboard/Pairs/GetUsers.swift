@@ -1,5 +1,6 @@
 import PairQL
 
+/// deprecated, remove after 2/10/26
 struct GetUsers: Pair {
   static let auth: ClientAuth = .parent
   typealias Output = [GetUser.User]

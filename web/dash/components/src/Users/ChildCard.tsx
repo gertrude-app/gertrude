@@ -2,15 +2,16 @@ import { Button } from '@shared/components';
 import { inflect } from '@shared/string';
 import cx from 'classnames';
 import React from 'react';
-import type { Subcomponents } from '@dash/types';
-import Computer from './Computer';
+import type { ChildComputer, ChildIOSDevice } from '@dash/types';
+import DeviceCard from './DeviceCard';
 
 type Props = {
   id: string;
   name: string;
   numKeys: number;
   numKeychains: number;
-  devices: Subcomponents<typeof Computer>;
+  computers: ChildComputer[];
+  iosDevices: ChildIOSDevice[];
   screenshotsEnabled: boolean;
   keystrokesEnabled: boolean;
   addDevice(): unknown;
@@ -21,7 +22,8 @@ const ChildCard: React.FC<Props> = ({
   name,
   numKeys,
   numKeychains,
-  devices,
+  computers,
+  iosDevices,
   screenshotsEnabled,
   keystrokesEnabled,
   addDevice,
@@ -63,25 +65,50 @@ const ChildCard: React.FC<Props> = ({
           <span className="font-semibold text-slate-600">{numKeys}</span> keys
         </p>
       </div>
-      {devices.length ? (
+      {computers.length || iosDevices.length ? (
         <>
           <div className="text-lg mt-4 -mb-4">
             <p className="text-slate-500">
-              <span className="text-xl font-bold text-slate-600">{devices.length}</span>
+              <span className="text-xl font-bold text-slate-600">
+                {computers.length + iosDevices.length}
+              </span>
               {` `}
-              {inflect(`computer`, devices.length)}:
+              {inflect(
+                iosDevices.length > 0 ? `device` : `computer`,
+                computers.length + iosDevices.length,
+              )}
+              :
             </p>
           </div>
           <div className="flex flex-col mt-3 gap-3 pt-3">
-            {devices.map((computer) => (
-              <Computer
+            {computers.map((computer) => (
+              <DeviceCard
                 key={computer.id}
-                id={computer.id}
-                deviceId={computer.deviceId}
-                modelTitle={computer.modelTitle}
-                modelIdentifier={computer.modelIdentifier}
-                name={computer.name}
-                status={computer.status}
+                to={`/computers/${computer.computerId}`}
+                imageSrc={`/macs/${computer.modelIdentifier}.png`}
+                imageAlt={computer.modelTitle}
+                title={computer.customName || computer.modelTitle}
+                subtitle={computer.customName ? computer.modelTitle : undefined}
+                status={{ case: `computerStatus`, status: computer.status }}
+              />
+            ))}
+            {iosDevices.map((device) => (
+              <DeviceCard
+                key={device.id}
+                to={
+                  device.pendingClaimCode === undefined
+                    ? `/ios-devices/${device.id}`
+                    : `/supervise-device/${device.pendingClaimCode}/download-helper`
+                }
+                imageSrc={`/ios/${device.deviceType}.png`}
+                imageAlt={device.modelName}
+                title={device.modelName}
+                subtitle={device.iosVersion}
+                status={
+                  device.pendingClaimCode !== undefined
+                    ? { case: `pendingSetup` }
+                    : undefined
+                }
               />
             ))}
           </div>
@@ -99,10 +126,12 @@ const ChildCard: React.FC<Props> = ({
       )}
       <div
         className={`flex ${
-          devices.length === 0 ? `justify-center` : `justify-end`
+          computers.length === 0 && iosDevices.length === 0
+            ? `justify-center`
+            : `justify-end`
         } mt-3 mr-2`}
       >
-        {devices.length > 0 && (
+        {computers.length > 0 && (
           <button
             className="w-8 h-8 rounded-full bg-violet-50 flex justify-center items-center text-violet-400 text-lg hover:bg-violet-100 transition-colors duration-100 hover:text-violet-500"
             onClick={addDevice}
@@ -112,7 +141,7 @@ const ChildCard: React.FC<Props> = ({
         )}
       </div>
     </div>
-    {devices.length !== 0 && (
+    {(computers.length !== 0 || iosDevices.length !== 0) && (
       <div className="flex flex-col xs:flex-row rounded-b-xl p-4 space-y-3 xs:space-y-0 xs:space-x-3">
         <Button
           type="link"
@@ -128,7 +157,7 @@ const ChildCard: React.FC<Props> = ({
           color="secondary"
           to={`${id}/activity`}
           className="flex-grow w-[100%] xs:w-auto"
-          disabled={devices.length === 0}
+          disabled={computers.length === 0}
           size="large"
         >
           <i className="fa-solid fa-binoculars mr-2" /> Activity

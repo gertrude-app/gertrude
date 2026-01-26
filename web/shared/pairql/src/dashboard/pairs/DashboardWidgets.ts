@@ -39,5 +39,10 @@ export namespace DashboardWidgets {
       html: string;
       learnMoreUrl?: string;
     };
+    pendingIOSDevices: Array<{
+      childName: string;
+      modelName: string;
+      claimCode: number;
+    }>;
   }
 }

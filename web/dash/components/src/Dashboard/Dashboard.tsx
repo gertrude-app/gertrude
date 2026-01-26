@@ -1,3 +1,4 @@
+import { posessive } from '@shared/string';
 import cx from 'classnames';
 import React, { useState } from 'react';
 import type {
@@ -10,12 +11,19 @@ import PageHeading from '../PageHeading';
 import SmartLink from '../SmartLink';
 import AddDeviceInstructions from '../Users/AddDeviceInstructions';
 import ConnectDeviceModal from '../Users/ConnectDeviceModal';
+import AttentionBanner from './AttentionBanner';
 import CreateFirstNotificationWidget from './CreateFirstNotificationWidget';
 import QuickActionsWidget from './QuickActionsWidget';
 import UnlockRequestsWidget from './UnlockRequestsWidget';
 import UserActivityWidget from './UserActivityWidget';
 import UserScreenshotsWidget from './UserScreenshotsWidget';
 import UserOverviewWidget from './UsersOverviewWidget';
+
+export type PendingIosDevice = {
+  childName: string;
+  modelName: string;
+  claimCode: number;
+};
 
 type Props = {
   date?: Date;
@@ -24,7 +32,8 @@ type Props = {
   dismissAnnouncement(id: UUID): unknown;
   addDeviceRequest: RequestState<CreatePendingAppConnection.Output>;
   childData: DashboardWidgets.Output[`children`];
-} & Omit<DashboardWidgets.Output, `children`>;
+  pendingIosDevices?: PendingIosDevice[];
+} & Omit<DashboardWidgets.Output, `children` | `pendingIOSDevices`>;
 
 const Dashboard: React.FC<Props> = ({
   unlockRequests,
@@ -38,6 +47,7 @@ const Dashboard: React.FC<Props> = ({
   addDeviceRequest,
   numParentNotifications,
   announcement,
+  pendingIosDevices = [],
 }) => {
   const [announcementDismissed, setAnnouncementDismissed] = useState(false);
   const hasNotifications = numParentNotifications > 0;
@@ -67,63 +77,29 @@ const Dashboard: React.FC<Props> = ({
     return (
       <div className="@container">
         <PageHeading icon="home">Dashboard</PageHeading>
+        {pendingIosDevices.map((device) => (
+          <AttentionBanner
+            key={device.claimCode}
+            icon="fa-solid fa-mobile-screen"
+            heading={`${posessive(device.childName)} ${device.modelName} is almost ready`}
+            subtext="Download the supervision tool to finish setting up."
+            linkTo={`/supervise-device/${device.claimCode}/download-helper`}
+            linkText="Continue Setup"
+            className="mt-5"
+          />
+        ))}
         {announcement && !announcementDismissed && (
-          <div
-            className={cx(
-              `shadow-md p-4 mt-5 flex flex-col @xl:flex-row @xl:items-start items-center gap-3 rounded-lg`,
-              announcement.kind === `warning`
-                ? `bg-amber-50 border-2 border-amber-500`
-                : `bg-violet-100 border border-violet-400`,
-            )}
-          >
-            <i
-              className={cx(
-                `text-3xl mt-1`,
-                announcement.kind === `warning` ? `text-amber-600` : `text-violet-600`,
-                announcement.icon ?? `fa fa-bolt`,
-              )}
-            />
-            <div className="flex flex-col @4xl:flex-row @4xl:items-start gap-3 @xl:gap-2 @4xl:gap-6">
-              <p
-                className={cx(
-                  `text-center @xl:text-left`,
-                  announcement.kind === `warning` ? `text-amber-900` : `text-violet-800`,
-                )}
-                dangerouslySetInnerHTML={{ __html: announcement.html }}
-              />
-              <div className="flex gap-2 justify-center @xl:justify-end whitespace-nowrap">
-                {announcement.learnMoreUrl && (
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href={announcement.learnMoreUrl}
-                    className={cx(
-                      `px-3 py-1 rounded-md border`,
-                      announcement.kind === `warning`
-                        ? `text-amber-600 hover:text-amber-800 border-amber-400`
-                        : `text-violet-500 hover:text-violet-800 border-violet-400`,
-                    )}
-                  >
-                    Learn more
-                  </a>
-                )}
-                <button
-                  onClick={() => {
-                    dismissAnnouncement(announcement.id);
-                    setAnnouncementDismissed(true);
-                  }}
-                  className={cx(
-                    `text-white px-3 py-1 rounded-md border @4xl:mr-1`,
-                    announcement.kind === `warning`
-                      ? `bg-amber-600 border-amber-600 hover:bg-amber-700`
-                      : `bg-violet-600 border-violet-600 hover:text-violet-800`,
-                  )}
-                >
-                  Dismiss
-                </button>
-              </div>
-            </div>
-          </div>
+          <AttentionBanner
+            kind={announcement.kind}
+            icon={announcement.icon ?? `fa fa-bolt`}
+            html={announcement.html}
+            learnMoreUrl={announcement.learnMoreUrl}
+            onDismiss={() => {
+              dismissAnnouncement(announcement.id);
+              setAnnouncementDismissed(true);
+            }}
+            className="mt-5"
+          />
         )}
         <div className="pt-6 grid grid-cols-1 @3xl:grid-cols-2 @6xl:grid-cols-3 gap-4 @3xl:gap-6 @6xl:gap-8">
           {!hasNotifications && (
