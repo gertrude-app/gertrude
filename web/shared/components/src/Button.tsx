@@ -13,7 +13,8 @@ interface CommonProps {
     | `primary`
     | `secondary`
     | `tertiary`
-    | `warning`;
+    | `warning`
+    | `gradient`;
   children: React.ReactNode;
   fullWidth?: boolean;
   size?: `small` | `medium` | `large`;
@@ -59,6 +60,9 @@ const Button: React.FC<Props> = ({
         break;
       case `warning`:
         colors = `bg-red-100/80 dark:bg-red-500/10 text-red-600 dark:text-red-300 border-red-100/80 dark:border-red-600/50 border hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-500/20 dark:hover:text-red-200 ring-transparent focus:ring-red-500 focus:border-red-500 dark:ring-offset-slate-900`;
+        break;
+      case `gradient`:
+        colors = `bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white border border-transparent shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 ring-transparent focus:ring-violet-500`;
         break;
     }
   } else {

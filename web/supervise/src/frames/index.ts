@@ -1,4 +1,6 @@
-export { default as ConnectDevice } from './ConnectDevice';
+export { default as CodeEntry } from './CodeEntry';
+export { default as PersonalizedConnect } from './PersonalizedConnect';
+export { default as DeviceMismatch } from './DeviceMismatch';
 export { default as ChooseDirection } from './ChooseDirection';
 export { default as DisableFindMy } from './DisableFindMy';
 export { default as DisablePrivateRelay } from './DisablePrivateRelay';

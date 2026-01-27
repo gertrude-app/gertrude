@@ -18,6 +18,6 @@
       "@site/*": ["../site/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["../images.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
 }

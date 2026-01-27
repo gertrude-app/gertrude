@@ -10,6 +10,7 @@ struct GetPendingSupervision: Pair {
 
   struct Output: PairOutput {
     let childName: String
+    let deviceType: String
     let modelIdentifier: String
     let modelName: String
     let iosVersion: String
@@ -27,6 +28,7 @@ extension GetPendingSupervision: Resolver {
     let child = try await context.db.find(validated.claimedChildId)
     return .init(
       childName: child.name,
+      deviceType: validated.device.deviceType,
       modelIdentifier: validated.device.modelIdentifier,
       modelName: validated.device.modelName,
       iosVersion: validated.device.iosVersion,
