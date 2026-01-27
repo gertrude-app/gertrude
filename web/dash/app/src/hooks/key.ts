@@ -6,6 +6,8 @@ import type {
   GetAdmin,
   GetAdminKeychain,
   GetAdminKeychains,
+  GetChild,
+  GetChildren,
   GetClaimDeviceData,
   GetDevice,
   GetDevices,
@@ -16,9 +18,7 @@ import type {
   GetSuspendFilterRequest,
   GetUnlockRequest,
   GetUnlockRequests,
-  GetUser,
   GetUserUnlockRequests,
-  GetUsers,
   IOSDevices,
   LatestAppVersions,
   SecurityEventsFeed,
@@ -45,11 +45,11 @@ export class QueryKey<T> {
 }
 
 export class Key extends QueryKey<never> {
-  static get users(): QueryKey<GetUsers.Output> {
-    return new QueryKey(`users`, [`users`]);
+  static get children(): QueryKey<GetChildren.Output> {
+    return new QueryKey(`children`, [`children`]);
   }
 
-  static user(id: UUID): QueryKey<GetUser.Output> {
+  static child(id: UUID): QueryKey<GetChild.Output> {
     return new QueryKey(`users/:id`, [`users`, id], id);
   }
 

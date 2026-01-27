@@ -11,7 +11,8 @@ describe(`dashboard onboarding nudges`, () => {
     screenshotsFrequency: 30,
     showSuspensionActivity: true,
     keychains: [],
-    devices: [],
+    computers: [],
+    iosDevices: [],
     createdAt: new Date().toISOString(),
   };
 
@@ -27,8 +28,8 @@ describe(`dashboard onboarding nudges`, () => {
       monthlyPriceInDollars: 10,
     });
     cy.interceptPql(`CreatePendingAppConnection`, { code: 123456 });
-    cy.interceptPql(`GetUser`, leopold);
-    cy.interceptPql(`GetUsers`, [leopold]);
+    cy.interceptPql(`GetChild`, leopold);
+    cy.interceptPql(`GetChildren`, [leopold]);
     cy.interceptPql(`SaveUser`, { success: true });
     cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
   });
@@ -41,6 +42,7 @@ describe(`dashboard onboarding nudges`, () => {
       childActivitySummaries: [],
       recentScreenshots: [],
       numParentNotifications: 0,
+      pendingIOSDevices: [],
     });
 
     cy.visit(`/`);
@@ -69,6 +71,7 @@ describe(`dashboard onboarding nudges`, () => {
       childActivitySummaries: [],
       recentScreenshots: [],
       numParentNotifications: 0,
+      pendingIOSDevices: [],
     });
 
     cy.visit(`/`);
@@ -91,6 +94,7 @@ describe(`dashboard onboarding nudges`, () => {
       childActivitySummaries: [],
       recentScreenshots: [],
       numParentNotifications: 0, // <-- no notifications
+      pendingIOSDevices: [],
     });
 
     cy.visit(`/settings`);

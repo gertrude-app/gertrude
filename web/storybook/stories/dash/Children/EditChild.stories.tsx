@@ -94,13 +94,14 @@ export const Default: Story = props({
       schedule: defaults.ruleSchedule(),
     }),
   ],
-  devices: [
+  computers: [
     {
       id: `1`,
-      deviceId: `1`,
-      name: `Silvery`,
+      computerId: `1`,
+      customName: `Silvery`,
       modelIdentifier: `Mac14,10`,
       modelTitle: `16" MacBook Pro (2023)`,
+      modelFamily: `macBookPro`,
       status: {
         case: `filterSuspended`,
         resuming: new Date(new Date().getTime() + 1000 * 60 * 12).toISOString(),
@@ -108,10 +109,20 @@ export const Default: Story = props({
     },
     {
       id: `2`,
-      deviceId: `2`,
+      computerId: `2`,
       modelIdentifier: `Mac14,14`,
       modelTitle: `Mac Studio (2023)`,
+      modelFamily: `studio`,
       status: { case: `offline` },
+    },
+  ],
+  iosDevices: [
+    {
+      id: `3`,
+      modelName: `iPhone 14`,
+      deviceType: `iPhone`,
+      iosVersion: `iOS 18.2`,
+      pendingClaimCode: 123456,
     },
   ],
   requestPublicKeychainRequest: { state: `idle` },
@@ -135,7 +146,8 @@ export const New: Story = props({
 // @screenshot: xs,md
 export const NoDevices: Story = props({
   ...Default.args,
-  devices: [],
+  computers: [],
+  iosDevices: [],
 });
 
 export default meta;

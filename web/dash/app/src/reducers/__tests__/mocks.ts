@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import type { ActivityFeedItem } from '@dash/components';
 import type {
   AdminNotification,
+  Child,
   ChildActivitySummaries,
   Device,
   FamilyActivitySummaries,
@@ -10,7 +11,6 @@ import type {
   KeychainSummary,
   SuspendFilterRequest,
   UnlockRequest,
-  User,
 } from '@dash/types';
 import * as empty from '../../lib/empty';
 
@@ -69,7 +69,7 @@ export function adminNotification(
   };
 }
 
-export function user(override: Partial<User> = {}): User {
+export function child(override: Partial<Child> = {}): Child {
   return {
     id: uuid(),
     name: `Huck`,
@@ -79,16 +79,17 @@ export function user(override: Partial<User> = {}): User {
     keyloggingEnabled: true,
     showSuspensionActivity: true,
     keychains: [],
-    devices: [
+    computers: [
       {
         id: `mac-123`,
-        deviceId: `d-mac-123`,
+        computerId: `d-mac-123`,
         modelFamily: `macBookAir`,
         modelTitle: `MacBook Air`,
         modelIdentifier: `MacBookAir8,1`,
         status: { case: `filterOn` },
       },
     ],
+    iosDevices: [],
     createdAt: new Date().toISOString(),
     ...override,
   };

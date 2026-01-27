@@ -11,15 +11,17 @@ type Story = StoryObj<typeof meta>;
 
 export const Standard: Story = props({
   id: ``,
-  devices: [
+  computers: [
     {
       id: `1`,
-      deviceId: `1`,
+      computerId: `1`,
       modelTitle: `16" Macbook Pro (2023)`,
       modelIdentifier: `Mac14,10`,
+      modelFamily: `macBookPro`,
       status: { case: `filterOn` },
     },
   ],
+  iosDevices: [],
   name: `John Doe`,
   numKeychains: 4,
   numKeys: 57,
@@ -30,7 +32,8 @@ export const Standard: Story = props({
 
 export const Empty: Story = props({
   id: ``,
-  devices: [],
+  computers: [],
+  iosDevices: [],
   name: `John Doe`,
   numKeychains: 0,
   numKeys: 0,
@@ -41,29 +44,33 @@ export const Empty: Story = props({
 
 export const Full: Story = props({
   id: ``,
-  devices: [
+  computers: [
     {
       id: `1`,
-      deviceId: `1`,
+      computerId: `1`,
       modelIdentifier: `Mac14,10`,
       modelTitle: `16" MacBook Pro (2023)`,
+      modelFamily: `macBookPro`,
       status: { case: `offline` },
     },
     {
       id: `2`,
-      deviceId: `2`,
+      computerId: `2`,
       modelIdentifier: `Mac14,13`,
       modelTitle: `Mac Studio (2023)`,
+      modelFamily: `studio`,
       status: { case: `offline` },
     },
     {
       id: `3`,
-      deviceId: `3`,
+      computerId: `3`,
       modelIdentifier: `iMac21,2`,
       modelTitle: `27" iMac (2021)`,
+      modelFamily: `iMac`,
       status: { case: `filterOn` },
     },
   ],
+  iosDevices: [],
   name: `John Doe`,
   numKeychains: 32,
   numKeys: 1546,

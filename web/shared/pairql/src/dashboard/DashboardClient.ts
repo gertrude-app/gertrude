@@ -134,6 +134,16 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetAdminKeychains.Output>(input, `GetAdminKeychains`, `parent`);
   };
 
+  public getChild = (input: P.GetChild.Input): Promise<Result<P.GetChild.Output>> => {
+    return this.query<P.GetChild.Output>(input, `GetChild`, `parent`);
+  };
+
+  public getChildren = (
+    input: P.GetChildren.Input,
+  ): Promise<Result<P.GetChildren.Output>> => {
+    return this.query<P.GetChildren.Output>(input, `GetChildren`, `parent`);
+  };
+
   public getClaimDeviceData = (
     input: P.GetClaimDeviceData.Input,
   ): Promise<Result<P.GetClaimDeviceData.Output>> => {
@@ -204,10 +214,6 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetUnlockRequests.Output>(input, `GetUnlockRequests`, `parent`);
   };
 
-  public getUser = (input: P.GetUser.Input): Promise<Result<P.GetUser.Output>> => {
-    return this.query<P.GetUser.Output>(input, `GetUser`, `parent`);
-  };
-
   public getUserUnlockRequests = (
     input: P.GetUserUnlockRequests.Input,
   ): Promise<Result<P.GetUserUnlockRequests.Output>> => {
@@ -216,10 +222,6 @@ export default class DashboardClient extends Client<Auth> {
       `GetUserUnlockRequests`,
       `parent`,
     );
-  };
-
-  public getUsers = (input: P.GetUsers.Input): Promise<Result<P.GetUsers.Output>> => {
-    return this.query<P.GetUsers.Output>(input, `GetUsers`, `parent`);
   };
 
   public handleCheckoutCancel = (

@@ -21,6 +21,8 @@ enum AuthedParentRoute: PairRoute {
   case getSuspendFilterRequest(GetSuspendFilterRequest.Input)
   case getUnlockRequest(GetUnlockRequest.Input)
   case getUnlockRequests
+  case getChild(GetChild.Input)
+  case getChildren
   case getUser(GetUser.Input)
   case handleCheckoutCancel(HandleCheckoutCancel.Input)
   case handleCheckoutSuccess(HandleCheckoutSuccess.Input)
@@ -126,6 +128,13 @@ extension AuthedParentRoute {
       }
       Route(.case(Self.getUnlockRequests)) {
         Operation(GetUnlockRequests.self)
+      }
+      Route(.case(Self.getChild)) {
+        Operation(GetChild.self)
+        Body(.dashboardInput(GetChild.self))
+      }
+      Route(.case(Self.getChildren)) {
+        Operation(GetChildren.self)
       }
       Route(.case(Self.getUser)) {
         Operation(GetUser.self)
@@ -233,6 +242,12 @@ extension AuthedParentRoute {
 extension AuthedParentRoute: RouteResponder {
   static func respond(to route: Self, in context: ParentContext) async throws -> Response {
     switch route {
+    case .getChild(let input):
+      let output = try await GetChild.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getChildren:
+      let output = try await GetChildren.resolve(in: context)
+      return try await self.respond(with: output)
     case .getUser(let uuid):
       let output = try await GetUser.resolve(with: uuid, in: context)
       return try await self.respond(with: output)

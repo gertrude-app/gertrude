@@ -47,6 +47,32 @@ export type BlockRule =
   | { case: `both`; a: BlockRule; b: BlockRule }
   | { case: `unless`; rule: BlockRule; negatedBy: BlockRule[] };
 
+export interface Child {
+  id: UUID;
+  name: string;
+  keyloggingEnabled: boolean;
+  screenshotsEnabled: boolean;
+  screenshotsResolution: number;
+  screenshotsFrequency: number;
+  showSuspensionActivity: boolean;
+  keychains: UserKeychainSummary[];
+  downtime?: PlainTimeWindow;
+  computers: ChildComputer[];
+  iosDevices: ChildIOSDevice[];
+  blockedApps?: BlockedApp[];
+  createdAt: ISODateString;
+}
+
+export interface ChildComputer {
+  id: UUID;
+  computerId: UUID;
+  status: ChildComputerStatus;
+  modelFamily: DeviceModelFamily;
+  modelTitle: string;
+  modelIdentifier: string;
+  customName?: string;
+}
+
 export type ChildComputerStatus =
   | { case: `filterSuspended`; resuming?: ISODateString }
   | { case: `downtime`; ending?: ISODateString }
@@ -54,6 +80,14 @@ export type ChildComputerStatus =
   | { case: `offline` }
   | { case: `filterOff` }
   | { case: `filterOn` };
+
+export interface ChildIOSDevice {
+  id: UUID;
+  modelName: string;
+  deviceType: string;
+  iosVersion: string;
+  pendingClaimCode?: number;
+}
 
 export type ClientAuth = `none` | `child` | `parent` | `superAdmin`;
 
@@ -169,21 +203,6 @@ export interface UnlockRequest {
   createdAt: ISODateString;
 }
 
-export interface User {
-  id: UUID;
-  name: string;
-  keyloggingEnabled: boolean;
-  screenshotsEnabled: boolean;
-  screenshotsResolution: number;
-  screenshotsFrequency: number;
-  showSuspensionActivity: boolean;
-  keychains: UserKeychainSummary[];
-  downtime?: PlainTimeWindow;
-  devices: UserDevice[];
-  blockedApps?: BlockedApp[];
-  createdAt: ISODateString;
-}
-
 export type UserActivityItem =
   | {
       case: `screenshot`;
@@ -208,16 +227,6 @@ export type UserActivityItem =
       createdAt: ISODateString;
       deletedAt?: ISODateString;
     };
-
-export interface UserDevice {
-  id: UUID;
-  deviceId: UUID;
-  status: ChildComputerStatus;
-  modelFamily: DeviceModelFamily;
-  modelTitle: string;
-  modelIdentifier: string;
-  customName?: string;
-}
 
 export interface UserKeychainSummary {
   id: UUID;

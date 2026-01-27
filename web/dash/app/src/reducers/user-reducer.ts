@@ -2,23 +2,23 @@ import { defaults } from '@dash/types';
 import { produce } from 'immer';
 import { v4 as uuid } from 'uuid';
 import type {
+  Child,
   PlainTimeWindow,
   RuleSchedule,
-  User,
   UserKeychainSummary,
 } from '@dash/types';
 import { commit, editable } from '../lib/helpers';
 
 type State = {
-  user?: Editable<User>;
+  child?: Editable<Child>;
   addingKeychain?: UserKeychainSummary | null;
   newBlockedAppIdentifier?: string;
 };
 
 export type Action =
-  | { type: `setUser`; user: User; new?: boolean }
+  | { type: `setChild`; child: Child; new?: boolean }
   | { type: `setName`; name: string }
-  | { type: `userSaved` }
+  | { type: `childSaved` }
   | { type: `setScreenshotsEnabled`; enabled: boolean }
   | { type: `setScreenshotsResolution`; resolution: number }
   | { type: `setScreenshotsFrequency`; frequency: number }
@@ -37,79 +37,79 @@ export type Action =
   | { type: `setAddingKeychain`; keychain?: UserKeychainSummary | null };
 
 function reducer(state: State, action: Action): State | undefined {
-  if (action.type === `setUser`) {
-    state.user = editable(action.user, action.new);
+  if (action.type === `setChild`) {
+    state.child = editable(action.child, action.new);
     return;
   } else if (action.type === `setAddingKeychain`) {
     state.addingKeychain = action.keychain;
     return;
-  } else if (!state.user) {
+  } else if (!state.child) {
     return;
   }
   switch (action.type) {
-    case `userSaved`:
-      state.user.isNew = false;
-      state.user = commit(state.user);
+    case `childSaved`:
+      state.child.isNew = false;
+      state.child = commit(state.child);
       return;
     case `setName`:
-      state.user.draft.name = action.name;
+      state.child.draft.name = action.name;
       return;
     case `setKeyloggingEnabled`:
-      state.user.draft.keyloggingEnabled = action.enabled;
+      state.child.draft.keyloggingEnabled = action.enabled;
       return;
     case `setScreenshotsEnabled`:
-      state.user.draft.screenshotsEnabled = action.enabled;
+      state.child.draft.screenshotsEnabled = action.enabled;
       return;
     case `setScreenshotsResolution`:
-      state.user.draft.screenshotsResolution = action.resolution;
+      state.child.draft.screenshotsResolution = action.resolution;
       return;
     case `setScreenshotsFrequency`:
-      state.user.draft.screenshotsFrequency = action.frequency;
+      state.child.draft.screenshotsFrequency = action.frequency;
       return;
     case `setShowSuspensionActivity`:
-      state.user.draft.showSuspensionActivity = action.show;
+      state.child.draft.showSuspensionActivity = action.show;
       return;
     case `updateNewBlockedAppIdentifier`:
       state.newBlockedAppIdentifier = action.identifier;
       return;
     case `addNewBlockedApp`:
       if (state.newBlockedAppIdentifier) {
-        state.user.draft.blockedApps = [
-          ...(state.user.draft.blockedApps ?? []),
+        state.child.draft.blockedApps = [
+          ...(state.child.draft.blockedApps ?? []),
           { id: uuid(), identifier: state.newBlockedAppIdentifier },
         ];
         state.newBlockedAppIdentifier = ``;
       }
       return;
     case `removeBlockedApp`:
-      state.user.draft.blockedApps = state.user.draft.blockedApps?.filter(
+      state.child.draft.blockedApps = state.child.draft.blockedApps?.filter(
         (app) => app.id !== action.id,
       );
       return;
     case `setBlockedAppSchedule`: {
-      if (!state.user.draft.blockedApps) return;
-      const blockedApp = state.user.draft.blockedApps.find((k) => k.id === action.id);
+      if (!state.child.draft.blockedApps) return;
+      const blockedApp = state.child.draft.blockedApps.find((k) => k.id === action.id);
       if (blockedApp) {
         blockedApp.schedule = action.schedule;
       }
       return;
     }
     case `removeKeychain`:
-      state.user.draft.keychains = state.user.draft.keychains.filter(
+      state.child.draft.keychains = state.child.draft.keychains.filter(
         (keychain) => keychain.id !== action.id,
       );
       return;
     case `addKeychain`:
-      state.user.draft.keychains.push(action.keychain);
+      state.child.draft.keychains.push(action.keychain);
       return;
     case `setDowntimeEnabled`:
-      state.user.draft.downtime = action.enabled ? defaults.timeWindow() : undefined;
+      state.child.draft.downtime = action.enabled ? defaults.timeWindow() : undefined;
       return;
     case `setDowntime`:
-      state.user.draft.downtime = action.downtime;
+      state.child.draft.downtime = action.downtime;
       return;
     case `setKeychainSchedule`: {
-      const keychain = state.user.draft.keychains.find((k) => k.id === action.id);
+      const keychain = state.child.draft.keychains.find((k) => k.id === action.id);
       if (keychain) {
         keychain.schedule = action.schedule;
       }

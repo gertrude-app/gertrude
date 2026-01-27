@@ -16,7 +16,7 @@ describe(`unlock request flow`, () => {
     });
 
     cy.interceptPql(`GetUnlockRequest`, mock.unlockRequest({ id: `2`, userId: `1` }));
-    cy.interceptPql(`GetUser`, mock.user({ id: `1`, keychains: [keychain] }));
+    cy.interceptPql(`GetChild`, mock.child({ id: `1`, keychains: [keychain] }));
     cy.interceptPql(`GetIdentifiedApps`, [mock.identifiedApp()]);
     cy.interceptPql(`GetSelectableKeychains`, { own: [keychain], public: [] });
     cy.interceptPql(`SaveKey`, { success: true });
@@ -68,7 +68,7 @@ describe(`unlock request flow`, () => {
   });
 
   it(`shows empty state if parent has no personal keychains to assign`, () => {
-    cy.interceptPql(`GetUser`, mock.user({ id: `1`, keychains: [] }));
+    cy.interceptPql(`GetChild`, mock.child({ id: `1`, keychains: [] }));
     cy.visit(`/children/1/unlock-requests/2`);
     cy.url().should(`include`, `/review`);
     cy.contains(`Accept`).click();
@@ -77,7 +77,7 @@ describe(`unlock request flow`, () => {
   });
 
   it(`shows alternate empty state if child has no personal keychains, but the parent has at least one they could assign`, () => {
-    cy.interceptPql(`GetUser`, mock.user({ id: `1`, keychains: [] }));
+    cy.interceptPql(`GetChild`, mock.child({ id: `1`, keychains: [] }));
     cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
     cy.visit(`/children/1/unlock-requests/2`);
     cy.url().should(`include`, `/review`);
@@ -163,7 +163,7 @@ describe(`unlock request flow`, () => {
     });
 
     // doesn't have keychain2
-    cy.interceptPql(`GetUser`, mock.user({ id: `1`, keychains: [keychain] }));
+    cy.interceptPql(`GetChild`, mock.child({ id: `1`, keychains: [keychain] }));
     cy.interceptPql(`GetSelectableKeychains`, { own: [keychain, keychain2], public: [] });
 
     cy.visit(`/children/1/unlock-requests/2/select-keychain`);
@@ -182,7 +182,7 @@ describe(`unlock request flow`, () => {
       name: `HTC`,
     });
 
-    cy.interceptPql(`GetUser`, mock.user({ id: `1`, keychains: [keychain, htc] }));
+    cy.interceptPql(`GetChild`, mock.child({ id: `1`, keychains: [keychain, htc] }));
     cy.interceptPql(`GetSelectableKeychains`, { own: [keychain, htc], public: [htc] });
     cy.visit(`/children/1/unlock-requests/2/select-keychain`);
     cy.contains(`HTC`);

@@ -95,6 +95,12 @@ export const throwingClient: ApiClient = {
   getAdminKeychains: () => {
     throw new Error(`ApiClient.getAdminKeychains() not implemented`);
   },
+  getChild: () => {
+    throw new Error(`ApiClient.getChild() not implemented`);
+  },
+  getChildren: () => {
+    throw new Error(`ApiClient.getChildren() not implemented`);
+  },
   getClaimDeviceData: () => {
     throw new Error(`ApiClient.getClaimDeviceData() not implemented`);
   },
@@ -127,12 +133,6 @@ export const throwingClient: ApiClient = {
   },
   getUnlockRequests: () => {
     throw new Error(`ApiClient.getUnlockRequests() not implemented`);
-  },
-  getUser: () => {
-    throw new Error(`ApiClient.getUser() not implemented`);
-  },
-  getUsers: () => {
-    throw new Error(`ApiClient.getUsers() not implemented`);
   },
   getUserUnlockRequests: () => {
     throw new Error(`ApiClient.getUserUnlockRequests() not implemented`);

@@ -9,8 +9,8 @@ describe(`create keychain`, () => {
     cy.interceptPql(`GetIdentifiedApps`, []);
     cy.interceptPql(`SaveKeychain`, { success: true });
     cy.interceptPql(`DeleteEntity_v2`, { success: true });
-    cy.interceptPql(`GetUsers`, [mock.user()]);
-    cy.interceptPql(`GetUser`, mock.user());
+    cy.interceptPql(`GetChildren`, [mock.child()]);
+    cy.interceptPql(`GetChild`, mock.child());
   });
 
   it(`doesn't allow selection of recently deleted keychains`, () => {
@@ -48,7 +48,7 @@ describe(`create keychain`, () => {
       own: [existing.summary],
       public: [],
     });
-    cy.interceptPql(`GetUser`, mock.user({ keychains: [existing.summary] }));
+    cy.interceptPql(`GetChild`, mock.child({ keychains: [existing.summary] }));
 
     cy.visit(`/keychains`);
     cy.contains(`Test keychain`);

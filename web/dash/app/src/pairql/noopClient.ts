@@ -64,6 +64,24 @@ const noopClient: ApiClient = {
       code: 123456,
     });
   },
+  getChild: async () => {
+    return Result.success({
+      id: ``,
+      name: ``,
+      keyloggingEnabled: false,
+      screenshotsEnabled: false,
+      screenshotsResolution: 1000,
+      screenshotsFrequency: 90,
+      showSuspensionActivity: true,
+      keychains: [],
+      computers: [],
+      iosDevices: [],
+      createdAt: new Date().toISOString(),
+    });
+  },
+  getChildren: async () => {
+    return Result.success([]);
+  },
   dashboardWidgets: async () => {
     return Result.success({
       children: [],
@@ -71,6 +89,7 @@ const noopClient: ApiClient = {
       unlockRequests: [],
       recentScreenshots: [],
       numParentNotifications: 0,
+      pendingIOSDevices: [],
     });
   },
   getIdentifiedApps: async () => {
@@ -123,20 +142,6 @@ const noopClient: ApiClient = {
   getUnlockRequests: async () => {
     return Result.success([]);
   },
-  getUser: async () => {
-    return Result.success({
-      id: ``,
-      name: ``,
-      keyloggingEnabled: false,
-      screenshotsEnabled: false,
-      screenshotsResolution: 1000,
-      screenshotsFrequency: 90,
-      showSuspensionActivity: true,
-      keychains: [],
-      devices: [],
-      createdAt: new Date().toISOString(),
-    });
-  },
   getDevice: async () => {
     return Result.success({
       id: ``,
@@ -186,9 +191,6 @@ const noopClient: ApiClient = {
     return Result.success({ childName: ``, days: [] });
   },
   familyActivitySummaries: async () => {
-    return Result.success([]);
-  },
-  getUsers: async () => {
     return Result.success([]);
   },
   decideFilterSuspensionRequest: async () => {
