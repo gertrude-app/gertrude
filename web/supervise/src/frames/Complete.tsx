@@ -1,15 +1,13 @@
 import cx from 'classnames';
 import React from 'react';
-import { useSupervise } from '../SuperviseContext';
+import type { CompleteProps } from '../types';
 
-const Complete: React.FC = () => {
-  const { api, mode, device } = useSupervise();
-
+const Complete: React.FC<CompleteProps> = ({ mode, deviceName, onDone }) => {
   const title = mode === `add` ? `Supervision Enabled` : `Supervision Removed`;
   const message =
     mode === `add`
-      ? `"${device?.name}" is now supervised.`
-      : `Supervision has been removed from "${device?.name}".`;
+      ? `"${deviceName}" is now supervised.`
+      : `Supervision has been removed from "${deviceName}".`;
 
   return (
     <div className="h-full flex flex-col items-center justify-center p-6 bg-white">
@@ -34,7 +32,7 @@ const Complete: React.FC = () => {
       <p className="text-sm text-gray-600 text-center mb-6 max-w-[280px]">{message}</p>
 
       <button
-        onClick={() => api.closeWindow()}
+        onClick={onDone}
         className={cx(
           `px-6 py-2.5 rounded-lg font-medium text-white transition-all`,
           `bg-gradient-to-r from-green-500 to-emerald-600`,

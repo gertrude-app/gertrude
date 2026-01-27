@@ -30,6 +30,7 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
     }
 
     expect(output.childName).toEqual(child.name)
+    expect(output.deviceType).toEqual(device.deviceType)
     expect(output.modelIdentifier).toEqual(device.modelIdentifier)
     expect(output.modelName).toEqual(device.modelName)
     expect(output.iosVersion).toEqual(device.iosVersion)

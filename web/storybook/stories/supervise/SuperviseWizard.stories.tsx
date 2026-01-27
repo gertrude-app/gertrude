@@ -1,6 +1,16 @@
-import { SuperviseWizard } from '@supervise/ui';
+import {
+  ChooseDirection,
+  CodeEntry,
+  Complete,
+  ConfirmReboot,
+  DeviceMismatch,
+  DisableFindMy,
+  DisablePrivateRelay,
+  InProgress,
+  PersonalizedConnect,
+} from '@supervise/ui';
 import type { Meta, StoryObj } from '@storybook/react';
-import type { DeviceInfo, SuperviseApi } from '@supervise/ui';
+import type { DeviceInfo } from '@supervise/ui';
 import { appWindow } from '../story-helpers';
 
 const mockDevice: DeviceInfo = {
@@ -10,134 +20,193 @@ const mockDevice: DeviceInfo = {
   osVersion: `17.2`,
 };
 
-const mockApi: SuperviseApi = {
-  getConnectedDevice: async () => {
-    await new Promise((r) => setTimeout(r, 800));
-    return mockDevice;
-  },
-  performOperation: async () => {
-    await new Promise((r) => setTimeout(r, 3000));
-  },
-  closeWindow: () => {
-    alert(`Window closed`);
-  },
-};
-
-const noDeviceApi: SuperviseApi = {
-  ...mockApi,
-  getConnectedDevice: async () => {
-    await new Promise((r) => setTimeout(r, 800));
-    throw new Error(`No device connected. Please connect your iPhone via USB.`);
-  },
-};
-
-const findMyEnabledApi: SuperviseApi = {
-  ...mockApi,
-  performOperation: async () => {
-    await new Promise((r) => setTimeout(r, 1500));
-    throw new Error(`Find My iPhone is enabled. Please disable it first.`);
-  },
-};
+const Window: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="w-[900px] h-[700px] overflow-hidden bg-white rounded-lg shadow-lg">
+    {children}
+  </div>
+);
 
 const meta = {
-  title: 'Supervise/SuperviseWizard', // eslint-disable-line
-  component: SuperviseWizard,
-  ...appWindow(400, 350),
-} satisfies Meta<typeof SuperviseWizard>;
+  title: 'Supervise/Frames', // eslint-disable-line
+  ...appWindow(900, 700),
+} satisfies Meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Frame1_ConnectDevice: Story = {
-  args: {
-    api: mockApi,
-    initialFrame: `connect-device`,
-  },
+export const CodeEntry_Empty: Story = {
+  render: () => (
+    <Window>
+      <CodeEntry
+        code=""
+        onCodeChange={() => {}}
+        onSubmit={() => {}}
+        loading={false}
+        error={null}
+      />
+    </Window>
+  ),
 };
 
-export const Frame1_NoDeviceError: Story = {
-  args: {
-    api: noDeviceApi,
-    initialFrame: `connect-device`,
-    initialError: `No device connected. Please connect your iPhone via USB.`,
-  },
+export const CodeEntry_Full: Story = {
+  render: () => (
+    <Window>
+      <CodeEntry
+        code="123456"
+        onCodeChange={() => {}}
+        onSubmit={() => {}}
+        loading={false}
+        error={null}
+      />
+    </Window>
+  ),
 };
 
-export const Frame2_ChooseDirection: Story = {
-  args: {
-    api: mockApi,
-    initialFrame: `choose-direction`,
-    initialDevice: mockDevice,
-  },
+export const CodeEntry_Loading: Story = {
+  render: () => (
+    <Window>
+      <CodeEntry
+        code="123456"
+        onCodeChange={() => {}}
+        onSubmit={() => {}}
+        loading={true}
+        error={null}
+      />
+    </Window>
+  ),
 };
 
-export const Frame3_DisableFindMy: Story = {
-  args: {
-    api: mockApi,
-    initialFrame: `disable-find-my`,
-    initialDevice: mockDevice,
-  },
+export const CodeEntry_Error: Story = {
+  render: () => (
+    <Window>
+      <CodeEntry
+        code="999999"
+        onCodeChange={() => {}}
+        onSubmit={() => {}}
+        loading={false}
+        error="Code not found. Check and try again."
+      />
+    </Window>
+  ),
 };
 
-export const Frame4_DisablePrivateRelay: Story = {
-  args: {
-    api: mockApi,
-    initialFrame: `disable-private-relay`,
-    initialDevice: mockDevice,
-  },
+export const PersonalizedConnect_Default: Story = {
+  render: () => (
+    <Window>
+      <PersonalizedConnect
+        childName="Luke"
+        deviceType="iPhone"
+        modelName="iPhone 14"
+        iosVersion="18.2"
+      />
+    </Window>
+  ),
 };
 
-export const Frame5_InProgress_Add: Story = {
-  args: {
-    api: mockApi,
-    initialFrame: `in-progress`,
-    initialDevice: mockDevice,
-    initialMode: `add`,
-  },
+export const DeviceMismatch_Default: Story = {
+  render: () => (
+    <Window>
+      <DeviceMismatch
+        expectedModelName="iPhone 14"
+        connectedModelName="iPhone 13"
+        childName="Luke"
+        onTryAgain={() => {}}
+      />
+    </Window>
+  ),
 };
 
-export const Frame5_InProgress_Remove: Story = {
-  args: {
-    api: mockApi,
-    initialFrame: `in-progress`,
-    initialDevice: mockDevice,
-    initialMode: `remove`,
-  },
+export const Frame_ChooseDirection: Story = {
+  render: () => (
+    <Window>
+      <ChooseDirection
+        device={mockDevice}
+        onChooseAdd={() => {}}
+        onChooseRemove={() => {}}
+      />
+    </Window>
+  ),
 };
 
-export const Frame5_FindMyError: Story = {
-  args: {
-    api: findMyEnabledApi,
-    initialFrame: `in-progress`,
-    initialDevice: mockDevice,
-    initialMode: `add`,
-    initialError: `Find My iPhone is enabled. Please disable it first.`,
-  },
+export const Frame_DisableFindMy: Story = {
+  render: () => (
+    <Window>
+      <DisableFindMy onContinue={() => {}} />
+    </Window>
+  ),
 };
 
-export const Frame6_ConfirmReboot: Story = {
-  args: {
-    api: mockApi,
-    initialFrame: `confirm-reboot`,
-    initialDevice: mockDevice,
-  },
+export const Frame_DisablePrivateRelay: Story = {
+  render: () => (
+    <Window>
+      <DisablePrivateRelay onContinue={() => {}} />
+    </Window>
+  ),
 };
 
-export const Frame7_Complete_Add: Story = {
-  args: {
-    api: mockApi,
-    initialFrame: `complete`,
-    initialDevice: mockDevice,
-    initialMode: `add`,
-  },
+export const Frame_InProgress_Ready: Story = {
+  render: () => (
+    <Window>
+      <InProgress
+        mode="add"
+        deviceName={mockDevice.name}
+        running={false}
+        progress={0}
+        onStart={() => {}}
+      />
+    </Window>
+  ),
 };
 
-export const Frame7_Complete_Remove: Story = {
-  args: {
-    api: mockApi,
-    initialFrame: `complete`,
-    initialDevice: mockDevice,
-    initialMode: `remove`,
-  },
+export const Frame_InProgress_Running: Story = {
+  render: () => (
+    <Window>
+      <InProgress
+        mode="add"
+        deviceName={mockDevice.name}
+        running={true}
+        progress={45}
+        onStart={() => {}}
+      />
+    </Window>
+  ),
+};
+
+export const Frame_InProgress_Remove: Story = {
+  render: () => (
+    <Window>
+      <InProgress
+        mode="remove"
+        deviceName={mockDevice.name}
+        running={false}
+        progress={0}
+        onStart={() => {}}
+      />
+    </Window>
+  ),
+};
+
+export const Frame_ConfirmReboot: Story = {
+  render: () => (
+    <Window>
+      <ConfirmReboot onConfirm={() => {}} />
+    </Window>
+  ),
+};
+
+export const Frame_Complete_Add: Story = {
+  render: () => (
+    <Window>
+      <Complete mode="add" deviceName={mockDevice.name} onDone={() => {}} />
+    </Window>
+  ),
+};
+
+export const Frame_Complete_Remove: Story = {
+  render: () => (
+    <Window>
+      <Complete mode="remove" deviceName={mockDevice.name} onDone={() => {}} />
+    </Window>
+  ),
 };
 
 export default meta;

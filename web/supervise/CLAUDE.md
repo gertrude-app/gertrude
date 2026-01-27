@@ -4,48 +4,35 @@ React UI for Mac/Windows iOS device supervision app.
 
 ## Architecture
 
-This package contains **only the UI** for a Tauri desktop app that supervises iOS devices.
-The actual Tauri/Rust code lives in a separate private repo.
+This package contains **purely presentational React components** for a Tauri desktop app
+that supervises iOS devices. The actual Tauri/Rust code and orchestration logic live in a
+separate private repo.
 
-## Status
-
-This UI layer is in proof-of-concept mode. The final production code will likely be much
-different. It's current state just proves out the sharing of code between two repos, and
-slots in a place for this UI in the open source monorepo. The API, structure and UI will
-change significantly before production.
-
-## Key Pattern: Abstract API
-
-Components accept a `SuperviseApi` interface instead of calling Tauri directly:
-
-```typescript
-interface SuperviseApi {
-  getConnectedDevice: () => Promise<DeviceInfo>;
-  performOperation: (mode: 'add' | 'remove') => Promise<void>;
-  closeWindow: () => void;
-}
-```
-
-The private Tauri repo provides the glue that maps this to actual `invoke()` calls.
+Components accept typed props and fire callbacks — they have no knowledge of state
+management, API calls, or Tauri operations. The private repo owns the state machine and
+wires these components together.
 
 ## Structure
 
-- `src/SuperviseWizard.tsx` - Main component, accepts `api` prop
-- `src/SuperviseContext.tsx` - React context for shared state
-- `src/frames/` - 7 wizard frames (ConnectDevice → Complete)
-- `src/types.ts` - DeviceInfo, SuperviseApi, Frame types
+- `src/frames/` — 9 frame components (CodeEntry, PersonalizedConnect, ChooseDirection,
+  etc.)
+- `src/types.ts` — Prop interfaces for all components
+- `src/index.ts` — Public exports
+- `src/FrameBackground.tsx` — Shared background wrapper with subtle gradient
+- `src/assets/` — Images used by frames
 
 ## Workflow
 
 1. Develop UI here with Storybook (`pnpm --filter @storybook/app start`)
-2. Sync to private repo: `cd {path-to-repo} && just sync-ui`
-3. Run Tauri app: `just run`
+2. Sync to private repo: `cd {path/to}/supervise && just sync-ui`
+3. Run Tauri app: `just dev`
 
 ## Storybook
 
-Stories at `../storybook/stories/supervise/`. Use `initialFrame`, `initialDevice`,
-`initialError` props to preview specific states.
+Stories at `../storybook/stories/supervise/`. Each story renders a frame with specific
+props to preview different visual states.
 
 ## Window Size
 
-The Tauri app window is fixed at **400×350px**. All frames must fit this constraint.
+The Tauri app window is fixed at **900×700px** (matching macOS onboarding). All frames
+must fit this constraint.

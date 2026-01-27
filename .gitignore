@@ -33,6 +33,7 @@ buildServer.json
 
 # Generated files
 web/appviews/src/main.tsx
+**/next-env.d.ts
 
 # Build output directories
 web/storybook/storybook-static/

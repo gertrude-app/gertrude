@@ -39,7 +39,7 @@ nuke-node-modules:
 # build & deploy
 
 build-site:
-  @pnpm --filter site build
+  @pnpm exec nx run site:build
 
 build-storybook:
   @pnpm exec nx run @storybook/app:build
@@ -95,7 +95,7 @@ typecheck-watch:
 
 fix: format lint-fix
 
-check: lint format-check typecheck test build-storybook
+check: lint format-check typecheck test build-storybook build-site
 
 [private]
 hmr-comment:
