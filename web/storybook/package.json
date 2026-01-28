@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "storybook dev --port 6007 --config-dir ./config --ci --disable-telemetry",
+    "start": "storybook dev --port 6006 --config-dir ./config --ci --disable-telemetry",
     "build": "storybook build --config-dir ./config --disable-telemetry",
     "typecheck": "tsc --noEmit"
   },

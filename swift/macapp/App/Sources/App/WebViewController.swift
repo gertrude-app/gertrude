@@ -138,6 +138,9 @@ class GertrudeWebview: WKWebView {
       case "a":
         NSApp.sendAction(#selector(NSText.selectAll(_:)), to: nil, from: self)
         return true
+      case "w":
+        self.window?.close()
+        return true
       default:
         break
       }
