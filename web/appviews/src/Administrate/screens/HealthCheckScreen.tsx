@@ -10,6 +10,7 @@ type Props = HealthCheck & {
   screenshotMonitoringEnabled: boolean;
   keystrokeMonitoringEnabled: boolean;
   installedAppVersion: string;
+  osVersionMajor: number;
   emit(action: HealthCheckAction): unknown;
 };
 
@@ -17,6 +18,7 @@ const HealthCheckScreen: React.FC<Props> = ({
   installedAppVersion,
   screenshotMonitoringEnabled,
   keystrokeMonitoringEnabled,
+  osVersionMajor,
   emit,
   ...props
 }) => {
@@ -25,6 +27,7 @@ const HealthCheckScreen: React.FC<Props> = ({
     installedAppVersion,
     screenshotMonitoringEnabled,
     keystrokeMonitoringEnabled,
+    osVersionMajor,
   );
 
   return (

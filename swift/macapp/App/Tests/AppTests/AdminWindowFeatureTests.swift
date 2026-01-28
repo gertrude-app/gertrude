@@ -17,6 +17,7 @@ final class AdminWindowFeatureTests: XCTestCase {
   func testAllNonCurrentUsersConsideredExemptable() async {
     await withDependencies {
       $0.app.installedVersion = { "1.0.0" }
+      $0.device.osVersion = { .sequoia }
       $0.date = .constant(.reference)
     } operation: {
       let (store, _) = AppReducer.testStore(mockDeps: false) {

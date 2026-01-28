@@ -54,6 +54,7 @@ struct AdminWindowFeature: Feature {
       var installedAppVersion: String
       var releaseChannel: ReleaseChannel
       var quitting: Bool
+      var osVersionMajor: Int
 
       struct AvailableAppUpdate: Equatable, Encodable {
         var semver: String
@@ -619,6 +620,7 @@ extension AdminWindowFeature.State.HealthCheck {
 extension AdminWindowFeature.State.View {
   init(rootState: AppReducer.State) {
     @Dependency(\.app) var app
+    @Dependency(\.device) var device
     let featureState = rootState.adminWindow
     let installedVersion = app.installedVersion() ?? "0.0.0"
 
@@ -634,6 +636,7 @@ extension AdminWindowFeature.State.View {
     self.installedAppVersion = installedVersion
     self.releaseChannel = rootState.appUpdates.releaseChannel
     self.quitting = featureState.quitting
+    self.osVersionMajor = device.osVersion().major
 
     if let latest = rootState.appUpdates.latestVersion, latest.semver > installedVersion {
       availableAppUpdate = .init(
