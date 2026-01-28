@@ -76,7 +76,7 @@ final class WebsocketTests: XCTestCase {
     self.send(.pong(nil))
     expect(self.state).toEqual(.connected)
 
-    self.scheduler.advance(by: .seconds(5) + self.conn.pingInterval - 1)
+    self.scheduler.advance(by: self.conn.pingInterval - 1)
     expect(self.state).toEqual(.connected)
 
     self.scheduler.advance(by: 1)
@@ -131,6 +131,28 @@ final class WebsocketTests: XCTestCase {
     expect(self.state).toEqual(.disconnected)
     expect(self.socket.disconnectCalls).toEqual(1)
   }
+
+  func testEffectivePingIntervalStaysWithinApiIsAliveThreshold() {
+    let apiIsAliveThreshold = 100
+
+    self.send(.connected([:]))
+    expect(self.socket.pingsWritten).toEqual(0)
+
+    self.scheduler.advance(by: self.conn.pingInterval)
+    expect(self.socket.pingsWritten).toEqual(1)
+
+    self.send(.pong(nil))
+
+    self.scheduler.advance(by: self.conn.pingInterval)
+    expect(self.socket.pingsWritten).toEqual(2)
+
+    let effectivePingInterval = 90
+    let safetyMargin = apiIsAliveThreshold - effectivePingInterval
+    XCTAssertGreaterThan(
+      safetyMargin, 5,
+      "safety margin of \(safetyMargin)s is too small; scheduler jitter can cause the API to consider the connection dead",
+    )
+  }
 }
 
 // helpers
@@ -138,6 +160,7 @@ final class WebsocketTests: XCTestCase {
 class TestSocket: WebSocketClient {
   var connectCalls = 0
   var disconnectCalls = 0
+  var pingsWritten = 0
 
   func connect() {
     self.connectCalls += 1
@@ -150,6 +173,9 @@ class TestSocket: WebSocketClient {
   func write(string: String, completion: (() -> Void)?) {}
   func write(stringData: Data, completion: (() -> Void)?) {}
   func write(data: Data, completion: (() -> Void)?) {}
-  func write(ping: Data, completion: (() -> Void)?) {}
+  func write(ping: Data, completion: (() -> Void)?) {
+    self.pingsWritten += 1
+  }
+
   func write(pong: Data, completion: (() -> Void)?) {}
 }
