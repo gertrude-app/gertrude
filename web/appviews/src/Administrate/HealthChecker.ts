@@ -23,6 +23,7 @@ export default class HealthChecker {
     private installedAppVersion: string,
     private screenshotMonitoringEnabled: boolean,
     private keystrokeMonitoringEnabled: boolean,
+    private osVersionMajor: number,
   ) {}
 
   public get items(): ItemData[] {
@@ -193,6 +194,7 @@ export default class HealthChecker {
   }
 
   public get notificationsPermission(): ItemData {
+    const isTahoeOrLater = this.osVersionMajor >= 26;
     switch (this.data.notificationsSetting) {
       case `alert`:
         return {
@@ -203,7 +205,9 @@ export default class HealthChecker {
         return {
           title: `Notification settings`,
           state: `warn`,
-          message: `Set to "banner", recommended setting is "alert"`,
+          message: isTahoeOrLater
+            ? `Set to “temporary”, recommended setting is “persistent”`
+            : `Set to “banner”, recommended setting is “alert”`,
           button: {
             icon: `cog`,
             label: `Fix setting`,

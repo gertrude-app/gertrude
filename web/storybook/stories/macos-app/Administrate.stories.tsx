@@ -38,6 +38,7 @@ export const Actions: Story = props({
   filterSuspensionDurationInSeconds: `300`,
   dangerZoneModal: `hidden`,
   availableAppUpdate: undefined,
+  osVersionMajor: 26,
   emit: () => {},
   dispatch: () => {},
 });

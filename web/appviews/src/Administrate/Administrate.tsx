@@ -26,6 +26,7 @@ export const Administrate: React.FC<Props> = ({
   advanced,
   quitting,
   dangerZoneModal,
+  osVersionMajor,
   emit,
   dispatch,
 }) => {
@@ -39,6 +40,7 @@ export const Administrate: React.FC<Props> = ({
           installedAppVersion={installedAppVersion}
           screenshotMonitoringEnabled={user?.keystrokeMonitoringEnabled ?? false}
           keystrokeMonitoringEnabled={user?.screenshotMonitoringEnabled ?? false}
+          osVersionMajor={osVersionMajor}
           emit={(action) => emit({ case: `healthCheck`, action })}
         />
       );

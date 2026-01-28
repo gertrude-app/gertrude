@@ -82,6 +82,7 @@ export interface AppState {
   installedAppVersion: string;
   releaseChannel: `stable` | `beta` | `canary`;
   quitting: boolean;
+  osVersionMajor: number;
   exemptableUsers?: Failable<ExemptableUser[]>;
   advanced?: AdvancedState;
 }
@@ -125,6 +126,7 @@ export class AdministrateStore extends Store<AppState, AppEvent, ViewState, View
       healthCheck: {},
       releaseChannel: `stable`,
       quitting: false,
+      osVersionMajor: 26,
     };
   }
 

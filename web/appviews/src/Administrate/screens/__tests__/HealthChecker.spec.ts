@@ -179,6 +179,7 @@ function makeChecker(
   installedAppVersion = `1.0.0`,
   screenshotMonitoringEnabled = true,
   keystrokeMonitoringEnabled = true,
+  osVersionMajor = 26,
 ): HealthChecker {
   const healthCheck: HealthCheck = {
     latestAppVersion: { case: `ok`, value: `1.0.0` },
@@ -195,5 +196,6 @@ function makeChecker(
     installedAppVersion,
     screenshotMonitoringEnabled,
     keystrokeMonitoringEnabled,
+    osVersionMajor,
   );
 }
