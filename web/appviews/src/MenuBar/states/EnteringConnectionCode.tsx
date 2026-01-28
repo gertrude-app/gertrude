@@ -11,9 +11,16 @@ interface Props {
 
 const EnteringConnectionCode: React.FC<Props> = ({ emit, connectionCode, dispatch }) => {
   const codeValid = connectionCode.match(/^\d{6}$/) !== null;
+
   function submit(): void {
     if (!codeValid) return;
     emit({ case: `connectSubmit`, code: Number(connectionCode) });
+  }
+
+  function handlePaste(e: React.ClipboardEvent<HTMLInputElement>): void {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData(`text`).replace(/\D/g, ``).slice(0, 6);
+    dispatch({ type: `connectionCodeUpdated`, code: pasted });
   }
   return (
     <MenuBarSized className="p-2">
@@ -35,11 +42,14 @@ const EnteringConnectionCode: React.FC<Props> = ({ emit, connectionCode, dispatc
         <div className="flex justify-center rounded-2xl space-x-1 bg-white/20 p-4">
           <input
             type="text"
+            inputMode="numeric"
             value={connectionCode}
             autoFocus
-            onChange={(e) =>
-              dispatch({ type: `connectionCodeUpdated`, code: e.target.value })
-            }
+            onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, ``).slice(0, 6);
+              dispatch({ type: `connectionCodeUpdated`, code: digits });
+            }}
+            onPaste={handlePaste}
             className="rounded-l-xl rounded-r border-none h-12 shadow focus:ring-indigo-500 focus:ring-2 transition duration-100 flex-grow"
           />
           <button
