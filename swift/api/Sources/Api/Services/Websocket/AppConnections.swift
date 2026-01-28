@@ -12,7 +12,7 @@ import Gertie
   func start() async {
     while true {
       try? await Task.sleep(seconds: 120)
-      self.flush()
+      await self.flush()
     }
   }
 
@@ -59,23 +59,24 @@ import Gertie
     return .offline
   }
 
-  private func flush() {
+  func flush() async {
     for connection in self.connections.values.filter(\.isDead) {
+      try? await connection.ws.close(code: .goingAway)
       self.remove(connection)
     }
   }
 
-  private var currentConnections: [AppConnection] {
-    self.flush()
+  private func currentConnections() async -> [AppConnection] {
+    await self.flush()
     return Array(self.connections.values)
   }
 
   func send(_ event: AppEvent) async throws {
-    try await self.currentConnections
-      .filter { $0.ids.satisfies(matcher: event.matcher) }
-      .asyncForEach { @Sendable conn in
-        try await conn.ws.send(app: event.message)
-      }
+    let conns = await self.currentConnections()
+    let matching = conns.filter { $0.ids.satisfies(matcher: event.matcher) }
+    for conn in matching {
+      try await conn.ws.send(app: event.message)
+    }
   }
 
   deinit {
