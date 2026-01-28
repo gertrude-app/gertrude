@@ -12,7 +12,7 @@ import Gertie
   func start() async {
     while true {
       try? await Task.sleep(seconds: 120)
-      self.flush()
+      await self.flush()
     }
   }
 
@@ -59,52 +59,24 @@ import Gertie
     return .offline
   }
 
-  private func flush() {
+  func flush() async {
     for connection in self.connections.values.filter(\.isDead) {
+      try? await connection.ws.close(code: .goingAway)
       self.remove(connection)
     }
   }
 
-  private var currentConnections: [AppConnection] {
-    self.flush()
+  private func currentConnections() async -> [AppConnection] {
+    await self.flush()
     return Array(self.connections.values)
   }
 
   func send(_ event: AppEvent) async throws {
-    let conns = self.currentConnections
+    let conns = await self.currentConnections()
     let matching = conns.filter { $0.ids.satisfies(matcher: event.matcher) }
-
-    if matching.isEmpty,
-       case .filterSuspensionRequestDecided_v2 = event.message,
-       case .userDevice(let computerUserId) = event.matcher {
-      self.logger.warning(
-        "[WS] no connection to deliver filter suspension decision, computerUser: \(computerUserId)",
-      )
-      let parentLink = await self.slackParentLink(for: computerUserId)
-      await get(dependency: \.slack).internal(
-        .macosLogs,
-        "ws: \(githubSearch("b7e3a1f9")), detail: _filter suspension decision had no connection_\(parentLink)",
-      )
-    }
-
     for conn in matching {
       try await conn.ws.send(app: event.message)
     }
-  }
-
-  private func slackParentLink(for computerUserId: ComputerUser.Id) async -> String {
-    let db = get(dependency: \.db)
-    guard let computerUser = try? await db.find(computerUserId),
-          let child = try? await computerUser.child(in: db),
-          let parent = try? await child.parent(in: db) else {
-      return ""
-    }
-    let computer = try? await computerUser.computer(in: db)
-    let computerName = computer?.customName ?? computer?.modelIdentifier ?? "unknown"
-    return "\n  -> " + AdminLink().slack(
-      to: .parent(parent.id),
-      text: "\(parent.email), \(child.name), \(computerName)",
-    )
   }
 
   deinit {

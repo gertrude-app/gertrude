@@ -1,18 +1,29 @@
 import Gertie
+import NIOCore
 import NIOWebSocket
 import Vapor
 import XCore
 
-protocol WebsocketProtocol {
-  func onText(_ callback: @Sendable @escaping (Self, String) async -> Void)
+protocol WebsocketProtocol: Sendable {
+  var eventLoop: EventLoop { get }
+  var isClosed: Bool { get }
+  var onClose: EventLoopFuture<Void> { get }
+  func setupTextHandler(_ callback: @Sendable @escaping (String) -> Void)
+  func setupPingHandler(_ callback: @Sendable @escaping () -> Void)
   func close(code: WebSocketErrorCode) async throws
   func close(code: WebSocketErrorCode) -> EventLoopFuture<Void>
-  var onClose: EventLoopFuture<Void> { get }
-  var isClosed: Bool { get }
-  func send(_ text: some Collection<Character>) async throws
+  func send(_ text: String) async throws
 }
 
-extension WebSocket: WebsocketProtocol {}
+extension WebSocket: WebsocketProtocol {
+  func setupTextHandler(_ callback: @Sendable @escaping (String) -> Void) {
+    self.onText { _, text in callback(text) }
+  }
+
+  func setupPingHandler(_ callback: @Sendable @escaping () -> Void) {
+    self.onPing { _, _ in callback() }
+  }
+}
 
 extension WebsocketProtocol {
   func send(codable msg: some Codable) async throws {

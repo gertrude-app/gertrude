@@ -19,18 +19,18 @@ final class AppConnection: Sendable {
 
   let id: Id
   let ids: Ids
-  let ws: WebSocket
+  let ws: any WebsocketProtocol
   let filterState: Mutex<FilterStateData?> = Mutex(nil)
   let lastActivity = Mutex(Date())
 
-  init(ws: WebSocket, ids: Ids) {
+  init(ws: any WebsocketProtocol, ids: Ids) {
     self.id = .init(UUID())
     self.ids = ids
     self.ws = ws
     // https://github.com/vapor/websocket-kit/issues/139
     self.ws.eventLoop.execute {
-      self.ws.onText { _, text in self.onText(text) }
-      self.ws.onPing { _, _ in self.onPing() }
+      self.ws.setupTextHandler { [weak self] text in self?.onText(text) }
+      self.ws.setupPingHandler { [weak self] in self?.onPing() }
       self.ws.onClose.whenComplete { result in
         switch result {
         case .success:

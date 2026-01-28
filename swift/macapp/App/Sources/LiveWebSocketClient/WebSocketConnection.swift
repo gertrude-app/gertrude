@@ -90,6 +90,7 @@ public class WebSocketConnection: WebSocketDelegate {
     case .pong:
       self.log("received pong, connectivity confirmed")
       self.transition(receiving: .receivedPong)
+      self.schedulePing()
 
     case .text(let json):
       guard let message = try? JSON.decode(json, as: WebSocketMessage.FromApiToApp.self) else {
@@ -136,10 +137,6 @@ public class WebSocketConnection: WebSocketDelegate {
     if self.currentState == .waitingForPong {
       self.logError("failed to receive timely pong")
       self.transition(receiving: .failedToReceiveTimelyPong)
-    } else if self.currentState == .connected {
-      self.schedulePing()
-    } else {
-      self.logError("unexpected state checking pong response")
     }
   }
 

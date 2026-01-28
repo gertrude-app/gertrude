@@ -2,7 +2,11 @@
 
 ## Release notes
 
-- `2.8.0` (beta 1/14/26)
+- `2.8.1` (beta 1/28/26, new downloads for now, watching ws fix effect)
+  - increase websocket margin of safety
+  - support copy/paste of connection codes
+  - fix wrong language for health check notification repair on Tahoe
+- `2.8.0` (released 1/14/26)
   - detect and mitigate screentime conflict
   - fix onboarding bug, not showing exempt user screen
 - `2.7.5` (beta 12/8/25, new downloads only)
