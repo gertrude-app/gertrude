@@ -10,6 +10,7 @@ interface Props {
   disabled?: boolean;
   length?: number;
   className?: string;
+  autoFocus?: boolean;
 }
 
 const CodeInput: React.FC<Props> = ({
@@ -19,12 +20,15 @@ const CodeInput: React.FC<Props> = ({
   disabled = false,
   length = 6,
   className,
+  autoFocus = true,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    inputRef.current?.focus({ preventScroll: true });
-  }, []);
+    if (autoFocus) {
+      inputRef.current?.focus({ preventScroll: true });
+    }
+  }, [autoFocus]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const digits = e.target.value.replace(/\D/g, ``).slice(0, length);

@@ -1,5 +1,6 @@
+import { CodeInput } from '@shared/components';
 import cx from 'classnames';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext } from 'react';
 import type { RequestState } from '../onboarding-store';
 import OnboardingContext from '../OnboardingContext';
 import * as Onboarding from '../UtilityComponents';
@@ -10,29 +11,9 @@ interface Props {
 }
 
 const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
   const { currentStep, emit, dispatch, osVersion } = useContext(OnboardingContext);
   const codeValid = connectionCode.match(/^\d{6}$/) !== null;
-
-  useEffect(() => {
-    if (
-      // catalina and big sur both showed wonky layout issues, caused by the focus
-      currentStep === `connectChild` &&
-      osVersion.major > 12 /* 12 = monterey */
-    ) {
-      inputRef.current?.focus({ preventScroll: true });
-    }
-  }, [currentStep, osVersion]);
-
-  useEffect(() => {
-    const listener: (event: KeyboardEvent) => void = (event: KeyboardEvent) => {
-      if (event.key === `Enter` && codeValid) {
-        emit({ case: `connectChildSubmitted`, code: Number(connectionCode) });
-      }
-    };
-    window.addEventListener(`keydown`, listener);
-    return () => window.removeEventListener(`keydown`, listener);
-  });
+  const shouldAutoFocus = currentStep === `connectChild` && osVersion.major > 12;
 
   return (
     <Onboarding.Centered className="relative">
@@ -49,16 +30,15 @@ const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
           Enter the 6-digit connection code from the Gertrude parent’s site:
         </p>
         <div className="flex mt-8 space-x-4">
-          <input
-            ref={inputRef}
-            disabled={currentStep !== `connectChild`}
-            type="text"
-            onChange={(event) =>
-              dispatch({ type: `connectionCodeUpdated`, code: event.target.value })
-            }
+          <CodeInput
             value={connectionCode}
-            className="shadow-lg shadow-slate-300/50 rounded-2xl text-3xl px-6 py-4 text-slate-600 font-bold font-mono w-64 tracking-[8px] border-2 border-white focus:border-violet-400 focus:ring-0 transition-[border-color,transform,box-shadow] duration-300 focus:shadow-xl focus:shadow-slate-300/50 focus:-translate-y-0.5 placeholder:text-slate-200"
-            placeholder="******"
+            onChange={(code) => dispatch({ type: `connectionCodeUpdated`, code })}
+            onSubmit={() =>
+              emit({ case: `connectChildSubmitted`, code: Number(connectionCode) })
+            }
+            disabled={currentStep !== `connectChild`}
+            autoFocus={shouldAutoFocus}
+            className="w-64 border-white"
           />
           <button
             tabIndex={-1}
