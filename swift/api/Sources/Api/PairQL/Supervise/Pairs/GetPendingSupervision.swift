@@ -25,6 +25,11 @@ extension GetPendingSupervision: Resolver {
       in: context,
     )
 
+    if validated.supervision.supervisedAt != nil {
+      let msg = "Device already supervised. Open the Gertrude app on the \(validated.device.deviceType) to continue setup."
+      throw context.error("1a01d2ae", .badRequest, user: msg)
+    }
+
     let child = try await context.db.find(validated.claimedChildId)
     return .init(
       childName: child.name,

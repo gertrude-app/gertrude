@@ -3,6 +3,7 @@ import Vapor
 
 enum SuperviseRoute: PairRoute {
   case getPendingSupervision(GetPendingSupervision.Input)
+  case logSupervisionEvent(LogSupervisionEvent.Input)
   case recordDeviceConnection(RecordDeviceConnection.Input)
   case markSupervisionVerified(MarkSupervisionVerified.Input)
   case reportSupervisionFailed(ReportSupervisionFailed.Input)
@@ -11,6 +12,10 @@ enum SuperviseRoute: PairRoute {
     Route(.case(Self.getPendingSupervision)) {
       Operation(GetPendingSupervision.self)
       Body(.json(GetPendingSupervision.Input.self))
+    }
+    Route(.case(Self.logSupervisionEvent)) {
+      Operation(LogSupervisionEvent.self)
+      Body(.json(LogSupervisionEvent.Input.self))
     }
     Route(.case(Self.recordDeviceConnection)) {
       Operation(RecordDeviceConnection.self)
@@ -32,6 +37,9 @@ extension SuperviseRoute: RouteResponder {
     switch route {
     case .getPendingSupervision(let input):
       let output = try await GetPendingSupervision.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .logSupervisionEvent(let input):
+      let output = try await LogSupervisionEvent.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .recordDeviceConnection(let input):
       let output = try await RecordDeviceConnection.resolve(with: input, in: context)

@@ -6,12 +6,10 @@ interface Props {
 
 const FrameBackground: React.FC<Props> = ({ children }) => (
   <div className="h-full relative overflow-hidden bg-slate-50">
-    <div className="absolute w-[50rem] h-[50rem] -right-64 -top-64 [background:radial-gradient(#8b5cf625_0%,transparent_70%,transparent)]" />
-    <div className="absolute w-[50rem] h-[50rem] right-16 -top-80 [background:radial-gradient(#d946ef20_0%,transparent_70%,transparent)]" />
-    <div className="absolute w-[50rem] h-[50rem] -left-80 -top-64 [background:radial-gradient(#8b5cf618_0%,transparent_70%,transparent)]" />
-    <div className="relative h-full flex flex-col items-center justify-center p-12">
-      {children}
-    </div>
+    <div className="absolute w-152 h-152 -left-96 -bottom-72 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)]" />
+    <div className="absolute w-152 h-152 left-0 -bottom-96 [background:radial-gradient(#d946ef56_0%,transparent_70%,transparent)]" />
+    <div className="absolute w-152 h-152 -right-80 -bottom-80 [background:radial-gradient(#8b5cf656_0%,transparent_70%,transparent)]" />
+    <div className="relative h-full">{children}</div>
   </div>
 );
 

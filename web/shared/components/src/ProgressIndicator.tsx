@@ -3,21 +3,22 @@ import React from 'react';
 
 interface Props {
   step: number;
+  totalSteps: number;
 }
 
-const ProgressIndicator: React.FC<Props> = ({ step }) => (
-  <div className="flex space-x-8 relative items-center">
+const ProgressIndicator: React.FC<Props> = ({ step, totalSteps }) => (
+  <div className="inline-flex space-x-8 relative items-center">
     <div
       className={cx(
         `absolute h-[3px] bg-violet-300 transition-[width] duration-1000 rounded-full`,
       )}
       style={{
-        width: `calc(${((step - 1) * 100) / 6}%)`,
+        width: `calc(${((step - 1) * 100) / (totalSteps - 1)}%)`,
       }}
     />
-    {new Array(7).fill(null).map((_, i) => (
+    {new Array(totalSteps).fill(null).map((_, i) => (
       <Step
-        key={i} // fine in this context
+        key={i}
         number={i + 1}
         status={step < i + 1 ? `incomplete` : step > i + 1 ? `complete` : `current`}
       />

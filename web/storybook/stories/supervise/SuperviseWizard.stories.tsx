@@ -1,24 +1,19 @@
 import {
-  ChooseDirection,
   CodeEntry,
   Complete,
-  ConfirmReboot,
+  ConfirmDevice,
+  ConfirmSupervision,
   DeviceMismatch,
   DisableFindMy,
   DisablePrivateRelay,
-  InProgress,
+  Error,
+  GetReady,
   PersonalizedConnect,
+  Supervising,
+  SwipeToUpgrade,
 } from '@supervise/ui';
 import type { Meta, StoryObj } from '@storybook/react';
-import type { DeviceInfo } from '@supervise/ui';
 import { appWindow } from '../story-helpers';
-
-const mockDevice: DeviceInfo = {
-  id: `00008030-001A34E22EFA802E`,
-  name: `Jane's iPhone`,
-  model: `iPhone 14 Pro`,
-  osVersion: `17.2`,
-};
 
 const Window: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="w-[900px] h-[700px] overflow-hidden bg-white rounded-lg shadow-lg">
@@ -115,13 +110,14 @@ export const DeviceMismatch_Default: Story = {
   ),
 };
 
-export const Frame_ChooseDirection: Story = {
+export const Frame_ConfirmDevice: Story = {
   render: () => (
     <Window>
-      <ChooseDirection
-        device={mockDevice}
-        onChooseAdd={() => {}}
-        onChooseRemove={() => {}}
+      <ConfirmDevice
+        deviceName="Harriet's iPhone"
+        iosVersion="18.5"
+        onConfirm={() => {}}
+        onReject={() => {}}
       />
     </Window>
   ),
@@ -130,7 +126,7 @@ export const Frame_ChooseDirection: Story = {
 export const Frame_DisableFindMy: Story = {
   render: () => (
     <Window>
-      <DisableFindMy onContinue={() => {}} />
+      <DisableFindMy childName="Luke" deviceType="iPhone" onContinue={() => {}} />
     </Window>
   ),
 };
@@ -143,68 +139,71 @@ export const Frame_DisablePrivateRelay: Story = {
   ),
 };
 
-export const Frame_InProgress_Ready: Story = {
+export const Frame_GetReady: Story = {
   render: () => (
     <Window>
-      <InProgress
-        mode="add"
-        deviceName={mockDevice.name}
-        running={false}
-        progress={0}
-        onStart={() => {}}
+      <GetReady onStart={() => {}} />
+    </Window>
+  ),
+};
+
+export const Frame_Supervising: Story = {
+  render: () => (
+    <Window>
+      <Supervising />
+    </Window>
+  ),
+};
+
+export const Frame_SwipeToUpgrade: Story = {
+  render: () => (
+    <Window>
+      <SwipeToUpgrade onContinue={() => {}} />
+    </Window>
+  ),
+};
+
+export const Frame_ConfirmSupervision: Story = {
+  render: () => (
+    <Window>
+      <ConfirmSupervision onYes={() => {}} onNo={() => {}} />
+    </Window>
+  ),
+};
+
+export const Frame_Complete: Story = {
+  render: () => (
+    <Window>
+      <Complete childName="Jane" deviceType="iPhone" onDone={() => {}} />
+    </Window>
+  ),
+};
+
+export const Frame_Error_FindMyEnabled: Story = {
+  render: () => (
+    <Window>
+      <Error errorType="findMyEnabled" onRetry={() => {}} onContactSupport={() => {}} />
+    </Window>
+  ),
+};
+
+export const Frame_Error_InvokeFailed: Story = {
+  render: () => (
+    <Window>
+      <Error
+        errorType="invokeFailed"
+        errorMessage="Device disconnected unexpectedly"
+        onRetry={() => {}}
+        onContactSupport={() => {}}
       />
     </Window>
   ),
 };
 
-export const Frame_InProgress_Running: Story = {
+export const Frame_Error_UserReportedNo: Story = {
   render: () => (
     <Window>
-      <InProgress
-        mode="add"
-        deviceName={mockDevice.name}
-        running={true}
-        progress={45}
-        onStart={() => {}}
-      />
-    </Window>
-  ),
-};
-
-export const Frame_InProgress_Remove: Story = {
-  render: () => (
-    <Window>
-      <InProgress
-        mode="remove"
-        deviceName={mockDevice.name}
-        running={false}
-        progress={0}
-        onStart={() => {}}
-      />
-    </Window>
-  ),
-};
-
-export const Frame_ConfirmReboot: Story = {
-  render: () => (
-    <Window>
-      <ConfirmReboot onConfirm={() => {}} />
-    </Window>
-  ),
-};
-
-export const Frame_Complete_Add: Story = {
-  render: () => (
-    <Window>
-      <Complete mode="add" deviceName={mockDevice.name} onDone={() => {}} />
-    </Window>
-  ),
-};
-
-export const Frame_Complete_Remove: Story = {
-  render: () => (
-    <Window>
-      <Complete mode="remove" deviceName={mockDevice.name} onDone={() => {}} />
+      <Error errorType="userReportedNo" onRetry={() => {}} onContactSupport={() => {}} />
     </Window>
   ),
 };

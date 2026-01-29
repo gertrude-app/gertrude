@@ -1,4 +1,5 @@
 import { Button } from '@shared/components';
+import { posessive } from '@shared/string';
 import React from 'react';
 import type { DeviceMismatchProps } from '../types';
 import FrameBackground from '../FrameBackground';
@@ -10,7 +11,7 @@ const DeviceMismatch: React.FC<DeviceMismatchProps> = ({
   onTryAgain,
 }) => (
   <FrameBackground>
-    <div className="flex flex-col items-center justify-center max-w-md">
+    <div className="h-full flex flex-col items-center justify-center max-w-md mx-auto">
       <div className="w-16 h-16 mb-6 rounded-2xl bg-red-100 flex items-center justify-center">
         <svg
           className="w-8 h-8 text-red-600"
@@ -45,7 +46,9 @@ const DeviceMismatch: React.FC<DeviceMismatchProps> = ({
       </div>
 
       <p className="text-base text-slate-600 text-center mb-8">
-        Please disconnect this device and connect {childName}&rsquo;s {expectedModelName}.
+        Please disconnect this device and connect {posessive(childName)}
+        {` `}
+        {expectedModelName}.
       </p>
 
       <Button type="button" onClick={onTryAgain} color="gradient" size="large">

@@ -6,6 +6,7 @@ export namespace GetPendingSupervision {
 
   export interface Output {
     childName: string;
+    deviceType: string;
     modelIdentifier: string;
     modelName: string;
     iosVersion: string;

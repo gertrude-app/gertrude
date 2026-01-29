@@ -1,49 +1,55 @@
-import cx from 'classnames';
+import { Button } from '@shared/components';
+import { posessive } from '@shared/string';
 import React from 'react';
 import type { DisableFindMyProps } from '../types';
+import InstructionLayout from '../InstructionLayout';
+import NumberedSteps from '../NumberedSteps';
+import disableFindMyIpadImg from '../assets/disable-findmy-ipad.png';
+import disableFindMyIphoneImg from '../assets/disable-findmy-iphone.png';
 
-const DisableFindMy: React.FC<DisableFindMyProps> = ({ onContinue }) => (
-  <div className="h-full flex flex-col items-center justify-center p-6 bg-white">
-    <div className="w-12 h-12 mb-4 rounded-xl bg-orange-100 flex items-center justify-center">
-      <svg
-        className="w-6 h-6 text-orange-600"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-        />
-      </svg>
-    </div>
+const iphoneImg: any = disableFindMyIphoneImg;
+const ipadImg: any = disableFindMyIpadImg;
+const iphoneSrc: string = typeof iphoneImg === `string` ? iphoneImg : iphoneImg.src;
+const ipadSrc: string = typeof ipadImg === `string` ? ipadImg : ipadImg.src;
 
-    <h1 className="text-lg font-semibold text-gray-900 mb-2">Disable Find My iPhone</h1>
-
-    <p className="text-sm text-gray-600 text-center mb-4 max-w-[280px]">
-      Find My iPhone must be disabled before proceeding. Go to{` `}
-      <span className="font-medium">Settings → [Your Name] → Find My</span>
-      {` `}and turn it off.
+const DisableFindMy: React.FC<DisableFindMyProps> = ({
+  childName,
+  deviceType,
+  onContinue,
+}) => (
+  <InstructionLayout
+    step={4}
+    totalSteps={8}
+    title={`Temporarily Disable Find My ${deviceType}`}
+    subtitle="You can re-enable it after supervision is complete."
+    imageSrc={deviceType === `iPad` ? ipadSrc : iphoneSrc}
+    imageAlt={`Find My ${deviceType} settings`}
+    footer={
+      <Button type="button" onClick={onContinue} color="gradient" size="large">
+        Done, next &rarr;
+      </Button>
+    }
+  >
+    <NumberedSteps
+      steps={[
+        {
+          title: `Open the Settings App`,
+          subtitle: `To the main, outermost screen`,
+        },
+        {
+          title: `Tap ${posessive(childName)} name at the top`,
+          subtitle: `This leads to the Apple Account settings`,
+        },
+        {
+          title: <>Go to Find My &rarr; Find My {deviceType}</>,
+          subtitle: <>Turn off Find My {deviceType}</>,
+        },
+      ]}
+    />
+    <p className="mt-8 text-sm text-gray-500">
+      You may have to disable <em>Stolen Device Protection</em> in order to do this.
     </p>
-
-    <p className="text-xs text-gray-400 text-center mb-6 max-w-[260px]">
-      You can re-enable it after the process is complete.
-    </p>
-
-    <button
-      onClick={onContinue}
-      className={cx(
-        `px-6 py-2.5 rounded-lg font-medium text-white transition-all`,
-        `bg-gradient-to-r from-blue-500 to-indigo-600`,
-        `hover:from-blue-600 hover:to-indigo-700`,
-        `active:scale-[0.98]`,
-      )}
-    >
-      I've disabled it
-    </button>
-  </div>
+  </InstructionLayout>
 );
 
 export default DisableFindMy;

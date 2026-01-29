@@ -20,6 +20,12 @@ export default class SuperviseClient extends Client<Auth> {
     );
   };
 
+  public logSupervisionEvent = (
+    input: P.LogSupervisionEvent.Input,
+  ): Promise<Result<P.LogSupervisionEvent.Output>> => {
+    return this.query<P.LogSupervisionEvent.Output>(input, `LogSupervisionEvent`, `none`);
+  };
+
   public markSupervisionVerified = (
     input: P.MarkSupervisionVerified.Input,
   ): Promise<Result<P.MarkSupervisionVerified.Output>> => {

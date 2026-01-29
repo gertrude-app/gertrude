@@ -1,49 +1,41 @@
-import cx from 'classnames';
+import { Button } from '@shared/components';
+import { posessive } from '@shared/string';
 import React from 'react';
 import type { CompleteProps } from '../types';
+import InstructionLayout from '../InstructionLayout';
+import NumberedSteps from '../NumberedSteps';
+import gertrudeAppImg from '../assets/gertrude-app.png';
 
-const Complete: React.FC<CompleteProps> = ({ mode, deviceName, onDone }) => {
-  const title = mode === `add` ? `Supervision Enabled` : `Supervision Removed`;
-  const message =
-    mode === `add`
-      ? `"${deviceName}" is now supervised.`
-      : `Supervision has been removed from "${deviceName}".`;
+const img: any = gertrudeAppImg;
+const gertrudeAppSrc: string = typeof img === `string` ? img : img.src;
 
-  return (
-    <div className="h-full flex flex-col items-center justify-center p-6 bg-white">
-      <div className="w-14 h-14 mb-4 rounded-full bg-green-100 flex items-center justify-center">
-        <svg
-          className="w-7 h-7 text-green-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-      </div>
-
-      <h1 className="text-xl font-semibold text-gray-900 mb-2">{title}</h1>
-
-      <p className="text-sm text-gray-600 text-center mb-6 max-w-[280px]">{message}</p>
-
-      <button
-        onClick={onDone}
-        className={cx(
-          `px-6 py-2.5 rounded-lg font-medium text-white transition-all`,
-          `bg-gradient-to-r from-green-500 to-emerald-600`,
-          `hover:from-green-600 hover:to-emerald-700`,
-          `active:scale-[0.98]`,
-        )}
-      >
+const Complete: React.FC<CompleteProps> = ({ childName, deviceType, onDone }) => (
+  <InstructionLayout
+    step={8}
+    totalSteps={8}
+    title="Supervision Complete!"
+    subtitle={`Just one more step to do on the Gertrude app to enable blocking`}
+    imageSrc={gertrudeAppSrc}
+    imageAlt="Gertrude app"
+    footer={
+      <Button type="button" onClick={onDone} color="gradient" size="large">
         Done
-      </button>
-    </div>
-  );
-};
+      </Button>
+    }
+  >
+    <NumberedSteps
+      steps={[
+        {
+          title: `Launch Gertrude on ${posessive(childName)} ${deviceType}`,
+          subtitle: `The app will know that supervision is complete`,
+        },
+        {
+          title: `Follow the instructions to finish setup`,
+          subtitle: `You will be guided to download a profile`,
+        },
+      ]}
+    />
+  </InstructionLayout>
+);
 
 export default Complete;
