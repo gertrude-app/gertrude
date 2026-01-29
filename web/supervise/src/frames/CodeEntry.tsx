@@ -14,9 +14,9 @@ const CodeEntry: React.FC<CodeEntryProps> = ({
 
   return (
     <FrameBackground>
-      <div className="flex flex-col items-center justify-center max-w-md">
-        <Logo size={120} textSize="text-6xl" className="mb-3" />
-        <span className="text-base font-semibold uppercase tracking-wider bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text] text-transparent mb-12">
+      <div className="h-full flex flex-col items-center justify-center max-w-md mx-auto">
+        <Logo size={110} textSize="text-6xl" className="mb-3" />
+        <span className="text-base font-semibold uppercase tracking-wider bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text] text-transparent mb-8 translate-x-6 -translate-y-7">
           Supervision Helper
         </span>
 

@@ -1,9 +1,9 @@
+import { ProgressIndicator } from '@shared/components';
 import cx from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
 import ConfettiExplosion from 'react-confetti-explosion';
 import type { OnboardingStep } from './onboarding-store';
 import OnboardingContext, { WithinActiveStepContext } from './OnboardingContext';
-import ProgressIndicator from './ProgressIndicator';
 
 interface Props {
   children: React.ReactNode;
@@ -40,7 +40,7 @@ const StepSwitcher: React.FC<Props> = ({ children, ready }) => {
             `-translate-y-16 opacity-0`,
         )}
       >
-        {!isUpgrade && <ProgressIndicator step={progressStep} />}
+        {!isUpgrade && <ProgressIndicator step={progressStep} totalSteps={7} />}
       </div>
     </div>
   );

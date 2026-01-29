@@ -23,6 +23,7 @@ enum SuperviseTsCodegenRoute {
   static var pairqlPairs: [any PairQL.Pair.Type] {
     [
       GetPendingSupervision.self,
+      LogSupervisionEvent.self,
       MarkSupervisionVerified.self,
       RecordDeviceConnection.self,
       ReportSupervisionFailed.self,

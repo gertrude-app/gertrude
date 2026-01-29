@@ -1,9 +1,12 @@
 export { default as CodeEntry } from './CodeEntry';
 export { default as PersonalizedConnect } from './PersonalizedConnect';
 export { default as DeviceMismatch } from './DeviceMismatch';
-export { default as ChooseDirection } from './ChooseDirection';
+export { default as ConfirmDevice } from './ConfirmDevice';
 export { default as DisableFindMy } from './DisableFindMy';
 export { default as DisablePrivateRelay } from './DisablePrivateRelay';
-export { default as InProgress } from './InProgress';
-export { default as ConfirmReboot } from './ConfirmReboot';
+export { default as GetReady } from './GetReady';
+export { default as Supervising } from './Supervising';
+export { default as SwipeToUpgrade } from './SwipeToUpgrade';
+export { default as ConfirmSupervision } from './ConfirmSupervision';
+export { default as Error } from './Error';
 export { default as Complete } from './Complete';

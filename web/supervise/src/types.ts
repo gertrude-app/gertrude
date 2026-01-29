@@ -5,8 +5,6 @@ export interface DeviceInfo {
   osVersion: string;
 }
 
-export type OperationMode = `add` | `remove`;
-
 export interface CodeEntryProps {
   code: string;
   onCodeChange: (code: string) => void;
@@ -29,13 +27,16 @@ export interface DeviceMismatchProps {
   onTryAgain: () => void;
 }
 
-export interface ChooseDirectionProps {
-  device: DeviceInfo;
-  onChooseAdd: () => void;
-  onChooseRemove: () => void;
+export interface ConfirmDeviceProps {
+  deviceName: string;
+  iosVersion: string;
+  onConfirm: () => void;
+  onReject: () => void;
 }
 
 export interface DisableFindMyProps {
+  childName: string;
+  deviceType: string;
   onContinue: () => void;
 }
 
@@ -43,20 +44,32 @@ export interface DisablePrivateRelayProps {
   onContinue: () => void;
 }
 
-export interface InProgressProps {
-  mode: OperationMode;
-  deviceName: string;
-  running: boolean;
-  progress: number;
+export interface GetReadyProps {
   onStart: () => void;
 }
 
-export interface ConfirmRebootProps {
-  onConfirm: () => void;
+export type SupervisingProps = Record<string, never>;
+
+export interface SwipeToUpgradeProps {
+  onContinue: () => void;
+}
+
+export interface ConfirmSupervisionProps {
+  onYes: () => void;
+  onNo: () => void;
+}
+
+export type ErrorType = `findMyEnabled` | `invokeFailed` | `userReportedNo`;
+
+export interface ErrorProps {
+  errorType: ErrorType;
+  errorMessage?: string;
+  onRetry: () => void;
+  onContactSupport: () => void;
 }
 
 export interface CompleteProps {
-  mode: OperationMode;
-  deviceName: string;
+  childName: string;
+  deviceType: string;
   onDone: () => void;
 }

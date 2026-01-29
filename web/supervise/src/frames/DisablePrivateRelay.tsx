@@ -1,49 +1,46 @@
-import cx from 'classnames';
+import { Button } from '@shared/components';
 import React from 'react';
 import type { DisablePrivateRelayProps } from '../types';
+import InstructionLayout from '../InstructionLayout';
+import NumberedSteps from '../NumberedSteps';
+import disablePrivateRelayImg from '../assets/disable-private-relay.png';
+
+const img: any = disablePrivateRelayImg;
+const imgSrc: string = typeof img === `string` ? img : img.src;
 
 const DisablePrivateRelay: React.FC<DisablePrivateRelayProps> = ({ onContinue }) => (
-  <div className="h-full flex flex-col items-center justify-center p-6 bg-white">
-    <div className="w-12 h-12 mb-4 rounded-xl bg-purple-100 flex items-center justify-center">
-      <svg
-        className="w-6 h-6 text-purple-600"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
-        />
-      </svg>
+  <InstructionLayout
+    step={5}
+    totalSteps={8}
+    title="Turn Off Private Relay"
+    subtitle="Private Relay if enabled blocks the supervision"
+    imageSrc={imgSrc}
+    imageAlt="Private Relay settings"
+    footer={
+      <Button type="button" onClick={onContinue} color="gradient" size="large">
+        Continue &rarr;
+      </Button>
+    }
+  >
+    <div className="flex flex-col gap-6">
+      <p className="text-slate-500">
+        Private relay requires an iCloud+ subscription. If you don’t have one, or can’t
+        find the setting, you can continue.
+      </p>
+      <NumberedSteps
+        steps={[
+          {
+            title: `Open Settings`,
+            subtitle: `Tap your name at the top of the screen`,
+          },
+          {
+            title: <>Go to iCloud &rarr; Private Relay</>,
+            subtitle: `Turn off Private Relay`,
+          },
+        ]}
+      />
     </div>
-
-    <h1 className="text-lg font-semibold text-gray-900 mb-2">Turn Off Private Relay</h1>
-
-    <p className="text-sm text-gray-600 text-center mb-4 max-w-[280px]">
-      If you use iCloud Private Relay, please disable it temporarily. Go to{` `}
-      <span className="font-medium">Settings → [Your Name] → iCloud → Private Relay</span>
-      .
-    </p>
-
-    <p className="text-xs text-gray-400 text-center mb-6 max-w-[260px]">
-      Skip this step if you don't use Private Relay.
-    </p>
-
-    <button
-      onClick={onContinue}
-      className={cx(
-        `px-6 py-2.5 rounded-lg font-medium text-white transition-all`,
-        `bg-gradient-to-r from-blue-500 to-indigo-600`,
-        `hover:from-blue-600 hover:to-indigo-700`,
-        `active:scale-[0.98]`,
-      )}
-    >
-      Continue
-    </button>
-  </div>
+  </InstructionLayout>
 );
 
 export default DisablePrivateRelay;

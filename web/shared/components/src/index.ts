@@ -8,5 +8,6 @@ export { default as SelectMenu } from './SelectMenu';
 export { default as Loading } from './Loading';
 export { default as AppIcon } from './AppIcon';
 export { default as Badge } from './Badge';
+export { default as ProgressIndicator } from './ProgressIndicator';
 export * as env from './env';
 export * from './env';

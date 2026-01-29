@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@shared/components": "workspace:*",
+    "@shared/string": "workspace:*",
     "@shared/tailwind": "workspace:*",
     "classnames": "2.5.1",
     "react": "19.1.0",
