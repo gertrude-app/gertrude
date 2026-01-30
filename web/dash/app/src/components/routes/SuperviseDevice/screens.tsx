@@ -50,11 +50,22 @@ export const DownloadHelperScreen: React.FC<
   initialDownloaded = false,
 }) => {
   const [hasDownloaded, setHasDownloaded] = useState(initialDownloaded);
+  const [showWindowsModal, setShowWindowsModal] = useState(false);
   const detectedPlatform = /Mac|Macintosh/i.test(navigator.userAgent) ? `mac` : `windows`;
 
   const handleDownload = (platform: `mac` | `windows`): void => {
+    if (platform === `windows`) {
+      setShowWindowsModal(true);
+    } else {
+      setHasDownloaded(true);
+      onDownload(platform);
+    }
+  };
+
+  const handleWindowsDownloadConfirm = (): void => {
+    setShowWindowsModal(false);
     setHasDownloaded(true);
-    onDownload(platform);
+    onDownload(`windows`);
   };
 
   return (
@@ -122,9 +133,64 @@ export const DownloadHelperScreen: React.FC<
           Next &rarr;
         </Button>
       </div>
+
+      {showWindowsModal && (
+        <WindowsSmartScreenModal
+          onCancel={() => setShowWindowsModal(false)}
+          onDownload={handleWindowsDownloadConfirm}
+        />
+      )}
     </div>
   );
 };
+
+export const WindowsSmartScreenModal: React.FC<{
+  onCancel: () => void;
+  onDownload: () => void;
+}> = ({ onCancel, onDownload }) => (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-2xl shadow-xl max-w-md mx-4 p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+          <i className="fa-brands fa-windows text-amber-600 text-lg" />
+        </div>
+        <h2 className="text-lg font-bold text-slate-800">Windows Security Note</h2>
+      </div>
+      <p className="text-slate-600 text-sm mb-4">
+        Windows will show a security warning for this app. When you see{` `}
+        <span className="font-medium">"Windows protected your PC"</span>:
+      </p>
+      <ol className="text-slate-600 text-sm mb-6 ml-4 space-y-2">
+        <li className="flex items-start gap-2">
+          <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+            1
+          </span>
+          <span>
+            Click <span className="font-medium">"More info"</span> (small link below the
+            warning text)
+          </span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+            2
+          </span>
+          <span>
+            Click <span className="font-medium">"Run anyway"</span>
+          </span>
+        </li>
+      </ol>
+      <div className="flex justify-end gap-3">
+        <Button type="button" color="tertiary" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type="button" color="primary" onClick={onDownload}>
+          <i className="fa-brands fa-windows mr-2" />
+          Download for Windows
+        </Button>
+      </div>
+    </div>
+  </div>
+);
 
 export const SuperviseScreen: React.FC<
   DeviceInfo & {
