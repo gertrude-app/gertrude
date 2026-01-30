@@ -10,6 +10,7 @@ import {
   DownloadHelperScreen,
   ProgressDots,
   SuperviseScreen,
+  WindowsSmartScreenModal,
 } from '../../../../dash/app/src/components/routes/SuperviseDevice/screens';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 
@@ -255,6 +256,15 @@ export const Done: Story = {
     children: [],
     initialStep: `done`,
   },
+};
+
+export const WindowsSmartScreenInterstitial: StoryObj = {
+  render: () => (
+    <div className="relative w-full h-[500px] bg-slate-100">
+      <WindowsSmartScreenModal onCancel={() => {}} onDownload={() => {}} />
+    </div>
+  ),
+  parameters: { layout: `centered` },
 };
 
 export default meta;

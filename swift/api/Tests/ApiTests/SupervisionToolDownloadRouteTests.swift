@@ -27,7 +27,7 @@ final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable 
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("/releases/supervision/GertrudeSupervisor.dmg")
+        expect(location).toContain("/releases/supervision/GertrudeSupervisor.zip")
       },
     )
 

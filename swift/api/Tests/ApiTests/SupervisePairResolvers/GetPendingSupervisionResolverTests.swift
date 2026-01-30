@@ -24,7 +24,7 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
       $0.date = .constant(.reference)
     } operation: {
       try await GetPendingSupervision.resolve(
-        with: .init(code: code),
+        with: .init(code: code, platform: "macos"),
         in: .mock,
       )
     }
@@ -39,7 +39,7 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
   func testCodeNotFound_throwsError() async throws {
     try await expectErrorFrom {
       try await GetPendingSupervision.resolve(
-        with: .init(code: Int.random(in: 100_000 ... 999_999)),
+        with: .init(code: Int.random(in: 100_000 ... 999_999), platform: "macos"),
         in: .mock,
       )
     }.toContain("not found")
@@ -62,7 +62,7 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
         $0.date = .constant(.reference)
       } operation: {
         try await GetPendingSupervision.resolve(
-          with: .init(code: code),
+          with: .init(code: code, platform: "macos"),
           in: .mock,
         )
       }
@@ -88,7 +88,7 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
         $0.date = .constant(.reference)
       } operation: {
         try await GetPendingSupervision.resolve(
-          with: .init(code: code),
+          with: .init(code: code, platform: "macos"),
           in: .mock,
         )
       }
