@@ -6,6 +6,7 @@ struct GetPendingSupervision: Pair {
 
   struct Input: PairInput {
     let code: Int
+    let platform: String
   }
 
   struct Output: PairOutput {
@@ -29,6 +30,15 @@ extension GetPendingSupervision: Resolver {
       let msg = "Device already supervised. Open the Gertrude app on the \(validated.device.deviceType) to continue setup."
       throw context.error("1a01d2ae", .badRequest, user: msg)
     }
+
+    try await context.db.create(IOSEvent(
+      eventId: "3b8f1e2c",
+      kind: .supervision,
+      detail: "tool_code_entered: platform=\(input.platform)",
+      deviceId: validated.device.id,
+      modelIdentifier: validated.device.modelIdentifier,
+      iosVersion: validated.device.iosVersion,
+    ))
 
     let child = try await context.db.find(validated.claimedChildId)
     return .init(

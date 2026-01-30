@@ -2,6 +2,7 @@
 export namespace GetPendingSupervision {
   export interface Input {
     code: number;
+    platform: string;
   }
 
   export interface Output {
