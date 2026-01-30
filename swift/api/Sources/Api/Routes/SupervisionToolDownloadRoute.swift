@@ -46,7 +46,7 @@ enum SupervisionToolDownloadRoute {
     var downloadUrl: String {
       switch self {
       case .mac:
-        "http://gertrude.nyc3.digitaloceanspaces.com/releases/supervision/GertrudeSupervisor.dmg"
+        "http://gertrude.nyc3.digitaloceanspaces.com/releases/supervision/GertrudeSupervisor.zip"
       case .windows:
         "http://gertrude.nyc3.digitaloceanspaces.com/releases/supervision/GertrudeSupervisor.exe"
       }

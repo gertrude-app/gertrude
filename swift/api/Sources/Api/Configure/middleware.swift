@@ -19,6 +19,8 @@ private func corsMiddleware(_ app: Application) -> CORSMiddleware {
         "https://admin.gertrude.app",
         "https://gertrude.app",
         "https://www.gertrude.app",
+        "tauri://localhost",
+        "http://tauri.localhost",
       ]) : .all,
     allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
     allowedHeaders: [
