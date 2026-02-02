@@ -13,6 +13,10 @@ struct IOSAppEntry: App {
     ProcessInfo.processInfo.operatingSystemVersion.majorVersion
   }
 
+  var deviceType: String {
+    UIDevice.current.model
+  }
+
   init() {
     self.store = Store(
       initialState: IOSReducer.State(),
@@ -25,7 +29,7 @@ struct IOSAppEntry: App {
 
   var body: some Scene {
     WindowGroup {
-      AppView(store: self.store, osMajorVersion: self.osMajorVersion)
+      AppView(store: self.store, osMajorVersion: self.osMajorVersion, deviceType: self.deviceType)
         .onAppear {
           self.store.send(.programmatic(.appDidLaunch))
         }

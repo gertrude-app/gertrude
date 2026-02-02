@@ -57,11 +57,6 @@ public struct IOSReducer {
       state.disabledBlockGroups.toggle(group)
       return .none
 
-    case .sheetDismissed where state.screen == .onboarding(.major(.explainAppleFamily)):
-      self.deps.log(state.screen, action, "118d259f")
-      state.screen = .onboarding(.major(.askIfInAppleFamily))
-      return .none
-
     case .sheetDismissed:
       return .none
 
@@ -132,7 +127,7 @@ public struct IOSReducer {
 
     case (.onboarding(.happyPath(.confirmMinorDevice)), .secondary):
       self.deps.log(state.screen, action, "a21c9040")
-      state.screen = .onboarding(.major(.explainHarderButPossible))
+      state.screen = .onboarding(.supervision(.setup(.explainSupervision)))
       return .none
 
     case (.onboarding(.happyPath(.confirmParentIsOnboarding)), .primary):
@@ -283,77 +278,6 @@ public struct IOSReducer {
       state.screen = .onboarding(.happyPath(.doneQuit))
       return .none
 
-      // MARK: - major (18+) path
-
-    case (.onboarding(.major(.explainHarderButPossible)), .primary):
-      self.deps.log(state.screen, action, "085eb5a6")
-      state.screen = .onboarding(.major(.askSelfOrOtherIsOnboarding))
-      return .none
-
-    case (.onboarding(.major(.askSelfOrOtherIsOnboarding)), .secondary):
-      self.deps.log(state.screen, action, "6d88421b")
-      state.onboarding.majorOnboarder = .other
-      state.screen = .onboarding(.major(.askIfOtherIsParent))
-      return .none
-
-    case (.onboarding(.major(.askIfOtherIsParent)), .primary):
-      self.deps.log(state.screen, action, "e0605ab9")
-      state.screen = .onboarding(.major(.explainFixAccountTypeEasyWay))
-      return .none
-
-    case (.onboarding(.major(.askIfOtherIsParent)), .secondary):
-      self.deps.log(state.screen, action, "db2a8c0b")
-      state.screen = .onboarding(.major(.askIfOwnsMac))
-      return .none
-
-    case (.onboarding(.major(.explainFixAccountTypeEasyWay)), .primary):
-      self.deps.log(state.screen, action, "1ed887e0")
-      state.screen = .onboarding(.happyPath(.confirmMinorDevice))
-      return .none
-
-    case (.onboarding(.major(.askSelfOrOtherIsOnboarding)), .tertiary):
-      self.deps.log(state.screen, action, "bbc0dac1", extra: "onboarder is self")
-      state.onboarding.majorOnboarder = .self
-      state.screen = .onboarding(.major(.askIfInAppleFamily))
-      return .none
-
-    case (.onboarding(.major(.askIfInAppleFamily)), .primary):
-      self.deps.log(state.screen, action, "605151b9")
-      state.screen = .onboarding(.major(.explainFixAccountTypeEasyWay))
-      return .none
-
-    case (.onboarding(.major(.askIfInAppleFamily)), .secondary):
-      self.deps.log(state.screen, action, "0fa6bc2a")
-      state.screen = .onboarding(.supervision(.setup(.harderButPossible)))
-      return .none
-
-    case (.onboarding(.major(.askIfInAppleFamily)), .tertiary):
-      self.deps.log(state.screen, action, "d17b9ef6")
-      state.screen = .onboarding(.major(.explainAppleFamily))
-      return .none
-
-    case (.onboarding(.major(.explainAppleFamily)), .primary):
-      self.deps.log(state.screen, action, "62f783e1")
-      state.screen = .onboarding(.major(.askIfInAppleFamily))
-      return .none
-
-    case (.onboarding(.major(.explainFixAccountTypeEasyWay)), .secondary):
-      self.deps.log(state.screen, action, "fd166517")
-      state.screen = .onboarding(.major(.askIfOwnsMac))
-      return .none
-
-    case (.onboarding(.major(.askIfOwnsMac)), .primary):
-      self.deps.log(state.screen, action, "219ba991")
-      state.onboarding.ownsMac = true
-      state.screen = .onboarding(.supervision(.setup(.harderButPossible)))
-      return .none
-
-    case (.onboarding(.major(.askIfOwnsMac)), .secondary):
-      self.deps.log(state.screen, action, "c1f63c92")
-      state.onboarding.ownsMac = false
-      state.screen = .onboarding(.supervision(.setup(.harderButPossible)))
-      return .none
-
       // MARK: - apple family
 
     case (.onboarding(.appleFamily(.explainRequiredForFiltering)), .primary):
@@ -390,72 +314,119 @@ public struct IOSReducer {
 
       // MARK: - supervision setup
 
-    case (.onboarding(.supervision(.setup(.harderButPossible))), .primary):
+    case (.onboarding(.supervision(.setup(.explainSupervision))), .primary):
       self.deps.log(state.screen, action, "261ba66b")
-      state.screen = .onboarding(.supervision(.setup(.explainSupervisionConcept)))
+      state.screen = .onboarding(.supervision(.setup(.costAndBranchPoint)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.explainSupervisionConcept))), .primary):
+    case (.onboarding(.supervision(.setup(.costAndBranchPoint))), .primary):
       self.deps.log(state.screen, action, "a0f78c2c")
-      state.screen = .onboarding(.supervision(.setup(.explainSupervisionOptions)))
+      state.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.explainSupervisionOptions))), .primary):
+    case (.onboarding(.supervision(.setup(.costAndBranchPoint))), .secondary):
       self.deps.log(state.screen, action, "7023c325")
-      state.screen = .onboarding(.supervision(.setup(.offerWorkaround)))
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.offerWorkaround))), .primary):
+    case (.onboarding(.supervision(.setup(.freeAlternativesHub))), .primary):
       self.deps.log(state.screen, action, "422d0980")
-      state.screen = .onboarding(.supervision(.setup(.explainSiblingWorkaround)))
+      state.screen = .onboarding(.supervision(.setup(.birthdayAlternativeExplain)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.explainSiblingWorkaround))), .primary):
+    case (.onboarding(.supervision(.setup(.freeAlternativesHub))), .secondary):
       self.deps.log(state.screen, action, "a5229ef2")
-      state.screen = .onboarding(.supervision(.setup(.siblingWorkaroundInstructions)))
+      state.screen = .onboarding(.supervision(.setup(.siblingAlternativeExplain)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.explainSiblingWorkaround))), .secondary):
+    case (.onboarding(.supervision(.setup(.freeAlternativesHub))), .tertiary):
       self.deps.log(state.screen, action, "ed672bfe")
-      state.screen = .onboarding(.supervision(.setup(.explainBirthdayWorkaround)))
+      state.screen = .onboarding(.supervision(.setup(.appleConfiguratorExplain)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.siblingWorkaroundInstructions))), .primary):
+    case (.onboarding(.supervision(.setup(.freeAlternativesHub))), .quaternary):
       self.deps.log(state.screen, action, "7bbba656")
-      state.screen = .onboarding(.happyPath(.confirmMinorDevice))
+      state.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.explainBirthdayWorkaround))), .primary):
+    case (.onboarding(.supervision(.setup(.birthdayAlternativeExplain))), .primary):
       self.deps.log(state.screen, action, "4c9db46e")
-      state.screen = .onboarding(.supervision(.setup(.birthdayWorkaroundInstructions)))
+      state.screen = .onboarding(.supervision(.setup(.birthdayAlternativeCons)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.explainBirthdayWorkaround))), .secondary):
+    case (.onboarding(.supervision(.setup(.birthdayAlternativeExplain))), .secondary):
       self.deps.log(state.screen, action, "359543af")
-      state.screen = .onboarding(.supervision(.setup(.chooseSupervisionPath)))
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.birthdayWorkaroundInstructions))), .primary):
+    case (.onboarding(.supervision(.setup(.birthdayAlternativeCons))), .primary):
       self.deps.log(state.screen, action, "d567937a")
-      state.screen = .onboarding(.happyPath(.confirmMinorDevice))
+      state.screen = .onboarding(.supervision(.setup(.birthdayAlternativeInstructions)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.chooseSupervisionPath))), .primary):
+    case (.onboarding(.supervision(.setup(.birthdayAlternativeCons))), .secondary):
+      self.deps.log(state.screen, action, "b1c2d3e4")
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.birthdayAlternativeInstructions))), .primary):
       self.deps.log(state.screen, action, "a6b17fd9")
-      state.screen = .onboarding(.supervision(.setup(.askHasProtector)))
+      state.screen = .onboarding(.supervision(.setup(.accountNowUnder18)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.chooseSupervisionPath))), .secondary):
+    case (.onboarding(.supervision(.setup(.siblingAlternativeExplain))), .primary):
       self.deps.log(state.screen, action, "5cdeb42b")
-      state.screen = .onboarding(.supervision(.setup(.appleConfiguratorInstructions)))
+      state.screen = .onboarding(.supervision(.setup(.siblingAlternativeCons)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.appleConfiguratorInstructions))), _):
+    case (.onboarding(.supervision(.setup(.siblingAlternativeExplain))), .secondary):
       self.deps.log(state.screen, action, "8c2ed1a5")
-      state.screen = .onboarding(.happyPath(.hiThere))
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
       return .none
 
-    case (.onboarding(.supervision(.setup(.askHasProtector))), .primary):
+    case (.onboarding(.supervision(.setup(.siblingAlternativeCons))), .primary):
+      self.deps.log(state.screen, action, "f3a1b2c4")
+      state.screen = .onboarding(.supervision(.setup(.siblingAlternativeInstructions)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.siblingAlternativeCons))), .secondary):
+      self.deps.log(state.screen, action, "d4e5f6a7")
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.siblingAlternativeInstructions))), .primary):
+      self.deps.log(state.screen, action, "e5f6a7b8")
+      state.screen = .onboarding(.supervision(.setup(.accountNowUnder18)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.accountNowUnder18))), .primary):
+      self.deps.log(state.screen, action, "b7c8d9e0")
+      state.screen = .onboarding(.happyPath(.confirmParentIsOnboarding))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.appleConfiguratorExplain))), .primary):
+      self.deps.log(state.screen, action, "c6d7e8f9")
+      state.screen = .onboarding(.supervision(.setup(.appleConfiguratorCons(step: 1))))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.appleConfiguratorExplain))), .secondary):
+      self.deps.log(state.screen, action, "a0b1c2d3")
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.appleConfiguratorCons(let step)))), .primary):
+      self.deps.log(state.screen, action, "e4f5a6b7")
+      if step < 3 {
+        state.screen = .onboarding(.supervision(.setup(.appleConfiguratorCons(step: step + 1))))
+      }
+      return .none
+
+    case (.onboarding(.supervision(.setup(.appleConfiguratorCons))), .secondary):
+      self.deps.log(state.screen, action, "c8d9e0f1")
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.explainNeedSomeoneElse))), .primary):
       self.deps.log(state.screen, action, "39d56d1a")
       return .run { [deps = self.deps] send in
         if let data = deps.sharedStorage.loadPendingSupervisionCode(),
@@ -477,7 +448,7 @@ public struct IOSReducer {
         }
       }
 
-    case (.onboarding(.supervision(.setup(.askHasProtector))), .secondary):
+    case (.onboarding(.supervision(.setup(.explainNeedSomeoneElse))), .secondary):
       self.deps.log(state.screen, action, "f0a2d33c")
       state.screen = .onboarding(.supervision(.setup(.selfManagementPlaceholder)))
       return .none
@@ -536,7 +507,7 @@ public struct IOSReducer {
         state.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
       } else {
         self.deps.log(state.screen, action, "00b0c478", extra: "unreachable missing code")
-        state.screen = .onboarding(.supervision(.setup(.askHasProtector)))
+        state.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
       }
       return .none
 
@@ -611,7 +582,7 @@ public struct IOSReducer {
 
     case (.onboarding(.authFail(.invalidAccount(.confirmIsMinor))), .primary):
       self.deps.log(state.screen, action, "9d0d9eac")
-      state.screen = .onboarding(.major(.explainHarderButPossible))
+      state.screen = .onboarding(.supervision(.setup(.explainSupervision)))
       return .none
 
     case (.onboarding(.authFail(.invalidAccount(.confirmIsMinor))), .secondary):

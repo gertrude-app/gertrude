@@ -5,10 +5,12 @@ import SwiftUI
 public struct AppView: View {
   @Bindable var store: StoreOf<IOSReducer>
   let osMajorVersion: Int
+  let deviceType: String
 
-  public init(store: StoreOf<IOSReducer>, osMajorVersion: Int) {
+  public init(store: StoreOf<IOSReducer>, osMajorVersion: Int, deviceType: String) {
     self.store = store
     self.osMajorVersion = osMajorVersion
+    self.deviceType = deviceType
   }
 
   @Environment(\.colorScheme) var cs
@@ -48,7 +50,7 @@ public struct AppView: View {
 
         case .onboarding(.happyPath(.confirmChildsDevice)):
           ButtonScreenView(
-            text: "Is this the device you want to protect?",
+            text: "Is this the \(self.deviceType) you want to protect?",
             primary: self.btn(text: "Yes", .primary),
             secondary: self.btn(text: "No", .secondary),
           )
@@ -62,7 +64,7 @@ public struct AppView: View {
 
         case .onboarding(.happyPath(.confirmMinorDevice)):
           ButtonScreenView(
-            text: "Is this a child’s (under 18) device?",
+            text: "Is this a child’s (under 18) \(self.deviceType)?",
             primary: self.btn(text: "Yes, under 18", .primary),
             secondary: self.btn(text: "No", .secondary),
           )
@@ -76,7 +78,7 @@ public struct AppView: View {
 
         case .onboarding(.happyPath(.confirmInAppleFamily)):
           ButtonScreenView(
-            text: "Apple also requires that the child’s device be part of an Apple Family. Is the Apple Account for this device already in an Apple Family?",
+            text: "Apple also requires that the child’s \(self.deviceType) be part of an Apple Family. Is the Apple Account for this \(self.deviceType) already in an Apple Family?",
             primary: self.btn(text: "Yes, it’s in an Apple Family", .primary),
             secondary: self.btn(text: "No", .secondary),
             tertiary: self.btn(text: "I’m not sure", .tertiary),
@@ -103,7 +105,7 @@ public struct AppView: View {
 
         case .onboarding(.happyPath(.explainInstallWithDevicePasscode)):
           ButtonScreenView(
-            text: "Great! Half way there. In the next step, use the passcode of THIS DEVICE (the one you’re holding), not your own.",
+            text: "Great! Half way there. In the next step, use the passcode of THIS \(self.deviceType.uppercased()) (the one you’re holding), not your own.",
             primary: self.btn(text: "Got it, next", .primary),
           )
 
@@ -141,7 +143,7 @@ public struct AppView: View {
 
         case .onboarding(.happyPath(.connectSuccess)):
           ButtonScreenView(
-            text: "Success! This device is now connected to your Gertrude parent account.",
+            text: "Success! This \(self.deviceType) is now connected to your Gertrude parent account.",
             primary: self.btn(text: "Next", .primary),
           )
 
@@ -197,7 +199,7 @@ public struct AppView: View {
 
         case .onboarding(.authFail(.invalidAccount(.unexpected))):
           ButtonScreenView(
-            text: "Well gosh, we’re not sure what’s wrong then. Try powering the device off completely, then start the installation again. If you get here again, please contact us for more help using the link below.",
+            text: "Well gosh, we’re not sure what’s wrong then. Try powering the \(self.deviceType) off completely, then start the installation again. If you get here again, please contact us for more help using the link below.",
             primary: .init(text: "Contact us", type: .link(.support), animate: false),
             screenType: .error,
           )
@@ -212,7 +214,7 @@ public struct AppView: View {
 
         case .onboarding(.authFail(.restricted)):
           ButtonScreenView(
-            text: "A restriction is preventing Gertrude from being installed. Is this device enrolled in mobile device management (MDM) by an organization or school? If so, try again on a device not managed by MDM.",
+            text: "A restriction is preventing Gertrude from being installed. Is this \(self.deviceType) enrolled in mobile device management (MDM) by an organization or school? If so, try again on a device not managed by MDM.",
             primary: .init(text: "Contact support", type: .link(.support), animate: false),
             secondary: self.btn(text: "Start over", .secondary),
             screenType: .error,
@@ -234,7 +236,7 @@ public struct AppView: View {
 
         case .onboarding(.authFail(.passcodeRequired)):
           ButtonScreenView(
-            text: "Sorry, Apple won’t let us install unless this device has a passcode set. Go to the Settings app and set one up, then try again.",
+            text: "Sorry, Apple won’t let us install unless this \(self.deviceType) has a passcode set. Go to the Settings app and set one up, then try again.",
             primary: self.btn(text: "Try again", .primary),
             screenType: .error,
           )
@@ -270,69 +272,9 @@ public struct AppView: View {
 
         case .onboarding(.childIsOnboardingFail):
           ButtonScreenView(
-            text: "Setting up Gertrude requires your parent or guardian. Give your device to them so they can finish the setup.",
+            text: "Setting up Gertrude requires your parent or guardian. Give your \(self.deviceType) to them so they can finish the setup.",
             primary: self.btn(text: "Done, continue", .primary),
           )
-
-        case .onboarding(.major(.explainHarderButPossible)):
-          ButtonScreenView(
-            text: "Getting this app working on the device of someone over 18 is harder, but still possible. We’ll walk you through all the steps.",
-            primary: self.btn(text: "Next", .primary),
-          )
-
-        case .onboarding(.major(.askSelfOrOtherIsOnboarding)):
-          ButtonScreenView(
-            text: "Is this your device, or are you setting up Gertrude for someone else?",
-            primary: self.btn(text: "I’m helping someone else", .secondary),
-            secondary: self.btn(text: "This is my device", .tertiary),
-            primaryLooksLikeSecondary: true,
-          )
-
-        case .onboarding(.major(.askIfOtherIsParent)):
-          ButtonScreenView(
-            text: "Are you the parent or guardian of the person who owns this device?",
-            primary: self.btn(text: "Yes", .primary),
-            secondary: self.btn(text: "No", .secondary),
-          )
-
-        case .onboarding(.major(.explainFixAccountTypeEasyWay)):
-          ButtonScreenView(
-            text: "The easiest way to make this work is to get this device signed into an Apple Account that is part of an Apple Family, with a birthday less than 18 years ago. If you can, do that now, then start the installation again, and the setup will be easy.\n\nHow can you do this?",
-            primary: self.btn(text: "Done", .primary),
-            secondary: self.btn(text: "Is there another way?", .secondary),
-            listItems: [
-              "Perhaps there is a younger sibling whose account could be used?",
-              "Apple does permit changing the birthday one time.",
-              "Anyone can create an Apple Family, and invite others to join.",
-            ],
-          )
-
-        case .onboarding(.major(.askIfOwnsMac)):
-          ButtonScreenView(
-            text: "Do you own a Mac computer?",
-            primary: self.btn(text: "Yes", .primary),
-            secondary: self.btn(text: "No", .secondary),
-          )
-
-        case .onboarding(.major(.askIfInAppleFamily)),
-             .onboarding(.major(.explainAppleFamily)):
-          ButtonScreenView(
-            text: "Are you in an Apple Family, or could you join one?",
-            primary: self.btn(text: "Yes", .primary),
-            secondary: self.btn(text: "No", .secondary),
-            tertiary: self.btn(text: "What’s an Apple Family?", .tertiary, animate: false),
-          )
-          .sheet(isPresented: self.explainFamilyPresented) {
-            ZStack {
-              Color(self.cs, light: .clear, dark: .black).ignoresSafeArea(edges: .all)
-              ButtonScreenView(
-                text: "An Apple Family group allows sharing of apps and services. There’s no cost, and it’s easy to set one up. You would need someone else to start a group (if they didn’t already have one) and then invite you to join.",
-                primary: .init(text: "Instructions", type: .link(.appleFamily), animate: false),
-                secondary: self.btn(text: "Continue", .primary, animate: false),
-              )
-            }
-            .presentationDetents([.fraction(0.9)])
-          }
 
         case .onboarding(.appleFamily(.explainRequiredForFiltering)):
           ButtonScreenView(
@@ -366,112 +308,151 @@ public struct AppView: View {
 
         case .onboarding(.appleFamily(.checkIfInAppleFamily)):
           ButtonScreenView(
-            text: "You can check if you’re already setup by opening the “Settings” app on this device. If you see a “Family” section right below the Apple Account name and picture, you’re already set.",
+            text: "You can check if you’re already setup by opening the Settings app on this \(self.deviceType). If you see a Family section right below the Apple Account name and picture, you’re already set.",
             primary: self.btn(text: "Yes, in a family", .primary),
             secondary: self.btn(text: "Not in a family yet", .secondary),
           )
 
         // supervision setup
 
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.harderButPossible))):
+        case .onboarding(.supervision(.setup(.explainSupervision))):
           ButtonScreenView(
-            text: "Getting this working on a device for someone 18 or older is harder, but we have some options. Let's walk through them.",
+            text: "To make this work, we’ll need to put this \(self.deviceType) into SUPERVISED MODE—a special mode designed for devices owned by schools and businesses that allows much greater control.",
             primary: self.btn(text: "Next", .primary),
           )
 
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.explainSupervisionConcept))):
+        case .onboarding(.supervision(.setup(.costAndBranchPoint))):
           ButtonScreenView(
-            text: "The solution is to put your device into \"supervised mode.\" This is a special mode that gives an administrator more control over the device.",
-            primary: self.btn(text: "Next", .primary),
+            text: "Supervising a device the easy way requires a Gertrude account ($10/year).\n\nThere are free alternatives, but they have downsides.",
+            primary: self.btn(text: "Continue with Gertrude", .primary),
+            secondary: self.btn(text: "Show me the free alternatives", .secondary),
           )
 
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.explainSupervisionOptions))):
-          ButtonScreenView(
-            text: "There are two ways to supervise your device: using our Gertrude tool ($10/year, easier), or Apple Configurator (free, but requires erasing your device).",
-            primary: self.btn(text: "Next", .primary),
+        case .onboarding(.supervision(.setup(.freeAlternativesHub))):
+          FreeAlternativesHubView(
+            onBirthdayTapped: {
+              self.store.send(.interactive(.onboardingBtnTapped(.primary, "Birthday")))
+            },
+            onSiblingTapped: {
+              self.store.send(.interactive(.onboardingBtnTapped(.secondary, "Sibling")))
+            },
+            onAppleConfiguratorTapped: {
+              self.store.send(.interactive(.onboardingBtnTapped(.tertiary, "Apple Configurator")))
+            },
+            onGertrudeTapped: {
+              self.store.send(.interactive(.onboardingBtnTapped(.quaternary, "Gertrude")))
+            },
           )
 
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.offerWorkaround))):
+        case .onboarding(.supervision(.setup(.birthdayAlternativeExplain))):
           ButtonScreenView(
-            text: "But wait—there might be an easier way that doesn't require supervision at all.",
-            primary: self.btn(text: "Tell me more", .primary),
+            text: "Apple allows you to change your Apple Account birthday one time. If you change it to make yourself under 18, Gertrude will work without supervision.",
+            primary: self.btn(text: "What are the downsides?", .primary),
+            secondary: self.btn(text: "Back to alternatives", .secondary),
           )
 
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.explainSiblingWorkaround))):
+        case .onboarding(.supervision(.setup(.birthdayAlternativeCons))):
           ButtonScreenView(
-            text: "If you have a younger sibling (under 18) whose Apple Account is in your Apple Family, you could sign into their account on this device. Gertrude would then work without supervision.",
-            primary: self.btn(text: "That would work for me", .primary),
-            secondary: self.btn(text: "What else?", .secondary),
-          )
-
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.siblingWorkaroundInstructions))):
-          ButtonScreenView(
-            text: "To switch accounts: Go to Settings, tap your name at the top, scroll down and tap Sign Out. Then sign in with your family member's Apple ID and come back to this app.",
-            primary: self.btn(text: "I've switched accounts", .primary),
-          )
-
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.explainBirthdayWorkaround))):
-          ButtonScreenView(
-            text: "Apple allows changing your Apple ID birthday one time. If you changed it to under 18, Gertrude would work without supervision.",
-            primary: self.btn(text: "That would work for me", .primary),
-            secondary: self.btn(text: "Neither works for me", .secondary),
-          )
-
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.birthdayWorkaroundInstructions))):
-          ButtonScreenView(
-            text: "To change your birthday: Go to Settings, tap your name, then Personal Information, then Birthday. Change it so you're under 18, then come back to this app.",
-            primary: self.btn(text: "I've updated my birthday", .primary),
-          )
-
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.chooseSupervisionPath))):
-          ButtonScreenView(
-            text: "Choose how you'd like to supervise your device:",
-            primary: self.btn(text: "Use Gertrude tool ($10/yr)", .primary),
-            secondary: self.btn(text: "Use Apple Configurator (free)", .secondary),
+            text: "You’ll be treated as a child in Apple’s system:",
+            primary: self.btn(text: "This works for me", .primary),
+            secondary: self.btn(text: "Back to alternatives", .secondary),
             listItems: [
-              "Gertrude tool: Easier, no device erase, $10/year",
-              "Apple Configurator: Free, but requires Mac and device erase",
+              "You’ll need to be a part of an Apple Family",
+              "Purchases may need approval",
+              "You can’t be a family organizer",
+              "Can be hard to undo later",
             ],
+            screenType: .error,
           )
 
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.appleConfiguratorInstructions))):
+        case .onboarding(.supervision(.setup(.birthdayAlternativeInstructions))):
           ButtonScreenView(
-            text: "We have a tutorial and a step-by-step video to guide you through the Apple Configurator process.",
-            primary: .init(text: "Instructions", type: .link(.supervisionTutorial), animate: false),
-            secondary: .init(
-              text: "Send the link",
-              type: .share(URL.supervisionTutorial.absoluteString),
-              animate: false,
-            ),
+            text: "To change your birthday: Go to Settings, tap your name, then Personal Information, then Birthday. Change it so you’re under 18, then come back to this app.",
+            primary: self.btn(text: "I’ve updated my birthday", .primary),
           )
 
-        // TODO: superios finalize screen text
-        case .onboarding(.supervision(.setup(.askHasProtector))):
+        case .onboarding(.supervision(.setup(.siblingAlternativeExplain))):
           ButtonScreenView(
-            text: "Do you have someone who can help manage your device? This could be a parent, spouse, friend, or accountability partner.",
-            primary: self.btn(text: "Yes, I have someone", .primary),
-            secondary: self.btn(text: "No, I want to manage myself", .secondary),
+            text: "If you have a younger sibling (under 18) in your Apple Family, you can sign into their Apple Account on this \(self.deviceType). Gertrude will then work without supervision.",
+            primary: self.btn(text: "What are the downsides?", .primary),
+            secondary: self.btn(text: "Back to alternatives", .secondary),
           )
 
-        // TODO: superios finalize screen text
+        case .onboarding(.supervision(.setup(.siblingAlternativeCons))):
+          ButtonScreenView(
+            text: "This \(self.deviceType) becomes your sibling’s in Apple’s eyes:",
+            primary: self.btn(text: "This works for me", .primary),
+            secondary: self.btn(text: "Back to alternatives", .secondary),
+            listItems: [
+              "iMessage and FaceTime use their account",
+              "App purchases go to their account",
+              "Other data may mix or sync",
+            ],
+            screenType: .error,
+          )
+
+        case .onboarding(.supervision(.setup(.siblingAlternativeInstructions))):
+          ButtonScreenView(
+            text: "To switch accounts: Go to Settings, tap your name at the top, scroll down and tap Sign Out. Then sign in with your sibling’s Apple ID and come back to this app.",
+            primary: self.btn(text: "I’ve switched accounts", .primary),
+          )
+
+        case .onboarding(.supervision(.setup(.accountNowUnder18))):
+          ButtonScreenView(
+            text: "Great! Assuming the account is now set up as under 18, we can proceed with the standard setup.",
+            primary: self.btn(text: "Continue", .primary),
+          )
+
+        case .onboarding(.supervision(.setup(.appleConfiguratorExplain))):
+          ButtonScreenView(
+            text: "You can use Apple’s free tool called Apple Configurator to supervise your own \(self.deviceType). This gives you full control without needing a Gertrude account.",
+            primary: self.btn(text: "What are the downsides?", .primary),
+            secondary: self.btn(text: "Back to alternatives", .secondary),
+          )
+
+        case .onboarding(.supervision(.setup(.appleConfiguratorCons(let step)))):
+          switch step {
+          case 1:
+            ButtonScreenView(
+              text: "This method requires completely erasing this \(self.deviceType). You can restore from a backup afterward, but sometimes a few customizations can be lost.",
+              primary: self.btn(text: "Next", .primary),
+              secondary: self.btn(text: "Back to alternatives", .secondary),
+              screenType: .error,
+            )
+          case 2:
+            ButtonScreenView(
+              text: "You’ll need a Mac computer and physical access to this \(self.deviceType) every time you want to make changes to the supervision settings.",
+              primary: self.btn(text: "Next", .primary),
+              secondary: self.btn(text: "Back to alternatives", .secondary),
+              screenType: .error,
+            )
+          default:
+            ButtonScreenView(
+              text: "The process takes about an hour, and is slightly technical, compared to ~5 minutes with Gertrude. Ready to proceed?",
+              primary: .init(
+                text: "Show me how",
+                type: .link(.supervisionTutorial),
+                animate: false,
+              ),
+              secondary: self.btn(text: "Back to alternatives", .secondary),
+              screenType: .error,
+            )
+          }
+
+        case .onboarding(.supervision(.setup(.explainNeedSomeoneElse))):
+          ButtonScreenView(
+            text: "A supervised \(self.deviceType) needs someone ELSE to manage it—typically a parent, spouse, or accountability partner. They’ll need to connect your \(self.deviceType) to their computer once during setup.",
+            primary: self.btn(text: "Got it, no problem", .primary),
+            secondary: self.btn(text: "I need to manage myself", .secondary),
+          )
+
         case .onboarding(.supervision(.setup(.selfManagementPlaceholder))):
           ButtonScreenView(
-            text: "Self-management is coming soon! For now, you'll need someone else to help supervise your device. We're working on a solution for self-management.",
+            text: "Self-management is coming soon! For now, you’ll need someone else to help supervise your \(self.deviceType). We’re working on a solution for self-management.",
             primary: self.btn(text: "Start over", .primary),
             secondary: .init(text: "Contact support", type: .link(.support), animate: false),
           )
 
-        // TODO: superios finalize screen text
         case .onboarding(.supervision(.setup(.generateSetupCode(let didError)))):
           SpinnerErrorView(
             loadingText: "Generating your setup code...",
@@ -480,14 +461,12 @@ public struct AppView: View {
             onRetry: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Retry"))) },
           )
 
-        // TODO: superios finalize screen text
         case .onboarding(.supervision(.setup(.instructionsForProtector(let code)))):
           InstructionsForProtectorView(
             code: code,
             onNext: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Next"))) },
           )
 
-        // TODO: superios finalize screen text
         case .onboarding(.supervision(.setup(.waitingForSupervision(let code)))):
           WaitingForSupervisionView(code: code)
 
@@ -495,10 +474,10 @@ public struct AppView: View {
 
         case .onboarding(.supervision(.resume(.codeClaimedNotSupervised(let regainedFocus)))):
           ButtonScreenView(
-            text: "Hmmm... We're not sure if this device is supervised yet. Open the Settings app and check if it says at the top of the main screen that the device is supervised, then come back here.",
+            text: "Hmmm... We’re not sure if this \(self.deviceType) is supervised yet. Open the Settings app and check if it says at the top of the main screen that it’s supervised, then come back here.",
             primary: self.btn(text: "Yes, it says supervised", .primary, disabled: !regainedFocus),
             secondary: self.btn(
-              text: "No, I don't see anything",
+              text: "No, I don’t see anything",
               .secondary,
               disabled: !regainedFocus,
             ),
@@ -506,31 +485,27 @@ public struct AppView: View {
             primaryLooksLikeSecondary: true,
           )
 
-        // TODO: superios finalize screen text
         case .onboarding(.supervision(.resume(.retrySupervision))):
           ButtonScreenView(
-            text: "No worries. Let's try setting up supervision again.",
+            text: "No worries. Let’s try setting up supervision again.",
             primary: self.btn(text: "Next", .primary),
           )
 
-        // TODO: superios finalize screen text
         case .onboarding(.supervision(.resume(.codeNotClaimed))):
           ButtonScreenView(
-            text: "Hmmm... your supervision setup code hasn't been claimed yet. Let's try again.",
+            text: "Hmmm... the supervision setup code hasn’t been claimed by a Gertrude account yet. Let’s try again.",
             primary: self.btn(text: "Next", .primary),
           )
 
-        // TODO: superios finalize screen text
         case .onboarding(.supervision(.resume(.promptInstallProfile))):
           ButtonScreenView(
-            text: "One more step: we need to install a configuration profile to enable content filtering.",
+            text: "One more step: we need to install something called a “profile” to allow blocking.",
             primary: self.btn(text: "Next", .primary),
           )
 
-        // TODO: superios finalize screen text
         case .onboarding(.supervision(.resume(.explainProfileDownload))):
           ButtonScreenView(
-            text: "When the browser opens, tap \"Allow\" to download the profile.",
+            text: "When the browser opens, tap “Allow” to download the profile.",
             primary: self.btn(text: "Got it", .primary),
           )
 
@@ -539,21 +514,19 @@ public struct AppView: View {
             self.store.send(.interactive(.onboardingBtnTapped(.primary, "Safari dismissed")))
           }
 
-        // TODO: superios finalize screen text + add graphic asset
         case .onboarding(.supervision(.resume(.explainProfileInstall(let regainedFocus)))):
           ButtonScreenView(
             text: "Now, open the Settings app:",
             primary: self.btn(text: "Done, continue", .primary, disabled: !regainedFocus),
             listItems: [
-              "Tap \"Profile Downloaded\" at top",
-              "Tap \"Install\"",
+              "Tap “Profile Downloaded” at top",
+              "Tap “Install”",
               "Enter your passcode",
               "Come back to this app",
             ],
           )
 
         case .onboarding(.supervision(.resume(.verifyingProfileInstall(let didError)))):
-          // TODO: superios finalize screen text
           SpinnerErrorView(
             loadingText: "Verifying profile installation...",
             errorText: "Profile not detected. Make sure you installed the profile in Settings.",
@@ -561,17 +534,15 @@ public struct AppView: View {
             onRetry: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Retry"))) },
           )
 
-        // TODO: superios finalize screen text
         case .onboarding(.supervision(.resume(.profileInstalled))):
           ButtonScreenView(
-            text: "Profile installed successfully! Content filtering is now active.",
+            text: "Profile installed successfully! Gertrude can now block unwanted content.",
             primary: self.btn(text: "Next", .primary),
           )
 
-        // TODO: superios finalize screen text
         case .onboarding(.supervision(.resume(.setupComplete))):
           ButtonScreenView(
-            text: "You're all set! Gertrude is now protecting your device.",
+            text: "You’re all set! The Gertrude account holder can manage what gets blocked and also remove the supervision when needed.",
             primary: self.btn(text: "Done", .primary),
           )
 
@@ -604,13 +575,6 @@ public struct AppView: View {
         .onAppear { store.send(.sheetPresented) }
         .onShake { store.send(.receivedShake) }
     }
-  }
-
-  var explainFamilyPresented: Binding<Bool> {
-    .init(
-      get: { self.store.screen == .onboarding(.major(.explainAppleFamily)) },
-      set: { presented in if !presented { self.store.send(.interactive(.sheetDismissed)) } },
-    )
   }
 
   func btn(
@@ -656,6 +620,7 @@ extension URL {
       IOSReducer()
     },
     osMajorVersion: 26,
+    deviceType: "iPhone",
   )
 }
 
@@ -667,6 +632,7 @@ extension URL {
       IOSReducer()
     },
     osMajorVersion: 26,
+    deviceType: "iPhone",
   )
 }
 
@@ -678,6 +644,7 @@ extension URL {
       IOSReducer()
     },
     osMajorVersion: 26,
+    deviceType: "iPhone",
   )
 }
 
@@ -691,6 +658,7 @@ extension URL {
       IOSReducer()
     },
     osMajorVersion: 26,
+    deviceType: "iPhone",
   )
 }
 
@@ -702,6 +670,7 @@ extension URL {
       IOSReducer()
     },
     osMajorVersion: 26,
+    deviceType: "iPhone",
   )
 }
 
@@ -713,6 +682,7 @@ extension URL {
       IOSReducer()
     },
     osMajorVersion: 26,
+    deviceType: "iPhone",
   )
 }
 
@@ -724,5 +694,6 @@ extension URL {
       IOSReducer()
     },
     osMajorVersion: 26,
+    deviceType: "iPhone",
   )
 }

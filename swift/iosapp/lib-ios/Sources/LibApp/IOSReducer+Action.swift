@@ -15,6 +15,7 @@ public extension IOSReducer {
         case primary
         case secondary
         case tertiary
+        case quaternary
       }
 
       case onboardingClearCache(ClearCacheFeature.Action)

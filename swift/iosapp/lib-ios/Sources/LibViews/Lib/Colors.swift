@@ -1,6 +1,16 @@
 import SwiftUI
 
 public extension Color {
+  static let slate100 = Color(hex: "#f1f5f9")!
+  static let slate200 = Color(hex: "#e2e8f0")!
+  static let slate300 = Color(hex: "#cbd5e1")!
+  static let slate400 = Color(hex: "#94a3b8")!
+  static let slate500 = Color(hex: "#64748b")!
+  static let slate600 = Color(hex: "#475569")!
+  static let slate700 = Color(hex: "#334155")!
+  static let slate800 = Color(hex: "#1e293b")!
+  static let slate900 = Color(hex: "#0f172a")!
+
   static let violet100 = Color(hex: "#ede9fe")!
   static let violet200 = Color(hex: "#ddd6fe")!
   static let violet300 = Color(hex: "#c4b5fd")!

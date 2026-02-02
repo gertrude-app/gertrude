@@ -1,6 +1,156 @@
 import SwiftUI
 
-// TODO: superios finalize screen text
+struct FreeAlternativesHubView: View {
+  @Environment(\.colorScheme) var cs
+
+  let onBirthdayTapped: () -> Void
+  let onSiblingTapped: () -> Void
+  let onAppleConfiguratorTapped: () -> Void
+  let onGertrudeTapped: () -> Void
+
+  @State private var showBg = false
+  @State private var iconOffset = Vector(x: 0, y: -20)
+  @State private var textOffset = Vector(x: 0, y: 20)
+  @State private var card1Offset = Vector(x: 0, y: 20)
+  @State private var card2Offset = Vector(x: 0, y: 20)
+  @State private var card3Offset = Vector(x: 0, y: 20)
+  @State private var orTextOffset = Vector(x: 0, y: 20)
+  @State private var buttonOffset = Vector(x: 0, y: 20)
+
+  var body: some View {
+    ZStack {
+      Rectangle()
+        .fill(
+          Gradient(colors: [
+            Color(self.cs, light: .violet200, dark: .violet950.opacity(0.7)),
+            .clear,
+          ]),
+        )
+        .ignoresSafeArea()
+        .opacity(self.showBg ? 1 : 0)
+        .onAppear {
+          withAnimation(.smooth(duration: 0.7)) {
+            self.showBg = true
+          }
+        }
+
+      VStack(alignment: .leading, spacing: 16) {
+        Image(systemName: "arrow.triangle.branch")
+          .font(.system(size: 40, weight: .regular))
+          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+          .swooshIn(tracking: self.$iconOffset, to: .zero, after: .zero, for: .milliseconds(800))
+          .frame(maxWidth: .infinity, alignment: .center)
+
+        Spacer()
+
+        Text("There are three free alternatives:")
+          .font(.system(size: 18, weight: .medium))
+          .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))
+
+        AlternativeCard(
+          icon: "birthday.cake",
+          title: "Change your birthday",
+          onTap: self.onBirthdayTapped,
+        )
+        .swooshIn(
+          tracking: self.$card1Offset,
+          to: .zero,
+          after: .milliseconds(100),
+          for: .milliseconds(800),
+        )
+
+        AlternativeCard(
+          icon: "person.2",
+          title: "Use a sibling’s account",
+          onTap: self.onSiblingTapped,
+        )
+        .swooshIn(
+          tracking: self.$card2Offset,
+          to: .zero,
+          after: .milliseconds(200),
+          for: .milliseconds(800),
+        )
+
+        AlternativeCard(
+          icon: "desktopcomputer",
+          title: "Supervise yourself",
+          onTap: self.onAppleConfiguratorTapped,
+        )
+        .swooshIn(
+          tracking: self.$card3Offset,
+          to: .zero,
+          after: .milliseconds(300),
+          for: .milliseconds(800),
+        )
+
+        Text("or")
+          .font(.system(size: 14, weight: .medium))
+          .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
+          .frame(maxWidth: .infinity, alignment: .center)
+          .padding(.top, 8)
+          .swooshIn(
+            tracking: self.$orTextOffset,
+            to: .zero,
+            after: .milliseconds(350),
+            for: .milliseconds(800),
+          )
+
+        BigButton(
+          "Go with Gertrude ($10/year)",
+          type: .button { self.onGertrudeTapped() },
+          variant: .primary,
+        )
+        .swooshIn(
+          tracking: self.$buttonOffset,
+          to: .zero,
+          after: .milliseconds(400),
+          for: .milliseconds(800),
+        )
+      }
+      .frame(maxWidth: 500)
+      .padding(30)
+      .padding(.top, 50)
+    }
+  }
+}
+
+struct AlternativeCard: View {
+  @Environment(\.colorScheme) var cs
+
+  let icon: String
+  let title: String
+  let onTap: () -> Void
+
+  var body: some View {
+    Button {
+      self.onTap()
+    } label: {
+      HStack(spacing: 14) {
+        Image(systemName: self.icon)
+          .font(.system(size: 22, weight: .medium))
+          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+          .frame(width: 36)
+
+        Text(self.title)
+          .font(.system(size: 16, weight: .semibold))
+          .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
+
+        Spacer()
+
+        Image(systemName: "chevron.right")
+          .font(.system(size: 12, weight: .semibold))
+          .foregroundStyle(Color(self.cs, light: .violet400, dark: .violet500))
+      }
+      .padding(.horizontal, 16)
+      .padding(.vertical, 14)
+      .background(
+        Color(self.cs, light: .violet500.opacity(0.1), dark: .violet500.opacity(0.15)),
+      )
+      .cornerRadius(16)
+    }
+    .buttonStyle(.plain)
+  }
+}
 
 struct InstructionsForProtectorView: View {
   @Environment(\.colorScheme) var cs
@@ -44,7 +194,7 @@ struct InstructionsForProtectorView: View {
         Spacer()
 
         Text(
-          "Share this link with your protector. They'll need to open it on a computer to complete the setup.",
+          "The parent/spouse/accountability partner will need to open this link on their computer (Mac or Windows) to setup the account and perform the supervision.",
         )
         .font(.system(size: 18, weight: .medium))
 
@@ -60,7 +210,7 @@ struct InstructionsForProtectorView: View {
           .frame(height: 40)
 
         BigButton(
-          "Send link to protector",
+          "Send link",
           type: .share(self.supervisionUrl),
           variant: .secondary,
           icon: "square.and.arrow.up",
@@ -116,17 +266,11 @@ struct WaitingForSupervisionView: View {
 
         Spacer()
 
-        // TODO: superios finalize screen text
-        Text(
-          "Now close this app and wait for your protector to complete the supervision process on their computer.",
-        )
-        .font(.system(size: 18, weight: .medium))
+        Text("Now close this app and have the helper create the account from that link.")
+          .font(.system(size: 18, weight: .medium))
 
-        // TODO: superios finalize screen text
-        Text(
-          "Once they're done, your device will restart. After it restarts, open this app again to finish setup.",
-        )
-        .font(.system(size: 18, weight: .medium))
+        Text("After the account is created, they’ll be walked through the supervision process.")
+          .font(.system(size: 18, weight: .medium))
 
         Spacer()
           .frame(height: 40)
@@ -143,6 +287,15 @@ struct WaitingForSupervisionView: View {
       .padding(.top, 50)
     }
   }
+}
+
+#Preview("FreeAlternativesHub") {
+  FreeAlternativesHubView(
+    onBirthdayTapped: {},
+    onSiblingTapped: {},
+    onAppleConfiguratorTapped: {},
+    onGertrudeTapped: {},
+  )
 }
 
 #Preview("InstructionsForProtector") {
