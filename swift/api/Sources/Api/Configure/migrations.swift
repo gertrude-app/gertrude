@@ -65,6 +65,7 @@ extension Configure {
     app.migrations.add(FixSearchPathTrigger())
     app.migrations.add(VendorIdAsDeviceId())
     app.migrations.add(CreateSupervisionTable())
+    app.migrations.add(SmsSends())
   }
 }
 

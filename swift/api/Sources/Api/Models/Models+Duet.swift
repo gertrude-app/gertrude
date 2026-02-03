@@ -702,3 +702,17 @@ extension AppStore.RatingEvent {
     case createdAt
   }
 }
+
+extension SmsSend: Duet.Identifiable {
+  typealias Id = Tagged<SmsSend, UUID>
+}
+
+extension SmsSend {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case parentId
+    case trigger
+    case countryCode
+    case createdAt
+  }
+}

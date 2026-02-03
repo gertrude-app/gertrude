@@ -2,6 +2,8 @@ import Dependencies
 import Foundation
 
 extension AdminEvent.UnlockRequestSubmitted: AdminNotifying {
+  static var smsSendTrigger: String { "unlockRequest" }
+
   func sendText(to phoneNumber: String) async throws {
     let newRequest =
       requestIds.count > 1

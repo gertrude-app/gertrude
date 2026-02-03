@@ -2,6 +2,8 @@ import Dependencies
 import Foundation
 
 extension AdminEvent.MacAppSecurityEvent: AdminNotifying {
+  static var smsSendTrigger: String { "securityEvent" }
+
   var desc: String {
     "\(event.toWords)\(detail.map { ": \($0)" } ?? "")"
   }
