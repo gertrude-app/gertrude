@@ -1256,3 +1256,29 @@ extension AppStore.RatingEvent: Model {
     ]
   }
 }
+
+extension SmsSend: Model {
+  public static let schemaName = "system"
+  public static let tableName = "sms_sends"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .parentId: .uuid(self.parentId)
+    case .trigger: .varchar(self.trigger)
+    case .countryCode: .varchar(self.countryCode)
+    case .createdAt: .date(self.createdAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .parentId: .uuid(self.parentId),
+      .trigger: .varchar(self.trigger),
+      .countryCode: .varchar(self.countryCode),
+      .createdAt: .currentTimestamp,
+    ]
+  }
+}

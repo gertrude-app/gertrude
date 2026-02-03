@@ -2,6 +2,8 @@ import Dependencies
 import Foundation
 
 extension AdminEvent.SuspendFilterRequestSubmitted: AdminNotifying {
+  static var smsSendTrigger: String { "suspendFilterRequest" }
+
   func sendEmail(to address: String, isFallback: Bool = false) async throws {
     try await with(dependency: \.postmark)
       .send(template: .notifySuspendFilter(

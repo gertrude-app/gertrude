@@ -29,13 +29,13 @@ extension AdminNotifier: DependencyKey {
               switch (notification.trigger, event) {
               case (.suspendFilterRequestSubmitted, .suspendFilterRequestSubmitted(let event)):
                 let method = try await notification.method(in: db)
-                try await event.send(with: method.config)
+                try await event.send(with: method.config, parentId: parentId)
               case (.unlockRequestSubmitted, .unlockRequestSubmitted(let event)):
                 let method = try await notification.method(in: db)
-                try await event.send(with: method.config)
+                try await event.send(with: method.config, parentId: parentId)
               case (.adminChildSecurityEvent, .adminChildSecurityEvent(let event)):
                 let method = try await notification.method(in: db)
-                try await event.send(with: method.config)
+                try await event.send(with: method.config, parentId: parentId)
               default:
                 break
               }
