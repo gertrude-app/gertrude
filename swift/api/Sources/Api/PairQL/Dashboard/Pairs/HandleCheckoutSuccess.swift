@@ -1,6 +1,7 @@
 import Dependencies
 import Foundation
 import PairQL
+import Vapor
 
 struct HandleCheckoutSuccess: Pair {
   static let auth: ClientAuth = .parent
@@ -16,29 +17,61 @@ extension HandleCheckoutSuccess: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     @Dependency(\.date.now) var now
     @Dependency(\.stripe) var stripe
+    @Dependency(\.slack) var slack
+    @Dependency(\.postmark) var postmark
 
     let session = try await stripe.getCheckoutSession(input.stripeCheckoutSessionId)
-    var parent = try await context.db.find(session.parentId)
-    let subscriptionId = try session.parentSubscriptionId
-    let subscription = try await stripe.getSubscription(subscriptionId.rawValue)
-    switch (parent.subscriptionStatus, subscription.status) {
+    guard let parentId = session.clientReferenceId
+      .flatMap(UUID.init(uuidString:))
+      .flatMap(Parent.Id.init(rawValue:)) else {
+      unexpected("d3f3b1c3", context)
+      throw Abort(.badRequest)
+    }
 
-    case (.trialing, .active),
-         (.trialExpiringSoon, .active),
-         (.overdue, .active),
-         (.paid, .active), // <-- happens when stripe webhook received before
-         (.unpaid, .active):
-      parent.subscriptionStatus = .paid
-      parent.subscriptionId = subscriptionId
-      parent.subscriptionStatusExpiration = now + .days(33)
-      try await context.db.update(parent)
+    let parent = try await context.db.find(parentId)
+    guard let subscriptionId = session.subscription else {
+      unexpected("9742cd40", context)
+      throw Abort(.badRequest)
+    }
 
-    case (let parentStatus, let stripeStatus):
-      unexpected(
-        "1146b93f",
-        context,
-        "admin: .\(parentStatus), stripe: .\(stripeStatus), subs: \(subscriptionId)",
-      )
+    let subscription = try await stripe.getSubscription(subscriptionId)
+    guard let priceId = subscription.items.data.first?.price.id else {
+      unexpected("10bd2192", context)
+      throw Abort(.badRequest)
+    }
+
+    guard let tier = Subscription.Tier(stripePriceId: priceId) else {
+      unexpected("2958cf22", context)
+      throw Abort(.badRequest)
+    }
+
+    let expiration = Date(timeIntervalSince1970: TimeInterval(subscription.currentPeriodEnd))
+    if var model = try await parent.subscription(in: context.db) {
+      switch model.plan {
+      case .full(.complimentary):
+        unexpected("537d360f", context)
+        throw Abort(.badRequest)
+      default:
+        if model.stripeId == nil {
+          notifyFirstPayment(parent: parent, tier: tier)
+        }
+        model.tier = tier
+        model.billingStatus = .paid
+        model.stripeId = .init(subscriptionId)
+        model.statusExpiresAt = expiration + .days(2)
+        try await context.db.update(model)
+      }
+    } else {
+      // if they have no subscription record, they were on the free plan
+      try await context.db.create(Subscription(
+        parentId: parent.id,
+        tier: tier,
+        billingStatus: .paid,
+        stripeId: .init(subscriptionId),
+        statusExpiresAt: expiration + .days(2),
+      ))
+      // all full subscriptions should have come thru trial state
+      if tier != .light { unexpected("d6db1ebc", context) }
     }
 
     return .success

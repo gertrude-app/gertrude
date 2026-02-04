@@ -67,6 +67,7 @@ extension Configure {
     app.migrations.add(CreateSupervisionTable())
     app.migrations.add(SmsSends())
     app.migrations.add(SecurityEventNotificationTriggers())
+    app.migrations.add(SubscriptionRefactor())
   }
 }
 

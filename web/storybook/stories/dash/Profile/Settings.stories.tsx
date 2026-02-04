@@ -1,4 +1,5 @@
 import { Settings } from '@dash/components';
+import type { Plan } from '@dash/types';
 import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { confirmableEntityAction, props, withIdsAnd } from '../../story-helpers';
@@ -20,13 +21,44 @@ const notificationProps = {
   saveButtonDisabled: false,
 };
 
-// @screenshot: xs,md
-export const Default: Story = props({
+const plans: Record<string, Plan> = {
+  fullPaid: {
+    case: `full`,
+    status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
+  },
+  fullPaidLegacy: {
+    case: `full`,
+    status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 500 },
+  },
+  fullTrialing: {
+    case: `full`,
+    status: {
+      case: `trialing`,
+      until: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+  },
+  fullTrialingExpiringSoon: {
+    case: `full`,
+    status: {
+      case: `trialing`,
+      until: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+  },
+  fullOverdue: {
+    case: `full`,
+    status: { case: `overdue`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
+  },
+  fullTrialExpired: { case: `full`, status: { case: `trialExpired` } },
+  fullComplimentary: { case: `full`, status: { case: `complimentary` } },
+  lightPaid: { case: `light`, status: { case: `paid`, stripeId: `sub_456` } },
+  lightOverdue: { case: `light`, status: { case: `overdue`, stripeId: `sub_456` } },
+  free: { case: `free`, kind: { case: `standard` } },
+};
+
+const baseArgs = {
   newMethodId: undefined,
   setNewMethodId: () => {},
   email: `johndoe@example.com`,
-  status: { case: `paid` },
-  monthlyPriceInDollars: 10,
   methods: withIdsAnd({ deletable: false }, [
     { method: `email` as const, value: `me@example.com`, inUse: true },
     { method: `slack` as const, value: `#Gertrude`, inUse: true },
@@ -72,23 +104,31 @@ export const Default: Story = props({
   ]),
   deleteMethod: confirmableEntityAction(),
   deleteNotification: confirmableEntityAction(),
-  billingPortalRequest: { state: `idle` },
+  billingPortalRequest: { state: `idle` as const },
   updateNotification: () => {},
   saveNotification: () => {},
   createNotification: () => {},
   manageSubscription: () => {},
   newMethodEventHandler: () => {},
+};
+
+// @screenshot: xs,md
+export const Default: Story = props({
+  ...baseArgs,
+  plan: plans.fullPaid,
 });
 
 // @screenshot: xs,md
 export const NoNotifications: Story = props({
-  ...Default.args,
+  ...baseArgs,
+  plan: plans.fullPaid,
   notifications: [],
 });
 
 // @screenshot: xs,md
 export const AddingMethod: Story = props({
-  ...Default.args,
+  ...baseArgs,
+  plan: plans.fullPaid,
   pendingMethod: {
     case: `email`,
     email: ``,
@@ -100,7 +140,8 @@ export const AddingMethod: Story = props({
 
 // @screenshot: xs,md
 export const AddingMethodVerifying: Story = props({
-  ...Default.args,
+  ...baseArgs,
+  plan: plans.fullPaid,
   pendingMethod: {
     case: `email`,
     email: ``,
@@ -112,11 +153,57 @@ export const AddingMethodVerifying: Story = props({
 
 // @screenshot: xs,md
 export const AfterNewMethodCreation: Story = props({
-  ...Default.args,
+  ...baseArgs,
+  plan: plans.fullPaid,
   newMethodId: {
     confirmed: true,
     id: `1`,
   },
+});
+
+export const FullTrialing: Story = props({
+  ...baseArgs,
+  plan: plans.fullTrialing,
+});
+
+export const FullTrialingExpiringSoon: Story = props({
+  ...baseArgs,
+  plan: plans.fullTrialingExpiringSoon,
+});
+
+export const FullOverdue: Story = props({
+  ...baseArgs,
+  plan: plans.fullOverdue,
+});
+
+export const FullTrialExpired: Story = props({
+  ...baseArgs,
+  plan: plans.fullTrialExpired,
+});
+
+export const FullPaidLegacy: Story = props({
+  ...baseArgs,
+  plan: plans.fullPaidLegacy,
+});
+
+export const FullComplimentary: Story = props({
+  ...baseArgs,
+  plan: plans.fullComplimentary,
+});
+
+export const LightPaid: Story = props({
+  ...baseArgs,
+  plan: plans.lightPaid,
+});
+
+export const LightOverdue: Story = props({
+  ...baseArgs,
+  plan: plans.lightOverdue,
+});
+
+export const Free: Story = props({
+  ...baseArgs,
+  plan: plans.free,
 });
 
 export default meta;

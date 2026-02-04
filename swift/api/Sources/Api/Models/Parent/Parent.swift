@@ -1,68 +1,49 @@
 import DuetSQL
 import Gertie
-import TaggedMoney
 
 struct Parent: Codable, Sendable {
   var id: Id
   var email: EmailAddress
   var password: String
-  var subscriptionId: SubscriptionId?
-  var subscriptionStatus: SubscriptionStatus
-  var subscriptionStatusExpiration: Date
-  var monthlyPrice: Cents<Int>
-  var trialPeriodDays: Int
+  var emailVerifiedAt: Date?
+  var deletedAt: Date?
   var gclid: String?
   var abTestVariant: String?
   var createdAt = Date()
   var updatedAt = Date()
 
-  var accountStatus: AdminAccountStatus {
-    self.subscriptionStatus.accountStatus
+  var emailVerified: Bool {
+    self.emailVerifiedAt != nil
   }
 
-  var isPendingEmailVerification: Bool {
-    self.subscriptionStatus == .pendingEmailVerification
+  var isPendingDeletion: Bool {
+    guard let deletedAt else { return false }
+    return deletedAt > Date()
+  }
+
+  var isDeleted: Bool {
+    guard let deletedAt else { return false }
+    return deletedAt <= Date()
   }
 
   init(
     id: Id = .init(),
     email: EmailAddress,
     password: String,
-    subscriptionStatus: SubscriptionStatus = .pendingEmailVerification,
-    subscriptionStatusExpiration: Date = Date().advanced(by: .days(3)),
-    subscriptionId: SubscriptionId? = nil,
-    monthlyPrice: Cents<Int> = .init(1000),
-    trialPeriodDays: Int = 21,
+    emailVerifiedAt: Date? = nil,
+    deletedAt: Date? = nil,
     gclid: String? = nil,
     abTestVariant: String? = nil,
   ) {
     self.id = id
     self.email = email
     self.password = password
-    self.subscriptionId = subscriptionId
-    self.subscriptionStatus = subscriptionStatus
-    self.subscriptionStatusExpiration = subscriptionStatusExpiration
-    self.monthlyPrice = monthlyPrice
-    self.trialPeriodDays = trialPeriodDays
+    self.emailVerifiedAt = emailVerifiedAt
+    self.deletedAt = deletedAt
     self.gclid = gclid
     self.abTestVariant = abTestVariant
   }
 }
-
-// extensions
-
-extension Parent {
-  var stripePriceId: String {
-    switch self.monthlyPrice.rawValue {
-    case 500: // legacy $5/mo price
-      "price_1M9xZYGKRdhETuKA22aYJ4fI"
-    default: // new post-vinci lowered price, 6/25
-      "price_1RJbTrGKRdhETuKAkI5OO1NB"
-    }
-  }
-}
-
-// loaders
 
 extension Parent {
   func keychains(in db: any DuetSQL.Client) async throws -> [Keychain] {
@@ -103,32 +84,14 @@ extension Parent {
       .where(.parentId == self.id)
       .all(in: db)
   }
-}
 
-// extensions
+  func subscription(in db: any DuetSQL.Client) async throws -> Subscription? {
+    try? await Subscription.query()
+      .where(.parentId == self.id)
+      .first(in: db)
+  }
 
-extension Parent {
-  typealias SubscriptionId = Tagged<Parent, String>
-
-  enum SubscriptionStatus: String, Codable, Equatable, CaseIterable, Sendable {
-    case pendingEmailVerification
-    case trialing
-    case trialExpiringSoon
-    case overdue
-    case paid
-    case unpaid
-    case pendingAccountDeletion
-    case complimentary
-
-    var accountStatus: AdminAccountStatus {
-      switch self {
-      case .paid, .trialing, .trialExpiringSoon, .complimentary:
-        .active
-      case .overdue:
-        .needsAttention
-      case .pendingEmailVerification, .unpaid, .pendingAccountDeletion:
-        .inactive
-      }
-    }
+  func plan(in db: any DuetSQL.Client) async throws -> Plan {
+    try await .init(subscription: self.subscription(in: db))
   }
 }

@@ -15,38 +15,31 @@ struct StripeUrl: Pair {
 
 extension StripeUrl: NoInputResolver {
   static func resolve(in context: ParentContext) async throws -> Output {
-    switch (context.parent.subscriptionStatus, context.parent.subscriptionId) {
-
-    case (.trialing, nil),
-         (.trialExpiringSoon, nil),
-         (.overdue, nil),
-         (.unpaid, nil):
-      return try await .init(url: checkoutSessionUrl(for: context))
-
-    case (.paid, .some(let subscription)),
-         (.overdue, .some(let subscription)),
-         (.unpaid, .some(let subscription)):
-      return try await .init(url: billingPortalSessionUrl(for: subscription))
-
-    // should never happen...
-    case (let status, let subscription):
-      unexpected("65554aa1", context, ".\(status), \(subscription ?? "nil")")
-      if let subscription {
-        return try await .init(url: billingPortalSessionUrl(for: subscription))
-      } else {
-        return try await .init(url: checkoutSessionUrl(for: context))
-      }
+    switch try await context.parent.plan(in: context.db) {
+    case .full(.trialing), .full(.trialExpired):
+      return try await .init(url: checkoutSessionUrl(tier: .full, in: context))
+    case .full(.paid(let stripeId, _)), .full(.overdue(let stripeId, _)):
+      return try await .init(url: billingPortalSessionUrl(for: stripeId))
+    case .light(.paid(let stripeId)), .light(.overdue(let stripeId)):
+      return try await .init(url: billingPortalSessionUrl(for: stripeId))
+    // client should not be sending these states
+    case .free, .full(.complimentary):
+      unexpected("550e0632", context)
+      throw Abort(.badRequest)
     }
   }
 }
 
 // helpers
 
-private func checkoutSessionUrl(for context: ParentContext) async throws -> String {
+private func checkoutSessionUrl(
+  tier: Subscription.Tier,
+  in context: ParentContext,
+) async throws -> String {
   let sessionData = Stripe.CheckoutSessionData(
     successUrl: "\(context.dashboardUrl)/checkout-success?session_id={CHECKOUT_SESSION_ID}",
     cancelUrl: "\(context.dashboardUrl)/checkout-cancel?session_id={CHECKOUT_SESSION_ID}",
-    lineItems: [.init(quantity: 1, priceId: context.parent.stripePriceId)],
+    lineItems: [.init(quantity: 1, priceId: tier.checkoutStripePriceId)],
     mode: .subscription,
     clientReferenceId: context.parent.id.lowercased,
     customerEmail: context.parent.email.rawValue,
@@ -69,10 +62,10 @@ private func checkoutSessionUrl(for context: ParentContext) async throws -> Stri
 }
 
 private func billingPortalSessionUrl(
-  for subscriptionId: Parent.SubscriptionId,
+  for stripeId: Subscription.StripeId,
 ) async throws -> String {
   @Dependency(\.stripe) var stripe
-  let subscription = try await stripe.getSubscription(subscriptionId.rawValue)
+  let subscription = try await stripe.getSubscription(stripeId.rawValue)
   let portal = try await stripe.createBillingPortalSession(subscription.customer)
   return portal.url
 }

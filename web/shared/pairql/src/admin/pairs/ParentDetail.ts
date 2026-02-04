@@ -10,9 +10,9 @@ export namespace ParentDetail {
     id: UUID;
     email: string;
     status: string;
-    subscriptionStatus: string;
-    subscriptionId?: string;
-    monthlyPriceInCents: number;
+    plan: string;
+    billingStatus?: string;
+    stripeSubscriptionId?: string;
     createdAt: ISODateString;
     children: Array<{
       id: UUID;

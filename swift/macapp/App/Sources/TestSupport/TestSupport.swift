@@ -85,7 +85,7 @@ public func expect<T: Equatable>(
   file: StaticString = #filePath,
   line: UInt = #line,
 ) async -> EquatableExpectation<T> {
-  await EquatableExpectation(value: isolated.value, file: file, line: line)
+  await EquatableExpectation(value: isolated.value, file: file, filePath: file, line: line)
 }
 
 public func expect<T: Equatable>(
@@ -93,7 +93,7 @@ public func expect<T: Equatable>(
   file: StaticString = #filePath,
   line: UInt = #line,
 ) -> EquatableExpectation<T> {
-  EquatableExpectation(value: isolated.value, file: file, line: line)
+  EquatableExpectation(value: isolated.value, file: file, filePath: file, line: line)
 }
 
 public struct TestErr: Equatable, Error, LocalizedError {

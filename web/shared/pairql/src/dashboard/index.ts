@@ -12,7 +12,7 @@ export * from './pairs/DeleteActivityItems_v2';
 export * from './pairs/DeleteEntity_v2';
 export * from './pairs/FamilyActivitySummaries';
 export * from './pairs/FlagActivityItems';
-export * from './pairs/GetAdmin';
+export * from './pairs/GetAccountOwner';
 export * from './pairs/GetAdminKeychain';
 export * from './pairs/GetAdminKeychains';
 export * from './pairs/GetChild';

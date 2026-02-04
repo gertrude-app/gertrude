@@ -118,8 +118,10 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.FlagActivityItems.Output>(input, `FlagActivityItems`, `parent`);
   };
 
-  public getAdmin = (input: P.GetAdmin.Input): Promise<Result<P.GetAdmin.Output>> => {
-    return this.query<P.GetAdmin.Output>(input, `GetAdmin`, `parent`);
+  public getAccountOwner = (
+    input: P.GetAccountOwner.Input,
+  ): Promise<Result<P.GetAccountOwner.Output>> => {
+    return this.query<P.GetAccountOwner.Output>(input, `GetAccountOwner`, `parent`);
   };
 
   public getAdminKeychain = (

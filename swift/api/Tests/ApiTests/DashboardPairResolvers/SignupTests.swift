@@ -16,7 +16,7 @@ final class SignupTests: ApiTestCase, @unchecked Sendable {
   func testInitiateSignupWithExistingVerifiedEmailButBadPasswordSendsEmail() async throws {
     let existing = try await self.db.create(Parent.random {
       $0.password = "nope"
-      $0.subscriptionStatus = .trialing
+      $0.emailVerifiedAt = .reference - .days(1)
     })
 
     let input = Signup.Input(email: existing.email.rawValue, password: "pass")
@@ -37,8 +37,7 @@ final class SignupTests: ApiTestCase, @unchecked Sendable {
       .first(in: self.db)
 
     expect(output).toEqual(.init(admin: nil))
-    expect(parent.subscriptionStatus).toEqual(.pendingEmailVerification)
-    expect(parent.subscriptionStatusExpiration).toEqual(.reference.advanced(by: .days(3)))
+    expect(parent.emailVerifiedAt).toEqual(nil)
     expect(sent.emails.count).toEqual(1)
     expect(sent.emails[0].to).toEqual(email)
     expect(sent.emails[0].template).toBe("initial-signup")
@@ -66,8 +65,8 @@ final class SignupTests: ApiTestCase, @unchecked Sendable {
   func testSigningUpWhenAlreadyVerifiedReturnsAuthCreds() async throws {
     let uuids = MockUUIDs()
     let existing = try await self.parent {
-      $0.subscriptionStatus = .trialing
       $0.password = "pass"
+      $0.emailVerifiedAt = .reference - .days(1)
     }
 
     try await withDependencies {

@@ -19,12 +19,13 @@ struct ParentData: Sendable {
   var numNonEmptyKeychains: Int
   var numNotifications: Int
   var childActivityCount: Int
+  // TODO: this name is weird, rename to monthlyPaidPriceCents?
+  // @see https://github.com/gertrude-app/gertrude/issues/478
   var paidPrice: Cents<Int>?
-  var subscriptionStatus: Parent.SubscriptionStatus
   var hasGclid: Bool
   var createdAt: Date
 
-  init(model: Parent) {
+  init(model: Parent, subscription: Subscription?) {
     self.id = model.id
     self.email = model.email
     self.numComputerUsers = 0
@@ -32,8 +33,7 @@ struct ParentData: Sendable {
     self.numNonEmptyKeychains = 0
     self.numNotifications = 0
     self.childActivityCount = 0
-    self.paidPrice = model.subscriptionStatus == .paid ? model.monthlyPrice : nil
-    self.subscriptionStatus = model.subscriptionStatus
+    self.paidPrice = Plan(subscription: subscription).monthlyPrice
     self.hasGclid = model.gclid != nil
     self.createdAt = model.createdAt
   }
@@ -75,8 +75,12 @@ struct AnalyticsData: Sendable {
     let parentModels = try await Parent.query()
       .where(.not(.like(.email, "%.smoke-test-%")))
       .where(.not(.like(.email, "e2e-user-%")))
-      .where(.subscriptionStatus != .enum(Parent.SubscriptionStatus.pendingEmailVerification))
+      .where(.not(.isNull(.emailVerifiedAt)))
       .all(in: self.db)
+
+    let allSubscriptions = try await Subscription.query().all(in: self.db)
+    let subscriptionMap = Dictionary(uniqueKeysWithValues: allSubscriptions
+      .map { ($0.parentId, $0) })
 
     let nonEmptyKeyChains = try await self.db.customQuery(NonEmptyKeychains.self)
     let keychainMap: [Parent.Id: [Int]] = nonEmptyKeyChains.reduce(into: [:]) { map, row in
@@ -117,7 +121,7 @@ struct AnalyticsData: Sendable {
     )
     var totalAnnualCents = Cents(0)
     var parents = parentModels.reduce(into: [Parent.Id: ParentData]()) { map, model in
-      var parent = ParentData(model: model)
+      var parent = ParentData(model: model, subscription: subscriptionMap[model.id])
       parent.numNonEmptyKeychains = keychainMap[model.id]?.count ?? 0
       parent.numChildren = childMap[model.id] ?? 0
       parent.numNotifications = notificationsMap[model.id] ?? 0

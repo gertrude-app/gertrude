@@ -44,26 +44,25 @@ enum DashboardTsCodegenRoute {
       ("AdminKeychain", GetAdminKeychains.AdminKeychain.self),
       ("UserActivityItem", UserActivity.Item.self),
       ("AdminNotificationTrigger", Parent.Notification.Trigger.self),
-      ("AdminSubscriptionStatus", GetAdmin.SubscriptionStatus.self),
-      ("VerifiedNotificationMethod", GetAdmin.VerifiedNotificationMethod.self),
-      ("AdminNotification", GetAdmin.Notification.self),
+      ("VerifiedNotificationMethod", GetAccountOwner.VerifiedNotificationMethod.self),
+      ("AdminNotification", GetAccountOwner.Notification.self),
       ("WebPolicy", WebContentFilterPolicy.Kind.self),
       ("BlockRule", GertieIOS.BlockRule.self),
       ("SecurityEventSeverity", SecurityEventsFeed.Severity.self),
+      ("Plan", Plan.self),
     ]
   }
 
   static var pairqlPairs: [any Pair.Type] {
     [
       UserActivityFeed.self,
-      GetAdmin.self,
+      GetAccountOwner.self,
       ConfirmPendingNotificationMethod.self,
       CreatePendingAppConnection.self,
       CreatePendingNotificationMethod.self,
       DashboardWidgets.self,
       DeleteActivityItems_v2.self,
       DeleteEntity_v2.self,
-      GetAdmin.self,
       GetAdminKeychain.self,
       GetAdminKeychains.self,
       GetDevice.self,
@@ -120,6 +119,7 @@ enum DashboardTsCodegenRoute {
     var sharedAliases: [Config.Alias] = [
       .init(NoInput.self, as: "void"),
       .init(Date.self, as: "ISODateString"),
+      .init(Subscription.StripeId.self, as: "string"),
     ]
     var config = Config(compact: true, aliasing: sharedAliases)
 

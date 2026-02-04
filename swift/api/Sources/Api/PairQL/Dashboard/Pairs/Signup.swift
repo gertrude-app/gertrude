@@ -44,7 +44,7 @@ extension Signup: Resolver {
       .first(in: context.db)
 
     if let existing {
-      if !existing.isPendingEmailVerification, let creds = try? await Login.resolve(
+      if existing.emailVerified, let creds = try? await Login.resolve(
         with: .init(email: input.email, password: input.password),
         in: context,
       ) {
@@ -55,7 +55,7 @@ extension Signup: Resolver {
         postmark.toSuperAdmin("signup [exists]", email)
       }
 
-      if existing.isPendingEmailVerification {
+      if !existing.emailVerified {
         try await sendVerificationEmail(to: existing, in: context, claimCode: input.claimCode)
       } else {
         try await postmark.send(template: .reSignup(
@@ -70,8 +70,6 @@ extension Signup: Resolver {
     let parent = try await context.db.create(Parent(
       email: .init(rawValue: email),
       password: context.env.mode == .test ? input.password : Bcrypt.hash(input.password),
-      subscriptionStatus: .pendingEmailVerification,
-      subscriptionStatusExpiration: now + .days(3),
       gclid: input.gclid,
       abTestVariant: input.abTestVariant,
     ))

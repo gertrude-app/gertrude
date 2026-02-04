@@ -3,14 +3,15 @@ import Gertie
 import XCore
 import XCTest
 import XExpect
+import XStripe
 
 @testable import Api
 
 final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
   func testStripeUrlForBillingPortalSession() async throws {
-    let parent = try await self.parent {
-      $0.subscriptionId = .init(rawValue: "sub_123")
-      $0.subscriptionStatus = .paid
+    let parent = try await self.parentWithSubscription {
+      $1.stripeId = .init("sub_123")
+      $1.billingStatus = .paid
     }
 
     let output = try await withDependencies {
@@ -23,16 +24,16 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
         return .init(id: "bps_123", url: "bps-url")
       }
     } operation: {
-      try await StripeUrl.resolve(in: context(parent))
+      try await StripeUrl.resolve(in: context(parent.model))
     }
 
     expect(output).toEqual(.init(url: "bps-url"))
   }
 
   func testStripeUrlForCheckoutSession() async throws {
-    let parent = try await self.parent {
-      $0.subscriptionId = nil
-      $0.subscriptionStatus = .trialing
+    let parent = try await self.parentWithSubscription {
+      $1.stripeId = nil
+      $1.billingStatus = .trialing
     }
 
     let output = try await withDependencies {
@@ -42,7 +43,7 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
         return .init(id: "s1", url: "/checkout-url", subscription: "subsid", clientReferenceId: nil)
       }
     } operation: {
-      try await StripeUrl.resolve(in: context(parent))
+      try await StripeUrl.resolve(in: context(parent.model))
     }
 
     expect(output).toEqual(.init(url: "/checkout-url"))
@@ -50,7 +51,10 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testHandleCheckoutSuccess() async throws {
     let sessionId = "cs_123"
-    let parent = try await self.db.create(Parent.random { $0.subscriptionStatus = .trialing })
+    let parent = try await self.parentWithSubscription {
+      $1.stripeId = nil
+      $1.billingStatus = .trialing
+    }
 
     let output = try await withDependencies {
       $0.stripe.getCheckoutSession = { id in
@@ -64,20 +68,26 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
       }
       $0.stripe.getSubscription = { id in
         expect(id).toBe("sub_123")
-        return .init(id: id, status: .active, customer: "cus_123", currentPeriodEnd: 0)
+        return .init(
+          id: id,
+          status: .active,
+          customer: "cus_123",
+          currentPeriodEnd: Int(Date.reference.addingTimeInterval(.days(31)).timeIntervalSince1970),
+          items: [.init(price: .init(id: "price_1RJbTrGKRdhETuKAkI5OO1NB"))],
+        )
       }
     } operation: {
       try await HandleCheckoutSuccess.resolve(
         with: .init(stripeCheckoutSessionId: sessionId),
-        in: context(parent),
+        in: context(parent.model),
       )
     }
 
     expect(output).toEqual(.success)
-    let retrieved = try await self.db.find(parent.id)
-    expect(retrieved.subscriptionId).toEqual(.init(rawValue: "sub_123"))
-    expect(retrieved.subscriptionStatus).toEqual(.paid)
-    expect(retrieved.subscriptionStatusExpiration).toEqual(Date.reference + .days(33))
+    let retrieved = try await ParentWithSubscription.find(parent.id, in: self.db)
+    expect(retrieved.subscription!.stripeId).toEqual(.init(rawValue: "sub_123"))
+    expect(retrieved.subscription!.billingStatus).toEqual(.paid)
+    expect(retrieved.subscription!.statusExpiresAt).toEqual(Date.reference + .days(33))
   }
 
   func testCreatePendingAppConnection() async throws {
@@ -96,7 +106,10 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testGetParentWithNotifications() async throws {
-    let parent = try await self.parent(with: \.subscriptionStatus, of: .paid)
+    let parent = try await self.parentWithSubscription {
+      $1.billingStatus = .paid
+      $1.stripeId = .init("sub_123")
+    }
     let method = Parent.NotificationMethod(
       parentId: parent.id,
       config: .email(email: "blob@blob.com"),
@@ -107,13 +120,13 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
     notification.methodId = method.id
     try await self.db.create(notification)
 
-    let output = try await GetAdmin.resolve(in: context(parent))
+    let output = try await GetAccountOwner.resolve(in: context(parent.model))
 
     expect(output).toEqual(
       .init(
         id: parent.id,
         email: parent.email.rawValue,
-        subscriptionStatus: .paid,
+        plan: .full(status: .paid(stripeId: .init("sub_123"), monthlyPriceInCents: 1000)),
         notifications: [
           .init(
             id: notification.id,
@@ -122,8 +135,6 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
           ),
         ],
         verifiedNotificationMethods: [.init(id: method.id, config: method.config)],
-        hasAdminChild: false,
-        monthlyPriceInDollars: 10,
       ),
     )
   }

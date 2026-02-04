@@ -1,4 +1,5 @@
 import Dependencies
+import Foundation
 
 @testable import Api
 
@@ -111,6 +112,23 @@ extension ApiTestCase {
     of value: T,
   ) async throws -> ParentEntities {
     try await self.parent(with: { $0[keyPath: kp] = value })
+  }
+
+  func parentWithSubscription(
+    with config: (inout Parent, inout Subscription) -> Void = { _, _ in },
+  ) async throws -> ParentWithSubscription {
+    var parent = try await self.db.create(Parent.random)
+    var subscription = try await self.db.create(Subscription(
+      parentId: parent.id,
+      tier: .full,
+      billingStatus: .trialing,
+      trialStartedAt: .reference,
+      statusExpiresAt: .reference + .days(18),
+    ))
+    config(&parent, &subscription)
+    try await self.db.update(parent)
+    try await self.db.update(subscription)
+    return .init(model: parent, subscription: subscription)
   }
 
   func child<T>(

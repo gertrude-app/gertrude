@@ -106,14 +106,15 @@ describe(`payment`, () => {
 
   it(`fetching stripe url`, () => {
     cy.simulateLoggedIn();
-    cy.interceptPql(`GetAdmin`, {
+    cy.interceptPql(`GetAccountOwner`, {
       id: betsy.id,
       email: betsy.email,
-      subscriptionStatus: { case: `paid` },
+      plan: {
+        case: `full`,
+        status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
+      },
       notifications: [],
       verifiedNotificationMethods: [],
-      hasAdminChild: false,
-      monthlyPriceInDollars: 10,
     });
 
     cy.interceptPql(`StripeUrl`, { url: `/stripe-url` });

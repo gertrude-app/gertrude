@@ -483,3 +483,231 @@ extension ChildComputerStatus {
     }
   }
 }
+
+extension Plan {
+  private struct _NamedCase: Codable {
+    var `case`: String
+    static func extract(from decoder: Decoder) throws -> String {
+      let container = try decoder.singleValueContainer()
+      return try container.decode(_NamedCase.self).case
+    }
+  }
+
+  private struct _TypeScriptDecodeError: Error {
+    var message: String
+  }
+
+  private struct _CaseFree: Codable {
+    var `case` = "free"
+    var kind: Plan.FreeKind
+  }
+
+  private struct _CaseLight: Codable {
+    var `case` = "light"
+    var status: BillingStatus.Light
+  }
+
+  private struct _CaseFull: Codable {
+    var `case` = "full"
+    var status: BillingStatus.Full
+  }
+
+  func encode(to encoder: Encoder) throws {
+    switch self {
+    case .free(let kind):
+      try _CaseFree(kind: kind).encode(to: encoder)
+    case .light(let status):
+      try _CaseLight(status: status).encode(to: encoder)
+    case .full(let status):
+      try _CaseFull(status: status).encode(to: encoder)
+    }
+  }
+
+  init(from decoder: Decoder) throws {
+    let caseName = try _NamedCase.extract(from: decoder)
+    let container = try decoder.singleValueContainer()
+    switch caseName {
+    case "free":
+      let value = try container.decode(_CaseFree.self)
+      self = .free(kind: value.kind)
+    case "light":
+      let value = try container.decode(_CaseLight.self)
+      self = .light(status: value.status)
+    case "full":
+      let value = try container.decode(_CaseFull.self)
+      self = .full(status: value.status)
+    default:
+      throw _TypeScriptDecodeError(message: "Unexpected case name: `\(caseName)`")
+    }
+  }
+}
+
+extension Plan.FreeKind {
+  private struct _NamedCase: Codable {
+    var `case`: String
+    static func extract(from decoder: Decoder) throws -> String {
+      let container = try decoder.singleValueContainer()
+      return try container.decode(_NamedCase.self).case
+    }
+  }
+
+  private struct _TypeScriptDecodeError: Error {
+    var message: String
+  }
+
+  private struct _CaseLapsedLight: Codable {
+    var `case` = "lapsedLight"
+    var stripeId: Tagged<Api.Subscription, Swift.String>
+  }
+
+  private struct _CaseLapsedFull: Codable {
+    var `case` = "lapsedFull"
+    var stripeId: Tagged<Api.Subscription, Swift.String>
+  }
+
+  func encode(to encoder: Encoder) throws {
+    switch self {
+    case .lapsedLight(let stripeId):
+      try _CaseLapsedLight(stripeId: stripeId).encode(to: encoder)
+    case .lapsedFull(let stripeId):
+      try _CaseLapsedFull(stripeId: stripeId).encode(to: encoder)
+    case .standard:
+      try _NamedCase(case: "standard").encode(to: encoder)
+    }
+  }
+
+  init(from decoder: Decoder) throws {
+    let caseName = try _NamedCase.extract(from: decoder)
+    let container = try decoder.singleValueContainer()
+    switch caseName {
+    case "lapsedLight":
+      let value = try container.decode(_CaseLapsedLight.self)
+      self = .lapsedLight(stripeId: value.stripeId)
+    case "lapsedFull":
+      let value = try container.decode(_CaseLapsedFull.self)
+      self = .lapsedFull(stripeId: value.stripeId)
+    case "standard":
+      self = .standard
+    default:
+      throw _TypeScriptDecodeError(message: "Unexpected case name: `\(caseName)`")
+    }
+  }
+}
+
+extension BillingStatus.Full {
+  private struct _NamedCase: Codable {
+    var `case`: String
+    static func extract(from decoder: Decoder) throws -> String {
+      let container = try decoder.singleValueContainer()
+      return try container.decode(_NamedCase.self).case
+    }
+  }
+
+  private struct _TypeScriptDecodeError: Error {
+    var message: String
+  }
+
+  private struct _CaseTrialing: Codable {
+    var `case` = "trialing"
+    var until: Date
+  }
+
+  private struct _CasePaid: Codable {
+    var `case` = "paid"
+    var stripeId: Tagged<Api.Subscription, Swift.String>
+    var monthlyPriceInCents: Int
+  }
+
+  private struct _CaseOverdue: Codable {
+    var `case` = "overdue"
+    var stripeId: Tagged<Api.Subscription, Swift.String>
+    var monthlyPriceInCents: Int
+  }
+
+  func encode(to encoder: Encoder) throws {
+    switch self {
+    case .trialing(let until):
+      try _CaseTrialing(until: until).encode(to: encoder)
+    case .paid(let stripeId, let monthlyPriceInCents):
+      try _CasePaid(stripeId: stripeId, monthlyPriceInCents: monthlyPriceInCents)
+        .encode(to: encoder)
+    case .overdue(let stripeId, let monthlyPriceInCents):
+      try _CaseOverdue(stripeId: stripeId, monthlyPriceInCents: monthlyPriceInCents)
+        .encode(to: encoder)
+    case .complimentary:
+      try _NamedCase(case: "complimentary").encode(to: encoder)
+    case .trialExpired:
+      try _NamedCase(case: "trialExpired").encode(to: encoder)
+    }
+  }
+
+  init(from decoder: Decoder) throws {
+    let caseName = try _NamedCase.extract(from: decoder)
+    let container = try decoder.singleValueContainer()
+    switch caseName {
+    case "trialing":
+      let value = try container.decode(_CaseTrialing.self)
+      self = .trialing(until: value.until)
+    case "paid":
+      let value = try container.decode(_CasePaid.self)
+      self = .paid(stripeId: value.stripeId, monthlyPriceInCents: value.monthlyPriceInCents)
+    case "overdue":
+      let value = try container.decode(_CaseOverdue.self)
+      self = .overdue(stripeId: value.stripeId, monthlyPriceInCents: value.monthlyPriceInCents)
+    case "complimentary":
+      self = .complimentary
+    case "trialExpired":
+      self = .trialExpired
+    default:
+      throw _TypeScriptDecodeError(message: "Unexpected case name: `\(caseName)`")
+    }
+  }
+}
+
+extension BillingStatus.Light {
+  private struct _NamedCase: Codable {
+    var `case`: String
+    static func extract(from decoder: Decoder) throws -> String {
+      let container = try decoder.singleValueContainer()
+      return try container.decode(_NamedCase.self).case
+    }
+  }
+
+  private struct _TypeScriptDecodeError: Error {
+    var message: String
+  }
+
+  private struct _CasePaid: Codable {
+    var `case` = "paid"
+    var stripeId: Tagged<Api.Subscription, Swift.String>
+  }
+
+  private struct _CaseOverdue: Codable {
+    var `case` = "overdue"
+    var stripeId: Tagged<Api.Subscription, Swift.String>
+  }
+
+  func encode(to encoder: Encoder) throws {
+    switch self {
+    case .paid(let stripeId):
+      try _CasePaid(stripeId: stripeId).encode(to: encoder)
+    case .overdue(let stripeId):
+      try _CaseOverdue(stripeId: stripeId).encode(to: encoder)
+    }
+  }
+
+  init(from decoder: Decoder) throws {
+    let caseName = try _NamedCase.extract(from: decoder)
+    let container = try decoder.singleValueContainer()
+    switch caseName {
+    case "paid":
+      let value = try container.decode(_CasePaid.self)
+      self = .paid(stripeId: value.stripeId)
+    case "overdue":
+      let value = try container.decode(_CaseOverdue.self)
+      self = .overdue(stripeId: value.stripeId)
+    default:
+      throw _TypeScriptDecodeError(message: "Unexpected case name: `\(caseName)`")
+    }
+  }
+}
