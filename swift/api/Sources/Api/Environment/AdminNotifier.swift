@@ -1,4 +1,5 @@
 import Dependencies
+import Gertie
 
 struct AdminNotifier: Sendable {
   var notify: @Sendable (Parent.Id, AdminEvent) async -> Void
@@ -33,9 +34,19 @@ extension AdminNotifier: DependencyKey {
               case (.unlockRequestSubmitted, .unlockRequestSubmitted(let event)):
                 let method = try await notification.method(in: db)
                 try await event.send(with: method.config, parentId: parentId)
-              case (.adminChildSecurityEvent, .adminChildSecurityEvent(let event)):
+              case (.securityEventsAll, .securityEvent(let event)):
                 let method = try await notification.method(in: db)
                 try await event.send(with: method.config, parentId: parentId)
+              case (.securityEventsMedium, .securityEvent(let event)):
+                if event.severity >= .medium {
+                  let method = try await notification.method(in: db)
+                  try await event.send(with: method.config, parentId: parentId)
+                }
+              case (.securityEventsRecommended, .securityEvent(let event)):
+                if event.severity >= .recommended {
+                  let method = try await notification.method(in: db)
+                  try await event.send(with: method.config, parentId: parentId)
+                }
               default:
                 break
               }
@@ -53,7 +64,7 @@ extension AdminNotifier: DependencyKey {
               try await event.sendEmail(to: parent.email.rawValue, isFallback: true)
             case .unlockRequestSubmitted(let event):
               try await event.sendEmail(to: parent.email.rawValue, isFallback: true)
-            case .adminChildSecurityEvent:
+            case .securityEvent:
               break
             }
           } catch {

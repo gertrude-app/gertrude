@@ -205,9 +205,8 @@ final class MacAppResolverTests: ApiTestCase, @unchecked Sendable {
 
     expect(sent.parentNotifications).toEqual([.init(
       parentId: child.parentId,
-      event: .adminChildSecurityEvent(.init(
-        userName: child.name,
-        event: .appQuit,
+      event: .securityEvent(.init(
+        source: .macApp(childName: child.name, event: .appQuit),
         detail: "foo",
       )),
     )])

@@ -6,6 +6,12 @@ import React, { useEffect, useRef } from 'react';
 import type { AdminNotificationTrigger, VerifiedNotificationMethod } from '@dash/types';
 import GradientIcon from '../GradientIcon';
 
+type TriggerCategory =
+  | `suspendFilterRequestSubmitted`
+  | `unlockRequestSubmitted`
+  | `securityEvents`;
+type SecurityEventLevel = `recommended` | `medium` | `all`;
+
 type Props = {
   trigger: AdminNotificationTrigger;
   methodOptions: Array<{ display: string; value: string }>;
@@ -19,7 +25,6 @@ type Props = {
   onSave(): unknown;
   saveButtonDisabled: boolean;
   isNew: boolean;
-  showSecurityEventOption: boolean;
 };
 
 const NotificationCard: React.FC<Props> = ({
@@ -34,7 +39,6 @@ const NotificationCard: React.FC<Props> = ({
   updateTrigger,
   onSave,
   saveButtonDisabled,
-  showSecurityEventOption,
   isNew,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -44,6 +48,21 @@ const NotificationCard: React.FC<Props> = ({
       ref.current.scrollIntoView({ behavior: `smooth` });
     }
   }, [isNew]);
+
+  const triggerCategory = getTriggerCategory(trigger);
+  const securityLevel = getSecurityLevel(trigger);
+
+  const handleCategoryChange = (category: TriggerCategory): void => {
+    if (category === `securityEvents`) {
+      updateTrigger(`securityEventsRecommended`);
+    } else {
+      updateTrigger(category);
+    }
+  };
+
+  const handleSecurityLevelChange = (level: SecurityEventLevel): void => {
+    updateTrigger(`securityEvents${capitalize(level)}` as AdminNotificationTrigger);
+  };
 
   return (
     <div
@@ -57,7 +76,11 @@ const NotificationCard: React.FC<Props> = ({
       <div
         className={cx(
           `p-4 space-y-4 -mt-4 duration-150 transition-[height,opacity] flex-grow`,
-          editing ? `h-56` : `h-0 opacity-0 overflow-hidden`,
+          editing
+            ? triggerCategory === `securityEvents`
+              ? `h-80`
+              : `h-56`
+            : `h-0 opacity-0 overflow-hidden`,
         )}
       >
         <div>
@@ -72,27 +95,28 @@ const NotificationCard: React.FC<Props> = ({
           <h3 className="mb-1 text-violet-800 font-medium text-md ml-1">Upon:</h3>
           <SelectMenu
             options={[
-              {
-                value: `suspendFilterRequestSubmitted`,
-                display: `Suspension requests`,
-              },
-              {
-                value: `unlockRequestSubmitted`,
-                display: `Unlock requests`,
-              },
-              ...(showSecurityEventOption
-                ? [
-                    {
-                      value: `adminChildSecurityEvent`,
-                      display: `Admin-child security events`,
-                    },
-                  ]
-                : []),
+              { value: `suspendFilterRequestSubmitted`, display: `Suspension requests` },
+              { value: `unlockRequestSubmitted`, display: `Unlock requests` },
+              { value: `securityEvents`, display: `Security events` },
             ]}
-            selectedOption={trigger}
-            setSelected={updateTrigger}
+            selectedOption={triggerCategory}
+            setSelected={handleCategoryChange}
           />
         </div>
+        {triggerCategory === `securityEvents` && (
+          <div>
+            <h3 className="mb-1 text-violet-800 font-medium text-md ml-1">Level:</h3>
+            <SelectMenu
+              options={[
+                { value: `recommended`, display: `Recommended (highest-risk only)` },
+                { value: `medium`, display: `Medium (more events)` },
+                { value: `all`, display: `All (every event)` },
+              ]}
+              selectedOption={securityLevel ?? `recommended`}
+              setSelected={handleSecurityLevelChange}
+            />
+          </div>
+        )}
       </div>
       <div className="bg-slate-50 rounded-b-xl flex justify-between items-center p-3 px-4">
         <GradientIcon
@@ -181,8 +205,32 @@ function triggerText(trigger: AdminNotificationTrigger): string {
       return `filter suspension requests`;
     case `unlockRequestSubmitted`:
       return `unlock requests`;
-    case `adminChildSecurityEvent`:
-      return `admin-child security events`;
+    case `securityEventsAll`:
+      return `all security events`;
+    case `securityEventsMedium`:
+      return `security events`;
+    case `securityEventsRecommended`:
+      return `high-risk security events`;
+  }
+}
+
+function getTriggerCategory(trigger: AdminNotificationTrigger): TriggerCategory {
+  if (trigger.startsWith(`securityEvents`)) {
+    return `securityEvents`;
+  }
+  return trigger as TriggerCategory;
+}
+
+function getSecurityLevel(trigger: AdminNotificationTrigger): SecurityEventLevel | null {
+  switch (trigger) {
+    case `securityEventsRecommended`:
+      return `recommended`;
+    case `securityEventsMedium`:
+      return `medium`;
+    case `securityEventsAll`:
+      return `all`;
+    default:
+      return null;
   }
 }
 

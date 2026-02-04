@@ -1,4 +1,10 @@
 public enum SecurityEvent: Equatable, Codable, Sendable {
+  public enum Severity: Sendable {
+    case all
+    case medium
+    case recommended
+  }
+
   public enum MacApp: String, Codable, Equatable, Sendable {
     case filterSuspendedRemotely
     case filterSuspensionGrantedByAdmin
@@ -37,6 +43,23 @@ public enum SecurityEvent: Equatable, Codable, Sendable {
 
   case macApp(MacApp)
   case dashboard(Dashboard)
+}
+
+// explicit Comparable: all < medium < recommended (increasing importance)
+// the notification filter uses `>=` to include events at or above a threshold,
+// e.g. `severity >= .medium` matches medium and recommended events
+extension SecurityEvent.Severity: Comparable {
+  private var importance: Int {
+    switch self {
+    case .all: 0
+    case .medium: 1
+    case .recommended: 2
+    }
+  }
+
+  public static func < (lhs: Self, rhs: Self) -> Bool {
+    lhs.importance < rhs.importance
+  }
 }
 
 public extension SecurityEvent.Dashboard {
@@ -103,6 +126,28 @@ public extension SecurityEvent.Dashboard {
       "This event occurs when a parent changes which apps are blocked for a child. Should be investigated if the change was not made by you."
     case .iosBlockRuleDeleted:
       "This event occurs when a parent deletes an iOS block rule from the parents admin site. Should be investigated if the change was not made by you."
+    }
+  }
+
+  var severity: SecurityEvent.Severity {
+    switch self {
+    case .passwordChanged,
+         .passwordResetRequested,
+         .childDeleted,
+         .monitoringDecreased,
+         .notificationDeleted,
+         .blockedAppsChanged:
+      .recommended
+    case .loginFailed,
+         .childComputerDeleted,
+         .iosBlockRuleDeleted:
+      .medium
+    case .login,
+         .childAdded,
+         .keyCreated,
+         .keychainCreated,
+         .keychainsChanged:
+      .all
     }
   }
 }
@@ -179,6 +224,31 @@ public extension SecurityEvent.MacApp {
       "This event occurs when the system extension (filter) state has changed. It should be investigated if the state remains uninstalled or stopped."
     case .blockedAppLaunchAttempted:
       "This event occurs when a child tries to launch an app designated blocked by the parent. There is no security risk as Gertrude will not allow the app to open, but repeated events do represent an attempt by the child to launch forbidden apps."
+    }
+  }
+
+  var severity: SecurityEvent.Severity {
+    switch self {
+    case .childDisconnected,
+         .macosUserExempted,
+         .newMacOsUserCreated,
+         .filterSuspensionGrantedByAdmin,
+         .appQuit,
+         .appUpdateFailedToReplaceSystemExtension:
+      .recommended
+    case .systemExtensionChangeRequested,
+         .systemExtensionStateChanged,
+         .systemClockOrTimeZoneChanged,
+         .blockedAppLaunchAttempted,
+         .filterSuspendedRemotely,
+         .advancedSettingsOpened:
+      .medium
+    case
+      .filterSuspensionExpired,
+      .filterSuspensionEndedEarly,
+      .appLaunched,
+      .appUpdateSucceeded:
+      .all
     }
   }
 }

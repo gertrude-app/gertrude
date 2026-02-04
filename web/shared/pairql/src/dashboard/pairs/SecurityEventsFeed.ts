@@ -1,4 +1,6 @@
 // auto-generated, do not edit
+import type { SecurityEventSeverity } from '../shared';
+
 export namespace SecurityEventsFeed {
   export type Input = void;
 
@@ -13,6 +15,7 @@ export namespace SecurityEventsFeed {
         event: string;
         detail?: string;
         explanation: string;
+        severity: SecurityEventSeverity;
         createdAt: ISODateString;
       }
     | {
@@ -21,6 +24,7 @@ export namespace SecurityEventsFeed {
         event: string;
         detail?: string;
         explanation: string;
+        severity: SecurityEventSeverity;
         ipAddress?: string;
         createdAt: ISODateString;
       }

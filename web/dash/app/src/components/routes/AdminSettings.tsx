@@ -100,11 +100,7 @@ const AdminSettings: React.FC = () => {
   }
 
   const admin = query.data;
-  const notificationProps = makeNotificationProps(
-    state,
-    saveNotification.isPending,
-    admin.hasAdminChild,
-  );
+  const notificationProps = makeNotificationProps(state, saveNotification.isPending);
 
   return (
     <Settings
@@ -185,7 +181,6 @@ function methodDeletable(
 function makeNotificationProps(
   state: State,
   savingNotification: boolean,
-  showSecurityEventOption: boolean,
 ): (
   editable: State[`notifications`][number],
 ) => React.ComponentProps<typeof Settings>[`notifications`][0] | null {
@@ -207,7 +202,6 @@ function makeNotificationProps(
       })),
       editing: editable.editing === true,
       isNew: editable.isNew === true,
-      showSecurityEventOption,
     };
   };
 }

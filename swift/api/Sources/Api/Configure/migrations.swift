@@ -66,6 +66,7 @@ extension Configure {
     app.migrations.add(VendorIdAsDeviceId())
     app.migrations.add(CreateSupervisionTable())
     app.migrations.add(SmsSends())
+    app.migrations.add(SecurityEventNotificationTriggers())
   }
 }
 

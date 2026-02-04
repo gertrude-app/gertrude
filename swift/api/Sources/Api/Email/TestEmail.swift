@@ -100,7 +100,7 @@ import Vapor
         try await postmark.send(template: .notifySecurityEvent(
           to: to,
           model: .init(
-            userName: "Franny",
+            context: "for child Franny",
             description: Gertie.SecurityEvent.MacApp.appQuit.toWords,
             explanation: Gertie.SecurityEvent.MacApp.appQuit.explanation,
           ),

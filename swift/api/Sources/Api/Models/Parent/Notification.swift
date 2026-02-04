@@ -29,7 +29,9 @@ extension Parent.Notification {
   enum Trigger: String, Codable, CaseIterable, Equatable, Sendable {
     case unlockRequestSubmitted
     case suspendFilterRequestSubmitted
-    case adminChildSecurityEvent
+    case securityEventsAll
+    case securityEventsMedium
+    case securityEventsRecommended
   }
 }
 

@@ -16,7 +16,9 @@ export interface AdminNotification {
 export type AdminNotificationTrigger =
   | `unlockRequestSubmitted`
   | `suspendFilterRequestSubmitted`
-  | `adminChildSecurityEvent`;
+  | `securityEventsAll`
+  | `securityEventsMedium`
+  | `securityEventsRecommended`;
 
 export type AdminSubscriptionStatus =
   | { case: `trialing`; daysLeft: number }
@@ -158,6 +160,8 @@ export interface RuleSchedule {
   };
   window: PlainTimeWindow;
 }
+
+export type SecurityEventSeverity = `all` | `medium` | `recommended`;
 
 export type SharedKey =
   | { type: `anySubdomain`; domain: string; scope: AppScope }

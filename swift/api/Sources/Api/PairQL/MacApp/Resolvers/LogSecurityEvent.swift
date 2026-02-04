@@ -25,15 +25,10 @@ extension LogSecurityEvent: Resolver {
       return .success
     }
 
-    if computerUser.isAdmin != true {
-      return .success
-    }
-
     await with(dependency: \.adminNotifier).notify(
       context.child.parentId,
-      .adminChildSecurityEvent(.init(
-        userName: context.child.name,
-        event: event,
+      .securityEvent(.init(
+        source: .macApp(childName: context.child.name, event: event),
         detail: input.detail,
       )),
     )

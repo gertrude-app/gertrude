@@ -65,12 +65,12 @@ struct NotifyUnlockRequest: TemplateEmailModel {
 }
 
 struct NotifySecurityEvent: TemplateEmailModel {
-  static var subject: String { "[Gertrude App] Security event for child: {{userName}}" }
-  var userName: String
+  static var subject: String { "[Gertrude App] Security event {{context}}" }
+  var context: String
   var description: String
   var explanation: String
   var templateModel: [String: String] { [
-    "userName": self.userName,
+    "context": self.context,
     "description": self.description,
     "explanation": self.explanation,
   ] }
