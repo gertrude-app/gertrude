@@ -1,20 +1,15 @@
 // auto-generated, do not edit
-import type {
-  AdminNotification,
-  AdminSubscriptionStatus,
-  VerifiedNotificationMethod,
-} from '../shared';
+import type { AdminNotification, Plan, VerifiedNotificationMethod } from '../shared';
 
-export namespace GetAdmin {
+export namespace GetAccountOwner {
   export type Input = void;
 
   export interface Output {
     id: UUID;
     email: string;
-    subscriptionStatus: AdminSubscriptionStatus;
+    plan: Plan;
     notifications: AdminNotification[];
     verifiedNotificationMethods: VerifiedNotificationMethod[];
     hasAdminChild: boolean;
-    monthlyPriceInDollars: number;
   }
 }

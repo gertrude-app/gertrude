@@ -49,7 +49,10 @@ export function interceptPql(
   slug: `FlagActivityItems`,
   output: T.FlagActivityItems.Output,
 ): void;
-export function interceptPql(slug: `GetAdmin`, output: T.GetAdmin.Output): void;
+export function interceptPql(
+  slug: `GetAccountOwner`,
+  output: T.GetAccountOwner.Output,
+): void;
 export function interceptPql(
   slug: `GetAdminKeychain`,
   output: T.GetAdminKeychain.Output,
@@ -190,7 +193,7 @@ export function forcePqlErr(
     | `DeleteEntity_v2`
     | `FamilyActivitySummaries`
     | `FlagActivityItems`
-    | `GetAdmin`
+    | `GetAccountOwner`
     | `GetAdminKeychain`
     | `GetAdminKeychains`
     | `GetChild`

@@ -38,11 +38,17 @@ final class CheckInResolverTests: ApiTestCase, @unchecked Sendable {
       Release("3.0.0", channel: .beta),
     ])
 
-    let child = try await self.child(withParent: {
-      $0.subscriptionStatus = .overdue
-    }).withDevice(computer: {
+    let child = try await self.child().withDevice(computer: {
       $0.appReleaseChannel = .beta
     })
+
+    try await self.db.create(Subscription(
+      parentId: child.parentId,
+      tier: .full,
+      billingStatus: .overdue, // <-- needs attention
+      stripeId: .init("sub_123"),
+      statusExpiresAt: .distantFuture,
+    ))
 
     let output = try await CheckIn.resolve(
       with: .init(appVersion: "1.0.0", filterVersion: nil),

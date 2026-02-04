@@ -3,7 +3,7 @@ import type {
   CombinedUsersActivityFeed,
   DashboardWidgets,
   FamilyActivitySummaries,
-  GetAdmin,
+  GetAccountOwner,
   GetAdminKeychain,
   GetAdminKeychains,
   GetChild,
@@ -127,8 +127,8 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`suspend-filter-requests/:id`, [`suspend-filter-requests`, id]);
   }
 
-  static get admin(): QueryKey<GetAdmin.Output> {
-    return new QueryKey(`admin`, [`admin`]);
+  static get accountOwner(): QueryKey<GetAccountOwner.Output> {
+    return new QueryKey(`account-owner`, [`account-owner`]);
   }
 
   static get apps(): QueryKey<GetIdentifiedApps.Output> {

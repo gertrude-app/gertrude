@@ -118,7 +118,7 @@ enum AccountLifecycle {
     ] }
   }
 
-  struct TrialEndedToOverdue: TemplateEmailModel {
+  struct TrialExpired: TemplateEmailModel {
     static var subject: String { "[action required] Gertrude trial ended" }
     var length: Int
     var templateModel: [String: String] { ["length": "\(self.length)"] }

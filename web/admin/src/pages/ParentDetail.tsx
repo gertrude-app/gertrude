@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
-import { StatusBadge, getSubscriptionLabel } from '../components/Badge';
+import { StatusBadge } from '../components/Badge';
 import { CopyButton, CopyLinkButton } from '../components/CopyButton';
 import ErrorState from '../components/ErrorState';
 import {
@@ -104,29 +104,22 @@ const ParentDetail: React.FC = () => {
 
         <div className="p-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <InfoCard
-              label="Subscription"
-              value={getSubscriptionLabel(data.subscriptionStatus)}
-            />
-            <InfoCard
-              label="Monthly Price"
-              value={`$${(data.monthlyPriceInCents / 100).toFixed(2)}`}
-              highlight
-            />
+            <InfoCard label="Plan" value={data.plan} highlight />
+            <InfoCard label="Billing Status" value={data.billingStatus ?? `—`} />
             <InfoCard label="Children" value={data.children.length.toString()} />
             <InfoCard label="Created" value={formatDate(data.createdAt)} />
           </div>
 
-          {data.subscriptionId && (
+          {data.stripeSubscriptionId && (
             <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
               <span className="text-sm text-slate-500">Stripe ID: </span>
               <a
-                href={`https://dashboard.stripe.com/acct_1L8TXdGKRdhETuKA/subscriptions/${data.subscriptionId}`}
+                href={`https://dashboard.stripe.com/acct_1L8TXdGKRdhETuKA/subscriptions/${data.stripeSubscriptionId}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-mono text-brand-violet hover:text-brand-fuchsia transition-colors"
               >
-                {data.subscriptionId}
+                {data.stripeSubscriptionId}
               </a>
             </div>
           )}

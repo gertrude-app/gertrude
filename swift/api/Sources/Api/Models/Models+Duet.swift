@@ -7,6 +7,14 @@ extension RequestStatus: @retroactive PostgresEnum {
   public var typeName: String { "enum_shared_request_status" }
 }
 
+extension Subscription.Tier: PostgresEnum {
+  public var typeName: String { "parent.subscription_tier" }
+}
+
+extension BillingStatus.Db: PostgresEnum {
+  public var typeName: String { "parent.billing_status" }
+}
+
 protocol HasCreatedAt {
   var createdAt: Date { get set }
 }
@@ -166,20 +174,32 @@ extension Parent {
     case id
     case email
     case password
-    case subscriptionId
-    case subscriptionStatus
-    case subscriptionStatusExpiration
+    case emailVerifiedAt
+    case deletedAt
     case gclid
     case abTestVariant
-    case monthlyPrice
-    case trialPeriodDays
     case createdAt
     case updatedAt
   }
 }
 
-extension Parent.SubscriptionStatus: PostgresEnum {
-  var typeName: String { "enum_parent_subscription_status" }
+extension Subscription: Duet.Identifiable {
+  typealias Id = Tagged<Subscription, UUID>
+}
+
+extension Subscription {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case parentId
+    case tier
+    case billingStatus
+    case stripeId
+    case isLegacyPrice
+    case trialStartedAt
+    case statusExpiresAt
+    case createdAt
+    case updatedAt
+  }
 }
 
 extension Parent.Notification: Duet.Identifiable {

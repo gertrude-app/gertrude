@@ -29,14 +29,21 @@ extension VerifySignupEmail: Resolver {
     case .notExpired(let parentId, let claimCode):
       var parent = try await context.db.find(parentId)
       let token = try await context.db.create(Parent.DashToken(parentId: parent.id))
-      if parent.subscriptionStatus != .pendingEmailVerification {
+      if parent.emailVerified {
         return .init(token: token.value, adminId: parent.id, claimCode: claimCode)
       }
 
-      parent.subscriptionStatusExpiration = get(dependency: \.date.now) + .days(21 - 3)
-      parent.subscriptionStatus = .trialing
-
+      parent.emailVerifiedAt = get(dependency: \.date.now)
       try await context.db.update(parent)
+
+      let now = get(dependency: \.date.now)
+      try await context.db.create(Subscription(
+        parentId: parent.id,
+        tier: .full,
+        billingStatus: .trialing,
+        trialStartedAt: now,
+        statusExpiresAt: now + .days(21 - 3),
+      ))
 
       // they get a default "verified" notification method, since they verified email
       try await context.db.create(Parent.NotificationMethod(
@@ -61,7 +68,7 @@ extension VerifySignupEmail: Resolver {
 
     case .expired(let parentId):
       let parent = try await context.db.find(parentId)
-      if parent.subscriptionStatus == .pendingEmailVerification {
+      if !parent.emailVerified {
         try await sendVerificationEmail(to: parent, in: context)
         throw context.error("84a6c609", .badRequest, user: EXPIRED_TOKEN_MSG)
       } else {
@@ -75,7 +82,7 @@ extension VerifySignupEmail: Resolver {
 
     case .previouslyRetrieved(let parentId):
       let parent = try await context.db.find(parentId)
-      if parent.subscriptionStatus == .pendingEmailVerification {
+      if !parent.emailVerified {
         try await sendVerificationEmail(to: parent, in: context)
         throw context.error("6257bfb9", .badRequest, user: UNEXPECTED_RESEND_MSG)
       } else {

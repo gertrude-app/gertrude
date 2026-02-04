@@ -40,6 +40,10 @@ struct ApiTypeScriptEnumsCodableGenerator: AggregateCodeGenerator {
         (SecurityEventsFeed.FeedEvent.self, false),
         (UserActivity.Item.self, true),
         (ChildComputerStatus.self, false),
+        (Plan.self, false),
+        (Plan.FreeKind.self, false),
+        (BillingStatus.Full.self, false),
+        (BillingStatus.Light.self, false),
       ],
       imports: [
         "Tagged": "Tagged",

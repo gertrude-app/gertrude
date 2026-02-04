@@ -20,15 +20,17 @@ const noopClient: ApiClient = {
   flagActivityItems: async () => {
     return Result.success({ success: true });
   },
-  getAdmin: async () => {
+  getAccountOwner: async () => {
     return Result.success({
       id: ``,
       email: ``,
-      subscriptionStatus: { case: `paid` },
+      plan: {
+        case: `full`,
+        status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
+      },
       notifications: [],
       verifiedNotificationMethods: [],
       hasAdminChild: false,
-      monthlyPriceInDollars: 10,
     });
   },
   getAdminKeychain: async () => {

@@ -10,24 +10,25 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
   let context = Context.mock
 
   func testVerifySignupEmailSetsSubscriptionStatusAndCreatesNotificationMethod() async throws {
-    let parent = try await self.parent(with: \.subscriptionStatus, of: .pendingEmailVerification)
+    let parent = try await self.parent(with: \.emailVerifiedAt, of: nil)
     let token = await with(dependency: \.ephemeral).createParentIdToken(parent.id)
 
     let output = try await VerifySignupEmail.resolve(with: .init(token: token), in: self.context)
 
-    let retrieved = try await self.db.find(parent.id)
+    let retrieved = try await ParentWithSubscription.find(parent.id, in: self.db)
     let method = try await Parent.NotificationMethod.query()
       .where(.parentId == parent.id)
       .first(in: self.db)
 
     expect(output.adminId).toEqual(parent.id)
-    expect(retrieved.subscriptionStatus).toEqual(.trialing)
-    expect(retrieved.subscriptionStatusExpiration).toEqual(.reference.advanced(by: .days(18)))
+    // TODO: this is going to change soon
+    expect(retrieved.subscription!.billingStatus).toEqual(.trialing)
+    expect(retrieved.subscription!.statusExpiresAt).toEqual(.reference.advanced(by: .days(18)))
     expect(method.config).toEqual(.email(email: parent.email.rawValue))
   }
 
   func testVerifyingWithExpiredTokenErrorsButSendsNewVerification() async throws {
-    let parent = try await self.parent(with: \.subscriptionStatus, of: .pendingEmailVerification)
+    let parent = try await self.parent(with: \.emailVerifiedAt, of: nil)
     let token = await with(dependency: \.ephemeral).createParentIdToken(
       parent.id,
       expiration: Date.reference - .days(1),
@@ -45,8 +46,7 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
     try await withDependencies {
       $0.date = .init { Date() }
     } operation: {
-      let parent = try await self
-        .parent(with: \.subscriptionStatus, of: .trialing) // <- already verified
+      let parent = try await self.parent(with: \.emailVerifiedAt, of: .epoch) // <- verified
       let token = await with(dependency: \.ephemeral).createParentIdToken(
         parent.id,
         expiration: Date() - .days(1),
@@ -59,7 +59,7 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testPreviouslyRetrievedTokenForVerifiedParentErrors() async throws {
-    let parent = try await self.parent(with: \.subscriptionStatus, of: .pendingEmailVerification)
+    let parent = try await self.parent(with: \.emailVerifiedAt, of: nil)
     let token = await with(dependency: \.ephemeral).createParentIdToken(parent.id)
 
     // first use succeeds
@@ -71,7 +71,7 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testPreviouslyRetrievedTokenForStillPendingParentResendsEmail() async throws {
-    let parent = try await self.parent(with: \.subscriptionStatus, of: .pendingEmailVerification)
+    let parent = try await self.parent(with: \.emailVerifiedAt, of: nil)
     let ephemeral = with(dependency: \.ephemeral)
     let token = await ephemeral.createParentIdToken(parent.id)
 
@@ -80,7 +80,7 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
 
     // manually reset the parent to pending (simulating edge case)
     var retrieved = try await self.db.find(parent.id)
-    retrieved.subscriptionStatus = .pendingEmailVerification
+    retrieved.emailVerifiedAt = nil
     try await self.db.update(retrieved)
 
     let result = await VerifySignupEmail.result(with: .init(token: token), in: self.context)
@@ -89,8 +89,7 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testVerifySignupEmailDoesntChangeAdminUserSubscriptionStatusWhenNotPending() async throws {
-    let parent = try await self
-      .parent(with: \.subscriptionStatus, of: .trialing) // <- not pending
+    let parent = try await self.parent(with: \.emailVerifiedAt, of: .epoch) // <- verified
     let token = await with(dependency: \.ephemeral)
       .createParentIdToken(parent.id)
 
@@ -99,12 +98,12 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
     let retrieved = try await self.db.find(parent.id)
 
     expect(output.adminId).toEqual(parent.id)
-    expect(retrieved.subscriptionStatus).toEqual(.trialing) // <-- not changed
+    expect(retrieved.emailVerifiedAt).toEqual(.epoch) // <-- not changed
   }
 
   func testAttemptToLoginWhenEmailNotVerifiedBlocksAndSendsEmail() async throws {
     let parent = try await self.parent {
-      $0.subscriptionStatus = .pendingEmailVerification
+      $0.emailVerifiedAt = nil
       $0.password = "lol-lol-lol"
     }
 

@@ -11,6 +11,7 @@ enum AuthedParentRoute: PairRoute {
   case deleteActivityItems_v2(DeleteActivityItems_v2.Input)
   case deleteEntity_v2(DeleteEntity_v2.Input)
   case flagActivityItems(FlagActivityItems.Input)
+  case getAccountOwner
   case getAdmin
   case getAdminKeychain(GetAdminKeychain.Input)
   case getAdminKeychains
@@ -94,6 +95,9 @@ extension AuthedParentRoute {
       Route(.case(Self.flagActivityItems)) {
         Operation(FlagActivityItems.self)
         Body(.dashboardInput(FlagActivityItems.self))
+      }
+      Route(.case(Self.getAccountOwner)) {
+        Operation(GetAccountOwner.self)
       }
       Route(.case(Self.getAdmin)) {
         Operation(GetAdmin.self)
@@ -280,6 +284,9 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .combinedUsersActivityFeed(let input):
       let output = try await CombinedUsersActivityFeed.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getAccountOwner:
+      let output = try await GetAccountOwner.resolve(in: context)
       return try await self.respond(with: output)
     case .getAdmin:
       let output = try await GetAdmin.resolve(in: context)

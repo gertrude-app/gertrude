@@ -25,7 +25,7 @@ import XHttp
       await self.syncTemplate(VerifyNotificationEmail.self)
       await self.syncTemplate(V2_7_0_Announce.self)
       await self.syncTemplate(AccountLifecycle.TrialEndingSoon.self)
-      await self.syncTemplate(AccountLifecycle.TrialEndedToOverdue.self)
+      await self.syncTemplate(AccountLifecycle.TrialExpired.self)
       await self.syncTemplate(AccountLifecycle.OverdueToUnpaid.self)
       await self.syncTemplate(AccountLifecycle.PaidToOverdue.self)
       await self.syncTemplate(AccountLifecycle.UnpaidToPendingDelete.self)

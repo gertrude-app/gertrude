@@ -20,9 +20,15 @@ enum AdminBetsy {
       id: Ids.betsy,
       email: "betsy-mcstandard" |> Reset.testEmail,
       password: Bcrypt.hash("betsy123"),
-      subscriptionStatus: .trialing,
-      subscriptionStatusExpiration: Date().advanced(by: .days(53)),
-      subscriptionId: nil,
+    ))
+
+    try await db.create(Subscription(
+      parentId: betsy.id,
+      tier: .full,
+      billingStatus: .trialing,
+      stripeId: nil,
+      trialStartedAt: Date(),
+      statusExpiresAt: Date() + .days(21 - 3),
     ))
 
     let email = try await Reset.createNotification(

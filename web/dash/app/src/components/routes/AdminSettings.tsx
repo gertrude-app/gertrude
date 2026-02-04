@@ -18,18 +18,18 @@ const AdminSettings: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [newMethodId, setNewMethodId] = useState<NewMethod | undefined>(undefined);
 
-  const query = useQuery(Key.admin, Current.api.getAdmin, {
-    onReceive: (admin) => dispatch({ type: `receivedAdmin`, admin }),
+  const query = useQuery(Key.accountOwner, Current.api.getAccountOwner, {
+    onReceive: (accountOwner) => dispatch({ type: `receivedAccountOwner`, accountOwner }),
   });
 
   const getStripeUrl = useMutation(Current.api.stripeUrl);
 
   const deleteNotification = useConfirmableDelete(`parentNotification`, {
-    invalidating: [Key.admin],
+    invalidating: [Key.accountOwner],
   });
 
   const deleteMethod = useConfirmableDelete(`parentVerifiedNotificationMethod`, {
-    invalidating: [Key.admin],
+    invalidating: [Key.accountOwner],
   });
 
   const saveNotification = useMutation(
@@ -43,7 +43,7 @@ const AdminSettings: React.FC = () => {
         trigger: notification.draft.trigger,
       });
     },
-    { toast: `save:notification`, invalidating: [Key.admin] },
+    { toast: `save:notification`, invalidating: [Key.accountOwner] },
   );
 
   const createPendingNotificationMethod = useMutation(
@@ -66,7 +66,7 @@ const AdminSettings: React.FC = () => {
       },
       onError: () => dispatch(PendingMethod.createFailed),
       toast: `create:pending-notification-method`,
-      invalidating: [Key.admin],
+      invalidating: [Key.accountOwner],
     },
   );
 
@@ -87,7 +87,7 @@ const AdminSettings: React.FC = () => {
       },
       onError: () => dispatch(PendingMethod.confirmFailed),
       toast: `confirm:pending-notification-method`,
-      invalidating: [Key.admin],
+      invalidating: [Key.accountOwner],
     },
   );
 
@@ -107,8 +107,7 @@ const AdminSettings: React.FC = () => {
       newMethodId={newMethodId}
       setNewMethodId={setNewMethodId}
       email={admin.email}
-      status={admin.subscriptionStatus}
-      monthlyPriceInDollars={admin.monthlyPriceInDollars}
+      plan={admin.plan}
       billingPortalRequest={ReqState.fromMutation(getStripeUrl)}
       methods={typesafe.objectValues(state.notificationMethods).map((method) => ({
         id: method.id,

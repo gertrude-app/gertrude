@@ -86,8 +86,8 @@ export const throwingClient: ApiClient = {
   flagActivityItems: () => {
     throw new Error(`ApiClient.flagActivityItems() not implemented`);
   },
-  getAdmin: () => {
-    throw new Error(`ApiClient.getAdmin() not implemented`);
+  getAccountOwner: () => {
+    throw new Error(`ApiClient.getAccountOwner() not implemented`);
   },
   getAdminKeychain: () => {
     throw new Error(`ApiClient.getAdminKeychain() not implemented`);

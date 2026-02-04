@@ -202,13 +202,10 @@ extension Parent: Model {
     case .id: .id(self.self)
     case .email: .string(self.email.rawValue)
     case .password: .string(self.password)
-    case .subscriptionId: .string(self.subscriptionId?.rawValue)
-    case .subscriptionStatus: .enum(self.subscriptionStatus)
-    case .subscriptionStatusExpiration: .date(self.subscriptionStatusExpiration)
+    case .emailVerifiedAt: .date(self.emailVerifiedAt)
+    case .deletedAt: .date(self.deletedAt)
     case .gclid: .string(self.gclid)
     case .abTestVariant: .string(self.abTestVariant)
-    case .monthlyPrice: .int(self.monthlyPrice.rawValue)
-    case .trialPeriodDays: .int(self.trialPeriodDays)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -219,13 +216,46 @@ extension Parent: Model {
       .id: .id(self),
       .email: .string(email.rawValue),
       .password: .string(password),
-      .subscriptionId: .string(subscriptionId?.rawValue),
-      .subscriptionStatus: .enum(subscriptionStatus),
-      .subscriptionStatusExpiration: .date(subscriptionStatusExpiration),
+      .emailVerifiedAt: .date(emailVerifiedAt),
+      .deletedAt: .date(deletedAt),
       .gclid: .string(gclid),
       .abTestVariant: .string(abTestVariant),
-      .monthlyPrice: .int(monthlyPrice.rawValue),
-      .trialPeriodDays: .int(trialPeriodDays),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension Subscription: Model {
+  public typealias ColumnName = CodingKeys
+  public static let schemaName = "parent"
+  public static let tableName = "subscriptions"
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .parentId: .uuid(self.parentId)
+    case .tier: .enum(self.tier)
+    case .billingStatus: .enum(self.billingStatus)
+    case .stripeId: .string(self.stripeId?.rawValue)
+    case .isLegacyPrice: .bool(self.isLegacyPrice)
+    case .trialStartedAt: .date(self.trialStartedAt)
+    case .statusExpiresAt: .date(self.statusExpiresAt)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .parentId: .uuid(self.parentId),
+      .tier: .enum(self.tier),
+      .billingStatus: .enum(self.billingStatus),
+      .stripeId: .string(self.stripeId?.rawValue),
+      .isLegacyPrice: .bool(self.isLegacyPrice),
+      .trialStartedAt: .date(self.trialStartedAt),
+      .statusExpiresAt: .date(self.statusExpiresAt),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

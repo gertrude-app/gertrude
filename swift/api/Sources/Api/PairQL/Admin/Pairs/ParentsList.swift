@@ -40,7 +40,7 @@ extension ParentsList: Resolver {
     let baseQuery = Parent.query()
       .where(.not(.like(.email, "%.smoke-test-%")))
       .where(.not(.like(.email, "e2e-user-%")))
-      .where(.subscriptionStatus != .enum(Parent.SubscriptionStatus.pendingEmailVerification))
+      .where(.not(.isNull(.emailVerifiedAt)))
 
     let totalCount = try await baseQuery.count(in: context.db)
     let totalPages = max(1, Int(ceil(Double(totalCount) / Double(pageSize))))
@@ -51,15 +51,24 @@ extension ParentsList: Resolver {
       .offset(offset)
       .all(in: context.db)
 
+    // TODO: shouldn't have to do this, shared query should handle
+    // @see https://github.com/gertrude-app/gertrude/issues/478
+    let parentIds = parents.map(\.id)
+    let subscriptions = try await Subscription.query()
+      .where(.parentId |=| parentIds)
+      .all(in: context.db)
+    let subscriptionMap = Dictionary(uniqueKeysWithValues: subscriptions.map { ($0.parentId, $0) })
+
     let analyticsData = try await AnalyticsQuery.shared.data()
 
     let summaries = parents.map { parent -> ParentSummary in
       let parentData = analyticsData.parents[parent.id]
+      let subscription = subscriptionMap[parent.id]
       return ParentSummary(
         id: parent.id,
         email: parent.email.rawValue,
         createdAt: parent.createdAt,
-        subscriptionStatus: parent.subscriptionStatus.rawValue,
+        subscriptionStatus: self.subscriptionStatusString(for: subscription),
         numChildren: parentData?.numChildren ?? 0,
         numKeychains: parentData?.numNonEmptyKeychains ?? 0,
         numNotifications: parentData?.numNotifications ?? 0,
@@ -73,5 +82,28 @@ extension ParentsList: Resolver {
       page: page,
       totalPages: totalPages,
     )
+  }
+
+  private static func subscriptionStatusString(for subscription: Subscription?) -> String {
+    guard let subscription else {
+      return "free"
+    }
+    guard let billingStatus = subscription.billingStatus else {
+      return "complimentary"
+    }
+    switch billingStatus {
+    case .trialing:
+      return "trialing"
+    case .trialExpiringSoon:
+      return "trialExpiringSoon"
+    case .trialExpired:
+      return "trialExpired"
+    case .paid:
+      return "paid"
+    case .overdue:
+      return "overdue"
+    case .unpaid, .cancelled:
+      return "unpaid"
+    }
   }
 }
