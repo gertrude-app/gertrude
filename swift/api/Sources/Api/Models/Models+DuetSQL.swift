@@ -242,7 +242,7 @@ extension Parent.Notification: Model {
     case .id: .id(self)
     case .parentId: .uuid(self.parentId)
     case .methodId: .uuid(self.methodId)
-    case .trigger: .enum(self.trigger)
+    case .trigger: .string(self.trigger.rawValue)
     case .createdAt: .date(self.createdAt)
     }
   }
@@ -252,7 +252,7 @@ extension Parent.Notification: Model {
       .id: .id(self),
       .parentId: .uuid(self.parentId),
       .methodId: .uuid(self.methodId),
-      .trigger: .enum(self.trigger),
+      .trigger: .string(self.trigger.rawValue),
       .createdAt: .currentTimestamp,
     ]
   }

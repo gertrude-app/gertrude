@@ -24,7 +24,6 @@ export const Email: Story = props({
   cancelEdit: () => {},
   updateMethod: () => {},
   updateTrigger: () => {},
-  showSecurityEventOption: false,
   methodOptions: [
     { display: `Email foo@bar.com`, value: `1` },
     { display: `Text (555) 555-5555`, value: `2` },
@@ -53,6 +52,12 @@ export const Slack: Story = props({
     },
   },
   trigger: `suspendFilterRequestSubmitted`,
+});
+
+export const EditingSecurityEvents: Story = props({
+  ...Email.args,
+  editing: true,
+  trigger: `securityEventsRecommended`,
 });
 
 export default meta;

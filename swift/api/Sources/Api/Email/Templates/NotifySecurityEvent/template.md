@@ -1,4 +1,4 @@
-Received security event for child {{userName}}:
+Received security event {{context}}:
 
 Description: {{description}}
 

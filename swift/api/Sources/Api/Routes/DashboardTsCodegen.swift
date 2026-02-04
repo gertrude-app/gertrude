@@ -49,6 +49,7 @@ enum DashboardTsCodegenRoute {
       ("AdminNotification", GetAdmin.Notification.self),
       ("WebPolicy", WebContentFilterPolicy.Kind.self),
       ("BlockRule", GertieIOS.BlockRule.self),
+      ("SecurityEventSeverity", SecurityEventsFeed.Severity.self),
     ]
   }
 

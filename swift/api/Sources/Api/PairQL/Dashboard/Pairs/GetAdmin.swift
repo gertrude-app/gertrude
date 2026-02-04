@@ -42,10 +42,6 @@ extension GetAdmin: NoInputResolver {
     let parent = context.parent
     async let notifications = parent.notifications(in: context.db)
     async let methods = parent.verifiedNotificationMethods(in: context.db)
-    async let hasAdminChild = try await parent.children(in: context.db)
-      .concurrentMap { try await $0.computerUsers(in: context.db) }
-      .flatMap(\.self)
-      .contains { $0.isAdmin == true }
 
     return try await .init(
       id: parent.id,
@@ -57,7 +53,8 @@ extension GetAdmin: NoInputResolver {
       verifiedNotificationMethods: methods.map {
         .init(id: $0.id, config: $0.config)
       },
-      hasAdminChild: hasAdminChild,
+      // deprecated: was used to gate security event notifications, now always enabled
+      hasAdminChild: false,
       monthlyPriceInDollars: Int(parent.monthlyPrice.rawValue / 100),
     )
   }

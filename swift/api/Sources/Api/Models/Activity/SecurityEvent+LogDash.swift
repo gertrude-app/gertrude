@@ -39,7 +39,7 @@ private func dashSecurityEvent(
   with db: any DuetSQL.Client,
 ) {
   Task {
-    try? await db.create(Api.SecurityEvent(
+    _ = try? await db.create(Api.SecurityEvent(
       // opt out of using the controlled uuid dependency
       // as the unstructured task causes test flakiness
       id: .init(UUID()),
@@ -48,5 +48,13 @@ private func dashSecurityEvent(
       detail: detail,
       ipAddress: ipAddress,
     ))
+
+    await with(dependency: \.adminNotifier).notify(
+      parentId,
+      .securityEvent(.init(
+        source: .dashboard(event: event),
+        detail: detail,
+      )),
+    )
   }
 }

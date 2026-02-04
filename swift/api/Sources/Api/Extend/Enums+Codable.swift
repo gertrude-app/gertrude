@@ -235,6 +235,7 @@ extension SecurityEventsFeed.FeedEvent {
     var event: String
     var detail: String?
     var explanation: String
+    var severity: SecurityEventsFeed.Severity
     var createdAt: Date
   }
 
@@ -244,6 +245,7 @@ extension SecurityEventsFeed.FeedEvent {
     var event: String
     var detail: String?
     var explanation: String
+    var severity: SecurityEventsFeed.Severity
     var ipAddress: String?
     var createdAt: Date
   }
@@ -260,6 +262,7 @@ extension SecurityEventsFeed.FeedEvent {
         event: unflat.event,
         detail: unflat.detail,
         explanation: unflat.explanation,
+        severity: unflat.severity,
         createdAt: unflat.createdAt,
       ).encode(to: encoder)
     case .admin(let unflat):
@@ -268,6 +271,7 @@ extension SecurityEventsFeed.FeedEvent {
         event: unflat.event,
         detail: unflat.detail,
         explanation: unflat.explanation,
+        severity: unflat.severity,
         ipAddress: unflat.ipAddress,
         createdAt: unflat.createdAt,
       ).encode(to: encoder)
@@ -289,6 +293,7 @@ extension SecurityEventsFeed.FeedEvent {
         event: value.event,
         detail: value.detail,
         explanation: value.explanation,
+        severity: value.severity,
         createdAt: value.createdAt,
       ))
     case "admin":
@@ -298,6 +303,7 @@ extension SecurityEventsFeed.FeedEvent {
         event: value.event,
         detail: value.detail,
         explanation: value.explanation,
+        severity: value.severity,
         ipAddress: value.ipAddress,
         createdAt: value.createdAt,
       ))

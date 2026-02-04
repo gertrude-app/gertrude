@@ -4,12 +4,16 @@ import TaggedTime
 enum AdminEvent: Equatable {
   case unlockRequestSubmitted(UnlockRequestSubmitted)
   case suspendFilterRequestSubmitted(SuspendFilterRequestSubmitted)
-  case adminChildSecurityEvent(MacAppSecurityEvent)
+  case securityEvent(SecurityEventPayload)
 
-  struct MacAppSecurityEvent: Equatable {
-    var userName: String
-    var event: Gertie.SecurityEvent.MacApp
+  struct SecurityEventPayload: Equatable {
+    var source: Source
     var detail: String?
+
+    enum Source: Equatable {
+      case macApp(childName: String, event: Gertie.SecurityEvent.MacApp)
+      case dashboard(event: Gertie.SecurityEvent.Dashboard)
+    }
   }
 
   struct UnlockRequestSubmitted: Equatable {

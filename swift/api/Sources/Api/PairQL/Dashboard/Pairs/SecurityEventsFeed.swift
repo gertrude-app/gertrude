@@ -5,6 +5,12 @@ import PairQL
 struct SecurityEventsFeed: Pair {
   static let auth: ClientAuth = .parent
 
+  enum Severity: String, PairNestable {
+    case all
+    case medium
+    case recommended
+  }
+
   struct ChildSecurityEvent: PairNestable {
     var id: SecurityEvent.Id
     var childId: Child.Id
@@ -14,6 +20,7 @@ struct SecurityEventsFeed: Pair {
     var event: String
     var detail: String?
     var explanation: String
+    var severity: Severity
     var createdAt: Date
   }
 
@@ -22,6 +29,7 @@ struct SecurityEventsFeed: Pair {
     var event: String
     var detail: String?
     var explanation: String
+    var severity: Severity
     var ipAddress: String?
     var createdAt: Date
   }
@@ -32,6 +40,16 @@ struct SecurityEventsFeed: Pair {
   }
 
   typealias Output = [FeedEvent]
+}
+
+extension SecurityEventsFeed.Severity {
+  init(_ severity: Gertie.SecurityEvent.Severity) {
+    switch severity {
+    case .all: self = .all
+    case .medium: self = .medium
+    case .recommended: self = .recommended
+    }
+  }
 }
 
 // resolver
@@ -74,6 +92,7 @@ extension SecurityEventsFeed: NoInputResolver {
           event: event.toWords,
           detail: model.detail,
           explanation: event.explanation,
+          severity: .init(event.severity),
           createdAt: model.createdAt,
         ))
       } else {
@@ -85,6 +104,7 @@ extension SecurityEventsFeed: NoInputResolver {
           event: event.toWords,
           detail: model.detail,
           explanation: event.explanation,
+          severity: .init(event.severity),
           ipAddress: model.ipAddress,
           createdAt: model.createdAt,
         ))

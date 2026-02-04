@@ -1,18 +1,51 @@
 import Dependencies
 import Foundation
+import Gertie
 
-extension AdminEvent.MacAppSecurityEvent: AdminNotifying {
+extension AdminEvent.SecurityEventPayload: AdminNotifying {
   static var smsSendTrigger: String { "securityEvent" }
-
   var desc: String {
-    "\(event.toWords)\(detail.map { ": \($0)" } ?? "")"
+    let eventWords: String = switch source {
+    case .macApp(_, let event):
+      event.toWords
+    case .dashboard(let event):
+      event.toWords
+    }
+    return "\(eventWords)\(detail.map { ": \($0)" } ?? "")"
+  }
+
+  var explanation: String {
+    switch source {
+    case .macApp(_, let event):
+      event.explanation
+    case .dashboard(let event):
+      event.explanation
+    }
+  }
+
+  var severity: Gertie.SecurityEvent.Severity {
+    switch source {
+    case .macApp(_, let event):
+      event.severity
+    case .dashboard(let event):
+      event.severity
+    }
+  }
+
+  var context: String {
+    switch source {
+    case .macApp(let childName, _):
+      "for child \(childName)"
+    case .dashboard:
+      "in parent website"
+    }
   }
 
   func sendText(to phoneNumber: String) async throws {
     let message = """
-    [Gertrude App] Received security event: "\(desc)" for child \(userName).
+    [Gertrude] Security event: "\(desc)" \(context).
 
-    \(event.explanation)
+    \(explanation)
     """
 
     try await with(dependency: \.twilio)
@@ -24,18 +57,18 @@ extension AdminEvent.MacAppSecurityEvent: AdminNotifying {
       .send(template: .notifySecurityEvent(
         to: address,
         model: .init(
-          userName: self.userName,
+          context: self.context,
           description: self.desc,
-          explanation: self.event.explanation,
+          explanation: self.explanation,
         ),
       ))
   }
 
   func sendSlack(channel: String, token: String) async throws {
     let text = """
-    Received security event: `\(desc)` for child *\(userName)*.
+    Security event: `\(desc)` \(context).
 
-    \(event.explanation)
+    \(explanation)
     """
     try await with(dependency: \.slack)
       .send(Slack(text: text, channel: channel, token: token))

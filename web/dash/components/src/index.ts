@@ -65,3 +65,5 @@ export type { ActivityFeedItem } from './Users/Activity/ChildActivityFeed';
 export { default as BlockRuleEditor } from './iOS/BlockRuleEditor';
 export { default as ChildAssignmentPicker } from './ClaimDevice/ChildAssignmentPicker';
 export type { ChildSelection } from './ClaimDevice/ChildAssignmentPicker';
+export { default as SecurityEventsFeed } from './SecurityEventsFeed';
+export type { IpLocation, SecurityEvent } from './SecurityEventsFeed';
