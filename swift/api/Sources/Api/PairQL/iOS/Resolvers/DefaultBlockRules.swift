@@ -7,7 +7,7 @@ import IOSRoute
 extension DefaultBlockRules: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     try await IOSApp.BlockRule.query()
-      .where(.not(.isNull(.groupId)))
+      .where(.groupId != nil)
       .all(in: context.db)
       .map(\.rule.legacy)
   }

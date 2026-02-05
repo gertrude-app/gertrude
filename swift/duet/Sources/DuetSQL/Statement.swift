@@ -188,6 +188,8 @@ public extension SQL.Statement {
         sql.appendInterpolation(expression: .uuid(id.uuidId.uuidString))
       case .binding(.enum(.some(let customEnum))):
         sql.appendInterpolation(expression: .customEnum(customEnum.typeName, customEnum.rawValue))
+      case .binding(.enum(.none)):
+        sql.appendInterpolation(expression: .null)
       case .binding(.json(.some(let json))):
         sql.appendInterpolation(expression: .jsonb(json))
       case .binding(.json(.none)):

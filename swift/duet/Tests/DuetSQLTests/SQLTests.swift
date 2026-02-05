@@ -1,4 +1,7 @@
+import Logging
+import NIOEmbedded
 import PostgresKit
+import SQLKit
 import Tagged
 import XCTest
 import XExpect
@@ -473,6 +476,42 @@ final class SqlTests: XCTestCase {
       .varchar("version"),
     ])
   }
+
+  func testNilEnumSerializesToNull() async throws {
+    let thing = Thing(
+      customEnum: .bar,
+      optionalCustomEnum: nil,
+    )
+
+    let client = TestClient()
+    _ = try await client.create([thing])
+
+    let sql = client.stmt.sql
+    var serializer = SQLSerializer(database: TestDatabase())
+    sql.serialize(to: &serializer)
+    let sqlString = serializer.sql
+
+    expect(sqlString).toContain("'bar'::custom_enums")
+    expect(sqlString).toContain(", NULL,")
+  }
+
+  func testNonNilEnumSerializesToTypedValue() async throws {
+    let thing = Thing(
+      customEnum: .foo,
+      optionalCustomEnum: .bar,
+    )
+
+    let client = TestClient()
+    _ = try await client.create([thing])
+
+    let sql = client.stmt.sql
+    var serializer = SQLSerializer(database: TestDatabase())
+    sql.serialize(to: &serializer)
+    let sqlString = serializer.sql
+
+    expect(sqlString).toContain("'foo'::custom_enums")
+    expect(sqlString).toContain("'bar'::custom_enums")
+  }
 }
 
 // helpers
@@ -545,5 +584,24 @@ private struct TestDbRow: SQLRow {
 
   func decode<D: Decodable>(column: String, as: D.Type) throws -> D {
     try JSONDecoder().decode(D.self, from: String(column).data(using: .utf8)!)
+  }
+}
+
+private struct TestDatabase: SQLDatabase {
+  var logger: Logger { Logger(label: "test") }
+  var eventLoop: any EventLoop { EmbeddedEventLoop() }
+  var dialect: any SQLDialect { PostgresDialect() }
+
+  func execute(
+    sql query: any SQLExpression,
+    _ onRow: @escaping @Sendable (any SQLRow) -> Void,
+  ) -> EventLoopFuture<Void> {
+    self.eventLoop.makeSucceededVoidFuture()
+  }
+
+  func withSession<R>(
+    _ closure: @escaping @Sendable (any SQLDatabase) async throws -> R,
+  ) async throws -> R {
+    try await closure(self)
   }
 }
