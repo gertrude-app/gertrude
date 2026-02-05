@@ -9,7 +9,7 @@ enum Reset {
     @Dependency(\.db) var db
     try await Parent.query()
       .where(.id != Parent.Id.stagingPublicKeychainOwner)
-      .delete(in: db)
+      .delete(in: db, force: true)
     try await AdminBetsy.create()
     try await self.createIOSEvents()
   }

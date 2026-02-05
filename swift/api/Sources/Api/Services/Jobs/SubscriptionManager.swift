@@ -8,7 +8,7 @@ import XCore
 
 enum SubscriptionEmail: Equatable {
   case trialEndingSoon(length: Int, remaining: Int)
-  case trialEndedToOverdue(length: Int)
+  case trialExpired(length: Int)
   case overdueToUnpaid
   case paidToOverdue
   case unpaidToPendingDelete
@@ -16,8 +16,9 @@ enum SubscriptionEmail: Equatable {
 
 struct SubscriptionUpdate: Equatable {
   enum Action: Equatable {
-    case update(status: Parent.SubscriptionStatus, expiration: Date)
+    case update(status: BillingStatus.Db, expiration: Date)
     case delete(reason: String)
+    case softDelete
   }
 
   var action: Action
@@ -38,34 +39,43 @@ struct SubscriptionManager: AsyncScheduledJob {
 
   func advanceExpired() async throws {
     var logs: [String] = []
-    let parents = try await Parent.query().all(in: self.db)
-    for var parent in parents {
+    let parents = try await ParentWithSubscription.all(in: self.db)
+    for parent in parents {
       guard let update = try await self.subscriptionUpdate(for: parent) else {
         continue
       }
 
-      switch update.action {
+      switch (update.action, parent.subscription) {
 
-      case .update(let status, let expiration):
-        parent.subscriptionStatus = status
-        parent.subscriptionStatusExpiration = expiration
-        try await self.db.update(parent)
-        let link = self.adminLink(for: parent)
+      case (.update(let status, let expiration), .some(var subscription)):
+        subscription.billingStatus = status
+        subscription.statusExpiresAt = expiration
+        try await self.db.update(subscription)
+        let link = self.adminLink(for: parent.model)
         logs.append("Updated parent \(link) to `.\(status)` until \(expiration)")
 
-      case .delete(let reason):
+      case (.delete(let reason), _):
         try await self.db.create(DeletedEntity(
           type: "Parent",
           reason: reason,
-          data: JSON.encode(parent, [.isoDates]),
+          data: JSON.encode(parent.model, [.isoDates]),
         ))
-        try await self.db.delete(parent)
-        logs.append("Deleted parent \(self.adminLink(for: parent)) reason: \(reason)")
+        logs.append("Deleted parent `\(parent.email)` reason: \(reason)")
+        try await self.db.delete(parent.model)
+
+      case (.softDelete, _):
+        self.postmark.toSuperAdmin(
+          "TODO: soft delete parent accounts, issue #477",
+          "parent: \(self.adminLink(for: parent.model))",
+        )
+
+      case (.update, .none):
+        unexpected("f3c5e1b2", parent.model.id, "should be unreachable, investigate")
       }
 
       if let event = update.email {
         try await self.postmark.send(template: email(event, to: parent.email))
-        logs.append("Sent `.\(event)` email to parent \(self.adminLink(for: parent))")
+        logs.append("Sent `.\(event)` email to parent \(self.adminLink(for: parent.model))")
       }
     }
 
@@ -77,73 +87,77 @@ struct SubscriptionManager: AsyncScheduledJob {
     }
   }
 
-  func subscriptionUpdate(for parent: Parent) async throws -> SubscriptionUpdate? {
-    if parent.subscriptionStatusExpiration > self.now {
-      return nil
-    }
-
-    let completedOnboarding = try await parent.completedOnboarding(self.db)
-    switch parent.subscriptionStatus {
-
-    case .pendingEmailVerification:
+  func subscriptionUpdate(for parent: ParentWithSubscription) async throws -> SubscriptionUpdate? {
+    if !parent.emailVerified, parent.createdAt < self.now - .days(3) {
       return .init(
         action: .delete(reason: "email never verified"),
         email: nil,
       )
+    }
 
-    case .trialing where parent.trialPeriodDays == 60: // <-- legacy 60-day trial
-      return .init(
-        action: .update(
-          status: .trialExpiringSoon,
-          expiration: self.now + .days(7),
-        ),
-        email: .trialEndingSoon(length: parent.trialPeriodDays, remaining: 7),
-      )
+    guard let subscription = parent.subscription else {
+      return nil
+    }
+
+    if subscription.statusExpiresAt > self.now {
+      return nil
+    }
+
+    // TODO: this should really be generalized to "did somethinge meaningful"
+    // so that supervision factors in, at least for the overdue case.... 🤔
+    let completedOnboarding = try await parent.model.completedOnboarding(self.db)
+    switch subscription.billingStatus {
 
     case .trialing:
       return .init(
-        action: .update(
-          status: .trialExpiringSoon,
-          expiration: self.now + .days(3),
-        ),
-        email: .trialEndingSoon(length: parent.trialPeriodDays, remaining: 3),
+        action: .update(status: .trialExpiringSoon, expiration: self.now + .days(3)),
+        email: .trialEndingSoon(length: 21, remaining: 3),
       )
 
     case .trialExpiringSoon:
       return .init(
-        action: .update(status: .overdue, expiration: self.now + .days(7)),
-        email: completedOnboarding ? .trialEndedToOverdue(length: parent.trialPeriodDays) : nil,
+        action: .update(status: .trialExpired, expiration: self.now + .days(7)),
+        email: completedOnboarding ? .trialExpired(length: 21) : nil,
       )
 
-    case .overdue:
-      return try await self.updateIfPaid(parent.subscriptionId) ?? .init(
+    case .trialExpired:
+      return .init(
         action: .update(status: .unpaid, expiration: self.now + .days(365)),
         email: completedOnboarding ? .overdueToUnpaid : nil,
       )
 
-    case .pendingAccountDeletion:
-      return .init(
-        action: .delete(reason: "account unpaid > 1yr"),
-        email: nil,
-      )
-
-    case .unpaid:
-      return .init(
-        action: .update(
-          status: .pendingAccountDeletion,
-          expiration: self.now + .days(30),
-        ),
-        email: completedOnboarding ? .unpaidToPendingDelete : nil,
-      )
-
     case .paid:
-      return try await self.updateIfPaid(parent.subscriptionId) ?? .init(
+      return try await self.updateIfPaid(subscription.stripeId) ?? .init(
         action: .update(status: .overdue, expiration: self.now + .days(14)),
         email: .paidToOverdue,
       )
 
-    case .complimentary:
+    case .overdue:
+      return try await self.updateIfPaid(subscription.stripeId) ?? .init(
+        action: .update(status: .unpaid, expiration: self.now + .days(365)),
+        email: completedOnboarding ? .overdueToUnpaid : nil,
+      )
+
+    case .unpaid:
+      // TODO: eventually query this when we have free features
+      let usingFreeFeatures = Int.random(in: 0 ... 1) == Int.max
+      if usingFreeFeatures {
+        return .init(action: .update(status: .unpaid, expiration: self.now + .days(90)))
+      } else {
+        return .init(action: .softDelete, email: completedOnboarding ? .unpaidToPendingDelete : nil)
+      }
+
+    // TODO: we're not generating this state yet, see issue #466
+    case .cancelled:
+      return nil
+
+    // complimentary, expires should be .distantFuture, hence unreachable
+    case nil where subscription.tier == .full:
       unexpected("2d1710c2", parent.id)
+      return nil
+
+    case nil:
+      unexpected("8610dd81", parent.id) // unreachable
       return nil
     }
   }
@@ -151,7 +165,7 @@ struct SubscriptionManager: AsyncScheduledJob {
   // failsafe in case webhook missed the `invoice.paid` event
   // theoretically, we should never find a subscription active
   private func updateIfPaid(
-    _ subscriptionId: Parent.SubscriptionId?,
+    _ subscriptionId: Subscription.StripeId?,
   ) async throws -> SubscriptionUpdate? {
     if let subsId = subscriptionId?.rawValue,
        let subscription = try? await self.stripe.getSubscription(subsId),
@@ -192,8 +206,8 @@ func email(_ event: SubscriptionEmail, to address: EmailAddress) -> TemplateEmai
       to: address.rawValue,
       model: .init(length: length, remaining: remaining),
     )
-  case .trialEndedToOverdue(let length):
-    .trialEndedToOverdue(to: address.rawValue, model: .init(length: length))
+  case .trialExpired(let length):
+    .trialExpired(to: address.rawValue, model: .init(length: length))
   case .overdueToUnpaid:
     .overdueToUnpaid(to: address.rawValue, model: .init())
   case .paidToOverdue:

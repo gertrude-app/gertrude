@@ -75,11 +75,10 @@ describe(`create new notification method flow`, () => {
   });
 });
 
-describe(`receiving admin from api`, () => {
+describe(`receiving account owner from api`, () => {
   it(`.succeeded sets correctly massaged data on state slice`, () => {
-    const apiData = mock.adminSettings({
+    const apiData = mock.accountOwner({
       email: `blob@blob.com`,
-      subscriptionStatus: { case: `trialing`, daysLeft: 60 },
       verifiedNotificationMethods: [
         {
           id: `verifiedMethod1`,
@@ -102,8 +101,8 @@ describe(`receiving admin from api`, () => {
     const nextState = reducer(
       { ...initialState },
       {
-        type: `receivedAdmin`,
-        admin: apiData,
+        type: `receivedAccountOwner`,
+        accountOwner: apiData,
       },
     );
 

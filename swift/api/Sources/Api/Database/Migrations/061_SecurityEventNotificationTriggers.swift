@@ -33,6 +33,11 @@ struct SecurityEventNotificationTriggers: GertieMigration {
 
   func down(sql: SQLDatabase) async throws {
     try await sql.execute("""
+      ALTER TABLE parent.notifications
+      DROP CONSTRAINT chk_notification_trigger;
+    """)
+
+    try await sql.execute("""
       CREATE TYPE public.enum_parent_notification_trigger AS ENUM (
         'unlockRequestSubmitted',
         'suspendFilterRequestSubmitted',
@@ -44,11 +49,6 @@ struct SecurityEventNotificationTriggers: GertieMigration {
       UPDATE parent.notifications
       SET trigger = 'adminChildSecurityEvent'
       WHERE trigger IN ('securityEventsAll', 'securityEventsMedium', 'securityEventsRecommended');
-    """)
-
-    try await sql.execute("""
-      ALTER TABLE parent.notifications
-      DROP CONSTRAINT chk_notification_trigger;
     """)
 
     try await sql.execute("""

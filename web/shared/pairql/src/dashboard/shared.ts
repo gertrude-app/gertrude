@@ -20,13 +20,6 @@ export type AdminNotificationTrigger =
   | `securityEventsMedium`
   | `securityEventsRecommended`;
 
-export type AdminSubscriptionStatus =
-  | { case: `trialing`; daysLeft: number }
-  | { case: `complimentary` }
-  | { case: `paid` }
-  | { case: `overdue` }
-  | { case: `unpaid` };
-
 export type AppScope =
   | { type: `unrestricted` }
   | { type: `webBrowsers` }
@@ -142,6 +135,28 @@ export interface PlainTimeWindow {
   start: PlainTime;
   end: PlainTime;
 }
+
+export type Plan =
+  | {
+      case: `free`;
+      kind:
+        | { case: `lapsedLight`; stripeId: string }
+        | { case: `lapsedFull`; stripeId: string }
+        | { case: `standard` };
+    }
+  | {
+      case: `light`;
+      status: { case: `paid`; stripeId: string } | { case: `overdue`; stripeId: string };
+    }
+  | {
+      case: `full`;
+      status:
+        | { case: `trialing`; until: ISODateString }
+        | { case: `paid`; stripeId: string; monthlyPriceInCents: number }
+        | { case: `overdue`; stripeId: string; monthlyPriceInCents: number }
+        | { case: `complimentary` }
+        | { case: `trialExpired` };
+    };
 
 export type ReleaseChannel = `stable` | `beta` | `canary`;
 

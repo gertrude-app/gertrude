@@ -32,9 +32,11 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = `sm` })
 };
 
 const subscriptionStyles: Record<string, string> = {
+  free: `bg-slate-50 text-slate-500 ring-slate-400/20`,
   paid: `bg-emerald-50 text-emerald-700 ring-emerald-600/20`,
   trialing: `bg-sky-50 text-sky-700 ring-sky-600/20`,
   trialExpiringSoon: `bg-amber-50 text-amber-700 ring-amber-600/20`,
+  trialExpired: `bg-orange-50 text-orange-700 ring-orange-600/20`,
   overdue: `bg-amber-50 text-amber-700 ring-amber-600/20`,
   unpaid: `bg-red-50 text-red-700 ring-red-600/20`,
   pendingEmailVerification: `bg-slate-50 text-slate-600 ring-slate-500/20`,
@@ -42,9 +44,11 @@ const subscriptionStyles: Record<string, string> = {
 };
 
 const subscriptionLabels: Record<string, string> = {
+  free: `Free`,
   paid: `Paid`,
   trialing: `Trial`,
   trialExpiringSoon: `Trial Expiring Soon`,
+  trialExpired: `Trial Expired`,
   overdue: `Overdue`,
   unpaid: `Unpaid`,
   pendingEmailVerification: `Pending`,

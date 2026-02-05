@@ -123,8 +123,18 @@ extension CheckIn_v2: Resolver {
       }
     }
 
+    let subscription = try await parent.subscription(in: context.db)
+    let adminAccountStatus: AdminAccountStatus = switch Plan(subscription: subscription) {
+    case .full(.trialExpired), .full(.overdue):
+      .needsAttention
+    case .full:
+      .active
+    case .light, .free:
+      .inactive
+    }
+
     return try await Output(
-      adminAccountStatus: parent.accountStatus,
+      adminAccountStatus: adminAccountStatus,
       appManifest: appManifest,
       keychains: keychains,
       latestRelease: latestRelease,

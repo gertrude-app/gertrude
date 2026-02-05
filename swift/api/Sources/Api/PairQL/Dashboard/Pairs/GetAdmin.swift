@@ -2,6 +2,7 @@ import Dependencies
 import Foundation
 import PairQL
 
+/// deprecated, remove 2/21/26
 struct GetAdmin: Pair {
   static let auth: ClientAuth = .parent
 
@@ -40,13 +41,14 @@ struct GetAdmin: Pair {
 extension GetAdmin: NoInputResolver {
   static func resolve(in context: ParentContext) async throws -> Output {
     let parent = context.parent
+    async let subscription = parent.subscription(in: context.db)
     async let notifications = parent.notifications(in: context.db)
     async let methods = parent.verifiedNotificationMethods(in: context.db)
 
     return try await .init(
       id: parent.id,
       email: parent.email.rawValue,
-      subscriptionStatus: .init(parent),
+      subscriptionStatus: .init(parent, subscription: subscription),
       notifications: notifications.map {
         .init(id: $0.id, trigger: $0.trigger, methodId: $0.methodId)
       },
@@ -55,32 +57,28 @@ extension GetAdmin: NoInputResolver {
       },
       // deprecated: was used to gate security event notifications, now always enabled
       hasAdminChild: false,
-      monthlyPriceInDollars: Int(parent.monthlyPrice.rawValue / 100),
+      monthlyPriceInDollars: subscription?.isLegacyPrice == true ? 5 : 10,
     )
   }
 }
 
 extension GetAdmin.SubscriptionStatus {
-  init(_ admin: Parent) throws {
-    @Dependency(\.date.now) var now
-    switch admin.subscriptionStatus {
-    case .complimentary:
+  init(_ parent: Parent, subscription: Subscription?) throws {
+    switch Plan(subscription: subscription) {
+    case .full(.complimentary):
       self = .complimentary
-    case .trialing:
-      let delta = now.distance(to: admin.subscriptionStatusExpiration)
-      self = .trialing(daysLeft: Int(delta / 86400) + 7) // 7 days in "expiring soon"
-    case .trialExpiringSoon:
-      let delta = now.distance(to: admin.subscriptionStatusExpiration)
+    case .full(.trialing(let expiration)):
+      let delta = get(dependency: \.date.now).distance(to: expiration)
       self = .trialing(daysLeft: Int(delta / 86400))
-    case .paid:
-      self = .paid
-    case .overdue:
+    case .full(.trialExpired):
       self = .overdue
-    case .unpaid, .pendingAccountDeletion:
-      self = .unpaid
-    case .pendingEmailVerification:
-      struct EmailNotVerified: Error {}
-      throw EmailNotVerified() // should never happen
+    case .full(.paid):
+      self = .paid
+    case .full(.overdue):
+      self = .overdue
+    // these states should be unreachable during deprecation of this pair
+    case .free, .light:
+      self = .paid
     }
   }
 }

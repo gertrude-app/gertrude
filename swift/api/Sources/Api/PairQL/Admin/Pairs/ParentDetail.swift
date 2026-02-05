@@ -15,9 +15,9 @@ struct ParentDetail: Pair {
     var id: Parent.Id
     var email: String
     var status: String
-    var subscriptionStatus: String
-    var subscriptionId: String?
-    var monthlyPriceInCents: Int
+    var plan: String
+    var billingStatus: String?
+    var stripeSubscriptionId: String?
     var createdAt: Date
     var children: [ChildOutput]
     var keychains: [KeychainOutput]
@@ -67,9 +67,7 @@ struct ParentDetail: Pair {
 
 extension ParentDetail: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
-    let parent = try await Parent.query()
-      .where(.id == .uuid(input.id))
-      .first(in: context.db, orThrow: context.error("c8f93d61", .notFound, "Parent not found"))
+    let parent = try await ParentWithSubscription.find(.init(input.id), in: context.db)
 
     let children = try await Child.query()
       .where(.parentId == parent.id)
@@ -156,17 +154,57 @@ extension ParentDetail: Resolver {
     let parentData = analyticsData.parents[parent.id]
     let status = parentData?.status.rawValue ?? "unknown"
 
+    // TODO: maybe better in the future to send the full Plan enum and let client handle display
+    // @see https://github.com/gertrude-app/gertrude/issues/478
+    let (plan, billingStatus) = Plan(subscription: parent.subscription).displayStrings
+
     return .init(
       id: parent.id,
       email: parent.email.rawValue,
       status: status,
-      subscriptionStatus: parent.subscriptionStatus.rawValue,
-      subscriptionId: parent.subscriptionId?.rawValue,
-      monthlyPriceInCents: parent.monthlyPrice.rawValue,
+      plan: plan,
+      billingStatus: billingStatus,
+      stripeSubscriptionId: parent.subscription?.stripeId?.rawValue,
       createdAt: parent.createdAt,
       children: childOutputs,
       keychains: keychainOutputs,
       notifications: notificationOutputs,
     )
+  }
+}
+
+private extension Plan {
+  var displayStrings: (plan: String, billingStatus: String?) {
+    switch self {
+    case .free(let kind):
+      switch kind {
+      case .standard:
+        ("free", nil)
+      case .lapsedLight:
+        ("free (lapsed light)", "unpaid")
+      case .lapsedFull:
+        ("free (lapsed full)", "unpaid")
+      }
+    case .light(let status):
+      switch status {
+      case .paid:
+        ("light", "paid")
+      case .overdue:
+        ("light", "overdue")
+      }
+    case .full(let status):
+      switch status {
+      case .complimentary:
+        ("complimentary", nil)
+      case .trialing:
+        ("full", "trialing")
+      case .trialExpired:
+        ("full", "trial expired")
+      case .paid:
+        ("full", "paid")
+      case .overdue:
+        ("full", "overdue")
+      }
+    }
   }
 }

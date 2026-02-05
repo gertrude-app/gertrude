@@ -117,8 +117,8 @@ import Vapor
         try await postmark
           .send(template: .trialEndingSoon(to: to, model: .init(length: 21, remaining: 3)))
 
-      case "admin-trial-ended-to-overdue":
-        try await postmark.send(template: .trialEndedToOverdue(to: to, model: .init(length: 21)))
+      case "admin-trial-expired":
+        try await postmark.send(template: .trialExpired(to: to, model: .init(length: 21)))
 
       case "admin-overdue-to-unpaid":
         try await postmark.send(template: .overdueToUnpaid(to: to, model: .init()))
@@ -170,8 +170,8 @@ import Vapor
         return write(template: V2_7_0_Announce.self)
       case "admin-trial-ending-soon":
         return write(template: AccountLifecycle.TrialEndingSoon.self)
-      case "admin-trial-ended-to-overdue":
-        return write(template: AccountLifecycle.TrialEndedToOverdue.self)
+      case "admin-trial-expired":
+        return write(template: AccountLifecycle.TrialExpired.self)
       case "admin-overdue-to-unpaid":
         return write(template: AccountLifecycle.OverdueToUnpaid.self)
       case "admin-paid-to-overdue":

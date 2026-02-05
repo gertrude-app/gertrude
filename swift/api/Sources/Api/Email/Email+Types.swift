@@ -13,7 +13,7 @@ enum TemplateEmail {
   case reSignup(to: String, model: ReSignup)
   case v2_7_0_Announce(to: [String], model: V2_7_0_Announce, dryRun: Bool)
   case trialEndingSoon(to: String, model: AccountLifecycle.TrialEndingSoon)
-  case trialEndedToOverdue(to: String, model: AccountLifecycle.TrialEndedToOverdue)
+  case trialExpired(to: String, model: AccountLifecycle.TrialExpired)
   case overdueToUnpaid(to: String, model: AccountLifecycle.OverdueToUnpaid)
   case paidToOverdue(to: String, model: AccountLifecycle.PaidToOverdue)
   case unpaidToPendingDelete(to: String, model: AccountLifecycle.UnpaidToPendingDelete)
@@ -68,7 +68,7 @@ extension TemplateEmail {
     case .reSignup(_, let model): model
     case .v2_7_0_Announce(_, let model, _): model
     case .trialEndingSoon(_, let model): model
-    case .trialEndedToOverdue(_, let model): model
+    case .trialExpired(_, let model): model
     case .overdueToUnpaid(_, let model): model
     case .paidToOverdue(_, let model): model
     case .unpaidToPendingDelete(_, let model): model

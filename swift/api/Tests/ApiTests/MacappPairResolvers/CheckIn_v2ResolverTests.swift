@@ -38,11 +38,16 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
       Release("3.0.0", channel: .beta),
     ])
 
-    let child = try await self.child(withParent: {
-      $0.subscriptionStatus = .overdue
-    }).withDevice(computer: {
+    let child = try await self.child().withDevice(computer: {
       $0.appReleaseChannel = .beta
     })
+    try await self.db.create(Subscription(
+      parentId: child.parentId,
+      tier: .full,
+      billingStatus: .overdue, // <-- needs attention
+      stripeId: .init("sub_123"),
+      statusExpiresAt: .distantFuture,
+    ))
 
     let output = try await CheckIn_v2.resolve(
       with: .init(appVersion: "1.0.0", filterVersion: nil),
@@ -296,6 +301,73 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
       .where(.parentId == child.parent.model.id)
       .all(in: self.db)
     expect(after.count).toEqual(0)
+  }
+
+  func testAdminAccountStatus_FullPaid_IsActive() async throws {
+    let child = try await self.child().withDevice()
+    try await self.db.create(Subscription(
+      parentId: child.parentId,
+      tier: .full,
+      billingStatus: .paid,
+      stripeId: .init("sub_123"),
+      statusExpiresAt: .distantFuture,
+    ))
+
+    let output = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "1.0.0", filterVersion: nil),
+      in: child.context,
+    )
+    expect(output.adminAccountStatus).toEqual(.active)
+  }
+
+  func testAdminAccountStatus_FullTrialing_IsActive() async throws {
+    let child = try await self.child().withDevice()
+    try await self.db.create(Subscription(
+      parentId: child.parentId,
+      tier: .full,
+      billingStatus: .trialing,
+      trialStartedAt: Date(),
+      statusExpiresAt: .distantFuture,
+    ))
+
+    let output = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "1.0.0", filterVersion: nil),
+      in: child.context,
+    )
+    expect(output.adminAccountStatus).toEqual(.active)
+  }
+
+  // TODO: https://github.com/gertrude-app/gertrude/issues/479
+  // func testAdminAccountStatus_FullComplimentary_IsActive() async throws {
+  //   let child = try await self.child().withDevice()
+  //   try await self.db.create(Subscription(
+  //     parentId: child.parentId,
+  //     tier: .full,
+  //     billingStatus: nil,
+  //     statusExpiresAt: .distantFuture,
+  //   ))
+  //
+  //   let output = try await CheckIn_v2.resolve(
+  //     with: .init(appVersion: "1.0.0", filterVersion: nil),
+  //     in: child.context,
+  //   )
+  //   expect(output.adminAccountStatus).toEqual(.active)
+  // }
+
+  func testAdminAccountStatus_FullTrialExpired_IsNeedsAttention() async throws {
+    let child = try await self.child().withDevice()
+    try await self.db.create(Subscription(
+      parentId: child.parentId,
+      tier: .full,
+      billingStatus: .trialExpired,
+      statusExpiresAt: .distantFuture,
+    ))
+
+    let output = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "1.0.0", filterVersion: nil),
+      in: child.context,
+    )
+    expect(output.adminAccountStatus).toEqual(.needsAttention)
   }
 }
 

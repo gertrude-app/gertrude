@@ -59,7 +59,7 @@ extension PostmarkClient {
     case .initialSignup(let recipient, _),
          .reSignup(let recipient, _),
          .trialEndingSoon(let recipient, _),
-         .trialEndedToOverdue(let recipient, _),
+         .trialExpired(let recipient, _),
          .overdueToUnpaid(let recipient, _),
          .paidToOverdue(let recipient, _),
          .unpaidToPendingDelete(let recipient, _),

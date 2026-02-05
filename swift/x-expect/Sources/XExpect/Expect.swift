@@ -5,32 +5,52 @@ public struct CollectionExpectation<T: Collection> {
   let collection: T
   var negated = false
   let file: StaticString
+  let filePath: StaticString
   let line: UInt
 
-  public init(collection: T, negated: Bool = false, file: StaticString, line: UInt) {
+  public init(
+    collection: T,
+    negated: Bool = false,
+    file: StaticString,
+    filePath: StaticString,
+    line: UInt,
+  ) {
     self.collection = collection
     self.negated = negated
     self.file = file
+    self.filePath = filePath
     self.line = line
   }
 
   public var not: Self {
-    Self(collection: self.collection, negated: true, file: #fileID, line: #line)
+    Self(
+      collection: self.collection,
+      negated: true,
+      file: self.file,
+      filePath: self.filePath,
+      line: self.line,
+    )
   }
 
   public func toHaveCount(_ count: Int) {
     if self.negated {
-      XCTAssertNotEqual(self.collection.count, count, file: self.file, line: self.line)
+      XCTAssertNotEqual(self.collection.count, count, file: self.filePath, line: self.line)
     } else {
-      expectNoDifference(self.collection.count, count, fileID: self.file, line: self.line)
+      expectNoDifference(
+        self.collection.count,
+        count,
+        fileID: self.file,
+        filePath: self.filePath,
+        line: self.line,
+      )
     }
   }
 
   public func toBeEmpty() {
     if self.negated {
-      XCTAssertFalse(self.collection.isEmpty, file: self.file, line: self.line)
+      XCTAssertFalse(self.collection.isEmpty, file: self.filePath, line: self.line)
     } else {
-      XCTAssertTrue(self.collection.isEmpty, file: self.file, line: self.line)
+      XCTAssertTrue(self.collection.isEmpty, file: self.filePath, line: self.line)
     }
   }
 }
@@ -38,9 +58,15 @@ public struct CollectionExpectation<T: Collection> {
 public extension CollectionExpectation where T: Equatable {
   func toEqual(_ expected: T) {
     if self.negated {
-      XCTAssertNotEqual(self.collection, expected, file: self.file, line: self.line)
+      XCTAssertNotEqual(self.collection, expected, file: self.filePath, line: self.line)
     } else {
-      expectNoDifference(self.collection, expected, fileID: self.file, line: self.line)
+      expectNoDifference(
+        self.collection,
+        expected,
+        fileID: self.file,
+        filePath: self.filePath,
+        line: self.line,
+      )
     }
   }
 }
@@ -48,20 +74,28 @@ public extension CollectionExpectation where T: Equatable {
 public struct ErrorExpectation<T> {
   let fn: () async throws -> T
   let file: StaticString
+  let filePath: StaticString
   let line: UInt
 
-  public init(fn: @escaping () async throws -> T, file: StaticString, line: UInt) {
+  public init(
+    fn: @escaping () async throws -> T,
+    file: StaticString,
+    filePath: StaticString,
+    line: UInt,
+  ) {
     self.fn = fn
     self.file = file
+    self.filePath = filePath
     self.line = line
   }
 
   public func toContain(_ substring: String) async throws {
     do {
       _ = try await self.fn()
-      XCTFail("Expected error, got none", file: self.file, line: self.line)
+      XCTFail("Expected error, got none", file: self.filePath, line: self.line)
     } catch {
-      expect("\(error)", file: self.file, line: self.line).toContain(substring)
+      expect("\(error)", file: self.file, filePath: self.filePath, line: self.line)
+        .toContain(substring)
     }
   }
 }
@@ -70,24 +104,44 @@ public struct EquatableExpectation<T: Equatable> {
   let value: T
   var negated = false
   let file: StaticString
+  let filePath: StaticString
   let line: UInt
 
-  public init(value: T, negated: Bool = false, file: StaticString, line: UInt) {
+  public init(
+    value: T,
+    negated: Bool = false,
+    file: StaticString,
+    filePath: StaticString,
+    line: UInt,
+  ) {
     self.value = value
     self.negated = negated
     self.file = file
+    self.filePath = filePath
     self.line = line
   }
 
   public var not: Self {
-    Self(value: self.value, negated: true, file: #fileID, line: #line)
+    Self(
+      value: self.value,
+      negated: true,
+      file: self.file,
+      filePath: self.filePath,
+      line: self.line,
+    )
   }
 
   public func toEqual(_ other: T) {
     if self.negated {
-      XCTAssertNotEqual(self.value, other, file: self.file, line: self.line)
+      XCTAssertNotEqual(self.value, other, file: self.filePath, line: self.line)
     } else {
-      expectNoDifference(self.value, other, fileID: self.file, line: self.line)
+      expectNoDifference(
+        self.value,
+        other,
+        fileID: self.file,
+        filePath: self.filePath,
+        line: self.line,
+      )
     }
   }
 }
@@ -96,32 +150,52 @@ public struct EquatableOptionalExpectation<T: Equatable> {
   let value: T?
   var negated = false
   let file: StaticString
+  let filePath: StaticString
   let line: UInt
 
-  public init(value: T? = nil, negated: Bool = false, file: StaticString, line: UInt) {
+  public init(
+    value: T? = nil,
+    negated: Bool = false,
+    file: StaticString,
+    filePath: StaticString,
+    line: UInt,
+  ) {
     self.value = value
     self.negated = negated
     self.file = file
+    self.filePath = filePath
     self.line = line
   }
 
   public var not: Self {
-    Self(value: self.value, negated: true, file: #fileID, line: #line)
+    Self(
+      value: self.value,
+      negated: true,
+      file: self.file,
+      filePath: self.filePath,
+      line: self.line,
+    )
   }
 
   public func toEqual(_ other: T) {
     if self.negated {
-      XCTAssertNotEqual(self.value, other, file: self.file, line: self.line)
+      XCTAssertNotEqual(self.value, other, file: self.filePath, line: self.line)
     } else {
-      expectNoDifference(self.value, other, fileID: self.file, line: self.line)
+      expectNoDifference(
+        self.value,
+        other,
+        fileID: self.file,
+        filePath: self.filePath,
+        line: self.line,
+      )
     }
   }
 
   public func toBeNil() {
     if self.negated {
-      XCTAssertNotNil(self.value, file: self.file, line: self.line)
+      XCTAssertNotNil(self.value, file: self.filePath, line: self.line)
     } else {
-      XCTAssertNil(self.value, file: self.file, line: self.line)
+      XCTAssertNil(self.value, file: self.filePath, line: self.line)
     }
   }
 }
@@ -129,23 +203,30 @@ public struct EquatableOptionalExpectation<T: Equatable> {
 public struct ResultExpectation<Success, Failure: Swift.Error> {
   let result: Result<Success, Failure>
   let file: StaticString
+  let filePath: StaticString
   let line: UInt
 
-  public init(result: Result<Success, Failure>, file: StaticString, line: UInt) {
+  public init(
+    result: Result<Success, Failure>,
+    file: StaticString,
+    filePath: StaticString,
+    line: UInt,
+  ) {
     self.result = result
     self.file = file
+    self.filePath = filePath
     self.line = line
   }
 
   public func toBeError(containing substring: String) {
     switch self.result {
     case .success(let value):
-      XCTFail("Expected error, got success: \(value)", file: self.file, line: self.line)
+      XCTFail("Expected error, got success: \(value)", file: self.filePath, line: self.line)
     case .failure(let error):
       XCTAssert(
         "\(error)".contains(substring),
         "Expected error `\(error)` to contain `\(substring)`",
-        file: self.file,
+        file: self.filePath,
         line: self.line,
       )
     }
@@ -155,16 +236,18 @@ public struct ResultExpectation<Success, Failure: Swift.Error> {
 public struct OptionalExpectation {
   let value: Any?
   let file: StaticString
+  let filePath: StaticString
   let line: UInt
 
-  public init(value: Any? = nil, file: StaticString, line: UInt) {
+  public init(value: Any? = nil, file: StaticString, filePath: StaticString, line: UInt) {
     self.value = value
     self.file = file
+    self.filePath = filePath
     self.line = line
   }
 
   public func toBeNil() {
-    XCTAssertNil(self.value, file: self.file, line: self.line)
+    XCTAssertNil(self.value, file: self.filePath, line: self.line)
   }
 }
 
@@ -172,24 +255,44 @@ public struct StringExpectation {
   let value: String
   var negated = false
   let file: StaticString
+  let filePath: StaticString
   let line: UInt
 
-  public init(value: String, negated: Bool = false, file: StaticString, line: UInt) {
+  public init(
+    value: String,
+    negated: Bool = false,
+    file: StaticString,
+    filePath: StaticString,
+    line: UInt,
+  ) {
     self.value = value
     self.negated = negated
     self.file = file
+    self.filePath = filePath
     self.line = line
   }
 
   public var not: Self {
-    Self(value: self.value, negated: true, file: #fileID, line: #line)
+    Self(
+      value: self.value,
+      negated: true,
+      file: self.file,
+      filePath: self.filePath,
+      line: self.line,
+    )
   }
 
   public func toBe(_ other: String) {
     if self.negated {
-      XCTAssertNotEqual(self.value, other, file: self.file, line: self.line)
+      XCTAssertNotEqual(self.value, other, file: self.filePath, line: self.line)
     } else {
-      expectNoDifference(self.value, other, fileID: self.file, line: self.line)
+      expectNoDifference(
+        self.value,
+        other,
+        fileID: self.file,
+        filePath: self.filePath,
+        line: self.line,
+      )
     }
   }
 
@@ -198,14 +301,14 @@ public struct StringExpectation {
       XCTAssert(
         self.value.contains(substring),
         "Expected `\(self.value)` to contain `\(substring)`",
-        file: self.file,
+        file: self.filePath,
         line: self.line,
       )
     } else {
       XCTAssert(
         !self.value.contains(substring),
         "Expected `\(self.value)` NOT to contain `\(substring)`",
-        file: self.file,
+        file: self.filePath,
         line: self.line,
       )
     }
@@ -215,85 +318,95 @@ public struct StringExpectation {
 public struct BoolExpectation {
   let value: Bool
   let file: StaticString
+  let filePath: StaticString
   let line: UInt
 
-  public init(value: Bool, file: StaticString, line: UInt) {
+  public init(value: Bool, file: StaticString, filePath: StaticString, line: UInt) {
     self.value = value
     self.file = file
+    self.filePath = filePath
     self.line = line
   }
 
   public func toBeTrue() {
-    XCTAssert(self.value, file: self.file, line: self.line)
+    XCTAssert(self.value, file: self.filePath, line: self.line)
   }
 
   public func toBeFalse() {
-    XCTAssert(!self.value, file: self.file, line: self.line)
+    XCTAssert(!self.value, file: self.filePath, line: self.line)
   }
 }
 
 public func expect(
   _ value: Bool,
   file: StaticString = #fileID,
+  filePath: StaticString = #filePath,
   line: UInt = #line,
 ) -> BoolExpectation {
-  BoolExpectation(value: value, file: file, line: line)
+  BoolExpectation(value: value, file: file, filePath: filePath, line: line)
 }
 
 public func expect(
   _ value: String,
   file: StaticString = #fileID,
+  filePath: StaticString = #filePath,
   line: UInt = #line,
 ) -> StringExpectation {
-  StringExpectation(value: value, file: file, line: line)
+  StringExpectation(value: value, file: file, filePath: filePath, line: line)
 }
 
 @_disfavoredOverload
 public func expect<T: Equatable>(
   _ value: T,
   file: StaticString = #fileID,
+  filePath: StaticString = #filePath,
   line: UInt = #line,
 ) -> EquatableExpectation<T> {
-  EquatableExpectation(value: value, file: file, line: line)
+  EquatableExpectation(value: value, file: file, filePath: filePath, line: line)
 }
 
 @_disfavoredOverload
 public func expect<T: Equatable>(
   _ value: T?,
   file: StaticString = #fileID,
+  filePath: StaticString = #filePath,
   line: UInt = #line,
 ) -> EquatableOptionalExpectation<T> {
-  EquatableOptionalExpectation(value: value, file: file, line: line)
+  EquatableOptionalExpectation(value: value, file: file, filePath: filePath, line: line)
 }
 
 public func expect(
   _ value: (some Any)?,
   file: StaticString = #fileID,
+  filePath: StaticString = #filePath,
   line: UInt = #line,
 ) -> OptionalExpectation {
-  OptionalExpectation(value: value, file: file, line: line)
+  OptionalExpectation(value: value, file: file, filePath: filePath, line: line)
 }
 
 public func expect<C: Collection>(
   _ collection: C,
   file: StaticString = #fileID,
+  filePath: StaticString = #filePath,
   line: UInt = #line,
 ) -> CollectionExpectation<C> {
-  CollectionExpectation(collection: collection, file: file, line: line)
+  CollectionExpectation(collection: collection, file: file, filePath: filePath, line: line)
 }
 
 public func expect<S, F: Error>(
   _ result: Result<S, F>,
   file: StaticString = #fileID,
+  filePath: StaticString = #filePath,
   line: UInt = #line,
 ) -> ResultExpectation<S, F> {
-  ResultExpectation(result: result, file: file, line: line)
+  ResultExpectation(result: result, file: file, filePath: filePath, line: line)
 }
 
 public func expectErrorFrom<T>(
   file: StaticString = #fileID,
+  filePath: StaticString = #filePath,
   line: UInt = #line,
   fn: @escaping () async throws -> T,
 ) -> ErrorExpectation<T> {
-  ErrorExpectation(fn: fn, file: file, line: line)
+  ErrorExpectation(fn: fn, file: file, filePath: filePath, line: line)
 }

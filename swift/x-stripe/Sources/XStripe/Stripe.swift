@@ -49,18 +49,47 @@ public enum Stripe {
         case unpaid
       }
 
+      public struct Items: Decodable {
+        public struct Item: Decodable {
+          public struct Price: Decodable {
+            public let id: String
+            public init(id: String) {
+              self.id = id
+            }
+          }
+
+          public let price: Price
+          public init(price: Price) {
+            self.price = price
+          }
+        }
+
+        public let data: [Item]
+        public init(data: [Item]) {
+          self.data = data
+        }
+      }
+
       public let id: String
       public let status: Status
       public let customer: String
+      public let items: Items
 
       /// unix epoch timestamp (seconds)
       public let currentPeriodEnd: Int
 
-      public init(id: String, status: Status, customer: String, currentPeriodEnd: Int) {
+      public init(
+        id: String,
+        status: Status,
+        customer: String,
+        currentPeriodEnd: Int,
+        items: [Items.Item] = [],
+      ) {
         self.id = id
         self.status = status
         self.customer = customer
         self.currentPeriodEnd = currentPeriodEnd
+        self.items = Items(data: items)
       }
     }
 

@@ -3,7 +3,7 @@ import { produce } from 'immer';
 import type { NotificationUpdate } from '@dash/components';
 import type {
   AdminNotification,
-  GetAdmin,
+  GetAccountOwner,
   NewAdminNotificationMethodEvent,
   PendingNotificationMethod,
   VerifiedNotificationMethod,
@@ -21,16 +21,16 @@ export type State = {
 };
 
 type Action =
-  | { type: `receivedAdmin`; admin: GetAdmin.Output }
+  | { type: `receivedAccountOwner`; accountOwner: GetAccountOwner.Output }
   | { type: `notificationCreated`; id: UUID; methodId?: UUID }
   | { type: `newNotificationMethodEvent`; event: NewAdminNotificationMethodEvent }
   | { type: `updateNotification`; update: NotificationUpdate };
 
 export function reducer(state: State, action: Action): State | undefined {
   switch (action.type) {
-    case `receivedAdmin`:
+    case `receivedAccountOwner`:
       state.notifications = {};
-      for (const notification of action.admin.notifications) {
+      for (const notification of action.accountOwner.notifications) {
         state.notifications[notification.id] = {
           editing: false,
           ...editable(notification),
@@ -38,7 +38,7 @@ export function reducer(state: State, action: Action): State | undefined {
       }
 
       state.notificationMethods = {};
-      for (const method of action.admin.verifiedNotificationMethods) {
+      for (const method of action.accountOwner.verifiedNotificationMethods) {
         state.notificationMethods[method.id] = method;
       }
 

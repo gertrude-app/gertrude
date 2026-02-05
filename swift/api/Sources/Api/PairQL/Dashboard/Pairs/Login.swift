@@ -26,7 +26,7 @@ extension Login: Resolver {
       .where(.email == .string(input.email.lowercased()))
       .first(in: context.db, orThrow: context |> loginError)
 
-    if parent.subscriptionStatus == .pendingEmailVerification {
+    if !parent.emailVerified {
       try await sendVerificationEmail(to: parent, in: context)
       throw context.error(
         "4b5bbea0",

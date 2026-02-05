@@ -6,7 +6,7 @@ import type {
   ChildActivitySummaries,
   Device,
   FamilyActivitySummaries,
-  GetAdmin,
+  GetAccountOwner,
   GetIdentifiedApps,
   KeychainSummary,
   SuspendFilterRequest,
@@ -14,17 +14,18 @@ import type {
 } from '@dash/types';
 import * as empty from '../../lib/empty';
 
-type Admin = GetAdmin.Output;
+type AccountOwner = GetAccountOwner.Output;
 
-export function adminSettings(override: Partial<Admin> = {}): Admin {
+export function accountOwner(override: Partial<AccountOwner> = {}): AccountOwner {
   return {
     id: uuid(),
     email: `you@example.com`,
-    subscriptionStatus: { case: `paid` },
+    plan: {
+      case: `full`,
+      status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
+    },
     notifications: [],
     verifiedNotificationMethods: [],
-    hasAdminChild: false,
-    monthlyPriceInDollars: 10,
     ...override,
   };
 }
