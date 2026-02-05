@@ -41,7 +41,7 @@ final class IOSReducerTestsAuthFail: XCTestCase {
       }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) { // <-- "Age is over 18"
-      $0.screen = .onboarding(.major(.explainHarderButPossible))
+      $0.screen = .onboarding(.supervision(.setup(.explainSupervision)))
     }
   }
 

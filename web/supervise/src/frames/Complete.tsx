@@ -35,6 +35,9 @@ const Complete: React.FC<CompleteProps> = ({ childName, deviceType, onDone }) =>
         },
       ]}
     />
+    <p className="mt-12 text-sm text-slate-500">
+      Don't forget to re-enable Find My and Private Relay.
+    </p>
   </InstructionLayout>
 );
 
