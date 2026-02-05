@@ -40,7 +40,7 @@ extension ParentsList: Resolver {
     let baseQuery = Parent.query()
       .where(.not(.like(.email, "%.smoke-test-%")))
       .where(.not(.like(.email, "e2e-user-%")))
-      .where(.not(.isNull(.emailVerifiedAt)))
+      .where(.emailVerifiedAt != nil)
 
     let totalCount = try await baseQuery.count(in: context.db)
     let totalPages = max(1, Int(ceil(Double(totalCount) / Double(pageSize))))

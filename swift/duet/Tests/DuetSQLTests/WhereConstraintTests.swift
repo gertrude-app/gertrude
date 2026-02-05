@@ -47,6 +47,12 @@ final class WhereConstraintTests: XCTestCase {
       (.createdAt >= .currentTime, #""created_at" >= $1"#, [.currentTimestamp]),
       (.createdAt < .currentTime, #""created_at" < $1"#, [.currentTimestamp]),
       (.createdAt <= .currentTime, #""created_at" <= $1"#, [.currentTimestamp]),
+      (.optionalString == nil, #""optional_string" IS NULL"#, []),
+      (.optionalString != nil, #"NOT "optional_string" IS NULL"#, []),
+      (.optionalInt == nil, #""optional_int" IS NULL"#, []),
+      (.optionalInt != nil, #"NOT "optional_int" IS NULL"#, []),
+      (.optionalCustomEnum == nil, #""optional_custom_enum" IS NULL"#, []),
+      (.optionalCustomEnum != nil, #"NOT "optional_custom_enum" IS NULL"#, []),
     ]
 
     for (constraint, expectedSQL, expectedParams) in cases {

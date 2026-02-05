@@ -75,7 +75,7 @@ struct AnalyticsData: Sendable {
     let parentModels = try await Parent.query()
       .where(.not(.like(.email, "%.smoke-test-%")))
       .where(.not(.like(.email, "e2e-user-%")))
-      .where(.not(.isNull(.emailVerifiedAt)))
+      .where(.emailVerifiedAt != nil)
       .all(in: self.db)
 
     let allSubscriptions = try await Subscription.query().all(in: self.db)

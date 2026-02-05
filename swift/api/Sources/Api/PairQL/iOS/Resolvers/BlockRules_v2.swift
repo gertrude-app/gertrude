@@ -18,7 +18,7 @@ extension BlockRules_v2: Resolver {
     let deviceId: IOSApp.Device.Id? = input.vendorId == .init(.zero) ? nil : .init(input.vendorId)
     return try await IOSApp.BlockRule.query()
       .where(.or(
-        .not(.isNull(.groupId)) .&& .groupId |!=| disabledGroupIds,
+        .groupId != nil .&& .groupId |!=| disabledGroupIds,
         deviceId.map { .deviceId == $0 } ?? .never,
       ))
       .orderBy(.id, .asc)

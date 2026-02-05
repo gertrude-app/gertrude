@@ -204,6 +204,13 @@ public func == <M: Model>(
   .equals(lhs, .int(rhs))
 }
 
+public func == <M: Model>(
+  lhs: M.ColumnName,
+  rhs: _OptionalNilComparisonType,
+) -> SQL.WhereConstraint<M> {
+  .isNull(lhs)
+}
+
 public func != <M: Model>(
   lhs: M.ColumnName,
   rhs: Postgres.Data,
@@ -230,6 +237,13 @@ public func != <M: Model>(
   rhs: String,
 ) -> SQL.WhereConstraint<M> {
   .not(.equals(lhs, .string(rhs)))
+}
+
+public func != <M: Model>(
+  lhs: M.ColumnName,
+  rhs: _OptionalNilComparisonType,
+) -> SQL.WhereConstraint<M> {
+  .not(.isNull(lhs))
 }
 
 infix operator |=|
@@ -310,4 +324,9 @@ public func <> <M: Model>(
   rhs: Postgres.Data,
 ) -> SQL.WhereConstraint<M> {
   .not(.equals(lhs, rhs))
+}
+
+// prior art: https://github.com/swiftlang/swift/blob/5e5978c0747cafb877d814a91e600d978f80eec0/stdlib/public/core/Optional.swift#L604
+public struct _OptionalNilComparisonType: ExpressibleByNilLiteral, Sendable {
+  public init(nilLiteral: ()) {}
 }
