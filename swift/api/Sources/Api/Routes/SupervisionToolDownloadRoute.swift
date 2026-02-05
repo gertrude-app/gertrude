@@ -46,9 +46,9 @@ enum SupervisionToolDownloadRoute {
     var downloadUrl: String {
       switch self {
       case .mac:
-        "http://gertrude.nyc3.digitaloceanspaces.com/releases/supervision/GertrudeSupervisor.zip"
+        "https://gertrude.nyc3.digitaloceanspaces.com/releases/supervision/GertrudeSupervisor.zip"
       case .windows:
-        "http://gertrude.nyc3.digitaloceanspaces.com/releases/supervision/GertrudeSupervisor.exe"
+        "https://gertrude.nyc3.digitaloceanspaces.com/releases/supervision/GertrudeSupervisor.exe"
       }
     }
   }
