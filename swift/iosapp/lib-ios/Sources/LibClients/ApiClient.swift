@@ -70,7 +70,7 @@ extension ApiClient: DependencyKey {
           from: ConnectedRules_v2.self,
           with: .connectedRules_v2(.init(
             deviceId: conn.deviceId,
-            modelIdentifier: deviceData.type.rawValue,
+            modelIdentifier: deviceData.modelIdentifier,
             appVersion: version,
             iosVersion: deviceData.iOSVersion,
           )),
