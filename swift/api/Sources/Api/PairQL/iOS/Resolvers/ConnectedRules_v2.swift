@@ -14,7 +14,9 @@ extension ConnectedRules_v2: Resolver {
       .map(\.rule)
 
     var device = ctx.device
-    device.modelIdentifier = input.modelIdentifier
+    if device.shouldUpdateModelIdentifier(to: input.modelIdentifier) {
+      device.modelIdentifier = input.modelIdentifier
+    }
     device.appVersion = input.appVersion
     device.iosVersion = input.iosVersion
     if device != ctx.device {
