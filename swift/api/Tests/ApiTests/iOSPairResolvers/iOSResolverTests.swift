@@ -94,4 +94,78 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
       .first(in: self.db)
     expect(device.modelIdentifier).toEqual("iPhone,unknown")
   }
+
+  func testDeviceShouldUpdateModelIdentifier() {
+    func device(_ modelIdentifier: String) -> IOSApp.Device {
+      IOSApp.Device(
+        id: .init(),
+        modelIdentifier: modelIdentifier,
+        appVersion: "1.0",
+        iosVersion: "18.0",
+      )
+    }
+    expect(device("iPhone,unknown").shouldUpdateModelIdentifier(to: "iPhone14,2")).toEqual(true)
+    expect(device("iPhone14,2").shouldUpdateModelIdentifier(to: "iPhone14,3")).toEqual(true)
+    expect(device("iPhone14,2").shouldUpdateModelIdentifier(to: "iPhone14,2")).toEqual(false)
+    expect(device("iPhone14,2").shouldUpdateModelIdentifier(to: "iPhone,unknown")).toEqual(false)
+    expect(device("iPad,unknown").shouldUpdateModelIdentifier(to: "iPad,unknown")).toEqual(false)
+    expect(device("iPhone14,2").shouldUpdateModelIdentifier(to: "iPhone")).toEqual(false)
+    expect(device("iPhone14,2").shouldUpdateModelIdentifier(to: "iPad")).toEqual(false)
+    expect(device("iPhone,unknown").shouldUpdateModelIdentifier(to: "iPhone")).toEqual(false)
+  }
+
+  func testLogIOSEvent_v2_backfillsLegacyDevice() async throws {
+    let vendorId = UUID()
+    try await self.db.create(IOSApp.Device(
+      id: .init(vendorId),
+      modelIdentifier: "iPhone,unknown",
+      appVersion: "1.0.0",
+      iosVersion: "17.0",
+    ))
+
+    _ = try await LogIOSEvent_v2.resolve(
+      with: .init(
+        eventId: UUID().uuidString,
+        kind: "event",
+        modelIdentifier: "iPhone14,2",
+        iOSVersion: "18.0.1",
+        appVersion: "1.5.0",
+        vendorId: vendorId,
+        detail: nil,
+      ),
+      in: .mock,
+    )
+
+    let device = try await IOSApp.Device.query()
+      .where(.id == vendorId)
+      .first(in: self.db)
+    expect(device.modelIdentifier).toEqual("iPhone14,2")
+  }
+
+  func testLogIOSEvent_v1_doesNotOverwriteGoodData() async throws {
+    let vendorId = UUID()
+    try await self.db.create(IOSApp.Device(
+      id: .init(vendorId),
+      modelIdentifier: "iPhone14,2",
+      appVersion: "1.0.0",
+      iosVersion: "17.0",
+    ))
+
+    _ = try await LogIOSEvent.resolve(
+      with: .init(
+        eventId: UUID().uuidString,
+        kind: "event",
+        deviceType: "iPhone",
+        iOSVersion: "18.0.1",
+        vendorId: vendorId,
+        detail: nil,
+      ),
+      in: .mock,
+    )
+
+    let device = try await IOSApp.Device.query()
+      .where(.id == vendorId)
+      .first(in: self.db)
+    expect(device.modelIdentifier).toEqual("iPhone14,2")
+  }
 }

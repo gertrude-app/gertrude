@@ -31,6 +31,14 @@ extension IOSApp {
 }
 
 extension IOSApp.Device {
+  func shouldUpdateModelIdentifier(to incoming: String) -> Bool {
+    incoming.contains(",")
+      && !incoming.hasSuffix(",unknown")
+      && self.modelIdentifier != incoming
+  }
+}
+
+extension IOSApp.Device {
   @discardableResult
   static func ensureExists(
     id: Id,
@@ -39,7 +47,11 @@ extension IOSApp.Device {
     appVersion: String,
     in db: any DuetSQL.Client,
   ) async throws -> IOSApp.Device {
-    if let existing = try? await db.find(id) {
+    if var existing = try? await db.find(id) {
+      if existing.shouldUpdateModelIdentifier(to: modelIdentifier) {
+        existing.modelIdentifier = modelIdentifier
+        try await db.update(existing)
+      }
       return existing
     }
     return try await db.create(IOSApp.Device(
