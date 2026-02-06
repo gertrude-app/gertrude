@@ -7,208 +7,187 @@ import XExpect
 
 final class IOSReducerTestsMajor: XCTestCase {
   @MainActor
-  func testOver18GoesDirectlyToSupervision() async throws {
+  func testMajorHappiestPath() async throws {
     let store = store(starting: .onboarding(.happyPath(.confirmMinorDevice)))
 
     await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) { // <-- over 18
-      $0.screen = .onboarding(.supervision(.setup(.explainSupervision)))
+      $0.screen = .onboarding(.major(.explainHarderButPossible))
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.costAndBranchPoint)))
-    }
-  }
-
-  @MainActor
-  func testSupervisionSetupFlow() async throws {
-    let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.setup(.explainSupervision))),
-    )) {
-      IOSReducer()
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.costAndBranchPoint)))
+      $0.screen = .onboarding(.major(.askSelfOrOtherIsOnboarding))
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
+      $0.screen = .onboarding(.major(.askIfOtherIsParent))
+      $0.onboarding.majorOnboarder = .other
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.major(.explainFixAccountTypeEasyWay))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.happyPath(.confirmMinorDevice))
     }
   }
 
   @MainActor
-  func testSupervisionBirthdayAlternativePath() async throws {
-    let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.setup(.freeAlternativesHub))),
-    )) {
-      IOSReducer()
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.birthdayAlternativeExplain)))
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.birthdayAlternativeCons)))
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.birthdayAlternativeInstructions)))
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.accountNowUnder18)))
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.happyPath(.confirmParentIsOnboarding))
-    }
-  }
-
-  @MainActor
-  func testSupervisionSiblingAlternativePath() async throws {
-    let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.setup(.freeAlternativesHub))),
-    )) {
-      IOSReducer()
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.siblingAlternativeExplain)))
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.siblingAlternativeCons)))
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.siblingAlternativeInstructions)))
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.accountNowUnder18)))
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.happyPath(.confirmParentIsOnboarding))
-    }
-  }
-
-  @MainActor
-  func testSupervisionAppleConfiguratorPath() async throws {
-    let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.setup(.freeAlternativesHub))),
-    )) {
-      IOSReducer()
-    }
+  func testMajorSelfPath1() async throws {
+    let store = store(starting: .onboarding(.major(.askSelfOrOtherIsOnboarding)))
 
     await store.send(.interactive(.onboardingBtnTapped(.tertiary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.appleConfiguratorExplain)))
+      $0.onboarding.majorOnboarder = .self
+      $0.screen = .onboarding(.major(.askIfInAppleFamily))
     }
 
+    // first they click "what's an apple family" and see the sheet
+    await store.send(.interactive(.onboardingBtnTapped(.tertiary, ""))) {
+      $0.screen = .onboarding(.major(.explainAppleFamily))
+    }
+
+    // dismiss the sheet (by button)
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.appleConfiguratorCons(step: 1))))
+      $0.screen = .onboarding(.major(.askIfInAppleFamily))
     }
 
+    // show the sheet again, so we can test the dismiss action
+    await store.send(.interactive(.onboardingBtnTapped(.tertiary, ""))) {
+      $0.screen = .onboarding(.major(.explainAppleFamily))
+    }
+
+    // dismiss the sheet (by dismiss gesture)
+    await store.send(.interactive(.sheetDismissed)) {
+      $0.screen = .onboarding(.major(.askIfInAppleFamily))
+    }
+
+    // now they click that they could be in an apple family
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.appleConfiguratorCons(step: 2))))
+      $0.screen = .onboarding(.major(.explainFixAccountTypeEasyWay))
     }
 
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.appleConfiguratorCons(step: 3))))
-    }
-  }
-
-  @MainActor
-  func testSupervisionContinueWithGertrude() async throws {
-    let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.setup(.costAndBranchPoint))),
-    )) {
-      IOSReducer()
-    } withDependencies: {
-      $0.sharedStorage.loadPendingSupervisionCode = { nil }
-      $0.api.createSupervisionCode = { .init(code: 123_123, expiresAt: .reference) }
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
-
-    await store
-      .receive(.programmatic(.setScreen(.onboarding(.supervision(.setup(.generateSetupCode())))))) {
-        $0.screen = .onboarding(.supervision(.setup(.generateSetupCode())))
-      }
-
-    await store
-      .receive(.programmatic(.supervisionCodeGenerated(code: 123_123))) {
-        $0.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: 123_123))))
-      }
-  }
-
-  @MainActor
-  func testSupervisionGertrudeFromHub() async throws {
-    let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.setup(.freeAlternativesHub))),
-    )) {
-      IOSReducer()
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.quaternary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
-    }
-  }
-
-  @MainActor
-  func testSelfManagementPlaceholder_goesToHiThere() async throws {
-    let store = store(starting: .onboarding(.supervision(.setup(.explainNeedSomeoneElse))))
+    // they click "is there another way?" from easy fix account screen
     await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.selfManagementPlaceholder)))
+      $0.screen = .onboarding(.major(.askIfOwnsMac))
     }
+
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.happyPath(.hiThere))
+      $0.screen = .onboarding(.supervision(.intro))
+      $0.onboarding.ownsMac = true
     }
   }
 
   @MainActor
-  func testGenerateSetupCode_retry_succeeds() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
-    let saved = LockIsolated(false)
-    let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.setup(.generateSetupCode(didError: true)))),
-    )) {
-      IOSReducer()
-    } withDependencies: {
-      $0.api.createSupervisionCode = { .init(code: code, expiresAt: .reference) }
-      $0.sharedStorage.savePendingSupervisionCode = { _ in saved.setValue(true) }
+  func testMajorSelfNoAppleFamilyStraightToSupervision() async throws {
+    let store = store(starting: .onboarding(.major(.askSelfOrOtherIsOnboarding)))
+
+    await store.send(.interactive(.onboardingBtnTapped(.tertiary, ""))) {
+      $0.onboarding.majorOnboarder = .self
+      $0.screen = .onboarding(.major(.askIfInAppleFamily))
     }
-    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
-    await store.receive(.programmatic(.supervisionCodeGenerated(code: code))) {
-      $0.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
+
+    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
+      $0.screen = .onboarding(.supervision(.intro))
     }
-    expect(saved.value).toEqual(true)
   }
 
   @MainActor
-  func testGenerateSetupCode_apiError_showsError() async throws {
+  func testMajorNoMacSetsState() async throws {
+    let store = store(starting: .onboarding(.major(.askIfOwnsMac)))
+
+    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
+      $0.screen = .onboarding(.supervision(.intro))
+      $0.onboarding.ownsMac = false
+    }
+  }
+
+  @MainActor
+  func testSupervisionHappiestPath() async throws {
     let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.setup(.explainNeedSomeoneElse))),
+      screen: .onboarding(.supervision(.intro)),
+      onboarding: .init(majorOnboarder: .other, ownsMac: true),
     )) {
       IOSReducer()
-    } withDependencies: {
-      $0.sharedStorage.loadPendingSupervisionCode = { nil }
-      $0.api.createSupervisionCode = { throw NSError(domain: "test", code: 1) }
     }
 
-    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
-    await store.receive(.programmatic(
-      .setScreen(.onboarding(.supervision(.setup(.generateSetupCode())))),
-    )) {
-      $0.screen = .onboarding(.supervision(.setup(.generateSetupCode())))
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.explainSupervision))
     }
-    await store.receive(.programmatic(.supervisionCodeGenerationFailed)) {
-      $0.screen = .onboarding(.supervision(.setup(.generateSetupCode(didError: true))))
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.explainRequiresEraseAndSetup))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.instructions))
+    }
+  }
+
+  @MainActor
+  func testSupervisionNeedsFriendHasFriendPath() async throws {
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.intro)),
+      onboarding: .init(majorOnboarder: .self, ownsMac: true),
+    )) {
+      IOSReducer()
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.explainSupervision))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.explainNeedFriendWithMac))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) { // <-- "i have a friend"
+      $0.screen = .onboarding(.supervision(.explainRequiresEraseAndSetup))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
+      $0.screen = .onboarding(.supervision(.sorryNoOtherWay))
+    }
+  }
+
+  @MainActor
+  func testSupervisionNeedsFriendNoFriendPath() async throws {
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.intro)),
+      onboarding: .init(majorOnboarder: .self, ownsMac: false),
+    )) {
+      IOSReducer()
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.explainSupervision))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.explainNeedFriendWithMac))
+    }
+
+    await store
+      .send(.interactive(.onboardingBtnTapped(.secondary, ""))) { // <-- "don't have a friend"
+        $0.screen = .onboarding(.supervision(.sorryNoOtherWay))
+      }
+  }
+
+  @MainActor
+  func testSupervisionOtherNotParentOrGuardian() async throws {
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.major(.askIfOtherIsParent)),
+      onboarding: .init(majorOnboarder: .other, ownsMac: nil),
+    )) {
+      IOSReducer()
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
+      $0.screen = .onboarding(.major(.askIfOwnsMac))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
+      $0.screen = .onboarding(.supervision(.intro))
+      $0.onboarding.ownsMac = false
     }
   }
 }

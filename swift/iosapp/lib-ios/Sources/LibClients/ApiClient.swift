@@ -12,29 +12,17 @@ import XCore
 @DependencyClient
 public struct ApiClient: Sendable {
   public var connectDevice: @Sendable (_ code: Int, _ vendorId: UUID)
-    async throws -> ChildIOSDeviceData_v2
-  public var connectedRules: @Sendable ()
-    async throws -> ConnectedRules.Output
+    async throws -> ChildIOSDeviceData
+  public var connectedRules: @Sendable (_ vendorId: UUID)
+    async throws -> ConnectedRules_b1.Output
   public var fetchBlockRules: @Sendable (_ vendorId: UUID, _ disabledGroups: [BlockGroup])
     async throws -> [BlockRule]
-  public var fetchDefaultBlockRules: @Sendable (_ vendorId: UUID?)
-    async throws -> [BlockRule]
-  public var logEvent: @Sendable (_ id: String, _ detail: String?)
-    async -> Void
-  public var recoveryDirective: @Sendable ()
-    async throws -> String?
-  public var setAccountConnection: @Sendable (ChildIOSDeviceData_v2?)
-    async -> Void
+  public var fetchDefaultBlockRules: @Sendable (_ vendorId: UUID?) async throws -> [BlockRule]
+  public var logEvent: @Sendable (_ id: String, _ detail: String?) async -> Void
+  public var recoveryDirective: @Sendable () async throws -> String?
+  public var setAuthToken: @Sendable (UUID?) async -> Void
   public var connectAccountFeatureFlag: @Sendable ()
     async throws -> ConnectAccountFeatureFlag.Output
-  public var createSupervisionCode: @Sendable ()
-    async throws -> CreateSupervisionCode.Output
-  public var checkSupervisionStatus: @Sendable (_ code: Int)
-    async throws -> CheckSupervisionStatus.Output
-  public var selfReportSupervision: @Sendable (_ isSupervised: Bool)
-    async throws -> Void
-  public var markSetupComplete: @Sendable ()
-    async throws -> Void
 }
 
 extension ApiClient: TestDependencyKey {
@@ -50,27 +38,24 @@ extension ApiClient: DependencyKey {
         @Dependency(\.device) var device
         let deviceData = await device.data()
         return try await output(
-          from: ConnectDevice_v2.self,
-          withUnauthed: .connectDevice_v2(.init(
+          from: ConnectDevice.self,
+          withUnauthed: .connectDevice(.init(
             verificationCode: code,
             vendorId: vendorId,
-            modelIdentifier: deviceData.modelIdentifier,
+            deviceType: deviceData.type.rawValue,
             appVersion: version,
             iosVersion: deviceData.iOSVersion,
           )),
         )
       },
-      connectedRules: {
+      connectedRules: { vendorId in
         @Dependency(\.device) var device
-        guard let conn = _accountConnection.withLock({ $0 }) else {
-          throw ApiClient.Error.missingAccountConnection
-        }
         let deviceData = await device.data()
         return try await output(
-          from: ConnectedRules_v2.self,
-          with: .connectedRules_v2(.init(
-            deviceId: conn.deviceId,
-            modelIdentifier: deviceData.modelIdentifier,
+          from: ConnectedRules.self,
+          with: .connectedRules(.init(
+            vendorId: vendorId,
+            deviceType: deviceData.type.rawValue,
             appVersion: version,
             iosVersion: deviceData.iOSVersion,
           )),
@@ -102,13 +87,12 @@ extension ApiClient: DependencyKey {
         let deviceData = await device.data()
         do {
           _ = try await output(
-            from: LogIOSEvent_v2.self,
-            withUnauthed: .logIOSEvent_v2(.init(
+            from: LogIOSEvent.self,
+            withUnauthed: .logIOSEvent(.init(
               eventId: id,
               kind: "ios",
-              modelIdentifier: deviceData.modelIdentifier,
+              deviceType: deviceData.type.rawValue,
               iOSVersion: deviceData.iOSVersion,
-              appVersion: version,
               vendorId: deviceData.vendorId,
               detail: detail,
             )),
@@ -133,8 +117,8 @@ extension ApiClient: DependencyKey {
         )
         return result.directive
       },
-      setAccountConnection: { conn in
-        _accountConnection.withLock { $0 = conn }
+      setAuthToken: { token in
+        _authToken.withLock { $0 = token }
       },
       connectAccountFeatureFlag: {
         try await output(
@@ -142,58 +126,18 @@ extension ApiClient: DependencyKey {
           withUnauthed: .connectAccountFeatureFlag,
         )
       },
-      createSupervisionCode: {
-        @Dependency(\.device) var device
-        guard let vendorId = await device.vendorId() else {
-          throw ApiClient.Error.missingVendorId
-        }
-        return try await output(
-          from: CreateSupervisionCode.self,
-          withUnauthed: .createSupervisionCode(.init(
-            deviceId: vendorId,
-            modelIdentifier: device.modelIdentifier(),
-            iosVersion: device.iOSVersion(),
-            appVersion: version,
-          )),
-        )
-      },
-      checkSupervisionStatus: { code in
-        @Dependency(\.device) var device
-        guard let vendorId = await device.vendorId() else {
-          throw ApiClient.Error.missingVendorId
-        }
-        return try await output(
-          from: CheckSupervisionStatus.self,
-          withUnauthed: .checkSupervisionStatus(.init(
-            vendorId: vendorId,
-            code: code,
-          )),
-        )
-      },
-      selfReportSupervision: { isSupervised in
-        _ = try await output(
-          from: SelfReportSupervision.self,
-          with: .selfReportSupervision(.init(isSupervised: isSupervised)),
-        )
-      },
-      markSetupComplete: {
-        _ = try await output(
-          from: MarkSetupComplete.self,
-          with: .markSetupComplete,
-        )
-      },
     )
   }
 }
 
-private let _accountConnection = Mutex<ChildIOSDeviceData_v2?>(nil)
+private let _authToken = Mutex<UUID?>(nil)
 
 func output<T: Pair>(
   from pair: T.Type,
   with route: AuthedRoute,
 ) async throws -> T.Output {
-  guard let token = _accountConnection.withLock({ $0?.token }) else {
-    throw ApiClient.Error.missingAccountConnection
+  guard let token = _authToken.withLock({ $0 }) else {
+    throw ApiClient.Error.missingAuthToken
   }
   let (data, res) = try await request(route: .authed(token, route))
   if let httpResponse = res as? HTTPURLResponse,
@@ -225,8 +169,7 @@ func output<T: Pair>(
 
 public extension ApiClient {
   enum Error: Swift.Error {
-    case missingVendorId
-    case missingAccountConnection
+    case missingAuthToken
     case missingDataOrResponse
     case unexpectedError(statusCode: Int)
   }

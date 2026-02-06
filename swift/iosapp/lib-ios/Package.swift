@@ -10,7 +10,6 @@ let package = Package(
     .library(name: "LibController", targets: ["LibController"]),
     .library(name: "LibClients", targets: ["LibClients"]),
     .library(name: "LibApp", targets: ["LibApp"]),
-    .library(name: "LibViews", targets: ["LibViews"]),
   ],
   dependencies: [
     .package(
@@ -62,14 +61,6 @@ let package = Package(
       name: "LibController",
       dependencies: [
         "LibClients",
-      ],
-    ),
-    .target(
-      name: "LibViews",
-      dependencies: [
-        "LibCore",
-        "LibApp",
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
       ],
     ),
     .target(

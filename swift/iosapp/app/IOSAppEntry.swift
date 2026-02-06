@@ -1,20 +1,14 @@
 import ComposableArchitecture
 import LibApp
-import LibViews
 import SwiftUI
 
 @main
 struct IOSAppEntry: App {
   let store: StoreOf<IOSReducer>
   @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-  @Environment(\.scenePhase) private var scenePhase
 
   var osMajorVersion: Int {
     ProcessInfo.processInfo.operatingSystemVersion.majorVersion
-  }
-
-  var deviceType: String {
-    UIDevice.current.model
   }
 
   init() {
@@ -29,21 +23,9 @@ struct IOSAppEntry: App {
 
   var body: some Scene {
     WindowGroup {
-      AppView(store: self.store, osMajorVersion: self.osMajorVersion, deviceType: self.deviceType)
+      AppView(store: self.store, osMajorVersion: self.osMajorVersion)
         .onAppear {
           self.store.send(.programmatic(.appDidLaunch))
-        }
-        .onChange(of: self.scenePhase) { _, newPhase in
-          switch newPhase {
-          case .active:
-            self.store.send(.programmatic(.appDidEnterForeground))
-          case .background:
-            self.store.send(.programmatic(.appDidEnterBackground))
-          case .inactive:
-            break
-          @unknown default:
-            break
-          }
         }
     }
   }

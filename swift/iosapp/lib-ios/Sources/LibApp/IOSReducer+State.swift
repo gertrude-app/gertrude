@@ -32,6 +32,8 @@ extension IOSReducer {
 
     public struct OnboardingState: Equatable {
       public var firstLaunch: Date?
+      public var majorOnboarder: MajorOnboarder?
+      public var ownsMac: Bool?
       public var returningTo: Screen?
       public var deviceSupervised: Bool = false
       public var clearCache: ClearCacheFeature.State?
@@ -39,9 +41,13 @@ extension IOSReducer {
 
       public init(
         firstLaunch: Date? = nil,
+        majorOnboarder: IOSReducer.MajorOnboarder? = nil,
+        ownsMac: Bool? = nil,
         returningTo: IOSReducer.Screen? = nil,
       ) {
         self.firstLaunch = firstLaunch
+        self.majorOnboarder = majorOnboarder
+        self.ownsMac = ownsMac
         self.returningTo = returningTo
       }
 
@@ -56,6 +62,7 @@ extension IOSReducer {
   public enum Onboarding: Equatable {
     case happyPath(HappyPath)
     case appleFamily(AppleFamily)
+    case major(Major)
     case supervision(Supervision)
     case authFail(AuthFail)
     case installFail(InstallFail)
@@ -93,43 +100,23 @@ extension IOSReducer {
       case checkIfInAppleFamily
     }
 
+    public enum Major: Equatable {
+      case explainHarderButPossible
+      case askSelfOrOtherIsOnboarding
+      case askIfOtherIsParent
+      case explainFixAccountTypeEasyWay
+      case askIfOwnsMac
+      case askIfInAppleFamily
+      case explainAppleFamily
+    }
+
     public enum Supervision: Equatable {
-      case setup(Setup)
-      case resume(Resume)
-
-      public enum Setup: Equatable {
-        case explainSupervision
-        case costAndBranchPoint
-        case freeAlternativesHub
-        case birthdayAlternativeExplain
-        case birthdayAlternativeCons
-        case birthdayAlternativeInstructions
-        case siblingAlternativeExplain
-        case siblingAlternativeCons
-        case siblingAlternativeInstructions
-        case appleConfiguratorExplain
-        case appleConfiguratorCons(step: Int = 1)
-        case accountNowUnder18
-        case explainNeedSomeoneElse
-        case selfManagementPlaceholder
-        case generateSetupCode(didError: Bool = false)
-        case instructionsForProtector(code: Int)
-        case waitingForSupervision(code: Int)
-      }
-
-      // these states occur after rebooting into supervision
-      public enum Resume: Equatable {
-        case codeNotClaimed(code: Int)
-        case codeClaimedNotSupervised(regainedFocus: Bool = false)
-        case retrySupervision
-        case promptInstallProfile
-        case explainProfileDownload
-        case installingProfile(profileUrl: URL)
-        case explainProfileInstall(regainedFocus: Bool = false)
-        case verifyingProfileInstall(didError: Bool = false)
-        case profileInstalled
-        case setupComplete
-      }
+      case intro
+      case explainSupervision
+      case explainNeedFriendWithMac
+      case explainRequiresEraseAndSetup
+      case instructions
+      case sorryNoOtherWay
     }
 
     public enum AuthFail: Equatable {
@@ -177,5 +164,10 @@ extension IOSReducer {
     case connecting
     case failedToConnect
     case connectSuccess
+  }
+
+  public enum MajorOnboarder: Equatable {
+    case `self`
+    case other
   }
 }

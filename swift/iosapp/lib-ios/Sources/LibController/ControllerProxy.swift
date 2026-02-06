@@ -83,10 +83,10 @@ public final class ControllerProxy: Sendable {
 
   @discardableResult
   func refreshRules(reason: RefreshReason) async -> Bool {
-    let conn = self.deps.storage.loadAccountConnection()
+    let token = self.deps.storage.loadAccountConnection()?.token
 
     if reason == .fauxHeartbeat {
-      let interval = conn != nil
+      let interval = token != nil
         ? Self.API_DEBOUNCE_INTERVAL_CONNECTED
         : Self.API_DEBOUNCE_INTERVAL_NORMAL
       if self.lastRefresh.withValue({ $0 }).advanced(by: interval) > self.deps.now {
@@ -96,13 +96,14 @@ public final class ControllerProxy: Sendable {
       self.lastRefresh.withValue { $0 = self.deps.now }
     }
 
-    if let conn {
-      return await self.refreshConnectedRules(conn)
-    } else if let vendorId = await self.deps.device.vendorId() {
-      return await self.refreshNormalRules(vendorId)
-    } else {
+    guard let vendorId = await self.deps.device.vendorId() else {
       self.deps.logger.log("no vendor id, skipping rule update")
       return false
+    }
+    if let token {
+      return await self.refreshConnectedRules(vendorId, token)
+    } else {
+      return await self.refreshNormalRules(vendorId)
     }
   }
 
@@ -138,12 +139,12 @@ public final class ControllerProxy: Sendable {
     }
   }
 
-  func refreshConnectedRules(_ connection: ChildIOSDeviceData_v2) async -> Bool {
+  func refreshConnectedRules(_ vendorId: UUID, _ token: UUID) async -> Bool {
     do {
       self.deps.logger.log("fetching rules from API")
       // NB: always set the token, controller doesn't know when connection is made
-      await self.deps.api.setAccountConnection(connection)
-      let config = try await self.deps.api.connectedRules()
+      await self.deps.api.setAuthToken(token)
+      let config = try await self.deps.api.connectedRules(vendorId)
       guard config.blockRules.count > 0 else {
         self.deps.logger.log("unexpected empty rules from api (connected)")
         return false

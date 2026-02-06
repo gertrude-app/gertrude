@@ -17,12 +17,11 @@ import Testing
       #expect(code == 123_456)
       #expect(vid == UUID(0))
       connectDeviceInvocations.withValue { $0 += 1 }
-      return ChildIOSDeviceData_v2(
+      return ChildIOSDeviceData(
         childId: UUID(1),
         token: UUID(2),
         deviceId: UUID(3),
         childName: "Franny",
-        supervised: nil,
       )
     }
   }

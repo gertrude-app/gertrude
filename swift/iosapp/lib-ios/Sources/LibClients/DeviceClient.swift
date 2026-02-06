@@ -10,7 +10,6 @@ public struct DeviceClient: Sendable {
   @MainActor public var type: @Sendable () async -> DeviceType
   @MainActor public var iOSVersion: @Sendable () async -> String
   @MainActor public var vendorId: @Sendable () async -> UUID?
-  public var modelIdentifier: @Sendable () -> String
   @MainActor public var data: @Sendable () async -> Data
   @MainActor public var batteryLevel: @Sendable () async -> BatteryLevel
   public var clearCache: @Sendable (Int?) -> AnyPublisher<ClearCacheUpdate, Never>
@@ -21,7 +20,6 @@ public struct DeviceClient: Sendable {
     type: @Sendable @escaping () async -> DeviceType,
     iOSVersion: @Sendable @escaping () async -> String,
     vendorId: @Sendable @escaping () async -> UUID?,
-    modelIdentifier: @Sendable @escaping () -> String,
     data: @Sendable @escaping () async -> Data,
     batteryLevel: @Sendable @escaping () async -> BatteryLevel,
     clearCache: @Sendable @escaping (Int?) -> AnyPublisher<ClearCacheUpdate, Never>,
@@ -31,7 +29,6 @@ public struct DeviceClient: Sendable {
     self.type = type
     self.iOSVersion = iOSVersion
     self.vendorId = vendorId
-    self.modelIdentifier = modelIdentifier
     self.data = data
     self.batteryLevel = batteryLevel
     self.clearCache = clearCache
@@ -64,13 +61,11 @@ public extension DeviceClient {
     public var type: DeviceType
     public var iOSVersion: String
     public var vendorId: UUID?
-    public var modelIdentifier: String
 
-    public init(type: DeviceType, iOSVersion: String, vendorId: UUID?, modelIdentifier: String) {
+    public init(type: DeviceType, iOSVersion: String, vendorId: UUID?) {
       self.type = type
       self.iOSVersion = iOSVersion
       self.vendorId = vendorId
-      self.modelIdentifier = modelIdentifier
     }
   }
 }
@@ -88,15 +83,12 @@ extension DeviceClient: DependencyKey {
         vendorId: {
           await getStableVendorId()
         },
-        modelIdentifier: getModelIdentifier,
         data: {
           let vendorId = await getStableVendorId()
-          let modelIdentifier = getModelIdentifier()
           return await MainActor.run { .init(
             type: UIDevice.current.userInterfaceIdiom == .pad ? .iPad : .iPhone,
             iOSVersion: UIDevice.current.systemVersion,
             vendorId: vendorId,
-            modelIdentifier: modelIdentifier,
           ) }
         },
         batteryLevel: { @MainActor in
@@ -118,13 +110,7 @@ extension DeviceClient: DependencyKey {
       type: { .iPhone },
       iOSVersion: { "18.0.1" },
       vendorId: { .init() },
-      modelIdentifier: { "iPhone15,2" },
-      data: { .init(
-        type: .iPhone,
-        iOSVersion: "18.0.1",
-        vendorId: .init(),
-        modelIdentifier: "iPhone15,2",
-      ) },
+      data: { .init(type: .iPhone, iOSVersion: "18.0.1", vendorId: .init()) },
       batteryLevel: { .level(0.9) },
       clearCache: { _ in AnyPublisher(Empty()) },
       deleteCacheFillDir: {},
@@ -139,13 +125,7 @@ extension DeviceClient: DependencyKey {
       type: { .iPhone },
       iOSVersion: { "18.3.1" },
       vendorId: { UUID(42) },
-      modelIdentifier: { "iPhone15,2" },
-      data: { .init(
-        type: .iPhone,
-        iOSVersion: "18.3.1",
-        vendorId: UUID(42),
-        modelIdentifier: "iPhone15,2",
-      ) },
+      data: { .init(type: .iPhone, iOSVersion: "18.3.1", vendorId: UUID(42)) },
       batteryLevel: { .level(0.85) },
       clearCache: { _ in AnyPublisher(Empty()) },
       deleteCacheFillDir: {},
@@ -170,18 +150,6 @@ extension DeviceClient: DependencyKey {
     keychain.save(vendorId: current)
   }
   return current
-}
-
-// NB: currently duplicated, grep: af6ce6fd
-@Sendable func getModelIdentifier() -> String {
-  var systemInfo = utsname()
-  uname(&systemInfo)
-  let mirror = Mirror(reflecting: systemInfo.machine)
-  let identifier = mirror.children.reduce("") { identifier, element in
-    guard let value = element.value as? Int8, value != 0 else { return identifier }
-    return identifier + String(UnicodeScalar(UInt8(value)))
-  }
-  return identifier
 }
 
 @Sendable func getAvailableDiskSpaceInBytes() -> Int? {

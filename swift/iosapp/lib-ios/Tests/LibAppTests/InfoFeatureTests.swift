@@ -12,7 +12,7 @@ import Testing
 @Test func clearCacheButtonFlow() async throws {
   nonisolated(unsafe) let cacheClearSubject = PassthroughSubject<
     DeviceClient.ClearCacheUpdate,
-    Never,
+    Never
   >()
 
   let store = TestStore(initialState: InfoFeature.State()) {
@@ -346,12 +346,11 @@ import Testing
   let dismissInvocations = LockIsolated(0)
 
   let store = TestStore(initialState: InfoFeature.State(
-    connection: ChildIOSDeviceData_v2(
+    connection: ChildIOSDeviceData(
       childId: UUID(),
       token: UUID(),
       deviceId: UUID(),
       childName: "Test Child",
-      supervised: nil,
     ),
     vendorId: UUID(),
   )) {
@@ -498,12 +497,11 @@ import Testing
   let childId = UUID(1)
 
   let store = TestStore(initialState: InfoFeature.State(
-    connection: ChildIOSDeviceData_v2(
+    connection: ChildIOSDeviceData(
       childId: childId,
       token: UUID(),
       deviceId: UUID(),
       childName: "Test Child",
-      supervised: nil,
     ),
   )) {
     InfoFeature()
