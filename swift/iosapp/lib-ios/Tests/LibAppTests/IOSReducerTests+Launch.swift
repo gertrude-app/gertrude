@@ -139,6 +139,54 @@ final class IOSReducerTestsLaunch: XCTestCase {
   }
 
   @MainActor
+  func testSupervisionReboot_networkError_showsErrorThenRetrySucceeds() async throws {
+    let code = 123_456
+    let attemptCount = LockIsolated(0)
+    let store = TestStore(initialState: IOSReducer.State()) {
+      IOSReducer()
+    } withDependencies: {
+      $0.device.deleteCacheFillDir = {}
+      $0.continuousClock = ImmediateClock()
+      $0.systemExtension.filterRunning = { false }
+      $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
+      $0.sharedStorage.loadPendingSupervisionCode = {
+        .init(code: code, expiresAt: .reference)
+      }
+      $0.api.checkSupervisionStatus = { @Sendable _ in
+        let attempt = attemptCount.withValue { val in val += 1
+          return val
+        }
+        if attempt <= 4 {
+          throw URLError(.notConnectedToInternet)
+        }
+        return .pending
+      }
+    }
+
+    await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
+      $0.onboarding.firstLaunch = .distantPast
+    }
+    await store.receive(.programmatic(
+      .setScreen(.onboarding(.supervision(.resume(.networkError)))),
+    )) {
+      $0.screen = .onboarding(.supervision(.resume(.networkError)))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, "Try again"))) {
+      $0.screen = .launching
+    }
+
+    await store.receive(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.setFirstLaunch(.distantPast)))
+    await store.receive(.programmatic(
+      .setScreen(.onboarding(.supervision(.resume(.codeNotClaimed(code: code))))),
+    )) {
+      $0.screen = .onboarding(.supervision(.resume(.codeNotClaimed(code: code))))
+    }
+  }
+
+  @MainActor
   func testSupervisionReboot_complete_serverClientDisagreement() async throws {
     let accountSet = LockIsolated(false)
     let store = TestStore(initialState: IOSReducer.State()) {

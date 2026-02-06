@@ -193,6 +193,8 @@ extension IOSReducer.Onboarding.Supervision.Resume {
       .onboarding(.supervision(.resume(.setupComplete)))
     case (.setupComplete, _):
       .running(state: .notConnected)
+    case (.networkError, _):
+      .onboarding(.supervision(.resume(.networkError)))
     }
   }
 }
