@@ -557,6 +557,11 @@ public struct IOSReducer {
         deps.sharedStorage.clearPendingSupervisionCode()
       }
 
+    case (.onboarding(.supervision(.resume(.networkError))), .primary):
+      self.deps.log(state.screen, action, "be1c3c10")
+      state.screen = .launching
+      return .send(.programmatic(.appDidLaunch))
+
     // MARK: - error paths
 
     case (.onboarding(.authFail(.invalidAccount(.letsFigureThisOut))), .primary):
@@ -667,7 +672,7 @@ public struct IOSReducer {
             deps.log("migration performed by app", "5258e97c")
           }
 
-          switch try await deps.launchState() {
+          switch await deps.launchState() {
 
           case .running(.unconnected):
             await send(.programmatic(.setScreen(.running(state: .notConnected))))
@@ -727,6 +732,12 @@ public struct IOSReducer {
             // NB: if they remove the filter via Settings then launch app, we'll get here
             deps.log("non-running filter w/ stored groups", "23c207e2")
             await send(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere)))))
+
+          case .gertrudeSupervisionReboot(.networkError):
+            deps.log("supervision reboot network error after retries", "b7f3a2d1")
+            await send(.programmatic(
+              .setScreen(.onboarding(.supervision(.resume(.networkError)))),
+            ))
           }
         },
         // handle first launch

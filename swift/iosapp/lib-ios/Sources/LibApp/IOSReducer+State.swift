@@ -129,6 +129,7 @@ extension IOSReducer {
         case verifyingProfileInstall(didError: Bool = false)
         case profileInstalled
         case setupComplete
+        case networkError
       }
     }
 

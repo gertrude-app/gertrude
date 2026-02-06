@@ -15,6 +15,7 @@ extension IOSReducer.Deps {
       case supervisedButNeedsProfile(ChildIOSDeviceData_v2)
       // anomaly: api says "fully supervised", but filter is not running
       case serverClientDisagreement(ChildIOSDeviceData_v2)
+      case networkError
     }
 
     case running(Running)
@@ -24,26 +25,34 @@ extension IOSReducer.Deps {
     case configuratorSupervisionFirstLaunch
   }
 
-  func launchState() async throws -> LaunchState {
+  func launchState() async -> LaunchState {
     let filterRunning = await self.systemExtension.filterRunning()
     let supervisionData = self.sharedStorage.loadPendingSupervisionCode()
 
     if !filterRunning, let code = supervisionData?.code {
-      let supervisionStatus = try await self.api.checkSupervisionStatus(code)
-      switch supervisionStatus {
-      case .pending:
-        return .gertrudeSupervisionReboot(.codeNotClaimed(code: code))
-      case .expired:
-        return .gertrudeSupervisionReboot(.codeExpired)
-      case .notFound:
-        return .gertrudeSupervisionReboot(.codeNotFound)
-      case .claimed(let conn):
-        return .gertrudeSupervisionReboot(.codeClaimedNotSupervised(conn))
-      case .missingProfile(let conn):
-        return .gertrudeSupervisionReboot(.supervisedButNeedsProfile(conn))
-      case .complete(let conn):
-        return .gertrudeSupervisionReboot(.serverClientDisagreement(conn))
+      for attempt in 0 ..< 4 {
+        if attempt > 0 {
+          try? await self.clock.sleep(for: .seconds(2))
+        }
+        guard let status = try? await self.api.checkSupervisionStatus(code) else {
+          continue
+        }
+        switch status {
+        case .pending:
+          return .gertrudeSupervisionReboot(.codeNotClaimed(code: code))
+        case .expired:
+          return .gertrudeSupervisionReboot(.codeExpired)
+        case .notFound:
+          return .gertrudeSupervisionReboot(.codeNotFound)
+        case .claimed(let conn):
+          return .gertrudeSupervisionReboot(.codeClaimedNotSupervised(conn))
+        case .missingProfile(let conn):
+          return .gertrudeSupervisionReboot(.supervisedButNeedsProfile(conn))
+        case .complete(let conn):
+          return .gertrudeSupervisionReboot(.serverClientDisagreement(conn))
+        }
       }
+      return .gertrudeSupervisionReboot(.networkError)
     }
 
     let disabledBlockGroups = self.sharedStorage.loadDisabledBlockGroups()

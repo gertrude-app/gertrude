@@ -546,6 +546,13 @@ public struct AppView: View {
             primary: self.btn(text: "Done", .primary),
           )
 
+        case .onboarding(.supervision(.resume(.networkError))):
+          ButtonScreenView(
+            text: "Couldn’t reach Gertrude’s servers. Please check your internet connection and try again.",
+            primary: self.btn(text: "Try again", .primary),
+            screenType: .error,
+          )
+
         case .supervisionSuccessFirstLaunch:
           ButtonScreenView(
             text: "Excellent! Looks like you’ve installed Gertrude under Supervised mode. Just a couple steps to get you all set up.",
