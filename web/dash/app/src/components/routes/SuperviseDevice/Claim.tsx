@@ -80,6 +80,7 @@ const SuperviseDeviceClaim: React.FC = () => {
         </div>
         <ChildAssignmentPicker
           children={children}
+          deviceType={deviceType}
           onSubmit={(selection) => void handleSubmit(selection)}
           onCancel={handleCancel}
           isSubmitting={isSubmitting}

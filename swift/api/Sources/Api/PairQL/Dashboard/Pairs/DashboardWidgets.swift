@@ -85,6 +85,10 @@ extension DashboardWidgets: NoInputResolver {
       .where(.childId |=| children.map(\.id))
       .all(in: context.db)
 
+    let iosDevices = try await IOSApp.Device.query()
+      .where(.childId |=| children.map(\.id))
+      .all(in: context.db)
+
     let unlockRequests = try await Api.UnlockRequest.query()
       .where(.computerUserId |=| computerUsers.map(\.id))
       .where(.status == .enum(RequestStatus.pending))
@@ -122,11 +126,12 @@ extension DashboardWidgets: NoInputResolver {
     )
 
     return try await .init(
-      children: children.concurrentMap { user in try await .init(
-        id: user.id,
-        name: user.name,
-        status: consolidatedChildComputerStatus(user.id, computerUsers),
-        numDevices: computerUsers.count(where: { $0.childId == user.id }),
+      children: children.concurrentMap { child in try await .init(
+        id: child.id,
+        name: child.name,
+        status: consolidatedChildComputerStatus(child.id, computerUsers),
+        numDevices: computerUsers.count(where: { $0.childId == child.id })
+          + iosDevices.count(where: { $0.childId == child.id }),
       ) },
       childActivitySummaries: childActivitySummaries(
         children: children,

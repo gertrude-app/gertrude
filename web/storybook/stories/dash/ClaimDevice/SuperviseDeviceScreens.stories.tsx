@@ -61,6 +61,7 @@ const SuperviseDeviceScreen: React.FC<{
           </div>
           <ChildAssignmentPicker
             children={children}
+            deviceType={deviceType}
             onSubmit={() => {
               setIsSubmitting(true);
               setTimeout(() => {
