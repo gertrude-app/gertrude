@@ -159,4 +159,56 @@ final class IOSReducerTestsMajor: XCTestCase {
       $0.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
     }
   }
+
+  @MainActor
+  func testSelfManagementPlaceholder_goesToHiThere() async throws {
+    let store = store(starting: .onboarding(.supervision(.setup(.explainNeedSomeoneElse))))
+    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
+      $0.screen = .onboarding(.supervision(.setup(.selfManagementPlaceholder)))
+    }
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.happyPath(.hiThere))
+    }
+  }
+
+  @MainActor
+  func testGenerateSetupCode_retry_succeeds() async throws {
+    let code = Int.random(in: 100_000 ... 999_999)
+    let saved = LockIsolated(false)
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.setup(.generateSetupCode(didError: true)))),
+    )) {
+      IOSReducer()
+    } withDependencies: {
+      $0.api.createSupervisionCode = { .init(code: code, expiresAt: .reference) }
+      $0.sharedStorage.savePendingSupervisionCode = { _ in saved.setValue(true) }
+    }
+    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
+    await store.receive(.programmatic(.supervisionCodeGenerated(code: code))) {
+      $0.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
+    }
+    expect(saved.value).toEqual(true)
+  }
+
+  @MainActor
+  func testGenerateSetupCode_apiError_showsError() async throws {
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.setup(.explainNeedSomeoneElse))),
+    )) {
+      IOSReducer()
+    } withDependencies: {
+      $0.sharedStorage.loadPendingSupervisionCode = { nil }
+      $0.api.createSupervisionCode = { throw NSError(domain: "test", code: 1) }
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
+    await store.receive(.programmatic(
+      .setScreen(.onboarding(.supervision(.setup(.generateSetupCode())))),
+    )) {
+      $0.screen = .onboarding(.supervision(.setup(.generateSetupCode())))
+    }
+    await store.receive(.programmatic(.supervisionCodeGenerationFailed)) {
+      $0.screen = .onboarding(.supervision(.setup(.generateSetupCode(didError: true))))
+    }
+  }
 }
