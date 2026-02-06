@@ -28,8 +28,6 @@ extension IOSReducer.Onboarding {
       happyPath.fallbackDestination(from: btn)
     case .installFail(let installFail):
       installFail.fallbackDestination(from: btn)
-    case .major(let major):
-      major.fallbackDestination(from: btn)
     case .onParentDeviceFail:
       .onboarding(.happyPath(.hiThere))
     case .supervision(let supervision):
@@ -75,10 +73,10 @@ extension IOSReducer.Onboarding.AuthFail.InvalidAccount {
       .onboarding(.authFail(.invalidAccount(.confirmIsMinor)))
     case (.confirmInAppleFamily, .secondary):
       .onboarding(.appleFamily(.explainRequiredForFiltering))
-    case (.confirmInAppleFamily, .tertiary):
+    case (.confirmInAppleFamily, _):
       .onboarding(.appleFamily(.checkIfInAppleFamily))
     case (.confirmIsMinor, .primary):
-      .onboarding(.major(.explainHarderButPossible))
+      .onboarding(.supervision(.setup(.explainSupervision)))
     case (.confirmIsMinor, _):
       .onboarding(.authFail(.invalidAccount(.unexpected)))
     case (.letsFigureThisOut, _):
@@ -100,52 +98,101 @@ extension IOSReducer.Onboarding.InstallFail {
 
 extension IOSReducer.Onboarding.Supervision {
   func fallbackDestination(from btn: OnboardingBtn) -> IOSReducer.Screen {
-    switch (self, btn) {
-    case (.explainNeedFriendWithMac, _):
-      .onboarding(.supervision(.explainRequiresEraseAndSetup))
-    case (.explainRequiresEraseAndSetup, .primary):
-      .onboarding(.supervision(.instructions))
-    case (.explainRequiresEraseAndSetup, _):
-      .onboarding(.supervision(.sorryNoOtherWay))
-    case (.explainSupervision, _):
-      .onboarding(.supervision(.explainNeedFriendWithMac))
-    case (.instructions, _):
-      .onboarding(.happyPath(.hiThere))
-    case (.intro, _):
-      .onboarding(.supervision(.explainSupervision))
-    case (.sorryNoOtherWay, _):
-      .onboarding(.happyPath(.hiThere))
+    switch self {
+    case .setup(let setup):
+      setup.fallbackDestination(from: btn)
+    case .resume(let resume):
+      resume.fallbackDestination(from: btn)
     }
   }
 }
 
-extension IOSReducer.Onboarding.Major {
+extension IOSReducer.Onboarding.Supervision.Setup {
   func fallbackDestination(from btn: OnboardingBtn) -> IOSReducer.Screen {
     switch (self, btn) {
-    case (.askIfInAppleFamily, .primary):
-      .onboarding(.major(.explainFixAccountTypeEasyWay))
-    case (.askIfInAppleFamily, .secondary):
-      .onboarding(.supervision(.intro))
-    case (.askIfInAppleFamily, .tertiary):
-      .onboarding(.major(.explainAppleFamily))
-    case (.askIfOtherIsParent, .primary):
-      .onboarding(.major(.explainFixAccountTypeEasyWay))
-    case (.askIfOtherIsParent, _):
-      .onboarding(.major(.askIfOwnsMac))
-    case (.askIfOwnsMac, _):
-      .onboarding(.supervision(.intro))
-    case (.askSelfOrOtherIsOnboarding, .tertiary):
-      .onboarding(.major(.askIfInAppleFamily))
-    case (.askSelfOrOtherIsOnboarding, _):
-      .onboarding(.major(.askIfOtherIsParent))
-    case (.explainAppleFamily, _):
-      .onboarding(.major(.askIfInAppleFamily))
-    case (.explainFixAccountTypeEasyWay, .primary):
+    case (.explainSupervision, _):
+      .onboarding(.supervision(.setup(.costAndBranchPoint)))
+    case (.costAndBranchPoint, .primary):
+      .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
+    case (.costAndBranchPoint, _):
+      .onboarding(.supervision(.setup(.freeAlternativesHub)))
+    case (.freeAlternativesHub, _):
+      .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
+    case (.birthdayAlternativeExplain, .primary):
+      .onboarding(.supervision(.setup(.birthdayAlternativeCons)))
+    case (.birthdayAlternativeExplain, _):
+      .onboarding(.supervision(.setup(.freeAlternativesHub)))
+    case (.birthdayAlternativeCons, .primary):
+      .onboarding(.supervision(.setup(.birthdayAlternativeInstructions)))
+    case (.birthdayAlternativeCons, _):
+      .onboarding(.supervision(.setup(.freeAlternativesHub)))
+    case (.birthdayAlternativeInstructions, _):
       .onboarding(.happyPath(.confirmMinorDevice))
-    case (.explainFixAccountTypeEasyWay, _):
-      .onboarding(.major(.askIfOwnsMac))
-    case (.explainHarderButPossible, _):
-      .onboarding(.major(.askSelfOrOtherIsOnboarding))
+    case (.siblingAlternativeExplain, .primary):
+      .onboarding(.supervision(.setup(.siblingAlternativeCons)))
+    case (.siblingAlternativeExplain, _):
+      .onboarding(.supervision(.setup(.freeAlternativesHub)))
+    case (.siblingAlternativeCons, .primary):
+      .onboarding(.supervision(.setup(.siblingAlternativeInstructions)))
+    case (.siblingAlternativeCons, _):
+      .onboarding(.supervision(.setup(.freeAlternativesHub)))
+    case (.siblingAlternativeInstructions, _):
+      .onboarding(.happyPath(.confirmMinorDevice))
+    case (.appleConfiguratorExplain, .primary):
+      .onboarding(.supervision(.setup(.appleConfiguratorCons(step: 1))))
+    case (.appleConfiguratorExplain, _):
+      .onboarding(.supervision(.setup(.freeAlternativesHub)))
+    case (.appleConfiguratorCons(_), .secondary):
+      .onboarding(.supervision(.setup(.freeAlternativesHub)))
+    case (.appleConfiguratorCons(let step), _):
+      if step < 3 {
+        .onboarding(.supervision(.setup(.appleConfiguratorCons(step: step + 1))))
+      } else {
+        .onboarding(.happyPath(.hiThere))
+      }
+    case (.accountNowUnder18, _):
+      .onboarding(.happyPath(.confirmParentIsOnboarding))
+    case (.explainNeedSomeoneElse, .primary):
+      .onboarding(.supervision(.setup(.generateSetupCode())))
+    case (.explainNeedSomeoneElse, _):
+      .onboarding(.supervision(.setup(.selfManagementPlaceholder)))
+    case (.selfManagementPlaceholder, _):
+      .onboarding(.happyPath(.hiThere))
+    case (.generateSetupCode(_), _):
+      .onboarding(.supervision(.setup(.generateSetupCode(didError: true))))
+    case (.instructionsForProtector(let code), _):
+      .onboarding(.supervision(.setup(.waitingForSupervision(code: code))))
+    case (.waitingForSupervision(let code), _):
+      .onboarding(.supervision(.setup(.waitingForSupervision(code: code))))
+    }
+  }
+}
+
+extension IOSReducer.Onboarding.Supervision.Resume {
+  func fallbackDestination(from btn: OnboardingBtn) -> IOSReducer.Screen {
+    switch (self, btn) {
+    case (.codeNotClaimed(let code), _):
+      .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
+    case (.codeClaimedNotSupervised(_), .primary):
+      .onboarding(.supervision(.resume(.promptInstallProfile)))
+    case (.codeClaimedNotSupervised(_), _):
+      .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
+    case (.retrySupervision, _):
+      .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
+    case (.promptInstallProfile, _):
+      .onboarding(.supervision(.resume(.explainProfileDownload)))
+    case (.explainProfileDownload, _):
+      .onboarding(.supervision(.resume(.promptInstallProfile)))
+    case (.installingProfile(_), _):
+      .onboarding(.supervision(.resume(.explainProfileInstall())))
+    case (.explainProfileInstall, _):
+      .onboarding(.supervision(.resume(.verifyingProfileInstall())))
+    case (.verifyingProfileInstall(didError: _), _):
+      .onboarding(.supervision(.resume(.explainProfileInstall())))
+    case (.profileInstalled, _):
+      .onboarding(.supervision(.resume(.setupComplete)))
+    case (.setupComplete, _):
+      .running(state: .notConnected)
     }
   }
 }
@@ -161,12 +208,12 @@ extension IOSReducer.Onboarding.HappyPath {
       .onboarding(.happyPath(.explainTwoInstallSteps))
     case (.confirmInAppleFamily, .secondary):
       .onboarding(.appleFamily(.explainRequiredForFiltering))
-    case (.confirmInAppleFamily, .tertiary):
+    case (.confirmInAppleFamily, _):
       .onboarding(.appleFamily(.explainWhatIsAppleFamily))
     case (.confirmMinorDevice, .primary):
       .onboarding(.happyPath(.confirmParentIsOnboarding))
     case (.confirmMinorDevice, _):
-      .onboarding(.major(.explainHarderButPossible))
+      .onboarding(.supervision(.setup(.explainSupervision)))
     case (.confirmParentIsOnboarding, .primary):
       .onboarding(.happyPath(.confirmInAppleFamily))
     case (.confirmParentIsOnboarding, _):

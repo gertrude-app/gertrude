@@ -15,6 +15,7 @@ public extension IOSReducer {
         case primary
         case secondary
         case tertiary
+        case quaternary
       }
 
       case onboardingClearCache(ClearCacheFeature.Action)
@@ -28,6 +29,8 @@ public extension IOSReducer {
     public enum Programmatic: Equatable {
       case appDidLaunch
       case appWillTerminate
+      case appDidEnterForeground
+      case appDidEnterBackground
       case setFirstLaunch(Date)
       case setScreen(Screen)
       case authorizationSucceeded
@@ -35,6 +38,10 @@ public extension IOSReducer {
       case installSucceeded
       case installFailed(FilterInstallError)
       case receivedConnectAccountFeatureFlag(ConnectAccountFeatureFlag.Output)
+      case supervisionCodeGenerated(code: Int)
+      case supervisionCodeGenerationFailed
+      case filterVerified
+      case filterVerificationFailed
     }
   }
 }

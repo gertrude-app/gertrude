@@ -8,8 +8,8 @@ import os.log
 
 @DependencyClient
 public struct SharedStorageClient: Sendable {
-  public var loadAccountConnection: @Sendable () -> ChildIOSDeviceData?
-  public var saveAccountConnection: @Sendable (ChildIOSDeviceData) -> Void
+  public var loadAccountConnection: @Sendable () -> ChildIOSDeviceData_v2?
+  public var saveAccountConnection: @Sendable (ChildIOSDeviceData_v2) -> Void
 
   public var loadProtectionMode: @Sendable () -> ProtectionMode?
   public var saveProtectionMode: @Sendable (ProtectionMode) -> Void
@@ -23,12 +23,16 @@ public struct SharedStorageClient: Sendable {
   public var loadDebugLogs: @Sendable () -> [String]?
   public var saveDebugLogs: @Sendable ([String]) -> Void
 
+  public var loadPendingSupervisionCode: @Sendable () -> CreateSupervisionCode.Output?
+  public var savePendingSupervisionCode: @Sendable (CreateSupervisionCode.Output) -> Void
+  public var clearPendingSupervisionCode: @Sendable () -> Void
+
   public var migrateLegacyData: @Sendable () async -> Bool = { false }
 }
 
 @DependencyClient
 public struct SharedStorageReaderClient: Sendable {
-  public var loadAccountConnection: @Sendable () -> ChildIOSDeviceData?
+  public var loadAccountConnection: @Sendable () -> ChildIOSDeviceData_v2?
   public var loadProtectionMode: @Sendable () -> ProtectionMode?
   public var loadDisabledBlockGroups: @Sendable () -> [BlockGroup]?
   public var loadFirstLaunchDate: @Sendable () -> Date?
@@ -37,12 +41,14 @@ public struct SharedStorageReaderClient: Sendable {
 
 private enum Key: String {
   case accountConnection = "v1.5.0--account-connection"
+  case accountConnection_v2 = "v1.7.0--account-connection-v2"
   case debugLogs = "v1.5.0--debug-logs"
   case legacyProtectionMode = "ProtectionMode.v1.3.0"
   case protectionMode = "v1.5.0--protection-mode"
   case disabledBlockGroups = "disabledBlockGroups.v1.3.0"
   case legacyV1StorageKey = "blockRules.v1"
   case firstLaunchDate
+  case pendingSupervisionCode = "v1.7.0--pending-supervision-code"
 }
 
 extension SharedStorageClient: DependencyKey {
@@ -50,7 +56,7 @@ extension SharedStorageClient: DependencyKey {
     let reader = SharedStorageReaderClient.liveValue
     return .init(
       loadAccountConnection: reader.loadAccountConnection,
-      saveAccountConnection: { saveCodable($0, forKey: .accountConnection) },
+      saveAccountConnection: { saveCodable($0, forKey: .accountConnection_v2) },
       loadProtectionMode: reader.loadProtectionMode,
       saveProtectionMode: { saveCodable($0, forKey: .protectionMode) },
       loadDisabledBlockGroups: reader.loadDisabledBlockGroups,
@@ -59,6 +65,9 @@ extension SharedStorageClient: DependencyKey {
       saveFirstLaunchDate: { saveDate($0, forKey: .firstLaunchDate) },
       loadDebugLogs: reader.loadDebugLogs,
       saveDebugLogs: { saveCodable($0, forKey: .debugLogs) },
+      loadPendingSupervisionCode: { loadCodable(forKey: .pendingSupervisionCode) },
+      savePendingSupervisionCode: { saveCodable($0, forKey: .pendingSupervisionCode) },
+      clearPendingSupervisionCode: { removeKey(.pendingSupervisionCode) },
       migrateLegacyData: { await migrateLegacyStorage() },
     )
   }
@@ -74,7 +83,7 @@ public extension SharedStorageClient {
 
 extension SharedStorageReaderClient: DependencyKey {
   public static let liveValue = SharedStorageReaderClient(
-    loadAccountConnection: { loadCodable(forKey: .accountConnection) },
+    loadAccountConnection: { loadCodable(forKey: .accountConnection_v2) },
     loadProtectionMode: { loadCodable(forKey: .protectionMode) },
     loadDisabledBlockGroups: { loadCodable(forKey: .disabledBlockGroups) },
     loadFirstLaunchDate: { loadDate(forKey: .firstLaunchDate) },
@@ -83,9 +92,31 @@ extension SharedStorageReaderClient: DependencyKey {
 }
 
 func migrateLegacyStorage() async -> Bool {
+  // NB: remove this after harriet updates, she's the only one w/ this form of data
+  struct LegacyChildIOSDeviceData: Codable {
+    var childId: UUID
+    var token: UUID
+    var deviceId: UUID
+    var childName: String
+  }
+  if let accountV1Data = UserDefaults.gertrude.data(forKey: Key.accountConnection.rawValue),
+     let accountV1 = try? JSONDecoder().decode(LegacyChildIOSDeviceData.self, from: accountV1Data) {
+    let accountV2 = ChildIOSDeviceData_v2(
+      childId: accountV1.childId,
+      token: accountV1.token,
+      deviceId: accountV1.deviceId,
+      childName: accountV1.childName,
+      supervised: .byConfigurator,
+    )
+    saveCodable(accountV2, forKey: .accountConnection_v2)
+    @Dependency(\.api) var api
+    await api.logEvent(id: "7d1ec86d", detail: "migrated v1 account connection to v2 (harriet)")
+  }
+
   if UserDefaults.gertrude.data(forKey: Key.protectionMode.rawValue) != nil {
     return false // fast path, they have current data, we're done
   }
+
   @Dependency(\.api) var api
 
   // migrate 1.3.x data to 1.5.x
@@ -98,13 +129,6 @@ func migrateLegacyStorage() async -> Bool {
     }
     saveCodable(disabledGroups, forKey: .disabledBlockGroups)
     await api.logEvent(id: "edd6e55f", detail: "migrated v1.3.x -> 1.5.x")
-    return true
-  }
-
-  // 1.4.x testflight users had new data in old location
-  if let v14x: ProtectionMode = loadCodable(forKey: .legacyProtectionMode) {
-    saveCodable(v14x, forKey: .protectionMode)
-    await api.logEvent(id: "90442103", detail: "migrated v1.4.x (TestFlight) -> 1.5.x")
     return true
   }
 
@@ -152,6 +176,10 @@ private func saveDate(_ date: Date, forKey key: Key) {
 
 private func loadDate(forKey key: Key) -> Date? {
   UserDefaults.gertrude.object(forKey: key.rawValue) as? Date
+}
+
+private func removeKey(_ key: Key) {
+  UserDefaults.gertrude.removeObject(forKey: key.rawValue)
 }
 
 public extension DependencyValues {

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import IOSRoute
 import LibClients
 import os.log
 
@@ -56,11 +57,6 @@ public struct IOSReducer {
       state.disabledBlockGroups.toggle(group)
       return .none
 
-    case .sheetDismissed where state.screen == .onboarding(.major(.explainAppleFamily)):
-      self.deps.log(state.screen, action, "118d259f")
-      state.screen = .onboarding(.major(.askIfInAppleFamily))
-      return .none
-
     case .sheetDismissed:
       return .none
 
@@ -75,7 +71,7 @@ public struct IOSReducer {
 
     #if DEBUG
       case .receivedShake where state.screen == .onboarding(.happyPath(.hiThere)):
-        state.screen = .onboarding(.happyPath(.dontGetTrickedPreAuth))
+        state.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
         return .none
     #endif
 
@@ -131,7 +127,7 @@ public struct IOSReducer {
 
     case (.onboarding(.happyPath(.confirmMinorDevice)), .secondary):
       self.deps.log(state.screen, action, "a21c9040")
-      state.screen = .onboarding(.major(.explainHarderButPossible))
+      state.screen = .onboarding(.supervision(.setup(.explainSupervision)))
       return .none
 
     case (.onboarding(.happyPath(.confirmParentIsOnboarding)), .primary):
@@ -282,77 +278,6 @@ public struct IOSReducer {
       state.screen = .onboarding(.happyPath(.doneQuit))
       return .none
 
-      // MARK: - major (18+) path
-
-    case (.onboarding(.major(.explainHarderButPossible)), .primary):
-      self.deps.log(state.screen, action, "085eb5a6")
-      state.screen = .onboarding(.major(.askSelfOrOtherIsOnboarding))
-      return .none
-
-    case (.onboarding(.major(.askSelfOrOtherIsOnboarding)), .secondary):
-      self.deps.log(state.screen, action, "6d88421b")
-      state.onboarding.majorOnboarder = .other
-      state.screen = .onboarding(.major(.askIfOtherIsParent))
-      return .none
-
-    case (.onboarding(.major(.askIfOtherIsParent)), .primary):
-      self.deps.log(state.screen, action, "e0605ab9")
-      state.screen = .onboarding(.major(.explainFixAccountTypeEasyWay))
-      return .none
-
-    case (.onboarding(.major(.askIfOtherIsParent)), .secondary):
-      self.deps.log(state.screen, action, "db2a8c0b")
-      state.screen = .onboarding(.major(.askIfOwnsMac))
-      return .none
-
-    case (.onboarding(.major(.explainFixAccountTypeEasyWay)), .primary):
-      self.deps.log(state.screen, action, "1ed887e0")
-      state.screen = .onboarding(.happyPath(.confirmMinorDevice))
-      return .none
-
-    case (.onboarding(.major(.askSelfOrOtherIsOnboarding)), .tertiary):
-      self.deps.log(state.screen, action, "bbc0dac1", extra: "onboarder is self")
-      state.onboarding.majorOnboarder = .self
-      state.screen = .onboarding(.major(.askIfInAppleFamily))
-      return .none
-
-    case (.onboarding(.major(.askIfInAppleFamily)), .primary):
-      self.deps.log(state.screen, action, "605151b9")
-      state.screen = .onboarding(.major(.explainFixAccountTypeEasyWay))
-      return .none
-
-    case (.onboarding(.major(.askIfInAppleFamily)), .secondary):
-      self.deps.log(state.screen, action, "0fa6bc2a")
-      state.screen = .onboarding(.supervision(.intro))
-      return .none
-
-    case (.onboarding(.major(.askIfInAppleFamily)), .tertiary):
-      self.deps.log(state.screen, action, "d17b9ef6")
-      state.screen = .onboarding(.major(.explainAppleFamily))
-      return .none
-
-    case (.onboarding(.major(.explainAppleFamily)), .primary):
-      self.deps.log(state.screen, action, "62f783e1")
-      state.screen = .onboarding(.major(.askIfInAppleFamily))
-      return .none
-
-    case (.onboarding(.major(.explainFixAccountTypeEasyWay)), .secondary):
-      self.deps.log(state.screen, action, "fd166517")
-      state.screen = .onboarding(.major(.askIfOwnsMac))
-      return .none
-
-    case (.onboarding(.major(.askIfOwnsMac)), .primary):
-      self.deps.log(state.screen, action, "219ba991")
-      state.onboarding.ownsMac = true
-      state.screen = .onboarding(.supervision(.intro))
-      return .none
-
-    case (.onboarding(.major(.askIfOwnsMac)), .secondary):
-      self.deps.log(state.screen, action, "c1f63c92")
-      state.onboarding.ownsMac = false
-      state.screen = .onboarding(.supervision(.intro))
-      return .none
-
       // MARK: - apple family
 
     case (.onboarding(.appleFamily(.explainRequiredForFiltering)), .primary):
@@ -387,47 +312,250 @@ public struct IOSReducer {
       state.screen = .onboarding(.appleFamily(.checkIfInAppleFamily))
       return .none
 
-      // MARK: - supervision
+      // MARK: - supervision setup
 
-    case (.onboarding(.supervision(.intro)), .primary):
-      self.deps.log(state.screen, action, "ad77fbb6")
-      state.screen = .onboarding(.supervision(.explainSupervision))
+    case (.onboarding(.supervision(.setup(.explainSupervision))), .primary):
+      self.deps.log(state.screen, action, "261ba66b")
+      state.screen = .onboarding(.supervision(.setup(.costAndBranchPoint)))
       return .none
 
-    case (.onboarding(.supervision(.explainSupervision)), .primary):
-      if state.onboarding.ownsMac != true || state.onboarding.majorOnboarder == .self {
-        self.deps.log(state.screen, action, "896bc216", extra: "NEEDS friend w/ mac")
-        state.screen = .onboarding(.supervision(.explainNeedFriendWithMac))
-      } else {
-        self.deps.log(state.screen, action, "25a77e6a", extra: "HAS friend w/ mac")
-        state.screen = .onboarding(.supervision(.explainRequiresEraseAndSetup))
+    case (.onboarding(.supervision(.setup(.costAndBranchPoint))), .primary):
+      self.deps.log(state.screen, action, "a0f78c2c")
+      state.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.costAndBranchPoint))), .secondary):
+      self.deps.log(state.screen, action, "7023c325")
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.freeAlternativesHub))), .primary):
+      self.deps.log(state.screen, action, "422d0980")
+      state.screen = .onboarding(.supervision(.setup(.birthdayAlternativeExplain)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.freeAlternativesHub))), .secondary):
+      self.deps.log(state.screen, action, "a5229ef2")
+      state.screen = .onboarding(.supervision(.setup(.siblingAlternativeExplain)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.freeAlternativesHub))), .tertiary):
+      self.deps.log(state.screen, action, "ed672bfe")
+      state.screen = .onboarding(.supervision(.setup(.appleConfiguratorExplain)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.freeAlternativesHub))), .quaternary):
+      self.deps.log(state.screen, action, "7bbba656")
+      state.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.birthdayAlternativeExplain))), .primary):
+      self.deps.log(state.screen, action, "4c9db46e")
+      state.screen = .onboarding(.supervision(.setup(.birthdayAlternativeCons)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.birthdayAlternativeExplain))), .secondary):
+      self.deps.log(state.screen, action, "359543af")
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.birthdayAlternativeCons))), .primary):
+      self.deps.log(state.screen, action, "d567937a")
+      state.screen = .onboarding(.supervision(.setup(.birthdayAlternativeInstructions)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.birthdayAlternativeCons))), .secondary):
+      self.deps.log(state.screen, action, "b1c2d3e4")
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.birthdayAlternativeInstructions))), .primary):
+      self.deps.log(state.screen, action, "a6b17fd9")
+      state.screen = .onboarding(.supervision(.setup(.accountNowUnder18)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.siblingAlternativeExplain))), .primary):
+      self.deps.log(state.screen, action, "5cdeb42b")
+      state.screen = .onboarding(.supervision(.setup(.siblingAlternativeCons)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.siblingAlternativeExplain))), .secondary):
+      self.deps.log(state.screen, action, "8c2ed1a5")
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.siblingAlternativeCons))), .primary):
+      self.deps.log(state.screen, action, "f3a1b2c4")
+      state.screen = .onboarding(.supervision(.setup(.siblingAlternativeInstructions)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.siblingAlternativeCons))), .secondary):
+      self.deps.log(state.screen, action, "d4e5f6a7")
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.siblingAlternativeInstructions))), .primary):
+      self.deps.log(state.screen, action, "e5f6a7b8")
+      state.screen = .onboarding(.supervision(.setup(.accountNowUnder18)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.accountNowUnder18))), .primary):
+      self.deps.log(state.screen, action, "b7c8d9e0")
+      state.screen = .onboarding(.happyPath(.confirmParentIsOnboarding))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.appleConfiguratorExplain))), .primary):
+      self.deps.log(state.screen, action, "c6d7e8f9")
+      state.screen = .onboarding(.supervision(.setup(.appleConfiguratorCons(step: 1))))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.appleConfiguratorExplain))), .secondary):
+      self.deps.log(state.screen, action, "a0b1c2d3")
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.appleConfiguratorCons(let step)))), .primary):
+      self.deps.log(state.screen, action, "e4f5a6b7")
+      if step < 3 {
+        state.screen = .onboarding(.supervision(.setup(.appleConfiguratorCons(step: step + 1))))
       }
       return .none
 
-    case (.onboarding(.supervision(.explainNeedFriendWithMac)), .primary):
-      self.deps.log(state.screen, action, "0c5bdbdd")
-      state.screen = .onboarding(.supervision(.explainRequiresEraseAndSetup))
+    case (.onboarding(.supervision(.setup(.appleConfiguratorCons))), .secondary):
+      self.deps.log(state.screen, action, "c8d9e0f1")
+      state.screen = .onboarding(.supervision(.setup(.freeAlternativesHub)))
       return .none
 
-    case (.onboarding(.supervision(.explainNeedFriendWithMac)), .secondary):
-      self.deps.log(state.screen, action, "d858eaf8")
-      state.screen = .onboarding(.supervision(.sorryNoOtherWay))
+    case (.onboarding(.supervision(.setup(.explainNeedSomeoneElse))), .primary):
+      self.deps.log(state.screen, action, "39d56d1a")
+      return .run { [deps = self.deps] send in
+        if let data = deps.sharedStorage.loadPendingSupervisionCode(),
+           data.expiresAt > deps.now {
+          await send(.programmatic(.setScreen(.onboarding(
+            .supervision(.setup(.instructionsForProtector(code: data.code))),
+          ))))
+        } else {
+          await send(.programmatic(.setScreen(.onboarding(
+            .supervision(.setup(.generateSetupCode())),
+          ))))
+          do {
+            let data = try await deps.api.createSupervisionCode()
+            deps.sharedStorage.savePendingSupervisionCode(data)
+            await send(.programmatic(.supervisionCodeGenerated(code: data.code)))
+          } catch {
+            await send(.programmatic(.supervisionCodeGenerationFailed))
+          }
+        }
+      }
+
+    case (.onboarding(.supervision(.setup(.explainNeedSomeoneElse))), .secondary):
+      self.deps.log(state.screen, action, "f0a2d33c")
+      state.screen = .onboarding(.supervision(.setup(.selfManagementPlaceholder)))
       return .none
 
-    case (.onboarding(.supervision(.explainRequiresEraseAndSetup)), .primary):
-      self.deps.log(state.screen, action, "dc1521e6")
-      state.screen = .onboarding(.supervision(.instructions))
-      return .none
-
-    case (.onboarding(.supervision(.explainRequiresEraseAndSetup)), .secondary):
-      self.deps.log(state.screen, action, "bee80538")
-      state.screen = .onboarding(.supervision(.sorryNoOtherWay))
-      return .none
-
-    case (.onboarding(.supervision(.sorryNoOtherWay)), .secondary):
-      self.deps.log(state.screen, action, "f3b3f3b6")
+    case (.onboarding(.supervision(.setup(.selfManagementPlaceholder))), .primary):
+      self.deps.log(state.screen, action, "84555fc8")
       state.screen = .onboarding(.happyPath(.hiThere))
       return .none
+
+    // the only button on this screen is `retry` for a failure case
+    case (.onboarding(.supervision(.setup(.generateSetupCode(_)))), .primary):
+      self.deps.log(state.screen, action, "b530239d")
+      return .run { [deps = self.deps] send in
+        do {
+          let data = try await deps.api.createSupervisionCode()
+          deps.sharedStorage.savePendingSupervisionCode(data)
+          await send(.programmatic(.supervisionCodeGenerated(code: data.code)))
+        } catch {
+          await send(.programmatic(.supervisionCodeGenerationFailed))
+        }
+      }
+
+    case (.onboarding(.supervision(.setup(.instructionsForProtector(let code)))), .primary):
+      self.deps.log(state.screen, action, "0aea6b12")
+      state.screen = .onboarding(.supervision(.setup(.waitingForSupervision(code: code))))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.waitingForSupervision))), _):
+      self.deps.log(state.screen, action, "65dc5864")
+      return .none
+
+      // MARK: - supervision resume
+
+    case (.onboarding(.supervision(.resume(.codeNotClaimed(let code)))), .primary):
+      self.deps.log(state.screen, action, "ad87c533")
+      state.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.codeClaimedNotSupervised(_)))), .primary):
+      self.deps.log(state.screen, action, "f2729c3c")
+      state.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
+      return .run { [deps = self.deps] _ in
+        try await deps.api.selfReportSupervision(isSupervised: true)
+      }
+
+    case (.onboarding(.supervision(.resume(.codeClaimedNotSupervised(_)))), .secondary):
+      self.deps.log(state.screen, action, "36d7be7c")
+      state.screen = .onboarding(.supervision(.resume(.retrySupervision)))
+      return .run { [deps = self.deps] _ in
+        try await deps.api.selfReportSupervision(isSupervised: false)
+      }
+
+    case (.onboarding(.supervision(.resume(.retrySupervision))), .primary):
+      self.deps.log(state.screen, action, "d664b520")
+      if let code = self.deps.sharedStorage.loadPendingSupervisionCode()?.code {
+        state.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
+      } else {
+        self.deps.log(state.screen, action, "00b0c478", extra: "unreachable missing code")
+        state.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
+      }
+      return .none
+
+    case (.onboarding(.supervision(.resume(.promptInstallProfile))), .primary):
+      self.deps.log(state.screen, action, "7b5b4726")
+      state.screen = .onboarding(.supervision(.resume(.explainProfileDownload)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.explainProfileDownload))), .primary):
+      self.deps.log(state.screen, action, "0cc9747d")
+      return .run { [deps = self.deps] send in
+        let deviceId = deps.sharedStorage.loadAccountConnection()?.deviceId ?? .init(6)
+        let profileUrl = URL(string: "\(String.gertrudeApi)/ios-profile/\(deviceId)")!
+        await send(.programmatic(.setScreen(.onboarding(
+          .supervision(.resume(.installingProfile(profileUrl: profileUrl))),
+        ))))
+      }
+
+    case (.onboarding(.supervision(.resume(.installingProfile(_)))), _):
+      self.deps.log(state.screen, action, "f2e0454e")
+      state.screen = .onboarding(.supervision(.resume(.explainProfileInstall())))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.explainProfileInstall))), .primary):
+      self.deps.log(state.screen, action, "ee2f2b76")
+      state.screen = .onboarding(.supervision(.resume(.verifyingProfileInstall(didError: false))))
+      return .run { [deps = self.deps] send in
+        await send(.programmatic(deps.pollForFilter()))
+      }
+
+    case (.onboarding(.supervision(.resume(.verifyingProfileInstall))), .primary):
+      self.deps.log(state.screen, action, "d0d44fe4")
+      state.screen = .onboarding(.supervision(.resume(.verifyingProfileInstall(didError: false))))
+      return .run { [deps = self.deps] send in
+        await send(.programmatic(deps.pollForFilter()))
+      }
+
+    case (.onboarding(.supervision(.resume(.profileInstalled))), .primary):
+      self.deps.log(state.screen, action, "4af7783e")
+      state.screen = .onboarding(.supervision(.resume(.setupComplete)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.setupComplete))), .primary):
+      self.deps.log(state.screen, action, "6ed43005")
+      state.screen = .running(state: .connected)
+      return .run { [deps = self.deps] _ in
+        deps.sharedStorage.clearPendingSupervisionCode()
+      }
 
     // MARK: - error paths
 
@@ -454,7 +582,7 @@ public struct IOSReducer {
 
     case (.onboarding(.authFail(.invalidAccount(.confirmIsMinor))), .primary):
       self.deps.log(state.screen, action, "9d0d9eac")
-      state.screen = .onboarding(.major(.explainHarderButPossible))
+      state.screen = .onboarding(.supervision(.setup(.explainSupervision)))
       return .none
 
     case (.onboarding(.authFail(.invalidAccount(.confirmIsMinor))), .secondary):
@@ -538,40 +666,67 @@ public struct IOSReducer {
           if await deps.sharedStorage.migrateLegacyData() {
             deps.log("migration performed by app", "5258e97c")
           }
-          let connection = deps.sharedStorage.loadAccountConnection()
-          let filterRunning = await deps.systemExtension.filterRunning()
-          let disabledBlockGroups = deps.sharedStorage.loadDisabledBlockGroups()
-          switch (connection, filterRunning, disabledBlockGroups) {
 
-          // state: normal launch, ACCOUNT CONNECTED
-          case (.some(let conn), /* filter on: */ true, /* groups: */ _):
-            await send(.programmatic(.setScreen(.running(state: .connected))))
-            await deps.api.setAuthToken(conn.token)
+          switch try await deps.launchState() {
 
-          // state: normal launch, NO ACCOUNT
-          case ( /* conn: */ nil, /* filter on: */ true, /* groups: */ .some):
+          case .running(.unconnected):
             await send(.programmatic(.setScreen(.running(state: .notConnected))))
 
-          // state: first launch / onboarding needed
-          case ( /* conn: */ _, /* filter on: */ false, /* groups: */ .none):
+          case .running(.connected(let conn)):
+            await send(.programmatic(.setScreen(.running(state: .connected))))
+            await deps.receiveAccountConnection(conn)
+            deps.sharedStorage.clearPendingSupervisionCode()
+
+          case .onboardingNeeded:
+            deps.log("onboarding needed on launch", "7a539f70")
             await send(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere)))))
             if let featureFlag = try? await deps.api.connectAccountFeatureFlag() {
               await send(.programmatic(.receivedConnectAccountFeatureFlag(featureFlag)))
             }
 
-          // state: unusual - filter not running but block groups stored
-          case ( /* conn: */ _, /* filter on: */ false, /* groups: */ .some):
-            // NB: if they remove the filter via Settings then launch app, we'll get here
-            deps.log("non-running filter w/ stored groups", "23c207e2")
+          case .gertrudeSupervisionReboot(.codeNotClaimed(let code)):
+            deps.log("supervision reboot code not claimed", "e9b86e6b")
+            await send(.programmatic(
+              .setScreen(.onboarding(.supervision(.resume(.codeNotClaimed(code: code))))),
+            ))
+
+          case .gertrudeSupervisionReboot(.codeClaimedNotSupervised(let conn)):
+            deps.log("supervision reboot code claimed not supervised", "80580cd5")
+            await deps.receiveAccountConnection(conn)
+            await send(.programmatic(
+              .setScreen(.onboarding(.supervision(.resume(.codeClaimedNotSupervised())))),
+            ))
+
+          case .gertrudeSupervisionReboot(.codeExpired), .gertrudeSupervisionReboot(.codeNotFound):
+            deps.log("supervision reboot code expired/not found", "0b15e23f")
+            deps.sharedStorage.clearPendingSupervisionCode()
             await send(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere)))))
 
-          // state: first launch SUPERVISION
-          case ( /* conn: */ _, /* filter on: */ true, /* groups: */ .none):
-            deps.log("supervision success first launch", "bad8adcc")
+          case .gertrudeSupervisionReboot(.supervisedButNeedsProfile(let conn)):
+            deps.log("supervision reboot supervised but needs profile", "05a47c3a")
+            await deps.receiveAccountConnection(conn)
+            await send(.programmatic(
+              .setScreen(.onboarding(.supervision(.resume(.promptInstallProfile)))),
+            ))
+
+          case .gertrudeSupervisionReboot(.serverClientDisagreement(let conn)):
+            deps.log("server/client supervision state disagreement", "94991de7")
+            await deps.receiveAccountConnection(conn)
+            await send(.programmatic(
+              .setScreen(.onboarding(.supervision(.resume(.promptInstallProfile)))),
+            ))
+
+          case .configuratorSupervisionFirstLaunch:
+            deps.log("configurator supervision success first launch", "bad8adcc")
             await send(.programmatic(.setScreen(.supervisionSuccessFirstLaunch)))
             if let featureFlag = try? await deps.api.connectAccountFeatureFlag() {
               await send(.programmatic(.receivedConnectAccountFeatureFlag(featureFlag)))
             }
+
+          case .filterNoLongerRunning:
+            // NB: if they remove the filter via Settings then launch app, we'll get here
+            deps.log("non-running filter w/ stored groups", "23c207e2")
+            await send(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere)))))
           }
         },
         // handle first launch
@@ -685,19 +840,74 @@ public struct IOSReducer {
     case .receivedConnectAccountFeatureFlag(let feature):
       state.onboarding.connectFeature = feature
       return .none
+
+    case .supervisionCodeGenerated(let code):
+      self.deps.log(action, "fcba8692")
+      state.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
+      return .none
+
+    case .supervisionCodeGenerationFailed:
+      self.deps.log(action, "498796d3")
+      state.screen = .onboarding(.supervision(.setup(.generateSetupCode(didError: true))))
+      return .none
+
+    case .filterVerified:
+      self.deps.log(action, "a7e31b8f")
+      state.screen = .onboarding(.supervision(.resume(.profileInstalled)))
+      return .run { [deps = self.deps] _ in
+        _ = try? await deps.api.markSetupComplete()
+      }
+
+    case .filterVerificationFailed:
+      self.deps.log(action, "c4d92e1a")
+      state.screen = .onboarding(.supervision(.resume(.verifyingProfileInstall(didError: true))))
+      return .none
+
+    case .appDidEnterForeground
+      where state.screen == .onboarding(.supervision(.resume(.explainProfileInstall()))):
+      state.screen = .onboarding(.supervision(.resume(.explainProfileInstall(regainedFocus: true))))
+      return .none
+
+    case .appDidEnterForeground
+      where state.screen == .onboarding(.supervision(.resume(.codeClaimedNotSupervised()))):
+      state.screen =
+        .onboarding(.supervision(.resume(.codeClaimedNotSupervised(regainedFocus: true))))
+      return .none
+
+    case .appDidEnterForeground:
+      return .none
+
+    case .appDidEnterBackground:
+      return .none
     }
   }
 
   func destination(state: inout State, action: Destination.Action) -> Effect<Action> {
     switch action {
-    case .connectAccount(.connectionSucceeded(childData: let data)):
+    case .connectAccount(.connectionSucceeded(childData: let conn)):
       state.screen = .onboarding(.happyPath(.connectSuccess))
-      return .run { [deps = self.deps] send in
-        await deps.api.setAuthToken(data.token)
-        deps.sharedStorage.saveAccountConnection(data)
+      return .run { [deps = self.deps] _ in
+        await deps.receiveAccountConnection(conn)
       }
     default:
       return .none
     }
+  }
+}
+
+extension IOSReducer.Deps {
+  func receiveAccountConnection(_ conn: ChildIOSDeviceData_v2) async {
+    await self.api.setAccountConnection(conn)
+    self.sharedStorage.saveAccountConnection(conn)
+  }
+
+  func pollForFilter() async -> IOSReducer.Action.Programmatic {
+    for _ in 0 ..< 6 {
+      if await self.systemExtension.filterRunning() {
+        return .filterVerified
+      }
+      try? await self.clock.sleep(for: .milliseconds(500))
+    }
+    return .filterVerificationFailed
   }
 }
