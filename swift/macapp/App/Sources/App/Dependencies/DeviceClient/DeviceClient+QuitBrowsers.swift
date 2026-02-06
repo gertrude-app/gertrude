@@ -89,6 +89,7 @@ private let hardcodedNames = [
   "Firefox Developer Edition",
   "Chromium",
   "Opera",
+  "Opera GX",
   "Microsoft Edge",
   "Sizzy",
   "Vivaldi",
