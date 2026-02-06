@@ -69,8 +69,7 @@ describe(`supervise device claim flow`, () => {
       cy.visit(`/supervise-device/123456/claim`);
 
       cy.wait(`@GetClaimDeviceData`);
-      cy.contains(`What should we call this person?`);
-      cy.get(`input[placeholder="e.g. Luke"]`).should(`exist`);
+      cy.get(`[data-test="child-name-input"]`).should(`exist`);
     });
 
     it(`redirects to login if not authenticated`, () => {

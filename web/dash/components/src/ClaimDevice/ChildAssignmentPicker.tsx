@@ -7,6 +7,7 @@ export type ChildSelection =
 
 type Props = {
   children: Array<{ id: UUID; name: string }>;
+  deviceType: string;
   onSubmit: (selection: ChildSelection) => void;
   onCancel: () => void;
   isSubmitting: boolean;
@@ -17,6 +18,7 @@ const NEW_CHILD_VALUE = `__new__`;
 
 const ChildAssignmentPicker: React.FC<Props> = ({
   children,
+  deviceType,
   onSubmit,
   onCancel,
   isSubmitting,
@@ -50,14 +52,12 @@ const ChildAssignmentPicker: React.FC<Props> = ({
     return (
       <form onSubmit={handleSubmit} className="w-full">
         <div className="mb-6">
-          <h3 className="text-slate-700 font-medium mb-3">
-            What should we call this person?
-          </h3>
+          <h3 className="text-slate-700 font-medium mb-3">Name of {deviceType} owner:</h3>
           <TextInput
             type="text"
             value={newChildName}
             setValue={setNewChildName}
-            placeholder="e.g. Luke"
+            testId="child-name-input"
             autoFocus
             disabled={isSubmitting}
           />
