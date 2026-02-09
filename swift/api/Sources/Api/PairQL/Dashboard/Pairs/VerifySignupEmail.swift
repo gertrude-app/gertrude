@@ -36,15 +36,6 @@ extension VerifySignupEmail: Resolver {
       parent.emailVerifiedAt = get(dependency: \.date.now)
       try await context.db.update(parent)
 
-      let now = get(dependency: \.date.now)
-      try await context.db.create(Subscription(
-        parentId: parent.id,
-        tier: .full,
-        billingStatus: .trialing,
-        trialStartedAt: now,
-        statusExpiresAt: now + Plan.Full.trialLengthDays - Plan.Full.trialWarningDays,
-      ))
-
       // they get a default "verified" notification method, since they verified email
       try await context.db.create(Parent.NotificationMethod(
         parentId: parent.id,
