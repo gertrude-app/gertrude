@@ -352,8 +352,10 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.StartFullTrial.Output>(input, `StartFullTrial`, `parent`);
   };
 
-  public stripeUrl = (input: P.StripeUrl.Input): Promise<Result<P.StripeUrl.Output>> => {
-    return this.query<P.StripeUrl.Output>(input, `StripeUrl`, `parent`);
+  public stripeUrl = (
+    input: P.StripeUrl_v2.Input,
+  ): Promise<Result<P.StripeUrl_v2.Output>> => {
+    return this.query<P.StripeUrl_v2.Output>(input, `StripeUrl_v2`, `parent`);
   };
 
   public toggleChildKeychain = (

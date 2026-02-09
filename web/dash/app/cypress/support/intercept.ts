@@ -151,7 +151,7 @@ export function interceptPql(
   slug: `StartFullTrial`,
   output: T.StartFullTrial.Output,
 ): void;
-export function interceptPql(slug: `StripeUrl`, output: T.StripeUrl.Output): void;
+export function interceptPql(slug: `StripeUrl_v2`, output: T.StripeUrl_v2.Output): void;
 export function interceptPql(
   slug: `ToggleChildKeychain`,
   output: T.ToggleChildKeychain.Output,
@@ -233,7 +233,7 @@ export function forcePqlErr(
     | `SendPasswordResetEmail`
     | `Signup`
     | `StartFullTrial`
-    | `StripeUrl`
+    | `StripeUrl_v2`
     | `ToggleChildKeychain`
     | `UpdateIOSDevice`
     | `UpdateUnlockRequest`

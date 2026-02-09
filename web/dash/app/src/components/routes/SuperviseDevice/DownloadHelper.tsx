@@ -1,13 +1,24 @@
-import { ApiErrorMessage, Loading, PageHeading } from '@dash/components';
+import { ApiErrorMessage, Loading } from '@dash/components';
+import { Result } from '@shared/pairql';
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Current from '../../../environment';
-import { Key, useQuery } from '../../../hooks';
-import { DownloadHelperScreen } from './screens';
+import { Key, useFireAndForget, useQuery } from '../../../hooks';
+import { DownloadHelperScreen, ScreenShell } from './screens';
 
 const SuperviseDeviceDownloadHelper: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get(`session_id`);
+
+  useFireAndForget(
+    () => {
+      if (!sessionId) return Result.resolveUnexpected(`a7f2c301`);
+      return Current.api.handleCheckoutSuccess({ stripeCheckoutSessionId: sessionId });
+    },
+    { when: !!sessionId },
+  );
 
   const query = useQuery(Key.supervisionDeviceStatus(code), () =>
     Current.api.getSupervisionDeviceStatus({ code: parseInt(code ?? `0`, 10) }),
@@ -37,18 +48,15 @@ const SuperviseDeviceDownloadHelper: React.FC = () => {
   };
 
   return (
-    <div className="relative max-w-3xl">
-      <PageHeading icon="phone">Continue {deviceType} Setup</PageHeading>
-      <div className="mt-8 bg-white rounded-2xl border border-slate-200 p-6">
-        <DownloadHelperScreen
-          childName={childName}
-          modelName={modelName}
-          iosVersion={iosVersion}
-          onDownload={handleDownload}
-          onNext={handleNext}
-        />
-      </div>
-    </div>
+    <ScreenShell title={`Continue ${deviceType} Setup`}>
+      <DownloadHelperScreen
+        childName={childName}
+        modelName={modelName}
+        iosVersion={iosVersion}
+        onDownload={handleDownload}
+        onNext={handleNext}
+      />
+    </ScreenShell>
   );
 };
 

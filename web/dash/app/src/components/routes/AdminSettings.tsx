@@ -26,7 +26,11 @@ const AdminSettings: React.FC = () => {
   });
 
   const getStripeUrl = useMutation((tier: `full` | `light` | null) =>
-    Current.api.stripeUrl(tier),
+    Current.api.stripeUrl({
+      successPath: `/checkout-success`,
+      cancelPath: `/checkout-cancel`,
+      tier: tier ?? undefined,
+    }),
   );
 
   const deleteNotification = useConfirmableDelete(`parentNotification`, {
