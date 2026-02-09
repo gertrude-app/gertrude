@@ -25,7 +25,6 @@ enum AuthedParentRoute: PairRoute {
   case getUnlockRequests
   case getChild(GetChild.Input)
   case getChildren
-  case getUser(GetUser.Input)
   case handleCheckoutCancel(HandleCheckoutCancel.Input)
   case handleCheckoutSuccess(HandleCheckoutSuccess.Input)
   case iosDevice(IOSApp.Device.Id)
@@ -36,7 +35,6 @@ enum AuthedParentRoute: PairRoute {
   case childActivitySummaries(ChildActivitySummaries.Input)
   case combinedUsersActivityFeed(CombinedUsersActivityFeed.Input)
   case familyActivitySummaries(FamilyActivitySummaries.Input)
-  case getUsers
   case getUserUnlockRequests(GetUserUnlockRequests.Input)
   case saveDevice(SaveDevice.Input)
   case saveKey(SaveKey.Input)
@@ -146,10 +144,6 @@ extension AuthedParentRoute {
       Route(.case(Self.getChildren)) {
         Operation(GetChildren.self)
       }
-      Route(.case(Self.getUser)) {
-        Operation(GetUser.self)
-        Body(.dashboardInput(GetUser.self))
-      }
       Route(.case(Self.handleCheckoutCancel)) {
         Operation(HandleCheckoutCancel.self)
         Body(.dashboardInput(HandleCheckoutCancel.self))
@@ -176,9 +170,6 @@ extension AuthedParentRoute {
       Route(.case(Self.combinedUsersActivityFeed)) {
         Operation(CombinedUsersActivityFeed.self)
         Body(.dashboardInput(CombinedUsersActivityFeed.self))
-      }
-      Route(.case(Self.getUsers)) {
-        Operation(GetUsers.self)
       }
       Route(.case(Self.getUserUnlockRequests)) {
         Operation(GetUserUnlockRequests.self)
@@ -261,12 +252,6 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getChildren:
       let output = try await GetChildren.resolve(in: context)
-      return try await self.respond(with: output)
-    case .getUser(let uuid):
-      let output = try await GetUser.resolve(with: uuid, in: context)
-      return try await self.respond(with: output)
-    case .getUsers:
-      let output = try await GetUsers.resolve(in: context)
       return try await self.respond(with: output)
     case .saveUser(let input):
       let output = try await SaveUser.resolve(with: input, in: context)

@@ -4,6 +4,16 @@ import Foundation
 import Gertie
 import PairQL
 
+struct UserKeychainSummary: PairNestable {
+  var id: Api.Keychain.Id
+  var parentId: Parent.Id
+  var name: String
+  var description: String?
+  var isPublic: Bool
+  var numKeys: Int
+  var schedule: RuleSchedule?
+}
+
 struct GetChild: Pair {
   static let auth: ClientAuth = .parent
 
@@ -102,6 +112,36 @@ extension GetChild: Resolver {
       },
       blockedApps: blockedApps,
       createdAt: child.createdAt,
+    )
+  }
+}
+
+// TODO: this is major N+1 territory, write a custom query w/ join for perf
+// @see also ruleKeychains(for:in:)
+func childKeychainSummaries(
+  for childId: Child.Id,
+  in db: any DuetSQL.Client,
+) async throws -> [UserKeychainSummary] {
+  let childKeychains = try await ChildKeychain.query()
+    .where(.childId == childId)
+    .all(in: db)
+  let keychains = try await Keychain.query()
+    .where(.id |=| childKeychains.map(\.keychainId))
+    .all(in: db)
+  return try await keychains.concurrentMap { keychain in
+    let numKeys = try await db.count(
+      Key.self,
+      where: .keychainId == keychain.id,
+      withSoftDeleted: false,
+    )
+    return .init(
+      id: keychain.id,
+      parentId: keychain.parentId,
+      name: keychain.name,
+      description: keychain.description,
+      isPublic: keychain.isPublic,
+      numKeys: numKeys,
+      schedule: childKeychains.first { $0.keychainId == keychain.id }?.schedule,
     )
   }
 }
