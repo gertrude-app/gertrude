@@ -33,6 +33,12 @@ public extension String {
   }
 }
 
+public extension URL {
+  static func profileDownload(deviceId: UUID) -> URL {
+    URL(string: "\(String.gertrudeApi)/ios-profile/\(deviceId)")!
+  }
+}
+
 enum Configuration {
   enum Error: Swift.Error {
     case missingKey, invalidValue
