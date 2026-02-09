@@ -9,6 +9,7 @@ extension IOSApp {
     var appVersion: String
     var iosVersion: String
     var webPolicy: String
+    var isProfileLocked: Bool
     var createdAt = Date()
     var updatedAt = Date()
 
@@ -19,6 +20,7 @@ extension IOSApp {
       appVersion: String,
       iosVersion: String,
       webPolicy: String = "blockAll",
+      isProfileLocked: Bool = true,
     ) {
       self.id = id
       self.childId = childId
@@ -26,6 +28,7 @@ extension IOSApp {
       self.appVersion = appVersion
       self.iosVersion = iosVersion
       self.webPolicy = webPolicy
+      self.isProfileLocked = isProfileLocked
     }
   }
 }

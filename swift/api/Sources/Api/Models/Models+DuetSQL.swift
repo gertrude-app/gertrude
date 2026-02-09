@@ -135,6 +135,7 @@ extension IOSApp.Device: Model {
     case .appVersion: .string(self.appVersion)
     case .iosVersion: .string(self.iosVersion)
     case .webPolicy: .string(self.webPolicy)
+    case .isProfileLocked: .bool(self.isProfileLocked)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -148,6 +149,7 @@ extension IOSApp.Device: Model {
       .appVersion: .string(self.appVersion),
       .iosVersion: .string(self.iosVersion),
       .webPolicy: .string(self.webPolicy),
+      .isProfileLocked: .bool(self.isProfileLocked),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

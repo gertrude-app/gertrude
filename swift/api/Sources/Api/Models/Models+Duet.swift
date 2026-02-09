@@ -110,6 +110,7 @@ extension IOSApp.Device {
     case appVersion
     case iosVersion
     case webPolicy
+    case isProfileLocked
     case createdAt
     case updatedAt
   }
