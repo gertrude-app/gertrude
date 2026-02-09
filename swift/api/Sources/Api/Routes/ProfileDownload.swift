@@ -36,7 +36,6 @@ enum ProfileDownloadRoute {
 // @see https://developer.apple.com/documentation/devicemanagement/webcontentfilter
 // `DenyListURLS` is interesting, can specify 500 URLs, could put top 500 porn sites there...
 // `SafariHistoryRetentionEnabled`, also cool, kills private mode, and history clearing
-// TODO: research/implement PayloadRemovalDisallowed
 func generateProfileXml(for device: IOSApp.Device) -> String {
   """
   <?xml version="1.0" encoding="UTF-8"?>
@@ -60,6 +59,9 @@ func generateProfileXml(for device: IOSApp.Device) -> String {
 
       <key>PayloadDescription</key>
       <string>This profile allows the device to be securely managed by a Gertrude account.</string>
+
+      <key>PayloadRemovalDisallowed</key>
+      <\(device.isProfileLocked ? "true" : "false")/>
 
       <key>PayloadContent</key>
       <array>

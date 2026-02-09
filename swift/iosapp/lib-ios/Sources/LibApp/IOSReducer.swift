@@ -520,7 +520,7 @@ public struct IOSReducer {
       self.deps.log(state.screen, action, "0cc9747d")
       return .run { [deps = self.deps] send in
         let deviceId = deps.sharedStorage.loadAccountConnection()?.deviceId ?? .init(6)
-        let profileUrl = URL(string: "\(String.gertrudeApi)/ios-profile/\(deviceId)")!
+        let profileUrl = URL.profileDownload(deviceId: deviceId)
         await send(.programmatic(.setScreen(.onboarding(
           .supervision(.resume(.installingProfile(profileUrl: profileUrl))),
         ))))

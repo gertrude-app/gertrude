@@ -68,6 +68,7 @@ extension Configure {
     app.migrations.add(SmsSends())
     app.migrations.add(SecurityEventNotificationTriggers())
     app.migrations.add(SubscriptionRefactor())
+    app.migrations.add(AddProfileLocked())
   }
 }
 

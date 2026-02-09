@@ -38,6 +38,13 @@ struct InfoView: View {
           self.explainClearCacheView2
         case .clearingCache:
           EmptyView()
+        case .syncingProfile(let url):
+          ProfileDownloadView(
+            profileUrl: url,
+            osMajorVersion: ProcessInfo.processInfo.operatingSystemVersion.majorVersion,
+          ) {
+            self.store.send(.profileDownloadDismissed)
+          }
         }
       }
     }
@@ -149,6 +156,14 @@ struct InfoView: View {
           Spacer()
 
           VStack(spacing: 12) {
+            if connection.supervised != nil {
+              BigButton(
+                "Sync Profile",
+                type: .button { self.store.send(.syncProfileTapped) },
+                variant: .primary,
+                icon: "arrow.triangle.2.circlepath",
+              )
+            }
             BigButton(
               "Clear Cache",
               type: .button { self.store.send(.clearCacheTapped) },
@@ -297,6 +312,44 @@ struct InfoView: View {
         token: UUID(),
         deviceId: UUID(),
         childName: "Emma Johnson",
+      ),
+      vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+      numRules: 87,
+    ),
+  ) {
+    InfoFeature()
+  })
+  .environment(\.colorScheme, .dark)
+}
+
+#Preview("Supervised - Light") {
+  InfoView(store: .init(
+    initialState: .init(
+      connection: .init(
+        childId: UUID(uuidString: "123e4567-e89b-12d3-a456-426614174000")!,
+        token: UUID(),
+        deviceId: UUID(),
+        childName: "Emma Johnson",
+        supervised: .byGertrude(claimCode: 123_456),
+      ),
+      vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+      numRules: 87,
+    ),
+  ) {
+    InfoFeature()
+  })
+  .environment(\.colorScheme, .light)
+}
+
+#Preview("Supervised - Dark") {
+  InfoView(store: .init(
+    initialState: .init(
+      connection: .init(
+        childId: UUID(uuidString: "123e4567-e89b-12d3-a456-426614174000")!,
+        token: UUID(),
+        deviceId: UUID(),
+        childName: "Emma Johnson",
+        supervised: .byGertrude(claimCode: 123_456),
       ),
       vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
       numRules: 87,

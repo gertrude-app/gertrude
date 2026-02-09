@@ -38,6 +38,7 @@ public struct InfoFeature {
     case explainClearCache1
     case explainClearCache2
     case clearingCache
+    case syncingProfile(URL)
   }
 
   public enum Action: Equatable {
@@ -47,6 +48,8 @@ public struct InfoFeature {
     case explainClearCacheNextTapped
     case cancelClearCacheTapped
     case clearCache(ClearCacheFeature.Action)
+    case syncProfileTapped
+    case profileDownloadDismissed
   }
 
   struct Deps: Sendable {
@@ -82,6 +85,15 @@ public struct InfoFeature {
             try await deps.filter.send(notification: .rulesChanged)
           }
         }
+
+      case .syncProfileTapped:
+        let deviceId = state.connection?.deviceId ?? state.vendorId ?? .init(6)
+        state.subScreen = .syncingProfile(.profileDownload(deviceId: deviceId))
+        return .none
+
+      case .profileDownloadDismissed:
+        state.subScreen = .main
+        return .none
 
       case .clearCacheTapped:
         state.subScreen = .explainClearCache1
