@@ -11,6 +11,10 @@ LOCAL_API_URL = https:/$()/REPLACE.ngrok-free.app
 
 ## Release notes
 
+- `1.6.1` (testflight) (2/9/26)
+  - add sync profile button to test profile removal/replace
+- `1.6.0` (testflight) (2/2/26)
+  - supervision work for initial e2e testing
 - `1.5.0` (11/22/25)
   - battery fix, new faux-heartbeat
   - connect to account (hidden behind feature flag)
