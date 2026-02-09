@@ -12,5 +12,6 @@ export namespace GetSupervisionDeviceStatus {
     deviceType: string;
     iosVersion: string;
     supervisionStatus: `awaitingSupervision` | `supervised`;
+    requiresPayment: boolean;
   }
 }
