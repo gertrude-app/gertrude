@@ -18,6 +18,7 @@ export const Default: Story = props({
   startAddDevice: () => {},
   dismissAddDevice: () => {},
   dismissAnnouncement: () => {},
+  onStartTrial: () => {},
   addDeviceRequest: { state: `idle` },
   unlockRequests: withIdsAnd({ childId: `child1` }, [
     {

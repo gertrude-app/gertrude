@@ -60,6 +60,7 @@ const EditKeychain: React.FC<Props> = ({
         title={editingKey?.isNew ? `Create a new key` : `Edit key`}
         isOpen={!!editingKey}
         primaryButton={{
+          type: `action`,
           label: (
             <>
               {editingKey?.isNew ? `Create` : `Save`} key
@@ -69,7 +70,7 @@ const EditKeychain: React.FC<Props> = ({
           action: onKeySave,
           disabled: keyModalSaveButtonDisabled,
         }}
-        secondaryButton={{ action: dismissEditKeyModal }}
+        secondaryButton={{ type: `action`, action: dismissEditKeyModal }}
       >
         {editingKey && (
           <KeyCreator update={updateEditingKey} {...editingKey} apps={apps} />

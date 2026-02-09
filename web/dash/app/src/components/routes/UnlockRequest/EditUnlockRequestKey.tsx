@@ -36,7 +36,11 @@ const EditUnlockRequestKey: React.FC = () => {
       <ErrorModal
         title="Error accepting unlock request"
         error={accept.error}
-        primaryButton={{ label: `Try again`, action: () => navigate(`..`) }}
+        primaryButton={{
+          type: `action`,
+          label: `Try again`,
+          action: () => navigate(`..`),
+        }}
       />
     );
   }
@@ -60,10 +64,12 @@ const EditUnlockRequestKey: React.FC = () => {
       title="Review/edit unlocking key"
       onDismiss={() => navigate(`../..`)}
       secondaryButton={{
+        type: `action`,
         label: <>&larr; Back</>,
         action: () => navigate(`../select-keychain`),
       }}
       primaryButton={{
+        type: `action`,
         label: <>Submit &rarr;</>,
         action: () => accept.mutate(key),
         disabled: toKeyRecord(key) === null,

@@ -38,6 +38,7 @@ export const Default: Story = props({
   onAddKeychainClicked: () => {},
   startAddDevice: () => {},
   dismissAddDevice: () => {},
+  onStartTrial: () => {},
   deleteUser: confirmableEntityAction(),
   deleteDevice: confirmableEntityAction(),
   downtimeEnabled: false,

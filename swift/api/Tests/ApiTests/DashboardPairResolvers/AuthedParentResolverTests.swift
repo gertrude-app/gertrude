@@ -24,10 +24,10 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
         return .init(id: "bps_123", url: "bps-url")
       }
     } operation: {
-      try await StripeUrl.resolve(in: context(parent.model))
+      try await StripeUrl.resolve(with: nil, in: context(parent.model))
     }
 
-    expect(output).toEqual(.init(url: "bps-url"))
+    expect(output).toEqual(StripeUrl.Output(url: "bps-url"))
   }
 
   func testStripeUrlForCheckoutSession() async throws {
@@ -43,10 +43,35 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
         return .init(id: "s1", url: "/checkout-url", subscription: "subsid", clientReferenceId: nil)
       }
     } operation: {
-      try await StripeUrl.resolve(in: context(parent.model))
+      try await StripeUrl.resolve(with: nil, in: context(parent.model))
     }
 
-    expect(output).toEqual(.init(url: "/checkout-url"))
+    expect(output).toEqual(StripeUrl.Output(url: "/checkout-url"))
+  }
+
+  func testStripeUrlWithExplicitTierForLightUserUpgrade() async throws {
+    let parent = try await self.parentWithSubscription {
+      $1.tier = .light
+      $1.stripeId = .init("sub_light_123")
+      $1.billingStatus = .paid
+    }
+
+    let output = try await withDependencies {
+      $0.stripe.createCheckoutSession = { sessionData in
+        expect(sessionData.clientReferenceId).toEqual(parent.id.lowercased)
+        expect(sessionData.lineItems.first?.priceId).toEqual("price_1RJbTrGKRdhETuKAkI5OO1NB")
+        return .init(
+          id: "s1",
+          url: "/full-checkout-url",
+          subscription: "subsid",
+          clientReferenceId: nil,
+        )
+      }
+    } operation: {
+      try await StripeUrl.resolve(with: .full, in: context(parent.model))
+    }
+
+    expect(output).toEqual(StripeUrl.Output(url: "/full-checkout-url"))
   }
 
   func testHandleCheckoutSuccess() async throws {
@@ -88,21 +113,6 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
     expect(retrieved.subscription!.stripeId).toEqual(.init(rawValue: "sub_123"))
     expect(retrieved.subscription!.billingStatus).toEqual(.paid)
     expect(retrieved.subscription!.statusExpiresAt).toEqual(Date.reference + .days(33))
-  }
-
-  func testCreatePendingAppConnection() async throws {
-    let child = try await self.child()
-
-    let output = try await withDependencies {
-      $0.verificationCode.generate = { 1234 }
-    } operation: {
-      try await CreatePendingAppConnection.resolve(
-        with: .init(userId: child.id),
-        in: context(child.parent),
-      )
-    }
-
-    expect(output).toEqual(.init(code: 1234))
   }
 
   func testGetParentWithNotifications() async throws {

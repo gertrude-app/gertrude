@@ -1,6 +1,7 @@
 import Foundation
 import PairQL
 
+/// deprecated, remove after 2/19/26
 struct CreatePendingAppConnection: Pair {
   static let auth: ClientAuth = .parent
 

@@ -216,6 +216,7 @@ const IOSDevice: React.FC = () => {
         title={state.editingBlockRule?.id ? `Edit Block Rule` : `Create Block Rule`}
         isOpen={!!state.editingBlockRule}
         primaryButton={{
+          type: `action`,
           label: state.editingBlockRule?.id ? `Save` : `Create`,
           action: () => {
             saveBlockRule.mutate(undefined);
@@ -225,7 +226,10 @@ const IOSDevice: React.FC = () => {
             !validate.blockRuleProps(state.editingBlockRule) ||
             saveBlockRule.isPending,
         }}
-        secondaryButton={{ action: () => dispatch({ type: `dismissBlockRule` }) }}
+        secondaryButton={{
+          type: `action`,
+          action: () => dispatch({ type: `dismissBlockRule` }),
+        }}
       >
         {state.editingBlockRule && (
           <BlockRuleEditor

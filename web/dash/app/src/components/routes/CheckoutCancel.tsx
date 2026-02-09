@@ -20,10 +20,12 @@ const CheckoutCancel: React.FC = () => {
       icon="exclamation-triangle"
       isOpen
       primaryButton={{
+        type: `action`,
         label: `Back to settings →`,
         action: () => navigate(`/settings`),
       }}
       secondaryButton={{
+        type: `action`,
         label: `Contact support`,
         action: () => (window.location.href = `https://gertrude.app/contact`),
       }}

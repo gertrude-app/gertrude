@@ -38,10 +38,12 @@ const ReviewUnlockRequestRoute: React.FC = () => {
       title="Unlock Request"
       onDismiss={() => navigate(`../..`)}
       primaryButton={{
+        type: `action`,
         label: <>Accept &rarr;</>,
         action: () => navigate(`../select-keychain`),
       }}
       secondaryButton={{
+        type: `action`,
         label: `Deny`,
         action: () => navigate(`../deny`),
       }}

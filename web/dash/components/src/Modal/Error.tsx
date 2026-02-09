@@ -33,6 +33,7 @@ const Error: React.FC<Props> = ({
     secondaryButton={
       secondaryButton === `contactSupport`
         ? {
+            type: `action`,
             label: `Contact support`,
             action: () => (window.location.href = `https://gertrude.app/contact`),
           }

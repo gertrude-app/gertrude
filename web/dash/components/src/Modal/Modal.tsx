@@ -12,25 +12,23 @@ import React, { useEffect, useRef } from 'react';
 import type { IconType } from '../GradientIcon';
 import GradientIcon from '../GradientIcon';
 
+type ButtonAction =
+  | (() => unknown)
+  | {
+      type: `action`;
+      action(): unknown;
+      label?: string | React.ReactNode;
+      disabled?: boolean;
+    }
+  | { type: `link`; to: string; label: string | React.ReactNode };
+
 interface Props {
   type?: `destructive` | `default` | `container` | `error`;
   title: string;
   isOpen?: boolean;
   loading?: boolean;
-  primaryButton:
-    | (() => unknown)
-    | {
-        action(): unknown;
-        label?: string | React.ReactNode;
-        disabled?: boolean;
-      };
-  secondaryButton?:
-    | (() => unknown)
-    | {
-        action(): unknown;
-        label?: string | React.ReactNode;
-        disabled?: boolean;
-      };
+  primaryButton: ButtonAction;
+  secondaryButton?: ButtonAction;
   onDismiss?(): unknown;
   maximizeWidthForSmallScreens?: boolean;
   children?: React.ReactNode;
@@ -66,15 +64,10 @@ const Modal: React.FC<Props> = ({
     }
   }
 
-  const primary =
-    typeof primaryButton === `function`
-      ? { action: primaryButton, label: `OK` }
-      : primaryButton;
-
-  const secondary =
-    typeof secondaryButton === `function`
-      ? { action: secondaryButton, label: `Cancel` }
-      : secondaryButton;
+  const primary = normalizeButtonAction(primaryButton, `OK`);
+  const secondary = secondaryButton
+    ? normalizeButtonAction(secondaryButton, `Cancel`)
+    : undefined;
 
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -99,9 +92,9 @@ const Modal: React.FC<Props> = ({
         autoFocus
         onClose={
           onDismiss ??
-          (secondary?.action
+          (secondary?.type === `action`
             ? secondary.action
-            : type === `error`
+            : type === `error` && primary.type === `action`
               ? primary.action
               : () => {})
         }
@@ -186,21 +179,16 @@ const Modal: React.FC<Props> = ({
                   )}
                   <div className="sm:bg-slate-50 rounded-b-2xl sm:rounded-b-3xl pb-4 sm:pb-3 p-3 flex flex-col items-stretch sm:flex-row sm:justify-end">
                     {secondary && (
-                      <Button
+                      <ModalButton
                         testId="modal-secondary-btn"
-                        type="button"
+                        config={secondary}
                         color="tertiary"
                         className="sm:mr-3 w-[100%] sm:w-auto mb-4 sm:mb-0"
-                        disabled={secondary.disabled}
-                        onClick={secondary.action}
-                      >
-                        {secondary.label ?? `Cancel`}
-                      </Button>
+                      />
                     )}
-                    <Button
+                    <ModalButton
                       testId="modal-primary-btn"
-                      type="button"
-                      disabled={primary.disabled}
+                      config={primary}
                       color={
                         type === `destructive`
                           ? `warning`
@@ -209,10 +197,7 @@ const Modal: React.FC<Props> = ({
                             : `primary`
                       }
                       className="w-[100%] sm:w-auto"
-                      onClick={primary.action}
-                    >
-                      {primary.label}
-                    </Button>
+                    />
                   </div>
                 </>
               )}
@@ -234,3 +219,65 @@ function panelInnerClasses(maximizingWidthForSmallScreens: boolean): string {
     maximizingWidthForSmallScreens ? `px-2 pt-3` : `px-4 pt-5`,
   );
 }
+
+type NormalizedButton =
+  | {
+      type: `action`;
+      action: () => unknown;
+      label: string | React.ReactNode;
+      disabled?: boolean;
+    }
+  | { type: `link`; to: string; label: string | React.ReactNode };
+
+function normalizeButtonAction(
+  action: ButtonAction,
+  defaultLabel: string,
+): NormalizedButton {
+  if (typeof action === `function`) {
+    return { type: `action`, action, label: defaultLabel };
+  }
+  switch (action.type) {
+    case `link`:
+      return action;
+    case `action`:
+      return {
+        type: `action`,
+        action: action.action,
+        label: action.label ?? defaultLabel,
+        disabled: action.disabled,
+      };
+  }
+}
+
+const ModalButton: React.FC<{
+  testId: string;
+  config: NormalizedButton;
+  color: React.ComponentProps<typeof Button>[`color`];
+  className?: string;
+}> = ({ testId, config, color, className }) => {
+  if (config.type === `link`) {
+    return (
+      <Button
+        testId={testId}
+        type="link"
+        to={config.to}
+        color={color}
+        className={className}
+      >
+        {config.label}
+      </Button>
+    );
+  }
+  return (
+    <Button
+      testId={testId}
+      type="button"
+      color={color}
+      className={className}
+      disabled={config.disabled}
+      onClick={config.action}
+    >
+      {config.label}
+    </Button>
+  );
+};

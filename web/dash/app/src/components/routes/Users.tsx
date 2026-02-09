@@ -8,9 +8,10 @@ import ReqState from '../../lib/ReqState';
 const Users: React.FC = () => {
   const query = useQuery(Key.children, Current.api.getChildren);
 
-  const addDevice = useMutation((userId: UUID) =>
-    Current.api.createPendingAppConnection({ userId }),
+  const addDevice = useMutation((childId: UUID) =>
+    Current.api.createPendingAppConnection({ childId }),
   );
+  const startTrial = useMutation(() => Current.api.startFullTrial());
 
   if (query.isPending) {
     return <Loading />;
@@ -35,6 +36,7 @@ const Users: React.FC = () => {
       startAddDevice={(userId) => addDevice.mutate(userId)}
       dismissAddDevice={() => addDevice.reset()}
       addDeviceRequest={ReqState.fromMutation(addDevice)}
+      onStartTrial={() => startTrial.mutate(undefined)}
     />
   );
 };

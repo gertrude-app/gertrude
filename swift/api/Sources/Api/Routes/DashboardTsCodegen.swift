@@ -58,7 +58,7 @@ enum DashboardTsCodegenRoute {
       UserActivityFeed.self,
       GetAccountOwner.self,
       ConfirmPendingNotificationMethod.self,
-      CreatePendingAppConnection.self,
+      CreatePendingAppConnection_v2.self,
       CreatePendingNotificationMethod.self,
       DashboardWidgets.self,
       DeleteActivityItems_v2.self,
@@ -101,6 +101,7 @@ enum DashboardTsCodegenRoute {
       VerifySignupEmail.self,
       SaveConferenceEmail.self,
       SecurityEventsFeed.self,
+      StartFullTrial.self,
       RequestPublicKeychain.self,
       FlagActivityItems.self,
       IOSDevices.self,
@@ -118,6 +119,7 @@ enum DashboardTsCodegenRoute {
     var shared: [String: String] = [:]
     var sharedAliases: [Config.Alias] = [
       .init(NoInput.self, as: "void"),
+      .init(Infallible.self, as: "void"),
       .init(Date.self, as: "ISODateString"),
       .init(Subscription.StripeId.self, as: "string"),
     ]

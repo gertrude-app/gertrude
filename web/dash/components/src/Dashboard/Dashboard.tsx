@@ -2,7 +2,7 @@ import { posessive } from '@shared/string';
 import cx from 'classnames';
 import React, { useState } from 'react';
 import type {
-  CreatePendingAppConnection,
+  CreatePendingAppConnection_v2,
   DashboardWidgets,
   RequestState,
 } from '@dash/types';
@@ -30,7 +30,8 @@ type Props = {
   startAddDevice(childId: UUID): unknown;
   dismissAddDevice(): unknown;
   dismissAnnouncement(id: UUID): unknown;
-  addDeviceRequest: RequestState<CreatePendingAppConnection.Output>;
+  onStartTrial(): unknown;
+  addDeviceRequest: RequestState<CreatePendingAppConnection_v2.Output>;
   childData: DashboardWidgets.Output[`children`];
   pendingIosDevices?: PendingIosDevice[];
 } & Omit<DashboardWidgets.Output, `children` | `pendingIOSDevices`>;
@@ -44,6 +45,7 @@ const Dashboard: React.FC<Props> = ({
   startAddDevice,
   dismissAddDevice,
   dismissAnnouncement,
+  onStartTrial,
   addDeviceRequest,
   numParentNotifications,
   announcement,
@@ -58,6 +60,7 @@ const Dashboard: React.FC<Props> = ({
         <ConnectDeviceModal
           request={addDeviceRequest}
           dismissAddDevice={dismissAddDevice}
+          onStartTrial={onStartTrial}
         />
         <UndoMainPadding className="flex justify-center items-center md:min-h-screen">
           <FloatingMessage className="flex flex-col items-center p-6 sm:p-8 lg:p-12 max-w-3xl">

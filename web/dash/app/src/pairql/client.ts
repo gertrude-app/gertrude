@@ -194,6 +194,9 @@ export const throwingClient: ApiClient = {
   signup: () => {
     throw new Error(`ApiClient.signup() not implemented`);
   },
+  startFullTrial: () => {
+    throw new Error(`ApiClient.startFullTrial() not implemented`);
+  },
   stripeUrl: () => {
     throw new Error(`ApiClient.stripeUrl() not implemented`);
   },

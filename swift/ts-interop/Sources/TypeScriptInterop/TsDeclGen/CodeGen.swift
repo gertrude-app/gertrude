@@ -1,3 +1,5 @@
+import Runtime
+
 public struct CodeGen {
   let config: Config
 
@@ -8,6 +10,13 @@ public struct CodeGen {
   public func declaration(for type: Any.Type, as name: String? = nil) throws -> String {
     if let alias = self.config.alias(for: type) {
       return "export type \(name ?? "\(type)") = \(alias)"
+    }
+
+    let info = try typeInfo(of: type)
+    if info.isOptional {
+      let innerDecl = try declaration(for: info.genericTypes[0], as: nil)
+      let typeOnly = innerDecl.components(separatedBy: " = ").last ?? innerDecl
+      return "export type \(name ?? "\(type)") = \(typeOnly) | null"
     }
 
     let node = try Node(from: type, config: self.config)

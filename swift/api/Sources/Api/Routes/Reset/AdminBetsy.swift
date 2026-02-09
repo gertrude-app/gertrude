@@ -29,7 +29,7 @@ enum AdminBetsy {
       billingStatus: .trialing,
       stripeId: nil,
       trialStartedAt: Date(),
-      statusExpiresAt: Date() + .days(21 - 3),
+      statusExpiresAt: Date() + Plan.Full.trialLengthDays - Plan.Full.trialWarningDays,
     ))
 
     let email = try await Reset.createNotification(
