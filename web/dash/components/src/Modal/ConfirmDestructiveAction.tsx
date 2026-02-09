@@ -23,9 +23,9 @@ const ConfirmDestructiveAction: React.FC<Props> = ({
   <Modal
     type="destructive"
     title={title}
-    primaryButton={{ action: onConfirm, label: confirmText }}
+    primaryButton={{ type: `action`, action: onConfirm, label: confirmText }}
     isOpen={!!openWhenPresent}
-    secondaryButton={{ action: onDismiss, label: cancelText }}
+    secondaryButton={{ type: `action`, action: onDismiss, label: cancelText }}
     children={children}
   />
 );

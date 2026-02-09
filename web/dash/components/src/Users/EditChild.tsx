@@ -9,6 +9,7 @@ import type {
   ChildComputer,
   ChildIOSDevice,
   ConfirmableEntityAction,
+  CreatePendingAppConnection_v2,
   PlainTimeWindow,
   RequestState,
   RuleSchedule,
@@ -52,8 +53,9 @@ interface Props {
   deleteUser: ConfirmableEntityAction<void>;
   startAddDevice(): unknown;
   dismissAddDevice(): unknown;
+  onStartTrial(): unknown;
   deleteDevice: ConfirmableEntityAction;
-  addDeviceRequest?: RequestState<{ code: number }>;
+  addDeviceRequest?: RequestState<CreatePendingAppConnection_v2.Output>;
   saveButtonDisabled: boolean;
   onSave(): unknown;
   onAddKeychainClicked(): unknown;
@@ -101,6 +103,7 @@ const EditChild: React.FC<Props> = ({
   dismissAddDevice,
   addDeviceRequest,
   startAddDevice,
+  onStartTrial,
   onAddKeychainClicked,
   onSelectKeychainToAdd,
   onDismissAddKeychain,
@@ -166,6 +169,7 @@ const EditChild: React.FC<Props> = ({
       <ConnectDeviceModal
         request={addDeviceRequest}
         dismissAddDevice={dismissAddDevice}
+        onStartTrial={onStartTrial}
       />
       <AddKeychainDrawer
         request={fetchSelectableKeychainsRequest}

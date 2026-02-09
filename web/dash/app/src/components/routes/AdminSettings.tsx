@@ -4,6 +4,7 @@ import { Result } from '@shared/pairql';
 import { capitalize } from '@shared/string';
 import { notNullish, typesafe } from '@shared/ts-utils';
 import React, { useReducer, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 import type { State } from '../../reducers/admin-reducer';
 import type { NewMethod } from '@dash/components';
@@ -17,12 +18,16 @@ import reducer, { initialState } from '../../reducers/admin-reducer';
 const AdminSettings: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [newMethodId, setNewMethodId] = useState<NewMethod | undefined>(undefined);
+  const [searchParams] = useSearchParams();
+  const requestedTier = searchParams.get(`plan`) as `full` | `light` | null;
 
   const query = useQuery(Key.accountOwner, Current.api.getAccountOwner, {
     onReceive: (accountOwner) => dispatch({ type: `receivedAccountOwner`, accountOwner }),
   });
 
-  const getStripeUrl = useMutation(Current.api.stripeUrl);
+  const getStripeUrl = useMutation((tier: `full` | `light` | null) =>
+    Current.api.stripeUrl(tier),
+  );
 
   const deleteNotification = useConfirmableDelete(`parentNotification`, {
     invalidating: [Key.accountOwner],
@@ -130,7 +135,8 @@ const AdminSettings: React.FC = () => {
       createNotification={(methodId) =>
         dispatch({ type: `notificationCreated`, id: uuid(), methodId })
       }
-      manageSubscription={() => getStripeUrl.mutate()}
+      requestedTier={requestedTier}
+      manageSubscription={() => getStripeUrl.mutate(requestedTier)}
       newMethodEventHandler={(event) => {
         switch (event.type) {
           case `sendCodeClicked`:

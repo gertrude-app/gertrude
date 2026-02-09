@@ -10,7 +10,7 @@ const meta = {
       <Modal
         type="container"
         title="Select a keychain"
-        primaryButton={{ label: `Add keychain`, action: () => {} }}
+        primaryButton={{ type: `action`, label: `Add keychain`, action: () => {} }}
         secondaryButton={() => {}}
       >
         <Story />

@@ -42,6 +42,7 @@ interface Props {
   newMethodEventHandler(event: NewAdminNotificationMethodEvent): unknown;
   newMethodId?: NewMethod;
   setNewMethodId(id: NewMethod | undefined): unknown;
+  requestedTier?: `full` | `light` | null;
 }
 
 const Settings: React.FC<Props> = ({
@@ -60,6 +61,7 @@ const Settings: React.FC<Props> = ({
   manageSubscription,
   newMethodId,
   setNewMethodId,
+  requestedTier,
 }) => (
   <div className="relative">
     {newMethodId && newMethodId.confirmed && (
@@ -67,6 +69,7 @@ const Settings: React.FC<Props> = ({
         title="One more step!"
         icon="bell"
         primaryButton={{
+          type: `action`,
           action: () => {
             createNotification(newMethodId.id);
             setNewMethodId(undefined);
@@ -129,7 +132,7 @@ const Settings: React.FC<Props> = ({
         <div className="flex justify-end items-start flex-col mr-8">
           <h2 className="font-bold text-xl text-slate-700">{planName(plan)}</h2>
           <PlanPrice plan={plan} />
-          {showManageSubscriptionLink(plan) && (
+          {showManageSubscriptionLink(plan, requestedTier) && (
             <a
               {...(billingPortalRequest.state === `succeeded`
                 ? { href: billingPortalRequest.payload.url }
@@ -142,7 +145,7 @@ const Settings: React.FC<Props> = ({
                 billingPortalRequest.state === `idle` ? manageSubscription : void 0
               }
             >
-              {manageSubscriptionText(billingPortalRequest, plan)}
+              {manageSubscriptionText(billingPortalRequest, plan, requestedTier)}
             </a>
           )}
         </div>
@@ -295,8 +298,15 @@ function trialDaysRemaining(until: string): number {
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
-function showManageSubscriptionLink(plan: Plan): boolean {
-  if (plan.case === `free`) return false;
+function showManageSubscriptionLink(
+  plan: Plan,
+  requestedTier?: `full` | `light` | null,
+): boolean {
+  if (plan.case === `free`) {
+    if (requestedTier) return true;
+    if (plan.kind.case === `lapsedFull` || plan.kind.case === `lapsedLight`) return true;
+    return false;
+  }
   if (plan.case === `full` && plan.status.case === `complimentary`) return false;
   return true;
 }
@@ -349,9 +359,16 @@ function badgeText(plan: Plan): string {
   }
 }
 
-function manageSubscriptionText(req: RequestState<unknown>, plan: Plan): string {
+function manageSubscriptionText(
+  req: RequestState<unknown>,
+  plan: Plan,
+  requestedTier?: `full` | `light` | null,
+): string {
   switch (req.state) {
     case `idle`:
+      if (requestedTier === `full`) {
+        return `Subscribe to Full ($10/month)...`;
+      }
       if (
         plan.case === `full` &&
         (plan.status.case === `trialing` || plan.status.case === `trialExpired`)

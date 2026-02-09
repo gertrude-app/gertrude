@@ -30,10 +30,12 @@ const SelectUnlockRequestKeychain: React.FC = () => {
       title="Select a keychain"
       onDismiss={() => navigate(`../..`)}
       secondaryButton={{
+        type: `action`,
         label: <>&larr; Back</>,
         action: () => navigate(`../review`),
       }}
       primaryButton={{
+        type: `action`,
         label: <>Review key &rarr;</>,
         disabled: !keychainId,
         action: () => navigate(`../edit-key/${keychainId}`),

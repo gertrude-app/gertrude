@@ -558,6 +558,7 @@ extension Plan.FreeKind {
   private struct _CaseLapsedLight: Codable {
     var `case` = "lapsedLight"
     var stripeId: Tagged<Api.Subscription, Swift.String>
+    var hasTrialedFull: Bool
   }
 
   private struct _CaseLapsedFull: Codable {
@@ -567,8 +568,8 @@ extension Plan.FreeKind {
 
   func encode(to encoder: Encoder) throws {
     switch self {
-    case .lapsedLight(let stripeId):
-      try _CaseLapsedLight(stripeId: stripeId).encode(to: encoder)
+    case .lapsedLight(let stripeId, let hasTrialedFull):
+      try _CaseLapsedLight(stripeId: stripeId, hasTrialedFull: hasTrialedFull).encode(to: encoder)
     case .lapsedFull(let stripeId):
       try _CaseLapsedFull(stripeId: stripeId).encode(to: encoder)
     case .standard:
@@ -582,7 +583,7 @@ extension Plan.FreeKind {
     switch caseName {
     case "lapsedLight":
       let value = try container.decode(_CaseLapsedLight.self)
-      self = .lapsedLight(stripeId: value.stripeId)
+      self = .lapsedLight(stripeId: value.stripeId, hasTrialedFull: value.hasTrialedFull)
     case "lapsedFull":
       let value = try container.decode(_CaseLapsedFull.self)
       self = .lapsedFull(stripeId: value.stripeId)
@@ -609,7 +610,13 @@ extension BillingStatus.Full {
 
   private struct _CaseTrialing: Codable {
     var `case` = "trialing"
+    var kind: BillingStatus.Full.TrialKind
     var until: Date
+  }
+
+  private struct _CaseTrialExpired: Codable {
+    var `case` = "trialExpired"
+    var kind: BillingStatus.Full.TrialKind
   }
 
   private struct _CasePaid: Codable {
@@ -626,8 +633,10 @@ extension BillingStatus.Full {
 
   func encode(to encoder: Encoder) throws {
     switch self {
-    case .trialing(let until):
-      try _CaseTrialing(until: until).encode(to: encoder)
+    case .trialing(let kind, let until):
+      try _CaseTrialing(kind: kind, until: until).encode(to: encoder)
+    case .trialExpired(let kind):
+      try _CaseTrialExpired(kind: kind).encode(to: encoder)
     case .paid(let stripeId, let monthlyPriceInCents):
       try _CasePaid(stripeId: stripeId, monthlyPriceInCents: monthlyPriceInCents)
         .encode(to: encoder)
@@ -636,8 +645,6 @@ extension BillingStatus.Full {
         .encode(to: encoder)
     case .complimentary:
       try _NamedCase(case: "complimentary").encode(to: encoder)
-    case .trialExpired:
-      try _NamedCase(case: "trialExpired").encode(to: encoder)
     }
   }
 
@@ -647,7 +654,10 @@ extension BillingStatus.Full {
     switch caseName {
     case "trialing":
       let value = try container.decode(_CaseTrialing.self)
-      self = .trialing(until: value.until)
+      self = .trialing(kind: value.kind, until: value.until)
+    case "trialExpired":
+      let value = try container.decode(_CaseTrialExpired.self)
+      self = .trialExpired(kind: value.kind)
     case "paid":
       let value = try container.decode(_CasePaid.self)
       self = .paid(stripeId: value.stripeId, monthlyPriceInCents: value.monthlyPriceInCents)
@@ -656,8 +666,48 @@ extension BillingStatus.Full {
       self = .overdue(stripeId: value.stripeId, monthlyPriceInCents: value.monthlyPriceInCents)
     case "complimentary":
       self = .complimentary
-    case "trialExpired":
-      self = .trialExpired
+    default:
+      throw _TypeScriptDecodeError(message: "Unexpected case name: `\(caseName)`")
+    }
+  }
+}
+
+extension BillingStatus.Full.TrialKind {
+  private struct _NamedCase: Codable {
+    var `case`: String
+    static func extract(from decoder: Decoder) throws -> String {
+      let container = try decoder.singleValueContainer()
+      return try container.decode(_NamedCase.self).case
+    }
+  }
+
+  private struct _TypeScriptDecodeError: Error {
+    var message: String
+  }
+
+  private struct _CaseFromLight: Codable {
+    var `case` = "fromLight"
+    var stripeId: Tagged<Api.Subscription, Swift.String>
+  }
+
+  func encode(to encoder: Encoder) throws {
+    switch self {
+    case .fromLight(let stripeId):
+      try _CaseFromLight(stripeId: stripeId).encode(to: encoder)
+    case .full:
+      try _NamedCase(case: "full").encode(to: encoder)
+    }
+  }
+
+  init(from decoder: Decoder) throws {
+    let caseName = try _NamedCase.extract(from: decoder)
+    let container = try decoder.singleValueContainer()
+    switch caseName {
+    case "fromLight":
+      let value = try container.decode(_CaseFromLight.self)
+      self = .fromLight(stripeId: value.stripeId)
+    case "full":
+      self = .full
     default:
       throw _TypeScriptDecodeError(message: "Unexpected case name: `\(caseName)`")
     }
@@ -680,19 +730,21 @@ extension BillingStatus.Light {
   private struct _CasePaid: Codable {
     var `case` = "paid"
     var stripeId: Tagged<Api.Subscription, Swift.String>
+    var hasTrialedFull: Bool
   }
 
   private struct _CaseOverdue: Codable {
     var `case` = "overdue"
     var stripeId: Tagged<Api.Subscription, Swift.String>
+    var hasTrialedFull: Bool
   }
 
   func encode(to encoder: Encoder) throws {
     switch self {
-    case .paid(let stripeId):
-      try _CasePaid(stripeId: stripeId).encode(to: encoder)
-    case .overdue(let stripeId):
-      try _CaseOverdue(stripeId: stripeId).encode(to: encoder)
+    case .paid(let stripeId, let hasTrialedFull):
+      try _CasePaid(stripeId: stripeId, hasTrialedFull: hasTrialedFull).encode(to: encoder)
+    case .overdue(let stripeId, let hasTrialedFull):
+      try _CaseOverdue(stripeId: stripeId, hasTrialedFull: hasTrialedFull).encode(to: encoder)
     }
   }
 
@@ -702,10 +754,10 @@ extension BillingStatus.Light {
     switch caseName {
     case "paid":
       let value = try container.decode(_CasePaid.self)
-      self = .paid(stripeId: value.stripeId)
+      self = .paid(stripeId: value.stripeId, hasTrialedFull: value.hasTrialedFull)
     case "overdue":
       let value = try container.decode(_CaseOverdue.self)
-      self = .overdue(stripeId: value.stripeId)
+      self = .overdue(stripeId: value.stripeId, hasTrialedFull: value.hasTrialedFull)
     default:
       throw _TypeScriptDecodeError(message: "Unexpected case name: `\(caseName)`")
     }

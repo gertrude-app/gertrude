@@ -16,6 +16,7 @@ type Story = StoryObj<typeof meta>;
 export const Empty: Story = props({
   startAddDevice: () => {},
   dismissAddDevice: () => {},
+  onStartTrial: () => {},
   users: [],
 });
 
@@ -93,6 +94,33 @@ export const Default: Story = props({
       iosDevices: [],
     },
   ],
+});
+
+export const TrialGate: Story = props({
+  ...Default.args,
+  users: Default.args.users.slice(0, 1),
+  addDeviceRequest: {
+    state: `succeeded`,
+    payload: { code: 123123, gate: `trialRequired` },
+  },
+});
+
+export const UpgradeGate: Story = props({
+  ...Default.args,
+  users: Default.args.users.slice(0, 1),
+  addDeviceRequest: {
+    state: `succeeded`,
+    payload: { code: 123123, gate: `planUpgradeRequired` },
+  },
+});
+
+export const SubscriptionFixGate: Story = props({
+  ...Default.args,
+  users: Default.args.users.slice(0, 1),
+  addDeviceRequest: {
+    state: `succeeded`,
+    payload: { code: 123123, gate: `subscriptionFixRequired` },
+  },
 });
 
 // @screenshot: xs,md

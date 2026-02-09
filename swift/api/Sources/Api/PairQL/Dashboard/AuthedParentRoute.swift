@@ -5,6 +5,7 @@ import Vapor
 enum AuthedParentRoute: PairRoute {
   case confirmPendingNotificationMethod(ConfirmPendingNotificationMethod.Input)
   case createPendingAppConnection(CreatePendingAppConnection.Input)
+  case createPendingAppConnection_v2(CreatePendingAppConnection_v2.Input)
   case createPendingNotificationMethod(CreatePendingNotificationMethod.Input)
   case dashboardWidgets
   case decideFilterSuspensionRequest(DecideFilterSuspensionRequest.Input)
@@ -43,8 +44,9 @@ enum AuthedParentRoute: PairRoute {
   case saveNotification(SaveNotification.Input)
   case saveUser(SaveUser.Input)
   case toggleChildKeychain(ToggleChildKeychain.Input)
-  case stripeUrl
+  case stripeUrl(Subscription.Tier?)
   case securityEventsFeed
+  case startFullTrial
   case updateUnlockRequest(UpdateUnlockRequest.Input)
   case requestPublicKeychain(RequestPublicKeychain.Input)
   case upsertBlockRule(UpsertBlockRule.Input)
@@ -64,6 +66,10 @@ extension AuthedParentRoute {
       Route(.case(Self.createPendingAppConnection)) {
         Operation(CreatePendingAppConnection.self)
         Body(.dashboardInput(CreatePendingAppConnection.self))
+      }
+      Route(.case(Self.createPendingAppConnection_v2)) {
+        Operation(CreatePendingAppConnection_v2.self)
+        Body(.dashboardInput(CreatePendingAppConnection_v2.self))
       }
       Route(.case(Self.createPendingNotificationMethod)) {
         Operation(CreatePendingNotificationMethod.self)
@@ -203,9 +209,13 @@ extension AuthedParentRoute {
       }
       Route(.case(Self.stripeUrl)) {
         Operation(StripeUrl.self)
+        Optionally { Body(.json(Subscription.Tier.self)) }
       }
       Route(.case(Self.securityEventsFeed)) {
         Operation(SecurityEventsFeed.self)
+      }
+      Route(.case(Self.startFullTrial)) {
+        Operation(StartFullTrial.self)
       }
       Route(.case(Self.toggleChildKeychain)) {
         Operation(ToggleChildKeychain.self)
@@ -275,6 +285,9 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .createPendingAppConnection(let input):
       let output = try await CreatePendingAppConnection.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .createPendingAppConnection_v2(let input):
+      let output = try await CreatePendingAppConnection_v2.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .decideFilterSuspensionRequest(let input):
       let output = try await DecideFilterSuspensionRequest.resolve(with: input, in: context)
@@ -360,11 +373,14 @@ extension AuthedParentRoute: RouteResponder {
     case .saveKey(let input):
       let output = try await SaveKey.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .stripeUrl:
-      let output = try await StripeUrl.resolve(in: context)
+    case .stripeUrl(let input):
+      let output = try await StripeUrl.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .securityEventsFeed:
       let output = try await SecurityEventsFeed.resolve(in: context)
+      return try await self.respond(with: output)
+    case .startFullTrial:
+      let output = try await StartFullTrial.resolve(in: context)
       return try await self.respond(with: output)
     case .toggleChildKeychain(let input):
       let output = try await ToggleChildKeychain.resolve(with: input, in: context)

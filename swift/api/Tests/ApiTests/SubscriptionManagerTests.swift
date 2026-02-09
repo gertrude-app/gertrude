@@ -42,7 +42,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     )
     expect(retrievedTrialEndingSoon.subscription!.billingStatus).toEqual(.trialExpiringSoon)
     expect(retrievedTrialEndingSoon.subscription!.statusExpiresAt)
-      .toEqual(.reference + .days(3))
+      .toEqual(.reference + Plan.Full.trialWarningDays)
 
     expect(sent.emails.count).toEqual(1)
     expect(sent.emails[0].to).toEqual(trialEndingSoon.email.rawValue)
@@ -61,11 +61,14 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
   func testTrialExpiringSoon() async throws {
     let parent = try await self.parentWithSubscription {
       $1.billingStatus = .trialing
-      $1.trialStartedAt = .reference - .days(21)
+      $1.trialStartedAt = .reference - Plan.Full.trialLengthDays
       $1.statusExpiresAt = .reference - .days(1)
     }
     await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-      action: .update(status: .trialExpiringSoon, expiration: .reference + .days(3)),
+      action: .update(
+        status: .trialExpiringSoon,
+        expiration: .reference + Plan.Full.trialWarningDays,
+      ),
       email: .trialEndingSoon(length: 21, remaining: 3),
     ))
   }
@@ -73,11 +76,11 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
   func testTrialEnded_NotOnboarded() async throws {
     let parent = try await self.parentWithSubscription {
       $1.billingStatus = .trialExpiringSoon
-      $1.trialStartedAt = .reference - .days(21)
+      $1.trialStartedAt = .reference - Plan.Full.trialLengthDays
       $1.statusExpiresAt = .reference - .days(1)
     }
     await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-      action: .update(status: .trialExpired, expiration: .reference + .days(7)),
+      action: .update(status: .trialExpired, expiration: .reference + Plan.Full.trialGraceDays),
       email: nil, // <-- no email, they never onboarded
     ))
   }
@@ -89,12 +92,12 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
       parentId: parentModel.id,
       tier: .full,
       billingStatus: .trialExpiringSoon,
-      trialStartedAt: .reference - .days(21),
+      trialStartedAt: .reference - Plan.Full.trialLengthDays,
       statusExpiresAt: .reference - .days(1),
     )
     let parent = ParentWithSubscription(model: parentModel, subscription: subscription)
     await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-      action: .update(status: .trialExpired, expiration: .reference + .days(7)),
+      action: .update(status: .trialExpired, expiration: .reference + Plan.Full.trialGraceDays),
       email: .trialExpired(length: 21),
     ))
   }
@@ -102,7 +105,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
   func testTrialExpiredToUnpaid_NotOnboarded() async throws {
     let parent = try await self.parentWithSubscription {
       $1.billingStatus = .trialExpired
-      $1.trialStartedAt = .reference - .days(21)
+      $1.trialStartedAt = .reference - Plan.Full.trialLengthDays
       $1.statusExpiresAt = .reference - .days(1)
     }
     await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(

@@ -51,11 +51,11 @@ export default class DashboardClient extends Client<Auth> {
   };
 
   public createPendingAppConnection = (
-    input: P.CreatePendingAppConnection.Input,
-  ): Promise<Result<P.CreatePendingAppConnection.Output>> => {
-    return this.query<P.CreatePendingAppConnection.Output>(
+    input: P.CreatePendingAppConnection_v2.Input,
+  ): Promise<Result<P.CreatePendingAppConnection_v2.Output>> => {
+    return this.query<P.CreatePendingAppConnection_v2.Output>(
       input,
-      `CreatePendingAppConnection`,
+      `CreatePendingAppConnection_v2`,
       `parent`,
     );
   };
@@ -344,6 +344,12 @@ export default class DashboardClient extends Client<Auth> {
 
   public signup = (input: P.Signup.Input): Promise<Result<P.Signup.Output>> => {
     return this.query<P.Signup.Output>(input, `Signup`, `none`);
+  };
+
+  public startFullTrial = (
+    input: P.StartFullTrial.Input,
+  ): Promise<Result<P.StartFullTrial.Output>> => {
+    return this.query<P.StartFullTrial.Output>(input, `StartFullTrial`, `parent`);
   };
 
   public stripeUrl = (input: P.StripeUrl.Input): Promise<Result<P.StripeUrl.Output>> => {
