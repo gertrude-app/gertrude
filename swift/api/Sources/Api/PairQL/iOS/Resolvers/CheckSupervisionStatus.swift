@@ -68,7 +68,7 @@ func logIOSUnusual(_ id: String, _ detail: String) {
       detail: detail,
     ))
     await get(dependency: \.slack)
-      .internal(.iosLogs, "unusual iOS event: `\(id)` \(detail)")
+      .internal(.iosLogs, "unusual iOS event: \(githubSearch(id)) \(detail)")
   }
 }
 

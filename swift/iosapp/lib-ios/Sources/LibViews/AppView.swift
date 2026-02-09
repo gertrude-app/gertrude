@@ -659,7 +659,9 @@ extension URL {
   AppView(
     store: Store(initialState: IOSReducer.State(
       screen: .onboarding(.supervision(.resume(.installingProfile(
-        profileUrl: URL(string: "https://api.gertrude.app/ios-device-profile/test-id")!,
+        profileUrl: URL(
+          string: "https://gertrude-dev.nyc3.digitaloceanspaces.com/super.mobileconfig",
+        )!,
       )))),
     )) {
       IOSReducer()
