@@ -1,5 +1,6 @@
 import Dependencies
 import DuetSQL
+import Foundation
 import PodcastRoute
 
 extension LogPodcastEvent_v2: Resolver {
@@ -24,8 +25,14 @@ extension LogPodcastEvent_v2: Resolver {
         msg += " - \(detail)"
       }
       let search = githubSearch(input.eventId)
-      let message = "Podcast app event: \(search) \(msg)"
-      await slack.internal(.podcasts, message)
+      let (send, suppressed) = await PodcastSlackLimiter.shared.shouldSend(input.eventId)
+      if send {
+        var message = "Podcast app event: \(search) \(msg)"
+        if suppressed > 0 {
+          message += " _(+\(suppressed) suppressed)_"
+        }
+        await slack.internal(.podcasts, message)
+      }
 
       if input.eventId == "a72104d7", let installId = input.installId {
         let subscriptionCount = try await PodcastEvent.query()
@@ -44,5 +51,30 @@ extension LogPodcastEvent_v2: Resolver {
     }
 
     return .success
+  }
+}
+
+private actor PodcastSlackLimiter {
+  static let shared = PodcastSlackLimiter()
+
+  private var recent: [String: (count: Int, lastSent: Date)] = [:]
+  private let cooldown: TimeInterval = 60
+
+  func shouldSend(_ eventId: String) -> (send: Bool, suppressed: Int) {
+    let now = Date()
+
+    guard let entry = recent[eventId] else {
+      self.recent[eventId] = (count: 0, lastSent: now)
+      return (send: true, suppressed: 0)
+    }
+
+    if now.timeIntervalSince(entry.lastSent) >= self.cooldown {
+      let suppressed = entry.count
+      self.recent[eventId] = (count: 0, lastSent: now)
+      return (send: true, suppressed: suppressed)
+    }
+
+    self.recent[eventId] = (count: entry.count + 1, lastSent: entry.lastSent)
+    return (send: false, suppressed: 0)
   }
 }
