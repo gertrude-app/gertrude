@@ -94,7 +94,7 @@ enum DashboardTsCodegenRoute {
       SaveUser.self,
       SendPasswordResetEmail.self,
       Signup.self,
-      StripeUrl.self,
+      StripeUrl_v2.self,
       ToggleChildKeychain.self,
       DecideFilterSuspensionRequest.self,
       UpdateUnlockRequest.self,

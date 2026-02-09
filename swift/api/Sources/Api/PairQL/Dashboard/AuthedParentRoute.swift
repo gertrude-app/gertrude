@@ -43,6 +43,7 @@ enum AuthedParentRoute: PairRoute {
   case saveUser(SaveUser.Input)
   case toggleChildKeychain(ToggleChildKeychain.Input)
   case stripeUrl(Subscription.Tier?)
+  case stripeUrl_v2(StripeUrl_v2.Input)
   case securityEventsFeed
   case startFullTrial
   case updateUnlockRequest(UpdateUnlockRequest.Input)
@@ -202,6 +203,10 @@ extension AuthedParentRoute {
         Operation(StripeUrl.self)
         Optionally { Body(.json(Subscription.Tier.self)) }
       }
+      Route(.case(Self.stripeUrl_v2)) {
+        Operation(StripeUrl_v2.self)
+        Body(.dashboardInput(StripeUrl_v2.self))
+      }
       Route(.case(Self.securityEventsFeed)) {
         Operation(SecurityEventsFeed.self)
       }
@@ -360,6 +365,9 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .stripeUrl(let input):
       let output = try await StripeUrl.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .stripeUrl_v2(let input):
+      let output = try await StripeUrl_v2.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .securityEventsFeed:
       let output = try await SecurityEventsFeed.resolve(in: context)
