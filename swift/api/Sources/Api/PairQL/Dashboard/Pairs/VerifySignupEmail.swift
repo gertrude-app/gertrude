@@ -42,7 +42,7 @@ extension VerifySignupEmail: Resolver {
         tier: .full,
         billingStatus: .trialing,
         trialStartedAt: now,
-        statusExpiresAt: now + .days(21 - 3),
+        statusExpiresAt: now + Plan.Full.trialLengthDays - Plan.Full.trialWarningDays,
       ))
 
       // they get a default "verified" notification method, since they verified email

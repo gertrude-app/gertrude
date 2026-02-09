@@ -12,8 +12,8 @@ const meta = {
         title="Suspend Filter Request"
         icon="stopwatch"
         isOpen
-        primaryButton={{ label: `Grant`, action: () => {} }}
-        secondaryButton={{ label: `Deny`, action: () => {} }}
+        primaryButton={{ type: `action`, label: `Grant`, action: () => {} }}
+        secondaryButton={{ type: `action`, label: `Deny`, action: () => {} }}
       >
         <Story />
       </Modal>

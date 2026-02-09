@@ -11,8 +11,8 @@ const meta = {
         type="container"
         title="Unlock Request"
         icon="unlock"
-        primaryButton={{ label: `Accept`, action: () => {} }}
-        secondaryButton={{ label: `Deny`, action: () => {} }}
+        primaryButton={{ type: `action`, label: `Accept`, action: () => {} }}
+        secondaryButton={{ type: `action`, label: `Deny`, action: () => {} }}
       >
         <Story />
       </Modal>

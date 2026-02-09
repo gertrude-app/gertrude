@@ -18,8 +18,8 @@ export function interceptPql(
   output: T.ConfirmPendingNotificationMethod.Output,
 ): void;
 export function interceptPql(
-  slug: `CreatePendingAppConnection`,
-  output: T.CreatePendingAppConnection.Output,
+  slug: `CreatePendingAppConnection_v2`,
+  output: T.CreatePendingAppConnection_v2.Output,
 ): void;
 export function interceptPql(
   slug: `CreatePendingNotificationMethod`,
@@ -147,6 +147,10 @@ export function interceptPql(
   output: T.SendPasswordResetEmail.Output,
 ): void;
 export function interceptPql(slug: `Signup`, output: T.Signup.Output): void;
+export function interceptPql(
+  slug: `StartFullTrial`,
+  output: T.StartFullTrial.Output,
+): void;
 export function interceptPql(slug: `StripeUrl`, output: T.StripeUrl.Output): void;
 export function interceptPql(
   slug: `ToggleChildKeychain`,
@@ -185,7 +189,7 @@ export function forcePqlErr(
     | `ClaimSupervisionCode`
     | `CombinedUsersActivityFeed`
     | `ConfirmPendingNotificationMethod`
-    | `CreatePendingAppConnection`
+    | `CreatePendingAppConnection_v2`
     | `CreatePendingNotificationMethod`
     | `DashboardWidgets`
     | `DecideFilterSuspensionRequest`
@@ -228,6 +232,7 @@ export function forcePqlErr(
     | `SecurityEventsFeed`
     | `SendPasswordResetEmail`
     | `Signup`
+    | `StartFullTrial`
     | `StripeUrl`
     | `ToggleChildKeychain`
     | `UpdateIOSDevice`

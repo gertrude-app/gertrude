@@ -67,7 +67,7 @@ extension GetAdmin.SubscriptionStatus {
     switch Plan(subscription: subscription) {
     case .full(.complimentary):
       self = .complimentary
-    case .full(.trialing(let expiration)):
+    case .full(.trialing(_, let expiration)):
       let delta = get(dependency: \.date.now).distance(to: expiration)
       self = .trialing(daysLeft: Int(delta / 86400))
     case .full(.trialExpired):

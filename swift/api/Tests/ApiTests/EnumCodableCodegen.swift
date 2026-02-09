@@ -43,6 +43,7 @@ struct ApiTypeScriptEnumsCodableGenerator: AggregateCodeGenerator {
         (Plan.self, false),
         (Plan.FreeKind.self, false),
         (BillingStatus.Full.self, false),
+        (BillingStatus.Full.TrialKind.self, false),
         (BillingStatus.Light.self, false),
       ],
       imports: [

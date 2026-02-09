@@ -36,7 +36,11 @@ const DenyUnlockRequest: React.FC = () => {
       <ErrorModal
         title="Error denying unlock request"
         error={deny.error}
-        primaryButton={{ label: `Try again`, action: () => navigate(`..`) }}
+        primaryButton={{
+          type: `action`,
+          label: `Try again`,
+          action: () => navigate(`..`),
+        }}
       />
     );
   }
@@ -50,6 +54,7 @@ const DenyUnlockRequest: React.FC = () => {
       icon="comment"
       title="Add a comment"
       primaryButton={{
+        type: `action`,
         label: <>Deny &rarr;</>,
         action: () => deny.mutate(undefined),
       }}

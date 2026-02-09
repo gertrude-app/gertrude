@@ -16,7 +16,7 @@ export const Default: Story = props({
   title: `Just fyi...`,
   isOpen: true,
   primaryButton: () => {},
-  secondaryButton: { action: () => {} },
+  secondaryButton: { type: `action`, action: () => {} },
   onDismiss: () => {},
   children: (
     <>
@@ -44,7 +44,7 @@ export const Destructive: Story = props({
   type: `destructive`,
   title: `NOOOOOOOOO!!!`,
   icon: `exclamation-triangle`,
-  primaryButton: { label: `Delete`, action: () => {} },
+  primaryButton: { type: `action`, label: `Delete`, action: () => {} },
 });
 
 export const Container: Story = props({

@@ -32,9 +32,10 @@ const UserRoute: React.FC = () => {
     enabled: id !== `new` && state.child?.isNew !== true,
   });
 
-  const addDevice = useMutation((userId: UUID) =>
-    Current.api.createPendingAppConnection({ userId }),
+  const addDevice = useMutation((childId: UUID) =>
+    Current.api.createPendingAppConnection({ childId }),
   );
+  const startTrial = useMutation(() => Current.api.startFullTrial());
 
   const saveChild = useMutation(
     (child: Editable<Child>) =>
@@ -125,6 +126,7 @@ const UserRoute: React.FC = () => {
       startAddDevice={() => addDevice.mutate(id)}
       dismissAddDevice={() => addDevice.reset()}
       addDeviceRequest={ReqState.fromMutation(addDevice)}
+      onStartTrial={() => startTrial.mutate(undefined)}
       downtime={draft.downtime ?? defaults.timeWindow()}
       downtimeEnabled={!!draft.downtime}
       setDowntimeEnabled={(enabled) => dispatch({ type: `setDowntimeEnabled`, enabled })}

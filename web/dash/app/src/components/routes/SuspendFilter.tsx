@@ -92,6 +92,7 @@ const SuspendFilter: React.FC = () => {
       title="Suspend Filter Request"
       icon="stopwatch"
       primaryButton={{
+        type: `action`,
         label: `Grant`,
         action: () => update.mutate(`accepted`),
         disabled:
@@ -102,6 +103,7 @@ const SuspendFilter: React.FC = () => {
               Number(state.grantedCustomDurationInMinutes) <= 1)),
       }}
       secondaryButton={{
+        type: `action`,
         label: `Deny`,
         action: () => update.mutate(`rejected`),
       }}

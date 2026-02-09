@@ -89,6 +89,7 @@ extension String: PairOutput {}
 extension String: PairInput {}
 extension UUID: PairInput {}
 extension UUID: PairOutput {}
+extension Optional: PairInput where Wrapped: PairInput {}
 
 public struct Operation<P: Pair>: ParserPrinter {
   private var pair: P.Type

@@ -249,7 +249,10 @@ const noopClient: ApiClient = {
   signup: async () => {
     return Result.success({});
   },
-  stripeUrl: async () => {
+  startFullTrial: async () => {
+    return Result.success(undefined);
+  },
+  stripeUrl: async (_input) => {
     return Result.success({ url: `/` });
   },
   securityEventsFeed: async () => {

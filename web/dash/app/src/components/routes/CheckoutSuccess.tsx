@@ -23,6 +23,7 @@ const CheckoutSuccess: React.FC = () => {
       request={request}
       successTitle="Payment setup complete"
       primaryButton={{
+        type: `action`,
         label: `Back to settings →`,
         action: () => navigate(`/settings`),
       }}

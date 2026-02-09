@@ -28,7 +28,7 @@ describe(`dashboard onboarding nudges`, () => {
       notifications: [],
       verifiedNotificationMethods: [],
     });
-    cy.interceptPql(`CreatePendingAppConnection`, { code: 123456 });
+    cy.interceptPql(`CreatePendingAppConnection_v2`, { code: 123456 });
     cy.interceptPql(`GetChild`, leopold);
     cy.interceptPql(`GetChildren`, [leopold]);
     cy.interceptPql(`SaveUser`, { success: true });

@@ -10,15 +10,20 @@ enum Plan: Equatable, Sendable, Codable {
 enum BillingStatus {
   enum Full: Equatable, Sendable, Codable {
     case complimentary
-    case trialing(until: Date)
-    case trialExpired
+    case trialing(kind: TrialKind, until: Date)
+    case trialExpired(kind: TrialKind)
     case paid(stripeId: Subscription.StripeId, monthlyPriceInCents: Int)
     case overdue(stripeId: Subscription.StripeId, monthlyPriceInCents: Int)
+
+    enum TrialKind: Equatable, Sendable, Codable {
+      case full
+      case fromLight(stripeId: Subscription.StripeId)
+    }
   }
 
   enum Light: Equatable, Sendable, Codable {
-    case paid(stripeId: Subscription.StripeId)
-    case overdue(stripeId: Subscription.StripeId)
+    case paid(stripeId: Subscription.StripeId, hasTrialedFull: Bool)
+    case overdue(stripeId: Subscription.StripeId, hasTrialedFull: Bool)
   }
 }
 
@@ -27,8 +32,14 @@ enum BillingStatus {
 extension Plan {
   enum FreeKind: Equatable, Sendable, Codable {
     case standard
-    case lapsedLight(stripeId: Subscription.StripeId)
+    case lapsedLight(stripeId: Subscription.StripeId, hasTrialedFull: Bool)
     case lapsedFull(stripeId: Subscription.StripeId)
+  }
+
+  enum Full {
+    static let trialLengthDays: TimeInterval = .days(21)
+    static let trialWarningDays: TimeInterval = .days(3)
+    static let trialGraceDays: TimeInterval = .days(7)
   }
 
   var monthlyPrice: Cents<Int>? {
@@ -47,38 +58,70 @@ extension Plan {
     }
   }
 
-  init(subscription: Subscription?) {
+  var isFull: Bool {
+    switch self {
+    case .full: true
+    case .free, .light: false
+    }
+  }
+
+  var isLight: Bool {
+    switch self {
+    case .light: true
+    case .free, .full: false
+    }
+  }
+
+  var isFree: Bool {
+    switch self {
+    case .free: true
+    case .light, .full: false
+    }
+  }
+
+  init(subscription: Subscription?, now: Date = Date()) {
     guard let subscription else {
       self = .free(kind: .standard)
       return
     }
     switch subscription.tier {
     case .light:
-      switch (subscription.billingStatus, subscription.stripeId) {
-      case (nil, _):
+      switch (subscription.billingStatus, subscription.stripeId, subscription.trialStartedAt) {
+      case (nil, _, _):
         fatalError("invariant 020adef4, id: \(subscription.id)")
-      case (.trialing, _):
+      case (.trialing, _, _):
         fatalError("invariant 638203c8, id: \(subscription.id)")
-      case (.trialExpiringSoon, _):
+      case (.trialExpiringSoon, _, _):
         fatalError("invariant e0e2821e, id: \(subscription.id)")
-      case (.trialExpired, _):
+      case (.trialExpired, _, _):
         fatalError("invariant 6fd8c1f7, id: \(subscription.id)")
-      case (.paid, nil):
+      case (.paid, nil, _):
         fatalError("invariant d486cada, id: \(subscription.id)")
-      case (.overdue, nil):
+      case (.overdue, nil, _):
         fatalError("invariant 4d047803, id: \(subscription.id)")
-      case (.unpaid, nil):
+      case (.unpaid, nil, _):
         fatalError("invariant 38131a59, id: \(subscription.id)")
-      case (.cancelled, nil):
+      case (.cancelled, nil, _):
         fatalError("invariant 4c79e7b7, id: \(subscription.id)")
-      case (.paid, .some(let stripeId)):
-        self = .light(status: .paid(stripeId: stripeId))
-      case (.overdue, .some(let stripeId)):
-        self = .light(status: .overdue(stripeId: stripeId))
-      case (.unpaid, .some(let stripeId)):
-        self = .free(kind: .lapsedLight(stripeId: stripeId))
-      case (.cancelled, .some(let stripeId)):
-        self = .free(kind: .lapsedLight(stripeId: stripeId))
+      case (_, .none, .some):
+        fatalError("invariant 08cd4729, id: \(subscription.id)")
+      case (_, .some(let stripeId), .some(let trialStartedAt))
+        where trialStartedAt + Full.trialLengthDays > now:
+        self = .full(status: .trialing(
+          kind: .fromLight(stripeId: stripeId),
+          until: trialStartedAt + Full.trialLengthDays,
+        ))
+      case (_, .some(let stripeId), .some(let trialStartedAt))
+        where trialStartedAt + Full.trialLengthDays > now - Full.trialGraceDays:
+        self = .full(status: .trialExpired(kind: .fromLight(stripeId: stripeId)))
+      case (.paid, .some(let stripeId), let trialStarted):
+        self = .light(status: .paid(stripeId: stripeId, hasTrialedFull: trialStarted != nil))
+      case (.overdue, .some(let stripeId), let trialStarted):
+        self = .light(status: .overdue(stripeId: stripeId, hasTrialedFull: trialStarted != nil))
+      case (.unpaid, .some(let stripeId), let trialStarted):
+        self = .free(kind: .lapsedLight(stripeId: stripeId, hasTrialedFull: trialStarted != nil))
+      case (.cancelled, .some(let stripeId), let trialStarted):
+        self = .free(kind: .lapsedLight(stripeId: stripeId, hasTrialedFull: trialStarted != nil))
       }
     case .full:
       let priceInCents = subscription.isLegacyPrice ? 500 : 1000
@@ -100,11 +143,14 @@ extension Plan {
       case (.trialExpired, .some(_)):
         fatalError("invariant 7bb105c6, id: \(subscription.id)")
       case (.trialing, _):
-        self = .full(status: .trialing(until: subscription.statusExpiresAt + .days(3)))
+        self = .full(status: .trialing(
+          kind: .full,
+          until: subscription.statusExpiresAt + Full.trialWarningDays,
+        ))
       case (.trialExpiringSoon, _):
-        self = .full(status: .trialing(until: subscription.statusExpiresAt))
+        self = .full(status: .trialing(kind: .full, until: subscription.statusExpiresAt))
       case (.trialExpired, nil):
-        self = .full(status: .trialExpired)
+        self = .full(status: .trialExpired(kind: .full))
       case (.paid, .some(let stripeId)):
         self = .full(status: .paid(stripeId: stripeId, monthlyPriceInCents: priceInCents))
       case (.overdue, .some(let stripeId)):

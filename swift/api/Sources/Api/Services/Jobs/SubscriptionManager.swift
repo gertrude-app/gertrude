@@ -110,13 +110,16 @@ struct SubscriptionManager: AsyncScheduledJob {
 
     case .trialing:
       return .init(
-        action: .update(status: .trialExpiringSoon, expiration: self.now + .days(3)),
+        action: .update(
+          status: .trialExpiringSoon,
+          expiration: self.now + Plan.Full.trialWarningDays,
+        ),
         email: .trialEndingSoon(length: 21, remaining: 3),
       )
 
     case .trialExpiringSoon:
       return .init(
-        action: .update(status: .trialExpired, expiration: self.now + .days(7)),
+        action: .update(status: .trialExpired, expiration: self.now + Plan.Full.trialGraceDays),
         email: completedOnboarding ? .trialExpired(length: 21) : nil,
       )
 

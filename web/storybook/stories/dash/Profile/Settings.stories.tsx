@@ -34,6 +34,7 @@ const plans: Record<string, Plan> = {
     case: `full`,
     status: {
       case: `trialing`,
+      kind: { case: `full` },
       until: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
     },
   },
@@ -41,6 +42,7 @@ const plans: Record<string, Plan> = {
     case: `full`,
     status: {
       case: `trialing`,
+      kind: { case: `full` },
       until: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
     },
   },
@@ -48,10 +50,19 @@ const plans: Record<string, Plan> = {
     case: `full`,
     status: { case: `overdue`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
   },
-  fullTrialExpired: { case: `full`, status: { case: `trialExpired` } },
+  fullTrialExpired: {
+    case: `full`,
+    status: { case: `trialExpired`, kind: { case: `full` } },
+  },
   fullComplimentary: { case: `full`, status: { case: `complimentary` } },
-  lightPaid: { case: `light`, status: { case: `paid`, stripeId: `sub_456` } },
-  lightOverdue: { case: `light`, status: { case: `overdue`, stripeId: `sub_456` } },
+  lightPaid: {
+    case: `light`,
+    status: { case: `paid`, stripeId: `sub_456`, hasTrialedFull: false },
+  },
+  lightOverdue: {
+    case: `light`,
+    status: { case: `overdue`, stripeId: `sub_456`, hasTrialedFull: false },
+  },
   free: { case: `free`, kind: { case: `standard` } },
 };
 

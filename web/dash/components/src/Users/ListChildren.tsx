@@ -1,6 +1,10 @@
 import { Button } from '@shared/components';
 import React from 'react';
-import type { RequestState, Subcomponents } from '@dash/types';
+import type {
+  CreatePendingAppConnection_v2,
+  RequestState,
+  Subcomponents,
+} from '@dash/types';
 import EmptyState from '../EmptyState';
 import PageHeading from '../PageHeading';
 import ChildCard from './ChildCard';
@@ -8,9 +12,10 @@ import ConnectModal from './ConnectDeviceModal';
 
 type Props = {
   users: Subcomponents<typeof ChildCard>;
-  addDeviceRequest?: RequestState<{ code: number }>;
+  addDeviceRequest?: RequestState<CreatePendingAppConnection_v2.Output>;
   startAddDevice(userId: UUID): unknown;
   dismissAddDevice(): unknown;
+  onStartTrial(): unknown;
 };
 
 const ListChildren: React.FC<Props> = ({
@@ -18,9 +23,14 @@ const ListChildren: React.FC<Props> = ({
   addDeviceRequest,
   startAddDevice,
   dismissAddDevice,
+  onStartTrial,
 }) => (
   <div className="flex flex-col">
-    <ConnectModal request={addDeviceRequest} dismissAddDevice={dismissAddDevice} />
+    <ConnectModal
+      request={addDeviceRequest}
+      dismissAddDevice={dismissAddDevice}
+      onStartTrial={onStartTrial}
+    />
     <PageHeading icon="users">Children</PageHeading>
     <div className="mt-8 flex flex-col">
       {users.length > 0 ? (
