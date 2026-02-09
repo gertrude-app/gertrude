@@ -27,6 +27,7 @@ import SuperviseDevice from './components/routes/SuperviseDevice';
 import SuperviseDeviceClaim from './components/routes/SuperviseDevice/Claim';
 import SuperviseDeviceDone from './components/routes/SuperviseDevice/Done';
 import SuperviseDeviceDownloadHelper from './components/routes/SuperviseDevice/DownloadHelper';
+import SuperviseDevicePayment from './components/routes/SuperviseDevice/Payment';
 import SuperviseDeviceSupervise from './components/routes/SuperviseDevice/Supervise';
 import SuspendFilter from './components/routes/SuspendFilter';
 import DenyUnlockRequest from './components/routes/UnlockRequest/DenyUnlockRequest';
@@ -74,6 +75,7 @@ const App: React.FC = () => {
 
         <Route path="supervise-device/:code" element={<SuperviseDevice />}>
           <Route path="claim" element={<SuperviseDeviceClaim />} />
+          <Route path="payment" element={<SuperviseDevicePayment />} />
           <Route path="download-helper" element={<SuperviseDeviceDownloadHelper />} />
           <Route path="supervise" element={<SuperviseDeviceSupervise />} />
           <Route path="done" element={<SuperviseDeviceDone />} />

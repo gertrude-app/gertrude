@@ -18,6 +18,7 @@ struct GetSupervisionDeviceStatus: Pair {
     let deviceType: String
     let iosVersion: String
     let supervisionStatus: SupervisionStatus
+    let requiresPayment: Bool
   }
 
   enum SupervisionStatus: String, Codable, Equatable, Sendable {
@@ -46,6 +47,8 @@ extension GetSupervisionDeviceStatus: Resolver {
     }
 
     let child = try await context.verifiedChild(from: childId)
+    let subscription = try await context.parent.subscription(in: context.db)
+    let plan = Plan(subscription: subscription)
     return .init(
       deviceId: device.id,
       childId: child.id,
@@ -54,6 +57,7 @@ extension GetSupervisionDeviceStatus: Resolver {
       deviceType: device.deviceType,
       iosVersion: device.iosVersion,
       supervisionStatus: supervision.supervised ? .supervised : .awaitingSupervision,
+      requiresPayment: plan.isFree,
     )
   }
 }

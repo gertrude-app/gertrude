@@ -8,9 +8,15 @@ import XExpect
 final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable {
   func testValidDownload_redirectsAndLogsEvent() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
+    let parent = try await self.parentWithSubscription {
+      $1.tier = .light
+      $1.billingStatus = .paid
+      $1.stripeId = .init("sub_123")
+    }
+    let child = try await self.db.create(Child(parentId: parent.id, name: "Test Child"))
     let device = try await self.db.create(IOSApp.Device(
       id: .init(),
-      childId: nil,
+      childId: child.id,
       modelIdentifier: "iPhone15,2",
       appVersion: "1.0.0",
       iosVersion: "18.2",
@@ -49,5 +55,31 @@ final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable 
     expect(events[0].detail).toEqual("supervision_tool_download: platform=mac")
     expect(events[1].kind).toEqual(.supervision)
     expect(events[1].detail).toEqual("supervision_tool_download: platform=windows")
+  }
+
+  func testDownload_blockedForFreeUser() async throws {
+    let code = Int.random(in: 100_000 ... 999_999)
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child(parentId: parent.id, name: "Test Child"))
+    let device = try await self.db.create(IOSApp.Device(
+      id: .init(),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      appVersion: "1.0.0",
+      iosVersion: "18.2",
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: code,
+      claimCodeExpiresAt: .reference + .days(7),
+    ))
+
+    try await app.test(
+      .GET,
+      "download-supervision-app/\(code)/platform/mac",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.paymentRequired)
+      },
+    )
   }
 }

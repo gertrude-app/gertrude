@@ -117,7 +117,7 @@ describe(`payment`, () => {
       verifiedNotificationMethods: [],
     });
 
-    cy.interceptPql(`StripeUrl`, { url: `/stripe-url` });
+    cy.interceptPql(`StripeUrl_v2`, { url: `/stripe-url` });
 
     cy.visit(`/settings`);
     cy.contains(`Manage subscription`).click();

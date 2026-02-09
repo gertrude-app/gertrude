@@ -108,6 +108,7 @@ const noopClient: ApiClient = {
       deviceType: `iPhone`,
       iosVersion: `18.2`,
       supervisionStatus: `awaitingSupervision` as const,
+      requiresPayment: true,
     });
   },
   getSuspendFilterRequest: async () => {

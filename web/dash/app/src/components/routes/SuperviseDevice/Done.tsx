@@ -1,9 +1,9 @@
-import { ApiErrorMessage, Loading, PageHeading } from '@dash/components';
+import { ApiErrorMessage, Loading } from '@dash/components';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import Current from '../../../environment';
 import { Key, useQuery } from '../../../hooks';
-import { DoneScreen } from './screens';
+import { DoneScreen, ScreenShell } from './screens';
 
 const SuperviseDeviceDone: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
@@ -23,17 +23,14 @@ const SuperviseDeviceDone: React.FC = () => {
   const { deviceId, childName, modelName, deviceType, iosVersion } = query.data;
 
   return (
-    <div className="relative max-w-3xl">
-      <PageHeading icon="phone">{deviceType} Setup Complete</PageHeading>
-      <div className="mt-8 bg-white rounded-2xl border border-slate-200 p-6">
-        <DoneScreen
-          childName={childName}
-          modelName={modelName}
-          iosVersion={iosVersion}
-          deviceId={deviceId}
-        />
-      </div>
-    </div>
+    <ScreenShell title={`${deviceType} Setup Complete`}>
+      <DoneScreen
+        childName={childName}
+        modelName={modelName}
+        iosVersion={iosVersion}
+        deviceId={deviceId}
+      />
+    </ScreenShell>
   );
 };
 

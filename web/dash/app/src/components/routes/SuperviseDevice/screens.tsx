@@ -1,4 +1,6 @@
+import { PageHeading } from '@dash/components';
 import { Button } from '@shared/components';
+import { posessive } from '@shared/string';
 import React, { useState } from 'react';
 
 type DeviceInfo = {
@@ -6,6 +8,43 @@ type DeviceInfo = {
   modelName: string;
   iosVersion: string;
 };
+
+export const ScreenShell: React.FC<{
+  title: string;
+  children: React.ReactNode;
+}> = ({ title, children }) => (
+  <div className="relative max-w-3xl">
+    <PageHeading icon="phone">{title}</PageHeading>
+    <div className="mt-8 bg-white rounded-2xl border border-slate-200 p-6">
+      {children}
+    </div>
+  </div>
+);
+
+const ScreenHeader: React.FC<{
+  icon: string;
+  title: string;
+  subtitle?: string;
+  step?: { current: number; total: number };
+}> = ({ icon, title, subtitle, step }) => (
+  <div className="flex items-start gap-4 mb-6">
+    <div className="w-14 h-14 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
+      <i className={`fa-solid fa-${icon} text-violet-600 text-2xl`} />
+    </div>
+    <div className="flex-1">
+      {step && (
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-sm font-medium text-violet-600">
+            Step {step.current} of {step.total}
+          </p>
+          <ProgressDots current={step.current} total={step.total} />
+        </div>
+      )}
+      <h1 className="text-xl font-bold text-slate-800">{title}</h1>
+      {subtitle && <p className="text-slate-500 text-sm mt-1">{subtitle}</p>}
+    </div>
+  </div>
+);
 
 export const MobileDetectedScreen: React.FC<{ onThisIsComputer: () => void }> = ({
   onThisIsComputer,
@@ -70,23 +109,12 @@ export const DownloadHelperScreen: React.FC<
 
   return (
     <div>
-      <div className="flex items-start gap-4 mb-6">
-        <div className="w-14 h-14 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
-          <i className="fa-solid fa-download text-violet-600 text-2xl" />
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-sm font-medium text-violet-600">Step 1 of 3</p>
-            <ProgressDots current={1} total={3} />
-          </div>
-          <h1 className="text-xl font-bold text-slate-800">
-            Download and Launch the Supervision Helper App
-          </h1>
-          <p className="text-slate-500 text-sm mt-1">
-            Setting up {childName}'s {modelName} · iOS {iosVersion}
-          </p>
-        </div>
-      </div>
+      <ScreenHeader
+        icon="download"
+        title="Download and Launch the Supervision Helper App"
+        subtitle={`Setting up ${childName}'s ${modelName} · iOS ${iosVersion}`}
+        step={{ current: 1, total: 3 }}
+      />
 
       <p className="text-slate-600 text-sm mb-5">
         The helper app is a small app that you run one time on your computer. It will
@@ -213,23 +241,12 @@ export const SuperviseScreen: React.FC<
 
   return (
     <div>
-      <div className="flex items-start gap-4 mb-6">
-        <div className="w-14 h-14 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
-          <i className="fa-solid fa-plug text-violet-600 text-2xl" />
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-sm font-medium text-violet-600">Step 2 of 3</p>
-            <ProgressDots current={2} total={3} />
-          </div>
-          <h1 className="text-xl font-bold text-slate-800">
-            Connect {childName}'s {modelName} via USB
-          </h1>
-          <p className="text-slate-500 text-sm mt-1">
-            Setting up {childName}'s {modelName} · iOS {iosVersion}
-          </p>
-        </div>
-      </div>
+      <ScreenHeader
+        icon="plug"
+        title={`Connect ${childName}'s ${modelName} via USB`}
+        subtitle={`Setting up ${childName}'s ${modelName} · iOS ${iosVersion}`}
+        step={{ current: 2, total: 3 }}
+      />
 
       <HighlightableCard highlighted={!hasCopied} className="mb-4">
         <div className="flex items-center gap-2 mb-4">
@@ -376,21 +393,12 @@ export const DoneScreen: React.FC<
   }
 > = ({ childName, modelName, iosVersion, deviceId }) => (
   <div>
-    <div className="flex items-start gap-4 mb-6">
-      <div className="w-14 h-14 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
-        <i className="fa-solid fa-check text-violet-600 text-2xl" />
-      </div>
-      <div className="flex-1">
-        <div className="flex items-center justify-between mb-1">
-          <p className="text-sm font-medium text-violet-600">Step 3 of 3</p>
-          <ProgressDots current={3} total={3} />
-        </div>
-        <h1 className="text-xl font-bold text-slate-800">Setup Complete</h1>
-        <p className="text-slate-500 text-sm mt-1">
-          {childName}'s {modelName} · iOS {iosVersion}
-        </p>
-      </div>
-    </div>
+    <ScreenHeader
+      icon="check"
+      title="Setup Complete"
+      subtitle={`${childName}'s ${modelName} · iOS ${iosVersion}`}
+      step={{ current: 3, total: 3 }}
+    />
 
     <div className="bg-slate-50/50 rounded-2xl border border-slate-200 p-5 mb-6">
       <p className="text-slate-600 text-sm">
@@ -402,6 +410,75 @@ export const DoneScreen: React.FC<
     <div className="flex justify-end">
       <Button type="link" to={`/ios-devices/${deviceId}`} color="primary">
         Manage Device
+      </Button>
+    </div>
+  </div>
+);
+
+export const PaymentGateScreen: React.FC<
+  DeviceInfo & {
+    deviceType: string;
+    onSubscribe: () => void;
+    isRedirecting?: boolean;
+    checkoutCancelled?: boolean;
+  }
+> = ({
+  childName,
+  modelName,
+  iosVersion,
+  deviceType,
+  onSubscribe,
+  isRedirecting = false,
+  checkoutCancelled = false,
+}) => (
+  <div>
+    <ScreenHeader
+      icon="credit-card"
+      title="Subscribe to Continue"
+      subtitle={`Setting up ${posessive(childName)} ${modelName} · iOS ${iosVersion}`}
+    />
+
+    <p className="text-slate-600 mb-5">
+      To supervise {posessive(childName)} {deviceType}, you'll need a{` `}
+      <b>Gertrude Light subscription.</b>
+    </p>
+
+    <HighlightableCard highlighted className="mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold text-slate-800">Light Plan</h3>
+        <span className="text-lg font-bold text-violet-700">$10/year</span>
+      </div>
+      <ul className="space-y-2">
+        {[
+          `Supervise iPhones and iPads for 18+ users`,
+          `All basic iOS blocking (GIFs, Apple Maps, Spotify etc.)`,
+          `Unlimited devices for your family with one subscription`,
+        ].map((feature) => (
+          <li key={feature} className="flex items-center gap-2 text-sm text-slate-600">
+            <i className="fa-solid fa-check text-violet-500 text-xs" />
+            {feature}
+          </li>
+        ))}
+      </ul>
+      <p className="text-xs text-slate-400 mt-3">
+        This is a one-time annual payment. No trial period.
+      </p>
+    </HighlightableCard>
+
+    {checkoutCancelled && (
+      <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-6 text-sm text-amber-700">
+        Checkout was cancelled. You can try again when you're ready.
+      </div>
+    )}
+
+    <div className="flex justify-end">
+      <Button
+        type="button"
+        color="primary"
+        onClick={onSubscribe}
+        disabled={isRedirecting}
+      >
+        {isRedirecting ? `Redirecting...` : `Subscribe \u2014 $10/year`}
       </Button>
     </div>
   </div>

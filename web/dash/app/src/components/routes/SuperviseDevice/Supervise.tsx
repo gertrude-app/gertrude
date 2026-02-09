@@ -1,9 +1,9 @@
-import { ApiErrorMessage, Loading, PageHeading } from '@dash/components';
+import { ApiErrorMessage, Loading } from '@dash/components';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Current from '../../../environment';
 import { Key, useQuery } from '../../../hooks';
-import { SuperviseScreen } from './screens';
+import { ScreenShell, SuperviseScreen } from './screens';
 
 const SuperviseDeviceSupervise: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
@@ -29,18 +29,15 @@ const SuperviseDeviceSupervise: React.FC = () => {
   };
 
   return (
-    <div className="relative max-w-3xl">
-      <PageHeading icon="phone">Continue {deviceType} Setup</PageHeading>
-      <div className="mt-8 bg-white rounded-2xl border border-slate-200 p-6">
-        <SuperviseScreen
-          childName={childName}
-          modelName={modelName}
-          iosVersion={iosVersion}
-          code={codeNum}
-          onDone={handleDone}
-        />
-      </div>
-    </div>
+    <ScreenShell title={`Continue ${deviceType} Setup`}>
+      <SuperviseScreen
+        childName={childName}
+        modelName={modelName}
+        iosVersion={iosVersion}
+        code={codeNum}
+        onDone={handleDone}
+      />
+    </ScreenShell>
   );
 };
 

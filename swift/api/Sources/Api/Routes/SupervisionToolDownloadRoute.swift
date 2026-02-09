@@ -20,8 +20,17 @@ enum SupervisionToolDownloadRoute {
       throw Abort(.notFound, reason: "Device not found for claim code")
     }
 
+    let device = try await supervision.device(in: request.context.db)
+    guard let child = try await device.child(in: request.context.db) else {
+      throw Abort(.badRequest, reason: "Device not claimed")
+    }
+    let parent = try await child.parent(in: request.context.db)
+    let plan = try await parent.plan(in: request.context.db)
+    guard !plan.isFree else {
+      throw Abort(.paymentRequired, reason: "Subscription required")
+    }
+
     let task = Task {
-      let device = try await supervision.device(in: request.context.db)
       try await request.context.db.create(IOSEvent(
         eventId: "7d644b4d",
         kind: .supervision,

@@ -21,9 +21,8 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
       .first(in: self.db)
 
     expect(output.adminId).toEqual(parent.id)
-    // TODO: this is going to change soon
-    expect(retrieved.subscription!.billingStatus).toEqual(.trialing)
-    expect(retrieved.subscription!.statusExpiresAt).toEqual(.reference.advanced(by: .days(18)))
+    expect(retrieved.subscription).toBeNil()
+    expect(Plan(subscription: retrieved.subscription)).toEqual(.free(kind: .standard))
     expect(method.config).toEqual(.email(email: parent.email.rawValue))
   }
 
