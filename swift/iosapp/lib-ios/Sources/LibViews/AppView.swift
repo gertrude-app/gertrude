@@ -581,6 +581,7 @@ public struct AppView: View {
       InfoView(store: store)
         .onAppear { store.send(.sheetPresented) }
         .onShake { store.send(.receivedShake) }
+        .pageSheet()
     }
   }
 
