@@ -27,7 +27,7 @@ enum ProfileDownloadRoute {
         "Content-Type": "application/x-apple-aspen-config",
         "Content-Disposition": "attachment; filename=\"Gertrude.mobileconfig\"",
       ],
-      body: .init(string: generateProfileXml(for: device)),
+      body: .init(string: generateProfileXml(for: device, env: req.env)),
     )
   }
 }
@@ -36,8 +36,9 @@ enum ProfileDownloadRoute {
 // @see https://developer.apple.com/documentation/devicemanagement/webcontentfilter
 // `DenyListURLS` is interesting, can specify 500 URLs, could put top 500 porn sites there...
 // `SafariHistoryRetentionEnabled`, also cool, kills private mode, and history clearing
-func generateProfileXml(for device: IOSApp.Device) -> String {
-  """
+func generateProfileXml(for device: IOSApp.Device, env: Env) -> String {
+  let extraXml = env.get("IOS_PROFILE_EXTRA_XML") ?? ""
+  return """
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
   <plist version="1.0">
@@ -96,6 +97,7 @@ func generateProfileXml(for device: IOSApp.Device) -> String {
           <key>FilterBrowsers</key>
           <true/>
         </dict>
+  \(extraXml)
       </array>
     </dict>
   </plist>
