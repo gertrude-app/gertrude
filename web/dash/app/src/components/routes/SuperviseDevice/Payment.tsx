@@ -20,6 +20,7 @@ const SuperviseDevicePayment: React.FC = () => {
       successPath: `/supervise-device/${code}/download-helper`,
       cancelPath: `/supervise-device/${code}/payment`,
       tier: `light`,
+      associatedIosDeviceId: deviceStatus.data?.deviceId,
     }),
   );
 

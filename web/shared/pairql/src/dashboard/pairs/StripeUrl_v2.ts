@@ -4,6 +4,7 @@ export namespace StripeUrl_v2 {
     successPath: string;
     cancelPath: string;
     tier?: `light` | `full`;
+    associatedIosDeviceId?: UUID;
   }
 
   export interface Output {
