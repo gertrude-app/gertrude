@@ -128,6 +128,9 @@ final class IOSReducerTestsResume: XCTestCase {
       $0.screen = .onboarding(.supervision(.resume(.installingProfile(profileUrl: profileUrl))))
     }
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.resume(.profileNotRemovableWarning)))
+    }
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.supervision(.resume(.explainProfileInstall())))
     }
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {

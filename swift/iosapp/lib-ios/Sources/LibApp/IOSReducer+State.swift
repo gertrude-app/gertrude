@@ -125,6 +125,7 @@ extension IOSReducer {
         case promptInstallProfile
         case explainProfileDownload
         case installingProfile(profileUrl: URL)
+        case profileNotRemovableWarning
         case explainProfileInstall(regainedFocus: Bool = false)
         case verifyingProfileInstall(didError: Bool = false)
         case profileInstalled

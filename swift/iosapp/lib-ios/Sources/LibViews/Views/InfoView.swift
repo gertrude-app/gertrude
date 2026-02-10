@@ -359,3 +359,87 @@ struct InfoView: View {
   })
   .environment(\.colorScheme, .dark)
 }
+
+#Preview("iPad Sheet - Supervised") {
+  struct Container: View {
+    @State private var isPresented = true
+    var body: some View {
+      Color.gray.opacity(0.3)
+        .ignoresSafeArea()
+        .sheet(isPresented: self.$isPresented) {
+          InfoView(store: .init(
+            initialState: .init(
+              connection: .init(
+                childId: UUID(uuidString: "123e4567-e89b-12d3-a456-426614174000")!,
+                token: UUID(),
+                deviceId: UUID(),
+                childName: "Emma Johnson",
+                supervised: .byGertrude(claimCode: 123_456),
+              ),
+              vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+              numRules: 87,
+            ),
+          ) {
+            InfoFeature()
+          })
+          .pageSheet()
+        }
+    }
+  }
+  return Container()
+}
+
+#Preview("iPad Sheet - Syncing Profile") {
+  struct Container: View {
+    @State private var isPresented = true
+    var body: some View {
+      Color.gray.opacity(0.3)
+        .ignoresSafeArea()
+        .sheet(isPresented: self.$isPresented) {
+          InfoView(store: .init(
+            initialState: .init(
+              connection: .init(
+                childId: UUID(uuidString: "123e4567-e89b-12d3-a456-426614174000")!,
+                token: UUID(),
+                deviceId: UUID(),
+                childName: "Emma Johnson",
+                supervised: .byGertrude(claimCode: 123_456),
+              ),
+              vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+              numRules: 87,
+              subScreen: .syncingProfile(
+                URL(string: "https://gertrude-dev.nyc3.digitaloceanspaces.com/super.mobileconfig")!,
+              ),
+            ),
+          ) {
+            InfoFeature()
+          })
+          .pageSheet()
+        }
+    }
+  }
+  return Container()
+}
+
+#Preview("iPad Sheet - Unconnected") {
+  struct Container: View {
+    @State private var isPresented = true
+    var body: some View {
+      Color.gray.opacity(0.3)
+        .ignoresSafeArea()
+        .sheet(isPresented: self.$isPresented) {
+          InfoView(store: .init(
+            initialState: .init(
+              vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+              numRules: 42,
+              numDisabledBlockGroups: 4,
+            ),
+          ) {
+            InfoFeature()
+          })
+          .pageSheet()
+        }
+    }
+  }
+  return Container()
+}

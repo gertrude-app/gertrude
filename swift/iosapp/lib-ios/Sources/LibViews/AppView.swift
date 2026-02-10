@@ -514,13 +514,21 @@ public struct AppView: View {
             self.store.send(.interactive(.onboardingBtnTapped(.primary, "Safari dismissed")))
           }
 
+        case .onboarding(.supervision(.resume(.profileNotRemovableWarning))):
+          ButtonScreenView(
+            text: "When installing the profile, your \(self.deviceType) will warn you that it can’t be removed. Don’t worry—it can be removed at any time from the Gertrude account.",
+            primary: self.btn(text: "Got it", .primary),
+          )
+
         case .onboarding(.supervision(.resume(.explainProfileInstall(let regainedFocus)))):
           ButtonScreenView(
             text: "Now, open the Settings app:",
             primary: self.btn(text: "Done, continue", .primary, disabled: !regainedFocus),
             listItems: [
-              "Tap “Profile Downloaded” at top",
-              "Tap “Install”",
+              self.deviceType == "iPad"
+                ? "In the left column, tap \u{201c}Profile Downloaded\u{201d} near the top"
+                : "Tap \u{201c}Profile Downloaded\u{201d} near the top",
+              "Tap \u{201c}Install\u{201d}",
               "Enter your passcode",
               "Come back to this app",
             ],
@@ -581,6 +589,7 @@ public struct AppView: View {
       InfoView(store: store)
         .onAppear { store.send(.sheetPresented) }
         .onShake { store.send(.receivedShake) }
+        .pageSheet()
     }
   }
 
