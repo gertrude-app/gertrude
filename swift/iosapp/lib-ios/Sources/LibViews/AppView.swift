@@ -154,7 +154,8 @@ public struct AppView: View {
             onDone: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Done"))) },
           )
 
-        case .onboarding(.happyPath(.promptClearCache)):
+        case .onboarding(.happyPath(.promptClearCache)),
+             .onboarding(.supervision(.resume(.promptClearCache))):
           ButtonScreenView(
             text: "Gertrude is now blocking new content, like when a new and unique search is made for GIFs. But content ALREADY VIEWED will still be visible unless we clear the cache.",
             primary: self.btn(text: "Clear the cache", .primary),
@@ -544,14 +545,8 @@ public struct AppView: View {
 
         case .onboarding(.supervision(.resume(.profileInstalled))):
           ButtonScreenView(
-            text: "Profile installed successfully! Gertrude can now block unwanted content.",
+            text: "Profile installed successfully! Gertrude can now block unwanted content. The account holder can manage what gets blocked and also remove the supervision.",
             primary: self.btn(text: "Next", .primary),
-          )
-
-        case .onboarding(.supervision(.resume(.setupComplete))):
-          ButtonScreenView(
-            text: "You’re all set! The Gertrude account holder can manage what gets blocked and also remove the supervision when needed.",
-            primary: self.btn(text: "Done", .primary),
           )
 
         case .onboarding(.supervision(.resume(.networkError))):

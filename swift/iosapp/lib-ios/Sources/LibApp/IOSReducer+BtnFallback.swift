@@ -192,9 +192,9 @@ extension IOSReducer.Onboarding.Supervision.Resume {
     case (.verifyingProfileInstall(didError: _), _):
       .onboarding(.supervision(.resume(.explainProfileInstall())))
     case (.profileInstalled, _):
-      .onboarding(.supervision(.resume(.setupComplete)))
-    case (.setupComplete, _):
-      .running(state: .notConnected)
+      .onboarding(.supervision(.resume(.promptClearCache)))
+    case (.promptClearCache, _):
+      .onboarding(.happyPath(.requestAppStoreRating))
     case (.networkError, _):
       .onboarding(.supervision(.resume(.networkError)))
     }

@@ -140,10 +140,13 @@ final class IOSReducerTestsResume: XCTestCase {
       $0.screen = .onboarding(.supervision(.resume(.profileInstalled)))
     }
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.resume(.setupComplete)))
+      $0.screen = .onboarding(.supervision(.resume(.promptClearCache)))
     }
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .running(state: .connected)
+    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
+      $0.screen = .onboarding(.happyPath(.requestAppStoreRating))
+    }
+    await store.send(.interactive(.onboardingBtnTapped(.tertiary, ""))) {
+      $0.screen = .onboarding(.happyPath(.doneQuit))
     }
     expect(codeCleaned.value).toEqual(true)
     expect(setupCompleted.value).toEqual(true)
@@ -181,5 +184,28 @@ final class IOSReducerTestsResume: XCTestCase {
     await store.receive(.programmatic(.filterVerified)) {
       $0.screen = .onboarding(.supervision(.resume(.profileInstalled)))
     }
+  }
+
+  @MainActor
+  func testSupervisionCacheClearCompletion_clearsCode() async throws {
+    let codeCleaned = LockIsolated(false)
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.promptClearCache))),
+      onboarding: .init(),
+    )) {
+      IOSReducer()
+    } withDependencies: {
+      $0.sharedStorage.clearPendingSupervisionCode = { codeCleaned.setValue(true) }
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.onboarding.clearCache = .init(context: .onboarding)
+    }
+
+    await store.send(.interactive(.onboardingClearCache(.completeBtnTapped))) {
+      $0.onboarding.clearCache = nil
+      $0.screen = .onboarding(.happyPath(.requestAppStoreRating))
+    }
+    expect(codeCleaned.value).toEqual(true)
   }
 }

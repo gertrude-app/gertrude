@@ -71,15 +71,22 @@ public struct IOSReducer {
 
     #if DEBUG
       case .receivedShake where state.screen == .onboarding(.happyPath(.hiThere)):
-        state.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
+        state.screen = .onboarding(.supervision(.resume(.profileInstalled)))
         return .none
     #endif
 
     case .onboardingClearCache(.completeBtnTapped),
          .onboardingClearCache(.receivedClearCacheUpdate(.errorCouldNotCreateDir)):
       state.onboarding.clearCache = nil
-      state.screen = .onboarding(.happyPath(.requestAppStoreRating))
-      return .none
+      if state.screen == .onboarding(.supervision(.resume(.promptClearCache))) {
+        state.screen = .onboarding(.happyPath(.requestAppStoreRating))
+        return .run { [deps = self.deps] _ in
+          deps.sharedStorage.clearPendingSupervisionCode()
+        }
+      } else {
+        state.screen = .onboarding(.happyPath(.requestAppStoreRating))
+        return .none
+      }
 
     case .onboardingClearCache:
       return .none
@@ -552,12 +559,17 @@ public struct IOSReducer {
 
     case (.onboarding(.supervision(.resume(.profileInstalled))), .primary):
       self.deps.log(state.screen, action, "4af7783e")
-      state.screen = .onboarding(.supervision(.resume(.setupComplete)))
+      state.screen = .onboarding(.supervision(.resume(.promptClearCache)))
       return .none
 
-    case (.onboarding(.supervision(.resume(.setupComplete))), .primary):
-      self.deps.log(state.screen, action, "6ed43005")
-      state.screen = .running(state: .connected)
+    case (.onboarding(.supervision(.resume(.promptClearCache))), .primary):
+      self.deps.log(state.screen, action, "acfc7894")
+      state.onboarding.clearCache = .init(context: .onboarding)
+      return .none
+
+    case (.onboarding(.supervision(.resume(.promptClearCache))), .secondary):
+      self.deps.log(state.screen, action, "7d8b61d0")
+      state.screen = .onboarding(.happyPath(.requestAppStoreRating))
       return .run { [deps = self.deps] _ in
         deps.sharedStorage.clearPendingSupervisionCode()
       }
