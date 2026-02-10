@@ -62,6 +62,7 @@ extension IOSReducer {
 
     case onParentDeviceFail
     case childIsOnboardingFail
+    case mdmSupervisionExplainer
 
     public enum HappyPath: Equatable {
       case hiThere

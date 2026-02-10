@@ -134,7 +134,11 @@ public struct IOSReducer {
 
     case (.onboarding(.happyPath(.confirmMinorDevice)), .secondary):
       self.deps.log(state.screen, action, "a21c9040")
-      state.screen = .onboarding(.supervision(.setup(.explainSupervision)))
+      if self.isBuildAhead(of: state.onboarding.connectFeature.releasedAppStoreVersion) {
+        state.screen = .onboarding(.mdmSupervisionExplainer)
+      } else {
+        state.screen = .onboarding(.supervision(.setup(.explainSupervision)))
+      }
       return .none
 
     case (.onboarding(.happyPath(.confirmParentIsOnboarding)), .primary):
@@ -652,6 +656,11 @@ public struct IOSReducer {
       state.screen = .onboarding(.happyPath(.explainInstallWithDevicePasscode))
       return .none
 
+    case (.onboarding(.mdmSupervisionExplainer), .primary):
+      self.deps.log(state.screen, action, "b4e7f219")
+      state.screen = .onboarding(.happyPath(.hiThere))
+      return .none
+
     case (.onboarding(.childIsOnboardingFail), .primary):
       self.deps.log(state.screen, action, "566a3484")
       state.screen = .onboarding(.happyPath(.hiThere))
@@ -937,5 +946,18 @@ extension IOSReducer.Deps {
       try? await self.clock.sleep(for: .milliseconds(500))
     }
     return .filterVerificationFailed
+  }
+}
+
+extension IOSReducer {
+  func isBuildAhead(of appStoreVersion: String?) -> Bool {
+    guard let appStoreVersion else { return false }
+    let appVersion = self.deps.device.installedVersion()
+    let app = appVersion.split(separator: ".").compactMap { Int($0) }
+    let store = appStoreVersion.split(separator: ".").compactMap { Int($0) }
+    guard app.count >= 3, store.count >= 3 else { return false }
+    if app[0] != store[0] { return app[0] > store[0] }
+    if app[1] != store[1] { return app[1] > store[1] }
+    return app[2] > store[2]
   }
 }

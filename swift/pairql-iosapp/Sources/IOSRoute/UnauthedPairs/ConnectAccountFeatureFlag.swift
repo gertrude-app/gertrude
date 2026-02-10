@@ -13,6 +13,7 @@ public struct ConnectAccountFeatureFlag: Pair {
     public var offerScreenSkipBtnText: String?
     public var explainScreenText: String?
     public var connectAccountSheetInfoBlurb: String?
+    public var releasedAppStoreVersion: String?
 
     public init(
       isEnabled: Bool,
@@ -21,6 +22,7 @@ public struct ConnectAccountFeatureFlag: Pair {
       offerScreenSkipBtnText: String? = nil,
       explainScreenText: String? = nil,
       connectAccountSheetInfoBlurb: String? = nil,
+      releasedAppStoreVersion: String? = nil,
     ) {
       self.isEnabled = isEnabled
       self.offerScreenText = offerScreenText
@@ -28,6 +30,7 @@ public struct ConnectAccountFeatureFlag: Pair {
       self.offerScreenSkipBtnText = offerScreenSkipBtnText
       self.explainScreenText = explainScreenText
       self.connectAccountSheetInfoBlurb = connectAccountSheetInfoBlurb
+      self.releasedAppStoreVersion = releasedAppStoreVersion
     }
   }
 }

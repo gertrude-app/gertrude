@@ -32,6 +32,8 @@ extension IOSReducer.Onboarding {
       .onboarding(.happyPath(.hiThere))
     case .supervision(let supervision):
       supervision.fallbackDestination(from: btn)
+    case .mdmSupervisionExplainer:
+      .onboarding(.happyPath(.hiThere))
     }
   }
 }

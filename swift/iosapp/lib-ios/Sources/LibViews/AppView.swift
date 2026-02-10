@@ -271,6 +271,12 @@ public struct AppView: View {
             text: "Gertrude must be installed on the device you want to protect, not on a parent or guardian’s device. Delete the app and start over by installing it on the device you want to protect.",
           )
 
+        case .onboarding(.mdmSupervisionExplainer):
+          ButtonScreenView(
+            text: "Gertrude's content filter for adults (18+) requires a one-time device supervision step using a Mac or Windows computer. This process is not compatible with MDM-managed devices.\n\nTo use this feature, you'll need a personal device that is not managed by an organization.",
+            primary: self.btn(text: "OK", .primary),
+          )
+
         case .onboarding(.childIsOnboardingFail):
           ButtonScreenView(
             text: "Setting up Gertrude requires your parent or guardian. Give your \(self.deviceType) to them so they can finish the setup.",
