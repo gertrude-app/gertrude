@@ -82,7 +82,7 @@ struct ProfileDownloadView: View {
         .opacity(self.showBg ? 1 : 0)
 
       VStack(spacing: 12) {
-        Spacer().frame(height: 50)
+        Spacer().frame(height: 0)
 
         VStack(alignment: .leading, spacing: 12) {
           Text("1. Choose “Allow”")

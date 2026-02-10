@@ -519,8 +519,10 @@ public struct AppView: View {
             text: "Now, open the Settings app:",
             primary: self.btn(text: "Done, continue", .primary, disabled: !regainedFocus),
             listItems: [
-              "Tap “Profile Downloaded” at top",
-              "Tap “Install”",
+              self.deviceType == "iPad"
+                ? "In the left column, tap \u{201c}Profile Downloaded\u{201d} near the top"
+                : "Tap \u{201c}Profile Downloaded\u{201d} near the top",
+              "Tap \u{201c}Install\u{201d}",
               "Enter your passcode",
               "Come back to this app",
             ],
