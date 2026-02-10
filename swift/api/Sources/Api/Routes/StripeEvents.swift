@@ -91,6 +91,7 @@ enum StripeEventsRoute {
           stripeId: .init(eventSubscriptionId),
           statusExpiresAt: statusExpiration,
         ))
+        notifyFirstPayment(parent: parent, tier: eventTier)
       }
     }
 
