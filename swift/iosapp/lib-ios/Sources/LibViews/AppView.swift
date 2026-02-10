@@ -514,6 +514,12 @@ public struct AppView: View {
             self.store.send(.interactive(.onboardingBtnTapped(.primary, "Safari dismissed")))
           }
 
+        case .onboarding(.supervision(.resume(.profileNotRemovableWarning))):
+          ButtonScreenView(
+            text: "When installing the profile, your \(self.deviceType) will warn you that it can’t be removed. Don’t worry—it can be removed at any time from the Gertrude account.",
+            primary: self.btn(text: "Got it", .primary),
+          )
+
         case .onboarding(.supervision(.resume(.explainProfileInstall(let regainedFocus)))):
           ButtonScreenView(
             text: "Now, open the Settings app:",

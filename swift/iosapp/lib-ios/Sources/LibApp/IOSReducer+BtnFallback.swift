@@ -184,6 +184,8 @@ extension IOSReducer.Onboarding.Supervision.Resume {
     case (.explainProfileDownload, _):
       .onboarding(.supervision(.resume(.promptInstallProfile)))
     case (.installingProfile(_), _):
+      .onboarding(.supervision(.resume(.profileNotRemovableWarning)))
+    case (.profileNotRemovableWarning, _):
       .onboarding(.supervision(.resume(.explainProfileInstall())))
     case (.explainProfileInstall, _):
       .onboarding(.supervision(.resume(.verifyingProfileInstall())))
