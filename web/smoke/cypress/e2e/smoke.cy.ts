@@ -63,6 +63,7 @@ describe(`Smoke test`, () => {
 
     // get the connection code
     cy.contains(`Get connection code`).click();
+    cy.contains(`Start 21-day free trial`).click();
     cy.get(`[data-test=connection-code]`).invoke(`text`).as(`connectionCode`);
 
     // simulate that they installed the app and connected successfully
@@ -111,8 +112,8 @@ describe(`Smoke test`, () => {
     }).then((response) => {
       expect(response.redirects).to.have.length.greaterThan(0);
       const finalUrl = (response.redirects ?? [])[(response.redirects?.length ?? 0) - 1];
-      expect(finalUrl).to.include(`parents.gertrude.app/login`);
-      expect(finalUrl).to.include(`error=invalid_code`);
+      expect(finalUrl).to.include(`parents.gertrude.app/signup`);
+      expect(finalUrl).to.include(`error=missing_code`);
     });
   });
 });
