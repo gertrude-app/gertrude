@@ -42,7 +42,7 @@ func setup(
   storedProtectionMode: ProtectionMode? = .normal([.targetContains(value: "stored.com")]),
   apiNormalRules: [BlockRule] = [.targetContains(value: "api.com")],
   apiConnectedRules: [BlockRule] = [.targetContains(value: "connected.com")],
-  apiWebPolicy: WebContentFilterPolicy = .blockAll,
+  apiWebPolicy: WebContentFilterPolicy? = nil,
 ) async -> ControllerProxyTest {
   let test = ControllerProxyTest()
 
@@ -225,7 +225,7 @@ func setup(
   #expect(test.setAuthTokenCalls.value == [UUID(2)])
   #expect(test.connectedRulesCalls.value == 1)
   #expect(test.savedProtectionModes.value == [
-    .connected([.targetContains(value: "connected.com")], .blockAll),
+    .connected([.targetContains(value: "connected.com")], nil),
   ])
   #expect(test.notifyRulesChangedCount.value == 1)
 }
@@ -274,6 +274,18 @@ func setup(
   test.proxy.managedSettings.withValue { store in
     #expect(store != nil)
     #expect(store?.gertiePolicy == .blockAdultAnd(["bad.com"]))
+  }
+}
+
+@Test func nilWebPolicyClearsManagedSettingsStore() async throws {
+  let test = await setup(
+    accountConnected: true,
+    apiWebPolicy: nil,
+  )
+  test.proxy.managedSettings.setValue(.init(named: .init("existing policy")))
+  await test.proxy.refreshRules(reason: .startup)
+  test.proxy.managedSettings.withValue { store in
+    #expect(store == nil)
   }
 }
 

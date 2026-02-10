@@ -25,9 +25,11 @@ extension ConnectedRules_v2: Resolver {
 
     ModelIdentifier.alertIfUnknown(input.modelIdentifier)
 
-    return try await .init(
+    return .init(
       blockRules: blockRules,
-      webPolicy: ctx.device.webContentFilterPolicy(in: ctx.db),
+      // NB: for now always nil, for 1.7.0 launch, safety w/ supervised users,
+      // but we can turn it on later, and the app will set it, if we decide it's correct
+      webPolicy: nil,
     )
   }
 }

@@ -9,6 +9,8 @@ extension ConnectedRules: Resolver {
       iosVersion: input.iosVersion,
     )
 
-    return try await ConnectedRules_v2.resolve(with: v2Input, in: ctx)
+    var output = try await ConnectedRules_v2.resolve(with: v2Input, in: ctx)
+    output.webPolicy = try await ctx.device.webContentFilterPolicy(in: ctx.db)
+    return output
   }
 }
