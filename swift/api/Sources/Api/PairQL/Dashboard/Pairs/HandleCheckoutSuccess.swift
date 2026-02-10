@@ -70,6 +70,7 @@ extension HandleCheckoutSuccess: Resolver {
         stripeId: .init(subscriptionId),
         statusExpiresAt: expiration + .days(2),
       ))
+      notifyFirstPayment(parent: parent, tier: tier)
       // all full subscriptions should have come thru trial state
       if tier != .light { unexpected("d6db1ebc", context) }
     }

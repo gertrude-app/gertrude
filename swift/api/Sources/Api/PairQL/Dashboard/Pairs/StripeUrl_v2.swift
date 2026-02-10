@@ -11,6 +11,7 @@ struct StripeUrl_v2: Pair {
     var successPath: String
     var cancelPath: String
     var tier: Subscription.Tier?
+    var associatedIosDeviceId: IOSApp.Device.Id?
   }
 
   struct Output: PairOutput {
@@ -28,6 +29,7 @@ extension StripeUrl_v2: Resolver {
         tier: .full,
         successPath: input.successPath,
         cancelPath: input.cancelPath,
+        iosDeviceId: input.associatedIosDeviceId,
         in: context,
       ))
     case .full(.paid(let stripeId, _)), .full(.overdue(let stripeId, _)):
@@ -38,6 +40,7 @@ extension StripeUrl_v2: Resolver {
           tier: .full,
           successPath: input.successPath,
           cancelPath: input.cancelPath,
+          iosDeviceId: input.associatedIosDeviceId,
           in: context,
         ))
       }
@@ -48,6 +51,7 @@ extension StripeUrl_v2: Resolver {
           tier: tier,
           successPath: input.successPath,
           cancelPath: input.cancelPath,
+          iosDeviceId: input.associatedIosDeviceId,
           in: context,
         ))
       }
@@ -73,6 +77,7 @@ private func checkoutSessionUrl(
   tier: Subscription.Tier,
   successPath: String,
   cancelPath: String,
+  iosDeviceId: IOSApp.Device.Id?,
   in context: ParentContext,
 ) async throws -> String {
   let sessionData = Stripe.CheckoutSessionData(
@@ -97,6 +102,29 @@ private func checkoutSessionUrl(
       .unexpected("b66e1eaf", "admin: \(context.parent.id)")
     throw Abort(.internalServerError)
   }
+
+  Task {
+    _ = try? await context.db.create(InterestingEvent(
+      eventId: "checkout_initiated",
+      kind: "event",
+      context: "dash",
+      parentId: context.parent.id,
+      detail: "tier=\(tier)",
+    ))
+
+    if let iosDeviceId,
+       let device = try? await context.db.find(iosDeviceId) {
+      _ = try? await context.db.create(IOSEvent(
+        eventId: "fcd26a46",
+        kind: .supervision,
+        detail: "checkout_initiated, tier=\(tier)",
+        deviceId: device.id,
+        modelIdentifier: device.modelIdentifier,
+        iosVersion: device.iosVersion,
+      ))
+    }
+  }
+
   return url
 }
 
