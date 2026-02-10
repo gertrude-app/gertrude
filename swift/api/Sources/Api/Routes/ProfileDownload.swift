@@ -27,7 +27,7 @@ enum ProfileDownloadRoute {
         "Content-Type": "application/x-apple-aspen-config",
         "Content-Disposition": "attachment; filename=\"Gertrude.mobileconfig\"",
       ],
-      body: .init(string: generateProfileXml(for: device, env: req.env)),
+      body: .init(string: generateProfileXml(for: device)),
     )
   }
 }
@@ -36,9 +36,8 @@ enum ProfileDownloadRoute {
 // @see https://developer.apple.com/documentation/devicemanagement/webcontentfilter
 // `DenyListURLS` is interesting, can specify 500 URLs, could put top 500 porn sites there...
 // `SafariHistoryRetentionEnabled`, also cool, kills private mode, and history clearing
-func generateProfileXml(for device: IOSApp.Device, env: Env) -> String {
-  let extraXml = env.get("IOS_PROFILE_EXTRA_XML") ?? ""
-  return """
+func generateProfileXml(for device: IOSApp.Device) -> String {
+  """
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
   <plist version="1.0">
@@ -97,7 +96,26 @@ func generateProfileXml(for device: IOSApp.Device, env: Env) -> String {
           <key>FilterBrowsers</key>
           <true/>
         </dict>
-  \(extraXml)
+
+        <dict>
+          <key>PayloadType</key>
+          <string>com.apple.applicationaccess</string>
+
+          <key>PayloadIdentifier</key>
+          <string>app.gertrude.restrictions.ba37d4c5-f939-47b8-9e89-d8d7e1fc1592</string>
+
+          <key>PayloadUUID</key>
+          <string>ba37d4c5-f939-47b8-9e89-d8d7e1fc1592</string>
+
+          <key>PayloadVersion</key>
+          <integer>1</integer>
+
+          <key>allowAppRemoval</key>
+          <false/>
+
+          <key>allowEraseContentAndSettings</key>
+          <false/>
+        </dict>
       </array>
     </dict>
   </plist>
