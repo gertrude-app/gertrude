@@ -154,7 +154,8 @@ public struct AppView: View {
             onDone: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Done"))) },
           )
 
-        case .onboarding(.happyPath(.promptClearCache)):
+        case .onboarding(.happyPath(.promptClearCache)),
+             .onboarding(.supervision(.resume(.promptClearCache))):
           ButtonScreenView(
             text: "Gertrude is now blocking new content, like when a new and unique search is made for GIFs. But content ALREADY VIEWED will still be visible unless we clear the cache.",
             primary: self.btn(text: "Clear the cache", .primary),
@@ -268,6 +269,12 @@ public struct AppView: View {
         case .onboarding(.onParentDeviceFail):
           ButtonScreenView(
             text: "Gertrude must be installed on the device you want to protect, not on a parent or guardian’s device. Delete the app and start over by installing it on the device you want to protect.",
+          )
+
+        case .onboarding(.mdmSupervisionExplainer):
+          ButtonScreenView(
+            text: "Gertrude's content filter for adults (18+) requires a one-time device supervision step using a Mac or Windows computer. This process is not compatible with MDM-managed devices.\n\nTo use this feature, you'll need a personal device that is not managed by an organization.",
+            primary: self.btn(text: "OK", .primary),
           )
 
         case .onboarding(.childIsOnboardingFail):
@@ -544,14 +551,8 @@ public struct AppView: View {
 
         case .onboarding(.supervision(.resume(.profileInstalled))):
           ButtonScreenView(
-            text: "Profile installed successfully! Gertrude can now block unwanted content.",
+            text: "Profile installed successfully! Gertrude can now block unwanted content. The account holder can manage what gets blocked and also remove the supervision.",
             primary: self.btn(text: "Next", .primary),
-          )
-
-        case .onboarding(.supervision(.resume(.setupComplete))):
-          ButtonScreenView(
-            text: "You’re all set! The Gertrude account holder can manage what gets blocked and also remove the supervision when needed.",
-            primary: self.btn(text: "Done", .primary),
           )
 
         case .onboarding(.supervision(.resume(.networkError))):

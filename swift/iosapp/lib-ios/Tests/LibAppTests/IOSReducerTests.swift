@@ -606,6 +606,27 @@ final class IOSReducerTests: XCTestCase {
   }
 
   @MainActor
+  func testAppStoreReviewBuild_routesToExplainer() async throws {
+    var onboarding = IOSReducer.State.OnboardingState()
+    onboarding.connectFeature = .init(isEnabled: false, releasedAppStoreVersion: "1.6.2")
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.happyPath(.confirmMinorDevice)),
+      onboarding: onboarding,
+    )) {
+      IOSReducer()
+    } withDependencies: {
+      $0.device.installedVersion = { "1.7.0" }
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
+      $0.screen = .onboarding(.mdmSupervisionExplainer)
+    }
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.happyPath(.hiThere))
+    }
+  }
+
+  @MainActor
   func testInfoBtnTappedLoadsInfoFeatureDestination() async throws {
     let vendorId = UUID()
     let store = TestStore(initialState: IOSReducer.State(screen: .running(state: .notConnected))) {

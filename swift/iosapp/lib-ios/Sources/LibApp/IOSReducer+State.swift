@@ -62,6 +62,7 @@ extension IOSReducer {
 
     case onParentDeviceFail
     case childIsOnboardingFail
+    case mdmSupervisionExplainer
 
     public enum HappyPath: Equatable {
       case hiThere
@@ -129,7 +130,7 @@ extension IOSReducer {
         case explainProfileInstall(regainedFocus: Bool = false)
         case verifyingProfileInstall(didError: Bool = false)
         case profileInstalled
-        case setupComplete
+        case promptClearCache
         case networkError
       }
     }

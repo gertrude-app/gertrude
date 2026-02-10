@@ -71,15 +71,22 @@ public struct IOSReducer {
 
     #if DEBUG
       case .receivedShake where state.screen == .onboarding(.happyPath(.hiThere)):
-        state.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
+        state.screen = .onboarding(.supervision(.resume(.profileInstalled)))
         return .none
     #endif
 
     case .onboardingClearCache(.completeBtnTapped),
          .onboardingClearCache(.receivedClearCacheUpdate(.errorCouldNotCreateDir)):
       state.onboarding.clearCache = nil
-      state.screen = .onboarding(.happyPath(.requestAppStoreRating))
-      return .none
+      if state.screen == .onboarding(.supervision(.resume(.promptClearCache))) {
+        state.screen = .onboarding(.happyPath(.requestAppStoreRating))
+        return .run { [deps = self.deps] _ in
+          deps.sharedStorage.clearPendingSupervisionCode()
+        }
+      } else {
+        state.screen = .onboarding(.happyPath(.requestAppStoreRating))
+        return .none
+      }
 
     case .onboardingClearCache:
       return .none
@@ -127,7 +134,11 @@ public struct IOSReducer {
 
     case (.onboarding(.happyPath(.confirmMinorDevice)), .secondary):
       self.deps.log(state.screen, action, "a21c9040")
-      state.screen = .onboarding(.supervision(.setup(.explainSupervision)))
+      if self.isBuildAhead(of: state.onboarding.connectFeature.releasedAppStoreVersion) {
+        state.screen = .onboarding(.mdmSupervisionExplainer)
+      } else {
+        state.screen = .onboarding(.supervision(.setup(.explainSupervision)))
+      }
       return .none
 
     case (.onboarding(.happyPath(.confirmParentIsOnboarding)), .primary):
@@ -552,12 +563,17 @@ public struct IOSReducer {
 
     case (.onboarding(.supervision(.resume(.profileInstalled))), .primary):
       self.deps.log(state.screen, action, "4af7783e")
-      state.screen = .onboarding(.supervision(.resume(.setupComplete)))
+      state.screen = .onboarding(.supervision(.resume(.promptClearCache)))
       return .none
 
-    case (.onboarding(.supervision(.resume(.setupComplete))), .primary):
-      self.deps.log(state.screen, action, "6ed43005")
-      state.screen = .running(state: .connected)
+    case (.onboarding(.supervision(.resume(.promptClearCache))), .primary):
+      self.deps.log(state.screen, action, "acfc7894")
+      state.onboarding.clearCache = .init(context: .onboarding)
+      return .none
+
+    case (.onboarding(.supervision(.resume(.promptClearCache))), .secondary):
+      self.deps.log(state.screen, action, "7d8b61d0")
+      state.screen = .onboarding(.happyPath(.requestAppStoreRating))
       return .run { [deps = self.deps] _ in
         deps.sharedStorage.clearPendingSupervisionCode()
       }
@@ -638,6 +654,11 @@ public struct IOSReducer {
     case (.onboarding(.installFail(.other)), .primary):
       self.deps.log(state.screen, action, "cf059547")
       state.screen = .onboarding(.happyPath(.explainInstallWithDevicePasscode))
+      return .none
+
+    case (.onboarding(.mdmSupervisionExplainer), .primary):
+      self.deps.log(state.screen, action, "b4e7f219")
+      state.screen = .onboarding(.happyPath(.hiThere))
       return .none
 
     case (.onboarding(.childIsOnboardingFail), .primary):
@@ -925,5 +946,18 @@ extension IOSReducer.Deps {
       try? await self.clock.sleep(for: .milliseconds(500))
     }
     return .filterVerificationFailed
+  }
+}
+
+extension IOSReducer {
+  func isBuildAhead(of appStoreVersion: String?) -> Bool {
+    guard let appStoreVersion else { return false }
+    let appVersion = self.deps.device.installedVersion()
+    let app = appVersion.split(separator: ".").compactMap { Int($0) }
+    let store = appStoreVersion.split(separator: ".").compactMap { Int($0) }
+    guard app.count >= 3, store.count >= 3 else { return false }
+    if app[0] != store[0] { return app[0] > store[0] }
+    if app[1] != store[1] { return app[1] > store[1] }
+    return app[2] > store[2]
   }
 }

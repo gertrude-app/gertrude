@@ -11,6 +11,7 @@ public struct DeviceClient: Sendable {
   @MainActor public var iOSVersion: @Sendable () async -> String
   @MainActor public var vendorId: @Sendable () async -> UUID?
   public var modelIdentifier: @Sendable () -> String
+  public var installedVersion: @Sendable () -> String
   @MainActor public var data: @Sendable () async -> Data
   @MainActor public var batteryLevel: @Sendable () async -> BatteryLevel
   public var clearCache: @Sendable (Int?) -> AnyPublisher<ClearCacheUpdate, Never>
@@ -22,6 +23,7 @@ public struct DeviceClient: Sendable {
     iOSVersion: @Sendable @escaping () async -> String,
     vendorId: @Sendable @escaping () async -> UUID?,
     modelIdentifier: @Sendable @escaping () -> String,
+    installedVersion: @Sendable @escaping () -> String,
     data: @Sendable @escaping () async -> Data,
     batteryLevel: @Sendable @escaping () async -> BatteryLevel,
     clearCache: @Sendable @escaping (Int?) -> AnyPublisher<ClearCacheUpdate, Never>,
@@ -32,6 +34,7 @@ public struct DeviceClient: Sendable {
     self.iOSVersion = iOSVersion
     self.vendorId = vendorId
     self.modelIdentifier = modelIdentifier
+    self.installedVersion = installedVersion
     self.data = data
     self.batteryLevel = batteryLevel
     self.clearCache = clearCache
@@ -89,6 +92,9 @@ extension DeviceClient: DependencyKey {
           await getStableVendorId()
         },
         modelIdentifier: getModelIdentifier,
+        installedVersion: {
+          Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+        },
         data: {
           let vendorId = await getStableVendorId()
           let modelIdentifier = getModelIdentifier()
@@ -119,6 +125,7 @@ extension DeviceClient: DependencyKey {
       iOSVersion: { "18.0.1" },
       vendorId: { .init() },
       modelIdentifier: { "iPhone15,2" },
+      installedVersion: { "0.0.0" },
       data: { .init(
         type: .iPhone,
         iOSVersion: "18.0.1",
@@ -140,6 +147,7 @@ extension DeviceClient: DependencyKey {
       iOSVersion: { "18.3.1" },
       vendorId: { UUID(42) },
       modelIdentifier: { "iPhone15,2" },
+      installedVersion: { "1.0.0" },
       data: { .init(
         type: .iPhone,
         iOSVersion: "18.3.1",
