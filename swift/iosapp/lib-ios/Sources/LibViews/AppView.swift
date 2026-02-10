@@ -504,6 +504,12 @@ public struct AppView: View {
             primary: self.btn(text: "Next", .primary),
           )
 
+        case .onboarding(.supervision(.resume(.profileRemovedRecovery))):
+          ButtonScreenView(
+            text: "The supervision profile is no longer installed on this \(self.deviceType), preventing Gertrude from doing its job.",
+            primary: self.btn(text: "Reinstall profile", .primary),
+          )
+
         case .onboarding(.supervision(.resume(.promptInstallProfile))):
           ButtonScreenView(
             text: "One more step: we need to install something called a “profile” to allow blocking.",

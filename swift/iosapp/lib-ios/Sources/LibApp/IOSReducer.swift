@@ -522,6 +522,11 @@ public struct IOSReducer {
       }
       return .none
 
+    case (.onboarding(.supervision(.resume(.profileRemovedRecovery))), .primary):
+      self.deps.log(state.screen, action, "4693f615")
+      state.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
+      return .none
+
     case (.onboarding(.supervision(.resume(.promptInstallProfile))), .primary):
       self.deps.log(state.screen, action, "7b5b4726")
       state.screen = .onboarding(.supervision(.resume(.explainProfileDownload)))
@@ -563,6 +568,11 @@ public struct IOSReducer {
 
     case (.onboarding(.supervision(.resume(.profileInstalled))), .primary):
       self.deps.log(state.screen, action, "4af7783e")
+      if state.onboarding.isProfileRecovery {
+        state.onboarding.isProfileRecovery = false
+        state.screen = .running(state: .connected)
+        return .none
+      }
       state.screen = .onboarding(.supervision(.resume(.promptClearCache)))
       return .none
 
@@ -754,6 +764,14 @@ public struct IOSReducer {
               await send(.programmatic(.receivedConnectAccountFeatureFlag(featureFlag)))
             }
 
+          case .profileRemovedRecovery(let conn):
+            deps.log("profile removed recovery for supervised user", "4f22bd20")
+            await deps.receiveAccountConnection(conn)
+            await send(.programmatic(.setProfileRecovery))
+            await send(.programmatic(
+              .setScreen(.onboarding(.supervision(.resume(.profileRemovedRecovery)))),
+            ))
+
           case .filterNoLongerRunning:
             // NB: if they remove the filter via Settings then launch app, we'll get here
             deps.log("non-running filter w/ stored groups", "23c207e2")
@@ -803,6 +821,10 @@ public struct IOSReducer {
 
     case .setScreen(let screen):
       state.screen = screen
+      return .none
+
+    case .setProfileRecovery:
+      state.onboarding.isProfileRecovery = true
       return .none
 
     case .authorizationSucceeded:

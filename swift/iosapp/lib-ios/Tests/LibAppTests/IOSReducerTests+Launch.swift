@@ -211,6 +211,91 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
     }
   }
+
+  @MainActor
+  func testProfileRemovedRecovery_supervisedUser_showsRecoveryScreen() async throws {
+    let accountSet = LockIsolated(false)
+    let connSaved = LockIsolated(false)
+    let store = TestStore(initialState: IOSReducer.State()) {
+      IOSReducer()
+    } withDependencies: {
+      $0.device.deleteCacheFillDir = {}
+      $0.systemExtension.filterRunning = { false }
+      $0.sharedStorage.loadPendingSupervisionCode = { nil }
+      $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
+      $0.sharedStorage.loadDisabledBlockGroups = { @Sendable in [.gifs] }
+      $0.sharedStorage.loadAccountConnection = { .mock }
+      $0.sharedStorage.saveAccountConnection = { @Sendable _ in connSaved.setValue(true) }
+      $0.api.setAccountConnection = { @Sendable _ in accountSet.setValue(true) }
+    }
+
+    await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
+      $0.onboarding.firstLaunch = .distantPast
+    }
+    await store.receive(.programmatic(.setProfileRecovery)) {
+      $0.onboarding.isProfileRecovery = true
+    }
+    await store.receive(.programmatic(
+      .setScreen(.onboarding(.supervision(.resume(.profileRemovedRecovery)))),
+    )) {
+      $0.screen = .onboarding(.supervision(.resume(.profileRemovedRecovery)))
+    }
+    expect(accountSet.value).toEqual(true)
+    expect(connSaved.value).toEqual(true)
+  }
+
+  @MainActor
+  func testProfileRemovedRecovery_nonSupervisedUser_showsHiThere() async throws {
+    let store = TestStore(initialState: IOSReducer.State()) {
+      IOSReducer()
+    } withDependencies: {
+      $0.device.deleteCacheFillDir = {}
+      $0.systemExtension.filterRunning = { false }
+      $0.sharedStorage.loadPendingSupervisionCode = { nil }
+      $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
+      $0.sharedStorage.loadDisabledBlockGroups = { @Sendable in [.gifs] }
+      $0.sharedStorage.loadAccountConnection = { .mock { $0.supervised = nil } }
+    }
+
+    await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
+      $0.onboarding.firstLaunch = .distantPast
+    }
+    await store.receive(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere))))) {
+      $0.screen = .onboarding(.happyPath(.hiThere))
+    }
+  }
+
+  @MainActor
+  func testProfileRecovery_reinstallRoutesToProfileInstall() async throws {
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.profileRemovedRecovery))),
+      onboarding: .init(),
+    )) {
+      IOSReducer()
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, "Reinstall profile"))) {
+      $0.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
+    }
+  }
+
+  @MainActor
+  func testProfileRecovery_afterInstall_goesToRunning() async throws {
+    var state = IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.profileInstalled))),
+    )
+    state.onboarding.isProfileRecovery = true
+    let store = TestStore(initialState: state) {
+      IOSReducer()
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, "Next"))) {
+      $0.onboarding.isProfileRecovery = false
+      $0.screen = .running(state: .connected)
+    }
+  }
 }
 
 extension CreateSupervisionCode.Output {
