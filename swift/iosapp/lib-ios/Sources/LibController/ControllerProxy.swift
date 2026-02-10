@@ -158,15 +158,19 @@ public final class ControllerProxy: Sendable {
       self.notifyRulesChanged.withValue { $0() }
       self.deps.logger.log("web policy: \(String(describing: config.webPolicy))")
       self.managedSettings.withValue {
-        if let current = $0 {
-          current.gertiePolicy = config.webPolicy
-          self.deps.logger.log("updating existing managed settings store")
-          $0 = current
+        if config.webPolicy == nil {
+          $0 = nil
         } else {
-          self.deps.logger.log("creating new managed settings store")
-          let store = ManagedSettingsStore(named: .init(.gertrudeGroupId))
-          store.gertiePolicy = config.webPolicy
-          $0 = store
+          if let current = $0 {
+            current.gertiePolicy = config.webPolicy
+            self.deps.logger.log("updating existing managed settings store")
+            $0 = current
+          } else {
+            self.deps.logger.log("creating new managed settings store")
+            let store = ManagedSettingsStore(named: .init(.gertrudeGroupId))
+            store.gertiePolicy = config.webPolicy
+            $0 = store
+          }
         }
       }
       return true

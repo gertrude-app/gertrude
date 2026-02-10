@@ -3,7 +3,7 @@ import GertieIOS
 public indirect enum ProtectionMode {
   case onboarding([BlockRule])
   case normal([BlockRule])
-  case connected([BlockRule], WebContentFilterPolicy)
+  case connected([BlockRule], WebContentFilterPolicy?)
   // NB: Emergency lockdown represents the state where the app
   // is missing data, and needs to be very restrictive to fail safe.
   // There is a time period while the device is booting, before it
@@ -37,7 +37,7 @@ public extension ProtectionMode {
     case .normal(let rules):
       ".normal(\(rules.count))"
     case .connected(let rules, let policy):
-      ".connected(\(rules.count), \(policy.shortDesc))"
+      ".connected(\(rules.count), \(policy?.shortDesc ?? "nil"))"
     case .emergencyLockdown:
       ".emergencyLockdown"
     }
