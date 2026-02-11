@@ -15,7 +15,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.device.deleteCacheFillDir = {}
       $0.systemExtension.filterRunning = { false }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
-      $0.api.checkSupervisionStatus = { @Sendable _ in .pending }
+      $0.api.checkSupervisionFlowStatus = { @Sendable _ in .pending }
       $0.sharedStorage.loadPendingSupervisionCode = {
         .init(code: code, expiresAt: .reference)
       }
@@ -43,7 +43,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.sharedStorage.loadPendingSupervisionCode = { .mock }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
       $0.sharedStorage.clearPendingSupervisionCode = { clearedCode.setValue(true) }
-      $0.api.checkSupervisionStatus = { @Sendable _ in .expired }
+      $0.api.checkSupervisionFlowStatus = { @Sendable _ in .expired }
     }
 
     await store.send(.programmatic(.appDidLaunch))
@@ -67,7 +67,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.sharedStorage.loadPendingSupervisionCode = { .mock }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
       $0.sharedStorage.clearPendingSupervisionCode = { clearedCode.setValue(true) }
-      $0.api.checkSupervisionStatus = { @Sendable _ in .notFound }
+      $0.api.checkSupervisionFlowStatus = { @Sendable _ in .notFound }
     }
 
     await store.send(.programmatic(.appDidLaunch))
@@ -91,7 +91,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.sharedStorage.loadPendingSupervisionCode = { .mock }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
       $0.sharedStorage.saveAccountConnection = { @Sendable _ in }
-      $0.api.checkSupervisionStatus = { @Sendable _ in .claimed(.mock) }
+      $0.api.checkSupervisionFlowStatus = { @Sendable _ in .claimed(.mock) }
       $0.api.setAccountConnection = { @Sendable _ in accountSet.setValue(true) }
       $0.sharedStorage.clearPendingSupervisionCode = { fatalError("not cleared") }
     }
@@ -120,7 +120,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.sharedStorage.loadPendingSupervisionCode = { .mock }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
       $0.sharedStorage.saveAccountConnection = { @Sendable _ in connSaved.setValue(true) }
-      $0.api.checkSupervisionStatus = { @Sendable _ in .missingProfile(.mock) }
+      $0.api.checkSupervisionFlowStatus = { @Sendable _ in .missingProfile(.mock) }
       $0.api.setAccountConnection = { @Sendable _ in accountSet.setValue(true) }
       $0.sharedStorage.clearPendingSupervisionCode = { fatalError("not cleared") }
     }
@@ -152,7 +152,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.sharedStorage.loadPendingSupervisionCode = {
         .init(code: code, expiresAt: .reference)
       }
-      $0.api.checkSupervisionStatus = { @Sendable _ in
+      $0.api.checkSupervisionFlowStatus = { @Sendable _ in
         let attempt = attemptCount.withValue { val in val += 1
           return val
         }
@@ -197,7 +197,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.sharedStorage.loadPendingSupervisionCode = { .mock }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
       $0.sharedStorage.saveAccountConnection = { @Sendable _ in }
-      $0.api.checkSupervisionStatus = { @Sendable _ in .complete(.mock) }
+      $0.api.checkSupervisionFlowStatus = { @Sendable _ in .complete(.mock) }
       $0.api.setAccountConnection = { @Sendable _ in accountSet.setValue(true) }
     }
 
@@ -298,7 +298,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
   }
 }
 
-extension CreateSupervisionCode.Output {
+extension CreateSupervisionClaimCode.Output {
   static var mock: Self {
     .init(code: Int.random(in: 100_000 ... 999_999), expiresAt: .reference)
   }

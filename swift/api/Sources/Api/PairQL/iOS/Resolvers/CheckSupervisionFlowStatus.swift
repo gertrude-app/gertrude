@@ -3,7 +3,7 @@ import DuetSQL
 import IOSRoute
 import Vapor
 
-extension CheckSupervisionStatus: Resolver {
+extension CheckSupervisionFlowStatus: Resolver {
   static func resolve(with input: Input, in ctx: Context) async throws -> Output {
     let supervision = try? await IOSApp.Supervision.query()
       .where(.claimCode == input.code)

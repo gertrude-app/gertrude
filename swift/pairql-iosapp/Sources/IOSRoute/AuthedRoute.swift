@@ -4,7 +4,7 @@ public enum AuthedRoute: PairRoute {
   case connectedRules(ConnectedRules.Input)
   case connectedRules_v2(ConnectedRules_v2.Input)
   case createSuspendFilterRequest(CreateSuspendFilterRequest.Input)
-  case markSetupComplete
+  case markSupervisionProfileInstalled
   case pollFilterSuspensionDecision(PollFilterSuspensionDecision.Input)
   case screenshotUploadUrl(ScreenshotUploadUrl.Input)
   case selfReportSupervision(SelfReportSupervision.Input)
@@ -24,8 +24,8 @@ public extension AuthedRoute {
       Operation(CreateSuspendFilterRequest.self)
       Body(.json(CreateSuspendFilterRequest.Input.self))
     }
-    Route(.case(Self.markSetupComplete)) {
-      Operation(MarkSetupComplete.self)
+    Route(.case(Self.markSupervisionProfileInstalled)) {
+      Operation(MarkSupervisionProfileInstalled.self)
     }
     Route(.case(Self.pollFilterSuspensionDecision)) {
       Operation(PollFilterSuspensionDecision.self)

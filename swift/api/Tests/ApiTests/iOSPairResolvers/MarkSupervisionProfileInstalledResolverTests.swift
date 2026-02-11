@@ -5,7 +5,7 @@ import XExpect
 
 @testable import Api
 
-final class MarkSetupCompleteResolverTests: ApiTestCase, @unchecked Sendable {
+final class MarkSupervisionProfileInstalledResolverTests: ApiTestCase, @unchecked Sendable {
   func testHappyPath_marksProfileInstalledAndReturnsSuccess() async throws {
     let child = try await self.childWithIOSDevice()
     try await self.db.create(IOSApp.Supervision(
@@ -16,7 +16,7 @@ final class MarkSetupCompleteResolverTests: ApiTestCase, @unchecked Sendable {
       supervisedAt: .reference,
     ))
 
-    let output = try await MarkSetupComplete.resolve(in: child.context)
+    let output = try await MarkSupervisionProfileInstalled.resolve(in: child.context)
     expect(output).toEqual(.success)
 
     let supervision = try await child.device.supervision(in: self.db)!
@@ -41,13 +41,15 @@ final class MarkSetupCompleteResolverTests: ApiTestCase, @unchecked Sendable {
       profileInstalledAt: .reference,
     ))
 
-    let output = try await MarkSetupComplete.resolve(in: child.context)
+    let output = try await MarkSupervisionProfileInstalled.resolve(in: child.context)
     expect(output).toEqual(.success)
   }
 
   func testNoSupervision_throwsError() async throws {
     let child = try await self.childWithIOSDevice()
-    try await expectErrorFrom { try await MarkSetupComplete.resolve(in: child.context) }
-      .toContain("400")
+    try await expectErrorFrom {
+      try await MarkSupervisionProfileInstalled.resolve(in: child.context)
+    }
+    .toContain("400")
   }
 }

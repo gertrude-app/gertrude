@@ -35,7 +35,7 @@ extension IOSReducer.Deps {
         if attempt > 0 {
           try? await self.clock.sleep(for: .seconds(2))
         }
-        guard let status = try? await self.api.checkSupervisionStatus(code) else {
+        guard let status = try? await self.api.checkSupervisionFlowStatus(code) else {
           continue
         }
         switch status {

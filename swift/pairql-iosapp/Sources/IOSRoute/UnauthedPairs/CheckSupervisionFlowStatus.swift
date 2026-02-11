@@ -1,7 +1,7 @@
 import Foundation
 import PairQL
 
-public struct CheckSupervisionStatus: Pair {
+public struct CheckSupervisionFlowStatus: Pair {
   public static let auth: ClientAuth = .none
 
   public struct Input: PairInput {

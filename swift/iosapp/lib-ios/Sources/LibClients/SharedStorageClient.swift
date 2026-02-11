@@ -23,8 +23,8 @@ public struct SharedStorageClient: Sendable {
   public var loadDebugLogs: @Sendable () -> [String]?
   public var saveDebugLogs: @Sendable ([String]) -> Void
 
-  public var loadPendingSupervisionCode: @Sendable () -> CreateSupervisionCode.Output?
-  public var savePendingSupervisionCode: @Sendable (CreateSupervisionCode.Output) -> Void
+  public var loadPendingSupervisionCode: @Sendable () -> CreateSupervisionClaimCode.Output?
+  public var savePendingSupervisionCode: @Sendable (CreateSupervisionClaimCode.Output) -> Void
   public var clearPendingSupervisionCode: @Sendable () -> Void
 
   public var migrateLegacyData: @Sendable () async -> Bool = { false }
