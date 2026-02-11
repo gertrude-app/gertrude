@@ -3,6 +3,8 @@ import type { PqlError } from '@shared/pairql';
 import type { ClientAuth } from '@shared/pairql/src/admin';
 
 function getEndpoint(): string {
+  const fromEnv = import.meta.env.VITE_API_ENDPOINT;
+  if (fromEnv) return fromEnv;
   const href =
     typeof window !== `undefined` ? window.location.href : `http://localhost:4243`;
   if (
