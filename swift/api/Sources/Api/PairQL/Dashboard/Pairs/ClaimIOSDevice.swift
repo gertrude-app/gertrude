@@ -3,7 +3,7 @@ import Foundation
 import PairQL
 import Vapor
 
-struct ClaimSupervisionCode: Pair {
+struct ClaimIOSDevice: Pair {
   static let auth: ClientAuth = .parent
 
   enum ChildAssignment: Codable, Equatable, Sendable {
@@ -31,7 +31,7 @@ struct ClaimSupervisionCode: Pair {
 // and by means of query params, we detect that they are claiming a device and prompt them to
 // either a) create a child by just entering a name (most common), or b) choose from an
 // existing child if they already had a gertrude account
-extension ClaimSupervisionCode: Resolver {
+extension ClaimIOSDevice: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     let supervision = try? await IOSApp.Supervision.query()
       .where(.claimCode == input.code)

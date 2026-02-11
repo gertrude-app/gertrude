@@ -1,11 +1,7 @@
 import { posessive } from '@shared/string';
 import cx from 'classnames';
 import React, { useState } from 'react';
-import type {
-  CreatePendingAppConnection_v2,
-  DashboardWidgets,
-  RequestState,
-} from '@dash/types';
+import type { DashboardWidgets, MacAppConnectionCode, RequestState } from '@dash/types';
 import { UndoMainPadding } from '../Chrome/Chrome';
 import PageHeading from '../PageHeading';
 import SmartLink from '../SmartLink';
@@ -31,7 +27,7 @@ type Props = {
   dismissAddDevice(): unknown;
   dismissAnnouncement(id: UUID): unknown;
   onStartTrial(): unknown;
-  addDeviceRequest: RequestState<CreatePendingAppConnection_v2.Output>;
+  addDeviceRequest: RequestState<MacAppConnectionCode.Output>;
   childData: DashboardWidgets.Output[`children`];
   pendingIosDevices?: PendingIosDevice[];
 } & Omit<DashboardWidgets.Output, `children` | `pendingIOSDevices`>;

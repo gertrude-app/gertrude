@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-export namespace CreatePendingAppConnection_v2 {
+export namespace MacAppConnectionCode {
   export interface Input {
     childId: UUID;
   }

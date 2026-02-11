@@ -5,7 +5,7 @@ import XExpect
 
 @testable import Api
 
-final class RecordDeviceConnectionResolverTests: ApiTestCase, @unchecked Sendable {
+final class RecordDeviceUSBConnectionResolverTests: ApiTestCase, @unchecked Sendable {
   func testHappyPath_setsUdidAndInsertsEvent() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
@@ -23,7 +23,7 @@ final class RecordDeviceConnectionResolverTests: ApiTestCase, @unchecked Sendabl
     _ = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
-      try await RecordDeviceConnection.resolve(
+      try await RecordDeviceUSBConnection.resolve(
         with: .init(
           code: code,
           udid: "00008030-001234567890802E",
@@ -46,7 +46,7 @@ final class RecordDeviceConnectionResolverTests: ApiTestCase, @unchecked Sendabl
 
   func testCodeNotFound_throwsError() async throws {
     try await expectErrorFrom {
-      try await RecordDeviceConnection.resolve(
+      try await RecordDeviceUSBConnection.resolve(
         with: .init(
           code: Int.random(in: 100_000 ... 999_999),
           udid: "fake-udid",
@@ -75,7 +75,7 @@ final class RecordDeviceConnectionResolverTests: ApiTestCase, @unchecked Sendabl
       try await withDependencies {
         $0.date = .constant(.reference)
       } operation: {
-        try await RecordDeviceConnection.resolve(
+        try await RecordDeviceUSBConnection.resolve(
           with: .init(
             code: code,
             udid: "fake-udid",

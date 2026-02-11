@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import type { CreatePendingAppConnection_v2, RequestState } from '@dash/types';
+import type { MacAppConnectionCode, RequestState } from '@dash/types';
 import { RequestModal } from '../Modal';
 import Modal from '../Modal/Modal';
 
 interface Props {
-  request?: RequestState<CreatePendingAppConnection_v2.Output>;
+  request?: RequestState<MacAppConnectionCode.Output>;
   dismissAddDevice(): unknown;
   onStartTrial(): unknown;
 }

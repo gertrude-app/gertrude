@@ -3,7 +3,7 @@ import Foundation
 import PairQL
 import Vapor
 
-struct GetSupervisionDeviceStatus: Pair {
+struct GetIOSDeviceSupervisionStatus: Pair {
   static let auth: ClientAuth = .parent
 
   struct Input: PairInput {
@@ -27,7 +27,7 @@ struct GetSupervisionDeviceStatus: Pair {
   }
 }
 
-extension GetSupervisionDeviceStatus: Resolver {
+extension GetIOSDeviceSupervisionStatus: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     let supervision = try? await IOSApp.Supervision.query()
       .where(.claimCode == input.code)

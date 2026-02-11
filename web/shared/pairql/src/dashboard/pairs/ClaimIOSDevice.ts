@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-export namespace ClaimSupervisionCode {
+export namespace ClaimIOSDevice {
   export interface Input {
     code: number;
     child:

@@ -58,7 +58,6 @@ enum DashboardTsCodegenRoute {
       UserActivityFeed.self,
       GetAccountOwner.self,
       ConfirmPendingNotificationMethod.self,
-      CreatePendingAppConnection_v2.self,
       CreatePendingNotificationMethod.self,
       DashboardWidgets.self,
       DeleteActivityItems_v2.self,
@@ -108,9 +107,10 @@ enum DashboardTsCodegenRoute {
       GetIOSDevice.self,
       UpsertBlockRule.self,
       UpdateIOSDevice.self,
-      GetClaimDeviceData.self,
-      ClaimSupervisionCode.self,
-      GetSupervisionDeviceStatus.self,
+      GetIOSDeviceClaimData.self,
+      ClaimIOSDevice.self,
+      GetIOSDeviceSupervisionStatus.self,
+      MacAppConnectionCode.self,
     ]
   }
 

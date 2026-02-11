@@ -62,8 +62,8 @@ export const throwingClient: ApiClient = {
   confirmPendingNotificationMethod: () => {
     throw new Error(`ApiClient.confirmPendingNotificationMethod() not implemented`);
   },
-  createPendingAppConnection: () => {
-    throw new Error(`ApiClient.createPendingAppConnection() not implemented`);
+  macAppConnectionCode: () => {
+    throw new Error(`ApiClient.macAppConnectionCode() not implemented`);
   },
   createPendingNotificationMethod: () => {
     throw new Error(`ApiClient.createPendingNotificationMethod() not implemented`);
@@ -101,11 +101,11 @@ export const throwingClient: ApiClient = {
   getChildren: () => {
     throw new Error(`ApiClient.getChildren() not implemented`);
   },
-  getClaimDeviceData: () => {
-    throw new Error(`ApiClient.getClaimDeviceData() not implemented`);
+  getIOSDeviceClaimData: () => {
+    throw new Error(`ApiClient.getIOSDeviceClaimData() not implemented`);
   },
-  claimSupervisionCode: () => {
-    throw new Error(`ApiClient.claimSupervisionCode() not implemented`);
+  claimIOSDevice: () => {
+    throw new Error(`ApiClient.claimIOSDevice() not implemented`);
   },
   getDevice: () => {
     throw new Error(`ApiClient.getDevice() not implemented`);
@@ -122,8 +122,8 @@ export const throwingClient: ApiClient = {
   getSelectableKeychains: () => {
     throw new Error(`ApiClient.getSelectableKeychains() not implemented`);
   },
-  getSupervisionDeviceStatus: () => {
-    throw new Error(`ApiClient.getSupervisionDeviceStatus() not implemented`);
+  getIOSDeviceSupervisionStatus: () => {
+    throw new Error(`ApiClient.getIOSDeviceSupervisionStatus() not implemented`);
   },
   getSuspendFilterRequest: () => {
     throw new Error(`ApiClient.getSuspendFilterRequest() not implemented`);

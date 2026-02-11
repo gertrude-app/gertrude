@@ -36,12 +36,12 @@ export default class SuperviseClient extends Client<Auth> {
     );
   };
 
-  public recordDeviceConnection = (
-    input: P.RecordDeviceConnection.Input,
-  ): Promise<Result<P.RecordDeviceConnection.Output>> => {
-    return this.query<P.RecordDeviceConnection.Output>(
+  public recordDeviceUSBConnection = (
+    input: P.RecordDeviceUSBConnection.Input,
+  ): Promise<Result<P.RecordDeviceUSBConnection.Output>> => {
+    return this.query<P.RecordDeviceUSBConnection.Output>(
       input,
-      `RecordDeviceConnection`,
+      `RecordDeviceUSBConnection`,
       `none`,
     );
   };

@@ -9,7 +9,7 @@ const DashboardRoute: React.FC = () => {
   const widgetsQuery = useQuery(Key.dashboard, Current.api.dashboardWidgets);
   const deleteAnnouncement = useDeleteEntity(`announcement`);
   const addDevice = useMutation((childId: UUID) =>
-    Current.api.createPendingAppConnection({ childId }),
+    Current.api.macAppConnectionCode({ childId }),
   );
   const startTrial = useMutation(() => Current.api.startFullTrial());
 

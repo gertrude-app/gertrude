@@ -6,7 +6,7 @@ import PairQL
 // the expected device (matching the model that created the code), it sends us
 // this which gives us the device UDID, and lets us know that the device
 // has been at least connected via USB for the supervision process to start
-struct RecordDeviceConnection: Pair {
+struct RecordDeviceUSBConnection: Pair {
   static let auth: ClientAuth = .none
 
   struct Input: PairInput {
@@ -18,7 +18,7 @@ struct RecordDeviceConnection: Pair {
   typealias Output = Infallible
 }
 
-extension RecordDeviceConnection: Resolver {
+extension RecordDeviceUSBConnection: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let validated = try await SuperviseRoute.validatedSupervisionCode(
       code: input.code,

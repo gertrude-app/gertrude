@@ -31,16 +31,16 @@ generate a 6-digit code (e.g. `123456`) and displays it with the short URL
 **Phase 2 — Dashboard (on parent's computer):** Parent visits the short URL, which
 redirects through the API (resolving device info) to the dashboard signup/login page.
 After authenticating, parent lands on the claim flow where they name the child and call
-`ClaimSupervisionCode`. This creates the Child record, IOSDevice, auth token, and assigns
-block groups. Parent then hits a payment gate (Light plan, $10/year) and downloads the
+`ClaimIOSDevice`. This creates the Child record, IOSDevice, auth token, and assigns block
+groups. Parent then hits a payment gate (Light plan, $10/year) and downloads the
 supervision tool.
 
 **Phase 3 — Supervision Tool (on parent's computer, phone connected via USB):** Parent
 enters the 6-digit code. Tool calls `GetPendingSupervision` for device context, then waits
 for USB connection. When the phone is plugged in and trusted, tool calls
-`RecordDeviceConnection` with the device UDID. Parent disables Find My iPhone (required),
-then clicks "Supervise Now." The tool sends the supervision payload — **the phone
-reboots**. After reboot, parent verifies supervision in Settings and tool calls
+`RecordDeviceUSBConnection` with the device UDID. Parent disables Find My iPhone
+(required), then clicks "Supervise Now." The tool sends the supervision payload — **the
+phone reboots**. After reboot, parent verifies supervision in Settings and tool calls
 `MarkSupervisionVerified`.
 
 **Phase 4 — iOS App (back on the phone):** User opens Gertrude. App detects the stored
@@ -64,21 +64,21 @@ setup is complete.
 
 ### Dashboard Domain (`pairql-dashboard`)
 
-| Endpoint                     | Auth   | Purpose                                     |
-| ---------------------------- | ------ | ------------------------------------------- |
-| `ClaimSupervisionCode`       | Parent | Parent claims device with code + child name |
-| `GetClaimDeviceData`         | Parent | Fetch device info for claim UI              |
-| `GetSupervisionDeviceStatus` | Parent | Poll supervision progress for dashboard     |
+| Endpoint                        | Auth   | Purpose                                     |
+| ------------------------------- | ------ | ------------------------------------------- |
+| `ClaimIOSDevice`                | Parent | Parent claims device with code + child name |
+| `GetIOSDeviceClaimData`         | Parent | Fetch device info for claim UI              |
+| `GetIOSDeviceSupervisionStatus` | Parent | Poll supervision progress for dashboard     |
 
 ### Supervision Tool Domain (`SuperviseRoute`)
 
-| Endpoint                  | Auth | Purpose                               |
-| ------------------------- | ---- | ------------------------------------- |
-| `GetPendingSupervision`   | None | Tool fetches device context from code |
-| `RecordDeviceConnection`  | None | Tool reports USB connection + UDID    |
-| `MarkSupervisionVerified` | None | Tool confirms supervision succeeded   |
-| `ReportSupervisionFailed` | None | Tool reports supervision failure      |
-| `LogSupervisionEvent`     | None | Tool logs telemetry events            |
+| Endpoint                    | Auth | Purpose                               |
+| --------------------------- | ---- | ------------------------------------- |
+| `GetPendingSupervision`     | None | Tool fetches device context from code |
+| `RecordDeviceUSBConnection` | None | Tool reports USB connection + UDID    |
+| `MarkSupervisionVerified`   | None | Tool confirms supervision succeeded   |
+| `ReportSupervisionFailed`   | None | Tool reports supervision failure      |
+| `LogSupervisionEvent`       | None | Tool logs telemetry events            |
 
 ### HTTP Routes (non-PairQL)
 

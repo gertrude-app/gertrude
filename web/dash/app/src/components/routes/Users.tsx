@@ -9,7 +9,7 @@ const Users: React.FC = () => {
   const query = useQuery(Key.children, Current.api.getChildren);
 
   const addDevice = useMutation((childId: UUID) =>
-    Current.api.createPendingAppConnection({ childId }),
+    Current.api.macAppConnectionCode({ childId }),
   );
   const startTrial = useMutation(() => Current.api.startFullTrial());
 

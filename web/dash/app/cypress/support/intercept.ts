@@ -6,8 +6,8 @@ export function interceptPql(
   output: T.ChildActivitySummaries.Output,
 ): void;
 export function interceptPql(
-  slug: `ClaimSupervisionCode`,
-  output: T.ClaimSupervisionCode.Output,
+  slug: `ClaimIOSDevice`,
+  output: T.ClaimIOSDevice.Output,
 ): void;
 export function interceptPql(
   slug: `CombinedUsersActivityFeed`,
@@ -16,10 +16,6 @@ export function interceptPql(
 export function interceptPql(
   slug: `ConfirmPendingNotificationMethod`,
   output: T.ConfirmPendingNotificationMethod.Output,
-): void;
-export function interceptPql(
-  slug: `CreatePendingAppConnection_v2`,
-  output: T.CreatePendingAppConnection_v2.Output,
 ): void;
 export function interceptPql(
   slug: `CreatePendingNotificationMethod`,
@@ -63,13 +59,17 @@ export function interceptPql(
 ): void;
 export function interceptPql(slug: `GetChild`, output: T.GetChild.Output): void;
 export function interceptPql(slug: `GetChildren`, output: T.GetChildren.Output): void;
-export function interceptPql(
-  slug: `GetClaimDeviceData`,
-  output: T.GetClaimDeviceData.Output,
-): void;
 export function interceptPql(slug: `GetDevice`, output: T.GetDevice.Output): void;
 export function interceptPql(slug: `GetDevices`, output: T.GetDevices.Output): void;
 export function interceptPql(slug: `GetIOSDevice`, output: T.GetIOSDevice.Output): void;
+export function interceptPql(
+  slug: `GetIOSDeviceClaimData`,
+  output: T.GetIOSDeviceClaimData.Output,
+): void;
+export function interceptPql(
+  slug: `GetIOSDeviceSupervisionStatus`,
+  output: T.GetIOSDeviceSupervisionStatus.Output,
+): void;
 export function interceptPql(
   slug: `GetIdentifiedApps`,
   output: T.GetIdentifiedApps.Output,
@@ -77,10 +77,6 @@ export function interceptPql(
 export function interceptPql(
   slug: `GetSelectableKeychains`,
   output: T.GetSelectableKeychains.Output,
-): void;
-export function interceptPql(
-  slug: `GetSupervisionDeviceStatus`,
-  output: T.GetSupervisionDeviceStatus.Output,
 ): void;
 export function interceptPql(
   slug: `GetSuspendFilterRequest`,
@@ -116,6 +112,10 @@ export function interceptPql(slug: `Login`, output: T.Login.Output): void;
 export function interceptPql(
   slug: `LoginMagicLink`,
   output: T.LoginMagicLink.Output,
+): void;
+export function interceptPql(
+  slug: `MacAppConnectionCode`,
+  output: T.MacAppConnectionCode.Output,
 ): void;
 export function interceptPql(
   slug: `RequestMagicLink`,
@@ -186,10 +186,9 @@ export function interceptPql(slug: string, output: any): void {
 export function forcePqlErr(
   slug:
     | `ChildActivitySummaries`
-    | `ClaimSupervisionCode`
+    | `ClaimIOSDevice`
     | `CombinedUsersActivityFeed`
     | `ConfirmPendingNotificationMethod`
-    | `CreatePendingAppConnection_v2`
     | `CreatePendingNotificationMethod`
     | `DashboardWidgets`
     | `DecideFilterSuspensionRequest`
@@ -202,13 +201,13 @@ export function forcePqlErr(
     | `GetAdminKeychains`
     | `GetChild`
     | `GetChildren`
-    | `GetClaimDeviceData`
     | `GetDevice`
     | `GetDevices`
     | `GetIOSDevice`
+    | `GetIOSDeviceClaimData`
+    | `GetIOSDeviceSupervisionStatus`
     | `GetIdentifiedApps`
     | `GetSelectableKeychains`
-    | `GetSupervisionDeviceStatus`
     | `GetSuspendFilterRequest`
     | `GetUnlockRequest`
     | `GetUnlockRequests`
@@ -220,6 +219,7 @@ export function forcePqlErr(
     | `LogEvent`
     | `Login`
     | `LoginMagicLink`
+    | `MacAppConnectionCode`
     | `RequestMagicLink`
     | `RequestPublicKeychain`
     | `ResetPassword`

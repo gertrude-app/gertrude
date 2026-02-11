@@ -19,7 +19,7 @@ const SuperviseDeviceClaim: React.FC = () => {
   const [error, setError] = useState<string | undefined>();
 
   const query = useQuery(Key.claimDeviceData(code), () =>
-    Current.api.getClaimDeviceData({ code: parseInt(code, 10) }),
+    Current.api.getIOSDeviceClaimData({ code: parseInt(code, 10) }),
   );
 
   if (query.isPending) {
@@ -36,12 +36,12 @@ const SuperviseDeviceClaim: React.FC = () => {
     setError(undefined);
     setIsSubmitting(true);
 
-    const childInput: T.ClaimSupervisionCode.Input[`child`] =
+    const childInput: T.ClaimIOSDevice.Input[`child`] =
       selection.type === `new`
         ? { case: `newChild`, name: selection.name }
         : { case: `existingChild`, id: selection.id };
 
-    const result = await Current.api.claimSupervisionCode({
+    const result = await Current.api.claimIOSDevice({
       code: parseInt(code, 10),
       child: childInput,
     });

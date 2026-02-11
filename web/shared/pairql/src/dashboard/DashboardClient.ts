@@ -20,14 +20,10 @@ export default class DashboardClient extends Client<Auth> {
     );
   };
 
-  public claimSupervisionCode = (
-    input: P.ClaimSupervisionCode.Input,
-  ): Promise<Result<P.ClaimSupervisionCode.Output>> => {
-    return this.query<P.ClaimSupervisionCode.Output>(
-      input,
-      `ClaimSupervisionCode`,
-      `parent`,
-    );
+  public claimIOSDevice = (
+    input: P.ClaimIOSDevice.Input,
+  ): Promise<Result<P.ClaimIOSDevice.Output>> => {
+    return this.query<P.ClaimIOSDevice.Output>(input, `ClaimIOSDevice`, `parent`);
   };
 
   public combinedUsersActivityFeed = (
@@ -46,16 +42,6 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.ConfirmPendingNotificationMethod.Output>(
       input,
       `ConfirmPendingNotificationMethod`,
-      `parent`,
-    );
-  };
-
-  public createPendingAppConnection = (
-    input: P.CreatePendingAppConnection_v2.Input,
-  ): Promise<Result<P.CreatePendingAppConnection_v2.Output>> => {
-    return this.query<P.CreatePendingAppConnection_v2.Output>(
-      input,
-      `CreatePendingAppConnection_v2`,
       `parent`,
     );
   };
@@ -146,12 +132,6 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetChildren.Output>(input, `GetChildren`, `parent`);
   };
 
-  public getClaimDeviceData = (
-    input: P.GetClaimDeviceData.Input,
-  ): Promise<Result<P.GetClaimDeviceData.Output>> => {
-    return this.query<P.GetClaimDeviceData.Output>(input, `GetClaimDeviceData`, `parent`);
-  };
-
   public getDevice = (input: P.GetDevice.Input): Promise<Result<P.GetDevice.Output>> => {
     return this.query<P.GetDevice.Output>(input, `GetDevice`, `parent`);
   };
@@ -168,6 +148,26 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetIOSDevice.Output>(input, `GetIOSDevice`, `parent`);
   };
 
+  public getIOSDeviceClaimData = (
+    input: P.GetIOSDeviceClaimData.Input,
+  ): Promise<Result<P.GetIOSDeviceClaimData.Output>> => {
+    return this.query<P.GetIOSDeviceClaimData.Output>(
+      input,
+      `GetIOSDeviceClaimData`,
+      `parent`,
+    );
+  };
+
+  public getIOSDeviceSupervisionStatus = (
+    input: P.GetIOSDeviceSupervisionStatus.Input,
+  ): Promise<Result<P.GetIOSDeviceSupervisionStatus.Output>> => {
+    return this.query<P.GetIOSDeviceSupervisionStatus.Output>(
+      input,
+      `GetIOSDeviceSupervisionStatus`,
+      `parent`,
+    );
+  };
+
   public getIdentifiedApps = (
     input: P.GetIdentifiedApps.Input,
   ): Promise<Result<P.GetIdentifiedApps.Output>> => {
@@ -180,16 +180,6 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetSelectableKeychains.Output>(
       input,
       `GetSelectableKeychains`,
-      `parent`,
-    );
-  };
-
-  public getSupervisionDeviceStatus = (
-    input: P.GetSupervisionDeviceStatus.Input,
-  ): Promise<Result<P.GetSupervisionDeviceStatus.Output>> => {
-    return this.query<P.GetSupervisionDeviceStatus.Output>(
-      input,
-      `GetSupervisionDeviceStatus`,
       `parent`,
     );
   };
@@ -270,6 +260,16 @@ export default class DashboardClient extends Client<Auth> {
     input: P.LoginMagicLink.Input,
   ): Promise<Result<P.LoginMagicLink.Output>> => {
     return this.query<P.LoginMagicLink.Output>(input, `LoginMagicLink`, `none`);
+  };
+
+  public macAppConnectionCode = (
+    input: P.MacAppConnectionCode.Input,
+  ): Promise<Result<P.MacAppConnectionCode.Output>> => {
+    return this.query<P.MacAppConnectionCode.Output>(
+      input,
+      `MacAppConnectionCode`,
+      `parent`,
+    );
   };
 
   public requestMagicLink = (

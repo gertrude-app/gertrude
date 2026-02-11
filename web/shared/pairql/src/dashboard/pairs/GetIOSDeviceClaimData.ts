@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-export namespace GetClaimDeviceData {
+export namespace GetIOSDeviceClaimData {
   export interface Input {
     code: number;
   }

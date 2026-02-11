@@ -8,13 +8,13 @@ import type {
   GetAdminKeychains,
   GetChild,
   GetChildren,
-  GetClaimDeviceData,
   GetDevice,
   GetDevices,
   GetIOSDevice,
+  GetIOSDeviceClaimData,
+  GetIOSDeviceSupervisionStatus,
   GetIdentifiedApps,
   GetSelectableKeychains,
-  GetSupervisionDeviceStatus,
   GetSuspendFilterRequest,
   GetUnlockRequest,
   GetUnlockRequests,
@@ -139,13 +139,13 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`securityEvents`, [`securityEvents`]);
   }
 
-  static claimDeviceData(code: string): QueryKey<GetClaimDeviceData.Output> {
+  static claimDeviceData(code: string): QueryKey<GetIOSDeviceClaimData.Output> {
     return new QueryKey(`claim-device/:code`, [`claim-device`, code]);
   }
 
   static supervisionDeviceStatus(
     code: string,
-  ): QueryKey<GetSupervisionDeviceStatus.Output> {
+  ): QueryKey<GetIOSDeviceSupervisionStatus.Output> {
     return new QueryKey(`supervision-device/:code`, [`supervision-device`, code]);
   }
 

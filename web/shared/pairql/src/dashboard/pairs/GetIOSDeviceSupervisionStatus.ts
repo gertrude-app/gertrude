@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-export namespace GetSupervisionDeviceStatus {
+export namespace GetIOSDeviceSupervisionStatus {
   export interface Input {
     code: number;
   }
