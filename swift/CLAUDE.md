@@ -100,10 +100,13 @@ searches, and more
 **Key Features:**
 
 - Content filtering via Network Extension
-- Device management controller
 - Parent-controlled filtering rules
-- Filter suspension requests
-- Recovery mode and failsafes
+
+**Context:**
+
+- most commonly authorized via Screen Time, for users < 18
+- can also be authorized via Supervision, we support a custom supervision process, if you
+  need to know about it read `./docs/ios-supervision.md` from monorepo root.
 
 **Tech Stack:**
 
