@@ -8,6 +8,7 @@ import SwiftUI
 struct InfoView: View {
   @Bindable var store: StoreOf<InfoFeature>
   @Environment(\.colorScheme) var cs
+  @Environment(\.scenePhase) var scenePhase
   @State private var justCopied = false
 
   var body: some View {
@@ -45,9 +46,49 @@ struct InfoView: View {
           ) {
             self.store.send(.profileDownloadDismissed)
           }
+        case .syncProfileDownloaded:
+          ButtonScreenView(
+            text: "Great, profile downloaded! To finish the sync, we just need to reinstall it. You’ll do this in the Settings app—we’ll explain how.",
+            primary: ButtonScreenView.Config(text: "Next", type: .button {
+              self.store.send(.syncProfileNextTapped)
+            }),
+          )
+        case .syncProfileNotRemovableWarning:
+          ButtonScreenView(
+            text: "When reinstalling the profile, your \(self.deviceType) may warn you that it can’t be removed. Don’t worry—it can be removed at any time from the Gertrude account.",
+            primary: ButtonScreenView.Config(text: "Got it", type: .button {
+              self.store.send(.syncProfileNextTapped)
+            }),
+          )
+        case .syncProfileExplainInstall(let regainedFocus):
+          ButtonScreenView(
+            text: "Now, open the Settings app:",
+            primary: ButtonScreenView.Config(
+              text: "Done, continue",
+              type: .button { self.store.send(.syncProfileNextTapped) },
+              disabled: !regainedFocus,
+            ),
+            listItems: [
+              self.deviceType == "iPad"
+                ? "In the left column, tap “Profile Downloaded” near the top"
+                : "Tap “Profile Downloaded” near the top",
+              "Tap “Install”",
+              "Enter your passcode",
+              "Come back to this app",
+            ],
+          )
         }
       }
     }
+    .onChange(of: self.scenePhase) { _, newPhase in
+      if newPhase == .active {
+        self.store.send(.appEnteredForeground)
+      }
+    }
+  }
+
+  var deviceType: String {
+    UIDevice.current.userInterfaceIdiom == .pad ? "iPad" : "iPhone"
   }
 
   var unconnectedView: some View {

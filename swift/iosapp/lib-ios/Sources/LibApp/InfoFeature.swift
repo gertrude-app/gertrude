@@ -39,6 +39,9 @@ public struct InfoFeature {
     case explainClearCache2
     case clearingCache
     case syncingProfile(URL)
+    case syncProfileDownloaded
+    case syncProfileNotRemovableWarning
+    case syncProfileExplainInstall(regainedFocus: Bool = false)
   }
 
   public enum Action: Equatable {
@@ -50,6 +53,8 @@ public struct InfoFeature {
     case clearCache(ClearCacheFeature.Action)
     case syncProfileTapped
     case profileDownloadDismissed
+    case syncProfileNextTapped
+    case appEnteredForeground
   }
 
   struct Deps: Sendable {
@@ -92,7 +97,29 @@ public struct InfoFeature {
         return .none
 
       case .profileDownloadDismissed:
+        state.subScreen = .syncProfileDownloaded
+        return .none
+
+      case .syncProfileNextTapped where state.subScreen == .syncProfileDownloaded:
+        state.subScreen = .syncProfileNotRemovableWarning
+        return .none
+
+      case .syncProfileNextTapped where state.subScreen == .syncProfileNotRemovableWarning:
+        state.subScreen = .syncProfileExplainInstall()
+        return .none
+
+      case .syncProfileNextTapped where state.subScreen.isSyncProfileExplainInstall:
         state.subScreen = .main
+        return .none
+
+      case .syncProfileNextTapped:
+        state.subScreen = .main
+        return .none
+
+      case .appEnteredForeground:
+        if case .syncProfileExplainInstall(false) = state.subScreen {
+          state.subScreen = .syncProfileExplainInstall(regainedFocus: true)
+        }
         return .none
 
       case .clearCacheTapped:
@@ -185,6 +212,13 @@ public struct InfoFeature {
       deps.osLog.log("unconnected recovery: dismissing info screen")
       await deps.dismiss()
     }
+  }
+}
+
+extension InfoFeature.SubScreen {
+  var isSyncProfileExplainInstall: Bool {
+    if case .syncProfileExplainInstall = self { return true }
+    return false
   }
 }
 

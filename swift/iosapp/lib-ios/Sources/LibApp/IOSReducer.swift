@@ -544,6 +544,11 @@ public struct IOSReducer {
 
     case (.onboarding(.supervision(.resume(.installingProfile(_)))), _):
       self.deps.log(state.screen, action, "f2e0454e")
+      state.screen = .onboarding(.supervision(.resume(.profileDownloaded)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.profileDownloaded))), .primary):
+      self.deps.log(state.screen, action, "c179832d")
       state.screen = .onboarding(.supervision(.resume(.profileNotRemovableWarning)))
       return .none
 
