@@ -40,6 +40,7 @@ public extension IOSReducer {
       case receivedConnectAccountFeatureFlag(ConnectAccountFeatureFlag.Output)
       case supervisionCodeGenerated(code: Int)
       case supervisionCodeGenerationFailed
+      case setProfileRecovery
       case filterVerified
       case filterVerificationFailed
     }

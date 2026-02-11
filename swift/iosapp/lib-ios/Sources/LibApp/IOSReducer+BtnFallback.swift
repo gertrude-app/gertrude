@@ -181,6 +181,8 @@ extension IOSReducer.Onboarding.Supervision.Resume {
       .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
     case (.retrySupervision, _):
       .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
+    case (.profileRemovedRecovery, _):
+      .onboarding(.supervision(.resume(.promptInstallProfile)))
     case (.promptInstallProfile, _):
       .onboarding(.supervision(.resume(.explainProfileDownload)))
     case (.explainProfileDownload, _):

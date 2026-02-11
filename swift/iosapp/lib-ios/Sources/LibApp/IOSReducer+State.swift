@@ -34,6 +34,7 @@ extension IOSReducer {
       public var firstLaunch: Date?
       public var returningTo: Screen?
       public var deviceSupervised: Bool = false
+      public var isProfileRecovery: Bool = false
       public var clearCache: ClearCacheFeature.State?
       public var connectFeature = ConnectAccountFeatureFlag.Output(isEnabled: false)
 
@@ -123,6 +124,7 @@ extension IOSReducer {
         case codeNotClaimed(code: Int)
         case codeClaimedNotSupervised(regainedFocus: Bool = false)
         case retrySupervision
+        case profileRemovedRecovery
         case promptInstallProfile
         case explainProfileDownload
         case installingProfile(profileUrl: URL)

@@ -21,6 +21,7 @@ extension IOSReducer.Deps {
     case running(Running)
     case onboardingNeeded
     case filterNoLongerRunning
+    case profileRemovedRecovery(ChildIOSDeviceData_v2)
     case gertrudeSupervisionReboot(SupervisionReboot)
     case configuratorSupervisionFirstLaunch
   }
@@ -68,6 +69,10 @@ extension IOSReducer.Deps {
 
     case ( /* conn: */ _, /* filter on: */ false, /* groups: */ .none):
       return .onboardingNeeded
+
+    case (.some(let conn), /* filter on: */ false, /* groups: */ .some)
+      where conn.supervisedByGertrude:
+      return .profileRemovedRecovery(conn)
 
     case ( /* conn: */ _, /* filter on: */ false, /* groups: */ .some):
       return .filterNoLongerRunning

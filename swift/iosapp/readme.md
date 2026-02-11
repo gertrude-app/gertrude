@@ -11,6 +11,11 @@ LOCAL_API_URL = https:/$()/REPLACE.ngrok-free.app
 
 ## Release notes
 
+- `1.6.2` (testflight) (2/10/26)
+  - ipad ux improvements
+  - warn about profile removal
+  - route supervision flow thru cache clear
+  - safely handle managed settings web policy
 - `1.6.1` (testflight) (2/9/26)
   - add sync profile button to test profile removal/replace
 - `1.6.0` (testflight) (2/2/26)
