@@ -273,7 +273,7 @@ public struct AppView: View {
 
         case .onboarding(.mdmSupervisionExplainer):
           ButtonScreenView(
-            text: "Gertrude’s content filter for adults (18+) requires a one-time device supervision step using a Mac or Windows computer. This process is not compatible with MDM-managed devices.\n\nTo use this feature, you'll need a personal device that is not managed by an organization.",
+            text: "Gertrude’s content filter for adults (18+) requires a supervised device, per Apple’s own rules. This process is not compatible with MDM-managed devices.\n\nTo use this app, you’ll need a personal device that is not managed by an organization.",
             primary: self.btn(text: "OK", .primary),
           )
 
