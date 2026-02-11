@@ -6,7 +6,7 @@ import XExpect
 
 @testable import Api
 
-final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendable {
+final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sendable {
   func testNotFound_vendorIdMismatch() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSApp.Device(
@@ -25,7 +25,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
-      try await CheckSupervisionStatus.resolve(
+      try await CheckSupervisionFlowStatus.resolve(
         with: .init(
           vendorId: UUID(), // <-- different from device id
           code: code,
@@ -54,7 +54,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
-      try await CheckSupervisionStatus.resolve(
+      try await CheckSupervisionFlowStatus.resolve(
         with: .init(vendorId: device.id.rawValue, code: code),
         in: .mock,
       )
@@ -80,7 +80,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
-      try await CheckSupervisionStatus.resolve(
+      try await CheckSupervisionFlowStatus.resolve(
         with: .init(vendorId: device.id.rawValue, code: code),
         in: .mock,
       )
@@ -111,7 +111,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
       $0.date = .constant(.reference)
       $0.uuid = .mock(uuids)
     } operation: {
-      try await CheckSupervisionStatus.resolve(
+      try await CheckSupervisionFlowStatus.resolve(
         with: .init(vendorId: device.id.rawValue, code: code),
         in: .mock,
       )
@@ -148,7 +148,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
-      try await CheckSupervisionStatus.resolve(
+      try await CheckSupervisionFlowStatus.resolve(
         with: .init(vendorId: device.id.rawValue, code: code),
         in: .mock,
       )
@@ -191,7 +191,7 @@ final class CheckSupervisionStatusResolverTests: ApiTestCase, @unchecked Sendabl
       $0.date = .constant(.reference)
       $0.uuid = .mock(uuids)
     } operation: {
-      try await CheckSupervisionStatus.resolve(
+      try await CheckSupervisionFlowStatus.resolve(
         with: .init(vendorId: device.id.rawValue, code: code),
         in: .mock,
       )

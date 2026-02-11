@@ -450,7 +450,7 @@ public struct IOSReducer {
             .supervision(.setup(.generateSetupCode())),
           ))))
           do {
-            let data = try await deps.api.createSupervisionCode()
+            let data = try await deps.api.createSupervisionClaimCode()
             deps.sharedStorage.savePendingSupervisionCode(data)
             await send(.programmatic(.supervisionCodeGenerated(code: data.code)))
           } catch {
@@ -474,7 +474,7 @@ public struct IOSReducer {
       self.deps.log(state.screen, action, "b530239d")
       return .run { [deps = self.deps] send in
         do {
-          let data = try await deps.api.createSupervisionCode()
+          let data = try await deps.api.createSupervisionClaimCode()
           deps.sharedStorage.savePendingSupervisionCode(data)
           await send(.programmatic(.supervisionCodeGenerated(code: data.code)))
         } catch {
@@ -914,7 +914,7 @@ public struct IOSReducer {
       self.deps.log(action, "a7e31b8f")
       state.screen = .onboarding(.supervision(.resume(.profileInstalled)))
       return .run { [deps = self.deps] _ in
-        _ = try? await deps.api.markSetupComplete()
+        _ = try? await deps.api.markSupervisionProfileInstalled()
       }
 
     case .filterVerificationFailed:

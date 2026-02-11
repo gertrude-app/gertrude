@@ -3,9 +3,9 @@ import PairQL
 public enum UnauthedRoute: PairRoute {
   case blockRules(BlockRules.Input)
   case blockRules_v2(BlockRules_v2.Input)
-  case checkSupervisionStatus(CheckSupervisionStatus.Input)
+  case checkSupervisionFlowStatus(CheckSupervisionFlowStatus.Input)
   case connectDevice_v2(ConnectDevice_v2.Input)
-  case createSupervisionCode(CreateSupervisionCode.Input)
+  case createSupervisionClaimCode(CreateSupervisionClaimCode.Input)
   case defaultBlockRules(DefaultBlockRules.Input)
   case logIOSEvent(LogIOSEvent.Input)
   case logIOSEvent_v2(LogIOSEvent_v2.Input)
@@ -24,17 +24,17 @@ public extension UnauthedRoute {
       Operation(BlockRules_v2.self)
       Body(.json(BlockRules_v2.Input.self))
     }
-    Route(.case(Self.checkSupervisionStatus)) {
-      Operation(CheckSupervisionStatus.self)
-      Body(.json(CheckSupervisionStatus.Input.self))
+    Route(.case(Self.checkSupervisionFlowStatus)) {
+      Operation(CheckSupervisionFlowStatus.self)
+      Body(.json(CheckSupervisionFlowStatus.Input.self))
     }
     Route(.case(Self.connectDevice_v2)) {
       Operation(ConnectDevice_v2.self)
       Body(.json(ConnectDevice_v2.Input.self))
     }
-    Route(.case(Self.createSupervisionCode)) {
-      Operation(CreateSupervisionCode.self)
-      Body(.json(CreateSupervisionCode.Input.self))
+    Route(.case(Self.createSupervisionClaimCode)) {
+      Operation(CreateSupervisionClaimCode.self)
+      Body(.json(CreateSupervisionClaimCode.Input.self))
     }
     Route(.case(Self.defaultBlockRules)) {
       Operation(DefaultBlockRules.self)

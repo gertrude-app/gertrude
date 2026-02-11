@@ -3,7 +3,7 @@ import DuetSQL
 import IOSRoute
 import Vapor
 
-extension CreateSupervisionCode: Resolver {
+extension CreateSupervisionClaimCode: Resolver {
   static func resolve(with input: Input, in ctx: Context) async throws -> Output {
     ModelIdentifier.alertIfUnknown(input.modelIdentifier)
     let now = get(dependency: \.date.now)

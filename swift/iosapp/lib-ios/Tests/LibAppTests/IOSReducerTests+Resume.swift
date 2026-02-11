@@ -113,7 +113,7 @@ final class IOSReducerTestsResume: XCTestCase {
       $0.sharedStorage.clearPendingSupervisionCode = { codeCleaned.setValue(true) }
       $0.systemExtension.filterRunning = { true }
       $0.continuousClock = ImmediateClock()
-      $0.api.markSetupComplete = { @Sendable in setupCompleted.setValue(true) }
+      $0.api.markSupervisionProfileInstalled = { @Sendable in setupCompleted.setValue(true) }
     }
 
     let profileUrl = URL(string: "https://api.gertrude.app/ios-profile/\(deviceId)")!
@@ -162,7 +162,7 @@ final class IOSReducerTestsResume: XCTestCase {
     } withDependencies: {
       $0.continuousClock = ImmediateClock()
       $0.systemExtension.filterRunning = { filterRunning.value }
-      $0.api.markSetupComplete = { @Sendable in }
+      $0.api.markSupervisionProfileInstalled = { @Sendable in }
     }
 
     await store.send(.programmatic(.appDidEnterForeground)) {

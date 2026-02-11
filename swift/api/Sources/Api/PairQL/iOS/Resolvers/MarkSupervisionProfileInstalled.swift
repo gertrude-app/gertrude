@@ -1,10 +1,10 @@
 import IOSRoute
 import Vapor
 
-extension MarkSetupComplete: NoInputResolver {
+extension MarkSupervisionProfileInstalled: NoInputResolver {
   static func resolve(in ctx: IOSApp.ChildContext) async throws -> Output {
     guard var supervision = try await ctx.device.supervision(in: ctx.db) else {
-      logIOSUnexpected("d3b4f6e2", "mark setup complete without supervision")
+      logIOSUnexpected("d3b4f6e2", "mark profile installed without supervision")
       throw Abort(.badRequest)
     }
 

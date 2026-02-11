@@ -127,7 +127,7 @@ final class IOSReducerTestsMajor: XCTestCase {
       IOSReducer()
     } withDependencies: {
       $0.sharedStorage.loadPendingSupervisionCode = { nil }
-      $0.api.createSupervisionCode = { .init(code: 123_123, expiresAt: .reference) }
+      $0.api.createSupervisionClaimCode = { .init(code: 123_123, expiresAt: .reference) }
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
@@ -180,7 +180,7 @@ final class IOSReducerTestsMajor: XCTestCase {
     )) {
       IOSReducer()
     } withDependencies: {
-      $0.api.createSupervisionCode = { .init(code: code, expiresAt: .reference) }
+      $0.api.createSupervisionClaimCode = { .init(code: code, expiresAt: .reference) }
       $0.sharedStorage.savePendingSupervisionCode = { _ in saved.setValue(true) }
     }
     await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
@@ -198,7 +198,7 @@ final class IOSReducerTestsMajor: XCTestCase {
       IOSReducer()
     } withDependencies: {
       $0.sharedStorage.loadPendingSupervisionCode = { nil }
-      $0.api.createSupervisionCode = { throw NSError(domain: "test", code: 1) }
+      $0.api.createSupervisionClaimCode = { throw NSError(domain: "test", code: 1) }
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, "")))

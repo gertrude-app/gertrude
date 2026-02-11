@@ -6,7 +6,7 @@ import XExpect
 
 @testable import Api
 
-final class CreateSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable {
+final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sendable {
   func testHappyPath_andIdempotency() async throws {
     let deviceId = UUID()
     let fixedCode = Int.random(in: 100_000 ... 999_999)
@@ -15,7 +15,7 @@ final class CreateSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable
       $0.verificationCode = .init(generate: { fixedCode })
       $0.date = .constant(.reference)
     } operation: {
-      try await CreateSupervisionCode.resolve(
+      try await CreateSupervisionClaimCode.resolve(
         with: .init(
           deviceId: deviceId,
           modelIdentifier: "iPhone18,2",
@@ -45,7 +45,7 @@ final class CreateSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable
       $0.verificationCode = .init(generate: { Int.random(in: 100_000 ... 999_999) })
       $0.date = .constant(.reference)
     } operation: {
-      try await CreateSupervisionCode.resolve(
+      try await CreateSupervisionClaimCode.resolve(
         with: .init(
           deviceId: deviceId,
           modelIdentifier: "iPhone18,2",
@@ -84,7 +84,7 @@ final class CreateSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable
       $0.verificationCode = .init(generate: { newCode })
       $0.date = .constant(.reference)
     } operation: {
-      try await CreateSupervisionCode.resolve(
+      try await CreateSupervisionClaimCode.resolve(
         with: .init(
           deviceId: deviceId,
           modelIdentifier: "iPhone18,2",
@@ -115,7 +115,7 @@ final class CreateSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable
       $0.verificationCode = .init(generate: { newCode })
       $0.date = .constant(.reference)
     } operation: {
-      try await CreateSupervisionCode.resolve(
+      try await CreateSupervisionClaimCode.resolve(
         with: .init(
           deviceId: device.id.rawValue,
           modelIdentifier: "iPhone18,2",

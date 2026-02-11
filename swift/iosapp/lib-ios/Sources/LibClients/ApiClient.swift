@@ -27,13 +27,13 @@ public struct ApiClient: Sendable {
     async -> Void
   public var connectAccountFeatureFlag: @Sendable ()
     async throws -> ConnectAccountFeatureFlag.Output
-  public var createSupervisionCode: @Sendable ()
-    async throws -> CreateSupervisionCode.Output
-  public var checkSupervisionStatus: @Sendable (_ code: Int)
-    async throws -> CheckSupervisionStatus.Output
+  public var createSupervisionClaimCode: @Sendable ()
+    async throws -> CreateSupervisionClaimCode.Output
+  public var checkSupervisionFlowStatus: @Sendable (_ code: Int)
+    async throws -> CheckSupervisionFlowStatus.Output
   public var selfReportSupervision: @Sendable (_ isSupervised: Bool)
     async throws -> Void
-  public var markSetupComplete: @Sendable ()
+  public var markSupervisionProfileInstalled: @Sendable ()
     async throws -> Void
 }
 
@@ -142,14 +142,14 @@ extension ApiClient: DependencyKey {
           withUnauthed: .connectAccountFeatureFlag,
         )
       },
-      createSupervisionCode: {
+      createSupervisionClaimCode: {
         @Dependency(\.device) var device
         guard let vendorId = await device.vendorId() else {
           throw ApiClient.Error.missingVendorId
         }
         return try await output(
-          from: CreateSupervisionCode.self,
-          withUnauthed: .createSupervisionCode(.init(
+          from: CreateSupervisionClaimCode.self,
+          withUnauthed: .createSupervisionClaimCode(.init(
             deviceId: vendorId,
             modelIdentifier: device.modelIdentifier(),
             iosVersion: device.iOSVersion(),
@@ -157,14 +157,14 @@ extension ApiClient: DependencyKey {
           )),
         )
       },
-      checkSupervisionStatus: { code in
+      checkSupervisionFlowStatus: { code in
         @Dependency(\.device) var device
         guard let vendorId = await device.vendorId() else {
           throw ApiClient.Error.missingVendorId
         }
         return try await output(
-          from: CheckSupervisionStatus.self,
-          withUnauthed: .checkSupervisionStatus(.init(
+          from: CheckSupervisionFlowStatus.self,
+          withUnauthed: .checkSupervisionFlowStatus(.init(
             vendorId: vendorId,
             code: code,
           )),
@@ -176,10 +176,10 @@ extension ApiClient: DependencyKey {
           with: .selfReportSupervision(.init(isSupervised: isSupervised)),
         )
       },
-      markSetupComplete: {
+      markSupervisionProfileInstalled: {
         _ = try await output(
-          from: MarkSetupComplete.self,
-          with: .markSetupComplete,
+          from: MarkSupervisionProfileInstalled.self,
+          with: .markSupervisionProfileInstalled,
         )
       },
     )
