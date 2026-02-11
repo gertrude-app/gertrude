@@ -83,7 +83,7 @@ struct RunningView: View {
               .font(.system(size: 15, weight: .regular))
           }
         }
-        .padding(.bottom, 8)
+        .padding(.bottom, 12)
         .swooshIn(
           tracking: self.$settingsOffset,
           to: .zero,

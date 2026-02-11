@@ -273,7 +273,7 @@ public struct AppView: View {
 
         case .onboarding(.mdmSupervisionExplainer):
           ButtonScreenView(
-            text: "Gertrude's content filter for adults (18+) requires a one-time device supervision step using a Mac or Windows computer. This process is not compatible with MDM-managed devices.\n\nTo use this feature, you'll need a personal device that is not managed by an organization.",
+            text: "Gertrude’s content filter for adults (18+) requires a supervised device, per Apple’s own rules. This process is not compatible with MDM-managed devices.\n\nTo use this app, you’ll need a personal device that is not managed by an organization.",
             primary: self.btn(text: "OK", .primary),
           )
 
@@ -518,7 +518,7 @@ public struct AppView: View {
 
         case .onboarding(.supervision(.resume(.explainProfileDownload))):
           ButtonScreenView(
-            text: "When the browser opens, tap “Allow” to download the profile.",
+            text: "When the mini-browser opens, tap “Allow” to download the profile.",
             primary: self.btn(text: "Got it", .primary),
           )
 
@@ -526,6 +526,12 @@ public struct AppView: View {
           ProfileDownloadView(profileUrl: profileUrl, osMajorVersion: self.osMajorVersion) {
             self.store.send(.interactive(.onboardingBtnTapped(.primary, "Safari dismissed")))
           }
+
+        case .onboarding(.supervision(.resume(.profileDownloaded))):
+          ButtonScreenView(
+            text: "Great, profile downloaded! Now we need to install it. You’ll do this in the Settings app—we’ll explain how.",
+            primary: self.btn(text: "Next", .primary),
+          )
 
         case .onboarding(.supervision(.resume(.profileNotRemovableWarning))):
           ButtonScreenView(
@@ -539,9 +545,9 @@ public struct AppView: View {
             primary: self.btn(text: "Done, continue", .primary, disabled: !regainedFocus),
             listItems: [
               self.deviceType == "iPad"
-                ? "In the left column, tap \u{201c}Profile Downloaded\u{201d} near the top"
-                : "Tap \u{201c}Profile Downloaded\u{201d} near the top",
-              "Tap \u{201c}Install\u{201d}",
+                ? "In the left column, tap “Profile Downloaded” near the top"
+                : "Tap “Profile Downloaded” near the top",
+              "Tap “Install”",
               "Enter your passcode",
               "Come back to this app",
             ],
