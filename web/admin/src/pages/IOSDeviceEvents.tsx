@@ -25,6 +25,13 @@ const ERROR_EVENT_IDS = [
   `93958bd1`,
   `ae941213`,
   `d9dfd021`,
+  `498796d3`,
+  `c4d92e1a`,
+  `df3914fa`,
+  `b7f3a2d1`,
+  `fdab6cff`,
+  `8d4a445b`,
+  `2c3a4481`,
 ];
 
 const WARNING_EVENT_IDS = [
@@ -38,6 +45,14 @@ const WARNING_EVENT_IDS = [
   `d9e93a4b`,
   `ffff30ac`,
   `7c039b10`,
+  `00b0c478`,
+  `94991de7`,
+  `016d03db`,
+  `d3b4f6e2`,
+  `f9797be9`,
+  `bcca235f`,
+  `59d3c6d1`,
+  `e81796af`,
 ];
 
 const SUCCESS_EVENT_IDS = [
@@ -47,12 +62,19 @@ const SUCCESS_EVENT_IDS = [
   `421d373b`,
   `bad8adcc`,
   `cb9cf096`,
+  `fcba8692`,
+  `a7e31b8f`,
+  `09748184`,
+  `1c6f6ca8`,
+  `80451da8`,
 ];
 
 const getEventColor = (event: TimelineEvent): string => {
   const { eventId } = event;
   if (eventId === `cdb31095`) return `bg-green-500`;
   if (eventId === `8d35f043`) return `bg-sky-500`;
+  if (eventId === `f2c3863b`) return `bg-purple-400`;
+  if (eventId === `6ed43005`) return `bg-green-500`;
   if (ERROR_EVENT_IDS.includes(eventId)) return `bg-red-400`;
   if (WARNING_EVENT_IDS.includes(eventId)) return `bg-amber-400`;
   if (SUCCESS_EVENT_IDS.includes(eventId)) return `bg-emerald-400`;
