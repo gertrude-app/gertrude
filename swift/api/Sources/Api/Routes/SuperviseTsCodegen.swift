@@ -25,7 +25,7 @@ enum SuperviseTsCodegenRoute {
       GetPendingSupervision.self,
       LogSupervisionEvent.self,
       MarkSupervisionVerified.self,
-      RecordDeviceConnection.self,
+      RecordDeviceUSBConnection.self,
       ReportSupervisionFailed.self,
     ]
   }

@@ -33,7 +33,7 @@ struct ApiTypeScriptEnumsCodableGenerator: AggregateCodeGenerator {
     EnumCodableGen.EnumsGenerator(
       path: "\(repoRoot)/swift/api/Sources/Api/Extend/Enums+Codable.swift",
       types: [
-        (ClaimSupervisionCode.ChildAssignment.self, false),
+        (ClaimIOSDevice.ChildAssignment.self, false),
         (Parent.NotificationMethod.Config.self, false),
         (DecideFilterSuspensionRequest.Decision.self, false),
         (GetAdmin.SubscriptionStatus.self, false),

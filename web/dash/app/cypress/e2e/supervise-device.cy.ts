@@ -41,7 +41,7 @@ describe(`supervise device claim flow`, () => {
     });
 
     it(`shows child picker when parent has children`, () => {
-      cy.interceptPql(`GetClaimDeviceData`, {
+      cy.interceptPql(`GetIOSDeviceClaimData`, {
         children: [
           { id: `child-1`, name: `Emma` },
           { id: `child-2`, name: `Luke` },
@@ -53,13 +53,13 @@ describe(`supervise device claim flow`, () => {
 
       cy.visit(`/supervise-device/123456/claim`);
 
-      cy.wait(`@GetClaimDeviceData`);
+      cy.wait(`@GetIOSDeviceClaimData`);
       cy.contains(`Who does this device belong to?`);
       cy.contains(`Continue`);
     });
 
     it(`shows name input directly when parent has no children`, () => {
-      cy.interceptPql(`GetClaimDeviceData`, {
+      cy.interceptPql(`GetIOSDeviceClaimData`, {
         children: [],
         modelName: `iPhone 15 Pro`,
         deviceType: `iPhone`,
@@ -68,7 +68,7 @@ describe(`supervise device claim flow`, () => {
 
       cy.visit(`/supervise-device/123456/claim`);
 
-      cy.wait(`@GetClaimDeviceData`);
+      cy.wait(`@GetIOSDeviceClaimData`);
       cy.get(`[data-test="child-name-input"]`).should(`exist`);
     });
 

@@ -9,7 +9,7 @@ const SuperviseDeviceDone: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
 
   const query = useQuery(Key.supervisionDeviceStatus(code), () =>
-    Current.api.getSupervisionDeviceStatus({ code: parseInt(code, 10) }),
+    Current.api.getIOSDeviceSupervisionStatus({ code: parseInt(code, 10) }),
   );
 
   if (query.isPending) {

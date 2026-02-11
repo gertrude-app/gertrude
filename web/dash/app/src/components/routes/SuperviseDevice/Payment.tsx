@@ -12,7 +12,7 @@ const SuperviseDevicePayment: React.FC = () => {
   const checkoutCancelled = searchParams.has(`session_id`);
 
   const deviceStatus = useQuery(Key.supervisionDeviceStatus(code), () =>
-    Current.api.getSupervisionDeviceStatus({ code: parseInt(code ?? `0`, 10) }),
+    Current.api.getIOSDeviceSupervisionStatus({ code: parseInt(code ?? `0`, 10) }),
   );
 
   const getStripeUrl = useMutation(() =>

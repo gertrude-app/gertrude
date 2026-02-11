@@ -1,10 +1,6 @@
 import { Button } from '@shared/components';
 import React from 'react';
-import type {
-  CreatePendingAppConnection_v2,
-  RequestState,
-  Subcomponents,
-} from '@dash/types';
+import type { MacAppConnectionCode, RequestState, Subcomponents } from '@dash/types';
 import EmptyState from '../EmptyState';
 import PageHeading from '../PageHeading';
 import ChildCard from './ChildCard';
@@ -12,7 +8,7 @@ import ConnectModal from './ConnectDeviceModal';
 
 type Props = {
   users: Subcomponents<typeof ChildCard>;
-  addDeviceRequest?: RequestState<CreatePendingAppConnection_v2.Output>;
+  addDeviceRequest?: RequestState<MacAppConnectionCode.Output>;
   startAddDevice(userId: UUID): unknown;
   dismissAddDevice(): unknown;
   onStartTrial(): unknown;

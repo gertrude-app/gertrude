@@ -33,7 +33,7 @@ const UserRoute: React.FC = () => {
   });
 
   const addDevice = useMutation((childId: UUID) =>
-    Current.api.createPendingAppConnection({ childId }),
+    Current.api.macAppConnectionCode({ childId }),
   );
   const startTrial = useMutation(() => Current.api.startFullTrial());
 

@@ -9,7 +9,7 @@ import type {
   ChildComputer,
   ChildIOSDevice,
   ConfirmableEntityAction,
-  CreatePendingAppConnection_v2,
+  MacAppConnectionCode,
   PlainTimeWindow,
   RequestState,
   RuleSchedule,
@@ -55,7 +55,7 @@ interface Props {
   dismissAddDevice(): unknown;
   onStartTrial(): unknown;
   deleteDevice: ConfirmableEntityAction;
-  addDeviceRequest?: RequestState<CreatePendingAppConnection_v2.Output>;
+  addDeviceRequest?: RequestState<MacAppConnectionCode.Output>;
   saveButtonDisabled: boolean;
   onSave(): unknown;
   onAddKeychainClicked(): unknown;

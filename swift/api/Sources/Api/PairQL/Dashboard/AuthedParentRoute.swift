@@ -50,9 +50,10 @@ enum AuthedParentRoute: PairRoute {
   case requestPublicKeychain(RequestPublicKeychain.Input)
   case upsertBlockRule(UpsertBlockRule.Input)
   case updateIOSDevice(UpdateIOSDevice.Input)
-  case claimSupervisionCode(ClaimSupervisionCode.Input)
-  case getClaimDeviceData(GetClaimDeviceData.Input)
-  case getSupervisionDeviceStatus(GetSupervisionDeviceStatus.Input)
+  case claimIOSDevice(ClaimIOSDevice.Input)
+  case getIOSDeviceClaimData(GetIOSDeviceClaimData.Input)
+  case getIOSDeviceSupervisionStatus(GetIOSDeviceSupervisionStatus.Input)
+  case macAppConnectionCode(MacAppConnectionCode.Input)
 }
 
 extension AuthedParentRoute {
@@ -233,17 +234,21 @@ extension AuthedParentRoute {
         Operation(UpdateIOSDevice.self)
         Body(.dashboardInput(UpdateIOSDevice.self))
       }
-      Route(.case(Self.claimSupervisionCode)) {
-        Operation(ClaimSupervisionCode.self)
-        Body(.dashboardInput(ClaimSupervisionCode.self))
+      Route(.case(Self.claimIOSDevice)) {
+        Operation(ClaimIOSDevice.self)
+        Body(.dashboardInput(ClaimIOSDevice.self))
       }
-      Route(.case(Self.getClaimDeviceData)) {
-        Operation(GetClaimDeviceData.self)
-        Body(.dashboardInput(GetClaimDeviceData.self))
+      Route(.case(Self.getIOSDeviceClaimData)) {
+        Operation(GetIOSDeviceClaimData.self)
+        Body(.dashboardInput(GetIOSDeviceClaimData.self))
       }
-      Route(.case(Self.getSupervisionDeviceStatus)) {
-        Operation(GetSupervisionDeviceStatus.self)
-        Body(.dashboardInput(GetSupervisionDeviceStatus.self))
+      Route(.case(Self.getIOSDeviceSupervisionStatus)) {
+        Operation(GetIOSDeviceSupervisionStatus.self)
+        Body(.dashboardInput(GetIOSDeviceSupervisionStatus.self))
+      }
+      Route(.case(Self.macAppConnectionCode)) {
+        Operation(MacAppConnectionCode.self)
+        Body(.dashboardInput(MacAppConnectionCode.self))
       }
     }
     .eraseToAnyParserPrinter()
@@ -393,14 +398,17 @@ extension AuthedParentRoute: RouteResponder {
     case .updateIOSDevice(let input):
       let output = try await UpdateIOSDevice.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .claimSupervisionCode(let input):
-      let output = try await ClaimSupervisionCode.resolve(with: input, in: context)
+    case .claimIOSDevice(let input):
+      let output = try await ClaimIOSDevice.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .getClaimDeviceData(let input):
-      let output = try await GetClaimDeviceData.resolve(with: input, in: context)
+    case .getIOSDeviceClaimData(let input):
+      let output = try await GetIOSDeviceClaimData.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .getSupervisionDeviceStatus(let input):
-      let output = try await GetSupervisionDeviceStatus.resolve(with: input, in: context)
+    case .getIOSDeviceSupervisionStatus(let input):
+      let output = try await GetIOSDeviceSupervisionStatus.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .macAppConnectionCode(let input):
+      let output = try await MacAppConnectionCode.resolve(with: input, in: context)
       return try await self.respond(with: output)
     }
   }

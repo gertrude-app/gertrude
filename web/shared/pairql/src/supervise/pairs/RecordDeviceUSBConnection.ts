@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-export namespace RecordDeviceConnection {
+export namespace RecordDeviceUSBConnection {
   export interface Input {
     code: number;
     udid: string;

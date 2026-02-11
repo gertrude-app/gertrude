@@ -5,7 +5,7 @@ import XExpect
 
 @testable import Api
 
-final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable {
+final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testHappyPath_newChild_createsChildAndAssignsBlockGroups() async throws {
     let parent = try await self.parent()
     let code = Int.random(in: 100_000 ... 999_999)
@@ -25,7 +25,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
-      try await ClaimSupervisionCode.resolve(
+      try await ClaimIOSDevice.resolve(
         with: .init(code: code, child: .newChild(name: "Luke")),
         in: parent.context,
       )
@@ -86,7 +86,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
-      try await ClaimSupervisionCode.resolve(
+      try await ClaimIOSDevice.resolve(
         with: .init(code: code, child: .existingChild(id: existingChild.id)),
         in: parent.context,
       )
@@ -108,7 +108,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     let parent = try await self.parent()
 
     try await expectErrorFrom {
-      try await ClaimSupervisionCode.resolve(
+      try await ClaimIOSDevice.resolve(
         with: .init(code: Int.random(in: 100_000 ... 999_999), child: .newChild(name: "Test")),
         in: parent.context,
       )
@@ -135,7 +135,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
       try await withDependencies {
         $0.date = .constant(.reference)
       } operation: {
-        try await ClaimSupervisionCode.resolve(
+        try await ClaimIOSDevice.resolve(
           with: .init(code: code, child: .newChild(name: "Test")),
           in: parent.context,
         )
@@ -167,7 +167,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
       try await withDependencies {
         $0.date = .constant(.reference)
       } operation: {
-        try await ClaimSupervisionCode.resolve(
+        try await ClaimIOSDevice.resolve(
           with: .init(code: code, child: .newChild(name: "Test")),
           in: parent.context,
         )
@@ -197,7 +197,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
       try await withDependencies {
         $0.date = .constant(.reference)
       } operation: {
-        try await ClaimSupervisionCode.resolve(
+        try await ClaimIOSDevice.resolve(
           with: .init(code: code, child: .existingChild(id: otherChild.id)),
           in: parent.context,
         )
@@ -226,7 +226,7 @@ final class ClaimSupervisionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
-      try await ClaimSupervisionCode.resolve(
+      try await ClaimIOSDevice.resolve(
         // input child ignored, first claim wins: ------vvvvvvv
         with: .init(code: code, child: .newChild(name: "Ignored")),
         in: parent.context,

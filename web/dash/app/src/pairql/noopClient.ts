@@ -5,7 +5,7 @@ const noopClient: ApiClient = {
   confirmPendingNotificationMethod: async () => {
     return Result.success({ success: true });
   },
-  createPendingAppConnection: async () => {
+  macAppConnectionCode: async () => {
     return Result.success({ code: 0 });
   },
   createPendingNotificationMethod: async () => {
@@ -49,7 +49,7 @@ const noopClient: ApiClient = {
   getAdminKeychains: async () => {
     return Result.success({ children: [], keychains: [] });
   },
-  getClaimDeviceData: async () => {
+  getIOSDeviceClaimData: async () => {
     return Result.success({
       children: [],
       modelName: `iPhone 15 Pro`,
@@ -57,7 +57,7 @@ const noopClient: ApiClient = {
       iosVersion: `26.2`,
     });
   },
-  claimSupervisionCode: async () => {
+  claimIOSDevice: async () => {
     return Result.success({
       childName: `Luke`,
       modelName: `iPhone 15 Pro`,
@@ -99,7 +99,7 @@ const noopClient: ApiClient = {
   getSelectableKeychains: async () => {
     return Result.success({ own: [], public: [] });
   },
-  getSupervisionDeviceStatus: async () => {
+  getIOSDeviceSupervisionStatus: async () => {
     return Result.success({
       deviceId: `device-123`,
       childId: `child-456`,

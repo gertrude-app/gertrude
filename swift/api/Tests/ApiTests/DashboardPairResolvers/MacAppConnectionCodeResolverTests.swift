@@ -5,7 +5,7 @@ import XExpect
 
 @testable import Api
 
-final class CreatePendingAppConnection_v2Tests: ApiTestCase, @unchecked Sendable {
+final class MacAppConnectionCodeResolverTests: ApiTestCase, @unchecked Sendable {
   override func invokeTest() {
     withDependencies {
       $0.verificationCode.generate = { 123_456 }
@@ -22,7 +22,7 @@ final class CreatePendingAppConnection_v2Tests: ApiTestCase, @unchecked Sendable
     }
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
 
-    let output = try await CreatePendingAppConnection_v2.resolve(
+    let output = try await MacAppConnectionCode.resolve(
       with: .init(childId: child.id),
       in: context(parent.model),
     )
@@ -34,7 +34,7 @@ final class CreatePendingAppConnection_v2Tests: ApiTestCase, @unchecked Sendable
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
 
-    let output = try await CreatePendingAppConnection_v2.resolve(
+    let output = try await MacAppConnectionCode.resolve(
       with: .init(childId: child.id),
       in: parent.context,
     )
@@ -51,7 +51,7 @@ final class CreatePendingAppConnection_v2Tests: ApiTestCase, @unchecked Sendable
     }
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
 
-    let output = try await CreatePendingAppConnection_v2.resolve(
+    let output = try await MacAppConnectionCode.resolve(
       with: .init(childId: child.id),
       in: context(parent.model),
     )
@@ -68,7 +68,7 @@ final class CreatePendingAppConnection_v2Tests: ApiTestCase, @unchecked Sendable
     }
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
 
-    let output = try await CreatePendingAppConnection_v2.resolve(
+    let output = try await MacAppConnectionCode.resolve(
       with: .init(childId: child.id),
       in: context(parent.model),
     )
@@ -85,7 +85,7 @@ final class CreatePendingAppConnection_v2Tests: ApiTestCase, @unchecked Sendable
     }
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
 
-    let output = try await CreatePendingAppConnection_v2.resolve(
+    let output = try await MacAppConnectionCode.resolve(
       with: .init(childId: child.id),
       in: context(parent.model),
     )

@@ -2,7 +2,7 @@
 import Foundation
 import Tagged
 
-extension ClaimSupervisionCode.ChildAssignment {
+extension ClaimIOSDevice.ChildAssignment {
   private struct _NamedCase: Codable {
     var `case`: String
     static func extract(from decoder: Decoder) throws -> String {

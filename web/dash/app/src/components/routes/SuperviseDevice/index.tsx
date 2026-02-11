@@ -7,8 +7,8 @@ import { Key, useQuery } from '../../../hooks';
 
 export type SuperviseDeviceContext = {
   code: string;
-  claimData?: T.GetClaimDeviceData.Output;
-  deviceStatus?: T.GetSupervisionDeviceStatus.Output;
+  claimData?: T.GetIOSDeviceClaimData.Output;
+  deviceStatus?: T.GetIOSDeviceSupervisionStatus.Output;
 };
 
 const SuperviseDevice: React.FC = () => {
@@ -24,7 +24,7 @@ export const SuperviseDeviceClaimLoader: React.FC<{ children: React.ReactNode }>
   const { code = `` } = useParams<{ code: string }>();
 
   const query = useQuery(Key.claimDeviceData(code), () =>
-    Current.api.getClaimDeviceData({ code: parseInt(code ?? `0`, 10) }),
+    Current.api.getIOSDeviceClaimData({ code: parseInt(code ?? `0`, 10) }),
   );
 
   if (query.isPending) {
@@ -39,12 +39,12 @@ export const SuperviseDeviceClaimLoader: React.FC<{ children: React.ReactNode }>
 };
 
 export const SuperviseDeviceStatusLoader: React.FC<{
-  children: (data: T.GetSupervisionDeviceStatus.Output) => React.ReactNode;
+  children: (data: T.GetIOSDeviceSupervisionStatus.Output) => React.ReactNode;
 }> = ({ children }) => {
   const { code = `` } = useParams<{ code: string }>();
 
   const query = useQuery(Key.supervisionDeviceStatus(code), () =>
-    Current.api.getSupervisionDeviceStatus({ code: parseInt(code ?? `0`, 10) }),
+    Current.api.getIOSDeviceSupervisionStatus({ code: parseInt(code ?? `0`, 10) }),
   );
 
   if (query.isPending) {
