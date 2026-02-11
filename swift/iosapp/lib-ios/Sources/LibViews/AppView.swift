@@ -273,7 +273,7 @@ public struct AppView: View {
 
         case .onboarding(.mdmSupervisionExplainer):
           ButtonScreenView(
-            text: "Gertrude's content filter for adults (18+) requires a one-time device supervision step using a Mac or Windows computer. This process is not compatible with MDM-managed devices.\n\nTo use this feature, you'll need a personal device that is not managed by an organization.",
+            text: "Gertrude’s content filter for adults (18+) requires a one-time device supervision step using a Mac or Windows computer. This process is not compatible with MDM-managed devices.\n\nTo use this feature, you'll need a personal device that is not managed by an organization.",
             primary: self.btn(text: "OK", .primary),
           )
 
@@ -545,9 +545,9 @@ public struct AppView: View {
             primary: self.btn(text: "Done, continue", .primary, disabled: !regainedFocus),
             listItems: [
               self.deviceType == "iPad"
-                ? "In the left column, tap \u{201c}Profile Downloaded\u{201d} near the top"
-                : "Tap \u{201c}Profile Downloaded\u{201d} near the top",
-              "Tap \u{201c}Install\u{201d}",
+                ? "In the left column, tap “Profile Downloaded” near the top"
+                : "Tap “Profile Downloaded” near the top",
+              "Tap “Install”",
               "Enter your passcode",
               "Come back to this app",
             ],
