@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "next dev --turbopack",
+    "start": "next dev --turbopack --port ${PORT:-3000}",
     "build": "next build && cp _redirects _headers ./out",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"

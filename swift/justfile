@@ -1,5 +1,10 @@
 import 'watch-helpers.just'
 
+set dotenv-filename := "../.gtask-ports"
+set dotenv-required := false
+
+api_port := env("API_PORT", "8080")
+
 _default:
   @just --choose
 
@@ -34,7 +39,7 @@ watch-api:
   @just watch-swift . 'just run-api' 'macapp/**/*'
 
 run-api: build-api
-  @just exec-api serve
+  @just exec-api serve --port {{api_port}}
 
 run-api-ip: build-api
   @just exec-api serve --hostname 192.168.10.248
@@ -55,7 +60,7 @@ sync-staging-data: build-api
   @just exec-api sync-staging-data
 
 nuke-test-db:
-  @killall -q Postico; dropdb --if-exists gertrude_test; createdb gertrude_test
+  @killall -q Postico; db=$(grep '^TEST_DATABASE_NAME=' api/.env | cut -d= -f2); dropdb --if-exists "$db"; createdb "$db"
 
 hurl-dev *args:
   @hurl --variables-file api/hurl/dev.env {{args}}
@@ -66,13 +71,13 @@ hurl-prod *args:
 # emails (requires local dev api running)
 
 send-email template:
-  @curl http://127.0.0.1:8080/send-test-email/{{template}}
+  @curl http://127.0.0.1:{{api_port}}/send-test-email/{{template}}
 
 sync-email-templates:
-  @curl http://127.0.0.1:8080/sync-email-templates
+  @curl http://127.0.0.1:{{api_port}}/sync-email-templates
 
 web-email template:
-  @curl -s http://127.0.0.1:8080/web-test-email/{{template}}
+  @curl -s http://127.0.0.1:{{api_port}}/web-test-email/{{template}}
 
 # NB: requires `concurrently`, `vite` in $PATH
 watch-web-email template:

@@ -1,22 +1,25 @@
+set dotenv-filename := "../.gtask-ports"
+set dotenv-required := false
+
 _default:
   @just --choose
 
 # local dev
 
 dash:
-  @pnpm --filter @dash/app start
+  @PORT=${DASH_PORT:-8081} pnpm --filter @dash/app start
 
 site:
-  @pnpm --filter site start
+  @PORT=${SITE_PORT:-3000} pnpm --filter site start
 
 admin:
-  @pnpm --filter admin start
+  @PORT=${ADMIN_PORT:-4243} pnpm --filter admin start
 
 hmr-docs:
   @watchexec --watch site/markdoc --exts .md "just hmr-comment"
 
 storybook:
-  @pnpm --filter @storybook/app start
+  @PORT=${STORYBOOK_PORT:-6006} pnpm --filter @storybook/app start
 
 dev:
   pnpm concurrently \
