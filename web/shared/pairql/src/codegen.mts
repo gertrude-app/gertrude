@@ -61,7 +61,8 @@ async function generateDomain(config: DomainConfig): Promise<void> {
   const domainDir = path.join(PACKAGE_ROOT, `src`, config.domain);
   cleanDir(domainDir);
 
-  const endpoint = `http://127.0.0.1:8080/${config.domain}-ts-codegen`;
+  const apiPort = process.env.API_PORT ?? `8080`;
+  const endpoint = `http://127.0.0.1:${apiPort}/${config.domain}-ts-codegen`;
   const output = await fetchCodegenData(endpoint);
   const sharedTypes = Object.keys(output.shared).sort();
   const pairNames = Object.keys(output.pairs).sort();

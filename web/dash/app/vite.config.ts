@@ -2,10 +2,12 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 // https://vitejs.dev/config/
+const port = parseInt(process.env.PORT ?? `8081`);
+
 export default defineConfig({
   server: {
     host: `localhost`,
-    port: 8081,
+    port,
     strictPort: true,
     open: false,
   },
@@ -13,7 +15,7 @@ export default defineConfig({
     outDir: `build`,
   },
   preview: {
-    port: 8081,
+    port,
   },
   define: {
     'process.env.STORYBOOK_SCREENSHOT_TESTING': `false`,

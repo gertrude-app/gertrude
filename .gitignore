@@ -53,3 +53,5 @@ swift/podcasts/previews
 # Local task files
 claude.task.md
 claude.ledger.*
+.gtask-slot
+.gtask-ports
