@@ -169,14 +169,14 @@ struct InfoView: View {
           .padding(.bottom, 8)
 
           self.infoCard(
-            title: "Child Name",
+            title: connection.supervisedByGertrude ? "Supervised" : "Child Name",
             value: connection.childName,
             icon: "person.circle",
           )
 
           self.infoCard(
-            title: "Child ID",
-            value: String(connection.childId.uuidString.lowercased().prefix(23)),
+            title: connection.supervisedByGertrude ? "User ID" : "Child ID",
+            value: connection.childId.uuidString.lowercased(),
             icon: "number",
           )
 
