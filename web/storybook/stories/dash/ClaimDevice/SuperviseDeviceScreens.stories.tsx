@@ -1,7 +1,7 @@
-import { ChildAssignmentPicker, DeviceContextBanner } from '@dash/components';
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import {
+  ClaimScreen,
   DoneScreen,
   DownloadHelperScreen,
   PaymentGateScreen,
@@ -43,22 +43,11 @@ const SuperviseDeviceScreen: React.FC<{
   if (step === `claim`) {
     return (
       <ScreenShell title={`Connect ${deviceType}`}>
-        <div className="mb-4">
-          <DeviceContextBanner
-            modelName={modelName}
-            iosVersion={iosVersion}
-            label={`Adding ${deviceType}:`}
-          />
-        </div>
-        <div className="mb-6 pb-6 border-b border-slate-100">
-          <p className="text-sm text-slate-500 mb-1">Claim code</p>
-          <p className="text-2xl font-mono font-semibold text-slate-800 tracking-wider">
-            {code}
-          </p>
-        </div>
-        <ChildAssignmentPicker
+        <ClaimScreen
           children={children}
           deviceType={deviceType}
+          modelName={modelName}
+          iosVersion={iosVersion}
           onSubmit={() => {
             setIsSubmitting(true);
             setTimeout(() => {

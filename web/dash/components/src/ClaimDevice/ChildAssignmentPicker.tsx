@@ -52,7 +52,7 @@ const ChildAssignmentPicker: React.FC<Props> = ({
     return (
       <form onSubmit={handleSubmit} className="w-full">
         <div className="mb-6">
-          <h3 className="text-slate-700 font-medium mb-3">Name of {deviceType} owner:</h3>
+          <h3 className="text-slate-700 font-medium mb-3">Name of {deviceType} user:</h3>
           <TextInput
             type="text"
             value={newChildName}
@@ -89,7 +89,7 @@ const ChildAssignmentPicker: React.FC<Props> = ({
     <form onSubmit={handleSubmit} className="w-full">
       <div className="mb-6">
         <h3 className="text-slate-700 font-medium mb-3">
-          Who does this device belong to?
+          Who is the user of this {deviceType}?
         </h3>
         <SelectMenu
           options={options}

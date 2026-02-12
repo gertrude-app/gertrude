@@ -1,16 +1,11 @@
-import {
-  ApiErrorMessage,
-  ChildAssignmentPicker,
-  DeviceContextBanner,
-  Loading,
-} from '@dash/components';
+import { ApiErrorMessage, Loading } from '@dash/components';
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { ChildSelection } from '@dash/components';
 import type { T } from '@shared/pairql/dashboard';
 import Current from '../../../environment';
 import { Key, useQuery } from '../../../hooks';
-import { ScreenShell } from './screens';
+import { ClaimScreen, ScreenShell } from './screens';
 
 const SuperviseDeviceClaim: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
@@ -62,23 +57,11 @@ const SuperviseDeviceClaim: React.FC = () => {
 
   return (
     <ScreenShell title={`Connect ${deviceType}`}>
-      <div className="mb-4">
-        <DeviceContextBanner
-          modelName={modelName}
-          iosVersion={iosVersion}
-          deviceType={deviceType as `iPhone` | `iPad`}
-          label={`Adding ${deviceType}:`}
-        />
-      </div>
-      <div className="mb-6 pb-6 border-b border-slate-100">
-        <p className="text-sm text-slate-500 mb-1">Claim code</p>
-        <p className="text-2xl font-mono font-semibold text-slate-800 tracking-wider">
-          {code}
-        </p>
-      </div>
-      <ChildAssignmentPicker
+      <ClaimScreen
         children={children}
         deviceType={deviceType}
+        modelName={modelName}
+        iosVersion={iosVersion}
         onSubmit={(selection) => void handleSubmit(selection)}
         onCancel={handleCancel}
         isSubmitting={isSubmitting}

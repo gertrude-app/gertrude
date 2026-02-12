@@ -1,7 +1,12 @@
-import { PageHeading } from '@dash/components';
+import {
+  ChildAssignmentPicker,
+  DeviceContextBanner,
+  PageHeading,
+} from '@dash/components';
 import { Button } from '@shared/components';
 import { posessive } from '@shared/string';
 import React, { useState } from 'react';
+import type { ChildSelection } from '@dash/components';
 
 type DeviceInfo = {
   childName: string;
@@ -19,6 +24,45 @@ export const ScreenShell: React.FC<{
       {children}
     </div>
   </div>
+);
+
+export const ClaimScreen: React.FC<{
+  children: Array<{ id: string; name: string }>;
+  deviceType: string;
+  modelName: string;
+  iosVersion: string;
+  onSubmit: (selection: ChildSelection) => void;
+  onCancel: () => void;
+  isSubmitting: boolean;
+  error?: string;
+}> = ({
+  children,
+  deviceType,
+  modelName,
+  iosVersion,
+  onSubmit,
+  onCancel,
+  isSubmitting,
+  error,
+}) => (
+  <>
+    <div className="mb-8">
+      <DeviceContextBanner
+        modelName={modelName}
+        iosVersion={iosVersion}
+        deviceType={deviceType as `iPhone` | `iPad`}
+        label={`Adding ${deviceType}:`}
+      />
+    </div>
+    <ChildAssignmentPicker
+      children={children}
+      deviceType={deviceType}
+      onSubmit={onSubmit}
+      onCancel={onCancel}
+      isSubmitting={isSubmitting}
+      error={error}
+    />
+  </>
 );
 
 const ScreenHeader: React.FC<{
