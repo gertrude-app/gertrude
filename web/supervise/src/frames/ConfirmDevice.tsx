@@ -9,6 +9,7 @@ const imgSrc: string = typeof img === `string` ? img : img.src;
 
 const ConfirmDevice: React.FC<ConfirmDeviceProps> = ({
   deviceName,
+  deviceType,
   iosVersion,
   onConfirm,
   onReject,
@@ -16,8 +17,8 @@ const ConfirmDevice: React.FC<ConfirmDeviceProps> = ({
   <InstructionLayout
     step={3}
     totalSteps={8}
-    title="Device Found"
-    subtitle="Is this the device you want to supervise?"
+    title={`${deviceType} Found`}
+    subtitle={`Is this the ${deviceType} you want to supervise?`}
     imageSrc={imgSrc}
     imageAlt="Connected device"
     footer={

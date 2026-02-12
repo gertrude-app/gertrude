@@ -8,14 +8,18 @@ import confirmSupervisedImg from '../assets/confirm-supervised.png';
 const img: any = confirmSupervisedImg;
 const imgSrc: string = typeof img === `string` ? img : img.src;
 
-const ConfirmSupervision: React.FC<ConfirmSupervisionProps> = ({ onYes, onNo }) => (
+const ConfirmSupervision: React.FC<ConfirmSupervisionProps> = ({
+  deviceType,
+  onYes,
+  onNo,
+}) => (
   <InstructionLayout
     step={8}
     totalSteps={8}
     title="Confirm Supervision"
     subtitle="Let’s verify that supervision was enabled successfully."
     imageSrc={imgSrc}
-    imageAlt="Settings showing device is supervised"
+    imageAlt="Settings showing iPhone/iPad is supervised"
     footer={
       <div className="flex gap-4">
         <Button type="button" onClick={onNo} color="secondary" size="large">
@@ -31,11 +35,11 @@ const ConfirmSupervision: React.FC<ConfirmSupervisionProps> = ({ onYes, onNo }) 
       steps={[
         {
           title: `Open the Settings app`,
-          subtitle: `On the device you just supervised`,
+          subtitle: `On the ${deviceType} you just supervised`,
         },
         {
           title: `Look at the top of the screen`,
-          subtitle: `You should see “This iPhone is supervised and managed by Gertrude.”`,
+          subtitle: `You should see "This ${deviceType} is supervised and managed by Gertrude."`,
         },
       ]}
     />

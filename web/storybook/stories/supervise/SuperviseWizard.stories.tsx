@@ -104,6 +104,7 @@ export const DeviceMismatch_Default: Story = {
         expectedModelName="iPhone 14"
         connectedModelName="iPhone 13"
         childName="Luke"
+        deviceType="iPhone"
         onTryAgain={() => {}}
       />
     </Window>
@@ -115,6 +116,7 @@ export const Frame_ConfirmDevice: Story = {
     <Window>
       <ConfirmDevice
         deviceName="Harriet's iPhone"
+        deviceType="iPhone"
         iosVersion="18.5"
         onConfirm={() => {}}
         onReject={() => {}}
@@ -142,7 +144,7 @@ export const Frame_DisablePrivateRelay: Story = {
 export const Frame_GetReady: Story = {
   render: () => (
     <Window>
-      <GetReady onStart={() => {}} />
+      <GetReady deviceType="iPhone" onStart={() => {}} />
     </Window>
   ),
 };
@@ -150,7 +152,7 @@ export const Frame_GetReady: Story = {
 export const Frame_Supervising: Story = {
   render: () => (
     <Window>
-      <Supervising />
+      <Supervising deviceType="iPhone" />
     </Window>
   ),
 };
@@ -158,7 +160,7 @@ export const Frame_Supervising: Story = {
 export const Frame_SwipeToUpgrade: Story = {
   render: () => (
     <Window>
-      <SwipeToUpgrade onContinue={() => {}} />
+      <SwipeToUpgrade deviceType="iPhone" onContinue={() => {}} />
     </Window>
   ),
 };
@@ -166,7 +168,7 @@ export const Frame_SwipeToUpgrade: Story = {
 export const Frame_ConfirmSupervision: Story = {
   render: () => (
     <Window>
-      <ConfirmSupervision onYes={() => {}} onNo={() => {}} />
+      <ConfirmSupervision deviceType="iPhone" onYes={() => {}} onNo={() => {}} />
     </Window>
   ),
 };
@@ -182,7 +184,12 @@ export const Frame_Complete: Story = {
 export const Frame_Error_FindMyEnabled: Story = {
   render: () => (
     <Window>
-      <Error errorType="findMyEnabled" onRetry={() => {}} onContactSupport={() => {}} />
+      <Error
+        deviceType="iPhone"
+        errorType="findMyEnabled"
+        onRetry={() => {}}
+        onContactSupport={() => {}}
+      />
     </Window>
   ),
 };
@@ -191,6 +198,7 @@ export const Frame_Error_InvokeFailed: Story = {
   render: () => (
     <Window>
       <Error
+        deviceType="iPhone"
         errorType="invokeFailed"
         errorMessage="Device disconnected unexpectedly"
         onRetry={() => {}}
@@ -203,7 +211,12 @@ export const Frame_Error_InvokeFailed: Story = {
 export const Frame_Error_UserReportedNo: Story = {
   render: () => (
     <Window>
-      <Error errorType="userReportedNo" onRetry={() => {}} onContactSupport={() => {}} />
+      <Error
+        deviceType="iPhone"
+        errorType="userReportedNo"
+        onRetry={() => {}}
+        onContactSupport={() => {}}
+      />
     </Window>
   ),
 };

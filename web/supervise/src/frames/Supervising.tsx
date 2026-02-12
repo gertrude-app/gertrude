@@ -3,7 +3,7 @@ import React from 'react';
 import type { SupervisingProps } from '../types';
 import FrameBackground from '../FrameBackground';
 
-const Supervising: React.FC<SupervisingProps> = () => (
+const Supervising: React.FC<SupervisingProps> = ({ deviceType }) => (
   <FrameBackground>
     <div className="absolute top-0 left-0 w-full p-5 flex justify-center">
       <ProgressIndicator step={6} totalSteps={8} />
@@ -34,7 +34,7 @@ const Supervising: React.FC<SupervisingProps> = () => (
 
         <div className="text-center">
           <h1 className="text-3xl font-bold text-slate-800 mb-3">Please Wait</h1>
-          <p className="text-slate-500 text-lg">Do not disconnect your device.</p>
+          <p className="text-slate-500 text-lg">Do not disconnect your {deviceType}.</p>
         </div>
       </div>
     </div>
