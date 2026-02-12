@@ -1,13 +1,13 @@
 // import { convert, validate } from '@dash/block-rules';
 import {
   // BlockRuleEditor,
+  BlockGroupList,
   // EditBlockRules,
   Loading,
   PageHeading,
   // TrashBtn,
 } from '@dash/components';
 import { ApiErrorMessage /*ConfirmDeleteEntity*/ } from '@dash/components';
-import { /* Modal, */ SelectableListItem } from '@dash/components';
 // import { PlusIcon } from '@heroicons/react/24/solid';
 import { Button /* SelectMenu */ } from '@shared/components';
 // import { Result } from '@shared/pairql';
@@ -85,20 +85,11 @@ const IOSDevice: React.FC = () => {
       </PageHeading>
       <div className="mt-8">
         <div className="max-w-3xl">
-          <div className="bg-white rounded-xl p-5 border-[0.5px] border-slate-200 shadow shadow-slate-300/50">
-            <h2 className="text-lg font-bold text-slate-700 mb-4">Block Groups</h2>
-            <div className="space-y-2">
-              {deviceQuery.data.allBlockGroups.map(({ id, name }) => (
-                <SelectableListItem
-                  key={id}
-                  title={name}
-                  description={``}
-                  selected={state.enabledBlockGroups.includes(id)}
-                  onClick={() => dispatch({ type: `toggleBlockGroup`, id })}
-                />
-              ))}
-            </div>
-          </div>
+          <BlockGroupList
+            groups={deviceQuery.data.allBlockGroups}
+            enabledGroupIds={state.enabledBlockGroups}
+            onToggle={(id) => dispatch({ type: `toggleBlockGroup`, id })}
+          />
         </div>
         {/* <div className="mt-12 max-w-3xl">
           <h2 className="text-lg font-bold text-slate-700">Web Content Filter Policy</h2>

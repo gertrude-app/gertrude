@@ -63,6 +63,8 @@ export { DURATION_OPTS } from './Users/SuspendFilterRequestForm';
 export type { NewMethod, NotificationUpdate } from './Settings/Settings';
 export type { ActivityFeedItem } from './Users/Activity/ChildActivityFeed';
 export { default as BlockRuleEditor } from './iOS/BlockRuleEditor';
+export { default as BlockGroupList } from './iOS/BlockGroupList';
+export type { BlockGroupData } from './iOS/BlockGroupList';
 export { default as ChildAssignmentPicker } from './ClaimDevice/ChildAssignmentPicker';
 export type { ChildSelection } from './ClaimDevice/ChildAssignmentPicker';
 export { default as SecurityEventsFeed } from './SecurityEventsFeed';

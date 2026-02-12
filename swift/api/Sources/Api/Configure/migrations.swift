@@ -69,6 +69,7 @@ extension Configure {
     app.migrations.add(SecurityEventNotificationTriggers())
     app.migrations.add(SubscriptionRefactor())
     app.migrations.add(AddProfileLocked())
+    app.migrations.add(BlockGroupLongDescriptions())
   }
 }
 

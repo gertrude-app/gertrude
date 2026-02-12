@@ -609,6 +609,7 @@ extension IOSApp.BlockGroup {
     case id
     case name
     case description
+    case longDescription
     case createdAt
     case updatedAt
   }
