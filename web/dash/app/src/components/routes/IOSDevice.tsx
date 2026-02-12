@@ -1,23 +1,23 @@
-import { convert, validate } from '@dash/block-rules';
+// import { convert, validate } from '@dash/block-rules';
 import {
-  BlockRuleEditor,
-  EditBlockRules,
+  // BlockRuleEditor,
+  // EditBlockRules,
   Loading,
   PageHeading,
-  TrashBtn,
+  // TrashBtn,
 } from '@dash/components';
-import { ApiErrorMessage, ConfirmDeleteEntity } from '@dash/components';
-import { Modal, SelectableListItem } from '@dash/components';
-import { PlusIcon } from '@heroicons/react/24/solid';
-import { Button, SelectMenu } from '@shared/components';
-import { Result } from '@shared/pairql';
-import { notNullish } from '@shared/ts-utils';
+import { ApiErrorMessage /*ConfirmDeleteEntity*/ } from '@dash/components';
+import { /* Modal, */ SelectableListItem } from '@dash/components';
+// import { PlusIcon } from '@heroicons/react/24/solid';
+import { Button /* SelectMenu */ } from '@shared/components';
+// import { Result } from '@shared/pairql';
+// import { notNullish } from '@shared/ts-utils';
 import isEqual from 'lodash.isequal';
 import React, { useReducer } from 'react';
 import { useParams } from 'react-router-dom';
-import type { WebPolicy } from '@dash/types';
+// import type { WebPolicy } from '@dash/types';
 import Current from '../../environment';
-import { Key, useConfirmableDelete, useMutation, useQuery } from '../../hooks';
+import { Key, /*useConfirmableDelete, */ useMutation, useQuery } from '../../hooks';
 import reducer from '../../reducers/ios-device-reducer';
 
 const IOSDevice: React.FC = () => {
@@ -29,26 +29,26 @@ const IOSDevice: React.FC = () => {
     newDomain: ``,
   });
 
-  const deleteBlockRule = useConfirmableDelete(`blockRule`, {
-    invalidating: [Key.iOSDevice(id)],
-  });
+  // const deleteBlockRule = useConfirmableDelete(`blockRule`, {
+  //   invalidating: [Key.iOSDevice(id)],
+  // });
 
-  const saveBlockRule = useMutation(
-    () => {
-      const editingBlockRule = state.editingBlockRule;
-      if (!editingBlockRule) return Result.resolveUnexpected(`fb05188d`);
-      return Current.api.upsertBlockRule({
-        id: editingBlockRule.id,
-        deviceId: id,
-        rule: convert.propsToBlockRule(editingBlockRule),
-      });
-    },
-    {
-      toast: `save:block-rule`,
-      invalidating: [Key.iOSDevice(id)],
-      onSuccess: () => dispatch({ type: `dismissBlockRule` }),
-    },
-  );
+  // const saveBlockRule = useMutation(
+  //   () => {
+  //     const editingBlockRule = state.editingBlockRule;
+  //     if (!editingBlockRule) return Result.resolveUnexpected(`fb05188d`);
+  //     return Current.api.upsertBlockRule({
+  //       id: editingBlockRule.id,
+  //       deviceId: id,
+  //       rule: convert.propsToBlockRule(editingBlockRule),
+  //     });
+  //   },
+  //   {
+  //     toast: `save:block-rule`,
+  //     invalidating: [Key.iOSDevice(id)],
+  //     onSuccess: () => dispatch({ type: `dismissBlockRule` }),
+  //   },
+  // );
 
   const saveDevice = useMutation(
     () =>
@@ -100,7 +100,7 @@ const IOSDevice: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="mt-12 max-w-3xl">
+        {/* <div className="mt-12 max-w-3xl">
           <h2 className="text-lg font-bold text-slate-700">Web Content Filter Policy</h2>
           <div className="bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl relative">
             <SelectMenu
@@ -169,9 +169,8 @@ const IOSDevice: React.FC = () => {
               </div>
             )}
           </div>
-        </div>
-        {/* Block Rules */}
-        <div className="mt-12 max-w-3xl mb-12">
+        </div> */}
+        {/* <div className="mt-12 max-w-3xl mb-12">
           <h2 className="text-lg font-bold text-slate-700 mb-2">Block Rules</h2>
           <div className="bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl">
             <EditBlockRules
@@ -195,7 +194,7 @@ const IOSDevice: React.FC = () => {
               onAdd={() => dispatch({ type: `addBlockRule` })}
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="flex mt-8 justify-end border-slate-200 pt-8 border-t-2">
           <Button
@@ -209,7 +208,7 @@ const IOSDevice: React.FC = () => {
           </Button>
         </div>
       </div>
-      <Modal
+      {/* <Modal
         icon="location"
         type="container"
         maximizeWidthForSmallScreens
@@ -238,17 +237,17 @@ const IOSDevice: React.FC = () => {
           />
         )}
       </Modal>
-      <ConfirmDeleteEntity type="block rule" action={deleteBlockRule} />
+      <ConfirmDeleteEntity type="block rule" action={deleteBlockRule} /> */}
     </div>
   );
 };
 
 export default IOSDevice;
 
-const WEB_POLICY_OPTIONS: { value: WebPolicy; display: string }[] = [
-  { value: `blockAllExcept`, display: `Only approved websites` },
-  { value: `blockAdultAnd`, display: `Blocklist plus limit adult websites` },
-  { value: `blockAdult`, display: `Limit adult websites` },
-  { value: `blockAll`, display: `Block everything` },
-  { value: `allowAll`, display: `Unrestricted` },
-] as const;
+// const WEB_POLICY_OPTIONS: { value: WebPolicy; display: string }[] = [
+//   { value: `blockAllExcept`, display: `Only approved websites` },
+//   { value: `blockAdultAnd`, display: `Blocklist plus limit adult websites` },
+//   { value: `blockAdult`, display: `Limit adult websites` },
+//   { value: `blockAll`, display: `Block everything` },
+//   { value: `allowAll`, display: `Unrestricted` },
+// ] as const;
