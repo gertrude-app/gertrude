@@ -195,6 +195,7 @@ extension IOSDeviceEvents: Resolver {
     case "a7e31b8f": "✓ Filter verified (profile installed)"
     case "c4d92e1a": "✗ Filter verification failed"
     case "4af7783e": #"Profile Installed → "Next""#
+    case "8aa4790f": #"Website Password Warning → "Got it""#
     case "acfc7894": #"Prompt Clear Cache (supervision) → "Yes""#
     case "7d8b61d0": #"Prompt Clear Cache (supervision) → "Skip""#
     case "6ed43005": #"Setup Complete → "Done""#

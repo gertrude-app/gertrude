@@ -114,17 +114,12 @@ public struct IOSReducer {
 
     case (.onboarding(.happyPath(.confirmChildsDevice)), .primary):
       self.deps.log(state.screen, action, "666d5e0f")
-      state.screen = .onboarding(.happyPath(.explainMinorOrSupervised))
+      state.screen = .onboarding(.happyPath(.confirmMinorDevice))
       return .none
 
     case (.onboarding(.happyPath(.confirmChildsDevice)), .secondary):
       self.deps.log(state.screen, action, "30fac4e6")
       state.screen = .onboarding(.onParentDeviceFail)
-      return .none
-
-    case (.onboarding(.happyPath(.explainMinorOrSupervised)), .primary):
-      self.deps.log(state.screen, action, "6bc91c73")
-      state.screen = .onboarding(.happyPath(.confirmMinorDevice))
       return .none
 
     case (.onboarding(.happyPath(.confirmMinorDevice)), .primary):
@@ -578,6 +573,12 @@ public struct IOSReducer {
         state.screen = .running(state: .connected)
         return .none
       }
+      let childName = self.deps.sharedStorage.loadAccountConnection()?.childName
+      state.screen = .onboarding(.supervision(.resume(.websiteWarning(childName: childName))))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.websiteWarning(_)))), .primary):
+      self.deps.log(state.screen, action, "8aa4790f")
       state.screen = .onboarding(.supervision(.resume(.promptClearCache)))
       return .none
 

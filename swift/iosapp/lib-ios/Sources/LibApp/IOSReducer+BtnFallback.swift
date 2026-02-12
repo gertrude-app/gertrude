@@ -198,6 +198,8 @@ extension IOSReducer.Onboarding.Supervision.Resume {
     case (.verifyingProfileInstall(didError: _), _):
       .onboarding(.supervision(.resume(.explainProfileInstall())))
     case (.profileInstalled, _):
+      .onboarding(.supervision(.resume(.websiteWarning(childName: nil))))
+    case (.websiteWarning(_), _):
       .onboarding(.supervision(.resume(.promptClearCache)))
     case (.promptClearCache, _):
       .onboarding(.happyPath(.requestAppStoreRating))
@@ -211,7 +213,7 @@ extension IOSReducer.Onboarding.HappyPath {
   func fallbackDestination(from btn: OnboardingBtn) -> IOSReducer.Screen {
     switch (self, btn) {
     case (.confirmChildsDevice, .primary):
-      .onboarding(.happyPath(.explainMinorOrSupervised))
+      .onboarding(.happyPath(.confirmMinorDevice))
     case (.confirmChildsDevice, _):
       .onboarding(.onParentDeviceFail)
     case (.confirmInAppleFamily, .primary):
@@ -238,8 +240,6 @@ extension IOSReducer.Onboarding.HappyPath {
       .onboarding(.happyPath(.dontGetTrickedPreAuth))
     case (.explainInstallWithDevicePasscode, _):
       .onboarding(.happyPath(.dontGetTrickedPreInstall))
-    case (.explainMinorOrSupervised, _):
-      .onboarding(.happyPath(.confirmMinorDevice))
     case (.explainTwoInstallSteps, _):
       .onboarding(.happyPath(.explainAuthWithParentAppleAccount))
     case (.hiThere, _):

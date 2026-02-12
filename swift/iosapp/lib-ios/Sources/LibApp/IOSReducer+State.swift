@@ -69,7 +69,6 @@ extension IOSReducer {
       case hiThere
       case timeExpectation
       case confirmChildsDevice
-      case explainMinorOrSupervised
       case confirmMinorDevice
       case confirmParentIsOnboarding
       case confirmInAppleFamily
@@ -133,6 +132,7 @@ extension IOSReducer {
         case explainProfileInstall(regainedFocus: Bool = false)
         case verifyingProfileInstall(didError: Bool = false)
         case profileInstalled
+        case websiteWarning(childName: String?)
         case promptClearCache
         case networkError
       }

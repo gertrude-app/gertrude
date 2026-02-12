@@ -55,18 +55,12 @@ public struct AppView: View {
             secondary: self.btn(text: "No", .secondary),
           )
 
-        case .onboarding(.happyPath(.explainMinorOrSupervised)):
-          ButtonScreenView(
-            text: "Apple only allows Gertrude to do it’s job on two kinds of devices:",
-            primary: self.btn(text: "Next", .primary),
-            listItems: ["Devices used by children under 18", "Supervised devices"],
-          )
-
         case .onboarding(.happyPath(.confirmMinorDevice)):
           ButtonScreenView(
-            text: "Is this a child’s (under 18) \(self.deviceType)?",
-            primary: self.btn(text: "Yes, under 18", .primary),
-            secondary: self.btn(text: "No", .secondary),
+            text: "How old is the user of this \(self.deviceType)?",
+            primary: self.btn(text: "Under 18", .primary),
+            secondary: self.btn(text: "18 or older", .secondary),
+            primaryLooksLikeSecondary: true,
           )
 
         case .onboarding(.happyPath(.confirmParentIsOnboarding)):
@@ -448,7 +442,7 @@ public struct AppView: View {
 
         case .onboarding(.supervision(.setup(.explainNeedSomeoneElse))):
           ButtonScreenView(
-            text: "A supervised \(self.deviceType) needs someone ELSE to manage it—typically a parent, spouse, or accountability partner. They’ll need to connect your \(self.deviceType) to their computer once during setup.",
+            text: "A supervised \(self.deviceType) needs someone ELSE to manage it—typically a parent, spouse, or accountability partner. They’ll need to plug this \(self.deviceType) into a computer to get started.",
             primary: self.btn(text: "Got it, no problem", .primary),
             secondary: self.btn(text: "I need to manage myself", .secondary),
           )
@@ -535,7 +529,7 @@ public struct AppView: View {
 
         case .onboarding(.supervision(.resume(.profileNotRemovableWarning))):
           ButtonScreenView(
-            text: "When installing the profile, your \(self.deviceType) will warn you that it can’t be removed. Don’t worry—it can be removed at any time from the Gertrude account.",
+            text: "When installing the profile, your \(self.deviceType) will warn you that it can’t be removed. Don’t worry—it can be removed at any time from the Gertrude website.",
             primary: self.btn(text: "Got it", .primary),
           )
 
@@ -563,8 +557,14 @@ public struct AppView: View {
 
         case .onboarding(.supervision(.resume(.profileInstalled))):
           ButtonScreenView(
-            text: "Profile installed successfully! Gertrude can now block unwanted content. The account holder can manage what gets blocked and also remove the supervision.",
+            text: "Profile installed successfully! Gertrude can now block unwanted content.\n\nFrom the website, the account holder can manage what gets blocked and also remove the supervision.",
             primary: self.btn(text: "Next", .primary),
+          )
+
+        case .onboarding(.supervision(.resume(.websiteWarning(let childName)))):
+          ButtonScreenView(
+            text: "Because protection is controlled from the website, that also means it’s important that \(childName ?? "the \(self.deviceType) user") doesn’t know the website password.",
+            primary: self.btn(text: "Got it", .primary),
           )
 
         case .onboarding(.supervision(.resume(.networkError))):

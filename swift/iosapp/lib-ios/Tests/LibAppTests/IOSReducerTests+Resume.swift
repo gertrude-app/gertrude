@@ -109,7 +109,10 @@ final class IOSReducerTestsResume: XCTestCase {
     )) {
       IOSReducer()
     } withDependencies: {
-      $0.sharedStorage.loadAccountConnection = { @Sendable in .mock { $0.deviceId = deviceId } }
+      $0.sharedStorage.loadAccountConnection = { @Sendable in .mock {
+        $0.deviceId = deviceId
+        $0.childName = "Franny"
+      } }
       $0.sharedStorage.clearPendingSupervisionCode = { codeCleaned.setValue(true) }
       $0.systemExtension.filterRunning = { true }
       $0.continuousClock = ImmediateClock()
@@ -141,6 +144,9 @@ final class IOSReducerTestsResume: XCTestCase {
     }
     await store.receive(.programmatic(.filterVerified)) {
       $0.screen = .onboarding(.supervision(.resume(.profileInstalled)))
+    }
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.resume(.websiteWarning(childName: "Franny"))))
     }
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.supervision(.resume(.promptClearCache)))
