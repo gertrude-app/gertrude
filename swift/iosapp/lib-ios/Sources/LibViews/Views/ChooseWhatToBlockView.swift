@@ -336,6 +336,7 @@ extension BlockGroup {
     }
   }
 
+  // NB: these descriptions are now also in the database, should pull from API eventually
   var shortDescription: String {
     switch self {
     case .ads: "Block the most common ad providers across all apps."

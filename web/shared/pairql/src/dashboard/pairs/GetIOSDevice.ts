@@ -11,6 +11,8 @@ export namespace GetIOSDevice {
     allBlockGroups: Array<{
       id: UUID;
       name: string;
+      description: string;
+      longDescription: string;
     }>;
     enabledBlockGroups: UUID[];
     webPolicy: WebPolicy;

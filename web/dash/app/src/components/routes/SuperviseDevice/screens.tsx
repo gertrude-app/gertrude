@@ -1,7 +1,12 @@
-import { PageHeading } from '@dash/components';
+import {
+  ChildAssignmentPicker,
+  DeviceContextBanner,
+  PageHeading,
+} from '@dash/components';
 import { Button } from '@shared/components';
 import { posessive } from '@shared/string';
 import React, { useState } from 'react';
+import type { ChildSelection } from '@dash/components';
 
 type DeviceInfo = {
   childName: string;
@@ -19,6 +24,45 @@ export const ScreenShell: React.FC<{
       {children}
     </div>
   </div>
+);
+
+export const ClaimScreen: React.FC<{
+  children: Array<{ id: string; name: string }>;
+  deviceType: string;
+  modelName: string;
+  iosVersion: string;
+  onSubmit: (selection: ChildSelection) => void;
+  onCancel: () => void;
+  isSubmitting: boolean;
+  error?: string;
+}> = ({
+  children,
+  deviceType,
+  modelName,
+  iosVersion,
+  onSubmit,
+  onCancel,
+  isSubmitting,
+  error,
+}) => (
+  <>
+    <div className="mb-8">
+      <DeviceContextBanner
+        modelName={modelName}
+        iosVersion={iosVersion}
+        deviceType={deviceType as `iPhone` | `iPad`}
+        label={`Adding ${deviceType}:`}
+      />
+    </div>
+    <ChildAssignmentPicker
+      children={children}
+      deviceType={deviceType}
+      onSubmit={onSubmit}
+      onCancel={onCancel}
+      isSubmitting={isSubmitting}
+      error={error}
+    />
+  </>
 );
 
 const ScreenHeader: React.FC<{
@@ -111,9 +155,9 @@ export const DownloadHelperScreen: React.FC<
     <div>
       <ScreenHeader
         icon="download"
-        title="Download and Launch the Supervision Helper App"
+        title="Download the Supervision Helper App"
         subtitle={`Setting up ${childName}'s ${modelName} · iOS ${iosVersion}`}
-        step={{ current: 1, total: 3 }}
+        step={{ current: 1, total: 4 }}
       />
 
       <p className="text-slate-600 text-sm mb-5">
@@ -121,16 +165,11 @@ export const DownloadHelperScreen: React.FC<
         guide you through supervising the device so that it can run Gertrude.
       </p>
 
-      <HighlightableCard highlighted={!hasDownloaded} className="mb-4">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-xs font-bold flex items-center justify-center">
-            1
-          </span>
-          <span className="font-medium text-slate-700">
-            Download the app for your computer:
-          </span>
-        </div>
-        <div className="flex gap-3 ml-8">
+      <HighlightableCard highlighted className="mb-6">
+        <span className="font-medium text-slate-700 block mb-4">
+          Download the app for your computer:
+        </span>
+        <div className="flex gap-3">
           <DownloadButton
             platform="mac"
             primary={!hasDownloaded && detectedPlatform === `mac`}
@@ -142,18 +181,6 @@ export const DownloadHelperScreen: React.FC<
             onClick={() => handleDownload(`windows`)}
           />
         </div>
-      </HighlightableCard>
-
-      <HighlightableCard highlighted={hasDownloaded} className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-xs font-bold flex items-center justify-center">
-            2
-          </span>
-          <span className="font-medium text-slate-700">Launch the app</span>
-        </div>
-        <p className="text-slate-500 text-sm ml-8">
-          Open the downloaded file and launch the helper app, then click Next.
-        </p>
       </HighlightableCard>
 
       <div className="flex justify-end">
@@ -171,6 +198,79 @@ export const DownloadHelperScreen: React.FC<
     </div>
   );
 };
+
+export const LaunchHelperScreen: React.FC<
+  DeviceInfo & {
+    onNext: () => void;
+  }
+> = ({ childName, modelName, iosVersion, onNext }) => (
+  <div>
+    <ScreenHeader
+      icon="arrow-up-right-from-square"
+      title="Launch the Supervision Helper App"
+      subtitle={`Setting up ${childName}'s ${modelName} · iOS ${iosVersion}`}
+      step={{ current: 2, total: 4 }}
+    />
+
+    <div className="space-y-4 mb-6">
+      <HighlightableCard highlighted={false} className="">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-xs font-bold flex items-center justify-center">
+            1
+          </span>
+          <span className="font-medium text-slate-700">Locate the downloaded file</span>
+        </div>
+        <p className="text-slate-500 text-sm ml-8">
+          Check your <b>downloads folder</b> or <b>desktop</b> or the browser's download
+          area for the file you just downloaded.
+        </p>
+      </HighlightableCard>
+
+      <HighlightableCard highlighted={false} className="">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-xs font-bold flex items-center justify-center">
+            2
+          </span>
+          <span className="font-medium text-slate-700">Unzip if needed</span>
+        </div>
+        <p className="text-slate-500 text-sm ml-8">
+          Safari unzips files automatically, but other browsers may not. If you see a{` `}
+          <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded font-mono">
+            .zip
+          </code>
+          {` `}file, double-click it to unzip first.
+        </p>
+      </HighlightableCard>
+
+      <HighlightableCard highlighted={false} className="">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-xs font-bold flex items-center justify-center">
+            3
+          </span>
+          <span className="font-medium text-slate-700">Launch the app</span>
+        </div>
+        <div className="flex items-center gap-3 *ml-2">
+          <img
+            src="/supervise-app-icon.png"
+            alt="Gertrude Supervisor app icon"
+            className="w-20 h-20"
+          />
+          <p className="text-slate-500 text-sm">
+            Double-click the{` `}
+            <strong className="text-slate-700">Gertrude Supervisor</strong>
+            {` `}app to open it. Finally, click the button below to continue.
+          </p>
+        </div>
+      </HighlightableCard>
+    </div>
+
+    <div className="flex justify-end">
+      <Button type="button" color="primary" onClick={onNext}>
+        Done, helper app launched &rarr;
+      </Button>
+    </div>
+  </div>
+);
 
 export const WindowsSmartScreenModal: React.FC<{
   onCancel: () => void;
@@ -245,7 +345,7 @@ export const SuperviseScreen: React.FC<
         icon="plug"
         title={`Connect ${childName}'s ${modelName} via USB`}
         subtitle={`Setting up ${childName}'s ${modelName} · iOS ${iosVersion}`}
-        step={{ current: 2, total: 3 }}
+        step={{ current: 3, total: 4 }}
       />
 
       <HighlightableCard highlighted={!hasCopied} className="mb-4">
@@ -299,7 +399,7 @@ export const SuperviseScreen: React.FC<
       </HighlightableCard>
 
       <div className="flex justify-end">
-        <Button type="button" color="primary" onClick={onDone} disabled={!hasCopied}>
+        <Button type="button" color="primary" onClick={onDone}>
           Done
         </Button>
       </div>
@@ -391,29 +491,53 @@ export const DoneScreen: React.FC<
   DeviceInfo & {
     deviceId: string;
   }
-> = ({ childName, modelName, iosVersion, deviceId }) => (
-  <div>
-    <ScreenHeader
-      icon="check"
-      title="Setup Complete"
-      subtitle={`${childName}'s ${modelName} · iOS ${iosVersion}`}
-      step={{ current: 3, total: 3 }}
-    />
+> = ({ childName, modelName, iosVersion, deviceId }) => {
+  const deviceType = modelName.toLowerCase().includes(`ipad`) ? `iPad` : `iPhone`;
+  return (
+    <div>
+      <ScreenHeader
+        icon="check"
+        title="Setup Complete"
+        subtitle={`${posessive(childName)} ${modelName} · iOS ${iosVersion}`}
+        step={{ current: 4, total: 4 }}
+      />
 
-    <div className="bg-slate-50/50 rounded-2xl border border-slate-200 p-5 mb-6">
-      <p className="text-slate-600 text-sm">
-        {childName}'s {modelName} is now set up with Gertrude. You can manage this device
-        from your dashboard.
-      </p>
-    </div>
+      <div className="space-y-4 mb-6">
+        <HighlightableCard highlighted={false} className="">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-xs font-bold flex items-center justify-center">
+              1
+            </span>
+            <span className="font-medium text-slate-700">Setup complete</span>
+          </div>
+          <p className="text-slate-500 text-sm ml-8">
+            {posessive(childName)} {modelName} is now set up with Gertrude. You can manage
+            this {deviceType} from your dashboard.
+          </p>
+        </HighlightableCard>
 
-    <div className="flex justify-end">
-      <Button type="link" to={`/ios-devices/${deviceId}`} color="primary">
-        Manage Device
-      </Button>
+        <HighlightableCard highlighted={false} className="">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-6 h-6 rounded-full bg-violet-100 text-violet-600 text-xs font-bold flex items-center justify-center">
+              2
+            </span>
+            <span className="font-medium text-slate-700">Keep your password safe</span>
+          </div>
+          <p className="text-slate-500 text-sm ml-8">
+            The protection for this {deviceType} is managed from this website. It's
+            important that {childName} does not know the password to log in here.
+          </p>
+        </HighlightableCard>
+      </div>
+
+      <div className="flex justify-end">
+        <Button type="link" to={`/ios-devices/${deviceId}`} color="primary">
+          Manage {deviceType} &rarr;
+        </Button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const PaymentGateScreen: React.FC<
   DeviceInfo & {
@@ -439,8 +563,8 @@ export const PaymentGateScreen: React.FC<
     />
 
     <p className="text-slate-600 mb-5">
-      To supervise {posessive(childName)} {deviceType}, you'll need a{` `}
-      <b>Gertrude Light subscription.</b>
+      To supervise and manage {posessive(childName)} {deviceType}, you’ll need a{` `}
+      <b>Gertrude subscription.</b>
     </p>
 
     <HighlightableCard highlighted className="mb-6">

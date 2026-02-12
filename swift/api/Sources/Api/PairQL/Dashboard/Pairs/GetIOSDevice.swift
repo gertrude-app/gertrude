@@ -13,6 +13,8 @@ struct GetIOSDevice: Pair {
     struct BlockGroup: PairNestable {
       var id: IOSApp.BlockGroup.Id
       var name: String
+      var description: String
+      var longDescription: String
     }
 
     struct BlockRuleData: PairOutput {
@@ -46,7 +48,14 @@ extension GetIOSDevice: Resolver {
       childName: child.name,
       deviceType: device.deviceType,
       osVersion: device.iosVersion,
-      allBlockGroups: allBlockGroups.map { .init(id: $0.id, name: $0.name) },
+      allBlockGroups: allBlockGroups.map {
+        .init(
+          id: $0.id,
+          name: $0.name,
+          description: $0.description,
+          longDescription: $0.longDescription,
+        )
+      },
       enabledBlockGroups: enabledBlockGroups.map(\.id),
       webPolicy: .init(string: device.webPolicy) ?? .blockAll,
       webPolicyDomains: domains.map(\.domain),

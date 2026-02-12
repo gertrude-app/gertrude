@@ -5,10 +5,10 @@ import {
 } from '@dash/components';
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Turnstile from 'react-turnstile';
 import Current from '../../environment';
-import { useAuth, useLoginRedirect, useMutation, useTimeout } from '../../hooks';
+import { useAuth, useLoginRedirect, useMutation } from '../../hooks';
 
 const Signup: React.FC = () => {
   const { admin, login } = useAuth();
@@ -16,7 +16,6 @@ const Signup: React.FC = () => {
   const [email, setEmail] = useState(``);
   const [password, setPassword] = useState(``);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const navigate = useNavigate();
   const queryString = window.location.search;
   const claimCode = getQueryParam(`claimPendingSupervision`);
   const modelName = getQueryParam(`modelName`);
@@ -32,12 +31,6 @@ const Signup: React.FC = () => {
         claimCode,
       }),
     { onSuccess: ({ admin }) => admin && login(admin.adminId, admin.token) },
-  );
-
-  useTimeout(
-    () => navigate(`/login${queryString}`),
-    7500,
-    signup.isSuccess && signup.data?.admin === undefined,
   );
 
   if (admin !== null || (signup.isSuccess && signup.data?.admin !== undefined)) {

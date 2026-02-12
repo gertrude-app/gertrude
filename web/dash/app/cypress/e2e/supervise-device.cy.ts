@@ -54,7 +54,7 @@ describe(`supervise device claim flow`, () => {
       cy.visit(`/supervise-device/123456/claim`);
 
       cy.wait(`@GetIOSDeviceClaimData`);
-      cy.contains(`Who does this device belong to?`);
+      cy.contains(`Who is the user of this iPhone?`);
       cy.contains(`Continue`);
     });
 

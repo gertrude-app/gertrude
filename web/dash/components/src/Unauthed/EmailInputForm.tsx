@@ -52,7 +52,7 @@ const EmailInputForm: React.FC<Props> = ({
         <TextInput
           type="password"
           name="password"
-          label="Password:"
+          label="Create a password:"
           className="mb-6"
           autoComplete="new-password"
           required
@@ -68,7 +68,7 @@ const EmailInputForm: React.FC<Props> = ({
       fullWidth
       size="large"
     >
-      Submit &rarr;
+      Signup &rarr;
     </Button>
   </form>
 );
