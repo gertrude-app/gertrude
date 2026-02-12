@@ -44,7 +44,7 @@ const SuperviseDeviceDownloadHelper: React.FC = () => {
   };
 
   const handleNext = (): void => {
-    navigate(`/supervise-device/${code}/supervise`);
+    navigate(`/supervise-device/${code}/launch-helper`);
   };
 
   return (

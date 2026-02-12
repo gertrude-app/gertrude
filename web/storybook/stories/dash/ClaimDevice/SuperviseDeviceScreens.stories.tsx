@@ -4,6 +4,7 @@ import {
   ClaimScreen,
   DoneScreen,
   DownloadHelperScreen,
+  LaunchHelperScreen,
   PaymentGateScreen,
   ScreenShell,
   SuperviseScreen,
@@ -11,7 +12,7 @@ import {
 } from '../../../../dash/app/src/components/routes/SuperviseDevice/screens';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 
-type ScreenStep = `claim` | `payment` | `download` | `supervise` | `done`;
+type ScreenStep = `claim` | `payment` | `download` | `launch` | `supervise` | `done`;
 
 const SuperviseDeviceScreen: React.FC<{
   code: string;
@@ -86,8 +87,21 @@ const SuperviseDeviceScreen: React.FC<{
           modelName={modelName}
           iosVersion={iosVersion}
           onDownload={() => {}}
-          onNext={() => setStep(`supervise`)}
+          onNext={() => setStep(`launch`)}
           initialDownloaded={initialDownloaded}
+        />
+      </ScreenShell>
+    );
+  }
+
+  if (step === `launch`) {
+    return (
+      <ScreenShell title={`Continue ${deviceType} Setup`}>
+        <LaunchHelperScreen
+          childName={childName}
+          modelName={modelName}
+          iosVersion={iosVersion}
+          onNext={() => setStep(`supervise`)}
         />
       </ScreenShell>
     );
@@ -178,7 +192,7 @@ export const PaymentGateCancelled: Story = {
   },
 };
 
-export const DownloadHelperStep1: Story = {
+export const DownloadHelper: Story = {
   args: {
     code: `847293`,
     modelName: `iPhone 15`,
@@ -190,15 +204,14 @@ export const DownloadHelperStep1: Story = {
   },
 };
 
-export const DownloadHelperStep2: Story = {
+export const LaunchHelper: Story = {
   args: {
     code: `847293`,
     modelName: `iPhone 15`,
     iosVersion: `18.2`,
     childName: `Emma`,
     children: [],
-    initialStep: `download`,
-    initialDownloaded: true,
+    initialStep: `launch`,
   },
 };
 
