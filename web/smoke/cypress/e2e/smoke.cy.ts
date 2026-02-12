@@ -13,6 +13,21 @@ describe(`Smoke test`, () => {
       .should(`eq`, 200);
   });
 
+  it(`verify supervision tool downloads are reachable`, () => {
+    cy.request({
+      method: `HEAD`,
+      url: `https://gertrude.nyc3.digitaloceanspaces.com/releases/supervision/GertrudeSupervisor.zip`,
+    })
+      .its(`status`)
+      .should(`eq`, 200);
+    cy.request({
+      method: `HEAD`,
+      url: `https://gertrude.nyc3.digitaloceanspaces.com/releases/supervision/GertrudeSupervisor.exe`,
+    })
+      .its(`status`)
+      .should(`eq`, 200);
+  });
+
   it(`critical flows`, () => {
     // signup
     cy.visit(`/signup`);
