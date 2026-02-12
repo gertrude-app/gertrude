@@ -100,6 +100,26 @@ fix: format lint-fix
 
 check: lint format-check typecheck test build-storybook build-site
 
+sync-supervise-ui:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  GEN="$HOME/gertie/supervise/src/generated"
+  rm -rf "$GEN/supervise"
+  cp -r supervise/src "$GEN/supervise"
+  rm -rf "$GEN/pairql/supervise"
+  mkdir -p "$GEN/pairql/supervise"
+  cp -r shared/pairql/src/supervise/. "$GEN/pairql/supervise/"
+  cp shared/pairql/src/Client.ts "$GEN/pairql/Client.ts"
+  cp shared/pairql/src/Result.ts "$GEN/pairql/Result.ts"
+  cp shared/pairql/src/PqlError.ts "$GEN/pairql/PqlError.ts"
+  cp shared/pairql/src/types.ts "$GEN/pairql/types.ts"
+  rm -rf "$GEN/shared"
+  mkdir -p "$GEN/shared/components" "$GEN/shared/datetime" "$GEN/shared/string"
+  cp shared/components/src/*.{ts,tsx} "$GEN/shared/components/"
+  cp shared/datetime/src/index.ts "$GEN/shared/datetime/index.ts"
+  cp shared/string/src/index.ts "$GEN/shared/string/index.ts"
+  echo "Synced supervise UI to $HOME/supervise/src/generated"
+
 [private]
 hmr-comment:
   @bash -c "echo // $(date) >> './site/app/docs/[slug]/page.tsx'"

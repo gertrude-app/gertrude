@@ -12,7 +12,7 @@ const DisablePrivateRelay: React.FC<DisablePrivateRelayProps> = ({ onContinue })
   <InstructionLayout
     step={5}
     totalSteps={8}
-    title="Turn Off Private Relay"
+    title="Turn Off iCloud+ Private Relay"
     subtitle="Private Relay if enabled blocks the supervision"
     imageSrc={imgSrc}
     imageAlt="Private Relay settings"
@@ -23,9 +23,9 @@ const DisablePrivateRelay: React.FC<DisablePrivateRelayProps> = ({ onContinue })
     }
   >
     <div className="flex flex-col gap-6">
-      <p className="text-slate-500">
-        Private relay requires an iCloud+ subscription. If you don’t have one, or can’t
-        find the setting, you can continue.
+      <p className="text-slate-500 mb-4">
+        Private relay <b>requires a paid iCloud subscription.</b> If you don’t have one,
+        or can’t find the setting, you can continue.
       </p>
       <NumberedSteps
         steps={[

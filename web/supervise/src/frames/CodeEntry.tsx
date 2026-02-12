@@ -21,7 +21,7 @@ const CodeEntry: React.FC<CodeEntryProps> = ({
         </span>
 
         <p className={`text-base mb-4 ${error ? `text-red-600` : `text-slate-500`}`}>
-          {error ?? `Enter the 6-digit code from the Gertrude app:`}
+          {error ?? `Enter the 6-digit code from the Gertrude website:`}
         </p>
 
         <CodeInput

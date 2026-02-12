@@ -24,11 +24,13 @@ export interface DeviceMismatchProps {
   expectedModelName: string;
   connectedModelName: string;
   childName: string;
+  deviceType: string;
   onTryAgain: () => void;
 }
 
 export interface ConfirmDeviceProps {
   deviceName: string;
+  deviceType: string;
   iosVersion: string;
   onConfirm: () => void;
   onReject: () => void;
@@ -45,16 +47,21 @@ export interface DisablePrivateRelayProps {
 }
 
 export interface GetReadyProps {
+  deviceType: string;
   onStart: () => void;
 }
 
-export type SupervisingProps = Record<string, never>;
+export interface SupervisingProps {
+  deviceType: string;
+}
 
 export interface SwipeToUpgradeProps {
+  deviceType: string;
   onContinue: () => void;
 }
 
 export interface ConfirmSupervisionProps {
+  deviceType: string;
   onYes: () => void;
   onNo: () => void;
 }
@@ -62,6 +69,7 @@ export interface ConfirmSupervisionProps {
 export type ErrorType = `findMyEnabled` | `invokeFailed` | `userReportedNo`;
 
 export interface ErrorProps {
+  deviceType: string;
   errorType: ErrorType;
   errorMessage?: string;
   onRetry: () => void;

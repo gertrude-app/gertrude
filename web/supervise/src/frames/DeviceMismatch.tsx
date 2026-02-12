@@ -8,6 +8,7 @@ const DeviceMismatch: React.FC<DeviceMismatchProps> = ({
   expectedModelName,
   connectedModelName,
   childName,
+  deviceType,
   onTryAgain,
 }) => (
   <FrameBackground>
@@ -46,7 +47,7 @@ const DeviceMismatch: React.FC<DeviceMismatchProps> = ({
       </div>
 
       <p className="text-base text-slate-600 text-center mb-8">
-        Please disconnect this device and connect {posessive(childName)}
+        Please disconnect this {deviceType} and connect {posessive(childName)}
         {` `}
         {expectedModelName}.
       </p>

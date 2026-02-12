@@ -5,6 +5,7 @@ import FrameBackground from '../FrameBackground';
 
 function getErrorContent(
   errorType: ErrorType,
+  deviceType: string,
   errorMessage?: string,
 ): {
   title: string;
@@ -13,13 +14,13 @@ function getErrorContent(
   switch (errorType) {
     case `findMyEnabled`:
       return {
-        title: `Find My iPhone is Enabled`,
-        message: `Find My iPhone must be disabled before supervision can complete. Please disable it in Settings → [Your Name] → Find My, then try again.`,
+        title: `Find My ${deviceType} is Enabled`,
+        message: `Find My ${deviceType} must be disabled before supervision can complete. Please disable it in Settings → [Your Name] → Find My, then try again.`,
       };
     case `userReportedNo`:
       return {
         title: `Supervision Unsuccessful`,
-        message: `The device doesn't appear to be supervised. You can try the process again, or contact support for help.`,
+        message: `The ${deviceType} doesn't appear to be supervised. You can try the process again, or contact support for help.`,
       };
     case `invokeFailed`:
     default:
@@ -33,12 +34,13 @@ function getErrorContent(
 }
 
 const Error: React.FC<ErrorProps> = ({
+  deviceType,
   errorType,
   errorMessage,
   onRetry,
   onContactSupport,
 }) => {
-  const { title, message } = getErrorContent(errorType, errorMessage);
+  const { title, message } = getErrorContent(errorType, deviceType, errorMessage);
 
   return (
     <FrameBackground>
