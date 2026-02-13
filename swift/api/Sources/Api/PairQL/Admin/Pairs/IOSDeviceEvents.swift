@@ -111,8 +111,8 @@ extension IOSDeviceEvents: Resolver {
     // --- Post-Onboarding ---
     case "8a8a3033": #"Clear Cache? → "Yes""#
     case "1221f1a3": #"Clear Cache? → "Skip""#
-    case "f9f2e206": #"Cache Cleared → "Next" (legacy)"#
-    case "72dc8e84": #"Battery Warning → "Next" (legacy)"#
+    case "f9f2e206": #"Cache Cleared → "Next""#
+    case "72dc8e84": #"Battery Warning → "Next""#
     case "4fc0b1bf": #"Rate App? → "Rate""#
     case "a9480aa2": #"Rate App? → "Leave a review""#
     case "0dddc87c": #"Rate App? → "No thanks""#
@@ -139,14 +139,14 @@ extension IOSDeviceEvents: Resolver {
     case "548e81b6": #"How To Setup Family → "Done, continue""#
     case "1c495932": #"What Is Apple Family? → "Next""#
     // --- Old Supervision (Configurator/Erase, legacy) ---
-    case "ad77fbb6": #"Supervision Intro → "Continue" (legacy)"#
-    case "896bc216": "Supervision Explain → needs friend w/ Mac (legacy)"
-    case "25a77e6a": "Supervision Explain → has Mac access (legacy)"
-    case "0c5bdbdd": #"Need Friend With Mac → "OK" (legacy)"#
-    case "d858eaf8": #"Need Friend With Mac → "Don't have one" (legacy)"#
-    case "dc1521e6": #"Requires Erase & Setup → "OK" (legacy)"#
-    case "bee80538": #"Requires Erase & Setup → "No way" (legacy)"#
-    case "f3b3f3b6": #"Sorry No Other Way → "Start over" (legacy)"#
+    case "ad77fbb6": #"Supervision Intro → "Continue""#
+    case "896bc216": "Supervision Explain → needs friend w/ Mac"
+    case "25a77e6a": "Supervision Explain → has Mac access"
+    case "0c5bdbdd": #"Need Friend With Mac → "OK""#
+    case "d858eaf8": #"Need Friend With Mac → "Don't have one""#
+    case "dc1521e6": #"Requires Erase & Setup → "OK""#
+    case "bee80538": #"Requires Erase & Setup → "No way""#
+    case "f3b3f3b6": #"Sorry No Other Way → "Start over""#
     // --- New Supervision Setup Flow ---
     case "261ba66b": #"Explain Supervision → "Next""#
     case "a0f78c2c": #"Cost & Branch → "Continue with Gertrude""#
@@ -279,18 +279,17 @@ extension IOSDeviceEvents: Resolver {
     case "c732e0ab": "Migrated v1.1.x → 1.5.x"
     case "fdab6cff": "✗ Unexpected migration error"
     case "8d4a445b": "✗ Error migrating v1.1.x → 1.5.x"
-    case "90442103": "Migrated v1.4.x (TestFlight) → 1.5.x (legacy)"
     // --- Warnings & Misc ---
     case "23c207e2": "⚠ Non-running filter w/ stored groups"
     case "d9e93a4b": "⚠ No vendor id on opt out"
     case "ffff30ac": "⚠ Missing rules after opt-out"
     case "7c039b10": "⚠ Unhandled button action"
-    case "180e2347": "Handling upgrade (legacy)"
+    case "180e2347": "Handling upgrade"
     // --- Legacy (old app versions, no longer emitted) ---
-    case "dcd721aa": "🚀 First launch (legacy)"
-    case "d317c73c": "✓ Authorization succeeded (legacy)"
-    case "101c91ea": "✓ Filter install succeeded (legacy)"
-    case "739c08c6": "✗ Filter install failed (legacy)"
+    case "dcd721aa": "🚀 First launch"
+    case "d317c73c": "✓ Authorization succeeded"
+    case "101c91ea": "✓ Filter install succeeded"
+    case "739c08c6": "✗ Filter install failed"
     default: "Unknown: \(eventId)"
     }
   }
