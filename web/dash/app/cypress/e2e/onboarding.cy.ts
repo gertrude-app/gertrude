@@ -47,7 +47,7 @@ describe(`dashboard onboarding nudges`, () => {
     });
 
     cy.visit(`/`);
-    cy.contains(`add a child that you’d like to protect`);
+    cy.contains(`Mac computer`).click();
     cy.contains(`Add a child`).click();
     cy.location(`pathname`).should(`match`, /^\/children\/[a-f0-9-]{36}$/);
 

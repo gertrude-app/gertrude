@@ -130,47 +130,124 @@ const Dashboard: React.FC<Props> = ({
     );
   }
 
+  return <WelcomeScreen />;
+};
+
+export default Dashboard;
+
+type Platform = `mac` | `ios`;
+
+const WelcomeScreen: React.FC = () => {
+  const [platform, setPlatform] = useState<Platform | undefined>();
   return (
     <UndoMainPadding className="flex justify-center items-center md:min-h-screen">
-      <FloatingMessage className="flex flex-col items-center p-6 sm:p-8 lg:p-12">
-        <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
-          Welcome to the parent website!
-        </h1>
-        <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
-          The first step to getting up and running is to
-          {` `}
-          <b>add a child</b>
-          {` `}
-          that you’d like to protect.
-        </p>
-        <div className="mt-12 flex flex-col gap-4">
-          <OnboardingRecommendation
-            title="Add a child"
-            icon="fa-solid fa-user-plus"
-            href="/children/new"
-            primary
-          />
-          <div className="flex flex-col xl:flex-row gap-4">
-            <OnboardingRecommendation
-              title="How-to video (2 min)"
-              icon="fa-brands fa-youtube"
-              href="https://youtu.be/xMMuLngWhYE"
-              openInNewTab
-            />
-            <OnboardingRecommendation
-              title="Read our getting started guide"
-              icon="fa-solid fa-question-circle"
-              href="https://gertrude.app/docs/getting-started"
-              openInNewTab
-            />
-          </div>
-        </div>
+      <FloatingMessage className="flex flex-col items-center p-6 sm:p-8 lg:p-12 max-w-3xl">
+        {!platform ? (
+          <>
+            <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+              Welcome to Gertrude!
+            </h1>
+            <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
+              What type of device would you like to protect?
+            </p>
+            <div className="mt-12 flex flex-col sm:flex-row gap-4 w-full max-w-lg">
+              <PlatformOption
+                icon="fa-solid fa-laptop"
+                title="Mac computer"
+                onClick={() => setPlatform(`mac`)}
+              />
+              <PlatformOption
+                icon="fa-solid fa-mobile-screen"
+                title="iPhone or iPad"
+                onClick={() => setPlatform(`ios`)}
+              />
+            </div>
+          </>
+        ) : platform === `mac` ? (
+          <>
+            <button
+              onClick={() => setPlatform(undefined)}
+              className="self-start -mt-4 -ml-4 mb-2 text-slate-400 hover:text-slate-600 transition-colors text-sm"
+            >
+              <i className="fa-solid fa-arrow-left mr-1.5" />
+              Back
+            </button>
+            <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+              Protect a Mac
+            </h1>
+            <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
+              The first step is to <b>add a child</b> that you'd like to protect.
+            </p>
+            <div className="mt-12 flex flex-col gap-4">
+              <OnboardingRecommendation
+                title="Add a child"
+                icon="fa-solid fa-user-plus"
+                href="/children/new"
+                primary
+              />
+              <OnboardingRecommendation
+                title="How-to video (2 min)"
+                icon="fa-brands fa-youtube"
+                href="https://youtu.be/xMMuLngWhYE"
+                openInNewTab
+              />
+              <OnboardingRecommendation
+                title="Read our getting started guide"
+                icon="fa-solid fa-question-circle"
+                href="https://gertrude.app/docs/getting-started"
+                openInNewTab
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => setPlatform(undefined)}
+              className="self-start -mt-4 -ml-4 mb-2 text-slate-400 hover:text-slate-600 transition-colors text-sm"
+            >
+              <i className="fa-solid fa-arrow-left mr-1.5" />
+              Back
+            </button>
+            <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+              Protect an iPhone or iPad
+            </h1>
+            <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
+              To get started, search for <b>Gertrude Blocker</b> in the App Store on your
+              child's iPhone or iPad. The app will walk you through the setup process.
+            </p>
+            <div className="mt-12 flex flex-col gap-4">
+              <OnboardingRecommendation
+                title="Download from the App Store"
+                icon="fa-brands fa-app-store-ios"
+                href="https://apps.apple.com/app/gertrude/id6740543928"
+                openInNewTab
+                primary
+              />
+            </div>
+          </>
+        )}
       </FloatingMessage>
     </UndoMainPadding>
   );
 };
 
-export default Dashboard;
+interface PlatformOptionProps {
+  icon: string;
+  title: string;
+  onClick(): void;
+}
+
+const PlatformOption: React.FC<PlatformOptionProps> = ({ icon, title, onClick }) => (
+  <button
+    onClick={onClick}
+    className="flex-1 flex flex-col items-center gap-4 p-6 sm:p-8 rounded-2xl border border-slate-200 hover:border-violet-200 hover:bg-violet-50/50 transition-all duration-200 group"
+  >
+    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 flex justify-center items-center group-hover:-translate-y-1 transition-[box-shadow,transform] duration-200 group-hover:shadow-md group-hover:shadow-black/20">
+      <i className={cx(icon, `text-white text-2xl`)} />
+    </div>
+    <span className="text-lg font-bold text-slate-800">{title}</span>
+  </button>
+);
 
 interface FloatingMessageProps {
   className?: string;

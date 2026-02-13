@@ -49,7 +49,7 @@ describe(`signup`, () => {
       .its(`request.headers.${`X-AdminToken`.toLowerCase()}`)
       .should(`eq`, `token-123`);
 
-    cy.contains(`Welcome to the parent website!`).then(() => {
+    cy.contains(`Welcome to Gertrude!`).then(() => {
       expect(localStorage.getItem(`admin_id`)).to.eq(`admin-123`);
       expect(localStorage.getItem(`admin_token`)).to.eq(`token-123`);
     });
