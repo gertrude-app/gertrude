@@ -11,14 +11,12 @@ enum SubscriptionEmail: Equatable {
   case trialExpired(length: Int)
   case overdueToUnpaid
   case paidToOverdue
-  case unpaidToPendingDelete
 }
 
 struct SubscriptionUpdate: Equatable {
   enum Action: Equatable {
     case update(status: BillingStatus.Db, expiration: Date)
     case delete(reason: String)
-    case softDelete
   }
 
   var action: Action
@@ -62,12 +60,6 @@ struct SubscriptionManager: AsyncScheduledJob {
         ))
         logs.append("Deleted parent `\(parent.email)` reason: \(reason)")
         try await self.db.delete(parent.model)
-
-      case (.softDelete, _):
-        self.postmark.toSuperAdmin(
-          "TODO: soft delete parent accounts, issue #477",
-          "parent: \(self.adminLink(for: parent.model))",
-        )
 
       case (.update, .none):
         unexpected("f3c5e1b2", parent.model.id, "should be unreachable, investigate")
@@ -125,7 +117,7 @@ struct SubscriptionManager: AsyncScheduledJob {
 
     case .trialExpired:
       return .init(
-        action: .update(status: .unpaid, expiration: self.now + .days(365)),
+        action: .update(status: .unpaid, expiration: .distantFuture),
         email: completedOnboarding ? .overdueToUnpaid : nil,
       )
 
@@ -137,18 +129,14 @@ struct SubscriptionManager: AsyncScheduledJob {
 
     case .overdue:
       return try await self.updateIfPaid(subscription.stripeId) ?? .init(
-        action: .update(status: .unpaid, expiration: self.now + .days(365)),
+        action: .update(status: .unpaid, expiration: .distantFuture),
         email: completedOnboarding ? .overdueToUnpaid : nil,
       )
 
+    // terminal state, expiration is .distantFuture, hence unreachable
     case .unpaid:
-      // TODO: eventually query this when we have free features
-      let usingFreeFeatures = Int.random(in: 0 ... 1) == Int.max
-      if usingFreeFeatures {
-        return .init(action: .update(status: .unpaid, expiration: self.now + .days(90)))
-      } else {
-        return .init(action: .softDelete, email: completedOnboarding ? .unpaidToPendingDelete : nil)
-      }
+      unexpected("bab0487a", parent.id)
+      return nil
 
     // TODO: we're not generating this state yet, see issue #466
     case .cancelled:
@@ -215,7 +203,5 @@ func email(_ event: SubscriptionEmail, to address: EmailAddress) -> TemplateEmai
     .overdueToUnpaid(to: address.rawValue, model: .init())
   case .paidToOverdue:
     .paidToOverdue(to: address.rawValue, model: .init())
-  case .unpaidToPendingDelete:
-    .unpaidToPendingDelete(to: address.rawValue, model: .init())
   }
 }

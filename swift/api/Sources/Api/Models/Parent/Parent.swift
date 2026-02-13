@@ -6,7 +6,6 @@ struct Parent: Codable, Sendable {
   var email: EmailAddress
   var password: String
   var emailVerifiedAt: Date?
-  var deletedAt: Date?
   var gclid: String?
   var abTestVariant: String?
   var createdAt = Date()
@@ -16,22 +15,11 @@ struct Parent: Codable, Sendable {
     self.emailVerifiedAt != nil
   }
 
-  var isPendingDeletion: Bool {
-    guard let deletedAt else { return false }
-    return deletedAt > Date()
-  }
-
-  var isDeleted: Bool {
-    guard let deletedAt else { return false }
-    return deletedAt <= Date()
-  }
-
   init(
     id: Id = .init(),
     email: EmailAddress,
     password: String,
     emailVerifiedAt: Date? = nil,
-    deletedAt: Date? = nil,
     gclid: String? = nil,
     abTestVariant: String? = nil,
   ) {
@@ -39,7 +27,6 @@ struct Parent: Codable, Sendable {
     self.email = email
     self.password = password
     self.emailVerifiedAt = emailVerifiedAt
-    self.deletedAt = deletedAt
     self.gclid = gclid
     self.abTestVariant = abTestVariant
   }

@@ -109,7 +109,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
       $1.statusExpiresAt = .reference - .days(1)
     }
     await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-      action: .update(status: .unpaid, expiration: .reference + .days(365)),
+      action: .update(status: .unpaid, expiration: .distantFuture),
       email: nil, // <-- no email, they never onboarded
     ))
   }
@@ -126,7 +126,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
       }
     } operation: {
       await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-        action: .update(status: .unpaid, expiration: .reference + .days(365)),
+        action: .update(status: .unpaid, expiration: .distantFuture),
         email: nil, // <-- no email, they never onboarded
       ))
     }
@@ -144,47 +144,17 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     )
     let parent = ParentWithSubscription(model: parentModel, subscription: subscription)
     await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-      action: .update(status: .unpaid, expiration: .reference + .days(365)),
+      action: .update(status: .unpaid, expiration: .distantFuture),
       email: .overdueToUnpaid,
     ))
   }
 
-  func testUnpaidToPendingDeletion_NotOnboarded() async throws {
+  func testUnpaidIsTerminalState() async throws {
     let parent = try await self.parentWithSubscription {
       $1.billingStatus = .unpaid
       $1.statusExpiresAt = .epoch
     }
-    await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-      action: .softDelete,
-      email: nil, // <-- no email, they never onboarded
-    ))
-  }
-
-  func testUnpaidToPendingDeletion_Onboarded() throws {
-    // TODO: see issue #477
-    // let parent = try await self.parent {
-    //   $0.subscriptionStatus = .unpaid
-    //   $0.subscriptionStatusExpiration = .epoch
-    // }.withOnboardedChild().model
-    // await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-    //   action: .update(
-    //     status: .pendingAccountDeletion,
-    //     expiration: .reference + .days(30),
-    //   ),
-    //   email: .unpaidToPendingDelete,
-    // ))
-  }
-
-  func testPendingDeletionToDeleted() throws {
-    // TODO: see issue #477
-    // let parent = Parent.empty {
-    //   $0.subscriptionStatus = .pendingAccountDeletion
-    //   $0.subscriptionStatusExpiration = .epoch
-    // }
-    // await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-    //   action: .delete(reason: "account unpaid > 1yr"),
-    //   email: nil,
-    // ))
+    await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toBeNil()
   }
 
   func testEmailUnverifiedToDeleted() async throws {

@@ -131,10 +131,6 @@ enum AccountLifecycle {
   struct PaidToOverdue: TemplateEmailModel {
     static var subject: String { "[action required] Gertrude payment failed" }
   }
-
-  struct UnpaidToPendingDelete: TemplateEmailModel {
-    static var subject: String { "[action required] Gertrude account will be deleted" }
-  }
 }
 
 let EMAIL_NOTIFICATION_FALLBACK = """

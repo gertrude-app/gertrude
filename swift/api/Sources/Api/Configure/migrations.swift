@@ -70,6 +70,7 @@ extension Configure {
     app.migrations.add(SubscriptionRefactor())
     app.migrations.add(AddProfileLocked())
     app.migrations.add(BlockGroupLongDescriptions())
+    app.migrations.add(DropParentDeletedAt())
   }
 }
 

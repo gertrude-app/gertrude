@@ -62,7 +62,6 @@ extension PostmarkClient {
          .trialExpired(let recipient, _),
          .overdueToUnpaid(let recipient, _),
          .paidToOverdue(let recipient, _),
-         .unpaidToPendingDelete(let recipient, _),
          .passwordReset(let recipient, _),
          .passwordResetNoAccount(let recipient, _),
          .magicLink(let recipient, _),
