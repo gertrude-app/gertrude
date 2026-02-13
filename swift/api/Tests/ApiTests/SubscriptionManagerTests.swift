@@ -149,6 +149,24 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     ))
   }
 
+  func testOverdueToUnpaid_OnboardedViaIOSDevice() async throws {
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    try await self.db.create(IOSApp.Device.random { $0.childId = child.id })
+    let subscription = Subscription(
+      parentId: parent.id,
+      tier: .light,
+      billingStatus: .overdue,
+      trialStartedAt: .reference - .days(35),
+      statusExpiresAt: .reference - .days(1),
+    )
+    let parentWithSub = ParentWithSubscription(model: parent.model, subscription: subscription)
+    await expect(try SubscriptionManager().subscriptionUpdate(for: parentWithSub)).toEqual(.init(
+      action: .update(status: .unpaid, expiration: .distantFuture),
+      email: .overdueToUnpaid,
+    ))
+  }
+
   func testUnpaidIsTerminalState() async throws {
     let parent = try await self.parentWithSubscription {
       $1.billingStatus = .unpaid

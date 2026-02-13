@@ -95,9 +95,7 @@ struct SubscriptionManager: AsyncScheduledJob {
       return nil
     }
 
-    // TODO: this should really be generalized to "did somethinge meaningful"
-    // so that supervision factors in, at least for the overdue case.... 🤔
-    let completedOnboarding = try await parent.model.completedOnboarding(self.db)
+    let hasConnectedApp = try await parent.model.hasConnectedApp(self.db)
     switch subscription.billingStatus {
 
     case .trialing:
@@ -112,13 +110,13 @@ struct SubscriptionManager: AsyncScheduledJob {
     case .trialExpiringSoon:
       return .init(
         action: .update(status: .trialExpired, expiration: self.now + Plan.Full.trialGraceDays),
-        email: completedOnboarding ? .trialExpired(length: 21) : nil,
+        email: hasConnectedApp ? .trialExpired(length: 21) : nil,
       )
 
     case .trialExpired:
       return .init(
         action: .update(status: .unpaid, expiration: .distantFuture),
-        email: completedOnboarding ? .overdueToUnpaid : nil,
+        email: hasConnectedApp ? .overdueToUnpaid : nil,
       )
 
     case .paid:
@@ -130,7 +128,7 @@ struct SubscriptionManager: AsyncScheduledJob {
     case .overdue:
       return try await self.updateIfPaid(subscription.stripeId) ?? .init(
         action: .update(status: .unpaid, expiration: .distantFuture),
-        email: completedOnboarding ? .overdueToUnpaid : nil,
+        email: hasConnectedApp ? .overdueToUnpaid : nil,
       )
 
     // terminal state, expiration is .distantFuture, hence unreachable
@@ -181,12 +179,17 @@ struct SubscriptionManager: AsyncScheduledJob {
 // helpers
 
 private extension Parent {
-  func completedOnboarding(_ db: any DuetSQL.Client) async throws -> Bool {
+  func hasConnectedApp(_ db: any DuetSQL.Client) async throws -> Bool {
     let children = try await children(in: db)
-    let childDevices = try await children.concurrentMap {
+    let computers = try await children.concurrentMap {
       try await $0.computerUsers(in: db)
     }.flatMap(\.self)
-    return !childDevices.isEmpty
+    if !computers.isEmpty { return true }
+
+    let iosDevices = try await children.concurrentMap {
+      try await $0.iosDevices(in: db)
+    }.flatMap(\.self)
+    return !iosDevices.isEmpty
   }
 }
 
