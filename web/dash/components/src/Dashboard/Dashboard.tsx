@@ -52,23 +52,13 @@ const Dashboard: React.FC<Props> = ({
   const firstUser = childData[0];
   if (firstUser && childData.reduce((acc, cur) => acc + cur.numDevices, 0) === 0) {
     return (
-      <>
-        <ConnectDeviceModal
-          request={addDeviceRequest}
-          dismissAddDevice={dismissAddDevice}
-          onStartTrial={onStartTrial}
-        />
-        <UndoMainPadding className="flex justify-center items-center md:min-h-screen">
-          <FloatingMessage className="flex flex-col items-center p-6 sm:p-8 lg:p-12 max-w-3xl">
-            <AddDeviceInstructions
-              userName={firstUser.name}
-              userId={firstUser.id}
-              startAddDevice={startAddDevice}
-              onMainDashboard
-            />
-          </FloatingMessage>
-        </UndoMainPadding>
-      </>
+      <ConnectFirstDeviceScreen
+        firstUser={firstUser}
+        startAddDevice={startAddDevice}
+        dismissAddDevice={dismissAddDevice}
+        onStartTrial={onStartTrial}
+        addDeviceRequest={addDeviceRequest}
+      />
     );
   }
 
@@ -208,28 +198,112 @@ const WelcomeScreen: React.FC = () => {
               <i className="fa-solid fa-arrow-left mr-1.5" />
               Back
             </button>
-            <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
-              Protect an iPhone or iPad
-            </h1>
-            <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
-              To get started, search for <b>Gertrude Blocker</b> in the App Store on your
-              child's iPhone or iPad. The app will walk you through the setup process.
-            </p>
-            <div className="mt-12 flex flex-col gap-4">
-              <OnboardingRecommendation
-                title="Download from the App Store"
-                icon="fa-brands fa-app-store-ios"
-                href="https://apps.apple.com/app/gertrude/id6740543928"
-                openInNewTab
-                primary
-              />
-            </div>
+            <IosGetStartedInstructions />
           </>
         )}
       </FloatingMessage>
     </UndoMainPadding>
   );
 };
+
+interface ConnectFirstDeviceScreenProps {
+  firstUser: DashboardWidgets.Output[`children`][number];
+  startAddDevice(childId: UUID): unknown;
+  dismissAddDevice(): unknown;
+  onStartTrial(): unknown;
+  addDeviceRequest: RequestState<MacAppConnectionCode.Output>;
+}
+
+const ConnectFirstDeviceScreen: React.FC<ConnectFirstDeviceScreenProps> = ({
+  firstUser,
+  startAddDevice,
+  dismissAddDevice,
+  onStartTrial,
+  addDeviceRequest,
+}) => {
+  const [platform, setPlatform] = useState<Platform | undefined>();
+  return (
+    <>
+      <ConnectDeviceModal
+        request={addDeviceRequest}
+        dismissAddDevice={dismissAddDevice}
+        onStartTrial={onStartTrial}
+      />
+      <UndoMainPadding className="flex justify-center items-center md:min-h-screen">
+        <FloatingMessage className="flex flex-col items-center p-6 sm:p-8 lg:p-12 max-w-3xl">
+          {!platform ? (
+            <>
+              <h1 className="font-inter text-xl xs:text-2xl lg:text-3xl text-center">
+                What type of device will {firstUser.name} be using?
+              </h1>
+              <div className="mt-12 flex flex-col sm:flex-row gap-4 w-full max-w-lg">
+                <PlatformOption
+                  icon="fa-solid fa-laptop"
+                  title="Mac computer"
+                  onClick={() => setPlatform(`mac`)}
+                />
+                <PlatformOption
+                  icon="fa-solid fa-mobile-screen"
+                  title="iPhone or iPad"
+                  onClick={() => setPlatform(`ios`)}
+                />
+              </div>
+            </>
+          ) : platform === `mac` ? (
+            <>
+              <button
+                onClick={() => setPlatform(undefined)}
+                className="self-start -mt-4 -ml-4 mb-2 text-slate-400 hover:text-slate-600 transition-colors text-sm"
+              >
+                <i className="fa-solid fa-arrow-left mr-1.5" />
+                Back
+              </button>
+              <AddDeviceInstructions
+                userName={firstUser.name}
+                userId={firstUser.id}
+                startAddDevice={startAddDevice}
+              />
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => setPlatform(undefined)}
+                className="self-start -mt-4 -ml-4 mb-2 text-slate-400 hover:text-slate-600 transition-colors text-sm"
+              >
+                <i className="fa-solid fa-arrow-left mr-1.5" />
+                Back
+              </button>
+              <IosGetStartedInstructions childName={firstUser.name} />
+            </>
+          )}
+        </FloatingMessage>
+      </UndoMainPadding>
+    </>
+  );
+};
+
+const IosGetStartedInstructions: React.FC<{ childName?: string }> = ({ childName }) => (
+  <>
+    <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+      Protect {childName ? `${posessive(childName)} iPhone or iPad` : `an iPhone or iPad`}
+    </h1>
+    <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
+      {childName ? `Search` : `To get started, search`} for <b>Gertrude Blocker</b> in the
+      App Store on{` `}
+      {childName ? `${posessive(childName)} device` : `your child's iPhone or iPad`}. The
+      app will walk you through the setup process.
+    </p>
+    <div className="mt-12 flex flex-col gap-4">
+      <OnboardingRecommendation
+        title="Download from the App Store"
+        icon="fa-brands fa-app-store-ios"
+        href="https://apps.apple.com/app/gertrude/id6740543928"
+        openInNewTab
+        primary
+      />
+    </div>
+  </>
+);
 
 interface PlatformOptionProps {
   icon: string;

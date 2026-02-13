@@ -76,7 +76,8 @@ describe(`dashboard onboarding nudges`, () => {
     });
 
     cy.visit(`/`);
-    cy.contains(`Congrats on adding your first child!`);
+    cy.contains(`What type of device will Leopold be using?`);
+    cy.contains(`Mac computer`).click();
     cy.contains(`Get connection code`).click();
     cy.contains(`123456`).should(`be.visible`);
   });
