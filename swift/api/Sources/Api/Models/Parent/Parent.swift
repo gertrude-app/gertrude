@@ -22,6 +22,7 @@ struct Parent: Codable, Sendable {
     emailVerifiedAt: Date? = nil,
     gclid: String? = nil,
     abTestVariant: String? = nil,
+    createdAt: Date = Date(),
   ) {
     self.id = id
     self.email = email
@@ -29,6 +30,7 @@ struct Parent: Codable, Sendable {
     self.emailVerifiedAt = emailVerifiedAt
     self.gclid = gclid
     self.abTestVariant = abTestVariant
+    self.createdAt = createdAt
   }
 }
 

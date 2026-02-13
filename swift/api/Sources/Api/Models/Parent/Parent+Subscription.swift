@@ -37,6 +37,7 @@ struct ParentSubscriptionRow: CustomQueryable {
   var pGclid: String?
   var pAbTestVariant: String?
   var pEmailVerifiedAt: Date?
+  var pCreatedAt: Date
 
   var sId: Subscription.Id?
   var sParentId: Parent.Id?
@@ -56,6 +57,7 @@ struct ParentSubscriptionRow: CustomQueryable {
       p.\(Parent.columnName(.gclid)) AS p_gclid,
       p.\(Parent.columnName(.abTestVariant)) AS p_ab_test_variant,
       p.\(Parent.columnName(.emailVerifiedAt)) AS p_email_verified_at,
+      p.\(Parent.columnName(.createdAt)) AS p_created_at,
       s.\(Subscription.columnName(.id)) AS s_id,
       s.\(Subscription.columnName(.parentId)) AS s_parent_id,
       s.\(Subscription.columnName(.tier)) AS s_tier,
@@ -85,6 +87,7 @@ struct ParentSubscriptionRow: CustomQueryable {
       emailVerifiedAt: pEmailVerifiedAt,
       gclid: pGclid,
       abTestVariant: pAbTestVariant,
+      createdAt: pCreatedAt,
     )
 
     let subscription: Subscription? = self.sId.flatMap { id in
