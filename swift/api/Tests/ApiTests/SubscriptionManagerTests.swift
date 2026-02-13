@@ -175,6 +175,15 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toBeNil()
   }
 
+  func testCancelledIsTerminalState() async throws {
+    let parent = try await self.parentWithSubscription {
+      $1.billingStatus = .cancelled
+      $1.stripeId = .init("sub-123")
+      $1.statusExpiresAt = .epoch
+    }
+    await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toBeNil()
+  }
+
   func testEmailUnverifiedToDeleted() async throws {
     let parentModel = try await self.db.create(Parent.empty {
       $0.emailVerifiedAt = nil

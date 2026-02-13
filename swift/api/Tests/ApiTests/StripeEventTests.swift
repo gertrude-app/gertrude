@@ -117,6 +117,37 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     })
   }
 
+  func testSubscriptionDeletedEventCancelsSubscription() async throws {
+    let subscriptionId: Subscription.StripeId = .init("subId_".random)
+    let parent = try await self.parentWithSubscription {
+      $1.stripeId = subscriptionId
+      $1.billingStatus = .paid
+      $1.statusExpiresAt = .reference + .days(30)
+    }
+
+    let json = """
+      {
+        "type": "customer.subscription.deleted",
+        "data": {
+          "object": {
+            "id": "\(subscriptionId.rawValue)",
+            "customer": "cus_test123",
+            "status": "canceled"
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent)
+      let retrieved = try await Subscription.query()
+        .where(.parentId == parent.id)
+        .first(in: self.db)
+      expect(retrieved.billingStatus).toEqual(.cancelled)
+      expect(retrieved.statusExpiresAt).toEqual(.distantFuture)
+    })
+  }
+
   // @see email ref:96dc2
   func testUpdateAdminSubscriptionStatusFromSubscriptionIdAndAlternateEmail() async throws {
     let subscriptionId: Subscription.StripeId = .init("subId_".random)

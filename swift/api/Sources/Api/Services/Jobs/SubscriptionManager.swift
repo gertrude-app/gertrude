@@ -136,8 +136,9 @@ struct SubscriptionManager: AsyncScheduledJob {
       unexpected("bab0487a", parent.id)
       return nil
 
-    // TODO: we're not generating this state yet, see issue #466
+    // terminal state, expiration is .distantFuture, hence unreachable
     case .cancelled:
+      unexpected("c4f2a8d1", parent.id)
       return nil
 
     // complimentary, expires should be .distantFuture, hence unreachable
