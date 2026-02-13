@@ -16,7 +16,6 @@ enum TemplateEmail {
   case trialExpired(to: String, model: AccountLifecycle.TrialExpired)
   case overdueToUnpaid(to: String, model: AccountLifecycle.OverdueToUnpaid)
   case paidToOverdue(to: String, model: AccountLifecycle.PaidToOverdue)
-  case unpaidToPendingDelete(to: String, model: AccountLifecycle.UnpaidToPendingDelete)
   case screenTimeWarning(to: String, model: ScreenTimeWarning)
 }
 
@@ -71,7 +70,6 @@ extension TemplateEmail {
     case .trialExpired(_, let model): model
     case .overdueToUnpaid(_, let model): model
     case .paidToOverdue(_, let model): model
-    case .unpaidToPendingDelete(_, let model): model
     case .passwordReset(_, let model): model
     case .passwordResetNoAccount(_, let model): model
     case .magicLink(_, let model): model

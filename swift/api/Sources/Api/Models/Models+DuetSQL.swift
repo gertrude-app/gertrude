@@ -205,7 +205,6 @@ extension Parent: Model {
     case .email: .string(self.email.rawValue)
     case .password: .string(self.password)
     case .emailVerifiedAt: .date(self.emailVerifiedAt)
-    case .deletedAt: .date(self.deletedAt)
     case .gclid: .string(self.gclid)
     case .abTestVariant: .string(self.abTestVariant)
     case .createdAt: .date(self.createdAt)
@@ -219,7 +218,6 @@ extension Parent: Model {
       .email: .string(email.rawValue),
       .password: .string(password),
       .emailVerifiedAt: .date(emailVerifiedAt),
-      .deletedAt: .date(deletedAt),
       .gclid: .string(gclid),
       .abTestVariant: .string(abTestVariant),
       .createdAt: .currentTimestamp,

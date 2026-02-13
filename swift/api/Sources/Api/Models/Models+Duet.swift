@@ -176,7 +176,6 @@ extension Parent {
     case email
     case password
     case emailVerifiedAt
-    case deletedAt
     case gclid
     case abTestVariant
     case createdAt

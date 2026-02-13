@@ -126,9 +126,6 @@ import Vapor
       case "admin-paid-to-overdue":
         try await postmark.send(template: .paidToOverdue(to: to, model: .init()))
 
-      case "admin-unpaid-to-pending-delete":
-        try await postmark.send(template: .unpaidToPendingDelete(to: to, model: .init()))
-
       case "screen-time-warning":
         try await postmark.send(template: .screenTimeWarning(
           to: to,
@@ -176,8 +173,6 @@ import Vapor
         return write(template: AccountLifecycle.OverdueToUnpaid.self)
       case "admin-paid-to-overdue":
         return write(template: AccountLifecycle.PaidToOverdue.self)
-      case "admin-unpaid-to-pending-delete":
-        return write(template: AccountLifecycle.UnpaidToPendingDelete.self)
       case "screen-time-warning":
         return write(template: ScreenTimeWarning.self)
       default:

@@ -93,6 +93,24 @@ enum StripeEventsRoute {
         ))
         notifyFirstPayment(parent: parent, tier: eventTier)
       }
+
+    } else if event?.type == "customer.subscription.deleted",
+              let stripeSubId = event?.data?.object?.id {
+      if var subscription = try? await Subscription.query()
+        .where(.stripeId == .init(stripeSubId))
+        .first(in: request.context.db) {
+        subscription.billingStatus = .cancelled
+        subscription.statusExpiresAt = .distantFuture
+        try await request.context.db.update(subscription)
+        Task {
+          let parent = try await request.context.db.find(subscription.parentId) as Parent
+          let link = AdminLink().slack(to: .parent(parent.id), text: parent.email.rawValue)
+          await get(dependency: \.slack)
+            .internal(.info, "*Subscription cancelled* by \(link)")
+        }
+      } else {
+        unexpected("a7c3d1e5", detail: "stripe sub id: \(stripeSubId), event: \(stripeEvent.id)")
+      }
     }
 
     slackNotify(event)
@@ -113,6 +131,8 @@ private func slackNotify(_ event: EventInfo?) {
 private struct EventInfo: Decodable {
   struct Data: Decodable {
     struct Object: Decodable {
+      var id: String?
+
       struct Lines: Decodable {
         struct Line: Decodable {
           struct Period: Decodable {
