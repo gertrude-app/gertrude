@@ -31,50 +31,62 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = `sm` })
   );
 };
 
-const subscriptionStyles: Record<string, string> = {
-  free: `bg-slate-50 text-slate-500 ring-slate-400/20`,
-  paid: `bg-emerald-50 text-emerald-700 ring-emerald-600/20`,
-  trialing: `bg-sky-50 text-sky-700 ring-sky-600/20`,
-  trialExpiringSoon: `bg-amber-50 text-amber-700 ring-amber-600/20`,
-  trialExpired: `bg-orange-50 text-orange-700 ring-orange-600/20`,
-  overdue: `bg-amber-50 text-amber-700 ring-amber-600/20`,
-  unpaid: `bg-red-50 text-red-700 ring-red-600/20`,
-  pendingEmailVerification: `bg-slate-50 text-slate-600 ring-slate-500/20`,
-  complimentary: `bg-violet-50 text-violet-700 ring-violet-600/20`,
+const planBadgeStyles: Record<string, Record<string, string>> = {
+  full: {
+    paid: `bg-violet-50 text-violet-700 ring-violet-600/20`,
+    trialing: `bg-violet-50 text-violet-600 ring-violet-500/20`,
+    trialExpiringSoon: `bg-violet-50 text-violet-600 ring-violet-500/20`,
+    trialExpired: `bg-orange-50 text-orange-700 ring-orange-600/20`,
+    overdue: `bg-amber-50 text-amber-700 ring-amber-600/20`,
+    unpaid: `bg-red-50 text-red-700 ring-red-600/20`,
+    complimentary: `bg-violet-50 text-violet-700 ring-violet-600/20`,
+  },
+  light: {
+    paid: `bg-sky-50 text-sky-700 ring-sky-600/20`,
+    overdue: `bg-amber-50 text-amber-700 ring-amber-600/20`,
+    unpaid: `bg-red-50 text-red-700 ring-red-600/20`,
+  },
+  free: {
+    free: `bg-slate-50 text-slate-400 ring-slate-300/20`,
+    unpaid: `bg-slate-50 text-slate-400 ring-slate-300/20`,
+  },
 };
 
-const subscriptionLabels: Record<string, string> = {
-  free: `Free`,
+const billingLabels: Record<string, string> = {
   paid: `Paid`,
   trialing: `Trial`,
-  trialExpiringSoon: `Trial Expiring Soon`,
+  trialExpiringSoon: `Trial Soon`,
   trialExpired: `Trial Expired`,
   overdue: `Overdue`,
   unpaid: `Unpaid`,
-  pendingEmailVerification: `Pending`,
   complimentary: `Complimentary`,
+  free: `Free`,
 };
 
-interface SubscriptionBadgeProps {
+interface PlanBadgeProps {
+  planCase: string;
   status: string;
   size?: `sm` | `md`;
 }
 
-export const SubscriptionBadge: React.FC<SubscriptionBadgeProps> = ({
+export const PlanBadge: React.FC<PlanBadgeProps> = ({
+  planCase,
   status,
   size = `sm`,
 }) => {
+  const tierStyles = planBadgeStyles[planCase] ?? planBadgeStyles.free;
+  const style = tierStyles?.[status] ?? `bg-slate-50 text-slate-600 ring-slate-500/20`;
+  const tierLabel = planCase === `free` ? `` : planCase === `light` ? `Light` : `Full`;
+  const isLapsed = planCase === `free` && status === `unpaid`;
+  const statusLabel = isLapsed ? `Lapsed` : (billingLabels[status] ?? status);
+  const label = tierLabel ? `${tierLabel} · ${statusLabel}` : statusLabel;
   const sizeClass =
     size === `md` ? `px-3 py-1.5 text-sm` : `px-2.5 py-1 rounded-lg text-xs`;
   return (
     <span
-      className={`inline-flex items-center rounded-lg font-medium ring-1 ring-inset ${sizeClass} ${subscriptionStyles[status] ?? `bg-slate-50 text-slate-600 ring-slate-500/20`}`}
+      className={`inline-flex items-center rounded-lg font-medium ring-1 ring-inset ${sizeClass} ${style}`}
     >
-      {subscriptionLabels[status] ?? status}
+      {label}
     </span>
   );
 };
-
-export function getSubscriptionLabel(status: string): string {
-  return subscriptionLabels[status] ?? status;
-}

@@ -23,11 +23,12 @@ struct ParentsList: Pair {
     var id: Parent.Id
     var email: String
     var createdAt: Date
+    var planCase: String
     var subscriptionStatus: String
     var numChildren: Int
-    var numKeychains: Int
-    var numNotifications: Int
-    var status: String
+    var macDeviceCount: Int
+    var iosDeviceCount: Int
+    var macAppStatus: String
   }
 }
 
@@ -64,15 +65,22 @@ extension ParentsList: Resolver {
     let summaries = parents.map { parent -> ParentSummary in
       let parentData = analyticsData.parents[parent.id]
       let subscription = subscriptionMap[parent.id]
+      let plan = Plan(subscription: subscription)
+      let planCase = switch plan {
+      case .free: "free"
+      case .light: "light"
+      case .full: "full"
+      }
       return ParentSummary(
         id: parent.id,
         email: parent.email.rawValue,
         createdAt: parent.createdAt,
+        planCase: planCase,
         subscriptionStatus: self.subscriptionStatusString(for: subscription),
         numChildren: parentData?.numChildren ?? 0,
-        numKeychains: parentData?.numNonEmptyKeychains ?? 0,
-        numNotifications: parentData?.numNotifications ?? 0,
-        status: parentData?.status.rawValue ?? "unknown",
+        macDeviceCount: parentData?.numComputerUsers ?? 0,
+        iosDeviceCount: parentData?.numIOSDevices ?? 0,
+        macAppStatus: parentData?.status.rawValue ?? "unknown",
       )
     }
 

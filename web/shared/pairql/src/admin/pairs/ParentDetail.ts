@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { DeviceModelFamily } from '../shared';
+import type { DeviceModelFamily, Plan } from '../shared';
 
 export namespace ParentDetail {
   export interface Input {
@@ -10,9 +10,7 @@ export namespace ParentDetail {
     id: UUID;
     email: string;
     status: string;
-    plan: string;
-    billingStatus?: string;
-    stripeSubscriptionId?: string;
+    plan: Plan;
     createdAt: ISODateString;
     children: Array<{
       id: UUID;

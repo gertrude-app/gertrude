@@ -20,6 +20,8 @@ import {
 import LoadingState from '../components/LoadingState';
 import { formatDate, unCamelCase } from '../lib/format';
 
+type Plan = T.ParentDetail.Output[`plan`];
+
 const ParentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -104,25 +106,28 @@ const ParentDetail: React.FC = () => {
 
         <div className="p-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <InfoCard label="Plan" value={data.plan} highlight />
-            <InfoCard label="Billing Status" value={data.billingStatus ?? `—`} />
+            <PlanCard plan={data.plan} />
             <InfoCard label="Children" value={data.children.length.toString()} />
             <InfoCard label="Created" value={formatDate(data.createdAt)} />
           </div>
 
-          {data.stripeSubscriptionId && (
-            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-              <span className="text-sm text-slate-500">Stripe ID: </span>
-              <a
-                href={`https://dashboard.stripe.com/acct_1L8TXdGKRdhETuKA/subscriptions/${data.stripeSubscriptionId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-mono text-brand-violet hover:text-brand-fuchsia transition-colors"
-              >
-                {data.stripeSubscriptionId}
-              </a>
-            </div>
-          )}
+          {(() => {
+            const stripeId = extractStripeId(data.plan);
+            if (!stripeId) return null;
+            return (
+              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <span className="text-sm text-slate-500">Stripe: </span>
+                <a
+                  href={`https://dashboard.stripe.com/acct_1L8TXdGKRdhETuKA/subscriptions/${stripeId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-mono text-brand-violet hover:text-brand-fuchsia transition-colors"
+                >
+                  {stripeId}
+                </a>
+              </div>
+            );
+          })()}
         </div>
       </div>
 
@@ -485,28 +490,108 @@ const ParentDetail: React.FC = () => {
 interface InfoCardProps {
   label: string;
   value: string;
-  highlight?: boolean;
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({ label, value, highlight = false }) => (
-  <div
-    className={`rounded-xl p-4 ${
-      highlight
-        ? `bg-gradient-to-br from-brand-violet to-brand-fuchsia text-white`
-        : `bg-slate-50 border border-slate-100`
-    }`}
-  >
-    <div className={`text-sm ${highlight ? `text-white/80` : `text-slate-500`}`}>
-      {label}
-    </div>
-    <div
-      className={`text-lg font-display font-semibold mt-1 ${
-        highlight ? `text-white` : `text-slate-900`
-      }`}
-    >
-      {value}
-    </div>
+const InfoCard: React.FC<InfoCardProps> = ({ label, value }) => (
+  <div className="rounded-xl p-4 bg-slate-50 border border-slate-100">
+    <div className="text-sm text-slate-500">{label}</div>
+    <div className="text-lg font-display font-semibold mt-1 text-slate-900">{value}</div>
   </div>
 );
+
+const PLAN_TIER_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
+  full: { label: `Full`, bg: `from-violet-500 to-purple-600`, text: `text-white` },
+  light: { label: `Light`, bg: `from-sky-400 to-blue-500`, text: `text-white` },
+  free: { label: `Free`, bg: `from-slate-300 to-slate-400`, text: `text-white` },
+};
+
+function planBillingLabel(plan: Plan): string {
+  if (plan.case === `free`) {
+    switch (plan.kind.case) {
+      case `standard`:
+        return `No subscription`;
+      case `lapsedLight`:
+        return `Lapsed (was Light)`;
+      case `lapsedFull`:
+        return `Lapsed (was Full)`;
+    }
+  } else if (plan.case === `light`) {
+    switch (plan.status.case) {
+      case `paid`:
+        return `Paid — $10/yr`;
+      case `overdue`:
+        return `Overdue`;
+    }
+  } else {
+    switch (plan.status.case) {
+      case `complimentary`:
+        return `Complimentary`;
+      case `trialing`:
+        return `Trial — ends ${formatDate(plan.status.until)}`;
+      case `trialExpired`:
+        return `Trial expired`;
+      case `paid`:
+        return `Paid — $${plan.status.monthlyPriceInCents / 100}/mo`;
+      case `overdue`:
+        return `Overdue — $${plan.status.monthlyPriceInCents / 100}/mo`;
+    }
+  }
+}
+
+function sid(value: string | { rawValue: string }): string {
+  return typeof value === `string` ? value : value.rawValue;
+}
+
+function extractStripeId(plan: Plan): string | null {
+  if (plan.case === `free`) {
+    if (plan.kind.case === `lapsedLight` || plan.kind.case === `lapsedFull`) {
+      return sid(plan.kind.stripeId);
+    }
+    return null;
+  } else if (plan.case === `light`) {
+    return sid(plan.status.stripeId);
+  } else {
+    switch (plan.status.case) {
+      case `paid`:
+      case `overdue`:
+        return sid(plan.status.stripeId);
+      case `trialing`:
+        return plan.status.kind.case === `fromLight`
+          ? sid(plan.status.kind.stripeId)
+          : null;
+      case `trialExpired`:
+        return plan.status.kind.case === `fromLight`
+          ? sid(plan.status.kind.stripeId)
+          : null;
+      default:
+        return null;
+    }
+  }
+}
+
+const PlanCard: React.FC<{ plan: Plan }> = ({ plan }) => {
+  const fallback = {
+    label: `Free`,
+    bg: `from-slate-300 to-slate-400`,
+    text: `text-white`,
+  };
+  const tier = PLAN_TIER_CONFIG[plan.case] ?? fallback;
+  return (
+    <div
+      className={`rounded-xl p-4 bg-gradient-to-br ${tier.bg} ${tier.text} col-span-2`}
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-sm opacity-80">Plan</div>
+          <div className="text-lg font-display font-semibold mt-1">{tier.label}</div>
+        </div>
+        <div className="text-right">
+          <div className="text-sm opacity-80">Status</div>
+          <div className="text-sm font-medium mt-1">{planBillingLabel(plan)}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default ParentDetail;

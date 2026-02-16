@@ -15,9 +15,7 @@ struct ParentDetail: Pair {
     var id: Parent.Id
     var email: String
     var status: String
-    var plan: String
-    var billingStatus: String?
-    var stripeSubscriptionId: String?
+    var plan: Plan
     var createdAt: Date
     var children: [ChildOutput]
     var keychains: [KeychainOutput]
@@ -154,57 +152,15 @@ extension ParentDetail: Resolver {
     let parentData = analyticsData.parents[parent.id]
     let status = parentData?.status.rawValue ?? "unknown"
 
-    // TODO: maybe better in the future to send the full Plan enum and let client handle display
-    // @see https://github.com/gertrude-app/gertrude/issues/478
-    let (plan, billingStatus) = Plan(subscription: parent.subscription).displayStrings
-
     return .init(
       id: parent.id,
       email: parent.email.rawValue,
       status: status,
-      plan: plan,
-      billingStatus: billingStatus,
-      stripeSubscriptionId: parent.subscription?.stripeId?.rawValue,
+      plan: Plan(subscription: parent.subscription),
       createdAt: parent.createdAt,
       children: childOutputs,
       keychains: keychainOutputs,
       notifications: notificationOutputs,
     )
-  }
-}
-
-private extension Plan {
-  var displayStrings: (plan: String, billingStatus: String?) {
-    switch self {
-    case .free(let kind):
-      switch kind {
-      case .standard:
-        ("free", nil)
-      case .lapsedLight:
-        ("free (lapsed light)", "unpaid")
-      case .lapsedFull:
-        ("free (lapsed full)", "unpaid")
-      }
-    case .light(let status):
-      switch status {
-      case .paid:
-        ("light", "paid")
-      case .overdue:
-        ("light", "overdue")
-      }
-    case .full(let status):
-      switch status {
-      case .complimentary:
-        ("complimentary", nil)
-      case .trialing:
-        ("full", "trialing")
-      case .trialExpired:
-        ("full", "trial expired")
-      case .paid:
-        ("full", "paid")
-      case .overdue:
-        ("full", "overdue")
-      }
-    }
   }
 }

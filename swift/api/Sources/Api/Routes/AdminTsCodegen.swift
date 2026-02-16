@@ -20,6 +20,7 @@ enum AdminTsCodegenRoute {
       ("ClientAuth", ClientAuth.self),
       ("DeviceModelFamily", DeviceModelFamily.self),
       ("GertrudeApp", AppStore.GertrudeApp.self),
+      ("Plan", Plan.self),
     ]
   }
 
