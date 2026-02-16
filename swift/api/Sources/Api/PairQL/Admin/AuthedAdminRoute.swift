@@ -2,6 +2,7 @@ import PairQL
 import Vapor
 
 enum AuthedAdminRoute: PairRoute {
+  case subscriptionsOverview
   case macOverview
   case iOSOverview
   case iOSDetailedStats
@@ -17,6 +18,9 @@ enum AuthedAdminRoute: PairRoute {
   case appRatings(AppRatings.Input)
 
   nonisolated(unsafe) static let router = OneOf {
+    Route(.case(Self.subscriptionsOverview)) {
+      Operation(SubscriptionsOverview.self)
+    }
     Route(.case(Self.macOverview)) {
       Operation(MacOverview.self)
     }
@@ -71,6 +75,9 @@ enum AuthedAdminRoute: PairRoute {
 extension AuthedAdminRoute: RouteResponder {
   static func respond(to route: Self, in context: Context) async throws -> Response {
     switch route {
+    case .subscriptionsOverview:
+      let output = try await SubscriptionsOverview.resolve(in: context)
+      return try await self.respond(with: output)
     case .macOverview:
       let output = try await MacOverview.resolve(in: context)
       return try await self.respond(with: output)

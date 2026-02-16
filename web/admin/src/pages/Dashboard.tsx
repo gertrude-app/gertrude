@@ -9,6 +9,7 @@ import {
   MicIcon,
   MonitorIcon,
   SmartphoneIcon,
+  UsersIcon,
 } from '../components/Icons';
 import InstallsGraph from '../components/InstallsGraph';
 import LoadingState from '../components/LoadingState';
@@ -16,6 +17,9 @@ import PodcastInstallsGraph from '../components/PodcastInstallsGraph';
 import SignupGraph from '../components/SignupGraph';
 
 const Dashboard: React.FC = () => {
+  const [overviewData, setOverviewData] = useState<T.SubscriptionsOverview.Output | null>(
+    null,
+  );
   const [macData, setMacData] = useState<T.MacOverview.Output | null>(null);
   const [iosData, setIosData] = useState<T.IOSOverview.Output | null>(null);
   const [podcastData, setPodcastData] = useState<T.PodcastOverview.Output | null>(null);
@@ -27,11 +31,20 @@ const Dashboard: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const [macResult, iosResult, podcastResult] = await Promise.all([
+      const [overviewResult, macResult, iosResult, podcastResult] = await Promise.all([
+        client.subscriptionsOverview(),
         client.macOverview(),
         client.iOSOverview(),
         client.podcastOverview(),
       ]);
+
+      if (overviewResult.isError) {
+        setError(
+          overviewResult.error?.debugMessage ?? `Failed to load subscription data`,
+        );
+        setLoading(false);
+        return;
+      }
 
       if (macResult.isError) {
         setError(macResult.error?.debugMessage ?? `Failed to load Mac data`);
@@ -39,6 +52,7 @@ const Dashboard: React.FC = () => {
         return;
       }
 
+      setOverviewData(overviewResult.value ?? null);
       setMacData(macResult.value ?? null);
       setIosData(iosResult.value ?? null);
       setPodcastData(podcastResult.value ?? null);
@@ -58,6 +72,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-fade-in pt-4">
+      {overviewData && <OverviewSection data={overviewData} />}
       {macData && <MacSection data={macData} />}
       {iosData && <IOSSection data={iosData} />}
       {podcastData && <PodcastSection data={podcastData} />}
@@ -65,34 +80,40 @@ const Dashboard: React.FC = () => {
   );
 };
 
-interface MacSectionProps {
-  data: T.MacOverview.Output;
+interface OverviewSectionProps {
+  data: T.SubscriptionsOverview.Output;
 }
 
-const MacSection: React.FC<MacSectionProps> = ({ data }) => {
-  const monthlyRevenue = Math.round(data.annualRevenue / 12);
+const OverviewSection: React.FC<OverviewSectionProps> = ({ data }) => {
+  const freeCount =
+    data.totalAccounts - data.fullPlanCount - data.lightPlanCount - data.trialingCount;
   const stats = [
     { label: `Annual Revenue`, value: `$${data.annualRevenue.toLocaleString()}` },
     {
       label: `Monthly Revenue`,
-      value: `$${monthlyRevenue.toLocaleString()}`,
+      value: `$${data.monthlyRevenue.toLocaleString()}`,
       highlight: true,
     },
-    { label: `Paying Parents`, value: data.payingParents.toLocaleString() },
-    { label: `Active Parents`, value: data.activeParents.toLocaleString() },
-    { label: `Active Children`, value: data.childrenOfActiveParents.toLocaleString() },
-    { label: `All-Time Children`, value: data.allTimeChildren.toLocaleString() },
-    { label: `All-Time Installs`, value: data.allTimeAppInstallations.toLocaleString() },
+    { label: `Full Plans`, value: data.fullPlanCount.toLocaleString() },
+    { label: `Light Plans`, value: data.lightPlanCount.toLocaleString() },
+    { label: `Trialing`, value: data.trialingCount.toLocaleString() },
+    { label: `Total Accounts`, value: data.totalAccounts.toLocaleString() },
   ];
+
+  const signupItems = data.recentSignups.map((s) => ({
+    date: s.date,
+    status: s.planCase,
+    email: s.email,
+  }));
 
   return (
     <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
       <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-violet to-brand-fuchsia flex items-center justify-center shadow-lg shadow-brand-violet/20">
-            <MonitorIcon className="w-5 h-5 text-white" />
+            <UsersIcon className="w-5 h-5 text-white" />
           </div>
-          <h2 className="font-display font-semibold text-slate-900 text-xl">Mac App</h2>
+          <h2 className="font-display font-semibold text-slate-900 text-xl">Overview</h2>
         </div>
         <Link
           to="/parents"
@@ -103,7 +124,7 @@ const MacSection: React.FC<MacSectionProps> = ({ data }) => {
         </Link>
       </div>
       <div className="p-6 space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {stats.map((stat) => (
             <div
               key={stat.label}
@@ -128,10 +149,110 @@ const MacSection: React.FC<MacSectionProps> = ({ data }) => {
             </div>
           ))}
         </div>
+        <BreakdownBar
+          title="Plan Breakdown"
+          total={data.totalAccounts}
+          segments={[
+            {
+              label: `Full`,
+              value: data.fullPlanCount,
+              gradient: `from-brand-violet to-brand-fuchsia`,
+            },
+            {
+              label: `Light`,
+              value: data.lightPlanCount,
+              gradient: `from-sky-400 to-blue-500`,
+            },
+            {
+              label: `Free`,
+              value: freeCount,
+              gradient: `from-slate-300 to-slate-400`,
+            },
+          ]}
+        />
         <div>
           <h3 className="font-display font-medium text-slate-900 mb-3">Recent Signups</h3>
-          <SignupGraph signups={data.recentSignups} />
+          <SignupGraph signups={signupItems} />
         </div>
+      </div>
+    </section>
+  );
+};
+
+interface MacSectionProps {
+  data: T.MacOverview.Output;
+}
+
+const MacSection: React.FC<MacSectionProps> = ({ data }) => {
+  const totalParents = data.activeParents + data.onboardedParents + data.noActionParents;
+  const stats = [
+    {
+      label: `Protected Children`,
+      value: data.childrenOfActiveParents.toLocaleString(),
+      highlight: true,
+    },
+    { label: `Active Parents`, value: data.activeParents.toLocaleString() },
+    { label: `All-Time Children`, value: data.allTimeChildren.toLocaleString() },
+    { label: `All-Time Installs`, value: data.allTimeAppInstallations.toLocaleString() },
+  ];
+
+  return (
+    <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
+      <div className="px-6 py-5 border-b border-slate-100">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+            <MonitorIcon className="w-5 h-5 text-white" />
+          </div>
+          <h2 className="font-display font-semibold text-slate-900 text-xl">Mac App</h2>
+        </div>
+      </div>
+      <div className="p-6 space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className={`rounded-xl p-4 ${
+                stat.highlight
+                  ? `bg-gradient-to-br from-amber-500 to-orange-600 text-white`
+                  : `bg-slate-50 border border-slate-100`
+              }`}
+            >
+              <div
+                className={`text-2xl font-display font-semibold ${
+                  stat.highlight ? `text-white` : `text-slate-900`
+                }`}
+              >
+                {stat.value}
+              </div>
+              <div
+                className={`text-sm mt-1 ${stat.highlight ? `text-white/80` : `text-slate-500`}`}
+              >
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+        <BreakdownBar
+          title="Parent Engagement"
+          total={totalParents}
+          segments={[
+            {
+              label: `Active`,
+              value: data.activeParents,
+              gradient: `from-amber-500 to-orange-600`,
+            },
+            {
+              label: `Installed`,
+              value: data.onboardedParents,
+              gradient: `from-sky-400 to-blue-500`,
+            },
+            {
+              label: `No Action`,
+              value: data.noActionParents,
+              gradient: `from-slate-300 to-slate-400`,
+            },
+          ]}
+        />
       </div>
     </section>
   );

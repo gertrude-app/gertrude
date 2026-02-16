@@ -14,4 +14,5 @@ export * from './pairs/PodcastInstallsList';
 export * from './pairs/PodcastOverview';
 export * from './pairs/RequestAdminMagicLink';
 export * from './pairs/SearchParentByEmail';
+export * from './pairs/SubscriptionsOverview';
 export * from './pairs/VerifyAdminMagicLink';

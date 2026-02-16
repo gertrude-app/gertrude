@@ -19,9 +19,7 @@ struct ParentData: Sendable {
   var numNonEmptyKeychains: Int
   var numNotifications: Int
   var childActivityCount: Int
-  // TODO: this name is weird, rename to monthlyPaidPriceCents?
-  // @see https://github.com/gertrude-app/gertrude/issues/478
-  var paidPrice: Cents<Int>?
+  var plan: Plan
   var hasGclid: Bool
   var createdAt: Date
 
@@ -33,7 +31,7 @@ struct ParentData: Sendable {
     self.numNonEmptyKeychains = 0
     self.numNotifications = 0
     self.childActivityCount = 0
-    self.paidPrice = Plan(subscription: subscription).monthlyPrice
+    self.plan = Plan(subscription: subscription)
     self.hasGclid = model.gclid != nil
     self.createdAt = model.createdAt
   }
@@ -132,8 +130,8 @@ struct AnalyticsData: Sendable {
         data.overview.childrenOfActiveParents += parent.numChildren
       }
       map[parent.id] = parent
-      if let paidPrice = parent.paidPrice {
-        totalAnnualCents += paidPrice * 12
+      if let monthlyPrice = parent.plan.monthlyPrice {
+        totalAnnualCents += monthlyPrice * 12
         data.overview.payingParents += 1
       }
     }
