@@ -59,6 +59,9 @@ enum ModelIdentifier {
   }
 
   private static let mapping: [String: String] = [
+    // iPhone Air (2025)
+    "iPhone18,4": "iPhone Air",
+
     // iPhone 17 series (2025)
     "iPhone18,1": "iPhone 17 Pro",
     "iPhone18,2": "iPhone 17 Pro Max",
@@ -114,9 +117,26 @@ enum ModelIdentifier {
     "iPhone10,5": "iPhone 8 Plus",
     "iPhone10,6": "iPhone X",
 
+    // iPhone 7 series (2016)
+    "iPhone9,1": "iPhone 7",
+    "iPhone9,2": "iPhone 7 Plus",
+    "iPhone9,3": "iPhone 7",
+    "iPhone9,4": "iPhone 7 Plus",
+
+    // iPhone 6s series (2015)
+    "iPhone8,1": "iPhone 6s",
+    "iPhone8,2": "iPhone 6s Plus",
+
     // iPhone SE
     "iPhone14,6": "iPhone SE (3rd gen)",
     "iPhone12,8": "iPhone SE (2nd gen)",
+    "iPhone8,4": "iPhone SE (1st gen)",
+
+    // iPad Pro M5 (2025)
+    "iPad17,3": "iPad Pro 11-inch (M5)",
+    "iPad17,4": "iPad Pro 11-inch (M5)",
+    "iPad17,5": "iPad Pro 13-inch (M5)",
+    "iPad17,6": "iPad Pro 13-inch (M5)",
 
     // iPad Pro M4 (2024)
     "iPad16,3": "iPad Pro 11-inch (M4)",
@@ -152,6 +172,42 @@ enum ModelIdentifier {
     "iPad13,10": "iPad Pro 12.9-inch (M1)",
     "iPad13,11": "iPad Pro 12.9-inch (M1)",
 
+    // iPad Pro 12.9-inch (4th gen, 2020)
+    "iPad8,11": "iPad Pro 12.9-inch (4th gen)",
+    "iPad8,12": "iPad Pro 12.9-inch (4th gen)",
+
+    // iPad Pro 11-inch (2nd gen, 2020)
+    "iPad8,9": "iPad Pro 11-inch (2nd gen)",
+    "iPad8,10": "iPad Pro 11-inch (2nd gen)",
+
+    // iPad Pro 12.9-inch (3rd gen, 2018)
+    "iPad8,5": "iPad Pro 12.9-inch (3rd gen)",
+    "iPad8,6": "iPad Pro 12.9-inch (3rd gen)",
+    "iPad8,7": "iPad Pro 12.9-inch (3rd gen)",
+    "iPad8,8": "iPad Pro 12.9-inch (3rd gen)",
+
+    // iPad Pro 11-inch (1st gen, 2018)
+    "iPad8,1": "iPad Pro 11-inch (1st gen)",
+    "iPad8,2": "iPad Pro 11-inch (1st gen)",
+    "iPad8,3": "iPad Pro 11-inch (1st gen)",
+    "iPad8,4": "iPad Pro 11-inch (1st gen)",
+
+    // iPad Pro 12.9-inch (2nd gen, 2017)
+    "iPad7,1": "iPad Pro 12.9-inch (2nd gen)",
+    "iPad7,2": "iPad Pro 12.9-inch (2nd gen)",
+
+    // iPad Pro 10.5-inch (2017)
+    "iPad7,3": "iPad Pro 10.5-inch",
+    "iPad7,4": "iPad Pro 10.5-inch",
+
+    // iPad Pro 12.9-inch (1st gen, 2015)
+    "iPad6,7": "iPad Pro 12.9-inch (1st gen)",
+    "iPad6,8": "iPad Pro 12.9-inch (1st gen)",
+
+    // iPad Pro 9.7-inch (2016)
+    "iPad6,3": "iPad Pro 9.7-inch",
+    "iPad6,4": "iPad Pro 9.7-inch",
+
     // iPad Air (5th gen, 2022)
     "iPad13,16": "iPad Air (5th gen)",
     "iPad13,17": "iPad Air (5th gen)",
@@ -164,6 +220,10 @@ enum ModelIdentifier {
     "iPad11,3": "iPad Air (3rd gen)",
     "iPad11,4": "iPad Air (3rd gen)",
 
+    // iPad Air 2 (2014)
+    "iPad5,3": "iPad Air 2",
+    "iPad5,4": "iPad Air 2",
+
     // iPad mini (7th gen, 2024)
     "iPad16,1": "iPad mini (7th gen)",
     "iPad16,2": "iPad mini (7th gen)",
@@ -175,6 +235,10 @@ enum ModelIdentifier {
     // iPad mini (5th gen, 2019)
     "iPad11,1": "iPad mini (5th gen)",
     "iPad11,2": "iPad mini (5th gen)",
+
+    // iPad mini 4 (2015)
+    "iPad5,1": "iPad mini 4",
+    "iPad5,2": "iPad mini 4",
 
     // iPad (11th gen, 2024)
     "iPad15,7": "iPad (11th gen)",
@@ -195,6 +259,14 @@ enum ModelIdentifier {
     // iPad (7th gen, 2019)
     "iPad7,11": "iPad (7th gen)",
     "iPad7,12": "iPad (7th gen)",
+
+    // iPad (6th gen, 2018)
+    "iPad7,5": "iPad (6th gen)",
+    "iPad7,6": "iPad (6th gen)",
+
+    // iPad (5th gen, 2017)
+    "iPad6,11": "iPad (5th gen)",
+    "iPad6,12": "iPad (5th gen)",
 
     // Legacy/unknown backfill values
     "iPhone,unknown": "iPhone",
