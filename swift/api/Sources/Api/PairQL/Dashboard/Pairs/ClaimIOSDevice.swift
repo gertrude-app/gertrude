@@ -92,6 +92,12 @@ extension ClaimIOSDevice: Resolver {
       iosVersion: device.iosVersion,
     ))
 
+    Task {
+      let email = context.parent.email.rawValue
+      await get(dependency: \.slack)
+        .internal(.info, "*iOS supervision:* code `\(input.code)` claimed by `\(email)`")
+    }
+
     return .init(
       childName: child.name,
       modelName: device.modelName,

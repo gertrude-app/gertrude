@@ -39,6 +39,11 @@ enum SupervisionToolDownloadRoute {
         modelIdentifier: device.modelIdentifier,
         iosVersion: device.iosVersion,
       ))
+      await get(dependency: \.slack)
+        .internal(
+          .info,
+          "*iOS supervision:* tool downloaded (\(platform.rawValue)), code `\(code)`",
+        )
     }
 
     if request.context.env.mode == .test {

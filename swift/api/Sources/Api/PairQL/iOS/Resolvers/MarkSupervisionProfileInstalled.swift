@@ -20,6 +20,22 @@ extension MarkSupervisionProfileInstalled: NoInputResolver {
         modelIdentifier: ctx.device.modelIdentifier,
         iosVersion: ctx.device.iosVersion,
       ))
+
+      Task {
+        let slack = get(dependency: \.slack)
+        let postmark = get(dependency: \.postmark)
+        let parent = try? await ctx.child.parent(in: ctx.db)
+        let email = parent?.email.rawValue ?? "unknown"
+        let code = supervision.claimCode
+        await slack.internal(
+          .info,
+          "*iOS supervision complete!* filter confirmed running, code `\(code)`, parent `\(email)`",
+        )
+        postmark.toSuperAdmin(
+          "iOS Supervision Complete",
+          "Supervision profile installed and filter confirmed running.<br/>Parent: \(email)<br/>Claim code: \(code)",
+        )
+      }
     }
 
     return .success

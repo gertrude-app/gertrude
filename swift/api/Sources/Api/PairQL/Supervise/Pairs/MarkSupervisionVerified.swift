@@ -37,6 +37,11 @@ extension MarkSupervisionVerified: Resolver {
       iosVersion: validated.device.iosVersion,
     ))
 
+    Task {
+      await get(dependency: \.slack)
+        .internal(.info, "*iOS supervision:* supervision verified from tool, code `\(input.code)`")
+    }
+
     return .success
   }
 }
