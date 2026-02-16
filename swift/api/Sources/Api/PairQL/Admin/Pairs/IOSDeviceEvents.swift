@@ -213,7 +213,7 @@ extension IOSDeviceEvents: Resolver {
     case "7d644b4d": "⬇ Dash: supervision tool downloaded"
     case "3b8f1e2c": "🔑 Supervision tool: code entered"
     case "86af13a9": "🔌 Supervision tool: device connected"
-    case "016d03db": "⚠ Supervision tool: device mismatch"
+    case "016d03db": "Supervision tool event"
     case "09748184": "✓ Supervision verified"
     case "1c6f6ca8": "✓ Supervision profile installed confirmed"
     case "80451da8": "✓ Self-reported supervision"
