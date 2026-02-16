@@ -48,6 +48,11 @@ extension CreateSupervisionClaimCode: Resolver {
         ))
       }
 
+      Task {
+        await get(dependency: \.slack)
+          .internal(.info, "*iOS supervision:* claim code `\(code)` created")
+      }
+
       return Output(code: code, expiresAt: supervision.claimCodeExpiresAt)
     }
 
