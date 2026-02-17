@@ -17,6 +17,15 @@ struct IOSDetailedStats: Pair {
     var funnelEvents: [EventCount]
     var dropoffEvents: [EventCount]
     var errorEvents: [EventCount]
+    var supervision: SupervisionStats
+  }
+
+  struct SupervisionStats: PairNestable {
+    var totalClaims: Int
+    var pendingClaim: Int
+    var claimed: Int
+    var supervised: Int
+    var complete: Int
   }
 
   struct DateRange: PairNestable {
@@ -159,6 +168,7 @@ extension IOSDetailedStats: NoInputResolver {
 
     let topRegions = try await context.db.customQuery(TopRegionsQuery.self)
     let topVersions = try await context.db.customQuery(TopVersionsQuery.self)
+    let supervisionCounts = try await context.db.customQuery(SupervisionStatusQuery.self)
 
     let dateRangeResult = try await context.db.customQuery(DateRangeQuery.self).first
 
@@ -322,6 +332,21 @@ extension IOSDetailedStats: NoInputResolver {
           count: self.distinctVendorCount(for: "004d0d89", in: context),
         ),
       ],
+      supervision: {
+        let lookup = Dictionary(uniqueKeysWithValues: supervisionCounts
+          .map { ($0.status, $0.count) })
+        let pending = lookup["pendingClaim"] ?? 0
+        let claimed = lookup["claimed"] ?? 0
+        let supervised = lookup["supervised"] ?? 0
+        let complete = lookup["complete"] ?? 0
+        return SupervisionStats(
+          totalClaims: pending + claimed + supervised + complete,
+          pendingClaim: pending,
+          claimed: claimed,
+          supervised: supervised,
+          complete: complete,
+        )
+      }(),
     )
   }
 
@@ -689,4 +714,27 @@ private struct DateRangeQuery: CustomQueryable {
 
   var minDate: Date
   var maxDate: Date
+}
+
+private struct SupervisionStatusQuery: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    let profileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
+    let supervisedAt = IOSApp.Supervision.columnName(.supervisedAt)
+    let claimedAt = IOSApp.Supervision.columnName(.claimedAt)
+    return SQL.Statement("""
+    SELECT
+      CASE
+        WHEN \(profileInstalledAt) IS NOT NULL THEN 'complete'
+        WHEN \(supervisedAt) IS NOT NULL THEN 'supervised'
+        WHEN \(claimedAt) IS NOT NULL THEN 'claimed'
+        ELSE 'pendingClaim'
+      END AS status,
+      COUNT(*) AS count
+    FROM \(table: IOSApp.Supervision.self)
+    GROUP BY status
+    """)
+  }
+
+  var status: String
+  var count: Int
 }

@@ -198,6 +198,93 @@ const IOSStats: React.FC = () => {
         </div>
       </Section>
 
+      <Section title="Supervision Pipeline">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+          <StatCard
+            label="Total Claims"
+            value={data.supervision.totalClaims}
+            highlight="blue"
+          />
+          <StatCard label="Pending Claim" value={data.supervision.pendingClaim} />
+          <StatCard label="Claimed" value={data.supervision.claimed} />
+          <StatCard label="Supervised" value={data.supervision.supervised} />
+          <StatCard label="Complete" value={data.supervision.complete} />
+        </div>
+        {data.supervision.totalClaims > 0 && (
+          <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
+            <div className="flex justify-between items-baseline mb-3">
+              <h3 className="font-display font-medium text-slate-900">Pipeline Status</h3>
+              <span className="text-sm text-slate-500">
+                {data.supervision.totalClaims.toLocaleString()} total
+              </span>
+            </div>
+            <div className="h-6 bg-slate-200 rounded-full overflow-hidden flex">
+              {[
+                {
+                  value: data.supervision.pendingClaim,
+                  gradient: `from-slate-300 to-slate-400`,
+                },
+                {
+                  value: data.supervision.claimed,
+                  gradient: `from-amber-400 to-orange-500`,
+                },
+                {
+                  value: data.supervision.supervised,
+                  gradient: `from-sky-400 to-blue-500`,
+                },
+                {
+                  value: data.supervision.complete,
+                  gradient: `from-emerald-400 to-green-500`,
+                },
+              ].map((seg) => {
+                const pct = (seg.value / data.supervision.totalClaims) * 100;
+                return pct > 0 ? (
+                  <div
+                    key={seg.gradient}
+                    className={`h-full bg-gradient-to-r ${seg.gradient}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                ) : null;
+              })}
+            </div>
+            <div className="flex flex-wrap gap-x-6 gap-y-1 mt-3 text-sm">
+              {[
+                {
+                  label: `Pending Claim`,
+                  value: data.supervision.pendingClaim,
+                  gradient: `from-slate-300 to-slate-400`,
+                },
+                {
+                  label: `Claimed`,
+                  value: data.supervision.claimed,
+                  gradient: `from-amber-400 to-orange-500`,
+                },
+                {
+                  label: `Supervised`,
+                  value: data.supervision.supervised,
+                  gradient: `from-sky-400 to-blue-500`,
+                },
+                {
+                  label: `Complete`,
+                  value: data.supervision.complete,
+                  gradient: `from-emerald-400 to-green-500`,
+                },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded-full bg-gradient-to-r ${item.gradient}`}
+                  />
+                  <span className="text-slate-600">
+                    {item.label} ({item.value.toLocaleString()} ·{` `}
+                    {((item.value / data.supervision.totalClaims) * 100).toFixed(1)}%)
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </Section>
+
       <Section title="18+ Account Impact">
         <div className="grid grid-cols-3 gap-4 mb-4">
           <StatCard
