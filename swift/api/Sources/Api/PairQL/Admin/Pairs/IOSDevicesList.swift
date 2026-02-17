@@ -19,10 +19,11 @@ struct IOSDevicesList: Pair {
   struct DeviceSummary: PairNestable {
     var vendorId: UUID
     var deviceType: String
+    var modelName: String
     var iosVersion: String
     var firstLaunch: Date
     var eventCount: Int
-    var reachedOptOut: Bool
+    var status: String
   }
 }
 
@@ -45,10 +46,11 @@ extension IOSDevicesList: Resolver {
         DeviceSummary(
           vendorId: row.deviceId,
           deviceType: ModelIdentifier.deviceType(from: row.modelIdentifier),
+          modelName: ModelIdentifier.marketingName(for: row.modelIdentifier),
           iosVersion: row.iosVersion,
           firstLaunch: row.firstLaunch,
           eventCount: row.eventCount,
-          reachedOptOut: row.reachedOptOut,
+          status: row.status,
         )
       },
       totalCount: totalCount,
@@ -78,39 +80,60 @@ private struct DeviceSummaryQuery: CustomQueryable {
     }
     let limit = bindings[0]
     let offset = bindings[1]
-    let deviceId = IOSEvent.columnName(.deviceId)
-    let modelIdentifier = IOSEvent.columnName(.modelIdentifier)
-    let iosVersion = IOSEvent.columnName(.iosVersion)
-    let createdAt = IOSEvent.columnName(.createdAt)
-    let eventId = IOSEvent.columnName(.eventId)
+    let eDeviceId = IOSEvent.columnName(.deviceId)
+    let eModelId = IOSEvent.columnName(.modelIdentifier)
+    let eIosVer = IOSEvent.columnName(.iosVersion)
+    let eCreatedAt = IOSEvent.columnName(.createdAt)
+    let eEventId = IOSEvent.columnName(.eventId)
+    let dId = IOSApp.Device.columnName(.id)
+    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
+    let sId = IOSApp.Supervision.columnName(.id)
+    let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
+    let sSupervisedAt = IOSApp.Supervision.columnName(.supervisedAt)
+    let sClaimedAt = IOSApp.Supervision.columnName(.claimedAt)
     var stmt = SQL.Statement("""
     SELECT
-      first_launch.device_id,
-      first_launch.model_identifier,
-      first_launch.ios_version,
-      first_launch.created_at AS first_launch,
-      event_counts.event_count,
-      CASE WHEN opt_out.device_id IS NOT NULL THEN true ELSE false END AS reached_opt_out
+      fl.\(eDeviceId),
+      fl.\(eModelId),
+      fl.\(eIosVer),
+      fl.\(eCreatedAt) AS first_launch,
+      ec.event_count,
+      CASE
+        WHEN s.\(sProfileInstalledAt) IS NOT NULL THEN 'supervised'
+        WHEN s.\(sSupervisedAt) IS NOT NULL THEN 'missingProfile'
+        WHEN s.\(sClaimedAt) IS NOT NULL THEN 'claimed'
+        WHEN s.\(sId) IS NOT NULL THEN 'pendingClaim'
+        WHEN st.\(eDeviceId) IS NOT NULL THEN 'screenTime'
+        WHEN oo.\(eDeviceId) IS NOT NULL THEN 'complete'
+        ELSE 'incomplete'
+      END AS status
     FROM (
-      SELECT DISTINCT ON (\(deviceId))
-        \(deviceId), \(modelIdentifier), \(iosVersion), \(createdAt)
+      SELECT DISTINCT ON (\(eDeviceId))
+        \(eDeviceId), \(eModelId), \(eIosVer), \(eCreatedAt)
       FROM \(table: IOSEvent.self)
-      WHERE \(deviceId) IS NOT NULL
-        AND \(eventId) = '8d35f043'
-      ORDER BY \(deviceId), \(createdAt) ASC
-    ) first_launch
+      WHERE \(eDeviceId) IS NOT NULL
+        AND \(eEventId) = '8d35f043'
+      ORDER BY \(eDeviceId), \(eCreatedAt) ASC
+    ) fl
     LEFT JOIN (
-      SELECT \(deviceId), COUNT(*) AS event_count
+      SELECT \(eDeviceId), COUNT(*) AS event_count
       FROM \(table: IOSEvent.self)
-      WHERE \(deviceId) IS NOT NULL
-      GROUP BY \(deviceId)
-    ) event_counts ON first_launch.device_id = event_counts.device_id
+      WHERE \(eDeviceId) IS NOT NULL
+      GROUP BY \(eDeviceId)
+    ) ec ON fl.\(eDeviceId) = ec.\(eDeviceId)
     LEFT JOIN (
-      SELECT DISTINCT \(deviceId)
+      SELECT DISTINCT \(eDeviceId)
       FROM \(table: IOSEvent.self)
-      WHERE \(eventId) = 'cdb31095'
-    ) opt_out ON first_launch.device_id = opt_out.device_id
-    ORDER BY first_launch.created_at DESC
+      WHERE \(eEventId) = 'cdb31095'
+    ) oo ON fl.\(eDeviceId) = oo.\(eDeviceId)
+    LEFT JOIN \(table: IOSApp.Device.self) d ON d.\(dId) = fl.\(eDeviceId)
+    LEFT JOIN \(table: IOSApp.Supervision.self) s ON s.\(sDeviceId) = d.\(dId)
+    LEFT JOIN (
+      SELECT DISTINCT \(eDeviceId)
+      FROM \(table: IOSEvent.self)
+      WHERE \(eEventId) = '4a0c585f'
+    ) st ON fl.\(eDeviceId) = st.\(eDeviceId)
+    ORDER BY fl.\(eCreatedAt) DESC
     LIMIT\(" ")
     """)
     stmt.components.append(.binding(limit))
@@ -124,5 +147,5 @@ private struct DeviceSummaryQuery: CustomQueryable {
   var iosVersion: String
   var firstLaunch: Date
   var eventCount: Int
-  var reachedOptOut: Bool
+  var status: String
 }

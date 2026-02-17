@@ -110,6 +110,16 @@ export default class AdminClient extends Client<Auth> {
     );
   };
 
+  public subscriptionsOverview = (
+    input: P.SubscriptionsOverview.Input,
+  ): Promise<Result<P.SubscriptionsOverview.Output>> => {
+    return this.query<P.SubscriptionsOverview.Output>(
+      input,
+      `SubscriptionsOverview`,
+      `superAdmin`,
+    );
+  };
+
   public verifyAdminMagicLink = (
     input: P.VerifyAdminMagicLink.Input,
   ): Promise<Result<P.VerifyAdminMagicLink.Output>> => {

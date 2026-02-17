@@ -15,9 +15,7 @@ struct ParentDetail: Pair {
     var id: Parent.Id
     var email: String
     var status: String
-    var plan: String
-    var billingStatus: String?
-    var stripeSubscriptionId: String?
+    var plan: Plan
     var createdAt: Date
     var children: [ChildOutput]
     var keychains: [KeychainOutput]
@@ -31,7 +29,18 @@ struct ParentDetail: Pair {
     var screenshotsEnabled: Bool
     var createdAt: Date
     var installations: [InstallationOutput]
+    var iosDevices: [IOSDeviceOutput]
     var keychains: [ChildKeychainOutput]
+  }
+
+  struct IOSDeviceOutput: PairNestable {
+    var id: IOSApp.Device.Id
+    var modelName: String
+    var modelIdentifier: String
+    var iosVersion: String
+    var appVersion: String
+    var supervisionStatus: String?
+    var createdAt: Date
   }
 
   struct ChildKeychainOutput: PairNestable {
@@ -104,6 +113,21 @@ extension ParentDetail: Resolver {
         ))
       }
 
+      let devices = try await child.iosDevices(in: context.db)
+      var iosDeviceOutputs: [IOSDeviceOutput] = []
+      for device in devices {
+        let supervision = try await device.supervision(in: context.db)
+        iosDeviceOutputs.append(IOSDeviceOutput(
+          id: device.id,
+          modelName: device.modelName,
+          modelIdentifier: device.modelIdentifier,
+          iosVersion: device.iosVersion,
+          appVersion: device.appVersion,
+          supervisionStatus: supervision?.status.rawValue,
+          createdAt: device.createdAt,
+        ))
+      }
+
       let childKeychains = try await child.keychains(in: context.db)
       var childKeychainOutputs: [ChildKeychainOutput] = []
       for keychain in childKeychains {
@@ -125,6 +149,7 @@ extension ParentDetail: Resolver {
         screenshotsEnabled: child.screenshotsEnabled,
         createdAt: child.createdAt,
         installations: installations,
+        iosDevices: iosDeviceOutputs,
         keychains: childKeychainOutputs,
       ))
     }
@@ -154,57 +179,15 @@ extension ParentDetail: Resolver {
     let parentData = analyticsData.parents[parent.id]
     let status = parentData?.status.rawValue ?? "unknown"
 
-    // TODO: maybe better in the future to send the full Plan enum and let client handle display
-    // @see https://github.com/gertrude-app/gertrude/issues/478
-    let (plan, billingStatus) = Plan(subscription: parent.subscription).displayStrings
-
     return .init(
       id: parent.id,
       email: parent.email.rawValue,
       status: status,
-      plan: plan,
-      billingStatus: billingStatus,
-      stripeSubscriptionId: parent.subscription?.stripeId?.rawValue,
+      plan: Plan(subscription: parent.subscription),
       createdAt: parent.createdAt,
       children: childOutputs,
       keychains: keychainOutputs,
       notifications: notificationOutputs,
     )
-  }
-}
-
-private extension Plan {
-  var displayStrings: (plan: String, billingStatus: String?) {
-    switch self {
-    case .free(let kind):
-      switch kind {
-      case .standard:
-        ("free", nil)
-      case .lapsedLight:
-        ("free (lapsed light)", "unpaid")
-      case .lapsedFull:
-        ("free (lapsed full)", "unpaid")
-      }
-    case .light(let status):
-      switch status {
-      case .paid:
-        ("light", "paid")
-      case .overdue:
-        ("light", "overdue")
-      }
-    case .full(let status):
-      switch status {
-      case .complimentary:
-        ("complimentary", nil)
-      case .trialing:
-        ("full", "trialing")
-      case .trialExpired:
-        ("full", "trial expired")
-      case .paid:
-        ("full", "paid")
-      case .overdue:
-        ("full", "overdue")
-      }
-    }
   }
 }

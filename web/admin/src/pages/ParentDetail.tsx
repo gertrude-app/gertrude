@@ -12,6 +12,7 @@ import {
   KeyIcon,
   LoadingSpinner,
   MonitorIcon,
+  SmartphoneIcon,
   TrashIcon,
   UserIcon,
   UsersIcon,
@@ -19,6 +20,8 @@ import {
 } from '../components/Icons';
 import LoadingState from '../components/LoadingState';
 import { formatDate, unCamelCase } from '../lib/format';
+
+type Plan = T.ParentDetail.Output[`plan`];
 
 const ParentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -99,30 +102,37 @@ const ParentDetail: React.FC = () => {
               </div>
             </div>
           </div>
-          <StatusBadge status={data.status} size="md" />
+          <div className="flex items-center gap-2">
+            <IOSBadge children={data.children} />
+            <StatusBadge status={data.status} size="md" />
+          </div>
         </div>
 
         <div className="p-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <InfoCard label="Plan" value={data.plan} highlight />
-            <InfoCard label="Billing Status" value={data.billingStatus ?? `—`} />
+            <PlanCard plan={data.plan} />
+            <InfoCard label="Billing" value={planBillingLabel(data.plan)} />
             <InfoCard label="Children" value={data.children.length.toString()} />
             <InfoCard label="Created" value={formatDate(data.createdAt)} />
           </div>
 
-          {data.stripeSubscriptionId && (
-            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-              <span className="text-sm text-slate-500">Stripe ID: </span>
-              <a
-                href={`https://dashboard.stripe.com/acct_1L8TXdGKRdhETuKA/subscriptions/${data.stripeSubscriptionId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-mono text-brand-violet hover:text-brand-fuchsia transition-colors"
-              >
-                {data.stripeSubscriptionId}
-              </a>
-            </div>
-          )}
+          {(() => {
+            const stripeId = extractStripeId(data.plan);
+            if (!stripeId) return null;
+            return (
+              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <span className="text-sm text-slate-500">Stripe: </span>
+                <a
+                  href={`https://dashboard.stripe.com/acct_1L8TXdGKRdhETuKA/subscriptions/${stripeId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-mono text-brand-violet hover:text-brand-fuchsia transition-colors"
+                >
+                  {stripeId}
+                </a>
+              </div>
+            );
+          })()}
         </div>
       </div>
 
@@ -218,6 +228,58 @@ const ParentDetail: React.FC = () => {
                                 {install.osVersion && (
                                   <span>macOS {install.osVersion}</span>
                                 )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {child.iosDevices.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <SmartphoneIcon className="w-4 h-4 text-slate-400" />
+                        <h4 className="text-sm font-medium text-slate-700">
+                          iOS devices ({child.iosDevices.length})
+                        </h4>
+                      </div>
+                      <div className="grid gap-2">
+                        {child.iosDevices.map((device) => (
+                          <div
+                            key={device.id}
+                            className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex gap-4"
+                          >
+                            <div className="flex-shrink-0 w-20 h-20 bg-white rounded-lg border border-slate-200 flex items-center justify-center p-2">
+                              <img
+                                src={`https://parents.gertrude.app/ios/${device.modelIdentifier.startsWith(`iPad`) ? `iPad` : `iPhone`}.png`}
+                                alt={device.modelName}
+                                className="max-w-full max-h-full object-contain"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = `none`;
+                                }}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between items-start gap-2">
+                                <span className="font-medium text-slate-900">
+                                  {device.modelName}
+                                </span>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  {device.supervisionStatus && (
+                                    <SupervisionBadge status={device.supervisionStatus} />
+                                  )}
+                                  <span className="text-xs text-slate-400">
+                                    {formatDate(device.createdAt)}
+                                  </span>
+                                </div>
+                              </div>
+                              <p className="text-xs text-slate-400 font-mono mt-0.5">
+                                {device.modelIdentifier}
+                              </p>
+                              <div className="text-sm text-slate-600 mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                                <span>App v{device.appVersion}</span>
+                                <span>iOS {device.iosVersion}</span>
                               </div>
                             </div>
                           </div>
@@ -485,28 +547,176 @@ const ParentDetail: React.FC = () => {
 interface InfoCardProps {
   label: string;
   value: string;
-  highlight?: boolean;
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({ label, value, highlight = false }) => (
-  <div
-    className={`rounded-xl p-4 ${
-      highlight
-        ? `bg-gradient-to-br from-brand-violet to-brand-fuchsia text-white`
-        : `bg-slate-50 border border-slate-100`
-    }`}
-  >
-    <div className={`text-sm ${highlight ? `text-white/80` : `text-slate-500`}`}>
-      {label}
-    </div>
-    <div
-      className={`text-lg font-display font-semibold mt-1 ${
-        highlight ? `text-white` : `text-slate-900`
-      }`}
-    >
-      {value}
-    </div>
+const InfoCard: React.FC<InfoCardProps> = ({ label, value }) => (
+  <div className="rounded-xl p-4 bg-slate-50 border border-slate-100">
+    <div className="text-sm text-slate-500">{label}</div>
+    <div className="text-lg font-display font-semibold mt-1 text-slate-900">{value}</div>
   </div>
 );
+
+const PLAN_TIER_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
+  full: { label: `Full`, bg: `from-brand-violet to-brand-fuchsia`, text: `text-white` },
+  light: { label: `Light`, bg: `from-sky-400 to-blue-500`, text: `text-white` },
+  free: { label: `Free`, bg: `from-slate-300 to-slate-400`, text: `text-white` },
+};
+
+function planBillingLabel(plan: Plan): string {
+  if (plan.case === `free`) {
+    switch (plan.kind.case) {
+      case `standard`:
+        return `No subscription`;
+      case `lapsedLight`:
+        return `Lapsed (was Light)`;
+      case `lapsedFull`:
+        return `Lapsed (was Full)`;
+    }
+  } else if (plan.case === `light`) {
+    switch (plan.status.case) {
+      case `paid`:
+        return `Paid — $10/yr`;
+      case `overdue`:
+        return `Overdue`;
+    }
+  } else {
+    switch (plan.status.case) {
+      case `complimentary`:
+        return `Complimentary`;
+      case `trialing`:
+        return `Trial — ends ${formatDate(plan.status.until)}`;
+      case `trialExpired`:
+        return `Trial expired`;
+      case `paid`:
+        return `Paid — $${plan.status.monthlyPriceInCents / 100}/mo`;
+      case `overdue`:
+        return `Overdue — $${plan.status.monthlyPriceInCents / 100}/mo`;
+    }
+  }
+}
+
+function extractStripeId(plan: Plan): string | null {
+  if (plan.case === `free`) {
+    if (plan.kind.case === `lapsedLight` || plan.kind.case === `lapsedFull`) {
+      return plan.kind.stripeId ?? null;
+    }
+    return null;
+  } else if (plan.case === `light`) {
+    return plan.status.stripeId;
+  } else {
+    switch (plan.status.case) {
+      case `paid`:
+      case `overdue`:
+        return plan.status.stripeId;
+      case `trialing`:
+        return plan.status.kind.case === `fromLight` ? plan.status.kind.stripeId : null;
+      case `trialExpired`:
+        return plan.status.kind.case === `fromLight` ? plan.status.kind.stripeId : null;
+      default:
+        return null;
+    }
+  }
+}
+
+const PlanCard: React.FC<{ plan: Plan }> = ({ plan }) => {
+  const fallback = {
+    label: `Free`,
+    bg: `from-slate-300 to-slate-400`,
+    text: `text-white`,
+  };
+  const tier = PLAN_TIER_CONFIG[plan.case] ?? fallback;
+  return (
+    <div className={`rounded-xl p-4 bg-gradient-to-br ${tier.bg} ${tier.text}`}>
+      <div className="text-sm opacity-80">Plan</div>
+      <div className="text-lg font-display font-semibold mt-1">{tier.label}</div>
+    </div>
+  );
+};
+
+const SUPERVISION_CONFIG: Record<
+  string,
+  { label: string; bg: string; text: string; ring: string }
+> = {
+  complete: {
+    label: `Supervised`,
+    bg: `bg-emerald-50`,
+    text: `text-emerald-700`,
+    ring: `ring-emerald-600/20`,
+  },
+  supervised: {
+    label: `Missing Profile`,
+    bg: `bg-amber-50`,
+    text: `text-amber-700`,
+    ring: `ring-amber-600/20`,
+  },
+  claimed: {
+    label: `Claimed`,
+    bg: `bg-amber-50`,
+    text: `text-amber-700`,
+    ring: `ring-amber-600/20`,
+  },
+  pendingClaim: {
+    label: `Pending Claim`,
+    bg: `bg-slate-100`,
+    text: `text-slate-600`,
+    ring: `ring-slate-500/20`,
+  },
+};
+
+const SupervisionBadge: React.FC<{ status: string }> = ({ status }) => {
+  const config = SUPERVISION_CONFIG[status] ?? {
+    label: status,
+    bg: `bg-slate-100`,
+    text: `text-slate-600`,
+    ring: `ring-slate-500/20`,
+  };
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${config.bg} ${config.text} ring-1 ring-inset ${config.ring}`}
+    >
+      {config.label}
+    </span>
+  );
+};
+
+function iosStatus(
+  children: T.ParentDetail.Output[`children`],
+): { label: string; style: string } | null {
+  const devices = children.flatMap((c) => c.iosDevices);
+  if (devices.length === 0) return null;
+  const statuses = devices.map((d) => d.supervisionStatus).filter(Boolean);
+  if (statuses.includes(`complete`))
+    return {
+      label: `iOS: Supervised`,
+      style: `bg-emerald-50 text-emerald-700 ring-emerald-600/20`,
+    };
+  if (
+    statuses.includes(`supervised`) ||
+    statuses.includes(`claimed`) ||
+    statuses.includes(`pendingClaim`)
+  )
+    return {
+      label: `iOS: Pending`,
+      style: `bg-amber-50 text-amber-700 ring-amber-600/20`,
+    };
+  return {
+    label: `iOS: Connected`,
+    style: `bg-teal-50 text-teal-700 ring-teal-600/20`,
+  };
+}
+
+const IOSBadge: React.FC<{ children: T.ParentDetail.Output[`children`] }> = ({
+  children,
+}) => {
+  const info = iosStatus(children);
+  if (!info) return null;
+  return (
+    <span
+      className={`inline-flex items-center px-3 py-1.5 text-sm rounded-lg font-medium ring-1 ring-inset ${info.style}`}
+    >
+      {info.label}
+    </span>
+  );
+};
 
 export default ParentDetail;

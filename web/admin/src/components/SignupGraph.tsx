@@ -24,8 +24,8 @@ const SignupGraph: React.FC<SignupGraphProps> = ({ signups }) => {
       itemLabel="new signup"
       gradient="violet"
       statusConfig={{
-        isSuccess: (status) => status === `active`,
-        isWarning: (status) => status === `onboarded`,
+        isSuccess: (status) => status === `full`,
+        isWarning: (status) => status === `light`,
       }}
     />
   );

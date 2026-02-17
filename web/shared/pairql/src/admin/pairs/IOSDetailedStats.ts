@@ -104,5 +104,12 @@ export namespace IOSDetailedStats {
       name: string;
       count: number;
     }>;
+    supervision: {
+      totalClaims: number;
+      pendingClaim: number;
+      claimed: number;
+      supervised: number;
+      complete: number;
+    };
   }
 }

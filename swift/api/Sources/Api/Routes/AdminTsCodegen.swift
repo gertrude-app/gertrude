@@ -20,6 +20,7 @@ enum AdminTsCodegenRoute {
       ("ClientAuth", ClientAuth.self),
       ("DeviceModelFamily", DeviceModelFamily.self),
       ("GertrudeApp", AppStore.GertrudeApp.self),
+      ("Plan", Plan.self),
     ]
   }
 
@@ -27,6 +28,7 @@ enum AdminTsCodegenRoute {
     [
       RequestAdminMagicLink.self,
       VerifyAdminMagicLink.self,
+      SubscriptionsOverview.self,
       MacOverview.self,
       IOSOverview.self,
       IOSDetailedStats.self,
@@ -49,6 +51,7 @@ enum AdminTsCodegenRoute {
     var sharedAliases: [Config.Alias] = [
       .init(NoInput.self, as: "void"),
       .init(Date.self, as: "ISODateString"),
+      .init(Subscription.StripeId.self, as: "string"),
     ]
     var config = Config(compact: true, aliasing: sharedAliases)
 

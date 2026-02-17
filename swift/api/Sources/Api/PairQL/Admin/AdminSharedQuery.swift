@@ -18,10 +18,9 @@ struct ParentData: Sendable {
   var numChildren: Int
   var numNonEmptyKeychains: Int
   var numNotifications: Int
+  var numIOSDevices: Int
   var childActivityCount: Int
-  // TODO: this name is weird, rename to monthlyPaidPriceCents?
-  // @see https://github.com/gertrude-app/gertrude/issues/478
-  var paidPrice: Cents<Int>?
+  var plan: Plan
   var hasGclid: Bool
   var createdAt: Date
 
@@ -32,8 +31,9 @@ struct ParentData: Sendable {
     self.numChildren = 0
     self.numNonEmptyKeychains = 0
     self.numNotifications = 0
+    self.numIOSDevices = 0
     self.childActivityCount = 0
-    self.paidPrice = Plan(subscription: subscription).monthlyPrice
+    self.plan = Plan(subscription: subscription)
     self.hasGclid = model.gclid != nil
     self.createdAt = model.createdAt
   }
@@ -102,6 +102,11 @@ struct AnalyticsData: Sendable {
       map[row.parentId] = row.computerUserCount
     }
 
+    let iosDeviceCount = try await self.db.customQuery(IOSDeviceCount.self)
+    let iosDeviceMap: [Parent.Id: Int] = iosDeviceCount.reduce(into: [:]) { map, row in
+      map[row.parentId] = row.iosDeviceCount
+    }
+
     let activityCounts = try await self.db.customQuery(ActivityCounts.self)
     let activityMap: [Parent.Id: Int] = activityCounts.reduce(into: [:]) { map, row in
       map[row.parentId] = row.screenshotCount + row.keystrokeLineCount
@@ -126,14 +131,15 @@ struct AnalyticsData: Sendable {
       parent.numChildren = childMap[model.id] ?? 0
       parent.numNotifications = notificationsMap[model.id] ?? 0
       parent.numComputerUsers = computerUserMap[model.id] ?? 0
+      parent.numIOSDevices = iosDeviceMap[model.id] ?? 0
       parent.childActivityCount = activityMap[model.id] ?? 0
       if parent.isActive {
         data.overview.activeParents += 1
         data.overview.childrenOfActiveParents += parent.numChildren
       }
       map[parent.id] = parent
-      if let paidPrice = parent.paidPrice {
-        totalAnnualCents += paidPrice * 12
+      if let monthlyPrice = parent.plan.monthlyPrice {
+        totalAnnualCents += monthlyPrice * 12
         data.overview.payingParents += 1
       }
     }
@@ -267,4 +273,20 @@ struct ActivityCounts: CustomQueryable {
   var parentId: Parent.Id
   var screenshotCount: Int
   var keystrokeLineCount: Int
+}
+
+struct IOSDeviceCount: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    .init("""
+    SELECT c.\(Child.columnName(.parentId)) AS parent_id,
+           COUNT(DISTINCT d.id)::int AS ios_device_count
+    FROM \(table: Child.self) c
+    JOIN \(table: IOSApp.Device.self) d
+      ON d.\(IOSApp.Device.columnName(.childId)) = c.id
+    GROUP BY c.\(Child.columnName(.parentId));
+    """)
+  }
+
+  var parentId: Parent.Id
+  var iosDeviceCount: Int
 }

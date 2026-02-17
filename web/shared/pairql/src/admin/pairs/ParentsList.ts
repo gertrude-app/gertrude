@@ -10,11 +10,12 @@ export namespace ParentsList {
       id: UUID;
       email: string;
       createdAt: ISODateString;
+      planCase: string;
       subscriptionStatus: string;
       numChildren: number;
-      numKeychains: number;
-      numNotifications: number;
-      status: string;
+      macDeviceCount: number;
+      iosDeviceCount: number;
+      macAppStatus: string;
     }>;
     totalCount: number;
     page: number;

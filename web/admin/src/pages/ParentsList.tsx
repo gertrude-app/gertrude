@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
-import { StatusBadge, SubscriptionBadge } from '../components/Badge';
+import { PlanBadge, StatusBadge } from '../components/Badge';
 import ErrorState from '../components/ErrorState';
 import { UsersIcon } from '../components/Icons';
 import LoadingState from '../components/LoadingState';
@@ -145,19 +145,19 @@ const ParentsList: React.FC = () => {
                 Email
               </th>
               <th className="text-left px-5 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Status
+                Plan
               </th>
               <th className="text-left px-5 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Subscription
+                Mac App
               </th>
               <th className="text-center px-5 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Kids
               </th>
               <th className="text-center px-5 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Keys
+                Mac
               </th>
               <th className="text-center px-5 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Notifs
+                iOS
               </th>
               <th className="text-left px-5 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Created
@@ -177,10 +177,13 @@ const ParentsList: React.FC = () => {
                   </span>
                 </td>
                 <td className="px-5 py-4">
-                  <StatusBadge status={parent.status} />
+                  <PlanBadge
+                    planCase={parent.planCase}
+                    status={parent.subscriptionStatus}
+                  />
                 </td>
                 <td className="px-5 py-4">
-                  <SubscriptionBadge status={parent.subscriptionStatus} />
+                  <StatusBadge status={parent.macAppStatus} />
                 </td>
                 <td className="px-5 py-4 text-center">
                   <span
@@ -196,23 +199,23 @@ const ParentsList: React.FC = () => {
                 <td className="px-5 py-4 text-center">
                   <span
                     className={`inline-flex items-center justify-center w-7 h-7 rounded-lg text-sm font-medium ${
-                      parent.numKeychains > 0
-                        ? `bg-violet-100 text-violet-700`
+                      parent.macDeviceCount > 0
+                        ? `bg-amber-100 text-amber-700`
                         : `bg-slate-100 text-slate-400`
                     }`}
                   >
-                    {parent.numKeychains}
+                    {parent.macDeviceCount}
                   </span>
                 </td>
                 <td className="px-5 py-4 text-center">
                   <span
                     className={`inline-flex items-center justify-center w-7 h-7 rounded-lg text-sm font-medium ${
-                      parent.numNotifications > 0
-                        ? `bg-emerald-100 text-emerald-700`
+                      parent.iosDeviceCount > 0
+                        ? `bg-teal-100 text-teal-700`
                         : `bg-slate-100 text-slate-400`
                     }`}
                   >
-                    {parent.numNotifications}
+                    {parent.iosDeviceCount}
                   </span>
                 </td>
                 <td className="px-5 py-4 text-sm text-slate-500">
