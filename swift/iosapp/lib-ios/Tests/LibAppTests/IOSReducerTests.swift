@@ -109,6 +109,10 @@ final class IOSReducerTests: XCTestCase {
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.happyPath(.explainPermissionDependsOnAge))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.happyPath(.confirmMinorDevice))
     }
 
@@ -606,7 +610,7 @@ final class IOSReducerTests: XCTestCase {
     var onboarding = IOSReducer.State.OnboardingState()
     onboarding.connectFeature = .init(isEnabled: false, releasedAppStoreVersion: "1.6.2")
     let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.happyPath(.confirmMinorDevice)),
+      screen: .onboarding(.happyPath(.explainPermissionDependsOnAge)),
       onboarding: onboarding,
     )) {
       IOSReducer()
@@ -614,9 +618,15 @@ final class IOSReducerTests: XCTestCase {
       $0.device.installedVersion = { "1.7.0" }
     }
 
-    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
-      $0.screen = .onboarding(.mdmSupervisionExplainer)
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.happyPath(.confirmMinorDevice))
     }
+
+    await store
+      .send(.interactive(.onboardingBtnTapped(.secondary, ""))) { // <-- over 18, build ahead
+        $0.screen = .onboarding(.mdmSupervisionExplainer)
+      }
+
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.happyPath(.hiThere))
     }
