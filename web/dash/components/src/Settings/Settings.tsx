@@ -384,8 +384,11 @@ function manageSubscriptionText(
       if (plan.case === `free`) {
         switch (plan.kind.case) {
           case `lapsedLight`:
-          case `lapsedFull`:
             return `Reactivate subscription...`;
+          case `lapsedFull`:
+            return plan.kind.stripeId
+              ? `Reactivate subscription...`
+              : `Start subscription...`;
           case `standard`:
             return `Upgrade plan...`;
         }

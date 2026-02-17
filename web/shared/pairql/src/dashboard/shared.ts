@@ -141,7 +141,7 @@ export type Plan =
       case: `free`;
       kind:
         | { case: `lapsedLight`; stripeId: string; hasTrialedFull: boolean }
-        | { case: `lapsedFull`; stripeId: string }
+        | { case: `lapsedFull`; stripeId?: string }
         | { case: `standard` };
     }
   | {
