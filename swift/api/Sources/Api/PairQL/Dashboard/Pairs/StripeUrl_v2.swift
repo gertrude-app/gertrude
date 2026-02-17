@@ -56,8 +56,16 @@ extension StripeUrl_v2: Resolver {
         ))
       }
       switch kind {
-      case .lapsedFull(let stripeId):
+      case .lapsedFull(.some(let stripeId)):
         return try await .init(url: billingPortalSessionUrl(for: stripeId))
+      case .lapsedFull(nil):
+        return try await .init(url: checkoutSessionUrl(
+          tier: .full,
+          successPath: input.successPath,
+          cancelPath: input.cancelPath,
+          iosDeviceId: input.associatedIosDeviceId,
+          in: context,
+        ))
       case .lapsedLight(let stripeId, _):
         return try await .init(url: billingPortalSessionUrl(for: stripeId))
       case .standard:

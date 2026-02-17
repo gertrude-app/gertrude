@@ -563,7 +563,7 @@ extension Plan.FreeKind {
 
   private struct _CaseLapsedFull: Codable {
     var `case` = "lapsedFull"
-    var stripeId: Tagged<Api.Subscription, Swift.String>
+    var stripeId: Tagged<Api.Subscription, Swift.String>?
   }
 
   func encode(to encoder: Encoder) throws {

@@ -33,7 +33,7 @@ extension Plan {
   enum FreeKind: Equatable, Sendable, Codable {
     case standard
     case lapsedLight(stripeId: Subscription.StripeId, hasTrialedFull: Bool)
-    case lapsedFull(stripeId: Subscription.StripeId)
+    case lapsedFull(stripeId: Subscription.StripeId?)
   }
 
   enum Full {
@@ -133,7 +133,7 @@ extension Plan {
       case (.overdue, nil):
         fatalError("invariant 30dd51e1, id: \(subscription.id)")
       case (.unpaid, nil):
-        self = .free(kind: .standard)
+        self = .free(kind: .lapsedFull(stripeId: nil))
       case (.cancelled, nil):
         fatalError("invariant 36fcef75, id: \(subscription.id)")
       case (.trialing, .some(_)):
