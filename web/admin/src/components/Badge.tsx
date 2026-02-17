@@ -13,9 +13,9 @@ const statusStyles: Record<string, string> = {
 };
 
 const statusLabels: Record<string, string> = {
-  active: `Active`,
-  onboarded: `Onboarded`,
-  no_action: `No Action`,
+  active: `Mac: Active`,
+  onboarded: `Mac: Onboarded`,
+  no_action: `Mac: None`,
   unknown: `Unknown`,
 };
 

@@ -29,7 +29,18 @@ struct ParentDetail: Pair {
     var screenshotsEnabled: Bool
     var createdAt: Date
     var installations: [InstallationOutput]
+    var iosDevices: [IOSDeviceOutput]
     var keychains: [ChildKeychainOutput]
+  }
+
+  struct IOSDeviceOutput: PairNestable {
+    var id: IOSApp.Device.Id
+    var modelName: String
+    var modelIdentifier: String
+    var iosVersion: String
+    var appVersion: String
+    var supervisionStatus: String?
+    var createdAt: Date
   }
 
   struct ChildKeychainOutput: PairNestable {
@@ -102,6 +113,21 @@ extension ParentDetail: Resolver {
         ))
       }
 
+      let devices = try await child.iosDevices(in: context.db)
+      var iosDeviceOutputs: [IOSDeviceOutput] = []
+      for device in devices {
+        let supervision = try await device.supervision(in: context.db)
+        iosDeviceOutputs.append(IOSDeviceOutput(
+          id: device.id,
+          modelName: device.modelName,
+          modelIdentifier: device.modelIdentifier,
+          iosVersion: device.iosVersion,
+          appVersion: device.appVersion,
+          supervisionStatus: supervision?.status.rawValue,
+          createdAt: device.createdAt,
+        ))
+      }
+
       let childKeychains = try await child.keychains(in: context.db)
       var childKeychainOutputs: [ChildKeychainOutput] = []
       for keychain in childKeychains {
@@ -123,6 +149,7 @@ extension ParentDetail: Resolver {
         screenshotsEnabled: child.screenshotsEnabled,
         createdAt: child.createdAt,
         installations: installations,
+        iosDevices: iosDeviceOutputs,
         keychains: childKeychainOutputs,
       ))
     }

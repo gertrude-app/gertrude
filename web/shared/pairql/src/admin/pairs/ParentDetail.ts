@@ -28,6 +28,15 @@ export namespace ParentDetail {
         modelTitle: string;
         createdAt: ISODateString;
       }>;
+      iosDevices: Array<{
+        id: UUID;
+        modelName: string;
+        modelIdentifier: string;
+        iosVersion: string;
+        appVersion: string;
+        supervisionStatus?: string;
+        createdAt: ISODateString;
+      }>;
       keychains: Array<{
         id: UUID;
         name: string;

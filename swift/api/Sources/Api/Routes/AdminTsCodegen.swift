@@ -51,6 +51,7 @@ enum AdminTsCodegenRoute {
     var sharedAliases: [Config.Alias] = [
       .init(NoInput.self, as: "void"),
       .init(Date.self, as: "ISODateString"),
+      .init(Subscription.StripeId.self, as: "string"),
     ]
     var config = Config(compact: true, aliasing: sharedAliases)
 

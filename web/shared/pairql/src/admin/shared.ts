@@ -19,8 +19,8 @@ export type Plan =
   | {
       case: `free`;
       kind:
-        | { case: `lapsedLight`; stripeId: { rawValue: string }; hasTrialedFull: boolean }
-        | { case: `lapsedFull`; stripeId: { rawValue: string } }
+        | { case: `lapsedLight`; stripeId: string; hasTrialedFull: boolean }
+        | { case: `lapsedFull`; stripeId?: string }
         | { case: `standard` };
     }
   | {
@@ -39,9 +39,7 @@ export type Plan =
           }
         | {
             case: `trialExpired`;
-            kind:
-              | { case: `fromLight`; stripeId: { rawValue: string } }
-              | { case: `full` };
+            kind: { case: `fromLight`; stripeId: string } | { case: `full` };
           }
         | { case: `paid`; stripeId: string; monthlyPriceInCents: number }
         | { case: `overdue`; stripeId: string; monthlyPriceInCents: number }
