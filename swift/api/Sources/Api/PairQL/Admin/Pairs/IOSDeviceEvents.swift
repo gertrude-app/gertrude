@@ -90,6 +90,7 @@ extension IOSDeviceEvents: Resolver {
     case "30fac4e6": #"Is This Child's Device? → "No, it's mine""#
     case "6bc91c73": #"Only minors/supervised → "Next""#
     case "e17137b0": #"Is Device Minor? → "Yes""#
+    case "a8f633ca": #"Permission Depends On Age → "Got it, next""#
     case "a21c9040": #"Is Device Minor? → "No, 18+""#
     case "51611498": #"Parent Onboarding? → "Yes, I'm the parent""#
     case "3c4772ad": #"Parent Onboarding? → "No, child is""#
@@ -148,7 +149,10 @@ extension IOSDeviceEvents: Resolver {
     case "bee80538": #"Requires Erase & Setup → "No way""#
     case "f3b3f3b6": #"Sorry No Other Way → "Start over""#
     // --- New Supervision Setup Flow ---
-    case "261ba66b": #"Explain Supervision → "Next""#
+    case "f214328e": #"Adult Needs Supervision → "Tell me more""#
+    case "5dcda279": #"What Is Supervised Mode → "Next""#
+    case "e002ad70": #"Supervised Device Reassurance → "Next""#
+    case "261ba66b": #"Explain Supervision → "Got it, next""#
     case "a0f78c2c": #"Cost & Branch → "Continue with Gertrude""#
     case "7023c325": #"Cost & Branch → "Free alternatives""#
     case "422d0980": #"Free Alternatives → "Birthday""#

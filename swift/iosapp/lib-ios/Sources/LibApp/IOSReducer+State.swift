@@ -69,6 +69,7 @@ extension IOSReducer {
       case hiThere
       case timeExpectation
       case confirmChildsDevice
+      case explainPermissionDependsOnAge
       case confirmMinorDevice
       case confirmParentIsOnboarding
       case confirmInAppleFamily
@@ -99,6 +100,9 @@ extension IOSReducer {
       case resume(Resume)
 
       public enum Setup: Equatable {
+        case adultNeedsSupervision
+        case whatIsSupervisedMode
+        case supervisedDeviceReassurance
         case explainSupervision
         case costAndBranchPoint
         case freeAlternativesHub

@@ -112,6 +112,12 @@ extension IOSReducer.Onboarding.Supervision {
 extension IOSReducer.Onboarding.Supervision.Setup {
   func fallbackDestination(from btn: OnboardingBtn) -> IOSReducer.Screen {
     switch (self, btn) {
+    case (.adultNeedsSupervision, _):
+      .onboarding(.supervision(.setup(.whatIsSupervisedMode)))
+    case (.whatIsSupervisedMode, _):
+      .onboarding(.supervision(.setup(.supervisedDeviceReassurance)))
+    case (.supervisedDeviceReassurance, _):
+      .onboarding(.supervision(.setup(.explainSupervision)))
     case (.explainSupervision, _):
       .onboarding(.supervision(.setup(.costAndBranchPoint)))
     case (.costAndBranchPoint, .primary):
@@ -213,6 +219,8 @@ extension IOSReducer.Onboarding.HappyPath {
   func fallbackDestination(from btn: OnboardingBtn) -> IOSReducer.Screen {
     switch (self, btn) {
     case (.confirmChildsDevice, .primary):
+      .onboarding(.happyPath(.explainPermissionDependsOnAge))
+    case (.explainPermissionDependsOnAge, _):
       .onboarding(.happyPath(.confirmMinorDevice))
     case (.confirmChildsDevice, _):
       .onboarding(.onParentDeviceFail)
@@ -225,7 +233,7 @@ extension IOSReducer.Onboarding.HappyPath {
     case (.confirmMinorDevice, .primary):
       .onboarding(.happyPath(.confirmParentIsOnboarding))
     case (.confirmMinorDevice, _):
-      .onboarding(.supervision(.setup(.explainSupervision)))
+      .onboarding(.supervision(.setup(.adultNeedsSupervision)))
     case (.confirmParentIsOnboarding, .primary):
       .onboarding(.happyPath(.confirmInAppleFamily))
     case (.confirmParentIsOnboarding, _):

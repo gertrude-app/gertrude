@@ -7,10 +7,22 @@ import XExpect
 
 final class IOSReducerTestsMajor: XCTestCase {
   @MainActor
-  func testOver18GoesDirectlyToSupervision() async throws {
+  func testOver18SupervisionHappyPath() async throws {
     let store = store(starting: .onboarding(.happyPath(.confirmMinorDevice)))
 
     await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) { // <-- over 18
+      $0.screen = .onboarding(.supervision(.setup(.adultNeedsSupervision)))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.setup(.whatIsSupervisedMode)))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.setup(.supervisedDeviceReassurance)))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.supervision(.setup(.explainSupervision)))
     }
 
@@ -22,9 +34,21 @@ final class IOSReducerTestsMajor: XCTestCase {
   @MainActor
   func testSupervisionSetupFlow() async throws {
     let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.setup(.explainSupervision))),
+      screen: .onboarding(.supervision(.setup(.adultNeedsSupervision))),
     )) {
       IOSReducer()
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.setup(.whatIsSupervisedMode)))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.setup(.supervisedDeviceReassurance)))
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.setup(.explainSupervision)))
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {

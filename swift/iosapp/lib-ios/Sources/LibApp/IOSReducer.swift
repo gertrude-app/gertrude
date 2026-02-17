@@ -114,6 +114,11 @@ public struct IOSReducer {
 
     case (.onboarding(.happyPath(.confirmChildsDevice)), .primary):
       self.deps.log(state.screen, action, "666d5e0f")
+      state.screen = .onboarding(.happyPath(.explainPermissionDependsOnAge))
+      return .none
+
+    case (.onboarding(.happyPath(.explainPermissionDependsOnAge)), .primary):
+      self.deps.log(state.screen, action, "a8f633ca")
       state.screen = .onboarding(.happyPath(.confirmMinorDevice))
       return .none
 
@@ -132,7 +137,7 @@ public struct IOSReducer {
       if self.isBuildAhead(of: state.onboarding.connectFeature.releasedAppStoreVersion) {
         state.screen = .onboarding(.mdmSupervisionExplainer)
       } else {
-        state.screen = .onboarding(.supervision(.setup(.explainSupervision)))
+        state.screen = .onboarding(.supervision(.setup(.adultNeedsSupervision)))
       }
       return .none
 
@@ -319,6 +324,21 @@ public struct IOSReducer {
       return .none
 
       // MARK: - supervision setup
+
+    case (.onboarding(.supervision(.setup(.adultNeedsSupervision))), .primary):
+      self.deps.log(state.screen, action, "f214328e")
+      state.screen = .onboarding(.supervision(.setup(.whatIsSupervisedMode)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.whatIsSupervisedMode))), .primary):
+      self.deps.log(state.screen, action, "5dcda279")
+      state.screen = .onboarding(.supervision(.setup(.supervisedDeviceReassurance)))
+      return .none
+
+    case (.onboarding(.supervision(.setup(.supervisedDeviceReassurance))), .primary):
+      self.deps.log(state.screen, action, "e002ad70")
+      state.screen = .onboarding(.supervision(.setup(.explainSupervision)))
+      return .none
 
     case (.onboarding(.supervision(.setup(.explainSupervision))), .primary):
       self.deps.log(state.screen, action, "261ba66b")

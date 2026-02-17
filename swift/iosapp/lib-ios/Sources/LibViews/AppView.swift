@@ -55,6 +55,12 @@ public struct AppView: View {
             secondary: self.btn(text: "No", .secondary),
           )
 
+        case .onboarding(.happyPath(.explainPermissionDependsOnAge)):
+          ButtonScreenView(
+            text: "To protect privacy, Apple requires special permission before we can block unwanted internet access. How we get that permission depends on the AGE of the \(self.deviceType) user.",
+            primary: self.btn(text: "Got it, next", .primary),
+          )
+
         case .onboarding(.happyPath(.confirmMinorDevice)):
           ButtonScreenView(
             text: "How old is the user of this \(self.deviceType)?",
@@ -316,15 +322,33 @@ public struct AppView: View {
 
         // supervision setup
 
+        case .onboarding(.supervision(.setup(.adultNeedsSupervision))):
+          ButtonScreenView(
+            text: "Got it, over 18. So for adults, Apple doesn’t allow internet blocking unless the \(self.deviceType) is put into a special mode called SUPERVISED MODE.",
+            primary: self.btn(text: "Tell me more", .primary),
+          )
+
+        case .onboarding(.supervision(.setup(.whatIsSupervisedMode))):
+          ButtonScreenView(
+            text: "Supervised mode was originally designed for devices owned by schools and businesses. It allows access to settings and features that normal devices don’t have.",
+            primary: self.btn(text: "Next", .primary),
+          )
+
+        case .onboarding(.supervision(.setup(.supervisedDeviceReassurance))):
+          ButtonScreenView(
+            text: "Other than allowing access to these extra features and controls, a supervised \(self.deviceType) is the same as any other \(self.deviceType). You get to decide which extra features to use.",
+            primary: self.btn(text: "Next", .primary),
+          )
+
         case .onboarding(.supervision(.setup(.explainSupervision))):
           ButtonScreenView(
-            text: "To make this work, we’ll need to put this \(self.deviceType) into SUPERVISED MODE—a special mode designed for devices owned by schools and businesses that allows much greater control.",
-            primary: self.btn(text: "Next", .primary),
+            text: "So, to get Gertrude blocking unwanted content for you, we’ll need this \(self.deviceType) to be in supervised mode, which takes a little more up-front setup.",
+            primary: self.btn(text: "Got it, next", .primary),
           )
 
         case .onboarding(.supervision(.setup(.costAndBranchPoint))):
           ButtonScreenView(
-            text: "Supervising a device the easy way requires a Gertrude account ($10/year).\n\nThere are free alternatives, but they have downsides.",
+            text: "The easiest way to supervise a device is with a Gertrude account ($10/year).\n\nThere are free alternatives, but they have downsides.",
             primary: self.btn(text: "Continue with Gertrude", .primary),
             secondary: self.btn(text: "Show me the free alternatives", .secondary),
           )

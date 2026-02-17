@@ -11,7 +11,9 @@ LOCAL_API_URL = https:/$()/REPLACE.ngrok-free.app
 
 ## Release notes
 
-- `1.7.2` (testflight 2/13/26, will go to stable after 1.7.0)
+- `1.7.3` (submitted for review 2/17/26)
+  - a few final tweaks to supervision onboarding flow screen/text
+- `1.7.2` (testflight 2/13/26)
   - usability/text flow improvements from rachel supervision usability test
 - `1.7.1` (used semver for rachel testflight during app review, 2/11/26)
 - `1.7.0` (to app store review on 2/11/26)
