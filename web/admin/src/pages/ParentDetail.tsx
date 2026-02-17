@@ -609,13 +609,9 @@ function extractStripeId(plan: Plan): string | null {
       case `overdue`:
         return plan.status.stripeId;
       case `trialing`:
-        return plan.status.kind.case === `fromLight`
-          ? plan.status.kind.stripeId
-          : null;
+        return plan.status.kind.case === `fromLight` ? plan.status.kind.stripeId : null;
       case `trialExpired`:
-        return plan.status.kind.case === `fromLight`
-          ? plan.status.kind.stripeId
-          : null;
+        return plan.status.kind.case === `fromLight` ? plan.status.kind.stripeId : null;
       default:
         return null;
     }

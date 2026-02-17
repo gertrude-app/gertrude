@@ -113,15 +113,7 @@ const IOSDevicesList: React.FC = () => {
                   </code>
                 </td>
                 <td className="px-4 py-4">
-                  {device.reachedOptOut ? (
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                      Success
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
-                      Incomplete
-                    </span>
-                  )}
+                  <DeviceStatusBadge status={device.status} />
                 </td>
                 <td className="px-4 py-4">
                   <span
@@ -142,7 +134,7 @@ const IOSDevicesList: React.FC = () => {
                     ) : (
                       <IPhoneIcon className="w-4 h-4 text-sky-400" />
                     )}
-                    {device.deviceType}
+                    {device.modelName}
                   </span>
                 </td>
                 <td className="pl-4 pr-5 py-4 text-sm text-slate-500 text-right whitespace-nowrap">
@@ -162,6 +154,32 @@ const IOSDevicesList: React.FC = () => {
         />
       </div>
     </div>
+  );
+};
+
+const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
+  supervised: { label: `Supervised`, bg: `bg-blue-100`, text: `text-blue-700` },
+  screenTime: { label: `Screen Time`, bg: `bg-green-100`, text: `text-green-700` },
+  complete: { label: `Complete`, bg: `bg-green-100`, text: `text-green-700` },
+  missingProfile: {
+    label: `Missing Profile`,
+    bg: `bg-amber-100`,
+    text: `text-amber-700`,
+  },
+  claimed: { label: `Claimed`, bg: `bg-amber-100`, text: `text-amber-700` },
+  pendingClaim: { label: `Pending Claim`, bg: `bg-amber-100`, text: `text-amber-700` },
+  incomplete: { label: `Incomplete`, bg: `bg-slate-100`, text: `text-slate-500` },
+};
+
+const DeviceStatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  const fallback = { label: `Incomplete`, bg: `bg-slate-100`, text: `text-slate-500` };
+  const config = STATUS_CONFIG[status] ?? fallback;
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${config.bg} ${config.text}`}
+    >
+      {config.label}
+    </span>
   );
 };
 

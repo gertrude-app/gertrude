@@ -9,10 +9,11 @@ export namespace IOSDevicesList {
     devices: Array<{
       vendorId: UUID;
       deviceType: string;
+      modelName: string;
       iosVersion: string;
       firstLaunch: ISODateString;
       eventCount: number;
-      reachedOptOut: boolean;
+      status: string;
     }>;
     totalCount: number;
     page: number;
