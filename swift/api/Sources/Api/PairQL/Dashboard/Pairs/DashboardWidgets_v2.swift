@@ -3,15 +3,30 @@ import Foundation
 import Gertie
 import PairQL
 
-// deprecated: remove after 2026-03-06
-struct DashboardWidgets: Pair {
+struct DashboardWidgets_v2: Pair {
   static let auth: ClientAuth = .parent
+
+  enum DevicePlatform: String, PairNestable {
+    case mac
+    case ios
+  }
+
+  enum IOSDeviceStatus: String, PairNestable {
+    case setupComplete
+    case pendingSetup
+  }
+
+  struct DeviceInfo: PairNestable {
+    var platform: DevicePlatform
+    var deviceName: String
+    var macStatus: ChildComputerStatus?
+    var iosStatus: IOSDeviceStatus?
+  }
 
   struct Child: PairNestable {
     var id: Api.Child.Id
     var name: String
-    var status: ChildComputerStatus
-    var numDevices: Int
+    var devices: [DeviceInfo]
   }
 
   struct ChildActivitySummary: PairNestable {
@@ -64,7 +79,7 @@ struct DashboardWidgets: Pair {
 
 // resolver
 
-extension DashboardWidgets: NoInputResolver {
+extension DashboardWidgets_v2: NoInputResolver {
   static func resolve(in context: ParentContext) async throws -> Output {
     let children = try await Api.Child.query()
       .where(.parentId == context.parent.id)
@@ -82,58 +97,98 @@ extension DashboardWidgets: NoInputResolver {
       )
     }
 
-    let computerUsers = try await ComputerUser.query()
+    // step 1: fetch computerUsers and iosDevices concurrently (both depend only on children)
+    async let computerUsersAsync = ComputerUser.query()
+      .where(.childId |=| children.map(\.id))
+      .all(in: context.db)
+    async let iosDevicesAsync = IOSApp.Device.query()
       .where(.childId |=| children.map(\.id))
       .all(in: context.db)
 
-    let iosDevices = try await IOSApp.Device.query()
-      .where(.childId |=| children.map(\.id))
-      .all(in: context.db)
-
-    let unlockRequests = try await Api.UnlockRequest.query()
-      .where(.computerUserId |=| computerUsers.map(\.id))
-      .where(.status == .enum(RequestStatus.pending))
-      .all(in: context.db)
+    let computerUsers = try await computerUsersAsync
+    let iosDevices = try await iosDevicesAsync
 
     let computerToChildMap: [ComputerUser.Id: Api.Child] = computerUsers
       .reduce(into: [:]) { map, device in
         map[device.id] = children.first(where: { $0.id == device.childId })
       }
 
+    // step 2: launch all remaining queries concurrently
+    async let computersAsync = Computer.query()
+      .where(.id |=| computerUsers.map(\.computerId))
+      .all(in: context.db)
+    async let supervisionsAsync = IOSApp.Supervision.query()
+      .where(.deviceId |=| iosDevices.map(\.id))
+      .all(in: context.db)
+    async let unlockRequests = Api.UnlockRequest.query()
+      .where(.computerUserId |=| computerUsers.map(\.id))
+      .where(.status == .enum(RequestStatus.pending))
+      .all(in: context.db)
     async let keystrokes = KeystrokeLine.query()
       .where(.computerUserId |=| computerUsers.map(\.id))
       .where(.createdAt >= Date(subtractingDays: 14))
       .orderBy(.createdAt, .desc)
       .withSoftDeleted()
       .all(in: context.db)
-
     async let screenshots = Screenshot.query()
       .where(.computerUserId |=| computerUsers.map(\.id))
       .where(.createdAt >= Date(subtractingDays: 14))
       .orderBy(.createdAt, .desc)
       .withSoftDeleted()
       .all(in: context.db)
-
     async let notifications = context.parent.notifications(in: context.db)
-
     async let announcement = try? await DashAnnouncement.query()
       .where(.parentId == context.parent.id)
       .orderBy(.createdAt, .asc)
       .first(in: context.db)
-
     async let pendingDeviceRows = context.db.customQuery(
       PendingIOSDeviceRow.self,
       withBindings: [.uuid(context.parent.id)],
     )
 
+    let computerMap: [Computer.Id: Computer] = try await computersAsync
+      .reduce(into: [:]) { map, computer in map[computer.id] = computer }
+    let supervisionMap: [IOSApp.Device.Id: IOSApp.Supervision] = try await supervisionsAsync
+      .reduce(into: [:]) { map, s in map[s.deviceId] = s }
+
     return try await .init(
-      children: children.concurrentMap { child in try await .init(
-        id: child.id,
-        name: child.name,
-        status: consolidatedChildComputerStatus(child.id, computerUsers),
-        numDevices: computerUsers.count(where: { $0.childId == child.id })
-          + iosDevices.count(where: { $0.childId == child.id }),
-      ) },
+      children: children.concurrentMap { child in
+        let macDevices: [DeviceInfo] = try await computerUsers
+          .filter { $0.childId == child.id }
+          .concurrentMap { computerUser in
+            let computer = computerMap[computerUser.computerId]
+            let deviceName = computer?.customName
+              ?? computer?.model.shortDescription
+              ?? "Mac"
+            return await DeviceInfo(
+              platform: .mac,
+              deviceName: deviceName,
+              macStatus: computerUser.status(),
+              iosStatus: nil,
+            )
+          }
+
+        let childIOSDevices: [DeviceInfo] = iosDevices
+          .filter { $0.childId == child.id }
+          .map { device in
+            let supervision = supervisionMap[device.id]
+            let status: IOSDeviceStatus = supervision?.profileInstalled == true
+              ? .setupComplete
+              : .pendingSetup
+            return DeviceInfo(
+              platform: .ios,
+              deviceName: device.modelName,
+              macStatus: nil,
+              iosStatus: status,
+            )
+          }
+
+        return Child(
+          id: child.id,
+          name: child.name,
+          devices: macDevices + childIOSDevices,
+        )
+      },
       childActivitySummaries: childActivitySummaries(
         children: children,
         map: computerToChildMap,
@@ -171,7 +226,7 @@ extension DashboardWidgets: NoInputResolver {
 private func mapUnlockRequests(
   unlockRequests: [Api.UnlockRequest],
   map: [ComputerUser.Id: Child],
-) -> [DashboardWidgets.UnlockRequest] {
+) -> [DashboardWidgets_v2.UnlockRequest] {
   unlockRequests.map { unlockRequest in
     .init(
       id: unlockRequest.id,
@@ -188,7 +243,7 @@ private func recentScreenshots(
   children: [Child],
   map: [ComputerUser.Id: Child],
   screenshots: [Screenshot],
-) -> [DashboardWidgets.RecentScreenshot] {
+) -> [DashboardWidgets_v2.RecentScreenshot] {
   children.compactMap { user in
     screenshots
       .first { map[$0.computerUserId ?? .init()]?.id == user.id }
@@ -201,7 +256,7 @@ private func childActivitySummaries(
   map: [ComputerUser.Id: Child],
   keystrokes: [KeystrokeLine],
   screenshots: [Screenshot],
-) -> [DashboardWidgets.ChildActivitySummary] {
+) -> [DashboardWidgets_v2.ChildActivitySummary] {
   children.map { user in
     let userScreenshots = screenshots.filter { map[$0.computerUserId ?? .init()]?.id == user.id }
     let userKeystrokes = keystrokes.filter { map[$0.computerUserId]?.id == user.id }
@@ -218,31 +273,4 @@ private func childActivitySummaries(
       ).count,
     )
   }
-}
-
-struct PendingIOSDeviceRow: CustomQueryable {
-  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    var stmt = SQL.Statement("""
-    SELECT
-      c.\(Child.columnName(.name)) AS child_name,
-      d.\(IOSApp.Device.columnName(.modelIdentifier)) AS model_identifier,
-      s.\(IOSApp.Supervision.columnName(.claimCode)) AS claim_code
-    FROM \(table: IOSApp.Supervision.self) s
-    JOIN \(table: IOSApp.Device.self) d
-      ON d.id = s.\(IOSApp.Supervision.columnName(.deviceId))
-    JOIN \(table: Child.self) c
-      ON c.id = d.\(IOSApp.Device.columnName(.childId))
-    WHERE c.\(Child.columnName(.parentId)) =\(" ")
-    """)
-    stmt.components.append(.binding(bindings[0]))
-    stmt.components.append(.sql("""
-      AND s.\(IOSApp.Supervision.columnName(.claimedAt)) IS NOT NULL
-      AND s.\(IOSApp.Supervision.columnName(.supervisedAt)) IS NULL
-    """))
-    return stmt
-  }
-
-  var childName: String
-  var modelIdentifier: String
-  var claimCode: Int
 }

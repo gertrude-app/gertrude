@@ -47,31 +47,64 @@ export const Default: Story = props({
   childData: withIds([
     {
       name: `Little Jimmy`,
-      status: {
-        case: `filterSuspended`,
-        resuming: new Date(new Date().getTime() + 7 * 60 * 1000).toISOString(),
-      },
-      numDevices: 1,
+      devices: [
+        {
+          platform: `mac`,
+          deviceName: `MacBook Pro`,
+          macStatus: {
+            case: `filterSuspended`,
+            resuming: new Date(new Date().getTime() + 7 * 60 * 1000).toISOString(),
+          },
+        },
+      ],
     },
     {
       name: `Sally`,
-      status: {
-        case: `downtime`,
-        ending: new Date(new Date().getTime() + 60 * 60 * 1000).toISOString(),
-      },
-      numDevices: 2,
+      devices: [
+        {
+          platform: `mac`,
+          deviceName: `iMac`,
+          macStatus: {
+            case: `downtime`,
+            ending: new Date(new Date().getTime() + 60 * 60 * 1000).toISOString(),
+          },
+        },
+        { platform: `mac`, deviceName: `MacBook Air`, macStatus: { case: `offline` } },
+      ],
     },
     {
       name: `Henry`,
-      status: {
-        case: `downtimePaused`,
-        resuming: new Date(new Date().getTime() + 5 * 60 * 1000).toISOString(),
-      },
-      numDevices: 3,
+      devices: [
+        {
+          platform: `mac`,
+          deviceName: `Mac Mini`,
+          macStatus: {
+            case: `downtimePaused`,
+            resuming: new Date(new Date().getTime() + 5 * 60 * 1000).toISOString(),
+          },
+        },
+        { platform: `mac`, deviceName: `MacBook Pro`, macStatus: { case: `filterOn` } },
+        { platform: `ios`, deviceName: `iPhone 14`, iosStatus: `setupComplete` },
+      ],
     },
-    { name: `Humphry`, status: { case: `offline` }, numDevices: 4 },
-    { name: `Hon`, status: { case: `filterOff` }, numDevices: 5 },
-    { name: `Hilda`, status: { case: `filterOn` }, numDevices: 5 },
+    {
+      name: `Humphry`,
+      devices: [
+        { platform: `mac`, deviceName: `MacBook Air`, macStatus: { case: `offline` } },
+      ],
+    },
+    {
+      name: `Hon`,
+      devices: [
+        { platform: `mac`, deviceName: `iMac`, macStatus: { case: `filterOff` } },
+      ],
+    },
+    {
+      name: `Hilda`,
+      devices: [
+        { platform: `mac`, deviceName: `Mac Mini`, macStatus: { case: `filterOn` } },
+      ],
+    },
   ]),
   childActivitySummaries: withIdsAnd({ numReviewed: 0 }, [
     { name: `Little Jimmy`, numUnreviewed: 245 },
@@ -124,9 +157,7 @@ export const NoChildren: Story = props({
 // @screenshot: xs,lg
 export const NoDevices: Story = props({
   ...Default.args,
-  childData: withIds([
-    { name: `Little Jimmy`, status: { case: `filterOn` }, numDevices: 0 },
-  ]),
+  childData: withIds([{ name: `Little Jimmy`, devices: [] }]),
 });
 
 // @screenshot: xs,lg
@@ -146,38 +177,71 @@ export const WithPendingIosDevice: Story = props({
   ],
 });
 
-export const WithPendingIosDeviceAndAnnouncement: Story = props({
+export const Mixed: Story = props({
   ...Default.args,
-  pendingIosDevices: [
+  childData: withIds([
     {
-      childName: `Little Jimmy`,
-      modelName: `iPhone 14`,
-      claimCode: 847293,
+      name: `Little Jimmy`,
+      devices: [
+        {
+          platform: `mac`,
+          deviceName: `MacBook Pro`,
+          macStatus: { case: `filterOn` },
+        },
+        { platform: `ios`, deviceName: `iPhone 14`, iosStatus: `setupComplete` },
+      ],
     },
-  ],
-  announcement: {
-    id: `e60c0317-2af6-409a-bc6b-ee7c0d724d27`,
-    kind: `warning`,
-    icon: `fa-solid fa-triangle-exclamation`,
-    html: `<b>Action needed:</b> We detected that Screen Time web filtering is enabled on <b>Yeshua\u2019s</b> mac computer, which can interfere with Gertrude\u2019s ability to protect your child. Disable Screen Time\u2019s \u201cRestrictions\u201d &rarr; \u201cContent &amp; Privacy\u201d section to fix.`,
-    learnMoreUrl: `https://gertrude.app/blog/screen-time-web-filter-conflict`,
-  },
-});
-
-export const WithMultiplePendingIosDevices: Story = props({
-  ...Default.args,
-  pendingIosDevices: [
     {
-      childName: `Little Jimmy`,
-      modelName: `iPhone 14`,
-      claimCode: 847293,
+      name: `Sally`,
+      devices: [{ platform: `ios`, deviceName: `iPad Air`, iosStatus: `setupComplete` }],
     },
+    {
+      name: `Henry`,
+      devices: [
+        {
+          platform: `mac`,
+          deviceName: `Mac Mini`,
+          macStatus: {
+            case: `downtimePaused`,
+            resuming: new Date(new Date().getTime() + 5 * 60 * 1000).toISOString(),
+          },
+        },
+        { platform: `mac`, deviceName: `MacBook Pro`, macStatus: { case: `filterOn` } },
+        { platform: `ios`, deviceName: `iPhone 15`, iosStatus: `setupComplete` },
+      ],
+    },
+  ]),
+  pendingIosDevices: [
     {
       childName: `Sally`,
       modelName: `iPhone 15 Pro`,
       claimCode: 192837,
     },
   ],
+});
+
+export const IosOnly: Story = props({
+  ...Default.args,
+  childData: withIds([
+    {
+      name: `Little Jimmy`,
+      devices: [{ platform: `ios`, deviceName: `iPhone 14`, iosStatus: `setupComplete` }],
+    },
+    {
+      name: `Sally`,
+      devices: [
+        { platform: `ios`, deviceName: `iPad Air`, iosStatus: `setupComplete` },
+        { platform: `ios`, deviceName: `iPhone 15 Pro`, iosStatus: `pendingSetup` },
+      ],
+    },
+    {
+      name: `Henry`,
+      devices: [{ platform: `ios`, deviceName: `iPhone 13`, iosStatus: `setupComplete` }],
+    },
+  ]),
+  unlockRequests: [],
+  childActivitySummaries: [],
+  recentScreenshots: [],
 });
 
 export default meta;

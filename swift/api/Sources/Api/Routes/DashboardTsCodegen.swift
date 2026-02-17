@@ -59,7 +59,7 @@ enum DashboardTsCodegenRoute {
       GetAccountOwner.self,
       ConfirmPendingNotificationMethod.self,
       CreatePendingNotificationMethod.self,
-      DashboardWidgets.self,
+      DashboardWidgets_v2.self,
       DeleteActivityItems_v2.self,
       DeleteEntity_v2.self,
       GetAdminKeychain.self,

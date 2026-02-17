@@ -8,6 +8,7 @@ enum AuthedParentRoute: PairRoute {
   case createPendingAppConnection_v2(CreatePendingAppConnection_v2.Input)
   case createPendingNotificationMethod(CreatePendingNotificationMethod.Input)
   case dashboardWidgets
+  case dashboardWidgets_v2
   case decideFilterSuspensionRequest(DecideFilterSuspensionRequest.Input)
   case deleteActivityItems_v2(DeleteActivityItems_v2.Input)
   case deleteEntity_v2(DeleteEntity_v2.Input)
@@ -81,6 +82,9 @@ extension AuthedParentRoute {
       }
       Route(.case(Self.dashboardWidgets)) {
         Operation(DashboardWidgets.self)
+      }
+      Route(.case(Self.dashboardWidgets_v2)) {
+        Operation(DashboardWidgets_v2.self)
       }
       Route(.case(Self.decideFilterSuspensionRequest)) {
         Operation(DecideFilterSuspensionRequest.self)
@@ -271,6 +275,9 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .dashboardWidgets:
       let output = try await DashboardWidgets.resolve(in: context)
+      return try await self.respond(with: output)
+    case .dashboardWidgets_v2:
+      let output = try await DashboardWidgets_v2.resolve(in: context)
       return try await self.respond(with: output)
     case .deleteEntity_v2(let input):
       let output = try await DeleteEntity_v2.resolve(with: input, in: context)

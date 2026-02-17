@@ -1,25 +1,24 @@
 import { posessive } from '@shared/string';
 import cx from 'classnames';
 import React, { useState } from 'react';
-import type { DashboardWidgets, MacAppConnectionCode, RequestState } from '@dash/types';
+import type {
+  DashboardWidgets_v2,
+  MacAppConnectionCode,
+  RequestState,
+} from '@dash/types';
 import { UndoMainPadding } from '../Chrome/Chrome';
 import PageHeading from '../PageHeading';
 import SmartLink from '../SmartLink';
 import AddDeviceInstructions from '../Users/AddDeviceInstructions';
 import ConnectDeviceModal from '../Users/ConnectDeviceModal';
 import AttentionBanner from './AttentionBanner';
+import ChildrenDevicesWidget from './ChildrenDevicesWidget';
 import CreateFirstNotificationWidget from './CreateFirstNotificationWidget';
 import QuickActionsWidget from './QuickActionsWidget';
 import UnlockRequestsWidget from './UnlockRequestsWidget';
 import UserActivityWidget from './UserActivityWidget';
 import UserScreenshotsWidget from './UserScreenshotsWidget';
 import UserOverviewWidget from './UsersOverviewWidget';
-
-export type PendingIosDevice = {
-  childName: string;
-  modelName: string;
-  claimCode: number;
-};
 
 type Props = {
   date?: Date;
@@ -28,9 +27,9 @@ type Props = {
   dismissAnnouncement(id: UUID): unknown;
   onStartTrial(): unknown;
   addDeviceRequest: RequestState<MacAppConnectionCode.Output>;
-  childData: DashboardWidgets.Output[`children`];
-  pendingIosDevices?: PendingIosDevice[];
-} & Omit<DashboardWidgets.Output, `children` | `pendingIOSDevices`>;
+  childData: DashboardWidgets_v2.Output[`children`];
+  pendingIosDevices?: DashboardWidgets_v2.Output[`pendingIOSDevices`];
+} & Omit<DashboardWidgets_v2.Output, `children` | `pendingIOSDevices`>;
 
 const Dashboard: React.FC<Props> = ({
   unlockRequests,
@@ -49,8 +48,9 @@ const Dashboard: React.FC<Props> = ({
 }) => {
   const [announcementDismissed, setAnnouncementDismissed] = useState(false);
   const hasNotifications = numParentNotifications > 0;
+  const hasMacDevices = childData.some((c) => c.devices.some((d) => d.macStatus));
   const firstUser = childData[0];
-  if (firstUser && childData.reduce((acc, cur) => acc + cur.numDevices, 0) === 0) {
+  if (firstUser && childData.reduce((acc, cur) => acc + cur.devices.length, 0) === 0) {
     return (
       <ConnectFirstDeviceScreen
         firstUser={firstUser}
@@ -91,15 +91,13 @@ const Dashboard: React.FC<Props> = ({
           />
         )}
         <div className="pt-6 grid grid-cols-1 @3xl:grid-cols-2 @6xl:grid-cols-3 gap-4 @3xl:gap-6 @6xl:gap-8">
-          {!hasNotifications && (
+          {hasMacDevices && !hasNotifications && (
             <CreateFirstNotificationWidget className="@3xl:-order-10" />
           )}
-          <UserActivityWidget userActivity={childActivitySummaries} />
-          <UserOverviewWidget
-            users={childData}
-            className={cx(!hasNotifications && `@3xl:col-span-2 @6xl:col-span-1`)}
-          />
-          {recentScreenshots.length !== 0 && (
+          {hasMacDevices && <UserActivityWidget userActivity={childActivitySummaries} />}
+          <ChildrenDevicesWidget children={childData} />
+          <UserOverviewWidget users={childData} />
+          {hasMacDevices && recentScreenshots.length !== 0 && (
             <UserScreenshotsWidget
               screenshots={recentScreenshots}
               className="@3xl:-order-9 @6xl:row-span-2"
@@ -114,7 +112,11 @@ const Dashboard: React.FC<Props> = ({
               unlockRequests={unlockRequests}
             />
           )}
-          <QuickActionsWidget date={date} className="@3xl:-order-10 @6xl:row-span-2" />
+          <QuickActionsWidget
+            date={date}
+            hasMacDevices={hasMacDevices}
+            className="@3xl:-order-10 @6xl:row-span-2"
+          />
         </div>
       </div>
     );
@@ -207,7 +209,7 @@ const WelcomeScreen: React.FC = () => {
 };
 
 interface ConnectFirstDeviceScreenProps {
-  firstUser: DashboardWidgets.Output[`children`][number];
+  firstUser: DashboardWidgets_v2.Output[`children`][number];
   startAddDevice(childId: UUID): unknown;
   dismissAddDevice(): unknown;
   onStartTrial(): unknown;

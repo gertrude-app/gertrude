@@ -36,7 +36,7 @@ describe(`dashboard onboarding nudges`, () => {
   });
 
   it(`create first user from dashboard nudge`, () => {
-    cy.interceptPql(`DashboardWidgets`, {
+    cy.interceptPql(`DashboardWidgets_v2`, {
       // no users OR devices, so should see create first user prompt
       children: [],
       unlockRequests: [],
@@ -59,13 +59,12 @@ describe(`dashboard onboarding nudges`, () => {
   });
 
   it(`connect device from dashboard nudge`, () => {
-    cy.interceptPql(`DashboardWidgets`, {
+    cy.interceptPql(`DashboardWidgets_v2`, {
       children: [
         {
           name: leopold.name,
           id: leopold.id,
-          status: { case: `filterOn` },
-          numDevices: 0, // <- child, but no devices
+          devices: [], // <- child, but no devices
         },
       ],
       unlockRequests: [],
@@ -83,13 +82,18 @@ describe(`dashboard onboarding nudges`, () => {
   });
 
   it(`recommends that you add a notification if there aren't any`, () => {
-    cy.interceptPql(`DashboardWidgets`, {
+    cy.interceptPql(`DashboardWidgets_v2`, {
       children: [
         {
           name: leopold.name,
           id: leopold.id,
-          status: { case: `filterOn` },
-          numDevices: 1,
+          devices: [
+            {
+              platform: `mac`,
+              deviceName: `MacBook Pro`,
+              macStatus: { case: `filterOn` },
+            },
+          ],
         },
       ],
       unlockRequests: [],

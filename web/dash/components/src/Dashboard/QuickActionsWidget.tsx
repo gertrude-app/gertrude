@@ -3,6 +3,7 @@ import {
   BookOpenIcon,
   KeyIcon,
   LifebuoyIcon,
+  ShieldCheckIcon,
   UserPlusIcon,
 } from '@heroicons/react/24/solid';
 import React from 'react';
@@ -13,16 +14,26 @@ import DashboardWidget from './DashboardWidget';
 type Props = {
   className?: string;
   date?: Date;
+  hasMacDevices?: boolean;
 };
 
-const QuickActionsWidget: React.FC<Props> = ({ className, date = new Date() }) => (
+const QuickActionsWidget: React.FC<Props> = ({
+  className,
+  date = new Date(),
+  hasMacDevices = true,
+}) => (
   <DashboardWidget className={className}>
     <h1 className="text-2xl font-extrabold my-2 ml-2">Good {timeOfDay(date)}!</h1>
     <p className="mb-4 ml-2 text-slate-500">
       Here are some quick actions you may find useful:
     </p>
     <QuickAction name="Add a new child" Icon={UserPlusIcon} action="/children/new" />
-    <QuickAction name="Create a new keychain" Icon={KeyIcon} action="/keychains/new" />
+    {hasMacDevices && (
+      <QuickAction name="Create a new keychain" Icon={KeyIcon} action="/keychains/new" />
+    )}
+    {!hasMacDevices && (
+      <QuickAction name="Manage devices" Icon={ShieldCheckIcon} action="/children" />
+    )}
     <QuickAction
       name="View documentation"
       Icon={BookOpenIcon}

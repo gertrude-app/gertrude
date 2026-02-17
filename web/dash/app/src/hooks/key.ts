@@ -1,7 +1,7 @@
 import type {
   ChildActivitySummaries,
   CombinedUsersActivityFeed,
-  DashboardWidgets,
+  DashboardWidgets_v2,
   FamilyActivitySummaries,
   GetAccountOwner,
   GetAdminKeychain,
@@ -85,7 +85,7 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`selectable-keychains`, [`selectable-keychains`]);
   }
 
-  static get dashboard(): QueryKey<DashboardWidgets.Output> {
+  static get dashboard(): QueryKey<DashboardWidgets_v2.Output> {
     return new QueryKey(`dashboard`, [`dashboard`]);
   }
 
