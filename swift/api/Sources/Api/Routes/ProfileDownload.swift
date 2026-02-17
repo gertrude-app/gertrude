@@ -1,3 +1,4 @@
+import Dependencies
 import DuetSQL
 import GertieIOS
 import Vapor
@@ -22,12 +23,16 @@ enum ProfileDownloadRoute {
       throw Abort(.notFound)
     }
 
+    let xml = generateProfileXml(for: device)
+    let signer = with(dependency: \.profileSigner)
+    let signedBytes = try signer.sign(Array(xml.utf8))
+
     return Response(
       headers: [
         "Content-Type": "application/x-apple-aspen-config",
         "Content-Disposition": "attachment; filename=\"Gertrude.mobileconfig\"",
       ],
-      body: .init(string: generateProfileXml(for: device)),
+      body: .init(data: Data(signedBytes)),
     )
   }
 }

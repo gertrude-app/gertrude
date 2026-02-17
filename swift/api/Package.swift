@@ -28,6 +28,8 @@ let package = Package(
     .package(path: "../x-slack"),
     .package(path: "../x-stripe"),
     .package(path: "../x-expect"),
+    .package("apple/swift-certificates@1.15.1"),
+    .package("apple/swift-crypto@4.1.0"),
   ],
   targets: [
     .target(
@@ -56,6 +58,7 @@ let package = Package(
         .product(name: "XStripe", package: "x-stripe"),
         .product(name: "JWT", package: "jwt"),
         "Rainbow",
+        .product(name: "X509", package: "swift-certificates"),
       ],
       exclude: ["Email/Templates/", "Email/Layouts/"],
       swiftSettings: [
@@ -70,6 +73,8 @@ let package = Package(
       .target(name: "Api"),
       .product(name: "XExpect", package: "x-expect"),
       .product(name: "XCTVapor", package: "vapor"),
+      .product(name: "X509", package: "swift-certificates"),
+      .product(name: "Crypto", package: "swift-crypto"),
     ]),
   ],
 )
