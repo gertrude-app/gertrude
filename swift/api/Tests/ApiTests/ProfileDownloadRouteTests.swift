@@ -1,5 +1,8 @@
+import Crypto
 import Dependencies
 import DuetSQL
+import Foundation
+@_spi(CMS) import X509
 import XCTest
 import XCTVapor
 import XExpect
@@ -65,5 +68,38 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
         expect(res.status).toEqual(.notFound)
       },
     )
+  }
+
+  func testCmsSigningRoundTrip() throws {
+    let key = P256.Signing.PrivateKey()
+    let name = try DistinguishedName { CommonName("Test Profile Signer") }
+    let now = Date()
+    let cert = try Certificate(
+      version: .v3,
+      serialNumber: .init(),
+      publicKey: .init(key.publicKey),
+      notValidBefore: now.addingTimeInterval(-3600),
+      notValidAfter: now.addingTimeInterval(3600),
+      issuer: name,
+      subject: name,
+      signatureAlgorithm: .ecdsaWithSHA256,
+      extensions: Certificate.Extensions {},
+      issuerPrivateKey: .init(key),
+    )
+
+    let xml = generateProfileXml(for: .mock)
+    let xmlBytes = Array(xml.utf8)
+
+    let signedBytes = try CMS.sign(
+      xmlBytes,
+      signatureAlgorithm: .ecdsaWithSHA256,
+      certificate: cert,
+      privateKey: .init(key),
+      detached: false,
+    )
+
+    XCTAssertFalse(signedBytes.isEmpty)
+    XCTAssertNotEqual(signedBytes, xmlBytes)
+    XCTAssertTrue(signedBytes.count > xmlBytes.count)
   }
 }
