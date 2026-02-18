@@ -1,6 +1,11 @@
 import FluentSQL
 
 func installTriggers(_ sql: SQLDatabase) async throws {
+  // we can't install triggers when bringing up an unmigrated database, which
+  // happens during staging and other explicit database resets
+  let rows = try await sql.execute("SELECT 1 FROM pg_namespace WHERE nspname = 'parent'")
+  guard !rows.isEmpty else { return }
+
   try await preventSupervisedDataDeletion(sql)
 }
 
