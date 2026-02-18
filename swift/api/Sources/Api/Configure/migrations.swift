@@ -71,6 +71,7 @@ extension Configure {
     app.migrations.add(AddProfileLocked())
     app.migrations.add(BlockGroupLongDescriptions())
     app.migrations.add(DropParentDeletedAt())
+    app.migrations.add(IOSDeviceRestrictionToggles())
   }
 }
 

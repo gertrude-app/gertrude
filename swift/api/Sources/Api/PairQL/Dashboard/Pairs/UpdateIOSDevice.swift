@@ -12,6 +12,9 @@ struct UpdateIOSDevice: Pair {
     var enabledBlockGroups: [IOSApp.BlockGroup.Id]
     var webPolicy: WebContentFilterPolicy.Kind
     var webPolicyDomains: [String]
+    var isProfileLocked: Bool
+    var allowAppRemoval: Bool
+    var allowEraseContentAndSettings: Bool
   }
 }
 
@@ -40,6 +43,9 @@ extension UpdateIOSDevice: Resolver {
     }
 
     device.webPolicy = input.webPolicy.rawValue
+    device.isProfileLocked = input.isProfileLocked
+    device.allowAppRemoval = input.allowAppRemoval
+    device.allowEraseContentAndSettings = input.allowEraseContentAndSettings
     try await ctx.db.update(device)
 
     try await IOSApp.WebPolicyDomain.query()

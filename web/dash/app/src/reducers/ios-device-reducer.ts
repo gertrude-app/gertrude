@@ -7,6 +7,9 @@ export type State = {
   webPolicyDomains: string[];
   webPolicy: WebPolicy;
   newDomain: string;
+  isProfileLocked: boolean;
+  allowAppRemoval: boolean;
+  allowEraseContentAndSettings: boolean;
   editingBlockRule?: EditBlockRuleProps & { id?: UUID };
 };
 
@@ -20,6 +23,9 @@ export type Action =
   | { type: `editBlockRule`; event: EditEvent }
   | { type: `setEditingBlockRule`; rule: EditBlockRuleProps; id: UUID }
   | { type: `removeDomain`; domain: string }
+  | { type: `setIsProfileLocked`; value: boolean }
+  | { type: `setAllowAppRemoval`; value: boolean }
+  | { type: `setAllowEraseContentAndSettings`; value: boolean }
   | { type: `receiveData`; data: GetIOSDevice.Output };
 
 function reducer(state: State, action: Action): void {
@@ -50,10 +56,22 @@ function reducer(state: State, action: Action): void {
     case `removeDomain`:
       state.webPolicyDomains = state.webPolicyDomains.filter((d) => d !== action.domain);
       return;
+    case `setIsProfileLocked`:
+      state.isProfileLocked = action.value;
+      return;
+    case `setAllowAppRemoval`:
+      state.allowAppRemoval = action.value;
+      return;
+    case `setAllowEraseContentAndSettings`:
+      state.allowEraseContentAndSettings = action.value;
+      return;
     case `receiveData`:
       state.enabledBlockGroups = [...action.data.enabledBlockGroups];
       state.webPolicy = action.data.webPolicy;
       state.webPolicyDomains = [...action.data.webPolicyDomains];
+      state.isProfileLocked = action.data.isProfileLocked;
+      state.allowAppRemoval = action.data.allowAppRemoval;
+      state.allowEraseContentAndSettings = action.data.allowEraseContentAndSettings;
       return;
     case `addBlockRule`:
       state.editingBlockRule = {

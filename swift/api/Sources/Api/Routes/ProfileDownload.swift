@@ -116,10 +116,10 @@ func generateProfileXml(for device: IOSApp.Device) -> String {
           <integer>1</integer>
 
           <key>allowAppRemoval</key>
-          <false/>
+          <\(device.allowAppRemoval ? "true" : "false")/>
 
           <key>allowEraseContentAndSettings</key>
-          <false/>
+          <\(device.allowEraseContentAndSettings ? "true" : "false")/>
         </dict>
       </array>
     </dict>

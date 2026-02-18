@@ -7,6 +7,9 @@ export namespace UpdateIOSDevice {
     enabledBlockGroups: UUID[];
     webPolicy: WebPolicy;
     webPolicyDomains: string[];
+    isProfileLocked: boolean;
+    allowAppRemoval: boolean;
+    allowEraseContentAndSettings: boolean;
   }
 
   export type Output = SuccessOutput;

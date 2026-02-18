@@ -1,5 +1,5 @@
 import { NoSymbolIcon } from '@heroicons/react/24/outline';
-import { Button, Label, TextInput, Toggle } from '@shared/components';
+import { Button, Label, TextInput } from '@shared/components';
 import { inflect } from '@shared/string';
 import cx from 'classnames';
 import React from 'react';
@@ -18,6 +18,7 @@ import type {
 } from '@dash/types';
 import EmptyState from '../EmptyState';
 import TimeInput from '../Forms/TimeInput';
+import ToggleCard from '../Forms/ToggleCard';
 import KeychainCard from '../Keychains/KeychainCard';
 import { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
@@ -281,34 +282,18 @@ const EditChild: React.FC<Props> = ({
             {/* monitoring */}
             <div className="mt-4 max-w-3xl">
               <h2 className="text-lg font-bold text-slate-700">Monitoring</h2>
-              <div className="flex justify-between items-center bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl">
-                <div className="mr-3">
-                  <h3 className="font-medium text-slate-700 leading-tight">
-                    Enable keylogging
-                  </h3>
-                  <p className="text-slate-500 text-sm mt-1">
-                    Sends reports of all keystrokes to your review
-                  </p>
-                </div>
-                <Toggle enabled={keyloggingEnabled} setEnabled={setKeyloggingEnabled} />
-              </div>
-              <div
-                className={`bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl overflow-hidden relative`}
+              <ToggleCard
+                title="Enable keylogging"
+                description="Sends reports of all keystrokes to your review"
+                enabled={keyloggingEnabled}
+                setEnabled={setKeyloggingEnabled}
+              />
+              <ToggleCard
+                title="Enable screenshots"
+                description="Periodically take a screenshot and upload for your review"
+                enabled={screenshotsEnabled}
+                setEnabled={setScreenshotsEnabled}
               >
-                <div className="flex justify-between items-center">
-                  <div className="mr-3">
-                    <h3 className="font-medium text-slate-700 leading-tight">
-                      Enable screenshots
-                    </h3>
-                    <p className="text-slate-500 text-sm mt-1">
-                      Periodically take a screenshot and upload for your review
-                    </p>
-                  </div>
-                  <Toggle
-                    enabled={screenshotsEnabled}
-                    setEnabled={setScreenshotsEnabled}
-                  />
-                </div>
                 <div
                   className={cx(
                     `flex flex-col space-y-3 md:flex-row md:space-x-3 md:space-y-0 mt-5`,
@@ -330,45 +315,28 @@ const EditChild: React.FC<Props> = ({
                     unit="seconds"
                   />
                 </div>
-              </div>
-              <div
+              </ToggleCard>
+              <ToggleCard
+                title="Emphasize filter suspension activity"
+                description="Visually highlight activity that is recorded while filter is suspended"
+                enabled={showSuspensionActivity}
+                setEnabled={setShowSuspensionActivity}
                 className={cx(
-                  `flex justify-between items-center mt-3 p-6 bg-slate-100 rounded-xl transition-opacity duration-300`,
+                  `transition-opacity duration-300`,
                   !(screenshotsEnabled || keyloggingEnabled) && `!hidden`,
                 )}
-              >
-                <div className="mr-3">
-                  <h3 className="font-medium text-slate-700 leading-tight">
-                    Emphasize filter suspension activity
-                  </h3>
-                  <p className="text-slate-500 text-sm mt-1">
-                    Visually highlight activity that is recorded while filter is suspended
-                  </p>
-                </div>
-                <Toggle
-                  enabled={showSuspensionActivity}
-                  setEnabled={setShowSuspensionActivity}
-                />
-              </div>
+              />
             </div>
 
             {/* downtime */}
             <div className="mt-12 max-w-3xl">
               <h2 className="text-lg font-bold text-slate-700">Downtime</h2>
-              <div
-                className={`bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl overflow-hidden relative`}
+              <ToggleCard
+                title="Enable downtime"
+                description="Completely restrict all internet access during specified hours"
+                enabled={downtimeEnabled}
+                setEnabled={setDowntimeEnabled}
               >
-                <div className="flex justify-between items-center">
-                  <div className="mr-3">
-                    <h3 className="font-medium text-slate-700 leading-tight">
-                      Enable downtime
-                    </h3>
-                    <p className="text-slate-500 text-sm mt-1">
-                      Completely restrict all internet access during specified hours
-                    </p>
-                  </div>
-                  <Toggle enabled={downtimeEnabled} setEnabled={setDowntimeEnabled} />
-                </div>
                 <div
                   className={cx(
                     `flex justify-center items-center mt-4 bg-white rounded-xl p-4 gap-4 flex-col sm:flex-row md:flex-col md+:flex-row border-[0.5px] border-slate-200 shadow shadow-slate-300/50`,
@@ -386,7 +354,7 @@ const EditChild: React.FC<Props> = ({
                     setTime={(end) => setDowntime({ ...downtime, end })}
                   />
                 </div>
-              </div>
+              </ToggleCard>
             </div>
             {/* /downtime */}
 

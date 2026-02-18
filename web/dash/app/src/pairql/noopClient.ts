@@ -176,6 +176,9 @@ const noopClient: ApiClient = {
       webPolicy: `blockAllExcept`,
       webPolicyDomains: [],
       customBlockRules: [],
+      isProfileLocked: true,
+      allowAppRemoval: false,
+      allowEraseContentAndSettings: false,
     });
   },
   userActivityFeed: async () => {

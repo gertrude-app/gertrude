@@ -10,6 +10,8 @@ extension IOSApp {
     var iosVersion: String
     var webPolicy: String
     var isProfileLocked: Bool
+    var allowAppRemoval: Bool
+    var allowEraseContentAndSettings: Bool
     var createdAt = Date()
     var updatedAt = Date()
 
@@ -21,6 +23,8 @@ extension IOSApp {
       iosVersion: String,
       webPolicy: String = "blockAll",
       isProfileLocked: Bool = true,
+      allowAppRemoval: Bool = false,
+      allowEraseContentAndSettings: Bool = false,
     ) {
       self.id = id
       self.childId = childId
@@ -29,6 +33,8 @@ extension IOSApp {
       self.iosVersion = iosVersion
       self.webPolicy = webPolicy
       self.isProfileLocked = isProfileLocked
+      self.allowAppRemoval = allowAppRemoval
+      self.allowEraseContentAndSettings = allowEraseContentAndSettings
     }
   }
 }

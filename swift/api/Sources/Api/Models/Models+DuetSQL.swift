@@ -136,6 +136,8 @@ extension IOSApp.Device: Model {
     case .iosVersion: .string(self.iosVersion)
     case .webPolicy: .string(self.webPolicy)
     case .isProfileLocked: .bool(self.isProfileLocked)
+    case .allowAppRemoval: .bool(self.allowAppRemoval)
+    case .allowEraseContentAndSettings: .bool(self.allowEraseContentAndSettings)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -150,6 +152,8 @@ extension IOSApp.Device: Model {
       .iosVersion: .string(self.iosVersion),
       .webPolicy: .string(self.webPolicy),
       .isProfileLocked: .bool(self.isProfileLocked),
+      .allowAppRemoval: .bool(self.allowAppRemoval),
+      .allowEraseContentAndSettings: .bool(self.allowEraseContentAndSettings),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]
