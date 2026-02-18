@@ -59,6 +59,7 @@ struct AnalyticsData: Sendable {
 @globalActor actor AnalyticsQuery {
   static let shared = AnalyticsQuery()
   private var _data: AnalyticsData?
+  private var _inflight: Task<AnalyticsData, Error>?
 
   @Dependency(\.db) private var db
   @Dependency(\.logger) private var logger
@@ -67,8 +68,12 @@ struct AnalyticsData: Sendable {
 
   func data() async throws -> AnalyticsData {
     if let data = _data { return data }
-    let data = try await self.queryFreshData()
+    if let inflight = _inflight { return try await inflight.value }
+    let task = Task { try await self.queryFreshData() }
+    self._inflight = task
+    let data = try await task.value
     self._data = data
+    self._inflight = nil
     return data
   }
 
