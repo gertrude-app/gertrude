@@ -194,6 +194,8 @@ public extension SQL.Statement {
         sql.appendInterpolation(expression: .jsonb(json))
       case .binding(.json(.none)):
         sql.appendInterpolation(expression: .null)
+      case .binding(.null):
+        sql.appendInterpolation(expression: .null)
       case .binding(let data):
         sql.appendInterpolation(bind: data.binding)
       }

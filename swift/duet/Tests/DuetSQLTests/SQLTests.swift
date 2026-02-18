@@ -477,6 +477,16 @@ final class SqlTests: XCTestCase {
     ])
   }
 
+  func testNullBindingSerializesToNull() throws {
+    var stmt = SQL.Statement("SELECT * FROM things WHERE deleted_at = ")
+    stmt.components.append(.binding(.null))
+    let sql = stmt.sql
+    var serializer = SQLSerializer(database: TestDatabase())
+    sql.serialize(to: &serializer)
+    expect(serializer.sql).toContain("NULL")
+    expect(serializer.sql).not.toContain("$1")
+  }
+
   func testNilEnumSerializesToNull() async throws {
     let thing = Thing(
       customEnum: .bar,
