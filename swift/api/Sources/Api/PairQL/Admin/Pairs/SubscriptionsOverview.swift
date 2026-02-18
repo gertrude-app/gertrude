@@ -24,6 +24,7 @@ struct SubscriptionsOverview: Pair {
     var date: Date
     var email: String
     var planCase: String
+    var hasCompletedSupervision: Bool
   }
 }
 
@@ -70,6 +71,7 @@ extension SubscriptionsOverview: NoInputResolver {
         date: parent.createdAt,
         email: parent.email.rawValue,
         planCase: planCase,
+        hasCompletedSupervision: parent.hasCompletedSupervision,
       ))
     }
 

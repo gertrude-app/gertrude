@@ -102,7 +102,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ data }) => {
 
   const signupItems = data.recentSignups.map((s) => ({
     date: s.date,
-    status: s.planCase,
+    status: s.hasCompletedSupervision ? `supervised` : s.planCase,
     email: s.email,
   }));
 

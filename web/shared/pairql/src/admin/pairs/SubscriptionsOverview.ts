@@ -15,6 +15,7 @@ export namespace SubscriptionsOverview {
       date: ISODateString;
       email: string;
       planCase: string;
+      hasCompletedSupervision: boolean;
     }>;
   }
 }
