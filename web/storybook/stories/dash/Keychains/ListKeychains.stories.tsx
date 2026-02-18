@@ -12,8 +12,8 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-// @screenshot: md
 export const Default: Story = props({
+  hasAnyMacComputers: true,
   keychains: withIdsAnd(
     {
       mode: `keychains_page` as const,
@@ -54,13 +54,32 @@ export const Default: Story = props({
   },
 });
 
-// @screenshot: md
 export const Deleting: Story = props({
   ...Default.args,
   keychains: Default.args.keychains.slice(0, 1),
   remove: {
     ...Default.args.remove,
     id: `id-htc`,
+  },
+});
+
+export const EmptyWithMacs: Story = props({
+  hasAnyMacComputers: true,
+  keychains: [],
+  remove: {
+    start: () => {},
+    confirm: () => {},
+    cancel: () => {},
+  },
+});
+
+export const EmptyIOSOnly: Story = props({
+  hasAnyMacComputers: false,
+  keychains: [],
+  remove: {
+    start: () => {},
+    confirm: () => {},
+    cancel: () => {},
   },
 });
 

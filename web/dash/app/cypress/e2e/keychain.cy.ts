@@ -20,7 +20,11 @@ describe(`create keychain`, () => {
       children: [],
     };
 
-    cy.interceptPql(`GetAdminKeychains`, { keychains: [existing], children: [] });
+    cy.interceptPql(`GetAdminKeychains`, {
+      keychains: [existing],
+      children: [],
+      hasAnyMacComputers: true,
+    });
     cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
 
     cy.visit(`/keychains`);
@@ -43,7 +47,11 @@ describe(`create keychain`, () => {
       children: [],
     };
 
-    cy.interceptPql(`GetAdminKeychains`, { keychains: [existing], children: [] });
+    cy.interceptPql(`GetAdminKeychains`, {
+      keychains: [existing],
+      children: [],
+      hasAnyMacComputers: true,
+    });
     cy.interceptPql(`GetSelectableKeychains`, {
       own: [existing.summary],
       public: [],
@@ -61,7 +69,11 @@ describe(`create keychain`, () => {
   describe(`no keychains to start`, () => {
     beforeEach(() => {
       // parent starts with no keychains
-      cy.interceptPql(`GetAdminKeychains`, { keychains: [], children: [] });
+      cy.interceptPql(`GetAdminKeychains`, {
+        keychains: [],
+        children: [],
+        hasAnyMacComputers: true,
+      });
       // and no prior selectable keychains
       cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
     });

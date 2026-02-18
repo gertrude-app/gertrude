@@ -47,7 +47,7 @@ const noopClient: ApiClient = {
     });
   },
   getAdminKeychains: async () => {
-    return Result.success({ children: [], keychains: [] });
+    return Result.success({ children: [], keychains: [], hasAnyMacComputers: false });
   },
   getIOSDeviceClaimData: async () => {
     return Result.success({
