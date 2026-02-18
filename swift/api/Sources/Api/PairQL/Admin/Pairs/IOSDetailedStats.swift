@@ -58,7 +58,8 @@ struct IOSDetailedStats: Pair {
 
   struct SuccessBreakdown: PairNestable {
     var screenTime: SuccessItem
-    var supervision: SuccessItem
+    var configurator: SuccessItem
+    var gertrudeSupervision: SuccessItem
   }
 
   struct SuccessItem: PairNestable {
@@ -117,11 +118,13 @@ struct IOSDetailedStats: Pair {
 extension IOSDetailedStats: NoInputResolver {
   static func resolve(in context: Context) async throws -> Output {
     let firstLaunches = try await distinctVendorCount(for: "8d35f043", in: context)
-    let totalSuccess = try await distinctVendorCount(for: "cdb31095", in: context)
     let parentFalseStarts = try await context.db.count(ParentDeviceDropoffCount.self)
     let stuckIn18Plus = try await context.db.count(StuckIn18PlusCount.self)
-    let standardSuccess = try await context.db.count(StandardSuccessCount.self)
-    let supervisedSuccess = try await context.db.count(SupervisedSuccessCount.self)
+    let screenTimeSuccess = try await context.db.count(ScreenTimeSuccessCount.self)
+    let configuratorSuccess = try await context.db.count(ConfiguratorSuccessCount.self)
+    let gertrudeSupervisionSuccess = try await context.db
+      .count(GertrudeSupervisionSuccessCount.self)
+    let totalSuccess = screenTimeSuccess + configuratorSuccess + gertrudeSupervisionSuccess
     let childOnboardingIssue = try await context.db.count(ChildOnboardingIssueCount.self)
 
     let invalidAccountType = try await authFailureCount(for: "2bcf3d96", in: context)
@@ -216,14 +219,19 @@ extension IOSDetailedStats: NoInputResolver {
       ),
       successBreakdown: SuccessBreakdown(
         screenTime: SuccessItem(
-          count: standardSuccess,
-          pctOfSuccess: pct(standardSuccess, of: totalSuccess),
-          pctOfLaunch: pct(standardSuccess, of: firstLaunches),
+          count: screenTimeSuccess,
+          pctOfSuccess: pct(screenTimeSuccess, of: totalSuccess),
+          pctOfLaunch: pct(screenTimeSuccess, of: firstLaunches),
         ),
-        supervision: SuccessItem(
-          count: supervisedSuccess,
-          pctOfSuccess: pct(supervisedSuccess, of: totalSuccess),
-          pctOfLaunch: pct(supervisedSuccess, of: firstLaunches),
+        configurator: SuccessItem(
+          count: configuratorSuccess,
+          pctOfSuccess: pct(configuratorSuccess, of: totalSuccess),
+          pctOfLaunch: pct(configuratorSuccess, of: firstLaunches),
+        ),
+        gertrudeSupervision: SuccessItem(
+          count: gertrudeSupervisionSuccess,
+          pctOfSuccess: pct(gertrudeSupervisionSuccess, of: totalSuccess),
+          pctOfLaunch: pct(gertrudeSupervisionSuccess, of: firstLaunches),
         ),
       ),
       installFailures: InstallFailures(
@@ -492,10 +500,12 @@ private struct CombinedInstallFailureCount: CustomCountable {
   var count: Int
 }
 
-private struct StandardSuccessCount: CustomCountable {
+private struct ScreenTimeSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
+    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
+    let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
     return SQL.Statement("""
     SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
@@ -507,13 +517,17 @@ private struct StandardSuccessCount: CustomCountable {
       AND \(deviceId) NOT IN (
         SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
       )
+      AND \(deviceId) NOT IN (
+        SELECT \(sDeviceId) FROM \(table: IOSApp.Supervision.self)
+        WHERE \(sProfileInstalledAt) IS NOT NULL
+      )
     """)
   }
 
   var count: Int
 }
 
-private struct SupervisedSuccessCount: CustomCountable {
+private struct ConfiguratorSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
@@ -521,8 +535,32 @@ private struct SupervisedSuccessCount: CustomCountable {
     SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
     WHERE \(deviceId) IS NOT NULL
-      AND \(eventId) = 'cdb31095'
+      AND \(eventId) = '8d35f043'
       AND \(deviceId) IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
+      )
+    """)
+  }
+
+  var count: Int
+}
+
+private struct GertrudeSupervisionSuccessCount: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    let deviceId = IOSEvent.columnName(.deviceId)
+    let eventId = IOSEvent.columnName(.eventId)
+    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
+    let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
+    return SQL.Statement("""
+    SELECT COUNT(DISTINCT \(deviceId)) AS count
+    FROM \(table: IOSEvent.self)
+    WHERE \(deviceId) IS NOT NULL
+      AND \(eventId) = '8d35f043'
+      AND \(deviceId) IN (
+        SELECT \(sDeviceId) FROM \(table: IOSApp.Supervision.self)
+        WHERE \(sProfileInstalledAt) IS NOT NULL
+      )
+      AND \(deviceId) NOT IN (
         SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
       )
     """)

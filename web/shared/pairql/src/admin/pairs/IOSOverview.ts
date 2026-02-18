@@ -6,8 +6,9 @@ export namespace IOSOverview {
     adjustedLaunches: number;
     parentFalseStarts: number;
     totalSuccess: number;
-    standardSuccess: number;
-    supervisedSuccess: number;
+    screenTimeSuccess: number;
+    configuratorSuccess: number;
+    gertrudeSupervisionSuccess: number;
     stuckIn18PlusPath: number;
     successRate: number;
     recentInstalls: Array<{

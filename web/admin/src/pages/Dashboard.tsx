@@ -323,9 +323,9 @@ const IOSSection: React.FC<IOSSectionProps> = ({ data }) => (
         </div>
         <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
           <div className="text-2xl font-display font-semibold text-slate-900">
-            {data.parentFalseStarts.toLocaleString()}
+            {data.gertrudeSupervisionSuccess.toLocaleString()}
           </div>
-          <div className="text-sm mt-1 text-slate-500">Parent False Starts</div>
+          <div className="text-sm mt-1 text-slate-500">Gertrude Supervisions</div>
         </div>
       </div>
 
@@ -335,13 +335,18 @@ const IOSSection: React.FC<IOSSectionProps> = ({ data }) => (
         segments={[
           {
             label: `Screen Time`,
-            value: data.standardSuccess,
+            value: data.screenTimeSuccess,
             gradient: `from-sky-400 to-blue-500`,
           },
           {
-            label: `Supervision`,
-            value: data.supervisedSuccess,
+            label: `Configurated`,
+            value: data.configuratorSuccess,
             gradient: `from-emerald-400 to-green-500`,
+          },
+          {
+            label: `Supervised`,
+            value: data.gertrudeSupervisionSuccess,
+            gradient: `from-amber-400 to-orange-500`,
           },
         ]}
       />

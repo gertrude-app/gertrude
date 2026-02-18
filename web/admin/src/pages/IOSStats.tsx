@@ -174,7 +174,13 @@ const IOSStats: React.FC = () => {
             />
             <div
               className="h-full bg-gradient-to-r from-emerald-400 to-green-500"
-              style={{ width: `${data.successBreakdown.supervision.pctOfSuccess}%` }}
+              style={{ width: `${data.successBreakdown.configurator.pctOfSuccess}%` }}
+            />
+            <div
+              className="h-full bg-gradient-to-r from-amber-400 to-orange-500"
+              style={{
+                width: `${data.successBreakdown.gertrudeSupervision.pctOfSuccess}%`,
+              }}
             />
           </div>
           <div className="flex justify-between mt-3 text-sm">
@@ -189,9 +195,17 @@ const IOSStats: React.FC = () => {
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-400 to-green-500" />
               <span className="text-slate-600">
-                Supervision ({data.successBreakdown.supervision.count.toLocaleString()} ·
-                {` `}
-                {data.successBreakdown.supervision.pctOfSuccess}%)
+                Configurated ({data.successBreakdown.configurator.count.toLocaleString()}
+                {` `}·{` `}
+                {data.successBreakdown.configurator.pctOfSuccess}%)
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-amber-400 to-orange-500" />
+              <span className="text-slate-600">
+                Supervised (
+                {data.successBreakdown.gertrudeSupervision.count.toLocaleString()} ·{` `}
+                {data.successBreakdown.gertrudeSupervision.pctOfSuccess}%)
               </span>
             </div>
           </div>
