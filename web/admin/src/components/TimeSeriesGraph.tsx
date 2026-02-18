@@ -11,6 +11,7 @@ interface DataItem {
 interface StatusConfig {
   isSuccess: (status: string) => boolean;
   isWarning: (status: string) => boolean;
+  isInfo?: (status: string) => boolean;
 }
 
 interface TimeSeriesGraphProps<T extends DataItem> {
@@ -206,9 +207,11 @@ const TimeSeriesGraph = <T extends DataItem>({
                       className={`w-2 h-2 rounded-full shrink-0 ${
                         statusConfig.isSuccess(item.status)
                           ? `bg-emerald-500`
-                          : statusConfig.isWarning(item.status)
-                            ? `bg-amber-500`
-                            : `bg-slate-300`
+                          : statusConfig.isInfo?.(item.status)
+                            ? `bg-sky-500`
+                            : statusConfig.isWarning(item.status)
+                              ? `bg-amber-500`
+                              : `bg-slate-300`
                       }`}
                     />
                     <span className="truncate">{item.label}</span>

@@ -25,6 +25,7 @@ const InstallsGraph: React.FC<InstallsGraphProps> = ({ installs }) => {
       gradient="blue"
       statusConfig={{
         isSuccess: (status) => status === `success`,
+        isInfo: (status) => status === `supervised`,
         isWarning: () => false,
       }}
       twoColumnTooltip

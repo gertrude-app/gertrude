@@ -46,9 +46,16 @@ extension IOSOverview: NoInputResolver {
 
     let recentInstalls = try await context.db.customQuery(RecentInstallsQuery.self)
       .map { row in
-        RecentInstall(
+        let status = if row.supervised {
+          "supervised"
+        } else if row.succeeded {
+          "success"
+        } else {
+          "incomplete"
+        }
+        return RecentInstall(
           date: row.date,
-          status: row.succeeded ? "success" : "incomplete",
+          status: status,
           deviceType: ModelIdentifier.deviceType(from: row.modelIdentifier),
         )
       }
@@ -164,11 +171,14 @@ private struct RecentInstallsQuery: CustomQueryable {
     let eventId = IOSEvent.columnName(.eventId)
     let createdAt = IOSEvent.columnName(.createdAt)
     let modelIdentifier = IOSEvent.columnName(.modelIdentifier)
+    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
+    let profileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
     return SQL.Statement("""
     SELECT
       first_launch.\(createdAt) AS date,
       first_launch.\(modelIdentifier) AS model_identifier,
-      CASE WHEN success.\(deviceId) IS NOT NULL THEN TRUE ELSE FALSE END AS succeeded
+      CASE WHEN success.\(deviceId) IS NOT NULL THEN TRUE ELSE FALSE END AS succeeded,
+      CASE WHEN sup.\(sDeviceId) IS NOT NULL THEN TRUE ELSE FALSE END AS supervised
     FROM (
       SELECT DISTINCT ON (\(deviceId)) \(deviceId), \(createdAt), \(modelIdentifier)
       FROM \(table: IOSEvent.self)
@@ -180,6 +190,11 @@ private struct RecentInstallsQuery: CustomQueryable {
       FROM \(table: IOSEvent.self)
       WHERE \(deviceId) IS NOT NULL AND \(eventId) = 'cdb31095'
     ) success ON first_launch.\(deviceId) = success.\(deviceId)
+    LEFT JOIN (
+      SELECT \(sDeviceId)
+      FROM \(table: IOSApp.Supervision.self)
+      WHERE \(profileInstalledAt) IS NOT NULL
+    ) sup ON first_launch.\(deviceId) = sup.\(sDeviceId)
     ORDER BY first_launch.\(createdAt) DESC
     """)
   }
@@ -187,4 +202,5 @@ private struct RecentInstallsQuery: CustomQueryable {
   var date: Date
   var modelIdentifier: String
   var succeeded: Bool
+  var supervised: Bool
 }
