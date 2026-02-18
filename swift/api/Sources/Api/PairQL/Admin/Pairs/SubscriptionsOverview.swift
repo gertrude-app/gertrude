@@ -23,8 +23,7 @@ struct SubscriptionsOverview: Pair {
   struct RecentSignupOutput: PairNestable {
     var date: Date
     var email: String
-    var planCase: String
-    var hasCompletedSupervision: Bool
+    var engagement: String
   }
 }
 
@@ -41,19 +40,16 @@ extension SubscriptionsOverview: NoInputResolver {
     var signups: [RecentSignupOutput] = []
 
     for parent in data.parents.values {
-      let planCase: String
       switch parent.plan {
       case .free:
-        planCase = "free"
+        break
       case .light(let status):
-        planCase = "light"
         switch status {
         case .paid, .overdue:
           lightPlanCount += 1
           lightPlanAnnualCents += 83 * 12
         }
       case .full(let status):
-        planCase = "full"
         switch status {
         case .complimentary:
           break
@@ -67,11 +63,18 @@ extension SubscriptionsOverview: NoInputResolver {
         }
       }
 
+      let engagement = if parent.isActive || parent.hasCompletedSupervision {
+        "engaged"
+      } else if parent.numComputerUsers > 0 || parent.hasIncompleteSupervision {
+        "partial"
+      } else {
+        "none"
+      }
+
       signups.append(.init(
         date: parent.createdAt,
         email: parent.email.rawValue,
-        planCase: planCase,
-        hasCompletedSupervision: parent.hasCompletedSupervision,
+        engagement: engagement,
       ))
     }
 

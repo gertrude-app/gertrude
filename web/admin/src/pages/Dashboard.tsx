@@ -102,7 +102,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ data }) => {
 
   const signupItems = data.recentSignups.map((s) => ({
     date: s.date,
-    status: s.hasCompletedSupervision ? `supervised` : s.planCase,
+    status: s.engagement,
     email: s.email,
   }));
 
@@ -242,7 +242,7 @@ const MacSection: React.FC<MacSectionProps> = ({ data }) => {
               gradient: `from-amber-500 to-orange-600`,
             },
             {
-              label: `Installed`,
+              label: `Onboarded Only`,
               value: data.onboardedParents,
               gradient: `from-sky-400 to-blue-500`,
             },

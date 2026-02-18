@@ -20,6 +20,7 @@ struct ParentData: Sendable {
   var numNotifications: Int
   var numIOSDevices: Int
   var hasCompletedSupervision: Bool
+  var hasIncompleteSupervision: Bool
   var childActivityCount: Int
   var plan: Plan
   var hasGclid: Bool
@@ -34,6 +35,7 @@ struct ParentData: Sendable {
     self.numNotifications = 0
     self.numIOSDevices = 0
     self.hasCompletedSupervision = false
+    self.hasIncompleteSupervision = false
     self.childActivityCount = 0
     self.plan = Plan(subscription: subscription)
     self.hasGclid = model.gclid != nil
@@ -119,8 +121,10 @@ struct AnalyticsData: Sendable {
       map[row.parentId] = row.screenshotCount + row.keystrokeLineCount
     }
 
-    let completedSupervisions = try await self.db.customQuery(CompletedSupervisionParents.self)
-    let completedSupervisionSet = Set(completedSupervisions.map(\.parentId))
+    let supervisionParents = try await self.db.customQuery(SupervisionParents.self)
+    let completedSupervisionSet = Set(supervisionParents.filter(\.hasCompleted).map(\.parentId))
+    let incompleteSupervisionSet = Set(supervisionParents.filter { !$0.hasCompleted }
+      .map(\.parentId))
 
     var data = try await AnalyticsData(
       parents: [:],
@@ -143,6 +147,8 @@ struct AnalyticsData: Sendable {
       parent.numComputerUsers = computerUserMap[model.id] ?? 0
       parent.numIOSDevices = iosDeviceMap[model.id] ?? 0
       parent.hasCompletedSupervision = completedSupervisionSet.contains(model.id)
+      parent.hasIncompleteSupervision = incompleteSupervisionSet.contains(model.id)
+        && !completedSupervisionSet.contains(model.id)
       parent.childActivityCount = activityMap[model.id] ?? 0
       if parent.isActive {
         data.overview.activeParents += 1
@@ -302,18 +308,21 @@ struct IOSDeviceCount: CustomQueryable {
   var iosDeviceCount: Int
 }
 
-struct CompletedSupervisionParents: CustomQueryable {
+struct SupervisionParents: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     .init("""
-    SELECT DISTINCT c.\(Child.columnName(.parentId)) AS parent_id
+    SELECT c.\(Child.columnName(.parentId)) AS parent_id,
+           BOOL_OR(s.\(IOSApp.Supervision
+      .columnName(.profileInstalledAt)) IS NOT NULL) AS has_completed
     FROM \(table: IOSApp.Supervision.self) s
     JOIN \(table: IOSApp.Device.self) d
       ON d.id = s.\(IOSApp.Supervision.columnName(.deviceId))
     JOIN \(table: Child.self) c
       ON c.id = d.\(IOSApp.Device.columnName(.childId))
-    WHERE s.\(IOSApp.Supervision.columnName(.profileInstalledAt)) IS NOT NULL;
+    GROUP BY c.\(Child.columnName(.parentId));
     """)
   }
 
   var parentId: Parent.Id
+  var hasCompleted: Bool
 }

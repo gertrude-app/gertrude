@@ -14,8 +14,7 @@ export namespace SubscriptionsOverview {
     recentSignups: Array<{
       date: ISODateString;
       email: string;
-      planCase: string;
-      hasCompletedSupervision: boolean;
+      engagement: string;
     }>;
   }
 }
