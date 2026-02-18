@@ -8,8 +8,9 @@ struct IOSOverview: Pair {
     var adjustedLaunches: Int
     var parentFalseStarts: Int
     var totalSuccess: Int
-    var standardSuccess: Int
-    var supervisedSuccess: Int
+    var screenTimeSuccess: Int
+    var configuratorSuccess: Int
+    var gertrudeSupervisionSuccess: Int
     var stuckIn18PlusPath: Int
     var successRate: Double
     var recentInstalls: [RecentInstall]
@@ -29,13 +30,11 @@ extension IOSOverview: NoInputResolver {
       withBindings: [.string("8d35f043")],
     )
 
-    let totalSuccess = try await context.db.count(
-      DistinctVendorCount.self,
-      withBindings: [.string("cdb31095")],
-    )
-
-    let standardSuccess = try await context.db.count(StandardSuccessCount.self)
-    let supervisedSuccess = try await context.db.count(SupervisedSuccessCount.self)
+    let screenTimeSuccess = try await context.db.count(ScreenTimeSuccessCount.self)
+    let configuratorSuccess = try await context.db.count(ConfiguratorSuccessCount.self)
+    let gertrudeSupervisionSuccess = try await context.db
+      .count(GertrudeSupervisionSuccessCount.self)
+    let totalSuccess = screenTimeSuccess + configuratorSuccess + gertrudeSupervisionSuccess
     let stuckIn18PlusPath = try await context.db.count(StuckIn18PlusCount.self)
     let parentFalseStarts = try await context.db.count(ParentDeviceDropoffCount.self)
 
@@ -46,9 +45,16 @@ extension IOSOverview: NoInputResolver {
 
     let recentInstalls = try await context.db.customQuery(RecentInstallsQuery.self)
       .map { row in
-        RecentInstall(
+        let status = if row.supervised {
+          "supervised"
+        } else if row.succeeded {
+          "success"
+        } else {
+          "incomplete"
+        }
+        return RecentInstall(
           date: row.date,
-          status: row.succeeded ? "success" : "incomplete",
+          status: status,
           deviceType: ModelIdentifier.deviceType(from: row.modelIdentifier),
         )
       }
@@ -57,8 +63,9 @@ extension IOSOverview: NoInputResolver {
       adjustedLaunches: adjustedLaunches,
       parentFalseStarts: parentFalseStarts,
       totalSuccess: totalSuccess,
-      standardSuccess: standardSuccess,
-      supervisedSuccess: supervisedSuccess,
+      screenTimeSuccess: screenTimeSuccess,
+      configuratorSuccess: configuratorSuccess,
+      gertrudeSupervisionSuccess: gertrudeSupervisionSuccess,
       stuckIn18PlusPath: stuckIn18PlusPath,
       successRate: successRate,
       recentInstalls: recentInstalls,
@@ -83,10 +90,12 @@ private struct DistinctVendorCount: CustomCountable {
   var count: Int
 }
 
-private struct StandardSuccessCount: CustomCountable {
+private struct ScreenTimeSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
+    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
+    let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
     return SQL.Statement("""
     SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
@@ -98,13 +107,17 @@ private struct StandardSuccessCount: CustomCountable {
       AND \(deviceId) NOT IN (
         SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
       )
+      AND \(deviceId) NOT IN (
+        SELECT \(sDeviceId) FROM \(table: IOSApp.Supervision.self)
+        WHERE \(sProfileInstalledAt) IS NOT NULL
+      )
     """)
   }
 
   var count: Int
 }
 
-private struct SupervisedSuccessCount: CustomCountable {
+private struct ConfiguratorSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
@@ -112,8 +125,32 @@ private struct SupervisedSuccessCount: CustomCountable {
     SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
     WHERE \(deviceId) IS NOT NULL
-      AND \(eventId) = 'cdb31095'
+      AND \(eventId) = '8d35f043'
       AND \(deviceId) IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
+      )
+    """)
+  }
+
+  var count: Int
+}
+
+private struct GertrudeSupervisionSuccessCount: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    let deviceId = IOSEvent.columnName(.deviceId)
+    let eventId = IOSEvent.columnName(.eventId)
+    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
+    let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
+    return SQL.Statement("""
+    SELECT COUNT(DISTINCT \(deviceId)) AS count
+    FROM \(table: IOSEvent.self)
+    WHERE \(deviceId) IS NOT NULL
+      AND \(eventId) = '8d35f043'
+      AND \(deviceId) IN (
+        SELECT \(sDeviceId) FROM \(table: IOSApp.Supervision.self)
+        WHERE \(sProfileInstalledAt) IS NOT NULL
+      )
+      AND \(deviceId) NOT IN (
         SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
       )
     """)
@@ -164,11 +201,14 @@ private struct RecentInstallsQuery: CustomQueryable {
     let eventId = IOSEvent.columnName(.eventId)
     let createdAt = IOSEvent.columnName(.createdAt)
     let modelIdentifier = IOSEvent.columnName(.modelIdentifier)
+    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
+    let profileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
     return SQL.Statement("""
     SELECT
       first_launch.\(createdAt) AS date,
       first_launch.\(modelIdentifier) AS model_identifier,
-      CASE WHEN success.\(deviceId) IS NOT NULL THEN TRUE ELSE FALSE END AS succeeded
+      CASE WHEN success.\(deviceId) IS NOT NULL THEN TRUE ELSE FALSE END AS succeeded,
+      CASE WHEN sup.\(sDeviceId) IS NOT NULL THEN TRUE ELSE FALSE END AS supervised
     FROM (
       SELECT DISTINCT ON (\(deviceId)) \(deviceId), \(createdAt), \(modelIdentifier)
       FROM \(table: IOSEvent.self)
@@ -180,6 +220,11 @@ private struct RecentInstallsQuery: CustomQueryable {
       FROM \(table: IOSEvent.self)
       WHERE \(deviceId) IS NOT NULL AND \(eventId) = 'cdb31095'
     ) success ON first_launch.\(deviceId) = success.\(deviceId)
+    LEFT JOIN (
+      SELECT \(sDeviceId)
+      FROM \(table: IOSApp.Supervision.self)
+      WHERE \(profileInstalledAt) IS NOT NULL
+    ) sup ON first_launch.\(deviceId) = sup.\(sDeviceId)
     ORDER BY first_launch.\(createdAt) DESC
     """)
   }
@@ -187,4 +232,5 @@ private struct RecentInstallsQuery: CustomQueryable {
   var date: Date
   var modelIdentifier: String
   var succeeded: Bool
+  var supervised: Bool
 }

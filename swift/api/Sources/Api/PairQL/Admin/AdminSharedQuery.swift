@@ -19,6 +19,8 @@ struct ParentData: Sendable {
   var numNonEmptyKeychains: Int
   var numNotifications: Int
   var numIOSDevices: Int
+  var hasCompletedSupervision: Bool
+  var hasIncompleteSupervision: Bool
   var childActivityCount: Int
   var plan: Plan
   var hasGclid: Bool
@@ -32,6 +34,8 @@ struct ParentData: Sendable {
     self.numNonEmptyKeychains = 0
     self.numNotifications = 0
     self.numIOSDevices = 0
+    self.hasCompletedSupervision = false
+    self.hasIncompleteSupervision = false
     self.childActivityCount = 0
     self.plan = Plan(subscription: subscription)
     self.hasGclid = model.gclid != nil
@@ -57,6 +61,7 @@ struct AnalyticsData: Sendable {
 @globalActor actor AnalyticsQuery {
   static let shared = AnalyticsQuery()
   private var _data: AnalyticsData?
+  private var _inflight: Task<AnalyticsData, Error>?
 
   @Dependency(\.db) private var db
   @Dependency(\.logger) private var logger
@@ -65,8 +70,12 @@ struct AnalyticsData: Sendable {
 
   func data() async throws -> AnalyticsData {
     if let data = _data { return data }
-    let data = try await self.queryFreshData()
+    if let inflight = _inflight { return try await inflight.value }
+    let task = Task { try await self.queryFreshData() }
+    self._inflight = task
+    let data = try await task.value
     self._data = data
+    self._inflight = nil
     return data
   }
 
@@ -112,6 +121,11 @@ struct AnalyticsData: Sendable {
       map[row.parentId] = row.screenshotCount + row.keystrokeLineCount
     }
 
+    let supervisionParents = try await self.db.customQuery(SupervisionParents.self)
+    let completedSupervisionSet = Set(supervisionParents.filter(\.hasCompleted).map(\.parentId))
+    let incompleteSupervisionSet = Set(supervisionParents.filter { !$0.hasCompleted }
+      .map(\.parentId))
+
     var data = try await AnalyticsData(
       parents: [:],
       overview: .init(
@@ -132,6 +146,9 @@ struct AnalyticsData: Sendable {
       parent.numNotifications = notificationsMap[model.id] ?? 0
       parent.numComputerUsers = computerUserMap[model.id] ?? 0
       parent.numIOSDevices = iosDeviceMap[model.id] ?? 0
+      parent.hasCompletedSupervision = completedSupervisionSet.contains(model.id)
+      parent.hasIncompleteSupervision = incompleteSupervisionSet.contains(model.id)
+        && !completedSupervisionSet.contains(model.id)
       parent.childActivityCount = activityMap[model.id] ?? 0
       if parent.isActive {
         data.overview.activeParents += 1
@@ -289,4 +306,23 @@ struct IOSDeviceCount: CustomQueryable {
 
   var parentId: Parent.Id
   var iosDeviceCount: Int
+}
+
+struct SupervisionParents: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    .init("""
+    SELECT c.\(Child.columnName(.parentId)) AS parent_id,
+           BOOL_OR(s.\(IOSApp.Supervision
+      .columnName(.profileInstalledAt)) IS NOT NULL) AS has_completed
+    FROM \(table: IOSApp.Supervision.self) s
+    JOIN \(table: IOSApp.Device.self) d
+      ON d.id = s.\(IOSApp.Supervision.columnName(.deviceId))
+    JOIN \(table: Child.self) c
+      ON c.id = d.\(IOSApp.Device.columnName(.childId))
+    GROUP BY c.\(Child.columnName(.parentId));
+    """)
+  }
+
+  var parentId: Parent.Id
+  var hasCompleted: Bool
 }

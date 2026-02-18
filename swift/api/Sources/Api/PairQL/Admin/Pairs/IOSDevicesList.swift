@@ -103,6 +103,7 @@ private struct DeviceSummaryQuery: CustomQueryable {
         WHEN s.\(sSupervisedAt) IS NOT NULL THEN 'missingProfile'
         WHEN s.\(sClaimedAt) IS NOT NULL THEN 'claimed'
         WHEN s.\(sId) IS NOT NULL THEN 'pendingClaim'
+        WHEN cfg.\(eDeviceId) IS NOT NULL THEN 'configurated'
         WHEN st.\(eDeviceId) IS NOT NULL THEN 'screenTime'
         WHEN oo.\(eDeviceId) IS NOT NULL THEN 'complete'
         ELSE 'incomplete'
@@ -128,6 +129,11 @@ private struct DeviceSummaryQuery: CustomQueryable {
     ) oo ON fl.\(eDeviceId) = oo.\(eDeviceId)
     LEFT JOIN \(table: IOSApp.Device.self) d ON d.\(dId) = fl.\(eDeviceId)
     LEFT JOIN \(table: IOSApp.Supervision.self) s ON s.\(sDeviceId) = d.\(dId)
+    LEFT JOIN (
+      SELECT DISTINCT \(eDeviceId)
+      FROM \(table: IOSEvent.self)
+      WHERE \(eEventId) = 'bad8adcc'
+    ) cfg ON fl.\(eDeviceId) = cfg.\(eDeviceId)
     LEFT JOIN (
       SELECT DISTINCT \(eDeviceId)
       FROM \(table: IOSEvent.self)

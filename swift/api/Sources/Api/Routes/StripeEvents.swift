@@ -213,16 +213,16 @@ func verifyStripeSignature(
   }
 }
 
-func notifyFirstPayment(email: String, tier: Subscription.Tier) {
+func notifyFirstPayment(parent: Parent, tier: Subscription.Tier) {
+  let email = parent.email.rawValue
+  let adminLink = AdminLink()
+  let slackLink = adminLink.slack(to: .parent(parent.id), text: email)
+  let emailLink = adminLink.email(to: .parent(parent.id), text: email)
   Task {
     let slack = get(dependency: \.slack)
     let postmark = get(dependency: \.postmark)
-    await slack.internal(.info, "*FIRST Payment* from `\(email)`, plan: `.\(tier)`")
-    await slack.internal(.stripe, "*FIRST Payment* from `\(email)`, plan: `.\(tier)`")
-    postmark.toSuperAdmin("FIRST Payment", "from \(email), plan: .\(tier)")
+    await slack.internal(.info, "*FIRST Payment* from \(slackLink), plan: `.\(tier)`")
+    await slack.internal(.stripe, "*FIRST Payment* from \(slackLink), plan: `.\(tier)`")
+    postmark.toSuperAdmin("FIRST Payment", "from \(emailLink), plan: .\(tier)")
   }
-}
-
-func notifyFirstPayment(parent: Parent, tier: Subscription.Tier) {
-  notifyFirstPayment(email: parent.email.rawValue, tier: tier)
 }

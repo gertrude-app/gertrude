@@ -47,7 +47,12 @@ export namespace IOSDetailedStats {
         pctOfSuccess: number;
         pctOfLaunch: number;
       };
-      supervision: {
+      configurator: {
+        count: number;
+        pctOfSuccess: number;
+        pctOfLaunch: number;
+      };
+      gertrudeSupervision: {
         count: number;
         pctOfSuccess: number;
         pctOfLaunch: number;

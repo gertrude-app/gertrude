@@ -246,9 +246,10 @@ const ParentDetail: React.FC = () => {
                       </div>
                       <div className="grid gap-2">
                         {child.iosDevices.map((device) => (
-                          <div
+                          <Link
                             key={device.id}
-                            className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex gap-4"
+                            to={`/ios/${device.id.toLowerCase()}/events`}
+                            className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex gap-4 hover:bg-slate-100 hover:border-slate-200 transition-colors"
                           >
                             <div className="flex-shrink-0 w-20 h-20 bg-white rounded-lg border border-slate-200 flex items-center justify-center p-2">
                               <img
@@ -282,7 +283,7 @@ const ParentDetail: React.FC = () => {
                                 <span>iOS {device.iosVersion}</span>
                               </div>
                             </div>
-                          </div>
+                          </Link>
                         ))}
                       </div>
                     </div>
