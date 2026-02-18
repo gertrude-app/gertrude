@@ -113,6 +113,21 @@ extension DeleteEntity_v2: Resolver {
         .where(.id == input.id)
         .where(.parentId == context.parent.id)
         .first(in: context.db)
+
+      let devices = try await child.iosDevices(in: context.db)
+      for device in devices {
+        if let supervision = try await device.supervision(in: context.db),
+           supervision.supervised {
+          throw context.error(
+            id: "ce5344d3",
+            type: .badRequest,
+            debugMessage: "\(child.id) has supervised iOS device \(device.id)",
+            userMessage: "\(child.name) has a supervised iOS device. Supervision must be removed before they can be deleted.",
+            showContactSupport: true,
+          )
+        }
+      }
+
       dashSecurityEvent(.childDeleted, "name: \(child.name)", in: context)
 
       let childKeychainIds = try await ChildKeychain.query()

@@ -1,8 +1,13 @@
+import DuetSQL
 import FluentKit
 import Foundation
 import PostgresKit
 
 public extension SQLQueryString {
+  mutating func appendInterpolation<M: DuetSQL.Model>(table _: M.Type) {
+    self.appendInterpolation(unsafeRaw: M.qualifiedTableName)
+  }
+
   mutating func appendInterpolation<T: RawRepresentable>(id: T) where T.RawValue == UUID {
     self.appendInterpolation(uuid: id.rawValue)
   }

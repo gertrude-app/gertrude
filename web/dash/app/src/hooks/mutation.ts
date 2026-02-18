@@ -41,8 +41,12 @@ export function useMutation<T, V>(
       }
       if (toasting) {
         toast.dismiss();
-        const { verb, entity } = toasting;
-        toast.error(`Failed to ${verb} ${entity}`, { duration: 6000 });
+        if (error.userMessage) {
+          toast.error(error.userMessage, { duration: 8000 });
+        } else {
+          const { verb, entity } = toasting;
+          toast.error(`Failed to ${verb} ${entity}`, { duration: 6000 });
+        }
       }
     },
     onSuccess(payload) {
