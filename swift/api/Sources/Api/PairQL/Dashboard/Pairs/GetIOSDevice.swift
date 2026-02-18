@@ -30,6 +30,9 @@ struct GetIOSDevice: Pair {
     var webPolicy: WebContentFilterPolicy.Kind
     var webPolicyDomains: [String]
     var customBlockRules: [BlockRuleData]
+    var isProfileLocked: Bool
+    var allowAppRemoval: Bool
+    var allowEraseContentAndSettings: Bool
   }
 }
 
@@ -60,6 +63,9 @@ extension GetIOSDevice: Resolver {
       webPolicy: .init(string: device.webPolicy) ?? .blockAll,
       webPolicyDomains: domains.map(\.domain),
       customBlockRules: blockRules.map { .init(id: $0.id, rule: $0.rule) },
+      isProfileLocked: device.isProfileLocked,
+      allowAppRemoval: device.allowAppRemoval,
+      allowEraseContentAndSettings: device.allowEraseContentAndSettings,
     )
   }
 }

@@ -267,6 +267,14 @@ cd iosapp/lib-ios && SWIFT_DETERMINISTIC_HASHING=1 swift test # iOS app tests
 
 - read several examples in `api/Sources/Api/Database/Migrations/` to see pattern
 
+### Adding/Removing a Model Field
+
+Adding/removing a field/column to a model requires changes in three files:
+
+- The model struct (e.g. `api/Sources/Api/Models/IOS/IOSDevice.swift`) — add the property
+- `api/Sources/Api/Models/Models+Duet.swift` — add to the `CodingKeys` enum
+- `api/Sources/Api/Models/Models+DuetSQL.swift` — add to `postgresData` and `insertValues`
+
 ### Other database tasks
 
 - see `./claude/skills/database/SKILL.md`

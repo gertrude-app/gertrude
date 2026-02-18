@@ -111,6 +111,8 @@ extension IOSApp.Device {
     case iosVersion
     case webPolicy
     case isProfileLocked
+    case allowAppRemoval
+    case allowEraseContentAndSettings
     case createdAt
     case updatedAt
   }

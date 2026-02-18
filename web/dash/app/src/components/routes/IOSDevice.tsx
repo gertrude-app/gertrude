@@ -5,6 +5,7 @@ import {
   // EditBlockRules,
   Loading,
   PageHeading,
+  ToggleCard,
   // TrashBtn,
 } from '@dash/components';
 import { ApiErrorMessage /*ConfirmDeleteEntity*/ } from '@dash/components';
@@ -27,6 +28,9 @@ const IOSDevice: React.FC = () => {
     webPolicyDomains: [],
     webPolicy: `blockAll`,
     newDomain: ``,
+    isProfileLocked: true,
+    allowAppRemoval: false,
+    allowEraseContentAndSettings: false,
   });
 
   // const deleteBlockRule = useConfirmableDelete(`blockRule`, {
@@ -57,6 +61,9 @@ const IOSDevice: React.FC = () => {
         enabledBlockGroups: [...state.enabledBlockGroups],
         webPolicy: state.webPolicy,
         webPolicyDomains: [...state.webPolicyDomains],
+        isProfileLocked: state.isProfileLocked,
+        allowAppRemoval: state.allowAppRemoval,
+        allowEraseContentAndSettings: state.allowEraseContentAndSettings,
       }),
     { toast: `save:ios-device`, invalidating: [Key.iOSDevice(id)] },
   );
@@ -73,10 +80,15 @@ const IOSDevice: React.FC = () => {
     return <ApiErrorMessage error={deviceQuery.error} />;
   }
 
+  const dt = deviceQuery.data.deviceType;
+
   const isDirty =
     isEqual(state.enabledBlockGroups, deviceQuery.data.enabledBlockGroups) &&
     state.webPolicy === deviceQuery.data.webPolicy &&
-    isEqual(state.webPolicyDomains, deviceQuery.data.webPolicyDomains);
+    isEqual(state.webPolicyDomains, deviceQuery.data.webPolicyDomains) &&
+    state.isProfileLocked === deviceQuery.data.isProfileLocked &&
+    state.allowAppRemoval === deviceQuery.data.allowAppRemoval &&
+    state.allowEraseContentAndSettings === deviceQuery.data.allowEraseContentAndSettings;
 
   return (
     <div className="relative max-w-3xl">
@@ -89,6 +101,44 @@ const IOSDevice: React.FC = () => {
             groups={deviceQuery.data.allBlockGroups}
             enabledGroupIds={state.enabledBlockGroups}
             onToggle={(id) => dispatch({ type: `toggleBlockGroup`, id })}
+          />
+        </div>
+        <div className="mt-12 max-w-3xl">
+          <h2 className="text-lg font-bold text-slate-700">Device settings</h2>
+          <ToggleCard
+            title="Prevent protection removal"
+            description={`Make it impossible for the ${dt} user to remove Gertrude’s protection.`}
+            enabled={state.isProfileLocked}
+            setEnabled={(v) => dispatch({ type: `setIsProfileLocked`, value: v })}
+            warning={
+              !state.isProfileLocked
+                ? `The ${dt} user may remove the profile in order to stop Gertrude’s protection and uninstall.`
+                : undefined
+            }
+          />
+          <ToggleCard
+            title="Allow deleting apps"
+            description={`Keeping this off prevents the ${dt} user from deleting the Gertrude app, but also prevents them from deleting any app. Enable temporarily if you need to delete some apps from the ${dt}, then re-enable.`}
+            enabled={state.allowAppRemoval}
+            setEnabled={(v) => dispatch({ type: `setAllowAppRemoval`, value: v })}
+            warning={
+              state.allowAppRemoval
+                ? `The user can delete apps (including Gertrude) from their ${dt}`
+                : undefined
+            }
+          />
+          <ToggleCard
+            title="Allow factory reset"
+            description={`Allow the ${dt} to be erased and reset to factory settings, bypassing protection.`}
+            enabled={state.allowEraseContentAndSettings}
+            setEnabled={(v) =>
+              dispatch({ type: `setAllowEraseContentAndSettings`, value: v })
+            }
+            warning={
+              state.allowEraseContentAndSettings
+                ? `The user will be able to erase the ${dt} removing Gertrude and all restrictions`
+                : undefined
+            }
           />
         </div>
         {/* <div className="mt-12 max-w-3xl">

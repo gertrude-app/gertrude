@@ -64,6 +64,7 @@ export type { NewMethod, NotificationUpdate } from './Settings/Settings';
 export type { ActivityFeedItem } from './Users/Activity/ChildActivityFeed';
 export { default as BlockRuleEditor } from './iOS/BlockRuleEditor';
 export { default as BlockGroupList } from './iOS/BlockGroupList';
+export { default as ToggleCard } from './Forms/ToggleCard';
 export type { BlockGroupData } from './iOS/BlockGroupList';
 export { default as ChildAssignmentPicker } from './ClaimDevice/ChildAssignmentPicker';
 export type { ChildSelection } from './ClaimDevice/ChildAssignmentPicker';
