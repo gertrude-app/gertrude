@@ -36,7 +36,6 @@ export { default as EditBlockRules } from './iOS/EditBlockRules';
 export { default as EditChild } from './Users/EditChild';
 export { default as UnlockRequestCard } from './UnlockRequestCard';
 export { default as Dashboard } from './Dashboard/Dashboard';
-export type { PendingIosDevice } from './Dashboard/Dashboard';
 export { default as DaySummaryCard } from './Users/Activity/DaySummaryCard';
 export { default as KeystrokesViewer } from './Users/Activity/KeystrokesViewer';
 export { default as ScreenshotViewer } from './Users/Activity/ScreenshotViewer';
@@ -45,6 +44,8 @@ export { default as UnlockRequestsWidget } from './Dashboard/UnlockRequestsWidge
 export { default as UserScreenshotsWidget } from './Dashboard/UserScreenshotsWidget';
 export { default as UserActivityWidget } from './Dashboard/UserActivityWidget';
 export { default as UsersOverviewWidget } from './Dashboard/UsersOverviewWidget';
+export { default as ChildDeviceCard } from './Dashboard/ChildDeviceCard';
+export { default as ChildrenDevicesWidget } from './Dashboard/ChildrenDevicesWidget';
 export { default as ChildActivityFeed } from './Users/Activity/ChildActivityFeed';
 export { default as FeedHeader } from './Users/Activity/FeedHeader';
 export { default as ReviewDayWrapper } from './Users/Activity/ReviewDayWrapper';

@@ -27,6 +27,7 @@ enum ResetRoute {
       .get()
 
     let betsy = try await request.context.db.find(AdminBetsy.Ids.betsy)
+    let ben: Parent = try await request.context.db.find(AdminBen.Ids.ben)
     let dashUrl = request.env.dashboardUrl
     let jimmysId = AdminBetsy.Ids.jimmysId
     let filterReqId = AdminBetsy.Ids.suspendFilter.lowercased
@@ -41,6 +42,7 @@ enum ResetRoute {
           code { color: rebeccapurple; font-size: 1.2em;}
         </style>
         <h2>Reset complete</h2>
+        <h3>Betsy (Mac-focused)</h3>
         <p>
           To auto login as "Betsy" set this <code>.env</code> variable
            in <code>./dashboard/.env</code>
@@ -56,6 +58,19 @@ enum ResetRoute {
           To test a filter suspension, use
           <a href ="\(dashUrl)/children/\(jimmysId)/suspend-filter-requests/\(filterReqId)">
           this route</a> in the dashboard web app:<br />
+        </p>
+        <hr />
+        <h3>Ben (iOS-only, one child: Luke)</h3>
+        <p>
+          To auto login as "Ben" set this <code>.env</code> variable
+           in <code>./dashboard/.env</code>
+        </p>
+        <pre style="background: #eaeaea; padding: 1em 1em 0 1em;">
+        VITE_ADMIN_CREDS=\(ben.id.lowercased):\(ben.id.lowercased)
+        </pre>
+        <p>
+          ...or use his email address:
+           <code>\(ben.email)</code>
         </p>
         </body></html>
       """),

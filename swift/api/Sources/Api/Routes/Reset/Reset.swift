@@ -11,6 +11,7 @@ enum Reset {
       .where(.id != Parent.Id.stagingPublicKeychainOwner)
       .delete(in: db, force: true)
     try await AdminBetsy.create()
+    try await AdminBen.create()
     try await self.createIOSEvents()
   }
 

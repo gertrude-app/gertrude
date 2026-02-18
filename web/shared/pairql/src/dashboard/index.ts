@@ -5,7 +5,7 @@ export * from './pairs/ClaimIOSDevice';
 export * from './pairs/CombinedUsersActivityFeed';
 export * from './pairs/ConfirmPendingNotificationMethod';
 export * from './pairs/CreatePendingNotificationMethod';
-export * from './pairs/DashboardWidgets';
+export * from './pairs/DashboardWidgets_v2';
 export * from './pairs/DecideFilterSuspensionRequest';
 export * from './pairs/DeleteActivityItems_v2';
 export * from './pairs/DeleteEntity_v2';

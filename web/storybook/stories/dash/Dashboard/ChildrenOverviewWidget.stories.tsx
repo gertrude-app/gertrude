@@ -13,31 +13,64 @@ export const Default: Story = props({
   users: withIds([
     {
       name: `Little Jimmy`,
-      status: {
-        case: `filterSuspended`,
-        resuming: new Date(new Date().getTime() + 7 * 60 * 1000).toISOString(),
-      },
-      numDevices: 1,
+      devices: [
+        {
+          platform: `mac`,
+          deviceName: `MacBook Pro`,
+          macStatus: {
+            case: `filterSuspended`,
+            resuming: new Date(new Date().getTime() + 7 * 60 * 1000).toISOString(),
+          },
+        },
+      ],
     },
     {
       name: `Sally`,
-      status: {
-        case: `downtime`,
-        ending: new Date(new Date().getTime() + 60 * 60 * 1000).toISOString(),
-      },
-      numDevices: 2,
+      devices: [
+        {
+          platform: `mac`,
+          deviceName: `iMac`,
+          macStatus: {
+            case: `downtime`,
+            ending: new Date(new Date().getTime() + 60 * 60 * 1000).toISOString(),
+          },
+        },
+        { platform: `mac`, deviceName: `MacBook Air`, macStatus: { case: `offline` } },
+      ],
     },
     {
       name: `Henry`,
-      status: {
-        case: `downtimePaused`,
-        resuming: new Date(new Date().getTime() + 5 * 60 * 1000).toISOString(),
-      },
-      numDevices: 3,
+      devices: [
+        {
+          platform: `mac`,
+          deviceName: `Mac Mini`,
+          macStatus: {
+            case: `downtimePaused`,
+            resuming: new Date(new Date().getTime() + 5 * 60 * 1000).toISOString(),
+          },
+        },
+        { platform: `mac`, deviceName: `MacBook Pro`, macStatus: { case: `filterOn` } },
+        { platform: `ios`, deviceName: `iPhone 14`, iosStatus: `setupComplete` },
+      ],
     },
-    { name: `Humphry`, status: { case: `offline` }, numDevices: 4 },
-    { name: `Hon`, status: { case: `filterOff` }, numDevices: 5 },
-    { name: `Hilda`, status: { case: `filterOn` }, numDevices: 5 },
+    {
+      name: `Humphry`,
+      devices: [
+        { platform: `mac`, deviceName: `MacBook Air`, macStatus: { case: `offline` } },
+      ],
+    },
+    {
+      name: `Hon`,
+      devices: [
+        { platform: `mac`, deviceName: `iMac`, macStatus: { case: `filterOff` } },
+      ],
+    },
+    {
+      name: `Hilda`,
+      devices: [
+        { platform: `mac`, deviceName: `Mac Mini`, macStatus: { case: `filterOn` } },
+      ],
+    },
   ]),
 });
 

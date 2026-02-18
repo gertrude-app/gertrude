@@ -22,7 +22,7 @@ describe(`signup`, () => {
       token: `token-123`,
     });
 
-    cy.interceptPql(`DashboardWidgets`, {
+    cy.interceptPql(`DashboardWidgets_v2`, {
       children: [],
       unlockRequests: [],
       childActivitySummaries: [],
@@ -45,11 +45,11 @@ describe(`signup`, () => {
       expect(request.body.detail).to.contain(`PARENT-CHILD`);
     });
 
-    cy.wait(`@DashboardWidgets`)
+    cy.wait(`@DashboardWidgets_v2`)
       .its(`request.headers.${`X-AdminToken`.toLowerCase()}`)
       .should(`eq`, `token-123`);
 
-    cy.contains(`Welcome to the parent website!`).then(() => {
+    cy.contains(`Welcome to Gertrude!`).then(() => {
       expect(localStorage.getItem(`admin_id`)).to.eq(`admin-123`);
       expect(localStorage.getItem(`admin_token`)).to.eq(`token-123`);
     });

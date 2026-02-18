@@ -1,15 +1,19 @@
 // auto-generated, do not edit
 import type { ChildComputerStatus } from '../shared';
 
-export namespace DashboardWidgets {
+export namespace DashboardWidgets_v2 {
   export type Input = void;
 
   export interface Output {
     children: Array<{
       id: UUID;
       name: string;
-      status: ChildComputerStatus;
-      numDevices: number;
+      devices: Array<{
+        platform: `mac` | `ios`;
+        deviceName: string;
+        macStatus?: ChildComputerStatus;
+        iosStatus?: `setupComplete` | `pendingSetup`;
+      }>;
     }>;
     childActivitySummaries: Array<{
       id: UUID;

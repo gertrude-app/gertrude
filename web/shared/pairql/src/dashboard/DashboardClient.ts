@@ -57,9 +57,13 @@ export default class DashboardClient extends Client<Auth> {
   };
 
   public dashboardWidgets = (
-    input: P.DashboardWidgets.Input,
-  ): Promise<Result<P.DashboardWidgets.Output>> => {
-    return this.query<P.DashboardWidgets.Output>(input, `DashboardWidgets`, `parent`);
+    input: P.DashboardWidgets_v2.Input,
+  ): Promise<Result<P.DashboardWidgets_v2.Output>> => {
+    return this.query<P.DashboardWidgets_v2.Output>(
+      input,
+      `DashboardWidgets_v2`,
+      `parent`,
+    );
   };
 
   public decideFilterSuspensionRequest = (

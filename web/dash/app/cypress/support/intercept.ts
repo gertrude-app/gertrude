@@ -22,8 +22,8 @@ export function interceptPql(
   output: T.CreatePendingNotificationMethod.Output,
 ): void;
 export function interceptPql(
-  slug: `DashboardWidgets`,
-  output: T.DashboardWidgets.Output,
+  slug: `DashboardWidgets_v2`,
+  output: T.DashboardWidgets_v2.Output,
 ): void;
 export function interceptPql(
   slug: `DecideFilterSuspensionRequest`,
@@ -190,7 +190,7 @@ export function forcePqlErr(
     | `CombinedUsersActivityFeed`
     | `ConfirmPendingNotificationMethod`
     | `CreatePendingNotificationMethod`
-    | `DashboardWidgets`
+    | `DashboardWidgets_v2`
     | `DecideFilterSuspensionRequest`
     | `DeleteActivityItems_v2`
     | `DeleteEntity_v2`
