@@ -66,17 +66,13 @@ extension ParentsList: Resolver {
       let parentData = analyticsData.parents[parent.id]
       let subscription = subscriptionMap[parent.id]
       let plan = Plan(subscription: subscription)
-      let planCase = switch plan {
-      case .free: "free"
-      case .light: "light"
-      case .full: "full"
-      }
+      let (planCase, subscriptionStatus) = self.planDisplay(plan, subscription)
       return ParentSummary(
         id: parent.id,
         email: parent.email.rawValue,
         createdAt: parent.createdAt,
         planCase: planCase,
-        subscriptionStatus: self.subscriptionStatusString(for: subscription),
+        subscriptionStatus: subscriptionStatus,
         numChildren: parentData?.numChildren ?? 0,
         macDeviceCount: parentData?.numComputerUsers ?? 0,
         iosDeviceCount: parentData?.numIOSDevices ?? 0,
@@ -92,26 +88,37 @@ extension ParentsList: Resolver {
     )
   }
 
-  private static func subscriptionStatusString(for subscription: Subscription?) -> String {
-    guard let subscription else {
-      return "free"
-    }
-    guard let billingStatus = subscription.billingStatus else {
-      return "complimentary"
-    }
-    switch billingStatus {
-    case .trialing:
-      return "trialing"
-    case .trialExpiringSoon:
-      return "trialExpiringSoon"
-    case .trialExpired:
-      return "trialExpired"
-    case .paid:
-      return "paid"
-    case .overdue:
-      return "overdue"
-    case .unpaid, .cancelled:
-      return "unpaid"
+  private static func planDisplay(
+    _ plan: Plan,
+    _ subscription: Subscription?,
+  ) -> (planCase: String, subscriptionStatus: String) {
+    switch plan {
+    case .free:
+      ("free", "free")
+    case .light(.paid):
+      ("light", "paid")
+    case .light(.overdue):
+      ("light", "overdue")
+    case .full(.complimentary):
+      ("full", "complimentary")
+    case .full(.trialing(let kind, _)):
+      switch kind {
+      case .full:
+        ("full", "trialing")
+      case .fromLight:
+        ("light", "trialingFull")
+      }
+    case .full(.trialExpired(let kind)):
+      switch kind {
+      case .full:
+        ("full", "trialExpired")
+      case .fromLight:
+        ("light", "trialExpired")
+      }
+    case .full(.paid):
+      ("full", "paid")
+    case .full(.overdue):
+      ("full", "overdue")
     }
   }
 }

@@ -43,6 +43,8 @@ const planBadgeStyles: Record<string, Record<string, string>> = {
   },
   light: {
     paid: `bg-sky-50 text-sky-700 ring-sky-600/20`,
+    trialingFull: `bg-violet-50 text-violet-600 ring-violet-500/20`,
+    trialExpired: `bg-orange-50 text-orange-700 ring-orange-600/20`,
     overdue: `bg-amber-50 text-amber-700 ring-amber-600/20`,
     unpaid: `bg-red-50 text-red-700 ring-red-600/20`,
   },
@@ -56,6 +58,7 @@ const billingLabels: Record<string, string> = {
   paid: `Paid`,
   trialing: `Trial`,
   trialExpiringSoon: `Trial Soon`,
+  trialingFull: `Trialing Full`,
   trialExpired: `Trial Expired`,
   overdue: `Overdue`,
   unpaid: `Unpaid`,
