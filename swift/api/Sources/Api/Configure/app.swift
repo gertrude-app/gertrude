@@ -24,6 +24,7 @@ public enum Configure {
 private struct ApiLifecyle: LifecycleHandler {
   func didBootAsync(_ app: Application) async throws {
     await with(dependency: \.ephemeral).restoreStorage()
+    try await installTriggers(app.db as! SQLDatabase)
   }
 
   // NB: 7/2025 - as far as i can tell, this is not running ever
