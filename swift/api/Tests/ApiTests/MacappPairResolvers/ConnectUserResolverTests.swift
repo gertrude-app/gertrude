@@ -138,6 +138,54 @@ final class ConnectUserResolversTests: ApiTestCase, @unchecked Sendable {
     expect(retrievedOldToken?.id).not.toBeNil()
   }
 
+  func testConnectUser_createsDefaultKeychainForChildWithNoKeychains() async throws {
+    try await self.db.delete(all: Computer.self)
+    let child = try await self.child()
+    let keychainsBefore = try await child.model.keychains(in: self.db)
+    expect(keychainsBefore.isEmpty).toBeTrue()
+
+    let code = await with(dependency: \.ephemeral)
+      .createPendingAppConnection(child.id)
+    _ = try await ConnectUser.resolve(with: self.input(code), in: self.context)
+
+    let keychains = try await child.model.keychains(in: self.db)
+    expect(keychains.count).toEqual(1)
+    expect(keychains[0].name).toEqual("\(child.name)'s Keychain")
+    expect(keychains[0].description!).toContain("created automatically")
+
+    // now test delete cleans up an empty autogen keychain
+    let deleteOutput = try await DeleteEntity_v2.resolve(
+      with: .init(id: child.id.rawValue, type: .child),
+      in: child.parent.context,
+    )
+    expect(deleteOutput).toEqual(.success)
+    let childKeychains = try await ChildKeychain.query()
+      .where(.childId == child.id)
+      .all(in: self.db)
+    expect(childKeychains.isEmpty).toBeTrue()
+    let retrievedKeychain = try? await self.db.find(keychains[0].id)
+    expect(retrievedKeychain).toBeNil() // <-- empty autogen keychain cleaned up
+  }
+
+  func testConnectUser_doesNotCreateKeychainIfChildAlreadyHasOne() async throws {
+    try await self.db.delete(all: Computer.self)
+    let child = try await self.child()
+    let existing = try await self.db.create(Keychain(
+      parentId: child.parent.id,
+      name: "Existing",
+      isPublic: false,
+    ))
+    try await self.db.create(ChildKeychain(childId: child.id, keychainId: existing.id))
+
+    let code = await with(dependency: \.ephemeral)
+      .createPendingAppConnection(child.id)
+    _ = try await ConnectUser.resolve(with: self.input(code), in: self.context)
+
+    let keychains = try await child.model.keychains(in: self.db)
+    expect(keychains.count).toEqual(1)
+    expect(keychains[0].name).toEqual("Existing")
+  }
+
   // helpers
 
   func input(_ code: Int) -> ConnectUser.Input {

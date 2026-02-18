@@ -99,6 +99,7 @@ extension ConnectUser: Resolver {
       computerUserId: computerUser.id,
     ))
 
+    try await createDefaultKeychainIfNeeded(for: user, in: context.db)
     await notifyAdConversion(child: user, db: context.db)
 
     return Output(
@@ -115,6 +116,25 @@ extension ConnectUser: Resolver {
 }
 
 // helpers
+
+private func createDefaultKeychainIfNeeded(
+  for child: Child,
+  in db: any DuetSQL.Client,
+) async throws {
+  let existingKeychains = try await child.keychains(in: db)
+  guard existingKeychains.isEmpty else { return }
+  let keychain = try await db.create(Keychain(
+    parentId: child.parentId,
+    name: "\(child.name)'s Keychain",
+    isPublic: false,
+    description: """
+    This keychain was created automatically as a default place for you to \
+    add keys for \(child.name). Feel free to use it as is, change it, \
+    delete it, or create as many other keychains as you like.
+    """,
+  ))
+  try await db.create(ChildKeychain(childId: child.id, keychainId: keychain.id))
+}
 
 private func notifyAdConversion(child: Child, db: any DuetSQL.Client) async {
   guard let parent = try? await db.find(child.parentId),

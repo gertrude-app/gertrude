@@ -35,10 +35,7 @@ final class ChildResolversTests: ApiTestCase, @unchecked Sendable {
     expect(child.downtime).toEqual("22:00-06:00")
 
     let keychains = try await child.keychains(in: self.db)
-    expect(keychains.count).toEqual(1)
-    let keychainId = keychains[0].id
-    expect(keychains[0].name).toEqual("Franny’s Keychain")
-    expect(keychains[0].description!).toContain("created automatically")
+    expect(keychains.isEmpty).toBeTrue()
     expect(sent.websocketMessages).toEqual([.init(.userUpdated, to: .user(child.id))])
 
     // now delete...
@@ -53,14 +50,6 @@ final class ChildResolversTests: ApiTestCase, @unchecked Sendable {
       .init(.userUpdated, to: .user(child.id)),
       .init(.userDeleted, to: .user(child.id)),
     ])
-
-    // and the empty keychain should be deleted
-    let childKeychains = try await ChildKeychain.query()
-      .where(.childId == child.id)
-      .all(in: self.db)
-    expect(childKeychains.isEmpty).toBeTrue()
-    let retrievedKeychain = try? await self.db.find(keychainId)
-    expect(retrievedKeychain).toBeNil()
   }
 
   func testExistingChildUpdated() async throws {

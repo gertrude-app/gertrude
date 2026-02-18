@@ -43,17 +43,6 @@ extension SaveUser: Resolver {
         showSuspensionActivity: true,
         downtime: input.downtime,
       ))
-      let keychain = try await context.db.create(Keychain(
-        parentId: context.parent.id,
-        name: "\(input.name)’s Keychain",
-        isPublic: false,
-        description: """
-        This keychain was created automatically as a default place for you to \
-        add keys for \(input.name). Feel free to use it as is, change it, \
-        delete it, or create as many other keychains as you like.
-        """,
-      ))
-      try await context.db.create(ChildKeychain(childId: user.id, keychainId: keychain.id))
       dashSecurityEvent(.childAdded, "name: \(user.name)", in: context)
     } else {
       user = try await context.db.find(input.id)
