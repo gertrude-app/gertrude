@@ -19,6 +19,7 @@ final class ConnectUserResolversTests: ApiTestCase, @unchecked Sendable {
 
   func testConnectUser_createNewDevice() async throws {
     let child = try await self.child()
+    try await self.addFullPaidSubscription(for: child.parent.id)
     let code = await with(dependency: \.ephemeral)
       .createPendingAppConnection(child.id)
 
@@ -50,10 +51,12 @@ final class ConnectUserResolversTests: ApiTestCase, @unchecked Sendable {
   func testConnectUser_twoUsersSameComputer() async throws {
     try await self.db.delete(all: Computer.self)
     let child1 = try await self.child()
+    try await self.addFullPaidSubscription(for: child1.parent.id)
     let code1 = await with(dependency: \.ephemeral)
       .createPendingAppConnection(child1.id)
 
     let child2 = try await self.child { $0.parentId = child1.parent.id }
+    try await self.addFullPaidSubscription(for: child2.parent.id)
     let code2 = await with(dependency: \.ephemeral)
       .createPendingAppConnection(child2.id)
 
@@ -81,6 +84,7 @@ final class ConnectUserResolversTests: ApiTestCase, @unchecked Sendable {
       $0.date = .init { Date() } // for token expiration
     } operation: {
       let existingUser = try await self.childWithComputer()
+      try await self.addFullPaidSubscription(for: existingUser.parent.id)
       let existingMacAppToken = try await self.db.create(MacAppToken(
         childId: existingUser.id,
         computerUserId: existingUser.computerUser.id,
@@ -122,6 +126,7 @@ final class ConnectUserResolversTests: ApiTestCase, @unchecked Sendable {
 
     // this user is from a DIFFERENT admin, so it should fail
     let newUser = try await self.child()
+    try await self.addFullPaidSubscription(for: newUser.parent.id)
     let code = await with(dependency: \.ephemeral)
       .createPendingAppConnection(newUser.model.id)
 
@@ -138,7 +143,27 @@ final class ConnectUserResolversTests: ApiTestCase, @unchecked Sendable {
     expect(retrievedOldToken?.id).not.toBeNil()
   }
 
+  func testConnectUser_FailsWhenParentPlanDoesNotPermit() async throws {
+    let child = try await self.child()
+    let code = await with(dependency: \.ephemeral)
+      .createPendingAppConnection(child.id)
+
+    try await expectErrorFrom { [self] in
+      _ = try await ConnectUser.resolve(with: self.input(code), in: self.context)
+    }.toContain("plan does not currently support")
+  }
+
   // helpers
+
+  func addFullPaidSubscription(for parentId: Parent.Id) async throws {
+    try await self.db.create(Subscription(
+      parentId: parentId,
+      tier: .full,
+      billingStatus: .paid,
+      stripeId: .init("sub_test"),
+      statusExpiresAt: .distantFuture,
+    ))
+  }
 
   func input(_ code: Int) -> ConnectUser.Input {
     ConnectUser.Input(
