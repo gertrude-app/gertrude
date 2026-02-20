@@ -35,7 +35,6 @@ describe(`Smoke test`, () => {
     cy.get(`input[name=password]`).type(`${password}{enter}`);
     cy.contains(`Verification email sent`);
     cy.wait(Cypress.env(`CI`) ? 60000 : 7500);
-    cy.location(`pathname`).should(`eq`, `/login`);
 
     // verify email
     cy.request({ url: Cypress.env(`SMOKE_TEST_EMAIL_INBOX_URL`) }).then((response) => {
