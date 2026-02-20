@@ -60,6 +60,7 @@ struct IOSDetailedStats: Pair {
     var screenTime: SuccessItem
     var configurator: SuccessItem
     var gertrudeSupervision: SuccessItem
+    var nonSupervisedConnection: SuccessItem
   }
 
   struct SuccessItem: PairNestable {
@@ -124,7 +125,10 @@ extension IOSDetailedStats: NoInputResolver {
     let configuratorSuccess = try await context.db.count(ConfiguratorSuccessCount.self)
     let gertrudeSupervisionSuccess = try await context.db
       .count(GertrudeSupervisionSuccessCount.self)
-    let totalSuccess = screenTimeSuccess + configuratorSuccess + gertrudeSupervisionSuccess
+    let nonSupervisedConnectionSuccess = try await context.db
+      .count(NonSupervisedConnectionSuccessCount.self)
+    let totalSuccess = screenTimeSuccess + configuratorSuccess
+      + gertrudeSupervisionSuccess + nonSupervisedConnectionSuccess
     let childOnboardingIssue = try await context.db.count(ChildOnboardingIssueCount.self)
 
     let invalidAccountType = try await authFailureCount(for: "2bcf3d96", in: context)
@@ -232,6 +236,11 @@ extension IOSDetailedStats: NoInputResolver {
           count: gertrudeSupervisionSuccess,
           pctOfSuccess: pct(gertrudeSupervisionSuccess, of: totalSuccess),
           pctOfLaunch: pct(gertrudeSupervisionSuccess, of: firstLaunches),
+        ),
+        nonSupervisedConnection: SuccessItem(
+          count: nonSupervisedConnectionSuccess,
+          pctOfSuccess: pct(nonSupervisedConnectionSuccess, of: totalSuccess),
+          pctOfLaunch: pct(nonSupervisedConnectionSuccess, of: firstLaunches),
         ),
       ),
       installFailures: InstallFailures(
@@ -561,6 +570,32 @@ private struct GertrudeSupervisionSuccessCount: CustomCountable {
         WHERE \(sProfileInstalledAt) IS NOT NULL
       )
       AND \(deviceId) NOT IN (
+        SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
+      )
+    """)
+  }
+
+  var count: Int
+}
+
+private struct NonSupervisedConnectionSuccessCount: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    let deviceId = IOSEvent.columnName(.deviceId)
+    let eventId = IOSEvent.columnName(.eventId)
+    let tDeviceId = IOSApp.Token.columnName(.deviceId)
+    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
+    let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
+    return SQL.Statement("""
+    SELECT COUNT(DISTINCT e.\(deviceId)) AS count
+    FROM \(table: IOSEvent.self) e
+    INNER JOIN \(table: IOSApp.Token.self) t ON t.\(tDeviceId) = e.\(deviceId)
+    WHERE e.\(deviceId) IS NOT NULL
+      AND e.\(eventId) = '8d35f043'
+      AND e.\(deviceId) NOT IN (
+        SELECT \(sDeviceId) FROM \(table: IOSApp.Supervision.self)
+        WHERE \(sProfileInstalledAt) IS NOT NULL
+      )
+      AND e.\(deviceId) NOT IN (
         SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
       )
     """)

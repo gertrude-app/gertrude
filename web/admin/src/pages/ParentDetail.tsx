@@ -662,6 +662,12 @@ const SUPERVISION_CONFIG: Record<
     text: `text-slate-600`,
     ring: `ring-slate-500/20`,
   },
+  connected: {
+    label: `Connected`,
+    bg: `bg-teal-50`,
+    text: `text-teal-700`,
+    ring: `ring-teal-600/20`,
+  },
 };
 
 const SupervisionBadge: React.FC<{ status: string }> = ({ status }) => {
