@@ -182,8 +182,14 @@ const IOSStats: React.FC = () => {
                 width: `${data.successBreakdown.gertrudeSupervision.pctOfSuccess}%`,
               }}
             />
+            <div
+              className="h-full bg-gradient-to-r from-fuchsia-400 to-pink-500"
+              style={{
+                width: `${data.successBreakdown.nonSupervisedConnection.pctOfSuccess}%`,
+              }}
+            />
           </div>
-          <div className="flex justify-between mt-3 text-sm">
+          <div className="flex flex-wrap justify-between mt-3 text-sm gap-y-2">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-gradient-to-r from-sky-400 to-blue-500" />
               <span className="text-slate-600">
@@ -206,6 +212,15 @@ const IOSStats: React.FC = () => {
                 Supervised (
                 {data.successBreakdown.gertrudeSupervision.count.toLocaleString()} ·{` `}
                 {data.successBreakdown.gertrudeSupervision.pctOfSuccess}%)
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-fuchsia-400 to-pink-500" />
+              <span className="text-slate-600">
+                Connected (
+                {data.successBreakdown.nonSupervisedConnection.count.toLocaleString()} ·
+                {` `}
+                {data.successBreakdown.nonSupervisedConnection.pctOfSuccess}%)
               </span>
             </div>
           </div>

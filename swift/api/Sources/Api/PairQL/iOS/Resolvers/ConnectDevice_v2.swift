@@ -18,13 +18,17 @@ extension ConnectDevice_v2: Resolver {
     }
 
     let child = try await ctx.db.find(childId)
-    let device = try await IOSApp.Device.ensureExists(
+    var device = try await IOSApp.Device.ensureExists(
       id: .init(input.vendorId),
       modelIdentifier: input.modelIdentifier,
       iosVersion: input.iosVersion,
       appVersion: input.appVersion,
       in: ctx.db,
     )
+    if device.childId != child.id {
+      device.childId = child.id
+      try await ctx.db.update(device)
+    }
     let token = try await ctx.db.create(IOSApp.Token(deviceId: device.id))
 
     let groups = try await IOSApp.BlockGroup.query().all(in: ctx.db)

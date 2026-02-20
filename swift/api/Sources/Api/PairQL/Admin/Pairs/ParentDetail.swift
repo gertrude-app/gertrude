@@ -117,13 +117,23 @@ extension ParentDetail: Resolver {
       var iosDeviceOutputs: [IOSDeviceOutput] = []
       for device in devices {
         let supervision = try await device.supervision(in: context.db)
+        let hasToken = try await IOSApp.Token.query()
+          .where(.deviceId == device.id)
+          .exists(in: context.db)
+        let status: String? = if let supervision {
+          supervision.status.rawValue
+        } else if hasToken {
+          "connected"
+        } else {
+          nil
+        }
         iosDeviceOutputs.append(IOSDeviceOutput(
           id: device.id,
           modelName: device.modelName,
           modelIdentifier: device.modelIdentifier,
           iosVersion: device.iosVersion,
           appVersion: device.appVersion,
-          supervisionStatus: supervision?.status.rawValue,
+          supervisionStatus: status,
           createdAt: device.createdAt,
         ))
       }

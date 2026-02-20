@@ -150,7 +150,7 @@ final class ConnectUserResolversTests: ApiTestCase, @unchecked Sendable {
 
     try await expectErrorFrom { [self] in
       _ = try await ConnectUser.resolve(with: self.input(code), in: self.context)
-    }.toContain("plan does not currently support")
+    }.toContain("does not currently support connecting a Mac app")
   }
 
   // helpers

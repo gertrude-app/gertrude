@@ -57,6 +57,11 @@ export namespace IOSDetailedStats {
         pctOfSuccess: number;
         pctOfLaunch: number;
       };
+      nonSupervisedConnection: {
+        count: number;
+        pctOfSuccess: number;
+        pctOfLaunch: number;
+      };
     };
     installFailures: {
       invalidAccountType: number;
