@@ -45,6 +45,16 @@ extension ConnectDevice_v2: Resolver {
       supervised = .byOtherMethodUnconfirmed
     }
 
+    if case .byGertrude = supervised {} else {
+      let parentLink = AdminLink().slack(to: .parent(child.parentId), text: "parent")
+      Task {
+        await with(dependency: \.slack).internal(
+          .info,
+          "*iOS device connected* (non-supervised): child `\(child.name)`, \(parentLink)",
+        )
+      }
+    }
+
     return .init(
       childId: child.id.rawValue,
       token: token.value.rawValue,
