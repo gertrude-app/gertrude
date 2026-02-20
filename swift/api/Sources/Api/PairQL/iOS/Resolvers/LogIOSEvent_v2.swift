@@ -51,6 +51,18 @@ extension LogIOSEvent_v2: Resolver {
       await get(dependency: \.slack).internal(.iosOnboarding, message)
     }
 
+    if context.env.mode == .prod, input.eventId == "7c039b10" {
+      let device = "`\(input.modelName)`, iOS `\(input.iOSVersion)`, app `\(input.appVersion)`"
+      let eventDetail = detail ?? "(no detail)"
+      var message = "*iOS Unhandled Button* \(device)\n\(eventDetail)"
+      if let vendorId = input.vendorId {
+        let events = AdminLink().slack(to: .iosDeviceEvents(vendorId: vendorId), text: "see events")
+        message += " \(events)"
+      }
+      await get(dependency: \.slack).error(message)
+      get(dependency: \.postmark).unexpected("7c039b10", "\(device)<br/><br/>\(eventDetail)")
+    }
+
     return .success
   }
 }

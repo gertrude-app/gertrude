@@ -56,6 +56,7 @@ struct ButtonScreenView: View {
   @State private var primaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
   @State private var secondaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
   @State private var tertiaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
+  @State private var btnTapped = false
 
   var icon: String {
     switch self.screenType {
@@ -246,6 +247,8 @@ struct ButtonScreenView: View {
       .share(string)
     case .button(let onTap):
       .button {
+        guard !self.btnTapped else { return }
+        self.btnTapped = true
         if animate {
           self.vanishingAnimations()
           delayed(by: .milliseconds(800)) {
