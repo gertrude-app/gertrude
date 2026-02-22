@@ -42,7 +42,10 @@ enum ProfileDownloadRoute {
 // `DenyListURLS` is interesting, can specify 500 URLs, could put top 500 porn sites there...
 // `SafariHistoryRetentionEnabled`, also cool, kills private mode, and history clearing
 func generateProfileXml(for device: IOSApp.Device) -> String {
-  """
+  let tempSafariBlockDeviceId = "ed25c68a-2dba-4854-b3bd-efe0d8523e6f"
+  let disableSafari = device.id.lowercased == tempSafariBlockDeviceId
+  let disableAppInstallation = device.id.lowercased == tempSafariBlockDeviceId
+  return """
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
   <plist version="1.0">
@@ -120,6 +123,12 @@ func generateProfileXml(for device: IOSApp.Device) -> String {
 
           <key>allowEraseContentAndSettings</key>
           <\(device.allowEraseContentAndSettings ? "true" : "false")/>
+
+          <key>allowSafari</key>
+          <\(disableSafari ? "false" : "true")/>
+
+          <key>allowAppInstallation</key>
+          <\(disableAppInstallation ? "false" : "true")/>
         </dict>
       </array>
     </dict>
