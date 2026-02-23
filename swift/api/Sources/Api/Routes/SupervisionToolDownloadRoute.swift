@@ -50,7 +50,9 @@ enum SupervisionToolDownloadRoute {
       _ = try await task.value
     }
 
-    return request.redirect(to: platform.downloadUrl, redirectType: .temporary)
+    // we experienced caching issues at least on windows machines
+    let cacheBust = Int(Date().timeIntervalSince1970)
+    return request.redirect(to: "\(platform.downloadUrl)?t=\(cacheBust)", redirectType: .temporary)
   }
 
   enum Platform: String {
