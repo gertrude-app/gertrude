@@ -110,7 +110,9 @@ export default ConnectDeviceModal;
 const ConnectionCodeContent: React.FC<{ code: number }> = ({ code }) => (
   <div className="space-y-3 mb-2 flex flex-col">
     <div>
-      Enter the code below into the <i>Gertrude Mac App</i>:
+      On the Mac computer you want to protect, enter the code below after launching the
+      {` `}
+      <b>Gertrude Mac App</b>:
     </div>
     <code
       data-test="connection-code"
@@ -119,7 +121,8 @@ const ConnectionCodeContent: React.FC<{ code: number }> = ({ code }) => (
       {code}
     </code>
     <div>
-      The computer will show up in the list <em>once it has connected.</em>
+      Download the app from{` `}
+      <code className="text-fuchsia-700">https://gertrude.app/download</code>.
     </div>
   </div>
 );

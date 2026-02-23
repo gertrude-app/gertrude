@@ -120,6 +120,9 @@ extension DashboardWidgets_v2: NoInputResolver {
     async let supervisionsAsync = IOSApp.Supervision.query()
       .where(.deviceId |=| iosDevices.map(\.id))
       .all(in: context.db)
+    async let iosTokensAsync = IOSApp.Token.query()
+      .where(.deviceId |=| iosDevices.map(\.id))
+      .all(in: context.db)
     async let unlockRequests = Api.UnlockRequest.query()
       .where(.computerUserId |=| computerUsers.map(\.id))
       .where(.status == .enum(RequestStatus.pending))
@@ -150,6 +153,7 @@ extension DashboardWidgets_v2: NoInputResolver {
       .reduce(into: [:]) { map, computer in map[computer.id] = computer }
     let supervisionMap: [IOSApp.Device.Id: IOSApp.Supervision] = try await supervisionsAsync
       .reduce(into: [:]) { map, s in map[s.deviceId] = s }
+    let connectedDeviceIds: Set<IOSApp.Device.Id> = try await Set(iosTokensAsync.map(\.deviceId))
 
     return try await .init(
       children: children.concurrentMap { child in
@@ -172,9 +176,11 @@ extension DashboardWidgets_v2: NoInputResolver {
           .filter { $0.childId == child.id }
           .map { device in
             let supervision = supervisionMap[device.id]
-            let status: IOSDeviceStatus = supervision?.profileInstalled == true
-              ? .setupComplete
-              : .pendingSetup
+            let isConnected = connectedDeviceIds.contains(device.id)
+            let status: IOSDeviceStatus =
+              supervision?.profileInstalled == true || isConnected
+                ? .setupComplete
+                : .pendingSetup
             return DeviceInfo(
               platform: .ios,
               deviceName: device.modelName,

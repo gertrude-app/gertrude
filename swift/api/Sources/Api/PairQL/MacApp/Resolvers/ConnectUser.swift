@@ -6,7 +6,7 @@ import Vapor
 
 extension ConnectUser: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
-    guard let userId = await with(dependency: \.ephemeral)
+    guard let childId = await with(dependency: \.ephemeral)
       .getPendingAppConnection(input.verificationCode) else {
       throw context.error(
         id: "6e7fc234",
@@ -18,7 +18,21 @@ extension ConnectUser: Resolver {
     }
 
     let computerUser: ComputerUser
-    let user = try await context.db.find(userId)
+    let child = try await context.db.find(childId)
+
+    let parent = try await ParentWithSubscription.find(child.parentId, in: context.db)
+    switch parent.plan {
+    case .full(.complimentary), .full(.trialing), .full(.paid):
+      break
+    default:
+      unexpected("9cf4e745", parent.model.id, "mac app connection, no .full plan")
+      throw context.error(
+        id: "ba2d1e75",
+        type: .unauthorized,
+        debugMessage: "account does not permit mac app connection",
+        userMessage: "This Gertrude account does not currently support connecting a Mac app. Please upgrade or start a free trial and try again.",
+      )
+    }
 
     var computer = try? await Computer.query()
       .where(.serialNumber == input.serialNumber)
@@ -41,7 +55,7 @@ extension ConnectUser: Resolver {
 
       // sanity check - we only "transfer" a device, if the admin accounts match
       let existingUser = try await existingComputerUser.child(in: context.db)
-      if existingUser.parentId != user.parentId {
+      if existingUser.parentId != child.parentId {
         throw context.error(
           id: "41a43089",
           type: .unauthorized,
@@ -53,7 +67,7 @@ extension ConnectUser: Resolver {
       let oldUserId = existingComputerUser.childId
       existingComputerUser.username = input.username
       existingComputerUser.fullUsername = input.fullUsername
-      existingComputerUser.childId = user.id
+      existingComputerUser.childId = child.id
       existingComputerUser.isAdmin = input.isAdmin
 
       // update the device to be attached to the user issuing this request
@@ -75,7 +89,7 @@ extension ConnectUser: Resolver {
       if computer == nil {
         // create new admin device if we don't have one
         computer = try await context.db.create(Computer(
-          parentId: user.parentId,
+          parentId: child.parentId,
           osVersion: input.osVersion.flatMap(Semver.init),
           modelIdentifier: input.modelIdentifier,
           serialNumber: input.serialNumber,
@@ -84,7 +98,7 @@ extension ConnectUser: Resolver {
 
       // ...and create the user device
       computerUser = try await context.db.create(ComputerUser(
-        childId: user.id,
+        childId: child.id,
         computerId: computer?.id ?? .init(),
         isAdmin: input.isAdmin,
         appVersion: input.appVersion,
@@ -95,26 +109,46 @@ extension ConnectUser: Resolver {
     }
 
     let token = try await context.db.create(MacAppToken(
-      childId: user.id,
+      childId: child.id,
       computerUserId: computerUser.id,
     ))
 
-    await notifyAdConversion(child: user, db: context.db)
+    try await createDefaultKeychainIfNeeded(for: child, in: context.db)
+    await notifyAdConversion(child: child, db: context.db)
 
     return Output(
-      id: user.id.rawValue,
+      id: child.id.rawValue,
       token: token.value.rawValue,
       deviceId: computerUser.id.rawValue,
-      name: user.name,
-      keyloggingEnabled: user.keyloggingEnabled,
-      screenshotsEnabled: user.screenshotsEnabled,
-      screenshotFrequency: user.screenshotsFrequency,
-      screenshotSize: user.screenshotsResolution,
+      name: child.name,
+      keyloggingEnabled: child.keyloggingEnabled,
+      screenshotsEnabled: child.screenshotsEnabled,
+      screenshotFrequency: child.screenshotsFrequency,
+      screenshotSize: child.screenshotsResolution,
     )
   }
 }
 
 // helpers
+
+private func createDefaultKeychainIfNeeded(
+  for child: Child,
+  in db: any DuetSQL.Client,
+) async throws {
+  let existingKeychains = try await child.keychains(in: db)
+  guard existingKeychains.isEmpty else { return }
+  let keychain = try await db.create(Keychain(
+    parentId: child.parentId,
+    name: "\(child.name)'s Keychain",
+    isPublic: false,
+    description: """
+    This keychain was created automatically as a default place for you to \
+    add keys for \(child.name). Feel free to use it as is, change it, \
+    delete it, or create as many other keychains as you like.
+    """,
+  ))
+  try await db.create(ChildKeychain(childId: child.id, keychainId: keychain.id))
+}
 
 private func notifyAdConversion(child: Child, db: any DuetSQL.Client) async {
   guard let parent = try? await db.find(child.parentId),

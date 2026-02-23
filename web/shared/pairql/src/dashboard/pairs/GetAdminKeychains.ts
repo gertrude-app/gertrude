@@ -10,5 +10,6 @@ export namespace GetAdminKeychains {
       id: UUID;
       name: string;
     }>;
+    hasAnyMacComputers: boolean;
   }
 }

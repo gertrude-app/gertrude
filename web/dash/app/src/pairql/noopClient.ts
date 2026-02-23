@@ -5,6 +5,9 @@ const noopClient: ApiClient = {
   confirmPendingNotificationMethod: async () => {
     return Result.success({ success: true });
   },
+  iOSAppConnectionCode: async () => {
+    return Result.success({ code: 0 });
+  },
   macAppConnectionCode: async () => {
     return Result.success({ code: 0 });
   },
@@ -47,7 +50,7 @@ const noopClient: ApiClient = {
     });
   },
   getAdminKeychains: async () => {
-    return Result.success({ children: [], keychains: [] });
+    return Result.success({ children: [], keychains: [], hasAnyMacComputers: false });
   },
   getIOSDeviceClaimData: async () => {
     return Result.success({
@@ -176,6 +179,7 @@ const noopClient: ApiClient = {
       webPolicy: `blockAllExcept`,
       webPolicyDomains: [],
       customBlockRules: [],
+      isSupervised: false,
       isProfileLocked: true,
       allowAppRemoval: false,
       allowEraseContentAndSettings: false,

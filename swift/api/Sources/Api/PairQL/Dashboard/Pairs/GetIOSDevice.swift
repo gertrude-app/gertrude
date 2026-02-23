@@ -30,6 +30,7 @@ struct GetIOSDevice: Pair {
     var webPolicy: WebContentFilterPolicy.Kind
     var webPolicyDomains: [String]
     var customBlockRules: [BlockRuleData]
+    var isSupervised: Bool
     var isProfileLocked: Bool
     var allowAppRemoval: Bool
     var allowEraseContentAndSettings: Bool
@@ -47,6 +48,7 @@ extension GetIOSDevice: Resolver {
     let allBlockGroups = try await IOSApp.BlockGroup.query().all(in: ctx.db)
     let domains = try await device.webPolicyDomains(in: ctx.db)
     let blockRules = try await device.blockRules(in: ctx.db)
+    let supervision = try await device.supervision(in: ctx.db)
     return .init(
       childName: child.name,
       deviceType: device.deviceType,
@@ -63,6 +65,7 @@ extension GetIOSDevice: Resolver {
       webPolicy: .init(string: device.webPolicy) ?? .blockAll,
       webPolicyDomains: domains.map(\.domain),
       customBlockRules: blockRules.map { .init(id: $0.id, rule: $0.rule) },
+      isSupervised: supervision?.supervised ?? false,
       isProfileLocked: device.isProfileLocked,
       allowAppRemoval: device.allowAppRemoval,
       allowEraseContentAndSettings: device.allowEraseContentAndSettings,

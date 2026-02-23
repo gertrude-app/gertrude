@@ -23,10 +23,6 @@ export const Standard: Story = props({
   ],
   iosDevices: [],
   name: `John Doe`,
-  numKeychains: 4,
-  numKeys: 57,
-  screenshotsEnabled: true,
-  keystrokesEnabled: false,
   addDevice: () => {},
 });
 
@@ -35,10 +31,6 @@ export const Empty: Story = props({
   computers: [],
   iosDevices: [],
   name: `John Doe`,
-  numKeychains: 0,
-  numKeys: 0,
-  screenshotsEnabled: false,
-  keystrokesEnabled: false,
   addDevice: () => {},
 });
 
@@ -72,10 +64,6 @@ export const Full: Story = props({
   ],
   iosDevices: [],
   name: `John Doe`,
-  numKeychains: 32,
-  numKeys: 1546,
-  screenshotsEnabled: true,
-  keystrokesEnabled: true,
   addDevice: () => {},
 });
 

@@ -556,6 +556,7 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
       GetAdminKeychains.Output(
         keychains: [expectedKeychain],
         children: expectedUsers,
+        hasAnyMacComputers: false,
       ),
     )
   }

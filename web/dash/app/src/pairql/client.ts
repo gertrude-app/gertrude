@@ -62,6 +62,9 @@ export const throwingClient: ApiClient = {
   confirmPendingNotificationMethod: () => {
     throw new Error(`ApiClient.confirmPendingNotificationMethod() not implemented`);
   },
+  iOSAppConnectionCode: () => {
+    throw new Error(`ApiClient.iOSAppConnectionCode() not implemented`);
+  },
   macAppConnectionCode: () => {
     throw new Error(`ApiClient.macAppConnectionCode() not implemented`);
   },

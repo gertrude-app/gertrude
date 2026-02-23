@@ -5,6 +5,10 @@ struct ParentWithSubscription: Sendable {
   let model: Parent
   let subscription: Subscription?
 
+  var plan: Plan {
+    Plan(subscription: self.subscription)
+  }
+
   subscript<T>(dynamicMember keyPath: KeyPath<Parent, T>) -> T {
     self.model[keyPath: keyPath]
   }

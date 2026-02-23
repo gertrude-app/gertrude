@@ -27,20 +27,12 @@ export const Default: Story = props({
     {
       id: `child-4`,
       name: `Lil Suzy`,
-      numKeys: 33,
-      numKeychains: 55,
-      screenshotsEnabled: true,
-      keystrokesEnabled: true,
       computers: [],
       iosDevices: [],
     },
     {
       id: `child-1`,
       name: `John Doe`,
-      numKeys: 33,
-      numKeychains: 55,
-      screenshotsEnabled: true,
-      keystrokesEnabled: true,
       computers: [
         {
           id: `1`,
@@ -57,10 +49,6 @@ export const Default: Story = props({
     {
       id: `child-2`,
       name: `Jane Doe`,
-      numKeys: 55,
-      numKeychains: 2,
-      screenshotsEnabled: false,
-      keystrokesEnabled: false,
       computers: [
         {
           id: `2`,
@@ -139,10 +127,6 @@ export const WithIosDevices: Story = props({
     {
       id: `child-1`,
       name: `John Doe`,
-      numKeys: 33,
-      numKeychains: 55,
-      screenshotsEnabled: true,
-      keystrokesEnabled: true,
       computers: [
         {
           id: `1`,
@@ -167,10 +151,6 @@ export const WithIosDevices: Story = props({
     {
       id: `child-2`,
       name: `Jane Doe`,
-      numKeys: 55,
-      numKeychains: 2,
-      screenshotsEnabled: false,
-      keystrokesEnabled: false,
       computers: [
         {
           id: `2`,

@@ -29,6 +29,7 @@ struct GetAdminKeychains: Pair {
   struct Output: PairNestable, PairOutput {
     let keychains: [AdminKeychain]
     let children: [Child]
+    let hasAnyMacComputers: Bool
   }
 }
 
@@ -41,9 +42,11 @@ extension GetAdminKeychains: NoInputResolver {
     for model in models {
       try await keychains.append(.init(from: model, in: context))
     }
+    let computers = try await context.parent.computers(in: context.db)
     return try await .init(
       keychains: keychains,
       children: .init(parentId: context.parent.id),
+      hasAnyMacComputers: !computers.isEmpty,
     )
   }
 }

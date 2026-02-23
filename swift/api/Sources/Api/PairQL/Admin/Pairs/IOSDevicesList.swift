@@ -91,6 +91,7 @@ private struct DeviceSummaryQuery: CustomQueryable {
     let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
     let sSupervisedAt = IOSApp.Supervision.columnName(.supervisedAt)
     let sClaimedAt = IOSApp.Supervision.columnName(.claimedAt)
+    let tDeviceId = IOSApp.Token.columnName(.deviceId)
     var stmt = SQL.Statement("""
     SELECT
       fl.\(eDeviceId),
@@ -103,6 +104,7 @@ private struct DeviceSummaryQuery: CustomQueryable {
         WHEN s.\(sSupervisedAt) IS NOT NULL THEN 'missingProfile'
         WHEN s.\(sClaimedAt) IS NOT NULL THEN 'claimed'
         WHEN s.\(sId) IS NOT NULL THEN 'pendingClaim'
+        WHEN tk.\(tDeviceId) IS NOT NULL AND s.\(sId) IS NULL THEN 'connected'
         WHEN cfg.\(eDeviceId) IS NOT NULL THEN 'configurated'
         WHEN st.\(eDeviceId) IS NOT NULL THEN 'screenTime'
         WHEN oo.\(eDeviceId) IS NOT NULL THEN 'complete'
@@ -129,6 +131,12 @@ private struct DeviceSummaryQuery: CustomQueryable {
     ) oo ON fl.\(eDeviceId) = oo.\(eDeviceId)
     LEFT JOIN \(table: IOSApp.Device.self) d ON d.\(dId) = fl.\(eDeviceId)
     LEFT JOIN \(table: IOSApp.Supervision.self) s ON s.\(sDeviceId) = d.\(dId)
+    LEFT JOIN \(table: IOSApp.Token.self) tk ON tk.\(tDeviceId) = d.\(dId)
+    LEFT JOIN (
+      SELECT DISTINCT \(eDeviceId)
+      FROM \(table: IOSEvent.self)
+      WHERE \(eEventId) = 'bad8adcc'
+    ) cfg ON fl.\(eDeviceId) = cfg.\(eDeviceId)
     LEFT JOIN (
       SELECT DISTINCT \(eDeviceId)
       FROM \(table: IOSEvent.self)

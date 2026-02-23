@@ -20,7 +20,11 @@ describe(`create keychain`, () => {
       children: [],
     };
 
-    cy.interceptPql(`GetAdminKeychains`, { keychains: [existing], children: [] });
+    cy.interceptPql(`GetAdminKeychains`, {
+      keychains: [existing],
+      children: [],
+      hasAnyMacComputers: true,
+    });
     cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
 
     cy.visit(`/keychains`);
@@ -32,6 +36,7 @@ describe(`create keychain`, () => {
     cy.testId(`modal-primary-btn`).click();
     cy.sidebarClick(`Children`);
     cy.testId(`edit-user`).click();
+    cy.contains(`For Mac Computers`).click();
     cy.contains(`Add keychain`).click();
     cy.contains(`Existing`).should(`not.exist`);
   });
@@ -43,7 +48,11 @@ describe(`create keychain`, () => {
       children: [],
     };
 
-    cy.interceptPql(`GetAdminKeychains`, { keychains: [existing], children: [] });
+    cy.interceptPql(`GetAdminKeychains`, {
+      keychains: [existing],
+      children: [],
+      hasAnyMacComputers: true,
+    });
     cy.interceptPql(`GetSelectableKeychains`, {
       own: [existing.summary],
       public: [],
@@ -54,6 +63,7 @@ describe(`create keychain`, () => {
     cy.contains(`Test keychain`);
     cy.sidebarClick(`Children`);
     cy.testId(`edit-user`).click();
+    cy.contains(`For Mac Computers`).click();
     cy.contains(`Test keychain`);
     cy.contains(`Add keychain`).click();
   });
@@ -61,7 +71,11 @@ describe(`create keychain`, () => {
   describe(`no keychains to start`, () => {
     beforeEach(() => {
       // parent starts with no keychains
-      cy.interceptPql(`GetAdminKeychains`, { keychains: [], children: [] });
+      cy.interceptPql(`GetAdminKeychains`, {
+        keychains: [],
+        children: [],
+        hasAnyMacComputers: true,
+      });
       // and no prior selectable keychains
       cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
     });
@@ -69,6 +83,7 @@ describe(`create keychain`, () => {
     it(`(the keychain picker) shows empty state when parent has no personal keychains to assign`, () => {
       cy.visit(`/children`);
       cy.testId(`edit-user`).click();
+      cy.contains(`For Mac Computers`).click();
       cy.contains(`Add keychain`).click();
       cy.contains(`Looks like you don't have any keychains`);
     });

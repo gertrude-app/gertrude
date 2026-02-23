@@ -103,44 +103,56 @@ const IOSDevice: React.FC = () => {
             onToggle={(id) => dispatch({ type: `toggleBlockGroup`, id })}
           />
         </div>
-        <div className="mt-12 max-w-3xl">
-          <h2 className="text-lg font-bold text-slate-700">Device settings</h2>
-          <ToggleCard
-            title="Prevent protection removal"
-            description={`Make it impossible for the ${dt} user to remove Gertrude’s protection.`}
-            enabled={state.isProfileLocked}
-            setEnabled={(v) => dispatch({ type: `setIsProfileLocked`, value: v })}
-            warning={
-              !state.isProfileLocked
-                ? `The ${dt} user may remove the profile in order to stop Gertrude’s protection and uninstall.`
-                : undefined
-            }
-          />
-          <ToggleCard
-            title="Allow deleting apps"
-            description={`Keeping this off prevents the ${dt} user from deleting the Gertrude app, but also prevents them from deleting any app. Enable temporarily if you need to delete some apps from the ${dt}, then re-enable.`}
-            enabled={state.allowAppRemoval}
-            setEnabled={(v) => dispatch({ type: `setAllowAppRemoval`, value: v })}
-            warning={
-              state.allowAppRemoval
-                ? `The user can delete apps (including Gertrude) from their ${dt}`
-                : undefined
-            }
-          />
-          <ToggleCard
-            title="Allow factory reset"
-            description={`Allow the ${dt} to be erased and reset to factory settings, bypassing protection.`}
-            enabled={state.allowEraseContentAndSettings}
-            setEnabled={(v) =>
-              dispatch({ type: `setAllowEraseContentAndSettings`, value: v })
-            }
-            warning={
-              state.allowEraseContentAndSettings
-                ? `The user will be able to erase the ${dt} removing Gertrude and all restrictions`
-                : undefined
-            }
-          />
-        </div>
+        {deviceQuery.data.isSupervised && (
+          <div className="mt-12 max-w-3xl">
+            <h2 className="text-lg font-bold text-slate-700">
+              Supervision Profile Settings
+            </h2>
+            <div className="mt-2 mb-4 flex items-start gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+              <i className="fa-solid fa-circle-info text-amber-500 mt-0.5 shrink-0" />
+              <span>
+                After changing any setting below, you&rsquo;ll need to sync the profile on
+                the {dt} by opening the Gertrude app and going to{` `}
+                <b>Info &rarr; Sync Profile</b>.
+              </span>
+            </div>
+            <ToggleCard
+              title="Prevent protection removal"
+              description={`Make it impossible for the ${dt} user to remove Gertrude’s protection.`}
+              enabled={state.isProfileLocked}
+              setEnabled={(v) => dispatch({ type: `setIsProfileLocked`, value: v })}
+              warning={
+                !state.isProfileLocked
+                  ? `The ${dt} user may remove the profile in order to stop Gertrude’s protection and uninstall.`
+                  : undefined
+              }
+            />
+            <ToggleCard
+              title="Allow deleting apps"
+              description={`Keeping this off prevents the ${dt} user from deleting the Gertrude app, but also prevents them from deleting any app. Enable temporarily if you need to delete some apps from the ${dt}, then re-enable.`}
+              enabled={state.allowAppRemoval}
+              setEnabled={(v) => dispatch({ type: `setAllowAppRemoval`, value: v })}
+              warning={
+                state.allowAppRemoval
+                  ? `The user can delete apps (including Gertrude) from their ${dt}`
+                  : undefined
+              }
+            />
+            <ToggleCard
+              title="Allow factory reset"
+              description={`Allow the ${dt} to be erased and reset to factory settings, bypassing protection.`}
+              enabled={state.allowEraseContentAndSettings}
+              setEnabled={(v) =>
+                dispatch({ type: `setAllowEraseContentAndSettings`, value: v })
+              }
+              warning={
+                state.allowEraseContentAndSettings
+                  ? `The user will be able to erase the ${dt} removing Gertrude and all restrictions`
+                  : undefined
+              }
+            />
+          </div>
+        )}
         {/* <div className="mt-12 max-w-3xl">
           <h2 className="text-lg font-bold text-slate-700">Web Content Filter Policy</h2>
           <div className="bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl relative">

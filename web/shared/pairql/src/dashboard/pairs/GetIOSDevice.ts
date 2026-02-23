@@ -21,6 +21,7 @@ export namespace GetIOSDevice {
       id: UUID;
       rule: BlockRule;
     }>;
+    isSupervised: boolean;
     isProfileLocked: boolean;
     allowAppRemoval: boolean;
     allowEraseContentAndSettings: boolean;

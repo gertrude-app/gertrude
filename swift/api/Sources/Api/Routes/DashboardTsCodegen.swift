@@ -111,6 +111,7 @@ enum DashboardTsCodegenRoute {
       ClaimIOSDevice.self,
       GetIOSDeviceSupervisionStatus.self,
       MacAppConnectionCode.self,
+      IOSAppConnectionCode.self,
     ]
   }
 

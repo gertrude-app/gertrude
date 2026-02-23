@@ -1,6 +1,5 @@
 import { Button } from '@shared/components';
 import { inflect } from '@shared/string';
-import cx from 'classnames';
 import React from 'react';
 import type { ChildComputer, ChildIOSDevice } from '@dash/types';
 import DeviceCard from './DeviceCard';
@@ -8,63 +7,18 @@ import DeviceCard from './DeviceCard';
 type Props = {
   id: string;
   name: string;
-  numKeys: number;
-  numKeychains: number;
   computers: ChildComputer[];
   iosDevices: ChildIOSDevice[];
-  screenshotsEnabled: boolean;
-  keystrokesEnabled: boolean;
   addDevice(): unknown;
 };
 
-const ChildCard: React.FC<Props> = ({
-  id,
-  name,
-  numKeys,
-  numKeychains,
-  computers,
-  iosDevices,
-  screenshotsEnabled,
-  keystrokesEnabled,
-  addDevice,
-}) => (
+const ChildCard: React.FC<Props> = ({ id, name, computers, iosDevices, addDevice }) => (
   <div
     className="rounded-3xl border-[0.5px] border-slate-200 flex flex-col justify-between shadow-lg shadow-slate-300/50 bg-white sm:min-w-[400px]"
     data-test="user-card"
   >
     <div className="p-4 xs:p-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-extrabold text-slate-700 mr-3">{name}</h2>
-        <div className="flex items-center space-x-4">
-          <div
-            className={cx(
-              `w-9 h-9 rounded-full flex justify-center items-center text-lg`,
-              screenshotsEnabled
-                ? `bg-indigo-100 text-indigo-500`
-                : `bg-slate-100 text-slate-300`,
-            )}
-          >
-            <i className="fa-solid fa-camera" />
-          </div>
-          <div
-            className={cx(
-              `w-9 h-9 rounded-full flex justify-center items-center text-lg`,
-              keystrokesEnabled
-                ? `bg-indigo-100 text-indigo-500`
-                : `bg-slate-100 text-slate-300`,
-            )}
-          >
-            <i className="fa-solid fa-keyboard" />
-          </div>
-        </div>
-      </div>
-      <div className="flex justify-start items-center mb-4 mt-0.5">
-        <p className="text-slate-500">
-          <span className="font-semibold text-slate-600">{numKeychains}</span> keychains •
-          {` `}
-          <span className="font-semibold text-slate-600">{numKeys}</span> keys
-        </p>
-      </div>
+      <h2 className="text-3xl font-extrabold text-slate-700 mb-4">{name}</h2>
       {computers.length || iosDevices.length ? (
         <>
           <div className="text-lg mt-4 -mb-4">
@@ -146,21 +100,21 @@ const ChildCard: React.FC<Props> = ({
         <Button
           type="link"
           color="tertiary"
-          to={id}
-          testId="edit-user"
-          className="flex-grow w-[100%] xs:w-auto"
+          to={`${id}/activity`}
+          className="w-[100%] xs:basis-1/2"
+          disabled={computers.length === 0}
+          size="large"
         >
-          <i className="fa-solid fa-cog mr-2" /> Settings
+          <i className="fa-solid fa-binoculars mr-2" /> Mac activity
         </Button>
         <Button
           type="link"
           color="secondary"
-          to={`${id}/activity`}
-          className="flex-grow w-[100%] xs:w-auto"
-          disabled={computers.length === 0}
-          size="large"
+          to={id}
+          testId="edit-user"
+          className="w-[100%] xs:basis-1/2"
         >
-          <i className="fa-solid fa-binoculars mr-2" /> Activity
+          <i className="fa-solid fa-cog mr-2" /> Settings
         </Button>
       </div>
     )}

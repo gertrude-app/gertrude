@@ -48,6 +48,7 @@ const Keychains: React.FC = () => {
           });
         },
       }))}
+      hasAnyMacComputers={parentKeychainsQuery.data.hasAnyMacComputers}
       remove={deleteKeychain}
     />
   );

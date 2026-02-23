@@ -102,6 +102,10 @@ export function interceptPql(
   slug: `HandleCheckoutSuccess`,
   output: T.HandleCheckoutSuccess.Output,
 ): void;
+export function interceptPql(
+  slug: `IOSAppConnectionCode`,
+  output: T.IOSAppConnectionCode.Output,
+): void;
 export function interceptPql(slug: `IOSDevices`, output: T.IOSDevices.Output): void;
 export function interceptPql(
   slug: `LatestAppVersions`,
@@ -214,6 +218,7 @@ export function forcePqlErr(
     | `GetUserUnlockRequests`
     | `HandleCheckoutCancel`
     | `HandleCheckoutSuccess`
+    | `IOSAppConnectionCode`
     | `IOSDevices`
     | `LatestAppVersions`
     | `LogEvent`

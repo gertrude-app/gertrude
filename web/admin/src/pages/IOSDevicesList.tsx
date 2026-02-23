@@ -159,6 +159,7 @@ const IOSDevicesList: React.FC = () => {
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
   supervised: { label: `Supervised`, bg: `bg-blue-100`, text: `text-blue-700` },
+  connected: { label: `Connected`, bg: `bg-cyan-100`, text: `text-cyan-700` },
   configurated: { label: `Configurated`, bg: `bg-violet-100`, text: `text-violet-700` },
   screenTime: { label: `Screen Time`, bg: `bg-green-100`, text: `text-green-700` },
   complete: { label: `Complete`, bg: `bg-green-100`, text: `text-green-700` },

@@ -24,11 +24,11 @@ describe(`children screen`, () => {
       cy.wait(`@SaveUser`);
 
       cy.testId(`page-heading`).should(`have.text`, `Child settings`);
-      cy.contains(`Save child`).should(`be.disabled`);
+      cy.contains(`Save`).should(`not.be.visible`);
 
       cy.testId(`user-name`).type(`az`);
 
-      cy.contains(`Save child`).should(`be.enabled`);
+      cy.contains(`Save`).should(`be.visible`);
     });
 
     it(`redirects to new uuid path & doesn't list unsaved new child`, () => {

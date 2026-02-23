@@ -5,7 +5,7 @@ import React from 'react';
 type Props = {
   className?: string;
   heading: string;
-  secondaryText: string;
+  secondaryText: React.ReactNode;
   icon: string;
   buttonText: string;
   buttonIcon?: string;
@@ -16,6 +16,7 @@ type Props = {
     icon: string;
   };
   violet?: boolean;
+  buttonColor?: `primary` | `secondary` | `tertiary`;
 };
 
 const EmptyState: React.FC<Props> = ({
@@ -28,6 +29,7 @@ const EmptyState: React.FC<Props> = ({
   secondaryButton,
   icon,
   violet = false,
+  buttonColor = `primary`,
 }) => (
   <div
     className={cx(
@@ -46,12 +48,12 @@ const EmptyState: React.FC<Props> = ({
     <p className="text-slate-500 text-center">{secondaryText}</p>
     <div className="flex flex-col sm:flex-row sm:items-center justify-center items-stretch mt-6 w-full">
       {typeof action === `string` ? (
-        <Button color="primary" type="link" to={action}>
+        <Button color={buttonColor} type="link" to={action}>
           <i className={`fa fa-${buttonIcon} mr-4`} />
           {buttonText}
         </Button>
       ) : (
-        <Button color="primary" type="button" onClick={action}>
+        <Button color={buttonColor} type="button" onClick={action}>
           <i className={`fa fa-${buttonIcon} mr-4`} />
           {buttonText}
         </Button>

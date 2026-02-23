@@ -26,12 +26,8 @@ const Users: React.FC = () => {
       users={query.data.map((child) => ({
         id: child.id,
         name: child.name,
-        numKeychains: child.keychains.length,
-        numKeys: child.keychains.reduce((acc, keychain) => acc + keychain.numKeys, 0),
         computers: child.computers,
         iosDevices: child.iosDevices,
-        screenshotsEnabled: child.screenshotsEnabled,
-        keystrokesEnabled: child.keyloggingEnabled,
       }))}
       startAddDevice={(userId) => addDevice.mutate(userId)}
       dismissAddDevice={() => addDevice.reset()}

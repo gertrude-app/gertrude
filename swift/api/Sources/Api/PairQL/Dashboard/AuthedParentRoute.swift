@@ -54,6 +54,7 @@ enum AuthedParentRoute: PairRoute {
   case claimIOSDevice(ClaimIOSDevice.Input)
   case getIOSDeviceClaimData(GetIOSDeviceClaimData.Input)
   case getIOSDeviceSupervisionStatus(GetIOSDeviceSupervisionStatus.Input)
+  case iosAppConnectionCode(IOSAppConnectionCode.Input)
   case macAppConnectionCode(MacAppConnectionCode.Input)
 }
 
@@ -250,6 +251,10 @@ extension AuthedParentRoute {
         Operation(GetIOSDeviceSupervisionStatus.self)
         Body(.dashboardInput(GetIOSDeviceSupervisionStatus.self))
       }
+      Route(.case(Self.iosAppConnectionCode)) {
+        Operation(IOSAppConnectionCode.self)
+        Body(.dashboardInput(IOSAppConnectionCode.self))
+      }
       Route(.case(Self.macAppConnectionCode)) {
         Operation(MacAppConnectionCode.self)
         Body(.dashboardInput(MacAppConnectionCode.self))
@@ -413,6 +418,9 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getIOSDeviceSupervisionStatus(let input):
       let output = try await GetIOSDeviceSupervisionStatus.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .iosAppConnectionCode(let input):
+      let output = try await IOSAppConnectionCode.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .macAppConnectionCode(let input):
       let output = try await MacAppConnectionCode.resolve(with: input, in: context)
