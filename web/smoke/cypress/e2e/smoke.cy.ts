@@ -52,7 +52,7 @@ describe(`Smoke test`, () => {
       cy.visit({ url: verifyLink as any });
     });
     cy.contains(`I’m a parent`).click();
-    cy.contains(`Welcome to the parent website!`);
+    cy.contains(`Welcome to Gertrude!`);
 
     // log out, then attempt to re-signup
     cy.contains(`Log out`).click();
@@ -60,7 +60,7 @@ describe(`Smoke test`, () => {
     cy.get(`input[name=email]`).type(email);
     cy.get(`input[name=password]`).type(`${password}{enter}`);
     cy.location(`pathname`).should(`eq`, `/`);
-    cy.contains(`Welcome to the parent website!`);
+    cy.contains(`Welcome to Gertrude!`);
 
     // log out, then back in w/ email/pass
     cy.contains(`Log out`).click();
