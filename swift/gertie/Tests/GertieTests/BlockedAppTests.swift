@@ -23,6 +23,16 @@ final class BlockedAppTests: XCTestCase {
     expect(blocked.blocks(app: .init(bundleId: "com.weird"), at: Date())).toBeFalse()
   }
 
+  func testBlockedAppTrimsWhitespaceFromIdentifier() {
+    let blocked = BlockedApp(identifier: "Firefox ")
+    expect(blocked.blocks(app: .init(bundleId: "", localizedName: "Firefox"), at: Date()))
+      .toBeTrue()
+    expect(blocked.blocks(app: .init(bundleId: "", bundleName: "Firefox"), at: Date()))
+      .toBeTrue()
+    let blocked2 = BlockedApp(identifier: " com.app ")
+    expect(blocked2.blocks(app: .init(bundleId: "1234ABC.com.app"), at: Date())).toBeTrue()
+  }
+
   func testIdentifierWithDotTestedAsBundleIdFragment() {
     let blocked = BlockedApp(identifier: "com.app")
     expect(blocked.blocks(app: .init(bundleId: "com.not-match"), at: Date())).toBeFalse()
