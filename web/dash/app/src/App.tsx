@@ -7,6 +7,8 @@ import CheckoutCancel from './components/routes/CheckoutCancel';
 import CheckoutSuccess from './components/routes/CheckoutSuccess';
 import ChildActivityFeed from './components/routes/ChildActivityFeed';
 import ChildActivitySummaries from './components/routes/ChildActivitySummaries';
+import ChildIOSDevicesRoute from './components/routes/ChildIOSDevices';
+import ChildMac from './components/routes/ChildMac';
 import Computer from './components/routes/Computer';
 import Computers from './components/routes/Computers';
 import ConferenceEmailForm from './components/routes/ConferenceEmail';
@@ -113,6 +115,12 @@ const App: React.FC = () => {
 
           <Route path=":userId">
             <Route index element={<UserRoute />} />
+            <Route path="mac" element={<ChildMac />} />
+
+            <Route path="ios-devices">
+              <Route index element={<ChildIOSDevicesRoute />} />
+              <Route path=":deviceId" element={<IOSDevice />} />
+            </Route>
 
             <Route path="suspend-filter-requests/:id" element={<SuspendFilter />} />
 

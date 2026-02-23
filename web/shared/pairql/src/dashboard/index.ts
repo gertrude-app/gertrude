@@ -29,6 +29,7 @@ export * from './pairs/GetUnlockRequests';
 export * from './pairs/GetUserUnlockRequests';
 export * from './pairs/HandleCheckoutCancel';
 export * from './pairs/HandleCheckoutSuccess';
+export * from './pairs/IOSAppConnectionCode';
 export * from './pairs/IOSDevices';
 export * from './pairs/LatestAppVersions';
 export * from './pairs/LogEvent';

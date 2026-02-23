@@ -1,31 +1,23 @@
-import { NoSymbolIcon } from '@heroicons/react/24/outline';
 import { Button, Label, TextInput } from '@shared/components';
 import { inflect } from '@shared/string';
 import cx from 'classnames';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import type {
-  BlockedApp,
   ChildComputer,
   ChildIOSDevice,
   ConfirmableEntityAction,
+  IOSAppConnectionCode,
   MacAppConnectionCode,
-  PlainTimeWindow,
   RequestState,
-  RuleSchedule,
-  SuccessOutput,
-  UserKeychainSummary as Keychain,
 } from '@dash/types';
 import EmptyState from '../EmptyState';
-import TimeInput from '../Forms/TimeInput';
-import ToggleCard from '../Forms/ToggleCard';
-import KeychainCard from '../Keychains/KeychainCard';
+import GradientIcon from '../GradientIcon';
 import { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
 import AddDeviceInstructions from './AddDeviceInstructions';
-import AddKeychainDrawer from './AddKeychainDrawer';
-import BlockedAppCard from './BlockedAppCard';
 import ConnectDeviceModal from './ConnectDeviceModal';
+import ConnectIOSAppModal from './ConnectIOSAppModal';
 import DeviceCard from './DeviceCard';
 
 interface Props {
@@ -33,49 +25,19 @@ interface Props {
   isNew: boolean;
   name: string;
   setName(name: string): unknown;
-  keyloggingEnabled: boolean;
-  setKeyloggingEnabled(enabled: boolean): unknown;
-  screenshotsEnabled: boolean;
-  setScreenshotsEnabled(enabled: boolean): unknown;
-  screenshotsResolution: number;
-  setScreenshotsResolution(resolution: number): unknown;
-  screenshotsFrequency: number;
-  setScreenshotsFrequency(frequency: number): unknown;
-  showSuspensionActivity: boolean;
-  setShowSuspensionActivity(show: boolean): unknown;
-  setDowntimeEnabled(enabled: boolean): unknown;
-  downtimeEnabled: boolean;
-  setDowntime(window: PlainTimeWindow): unknown;
-  downtime: PlainTimeWindow;
-  removeKeychain(id: UUID): unknown;
-  keychains: Keychain[];
   computers: ChildComputer[];
   iosDevices: ChildIOSDevice[];
   deleteUser: ConfirmableEntityAction<void>;
   startAddDevice(): unknown;
   dismissAddDevice(): unknown;
+  startAddIOSDevice(): unknown;
+  dismissAddIOSDevice(): unknown;
   onStartTrial(): unknown;
   deleteDevice: ConfirmableEntityAction;
   addDeviceRequest?: RequestState<MacAppConnectionCode.Output>;
+  addIOSDeviceRequest?: RequestState<IOSAppConnectionCode.Output>;
   saveButtonDisabled: boolean;
   onSave(): unknown;
-  onAddKeychainClicked(): unknown;
-  onSelectKeychainToAdd(keychain: Keychain): unknown;
-  onConfirmAddKeychain(): unknown;
-  onDismissAddKeychain(): unknown;
-  addingKeychain?: Keychain | null;
-  fetchSelectableKeychainsRequest?: RequestState<{ own: Keychain[]; public: Keychain[] }>;
-  keychainSchedule?: RuleSchedule;
-  setAddingKeychainSchedule(schedule?: RuleSchedule): unknown;
-  setAssignedKeychainSchedule(id: UUID, schedule?: RuleSchedule): unknown;
-  blockedApps?: BlockedApp[];
-  newBlockedAppIdentifier: string;
-  updateNewBlockedAppIdentifier(identifier: string): unknown;
-  addNewBlockedApp(): unknown;
-  removeBlockedApp(id: UUID): unknown;
-  setBlockedAppSchedule(id: UUID, schedule?: RuleSchedule): unknown;
-  onRequestPublicKeychain(searchQuery: string, description: string): unknown;
-  requestPublicKeychainRequest: RequestState<SuccessOutput>;
 }
 
 const EditChild: React.FC<Props> = ({
@@ -83,18 +45,6 @@ const EditChild: React.FC<Props> = ({
   name,
   id,
   setName,
-  keyloggingEnabled,
-  setKeyloggingEnabled,
-  screenshotsEnabled,
-  setScreenshotsEnabled,
-  screenshotsResolution,
-  setScreenshotsResolution,
-  screenshotsFrequency,
-  setScreenshotsFrequency,
-  showSuspensionActivity,
-  setShowSuspensionActivity,
-  removeKeychain,
-  keychains,
   computers,
   iosDevices,
   deleteDevice,
@@ -104,28 +54,10 @@ const EditChild: React.FC<Props> = ({
   dismissAddDevice,
   addDeviceRequest,
   startAddDevice,
+  startAddIOSDevice,
+  dismissAddIOSDevice,
+  addIOSDeviceRequest,
   onStartTrial,
-  onAddKeychainClicked,
-  onSelectKeychainToAdd,
-  onDismissAddKeychain,
-  fetchSelectableKeychainsRequest,
-  addingKeychain,
-  onConfirmAddKeychain,
-  downtimeEnabled,
-  setDowntimeEnabled,
-  downtime,
-  setDowntime,
-  keychainSchedule,
-  setAddingKeychainSchedule,
-  setAssignedKeychainSchedule,
-  blockedApps,
-  newBlockedAppIdentifier,
-  updateNewBlockedAppIdentifier,
-  addNewBlockedApp,
-  removeBlockedApp,
-  setBlockedAppSchedule,
-  onRequestPublicKeychain,
-  requestPublicKeychainRequest,
 }) => {
   if (isNew) {
     return (
@@ -172,25 +104,17 @@ const EditChild: React.FC<Props> = ({
         dismissAddDevice={dismissAddDevice}
         onStartTrial={onStartTrial}
       />
-      <AddKeychainDrawer
-        request={fetchSelectableKeychainsRequest}
-        onSelect={onSelectKeychainToAdd}
-        onDismiss={onDismissAddKeychain}
-        onConfirm={onConfirmAddKeychain}
-        selected={addingKeychain ?? undefined}
-        existingKeychains={keychains}
-        userName={name}
-        schedule={keychainSchedule}
-        setSchedule={setAddingKeychainSchedule}
-        onRequestPublicKeychain={onRequestPublicKeychain}
-        requestPublicKeychainRequest={requestPublicKeychainRequest}
+      <ConnectIOSAppModal
+        request={addIOSDeviceRequest}
+        dismissModal={dismissAddIOSDevice}
+        childName={name}
       />
       <ConfirmDeleteEntity
         type="connection to computer"
         action={deleteDevice}
         text="Are you sure you want to delete the connection between this child and this computer?"
       />
-      <ConfirmDeleteEntity type="user" action={deleteUser} />
+      <ConfirmDeleteEntity type="child" action={deleteUser} />
       {(computers.length > 0 || iosDevices.length > 0) && (
         <PageHeading icon={`cog`}>Child settings</PageHeading>
       )}
@@ -206,285 +130,195 @@ const EditChild: React.FC<Props> = ({
         )}
         {(computers.length > 0 || iosDevices.length > 0) && (
           <>
-            <TextInput
-              type="text"
-              label="Name:"
-              testId="user-name"
-              value={name}
-              setValue={setName}
-              className="max-w-xl"
-            />
-            <h2 className="mt-5 text-lg font-bold text-slate-700">
-              {computers.length + iosDevices.length}
-              {` `}
-              {inflect(
-                iosDevices.length > 0 ? `device` : `computer`,
-                computers.length + iosDevices.length,
-              )}
-              :
-            </h2>
-            <div className="flex flex-col max-w-3xl -mx-2 xs:mx-0">
-              {computers.map((computer) => (
-                <div key={computer.id} className="flex items-center mt-3">
-                  <DeviceCard
-                    to={`/computers/${computer.computerId}`}
-                    imageSrc={`/macs/${computer.modelIdentifier}.png`}
-                    imageAlt={computer.modelTitle}
-                    title={computer.customName || computer.modelTitle}
-                    subtitle={computer.customName ? computer.modelTitle : undefined}
-                    status={{ case: `computerStatus`, status: computer.status }}
-                    className="flex-grow mr-1 xs:mr-3"
-                  />
-                  <button
-                    onClick={() => deleteDevice.start(computer.id)}
-                    className="transition-colors duration-100 flex justify-center items-center w-6 xs:w-10 h-6 xs:h-10 rounded-full hover:bg-slate-200/50 cursor-pointer text-slate-500 hover:text-red-500"
-                  >
-                    <i className="fa fa-trash" />
-                  </button>
-                </div>
-              ))}
-              {iosDevices.map((device) => (
-                <div key={device.id} className="flex items-center mt-3">
-                  <DeviceCard
-                    to={
-                      device.pendingClaimCode === undefined
-                        ? `/ios-devices/${device.id}`
-                        : `/supervise-device/${device.pendingClaimCode}/download-helper`
-                    }
-                    imageSrc={`/ios/${device.deviceType}.png`}
-                    imageAlt={device.modelName}
-                    title={device.modelName}
-                    subtitle={device.iosVersion}
-                    status={
-                      device.pendingClaimCode !== undefined
-                        ? { case: `pendingSetup` }
-                        : undefined
-                    }
-                    className="flex-grow mr-1 xs:mr-3"
-                  />
-                  <button
-                    disabled
-                    className="flex justify-center items-center w-6 xs:w-10 h-6 xs:h-10 rounded-full text-slate-300 cursor-not-allowed"
-                  >
-                    <i className="fa fa-trash" />
-                  </button>
-                </div>
-              ))}
-              <button
-                onClick={startAddDevice}
-                className="mt-5 text-violet-700 font-medium px-7 py-2 rounded-lg hover:bg-violet-100 self-end transition-colors duration-100"
-              >
-                <i className="fa fa-plus mr-2" />
-                Add a computer
-              </button>
-            </div>
-
-            {/* monitoring */}
-            <div className="mt-4 max-w-3xl">
-              <h2 className="text-lg font-bold text-slate-700">Monitoring</h2>
-              <ToggleCard
-                title="Enable keylogging"
-                description="Sends reports of all keystrokes to your review"
-                enabled={keyloggingEnabled}
-                setEnabled={setKeyloggingEnabled}
-              />
-              <ToggleCard
-                title="Enable screenshots"
-                description="Periodically take a screenshot and upload for your review"
-                enabled={screenshotsEnabled}
-                setEnabled={setScreenshotsEnabled}
-              >
-                <div
-                  className={cx(
-                    `flex flex-col space-y-3 md:flex-row md:space-x-3 md:space-y-0 mt-5`,
-                    screenshotsEnabled || `hidden`,
-                  )}
-                >
-                  <TextInput
-                    type="positiveInteger"
-                    label="Resolution"
-                    value={String(screenshotsResolution)}
-                    setValue={(num) => setScreenshotsResolution(Number(num))}
-                    unit="pixels"
-                  />
-                  <TextInput
-                    type="positiveInteger"
-                    label="Frequency"
-                    value={String(screenshotsFrequency)}
-                    setValue={(num) => setScreenshotsFrequency(Number(num))}
-                    unit="seconds"
-                  />
-                </div>
-              </ToggleCard>
-              <ToggleCard
-                title="Emphasize filter suspension activity"
-                description="Visually highlight activity that is recorded while filter is suspended"
-                enabled={showSuspensionActivity}
-                setEnabled={setShowSuspensionActivity}
+            <h2 className="text-lg font-bold text-slate-700 mb-2">Name:</h2>
+            <div className="flex items-end gap-3 max-w-2xl">
+              <TextInput type="text" testId="user-name" value={name} setValue={setName} />
+              <Button
                 className={cx(
-                  `transition-opacity duration-300`,
-                  !(screenshotsEnabled || keyloggingEnabled) && `!hidden`,
+                  `ScrollTop shrink-0 transition-opacity duration-200`,
+                  saveButtonDisabled && `opacity-0 pointer-events-none`,
                 )}
-              />
-            </div>
-
-            {/* downtime */}
-            <div className="mt-12 max-w-3xl">
-              <h2 className="text-lg font-bold text-slate-700">Downtime</h2>
-              <ToggleCard
-                title="Enable downtime"
-                description="Completely restrict all internet access during specified hours"
-                enabled={downtimeEnabled}
-                setEnabled={setDowntimeEnabled}
+                type="button"
+                onClick={onSave}
+                color="primary"
+                size="large"
               >
-                <div
-                  className={cx(
-                    `flex justify-center items-center mt-4 bg-white rounded-xl p-4 gap-4 flex-col sm:flex-row md:flex-col md+:flex-row border-[0.5px] border-slate-200 shadow shadow-slate-300/50`,
-                    downtimeEnabled || `hidden`,
-                  )}
-                >
-                  <span className="text-slate-500 font-medium">From</span>
-                  <TimeInput
-                    time={downtime.start}
-                    setTime={(start) => setDowntime({ ...downtime, start })}
-                  />
-                  <span className="text-slate-500 font-medium">to</span>
-                  <TimeInput
-                    time={downtime.end}
-                    setTime={(end) => setDowntime({ ...downtime, end })}
-                  />
-                </div>
-              </ToggleCard>
+                Save
+              </Button>
             </div>
-            {/* /downtime */}
-
-            {/* blocked apps */}
-            {blockedApps && (
-              <div className="mt-12 max-w-3xl mb-12">
-                <h2 className="text-lg font-bold text-slate-700">Blocked apps{` `}</h2>
-                {blockedApps.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center p-8 bg-slate-100 mt-2 rounded-2xl shadow-inner">
-                    <NoSymbolIcon className="w-8 h-8 text-slate-300" strokeWidth={2} />
-                    <h3 className="text-lg font-semibold text-slate-700 mt-2 mb-1">
-                      No blocked apps
-                    </h3>
-                    <p className="text-slate-500 text-sm text-center">
-                      Read more about what blocked apps are{` `}
-                      <Link
-                        to="https://gertrude.app/docs/block-mac-apps"
-                        className="text-blue-500 font-medium underline"
-                      >
-                        here.
-                      </Link>
-                    </p>
-                  </div>
-                ) : (
-                  <div className="gap-1.5 my-2 flex flex-col">
-                    {blockedApps.map((app) => (
-                      <BlockedAppCard
-                        app={app}
-                        setSchedule={(schedule) =>
-                          setBlockedAppSchedule(app.id, schedule)
-                        }
-                        onDelete={() => removeBlockedApp(app.id)}
-                      />
-                    ))}
-                  </div>
-                )}
-                <form
-                  className="flex gap-2 mt-4"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    addNewBlockedApp();
-                  }}
+            <div className="mt-10 max-w-3xl">
+              <h2 className="text-lg font-bold text-slate-700 mb-3">
+                Protection settings:
+              </h2>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  to={`/children/${id}/mac`}
+                  className="flex items-center rounded-xl px-5 py-8 sm:w-1/2 bg-violet-50 hover:bg-violet-100 transition duration-200 border border-violet-200"
                 >
-                  <TextInput
-                    key={`new-blocked-app-${blockedApps.length}`}
-                    type="text"
-                    value={newBlockedAppIdentifier}
-                    setValue={updateNewBlockedAppIdentifier}
-                    placeholder="App name or bundle id"
-                  />
-                  <Button
-                    size="small"
-                    className="whitespace-nowrap"
-                    color="secondary"
-                    type="submit"
-                    disabled={!newBlockedAppIdentifier}
-                  >
-                    <i className="fa fa-plus mr-2" />
-                    Add
-                  </Button>
-                </form>
+                  <GradientIcon icon="laptop" size="large" className="mr-4 shrink-0" />
+                  <h3 className="text-lg font-semibold text-slate-700 flex-grow">
+                    For Mac Computers
+                  </h3>
+                  <i className="fa-solid fa-chevron-right text-violet-400 ml-2" />
+                </Link>
+                <Link
+                  to={
+                    iosDevices.length === 1
+                      ? `/children/${id}/ios-devices/${iosDevices[0]?.id || ``}`
+                      : `/children/${id}/ios-devices`
+                  }
+                  className="flex items-center rounded-xl px-5 py-8 sm:w-1/2 bg-violet-50 hover:bg-violet-100 transition duration-200 border border-violet-200"
+                >
+                  <GradientIcon icon="phone" size="large" className="mr-4 shrink-0" />
+                  <h3 className="text-lg font-semibold text-slate-700 flex-grow">
+                    For iPhones and iPads
+                  </h3>
+                  <i className="fa-solid fa-chevron-right text-violet-400 ml-2" />
+                </Link>
               </div>
-            )}
-            {/* /blocked apps */}
+            </div>
 
-            {/* keychains */}
-            <div className="mt-12 max-w-3xl">
-              <h2 className="text-lg font-bold text-slate-700 mb-2">Keychains</h2>
-              <div className="py-3 flex flex-col space-y-4">
-                {keychains.length === 0 ? (
-                  <EmptyState
-                    heading={`No keychains`}
-                    secondaryText={`By default, all internet access is blocked for this child until you assign a keychain.`}
-                    icon={`key`}
-                    buttonText={`Add keychain`}
-                    action={onAddKeychainClicked}
-                  />
-                ) : (
-                  <>
-                    {keychains.map((keychain) => (
-                      <KeychainCard
-                        mode="assigned_to_child"
-                        keychainId={keychain.id}
-                        schedule={keychain.schedule}
-                        key={keychain.id}
-                        name={keychain.name}
-                        description={keychain.description}
-                        numKeys={keychain.numKeys}
-                        isPublic={keychain.isPublic}
-                        onRemove={() => removeKeychain(keychain.id)}
-                        setSchedule={(schedule) =>
-                          setAssignedKeychainSchedule(keychain.id, schedule)
-                        }
-                      />
+            <div className="mt-8 max-w-3xl flex flex-col gap-4">
+              <div className={computers.length > 0 ? `order-first` : `order-last`}>
+                <h2 className="text-lg font-bold text-slate-700">
+                  {computers.length > 0 ? (
+                    <>
+                      {computers.length} {inflect(`computer`, computers.length)}:
+                    </>
+                  ) : (
+                    `Computers:`
+                  )}
+                </h2>
+                {computers.length > 0 ? (
+                  <div className="flex flex-col -mx-2 xs:mx-0">
+                    {computers.map((computer) => (
+                      <div key={computer.id} className="flex items-center mt-3">
+                        <DeviceCard
+                          to={`/computers/${computer.computerId}`}
+                          imageSrc={`/macs/${computer.modelIdentifier}.png`}
+                          imageAlt={computer.modelTitle}
+                          title={computer.customName || computer.modelTitle}
+                          subtitle={computer.customName ? computer.modelTitle : undefined}
+                          status={{ case: `computerStatus`, status: computer.status }}
+                          className="flex-grow mr-1 xs:mr-3"
+                        />
+                        <button
+                          onClick={() => deleteDevice.start(computer.id)}
+                          className="transition-colors duration-100 flex justify-center items-center w-6 xs:w-10 h-6 xs:h-10 rounded-full hover:bg-slate-200/50 cursor-pointer text-slate-500 hover:text-red-500"
+                        >
+                          <i className="fa fa-trash" />
+                        </button>
+                      </div>
                     ))}
                     <Button
                       type="button"
-                      onClick={onAddKeychainClicked}
+                      onClick={startAddDevice}
                       color="secondary"
-                      className="xs:self-end"
+                      size="medium"
+                      className="self-end mt-4"
                     >
                       <i className="fa fa-plus mr-2" />
-                      Add keychain
+                      Add a computer
                     </Button>
-                  </>
+                  </div>
+                ) : (
+                  <EmptyState
+                    heading="No computers"
+                    secondaryText="Connect a Mac computer running the Gertrude Mac app."
+                    icon="laptop"
+                    buttonText="Add a computer"
+                    action={startAddDevice}
+                    buttonColor="secondary"
+                    className="mt-2"
+                  />
+                )}
+              </div>
+
+              <div
+                className={cx(
+                  iosDevices.length > 0 ? `order-first` : `order-last`,
+                  iosDevices.length === 0 && `hidden`,
+                )}
+              >
+                <h2 className="text-lg font-bold text-slate-700">
+                  {iosDevices.length > 0 ? (
+                    <>
+                      {iosDevices.length} iOS {inflect(`device`, iosDevices.length)}:
+                    </>
+                  ) : (
+                    `iOS devices:`
+                  )}
+                </h2>
+                {iosDevices.length > 0 ? (
+                  <div className="flex flex-col -mx-2 xs:mx-0">
+                    {iosDevices.map((device) => (
+                      <div key={device.id} className="flex items-center mt-3">
+                        <DeviceCard
+                          to={
+                            device.pendingClaimCode === undefined
+                              ? `/children/${id}/ios-devices/${device.id}`
+                              : `/supervise-device/${device.pendingClaimCode}/download-helper`
+                          }
+                          imageSrc={`/ios/${device.deviceType}.png`}
+                          imageAlt={device.modelName}
+                          title={device.modelName}
+                          subtitle={device.iosVersion}
+                          status={
+                            device.pendingClaimCode !== undefined
+                              ? { case: `pendingSetup` }
+                              : undefined
+                          }
+                          className="flex-grow mr-1 xs:mr-3"
+                        />
+                        <button
+                          disabled
+                          className="flex justify-center items-center w-6 xs:w-10 h-6 xs:h-10 rounded-full text-slate-300 cursor-not-allowed"
+                        >
+                          <i className="fa fa-trash" />
+                        </button>
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      onClick={startAddIOSDevice}
+                      color="secondary"
+                      size="medium"
+                      className="self-end mt-4"
+                    >
+                      <i className="fa fa-plus mr-2" />
+                      Add a device
+                    </Button>
+                  </div>
+                ) : (
+                  <EmptyState
+                    heading="No iOS devices"
+                    secondaryText="Add an iPhone or iPad to manage with Gertrude."
+                    icon="mobile-screen"
+                    buttonText="Add a device"
+                    action={startAddIOSDevice}
+                    buttonColor="secondary"
+                    className="mt-2"
+                  />
                 )}
               </div>
             </div>
           </>
         )}
-        <div
-          className={cx(
-            `flex mt-8 justify-end border-slate-200 space-x-5`,
-            (computers.length > 0 || iosDevices.length > 0) && `pt-8 border-t-2`,
-          )}
-        >
-          <Button type="button" onClick={deleteUser.start} color="warning">
-            Delete child
-          </Button>
-          {(computers.length > 0 || iosDevices.length > 0) && (
+        <div className="mt-12 max-w-3xl">
+          <h2 className="text-lg font-bold text-slate-700 mb-3">Danger zone:</h2>
+          <div className="rounded-2xl bg-slate-50 border border-red-200/60 px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <p className="text-slate-400 text-sm">
+              Permanently delete this child and all associated data.
+            </p>
             <Button
-              className="ScrollTop"
               type="button"
-              disabled={saveButtonDisabled}
-              onClick={onSave}
-              color="primary"
+              onClick={deleteUser.start}
+              color="warning"
+              className="shrink-0"
             >
-              Save child
+              Delete child
             </Button>
-          )}
+          </div>
         </div>
       </div>
     </div>

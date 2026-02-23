@@ -240,6 +240,16 @@ export default class DashboardClient extends Client<Auth> {
     );
   };
 
+  public iOSAppConnectionCode = (
+    input: P.IOSAppConnectionCode.Input,
+  ): Promise<Result<P.IOSAppConnectionCode.Output>> => {
+    return this.query<P.IOSAppConnectionCode.Output>(
+      input,
+      `IOSAppConnectionCode`,
+      `parent`,
+    );
+  };
+
   public iOSDevices = (
     input: P.IOSDevices.Input,
   ): Promise<Result<P.IOSDevices.Output>> => {

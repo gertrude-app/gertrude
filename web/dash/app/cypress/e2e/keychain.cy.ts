@@ -36,6 +36,7 @@ describe(`create keychain`, () => {
     cy.testId(`modal-primary-btn`).click();
     cy.sidebarClick(`Children`);
     cy.testId(`edit-user`).click();
+    cy.contains(`For Mac Computers`).click();
     cy.contains(`Add keychain`).click();
     cy.contains(`Existing`).should(`not.exist`);
   });
@@ -62,6 +63,7 @@ describe(`create keychain`, () => {
     cy.contains(`Test keychain`);
     cy.sidebarClick(`Children`);
     cy.testId(`edit-user`).click();
+    cy.contains(`For Mac Computers`).click();
     cy.contains(`Test keychain`);
     cy.contains(`Add keychain`).click();
   });
@@ -81,6 +83,7 @@ describe(`create keychain`, () => {
     it(`(the keychain picker) shows empty state when parent has no personal keychains to assign`, () => {
       cy.visit(`/children`);
       cy.testId(`edit-user`).click();
+      cy.contains(`For Mac Computers`).click();
       cy.contains(`Add keychain`).click();
       cy.contains(`Looks like you don't have any keychains`);
     });

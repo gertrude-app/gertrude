@@ -14,9 +14,9 @@ type Props = {
 };
 
 const BlockGroupList: React.FC<Props> = ({ groups, enabledGroupIds, onToggle }) => (
-  <div className="bg-white rounded-xl p-5 border-[0.5px] border-slate-200 shadow shadow-slate-300/50">
-    <h2 className="text-lg font-bold text-slate-700 mb-4">Block Groups</h2>
-    <div className="space-y-2">
+  <div>
+    <h2 className="text-lg font-bold text-slate-700 mb-3">Block Groups</h2>
+    <div className="bg-white rounded-xl p-5 border-[0.5px] border-slate-200 shadow shadow-slate-300/50 space-y-2">
       {groups.map((group) => (
         <BlockGroupItem
           key={group.id}
