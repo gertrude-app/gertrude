@@ -12,19 +12,20 @@ public struct BlockedApp {
 
 public extension BlockedApp {
   func blocks(app: RunningApp, at date: Date, in calendar: Calendar = .current) -> Bool {
+    let id = self.identifier.trimmingCharacters(in: .whitespaces)
     if self.schedule.map({ $0.active(at: date, in: calendar) }) == .some(false) {
       // if it has a schedule, and it's not active, we know it isn't blocked
-      false
-    } else if app.localizedName == self.identifier {
-      true
-    } else if app.bundleName == self.identifier {
-      true
-    } else if app.bundleId == self.identifier {
-      true
-    } else if self.identifier.contains("."), app.bundleId.contains(self.identifier) {
-      true
+      return false
+    } else if app.localizedName == id {
+      return true
+    } else if app.bundleName == id {
+      return true
+    } else if app.bundleId == id {
+      return true
+    } else if id.contains("."), app.bundleId.contains(id) {
+      return true
     } else {
-      false
+      return false
     }
   }
 }
