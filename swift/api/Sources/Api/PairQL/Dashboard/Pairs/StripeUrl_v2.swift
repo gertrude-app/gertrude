@@ -33,7 +33,7 @@ extension StripeUrl_v2: Resolver {
         in: context,
       ))
     case .full(.paid(let stripeId, _)), .full(.overdue(let stripeId, _)):
-      return try await .init(url: billingPortalSessionUrl(for: stripeId))
+      return try await .init(url: billingPortalSessionUrl(for: stripeId, tier: .full))
     case .light(.paid(let stripeId, _)), .light(.overdue(let stripeId, _)):
       if let tier = input.tier, tier == .full {
         return try await .init(url: checkoutSessionUrl(
@@ -44,7 +44,7 @@ extension StripeUrl_v2: Resolver {
           in: context,
         ))
       }
-      return try await .init(url: billingPortalSessionUrl(for: stripeId))
+      return try await .init(url: billingPortalSessionUrl(for: stripeId, tier: .light))
     case .free(let kind):
       if let tier = input.tier {
         return try await .init(url: checkoutSessionUrl(
@@ -57,7 +57,7 @@ extension StripeUrl_v2: Resolver {
       }
       switch kind {
       case .lapsedFull(.some(let stripeId)):
-        return try await .init(url: billingPortalSessionUrl(for: stripeId))
+        return try await .init(url: billingPortalSessionUrl(for: stripeId, tier: .full))
       case .lapsedFull(nil):
         return try await .init(url: checkoutSessionUrl(
           tier: .full,
@@ -67,7 +67,7 @@ extension StripeUrl_v2: Resolver {
           in: context,
         ))
       case .lapsedLight(let stripeId, _):
-        return try await .init(url: billingPortalSessionUrl(for: stripeId))
+        return try await .init(url: billingPortalSessionUrl(for: stripeId, tier: .light))
       case .standard:
         unexpected("92c4365f", context)
         throw Abort(.badRequest)
@@ -138,9 +138,16 @@ private func checkoutSessionUrl(
 
 private func billingPortalSessionUrl(
   for stripeId: Subscription.StripeId,
+  tier: Subscription.Tier,
 ) async throws -> String {
   @Dependency(\.stripe) var stripe
   let subscription = try await stripe.getSubscription(stripeId.rawValue)
-  let portal = try await stripe.createBillingPortalSession(subscription.customer)
+  // special light configuration prohibits proration on a customer cancel event, because
+  // we had an early user supervise a device after paying, then cancel getting 100% back
+  let configuration: String? = tier == .light ? "bpc_1T4P0qGKRdhETuKAyMZVbbVp" : nil
+  let portal = try await stripe.createBillingPortalSession(
+    subscription.customer,
+    configuration,
+  )
   return portal.url
 }

@@ -18,7 +18,7 @@ public extension Stripe {
     public var createCheckoutSession: @Sendable (CheckoutSessionData) async throws
       -> Stripe.Api.CheckoutSession
     public var getSubscription: @Sendable (String) async throws -> Stripe.Api.Subscription
-    public var createBillingPortalSession: @Sendable (String) async throws
+    public var createBillingPortalSession: @Sendable (String, String?) async throws
       -> Stripe.Api.BillingPortalSession
 
     public init(
@@ -33,7 +33,7 @@ public extension Stripe {
       createCheckoutSession: @Sendable @escaping (CheckoutSessionData) async throws
         -> Stripe.Api.CheckoutSession,
       getSubscription: @Sendable @escaping (String) async throws -> Stripe.Api.Subscription,
-      createBillingPortalSession: @Sendable @escaping (String) async throws
+      createBillingPortalSession: @Sendable @escaping (String, String?) async throws
         -> Stripe.Api.BillingPortalSession,
     ) {
       self.createPaymentIntent = createPaymentIntent
@@ -73,8 +73,12 @@ public extension Stripe.Client {
       getSubscription: { id in
         try await _getSubscription(id: id, secretKey: secretKey)
       },
-      createBillingPortalSession: { id in
-        try await _createBillingPortalSession(customerId: id, secretKey: secretKey)
+      createBillingPortalSession: { id, configuration in
+        try await _createBillingPortalSession(
+          customerId: id,
+          configuration: configuration,
+          secretKey: secretKey,
+        )
       },
     )
   }
@@ -84,10 +88,15 @@ public extension Stripe.Client {
 
 private func _createBillingPortalSession(
   customerId: String,
+  configuration: String?,
   secretKey: String,
 ) async throws -> Stripe.Api.BillingPortalSession {
+  var params = ["customer": customerId]
+  if let configuration {
+    params["configuration"] = configuration
+  }
   let (data, res) = try await HTTP.postFormUrlencoded(
-    ["customer": customerId],
+    params,
     to: "https://api.stripe.com/v1/billing_portal/sessions",
     auth: .basic(secretKey, ""),
   )
@@ -258,7 +267,7 @@ public extension Stripe.Client {
     getSubscription: { _ in
       .init(id: "sub_123", status: .trialing, customer: "cus_123", currentPeriodEnd: 0)
     },
-    createBillingPortalSession: { _ in
+    createBillingPortalSession: { _, _ in
       .init(id: "bps_123", url: "/billing_portal.session/url")
     },
   )

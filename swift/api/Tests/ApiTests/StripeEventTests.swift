@@ -18,6 +18,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
         "type": "invoice.paid",
         "data": {
           "object": {
+            "amount_due": 1000,
             "customer_email": "\(parent.email)",
             "subscription": "\(subscriptionId.rawValue)",
             "lines": {
@@ -49,6 +50,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
         "type": "invoice.paid",
         "data": {
           "object": {
+            "amount_due": 1000,
             "customer_email": "\(parent.email)",
             "subscription": "\(subscriptionId.rawValue)",
             "lines": {
@@ -85,6 +87,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
         "type": "invoice.paid",
         "data": {
           "object": {
+            "amount_due": 1000,
             "customer_email": "\(parent.email)",
             "subscription": "\(subscriptionId.rawValue)",
             "lines": {
@@ -164,6 +167,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
         "type": "invoice.paid",
         "data": {
           "object": {
+            "amount_due": 1000,
             "customer_email": "stripe@email.com",
             "subscription": "\(subscriptionId.rawValue)",
             "lines": {
@@ -193,6 +197,48 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
         .where(.parentId == parent.id)
         .first(in: self.db)
       expect(retrieved.statusExpiresAt).toEqual(expectedNewStatusExpiration)
+    })
+  }
+
+  func testZeroAmountDueInvoicePaidDoesNotOverrideCancelledStatus() async throws {
+    let subscriptionId: Subscription.StripeId = .init("subId_".random)
+    let parent = try await self.parentWithSubscription {
+      $1.stripeId = subscriptionId
+      $1.tier = .light
+      $1.billingStatus = .cancelled
+      $1.trialStartedAt = nil
+      $1.statusExpiresAt = .distantFuture
+    }
+
+    let json = """
+      {
+        "type": "invoice.paid",
+        "data": {
+          "object": {
+            "amount_due": 0,
+            "customer_email": "\(parent.email)",
+            "subscription": "\(subscriptionId.rawValue)",
+            "lines": {
+              "data": [
+                {
+                  "price": {
+                    "id": "price_1SwT4IGKRdhETuKAc9wwLtsR"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent)
+      let retrieved = try await Subscription.query()
+        .where(.parentId == parent.id)
+        .first(in: self.db)
+      expect(retrieved.billingStatus).toEqual(.cancelled)
+      expect(retrieved.tier).toEqual(.light)
     })
   }
 }
