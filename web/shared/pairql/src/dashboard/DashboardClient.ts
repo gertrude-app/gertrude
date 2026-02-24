@@ -126,6 +126,12 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetAdminKeychains.Output>(input, `GetAdminKeychains`, `parent`);
   };
 
+  public getAllDevices = (
+    input: P.GetAllDevices.Input,
+  ): Promise<Result<P.GetAllDevices.Output>> => {
+    return this.query<P.GetAllDevices.Output>(input, `GetAllDevices`, `parent`);
+  };
+
   public getChild = (input: P.GetChild.Input): Promise<Result<P.GetChild.Output>> => {
     return this.query<P.GetChild.Output>(input, `GetChild`, `parent`);
   };
@@ -138,12 +144,6 @@ export default class DashboardClient extends Client<Auth> {
 
   public getDevice = (input: P.GetDevice.Input): Promise<Result<P.GetDevice.Output>> => {
     return this.query<P.GetDevice.Output>(input, `GetDevice`, `parent`);
-  };
-
-  public getDevices = (
-    input: P.GetDevices.Input,
-  ): Promise<Result<P.GetDevices.Output>> => {
-    return this.query<P.GetDevices.Output>(input, `GetDevices`, `parent`);
   };
 
   public getIOSDevice = (
@@ -248,12 +248,6 @@ export default class DashboardClient extends Client<Auth> {
       `IOSAppConnectionCode`,
       `parent`,
     );
-  };
-
-  public iOSDevices = (
-    input: P.IOSDevices.Input,
-  ): Promise<Result<P.IOSDevices.Output>> => {
-    return this.query<P.IOSDevices.Output>(input, `IOSDevices`, `parent`);
   };
 
   public latestAppVersions = (

@@ -68,6 +68,7 @@ export const ICONS = [
   `cog`,
   `shield`,
   `bell`,
+  `layer-group`,
 ] as const;
 
 export type IconType = (typeof ICONS)[number];
@@ -114,6 +115,7 @@ const CLASS_MAP: Record<IconType, HeroIcon | string> = {
   cog: Cog6ToothIcon,
   shield: ShieldCheckIcon,
   bell: BellIcon,
+  'layer-group': `fa-solid fa-layer-group`,
 };
 
 const GradientIcon: React.FC<Props> = ({ icon, className, size }) => {

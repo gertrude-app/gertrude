@@ -1,6 +1,7 @@
 import Foundation
 import PairQL
 
+// @deprecated: remove after 2026-03-17, replaced by GetAllDevices
 struct GetDevices: Pair {
   static let auth: ClientAuth = .parent
   typealias Output = [GetDevice.Output]

@@ -98,7 +98,7 @@ const SecurityEventItem: React.FC<{ event: SecurityEvent; location?: IpLocation 
               {` `}
               on{` `}
               <Link
-                to={`/computers/${event.deviceId}`}
+                to={`/devices/${event.deviceId}`}
                 className="font-medium text-slate-700 hover:underline"
               >
                 {event.deviceName}

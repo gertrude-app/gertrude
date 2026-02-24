@@ -6,10 +6,10 @@ import type {
   GetAccountOwner,
   GetAdminKeychain,
   GetAdminKeychains,
+  GetAllDevices,
   GetChild,
   GetChildren,
   GetDevice,
-  GetDevices,
   GetIOSDevice,
   GetIOSDeviceClaimData,
   GetIOSDeviceSupervisionStatus,
@@ -19,7 +19,6 @@ import type {
   GetUnlockRequest,
   GetUnlockRequests,
   GetUserUnlockRequests,
-  IOSDevices,
   LatestAppVersions,
   SecurityEventsFeed,
   UserActivityFeed,
@@ -57,16 +56,12 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`latest-app-versions`, [`latest-app-versions`]);
   }
 
-  static get computers(): QueryKey<GetDevices.Output> {
-    return new QueryKey(`computers`, [`computers`]);
+  static get allDevices(): QueryKey<GetAllDevices.Output> {
+    return new QueryKey(`devices`, [`devices`]);
   }
 
   static computer(id: UUID): QueryKey<GetDevice.Output> {
     return new QueryKey(`computers/:id`, [`computers`, id], id);
-  }
-
-  static get iOSDevices(): QueryKey<IOSDevices.Output> {
-    return new QueryKey(`ios-devices`, [`ios-devices`]);
   }
 
   static iOSDevice(id: UUID): QueryKey<GetIOSDevice.Output> {

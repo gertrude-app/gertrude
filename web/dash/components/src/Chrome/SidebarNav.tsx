@@ -4,10 +4,10 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   Cog6ToothIcon,
-  ComputerDesktopIcon,
   HomeIcon,
   KeyIcon,
   LifebuoyIcon,
+  RectangleGroupIcon,
   ShieldCheckIcon,
   UsersIcon,
 } from '@heroicons/react/24/solid';
@@ -71,13 +71,13 @@ const SidebarNav: React.FC<Props> = ({
           Children
         </SidebarOption>
         <SidebarOption
-          Icon={ComputerDesktopIcon}
+          Icon={RectangleGroupIcon}
           collapsed={collapsed}
-          to="/computers"
-          isSelected={urlPath.startsWith(`/computers`)}
+          to="/devices"
+          isSelected={urlPath.startsWith(`/devices`)}
           onClick={onInternalLinkClick}
         >
-          Computers
+          Devices
         </SidebarOption>
         <SidebarOption
           Icon={KeyIcon}

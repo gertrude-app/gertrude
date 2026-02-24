@@ -61,7 +61,7 @@ export { default as EmptyState } from './EmptyState';
 export { ICONS as GRADIENT_ICONS, default as GradientIcon } from './GradientIcon';
 export { default as SuspendFilterRequestForm } from './Users/SuspendFilterRequestForm';
 export { default as ComputerCard } from './Computers/ComputerCard';
-export { default as ListComputers } from './Computers/ListComputers';
+export { default as ListDevices } from './Devices/ListDevices';
 export { default as EditComputer } from './Computers/EditComputer';
 export { DURATION_OPTS } from './Users/SuspendFilterRequestForm';
 export type { NewMethod, NotificationUpdate } from './Settings/Settings';

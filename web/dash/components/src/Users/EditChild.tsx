@@ -194,7 +194,7 @@ const EditChild: React.FC<Props> = ({
                     {computers.map((computer) => (
                       <div key={computer.id} className="flex items-center mt-3">
                         <DeviceCard
-                          to={`/computers/${computer.computerId}`}
+                          to={`/devices/${computer.computerId}`}
                           imageSrc={`/macs/${computer.modelIdentifier}.png`}
                           imageAlt={computer.modelTitle}
                           title={computer.customName || computer.modelTitle}

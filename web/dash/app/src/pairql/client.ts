@@ -110,11 +110,11 @@ export const throwingClient: ApiClient = {
   claimIOSDevice: () => {
     throw new Error(`ApiClient.claimIOSDevice() not implemented`);
   },
+  getAllDevices: () => {
+    throw new Error(`ApiClient.getAllDevices() not implemented`);
+  },
   getDevice: () => {
     throw new Error(`ApiClient.getDevice() not implemented`);
-  },
-  getDevices: () => {
-    throw new Error(`ApiClient.getDevices() not implemented`);
   },
   getIdentifiedApps: () => {
     throw new Error(`ApiClient.getIdentifiedApps() not implemented`);
@@ -145,9 +145,6 @@ export const throwingClient: ApiClient = {
   },
   handleCheckoutSuccess: () => {
     throw new Error(`ApiClient.handleCheckoutSuccess() not implemented`);
-  },
-  iOSDevices: () => {
-    throw new Error(`ApiClient.iOSDevices() not implemented`);
   },
   latestAppVersions: () => {
     throw new Error(`ApiClient.latestAppVersions() not implemented`);

@@ -42,7 +42,7 @@ const ComputerCard: React.FC<Props> = ({
     </div>
     <div className="py-3 pl-3 pr-5 border-t border-slate-200 rounded-b-3xl flex justify-between items-center @container">
       <UserStatus status={user?.status || { case: `offline` }} />
-      <Button type="link" to={`/computers/${id}`} color="tertiary" size="small">
+      <Button type="link" to={`/devices/${id}`} color="tertiary" size="small">
         <i className="fa-solid fa-pen mr-2" />
         Edit
       </Button>

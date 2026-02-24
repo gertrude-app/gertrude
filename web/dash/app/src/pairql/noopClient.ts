@@ -147,6 +147,9 @@ const noopClient: ApiClient = {
   getUnlockRequests: async () => {
     return Result.success([]);
   },
+  getAllDevices: async () => {
+    return Result.success({ computers: [], iosDevices: [] });
+  },
   getDevice: async () => {
     return Result.success({
       id: ``,
@@ -165,9 +168,6 @@ const noopClient: ApiClient = {
   },
   handleCheckoutSuccess: async () => {
     return Result.success({ success: true });
-  },
-  iOSDevices: async () => {
-    return Result.success([]);
   },
   getIOSDevice: async () => {
     return Result.success({
@@ -204,9 +204,6 @@ const noopClient: ApiClient = {
   },
   decideFilterSuspensionRequest: async () => {
     return Result.success({ success: true });
-  },
-  getDevices: async () => {
-    return Result.success([]);
   },
   latestAppVersions: async () => {
     return Result.success({

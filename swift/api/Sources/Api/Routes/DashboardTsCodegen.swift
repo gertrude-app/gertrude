@@ -65,7 +65,6 @@ enum DashboardTsCodegenRoute {
       GetAdminKeychain.self,
       GetAdminKeychains.self,
       GetDevice.self,
-      GetDevices.self,
       GetIdentifiedApps.self,
       GetSelectableKeychains.self,
       GetSuspendFilterRequest.self,
@@ -103,7 +102,6 @@ enum DashboardTsCodegenRoute {
       StartFullTrial.self,
       RequestPublicKeychain.self,
       FlagActivityItems.self,
-      IOSDevices.self,
       GetIOSDevice.self,
       UpsertBlockRule.self,
       UpdateIOSDevice.self,
@@ -112,6 +110,7 @@ enum DashboardTsCodegenRoute {
       GetIOSDeviceSupervisionStatus.self,
       MacAppConnectionCode.self,
       IOSAppConnectionCode.self,
+      GetAllDevices.self,
     ]
   }
 
