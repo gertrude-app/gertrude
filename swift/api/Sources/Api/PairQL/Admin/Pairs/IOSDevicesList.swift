@@ -140,11 +140,6 @@ private struct DeviceSummaryQuery: CustomQueryable {
     LEFT JOIN (
       SELECT DISTINCT \(eDeviceId)
       FROM \(table: IOSEvent.self)
-      WHERE \(eEventId) = 'bad8adcc'
-    ) cfg ON fl.\(eDeviceId) = cfg.\(eDeviceId)
-    LEFT JOIN (
-      SELECT DISTINCT \(eDeviceId)
-      FROM \(table: IOSEvent.self)
       WHERE \(eEventId) = '4a0c585f'
     ) st ON fl.\(eDeviceId) = st.\(eDeviceId)
     ORDER BY fl.\(eCreatedAt) DESC
