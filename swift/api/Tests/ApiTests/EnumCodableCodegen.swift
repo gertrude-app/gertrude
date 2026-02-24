@@ -36,7 +36,6 @@ struct ApiTypeScriptEnumsCodableGenerator: AggregateCodeGenerator {
         (ClaimIOSDevice.ChildAssignment.self, false),
         (Parent.NotificationMethod.Config.self, false),
         (DecideFilterSuspensionRequest.Decision.self, false),
-        (GetAdmin.SubscriptionStatus.self, false),
         (SecurityEventsFeed.FeedEvent.self, false),
         (UserActivity.Item.self, true),
         (ChildComputerStatus.self, false),
