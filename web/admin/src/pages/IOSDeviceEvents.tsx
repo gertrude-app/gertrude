@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import type { TimelineEvent } from '../lib/format';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
@@ -133,7 +133,7 @@ const IOSDeviceEvents: React.FC = () => {
           <>
             <code className="font-mono">{data.vendorId.slice(0, 8).toLowerCase()}</code>
             {` `}&middot;{` `}
-            {data.deviceType}
+            {data.modelName}
             {` `}&middot;{` `}
             iOS {data.iosVersion}
           </>
@@ -148,8 +148,35 @@ const IOSDeviceEvents: React.FC = () => {
       />
 
       <EventTimeline events={data.events} getEventColor={getEventColor} />
+
+      <div className="flex justify-between items-center pt-4 pb-8">
+        <NavButton vendorId={data.nextVendorId} direction="prev" />
+        <NavButton vendorId={data.prevVendorId} direction="next" />
+      </div>
     </div>
   );
 };
 
 export default IOSDeviceEvents;
+
+const NavButton: React.FC<{ vendorId?: string; direction: `prev` | `next` }> = ({
+  vendorId,
+  direction,
+}) => {
+  const label = direction === `prev` ? `\u2190 Previous Device` : `Next Device \u2192`;
+  if (vendorId) {
+    return (
+      <Link
+        to={`/ios/${vendorId}/events`}
+        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all"
+      >
+        {label}
+      </Link>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-300 bg-slate-50 border border-slate-100 rounded-lg cursor-default">
+      {label}
+    </span>
+  );
+};
