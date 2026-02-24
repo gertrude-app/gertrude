@@ -6,10 +6,13 @@ export namespace IOSDeviceEvents {
 
   export interface Output {
     vendorId: UUID;
+    modelName: string;
     deviceType: string;
     iosVersion: string;
     firstLaunch?: ISODateString;
     reachedOptOut: boolean;
+    prevVendorId?: UUID;
+    nextVendorId?: UUID;
     events: Array<{
       id: string;
       eventId: string;

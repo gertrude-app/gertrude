@@ -11,10 +11,13 @@ struct IOSDeviceEvents: Pair {
 
   struct Output: PairOutput {
     var vendorId: UUID
+    var modelName: String
     var deviceType: String
     var iosVersion: String
     var firstLaunch: Date?
     var reachedOptOut: Bool
+    var prevVendorId: UUID?
+    var nextVendorId: UUID?
     var events: [Event]
   }
 
@@ -42,8 +45,30 @@ extension IOSDeviceEvents: Resolver {
     let firstLaunch = events.first { $0.eventId == "8d35f043" }
     let reachedOptOut = events.contains { $0.eventId == "cdb31095" }
     let modelIdentifier = firstLaunch?.modelIdentifier ?? events.first?.modelIdentifier ?? "Unknown"
+    let modelName = ModelIdentifier.marketingName(for: modelIdentifier)
     let deviceType = ModelIdentifier.deviceType(from: modelIdentifier)
     let iosVersion = firstLaunch?.iosVersion ?? events.first?.iosVersion ?? "Unknown"
+
+    var prevVendorId: UUID?
+    var nextVendorId: UUID?
+    if let firstLaunchDate = firstLaunch?.createdAt {
+      if let prev = try? await IOSEvent.query()
+        .where(.eventId == "8d35f043")
+        .where(.deviceId != input.vendorId)
+        .where(.createdAt >= firstLaunchDate)
+        .orderBy(.createdAt, .asc)
+        .first(in: context.db) {
+        prevVendorId = prev.deviceId?.rawValue
+      }
+      if let next = try? await IOSEvent.query()
+        .where(.eventId == "8d35f043")
+        .where(.deviceId != input.vendorId)
+        .where(.createdAt <= firstLaunchDate)
+        .orderBy(.createdAt, .desc)
+        .first(in: context.db) {
+        nextVendorId = next.deviceId?.rawValue
+      }
+    }
 
     var outputEvents: [Event] = []
     for (index, event) in events.enumerated() {
@@ -66,10 +91,13 @@ extension IOSDeviceEvents: Resolver {
 
     return .init(
       vendorId: input.vendorId,
+      modelName: modelName,
       deviceType: deviceType,
       iosVersion: iosVersion,
       firstLaunch: firstLaunch?.createdAt,
       reachedOptOut: reachedOptOut,
+      prevVendorId: prevVendorId,
+      nextVendorId: nextVendorId,
       events: outputEvents,
     )
   }

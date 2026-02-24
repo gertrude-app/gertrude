@@ -29,6 +29,12 @@ enum StripeEventsRoute {
     if event?.type == "invoice.paid",
        let email = event?.data?.object?.customer_email {
 
+      let amountDue = event?.data?.object?.amount_due ?? 0
+      if amountDue <= 0 {
+        slackNotify(event)
+        return Response(status: .noContent)
+      }
+
       var parent = try? await Parent.query()
         .where(.email == email.lowercased())
         .first(in: request.context.db)
@@ -150,6 +156,7 @@ private struct EventInfo: Decodable {
         var data: [Line]?
       }
 
+      var amount_due: Int?
       var customer_email: String?
       var lines: Lines?
       var subscription: String?

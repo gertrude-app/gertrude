@@ -4,8 +4,6 @@ import Vapor
 
 enum AuthedParentRoute: PairRoute {
   case confirmPendingNotificationMethod(ConfirmPendingNotificationMethod.Input)
-  case createPendingAppConnection(CreatePendingAppConnection.Input)
-  case createPendingAppConnection_v2(CreatePendingAppConnection_v2.Input)
   case createPendingNotificationMethod(CreatePendingNotificationMethod.Input)
   case dashboardWidgets
   case dashboardWidgets_v2
@@ -14,7 +12,6 @@ enum AuthedParentRoute: PairRoute {
   case deleteEntity_v2(DeleteEntity_v2.Input)
   case flagActivityItems(FlagActivityItems.Input)
   case getAccountOwner
-  case getAdmin
   case getAdminKeychain(GetAdminKeychain.Input)
   case getAdminKeychains
   case getDevice(GetDevice.Input)
@@ -65,14 +62,6 @@ extension AuthedParentRoute {
         Operation(ConfirmPendingNotificationMethod.self)
         Body(.dashboardInput(ConfirmPendingNotificationMethod.self))
       }
-      Route(.case(Self.createPendingAppConnection)) {
-        Operation(CreatePendingAppConnection.self)
-        Body(.dashboardInput(CreatePendingAppConnection.self))
-      }
-      Route(.case(Self.createPendingAppConnection_v2)) {
-        Operation(CreatePendingAppConnection_v2.self)
-        Body(.dashboardInput(CreatePendingAppConnection_v2.self))
-      }
       Route(.case(Self.createPendingNotificationMethod)) {
         Operation(CreatePendingNotificationMethod.self)
         Body(.dashboardInput(CreatePendingNotificationMethod.self))
@@ -109,9 +98,6 @@ extension AuthedParentRoute {
       }
       Route(.case(Self.getAccountOwner)) {
         Operation(GetAccountOwner.self)
-      }
-      Route(.case(Self.getAdmin)) {
-        Operation(GetAdmin.self)
       }
       Route(.case(Self.getAdminKeychain)) {
         Operation(GetAdminKeychain.self)
@@ -290,12 +276,6 @@ extension AuthedParentRoute: RouteResponder {
     case .familyActivitySummaries(let input):
       let output = try await FamilyActivitySummaries.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .createPendingAppConnection(let input):
-      let output = try await CreatePendingAppConnection.resolve(with: input, in: context)
-      return try await self.respond(with: output)
-    case .createPendingAppConnection_v2(let input):
-      let output = try await CreatePendingAppConnection_v2.resolve(with: input, in: context)
-      return try await self.respond(with: output)
     case .decideFilterSuspensionRequest(let input):
       let output = try await DecideFilterSuspensionRequest.resolve(with: input, in: context)
       return try await self.respond(with: output)
@@ -307,9 +287,6 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getAccountOwner:
       let output = try await GetAccountOwner.resolve(in: context)
-      return try await self.respond(with: output)
-    case .getAdmin:
-      let output = try await GetAdmin.resolve(in: context)
       return try await self.respond(with: output)
     case .logEvent(let input):
       let output = try await LogEvent.resolve(with: input, in: context)

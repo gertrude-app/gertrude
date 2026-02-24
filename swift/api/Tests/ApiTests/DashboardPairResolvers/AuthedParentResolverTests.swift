@@ -19,7 +19,7 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
         expect(subId).toBe("sub_123")
         return .init(id: "sub_123", status: .active, customer: "cus_123", currentPeriodEnd: 0)
       }
-      $0.stripe.createBillingPortalSession = { cusId in
+      $0.stripe.createBillingPortalSession = { cusId, _ in
         expect(cusId).toBe("cus_123")
         return .init(id: "bps_123", url: "bps-url")
       }
