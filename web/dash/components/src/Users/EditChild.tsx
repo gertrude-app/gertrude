@@ -1,7 +1,7 @@
 import { Button, Label, TextInput } from '@shared/components';
 import { inflect } from '@shared/string';
 import cx from 'classnames';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type {
   ChildComputer,
@@ -11,6 +11,7 @@ import type {
   MacAppConnectionCode,
   RequestState,
 } from '@dash/types';
+import { IosGetStartedInstructions, PlatformOption } from '../Dashboard/Dashboard';
 import EmptyState from '../EmptyState';
 import GradientIcon from '../GradientIcon';
 import { ConfirmDeleteEntity } from '../Modal';
@@ -59,6 +60,7 @@ const EditChild: React.FC<Props> = ({
   addIOSDeviceRequest,
   onStartTrial,
 }) => {
+  const [platform, setPlatform] = useState<`mac` | `ios`>();
   if (isNew) {
     return (
       <div className="-my-6 md:-my-7 py-6 md:py-7 min-h-[calc(100vh-64px)] md:min-h-screen flex flex-col">
@@ -121,11 +123,54 @@ const EditChild: React.FC<Props> = ({
       <div className="mt-8">
         {computers.length === 0 && iosDevices.length === 0 && (
           <div className="-mt-6 bg-white rounded-3xl p-6 sm:p-8 shadow border-[0.5px] border-slate-200">
-            <AddDeviceInstructions
-              userName={name}
-              userId={id}
-              startAddDevice={startAddDevice}
-            />
+            {!platform ? (
+              <div className="flex flex-col items-center">
+                <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+                  Connect a device for {name}
+                </h1>
+                <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
+                  What type of device would you like to connect?
+                </p>
+                <div className="mt-12 flex flex-col sm:flex-row gap-4 w-full max-w-lg">
+                  <PlatformOption
+                    icon="fa-solid fa-laptop"
+                    title="Mac computer"
+                    onClick={() => setPlatform(`mac`)}
+                  />
+                  <PlatformOption
+                    icon="fa-solid fa-mobile-screen"
+                    title="iPhone or iPad"
+                    onClick={() => setPlatform(`ios`)}
+                  />
+                </div>
+              </div>
+            ) : platform === `mac` ? (
+              <>
+                <button
+                  onClick={() => setPlatform(undefined)}
+                  className="text-slate-400 hover:text-slate-600 transition-colors text-sm mb-2"
+                >
+                  <i className="fa-solid fa-arrow-left mr-1.5" />
+                  Back
+                </button>
+                <AddDeviceInstructions
+                  userName={name}
+                  userId={id}
+                  startAddDevice={startAddDevice}
+                />
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setPlatform(undefined)}
+                  className="text-slate-400 hover:text-slate-600 transition-colors text-sm mb-2"
+                >
+                  <i className="fa-solid fa-arrow-left mr-1.5" />
+                  Back
+                </button>
+                <IosGetStartedInstructions childName={name} />
+              </>
+            )}
           </div>
         )}
         {(computers.length > 0 || iosDevices.length > 0) && (
