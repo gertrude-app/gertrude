@@ -65,9 +65,12 @@ codegen-ts-codable-enums:
   @just swift fix
 
 codegen-pairql-ts-clients:
-  @cd web/shared/pairql && pnpm codegen
-  @printf "\nRunning 'lint-fix' and 'format' after codegen...\n"
-  @just web fix
+  #!/usr/bin/env bash
+  set -euo pipefail
+  (cd swift/api && swift run Run ts-codegen /tmp/codegen)
+  (cd web/shared/pairql && CODEGEN_INPUT_DIR=/tmp/codegen pnpm codegen)
+  printf "\nRunning 'lint-fix' and 'format' after codegen...\n"
+  just web fix
 
 codegen-macapp-appviews isolate="":
   @cd web/appviews && pnpm typecheck && node generate.mts {{isolate}}
