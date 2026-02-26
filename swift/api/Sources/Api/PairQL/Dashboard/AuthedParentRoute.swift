@@ -14,6 +14,7 @@ enum AuthedParentRoute: PairRoute {
   case getAccountOwner
   case getAdminKeychain(GetAdminKeychain.Input)
   case getAdminKeychains
+  case getAllDevices
   case getDevice(GetDevice.Input)
   case getDevices
   case getIdentifiedApps
@@ -26,7 +27,6 @@ enum AuthedParentRoute: PairRoute {
   case handleCheckoutCancel(HandleCheckoutCancel.Input)
   case handleCheckoutSuccess(HandleCheckoutSuccess.Input)
   case iosDevice(IOSApp.Device.Id)
-  case iosDevices
   case latestAppVersions
   case logEvent(LogEvent.Input)
   case userActivityFeed(UserActivityFeed.Input)
@@ -58,192 +58,198 @@ enum AuthedParentRoute: PairRoute {
 extension AuthedParentRoute {
   nonisolated(unsafe) static let router: AnyParserPrinter<URLRequestData, AuthedParentRoute> =
     OneOf {
-      Route(.case(Self.confirmPendingNotificationMethod)) {
-        Operation(ConfirmPendingNotificationMethod.self)
-        Body(.dashboardInput(ConfirmPendingNotificationMethod.self))
+      OneOf {
+        Route(.case(Self.confirmPendingNotificationMethod)) {
+          Operation(ConfirmPendingNotificationMethod.self)
+          Body(.dashboardInput(ConfirmPendingNotificationMethod.self))
+        }
+        Route(.case(Self.createPendingNotificationMethod)) {
+          Operation(CreatePendingNotificationMethod.self)
+          Body(.dashboardInput(CreatePendingNotificationMethod.self))
+        }
+        Route(.case(Self.childActivitySummaries)) {
+          Operation(ChildActivitySummaries.self)
+          Body(.dashboardInput(ChildActivitySummaries.self))
+        }
+        Route(.case(Self.dashboardWidgets)) {
+          Operation(DashboardWidgets.self)
+        }
+        Route(.case(Self.dashboardWidgets_v2)) {
+          Operation(DashboardWidgets_v2.self)
+        }
+        Route(.case(Self.decideFilterSuspensionRequest)) {
+          Operation(DecideFilterSuspensionRequest.self)
+          Body(.dashboardInput(DecideFilterSuspensionRequest.self))
+        }
+        Route(.case(Self.deleteActivityItems_v2)) {
+          Operation(DeleteActivityItems_v2.self)
+          Body(.dashboardInput(DeleteActivityItems_v2.self))
+        }
+        Route(.case(Self.deleteEntity_v2)) {
+          Operation(DeleteEntity_v2.self)
+          Body(.dashboardInput(DeleteEntity_v2.self))
+        }
+        Route(.case(Self.familyActivitySummaries)) {
+          Operation(FamilyActivitySummaries.self)
+          Body(.dashboardInput(FamilyActivitySummaries.self))
+        }
+        Route(.case(Self.flagActivityItems)) {
+          Operation(FlagActivityItems.self)
+          Body(.dashboardInput(FlagActivityItems.self))
+        }
+        Route(.case(Self.getAccountOwner)) {
+          Operation(GetAccountOwner.self)
+        }
+        Route(.case(Self.getAdminKeychain)) {
+          Operation(GetAdminKeychain.self)
+          Body(.dashboardInput(GetAdminKeychain.self))
+        }
+        Route(.case(Self.getAdminKeychains)) {
+          Operation(GetAdminKeychains.self)
+        }
+        Route(.case(Self.getAllDevices)) {
+          Operation(GetAllDevices.self)
+        }
+        Route(.case(Self.getDevice)) {
+          Operation(GetDevice.self)
+          Body(.dashboardInput(GetDevice.self))
+        }
       }
-      Route(.case(Self.createPendingNotificationMethod)) {
-        Operation(CreatePendingNotificationMethod.self)
-        Body(.dashboardInput(CreatePendingNotificationMethod.self))
+      OneOf {
+        Route(.case(Self.getDevices)) {
+          Operation(GetDevices.self)
+        }
+        Route(.case(Self.getIdentifiedApps)) {
+          Operation(GetIdentifiedApps.self)
+        }
+        Route(.case(Self.getSelectableKeychains)) {
+          Operation(GetSelectableKeychains.self)
+        }
+        Route(.case(Self.getSuspendFilterRequest)) {
+          Operation(GetSuspendFilterRequest.self)
+          Body(.dashboardInput(GetSuspendFilterRequest.self))
+        }
+        Route(.case(Self.getUnlockRequest)) {
+          Operation(GetUnlockRequest.self)
+          Body(.dashboardInput(GetUnlockRequest.self))
+        }
+        Route(.case(Self.getUnlockRequests)) {
+          Operation(GetUnlockRequests.self)
+        }
+        Route(.case(Self.getChild)) {
+          Operation(GetChild.self)
+          Body(.dashboardInput(GetChild.self))
+        }
+        Route(.case(Self.getChildren)) {
+          Operation(GetChildren.self)
+        }
+        Route(.case(Self.handleCheckoutCancel)) {
+          Operation(HandleCheckoutCancel.self)
+          Body(.dashboardInput(HandleCheckoutCancel.self))
+        }
+        Route(.case(Self.handleCheckoutSuccess)) {
+          Operation(HandleCheckoutSuccess.self)
+          Body(.dashboardInput(HandleCheckoutSuccess.self))
+        }
+        Route(.case(Self.iosDevice)) {
+          Operation(GetIOSDevice.self)
+          Body(.dashboardInput(GetIOSDevice.self))
+        }
+        Route(.case(Self.logEvent)) {
+          Operation(LogEvent.self)
+          Body(.dashboardInput(LogEvent.self))
+        }
+        Route(.case(Self.userActivityFeed)) {
+          Operation(UserActivityFeed.self)
+          Body(.dashboardInput(UserActivityFeed.self))
+        }
+        Route(.case(Self.combinedUsersActivityFeed)) {
+          Operation(CombinedUsersActivityFeed.self)
+          Body(.dashboardInput(CombinedUsersActivityFeed.self))
+        }
+        Route(.case(Self.getUserUnlockRequests)) {
+          Operation(GetUserUnlockRequests.self)
+          Body(.dashboardInput(GetUserUnlockRequests.self))
+        }
+        Route(.case(Self.latestAppVersions)) {
+          Operation(LatestAppVersions.self)
+        }
+        Route(.case(Self.saveDevice)) {
+          Operation(SaveDevice.self)
+          Body(.dashboardInput(SaveDevice.self))
+        }
       }
-      Route(.case(Self.childActivitySummaries)) {
-        Operation(ChildActivitySummaries.self)
-        Body(.dashboardInput(ChildActivitySummaries.self))
-      }
-      Route(.case(Self.dashboardWidgets)) {
-        Operation(DashboardWidgets.self)
-      }
-      Route(.case(Self.dashboardWidgets_v2)) {
-        Operation(DashboardWidgets_v2.self)
-      }
-      Route(.case(Self.decideFilterSuspensionRequest)) {
-        Operation(DecideFilterSuspensionRequest.self)
-        Body(.dashboardInput(DecideFilterSuspensionRequest.self))
-      }
-      Route(.case(Self.deleteActivityItems_v2)) {
-        Operation(DeleteActivityItems_v2.self)
-        Body(.dashboardInput(DeleteActivityItems_v2.self))
-      }
-      Route(.case(Self.deleteEntity_v2)) {
-        Operation(DeleteEntity_v2.self)
-        Body(.dashboardInput(DeleteEntity_v2.self))
-      }
-      Route(.case(Self.familyActivitySummaries)) {
-        Operation(FamilyActivitySummaries.self)
-        Body(.dashboardInput(FamilyActivitySummaries.self))
-      }
-      Route(.case(Self.flagActivityItems)) {
-        Operation(FlagActivityItems.self)
-        Body(.dashboardInput(FlagActivityItems.self))
-      }
-      Route(.case(Self.getAccountOwner)) {
-        Operation(GetAccountOwner.self)
-      }
-      Route(.case(Self.getAdminKeychain)) {
-        Operation(GetAdminKeychain.self)
-        Body(.dashboardInput(GetAdminKeychain.self))
-      }
-      Route(.case(Self.getAdminKeychains)) {
-        Operation(GetAdminKeychains.self)
-      }
-      Route(.case(Self.getDevice)) {
-        Operation(GetDevice.self)
-        Body(.dashboardInput(GetDevice.self))
-      }
-      Route(.case(Self.getDevices)) {
-        Operation(GetDevices.self)
-      }
-      Route(.case(Self.getIdentifiedApps)) {
-        Operation(GetIdentifiedApps.self)
-      }
-      Route(.case(Self.getSelectableKeychains)) {
-        Operation(GetSelectableKeychains.self)
-      }
-      Route(.case(Self.getSuspendFilterRequest)) {
-        Operation(GetSuspendFilterRequest.self)
-        Body(.dashboardInput(GetSuspendFilterRequest.self))
-      }
-      Route(.case(Self.getUnlockRequest)) {
-        Operation(GetUnlockRequest.self)
-        Body(.dashboardInput(GetUnlockRequest.self))
-      }
-      Route(.case(Self.getUnlockRequests)) {
-        Operation(GetUnlockRequests.self)
-      }
-      Route(.case(Self.getChild)) {
-        Operation(GetChild.self)
-        Body(.dashboardInput(GetChild.self))
-      }
-      Route(.case(Self.getChildren)) {
-        Operation(GetChildren.self)
-      }
-      Route(.case(Self.handleCheckoutCancel)) {
-        Operation(HandleCheckoutCancel.self)
-        Body(.dashboardInput(HandleCheckoutCancel.self))
-      }
-      Route(.case(Self.handleCheckoutSuccess)) {
-        Operation(HandleCheckoutSuccess.self)
-        Body(.dashboardInput(HandleCheckoutSuccess.self))
-      }
-      Route(.case(Self.iosDevices)) {
-        Operation(IOSDevices.self)
-      }
-      Route(.case(Self.iosDevice)) {
-        Operation(GetIOSDevice.self)
-        Body(.dashboardInput(GetIOSDevice.self))
-      }
-      Route(.case(Self.logEvent)) {
-        Operation(LogEvent.self)
-        Body(.dashboardInput(LogEvent.self))
-      }
-      Route(.case(Self.userActivityFeed)) {
-        Operation(UserActivityFeed.self)
-        Body(.dashboardInput(UserActivityFeed.self))
-      }
-      Route(.case(Self.combinedUsersActivityFeed)) {
-        Operation(CombinedUsersActivityFeed.self)
-        Body(.dashboardInput(CombinedUsersActivityFeed.self))
-      }
-      Route(.case(Self.getUserUnlockRequests)) {
-        Operation(GetUserUnlockRequests.self)
-        Body(.dashboardInput(GetUserUnlockRequests.self))
-      }
-      Route(.case(Self.latestAppVersions)) {
-        Operation(LatestAppVersions.self)
-      }
-      Route(.case(Self.saveDevice)) {
-        Operation(SaveDevice.self)
-        Body(.dashboardInput(SaveDevice.self))
-      }
-      Route(.case(Self.saveKey)) {
-        Operation(SaveKey.self)
-        Body(.dashboardInput(SaveKey.self))
-      }
-      Route(.case(Self.saveKeychain)) {
-        Operation(SaveKeychain.self)
-        Body(.dashboardInput(SaveKeychain.self))
-      }
-      Route(.case(Self.saveNotification)) {
-        Operation(SaveNotification.self)
-        Body(.dashboardInput(SaveNotification.self))
-      }
-      Route(.case(Self.saveUser)) {
-        Operation(SaveUser.self)
-        Body(.dashboardInput(SaveUser.self))
-      }
-      Route(.case(Self.stripeUrl)) {
-        Operation(StripeUrl.self)
-        Optionally { Body(.json(Subscription.Tier.self)) }
-      }
-      Route(.case(Self.stripeUrl_v2)) {
-        Operation(StripeUrl_v2.self)
-        Body(.dashboardInput(StripeUrl_v2.self))
-      }
-      Route(.case(Self.securityEventsFeed)) {
-        Operation(SecurityEventsFeed.self)
-      }
-      Route(.case(Self.startFullTrial)) {
-        Operation(StartFullTrial.self)
-      }
-      Route(.case(Self.toggleChildKeychain)) {
-        Operation(ToggleChildKeychain.self)
-        Body(.dashboardInput(ToggleChildKeychain.self))
-      }
-      Route(.case(Self.updateUnlockRequest)) {
-        Operation(UpdateUnlockRequest.self)
-        Body(.dashboardInput(UpdateUnlockRequest.self))
-      }
-      Route(.case(Self.requestPublicKeychain)) {
-        Operation(RequestPublicKeychain.self)
-        Body(.dashboardInput(RequestPublicKeychain.self))
-      }
-      Route(.case(Self.upsertBlockRule)) {
-        Operation(UpsertBlockRule.self)
-        Body(.dashboardInput(UpsertBlockRule.self))
-      }
-      Route(.case(Self.updateIOSDevice)) {
-        Operation(UpdateIOSDevice.self)
-        Body(.dashboardInput(UpdateIOSDevice.self))
-      }
-      Route(.case(Self.claimIOSDevice)) {
-        Operation(ClaimIOSDevice.self)
-        Body(.dashboardInput(ClaimIOSDevice.self))
-      }
-      Route(.case(Self.getIOSDeviceClaimData)) {
-        Operation(GetIOSDeviceClaimData.self)
-        Body(.dashboardInput(GetIOSDeviceClaimData.self))
-      }
-      Route(.case(Self.getIOSDeviceSupervisionStatus)) {
-        Operation(GetIOSDeviceSupervisionStatus.self)
-        Body(.dashboardInput(GetIOSDeviceSupervisionStatus.self))
-      }
-      Route(.case(Self.iosAppConnectionCode)) {
-        Operation(IOSAppConnectionCode.self)
-        Body(.dashboardInput(IOSAppConnectionCode.self))
-      }
-      Route(.case(Self.macAppConnectionCode)) {
-        Operation(MacAppConnectionCode.self)
-        Body(.dashboardInput(MacAppConnectionCode.self))
+      OneOf {
+        Route(.case(Self.saveKey)) {
+          Operation(SaveKey.self)
+          Body(.dashboardInput(SaveKey.self))
+        }
+        Route(.case(Self.saveKeychain)) {
+          Operation(SaveKeychain.self)
+          Body(.dashboardInput(SaveKeychain.self))
+        }
+        Route(.case(Self.saveNotification)) {
+          Operation(SaveNotification.self)
+          Body(.dashboardInput(SaveNotification.self))
+        }
+        Route(.case(Self.saveUser)) {
+          Operation(SaveUser.self)
+          Body(.dashboardInput(SaveUser.self))
+        }
+        Route(.case(Self.stripeUrl)) {
+          Operation(StripeUrl.self)
+          Optionally { Body(.json(Subscription.Tier.self)) }
+        }
+        Route(.case(Self.stripeUrl_v2)) {
+          Operation(StripeUrl_v2.self)
+          Body(.dashboardInput(StripeUrl_v2.self))
+        }
+        Route(.case(Self.securityEventsFeed)) {
+          Operation(SecurityEventsFeed.self)
+        }
+        Route(.case(Self.startFullTrial)) {
+          Operation(StartFullTrial.self)
+        }
+        Route(.case(Self.toggleChildKeychain)) {
+          Operation(ToggleChildKeychain.self)
+          Body(.dashboardInput(ToggleChildKeychain.self))
+        }
+        Route(.case(Self.updateUnlockRequest)) {
+          Operation(UpdateUnlockRequest.self)
+          Body(.dashboardInput(UpdateUnlockRequest.self))
+        }
+        Route(.case(Self.requestPublicKeychain)) {
+          Operation(RequestPublicKeychain.self)
+          Body(.dashboardInput(RequestPublicKeychain.self))
+        }
+        Route(.case(Self.upsertBlockRule)) {
+          Operation(UpsertBlockRule.self)
+          Body(.dashboardInput(UpsertBlockRule.self))
+        }
+        Route(.case(Self.updateIOSDevice)) {
+          Operation(UpdateIOSDevice.self)
+          Body(.dashboardInput(UpdateIOSDevice.self))
+        }
+        Route(.case(Self.claimIOSDevice)) {
+          Operation(ClaimIOSDevice.self)
+          Body(.dashboardInput(ClaimIOSDevice.self))
+        }
+        Route(.case(Self.getIOSDeviceClaimData)) {
+          Operation(GetIOSDeviceClaimData.self)
+          Body(.dashboardInput(GetIOSDeviceClaimData.self))
+        }
+        Route(.case(Self.getIOSDeviceSupervisionStatus)) {
+          Operation(GetIOSDeviceSupervisionStatus.self)
+          Body(.dashboardInput(GetIOSDeviceSupervisionStatus.self))
+        }
+        Route(.case(Self.iosAppConnectionCode)) {
+          Operation(IOSAppConnectionCode.self)
+          Body(.dashboardInput(IOSAppConnectionCode.self))
+        }
+        Route(.case(Self.macAppConnectionCode)) {
+          Operation(MacAppConnectionCode.self)
+          Body(.dashboardInput(MacAppConnectionCode.self))
+        }
       }
     }
     .eraseToAnyParserPrinter()
@@ -300,6 +306,9 @@ extension AuthedParentRoute: RouteResponder {
     case .getIdentifiedApps:
       let output = try await GetIdentifiedApps.resolve(in: context)
       return try await self.respond(with: output)
+    case .getAllDevices:
+      let output = try await GetAllDevices.resolve(in: context)
+      return try await self.respond(with: output)
     case .getDevice(let input):
       let output = try await GetDevice.resolve(with: input, in: context)
       return try await self.respond(with: output)
@@ -323,9 +332,6 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .iosDevice(let input):
       let output = try await GetIOSDevice.resolve(with: input, in: context)
-      return try await self.respond(with: output)
-    case .iosDevices:
-      let output = try await IOSDevices.resolve(in: context)
       return try await self.respond(with: output)
     case .latestAppVersions:
       let output = try await LatestAppVersions.resolve(in: context)

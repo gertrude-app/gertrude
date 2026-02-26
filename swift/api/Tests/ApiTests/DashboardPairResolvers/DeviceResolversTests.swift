@@ -5,7 +5,8 @@ import XExpect
 @testable import Api
 
 final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
-  func testGetDevices() async throws {
+  func testGetAllDevices() async throws {
+    try await self.db.delete(all: ComputerUser.self)
     try await self.db.delete(all: Computer.self)
     let child = try await self.child().withDevice { $0.appVersion = "2.2.2" }
     var device = child.computer
@@ -31,33 +32,111 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
     try await withDependencies {
       $0.websockets.status = { _ in .filterOn }
     } operation: {
-      var singleOutput = try await GetDevice.resolve(
-        with: device.id.rawValue,
-        in: context(child.parent),
-      )
+      let output = try await GetAllDevices.resolve(in: context(child.parent))
 
-      var expectedDeviceOutput = GetDevice.Output(
-        id: device.id,
-        name: "Pinky",
-        releaseChannel: .canary,
-        users: [
-          .init(id: child.id, name: child.name, status: .filterOn),
-          .init(id: child2.id, name: child2.name, status: .filterOn),
-        ],
-        appVersion: "2.2.2",
-        serialNumber: "1234567890",
-        modelIdentifier: "MacBookPro16,1",
-        modelFamily: .macBookPro,
-        modelTitle: "16\" MacBook Pro (2019)",
-      )
+      expect(output.computers.count).toEqual(1)
+      let mac = output.computers[0]
+      expect(mac.id).toEqual(device.id)
+      expect(mac.name).toEqual("Pinky")
+      expect(mac.modelIdentifier).toEqual("MacBookPro16,1")
+      expect(mac.modelTitle).toEqual("16\" MacBook Pro (2019)")
+      expect(mac.users.count).toEqual(2)
+      let userNames = mac.users.map(\.name)
+      expect(userNames.contains("Bob")).toBeTrue()
+      expect(userNames.contains(child.name)).toBeTrue()
+      expect(output.iosDevices).toEqual([])
+    }
+  }
 
-      sortUsers(in: &singleOutput, atPath: \.users)
-      sortUsers(in: &expectedDeviceOutput, atPath: \.users)
-      expect(singleOutput).toEqual(expectedDeviceOutput)
+  func testGetAllDevicesIncludesIOSDevices() async throws {
+    try await self.db.delete(all: Computer.self)
+    let child = try await self.child()
+    let iosDevice = try await self.db.create(IOSApp.Device.mock {
+      $0.childId = child.id
+      $0.modelIdentifier = "iPhone15,2"
+      $0.iosVersion = "18.4.0"
+    })
+    _ = try await self.db.create(IOSApp.Token(deviceId: iosDevice.id))
 
-      var allDevicesOutput = try await GetDevices.resolve(in: context(child.parent))
-      sortUsers(in: &allDevicesOutput, atPath: \.[0].users)
-      expect(allDevicesOutput).toEqual([expectedDeviceOutput])
+    try await withDependencies {
+      $0.websockets.status = { _ in .offline }
+    } operation: {
+      let output = try await GetAllDevices.resolve(in: context(child.parent))
+
+      expect(output.computers).toEqual([])
+      expect(output.iosDevices.count).toEqual(1)
+      let ios = output.iosDevices[0]
+      expect(ios.id).toEqual(iosDevice.id)
+      expect(ios.childId).toEqual(child.id)
+      expect(ios.childName).toEqual(child.name)
+      expect(ios.modelName).toEqual("iPhone 14 Pro")
+      expect(ios.deviceType).toEqual("iPhone")
+      expect(ios.iosVersion).toEqual("18.4.0")
+      expect(ios.pendingSetup).toEqual(false)
+    }
+  }
+
+  func testGetAllDevicesIOSPendingSetup() async throws {
+    try await self.db.delete(all: Computer.self)
+    let child = try await self.child()
+    _ = try await self.db.create(IOSApp.Device.mock {
+      $0.childId = child.id
+    })
+
+    try await withDependencies {
+      $0.websockets.status = { _ in .offline }
+    } operation: {
+      let output = try await GetAllDevices.resolve(in: context(child.parent))
+      expect(output.iosDevices.count).toEqual(1)
+      expect(output.iosDevices[0].pendingSetup).toEqual(true)
+    }
+  }
+
+  func testGetAllDevicesSupervisionClaimedButNotComplete() async throws {
+    try await self.db.delete(all: Computer.self)
+    let child = try await self.child()
+    let iosDevice = try await self.db.create(IOSApp.Device.mock {
+      $0.childId = child.id
+    })
+    _ = try await self.db.create(IOSApp.Token(deviceId: iosDevice.id))
+    _ = try await self.db.create(IOSApp.Supervision(
+      deviceId: iosDevice.id,
+      claimCode: 111_111,
+      claimCodeExpiresAt: .reference + .days(7),
+      claimedAt: Date(),
+    ))
+
+    try await withDependencies {
+      $0.websockets.status = { _ in .offline }
+    } operation: {
+      let output = try await GetAllDevices.resolve(in: context(child.parent))
+      expect(output.iosDevices.count).toEqual(1)
+      expect(output.iosDevices[0].pendingSetup).toEqual(true)
+    }
+  }
+
+  func testGetAllDevicesMixedMacAndIOS() async throws {
+    try await self.db.delete(all: ComputerUser.self)
+    try await self.db.delete(all: Computer.self)
+    let child = try await self.child().withDevice { $0.appVersion = "2.2.2" }
+    let iosDevice = try await self.db.create(IOSApp.Device.mock {
+      $0.childId = child.id
+      $0.modelIdentifier = "iPad14,1"
+      $0.iosVersion = "18.3.0"
+    })
+    _ = try await self.db.create(IOSApp.Token(deviceId: iosDevice.id))
+
+    try await withDependencies {
+      $0.websockets.status = { _ in .filterOn }
+    } operation: {
+      let output = try await GetAllDevices.resolve(in: context(child.parent))
+      expect(output.computers.count).toEqual(1)
+      expect(output.computers[0].id).toEqual(child.computer.id)
+      expect(output.iosDevices.count).toEqual(1)
+      expect(output.iosDevices[0].id).toEqual(iosDevice.id)
+      expect(output.iosDevices[0].childName).toEqual(child.name)
+      expect(output.iosDevices[0].deviceType).toEqual("iPad")
+      expect(output.iosDevices[0].pendingSetup).toEqual(false)
     }
   }
 
@@ -91,13 +170,4 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
     let retrievedAgain = try await self.db.find(device.id)
     expect(retrievedAgain.customName).toBeNil()
   }
-}
-
-// helpers
-
-func sortUsers<Root>(
-  in root: inout Root,
-  atPath keyPath: WritableKeyPath<Root, [GetDevice.Output.User]>,
-) {
-  root[keyPath: keyPath].sort(by: { $0.name < $1.name })
 }

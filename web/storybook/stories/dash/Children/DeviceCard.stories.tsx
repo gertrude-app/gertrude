@@ -10,7 +10,7 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 export const Online: Story = props({
-  to: `/computers/d1`,
+  to: `/devices/d1`,
   imageSrc: `/macs/Mac14,10.png`,
   imageAlt: `15" Macbook Pro (2023)`,
   title: `Silvery`,

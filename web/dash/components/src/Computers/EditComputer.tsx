@@ -123,7 +123,7 @@ const EditComputer: React.FC<Props> = ({
       </div>
     </div>
     <div className="flex justify-end gap-4 mt-6 xs:mt-8">
-      <Button size="large" type="link" to={`/computers`} color="tertiary">
+      <Button size="large" type="link" to={`/devices`} color="tertiary">
         Cancel
       </Button>
       <Button

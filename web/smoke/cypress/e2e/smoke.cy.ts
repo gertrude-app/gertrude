@@ -76,6 +76,7 @@ describe(`Smoke test`, () => {
     cy.contains(`Save child`).click();
 
     // get the connection code
+    cy.contains(`Mac computer`).click();
     cy.contains(`Get connection code`).click();
     cy.contains(`Start 21-day free trial`).click();
     cy.get(`[data-test=connection-code]`).invoke(`text`).as(`connectionCode`);

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import AuthedChrome from './components/Authed';
 import AdminSettings from './components/routes/AdminSettings';
 import ChangePassword from './components/routes/ChangePassword';
@@ -16,7 +16,6 @@ import Dashboard from './components/routes/Dashboard';
 import FamilyActivityFeedRoute from './components/routes/FamilyActivityFeed';
 import FamilyActivitySummaries from './components/routes/FamilyActivitySummaries';
 import IOSDevice from './components/routes/IOSDevice';
-import IOSDevices from './components/routes/IOSDevices';
 import Keychain from './components/routes/Keychain';
 import Keychains from './components/routes/Keychains';
 import Login from './components/routes/Login';
@@ -90,20 +89,17 @@ const App: React.FC = () => {
         <Route path="unlock-requests" element={<UsersUnlockRequests />} />
         <Route path="security-events" element={<SecurityEventsFeed />} />
 
-        <Route path="ios-devices">
-          <Route index element={<IOSDevices />} />
-          <Route path=":deviceId" element={<IOSDevice />} />
-        </Route>
-
         <Route path="keychains">
           <Route index element={<Keychains />} />
           <Route path=":keychainId" element={<Keychain />} />
         </Route>
 
-        <Route path="computers">
+        <Route path="devices">
           <Route index element={<Computers />} />
           <Route path=":computerId" element={<Computer />} />
         </Route>
+        <Route path="computers/*" element={<Navigate to="/devices" replace />} />
+        <Route path="ios-devices/*" element={<Navigate to="/devices" replace />} />
 
         <Route path="children">
           <Route index element={<Users />} />

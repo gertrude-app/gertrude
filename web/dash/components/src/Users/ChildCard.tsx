@@ -38,7 +38,7 @@ const ChildCard: React.FC<Props> = ({ id, name, computers, iosDevices, addDevice
             {computers.map((computer) => (
               <DeviceCard
                 key={computer.id}
-                to={`/computers/${computer.computerId}`}
+                to={`/devices/${computer.computerId}`}
                 imageSrc={`/macs/${computer.modelIdentifier}.png`}
                 imageAlt={computer.modelTitle}
                 title={computer.customName || computer.modelTitle}
@@ -51,7 +51,7 @@ const ChildCard: React.FC<Props> = ({ id, name, computers, iosDevices, addDevice
                 key={device.id}
                 to={
                   device.pendingClaimCode === undefined
-                    ? `/ios-devices/${device.id}`
+                    ? `/children/${id}/ios-devices/${device.id}`
                     : `/supervise-device/${device.pendingClaimCode}/download-helper`
                 }
                 imageSrc={`/ios/${device.deviceType}.png`}

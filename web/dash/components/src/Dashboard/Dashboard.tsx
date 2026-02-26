@@ -284,12 +284,14 @@ const ConnectFirstDeviceScreen: React.FC<ConnectFirstDeviceScreenProps> = ({
   );
 };
 
-const IosGetStartedInstructions: React.FC<{ childName?: string }> = ({ childName }) => (
+export const IosGetStartedInstructions: React.FC<{ childName?: string }> = ({
+  childName,
+}) => (
   <>
     <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
       Protect {childName ? `${posessive(childName)} iPhone or iPad` : `an iPhone or iPad`}
     </h1>
-    <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
+    <p className="text-base xs:text-lg sm:text-xl text-slate-600 mt-4 max-w-xl mx-auto">
       {childName ? `Search` : `To get started, search`} for <b>Gertrude Blocker</b> in the
       App Store on{` `}
       {childName ? `${posessive(childName)} device` : `your child's iPhone or iPad`}. The
@@ -307,13 +309,17 @@ const IosGetStartedInstructions: React.FC<{ childName?: string }> = ({ childName
   </>
 );
 
-interface PlatformOptionProps {
+export interface PlatformOptionProps {
   icon: string;
   title: string;
   onClick(): void;
 }
 
-const PlatformOption: React.FC<PlatformOptionProps> = ({ icon, title, onClick }) => (
+export const PlatformOption: React.FC<PlatformOptionProps> = ({
+  icon,
+  title,
+  onClick,
+}) => (
   <button
     onClick={onClick}
     className="flex-1 flex flex-col items-center gap-4 p-6 sm:p-8 rounded-2xl border border-slate-200 hover:border-violet-200 hover:bg-violet-50/50 transition-all duration-200 group"

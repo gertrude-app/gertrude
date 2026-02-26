@@ -1,10 +1,10 @@
-import { ApiErrorMessage, ListComputers, Loading } from '@dash/components';
+import { ApiErrorMessage, ListDevices, Loading } from '@dash/components';
 import React from 'react';
 import Current from '../../environment';
 import { Key, useQuery } from '../../hooks';
 
 const Computers: React.FC = () => {
-  const query = useQuery(Key.computers, Current.api.getDevices);
+  const query = useQuery(Key.allDevices, Current.api.getAllDevices);
 
   if (query.isPending) {
     return <Loading />;
@@ -14,7 +14,9 @@ const Computers: React.FC = () => {
     return <ApiErrorMessage error={query.error} />;
   }
 
-  return <ListComputers devices={query.data} />;
+  return (
+    <ListDevices computers={query.data.computers} iosDevices={query.data.iosDevices} />
+  );
 };
 
 export default Computers;

@@ -16,7 +16,7 @@ describe(`computers`, () => {
   };
 
   it(`editing computer`, () => {
-    cy.interceptPql(`GetDevices`, [silvery]);
+    cy.interceptPql(`GetAllDevices`, { computers: [silvery], iosDevices: [] });
     cy.interceptPql(`GetDevice`, silvery);
     cy.interceptPql(`SaveDevice`, { success: true });
     cy.interceptPql(`LatestAppVersions`, {
@@ -26,7 +26,7 @@ describe(`computers`, () => {
     });
 
     cy.simulateLoggedIn();
-    cy.visit(`/computers`);
+    cy.visit(`/devices`);
     cy.contains(`Silvery`);
     cy.contains(`Edit`).click();
     cy.contains(`Up to date`); // <- should be up to date initially

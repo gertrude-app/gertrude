@@ -57,10 +57,10 @@ export function interceptPql(
   slug: `GetAdminKeychains`,
   output: T.GetAdminKeychains.Output,
 ): void;
+export function interceptPql(slug: `GetAllDevices`, output: T.GetAllDevices.Output): void;
 export function interceptPql(slug: `GetChild`, output: T.GetChild.Output): void;
 export function interceptPql(slug: `GetChildren`, output: T.GetChildren.Output): void;
 export function interceptPql(slug: `GetDevice`, output: T.GetDevice.Output): void;
-export function interceptPql(slug: `GetDevices`, output: T.GetDevices.Output): void;
 export function interceptPql(slug: `GetIOSDevice`, output: T.GetIOSDevice.Output): void;
 export function interceptPql(
   slug: `GetIOSDeviceClaimData`,
@@ -106,7 +106,6 @@ export function interceptPql(
   slug: `IOSAppConnectionCode`,
   output: T.IOSAppConnectionCode.Output,
 ): void;
-export function interceptPql(slug: `IOSDevices`, output: T.IOSDevices.Output): void;
 export function interceptPql(
   slug: `LatestAppVersions`,
   output: T.LatestAppVersions.Output,
@@ -203,10 +202,10 @@ export function forcePqlErr(
     | `GetAccountOwner`
     | `GetAdminKeychain`
     | `GetAdminKeychains`
+    | `GetAllDevices`
     | `GetChild`
     | `GetChildren`
     | `GetDevice`
-    | `GetDevices`
     | `GetIOSDevice`
     | `GetIOSDeviceClaimData`
     | `GetIOSDeviceSupervisionStatus`
@@ -219,7 +218,6 @@ export function forcePqlErr(
     | `HandleCheckoutCancel`
     | `HandleCheckoutSuccess`
     | `IOSAppConnectionCode`
-    | `IOSDevices`
     | `LatestAppVersions`
     | `LogEvent`
     | `Login`
