@@ -214,6 +214,15 @@ jobs:
           restore-keys: api-test-v3-
       - name: test-api
         run: cd swift/api && swift test
+      - name: verify-swift-codegen
+        if: github.event_name == 'pull_request'
+        run: |
+          (cd swift/api && CODEGEN_SWIFT=1 swift test --filter Codegen)
+          swiftformat swift/
+          if ! git diff --exit-code; then
+            echo "::error::Swift codegen files are out of date. Run 'just codegen-swift' and commit the changes."
+            exit 1
+          fi
 
   macapp-lib:
     needs: files-changed
@@ -327,14 +336,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: build
-        run: |
-          git clone --depth 1 --branch 0.58.5 https://github.com/nicklockwood/SwiftFormat
-          cd SwiftFormat && swift build -c debug
-          cp ./.build/debug/swiftformat /usr/local/bin
-          cd ../ && rm -rf SwiftFormat/
       - name: swiftlint
-        run: cd swift && /usr/local/bin/swiftformat . --lint
+        run: cd swift && swiftformat . --lint
 
 
   xml-lint:
