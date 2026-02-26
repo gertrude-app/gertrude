@@ -122,6 +122,7 @@ jobs:
       - name: build-api
         run: |
           cd swift/api
+          swift build -c $CONFIGURATION -Xswiftc -static-stdlib
           BIN_PATH=$(swift build -c $CONFIGURATION -Xswiftc -static-stdlib --show-bin-path)
           echo "API_BIN_PATH=${BIN_PATH}" >> $GITHUB_ENV
           cp "${BIN_PATH}/Run" ../../${FILENAME}
