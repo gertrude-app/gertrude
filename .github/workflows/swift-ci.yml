@@ -130,13 +130,11 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           ${API_BIN_PATH}/Run ts-codegen /tmp/codegen
-          cd web/shared/pairql
-          pnpm install --frozen-lockfile
-          CODEGEN_INPUT_DIR=/tmp/codegen pnpm codegen
-          cd ../../..
-          npx prettier@3.5.3 --config .prettierrc.json --write \
-            web/shared/pairql/src/ web/dash/app/cypress/support/intercept.ts
-          if ! git diff --exit-code web/shared/pairql/ web/dash/app/cypress/support/intercept.ts; then
+          (cd web/shared/pairql && pnpm install --frozen-lockfile && CODEGEN_INPUT_DIR=/tmp/codegen pnpm codegen)
+          npx prettier@3.5.3 --config .prettierrc.json --write web/
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git checkout -- swift/api/Package.resolved
+          if ! git diff --exit-code -- web/; then
             echo "::error::PairQL TypeScript clients are out of date. Run 'just codegen-pairql-ts-clients' and commit the changes."
             exit 1
           fi
@@ -219,7 +217,9 @@ jobs:
         run: |
           (cd swift/api && CODEGEN_SWIFT=1 swift test --filter Codegen)
           swiftformat swift/
-          if ! git diff --exit-code; then
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git checkout -- swift/api/Package.resolved
+          if ! git diff --exit-code -- swift/; then
             echo "::error::Swift codegen files are out of date. Run 'just codegen-swift' and commit the changes."
             exit 1
           fi
