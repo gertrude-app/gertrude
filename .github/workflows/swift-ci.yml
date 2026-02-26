@@ -122,9 +122,23 @@ jobs:
       - name: build-api
         run: |
           cd swift/api
-          swift build -c $CONFIGURATION -Xswiftc -static-stdlib
           BIN_PATH=$(swift build -c $CONFIGURATION -Xswiftc -static-stdlib --show-bin-path)
+          echo "API_BIN_PATH=${BIN_PATH}" >> $GITHUB_ENV
           cp "${BIN_PATH}/Run" ../../${FILENAME}
+      - name: verify-pairql-codegen
+        if: github.event_name == 'pull_request'
+        run: |
+          ${API_BIN_PATH}/Run ts-codegen /tmp/codegen
+          cd web/shared/pairql
+          pnpm install --frozen-lockfile
+          CODEGEN_INPUT_DIR=/tmp/codegen pnpm codegen
+          cd ../../..
+          npx prettier@3.5.3 --config .prettierrc.json --write \
+            web/shared/pairql/src/ web/dash/app/cypress/support/intercept.ts
+          if ! git diff --exit-code web/shared/pairql/ web/dash/app/cypress/support/intercept.ts; then
+            echo "::error::PairQL TypeScript clients are out of date. Run 'just codegen-pairql-ts-clients' and commit the changes."
+            exit 1
+          fi
       - name: scp-bin
         uses: appleboy/scp-action@v0.1.7
         with:

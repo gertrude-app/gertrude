@@ -37,6 +37,11 @@ ENV PATH="${SWIFTLY_HOME_DIR}/bin:${PATH}"
 # NB: change swift version here as needed for prod build deploy
 RUN . "${SWIFTLY_HOME_DIR}/env.sh" && swiftly install 6.2.1
 
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g pnpm && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /workspace
 
 CMD ["bash"]

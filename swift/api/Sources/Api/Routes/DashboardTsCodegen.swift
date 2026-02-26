@@ -114,8 +114,7 @@ enum DashboardTsCodegenRoute {
     ]
   }
 
-  @Sendable static func handler(_ request: Request) async throws -> Response {
-    request.logger.notice("TS codegen: \("Dashboard".green)")
+  static func generate() throws -> Response {
     var shared: [String: String] = [:]
     var sharedAliases: [Config.Alias] = [
       .init(NoInput.self, as: "void"),
@@ -137,6 +136,11 @@ enum DashboardTsCodegenRoute {
     }
 
     return Response(shared: shared, pairs: pairs)
+  }
+
+  @Sendable static func handler(_ request: Request) async throws -> Response {
+    request.logger.notice("TS codegen: \("Dashboard".green)")
+    return try self.generate()
   }
 
   private static func ts<P: Pair>(
