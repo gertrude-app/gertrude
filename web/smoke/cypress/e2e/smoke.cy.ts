@@ -71,6 +71,7 @@ describe(`Smoke test`, () => {
     cy.location(`pathname`).should(`eq`, `/`);
 
     // create a child
+    cy.contains(`Mac computer`).click();
     cy.contains(`Add a child`).click();
     cy.get(`[data-test=user-name]`).type(`Franny`);
     cy.contains(`Save child`).click();
@@ -110,7 +111,7 @@ describe(`Smoke test`, () => {
     // edit the user
     cy.get(`[data-test="edit-user"]`).click();
     cy.get(`[data-test=user-name]`).clear().type(`Franny (edited)`);
-    cy.contains(`Save child`).click();
+    cy.contains(`Save`).click();
     cy.contains(`Child saved`);
 
     // verify visiting /login and /signup redirects to / if they're logged in
