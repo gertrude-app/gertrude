@@ -3,6 +3,7 @@ import DuetSQL
 import Vapor
 import XAws
 
+
 struct VerificationCodeGenerator: Sendable {
   var generate: @Sendable () -> Int
 }

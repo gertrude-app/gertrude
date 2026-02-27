@@ -6,7 +6,7 @@ export namespace GetAccountOwner {
 
   export interface Output {
     id: UUID;
-    email: string;
+    email: string; // agent was here
     plan: Plan;
     notifications: AdminNotification[];
     verifiedNotificationMethods: VerifiedNotificationMethod[];
