@@ -124,6 +124,10 @@ searches, and more
 - `LibClients` - API clients
 - `LibApp` - Main app UI (TCA-based)
 
+- when working on refining, or adding new iOS block rules, read
+  `./docs/ios-block-rule-analysis.md` for a workflow for analyzing filter logs without the
+  Console.app
+
 ### 3. API Server (`api/`)
 
 **Deployment:** api.gertrude.app
