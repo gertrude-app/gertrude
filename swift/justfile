@@ -63,10 +63,10 @@ nuke-test-db:
   @killall -q Postico; db=$(grep '^TEST_DATABASE_NAME=' api/.env | cut -d= -f2); dropdb --if-exists "$db"; createdb "$db"
 
 hurl-dev *args:
-  @hurl --variables-file api/hurl/dev.env {{args}}
+  @hurl --variable API_URL="http://127.0.0.1:{{api_port}}" {{args}}
 
 hurl-prod *args:
-  @hurl --variables-file api/hurl/prod.env {{args}}
+  @hurl --variable API_URL="https://api.gertrude.app" api/hurl/prod.env {{args}}
 
 # emails (requires local dev api running)
 

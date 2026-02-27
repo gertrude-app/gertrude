@@ -50,6 +50,7 @@ enum DashboardTsCodegenRoute {
       ("BlockRule", GertieIOS.BlockRule.self),
       ("SecurityEventSeverity", SecurityEventsFeed.Severity.self),
       ("Plan", Plan.self),
+      ("IOSDeviceChildAssignment", ClaimIOSDevice.ChildAssignment.self),
     ]
   }
 
@@ -109,6 +110,7 @@ enum DashboardTsCodegenRoute {
       ClaimIOSDevice.self,
       GetIOSDeviceSupervisionStatus.self,
       MacAppConnectionCode.self,
+      PrepIOSAppConnection.self,
       IOSAppConnectionCode.self,
       GetAllDevices.self,
     ]

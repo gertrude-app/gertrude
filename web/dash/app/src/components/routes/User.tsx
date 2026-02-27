@@ -2,7 +2,7 @@ import { ApiErrorMessage, EditChild, Loading } from '@dash/components';
 import React, { useEffect, useMemo, useReducer } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
-import type { Child } from '@dash/types';
+import type { Child, PrepIOSAppConnection } from '@dash/types';
 import Current from '../../environment';
 import { Key, useConfirmableDelete, useMutation, useQuery } from '../../hooks';
 import ReqState from '../../lib/ReqState';
@@ -29,6 +29,9 @@ const UserRoute: React.FC = () => {
   );
   const addIOSDevice = useMutation((childId: UUID) =>
     Current.api.iOSAppConnectionCode({ childId }),
+  );
+  const prepIOSConnection = useMutation((input: PrepIOSAppConnection.Input) =>
+    Current.api.prepIOSAppConnection(input),
   );
   const startTrial = useMutation(() => Current.api.startFullTrial());
 
@@ -96,6 +99,9 @@ const UserRoute: React.FC = () => {
       dismissAddIOSDevice={() => addIOSDevice.reset()}
       addIOSDeviceRequest={ReqState.fromMutation(addIOSDevice)}
       onStartTrial={() => startTrial.mutate(undefined)}
+      prepIOSConnection={prepIOSConnection.mutate}
+      iosSetupRequest={ReqState.fromMutation(prepIOSConnection)}
+      resetIOSSetup={prepIOSConnection.reset}
       deleteDevice={deleteComputerUser}
       saveButtonDisabled={
         !isDirty(state.child) || draft.name.trim() === `` || saveChild.isPending

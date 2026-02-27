@@ -5,6 +5,9 @@ const noopClient: ApiClient = {
   confirmPendingNotificationMethod: async () => {
     return Result.success({ success: true });
   },
+  prepIOSAppConnection: async () => {
+    return Result.success({ code: 0 });
+  },
   iOSAppConnectionCode: async () => {
     return Result.success({ code: 0 });
   },

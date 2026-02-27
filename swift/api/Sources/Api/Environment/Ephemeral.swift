@@ -150,6 +150,14 @@ actor Ephemeral {
     return code
   }
 
+  func getOrCreatePendingAppConnection(_ childId: Child.Id) -> Int {
+    if let existing = self.storage.pendingAppConnections
+      .first(where: { $0.value.childId == childId && $0.value.expiration > self.now }) {
+      return existing.key
+    }
+    return self.createPendingAppConnection(childId)
+  }
+
   func getPendingAppConnection(_ code: Int) -> Child.Id? {
     defer { Task { await self.persistStorage() } }
     #if DEBUG

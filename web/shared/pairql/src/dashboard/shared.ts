@@ -108,6 +108,10 @@ export type DeviceModelFamily =
   | 'pro'
   | 'unknown';
 
+export type IOSDeviceChildAssignment =
+  | { case: 'newChild'; name: string }
+  | { case: 'existingChild'; id: UUID };
+
 export interface Key {
   id: UUID;
   keychainId: UUID;
