@@ -1,9 +1,11 @@
+import { Button, Loading as LoadingAnimation, TextInput } from '@shared/components';
 import { posessive } from '@shared/string';
 import cx from 'classnames';
 import React, { useState } from 'react';
 import type {
   DashboardWidgets_v2,
   MacAppConnectionCode,
+  PrepIOSAppConnection,
   RequestState,
 } from '@dash/types';
 import { UndoMainPadding } from '../Chrome/Chrome';
@@ -27,6 +29,9 @@ type Props = {
   dismissAnnouncement(id: UUID): unknown;
   onStartTrial(): unknown;
   addDeviceRequest: RequestState<MacAppConnectionCode.Output>;
+  prepIOSConnection?(input: PrepIOSAppConnection.Input): unknown;
+  iosSetupRequest?: RequestState<PrepIOSAppConnection.Output>;
+  resetIOSSetup?(): unknown;
   childData: DashboardWidgets_v2.Output[`children`];
   pendingIosDevices?: DashboardWidgets_v2.Output[`pendingIOSDevices`];
 } & Omit<DashboardWidgets_v2.Output, `children` | `pendingIOSDevices`>;
@@ -42,6 +47,9 @@ const Dashboard: React.FC<Props> = ({
   dismissAnnouncement,
   onStartTrial,
   addDeviceRequest,
+  prepIOSConnection,
+  iosSetupRequest,
+  resetIOSSetup,
   numParentNotifications,
   announcement,
   pendingIosDevices = [],
@@ -58,6 +66,9 @@ const Dashboard: React.FC<Props> = ({
         dismissAddDevice={dismissAddDevice}
         onStartTrial={onStartTrial}
         addDeviceRequest={addDeviceRequest}
+        prepIOSConnection={prepIOSConnection}
+        iosSetupRequest={iosSetupRequest}
+        resetIOSSetup={resetIOSSetup}
       />
     );
   }
@@ -122,15 +133,39 @@ const Dashboard: React.FC<Props> = ({
     );
   }
 
-  return <WelcomeScreen />;
+  return (
+    <WelcomeScreen
+      prepIOSConnection={prepIOSConnection}
+      iosSetupRequest={iosSetupRequest}
+      resetIOSSetup={resetIOSSetup}
+    />
+  );
 };
 
 export default Dashboard;
 
 type Platform = `mac` | `ios`;
 
-const WelcomeScreen: React.FC = () => {
+interface WelcomeScreenProps {
+  prepIOSConnection?(input: PrepIOSAppConnection.Input): unknown;
+  iosSetupRequest?: RequestState<PrepIOSAppConnection.Output>;
+  resetIOSSetup?(): unknown;
+}
+
+const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
+  prepIOSConnection,
+  iosSetupRequest = { state: `idle` },
+  resetIOSSetup,
+}) => {
   const [platform, setPlatform] = useState<Platform | undefined>();
+  const [childName, setChildName] = useState(``);
+
+  const handleIOSBack = (): void => {
+    setPlatform(undefined);
+    setChildName(``);
+    resetIOSSetup?.();
+  };
+
   return (
     <UndoMainPadding className="flex justify-center items-center md:min-h-screen">
       <FloatingMessage className="flex flex-col items-center p-6 sm:p-8 lg:p-12 max-w-3xl">
@@ -191,16 +226,81 @@ const WelcomeScreen: React.FC = () => {
               />
             </div>
           </>
-        ) : (
+        ) : iosSetupRequest.state === `succeeded` ? (
+          <IOSConnectionCodeScreen
+            childName={childName}
+            code={iosSetupRequest.payload.code}
+          />
+        ) : iosSetupRequest.state === `ongoing` ? (
+          <>
+            <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+              Setting things up...
+            </h1>
+            <div className="mt-8">
+              <LoadingAnimation />
+            </div>
+          </>
+        ) : iosSetupRequest.state === `failed` ? (
           <>
             <button
-              onClick={() => setPlatform(undefined)}
+              onClick={handleIOSBack}
               className="self-start -mt-4 -ml-4 mb-2 text-slate-400 hover:text-slate-600 transition-colors text-sm"
             >
               <i className="fa-solid fa-arrow-left mr-1.5" />
               Back
             </button>
-            <IosGetStartedInstructions />
+            <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+              Something went wrong
+            </h1>
+            <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
+              We weren't able to set things up. Please try again.
+            </p>
+            <div className="mt-8">
+              <Button
+                type="button"
+                color="primary"
+                onClick={() =>
+                  prepIOSConnection?.({ child: { case: `newChild`, name: childName } })
+                }
+              >
+                Try again
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={handleIOSBack}
+              className="self-start -mt-4 -ml-4 mb-2 text-slate-400 hover:text-slate-600 transition-colors text-sm"
+            >
+              <i className="fa-solid fa-arrow-left mr-1.5" />
+              Back
+            </button>
+            <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+              What's your child's name?
+            </h1>
+            <form
+              className="mt-8 w-full max-w-sm flex flex-col items-center gap-6"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (childName.trim()) {
+                  prepIOSConnection?.({
+                    child: { case: `newChild`, name: childName.trim() },
+                  });
+                }
+              }}
+            >
+              <TextInput
+                type="text"
+                value={childName}
+                setValue={setChildName}
+                placeholder="e.g. Sally"
+                autoFocus
+              />
+              <Button type="submit" color="primary" disabled={!childName.trim()}>
+                Continue
+              </Button>
+            </form>
           </>
         )}
       </FloatingMessage>
@@ -208,12 +308,58 @@ const WelcomeScreen: React.FC = () => {
   );
 };
 
+export const IOSConnectionCodeScreen: React.FC<{ childName: string; code: number }> = ({
+  childName,
+  code,
+}) => (
+  <>
+    <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+      Protect {posessive(childName)} iPhone or iPad
+    </h1>
+    <code className="block text-3xl text-fuchsia-700 tracking-widest font-bold bg-fuchsia-50 px-6 py-3 rounded-xl mt-8">
+      {String(code).padStart(6, `0`)}
+    </code>
+    <p className="text-sm text-slate-500 mt-2">Connection code</p>
+    <ol className="mt-8 space-y-4 text-base sm:text-lg text-slate-700 max-w-xl">
+      <li className="flex gap-3">
+        <span className="shrink-0 w-7 h-7 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-sm font-bold">
+          1
+        </span>
+        <span>
+          Download <b>Gertrude Blocker</b> from the App Store on{` `}
+          {posessive(childName)} device
+        </span>
+      </li>
+      <li className="flex gap-3">
+        <span className="shrink-0 w-7 h-7 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-sm font-bold">
+          2
+        </span>
+        <span>
+          When the app asks to connect to a parent account, enter the code above
+        </span>
+      </li>
+    </ol>
+    <div className="mt-8 flex flex-col gap-4 w-full max-w-md">
+      <OnboardingRecommendation
+        title="Download from the App Store"
+        icon="fa-brands fa-app-store-ios"
+        href="https://apps.apple.com/app/gertrude/id6740543928"
+        openInNewTab
+        primary
+      />
+    </div>
+  </>
+);
+
 interface ConnectFirstDeviceScreenProps {
   firstUser: DashboardWidgets_v2.Output[`children`][number];
   startAddDevice(childId: UUID): unknown;
   dismissAddDevice(): unknown;
   onStartTrial(): unknown;
   addDeviceRequest: RequestState<MacAppConnectionCode.Output>;
+  prepIOSConnection?(input: PrepIOSAppConnection.Input): unknown;
+  iosSetupRequest?: RequestState<PrepIOSAppConnection.Output>;
+  resetIOSSetup?(): unknown;
 }
 
 const ConnectFirstDeviceScreen: React.FC<ConnectFirstDeviceScreenProps> = ({
@@ -222,8 +368,17 @@ const ConnectFirstDeviceScreen: React.FC<ConnectFirstDeviceScreenProps> = ({
   dismissAddDevice,
   onStartTrial,
   addDeviceRequest,
+  prepIOSConnection,
+  iosSetupRequest = { state: `idle` },
+  resetIOSSetup,
 }) => {
   const [platform, setPlatform] = useState<Platform | undefined>();
+
+  const handleIOSBack = (): void => {
+    setPlatform(undefined);
+    resetIOSSetup?.();
+  };
+
   return (
     <>
       <ConnectDeviceModal
@@ -247,7 +402,12 @@ const ConnectFirstDeviceScreen: React.FC<ConnectFirstDeviceScreenProps> = ({
                 <PlatformOption
                   icon="fa-solid fa-mobile-screen"
                   title="iPhone or iPad"
-                  onClick={() => setPlatform(`ios`)}
+                  onClick={() => {
+                    setPlatform(`ios`);
+                    prepIOSConnection?.({
+                      child: { case: `existingChild`, id: firstUser.id },
+                    });
+                  }}
                 />
               </div>
             </>
@@ -266,16 +426,48 @@ const ConnectFirstDeviceScreen: React.FC<ConnectFirstDeviceScreenProps> = ({
                 startAddDevice={startAddDevice}
               />
             </>
-          ) : (
+          ) : iosSetupRequest.state === `succeeded` ? (
+            <IOSConnectionCodeScreen
+              childName={firstUser.name}
+              code={iosSetupRequest.payload.code}
+            />
+          ) : iosSetupRequest.state === `failed` ? (
             <>
               <button
-                onClick={() => setPlatform(undefined)}
+                onClick={handleIOSBack}
                 className="self-start -mt-4 -ml-4 mb-2 text-slate-400 hover:text-slate-600 transition-colors text-sm"
               >
                 <i className="fa-solid fa-arrow-left mr-1.5" />
                 Back
               </button>
-              <IosGetStartedInstructions childName={firstUser.name} />
+              <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+                Something went wrong
+              </h1>
+              <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
+                We weren't able to get a connection code. Please try again.
+              </p>
+              <div className="mt-8">
+                <Button
+                  type="button"
+                  color="primary"
+                  onClick={() =>
+                    prepIOSConnection?.({
+                      child: { case: `existingChild`, id: firstUser.id },
+                    })
+                  }
+                >
+                  Try again
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+                Setting things up...
+              </h1>
+              <div className="mt-8">
+                <LoadingAnimation />
+              </div>
             </>
           )}
         </FloatingMessage>
@@ -283,31 +475,6 @@ const ConnectFirstDeviceScreen: React.FC<ConnectFirstDeviceScreenProps> = ({
     </>
   );
 };
-
-export const IosGetStartedInstructions: React.FC<{ childName?: string }> = ({
-  childName,
-}) => (
-  <>
-    <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
-      Protect {childName ? `${posessive(childName)} iPhone or iPad` : `an iPhone or iPad`}
-    </h1>
-    <p className="text-base xs:text-lg sm:text-xl text-slate-600 mt-4 max-w-xl mx-auto">
-      {childName ? `Search` : `To get started, search`} for <b>Gertrude Blocker</b> in the
-      App Store on{` `}
-      {childName ? `${posessive(childName)} device` : `your child's iPhone or iPad`}. The
-      app will walk you through the setup process.
-    </p>
-    <div className="mt-12 flex flex-col gap-4">
-      <OnboardingRecommendation
-        title="Download from the App Store"
-        icon="fa-brands fa-app-store-ios"
-        href="https://apps.apple.com/app/gertrude/id6740543928"
-        openInNewTab
-        primary
-      />
-    </div>
-  </>
-);
 
 export interface PlatformOptionProps {
   icon: string;

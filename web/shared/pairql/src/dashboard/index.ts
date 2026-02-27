@@ -35,6 +35,7 @@ export * from './pairs/LogEvent';
 export * from './pairs/Login';
 export * from './pairs/LoginMagicLink';
 export * from './pairs/MacAppConnectionCode';
+export * from './pairs/PrepIOSAppConnection';
 export * from './pairs/RequestMagicLink';
 export * from './pairs/RequestPublicKeychain';
 export * from './pairs/ResetPassword';

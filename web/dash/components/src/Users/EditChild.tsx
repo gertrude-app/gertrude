@@ -1,4 +1,9 @@
-import { Button, Label, TextInput } from '@shared/components';
+import {
+  Button,
+  Label,
+  Loading as LoadingAnimation,
+  TextInput,
+} from '@shared/components';
 import { inflect } from '@shared/string';
 import cx from 'classnames';
 import React, { useState } from 'react';
@@ -9,9 +14,10 @@ import type {
   ConfirmableEntityAction,
   IOSAppConnectionCode,
   MacAppConnectionCode,
+  PrepIOSAppConnection,
   RequestState,
 } from '@dash/types';
-import { IosGetStartedInstructions, PlatformOption } from '../Dashboard/Dashboard';
+import { IOSConnectionCodeScreen, PlatformOption } from '../Dashboard/Dashboard';
 import EmptyState from '../EmptyState';
 import GradientIcon from '../GradientIcon';
 import { ConfirmDeleteEntity } from '../Modal';
@@ -37,6 +43,9 @@ interface Props {
   deleteDevice: ConfirmableEntityAction;
   addDeviceRequest?: RequestState<MacAppConnectionCode.Output>;
   addIOSDeviceRequest?: RequestState<IOSAppConnectionCode.Output>;
+  prepIOSConnection?(input: PrepIOSAppConnection.Input): unknown;
+  iosSetupRequest?: RequestState<PrepIOSAppConnection.Output>;
+  resetIOSSetup?(): unknown;
   saveButtonDisabled: boolean;
   onSave(): unknown;
 }
@@ -58,6 +67,9 @@ const EditChild: React.FC<Props> = ({
   startAddIOSDevice,
   dismissAddIOSDevice,
   addIOSDeviceRequest,
+  prepIOSConnection,
+  iosSetupRequest = { state: `idle` },
+  resetIOSSetup,
   onStartTrial,
 }) => {
   const [platform, setPlatform] = useState<`mac` | `ios`>();
@@ -140,7 +152,12 @@ const EditChild: React.FC<Props> = ({
                   <PlatformOption
                     icon="fa-solid fa-mobile-screen"
                     title="iPhone or iPad"
-                    onClick={() => setPlatform(`ios`)}
+                    onClick={() => {
+                      setPlatform(`ios`);
+                      prepIOSConnection?.({
+                        child: { case: `existingChild`, id },
+                      });
+                    }}
                   />
                 </div>
               </div>
@@ -159,17 +176,54 @@ const EditChild: React.FC<Props> = ({
                   startAddDevice={startAddDevice}
                 />
               </>
-            ) : (
-              <>
+            ) : iosSetupRequest.state === `succeeded` ? (
+              <div className="flex flex-col items-center">
+                <IOSConnectionCodeScreen
+                  childName={name}
+                  code={iosSetupRequest.payload.code}
+                />
+              </div>
+            ) : iosSetupRequest.state === `failed` ? (
+              <div className="flex flex-col items-center">
                 <button
-                  onClick={() => setPlatform(undefined)}
-                  className="text-slate-400 hover:text-slate-600 transition-colors text-sm mb-2"
+                  onClick={() => {
+                    setPlatform(undefined);
+                    resetIOSSetup?.();
+                  }}
+                  className="self-start text-slate-400 hover:text-slate-600 transition-colors text-sm mb-2"
                 >
                   <i className="fa-solid fa-arrow-left mr-1.5" />
                   Back
                 </button>
-                <IosGetStartedInstructions childName={name} />
-              </>
+                <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+                  Something went wrong
+                </h1>
+                <p className="text-base xs:text-lg sm:text-xl text-slate-600 text-center mt-4 max-w-xl">
+                  We weren't able to get a connection code. Please try again.
+                </p>
+                <div className="mt-8">
+                  <Button
+                    type="button"
+                    color="primary"
+                    onClick={() =>
+                      prepIOSConnection?.({
+                        child: { case: `existingChild`, id },
+                      })
+                    }
+                  >
+                    Try again
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center">
+                <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
+                  Setting things up...
+                </h1>
+                <div className="mt-8">
+                  <LoadingAnimation />
+                </div>
+              </div>
             )}
           </div>
         )}

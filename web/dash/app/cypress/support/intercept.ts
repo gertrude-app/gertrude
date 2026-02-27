@@ -121,6 +121,10 @@ export function interceptPql(
   output: T.MacAppConnectionCode.Output,
 ): void;
 export function interceptPql(
+  slug: `PrepIOSAppConnection`,
+  output: T.PrepIOSAppConnection.Output,
+): void;
+export function interceptPql(
   slug: `RequestMagicLink`,
   output: T.RequestMagicLink.Output,
 ): void;
@@ -223,6 +227,7 @@ export function forcePqlErr(
     | `Login`
     | `LoginMagicLink`
     | `MacAppConnectionCode`
+    | `PrepIOSAppConnection`
     | `RequestMagicLink`
     | `RequestPublicKeychain`
     | `ResetPassword`

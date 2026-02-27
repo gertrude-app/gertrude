@@ -280,6 +280,16 @@ export default class DashboardClient extends Client<Auth> {
     );
   };
 
+  public prepIOSAppConnection = (
+    input: P.PrepIOSAppConnection.Input,
+  ): Promise<Result<P.PrepIOSAppConnection.Output>> => {
+    return this.query<P.PrepIOSAppConnection.Output>(
+      input,
+      `PrepIOSAppConnection`,
+      `parent`,
+    );
+  };
+
   public requestMagicLink = (
     input: P.RequestMagicLink.Input,
   ): Promise<Result<P.RequestMagicLink.Output>> => {
