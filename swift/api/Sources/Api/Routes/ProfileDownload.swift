@@ -42,9 +42,24 @@ enum ProfileDownloadRoute {
 // `DenyListURLS` is interesting, can specify 500 URLs, could put top 500 porn sites there...
 // `SafariHistoryRetentionEnabled`, also cool, kills private mode, and history clearing
 func generateProfileXml(for device: IOSApp.Device) -> String {
-  let tempSafariBlockDeviceId = "ed25c68a-2dba-4854-b3bd-efe0d8523e6f"
-  let disableSafari = device.id.lowercased == tempSafariBlockDeviceId
-  let disableAppInstallation = device.id.lowercased == tempSafariBlockDeviceId
+  var restrictionKeys = """
+        <key>allowAppRemoval</key>
+        <\(device.allowAppRemoval ? "true" : "false")/>
+
+        <key>allowEraseContentAndSettings</key>
+        <\(device.allowEraseContentAndSettings ? "true" : "false")/>
+  """
+  // special temporary customer workaround
+  if device.id.lowercased == "ed25c68a-2dba-4854-b3bd-efe0d8523e6f" {
+    restrictionKeys += """
+
+          <key>allowSafari</key>
+          <false/>
+
+          <key>allowAppInstallation</key>
+          <false/>
+    """
+  }
   return """
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -118,17 +133,7 @@ func generateProfileXml(for device: IOSApp.Device) -> String {
           <key>PayloadVersion</key>
           <integer>1</integer>
 
-          <key>allowAppRemoval</key>
-          <\(device.allowAppRemoval ? "true" : "false")/>
-
-          <key>allowEraseContentAndSettings</key>
-          <\(device.allowEraseContentAndSettings ? "true" : "false")/>
-
-          <key>allowSafari</key>
-          <\(disableSafari ? "false" : "true")/>
-
-          <key>allowAppInstallation</key>
-          <\(disableAppInstallation ? "false" : "true")/>
+  \(restrictionKeys)
         </dict>
       </array>
     </dict>
