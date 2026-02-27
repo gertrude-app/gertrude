@@ -235,6 +235,17 @@ export default defineConfig([
     `**/build/*`,
   ]),
   {
+    files: [
+      `shared/pairql/src/admin/**`,
+      `shared/pairql/src/dashboard/**`,
+      `shared/pairql/src/supervise/**`,
+      `dash/app/cypress/support/intercept.ts`,
+    ],
+    rules: {
+      '@stylistic/quotes': `off`,
+    },
+  },
+  {
     files: [`**/*.tsx`],
     rules: {
       'arrow-body-style': [`error`, `as-needed`],

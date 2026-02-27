@@ -9,10 +9,10 @@ export namespace DashboardWidgets_v2 {
       id: UUID;
       name: string;
       devices: Array<{
-        platform: `mac` | `ios`;
+        platform: 'mac' | 'ios';
         deviceName: string;
         macStatus?: ChildComputerStatus;
-        iosStatus?: `setupComplete` | `pendingSetup`;
+        iosStatus?: 'setupComplete' | 'pendingSetup';
       }>;
     }>;
     childActivitySummaries: Array<{
@@ -38,7 +38,7 @@ export namespace DashboardWidgets_v2 {
     numParentNotifications: number;
     announcement?: {
       id: UUID;
-      kind: `news` | `warning`;
+      kind: 'news' | 'warning';
       icon?: string;
       html: string;
       learnMoreUrl?: string;

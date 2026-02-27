@@ -3,7 +3,7 @@ export namespace StripeUrl_v2 {
   export interface Input {
     successPath: string;
     cancelPath: string;
-    tier?: `light` | `full`;
+    tier?: 'light' | 'full';
     associatedIosDeviceId?: UUID;
   }
 

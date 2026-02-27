@@ -6,7 +6,7 @@ export namespace SecurityEventsFeed {
 
   export type Output = Array<
     | {
-        case: `child`;
+        case: 'child';
         id: UUID;
         childId: UUID;
         childName: string;
@@ -19,7 +19,7 @@ export namespace SecurityEventsFeed {
         createdAt: ISODateString;
       }
     | {
-        case: `admin`;
+        case: 'admin';
         id: UUID;
         event: string;
         detail?: string;

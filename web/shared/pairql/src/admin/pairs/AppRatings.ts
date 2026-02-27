@@ -11,7 +11,7 @@ export namespace AppRatings {
     currentAverage: number;
     totalCount: number;
     items: Array<{
-      type: `review` | `ratingEvent`;
+      type: 'review' | 'ratingEvent';
       id: UUID;
       stars: number;
       date: ISODateString;
