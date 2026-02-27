@@ -14,16 +14,16 @@ export interface AdminNotification {
 }
 
 export type AdminNotificationTrigger =
-  | `unlockRequestSubmitted`
-  | `suspendFilterRequestSubmitted`
-  | `securityEventsAll`
-  | `securityEventsMedium`
-  | `securityEventsRecommended`;
+  | 'unlockRequestSubmitted'
+  | 'suspendFilterRequestSubmitted'
+  | 'securityEventsAll'
+  | 'securityEventsMedium'
+  | 'securityEventsRecommended';
 
 export type AppScope =
-  | { type: `unrestricted` }
-  | { type: `webBrowsers` }
-  | { type: `single`; single: SingleAppScope };
+  | { type: 'unrestricted' }
+  | { type: 'webBrowsers' }
+  | { type: 'single'; single: SingleAppScope };
 
 export interface BlockedApp {
   id: UUID;
@@ -32,15 +32,15 @@ export interface BlockedApp {
 }
 
 export type BlockRule =
-  | { case: `bundleIdContains`; value: string }
-  | { case: `urlContains`; value: string }
-  | { case: `hostnameContains`; value: string }
-  | { case: `hostnameEquals`; value: string }
-  | { case: `hostnameEndsWith`; value: string }
-  | { case: `targetContains`; value: string }
-  | { case: `flowTypeIs`; value: `browser` | `socket` }
-  | { case: `both`; a: BlockRule; b: BlockRule }
-  | { case: `unless`; rule: BlockRule; negatedBy: BlockRule[] };
+  | { case: 'bundleIdContains'; value: string }
+  | { case: 'urlContains'; value: string }
+  | { case: 'hostnameContains'; value: string }
+  | { case: 'hostnameEquals'; value: string }
+  | { case: 'hostnameEndsWith'; value: string }
+  | { case: 'targetContains'; value: string }
+  | { case: 'flowTypeIs'; value: 'browser' | 'socket' }
+  | { case: 'both'; a: BlockRule; b: BlockRule }
+  | { case: 'unless'; rule: BlockRule; negatedBy: BlockRule[] };
 
 export interface Child {
   id: UUID;
@@ -69,12 +69,12 @@ export interface ChildComputer {
 }
 
 export type ChildComputerStatus =
-  | { case: `filterSuspended`; resuming?: ISODateString }
-  | { case: `downtime`; ending?: ISODateString }
-  | { case: `downtimePaused`; resuming?: ISODateString }
-  | { case: `offline` }
-  | { case: `filterOff` }
-  | { case: `filterOn` };
+  | { case: 'filterSuspended'; resuming?: ISODateString }
+  | { case: 'downtime'; ending?: ISODateString }
+  | { case: 'downtimePaused'; resuming?: ISODateString }
+  | { case: 'offline' }
+  | { case: 'filterOff' }
+  | { case: 'filterOn' };
 
 export interface ChildIOSDevice {
   id: UUID;
@@ -84,7 +84,7 @@ export interface ChildIOSDevice {
   pendingClaimCode?: number;
 }
 
-export type ClientAuth = `none` | `child` | `parent` | `superAdmin`;
+export type ClientAuth = 'none' | 'child' | 'parent' | 'superAdmin';
 
 export interface Device {
   id: UUID;
@@ -99,14 +99,14 @@ export interface Device {
 }
 
 export type DeviceModelFamily =
-  | `macBook`
-  | `macBookAir`
-  | `macBookPro`
-  | `mini`
-  | `iMac`
-  | `studio`
-  | `pro`
-  | `unknown`;
+  | 'macBook'
+  | 'macBookAir'
+  | 'macBookPro'
+  | 'mini'
+  | 'iMac'
+  | 'studio'
+  | 'pro'
+  | 'unknown';
 
 export interface Key {
   id: UUID;
@@ -138,41 +138,41 @@ export interface PlainTimeWindow {
 
 export type Plan =
   | {
-      case: `free`;
+      case: 'free';
       kind:
-        | { case: `lapsedLight`; stripeId: string; hasTrialedFull: boolean }
-        | { case: `lapsedFull`; stripeId?: string }
-        | { case: `standard` };
+        | { case: 'lapsedLight'; stripeId: string; hasTrialedFull: boolean }
+        | { case: 'lapsedFull'; stripeId?: string }
+        | { case: 'standard' };
     }
   | {
-      case: `light`;
+      case: 'light';
       status:
-        | { case: `paid`; stripeId: string; hasTrialedFull: boolean }
-        | { case: `overdue`; stripeId: string; hasTrialedFull: boolean };
+        | { case: 'paid'; stripeId: string; hasTrialedFull: boolean }
+        | { case: 'overdue'; stripeId: string; hasTrialedFull: boolean };
     }
   | {
-      case: `full`;
+      case: 'full';
       status:
         | {
-            case: `trialing`;
-            kind: { case: `fromLight`; stripeId: string } | { case: `full` };
+            case: 'trialing';
+            kind: { case: 'fromLight'; stripeId: string } | { case: 'full' };
             until: ISODateString;
           }
         | {
-            case: `trialExpired`;
-            kind: { case: `fromLight`; stripeId: string } | { case: `full` };
+            case: 'trialExpired';
+            kind: { case: 'fromLight'; stripeId: string } | { case: 'full' };
           }
-        | { case: `paid`; stripeId: string; monthlyPriceInCents: number }
-        | { case: `overdue`; stripeId: string; monthlyPriceInCents: number }
-        | { case: `complimentary` };
+        | { case: 'paid'; stripeId: string; monthlyPriceInCents: number }
+        | { case: 'overdue'; stripeId: string; monthlyPriceInCents: number }
+        | { case: 'complimentary' };
     };
 
-export type ReleaseChannel = `stable` | `beta` | `canary`;
+export type ReleaseChannel = 'stable' | 'beta' | 'canary';
 
-export type RequestStatus = `pending` | `accepted` | `rejected`;
+export type RequestStatus = 'pending' | 'accepted' | 'rejected';
 
 export interface RuleSchedule {
-  mode: `active` | `inactive`;
+  mode: 'active' | 'inactive';
   days: {
     sunday: boolean;
     monday: boolean;
@@ -185,19 +185,19 @@ export interface RuleSchedule {
   window: PlainTimeWindow;
 }
 
-export type SecurityEventSeverity = `all` | `medium` | `recommended`;
+export type SecurityEventSeverity = 'all' | 'medium' | 'recommended';
 
 export type SharedKey =
-  | { type: `anySubdomain`; domain: string; scope: AppScope }
-  | { type: `domain`; domain: string; scope: AppScope }
-  | { type: `domainRegex`; pattern: string; scope: AppScope }
-  | { type: `skeleton`; scope: SingleAppScope }
-  | { type: `ipAddress`; ipAddress: string; scope: AppScope }
-  | { type: `path`; path: string; scope: AppScope };
+  | { type: 'anySubdomain'; domain: string; scope: AppScope }
+  | { type: 'domain'; domain: string; scope: AppScope }
+  | { type: 'domainRegex'; pattern: string; scope: AppScope }
+  | { type: 'skeleton'; scope: SingleAppScope }
+  | { type: 'ipAddress'; ipAddress: string; scope: AppScope }
+  | { type: 'path'; path: string; scope: AppScope };
 
 export type SingleAppScope =
-  | { type: `bundleId`; bundleId: string }
-  | { type: `identifiedAppSlug`; identifiedAppSlug: string };
+  | { type: 'bundleId'; bundleId: string }
+  | { type: 'identifiedAppSlug'; identifiedAppSlug: string };
 
 export interface SuccessOutput {
   success: boolean;
@@ -233,7 +233,7 @@ export interface UnlockRequest {
 
 export type UserActivityItem =
   | {
-      case: `screenshot`;
+      case: 'screenshot';
       id: UUID;
       ids: UUID[];
       url: string;
@@ -245,7 +245,7 @@ export type UserActivityItem =
       deletedAt?: ISODateString;
     }
   | {
-      case: `keystrokeLine`;
+      case: 'keystrokeLine';
       id: UUID;
       ids: UUID[];
       appName: string;
@@ -269,14 +269,14 @@ export interface UserKeychainSummary {
 export interface VerifiedNotificationMethod {
   id: UUID;
   config:
-    | { case: `slack`; channelId: string; channelName: string; token: string }
-    | { case: `email`; email: string }
-    | { case: `text`; phoneNumber: string };
+    | { case: 'slack'; channelId: string; channelName: string; token: string }
+    | { case: 'email'; email: string }
+    | { case: 'text'; phoneNumber: string };
 }
 
 export type WebPolicy =
-  | `allowAll`
-  | `blockAdult`
-  | `blockAdultAnd`
-  | `blockAllExcept`
-  | `blockAll`;
+  | 'allowAll'
+  | 'blockAdult'
+  | 'blockAdultAnd'
+  | 'blockAllExcept'
+  | 'blockAll';

@@ -42,6 +42,11 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     npm install -g pnpm && \
     rm -rf /var/lib/apt/lists/*
 
+RUN git clone --depth 1 --branch 0.58.5 https://github.com/nicklockwood/SwiftFormat && \
+    cd SwiftFormat && swift build -c release && \
+    cp .build/release/swiftformat /usr/local/bin/ && \
+    cd .. && rm -rf SwiftFormat/
+
 WORKDIR /workspace
 
 CMD ["bash"]

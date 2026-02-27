@@ -5,15 +5,15 @@ export namespace DeleteEntity_v2 {
   export interface Input {
     id: UUID;
     type:
-      | `announcement`
-      | `child`
-      | `computerUser`
-      | `parent`
-      | `parentNotification`
-      | `parentVerifiedNotificationMethod`
-      | `key`
-      | `keychain`
-      | `blockRule`;
+      | 'announcement'
+      | 'child'
+      | 'computerUser'
+      | 'parent'
+      | 'parentNotification'
+      | 'parentVerifiedNotificationMethod'
+      | 'key'
+      | 'keychain'
+      | 'blockRule';
   }
 
   export type Output = SuccessOutput;

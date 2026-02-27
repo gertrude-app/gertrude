@@ -6,6 +6,6 @@ export namespace MacAppConnectionCode {
 
   export interface Output {
     code: number;
-    gate?: `trialRequired` | `planUpgradeRequired` | `subscriptionFixRequired`;
+    gate?: 'trialRequired' | 'planUpgradeRequired' | 'subscriptionFixRequired';
   }
 }

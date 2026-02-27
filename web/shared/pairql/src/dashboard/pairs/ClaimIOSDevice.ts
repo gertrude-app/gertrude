@@ -4,11 +4,11 @@ export namespace ClaimIOSDevice {
     code: number;
     child:
       | {
-          case: `newChild`;
+          case: 'newChild';
           name: string;
         }
       | {
-          case: `existingChild`;
+          case: 'existingChild';
           id: UUID;
         };
   }
