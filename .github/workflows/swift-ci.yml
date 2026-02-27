@@ -244,6 +244,18 @@ jobs:
         run: cd swift/macapp/App && swift build
       - name: test
         run: cd swift/macapp/App && swift test
+      - name: verify-macapp-swift-codegen
+        if: github.event_name == 'pull_request'
+        run: |
+          (cd swift/macapp/App && CODEGEN_SWIFT=1 swift test --filter Codegen)
+          curl -sL https://github.com/nicklockwood/SwiftFormat/releases/download/0.58.5/swiftformat.zip -o /tmp/sf.zip
+          unzip -o /tmp/sf.zip -d /usr/local/bin/
+          swiftformat swift/macapp/App/Sources/App/Generated/
+          git checkout -- swift/macapp/App/Package.resolved
+          if ! git diff --exit-code -- swift/macapp/App/Sources/App/Generated/; then
+            echo "::error::Macapp Swift codegen files are out of date. Run 'just codegen-swift' and commit the changes."
+            exit 1
+          fi
 
   macapp-build:
     needs: files-changed
