@@ -240,6 +240,8 @@ export default defineConfig([
       `shared/pairql/src/dashboard/**`,
       `shared/pairql/src/supervise/**`,
       `dash/app/cypress/support/intercept.ts`,
+      `appviews/src/lib/shared-types.ts`,
+      `appviews/src/*/**-store.ts`,
     ],
     rules: {
       '@stylistic/quotes': `off`,

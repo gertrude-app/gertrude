@@ -6,23 +6,23 @@ import { Store } from '../lib/store';
 export interface AppState {
   windowOpen: boolean;
   request:
-    | { case: `failed`; error: string }
-    | { case: `idle` }
-    | { case: `ongoing` }
-    | { case: `succeeded` };
+    | { case: 'failed'; error: string }
+    | { case: 'idle' }
+    | { case: 'ongoing' }
+    | { case: 'succeeded' };
   adminAccountStatus: AdminAccountStatus;
   internetConnected: boolean;
   filterCommunicationConfirmed?: boolean;
 }
 
 export type AppEvent =
-  | { case: `requestSubmitted`; durationInSeconds: number; comment?: string }
-  | { case: `grantSuspensionClicked`; durationInSeconds: number }
-  | { case: `closeWindow` }
-  | { case: `requestFailedTryAgainClicked` }
-  | { case: `inactiveAccountRecheckClicked` }
-  | { case: `inactiveAccountDisconnectAppClicked` }
-  | { case: `noFilterCommunicationAdministrateClicked` };
+  | { case: 'requestSubmitted'; durationInSeconds: number; comment?: string }
+  | { case: 'grantSuspensionClicked'; durationInSeconds: number }
+  | { case: 'closeWindow' }
+  | { case: 'requestFailedTryAgainClicked' }
+  | { case: 'inactiveAccountRecheckClicked' }
+  | { case: 'inactiveAccountDisconnectAppClicked' }
+  | { case: 'noFilterCommunicationAdministrateClicked' };
 // end codegen
 
 export type ViewState = {
