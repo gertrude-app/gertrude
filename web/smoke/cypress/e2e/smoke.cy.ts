@@ -79,7 +79,9 @@ describe(`Smoke test`, () => {
     // get the connection code
     cy.contains(`Mac computer`).click();
     cy.contains(`Get connection code`).click();
+    cy.intercept(`POST`, `**/StartFullTrial`).as(`startTrial`);
     cy.contains(`Start 21-day free trial`).click();
+    cy.wait(`@startTrial`);
     cy.get(`[data-test=connection-code]`).invoke(`text`).as(`connectionCode`);
 
     // simulate that they installed the app and connected successfully
