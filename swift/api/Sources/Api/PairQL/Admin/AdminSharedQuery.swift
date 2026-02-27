@@ -182,6 +182,10 @@ extension ParentData {
       && (self.numNonEmptyKeychains > 0 || self.childActivityCount > 0)
   }
 
+  var hasConnectedFreeIOSDevice: Bool {
+    self.numIOSDevices > 0 && !self.hasIncompleteSupervision
+  }
+
   var status: ParentAnalyticsStatus {
     if self.isActive {
       .active
