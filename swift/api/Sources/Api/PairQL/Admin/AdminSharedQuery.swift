@@ -139,7 +139,7 @@ struct AnalyticsData: Sendable {
       ),
     )
     var totalAnnualCents = Cents(0)
-    var parents = parentModels.reduce(into: [Parent.Id: ParentData]()) { map, model in
+    let parents = parentModels.reduce(into: [Parent.Id: ParentData]()) { map, model in
       var parent = ParentData(model: model, subscription: subscriptionMap[model.id])
       parent.numNonEmptyKeychains = keychainMap[model.id]?.count ?? 0
       parent.numChildren = childMap[model.id] ?? 0
@@ -161,13 +161,6 @@ struct AnalyticsData: Sendable {
       }
     }
     data.overview.annualRevenue = Dollars(totalAnnualCents.rawValue / 100)
-
-    let children = try await Child.query().all(in: self.db)
-    for child in children {
-      guard var parent = parents[child.parentId] else { continue }
-      parent.numChildren += 1
-      parents[child.parentId] = parent
-    }
 
     data.parents = parents
     self._data = data
