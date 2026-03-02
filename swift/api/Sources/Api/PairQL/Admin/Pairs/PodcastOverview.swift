@@ -7,6 +7,7 @@ struct PodcastOverview: Pair {
   struct Output: PairOutput {
     var totalInstalls: Int
     var successfulSubscriptions: Int
+    var activePodcastUsers: Int
     var conversionRate: Double
     var iPhoneInstalls: Int
     var iPadInstalls: Int
@@ -43,6 +44,8 @@ extension PodcastOverview: NoInputResolver {
       withBindings: [.string("27c4f26a"), .string("%iPad%")],
     )
 
+    let activePodcastUsers = try await context.db.count(ActivePodcastUsersCount.self)
+
     let rate = pastTrialInstallCount > 0
       ? (Double(subscriptionCount) / Double(pastTrialInstallCount) * 1000).rounded() / 10
       : 0.0
@@ -59,6 +62,7 @@ extension PodcastOverview: NoInputResolver {
     return .init(
       totalInstalls: totalInstalls,
       successfulSubscriptions: subscriptionCount,
+      activePodcastUsers: activePodcastUsers,
       conversionRate: rate,
       iPhoneInstalls: iPhoneInstalls,
       iPadInstalls: iPadInstalls,
@@ -67,7 +71,7 @@ extension PodcastOverview: NoInputResolver {
   }
 }
 
-private struct DistinctDeviceEventCount: CustomCountable {
+struct DistinctDeviceEventCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     var stmt = SQL.Statement("""
     SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.installId))) AS count
@@ -151,4 +155,23 @@ private struct RecentInstallsQuery: CustomQueryable {
   var date: Date
   var modelIdentifier: String
   var isPaid: Bool
+}
+
+private struct ActivePodcastUsersCount: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    let installId = PodcastEvent.columnName(.installId)
+    let eventId = PodcastEvent.columnName(.eventId)
+    let createdAt = PodcastEvent.columnName(.createdAt)
+    return SQL.Statement("""
+    SELECT COUNT(DISTINCT \(installId)) AS count
+    FROM \(table: PodcastEvent.self)
+    WHERE \(installId) IS NOT NULL
+      AND (
+        (\(eventId) = '27c4f26a' AND \(createdAt) >= NOW() - INTERVAL '30 days')
+        OR \(eventId) = 'a72104d7'
+      )
+    """)
+  }
+
+  var count: Int
 }

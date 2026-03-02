@@ -578,7 +578,7 @@ private struct GertrudeSupervisionSuccessCount: CustomCountable {
   var count: Int
 }
 
-private struct NonSupervisedConnectionSuccessCount: CustomCountable {
+struct NonSupervisedConnectionSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)

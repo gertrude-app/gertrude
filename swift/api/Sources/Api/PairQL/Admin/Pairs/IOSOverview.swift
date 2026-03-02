@@ -11,6 +11,7 @@ struct IOSOverview: Pair {
     var screenTimeSuccess: Int
     var configuratorSuccess: Int
     var gertrudeSupervisionSuccess: Int
+    var nonSupervisedConnectionSuccess: Int
     var stuckIn18PlusPath: Int
     var successRate: Double
     var recentInstalls: [RecentInstall]
@@ -34,7 +35,10 @@ extension IOSOverview: NoInputResolver {
     let configuratorSuccess = try await context.db.count(ConfiguratorSuccessCount.self)
     let gertrudeSupervisionSuccess = try await context.db
       .count(GertrudeSupervisionSuccessCount.self)
-    let totalSuccess = screenTimeSuccess + configuratorSuccess + gertrudeSupervisionSuccess
+    let nonSupervisedConnectionSuccess = try await context.db
+      .count(NonSupervisedConnectionSuccessCount.self)
+    let totalSuccess = screenTimeSuccess + configuratorSuccess
+      + gertrudeSupervisionSuccess + nonSupervisedConnectionSuccess
     let stuckIn18PlusPath = try await context.db.count(StuckIn18PlusCount.self)
     let parentFalseStarts = try await context.db.count(ParentDeviceDropoffCount.self)
 
@@ -66,6 +70,7 @@ extension IOSOverview: NoInputResolver {
       screenTimeSuccess: screenTimeSuccess,
       configuratorSuccess: configuratorSuccess,
       gertrudeSupervisionSuccess: gertrudeSupervisionSuccess,
+      nonSupervisedConnectionSuccess: nonSupervisedConnectionSuccess,
       stuckIn18PlusPath: stuckIn18PlusPath,
       successRate: successRate,
       recentInstalls: recentInstalls,
