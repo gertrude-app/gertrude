@@ -15,6 +15,7 @@ struct SubscriptionsOverview: Pair {
     var fullPlanAnnualRevenue: Int
     var lightPlanCount: Int
     var lightPlanAnnualRevenue: Int
+    var podcastAnnualRevenue: Int
     var trialingCount: Int
     var totalAccounts: Int
     var recentSignups: [RecentSignupOutput]
@@ -80,7 +81,13 @@ extension SubscriptionsOverview: NoInputResolver {
       ))
     }
 
-    let totalAnnualCents = fullPlanAnnualCents + lightPlanAnnualCents
+    let podcastSubscriptions = try await context.db.count(
+      DistinctDeviceEventCount.self,
+      withBindings: [.string("a72104d7")],
+    )
+    let podcastAnnualCents = podcastSubscriptions * 850
+
+    let totalAnnualCents = fullPlanAnnualCents + lightPlanAnnualCents + podcastAnnualCents
     return .init(
       monthlyRevenue: totalAnnualCents / 100 / 12,
       annualRevenue: totalAnnualCents / 100,
@@ -88,6 +95,7 @@ extension SubscriptionsOverview: NoInputResolver {
       fullPlanAnnualRevenue: fullPlanAnnualCents / 100,
       lightPlanCount: lightPlanCount,
       lightPlanAnnualRevenue: lightPlanAnnualCents / 100,
+      podcastAnnualRevenue: podcastAnnualCents / 100,
       trialingCount: trialingCount,
       totalAccounts: data.overview.allTimeSignups,
       recentSignups: signups,

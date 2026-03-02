@@ -72,7 +72,14 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-fade-in pt-4">
-      {overviewData && <OverviewSection data={overviewData} />}
+      {overviewData && (
+        <OverviewSection
+          data={overviewData}
+          macData={macData}
+          iosData={iosData}
+          podcastData={podcastData}
+        />
+      )}
       {macData && <MacSection data={macData} />}
       {iosData && <IOSSection data={iosData} />}
       {podcastData && <PodcastSection data={podcastData} />}
@@ -82,21 +89,33 @@ const Dashboard: React.FC = () => {
 
 interface OverviewSectionProps {
   data: T.SubscriptionsOverview.Output;
+  macData: T.MacOverview.Output | null;
+  iosData: T.IOSOverview.Output | null;
+  podcastData: T.PodcastOverview.Output | null;
 }
 
-const OverviewSection: React.FC<OverviewSectionProps> = ({ data }) => {
+const OverviewSection: React.FC<OverviewSectionProps> = ({
+  data,
+  macData,
+  iosData,
+  podcastData,
+}) => {
+  const protectedPeople =
+    (macData?.childrenOfActiveParents ?? 0) +
+    (iosData?.totalSuccess ?? 0) +
+    (podcastData?.activePodcastUsers ?? 0);
   const freeCount =
     data.totalAccounts - data.fullPlanCount - data.lightPlanCount - data.trialingCount;
   const stats = [
-    { label: `Annual Revenue`, value: `$${data.annualRevenue.toLocaleString()}` },
     {
-      label: `Monthly Revenue`,
-      value: `$${data.monthlyRevenue.toLocaleString()}`,
+      label: `Protected People`,
+      value: protectedPeople.toLocaleString(),
       highlight: true,
     },
+    { label: `Annual Revenue`, value: `$${data.annualRevenue.toLocaleString()}` },
+    { label: `Monthly Revenue`, value: `$${data.monthlyRevenue.toLocaleString()}` },
     { label: `Full Plans`, value: data.fullPlanCount.toLocaleString() },
     { label: `Light Plans`, value: data.lightPlanCount.toLocaleString() },
-    { label: `Trialing`, value: data.trialingCount.toLocaleString() },
     { label: `Total Accounts`, value: data.totalAccounts.toLocaleString() },
   ];
 
@@ -186,12 +205,12 @@ interface MacSectionProps {
 const MacSection: React.FC<MacSectionProps> = ({ data }) => {
   const totalParents = data.activeParents + data.onboardedParents + data.noActionParents;
   const stats = [
+    { label: `Active Parents`, value: data.activeParents.toLocaleString() },
     {
       label: `Protected Children`,
       value: data.childrenOfActiveParents.toLocaleString(),
       highlight: true,
     },
-    { label: `Active Parents`, value: data.activeParents.toLocaleString() },
     { label: `All-Time Children`, value: data.allTimeChildren.toLocaleString() },
     { label: `All-Time Installs`, value: data.allTimeAppInstallations.toLocaleString() },
   ];
@@ -347,6 +366,11 @@ const IOSSection: React.FC<IOSSectionProps> = ({ data }) => (
             label: `Supervised`,
             value: data.gertrudeSupervisionSuccess,
             gradient: `from-amber-400 to-orange-500`,
+          },
+          {
+            label: `Connected`,
+            value: data.nonSupervisedConnectionSuccess,
+            gradient: `from-fuchsia-400 to-pink-500`,
           },
         ]}
       />

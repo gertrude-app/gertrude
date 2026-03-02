@@ -9,6 +9,7 @@ export namespace IOSOverview {
     screenTimeSuccess: number;
     configuratorSuccess: number;
     gertrudeSupervisionSuccess: number;
+    nonSupervisedConnectionSuccess: number;
     stuckIn18PlusPath: number;
     successRate: number;
     recentInstalls: Array<{
