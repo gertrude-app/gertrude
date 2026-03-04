@@ -35,6 +35,7 @@ export namespace ParentDetail {
         iosVersion: string;
         appVersion: string;
         supervisionStatus?: string;
+        lastCheckin?: ISODateString;
         createdAt: ISODateString;
       }>;
       keychains: Array<{

@@ -19,7 +19,7 @@ import {
   XIcon,
 } from '../components/Icons';
 import LoadingState from '../components/LoadingState';
-import { formatDate, unCamelCase } from '../lib/format';
+import { formatDate, timeAgo, unCamelCase } from '../lib/format';
 
 type Plan = T.ParentDetail.Output[`plan`];
 
@@ -281,6 +281,11 @@ const ParentDetail: React.FC = () => {
                               <div className="text-sm text-slate-600 mt-2 flex flex-wrap gap-x-4 gap-y-1">
                                 <span>App v{device.appVersion}</span>
                                 <span>iOS {device.iosVersion}</span>
+                                {device.lastCheckin && (
+                                  <span className="text-slate-400">
+                                    Last seen {timeAgo(device.lastCheckin)}
+                                  </span>
+                                )}
                               </div>
                             </div>
                           </Link>

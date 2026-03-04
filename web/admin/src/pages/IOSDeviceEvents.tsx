@@ -8,6 +8,7 @@ import ErrorState from '../components/ErrorState';
 import EventTimeline from '../components/EventTimeline';
 import { SmartphoneIcon } from '../components/Icons';
 import LoadingState from '../components/LoadingState';
+import { timeAgo } from '../lib/format';
 
 const ERROR_EVENT_IDS = [
   `e2e02460`,
@@ -139,11 +140,20 @@ const IOSDeviceEvents: React.FC = () => {
           </>
         }
         badge={
-          data.reachedOptOut && (
-            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-700">
-              Successfully Onboarded
-            </span>
-          )
+          <div className="flex flex-col items-end gap-1.5">
+            {data.reachedOptOut && (
+              <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                Successfully Onboarded
+              </span>
+            )}
+            {data.lastCheckin ? (
+              <span className="text-xs text-slate-400">
+                Last check-in: <span className="text-purple-400">{timeAgo(data.lastCheckin)}</span>
+              </span>
+            ) : (
+              <span className="text-xs text-slate-300">No check-ins yet</span>
+            )}
+          </div>
         }
       />
 

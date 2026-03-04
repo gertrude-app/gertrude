@@ -46,6 +46,15 @@ export function formatElapsed(seconds: number): string {
   }
 }
 
+export function timeAgo(dateString: string): string {
+  const seconds = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
+  if (seconds < 60) return `just now`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  const days = Math.floor(seconds / 86400);
+  return days === 1 ? `1 day ago` : `${days} days ago`;
+}
+
 export function unCamelCase(str: string): string {
   return str
     .replace(/([a-z])([A-Z])/g, `$1 $2`)
