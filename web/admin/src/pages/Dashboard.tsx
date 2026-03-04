@@ -127,7 +127,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
 
   return (
     <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-      <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+      <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-violet to-brand-fuchsia flex items-center justify-center shadow-lg shadow-brand-violet/20">
             <UsersIcon className="w-5 h-5 text-white" />
@@ -136,14 +136,14 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
         </div>
         <Link
           to="/parents"
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-violet hover:text-brand-fuchsia bg-brand-50 hover:bg-brand-100 rounded-lg transition-all group"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-brand-violet hover:text-brand-fuchsia bg-brand-50 hover:bg-brand-100 rounded-lg transition-all group"
         >
-          <span>View Parents</span>
-          <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          <span>Parents</span>
+          <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
         </Link>
       </div>
-      <div className="p-6 space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="p-4 sm:p-6 space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
           {stats.map((stat) => (
             <div
               key={stat.label}
@@ -217,7 +217,7 @@ const MacSection: React.FC<MacSectionProps> = ({ data }) => {
 
   return (
     <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-      <div className="px-6 py-5 border-b border-slate-100">
+      <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
             <MonitorIcon className="w-5 h-5 text-white" />
@@ -225,8 +225,8 @@ const MacSection: React.FC<MacSectionProps> = ({ data }) => {
           <h2 className="font-display font-semibold text-slate-900 text-xl">Mac App</h2>
         </div>
       </div>
-      <div className="p-6 space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="p-4 sm:p-6 space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {stats.map((stat) => (
             <div
               key={stat.label}
@@ -283,39 +283,41 @@ interface IOSSectionProps {
 
 const IOSSection: React.FC<IOSSectionProps> = ({ data }) => (
   <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-    <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
-          <SmartphoneIcon className="w-5 h-5 text-white" />
+    <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100">
+      <div className="flex flex-wrap justify-between items-center gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
+            <SmartphoneIcon className="w-5 h-5 text-white" />
+          </div>
+          <h2 className="font-display font-semibold text-slate-900 text-xl">iOS App</h2>
         </div>
-        <h2 className="font-display font-semibold text-slate-900 text-xl">iOS App</h2>
-      </div>
-      <div className="flex items-center gap-2">
-        <Link
-          to="/ios-devices"
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
-        >
-          <span>View Devices</span>
-          <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
-        <Link
-          to="/ios-stats"
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
-        >
-          <span>View Stats</span>
-          <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
-        <Link
-          to="/ratings/blocker"
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
-        >
-          <span>View Ratings</span>
-          <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to="/ios-devices"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
+          >
+            <span>Devices</span>
+            <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <Link
+            to="/ios-stats"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
+          >
+            <span>Stats</span>
+            <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <Link
+            to="/ratings/blocker"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
+          >
+            <span>Ratings</span>
+            <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </div>
       </div>
     </div>
-    <div className="p-6 space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
         <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
           <div className="text-2xl font-display font-semibold text-slate-900">
             {data.adjustedLaunches.toLocaleString()}
@@ -392,34 +394,36 @@ const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {
 
   return (
     <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-      <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-            <MicIcon className="w-5 h-5 text-white" />
+      <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100">
+        <div className="flex flex-wrap justify-between items-center gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <MicIcon className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="font-display font-semibold text-slate-900 text-xl">
+              Podcast App
+            </h2>
           </div>
-          <h2 className="font-display font-semibold text-slate-900 text-xl">
-            Podcast App
-          </h2>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            to="/podcasts"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-all group"
-          >
-            <span>View Installs</span>
-            <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-          <Link
-            to="/ratings/podcasts"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-all group"
-          >
-            <span>View Ratings</span>
-            <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              to="/podcasts"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-all group"
+            >
+              <span>Installs</span>
+              <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link
+              to="/ratings/podcasts"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-all group"
+            >
+              <span>Ratings</span>
+              <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
         </div>
       </div>
-      <div className="p-6 space-y-6">
-        <div className="grid grid-cols-4 gap-4">
+      <div className="p-4 sm:p-6 space-y-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
             <div className="text-2xl font-display font-semibold text-slate-900">
               {data.totalInstalls.toLocaleString()}

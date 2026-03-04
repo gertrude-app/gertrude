@@ -32,21 +32,24 @@ const Pagination: React.FC<PaginationProps> = ({
     <button
       onClick={() => onPageChange(currentPage - 1)}
       disabled={currentPage <= 1}
-      className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+      className="p-1.5 sm:p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
     >
-      <ChevronLeftIcon className="w-5 h-5" />
+      <ChevronLeftIcon className="w-4 h-4 sm:w-5 sm:h-5" />
     </button>
-    <div className="flex items-center gap-1 px-2">
+    <div className="flex items-center gap-0.5 sm:gap-1 px-1 sm:px-2">
       {getPageNumbers(currentPage, totalPages).map((pageNum, idx) =>
         pageNum === `...` ? (
-          <span key={`ellipsis-${idx}`} className="px-2 text-slate-400">
+          <span
+            key={`ellipsis-${idx}`}
+            className="px-1 sm:px-2 text-slate-400 text-xs sm:text-sm"
+          >
             ...
           </span>
         ) : (
           <button
             key={pageNum}
             onClick={() => onPageChange(pageNum as number)}
-            className={`min-w-[36px] h-9 px-3 rounded-lg text-sm font-medium transition-all ${
+            className={`min-w-[28px] h-7 px-2 sm:min-w-[36px] sm:h-9 sm:px-3 rounded-lg text-xs sm:text-sm font-medium transition-all ${
               pageNum === currentPage
                 ? `bg-gradient-to-r from-brand-violet to-brand-fuchsia text-white shadow-sm`
                 : `text-slate-600 hover:bg-slate-100`
@@ -60,9 +63,9 @@ const Pagination: React.FC<PaginationProps> = ({
     <button
       onClick={() => onPageChange(currentPage + 1)}
       disabled={currentPage >= totalPages}
-      className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+      className="p-1.5 sm:p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
     >
-      <ChevronRightIcon className="w-5 h-5" />
+      <ChevronRightIcon className="w-4 h-4 sm:w-5 sm:h-5" />
     </button>
   </div>
 );

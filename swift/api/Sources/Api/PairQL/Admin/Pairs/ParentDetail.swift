@@ -40,6 +40,7 @@ struct ParentDetail: Pair {
     var iosVersion: String
     var appVersion: String
     var supervisionStatus: String?
+    var lastCheckin: Date?
     var createdAt: Date
   }
 
@@ -127,6 +128,13 @@ extension ParentDetail: Resolver {
         } else {
           nil
         }
+        let lastCheckin = try await IOSEvent.query()
+          .where(.deviceId == device.id.rawValue)
+          .where(.kind == "checkin")
+          .orderBy(.createdAt, .desc)
+          .limit(1)
+          .all(in: context.db)
+          .first
         iosDeviceOutputs.append(IOSDeviceOutput(
           id: device.id,
           modelName: device.modelName,
@@ -134,6 +142,7 @@ extension ParentDetail: Resolver {
           iosVersion: device.iosVersion,
           appVersion: device.appVersion,
           supervisionStatus: status,
+          lastCheckin: lastCheckin?.createdAt,
           createdAt: device.createdAt,
         ))
       }

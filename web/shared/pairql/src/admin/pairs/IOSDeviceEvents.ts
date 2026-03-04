@@ -10,6 +10,7 @@ export namespace IOSDeviceEvents {
     deviceType: string;
     iosVersion: string;
     firstLaunch?: ISODateString;
+    lastCheckin?: ISODateString;
     reachedOptOut: boolean;
     prevVendorId?: UUID;
     nextVendorId?: UUID;

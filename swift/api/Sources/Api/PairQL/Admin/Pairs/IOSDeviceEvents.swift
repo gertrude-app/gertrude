@@ -15,9 +15,10 @@ struct IOSDeviceEvents: Pair {
     var deviceType: String
     var iosVersion: String
     var firstLaunch: Date?
+    var lastCheckin: Date?
     var reachedOptOut: Bool
-    var prevVendorId: UUID?
-    var nextVendorId: UUID?
+    var prevVendorId: IOSApp.Device.Id?
+    var nextVendorId: IOSApp.Device.Id?
     var events: [Event]
   }
 
@@ -43,14 +44,15 @@ extension IOSDeviceEvents: Resolver {
     }
 
     let firstLaunch = events.first { $0.eventId == "8d35f043" }
+    let lastCheckin = events.last { $0.kind == .checkin }
     let reachedOptOut = events.contains { $0.eventId == "cdb31095" }
     let modelIdentifier = firstLaunch?.modelIdentifier ?? events.first?.modelIdentifier ?? "Unknown"
     let modelName = ModelIdentifier.marketingName(for: modelIdentifier)
     let deviceType = ModelIdentifier.deviceType(from: modelIdentifier)
     let iosVersion = firstLaunch?.iosVersion ?? events.first?.iosVersion ?? "Unknown"
 
-    var prevVendorId: UUID?
-    var nextVendorId: UUID?
+    var prevVendorId: IOSApp.Device.Id?
+    var nextVendorId: IOSApp.Device.Id?
     if let firstLaunchDate = firstLaunch?.createdAt {
       if let prev = try? await IOSEvent.query()
         .where(.eventId == "8d35f043")
@@ -58,7 +60,7 @@ extension IOSDeviceEvents: Resolver {
         .where(.createdAt >= firstLaunchDate)
         .orderBy(.createdAt, .asc)
         .first(in: context.db) {
-        prevVendorId = prev.deviceId?.rawValue
+        prevVendorId = prev.deviceId
       }
       if let next = try? await IOSEvent.query()
         .where(.eventId == "8d35f043")
@@ -66,7 +68,7 @@ extension IOSDeviceEvents: Resolver {
         .where(.createdAt <= firstLaunchDate)
         .orderBy(.createdAt, .desc)
         .first(in: context.db) {
-        nextVendorId = next.deviceId?.rawValue
+        nextVendorId = next.deviceId
       }
     }
 
@@ -95,6 +97,7 @@ extension IOSDeviceEvents: Resolver {
       deviceType: deviceType,
       iosVersion: iosVersion,
       firstLaunch: firstLaunch?.createdAt,
+      lastCheckin: lastCheckin?.createdAt,
       reachedOptOut: reachedOptOut,
       prevVendorId: prevVendorId,
       nextVendorId: nextVendorId,
@@ -316,6 +319,7 @@ extension IOSDeviceEvents: Resolver {
     case "d9e93a4b": "⚠ No vendor id on opt out"
     case "ffff30ac": "⚠ Missing rules after opt-out"
     case "7c039b10": "⚠ Unhandled button action"
+    case "b977cfdc": "Check-in"
     case "180e2347": "Handling upgrade"
     // --- Legacy (old app versions, no longer emitted) ---
     case "dcd721aa": "🚀 First launch"

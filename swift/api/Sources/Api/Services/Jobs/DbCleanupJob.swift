@@ -92,6 +92,13 @@ struct CleanupJob: AsyncScheduledJob {
 
     logs.append("Deleted \(smokeAdmins) smoke test admin accounts")
 
+    let checkinEvents = try await IOSEvent.query()
+      .where(.kind == "checkin")
+      .where(.createdAt < 14.daysAgo)
+      .delete(in: self.db)
+
+    logs.append("Deleted \(checkinEvents) iOS check-in events")
+
     await self.db.notifyDeprecationComplete(
       if: "BlockRules(v1)",
       notLoggedWithinLast: .days(90),

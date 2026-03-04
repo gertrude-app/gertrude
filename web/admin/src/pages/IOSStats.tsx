@@ -140,19 +140,26 @@ const IOSStats: React.FC = () => {
               color: `bg-slate-300`,
             },
           ].map((item) => (
-            <div key={item.label} className="flex items-center gap-4">
-              <div className="w-64 text-sm text-slate-700">{item.label}</div>
-              <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${item.color} rounded-full`}
-                  style={{ width: `${item.pct}%` }}
-                />
-              </div>
-              <div className="flex gap-2">
-                <div className="w-14 text-right text-sm font-medium text-slate-900">
-                  {item.count.toLocaleString()}
+            <div
+              key={item.label}
+              className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:gap-4"
+            >
+              <div className="sm:w-64 text-sm text-slate-700">{item.label}</div>
+              <div className="flex items-center gap-2 sm:gap-4 sm:flex-1">
+                <div className="flex-1 h-5 sm:h-6 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${item.color} rounded-full`}
+                    style={{ width: `${item.pct}%` }}
+                  />
                 </div>
-                <div className="w-12 text-right text-sm text-slate-400">{item.pct}%</div>
+                <div className="flex gap-2 shrink-0">
+                  <div className="w-10 sm:w-14 text-right text-sm font-medium text-slate-900">
+                    {item.count.toLocaleString()}
+                  </div>
+                  <div className="w-12 text-right text-sm text-slate-400">
+                    {item.pct}%
+                  </div>
+                </div>
               </div>
             </div>
           ))}
@@ -228,7 +235,7 @@ const IOSStats: React.FC = () => {
       </Section>
 
       <Section title="Supervision Pipeline">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 mb-4">
           <StatCard
             label="Total Claims"
             value={data.supervision.totalClaims}
@@ -315,7 +322,7 @@ const IOSStats: React.FC = () => {
       </Section>
 
       <Section title="18+ Account Impact">
-        <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
           <StatCard
             label="Stuck in Major Path"
             value={data.outcomes.stuckIn18Plus.count}
@@ -425,17 +432,17 @@ const IOSStats: React.FC = () => {
             return data.topIOSVersions.map((v) => {
               const pct = (v.count / totalCount) * 100;
               return (
-                <div key={v.version} className="flex items-center gap-4">
-                  <div className="w-20 text-sm font-medium text-slate-700">
+                <div key={v.version} className="flex items-center gap-2 sm:gap-4">
+                  <div className="w-16 sm:w-20 text-xs sm:text-sm font-medium text-slate-700 shrink-0">
                     iOS {v.version}
                   </div>
-                  <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="flex-1 h-5 sm:h-6 bg-slate-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-sky-400 to-blue-500 rounded-full"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <div className="w-28 text-right text-sm font-medium text-slate-900">
+                  <div className="w-20 sm:w-28 text-right text-xs sm:text-sm font-medium text-slate-900 shrink-0">
                     {v.count.toLocaleString()} ({pct.toFixed(1)}%)
                   </div>
                 </div>
@@ -452,14 +459,18 @@ const IOSStats: React.FC = () => {
               i > 0 ? (data.funnelEvents[i - 1]?.count ?? e.count) : e.count;
             const dropoff = prevCount > 0 ? ((prevCount - e.count) / prevCount) * 100 : 0;
             return (
-              <div key={e.id} className="flex items-center gap-4">
-                <code className="text-xs text-slate-400 w-20">{e.id}</code>
-                <div className="flex-1 text-sm text-slate-700">{e.name}</div>
-                <div className="w-24 text-right text-sm font-medium text-slate-900">
+              <div key={e.id} className="flex items-center gap-2 sm:gap-4">
+                <code className="text-xs text-slate-400 w-16 sm:w-20 shrink-0">
+                  {e.id}
+                </code>
+                <div className="flex-1 text-xs sm:text-sm text-slate-700 min-w-0 truncate">
+                  {e.name}
+                </div>
+                <div className="w-16 sm:w-24 text-right text-xs sm:text-sm font-medium text-slate-900 shrink-0">
                   {e.count.toLocaleString()}
                 </div>
                 {i > 0 && dropoff > 0 && (
-                  <div className="w-20 text-right text-xs text-red-500">
+                  <div className="w-14 sm:w-20 text-right text-xs text-red-500 shrink-0">
                     -{dropoff.toFixed(1)}%
                   </div>
                 )}
@@ -475,10 +486,14 @@ const IOSStats: React.FC = () => {
             {[...data.dropoffEvents]
               .sort((a, b) => b.count - a.count)
               .map((e) => (
-                <div key={e.id} className="flex items-center gap-4">
-                  <code className="text-xs text-slate-400 w-20">{e.id}</code>
-                  <div className="flex-1 text-sm text-slate-700">{e.name}</div>
-                  <div className="w-20 text-right text-sm font-medium text-slate-900">
+                <div key={e.id} className="flex items-center gap-2 sm:gap-4">
+                  <code className="text-xs text-slate-400 w-16 sm:w-20 shrink-0">
+                    {e.id}
+                  </code>
+                  <div className="flex-1 text-xs sm:text-sm text-slate-700 min-w-0 truncate">
+                    {e.name}
+                  </div>
+                  <div className="w-14 sm:w-20 text-right text-xs sm:text-sm font-medium text-slate-900 shrink-0">
                     {e.count.toLocaleString()}
                   </div>
                 </div>
@@ -491,10 +506,14 @@ const IOSStats: React.FC = () => {
             {[...data.errorEvents]
               .sort((a, b) => b.count - a.count)
               .map((e) => (
-                <div key={e.id} className="flex items-center gap-4">
-                  <code className="text-xs text-slate-400 w-20">{e.id}</code>
-                  <div className="flex-1 text-sm text-slate-700">{e.name}</div>
-                  <div className="w-20 text-right text-sm font-medium text-red-500">
+                <div key={e.id} className="flex items-center gap-2 sm:gap-4">
+                  <code className="text-xs text-slate-400 w-16 sm:w-20 shrink-0">
+                    {e.id}
+                  </code>
+                  <div className="flex-1 text-xs sm:text-sm text-slate-700 min-w-0 truncate">
+                    {e.name}
+                  </div>
+                  <div className="w-14 sm:w-20 text-right text-xs sm:text-sm font-medium text-red-500 shrink-0">
                     {e.count.toLocaleString()}
                   </div>
                 </div>

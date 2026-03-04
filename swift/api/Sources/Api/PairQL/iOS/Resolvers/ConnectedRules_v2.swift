@@ -1,4 +1,7 @@
+import Crypto
+import Dependencies
 import DuetSQL
+import GertieIOS
 import IOSRoute
 
 extension ConnectedRules_v2: Resolver {
@@ -12,6 +15,21 @@ extension ConnectedRules_v2: Resolver {
       .orderBy(.id, .asc)
       .all(in: ctx.db)
       .map(\.rule)
+
+    let rulesHash = iosBlockRulesHash(blockRules)
+    let deviceId = ctx.device.id.lowercased
+    with(dependency: \.logger).info(
+      "ConnectedRules_v2: device=\(deviceId), rules=\(blockRules.count), hash=\(rulesHash)",
+    )
+
+    _ = try? await ctx.db.create(IOSEvent(
+      eventId: "b977cfdc",
+      kind: .checkin,
+      detail: "rules=\(blockRules.count), hash=\(rulesHash)",
+      deviceId: ctx.device.id,
+      modelIdentifier: input.modelIdentifier,
+      iosVersion: input.iosVersion,
+    ))
 
     var device = ctx.device
     if device.shouldUpdateModelIdentifier(to: input.modelIdentifier) {
@@ -32,4 +50,10 @@ extension ConnectedRules_v2: Resolver {
       webPolicy: nil,
     )
   }
+}
+
+func iosBlockRulesHash(_ rules: [GertieIOS.BlockRule]) -> String {
+  let data = try! JSONEncoder().encode(rules)
+  let digest = SHA256.hash(data: data)
+  return digest.prefix(4).map { String(format: "%02x", $0) }.joined()
 }

@@ -76,8 +76,8 @@ const PodcastInstallsList: React.FC = () => {
         />
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-        <table className="w-full">
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-x-auto">
+        <table className="w-full min-w-[640px]">
           <thead>
             <tr className="border-b border-slate-100">
               <th className="text-left pl-5 pr-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-28">

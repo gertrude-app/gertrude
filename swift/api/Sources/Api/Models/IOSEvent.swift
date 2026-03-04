@@ -36,5 +36,6 @@ extension IOSEvent {
     case filter
     case error
     case supervision
+    case checkin
   }
 }

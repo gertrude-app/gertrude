@@ -32,11 +32,11 @@ const BreakdownBar: React.FC<BreakdownBarProps> = ({ title, total, segments }) =
           />
         ))}
       </div>
-      <div className="flex justify-between mt-3 text-sm">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm">
         {segments.map((segment, index) => (
-          <div key={segment.label} className="flex items-center gap-2">
+          <div key={segment.label} className="flex items-center gap-1.5">
             <div
-              className={`w-3 h-3 rounded-full bg-gradient-to-r ${segment.gradient}`}
+              className={`w-3 h-3 rounded-full bg-gradient-to-r ${segment.gradient} shrink-0`}
             />
             <span className="text-slate-600">
               {segment.label} ({segment.value.toLocaleString()} ·{` `}

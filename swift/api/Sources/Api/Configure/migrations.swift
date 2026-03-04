@@ -72,6 +72,7 @@ extension Configure {
     app.migrations.add(BlockGroupLongDescriptions())
     app.migrations.add(DropParentDeletedAt())
     app.migrations.add(IOSDeviceRestrictionToggles())
+    app.migrations.add(IOSEventCheckinKind())
   }
 }
 
