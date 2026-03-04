@@ -51,6 +51,15 @@ extension LogIOSEvent_v2: Resolver {
       await get(dependency: \.slack).internal(.iosOnboarding, message)
     }
 
+    if context.env.mode == .prod, input.eventId == "84555fc8" {
+      var message = "*iOS Self-Management Dead End*"
+      if let vendorId = input.vendorId {
+        let events = AdminLink().slack(to: .iosDeviceEvents(vendorId: vendorId), text: "see events")
+        message += " \(events)"
+      }
+      await get(dependency: \.slack).internal(.iosOnboarding, message)
+    }
+
     if context.env.mode == .prod, input.eventId == "7c039b10" {
       let device = "`\(input.modelName)`, iOS `\(input.iOSVersion)`, app `\(input.appVersion)`"
       let eventDetail = detail ?? "(no detail)"

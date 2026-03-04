@@ -110,9 +110,13 @@ enum StripeEventsRoute {
         try await request.context.db.update(subscription)
         Task {
           let parent = try await request.context.db.find(subscription.parentId) as Parent
-          let link = AdminLink().slack(to: .parent(parent.id), text: parent.email.rawValue)
+          let adminLink = AdminLink()
+          let slackLink = adminLink.slack(to: .parent(parent.id), text: parent.email.rawValue)
+          let emailLink = adminLink.email(to: .parent(parent.id), text: parent.email.rawValue)
           await get(dependency: \.slack)
-            .internal(.info, "*Subscription cancelled* by \(link)")
+            .internal(.info, "*Subscription cancelled* by \(slackLink)")
+          get(dependency: \.postmark)
+            .toSuperAdmin("Subscription Cancelled", "by \(emailLink)")
         }
       } else {
         unexpected("a7c3d1e5", detail: "stripe sub id: \(stripeSubId), event: \(stripeEvent.id)")
