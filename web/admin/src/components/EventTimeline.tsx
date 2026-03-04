@@ -37,7 +37,7 @@ const EventTimeline: React.FC<EventTimelineProps> = ({
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-      <div className="px-6 py-4 border-b border-slate-100">
+      <div className="px-4 sm:px-6 py-4 border-b border-slate-100">
         <h2 className="font-display font-medium text-slate-900">
           Event Timeline ({events.length} events)
         </h2>
@@ -45,7 +45,7 @@ const EventTimeline: React.FC<EventTimelineProps> = ({
 
       <div className="divide-y divide-slate-100">
         {Array.from(eventGroups.entries()).map(([dateKey, groupEvents]) => (
-          <div key={dateKey} className="px-6 py-4">
+          <div key={dateKey} className="px-4 sm:px-6 py-4">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-2 h-2 rounded-full bg-slate-400" />
               <span className="text-sm font-medium text-slate-700">
@@ -65,22 +65,22 @@ const EventTimeline: React.FC<EventTimelineProps> = ({
                       className={`absolute -left-[21px] w-3 h-3 rounded-full ${getEventColor(event)} ring-2 ring-white`}
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline gap-2">
-                        <code className="text-sm text-slate-400 font-mono">
+                      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                        <code className="text-xs sm:text-sm text-slate-400 font-mono">
                           {formatTime(event.createdAt)}
                         </code>
                         <a
                           href={`https://github.com/search?q=repo%3Agertrude-app%2Fgertrude%20${event.eventId}&type=code`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-violet-400 hover:text-violet-600 font-mono transition-colors"
+                          className="text-xs sm:text-sm text-violet-400 hover:text-violet-600 font-mono transition-colors"
                         >
                           {event.eventId}
                         </a>
                         {renderEventMeta?.(event)}
                         {event.elapsedSeconds !== undefined &&
                           event.elapsedSeconds !== null && (
-                            <span className="text-sm text-slate-400 font-mono">
+                            <span className="text-xs sm:text-sm text-slate-400 font-mono">
                               {formatElapsed(event.elapsedSeconds)}
                             </span>
                           )}

@@ -82,34 +82,36 @@ const ParentDetail: React.FC = () => {
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-        <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-start">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-violet to-brand-fuchsia flex items-center justify-center shadow-lg shadow-brand-violet/20">
-              <UserIcon className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1">
-                <h1 className="text-xl font-display font-semibold text-slate-900 tracking-tight">
-                  {data.email}
-                </h1>
-                <CopyButton text={data.email} />
+        <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-brand-violet to-brand-fuchsia flex items-center justify-center shadow-lg shadow-brand-violet/20 shrink-0">
+                <UserIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <div className="flex items-center gap-1 mt-0.5">
-                <p className="text-sm text-slate-500 font-mono">
-                  {data.id.toLowerCase()}
-                </p>
-                <CopyButton text={data.id.toLowerCase()} />
+              <div className="min-w-0">
+                <div className="flex items-center gap-1">
+                  <h1 className="text-lg sm:text-xl font-display font-semibold text-slate-900 tracking-tight truncate">
+                    {data.email}
+                  </h1>
+                  <CopyButton text={data.email} />
+                </div>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <p className="text-xs sm:text-sm text-slate-500 font-mono truncate">
+                    {data.id.toLowerCase()}
+                  </p>
+                  <CopyButton text={data.id.toLowerCase()} />
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <IOSBadge children={data.children} />
-            <StatusBadge status={data.status} size="md" />
+            <div className="flex items-center gap-2 shrink-0">
+              <IOSBadge children={data.children} />
+              <StatusBadge status={data.status} size="md" />
+            </div>
           </div>
         </div>
 
-        <div className="p-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="p-4 sm:p-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
             <PlanCard plan={data.plan} />
             <InfoCard label="Billing" value={planBillingLabel(data.plan)} />
             <InfoCard label="Children" value={data.children.length.toString()} />
@@ -137,7 +139,7 @@ const ParentDetail: React.FC = () => {
       </div>
 
       <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-        <div className="px-6 py-5 border-b border-slate-100">
+        <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-sky-100 flex items-center justify-center">
               <UsersIcon className="w-5 h-5 text-sky-600" />
@@ -150,7 +152,7 @@ const ParentDetail: React.FC = () => {
             </h2>
           </div>
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {data.children.length === 0 ? (
             <p className="text-slate-500 text-center py-4">No children configured</p>
           ) : (
@@ -160,12 +162,12 @@ const ParentDetail: React.FC = () => {
                   key={child.id}
                   className="border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-colors"
                 >
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center shrink-0">
                         <UserIcon className="w-[18px] h-[18px] text-sky-600" />
                       </div>
-                      <h3 className="font-display font-semibold text-slate-900 text-xl">
+                      <h3 className="font-display font-semibold text-slate-900 text-lg sm:text-xl">
                         {child.name}
                       </h3>
                       <CopyLinkButton childId={child.id} />
@@ -196,9 +198,9 @@ const ParentDetail: React.FC = () => {
                         {child.installations.map((install) => (
                           <div
                             key={install.id}
-                            className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex gap-4"
+                            className="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-100 flex gap-3 sm:gap-4"
                           >
-                            <div className="flex-shrink-0 w-20 h-20 bg-white rounded-lg border border-slate-200 flex items-center justify-center p-2">
+                            <div className="flex-shrink-0 w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-lg border border-slate-200 flex items-center justify-center p-1.5 sm:p-2">
                               <img
                                 src={`https://parents.gertrude.app/macs/${install.modelIdentifier}.png`}
                                 alt={install.modelTitle}
@@ -209,11 +211,11 @@ const ParentDetail: React.FC = () => {
                               />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="flex justify-between items-start gap-2">
+                              <div className="sm:flex sm:justify-between sm:items-start sm:gap-2">
                                 <span className="font-medium text-slate-900">
                                   {install.modelTitle}
                                 </span>
-                                <span className="text-xs text-slate-400 flex-shrink-0">
+                                <span className="text-xs text-slate-400 block mt-0.5 sm:mt-0 sm:flex-shrink-0">
                                   {formatDate(install.createdAt)}
                                 </span>
                               </div>
@@ -249,9 +251,9 @@ const ParentDetail: React.FC = () => {
                           <Link
                             key={device.id}
                             to={`/ios/${device.id.toLowerCase()}/events`}
-                            className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex gap-4 hover:bg-slate-100 hover:border-slate-200 transition-colors"
+                            className="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-100 flex gap-3 sm:gap-4 hover:bg-slate-100 hover:border-slate-200 transition-colors"
                           >
-                            <div className="flex-shrink-0 w-20 h-20 bg-white rounded-lg border border-slate-200 flex items-center justify-center p-2">
+                            <div className="flex-shrink-0 w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-lg border border-slate-200 flex items-center justify-center p-1.5 sm:p-2">
                               <img
                                 src={`https://parents.gertrude.app/ios/${device.modelIdentifier.startsWith(`iPad`) ? `iPad` : `iPhone`}.png`}
                                 alt={device.modelName}
@@ -262,11 +264,11 @@ const ParentDetail: React.FC = () => {
                               />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="flex justify-between items-start gap-2">
+                              <div className="sm:flex sm:justify-between sm:items-start sm:gap-2">
                                 <span className="font-medium text-slate-900">
                                   {device.modelName}
                                 </span>
-                                <div className="flex items-center gap-2 flex-shrink-0">
+                                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 sm:mt-0 sm:flex-shrink-0">
                                   {device.supervisionStatus && (
                                     <SupervisionBadge status={device.supervisionStatus} />
                                   )}
@@ -332,7 +334,7 @@ const ParentDetail: React.FC = () => {
       </section>
 
       <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-        <div className="px-6 py-5 border-b border-slate-100">
+        <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-violet-100 flex items-center justify-center">
               <KeyIcon className="w-5 h-5 text-violet-600" />
@@ -345,11 +347,11 @@ const ParentDetail: React.FC = () => {
             </h2>
           </div>
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {data.keychains.length === 0 ? (
             <p className="text-slate-500 text-center py-4">No keychains configured</p>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
               {data.keychains.map((keychain) => (
                 <div
                   key={keychain.id}
@@ -374,7 +376,7 @@ const ParentDetail: React.FC = () => {
       </section>
 
       <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-        <div className="px-6 py-5 border-b border-slate-100">
+        <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center">
               <BellIcon className="w-5 h-5 text-emerald-600" />
@@ -387,7 +389,7 @@ const ParentDetail: React.FC = () => {
             </h2>
           </div>
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {data.notifications.length === 0 ? (
             <p className="text-slate-500 text-center py-4">No notifications configured</p>
           ) : (
@@ -406,7 +408,7 @@ const ParentDetail: React.FC = () => {
       </section>
 
       <section className="bg-white rounded-2xl border border-red-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-5 border-b border-red-100">
+        <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-red-100">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-red-100 flex items-center justify-center">
               <AlertCircleIcon className="w-5 h-5 text-red-600" />
@@ -416,8 +418,8 @@ const ParentDetail: React.FC = () => {
             </h2>
           </div>
         </div>
-        <div className="p-6">
-          <div className="flex items-center justify-between">
+        <div className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <h3 className="font-medium text-slate-900">Delete this parent</h3>
               <p className="text-sm text-slate-500 mt-1">
@@ -427,7 +429,7 @@ const ParentDetail: React.FC = () => {
             </div>
             <button
               onClick={() => setShowDeleteModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors self-start sm:self-auto shrink-0"
             >
               <TrashIcon className="w-4 h-4" />
               Delete Parent

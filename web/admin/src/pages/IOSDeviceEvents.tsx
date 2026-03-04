@@ -148,7 +148,8 @@ const IOSDeviceEvents: React.FC = () => {
             )}
             {data.lastCheckin ? (
               <span className="text-xs text-slate-400">
-                Last check-in: <span className="text-purple-400">{timeAgo(data.lastCheckin)}</span>
+                Last check-in:{` `}
+                <span className="text-purple-400">{timeAgo(data.lastCheckin)}</span>
               </span>
             ) : (
               <span className="text-xs text-slate-300">No check-ins yet</span>

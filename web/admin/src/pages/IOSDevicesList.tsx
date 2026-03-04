@@ -76,26 +76,26 @@ const IOSDevicesList: React.FC = () => {
         />
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-slate-100">
-              <th className="text-left pl-5 pr-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-28">
-                Device ID
+              <th className="text-left pl-5 pr-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider sm:w-28">
+                <span className="hidden sm:inline">Device </span>ID
               </th>
               <th className="text-left px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-24">
                 Status
               </th>
-              <th className="text-left px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-20">
+              <th className="text-left px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-20 hidden sm:table-cell">
                 Events
               </th>
-              <th className="text-left px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-16">
+              <th className="text-left px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-16 hidden sm:table-cell">
                 iOS
               </th>
               <th className="text-left px-4 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Device
               </th>
-              <th className="text-right pl-4 pr-5 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-40">
+              <th className="text-right pl-4 pr-5 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-40 hidden sm:table-cell">
                 First Launch
               </th>
             </tr>
@@ -108,14 +108,14 @@ const IOSDevicesList: React.FC = () => {
                 className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
               >
                 <td className="pl-5 pr-4 py-4">
-                  <code className="text-sky-600 group-hover:text-blue-600 font-mono text-sm transition-colors">
+                  <code className="text-sky-600 group-hover:text-blue-600 font-mono text-xs sm:text-sm transition-colors inline-block max-w-[4ch] sm:max-w-none overflow-hidden">
                     {device.vendorId.slice(0, 8).toLowerCase()}
                   </code>
                 </td>
                 <td className="px-4 py-4">
                   <DeviceStatusBadge status={device.status} />
                 </td>
-                <td className="px-4 py-4">
+                <td className="px-4 py-4 hidden sm:table-cell">
                   <span
                     className={`inline-flex items-center justify-center w-8 h-7 rounded-lg text-sm font-medium ${
                       device.eventCount > 10
@@ -126,8 +126,10 @@ const IOSDevicesList: React.FC = () => {
                     {device.eventCount}
                   </span>
                 </td>
-                <td className="px-4 py-4 text-sm text-slate-500">{device.iosVersion}</td>
-                <td className="px-4 py-4 text-sm text-slate-700">
+                <td className="px-4 py-4 text-sm text-slate-500 hidden sm:table-cell">
+                  {device.iosVersion}
+                </td>
+                <td className="px-4 py-4 text-xs sm:text-sm text-slate-700">
                   <span className="inline-flex items-center gap-1.5">
                     {device.deviceType.toLowerCase().includes(`ipad`) ? (
                       <IPadIcon className="w-4 h-4 text-violet-400" />
@@ -137,7 +139,7 @@ const IOSDevicesList: React.FC = () => {
                     {device.modelName}
                   </span>
                 </td>
-                <td className="pl-4 pr-5 py-4 text-sm text-slate-500 text-right whitespace-nowrap">
+                <td className="pl-4 pr-5 py-4 text-sm text-slate-500 text-right whitespace-nowrap hidden sm:table-cell">
                   {formatDateTime(device.firstLaunch)}
                 </td>
               </tr>
@@ -178,7 +180,7 @@ const DeviceStatusBadge: React.FC<{ status: string }> = ({ status }) => {
   const config = STATUS_CONFIG[status] ?? fallback;
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${config.bg} ${config.text}`}
+      className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium whitespace-nowrap ${config.bg} ${config.text}`}
     >
       {config.label}
     </span>

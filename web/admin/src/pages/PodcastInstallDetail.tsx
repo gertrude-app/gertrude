@@ -120,7 +120,7 @@ const PodcastInstallDetail: React.FC = () => {
 
       {data.subscribedFeeds.length > 0 && (
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100">
+          <div className="px-4 sm:px-6 py-4 border-b border-slate-100">
             <h2 className="font-display font-medium text-slate-900">
               Subscribed Feeds ({data.subscribedFeeds.length})
             </h2>
@@ -132,7 +132,7 @@ const PodcastInstallDetail: React.FC = () => {
                 href={feed.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 px-6 py-3 hover:bg-emerald-50 transition-colors group"
+                className="flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 hover:bg-emerald-50 transition-colors group"
               >
                 <span className="text-sm text-slate-400 whitespace-nowrap">
                   {formatDate(feed.subscribedAt)}

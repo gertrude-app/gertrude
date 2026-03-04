@@ -25,8 +25,8 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, subvalue, highlight }
   const subClass = highlight ? `text-white/80` : `text-slate-500`;
 
   return (
-    <div className={`rounded-xl p-4 ${bgClass}`}>
-      <div className={`text-2xl font-display font-semibold ${textClass}`}>
+    <div className={`rounded-xl p-3 sm:p-4 ${bgClass}`}>
+      <div className={`text-xl sm:text-2xl font-display font-semibold ${textClass}`}>
         {typeof value === `number` ? value.toLocaleString() : value}
       </div>
       {subvalue && <div className={`text-sm ${subClass}`}>{subvalue}</div>}

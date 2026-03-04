@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type TimespanOption = `week` | `month` | `3 months` | `6 months` | `year`;
 
@@ -39,8 +39,29 @@ const TimeSeriesGraph = <T extends DataItem>({
 }: TimeSeriesGraphProps<T>): React.ReactElement => {
   const [timespan, setTimespan] = useState<TimespanOption>(`month`);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+
+  useEffect(() => {
+    const onResize = (): void => setIsMobile(window.innerWidth < 640);
+    window.addEventListener(`resize`, onResize);
+    return () => window.removeEventListener(`resize`, onResize);
+  }, []);
 
   const periodConfig = (() => {
+    if (isMobile) {
+      switch (timespan) {
+        case `week`:
+          return { numPeriods: 7, daysPerPeriod: 1 };
+        case `month`:
+          return { numPeriods: 15, daysPerPeriod: 2 };
+        case `3 months`:
+          return { numPeriods: 30, daysPerPeriod: 3 };
+        case `6 months`:
+          return { numPeriods: 30, daysPerPeriod: 6 };
+        case `year`:
+          return { numPeriods: 26, daysPerPeriod: 14 };
+      }
+    }
     switch (timespan) {
       case `week`:
         return { numPeriods: 7, daysPerPeriod: 1 };
@@ -168,7 +189,7 @@ const TimeSeriesGraph = <T extends DataItem>({
         {hoveredData && hoveredIndex !== null && (
           <div
             className={`absolute z-30 bg-white shadow-xl rounded-xl p-4 border border-slate-200 pointer-events-none ${
-              twoColumnTooltip ? `w-96` : `w-56`
+              twoColumnTooltip ? `w-72 sm:w-96` : `w-48 sm:w-56`
             }`}
             style={{
               top: 8,
@@ -223,8 +244,8 @@ const TimeSeriesGraph = <T extends DataItem>({
         )}
       </div>
 
-      <div className="py-4 px-5 flex justify-between items-center gap-4 border-t border-slate-200 bg-white">
-        <div className="flex flex-col">
+      <div className="py-3 sm:py-4 px-4 sm:px-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 border-t border-slate-200 bg-white">
+        <div className="flex items-center sm:items-start gap-3 sm:gap-0 sm:flex-col">
           <span className="text-slate-500 text-sm">
             {thisPeriodCount} {itemLabel}
             {thisPeriodCount !== 1 && `s`}
@@ -238,13 +259,13 @@ const TimeSeriesGraph = <T extends DataItem>({
             {percentChange}%
           </span>
         </div>
-        <div className="flex gap-1 items-center">
+        <div className="flex flex-wrap gap-1 items-center">
           {([`week`, `month`, `3 months`, `6 months`, `year`] as TimespanOption[]).map(
             (option) => (
               <button
                 key={option}
                 onClick={() => setTimespan(option)}
-                className={`capitalize px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                className={`capitalize px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                   timespan === option
                     ? `text-white bg-gradient-to-r ${buttonActiveClasses[gradient]} shadow-md`
                     : `text-slate-500 hover:text-slate-700 hover:bg-slate-100`
@@ -255,7 +276,6 @@ const TimeSeriesGraph = <T extends DataItem>({
             ),
           )}
         </div>
-        <div className="w-32" />
       </div>
     </div>
   );

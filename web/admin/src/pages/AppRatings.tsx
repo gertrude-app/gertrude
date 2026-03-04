@@ -110,7 +110,7 @@ const AppRatings: React.FC = () => {
       </div>
 
       <Section title="Overview">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
           <StatCard label="Total Ratings" value={data.totalCount} />
           <StatCard
             label="Average Rating"
@@ -178,7 +178,9 @@ const RatingItem: React.FC<{ item: T.AppRatings.Output[`items`][number] }> = ({
           <Stars count={item.stars} />
           <span className="text-slate-400">·</span>
           <span className="text-sm text-slate-500">{dateStr}</span>
-          <span className="text-xs text-slate-400">(rating only, no review)</span>
+          <span className="text-xs text-slate-400 hidden sm:inline">
+            (rating only, no review)
+          </span>
         </div>
       </div>
     );
