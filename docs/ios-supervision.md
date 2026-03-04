@@ -104,3 +104,9 @@ tiered model that includes supervision as a key feature of the Light plan.
 
 The tool has a split architecture: React UI in the monorepo (`web/supervise/src/`),
 Rust/Tauri backend in a private repo.
+
+## Planning Archive
+
+Detailed planning documents, task specs (36 tasks), decision logs, and design analysis for
+this feature are archived at
+https://github.com/gertrude-app/ios-supervision-planning
