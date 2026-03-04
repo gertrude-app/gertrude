@@ -177,7 +177,7 @@ const NavButton: React.FC<{ vendorId?: string; direction: `prev` | `next` }> = (
   if (vendorId) {
     return (
       <Link
-        to={`/ios/${vendorId}/events`}
+        to={`/ios/${vendorId.toLowerCase()}/events`}
         className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all"
       >
         {label}
