@@ -5,6 +5,11 @@ export interface DeviceInfo {
   osVersion: string;
 }
 
+export interface ITunesRequiredProps {
+  deviceType: string;
+  onContinue: () => void;
+}
+
 export interface CodeEntryProps {
   code: string;
   onCodeChange: (code: string) => void;
@@ -18,6 +23,7 @@ export interface PersonalizedConnectProps {
   deviceType: string;
   modelName: string;
   iosVersion: string;
+  isWindows?: boolean;
 }
 
 export interface DeviceMismatchProps {

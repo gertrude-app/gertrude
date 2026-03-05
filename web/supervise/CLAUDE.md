@@ -24,8 +24,10 @@ wires these components together.
 ## Workflow
 
 1. Develop UI here with Storybook (`pnpm --filter @storybook/app start`)
-2. Sync to private repo: `cd {path/to}/supervise && just sync-ui`
-3. Run Tauri app: `just dev`
+2. Sync to private repo: `cd web/ && just sync-supervise-ui` (copies `src/` into
+   `~/gertie/supervise/src/generated/supervise/`)
+3. Wire up new screens in the supervise repo's state machine (`~/gertie/supervise/src/`)
+4. Run Tauri app: `cd ~/gertie/supervise && just dev`
 
 ## Storybook
 
