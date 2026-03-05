@@ -80,6 +80,11 @@
 # edit children
 /a-c https://parents.gertrude.app/children 302
 
+####################
+# supervision tool #
+####################
+/itunes https://www.apple.com/itunes/download/win64 302
+
 ###########
 # utility #
 ###########

@@ -13,6 +13,7 @@ const PersonalizedConnect: React.FC<PersonalizedConnectProps> = ({
   deviceType,
   modelName,
   iosVersion,
+  isWindows,
 }) => {
   const [showHint, setShowHint] = React.useState(false);
 
@@ -68,6 +69,9 @@ const PersonalizedConnect: React.FC<PersonalizedConnectProps> = ({
         <span className="font-medium">Trouble connecting?</span> Try a different cable,
         and make sure to plug <em>directly</em> into your computer—not through a dongle or
         adapter.
+        {isWindows && (
+          <> Also make sure iTunes has been installed and opened at least once.</>
+        )}
       </div>
     </InstructionLayout>
   );

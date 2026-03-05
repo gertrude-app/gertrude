@@ -8,6 +8,7 @@ import {
   DisablePrivateRelay,
   Error,
   GetReady,
+  ITunesRequired,
   PersonalizedConnect,
   Supervising,
   SwipeToUpgrade,
@@ -80,6 +81,14 @@ export const CodeEntry_Error: Story = {
         loading={false}
         error="Code not found. Check and try again."
       />
+    </Window>
+  ),
+};
+
+export const Frame_ITunesRequired: Story = {
+  render: () => (
+    <Window>
+      <ITunesRequired deviceType="iPad" onContinue={() => {}} />
     </Window>
   ),
 };
