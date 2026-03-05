@@ -1,10 +1,12 @@
 import ClientInterfaces
 import Dependencies
 import Gertie
+import TSCodable
 
 extension MenuBarFeature.State {
-  enum View: Equatable, Encodable {
-    struct Connected: Equatable, Encodable {
+  @TSCodable
+  enum View: Equatable {
+    struct Connected: Equatable, Codable {
       enum UpdateStatus: String, Equatable, Codable {
         case available
         case nag

@@ -3,6 +3,7 @@ import ComposableArchitecture
 import Core
 import Foundation
 import Gertie
+import TSCodable
 
 struct OnboardingFeature: Feature {
   struct State: Equatable, Encodable, Sendable {
@@ -36,7 +37,8 @@ struct OnboardingFeature: Feature {
   }
 
   enum Action: Equatable, Sendable {
-    enum View: Equatable, Sendable, Decodable {
+    @TSCodable
+    enum View: Equatable, Sendable {
       case closeWindow
       case primaryBtnClicked
       case secondaryBtnClicked

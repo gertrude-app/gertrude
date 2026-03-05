@@ -32,11 +32,18 @@ let package = Package(
     .package(path: "../../x-expect"),
     .package(path: "../../gertie"),
     .package(path: "../../ts-interop"),
+    .package(path: "../../ts-codable-macro"),
   ],
   targets: [
     .checkedTarget(
       name: "App",
-      dependencies: [.tca, "x-kit" => "XCore", "Core", "ClientInterfaces"],
+      dependencies: [
+        .tca,
+        "x-kit" => "XCore",
+        "Core",
+        "ClientInterfaces",
+        "ts-codable-macro" => "TSCodable",
+      ],
     ),
     .checkedTarget(
       name: "ClientInterfaces",

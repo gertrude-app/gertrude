@@ -1,4 +1,5 @@
 {
+  "originHash" : "a2a137b4260f2fc707e15b6d13c4479ffd9fdac552ed0dcd3ea10845aae90d7c",
   "pins" : [
     {
       "identity" : "swift-case-paths",
@@ -37,6 +38,15 @@
       }
     },
     {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-syntax",
+      "state" : {
+        "revision" : "0687f71944021d616d34d922343dcef086855920",
+        "version" : "600.0.1"
+      }
+    },
+    {
       "identity" : "swift-tagged",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jaredh159/swift-tagged.git",
@@ -64,5 +74,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

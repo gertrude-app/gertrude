@@ -1,6 +1,7 @@
 import DuetSQL
 import Foundation
 import PairQL
+import TSCodable
 import Vapor
 
 struct DateRange: PairNestable, PairInput {
@@ -32,6 +33,7 @@ public enum UserActivity {
     var deletedAt: Date?
   }
 
+  @TSCodable
   public enum Item: PairNestable {
     case screenshot(Screenshot)
     case keystrokeLine(CoalescedKeystrokeLine)

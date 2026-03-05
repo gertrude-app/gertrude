@@ -1,3 +1,6 @@
+import TSCodable
+
+@TSCodable
 public enum BlockRule {
   // WARNING: all changes must be carefully synced w/ typescript below!
   case bundleIdContains(value: String)
@@ -29,4 +32,4 @@ public extension BlockRule {
 
 // conformances
 
-extension BlockRule: Equatable, Codable, Sendable, Hashable {}
+extension BlockRule: Equatable, Sendable, Hashable {}

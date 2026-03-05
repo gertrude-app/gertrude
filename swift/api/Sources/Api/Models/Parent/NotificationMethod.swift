@@ -1,4 +1,5 @@
 import Duet
+import TSCodable
 
 extension Parent {
   struct NotificationMethod: Codable, Sendable {
@@ -18,7 +19,8 @@ extension Parent {
 // extensions
 
 extension Parent.NotificationMethod {
-  enum Config: Codable, Equatable, Sendable {
+  @TSCodable
+  enum Config: Equatable, Sendable {
     case slack(channelId: String, channelName: String, token: String)
     case email(email: String)
     case text(phoneNumber: String)

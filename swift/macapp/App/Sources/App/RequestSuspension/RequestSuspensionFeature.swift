@@ -2,6 +2,7 @@ import ClientInterfaces
 import ComposableArchitecture
 import Foundation
 import Gertie
+import TSCodable
 
 struct RequestSuspensionFeature: Feature {
   struct State: Equatable, Encodable {
@@ -21,7 +22,8 @@ struct RequestSuspensionFeature: Feature {
   }
 
   enum Action: Equatable, Sendable {
-    enum View: Equatable, Decodable {
+    @TSCodable
+    enum View: Equatable {
       case closeWindow
       case requestSubmitted(durationInSeconds: Int, comment: String?)
       case requestFailedTryAgainClicked

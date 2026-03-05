@@ -40,7 +40,6 @@ fix:
 
 codegen:
   @just codegen-typescript
-  @just codegen-swift
   @just codegen-macapp-appviews
 
 codegen-macapp:
@@ -48,24 +47,10 @@ codegen-macapp:
   @just swift fix
   @just codegen-macapp-appviews
 
-codegen-swift:
-  @cd swift/macapp/App && CODEGEN_SWIFT=1 swift test --filter Codegen
-  @cd swift/api && CODEGEN_SWIFT=1 swift test --filter Codegen
-  @just swift fix
-
-codegen-api:
-  @cd swift/api && CODEGEN_SWIFT=1 swift test --filter Codegen
-  @just swift fix
-
 codegen-typescript:
   @cd swift/macapp/App && CODEGEN_TYPESCRIPT=1 swift test --filter Codegen
   @just web format
   @just codegen-pairql-ts-clients
-
-codegen-ts-codable-enums:
-  @cd swift/macapp/App && CODEGEN_TS_CODABLE_ENUMS=1 swift test --filter Codegen
-  @cd swift/api && CODEGEN_TS_CODABLE_ENUMS=1 swift test --filter Codegen
-  @just swift fix
 
 codegen-pairql-ts-clients:
   #!/usr/bin/env bash

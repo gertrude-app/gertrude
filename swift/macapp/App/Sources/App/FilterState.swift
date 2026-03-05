@@ -2,8 +2,6 @@ import Dependencies
 import Foundation
 import Gertie
 
-extension FilterState.WithRelativeTimes: Codable {}
-
 extension FilterState.WithTimes {
   init(from state: AppReducer.State) {
     guard case .installedAndRunning = state.filter.extension else {

@@ -67,7 +67,6 @@ require_clean_paths() {
 
 verify_codegen() {
   require_clean_paths swift web/appviews/src web/shared/pairql
-  just codegen-swift
   just codegen-typescript
   if ! git diff --exit-code -- swift web/appviews/src web/shared/pairql web/dash/app/cypress/support/intercept.ts; then
     echo "Codegen output changed. Run the relevant codegen command(s) and commit the results." >&2

@@ -1,12 +1,14 @@
 import DuetSQL
 import Foundation
 import PairQL
+import TSCodable
 import Vapor
 
 struct ClaimIOSDevice: Pair {
   static let auth: ClientAuth = .parent
 
-  enum ChildAssignment: Codable, Equatable, Sendable {
+  @TSCodable
+  enum ChildAssignment: Equatable, Sendable {
     case newChild(name: String)
     case existingChild(id: Child.Id)
   }

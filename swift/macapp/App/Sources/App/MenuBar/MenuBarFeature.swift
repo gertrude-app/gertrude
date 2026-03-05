@@ -1,12 +1,14 @@
 import ComposableArchitecture
 import Foundation
+import TSCodable
 
 enum MenuBarFeature: Feature {
   struct State: Equatable {
     var dropdownOpen = false
   }
 
-  enum Action: Equatable, Decodable, Sendable {
+  @TSCodable
+  enum Action: Equatable, Sendable {
     case menuBarIconClicked
     case resumeFilterClicked
     case suspendFilterClicked

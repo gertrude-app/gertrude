@@ -4,6 +4,7 @@ import Core
 import Foundation
 import Gertie
 import MacAppRoute
+import TSCodable
 
 struct BlockedRequestsFeature: Feature {
   struct State: Equatable, Sendable {
@@ -18,7 +19,8 @@ struct BlockedRequestsFeature: Feature {
   }
 
   enum Action: Equatable, Sendable {
-    enum View: Equatable, Sendable, Decodable {
+    @TSCodable
+    enum View: Equatable, Sendable {
       case filterTextUpdated(text: String)
       case requestFailedTryAgainClicked
       case unlockRequestSubmitted(comment: String?)
