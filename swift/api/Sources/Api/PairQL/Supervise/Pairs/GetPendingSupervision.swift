@@ -75,8 +75,9 @@ extension SuperviseRoute {
 
     let device = try await supervision.device(in: context.db)
     guard let claimedChildId = device.childId else {
-      logIOSUnexpected("\(baseId)-2", "supervision code not yet claimed")
-      throw context.error("\(baseId)-2", .notFound, user: codeNotFound)
+      logIOSUnusual("\(baseId)-2", "supervision code not yet claimed")
+      let msg = "This device hasn't been claimed yet. Complete the claim step in the Gertrude dashboard first."
+      throw context.error("\(baseId)-2", .badRequest, user: msg)
     }
 
     if supervision.claimCodeExpiresAt < get(dependency: \.date.now) {

@@ -22,18 +22,22 @@ extension MarkSupervisionProfileInstalled: NoInputResolver {
       ))
 
       Task {
-        let slack = get(dependency: \.slack)
-        let postmark = get(dependency: \.postmark)
-        let parent = try? await ctx.child.parent(in: ctx.db)
-        let email = parent?.email.rawValue ?? "unknown"
-        let code = supervision.claimCode
-        await slack.internal(
+        let parent = try await ctx.child.parent(in: ctx.db)
+        await get(dependency: \.slack).internal(
           .info,
-          "*iOS supervision complete!* filter confirmed running, code `\(code)`, parent `\(email)`",
+          """
+          *iOS supervision complete!* filter confirmed running
+          Parent: \(parent.adminSiteLink(.slack))
+          Claim code: `\(supervision.claimCode)`
+          """,
         )
-        postmark.toSuperAdmin(
+        get(dependency: \.postmark).toSuperAdmin(
           "iOS Supervision Complete",
-          "Supervision profile installed and filter confirmed running.<br/>Parent: \(email)<br/>Claim code: \(code)",
+          """
+          Supervision profile installed and filter confirmed running.<br/>
+          Parent: \(parent.adminSiteLink(.email))<br/>
+          Claim code: \(supervision.claimCode)
+          """,
         )
       }
     }

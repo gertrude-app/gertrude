@@ -83,4 +83,15 @@ extension Parent {
   func plan(in db: any DuetSQL.Client) async throws -> Plan {
     try await .init(subscription: self.subscription(in: db))
   }
+
+  func adminSiteLink(_ kind: AdminLink.Kind) -> String {
+    switch kind {
+    case .email:
+      AdminLink().email(to: .parent(self.id), text: self.email.rawValue)
+    case .slack:
+      AdminLink().slack(to: .parent(self.id), text: self.email.rawValue)
+    case .url:
+      AdminLink().url(to: .parent(self.id))
+    }
+  }
 }
