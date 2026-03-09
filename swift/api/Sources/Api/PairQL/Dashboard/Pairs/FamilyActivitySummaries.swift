@@ -4,7 +4,7 @@ import PairQL
 struct FamilyActivitySummaries: Pair {
   static let auth: ClientAuth = .parent
   struct Input: PairInput {
-    var jsTimezoneOffsetMinutes: Int
+    var timeZone: String
   }
 
   typealias Output = [ChildActivitySummaries.Day]
@@ -17,7 +17,7 @@ extension FamilyActivitySummaries: Resolver {
     let computerUserIds = try await ctx.computerUsers().map(\.id)
     return try await ChildActivitySummaries.days(
       computerUserIds,
-      input.jsTimezoneOffsetMinutes,
+      input.timeZone,
       in: ctx.db,
     )
   }

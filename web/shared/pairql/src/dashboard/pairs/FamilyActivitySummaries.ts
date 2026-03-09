@@ -1,7 +1,7 @@
 // auto-generated, do not edit
 export namespace FamilyActivitySummaries {
   export interface Input {
-    jsTimezoneOffsetMinutes: number;
+    timeZone: string;
   }
 
   export type Output = Array<{

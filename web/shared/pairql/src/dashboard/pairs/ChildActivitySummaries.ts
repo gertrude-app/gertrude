@@ -2,7 +2,7 @@
 export namespace ChildActivitySummaries {
   export interface Input {
     childId: UUID;
-    jsTimezoneOffsetMinutes: number;
+    timeZone: string;
   }
 
   export interface Output {

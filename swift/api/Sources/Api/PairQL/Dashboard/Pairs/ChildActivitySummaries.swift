@@ -6,7 +6,7 @@ struct ChildActivitySummaries: Pair {
   static let auth: ClientAuth = .parent
   struct Input: PairInput {
     var childId: Child.Id
-    var jsTimezoneOffsetMinutes: Int
+    var timeZone: String
   }
 
   struct Output: PairOutput {
@@ -33,7 +33,7 @@ extension ChildActivitySummaries: Resolver {
     let computerUserIds = try await child.computerUsers(in: context.db).map(\.id)
     let days = try await ChildActivitySummaries.days(
       computerUserIds,
-      input.jsTimezoneOffsetMinutes,
+      input.timeZone,
       in: context.db,
     )
     return .init(childName: child.name, days: days)
@@ -41,16 +41,15 @@ extension ChildActivitySummaries: Resolver {
 
   static func days(
     _ computerUserIds: [ComputerUser.Id],
-    _ jsTimezoneOffsetMinutes: Int,
+    _ timeZoneId: String,
     in db: any Client,
   ) async throws -> [Day] {
     @Dependency(\.date) var date
 
     let twoWeeksAgo = date.now - .days(14)
     var calendar = Calendar.current
-    // NB: js returns timezone offsets as minutes BEHIND UTC, hence negative
-    if let jsTz = TimeZone(secondsFromGMT: -jsTimezoneOffsetMinutes * 60) {
-      calendar.timeZone = jsTz
+    if let tz = TimeZone(identifier: timeZoneId) {
+      calendar.timeZone = tz
     }
 
     let screenshots = try await Screenshot.query()
