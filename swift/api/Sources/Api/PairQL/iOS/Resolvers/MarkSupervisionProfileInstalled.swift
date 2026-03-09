@@ -26,8 +26,9 @@ extension MarkSupervisionProfileInstalled: NoInputResolver {
         await get(dependency: \.slack).internal(
           .info,
           """
-          *iOS supervision complete!* filter confirmed running, \
-          code `\(code)`, parent `\(parent.adminSiteLink(.slack))`
+          *iOS supervision complete!* filter confirmed running
+          Parent: \(parent.adminSiteLink(.slack))
+          Claim code: `\(supervision.claimCode)`
           """,
         )
         get(dependency: \.postmark).toSuperAdmin(

@@ -45,7 +45,7 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
     }.toContain("not found")
   }
 
-  func testCodeNotClaimed_throwsSameErrorAsNotFound() async throws {
+  func testCodeNotClaimed_throwsError() async throws {
     let device = try await self.db.create(IOSApp.Device.random {
       $0.childId = nil
     })
@@ -66,7 +66,7 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
           in: .mock,
         )
       }
-    }.toContain("not found")
+    }.toContain("Complete the claim step in the Gertrude dashboard first")
   }
 
   func testCodeExpired_throwsExpiredError() async throws {
