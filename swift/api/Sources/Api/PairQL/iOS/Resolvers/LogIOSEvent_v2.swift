@@ -57,7 +57,7 @@ extension LogIOSEvent_v2: Resolver {
         let events = AdminLink().slack(to: .iosDeviceEvents(vendorId: vendorId), text: "see events")
         message += " \(events)"
       }
-      await get(dependency: \.slack).internal(.iosOnboarding, message)
+      await get(dependency: \.slack).internal(.info, message)
     }
 
     if context.env.mode == .prod, input.eventId == "7c039b10" {

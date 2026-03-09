@@ -19,6 +19,12 @@ struct AdminLink {
     }
   }
 
+  enum Kind {
+    case url
+    case slack
+    case email
+  }
+
   private let baseUrl: String
 
   init(_ overrideAdminUrl: String? = nil) {

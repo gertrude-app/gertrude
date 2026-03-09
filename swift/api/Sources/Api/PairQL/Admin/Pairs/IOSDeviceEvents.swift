@@ -72,13 +72,14 @@ extension IOSDeviceEvents: Resolver {
       }
     }
 
+    let filteredEvents = events.filter { $0.eventId != "b977cfdc" }
     var outputEvents: [Event] = []
-    for (index, event) in events.enumerated() {
+    for (index, event) in filteredEvents.enumerated() {
       let elapsedSeconds: Int?
       if index == 0 {
         elapsedSeconds = nil
       } else {
-        let previousEvent = events[index - 1]
+        let previousEvent = filteredEvents[index - 1]
         elapsedSeconds = Int(event.createdAt.timeIntervalSince(previousEvent.createdAt))
       }
       outputEvents.append(Event(
