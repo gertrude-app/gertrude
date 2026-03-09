@@ -10,7 +10,7 @@ const ChildActivitySummariesRoute: React.FC = () => {
   const getSummaries = useQuery(Key.childActivitySummaries(userId), () =>
     Current.api.childActivitySummaries({
       childId: userId,
-      jsTimezoneOffsetMinutes: new Date().getTimezoneOffset(),
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     }),
   );
 

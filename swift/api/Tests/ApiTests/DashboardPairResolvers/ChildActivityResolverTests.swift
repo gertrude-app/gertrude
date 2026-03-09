@@ -1,3 +1,4 @@
+import Dependencies
 import XCTest
 import XExpect
 
@@ -129,11 +130,11 @@ final class ChildActivityResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.db.create(keystrokeLine2)
 
     var calendar = Calendar.current
-    calendar.timeZone = TimeZone(secondsFromGMT: TimeZone.current.secondsFromGMT())!
+    calendar.timeZone = TimeZone.current
 
     // test getting the activity overview summaries
     let summary = try await FamilyActivitySummaries.resolve(
-      with: .init(jsTimezoneOffsetMinutes: -(TimeZone.current.secondsFromGMT() / 60)),
+      with: .init(timeZone: TimeZone.current.identifier),
       in: context(child1.parent),
     )
 
@@ -210,6 +211,57 @@ final class ChildActivityResolverTests: ApiTestCase, @unchecked Sendable {
         createdAt: screenshot2.createdAt,
       ))],
     ))
+  }
+
+  @MainActor
+  func testActivitySummariesDSTTransition() async throws {
+    let child = try await self.childWithComputer()
+
+    let eastern = TimeZone(identifier: "America/New_York")!
+    var cal = Calendar.current
+    cal.timeZone = eastern
+
+    // DST spring forward: March 8 2026 at 2:00 AM EST -> 3:00 AM EDT
+    // create a screenshot on Saturday March 7 at 3:00 PM EST (UTC-5)
+    var satScreenshot = Screenshot.mock
+    satScreenshot.computerUserId = child.computerUser.id
+    satScreenshot.createdAt = cal.date(
+      from: DateComponents(year: 2026, month: 3, day: 7, hour: 15),
+    )!
+
+    // create a screenshot on Sunday March 8 at 1:00 PM EDT (UTC-4, after DST)
+    var sunScreenshot = Screenshot.mock
+    sunScreenshot.computerUserId = child.computerUser.id
+    sunScreenshot.createdAt = cal.date(
+      from: DateComponents(year: 2026, month: 3, day: 8, hour: 13),
+    )!
+
+    try await self.db.create([satScreenshot, sunScreenshot])
+
+    let now = cal.date(from: DateComponents(year: 2026, month: 3, day: 9, hour: 10))!
+    let days = try await withDependencies {
+      $0.date = .constant(now)
+    } operation: {
+      try await ChildActivitySummaries.days(
+        [child.computerUser.id],
+        "America/New_York",
+        in: self.db,
+      )
+    }
+
+    expect(days).toHaveCount(2)
+
+    let sunDay = days.first(where: {
+      cal.component(.day, from: $0.date) == 8
+    })
+    let satDay = days.first(where: {
+      cal.component(.day, from: $0.date) == 7
+    })
+
+    expect(sunDay).not.toBeNil()
+    expect(sunDay?.numTotal).toEqual(1)
+    expect(satDay).not.toBeNil()
+    expect(satDay?.numTotal).toEqual(1)
   }
 
   func testDeleteActivityItems_v2() async throws {

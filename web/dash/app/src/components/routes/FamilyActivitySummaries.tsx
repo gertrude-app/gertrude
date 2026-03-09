@@ -6,7 +6,7 @@ import { Key, useQuery } from '../../hooks';
 const FamilyActivitySummariesRoute: React.FC = () => {
   const query = useQuery(Key.familyActivitySummaries, () =>
     Current.api.familyActivitySummaries({
-      jsTimezoneOffsetMinutes: new Date().getTimezoneOffset(),
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     }),
   );
 
