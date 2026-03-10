@@ -14,8 +14,7 @@ let package = Package(
     .package("pointfreeco/swift-dependencies@1.0.0"),
     .package("pointfreeco/swift-concurrency-extras@1.1.0"),
     .package("m-barthelemy/vapor-queues-fluent-driver@3.0.0-beta1"),
-    // fork avoids swift-syntax transitive dep via swift-url-routing -> case-paths
-    .package(url: "https://github.com/gertrude-app/vapor-routing", revision: "8e1028d"),
+    .package(url: "https://github.com/pointfreeco/vapor-routing", from: "0.1.3"),
     .package(path: "../duet"),
     .package(path: "../gertie"),
     .package(path: "../pairql"),

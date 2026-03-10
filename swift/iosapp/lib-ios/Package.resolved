@@ -1,5 +1,5 @@
 {
-  "originHash" : "71cf364df9a9c43b6d883394feb609914302009b3bd296e3a60f3a3650d0d038",
+  "originHash" : "4c2d9f40218f881a8dd657f447c8d5840544e1b387d54271e27e61eae91530a6",
   "pins" : [
     {
       "identity" : "combine-schedulers",
@@ -139,10 +139,10 @@
     {
       "identity" : "swift-url-routing",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/gertrude-app/swift-url-routing",
+      "location" : "https://github.com/pointfreeco/swift-url-routing",
       "state" : {
-        "branch" : "1cf1ca6",
-        "revision" : "1cf1ca67f4a4e442a599473e320049a85cd31588"
+        "revision" : "1cfd564259ecb1d324bb718a8f03e513dab738d2",
+        "version" : "0.6.2"
       }
     },
     {
