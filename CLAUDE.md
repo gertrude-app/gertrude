@@ -69,6 +69,12 @@ Supports all 3 apps, plus dashboard and admin websites
 - Postmark-based email system for transactional emails
 - when working on email templates, read `./docs/templated-emails.md`
 
+## Support docs
+
+- high-level docs describing functionality and features live in `./docs/support/` - if
+  current product understanding and feature semantics is important for the task, start
+  with `./docs/support/product-overview.md` and then read the relevant sub-docs
+
 ## Git operations
 
 - only make git commits when explicity instructed
