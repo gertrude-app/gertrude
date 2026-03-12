@@ -29,6 +29,9 @@ check:
   @cd swift && just check
   @cd web && just check
 
+ci-local:
+  @./scripts/ci-local.sh
+
 fix:
   @cd swift && just fix
   @cd web && just fix
@@ -74,4 +77,3 @@ codegen-pairql-ts-clients:
 
 codegen-macapp-appviews isolate="":
   @cd web/appviews && pnpm typecheck && node generate.mts {{isolate}}
-
