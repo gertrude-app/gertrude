@@ -12,7 +12,7 @@ final class BlockRuleTests: XCTestCase {
       ),
       (
         .flowTypeIs(value: .browser),
-        #"{"case":"flowTypeIs","value":{"browser":{}}}"#,
+        #"{"case":"flowTypeIs","value":"browser"}"#,
       ),
       (
         .both(a: .hostnameEquals(value: "a.com"), b: .targetContains(value: "bad")),
@@ -33,5 +33,31 @@ final class BlockRuleTests: XCTestCase {
       expect(String(data: data, encoding: .utf8)!).toEqual(expected)
       expect(try JSONDecoder().decode(BlockRule.self, from: data)).toEqual(rule)
     }
+  }
+
+  func testFlowTypeDecodesFromStringFormat() throws {
+    let json = Data(#""browser""#.utf8)
+    let decoded = try JSONDecoder().decode(FlowType.self, from: json)
+    expect(decoded).toEqual(.browser)
+  }
+
+  func testFlowTypeDecodesFromLegacyObjectFormat() throws {
+    let json = Data(#"{"browser":{}}"#.utf8)
+    let decoded = try JSONDecoder().decode(FlowType.self, from: json)
+    expect(decoded).toEqual(.browser)
+  }
+
+  func testFlowTypeEncodesAsString() throws {
+    let data = try JSONEncoder().encode(FlowType.browser)
+    expect(String(data: data, encoding: .utf8)!).toEqual(#""browser""#)
+  }
+
+  func testBlockRuleDecodesFlowTypeFromBothFormats() throws {
+    let objectJson = Data(#"{"case":"flowTypeIs","value":{"browser":{}}}"#.utf8)
+    let stringJson = Data(#"{"case":"flowTypeIs","value":"browser"}"#.utf8)
+    expect(try JSONDecoder().decode(BlockRule.self, from: objectJson))
+      .toEqual(.flowTypeIs(value: .browser))
+    expect(try JSONDecoder().decode(BlockRule.self, from: stringJson))
+      .toEqual(.flowTypeIs(value: .browser))
   }
 }

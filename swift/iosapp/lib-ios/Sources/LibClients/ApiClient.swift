@@ -66,7 +66,7 @@ extension ApiClient: DependencyKey {
           throw ApiClient.Error.missingAccountConnection
         }
         let deviceData = await device.data()
-        return try await output(
+        let result = try await output(
           from: ConnectedRules_v2.self,
           with: .connectedRules_v2(.init(
             deviceId: conn.deviceId,
@@ -75,6 +75,8 @@ extension ApiClient: DependencyKey {
             iosVersion: deviceData.iOSVersion,
           )),
         )
+        // context: https://gist.github.com/jaredh159/af45d98eee7f8a33b6b5af945ec23cfc
+        return .init(blockRules: result.blockRules.map(\.current), webPolicy: result.webPolicy)
       },
       fetchBlockRules: { vendorId, disabledGroups in
         let legacyRules = try await output(
