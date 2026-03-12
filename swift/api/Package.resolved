@@ -1,5 +1,5 @@
 {
-  "originHash" : "e82ed29018eb7dce2fa87f817c60fa5932e0aca71ce9efc4dae85ee0debdcf87",
+  "originHash" : "18a16d4fc11d8dc01fca5010219601c533f3f8c421b54cae61daa569f74d8cc8",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -195,8 +195,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "revision" : "5da6989aae464f324eef5c5b52bdb7974725ab81",
-        "version" : "1.0.0"
+        "revision" : "6989976265be3f8d2b5802c722f9ba168e227c71",
+        "version" : "1.7.2"
       }
     },
     {
@@ -357,8 +357,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-parsing",
       "state" : {
-        "revision" : "a0e7d73f462c1c38c59dc40a3969ac40cea42950",
-        "version" : "0.13.0"
+        "revision" : "3432cb81164dd3d69a75d0d63205be5fbae2c34b",
+        "version" : "0.14.1"
       }
     },
     {
@@ -377,6 +377,15 @@
       "state" : {
         "revision" : "1de37290c0ab3c5a96028e0f02911b672fd42348",
         "version" : "2.9.1"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-syntax",
+      "state" : {
+        "revision" : "0687f71944021d616d34d922343dcef086855920",
+        "version" : "600.0.1"
       }
     },
     {
@@ -400,10 +409,10 @@
     {
       "identity" : "swift-url-routing",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/gertrude-app/swift-url-routing",
+      "location" : "https://github.com/pointfreeco/swift-url-routing",
       "state" : {
-        "branch" : "1cf1ca6",
-        "revision" : "1cf1ca67f4a4e442a599473e320049a85cd31588"
+        "revision" : "1cfd564259ecb1d324bb718a8f03e513dab738d2",
+        "version" : "0.6.2"
       }
     },
     {
@@ -427,10 +436,10 @@
     {
       "identity" : "vapor-routing",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/gertrude-app/vapor-routing",
+      "location" : "https://github.com/pointfreeco/vapor-routing",
       "state" : {
-        "branch" : "8e1028d",
-        "revision" : "8e1028df0443efb7e978cd15ddbdd98fce0573a3"
+        "revision" : "ae1db2ec96fad88b00173a265313de2c447a9945",
+        "version" : "0.1.3"
       }
     },
     {

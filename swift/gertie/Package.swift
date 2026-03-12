@@ -12,6 +12,7 @@ let package = Package(
     .package("jaredh159/swift-tagged@0.8.2"),
     .package(path: "../x-kit"),
     .package(path: "../x-expect"),
+    .package(path: "../ts-codable-macro"),
   ],
   targets: [
     .target(
@@ -19,6 +20,7 @@ let package = Package(
       dependencies: [
         .product(name: "XCore", package: "x-kit"),
         .product(name: "TaggedTime", package: "swift-tagged"),
+        .product(name: "TSCodable", package: "ts-codable-macro"),
       ],
       swiftSettings: [.unsafeFlags(["-Xfrontend", "-warnings-as-errors"])],
     ),
@@ -31,8 +33,17 @@ let package = Package(
     ),
     .target(
       name: "GertieIOS",
-      dependencies: [],
+      dependencies: [
+        .product(name: "TSCodable", package: "ts-codable-macro"),
+      ],
       swiftSettings: [.unsafeFlags(["-Xfrontend", "-warnings-as-errors"])],
+    ),
+    .testTarget(
+      name: "GertieIOSTests",
+      dependencies: [
+        "GertieIOS",
+        .product(name: "XExpect", package: "x-expect"),
+      ],
     ),
   ],
 )

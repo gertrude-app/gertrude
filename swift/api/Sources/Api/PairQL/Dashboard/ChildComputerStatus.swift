@@ -1,6 +1,8 @@
 import Foundation
+import TSCodable
 
-enum ChildComputerStatus: Equatable, Sendable, Codable {
+@TSCodable
+enum ChildComputerStatus: Equatable, Sendable {
   case offline
   case filterOff
   case filterOn

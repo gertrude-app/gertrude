@@ -11,6 +11,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     gnupg2 \
     libc6-dev \
     libcurl4-openssl-dev \
+    libicu-dev \
     libedit2 \
     libgcc-13-dev \
     libpython3-dev \

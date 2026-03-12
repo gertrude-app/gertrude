@@ -2,29 +2,7 @@ import Foundation
 import GertieIOS
 import PairQL
 
-/// deprecated: v1.5.0, only used by harriet, remove quickly
-public struct ConnectedRules: Pair {
-  public static let auth: ClientAuth = .child
-
-  public struct Input: PairInput {
-    public var vendorId: UUID
-    public var deviceType: String
-    public var appVersion: String
-    public var iosVersion: String
-
-    public init(
-      vendorId: UUID,
-      deviceType: String,
-      appVersion: String,
-      iosVersion: String,
-    ) {
-      self.vendorId = vendorId
-      self.deviceType = deviceType
-      self.appVersion = appVersion
-      self.iosVersion = iosVersion
-    }
-  }
-
+public enum ConnectedRules {
   public struct Output: PairOutput {
     public var blockRules: [BlockRule]
     public var webPolicy: WebContentFilterPolicy?

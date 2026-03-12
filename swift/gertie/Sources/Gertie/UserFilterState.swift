@@ -1,4 +1,5 @@
 import Foundation
+import TSCodable
 
 public enum FilterState {
   /// a representation of the filter state omitting times for temporary states
@@ -23,6 +24,7 @@ public enum FilterState {
   /// for exposing to the parent/child in some UI
   /// with expiration times represented in natural
   /// language relative time, i.e. "resuming in 5 minutes"
+  @TSCodable
   public enum WithRelativeTimes {
     case off
     case on

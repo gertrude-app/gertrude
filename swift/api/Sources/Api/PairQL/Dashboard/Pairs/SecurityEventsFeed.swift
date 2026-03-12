@@ -1,6 +1,7 @@
 import DuetSQL
 import Gertie
 import PairQL
+import TSCodable
 
 struct SecurityEventsFeed: Pair {
   static let auth: ClientAuth = .parent
@@ -34,6 +35,7 @@ struct SecurityEventsFeed: Pair {
     var createdAt: Date
   }
 
+  @TSCodable
   enum FeedEvent: PairOutput {
     case child(ChildSecurityEvent)
     case admin(AdminSecurityEvent)

@@ -9,8 +9,7 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/jaredh159/swift-tagged", exact: "0.8.2"),
-    // fork avoids swift-syntax transitive dep via case-paths
-    .package(url: "https://github.com/gertrude-app/swift-url-routing", revision: "1cf1ca6"),
+    .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.6.2"),
     .package(path: "../pairql"),
     .package(path: "../gertie"),
   ],

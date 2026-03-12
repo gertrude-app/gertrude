@@ -73,6 +73,7 @@ extension Configure {
     app.migrations.add(DropParentDeletedAt())
     app.migrations.add(IOSDeviceRestrictionToggles())
     app.migrations.add(IOSEventCheckinKind())
+    app.migrations.add(ReencodeFlowTypeAsString())
   }
 }
 

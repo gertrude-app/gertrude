@@ -25,5 +25,14 @@ public struct ConnectedRules_v2: Pair {
     }
   }
 
-  public typealias Output = ConnectedRules.Output
+  // context: https://gist.github.com/jaredh159/af45d98eee7f8a33b6b5af945ec23cfc
+  public struct Output: PairOutput, Codable, Equatable, Sendable {
+    public var blockRules: [BlockRule.Frozen]
+    public var webPolicy: WebContentFilterPolicy?
+
+    public init(blockRules: [BlockRule.Frozen], webPolicy: WebContentFilterPolicy?) {
+      self.blockRules = blockRules
+      self.webPolicy = webPolicy
+    }
+  }
 }

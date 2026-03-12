@@ -122,8 +122,9 @@ jobs:
       - name: build-api
         run: |
           cd swift/api
-          swift build -c $CONFIGURATION -Xswiftc -static-stdlib
-          BIN_PATH=$(swift build -c $CONFIGURATION -Xswiftc -static-stdlib --show-bin-path)
+          XCTEST_LIB=$(dirname "$(find /root -name 'libXCTest.so' -print -quit 2>/dev/null)")
+          swift build -c $CONFIGURATION --static-swift-stdlib -Xlinker -L"${XCTEST_LIB}"
+          BIN_PATH=$(swift build -c $CONFIGURATION --static-swift-stdlib -Xlinker -L"${XCTEST_LIB}" --show-bin-path)
           echo "API_BIN_PATH=${BIN_PATH}" >> $GITHUB_ENV
           cp "${BIN_PATH}/Run" ../../${FILENAME}
       - name: verify-pairql-codegen
@@ -212,17 +213,6 @@ jobs:
           restore-keys: api-test-v3-
       - name: test-api
         run: cd swift/api && swift test
-      - name: verify-swift-codegen
-        if: github.event_name == 'pull_request'
-        run: |
-          (cd swift/api && CODEGEN_SWIFT=1 swift test --filter Codegen)
-          swiftformat swift/
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git checkout -- swift/api/Package.resolved
-          if ! git diff --exit-code -- swift/; then
-            echo "::error::Swift codegen files are out of date. Run 'just codegen-swift' and commit the changes."
-            exit 1
-          fi
 
   macapp-lib:
     needs: files-changed
@@ -244,18 +234,6 @@ jobs:
         run: cd swift/macapp/App && swift build
       - name: test
         run: cd swift/macapp/App && swift test
-      - name: verify-macapp-swift-codegen
-        if: github.event_name == 'pull_request'
-        run: |
-          (cd swift/macapp/App && CODEGEN_SWIFT=1 swift test --filter Codegen)
-          curl -sL https://github.com/nicklockwood/SwiftFormat/releases/download/0.58.5/swiftformat.zip -o /tmp/sf.zip
-          unzip -o /tmp/sf.zip -d /usr/local/bin/
-          swiftformat swift/macapp/App/Sources/App/Generated/
-          git checkout -- swift/macapp/App/Package.resolved
-          if ! git diff --exit-code -- swift/macapp/App/Sources/App/Generated/; then
-            echo "::error::Macapp Swift codegen files are out of date. Run 'just codegen-swift' and commit the changes."
-            exit 1
-          fi
       - name: setup-node
         if: github.event_name == 'pull_request'
         uses: actions/setup-node@v4

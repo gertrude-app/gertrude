@@ -1,27 +1,32 @@
 import Foundation
 import TaggedMoney
+import TSCodable
 
-enum Plan: Equatable, Sendable, Codable {
+@TSCodable
+enum Plan: Equatable, Sendable {
   case free(kind: Plan.FreeKind)
   case light(status: BillingStatus.Light)
   case full(status: BillingStatus.Full)
 }
 
 enum BillingStatus {
-  enum Full: Equatable, Sendable, Codable {
+  @TSCodable
+  enum Full: Equatable, Sendable {
     case complimentary
     case trialing(kind: TrialKind, until: Date)
     case trialExpired(kind: TrialKind)
     case paid(stripeId: Subscription.StripeId, monthlyPriceInCents: Int)
     case overdue(stripeId: Subscription.StripeId, monthlyPriceInCents: Int)
 
-    enum TrialKind: Equatable, Sendable, Codable {
+    @TSCodable
+    enum TrialKind: Equatable, Sendable {
       case full
       case fromLight(stripeId: Subscription.StripeId)
     }
   }
 
-  enum Light: Equatable, Sendable, Codable {
+  @TSCodable
+  enum Light: Equatable, Sendable {
     case paid(stripeId: Subscription.StripeId, hasTrialedFull: Bool)
     case overdue(stripeId: Subscription.StripeId, hasTrialedFull: Bool)
   }
@@ -30,7 +35,8 @@ enum BillingStatus {
 // extensions
 
 extension Plan {
-  enum FreeKind: Equatable, Sendable, Codable {
+  @TSCodable
+  enum FreeKind: Equatable, Sendable {
     case standard
     case lapsedLight(stripeId: Subscription.StripeId, hasTrialedFull: Bool)
     case lapsedFull(stripeId: Subscription.StripeId?)

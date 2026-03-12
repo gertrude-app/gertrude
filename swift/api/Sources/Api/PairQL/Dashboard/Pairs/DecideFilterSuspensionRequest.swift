@@ -1,9 +1,11 @@
 import Gertie
 import PairQL
+import TSCodable
 
 struct DecideFilterSuspensionRequest: Pair {
   static let auth: ClientAuth = .parent
 
+  @TSCodable
   enum Decision: PairNestable {
     case rejected
     case accepted(durationInSeconds: Int, extraMonitoring: String?)

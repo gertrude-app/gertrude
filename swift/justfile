@@ -60,7 +60,7 @@ sync-staging-data: build-api
   @just exec-api sync-staging-data
 
 nuke-test-db:
-  @killall -q Postico; db=$(grep '^TEST_DATABASE_NAME=' api/.env | cut -d= -f2); dropdb --if-exists "$db"; createdb "$db"
+  @killall -q Postico; db=$(grep '^TEST_DATABASE_NAME=' api/.env | cut -d= -f2); dropdb --if-exists --force "$db"; createdb "$db"
 
 hurl-dev *args:
   @hurl --variable API_URL="http://127.0.0.1:{{api_port}}" {{args}}

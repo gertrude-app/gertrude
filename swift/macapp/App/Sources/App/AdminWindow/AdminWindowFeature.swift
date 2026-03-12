@@ -4,6 +4,7 @@ import Core
 import Foundation
 import Gertie
 import TaggedTime
+import TSCodable
 
 struct AdminWindowFeature: Feature {
   enum Screen: String, Equatable, Codable {
@@ -15,7 +16,8 @@ struct AdminWindowFeature: Feature {
 
   struct State: Equatable {
     struct HealthCheck: Equatable, Encodable {
-      enum FilterStatus: Equatable, Codable {
+      @TSCodable
+      enum FilterStatus: Equatable {
         case installing
         case installTimeout
         case notInstalled
@@ -92,7 +94,8 @@ struct AdminWindowFeature: Feature {
   }
 
   enum Action: Equatable, Sendable {
-    enum View: Equatable, Sendable, Decodable {
+    @TSCodable
+    enum View: Equatable, Sendable {
       enum HealthCheckAction: String, Equatable, Sendable, Codable {
         case recheckClicked
         case upgradeAppClicked
@@ -109,7 +112,8 @@ struct AdminWindowFeature: Feature {
         case openScreenTimeSettingsClicked
       }
 
-      enum AdvancedAction: Equatable, Sendable, Codable {
+      @TSCodable
+      enum AdvancedAction: Equatable, Sendable {
         case pairqlEndpointSet(url: String?)
         case websocketEndpointSet(url: String?)
         case appcastEndpointSet(url: String?)
