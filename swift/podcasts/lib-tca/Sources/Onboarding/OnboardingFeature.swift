@@ -77,22 +77,7 @@ struct OnboardingFeature {
   }
 
   func shouldNotBeOnboarding() -> Bool {
-    if self.keychain.loadPincode() != nil {
-      return true
-    }
-    let previouslyCompleted = self.database.tryRead { db in
-      try Record.find(id: .onboardingFinished).fetchOne(db) != nil
-    }
-    if previouslyCompleted == true {
-      return true
-    }
-    let numShows = self.database.tryRead { db in
-      try Show.count().fetchOne(db)
-    }
-    if (numShows ?? 0) > 0 {
-      return true
-    }
-    return false
+    self.keychain.loadPincode() != nil
   }
 }
 

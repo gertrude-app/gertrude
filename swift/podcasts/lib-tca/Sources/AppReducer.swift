@@ -163,13 +163,10 @@ struct AppReducer: Sendable {
         if self.keychain.hasPincode() {
           state.mode = .podcasts(.init())
           log(.unexpected("73430b7b"), "false onboarding")
-          return .none
         } else {
-          return .run { _ in
-            await log(.unexpected("9f4d7c2d"), "false onboarding").value
-            preconditionFailure("unreachable-9f4d7c2d")
-          }
+          log(.unexpected("9f4d7c2d"), "false onboarding")
         }
+        return .none
       case .alert:
         return .none
       case .nowPlaying:
