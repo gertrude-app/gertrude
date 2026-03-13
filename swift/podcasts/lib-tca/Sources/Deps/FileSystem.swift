@@ -6,6 +6,7 @@ import Foundation
 struct FileSystemClient: Sendable {
   var removeItem: @Sendable (_ at: URL) throws -> Void
   var fileExists: @Sendable (_ at: URL) -> Bool = { _ in true }
+  var fileSize: @Sendable (_ at: URL) -> Int64? = { _ in 1 }
 }
 
 extension FileSystemClient: DependencyKey {
@@ -17,6 +18,13 @@ extension FileSystemClient: DependencyKey {
       fileExists: { url in
         FileManager.default.fileExists(atPath: url.path)
       },
+      fileSize: { url in
+        guard let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
+              let size = attrs[.size] as? NSNumber else {
+          return nil
+        }
+        return size.int64Value
+      },
     )
   }
 
@@ -24,6 +32,7 @@ extension FileSystemClient: DependencyKey {
     .init(
       removeItem: { _ in },
       fileExists: { _ in true },
+      fileSize: { _ in 1 },
     )
   }
 }

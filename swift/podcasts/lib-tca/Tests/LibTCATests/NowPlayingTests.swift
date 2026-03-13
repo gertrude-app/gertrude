@@ -50,6 +50,7 @@ import Testing
     await withDependencies {
       $0.continuousClock = clock
       $0.date = .constant(.reference)
+      $0.api.logEvent = { _, _, _, _ in }
       $0.defaultDatabase = try! appDatabase {
         try fixtures($0)
         try NowPlayingModel.insert {
@@ -113,6 +114,7 @@ import Testing
     await withDependencies {
       $0.continuousClock = clock
       $0.date = .constant(.reference)
+      $0.api.logEvent = { _, _, _, _ in }
       $0.defaultDatabase = try! appDatabase {
         try fixtures($0)
         try NowPlayingModel.insert {
@@ -218,6 +220,121 @@ import Testing
       nowPlaying = dep(\.db).nowPlaying()
       #expect(nowPlaying?.episode.id == 4 && nowPlaying?.isPlaying == false)
       #expect(nowPlaying?.episode.downloadedAt == nil)
+    }
+  }
+
+  @Test func `empty file download is treated as a failed download`() async throws {
+    let clock = TestClock()
+    let downloadInvocations = LockIsolated<[Episode.ID]>([])
+    await withDependencies {
+      $0.continuousClock = clock
+      $0.date = .constant(.reference)
+      $0.api.logEvent = { _, _, _, _ in }
+      $0.defaultDatabase = try! appDatabase {
+        try fixtures($0)
+        try NowPlayingModel.insert {
+          NowPlayingModel(episodeId: 4, isPlaying: false)
+        }.execute($0)
+      }
+      $0.network.isConnected = { true }
+      $0.audio.play = { _, _ in fatalError() }
+      $0.fileSystem.fileExists = { _ in true } // <- file is present
+      $0.fileSystem.fileSize = { _ in 0 } // <- but empty, so download must fail validation
+      $0.podcasts.downloadAudio = { ep in
+        downloadInvocations.withValue { $0.append(ep.id) }
+        return true // <- transport says "success", validation has to reject it
+      }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: NowPlayingFeature.init)
+
+      var nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.id == 4 && nowPlaying?.isPlaying == false)
+      #expect(nowPlaying?.episode.downloadedAt == nil)
+
+      let (episode, show) = dep(\.db).episodeWithShow(4)!
+      await store.send(.episodePlayPauseTapped(episode, show))
+
+      await clock.advance(by: .seconds(2))
+
+      nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.downloadedAt == .distantFuture)
+      #expect(downloadInvocations.value.isEmpty)
+
+      await clock.advance(by: .seconds(2))
+
+      nowPlaying = dep(\.db).nowPlaying()
+      #expect(downloadInvocations.value == [.init(4)])
+      #expect(nowPlaying?.episode.downloadedAt == nil)
+      #expect(nowPlaying?.episode.id == 4 && nowPlaying?.isPlaying == false)
+
+      await clock.advance(by: .seconds(1))
+
+      await store.receive(.delegate(.alert(lstr(.episodeDownloadFailed))))
+
+      nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.id == 4 && nowPlaying?.isPlaying == false)
+      #expect(nowPlaying?.episode.downloadedAt == nil)
+    }
+  }
+
+  @Test func `resume downloaded episode with empty file re-downloads`() async throws {
+    let clock = TestClock()
+    let playInvocations = LockIsolated<[Episode.ID]>([])
+    let downloadInvocations = LockIsolated<[Episode.ID]>([])
+    let fileSize = LockIsolated<Int64>(0)
+    await withDependencies {
+      $0.continuousClock = clock
+      $0.date = .constant(.reference)
+      $0.api.logEvent = { _, _, _, _ in }
+      $0.defaultDatabase = try! appDatabase {
+        try fixtures($0)
+        try NowPlayingModel.insert {
+          NowPlayingModel(episodeId: 5, isPlaying: false)
+        }.execute($0)
+      }
+      $0.network.isConnected = { true }
+      $0.audio.play = { ep, _ in
+        playInvocations.withValue { $0.append(ep.id) }
+      }
+      $0.fileSystem.fileExists = { _ in true } // <- looks downloaded at first glance
+      $0.fileSystem.fileSize = { _ in fileSize.value } // <- starts empty, flips after re-download
+      $0.podcasts.downloadAudio = { ep in
+        fileSize.setValue(2) // <- recovery path makes the local file playable again
+        downloadInvocations.withValue { $0.append(ep.id) }
+        return true
+      }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: NowPlayingFeature.init)
+
+      var nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.id == 5 && nowPlaying?.isPlaying == false)
+      #expect(nowPlaying?.episode.downloadedAt == .reference)
+
+      let (episode, show) = dep(\.db).episodeWithShow(5)!
+      await store.send(.episodePlayPauseTapped(episode, show))
+
+      await clock.advance(by: .seconds(1))
+
+      nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.id == 5 && nowPlaying?.isPlaying == false)
+      #expect(nowPlaying?.episode
+        .downloadedAt == .distantFuture) // <- resumes by re-downloading first
+      #expect(downloadInvocations.value.isEmpty)
+      #expect(playInvocations.value.isEmpty)
+
+      await clock.advance(by: .seconds(2))
+
+      nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.downloadedAt == .reference)
+      #expect(downloadInvocations.value == [.init(5)])
+      #expect(playInvocations.value.isEmpty)
+
+      await clock.advance(by: .seconds(1))
+
+      nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.id == 5 && nowPlaying?.isPlaying == true)
+      #expect(downloadInvocations.value == [.init(5)])
+      #expect(playInvocations.value == [.init(5), .init(5)])
     }
   }
 

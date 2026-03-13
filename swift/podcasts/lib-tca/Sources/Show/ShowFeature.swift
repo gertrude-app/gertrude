@@ -48,7 +48,8 @@ struct ShowFeature {
         switch episodeAction {
         case .downloadTapped:
           return .run { send in
-            if let error = await ensureDownloaded(episode: episode).error {
+            let outcome = await ensureDownloaded(episode: episode)
+            if let error = outcome.error {
               await send(.delegate(.alert(error.message)))
             }
           }
