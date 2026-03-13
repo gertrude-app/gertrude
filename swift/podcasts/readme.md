@@ -2,6 +2,9 @@
 
 ## Releases
 
+- `1.3.1` (3/12/2026)
+  - attempt another mitigation on missing local file errors
+  - fix false onboarding crash on reinstall/restore
 - `1.3.0` (12/31/2025)
   - add button to reclaim storage space
   - more aggressive cleanup of downloaded episodes

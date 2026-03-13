@@ -208,7 +208,11 @@ extension NowPlaying {
 }
 
 private func _play(episode: Episode, show: Show) async throws {
-  if dep(\.fileSystem).fileExists(at: episode.localAudioUrl) {
+  let fileSystem = dep(\.fileSystem)
+  let fileExists = fileSystem.fileExists(at: episode.localAudioUrl)
+  let fileSize = fileSystem.fileSize(at: episode.localAudioUrl)
+
+  if fileExists, let size = fileSize, size > 0 {
     try await dep(\.audio).play(episode: episode, show: show)
   } else {
     NowPlaying.updateSyncingProgress { $0.isPlaying = false }
@@ -218,17 +222,52 @@ private func _play(episode: Episode, show: Show) async throws {
         .where { $0.id == episode.id }
         .execute(db)
     }
+    let detail = missingPlaybackFileDetail(
+      episode: episode,
+      show: show,
+      fileExists: fileExists,
+      fileSize: fileSize,
+    )
     if dep(\.network).isConnected() {
-      if case .success = await trackedDownload(episode: episode) {
+      switch await trackedDownload(episode: episode) {
+      case .success:
         try await dep(\.audio).play(episode: episode, show: show)
         NowPlaying.updateSyncingProgress { $0.isPlaying = true }
-        unexpected(id: "ba664a9f", "episode play without local file, recovered")
-      } else {
+        log(
+          .info("d299b47a"),
+          "episode play recovered after local file check failed",
+          detail: detail,
+        )
+      case .cancelled:
         NowPlaying.delete()
-        unexpected(id: "4fa186eb", "episode play without local file, dl failed")
+      case .failure:
+        NowPlaying.delete()
+        unexpected(id: "2e2c9e97", detail)
       }
     } else {
       NowPlaying.delete()
     }
   }
+}
+
+private func missingPlaybackFileDetail(
+  episode: Episode,
+  show: Show,
+  fileExists: Bool,
+  fileSize: Int64?,
+) -> String {
+  let fileState = if fileExists {
+    if let fileSize {
+      "exists:\(fileSize)b"
+    } else {
+      "exists:unknown"
+    }
+  } else {
+    "missing"
+  }
+
+  let downloadedAt = episode.downloadedAt.map { "\($0)" } ?? "nil"
+  let domain = URL(string: episode.audioUrl)?.host ?? "unknown"
+
+  return "ep:\(episode.id) show:\(show.id) file:\(fileState) expected:\(episode.sizeInBytes)b downloadedAt:\(downloadedAt) domain:\(domain)"
 }

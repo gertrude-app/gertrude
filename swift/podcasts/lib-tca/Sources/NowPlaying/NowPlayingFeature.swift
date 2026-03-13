@@ -164,10 +164,11 @@ struct NowPlayingFeature {
       // initialize new episode to paused, so we can handle possible download
       NowPlaying.set(.init(episodeId: episode.id, isPlaying: false, minimized: true))
       await testAssertCheckpoint("now playing set, initialize to paused")
-      if let error = await ensureDownloaded(episode: episode).error {
+      let outcome = await ensureDownloaded(episode: episode)
+      if let error = outcome.error {
         await send(.delegate(.alert(error.message)))
         // TODO: delete now playing, i think
-      } else {
+      } else if case .success = outcome {
         NowPlaying.updateSyncingProgress { $0.isPlaying = true }
       }
     }

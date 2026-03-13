@@ -166,7 +166,8 @@ func downloadEpisodeLive(episode: Episode) async -> Bool {
 
     let (data, response) = try await URLSession.shared.data(from: sourceUrl)
     guard let httpResponse = response as? HTTPURLResponse,
-          httpResponse.statusCode == 200 else {
+          httpResponse.statusCode == 200,
+          !data.isEmpty else {
       return false
     }
 

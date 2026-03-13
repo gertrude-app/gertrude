@@ -25,8 +25,9 @@ extension LogPodcastEvent_v2: Resolver {
         msg += " - \(detail)"
       }
       let search = githubSearch(input.eventId)
+      let slackSuppressed = suppressedPodcastSlackEventIds.contains(input.eventId)
       let (send, suppressed) = await PodcastSlackLimiter.shared.shouldSend(input.eventId)
-      if send {
+      if send, !slackSuppressed {
         var message = "Podcast app event: \(search) \(msg)"
         if suppressed > 0 {
           message += " _(+\(suppressed) suppressed)_"
@@ -53,6 +54,14 @@ extension LogPodcastEvent_v2: Resolver {
     return .success
   }
 }
+
+// suppress pre 1.3.1 missing file events, to test new mitigations
+private let suppressedPodcastSlackEventIds: Set<String> = [
+  "eeaa7b30",
+  "45692a47",
+  "ba664a9f",
+  "4fa186eb",
+]
 
 private actor PodcastSlackLimiter {
   static let shared = PodcastSlackLimiter()

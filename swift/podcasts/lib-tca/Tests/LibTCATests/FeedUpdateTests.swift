@@ -296,6 +296,95 @@ import Testing
   }
 }
 
+@Test func `feed invalidation during download should not restore downloaded state`() async throws {
+  let clock = TestClock()
+  let episode = Episode.mock(1, showId: 1)
+  let fetchedFeed = Feed(
+    show: .mock(1),
+    episodes: [.mock(1, showId: 1) { $0.duration = 7200 }],
+  )
+  let releaseDownload = LockIsolated<CheckedContinuation<Void, Never>?>(nil)
+
+  try? FileManager.default.removeItem(at: episode.localAudioUrl.deletingLastPathComponent())
+  defer {
+    try? FileManager.default.removeItem(at: episode.localAudioUrl.deletingLastPathComponent())
+  }
+
+  try await withDependencies {
+    $0.continuousClock = clock
+    $0.date = .constant(.reference)
+    $0.api.logEvent = { _, _, _, _ in }
+    $0.fileSystem.removeItem = { try FileManager.default.removeItem(at: $0) }
+    $0.fileSystem.fileExists = { FileManager.default.fileExists(atPath: $0.path) }
+    $0.defaultDatabase = try! appDatabase {
+      try Show.insert { [Show.mock(1)] }.execute($0)
+      try Episode.insert { [episode] }.execute($0)
+    }
+    $0.podcasts.getFeed = { _ in fetchedFeed }
+    $0.podcasts.downloadArtwork = { _ in }
+    $0.podcasts.downloadAudio = { episode in
+      do {
+        try FileManager.default.createDirectory(
+          at: episode.localAudioUrl.deletingLastPathComponent(),
+          withIntermediateDirectories: true,
+        )
+        try Data("ok".utf8).write(to: episode.localAudioUrl)
+      } catch {
+        return false
+      }
+      // Pause after the file exists locally but before trackedDownload() records success.
+      await withCheckedContinuation {
+        releaseDownload.setValue($0)
+      }
+      return true
+    }
+  } operation: {
+    let task = Task {
+      await trackedDownload(episode: episode)
+    }
+
+    await clock.advance(by: .seconds(3))
+
+    while releaseDownload.value == nil {
+      await Task.yield()
+    }
+
+    #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path))
+
+    // Drive the real feed-refresh invalidation path that removes the local file and
+    // clears downloadedAt because the feed's audio metadata changed.
+    let updates = await _feedUpdates(input: _prepareFeedUpdateInputData())
+    #expect(updates.actions == [.invalidateEpisodeAudio(episode.id)])
+
+    _ = await _performFeedUpdates(updates)
+
+    let invalidatedMidFlight = dep(\.db).tryRead { db in
+      try Episode.find(episode.id).fetchOne(db)
+    }
+    #expect(invalidatedMidFlight?.downloadedAt == nil)
+    #expect(invalidatedMidFlight?.duration == 7200)
+    #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path) == false)
+
+    releaseDownload.withValue {
+      $0?.resume()
+      $0 = nil
+    }
+
+    await clock.advance(by: .seconds(2))
+    _ = await task.value
+
+    let refreshed = dep(\.db).tryRead { db in
+      try Episode.find(episode.id).fetchOne(db)
+    }
+
+    // This is the production-plausible regression: feed invalidation already removed the
+    // file, so download completion should not be able to stamp the episode back to downloaded.
+    #expect(refreshed?.downloadedAt == nil)
+    #expect(refreshed?.duration == 7200)
+    #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path) == false)
+  }
+}
+
 // mocks
 
 extension Show.FeedData {
