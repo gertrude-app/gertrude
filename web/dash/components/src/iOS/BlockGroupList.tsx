@@ -37,7 +37,9 @@ const BlockGroupItem: React.FC<{
   const [expanded, setExpanded] = useState(false);
   return (
     <div
-      className={`rounded-xl overflow-hidden transition duration-100 ${enabled ? `bg-violet-50` : `hover:bg-slate-50`}`}
+      className={`rounded-xl overflow-hidden transition duration-100 ${
+        enabled ? `bg-violet-50` : `hover:bg-slate-50`
+      }`}
     >
       <div className="flex">
         <button
@@ -46,7 +48,11 @@ const BlockGroupItem: React.FC<{
         >
           <div className="w-12 self-stretch flex flex-shrink-0 justify-center items-start pt-3.5">
             <div
-              className={`rounded-full flex justify-center items-center text-white transition-[width,border-width,border] ${enabled ? `border-none w-6 h-6 bg-gradient-to-br from-indigo-500 to-fuchsia-500` : `w-5 h-5 border-2`}`}
+              className={`rounded-full flex justify-center items-center text-white transition-[width,border-width,border] ${
+                enabled
+                  ? `border-none w-6 h-6 bg-gradient-to-br from-indigo-500 to-fuchsia-500`
+                  : `w-5 h-5 border-2`
+              }`}
             >
               <i className="fa-solid fa-check text-sm" />
             </div>
@@ -55,7 +61,11 @@ const BlockGroupItem: React.FC<{
             <div className="flex items-center gap-2">
               <h3 className="font-bold leading-tight">{group.name}</h3>
               <span
-                className={`text-xs font-semibold px-2 py-0.5 rounded-full ${enabled ? `bg-violet-200 text-violet-800` : `bg-slate-200 text-slate-500`}`}
+                className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                  enabled
+                    ? `bg-violet-200 text-violet-800`
+                    : `bg-slate-200 text-slate-500`
+                }`}
               >
                 {enabled ? `Blocked` : `Not blocked`}
               </span>
@@ -68,7 +78,11 @@ const BlockGroupItem: React.FC<{
         {group.longDescription && (
           <button
             type="button"
-            className={`flex-shrink-0 self-center mr-3 w-8 h-8 flex items-center justify-center rounded-full transition ${expanded ? `text-violet-600 bg-violet-100` : `text-violet-400 hover:text-violet-600 hover:bg-violet-100/60`}`}
+            className={`flex-shrink-0 self-center mr-3 w-8 h-8 flex items-center justify-center rounded-full transition ${
+              expanded
+                ? `text-violet-600 bg-violet-100`
+                : `text-violet-400 hover:text-violet-600 hover:bg-violet-100/60`
+            }`}
             onClick={() => setExpanded(!expanded)}
           >
             <i className="fa-solid fa-circle-question text-[15px]" />

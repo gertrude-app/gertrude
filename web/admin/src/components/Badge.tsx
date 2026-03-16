@@ -24,7 +24,9 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = `sm` })
     size === `md` ? `px-3 py-1.5 text-sm` : `px-2.5 py-1 rounded-lg text-xs`;
   return (
     <span
-      className={`inline-flex items-center rounded-lg font-medium ring-1 ring-inset ${sizeClass} ${statusStyles[status] ?? statusStyles.unknown}`}
+      className={`inline-flex items-center rounded-lg font-medium ring-1 ring-inset ${sizeClass} ${
+        statusStyles[status] ?? statusStyles.unknown
+      }`}
     >
       {statusLabels[status] ?? status}
     </span>

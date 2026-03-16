@@ -77,7 +77,9 @@ const SpotlightScreen: React.FC = () => {
           </div>
         </div>
         <div
-          className={`flex-1 overflow-hidden transition-opacity duration-300 ${showResults ? `opacity-100` : `opacity-0`}`}
+          className={`flex-1 overflow-hidden transition-opacity duration-300 ${
+            showResults ? `opacity-100` : `opacity-0`
+          }`}
         >
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
@@ -88,7 +90,9 @@ const SpotlightScreen: React.FC = () => {
               {[...Array(8)].map((_, i) => (
                 <div
                   key={i}
-                  className={`aspect-square bg-slate-500/50 rounded-lg flex items-center justify-center transition-all duration-200 ${showResults ? `opacity-100 scale-100` : `opacity-0 scale-90`}`}
+                  className={`aspect-square bg-slate-500/50 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                    showResults ? `opacity-100 scale-100` : `opacity-0 scale-90`
+                  }`}
                   style={{ transitionDelay: showResults ? `${i * 50}ms` : `0ms` }}
                 >
                   <BlockedIcon className="size-5 text-red-400/70" />

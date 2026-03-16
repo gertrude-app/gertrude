@@ -32,7 +32,9 @@ const AnimatedUnderline: React.FC<AnimatedUnderlineProps> = ({
       </linearGradient>
     </defs>
     <path
-      d={`M 0 ${height / 2} Q 50 ${height / 2 - 2}, 100 ${height / 2} T 200 ${height / 2}`}
+      d={`M 0 ${height / 2} Q 50 ${height / 2 - 2}, 100 ${height / 2} T 200 ${
+        height / 2
+      }`}
       stroke={`url(#${gradientId})`}
       strokeWidth={strokeWidth}
       fill="none"

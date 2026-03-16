@@ -161,7 +161,9 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
                 {stat.value}
               </div>
               <div
-                className={`text-sm mt-1 ${stat.highlight ? `text-white/80` : `text-slate-500`}`}
+                className={`text-sm mt-1 ${
+                  stat.highlight ? `text-white/80` : `text-slate-500`
+                }`}
               >
                 {stat.label}
               </div>
@@ -244,7 +246,9 @@ const MacSection: React.FC<MacSectionProps> = ({ data }) => {
                 {stat.value}
               </div>
               <div
-                className={`text-sm mt-1 ${stat.highlight ? `text-white/80` : `text-slate-500`}`}
+                className={`text-sm mt-1 ${
+                  stat.highlight ? `text-white/80` : `text-slate-500`
+                }`}
               >
                 {stat.label}
               </div>

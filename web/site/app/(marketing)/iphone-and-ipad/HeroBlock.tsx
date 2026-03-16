@@ -122,7 +122,9 @@ const BlockedGifSearchScreen: React.FC = () => {
       </div>
       <div className="h-28 shrink-0" />
       <div
-        className={`flex-1 bg-white flex flex-col rounded-t-2xl shadow-2xl ${isVisible ? `translate-y-0` : `translate-y-full`}`}
+        className={`flex-1 bg-white flex flex-col rounded-t-2xl shadow-2xl ${
+          isVisible ? `translate-y-0` : `translate-y-full`
+        }`}
         style={{
           transition: `transform 0.5s cubic-bezier(0.22, 1.1, 0.36, 1)`,
           transitionDelay: isVisible ? `${slideUpDelay}ms` : `0ms`,
@@ -147,7 +149,9 @@ const BlockedGifSearchScreen: React.FC = () => {
               <span className="text-gray-700 text-sm font-medium inline-flex items-center h-5">
                 <span>{searchText.slice(0, typedChars)}</span>
                 <span
-                  className={`w-0.5 h-4 bg-blue-500 ml-px ${isVisible ? `animate-pulse` : `opacity-0`}`}
+                  className={`w-0.5 h-4 bg-blue-500 ml-px ${
+                    isVisible ? `animate-pulse` : `opacity-0`
+                  }`}
                 />
               </span>
             </div>
@@ -168,7 +172,9 @@ const BlockedGifSearchScreen: React.FC = () => {
             {[...Array(18)].map((_, i) => (
               <div
                 key={i}
-                className={`aspect-square rounded-lg relative flex items-center justify-center bg-gray-300 shadow-inner transition-all duration-200 ${showSquares ? `opacity-100 scale-100` : `opacity-0 scale-90`}`}
+                className={`aspect-square rounded-lg relative flex items-center justify-center bg-gray-300 shadow-inner transition-all duration-200 ${
+                  showSquares ? `opacity-100 scale-100` : `opacity-0 scale-90`
+                }`}
                 style={{
                   transitionDelay: showSquares ? `${i * 40}ms` : `0ms`,
                 }}

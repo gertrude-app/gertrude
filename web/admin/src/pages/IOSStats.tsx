@@ -49,7 +49,10 @@ const IOSStats: React.FC = () => {
       month: `long`,
       day: `numeric`,
     };
-    return `${start.toLocaleDateString(`en-US`, options)} – ${end.toLocaleDateString(`en-US`, options)}`;
+    return `${start.toLocaleDateString(`en-US`, options)} – ${end.toLocaleDateString(
+      `en-US`,
+      options,
+    )}`;
   };
 
   const total18Plus =
