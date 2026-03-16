@@ -93,8 +93,11 @@ extension CheckIn_v2: Resolver {
     }
 
     if let namedApps = input.namedApps, !namedApps.isEmpty {
+      let identifiedRows = try await context.db.customQuery(IdentifiedBundleIds.self)
+      let identifiedBundleIds = Set(identifiedRows.map(\.bundleId))
       var bindings: [Postgres.Data] = []
       for var namedApp in namedApps.uniqued(on: \.bundleId) {
+        guard !identifiedBundleIds.contains(namedApp.bundleId) else { continue }
         namedApp.dbPrepare()
         bindings.append(.string(namedApp.bundleId))
         bindings.append(.string(namedApp.bundleName))
