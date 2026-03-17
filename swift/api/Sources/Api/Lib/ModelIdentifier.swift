@@ -59,6 +59,9 @@ enum ModelIdentifier {
   }
 
   private static let mapping: [String: String] = [
+    // iPhone 17e (March 2026)
+    "iPhone18,5": "iPhone 17e",
+
     // iPhone Air (2025)
     "iPhone18,4": "iPhone Air",
 
