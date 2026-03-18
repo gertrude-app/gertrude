@@ -7,7 +7,7 @@ export namespace PodcastInstallsList {
 
   export interface Output {
     installs: Array<{
-      installId: UUID;
+      deviceId: UUID;
       deviceType: string;
       iosVersion: string;
       appVersion: string;

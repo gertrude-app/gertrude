@@ -37,19 +37,19 @@ const getKindBadgeClass = (kind: string): string => {
 };
 
 const PodcastInstallDetail: React.FC = () => {
-  const { installId } = useParams<{ installId: string }>();
+  const { deviceId } = useParams<{ deviceId: string }>();
   const [data, setData] = useState<T.PodcastInstallDetail.Output | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      if (!installId) return;
+      if (!deviceId) return;
 
       setLoading(true);
       setError(null);
 
-      const result = await client.podcastInstallDetail({ installId });
+      const result = await client.podcastInstallDetail({ deviceId });
 
       if (result.isError) {
         setError(result.error?.debugMessage ?? `Failed to load install details`);
@@ -62,7 +62,7 @@ const PodcastInstallDetail: React.FC = () => {
     };
 
     fetchData();
-  }, [installId]);
+  }, [deviceId]);
 
   if (loading) {
     return <LoadingState context="install details" gradient="green" />;
@@ -86,7 +86,7 @@ const PodcastInstallDetail: React.FC = () => {
         title="Install Details"
         subtitle={
           <>
-            <code className="font-mono">{data.installId.slice(0, 8).toLowerCase()}</code>
+            <code className="font-mono">{data.deviceId.slice(0, 8).toLowerCase()}</code>
             {` `}&middot;{` `}
             {data.deviceType}
             {` `}&middot;{` `}

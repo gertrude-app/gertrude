@@ -208,6 +208,7 @@ import Testing
   @Test func `defeat repeat free trial attempt`() async throws {
     await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
+      $0.api.migrateDeviceId = { _, _ in }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase {
         try Subscription
@@ -218,6 +219,7 @@ import Testing
           }
           .execute($0)
       }
+      $0.device.vendorId = { nil }
       $0.storekit = .testValue
       $0.mainQueue = .immediate
       $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
@@ -230,6 +232,8 @@ import Testing
           "\(UUID())".data(using: .utf8)
         case .installDate:
           "\(Date.reference.advanced(by: -.days(35)).timeIntervalSince1970)".data(using: .utf8)
+        case .deviceId:
+          nil
         }
       }
     } operation: {
@@ -240,6 +244,7 @@ import Testing
       #expect(sub.expiresAt == .reference + .days(30))
 
       await store.send(.appDidLaunch)
+      await store.finish()
 
       sub = dep(\.db).subscription()
       #expect(sub.status == .unpaid)

@@ -106,15 +106,15 @@ const PodcastInstallsList: React.FC = () => {
           <tbody className="divide-y divide-slate-100">
             {data.installs.map((install) => (
               <tr
-                key={install.installId}
+                key={install.deviceId}
                 onClick={() =>
-                  navigate(`/podcasts/${install.installId.toLowerCase()}/detail`)
+                  navigate(`/podcasts/${install.deviceId.toLowerCase()}/detail`)
                 }
                 className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
               >
                 <td className="pl-5 pr-4 py-4">
                   <code className="text-emerald-600 group-hover:text-green-600 font-mono text-sm transition-colors">
-                    {install.installId.slice(0, 8).toLowerCase()}
+                    {install.deviceId.slice(0, 8).toLowerCase()}
                   </code>
                 </td>
                 <td className="px-4 py-4">

@@ -6,11 +6,11 @@ struct PodcastInstallDetail: Pair {
   static let auth: ClientAuth = .superAdmin
 
   struct Input: PairInput {
-    var installId: UUID
+    var deviceId: UUID
   }
 
   struct Output: PairOutput {
-    var installId: UUID
+    var deviceId: UUID
     var deviceType: String
     var iosVersion: String
     var appVersion: String
@@ -39,7 +39,7 @@ struct PodcastInstallDetail: Pair {
 extension PodcastInstallDetail: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let events = try await PodcastEvent.query()
-      .where(.installId == input.installId)
+      .where(.deviceId == input.deviceId)
       .orderBy(.createdAt, .asc)
       .all(in: context.db)
 
@@ -87,7 +87,7 @@ extension PodcastInstallDetail: Resolver {
       }
 
     return .init(
-      installId: input.installId,
+      deviceId: input.deviceId,
       deviceType: deviceType,
       iosVersion: iosVersion,
       appVersion: appVersion,

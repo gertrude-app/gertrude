@@ -12,6 +12,9 @@ extension PodcastRoute: RouteResponder {
       case .logPodcastEvent_v2(let input):
         let output = try await LogPodcastEvent_v2.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .logPodcastEvent_v3(let input):
+        let output = try await LogPodcastEvent_v3.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       case .podcastProducts:
         let output = try await PodcastProducts.resolve(in: context)
         return try await self.respond(with: output)
@@ -23,6 +26,9 @@ extension PodcastRoute: RouteResponder {
         return try await self.respond(with: output)
       case .verifyDbDownload(let input):
         let output = try await VerifyDbDownload.resolve(with: input, in: context)
+        return try await self.respond(with: output)
+      case .migratePodcastVendorId(let input):
+        let output = try await MigratePodcastVendorId.resolve(with: input, in: context)
         return try await self.respond(with: output)
       }
     }

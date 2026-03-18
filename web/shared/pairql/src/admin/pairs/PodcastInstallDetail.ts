@@ -1,11 +1,11 @@
 // auto-generated, do not edit
 export namespace PodcastInstallDetail {
   export interface Input {
-    installId: UUID;
+    deviceId: UUID;
   }
 
   export interface Output {
-    installId: UUID;
+    deviceId: UUID;
     deviceType: string;
     iosVersion: string;
     appVersion: string;

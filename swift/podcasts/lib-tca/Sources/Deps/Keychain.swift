@@ -13,8 +13,13 @@ struct KeychainClient: Sendable {
 extension KeychainClient {
   enum Key: String {
     case pincode
-    case installId
     case installDate
+    case deviceId
+    // @deprecated since v1.4.0 - used to hold randomly generated
+    // UUID to identify install, but we switched to using deviceId
+    // which is derived from identifierForVendor (deviceId) to
+    // cross-correlate with installs on the main iOS app
+    case installId
 
     #if !DEBUG
       var secAttrAccount: String {
@@ -35,7 +40,7 @@ extension KeychainClient {
 
 extension KeychainClient {
   func isFirstLaunch() -> Bool {
-    self.loadInstallDate() == nil || self.loadInstallId() == nil
+    self.loadInstallDate() == nil
   }
 
   func save(installDate: Date) {
@@ -53,7 +58,7 @@ extension KeychainClient {
     }
   }
 
-  func loadInstallId() -> UUID? {
+  func loadDeprecatedInstallId() -> UUID? {
     if let data = self._load(.installId),
        let string = String(data: data, encoding: .utf8),
        let uuid = UUID(uuidString: string) {
@@ -66,6 +71,21 @@ extension KeychainClient {
   func save(installId: UUID) {
     let data = installId.uuidString.data(using: .utf8)!
     self._save(.installId, data)
+  }
+
+  func loadDeviceId() -> UUID? {
+    if let data = self._load(.deviceId),
+       let string = String(data: data, encoding: .utf8),
+       let uuid = UUID(uuidString: string) {
+      uuid
+    } else {
+      nil
+    }
+  }
+
+  func save(deviceId: UUID) {
+    let data = deviceId.uuidString.data(using: .utf8)!
+    self._save(.deviceId, data)
   }
 
   func loadPincode() -> Int? {
@@ -144,7 +164,7 @@ extension DependencyValues {
           "111111".data(using: .utf8)!
         case .installDate:
           "1760103425".data(using: .utf8)!
-        case .installId:
+        case .deviceId, .installId:
           "DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF".data(using: .utf8)!
         }
       },

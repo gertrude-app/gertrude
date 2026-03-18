@@ -1127,7 +1127,7 @@ extension PodcastEvent: Model {
     case .modelIdentifier: .string(self.modelIdentifier)
     case .appVersion: .string(self.appVersion)
     case .iosVersion: .string(self.iosVersion)
-    case .installId: .uuid(self.installId)
+    case .deviceId: .uuid(self.deviceId)
     case .detail: .string(self.detail)
     case .createdAt: .date(self.createdAt)
     }
@@ -1142,7 +1142,7 @@ extension PodcastEvent: Model {
       .modelIdentifier: .string(self.modelIdentifier),
       .appVersion: .string(self.appVersion),
       .iosVersion: .string(self.iosVersion),
-      .installId: .uuid(self.installId),
+      .deviceId: .uuid(self.deviceId),
       .detail: .string(self.detail),
       .createdAt: .currentTimestamp,
     ]

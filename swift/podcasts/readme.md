@@ -2,6 +2,8 @@
 
 ## Releases
 
+- `1.4.0` (pending more dev)
+  - install id -> device id (from vendor id) migration
 - `1.3.1` (3/12/2026)
   - attempt another mitigation on missing local file errors
   - fix false onboarding crash on reinstall/restore
