@@ -14,13 +14,12 @@ extension RequestPublicKeychain: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     @Dependency(\.postmark) var postmark
 
+    let adminLink = AdminLink()
     let html = """
-    <p>From admin <b>\(
-      context.parent.email
-    )</b> (<a href="https://gertrude-analytics.vercel.app/admins/\(
-      context.parent
-        .id
-    )">view in analytics site</a>).</p>
+    <p>From admin \(adminLink.email(
+      to: .parent(context.parent.id),
+      text: context.parent.email.rawValue,
+    )).</p>
     <p>They searched for "<b>\(input.searchQuery)</b>". This is what they want:</p>
     <code>"\(input.description)"</code>
     """

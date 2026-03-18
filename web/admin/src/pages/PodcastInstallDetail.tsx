@@ -110,7 +110,9 @@ const PodcastInstallDetail: React.FC = () => {
           const podcastEvent = event as PodcastEvent;
           return (
             <span
-              className={`text-xs px-1.5 py-0.5 rounded ${getKindBadgeClass(podcastEvent.kind)}`}
+              className={`text-xs px-1.5 py-0.5 rounded ${getKindBadgeClass(
+                podcastEvent.kind,
+              )}`}
             >
               {podcastEvent.kind}
             </span>

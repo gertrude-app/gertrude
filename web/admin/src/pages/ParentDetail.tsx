@@ -255,7 +255,11 @@ const ParentDetail: React.FC = () => {
                           >
                             <div className="flex-shrink-0 w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-lg border border-slate-200 flex items-center justify-center p-1.5 sm:p-2">
                               <img
-                                src={`https://parents.gertrude.app/ios/${device.modelIdentifier.startsWith(`iPad`) ? `iPad` : `iPhone`}.png`}
+                                src={`https://parents.gertrude.app/ios/${
+                                  device.modelIdentifier.startsWith(`iPad`)
+                                    ? `iPad`
+                                    : `iPhone`
+                                }.png`}
                                 alt={device.modelName}
                                 className="max-w-full max-h-full object-contain"
                                 onError={(e) => {

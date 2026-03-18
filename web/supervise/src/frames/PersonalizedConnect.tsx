@@ -64,7 +64,9 @@ const PersonalizedConnect: React.FC<PersonalizedConnectProps> = ({
         ]}
       />
       <div
-        className={`mt-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 transition-opacity duration-700 ${showHint ? `opacity-100` : `opacity-0`}`}
+        className={`mt-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 transition-opacity duration-700 ${
+          showHint ? `opacity-100` : `opacity-0`
+        }`}
       >
         <span className="font-medium">Trouble connecting?</span> Try a different cable,
         and make sure to plug <em>directly</em> into your computer—not through a dongle or

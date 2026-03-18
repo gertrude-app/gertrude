@@ -176,7 +176,9 @@ const TimeSeriesGraph = <T extends DataItem>({
                 onMouseLeave={() => setHoveredIndex(null)}
               >
                 <div
-                  className={`w-full rounded-t-sm transition-all duration-150 bg-gradient-to-t ${gradientClasses[gradient]} ${
+                  className={`w-full rounded-t-sm transition-all duration-150 bg-gradient-to-t ${
+                    gradientClasses[gradient]
+                  } ${
                     isHovered ? `shadow-lg ${shadowClasses[gradient]} scale-x-110` : ``
                   }`}
                   style={{ height: barHeight }}
@@ -200,7 +202,13 @@ const TimeSeriesGraph = <T extends DataItem>({
           >
             <span className="text-slate-400 text-xs font-medium block">
               {hoveredData.isGrouped
-                ? `${hoveredData.startTime.toLocaleDateString(`en-US`, { month: `short`, day: `numeric` })} – ${hoveredData.time.toLocaleDateString(`en-US`, { month: `short`, day: `numeric` })}`
+                ? `${hoveredData.startTime.toLocaleDateString(`en-US`, {
+                    month: `short`,
+                    day: `numeric`,
+                  })} – ${hoveredData.time.toLocaleDateString(`en-US`, {
+                    month: `short`,
+                    day: `numeric`,
+                  })}`
                 : hoveredData.time.toLocaleDateString(`en-US`, {
                     weekday: `short`,
                     month: `short`,

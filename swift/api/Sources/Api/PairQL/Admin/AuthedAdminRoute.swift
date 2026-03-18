@@ -16,6 +16,9 @@ enum AuthedAdminRoute: PairRoute {
   case deleteParent(DeleteParent.Input)
   case searchParentByEmail(SearchParentByEmail.Input)
   case appRatings(AppRatings.Input)
+  case getUnidentifiedApps(GetUnidentifiedApps.Input)
+  case getIdentifiedAppsForAdmin
+  case promoteApp(PromoteApp.Input)
 
   nonisolated(unsafe) static let router = OneOf {
     Route(.case(Self.subscriptionsOverview)) {
@@ -69,6 +72,17 @@ enum AuthedAdminRoute: PairRoute {
       Operation(AppRatings.self)
       Body(.input(AppRatings.self))
     }
+    Route(.case(Self.getUnidentifiedApps)) {
+      Operation(GetUnidentifiedApps.self)
+      Body(.input(GetUnidentifiedApps.self))
+    }
+    Route(.case(Self.getIdentifiedAppsForAdmin)) {
+      Operation(GetIdentifiedAppsForAdmin.self)
+    }
+    Route(.case(Self.promoteApp)) {
+      Operation(PromoteApp.self)
+      Body(.input(PromoteApp.self))
+    }
   }
 }
 
@@ -116,6 +130,15 @@ extension AuthedAdminRoute: RouteResponder {
       return try await self.respond(with: output)
     case .appRatings(let input):
       let output = try await AppRatings.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getUnidentifiedApps(let input):
+      let output = try await GetUnidentifiedApps.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getIdentifiedAppsForAdmin:
+      let output = try await GetIdentifiedAppsForAdmin.resolve(in: context)
+      return try await self.respond(with: output)
+    case .promoteApp(let input):
+      let output = try await PromoteApp.resolve(with: input, in: context)
       return try await self.respond(with: output)
     }
   }

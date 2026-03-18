@@ -44,7 +44,9 @@ const GertrudeForIOS: React.FC = () => {
           <div
             className="max-w-2xl mx-4 relative"
             style={{
-              transform: `translateY(${Math.max(0, 1 - (exitProgress - 0.22) / 0.1) * 60}px)`,
+              transform: `translateY(${
+                Math.max(0, 1 - (exitProgress - 0.22) / 0.1) * 60
+              }px)`,
               pointerEvents: exitProgress > 0.22 ? `auto` : `none`,
             }}
           >
@@ -124,7 +126,13 @@ const GertrudeForIOS: React.FC = () => {
             <div className="md+:hidden relative h-[140px] [@media(min-height:700px)]:h-[260px] xs:h-[300px] overflow-hidden flex items-start justify-center -mt-4 [@media(min-height:700px)]:-mt-8 mb-4 xs:mb-8">
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-fuchsia-100/40 to-violet-200/60" />
               <div
-                className={`${isVisible && exitProgress === 0 ? `translate-y-0 opacity-100` : !isVisible ? `translate-y-12 opacity-0` : ``}`}
+                className={`${
+                  isVisible && exitProgress === 0
+                    ? `translate-y-0 opacity-100`
+                    : !isVisible
+                      ? `translate-y-12 opacity-0`
+                      : ``
+                }`}
                 style={{
                   transition: `all 0.6s cubic-bezier(0.2, 1.4, 0.5, 1)`,
                   transitionDelay: isVisible && exitProgress === 0 ? `600ms` : `0ms`,
@@ -147,7 +155,13 @@ const GertrudeForIOS: React.FC = () => {
               <div className="md+:order-1 md+:col-span-9 relative z-10 flex flex-col items-center xs:items-start">
                 <div className="relative inline-block mb-3 xs:mb-6">
                   <div
-                    className={`inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-500 px-3 xs:px-4 py-1.5 xs:py-2 rounded-full shadow-lg shadow-green-600/30 ${isVisible && exitProgress === 0 ? `translate-x-0` : !isVisible ? `-translate-x-[500px]` : ``}`}
+                    className={`inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-500 px-3 xs:px-4 py-1.5 xs:py-2 rounded-full shadow-lg shadow-green-600/30 ${
+                      isVisible && exitProgress === 0
+                        ? `translate-x-0`
+                        : !isVisible
+                          ? `-translate-x-[500px]`
+                          : ``
+                    }`}
                     style={{
                       transition: `transform 0.25s cubic-bezier(0.2, 1.4, 0.5, 1)`,
                       transitionDelay: isVisible && exitProgress === 0 ? `1000ms` : `0ms`,
@@ -155,7 +169,9 @@ const GertrudeForIOS: React.FC = () => {
                         ? `waggle-badge 0.5s ease-in-out 1.35s`
                         : `none`,
                       ...(exitProgress > 0.08 && {
-                        transform: `translateX(${(-(exitProgress - 0.08) / 0.25) * 300}px)`,
+                        transform: `translateX(${
+                          (-(exitProgress - 0.08) / 0.25) * 300
+                        }px)`,
                         opacity: 1 - (exitProgress - 0.08) / 0.25,
                       }),
                     }}
@@ -386,7 +402,9 @@ const BlockedGifSearchScreen: React.FC<BlockedGifSearchScreenProps> = ({ isVisib
       </div>
       <div className="h-16 shrink-0" />
       <div
-        className={`flex-1 bg-white flex flex-col ${isVisible ? `translate-y-0` : `translate-y-full`}`}
+        className={`flex-1 bg-white flex flex-col ${
+          isVisible ? `translate-y-0` : `translate-y-full`
+        }`}
         style={{
           transition: `transform 0.5s cubic-bezier(0.22, 1.1, 0.36, 1)`,
           transitionDelay: isVisible ? `${slideUpDelay}ms` : `0ms`,
@@ -431,7 +449,9 @@ const BlockedGifSearchScreen: React.FC<BlockedGifSearchScreenProps> = ({ isVisib
             {[...Array(18)].map((_, i) => (
               <div
                 key={i}
-                className={`aspect-square bg-gradient-to-br from-gray-200 to-gray-300 rounded relative flex items-center justify-center ${isVisible ? `opacity-100 scale-100` : `opacity-0 scale-75`}`}
+                className={`aspect-square bg-gradient-to-br from-gray-200 to-gray-300 rounded relative flex items-center justify-center ${
+                  isVisible ? `opacity-100 scale-100` : `opacity-0 scale-75`
+                }`}
                 style={{
                   transition: `opacity 0.2s ease-out, transform 0.2s ease-out`,
                   transitionDelay: isVisible

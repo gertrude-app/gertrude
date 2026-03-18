@@ -42,6 +42,9 @@ enum AdminTsCodegenRoute {
       DeleteParent.self,
       SearchParentByEmail.self,
       AppRatings.self,
+      GetUnidentifiedApps.self,
+      GetIdentifiedAppsForAdmin.self,
+      PromoteApp.self,
     ]
   }
 

@@ -22,7 +22,9 @@ const SpotifyScreen: React.FC = () => {
   return (
     <div className="size-full flex flex-col bg-gradient-to-b from-slate-800 to-black relative overflow-hidden">
       <div
-        className={`absolute inset-0 flex flex-col transition-all duration-500 ${showNowPlaying ? `opacity-100 translate-x-0` : `opacity-0 -translate-x-full`}`}
+        className={`absolute inset-0 flex flex-col transition-all duration-500 ${
+          showNowPlaying ? `opacity-100 translate-x-0` : `opacity-0 -translate-x-full`
+        }`}
       >
         <div className="flex-1 flex flex-col items-center justify-center px-6 pt-8">
           <div className="w-[70%] aspect-square bg-slate-700 rounded-lg flex items-center justify-center mb-6 shadow-2xl">
@@ -60,7 +62,9 @@ const SpotifyScreen: React.FC = () => {
         </div>
       </div>
       <div
-        className={`absolute inset-0 flex flex-col transition-all duration-500 ${!showNowPlaying ? `opacity-100 translate-x-0` : `opacity-0 translate-x-full`}`}
+        className={`absolute inset-0 flex flex-col transition-all duration-500 ${
+          !showNowPlaying ? `opacity-100 translate-x-0` : `opacity-0 translate-x-full`
+        }`}
       >
         <div className="p-4 pt-16">
           <div className="flex items-center gap-2 mb-1">

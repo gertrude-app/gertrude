@@ -62,7 +62,9 @@ const EventTimeline: React.FC<EventTimelineProps> = ({
                 return (
                   <div key={event.id} className="relative flex items-start gap-3">
                     <div
-                      className={`absolute -left-[21px] w-3 h-3 rounded-full ${getEventColor(event)} ring-2 ring-white`}
+                      className={`absolute -left-[21px] w-3 h-3 rounded-full ${getEventColor(
+                        event,
+                      )} ring-2 ring-white`}
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
@@ -92,7 +94,9 @@ const EventTimeline: React.FC<EventTimelineProps> = ({
                             className="p-0.5 -ml-1 hover:bg-slate-100 rounded transition-colors"
                           >
                             <ChevronRightIcon
-                              className={`w-4 h-4 text-slate-400 transition-transform ${isExpanded ? `rotate-90` : ``}`}
+                              className={`w-4 h-4 text-slate-400 transition-transform ${
+                                isExpanded ? `rotate-90` : ``
+                              }`}
                             />
                           </button>
                         )}
