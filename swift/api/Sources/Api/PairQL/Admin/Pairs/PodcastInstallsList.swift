@@ -17,7 +17,7 @@ struct PodcastInstallsList: Pair {
   }
 
   struct InstallSummary: PairNestable {
-    var installId: UUID
+    var deviceId: UUID
     var deviceType: String
     var iosVersion: String
     var appVersion: String
@@ -45,7 +45,7 @@ extension PodcastInstallsList: Resolver {
     return .init(
       installs: installs.map { row in
         InstallSummary(
-          installId: row.installId,
+          deviceId: row.deviceId,
           deviceType: ModelIdentifier.deviceType(from: row.modelIdentifier),
           iosVersion: row.iosVersion,
           appVersion: row.appVersion,
@@ -64,13 +64,12 @@ extension PodcastInstallsList: Resolver {
 
 private struct DistinctInstallCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    let installId = PodcastEvent.columnName(.installId)
+    let deviceId = PodcastEvent.columnName(.deviceId)
     let eventId = PodcastEvent.columnName(.eventId)
     return SQL.Statement("""
-    SELECT COUNT(DISTINCT \(installId)) AS count
+    SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: PodcastEvent.self)
-    WHERE \(installId) IS NOT NULL
-      AND \(eventId) = '27c4f26a'
+    WHERE \(eventId) = '27c4f26a'
     """)
   }
 
@@ -84,7 +83,7 @@ private struct InstallSummaryQuery: CustomQueryable {
     }
     let limit = bindings[0]
     let offset = bindings[1]
-    let installId = PodcastEvent.columnName(.installId)
+    let deviceId = PodcastEvent.columnName(.deviceId)
     let modelIdentifier = PodcastEvent.columnName(.modelIdentifier)
     let iosVersion = PodcastEvent.columnName(.iosVersion)
     let appVersion = PodcastEvent.columnName(.appVersion)
@@ -92,40 +91,37 @@ private struct InstallSummaryQuery: CustomQueryable {
     let eventId = PodcastEvent.columnName(.eventId)
     var stmt = SQL.Statement("""
     SELECT
-      first_launch.install_id,
+      first_launch.device_id,
       first_launch.model_identifier,
       first_launch.ios_version,
       first_launch.app_version,
       first_launch.created_at AS first_launch,
       COALESCE(event_counts.event_count, 0) AS event_count,
       COALESCE(feed_counts.feed_count, 0) AS feed_count,
-      CASE WHEN paid.install_id IS NOT NULL THEN true ELSE false END AS is_paid
+      CASE WHEN paid.device_id IS NOT NULL THEN true ELSE false END AS is_paid
     FROM (
-      SELECT DISTINCT ON (\(installId))
-        \(installId), \(modelIdentifier), \(iosVersion), \(appVersion), \(createdAt)
+      SELECT DISTINCT ON (\(deviceId))
+        \(deviceId), \(modelIdentifier), \(iosVersion), \(appVersion), \(createdAt)
       FROM \(table: PodcastEvent.self)
-      WHERE \(installId) IS NOT NULL
-        AND \(eventId) = '27c4f26a'
-      ORDER BY \(installId), \(createdAt) ASC
+      WHERE \(eventId) = '27c4f26a'
+      ORDER BY \(deviceId), \(createdAt) ASC
     ) first_launch
     LEFT JOIN (
-      SELECT \(installId), COUNT(*) AS event_count
+      SELECT \(deviceId), COUNT(*) AS event_count
       FROM \(table: PodcastEvent.self)
-      WHERE \(installId) IS NOT NULL
-      GROUP BY \(installId)
-    ) event_counts ON first_launch.install_id = event_counts.install_id
+      GROUP BY \(deviceId)
+    ) event_counts ON first_launch.device_id = event_counts.device_id
     LEFT JOIN (
-      SELECT \(installId), COUNT(*) AS feed_count
+      SELECT \(deviceId), COUNT(*) AS feed_count
       FROM \(table: PodcastEvent.self)
-      WHERE \(installId) IS NOT NULL
-        AND \(eventId) = '7785c87b'
-      GROUP BY \(installId)
-    ) feed_counts ON first_launch.install_id = feed_counts.install_id
+      WHERE \(eventId) = '7785c87b'
+      GROUP BY \(deviceId)
+    ) feed_counts ON first_launch.device_id = feed_counts.device_id
     LEFT JOIN (
-      SELECT DISTINCT \(installId)
+      SELECT DISTINCT \(deviceId)
       FROM \(table: PodcastEvent.self)
       WHERE \(eventId) = 'a72104d7'
-    ) paid ON first_launch.install_id = paid.install_id
+    ) paid ON first_launch.device_id = paid.device_id
     ORDER BY first_launch.created_at DESC
     LIMIT\(" ")
     """)
@@ -135,7 +131,7 @@ private struct InstallSummaryQuery: CustomQueryable {
     return stmt
   }
 
-  var installId: UUID
+  var deviceId: UUID
   var modelIdentifier: String
   var iosVersion: String
   var appVersion: String

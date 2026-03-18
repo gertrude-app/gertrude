@@ -7,13 +7,13 @@ extension AddShowFeature {
   func handleSpecialAction(input: String) -> Effect<Action>? {
     if input == "am: upload db" {
       return .run { send in
-        guard let installId = self.keychain.loadInstallId() else { return }
+        guard let deviceId = self.keychain.loadDeviceId() else { return }
         // can't just upload current file, data might be in WAL, so export
         let queue = try DatabaseQueue(path: URL.localDb.path)
         try queue.backup(to: DatabaseQueue(path: URL.tempDb.path))
         defer { try? FileManager.default.removeItem(at: .tempDb) }
         let dbData = try Data(contentsOf: .tempDb)
-        let uploadUrl = try await self.api.createDatabaseUpload(installId)
+        let uploadUrl = try await self.api.createDatabaseUpload(deviceId)
         var request = URLRequest(url: uploadUrl, cachePolicy: .reloadIgnoringCacheData)
         request.httpMethod = "PUT"
         request.addValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
@@ -25,7 +25,7 @@ extension AddShowFeature {
           return
         }
         log(.info("a5f6b9c3"), "upload db success")
-        await send(.delegate(.alert("DB upload success: \(installId)")))
+        await send(.delegate(.alert("DB upload success: \(deviceId)")))
       }
     }
 
@@ -37,11 +37,11 @@ extension AddShowFeature {
       }
 
       return .run { send in
-        guard let installId = self.keychain.loadInstallId() else {
-          await send(.delegate(.alert("DB download failed: no install id")))
+        guard let deviceId = self.keychain.loadDeviceId() else {
+          await send(.delegate(.alert("DB download failed: no device id")))
           return
         }
-        let allowed = try await self.api.verifyDbDownload(installId, urlString)
+        let allowed = try await self.api.verifyDbDownload(deviceId, urlString)
         guard allowed else {
           log(.info("c3b2a1f0"), "download db not allowed")
           await send(.delegate(.alert("DB download not allowed")))
@@ -63,11 +63,11 @@ extension AddShowFeature {
     if input.starts(with: "am: promo ") {
       let code = String(input.dropFirst("am: promo ".count))
       return .run { send in
-        guard let installId = self.keychain.loadInstallId() else {
-          await send(.delegate(.alert("Promo failed: no install id")))
+        guard let deviceId = self.keychain.loadDeviceId() else {
+          await send(.delegate(.alert("Promo failed: no device id")))
           return
         }
-        let verified = try await self.api.verifyPromoCode(installId, code)
+        let verified = try await self.api.verifyPromoCode(deviceId, code)
         if verified {
           try CurrentSubscription.set(status: .complimentary, expiringAt: .distantFuture)
           log(.info("111b15d5"), "set subscription to complimentary")

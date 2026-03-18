@@ -74,7 +74,7 @@ extension PodcastOverview: NoInputResolver {
 struct DistinctDeviceEventCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     var stmt = SQL.Statement("""
-    SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.installId))) AS count
+    SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.deviceId))) AS count
     FROM \(table: PodcastEvent.self)
     WHERE \(PodcastEvent.columnName(.eventId)) =
     """)
@@ -90,7 +90,7 @@ struct DistinctDeviceEventCount: CustomCountable {
 private struct PastTrialInstallCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     var stmt = SQL.Statement("""
-    SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.installId))) AS count
+    SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.deviceId))) AS count
     FROM \(table: PodcastEvent.self)
     WHERE
       \(PodcastEvent.columnName(.createdAt)) < NOW() - INTERVAL '30 days'
@@ -113,7 +113,7 @@ private struct DeviceTypeInstallCount: CustomCountable {
     let eventId = bindings[0]
     let devicePattern = bindings[1]
     var stmt = SQL.Statement("""
-    SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.installId))) AS count
+    SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.deviceId))) AS count
     FROM \(table: PodcastEvent.self)
     WHERE \(PodcastEvent.columnName(.eventId)) =\(" ")
     """)
@@ -128,7 +128,7 @@ private struct DeviceTypeInstallCount: CustomCountable {
 
 private struct RecentInstallsQuery: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    let installId = PodcastEvent.columnName(.installId)
+    let deviceId = PodcastEvent.columnName(.deviceId)
     let eventId = PodcastEvent.columnName(.eventId)
     let createdAt = PodcastEvent.columnName(.createdAt)
     let modelIdentifier = PodcastEvent.columnName(.modelIdentifier)
@@ -136,18 +136,18 @@ private struct RecentInstallsQuery: CustomQueryable {
     SELECT
       first_launch.\(createdAt) AS date,
       first_launch.\(modelIdentifier) AS model_identifier,
-      CASE WHEN paid.\(installId) IS NOT NULL THEN TRUE ELSE FALSE END AS is_paid
+      CASE WHEN paid.\(deviceId) IS NOT NULL THEN TRUE ELSE FALSE END AS is_paid
     FROM (
-      SELECT DISTINCT ON (\(installId)) \(installId), \(createdAt), \(modelIdentifier)
+      SELECT DISTINCT ON (\(deviceId)) \(deviceId), \(createdAt), \(modelIdentifier)
       FROM \(table: PodcastEvent.self)
-      WHERE \(installId) IS NOT NULL AND \(eventId) = '27c4f26a'
-      ORDER BY \(installId), \(createdAt)
+      WHERE \(eventId) = '27c4f26a'
+      ORDER BY \(deviceId), \(createdAt)
     ) first_launch
     LEFT JOIN (
-      SELECT DISTINCT \(installId)
+      SELECT DISTINCT \(deviceId)
       FROM \(table: PodcastEvent.self)
-      WHERE \(installId) IS NOT NULL AND \(eventId) = 'a72104d7'
-    ) paid ON first_launch.\(installId) = paid.\(installId)
+      WHERE \(eventId) = 'a72104d7'
+    ) paid ON first_launch.\(deviceId) = paid.\(deviceId)
     ORDER BY first_launch.\(createdAt) DESC
     """)
   }
@@ -159,14 +159,13 @@ private struct RecentInstallsQuery: CustomQueryable {
 
 private struct ActivePodcastUsersCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    let installId = PodcastEvent.columnName(.installId)
+    let deviceId = PodcastEvent.columnName(.deviceId)
     let eventId = PodcastEvent.columnName(.eventId)
     let createdAt = PodcastEvent.columnName(.createdAt)
     return SQL.Statement("""
-    SELECT COUNT(DISTINCT \(installId)) AS count
+    SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: PodcastEvent.self)
-    WHERE \(installId) IS NOT NULL
-      AND (
+    WHERE (
         (\(eventId) = '27c4f26a' AND \(createdAt) >= NOW() - INTERVAL '30 days')
         OR \(eventId) = 'a72104d7'
       )

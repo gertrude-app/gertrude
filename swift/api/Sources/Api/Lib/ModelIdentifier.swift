@@ -20,6 +20,7 @@ extension PodcastEvent: IOSModelIdentifiable {}
 extension IOSApp.Device: IOSModelIdentifiable {}
 extension IOSEvent: IOSModelIdentifiable {}
 extension LogPodcastEvent_v2.Input: IOSModelIdentifiable {}
+extension LogPodcastEvent_v3.Input: IOSModelIdentifiable {}
 extension LogIOSEvent_v2.Input: IOSModelIdentifiable {}
 
 enum ModelIdentifier {

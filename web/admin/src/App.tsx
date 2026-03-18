@@ -57,7 +57,7 @@ const App: React.FC = () => {
         <Route path="/ios-devices" element={<IOSDevicesList />} />
         <Route path="/ios/:vendorId/events" element={<IOSDeviceEvents />} />
         <Route path="/podcasts" element={<PodcastInstallsList />} />
-        <Route path="/podcasts/:installId/detail" element={<PodcastInstallDetail />} />
+        <Route path="/podcasts/:deviceId/detail" element={<PodcastInstallDetail />} />
         <Route path="/ratings/:app" element={<AppRatings />} />
         <Route path="/parents" element={<ParentsList />} />
         <Route path="/parents/:id" element={<ParentDetail />} />

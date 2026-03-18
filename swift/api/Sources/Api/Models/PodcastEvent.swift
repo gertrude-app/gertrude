@@ -6,7 +6,7 @@ struct PodcastEvent: Codable, Sendable {
   var kind: Kind
   var label: String
   var detail: String?
-  var installId: UUID?
+  var deviceId: UUID
   var modelIdentifier: String
   var appVersion: String
   var iosVersion: String
@@ -18,7 +18,7 @@ struct PodcastEvent: Codable, Sendable {
     kind: Kind,
     label: String,
     detail: String? = nil,
-    installId: UUID? = nil,
+    deviceId: UUID,
     modelIdentifier: String,
     appVersion: String,
     iosVersion: String,
@@ -28,7 +28,7 @@ struct PodcastEvent: Codable, Sendable {
     self.kind = kind
     self.label = label
     self.detail = detail
-    self.installId = installId
+    self.deviceId = deviceId
     self.modelIdentifier = modelIdentifier
     self.appVersion = appVersion
     self.iosVersion = iosVersion

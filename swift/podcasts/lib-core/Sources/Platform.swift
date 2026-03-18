@@ -34,6 +34,7 @@ import SwiftUI
     public var userInterfaceIdiom: UserInterfaceIdiom { .phone }
     public var NOT_REAL_CHECK_XCODE: String { "" }
     public var systemVersion: String { "26.1.2" }
+    public var identifierForVendor: UUID? { nil }
   }
 
   public struct UIImage {

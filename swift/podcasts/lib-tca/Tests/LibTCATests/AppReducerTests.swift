@@ -18,6 +18,7 @@ import Testing
         // vvv --- prior install's db survived (e.g. device restore)
         try Record.insert { [Record(id: .onboardingFinished)] }.execute($0)
       }
+      $0.device.vendorId = { nil }
       $0.keychain._load = { _ in nil } // <- but keychain was wiped, no pincode
       $0.keychain._save = { _, _ in }
       $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
@@ -39,6 +40,39 @@ import Testing
 
       transactions.continuation.finish()
       await store.finish()
+    }
+  }
+
+  @Test func `first launch sends 27c4f26a event after device id is established`() async {
+    let transactions = AsyncStream<TransactionData>.makeStream()
+    let loggedEventIds = LockIsolated<[String]>([])
+    let keychainStore = LockIsolated<[String: Data]>([:])
+    await withDependencies {
+      $0.api.logEvent = { id, _, _, _ in loggedEventIds.withValue { $0.append(id) } }
+      $0.date = .constant(.reference)
+      $0.locale = Locale(identifier: "en_US")
+      $0.defaultDatabase = try! appDatabase()
+      $0.device.vendorId = { UUID() }
+      $0.keychain._load = { key in keychainStore.value[key.rawValue] }
+      $0.keychain._save = { key, data in keychainStore.withValue { $0[key.rawValue] = data } }
+      $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
+      $0.notificationCenter.appForegroundingEvents = { Empty().eraseToAnyPublisher() }
+      $0.mainQueue = .immediate
+      $0.storekit.verifiedCurrentEntitlements = { [] }
+      $0.storekit.transactionUpdates = { transactions.stream }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: AppReducer.init)
+
+      await store.send(.appDidLaunch) {
+        $0.mode = .onboarding(.init())
+      }
+
+      transactions.continuation.finish()
+      await store.finish()
+
+      #expect(keychainStore.value[KeychainClient.Key.deviceId.rawValue] != nil)
+      await Task.yield()
+      #expect(loggedEventIds.value.contains("27c4f26a"))
     }
   }
 }

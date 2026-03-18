@@ -33,7 +33,9 @@ struct AppReducer: Sendable {
     case dismiss
   }
 
+  @Dependency(\.api) var api
   @Dependency(\.db) var database
+  @Dependency(\.device) var device
   @Dependency(\.keychain) var keychain
   @Dependency(\.audio) var audio
   @Dependency(\.mainQueue) var mainQueue
@@ -49,17 +51,11 @@ struct AppReducer: Sendable {
     Reduce { state, action in
       switch action {
       case .appDidLaunch:
-        if self.keychain.isFirstLaunch() {
+        let isFirstLaunch = self.keychain.isFirstLaunch()
+        if isFirstLaunch {
           let installDate = self.date.now
           self.keychain.save(installDate: installDate)
           self.database.insertRecord(id: .installDate)
-          let installId = UUID()
-          self.keychain.save(installId: installId)
-          self.database.insertRecord(id: .installId, value: "\(installId)")
-          self.logFirstLaunch()
-        } else {
-          let updated = self.defeatRepeatFreeTrialAttempt(state.subscription)
-          self.expireFreeTrial(updated ?? state.subscription)
         }
 
         if self.keychain.hasPincode() {
@@ -68,6 +64,15 @@ struct AppReducer: Sendable {
           state.mode = .onboarding(.init())
         }
         return .merge(
+          .run { [subscription = state.subscription] _ in
+            await self.ensureDeviceId()
+            if isFirstLaunch {
+              self.logFirstLaunch()
+            } else {
+              let updated = self.defeatRepeatFreeTrialAttempt(subscription)
+              self.expireFreeTrial(updated ?? subscription)
+            }
+          },
           .publisher {
             self.audio.systemEvents()
               .map { .nowPlaying(.system($0)) }
@@ -190,15 +195,14 @@ struct AppReducer: Sendable {
     }
 
     log(.subscription("1ace9aa6"), "defeated repeat free trial attempt")
-    let installId = self.keychain.loadInstallId() ?? .init()
+    let deviceId = self.keychain.loadDeviceId() ?? UUID()
     try? self.database.write { db in
-      try Record
-        .insert { [
-          Record(id: .installDate, createdAt: installDate),
-          Record(id: .installId, value: "\(installId)", createdAt: installDate),
-          Record(id: .onboardingFinished, createdAt: installDate),
-        ] }
-        .execute(db)
+      let records = [
+        Record(id: .installDate, createdAt: installDate),
+        Record(id: .onboardingFinished, createdAt: installDate),
+        Record(id: .deviceId, value: "\(deviceId)", createdAt: installDate),
+      ]
+      try Record.insert { records }.execute(db)
     }
     return try? CurrentSubscription.set(
       status: .trialing,
@@ -233,6 +237,18 @@ struct AppReducer: Sendable {
     let region = self.locale.region?.identifier ?? "(nil)"
     let lang = self.locale.language.languageCode?.identifier ?? "(nil)"
     log(.info("27c4f26a"), "firstLaunch", detail: "region: `\(region)`, language: `\(lang)`")
+  }
+
+  func ensureDeviceId() async {
+    guard self.keychain.loadDeviceId() == nil else { return }
+    // we record the ios vendor id as our device id, same as
+    // in the ios app, to correlate installs between apps
+    // prior to 1.4.0 we used a random uuid as identifier
+    guard let deviceId = await self.device.vendorId() else { return }
+    self.keychain.save(deviceId: deviceId)
+    self.database.insertRecord(id: .deviceId, value: "\(deviceId)")
+    guard let oldInstallId = self.keychain.loadDeprecatedInstallId() else { return }
+    try? await self.api.migrateDeviceId(oldInstallId, deviceId)
   }
 }
 

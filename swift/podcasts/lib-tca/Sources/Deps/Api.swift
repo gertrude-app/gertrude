@@ -13,53 +13,62 @@ struct ApiClient: Sendable {
     _ label: String,
     _ detail: String?,
   ) async throws -> Void
+  var migrateDeviceId: @Sendable (_ oldDeviceId: UUID, _ newVendorId: UUID) async throws -> Void
   var productIds: @Sendable () async throws -> [String]
-  var createDatabaseUpload: @Sendable (_ installId: UUID) async throws -> URL
-  var verifyPromoCode: @Sendable (_ installId: UUID, _ code: String) async throws -> Bool
-  var verifyDbDownload: @Sendable (_ installId: UUID, _ downloadUrl: String) async throws -> Bool
+  var createDatabaseUpload: @Sendable (_ deviceId: UUID) async throws -> URL
+  var verifyPromoCode: @Sendable (_ deviceId: UUID, _ code: String) async throws -> Bool
+  var verifyDbDownload: @Sendable (_ deviceId: UUID, _ downloadUrl: String) async throws -> Bool
 }
 
 extension ApiClient: DependencyKey {
   static var liveValue: ApiClient {
     .init(
       logEvent: { id, kind, label, detail in
-        let iosVersion = await MainActor.run { UIDevice.current.systemVersion }
-        let modelIdentifier = getModelIdentifier()
+        guard let deviceId = dep(\.keychain).loadDeviceId() else { return }
+        let device = dep(\.device)
+        let (_, iosVersion, modelIdentifier) = await device.data()
 
         let appVersion = Bundle.main
           .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
 
-        let input = LogPodcastEvent_v2.Input(
+        let input = LogPodcastEvent_v3.Input(
           eventId: id,
           kind: kind.string,
           label: label,
           detail: detail,
-          installId: dep(\.keychain).loadInstallId(),
+          deviceId: deviceId,
           modelIdentifier: modelIdentifier,
           appVersion: appVersion,
           iosVersion: iosVersion,
         )
 
-        let _: Empty = try await pairql("LogPodcastEvent_v2", input: input)
+        let _: Empty = try await pairql("LogPodcastEvent_v3", input: input)
+      },
+      migrateDeviceId: { oldDeviceId, newVendorId in
+        let input = MigratePodcastVendorId.Input(
+          oldDeviceId: oldDeviceId,
+          newVendorId: newVendorId,
+        )
+        let _: Empty = try await pairql("MigratePodcastVendorId", input: input)
       },
       productIds: {
         try await pairql("PodcastProducts")
       },
-      createDatabaseUpload: { installId in
-        let input = CreateDatabaseUpload.Input(installId: installId)
+      createDatabaseUpload: { deviceId in
+        let input = CreateDatabaseUpload.Input(installId: deviceId)
         let output: CreateDatabaseUpload.Output = try await pairql(
           "CreateDatabaseUpload",
           input: input,
         )
         return output.uploadUrl
       },
-      verifyPromoCode: { installId, code in
-        let input = VerifyPromoCode.Input(installId: installId, code: code)
+      verifyPromoCode: { deviceId, code in
+        let input = VerifyPromoCode.Input(installId: deviceId, code: code)
         let output: SuccessOutput = try await pairql("VerifyPromoCode", input: input)
         return output.success
       },
-      verifyDbDownload: { installId, downloadUrl in
-        let input = VerifyDbDownload.Input(installId: installId, downloadUrl: downloadUrl)
+      verifyDbDownload: { deviceId, downloadUrl in
+        let input = VerifyDbDownload.Input(installId: deviceId, downloadUrl: downloadUrl)
         let output: SuccessOutput = try await pairql("VerifyDbDownload", input: input)
         return output.success
       },
@@ -96,18 +105,6 @@ func pairql<Output: Decodable>(
 }
 
 private struct Empty: Codable {}
-
-// NB: currently duplicated, grep: af6ce6fd
-private func getModelIdentifier() -> String {
-  var systemInfo = utsname()
-  uname(&systemInfo)
-  let mirror = Mirror(reflecting: systemInfo.machine)
-  let identifier = mirror.children.reduce("") { identifier, element in
-    guard let value = element.value as? Int8, value != 0 else { return identifier }
-    return identifier + String(UnicodeScalar(UInt8(value)))
-  }
-  return identifier
-}
 
 extension ApiClient {
   enum ApiError: Error {

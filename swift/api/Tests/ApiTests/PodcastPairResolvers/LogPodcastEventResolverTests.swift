@@ -41,7 +41,7 @@ final class LogPodcastEventResolverTests: ApiTestCase, @unchecked Sendable {
     expect(retrieved.modelIdentifier).toEqual(modelIdentifier)
     expect(retrieved.appVersion).toEqual(appVersion)
     expect(retrieved.iosVersion).toEqual(iosVersion)
-    expect(retrieved.installId).toEqual(installId)
+    expect(retrieved.deviceId).toEqual(installId)
     expect(retrieved.detail).toEqual(detail)
     expect(retrieved.createdAt).not.toBeNil()
   }

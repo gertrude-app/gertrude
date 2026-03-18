@@ -656,7 +656,7 @@ extension PodcastEvent {
     case modelIdentifier
     case appVersion
     case iosVersion
-    case installId
+    case deviceId
     case detail
     case createdAt
   }
