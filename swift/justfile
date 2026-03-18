@@ -4,6 +4,7 @@ set dotenv-filename := "../.gtask-ports"
 set dotenv-required := false
 
 api_port := env("API_PORT", "8080")
+ngrok_subdomain := env("NGROK_SUBDOMAIN", "")
 
 _default:
   @just --choose
@@ -31,7 +32,10 @@ iosapp-xcode-build:
   @pnpm exec nx run iosapp:xcode-build
 
 iosconfig:
-  @echo "LOCAL_API_URL = https:/\$()/REPLACE.ngrok-free.app" > iosapp/config/Local.xcconfig
+  @echo "LOCAL_API_URL = https:/\$()/{{ngrok_subdomain}}.ngrok-free.app" > iosapp/config/Local.xcconfig
+
+ios-tunnel:
+  @ngrok http {{api_port}} --url https://{{ngrok_subdomain}}.ngrok-free.app
 
 # api
 
