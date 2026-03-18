@@ -22,6 +22,26 @@ export default class AdminClient extends Client<Auth> {
     return this.query<P.DeleteParent.Output>(input, `DeleteParent`, `superAdmin`);
   };
 
+  public getIdentifiedAppsForAdmin = (
+    input: P.GetIdentifiedAppsForAdmin.Input,
+  ): Promise<Result<P.GetIdentifiedAppsForAdmin.Output>> => {
+    return this.query<P.GetIdentifiedAppsForAdmin.Output>(
+      input,
+      `GetIdentifiedAppsForAdmin`,
+      `superAdmin`,
+    );
+  };
+
+  public getUnidentifiedApps = (
+    input: P.GetUnidentifiedApps.Input,
+  ): Promise<Result<P.GetUnidentifiedApps.Output>> => {
+    return this.query<P.GetUnidentifiedApps.Output>(
+      input,
+      `GetUnidentifiedApps`,
+      `superAdmin`,
+    );
+  };
+
   public iOSDetailedStats = (
     input: P.IOSDetailedStats.Input,
   ): Promise<Result<P.IOSDetailedStats.Output>> => {
@@ -88,6 +108,12 @@ export default class AdminClient extends Client<Auth> {
     input: P.PodcastOverview.Input,
   ): Promise<Result<P.PodcastOverview.Output>> => {
     return this.query<P.PodcastOverview.Output>(input, `PodcastOverview`, `superAdmin`);
+  };
+
+  public promoteApp = (
+    input: P.PromoteApp.Input,
+  ): Promise<Result<P.PromoteApp.Output>> => {
+    return this.query<P.PromoteApp.Output>(input, `PromoteApp`, `superAdmin`);
   };
 
   public requestAdminMagicLink = (

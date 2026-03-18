@@ -23,6 +23,7 @@ const Dashboard: React.FC = () => {
   const [macData, setMacData] = useState<T.MacOverview.Output | null>(null);
   const [iosData, setIosData] = useState<T.IOSOverview.Output | null>(null);
   const [podcastData, setPodcastData] = useState<T.PodcastOverview.Output | null>(null);
+  const [appNamingCount, setAppNamingCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,12 +32,14 @@ const Dashboard: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const [overviewResult, macResult, iosResult, podcastResult] = await Promise.all([
-        client.subscriptionsOverview(),
-        client.macOverview(),
-        client.iOSOverview(),
-        client.podcastOverview(),
-      ]);
+      const [overviewResult, macResult, iosResult, podcastResult, appNamingResult] =
+        await Promise.all([
+          client.subscriptionsOverview(),
+          client.macOverview(),
+          client.iOSOverview(),
+          client.podcastOverview(),
+          client.getUnidentifiedApps({ threshold: 100_000, limit: 1 }),
+        ]);
 
       if (overviewResult.isError) {
         setError(
@@ -56,6 +59,9 @@ const Dashboard: React.FC = () => {
       setMacData(macResult.value ?? null);
       setIosData(iosResult.value ?? null);
       setPodcastData(podcastResult.value ?? null);
+      if (!appNamingResult.isError && appNamingResult.value) {
+        setAppNamingCount(appNamingResult.value.totalAboveThreshold);
+      }
       setLoading(false);
     };
 
@@ -72,6 +78,26 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-fade-in pt-4">
+      {appNamingCount !== null && appNamingCount > 0 && (
+        <Link
+          to="/app-naming"
+          className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-brand-violet/10 to-brand-fuchsia/10 border border-brand-violet/20 rounded-2xl hover:from-brand-violet/15 hover:to-brand-fuchsia/15 transition-all group"
+        >
+          <div>
+            <p className="font-display font-semibold text-brand-violet">
+              App Naming Queue
+            </p>
+            <p className="text-sm text-slate-600 mt-0.5">
+              {appNamingCount} app{appNamingCount !== 1 ? `s` : ``} above 100K requests
+              need names
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 text-sm font-medium text-brand-violet group-hover:gap-2.5 transition-all">
+            Review
+            <ArrowRightIcon className="w-4 h-4" />
+          </div>
+        </Link>
+      )}
       {overviewData && (
         <OverviewSection
           data={overviewData}

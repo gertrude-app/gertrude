@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
+import AppNaming from './pages/AppNaming';
+import AppNamingDetail from './pages/AppNamingDetail';
 import AppRatings from './pages/AppRatings';
 import Dashboard from './pages/Dashboard';
 import IOSDeviceEvents from './pages/IOSDeviceEvents';
@@ -49,6 +51,8 @@ const App: React.FC = () => {
     <Layout onLogout={handleLogout}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/app-naming" element={<AppNaming />} />
+        <Route path="/app-naming/:bundleId" element={<AppNamingDetail />} />
         <Route path="/ios-stats" element={<IOSStats />} />
         <Route path="/ios-devices" element={<IOSDevicesList />} />
         <Route path="/ios/:vendorId/events" element={<IOSDeviceEvents />} />
