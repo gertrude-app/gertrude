@@ -134,7 +134,7 @@ public struct ClearCacheFeature {
     }
   }
 
-  func startCacheClear(_ state: inout State) -> Effect<Action> {
+  func startCacheClear(_ state: inout State) -> EffectOf<ClearCacheFeature> {
     state.screen = .clearing
     state.startClearCache = self.deps.date.now
     let availableSpace = state.availableDiskSpaceInBytes

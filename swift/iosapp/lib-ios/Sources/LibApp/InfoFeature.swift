@@ -179,7 +179,7 @@ public struct InfoFeature {
     }
   }
 
-  func unconnectedRecovery() -> Effect<Action> {
+  func unconnectedRecovery() -> EffectOf<InfoFeature> {
     .run { [deps = self.deps] _ in
       await deps.api.logEvent("a8998540", "entering recovery mode")
       if deps.sharedStorage.loadDisabledBlockGroups() == nil {
