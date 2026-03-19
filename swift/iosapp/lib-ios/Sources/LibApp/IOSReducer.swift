@@ -47,7 +47,7 @@ public struct IOSReducer {
     }
   }
 
-  func interactive(state: inout State, action: Action.Interactive) -> Effect<Action> {
+  func interactive(state: inout State, action: Action.Interactive) -> EffectOf<IOSReducer> {
     switch action {
     case .onboardingBtnTapped(let btn, _):
       return self.onboardingBtnTapped(btn, state: &state, action: action)
@@ -100,7 +100,7 @@ public struct IOSReducer {
     _ btn: Action.Interactive.OnboardingBtn,
     state: inout State,
     action: Action.Interactive,
-  ) -> Effect<Action> {
+  ) -> EffectOf<IOSReducer> {
     switch (state.screen, btn) {
     case (.onboarding(.happyPath(.hiThere)), .primary):
       self.deps.log(state.screen, action, "6f97eb1b")
@@ -723,7 +723,7 @@ public struct IOSReducer {
     }
   }
 
-  func programmatic(state: inout State, action: Action.Programmatic) -> Effect<Action> {
+  func programmatic(state: inout State, action: Action.Programmatic) -> EffectOf<IOSReducer> {
     switch action {
     case .appDidLaunch:
       return .merge(
@@ -967,7 +967,7 @@ public struct IOSReducer {
     }
   }
 
-  func destination(state: inout State, action: Destination.Action) -> Effect<Action> {
+  func destination(state: inout State, action: Destination.Action) -> EffectOf<IOSReducer> {
     switch action {
     case .connectAccount(.connectionSucceeded(childData: let conn)):
       state.screen = .onboarding(.happyPath(.connectSuccess))

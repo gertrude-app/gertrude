@@ -5,7 +5,7 @@ import LibClients
 import TaggedTime
 
 extension IOSReducer {
-  @Reducer(state: .equatable, action: .equatable)
+  @Reducer
   public enum Destination {
     case connectAccount(ConnectAccount)
     case info(InfoFeature)
@@ -189,3 +189,6 @@ extension IOSReducer {
     case connectSuccess
   }
 }
+
+extension IOSReducer.Destination.State: Equatable {}
+extension IOSReducer.Destination.Action: Equatable {}

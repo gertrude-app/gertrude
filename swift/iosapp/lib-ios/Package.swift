@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 import PackageDescription
 
 let package = Package(
@@ -23,7 +23,8 @@ let package = Package(
     ),
     .package(
       url: "https://github.com/pointfreeco/swift-composable-architecture",
-      from: "1.18.0",
+      from: "1.25.0",
+      traits: ["ComposableArchitecture2Deprecations"],
     ),
     .package(path: "../../pairql-iosapp"),
     .package(path: "../../gertie"),

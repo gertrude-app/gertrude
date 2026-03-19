@@ -4,7 +4,7 @@ import os.log
 import SQLiteData
 
 extension AddShowFeature {
-  func handleSpecialAction(input: String) -> Effect<Action>? {
+  func handleSpecialAction(input: String) -> EffectOf<AddShowFeature>? {
     if input == "am: upload db" {
       return .run { send in
         guard let deviceId = self.keychain.loadDeviceId() else { return }

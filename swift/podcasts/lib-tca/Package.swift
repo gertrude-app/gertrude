@@ -11,7 +11,11 @@ let package = Package(
     .package(path: "../../pairql-podcasts"),
     .package(url: "https://github.com/pointfreeco/sqlite-data", exact: "1.4.0"),
     .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.10.0"),
-    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.22.3"),
+    .package(
+      url: "https://github.com/pointfreeco/swift-composable-architecture",
+      from: "1.25.0",
+      traits: ["ComposableArchitecture2Deprecations"],
+    ),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
     .package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.10.0"),
     .package(

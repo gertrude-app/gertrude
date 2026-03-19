@@ -139,7 +139,10 @@ struct NowPlayingFeature {
     }
   }
 
-  func updateNowPlaying(_ episode: Episode, _ nowPlaying: NowPlaying.Data) -> Effect<Action> {
+  func updateNowPlaying(
+    _ episode: Episode,
+    _ nowPlaying: NowPlaying.Data,
+  ) -> EffectOf<NowPlayingFeature> {
     if episode.id == nowPlaying.episode.id {
       self.toggle(nowPlaying: nowPlaying)
     } else {
@@ -147,7 +150,7 @@ struct NowPlayingFeature {
     }
   }
 
-  func toggle(nowPlaying: NowPlaying.Data) -> Effect<Action> {
+  func toggle(nowPlaying: NowPlaying.Data) -> EffectOf<NowPlayingFeature> {
     if nowPlaying.isPlaying || nowPlaying.episode.downloaded {
       .run { _ in NowPlaying.updateSyncingProgress { $0.isPlaying.toggle() } }
     } else {
@@ -155,7 +158,7 @@ struct NowPlayingFeature {
     }
   }
 
-  func play(episode: Episode, previous: NowPlaying.Data?) -> Effect<Action> {
+  func play(episode: Episode, previous: NowPlaying.Data?) -> EffectOf<NowPlayingFeature> {
     .run { send in
       if previous != nil {
         // write pause to current, to make sure playback stops
@@ -189,7 +192,7 @@ struct NowPlayingFeature {
     _ direction: SkipDirection,
     amount: Double,
     from location: Double? = nil,
-  ) -> Effect<Action> {
+  ) -> EffectOf<NowPlayingFeature> {
     .run { _ in
       var currentLoc = location ?? -1.0
       if currentLoc < 0 {
@@ -210,7 +213,7 @@ struct NowPlayingFeature {
     _ nowPlaying: NowPlaying.Data,
     to newTime: Double,
     from source: ScrubSource,
-  ) -> Effect<Action> {
+  ) -> EffectOf<NowPlayingFeature> {
     .run { _ in
       nowPlaying.setProgress(newTime, sync: source == .lockScreen)
       if source == .appUi {

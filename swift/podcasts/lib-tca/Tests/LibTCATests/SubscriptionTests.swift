@@ -91,6 +91,11 @@ import Testing
         ))
       }
 
+      // megayield
+      for _ in 0 ..< 20 {
+        await Task.yield()
+      }
+
       sub = dep(\.db).subscription()
       #expect(sub.status == .trialing)
       #expect(sub.expiresAt == .reference + .days(30))

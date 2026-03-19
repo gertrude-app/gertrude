@@ -282,8 +282,8 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: swift/iosapp/lib-ios/.build
-          key: iosapp-xc26.1.1--${{ hashFiles('swift/iosapp/lib-ios/Package.resolved') }}
-          restore-keys: iosapp-xc26.1.1--
+          key: iosapp-xc26.1.1-b--${{ hashFiles('swift/iosapp/lib-ios/Package.resolved') }}
+          restore-keys: iosapp-xc26.1.1-b--
       - name: build
         run: cd swift/iosapp/lib-ios && swift build
       - name: test
