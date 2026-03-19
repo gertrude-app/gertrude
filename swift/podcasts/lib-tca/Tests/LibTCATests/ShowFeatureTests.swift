@@ -12,6 +12,7 @@ import Testing
     let clock = TestClock()
     let episode = Episode.mock(2, showId: 1)
     let releaseDownload = LockIsolated<CheckedContinuation<Void, Never>?>(nil)
+    let loggedEventIds = LockIsolated<[String]>([])
 
     try? FileManager.default.removeItem(at: episode.localAudioUrl.deletingLastPathComponent())
     defer {
@@ -21,7 +22,9 @@ import Testing
     try await withDependencies {
       $0.continuousClock = clock
       $0.date = .constant(.reference)
-      $0.api.logEvent = { _, _, _, _ in }
+      $0.api.logEvent = { id, _, _, _ in
+        loggedEventIds.withValue { $0.append(id) }
+      }
       $0.fileSystem.removeItem = { try FileManager.default.removeItem(at: $0) }
       $0.fileSystem.fileExists = { FileManager.default.fileExists(atPath: $0.path) }
       $0.defaultDatabase = try! appDatabase {
@@ -88,6 +91,7 @@ import Testing
       #expect(refreshed?.isArchived == true)
       #expect(refreshed?.downloadedAt == nil)
       #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path) == false)
+      #expect(loggedEventIds.value.contains("8c975d36"))
     }
   }
 

@@ -277,6 +277,69 @@ import Testing
     }
   }
 
+  @Test func `concurrent dupe downloads share one in-flight task`() async throws {
+    let clock = TestClock()
+    let downloadInvocations = LockIsolated<[Episode.ID]>([])
+    let releaseDownload = LockIsolated<CheckedContinuation<Void, Never>?>(nil)
+
+    await withDependencies {
+      $0.api.logEvent = { _, _, _, _ in }
+      $0.continuousClock = clock
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase {
+        try fixtures($0)
+      }
+      $0.network.isConnected = { true }
+      $0.podcasts.downloadAudio = { ep in
+        downloadInvocations.withValue { $0.append(ep.id) }
+        await withCheckedContinuation {
+          releaseDownload.setValue($0)
+        }
+        return true
+      }
+    } operation: {
+      guard let episode = dep(\.db).tryRead({ db in
+        try Episode.find(Episode.ID(4)).fetchOne(db)!
+      }) else {
+        Issue.record("missing episode fixture")
+        return
+      }
+
+      let first = Task { await trackedDownload(episode: episode) }
+
+      await clock.advance(by: .seconds(2))
+      while releaseDownload.value == nil {
+        await Task.yield()
+      }
+
+      let second = Task { await trackedDownload(episode: episode) }
+      await Task.yield()
+
+      #expect(downloadInvocations.value == [.init(4)])
+
+      releaseDownload.withValue {
+        $0?.resume()
+        $0 = nil
+      }
+      await clock.advance(by: .seconds(1))
+
+      let outcomes = await [first.value, second.value]
+      #expect(outcomes.allSatisfy {
+        if case .success = $0 {
+          true
+        } else {
+          false
+        }
+      })
+      #expect(downloadInvocations.value == [.init(4)])
+
+      let refreshed = dep(\.db).tryRead { db in
+        try Episode.find(Episode.ID(4)).fetchOne(db)
+      }
+      #expect(refreshed?.downloadedAt == .reference)
+    }
+  }
+
   @Test func `resume downloaded episode with empty file re-downloads`() async throws {
     let clock = TestClock()
     let playInvocations = LockIsolated<[Episode.ID]>([])
