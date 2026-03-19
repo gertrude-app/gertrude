@@ -139,7 +139,10 @@ struct NowPlayingFeature {
     }
   }
 
-  func updateNowPlaying(_ episode: Episode, _ nowPlaying: NowPlaying.Data) -> EffectOf<NowPlayingFeature> {
+  func updateNowPlaying(
+    _ episode: Episode,
+    _ nowPlaying: NowPlaying.Data,
+  ) -> EffectOf<NowPlayingFeature> {
     if episode.id == nowPlaying.episode.id {
       self.toggle(nowPlaying: nowPlaying)
     } else {
