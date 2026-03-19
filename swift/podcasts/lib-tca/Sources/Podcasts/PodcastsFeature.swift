@@ -198,14 +198,14 @@ struct PodcastsFeature {
   }
 
   @MainActor
-  func updateFeedsAndDownload(with send: Send<Action>) async {
+  func updateFeedsAndDownload(with send: SendOf<PodcastsFeature>) async {
     let downloads = await updateFeeds()
     if !downloads.isEmpty {
       send(.addToDownloadQueue(downloads))
     }
   }
 
-  func handleDebugMenu(_ action: PodcastsHomeView.DebugMenuAction) -> Effect<Action> {
+  func handleDebugMenu(_ action: PodcastsHomeView.DebugMenuAction) -> EffectOf<PodcastsFeature> {
     switch action {
     case .setTrialExpiringSoon:
       .run { _ in

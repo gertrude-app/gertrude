@@ -165,7 +165,7 @@ struct AddShowFeature {
     }
   }
 
-  func subscribe(to feedUrl: String, artwork withArtwork: Bool) -> Effect<Action> {
+  func subscribe(to feedUrl: String, artwork withArtwork: Bool) -> EffectOf<AddShowFeature> {
     .run { send in
       do {
         log(.info("7785c87b"), "subscribe", detail: "\(feedUrl), artwork: \(withArtwork)")
