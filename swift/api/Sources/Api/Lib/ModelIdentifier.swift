@@ -59,6 +59,8 @@ enum ModelIdentifier {
     return "iPhone"
   }
 
+  // NB: use https://github.com/devicekit/DeviceKit as source of truth for new devices
+  // search model identifier and see changelog for marketing names
   private static let mapping: [String: String] = [
     // iPhone 17e (March 2026)
     "iPhone18,5": "iPhone 17e",
@@ -147,6 +149,10 @@ enum ModelIdentifier {
     "iPad16,4": "iPad Pro 11-inch (M4)",
     "iPad16,5": "iPad Pro 13-inch (M4)",
     "iPad16,6": "iPad Pro 13-inch (M4)",
+
+    // iPad Air M4 (2026)
+    "iPad16,7": "iPad Air 11-inch (M4)",
+    "iPad16,8": "iPad Air 11-inch (M4)",
 
     // iPad Air M3 (2025)
     "iPad15,3": "iPad Air 11-inch (M3)",
