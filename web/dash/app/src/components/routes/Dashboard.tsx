@@ -7,7 +7,9 @@ import { Key, useDeleteEntity, useMutation, useQuery } from '../../hooks';
 import ReqState from '../../lib/ReqState';
 
 const DashboardRoute: React.FC = () => {
-  const widgetsQuery = useQuery(Key.dashboard, Current.api.dashboardWidgets);
+  const widgetsQuery = useQuery(Key.dashboard, Current.api.dashboardWidgets, {
+    refetchIntervalSeconds: 9 * 60, // img sig expires in 10 min
+  });
   const deleteAnnouncement = useDeleteEntity(`announcement`);
   const addDevice = useMutation((childId: UUID) =>
     Current.api.macAppConnectionCode({ childId }),

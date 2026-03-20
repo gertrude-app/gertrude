@@ -18,17 +18,22 @@ function useQueryResult<T>(
   fn: () => Promise<Result<T, PqlError>>,
   options: QueryOptions<T> & Partial<UseQueryOptions<T, PqlError>> = {},
 ): QueryResult<T> {
+  const { refetchIntervalSeconds, ...rest } = options;
   return useLibQuery({
     queryKey: key,
     queryFn: async () => {
       const value = (await fn()).valueOrThrow();
-      if (options.onReceive) {
-        options.onReceive(value);
+      if (rest.onReceive) {
+        rest.onReceive(value);
       }
       return value;
     },
     retry: env.isCypress() ? false : 3,
-    ...options,
+    ...rest,
+    refetchInterval:
+      refetchIntervalSeconds === undefined
+        ? rest.refetchInterval
+        : refetchIntervalSeconds * 1000,
   });
 }
 
@@ -76,6 +81,7 @@ export function useFireAndForget<T>(
 type QueryOptions<T> = {
   enabled?: boolean;
   onReceive?: (data: T) => unknown;
+  refetchIntervalSeconds?: number;
 };
 
 type FireAndForgetOptions<T> = {

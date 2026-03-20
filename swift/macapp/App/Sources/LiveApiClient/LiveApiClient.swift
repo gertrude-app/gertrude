@@ -101,8 +101,8 @@ extension ApiClient: @retroactive DependencyKey {
     uploadScreenshot: { data in
       guard await accountActive.value else { throw Error.accountInactive }
       let signed = try await output(
-        from: CreateSignedScreenshotUpload.self,
-        with: .createSignedScreenshotUpload(.init(
+        from: CreateSignedScreenshotUpload_v2.self,
+        with: .createSignedScreenshotUpload_v2(.init(
           width: data.width,
           height: data.height,
           filterSuspended: data.filterSuspended,
@@ -112,10 +112,10 @@ extension ApiClient: @retroactive DependencyKey {
 
       var request = URLRequest(url: signed.uploadUrl, cachePolicy: .reloadIgnoringCacheData)
       request.httpMethod = "PUT"
-      request.addValue("public-read", forHTTPHeaderField: "x-amz-acl")
       request.addValue("image/jpeg", forHTTPHeaderField: "Content-Type")
 
-      return try await withCheckedThrowingContinuation { continuation in
+      try await withCheckedThrowingContinuation {
+        (continuation: CheckedContinuation<Void, any Swift.Error>) in
         URLSession.shared.uploadTask(with: request, from: data.image) { data, response, error in
           if let error {
             continuation.resume(throwing: error)
@@ -125,7 +125,7 @@ extension ApiClient: @retroactive DependencyKey {
             continuation.resume(throwing: Error.missingDataOrResponse)
             return
           }
-          continuation.resume(returning: signed.webUrl)
+          continuation.resume()
         }.resume()
       }
     },

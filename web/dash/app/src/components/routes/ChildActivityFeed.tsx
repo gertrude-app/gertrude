@@ -14,8 +14,10 @@ const ChildActivityFeedRoute: React.FC = () => {
   const optimistic = useOptimism();
   const queryKey = Key.userActivityFeed(userId, urlDate);
 
-  const query = useQuery(queryKey, () =>
-    Current.api.userActivityFeed({ userId, range: entireDay(date) }),
+  const query = useQuery(
+    queryKey,
+    () => Current.api.userActivityFeed({ userId, range: entireDay(date) }),
+    { refetchIntervalSeconds: 9 * 60 }, // img sig expires in 10 min
   );
 
   const deleteItems = useMutation(

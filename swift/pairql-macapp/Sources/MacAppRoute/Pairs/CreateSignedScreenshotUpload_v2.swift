@@ -1,9 +1,8 @@
 import Foundation
 import PairQL
 
-/// deprecated: v2.0.0 - v2.8.1
-/// remove when MSV is 2.9.0
-public struct CreateSignedScreenshotUpload: Pair {
+/// in use: v2.9.0 - present
+public struct CreateSignedScreenshotUpload_v2: Pair {
   public static let auth: ClientAuth = .child
 
   public struct Input: PairInput {
@@ -27,11 +26,9 @@ public struct CreateSignedScreenshotUpload: Pair {
 
   public struct Output: PairOutput {
     public let uploadUrl: URL
-    public let webUrl: URL
 
-    public init(uploadUrl: URL, webUrl: URL) {
+    public init(uploadUrl: URL) {
       self.uploadUrl = uploadUrl
-      self.webUrl = webUrl
     }
   }
 }

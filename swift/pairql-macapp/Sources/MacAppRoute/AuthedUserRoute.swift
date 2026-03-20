@@ -6,6 +6,7 @@ public enum AuthedUserRoute: PairRoute {
   case checkIn_v2(CheckIn_v2.Input)
   case createKeystrokeLines(CreateKeystrokeLines.Input)
   case createSignedScreenshotUpload(CreateSignedScreenshotUpload.Input)
+  case createSignedScreenshotUpload_v2(CreateSignedScreenshotUpload_v2.Input)
   case createSuspendFilterRequest_v2(CreateSuspendFilterRequest_v2.Input)
   case createUnlockRequests_v3(CreateUnlockRequests_v3.Input)
   case logFilterEvents(LogFilterEvents.Input)
@@ -30,6 +31,10 @@ public extension AuthedUserRoute {
     Route(.case(Self.createSignedScreenshotUpload)) {
       Operation(CreateSignedScreenshotUpload.self)
       Body(.json(CreateSignedScreenshotUpload.Input.self))
+    }
+    Route(.case(Self.createSignedScreenshotUpload_v2)) {
+      Operation(CreateSignedScreenshotUpload_v2.self)
+      Body(.json(CreateSignedScreenshotUpload_v2.Input.self))
     }
     Route(.case(Self.createSuspendFilterRequest_v2)) {
       Operation(CreateSuspendFilterRequest_v2.self)
