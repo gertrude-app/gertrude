@@ -57,7 +57,7 @@ extension GetIOSDeviceSupervisionStatus: Resolver {
       deviceType: device.deviceType,
       iosVersion: device.iosVersion,
       supervisionStatus: supervision.supervised ? .supervised : .awaitingSupervision,
-      requiresPayment: plan.isFree,
+      requiresPayment: !plan.allowsSupervision,
     )
   }
 }

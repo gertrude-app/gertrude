@@ -11,7 +11,10 @@ LOCAL_API_URL = https:/$()/REPLACE.ngrok-free.app
 
 ## Release notes
 
-- `1.7.3` (submitted for review 2/17/26)
+- `1.8.0` (submitted 3/24/26)
+  - drive block groups from api/db
+  - close subscription required loophole
+- `1.7.3` (2/19/26)
   - a few final tweaks to supervision onboarding flow screen/text
 - `1.7.2` (testflight 2/13/26)
   - usability/text flow improvements from rachel supervision usability test

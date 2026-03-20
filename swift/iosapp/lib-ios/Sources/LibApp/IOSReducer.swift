@@ -5,6 +5,7 @@ import LibClients
 import os.log
 
 @_exported import GertieIOS
+@_exported import PairQL
 @_exported import XCore
 
 @Reducer
@@ -524,9 +525,19 @@ public struct IOSReducer {
 
     case (.onboarding(.supervision(.resume(.codeClaimedNotSupervised(_)))), .primary):
       self.deps.log(state.screen, action, "f2729c3c")
-      state.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
-      return .run { [deps = self.deps] _ in
-        try await deps.api.selfReportSupervision(isSupervised: true)
+      return .run { [deps = self.deps] send in
+        do {
+          try await deps.api.selfReportSupervision(isSupervised: true)
+          await send(
+            .programmatic(.setScreen(.onboarding(.supervision(.resume(.promptInstallProfile))))),
+          )
+        } catch let error as PqlError where error.type == .paymentRequired {
+          await send(
+            .programmatic(.setScreen(.onboarding(.supervision(.resume(.requiresSubscription))))),
+          )
+        } catch {
+          deps.log("selfReportSupervision failed: \(error)", "2f135579")
+        }
       }
 
     case (.onboarding(.supervision(.resume(.codeClaimedNotSupervised(_)))), .secondary):
@@ -627,6 +638,11 @@ public struct IOSReducer {
       self.deps.log(state.screen, action, "be1c3c10")
       state.screen = .launching
       return .send(.programmatic(.appDidLaunch))
+
+    case (.onboarding(.supervision(.resume(.requiresSubscription))), .primary):
+      self.deps.log(state.screen, action, "b5e8076e")
+      state.screen = .onboarding(.supervision(.resume(.codeClaimedNotSupervised())))
+      return .none
 
     // MARK: - error paths
 

@@ -26,7 +26,7 @@ enum SupervisionToolDownloadRoute {
     }
     let parent = try await child.parent(in: request.context.db)
     let plan = try await parent.plan(in: request.context.db)
-    guard !plan.isFree else {
+    guard plan.allowsSupervision else {
       throw Abort(.paymentRequired, reason: "Subscription required")
     }
 

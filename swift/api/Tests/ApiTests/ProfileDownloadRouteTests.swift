@@ -70,6 +70,40 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
     )
   }
 
+  func testSupervisedDevice_blockedWithoutEligiblePlan() async throws {
+    let parent = try await self.parentWithSubscription {
+      $1.tier = .full
+      $1.billingStatus = .trialing
+      $1.trialStartedAt = .reference
+      $1.statusExpiresAt = .reference + .days(18)
+    }
+    let child = try await self.db.create(Child(parentId: parent.id, name: "Test Child"))
+    let device = try await self.db.create(IOSApp.Device(
+      id: .init(),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      appVersion: "1.0.0",
+      iosVersion: "18.2",
+    ))
+    try await self.db.create(IOSApp.Supervision(
+      deviceId: device.id,
+      claimCode: .random(in: 100_000 ... 999_999),
+      claimCodeExpiresAt: .reference + .days(7),
+      claimedAt: .reference,
+      supervisedAt: .reference,
+    ))
+
+    try await app.test(
+      .GET,
+      "ios-profile/\(device.id.lowercased)",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.paymentRequired)
+        expect(res.headers.first(name: .contentType) ?? "").toContain("text/html")
+        expect(res.body.string).toContain("Subscription Required")
+      },
+    )
+  }
+
   func testCmsSigningRoundTrip() throws {
     let key = P256.Signing.PrivateKey()
     let name = try DistinguishedName { CommonName("Test Profile Signer") }

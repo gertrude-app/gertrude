@@ -1,4 +1,5 @@
 import IOSRoute
+import Vapor
 
 extension SelfReportSupervision: Resolver {
   static func resolve(
@@ -8,6 +9,14 @@ extension SelfReportSupervision: Resolver {
     guard var supervision = try await ctx.device.supervision(in: ctx.db) else {
       logIOSUnexpected("f9797be9", "unreachable, \(ctx.device.id)")
       return .success
+    }
+
+    if input.isSupervised {
+      let parent = try await ctx.child.parent(in: ctx.db)
+      let plan = try await parent.plan(in: ctx.db)
+      guard plan.allowsSupervision else {
+        throw ctx.error("d6369ed1", .paymentRequired, "subscription required for supervision")
+      }
     }
 
     let wasSupervised = supervision.supervised

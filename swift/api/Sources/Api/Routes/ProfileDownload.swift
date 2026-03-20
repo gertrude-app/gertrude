@@ -23,6 +23,26 @@ enum ProfileDownloadRoute {
       throw Abort(.notFound)
     }
 
+    if let child = try await device.child(in: req.context.db) {
+      let parent = try await child.parent(in: req.context.db)
+      let plan = try await parent.plan(in: req.context.db)
+      if !plan.allowsSupervision {
+        let parentLink = AdminLink().slack(to: .parent(parent.id), text: parent.email.rawValue)
+        Task {
+          await get(dependency: \.slack)
+            .internal(
+              .info,
+              "*iOS supervision:* profile download blocked (no subscription), \(parentLink)",
+            )
+        }
+        return Response(
+          status: .paymentRequired,
+          headers: ["Content-Type": "text/html; charset=utf-8"],
+          body: .init(string: SUBSCRIPTION_REQUIRED_HTML),
+        )
+      }
+    }
+
     let xml = generateProfileXml(for: device)
     let signer = with(dependency: \.profileSigner)
     let signedBytes = try signer.sign(Array(xml.utf8))
@@ -140,3 +160,45 @@ func generateProfileXml(for device: IOSApp.Device) -> String {
   </plist>
   """.trimmingCharacters(in: .whitespacesAndNewlines)
 }
+
+private let SUBSCRIPTION_REQUIRED_HTML = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscription Required</title>
+  <style>
+    body {
+      font-family: -apple-system, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f5f3ff;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px 24px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(109, 40, 217, 0.1);
+    }
+    h1 { color: #5b21b6; font-size: 22px; margin: 0 0 12px; }
+    p { color: #4b5563; font-size: 15px; line-height: 1.5; margin: 0; }
+    .url { color: #7c3aed; white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Subscription Required</h1>
+    <p>Gertrude supervision requires a paid subscription ($10/year). Subscribe at <span class="url">https://parents.gertrude.app</span> and then try again.</p>
+  </div>
+</body>
+</html>
+"""
