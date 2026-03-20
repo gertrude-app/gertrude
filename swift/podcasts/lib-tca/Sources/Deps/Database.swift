@@ -117,6 +117,9 @@ public func appDatabase(
   migrator.registerMigration("release") {
     try Migrations.release($0)
   }
+  migrator.registerMigration("playback-rate") {
+    try Migrations.playbackRate($0)
+  }
   try migrator.migrate(database)
 
   try database.write { db in

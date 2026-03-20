@@ -235,6 +235,7 @@ extension Show {
       showArtwork: self.showArtwork,
       iTunesId: feedData.iTunesId,
       sort: self.sort,
+      playbackRate: self.playbackRate,
       updatedAt: self.updatedAt,
       createdAt: self.createdAt,
     )

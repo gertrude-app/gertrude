@@ -208,6 +208,7 @@ extension NowPlaying {
 }
 
 private func _play(episode: Episode, show: Show) async throws {
+  await dep(\.audio).setPlaybackRate(show.playbackRate)
   let fileSystem = dep(\.fileSystem)
   let fileExists = fileSystem.fileExists(at: episode.localAudioUrl)
   let fileSize = fileSystem.fileSize(at: episode.localAudioUrl)

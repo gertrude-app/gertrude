@@ -278,13 +278,12 @@ import Testing
   }
 
   @Test func `concurrent dupe downloads share one in-flight task`() async throws {
-    let clock = TestClock()
     let downloadInvocations = LockIsolated<[Episode.ID]>([])
     let releaseDownload = LockIsolated<CheckedContinuation<Void, Never>?>(nil)
 
     await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
-      $0.continuousClock = clock
+      $0.continuousClock = ImmediateClock()
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase {
         try fixtures($0)
@@ -307,7 +306,6 @@ import Testing
 
       let first = Task { await trackedDownload(episode: episode) }
 
-      await clock.advance(by: .seconds(2))
       while releaseDownload.value == nil {
         await Task.yield()
       }
@@ -321,7 +319,6 @@ import Testing
         $0?.resume()
         $0 = nil
       }
-      await clock.advance(by: .seconds(1))
 
       let outcomes = await [first.value, second.value]
       #expect(outcomes.allSatisfy {
@@ -464,6 +461,66 @@ import Testing
       #expect(downloadInvocations.value == [.init(4)])
       #expect(playInvocations.value == [.init(4)])
       #expect(nowPlaying.isPlaying(episodeId: 4) == true)
+    }
+  }
+
+  @Test func `speed button tap persists rate to db and calls audio dep`() async throws {
+    let setRateInvocations = LockIsolated<[Double]>([])
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase {
+        try fixtures($0)
+        try NowPlayingModel.insert {
+          NowPlayingModel(episodeId: 3, isPlaying: true)
+        }.execute($0)
+      }
+      $0.audio.setPlaybackRate = { rate in setRateInvocations.withValue { $0.append(rate) } }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: NowPlayingFeature.init)
+
+      await store.send(.view(.speedButtonTapped(1.5)))
+
+      #expect(setRateInvocations.value == [1.5])
+      let show = dep(\.db).show(id: Show.ID(1))!
+      #expect(show.playbackRate == 1.5)
+    }
+  }
+
+  @Test func `stored show rate is applied when episode starts playing`() async throws {
+    let clock = TestClock()
+    let setRateInvocations = LockIsolated<[Double]>([])
+    let playInvocations = LockIsolated<[Episode.ID]>([])
+    let pauseInvocations = LockIsolated(0)
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.continuousClock = clock
+      $0.defaultDatabase = try! appDatabase {
+        try Show.insert { [.mock(1), .mock(2) { $0.playbackRate = 1.5 }] }.execute($0)
+        try Episode.insert { [
+          .mock(3, showId: 1) { $0.downloadedAt = .reference },
+          .mock(4, showId: 1) { $0.downloadedAt = nil },
+          .mock(5, showId: 2) { $0.downloadedAt = .reference },
+        ] }.execute($0)
+        try NowPlayingModel.insert {
+          NowPlayingModel(episodeId: 3, isPlaying: true)
+        }.execute($0)
+      }
+      $0.audio.play = { ep, _ in playInvocations.withValue { $0.append(ep.id) } }
+      $0.audio.pause = { pauseInvocations.withValue { $0 += 1 } }
+      $0.audio.setPlaybackRate = { rate in setRateInvocations.withValue { $0.append(rate) } }
+      $0.podcasts.downloadAudio = { _ in fatalError() }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: NowPlayingFeature.init)
+
+      let (episode, show) = dep(\.db).episodeWithShow(5)!
+      await store.send(.episodePlayPauseTapped(episode, show))
+
+      #expect(pauseInvocations.value == 1)
+
+      await clock.advance(by: .seconds(1))
+
+      #expect(playInvocations.value == [.init(5)])
+      #expect(setRateInvocations.value.contains(1.5))
     }
   }
 

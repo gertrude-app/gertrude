@@ -420,6 +420,7 @@ extension Show {
       showArtwork: true,
       iTunesId: 123_456_789,
       sort: .newestToOldest,
+      playbackRate: 1.0,
       updatedAt: .reference,
       createdAt: .reference,
     )

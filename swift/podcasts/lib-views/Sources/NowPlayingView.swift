@@ -17,6 +17,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
     case dismissed
     case miniPlayerTapped
     case scrubbed(to: Double)
+    case speedButtonTapped(Double)
   }
 
   public init(
@@ -167,12 +168,23 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
 
         Spacer()
 
-        Button(action: {
-          // TODO: More actions
-        }) {
-          Image(systemName: "ellipsis")
-            .font(.system(size: 18, weight: .medium))
+        Menu {
+          ForEach([0.7, 0.8, 0.9, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0], id: \.self) { rate in
+            Button { self.emit(.speedButtonTapped(rate)) } label: {
+              if self.show.playbackRate == rate {
+                Label(self.speedLabel(rate), systemImage: "checkmark")
+              } else {
+                Text(self.speedLabel(rate))
+              }
+            }
+          }
+        } label: {
+          Text(self.speedLabel(self.show.playbackRate))
+            .font(.system(size: 13, weight: .semibold, design: .rounded))
             .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(Color(self.cs, light: .violet200, dark: .violet800)))
         }
       }
       .padding(.horizontal, 20)
@@ -295,6 +307,10 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
       .padding(.bottom, 40)
     }
   }
+
+  private func speedLabel(_ rate: Double) -> String {
+    String(format: "%.1f×", rate)
+  }
 }
 
 #Preview("Mini Player") {
@@ -337,6 +353,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
       description: "Weekly Swift discussions",
       showArtwork: true,
       artworkUrl: nil,
+      playbackRate: 1.4,
     ),
     minimized: false,
     emit: { _ in },
