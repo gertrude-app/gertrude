@@ -14,7 +14,8 @@ extension IOSReducer {
   @ObservableState
   public struct State: Equatable {
     public var screen: Screen = .launching
-    public var disabledBlockGroups: [BlockGroup] = []
+    public var allBlockGroups: [GetBlockGroups.BlockGroupInfo] = []
+    public var disabledBlockGroupIds: [UUID] = []
     public var onboarding: OnboardingState = .init()
 
     @Presents
@@ -22,11 +23,13 @@ extension IOSReducer {
 
     public init(
       screen: IOSReducer.Screen = .launching,
-      disabledBlockGroups: [BlockGroup] = [],
+      allBlockGroups: [GetBlockGroups.BlockGroupInfo] = [],
+      disabledBlockGroupIds: [UUID] = [],
       onboarding: OnboardingState = .init(),
     ) {
       self.screen = screen
-      self.disabledBlockGroups = disabledBlockGroups
+      self.allBlockGroups = allBlockGroups
+      self.disabledBlockGroupIds = disabledBlockGroupIds
       self.onboarding = onboarding
     }
 

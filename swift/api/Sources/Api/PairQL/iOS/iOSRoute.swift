@@ -40,6 +40,12 @@ extension IOSRoute: RouteResponder {
       case .connectAccountFeatureFlag:
         let output = try await ConnectAccountFeatureFlag.resolve(in: context)
         return try await self.respond(with: output)
+      case .getBlockGroups(let input):
+        let output = try await GetBlockGroups.resolve(with: input, in: context)
+        return try await self.respond(with: output)
+      case .blockRules_v3(let input):
+        let output = try await BlockRules_v3.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       }
 
     case .authed(let uuid, let authedRoute):

@@ -83,7 +83,7 @@ import Testing
 
   let store = TestStore(initialState: InfoFeature.State(
     connection: nil,
-    vendorId: vendorId,
+    deviceId: vendorId,
   )) {
     InfoFeature()
   } withDependencies: {
@@ -91,11 +91,11 @@ import Testing
     $0.api.logEvent = { @Sendable id, detail in
       apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
     }
-    $0.sharedStorage.loadDisabledBlockGroups = { @Sendable in
-      [.whatsAppFeatures]
+    $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in
+      [BlockGroup.whatsAppFeatures.legacyUUID]
     }
-    $0.sharedStorage.saveDisabledBlockGroups = { @Sendable _ in
-      fatalError("saveDisabledBlockGroups should not be called")
+    $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable _ in
+      fatalError("saveDisabledBlockGroupIds should not be called")
     }
     $0.sharedStorage.loadProtectionMode = { @Sendable in
       .normal([.urlContains(value: "existing-rule")])
@@ -128,7 +128,7 @@ import Testing
 @Test func unconnectedRecoveryWithMissingDisabledBlockGroups() async throws {
   let recoveryDirectiveInvocations = LockIsolated(0)
   let apiLoggedEvents = LockIsolated<[Both<String, String?>]>([])
-  let savedDisabledBlockGroups = LockIsolated<[[BlockGroup]]>([])
+  let savedDisabledBlockGroups = LockIsolated<[[UUID]]>([])
   let filterNotifications = LockIsolated<[FilterClient.Notification]>([])
   let dismissInvocations = LockIsolated(0)
 
@@ -139,10 +139,10 @@ import Testing
     $0.api.logEvent = { @Sendable id, detail in
       apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
     }
-    $0.sharedStorage.loadDisabledBlockGroups = { @Sendable in
+    $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in
       nil // <-- missing disabled block groups triggers save
     }
-    $0.sharedStorage.saveDisabledBlockGroups = { @Sendable groups in
+    $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable groups in
       savedDisabledBlockGroups.withValue { $0.append(groups) }
     }
     $0.sharedStorage.loadProtectionMode = { @Sendable in
@@ -186,13 +186,13 @@ import Testing
     InfoFeature()
   } withDependencies: {
     $0.osLog.log = { @Sendable _ in }
-    $0.device.vendorId = { UUID(1) }
+    $0.device.deviceId = { UUID(1) }
     $0.api.logEvent = { @Sendable id, detail in
       apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
     }
-    $0.sharedStorage.loadDisabledBlockGroups = { @Sendable in [] }
-    $0.sharedStorage.saveDisabledBlockGroups = { @Sendable _ in
-      fatalError("saveDisabledBlockGroups should not be called")
+    $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in [] }
+    $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable _ in
+      fatalError("saveDisabledBlockGroupIds should not be called")
     }
     $0.sharedStorage.loadProtectionMode = { @Sendable in
       nil // <-- missing rules trigger fetch
@@ -242,13 +242,13 @@ import Testing
     InfoFeature()
   } withDependencies: {
     $0.osLog.log = { @Sendable _ in }
-    $0.device.vendorId = { UUID(1) }
+    $0.device.deviceId = { UUID(1) }
     $0.api.logEvent = { @Sendable id, detail in
       apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
     }
-    $0.sharedStorage.loadDisabledBlockGroups = { @Sendable in [] }
-    $0.sharedStorage.saveDisabledBlockGroups = { @Sendable _ in
-      fatalError("saveDisabledBlockGroups should not be called")
+    $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in [] }
+    $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable _ in
+      fatalError("saveDisabledBlockGroupIds should not be called")
     }
     $0.sharedStorage.loadProtectionMode = { @Sendable in
       .normal([])
@@ -301,9 +301,9 @@ import Testing
     $0.api.logEvent = { @Sendable id, detail in
       apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
     }
-    $0.sharedStorage.loadDisabledBlockGroups = { @Sendable in [] }
-    $0.sharedStorage.saveDisabledBlockGroups = { @Sendable _ in
-      fatalError("saveDisabledBlockGroups should not be called")
+    $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in [] }
+    $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable _ in
+      fatalError("saveDisabledBlockGroupIds should not be called")
     }
     $0.sharedStorage.saveProtectionMode = { @Sendable _ in
       fatalError("saveProtectionMode should not be called")
@@ -353,7 +353,7 @@ import Testing
       childName: "Test Child",
       supervised: nil,
     ),
-    vendorId: UUID(),
+    deviceId: UUID(),
   )) {
     InfoFeature()
   } withDependencies: {
@@ -361,11 +361,11 @@ import Testing
     $0.api.logEvent = { @Sendable id, detail in
       apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
     }
-    $0.sharedStorage.loadDisabledBlockGroups = { @Sendable in
-      fatalError("loadDisabledBlockGroups should not be called")
+    $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in
+      fatalError("loadDisabledBlockGroupIds should not be called")
     }
-    $0.sharedStorage.saveDisabledBlockGroups = { @Sendable _ in
-      fatalError("saveDisabledBlockGroups should not be called")
+    $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable _ in
+      fatalError("saveDisabledBlockGroupIds should not be called")
     }
     $0.sharedStorage.loadProtectionMode = { @Sendable in
       fatalError("loadProtectionMode should not be called")
@@ -401,31 +401,31 @@ import Testing
   let savedProtectionModes = LockIsolated<[ProtectionMode]>([])
   let fetchBlockRulesInvocations = LockIsolated(0)
   let filterNotifications = LockIsolated<[FilterClient.Notification]>([])
-  let loadDisabledBlockGroupsInvocations = LockIsolated(0)
+  let loadDisabledBlockGroupIdsInvocations = LockIsolated(0)
   let vendorId = UUID(1)
 
   let store = TestStore(initialState: InfoFeature.State(
     connection: nil,
-    vendorId: vendorId,
+    deviceId: vendorId,
   )) {
     InfoFeature()
   } withDependencies: {
     $0.api.logEvent = { @Sendable _, _ in
       fatalError("logEvent should not be called")
     }
-    $0.sharedStorage.loadDisabledBlockGroups = { @Sendable in
-      loadDisabledBlockGroupsInvocations.withValue { $0 += 1 }
-      return [.whatsAppFeatures]
+    $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in
+      loadDisabledBlockGroupIdsInvocations.withValue { $0 += 1 }
+      return [BlockGroup.whatsAppFeatures.legacyUUID]
     }
-    $0.sharedStorage.saveDisabledBlockGroups = { @Sendable _ in
-      fatalError("saveDisabledBlockGroups should not be called")
+    $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable _ in
+      fatalError("saveDisabledBlockGroupIds should not be called")
     }
     $0.sharedStorage.saveProtectionMode = { @Sendable mode in
       savedProtectionModes.withValue { $0.append(mode) }
     }
     $0.api.fetchBlockRules = { @Sendable vid, disabledGroups in
       #expect(vid == vendorId)
-      #expect(disabledGroups == [.whatsAppFeatures])
+      #expect(disabledGroups == [BlockGroup.whatsAppFeatures.legacyUUID])
       fetchBlockRulesInvocations.withValue { $0 += 1 }
       return [.urlContains(value: "fetched-rule")]
     }
@@ -437,7 +437,7 @@ import Testing
 
   await store.send(.sheetPresented)
 
-  #expect(loadDisabledBlockGroupsInvocations.value == 1)
+  #expect(loadDisabledBlockGroupIdsInvocations.value == 1)
   #expect(fetchBlockRulesInvocations.value == 1)
   #expect(savedProtectionModes.value == [.normal([.urlContains(value: "fetched-rule")])])
   #expect(filterNotifications.value == [.rulesChanged])
@@ -446,7 +446,7 @@ import Testing
 @MainActor
 @Test func ensureUnconnectedRulesWithMissingDisabledBlockGroups() async throws {
   let apiLoggedEvents = LockIsolated<[Both<String, String?>]>([])
-  let savedDisabledBlockGroups = LockIsolated<[[BlockGroup]]>([])
+  let savedDisabledBlockGroups = LockIsolated<[[UUID]]>([])
   let savedProtectionModes = LockIsolated<[ProtectionMode]>([])
   let fetchBlockRulesInvocations = LockIsolated(0)
   let filterNotifications = LockIsolated<[FilterClient.Notification]>([])
@@ -454,17 +454,17 @@ import Testing
 
   let store = TestStore(initialState: InfoFeature.State(
     connection: nil,
-    vendorId: vendorId,
+    deviceId: vendorId,
   )) {
     InfoFeature()
   } withDependencies: {
     $0.api.logEvent = { @Sendable id, detail in
       apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
     }
-    $0.sharedStorage.loadDisabledBlockGroups = { @Sendable in
+    $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in
       nil
     }
-    $0.sharedStorage.saveDisabledBlockGroups = { @Sendable groups in
+    $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable groups in
       savedDisabledBlockGroups.withValue { $0.append(groups) }
     }
     $0.sharedStorage.saveProtectionMode = { @Sendable mode in
@@ -485,7 +485,10 @@ import Testing
   await store.send(.sheetPresented)
 
   #expect(savedDisabledBlockGroups.value == [[]]) // <-- saved empty disabled block groups
-  #expect(apiLoggedEvents.value == [Both("59d3c6d1", "UNEXPECTED no stored disabled block groups")])
+  #expect(apiLoggedEvents.value == [Both(
+    "59d3c6d1",
+    "UNEXPECTED no stored disabled block groups ids",
+  )])
   #expect(fetchBlockRulesInvocations.value == 1)
   #expect(savedProtectionModes.value == [.normal([.urlContains(value: "fetched-rule")])])
   #expect(filterNotifications.value == [.rulesChanged])

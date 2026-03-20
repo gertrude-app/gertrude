@@ -1,30 +1,34 @@
 import ComposableArchitecture
 import IOSRoute
 import LibClients
+import os.log
 
 @Reducer
 public struct InfoFeature {
   @ObservableState
   public struct State: Equatable, Sendable {
     public var connection: ChildIOSDeviceData_v2?
-    public var vendorId: UUID?
+    public var deviceId: UUID?
     public var numRules: Int = 0
     public var numDisabledBlockGroups: Int = 0
+    public var numTotalBlockGroups: Int = 9
     public var timesShaken: Int = 0
     public var subScreen: SubScreen = .main
     public var clearCache: ClearCacheFeature.State?
 
     public init(
       connection: ChildIOSDeviceData_v2? = nil,
-      vendorId: UUID? = nil,
+      deviceId: UUID? = nil,
       numRules: Int = 0,
       numDisabledBlockGroups: Int = 0,
+      numTotalBlockGroups: Int = 9,
       subScreen: SubScreen = .main,
     ) {
       self.connection = connection
-      self.vendorId = vendorId
+      self.deviceId = deviceId
       self.numRules = numRules
       self.numDisabledBlockGroups = numDisabledBlockGroups
+      self.numTotalBlockGroups = numTotalBlockGroups
       self.subScreen = subScreen
     }
   }
@@ -82,17 +86,17 @@ public struct InfoFeature {
       case .sheetPresented:
         state.subScreen = .main
         return .run { [state, deps = self.deps] _ in
-          deps.osLog.log("Info appear vendor id: \(state.vendorId?.uuidString ?? "(nil)")")
+          deps.osLog.log("Info appear device id: \(state.deviceId?.uuidString ?? "(nil)")")
           if let connection = state.connection {
             try await deps.refreshConnectedState(connection: connection)
           } else {
-            try await deps.ensureUnconnectedRules(vendorId: state.vendorId)
+            try await deps.ensureUnconnectedRules(deviceId: state.deviceId)
             try await deps.filter.send(notification: .rulesChanged)
           }
         }
 
       case .syncProfileTapped:
-        let deviceId = state.connection?.deviceId ?? state.vendorId ?? .init(6)
+        let deviceId = state.connection?.deviceId ?? state.deviceId ?? .init(6)
         state.subScreen = .syncingProfile(.profileDownload(deviceId: deviceId))
         return .none
 
@@ -182,9 +186,9 @@ public struct InfoFeature {
   func unconnectedRecovery() -> EffectOf<InfoFeature> {
     .run { [deps = self.deps] _ in
       await deps.api.logEvent("a8998540", "entering recovery mode")
-      if deps.sharedStorage.loadDisabledBlockGroups() == nil {
-        deps.osLog.log("unconnected recovery: no stored disabled block groups, saving empty")
-        deps.sharedStorage.saveDisabledBlockGroups([])
+      if deps.sharedStorage.loadDisabledBlockGroupIds() == nil {
+        deps.osLog.log("unconnected recovery: no stored disabled block group ids, saving empty")
+        deps.sharedStorage.saveDisabledBlockGroupIds([])
       } else {
         deps.osLog.log("unconnected recovery: disabled block groups already stored")
       }
@@ -194,7 +198,7 @@ public struct InfoFeature {
         deps.osLog.log("unconnected recovery: rules missing, fetching defaults")
         await deps.api.logEvent("bcca235f", "rules missing in recovery mode")
         let defaultRules = try? await deps.api
-          .fetchDefaultBlockRules(deps.device.vendorId())
+          .fetchDefaultBlockRules(deps.device.deviceId())
         if let defaultRules, !defaultRules.isEmpty {
           deps.sharedStorage.saveProtectionMode(.normal(defaultRules))
           deps.osLog.log("unconnected recovery: saved fetched default rules")
@@ -223,15 +227,15 @@ extension InfoFeature.SubScreen {
 }
 
 extension InfoFeature.Deps {
-  func ensureUnconnectedRules(vendorId: UUID?) async throws {
-    let disabled = self.sharedStorage.loadDisabledBlockGroups()
+  func ensureUnconnectedRules(deviceId: UUID?) async throws {
+    let disabled = self.sharedStorage.loadDisabledBlockGroupIds()
     if disabled == nil {
-      await self.api.logEvent("59d3c6d1", "UNEXPECTED no stored disabled block groups")
-      self.sharedStorage.saveDisabledBlockGroups([])
+      await self.api.logEvent("59d3c6d1", "UNEXPECTED no stored disabled block groups ids")
+      self.sharedStorage.saveDisabledBlockGroupIds([])
     }
-    guard let vendorId else { return }
+    guard let deviceId else { return }
     let rules = try await self.api.fetchBlockRules(
-      vendorId: vendorId,
+      deviceId: deviceId,
       disabledGroups: disabled ?? [],
     )
     self.sharedStorage.saveProtectionMode(.normal(rules))

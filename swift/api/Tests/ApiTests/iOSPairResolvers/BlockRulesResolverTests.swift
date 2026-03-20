@@ -6,6 +6,86 @@ import XExpect
 @testable import Api
 
 final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
+
+  // MARK: v3 tests
+
+  func testBlockRulesV3_AllGroupsEnabled() async throws {
+    let gifs = CreateBlockGroups.GroupIds().gifs
+    let ads = CreateBlockGroups.GroupIds().ads
+    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.create([
+      IOSApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
+      IOSApp.BlockRule(rule: .urlContains(value: "ad"), groupId: .init(ads)),
+    ])
+
+    let rules = try await BlockRules_v3.resolve(
+      with: .init(deviceId: UUID(), appVersion: "2.0.0", disabledGroups: []),
+      in: .mock,
+    )
+    expect(Set(rules)).toEqual([.urlContains(value: "gif"), .urlContains(value: "ad")])
+  }
+
+  func testBlockRulesV3_OneGroupDisabled() async throws {
+    let gifs = CreateBlockGroups.GroupIds().gifs
+    let ads = CreateBlockGroups.GroupIds().ads
+    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.create([
+      IOSApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
+      IOSApp.BlockRule(rule: .urlContains(value: "ad"), groupId: .init(ads)),
+    ])
+
+    let rules = try await BlockRules_v3.resolve(
+      with: .init(deviceId: UUID(), appVersion: "2.0.0", disabledGroups: [ads]),
+      in: .mock,
+    )
+    expect(rules).toEqual([.urlContains(value: "gif")])
+  }
+
+  func testBlockRulesV3_MultipleGroupsDisabled() async throws {
+    let gifs = CreateBlockGroups.GroupIds().gifs
+    let ads = CreateBlockGroups.GroupIds().ads
+    let spotify = CreateBlockGroups.GroupIds().spotifyImages
+    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.create([
+      IOSApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
+      IOSApp.BlockRule(rule: .urlContains(value: "ad"), groupId: .init(ads)),
+      IOSApp.BlockRule(rule: .urlContains(value: "spotify"), groupId: .init(spotify)),
+    ])
+
+    let rules = try await BlockRules_v3.resolve(
+      with: .init(deviceId: UUID(), appVersion: "2.0.0", disabledGroups: [ads, gifs]),
+      in: .mock,
+    )
+    expect(rules).toEqual([.urlContains(value: "spotify")])
+  }
+
+  func testBlockRulesV3_DeviceSpecificRulesAlwaysIncluded() async throws {
+    let vendorId = UUID()
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSApp.Device(
+      id: .init(vendorId),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      appVersion: "2.0.0",
+      iosVersion: "18.0",
+    ))
+    let gifs = CreateBlockGroups.GroupIds().gifs
+    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.create([
+      IOSApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
+      IOSApp.BlockRule(deviceId: device.id, rule: .urlContains(value: "custom")),
+    ])
+
+    let rules = try await BlockRules_v3.resolve(
+      with: .init(deviceId: vendorId, appVersion: "2.0.0", disabledGroups: [gifs]),
+      in: .mock,
+    )
+    expect(rules).toEqual([.urlContains(value: "custom")])
+  }
+
+  // MARK: v2 tests
+
   func testBlockRules() async throws {
     let vendorId = UUID()
     let otherVendorId = UUID()
@@ -148,7 +228,7 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     expect(Set(rules)).toEqual([.urlContains("gif")])
   }
 
-  // MARK: v1 legacy tests below
+  // MARK: v1 legacy tests
 
   func testBlockRules_v1() async throws {
     let rules = try await BlockRules.resolve(with: .init(vendorId: UUID()), in: .mock)

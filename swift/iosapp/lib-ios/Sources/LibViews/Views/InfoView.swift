@@ -108,7 +108,7 @@ struct InfoView: View {
 
           self.infoCard(
             title: "Device ID",
-            value: self.store.vendorId?.uuidString.lowercased() ?? "(nil)",
+            value: self.store.deviceId?.uuidString.lowercased() ?? "(nil)",
             icon: "iphone",
             showCopyButton: true,
             justCopied: self.$justCopied,
@@ -147,10 +147,9 @@ struct InfoView: View {
   }
 
   var blockGroupsCardValue: String {
-    let totalBlockGroups = [BlockGroup].all.count
-    let enabled = totalBlockGroups - self.store.numDisabledBlockGroups
-    let total = max(totalBlockGroups, enabled)
-    return "\(enabled)/\(total) groups enabled"
+    let total = self.store.numTotalBlockGroups
+    let enabled = total - self.store.numDisabledBlockGroups
+    return "\(max(0, enabled))/\(total) groups enabled"
   }
 
   func connectedView(connection: ChildIOSDeviceData_v2) -> some View {
@@ -182,7 +181,7 @@ struct InfoView: View {
 
           self.infoCard(
             title: "Device ID",
-            value: self.store.vendorId?.uuidString.lowercased() ?? "(nil)",
+            value: self.store.deviceId?.uuidString.lowercased() ?? "(nil)",
             icon: "iphone",
             showCopyButton: true,
             justCopied: self.$justCopied,
@@ -304,7 +303,7 @@ struct InfoView: View {
 #Preview("Unconnected - Light") {
   InfoView(store: .init(
     initialState: .init(
-      vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+      deviceId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
       numRules: 42,
       numDisabledBlockGroups: 4,
     ),
@@ -317,7 +316,7 @@ struct InfoView: View {
 #Preview("Unconnected - Dark") {
   InfoView(store: .init(
     initialState: .init(
-      vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+      deviceId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
       numRules: 42,
       numDisabledBlockGroups: 4,
     ),
@@ -336,7 +335,7 @@ struct InfoView: View {
         deviceId: UUID(),
         childName: "Emma Johnson",
       ),
-      vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+      deviceId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
       numRules: 87,
     ),
   ) {
@@ -354,7 +353,7 @@ struct InfoView: View {
         deviceId: UUID(),
         childName: "Emma Johnson",
       ),
-      vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+      deviceId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
       numRules: 87,
     ),
   ) {
@@ -373,7 +372,7 @@ struct InfoView: View {
         childName: "Emma Johnson",
         supervised: .byGertrude(claimCode: 123_456),
       ),
-      vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+      deviceId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
       numRules: 87,
     ),
   ) {
@@ -392,7 +391,7 @@ struct InfoView: View {
         childName: "Emma Johnson",
         supervised: .byGertrude(claimCode: 123_456),
       ),
-      vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+      deviceId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
       numRules: 87,
     ),
   ) {
@@ -417,7 +416,7 @@ struct InfoView: View {
                 childName: "Emma Johnson",
                 supervised: .byGertrude(claimCode: 123_456),
               ),
-              vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+              deviceId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
               numRules: 87,
             ),
           ) {
@@ -446,7 +445,7 @@ struct InfoView: View {
                 childName: "Emma Johnson",
                 supervised: .byGertrude(claimCode: 123_456),
               ),
-              vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+              deviceId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
               numRules: 87,
               subScreen: .syncingProfile(
                 URL(string: "https://gertrude-dev.nyc3.digitaloceanspaces.com/super.mobileconfig")!,
@@ -471,7 +470,7 @@ struct InfoView: View {
         .sheet(isPresented: self.$isPresented) {
           InfoView(store: .init(
             initialState: .init(
-              vendorId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
+              deviceId: UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!,
               numRules: 42,
               numDisabledBlockGroups: 4,
             ),

@@ -98,8 +98,8 @@ public final class ControllerProxy: Sendable {
 
     if let conn {
       return await self.refreshConnectedRules(conn)
-    } else if let vendorId = await self.deps.device.vendorId() {
-      return await self.refreshNormalRules(vendorId)
+    } else if let deviceId = await self.deps.device.deviceId() {
+      return await self.refreshNormalRules(deviceId)
     } else {
       self.deps.logger.log("no vendor id, skipping rule update")
       return false
@@ -108,7 +108,7 @@ public final class ControllerProxy: Sendable {
 
   func refreshNormalRules(_ vendorId: UUID) async -> Bool {
     self.managedSettings.setValue(nil)
-    guard let disabled = self.deps.storage.loadDisabledBlockGroups() else {
+    guard let disabled = self.deps.storage.loadDisabledBlockGroupIds() else {
       self.deps.logger.log("no stored block groups, skipping rule update")
       return false
     }

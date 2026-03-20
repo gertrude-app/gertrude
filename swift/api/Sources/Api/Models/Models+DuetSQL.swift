@@ -1046,6 +1046,7 @@ extension IOSApp.BlockGroup: Model {
     case .name: .string(self.name)
     case .description: .string(self.description)
     case .longDescription: .string(self.longDescription)
+    case .imageSlug: .string(self.imageSlug)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -1057,6 +1058,7 @@ extension IOSApp.BlockGroup: Model {
       .name: .string(self.name),
       .description: .string(self.description),
       .longDescription: .string(self.longDescription),
+      .imageSlug: .string(self.imageSlug),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

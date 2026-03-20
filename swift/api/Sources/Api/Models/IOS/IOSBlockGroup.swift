@@ -7,14 +7,22 @@ extension IOSApp {
     var name: String
     var description: String
     var longDescription: String
+    var imageSlug: String?
     var createdAt = Date()
     var updatedAt = Date()
 
-    init(id: Id = .init(), name: String, description: String, longDescription: String) {
+    init(
+      id: Id = .init(),
+      name: String,
+      description: String,
+      longDescription: String,
+      imageSlug: String? = nil,
+    ) {
       self.id = id
       self.name = name
       self.description = description
       self.longDescription = longDescription
+      self.imageSlug = imageSlug
     }
   }
 }
