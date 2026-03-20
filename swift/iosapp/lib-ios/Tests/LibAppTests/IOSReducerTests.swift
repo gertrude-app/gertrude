@@ -314,7 +314,11 @@ final class IOSReducerTests: XCTestCase {
       $0.screen = .running(state: .notConnected)
     }
 
-    await store.receive(.programmatic(.receivedDisabledBlockGroupIds([])))
+    await store.receive(.programmatic(.receivedDisabledBlockGroupIds([
+      UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!,
+    ]))) {
+      $0.disabledBlockGroupIds = [UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!]
+    }
 
     expect(defaultBlocksInvocations.value).toEqual(1)
     var data = userDefaults.data(forKey: "v1.5.0--protection-mode")!
@@ -364,8 +368,13 @@ final class IOSReducerTests: XCTestCase {
     await store.receive(.programmatic(.receivedDisabledBlockGroupIds([
       BlockGroup.gifs.legacyUUID,
       BlockGroup.ads.legacyUUID,
+      UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!,
     ]))) {
-      $0.disabledBlockGroupIds = [BlockGroup.gifs.legacyUUID, BlockGroup.ads.legacyUUID]
+      $0.disabledBlockGroupIds = [
+        BlockGroup.gifs.legacyUUID,
+        BlockGroup.ads.legacyUUID,
+        UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!,
+      ]
     }
 
     var data = userDefaults.data(forKey: "v1.5.0--protection-mode")!
