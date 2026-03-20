@@ -74,6 +74,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7FA1A0012E12300100A1B2C3 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		7FA1A0022E12300200A1B2C3 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		7FA1A0032E12300300A1B2C3 /* Local.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Local.xcconfig; sourceTree = "<group>"; };
 		7F0B886F29C21561001E9427 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		7F3BA9B629C214AB00C4FAF1 /* App */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = App; path = ../App; sourceTree = "<group>"; };
 		7F4D0E4D2628B9450060281F /* libbsm.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbsm.tbd; path = usr/lib/libbsm.tbd; sourceTree = SDKROOT; };
@@ -132,6 +135,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7FA1A0002E12300000A1B2C3 /* config */ = {
+			isa = PBXGroup;
+			children = (
+				7FA1A0012E12300100A1B2C3 /* Debug.xcconfig */,
+				7FA1A0022E12300200A1B2C3 /* Release.xcconfig */,
+				7FA1A0032E12300300A1B2C3 /* Local.xcconfig */,
+			);
+			path = ../config;
+			sourceTree = "<group>";
+		};
 		7F3BA9B529C214AB00C4FAF1 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
@@ -163,6 +176,7 @@
 		C4B45DAC22739FFF0050C59B = {
 			isa = PBXGroup;
 			children = (
+				7FA1A0002E12300000A1B2C3 /* config */,
 				7F3BA9B529C214AB00C4FAF1 /* Packages */,
 				7F5476DD299BCFF30084F682 /* Filter */,
 				C4B45DB722739FFF0050C59B /* Gertrude */,
@@ -598,6 +612,7 @@
 		};
 		C4B45DC62273A0020050C59B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7FA1A0012E12300100A1B2C3 /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -625,6 +640,7 @@
 		};
 		C4B45DC72273A0020050C59B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7FA1A0022E12300200A1B2C3 /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;

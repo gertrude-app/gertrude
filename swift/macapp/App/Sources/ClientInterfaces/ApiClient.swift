@@ -63,11 +63,7 @@ public struct ApiClient: Sendable {
 }
 
 extension ApiClient: EndpointOverridable {
-  #if DEBUG
-    public static let endpointDefault = URL(string: "http://127.0.0.1:8080/pairql")!
-  #else
-    public static let endpointDefault = URL(string: "https://api.gertrude.app/pairql")!
-  #endif
+  public static let endpointDefault = AppConfiguration.apiBaseURL.appendingPathComponent("pairql")
 
   public static let endpointOverride = LockIsolated<URL?>(nil)
 }

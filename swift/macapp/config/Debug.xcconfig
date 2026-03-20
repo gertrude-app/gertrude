@@ -1,0 +1,4 @@
+#include? "./Local.xcconfig"
+FALLBACK = http:/$()/127.0.0.1:8080
+API_BASE_URL = $(LOCAL_API_URL:default=$(FALLBACK))
+APPCAST_URL = $(API_BASE_URL)/appcast.xml

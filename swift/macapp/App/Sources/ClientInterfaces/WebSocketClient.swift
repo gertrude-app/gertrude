@@ -35,11 +35,8 @@ public struct WebSocketClient: Sendable {
 }
 
 extension WebSocketClient: EndpointOverridable {
-  #if DEBUG
-    public static let endpointDefault = URL(string: "http://127.0.0.1:8080/app-websocket")!
-  #else
-    public static let endpointDefault = URL(string: "https://api.gertrude.app/app-websocket")!
-  #endif
+  public static let endpointDefault = AppConfiguration.apiBaseURL
+    .appendingPathComponent("app-websocket")
 
   public static let endpointOverride = LockIsolated<URL?>(nil)
 }
