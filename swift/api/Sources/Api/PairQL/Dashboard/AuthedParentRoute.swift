@@ -5,7 +5,6 @@ import Vapor
 enum AuthedParentRoute: PairRoute {
   case confirmPendingNotificationMethod(ConfirmPendingNotificationMethod.Input)
   case createPendingNotificationMethod(CreatePendingNotificationMethod.Input)
-  case dashboardWidgets
   case dashboardWidgets_v2
   case decideFilterSuspensionRequest(DecideFilterSuspensionRequest.Input)
   case deleteActivityItems_v2(DeleteActivityItems_v2.Input)
@@ -16,7 +15,6 @@ enum AuthedParentRoute: PairRoute {
   case getAdminKeychains
   case getAllDevices
   case getDevice(GetDevice.Input)
-  case getDevices
   case getIdentifiedApps
   case getSelectableKeychains
   case getSuspendFilterRequest(GetSuspendFilterRequest.Input)
@@ -40,7 +38,6 @@ enum AuthedParentRoute: PairRoute {
   case saveNotification(SaveNotification.Input)
   case saveUser(SaveUser.Input)
   case toggleChildKeychain(ToggleChildKeychain.Input)
-  case stripeUrl(Subscription.Tier?)
   case stripeUrl_v2(StripeUrl_v2.Input)
   case securityEventsFeed
   case startFullTrial
@@ -71,9 +68,6 @@ extension AuthedParentRoute {
         Route(.case(Self.childActivitySummaries)) {
           Operation(ChildActivitySummaries.self)
           Body(.dashboardInput(ChildActivitySummaries.self))
-        }
-        Route(.case(Self.dashboardWidgets)) {
-          Operation(DashboardWidgets.self)
         }
         Route(.case(Self.dashboardWidgets_v2)) {
           Operation(DashboardWidgets_v2.self)
@@ -117,9 +111,6 @@ extension AuthedParentRoute {
         }
       }
       OneOf {
-        Route(.case(Self.getDevices)) {
-          Operation(GetDevices.self)
-        }
         Route(.case(Self.getIdentifiedApps)) {
           Operation(GetIdentifiedApps.self)
         }
@@ -197,10 +188,6 @@ extension AuthedParentRoute {
           Operation(SaveUser.self)
           Body(.dashboardInput(SaveUser.self))
         }
-        Route(.case(Self.stripeUrl)) {
-          Operation(StripeUrl.self)
-          Optionally { Body(.json(Subscription.Tier.self)) }
-        }
         Route(.case(Self.stripeUrl_v2)) {
           Operation(StripeUrl_v2.self)
           Body(.dashboardInput(StripeUrl_v2.self))
@@ -275,9 +262,6 @@ extension AuthedParentRoute: RouteResponder {
     case .childActivitySummaries(let input):
       let output = try await ChildActivitySummaries.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .dashboardWidgets:
-      let output = try await DashboardWidgets.resolve(in: context)
-      return try await self.respond(with: output)
     case .dashboardWidgets_v2:
       let output = try await DashboardWidgets_v2.resolve(in: context)
       return try await self.respond(with: output)
@@ -316,9 +300,6 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getDevice(let input):
       let output = try await GetDevice.resolve(with: input, in: context)
-      return try await self.respond(with: output)
-    case .getDevices:
-      let output = try await GetDevices.resolve(in: context)
       return try await self.respond(with: output)
     case .getSelectableKeychains:
       let output = try await GetSelectableKeychains.resolve(in: context)
@@ -367,9 +348,6 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .saveKey(let input):
       let output = try await SaveKey.resolve(with: input, in: context)
-      return try await self.respond(with: output)
-    case .stripeUrl(let input):
-      let output = try await StripeUrl.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .stripeUrl_v2(let input):
       let output = try await StripeUrl_v2.resolve(with: input, in: context)
