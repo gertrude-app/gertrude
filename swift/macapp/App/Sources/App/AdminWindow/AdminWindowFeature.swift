@@ -24,7 +24,7 @@ struct AdminWindowFeature: Feature {
         case disabled
         case unexpected
         case communicationBroken(repairing: Bool)
-        case installed(version: String, numUserKeys: Int)
+        case installed(version: String, numUserKeys: Int, filteringDisabled: Bool? = nil)
       }
 
       var latestAppVersion: Failable<String>?
@@ -570,7 +570,11 @@ extension AdminWindowFeature.RootReducer {
       switch await self.xpc.requestAck() {
       case .success(let ack) where ack.userId == getuid():
         await send(.adminWindow(.setFilterStatus(
-          .installed(version: ack.version, numUserKeys: ack.numUserKeys),
+          .installed(
+            version: ack.version,
+            numUserKeys: ack.numUserKeys,
+            filteringDisabled: ack.filteringDisabled,
+          ),
         )))
       case .success(let ack):
         await send(.adminWindow(.setFilterStatus(
@@ -583,7 +587,11 @@ extension AdminWindowFeature.RootReducer {
       switch await self.xpc.requestAck() {
       case .success(let ack) where ack.userId == getuid():
         await send(.adminWindow(.setFilterStatus(
-          .installed(version: ack.version, numUserKeys: ack.numUserKeys),
+          .installed(
+            version: ack.version,
+            numUserKeys: ack.numUserKeys,
+            filteringDisabled: ack.filteringDisabled,
+          ),
         )))
       case .success(let ack):
         await send(.adminWindow(.setFilterStatus(

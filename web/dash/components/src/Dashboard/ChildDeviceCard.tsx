@@ -82,5 +82,7 @@ function macStatusInfo(status: ChildComputerStatus): {
       return { pillClasses: `bg-purple-50 text-purple-700`, text: `Downtime` };
     case `downtimePaused`:
       return { pillClasses: `bg-yellow-50 text-yellow-700`, text: `Paused` };
+    case `unfiltered`:
+      return { pillClasses: `bg-orange-50 text-orange-700`, text: `Unfiltered` };
   }
 }

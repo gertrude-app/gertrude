@@ -25,6 +25,7 @@ struct GetChild: Pair {
     var screenshotsResolution: Int
     var screenshotsFrequency: Int
     var showSuspensionActivity: Bool
+    var filteringDisabled: Bool
     var keychains: [UserKeychainSummary]
     var downtime: PlainTimeWindow?
     var computers: [Computer]
@@ -97,6 +98,7 @@ extension GetChild: Resolver {
       screenshotsResolution: child.screenshotsResolution,
       screenshotsFrequency: child.screenshotsFrequency,
       showSuspensionActivity: child.showSuspensionActivity,
+      filteringDisabled: child.filteringDisabled,
       keychains: childKeychains,
       downtime: child.downtime,
       computers: computers.uniqued(on: \.id),

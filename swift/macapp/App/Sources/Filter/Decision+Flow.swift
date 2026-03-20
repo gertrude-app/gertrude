@@ -58,7 +58,8 @@ public extension NetworkFilter {
     }
 
     if self.state.macappsAliveUntil[userId] == nil,
-       self.state.userKeychains[userId] != nil {
+       self.state.userKeychains[userId] != nil
+       || self.state.filteringDisabledUsers.contains(userId) {
       return .block(.macappAWOL(userId))
     }
 

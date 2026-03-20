@@ -97,6 +97,8 @@ extension FilterState.WithoutTimes {
       .filterOff
     case .on:
       .filterOn
+    case .unfiltered:
+      .unfiltered
     case .suspended:
       .filterSuspended(resuming: nil)
     case .downtime:
@@ -114,6 +116,8 @@ extension FilterState.WithTimes {
       .filterOff
     case .on:
       .filterOn
+    case .unfiltered:
+      .unfiltered
     case .suspended(let resuming):
       .filterSuspended(resuming: resuming)
     case .downtime(let ending):

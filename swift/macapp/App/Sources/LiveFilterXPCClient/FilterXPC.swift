@@ -66,11 +66,16 @@ struct FilterXPC: Sendable {
     manifest: AppIdManifest,
     keychains: [RuleKeychain],
     downtime: Downtime?,
+    filteringDisabled: Bool?,
   ) async throws {
     try await self.establishConnection()
 
     let manifestData = try XPC.encode(manifest)
-    let filterData = try XPC.encode(UserFilterData(keychains: keychains, downtime: downtime))
+    let filterData = try XPC.encode(UserFilterData(
+      keychains: keychains,
+      downtime: downtime,
+      filteringDisabled: filteringDisabled,
+    ))
 
     try await withTimeout(connection: sharedConnection) { filterProxy, continuation in
       filterProxy.receiveUserRules(

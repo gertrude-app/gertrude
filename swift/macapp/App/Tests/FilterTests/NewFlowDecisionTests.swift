@@ -48,6 +48,16 @@ final class NewFlowDecisionTests: XCTestCase {
     expect(TestFilter.scenario().newFlowDecision(flow)).toEqual(.block(.defaultNotAllowed))
   }
 
+  func testFilteringDisabledUserBlockedWhenMacappAWOL() {
+    let flow = FilterFlow.test(hostname: "example.com")
+    let filter = TestFilter.scenario(
+      userKeychains: [:],
+      macappsAliveUntil: [:],
+      filteringDisabledUsers: [502],
+    )
+    expect(filter.newFlowDecision(flow)).toEqual(.block(.macappAWOL(502)))
+  }
+
   func testFilterSuspensionAllowNotGrantedIfMacappAppearsAWOL() {
     let flow = FilterFlow.test(url: nil, hostname: "unknown.com")
     let filter = TestFilter.scenario(

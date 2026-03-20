@@ -52,6 +52,7 @@ final class FilterReducerTests: XCTestCase {
       keychains: [keychain],
       downtime: nil,
       manifest: manifest,
+      filteringDisabled: nil,
     ))
 
     let saveState = spy(on: Persistent.State.self, returning: ())
@@ -93,13 +94,13 @@ final class FilterReducerTests: XCTestCase {
       keychains: [.mock],
       downtime: nil,
       manifest: .mock,
+      filteringDisabled: nil,
     )))) {
       $0.exemptUsers = [504] // ... so they are removed from the exempt list
     }
   }
 
-  // this is a bit of a hack until we support the concept of "non-filtered" children
-  // see https://github.com/gertrude-app/project/issues/163
+  // nil filteringDisabled = old app; legacy behavior preserved for backwards compat
   @MainActor
   func testReceivingRulesWithZeroKeysDoesNotClearExemptStatus() async {
     let (store, _) = Filter.testStore {
@@ -113,8 +114,30 @@ final class FilterReducerTests: XCTestCase {
       keychains: [], // <-- but there are ZERO keys
       downtime: nil,
       manifest: .mock,
+      filteringDisabled: nil,
     )))) {
       $0.exemptUsers = [501, 504] // ... so they are NOT removed from the exempt list
+    }
+  }
+
+  @MainActor
+  func testTransitioningBackFromMonitoringOnlyClearsStaleKeychains() async {
+    let (store, _) = Filter.testStore {
+      $0.userKeychains = [502: [.mock]] // stale from before monitoring-only was enabled
+      $0.filteringDisabledUsers = [502] // currently monitoring-only
+    }
+    store.deps.filterExtension = .mock
+    store.deps.storage = .mock
+
+    await store.send(.xpc(.receivedAppMessage(.userRules(
+      userId: 502,
+      keychains: [], // no keychains added yet after switching back to filtering
+      downtime: nil,
+      manifest: .mock,
+      filteringDisabled: false, // new app sends explicit false, not nil
+    )))) {
+      $0.userKeychains[502] = [] // stale keychains cleared — child correctly gets block-all
+      $0.filteringDisabledUsers = [] // removed from monitoring-only
     }
   }
 
@@ -132,6 +155,7 @@ final class FilterReducerTests: XCTestCase {
       keychains: [.mock],
       downtime: downtime,
       manifest: .mock,
+      filteringDisabled: nil,
     )))) {
       $0.userDowntime[502] = downtime
     }
@@ -161,6 +185,7 @@ final class FilterReducerTests: XCTestCase {
       keychains: [.mock],
       downtime: nil, // <-- downtime removed
       manifest: .mock,
+      filteringDisabled: nil,
     )))) {
       $0.userDowntime = [:]
     }

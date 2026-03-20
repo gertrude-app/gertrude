@@ -489,6 +489,7 @@ extension Child {
     case screenshotsResolution
     case screenshotsFrequency
     case showSuspensionActivity
+    case filteringDisabled
     case downtime
     case createdAt
     case updatedAt

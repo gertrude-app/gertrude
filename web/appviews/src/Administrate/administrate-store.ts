@@ -10,7 +10,12 @@ export interface HealthCheck {
   latestAppVersion?: { case: 'ok'; value: string } | { case: 'error'; message?: string };
   filterStatus?:
     | { case: 'communicationBroken'; repairing: boolean }
-    | { case: 'installed'; version: string; numUserKeys: number }
+    | {
+        case: 'installed';
+        version: string;
+        numUserKeys: number;
+        filteringDisabled?: boolean;
+      }
     | { case: 'installing' }
     | { case: 'installTimeout' }
     | { case: 'notInstalled' }

@@ -46,6 +46,7 @@ const UserRoute: React.FC = () => {
         screenshotsFrequency: child.draft.screenshotsFrequency,
         screenshotsResolution: child.draft.screenshotsResolution,
         showSuspensionActivity: child.draft.showSuspensionActivity,
+        filteringDisabled: child.draft.filteringDisabled,
         downtime: child.draft.downtime,
         keychains: child.draft.keychains.map(({ id, schedule }) => ({ id, schedule })),
         blockedApps: child.draft.blockedApps,

@@ -9,6 +9,7 @@ public enum FilterState {
     case suspended
     case downtime
     case downtimePaused
+    case unfiltered
   }
 
   /// a representation of the filter state with times for temporary states
@@ -18,6 +19,7 @@ public enum FilterState {
     case suspended(resuming: Date)
     case downtime(ending: Date)
     case downtimePaused(resuming: Date)
+    case unfiltered
   }
 
   /// a representation of the filter state suitable
@@ -31,6 +33,7 @@ public enum FilterState {
     case suspended(resuming: String)
     case downtime(ending: String)
     case downtimePaused(resuming: String)
+    case unfiltered
   }
 }
 
@@ -49,6 +52,8 @@ public extension FilterState.WithTimes {
       .downtime(ending: now.timeRemaining(until: date))
     case .downtimePaused(resuming: let date):
       .downtimePaused(resuming: now.timeRemaining(until: date))
+    case .unfiltered:
+      .unfiltered
     }
   }
 }
@@ -58,7 +63,7 @@ public extension FilterState.WithRelativeTimes {
     switch self {
     case .suspended:
       true
-    case .off, .on, .downtime, .downtimePaused:
+    case .off, .on, .downtime, .downtimePaused, .unfiltered:
       false
     }
   }
@@ -75,6 +80,8 @@ public extension FilterState.WithRelativeTimes {
       .downtime
     case .downtimePaused:
       .downtimePaused
+    case .unfiltered:
+      .unfiltered
     }
   }
 }

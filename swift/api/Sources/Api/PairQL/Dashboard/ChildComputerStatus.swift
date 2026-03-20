@@ -6,6 +6,7 @@ enum ChildComputerStatus: Equatable, Sendable {
   case offline
   case filterOff
   case filterOn
+  case unfiltered
   // NB: dates optional while still supporting < `v2.7.0`
   case filterSuspended(resuming: Date?)
   case downtime(ending: Date?)
@@ -53,6 +54,7 @@ func consolidatedChildComputerStatus(
   // if we happen to have more than two child computers online
   // reporting _different_ things, return the "scariest" one
   return statuses.first(where: { $0 == .filterOff })
+    ?? statuses.first(where: { $0 == .unfiltered })
     ?? statuses.first(where: { $0.isSuspended })
     ?? statuses.first(where: { $0.isDowntimePaused })
     ?? statuses.first(where: { $0.isDowntime })

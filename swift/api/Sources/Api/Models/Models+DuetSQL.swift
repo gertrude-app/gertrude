@@ -787,6 +787,7 @@ extension Child: Model {
     case .screenshotsResolution: .int(self.screenshotsResolution)
     case .screenshotsFrequency: .int(self.screenshotsFrequency)
     case .showSuspensionActivity: .bool(self.showSuspensionActivity)
+    case .filteringDisabled: .bool(self.filteringDisabled)
     case .downtime: .json(self.downtime?.toPostgresJson)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
@@ -803,6 +804,7 @@ extension Child: Model {
       .screenshotsResolution: .int(self.screenshotsResolution),
       .screenshotsFrequency: .int(self.screenshotsFrequency),
       .showSuspensionActivity: .bool(self.showSuspensionActivity),
+      .filteringDisabled: .bool(self.filteringDisabled),
       .downtime: .json(self.downtime?.toPostgresJson),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,

@@ -17,7 +17,7 @@ public struct FilterXPCClient: Sendable {
   public var sendAlive: @Sendable () async -> Result<Bool, XPCErr>
   public var sendDeleteAllStoredState: @Sendable () async -> Result<Void, XPCErr>
   public var sendURLMessage: @Sendable (XPC.URLMessage) async -> Void
-  public var sendUserRules: @Sendable (AppIdManifest, [RuleKeychain], Downtime?)
+  public var sendUserRules: @Sendable (AppIdManifest, [RuleKeychain], Downtime?, Bool?)
     async -> Result<Void, XPCErr>
   public var setBlockStreaming: @Sendable (Bool) async -> Result<Void, XPCErr>
   public var setUserExemption: @Sendable (uid_t, Bool) async -> Result<Void, XPCErr>
@@ -36,7 +36,7 @@ public struct FilterXPCClient: Sendable {
     sendAlive: @escaping @Sendable () async -> Result<Bool, XPCErr>,
     sendDeleteAllStoredState: @escaping @Sendable () async -> Result<Void, XPCErr>,
     sendURLMessage: @escaping @Sendable (XPC.URLMessage) async -> Void,
-    sendUserRules: @escaping @Sendable (AppIdManifest, [RuleKeychain], Downtime?)
+    sendUserRules: @escaping @Sendable (AppIdManifest, [RuleKeychain], Downtime?, Bool?)
     async -> Result<Void, XPCErr>,
     setBlockStreaming: @escaping @Sendable (Bool) async -> Result<Void, XPCErr>,
     setUserExemption: @escaping @Sendable (uid_t, Bool) async -> Result<Void, XPCErr>,
@@ -161,7 +161,7 @@ extension FilterXPCClient: TestDependencyKey {
       sendAlive: { .success(true) },
       sendDeleteAllStoredState: { .success(()) },
       sendURLMessage: { _ in },
-      sendUserRules: { _, _, _ in .success(()) },
+      sendUserRules: { _, _, _, _ in .success(()) },
       setBlockStreaming: { _ in .success(()) },
       setUserExemption: { _, _ in .success(()) },
       suspendFilter: { _ in .success(()) },

@@ -9,6 +9,7 @@ interface Props {
   enabled: boolean;
   setEnabled: (enabled: boolean) => unknown;
   warning?: string;
+  disabledReason?: string;
   children?: React.ReactNode;
   className?: string;
 }
@@ -19,6 +20,7 @@ const ToggleCard: React.FC<Props> = ({
   enabled,
   setEnabled,
   warning,
+  disabledReason,
   children,
   className,
 }) => (
@@ -33,9 +35,9 @@ const ToggleCard: React.FC<Props> = ({
     <div className="flex justify-between items-center gap-10">
       <div>
         <h3 className="font-medium text-slate-700 leading-tight">{title}</h3>
-        <p className="text-slate-500 text-sm mt-1">{description}</p>
+        <p className="text-slate-500 text-sm mt-1">{disabledReason ?? description}</p>
       </div>
-      <Toggle enabled={enabled} setEnabled={setEnabled} />
+      <Toggle enabled={enabled} setEnabled={setEnabled} disabled={!!disabledReason} />
     </div>
     {warning && (
       <div className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 bg-amber-50/70 border border-amber-200/60 text-amber-700 text-sm rounded-full">

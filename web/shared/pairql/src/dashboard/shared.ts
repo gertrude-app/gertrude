@@ -50,6 +50,7 @@ export interface Child {
   screenshotsResolution: number;
   screenshotsFrequency: number;
   showSuspensionActivity: boolean;
+  filteringDisabled: boolean;
   keychains: UserKeychainSummary[];
   downtime?: PlainTimeWindow;
   computers: ChildComputer[];
@@ -74,7 +75,8 @@ export type ChildComputerStatus =
   | { case: 'downtimePaused'; resuming?: ISODateString }
   | { case: 'offline' }
   | { case: 'filterOff' }
-  | { case: 'filterOn' };
+  | { case: 'filterOn' }
+  | { case: 'unfiltered' };
 
 export interface ChildIOSDevice {
   id: UUID;

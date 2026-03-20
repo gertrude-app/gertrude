@@ -35,6 +35,7 @@ const ChildMacRoute: React.FC = () => {
         screenshotsFrequency: child.draft.screenshotsFrequency,
         screenshotsResolution: child.draft.screenshotsResolution,
         showSuspensionActivity: child.draft.showSuspensionActivity,
+        filteringDisabled: child.draft.filteringDisabled,
         downtime: child.draft.downtime,
         keychains: child.draft.keychains.map(({ id, schedule }) => ({ id, schedule })),
         blockedApps: child.draft.blockedApps,
@@ -87,6 +88,10 @@ const ChildMacRoute: React.FC = () => {
       showSuspensionActivity={draft.showSuspensionActivity}
       setShowSuspensionActivity={(show) =>
         dispatch({ type: `setShowSuspensionActivity`, show })
+      }
+      filteringDisabled={draft.filteringDisabled}
+      setFilteringDisabled={(disabled) =>
+        dispatch({ type: `setFilteringDisabled`, disabled })
       }
       downtime={draft.downtime ?? defaults.timeWindow()}
       downtimeEnabled={!!draft.downtime}

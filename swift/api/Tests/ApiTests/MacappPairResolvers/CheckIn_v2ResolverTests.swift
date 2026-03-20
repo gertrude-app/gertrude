@@ -26,6 +26,7 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.userData.screenshotFrequency).toEqual(376)
     expect(output.userData.screenshotSize).toEqual(1081)
     expect(output.userData.downtime).toEqual("22:00-08:00")
+    expect(output.userData.filteringDisabled).toEqual(false)
 
     let computer = try await self.db.find(child.computer.id)
     expect(computer.filterVersion).toEqual("3.3.3")

@@ -12,11 +12,12 @@ final class ChildResolversTests: ApiTestCase, @unchecked Sendable {
       id: .init(),
       isNew: true,
       name: "Franny",
-      keyloggingEnabled: false, // <-- ignored for new child, we set
-      screenshotsEnabled: false, // <-- ignored for new child, we set
-      screenshotsResolution: 999, // <-- ignored for new child, we set
-      screenshotsFrequency: 888, // <-- ignored for new child, we set
-      showSuspensionActivity: false, // <-- ignored for new child, we set
+      keyloggingEnabled: false, // <-- ignored for new child, we set recommended default
+      screenshotsEnabled: false, // <-- ignored for new child, we set recommended default
+      screenshotsResolution: 999, // <-- ignored for new child, we set recommended default
+      screenshotsFrequency: 888, // <-- ignored for new child, we set recommended default
+      showSuspensionActivity: false, // <-- ignored for new child, we set recommended default
+      filteringDisabled: false, // <-- honored as-is (no recommended default override)
       downtime: "22:00-06:00",
       keychains: [],
     )
@@ -32,6 +33,7 @@ final class ChildResolversTests: ApiTestCase, @unchecked Sendable {
     expect(child.screenshotsResolution).toEqual(1000)
     expect(child.screenshotsFrequency).toEqual(180)
     expect(child.showSuspensionActivity).toEqual(true)
+    expect(child.filteringDisabled).toEqual(false)
     expect(child.downtime).toEqual("22:00-06:00")
 
     let keychains = try await child.keychains(in: self.db)
@@ -65,6 +67,7 @@ final class ChildResolversTests: ApiTestCase, @unchecked Sendable {
         screenshotsResolution: 333,
         screenshotsFrequency: 444,
         showSuspensionActivity: true,
+        filteringDisabled: false,
         downtime: "22:00-06:00",
         keychains: [],
       ),
@@ -97,6 +100,7 @@ final class ChildResolversTests: ApiTestCase, @unchecked Sendable {
         screenshotsResolution: 333,
         screenshotsFrequency: 1, // <-- below minimum of 10
         showSuspensionActivity: true,
+        filteringDisabled: false,
         keychains: [],
       ),
       in: child.parent.context,
@@ -105,6 +109,53 @@ final class ChildResolversTests: ApiTestCase, @unchecked Sendable {
     let retrieved = try await self.db.find(child.id)
     expect(output).toEqual(.success)
     expect(retrieved.screenshotsFrequency).toEqual(10)
+  }
+
+  func testNewChildHonorsFilteringDisabled() async throws {
+    let parent = try await self.parent()
+    let input = SaveUser.Input.mock(with: {
+      $0.filteringDisabled = true
+      $0.screenshotsEnabled = true
+    })
+    _ = try await SaveUser.resolve(with: input, in: parent.context)
+    let child = try await self.db.find(input.id)
+    expect(child.filteringDisabled).toEqual(true)
+  }
+
+  func testRejectsFilteringDisabledWithNoMonitoring() async throws {
+    let child = try await self.child()
+    var threw = false
+    do {
+      _ = try await SaveUser.resolve(
+        with: .mock(with: {
+          $0.id = child.id
+          $0.isNew = false
+          $0.filteringDisabled = true
+          $0.screenshotsEnabled = false
+        }),
+        in: child.parent.context,
+      )
+    } catch {
+      threw = true
+    }
+    expect(threw).toEqual(true)
+  }
+
+  func testRejectsNewChildWithFilteringDisabledAndNoMonitoring() async throws {
+    let parent = try await self.parent()
+    var threw = false
+    do {
+      _ = try await SaveUser.resolve(
+        with: .mock(with: {
+          $0.filteringDisabled = true
+          $0.screenshotsEnabled = false
+        }),
+        in: parent.context,
+      )
+    } catch {
+      threw = true
+    }
+    expect(threw).toEqual(true)
   }
 
   func testSetsNewKeychainsFromEmpty() async throws {
@@ -247,6 +298,7 @@ extension SaveUser.Input {
       screenshotsResolution: child.screenshotsResolution,
       screenshotsFrequency: child.screenshotsFrequency,
       showSuspensionActivity: child.showSuspensionActivity,
+      filteringDisabled: child.filteringDisabled,
       keychains: keychains,
     )
   }
@@ -261,6 +313,7 @@ extension SaveUser.Input {
       screenshotsResolution: 100,
       screenshotsFrequency: 180,
       showSuspensionActivity: true,
+      filteringDisabled: false,
       downtime: nil,
       keychains: [],
     )

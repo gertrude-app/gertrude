@@ -27,7 +27,10 @@ extension FilterState.WithTimes {
       return
     }
 
-    self = .init(checkingFilterSuspensionIn: state, orElse: .on)
+    let fallback: FilterState.WithTimes = state.user.data?.filteringDisabled == true
+      ? .unfiltered
+      : .on
+    self = .init(checkingFilterSuspensionIn: state, orElse: fallback)
   }
 
   private init(

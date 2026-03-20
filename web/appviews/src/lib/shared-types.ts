@@ -4,7 +4,8 @@ export type FilterState =
   | { case: 'downtime'; ending: string }
   | { case: 'downtimePaused'; resuming: string }
   | { case: 'off' }
-  | { case: 'on' };
+  | { case: 'on' }
+  | { case: 'unfiltered' };
 
 export type AdminAccountStatus = 'active' | 'needsAttention' | 'inactive';
 // end codegen

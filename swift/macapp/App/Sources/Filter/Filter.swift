@@ -10,6 +10,7 @@ public struct Filter: Reducer, Sendable {
     public var userDowntime: [uid_t: Downtime] = [:]
     public var appIdManifest = AppIdManifest()
     public var exemptUsers: Set<uid_t> = []
+    public var filteringDisabledUsers: Set<uid_t> = []
     public var suspensions: [uid_t: FilterSuspension] = [:]
     public var appCache: [String: AppDescriptor] = [:]
     public var blockListeners: [uid_t: Date] = [:]
@@ -92,6 +93,7 @@ public struct Filter: Reducer, Sendable {
       state.userKeychains = persisted.userKeychains
       state.appIdManifest = persisted.appIdManifest
       state.exemptUsers = persisted.exemptUsers
+      state.filteringDisabledUsers = persisted.filteringDisabledUsers ?? []
       return .none
 
     case .loadedPersistentState(.none):
@@ -192,6 +194,7 @@ public struct Filter: Reducer, Sendable {
       state.userKeychains[userId] = nil
       state.suspensions[userId] = nil
       state.exemptUsers.remove(userId)
+      state.filteringDisabledUsers.remove(userId)
       return self.saving(state.persistent)
 
     case .xpc(.receivedAppMessage(.endFilterSuspension(let userId))):
@@ -219,15 +222,26 @@ public struct Filter: Reducer, Sendable {
       let keychains,
       let downtime,
       let manifest,
+      let filteringDisabled,
     ))):
       state.recordAppActivity(from: userId)
-      if !keychains.isEmpty {
+      // nil = old app (filteringDisabled absent from XPC JSON) — preserve stale state for
+      // monitoring-only children on legacy app versions that don't send filteringDisabled.
+      // false = new app, explicitly filtering — clear keychains even when empty, so a transition
+      // back from monitoring-only correctly resets to block-all with no rules.
+      // safe to drop the nil branch (roughly march 2027 or later) once legacy versions phase out.
+      if !keychains.isEmpty || filteringDisabled == false {
         state.userKeychains[userId] = keychains
         state.exemptUsers.remove(userId)
       }
       state.appIdManifest = manifest
       state.appCache = [:]
       state.userDowntime[userId] = downtime
+      if filteringDisabled == true {
+        state.filteringDisabledUsers.insert(userId)
+      } else {
+        state.filteringDisabledUsers.remove(userId)
+      }
       return self.saving(state.persistent)
 
     case .xpc(.receivedAppMessage(.setUserExemption(let userId, let enabled))):
@@ -287,6 +301,7 @@ public extension Filter.State {
     public var userKeys: [uid_t: Int] = [:]
     public var numAppsInManifest: Int
     public var exemptUsers: Set<uid_t> = []
+    public var filteringDisabledUsers: Set<uid_t> = []
     public var suspensions: [uid_t: FilterSuspension] = [:]
     public var numAppsInCache: Int
     public var blockListeners: [uid_t: Date] = [:]
@@ -301,6 +316,7 @@ public extension Filter.State {
       },
       numAppsInManifest: self.appIdManifest.apps.count,
       exemptUsers: self.exemptUsers,
+      filteringDisabledUsers: self.filteringDisabledUsers,
       suspensions: self.suspensions,
       numAppsInCache: self.appCache.count,
       blockListeners: self.blockListeners,

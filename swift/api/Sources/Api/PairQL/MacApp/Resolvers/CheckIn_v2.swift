@@ -153,6 +153,7 @@ extension CheckIn_v2: Resolver {
         screenshotSize: context.child.screenshotsResolution,
         downtime: context.child.downtime,
         blockedApps: blockedApps.map(\.blockedApp),
+        filteringDisabled: context.child.filteringDisabled ? true : false,
         connectedAt: computerUser.createdAt,
       ),
       browsers: browsers.map(\.match),
