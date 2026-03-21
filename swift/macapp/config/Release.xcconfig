@@ -1,0 +1,2 @@
+API_BASE_URL = https:/$()/api.gertrude.app
+APPCAST_URL = $(API_BASE_URL)/appcast.xml

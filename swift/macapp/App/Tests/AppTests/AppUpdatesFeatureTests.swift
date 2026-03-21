@@ -1,4 +1,5 @@
 import Dependencies
+import Foundation
 import MacAppRoute
 import TestSupport
 import XCTest
@@ -7,6 +8,33 @@ import XExpect
 @testable import App
 
 final class AppUpdatesFeatureTests: XCTestCase {
+  private func assertAppcastURL(
+    _ actual: String,
+    channel: String,
+    requestingAppVersion: String = "1.0.0",
+    file: StaticString = #filePath,
+    line: UInt = #line,
+  ) {
+    guard let url = URL(string: actual) else {
+      XCTFail("expected valid URL: \(actual)", file: file, line: line)
+      return
+    }
+    XCTAssertEqual(url.scheme, "http", file: file, line: line)
+    XCTAssertEqual(url.host, "127.0.0.1", file: file, line: line)
+    XCTAssertEqual(url.port, 8080, file: file, line: line)
+    XCTAssertEqual(url.path, "/appcast.xml", file: file, line: line)
+
+    guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+      XCTFail("expected URL components for: \(actual)", file: file, line: line)
+      return
+    }
+    let queryItems = Dictionary(
+      uniqueKeysWithValues: (components.queryItems ?? []).map { ($0.name, $0.value ?? "") },
+    )
+    XCTAssertEqual(queryItems["channel"], channel, file: file, line: line)
+    XCTAssertEqual(queryItems["requestingAppVersion"], requestingAppVersion, file: file, line: line)
+  }
+
   @MainActor
   func testReceivingLatestVersionFromCheckInSetsLatestReleaseAndChannel() async {
     let (store, _) = AppReducer.testStore {
@@ -143,8 +171,9 @@ final class AppUpdatesFeatureTests: XCTestCase {
 
     await store.send(.adminWindow(.delegate(.triggerAppUpdate)))
     await expect(saveState.called).toEqual(true)
-    await expect(triggerUpdate.calls)
-      .toEqual(["http://127.0.0.1:8080/appcast.xml?channel=stable&requestingAppVersion=1.0.0"])
+    let calls = await triggerUpdate.calls
+    await expect(calls.count).toEqual(1)
+    self.assertAppcastURL(calls[0], channel: "stable")
   }
 
   @MainActor
@@ -154,8 +183,9 @@ final class AppUpdatesFeatureTests: XCTestCase {
     store.deps.updater.triggerUpdate = triggerUpdate.fn
 
     await store.send(.adminWindow(.delegate(.triggerAppUpdate)))
-    await expect(triggerUpdate.calls)
-      .toEqual(["http://127.0.0.1:8080/appcast.xml?channel=beta&requestingAppVersion=1.0.0"])
+    let calls = await triggerUpdate.calls
+    await expect(calls.count).toEqual(1)
+    self.assertAppcastURL(calls[0], channel: "beta")
   }
 
   @MainActor
@@ -186,8 +216,9 @@ final class AppUpdatesFeatureTests: XCTestCase {
     await Task.repeatYield(count: IS_CI ? 60 : 25)
 
     await expect(saveState.called).toEqual(true)
-    await expect(triggerUpdate.calls)
-      .toEqual(["http://127.0.0.1:8080/appcast.xml?channel=beta&requestingAppVersion=1.0.0"])
+    let calls = await triggerUpdate.calls
+    await expect(calls.count).toEqual(1)
+    self.assertAppcastURL(calls[0], channel: "beta")
   }
 
   @MainActor

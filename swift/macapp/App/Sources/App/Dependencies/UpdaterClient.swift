@@ -27,11 +27,7 @@ public extension DependencyValues {
 }
 
 extension UpdaterClient: EndpointOverridable {
-  #if DEBUG
-    public static let endpointDefault = URL(string: "http://127.0.0.1:8080/appcast.xml")!
-  #else
-    public static let endpointDefault = URL(string: "https://api.gertrude.app/appcast.xml")!
-  #endif
+  public static let endpointDefault = AppConfiguration.appcastURL
 
   public static let endpointOverride = LockIsolated<URL?>(nil)
 }

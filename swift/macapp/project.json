@@ -4,6 +4,7 @@
   "implicitDependencies": ["App"],
   "namedInputs": {
     "xcode-sources": [
+      "{projectRoot}/config/**/*.xcconfig",
       "{projectRoot}/Xcode/Gertrude/**/*.swift",
       "{projectRoot}/Xcode/Gertrude/**/*.plist",
       "{projectRoot}/Xcode/Gertrude/**/*.entitlements",
