@@ -9,7 +9,7 @@ import Foundation
 public struct DeviceClient: Sendable {
   @MainActor public var type: @Sendable () async -> DeviceType
   @MainActor public var iOSVersion: @Sendable () async -> String
-  @MainActor public var vendorId: @Sendable () async -> UUID?
+  @MainActor public var deviceId: @Sendable () async -> UUID?
   public var modelIdentifier: @Sendable () -> String
   public var installedVersion: @Sendable () -> String
   @MainActor public var data: @Sendable () async -> Data
@@ -21,7 +21,7 @@ public struct DeviceClient: Sendable {
   public init(
     type: @Sendable @escaping () async -> DeviceType,
     iOSVersion: @Sendable @escaping () async -> String,
-    vendorId: @Sendable @escaping () async -> UUID?,
+    deviceId: @Sendable @escaping () async -> UUID?,
     modelIdentifier: @Sendable @escaping () -> String,
     installedVersion: @Sendable @escaping () -> String,
     data: @Sendable @escaping () async -> Data,
@@ -32,7 +32,7 @@ public struct DeviceClient: Sendable {
   ) {
     self.type = type
     self.iOSVersion = iOSVersion
-    self.vendorId = vendorId
+    self.deviceId = deviceId
     self.modelIdentifier = modelIdentifier
     self.installedVersion = installedVersion
     self.data = data
@@ -66,13 +66,13 @@ public extension DeviceClient {
   struct Data: Sendable {
     public var type: DeviceType
     public var iOSVersion: String
-    public var vendorId: UUID?
+    public var deviceId: UUID?
     public var modelIdentifier: String
 
-    public init(type: DeviceType, iOSVersion: String, vendorId: UUID?, modelIdentifier: String) {
+    public init(type: DeviceType, iOSVersion: String, deviceId: UUID?, modelIdentifier: String) {
       self.type = type
       self.iOSVersion = iOSVersion
-      self.vendorId = vendorId
+      self.deviceId = deviceId
       self.modelIdentifier = modelIdentifier
     }
   }
@@ -88,20 +88,20 @@ extension DeviceClient: DependencyKey {
         iOSVersion: { await MainActor.run {
           UIDevice.current.systemVersion
         }},
-        vendorId: {
-          await getStableVendorId()
+        deviceId: {
+          await getFrozenVendorId()
         },
         modelIdentifier: getModelIdentifier,
         installedVersion: {
           Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
         },
         data: {
-          let vendorId = await getStableVendorId()
+          let deviceId = await getFrozenVendorId()
           let modelIdentifier = getModelIdentifier()
           return await MainActor.run { .init(
             type: UIDevice.current.userInterfaceIdiom == .pad ? .iPad : .iPhone,
             iOSVersion: UIDevice.current.systemVersion,
-            vendorId: vendorId,
+            deviceId: deviceId,
             modelIdentifier: modelIdentifier,
           ) }
         },
@@ -123,13 +123,13 @@ extension DeviceClient: DependencyKey {
     public static let liveValue = DeviceClient(
       type: { .iPhone },
       iOSVersion: { "18.0.1" },
-      vendorId: { .init() },
+      deviceId: { .init() },
       modelIdentifier: { "iPhone15,2" },
       installedVersion: { "0.0.0" },
       data: { .init(
         type: .iPhone,
         iOSVersion: "18.0.1",
-        vendorId: .init(),
+        deviceId: .init(),
         modelIdentifier: "iPhone15,2",
       ) },
       batteryLevel: { .level(0.9) },
@@ -145,13 +145,13 @@ extension DeviceClient: DependencyKey {
     static let mock = DeviceClient(
       type: { .iPhone },
       iOSVersion: { "18.3.1" },
-      vendorId: { UUID(42) },
+      deviceId: { UUID(42) },
       modelIdentifier: { "iPhone15,2" },
       installedVersion: { "1.0.0" },
       data: { .init(
         type: .iPhone,
         iOSVersion: "18.3.1",
-        vendorId: UUID(42),
+        deviceId: UUID(42),
         modelIdentifier: "iPhone15,2",
       ) },
       batteryLevel: { .level(0.85) },
@@ -162,7 +162,7 @@ extension DeviceClient: DependencyKey {
   }
 #endif
 
-@Sendable func getStableVendorId() async -> UUID? {
+@Sendable func getFrozenVendorId() async -> UUID? {
   @Dependency(\.keychain) var keychain
   if let stored = keychain.loadVendorId() {
     return stored

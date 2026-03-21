@@ -11,13 +11,15 @@ import XCore
 
 @DependencyClient
 public struct ApiClient: Sendable {
-  public var connectDevice: @Sendable (_ code: Int, _ vendorId: UUID)
+  public var connectDevice: @Sendable (_ code: Int, _ deviceId: UUID)
     async throws -> ChildIOSDeviceData_v2
   public var connectedRules: @Sendable ()
     async throws -> ConnectedRules.Output
-  public var fetchBlockRules: @Sendable (_ vendorId: UUID, _ disabledGroups: [BlockGroup])
+  public var fetchAllBlockGroups: @Sendable (_ deviceId: UUID)
+    async throws -> [GetBlockGroups.BlockGroupInfo]
+  public var fetchBlockRules: @Sendable (_ deviceId: UUID, _ disabledGroups: [UUID])
     async throws -> [BlockRule]
-  public var fetchDefaultBlockRules: @Sendable (_ vendorId: UUID?)
+  public var fetchDefaultBlockRules: @Sendable (_ deviceId: UUID?)
     async throws -> [BlockRule]
   public var logEvent: @Sendable (_ id: String, _ detail: String?)
     async -> Void
@@ -46,14 +48,14 @@ extension ApiClient: DependencyKey {
     let version = Bundle.main
       .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
     return ApiClient(
-      connectDevice: { code, vendorId in
+      connectDevice: { code, deviceId in
         @Dependency(\.device) var device
         let deviceData = await device.data()
         return try await output(
           from: ConnectDevice_v2.self,
           withUnauthed: .connectDevice_v2(.init(
             verificationCode: code,
-            vendorId: vendorId,
+            vendorId: deviceId,
             modelIdentifier: deviceData.modelIdentifier,
             appVersion: version,
             iosVersion: deviceData.iOSVersion,
@@ -78,22 +80,27 @@ extension ApiClient: DependencyKey {
         // context: https://gist.github.com/jaredh159/af45d98eee7f8a33b6b5af945ec23cfc
         return .init(blockRules: result.blockRules.map(\.current), webPolicy: result.webPolicy)
       },
-      fetchBlockRules: { vendorId, disabledGroups in
-        let legacyRules = try await output(
-          from: BlockRules_v2.self,
-          withUnauthed: .blockRules_v2(.init(
+      fetchAllBlockGroups: { deviceId in
+        try await output(
+          from: GetBlockGroups.self,
+          withUnauthed: .getBlockGroups(.init(deviceId: deviceId)),
+        )
+      },
+      fetchBlockRules: { deviceId, disabledGroups in
+        try await output(
+          from: BlockRules_v3.self,
+          withUnauthed: .blockRules_v3(.init(
+            deviceId: deviceId,
+            appVersion: version,
             disabledGroups: disabledGroups,
-            vendorId: vendorId,
-            version: version,
           )),
         )
-        return legacyRules.map(\.current)
       },
-      fetchDefaultBlockRules: { vendorId in
+      fetchDefaultBlockRules: { deviceId in
         let legacyRules = try await output(
           from: DefaultBlockRules.self,
           withUnauthed: .defaultBlockRules(.init(
-            vendorId: vendorId,
+            vendorId: deviceId,
             version: version,
           )),
         )
@@ -111,7 +118,7 @@ extension ApiClient: DependencyKey {
               modelIdentifier: deviceData.modelIdentifier,
               iOSVersion: deviceData.iOSVersion,
               appVersion: version,
-              vendorId: deviceData.vendorId,
+              vendorId: deviceData.deviceId,
               detail: detail,
             )),
           )
@@ -126,7 +133,7 @@ extension ApiClient: DependencyKey {
         let result = try await output(
           from: RecoveryDirective.self,
           withUnauthed: .recoveryDirective(.init(
-            vendorId: deviceData.vendorId,
+            vendorId: deviceData.deviceId,
             deviceType: deviceData.type.rawValue,
             iOSVersion: deviceData.iOSVersion,
             locale: locale.region?.identifier,
@@ -146,13 +153,13 @@ extension ApiClient: DependencyKey {
       },
       createSupervisionClaimCode: {
         @Dependency(\.device) var device
-        guard let vendorId = await device.vendorId() else {
+        guard let deviceId = await device.deviceId() else {
           throw ApiClient.Error.missingVendorId
         }
         return try await output(
           from: CreateSupervisionClaimCode.self,
           withUnauthed: .createSupervisionClaimCode(.init(
-            deviceId: vendorId,
+            deviceId: deviceId,
             modelIdentifier: device.modelIdentifier(),
             iosVersion: device.iOSVersion(),
             appVersion: version,
@@ -161,13 +168,13 @@ extension ApiClient: DependencyKey {
       },
       checkSupervisionFlowStatus: { code in
         @Dependency(\.device) var device
-        guard let vendorId = await device.vendorId() else {
+        guard let deviceId = await device.deviceId() else {
           throw ApiClient.Error.missingVendorId
         }
         return try await output(
           from: CheckSupervisionFlowStatus.self,
           withUnauthed: .checkSupervisionFlowStatus(.init(
-            vendorId: vendorId,
+            vendorId: deviceId,
             code: code,
           )),
         )

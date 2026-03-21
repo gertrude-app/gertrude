@@ -52,9 +52,13 @@ public struct IOSReducer {
     case .onboardingBtnTapped(let btn, _):
       return self.onboardingBtnTapped(btn, state: &state, action: action)
 
-    case .blockGroupToggled(let group):
-      self.deps.log("block group toggled: \(group)", "02976f9b")
-      state.disabledBlockGroups.toggle(group)
+    case .blockGroupToggled(let groupId):
+      self.deps.log("block group toggled: \(groupId)", "02976f9b")
+      if state.disabledBlockGroupIds.contains(groupId) {
+        state.disabledBlockGroupIds.removeAll { $0 == groupId }
+      } else {
+        state.disabledBlockGroupIds.append(groupId)
+      }
       return .none
 
     case .sheetDismissed:
@@ -63,9 +67,11 @@ public struct IOSReducer {
     case .infoBtnTapped:
       state.destination = .info(.init(
         connection: self.deps.sharedStorage.loadAccountConnection(),
-        vendorId: self.deps.keychain.loadVendorId(),
+        // TODO: should async call device.deviceId() instead
+        deviceId: self.deps.keychain.loadVendorId(),
         numRules: self.deps.sharedStorage.loadProtectionMode()?.rules?.count ?? 0,
-        numDisabledBlockGroups: self.deps.sharedStorage.loadDisabledBlockGroups()?.count ?? 0,
+        numDisabledBlockGroups: self.deps.sharedStorage.loadDisabledBlockGroupIds()?.count ?? 0,
+        numTotalBlockGroups: state.allBlockGroups.isEmpty ? 9 : state.allBlockGroups.count,
       ))
       return .none
 
@@ -236,14 +242,17 @@ public struct IOSReducer {
 
     case (.onboarding(.happyPath(.optOutBlockGroups)), .primary):
       self.deps.log(state.screen, action, "cdb31095")
-      if state.disabledBlockGroups == .all { return .none }
+      if !state.allBlockGroups.isEmpty,
+         state.allBlockGroups.allSatisfy({ state.disabledBlockGroupIds.contains($0.id) }) {
+        return .none
+      }
       state.screen = .onboarding(.happyPath(.promptClearCache))
       return .merge(
-        .run { [deps = self.deps, disabled = state.disabledBlockGroups] _ in
-          deps.sharedStorage.saveDisabledBlockGroups(disabled)
-          if let vendorId = await deps.device.vendorId() {
+        .run { [deps = self.deps, disabled = state.disabledBlockGroupIds] _ in
+          deps.sharedStorage.saveDisabledBlockGroupIds(disabled)
+          if let deviceId = await deps.device.deviceId() {
             let result = try? await deps.api.fetchBlockRules(
-              vendorId: vendorId,
+              deviceId: deviceId,
               disabledGroups: disabled,
             )
             if let rules = result, !rules.isEmpty {
@@ -809,6 +818,17 @@ public struct IOSReducer {
               .setScreen(.onboarding(.supervision(.resume(.networkError)))),
             ))
           }
+          if let ids = deps.sharedStorage.loadDisabledBlockGroupIds() {
+            await send(.programmatic(.receivedDisabledBlockGroupIds(ids)))
+          }
+          if let groups = deps.sharedStorage.loadAllBlockGroups() {
+            await send(.programmatic(.receivedAllBlockGroups(groups)))
+          } else if let deviceId = await deps.device.deviceId(),
+                    let groups = try? await deps.api.fetchAllBlockGroups(deviceId),
+                    !groups.isEmpty {
+            deps.sharedStorage.saveAllBlockGroups(groups)
+            await send(.programmatic(.receivedAllBlockGroups(groups)))
+          }
         },
         // handle first launch
         .run { [deps = self.deps] send in
@@ -818,13 +838,21 @@ public struct IOSReducer {
             let now = deps.now
             deps.sharedStorage.saveFirstLaunchDate(now)
             await send(.programmatic(.setFirstLaunch(now)))
+            let deviceId = await deps.device.deviceId()
             // prefetch the default block groups for onboarding
-            let defaultRules = try? await deps.api.fetchDefaultBlockRules(deps.device.vendorId())
+            let defaultRules = try? await deps.api.fetchDefaultBlockRules(deviceId)
             if let defaultRules, !defaultRules.isEmpty {
               deps.sharedStorage.saveProtectionMode(.onboarding(defaultRules))
             } else {
               deps.sharedStorage
                 .saveProtectionMode(.onboarding(BlockRule.Legacy.defaults.map(\.current)))
+            }
+            // prefetch block group catalog so it's ready when user reaches opt-out screen
+            if let deviceId,
+               let groups = try? await deps.api.fetchAllBlockGroups(deviceId),
+               !groups.isEmpty {
+              deps.sharedStorage.saveAllBlockGroups(groups)
+              await send(.programmatic(.receivedAllBlockGroups(groups)))
             }
             await deps.api.logEvent(
               "8d35f043",
@@ -904,7 +932,7 @@ public struct IOSReducer {
         state.screen = .onboarding(.happyPath(.optOutBlockGroups))
       }
       return .run { [deps = self.deps] _ in
-        deps.sharedStorage.saveDisabledBlockGroups([])
+        deps.sharedStorage.saveDisabledBlockGroupIds([])
       }
 
     case .installFailed(let err):
@@ -924,6 +952,14 @@ public struct IOSReducer {
 
     case .receivedConnectAccountFeatureFlag(let feature):
       state.onboarding.connectFeature = feature
+      return .none
+
+    case .receivedAllBlockGroups(let groups):
+      state.allBlockGroups = groups
+      return .none
+
+    case .receivedDisabledBlockGroupIds(let ids):
+      state.disabledBlockGroupIds = ids
       return .none
 
     case .supervisionCodeGenerated(let code):

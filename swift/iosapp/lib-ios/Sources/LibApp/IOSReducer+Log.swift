@@ -61,7 +61,7 @@ extension IOSReducer.Deps {
 
   private func eventMeta() async -> String {
     let device = await self.device.data()
-    return "device: \(device.type), iOS: \(device.iOSVersion), vendorId: \(device.vendorId?.uuidString.lowercased() ?? "nil")"
+    return "device: \(device.type), iOS: \(device.iOSVersion), deviceId: \(device.deviceId?.uuidString.lowercased() ?? "nil")"
   }
 }
 

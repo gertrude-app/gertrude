@@ -56,10 +56,10 @@ extension IOSReducer.Deps {
       return .gertrudeSupervisionReboot(.networkError)
     }
 
-    let disabledBlockGroups = self.sharedStorage.loadDisabledBlockGroups()
+    let disabledBlockGroupIds = self.sharedStorage.loadDisabledBlockGroupIds()
     let connection = self.sharedStorage.loadAccountConnection()
 
-    switch (connection, filterRunning, disabledBlockGroups) {
+    switch (connection, filterRunning, disabledBlockGroupIds) {
 
     case (.some(let conn), /* filter on: */ true, /* groups: */ _):
       return .running(.connected(conn))

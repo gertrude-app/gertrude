@@ -1,21 +1,39 @@
+import IOSRoute
 import LibApp
 import SwiftUI
 
 struct ChooseWhatToBlockView: View {
   @Environment(\.colorScheme) var cs
 
-  let deselectedGroups: [BlockGroup]
-  let onGroupToggle: (BlockGroup) -> Void
+  let allGroups: [GetBlockGroups.BlockGroupInfo]
+  let disabledGroupIds: [UUID]
+  let onGroupToggle: (UUID) -> Void
   let onDone: () -> Void
 
-  @State private var sheetItem: BlockGroup? = nil
+  @State private var sheetItem: GetBlockGroups.BlockGroupInfo? = nil
   @State private var iconOffset = Vector(x: 0, y: 20)
   @State private var titleOffset = Vector(x: 0, y: 20)
   @State private var paragraphOffset = Vector(x: 0, y: 20)
-  @State private var itemOffsets = Array(repeating: Vector(x: 0, y: 40), count: 9)
+  @State private var itemOffsets: [Vector]
   @State private var buttonOffset = Vector(x: 0, y: 20)
   @State private var showBg = false
   @State private var showTooltip = false
+
+  init(
+    allGroups: [GetBlockGroups.BlockGroupInfo],
+    disabledGroupIds: [UUID],
+    onGroupToggle: @escaping (UUID) -> Void,
+    onDone: @escaping () -> Void,
+  ) {
+    self.allGroups = allGroups
+    self.disabledGroupIds = disabledGroupIds
+    self.onGroupToggle = onGroupToggle
+    self.onDone = onDone
+    self._itemOffsets = State(initialValue: Array(
+      repeating: Vector(x: 0, y: 40),
+      count: allGroups.count,
+    ))
+  }
 
   var body: some View {
     ScrollView {
@@ -28,7 +46,7 @@ struct ChooseWhatToBlockView: View {
           .cornerRadius(24)
           .swooshIn(tracking: self.$iconOffset, to: .zero, after: .zero, for: .seconds(0.6))
 
-        Text("Success! We’re nearly done.")
+        Text("Success! We're nearly done.")
           .multilineTextAlignment(.center)
           .font(.system(size: 24, weight: .bold))
           .padding(.top, 28)
@@ -41,7 +59,7 @@ struct ChooseWhatToBlockView: View {
           )
 
         Text(
-          "Gertrude is all set to block content. Take a moment to decide if there are any of these types of content that you don’t want to block:",
+          "Gertrude is all set to block content. Take a moment to decide if there are any of these types of content that you don't want to block:",
         )
         .multilineTextAlignment(.center)
         .font(.system(size: 18, weight: .medium))
@@ -65,7 +83,8 @@ struct ChooseWhatToBlockView: View {
             }
           },
           variant: .primary,
-          disabled: self.deselectedGroups == .all,
+          disabled: !self.allGroups.isEmpty
+            && self.allGroups.allSatisfy { self.disabledGroupIds.contains($0.id) },
         )
         .swooshIn(
           tracking: self.$buttonOffset,
@@ -94,12 +113,14 @@ struct ChooseWhatToBlockView: View {
           Color(self.cs, light: .white, dark: .violet950.opacity(0.3))
             .edgesIgnoringSafeArea(.vertical)
           VStack {
-            Image(item.image)
-              .resizable()
-              .frame(maxWidth: .infinity)
-              .aspectRatio(contentMode: .fit)
-              .shadow(color: .black.opacity(0.1), radius: 8)
-            Text(item.title)
+            if let imageName = item.imageSlug {
+              Image(imageName)
+                .resizable()
+                .frame(maxWidth: .infinity)
+                .aspectRatio(contentMode: .fit)
+                .shadow(color: .black.opacity(0.1), radius: 8)
+            }
+            Text(item.name)
               .font(.system(size: 24, weight: .bold))
               .padding(.top, 20)
               .padding(.bottom, 4)
@@ -149,21 +170,24 @@ struct ChooseWhatToBlockView: View {
 
   var selectableGroups: some View {
     VStack(alignment: .leading) {
-      ForEach(Array(allBlockGroups.enumerated()), id: \.1) { (index: Int, item: BlockGroup) in
+      ForEach(
+        Array(self.allGroups.enumerated()),
+        id: \.1.id,
+      ) { (index: Int, item: GetBlockGroups.BlockGroupInfo) in
         Button {
           withAnimation(.smooth(duration: 0.1)) {
-            self.onGroupToggle(item)
+            self.onGroupToggle(item.id)
           }
         } label: {
           ZStack {
             HStack(alignment: .top, spacing: 12) {
               Image(systemName: "checkmark")
                 .font(.system(size: 12, weight: .bold))
-                .scaleEffect(self.isSelected(item) ? 1 : 0)
+                .scaleEffect(self.isEnabled(item) ? 1 : 0)
                 .foregroundStyle(.white)
                 .padding(4)
                 .background(
-                  self.isSelected(item)
+                  self.isEnabled(item)
                     ? Color.violet500
                     : Color(
                       self.cs,
@@ -175,14 +199,14 @@ struct ChooseWhatToBlockView: View {
                 .overlay {
                   RoundedRectangle(cornerRadius: 6)
                     .stroke(
-                      self.isSelected(item) ? Color.violet500 : Color.gray.opacity(0.2),
+                      self.isEnabled(item) ? Color.violet500 : Color.gray.opacity(0.2),
                       lineWidth: 2,
                     )
                 }
 
               VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 0) {
-                  Text(item.title)
+                  Text(item.name)
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(Color(self.cs, light: .black, dark: .white))
 
@@ -190,6 +214,8 @@ struct ChooseWhatToBlockView: View {
                     withAnimation {
                       self.showTooltip = false
                     }
+                    // if analytics show high engagement here, consider adding
+                    // image_url_light + image_url_dark columns to iosapp.block_groups
                     self.sheetItem = item
                   } label: {
                     Image(systemName: "questionmark.circle")
@@ -233,7 +259,7 @@ struct ChooseWhatToBlockView: View {
               color: Color(self.cs, light: .violet200, dark: .violet900.opacity(0.3)),
               radius: 3,
             )
-            .opacity(self.isSelected(item) ? 1 : self.cs == .light ? 0.7 : 0.5)
+            .opacity(self.isEnabled(item) ? 1 : self.cs == .light ? 0.7 : 0.5)
 
             if index == 0 {
               VStack(spacing: -24) {
@@ -271,7 +297,7 @@ struct ChooseWhatToBlockView: View {
           }
         }
         .buttonStyle(BounceButtonStyle())
-        .sensoryFeedback(.selection, trigger: self.isSelected(item))
+        .sensoryFeedback(.selection, trigger: self.isEnabled(item))
         .swooshIn(
           tracking: self.$itemOffsets[index],
           to: .zero,
@@ -284,8 +310,8 @@ struct ChooseWhatToBlockView: View {
     .padding(.vertical, 20)
   }
 
-  func isSelected(_ group: BlockGroup) -> Bool {
-    !self.deselectedGroups.contains(group)
+  func isEnabled(_ group: GetBlockGroups.BlockGroupInfo) -> Bool {
+    !self.disabledGroupIds.contains(group.id)
   }
 
   func vanishingAnimations() {
@@ -293,7 +319,7 @@ struct ChooseWhatToBlockView: View {
       self.iconOffset.y = -20
       self.titleOffset.y = -20
       self.paragraphOffset.y = -20
-      self.itemOffsets = Array(repeating: .init(x: 0, y: -20), count: allBlockGroups.count)
+      self.itemOffsets = Array(repeating: .init(x: 0, y: -20), count: self.allGroups.count)
     }
 
     delayed(by: .milliseconds(100)) {
@@ -305,82 +331,37 @@ struct ChooseWhatToBlockView: View {
   }
 }
 
-let allBlockGroups: [BlockGroup] = .all
-
-extension BlockGroup {
-  var title: String {
-    switch self {
-    case .ads: "Ads"
-    case .aiFeatures: "AI features"
-    case .appStoreImages: "App store images"
-    case .appleMapsImages: "Apple Maps images"
-    case .appleWebsite: "apple.com"
-    case .gifs: "GIFs"
-    case .spotlightSearches: "Spotlight"
-    case .whatsAppFeatures: "WhatsApp"
-    case .spotifyImages: "Spotify images"
-    }
-  }
-
-  var image: String {
-    switch self {
-    case .ads: "AdBlocking"
-    case .aiFeatures: "AIFeatures"
-    case .appStoreImages: "AppStoreImages"
-    case .appleMapsImages: "MapsImages"
-    case .appleWebsite: "AppleWebsite"
-    case .gifs: "MessagesGIFs"
-    case .spotlightSearches: "SpotlightSearch"
-    case .whatsAppFeatures: "BadWhatsAppFeatures"
-    case .spotifyImages: "SpotifyImages"
-    }
-  }
-
-  // NB: these descriptions are now also in the database, should pull from API eventually
-  var shortDescription: String {
-    switch self {
-    case .ads: "Block the most common ad providers across all apps."
-    case .aiFeatures: "Block certain cloud-based AI features like image recognition."
-    case .appStoreImages: "Block images from the App Store."
-    case .appleMapsImages: "Block all images from Apple Maps business listings."
-    case .appleWebsite: "Block web access to apple.com and linked sites."
-    case .gifs: "Block GIFs in Messages #images, WhatsApp, Signal, and more."
-    case .spotlightSearches: "Block internet searches through Spotlight."
-    case .whatsAppFeatures: "Block some parts of WhatsApp, including media content."
-    case .spotifyImages: "Block most album artwork and images from the Spotify app."
-    }
-  }
-
-  var longDescription: String {
-    switch self {
-    case .ads:
-      "Blocks the 20 most common ad providers, including Google ads, in all browsers and apps. Does not guarantee to block all ads, but should make a noticeable difference."
-    case .aiFeatures:
-      "Blocks certain cloud-based AI features like image recognition. For example, the iOS 18 feature where an item in a photo can be long-pressed, identified, and searched for online."
-    case .appStoreImages:
-      "Eliminates all images for apps in the App Store, and in other places where the App Store appears, like in the Messages texting app."
-    case .appleMapsImages:
-      "Apple Maps business listings show photos uploaded by customers and businesses, and for certain types of businesses, these can be explicit. This group blocks all images from within Apple Maps."
-    case .appleWebsite:
-      "Certain parts of iOS (including the Settings app) contain links to the apple.com website. It is possible to view these pages and from there follow links to other parts of the web. This group blocks this access."
-    case .gifs:
-      "Blocks viewing and searching for GIFs in the #images feature of Apple’s texting app, plus in other common messaging apps like WhatsApp, Skype, and Signal."
-    case .spotlightSearches:
-      "The built in search bar in iOS (called Spotlight) allows searching for information and images from the internet. This group stops all spotlight internet searches. On-device data searches are not blocked."
-    case .whatsAppFeatures:
-      "This group attempts to block some of aspects of the WhatsApp app, including the media channels. It is experimental, and does not guarantee by any means that the app will be safe for children, but it does reduce some risks."
-    case .spotifyImages:
-      "Blocks images displayed in the Spotify app, including album artwork, artist photos, and playlist covers. This helps prevent exposure to potentially explicit or inappropriate imagery while still allowing music playback."
-    }
-  }
-}
+extension GetBlockGroups.BlockGroupInfo: @retroactive Identifiable {}
 
 #Preview("none selected") {
-  ChooseWhatToBlockView(deselectedGroups: .all, onGroupToggle: { _ in }) {}
+  ChooseWhatToBlockView(
+    allGroups: previewBlockGroups,
+    disabledGroupIds: previewBlockGroups.map(\.id),
+    onGroupToggle: { _ in },
+    onDone: {},
+  )
 }
 
 #Preview("all selected") {
-  ChooseWhatToBlockView(deselectedGroups: [], onGroupToggle: { _ in }) {}
+  ChooseWhatToBlockView(
+    allGroups: previewBlockGroups,
+    disabledGroupIds: [],
+    onGroupToggle: { _ in },
+    onDone: {},
+  )
+}
+
+private let previewBlockGroups: [GetBlockGroups.BlockGroupInfo] = [
+  "MessagesGIFs", "MapsImages", "AIFeatures", "AppStoreImages", "SpotlightSearch",
+  "AdBlocking", "BadWhatsAppFeatures", "AppleWebsite", "SpotifyImages", "AppleMusicImages",
+].map { slug in
+  .init(
+    id: UUID(),
+    name: slug,
+    shortDescription: "Short description for \(slug)",
+    longDescription: "Long description for \(slug)",
+    imageSlug: slug,
+  )
 }
 
 struct BounceButtonStyle: ButtonStyle {

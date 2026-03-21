@@ -16,10 +16,10 @@ struct ControllerProxyTest {
   let loadAccountConnectionCalled = LockIsolated<Int>(0)
   let osLogs: LockIsolated<[String]> = .init([])
   let refreshRulesCalls: LockIsolated<[ControllerProxy.RefreshReason]> = .init([])
-  let loadDisabledBlockGroupsCalls: LockIsolated<Int> = .init(0)
+  let loadDisabledBlockGroupIdsCalls: LockIsolated<Int> = .init(0)
   let loadProtectionModeCalls: LockIsolated<Int> = .init(0)
   let savedProtectionModes: LockIsolated<[ProtectionMode]> = .init([])
-  let fetchBlockRulesCalls: LockIsolated<[Both<UUID, [BlockGroup]>]> = .init([])
+  let fetchBlockRulesCalls: LockIsolated<[Both<UUID, [UUID]>]> = .init([])
   let connectedRulesCalls: LockIsolated<Int> = .init(0)
   let setAuthTokenCalls: LockIsolated<[UUID?]> = .init([])
 
@@ -38,7 +38,7 @@ struct ControllerProxyTest {
 func setup(
   performsMigration: Bool = false,
   accountConnected: Bool = false,
-  disabledBlockGroups: [BlockGroup] = [],
+  disabledBlockGroupIds: [UUID] = [],
   storedProtectionMode: ProtectionMode? = .normal([.targetContains(value: "stored.com")]),
   apiNormalRules: [BlockRule] = [.targetContains(value: "api.com")],
   apiConnectedRules: [BlockRule] = [.targetContains(value: "connected.com")],
@@ -55,7 +55,7 @@ func setup(
       test.migrateCalled.withValue { $0 = true }
       return performsMigration
     }
-    $0.device.vendorId = { UUID(1) }
+    $0.device.deviceId = { UUID(1) }
     $0.api.logEvent = { id, detail in
       await Task.megaYield() // ensure notify callback set in time for init migration
       test.loggedApiEvents.withValue { $0.append(id) }
@@ -71,9 +71,9 @@ func setup(
     $0.api.setAccountConnection = { conn in
       test.setAuthTokenCalls.withValue { $0.append(conn?.token) }
     }
-    $0.sharedStorage.loadDisabledBlockGroups = {
-      test.loadDisabledBlockGroupsCalls.withValue { $0 += 1 }
-      return disabledBlockGroups
+    $0.sharedStorage.loadDisabledBlockGroupIds = {
+      test.loadDisabledBlockGroupIdsCalls.withValue { $0 += 1 }
+      return disabledBlockGroupIds
     }
     $0.sharedStorage.loadProtectionMode = {
       test.loadProtectionModeCalls.withValue { $0 += 1 }
@@ -123,7 +123,10 @@ func setup(
 }
 
 @Test func refreshRulesForStartupNotConnected() async throws {
-  let test = await setup(accountConnected: false, disabledBlockGroups: [.ads])
+  let test = await setup(
+    accountConnected: false,
+    disabledBlockGroupIds: [BlockGroup.ads.legacyUUID],
+  )
   test.proxy.managedSettings.setValue(.init(named: .init("should clear")))
 
   // would debounce, but since =.startup, doesn't consult lastRefresh
@@ -134,8 +137,8 @@ func setup(
   #expect(test.loadAccountConnectionCalled.value == 1)
   #expect(test.proxy.lastRefresh.value == .reference - .minutes(2)) // not touched
   #expect(test.proxy.managedSettings.withValue { $0 == nil } == true) // cleared
-  #expect(test.loadDisabledBlockGroupsCalls.value == 1)
-  #expect(test.fetchBlockRulesCalls.value == [Both(UUID(1), [.ads])])
+  #expect(test.loadDisabledBlockGroupIdsCalls.value == 1)
+  #expect(test.fetchBlockRulesCalls.value == [Both(UUID(1), [BlockGroup.ads.legacyUUID])])
   #expect(test.savedProtectionModes.value == [.normal([.targetContains(value: "api.com")])])
   #expect(test.notifyRulesChangedCount.value == 1)
 }

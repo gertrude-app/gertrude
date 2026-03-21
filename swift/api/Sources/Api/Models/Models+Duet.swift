@@ -611,6 +611,7 @@ extension IOSApp.BlockGroup {
     case name
     case description
     case longDescription
+    case imageSlug
     case createdAt
     case updatedAt
   }

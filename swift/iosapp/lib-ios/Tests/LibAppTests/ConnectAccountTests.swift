@@ -12,7 +12,7 @@ import Testing
   let store = TestStore(initialState: ConnectAccount.State()) {
     ConnectAccount()
   } withDependencies: {
-    $0.device.vendorId = { UUID(0) }
+    $0.device.deviceId = { UUID(0) }
     $0.api.connectDevice = { @Sendable code, vid in
       #expect(code == 123_456)
       #expect(vid == UUID(0))
@@ -48,7 +48,7 @@ import Testing
   let store = TestStore(initialState: ConnectAccount.State()) {
     ConnectAccount()
   } withDependencies: {
-    $0.device.vendorId = { nil }
+    $0.device.deviceId = { nil }
     $0.api.connectDevice = { @Sendable _, _ in
       fatalError("connectDevice should not be called")
     }
@@ -58,8 +58,8 @@ import Testing
     $0.screen = .connecting
   }
 
-  await store.receive(.setScreen(.connectionFailed(error: "No vendor ID found"))) {
-    $0.screen = .connectionFailed(error: "No vendor ID found")
+  await store.receive(.setScreen(.connectionFailed(error: "No device ID found"))) {
+    $0.screen = .connectionFailed(error: "No device ID found")
   }
 }
 
@@ -68,7 +68,7 @@ import Testing
   let store = TestStore(initialState: ConnectAccount.State()) {
     ConnectAccount()
   } withDependencies: {
-    $0.device.vendorId = { UUID(3) }
+    $0.device.deviceId = { UUID(3) }
     $0.api.connectDevice = { @Sendable _, _ in
       struct TestError: Error, LocalizedError {
         var errorDescription: String? { "Invalid code" }

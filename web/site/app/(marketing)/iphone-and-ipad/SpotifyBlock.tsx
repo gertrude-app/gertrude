@@ -26,6 +26,20 @@ const SpotifyBlock: React.FC = () => (
       <FeatureItem inverted text="Hides explicit album cover artwork" />
       <FeatureItem inverted text="Music playback completely unaffected" />
       <FeatureItem inverted text="Works with all Spotify content" />
+      <FeatureItem
+        inverted
+        text={
+          <>
+            Also blocks artwork and videos in{` `}
+            <a
+              href="/blog/block-apple-music-images-iphone"
+              className="underline underline-offset-2 decoration-white/40 hover:decoration-white/80 transition-colors"
+            >
+              Apple Music
+            </a>
+          </>
+        }
+      />
     </ul>
   </DeviceMockupBlock>
 );

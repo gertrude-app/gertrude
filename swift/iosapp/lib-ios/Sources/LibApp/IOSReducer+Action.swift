@@ -20,7 +20,7 @@ public extension IOSReducer {
 
       case onboardingClearCache(ClearCacheFeature.Action)
       case onboardingBtnTapped(OnboardingBtn, String)
-      case blockGroupToggled(BlockGroup)
+      case blockGroupToggled(UUID)
       case sheetDismissed
       case receivedShake
       case infoBtnTapped
@@ -38,6 +38,8 @@ public extension IOSReducer {
       case installSucceeded
       case installFailed(FilterInstallError)
       case receivedConnectAccountFeatureFlag(ConnectAccountFeatureFlag.Output)
+      case receivedAllBlockGroups([GetBlockGroups.BlockGroupInfo])
+      case receivedDisabledBlockGroupIds([UUID])
       case supervisionCodeGenerated(code: Int)
       case supervisionCodeGenerationFailed
       case setProfileRecovery

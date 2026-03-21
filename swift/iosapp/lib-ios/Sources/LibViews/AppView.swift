@@ -149,7 +149,8 @@ public struct AppView: View {
 
         case .onboarding(.happyPath(.optOutBlockGroups)):
           ChooseWhatToBlockView(
-            deselectedGroups: self.store.disabledBlockGroups,
+            allGroups: self.store.allBlockGroups,
+            disabledGroupIds: self.store.disabledBlockGroupIds,
             onGroupToggle: { self.store.send(.interactive(.blockGroupToggled($0))) },
             onDone: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Done"))) },
           )

@@ -75,6 +75,7 @@ extension Configure {
     app.migrations.add(IOSEventCheckinKind())
     app.migrations.add(ReencodeFlowTypeAsString())
     app.migrations.add(PodcastDeviceId())
+    app.migrations.add(BlockGroupImageSlugs())
   }
 }
 

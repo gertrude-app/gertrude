@@ -12,6 +12,8 @@ public enum UnauthedRoute: PairRoute {
   case recoveryDirective(RecoveryDirective.Input)
   case recoveryDirective_v2(RecoveryDirective_v2.Input)
   case connectAccountFeatureFlag
+  case getBlockGroups(GetBlockGroups.Input)
+  case blockRules_v3(BlockRules_v3.Input)
 }
 
 public extension UnauthedRoute {
@@ -58,6 +60,14 @@ public extension UnauthedRoute {
     }
     Route(.case(Self.connectAccountFeatureFlag)) {
       Operation(ConnectAccountFeatureFlag.self)
+    }
+    Route(.case(Self.getBlockGroups)) {
+      Operation(GetBlockGroups.self)
+      Body(.json(GetBlockGroups.Input.self))
+    }
+    Route(.case(Self.blockRules_v3)) {
+      Operation(BlockRules_v3.self)
+      Body(.json(BlockRules_v3.Input.self))
     }
   }
   .eraseToAnyParserPrinter()

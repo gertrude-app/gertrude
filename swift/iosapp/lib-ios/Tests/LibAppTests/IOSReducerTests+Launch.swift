@@ -16,6 +16,8 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.systemExtension.filterRunning = { false }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
       $0.api.checkSupervisionFlowStatus = { @Sendable _ in .pending }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
+      $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
       $0.sharedStorage.loadPendingSupervisionCode = {
         .init(code: code, expiresAt: .reference)
       }
@@ -44,6 +46,8 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
       $0.sharedStorage.clearPendingSupervisionCode = { clearedCode.setValue(true) }
       $0.api.checkSupervisionFlowStatus = { @Sendable _ in .expired }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
+      $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
     }
 
     await store.send(.programmatic(.appDidLaunch))
@@ -68,6 +72,8 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
       $0.sharedStorage.clearPendingSupervisionCode = { clearedCode.setValue(true) }
       $0.api.checkSupervisionFlowStatus = { @Sendable _ in .notFound }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
+      $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
     }
 
     await store.send(.programmatic(.appDidLaunch))
@@ -93,6 +99,8 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.sharedStorage.saveAccountConnection = { @Sendable _ in }
       $0.api.checkSupervisionFlowStatus = { @Sendable _ in .claimed(.mock) }
       $0.api.setAccountConnection = { @Sendable _ in accountSet.setValue(true) }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
+      $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
       $0.sharedStorage.clearPendingSupervisionCode = { fatalError("not cleared") }
     }
 
@@ -122,6 +130,8 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.sharedStorage.saveAccountConnection = { @Sendable _ in connSaved.setValue(true) }
       $0.api.checkSupervisionFlowStatus = { @Sendable _ in .missingProfile(.mock) }
       $0.api.setAccountConnection = { @Sendable _ in accountSet.setValue(true) }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
+      $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
       $0.sharedStorage.clearPendingSupervisionCode = { fatalError("not cleared") }
     }
 
@@ -149,9 +159,11 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.continuousClock = ImmediateClock()
       $0.systemExtension.filterRunning = { false }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
+      $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
       $0.sharedStorage.loadPendingSupervisionCode = {
         .init(code: code, expiresAt: .reference)
       }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
       $0.api.checkSupervisionFlowStatus = { @Sendable _ in
         let attempt = attemptCount.withValue { val in val += 1
           return val
@@ -199,6 +211,8 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.sharedStorage.saveAccountConnection = { @Sendable _ in }
       $0.api.checkSupervisionFlowStatus = { @Sendable _ in .complete(.mock) }
       $0.api.setAccountConnection = { @Sendable _ in accountSet.setValue(true) }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
+      $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
     }
 
     await store.send(.programmatic(.appDidLaunch))
@@ -223,10 +237,11 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.systemExtension.filterRunning = { false }
       $0.sharedStorage.loadPendingSupervisionCode = { nil }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
-      $0.sharedStorage.loadDisabledBlockGroups = { @Sendable in [.gifs] }
+      $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in [BlockGroup.gifs.legacyUUID] }
       $0.sharedStorage.loadAccountConnection = { .mock }
       $0.sharedStorage.saveAccountConnection = { @Sendable _ in connSaved.setValue(true) }
       $0.api.setAccountConnection = { @Sendable _ in accountSet.setValue(true) }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
     }
 
     await store.send(.programmatic(.appDidLaunch))
@@ -241,6 +256,10 @@ final class IOSReducerTestsLaunch: XCTestCase {
     )) {
       $0.screen = .onboarding(.supervision(.resume(.profileRemovedRecovery)))
     }
+    await store
+      .receive(.programmatic(.receivedDisabledBlockGroupIds([BlockGroup.gifs.legacyUUID]))) {
+        $0.disabledBlockGroupIds = [BlockGroup.gifs.legacyUUID]
+      }
     expect(accountSet.value).toEqual(true)
     expect(connSaved.value).toEqual(true)
   }
@@ -254,8 +273,9 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.systemExtension.filterRunning = { false }
       $0.sharedStorage.loadPendingSupervisionCode = { nil }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
-      $0.sharedStorage.loadDisabledBlockGroups = { @Sendable in [.gifs] }
+      $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in [BlockGroup.gifs.legacyUUID] }
       $0.sharedStorage.loadAccountConnection = { .mock { $0.supervised = nil } }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
     }
 
     await store.send(.programmatic(.appDidLaunch))
@@ -265,6 +285,10 @@ final class IOSReducerTestsLaunch: XCTestCase {
     await store.receive(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere))))) {
       $0.screen = .onboarding(.happyPath(.hiThere))
     }
+    await store
+      .receive(.programmatic(.receivedDisabledBlockGroupIds([BlockGroup.gifs.legacyUUID]))) {
+        $0.disabledBlockGroupIds = [BlockGroup.gifs.legacyUUID]
+      }
   }
 
   @MainActor

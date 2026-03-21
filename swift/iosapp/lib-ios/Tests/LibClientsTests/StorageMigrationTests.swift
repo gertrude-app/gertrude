@@ -12,11 +12,62 @@ import Testing
   try await withDependencies {
     $0.api.logEvent = { _, _ in }
     $0.api.fetchDefaultBlockRules = { _ in [.targetContains(value: "def.com")] }
-    $0.device.vendorId = { UUID() }
+    $0.device.deviceId = { UUID() }
   } operation: {
+    try await `block group enum strings migrate to UUIDs`()
+    try await `block group migration writes empty array on fresh install`()
+    try await `block group migration is idempotent`()
     try await test_v1_3_to_v15_migration()
     try await test_v1_0_to_v15_migration()
   }
+}
+
+func `block group enum strings migrate to UUIDs`() async throws {
+  let userDefaults = getUserDefaults()
+
+  let legacyGroups: [BlockGroup] = [.gifs, .spotifyImages, .ads]
+  try userDefaults.set(JSONEncoder().encode(legacyGroups), forKey: "disabledBlockGroups.v1.3.0")
+
+  #expect(userDefaults.data(forKey: "v1.8.0--disabled-block-group-ids") == nil)
+  _ = await migrateLegacyStorage()
+
+  let v2Data = try #require(userDefaults.data(forKey: "v1.8.0--disabled-block-group-ids"))
+  let uuids = try JSONDecoder().decode([UUID].self, from: v2Data)
+  #expect(uuids == [
+    UUID(uuidString: "087628b2-742c-4164-a3cc-717c4ac72c1a")!, // gifs
+    UUID(uuidString: "ee242fc6-07c7-4694-a3ce-0323b0ddc1fe")!, // spotifyImages
+    UUID(uuidString: "1ea5f1b8-1b14-4894-9913-56cfee98bd48")!, // ads
+    UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!,
+    // appleMusicImages (opted out for upgraders)
+  ])
+}
+
+func `block group migration writes empty array on fresh install`() async throws {
+  let userDefaults = getUserDefaults()
+
+  _ = await migrateLegacyStorage()
+
+  let v2Data = try #require(userDefaults.data(forKey: "v1.8.0--disabled-block-group-ids"))
+  let uuids = try JSONDecoder().decode([UUID].self, from: v2Data)
+  #expect(uuids == [UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!])
+}
+
+func `block group migration is idempotent`() async throws {
+  let userDefaults = getUserDefaults()
+
+  let legacyGroups: [BlockGroup] = [.gifs]
+  try userDefaults.set(JSONEncoder().encode(legacyGroups), forKey: "disabledBlockGroups.v1.3.0")
+
+  _ = await migrateLegacyStorage()
+  let firstRunData = try #require(userDefaults.data(forKey: "v1.8.0--disabled-block-group-ids"))
+
+  // change old key — second run must not re-read it
+  let newGroups: [BlockGroup] = [.ads, .spotifyImages]
+  try userDefaults.set(JSONEncoder().encode(newGroups), forKey: "disabledBlockGroups.v1.3.0")
+
+  _ = await migrateLegacyStorage()
+  let secondRunData = try #require(userDefaults.data(forKey: "v1.8.0--disabled-block-group-ids"))
+  #expect(firstRunData == secondRunData)
 }
 
 func test_v1_3_to_v15_migration() async throws {

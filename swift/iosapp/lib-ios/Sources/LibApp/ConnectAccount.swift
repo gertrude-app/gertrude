@@ -44,12 +44,12 @@ public struct ConnectAccount {
       case .codeSubmitted(let code):
         state.screen = .connecting
         return .run { [deps = self.deps] send in
-          guard let vendorId = await deps.device.vendorId() else {
-            await send(.setScreen(.connectionFailed(error: "No vendor ID found")))
+          guard let deviceId = await deps.device.deviceId() else {
+            await send(.setScreen(.connectionFailed(error: "No device ID found")))
             return
           }
           do {
-            let childData = try await deps.api.connectDevice(code: code, vendorId: vendorId)
+            let childData = try await deps.api.connectDevice(code: code, deviceId: deviceId)
             await send(.connectionSucceeded(childData: childData))
           } catch {
             await send(.setScreen(.connectionFailed(error: error.localizedDescription)))

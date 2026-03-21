@@ -14,8 +14,10 @@ public struct SharedStorageClient: Sendable {
   public var loadProtectionMode: @Sendable () -> ProtectionMode?
   public var saveProtectionMode: @Sendable (ProtectionMode) -> Void
 
-  public var loadDisabledBlockGroups: @Sendable () -> [BlockGroup]?
-  public var saveDisabledBlockGroups: @Sendable ([BlockGroup]) -> Void
+  public var loadDisabledBlockGroupIds: @Sendable () -> [UUID]?
+  public var saveDisabledBlockGroupIds: @Sendable ([UUID]) -> Void
+  public var loadAllBlockGroups: @Sendable () -> [GetBlockGroups.BlockGroupInfo]?
+  public var saveAllBlockGroups: @Sendable ([GetBlockGroups.BlockGroupInfo]) -> Void
 
   public var loadFirstLaunchDate: @Sendable () -> Date?
   public var saveFirstLaunchDate: @Sendable (Date) -> Void
@@ -34,18 +36,19 @@ public struct SharedStorageClient: Sendable {
 public struct SharedStorageReaderClient: Sendable {
   public var loadAccountConnection: @Sendable () -> ChildIOSDeviceData_v2?
   public var loadProtectionMode: @Sendable () -> ProtectionMode?
-  public var loadDisabledBlockGroups: @Sendable () -> [BlockGroup]?
+  public var loadDisabledBlockGroupIds: @Sendable () -> [UUID]?
   public var loadFirstLaunchDate: @Sendable () -> Date?
   public var loadDebugLogs: @Sendable () -> [String]?
 }
 
 private enum Key: String {
-  case accountConnection = "v1.5.0--account-connection"
   case accountConnection_v2 = "v1.7.0--account-connection-v2"
   case debugLogs = "v1.5.0--debug-logs"
   case legacyProtectionMode = "ProtectionMode.v1.3.0"
   case protectionMode = "v1.5.0--protection-mode"
   case disabledBlockGroups = "disabledBlockGroups.v1.3.0"
+  case disabledBlockGroupIds = "v1.8.0--disabled-block-group-ids"
+  case allBlockGroups = "v1.8.0--all-block-groups"
   case legacyV1StorageKey = "blockRules.v1"
   case firstLaunchDate
   case pendingSupervisionCode = "v1.7.0--pending-supervision-code"
@@ -59,8 +62,10 @@ extension SharedStorageClient: DependencyKey {
       saveAccountConnection: { saveCodable($0, forKey: .accountConnection_v2) },
       loadProtectionMode: reader.loadProtectionMode,
       saveProtectionMode: { saveCodable($0, forKey: .protectionMode) },
-      loadDisabledBlockGroups: reader.loadDisabledBlockGroups,
-      saveDisabledBlockGroups: { saveCodable($0, forKey: .disabledBlockGroups) },
+      loadDisabledBlockGroupIds: reader.loadDisabledBlockGroupIds,
+      saveDisabledBlockGroupIds: { saveCodable($0, forKey: .disabledBlockGroupIds) },
+      loadAllBlockGroups: { loadCodable(forKey: .allBlockGroups) },
+      saveAllBlockGroups: { saveCodable($0, forKey: .allBlockGroups) },
       loadFirstLaunchDate: reader.loadFirstLaunchDate,
       saveFirstLaunchDate: { saveDate($0, forKey: .firstLaunchDate) },
       loadDebugLogs: reader.loadDebugLogs,
@@ -85,32 +90,21 @@ extension SharedStorageReaderClient: DependencyKey {
   public static let liveValue = SharedStorageReaderClient(
     loadAccountConnection: { loadCodable(forKey: .accountConnection_v2) },
     loadProtectionMode: { loadCodable(forKey: .protectionMode) },
-    loadDisabledBlockGroups: { loadCodable(forKey: .disabledBlockGroups) },
+    loadDisabledBlockGroupIds: { loadCodable(forKey: .disabledBlockGroupIds) },
     loadFirstLaunchDate: { loadDate(forKey: .firstLaunchDate) },
     loadDebugLogs: { loadCodable(forKey: .debugLogs) },
   )
 }
 
 func migrateLegacyStorage() async -> Bool {
-  // NB: remove this after harriet updates, she's the only one w/ this form of data
-  struct LegacyChildIOSDeviceData: Codable {
-    var childId: UUID
-    var token: UUID
-    var deviceId: UUID
-    var childName: String
-  }
-  if let accountV1Data = UserDefaults.gertrude.data(forKey: Key.accountConnection.rawValue),
-     let accountV1 = try? JSONDecoder().decode(LegacyChildIOSDeviceData.self, from: accountV1Data) {
-    let accountV2 = ChildIOSDeviceData_v2(
-      childId: accountV1.childId,
-      token: accountV1.token,
-      deviceId: accountV1.deviceId,
-      childName: accountV1.childName,
-      supervised: .byConfigurator,
-    )
-    saveCodable(accountV2, forKey: .accountConnection_v2)
+  if UserDefaults.gertrude.data(forKey: Key.disabledBlockGroupIds.rawValue) == nil {
+    let legacyGroups: [BlockGroup] = loadCodable(forKey: .disabledBlockGroups) ?? []
+    var uuids = legacyGroups.map(\.legacyUUID)
+    // don't auto opt-in upgraders to new Apple Music group released March 2026
+    uuids.append(UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!)
+    saveCodable(uuids, forKey: .disabledBlockGroupIds)
     @Dependency(\.api) var api
-    await api.logEvent(id: "7d1ec86d", detail: "migrated v1 account connection to v2 (harriet)")
+    await api.logEvent(id: "04376893", detail: "migrated block groups to UUIDs")
   }
 
   if UserDefaults.gertrude.data(forKey: Key.protectionMode.rawValue) != nil {
@@ -145,7 +139,7 @@ func migrateLegacyStorage() async -> Bool {
   // migrate < 1.3.x very old data, from 1.0/1 -> 1.5
   @Dependency(\.device) var device
   saveCodable([BlockGroup.spotifyImages], forKey: .disabledBlockGroups)
-  if let defaultRules = try? await api.fetchDefaultBlockRules(device.vendorId()) {
+  if let defaultRules = try? await api.fetchDefaultBlockRules(device.deviceId()) {
     await api.logEvent(id: "c732e0ab", detail: "migrated v1.1.x -> 1.5.x")
     saveCodable(ProtectionMode.normal(defaultRules), forKey: .protectionMode)
   } else {

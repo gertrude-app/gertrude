@@ -53,7 +53,7 @@ export const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
 );
 
 interface FeatureItemProps {
-  text: string;
+  text: React.ReactNode;
   inverted?: boolean;
 }
 
