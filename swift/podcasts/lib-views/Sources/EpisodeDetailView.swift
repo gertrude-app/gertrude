@@ -114,10 +114,12 @@ public struct EpisodeDetailView: View {
             )
           }
 
-          self.infoRow(
-            label: lstr(.episodeDetailSize),
-            value: formatFileSize(self.episodeDetail.sizeInBytes),
-          )
+          if self.episodeDetail.sizeInBytes > 0 {
+            self.infoRow(
+              label: lstr(.episodeDetailSize),
+              value: formatFileSize(self.episodeDetail.sizeInBytes),
+            )
+          }
 
           self.infoRow(
             label: lstr(.settingsSubscriptionStatus),

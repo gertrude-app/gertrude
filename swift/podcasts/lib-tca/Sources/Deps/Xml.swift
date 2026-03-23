@@ -1,7 +1,7 @@
 import Foundation
 
 func parsePodcastFeed(_ xmlString: String, source: String) throws -> Feed {
-  guard let xmlData = xmlString.data(using: .utf8) else {
+  guard let xmlData = sanitizeFeedXML(xmlString).data(using: .utf8) else {
     throw XMLParseError.invalidUtf8
   }
 
@@ -32,6 +32,31 @@ enum XMLParseError: Error, Sendable {
   case invalidDuration
   case invalidAudioType
   case missingEpisodeSize
+}
+
+private func sanitizeFeedXML(_ xml: String) -> String {
+  let parts = xml.components(separatedBy: "<![CDATA[")
+  guard parts.count > 1 else {
+    return escapeBareFeedAmpersands(xml)
+  }
+  var result = escapeBareFeedAmpersands(parts[0])
+  for part in parts.dropFirst() {
+    if let cdataEnd = part.range(of: "]]>") {
+      result += "<![CDATA[" + part[..<cdataEnd.upperBound]
+      result += escapeBareFeedAmpersands(String(part[cdataEnd.upperBound...]))
+    } else {
+      result += "<![CDATA[" + part
+    }
+  }
+  return result
+}
+
+private func escapeBareFeedAmpersands(_ text: String) -> String {
+  text.replacingOccurrences(
+    of: "&(?!amp;|lt;|gt;|quot;|apos;|#\\d+;|#x[0-9a-fA-F]+;)",
+    with: "&amp;",
+    options: .regularExpression,
+  )
 }
 
 private class PodcastFeedParser: NSObject, XMLParserDelegate {
@@ -132,9 +157,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
         return
       }
 
-      // Skip episode if it has neither size nor duration
-      guard self.episodeSize > 0 || (self.episodeDuration ?? 0) > 0 else {
-        // Skip this episode, don't add it to the episodes array
+      guard !self.episodeAudioUrl.isEmpty else {
         self.isInItem = false
         return
       }
@@ -260,22 +283,24 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
 
   private func parseDuration(_ durationString: String) -> Int? {
     // Handle formats like "1:23:45" or "3600" (seconds)
+    let seconds: Int?
     if durationString.contains(":") {
       let components = durationString.split(separator: ":").compactMap { Int($0) }
       switch components.count {
       case 3: // HH:MM:SS
-        return components[0] * 3600 + components[1] * 60 + components[2]
+        seconds = components[0] * 3600 + components[1] * 60 + components[2]
       case 2: // MM:SS
-        return components[0] * 60 + components[1]
+        seconds = components[0] * 60 + components[1]
       case 1: // SS
-        return components[0]
+        seconds = components[0]
       default:
-        return nil
+        seconds = nil
       }
     } else {
-      // Assume it's already in seconds
-      return Int(durationString)
+      seconds = Int(durationString)
     }
+    guard let seconds, seconds > 0 else { return nil }
+    return seconds
   }
 
   private func stripHTML(_ html: String) -> String {
