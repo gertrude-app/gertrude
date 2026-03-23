@@ -201,7 +201,7 @@ func `parse empty feed`() {
 }
 
 @Test
-func `parse missing guid`() {
+func `missing guid falls back to audio url`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
@@ -217,9 +217,55 @@ func `parse missing guid`() {
   </rss>
   """
 
-  #expect(throws: XMLParseError.missingRequiredData) {
-    try parsePodcastFeed(xmlString, source: "")
-  }
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.episodes.count == 1)
+  #expect(feed.episodes[0].guid == "https://example.com/ep1.mp3")
+}
+
+@Test
+func `http audio url is upgraded to https`() throws {
+  let xmlString = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0">
+    <channel>
+      <title>Test Podcast</title>
+
+      <item>
+        <title>Episode One</title>
+        <guid>ep-1</guid>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <enclosure url="http://s3.us-east-2.amazonaws.com/bucket/ep1.mp3" type="audio/mpeg" length="5000000"/>
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.episodes[0].audioUrl == "https://s3.us-east-2.amazonaws.com/bucket/ep1.mp3")
+}
+
+@Test
+func `missing guid with query params uses normalized url as guid`() throws {
+  let xmlString = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0">
+    <channel>
+      <title>Test Podcast</title>
+
+      <item>
+        <title>Episode without GUID</title>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <enclosure url="https://cdn.example.com/ep1.mp3?token=abc123&amp;expires=9999999" type="audio/mpeg" length="1000000"/>
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.episodes.count == 1)
+  #expect(feed.episodes[0]
+    .audioUrl == "https://cdn.example.com/ep1.mp3?token=abc123&expires=9999999")
+  #expect(feed.episodes[0].guid == "https://cdn.example.com/ep1.mp3")
 }
 
 @Test
@@ -961,7 +1007,7 @@ func `parse TAL feed`() throws {
 }
 
 @Test
-func `skips invalid episodes`() throws {
+func `skips episodes with no audio url`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -976,12 +1022,11 @@ func `skips invalid episodes`() throws {
 
       <item>
         <title>Episode 1</title>
-        <description>First test episode</description>
+        <description>No enclosure at all</description>
         <link>https://example.com/episode1</link>
         <guid>episode-1</guid>
         <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
-        <itunes:image href="https://example.com/episode1-artwork.jpg"/>
-        <enclosure url="https://example.com/episode1.mp3" type="audio/mpeg" />
+        <itunes:duration>30:00</itunes:duration>
       </item>
 
       <item>
@@ -998,7 +1043,7 @@ func `skips invalid episodes`() throws {
   """
 
   let feed = try parsePodcastFeed(xmlString, source: "")
-  #expect(feed.episodes.count == 1) // one episode should be dropped, no length
+  #expect(feed.episodes.count == 1) // episode without enclosure is dropped
 }
 
 @Test
@@ -1017,12 +1062,11 @@ func `fails on no valid episodes`() throws {
 
       <item>
         <title>Episode 1</title>
-        <description>First test episode</description>
+        <description>No enclosure, no audio url</description>
         <link>https://example.com/episode1</link>
         <guid>episode-1</guid>
         <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
-        <itunes:image href="https://example.com/episode1-artwork.jpg"/>
-        <enclosure url="https://example.com/episode1.mp3" type="audio/mpeg" />
+        <itunes:duration>30:00</itunes:duration>
       </item>
     </channel>
   </rss>
@@ -1031,6 +1075,82 @@ func `fails on no valid episodes`() throws {
   #expect(throws: (any Error).self) {
     _ = try parsePodcastFeed(xmlString, source: "")
   }
+}
+
+@Test
+func `bare ampersand in xml text is recovered`() throws {
+  let xmlString = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+    <channel>
+      <title>Test Podcast</title>
+      <item>
+        <title>Episode 1</title>
+        <guid>ep-1</guid>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <itunes:subtitle>A Q & A session</itunes:subtitle>
+        <enclosure url="https://example.com/ep1.mp3" type="audio/mpeg" length="1000000"/>
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.episodes.count == 1)
+}
+
+@Test
+func `bare ampersand inside cdata is not corrupted`() throws {
+  let xmlString = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+    <channel>
+      <title>Test Podcast</title>
+      <item>
+        <title>Episode 1</title>
+        <guid>ep-1</guid>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <description><![CDATA[Tom & Jerry discuss the Q & A]]></description>
+        <enclosure url="https://example.com/ep1.mp3" type="audio/mpeg" length="1000000"/>
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.episodes[0].description == "Tom & Jerry discuss the Q & A")
+}
+
+@Test
+func `zero duration string treated as nil`() throws {
+  let xmlString = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+    <channel>
+      <title>Test Podcast</title>
+
+      <item>
+        <title>Zero colon format</title>
+        <guid>ep-1</guid>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <itunes:duration>0:00</itunes:duration>
+        <enclosure url="https://example.com/ep1.mp3" type="audio/mpeg" length="1000000"/>
+      </item>
+
+      <item>
+        <title>Zero seconds format</title>
+        <guid>ep-2</guid>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <itunes:duration>0</itunes:duration>
+        <enclosure url="https://example.com/ep2.mp3" type="audio/mpeg" length="1000000"/>
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.episodes[0].duration == nil)
+  #expect(feed.episodes[1].duration == nil)
 }
 
 @Test
@@ -1120,4 +1240,28 @@ func `episode without duration is nil`() throws {
 
   let feed = try parsePodcastFeed(xmlString, source: "")
   #expect(feed.episodes[0].duration == nil)
+}
+
+@Test
+func `control characters in feed are stripped`() throws {
+  let bell = "\u{07}"
+  let null = "\u{00}"
+  let xmlString = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+    <channel>
+      <title>Test\(bell)Podcast</title>
+      <item>
+        <title>Episode\(null)One</title>
+        <guid>ep-1</guid>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <enclosure url="https://example.com/ep1.mp3" type="audio/mpeg" length="1000000"/>
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.show.name == "TestPodcast")
+  #expect(feed.episodes[0].title == "EpisodeOne")
 }
