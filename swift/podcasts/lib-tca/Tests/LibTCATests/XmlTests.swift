@@ -223,6 +223,28 @@ func `missing guid falls back to audio url`() throws {
 }
 
 @Test
+func `http audio url is upgraded to https`() throws {
+  let xmlString = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0">
+    <channel>
+      <title>Test Podcast</title>
+
+      <item>
+        <title>Episode One</title>
+        <guid>ep-1</guid>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <enclosure url="http://s3.us-east-2.amazonaws.com/bucket/ep1.mp3" type="audio/mpeg" length="5000000"/>
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.episodes[0].audioUrl == "https://s3.us-east-2.amazonaws.com/bucket/ep1.mp3")
+}
+
+@Test
 func `missing guid with query params uses normalized url as guid`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>

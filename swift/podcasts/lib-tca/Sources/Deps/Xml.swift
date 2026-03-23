@@ -56,6 +56,11 @@ private func sanitizeFeedXML(_ xml: String) -> String {
   return result
 }
 
+private func upgradeToHttps(_ urlString: String) -> String {
+  guard urlString.hasPrefix("http://") else { return urlString }
+  return "https://" + urlString.dropFirst(7)
+}
+
 private func urlWithoutQueryOrFragment(_ urlString: String) -> String {
   guard var components = URLComponents(string: urlString) else {
     return urlString
@@ -132,7 +137,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
 
     // Handle attributes
     if elementName == "enclosure", self.isInItem {
-      self.episodeAudioUrl = attributeDict["url"] ?? ""
+      self.episodeAudioUrl = upgradeToHttps(attributeDict["url"] ?? "")
       let typeString = attributeDict["type"] ?? ""
       self.episodeAudioType = AudioType(rawValue: typeString) ?? .mp3
       let lengthString = attributeDict["length"] ?? "0"

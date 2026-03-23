@@ -2,8 +2,10 @@
 
 ## Releases
 
-- `1.4.0` (pending more dev)
+- `1.4.0` (3/23/2026)
+  - new feature: podcast playback speed
   - install id -> device id (from vendor id) migration
+  - improve robustness of handling malformed feeds
 - `1.3.1` (3/12/2026)
   - attempt another mitigation on missing local file errors
   - fix false onboarding crash on reinstall/restore
