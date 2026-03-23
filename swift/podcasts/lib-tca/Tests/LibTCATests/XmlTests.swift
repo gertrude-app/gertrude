@@ -201,7 +201,7 @@ func `parse empty feed`() {
 }
 
 @Test
-func `parse missing guid`() {
+func `missing guid falls back to audio url`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
   <rss version="2.0">
@@ -217,9 +217,33 @@ func `parse missing guid`() {
   </rss>
   """
 
-  #expect(throws: XMLParseError.missingRequiredData) {
-    try parsePodcastFeed(xmlString, source: "")
-  }
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.episodes.count == 1)
+  #expect(feed.episodes[0].guid == "https://example.com/ep1.mp3")
+}
+
+@Test
+func `missing guid with query params uses normalized url as guid`() throws {
+  let xmlString = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0">
+    <channel>
+      <title>Test Podcast</title>
+
+      <item>
+        <title>Episode without GUID</title>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <enclosure url="https://cdn.example.com/ep1.mp3?token=abc123&amp;expires=9999999" type="audio/mpeg" length="1000000"/>
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.episodes.count == 1)
+  #expect(feed.episodes[0]
+    .audioUrl == "https://cdn.example.com/ep1.mp3?token=abc123&expires=9999999")
+  #expect(feed.episodes[0].guid == "https://cdn.example.com/ep1.mp3")
 }
 
 @Test
@@ -1194,4 +1218,28 @@ func `episode without duration is nil`() throws {
 
   let feed = try parsePodcastFeed(xmlString, source: "")
   #expect(feed.episodes[0].duration == nil)
+}
+
+@Test
+func `control characters in feed are stripped`() throws {
+  let bell = "\u{07}"
+  let null = "\u{00}"
+  let xmlString = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+    <channel>
+      <title>Test\(bell)Podcast</title>
+      <item>
+        <title>Episode\(null)One</title>
+        <guid>ep-1</guid>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <enclosure url="https://example.com/ep1.mp3" type="audio/mpeg" length="1000000"/>
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.show.name == "TestPodcast")
+  #expect(feed.episodes[0].title == "EpisodeOne")
 }

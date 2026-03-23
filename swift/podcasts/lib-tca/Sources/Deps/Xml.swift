@@ -35,9 +35,14 @@ enum XMLParseError: Error, Sendable {
 }
 
 private func sanitizeFeedXML(_ xml: String) -> String {
-  let parts = xml.components(separatedBy: "<![CDATA[")
+  let clean = xml.replacingOccurrences(
+    of: "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]",
+    with: "",
+    options: .regularExpression,
+  )
+  let parts = clean.components(separatedBy: "<![CDATA[")
   guard parts.count > 1 else {
-    return escapeBareFeedAmpersands(xml)
+    return escapeBareFeedAmpersands(clean)
   }
   var result = escapeBareFeedAmpersands(parts[0])
   for part in parts.dropFirst() {
@@ -49,6 +54,15 @@ private func sanitizeFeedXML(_ xml: String) -> String {
     }
   }
   return result
+}
+
+private func urlWithoutQueryOrFragment(_ urlString: String) -> String {
+  guard var components = URLComponents(string: urlString) else {
+    return urlString
+  }
+  components.query = nil
+  components.fragment = nil
+  return components.string ?? urlString
 }
 
 private func escapeBareFeedAmpersands(_ text: String) -> String {
@@ -152,14 +166,13 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
 
     if elementName == "item" {
       // Finished parsing an episode
-      guard !self.episodeGuid.isEmpty else {
-        self.parseError = .missingRequiredData
-        return
-      }
-
       guard !self.episodeAudioUrl.isEmpty else {
         self.isInItem = false
         return
+      }
+
+      if self.episodeGuid.isEmpty {
+        self.episodeGuid = urlWithoutQueryOrFragment(self.episodeAudioUrl)
       }
 
       let episode = Episode.FeedData(

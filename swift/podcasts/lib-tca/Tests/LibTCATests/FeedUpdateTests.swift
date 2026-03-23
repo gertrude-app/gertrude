@@ -385,6 +385,28 @@ import Testing
   }
 }
 
+@Test func `no-guid episode with rotating query params is not churned`() {
+  let normalizedGuid = "https://cdn.example.com/ep1.mp3"
+  let existingEpisode = Episode.mock(1, showId: 1) {
+    $0.guid = normalizedGuid
+    $0.audioUrl = "https://cdn.example.com/ep1.mp3?token=old&expires=111"
+    $0.title = "Episode One"
+  }
+  let feedEpisodeRefreshed = Episode.FeedData.mock(1, showId: 1) {
+    $0.guid = normalizedGuid
+    $0.audioUrl = "https://cdn.example.com/ep1.mp3?token=new&expires=222"
+    $0.title = "Episode One"
+  }
+  let updates = _feedUpdates(input: .init(
+    feeds: [Feed(show: .mock(1), episodes: [feedEpisodeRefreshed])],
+    shows: [.mock(1)],
+    episodes: [existingEpisode],
+    now: .reference,
+  ))
+  #expect(updates.addEpisodes.isEmpty)
+  #expect(updates.deleteEpisodes.isEmpty)
+}
+
 // mocks
 
 extension Show.FeedData {
