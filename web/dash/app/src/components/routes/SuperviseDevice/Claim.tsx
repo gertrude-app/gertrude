@@ -1,5 +1,5 @@
 import { ApiErrorMessage, Loading } from '@dash/components';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { ChildSelection } from '@dash/components';
 import type { T } from '@shared/pairql/dashboard';
@@ -16,6 +16,16 @@ const SuperviseDeviceClaim: React.FC = () => {
   const query = useQuery(Key.claimDeviceData(code), () =>
     Current.api.getIOSDeviceClaimData({ code: parseInt(code, 10) }),
   );
+
+  useEffect(() => {
+    if (!query.isSuccess || !query.data.resumeStep) return;
+    const paths = {
+      payment: `/supervise-device/${code}/payment`,
+      downloadHelper: `/supervise-device/${code}/download-helper`,
+      done: `/supervise-device/${code}/done`,
+    };
+    navigate(paths[query.data.resumeStep], { replace: true });
+  }, [query.isSuccess, query.data?.resumeStep, navigate, code]);
 
   if (query.isPending) {
     return <Loading />;

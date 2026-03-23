@@ -85,6 +85,18 @@ extension Plan {
     }
   }
 
+  var allowsSupervision: Bool {
+    switch self {
+    case .free: false
+    case .light: true
+    case .full(let status):
+      switch status {
+      case .complimentary, .paid: true
+      case .trialing, .trialExpired, .overdue: false
+      }
+    }
+  }
+
   init(subscription: Subscription?, now: Date = Date()) {
     guard let subscription else {
       self = .free(kind: .standard)

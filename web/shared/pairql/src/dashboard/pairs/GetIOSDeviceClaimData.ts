@@ -12,5 +12,6 @@ export namespace GetIOSDeviceClaimData {
     modelName: string;
     deviceType: string;
     iosVersion: string;
+    resumeStep?: 'payment' | 'downloadHelper' | 'done';
   }
 }
