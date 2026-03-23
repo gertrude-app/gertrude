@@ -18,6 +18,7 @@ struct Show: Equatable, Hashable {
   var showArtwork: Bool
   var iTunesId: Int?
   var sort: SortOrder
+  var playbackRate: Double
   var updatedAt: Date = .init()
   var createdAt: Date
 }
@@ -89,6 +90,7 @@ extension Show {
         showArtwork: showArtwork,
         iTunesId: self.iTunesId,
         sort: .newestToOldest,
+        playbackRate: 1.0,
         createdAt: now,
       )
     }
@@ -107,6 +109,7 @@ extension ShowData {
       showArtwork: show.showArtwork,
       artworkImage: show.showArtwork ? show.localArtworkImage : nil,
       artworkUrl: show.showArtwork ? show.artworkUrl : nil,
+      playbackRate: show.playbackRate,
     )
   }
 }
@@ -122,6 +125,7 @@ extension Show {
       artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/a2/94/d3/a294d3e7-bf02-377f-a531-7b0491a4cb81/mza_4607163774963783796.png/600x600bb.jpg",
       showArtwork: true,
       sort: .newestToOldest,
+      playbackRate: 1.0,
       createdAt: Date(),
     )
   }

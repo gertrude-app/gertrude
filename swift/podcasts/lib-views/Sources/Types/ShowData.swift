@@ -14,6 +14,7 @@ public struct ShowData: Identifiable {
   public var showArtwork: Bool
   public var artworkImage: UIImage?
   public var artworkUrl: String?
+  public var playbackRate: Double
 
   public init(
     id: Int,
@@ -23,6 +24,7 @@ public struct ShowData: Identifiable {
     showArtwork: Bool,
     artworkImage: UIImage? = nil,
     artworkUrl: String? = nil,
+    playbackRate: Double = 1.0,
   ) {
     self.id = id
     self.name = name
@@ -31,5 +33,6 @@ public struct ShowData: Identifiable {
     self.showArtwork = showArtwork
     self.artworkImage = artworkImage
     self.artworkUrl = artworkUrl
+    self.playbackRate = playbackRate
   }
 }

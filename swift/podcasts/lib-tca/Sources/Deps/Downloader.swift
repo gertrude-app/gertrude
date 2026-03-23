@@ -17,6 +17,13 @@ enum DownloadOutcome {
 }
 
 func trackedDownload(episode: Episode) async -> DownloadOutcome {
+  @Dependency(\.downloadCoordinator) var downloadCoordinator
+  return await downloadCoordinator.run(episodeId: episode.id) {
+    await _trackedDownload(episode: episode)
+  }
+}
+
+private func _trackedDownload(episode: Episode) async -> DownloadOutcome {
   @Dependency(\.db) var database
   @Dependency(\.podcasts) var podcasts
   @Dependency(\.date) var date
@@ -101,27 +108,33 @@ func trackedDownload(episode: Episode) async -> DownloadOutcome {
 }
 
 func ensureDownloaded(episode: Episode) async -> DownloadOutcome {
+  let currentEpisode = dep(\.db).tryRead { db in
+    try Episode.find(episode.id).fetchOne(db)
+  } ?? episode
   let fileSystem = dep(\.fileSystem)
-  if episode.downloaded {
-    if localAudioLooksDownloaded(episode, fileSystem: fileSystem) {
+  if currentEpisode.downloaded {
+    if localAudioLooksDownloaded(currentEpisode, fileSystem: fileSystem) {
       return .success
     }
-    try? fileSystem.removeItem(at: episode.localAudioUrl)
+    try? fileSystem.removeItem(at: currentEpisode.localAudioUrl)
     dep(\.db).tryWrite { db in
       try Episode
         .update { $0.downloadedAt = nil }
-        .where { $0.id == episode.id }
+        .where { $0.id == currentEpisode.id }
         .execute(db)
     }
     unexpected(
       id: "459454b4",
-      downloadStateDetail(episode, fileSystem: fileSystem),
+      downloadStateDetail(currentEpisode, fileSystem: fileSystem),
     )
+  }
+  if currentEpisode.downloading {
+    return await trackedDownload(episode: currentEpisode)
   }
   if dep(\.network).isConnected() == false {
     return .failure(.init(message: lstr(.episodeDownloadNoInternet)))
   }
-  return await trackedDownload(episode: episode)
+  return await trackedDownload(episode: currentEpisode)
 }
 
 private func localAudioLooksDownloaded(
@@ -178,4 +191,44 @@ func testAssertCheckpoint(_ label: String) async {
       if false { eprint("⏰ <- finish ASSERT CHECKPOINT `\(label)`") }
     }
   #endif
+}
+
+actor EpisodeDownloadCoordinator {
+  private var inFlight: [Episode.ID: Task<DownloadOutcome, Never>] = [:]
+
+  func run(
+    episodeId: Episode.ID,
+    operation: @escaping @Sendable () async -> DownloadOutcome,
+  ) async -> DownloadOutcome {
+    if let existing = self.inFlight[episodeId] {
+      return await existing.value
+    }
+
+    let task = Task {
+      await operation()
+    }
+    self.inFlight[episodeId] = task
+    defer { self.inFlight[episodeId] = nil }
+
+    let outcome = await task.value
+    return outcome
+  }
+}
+
+extension EpisodeDownloadCoordinator: DependencyKey {
+  static var liveValue: EpisodeDownloadCoordinator {
+    EpisodeDownloadCoordinator()
+  }
+
+  static var testValue: EpisodeDownloadCoordinator {
+    EpisodeDownloadCoordinator()
+  }
+}
+
+extension DependencyValues {
+  // dependency-scoped so tests don't share a process-global in-flight download registry.
+  var downloadCoordinator: EpisodeDownloadCoordinator {
+    get { self[EpisodeDownloadCoordinator.self] }
+    set { self[EpisodeDownloadCoordinator.self] = newValue }
+  }
 }

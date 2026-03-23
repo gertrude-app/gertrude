@@ -12,6 +12,7 @@ struct AudioPlayer: Sendable {
   var play: @Sendable (_ episode: Episode, _ show: Show) async throws -> Void
   var pause: @Sendable () async -> Void
   var seek: @Sendable (_ to: Double) async -> Void = { _ in }
+  var setPlaybackRate: @Sendable (_ rate: Double) async -> Void = { _ in }
   var getPlayingPosition: @Sendable () async -> Double?
   var systemEvents: @Sendable () -> AnyPublisher<SystemEvent, Never> = {
     Empty().eraseToAnyPublisher()
@@ -46,6 +47,9 @@ extension AudioPlayer: DependencyKey {
       seek: { time in
         sharedPlayer.withLock { $0.seek(to: time) }
       },
+      setPlaybackRate: { rate in
+        sharedPlayer.withLock { $0.setPlaybackRate(rate) }
+      },
       getPlayingPosition: {
         sharedPlayer.withLock { $0.player.currentTime }
       },
@@ -72,6 +76,7 @@ private final class Player: Sendable {
   fileprivate let player: Mutex<AVPlayerData?> = Mutex(nil)
   private let episode: Mutex<Episode?> = Mutex(nil)
   private let timer: Mutex<Any?> = Mutex(nil)
+  private let playbackRate: Mutex<Double> = Mutex(1.0)
   private let subject = Mutex(PassthroughSubject<AudioPlayer.SystemEvent, Never>())
   private let completionObserver: Locked<Any?> = Locked(nil)
   private let interruptionObserver: Locked<Any?> = Locked(nil)
@@ -98,9 +103,23 @@ private final class Player: Sendable {
       try self.player.play(new: episode)
       self.setupCompletionObserver()
     }
+    self.applyStoredRate()
     self.episode.withLock { $0 = episode }
     self.updateNowPlayingInfo(episode: episode, show: show)
     self.startTimeUpdates()
+  }
+
+  private func applyStoredRate() {
+    let rate = self.playbackRate.withLock { $0 }
+    self.player.withLock { $0?.player.rate = Float(rate) }
+  }
+
+  func setPlaybackRate(_ rate: Double) {
+    self.playbackRate.withLock { $0 = rate }
+    self.player.withLock {
+      guard $0?.player.timeControlStatus == .playing else { return }
+      $0?.player.rate = Float(rate)
+    }
   }
 
   func pause() {
@@ -118,12 +137,13 @@ private final class Player: Sendable {
   }
 
   private func updateNowPlayingInfo(episode: Episode, show: Show) {
+    let rate = self.playbackRate.withLock { $0 }
     var nowPlayingInfo: [String: Any] = [
       MPMediaItemPropertyTitle: episode.title,
       MPMediaItemPropertyArtist: show.name,
       MPMediaItemPropertyAlbumTitle: show.name,
       MPNowPlayingInfoPropertyElapsedPlaybackTime: self.player.currentTime ?? 0.0,
-      MPNowPlayingInfoPropertyPlaybackRate: self.player.isPlaying ? 1.0 : 0.0,
+      MPNowPlayingInfoPropertyPlaybackRate: self.player.isPlaying ? rate : 0.0,
     ]
     if let duration = episode.duration {
       nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = TimeInterval(duration)
@@ -156,6 +176,7 @@ private final class Player: Sendable {
   private func setupRemotePlayCommand() {
     MPRemoteCommandCenter.shared().playCommand.addTarget { [weak self] _ in
       let position = self?.player.play()
+      self?.applyStoredRate()
       self?.startTimeUpdates()
       self?.emit(.play(position))
       return .success
@@ -244,8 +265,9 @@ private final class Player: Sendable {
   }
 
   private func updateElapsedTime() {
+    let rate = self.playbackRate.withLock { $0 }
     var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [:]
-    nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = self.player.isPlaying ? 1.0 : 0.0
+    nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = self.player.isPlaying ? rate : 0.0
     nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = self.player.currentTime ?? 0.0
     MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
   }

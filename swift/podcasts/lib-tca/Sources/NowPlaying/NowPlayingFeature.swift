@@ -59,6 +59,8 @@ struct NowPlayingFeature {
           return self.skip(nowPlaying, .backward, amount: 15)
         case .skipForwardTapped:
           return self.skip(nowPlaying, .forward, amount: 30)
+        case .speedButtonTapped(let rate):
+          return self.setPlaybackRate(rate, for: nowPlaying.show)
         }
       case .system(let event):
         guard let nowPlaying = state.data else {
@@ -206,6 +208,18 @@ struct NowPlayingFeature {
       }
       await self.audio.seek(to: newTime)
       nowPlaying.setProgress(newTime)
+    }
+  }
+
+  func setPlaybackRate(_ rate: Double, for show: Show) -> EffectOf<NowPlayingFeature> {
+    .run { [showId = show.id] _ in
+      dep(\.db).tryWrite { db in
+        try Show
+          .where { $0.id == showId }
+          .update { $0.playbackRate = rate }
+          .execute(db)
+      }
+      await self.audio.setPlaybackRate(rate)
     }
   }
 

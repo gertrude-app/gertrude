@@ -144,4 +144,12 @@ enum Migrations {
       """,
     ).execute(db)
   }
+
+  @Sendable static func playbackRate(_ db: Database) throws {
+    try #sql(
+      """
+      ALTER TABLE shows ADD COLUMN playbackRate REAL NOT NULL DEFAULT 1.0;
+      """,
+    ).execute(db)
+  }
 }
