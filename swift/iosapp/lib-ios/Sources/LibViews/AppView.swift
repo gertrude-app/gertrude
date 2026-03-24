@@ -599,6 +599,13 @@ public struct AppView: View {
             screenType: .error,
           )
 
+        case .onboarding(.supervision(.resume(.requiresSubscription))):
+          ButtonScreenView(
+            text: "A Gertrude subscription is required to use supervision. Have a parent subscribe at parents.gertrude.app, then tap Try Again.",
+            primary: self.btn(text: "Try Again", .primary),
+            screenType: .error,
+          )
+
         case .supervisionSuccessFirstLaunch:
           ButtonScreenView(
             text: "Excellent! Looks like you’ve installed Gertrude under Supervised mode. Just a couple steps to get you all set up.",

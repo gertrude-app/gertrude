@@ -142,6 +142,7 @@ extension IOSReducer {
         case websiteWarning(childName: String?)
         case promptClearCache
         case networkError
+        case requiresSubscription
       }
     }
 

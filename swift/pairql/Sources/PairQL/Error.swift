@@ -45,6 +45,7 @@ public extension PqlError {
     case serverError
     case unauthorized
     case loggedOut
+    case paymentRequired
 
     var statusCode: Int {
       switch self {
@@ -53,6 +54,7 @@ public extension PqlError {
       case .serverError: 500
       case .unauthorized: 401
       case .loggedOut: 401
+      case .paymentRequired: 402
       }
     }
   }

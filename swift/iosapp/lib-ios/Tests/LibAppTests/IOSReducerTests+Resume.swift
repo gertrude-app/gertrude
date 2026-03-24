@@ -31,10 +31,53 @@ final class IOSReducerTestsResume: XCTestCase {
       }
     }
 
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
-    }
+    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
+    await store
+      .receive(
+        .programmatic(.setScreen(.onboarding(.supervision(.resume(.promptInstallProfile))))),
+      ) {
+        $0.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
+      }
     expect(reported.value).toEqual(true)
+  }
+
+  @MainActor
+  func testClaimedNotSupervised_yesSupervised_requiresSubscriptionOn402() async throws {
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.codeClaimedNotSupervised()))),
+    )) {
+      IOSReducer()
+    } withDependencies: {
+      $0.api.selfReportSupervision = { @Sendable _ in
+        throw PqlError(id: "test", requestId: "test", type: .paymentRequired, debugMessage: "test")
+      }
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
+    await store
+      .receive(
+        .programmatic(.setScreen(.onboarding(.supervision(.resume(.requiresSubscription))))),
+      ) {
+        $0.screen = .onboarding(.supervision(.resume(.requiresSubscription)))
+      }
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.resume(.codeClaimedNotSupervised())))
+    }
+  }
+
+  @MainActor
+  func testClaimedNotSupervised_doesNotRequireSubscriptionOnOtherErrors() async throws {
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.codeClaimedNotSupervised()))),
+    )) {
+      IOSReducer()
+    } withDependencies: {
+      $0.api.selfReportSupervision = { @Sendable _ in
+        throw URLError(.notConnectedToInternet)
+      }
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
   }
 
   @MainActor

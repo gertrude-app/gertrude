@@ -211,6 +211,8 @@ extension IOSReducer.Onboarding.Supervision.Resume {
       .onboarding(.happyPath(.requestAppStoreRating))
     case (.networkError, _):
       .onboarding(.supervision(.resume(.networkError)))
+    case (.requiresSubscription, _):
+      .onboarding(.supervision(.resume(.codeClaimedNotSupervised())))
     }
   }
 }
