@@ -1,6 +1,7 @@
 @preconcurrency import Combine
 import ComposableArchitecture
 import GertieIOS
+import IOSRoute
 import LibCore
 import XCTest
 import XExpect
@@ -22,6 +23,7 @@ final class IOSReducerTests: XCTestCase {
     let storedDates = LockIsolated<[Date]>([])
     let savedProtectionModes = LockIsolated<[ProtectionMode]>([])
     let savedDisabledBlockGroups = LockIsolated<[[UUID]]>([])
+    let savedAllBlockGroups = LockIsolated<[[GetBlockGroups.BlockGroupInfo]]>([])
     let cacheClearSubject = PassthroughSubject<DeviceClient.ClearCacheUpdate, Never>()
     let deviceId = UUID()
     let id1 = UUID()
@@ -46,7 +48,10 @@ final class IOSReducerTests: XCTestCase {
         fetchBlockRulesInvocations.withValue { $0 += 1 }
         return [.urlContains(value: "GIFs")]
       }
-      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [
+        .init(id: id1, name: "G1", shortDescription: "", longDescription: ""),
+        .init(id: id2, name: "G2", shortDescription: "", longDescription: ""),
+      ] }
       $0.api.connectAccountFeatureFlag = { @Sendable in
         .init(isEnabled: false)
       }
@@ -70,6 +75,11 @@ final class IOSReducerTests: XCTestCase {
       $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
       $0.sharedStorage.loadAccountConnection = { @Sendable in nil }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in nil }
+      $0.sharedStorage.loadPendingSupervisionCode = { @Sendable in nil }
+      $0.sharedStorage.loadAllBlockGroups = { @Sendable in nil }
+      $0.sharedStorage.saveAllBlockGroups = { @Sendable value in
+        savedAllBlockGroups.withValue { $0.append(value) }
+      }
       $0.sharedStorage.saveFirstLaunchDate = { @Sendable value in
         storedDates.withValue { $0.append(value) }
       }
@@ -95,13 +105,38 @@ final class IOSReducerTests: XCTestCase {
       $0.screen = .onboarding(.happyPath(.hiThere))
     }
 
+    await store.receive(.programmatic(.receivedAllBlockGroups([
+      .init(id: id1, name: "G1", shortDescription: "", longDescription: ""),
+      .init(id: id2, name: "G2", shortDescription: "", longDescription: ""),
+    ]))) {
+      $0.allBlockGroups = [
+        .init(id: id1, name: "G1", shortDescription: "", longDescription: ""),
+        .init(id: id2, name: "G2", shortDescription: "", longDescription: ""),
+      ]
+    }
+
     await store.receive(.programmatic(.receivedConnectAccountFeatureFlag(.init(isEnabled: false))))
+
+    await store.receive(.programmatic(.receivedAllBlockGroups([
+      .init(id: id1, name: "G1", shortDescription: "", longDescription: ""),
+      .init(id: id2, name: "G2", shortDescription: "", longDescription: ""),
+    ])))
 
     expect(storedDates.value).toEqual([.reference])
     expect(apiLoggedDetails.value).toEqual(["[onboarding] first launch, region: `US`"])
     expect(deleteCacheFillDirInvocations.value).toEqual(1)
     expect(defaultBlocksInvocations.value).toEqual(1)
     expect(savedProtectionModes.value).toEqual([.onboarding([.urlContains(value: "default-rule")])])
+    expect(savedAllBlockGroups.value).toEqual([
+      [
+        .init(id: id1, name: "G1", shortDescription: "", longDescription: ""),
+        .init(id: id2, name: "G2", shortDescription: "", longDescription: ""),
+      ],
+      [
+        .init(id: id1, name: "G1", shortDescription: "", longDescription: ""),
+        .init(id: id2, name: "G2", shortDescription: "", longDescription: ""),
+      ],
+    ])
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.happyPath(.timeExpectation))
@@ -252,6 +287,7 @@ final class IOSReducerTests: XCTestCase {
   func testConnectAccountFeatureFlagEnabled() async throws {
     var initialState = IOSReducer.State(
       screen: .onboarding(.happyPath(.dontGetTrickedPreInstall)),
+      allBlockGroups: [.init(id: UUID(), name: "", shortDescription: "", longDescription: "")],
     )
     initialState.onboarding.connectFeature = .init(isEnabled: true)
 
@@ -548,6 +584,7 @@ final class IOSReducerTests: XCTestCase {
   }
 
   func testFirstLaunchSupervisedSuccess() async throws {
+    let groupId = UUID()
     let store = await TestStore(initialState: IOSReducer.State()) {
       IOSReducer()
     } withDependencies: {
@@ -563,6 +600,9 @@ final class IOSReducerTests: XCTestCase {
       // but no sign of onboarding...
       $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
       $0.sharedStorage.loadAccountConnection = { @Sendable in nil }
+      $0.sharedStorage.loadAllBlockGroups = { @Sendable in [
+        .init(id: groupId, name: "", shortDescription: "", longDescription: ""),
+      ] }
     }
 
     await store.send(.programmatic(.appDidLaunch))
@@ -577,6 +617,12 @@ final class IOSReducerTests: XCTestCase {
     }
 
     await store.receive(.programmatic(.receivedConnectAccountFeatureFlag(.init(isEnabled: false))))
+
+    await store.receive(.programmatic(.receivedAllBlockGroups([
+      .init(id: groupId, name: "", shortDescription: "", longDescription: ""),
+    ]))) {
+      $0.allBlockGroups = [.init(id: groupId, name: "", shortDescription: "", longDescription: "")]
+    }
 
     // primary button goes to opt out groups
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
@@ -594,6 +640,31 @@ final class IOSReducerTests: XCTestCase {
     await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
       $0.screen = .onboarding(.onParentDeviceFail)
     }
+  }
+
+  @MainActor
+  func testNoBlockGroupsFallback() async throws {
+    let savedDisabledGroups = LockIsolated<[[UUID]]>([])
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.happyPath(.dontGetTrickedPreInstall)),
+      allBlockGroups: [], // <-- no groups fetched (e.g. api was down)
+    )) {
+      IOSReducer()
+    } withDependencies: {
+      $0.api.logEvent = { @Sendable _, _ in }
+      $0.systemExtension.installFilter = { .success(()) }
+      $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable value in
+        savedDisabledGroups.withValue { $0.append(value) }
+      }
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
+
+    await store.receive(.programmatic(.installSucceeded)) {
+      $0.screen = .onboarding(.happyPath(.promptClearCache))
+    }
+
+    expect(savedDisabledGroups.value).toEqual([[], []]) // empty saved twice (both safeguards)
   }
 
   @MainActor
