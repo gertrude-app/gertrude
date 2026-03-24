@@ -217,8 +217,7 @@ public struct IOSReducer {
 
     case (.onboarding(.happyPath(.offerAccountConnect)), .primary):
       self.deps.log(state.screen, action, "62b6a262")
-      state.screen = .onboarding(.happyPath(.optOutBlockGroups))
-      return .none
+      return self.transitionToOptOutOrSkip(state: &state)
 
     case (.onboarding(.happyPath(.offerAccountConnect)), .secondary):
       self.deps.log(state.screen, action, "b93bb543")
@@ -716,10 +715,10 @@ public struct IOSReducer {
       state.onboarding.deviceSupervised = true
       if state.onboarding.connectFeature.isEnabled {
         state.screen = .onboarding(.happyPath(.offerAccountConnect))
+        return .none
       } else {
-        state.screen = .onboarding(.happyPath(.optOutBlockGroups))
+        return self.transitionToOptOutOrSkip(state: &state)
       }
-      return .none
 
     default:
       #if DEBUG
@@ -928,11 +927,16 @@ public struct IOSReducer {
       }
       if state.onboarding.connectFeature.isEnabled {
         state.screen = .onboarding(.happyPath(.offerAccountConnect))
+        return .run { [deps = self.deps] _ in
+          deps.sharedStorage.saveDisabledBlockGroupIds([])
+        }
       } else {
-        state.screen = .onboarding(.happyPath(.optOutBlockGroups))
-      }
-      return .run { [deps = self.deps] _ in
-        deps.sharedStorage.saveDisabledBlockGroupIds([])
+        return .merge(
+          .run { [deps = self.deps] _ in
+            deps.sharedStorage.saveDisabledBlockGroupIds([])
+          },
+          self.transitionToOptOutOrSkip(state: &state),
+        )
       }
 
     case .installFailed(let err):
@@ -1034,6 +1038,18 @@ extension IOSReducer.Deps {
 }
 
 extension IOSReducer {
+  func transitionToOptOutOrSkip(state: inout State) -> EffectOf<IOSReducer> {
+    guard !state.allBlockGroups.isEmpty else {
+      state.screen = .onboarding(.happyPath(.promptClearCache))
+      return .run { [deps = self.deps] _ in
+        deps.log("UNEXPECTED: no block groups at opt-out screen", "ebedab78")
+        deps.sharedStorage.saveDisabledBlockGroupIds([])
+      }
+    }
+    state.screen = .onboarding(.happyPath(.optOutBlockGroups))
+    return .none
+  }
+
   func isBuildAhead(of appStoreVersion: String?) -> Bool {
     guard let appStoreVersion else { return false }
     let appVersion = self.deps.device.installedVersion()
