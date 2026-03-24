@@ -257,7 +257,7 @@ private func recentScreenshots(
 ) -> [DashboardWidgets_v2.RecentScreenshot] {
   children.compactMap { user in
     screenshots
-      .first { map[$0.computerUserId ?? .init()]?.id == user.id }
+      .first { map[$0.computerUserId]?.id == user.id }
       .map { screenshot in
         .init(
           id: screenshot.id,
@@ -276,7 +276,7 @@ private func childActivitySummaries(
   screenshots: [Screenshot],
 ) -> [DashboardWidgets_v2.ChildActivitySummary] {
   children.map { user in
-    let userScreenshots = screenshots.filter { map[$0.computerUserId ?? .init()]?.id == user.id }
+    let userScreenshots = screenshots.filter { map[$0.computerUserId]?.id == user.id }
     let userKeystrokes = keystrokes.filter { map[$0.computerUserId]?.id == user.id }
     return .init(
       id: user.id,

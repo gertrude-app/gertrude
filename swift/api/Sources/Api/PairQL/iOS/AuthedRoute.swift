@@ -28,9 +28,6 @@ extension AuthedRoute: RouteResponder {
     case .pollFilterSuspensionDecision(let input):
       let output = try await PollFilterSuspensionDecision.resolve(with: input, in: ctx)
       return try await self.respond(with: output)
-    case .screenshotUploadUrl(let input):
-      let output = try await ScreenshotUploadUrl.resolve(with: input, in: ctx)
-      return try await self.respond(with: output)
     case .selfReportSupervision(let input):
       let output = try await SelfReportSupervision.resolve(with: input, in: ctx)
       return try await self.respond(with: output)

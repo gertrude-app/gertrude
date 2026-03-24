@@ -76,6 +76,7 @@ extension Configure {
     app.migrations.add(ReencodeFlowTypeAsString())
     app.migrations.add(PodcastDeviceId())
     app.migrations.add(BlockGroupImageSlugs())
+    app.migrations.add(DropIosScreenshots())
   }
 }
 

@@ -426,7 +426,6 @@ extension Screenshot {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case computerUserId
-    case iosDeviceId
     case url
     case width
     case height
