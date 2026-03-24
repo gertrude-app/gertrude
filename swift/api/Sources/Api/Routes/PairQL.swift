@@ -185,6 +185,10 @@ private func slackPairQLRouteNotFound(_ request: Request, _ error: Error) async 
     return
   }
 
+  if domain == "dashboard", operation == "ChildActivitySummaries" {
+    return
+  }
+
   try? await with(dependency: \.slack).error("""
   *PairQL parsing error:*
   domain: `\(domain)`
