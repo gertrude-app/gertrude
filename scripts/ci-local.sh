@@ -14,6 +14,9 @@ DASH_PORT="${DASH_PORT:-8081}"
 CI_API_PORT="${CI_API_PORT:-$((API_PORT + 100))}"
 CI_DASH_PORT="${CI_DASH_PORT:-$((DASH_PORT + 100))}"
 
+lsof -ti tcp:"$CI_API_PORT" | xargs kill -9 2>/dev/null || true
+lsof -ti tcp:"$CI_DASH_PORT" | xargs kill -9 2>/dev/null || true
+
 if [[ ! -f swift/api/.env ]]; then
   echo "Missing swift/api/.env" >&2
   exit 1

@@ -35,6 +35,7 @@ iosconfig:
   @echo "LOCAL_API_URL = https:/\$()/{{ngrok_subdomain}}.ngrok-free.app" > iosapp/config/Local.xcconfig
 
 ios-tunnel:
+  @pkill -f ngrok || true
   @ngrok http {{api_port}} --url https://{{ngrok_subdomain}}.ngrok-free.app
 
 # api
