@@ -98,10 +98,14 @@ extension SharedStorageReaderClient: DependencyKey {
 
 func migrateLegacyStorage() async -> Bool {
   if UserDefaults.gertrude.data(forKey: Key.disabledBlockGroupIds.rawValue) == nil {
-    let legacyGroups: [BlockGroup] = loadCodable(forKey: .disabledBlockGroups) ?? []
-    var uuids = legacyGroups.map(\.legacyUUID)
-    // don't auto opt-in upgraders to new Apple Music group released March 2026
-    uuids.append(UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!)
+    let legacyGroups: [BlockGroup]? = loadCodable(forKey: .disabledBlockGroups)
+    var uuids = (legacyGroups ?? []).map(\.legacyUUID)
+    let isUpgrader = legacyGroups != nil
+      || UserDefaults.gertrude.data(forKey: Key.legacyV1StorageKey.rawValue) != nil
+    if isUpgrader {
+      // don't auto opt-in upgraders to new Apple Music group released March 2026
+      uuids.append(UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!)
+    }
     saveCodable(uuids, forKey: .disabledBlockGroupIds)
     @Dependency(\.api) var api
     await api.logEvent(id: "04376893", detail: "migrated block groups to UUIDs")

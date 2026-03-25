@@ -350,6 +350,7 @@ final class IOSReducerTests: XCTestCase {
       $0.screen = .running(state: .notConnected)
     }
 
+    // they get opted out of new apple music group, as an upgrader
     await store.receive(.programmatic(.receivedDisabledBlockGroupIds([
       UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!,
     ]))) {
@@ -404,6 +405,7 @@ final class IOSReducerTests: XCTestCase {
     await store.receive(.programmatic(.receivedDisabledBlockGroupIds([
       BlockGroup.gifs.legacyUUID,
       BlockGroup.ads.legacyUUID,
+      // they get opted out of new apple music group, as an upgrader
       UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!,
     ]))) {
       $0.disabledBlockGroupIds = [

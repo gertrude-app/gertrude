@@ -49,7 +49,7 @@ func `block group migration writes empty array on fresh install`() async throws 
 
   let v2Data = try #require(userDefaults.data(forKey: "v1.8.0--disabled-block-group-ids"))
   let uuids = try JSONDecoder().decode([UUID].self, from: v2Data)
-  #expect(uuids == [UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!])
+  #expect(uuids == [])
 }
 
 func `block group migration is idempotent`() async throws {
