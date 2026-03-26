@@ -1,5 +1,7 @@
 import 'watch-helpers.just'
 
+mod macapp
+
 set dotenv-filename := "../.gtask-ports"
 set dotenv-required := false
 
@@ -8,17 +10,6 @@ ngrok_subdomain := env("NGROK_SUBDOMAIN", "")
 
 _default:
   @just --choose
-
-# macapp
-
-bump version:
-  @node macapp/bump.mjs {{version}}
-
-macapp:
-  @open macapp/Xcode/Gertrude.xcodeproj
-
-macapp-xcode-build:
-  @pnpm exec nx run macapp:xcode-build
 
 # ios
 
@@ -125,7 +116,7 @@ fix:
 
 check:
   @just build
-  @just macapp-xcode-build
+  @just macapp xcode-build
   @just iosapp-xcode-build
   @just test
   @just lint
