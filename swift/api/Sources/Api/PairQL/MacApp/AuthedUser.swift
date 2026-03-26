@@ -34,6 +34,9 @@ extension AuthedUserRoute: RouteResponder {
     case .createSignedScreenshotUpload(let input):
       let output = try await CreateSignedScreenshotUpload.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .createSignedScreenshotUpload_v2(let input):
+      let output = try await CreateSignedScreenshotUpload_v2.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .logFilterEvents(let input):
       let output = try await LogFilterEvents.resolve(with: input, in: context)
       return try await self.respond(with: output)

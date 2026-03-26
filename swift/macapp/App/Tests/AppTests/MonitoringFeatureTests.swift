@@ -812,7 +812,7 @@ final class MonitoringFeatureTests: XCTestCase {
 
   func spyScreenshots(_ store: TestStoreOf<AppReducer>) -> (
     takeScreenshot: Spy<Void, Int>,
-    uploadScreenshot: Spy<URL, ApiClient.UploadScreenshotData>,
+    uploadScreenshot: Spy<Void, ApiClient.UploadScreenshotData>,
     takePendingScreenshots: Mock<[(Data, Int, Int, Date)]>,
   ) {
     let takeScreenshot = spy(on: Int.self, returning: ())
@@ -822,7 +822,7 @@ final class MonitoringFeatureTests: XCTestCase {
 
     let uploadScreenshot = spy(
       on: ApiClient.UploadScreenshotData.self,
-      returning: URL(string: "/uploaded.png")!,
+      returning: (),
     )
     store.deps.api.uploadScreenshot = uploadScreenshot.fn
     return (takeScreenshot, uploadScreenshot, takePendingScreenshots)

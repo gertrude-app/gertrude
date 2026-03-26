@@ -1,7 +1,8 @@
 import Foundation
 import PairQL
 
-/// in use: v2.0.0 - present
+/// deprecated: v2.0.0 - v2.8.1
+/// remove when MSV is 2.9.0
 public struct CreateSignedScreenshotUpload: Pair {
   public static let auth: ClientAuth = .child
 

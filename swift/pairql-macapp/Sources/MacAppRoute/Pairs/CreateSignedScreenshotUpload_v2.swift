@@ -1,18 +1,25 @@
 import Foundation
 import PairQL
 
-/// in use: v1.5.0 - present
-public struct ScreenshotUploadUrl: Pair {
+/// in use: v2.9.0 - present
+public struct CreateSignedScreenshotUpload_v2: Pair {
   public static let auth: ClientAuth = .child
 
   public struct Input: PairInput {
     public let width: Int
     public let height: Int
-    public let createdAt: Date
+    public var filterSuspended: Bool?
+    public let createdAt: Date?
 
-    public init(width: Int, height: Int, createdAt: Date) {
+    public init(
+      width: Int,
+      height: Int,
+      filterSuspended: Bool? = false,
+      createdAt: Date? = nil,
+    ) {
       self.width = width
       self.height = height
+      self.filterSuspended = filterSuspended
       self.createdAt = createdAt
     }
   }

@@ -72,6 +72,7 @@ final class IOSReducerTests: XCTestCase {
         batteryCheckInvocations.withValue { $0 += 1 }
         return .level(0.2)
       }
+      $0.sharedStorage.loadPendingSupervisionCode = { @Sendable in nil }
       $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
       $0.sharedStorage.loadAccountConnection = { @Sendable in nil }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in nil }

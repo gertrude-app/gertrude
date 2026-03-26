@@ -671,7 +671,6 @@ extension Screenshot: Model {
     switch column {
     case .id: .id(self)
     case .computerUserId: .uuid(self.computerUserId)
-    case .iosDeviceId: .uuid(self.iosDeviceId)
     case .url: .string(self.url)
     case .width: .int(self.width)
     case .height: .int(self.height)
@@ -686,7 +685,6 @@ extension Screenshot: Model {
     [
       .id: .id(self),
       .computerUserId: .uuid(self.computerUserId),
-      .iosDeviceId: .uuid(self.iosDeviceId),
       .url: .string(self.url),
       .width: .int(self.width),
       .height: .int(self.height),

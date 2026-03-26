@@ -2,6 +2,7 @@ import DuetSQL
 import Foundation
 import Gertie
 import PairQL
+import XAws
 
 struct DashboardWidgets_v2: Pair {
   static let auth: ClientAuth = .parent
@@ -209,6 +210,8 @@ extension DashboardWidgets_v2: NoInputResolver {
         children: children,
         map: computerToChildMap,
         screenshots: screenshots,
+        aws: with(dependency: \.aws),
+        bucketUrl: with(dependency: \.env.s3.bucketUrl),
       ),
       numParentNotifications: notifications.count,
       announcement: announcement.map { .init(
@@ -249,11 +252,20 @@ private func recentScreenshots(
   children: [Child],
   map: [ComputerUser.Id: Child],
   screenshots: [Screenshot],
+  aws: AWS.Client,
+  bucketUrl: String,
 ) -> [DashboardWidgets_v2.RecentScreenshot] {
   children.compactMap { user in
     screenshots
-      .first { map[$0.computerUserId ?? .init()]?.id == user.id }
-      .map { .init(id: $0.id, childName: user.name, url: $0.url, createdAt: $0.createdAt) }
+      .first { map[$0.computerUserId]?.id == user.id }
+      .map { screenshot in
+        .init(
+          id: screenshot.id,
+          childName: user.name,
+          url: signedScreenshotUrl(screenshot.url, bucketUrl: bucketUrl, aws: aws),
+          createdAt: screenshot.createdAt,
+        )
+      }
   }
 }
 
@@ -264,7 +276,7 @@ private func childActivitySummaries(
   screenshots: [Screenshot],
 ) -> [DashboardWidgets_v2.ChildActivitySummary] {
   children.map { user in
-    let userScreenshots = screenshots.filter { map[$0.computerUserId ?? .init()]?.id == user.id }
+    let userScreenshots = screenshots.filter { map[$0.computerUserId]?.id == user.id }
     let userKeystrokes = keystrokes.filter { map[$0.computerUserId]?.id == user.id }
     return .init(
       id: user.id,
@@ -279,4 +291,31 @@ private func childActivitySummaries(
       ).count,
     )
   }
+}
+
+struct PendingIOSDeviceRow: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    var stmt = SQL.Statement("""
+    SELECT
+      c.\(Child.columnName(.name)) AS child_name,
+      d.\(IOSApp.Device.columnName(.modelIdentifier)) AS model_identifier,
+      s.\(IOSApp.Supervision.columnName(.claimCode)) AS claim_code
+    FROM \(table: IOSApp.Supervision.self) s
+    JOIN \(table: IOSApp.Device.self) d
+      ON d.id = s.\(IOSApp.Supervision.columnName(.deviceId))
+    JOIN \(table: Child.self) c
+      ON c.id = d.\(IOSApp.Device.columnName(.childId))
+    WHERE c.\(Child.columnName(.parentId)) =\(" ")
+    """)
+    stmt.components.append(.binding(bindings[0]))
+    stmt.components.append(.sql("""
+      AND s.\(IOSApp.Supervision.columnName(.claimedAt)) IS NOT NULL
+      AND s.\(IOSApp.Supervision.columnName(.supervisedAt)) IS NULL
+    """))
+    return stmt
+  }
+
+  var childName: String
+  var modelIdentifier: String
+  var claimCode: Int
 }

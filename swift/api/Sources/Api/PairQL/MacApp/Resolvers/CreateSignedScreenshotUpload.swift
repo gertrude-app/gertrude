@@ -20,7 +20,7 @@ extension CreateSignedScreenshotUpload: Resolver {
       )
     }
 
-    let signedUrl = try with(dependency: \.aws).signedS3UploadUrl(objectName)
+    let uploadUrl = try with(dependency: \.aws).signedS3UploadUrl(objectName)
 
     try await context.db.create(Screenshot(
       computerUserId: computerUser.id,
@@ -31,6 +31,6 @@ extension CreateSignedScreenshotUpload: Resolver {
       createdAt: input.createdAt ?? get(dependency: \.date.now),
     ))
 
-    return .init(uploadUrl: signedUrl, webUrl: webUrl)
+    return .init(uploadUrl: uploadUrl, webUrl: webUrl)
   }
 }

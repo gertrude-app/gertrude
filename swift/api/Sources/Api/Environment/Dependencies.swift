@@ -147,9 +147,14 @@ private enum LoggerKey: DependencyKey {
 
   extension AWS.Client: @retroactive TestDependencyKey {
     public static var testValue: AWS.Client {
-      .init(signedS3UploadUrl: { _, _, _ in
-        unimplemented("AWS.Client.signedS3UploadUrl()", placeholder: URL(string: "/")!)
-      })
+      .init(
+        signedS3UploadUrl: { _, _, _ in
+          unimplemented("AWS.Client.signedS3UploadUrl()", placeholder: URL(string: "/")!)
+        },
+        signedS3GetUrl: { _ in
+          unimplemented("AWS.Client.signedS3GetUrl()", placeholder: URL(string: "/")!)
+        },
+      )
     }
   }
 

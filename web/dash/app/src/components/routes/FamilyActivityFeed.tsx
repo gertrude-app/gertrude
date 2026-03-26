@@ -14,8 +14,10 @@ const FamilyActivityFeedRoute: React.FC = () => {
   const optimistic = useOptimism();
   const queryKey = Key.combinedUsersActivityFeed(urlDate);
 
-  const query = useQuery(queryKey, () =>
-    Current.api.combinedUsersActivityFeed({ range: entireDay(date) }),
+  const query = useQuery(
+    queryKey,
+    () => Current.api.combinedUsersActivityFeed({ range: entireDay(date) }),
+    { refetchIntervalSeconds: 9 * 60 }, // img sig expires in 10 min
   );
 
   const deleteItems = useMutation(

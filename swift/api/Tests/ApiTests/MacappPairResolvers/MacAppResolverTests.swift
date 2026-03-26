@@ -133,6 +133,7 @@ final class MacAppResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await withDependencies {
       $0.aws._signedS3UploadUrl = { _, _, _ in URL(string: "from-aws.com")! }
+      $0.aws._signedS3GetUrl = { _ in URL(string: "from-aws.com")! }
     } operation: {
       try await CreateSignedScreenshotUpload.resolve(
         with: .init(width: 111, height: 222),
@@ -152,6 +153,7 @@ final class MacAppResolverTests: ApiTestCase, @unchecked Sendable {
 
     try await withDependencies {
       $0.aws._signedS3UploadUrl = { _, _, _ in URL(string: "from-aws.com")! }
+      $0.aws._signedS3GetUrl = { _ in URL(string: "from-aws.com")! }
       $0.uuid = .mock(uuids)
     } operation: {
       _ = try await CreateSignedScreenshotUpload.resolve(
@@ -162,6 +164,30 @@ final class MacAppResolverTests: ApiTestCase, @unchecked Sendable {
       expect(screenshot.width).toEqual(1116)
       expect(screenshot.createdAt).toEqual(.epoch)
     }
+  }
+
+  func testCreateSignedScreenshotUpload_v2() async throws {
+    let child = try await self.childWithComputer()
+    let uuids = MockUUIDs()
+
+    let output = try await withDependencies {
+      $0.aws._signedS3UploadUrl = { _, _, isPublicRead in
+        expect(isPublicRead).toEqual(false)
+        return URL(string: "https://upload.test")!
+      }
+      $0.uuid = .mock(uuids)
+    } operation: {
+      try await CreateSignedScreenshotUpload_v2.resolve(
+        with: .init(width: 1116, height: 222, createdAt: .epoch),
+        in: self.context(child),
+      )
+    }
+
+    expect(output.uploadUrl.absoluteString).toEqual("https://upload.test")
+
+    let screenshot = try await self.db.find(Screenshot.Id(uuids[1]))
+    expect(screenshot.width).toEqual(1116)
+    expect(screenshot.createdAt).toEqual(.epoch)
   }
 
   func testPre_2_1_0_AppSendingMonitoringItemsWithoutFilterSuspendedBool() {

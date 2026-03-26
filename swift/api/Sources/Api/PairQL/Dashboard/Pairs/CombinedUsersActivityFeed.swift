@@ -49,12 +49,20 @@ extension CombinedUsersActivityFeed: Resolver {
         .all(in: context.db)
 
       let coalesced = try await coalesce(screenshots, keystrokes)
+      let aws = with(dependency: \.aws)
+      let bucketUrl = with(dependency: \.env.s3.bucketUrl)
+      let signedItems = coalesced.map { item -> UserActivity.Item in
+        guard case .screenshot(let s) = item else { return item }
+        var signed = s
+        signed.url = signedScreenshotUrl(s.url, bucketUrl: bucketUrl, aws: aws)
+        return .screenshot(signed)
+      }
 
       return UserDay(
         userName: child.name,
         showSuspensionActivity: child.showSuspensionActivity,
-        numDeleted: coalesced.lazy.filter(\.isDeleted).count,
-        items: coalesced.lazy.filter(\.notDeleted),
+        numDeleted: signedItems.lazy.filter(\.isDeleted).count,
+        items: signedItems.lazy.filter(\.notDeleted),
       )
     }
   }

@@ -52,6 +52,7 @@ final class ChildActivityResolverTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.childWithComputer()
     var screenshot = Screenshot.random
     screenshot.computerUserId = child.computerUser.id
+    screenshot.url = "\(self.env.s3.bucketUrl)/screenshots/test-get-activity-day.jpg"
     screenshot.createdAt = .reference - 1
     try await self.db.create(screenshot)
     var keystrokeLine = KeystrokeLine.random
@@ -60,16 +61,20 @@ final class ChildActivityResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.db.create(keystrokeLine)
     let twoDaysAgo = Date.reference - .days(2)
 
-    let output = try await UserActivityFeed.resolve(
-      with: .init(
-        userId: child.id,
-        range: .init(
-          start: twoDaysAgo.isoString,
-          end: Date.reference.isoString,
+    let output = try await withDependencies {
+      $0.aws._signedS3GetUrl = { _ in URL(string: "https://signed.test/img.jpg")! }
+    } operation: {
+      try await UserActivityFeed.resolve(
+        with: .init(
+          userId: child.id,
+          range: .init(
+            start: twoDaysAgo.isoString,
+            end: Date.reference.isoString,
+          ),
         ),
-      ),
-      in: context(child.parent),
-    )
+        in: context(child.parent),
+      )
+    }
 
     expect(output.userName).toEqual(child.name)
     expect(output.numDeleted).toEqual(0)
@@ -88,7 +93,7 @@ final class ChildActivityResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.items.last?.screenshot).toEqual(.init(
       id: screenshot.id,
       ids: [screenshot.id],
-      url: screenshot.url,
+      url: "https://signed.test/img.jpg",
       width: screenshot.width,
       height: screenshot.height,
       duringSuspension: screenshot.filterSuspended,
@@ -104,6 +109,7 @@ final class ChildActivityResolverTests: ApiTestCase, @unchecked Sendable {
     let child1 = try await self.childWithComputer()
     var screenshot = Screenshot.mock
     screenshot.computerUserId = child1.computerUser.id
+    screenshot.url = "\(self.env.s3.bucketUrl)/screenshots/test-combined-user-activity-1.jpg"
     screenshot.createdAt = .reference - 5
     var flaggedOldScreenshot = Screenshot.mock
     flaggedOldScreenshot.computerUserId = child1.computerUser.id
@@ -121,6 +127,7 @@ final class ChildActivityResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.db.update(child2.model)
     var screenshot2 = Screenshot.mock
     screenshot2.computerUserId = child2.computerUser.id
+    screenshot2.url = "\(self.env.s3.bucketUrl)/screenshots/test-combined-user-activity-2.jpg"
     screenshot2.createdAt = .reference - 3
     try await self.db.create(screenshot2)
     var keystrokeLine2 = KeystrokeLine.mock
@@ -161,10 +168,14 @@ final class ChildActivityResolverTests: ApiTestCase, @unchecked Sendable {
     )
 
     // test getting the activity day detail (screenshots and keystrokes)
-    let dayOutput = try await CombinedUsersActivityFeed.resolve(
-      with: .init(range: dateRange),
-      in: context(child1.parent),
-    )
+    let dayOutput = try await withDependencies {
+      $0.aws._signedS3GetUrl = { _ in URL(string: "https://signed.test/img.jpg")! }
+    } operation: {
+      try await CombinedUsersActivityFeed.resolve(
+        with: .init(range: dateRange),
+        in: context(child1.parent),
+      )
+    }
 
     expect(dayOutput).toHaveCount(2)
     let childDay1 = dayOutput[0]
@@ -185,7 +196,7 @@ final class ChildActivityResolverTests: ApiTestCase, @unchecked Sendable {
         .screenshot(.init(
           id: screenshot.id,
           ids: [screenshot.id],
-          url: screenshot.url,
+          url: "https://signed.test/img.jpg",
           width: screenshot.width,
           height: screenshot.height,
           duringSuspension: screenshot.filterSuspended,
@@ -203,7 +214,7 @@ final class ChildActivityResolverTests: ApiTestCase, @unchecked Sendable {
       items: [.screenshot(.init(
         id: screenshot2.id,
         ids: [screenshot2.id],
-        url: screenshot2.url,
+        url: "https://signed.test/img.jpg",
         width: screenshot2.width,
         height: screenshot2.height,
         duringSuspension: screenshot2.filterSuspended,
