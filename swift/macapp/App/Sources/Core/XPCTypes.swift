@@ -4,10 +4,16 @@ import Gertie
 public struct UserFilterData: Sendable, Codable {
   public var keychains: [RuleKeychain]
   public var downtime: Downtime?
+  public var filteringDisabled: Bool?
 
-  public init(keychains: [RuleKeychain], downtime: Downtime? = nil) {
+  public init(
+    keychains: [RuleKeychain],
+    downtime: Downtime? = nil,
+    filteringDisabled: Bool? = nil,
+  ) {
     self.keychains = keychains
     self.downtime = downtime
+    self.filteringDisabled = filteringDisabled
   }
 }
 
@@ -128,12 +134,20 @@ public extension XPC {
     public var version: String
     public var userId: uid_t
     public var numUserKeys: Int
+    public var filteringDisabled: Bool?
 
-    public init(randomInt: Int, version: String, userId: uid_t, numUserKeys: Int) {
+    public init(
+      randomInt: Int,
+      version: String,
+      userId: uid_t,
+      numUserKeys: Int,
+      filteringDisabled: Bool? = nil,
+    ) {
       self.randomInt = randomInt
       self.version = version
       self.userId = userId
       self.numUserKeys = numUserKeys
+      self.filteringDisabled = filteringDisabled
     }
   }
 }

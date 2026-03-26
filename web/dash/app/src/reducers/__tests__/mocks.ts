@@ -79,6 +79,7 @@ export function child(override: Partial<Child> = {}): Child {
     screenshotsFrequency: 60,
     keyloggingEnabled: true,
     showSuspensionActivity: true,
+    filteringDisabled: false,
     keychains: [],
     computers: [
       {

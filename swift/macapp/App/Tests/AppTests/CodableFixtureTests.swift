@@ -23,6 +23,9 @@ final class CodableFixtureTests: XCTestCase {
     try self.assertRoundTrip(AdminWindowFeature.State.HealthCheck.FilterStatus.installed(
       version: "2.5.0", numUserKeys: 42,
     ))
+    try self.assertRoundTrip(AdminWindowFeature.State.HealthCheck.FilterStatus.installed(
+      version: "2.5.0", numUserKeys: 0, filteringDisabled: true,
+    ))
     try self.assertRoundTrip(AdminWindowFeature.Action.View.AdvancedAction.pairqlEndpointSet(
       url: "http://localhost:8080",
     ))

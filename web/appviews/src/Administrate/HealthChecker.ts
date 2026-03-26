@@ -355,7 +355,7 @@ export default class HealthChecker {
     }
 
     const items: ItemData[] = [];
-    const { version, numUserKeys } = filterStatus;
+    const { version, numUserKeys, filteringDisabled } = filterStatus;
 
     if (this.shouldShowFilterOutOfDateItem(latestAppVersion, version)) {
       items.push({
@@ -370,7 +370,13 @@ export default class HealthChecker {
       });
     }
 
-    if (numUserKeys > 0) {
+    if (filteringDisabled === true) {
+      items.push({
+        title: `Filter rules`,
+        state: `ok`,
+        message: `Monitoring only, internet filtering disabled`,
+      });
+    } else if (numUserKeys > 0) {
       items.push({
         title: `Filter rules`,
         state: `ok`,

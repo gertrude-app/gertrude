@@ -145,4 +145,37 @@ final class EarlyDecisionTests: XCTestCase {
     )])
     expect(filter.earlyUserDecision(auditToken: .init())).toEqual(.none(502))
   }
+
+  func testFilteringDisabledUserAllowed() {
+    let filter = TestFilter.scenario(filteringDisabledUsers: [502])
+    expect(filter.earlyUserDecision(auditToken: .init())).toEqual(.allow(.filteringDisabled(502)))
+  }
+
+  func testFilteringDisabledNotAppliedToOtherUser() {
+    let filter = TestFilter.scenario(filteringDisabledUsers: [503])
+    expect(filter.earlyUserDecision(auditToken: .init())).toEqual(.none(502))
+  }
+
+  func testFilteringDisabledNotAllowedEarlyWhenMacappAWOL() {
+    let filter = TestFilter.scenario(
+      macappsAliveUntil: [:],
+      filteringDisabledUsers: [502],
+    )
+    expect(filter.earlyUserDecision(auditToken: .init())).toEqual(.none(502))
+  }
+
+  func testDowntimeTrumpsFilteringDisabled() {
+    let downtime = PlainTimeWindow(
+      start: .init(hour: 22, minute: 0),
+      end: .init(hour: 5, minute: 0),
+    )
+    let withinDowntime = Calendar.current.date(from: DateComponents(hour: 23, minute: 33))!
+    let filter = TestFilter.scenario(
+      userIdFromAuditToken: 502,
+      userDowntime: [502: downtime],
+      date: .constant(withinDowntime),
+      filteringDisabledUsers: [502],
+    )
+    expect(filter.earlyUserDecision(auditToken: .init())).toEqual(.blockDuringDowntime(502))
+  }
 }

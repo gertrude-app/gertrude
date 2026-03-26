@@ -32,6 +32,11 @@ public extension NetworkFilter {
       return self.logDecision(.allow(.exemptUser(userId)))
     }
 
+    if self.state.filteringDisabledUsers.contains(userId),
+       self.state.macappsAliveUntil[userId] != nil {
+      return self.logDecision(.allow(.filteringDisabled(userId)))
+    }
+
     if let suspension = self.state.suspensions[userId],
        suspension.isActive,
        suspension.scope == .unrestricted,

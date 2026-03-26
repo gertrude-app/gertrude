@@ -1,0 +1,4 @@
+#include? "./Local.xcconfig"
+FALLBACK = https:/$()/api.gertrude.app
+API_BASE_URL = $(LOCAL_API_URL:default=$(FALLBACK))
+APPCAST_URL = $(API_BASE_URL)/appcast.xml

@@ -143,6 +143,60 @@ describe(`HealthChecker`, () => {
       });
     });
 
+    test(`filteringDisabled with zero keys shows monitoring-only ok`, () => {
+      const checker = makeChecker({
+        filterStatus: {
+          case: `installed`,
+          version: `1.0.0`,
+          numUserKeys: 0,
+          filteringDisabled: true,
+        },
+      });
+      expect(checker.filterItems).toEqual([
+        {
+          title: `Filter rules`,
+          state: `ok`,
+          message: `Monitoring only, internet filtering disabled`,
+        },
+      ]);
+    });
+
+    test(`filteringDisabled with stale nonzero keys still shows monitoring-only ok`, () => {
+      const checker = makeChecker({
+        filterStatus: {
+          case: `installed`,
+          version: `1.0.0`,
+          numUserKeys: 5,
+          filteringDisabled: true,
+        },
+      });
+      expect(checker.filterItems).toEqual([
+        {
+          title: `Filter rules`,
+          state: `ok`,
+          message: `Monitoring only, internet filtering disabled`,
+        },
+      ]);
+    });
+
+    test(`zero keys without filteringDisabled shows warning`, () => {
+      const checker = makeChecker({
+        filterStatus: { case: `installed`, version: `1.0.0`, numUserKeys: 0 },
+      });
+      expect(checker.filterItems).toEqual([
+        {
+          title: `Filter rules`,
+          state: `warn`,
+          message: `No keys loaded, try refreshing rules`,
+          button: {
+            icon: `sync`,
+            label: `Refresh rules`,
+            action: `zeroKeysRefreshRulesClicked`,
+          },
+        },
+      ]);
+    });
+
     test(`filter version = app version, but both behind api latest`, () => {
       const checker = makeChecker({
         latestAppVersion: { case: `ok`, value: `1.0.1` }, // <-- new version!

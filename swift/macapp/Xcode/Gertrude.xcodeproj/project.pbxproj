@@ -77,6 +77,7 @@
 		7FA1A0012E12300100A1B2C3 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		7FA1A0022E12300200A1B2C3 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		7FA1A0032E12300300A1B2C3 /* Local.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Local.xcconfig; sourceTree = "<group>"; };
+		1462BE8494B09629F4C344C5 /* VM.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = VM.xcconfig; sourceTree = "<group>"; };
 		7F0B886F29C21561001E9427 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		7F3BA9B629C214AB00C4FAF1 /* App */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = App; path = ../App; sourceTree = "<group>"; };
 		7F4D0E4D2628B9450060281F /* libbsm.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbsm.tbd; path = usr/lib/libbsm.tbd; sourceTree = SDKROOT; };
@@ -140,6 +141,7 @@
 			children = (
 				7FA1A0012E12300100A1B2C3 /* Debug.xcconfig */,
 				7FA1A0022E12300200A1B2C3 /* Release.xcconfig */,
+				1462BE8494B09629F4C344C5 /* VM.xcconfig */,
 				7FA1A0032E12300300A1B2C3 /* Local.xcconfig */,
 			);
 			path = ../config;
@@ -666,6 +668,131 @@
 			};
 			name = Release;
 		};
+		5C16D7E9825387A0F2293BD9 /* VM */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WFN83LM943;
+				ENABLE_HARDENED_RUNTIME = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				OTHER_CODE_SIGN_FLAGS = "$(inherited) -i $(PRODUCT_BUNDLE_IDENTIFIER)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.netrivet.gertrude.relauncher;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = VM;
+		};
+		79BC192847044B8FEB8F9E22 /* VM */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_ENTITLEMENTS = GertrudeFilterExtension/GertrudeFilterExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = WFN83LM943;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = GertrudeFilterExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.netrivet.gertrude.filter-extension";
+				PRODUCT_NAME = "com.netrivet.gertrude.filter-extension";
+				PROVISIONING_PROFILE_SPECIFIER = "Gertrude Agent (filter extension)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = VM;
+		};
+		0D195128F8EEECF73866FB74 /* VM */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = VM;
+		};
+		7277DB9739303402A7D0F910 /* VM */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1462BE8494B09629F4C344C5 /* VM.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Gertrude/Gertrude.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 0.2.1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = WFN83LM943;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = Gertrude/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MARKETING_VERSION = 0.2.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.netrivet.gertrude.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "Gertrude Agent (app)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = VM;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -674,6 +801,7 @@
 			buildConfigurations = (
 				7FA3E6A32B851F0E00A4CE5C /* Debug */,
 				7FA3E6A42B851F0E00A4CE5C /* Release */,
+				5C16D7E9825387A0F2293BD9 /* VM */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -683,6 +811,7 @@
 			buildConfigurations = (
 				C40A5C52229DD6A500627D50 /* Debug */,
 				C40A5C53229DD6A500627D50 /* Release */,
+				79BC192847044B8FEB8F9E22 /* VM */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -692,6 +821,7 @@
 			buildConfigurations = (
 				C4B45DC32273A0020050C59B /* Debug */,
 				C4B45DC42273A0020050C59B /* Release */,
+				0D195128F8EEECF73866FB74 /* VM */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -701,6 +831,7 @@
 			buildConfigurations = (
 				C4B45DC62273A0020050C59B /* Debug */,
 				C4B45DC72273A0020050C59B /* Release */,
+				7277DB9739303402A7D0F910 /* VM */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

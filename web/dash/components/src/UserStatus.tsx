@@ -54,6 +54,12 @@ const UserStatus: React.FC<Props> = ({ status, name }) => {
           gradient: `[background:radial-gradient(#22c55e20_0%,transparent_70%)]`,
           primaryText: `Filter on`,
         };
+      case `unfiltered`:
+        return {
+          color: `bg-orange-400`,
+          gradient: `[background:radial-gradient(#fb923c20_0%,transparent_70%)]`,
+          primaryText: `Unfiltered`,
+        };
     }
   })();
 

@@ -13,6 +13,8 @@ public struct UserData {
   public var downtime: PlainTimeWindow?
   // `blockedApps` added in v2.6.0, but backwards compatible
   public var blockedApps: [BlockedApp]?
+  // `filteringDisabled` added in v2.7.0, but backwards compatible
+  public var filteringDisabled: Bool?
   public var connectedAt: Date
 
   public init(
@@ -26,6 +28,7 @@ public struct UserData {
     screenshotSize: Int,
     downtime: PlainTimeWindow? = nil,
     blockedApps: [BlockedApp]? = nil,
+    filteringDisabled: Bool? = nil,
     connectedAt: Date = .init(),
   ) {
     self.id = id
@@ -38,6 +41,7 @@ public struct UserData {
     self.screenshotSize = screenshotSize
     self.downtime = downtime
     self.blockedApps = blockedApps
+    self.filteringDisabled = filteringDisabled
     self.connectedAt = connectedAt
   }
 }

@@ -35,6 +35,8 @@ interface Props {
   setScreenshotsFrequency(frequency: number): unknown;
   showSuspensionActivity: boolean;
   setShowSuspensionActivity(show: boolean): unknown;
+  filteringDisabled: boolean;
+  setFilteringDisabled(disabled: boolean): unknown;
   downtimeEnabled: boolean;
   setDowntimeEnabled(enabled: boolean): unknown;
   downtime: PlainTimeWindow;
@@ -79,6 +81,8 @@ const ChildMacSettings: React.FC<Props> = ({
   setScreenshotsFrequency,
   showSuspensionActivity,
   setShowSuspensionActivity,
+  filteringDisabled,
+  setFilteringDisabled,
   downtimeEnabled,
   setDowntimeEnabled,
   downtime,
@@ -171,6 +175,11 @@ const ChildMacSettings: React.FC<Props> = ({
             description="Periodically take a screenshot and upload for your review"
             enabled={screenshotsEnabled}
             setEnabled={setScreenshotsEnabled}
+            disabledReason={
+              filteringDisabled
+                ? `Screenshots are required when internet filtering is disabled`
+                : undefined
+            }
           >
             <div
               className={cx(
@@ -293,46 +302,64 @@ const ChildMacSettings: React.FC<Props> = ({
         )}
 
         <div className="mt-12 max-w-3xl">
-          <h2 className="text-lg font-bold text-slate-700 mb-2">Keychains</h2>
-          <div className="py-3 flex flex-col space-y-4">
-            {keychains.length === 0 ? (
-              <EmptyState
-                heading={`No keychains`}
-                secondaryText={`By default, all internet access is blocked for this child until you assign a keychain.`}
-                icon={`key`}
-                buttonText={`Add keychain`}
-                action={onAddKeychainClicked}
-              />
-            ) : (
-              <>
-                {keychains.map((keychain) => (
-                  <KeychainCard
-                    mode="assigned_to_child"
-                    keychainId={keychain.id}
-                    schedule={keychain.schedule}
-                    key={keychain.id}
-                    name={keychain.name}
-                    description={keychain.description}
-                    numKeys={keychain.numKeys}
-                    isPublic={keychain.isPublic}
-                    onRemove={() => removeKeychain(keychain.id)}
-                    setSchedule={(schedule) =>
-                      setAssignedKeychainSchedule(keychain.id, schedule)
-                    }
-                  />
-                ))}
-                <Button
-                  type="button"
-                  onClick={onAddKeychainClicked}
-                  color="secondary"
-                  className="xs:self-end"
-                >
-                  <i className="fa fa-plus mr-2" />
-                  Add keychain
-                </Button>
-              </>
-            )}
-          </div>
+          <h2 className="text-lg font-bold text-slate-700">Filtering</h2>
+          <ToggleCard
+            title="Filter internet access"
+            description="Block all internet access except sites allowed by assigned keychains"
+            enabled={!filteringDisabled}
+            setEnabled={(enabled) => setFilteringDisabled(!enabled)}
+            disabledReason={
+              !screenshotsEnabled
+                ? `Internet filtering can only be disabled when screenshots are enabled`
+                : undefined
+            }
+            warning={
+              filteringDisabled
+                ? `${childName} has unrestricted internet access and is only protected by ${keyloggingEnabled ? `screenshots and keylogging` : `screenshots`}`
+                : undefined
+            }
+          />
+          {!filteringDisabled && (
+            <div className="mt-4 flex flex-col space-y-4">
+              {keychains.length === 0 ? (
+                <EmptyState
+                  heading={`No keychains`}
+                  secondaryText={`By default, all internet access is blocked for this child until you assign a keychain.`}
+                  icon={`key`}
+                  buttonText={`Add keychain`}
+                  action={onAddKeychainClicked}
+                />
+              ) : (
+                <>
+                  {keychains.map((keychain) => (
+                    <KeychainCard
+                      mode="assigned_to_child"
+                      keychainId={keychain.id}
+                      schedule={keychain.schedule}
+                      key={keychain.id}
+                      name={keychain.name}
+                      description={keychain.description}
+                      numKeys={keychain.numKeys}
+                      isPublic={keychain.isPublic}
+                      onRemove={() => removeKeychain(keychain.id)}
+                      setSchedule={(schedule) =>
+                        setAssignedKeychainSchedule(keychain.id, schedule)
+                      }
+                    />
+                  ))}
+                  <Button
+                    type="button"
+                    onClick={onAddKeychainClicked}
+                    color="secondary"
+                    className="xs:self-end"
+                  >
+                    <i className="fa fa-plus mr-2" />
+                    Add keychain
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex mt-12 pt-8 border-t-2 border-slate-200 justify-end space-x-5">

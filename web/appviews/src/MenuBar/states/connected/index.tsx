@@ -66,6 +66,8 @@ const Connected: React.FC<Props> = ({
                 filterState.case === `suspended`,
               '[background:radial-gradient(#e879f950_0%,transparent_70%)] dark:[background:radial-gradient(#d946ef40_0%,transparent_70%)]':
                 filterState.case === `downtimePaused`,
+              '[background:radial-gradient(#fb923c50_0%,transparent_70%)] dark:[background:radial-gradient(#ea580c40_0%,transparent_70%)]':
+                filterState.case === `unfiltered`,
             })}
           />
           <div className="relative">
@@ -80,11 +82,15 @@ const Connected: React.FC<Props> = ({
                     filterState.case === `suspended`,
                   'bg-fuchsia-400/50 text-fuchsia-950 dark:text-fuchsia-50':
                     filterState.case === `downtimePaused`,
+                  'bg-orange-400/50 text-orange-950 dark:text-orange-50':
+                    filterState.case === `unfiltered`,
                 })}
               >
                 {filterState.case === `downtimePaused`
                   ? `Downtime paused`
-                  : `Filter ${filterState.case}`}
+                  : filterState.case === `unfiltered`
+                    ? `Filter open`
+                    : `Filter ${filterState.case}`}
               </span>
               {filterState.case === `off` && (
                 <Btn.Violet onClick={() => emit({ case: `turnOnFilterClicked` })}>
@@ -112,14 +118,22 @@ const Connected: React.FC<Props> = ({
           <div className="flex mt-3 space-x-3 relative">
             <Btn.Labeled
               onClick={() => emit({ case: `viewNetworkTrafficClicked` })}
-              disabled={filterState.case === `off` || filterState.case === `suspended`}
+              disabled={
+                filterState.case === `off` ||
+                filterState.case === `suspended` ||
+                filterState.case === `unfiltered`
+              }
               iconClass="fa-tower-broadcast"
             >
               Blocked requests
             </Btn.Labeled>
             <Btn.Labeled
               onClick={() => emit({ case: `suspendFilterClicked` })}
-              disabled={filterState.case === `off` || filterState.case === `suspended`}
+              disabled={
+                filterState.case === `off` ||
+                filterState.case === `suspended` ||
+                filterState.case === `unfiltered`
+              }
               iconClass="fa-clock-rotate-left"
             >
               Suspend filter

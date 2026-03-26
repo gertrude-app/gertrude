@@ -14,6 +14,7 @@ struct SaveUser: Pair {
     var screenshotsResolution: Int
     var screenshotsFrequency: Int
     var showSuspensionActivity: Bool
+    var filteringDisabled: Bool
     var downtime: PlainTimeWindow?
     var keychains: [ChildKeychain]
     var blockedApps: [UserBlockedApp.DTO]?
@@ -29,6 +30,15 @@ struct SaveUser: Pair {
 
 extension SaveUser: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
+    if input.filteringDisabled, !input.screenshotsEnabled {
+      throw context.error(
+        id: "c3578cf8",
+        type: .badRequest,
+        debugMessage: "filteringDisabled=true requires screenshotsEnabled=true",
+        userMessage: "Internet filtering can only be disabled if screenshots are enabled.",
+        showContactSupport: false,
+      )
+    }
     var user: Child
     if input.isNew {
       user = try await context.db.create(Child(
@@ -41,6 +51,7 @@ extension SaveUser: Resolver {
         screenshotsResolution: 1000,
         screenshotsFrequency: 180,
         showSuspensionActivity: true,
+        filteringDisabled: input.filteringDisabled,
         downtime: input.downtime,
       ))
       dashSecurityEvent(.childAdded, "name: \(user.name)", in: context)
@@ -56,6 +67,7 @@ extension SaveUser: Resolver {
       user.screenshotsResolution = input.screenshotsResolution
       user.screenshotsFrequency = max(10, input.screenshotsFrequency)
       user.showSuspensionActivity = input.showSuspensionActivity
+      user.filteringDisabled = input.filteringDisabled
       user.downtime = input.downtime
       try await context.db.update(user)
 
@@ -107,6 +119,9 @@ func monitoringDecreased(user: Child, input: SaveUser.Input) -> String? {
   }
   if user.screenshotsEnabled, !input.screenshotsEnabled {
     parts.append("screenshots disabled")
+  }
+  if !user.filteringDisabled, input.filteringDisabled {
+    parts.append("internet filtering disabled")
   }
   if user.screenshotsResolution > input.screenshotsResolution {
     parts.append("screenshots resolution decreased")

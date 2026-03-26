@@ -11,6 +11,7 @@ class TestFilter: NetworkFilter {
     var userDowntime: [uid_t: Downtime] = [:]
     var appIdManifest = AppIdManifest()
     var exemptUsers: Set<uid_t> = []
+    var filteringDisabledUsers: Set<uid_t> = []
     var suspensions: [uid_t: FilterSuspension] = [:]
     var appCache: [String: AppDescriptor] = [:]
     var macappsAliveUntil: [uid_t: Date] = [:]
@@ -42,6 +43,7 @@ class TestFilter: NetworkFilter {
       categories: ["browser": ["chrome"]],
     ),
     exemptUsers: Set<uid_t> = [],
+    filteringDisabledUsers: Set<uid_t> = [],
     suspensions: [uid_t: FilterSuspension] = [:],
   ) -> TestFilter {
     withDependencies {
@@ -57,6 +59,7 @@ class TestFilter: NetworkFilter {
         userDowntime: userDowntime.mapValues { Downtime(window: $0) },
         appIdManifest: appIdManifest,
         exemptUsers: exemptUsers,
+        filteringDisabledUsers: filteringDisabledUsers,
         suspensions: suspensions,
         macappsAliveUntil: macappsAliveUntil,
       )

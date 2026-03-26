@@ -12,6 +12,7 @@ public enum Persistent {
     public var userDowntime: [uid_t: PlainTimeWindow] = [:]
     public var appIdManifest = AppIdManifest()
     public var exemptUsers: Set<uid_t> = []
+    public var filteringDisabledUsers: Set<uid_t>?
   }
 
   // v2.0.0 - v2.4.0
@@ -30,6 +31,9 @@ extension Filter.State {
       userDowntime: self.userDowntime.mapValues { $0.window },
       appIdManifest: self.appIdManifest,
       exemptUsers: self.exemptUsers,
+      filteringDisabledUsers: self.filteringDisabledUsers.isEmpty
+        ? nil
+        : self.filteringDisabledUsers,
     )
   }
 }

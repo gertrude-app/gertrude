@@ -45,8 +45,13 @@ extension FilterXPCClient: @retroactive DependencyKey {
         try await xpc.sendDeleteAllStoredState()
       }},
       sendURLMessage: send(urlMessage:),
-      sendUserRules: { manifest, keychains, downtime in await .init {
-        try await xpc.sendUserRules(manifest: manifest, keychains: keychains, downtime: downtime)
+      sendUserRules: { manifest, keychains, downtime, filteringDisabled in await .init {
+        try await xpc.sendUserRules(
+          manifest: manifest,
+          keychains: keychains,
+          downtime: downtime,
+          filteringDisabled: filteringDisabled,
+        )
       }},
       setBlockStreaming: { enabled in await .init {
         try await xpc.setBlockStreaming(enabled: enabled)
@@ -109,11 +114,13 @@ actor ThreadSafeFilterXPC {
     manifest: AppIdManifest,
     keychains: [RuleKeychain],
     downtime: Downtime?,
+    filteringDisabled: Bool?,
   ) async throws {
     try await self.filterXpc.sendUserRules(
       manifest: manifest,
       keychains: keychains,
       downtime: downtime,
+      filteringDisabled: filteringDisabled,
     )
   }
 

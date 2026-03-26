@@ -113,8 +113,9 @@ extension AppReducer.State {
     case .some(.communicationBroken),
          .some(.unexpected):
       return true
-    case .some(.installed(let version, let numUserKeys)):
-      if version != self.appUpdates.installedVersion || numUserKeys == 0 {
+    case .some(.installed(let version, let numUserKeys, let filteringDisabled)):
+      if version != self.appUpdates.installedVersion
+        || (numUserKeys == 0 && filteringDisabled != true) {
         return true
       }
     default:

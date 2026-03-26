@@ -26,6 +26,7 @@ export type Action =
   | { type: `setDowntimeEnabled`; enabled: boolean }
   | { type: `setDowntime`; downtime: PlainTimeWindow }
   | { type: `setShowSuspensionActivity`; show: boolean }
+  | { type: `setFilteringDisabled`; disabled: boolean }
   | { type: `removeKeychain`; id: UUID }
   | { type: `updateNewBlockedAppIdentifier`; identifier: string }
   | { type: `removeBlockedApp`; id: UUID }
@@ -68,6 +69,9 @@ function reducer(state: State, action: Action): State | undefined {
       return;
     case `setShowSuspensionActivity`:
       state.child.draft.showSuspensionActivity = action.show;
+      return;
+    case `setFilteringDisabled`:
+      state.child.draft.filteringDisabled = action.disabled;
       return;
     case `updateNewBlockedAppIdentifier`:
       state.newBlockedAppIdentifier = action.identifier;

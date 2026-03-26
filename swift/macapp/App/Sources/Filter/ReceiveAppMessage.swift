@@ -122,6 +122,8 @@ import os.log
         version: self.filterExtension.version(),
         userId: userId,
         numUserKeys: savedState?.userKeychains[userId]?.numKeys ?? 0,
+        filteringDisabled: savedState?.filteringDisabledUsers?.contains(userId) == true
+          ? true : nil,
       )
       let data = try XPC.encode(ack)
       reply(data, nil)
@@ -148,6 +150,7 @@ import os.log
         keychains: userData.keychains,
         downtime: userData.downtime,
         manifest: manifest,
+        filteringDisabled: userData.filteringDisabled,
       ))) }
       os_log(
         "[G•] FILTER xpc.receiveUserRules(userId: %{public}d,...) num keys: %{public}d",
@@ -166,7 +169,9 @@ import os.log
       os_log("[G•] FILTER xpc.receiveListUserTypesRequest()")
       let savedState = try storage.loadPersistentStateSync()
       let exemptUsers = Array(savedState?.exemptUsers ?? [])
-      let protectedUsers = savedState.map { Array($0.userKeychains.keys) } ?? []
+      let protectedUsers = savedState.map {
+        Array(Set($0.userKeychains.keys).union($0.filteringDisabledUsers ?? []))
+      } ?? []
       let data = try XPC.encode(FilterUserTypes(exempt: exemptUsers, protected: protectedUsers))
       reply(data, nil)
     } catch {
