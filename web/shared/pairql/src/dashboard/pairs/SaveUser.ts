@@ -11,7 +11,7 @@ export namespace SaveUser {
     screenshotsResolution: number;
     screenshotsFrequency: number;
     showSuspensionActivity: boolean;
-    filteringDisabled: boolean;
+    filteringDisabled?: boolean;
     downtime?: PlainTimeWindow;
     keychains: Array<{
       id: UUID;
