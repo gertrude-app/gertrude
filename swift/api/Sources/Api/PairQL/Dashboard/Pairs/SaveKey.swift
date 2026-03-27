@@ -21,21 +21,46 @@ extension SaveKey: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     let keychain = try await context.parent.keychain(input.keychainId, in: context.db)
     if input.isNew {
-      try await context.db.create(Key(
-        id: input.id,
-        keychainId: keychain.id,
-        key: input.key,
-        comment: input.comment,
-        deletedAt: input.expiration,
-      ))
-      let detail = "key opening \(input.key.simpleDescription) added to keychain '\(keychain.name)'"
-      dashSecurityEvent(.keyCreated, detail, in: context)
+      let existingKeys = try await keychain.keys(in: context.db)
+      if var existing = existingKeys.first(where: { $0.key == input.key }) {
+        var needsUpdate = false
+        if let comment = input.comment, comment != existing.comment {
+          existing.comment = comment
+          needsUpdate = true
+        }
+        if input.expiration != existing.deletedAt {
+          existing.deletedAt = input.expiration
+          needsUpdate = true
+        }
+        if needsUpdate {
+          try await context.db.update(existing)
+        }
+      } else {
+        try await context.db.create(Key(
+          id: input.id,
+          keychainId: keychain.id,
+          key: input.key,
+          comment: input.comment,
+          deletedAt: input.expiration,
+        ))
+        let detail = "key opening \(input.key.simpleDescription) added to keychain '\(keychain.name)'"
+        dashSecurityEvent(.keyCreated, detail, in: context)
+      }
     } else {
-      var key = try await context.db.find(input.id)
-      key.comment = input.comment
-      key.key = input.key
-      key.deletedAt = input.expiration
-      try await context.db.update(key)
+      let existingKeys = try await keychain.keys(in: context.db)
+      let conflict = existingKeys.first(where: { $0.key == input.key && $0.id != input.id })
+      if var conflict {
+        conflict.comment = input.comment
+        conflict.deletedAt = input.expiration
+        try await context.db.update(conflict)
+        try await context.db.delete(input.id, force: true)
+      } else {
+        var key = try await context.db.find(input.id)
+        key.comment = input.comment
+        key.key = input.key
+        key.deletedAt = input.expiration
+        try await context.db.update(key)
+      }
     }
     try await with(dependency: \.websockets)
       .send(.userUpdated, to: .usersWith(keychain: keychain.id))
