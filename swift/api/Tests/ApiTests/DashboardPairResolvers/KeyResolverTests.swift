@@ -69,6 +69,105 @@ final class KeyResolverTests: ApiTestCase, @unchecked Sendable {
       .toEqual([.init(.userUpdated, to: .usersWith(keychain: admin.keychain.id))])
   }
 
+  func testCreateDuplicateKeySilentlyAccepts() async throws {
+    let (input, admin) = try await prepare()
+    _ = try await SaveKey.resolve(with: input, in: admin.context)
+
+    var dupeInput = input
+    dupeInput.id = .init()
+    dupeInput.comment = nil
+    let output = try await SaveKey.resolve(with: dupeInput, in: admin.context)
+    expect(output).toEqual(.success)
+
+    let keys = try await admin.keychain.keys(in: self.db)
+    let matching = keys.filter { $0.key == input.key }
+    expect(matching.count).toEqual(1)
+    expect(matching.first?.comment).toEqual("a comment")
+  }
+
+  func testCreateDuplicateKeyUpdatesComment() async throws {
+    let (input, admin) = try await prepare()
+    _ = try await SaveKey.resolve(with: input, in: admin.context)
+
+    var dupeInput = input
+    dupeInput.id = .init()
+    dupeInput.comment = "updated comment"
+    let output = try await SaveKey.resolve(with: dupeInput, in: admin.context)
+    expect(output).toEqual(.success)
+
+    let keys = try await admin.keychain.keys(in: self.db)
+    let matching = keys.filter { $0.key == input.key }
+    expect(matching.count).toEqual(1)
+    expect(matching.first?.comment).toEqual("updated comment")
+  }
+
+  func testCreateDuplicateKeyWithFutureExpirationDeduplicates() async throws {
+    var (input, admin) = try await prepare()
+    input.expiration = Date(addingDays: 5)
+    _ = try await SaveKey.resolve(with: input, in: admin.context)
+
+    var dupeInput = input
+    dupeInput.id = .init()
+    dupeInput.comment = "second try"
+    dupeInput.expiration = nil
+    let output = try await SaveKey.resolve(with: dupeInput, in: admin.context)
+    expect(output).toEqual(.success)
+
+    let keys = try await admin.keychain.keys(in: self.db)
+    let matching = keys.filter { $0.key == input.key }
+    expect(matching.count).toEqual(1)
+    expect(matching.first?.comment).toEqual("second try")
+    expect(matching.first?.deletedAt).toBeNil()
+  }
+
+  func testEditKeyToDuplicateMergesAndDeletes() async throws {
+    let (input, admin) = try await prepare()
+    _ = try await SaveKey.resolve(with: input, in: admin.context)
+    let secondKey = try await self.db.create(Key(
+      keychainId: admin.keychain.id,
+      key: .domain(domain: "other.com", scope: .unrestricted),
+    ))
+
+    var editInput = input
+    editInput.isNew = false
+    editInput.id = secondKey.id
+    editInput.key = input.key
+    editInput.comment = "merged comment"
+
+    let output = try await SaveKey.resolve(with: editInput, in: admin.context)
+    expect(output).toEqual(.success)
+
+    let keys = try await admin.keychain.keys(in: self.db)
+    let matching = keys.filter { $0.key == input.key }
+    expect(matching.count).toEqual(1)
+    expect(matching.first?.comment).toEqual("merged comment")
+    let others = keys.filter { $0.key == secondKey.key }
+    expect(others.count).toEqual(0)
+  }
+
+  func testEditKeyToDuplicateClearsComment() async throws {
+    let (input, admin) = try await prepare()
+    _ = try await SaveKey.resolve(with: input, in: admin.context)
+    let secondKey = try await self.db.create(Key(
+      keychainId: admin.keychain.id,
+      key: .domain(domain: "other.com", scope: .unrestricted),
+    ))
+
+    var editInput = input
+    editInput.isNew = false
+    editInput.id = secondKey.id
+    editInput.key = input.key
+    editInput.comment = nil
+
+    let output = try await SaveKey.resolve(with: editInput, in: admin.context)
+    expect(output).toEqual(.success)
+
+    let keys = try await admin.keychain.keys(in: self.db)
+    let matching = keys.filter { $0.key == input.key }
+    expect(matching.count).toEqual(1)
+    expect(matching.first?.comment).toBeNil()
+  }
+
   func testUpdateKeyRecordWithExpiration() async throws {
     var (input, admin) = try await prepare()
     let key = try await self.db.create(Key(keychainId: admin.keychain.id, key: .mock))
