@@ -34,5 +34,3 @@ the management surface for the main apps rather than a separate standalone produ
 - [Mac app](./mac-app.md)
 - [iOS app](./ios-app.md)
 - [Gertrude AM](./gertrude-am.md)
-- [Dashboard](./dashboard.md)
-- [Support context](./support-context.md)
