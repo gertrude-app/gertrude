@@ -76,6 +76,10 @@ extension KeychainClient: DependencyKey {
   }
 }
 
+extension KeychainClient: TestDependencyKey {
+  public static let testValue = KeychainClient()
+}
+
 public extension DependencyValues {
   var keychain: KeychainClient {
     get { self[KeychainClient.self] }

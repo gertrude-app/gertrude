@@ -21,6 +21,7 @@ final class IOSReducerTests: XCTestCase {
     let defaultBlocksInvocations = LockIsolated(0)
     let fetchBlockRulesInvocations = LockIsolated(0)
     let storedDates = LockIsolated<[Date]>([])
+    let storedProtectionMode = LockIsolated<ProtectionMode?>(nil)
     let savedProtectionModes = LockIsolated<[ProtectionMode]>([])
     let savedDisabledBlockGroups = LockIsolated<[[UUID]]>([])
     let savedAllBlockGroups = LockIsolated<[[GetBlockGroups.BlockGroupInfo]]>([])
@@ -72,11 +73,12 @@ final class IOSReducerTests: XCTestCase {
         batteryCheckInvocations.withValue { $0 += 1 }
         return .level(0.2)
       }
+      $0.sharedStorage.migrateLegacyData = { @Sendable in false }
       $0.sharedStorage.loadPendingSupervisionCode = { @Sendable in nil }
       $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
       $0.sharedStorage.loadAccountConnection = { @Sendable in nil }
+      $0.sharedStorage.loadProtectionMode = { @Sendable in storedProtectionMode.value }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in nil }
-      $0.sharedStorage.loadPendingSupervisionCode = { @Sendable in nil }
       $0.sharedStorage.loadAllBlockGroups = { @Sendable in nil }
       $0.sharedStorage.saveAllBlockGroups = { @Sendable value in
         savedAllBlockGroups.withValue { $0.append(value) }
@@ -85,6 +87,7 @@ final class IOSReducerTests: XCTestCase {
         storedDates.withValue { $0.append(value) }
       }
       $0.sharedStorage.saveProtectionMode = { @Sendable value in
+        storedProtectionMode.setValue(value)
         savedProtectionModes.withValue { $0.append(value) }
       }
       $0.device.clearCache = { _ in
@@ -198,7 +201,7 @@ final class IOSReducerTests: XCTestCase {
     await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
 
     await store.receive(.programmatic(.installSucceeded)) {
-      $0.screen = .onboarding(.happyPath(.optOutBlockGroups))
+      $0.screen = .onboarding(.happyPath(.offerAccountConnect))
     }
 
     expect(savedProtectionModes.value.count).toEqual(1)
@@ -209,6 +212,10 @@ final class IOSReducerTests: XCTestCase {
       "[onboarding] authorization succeeded",
       "[onboarding] filter install success",
     ])
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.happyPath(.optOutBlockGroups))
+    }
 
     await store.send(.interactive(.blockGroupToggled(id1))) {
       $0.disabledBlockGroupIds = [id1]
@@ -336,6 +343,7 @@ final class IOSReducerTests: XCTestCase {
         return [.urlContains(value: "GIFs")]
       }
       $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
+      $0.api.connectAccountFeatureFlag = { @Sendable in .init(isEnabled: true) }
       $0.sharedStorage = .liveValue
       $0.sharedStorage.saveFirstLaunchDate(.reference)
       $0.systemExtension.filterRunning = { true } // <-- filter running
@@ -349,6 +357,10 @@ final class IOSReducerTests: XCTestCase {
 
     await store.receive(.programmatic(.setScreen(.running(state: .notConnected)))) {
       $0.screen = .running(state: .notConnected)
+    }
+
+    await store.receive(.programmatic(.receivedConnectAccountFeatureFlag(.init(isEnabled: true)))) {
+      $0.onboarding.connectFeature = .init(isEnabled: true)
     }
 
     // they get opted out of new apple music group, as an upgrader
@@ -388,6 +400,7 @@ final class IOSReducerTests: XCTestCase {
       $0.device.deleteCacheFillDir = {}
       $0.api.logEvent = { @Sendable _, _ in }
       $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
+      $0.api.connectAccountFeatureFlag = { @Sendable in .init(isEnabled: true) }
       $0.sharedStorage = .liveValue
       $0.sharedStorage.saveFirstLaunchDate(.reference)
       $0.systemExtension.filterRunning = { true }
@@ -401,6 +414,10 @@ final class IOSReducerTests: XCTestCase {
 
     await store.receive(.programmatic(.setScreen(.running(state: .notConnected)))) {
       $0.screen = .running(state: .notConnected)
+    }
+
+    await store.receive(.programmatic(.receivedConnectAccountFeatureFlag(.init(isEnabled: true)))) {
+      $0.onboarding.connectFeature = .init(isEnabled: true)
     }
 
     await store.receive(.programmatic(.receivedDisabledBlockGroupIds([
@@ -449,6 +466,10 @@ final class IOSReducerTests: XCTestCase {
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in nil }
       $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
       $0.sharedStorage.loadAccountConnection = { @Sendable in nil }
+      $0.sharedStorage.loadAllBlockGroups = { @Sendable in nil }
+      $0.sharedStorage.loadPendingSupervisionCode = { @Sendable in nil }
+      $0.sharedStorage.migrateLegacyData = { @Sendable in false }
+      $0.sharedStorage.saveFirstLaunchDate = { @Sendable _ in }
       $0.sharedStorage.saveProtectionMode = { @Sendable value in
         savedProtectionModes.withValue { $0.append(value) }
       }
@@ -570,9 +591,14 @@ final class IOSReducerTests: XCTestCase {
       $0.sharedStorage.loadProtectionMode = { @Sendable in
         .normal([.urlContains(value: "bad")])
       }
+      $0.sharedStorage.loadAccountConnection = { @Sendable in nil }
+      $0.sharedStorage.loadAllBlockGroups = { @Sendable in nil }
       $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in [] }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
+      $0.sharedStorage.loadPendingSupervisionCode = { @Sendable in nil }
+      $0.sharedStorage.migrateLegacyData = { @Sendable in false }
       $0.systemExtension.filterRunning = { true }
+      $0.api.connectAccountFeatureFlag = { @Sendable in .init(isEnabled: true) }
     }
 
     await store.send(.programmatic(.appDidLaunch))
@@ -581,6 +607,9 @@ final class IOSReducerTests: XCTestCase {
     }
     await store.receive(.programmatic(.setScreen(.running(state: .notConnected)))) {
       $0.screen = .running(state: .notConnected)
+    }
+    await store.receive(.programmatic(.receivedConnectAccountFeatureFlag(.init(isEnabled: true)))) {
+      $0.onboarding.connectFeature = .init(isEnabled: true)
     }
     await store.receive(.programmatic(.receivedDisabledBlockGroupIds([])))
     await store.send(.programmatic(.appWillTerminate))
@@ -601,11 +630,16 @@ final class IOSReducerTests: XCTestCase {
       $0.systemExtension.filterRunning = { true }
       $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
       // but no sign of onboarding...
+      $0.sharedStorage.loadFirstLaunchDate = { @Sendable in nil }
       $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
       $0.sharedStorage.loadAccountConnection = { @Sendable in nil }
       $0.sharedStorage.loadAllBlockGroups = { @Sendable in [
         .init(id: groupId, name: "", shortDescription: "", longDescription: ""),
       ] }
+      $0.sharedStorage.loadPendingSupervisionCode = { @Sendable in nil }
+      $0.sharedStorage.migrateLegacyData = { @Sendable in false }
+      $0.sharedStorage.saveFirstLaunchDate = { @Sendable _ in }
+      $0.sharedStorage.saveProtectionMode = { @Sendable _ in }
     }
 
     await store.send(.programmatic(.appDidLaunch))
@@ -627,9 +661,8 @@ final class IOSReducerTests: XCTestCase {
       $0.allBlockGroups = [.init(id: groupId, name: "", shortDescription: "", longDescription: "")]
     }
 
-    // primary button goes to opt out groups
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.happyPath(.optOutBlockGroups))
+      $0.screen = .onboarding(.happyPath(.offerAccountConnect))
       $0.onboarding.deviceSupervised = true
     }
 
@@ -664,10 +697,10 @@ final class IOSReducerTests: XCTestCase {
     await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
 
     await store.receive(.programmatic(.installSucceeded)) {
-      $0.screen = .onboarding(.happyPath(.promptClearCache))
+      $0.screen = .onboarding(.happyPath(.offerAccountConnect))
     }
 
-    expect(savedDisabledGroups.value).toEqual([[], []]) // empty saved twice (both safeguards)
+    expect(savedDisabledGroups.value).toEqual([[]])
   }
 
   @MainActor

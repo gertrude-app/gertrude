@@ -151,6 +151,7 @@ final class IOSReducerTestsMajor: XCTestCase {
       IOSReducer()
     } withDependencies: {
       $0.sharedStorage.loadPendingSupervisionCode = { nil }
+      $0.sharedStorage.savePendingSupervisionCode = { _ in }
       $0.api.createSupervisionClaimCode = { .init(code: 123_123, expiresAt: .reference) }
     }
 

@@ -8,14 +8,13 @@ import Testing
 
 @MainActor
 @Test func allMigrations() async throws {
-  // NB: run from one test to prevent thread contention of group suite
   try await withDependencies {
     $0.api.logEvent = { _, _ in }
     $0.api.fetchDefaultBlockRules = { _ in [.targetContains(value: "def.com")] }
     $0.device.deviceId = { UUID() }
   } operation: {
     try await `block group enum strings migrate to UUIDs`()
-    try await `block group migration writes empty array on fresh install`()
+    try await `fresh install migration does not write block group ids`()
     try await `block group migration is idempotent`()
     try await test_v1_3_to_v15_migration()
     try await test_v1_0_to_v15_migration()
@@ -42,14 +41,12 @@ func `block group enum strings migrate to UUIDs`() async throws {
   ])
 }
 
-func `block group migration writes empty array on fresh install`() async throws {
+func `fresh install migration does not write block group ids`() async throws {
   let userDefaults = getUserDefaults()
 
   _ = await migrateLegacyStorage()
 
-  let v2Data = try #require(userDefaults.data(forKey: "v1.8.0--disabled-block-group-ids"))
-  let uuids = try JSONDecoder().decode([UUID].self, from: v2Data)
-  #expect(uuids == [])
+  #expect(userDefaults.data(forKey: "v1.8.0--disabled-block-group-ids") == nil)
 }
 
 func `block group migration is idempotent`() async throws {

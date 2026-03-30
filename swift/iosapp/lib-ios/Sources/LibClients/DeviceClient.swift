@@ -1,46 +1,30 @@
 import Combine
 import Dependencies
+import DependenciesMacros
 import Foundation
 
 #if os(iOS)
   import UIKit
 #endif
 
+@DependencyClient
 public struct DeviceClient: Sendable {
-  @MainActor public var type: @Sendable () async -> DeviceType
-  @MainActor public var iOSVersion: @Sendable () async -> String
-  @MainActor public var deviceId: @Sendable () async -> UUID?
-  public var modelIdentifier: @Sendable () -> String
-  public var installedVersion: @Sendable () -> String
-  @MainActor public var data: @Sendable () async -> Data
-  @MainActor public var batteryLevel: @Sendable () async -> BatteryLevel
-  public var clearCache: @Sendable (Int?) -> AnyPublisher<ClearCacheUpdate, Never>
-  public var deleteCacheFillDir: @Sendable () async -> Void
-  public var availableDiskSpaceInBytes: @Sendable () -> Int?
-
-  public init(
-    type: @Sendable @escaping () async -> DeviceType,
-    iOSVersion: @Sendable @escaping () async -> String,
-    deviceId: @Sendable @escaping () async -> UUID?,
-    modelIdentifier: @Sendable @escaping () -> String,
-    installedVersion: @Sendable @escaping () -> String,
-    data: @Sendable @escaping () async -> Data,
-    batteryLevel: @Sendable @escaping () async -> BatteryLevel,
-    clearCache: @Sendable @escaping (Int?) -> AnyPublisher<ClearCacheUpdate, Never>,
-    deleteCacheFillDir: @Sendable @escaping () async -> Void,
-    availableDiskSpaceInBytes: @Sendable @escaping () -> Int?,
-  ) {
-    self.type = type
-    self.iOSVersion = iOSVersion
-    self.deviceId = deviceId
-    self.modelIdentifier = modelIdentifier
-    self.installedVersion = installedVersion
-    self.data = data
-    self.batteryLevel = batteryLevel
-    self.clearCache = clearCache
-    self.deleteCacheFillDir = deleteCacheFillDir
-    self.availableDiskSpaceInBytes = availableDiskSpaceInBytes
+  public var type: @MainActor @Sendable () async -> DeviceType = { .iPhone }
+  public var iOSVersion: @MainActor @Sendable () async -> String = { "18.0.1" }
+  public var deviceId: @MainActor @Sendable () async -> UUID? = { nil }
+  public var modelIdentifier: @Sendable () -> String = { "iPhone15,2" }
+  public var installedVersion: @Sendable () -> String = { "0.0.0" }
+  public var data: @MainActor @Sendable () async -> Data = {
+    .init(type: .iPhone, iOSVersion: "18.0.1", deviceId: nil, modelIdentifier: "iPhone15,2")
   }
+
+  public var batteryLevel: @MainActor @Sendable () async -> BatteryLevel = { .unknown }
+  public var clearCache: @Sendable (Int?) -> AnyPublisher<ClearCacheUpdate, Never> = { _ in
+    AnyPublisher(Empty())
+  }
+
+  public var deleteCacheFillDir: @Sendable () async -> Void = {}
+  public var availableDiskSpaceInBytes: @Sendable () -> Int? = { nil }
 }
 
 public extension DeviceClient {
@@ -138,6 +122,10 @@ extension DeviceClient: DependencyKey {
       availableDiskSpaceInBytes: { 1_000_000_000 },
     )
   #endif
+}
+
+extension DeviceClient: TestDependencyKey {
+  public static let testValue = DeviceClient()
 }
 
 #if DEBUG
