@@ -78,6 +78,10 @@ extension SharedStorageClient: DependencyKey {
   }
 }
 
+extension SharedStorageClient: TestDependencyKey {
+  public static let testValue = SharedStorageClient()
+}
+
 public extension SharedStorageClient {
   func saveDebugLog(_ log: String) {
     var logs = self.loadDebugLogs() ?? []
@@ -96,19 +100,23 @@ extension SharedStorageReaderClient: DependencyKey {
   )
 }
 
+extension SharedStorageReaderClient: TestDependencyKey {
+  public static let testValue = SharedStorageReaderClient()
+}
+
 func migrateLegacyStorage() async -> Bool {
   if UserDefaults.gertrude.data(forKey: Key.disabledBlockGroupIds.rawValue) == nil {
     let legacyGroups: [BlockGroup]? = loadCodable(forKey: .disabledBlockGroups)
-    var uuids = (legacyGroups ?? []).map(\.legacyUUID)
     let isUpgrader = legacyGroups != nil
       || UserDefaults.gertrude.data(forKey: Key.legacyV1StorageKey.rawValue) != nil
     if isUpgrader {
+      var uuids = (legacyGroups ?? []).map(\.legacyUUID)
       // don't auto opt-in upgraders to new Apple Music group released March 2026
       uuids.append(UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!)
+      saveCodable(uuids, forKey: .disabledBlockGroupIds)
+      @Dependency(\.api) var api
+      await api.logEvent(id: "04376893", detail: "migrated block groups to UUIDs")
     }
-    saveCodable(uuids, forKey: .disabledBlockGroupIds)
-    @Dependency(\.api) var api
-    await api.logEvent(id: "04376893", detail: "migrated block groups to UUIDs")
   }
 
   if UserDefaults.gertrude.data(forKey: Key.protectionMode.rawValue) != nil {

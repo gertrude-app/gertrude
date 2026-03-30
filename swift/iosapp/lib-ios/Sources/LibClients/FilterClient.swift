@@ -39,6 +39,10 @@ extension FilterClient: DependencyKey {
   }
 }
 
+extension FilterClient: TestDependencyKey {
+  public static let testValue = FilterClient()
+}
+
 func fireAndForget(url: URL) async {
   var request = URLRequest(url: url)
   request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData

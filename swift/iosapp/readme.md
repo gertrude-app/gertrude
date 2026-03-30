@@ -11,6 +11,9 @@ LOCAL_API_URL = https:/$()/REPLACE.ngrok-free.app
 
 ## Release notes
 
+- `1.8.1` (3/30/26)
+  - fix fresh install migration writing block group ids, preventing acct connect
+  - make connect-account offer unconditional, fetch flag on every launch
 - `1.8.0` (submitted 3/24/26)
   - drive block groups from api/db
   - close subscription required loophole

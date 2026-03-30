@@ -729,12 +729,8 @@ public struct IOSReducer {
     case (.supervisionSuccessFirstLaunch, .primary):
       self.deps.log(state.screen, action, "aa563df6")
       state.onboarding.deviceSupervised = true
-      if state.onboarding.connectFeature.isEnabled {
-        state.screen = .onboarding(.happyPath(.offerAccountConnect))
-        return .none
-      } else {
-        return self.transitionToOptOutOrSkip(state: &state)
-      }
+      state.screen = .onboarding(.happyPath(.offerAccountConnect))
+      return .none
 
     default:
       #if DEBUG
@@ -771,9 +767,6 @@ public struct IOSReducer {
           case .onboardingNeeded:
             deps.log("onboarding needed on launch", "7a539f70")
             await send(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere)))))
-            if let featureFlag = try? await deps.api.connectAccountFeatureFlag() {
-              await send(.programmatic(.receivedConnectAccountFeatureFlag(featureFlag)))
-            }
 
           case .gertrudeSupervisionReboot(.codeNotClaimed(let code)):
             deps.log("supervision reboot code not claimed", "e9b86e6b")
@@ -810,9 +803,6 @@ public struct IOSReducer {
           case .configuratorSupervisionFirstLaunch:
             deps.log("configurator supervision success first launch", "bad8adcc")
             await send(.programmatic(.setScreen(.supervisionSuccessFirstLaunch)))
-            if let featureFlag = try? await deps.api.connectAccountFeatureFlag() {
-              await send(.programmatic(.receivedConnectAccountFeatureFlag(featureFlag)))
-            }
 
           case .profileRemovedRecovery(let conn):
             deps.log("profile removed recovery for supervised user", "4f22bd20")
@@ -832,6 +822,9 @@ public struct IOSReducer {
             await send(.programmatic(
               .setScreen(.onboarding(.supervision(.resume(.networkError)))),
             ))
+          }
+          if let featureFlag = try? await deps.api.connectAccountFeatureFlag() {
+            await send(.programmatic(.receivedConnectAccountFeatureFlag(featureFlag)))
           }
           if let ids = deps.sharedStorage.loadDisabledBlockGroupIds() {
             await send(.programmatic(.receivedDisabledBlockGroupIds(ids)))
@@ -941,18 +934,9 @@ public struct IOSReducer {
       } else {
         self.deps.unexpected(state.screen, action, "c98b9525")
       }
-      if state.onboarding.connectFeature.isEnabled {
-        state.screen = .onboarding(.happyPath(.offerAccountConnect))
-        return .run { [deps = self.deps] _ in
-          deps.sharedStorage.saveDisabledBlockGroupIds([])
-        }
-      } else {
-        return .merge(
-          .run { [deps = self.deps] _ in
-            deps.sharedStorage.saveDisabledBlockGroupIds([])
-          },
-          self.transitionToOptOutOrSkip(state: &state),
-        )
+      state.screen = .onboarding(.happyPath(.offerAccountConnect))
+      return .run { [deps = self.deps] _ in
+        deps.sharedStorage.saveDisabledBlockGroupIds([])
       }
 
     case .installFailed(let err):
