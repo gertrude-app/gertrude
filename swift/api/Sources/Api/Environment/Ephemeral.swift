@@ -45,6 +45,7 @@ actor Ephemeral {
     var pendingAppConnections: [Int: ChildId] = [:]
     var pendingMethods: [Parent.NotificationMethod.Id: PendingMethod] = [:]
     var superAdminEmails: [UUID: SuperAdminEmail] = [:]
+    var latestIOSAppStoreVersion: String?
   }
 
   private var storage = Storage()
@@ -187,6 +188,15 @@ actor Ephemeral {
       return nil
     }
     return stored.email
+  }
+
+  func getLatestIOSAppStoreVersion() -> String? {
+    self.storage.latestIOSAppStoreVersion
+  }
+
+  func setLatestIOSAppStoreVersion(_ version: String?) {
+    defer { Task { await self.persistStorage() } }
+    self.storage.latestIOSAppStoreVersion = version
   }
 }
 
