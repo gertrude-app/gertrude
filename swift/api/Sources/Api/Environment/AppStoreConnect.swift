@@ -10,6 +10,7 @@ import XHttp
 struct AppStoreConnectClient: Sendable {
   var fetchReviews: @Sendable (_ app: AppStore.GertrudeApp) async throws -> [CustomerReview]
   var fetchRatings: @Sendable (_ app: AppStore.GertrudeApp) async throws -> ITunesRatings
+  var fetchAppStoreVersion: @Sendable (_ app: AppStore.GertrudeApp) async throws -> String
 }
 
 struct CustomerReview: Codable, Sendable {
@@ -36,6 +37,9 @@ extension AppStoreConnectClient: DependencyKey {
       },
       fetchRatings: { app in
         try await fetchITunesRatings(appId: app.appleId)
+      },
+      fetchAppStoreVersion: { app in
+        try await fetchITunesVersion(appId: app.appleId)
       },
     )
   }
@@ -144,6 +148,15 @@ private func fetchITunesRatings(appId: String) async throws -> ITunesRatings {
   )
 }
 
+private func fetchITunesVersion(appId: String) async throws -> String {
+  let url = "https://itunes.apple.com/lookup?id=\(appId)"
+  let response = try await HTTP.get(url, decoding: ITunesLookupResponse.self)
+  guard let result = response.results.first else {
+    throw AppStoreConnectError.noResults
+  }
+  return result.version
+}
+
 private struct ITunesLookupResponse: Codable {
   var resultCount: Int
   var results: [Result]
@@ -151,6 +164,7 @@ private struct ITunesLookupResponse: Codable {
   struct Result: Codable {
     var averageUserRating: Double
     var userRatingCount: Int
+    var version: String
   }
 }
 
@@ -165,6 +179,10 @@ extension AppStoreConnectClient: TestDependencyKey {
       fetchRatings: unimplemented(
         "AppStoreConnectClient.fetchRatings()",
         placeholder: ITunesRatings(averageUserRating: 0, userRatingCount: 0),
+      ),
+      fetchAppStoreVersion: unimplemented(
+        "AppStoreConnectClient.fetchAppStoreVersion()",
+        placeholder: "",
       ),
     )
   }
