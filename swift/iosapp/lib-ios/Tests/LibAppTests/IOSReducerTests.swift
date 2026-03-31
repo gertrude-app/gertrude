@@ -213,7 +213,7 @@ final class IOSReducerTests: XCTestCase {
       "[onboarding] filter install success",
     ])
 
-    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
       $0.screen = .onboarding(.happyPath(.optOutBlockGroups))
     }
 
@@ -322,6 +322,14 @@ final class IOSReducerTests: XCTestCase {
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.destination = .connectAccount(.init())
+    }
+
+    await store.send(.destination(.dismiss)) {
+      $0.destination = nil
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
       $0.screen = .onboarding(.happyPath(.optOutBlockGroups))
     }
   }
