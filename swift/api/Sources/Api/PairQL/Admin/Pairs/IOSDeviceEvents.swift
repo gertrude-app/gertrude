@@ -216,8 +216,8 @@ extension IOSDeviceEvents: Resolver {
     case "498796d3": "✗ Supervision code generation failed"
     // --- Supervision Resume / Profile Install Flow ---
     case "ad87c533": #"Code Not Claimed → "Continue""#
-    case "f2729c3c": #"Claimed Not Supervised → "Install profile""#
-    case "36d7be7c": #"Claimed Not Supervised → "Retry supervision""#
+    case "f2729c3c": #"Claimed Not Supervised → "Retry supervision""#
+    case "36d7be7c": #"Claimed Not Supervised → "Retry" (deprecated, self-report)"#
     case "d664b520": #"Retry Supervision → "Continue""#
     case "00b0c478": "⚠ Unreachable: missing supervision code"
     case "4693f615": #"Profile Removed Recovery → "Install""#

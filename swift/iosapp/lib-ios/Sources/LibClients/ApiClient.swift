@@ -33,8 +33,6 @@ public struct ApiClient: Sendable {
     async throws -> CreateSupervisionClaimCode.Output
   public var checkSupervisionFlowStatus: @Sendable (_ code: Int)
     async throws -> CheckSupervisionFlowStatus.Output
-  public var selfReportSupervision: @Sendable (_ isSupervised: Bool)
-    async throws -> Void
   public var markSupervisionProfileInstalled: @Sendable ()
     async throws -> Void
 }
@@ -177,12 +175,6 @@ extension ApiClient: DependencyKey {
             vendorId: deviceId,
             code: code,
           )),
-        )
-      },
-      selfReportSupervision: { isSupervised in
-        _ = try await output(
-          from: SelfReportSupervision.self,
-          with: .selfReportSupervision(.init(isSupervised: isSupervised)),
         )
       },
       markSupervisionProfileInstalled: {

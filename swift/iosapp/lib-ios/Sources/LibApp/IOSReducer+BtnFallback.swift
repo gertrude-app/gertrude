@@ -181,9 +181,7 @@ extension IOSReducer.Onboarding.Supervision.Resume {
     switch (self, btn) {
     case (.codeNotClaimed(let code), _):
       .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
-    case (.codeClaimedNotSupervised(_), .primary):
-      .onboarding(.supervision(.resume(.promptInstallProfile)))
-    case (.codeClaimedNotSupervised(_), _):
+    case (.codeClaimedNotSupervised, _):
       .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
     case (.retrySupervision, _):
       .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
@@ -212,7 +210,7 @@ extension IOSReducer.Onboarding.Supervision.Resume {
     case (.networkError, _):
       .onboarding(.supervision(.resume(.networkError)))
     case (.requiresSubscription, _):
-      .onboarding(.supervision(.resume(.codeClaimedNotSupervised())))
+      .onboarding(.supervision(.resume(.codeClaimedNotSupervised)))
     }
   }
 }
