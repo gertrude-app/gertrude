@@ -131,9 +131,9 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.onboarding.firstLaunch = .distantPast
     }
     await store.receive(.programmatic(
-      .setScreen(.onboarding(.supervision(.resume(.codeClaimedNotSupervised())))),
+      .setScreen(.onboarding(.supervision(.resume(.codeClaimedNotSupervised)))),
     )) {
-      $0.screen = .onboarding(.supervision(.resume(.codeClaimedNotSupervised())))
+      $0.screen = .onboarding(.supervision(.resume(.codeClaimedNotSupervised)))
     }
     await store.receive(.programmatic(.receivedConnectAccountFeatureFlag(.init(isEnabled: true)))) {
       $0.onboarding.connectFeature = .init(isEnabled: true)

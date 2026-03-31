@@ -18,95 +18,34 @@ final class IOSReducerTestsResume: XCTestCase {
   }
 
   @MainActor
-  func testClaimedNotSupervised_yesSupervised_reportsAndPromptsProfile() async throws {
-    let reported = LockIsolated(false)
+  func testClaimedNotSupervised_withCode_goesToInstructions() async throws {
     let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.resume(.codeClaimedNotSupervised()))),
+      screen: .onboarding(.supervision(.resume(.codeClaimedNotSupervised))),
     )) {
       IOSReducer()
     } withDependencies: {
-      $0.api.selfReportSupervision = { @Sendable isSupervised in
-        expect(isSupervised).toEqual(true)
-        reported.setValue(true)
+      $0.sharedStorage.loadPendingSupervisionCode = {
+        .init(code: 456, expiresAt: .reference)
       }
     }
 
-    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
-    await store
-      .receive(
-        .programmatic(.setScreen(.onboarding(.supervision(.resume(.promptInstallProfile))))),
-      ) {
-        $0.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
-      }
-    expect(reported.value).toEqual(true)
-  }
-
-  @MainActor
-  func testClaimedNotSupervised_yesSupervised_requiresSubscriptionOn402() async throws {
-    let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.resume(.codeClaimedNotSupervised()))),
-    )) {
-      IOSReducer()
-    } withDependencies: {
-      $0.api.selfReportSupervision = { @Sendable _ in
-        throw PqlError(id: "test", requestId: "test", type: .paymentRequired, debugMessage: "test")
-      }
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
-    await store
-      .receive(
-        .programmatic(.setScreen(.onboarding(.supervision(.resume(.requiresSubscription))))),
-      ) {
-        $0.screen = .onboarding(.supervision(.resume(.requiresSubscription)))
-      }
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.resume(.codeClaimedNotSupervised())))
+      $0.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: 456))))
     }
   }
 
   @MainActor
-  func testClaimedNotSupervised_doesNotRequireSubscriptionOnOtherErrors() async throws {
+  func testClaimedNotSupervised_noCode_fallsBackToExplain() async throws {
     let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.resume(.codeClaimedNotSupervised()))),
+      screen: .onboarding(.supervision(.resume(.codeClaimedNotSupervised))),
     )) {
       IOSReducer()
     } withDependencies: {
-      $0.api.selfReportSupervision = { @Sendable _ in
-        throw URLError(.notConnectedToInternet)
-      }
+      $0.sharedStorage.loadPendingSupervisionCode = { nil }
     }
 
-    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
-  }
-
-  @MainActor
-  func testClaimedNotSupervised_notSupervised_reportsAndRetries() async throws {
-    let reported = LockIsolated(false)
-    let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.resume(.codeClaimedNotSupervised()))),
-    )) {
-      IOSReducer()
-    } withDependencies: {
-      $0.api.selfReportSupervision = { @Sendable isSupervised in
-        expect(isSupervised).toEqual(false)
-        reported.setValue(true)
-      }
-    }
-
-    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
-      $0.screen = .onboarding(.supervision(.resume(.retrySupervision)))
-    }
-    expect(reported.value).toEqual(true)
-  }
-
-  @MainActor
-  func testClaimedNotSupervised_foreground_setsRegainedFocus() async throws {
-    let store = store(
-      starting: .onboarding(.supervision(.resume(.codeClaimedNotSupervised()))),
-    )
-    await store.send(.programmatic(.appDidEnterForeground)) {
-      $0.screen = .onboarding(.supervision(.resume(.codeClaimedNotSupervised(regainedFocus: true))))
+    await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
     }
   }
 

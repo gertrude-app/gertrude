@@ -522,29 +522,15 @@ public struct IOSReducer {
       state.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
       return .none
 
-    case (.onboarding(.supervision(.resume(.codeClaimedNotSupervised(_)))), .primary):
+    case (.onboarding(.supervision(.resume(.codeClaimedNotSupervised))), .primary):
       self.deps.log(state.screen, action, "f2729c3c")
-      return .run { [deps = self.deps] send in
-        do {
-          try await deps.api.selfReportSupervision(isSupervised: true)
-          await send(
-            .programmatic(.setScreen(.onboarding(.supervision(.resume(.promptInstallProfile))))),
-          )
-        } catch let error as PqlError where error.type == .paymentRequired {
-          await send(
-            .programmatic(.setScreen(.onboarding(.supervision(.resume(.requiresSubscription))))),
-          )
-        } catch {
-          deps.log("selfReportSupervision failed: \(error)", "2f135579")
-        }
+      if let code = self.deps.sharedStorage.loadPendingSupervisionCode()?.code {
+        state.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
+      } else {
+        self.deps.log(state.screen, action, "00b0c478", extra: "unreachable missing code")
+        state.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
       }
-
-    case (.onboarding(.supervision(.resume(.codeClaimedNotSupervised(_)))), .secondary):
-      self.deps.log(state.screen, action, "36d7be7c")
-      state.screen = .onboarding(.supervision(.resume(.retrySupervision)))
-      return .run { [deps = self.deps] _ in
-        try await deps.api.selfReportSupervision(isSupervised: false)
-      }
+      return .none
 
     case (.onboarding(.supervision(.resume(.retrySupervision))), .primary):
       self.deps.log(state.screen, action, "d664b520")
@@ -640,7 +626,7 @@ public struct IOSReducer {
 
     case (.onboarding(.supervision(.resume(.requiresSubscription))), .primary):
       self.deps.log(state.screen, action, "b5e8076e")
-      state.screen = .onboarding(.supervision(.resume(.codeClaimedNotSupervised())))
+      state.screen = .onboarding(.supervision(.resume(.codeClaimedNotSupervised)))
       return .none
 
     // MARK: - error paths
@@ -778,7 +764,7 @@ public struct IOSReducer {
             deps.log("supervision reboot code claimed not supervised", "80580cd5")
             await deps.receiveAccountConnection(conn)
             await send(.programmatic(
-              .setScreen(.onboarding(.supervision(.resume(.codeClaimedNotSupervised())))),
+              .setScreen(.onboarding(.supervision(.resume(.codeClaimedNotSupervised)))),
             ))
 
           case .gertrudeSupervisionReboot(.codeExpired), .gertrudeSupervisionReboot(.codeNotFound):
@@ -991,12 +977,6 @@ public struct IOSReducer {
     case .appDidEnterForeground
       where state.screen == .onboarding(.supervision(.resume(.explainProfileInstall()))):
       state.screen = .onboarding(.supervision(.resume(.explainProfileInstall(regainedFocus: true))))
-      return .none
-
-    case .appDidEnterForeground
-      where state.screen == .onboarding(.supervision(.resume(.codeClaimedNotSupervised()))):
-      state.screen =
-        .onboarding(.supervision(.resume(.codeClaimedNotSupervised(regainedFocus: true))))
       return .none
 
     case .appDidEnterForeground:

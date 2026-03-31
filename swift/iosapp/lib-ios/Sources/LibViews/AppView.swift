@@ -498,17 +498,11 @@ public struct AppView: View {
 
         // supervision resume
 
-        case .onboarding(.supervision(.resume(.codeClaimedNotSupervised(let regainedFocus)))):
+        case .onboarding(.supervision(.resume(.codeClaimedNotSupervised))):
           ButtonScreenView(
-            text: "Hmmm... We’re not sure if this \(self.deviceType) is supervised yet. Open the Settings app and check if it says at the top of the main screen that it’s supervised, then come back here.",
-            primary: self.btn(text: "Yes, it says supervised", .primary, disabled: !regainedFocus),
-            secondary: self.btn(
-              text: "No, I don’t see anything",
-              .secondary,
-              disabled: !regainedFocus,
-            ),
-            screenType: .question,
-            primaryLooksLikeSecondary: true,
+            text: "We haven’t been able to confirm that this \(self.deviceType) is supervised yet. Supervision is required for Gertrude to manage this device — there’s no way to skip this step. If you’re having trouble, please contact us for help.",
+            primary: self.btn(text: "Retry supervision", .primary),
+            secondary: .init(text: "Contact support", type: .link(.support), animate: false),
           )
 
         case .onboarding(.supervision(.resume(.retrySupervision))):
