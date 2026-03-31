@@ -121,14 +121,14 @@ public struct AppView: View {
             text: self.store.onboarding.connectFeature.offerScreenText ??
               "You can connect this device to a Gertrude parent account for more controls and features.",
             primary: self.btn(
-              text: self.store.onboarding.connectFeature.offerScreenSkipBtnText ?? "No thanks",
-              .primary,
-            ),
-            secondary: self.btn(
               text: self.store.onboarding.connectFeature.offerScreenConnectBtnText ??
                 "Connect to account",
-              .secondary,
+              .primary,
               animate: false,
+            ),
+            secondary: self.btn(
+              text: self.store.onboarding.connectFeature.offerScreenSkipBtnText ?? "No thanks",
+              .secondary,
             ),
             tertiary: self.btn(text: "Tell me more", .tertiary),
           )

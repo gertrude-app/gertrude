@@ -217,13 +217,13 @@ public struct IOSReducer {
       }
 
     case (.onboarding(.happyPath(.offerAccountConnect)), .primary):
-      self.deps.log(state.screen, action, "62b6a262")
-      return self.transitionToOptOutOrSkip(state: &state)
-
-    case (.onboarding(.happyPath(.offerAccountConnect)), .secondary):
       self.deps.log(state.screen, action, "b93bb543")
       state.destination = .connectAccount(.init())
       return .none
+
+    case (.onboarding(.happyPath(.offerAccountConnect)), .secondary):
+      self.deps.log(state.screen, action, "62b6a262")
+      return self.transitionToOptOutOrSkip(state: &state)
 
     case (.onboarding(.happyPath(.offerAccountConnect)), .tertiary):
       self.deps.log(state.screen, action, "f4986227")
