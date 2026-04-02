@@ -7,6 +7,9 @@ public struct ApiClient: Sendable {
   public var checkIn: @Sendable (CheckIn_v2.Input) async throws -> CheckIn_v2.Output
   public var clearUserToken: @Sendable () async -> Void
   public var connectUser: @Sendable (ConnectUser.Input) async throws -> UserData
+  public var createOnboardingAppKeys: @Sendable (CreateOnboardingAppKeys.Input) async throws -> Void
+  public var createOnboardingBlockedApps: @Sendable (CreateOnboardingBlockedApps.Input)
+    async throws -> Void
   public var createKeystrokeLines: @Sendable (CreateKeystrokeLines.Input) async throws -> Void
   public var createSuspendFilterRequest: @Sendable (CreateSuspendFilterRequest_v2.Input)
     async throws -> UUID
@@ -20,18 +23,22 @@ public struct ApiClient: Sendable {
   public var setAccountActive: @Sendable (Bool) async -> Void
   public var setUserToken: @Sendable (UUID) async -> Void
   public var trustedNetworkTimestamp: @Sendable () async throws -> Double
+  public var uploadAppIcon: @Sendable (UploadAppIcon.Input) async throws -> Void
   public var uploadScreenshot: @Sendable (UploadScreenshotData) async throws -> Void
 
   public init(
     checkIn: @escaping @Sendable (CheckIn_v2.Input) async throws -> CheckIn_v2.Output,
     clearUserToken: @escaping @Sendable () async -> Void,
     connectUser: @escaping @Sendable (ConnectUser.Input) async throws -> UserData,
+    createOnboardingAppKeys: @escaping @Sendable (CreateOnboardingAppKeys.Input)
+    async throws -> Void,
+    createOnboardingBlockedApps: @escaping @Sendable (CreateOnboardingBlockedApps.Input)
+    async throws -> Void,
     createKeystrokeLines: @escaping @Sendable (CreateKeystrokeLines.Input) async throws -> Void,
-    createSuspendFilterRequest: @escaping @Sendable (
-      CreateSuspendFilterRequest_v2.Input,
-    ) async throws -> UUID,
-    createUnlockRequests: @escaping @Sendable (CreateUnlockRequests_v3.Input) async throws
-      -> [UUID],
+    createSuspendFilterRequest: @escaping @Sendable (CreateSuspendFilterRequest_v2.Input)
+    async throws -> UUID,
+    createUnlockRequests: @escaping @Sendable (CreateUnlockRequests_v3.Input)
+    async throws -> [UUID],
     getUserToken: @escaping @Sendable () async throws -> UUID?,
     logFilterEvents: @escaping @Sendable (LogFilterEvents.Input) async -> Void,
     logInterestingEvent: @escaping @Sendable (LogInterestingEvent.Input) async -> Void,
@@ -41,11 +48,14 @@ public struct ApiClient: Sendable {
     setAccountActive: @escaping @Sendable (Bool) async -> Void,
     setUserToken: @escaping @Sendable (UUID) async -> Void,
     trustedNetworkTimestamp: @escaping @Sendable () async throws -> Double,
+    uploadAppIcon: @escaping @Sendable (UploadAppIcon.Input) async throws -> Void,
     uploadScreenshot: @escaping @Sendable (UploadScreenshotData) async throws -> Void,
   ) {
     self.checkIn = checkIn
     self.clearUserToken = clearUserToken
     self.connectUser = connectUser
+    self.createOnboardingAppKeys = createOnboardingAppKeys
+    self.createOnboardingBlockedApps = createOnboardingBlockedApps
     self.createKeystrokeLines = createKeystrokeLines
     self.createSuspendFilterRequest = createSuspendFilterRequest
     self.createUnlockRequests = createUnlockRequests
@@ -58,6 +68,7 @@ public struct ApiClient: Sendable {
     self.setAccountActive = setAccountActive
     self.setUserToken = setUserToken
     self.trustedNetworkTimestamp = trustedNetworkTimestamp
+    self.uploadAppIcon = uploadAppIcon
     self.uploadScreenshot = uploadScreenshot
   }
 }
@@ -100,6 +111,8 @@ extension ApiClient: TestDependencyKey {
     checkIn: unimplemented("ApiClient.checkIn"),
     clearUserToken: unimplemented("ApiClient.clearUserToken"),
     connectUser: unimplemented("ApiClient.connectUser"),
+    createOnboardingAppKeys: unimplemented("ApiClient.createOnboardingAppKeys"),
+    createOnboardingBlockedApps: unimplemented("ApiClient.createOnboardingBlockedApps"),
     createKeystrokeLines: unimplemented("ApiClient.createKeystrokeLines"),
     createSuspendFilterRequest: unimplemented("ApiClient.createSuspendFilterRequest"),
     createUnlockRequests: unimplemented("ApiClient.createUnlockRequests"),
@@ -112,6 +125,7 @@ extension ApiClient: TestDependencyKey {
     setAccountActive: unimplemented("ApiClient.setAccountActive"),
     setUserToken: unimplemented("ApiClient.setUserToken"),
     trustedNetworkTimestamp: unimplemented("ApiClient.trustedNetworkTimestamp"),
+    uploadAppIcon: unimplemented("ApiClient.uploadAppIcon"),
     uploadScreenshot: unimplemented("ApiClient.uploadScreenshot"),
   )
 
@@ -119,6 +133,8 @@ extension ApiClient: TestDependencyKey {
     checkIn: { _ in throw Error.unexpectedError(statusCode: 999) },
     clearUserToken: {},
     connectUser: { _ in throw Error.unexpectedError(statusCode: 888) },
+    createOnboardingAppKeys: { _ in },
+    createOnboardingBlockedApps: { _ in },
     createKeystrokeLines: { _ in },
     createSuspendFilterRequest: { _ in .init() },
     createUnlockRequests: { _ in [] },
@@ -131,6 +147,7 @@ extension ApiClient: TestDependencyKey {
     setAccountActive: { _ in },
     setUserToken: { _ in },
     trustedNetworkTimestamp: { 0.0 },
+    uploadAppIcon: { _ in },
     uploadScreenshot: { _ in },
   )
 }

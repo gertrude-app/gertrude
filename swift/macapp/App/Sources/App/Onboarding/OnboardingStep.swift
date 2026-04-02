@@ -50,6 +50,11 @@ extension OnboardingFeature.State {
     case installSysExt_failed
     case installSysExt_success
 
+    // app key selection
+    case appKeySelection_intro
+    case appKeySelection_blockApps
+    case appKeySelection_allowInternet
+
     // wrap up
     case exemptUsers
     case locateMenuBarIcon
@@ -115,7 +120,13 @@ extension OnboardingFeature.State.Step {
     case .installSysExt_failed:
       .installSysExt_success
     case .installSysExt_success:
-      .locateMenuBarIcon
+      .appKeySelection_intro
+    case .appKeySelection_intro:
+      .appKeySelection_blockApps
+    case .appKeySelection_blockApps:
+      .appKeySelection_allowInternet
+    case .appKeySelection_allowInternet:
+      .exemptUsers
     case .exemptUsers:
       .locateMenuBarIcon
     case .locateMenuBarIcon:
@@ -187,6 +198,12 @@ extension OnboardingFeature.State.Step {
       .installSysExt_explain
     case .installSysExt_success:
       .installSysExt_explain
+    case .appKeySelection_intro:
+      .installSysExt_success
+    case .appKeySelection_blockApps:
+      .appKeySelection_intro
+    case .appKeySelection_allowInternet:
+      .appKeySelection_blockApps
     case .exemptUsers:
       .installSysExt_explain
     case .locateMenuBarIcon:
@@ -238,8 +255,11 @@ extension OnboardingFeature.State.Step: Comparable {
     case .installSysExt_allow: 95
     case .installSysExt_failed: 100
     case .installSysExt_success: 105
-    case .exemptUsers: 108
-    case .locateMenuBarIcon: 110
+    case .appKeySelection_intro: 106
+    case .appKeySelection_blockApps: 107
+    case .appKeySelection_allowInternet: 108
+    case .exemptUsers: 110
+    case .locateMenuBarIcon: 112
     case .viewHealthCheck: 115
     case .encourageFilterSuspensions: 117
     case .screenTimeConflict: 118

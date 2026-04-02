@@ -165,6 +165,9 @@ function getProgressStep(currentStep: OnboardingStep): number {
     case `installSysExt_allow`:
     case `installSysExt_failed`:
     case `installSysExt_success`:
+    case `appKeySelection_intro`:
+    case `appKeySelection_blockApps`:
+    case `appKeySelection_allowInternet`:
     case `screenTimeConflict`:
     case `exemptUsers`:
     case `locateMenuBarIcon`:

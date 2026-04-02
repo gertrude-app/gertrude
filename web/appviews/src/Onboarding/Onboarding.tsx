@@ -23,6 +23,8 @@ export const Onboarding: React.FC<Props> = ({
   didResume,
   exemptableUserIds,
   exemptUserIds,
+  discoveredApps,
+  blockedBundleIds,
   osVersion,
   isUpgrade,
 }) => {
@@ -158,6 +160,26 @@ export const Onboarding: React.FC<Props> = ({
           step="installSysExt_success"
           component={<Step.InstallSysExt step="installSysExt_success" />}
           confetti
+        />
+        <OnboardingPage
+          step="appKeySelection_intro"
+          component={<Step.AppKeySelectionIntro />}
+        />
+        <OnboardingPage
+          step="appKeySelection_blockApps"
+          component={
+            <Step.BlockApps apps={discoveredApps} childName={currentUser?.name} />
+          }
+        />
+        <OnboardingPage
+          step="appKeySelection_allowInternet"
+          component={
+            <Step.AllowInternetApps
+              apps={discoveredApps.filter(
+                (app) => !blockedBundleIds.includes(app.bundleId),
+              )}
+            />
+          }
         />
         <OnboardingPage
           step="screenTimeConflict"

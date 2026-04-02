@@ -26,6 +26,8 @@ struct OnboardingFeature: Feature {
     var currentUser: MacUser?
     var connectChildRequest: PayloadRequestState<String, String> = .idle
     var users: [MacUser] = []
+    var discoveredApps: [DiscoveredApp] = []
+    var createAppKeysRequest: RequestState<String> = .idle
     var filterUsers: FilterUserTypes?
     var upgrade = false
   }
@@ -45,6 +47,8 @@ struct OnboardingFeature: Feature {
       case chooseSwitchToNonAdminUserClicked
       case chooseCreateNonAdminClicked
       case chooseDemoteAdminClicked
+      case blockedAppsSelected(bundleIds: [String])
+      case appKeysSelected(bundleIds: [String])
       case connectChildSubmitted(code: Int)
       case infoModalOpened(step: State.Step, detail: String?)
       case setUserExemption(userId: uid_t, enabled: Bool)
@@ -60,8 +64,11 @@ struct OnboardingFeature: Feature {
     case delegate(Delegate)
     case resume(Resume)
     case receivedDeviceData(currentUserId: uid_t, users: [MacOSUser])
+    case receivedDiscoveredApps([DiscoveredApp])
     case receivedFilterUsers(FilterUserTypes)
     case connectUser(TaskResult<UserData>)
+    case createOnboardingBlockedAppsCompleted(success: Bool)
+    case createOnboardingAppKeysCompleted(success: Bool)
     case setStep(State.Step)
     case sysExtInstallTimedOut
     case closeWindow
@@ -486,6 +493,8 @@ struct OnboardingFeature: Feature {
           switch installResult {
           case .installedSuccessfully:
             await send(.setStep(.installSysExt_success))
+            let apps = await self.device.discoverInstalledApps()
+            await send(.receivedDiscoveredApps(apps))
             // NB: the two xpc calls below also implicitly establish the XPC connection
             // so if they are ever removed, we should call requestAck() or similar here
             // NB: safeguard, make sure onboarding user not exempted
@@ -494,7 +503,7 @@ struct OnboardingFeature: Feature {
             case .success(let userTypes):
               await send(.receivedFilterUsers(userTypes))
             case .failure(let err):
-              log("failed to get user types: \(err)", "576f0178")
+              unexpectedError(id: "576f0178", detail: "failed to get user types: \(err)")
             }
           case .timedOutWaiting:
             await send(.sysExtInstallTimedOut)
@@ -559,9 +568,84 @@ struct OnboardingFeature: Feature {
         state.step = .installSysExt_explain
         return .none
 
-      case .webview(.primaryBtnClicked) where step == .installSysExt_success,
-           .webview(.secondaryBtnClicked) where step == .installSysExt_failed:
+      case .webview(.primaryBtnClicked) where step == .installSysExt_success:
         log(step, action, "78bded66")
+        if state.discoveredApps.isEmpty {
+          return .exec { send in
+            await self.finishOnboardingConfig(send)
+          }
+        }
+        state.step = .appKeySelection_intro
+        return .none
+
+      case .webview(.secondaryBtnClicked) where step == .installSysExt_failed:
+        log(step, action, "78bded66")
+        return .exec { send in
+          await self.finishOnboardingConfig(send)
+        }
+
+      case .receivedDiscoveredApps(let apps):
+        state.discoveredApps = apps
+        return .none
+
+      case .webview(.primaryBtnClicked) where step == .appKeySelection_intro:
+        log(step, action, "03fd4138")
+        state.step = .appKeySelection_blockApps
+        return .none
+
+      case .webview(.secondaryBtnClicked) where step == .appKeySelection_intro:
+        log(step, action, "f7edc060")
+        return .exec { send in
+          await self.finishOnboardingConfig(send)
+        }
+
+      case .webview(.blockedAppsSelected(let bundleIds)):
+        log("blocked apps selected: \(bundleIds.count) apps", "f472f337")
+        if bundleIds.isEmpty {
+          state.step = .appKeySelection_allowInternet
+          return .none
+        }
+        return .exec { send in
+          do {
+            try await self.api.createOnboardingBlockedApps(bundleIds)
+            await send(.createOnboardingBlockedAppsCompleted(success: true))
+          } catch {
+            unexpectedError(id: "5e3a5762", detail: "create onboarding blocked apps err: \(error)")
+            await send(.createOnboardingBlockedAppsCompleted(success: false))
+          }
+        }
+
+      case .createOnboardingBlockedAppsCompleted:
+        state.step = .appKeySelection_allowInternet
+        return .none
+
+      case .webview(.appKeysSelected(let bundleIds)):
+        log("app keys selected: \(bundleIds.count) apps", "b26dfa33")
+        if bundleIds.isEmpty {
+          return .exec { send in
+            await self.finishOnboardingConfig(send)
+          }
+        }
+        state.createAppKeysRequest = .ongoing
+        return .exec { send in
+          do {
+            try await self.api.createOnboardingAppKeys(bundleIds)
+            await send(.createOnboardingAppKeysCompleted(success: true))
+          } catch {
+            unexpectedError(id: "dfab97bd", detail: "create onboarding app keys err: \(error)")
+            await send(.createOnboardingAppKeysCompleted(success: false))
+          }
+        }
+
+      case .createOnboardingAppKeysCompleted(success: true):
+        log("onboarding app keys created successfully", "51248d15")
+        state.createAppKeysRequest = .succeeded
+        return .exec { send in
+          await self.finishOnboardingConfig(send)
+        }
+
+      case .createOnboardingAppKeysCompleted(success: false):
+        state.createAppKeysRequest = .failed(error: "Failed to create keys")
         return .exec { send in
           await self.finishOnboardingConfig(send)
         }

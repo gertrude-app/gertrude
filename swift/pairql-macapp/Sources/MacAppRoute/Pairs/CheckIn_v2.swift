@@ -17,6 +17,8 @@ public struct CheckIn_v2: Pair {
     public var namedApps: [RunningApp]?
     /// added in v2.8.0
     public var screentimeConflictDetected: Bool?
+    /// added in v2.9.0
+    public var installedApps: [InstalledAppInfo]?
 
     public init(
       appVersion: String,
@@ -27,6 +29,7 @@ public struct CheckIn_v2: Pair {
       pendingUnlockRequests: [UUID]? = nil,
       namedApps: [RunningApp]? = nil,
       screentimeConflictDetected: Bool? = nil,
+      installedApps: [InstalledAppInfo]? = nil,
     ) {
       self.appVersion = appVersion
       self.filterVersion = filterVersion
@@ -36,6 +39,7 @@ public struct CheckIn_v2: Pair {
       self.pendingUnlockRequests = pendingUnlockRequests
       self.namedApps = namedApps
       self.screentimeConflictDetected = screentimeConflictDetected
+      self.installedApps = installedApps
     }
   }
 
@@ -85,6 +89,25 @@ public struct CheckIn_v2: Pair {
     }
   }
 
+  public struct InstalledAppInfo: PairNestable {
+    public var bundleId: String
+    public var name: String
+    public var category: String?
+    public var iconContentHash: String
+
+    public init(
+      bundleId: String,
+      name: String,
+      category: String?,
+      iconContentHash: String,
+    ) {
+      self.bundleId = bundleId
+      self.name = name
+      self.category = category
+      self.iconContentHash = iconContentHash
+    }
+  }
+
   public struct Output: PairOutput {
     public var adminAccountStatus: AdminAccountStatus
     public var appManifest: AppIdManifest
@@ -96,6 +119,7 @@ public struct CheckIn_v2: Pair {
     public var resolvedFilterSuspension: ResolvedFilterSuspension?
     public var resolvedUnlockRequests: [ResolvedUnlockRequest]?
     public var trustedTime: Double
+    public var needsIconUpload: [String]?
 
     public init(
       adminAccountStatus: AdminAccountStatus,
@@ -108,6 +132,7 @@ public struct CheckIn_v2: Pair {
       resolvedFilterSuspension: ResolvedFilterSuspension? = nil,
       resolvedUnlockRequests: [ResolvedUnlockRequest]? = nil,
       trustedTime: Double,
+      needsIconUpload: [String]? = nil,
     ) {
       self.adminAccountStatus = adminAccountStatus
       self.appManifest = appManifest
@@ -119,6 +144,7 @@ public struct CheckIn_v2: Pair {
       self.resolvedFilterSuspension = resolvedFilterSuspension
       self.resolvedUnlockRequests = resolvedUnlockRequests
       self.trustedTime = trustedTime
+      self.needsIconUpload = needsIconUpload
     }
   }
 }

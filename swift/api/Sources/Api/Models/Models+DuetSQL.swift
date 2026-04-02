@@ -1322,3 +1322,63 @@ extension SmsSend: Model {
     ]
   }
 }
+
+extension CatalogedApp: Model {
+  public static let schemaName = "macos"
+  public static let tableName = "mac_apps"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .bundleId: .string(self.bundleId)
+    case .name: .string(self.name)
+    case .category: .string(self.category)
+    case .icon: .bytea(self.icon)
+    case .iconContentHash: .string(self.iconContentHash)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .bundleId: .string(self.bundleId),
+      .name: .string(self.name),
+      .category: .string(self.category),
+      .icon: .bytea(self.icon),
+      .iconContentHash: .string(self.iconContentHash),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension InstalledMacApp: Model {
+  public static let schemaName = "child"
+  public static let tableName = "installed_mac_apps"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .childId: .uuid(self.childId)
+    case .computerId: .uuid(self.computerId)
+    case .macAppId: .uuid(self.macAppId)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .childId: .uuid(self.childId),
+      .computerId: .uuid(self.computerId),
+      .macAppId: .uuid(self.macAppId),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}

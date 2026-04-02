@@ -741,3 +741,35 @@ extension SmsSend {
     case createdAt
   }
 }
+
+extension CatalogedApp: Duet.Identifiable {
+  typealias Id = Tagged<CatalogedApp, UUID>
+}
+
+extension CatalogedApp {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case bundleId
+    case name
+    case category
+    case icon
+    case iconContentHash
+    case createdAt
+    case updatedAt
+  }
+}
+
+extension InstalledMacApp: Duet.Identifiable {
+  typealias Id = Tagged<InstalledMacApp, UUID>
+}
+
+extension InstalledMacApp {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case childId
+    case computerId
+    case macAppId
+    case createdAt
+    case updatedAt
+  }
+}

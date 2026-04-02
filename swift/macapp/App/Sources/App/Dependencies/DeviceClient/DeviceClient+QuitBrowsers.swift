@@ -71,7 +71,7 @@ func terminate(
 }
 
 // safeguard, in case we get nothing from api, at least kill all these
-private let hardcodedNames = [
+let hardcodedNames = [
   "Arc",
   "Brave Browser",
   "Brave Browser Beta",

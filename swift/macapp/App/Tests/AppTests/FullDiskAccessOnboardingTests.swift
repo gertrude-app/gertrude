@@ -81,9 +81,6 @@ final class FullDiskAccessOnboardingTests: XCTestCase {
     expect(filterReplacedInvocations.value).toEqual(1)
 
     await store.receive(.checkIn(result: .success(checkInResult), reason: .appUpdated))
-    await store.receive(.setTrustedTimestamp(.reference)) {
-      $0.timestamp = .reference
-    }
 
     await store.receive(.onboarding(
       .delegate(.openForUpgrade(step: .allowFullDiskAccess_grantAndRestart)),
@@ -91,6 +88,10 @@ final class FullDiskAccessOnboardingTests: XCTestCase {
       $0.onboarding.step = .allowFullDiskAccess_grantAndRestart
       $0.onboarding.windowOpen = true
       $0.onboarding.upgrade = true
+    }
+
+    await store.receive(.setTrustedTimestamp(.reference)) {
+      $0.timestamp = .reference
     }
 
     // from update success aftermath

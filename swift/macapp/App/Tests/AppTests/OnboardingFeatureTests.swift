@@ -311,6 +311,15 @@ final class OnboardingFeatureTests: XCTestCase {
     )
     store.deps.filterXpc.requestUserTypes = getUserTypes.fn
 
+    // ✅ section: app key selection (discovery preloaded during sysext install)
+
+    let fakeApps: [DiscoveredApp] = [
+      .init(name: "Slack", bundleId: "com.tinyspeck.slackmacgap", iconPath: "", category: nil),
+      .init(name: "Zoom", bundleId: "us.zoom.xos", iconPath: "", category: nil),
+    ]
+    let discoverApps: Mock<[DiscoveredApp]> = mock(always: fakeApps)
+    store.deps.device.discoverInstalledApps = discoverApps.fn
+
     // they click "Got it" on the install sys ext trick screen...
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
       $0.onboarding.step = .installSysExt_allow // ...and go to sys ext allow...
@@ -324,6 +333,12 @@ final class OnboardingFeatureTests: XCTestCase {
       $0.onboarding.step = .installSysExt_success
     }
 
+    // app discovery fires during sysext install success (preloaded)
+    await expect(discoverApps.calls.count).toEqual(1)
+    await store.receive(.onboarding(.receivedDiscoveredApps(fakeApps))) {
+      $0.onboarding.discoveredApps = fakeApps
+    }
+
     // we clear the exempted state for the current user proactively as safeguard
     await expect(setUserExemption.calls).toEqual([.init(502, false)])
 
@@ -332,9 +347,30 @@ final class OnboardingFeatureTests: XCTestCase {
       $0.onboarding.filterUsers = .init(exempt: [], protected: [])
     }
 
+    // they click "Next" on the install sys ext success screen
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+      $0.onboarding.step = .appKeySelection_intro
+    }
+
+    // they click "Let's go" on the intro screen
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+      $0.onboarding.step = .appKeySelection_blockApps
+    }
+
+    // they choose to block Zoom and click "Block (1) app"
+    let createBlockedApps = succeed(with: (), capturing: [String].self)
+    store.deps.api.createOnboardingBlockedApps = createBlockedApps.fn
+
+    await store.send(.onboarding(.webview(.blockedAppsSelected(bundleIds: ["us.zoom.xos"]))))
+
+    await expect(createBlockedApps.calls).toEqual([["us.zoom.xos"]])
+    await store.receive(.onboarding(.createOnboardingBlockedAppsCompleted(success: true))) {
+      $0.onboarding.step = .appKeySelection_allowInternet
+    }
+
     // 🔐 start protection actions
 
-    // we kick off protection when they move past sys ext stage, lots happens...
+    // finishOnboardingConfig is called after app keys are created, so set up deps first
     let setAccountActive = spy(on: Bool.self, returning: ())
     store.deps.api.setAccountActive = setAccountActive.fn
     let checkInResult = CheckIn_v2.Output.empty {
@@ -358,11 +394,21 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.app.preventScreenCaptureNag = preventScreenCaptureNag.fn
     store.deps.device.screenTimeWebFilterActive = { false }
 
-    // ✅ section: exempt users and wrap-up
+    // they choose to allow Slack internet access and click "Allow (1) app"
+    let createAppKeys = succeed(with: (), capturing: [String].self)
+    store.deps.api.createOnboardingAppKeys = createAppKeys.fn
 
-    // they click "Next" on the install sys ext success screen
-    // NB: this actually kicks off the `.startProtecting` sequence
-    await store.send(.onboarding(.webview(.primaryBtnClicked)))
+    await store
+      .send(.onboarding(.webview(.appKeysSelected(bundleIds: ["com.tinyspeck.slackmacgap"])))) {
+        $0.onboarding.createAppKeysRequest = .ongoing
+      }
+
+    await expect(createAppKeys.calls).toEqual([["com.tinyspeck.slackmacgap"]])
+    await store.receive(.onboarding(.createOnboardingAppKeysCompleted(success: true))) {
+      $0.onboarding.createAppKeysRequest = .succeeded
+    }
+
+    // ✅ section: exempt users and wrap-up
 
     await store.receive(.onboarding(.receivedDeviceData(
       currentUserId: 502,
@@ -472,22 +518,36 @@ final class OnboardingFeatureTests: XCTestCase {
   }
 
   @MainActor
+  func testSkipFromAppKeySelectionIntro() async {
+    let store = onboardingFeatureStore { $0.step = .appKeySelection_intro }
+    await store.send(.webview(.secondaryBtnClicked))
+    await store.receive(.setStep(.exemptUsers))
+  }
+
+  @MainActor
+  func testEmptyDiscoveredAppsSkipsAppKeySelection() async {
+    let store = onboardingFeatureStore { $0.step = .installSysExt_success }
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.setStep(.exemptUsers))
+  }
+
+  @MainActor
   func testSingleUserOnlySkipsExemptUserScreen() async {
     let store = onboardingFeatureStore {
-      $0.step = .installSysExt_success
+      $0.step = .appKeySelection_allowInternet
       $0.filterUsers = .init(exempt: [], protected: [])
     }
     store.deps.device.currentUserId = { 501 }
     store.deps.device.listMacOSUsers = { [.init(id: 501, name: "Dad", type: .admin)] }
 
-    await store.send(.webview(.primaryBtnClicked))
+    await store.send(.webview(.appKeysSelected(bundleIds: [])))
     await store.receive(.setStep(.locateMenuBarIcon))
   }
 
   @MainActor
   func testDoesntSkipExemptScreenIfOtherUsers() async {
     let store = onboardingFeatureStore {
-      $0.step = .installSysExt_success
+      $0.step = .appKeySelection_allowInternet
       $0.filterUsers = .init(exempt: [], protected: [501]) // <-- Dad is protected
     }
     store.deps.device.currentUserId = { 502 }
@@ -496,7 +556,7 @@ final class OnboardingFeatureTests: XCTestCase {
       .init(id: 502, name: "Lil jimmy", type: .standard),
     ] }
 
-    await store.send(.webview(.primaryBtnClicked))
+    await store.send(.webview(.appKeysSelected(bundleIds: [])))
     await store.receive(.setStep(.exemptUsers)) // ... but we still show exempt screen
   }
 

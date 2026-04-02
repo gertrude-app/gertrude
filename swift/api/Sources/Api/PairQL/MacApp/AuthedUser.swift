@@ -46,6 +46,12 @@ extension AuthedUserRoute: RouteResponder {
     case .createKeystrokeLines(let input):
       let output = try await CreateKeystrokeLines.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .createOnboardingAppKeys(let input):
+      let output = try await CreateOnboardingAppKeys.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .createOnboardingBlockedApps(let input):
+      let output = try await CreateOnboardingBlockedApps.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .createSuspendFilterRequest_v2(let input):
       let output = try await CreateSuspendFilterRequest_v2.resolve(with: input, in: context)
       return try await self.respond(with: output)
@@ -54,6 +60,9 @@ extension AuthedUserRoute: RouteResponder {
       return try await self.respond(with: output)
     case .reportBrowsers(let input):
       let output = try await ReportBrowsers.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .uploadAppIcon(let input):
+      let output = try await UploadAppIcon.resolve(with: input, in: context)
       return try await self.respond(with: output)
     }
   }

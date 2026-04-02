@@ -30,6 +30,7 @@ struct AppReducer: Reducer, Sendable {
     var onboarding = OnboardingFeature.State()
     var monitoring = MonitoringFeature.State()
     var requestSuspension = RequestSuspensionFeature.State()
+    var pendingIconUploads: [String] = []
     var screenTimeConflictDetected = false
     var user = UserFeature.State()
     var timestamp: TrustedTimestamp?
@@ -79,6 +80,7 @@ struct AppReducer: Reducer, Sendable {
     case setTrustedTimestamp(TrustedTimestamp)
     case networkConnectionChanged(connected: Bool)
     case setScreenTimeConflictDetected(Bool)
+    case uploadedAppIcons([String])
 
     indirect case adminAuthed(Action)
   }

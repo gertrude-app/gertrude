@@ -53,10 +53,16 @@ vm os="tahoe":
   set -euo pipefail
   if [ "{{os}}" = "sequoia" ]; then IMAGE="gertrude-base"
   elif [ "{{os}}" = "tahoe" ]; then IMAGE="gertrude-tahoe"
-  else echo "✗ unknown os: {{os}} (expected sequoia or tahoe)" >&2; exit 1
+  elif [ "{{os}}" = "sonoma" ]; then IMAGE="gertrude-sonoma"
+  elif [ "{{os}}" = "ventura" ]; then IMAGE="gertrude-ventura"
+  else echo "✗ unknown os: {{os}} (expected sequoia, tahoe, sonoma, or ventura)" >&2; exit 1
   fi
   APP=$(just macapp find-app)
   APP_DIR=$(dirname "$APP")
+  TARBALL="$APP_DIR/Gertrude.app.tar.gz"
+  echo "→ packaging app..."
+  tar czf "$TARBALL" -C "$APP_DIR" Gertrude.app
+  just macapp vm-clean
   VM="gertrude-gui-$(date +%s)"
   echo "→ cloning $IMAGE..."
   tart clone "$IMAGE" "$VM"
@@ -81,25 +87,27 @@ vm os="tahoe":
 [private]
 find-app:
   #!/usr/bin/env bash
-  APP=$(find ~/Library/Developer/Xcode/DerivedData -name "Gertrude.app" -maxdepth 8 2>/dev/null \
-    | xargs ls -dt 2>/dev/null | head -1)
+  APP=$(find ~/Library/Developer/Xcode/DerivedData -path "*/Products/VM/Gertrude.app/Contents/MacOS/Gertrude" -maxdepth 10 2>/dev/null \
+    | xargs ls -t 2>/dev/null | head -1 \
+    | sed 's|/Contents/MacOS/Gertrude$||')
   if [ -z "$APP" ]; then
-    echo "✗ no Gertrude.app found in DerivedData — build in Xcode first (Cmd+B)" >&2
+    echo "✗ no Gertrude.app found in DerivedData with VM config — build with 'Gertrude VM' scheme (Cmd+B)" >&2
     exit 1
   fi
-  MOD=$(stat -f %m "$APP")
+  DD_DIR=$(echo "$APP" | sed 's|/Build/Products/.*||')
+  TASK=$(plutil -extract WorkspacePath raw "$DD_DIR/info.plist" 2>/dev/null \
+    | sed 's|.*/tasks/||; s|/swift/.*||')
+  MOD=$(stat -f %m "$APP/Contents/MacOS/Gertrude")
   NOW=$(date +%s)
   DIFF=$(( (NOW - MOD) / 60 ))
   if [ "$DIFF" -lt 1 ]; then
-    echo "→ using build from just now" >&2
+    AGE="just now"
   elif [ "$DIFF" -lt 60 ]; then
-    echo "→ using build from ${DIFF}m ago" >&2
+    AGE="${DIFF}m ago"
   else
-    echo "→ using build from $(( DIFF / 60 ))h ago" >&2
+    AGE="$(( DIFF / 60 ))h ago"
   fi
-  if echo "$APP" | grep -q "/Debug/"; then
-    echo -e "\033[33m⚠ debug build — filter will crash in VM (tsan), build Release instead\033[0m" >&2
-  fi
+  echo -e "→ using VM build from $AGE (task: \033[32m$TASK\033[0m)" >&2
   echo "$APP"
 
 [private]
@@ -127,5 +135,8 @@ vm-ssh ip +cmd:
 #   $() captures hang forever waiting for tart to exit
 # - screenresolution (brew) can't set HiDPI/retina modes, only 1x — set
 #   display scaling manually in System Settings after VM boots
-# - golden images: gertrude-base (Sequoia), gertrude-tahoe (Tahoe), both
-#   SIP off, Franny user baked in (UID 502, pw: franny, auto-login)
+# - golden images: gertrude-base (Sequoia), gertrude-tahoe (Tahoe),
+#   gertrude-sonoma (Sonoma), gertrude-ventura (Ventura), all SIP off,
+#   Franny user baked in (UID 502, pw: franny, auto-login)
+# - SIP must be off: system extensions require notarization with SIP enabled,
+#   and dev builds aren't notarized (production builds are, so customers are fine)

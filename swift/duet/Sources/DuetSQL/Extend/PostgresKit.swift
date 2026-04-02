@@ -19,6 +19,7 @@ enum DuetSqlExpression: SQLExpression {
   case null
   case customEnum(String, String)
   case jsonb(String)
+  case bytea(String)
 
   func serialize(to serializer: inout SQLSerializer) {
     switch self {
@@ -30,6 +31,8 @@ enum DuetSqlExpression: SQLExpression {
       serializer.write("'\(json)'::jsonb")
     case .customEnum(let typeName, let value):
       serializer.write("'\(value)'::\(typeName)")
+    case .bytea(let base64):
+      serializer.write("decode('\(base64)', 'base64')")
     case .currentTimestamp:
       serializer.write("CURRENT_TIMESTAMP")
     case .null:

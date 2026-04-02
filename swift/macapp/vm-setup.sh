@@ -2,11 +2,12 @@
 set -euo pipefail
 
 for i in $(seq 1 30); do
-  [ -f "/Volumes/My Shared Files/build/Gertrude.app/Contents/MacOS/Gertrude" ] && break
+  [ -f "/Volumes/My Shared Files/build/Gertrude.app.tar.gz" ] && break
   sleep 2
 done
 sleep 3
-sudo cp -rf "/Volumes/My Shared Files/build/Gertrude.app" /Applications/
+sudo rm -rf /Applications/Gertrude.app
+sudo tar xzf "/Volumes/My Shared Files/build/Gertrude.app.tar.gz" -C /Applications/
 
 sudo -u franny defaults delete com.netrivet.gertrude.app 2>/dev/null || true
 sudo rm -rf /Users/franny/Library/Application\ Support/Gertrude

@@ -21,6 +21,18 @@ extension ApiClient: @retroactive DependencyKey {
         withUnauthed: .connectUser(input),
       )
     },
+    createOnboardingAppKeys: { input in
+      _ = try await output(
+        from: CreateOnboardingAppKeys.self,
+        with: .createOnboardingAppKeys(input),
+      )
+    },
+    createOnboardingBlockedApps: { input in
+      _ = try await output(
+        from: CreateOnboardingBlockedApps.self,
+        with: .createOnboardingBlockedApps(input),
+      )
+    },
     createKeystrokeLines: { input in
       guard await accountActive.value else { return }
       // always produces `.success` if it doesn't throw
@@ -96,6 +108,13 @@ extension ApiClient: @retroactive DependencyKey {
       try await output(
         from: TrustedTime.self,
         withUnauthed: .trustedTime,
+      )
+    },
+    uploadAppIcon: { input in
+      guard await accountActive.value else { return }
+      _ = try await output(
+        from: UploadAppIcon.self,
+        with: .uploadAppIcon(input),
       )
     },
     uploadScreenshot: { data in

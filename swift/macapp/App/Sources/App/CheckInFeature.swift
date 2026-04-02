@@ -1,6 +1,8 @@
 import ComposableArchitecture
 import Core
+import CryptoKit
 import Foundation
+import Gertie
 import MacAppRoute
 
 enum CheckInFeature {
@@ -52,6 +54,7 @@ extension CheckInFeature.RootReducer {
       state.appUpdates.releaseChannel = output.updateReleaseChannel
       state.admin.accountStatus = output.adminAccountStatus
       state.browsers = output.browsers
+      state.pendingIconUploads = output.needsIconUpload ?? []
       return .merge(
         .exec { send in
           await send(.user(.updated(previous: previousUserData)))
@@ -110,6 +113,7 @@ extension CheckInFeature.RootReducer {
             }
           }
         },
+        self.uploadPendingIcons(state: state),
       )
 
     case .checkIn(result: .failure(let err), reason: let reason):
@@ -125,6 +129,11 @@ extension CheckInFeature.RootReducer {
         }
       }
 
+    case .uploadedAppIcons(let bundleIds):
+      let uploaded = Set(bundleIds)
+      state.pendingIconUploads.removeAll { uploaded.contains($0) }
+      return .none
+
     default:
       return .none
     }
@@ -138,6 +147,25 @@ extension CheckInFeature.RootReducer {
           await self.device.notifyNoInternet()
         }
       } else {
+        var appInfos: [CheckIn_v2.InstalledAppInfo] = []
+
+        if reason == .heartbeat {
+          let discovered = await self.device.discoverInstalledApps()
+          for app in discovered {
+            guard let data = try? Data(contentsOf: URL(fileURLWithPath: app.iconPath)) else {
+              continue
+            }
+            appInfos.append(.init(
+              bundleId: app.bundleId,
+              name: app.name,
+              category: app.category,
+              iconContentHash: data.sha256Hex,
+            ))
+          }
+        }
+
+        let installedApps = appInfos.isEmpty ? nil : appInfos
+
         await send(.checkIn(
           result: TaskResult {
             try await api.appCheckIn(
@@ -146,6 +174,7 @@ extension CheckInFeature.RootReducer {
               pendingFilterSuspension: state.requestSuspension.pending?.id,
               pendingUnlockRequests: state.blockedRequests.pendingUnlockRequests.map(\.id),
               sendNamedApps: reason == .heartbeat,
+              installedApps: installedApps,
             )
           },
           reason: reason,
@@ -153,6 +182,31 @@ extension CheckInFeature.RootReducer {
       }
       if screentimeDetected {
         await send(.setScreenTimeConflictDetected(true))
+      }
+    }
+  }
+
+  func uploadPendingIcons(state: State) -> Effect<Action> {
+    .exec { [pendingIconUploads = state.pendingIconUploads] send in
+      guard !pendingIconUploads.isEmpty else { return }
+      let discovered = await self.device.discoverInstalledApps()
+      let pendingSet = Set(pendingIconUploads)
+      var uploaded: [String] = []
+      for app in discovered where pendingSet.contains(app.bundleId) {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: app.iconPath)) else {
+          continue
+        }
+        do {
+          try await self.api.uploadAppIcon(.init(
+            bundleId: app.bundleId,
+            iconData: data,
+            iconContentHash: data.sha256Hex,
+          ))
+          uploaded.append(app.bundleId)
+        } catch {}
+      }
+      if !uploaded.isEmpty {
+        await send(.uploadedAppIcons(uploaded))
       }
     }
   }
@@ -170,5 +224,11 @@ extension CheckIn {
     case receivedWebsocketMessage
     case userRefreshedRules
     case pendingRequest
+  }
+}
+
+private extension Data {
+  var sha256Hex: String {
+    SHA256.hash(data: self).map { String(format: "%02x", $0) }.joined()
   }
 }

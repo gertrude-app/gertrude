@@ -5,6 +5,7 @@ import Tagged
 struct LilThing: Codable {
   var id: Id
   var int: Int
+  var data: Data?
   var createdAt = Date()
   var updatedAt = Date()
   var deletedAt: Date?
@@ -12,12 +13,14 @@ struct LilThing: Codable {
   init(
     id: Id = .init(UUID()),
     int: Int = 123,
+    data: Data? = nil,
     createdAt: Date = Date(),
     updatedAt: Date = Date(),
     deletedAt: Date? = nil,
   ) {
     self.id = id
     self.int = int
+    self.data = data
     self.createdAt = createdAt
     self.updatedAt = updatedAt
     self.deletedAt = deletedAt
@@ -44,6 +47,7 @@ extension LilThing {
     [
       .id: .id(self),
       .int: .int(self.int),
+      .data: .bytea(self.data),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
       .deletedAt: .date(self.deletedAt),
@@ -55,6 +59,7 @@ extension LilThing {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case int
+    case data
     case createdAt
     case updatedAt
     case deletedAt
@@ -71,6 +76,8 @@ extension LilThing: Model {
       .id(self)
     case .int:
       .int(self.int)
+    case .data:
+      .bytea(self.data)
     case .createdAt:
       .date(self.createdAt)
     case .updatedAt:

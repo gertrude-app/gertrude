@@ -47,6 +47,7 @@ public enum Postgres {
     case date(Date?)
     case `enum`(PostgresEnum?)
     case json(String?)
+    case bytea(Foundation.Data?)
     case null
     case currentTimestamp
   }
@@ -78,6 +79,8 @@ public extension Postgres.Data {
       return "'{\(ints.map(String.init).joined(separator: ","))}'"
     case .json(let string):
       return string
+    case .bytea(let data):
+      return data?.base64EncodedString()
     case .null:
       return "NULL"
     case .string(let string):
@@ -117,6 +120,8 @@ extension Postgres.Data: Equatable {
       lhsVal == rhsVal
     case (.enum(let lhsVal), .enum(let rhsVal)):
       lhsVal?.rawValue == rhsVal?.rawValue
+    case (.bytea(let lhsVal), .bytea(let rhsVal)):
+      lhsVal == rhsVal
     case (.null, .null):
       true
     case (.currentTimestamp, .currentTimestamp):

@@ -3,7 +3,7 @@ import React from 'react';
 
 interface Props {
   children: React.ReactNode;
-  heading: string;
+  heading?: string;
   type: `info` | `warning`;
   className?: string;
 }
@@ -25,7 +25,7 @@ const Callout: React.FC<Props> = ({ children, heading, type, className }) => (
         )}
       />
     </div>
-    <h3 className="text-lg font-semibold text-slate-700">{heading}</h3>
+    {heading && <h3 className="text-lg font-semibold text-slate-700">{heading}</h3>}
     <div className="text-slate-500 mt-2">{children}</div>
   </div>
 );
