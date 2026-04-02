@@ -32,13 +32,7 @@ import SuperviseDeviceLaunchHelper from './components/routes/SuperviseDevice/Lau
 import SuperviseDevicePayment from './components/routes/SuperviseDevice/Payment';
 import SuperviseDeviceSupervise from './components/routes/SuperviseDevice/Supervise';
 import SuspendFilter from './components/routes/SuspendFilter';
-import DenyUnlockRequest from './components/routes/UnlockRequest/DenyUnlockRequest';
-import EditUnlockRequestKey from './components/routes/UnlockRequest/EditUnlockRequestKey';
-import FetchUnlockRequest from './components/routes/UnlockRequest/FetchUnlockRequest';
-import ReviewUnlockRequest from './components/routes/UnlockRequest/ReviewUnlockRequest';
-import SelectUnlockRequestKeychain from './components/routes/UnlockRequest/SelectUnlockRequestKeychain';
 import UserUnlockRequests from './components/routes/UnlockRequest/UserUnlockRequests';
-import UsersUnlockRequests from './components/routes/UnlockRequest/UsersUnlockRequests';
 import UseCaseSurvey from './components/routes/UseCaseSurvey';
 import UserRoute from './components/routes/User';
 import Users from './components/routes/Users';
@@ -86,7 +80,8 @@ const App: React.FC = () => {
         <Route path="/checkout-success" element={<CheckoutSuccess />} />
         <Route path="/checkout-cancel" element={<CheckoutCancel />} />
         <Route path="settings" element={<AdminSettings />} />
-        <Route path="unlock-requests" element={<UsersUnlockRequests />} />
+        {/* @deprecated safe to remove May 2026 */}
+        <Route path="unlock-requests" element={<Navigate to="/" replace />} />
         <Route path="security-events" element={<SecurityEventsFeed />} />
 
         <Route path="keychains">
@@ -122,13 +117,8 @@ const App: React.FC = () => {
 
             <Route path="unlock-requests">
               <Route index element={<UserUnlockRequests />} />
-              <Route path=":id">
-                <Route index element={<FetchUnlockRequest />} />
-                <Route path="review" element={<ReviewUnlockRequest />} />
-                <Route path="select-keychain" element={<SelectUnlockRequestKeychain />} />
-                <Route path="edit-key/:keychainId" element={<EditUnlockRequestKey />} />
-                <Route path="deny" element={<DenyUnlockRequest />} />
-              </Route>
+              {/* @deprecated safe to remove May 2026 */}
+              <Route path=":id/*" element={<Navigate to=".." replace />} />
             </Route>
 
             <Route path="activity">

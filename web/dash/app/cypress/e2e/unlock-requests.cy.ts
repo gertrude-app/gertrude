@@ -1,250 +1,176 @@
 /// <reference types="cypress" />
-import type { KeychainSummary } from '@dash/types';
+import type { KeychainSummary, UnlockRequest } from '@dash/types';
 import * as mock from '../../src/reducers/__tests__/mocks';
 import { betsy } from '../fixtures/helpers';
 
-describe(`unlock request flow`, () => {
+describe(`batch unlock requests flow`, () => {
   let keychain: KeychainSummary;
+
+  function makeRequest(override: Partial<UnlockRequest> = {}): UnlockRequest {
+    return mock.unlockRequest({
+      userId: `child-1`,
+      userName: `Huck`,
+      status: `pending`,
+      ...override,
+    });
+  }
 
   beforeEach(() => {
     cy.simulateLoggedIn();
-
     keychain = mock.keychainSummary({
-      id: `keychain-id`,
+      id: `keychain-1`,
       parentId: betsy.id,
-      name: `Music Theory`,
+      name: `School`,
     });
-
-    cy.interceptPql(`GetUnlockRequest`, mock.unlockRequest({ id: `2`, userId: `1` }));
-    cy.interceptPql(`GetChild`, mock.child({ id: `1`, keychains: [keychain] }));
-    cy.interceptPql(`GetIdentifiedApps`, [mock.identifiedApp()]);
-    cy.interceptPql(`GetSelectableKeychains`, { own: [keychain], public: [] });
-    cy.interceptPql(`SaveKey`, { success: true });
-    cy.interceptPql(`UpdateUnlockRequest`, { success: true });
+    cy.interceptPql(`HandleUnlockRequests`, { success: true });
   });
 
-  it(`handles full happy path for ACCEPT w/ all redirects`, () => {
-    cy.visit(`/children/1/unlock-requests/2`);
-    cy.url().should(`include`, `/review`);
-    cy.contains(`Accept`).click();
-    cy.location(`pathname`).should(`eq`, `/children/1/unlock-requests/2/select-keychain`);
-    cy.contains(`Music Theory`).click();
-    cy.contains(`Review key`).click();
-    cy.location(`pathname`).should(
-      `eq`,
-      `/children/1/unlock-requests/2/edit-key/keychain-id`,
-    );
+  it(`shows empty state when no pending requests`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, { requests: [], keychains: [keychain] });
+    cy.visit(`/children/child-1/unlock-requests`);
+    cy.contains(`No pending unlock requests`);
+  });
 
-    // server should now say it's been accepted when it refetches
-    cy.interceptPql(
-      `GetUnlockRequest`,
-      mock.unlockRequest({ id: `2`, userId: `1`, status: `accepted` }),
-    );
+  it(`displays batch UI with multiple requests`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [
+        makeRequest({ domain: `khanacademy.org`, url: `https://khanacademy.org/math` }),
+        makeRequest({ domain: `docs.google.com`, url: `https://docs.google.com/doc/1` }),
+        makeRequest({
+          domain: `coolmath.com`,
+          url: `https://coolmath.com/games`,
+          requestComment: `need this for homework`,
+        }),
+      ],
+      keychains: [keychain],
+    });
+    cy.visit(`/children/child-1/unlock-requests`);
+    cy.contains(`khanacademy.org`);
+    cy.contains(`docs.google.com`);
+    cy.contains(`coolmath.com`);
+    cy.contains(`need this for homework`);
+  });
 
+  it(`submits batch accept for all requests`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [
+        makeRequest({ id: `req-1`, domain: `khanacademy.org` }),
+        makeRequest({ id: `req-2`, domain: `coolmath.com` }),
+      ],
+      keychains: [keychain],
+    });
+    cy.visit(`/children/child-1/unlock-requests`);
     cy.contains(`Submit`).click();
-    cy.location(`pathname`).should(`eq`, `/children/1/unlock-requests/2`);
-    cy.contains(`accepted`);
+    cy.wait(`@HandleUnlockRequests`)
+      .its(`request.body`)
+      .should((body) => {
+        expect(body.decisions).to.have.length(2);
+        expect(body.decisions[0].status).to.eq(`accepted`);
+        expect(body.decisions[1].status).to.eq(`accepted`);
+      });
   });
 
-  it(`handles full happy path for DENY w/ all redirects`, () => {
-    cy.visit(`/children/1/unlock-requests/2`);
-    cy.url().should(`include`, `/review`);
-    cy.contains(`Deny`).click();
-    cy.location(`pathname`).should(`eq`, `/children/1/unlock-requests/2/deny`);
-    cy.contains(`comment`);
-    cy.testId(`deny-unlock-req-comment`).type(`nope`);
-
-    // server should say it's been rejected when it refetches
-    cy.interceptPql(
-      `GetUnlockRequest`,
-      mock.unlockRequest({ id: `2`, userId: `1`, status: `rejected` }),
-    );
-
-    cy.contains(`Deny`).click();
-    cy.wait(`@UpdateUnlockRequest`)
-      .its(`request.body.responseComment`)
-      .should(`eq`, `nope`);
-    cy.contains(`rejected`);
-  });
-
-  it(`shows empty state if parent has no personal keychains to assign`, () => {
-    cy.interceptPql(`GetChild`, mock.child({ id: `1`, keychains: [] }));
-    cy.visit(`/children/1/unlock-requests/2`);
-    cy.url().should(`include`, `/review`);
-    cy.contains(`Accept`).click();
-    cy.location(`pathname`).should(`eq`, `/children/1/unlock-requests/2/select-keychain`);
-    cy.contains(`No keychains`);
-  });
-
-  it(`shows alternate empty state if child has no personal keychains, but the parent has at least one they could assign`, () => {
-    cy.interceptPql(`GetChild`, mock.child({ id: `1`, keychains: [] }));
-    cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
-    cy.visit(`/children/1/unlock-requests/2`);
-    cy.url().should(`include`, `/review`);
-    cy.contains(`Accept`).click();
-    cy.location(`pathname`).should(`eq`, `/children/1/unlock-requests/2/select-keychain`);
-    cy.contains(`No keychains`);
-  });
-
-  it(`displays not found error if not found`, () => {
-    cy.forcePqlErr(`GetUnlockRequest`, {
-      type: `notFound`,
-      entityName: `Unlock request`,
+  it(`can deny individual requests`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [
+        makeRequest({ id: `req-1`, domain: `khanacademy.org` }),
+        makeRequest({ id: `req-2`, domain: `coolmath.com` }),
+      ],
+      keychains: [keychain],
     });
-    cy.visit(`/children/1/unlock-requests/2-nope`);
-    cy.contains(`Unlock request not found`);
+    cy.visit(`/children/child-1/unlock-requests`);
+    cy.contains(`khanacademy.org`)
+      .closest(`tr, [class*="border"]`)
+      .contains(`Deny`)
+      .click();
+    cy.contains(`Submit`).click();
+    cy.wait(`@HandleUnlockRequests`)
+      .its(`request.body`)
+      .should((body) => {
+        expect(body.decisions.some((d: any) => d.status === `rejected`)).to.eq(true);
+        expect(body.decisions.some((d: any) => d.status === `accepted`)).to.eq(true);
+      });
   });
 
-  it(`shows generic error for unknown error`, () => {
-    cy.forcePqlErr(`GetUnlockRequest`, { type: `serverError` });
-    cy.visit(`/children/1/unlock-requests/2`);
+  it(`deny all button sets all rows to deny`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [
+        makeRequest({ id: `req-1`, domain: `khanacademy.org` }),
+        makeRequest({ id: `req-2`, domain: `coolmath.com` }),
+      ],
+      keychains: [keychain],
+    });
+    cy.visit(`/children/child-1/unlock-requests`);
+    cy.contains(`Deny all`).click();
+    cy.contains(`Submit`).click();
+    cy.wait(`@HandleUnlockRequests`)
+      .its(`request.body`)
+      .should((body) => {
+        expect(body.decisions.every((d: any) => d.status === `rejected`)).to.eq(true);
+      });
+  });
+
+  it(`shows single request without bulk action buttons`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [makeRequest({ id: `req-1`, domain: `example.com` })],
+      keychains: [keychain],
+    });
+    cy.visit(`/children/child-1/unlock-requests`);
+    cy.contains(`example.com`);
+    cy.contains(`Deny all`).should(`not.exist`);
+    cy.contains(`Accept all`).should(`not.exist`);
+    cy.contains(`Submit`);
+  });
+
+  it(`redirects old single-request URLs to batch UI`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [makeRequest({ id: `req-1`, domain: `example.com` })],
+      keychains: [keychain],
+    });
+    cy.visit(`/children/child-1/unlock-requests/some-request-id`);
+    cy.location(`pathname`).should(`eq`, `/children/child-1/unlock-requests`);
+  });
+
+  it(`redirects top-level /unlock-requests to dashboard`, () => {
+    cy.interceptPql(`DashboardWidgets_v2`, {
+      children: [],
+      childActivitySummaries: [],
+      unlockRequests: [],
+      recentScreenshots: [],
+      numParentNotifications: 0,
+      pendingIOSDevices: [],
+    });
+    cy.visit(`/unlock-requests`);
+    cy.location(`pathname`).should(`eq`, `/`);
+  });
+
+  it(`naughty domains default to deny or undecided`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [
+        makeRequest({ id: `req-1`, domain: `youtube.com`, url: `https://youtube.com` }),
+        makeRequest({
+          id: `req-2`,
+          domain: `khanacademy.org`,
+          url: `https://khanacademy.org`,
+        }),
+      ],
+      keychains: [keychain],
+    });
+    cy.visit(`/children/child-1/unlock-requests`);
+    cy.contains(`Submit`).click();
+    cy.wait(`@HandleUnlockRequests`)
+      .its(`request.body`)
+      .should((body) => {
+        const ytDecision = body.decisions.find((d: any) => d.unlockRequestId === `req-1`);
+        expect(ytDecision.status).to.eq(`rejected`);
+        const kaDecision = body.decisions.find((d: any) => d.unlockRequestId === `req-2`);
+        expect(kaDecision.status).to.eq(`accepted`);
+      });
+  });
+
+  it(`handles API error on load`, () => {
+    cy.forcePqlErr(`GetBatchUnlockRequestData`, { type: `serverError` });
+    cy.visit(`/children/child-1/unlock-requests`);
     cy.contains(`try again`);
-  });
-
-  it(`shows decided status: accepted`, () => {
-    cy.interceptPql(
-      `GetUnlockRequest`,
-      mock.unlockRequest({ id: `2`, userId: `1`, status: `accepted` }),
-    );
-    cy.visit(`/children/1/unlock-requests/2`);
-    cy.contains(`accepted`);
-  });
-
-  it(`shows decided status: rejected`, () => {
-    cy.interceptPql(
-      `GetUnlockRequest`,
-      mock.unlockRequest({ id: `2`, userId: `1`, status: `rejected` }),
-    );
-    cy.visit(`/children/1/unlock-requests/2`);
-    cy.contains(`rejected`);
-  });
-
-  it(`redirects to reviewing for pending status`, () => {
-    cy.visit(`/children/1/unlock-requests/2`);
-    cy.url().should(`include`, `/review`);
-  });
-
-  it(`redirects to /unlock-request/:id when review loads non-pending`, () => {
-    cy.interceptPql(
-      `GetUnlockRequest`,
-      mock.unlockRequest({ id: `2`, userId: `1`, status: `rejected` }),
-    );
-    cy.visit(`/children/1/unlock-requests/2/review`);
-    cy.location(`pathname`).should(`eq`, `/children/1/unlock-requests/2`);
-  });
-
-  it(`shows review modal on review screen`, () => {
-    cy.interceptPql(
-      `GetUnlockRequest`,
-      mock.unlockRequest({
-        id: `2`,
-        userId: `1`,
-        requestComment: `please dad!`,
-        domain: `happyfish.com`,
-      }),
-    );
-    cy.visit(`/children/1/unlock-requests/2/review`);
-    cy.contains(`please dad!`);
-    cy.contains(`happyfish.com`);
-  });
-
-  it(`goes to select keychain screen when review accept clicked`, () => {
-    cy.visit(`/children/1/unlock-requests/2/review`);
-    cy.contains(`Accept`).click();
-    cy.location(`pathname`).should(`eq`, `/children/1/unlock-requests/2/select-keychain`);
-    cy.contains(`Select a keychain`);
-    cy.contains(`Music Theory`);
-  });
-
-  it(`only shows keychains attached to a child`, () => {
-    const keychain2 = mock.keychainSummary({
-      parentId: betsy.id,
-      name: `Misc McStandard Keys`,
-    });
-
-    // doesn't have keychain2
-    cy.interceptPql(`GetChild`, mock.child({ id: `1`, keychains: [keychain] }));
-    cy.interceptPql(`GetSelectableKeychains`, { own: [keychain, keychain2], public: [] });
-
-    cy.visit(`/children/1/unlock-requests/2/select-keychain`);
-
-    // asserting this first ensures next doesn't pass before render
-    cy.contains(`Music Theory`);
-
-    // ... so it shouldn't be in the list
-    cy.contains(`Misc McStandard Keys`).should(`not.exist`);
-  });
-
-  it(`includes public keychains by parent`, () => {
-    const htc = mock.keychainSummary({
-      isPublic: true,
-      parentId: betsy.id, // <--  parent owns the public keychain
-      name: `HTC`,
-    });
-
-    cy.interceptPql(`GetChild`, mock.child({ id: `1`, keychains: [keychain, htc] }));
-    cy.interceptPql(`GetSelectableKeychains`, { own: [keychain, htc], public: [htc] });
-    cy.visit(`/children/1/unlock-requests/2/select-keychain`);
-    cy.contains(`HTC`);
-  });
-
-  it(`shows useful error message on accept failure`, () => {
-    cy.visit(`/children/1/unlock-requests/2/select-keychain`);
-    cy.contains(`Music Theory`).click();
-    cy.contains(`Review key`).click();
-    cy.forcePqlErr(`UpdateUnlockRequest`, { type: `serverError` });
-    cy.contains(`Submit`).click();
-    cy.contains(`Contact support`);
-  });
-
-  it(`handles deny flow, starting from deny url`, () => {
-    cy.visit(`/children/1/unlock-requests/2/deny`);
-
-    // server should say it's been rejected when it refetches
-    cy.interceptPql(
-      `GetUnlockRequest`,
-      mock.unlockRequest({ id: `2`, userId: `1`, status: `rejected` }),
-    );
-
-    cy.contains(`Deny`).click();
-    cy.location(`pathname`).should(`eq`, `/children/1/unlock-requests/2`);
-    cy.contains(`rejected`);
-  });
-
-  it(`improves ux by leveraging unlock request source`, () => {
-    cy.interceptPql(
-      `GetUnlockRequest`,
-      mock.unlockRequest({
-        id: `2`,
-        userId: `1`,
-        url: `https://music.jwpcdn.com/player/v/8.26.2/gapro.js`,
-        domain: `music.jwpcdn.com`,
-      }),
-    );
-    cy.visit(`/children/1/unlock-requests/2/select-keychain`);
-    cy.contains(`Music Theory`).click();
-    cy.contains(`Review key`).click();
-    cy.contains(`jwpcdn.com`).click();
-
-    cy.testId(`unlock-request-src`).should(
-      `contain`,
-      `https://music.jwpcdn.com/player/v/8.26.2/gapro.js`,
-    );
-
-    cy.testId(`address-type`).within(() => {
-      cy.get(`button`).click();
-      cy.contains(`Strict`).click();
-    });
-
-    // we should get the full hostname with subdomain
-    cy.testId(`key-address`).should(`have.value`, `music.jwpcdn.com`);
-
-    cy.testId(`address-type`).within(() => {
-      cy.get(`button`).click();
-      cy.contains(`Standard`).click();
-    });
-
-    // hostname is eliminated again for a simpler `standard` type
-    cy.testId(`key-address`).should(`have.value`, `jwpcdn.com`);
   });
 });

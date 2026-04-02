@@ -1,6 +1,7 @@
 import Gertie
 import PairQL
 
+// @deprecated safe to remove 2026-04-21
 struct UpdateUnlockRequest: Pair {
   static let auth: ClientAuth = .parent
 

@@ -61,18 +61,6 @@ extension AdminEvent.UnlockRequestSubmitted: AdminNotifying {
 
 extension AdminEvent.UnlockRequestSubmitted {
   private var url: String {
-    if requestIds.count == 1, let first = requestIds.first {
-      self.individualRequestUrl(first)
-    } else {
-      self.userUnlockRequestsUrl
-    }
-  }
-
-  private var userUnlockRequestsUrl: String {
     "\(dashboardUrl)/children/\(userId.lowercased)/unlock-requests"
-  }
-
-  private func individualRequestUrl(_ requestId: UnlockRequest.Id) -> String {
-    "\(self.userUnlockRequestsUrl)/\(requestId.lowercased)"
   }
 }

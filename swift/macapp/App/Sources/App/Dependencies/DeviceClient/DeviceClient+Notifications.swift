@@ -84,6 +84,20 @@ extension DeviceClient {
     await showNotification(title, body)
   }
 
+  func notifyUnlockRequestsHandled(accepted: Int, rejected: Int, targets: [String]) async {
+    var parts: [String] = []
+    if accepted > 0 {
+      parts.append("\(accepted) accepted")
+    }
+    if rejected > 0 {
+      parts.append("\(rejected) denied")
+    }
+    let title = "🔓 Unlock requests: \(parts.joined(separator: ", "))"
+    let body = targets.prefix(5).joined(separator: ", ")
+      + (targets.count > 5 ? ", and \(targets.count - 5) more" : "")
+    await showNotification(title, body)
+  }
+
   func notifyFilterSuspension(
     resuming seconds: Seconds<Int>,
     from now: Date = Date(),

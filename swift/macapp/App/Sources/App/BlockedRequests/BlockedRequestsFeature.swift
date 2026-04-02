@@ -177,6 +177,10 @@ extension BlockedRequestsFeature.RootReducer {
       state.blockedRequests.pendingUnlockRequests.removeAll(where: { $0.id == id })
       return .none
 
+    case .websocket(.receivedMessage(.unlockRequestsHandled(let ids, _, _, _))):
+      state.blockedRequests.pendingUnlockRequests.removeAll { ids.contains($0.id) }
+      return .none
+
     case .heartbeat(.everyMinute):
       state.blockedRequests.pendingUnlockRequests
         .removeAll(where: { $0.createdAt.advanced(by: .minutes(20)) < now })

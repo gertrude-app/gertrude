@@ -108,6 +108,15 @@ extension WebSocketFeature.RootReducer {
           )
         }
 
+      case .receivedMessage(.unlockRequestsHandled(_, let accepted, let rejected, let targets)):
+        return .exec { _ in
+          await device.notifyUnlockRequestsHandled(
+            accepted: accepted,
+            rejected: rejected,
+            targets: targets,
+          )
+        }
+
       case .receivedMessage(.userDeleted):
         return .none // handled above, with other disconnect-like actions
 

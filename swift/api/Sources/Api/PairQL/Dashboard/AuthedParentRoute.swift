@@ -14,6 +14,8 @@ enum AuthedParentRoute: PairRoute {
   case getAdminKeychain(GetAdminKeychain.Input)
   case getAdminKeychains
   case getAllDevices
+  case getBatchUnlockRequestData(GetBatchUnlockRequestData.Input)
+  case handleUnlockRequests(HandleUnlockRequests.Input)
   case getDevice(GetDevice.Input)
   case getIdentifiedApps
   case getSelectableKeychains
@@ -159,9 +161,17 @@ extension AuthedParentRoute {
           Operation(CombinedUsersActivityFeed.self)
           Body(.dashboardInput(CombinedUsersActivityFeed.self))
         }
+        Route(.case(Self.getBatchUnlockRequestData)) {
+          Operation(GetBatchUnlockRequestData.self)
+          Body(.dashboardInput(GetBatchUnlockRequestData.self))
+        }
         Route(.case(Self.getUserUnlockRequests)) {
           Operation(GetUserUnlockRequests.self)
           Body(.dashboardInput(GetUserUnlockRequests.self))
+        }
+        Route(.case(Self.handleUnlockRequests)) {
+          Operation(HandleUnlockRequests.self)
+          Body(.dashboardInput(HandleUnlockRequests.self))
         }
         Route(.case(Self.latestAppVersions)) {
           Operation(LatestAppVersions.self)
@@ -334,8 +344,14 @@ extension AuthedParentRoute: RouteResponder {
     case .getUnlockRequests:
       let output = try await GetUnlockRequests.resolve(in: context)
       return try await self.respond(with: output)
+    case .getBatchUnlockRequestData(let input):
+      let output = try await GetBatchUnlockRequestData.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .getUserUnlockRequests(let input):
       let output = try await GetUserUnlockRequests.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .handleUnlockRequests(let input):
+      let output = try await HandleUnlockRequests.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .getSuspendFilterRequest(let input):
       let output = try await GetSuspendFilterRequest.resolve(with: input, in: context)
