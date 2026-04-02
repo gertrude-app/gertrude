@@ -33,11 +33,13 @@ targets:
       - package: LibTCA
     settings:
       base:
+        SWIFT_VERSION: "6.0"
+        PRODUCT_NAME: "Gertrude AM"
         DEVELOPMENT_TEAM: "WFN83LM943"
         CODE_SIGN_STYLE: Automatic
         INFOPLIST_FILE: app/Info.plist
-        MARKETING_VERSION: 1.4.0
-        CURRENT_PROJECT_VERSION: 21
+        MARKETING_VERSION: 1.4.1
+        CURRENT_PROJECT_VERSION: 22
       configs:
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.am"
