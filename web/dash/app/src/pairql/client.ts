@@ -113,6 +113,9 @@ export const throwingClient: ApiClient = {
   claimIOSDevice: () => {
     throw new Error(`ApiClient.claimIOSDevice() not implemented`);
   },
+  getBatchUnlockRequestData: () => {
+    throw new Error(`ApiClient.getBatchUnlockRequestData() not implemented`);
+  },
   getAllDevices: () => {
     throw new Error(`ApiClient.getAllDevices() not implemented`);
   },
@@ -134,14 +137,8 @@ export const throwingClient: ApiClient = {
   getSuspendFilterRequest: () => {
     throw new Error(`ApiClient.getSuspendFilterRequest() not implemented`);
   },
-  getUnlockRequest: () => {
-    throw new Error(`ApiClient.getUnlockRequest() not implemented`);
-  },
-  getUnlockRequests: () => {
-    throw new Error(`ApiClient.getUnlockRequests() not implemented`);
-  },
-  getUserUnlockRequests: () => {
-    throw new Error(`ApiClient.getUserUnlockRequests() not implemented`);
+  handleUnlockRequests: () => {
+    throw new Error(`ApiClient.handleUnlockRequests() not implemented`);
   },
   handleCheckoutCancel: () => {
     throw new Error(`ApiClient.handleCheckoutCancel() not implemented`);
@@ -208,9 +205,6 @@ export const throwingClient: ApiClient = {
   },
   updateIOSDevice: () => {
     throw new Error(`ApiClient.updateIOSDevice() not implemented`);
-  },
-  updateUnlockRequest: () => {
-    throw new Error(`ApiClient.updateUnlockRequest() not implemented`);
   },
   upsertBlockRule: () => {
     throw new Error(`ApiClient.upsertBlockRule() not implemented`);

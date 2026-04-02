@@ -131,7 +131,7 @@ extension ConnectUser: Resolver {
 
 // helpers
 
-private func createDefaultKeychainIfNeeded(
+func createDefaultKeychainIfNeeded(
   for child: Child,
   in db: any DuetSQL.Client,
 ) async throws {

@@ -7,6 +7,7 @@ import type {
   GetAdminKeychain,
   GetAdminKeychains,
   GetAllDevices,
+  GetBatchUnlockRequestData,
   GetChild,
   GetChildren,
   GetDevice,
@@ -16,9 +17,6 @@ import type {
   GetIdentifiedApps,
   GetSelectableKeychains,
   GetSuspendFilterRequest,
-  GetUnlockRequest,
-  GetUnlockRequests,
-  GetUserUnlockRequests,
   LatestAppVersions,
   SecurityEventsFeed,
   UserActivityFeed,
@@ -49,7 +47,7 @@ export class Key extends QueryKey<never> {
   }
 
   static child(id: UUID): QueryKey<GetChild.Output> {
-    return new QueryKey(`users/:id`, [`users`, id], id);
+    return new QueryKey(`children/:id`, [`children`, id], id);
   }
 
   static get latestAppVersions(): QueryKey<LatestAppVersions.Output> {
@@ -69,11 +67,15 @@ export class Key extends QueryKey<never> {
   }
 
   static childActivitySummaries(id: UUID): QueryKey<ChildActivitySummaries.Output> {
-    return new QueryKey(`users/:id/activity`, [`users`, id, `activity`], id);
+    return new QueryKey(`children/:id/activity`, [`children`, id, `activity`], id);
   }
 
   static userActivityFeed(id: UUID, day: string): QueryKey<UserActivityFeed.Output> {
-    return new QueryKey(`users/:id/activity/:day`, [`users`, id, `activity`, day], id);
+    return new QueryKey(
+      `children/:id/activity/:day`,
+      [`children`, id, `activity`, day],
+      id,
+    );
   }
 
   static get selectableKeychains(): QueryKey<GetSelectableKeychains.Output> {
@@ -85,13 +87,13 @@ export class Key extends QueryKey<never> {
   }
 
   static get familyActivitySummaries(): QueryKey<FamilyActivitySummaries.Output> {
-    return new QueryKey(`users/activity`, [`users`, `activity`]);
+    return new QueryKey(`children/activity`, [`children`, `activity`]);
   }
 
   static combinedUsersActivityFeed(
     day: string,
   ): QueryKey<CombinedUsersActivityFeed.Output> {
-    return new QueryKey(`users/activity/:day`, [`users`, `activity`, day]);
+    return new QueryKey(`children/activity/:day`, [`children`, `activity`, day]);
   }
 
   static get adminKeychains(): QueryKey<GetAdminKeychains.Output> {
@@ -102,20 +104,12 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`admin-keychains/:id`, [`admin-keychains`, id], id);
   }
 
-  static userUnlockRequests(id: UUID): QueryKey<GetUserUnlockRequests.Output> {
+  static batchUnlockRequestData(id: UUID): QueryKey<GetBatchUnlockRequestData.Output> {
     return new QueryKey(
-      `users/:id/unlock-requests`,
-      [`users`, id, `unlock-requests`],
+      `children/:id/batch-unlock-requests`,
+      [`children`, id, `batch-unlock-requests`],
       id,
     );
-  }
-
-  static get combinedUsersUnlockRequests(): QueryKey<GetUnlockRequests.Output> {
-    return new QueryKey(`unlock-requests`, [`unlock-requests`]);
-  }
-
-  static unlockRequest(id: UUID): QueryKey<GetUnlockRequest.Output> {
-    return new QueryKey(`unlock-requests/:id`, [`unlock-requests`, id]);
   }
 
   static suspendFilterRequest(id: UUID): QueryKey<GetSuspendFilterRequest.Output> {

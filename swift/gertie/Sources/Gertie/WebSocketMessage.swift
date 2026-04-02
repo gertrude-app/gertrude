@@ -17,6 +17,12 @@ public enum WebSocketMessage {
       target: String,
       comment: String?,
     )
+    case unlockRequestsHandled(
+      ids: [UUID],
+      accepted: Int,
+      rejected: Int,
+      targets: [String],
+    )
   }
 
   public enum FromAppToApi: Codable, Equatable, Sendable {

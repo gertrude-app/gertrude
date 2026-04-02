@@ -1,6 +1,7 @@
 import DuetSQL
 import PairQL
 
+// @deprecated safe to remove 2026-04-21
 struct GetUnlockRequests: Pair {
   static let auth: ClientAuth = .parent
   typealias Output = [GetUnlockRequest.Output]

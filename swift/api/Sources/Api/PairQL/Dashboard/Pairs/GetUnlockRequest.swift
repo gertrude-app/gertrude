@@ -2,6 +2,7 @@ import Foundation
 import Gertie
 import PairQL
 
+// @deprecated safe to remove 2026-04-21, move Output type to GetBatchUnlockRequestData
 struct GetUnlockRequest: Pair {
   static let auth: ClientAuth = .parent
 

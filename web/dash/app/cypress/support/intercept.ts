@@ -58,6 +58,10 @@ export function interceptPql(
   output: T.GetAdminKeychains.Output,
 ): void;
 export function interceptPql(slug: `GetAllDevices`, output: T.GetAllDevices.Output): void;
+export function interceptPql(
+  slug: `GetBatchUnlockRequestData`,
+  output: T.GetBatchUnlockRequestData.Output,
+): void;
 export function interceptPql(slug: `GetChild`, output: T.GetChild.Output): void;
 export function interceptPql(slug: `GetChildren`, output: T.GetChildren.Output): void;
 export function interceptPql(slug: `GetDevice`, output: T.GetDevice.Output): void;
@@ -83,24 +87,16 @@ export function interceptPql(
   output: T.GetSuspendFilterRequest.Output,
 ): void;
 export function interceptPql(
-  slug: `GetUnlockRequest`,
-  output: T.GetUnlockRequest.Output,
-): void;
-export function interceptPql(
-  slug: `GetUnlockRequests`,
-  output: T.GetUnlockRequests.Output,
-): void;
-export function interceptPql(
-  slug: `GetUserUnlockRequests`,
-  output: T.GetUserUnlockRequests.Output,
-): void;
-export function interceptPql(
   slug: `HandleCheckoutCancel`,
   output: T.HandleCheckoutCancel.Output,
 ): void;
 export function interceptPql(
   slug: `HandleCheckoutSuccess`,
   output: T.HandleCheckoutSuccess.Output,
+): void;
+export function interceptPql(
+  slug: `HandleUnlockRequests`,
+  output: T.HandleUnlockRequests.Output,
 ): void;
 export function interceptPql(
   slug: `IOSAppConnectionCode`,
@@ -168,10 +164,6 @@ export function interceptPql(
   output: T.UpdateIOSDevice.Output,
 ): void;
 export function interceptPql(
-  slug: `UpdateUnlockRequest`,
-  output: T.UpdateUnlockRequest.Output,
-): void;
-export function interceptPql(
   slug: `UpsertBlockRule`,
   output: T.UpsertBlockRule.Output,
 ): void;
@@ -207,6 +199,7 @@ export function forcePqlErr(
     | `GetAdminKeychain`
     | `GetAdminKeychains`
     | `GetAllDevices`
+    | `GetBatchUnlockRequestData`
     | `GetChild`
     | `GetChildren`
     | `GetDevice`
@@ -216,11 +209,9 @@ export function forcePqlErr(
     | `GetIdentifiedApps`
     | `GetSelectableKeychains`
     | `GetSuspendFilterRequest`
-    | `GetUnlockRequest`
-    | `GetUnlockRequests`
-    | `GetUserUnlockRequests`
     | `HandleCheckoutCancel`
     | `HandleCheckoutSuccess`
+    | `HandleUnlockRequests`
     | `IOSAppConnectionCode`
     | `LatestAppVersions`
     | `LogEvent`
@@ -244,7 +235,6 @@ export function forcePqlErr(
     | `StripeUrl_v2`
     | `ToggleChildKeychain`
     | `UpdateIOSDevice`
-    | `UpdateUnlockRequest`
     | `UpsertBlockRule`
     | `UserActivityFeed`
     | `VerifySignupEmail`,

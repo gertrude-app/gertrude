@@ -132,6 +132,16 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetAllDevices.Output>(input, `GetAllDevices`, `parent`);
   };
 
+  public getBatchUnlockRequestData = (
+    input: P.GetBatchUnlockRequestData.Input,
+  ): Promise<Result<P.GetBatchUnlockRequestData.Output>> => {
+    return this.query<P.GetBatchUnlockRequestData.Output>(
+      input,
+      `GetBatchUnlockRequestData`,
+      `parent`,
+    );
+  };
+
   public getChild = (input: P.GetChild.Input): Promise<Result<P.GetChild.Output>> => {
     return this.query<P.GetChild.Output>(input, `GetChild`, `parent`);
   };
@@ -198,28 +208,6 @@ export default class DashboardClient extends Client<Auth> {
     );
   };
 
-  public getUnlockRequest = (
-    input: P.GetUnlockRequest.Input,
-  ): Promise<Result<P.GetUnlockRequest.Output>> => {
-    return this.query<P.GetUnlockRequest.Output>(input, `GetUnlockRequest`, `parent`);
-  };
-
-  public getUnlockRequests = (
-    input: P.GetUnlockRequests.Input,
-  ): Promise<Result<P.GetUnlockRequests.Output>> => {
-    return this.query<P.GetUnlockRequests.Output>(input, `GetUnlockRequests`, `parent`);
-  };
-
-  public getUserUnlockRequests = (
-    input: P.GetUserUnlockRequests.Input,
-  ): Promise<Result<P.GetUserUnlockRequests.Output>> => {
-    return this.query<P.GetUserUnlockRequests.Output>(
-      input,
-      `GetUserUnlockRequests`,
-      `parent`,
-    );
-  };
-
   public handleCheckoutCancel = (
     input: P.HandleCheckoutCancel.Input,
   ): Promise<Result<P.HandleCheckoutCancel.Output>> => {
@@ -236,6 +224,16 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.HandleCheckoutSuccess.Output>(
       input,
       `HandleCheckoutSuccess`,
+      `parent`,
+    );
+  };
+
+  public handleUnlockRequests = (
+    input: P.HandleUnlockRequests.Input,
+  ): Promise<Result<P.HandleUnlockRequests.Output>> => {
+    return this.query<P.HandleUnlockRequests.Output>(
+      input,
+      `HandleUnlockRequests`,
       `parent`,
     );
   };
@@ -390,16 +388,6 @@ export default class DashboardClient extends Client<Auth> {
     input: P.UpdateIOSDevice.Input,
   ): Promise<Result<P.UpdateIOSDevice.Output>> => {
     return this.query<P.UpdateIOSDevice.Output>(input, `UpdateIOSDevice`, `parent`);
-  };
-
-  public updateUnlockRequest = (
-    input: P.UpdateUnlockRequest.Input,
-  ): Promise<Result<P.UpdateUnlockRequest.Output>> => {
-    return this.query<P.UpdateUnlockRequest.Output>(
-      input,
-      `UpdateUnlockRequest`,
-      `parent`,
-    );
   };
 
   public upsertBlockRule = (

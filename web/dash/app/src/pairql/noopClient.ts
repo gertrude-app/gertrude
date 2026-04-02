@@ -131,25 +131,8 @@ const noopClient: ApiClient = {
       extraMonitoringOptions: {},
     });
   },
-  getUnlockRequest: async () => {
-    return Result.success({
-      id: ``,
-      userId: ``,
-      userName: ``,
-      status: `rejected`,
-      url: ``,
-      domain: ``,
-      ipAddress: ``,
-      requestComment: ``,
-      appName: ``,
-      appSlug: ``,
-      appBundleId: ``,
-      appCategories: [],
-      createdAt: new Date().toISOString(),
-    });
-  },
-  getUnlockRequests: async () => {
-    return Result.success([]);
+  getBatchUnlockRequestData: async () => {
+    return Result.success({ requests: [], keychains: [] });
   },
   getAllDevices: async () => {
     return Result.success({ computers: [], iosDevices: [] });
@@ -166,6 +149,9 @@ const noopClient: ApiClient = {
       modelFamily: `unknown`,
       modelTitle: ``,
     });
+  },
+  handleUnlockRequests: async () => {
+    return Result.success({ success: true });
   },
   handleCheckoutCancel: async () => {
     return Result.success({ success: true });
@@ -216,9 +202,6 @@ const noopClient: ApiClient = {
       canary: ``,
     });
   },
-  getUserUnlockRequests: async () => {
-    return Result.success([]);
-  },
   login: async () => {
     return Result.success({ token: ``, adminId: `` });
   },
@@ -268,9 +251,6 @@ const noopClient: ApiClient = {
     return Result.success([]);
   },
   toggleChildKeychain: async () => {
-    return Result.success({ success: true });
-  },
-  updateUnlockRequest: async () => {
     return Result.success({ success: true });
   },
   upsertBlockRule: async () => {
