@@ -23,6 +23,33 @@ public extension Key {
 public extension Key {
   struct Domain: Equatable, Hashable, Codable, Sendable {
     public let string: String
+    public let utf8: [UInt8]
+
+    public init(string: String) {
+      self.string = string
+      self.utf8 = Array(string.utf8)
+    }
+
+    enum CodingKeys: String, CodingKey { case string }
+
+    public init(from decoder: Decoder) throws {
+      let container = try decoder.container(keyedBy: CodingKeys.self)
+      let string = try container.decode(String.self, forKey: .string)
+      self.init(string: string)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(self.string, forKey: .string)
+    }
+
+    public static func == (lhs: Domain, rhs: Domain) -> Bool {
+      lhs.string == rhs.string
+    }
+
+    public func hash(into hasher: inout Hasher) {
+      hasher.combine(self.string)
+    }
   }
 
   struct DomainRegexPattern: Hashable, Codable, Sendable {

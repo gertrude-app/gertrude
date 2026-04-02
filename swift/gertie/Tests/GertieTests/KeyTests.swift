@@ -225,6 +225,32 @@ final class KeyTests: XCTestCase {
     }
   }
 
+  func testKeyDomainCodableRoundtrip() throws {
+    let domains: [Key.Domain] = [
+      "example.com",
+      "hondros.com",
+      "foo.bar.baz.com",
+    ]
+    let encoder = JSONEncoder()
+    let decoder = JSONDecoder()
+    for domain in domains {
+      let data = try encoder.encode(domain)
+      let decoded = try decoder.decode(Key.Domain.self, from: data)
+      expect(decoded.string).toEqual(domain.string)
+      expect(decoded.utf8).toEqual(domain.utf8)
+      expect(decoded).toEqual(domain)
+      let json = String(data: data, encoding: .utf8)!
+      expect(json.contains("utf8")).toEqual(false)
+    }
+  }
+
+  func testKeyDomainDecodesFromPlainString() throws {
+    let json = #"{"string":"test.example.com"}"#
+    let decoded = try JSONDecoder().decode(Key.Domain.self, from: json.data(using: .utf8)!)
+    expect(decoded.string).toEqual("test.example.com")
+    expect(decoded.utf8).toEqual(Array("test.example.com".utf8))
+  }
+
   func testJsonEncodingAppScope() {
     let cases: [(AppScope, String)] = [
       (
