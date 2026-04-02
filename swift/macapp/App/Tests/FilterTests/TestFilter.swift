@@ -7,8 +7,17 @@ import Gertie
 
 class TestFilter: NetworkFilter {
   struct State: DecisionState {
-    var userKeychains: [uid_t: [RuleKeychain]] = [:]
+    var userKeychains: [uid_t: [RuleKeychain]] = [:] {
+      didSet { self.rebuildKeychainIndexes() }
+    }
+
+    var userKeychainIndexes: [uid_t: KeychainIndex] = [:]
     var userDowntime: [uid_t: Downtime] = [:]
+
+    mutating func rebuildKeychainIndexes() {
+      self.userKeychainIndexes = self.userKeychains.mapValues { KeychainIndex(keychains: $0) }
+    }
+
     var appIdManifest = AppIdManifest()
     var exemptUsers: Set<uid_t> = []
     var filteringDisabledUsers: Set<uid_t> = []
@@ -54,15 +63,15 @@ class TestFilter: NetworkFilter {
       $0.calendar = Calendar(identifier: .gregorian)
     } operation: {
       let filter = TestFilter()
-      filter.state = State(
-        userKeychains: userKeychains,
-        userDowntime: userDowntime.mapValues { Downtime(window: $0) },
-        appIdManifest: appIdManifest,
-        exemptUsers: exemptUsers,
-        filteringDisabledUsers: filteringDisabledUsers,
-        suspensions: suspensions,
-        macappsAliveUntil: macappsAliveUntil,
-      )
+      var state = State()
+      state.userDowntime = userDowntime.mapValues { Downtime(window: $0) }
+      state.appIdManifest = appIdManifest
+      state.exemptUsers = exemptUsers
+      state.filteringDisabledUsers = filteringDisabledUsers
+      state.suspensions = suspensions
+      state.macappsAliveUntil = macappsAliveUntil
+      state.userKeychains = userKeychains
+      filter.state = state
       return filter
     }
   }

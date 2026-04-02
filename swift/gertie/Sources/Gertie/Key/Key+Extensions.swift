@@ -1,4 +1,27 @@
+import Foundation
 import XCore
+
+private let regexCache = RegexCache()
+
+private final class RegexCache: @unchecked Sendable {
+  private var cache: [String: NSRegularExpression] = [:]
+  private let lock = NSLock()
+
+  func compiled(_ pattern: String) -> NSRegularExpression? {
+    self.lock.lock()
+    defer { lock.unlock() }
+    if let cached = cache[pattern] { return cached }
+    guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
+    self.cache[pattern] = regex
+    return regex
+  }
+}
+
+public func matchesCompiledRegex(_ string: String, pattern: String) -> Bool {
+  guard let regex = regexCache.compiled(pattern) else { return false }
+  let range = NSRange(string.startIndex..., in: string)
+  return regex.firstMatch(in: string, range: range) != nil
+}
 
 public extension Key.Domain {
   init?(_ input: String) {
@@ -14,20 +37,34 @@ public extension Key.Domain {
           URL(string: domain) != nil else {
       return nil
     }
-    string = domain.lowercased()
+    let lowered = domain.lowercased()
+    string = lowered
+    utf8 = Array(lowered.utf8)
   }
 
   func matches(hostname: String) -> Bool {
-    let hostname = hostname.lowercased()
-    if hostname == string {
+    self.matches(lowercasedHostname: hostname.lowercased())
+  }
+
+  func matches(lowercasedHostname hostname: String) -> Bool {
+    self.matchesUTF8(Array(hostname.utf8))
+  }
+
+  func matchesUTF8(_ hostname: [UInt8]) -> Bool {
+    let www: [UInt8] = [0x77, 0x77, 0x77, 0x2E] // "www."
+    if hostname == utf8 {
       return true
     }
 
-    if hostname.starts(with: "www."), hostname == "www.\(string)" {
+    if hostname.count == utf8.count + 4,
+       hostname.starts(with: www),
+       hostname.dropFirst(4).elementsEqual(utf8) {
       return true
     }
 
-    if string.starts(with: "www."), "www.\(hostname)" == string {
+    if utf8.count == hostname.count + 4,
+       utf8.starts(with: www),
+       utf8.dropFirst(4).elementsEqual(hostname) {
       return true
     }
 
@@ -35,7 +72,18 @@ public extension Key.Domain {
   }
 
   func matchesAnySubdomain(of hostname: String) -> Bool {
-    self.matches(hostname: hostname) || hostname.lowercased().hasSuffix(".\(string)")
+    self.matchesAnySubdomain(ofLowercased: hostname.lowercased())
+  }
+
+  func matchesAnySubdomain(ofLowercased hostname: String) -> Bool {
+    self.matchesAnySubdomainUTF8(Array(hostname.utf8))
+  }
+
+  func matchesAnySubdomainUTF8(_ hostname: [UInt8]) -> Bool {
+    self.matchesUTF8(hostname)
+      || (hostname.count > utf8.count + 1
+        && hostname[hostname.count - utf8.count - 1] == 0x2E // "."
+        && hostname.suffix(utf8.count).elementsEqual(utf8))
   }
 }
 
@@ -72,11 +120,14 @@ public extension Key.Path {
   }
 
   func matches(url: String) -> Bool {
-    let url = url.regexRemove("^https?://").lowercased()
+    self.matches(lowercasedUrl: url.regexRemove("^https?://").lowercased())
+  }
+
+  func matches(lowercasedUrl url: String) -> Bool {
     if let regex {
-      return url.matchesRegex(regex)
+      matchesCompiledRegex(url, pattern: regex)
     } else {
-      return url.regexRemove("/$") == domain.string + "/" + path.regexRemove("/$")
+      url.regexRemove("/$") == domain.string + "/" + path.regexRemove("/$")
     }
   }
 }

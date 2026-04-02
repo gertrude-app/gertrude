@@ -73,49 +73,112 @@ public extension NetworkFilter {
       return .block(.noUserKeys)
     }
 
-    for keychain in keychains {
-      if keychain.schedule?.active(at: self.now, in: self.calendar) == false {
-        continue
+    let lowercasedHostname = flow.hostname?.lowercased()
+    let hostnameUTF8 = lowercasedHostname.map { Array($0.utf8) }
+    let lowercasedUrl = flow.url?.regexRemove("^https?://").lowercased()
+
+    if let utf8 = hostnameUTF8,
+       let index = self.state.userKeychainIndexes[userId] {
+      let normalized = KeychainIndex.normalizeUTF8(utf8)
+      if let matches = index.exactDomains[normalized] {
+        for match in matches {
+          if match.schedule?.active(at: self.now, in: self.calendar) == false {
+            continue
+          }
+          if match.scope.permits(app) {
+            return .allow(.permittedByKey(match.ruleKeyId))
+          }
+        }
       }
-      for ruleKey in keychain.keys {
-        switch ruleKey.key {
 
-        case .domain(domain: let domain, scope: let scope):
-          if let hostname = flow.hostname, scope.permits(app),
-             domain.matches(hostname: hostname) {
-            return .allow(.permittedByKey(ruleKey.id))
+      for remainder in index.remainders {
+        if remainder.schedule?.active(at: self.now, in: self.calendar) == false {
+          continue
+        }
+        for ruleKey in remainder.keys {
+          switch ruleKey.key {
+          case .anySubdomain(domain: let domain, scope: let scope):
+            if scope.permits(app), domain.matchesAnySubdomainUTF8(utf8) {
+              return .allow(.permittedByKey(ruleKey.id))
+            }
+
+          case .skeleton(scope: let singleScope):
+            if AppScope.single(singleScope).permits(app) {
+              return .allow(.permittedByKey(ruleKey.id))
+            }
+
+          case .domainRegex(pattern: let pattern, scope: let scope):
+            if let hostname = lowercasedHostname,
+               matchesCompiledRegex(hostname, pattern: pattern.regex),
+               scope.permits(app) {
+              return .allow(.permittedByKey(ruleKey.id))
+            }
+
+          case .ipAddress(ipAddress: let ip, scope: let scope):
+            if let ipAddress = flow.ipAddress,
+               ipAddress == ip.string,
+               scope.permits(app) {
+              return .allow(.permittedByKey(ruleKey.id))
+            }
+
+          case .path(path: let path, scope: let scope):
+            if let url = lowercasedUrl,
+               path.matches(lowercasedUrl: url),
+               scope.permits(app) {
+              return .allow(.permittedByKey(ruleKey.id))
+            }
+
+          case .domain:
+            break
           }
+        }
+      }
+    } else {
+      for keychain in keychains {
+        if keychain.schedule?.active(at: self.now, in: self.calendar) == false {
+          continue
+        }
+        for ruleKey in keychain.keys {
+          switch ruleKey.key {
 
-        case .anySubdomain(domain: let domain, scope: let scope):
-          if let hostname = flow.hostname,
-             scope.permits(app),
-             domain.matchesAnySubdomain(of: hostname) {
-            return .allow(.permittedByKey(ruleKey.id))
-          }
+          case .domain(domain: let domain, scope: let scope):
+            if let utf8 = hostnameUTF8, scope.permits(app),
+               domain.matchesUTF8(utf8) {
+              return .allow(.permittedByKey(ruleKey.id))
+            }
 
-        case .skeleton(scope: let singleScope):
-          if AppScope.single(singleScope).permits(app) {
-            return .allow(.permittedByKey(ruleKey.id))
-          }
+          case .anySubdomain(domain: let domain, scope: let scope):
+            if let utf8 = hostnameUTF8,
+               scope.permits(app),
+               domain.matchesAnySubdomainUTF8(utf8) {
+              return .allow(.permittedByKey(ruleKey.id))
+            }
 
-        case .domainRegex(pattern: let pattern, scope: let scope):
-          if flow.hostname?.matchesRegex(pattern.regex) == true,
-             scope.permits(app) {
-            return .allow(.permittedByKey(ruleKey.id))
-          }
+          case .skeleton(scope: let singleScope):
+            if AppScope.single(singleScope).permits(app) {
+              return .allow(.permittedByKey(ruleKey.id))
+            }
 
-        case .ipAddress(ipAddress: let ip, scope: let scope):
-          if let ipAddress = flow.ipAddress,
-             ipAddress == ip.string,
-             scope.permits(app) {
-            return .allow(.permittedByKey(ruleKey.id))
-          }
+          case .domainRegex(pattern: let pattern, scope: let scope):
+            if let hostname = lowercasedHostname,
+               matchesCompiledRegex(hostname, pattern: pattern.regex),
+               scope.permits(app) {
+              return .allow(.permittedByKey(ruleKey.id))
+            }
 
-        case .path(path: let path, scope: let scope):
-          if let url = flow.url,
-             path.matches(url: url),
-             scope.permits(app) {
-            return .allow(.permittedByKey(ruleKey.id))
+          case .ipAddress(ipAddress: let ip, scope: let scope):
+            if let ipAddress = flow.ipAddress,
+               ipAddress == ip.string,
+               scope.permits(app) {
+              return .allow(.permittedByKey(ruleKey.id))
+            }
+
+          case .path(path: let path, scope: let scope):
+            if let url = lowercasedUrl,
+               path.matches(lowercasedUrl: url),
+               scope.permits(app) {
+              return .allow(.permittedByKey(ruleKey.id))
+            }
           }
         }
       }
@@ -141,15 +204,17 @@ public extension NetworkFilter {
 }
 
 public func bytesToAscii(_ bytes: Data) -> String {
-  var str = ""
+  var result = [UInt8]()
+  result.reserveCapacity(bytes.count * 3)
+  let dotBytes: [UInt8] = [0xE2, 0x80, 0xA2]
   for byte in bytes {
     switch byte {
     // ascii characters possible in hostname
     case 45 ... 57, 61, 63, 65 ... 90, 95, 97 ... 122:
-      str += String(Character(UnicodeScalar(byte)))
+      result.append(byte)
     default:
-      str += "•"
+      result.append(contentsOf: dotBytes)
     }
   }
-  return str
+  return String(bytes: result, encoding: .utf8) ?? ""
 }

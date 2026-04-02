@@ -6,7 +6,11 @@ import os.log
 
 public struct Filter: Reducer, Sendable {
   public struct State: Equatable, DecisionState {
-    public var userKeychains: [uid_t: [RuleKeychain]] = [:]
+    public var userKeychains: [uid_t: [RuleKeychain]] = [:] {
+      didSet { rebuildKeychainIndexes() }
+    }
+
+    public var userKeychainIndexes: [uid_t: KeychainIndex] = [:]
     public var userDowntime: [uid_t: Downtime] = [:]
     public var appIdManifest = AppIdManifest()
     public var exemptUsers: Set<uid_t> = []
@@ -293,6 +297,10 @@ public extension Filter.State {
   mutating func recordAppActivity(from userId: uid_t) {
     @Dependency(\.date.now) var now
     self.macappsAliveUntil[userId] = now + .seconds(150)
+  }
+
+  mutating func rebuildKeychainIndexes() {
+    userKeychainIndexes = userKeychains.mapValues { KeychainIndex(keychains: $0) }
   }
 }
 
