@@ -8,6 +8,12 @@ import XExpect
 @testable import Api
 
 final class CreateOnboardingAppKeysResolverTests: ApiTestCase, @unchecked Sendable {
+  override func setUp() async throws {
+    try await super.setUp()
+    try await self.db.delete(all: AppBundleId.self)
+    try await self.db.delete(all: IdentifiedApp.self)
+  }
+
   func testCreatesSkeletonKeysInDefaultKeychain() async throws {
     let child = try await self.childWithComputer()
 
@@ -178,6 +184,75 @@ final class CreateOnboardingAppKeysResolverTests: ApiTestCase, @unchecked Sendab
       .where(.keychainId == keychains[0].id)
       .all(in: self.db)
     expect(keys).toHaveCount(3)
+  }
+
+  func testUsesIdentifiedAppSlugWhenAvailable() async throws {
+    let child = try await self.childWithComputer()
+    let app = try await self.db.create(IdentifiedApp(
+      name: "Music",
+      slug: "music",
+      launchable: true,
+    ))
+    try await self.db.create(AppBundleId(
+      identifiedAppId: app.id,
+      bundleId: "com.apple.Music",
+    ))
+
+    let output = try await CreateOnboardingAppKeys.resolve(
+      with: ["com.apple.Music", "com.unknown.App"],
+      in: child.context,
+    )
+
+    expect(output).toEqual(.success)
+
+    let keychains = try await child.model.keychains(in: self.db)
+    let keys = try await Api.Key.query()
+      .where(.keychainId == keychains[0].id)
+      .all(in: self.db)
+    let sortedKeys = keys.sorted { "\($0.key)" < "\($1.key)" }
+    expect(sortedKeys).toHaveCount(2)
+    expect(sortedKeys[0].key).toEqual(.skeleton(scope: .bundleId("com.unknown.App")))
+    expect(sortedKeys[1].key).toEqual(.skeleton(scope: .identifiedAppSlug("music")))
+  }
+
+  func testSkipsSlugKeyWhenLegacyBundleIdKeyExists() async throws {
+    let child = try await self.childWithComputer()
+    let keychain = try await self.db.create(Keychain(
+      parentId: child.parentId,
+      name: "\(child.name)'s Keychain",
+      isPublic: false,
+    ))
+    try await self.db.create(ChildKeychain(
+      childId: child.id,
+      keychainId: keychain.id,
+    ))
+    try await self.db.create(Key(
+      keychainId: keychain.id,
+      key: .skeleton(scope: .bundleId("com.apple.Music")),
+    ))
+
+    let app = try await self.db.create(IdentifiedApp(
+      name: "Music",
+      slug: "music",
+      launchable: true,
+    ))
+    try await self.db.create(AppBundleId(
+      identifiedAppId: app.id,
+      bundleId: "com.apple.Music",
+    ))
+
+    let output = try await CreateOnboardingAppKeys.resolve(
+      with: ["com.apple.Music"],
+      in: child.context,
+    )
+
+    expect(output).toEqual(.success)
+
+    let keys = try await Api.Key.query()
+      .where(.keychainId == keychain.id)
+      .all(in: self.db)
+    expect(keys).toHaveCount(1)
+    expect(keys[0].key).toEqual(.skeleton(scope: .bundleId("com.apple.Music")))
   }
 
   func testAllBrowsersFilteredCreatesNoKeychainOrKeys() async throws {
