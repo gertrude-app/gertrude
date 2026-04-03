@@ -17,6 +17,7 @@ struct AppStoreVersionPollJob: AsyncScheduledJob {
     do {
       let version = try await self.appStoreConnect.fetchAppStoreVersion(.blocker)
       await self.ephemeral.setLatestIOSAppStoreVersion(version)
+      await self.slack.internal(.debug, "Polled iOS App Store version: `\(version)`")
     } catch {
       await self.ephemeral.setLatestIOSAppStoreVersion(nil)
       await self.slack.error("Failed to poll iOS App Store version: \(error)")
