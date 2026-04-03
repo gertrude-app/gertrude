@@ -1,10 +1,4 @@
-import {
-  type RequestGroup,
-  UNSAFE_DOMAINS,
-  domain,
-  groupRequestsByKey,
-  naughtyInfo,
-} from '@dash/keys';
+import { type RequestGroup, groupRequestsByKey, naughtyInfo } from '@dash/keys';
 import {
   AdjustmentsHorizontalIcon,
   InformationCircleIcon,
@@ -37,16 +31,12 @@ type Props = {
   submitting?: boolean;
 };
 
-function defaultAddressType(request: UnlockRequest): AddressType {
-  if (!request.domain && !request.url) return `strict`;
-  const raw = request.domain ?? request.url?.split(`/`)[2] ?? ``;
-  const registrable = domain.registrable(raw);
-  if (!registrable || UNSAFE_DOMAINS.includes(registrable)) return `strict`;
-  return `standard`;
+function defaultAddressType(key: RequestGroup[`key`]): AddressType {
+  return key.type === `anySubdomain` ? `standard` : `strict`;
 }
 
-function hasDomainScope(request: UnlockRequest): boolean {
-  return !!(request.domain || request.url);
+function hasDomainScope(key: RequestGroup[`key`]): boolean {
+  return key.type === `domain` || key.type === `anySubdomain`;
 }
 
 const BatchUnlockRequests: React.FC<Props> = ({
@@ -75,7 +65,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
             decision,
             keychainId: bestKeychainId,
             keychainOverridden: false,
-            addressType: defaultAddressType(g.representative),
+            addressType: defaultAddressType(g.key),
             expiration: undefined,
             comment: undefined,
           },
@@ -101,7 +91,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
             decision,
             keychainId: globalKeychainId,
             keychainOverridden: false,
-            addressType: defaultAddressType(g.representative),
+            addressType: defaultAddressType(g.key),
             expiration: undefined,
             comment: undefined,
           };
@@ -176,7 +166,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
         if (rs.decision === `accept`) {
           const baseKey = group.key;
           const key =
-            hasDomainScope(request) && rs.addressType !== defaultAddressType(request)
+            hasDomainScope(baseKey) && rs.addressType !== defaultAddressType(baseKey)
               ? rs.addressType === `strict` && baseKey.type === `anySubdomain`
                 ? { ...baseKey, type: `domain` as const }
                 : rs.addressType === `standard` && baseKey.type === `domain`
@@ -215,8 +205,8 @@ const BatchUnlockRequests: React.FC<Props> = ({
     r.ipAddress ??
     `unknown`;
 
-  const typeLabel = (r: UnlockRequest): { label: string; isApp: boolean } => {
-    if (r.appBundleId && !r.url && !r.domain) {
+  const typeLabel = (group: RequestGroup): { label: string; isApp: boolean } => {
+    if (group.key.scope.type !== `webBrowsers`) {
       return { label: `App`, isApp: true };
     }
     return { label: `Web`, isApp: false };
@@ -261,7 +251,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
         {groups.map((group) => {
           const request = group.representative;
           const row = getRow(request.id);
-          const { label: type, isApp } = typeLabel(request);
+          const { label: type, isApp } = typeLabel(group);
           const infoExpanded = expandedInfo === request.id;
           return (
             <div
@@ -348,7 +338,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
                 {expandedEdit === request.id && (
                   <div className="pb-3 pt-1">
                     <EditPanel
-                      request={request}
+                      keyRecord={group.key}
                       row={row}
                       onUpdate={(update) => updateRow(request.id, update)}
                     />
@@ -406,7 +396,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
               {groups.map((group) => {
                 const request = group.representative;
                 const row = getRow(request.id);
-                const { label: type, isApp } = typeLabel(request);
+                const { label: type, isApp } = typeLabel(group);
                 const infoExpanded = expandedInfo === request.id;
                 const editExpanded = expandedEdit === request.id;
 
@@ -519,7 +509,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
                       <tr className="bg-violet-50/30">
                         <td colSpan={5} className="px-6 py-4">
                           <EditPanel
-                            request={request}
+                            keyRecord={group.key}
                             row={row}
                             onUpdate={(update) => updateRow(request.id, update)}
                           />
@@ -656,11 +646,11 @@ const DecisionButtons: React.FC<{
 );
 
 const EditPanel: React.FC<{
-  request: UnlockRequest;
+  keyRecord: RequestGroup[`key`];
   row: RowState;
   onUpdate: (update: Partial<RowState>) => void;
-}> = ({ request, row, onUpdate }) => {
-  const showDomain = hasDomainScope(request);
+}> = ({ keyRecord, row, onUpdate }) => {
+  const showDomain = hasDomainScope(keyRecord);
   return (
     <div
       className={cx(
