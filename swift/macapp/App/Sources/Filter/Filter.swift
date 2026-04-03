@@ -95,7 +95,9 @@ public struct Filter: Reducer, Sendable {
 
     case .loadedPersistentState(.some(let persisted)):
       state.userKeychains = persisted.userKeychains
-      state.appIdManifest = persisted.appIdManifest
+      var manifest = persisted.appIdManifest
+      manifest.normalizeBundleIds()
+      state.appIdManifest = manifest
       state.exemptUsers = persisted.exemptUsers
       state.filteringDisabledUsers = persisted.filteringDisabledUsers ?? []
       return .none
@@ -238,7 +240,9 @@ public struct Filter: Reducer, Sendable {
         state.userKeychains[userId] = keychains
         state.exemptUsers.remove(userId)
       }
-      state.appIdManifest = manifest
+      var normalizedManifest = manifest
+      normalizedManifest.normalizeBundleIds()
+      state.appIdManifest = normalizedManifest
       state.appCache = [:]
       state.userDowntime[userId] = downtime
       if filteringDisabled == true {

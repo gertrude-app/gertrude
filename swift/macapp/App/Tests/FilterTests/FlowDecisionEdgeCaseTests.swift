@@ -102,6 +102,57 @@ final class FlowDecisionEdgeCaseTests: XCTestCase {
     expect(filter.completedDecision(&blocked)).toEqual(.block(.defaultNotAllowed))
   }
 
+  // MARK: - leading dot bundle ID normalization
+
+  func testSkeletonKeyMatchesFlowWithLeadingDotBundleId() {
+    let key = RuleKey(key: .skeleton(scope: .bundleId("com.apple.Music")))
+    let filter = TestFilter.scenario(userKeychains: [502: key.into()])
+    var flow = FilterFlow.test(hostname: "bag.itunes.apple.com", bundleId: ".com.apple.Music")
+    expect(filter.completedDecision(&flow)).toEqual(.allow(.permittedByKey(key.id)))
+  }
+
+  func testSkeletonKeyWithLeadingDotMatchesCleanFlowBundleId() {
+    let key = RuleKey(key: .skeleton(scope: .bundleId(".com.apple.Music")))
+    let filter = TestFilter.scenario(userKeychains: [502: key.into()])
+    var flow = FilterFlow.test(hostname: "bag.itunes.apple.com", bundleId: "com.apple.Music")
+    expect(filter.completedDecision(&flow)).toEqual(.allow(.permittedByKey(key.id)))
+  }
+
+  func testDomainKeyWithBundleIdScopeMatchesDespiteLeadingDot() {
+    let key = RuleKey(key: .domain(domain: "safe.com", scope: .single(.bundleId("com.app"))))
+    let filter = TestFilter.scenario(userKeychains: [502: key.into()])
+    var flow = FilterFlow.test(hostname: "safe.com", bundleId: ".com.app")
+    expect(filter.completedDecision(&flow)).toEqual(.allow(.permittedByKey(key.id)))
+  }
+
+  func testWebBrowsersScopeMatchesFlowWithLeadingDotBundleId() {
+    let key = RuleKey(key: .domain(domain: "safe.com", scope: .webBrowsers))
+    let filter = TestFilter.scenario(
+      userKeychains: [502: key.into()],
+      appIdManifest: .init(
+        apps: ["chrome": ["com.chrome"]],
+        displayNames: ["chrome": "Chrome"],
+        categories: ["browser": ["chrome"]],
+      ),
+    )
+    var flow = FilterFlow.test(hostname: "safe.com", bundleId: ".com.chrome")
+    expect(filter.completedDecision(&flow)).toEqual(.allow(.permittedByKey(key.id)))
+  }
+
+  func testIdentifiedAppSlugMatchesFlowWithLeadingDotBundleId() {
+    let key = RuleKey(key: .skeleton(scope: .identifiedAppSlug("music")))
+    let filter = TestFilter.scenario(
+      userKeychains: [502: key.into()],
+      appIdManifest: .init(
+        apps: ["music": ["com.apple.Music"]],
+        displayNames: ["music": "Music"],
+        categories: [:],
+      ),
+    )
+    var flow = FilterFlow.test(hostname: "bag.itunes.apple.com", bundleId: ".com.apple.Music")
+    expect(filter.completedDecision(&flow)).toEqual(.allow(.permittedByKey(key.id)))
+  }
+
   // MARK: - scope interactions with domain keys
 
   func testDomainKeyWithBundleIdScopeOnlyMatchesThatApp() {

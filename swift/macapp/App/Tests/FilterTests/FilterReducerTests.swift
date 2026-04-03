@@ -62,16 +62,19 @@ final class FilterReducerTests: XCTestCase {
 
     await mainQueue.advance(by: .seconds(1))
 
+    var normalizedManifest = manifest
+    normalizedManifest.normalizeBundleIds()
+
     await store.receive(.xpc(message)) {
       $0.userKeychains[502] = [keychain]
-      $0.appIdManifest = manifest
+      $0.appIdManifest = normalizedManifest
       $0.appCache = [:] // clears out app cache when new manifest is received
       $0.macappsAliveUntil[502] = .epoch + .macappAliveBuffer
     }
 
     await expect(saveState.calls).toEqual([.init(
       userKeychains: [503: [.mock], 502: [keychain]], //  <-- new info from user rules
-      appIdManifest: manifest, // <-- new info from user rules
+      appIdManifest: normalizedManifest, // <-- new info from user rules
       exemptUsers: [501], // <-- preserving existing unchanged data
     )])
 
@@ -160,10 +163,12 @@ final class FilterReducerTests: XCTestCase {
       $0.userDowntime[502] = downtime
     }
 
+    var normalizedMock = AppIdManifest.mock
+    normalizedMock.normalizeBundleIds()
     await expect(save.calls).toEqual([.init(
       userKeychains: [502: [.mock]],
       userDowntime: [502: downtime.window], // <-- new downtime info saved
-      appIdManifest: .mock,
+      appIdManifest: normalizedMock,
       exemptUsers: [],
     )])
   }
@@ -668,6 +673,39 @@ final class FilterReducerTests: XCTestCase {
     let event3 = FilterLogs.Event(id: "1", detail: nil) // <-- same id, different detail
     logs.log(event: event3)
     expect(logs.events).toEqual([event1: 2, newEvent: 1, event3: 1])
+  }
+
+  @MainActor
+  func testUserRulesNormalizesManifestBundleIds() async {
+    let (store, _) = Filter.testStore()
+    store.deps.filterExtension = .mock
+    store.deps.storage = .mock
+
+    let dottedManifest = AppIdManifest(
+      apps: ["music": [".com.apple.Music", "com.apple.AMPArtworkAgent"]],
+      displayNames: ["music": "Music"],
+      categories: [:],
+    )
+
+    await store.send(.xpc(.receivedAppMessage(.userRules(
+      userId: 502,
+      keychains: [.mock],
+      downtime: nil,
+      manifest: dottedManifest,
+      filteringDisabled: nil,
+    )))) {
+      $0.userKeychains[502] = [.mock]
+      $0.appIdManifest = AppIdManifest(
+        apps: ["music": [
+          ".com.apple.Music", "com.apple.Music",
+          ".com.apple.AMPArtworkAgent", "com.apple.AMPArtworkAgent",
+        ]],
+        displayNames: ["music": "Music"],
+        categories: [:],
+      )
+      $0.appCache = [:]
+      $0.macappsAliveUntil[502] = .epoch + .macappAliveBuffer
+    }
   }
 }
 
