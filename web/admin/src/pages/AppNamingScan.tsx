@@ -4,6 +4,7 @@ import client from '../api/client';
 import { CheckIcon, LoadingSpinner } from '../components/Icons';
 
 type UnidentifiedApp = T.GetUnidentifiedApps.Output[`apps`][number];
+type IdentifiedApp = T.GetIdentifiedAppsForAdmin.Output[number];
 
 const CATEGORIES = [
   { id: `7abf7b9c-ac52-4e16-98ff-8d4a6210b5b0`, slug: `browser`, name: `Browser` },
@@ -45,6 +46,7 @@ interface ItunesHit {
   editedName: string;
   slug: string;
   categoryId: string;
+  matchedExistingApp: { id: string; name: string } | null;
   promoting: boolean;
   promoted: boolean;
   error: string | null;
@@ -69,6 +71,7 @@ function toSlug(name: string): string {
 
 const AppNamingScan: React.FC = () => {
   const [apps, setApps] = useState<UnidentifiedApp[]>([]);
+  const [identifiedApps, setIdentifiedApps] = useState<IdentifiedApp[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -79,13 +82,17 @@ const AppNamingScan: React.FC = () => {
 
   useEffect(() => {
     const load = async (): Promise<void> => {
-      const result = await client.getUnidentifiedApps({ threshold: 1, limit: 0 });
-      if (result.isError) {
+      const [unidResult, idResult] = await Promise.all([
+        client.getUnidentifiedApps({ threshold: 1, limit: 0 }),
+        client.getIdentifiedAppsForAdmin(undefined),
+      ]);
+      if (unidResult.isError) {
         setLoadError(`Failed to load apps`);
         setLoading(false);
         return;
       }
-      setApps(result.value?.apps ?? []);
+      setApps(unidResult.value?.apps ?? []);
+      setIdentifiedApps(idResult.value ?? []);
       setLoading(false);
     };
     load();
@@ -110,6 +117,8 @@ const AppNamingScan: React.FC = () => {
           const name: string = r.trackName ?? r.collectionName ?? bundleId;
           const primaryGenre: string = r.primaryGenreName ?? ``;
           const genreSlug = ITUNES_GENRE_TO_SLUG[primaryGenre];
+          const slug = toSlug(name);
+          const existingMatch = identifiedApps.find((a) => a.slug === slug);
           setHits((prev) => [
             ...prev,
             {
@@ -119,8 +128,11 @@ const AppNamingScan: React.FC = () => {
               iconUrl: r.artworkUrl60 ?? ``,
               primaryGenre,
               editedName: name,
-              slug: toSlug(name),
+              slug,
               categoryId: genreSlug ?? ``,
+              matchedExistingApp: existingMatch
+                ? { id: existingMatch.id, name: existingMatch.name }
+                : null,
               promoting: false,
               promoted: false,
               error: null,
@@ -136,7 +148,7 @@ const AppNamingScan: React.FC = () => {
       }
     }
     setScanning(false);
-  }, [apps]);
+  }, [apps, identifiedApps]);
 
   const stopScan = useCallback(() => {
     scanAbortRef.current = true;
@@ -147,6 +159,28 @@ const AppNamingScan: React.FC = () => {
       prev.map((h) => (h.app.bundleId === bundleId ? { ...h, ...updates } : h)),
     );
   }, []);
+
+  const linkHit = useCallback(
+    async (hit: ItunesHit) => {
+      if (!hit.matchedExistingApp) return;
+      updateHit(hit.app.bundleId, { promoting: true, error: null });
+
+      const result = await client.promoteApp({
+        bundleId: hit.app.bundleId,
+        existingAppId: hit.matchedExistingApp.id,
+      });
+
+      if (result.isError) {
+        updateHit(hit.app.bundleId, {
+          promoting: false,
+          error: result.error?.userMessage ?? result.error?.debugMessage ?? `Failed`,
+        });
+      } else {
+        updateHit(hit.app.bundleId, { promoting: false, promoted: true });
+      }
+    },
+    [updateHit],
+  );
 
   const promoteHit = useCallback(
     async (hit: ItunesHit) => {
@@ -296,50 +330,69 @@ const AppNamingScan: React.FC = () => {
                     )}
                     <span className="text-xs text-slate-400">{hit.developer}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={hit.editedName}
-                      onChange={(e) => {
-                        const name = e.target.value;
-                        updateHit(hit.app.bundleId, {
-                          editedName: name,
-                          slug: toSlug(name),
-                        });
-                      }}
-                      className="w-[65%] px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-violet/30 focus:border-brand-violet"
-                    />
-                    <input
-                      type="text"
-                      value={hit.slug}
-                      onChange={(e) =>
-                        updateHit(hit.app.bundleId, { slug: e.target.value })
-                      }
-                      className="w-[35%] px-3 py-1.5 text-sm font-mono text-slate-500 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-violet/30 focus:border-brand-violet"
-                    />
-                    <select
-                      value={hit.categoryId}
-                      onChange={(e) =>
-                        updateHit(hit.app.bundleId, { categoryId: e.target.value })
-                      }
-                      className="px-2 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-violet/30 focus:border-brand-violet bg-white text-slate-600 max-w-[160px]"
-                    >
-                      <option value="">(no category)</option>
-                      {CATEGORIES.map((cat) => (
-                        <option key={cat.id} value={cat.slug}>
-                          {cat.name}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      onClick={() => promoteHit(hit)}
-                      disabled={hit.promoting}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-brand-violet to-brand-fuchsia rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex-shrink-0"
-                    >
-                      {hit.promoting && <LoadingSpinner className="w-3.5 h-3.5" />}
-                      Promote
-                    </button>
-                  </div>
+                  {hit.matchedExistingApp ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-slate-600">
+                        Link to existing:{` `}
+                        <span className="font-medium text-brand-violet">
+                          {hit.matchedExistingApp.name}
+                        </span>
+                      </span>
+                      <button
+                        onClick={() => linkHit(hit)}
+                        disabled={hit.promoting}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-sky-500 hover:bg-sky-600 rounded-lg transition-colors disabled:opacity-50 flex-shrink-0 ml-auto"
+                      >
+                        {hit.promoting && <LoadingSpinner className="w-3.5 h-3.5" />}
+                        Link
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={hit.editedName}
+                        onChange={(e) => {
+                          const name = e.target.value;
+                          updateHit(hit.app.bundleId, {
+                            editedName: name,
+                            slug: toSlug(name),
+                          });
+                        }}
+                        className="w-[65%] px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-violet/30 focus:border-brand-violet"
+                      />
+                      <input
+                        type="text"
+                        value={hit.slug}
+                        onChange={(e) =>
+                          updateHit(hit.app.bundleId, { slug: e.target.value })
+                        }
+                        className="w-[35%] px-3 py-1.5 text-sm font-mono text-slate-500 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-violet/30 focus:border-brand-violet"
+                      />
+                      <select
+                        value={hit.categoryId}
+                        onChange={(e) =>
+                          updateHit(hit.app.bundleId, { categoryId: e.target.value })
+                        }
+                        className="px-2 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-violet/30 focus:border-brand-violet bg-white text-slate-600 max-w-[160px]"
+                      >
+                        <option value="">(no category)</option>
+                        {CATEGORIES.map((cat) => (
+                          <option key={cat.id} value={cat.slug}>
+                            {cat.name}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={() => promoteHit(hit)}
+                        disabled={hit.promoting}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-brand-violet to-brand-fuchsia rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex-shrink-0"
+                      >
+                        {hit.promoting && <LoadingSpinner className="w-3.5 h-3.5" />}
+                        Promote
+                      </button>
+                    </div>
+                  )}
                   {hit.itunesName !== hit.editedName && (
                     <p className="text-xs text-slate-400">iTunes: {hit.itunesName}</p>
                   )}
