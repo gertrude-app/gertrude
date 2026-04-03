@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import AppNaming from './pages/AppNaming';
 import AppNamingDetail from './pages/AppNamingDetail';
+import AppNamingScan from './pages/AppNamingScan';
 import AppRatings from './pages/AppRatings';
 import Dashboard from './pages/Dashboard';
 import IOSDeviceEvents from './pages/IOSDeviceEvents';
@@ -52,6 +53,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/app-naming" element={<AppNaming />} />
+        <Route path="/app-naming/scan" element={<AppNamingScan />} />
         <Route path="/app-naming/:bundleId" element={<AppNamingDetail />} />
         <Route path="/ios-stats" element={<IOSStats />} />
         <Route path="/ios-devices" element={<IOSDevicesList />} />

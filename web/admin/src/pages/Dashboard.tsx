@@ -9,6 +9,7 @@ import {
   MicIcon,
   MonitorIcon,
   SmartphoneIcon,
+  TagIcon,
   UsersIcon,
 } from '../components/Icons';
 import InstallsGraph from '../components/InstallsGraph';
@@ -24,6 +25,13 @@ const Dashboard: React.FC = () => {
   const [iosData, setIosData] = useState<T.IOSOverview.Output | null>(null);
   const [podcastData, setPodcastData] = useState<T.PodcastOverview.Output | null>(null);
   const [appNamingCount, setAppNamingCount] = useState<number | null>(null);
+  const [appNamingStats, setAppNamingStats] = useState<{
+    total: number;
+    above100k: number;
+    above50k: number;
+    above10k: number;
+    above1k: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,14 +40,27 @@ const Dashboard: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const [overviewResult, macResult, iosResult, podcastResult, appNamingResult] =
-        await Promise.all([
-          client.subscriptionsOverview(),
-          client.macOverview(),
-          client.iOSOverview(),
-          client.podcastOverview(),
-          client.getUnidentifiedApps({ threshold: 100_000, limit: 1 }),
-        ]);
+      const [
+        overviewResult,
+        macResult,
+        iosResult,
+        podcastResult,
+        appNamingResult,
+        apps50k,
+        apps10k,
+        apps1k,
+        appsAll,
+      ] = await Promise.all([
+        client.subscriptionsOverview(),
+        client.macOverview(),
+        client.iOSOverview(),
+        client.podcastOverview(),
+        client.getUnidentifiedApps({ threshold: 100_000, limit: 1 }),
+        client.getUnidentifiedApps({ threshold: 50_000, limit: 1 }),
+        client.getUnidentifiedApps({ threshold: 10_000, limit: 1 }),
+        client.getUnidentifiedApps({ threshold: 1_000, limit: 1 }),
+        client.getUnidentifiedApps({ threshold: 1, limit: 1 }),
+      ]);
 
       if (overviewResult.isError) {
         setError(
@@ -62,6 +83,26 @@ const Dashboard: React.FC = () => {
       if (!appNamingResult.isError && appNamingResult.value) {
         setAppNamingCount(appNamingResult.value.totalAboveThreshold);
       }
+      if (
+        !appsAll.isError &&
+        appsAll.value &&
+        !apps1k.isError &&
+        apps1k.value &&
+        !apps10k.isError &&
+        apps10k.value &&
+        !apps50k.isError &&
+        apps50k.value &&
+        !appNamingResult.isError &&
+        appNamingResult.value
+      ) {
+        setAppNamingStats({
+          total: appsAll.value.totalAboveThreshold,
+          above100k: appNamingResult.value.totalAboveThreshold,
+          above50k: apps50k.value.totalAboveThreshold,
+          above10k: apps10k.value.totalAboveThreshold,
+          above1k: apps1k.value.totalAboveThreshold,
+        });
+      }
       setLoading(false);
     };
 
@@ -77,8 +118,8 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 animate-fade-in pt-4">
-      {appNamingCount !== null && appNamingCount > 0 && (
+    <div className="space-y-8 animate-fade-in pt-4 pb-16">
+      {appNamingCount !== null && appNamingCount > 100 && (
         <Link
           to="/app-naming"
           className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-brand-violet/10 to-brand-fuchsia/10 border border-brand-violet/20 rounded-2xl hover:from-brand-violet/15 hover:to-brand-fuchsia/15 transition-all group"
@@ -109,6 +150,7 @@ const Dashboard: React.FC = () => {
       {macData && <MacSection data={macData} />}
       {iosData && <IOSSection data={iosData} />}
       {podcastData && <PodcastSection data={podcastData} />}
+      {appNamingStats && <AppNamingCard stats={appNamingStats} />}
     </div>
   );
 };
@@ -502,6 +544,73 @@ const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {
             Recent Installs
           </h3>
           <PodcastInstallsGraph installs={data.recentInstalls} />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+interface AppNamingCardProps {
+  stats: {
+    total: number;
+    above100k: number;
+    above50k: number;
+    above10k: number;
+    above1k: number;
+  };
+}
+
+const AppNamingCard: React.FC<AppNamingCardProps> = ({ stats }) => {
+  const thresholds = [
+    { label: `50K+`, value: stats.above50k },
+    { label: `10K+`, value: stats.above10k },
+    { label: `1K+`, value: stats.above1k },
+  ];
+
+  return (
+    <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
+      <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-violet to-brand-fuchsia flex items-center justify-center shadow-lg shadow-brand-violet/20">
+            <TagIcon className="w-5 h-5 text-white" />
+          </div>
+          <h2 className="font-display font-semibold text-slate-900 text-xl">
+            App Naming
+          </h2>
+        </div>
+        <Link
+          to="/app-naming"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-brand-violet hover:text-brand-fuchsia bg-brand-50 hover:bg-brand-100 rounded-lg transition-all group"
+        >
+          <span>Review</span>
+          <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+      </div>
+      <div className="p-4 sm:p-6">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
+          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+            <div className="text-2xl font-display font-semibold text-slate-900">
+              {stats.total.toLocaleString()}
+            </div>
+            <div className="text-sm mt-1 text-slate-500">Total Unnamed</div>
+          </div>
+          <div className="bg-gradient-to-br from-brand-violet to-brand-fuchsia rounded-xl p-4">
+            <div className="text-2xl font-display font-semibold text-white">
+              {stats.above100k.toLocaleString()}
+            </div>
+            <div className="text-sm mt-1 text-white/80">100K+ requests</div>
+          </div>
+          {thresholds.map((t) => (
+            <div
+              key={t.label}
+              className="bg-slate-50 border border-slate-100 rounded-xl p-4"
+            >
+              <div className="text-2xl font-display font-semibold text-slate-900">
+                {t.value.toLocaleString()}
+              </div>
+              <div className="text-sm mt-1 text-slate-500">{t.label} requests</div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
