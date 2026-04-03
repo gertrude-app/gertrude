@@ -135,7 +135,7 @@ private struct ReviewsResponse: Codable {
 }
 
 private func fetchITunesRatings(appId: String) async throws -> ITunesRatings {
-  let url = "https://itunes.apple.com/lookup?id=\(appId)"
+  let url = "https://itunes.apple.com/lookup?id=\(appId)&cb=\(Int(Date().timeIntervalSince1970))"
   let response = try await HTTP.get(url, decoding: ITunesLookupResponse.self)
 
   guard let result = response.results.first else {
@@ -149,7 +149,7 @@ private func fetchITunesRatings(appId: String) async throws -> ITunesRatings {
 }
 
 private func fetchITunesVersion(appId: String) async throws -> String {
-  let url = "https://itunes.apple.com/lookup?id=\(appId)"
+  let url = "https://itunes.apple.com/lookup?id=\(appId)&cb=\(Int(Date().timeIntervalSince1970))"
   let response = try await HTTP.get(url, decoding: ITunesLookupResponse.self)
   guard let result = response.results.first else {
     throw AppStoreConnectError.noResults
