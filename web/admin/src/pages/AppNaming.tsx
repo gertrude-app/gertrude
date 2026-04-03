@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
 import ErrorState from '../components/ErrorState';
@@ -78,7 +78,13 @@ const AppNaming: React.FC = () => {
             {threshold.toLocaleString()} requests
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/app-naming/scan"
+            className="px-3 py-1.5 text-sm font-medium text-brand-violet hover:text-brand-fuchsia bg-brand-50 hover:bg-brand-100 rounded-lg transition-all"
+          >
+            iTunes Scan
+          </Link>
           <span className="text-sm text-slate-500">Threshold:</span>
           <div className="flex rounded-lg border border-slate-200 overflow-hidden">
             {THRESHOLD_OPTIONS.map((opt) => (
