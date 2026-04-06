@@ -65,15 +65,22 @@ extension PromoteApp: Resolver {
       name = existing.name
     }
 
+    let unidentifiedApp = try? await UnidentifiedApp.query()
+      .where(.bundleId == input.bundleId)
+      .first(in: context.db)
+
     try await context.db.create(AppBundleId(
       identifiedAppId: identifiedAppId,
       bundleId: input.bundleId,
+      count: unidentifiedApp?.count ?? 0,
     ))
 
-    try await context.db.delete(
-      UnidentifiedApp.self,
-      where: .bundleId == input.bundleId,
-    )
+    if unidentifiedApp != nil {
+      try await context.db.delete(
+        UnidentifiedApp.self,
+        where: .bundleId == input.bundleId,
+      )
+    }
 
     return .init(identifiedAppId: identifiedAppId, name: name)
   }

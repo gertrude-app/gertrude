@@ -382,6 +382,7 @@ extension AppBundleId: Model {
     case .id: .id(self)
     case .bundleId: .string(self.bundleId)
     case .identifiedAppId: .uuid(self.identifiedAppId)
+    case .count: .int(self.count)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -392,6 +393,7 @@ extension AppBundleId: Model {
       .id: .id(self),
       .bundleId: .string(self.bundleId),
       .identifiedAppId: .uuid(self.identifiedAppId),
+      .count: .int(self.count),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

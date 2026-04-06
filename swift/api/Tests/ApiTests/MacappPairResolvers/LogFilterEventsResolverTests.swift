@@ -53,16 +53,26 @@ final class LogFilterEventsResolverTests: ApiTestCase, @unchecked Sendable {
       .orderBy(.bundleId, .asc)
       .all(in: self.db)
 
-    expect(unidentifiedApps.count).toEqual(2) // <-- identified ignored
+    expect(unidentifiedApps.count).toEqual(2)
     expect(unidentifiedApps[0].bundleId).toEqual("com.gadget")
     expect(unidentifiedApps[0].count).toEqual(2)
     expect(unidentifiedApps[1].bundleId).toEqual("com.widget")
     expect(unidentifiedApps[1].count).toEqual(6) // <-- added to existing count
 
+    let xcodeBundleId = try await AppBundleId.query()
+      .where(.bundleId == "com.xcode")
+      .first(in: self.db)
+    expect(xcodeBundleId.count).toEqual(1) // <-- identified app count incremented
+
     // ensure no crash if all bundle ids already identified
-    let input2 = FilterLogs(bundleIds: ["com.xcode": 1], events: [:])
+    let input2 = FilterLogs(bundleIds: ["com.xcode": 5], events: [:])
     let output = try await LogFilterEvents.resolve(with: input2, in: child.context)
     expect(output).toEqual(.success)
+
+    let xcodeBundleIdAfter = try await AppBundleId.query()
+      .where(.bundleId == "com.xcode")
+      .first(in: self.db)
+    expect(xcodeBundleIdAfter.count).toEqual(6) // <-- accumulated
   }
 
   func testScreenTimeWarningEmailSentOncePerComputer() async throws {

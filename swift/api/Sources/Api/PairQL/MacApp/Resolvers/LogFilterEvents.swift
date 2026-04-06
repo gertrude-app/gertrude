@@ -62,6 +62,30 @@ struct UpsertUnidentifiedApps: CustomQueryable {
   }
 }
 
+struct UpsertAppBundleIdCounts: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    let tableName = AppBundleId.qualifiedTableName
+    let count = AppBundleId.columnName(.count)
+    let bundleId = AppBundleId.columnName(.bundleId)
+    var stmt = SQL.Statement("""
+    UPDATE \(tableName) SET \(count) = \(tableName).\(count) + CASE \(bundleId)
+    """)
+    for i in (0 ..< bindings.count).striding(by: 2) {
+      stmt.components.append(.sql("\nWHEN "))
+      stmt.components.append(.binding(bindings[i]))
+      stmt.components.append(.sql(" THEN "))
+      stmt.components.append(.binding(bindings[i + 1]))
+    }
+    stmt.components.append(.sql("\nEND\nWHERE \(bundleId) IN ("))
+    for i in (0 ..< bindings.count).striding(by: 2) {
+      if i > 0 { stmt.components.append(.sql(", ")) }
+      stmt.components.append(.binding(bindings[i]))
+    }
+    stmt.components.append(.sql(")"))
+    return stmt
+  }
+}
+
 struct IdentifiedBundleIds: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     .init("""
@@ -160,19 +184,30 @@ private func storeUnidentifiedApps(
 
   let rows = try await context.db.customQuery(IdentifiedBundleIds.self)
   let identifiedBundleIds = Set(rows.map(\.bundleId))
-  var bindings: [Postgres.Data] = []
+  var unidentifiedBindings: [Postgres.Data] = []
+  var identifiedBindings: [Postgres.Data] = []
 
   for (bundleId, count) in bundleIds {
-    if !identifiedBundleIds.contains(bundleId) {
-      bindings.append(.string(bundleId))
-      bindings.append(.int(count))
+    if identifiedBundleIds.contains(bundleId) {
+      identifiedBindings.append(.string(bundleId))
+      identifiedBindings.append(.int(count))
+    } else {
+      unidentifiedBindings.append(.string(bundleId))
+      unidentifiedBindings.append(.int(count))
     }
   }
 
-  if !bindings.isEmpty {
+  if !unidentifiedBindings.isEmpty {
     _ = try await context.db.customQuery(
       UpsertUnidentifiedApps.self,
-      withBindings: bindings,
+      withBindings: unidentifiedBindings,
+    )
+  }
+
+  if !identifiedBindings.isEmpty {
+    _ = try await context.db.customQuery(
+      UpsertAppBundleIdCounts.self,
+      withBindings: identifiedBindings,
     )
   }
 }
