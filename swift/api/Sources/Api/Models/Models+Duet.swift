@@ -273,6 +273,7 @@ extension AppBundleId {
     case id
     case bundleId
     case identifiedAppId
+    case count
     case createdAt
     case updatedAt
   }

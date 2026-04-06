@@ -79,6 +79,7 @@ extension Configure {
     app.migrations.add(DropIosScreenshots())
     app.migrations.add(AddChildFilteringDisabled())
     app.migrations.add(DeduplicateKeys())
+    app.migrations.add(AddAppBundleIdCount())
   }
 }
 
