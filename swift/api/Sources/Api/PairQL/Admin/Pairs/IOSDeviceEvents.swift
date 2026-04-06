@@ -72,7 +72,7 @@ extension IOSDeviceEvents: Resolver {
       }
     }
 
-    let filteredEvents = events.filter { $0.eventId != "b977cfdc" }
+    let filteredEvents = events.filter { !["b977cfdc", "06329f27"].contains($0.eventId) }
     var outputEvents: [Event] = []
     for (index, event) in filteredEvents.enumerated() {
       let elapsedSeconds: Int?
@@ -321,6 +321,7 @@ extension IOSDeviceEvents: Resolver {
     case "ffff30ac": "⚠ Missing rules after opt-out"
     case "7c039b10": "⚠ Unhandled button action"
     case "b977cfdc": "Check-in"
+    case "06329f27": "Block rules fetched"
     case "180e2347": "Handling upgrade"
     // --- Legacy (old app versions, no longer emitted) ---
     case "dcd721aa": "🚀 First launch"
