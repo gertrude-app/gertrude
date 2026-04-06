@@ -142,6 +142,37 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output).toEqual(StripeUrl_v2.Output(url: "/light-checkout-url"))
   }
 
+  func testStripeUrlV2ForTrialExpiredUserWithLightTier() async throws {
+    let parent = try await self.parentWithSubscription {
+      $1.stripeId = nil
+      $1.billingStatus = .trialExpired
+    }
+
+    let output = try await withDependencies {
+      $0.stripe.createCheckoutSession = { sessionData in
+        expect(sessionData.clientReferenceId).toEqual(parent.id.lowercased)
+        expect(sessionData.lineItems.first?.priceId).toEqual("price_1SwT4IGKRdhETuKAc9wwLtsR")
+        return .init(
+          id: "s1",
+          url: "/light-checkout-url",
+          subscription: "subsid",
+          clientReferenceId: nil,
+        )
+      }
+    } operation: {
+      try await StripeUrl_v2.resolve(
+        with: .init(
+          successPath: "/supervise-device/123/download-helper",
+          cancelPath: "/supervise-device/123/payment",
+          tier: .light,
+        ),
+        in: context(parent.model),
+      )
+    }
+
+    expect(output).toEqual(StripeUrl_v2.Output(url: "/light-checkout-url"))
+  }
+
   func testHandleCheckoutSuccess() async throws {
     let sessionId = "cs_123"
     let parent = try await self.parentWithSubscription {

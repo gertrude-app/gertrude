@@ -26,7 +26,7 @@ extension StripeUrl_v2: Resolver {
     switch try await context.parent.plan(in: context.db) {
     case .full(.trialing), .full(.trialExpired):
       return try await .init(url: checkoutSessionUrl(
-        tier: .full,
+        tier: input.tier ?? .full,
         successPath: input.successPath,
         cancelPath: input.cancelPath,
         iosDeviceId: input.associatedIosDeviceId,
