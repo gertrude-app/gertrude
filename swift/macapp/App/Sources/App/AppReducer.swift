@@ -119,6 +119,9 @@ struct AppReducer: Reducer, Sendable {
             effects.append(.exec { send in await send(.startProtecting(user: user)) })
           } else {
             state.onboarding.connectChildRequest = .succeeded(payload: user.name)
+            effects.append(.exec { _ in
+              await self.api.setUserToken(user.token)
+            })
           }
         }
         if let onboardingStep = persisted.resumeOnboarding {

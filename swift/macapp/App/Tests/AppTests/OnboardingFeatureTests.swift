@@ -1609,6 +1609,42 @@ final class OnboardingFeatureTests: XCTestCase {
       $0.onboarding.step = .exemptUsers
     }
   }
+
+  @MainActor
+  func testResumeFromScreenRecordingRestoresUserToken() async {
+    let (store, _) = AppReducer.testStore()
+    let user = UserData.mock
+    let setToken = spy(on: UUID.self, returning: ())
+    store.deps.api.setUserToken = setToken.fn
+    store.deps.monitoring.screenRecordingPermissionGranted = { true }
+    store.deps.storage.loadPersistentState = { .mock {
+      $0.user = user
+      $0.resumeOnboarding = .checkingScreenRecordingPermission
+    }}
+
+    await store.send(.application(.didFinishLaunching))
+    await store.skipReceivedActions()
+
+    await expect(setToken.calls).toEqual([user.token])
+  }
+
+  @MainActor
+  func testResumeFromFDARestoresUserToken() async {
+    let (store, _) = AppReducer.testStore()
+    let user = UserData.mock
+    let setToken = spy(on: UUID.self, returning: ())
+    store.deps.api.setUserToken = setToken.fn
+    store.deps.app.hasFullDiskAccess = { true }
+    store.deps.storage.loadPersistentState = { .mock {
+      $0.user = user
+      $0.resumeOnboarding = .checkingFullDiskAccessPermission(upgrade: false)
+    }}
+
+    await store.send(.application(.didFinishLaunching))
+    await store.skipReceivedActions()
+
+    await expect(setToken.calls).toEqual([user.token])
+  }
 }
 
 // helpers
