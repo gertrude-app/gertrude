@@ -33,6 +33,7 @@ targets:
       - package: LibTCA
     settings:
       base:
+        TARGETED_DEVICE_FAMILY: "1,2" # iPhone and iPad
         SWIFT_VERSION: "6.0"
         PRODUCT_NAME: "Gertrude AM"
         DEVELOPMENT_TEAM: "WFN83LM943"

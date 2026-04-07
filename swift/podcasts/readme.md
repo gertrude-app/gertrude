@@ -2,7 +2,7 @@
 
 ## Releases
 
-- `1.4.1` (4/2/2026)
+- `1.4.1` (4/7/2026)
   - fix episode website link (was pointing to show)
 - `1.4.0` (3/23/2026)
   - new feature: podcast playback speed
