@@ -229,7 +229,8 @@ const AppNamingDetail: React.FC = () => {
       return;
     }
 
-    navigate(`/app-naming`);
+    const upgraded = result.value?.upgradedKeyCount ?? 0;
+    navigate(`/app-naming${upgraded > 0 ? `?upgraded=${upgraded}` : ``}`);
   };
 
   if (!app) {
