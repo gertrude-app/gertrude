@@ -2,7 +2,15 @@
 
 ## Release notes
 
-- `2.8.1` (beta 1/28/26, new downloads for now, watching ws fix effect)
+- `2.9.0` (beta 4/8/26, new downloads, adding more onboarding screens)
+  - new onboarding screen for app blocking
+  - new onboarding screen for app keys
+  - improve app key request unlock matching via leading dots
+  - major network request speed improvements
+  - support filter-off/only-screenshots as first-class config option
+  - increase privacy of screenshot storage
+  - upload app catalog w/ icons for future dash consumption
+- `2.8.1` (1/28/26, new downloads for now, watching ws fix effect)
   - increase websocket margin of safety
   - support copy/paste of connection codes
   - fix wrong language for health check notification repair on Tahoe
