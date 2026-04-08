@@ -316,6 +316,7 @@ final class OnboardingFeatureTests: XCTestCase {
     let fakeApps: [DiscoveredApp] = [
       .init(name: "Slack", bundleId: "com.tinyspeck.slackmacgap", iconPath: "", category: nil),
       .init(name: "Zoom", bundleId: "us.zoom.xos", iconPath: "", category: nil),
+      .init(name: "Launchpad", bundleId: "com.apple.apps.launcher", iconPath: "", category: nil),
     ]
     let discoverApps: Mock<[DiscoveredApp]> = mock(always: fakeApps)
     store.deps.device.discoverInstalledApps = discoverApps.fn
@@ -335,8 +336,12 @@ final class OnboardingFeatureTests: XCTestCase {
 
     // app discovery fires during sysext install success (preloaded)
     await expect(discoverApps.calls.count).toEqual(1)
+    let expectedApps: [DiscoveredApp] = [
+      .init(name: "Slack", bundleId: "com.tinyspeck.slackmacgap", iconPath: "", category: nil),
+      .init(name: "Zoom", bundleId: "us.zoom.xos", iconPath: "", category: nil),
+    ]
     await store.receive(.onboarding(.receivedDiscoveredApps(fakeApps))) {
-      $0.onboarding.discoveredApps = fakeApps
+      $0.onboarding.discoveredApps = expectedApps
     }
 
     // we clear the exempted state for the current user proactively as safeguard

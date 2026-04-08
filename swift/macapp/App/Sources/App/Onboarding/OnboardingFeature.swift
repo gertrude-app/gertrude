@@ -698,7 +698,9 @@ struct OnboardingFeature: Feature {
         }
 
       case .receivedDiscoveredApps(let apps):
-        state.discoveredApps = apps
+        state.discoveredApps = apps.filter { app in
+          !ONBOARDING_HIDDEN_BUNDLE_IDS.contains { app.bundleId.contains($0) }
+        }
         return .none
 
       case .webview(.primaryBtnClicked) where step == .appKeySelection_intro:
@@ -983,3 +985,29 @@ extension OnboardingFeature.Reducer {
     self.log("received .\(shortAction) from step .\(step)", id)
   }
 }
+
+private let ONBOARDING_HIDDEN_BUNDLE_IDS = [
+  "com.netrivet.gertrude",
+  "com.apple.apps.launcher", // Launchpad (Tahoe+)
+  "com.apple.launchpad.launcher", // Launchpad (pre-Tahoe)
+  "com.apple.exposelauncher", // Mission Control
+  "com.apple.backup.launcher", // Time Machine
+  "com.apple.screenshot.launcher",
+  "com.apple.ActivityMonitor",
+  "com.apple.airport.airportutility",
+  "com.apple.audio.AudioMIDISetup",
+  "com.apple.BluetoothFileExchange",
+  "com.apple.bootcampassistant",
+  "com.apple.ColorSyncUtility",
+  "com.apple.Console",
+  "com.apple.DigitalColorMeter",
+  "com.apple.DiskUtility",
+  "com.apple.keychainaccess",
+  "com.apple.grapher",
+  "com.apple.Magnifier",
+  "com.apple.MigrateAssistant",
+  "com.apple.printcenter",
+  "com.apple.ScriptEditor2",
+  "com.apple.SystemProfiler", // System Information
+  "com.apple.VoiceOverUtility",
+]
