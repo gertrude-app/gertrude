@@ -116,11 +116,10 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
         <Onboarding.Centered>
           <Onboarding.Heading>System extension installed!</Onboarding.Heading>
           <Onboarding.Text className="mt-4 mb-8">
-            Hooray, we’ve confirmed the system extension is <em>ready to go!</em>
+            Past all the hard parts&mdash;that was the last permission you need to grant.
           </Onboarding.Text>
           <Callout type="info" heading="Good to know:">
-            You’re past all the hard parts, all that’s left is to briefly show you around
-            a bit.
+            Up next, a few options and recommendations to help you off to a smooth start.
           </Callout>
           <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" className="mt-8">
             Next

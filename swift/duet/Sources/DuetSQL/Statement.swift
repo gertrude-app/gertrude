@@ -194,6 +194,10 @@ public extension SQL.Statement {
         sql.appendInterpolation(expression: .jsonb(json))
       case .binding(.json(.none)):
         sql.appendInterpolation(expression: .null)
+      case .binding(.bytea(.some(let data))):
+        sql.appendInterpolation(expression: .bytea(data.base64EncodedString()))
+      case .binding(.bytea(.none)):
+        sql.appendInterpolation(expression: .null)
       case .binding(.null):
         sql.appendInterpolation(expression: .null)
       case .binding(let data):

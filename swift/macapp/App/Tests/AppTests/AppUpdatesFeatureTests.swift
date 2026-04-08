@@ -172,7 +172,7 @@ final class AppUpdatesFeatureTests: XCTestCase {
     await store.send(.adminWindow(.delegate(.triggerAppUpdate)))
     await expect(saveState.called).toEqual(true)
     let calls = await triggerUpdate.calls
-    await expect(calls.count).toEqual(1)
+    expect(calls.count).toEqual(1)
     self.assertAppcastURL(calls[0], channel: "stable")
   }
 
@@ -184,7 +184,7 @@ final class AppUpdatesFeatureTests: XCTestCase {
 
     await store.send(.adminWindow(.delegate(.triggerAppUpdate)))
     let calls = await triggerUpdate.calls
-    await expect(calls.count).toEqual(1)
+    expect(calls.count).toEqual(1)
     self.assertAppcastURL(calls[0], channel: "beta")
   }
 
@@ -217,7 +217,7 @@ final class AppUpdatesFeatureTests: XCTestCase {
 
     await expect(saveState.called).toEqual(true)
     let calls = await triggerUpdate.calls
-    await expect(calls.count).toEqual(1)
+    expect(calls.count).toEqual(1)
     self.assertAppcastURL(calls[0], channel: "beta")
   }
 

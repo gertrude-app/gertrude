@@ -49,6 +49,7 @@ interface ItunesHit {
   matchedExistingApp: { id: string; name: string } | null;
   promoting: boolean;
   promoted: boolean;
+  upgradedKeyCount: number;
   error: string | null;
 }
 
@@ -135,6 +136,7 @@ const AppNamingScan: React.FC = () => {
                 : null,
               promoting: false,
               promoted: false,
+              upgradedKeyCount: 0,
               error: null,
             },
           ]);
@@ -176,7 +178,12 @@ const AppNamingScan: React.FC = () => {
           error: result.error?.userMessage ?? result.error?.debugMessage ?? `Failed`,
         });
       } else {
-        updateHit(hit.app.bundleId, { promoting: false, promoted: true });
+        const upgraded = result.value?.upgradedKeyCount ?? 0;
+        updateHit(hit.app.bundleId, {
+          promoting: false,
+          promoted: true,
+          upgradedKeyCount: upgraded,
+        });
       }
     },
     [updateHit],
@@ -207,7 +214,12 @@ const AppNamingScan: React.FC = () => {
           error: result.error?.userMessage ?? result.error?.debugMessage ?? `Failed`,
         });
       } else {
-        updateHit(hit.app.bundleId, { promoting: false, promoted: true });
+        const upgraded = result.value?.upgradedKeyCount ?? 0;
+        updateHit(hit.app.bundleId, {
+          promoting: false,
+          promoted: true,
+          upgradedKeyCount: upgraded,
+        });
       }
     },
     [updateHit],
@@ -410,6 +422,15 @@ const AppNamingScan: React.FC = () => {
             <CheckIcon className="w-4 h-4" />
             <span>
               {promotedCount} app{promotedCount !== 1 ? `s` : ``} promoted this session
+              {(() => {
+                const totalUpgraded = hits.reduce(
+                  (sum, h) => sum + h.upgradedKeyCount,
+                  0,
+                );
+                return totalUpgraded > 0
+                  ? ` (${totalUpgraded} key${totalUpgraded !== 1 ? `s` : ``} upgraded to slug)`
+                  : ``;
+              })()}
             </span>
           </div>
         </div>

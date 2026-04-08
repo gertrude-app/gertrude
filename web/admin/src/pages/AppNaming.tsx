@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
 import ErrorState from '../components/ErrorState';
-import { ArrowLeftIcon } from '../components/Icons';
+import { ArrowLeftIcon, CheckIcon } from '../components/Icons';
 import LoadingState from '../components/LoadingState';
 
 type UnidentifiedApp = T.GetUnidentifiedApps.Output[`apps`][number];
@@ -18,6 +18,11 @@ const THRESHOLD_OPTIONS = [
 
 const AppNaming: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [upgradedBanner, setUpgradedBanner] = useState<number | null>(() => {
+    const val = searchParams.get(`upgraded`);
+    return val ? parseInt(val, 10) : null;
+  });
   const [threshold, setThreshold] = useState(100_000);
   const [apps, setApps] = useState<UnidentifiedApp[]>([]);
   const [totalAboveThreshold, setTotalAboveThreshold] = useState(0);
@@ -51,6 +56,14 @@ const AppNaming: React.FC = () => {
     fetchApps(threshold);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (upgradedBanner === null) return;
+    searchParams.delete(`upgraded`);
+    setSearchParams(searchParams, { replace: true });
+    const timer = setTimeout(() => setUpgradedBanner(null), 5000);
+    return () => clearTimeout(timer);
+  }, [upgradedBanner, searchParams, setSearchParams]);
 
   const handleThresholdChange = (newThreshold: number): void => {
     setThreshold(newThreshold);
@@ -103,6 +116,24 @@ const AppNaming: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {upgradedBanner !== null && (
+        <div className="bg-emerald-50 border border-emerald-200/50 rounded-xl px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-emerald-700">
+            <CheckIcon className="w-4 h-4" />
+            <span>
+              Promoted! {upgradedBanner} existing key
+              {upgradedBanner !== 1 ? `s` : ``} upgraded to slug.
+            </span>
+          </div>
+          <button
+            onClick={() => setUpgradedBanner(null)}
+            className="text-emerald-500 hover:text-emerald-700 text-xs font-medium"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
         <table className="w-full text-sm">

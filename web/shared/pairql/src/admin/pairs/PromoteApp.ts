@@ -14,5 +14,6 @@ export namespace PromoteApp {
   export interface Output {
     identifiedAppId: UUID;
     name: string;
+    upgradedKeyCount: number;
   }
 }

@@ -5,6 +5,8 @@ public enum AuthedUserRoute: PairRoute {
   case checkIn(CheckIn.Input)
   case checkIn_v2(CheckIn_v2.Input)
   case createKeystrokeLines(CreateKeystrokeLines.Input)
+  case createOnboardingAppKeys(CreateOnboardingAppKeys.Input)
+  case createOnboardingBlockedApps(CreateOnboardingBlockedApps.Input)
   case createSignedScreenshotUpload(CreateSignedScreenshotUpload.Input)
   case createSignedScreenshotUpload_v2(CreateSignedScreenshotUpload_v2.Input)
   case createSuspendFilterRequest_v2(CreateSuspendFilterRequest_v2.Input)
@@ -12,6 +14,7 @@ public enum AuthedUserRoute: PairRoute {
   case logFilterEvents(LogFilterEvents.Input)
   case logSecurityEvent(LogSecurityEvent.Input)
   case reportBrowsers(ReportBrowsers.Input)
+  case uploadAppIcon(UploadAppIcon.Input)
 }
 
 public extension AuthedUserRoute {
@@ -27,6 +30,14 @@ public extension AuthedUserRoute {
     Route(.case(Self.createKeystrokeLines)) {
       Operation(CreateKeystrokeLines.self)
       Body(.json(CreateKeystrokeLines.Input.self))
+    }
+    Route(.case(Self.createOnboardingAppKeys)) {
+      Operation(CreateOnboardingAppKeys.self)
+      Body(.json(CreateOnboardingAppKeys.Input.self))
+    }
+    Route(.case(Self.createOnboardingBlockedApps)) {
+      Operation(CreateOnboardingBlockedApps.self)
+      Body(.json(CreateOnboardingBlockedApps.Input.self))
     }
     Route(.case(Self.createSignedScreenshotUpload)) {
       Operation(CreateSignedScreenshotUpload.self)
@@ -55,6 +66,10 @@ public extension AuthedUserRoute {
     Route(.case(Self.reportBrowsers)) {
       Operation(ReportBrowsers.self)
       Body(.json(ReportBrowsers.Input.self))
+    }
+    Route(.case(Self.uploadAppIcon)) {
+      Operation(UploadAppIcon.self)
+      Body(.json(UploadAppIcon.Input.self))
     }
   }
   .eraseToAnyParserPrinter()

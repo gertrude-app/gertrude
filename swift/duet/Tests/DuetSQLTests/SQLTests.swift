@@ -322,13 +322,19 @@ final class SqlTests: XCTestCase {
 
     let expected = """
     UPDATE public.lil_things
-    SET "int" = $1, "deleted_at" = $2, "updated_at" = $3
-    WHERE "id" = $4
+    SET "int" = $1, "data" = $2, "deleted_at" = $3, "updated_at" = $4
+    WHERE "id" = $5
     RETURNING *
     """
 
     expect(client.stmt.prepared).toEqual(expected)
-    expect(client.stmt.params).toEqual([3, .date(.epoch), .currentTimestamp, .id(thing)])
+    expect(client.stmt.params).toEqual([
+      3,
+      .bytea(nil),
+      .date(.epoch),
+      .currentTimestamp,
+      .id(thing),
+    ])
   }
 
   func testCreate() async throws {
@@ -339,14 +345,15 @@ final class SqlTests: XCTestCase {
 
     let expected = """
     INSERT INTO public.lil_things
-    ("created_at", "deleted_at", "id", "int", "updated_at")
+    ("created_at", "data", "deleted_at", "id", "int", "updated_at")
     VALUES
-    ($1, $2, $3, $4, $5)
+    ($1, $2, $3, $4, $5, $6)
     """
 
     expect(client.stmt.prepared).toEqual(expected)
     expect(client.stmt.params).toEqual([
       .currentTimestamp,
+      .bytea(nil),
       .date(nil),
       .id(thing),
       .int(3),
@@ -363,19 +370,21 @@ final class SqlTests: XCTestCase {
 
     let expected = """
     INSERT INTO public.lil_things
-    ("created_at", "deleted_at", "id", "int", "updated_at")
+    ("created_at", "data", "deleted_at", "id", "int", "updated_at")
     VALUES
-    ($1, $2, $3, $4, $5), ($6, $7, $8, $9, $10)
+    ($1, $2, $3, $4, $5, $6), ($7, $8, $9, $10, $11, $12)
     """
 
     expect(client.stmt.prepared).toEqual(expected)
     expect(client.stmt.params).toEqual([
       .currentTimestamp,
+      .bytea(nil),
       .date(nil),
       .id(thing1),
       .int(1),
       .currentTimestamp,
       .currentTimestamp,
+      .bytea(nil),
       .date(nil),
       .id(thing2),
       .int(2),
@@ -430,13 +439,13 @@ final class SqlTests: XCTestCase {
 
     let expected = """
     UPDATE public.lil_things
-    SET "int" = $1, "deleted_at" = $2, "updated_at" = $3
-    WHERE "id" = $4
+    SET "int" = $1, "data" = $2, "deleted_at" = $3, "updated_at" = $4
+    WHERE "id" = $5
     RETURNING *
     """
 
     expect(client.stmt.prepared).toEqual(expected)
-    expect(client.stmt.params).toEqual([5, .date(nil), .currentTimestamp, .id(thing)])
+    expect(client.stmt.params).toEqual([5, .bytea(nil), .date(nil), .currentTimestamp, .id(thing)])
   }
 
   func testKitchenSinkInsert() async throws {
@@ -502,6 +511,34 @@ final class SqlTests: XCTestCase {
     let sqlString = serializer.sql
 
     expect(sqlString).toContain("'bar'::custom_enums")
+    expect(sqlString).toContain(", NULL,")
+  }
+
+  func testByteaSerializesToDecode() async throws {
+    let thing = LilThing(int: 1, data: Data("hello".utf8))
+
+    let client = TestClient()
+    _ = try await client.create([thing])
+
+    let sql = client.stmt.sql
+    var serializer = SQLSerializer(database: TestDatabase())
+    sql.serialize(to: &serializer)
+    let sqlString = serializer.sql
+
+    expect(sqlString).toContain("decode('aGVsbG8=', 'base64')")
+  }
+
+  func testNilByteaSerializesToNull() async throws {
+    let thing = LilThing(int: 1, data: nil)
+
+    let client = TestClient()
+    _ = try await client.create([thing])
+
+    let sql = client.stmt.sql
+    var serializer = SQLSerializer(database: TestDatabase())
+    sql.serialize(to: &serializer)
+    let sqlString = serializer.sql
+
     expect(sqlString).toContain(", NULL,")
   }
 

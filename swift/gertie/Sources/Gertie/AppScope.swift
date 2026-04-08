@@ -36,8 +36,14 @@ public extension AppScope {
     case .single(.identifiedAppSlug(let slug)):
       app.slug == slug
     case .single(.bundleId(let bundleId)):
-      app.bundleId == bundleId
+      app.bundleId.droppingDotPrefix == bundleId.droppingDotPrefix
     }
+  }
+}
+
+private extension String {
+  var droppingDotPrefix: Substring {
+    self.first == "." ? self.dropFirst() : self[...]
   }
 }
 

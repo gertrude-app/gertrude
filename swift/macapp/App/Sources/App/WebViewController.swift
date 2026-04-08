@@ -75,7 +75,10 @@ class WebViewController<State, Action>:
       self.webView.loadHTMLString(html, baseURL: fileDirectoryURL)
       self.webView.frame = NSRect(origin: .zero, size: NSSize(width: 400, height: 300))
     } else {
-      self.webView.loadFileURL(filePathURL, allowingReadAccessTo: fileDirectoryURL)
+      let readAccessURL = screen == "Onboarding"
+        ? URL(fileURLWithPath: "/") // <-- for app icons in tmp dir
+        : fileDirectoryURL
+      self.webView.loadFileURL(filePathURL, allowingReadAccessTo: readAccessURL)
     }
 
     self.view = self.webView

@@ -1,6 +1,7 @@
 import ClientInterfaces
 import ComposableArchitecture
 import Foundation
+import Gertie
 import MacAppRoute
 import os.log
 
@@ -65,6 +66,7 @@ public extension ApiClient {
     pendingFilterSuspension: UUID? = nil,
     pendingUnlockRequests: [UUID]? = nil,
     sendNamedApps: Bool = false,
+    installedApps: [CheckIn_v2.InstalledAppInfo]? = nil,
   ) async throws -> CheckIn_v2.Output {
     @Dependency(\.app) var appClient
     @Dependency(\.device) var device
@@ -78,6 +80,7 @@ public extension ApiClient {
         pendingUnlockRequests: pendingUnlockRequests,
         namedApps: sendNamedApps ? device.listRunningApps().filter(\.hasName) : nil,
         screentimeConflictDetected: screenTimeConflictDetected,
+        installedApps: installedApps,
       ),
     )
   }

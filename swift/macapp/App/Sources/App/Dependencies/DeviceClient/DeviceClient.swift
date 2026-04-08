@@ -7,6 +7,7 @@ import SystemConfiguration
 struct DeviceClient: Sendable {
   var currentMacOsUserType: @Sendable () async throws -> MacOSUserType
   var currentUserId: @Sendable () -> uid_t
+  var discoverInstalledApps: @Sendable () async -> [DiscoveredApp]
   // @see https://developer.apple.com/forums/thread/707522
   var currentUserHasScreen: @Sendable () -> Bool
   var fullUsername: @Sendable () -> String
@@ -36,6 +37,7 @@ extension DeviceClient: DependencyKey {
   static let liveValue = Self(
     currentMacOsUserType: getCurrentMacOSUserType,
     currentUserId: { getuid() },
+    discoverInstalledApps: getInstalledApps,
     currentUserHasScreen: {
       var uid: uid_t = 0
       SCDynamicStoreCopyConsoleUser(nil, &uid, nil)
@@ -83,6 +85,7 @@ extension DeviceClient: TestDependencyKey {
   static let testValue = Self(
     currentMacOsUserType: unimplemented("DeviceClient.currentMacOsUserType"),
     currentUserId: unimplemented("DeviceClient.currentUserId", placeholder: 502),
+    discoverInstalledApps: unimplemented("DeviceClient.discoverInstalledApps", placeholder: []),
     currentUserHasScreen: unimplemented("DeviceClient.currentUserHasScreen", placeholder: true),
     fullUsername: unimplemented("DeviceClient.fullUsername", placeholder: ""),
     listMacOSUsers: unimplemented("DeviceClient.listMacOSUsers"),
@@ -118,6 +121,7 @@ extension DeviceClient: TestDependencyKey {
   static let mock = Self(
     currentMacOsUserType: { .standard },
     currentUserId: { 502 },
+    discoverInstalledApps: { [] },
     currentUserHasScreen: { true },
     fullUsername: { "test-full-username" },
     listMacOSUsers: { [

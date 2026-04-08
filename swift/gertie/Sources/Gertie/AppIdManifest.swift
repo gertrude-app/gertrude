@@ -22,6 +22,20 @@ public struct AppIdManifest: Codable, Equatable, Sendable {
     self.categories = categories
   }
 
+  public mutating func normalizeBundleIds() {
+    self.apps = self.apps.mapValues { bundleIds in
+      var expanded = bundleIds
+      for id in bundleIds {
+        if id.hasPrefix(".") {
+          expanded.insert(String(id.dropFirst()))
+        } else {
+          expanded.insert("." + id)
+        }
+      }
+      return expanded
+    }
+  }
+
   public func appSlug(fromBundleId bundleId: String?) -> String? {
     guard let bundleId else {
       return nil

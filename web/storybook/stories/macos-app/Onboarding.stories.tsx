@@ -2,6 +2,68 @@ import { Onboarding } from '@macos/appviews';
 import type { Meta, StoryObj } from '@storybook/react';
 import { appWindow, props } from '../story-helpers';
 
+function fakeIcon(letter: string, color: string): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect width="128" height="128" rx="28" fill="${color}"/><text x="64" y="64" text-anchor="middle" dominant-baseline="central" font-size="64" font-family="system-ui" fill="white">${letter}</text></svg>`;
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
+}
+
+const BASE_APPS = [
+  {
+    name: `Slack`,
+    bundleId: `com.tinyspeck.slackmacgap`,
+    iconPath: fakeIcon(`S`, `#611f69`),
+    category: `public.app-category.business`,
+  },
+  {
+    name: `Spotify`,
+    bundleId: `com.spotify.client`,
+    iconPath: fakeIcon(`S`, `#1db954`),
+    category: `public.app-category.music`,
+  },
+  {
+    name: `Zoom`,
+    bundleId: `us.zoom.xos`,
+    iconPath: fakeIcon(`Z`, `#2d8cff`),
+    category: `public.app-category.video`,
+  },
+  {
+    name: `Discord`,
+    bundleId: `com.hnc.Discord`,
+    iconPath: fakeIcon(`D`, `#5865f2`),
+    category: `public.app-category.social-networking`,
+  },
+  {
+    name: `Visual Studio Code`,
+    bundleId: `com.microsoft.VSCode`,
+    iconPath: fakeIcon(`V`, `#007acc`),
+    category: `public.app-category.developer-tools`,
+  },
+  {
+    name: `Notion`,
+    bundleId: `notion.id`,
+    iconPath: fakeIcon(`N`, `#000000`),
+    category: `public.app-category.productivity`,
+  },
+  {
+    name: `Figma`,
+    bundleId: `com.figma.Desktop`,
+    iconPath: fakeIcon(`F`, `#f24e1e`),
+    category: `public.app-category.graphics-design`,
+  },
+  {
+    name: `Steam`,
+    bundleId: `com.valvesoftware.steam`,
+    iconPath: fakeIcon(`S`, `#1b2838`),
+    category: `public.app-category.games`,
+  },
+];
+
+const STUB_APPS = [
+  ...BASE_APPS,
+  ...BASE_APPS.map((a) => ({ ...a, bundleId: `${a.bundleId}.2`, name: `${a.name} 2` })),
+  ...BASE_APPS.map((a) => ({ ...a, bundleId: `${a.bundleId}.3`, name: `${a.name} 3` })),
+];
+
 const meta = {
   title: 'MacOS App/Onboarding', // eslint-disable-line
   component: Onboarding,
@@ -29,6 +91,9 @@ export const Welcome: Story = props({
   didResume: false,
   receivedAppState: true,
   isUpgrade: false,
+  discoveredApps: [],
+  blockedBundleIds: [],
+  createAppKeysRequest: { case: `idle` },
   emit: () => {},
   dispatch: () => {},
 });
@@ -227,6 +292,23 @@ export const InstallSysExtFail: Story = props({
 export const InstallSysExtSuccess: Story = props({
   ...Welcome.args,
   step: `installSysExt_success`,
+});
+
+export const AppKeySelectionIntro: Story = props({
+  ...Welcome.args,
+  step: `appKeySelection_intro`,
+});
+
+export const BlockApps: Story = props({
+  ...Welcome.args,
+  step: `appKeySelection_blockApps`,
+  discoveredApps: STUB_APPS,
+});
+
+export const AllowInternetApps: Story = props({
+  ...Welcome.args,
+  step: `appKeySelection_allowInternet`,
+  discoveredApps: STUB_APPS,
 });
 
 export const ScreenTimeConflict: Story = props({

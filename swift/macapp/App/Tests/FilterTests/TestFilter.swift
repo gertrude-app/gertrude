@@ -65,7 +65,9 @@ class TestFilter: NetworkFilter {
       let filter = TestFilter()
       var state = State()
       state.userDowntime = userDowntime.mapValues { Downtime(window: $0) }
-      state.appIdManifest = appIdManifest
+      var normalizedManifest = appIdManifest
+      normalizedManifest.normalizeBundleIds()
+      state.appIdManifest = normalizedManifest
       state.exemptUsers = exemptUsers
       state.filteringDisabledUsers = filteringDisabledUsers
       state.suspensions = suspensions

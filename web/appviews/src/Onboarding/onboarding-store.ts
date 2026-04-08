@@ -35,6 +35,9 @@ export type OnboardingStep =
   | 'installSysExt_allow'
   | 'installSysExt_failed'
   | 'installSysExt_success'
+  | 'appKeySelection_intro'
+  | 'appKeySelection_blockApps'
+  | 'appKeySelection_allowInternet'
   | 'exemptUsers'
   | 'locateMenuBarIcon'
   | 'viewHealthCheck'
@@ -56,6 +59,13 @@ export interface MacOSUser {
   isAdmin: boolean;
 }
 
+export interface DiscoveredApp {
+  name: string;
+  bundleId: string;
+  iconPath: string;
+  category?: string;
+}
+
 export interface AppState {
   osVersion: {
     name: 'catalina' | 'bigSur' | 'monterey' | 'ventura' | 'sonoma' | 'sequoia' | 'tahoe';
@@ -69,10 +79,14 @@ export interface AppState {
   users: MacOSUser[];
   exemptableUserIds: number[];
   exemptUserIds: number[];
+  discoveredApps: DiscoveredApp[];
+  createAppKeysRequest: RequestState;
   isUpgrade: boolean;
 }
 
 export type AppEvent =
+  | { case: 'blockedAppsSelected'; bundleIds: string[] }
+  | { case: 'appKeysSelected'; bundleIds: string[] }
   | { case: 'connectChildSubmitted'; code: number }
   | { case: 'infoModalOpened'; step: OnboardingStep; detail?: string }
   | { case: 'setUserExemption'; userId: number; enabled: boolean }
@@ -88,6 +102,7 @@ export type ViewState = {
   connectionCode: string;
   receivedAppState: boolean;
   didResume: boolean;
+  blockedBundleIds: string[];
 };
 export type ViewAction = { type: `connectionCodeUpdated`; code: string };
 
@@ -105,9 +120,12 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
       users: [],
       exemptableUserIds: [],
       exemptUserIds: [],
+      discoveredApps: [],
+      createAppKeysRequest: { case: `idle` },
       connectionCode: ``,
       receivedAppState: false,
       didResume: false,
+      blockedBundleIds: [],
       isUpgrade: false,
     };
   }
@@ -131,6 +149,8 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
         switch (action.event.case) {
           case `connectChildSubmitted`:
             return { ...state, connectionCode: `` };
+          case `blockedAppsSelected`:
+            return { ...state, blockedBundleIds: action.event.bundleIds };
           default:
             return state;
         }
