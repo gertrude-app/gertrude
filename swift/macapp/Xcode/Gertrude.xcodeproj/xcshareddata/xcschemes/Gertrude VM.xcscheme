@@ -72,7 +72,7 @@
       buildConfiguration = "VM">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "VM"
+      buildConfiguration = "Release"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
