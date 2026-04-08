@@ -82,6 +82,16 @@ swift/
 - `ClientInterfaces` - Dependency protocols
 - `Live*Client` - Live implementations (API, WebSocket, XPC, etc.)
 
+**VM Testing:**
+
+A macOS VM may be running for manual testing. If `swift/.env.vm` exists, you can run
+commands on it non-interactively via:
+
+```bash
+source swift/.env.vm && sshpass -p franny ssh -o StrictHostKeyChecking=no \
+  -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "franny@$VM_IP" "<command>"
+```
+
 ### 2. iOS App (`iosapp/`)
 
 **Description**:

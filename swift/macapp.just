@@ -10,14 +10,23 @@ xcode-build:
   @pnpm exec nx run macapp:xcode-build
 
 vm-logs ip:
-  @sshpass -p admin ssh -o StrictHostKeyChecking=no "admin@{{ip}}" '/usr/bin/log stream --predicate "process == \"Gertrude\" OR process == \"com.netrivet.gertrude.filter-extension\"" --level debug --style compact' | /usr/bin/grep --line-buffered '•\]'
+  @sshpass -p admin ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "admin@{{ip}}" '/usr/bin/log stream --predicate "process == \"Gertrude\" OR process == \"com.netrivet.gertrude.filter-extension\"" --level debug --style compact' | /usr/bin/grep --line-buffered '•\]'
+
+vm-connect:
+  #!/usr/bin/env bash
+  if [ ! -f .env.vm ]; then
+    echo "✗ no VM running — run 'just swift macapp vm' first" >&2
+    exit 1
+  fi
+  source .env.vm
+  exec sshpass -p franny ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "franny@$VM_IP"
 
 vm-clean:
   #!/usr/bin/env bash
   for vm in $(tart list 2>/dev/null | awk '/^local/ && /gertrude-(test|gui)-/ {print $2}'); do
     tart stop "$vm" 2>/dev/null || true
     tart delete "$vm" 2>/dev/null || true
-    echo "deleted $vm"
+    echo "x deleted $vm"
   done
   echo "✓ clean"
 
@@ -68,17 +77,17 @@ vm os="tahoe":
   tart clone "$IMAGE" "$VM"
   echo "→ booting headless to install app..."
   tart run --no-graphics --dir=build:"$APP_DIR" "$VM" >/dev/null 2>&1 &
+  TART_PID=$!
   IP=$(just macapp vm-wait-for-ip "$VM")
+  echo "VM_IP=$IP" > .env.vm
   echo "→ installing app at $IP..."
   cat macapp/vm-setup.sh | just macapp vm-ssh "$IP" 'bash -s'
   echo "→ stopping headless VM..."
   tart stop "$VM" 2>/dev/null || true
+  wait $TART_PID 2>/dev/null || true
   sleep 5
   echo "→ launching {{os}} VM with display..."
-  echo "  SSH (admin):  sshpass -p admin ssh admin@<ip>    (pw: admin)"
-  echo "  SSH (franny): sshpass -p franny ssh franny@<ip>  (pw: franny)"
-  echo "  Logs:         just swift macapp vm-logs <ip>"
-  echo "  Cleanup:      tart delete $VM"
+  echo "→ connect: 'just swift macapp vm-connect'"
   echo ""
   tart run --dir=build:"$APP_DIR" "$VM"
 
@@ -142,7 +151,7 @@ vm-wait-for-ip vm:
 
 [private]
 vm-ssh ip +cmd:
-  @sshpass -p admin ssh -o StrictHostKeyChecking=no "admin@{{ip}}" {{cmd}}
+  @sshpass -p admin ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR "admin@{{ip}}" {{cmd}}
 
 # VM notes (tart-based macOS VMs for testing Gertrude, created 2026-03)
 # - must build Release for VM testing: Debug has TSan dylib crash in filter
