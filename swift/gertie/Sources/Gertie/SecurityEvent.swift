@@ -22,6 +22,7 @@ public enum SecurityEvent: Equatable, Codable, Sendable {
     case advancedSettingsOpened
     case systemClockOrTimeZoneChanged
     case blockedAppLaunchAttempted
+    case filteringDisabledDuringOnboarding
   }
 
   public enum Dashboard: String, Codable, Equatable, Sendable {
@@ -199,6 +200,8 @@ public extension SecurityEvent.MacApp {
       "System extension state changed"
     case .blockedAppLaunchAttempted:
       "Blocked app launch attempted"
+    case .filteringDisabledDuringOnboarding:
+      "Internet filtering disabled during onboarding"
     }
   }
 
@@ -236,6 +239,8 @@ public extension SecurityEvent.MacApp {
       "This event occurs when the system extension (filter) state has changed. It should be investigated if the state remains uninstalled or stopped."
     case .blockedAppLaunchAttempted:
       "This event occurs when a child tries to launch an app designated blocked by the parent. There is no security risk as Gertrude will not allow the app to open, but repeated events do represent an attempt by the child to launch forbidden apps."
+    case .filteringDisabledDuringOnboarding:
+      "This event occurs when internet filtering is disabled for a child during the onboarding process. This is a legitimate option offered during setup, but should be investigated if the parent did not intend for filtering to be disabled."
     }
   }
 
@@ -246,7 +251,8 @@ public extension SecurityEvent.MacApp {
          .newMacOsUserCreated,
          .filterSuspensionGrantedByAdmin,
          .appQuit,
-         .appUpdateFailedToReplaceSystemExtension:
+         .appUpdateFailedToReplaceSystemExtension,
+         .filteringDisabledDuringOnboarding:
       .recommended
     case .systemExtensionChangeRequested,
          .systemExtensionStateChanged,

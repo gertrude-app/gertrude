@@ -10,6 +10,7 @@ public struct ApiClient: Sendable {
   public var createOnboardingAppKeys: @Sendable (CreateOnboardingAppKeys.Input) async throws -> Void
   public var createOnboardingBlockedApps: @Sendable (CreateOnboardingBlockedApps.Input)
     async throws -> Void
+  public var disableFilterForChild: @Sendable () async throws -> Void
   public var createKeystrokeLines: @Sendable (CreateKeystrokeLines.Input) async throws -> Void
   public var createSuspendFilterRequest: @Sendable (CreateSuspendFilterRequest_v2.Input)
     async throws -> UUID
@@ -34,6 +35,7 @@ public struct ApiClient: Sendable {
     async throws -> Void,
     createOnboardingBlockedApps: @escaping @Sendable (CreateOnboardingBlockedApps.Input)
     async throws -> Void,
+    disableFilterForChild: @escaping @Sendable () async throws -> Void,
     createKeystrokeLines: @escaping @Sendable (CreateKeystrokeLines.Input) async throws -> Void,
     createSuspendFilterRequest: @escaping @Sendable (CreateSuspendFilterRequest_v2.Input)
     async throws -> UUID,
@@ -56,6 +58,7 @@ public struct ApiClient: Sendable {
     self.connectUser = connectUser
     self.createOnboardingAppKeys = createOnboardingAppKeys
     self.createOnboardingBlockedApps = createOnboardingBlockedApps
+    self.disableFilterForChild = disableFilterForChild
     self.createKeystrokeLines = createKeystrokeLines
     self.createSuspendFilterRequest = createSuspendFilterRequest
     self.createUnlockRequests = createUnlockRequests
@@ -113,6 +116,7 @@ extension ApiClient: TestDependencyKey {
     connectUser: unimplemented("ApiClient.connectUser"),
     createOnboardingAppKeys: unimplemented("ApiClient.createOnboardingAppKeys"),
     createOnboardingBlockedApps: unimplemented("ApiClient.createOnboardingBlockedApps"),
+    disableFilterForChild: unimplemented("ApiClient.disableFilterForChild"),
     createKeystrokeLines: unimplemented("ApiClient.createKeystrokeLines"),
     createSuspendFilterRequest: unimplemented("ApiClient.createSuspendFilterRequest"),
     createUnlockRequests: unimplemented("ApiClient.createUnlockRequests"),
@@ -135,6 +139,7 @@ extension ApiClient: TestDependencyKey {
     connectUser: { _ in throw Error.unexpectedError(statusCode: 888) },
     createOnboardingAppKeys: { _ in },
     createOnboardingBlockedApps: { _ in },
+    disableFilterForChild: {},
     createKeystrokeLines: { _ in },
     createSuspendFilterRequest: { _ in .init() },
     createUnlockRequests: { _ in [] },

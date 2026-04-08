@@ -55,6 +55,9 @@ extension OnboardingFeature.State {
     case appKeySelection_blockApps
     case appKeySelection_allowInternet
 
+    // opt out of filtering
+    case optOutOfFiltering
+
     // wrap up
     case exemptUsers
     case locateMenuBarIcon
@@ -120,6 +123,8 @@ extension OnboardingFeature.State.Step {
     case .installSysExt_failed:
       .installSysExt_success
     case .installSysExt_success:
+      .optOutOfFiltering
+    case .optOutOfFiltering:
       .appKeySelection_intro
     case .appKeySelection_intro:
       .appKeySelection_blockApps
@@ -198,8 +203,10 @@ extension OnboardingFeature.State.Step {
       .installSysExt_explain
     case .installSysExt_success:
       .installSysExt_explain
-    case .appKeySelection_intro:
+    case .optOutOfFiltering:
       .installSysExt_success
+    case .appKeySelection_intro:
+      .optOutOfFiltering
     case .appKeySelection_blockApps:
       .appKeySelection_intro
     case .appKeySelection_allowInternet:
@@ -258,6 +265,7 @@ extension OnboardingFeature.State.Step: Comparable {
     case .appKeySelection_intro: 106
     case .appKeySelection_blockApps: 107
     case .appKeySelection_allowInternet: 108
+    case .optOutOfFiltering: 109
     case .exemptUsers: 110
     case .locateMenuBarIcon: 112
     case .viewHealthCheck: 115

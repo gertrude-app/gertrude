@@ -359,6 +359,11 @@ export const AllowInternetApps: Story = props({
   discoveredApps: STUB_APPS,
 });
 
+export const OptOutOfFiltering: Story = props({
+  ...Welcome.args,
+  step: `optOutOfFiltering`,
+});
+
 export const ScreenTimeConflict: Story = props({
   ...Welcome.args,
   step: `screenTimeConflict`,

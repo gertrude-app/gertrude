@@ -38,6 +38,7 @@ export type OnboardingStep =
   | 'appKeySelection_intro'
   | 'appKeySelection_blockApps'
   | 'appKeySelection_allowInternet'
+  | 'optOutOfFiltering'
   | 'exemptUsers'
   | 'locateMenuBarIcon'
   | 'viewHealthCheck'

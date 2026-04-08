@@ -33,6 +33,12 @@ extension ApiClient: @retroactive DependencyKey {
         with: .createOnboardingBlockedApps(input),
       )
     },
+    disableFilterForChild: {
+      _ = try await output(
+        from: DisableFilterForChild.self,
+        with: .disableFilterForChild,
+      )
+    },
     createKeystrokeLines: { input in
       guard await accountActive.value else { return }
       // always produces `.success` if it doesn't throw

@@ -8,6 +8,7 @@ public enum AuthedUserRoute: PairRoute {
   case createOnboardingAppKeys(CreateOnboardingAppKeys.Input)
   case createOnboardingBlockedApps(CreateOnboardingBlockedApps.Input)
   case createOnboardingKeychain(CreateOnboardingKeychain.Input)
+  case disableFilterForChild
   case createSignedScreenshotUpload(CreateSignedScreenshotUpload.Input)
   case createSignedScreenshotUpload_v2(CreateSignedScreenshotUpload_v2.Input)
   case createSuspendFilterRequest_v2(CreateSuspendFilterRequest_v2.Input)
@@ -43,6 +44,9 @@ public extension AuthedUserRoute {
     Route(.case(Self.createOnboardingKeychain)) {
       Operation(CreateOnboardingKeychain.self)
       Body(.json(CreateOnboardingKeychain.Input.self))
+    }
+    Route(.case(Self.disableFilterForChild)) {
+      Operation(DisableFilterForChild.self)
     }
     Route(.case(Self.createSignedScreenshotUpload)) {
       Operation(CreateSignedScreenshotUpload.self)

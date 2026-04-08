@@ -354,6 +354,11 @@ final class OnboardingFeatureTests: XCTestCase {
 
     // they click "Next" on the install sys ext success screen
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+      $0.onboarding.step = .optOutOfFiltering
+    }
+
+    // they choose to keep filtering enabled (primary button)
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
       $0.onboarding.step = .appKeySelection_intro
     }
 
@@ -530,10 +535,104 @@ final class OnboardingFeatureTests: XCTestCase {
   }
 
   @MainActor
-  func testEmptyDiscoveredAppsSkipsAppKeySelection() async {
-    let store = onboardingFeatureStore { $0.step = .installSysExt_success }
+  func testInstallSysExtSuccessGoesToOptOutOfFiltering() async {
+    let store = onboardingFeatureStore {
+      $0.step = .installSysExt_success
+      $0.discoveredApps = [.init(
+        name: "Slack",
+        bundleId: "com.tinyspeck.slackmacgap",
+        iconPath: "",
+      )]
+    }
+    await store.send(.webview(.primaryBtnClicked)) {
+      $0.step = .optOutOfFiltering
+    }
+  }
+
+  @MainActor
+  func testKeepFilteringEnabledNoAppsSkipsToFinish() async {
+    let store = onboardingFeatureStore { $0.step = .optOutOfFiltering }
     await store.send(.webview(.primaryBtnClicked))
     await store.receive(.setStep(.exemptUsers))
+  }
+
+  @MainActor
+  func testKeepFilteringEnabledWithAppsGoesToAppKeySelection() async {
+    let store = onboardingFeatureStore {
+      $0.step = .optOutOfFiltering
+      $0.discoveredApps = [.init(
+        name: "Slack",
+        bundleId: "com.tinyspeck.slackmacgap",
+        iconPath: "",
+      )]
+    }
+    await store.send(.webview(.primaryBtnClicked)) {
+      $0.step = .appKeySelection_intro
+    }
+  }
+
+  @MainActor
+  func testDisableFilteringNoAppsCallsApiAndFinishes() async {
+    let store = onboardingFeatureStore { $0.step = .optOutOfFiltering }
+    let disableFilter = mock(always: ())
+    store.deps.api.disableFilterForChild = disableFilter.fn
+    await store.send(.webview(.secondaryBtnClicked)) {
+      $0.filteringDisabled = true
+    }
+    await store.receive(.setStep(.exemptUsers))
+    await expect(disableFilter.calls.count).toEqual(1)
+  }
+
+  @MainActor
+  func testDisableFilteringWithAppsSkipsIntroGoesToBlockApps() async {
+    let store = onboardingFeatureStore {
+      $0.step = .optOutOfFiltering
+      $0.discoveredApps = [.init(
+        name: "Slack",
+        bundleId: "com.tinyspeck.slackmacgap",
+        iconPath: "",
+      )]
+    }
+    let disableFilter = mock(always: ())
+    store.deps.api.disableFilterForChild = disableFilter.fn
+    await store.send(.webview(.secondaryBtnClicked)) {
+      $0.filteringDisabled = true
+      $0.step = .appKeySelection_blockApps
+    }
+    await expect(disableFilter.calls.count).toEqual(1)
+  }
+
+  @MainActor
+  func testFilteringDisabledSkipsAllowInternetAfterBlockedApps() async {
+    let store = onboardingFeatureStore {
+      $0.step = .appKeySelection_blockApps
+      $0.filteringDisabled = true
+    }
+    await store.send(.webview(.blockedAppsSelected(bundleIds: [])))
+    await store.receive(.setStep(.exemptUsers))
+  }
+
+  @MainActor
+  func testFilteringDisabledSkipsAllowInternetAfterBlockedAppsCreated() async {
+    let store = onboardingFeatureStore {
+      $0.step = .appKeySelection_blockApps
+      $0.filteringDisabled = true
+    }
+    store.deps.api.createOnboardingBlockedApps = { _ in }
+    await store.send(.webview(.blockedAppsSelected(bundleIds: ["us.zoom.xos"])))
+    await store.receive(.createOnboardingBlockedAppsCompleted(success: true))
+    await store.receive(.setStep(.exemptUsers))
+  }
+
+  @MainActor
+  func testFilteringEnabledDoesNotSkipAllowInternet() async {
+    let store = onboardingFeatureStore {
+      $0.step = .appKeySelection_blockApps
+      $0.filteringDisabled = false
+    }
+    await store.send(.webview(.blockedAppsSelected(bundleIds: []))) {
+      $0.step = .appKeySelection_allowInternet
+    }
   }
 
   @MainActor
@@ -827,7 +926,7 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.send(.webview(.primaryBtnClicked))
     await store.receive(.setStep(.allowKeylogging_required)) // we always stop here
     await store.send(.webview(.primaryBtnClicked))
-    await store.receive(.setStep(.exemptUsers))
+    await store.receive(.setStep(.optOutOfFiltering))
   }
 
   @MainActor
@@ -941,8 +1040,9 @@ final class OnboardingFeatureTests: XCTestCase {
   @MainActor
   func testClickingSkipSecondaryFromInstallSysExtFailed() async {
     let store = onboardingFeatureStore { $0.step = .installSysExt_failed }
-    await store.send(.webview(.secondaryBtnClicked))
-    await store.receive(.setStep(.exemptUsers))
+    await store.send(.webview(.secondaryBtnClicked)) {
+      $0.step = .optOutOfFiltering
+    }
   }
 
   @MainActor
@@ -1056,7 +1156,7 @@ final class OnboardingFeatureTests: XCTestCase {
     let store = onboardingFeatureStore { $0.step = .allowKeylogging_required }
     store.deps.filterExtension.state = { .installedAndRunning }
     await store.send(.webview(.secondaryBtnClicked))
-    await store.receive(.setStep(.exemptUsers))
+    await store.receive(.setStep(.optOutOfFiltering))
   }
 
   @MainActor
@@ -1707,8 +1807,9 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.receive(.setStep(.installSysExt_failed))
 
     // they click to skip the install from the fail screen
-    await store.send(.webview(.secondaryBtnClicked))
-    await store.receive(.setStep(.exemptUsers))
+    await store.send(.webview(.secondaryBtnClicked)) {
+      $0.step = .optOutOfFiltering
+    }
 
     // and then, the install times out...
     timedOut.setValue(true)
@@ -1716,7 +1817,7 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.skipReceivedActions()
 
     store.assert {
-      $0.step = .exemptUsers // ...and they should NOT be brought back to fail
+      $0.step = .optOutOfFiltering // ...and they should NOT be brought back to fail
     }
   }
 
@@ -1832,7 +1933,7 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.skipReceivedActions()
 
     store.assert {
-      $0.onboarding.step = .exemptUsers
+      $0.onboarding.step = .optOutOfFiltering
     }
   }
 

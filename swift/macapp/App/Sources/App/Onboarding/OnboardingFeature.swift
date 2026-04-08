@@ -39,6 +39,7 @@ struct OnboardingFeature: Feature {
     var discoveredApps: [DiscoveredApp] = []
     var createAppKeysRequest: RequestState<String> = .idle
     var filterUsers: FilterUserTypes?
+    var filteringDisabled = false
     var upgrade = false
   }
 
@@ -683,6 +684,16 @@ struct OnboardingFeature: Feature {
 
       case .webview(.primaryBtnClicked) where step == .installSysExt_success:
         log(step, action, "78bded66")
+        state.step = .optOutOfFiltering
+        return .none
+
+      case .webview(.secondaryBtnClicked) where step == .installSysExt_failed:
+        log(step, action, "78bded66")
+        state.step = .optOutOfFiltering
+        return .none
+
+      case .webview(.primaryBtnClicked) where step == .optOutOfFiltering:
+        log(step, action, "21c26cb5")
         if state.discoveredApps.isEmpty {
           return .exec { send in
             await self.finishOnboardingConfig(send)
@@ -691,10 +702,18 @@ struct OnboardingFeature: Feature {
         state.step = .appKeySelection_intro
         return .none
 
-      case .webview(.secondaryBtnClicked) where step == .installSysExt_failed:
-        log(step, action, "78bded66")
-        return .exec { send in
-          await self.finishOnboardingConfig(send)
+      case .webview(.secondaryBtnClicked) where step == .optOutOfFiltering:
+        log(step, action, "0a139c5b")
+        state.filteringDisabled = true
+        if state.discoveredApps.isEmpty {
+          return .exec { send in
+            try? await self.api.disableFilterForChild()
+            await self.finishOnboardingConfig(send)
+          }
+        }
+        state.step = .appKeySelection_blockApps
+        return .exec { _ in
+          try? await self.api.disableFilterForChild()
         }
 
       case .receivedDiscoveredApps(let apps):
@@ -717,6 +736,11 @@ struct OnboardingFeature: Feature {
       case .webview(.blockedAppsSelected(let bundleIds)):
         log("blocked apps selected: \(bundleIds.count) apps", "f472f337")
         if bundleIds.isEmpty {
+          if state.filteringDisabled {
+            return .exec { send in
+              await self.finishOnboardingConfig(send)
+            }
+          }
           state.step = .appKeySelection_allowInternet
           return .none
         }
@@ -731,6 +755,11 @@ struct OnboardingFeature: Feature {
         }
 
       case .createOnboardingBlockedAppsCompleted:
+        if state.filteringDisabled {
+          return .exec { send in
+            await self.finishOnboardingConfig(send)
+          }
+        }
         state.step = .appKeySelection_allowInternet
         return .none
 
@@ -929,8 +958,8 @@ struct OnboardingFeature: Feature {
         return await send(.setStep(.installSysExt_explain))
       }
 
-      log("sys ext already installed and running, skipping stage", "b0e6e683")
-      await self.finishOnboardingConfig(send)
+      log("sys ext already installed and running, skipping to opt out", "b0e6e683")
+      await send(.setStep(.optOutOfFiltering))
     }
 
     func finishOnboardingConfig(_ send: Send<Action>) async {

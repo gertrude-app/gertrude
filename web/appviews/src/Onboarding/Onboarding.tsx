@@ -167,6 +167,7 @@ export const Onboarding: React.FC<Props> = ({
           component={<Step.InstallSysExt step="installSysExt_success" />}
           confetti
         />
+        <OnboardingPage step="optOutOfFiltering" component={<Step.OptOutOfFiltering />} />
         <OnboardingPage
           step="appKeySelection_intro"
           component={<Step.AppKeySelectionIntro />}
