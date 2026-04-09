@@ -52,6 +52,9 @@ extension AuthedUserRoute: RouteResponder {
     case .createOnboardingBlockedApps(let input):
       let output = try await CreateOnboardingBlockedApps.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .createOnboardingKeychain(let input):
+      let output = try await CreateOnboardingKeychain.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .createSuspendFilterRequest_v2(let input):
       let output = try await CreateSuspendFilterRequest_v2.resolve(with: input, in: context)
       return try await self.respond(with: output)

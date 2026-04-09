@@ -7,6 +7,7 @@ struct Keychain: Codable, Sendable {
   var description: String?
   var warning: String?
   var isPublic: Bool
+  var rootDomain: String?
   var createdAt = Date()
   var updatedAt = Date()
 
@@ -17,6 +18,7 @@ struct Keychain: Codable, Sendable {
     isPublic: Bool = false,
     description: String? = nil,
     warning: String? = nil,
+    rootDomain: String? = nil,
   ) {
     self.id = id
     self.parentId = parentId
@@ -24,6 +26,7 @@ struct Keychain: Codable, Sendable {
     self.isPublic = isPublic
     self.description = description
     self.warning = warning
+    self.rootDomain = rootDomain
   }
 }
 

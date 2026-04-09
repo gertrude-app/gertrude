@@ -81,6 +81,7 @@ extension Configure {
     app.migrations.add(DeduplicateKeys())
     app.migrations.add(AddAppBundleIdCount())
     app.migrations.add(CreateMacAppsTables())
+    app.migrations.add(AddKeychainRootDomain())
   }
 }
 

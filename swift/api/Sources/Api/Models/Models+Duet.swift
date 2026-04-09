@@ -345,6 +345,7 @@ extension Keychain {
     case description
     case warning
     case isPublic
+    case rootDomain
     case createdAt
     case updatedAt
   }

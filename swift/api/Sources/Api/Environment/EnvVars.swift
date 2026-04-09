@@ -14,7 +14,13 @@ public struct Env: Sendable {
   public var primarySupportEmail: String
   public var superAdminEmail: String
   public var cloudflareSecret: String
+  public var keychainCrawler: KeychainCrawler
   public var get: @Sendable (String) -> String?
+
+  public struct KeychainCrawler: Sendable {
+    public var url: String
+    public var authToken: String
+  }
 
   public enum AppMode: Equatable, Sendable {
     case prod
@@ -134,6 +140,10 @@ extension Env: DependencyKey {
       primarySupportEmail: processEnv("PRIMARY_SUPPORT_EMAIL"),
       superAdminEmail: processEnv("SUPER_ADMIN_EMAIL"),
       cloudflareSecret: processEnv("CLOUDFLARE_SECRET"),
+      keychainCrawler: KeychainCrawler(
+        url: processEnv("KEYCHAIN_CRAWLER_URL"),
+        authToken: processEnv("KEYCHAIN_CRAWLER_AUTH_TOKEN"),
+      ),
       get: { ProcessInfo.processInfo.environment[$0] },
     )
   }
