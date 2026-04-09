@@ -5,6 +5,7 @@ import Gertie
 import SystemConfiguration
 
 struct DeviceClient: Sendable {
+  var createStandardUser: @Sendable (String, String, String) async throws -> Void
   var currentMacOsUserType: @Sendable () async throws -> MacOSUserType
   var currentUserId: @Sendable () -> uid_t
   var discoverInstalledApps: @Sendable () async -> [DiscoveredApp]
@@ -12,6 +13,7 @@ struct DeviceClient: Sendable {
   var currentUserHasScreen: @Sendable () -> Bool
   var fullUsername: @Sendable () -> String
   var listMacOSUsers: @Sendable () async throws -> [MacOSUser]
+  var macOSUserExists: @Sendable (String) async -> Bool
   var listRunningApps: @Sendable () -> [RunningApp]
   var modelIdentifier: @Sendable () -> String?
   var notificationsSetting: @Sendable () async -> NotificationsSetting
@@ -19,6 +21,7 @@ struct DeviceClient: Sendable {
   var openSystemPrefs: @Sendable (SystemPrefsLocation) async -> Void
   var openWebUrl: @Sendable (URL) async -> Void
   var osVersion: @Sendable () -> MacOSVersion
+  var parentHasSecureToken: @Sendable () async -> Bool
   var quitBrowsers: @Sendable ([BrowserMatch]) async -> Void
   var quitNonSafariBrowsers: @Sendable ([BrowserMatch]) async -> Void
   var requestNotificationAuthorization: @Sendable () async -> Void
@@ -35,6 +38,7 @@ struct DeviceClient: Sendable {
 
 extension DeviceClient: DependencyKey {
   static let liveValue = Self(
+    createStandardUser: createStandardUser(shortName:fullName:password:),
     currentMacOsUserType: getCurrentMacOSUserType,
     currentUserId: { getuid() },
     discoverInstalledApps: getInstalledApps,
@@ -47,6 +51,7 @@ extension DeviceClient: DependencyKey {
     },
     fullUsername: { NSFullUserName() },
     listMacOSUsers: getAllMacOSUsers,
+    macOSUserExists: macOSUserExists(_:),
     listRunningApps: { NSWorkspace.shared.runningApplications.compactMap(\.runningApp) },
     modelIdentifier: { platform("model", format: .data)?.filter { $0 != .init("\0") } },
     notificationsSetting: getNotificationsSetting,
@@ -54,6 +59,7 @@ extension DeviceClient: DependencyKey {
     openSystemPrefs: openSystemPrefs(at:),
     openWebUrl: { NSWorkspace.shared.open($0) },
     osVersion: { macOSVersion() },
+    parentHasSecureToken: getParentHasSecureToken,
     quitBrowsers: quitAllBrowsers,
     quitNonSafariBrowsers: quitAllNonSafariBrowsers,
     requestNotificationAuthorization: requestNotificationAuth,
@@ -83,12 +89,14 @@ extension DeviceClient: DependencyKey {
 
 extension DeviceClient: TestDependencyKey {
   static let testValue = Self(
+    createStandardUser: unimplemented("DeviceClient.createStandardUser"),
     currentMacOsUserType: unimplemented("DeviceClient.currentMacOsUserType"),
     currentUserId: unimplemented("DeviceClient.currentUserId", placeholder: 502),
     discoverInstalledApps: unimplemented("DeviceClient.discoverInstalledApps", placeholder: []),
     currentUserHasScreen: unimplemented("DeviceClient.currentUserHasScreen", placeholder: true),
     fullUsername: unimplemented("DeviceClient.fullUsername", placeholder: ""),
     listMacOSUsers: unimplemented("DeviceClient.listMacOSUsers"),
+    macOSUserExists: unimplemented("DeviceClient.macOSUserExists", placeholder: false),
     listRunningApps: unimplemented("DeviceClient.listRunningApps", placeholder: []),
     modelIdentifier: unimplemented("DeviceClient.modelIdentifier", placeholder: nil),
     notificationsSetting: unimplemented("DeviceClient.notificationsSetting", placeholder: .none),
@@ -98,6 +106,10 @@ extension DeviceClient: TestDependencyKey {
     osVersion: unimplemented(
       "DeviceClient.osVersion",
       placeholder: .init(major: 15, minor: 0, patch: 0),
+    ),
+    parentHasSecureToken: unimplemented(
+      "DeviceClient.parentHasSecureToken",
+      placeholder: true,
     ),
     quitBrowsers: unimplemented("DeviceClient.quitBrowsers"),
     quitNonSafariBrowsers: unimplemented("DeviceClient.quitNonSafariBrowsers"),
@@ -119,6 +131,7 @@ extension DeviceClient: TestDependencyKey {
   )
 
   static let mock = Self(
+    createStandardUser: { _, _, _ in },
     currentMacOsUserType: { .standard },
     currentUserId: { 502 },
     discoverInstalledApps: { [] },
@@ -128,6 +141,7 @@ extension DeviceClient: TestDependencyKey {
       .init(id: 501, name: "Dad", type: .admin),
       .init(id: 502, name: "liljimmy", type: .standard),
     ] },
+    macOSUserExists: { _ in false },
     listRunningApps: { [
       .init(bundleId: "com.apple.Safari", bundleName: "Safari"),
       .init(bundleId: "com.apple.Terminal", bundleName: "Terminal"),
@@ -138,6 +152,7 @@ extension DeviceClient: TestDependencyKey {
     openSystemPrefs: { _ in },
     openWebUrl: { _ in },
     osVersion: { .init(major: 14, minor: 0, patch: 0) },
+    parentHasSecureToken: { true },
     quitBrowsers: { _ in },
     quitNonSafariBrowsers: { _ in },
     requestNotificationAuthorization: {},
