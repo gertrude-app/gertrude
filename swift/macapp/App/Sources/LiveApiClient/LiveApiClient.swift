@@ -39,6 +39,12 @@ extension ApiClient: @retroactive DependencyKey {
         with: .disableFilterForChild,
       )
     },
+    setDowntimeSchedule: { input in
+      _ = try await output(
+        from: SetDowntimeSchedule.self,
+        with: .setDowntimeSchedule(input),
+      )
+    },
     createKeystrokeLines: { input in
       guard await accountActive.value else { return }
       // always produces `.success` if it doesn't throw

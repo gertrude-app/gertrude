@@ -35,10 +35,11 @@ export type OnboardingStep =
   | 'installSysExt_allow'
   | 'installSysExt_failed'
   | 'installSysExt_success'
+  | 'optOutOfFiltering'
+  | 'configureDowntime'
   | 'appKeySelection_intro'
   | 'appKeySelection_blockApps'
   | 'appKeySelection_allowInternet'
-  | 'optOutOfFiltering'
   | 'exemptUsers'
   | 'locateMenuBarIcon'
   | 'viewHealthCheck'
@@ -71,6 +72,16 @@ export interface DiscoveredApp {
   bundleId: string;
   iconPath: string;
   category?: string;
+}
+
+export interface PlainTime {
+  hour: number;
+  minute: number;
+}
+
+export interface PlainTimeWindow {
+  start: PlainTime;
+  end: PlainTime;
 }
 
 export interface AppState {
@@ -106,6 +117,7 @@ export type AppEvent =
   | { case: 'appKeysSelected'; bundleIds: string[] }
   | { case: 'connectChildSubmitted'; code: number }
   | { case: 'infoModalOpened'; step: OnboardingStep; detail?: string }
+  | { case: 'setDowntimeSchedule'; window: PlainTimeWindow }
   | { case: 'setUserExemption'; userId: number; enabled: boolean }
   | { case: 'closeWindow' }
   | { case: 'primaryBtnClicked' }

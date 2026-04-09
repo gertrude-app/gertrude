@@ -168,6 +168,7 @@ function getProgressStep(currentStep: OnboardingStep): number {
     case `installSysExt_failed`:
     case `installSysExt_success`:
     case `optOutOfFiltering`:
+    case `configureDowntime`:
     case `appKeySelection_intro`:
     case `appKeySelection_blockApps`:
     case `appKeySelection_allowInternet`:

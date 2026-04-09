@@ -359,6 +359,11 @@ final class OnboardingFeatureTests: XCTestCase {
 
     // they choose to keep filtering enabled (primary button)
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+      $0.onboarding.step = .configureDowntime
+    }
+
+    // they skip configuring downtime
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
       $0.onboarding.step = .appKeySelection_intro
     }
 
@@ -550,16 +555,36 @@ final class OnboardingFeatureTests: XCTestCase {
   }
 
   @MainActor
-  func testKeepFilteringEnabledNoAppsSkipsToFinish() async {
+  func testKeepFilteringEnabledGoesToConfigureDowntime() async {
     let store = onboardingFeatureStore { $0.step = .optOutOfFiltering }
+    await store.send(.webview(.primaryBtnClicked)) {
+      $0.step = .configureDowntime
+    }
+  }
+
+  @MainActor
+  func testDisableFilteringGoesToConfigureDowntimeAndFiresApi() async {
+    let store = onboardingFeatureStore { $0.step = .optOutOfFiltering }
+    let disableFilter = mock(always: ())
+    store.deps.api.disableFilterForChild = disableFilter.fn
+    await store.send(.webview(.secondaryBtnClicked)) {
+      $0.filteringDisabled = true
+      $0.step = .configureDowntime
+    }
+    await expect(disableFilter.calls.count).toEqual(1)
+  }
+
+  @MainActor
+  func testConfigureDowntimePrimaryNoAppsFinishes() async {
+    let store = onboardingFeatureStore { $0.step = .configureDowntime }
     await store.send(.webview(.primaryBtnClicked))
     await store.receive(.setStep(.exemptUsers))
   }
 
   @MainActor
-  func testKeepFilteringEnabledWithAppsGoesToAppKeySelection() async {
+  func testConfigureDowntimePrimaryWithAppsGoesToAppKeySelectionIntro() async {
     let store = onboardingFeatureStore {
-      $0.step = .optOutOfFiltering
+      $0.step = .configureDowntime
       $0.discoveredApps = [.init(
         name: "Slack",
         bundleId: "com.tinyspeck.slackmacgap",
@@ -572,34 +597,32 @@ final class OnboardingFeatureTests: XCTestCase {
   }
 
   @MainActor
-  func testDisableFilteringNoAppsCallsApiAndFinishes() async {
-    let store = onboardingFeatureStore { $0.step = .optOutOfFiltering }
-    let disableFilter = mock(always: ())
-    store.deps.api.disableFilterForChild = disableFilter.fn
-    await store.send(.webview(.secondaryBtnClicked)) {
-      $0.filteringDisabled = true
-    }
-    await store.receive(.setStep(.exemptUsers))
-    await expect(disableFilter.calls.count).toEqual(1)
-  }
-
-  @MainActor
-  func testDisableFilteringWithAppsSkipsIntroGoesToBlockApps() async {
+  func testConfigureDowntimePrimaryFilteringDisabledWithAppsSkipsIntro() async {
     let store = onboardingFeatureStore {
-      $0.step = .optOutOfFiltering
+      $0.step = .configureDowntime
+      $0.filteringDisabled = true
       $0.discoveredApps = [.init(
         name: "Slack",
         bundleId: "com.tinyspeck.slackmacgap",
         iconPath: "",
       )]
     }
-    let disableFilter = mock(always: ())
-    store.deps.api.disableFilterForChild = disableFilter.fn
-    await store.send(.webview(.secondaryBtnClicked)) {
-      $0.filteringDisabled = true
+    await store.send(.webview(.primaryBtnClicked)) {
       $0.step = .appKeySelection_blockApps
     }
-    await expect(disableFilter.calls.count).toEqual(1)
+  }
+
+  @MainActor
+  func testSetDowntimeScheduleFiresApi() async {
+    let store = onboardingFeatureStore { $0.step = .configureDowntime }
+    let setDowntime = spy(on: PlainTimeWindow.self, returning: ())
+    store.deps.api.setDowntimeSchedule = setDowntime.fn
+    let window = PlainTimeWindow(
+      start: .init(hour: 21, minute: 0),
+      end: .init(hour: 7, minute: 30),
+    )
+    await store.send(.webview(.setDowntimeSchedule(window: window)))
+    await expect(setDowntime.calls).toEqual([window])
   }
 
   @MainActor

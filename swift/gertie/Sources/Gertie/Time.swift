@@ -34,11 +34,19 @@ public extension PlainTime {
     let rel = other.minutesFromMidnight - self.minutesFromMidnight
     return rel < 0 ? rel + (24 * 60) : rel
   }
+
+  var isValid: Bool {
+    (0 ... 23).contains(self.hour) && (0 ... 59).contains(self.minute)
+  }
 }
 
 public extension PlainTimeWindow {
   var crossesMidnight: Bool {
     self.start.hour > self.end.hour
+  }
+
+  var isValid: Bool {
+    self.start.isValid && self.end.isValid && self.start != self.end
   }
 
   func contains(_ date: Date, in calendar: Calendar) -> Bool {

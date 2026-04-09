@@ -364,6 +364,11 @@ export const OptOutOfFiltering: Story = props({
   step: `optOutOfFiltering`,
 });
 
+export const ConfigureDowntime: Story = props({
+  ...Welcome.args,
+  step: `configureDowntime`,
+});
+
 export const ScreenTimeConflict: Story = props({
   ...Welcome.args,
   step: `screenTimeConflict`,

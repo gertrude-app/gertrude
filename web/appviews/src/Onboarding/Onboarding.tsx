@@ -168,6 +168,7 @@ export const Onboarding: React.FC<Props> = ({
           confetti
         />
         <OnboardingPage step="optOutOfFiltering" component={<Step.OptOutOfFiltering />} />
+        <OnboardingPage step="configureDowntime" component={<Step.ConfigureDowntime />} />
         <OnboardingPage
           step="appKeySelection_intro"
           component={<Step.AppKeySelectionIntro />}

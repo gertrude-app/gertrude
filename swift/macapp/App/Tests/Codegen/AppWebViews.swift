@@ -84,6 +84,8 @@ struct AppWebViewStoreTypes: AggregateCodeGenerator {
         .init(OnboardingFeature.State.MacUser.RemediationStep.self, as: "UserRemediationStep"),
         .init(OnboardingFeature.State.MacUser.self, as: "MacOSUser"),
         .init(DiscoveredApp.self),
+        .init(PlainTime.self),
+        .init(PlainTimeWindow.self),
       ],
       types: [
         .init(OnboardingFeature.State.View.self, as: "AppState"),
@@ -94,6 +96,8 @@ struct AppWebViewStoreTypes: AggregateCodeGenerator {
         (OnboardingFeature.State.MacUser.RemediationStep.self, "UserRemediationStep"),
         (OnboardingFeature.State.MacUser.self, "MacOSUser"),
         (DiscoveredApp.self, "DiscoveredApp"),
+        (PlainTime.self, "PlainTime"),
+        (PlainTimeWindow.self, "PlainTimeWindow"),
         (PayloadRequestState<String, String>.self, "RequestState<string>"),
         (RequestState<String>.self, "RequestState"),
       ],

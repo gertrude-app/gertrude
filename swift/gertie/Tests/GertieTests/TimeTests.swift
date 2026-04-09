@@ -3,6 +3,40 @@ import XCTest
 import XExpect
 
 final class TimeTests: XCTestCase {
+  func testPlainTimeIsValid() {
+    let valid: [PlainTime] = [
+      .init(hour: 0, minute: 0),
+      .init(hour: 23, minute: 59),
+      .init(hour: 12, minute: 30),
+    ]
+    for time in valid {
+      expect(time.isValid).toBeTrue()
+    }
+    let invalid: [PlainTime] = [
+      .init(hour: -1, minute: 0),
+      .init(hour: 24, minute: 0),
+      .init(hour: 0, minute: -1),
+      .init(hour: 0, minute: 60),
+    ]
+    for time in invalid {
+      expect(time.isValid).toBeFalse()
+    }
+  }
+
+  func testPlainTimeWindowIsValid() {
+    expect(PlainTimeWindow(start: "09:00", end: "10:00").isValid).toBeTrue()
+    expect(PlainTimeWindow(start: "21:00", end: "07:30").isValid).toBeTrue()
+
+    let invalid: [PlainTimeWindow] = [
+      .init(start: .init(hour: 24, minute: 0), end: .init(hour: 7, minute: 0)),
+      .init(start: .init(hour: 21, minute: 0), end: .init(hour: 7, minute: 60)),
+      .init(start: .init(hour: 9, minute: 0), end: .init(hour: 9, minute: 0)),
+    ]
+    for window in invalid {
+      expect(window.isValid).toBeFalse()
+    }
+  }
+
   func testPlainTimeMinutesUntil() {
     let cases: [(test: String, reference: String, expected: Int)] = [
       (test: "12:00", reference: "12:00", expected: 0),

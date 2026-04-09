@@ -73,6 +73,7 @@ struct OnboardingFeature: Feature {
       case appKeysSelected(bundleIds: [String])
       case connectChildSubmitted(code: Int)
       case infoModalOpened(step: State.Step, detail: String?)
+      case setDowntimeSchedule(window: PlainTimeWindow)
       case setUserExemption(userId: uid_t, enabled: Bool)
     }
 
@@ -694,26 +695,33 @@ struct OnboardingFeature: Feature {
 
       case .webview(.primaryBtnClicked) where step == .optOutOfFiltering:
         log(step, action, "21c26cb5")
-        if state.discoveredApps.isEmpty {
-          return .exec { send in
-            await self.finishOnboardingConfig(send)
-          }
-        }
-        state.step = .appKeySelection_intro
+        state.step = .configureDowntime
         return .none
 
       case .webview(.secondaryBtnClicked) where step == .optOutOfFiltering:
         log(step, action, "0a139c5b")
         state.filteringDisabled = true
+        state.step = .configureDowntime
+        return .exec { _ in
+          try? await self.api.disableFilterForChild()
+        }
+
+      case .webview(.primaryBtnClicked) where step == .configureDowntime:
+        log(step, action, "5449cfc0")
         if state.discoveredApps.isEmpty {
           return .exec { send in
-            try? await self.api.disableFilterForChild()
             await self.finishOnboardingConfig(send)
           }
         }
-        state.step = .appKeySelection_blockApps
+        state.step = state.filteringDisabled
+          ? .appKeySelection_blockApps
+          : .appKeySelection_intro
+        return .none
+
+      case .webview(.setDowntimeSchedule(let window)):
+        log("setDowntimeSchedule window=\(window)", "34921fbf")
         return .exec { _ in
-          try? await self.api.disableFilterForChild()
+          try? await self.api.setDowntimeSchedule(window)
         }
 
       case .receivedDiscoveredApps(let apps):

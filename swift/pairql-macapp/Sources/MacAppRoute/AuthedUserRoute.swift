@@ -16,6 +16,7 @@ public enum AuthedUserRoute: PairRoute {
   case logFilterEvents(LogFilterEvents.Input)
   case logSecurityEvent(LogSecurityEvent.Input)
   case reportBrowsers(ReportBrowsers.Input)
+  case setDowntimeSchedule(SetDowntimeSchedule.Input)
   case uploadAppIcon(UploadAppIcon.Input)
 }
 
@@ -75,6 +76,10 @@ public extension AuthedUserRoute {
     Route(.case(Self.reportBrowsers)) {
       Operation(ReportBrowsers.self)
       Body(.json(ReportBrowsers.Input.self))
+    }
+    Route(.case(Self.setDowntimeSchedule)) {
+      Operation(SetDowntimeSchedule.self)
+      Body(.json(SetDowntimeSchedule.Input.self))
     }
     Route(.case(Self.uploadAppIcon)) {
       Operation(UploadAppIcon.self)

@@ -11,6 +11,7 @@ public struct ApiClient: Sendable {
   public var createOnboardingBlockedApps: @Sendable (CreateOnboardingBlockedApps.Input)
     async throws -> Void
   public var disableFilterForChild: @Sendable () async throws -> Void
+  public var setDowntimeSchedule: @Sendable (SetDowntimeSchedule.Input) async throws -> Void
   public var createKeystrokeLines: @Sendable (CreateKeystrokeLines.Input) async throws -> Void
   public var createSuspendFilterRequest: @Sendable (CreateSuspendFilterRequest_v2.Input)
     async throws -> UUID
@@ -36,6 +37,7 @@ public struct ApiClient: Sendable {
     createOnboardingBlockedApps: @escaping @Sendable (CreateOnboardingBlockedApps.Input)
     async throws -> Void,
     disableFilterForChild: @escaping @Sendable () async throws -> Void,
+    setDowntimeSchedule: @escaping @Sendable (SetDowntimeSchedule.Input) async throws -> Void,
     createKeystrokeLines: @escaping @Sendable (CreateKeystrokeLines.Input) async throws -> Void,
     createSuspendFilterRequest: @escaping @Sendable (CreateSuspendFilterRequest_v2.Input)
     async throws -> UUID,
@@ -59,6 +61,7 @@ public struct ApiClient: Sendable {
     self.createOnboardingAppKeys = createOnboardingAppKeys
     self.createOnboardingBlockedApps = createOnboardingBlockedApps
     self.disableFilterForChild = disableFilterForChild
+    self.setDowntimeSchedule = setDowntimeSchedule
     self.createKeystrokeLines = createKeystrokeLines
     self.createSuspendFilterRequest = createSuspendFilterRequest
     self.createUnlockRequests = createUnlockRequests
@@ -117,6 +120,7 @@ extension ApiClient: TestDependencyKey {
     createOnboardingAppKeys: unimplemented("ApiClient.createOnboardingAppKeys"),
     createOnboardingBlockedApps: unimplemented("ApiClient.createOnboardingBlockedApps"),
     disableFilterForChild: unimplemented("ApiClient.disableFilterForChild"),
+    setDowntimeSchedule: unimplemented("ApiClient.setDowntimeSchedule"),
     createKeystrokeLines: unimplemented("ApiClient.createKeystrokeLines"),
     createSuspendFilterRequest: unimplemented("ApiClient.createSuspendFilterRequest"),
     createUnlockRequests: unimplemented("ApiClient.createUnlockRequests"),
@@ -140,6 +144,7 @@ extension ApiClient: TestDependencyKey {
     createOnboardingAppKeys: { _ in },
     createOnboardingBlockedApps: { _ in },
     disableFilterForChild: {},
+    setDowntimeSchedule: { _ in },
     createKeystrokeLines: { _ in },
     createSuspendFilterRequest: { _ in .init() },
     createUnlockRequests: { _ in [] },

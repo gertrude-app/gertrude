@@ -32,6 +32,14 @@ struct SaveUser: Pair {
 
 extension SaveUser: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
+    if let downtime = input.downtime, !downtime.isValid {
+      throw context.error("a5090c44", .badRequest, "invalid downtime window: \(downtime)")
+    }
+    for keychain in input.keychains {
+      if let window = keychain.schedule?.window, !window.isValid {
+        throw context.error("58002202", .badRequest, "invalid keychain schedule window: \(window)")
+      }
+    }
     let filteringDisabled = input.filteringDisabled ?? false
     if filteringDisabled, !input.screenshotsEnabled {
       throw context.error(
