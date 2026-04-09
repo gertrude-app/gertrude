@@ -24,6 +24,7 @@ public enum HTTP {
     headers: [String: String] = [:],
     auth: AuthType? = nil,
     keyEncodingStrategy: JSONEncoder.KeyEncodingStrategy = .useDefaultKeys,
+    timeoutInterval: TimeInterval? = nil,
   ) async throws -> (Data, HTTPURLResponse) {
     var request = try urlRequest(
       to: urlString,
@@ -33,6 +34,9 @@ public enum HTTP {
     )
     request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
     request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+    if let timeoutInterval {
+      request.timeoutInterval = timeoutInterval
+    }
     let encoder = JSONEncoder()
     encoder.keyEncodingStrategy = keyEncodingStrategy
     request.httpBody = try encoder.encode(body)
@@ -48,6 +52,7 @@ public enum HTTP {
     auth: AuthType? = nil,
     keyEncodingStrategy: JSONEncoder.KeyEncodingStrategy = .useDefaultKeys,
     keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys,
+    timeoutInterval: TimeInterval? = nil,
   ) async throws -> Response {
     let (data, _) = try await sendJson(
       body: body,
@@ -56,6 +61,7 @@ public enum HTTP {
       headers: headers,
       auth: auth,
       keyEncodingStrategy: keyEncodingStrategy,
+      timeoutInterval: timeoutInterval,
     )
     return try decode(Response.self, from: data, using: keyDecodingStrategy)
   }

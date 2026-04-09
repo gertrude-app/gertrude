@@ -453,4 +453,7 @@ env:
   APPSTORE_ISSUER_ID: not-real
   APPSTORE_KEY_ID: not-real
   APPSTORE_PRIVATE_KEY: not-real
+  KEYCHAIN_CRAWLER_URL: not-real
+  KEYCHAIN_CRAWLER_AUTH_TOKEN: not-real
+
 
