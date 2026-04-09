@@ -175,7 +175,14 @@ export const Onboarding: React.FC<Props> = ({
         <OnboardingPage
           step="appKeySelection_blockApps"
           component={
-            <Step.BlockApps apps={discoveredApps} childName={currentUser?.name} />
+            <Step.BlockApps
+              apps={discoveredApps}
+              childName={
+                connectChildRequest.case === `succeeded`
+                  ? connectChildRequest.payload
+                  : undefined
+              }
+            />
           }
         />
         <OnboardingPage
