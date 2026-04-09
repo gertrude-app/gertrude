@@ -26,6 +26,7 @@ struct GetChild: Pair {
     var screenshotsFrequency: Int
     var showSuspensionActivity: Bool
     var filteringDisabled: Bool
+    var canDisableFilter: Bool
     var keychains: [UserKeychainSummary]
     var downtime: PlainTimeWindow?
     var computers: [Computer]
@@ -90,6 +91,9 @@ extension GetChild: Resolver {
       blockedApps = try await (child.blockedApps(in: context.db)).map(\.dto)
     }
 
+    let canDisableFilter = !versions.isEmpty
+      && versions.allSatisfy { $0 >= .init("2.9.0")! }
+
     return try await .init(
       id: child.id,
       name: child.name,
@@ -99,6 +103,7 @@ extension GetChild: Resolver {
       screenshotsFrequency: child.screenshotsFrequency,
       showSuspensionActivity: child.showSuspensionActivity,
       filteringDisabled: child.filteringDisabled,
+      canDisableFilter: canDisableFilter,
       keychains: childKeychains,
       downtime: child.downtime,
       computers: computers.uniqued(on: \.id),

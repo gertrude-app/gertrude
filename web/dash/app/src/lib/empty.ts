@@ -21,6 +21,7 @@ export function child(id: UUID): Child {
     screenshotsFrequency: 120,
     showSuspensionActivity: false,
     filteringDisabled: false,
+    canDisableFilter: false,
     keychains: [],
     computers: [],
     iosDevices: [],

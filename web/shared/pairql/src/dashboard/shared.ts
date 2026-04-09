@@ -51,6 +51,7 @@ export interface Child {
   screenshotsFrequency: number;
   showSuspensionActivity: boolean;
   filteringDisabled: boolean;
+  canDisableFilter: boolean;
   keychains: UserKeychainSummary[];
   downtime?: PlainTimeWindow;
   computers: ChildComputer[];

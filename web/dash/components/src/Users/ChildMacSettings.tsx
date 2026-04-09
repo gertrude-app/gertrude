@@ -37,6 +37,7 @@ interface Props {
   setShowSuspensionActivity(show: boolean): unknown;
   filteringDisabled: boolean;
   setFilteringDisabled(disabled: boolean): unknown;
+  canDisableFilter: boolean;
   downtimeEnabled: boolean;
   setDowntimeEnabled(enabled: boolean): unknown;
   downtime: PlainTimeWindow;
@@ -83,6 +84,7 @@ const ChildMacSettings: React.FC<Props> = ({
   setShowSuspensionActivity,
   filteringDisabled,
   setFilteringDisabled,
+  canDisableFilter,
   downtimeEnabled,
   setDowntimeEnabled,
   downtime,
@@ -303,22 +305,24 @@ const ChildMacSettings: React.FC<Props> = ({
 
         <div className="mt-12 max-w-3xl">
           <h2 className="text-lg font-bold text-slate-700">Filtering</h2>
-          <ToggleCard
-            title="Filter internet access"
-            description="Block all internet access except sites allowed by assigned keychains"
-            enabled={!filteringDisabled}
-            setEnabled={(enabled) => setFilteringDisabled(!enabled)}
-            disabledReason={
-              !screenshotsEnabled
-                ? `Internet filtering can only be disabled when screenshots are enabled`
-                : undefined
-            }
-            warning={
-              filteringDisabled
-                ? `${childName} has unrestricted internet access and is only protected by ${keyloggingEnabled ? `screenshots and keylogging` : `screenshots`}`
-                : undefined
-            }
-          />
+          {canDisableFilter && (
+            <ToggleCard
+              title="Filter internet access"
+              description="Block all internet access except sites allowed by assigned keychains"
+              enabled={!filteringDisabled}
+              setEnabled={(enabled) => setFilteringDisabled(!enabled)}
+              disabledReason={
+                !screenshotsEnabled
+                  ? `Internet filtering can only be disabled when screenshots are enabled`
+                  : undefined
+              }
+              warning={
+                filteringDisabled
+                  ? `${childName} has unrestricted internet access and is only protected by ${keyloggingEnabled ? `screenshots and keylogging` : `screenshots`}`
+                  : undefined
+              }
+            />
+          )}
           {!filteringDisabled && (
             <div className="mt-4 flex flex-col space-y-4">
               {keychains.length === 0 ? (

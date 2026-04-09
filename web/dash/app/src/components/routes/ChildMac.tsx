@@ -93,6 +93,7 @@ const ChildMacRoute: React.FC = () => {
       setFilteringDisabled={(disabled) =>
         dispatch({ type: `setFilteringDisabled`, disabled })
       }
+      canDisableFilter={draft.canDisableFilter}
       downtime={draft.downtime ?? defaults.timeWindow()}
       downtimeEnabled={!!draft.downtime}
       setDowntimeEnabled={(enabled) => dispatch({ type: `setDowntimeEnabled`, enabled })}
