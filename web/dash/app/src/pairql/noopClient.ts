@@ -81,6 +81,7 @@ const noopClient: ApiClient = {
       screenshotsFrequency: 90,
       showSuspensionActivity: true,
       filteringDisabled: false,
+      canDisableFilter: false,
       keychains: [],
       computers: [],
       iosDevices: [],

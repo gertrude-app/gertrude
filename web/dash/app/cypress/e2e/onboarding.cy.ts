@@ -11,6 +11,7 @@ describe(`dashboard onboarding nudges`, () => {
     screenshotsFrequency: 30,
     showSuspensionActivity: true,
     filteringDisabled: false,
+    canDisableFilter: false,
     keychains: [],
     computers: [],
     iosDevices: [],

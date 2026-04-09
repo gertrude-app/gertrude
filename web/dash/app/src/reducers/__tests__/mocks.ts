@@ -80,6 +80,7 @@ export function child(override: Partial<Child> = {}): Child {
     keyloggingEnabled: true,
     showSuspensionActivity: true,
     filteringDisabled: false,
+    canDisableFilter: true,
     keychains: [],
     computers: [
       {
