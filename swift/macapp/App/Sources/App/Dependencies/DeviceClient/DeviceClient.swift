@@ -15,6 +15,7 @@ struct DeviceClient: Sendable {
   var listMacOSUsers: @Sendable () async throws -> [MacOSUser]
   var macOSUserExists: @Sendable (String) async -> Bool
   var listRunningApps: @Sendable () -> [RunningApp]
+  var logOutCurrentUser: @Sendable () async throws -> Void
   var modelIdentifier: @Sendable () -> String?
   var notificationsSetting: @Sendable () async -> NotificationsSetting
   var numericUserId: @Sendable () -> uid_t
@@ -53,6 +54,7 @@ extension DeviceClient: DependencyKey {
     listMacOSUsers: getAllMacOSUsers,
     macOSUserExists: macOSUserExists(_:),
     listRunningApps: { NSWorkspace.shared.runningApplications.compactMap(\.runningApp) },
+    logOutCurrentUser: doLogOutCurrentUser,
     modelIdentifier: { platform("model", format: .data)?.filter { $0 != .init("\0") } },
     notificationsSetting: getNotificationsSetting,
     numericUserId: { getuid() },
@@ -98,6 +100,7 @@ extension DeviceClient: TestDependencyKey {
     listMacOSUsers: unimplemented("DeviceClient.listMacOSUsers"),
     macOSUserExists: unimplemented("DeviceClient.macOSUserExists", placeholder: false),
     listRunningApps: unimplemented("DeviceClient.listRunningApps", placeholder: []),
+    logOutCurrentUser: unimplemented("DeviceClient.logOutCurrentUser"),
     modelIdentifier: unimplemented("DeviceClient.modelIdentifier", placeholder: nil),
     notificationsSetting: unimplemented("DeviceClient.notificationsSetting", placeholder: .none),
     numericUserId: unimplemented("DeviceClient.numericUserId", placeholder: 502),
@@ -146,6 +149,7 @@ extension DeviceClient: TestDependencyKey {
       .init(bundleId: "com.apple.Safari", bundleName: "Safari"),
       .init(bundleId: "com.apple.Terminal", bundleName: "Terminal"),
     ] },
+    logOutCurrentUser: {},
     modelIdentifier: { "test-model-identifier" },
     notificationsSetting: { .alert },
     numericUserId: { 502 },
