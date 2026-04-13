@@ -4,7 +4,7 @@ import Foundation
 extension AdminEvent.UnlockRequestSubmitted: AdminNotifying {
   static var smsSendTrigger: String { "unlockRequest" }
 
-  func sendText(to phoneNumber: String) async throws {
+  func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult {
     let newRequest =
       requestIds.count > 1
         ? "\(requestIds.count) new unlock requests"
@@ -15,7 +15,7 @@ extension AdminEvent.UnlockRequestSubmitted: AdminNotifying {
      View the details and approve or deny at \(url)
     """
 
-    try await with(dependency: \.twilio)
+    return try await with(dependency: \.twilio)
       .send(Text(to: .init(phoneNumber), message: message))
   }
 

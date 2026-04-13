@@ -57,10 +57,16 @@ private func sendVerification(
 
   case .text(phoneNumber: let phoneNumber):
     do {
-      try await with(dependency: \.twilio).send(Text(
+      let result = try await with(dependency: \.twilio).send(Text(
         to: .init(rawValue: phoneNumber),
         message: "Your verification code is \(code)",
       ))
+      SmsSend.recordDetached(
+        parentId: context.parent.id,
+        trigger: "verification",
+        phoneNumber: phoneNumber,
+        twilioResult: result,
+      )
     } catch {
       let parentLink = AdminLink().slack(
         to: .parent(context.parent.id),

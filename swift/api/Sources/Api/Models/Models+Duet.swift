@@ -739,6 +739,8 @@ extension SmsSend {
     case parentId
     case trigger
     case countryCode
+    case twilioMessageSid
+    case numSegments
     case createdAt
   }
 }

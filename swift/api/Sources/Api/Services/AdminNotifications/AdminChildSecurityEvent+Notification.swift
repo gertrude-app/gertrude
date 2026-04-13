@@ -41,14 +41,14 @@ extension AdminEvent.SecurityEventPayload: AdminNotifying {
     }
   }
 
-  func sendText(to phoneNumber: String) async throws {
+  func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult {
     let message = """
     [Gertrude] Security event: "\(desc)" \(context).
 
     \(explanation)
     """
 
-    try await with(dependency: \.twilio)
+    return try await with(dependency: \.twilio)
       .send(Text(to: .init(phoneNumber), message: message))
   }
 

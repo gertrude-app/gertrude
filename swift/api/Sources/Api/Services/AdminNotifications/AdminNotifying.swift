@@ -3,7 +3,7 @@ import Tagged
 import XSlack
 
 protocol AdminNotifying {
-  func sendText(to phoneNumber: String) async throws
+  func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult
   func sendSlack(channel: String, token: String) async throws
   func sendEmail(to address: String, isFallback: Bool) async throws
   static var smsSendTrigger: String { get }
@@ -16,38 +16,22 @@ extension AdminNotifying {
   ) async throws {
     switch config {
     case .text(let phoneNumber):
-      try await sendText(to: phoneNumber)
-      self.recordSmsSend(phoneNumber: phoneNumber, parentId: parentId)
+      let result = try await sendText(to: phoneNumber)
+      SmsSend.recordDetached(
+        parentId: parentId,
+        trigger: Self.smsSendTrigger,
+        phoneNumber: phoneNumber,
+        twilioResult: result,
+      )
     case .slack(let channelId, _, let token):
       try await sendSlack(channel: channelId, token: token)
     case .email(let address):
       try await sendEmail(to: address, isFallback: false)
     }
   }
-
-  private func recordSmsSend(phoneNumber: String, parentId: Parent.Id) {
-    Task { [trigger = Self.smsSendTrigger] in
-      try await get(dependency: \.db).create(SmsSend(
-        parentId: parentId,
-        trigger: trigger,
-        countryCode: extractCountryCode(from: phoneNumber),
-      ))
-    }
-  }
 }
 
 // helpers and domain types
-
-private func extractCountryCode(from phoneNumber: String) -> String {
-  var number = phoneNumber
-  if number.hasPrefix("+") {
-    number = String(number.dropFirst())
-  }
-  if number.hasPrefix("1") || number.hasPrefix("7") {
-    return String(number.prefix(1))
-  }
-  return String(number.prefix(2))
-}
 
 struct Slack: Equatable {
   let text: String

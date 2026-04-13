@@ -1310,6 +1310,8 @@ extension SmsSend: Model {
     case .parentId: .uuid(self.parentId)
     case .trigger: .varchar(self.trigger)
     case .countryCode: .varchar(self.countryCode)
+    case .twilioMessageSid: .varchar(self.twilioMessageSid)
+    case .numSegments: .int(self.numSegments)
     case .createdAt: .date(self.createdAt)
     }
   }
@@ -1320,6 +1322,8 @@ extension SmsSend: Model {
       .parentId: .uuid(self.parentId),
       .trigger: .varchar(self.trigger),
       .countryCode: .varchar(self.countryCode),
+      .twilioMessageSid: .varchar(self.twilioMessageSid),
+      .numSegments: .int(self.numSegments),
       .createdAt: .currentTimestamp,
     ]
   }

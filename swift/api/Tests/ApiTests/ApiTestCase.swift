@@ -28,6 +28,7 @@ class ApiTestCase: XCTestCase, @unchecked Sendable {
       $0.ephemeral = Ephemeral()
       $0.twilio.send = {
         self.sent.texts.append($0)
+        return .init(messageSid: "SMtest", numSegments: 1)
       }
       $0.slack.send = { @Sendable msg, tok in
         if msg.channel != "debug" {
