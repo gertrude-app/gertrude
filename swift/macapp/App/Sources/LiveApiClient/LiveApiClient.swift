@@ -33,10 +33,28 @@ extension ApiClient: @retroactive DependencyKey {
         with: .createOnboardingBlockedApps(input),
       )
     },
+    createOnboardingKeychain: { input in
+      try await output(
+        from: CreateOnboardingKeychain.self,
+        with: .createOnboardingKeychain(input),
+      ).success
+    },
     disableFilterForChild: {
       _ = try await output(
         from: DisableFilterForChild.self,
         with: .disableFilterForChild,
+      )
+    },
+    getPublicKeychains: {
+      try await output(
+        from: GetPublicKeychains.self,
+        withUnauthed: .getPublicKeychains,
+      )
+    },
+    selectPublicKeychains: { input in
+      _ = try await output(
+        from: SelectPublicKeychains.self,
+        with: .selectPublicKeychains(input),
       )
     },
     setDowntimeSchedule: { input in

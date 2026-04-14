@@ -61,6 +61,12 @@ extension OnboardingFeature.State {
     case appKeySelection_blockApps
     case appKeySelection_allowInternet
 
+    // keychains
+    case aboutPermittingWebsites
+    case meetKeychains
+    case selectPublicKeychains
+    case customKeychains
+
     // wrap up
     case exemptUsers
     case locateMenuBarIcon
@@ -136,6 +142,14 @@ extension OnboardingFeature.State.Step {
     case .appKeySelection_blockApps:
       .appKeySelection_allowInternet
     case .appKeySelection_allowInternet:
+      .aboutPermittingWebsites
+    case .aboutPermittingWebsites:
+      .meetKeychains
+    case .meetKeychains:
+      .selectPublicKeychains
+    case .selectPublicKeychains:
+      .customKeychains
+    case .customKeychains:
       .exemptUsers
     case .exemptUsers:
       .locateMenuBarIcon
@@ -218,6 +232,14 @@ extension OnboardingFeature.State.Step {
       .appKeySelection_intro
     case .appKeySelection_allowInternet:
       .appKeySelection_blockApps
+    case .aboutPermittingWebsites:
+      .appKeySelection_allowInternet
+    case .meetKeychains:
+      .aboutPermittingWebsites
+    case .selectPublicKeychains:
+      .meetKeychains
+    case .customKeychains:
+      .selectPublicKeychains
     case .exemptUsers:
       .installSysExt_explain
     case .locateMenuBarIcon:
@@ -274,6 +296,10 @@ extension OnboardingFeature.State.Step: Comparable {
     case .appKeySelection_intro: 290
     case .appKeySelection_blockApps: 300
     case .appKeySelection_allowInternet: 310
+    case .aboutPermittingWebsites: 312
+    case .meetKeychains: 314
+    case .selectPublicKeychains: 316
+    case .customKeychains: 318
     case .exemptUsers: 320
     case .locateMenuBarIcon: 330
     case .viewHealthCheck: 340

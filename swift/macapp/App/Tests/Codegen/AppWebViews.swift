@@ -1,5 +1,6 @@
 import Foundation
 import Gertie
+import MacAppRoute
 import TypeScriptInterop
 
 @testable import App
@@ -84,6 +85,7 @@ struct AppWebViewStoreTypes: AggregateCodeGenerator {
         .init(OnboardingFeature.State.MacUser.RemediationStep.self, as: "UserRemediationStep"),
         .init(OnboardingFeature.State.MacUser.self, as: "MacOSUser"),
         .init(DiscoveredApp.self),
+        .init(GetPublicKeychains.PublicKeychain.self, as: "PublicKeychain"),
         .init(PlainTime.self),
         .init(PlainTimeWindow.self),
       ],
@@ -96,6 +98,7 @@ struct AppWebViewStoreTypes: AggregateCodeGenerator {
         (OnboardingFeature.State.MacUser.RemediationStep.self, "UserRemediationStep"),
         (OnboardingFeature.State.MacUser.self, "MacOSUser"),
         (DiscoveredApp.self, "DiscoveredApp"),
+        (GetPublicKeychains.PublicKeychain.self, "PublicKeychain"),
         (PlainTime.self, "PlainTime"),
         (PlainTimeWindow.self, "PlainTimeWindow"),
         (PayloadRequestState<String, String>.self, "RequestState<string>"),

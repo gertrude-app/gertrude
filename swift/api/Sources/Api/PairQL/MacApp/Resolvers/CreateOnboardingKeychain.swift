@@ -92,8 +92,8 @@ private func crawlerSlackMessage(input: String, response: CrawlerResponse) -> St
   if response.llmFlagged.isEmpty {
     lines.append("  (none)")
   } else {
-    for domain in response.llmFlagged {
-      lines.append("  • \(domain)")
+    for flagged in response.llmFlagged {
+      lines.append("  • \(flagged.domain) — \(flagged.concern)")
     }
   }
   lines.append("")

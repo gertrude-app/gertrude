@@ -544,6 +544,7 @@ extension Keychain: Model {
     case .warning: .string(self.warning)
     case .isPublic: .bool(self.isPublic)
     case .rootDomain: .string(self.rootDomain)
+    case .brandColor: .string(self.brandColor)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -558,6 +559,7 @@ extension Keychain: Model {
       .warning: .string(self.warning),
       .isPublic: .bool(self.isPublic),
       .rootDomain: .string(self.rootDomain),
+      .brandColor: .string(self.brandColor),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

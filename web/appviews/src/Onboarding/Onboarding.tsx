@@ -27,6 +27,9 @@ export const Onboarding: React.FC<Props> = ({
   exemptableUserIds,
   exemptUserIds,
   discoveredApps,
+  publicKeychains,
+  customKeychainDomains,
+  createCustomKeychainRequest,
   blockedBundleIds,
   osVersion,
   isUpgrade,
@@ -193,6 +196,24 @@ export const Onboarding: React.FC<Props> = ({
               apps={discoveredApps.filter(
                 (app) => !blockedBundleIds.includes(app.bundleId),
               )}
+            />
+          }
+        />
+        <OnboardingPage
+          step="aboutPermittingWebsites"
+          component={<Step.AboutPermittingWebsites />}
+        />
+        <OnboardingPage step="meetKeychains" component={<Step.MeetKeychains />} />
+        <OnboardingPage
+          step="selectPublicKeychains"
+          component={<Step.SelectPublicKeychains keychains={publicKeychains} />}
+        />
+        <OnboardingPage
+          step="customKeychains"
+          component={
+            <Step.CustomKeychains
+              unlocked={customKeychainDomains}
+              request={createCustomKeychainRequest}
             />
           }
         />

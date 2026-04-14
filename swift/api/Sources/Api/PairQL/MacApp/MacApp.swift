@@ -10,6 +10,9 @@ extension MacAppRoute: RouteResponder {
       case .connectUser(let input):
         let output = try await ConnectUser.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .getPublicKeychains:
+        let output = try await GetPublicKeychains.resolve(in: context)
+        return try await self.respond(with: output)
       case .logInterestingEvent(let input):
         let output = try await LogInterestingEvent.resolve(with: input, in: context)
         return try await self.respond(with: output)

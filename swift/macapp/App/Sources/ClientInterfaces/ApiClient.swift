@@ -10,7 +10,11 @@ public struct ApiClient: Sendable {
   public var createOnboardingAppKeys: @Sendable (CreateOnboardingAppKeys.Input) async throws -> Void
   public var createOnboardingBlockedApps: @Sendable (CreateOnboardingBlockedApps.Input)
     async throws -> Void
+  public var createOnboardingKeychain: @Sendable (CreateOnboardingKeychain.Input)
+    async throws -> Bool
   public var disableFilterForChild: @Sendable () async throws -> Void
+  public var getPublicKeychains: @Sendable () async throws -> GetPublicKeychains.Output
+  public var selectPublicKeychains: @Sendable (SelectPublicKeychains.Input) async throws -> Void
   public var setDowntimeSchedule: @Sendable (SetDowntimeSchedule.Input) async throws -> Void
   public var createKeystrokeLines: @Sendable (CreateKeystrokeLines.Input) async throws -> Void
   public var createSuspendFilterRequest: @Sendable (CreateSuspendFilterRequest_v2.Input)
@@ -36,7 +40,11 @@ public struct ApiClient: Sendable {
     async throws -> Void,
     createOnboardingBlockedApps: @escaping @Sendable (CreateOnboardingBlockedApps.Input)
     async throws -> Void,
+    createOnboardingKeychain: @escaping @Sendable (CreateOnboardingKeychain.Input)
+    async throws -> Bool,
     disableFilterForChild: @escaping @Sendable () async throws -> Void,
+    getPublicKeychains: @escaping @Sendable () async throws -> GetPublicKeychains.Output,
+    selectPublicKeychains: @escaping @Sendable (SelectPublicKeychains.Input) async throws -> Void,
     setDowntimeSchedule: @escaping @Sendable (SetDowntimeSchedule.Input) async throws -> Void,
     createKeystrokeLines: @escaping @Sendable (CreateKeystrokeLines.Input) async throws -> Void,
     createSuspendFilterRequest: @escaping @Sendable (CreateSuspendFilterRequest_v2.Input)
@@ -60,7 +68,10 @@ public struct ApiClient: Sendable {
     self.connectUser = connectUser
     self.createOnboardingAppKeys = createOnboardingAppKeys
     self.createOnboardingBlockedApps = createOnboardingBlockedApps
+    self.createOnboardingKeychain = createOnboardingKeychain
     self.disableFilterForChild = disableFilterForChild
+    self.getPublicKeychains = getPublicKeychains
+    self.selectPublicKeychains = selectPublicKeychains
     self.setDowntimeSchedule = setDowntimeSchedule
     self.createKeystrokeLines = createKeystrokeLines
     self.createSuspendFilterRequest = createSuspendFilterRequest
@@ -119,7 +130,10 @@ extension ApiClient: TestDependencyKey {
     connectUser: unimplemented("ApiClient.connectUser"),
     createOnboardingAppKeys: unimplemented("ApiClient.createOnboardingAppKeys"),
     createOnboardingBlockedApps: unimplemented("ApiClient.createOnboardingBlockedApps"),
+    createOnboardingKeychain: unimplemented("ApiClient.createOnboardingKeychain"),
     disableFilterForChild: unimplemented("ApiClient.disableFilterForChild"),
+    getPublicKeychains: unimplemented("ApiClient.getPublicKeychains"),
+    selectPublicKeychains: unimplemented("ApiClient.selectPublicKeychains"),
     setDowntimeSchedule: unimplemented("ApiClient.setDowntimeSchedule"),
     createKeystrokeLines: unimplemented("ApiClient.createKeystrokeLines"),
     createSuspendFilterRequest: unimplemented("ApiClient.createSuspendFilterRequest"),
@@ -143,7 +157,10 @@ extension ApiClient: TestDependencyKey {
     connectUser: { _ in throw Error.unexpectedError(statusCode: 888) },
     createOnboardingAppKeys: { _ in },
     createOnboardingBlockedApps: { _ in },
+    createOnboardingKeychain: { _ in true },
     disableFilterForChild: {},
+    getPublicKeychains: { [] },
+    selectPublicKeychains: { _ in },
     setDowntimeSchedule: { _ in },
     createKeystrokeLines: { _ in },
     createSuspendFilterRequest: { _ in .init() },

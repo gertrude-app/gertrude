@@ -3,6 +3,7 @@ import ComposableArchitecture
 import Core
 import Foundation
 import Gertie
+import MacAppRoute
 import TSCodable
 
 struct OnboardingFeature: Feature {
@@ -37,6 +38,9 @@ struct OnboardingFeature: Feature {
     var connectChildRequest: PayloadRequestState<String, String> = .idle
     var users: [MacUser] = []
     var discoveredApps: [DiscoveredApp] = []
+    var publicKeychains: [GetPublicKeychains.PublicKeychain] = []
+    var customKeychainDomains: [String] = []
+    var createCustomKeychainRequest: RequestState<String> = .idle
     var createAppKeysRequest: RequestState<String> = .idle
     var filterUsers: FilterUserTypes?
     var filteringDisabled = false
@@ -70,10 +74,12 @@ struct OnboardingFeature: Feature {
       case postCreateLogoutClicked
       case postCreateSkipClicked
       case blockedAppsSelected(bundleIds: [String])
+      case publicKeychainsSelected(ids: [UUID])
       case appKeysSelected(bundleIds: [String])
       case connectChildSubmitted(code: Int)
       case infoModalOpened(step: State.Step, detail: String?)
       case setDowntimeSchedule(window: PlainTimeWindow)
+      case createOnboardingKeychain(domain: String)
       case setUserExemption(userId: uid_t, enabled: Bool)
     }
 
@@ -88,9 +94,11 @@ struct OnboardingFeature: Feature {
     case resume(Resume)
     case receivedDeviceData(currentUserId: uid_t, users: [MacOSUser])
     case receivedDiscoveredApps([DiscoveredApp])
+    case receivedPublicKeychains([GetPublicKeychains.PublicKeychain])
     case receivedFilterUsers(FilterUserTypes)
     case connectUser(TaskResult<UserData>)
     case createOnboardingBlockedAppsCompleted(success: Bool)
+    case createOnboardingKeychainCompleted(domain: String, success: Bool)
     case createOnboardingAppKeysCompleted(success: Bool)
     case setStep(State.Step)
     case setRemediationStep(State.MacUser.RemediationStep?)
@@ -353,7 +361,16 @@ struct OnboardingFeature: Feature {
       case .connectUser(.success(let user)):
         log("connect user success", "3a1ac301")
         state.connectChildRequest = .succeeded(payload: user.name)
-        return .none
+        return .exec { send in
+          let keychains: [GetPublicKeychains.PublicKeychain]
+          do {
+            keychains = try await self.api.getPublicKeychains()
+          } catch {
+            unexpectedError(id: "9953fc5a", error)
+            keychains = []
+          }
+          await send(.receivedPublicKeychains(keychains))
+        }
 
       case .connectUser(.failure(let error)):
         log("connect user failed \(error)", "0ed97f9a")
@@ -730,6 +747,10 @@ struct OnboardingFeature: Feature {
         }
         return .none
 
+      case .receivedPublicKeychains(let keychains):
+        state.publicKeychains = keychains
+        return .none
+
       case .webview(.primaryBtnClicked) where step == .appKeySelection_intro:
         log(step, action, "03fd4138")
         state.step = .appKeySelection_blockApps
@@ -771,12 +792,61 @@ struct OnboardingFeature: Feature {
         state.step = .appKeySelection_allowInternet
         return .none
 
+      case .webview(.primaryBtnClicked) where step == .aboutPermittingWebsites:
+        log(step, action, "644b010a")
+        state.step = .meetKeychains
+        return .none
+
+      case .webview(.primaryBtnClicked) where step == .meetKeychains:
+        log(step, action, "0d275d8d")
+        state.step = state.publicKeychains.isEmpty
+          ? .customKeychains
+          : .selectPublicKeychains
+        return .none
+
+      case .webview(.publicKeychainsSelected(let ids)):
+        log("public keychains selected: \(ids.count)", "5b09a4f1")
+        state.step = .customKeychains
+        if ids.isEmpty {
+          return .none
+        }
+        return .exec { _ in
+          try? await self.api.selectPublicKeychains(ids)
+        }
+
+      case .webview(.primaryBtnClicked) where step == .customKeychains:
+        log(step, action, "2d2d94c9")
+        return .exec { send in
+          await self.finishOnboardingConfig(send)
+        }
+
+      case .webview(.createOnboardingKeychain(let domain)):
+        log("createOnboardingKeychain domain=\(domain)", "b4f1aa60")
+        state.createCustomKeychainRequest = .ongoing
+        return .exec { send in
+          do {
+            let success = try await self.api.createOnboardingKeychain(domain)
+            await send(.createOnboardingKeychainCompleted(domain: domain, success: success))
+          } catch {
+            unexpectedError(id: "1820cb3b", detail: "create onboarding keychain err: \(error)")
+            await send(.createOnboardingKeychainCompleted(domain: domain, success: false))
+          }
+        }
+
+      case .createOnboardingKeychainCompleted(let domain, let success):
+        if success {
+          state.customKeychainDomains.append(domain)
+          state.createCustomKeychainRequest = .succeeded
+        } else {
+          state.createCustomKeychainRequest = .failed(error: domain)
+        }
+        return .none
+
       case .webview(.appKeysSelected(let bundleIds)):
         log("app keys selected: \(bundleIds.count) apps", "b26dfa33")
         if bundleIds.isEmpty {
-          return .exec { send in
-            await self.finishOnboardingConfig(send)
-          }
+          state.step = .aboutPermittingWebsites
+          return .none
         }
         state.createAppKeysRequest = .ongoing
         return .exec { send in
@@ -792,15 +862,13 @@ struct OnboardingFeature: Feature {
       case .createOnboardingAppKeysCompleted(success: true):
         log("onboarding app keys created successfully", "51248d15")
         state.createAppKeysRequest = .succeeded
-        return .exec { send in
-          await self.finishOnboardingConfig(send)
-        }
+        state.step = .aboutPermittingWebsites
+        return .none
 
       case .createOnboardingAppKeysCompleted(success: false):
         state.createAppKeysRequest = .failed(error: "Failed to create keys")
-        return .exec { send in
-          await self.finishOnboardingConfig(send)
-        }
+        state.step = .aboutPermittingWebsites
+        return .none
 
       case .webview(.primaryBtnClicked) where step == .screenTimeConflict:
         log(step, action, "c2cfc834")

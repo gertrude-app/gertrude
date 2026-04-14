@@ -96,6 +96,17 @@ final class OnboardingFeatureTests: XCTestCase {
     let setUserToken = spy(on: UUID.self, returning: ())
     store.deps.api.setUserToken = setUserToken.fn
 
+    // we fetch public keychains in the background after connecting the user
+    let publicKeychain = GetPublicKeychains.PublicKeychain(
+      id: UUID(),
+      name: "HTC",
+      description: "homeschool",
+      warning: nil,
+      brandColor: nil,
+    )
+    let getPublicKeychains = mock(always: [publicKeychain])
+    store.deps.api.getPublicKeychains = getPublicKeychains.fn
+
     // they enter code `123456` and click submit...
     await store.send(.onboarding(.webview(.connectChildSubmitted(code: 123_456)))) {
       $0.onboarding.step = .connectChild
@@ -112,6 +123,12 @@ final class OnboardingFeatureTests: XCTestCase {
       $0.onboarding.step = .connectChild
       $0.onboarding.connectChildRequest = .succeeded(payload: "lil suzy")
     }
+
+    // ...and we kick off a background fetch of the public keychains
+    await store.receive(.onboarding(.receivedPublicKeychains([publicKeychain]))) {
+      $0.onboarding.publicKeychains = [publicKeychain]
+    }
+    await expect(getPublicKeychains.calls.count).toEqual(1)
 
     // we persisted the user data
     await expect(saveState.calls.count).toEqual(2)
@@ -383,9 +400,44 @@ final class OnboardingFeatureTests: XCTestCase {
       $0.onboarding.step = .appKeySelection_allowInternet
     }
 
+    // they choose to allow Slack internet access and click "Allow (1) app"
+    let createAppKeys = succeed(with: (), capturing: [String].self)
+    store.deps.api.createOnboardingAppKeys = createAppKeys.fn
+
+    await store
+      .send(.onboarding(.webview(.appKeysSelected(bundleIds: ["com.tinyspeck.slackmacgap"])))) {
+        $0.onboarding.createAppKeysRequest = .ongoing
+      }
+
+    await expect(createAppKeys.calls).toEqual([["com.tinyspeck.slackmacgap"]])
+    await store.receive(.onboarding(.createOnboardingAppKeysCompleted(success: true))) {
+      $0.onboarding.createAppKeysRequest = .succeeded
+      $0.onboarding.step = .aboutPermittingWebsites
+    }
+
+    // they click "Next" on the about permitting websites screen
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+      $0.onboarding.step = .meetKeychains
+    }
+
+    // they click "Next" on the meet keychains screen
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+      $0.onboarding.step = .selectPublicKeychains
+    }
+
+    // they pick the public keychain and click "Add (1) keychain"
+    let selectPublicKeychains = spy(on: [UUID].self, returning: ())
+    store.deps.api.selectPublicKeychains = selectPublicKeychains.fn
+
+    await store.send(.onboarding(.webview(.publicKeychainsSelected(ids: [publicKeychain.id])))) {
+      $0.onboarding.step = .customKeychains
+    }
+
+    await expect(selectPublicKeychains.calls).toEqual([[publicKeychain.id]])
+
     // 🔐 start protection actions
 
-    // finishOnboardingConfig is called after app keys are created, so set up deps first
+    // finishOnboardingConfig is called after customKeychains primary, so set up deps first
     let setAccountActive = spy(on: Bool.self, returning: ())
     store.deps.api.setAccountActive = setAccountActive.fn
     let checkInResult = CheckIn_v2.Output.empty {
@@ -409,19 +461,8 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.app.preventScreenCaptureNag = preventScreenCaptureNag.fn
     store.deps.device.screenTimeWebFilterActive = { false }
 
-    // they choose to allow Slack internet access and click "Allow (1) app"
-    let createAppKeys = succeed(with: (), capturing: [String].self)
-    store.deps.api.createOnboardingAppKeys = createAppKeys.fn
-
-    await store
-      .send(.onboarding(.webview(.appKeysSelected(bundleIds: ["com.tinyspeck.slackmacgap"])))) {
-        $0.onboarding.createAppKeysRequest = .ongoing
-      }
-
-    await expect(createAppKeys.calls).toEqual([["com.tinyspeck.slackmacgap"]])
-    await store.receive(.onboarding(.createOnboardingAppKeysCompleted(success: true))) {
-      $0.onboarding.createAppKeysRequest = .succeeded
-    }
+    // they click "Continue" on the custom keychains step
+    await store.send(.onboarding(.webview(.primaryBtnClicked)))
 
     // ✅ section: exempt users and wrap-up
 
@@ -648,7 +689,7 @@ final class OnboardingFeatureTests: XCTestCase {
   }
 
   @MainActor
-  func testFilteringEnabledDoesNotSkipAllowInternet() async {
+  func testFilteringEnabledRoutesToAllowInternetAfterBlockedApps() async {
     let store = onboardingFeatureStore {
       $0.step = .appKeySelection_blockApps
       $0.filteringDisabled = false
@@ -659,22 +700,106 @@ final class OnboardingFeatureTests: XCTestCase {
   }
 
   @MainActor
+  func testMeetKeychainsPrimaryWithEmptyPublicKeychainsSkipsToCustom() async {
+    let store = onboardingFeatureStore {
+      $0.step = .meetKeychains
+      $0.publicKeychains = []
+    }
+    await store.send(.webview(.primaryBtnClicked)) {
+      $0.step = .customKeychains
+    }
+  }
+
+  @MainActor
+  func testCreateOnboardingKeychainSuccessAppendsDomain() async {
+    let store = onboardingFeatureStore { $0.step = .customKeychains }
+    let createKeychain = spy(on: String.self, returning: true)
+    store.deps.api.createOnboardingKeychain = createKeychain.fn
+
+    await store.send(.webview(.createOnboardingKeychain(domain: "schoolportal.edu"))) {
+      $0.createCustomKeychainRequest = .ongoing
+    }
+    await store.receive(.createOnboardingKeychainCompleted(
+      domain: "schoolportal.edu",
+      success: true,
+    )) {
+      $0.customKeychainDomains = ["schoolportal.edu"]
+      $0.createCustomKeychainRequest = .succeeded
+    }
+    await expect(createKeychain.calls).toEqual(["schoolportal.edu"])
+  }
+
+  @MainActor
+  func testCreateOnboardingKeychainFailureStoresFailedDomain() async {
+    let store = onboardingFeatureStore { $0.step = .customKeychains }
+    let createKeychain = spy(on: String.self, returning: false)
+    store.deps.api.createOnboardingKeychain = createKeychain.fn
+
+    await store.send(.webview(.createOnboardingKeychain(domain: "not.real"))) {
+      $0.createCustomKeychainRequest = .ongoing
+    }
+    await store.receive(.createOnboardingKeychainCompleted(
+      domain: "not.real",
+      success: false,
+    )) {
+      $0.createCustomKeychainRequest = .failed(error: "not.real")
+    }
+    await expect(createKeychain.calls).toEqual(["not.real"])
+  }
+
+  @MainActor
+  func testFilteringDisabledSkipsKeychainStepEvenWhenKeychainsExist() async {
+    let store = onboardingFeatureStore {
+      $0.step = .appKeySelection_blockApps
+      $0.filteringDisabled = true
+      $0.publicKeychains = [
+        .init(id: UUID(), name: "HTC", description: nil, warning: nil, brandColor: nil),
+      ]
+    }
+    await store.send(.webview(.blockedAppsSelected(bundleIds: [])))
+    await store.receive(.setStep(.exemptUsers))
+  }
+
+  @MainActor
+  func testKeychainStepEmptySelectionAdvancesWithoutFiringApi() async {
+    let store = onboardingFeatureStore { $0.step = .selectPublicKeychains }
+    let selectKeychains = spy(on: [UUID].self, returning: ())
+    store.deps.api.selectPublicKeychains = selectKeychains.fn
+    await store.send(.webview(.publicKeychainsSelected(ids: []))) {
+      $0.step = .customKeychains
+    }
+    await expect(selectKeychains.calls.count).toEqual(0)
+  }
+
+  @MainActor
+  func testKeychainStepNonEmptySelectionFiresApiAndAdvances() async {
+    let id = UUID()
+    let store = onboardingFeatureStore { $0.step = .selectPublicKeychains }
+    let selectKeychains = spy(on: [UUID].self, returning: ())
+    store.deps.api.selectPublicKeychains = selectKeychains.fn
+    await store.send(.webview(.publicKeychainsSelected(ids: [id]))) {
+      $0.step = .customKeychains
+    }
+    await expect(selectKeychains.calls).toEqual([[id]])
+  }
+
+  @MainActor
   func testSingleUserOnlySkipsExemptUserScreen() async {
     let store = onboardingFeatureStore {
-      $0.step = .appKeySelection_allowInternet
+      $0.step = .customKeychains
       $0.filterUsers = .init(exempt: [], protected: [])
     }
     store.deps.device.currentUserId = { 501 }
     store.deps.device.listMacOSUsers = { [.init(id: 501, name: "Dad", type: .admin)] }
 
-    await store.send(.webview(.appKeysSelected(bundleIds: [])))
+    await store.send(.webview(.primaryBtnClicked))
     await store.receive(.setStep(.locateMenuBarIcon))
   }
 
   @MainActor
   func testDoesntSkipExemptScreenIfOtherUsers() async {
     let store = onboardingFeatureStore {
-      $0.step = .appKeySelection_allowInternet
+      $0.step = .customKeychains
       $0.filterUsers = .init(exempt: [], protected: [501]) // <-- Dad is protected
     }
     store.deps.device.currentUserId = { 502 }
@@ -683,7 +808,7 @@ final class OnboardingFeatureTests: XCTestCase {
       .init(id: 502, name: "Lil jimmy", type: .standard),
     ] }
 
-    await store.send(.webview(.appKeysSelected(bundleIds: [])))
+    await store.send(.webview(.primaryBtnClicked))
     await store.receive(.setStep(.exemptUsers)) // ... but we still show exempt screen
   }
 

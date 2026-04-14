@@ -17,7 +17,7 @@ struct CrawlerResponse: Decodable, Equatable, Sendable {
   var domain: String
   var recommendedKeys: [RecommendedKey]
   var rejectedDomains: [RejectedDomain]
-  var llmFlagged: [String]
+  var llmFlagged: [LlmFlagged]
   var warnings: [String]
 
   struct RecommendedKey: Decodable, Equatable, Sendable {
@@ -29,6 +29,11 @@ struct CrawlerResponse: Decodable, Equatable, Sendable {
   struct RejectedDomain: Decodable, Equatable, Sendable {
     var domain: String
     var reason: String
+  }
+
+  struct LlmFlagged: Decodable, Equatable, Sendable {
+    var domain: String
+    var concern: String
   }
 }
 

@@ -171,6 +171,10 @@ function getProgressStep(currentStep: OnboardingStep): number {
     case `configureDowntime`:
     case `appKeySelection_intro`:
     case `appKeySelection_blockApps`:
+    case `aboutPermittingWebsites`:
+    case `meetKeychains`:
+    case `selectPublicKeychains`:
+    case `customKeychains`:
     case `appKeySelection_allowInternet`:
     case `screenTimeConflict`:
     case `exemptUsers`:

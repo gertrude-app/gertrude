@@ -68,6 +68,9 @@ extension AuthedUserRoute: RouteResponder {
     case .reportBrowsers(let input):
       let output = try await ReportBrowsers.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .selectPublicKeychains(let input):
+      let output = try await SelectPublicKeychains.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .setDowntimeSchedule(let input):
       let output = try await SetDowntimeSchedule.resolve(with: input, in: context)
       return try await self.respond(with: output)

@@ -84,6 +84,7 @@ extension Configure {
     app.migrations.add(AddKeychainRootDomain())
     app.migrations.add(ShortUrlsAndSmsSendFields())
     app.migrations.add(CreateAlwaysBlockedTables())
+    app.migrations.add(AddKeychainBrandColor())
   }
 }
 
