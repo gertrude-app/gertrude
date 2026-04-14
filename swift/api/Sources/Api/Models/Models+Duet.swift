@@ -745,6 +745,21 @@ extension SmsSend {
   }
 }
 
+extension ShortUrl: Duet.Identifiable {
+  typealias Id = Tagged<ShortUrl, UUID>
+}
+
+extension ShortUrl {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case shortId
+    case target
+    case clickCount
+    case createdAt
+    case deletedAt
+  }
+}
+
 extension CatalogedApp: Duet.Identifiable {
   typealias Id = Tagged<CatalogedApp, UUID>
 }

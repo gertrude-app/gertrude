@@ -22,10 +22,9 @@ extension AdminEvent.SuspendFilterRequestSubmitted: AdminNotifying {
   }
 
   func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult {
-    let message = """
-    [Gertrude App] New suspend filter request from user "\(self.childName)".\
-     View the details and approve or deny at \(self.url)
-    """
+    let linkUrl = await (try? with(dependency: \.db)
+      .create(ShortUrl(target: self.url)).publicUrl) ?? self.url
+    let message = "Gertrude: suspend filter request from \(self.childName).\n\n\(linkUrl)"
     return try await with(dependency: \.twilio)
       .send(Text(to: .init(rawValue: phoneNumber), message: message))
   }

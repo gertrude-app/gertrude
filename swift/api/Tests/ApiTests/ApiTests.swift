@@ -4,6 +4,7 @@ import MacAppRoute
 import Vapor
 import XCore
 import XCTest
+import XCTVapor
 import XExpect
 
 #if canImport(FoundationNetworking)
@@ -114,6 +115,22 @@ final class ApiTests: ApiTestCase, @unchecked Sendable {
 
     let matched = try PairQLRoute.router.match(request: request)
     expect(matched).toEqual(route)
+  }
+
+  func testShortUrlRedirect() async throws {
+    let shortUrl = try await self.db.create(ShortUrl(
+      target: "https://parents.gertrude.app/children/abc/unlock-requests",
+    ))
+
+    try await app.test(
+      .GET,
+      "short-url/\(shortUrl.shortId)",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.temporaryRedirect)
+        let location = res.headers.first(name: .location)!
+        expect(location).toEqual("https://parents.gertrude.app/children/abc/unlock-requests")
+      },
+    )
   }
 
   func testChildContextCreated() async throws {

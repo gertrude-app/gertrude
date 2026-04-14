@@ -61,7 +61,7 @@ private func sendVerification(
         to: .init(rawValue: phoneNumber),
         message: "Your verification code is \(code)",
       ))
-      SmsSend.recordDetached(
+      SmsSend.createDetached(
         parentId: context.parent.id,
         trigger: "verification",
         phoneNumber: phoneNumber,

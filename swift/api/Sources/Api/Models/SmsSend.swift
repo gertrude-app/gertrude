@@ -31,7 +31,7 @@ struct SmsSend: Codable, Sendable {
 extension SmsSend {
   /// Fire-and-forget audit write. DB failures are logged to #unexpectedErrors;
   /// never throws, never awaits — safe to call from hot notification paths.
-  static func recordDetached(
+  static func createDetached(
     parentId: Parent.Id,
     trigger: String,
     phoneNumber: String,
@@ -47,11 +47,18 @@ extension SmsSend {
           numSegments: twilioResult.numSegments,
         ))
       } catch {
-        await get(dependency: \.slack).error(
-          "Failed to record SmsSend audit row (trigger=\(trigger), sid=\(twilioResult.messageSid)): \(error)",
-        )
+        slackErr("9a63bf38 \(trigger), \(twilioResult.messageSid), \(error)")
+      }
+      if let segments = twilioResult.numSegments, segments > 1 {
+        slackErr("d6cf22c5 \(trigger), \(segments), \(twilioResult.messageSid)")
       }
     }
+  }
+}
+
+extension String {
+  func truncatedForSms(max: Int = 25) -> String {
+    self.count <= max ? self : "\(self.prefix(max - 2)).."
   }
 }
 

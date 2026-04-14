@@ -1329,6 +1329,34 @@ extension SmsSend: Model {
   }
 }
 
+extension ShortUrl: Model {
+  public static let schemaName = "system"
+  public static let tableName = "short_urls"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .shortId: .varchar(self.shortId)
+    case .target: .string(self.target)
+    case .clickCount: .int(self.clickCount)
+    case .createdAt: .date(self.createdAt)
+    case .deletedAt: .date(self.deletedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .shortId: .varchar(self.shortId),
+      .target: .string(self.target),
+      .clickCount: .int(self.clickCount),
+      .createdAt: .currentTimestamp,
+      .deletedAt: .date(self.deletedAt),
+    ]
+  }
+}
+
 extension CatalogedApp: Model {
   public static let schemaName = "macos"
   public static let tableName = "mac_apps"

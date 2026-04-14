@@ -62,6 +62,12 @@ struct CleanupJob: AsyncScheduledJob {
 
     logs.append("Deleted \(deletedPendingUnlockRequests) pending unlock requests")
 
+    let deletedShortUrls = try await ShortUrl.query()
+      .where(.deletedAt < now)
+      .delete(in: self.db, force: true)
+
+    logs.append("Deleted \(deletedShortUrls) short urls")
+
     let deletedDashTokens = try await Parent.DashToken.query()
       .where(.deletedAt < now .&& .not(.isNull(.deletedAt)))
       .delete(in: self.db, force: true)

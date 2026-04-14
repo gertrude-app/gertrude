@@ -17,7 +17,7 @@ extension AdminNotifying {
     switch config {
     case .text(let phoneNumber):
       let result = try await sendText(to: phoneNumber)
-      SmsSend.recordDetached(
+      SmsSend.createDetached(
         parentId: parentId,
         trigger: Self.smsSendTrigger,
         phoneNumber: phoneNumber,
