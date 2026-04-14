@@ -96,7 +96,7 @@ final class OnboardingFeatureTests: XCTestCase {
     let setUserToken = spy(on: UUID.self, returning: ())
     store.deps.api.setUserToken = setUserToken.fn
 
-    // we fetch public keychains in the background after connecting the user
+    // we fetch public keychains when they enter the meet keychains screen
     let publicKeychain = GetPublicKeychains.PublicKeychain(
       id: UUID(),
       name: "HTC",
@@ -123,12 +123,6 @@ final class OnboardingFeatureTests: XCTestCase {
       $0.onboarding.step = .connectChild
       $0.onboarding.connectChildRequest = .succeeded(payload: "lil suzy")
     }
-
-    // ...and we kick off a background fetch of the public keychains
-    await store.receive(.onboarding(.receivedPublicKeychains([publicKeychain]))) {
-      $0.onboarding.publicKeychains = [publicKeychain]
-    }
-    await expect(getPublicKeychains.calls.count).toEqual(1)
 
     // we persisted the user data
     await expect(saveState.calls.count).toEqual(2)
@@ -419,6 +413,12 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
       $0.onboarding.step = .meetKeychains
     }
+
+    // ...and we fetch the public keychains for the next screen
+    await store.receive(.onboarding(.receivedPublicKeychains([publicKeychain]))) {
+      $0.onboarding.publicKeychains = [publicKeychain]
+    }
+    await expect(getPublicKeychains.calls.count).toEqual(1)
 
     // they click "Next" on the meet keychains screen
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {

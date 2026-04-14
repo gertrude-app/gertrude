@@ -25,28 +25,52 @@ extension CreateOnboardingKeychain: Resolver {
     @Dependency(\.logger) var logger
     @Dependency(\.slack) var slack
 
+    let existing = try await Keychain.query()
+      .where(.parentId == parentId)
+      .where(.rootDomain == cleaned)
+      .all(in: context.db)
+    if let existingKeychain = existing.first {
+      let existingLinks = try await ChildKeychain.query()
+        .where(.childId == childId)
+        .where(.keychainId == existingKeychain.id)
+        .all(in: context.db)
+      if existingLinks.isEmpty {
+        try await context.db.create(ChildKeychain(
+          childId: childId,
+          keychainId: existingKeychain.id,
+        ))
+        try await websockets.send(.userUpdated, to: .user(childId))
+      }
+      return .success
+    }
+
+    guard let rootDomain = Gertie.Key.Domain(cleaned) else { return .failure }
+    let rootKey = Gertie.Key.anySubdomain(domain: rootDomain, scope: .webBrowsers)
+
+    let keychain = try await context.db.create(Keychain(
+      parentId: parentId,
+      name: cleaned,
+      isPublic: false,
+      rootDomain: cleaned,
+    ))
+    try await context.db.create(Key(keychainId: keychain.id, key: rootKey))
+    try await context.db.create(ChildKeychain(childId: childId, keychainId: keychain.id))
+    try await websockets.send(.userUpdated, to: .user(childId))
+
     let task = Task {
       do {
-        let existing = try await Keychain.query()
-          .where(.parentId == parentId)
-          .where(.rootDomain == cleaned)
-          .all(in: context.db)
-        if !existing.isEmpty { return }
-
         let response = try await crawler.analyze(cleaned)
         await slack.internal(.info, crawlerSlackMessage(input: cleaned, response: response))
-        let keychain = try await context.db.create(Keychain(
-          parentId: parentId,
-          name: response.name,
-          isPublic: false,
-          description: response.description,
-          rootDomain: cleaned,
-        ))
+        var updated = keychain
+        updated.name = response.name
+        updated.description = response.description
+        try await context.db.update(updated)
         for recommended in response.recommendedKeys {
-          guard let gertieKey = gertieKey(from: recommended) else { continue }
+          guard let gertieKey = gertieKey(from: recommended), gertieKey != rootKey else {
+            continue
+          }
           try await context.db.create(Key(keychainId: keychain.id, key: gertieKey))
         }
-        try await context.db.create(ChildKeychain(childId: childId, keychainId: keychain.id))
         try await websockets.send(.userUpdated, to: .user(childId))
       } catch {
         logger.error("11ac6efb keychain crawl failed for `\(cleaned)`: \(error)")

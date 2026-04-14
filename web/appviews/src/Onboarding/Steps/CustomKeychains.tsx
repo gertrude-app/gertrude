@@ -1,6 +1,6 @@
 import { TextInput } from '@shared/components';
 import cx from 'classnames';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import type { RequestState } from '../onboarding-store';
 import OnboardingContext, { WithinActiveStepContext } from '../OnboardingContext';
 import * as Onboarding from '../UtilityComponents';
@@ -18,10 +18,6 @@ const CustomKeychains: React.FC<Props> = ({ unlocked, request }) => {
   const trimmed = domain.trim();
   const canSubmit = trimmed.includes(`.`) && !ongoing;
   const shouldAutoFocus = currentStep === `customKeychains` && osVersion.major > 12;
-
-  useEffect(() => {
-    setDomain(``);
-  }, [unlocked.length]);
 
   return (
     <Onboarding.Centered>
@@ -41,6 +37,7 @@ const CustomKeychains: React.FC<Props> = ({ unlocked, request }) => {
           e.preventDefault();
           if (canSubmit) {
             emit({ case: `createOnboardingKeychain`, domain: trimmed });
+            setDomain(``);
           }
         }}
       >
@@ -110,10 +107,11 @@ const CustomKeychains: React.FC<Props> = ({ unlocked, request }) => {
       </div>
 
       <Onboarding.PrimaryButton
+        renderAsSecondary={unlocked.length === 0}
         className="mt-10"
-        icon={unlocked.length > 0 ? `fa-solid fa-arrow-right` : undefined}
+        icon="fa-solid fa-arrow-right"
       >
-        {unlocked.length === 0 ? `Skip for now` : `Continue`}
+        {unlocked.length === 0 ? `Skip for now` : `All done`}
       </Onboarding.PrimaryButton>
     </Onboarding.Centered>
   );

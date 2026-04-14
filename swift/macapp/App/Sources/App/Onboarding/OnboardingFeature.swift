@@ -361,16 +361,7 @@ struct OnboardingFeature: Feature {
       case .connectUser(.success(let user)):
         log("connect user success", "3a1ac301")
         state.connectChildRequest = .succeeded(payload: user.name)
-        return .exec { send in
-          let keychains: [GetPublicKeychains.PublicKeychain]
-          do {
-            keychains = try await self.api.getPublicKeychains()
-          } catch {
-            unexpectedError(id: "9953fc5a", error)
-            keychains = []
-          }
-          await send(.receivedPublicKeychains(keychains))
-        }
+        return .none
 
       case .connectUser(.failure(let error)):
         log("connect user failed \(error)", "0ed97f9a")
@@ -748,6 +739,7 @@ struct OnboardingFeature: Feature {
         return .none
 
       case .receivedPublicKeychains(let keychains):
+        log("received public keychains: count=\(keychains.count)", "bb40d328")
         state.publicKeychains = keychains
         return .none
 
@@ -795,7 +787,16 @@ struct OnboardingFeature: Feature {
       case .webview(.primaryBtnClicked) where step == .aboutPermittingWebsites:
         log(step, action, "644b010a")
         state.step = .meetKeychains
-        return .none
+        return .exec { send in
+          let keychains: [GetPublicKeychains.PublicKeychain]
+          do {
+            keychains = try await self.api.getPublicKeychains()
+          } catch {
+            unexpectedError(id: "9953fc5a", error)
+            keychains = []
+          }
+          await send(.receivedPublicKeychains(keychains))
+        }
 
       case .webview(.primaryBtnClicked) where step == .meetKeychains:
         log(step, action, "0d275d8d")
@@ -811,7 +812,11 @@ struct OnboardingFeature: Feature {
           return .none
         }
         return .exec { _ in
-          try? await self.api.selectPublicKeychains(ids)
+          do {
+            try await self.api.selectPublicKeychains(ids)
+          } catch {
+            unexpectedError(id: "7ff78381", detail: "select public keychains err: \(error)")
+          }
         }
 
       case .webview(.primaryBtnClicked) where step == .customKeychains:
