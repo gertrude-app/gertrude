@@ -55,6 +55,7 @@ func classifyCreateStandardUserFailure(stderr: String) -> CreateStandardUserErro
   shortName: String,
   fullName: String,
   password: String,
+  hint: String?,
 ) async throws {
   if await !getParentHasSecureToken() {
     throw CreateStandardUserError.parentMissingSecureToken
@@ -68,12 +69,16 @@ func classifyCreateStandardUserFailure(stderr: String) -> CreateStandardUserErro
   let stdin = Pipe()
   let stderr = Pipe()
   proc.executableURL = URL(fileURLWithPath: "/usr/sbin/sysadminctl")
-  proc.arguments = [
+  var args = [
     "-addUser", shortName,
     "-fullName", fullName,
     "-password", "-",
-    "interactive",
   ]
+  if let hint, !hint.isEmpty {
+    args.append(contentsOf: ["-hint", hint])
+  }
+  args.append("interactive")
+  proc.arguments = args
   proc.standardInput = stdin
   proc.standardOutput = FileHandle.nullDevice
   proc.standardError = stderr

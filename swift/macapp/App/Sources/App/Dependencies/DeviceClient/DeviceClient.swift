@@ -5,7 +5,7 @@ import Gertie
 import SystemConfiguration
 
 struct DeviceClient: Sendable {
-  var createStandardUser: @Sendable (String, String, String) async throws -> Void
+  var createStandardUser: @Sendable (String, String, String, String?) async throws -> Void
   var currentMacOsUserType: @Sendable () async throws -> MacOSUserType
   var currentUserId: @Sendable () -> uid_t
   var discoverInstalledApps: @Sendable () async -> [DiscoveredApp]
@@ -39,7 +39,7 @@ struct DeviceClient: Sendable {
 
 extension DeviceClient: DependencyKey {
   static let liveValue = Self(
-    createStandardUser: createStandardUser(shortName:fullName:password:),
+    createStandardUser: createStandardUser(shortName:fullName:password:hint:),
     currentMacOsUserType: getCurrentMacOSUserType,
     currentUserId: { getuid() },
     discoverInstalledApps: getInstalledApps,
@@ -134,7 +134,7 @@ extension DeviceClient: TestDependencyKey {
   )
 
   static let mock = Self(
-    createStandardUser: { _, _, _ in },
+    createStandardUser: { _, _, _, _ in },
     currentMacOsUserType: { .standard },
     currentUserId: { 502 },
     discoverInstalledApps: { [] },

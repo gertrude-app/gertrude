@@ -92,6 +92,8 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
   return (
     <WithinActiveStepContext.Provider value={step === currentStep}>
       <div
+        // inert fixes off-screen focus/layout shift issues from webkit autoscroll
+        inert={step !== currentStep}
         className={cx(
           step === currentStep
             ? `left-0 z-10`

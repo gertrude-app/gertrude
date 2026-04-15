@@ -1442,6 +1442,227 @@ final class OnboardingFeatureTests: XCTestCase {
   }
 
   @MainActor
+  func testChooseSwitchOpensLogoutConfirmModal() async {
+    let store = onboardingFeatureStore {
+      $0.step = .macosUserAccountType
+      $0.userRemediationStep = .choose
+    }
+
+    await store.send(.webview(.chooseSwitchToNonAdminUserClicked)) {
+      $0.logoutConfirmVisible = true
+    }
+
+    await store.send(.webview(.logoutConfirmCanceled)) {
+      $0.logoutConfirmVisible = false
+    }
+  }
+
+  @MainActor
+  func testLogoutConfirmWatchdogFallsBackToSwitchTutorial() async {
+    let store = onboardingFeatureStore {
+      $0.step = .macosUserAccountType
+      $0.userRemediationStep = .choose
+      $0.logoutConfirmVisible = true
+    }
+    store.deps.mainQueue = .immediate
+    store.deps.device.logOutCurrentUser = {}
+
+    await store.send(.webview(.logoutConfirmClicked)) {
+      $0.logoutConfirmVisible = false
+    }
+
+    await store.receive(.logOutCurrentUserDidNotTakeEffect) {
+      $0.userRemediationStep = .switch
+    }
+  }
+
+  @MainActor
+  func testLogoutThrowsFallsBackImmediately() async {
+    struct Boom: Error {}
+    let store = onboardingFeatureStore {
+      $0.step = .macosUserAccountType
+      $0.userRemediationStep = .choose
+      $0.logoutConfirmVisible = true
+    }
+    store.deps.mainQueue = .immediate
+    store.deps.device.logOutCurrentUser = { throw Boom() }
+
+    await store.send(.webview(.logoutConfirmClicked)) {
+      $0.logoutConfirmVisible = false
+    }
+
+    await store.receive(.logOutCurrentUserDidNotTakeEffect) {
+      $0.userRemediationStep = .switch
+    }
+  }
+
+  @MainActor
+  func testChooseCreateWithSecureTokenRoutesToCreateForm() async {
+    let store = onboardingFeatureStore {
+      $0.step = .macosUserAccountType
+      $0.userRemediationStep = .choose
+    }
+    store.deps.device.parentHasSecureToken = { true }
+
+    await store.send(.webview(.chooseCreateNonAdminClicked))
+
+    await store.receive(.setRemediationStep(.createForm)) {
+      $0.userRemediationStep = .createForm
+    }
+  }
+
+  @MainActor
+  func testChooseCreateWithoutSecureTokenFallsBackToTutorial() async {
+    let store = onboardingFeatureStore {
+      $0.step = .macosUserAccountType
+      $0.userRemediationStep = .choose
+    }
+    store.deps.device.parentHasSecureToken = { false }
+
+    await store.send(.webview(.chooseCreateNonAdminClicked))
+
+    await store.receive(.setRemediationStep(.create)) {
+      $0.userRemediationStep = .create
+    }
+  }
+
+  @MainActor
+  func testCreateUserSuccessLandsOnCreateSuccess() async {
+    let store = onboardingFeatureStore {
+      $0.step = .macosUserAccountType
+      $0.userRemediationStep = .createForm
+    }
+    let created = LockIsolated<(String, String, String, String?)?>(nil)
+    store.deps.device.createStandardUser = { s, f, p, h in
+      created.setValue((s, f, p, h))
+    }
+
+    await store.send(.webview(.createUserSubmitted(
+      fullName: "Little Jimmy",
+      username: "jimmy",
+      password: "secret-123",
+      passwordHint: "favorite color",
+    ))) {
+      $0.createUserRequest = .ongoing
+    }
+
+    await store.receive(.createStandardUserCompleted(
+      .success(.init(fullName: "Little Jimmy", username: "jimmy")),
+    )) {
+      $0.createUserRequest = .succeeded
+      $0.createdChildUser = .init(fullName: "Little Jimmy", username: "jimmy")
+      $0.userRemediationStep = .createSuccess
+    }
+
+    expect(created.value?.0).toEqual("jimmy")
+    expect(created.value?.1).toEqual("Little Jimmy")
+    expect(created.value?.2).toEqual("secret-123")
+    expect(created.value?.3).toEqual("favorite color")
+  }
+
+  @MainActor
+  func testCreateUserAuthCancelledShowsErrorStayingOnForm() async {
+    let store = onboardingFeatureStore {
+      $0.step = .macosUserAccountType
+      $0.userRemediationStep = .createForm
+    }
+    store.deps.device.createStandardUser = { _, _, _, _ in
+      throw CreateStandardUserError.cancelledByAdminAuth
+    }
+
+    await store.send(.webview(.createUserSubmitted(
+      fullName: "Jane",
+      username: "jane",
+      password: "pwpwpwpw",
+      passwordHint: nil,
+    ))) {
+      $0.createUserRequest = .ongoing
+    }
+
+    await store.receive(.createStandardUserCompleted(
+      .failure(CreateStandardUserError.cancelledByAdminAuth),
+    )) {
+      $0.createUserRequest = .failed(
+        error: "You cancelled the macOS admin password prompt. Try again to continue.",
+      )
+    }
+    store.assert {
+      $0.userRemediationStep = .createForm
+      $0.createdChildUser = nil
+    }
+  }
+
+  @MainActor
+  func testCreateUserMissingSecureTokenRoutesToCreateTutorial() async {
+    let store = onboardingFeatureStore {
+      $0.step = .macosUserAccountType
+      $0.userRemediationStep = .createForm
+    }
+    store.deps.device.createStandardUser = { _, _, _, _ in
+      throw CreateStandardUserError.parentMissingSecureToken
+    }
+
+    await store.send(.webview(.createUserSubmitted(
+      fullName: "Jane",
+      username: "jane",
+      password: "pwpwpwpw",
+      passwordHint: nil,
+    ))) {
+      $0.createUserRequest = .ongoing
+    }
+
+    await store.receive(.createStandardUserCompleted(
+      .failure(CreateStandardUserError.parentMissingSecureToken),
+    )) {
+      $0.createUserRequest = .failed(
+        error: "Your macOS user can’t create new accounts. We’ll show you another way.",
+      )
+      $0.userRemediationStep = .create
+    }
+  }
+
+  @MainActor
+  func testCreateUserCanceledReturnsToChoose() async {
+    let store = onboardingFeatureStore {
+      $0.step = .macosUserAccountType
+      $0.userRemediationStep = .createForm
+      $0.createUserRequest = .failed(error: "prior error")
+    }
+
+    await store.send(.webview(.createUserCanceled)) {
+      $0.userRemediationStep = .choose
+      $0.createUserRequest = .idle
+    }
+  }
+
+  @MainActor
+  func testPostCreateLogoutOpensModal() async {
+    let store = onboardingFeatureStore {
+      $0.step = .macosUserAccountType
+      $0.userRemediationStep = .createSuccess
+      $0.createdChildUser = .init(fullName: "Jane", username: "jane")
+    }
+
+    await store.send(.webview(.postCreateLogoutClicked)) {
+      $0.logoutConfirmVisible = true
+    }
+  }
+
+  @MainActor
+  func testPostCreateSkipMovesToConnectChild() async {
+    let store = onboardingFeatureStore {
+      $0.step = .macosUserAccountType
+      $0.userRemediationStep = .createSuccess
+      $0.createdChildUser = .init(fullName: "Jane", username: "jane")
+    }
+
+    await store.send(.webview(.postCreateSkipClicked)) {
+      $0.userRemediationStep = nil
+      $0.step = .getChildConnectionCode
+    }
+  }
+
+  @MainActor
   func testSettingStepDoesntOpenWindow() async {
     let store = onboardingFeatureStore {
       $0.windowOpen = false

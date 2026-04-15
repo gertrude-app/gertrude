@@ -134,6 +134,8 @@ const OnboardingStatefulSwitcher: React.FC = () => {
                   { id: 501, name: `Bob McParent`, isAdmin: true },
                   { id: 502, name: `Suzy`, isAdmin: false },
                 ]}
+                logoutConfirmVisible={false}
+                createUserRequest={{ case: `idle` }}
               />
             }
             confetti
