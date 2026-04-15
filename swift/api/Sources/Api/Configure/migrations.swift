@@ -82,8 +82,7 @@ extension Configure {
     app.migrations.add(AddAppBundleIdCount())
     app.migrations.add(CreateMacAppsTables())
     app.migrations.add(AddKeychainRootDomain())
-    app.migrations.add(AddSmsSendTwilioFields())
-    app.migrations.add(CreateShortUrls())
+    app.migrations.add(ShortUrlsAndSmsSendFields())
   }
 }
 

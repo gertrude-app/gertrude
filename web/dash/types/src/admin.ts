@@ -7,7 +7,7 @@ export type NewAdminNotificationMethodEvent =
   | { type: `sendCodeClicked` }
   | { type: `verifyCodeClicked` }
   | { type: `createPendingMethodStarted` }
-  | { type: `createPendingMethodSucceeded`; methodId: UUID }
+  | { type: `createPendingMethodSucceeded`; methodId: UUID; ntfyTopic?: string }
   | { type: `createPendingMethodFailed` }
   | { type: `confirmPendingMethodStarted` }
   | { type: `confirmPendingMethodSucceeded` }

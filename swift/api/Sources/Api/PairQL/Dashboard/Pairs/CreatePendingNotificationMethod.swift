@@ -10,6 +10,12 @@ struct CreatePendingNotificationMethod: Pair {
 
   struct Output: PairOutput {
     let methodId: Parent.NotificationMethod.Id
+    let ntfyTopic: String?
+
+    init(methodId: Parent.NotificationMethod.Id, ntfyTopic: String? = nil) {
+      self.methodId = methodId
+      self.ntfyTopic = ntfyTopic
+    }
   }
 }
 
@@ -19,6 +25,22 @@ extension Parent.NotificationMethod.Config: PairInput {}
 
 extension CreatePendingNotificationMethod: Resolver {
   static func resolve(with config: Input, in context: ParentContext) async throws -> Output {
+    if case .ntfy = config {
+      let topic = NtfyClient.generateTopic()
+      let model = Parent.NotificationMethod(
+        parentId: context.parent.id,
+        config: .ntfy(topic: topic),
+      )
+      await with(dependency: \.ephemeral).storePendingNtfyMethod(model)
+      try await with(dependency: \.ntfy).send(
+        topic,
+        "Gertrude",
+        "This ntfy topic is now connected to Gertrude notifications.",
+        nil,
+      )
+      return .init(methodId: model.id, ntfyTopic: topic)
+    }
+
     let model = Parent.NotificationMethod(parentId: context.parent.id, config: config)
     let code = await with(dependency: \.ephemeral)
       .createPendingNotificationMethod(model)
@@ -76,5 +98,8 @@ private func sendVerification(
         .error("Failed to send SMS verification to \(phoneNumber) (\(parentLink)): \(error)")
       throw error
     }
+
+  case .ntfy:
+    break
   }
 }

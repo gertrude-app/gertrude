@@ -278,7 +278,8 @@ export interface VerifiedNotificationMethod {
   config:
     | { case: 'slack'; channelId: string; channelName: string; token: string }
     | { case: 'email'; email: string }
-    | { case: 'text'; phoneNumber: string };
+    | { case: 'text'; phoneNumber: string }
+    | { case: 'ntfy'; topic: string };
 }
 
 export type WebPolicy =

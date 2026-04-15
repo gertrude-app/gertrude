@@ -4,6 +4,15 @@ import Foundation
 extension AdminEvent.UnlockRequestSubmitted: AdminNotifying {
   static var smsSendTrigger: String { "unlockRequest" }
 
+  func sendNtfy(topic: String) async throws {
+    let request = requestIds.count > 1
+      ? "\(requestIds.count) unlock requests"
+      : "unlock request"
+    let message = "\(request.capitalized) from \(self.userName)\n\n\(self.url)"
+    try await with(dependency: \.ntfy)
+      .send(topic, "Gertrude", message, self.url)
+  }
+
   func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult {
     let request = requestIds.count > 1
       ? "\(requestIds.count) unlock requests"

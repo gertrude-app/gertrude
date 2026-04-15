@@ -41,6 +41,19 @@ extension AdminEvent.SecurityEventPayload: AdminNotifying {
     }
   }
 
+  func sendNtfy(topic: String) async throws {
+    let url = "https://parents.gertrude.app/security-events"
+    let message = """
+    Security event \(self.context): \(self.desc).
+
+    \(self.explanation)
+
+    \(url)
+    """
+    try await with(dependency: \.ntfy)
+      .send(topic, "Gertrude security event", message, url)
+  }
+
   func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult {
     let who = switch source {
     case .macApp(let childName, _):

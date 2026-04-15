@@ -1,7 +1,13 @@
 import FluentSQL
 
-struct CreateShortUrls: GertieMigration {
+struct ShortUrlsAndSmsSendFields: GertieMigration {
   func up(sql: SQLDatabase) async throws {
+    try await sql.execute("""
+      ALTER TABLE system.sms_sends
+      ADD COLUMN twilio_message_sid varchar(48),
+      ADD COLUMN num_segments smallint;
+    """)
+
     try await sql.execute("""
       CREATE TABLE system.short_urls (
         id uuid NOT NULL,
@@ -49,6 +55,12 @@ struct CreateShortUrls: GertieMigration {
   func down(sql: SQLDatabase) async throws {
     try await sql.execute("""
       DROP TABLE IF EXISTS system.short_urls;
+    """)
+
+    try await sql.execute("""
+      ALTER TABLE system.sms_sends
+      DROP COLUMN IF EXISTS twilio_message_sid,
+      DROP COLUMN IF EXISTS num_segments;
     """)
   }
 }

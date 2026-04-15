@@ -6,6 +6,7 @@ protocol AdminNotifying {
   func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult
   func sendSlack(channel: String, token: String) async throws
   func sendEmail(to address: String, isFallback: Bool) async throws
+  func sendNtfy(topic: String) async throws
   static var smsSendTrigger: String { get }
 }
 
@@ -27,6 +28,8 @@ extension AdminNotifying {
       try await sendSlack(channel: channelId, token: token)
     case .email(let address):
       try await sendEmail(to: address, isFallback: false)
+    case .ntfy(let topic):
+      try await sendNtfy(topic: topic)
     }
   }
 }

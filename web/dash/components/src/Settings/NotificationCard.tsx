@@ -196,6 +196,10 @@ function methodTarget(method: VerifiedNotificationMethod): string {
       return prettyE164(method.config.phoneNumber);
     case `slack`:
       return method.config.channelName;
+    case `ntfy`: {
+      const t = method.config.topic;
+      return t.length > 15 ? `${t.slice(0, 12)}...` : t;
+    }
   }
 }
 
@@ -234,10 +238,14 @@ function getSecurityLevel(trigger: AdminNotificationTrigger): SecurityEventLevel
   }
 }
 
-function methodIcon(method: VerifiedNotificationMethod): `email` | `slack` | `phone` {
+function methodIcon(
+  method: VerifiedNotificationMethod,
+): `email` | `slack` | `phone` | `bell` {
   switch (method.config.case) {
     case `text`:
       return `phone`;
+    case `ntfy`:
+      return `bell`;
     default:
       return method.config.case;
   }
