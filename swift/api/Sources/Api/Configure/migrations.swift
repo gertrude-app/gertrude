@@ -82,11 +82,8 @@ extension Configure {
     app.migrations.add(AddAppBundleIdCount())
     app.migrations.add(CreateMacAppsTables())
     app.migrations.add(AddKeychainRootDomain())
-<<<<<<< HEAD
     app.migrations.add(ShortUrlsAndSmsSendFields())
-=======
     app.migrations.add(CreateAlwaysBlockedTables())
->>>>>>> ab221e7c (macapp: new feature - always blocked)
   }
 }
 

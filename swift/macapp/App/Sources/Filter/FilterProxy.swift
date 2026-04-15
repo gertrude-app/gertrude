@@ -112,7 +112,7 @@ public class FilterProxy {
         withFilterInbound: false,
         peekInboundBytes: Int.max,
         filterOutbound: true,
-        peekOutboundBytes: 1024,
+        peekOutboundBytes: 4096,
       )
     }
   }

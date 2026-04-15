@@ -27,7 +27,9 @@ extension BlockRule {
     case .hostnameEquals(let v): .hostnameEquals(value: v)
     case .hostnameEndsWith(let v): .hostnameEndsWith(value: v)
     case .hostnameOrSubdomain:
-      preconditionFailure("hostnameOrSubdomain has no Frozen representation; filter with .frozenEncodable first")
+      preconditionFailure(
+        "hostnameOrSubdomain has no Frozen representation; filter with .frozenEncodable first",
+      )
     case .targetContains(let v): .targetContains(value: v)
     case .flowTypeIs(let v): .flowTypeIs(value: v.legacy)
     case .both(let a, let b): .both(a: a.frozen, b: b.frozen)
@@ -83,7 +85,9 @@ public extension BlockRule {
     case .hostnameContains(let hostname): .hostnameContains(hostname)
     case .hostnameEndsWith(let hostname): .hostnameEndsWith(hostname)
     case .hostnameOrSubdomain:
-      preconditionFailure("hostnameOrSubdomain has no Legacy representation; filter with .frozenEncodable first")
+      preconditionFailure(
+        "hostnameOrSubdomain has no Legacy representation; filter with .frozenEncodable first",
+      )
     case .hostnameEquals(let hostname): .hostnameEquals(hostname)
     case .targetContains(let target): .targetContains(target)
     case .unless(let rule, let negatedBy): .unless(
@@ -159,7 +163,7 @@ public extension BlockRule {
   }
 }
 
-public extension Sequence where Element == BlockRule {
+public extension Sequence<BlockRule> {
   var frozenEncodable: [BlockRule] {
     filter(\.isFrozenEncodable)
   }
