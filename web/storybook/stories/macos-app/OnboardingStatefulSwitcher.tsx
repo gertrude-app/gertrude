@@ -89,9 +89,6 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`viewHealthCheck`);
             break;
           case `viewHealthCheck`:
-            setStep(`howToUseGertrude`);
-            break;
-          case `howToUseGertrude`:
             setStep(`finish`);
             break;
           case `finish`:
@@ -222,7 +219,6 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             component={<Step.LocateMenuBarIcon />}
           />
           <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
-          <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />
           <OnboardingPage step="finish" component={<Step.Finish />} />
         </StepSwitcher>
       </OnboardingContext.Provider>

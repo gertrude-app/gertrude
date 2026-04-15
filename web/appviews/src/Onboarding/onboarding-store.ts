@@ -49,7 +49,6 @@ export type OnboardingStep =
   | 'viewHealthCheck'
   | 'encourageFilterSuspensions'
   | 'screenTimeConflict'
-  | 'howToUseGertrude'
   | 'finish';
 
 export interface MacOSVersion {

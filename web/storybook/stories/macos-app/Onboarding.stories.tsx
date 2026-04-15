@@ -649,11 +649,6 @@ export const EasyMode: Story = props({
   step: `encourageFilterSuspensions`,
 });
 
-export const HowToUseGertrude: Story = props({
-  ...Welcome.args,
-  step: `howToUseGertrude`,
-});
-
 export const Finish: Story = props({
   ...Welcome.args,
   step: `finish`,

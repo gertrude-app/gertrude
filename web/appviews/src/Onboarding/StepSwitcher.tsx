@@ -181,7 +181,6 @@ function getProgressStep(currentStep: OnboardingStep): number {
     case `locateMenuBarIcon`:
     case `viewHealthCheck`:
     case `encourageFilterSuspensions`:
-    case `howToUseGertrude`:
     case `finish`:
       return 7;
   }

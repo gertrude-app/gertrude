@@ -535,12 +535,7 @@ final class OnboardingFeatureTests: XCTestCase {
 
     // they click "Next" on the encourage filter suspensions screen
     await store.send(.onboarding(.webview(.primaryBtnClicked)))
-    await store.receive(.onboarding(.setStep(.howToUseGertrude))) {
-      $0.onboarding.step = .howToUseGertrude // ...and go to how to use
-    }
-
-    // they click "Next" on the how to use screen
-    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+    await store.receive(.onboarding(.setStep(.finish))) {
       $0.onboarding.step = .finish // ...and go to finish
     }
 
@@ -2043,7 +2038,7 @@ final class OnboardingFeatureTests: XCTestCase {
     ])
 
     await store.send(.webview(.secondaryBtnClicked)) {
-      $0.step = .howToUseGertrude
+      $0.step = .finish
     }
   }
 

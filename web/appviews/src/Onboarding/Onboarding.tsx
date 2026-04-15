@@ -236,7 +236,6 @@ export const Onboarding: React.FC<Props> = ({
           step="encourageFilterSuspensions"
           component={<Step.EncourageFilterSuspensions />}
         />
-        <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />
         <OnboardingPage step="finish" component={<Step.Finish />} />
       </StepSwitcher>
     </OnboardingContext.Provider>

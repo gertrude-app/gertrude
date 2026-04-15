@@ -73,7 +73,6 @@ extension OnboardingFeature.State {
     case viewHealthCheck
     case encourageFilterSuspensions
     case screenTimeConflict
-    case howToUseGertrude
     case finish
   }
 }
@@ -158,10 +157,8 @@ extension OnboardingFeature.State.Step {
     case .viewHealthCheck:
       .encourageFilterSuspensions
     case .encourageFilterSuspensions:
-      .howToUseGertrude
+      .finish
     case .screenTimeConflict:
-      .howToUseGertrude
-    case .howToUseGertrude:
       .finish
     case .finish:
       .finish
@@ -250,10 +247,8 @@ extension OnboardingFeature.State.Step {
       .viewHealthCheck
     case .screenTimeConflict:
       .encourageFilterSuspensions
-    case .howToUseGertrude:
-      .encourageFilterSuspensions
     case .finish:
-      .howToUseGertrude
+      .encourageFilterSuspensions
     }
   }
 }
@@ -305,7 +300,6 @@ extension OnboardingFeature.State.Step: Comparable {
     case .viewHealthCheck: 340
     case .encourageFilterSuspensions: 350
     case .screenTimeConflict: 360
-    case .howToUseGertrude: 370
     case .finish: 380
     }
   }

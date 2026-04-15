@@ -22,7 +22,6 @@ export { default as ScreenTimeConflict } from './ScreenTimeConflict';
 export { default as ExemptUsers } from './ExemptUsers';
 export { default as LocateMenuBarIcon } from './LocateMenuBarIcon';
 export { default as ViewHealthCheck } from './ViewHealthCheck';
-export { default as HowToUseGertrude } from './HowToUseGertrude';
 export { default as HowToUseGifs } from './HowToUseGifs';
 export { default as OptOutOfFiltering } from './OptOutOfFiltering';
 export { default as ConfigureDowntime } from './ConfigureDowntime';

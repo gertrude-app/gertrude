@@ -885,7 +885,7 @@ struct OnboardingFeature: Feature {
 
       case .webview(.secondaryBtnClicked) where step == .screenTimeConflict:
         log(step, action, "6eab4506")
-        state.step = .howToUseGertrude
+        state.step = .finish
         return .none
 
       case .webview(.setUserExemption(userId: let userId, enabled: let enabled)):
@@ -920,14 +920,9 @@ struct OnboardingFeature: Feature {
           if await self.device.screenTimeWebFilterActive() {
             await send(.setStep(.screenTimeConflict))
           } else {
-            await send(.setStep(.howToUseGertrude))
+            await send(.setStep(.finish))
           }
         }
-
-      case .webview(.primaryBtnClicked) where step == .howToUseGertrude:
-        log(step, action, "eb044990")
-        state.step = .finish
-        return .none
 
       case .webview(.primaryBtnClicked) where step == .finish,
            .closeWindow,
