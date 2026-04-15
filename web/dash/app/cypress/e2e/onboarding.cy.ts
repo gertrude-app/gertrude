@@ -15,6 +15,10 @@ describe(`dashboard onboarding nudges`, () => {
     keychains: [],
     computers: [],
     iosDevices: [],
+    availableAlwaysBlockedGroups: [],
+    alwaysBlockedGroupIds: [],
+    customAlwaysBlockedRules: [],
+    supportsAlwaysBlocked: false,
     createdAt: new Date().toISOString(),
   };
 

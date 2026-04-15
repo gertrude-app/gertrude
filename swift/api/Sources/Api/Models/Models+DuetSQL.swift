@@ -845,6 +845,114 @@ extension ChildKeychain: Model {
 extension RuleSchedule: @retroactive PostgresJsonable {}
 extension PlainTimeWindow: @retroactive PostgresJsonable {}
 
+extension AlwaysBlockedGroup: Model {
+  public static let schemaName = "macapp"
+  public static let tableName = "always_blocked_groups"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .name: .string(self.name)
+    case .description: .string(self.description)
+    case .longDescription: .string(self.longDescription)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .name: .string(self.name),
+      .description: .string(self.description),
+      .longDescription: .string(self.longDescription),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension AlwaysBlockedRule: Model {
+  public static let schemaName = "macapp"
+  public static let tableName = "always_blocked_rules"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .groupId: .uuid(self.groupId)
+    case .rule: .json(self.rule.toPostgresJson)
+    case .comment: .string(self.comment)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .groupId: .uuid(self.groupId),
+      .rule: .json(self.rule.toPostgresJson),
+      .comment: .string(self.comment),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension ChildAlwaysBlockedGroup: Model {
+  public static let schemaName = "child"
+  public static let tableName = "always_blocked_groups"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .childId: .uuid(self.childId)
+    case .groupId: .uuid(self.groupId)
+    case .createdAt: .date(self.createdAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .childId: .uuid(self.childId),
+      .groupId: .uuid(self.groupId),
+      .createdAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension ChildAlwaysBlockedRule: Model {
+  public static let schemaName = "child"
+  public static let tableName = "always_blocked_rules"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .childId: .uuid(self.childId)
+    case .rule: .json(self.rule.toPostgresJson)
+    case .comment: .string(self.comment)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .childId: .uuid(self.childId),
+      .rule: .json(self.rule.toPostgresJson),
+      .comment: .string(self.comment),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
 extension MacAppToken: Model {
   public static let schemaName = "child"
   public static let tableName = "macapp_tokens"

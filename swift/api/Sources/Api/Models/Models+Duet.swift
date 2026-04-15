@@ -512,6 +512,64 @@ extension ChildKeychain {
   }
 }
 
+extension AlwaysBlockedGroup: Duet.Identifiable {
+  typealias Id = Tagged<AlwaysBlockedGroup, UUID>
+}
+
+extension AlwaysBlockedGroup {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case name
+    case description
+    case longDescription
+    case createdAt
+    case updatedAt
+  }
+}
+
+extension AlwaysBlockedRule: Duet.Identifiable {
+  typealias Id = Tagged<AlwaysBlockedRule, UUID>
+}
+
+extension AlwaysBlockedRule {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case groupId
+    case rule
+    case comment
+    case createdAt
+    case updatedAt
+  }
+}
+
+extension ChildAlwaysBlockedGroup: Duet.Identifiable {
+  typealias Id = Tagged<ChildAlwaysBlockedGroup, UUID>
+}
+
+extension ChildAlwaysBlockedGroup {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case childId
+    case groupId
+    case createdAt
+  }
+}
+
+extension ChildAlwaysBlockedRule: Duet.Identifiable {
+  typealias Id = Tagged<ChildAlwaysBlockedRule, UUID>
+}
+
+extension ChildAlwaysBlockedRule {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case childId
+    case rule
+    case comment
+    case createdAt
+    case updatedAt
+  }
+}
+
 extension MacAppToken: Duet.Identifiable {
   typealias Id = Tagged<MacAppToken, UUID>
 }

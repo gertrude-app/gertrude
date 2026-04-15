@@ -1,4 +1,5 @@
 import Foundation
+import Gertie
 
 public enum FilterDecision: Equatable, Sendable {
   public enum FromFlow: Equatable, Sendable {
@@ -8,12 +9,15 @@ public enum FilterDecision: Equatable, Sendable {
       case defaultNotAllowed
       case urlMessage(XPC.URLMessage)
       case macappAWOL(uid_t)
+      case alwaysBlocked(BlockRule)
+      case quicBlockedForAlwaysBlocked(uid_t)
     }
 
     public enum AllowReason: Equatable, Sendable {
       case dnsRequest
       case fromGertrudeApp
       case filterSuspended
+      case filteringDisabled(uid_t)
       case systemUiServerInternal
       case permittedByKey(UUID)
     }

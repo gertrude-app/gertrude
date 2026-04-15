@@ -1,5 +1,11 @@
 // auto-generated, do not edit
-import type { BlockedApp, PlainTimeWindow, RuleSchedule, SuccessOutput } from '../shared';
+import type {
+  BlockRule,
+  BlockedApp,
+  PlainTimeWindow,
+  RuleSchedule,
+  SuccessOutput,
+} from '../shared';
 
 export namespace SaveUser {
   export interface Input {
@@ -18,6 +24,12 @@ export namespace SaveUser {
       schedule?: RuleSchedule;
     }>;
     blockedApps?: BlockedApp[];
+    alwaysBlockedGroupIds?: UUID[];
+    customAlwaysBlockedRules?: Array<{
+      id: UUID;
+      rule: BlockRule;
+      comment?: string;
+    }>;
   }
 
   export type Output = SuccessOutput;

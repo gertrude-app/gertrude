@@ -18,6 +18,8 @@ struct SaveUser: Pair {
     var downtime: PlainTimeWindow?
     var keychains: [ChildKeychain]
     var blockedApps: [UserBlockedApp.DTO]?
+    var alwaysBlockedGroupIds: [AlwaysBlockedGroup.Id]?
+    var customAlwaysBlockedRules: [ChildCustomBlockRule]?
 
     struct ChildKeychain: PairNestable {
       var id: Keychain.Id
@@ -102,6 +104,54 @@ extension SaveUser: Resolver {
         }
 
         try await context.db.create(pivots)
+      }
+
+      if let groupIds = input.alwaysBlockedGroupIds {
+        let existing = try await ChildAlwaysBlockedGroup.query()
+          .where(.childId == user.id)
+          .all(in: context.db)
+          .map(\.groupId)
+        if Set(existing) != Set(groupIds) {
+          dashSecurityEvent(
+            .alwaysBlockedGroupsChanged,
+            "child: \(user.name)",
+            in: context,
+          )
+          try await ChildAlwaysBlockedGroup.query()
+            .where(.childId == user.id)
+            .delete(in: context.db)
+          let pivots = groupIds.map {
+            ChildAlwaysBlockedGroup(childId: user.id, groupId: $0)
+          }
+          try await context.db.create(pivots)
+        }
+      }
+
+      if let customRules = input.customAlwaysBlockedRules {
+        let existing = try await ChildAlwaysBlockedRule.query()
+          .where(.childId == user.id)
+          .orderBy(.createdAt, .asc)
+          .all(in: context.db)
+          .map { ChildCustomBlockRule(id: $0.id, rule: $0.rule, comment: $0.comment) }
+        if existing != customRules {
+          dashSecurityEvent(
+            .alwaysBlockedRulesChanged,
+            "child: \(user.name)",
+            in: context,
+          )
+          try await ChildAlwaysBlockedRule.query()
+            .where(.childId == user.id)
+            .delete(in: context.db)
+          let models = customRules.map {
+            ChildAlwaysBlockedRule(
+              id: $0.id,
+              childId: user.id,
+              rule: $0.rule,
+              comment: $0.comment,
+            )
+          }
+          try await context.db.create(models)
+        }
       }
     }
 

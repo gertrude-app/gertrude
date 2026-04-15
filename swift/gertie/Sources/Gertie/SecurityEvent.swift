@@ -39,6 +39,8 @@ public enum SecurityEvent: Equatable, Codable, Sendable {
     case keychainsChanged
     case notificationDeleted
     case blockedAppsChanged
+    case alwaysBlockedGroupsChanged
+    case alwaysBlockedRulesChanged
   }
 
   case macApp(MacApp)
@@ -93,6 +95,10 @@ public extension SecurityEvent.Dashboard {
       "Blocked apps changed"
     case .iosBlockRuleDeleted:
       "iOS block rule deleted"
+    case .alwaysBlockedGroupsChanged:
+      "Always blocked groups changed"
+    case .alwaysBlockedRulesChanged:
+      "Always blocked custom rules changed"
     }
   }
 
@@ -126,6 +132,10 @@ public extension SecurityEvent.Dashboard {
       "This event occurs when a parent changes which apps are blocked for a child. Should be investigated if the change was not made by you."
     case .iosBlockRuleDeleted:
       "This event occurs when a parent deletes an iOS block rule from the parents admin site. Should be investigated if the change was not made by you."
+    case .alwaysBlockedGroupsChanged:
+      "This event occurs when a parent changes which Always Blocked groups are assigned to a child. Should be investigated if the change was not made by you."
+    case .alwaysBlockedRulesChanged:
+      "This event occurs when a parent changes a child's custom Always Blocked rules. Should be investigated if the change was not made by you."
     }
   }
 
@@ -140,7 +150,9 @@ public extension SecurityEvent.Dashboard {
       .recommended
     case .loginFailed,
          .childComputerDeleted,
-         .iosBlockRuleDeleted:
+         .iosBlockRuleDeleted,
+         .alwaysBlockedGroupsChanged,
+         .alwaysBlockedRulesChanged:
       .medium
     case .login,
          .childAdded,

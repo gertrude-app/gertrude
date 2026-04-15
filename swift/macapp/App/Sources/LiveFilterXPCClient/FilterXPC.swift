@@ -67,6 +67,7 @@ struct FilterXPC: Sendable {
     keychains: [RuleKeychain],
     downtime: Downtime?,
     filteringDisabled: Bool?,
+    alwaysBlocked: [BlockRule]?,
   ) async throws {
     try await self.establishConnection()
 
@@ -75,6 +76,7 @@ struct FilterXPC: Sendable {
       keychains: keychains,
       downtime: downtime,
       filteringDisabled: filteringDisabled,
+      alwaysBlocked: alwaysBlocked,
     ))
 
     try await withTimeout(connection: sharedConnection) { filterProxy, continuation in

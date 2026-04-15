@@ -25,7 +25,7 @@ final class CheckInFeatureTests: XCTestCase {
 
     let sentKeychains = LockIsolated<[[RuleKeychain]]>([])
     let sentDowntimes = LockIsolated<[Downtime?]>([])
-    store.deps.filterXpc.sendUserRules = { _, keychains, downtime, _ in
+    store.deps.filterXpc.sendUserRules = { _, keychains, downtime, _, _ in
       sentKeychains.withValue { $0.append(keychains) }
       sentDowntimes.withValue { $0.append(downtime) }
       return .success(())
@@ -148,7 +148,7 @@ final class CheckInFeatureTests: XCTestCase {
     let (store, bgQueue) = AppReducer.testStore()
     let notifications = spyOnNotifications(store)
     store.deps.filterXpc
-      .sendUserRules = { _, _, _, _ in .failure(.unknownError("printer on fire")) }
+      .sendUserRules = { _, _, _, _, _ in .failure(.unknownError("printer on fire")) }
     await store.send(.application(.didFinishLaunching))
 
     await bgQueue.advance(by: .milliseconds(5))
@@ -188,7 +188,7 @@ final class CheckInFeatureTests: XCTestCase {
 
     let setAccountActive = spy(on: Bool.self, returning: ())
     store.deps.api.setAccountActive = setAccountActive.fn
-    store.deps.filterXpc.sendUserRules = { _, _, _, _ in fatalError() }
+    store.deps.filterXpc.sendUserRules = { _, _, _, _, _ in fatalError() }
 
     let output1 = CheckIn_v2.Output.mock {
       $0.adminAccountStatus = .inactive
@@ -216,7 +216,7 @@ final class CheckInFeatureTests: XCTestCase {
     }
     let checkIn2 = spy(on: CheckIn_v2.Input.self, returning: output2)
     store.deps.api.checkIn = checkIn2.fn
-    store.deps.filterXpc.sendUserRules = { _, _, _, _ in .success(()) }
+    store.deps.filterXpc.sendUserRules = { _, _, _, _, _ in .success(()) }
 
     await store.send(.heartbeat(.everySixHours))
     await expect(checkIn2.called).toEqual(true)

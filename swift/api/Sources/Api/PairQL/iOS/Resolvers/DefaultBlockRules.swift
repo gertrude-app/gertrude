@@ -9,6 +9,8 @@ extension DefaultBlockRules: Resolver {
     try await IOSApp.BlockRule.query()
       .where(.groupId != nil)
       .all(in: context.db)
-      .map(\.rule.legacy)
+      .map(\.rule)
+      .frozenEncodable
+      .map(\.legacy)
   }
 }

@@ -12,51 +12,53 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     rules: [
-      [
-        `rule1`,
-        {
+      {
+        id: `rule1`,
+        props: {
           type: `app`,
           primaryValue: `com.apple.Safari`,
           secondaryValue: ``,
           condition: `always`,
         },
-      ],
-      [
-        `rule2`,
-        {
+      },
+      {
+        id: `rule2`,
+        props: {
           type: `address`,
           primaryValue: `bad-site.com`,
           secondaryValue: ``,
           condition: `always`,
         },
-      ],
-      [
-        `rule3`,
-        {
+      },
+      {
+        id: `rule3`,
+        props: {
           type: `app`,
           primaryValue: `com.example.Game`,
           secondaryValue: `ads.com`,
           condition: `whenAddressContains`,
         },
-      ],
-      [
-        `rule4`,
-        {
+      },
+      {
+        id: `rule4`,
+        props: {
           type: `address`,
           primaryValue: `social.com`,
           secondaryValue: ``,
           condition: `whenIsBrowser`,
         },
-      ],
-      [
-        `rule5`,
-        {
+        readOnly: true,
+      },
+      {
+        id: `rule5`,
+        props: {
           type: `app`,
           primaryValue: `com.netflix.Netflix`,
           secondaryValue: `foo.com\nbar.com`,
           condition: `unlessAddressContains`,
         },
-      ],
+        readOnly: true,
+      },
     ],
     onDelete: () => {},
     onEdit: () => {},

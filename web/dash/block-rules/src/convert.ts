@@ -8,6 +8,7 @@ export function blockRuleToProps(rule: BlockRule): EditBlockRuleProps | null {
     case `hostnameContains`:
     case `hostnameEquals`:
     case `hostnameEndsWith`:
+    case `hostnameOrSubdomain`:
     case `urlContains`:
       return createSimpleRule(rule);
     case `both`:
@@ -106,6 +107,7 @@ type AddressRule = Extract<
   | { case: `hostnameContains` }
   | { case: `hostnameEquals` }
   | { case: `hostnameEndsWith` }
+  | { case: `hostnameOrSubdomain` }
   | { case: `urlContains` }
 >;
 
@@ -115,6 +117,7 @@ function isAddressRule(rule: BlockRule): rule is AddressRule {
     `hostnameContains`,
     `hostnameEquals`,
     `hostnameEndsWith`,
+    `hostnameOrSubdomain`,
     `urlContains`,
   ].includes(rule.case);
 }
@@ -126,7 +129,7 @@ export function propsToBlockRule(props: EditBlockRuleProps): BlockRule {
       if (type === `app`) {
         return { case: `bundleIdContains`, value: primaryValue };
       } else {
-        return { case: `targetContains`, value: primaryValue };
+        return { case: `hostnameOrSubdomain`, value: primaryValue };
       }
     case `whenAddressContains`:
       return {

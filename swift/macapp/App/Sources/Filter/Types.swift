@@ -12,6 +12,7 @@ public extension XPCEvent {
         downtime: Downtime?,
         manifest: AppIdManifest,
         filteringDisabled: Bool?,
+        alwaysBlocked: [BlockRule]?,
       )
       case setBlockStreaming(enabled: Bool, userId: uid_t)
       case disconnectUser(userId: uid_t)

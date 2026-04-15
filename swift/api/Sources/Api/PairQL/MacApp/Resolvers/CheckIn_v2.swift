@@ -9,6 +9,7 @@ extension CheckIn_v2: Resolver {
     async let browsers = Browser.query().all(in: context.db)
     async let blockedApps = context.child.blockedApps(in: context.db)
     async let keychains = loadRuleKeychains(in: context)
+    async let alwaysBlocked = loadAlwaysBlockedRules(for: context.child.id, in: context.db)
 
     let computerUser = try await syncComputerUser(from: input, in: context)
 
@@ -54,6 +55,7 @@ extension CheckIn_v2: Resolver {
       resolvedUnlockRequests: resolvedUnlockRequests,
       trustedTime: get(dependency: \.date.now).timeIntervalSince1970,
       needsIconUpload: needsIconUpload,
+      alwaysBlocked: alwaysBlocked.isEmpty ? nil : alwaysBlocked,
     )
   }
 }
@@ -334,6 +336,25 @@ private extension CheckIn_v2 {
 }
 
 // helpers
+
+func loadAlwaysBlockedRules(
+  for childId: Child.Id,
+  in db: any DuetSQL.Client,
+) async throws -> [BlockRule] {
+  async let childGroups = ChildAlwaysBlockedGroup.query()
+    .where(.childId == childId)
+    .all(in: db)
+  async let customRules = ChildAlwaysBlockedRule.query()
+    .where(.childId == childId)
+    .all(in: db)
+
+  let groupIds = try await childGroups.map(\.groupId)
+  let groupRules = groupIds.isEmpty ? [] : try await AlwaysBlockedRule.query()
+    .where(.groupId |=| groupIds)
+    .all(in: db)
+
+  return try await groupRules.map(\.rule) + customRules.map(\.rule)
+}
 
 // TODO: this is major N+1 territory, write a custom query w/ join for perf
 // @see also userKeychainSummaries(for:in:)

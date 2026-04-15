@@ -93,6 +93,10 @@ export function child(override: Partial<Child> = {}): Child {
       },
     ],
     iosDevices: [],
+    availableAlwaysBlockedGroups: [],
+    alwaysBlockedGroupIds: [],
+    customAlwaysBlockedRules: [],
+    supportsAlwaysBlocked: true,
     createdAt: new Date().toISOString(),
     ...override,
   };

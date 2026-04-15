@@ -164,6 +164,63 @@ final class EarlyDecisionTests: XCTestCase {
     expect(filter.earlyUserDecision(auditToken: .init())).toEqual(.none(502))
   }
 
+  func testFilteringDisabledDeferredWhenUserHasAlwaysBlockedRules() {
+    let filter = TestFilter.scenario(
+      userAlwaysBlocked: [502: [.hostnameContains(value: "evil")]],
+      filteringDisabledUsers: [502],
+    )
+    expect(filter.earlyUserDecision(auditToken: .init())).toEqual(.none(502))
+  }
+
+  func testSuspensionDeferredWhenUserHasAlwaysBlockedRules() {
+    let filter = TestFilter.scenario(
+      userAlwaysBlocked: [502: [.hostnameContains(value: "evil")]],
+      suspensions: [502: .init(scope: .unrestricted, duration: 100)],
+    )
+    expect(filter.earlyUserDecision(auditToken: .init())).toEqual(.none(502))
+  }
+
+  func testEmptyAlwaysBlockedListDoesNotDeferFastPath() {
+    let filter = TestFilter.scenario(
+      userAlwaysBlocked: [502: []], // <-- empty list shouldn't block fast path
+      suspensions: [502: .init(scope: .unrestricted, duration: 100)],
+    )
+    expect(filter.earlyUserDecision(auditToken: .init())).toEqual(.allow(.filterSuspended(502)))
+  }
+
+  func testAlwaysBlockedForOtherUserDoesNotAffectThisUser() {
+    let filter = TestFilter.scenario(
+      userAlwaysBlocked: [503: [.hostnameContains(value: "evil")]],
+      suspensions: [502: .init(scope: .unrestricted, duration: 100)],
+    )
+    expect(filter.earlyUserDecision(auditToken: .init())).toEqual(.allow(.filterSuspended(502)))
+  }
+
+  func testExemptUserStillShortCircuitsEvenWithAlwaysBlockedRules() {
+    // exempt users bypass always-blocked entirely in v1
+    let filter = TestFilter.scenario(
+      userIdFromAuditToken: 503,
+      userAlwaysBlocked: [503: [.hostnameContains(value: "evil")]],
+      exemptUsers: [503],
+    )
+    expect(filter.earlyUserDecision(auditToken: .init())).toEqual(.allow(.exemptUser(503)))
+  }
+
+  func testDowntimeStillTrumpsAlwaysBlocked() {
+    let downtime = PlainTimeWindow(
+      start: .init(hour: 22, minute: 0),
+      end: .init(hour: 5, minute: 0),
+    )
+    let withinDowntime = Calendar.current.date(from: DateComponents(hour: 23, minute: 33))!
+    let filter = TestFilter.scenario(
+      userIdFromAuditToken: 502,
+      userDowntime: [502: downtime],
+      userAlwaysBlocked: [502: [.hostnameContains(value: "evil")]],
+      date: .constant(withinDowntime),
+    )
+    expect(filter.earlyUserDecision(auditToken: .init())).toEqual(.blockDuringDowntime(502))
+  }
+
   func testDowntimeTrumpsFilteringDisabled() {
     let downtime = PlainTimeWindow(
       start: .init(hour: 22, minute: 0),

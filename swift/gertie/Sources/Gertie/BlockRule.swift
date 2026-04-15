@@ -8,6 +8,8 @@ public enum BlockRule {
   case hostnameContains(value: String)
   case hostnameEquals(value: String)
   case hostnameEndsWith(value: String)
+  // added macapp 2.9.1 / iOS 1.9.x — no Frozen/Legacy encoding
+  case hostnameOrSubdomain(value: String)
   case targetContains(value: String) // "target" = url ?? hostname
   case flowTypeIs(value: FlowType)
   indirect case both(a: BlockRule, b: BlockRule)
@@ -22,6 +24,7 @@ public extension BlockRule {
       | { case: 'hostnameContains'; value: string }
       | { case: 'hostnameEquals'; value: string }
       | { case: 'hostnameEndsWith'; value: string }
+      | { case: 'hostnameOrSubdomain'; value: string }
       | { case: 'targetContains'; value: string }
       | { case: 'flowTypeIs'; value: 'browser' | 'socket' }
       | { case: 'both'; a: BlockRule; b: BlockRule }

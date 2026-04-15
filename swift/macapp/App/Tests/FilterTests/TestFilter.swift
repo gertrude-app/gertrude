@@ -13,6 +13,7 @@ class TestFilter: NetworkFilter {
 
     var userKeychainIndexes: [uid_t: KeychainIndex] = [:]
     var userDowntime: [uid_t: Downtime] = [:]
+    var userAlwaysBlocked: [uid_t: [BlockRule]] = [:]
 
     mutating func rebuildKeychainIndexes() {
       self.userKeychainIndexes = self.userKeychains.mapValues { KeychainIndex(keychains: $0) }
@@ -44,6 +45,7 @@ class TestFilter: NetworkFilter {
     userIdFromAuditToken userId: uid_t? = 502,
     userKeychains: [uid_t: [RuleKeychain]] = [502: [.mock]],
     userDowntime: [uid_t: PlainTimeWindow] = [:],
+    userAlwaysBlocked: [uid_t: [BlockRule]] = [:],
     macappsAliveUntil: [uid_t: Date] = [502: .distantFuture, 503: .distantFuture],
     date: Dependencies.DateGenerator = .init { Date() },
     appIdManifest: AppIdManifest = .init(
@@ -65,6 +67,7 @@ class TestFilter: NetworkFilter {
       let filter = TestFilter()
       var state = State()
       state.userDowntime = userDowntime.mapValues { Downtime(window: $0) }
+      state.userAlwaysBlocked = userAlwaysBlocked
       var normalizedManifest = appIdManifest
       normalizedManifest.normalizeBundleIds()
       state.appIdManifest = normalizedManifest

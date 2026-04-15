@@ -151,11 +151,13 @@ import os.log
         downtime: userData.downtime,
         manifest: manifest,
         filteringDisabled: userData.filteringDisabled,
+        alwaysBlocked: userData.alwaysBlocked,
       ))) }
       os_log(
-        "[G•] FILTER xpc.receiveUserRules(userId: %{public}d,...) num keys: %{public}d",
+        "[G•] FILTER xpc.receiveUserRules(userId: %{public}d,...) num keys: %{public}d, num always-blocked: %{public}d",
         userId,
         userData.keychains.numKeys,
+        userData.alwaysBlocked?.count ?? 0,
       )
       reply(nil)
     } catch {

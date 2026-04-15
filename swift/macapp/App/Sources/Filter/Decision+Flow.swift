@@ -59,13 +59,49 @@ public extension NetworkFilter {
 
     if self.state.macappsAliveUntil[userId] == nil,
        self.state.userKeychains[userId] != nil
-       || self.state.filteringDisabledUsers.contains(userId) {
+       || self.state.filteringDisabledUsers.contains(userId)
+       || self.state.userAlwaysBlocked[userId] != nil {
       return .block(.macappAWOL(userId))
+    }
+
+    // always-blocked rules override suspensions, filtering-disabled, and allow-keys.
+    // only checked when the user has rules assigned — zero cost otherwise.
+    let alwaysBlocked = self.state.userAlwaysBlocked[userId]
+    if let alwaysBlocked,
+       let matched = alwaysBlocked.first(where: { $0.blocksFlow(flow) }) {
+      return .block(.alwaysBlocked(matched))
+    }
+
+    // non-WebKit flows (Chrome, Firefox, Electron, native sockets) arrive at
+    // new-flow time with a nil hostname — SNI isn't parsed until peek. if we
+    // early-allow here for filtering-disabled or suspension, the flow never
+    // peeks and AB rules never get a chance to match the real hostname. defer
+    // so the outbound peek round-trip can re-run flowDecision with hostname.
+    let deferForAlwaysBlocked = canDefer
+      && flow.hostname == nil
+      && alwaysBlocked?.isEmpty == false
+
+    // QUIC (UDP/443) ClientHello is encrypted, so we can't parse SNI — meaning
+    // hostname-dependent always-blocked rules can never match. when a user with
+    // AB rules would otherwise be blindly allowed (suspension/filtering-disabled),
+    // block QUIC so Chrome/etc. fall back to TCP+TLS where SNI is visible.
+    let blockQuicForAlwaysBlocked = deferForAlwaysBlocked
+      && flow.isUDP
+      && flow.port == .https(443)
+
+    if self.state.filteringDisabledUsers.contains(userId) {
+      if blockQuicForAlwaysBlocked {
+        return .block(.quicBlockedForAlwaysBlocked(userId))
+      }
+      return deferForAlwaysBlocked ? nil : .allow(.filteringDisabled(userId))
     }
 
     let app = appDescriptor(for: flow.bundleId ?? "", auditToken: auditToken)
     if self.activeSuspension(for: userId, permits: app) {
-      return .allow(.filterSuspended)
+      if blockQuicForAlwaysBlocked {
+        return .block(.quicBlockedForAlwaysBlocked(userId))
+      }
+      return deferForAlwaysBlocked ? nil : .allow(.filterSuspended)
     }
 
     let keychains = self.state.userKeychains[userId] ?? []

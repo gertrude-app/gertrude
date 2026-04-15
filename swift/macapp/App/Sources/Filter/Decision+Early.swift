@@ -32,12 +32,19 @@ public extension NetworkFilter {
       return self.logDecision(.allow(.exemptUser(userId)))
     }
 
-    if self.state.filteringDisabledUsers.contains(userId),
+    // if the user has always-blocked rules, skip early-allow for filtering-disabled
+    // and filter-suspended so the flow stage can evaluate the rules against the flow.
+    // zero-cost for users without always-blocked rules — the existing fast paths fire.
+    let hasAlwaysBlocked = !(self.state.userAlwaysBlocked[userId]?.isEmpty ?? true)
+
+    if !hasAlwaysBlocked,
+       self.state.filteringDisabledUsers.contains(userId),
        self.state.macappsAliveUntil[userId] != nil {
       return self.logDecision(.allow(.filteringDisabled(userId)))
     }
 
-    if let suspension = self.state.suspensions[userId],
+    if !hasAlwaysBlocked,
+       let suspension = self.state.suspensions[userId],
        suspension.isActive,
        suspension.scope == .unrestricted,
        self.state.macappsAliveUntil[userId] != nil {

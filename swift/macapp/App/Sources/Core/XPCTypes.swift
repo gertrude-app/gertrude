@@ -5,15 +5,18 @@ public struct UserFilterData: Sendable, Codable {
   public var keychains: [RuleKeychain]
   public var downtime: Downtime?
   public var filteringDisabled: Bool?
+  public var alwaysBlocked: [BlockRule]?
 
   public init(
     keychains: [RuleKeychain],
     downtime: Downtime? = nil,
     filteringDisabled: Bool? = nil,
+    alwaysBlocked: [BlockRule]? = nil,
   ) {
     self.keychains = keychains
     self.downtime = downtime
     self.filteringDisabled = filteringDisabled
+    self.alwaysBlocked = alwaysBlocked
   }
 }
 
