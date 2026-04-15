@@ -6,8 +6,16 @@ import Vapor
 
 extension ConnectUser: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
-    guard let childId = await with(dependency: \.ephemeral)
-      .getPendingAppConnection(input.verificationCode) else {
+    var resolvedChildId = await with(dependency: \.ephemeral)
+      .getPendingAppConnection(input.verificationCode)
+
+    #if DEBUG
+      if resolvedChildId == nil, input.verificationCode == 111_111, context.env.mode != .prod {
+        resolvedChildId = try await debugConnectVMChild(input: input, context: context)
+      }
+    #endif
+
+    guard let childId = resolvedChildId else {
       throw context.error(
         id: "6e7fc234",
         type: .unauthorized,
@@ -149,6 +157,69 @@ func createDefaultKeychainIfNeeded(
   ))
   try await db.create(ChildKeychain(childId: child.id, keychainId: keychain.id))
 }
+
+#if DEBUG
+  private func debugConnectVMChild(
+    input: ConnectUser.Input,
+    context: Context,
+  ) async throws -> Child.Id? {
+    let email = context.env.superAdminEmail
+    guard let parent = try? await Parent.query()
+      .where(.email == email)
+      .first(in: context.db) else {
+      return nil
+    }
+
+    @Dependency(\.date.now) var now
+    let formatter = DateFormatter()
+    formatter.dateFormat = "h:mma"
+    formatter.amSymbol = "am"
+    formatter.pmSymbol = "pm"
+    let timeString = formatter.string(from: now).lowercased()
+    let osName = debugVMOsName(from: input.osVersion)
+    let name = "vm \(osName) \(timeString)"
+
+    let childId = Child.Id()
+    let parentContext = ParentContext(
+      requestId: context.requestId,
+      dashboardUrl: context.dashboardUrl,
+      parent: parent,
+      ipAddress: context.ipAddress,
+    )
+    _ = try await SaveUser.resolve(
+      with: .init(
+        id: childId,
+        isNew: true,
+        name: name,
+        keyloggingEnabled: true,
+        screenshotsEnabled: true,
+        screenshotsResolution: 1000,
+        screenshotsFrequency: 180,
+        showSuspensionActivity: true,
+        filteringDisabled: false,
+        downtime: nil,
+        keychains: [],
+        blockedApps: nil,
+      ),
+      in: parentContext,
+    )
+    return childId
+  }
+
+  private func debugVMOsName(from osVersion: String?) -> String {
+    guard let osVersion, let semver = Semver(osVersion) else { return "mac" }
+    switch semver.major {
+    case 10: return "catalina"
+    case 11: return "bigsur"
+    case 12: return "monterey"
+    case 13: return "ventura"
+    case 14: return "sonoma"
+    case 15: return "sequoia"
+    case 26: return "tahoe"
+    default: return "mac"
+    }
+  }
+#endif
 
 private func notifyAdConversion(child: Child, db: any DuetSQL.Client) async {
   guard let parent = try? await db.find(child.parentId),
