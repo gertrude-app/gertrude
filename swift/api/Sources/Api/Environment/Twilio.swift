@@ -7,7 +7,12 @@ import XHttp
 #endif
 
 struct TwilioSmsClient: Sendable {
-  var send: @Sendable (_ text: Text) async throws -> Void
+  struct SendResult: Sendable {
+    var messageSid: String
+    var numSegments: Int?
+  }
+
+  var send: @Sendable (_ text: Text) async throws -> SendResult
 }
 
 struct TwilioError: Error, CustomStringConvertible {
@@ -43,12 +48,23 @@ extension TwilioSmsClient: DependencyKey {
         let bodyString = String(data: data, encoding: .utf8) ?? "<decode err>"
         throw TwilioError(statusCode: httpResponse.statusCode, body: bodyString)
       }
+
+      let decoded = try JSONDecoder().decode(TwilioMessageResponse.self, from: data)
+      return .init(
+        messageSid: decoded.sid,
+        numSegments: decoded.num_segments.flatMap(Int.init),
+      )
     }
   }
 }
 
+private struct TwilioMessageResponse: Decodable {
+  let sid: String
+  let num_segments: String?
+}
+
 extension TwilioSmsClient {
-  static let mock = TwilioSmsClient(send: { _ in })
+  static let mock = TwilioSmsClient(send: { _ in .init(messageSid: "SMmock", numSegments: 1) })
 }
 
 extension DependencyValues {

@@ -4,7 +4,7 @@ import cx from 'classnames';
 import React from 'react';
 
 type Props = {
-  method: `email` | `slack` | `text`;
+  method: `email` | `slack` | `text` | `ntfy`;
   value: string;
   deletable: boolean;
   onDelete(): unknown;

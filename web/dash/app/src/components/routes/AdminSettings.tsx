@@ -69,9 +69,9 @@ const AdminSettings: React.FC = () => {
       return Current.api.createPendingNotificationMethod(method);
     },
     {
-      onSuccess: ({ methodId }) => {
+      onSuccess: ({ methodId, ntfyTopic }) => {
         setNewMethodId({ id: methodId, confirmed: false });
-        dispatch(PendingMethod.createSucceeded(methodId));
+        dispatch(PendingMethod.createSucceeded(methodId, ntfyTopic));
       },
       onError: () => dispatch(PendingMethod.createFailed),
       toast: `create:pending-notification-method`,
@@ -168,6 +168,10 @@ function methodPrimaryValue(method: VerifiedNotificationMethod): string {
     case `text`: {
       return prettyE164(method.config.phoneNumber);
     }
+    case `ntfy`: {
+      const t = method.config.topic;
+      return t.length > 15 ? `${t.slice(0, 12)}...` : t;
+    }
   }
 }
 
@@ -224,10 +228,10 @@ const PendingMethod = {
     type: `newNotificationMethodEvent`,
     event: { type: `createPendingMethodFailed` },
   },
-  createSucceeded(methodId: UUID) {
+  createSucceeded(methodId: UUID, ntfyTopic?: string) {
     return {
       type: `newNotificationMethodEvent`,
-      event: { type: `createPendingMethodSucceeded`, methodId },
+      event: { type: `createPendingMethodSucceeded`, methodId, ntfyTopic },
     } as const;
   },
   confirmStarted: {

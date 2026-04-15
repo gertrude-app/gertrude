@@ -123,6 +123,17 @@ describe(`Smoke test`, () => {
     cy.location(`pathname`).should(`eq`, `/`);
   });
 
+  it(`short url redirect chain resolves canary to success target`, () => {
+    cy.request({
+      url: `https://gertrude.app/u/smoke`,
+      followRedirect: true,
+    }).then((response) => {
+      expect(response.redirects).to.have.length.greaterThan(0);
+      const finalUrl = (response.redirects ?? [])[(response.redirects?.length ?? 0) - 1];
+      expect(finalUrl).to.include(`smoke-test-short-url=success`);
+    });
+  });
+
   it(`supervision redirect chain returns error for unknown code`, () => {
     cy.request({
       url: `https://gertrude.app/s/999999`,

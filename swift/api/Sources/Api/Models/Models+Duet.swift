@@ -739,7 +739,24 @@ extension SmsSend {
     case parentId
     case trigger
     case countryCode
+    case twilioMessageSid
+    case numSegments
     case createdAt
+  }
+}
+
+extension ShortUrl: Duet.Identifiable {
+  typealias Id = Tagged<ShortUrl, UUID>
+}
+
+extension ShortUrl {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case shortId
+    case target
+    case clickCount
+    case createdAt
+    case deletedAt
   }
 }
 

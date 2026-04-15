@@ -122,6 +122,18 @@ actor Ephemeral {
     return code
   }
 
+  func storePendingNtfyMethod(
+    _ model: Parent.NotificationMethod,
+    expiration: Date? = nil,
+  ) {
+    defer { Task { await self.persistStorage() } }
+    self.storage.pendingMethods[model.id] = .init(
+      model: model,
+      code: 0,
+      expiration: expiration ?? self.now + .minutes(60),
+    )
+  }
+
   func confirmPendingNotificationMethod(
     _ modelId: Parent.NotificationMethod.Id,
     _ code: Int,

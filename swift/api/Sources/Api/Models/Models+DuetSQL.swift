@@ -1310,6 +1310,8 @@ extension SmsSend: Model {
     case .parentId: .uuid(self.parentId)
     case .trigger: .varchar(self.trigger)
     case .countryCode: .varchar(self.countryCode)
+    case .twilioMessageSid: .varchar(self.twilioMessageSid)
+    case .numSegments: .int(self.numSegments)
     case .createdAt: .date(self.createdAt)
     }
   }
@@ -1320,7 +1322,37 @@ extension SmsSend: Model {
       .parentId: .uuid(self.parentId),
       .trigger: .varchar(self.trigger),
       .countryCode: .varchar(self.countryCode),
+      .twilioMessageSid: .varchar(self.twilioMessageSid),
+      .numSegments: .int(self.numSegments),
       .createdAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension ShortUrl: Model {
+  public static let schemaName = "system"
+  public static let tableName = "short_urls"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .shortId: .varchar(self.shortId)
+    case .target: .string(self.target)
+    case .clickCount: .int(self.clickCount)
+    case .createdAt: .date(self.createdAt)
+    case .deletedAt: .date(self.deletedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .shortId: .varchar(self.shortId),
+      .target: .string(self.target),
+      .clickCount: .int(self.clickCount),
+      .createdAt: .currentTimestamp,
+      .deletedAt: .date(self.deletedAt),
     ]
   }
 }

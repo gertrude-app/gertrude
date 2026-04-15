@@ -78,6 +78,10 @@ extension XSlack.Slack.Client {
   }
 }
 
+func slackErr(_ message: String) {
+  Task { await with(dependency: \.slack).error(message) }
+}
+
 // NB: count/date will reset on a new deploy or api
 // crash/restart but should be good enough for now
 struct LimitHelper: Sendable {

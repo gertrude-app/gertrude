@@ -21,12 +21,17 @@ extension AdminEvent.SuspendFilterRequestSubmitted: AdminNotifying {
       .send(Slack(text: text, channel: channel, token: token))
   }
 
-  func sendText(to phoneNumber: String) async throws {
-    let message = """
-    [Gertrude App] New suspend filter request from user "\(self.childName)".\
-     View the details and approve or deny at \(self.url)
-    """
-    try await with(dependency: \.twilio)
+  func sendNtfy(topic: String) async throws {
+    let message = "Suspend filter request from \(self.childName)\n\n\(self.url)"
+    try await with(dependency: \.ntfy)
+      .send(topic, "Gertrude", message, self.url)
+  }
+
+  func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult {
+    let linkUrl = await (try? with(dependency: \.db)
+      .create(ShortUrl(target: self.url)).publicUrl) ?? self.url
+    let message = "Gertrude: suspend filter request from \(self.childName).\n\n\(linkUrl)"
+    return try await with(dependency: \.twilio)
       .send(Text(to: .init(rawValue: phoneNumber), message: message))
   }
 

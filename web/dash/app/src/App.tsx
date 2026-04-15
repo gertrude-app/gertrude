@@ -18,6 +18,7 @@ import FamilyActivitySummaries from './components/routes/FamilyActivitySummaries
 import IOSDevice from './components/routes/IOSDevice';
 import Keychain from './components/routes/Keychain';
 import Keychains from './components/routes/Keychains';
+import LinkExpired from './components/routes/LinkExpired';
 import Login from './components/routes/Login';
 import Logout from './components/routes/Logout';
 import MagicLink from './components/routes/MagicLink';
@@ -64,6 +65,7 @@ const App: React.FC = () => {
       <Route path="/verify-signup-email/:token" element={<VerifySignupEmail />} />
       <Route path="/reset-password" element={<RequestPasswordReset />} />
       <Route path="/reset-password/:token" element={<ChangePassword />} />
+      <Route path="/link-expired" element={<LinkExpired />} />
 
       {/* authed routes */}
       <Route path="/" element={<AuthedChrome />}>

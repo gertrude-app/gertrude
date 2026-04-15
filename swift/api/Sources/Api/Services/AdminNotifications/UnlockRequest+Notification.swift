@@ -4,18 +4,23 @@ import Foundation
 extension AdminEvent.UnlockRequestSubmitted: AdminNotifying {
   static var smsSendTrigger: String { "unlockRequest" }
 
-  func sendText(to phoneNumber: String) async throws {
-    let newRequest =
-      requestIds.count > 1
-        ? "\(requestIds.count) new unlock requests"
-        : "New unlock request"
+  func sendNtfy(topic: String) async throws {
+    let request = requestIds.count > 1
+      ? "\(requestIds.count) unlock requests"
+      : "unlock request"
+    let message = "\(request.capitalized) from \(self.userName)\n\n\(self.url)"
+    try await with(dependency: \.ntfy)
+      .send(topic, "Gertrude", message, self.url)
+  }
 
-    let message = """
-    [Gertrude App] \(newRequest) from user "\(userName)".\
-     View the details and approve or deny at \(url)
-    """
-
-    try await with(dependency: \.twilio)
+  func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult {
+    let request = requestIds.count > 1
+      ? "\(requestIds.count) unlock requests"
+      : "unlock request"
+    let linkUrl = await (try? with(dependency: \.db)
+      .create(ShortUrl(target: self.url)).publicUrl) ?? self.url
+    let message = "Gertrude: \(request) from \(self.userName).\n\n\(linkUrl)"
+    return try await with(dependency: \.twilio)
       .send(Text(to: .init(phoneNumber), message: message))
   }
 
@@ -36,8 +41,8 @@ extension AdminEvent.UnlockRequestSubmitted: AdminNotifying {
 
   func sendEmail(to address: String, isFallback: Bool = false) async throws {
     let subject = requestIds.count > 1
-      ? "\(requestIds.count) new unlock requests from \(userName)"
-      : "New unlock request from \(userName)"
+      ? "\(requestIds.count) new unlock requests from \(self.userName)"
+      : "New unlock request from \(self.userName)"
 
     let unlockRequests = requestIds.count > 1
       ? "\(requestIds.count) new <b>unlock requests</b>"

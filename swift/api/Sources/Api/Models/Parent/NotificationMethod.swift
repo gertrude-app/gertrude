@@ -24,5 +24,6 @@ extension Parent.NotificationMethod {
     case slack(channelId: String, channelName: String, token: String)
     case email(email: String)
     case text(phoneNumber: String)
+    case ntfy(topic: String)
   }
 }

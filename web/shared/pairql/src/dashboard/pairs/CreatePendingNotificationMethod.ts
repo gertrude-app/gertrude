@@ -14,9 +14,14 @@ export namespace CreatePendingNotificationMethod {
     | {
         case: 'text';
         phoneNumber: string;
+      }
+    | {
+        case: 'ntfy';
+        topic: string;
       };
 
   export interface Output {
     methodId: UUID;
+    ntfyTopic?: string;
   }
 }

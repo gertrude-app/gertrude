@@ -378,6 +378,66 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
     expect(retrieved?.config).toEqual(.email(email: "blob@blob.com"))
   }
 
+  func testCreatePendingMethod_Ntfy() async throws {
+    let parent = try await self.parent()
+    let uuids = MockUUIDs()
+    let id = uuids[0]
+
+    struct NtfySend: Sendable, Equatable {
+      let topic: String
+      let title: String?
+      let message: String
+      let click: String?
+    }
+    let ntfySends = LockIsolated<[NtfySend]>([])
+
+    let output = try await withDependencies {
+      $0.uuid = .mock(uuids)
+      $0.ntfy.send = { topic, title, message, click in
+        ntfySends.withValue {
+          $0.append(.init(topic: topic, title: title, message: message, click: click))
+        }
+      }
+    } operation: {
+      try await CreatePendingNotificationMethod.resolve(
+        with: .ntfy(topic: ""),
+        in: context(parent),
+      )
+    }
+
+    let topic = try XCTUnwrap(output.ntfyTopic)
+    expect(output.methodId.rawValue).toEqual(id)
+    expect(topic).not.toEqual("")
+
+    // verify no db record created yet
+    let preConfirm = try? await self.db.find(Parent.NotificationMethod.self, byId: id)
+    expect(preConfirm).toBeNil()
+
+    // bootstrap ntfy notification sent to the generated topic
+    expect(ntfySends.value).toEqual([
+      .init(
+        topic: topic,
+        title: "Gertrude",
+        message: "This ntfy topic is now connected to Gertrude notifications.",
+        click: nil,
+      ),
+    ])
+
+    // submit the "confirm pending" mutation (ntfy uses code 0)
+    let confirmOutput = try await ConfirmPendingNotificationMethod.resolve(
+      with: .init(id: .init(id), code: 0),
+      in: context(parent),
+    )
+
+    expect(confirmOutput).toEqual(.success)
+
+    // verify method now added to db w/ the generated topic
+    let retrieved = try? await self.db.find(Parent.NotificationMethod.self, byId: id)
+    expect(retrieved?.id.rawValue).toEqual(id)
+    expect(retrieved?.parentId).toEqual(parent.id)
+    expect(retrieved?.config).toEqual(.ntfy(topic: topic))
+  }
+
   func testCreateNewAdminNotification() async throws {
     let parent = try await self.parent()
     let method = try await self.db.create(

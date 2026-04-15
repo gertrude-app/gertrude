@@ -3,6 +3,7 @@ import { produce } from 'immer';
 import type { NotificationUpdate } from '@dash/components';
 import type {
   AdminNotification,
+  CreatePendingNotificationMethod,
   GetAccountOwner,
   NewAdminNotificationMethodEvent,
   PendingNotificationMethod,
@@ -70,8 +71,7 @@ export function reducer(state: State, action: Action): State | undefined {
             sendCodeRequest: Req.idle(),
             confirmationRequest: Req.idle(),
             confirmationCode: ``,
-            case: `email`,
-            email: ``,
+            ...emptyMethodConfig(`email`),
           };
           return;
         case `cancelClicked`:
@@ -109,7 +109,12 @@ export function reducer(state: State, action: Action): State | undefined {
           return;
         case `methodTypeUpdated`:
           if (state.pendingNotificationMethod) {
-            state.pendingNotificationMethod.case = action.event.methodType;
+            state.pendingNotificationMethod = {
+              sendCodeRequest: Req.idle(),
+              confirmationRequest: Req.idle(),
+              confirmationCode: ``,
+              ...emptyMethodConfig(action.event.methodType),
+            };
           }
           return;
         case `createPendingMethodStarted`:
@@ -122,6 +127,12 @@ export function reducer(state: State, action: Action): State | undefined {
             state.pendingNotificationMethod.sendCodeRequest = Req.succeed(
               action.event.methodId,
             );
+            if (
+              action.event.ntfyTopic &&
+              state.pendingNotificationMethod.case === `ntfy`
+            ) {
+              state.pendingNotificationMethod.topic = action.event.ntfyTopic;
+            }
           }
           return;
         case `createPendingMethodFailed`:
@@ -189,6 +200,21 @@ export const initialState: State = {
 
 export default produce(reducer);
 
+function emptyMethodConfig(
+  type: CreatePendingNotificationMethod.Input[`case`],
+): CreatePendingNotificationMethod.Input {
+  switch (type) {
+    case `email`:
+      return { case: `email`, email: `` };
+    case `text`:
+      return { case: `text`, phoneNumber: `` };
+    case `slack`:
+      return { case: `slack`, channelId: ``, channelName: ``, token: `` };
+    case `ntfy`:
+      return { case: `ntfy`, topic: `` };
+  }
+}
+
 function toVerifiedMethod(
   pending: PendingNotificationMethod,
   id: UUID,
@@ -208,5 +234,7 @@ function toVerifiedMethod(
           token: pending.token,
         },
       };
+    case `ntfy`:
+      return { id, config: { case: `ntfy`, topic: pending.topic } };
   }
 }

@@ -92,6 +92,11 @@ public extension Configure {
     )
 
     app.get(
+      "short-url", ":shortId",
+      use: ShortUrlRedirectRoute.handler(_:),
+    )
+
+    app.get(
       "ios-profile", ":deviceId",
       use: ProfileDownloadRoute.handler(_:),
     )
