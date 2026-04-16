@@ -59,6 +59,26 @@ the original flagship product, even though the iOS app now has a larger user bas
 - Public keychains are meant to speed up the process of unblocking common services and
   reduce the technical burden on parents.
 
+## Always Blocked
+
+- **Always Blocked** is a parallel layer of rules that *always deny* specific traffic,
+  inverting the default allowlist model for a narrow set of cases.
+- Keys and keychains *allow*; Always Blocked rules *deny*. The two systems coexist and
+  deny takes priority: if an Always Blocked rule matches, the traffic is blocked even if
+  a key would otherwise allow it.
+- Always Blocked rules override **filter suspensions**, **filtering-disabled** state, and
+  **allow-keys**. They do not override downtime (downtime already blocks everything).
+- Always Blocked rules do **not** apply to exempt macOS users in v1. An exempt user
+  remains outside the filter entirely.
+- There are two sources of rules:
+  - **Gertrude-authored bundles** parents can subscribe to — for example, Messages GIF
+    search, a curated adult-content top list, and social-media groups.
+  - **Per-child custom rules** parents author themselves in the dashboard.
+- Requires Mac app `v2.9.1` or later. Older Mac app versions ignore Always Blocked
+  assignments silently.
+- The primary motivation is filter suspensions: many parents want certain categories
+  (adult content, Messages GIF search, etc.) to stay blocked even during a suspension.
+
 ## How Parents Control It
 
 - Parents create and manage children in the dashboard.
@@ -84,6 +104,8 @@ the original flagship product, even though the iOS app now has a larger user bas
 - While the filter is suspended, monitoring can remain on, and extra monitoring can be
   applied during the suspension.
 - When the suspension expires, the filter turns back on automatically.
+- If the child has Always Blocked rules assigned, those rules remain enforced during a
+  suspension — a suspension does not unblock traffic that matches an Always Blocked rule.
 - In the dashboard, activity recorded during a suspension can be visually emphasized so
   parents can review it more carefully.
 
@@ -139,6 +161,8 @@ the original flagship product, even though the iOS app now has a larger user bas
 - The same exemption controls are also available from the health check/admin area.
 - This is a common support issue when a parent installs Gertrude on a shared Mac and then
   finds their own account unexpectedly filtered.
+- Exempt users are not subject to Always Blocked rules in v1. Always Blocked only applies
+  to non-exempt, filter-enrolled users.
 
 ## Onboarding
 
@@ -173,3 +197,6 @@ the original flagship product, even though the iOS app now has a larger user bas
   full-disk/screen-capture related permission flows.
 - **January 2026:** `v2.8.0` added explicit detection and mitigation for conflicts with
   Apple's Screen Time web filter.
+- **April 2026:** `v2.9.1` added **Always Blocked** — a parallel deny layer that persists
+  through filter suspensions, covering Gertrude-authored bundles (Messages GIF search,
+  adult-content top list, social media) and per-child custom rules.

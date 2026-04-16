@@ -36,6 +36,7 @@ public protocol DecisionState {
   var userKeychains: [uid_t: [RuleKeychain]] { get }
   var userKeychainIndexes: [uid_t: KeychainIndex] { get }
   var userDowntime: [uid_t: Downtime] { get }
+  var userAlwaysBlocked: [uid_t: [BlockRule]] { get }
   var appIdManifest: AppIdManifest { get }
   var exemptUsers: Set<uid_t> { get }
   var filteringDisabledUsers: Set<uid_t> { get }

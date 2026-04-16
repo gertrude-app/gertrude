@@ -120,6 +120,8 @@ public struct CheckIn_v2: Pair {
     public var resolvedUnlockRequests: [ResolvedUnlockRequest]?
     public var trustedTime: Double
     public var needsIconUpload: [String]?
+    /// added in v2.10.0
+    public var alwaysBlocked: [BlockRule]?
 
     public init(
       adminAccountStatus: AdminAccountStatus,
@@ -133,6 +135,7 @@ public struct CheckIn_v2: Pair {
       resolvedUnlockRequests: [ResolvedUnlockRequest]? = nil,
       trustedTime: Double,
       needsIconUpload: [String]? = nil,
+      alwaysBlocked: [BlockRule]? = nil,
     ) {
       self.adminAccountStatus = adminAccountStatus
       self.appManifest = appManifest
@@ -145,6 +148,7 @@ public struct CheckIn_v2: Pair {
       self.resolvedUnlockRequests = resolvedUnlockRequests
       self.trustedTime = trustedTime
       self.needsIconUpload = needsIconUpload
+      self.alwaysBlocked = alwaysBlocked
     }
   }
 }

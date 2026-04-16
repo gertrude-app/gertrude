@@ -11,11 +11,17 @@ type Props = {
   groups: BlockGroupData[];
   enabledGroupIds: readonly UUID[];
   onToggle(id: UUID): void;
+  title?: string;
 };
 
-const BlockGroupList: React.FC<Props> = ({ groups, enabledGroupIds, onToggle }) => (
+const BlockGroupList: React.FC<Props> = ({
+  groups,
+  enabledGroupIds,
+  onToggle,
+  title = `Block Groups`,
+}) => (
   <div>
-    <h2 className="text-lg font-bold text-slate-700 mb-3">Block Groups</h2>
+    <h2 className="text-lg font-bold text-slate-700 mb-3">{title}</h2>
     <div className="bg-white rounded-xl p-5 border-[0.5px] border-slate-200 shadow shadow-slate-300/50 space-y-2">
       {groups.map((group) => (
         <BlockGroupItem

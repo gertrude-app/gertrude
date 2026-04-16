@@ -37,6 +37,7 @@ export type BlockRule =
   | { case: 'hostnameContains'; value: string }
   | { case: 'hostnameEquals'; value: string }
   | { case: 'hostnameEndsWith'; value: string }
+  | { case: 'hostnameOrSubdomain'; value: string }
   | { case: 'targetContains'; value: string }
   | { case: 'flowTypeIs'; value: 'browser' | 'socket' }
   | { case: 'both'; a: BlockRule; b: BlockRule }
@@ -57,6 +58,15 @@ export interface Child {
   computers: ChildComputer[];
   iosDevices: ChildIOSDevice[];
   blockedApps?: BlockedApp[];
+  availableAlwaysBlockedGroups: Array<{
+    id: UUID;
+    name: string;
+    description: string;
+    longDescription: string;
+  }>;
+  alwaysBlockedGroupIds: UUID[];
+  customAlwaysBlockedRules: Array<{ id: UUID; rule: BlockRule; comment?: string }>;
+  supportsAlwaysBlocked: boolean;
   createdAt: ISODateString;
 }
 

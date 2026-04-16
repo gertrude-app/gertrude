@@ -152,7 +152,7 @@ describe(`propsToBlockRule`, () => {
         secondaryValue: ``,
         condition: `always`,
       },
-      { case: `targetContains`, value: `example.com` },
+      { case: `hostnameOrSubdomain`, value: `example.com` },
     ],
     [
       {
@@ -161,7 +161,7 @@ describe(`propsToBlockRule`, () => {
         secondaryValue: ``,
         condition: `always`,
       },
-      { case: `targetContains`, value: `foo` },
+      { case: `hostnameOrSubdomain`, value: `foo` },
     ],
     [
       {
@@ -170,7 +170,7 @@ describe(`propsToBlockRule`, () => {
         secondaryValue: ``,
         condition: `always`,
       },
-      { case: `targetContains`, value: `bar.com` },
+      { case: `hostnameOrSubdomain`, value: `bar.com` },
     ],
     [
       {
@@ -179,7 +179,7 @@ describe(`propsToBlockRule`, () => {
         secondaryValue: ``,
         condition: `always`,
       },
-      { case: `targetContains`, value: `.org` },
+      { case: `hostnameOrSubdomain`, value: `.org` },
     ],
     [
       {
@@ -188,7 +188,7 @@ describe(`propsToBlockRule`, () => {
         secondaryValue: ``,
         condition: `always`,
       },
-      { case: `targetContains`, value: `baz` },
+      { case: `hostnameOrSubdomain`, value: `baz` },
     ],
     [
       {

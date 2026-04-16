@@ -53,6 +53,7 @@ final class FilterReducerTests: XCTestCase {
       downtime: nil,
       manifest: manifest,
       filteringDisabled: nil,
+      alwaysBlocked: nil,
     ))
 
     let saveState = spy(on: Persistent.State.self, returning: ())
@@ -98,6 +99,7 @@ final class FilterReducerTests: XCTestCase {
       downtime: nil,
       manifest: .mock,
       filteringDisabled: nil,
+      alwaysBlocked: nil,
     )))) {
       $0.exemptUsers = [504] // ... so they are removed from the exempt list
     }
@@ -118,6 +120,7 @@ final class FilterReducerTests: XCTestCase {
       downtime: nil,
       manifest: .mock,
       filteringDisabled: nil,
+      alwaysBlocked: nil,
     )))) {
       $0.exemptUsers = [501, 504] // ... so they are NOT removed from the exempt list
     }
@@ -138,6 +141,7 @@ final class FilterReducerTests: XCTestCase {
       downtime: nil,
       manifest: .mock,
       filteringDisabled: false, // new app sends explicit false, not nil
+      alwaysBlocked: nil,
     )))) {
       $0.userKeychains[502] = [] // stale keychains cleared — child correctly gets block-all
       $0.filteringDisabledUsers = [] // removed from monitoring-only
@@ -159,6 +163,7 @@ final class FilterReducerTests: XCTestCase {
       downtime: downtime,
       manifest: .mock,
       filteringDisabled: nil,
+      alwaysBlocked: nil,
     )))) {
       $0.userDowntime[502] = downtime
     }
@@ -191,6 +196,7 @@ final class FilterReducerTests: XCTestCase {
       downtime: nil, // <-- downtime removed
       manifest: .mock,
       filteringDisabled: nil,
+      alwaysBlocked: nil,
     )))) {
       $0.userDowntime = [:]
     }
@@ -693,6 +699,7 @@ final class FilterReducerTests: XCTestCase {
       downtime: nil,
       manifest: dottedManifest,
       filteringDisabled: nil,
+      alwaysBlocked: nil,
     )))) {
       $0.userKeychains[502] = [.mock]
       $0.appIdManifest = AppIdManifest(

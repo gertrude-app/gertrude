@@ -164,6 +164,210 @@ final class NewFlowDecisionTests: XCTestCase {
     expect(filter.newFlowDecision(.test(bundleId: "com.netrivet.gertrude.app")))
       .toEqual(.allow(.fromGertrudeApp))
   }
+
+  // MARK: Always Blocked flow-stage tests
+
+  func testAlwaysBlockedRuleBeatsAllowKey() {
+    let key = RuleKey(key: .domain(domain: "evil.com", scope: .unrestricted))
+    let filter = TestFilter.scenario(
+      userKeychains: [502: key.into()],
+      userAlwaysBlocked: [502: [.hostnameContains(value: "evil")]],
+    )
+    let flow = FilterFlow.test(hostname: "evil.com")
+    expect(filter.newFlowDecision(flow))
+      .toEqual(.block(.alwaysBlocked(.hostnameContains(value: "evil"))))
+  }
+
+  func testAlwaysBlockedRuleBlocksDuringFilterSuspension() {
+    let filter = TestFilter.scenario(
+      userKeychains: [502: [.mock]],
+      userAlwaysBlocked: [502: [.hostnameEndsWith(value: "evil.com")]],
+      suspensions: [502: .init(scope: .unrestricted, duration: 1000)],
+    )
+    let flow = FilterFlow.test(hostname: "evil.com")
+    expect(filter.newFlowDecision(flow))
+      .toEqual(.block(.alwaysBlocked(.hostnameEndsWith(value: "evil.com"))))
+  }
+
+  func testAlwaysBlockedRuleBlocksForFilteringDisabledUser() {
+    let filter = TestFilter.scenario(
+      userKeychains: [:],
+      userAlwaysBlocked: [502: [.hostnameEndsWith(value: "evil.com")]],
+      filteringDisabledUsers: [502],
+    )
+    let flow = FilterFlow.test(hostname: "evil.com")
+    expect(filter.newFlowDecision(flow))
+      .toEqual(.block(.alwaysBlocked(.hostnameEndsWith(value: "evil.com"))))
+  }
+
+  func testFilteringDisabledUserAllowedWhenAlwaysBlockedDoesNotMatch() {
+    let filter = TestFilter.scenario(
+      userKeychains: [:],
+      userAlwaysBlocked: [502: [.hostnameEndsWith(value: "evil.com")]],
+      filteringDisabledUsers: [502],
+    )
+    let flow = FilterFlow.test(hostname: "example.com")
+    expect(filter.newFlowDecision(flow)).toEqual(.allow(.filteringDisabled(502)))
+  }
+
+  func testFilterSuspendedUserAllowedWhenAlwaysBlockedDoesNotMatch() {
+    let filter = TestFilter.scenario(
+      userKeychains: [502: [.mock]],
+      userAlwaysBlocked: [502: [.hostnameEndsWith(value: "evil.com")]],
+      suspensions: [502: .init(scope: .unrestricted, duration: 1000)],
+    )
+    let flow = FilterFlow.test(hostname: "example.com")
+    expect(filter.newFlowDecision(flow)).toEqual(.allow(.filterSuspended))
+  }
+
+  func testAlwaysBlockedEvaluatedBeforeKeychainAllow() {
+    // same keychain would allow, but AB blocks first
+    let key = RuleKey(key: .skeleton(scope: .bundleId("com.evil.app")))
+    let filter = TestFilter.scenario(
+      userKeychains: [502: key.into()],
+      userAlwaysBlocked: [502: [.bundleIdContains(value: "com.evil")]],
+    )
+    let flow = FilterFlow.test(hostname: "anything.com", bundleId: "com.evil.app")
+    expect(filter.newFlowDecision(flow))
+      .toEqual(.block(.alwaysBlocked(.bundleIdContains(value: "com.evil"))))
+  }
+
+  func testAwolMacappBlockedWhenOnlyAlwaysBlockedAssigned() {
+    // AWOL blocking should fire even when the user has *only* always-blocked rules
+    // (no keychains, not filtering-disabled)
+    let filter = TestFilter.scenario(
+      userKeychains: [:],
+      userAlwaysBlocked: [502: [.hostnameContains(value: "evil")]],
+      macappsAliveUntil: [:],
+    )
+    let flow = FilterFlow.test(hostname: "example.com")
+    expect(filter.newFlowDecision(flow)).toEqual(.block(.macappAWOL(502)))
+  }
+
+  func testAlwaysBlockedForOtherUserDoesNotAffectThisUser() {
+    let filter = TestFilter.scenario(
+      userKeychains: [502: [.mock]],
+      userAlwaysBlocked: [503: [.hostnameContains(value: "evil")]],
+      suspensions: [502: .init(scope: .unrestricted, duration: 1000)],
+    )
+    let flow = FilterFlow.test(hostname: "evil.com")
+    expect(filter.newFlowDecision(flow)).toEqual(.allow(.filterSuspended))
+  }
+
+  // regression: Chrome flows arrive at new-flow time with nil hostname (SNI
+  // isn't parsed until peek). if a suspended user has AB rules, we must defer
+  // rather than early-allow, so the peek round-trip gets a chance to match.
+  func testSuspendedChromeFlowDefersWhenAlwaysBlockedNeedsHostname() {
+    let filter = TestFilter.scenario(
+      userKeychains: [502: [.mock]],
+      userAlwaysBlocked: [502: [.hostnameEndsWith(value: "evil.com")]],
+      suspensions: [502: .init(scope: .unrestricted, duration: 1000)],
+    )
+    let flow = FilterFlow.test(hostname: nil, bundleId: "com.google.Chrome")
+    expect(filter.newFlowDecision(flow)).toBeNil()
+  }
+
+  func testFilteringDisabledChromeFlowDefersWhenAlwaysBlockedNeedsHostname() {
+    let filter = TestFilter.scenario(
+      userKeychains: [:],
+      userAlwaysBlocked: [502: [.hostnameEndsWith(value: "evil.com")]],
+      filteringDisabledUsers: [502],
+    )
+    let flow = FilterFlow.test(hostname: nil, bundleId: "com.google.Chrome")
+    expect(filter.newFlowDecision(flow)).toBeNil()
+  }
+
+  // after peek populates hostname via SNI, the completed-flow path must block.
+  func testSuspendedChromeFlowBlockedByAlwaysBlockedAfterSniParsed() {
+    let filter = TestFilter.scenario(
+      userKeychains: [502: [.mock]],
+      userAlwaysBlocked: [502: [.hostnameEndsWith(value: "evil.com")]],
+      suspensions: [502: .init(scope: .unrestricted, duration: 1000)],
+    )
+    var flow = FilterFlow.test(hostname: "api.evil.com", bundleId: "com.google.Chrome")
+    expect(filter.completedDecision(&flow))
+      .toEqual(.block(.alwaysBlocked(.hostnameEndsWith(value: "evil.com"))))
+  }
+
+  // QUIC ClientHello is encrypted, so SNI can't be parsed. when a user with
+  // AB rules would otherwise fall through to a blind allow, block QUIC so
+  // the client retries over TCP+TLS and SNI becomes visible.
+  func testSuspendedQuicFlowBlockedWhenAlwaysBlockedNeedsHostname() {
+    let filter = TestFilter.scenario(
+      userKeychains: [502: [.mock]],
+      userAlwaysBlocked: [502: [.hostnameEndsWith(value: "evil.com")]],
+      suspensions: [502: .init(scope: .unrestricted, duration: 1000)],
+    )
+    let flow = FilterFlow.test(
+      hostname: nil,
+      bundleId: "com.google.Chrome",
+      port: .https(443),
+      ipProtocol: .udp(Int32(IPPROTO_UDP)),
+    )
+    expect(filter.newFlowDecision(flow))
+      .toEqual(.block(.quicBlockedForAlwaysBlocked(502)))
+  }
+
+  func testFilteringDisabledQuicFlowBlockedWhenAlwaysBlockedNeedsHostname() {
+    let filter = TestFilter.scenario(
+      userKeychains: [:],
+      userAlwaysBlocked: [502: [.hostnameEndsWith(value: "evil.com")]],
+      filteringDisabledUsers: [502],
+    )
+    let flow = FilterFlow.test(
+      hostname: nil,
+      bundleId: "com.google.Chrome",
+      port: .https(443),
+      ipProtocol: .udp(Int32(IPPROTO_UDP)),
+    )
+    expect(filter.newFlowDecision(flow))
+      .toEqual(.block(.quicBlockedForAlwaysBlocked(502)))
+  }
+
+  // QUIC block only fires when the user has AB rules — no rules, no block.
+  func testSuspendedQuicFlowAllowedWhenNoAlwaysBlockedRules() {
+    let filter = TestFilter.scenario(
+      userKeychains: [502: [.mock]],
+      suspensions: [502: .init(scope: .unrestricted, duration: 1000)],
+    )
+    let flow = FilterFlow.test(
+      hostname: nil,
+      bundleId: "com.google.Chrome",
+      port: .https(443),
+      ipProtocol: .udp(Int32(IPPROTO_UDP)),
+    )
+    expect(filter.newFlowDecision(flow)).toEqual(.allow(.filterSuspended))
+  }
+
+  // QUIC with hostname already present (rare, but possible) should run the
+  // AB rule check normally rather than force a downgrade.
+  func testSuspendedQuicFlowWithHostnameDoesNotForceDowngrade() {
+    let filter = TestFilter.scenario(
+      userKeychains: [502: [.mock]],
+      userAlwaysBlocked: [502: [.hostnameEndsWith(value: "evil.com")]],
+      suspensions: [502: .init(scope: .unrestricted, duration: 1000)],
+    )
+    let flow = FilterFlow.test(
+      hostname: "example.com",
+      bundleId: "com.google.Chrome",
+      port: .https(443),
+      ipProtocol: .udp(Int32(IPPROTO_UDP)),
+    )
+    expect(filter.newFlowDecision(flow)).toEqual(.allow(.filterSuspended))
+  }
+
+  // AB rules that don't need hostname (e.g. bundleIdContains) must still
+  // resolve at new-flow time — no deferral, no extra peek round-trip.
+  func testSuspendedFlowWithBundleIdAlwaysBlockedRuleResolvesAtNewFlow() {
+    let filter = TestFilter.scenario(
+      userKeychains: [502: [.mock]],
+      userAlwaysBlocked: [502: [.bundleIdContains(value: "com.apple.Spotlight")]],
+      suspensions: [502: .init(scope: .unrestricted, duration: 1000)],
+    )
+    let flow = FilterFlow.test(hostname: nil, bundleId: "com.apple.Spotlight")
+    expect(filter.newFlowDecision(flow))
+      .toEqual(.block(.alwaysBlocked(.bundleIdContains(value: "com.apple.Spotlight"))))
+  }
 }
 
 // helpers
@@ -190,6 +394,7 @@ extension FilterFlow {
     userId: uid_t? = 502,
     port: Core.Port? = nil,
     ipProtocol: IpProtocol? = nil,
+    flowType: FlowType? = nil,
   ) -> Self {
     FilterFlow(
       url: url,
@@ -200,6 +405,7 @@ extension FilterFlow {
       userId: userId,
       port: port,
       ipProtocol: ipProtocol,
+      flowType: flowType,
     )
   }
 }

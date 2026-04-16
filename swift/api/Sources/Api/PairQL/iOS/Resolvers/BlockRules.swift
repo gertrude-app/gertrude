@@ -21,7 +21,9 @@ extension BlockRules: Resolver {
       return try await IOSApp.BlockRule.query()
         .where(.isNull(.deviceId) .|| input.vendorId.map { .deviceId == $0 } ?? .never)
         .all(in: context.db)
-        .map(\.rule.legacy)
+        .map(\.rule)
+        .frozenEncodable
+        .map(\.legacy)
     }
 
     var rules = BlockRule.Legacy.defaults

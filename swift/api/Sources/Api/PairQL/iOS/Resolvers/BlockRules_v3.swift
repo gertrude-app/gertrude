@@ -16,7 +16,7 @@ extension BlockRules_v3: Resolver {
       .orderBy(.id, .asc)
       .all(in: ctx.db)
 
-    let blockRules = rules.map(\.rule)
+    let blockRules = rules.map(\.rule).frozenEncodable
     let rulesHash = iosBlockRulesHash(blockRules)
     with(dependency: \.logger).info(
       "BlockRules_v3: device=\(input.deviceId), v=\(input.appVersion), rules=\(blockRules.count), hash=\(rulesHash)",

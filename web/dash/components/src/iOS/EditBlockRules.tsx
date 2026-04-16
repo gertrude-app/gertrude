@@ -6,8 +6,14 @@ import EmptyState from '../EmptyState';
 import { TrashBtn } from '../Forms';
 import BlockRuleSummary from './BlockRuleSummary';
 
+export type Rule = {
+  id: UUID;
+  props: EditBlockRuleProps;
+  readOnly?: boolean;
+};
+
 export type Props = {
-  rules: Array<[UUID, EditBlockRuleProps]>;
+  rules: Array<Rule>;
   onDelete(id: UUID): unknown;
   onEdit(id: UUID): unknown;
   onAdd(): unknown;
@@ -32,14 +38,16 @@ const EditBlockRules: React.FC<Props> = ({
       />
     ) : (
       <>
-        <div className="flex flex-col gap-1 cursor-pointer">
-          {rules.map(([id, rule], idx) => (
+        <div className="flex flex-col gap-1">
+          {rules.map(({ id, props, readOnly }, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between gap-2 px-2 py-1 rounded-lg group transition hover:bg-slate-50"
-              onClick={() => onEdit(id)}
+              className={`flex items-center justify-between gap-2 px-2 py-1 rounded-lg group transition ${
+                readOnly ? `` : `cursor-pointer hover:bg-slate-50`
+              }`}
+              onClick={readOnly ? undefined : () => onEdit(id)}
             >
-              <BlockRuleSummary {...rule} />
+              <BlockRuleSummary {...props} />
               <TrashBtn onClick={() => onDelete(id)} />
             </div>
           ))}

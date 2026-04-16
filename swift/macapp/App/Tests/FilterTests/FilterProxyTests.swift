@@ -98,6 +98,31 @@ final class FilterProxyTests: XCTestCase {
     }
   }
 
+  @MainActor
+  func testAlwaysBlockedNewFlowDoesNotSendDecisionEvenWhenSending() async {
+    let sent = LockIsolated<[String]>([])
+    await withDependencies {
+      $0.filterExtension.version = { "2.6.0" }
+      $0.date = .constant(.init(timeIntervalSinceReferenceDate: 0))
+      $0.uuid = .incrementing
+      $0.xpc.sendBlockedRequest = { _, req in
+        sent.withValue { $0.append(req.app.bundleId) }
+      }
+    } operation: {
+      let proxy = FilterProxy(
+        earlyDecision: .none(501),
+        flowDecision: .block(.alwaysBlocked(.targetContains(value: "giphy.com"))),
+      ) {
+        $0.blockListeners[501] = .distantFuture
+      }
+      proxy.sendingBlockDecisions = true
+      let verdict = proxy.handleNewFlow(.mock)
+      expect(verdict.isDrop).toBeTrue()
+      await Task.megaYield()
+      expect(sent.value).toEqual([]) // <-- always-blocked hits are not surfaced
+    }
+  }
+
   func testAllowedNewFlowWithoutPeekingBytesAllowsAndLogs() {
     let proxy = FilterProxy(
       earlyDecision: .none(501),
@@ -173,6 +198,32 @@ final class FilterProxyTests: XCTestCase {
       expect(verdict.isDrop).toBeTrue()
       await Task.megaYield()
       expect(sent.value).toEqual(["com.acme.app"])
+    }
+  }
+
+  @MainActor
+  func testAlwaysBlockedDataFlowDoesNotSendDecisionEvenWhenSending() async {
+    let sent = LockIsolated<[String]>([])
+    await withDependencies {
+      $0.filterExtension.version = { "2.6.0" }
+      $0.date = .constant(.init(timeIntervalSinceReferenceDate: 0))
+      $0.uuid = .incrementing
+      $0.xpc.sendBlockedRequest = { _, req in
+        sent.withValue { $0.append(req.app.bundleId) }
+      }
+    } operation: {
+      let proxy = FilterProxy(
+        flowDecision: .block(.alwaysBlocked(.targetContains(value: "giphy.com"))),
+      ) {
+        $0.blockListeners[501] = .distantFuture
+      }
+      let flow = NEFilterFlow.DTO.mock
+      proxy.flowUserIds[flow.identifier] = 501
+      proxy.sendingBlockDecisions = true
+      let verdict = proxy.handleOutboundData(from: flow, readBytes: .init())
+      expect(verdict.isDrop).toBeTrue()
+      await Task.megaYield()
+      expect(sent.value).toEqual([]) // <-- always-blocked hits are not surfaced
     }
   }
 }

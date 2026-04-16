@@ -14,6 +14,19 @@ struct UserKeychainSummary: PairNestable {
   var schedule: RuleSchedule?
 }
 
+struct AlwaysBlockedGroupSummary: PairNestable {
+  var id: AlwaysBlockedGroup.Id
+  var name: String
+  var description: String
+  var longDescription: String
+}
+
+struct ChildCustomBlockRule: PairNestable {
+  var id: ChildAlwaysBlockedRule.Id
+  var rule: BlockRule
+  var comment: String?
+}
+
 struct GetChild: Pair {
   static let auth: ClientAuth = .parent
 
@@ -32,6 +45,10 @@ struct GetChild: Pair {
     var computers: [Computer]
     var iosDevices: [IOSDevice]
     var blockedApps: [UserBlockedApp.DTO]?
+    var availableAlwaysBlockedGroups: [AlwaysBlockedGroupSummary]
+    var alwaysBlockedGroupIds: [AlwaysBlockedGroup.Id]
+    var customAlwaysBlockedRules: [ChildCustomBlockRule]
+    var supportsAlwaysBlocked: Bool
     var createdAt: Date
   }
 
@@ -66,6 +83,24 @@ extension GetChild: Resolver {
   ) async throws -> Output {
     let child = try await context.verifiedChild(from: id)
     async let childKeychains = childKeychainSummaries(for: child.id, in: context.db)
+    async let availableAlwaysBlockedGroups = AlwaysBlockedGroup.query()
+      .orderBy(.name, .asc)
+      .all(in: context.db)
+      .map { AlwaysBlockedGroupSummary(
+        id: $0.id,
+        name: $0.name,
+        description: $0.description,
+        longDescription: $0.longDescription,
+      ) }
+    async let alwaysBlockedGroupIds = ChildAlwaysBlockedGroup.query()
+      .where(.childId == child.id)
+      .all(in: context.db)
+      .map(\.groupId)
+    async let customAlwaysBlockedRules = ChildAlwaysBlockedRule.query()
+      .where(.childId == child.id)
+      .orderBy(.createdAt, .asc)
+      .all(in: context.db)
+      .map { ChildCustomBlockRule(id: $0.id, rule: $0.rule, comment: $0.comment) }
     let pairs = try await ComputerUser.query()
       .where(.childId == child.id)
       .all(in: context.db)
@@ -94,6 +129,9 @@ extension GetChild: Resolver {
     let canDisableFilter = !versions.isEmpty
       && versions.allSatisfy { $0 >= .init("2.9.0")! }
 
+    let supportsAlwaysBlocked = !versions.isEmpty
+      && versions.allSatisfy { $0 >= .init("2.9.1")! }
+
     return try await .init(
       id: child.id,
       name: child.name,
@@ -118,6 +156,10 @@ extension GetChild: Resolver {
         )
       },
       blockedApps: blockedApps,
+      availableAlwaysBlockedGroups: availableAlwaysBlockedGroups,
+      alwaysBlockedGroupIds: alwaysBlockedGroupIds,
+      customAlwaysBlockedRules: customAlwaysBlockedRules,
+      supportsAlwaysBlocked: supportsAlwaysBlocked,
       createdAt: child.createdAt,
     )
   }

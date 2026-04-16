@@ -15,6 +15,7 @@ extension ConnectedRules_v2: Resolver {
       .orderBy(.id, .asc)
       .all(in: ctx.db)
       .map(\.rule)
+      .frozenEncodable
 
     let rulesHash = iosBlockRulesHash(blockRules)
     let deviceId = ctx.device.id.lowercased

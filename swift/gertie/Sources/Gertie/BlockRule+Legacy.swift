@@ -26,6 +26,10 @@ extension BlockRule {
     case .hostnameContains(let v): .hostnameContains(value: v)
     case .hostnameEquals(let v): .hostnameEquals(value: v)
     case .hostnameEndsWith(let v): .hostnameEndsWith(value: v)
+    case .hostnameOrSubdomain:
+      preconditionFailure(
+        "hostnameOrSubdomain has no Frozen representation; filter with .frozenEncodable first",
+      )
     case .targetContains(let v): .targetContains(value: v)
     case .flowTypeIs(let v): .flowTypeIs(value: v.legacy)
     case .both(let a, let b): .both(a: a.frozen, b: b.frozen)
@@ -80,6 +84,10 @@ public extension BlockRule {
     case .flowTypeIs(let flowType): .flowTypeIs(flowType.legacy)
     case .hostnameContains(let hostname): .hostnameContains(hostname)
     case .hostnameEndsWith(let hostname): .hostnameEndsWith(hostname)
+    case .hostnameOrSubdomain:
+      preconditionFailure(
+        "hostnameOrSubdomain has no Legacy representation; filter with .frozenEncodable first",
+      )
     case .hostnameEquals(let hostname): .hostnameEquals(hostname)
     case .targetContains(let target): .targetContains(target)
     case .unless(let rule, let negatedBy): .unless(
@@ -94,7 +102,7 @@ public extension BlockRule {
 // extensions
 
 public extension BlockRule.Legacy {
-  var current: GertieIOS.BlockRule {
+  var current: BlockRule {
     switch self {
     case .bundleIdContains(let bundleId):
       .bundleIdContains(value: bundleId)
@@ -140,3 +148,23 @@ public extension BlockRule.Legacy {
 }
 
 extension BlockRule.Legacy: Equatable, Codable, Sendable, Hashable {}
+
+public extension BlockRule {
+  var isFrozenEncodable: Bool {
+    switch self {
+    case .hostnameOrSubdomain: false
+    case .both(let a, let b): a.isFrozenEncodable && b.isFrozenEncodable
+    case .unless(let rule, let negatedBy):
+      rule.isFrozenEncodable && negatedBy.allSatisfy(\.isFrozenEncodable)
+    case .bundleIdContains, .urlContains, .hostnameContains, .hostnameEquals,
+         .hostnameEndsWith, .targetContains, .flowTypeIs:
+      true
+    }
+  }
+}
+
+public extension Sequence<BlockRule> {
+  var frozenEncodable: [BlockRule] {
+    filter(\.isFrozenEncodable)
+  }
+}

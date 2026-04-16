@@ -1,10 +1,13 @@
+import { convert, validate } from '@dash/block-rules';
 import { NoSymbolIcon } from '@heroicons/react/24/outline';
 import { Button, TextInput } from '@shared/components';
 import { posessive } from '@shared/string';
 import cx from 'classnames';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import type { EditBlockRuleProps, EditEvent } from '@dash/block-rules';
 import type {
+  BlockRule,
   BlockedApp,
   MacAppConnectionCode,
   PlainTimeWindow,
@@ -17,7 +20,11 @@ import EmptyState from '../EmptyState';
 import TimeInput from '../Forms/TimeInput';
 import ToggleCard from '../Forms/ToggleCard';
 import KeychainCard from '../Keychains/KeychainCard';
+import Modal from '../Modal/Modal';
 import PageHeading from '../PageHeading';
+import BlockGroupList from '../iOS/BlockGroupList';
+import BlockRuleEditor from '../iOS/BlockRuleEditor';
+import EditBlockRules from '../iOS/EditBlockRules';
 import AddKeychainDrawer from './AddKeychainDrawer';
 import BlockedAppCard from './BlockedAppCard';
 import ConnectDeviceModal from './ConnectDeviceModal';
@@ -67,6 +74,23 @@ interface Props {
   onStartTrial(): unknown;
   saveButtonDisabled: boolean;
   onSave(): unknown;
+  supportsAlwaysBlocked: boolean;
+  availableAlwaysBlockedGroups: Array<{
+    id: UUID;
+    name: string;
+    description: string;
+    longDescription: string;
+  }>;
+  alwaysBlockedGroupIds: UUID[];
+  toggleAlwaysBlockedGroup(id: UUID): unknown;
+  customAlwaysBlockedRules: Array<{ id: UUID; rule: BlockRule; comment?: string }>;
+  editingAlwaysBlockedRule?: EditBlockRuleProps & { id?: UUID };
+  addAlwaysBlockedRule(): unknown;
+  editAlwaysBlockedRule(id: UUID, rule: EditBlockRuleProps): unknown;
+  editAlwaysBlockedRuleForm(event: EditEvent): unknown;
+  saveAlwaysBlockedRule(): unknown;
+  dismissAlwaysBlockedRule(): unknown;
+  deleteAlwaysBlockedRule(id: UUID): unknown;
 }
 
 const ChildMacSettings: React.FC<Props> = ({
@@ -114,6 +138,18 @@ const ChildMacSettings: React.FC<Props> = ({
   onStartTrial,
   saveButtonDisabled,
   onSave,
+  supportsAlwaysBlocked,
+  availableAlwaysBlockedGroups,
+  alwaysBlockedGroupIds,
+  toggleAlwaysBlockedGroup,
+  customAlwaysBlockedRules,
+  editingAlwaysBlockedRule,
+  addAlwaysBlockedRule,
+  editAlwaysBlockedRule,
+  editAlwaysBlockedRuleForm,
+  saveAlwaysBlockedRule,
+  dismissAlwaysBlockedRule,
+  deleteAlwaysBlockedRule,
 }) => (
   <div className="relative max-w-3xl">
     <AddKeychainDrawer
@@ -303,6 +339,52 @@ const ChildMacSettings: React.FC<Props> = ({
           </div>
         )}
 
+        {supportsAlwaysBlocked && (
+          <div className="mt-12 max-w-3xl">
+            <h2 className="text-lg font-bold text-slate-700 mb-1">Always-Blocked</h2>
+            <p className="text-slate-500 text-sm mb-4">
+              These blocks apply at all times, even when the filter is suspended.
+            </p>
+            {availableAlwaysBlockedGroups.length > 0 && (
+              <BlockGroupList
+                title="Always-Blocked groups"
+                groups={availableAlwaysBlockedGroups}
+                enabledGroupIds={alwaysBlockedGroupIds}
+                onToggle={toggleAlwaysBlockedGroup}
+              />
+            )}
+            <div className={cx(availableAlwaysBlockedGroups.length > 0 && `mt-6`)}>
+              <h3 className="text-base font-bold text-slate-700 mb-3">
+                Custom Always-Blocked rules
+              </h3>
+              <div className="bg-white rounded-xl p-5 border-[0.5px] border-slate-200 shadow shadow-slate-300/50">
+                <EditBlockRules
+                  rules={customAlwaysBlockedRules
+                    .map((r) => {
+                      const props = convert.blockRuleToProps(r.rule);
+                      if (!props) return null;
+                      return {
+                        id: r.id,
+                        props,
+                        readOnly: r.rule.case !== `hostnameOrSubdomain`,
+                      };
+                    })
+                    .filter((r) => r !== null)}
+                  onAdd={addAlwaysBlockedRule}
+                  onEdit={(id) => {
+                    const entry = customAlwaysBlockedRules.find((r) => r.id === id);
+                    if (!entry) return;
+                    if (entry.rule.case !== `hostnameOrSubdomain`) return;
+                    const props = convert.blockRuleToProps(entry.rule);
+                    if (props) editAlwaysBlockedRule(id, props);
+                  }}
+                  onDelete={deleteAlwaysBlockedRule}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="mt-12 max-w-3xl">
           <h2 className="text-lg font-bold text-slate-700">Filtering</h2>
           {canDisableFilter && (
@@ -377,6 +459,33 @@ const ChildMacSettings: React.FC<Props> = ({
             Save settings
           </Button>
         </div>
+        <Modal
+          icon="shield"
+          type="container"
+          maximizeWidthForSmallScreens
+          title={editingAlwaysBlockedRule?.id ? `Edit Block Rule` : `Create Block Rule`}
+          isOpen={!!editingAlwaysBlockedRule}
+          primaryButton={{
+            type: `action`,
+            label: editingAlwaysBlockedRule?.id ? `Save` : `Create`,
+            action: saveAlwaysBlockedRule,
+            disabled:
+              !editingAlwaysBlockedRule ||
+              !validate.blockRuleProps(editingAlwaysBlockedRule),
+          }}
+          secondaryButton={{
+            type: `action`,
+            action: dismissAlwaysBlockedRule,
+          }}
+        >
+          {editingAlwaysBlockedRule && (
+            <BlockRuleEditor
+              {...editingAlwaysBlockedRule}
+              addressOnly
+              emit={editAlwaysBlockedRuleForm}
+            />
+          )}
+        </Modal>
       </>
     )}
   </div>

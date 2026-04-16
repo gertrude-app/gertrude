@@ -25,6 +25,10 @@ export function child(id: UUID): Child {
     keychains: [],
     computers: [],
     iosDevices: [],
+    availableAlwaysBlockedGroups: [],
+    alwaysBlockedGroupIds: [],
+    customAlwaysBlockedRules: [],
+    supportsAlwaysBlocked: false,
     createdAt: new Date().toISOString(),
   };
 }

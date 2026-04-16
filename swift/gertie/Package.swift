@@ -34,6 +34,7 @@ let package = Package(
     .target(
       name: "GertieIOS",
       dependencies: [
+        "Gertie",
         .product(name: "TSCodable", package: "ts-codable-macro"),
       ],
       swiftSettings: [.unsafeFlags(["-Xfrontend", "-warnings-as-errors"])],

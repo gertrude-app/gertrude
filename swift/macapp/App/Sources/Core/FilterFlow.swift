@@ -11,6 +11,7 @@ public struct FilterFlow: Equatable, Codable, Sendable {
   public var userId: uid_t?
   public var port: Port?
   public var ipProtocol: IpProtocol?
+  public var flowType: FlowType?
 
   public var isDnsRequest: Bool {
     self.isUDP && self.port == .dns(53)
@@ -100,6 +101,7 @@ public struct FilterFlow: Equatable, Codable, Sendable {
     userId: uid_t? = nil,
     port: Port? = nil,
     ipProtocol: IpProtocol? = nil,
+    flowType: FlowType? = nil,
   ) {
     self.url = url
     self.ipAddress = ipAddress
@@ -109,6 +111,7 @@ public struct FilterFlow: Equatable, Codable, Sendable {
     self.userId = userId
     self.port = port
     self.ipProtocol = ipProtocol
+    self.flowType = flowType
   }
 
   public init(url: String?, description: String) {

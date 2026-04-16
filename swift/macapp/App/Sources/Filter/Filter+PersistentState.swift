@@ -13,6 +13,7 @@ public enum Persistent {
     public var appIdManifest = AppIdManifest()
     public var exemptUsers: Set<uid_t> = []
     public var filteringDisabledUsers: Set<uid_t>?
+    public var userAlwaysBlocked: [uid_t: [BlockRule]]?
   }
 
   // v2.0.0 - v2.4.0
@@ -34,6 +35,9 @@ extension Filter.State {
       filteringDisabledUsers: self.filteringDisabledUsers.isEmpty
         ? nil
         : self.filteringDisabledUsers,
+      userAlwaysBlocked: self.userAlwaysBlocked.isEmpty
+        ? nil
+        : self.userAlwaysBlocked,
     )
   }
 }

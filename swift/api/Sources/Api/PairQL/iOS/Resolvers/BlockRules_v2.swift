@@ -22,8 +22,9 @@ extension BlockRules_v2: Resolver {
       .orderBy(.id, .asc)
       .all(in: ctx.db)
 
-    let legacyRules = rules.map(\.rule.legacy)
-    let rulesHash = iosBlockRulesHash(rules.map(\.rule))
+    let compatibleRules = rules.map(\.rule).frozenEncodable
+    let legacyRules = compatibleRules.map(\.legacy)
+    let rulesHash = iosBlockRulesHash(compatibleRules)
     let vendorId = input.vendorId.uuidString.lowercased()
     with(dependency: \.logger).info(
       "BlockRules_v2: vendor=\(vendorId), rules=\(legacyRules.count), hash=\(rulesHash)",

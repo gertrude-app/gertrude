@@ -95,6 +95,7 @@ extension CheckInFeature.RootReducer {
               Downtime(window: $0, pausedUntil: downtimePausedUntil)
             },
             output.userData.filteringDisabled,
+            output.alwaysBlocked,
           )
 
           if case .some(let suspension) = output.resolvedFilterSuspension,

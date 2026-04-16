@@ -1,6 +1,7 @@
 import Combine
 import Core
 import Foundation
+import Gertie
 import NetworkExtension
 import os.log
 
@@ -93,6 +94,8 @@ public class FilterProxy {
     case .block(.urlMessage(let message)):
       self.store.send(urlMessage: message)
       return .drop()
+    case .block(.alwaysBlocked), .block(.quicBlockedForAlwaysBlocked):
+      return dropNewFlow()
     case .block:
       if self.sendingBlockDecisions {
         self.store.sendBlocked(filterFlow, auditToken: flow.sourceAppAuditToken)
@@ -109,7 +112,7 @@ public class FilterProxy {
         withFilterInbound: false,
         peekInboundBytes: Int.max,
         filterOutbound: true,
-        peekOutboundBytes: 1024,
+        peekOutboundBytes: 4096,
       )
     }
   }
@@ -139,6 +142,8 @@ public class FilterProxy {
     }
 
     switch decision {
+    case .block(.alwaysBlocked), .block(.quicBlockedForAlwaysBlocked):
+      return dropFlow()
     case .block:
       if self.sendingBlockDecisions {
         self.store.sendBlocked(filterFlow, auditToken: flow.sourceAppAuditToken)
@@ -191,17 +196,20 @@ public extension NEFilterFlow {
     let sourceAppAuditToken: Data?
     let description: String
     let url: URL?
+    let flowType: FlowType?
 
     public init(
       identifier: UUID = .init(),
       sourceAppAuditToken: Data? = nil,
       description: String,
       url: URL? = nil,
+      flowType: FlowType? = nil,
     ) {
       self.identifier = identifier
       self.sourceAppAuditToken = sourceAppAuditToken
       self.description = description
       self.url = url
+      self.flowType = flowType
     }
   }
 
@@ -210,6 +218,16 @@ public extension NEFilterFlow {
     sourceAppAuditToken: self.sourceAppAuditToken,
     description: self.description,
     url: self.url,
+    // per NEFilterFlow.h: "The flow's HTTP request URL. Will be nil if the
+    // flow did not originate from WebKit." On macOS this is the only
+    // documented browser-vs-socket signal (NEFilterBrowserFlow is iOS-only),
+    // so `.browser` here specifically means "WebKit-originated" — Safari,
+    // WKWebView embeddings, SFSafariViewController. Chrome/Chromium, Firefox,
+    // Edge, Arc, Brave, and Electron apps all use their own network stacks
+    // and will classify as `.socket` despite being "browsers" colloquially.
+    // Treat `.flowTypeIs(.browser)` on Mac as a Safari/WebKit-only signal,
+    // not a general browser detector.
+    flowType: self.url != nil ? .browser : .socket,
   ) }
 }
 
@@ -217,6 +235,7 @@ extension FilterFlow {
   init(_ flow: NEFilterFlow.DTO, userId: uid_t? = nil) {
     self.init(url: flow.url?.absoluteString, description: flow.description)
     self.userId = userId
+    self.flowType = flow.flowType
   }
 }
 

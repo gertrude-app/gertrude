@@ -12,6 +12,7 @@ public struct Filter: Reducer, Sendable {
 
     public var userKeychainIndexes: [uid_t: KeychainIndex] = [:]
     public var userDowntime: [uid_t: Downtime] = [:]
+    public var userAlwaysBlocked: [uid_t: [BlockRule]] = [:]
     public var appIdManifest = AppIdManifest()
     public var exemptUsers: Set<uid_t> = []
     public var filteringDisabledUsers: Set<uid_t> = []
@@ -100,6 +101,7 @@ public struct Filter: Reducer, Sendable {
       state.appIdManifest = manifest
       state.exemptUsers = persisted.exemptUsers
       state.filteringDisabledUsers = persisted.filteringDisabledUsers ?? []
+      state.userAlwaysBlocked = persisted.userAlwaysBlocked ?? [:]
       return .none
 
     case .loadedPersistentState(.none):
@@ -198,6 +200,7 @@ public struct Filter: Reducer, Sendable {
 
     case .xpc(.receivedAppMessage(.disconnectUser(let userId))):
       state.userKeychains[userId] = nil
+      state.userAlwaysBlocked[userId] = nil
       state.suspensions[userId] = nil
       state.exemptUsers.remove(userId)
       state.filteringDisabledUsers.remove(userId)
@@ -229,6 +232,7 @@ public struct Filter: Reducer, Sendable {
       let downtime,
       let manifest,
       let filteringDisabled,
+      let alwaysBlocked,
     ))):
       state.recordAppActivity(from: userId)
       // nil = old app (filteringDisabled absent from XPC JSON) — preserve stale state for
@@ -239,6 +243,15 @@ public struct Filter: Reducer, Sendable {
       if !keychains.isEmpty || filteringDisabled == false {
         state.userKeychains[userId] = keychains
         state.exemptUsers.remove(userId)
+      }
+      // legacy app (pre-always-blocked) sends nil — leave prior rules untouched.
+      // new app sends [] or [...] explicitly so stale rules get cleared on unassign.
+      if let alwaysBlocked {
+        if alwaysBlocked.isEmpty {
+          state.userAlwaysBlocked[userId] = nil
+        } else {
+          state.userAlwaysBlocked[userId] = alwaysBlocked
+        }
       }
       var normalizedManifest = manifest
       normalizedManifest.normalizeBundleIds()
@@ -318,6 +331,7 @@ public extension Filter.State {
     public var numAppsInCache: Int
     public var blockListeners: [uid_t: Date] = [:]
     public var userDowntime: [uid_t: Downtime] = [:]
+    public var userAlwaysBlocked: [uid_t: Int] = [:]
   }
 
   var debug: Debug {
@@ -333,6 +347,7 @@ public extension Filter.State {
       numAppsInCache: self.appCache.count,
       blockListeners: self.blockListeners,
       userDowntime: self.userDowntime,
+      userAlwaysBlocked: self.userAlwaysBlocked.mapValues(\.count),
     )
   }
 }

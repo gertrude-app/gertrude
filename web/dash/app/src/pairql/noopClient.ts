@@ -85,6 +85,10 @@ const noopClient: ApiClient = {
       keychains: [],
       computers: [],
       iosDevices: [],
+      availableAlwaysBlockedGroups: [],
+      alwaysBlockedGroupIds: [],
+      customAlwaysBlockedRules: [],
+      supportsAlwaysBlocked: false,
       createdAt: new Date().toISOString(),
     });
   },

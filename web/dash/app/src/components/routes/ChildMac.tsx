@@ -39,6 +39,12 @@ const ChildMacRoute: React.FC = () => {
         downtime: child.draft.downtime,
         keychains: child.draft.keychains.map(({ id, schedule }) => ({ id, schedule })),
         blockedApps: child.draft.blockedApps,
+        alwaysBlockedGroupIds: [...child.draft.alwaysBlockedGroupIds],
+        customAlwaysBlockedRules: child.draft.customAlwaysBlockedRules.map((r) => ({
+          id: r.id,
+          rule: r.rule,
+          comment: r.comment,
+        })),
       }),
     {
       onSuccess: () => dispatch({ type: `childSaved` }),
@@ -147,6 +153,24 @@ const ChildMacRoute: React.FC = () => {
       onStartTrial={() => startTrial.mutate(undefined)}
       saveButtonDisabled={!isDirty(state.child) || saveChild.isPending}
       onSave={() => saveChild.mutate(child)}
+      supportsAlwaysBlocked={draft.supportsAlwaysBlocked}
+      availableAlwaysBlockedGroups={draft.availableAlwaysBlockedGroups}
+      alwaysBlockedGroupIds={draft.alwaysBlockedGroupIds}
+      toggleAlwaysBlockedGroup={(id) =>
+        dispatch({ type: `toggleAlwaysBlockedGroup`, id })
+      }
+      customAlwaysBlockedRules={draft.customAlwaysBlockedRules}
+      editingAlwaysBlockedRule={state.editingAlwaysBlockedRule}
+      addAlwaysBlockedRule={() => dispatch({ type: `addAlwaysBlockedRule` })}
+      editAlwaysBlockedRule={(id, rule) =>
+        dispatch({ type: `editAlwaysBlockedRule`, id, rule })
+      }
+      editAlwaysBlockedRuleForm={(event) =>
+        dispatch({ type: `editAlwaysBlockedRuleForm`, event })
+      }
+      saveAlwaysBlockedRule={() => dispatch({ type: `saveAlwaysBlockedRule` })}
+      dismissAlwaysBlockedRule={() => dispatch({ type: `dismissAlwaysBlockedRule` })}
+      deleteAlwaysBlockedRule={(id) => dispatch({ type: `deleteAlwaysBlockedRule`, id })}
     />
   );
 };
