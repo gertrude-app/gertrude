@@ -48,7 +48,7 @@ extension OnboardingFeature.State {
     case installSysExt_trick
     case installSysExt_allow
     case installSysExt_failed
-    case installSysExt_success
+    case installSysExt_success_configPivot
 
     // opt out of filtering
     case optOutOfFiltering
@@ -127,10 +127,10 @@ extension OnboardingFeature.State.Step {
     case .installSysExt_trick:
       .installSysExt_allow
     case .installSysExt_allow:
-      .installSysExt_success
+      .installSysExt_success_configPivot
     case .installSysExt_failed:
-      .installSysExt_success
-    case .installSysExt_success:
+      .installSysExt_success_configPivot
+    case .installSysExt_success_configPivot:
       .optOutOfFiltering
     case .optOutOfFiltering:
       .configureDowntime
@@ -217,10 +217,10 @@ extension OnboardingFeature.State.Step {
       .installSysExt_trick
     case .installSysExt_failed:
       .installSysExt_explain
-    case .installSysExt_success:
+    case .installSysExt_success_configPivot:
       .installSysExt_explain
     case .optOutOfFiltering:
-      .installSysExt_success
+      .installSysExt_success_configPivot
     case .configureDowntime:
       .optOutOfFiltering
     case .appKeySelection_intro:
@@ -285,7 +285,7 @@ extension OnboardingFeature.State.Step: Comparable {
     case .installSysExt_trick: 230
     case .installSysExt_allow: 240
     case .installSysExt_failed: 250
-    case .installSysExt_success: 260
+    case .installSysExt_success_configPivot: 260
     case .optOutOfFiltering: 270
     case .configureDowntime: 280
     case .appKeySelection_intro: 290

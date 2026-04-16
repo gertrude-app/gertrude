@@ -341,8 +341,8 @@ final class OnboardingFeatureTests: XCTestCase {
     await expect(installSysExt.calls.count).toEqual(1)
 
     // because filterExtension.install is mocked to return success, we go to success
-    await store.receive(.onboarding(.setStep(.installSysExt_success))) {
-      $0.onboarding.step = .installSysExt_success
+    await store.receive(.onboarding(.setStep(.installSysExt_success_configPivot))) {
+      $0.onboarding.step = .installSysExt_success_configPivot
     }
 
     // app discovery fires during sysext install success (preloaded)
@@ -578,7 +578,7 @@ final class OnboardingFeatureTests: XCTestCase {
   @MainActor
   func testInstallSysExtSuccessGoesToOptOutOfFiltering() async {
     let store = onboardingFeatureStore {
-      $0.step = .installSysExt_success
+      $0.step = .installSysExt_success_configPivot
       $0.discoveredApps = [.init(
         name: "Slack",
         bundleId: "com.tinyspeck.slackmacgap",
@@ -1201,7 +1201,7 @@ final class OnboardingFeatureTests: XCTestCase {
     let store = onboardingFeatureStore { $0.step = .installSysExt_allow }
     store.deps.filterExtension.state = { .installedAndRunning } // <-- installed
     await store.send(.webview(.secondaryBtnClicked))
-    await store.receive(.setStep(.installSysExt_success)) // <-- goes to success
+    await store.receive(.setStep(.installSysExt_success_configPivot)) // <-- goes to success
   }
 
   // for most users, we will move them along automatically to
@@ -1214,7 +1214,7 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.filterExtension.state = filterState.fn
 
     await store.send(.webview(.primaryBtnClicked))
-    await store.receive(.setStep(.installSysExt_success))
+    await store.receive(.setStep(.installSysExt_success_configPivot))
     await expect(filterState.calls.count).toEqual(1)
   }
 
@@ -1251,8 +1251,8 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.filterExtension.state = filterState.fn
 
     await store.send(.webview(.primaryBtnClicked))
-    await store.receive(.setStep(.installSysExt_success)) {
-      $0.step = .installSysExt_success
+    await store.receive(.setStep(.installSysExt_success_configPivot)) {
+      $0.step = .installSysExt_success_configPivot
     }
   }
 
@@ -1265,8 +1265,8 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.filterExtension.start = filterStart.fn
 
     await store.send(.webview(.primaryBtnClicked))
-    await store.receive(.setStep(.installSysExt_success)) {
-      $0.step = .installSysExt_success
+    await store.receive(.setStep(.installSysExt_success_configPivot)) {
+      $0.step = .installSysExt_success_configPivot
     }
 
     await expect(filterStart.calls.count).toEqual(1)

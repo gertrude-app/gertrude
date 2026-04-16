@@ -340,9 +340,9 @@ export const InstallSysExtFail: Story = props({
   step: `installSysExt_failed`,
 });
 
-export const InstallSysExtSuccess: Story = props({
+export const PermissionsComplete: Story = props({
   ...Welcome.args,
-  step: `installSysExt_success`,
+  step: `installSysExt_success_configPivot`,
 });
 
 export const AppKeySelectionIntro: Story = props({

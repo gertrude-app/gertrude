@@ -77,9 +77,9 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`installSysExt_failed`);
             break;
           case `installSysExt_failed`:
-            setStep(`installSysExt_success`);
+            setStep(`installSysExt_success_configPivot`);
             break;
-          case `installSysExt_success`:
+          case `installSysExt_success_configPivot`:
             setStep(`exemptUsers`);
             break;
           case `exemptUsers`:
@@ -206,9 +206,10 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             component={<Step.InstallSysExt step="installSysExt_failed" />}
           />
           <OnboardingPage
-            step="installSysExt_success"
-            component={<Step.InstallSysExt step="installSysExt_success" />}
+            step="installSysExt_success_configPivot"
+            component={<Step.PermissionsComplete />}
             confetti
+            confettiDelay={200}
           />
           <OnboardingPage
             step="exemptUsers"

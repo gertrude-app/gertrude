@@ -34,7 +34,7 @@ export type OnboardingStep =
   | 'installSysExt_trick'
   | 'installSysExt_allow'
   | 'installSysExt_failed'
-  | 'installSysExt_success'
+  | 'installSysExt_success_configPivot'
   | 'optOutOfFiltering'
   | 'configureDowntime'
   | 'appKeySelection_intro'

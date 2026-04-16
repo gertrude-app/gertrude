@@ -615,7 +615,7 @@ struct OnboardingFeature: Feature {
           log("sys ext install result=\(installResult)", "adbc0453")
           switch installResult {
           case .installedSuccessfully:
-            await send(.setStep(.installSysExt_success))
+            await send(.setStep(.installSysExt_success_configPivot))
             let apps = await self.device.discoverInstalledApps()
             await send(.receivedDiscoveredApps(apps))
             // NB: the two xpc calls below also implicitly establish the XPC connection
@@ -653,11 +653,11 @@ struct OnboardingFeature: Feature {
           case .errorLoadingConfig, .unknown:
             await send(.setStep(.installSysExt_failed))
           case .installedAndRunning:
-            await send(.setStep(.installSysExt_success))
+            await send(.setStep(.installSysExt_success_configPivot))
           case .installedButNotRunning:
             if await self.systemExtension.start() == .installedAndRunning {
               log("non-running sys ext started successfully", "d0021f5d")
-              await send(.setStep(.installSysExt_success))
+              await send(.setStep(.installSysExt_success_configPivot))
             } else {
               // TODO: should we try to replace once?
               await send(.setStep(.installSysExt_failed))
@@ -665,7 +665,8 @@ struct OnboardingFeature: Feature {
           }
         }
 
-      case .sysExtInstallTimedOut where step < .installSysExt_success && state.windowOpen:
+      case .sysExtInstallTimedOut
+        where step < .installSysExt_success_configPivot && state.windowOpen:
         log("sys ext install timed out, moving to fail", "83da9790")
         state.step = .installSysExt_failed
         return .none
@@ -680,7 +681,7 @@ struct OnboardingFeature: Feature {
           let state = await self.systemExtension.state()
           log("\(action) from .installSysExt_allow, state=\(state)", "b0e6e683")
           if state == .installedAndRunning {
-            await send(.setStep(.installSysExt_success))
+            await send(.setStep(.installSysExt_success_configPivot))
           } else {
             await send(.setStep(.installSysExt_failed))
           }
@@ -691,7 +692,7 @@ struct OnboardingFeature: Feature {
         state.step = .installSysExt_explain
         return .none
 
-      case .webview(.primaryBtnClicked) where step == .installSysExt_success:
+      case .webview(.primaryBtnClicked) where step == .installSysExt_success_configPivot:
         log(step, action, "78bded66")
         state.step = .optOutOfFiltering
         return .none

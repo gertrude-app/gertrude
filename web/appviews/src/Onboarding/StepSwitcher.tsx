@@ -13,7 +13,7 @@ interface Props {
 const StepSwitcher: React.FC<Props> = ({ children, ready }) => {
   const [expandBlurs, setExpandBlurs] = useState(false);
   const { currentStep, isUpgrade } = useContext(OnboardingContext);
-  const progressStep = getProgressStep(currentStep);
+  const progress = getProgress(currentStep);
 
   useEffect(() => {
     if (currentStep === `finish`) {
@@ -36,11 +36,12 @@ const StepSwitcher: React.FC<Props> = ({ children, ready }) => {
       <div
         className={cx(
           `absolute top-0 left-0 w-full p-5 flex justify-center items-center transition-[opacity,transform] duration-500`,
-          (currentStep === `welcome` || currentStep === `finish`) &&
-            `-translate-y-16 opacity-0`,
+          progress === `hidden` && `-translate-y-16 opacity-0`,
         )}
       >
-        {!isUpgrade && <ProgressIndicator step={progressStep} totalSteps={7} />}
+        {!isUpgrade && progress !== `hidden` && (
+          <ProgressIndicator step={progress.step} totalSteps={progress.totalSteps} />
+        )}
       </div>
     </div>
   );
@@ -52,6 +53,7 @@ interface OnboardingStepProps {
   step: OnboardingStep;
   component: React.ReactNode;
   confetti?: boolean;
+  confettiDelay?: number;
   confettiDeps?: any[];
 }
 
@@ -59,6 +61,7 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
   step,
   component,
   confetti,
+  confettiDelay = 1000,
   confettiDeps,
 }) => {
   const { currentStep, isUpgrade } = useContext(OnboardingContext);
@@ -71,10 +74,10 @@ export const OnboardingPage: React.FC<OnboardingStepProps> = ({
       if (confetti) {
         setTimeout(() => {
           setShowConfetti(true);
-        }, 1000);
+        }, confettiDelay);
       }
     }
-  }, [step, currentStep, confettiDeps, confetti]);
+  }, [step, currentStep, confettiDeps, confetti, confettiDelay]);
 
   if (
     isUpgrade &&
@@ -133,55 +136,67 @@ const Blur: React.FC<{ position: string; expandBlurs: boolean; alt?: boolean }> 
   />
 );
 
-function getProgressStep(currentStep: OnboardingStep): number {
+const PERMISSIONS_TOTAL = 7;
+const CONFIGURATION_TOTAL = 7;
+
+type Progress = `hidden` | { step: number; totalSteps: number };
+
+function getProgress(currentStep: OnboardingStep): Progress {
   switch (currentStep) {
     case `welcome`:
+    case `installSysExt_success_configPivot`:
+    case `finish`:
+      return `hidden`;
     case `wrongInstallDir`:
     case `confirmGertrudeAccount`:
     case `noGertrudeAccount`:
     case `macosUserAccountType`:
-      return 1;
+      return { step: 1, totalSteps: PERMISSIONS_TOTAL };
     case `getChildConnectionCode`:
     case `connectChild`:
-      return 2;
+      return { step: 2, totalSteps: PERMISSIONS_TOTAL };
     case `howToUseGifs`:
     case `allowNotifications_start`:
     case `allowNotifications_grant`:
     case `allowNotifications_failed`:
-      return 3;
+      return { step: 3, totalSteps: PERMISSIONS_TOTAL };
     case `allowFullDiskAccess_grantAndRestart`:
     case `allowFullDiskAccess_failed`:
     case `allowFullDiskAccess_success`:
-      return 4;
+      return { step: 4, totalSteps: PERMISSIONS_TOTAL };
     case `allowScreenshots_required`:
     case `allowScreenshots_grantAndRestart`:
     case `allowScreenshots_failed`:
     case `allowScreenshots_success`:
-      return 5;
+      return { step: 5, totalSteps: PERMISSIONS_TOTAL };
     case `allowKeylogging_required`:
     case `allowKeylogging_grant`:
     case `allowKeylogging_failed`:
-      return 6;
+      return { step: 6, totalSteps: PERMISSIONS_TOTAL };
     case `installSysExt_explain`:
     case `installSysExt_trick`:
     case `installSysExt_allow`:
     case `installSysExt_failed`:
-    case `installSysExt_success`:
+      return { step: 7, totalSteps: PERMISSIONS_TOTAL };
     case `optOutOfFiltering`:
     case `configureDowntime`:
+      return { step: 2, totalSteps: CONFIGURATION_TOTAL };
     case `appKeySelection_intro`:
     case `appKeySelection_blockApps`:
+      return { step: 3, totalSteps: CONFIGURATION_TOTAL };
+    case `appKeySelection_allowInternet`:
+      return { step: 4, totalSteps: CONFIGURATION_TOTAL };
     case `aboutPermittingWebsites`:
     case `meetKeychains`:
     case `selectPublicKeychains`:
     case `customKeychains`:
-    case `appKeySelection_allowInternet`:
-    case `screenTimeConflict`:
+      return { step: 5, totalSteps: CONFIGURATION_TOTAL };
     case `exemptUsers`:
+      return { step: 6, totalSteps: CONFIGURATION_TOTAL };
     case `locateMenuBarIcon`:
     case `viewHealthCheck`:
     case `encourageFilterSuspensions`:
-    case `finish`:
-      return 7;
+    case `screenTimeConflict`:
+      return { step: 7, totalSteps: CONFIGURATION_TOTAL };
   }
 }

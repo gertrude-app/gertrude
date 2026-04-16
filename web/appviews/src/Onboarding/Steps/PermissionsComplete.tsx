@@ -1,57 +1,62 @@
 import cx from 'classnames';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import GradientFadeInScreen from '../GradientFadeInScreen';
 import OnboardingContext from '../OnboardingContext';
 
-const Finish: React.FC = () => {
+const PermissionsComplete: React.FC = () => {
   const { currentStep, emit } = useContext(OnboardingContext);
+  const [fadeOut, setFadeOut] = useState(false);
   return (
     <GradientFadeInScreen
-      shown={currentStep === `finish`}
-      fadeInDelay={2000}
-      gradient="violet-to-fuchsia"
+      shown={currentStep === `installSysExt_success_configPivot`}
+      fadeOut={fadeOut}
     >
       {(fadeIn) => (
         <>
           <h1
             className={cx(
-              `text-6xl mb-4 font-bold text-white transition-[transform,opacity] duration-1000 delay-[1s]`,
+              `text-7xl mb-6 font-bold text-white transition-[transform,opacity] duration-1000`,
               !fadeIn && `opacity-0 translate-y-6`,
             )}
           >
-            All done!
+            Permissions done.
           </h1>
           <p
             className={cx(
-              `text-2xl text-white/70 max-w-2xl text-center transition-[transform,opacity] duration-1000 delay-[1.3s]`,
+              `text-3xl text-white max-w-3xl text-center transition-[transform,opacity] duration-1000 delay-[400ms] px-8`,
               !fadeIn && `opacity-0 translate-y-6`,
             )}
           >
-            You&rsquo;re all set up! If you have any questions or run into any problems
-            you can always reach us at:
+            The rest is the easy part: a handful of choices to tell Gertrude how to
+            protect your child.
           </p>
-          <span
+          <p
             className={cx(
-              `text-4xl my-8 font-mono bg-white/50 px-8 py-4 rounded-3xl text-black/70 transition-[transform,opacity] duration-1000 delay-[1.6s] shadow-md`,
+              `text-xl text-white/60 max-w-2xl text-center mt-8 transition-[transform,opacity] duration-1000 delay-[700ms] px-8 italic`,
               !fadeIn && `opacity-0 translate-y-6`,
             )}
           >
-            https://gertrude.app/contact
-          </span>
+            Don&rsquo;t worry&mdash;you can change any of these later from the Gertrude
+            parent’s website.
+          </p>
           <div
             className={cx(
-              `transition-[opacity,transform] duration-1000 delay-[1.9s]`,
+              `mt-12 transition-[opacity,transform] duration-1000 delay-[1s]`,
               !fadeIn && `opacity-0 translate-y-6`,
             )}
           >
             <button
               tabIndex={-1}
               className="bg-white px-10 py-5 rounded-2xl text-xl font-semibold shadow-lg hover:opacity-90 transiton-[opacity,transform] duration-200 active:scale-[98%] active:shadow-md"
-              onClick={() => emit({ case: `primaryBtnClicked` })}
+              onClick={() => {
+                setFadeOut(true);
+                setTimeout(() => emit({ case: `primaryBtnClicked` }), 800);
+              }}
             >
               <span className="bg-gradient-to-r from-indigo-600 to-fuchsia-500 bg-clip-text [-webkit-background-clip:text] text-transparent">
-                Close
+                Let&rsquo;s go
               </span>
+              <i className="ml-2 fa-solid fa-arrow-right text-fuchsia-500" />
             </button>
           </div>
         </>
@@ -60,4 +65,4 @@ const Finish: React.FC = () => {
   );
 };
 
-export default Finish;
+export default PermissionsComplete;

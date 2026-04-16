@@ -10,8 +10,7 @@ interface Props {
     | `installSysExt_explain`
     | `installSysExt_trick`
     | `installSysExt_allow`
-    | `installSysExt_failed`
-    | `installSysExt_success`;
+    | `installSysExt_failed`;
 }
 
 const InstallSysExt: React.FC<Props> = ({ step }) => {
@@ -111,23 +110,6 @@ const InstallSysExt: React.FC<Props> = ({ step }) => {
           />
         </Onboarding.Centered>
       );
-    case `installSysExt_success`:
-      return (
-        <Onboarding.Centered>
-          <Onboarding.Heading>System extension installed!</Onboarding.Heading>
-          <Onboarding.Text className="mt-4 mb-8">
-            Past all the hard parts&mdash;that was the last permission you need to grant.
-          </Onboarding.Text>
-          <Callout type="info" heading="Good to know:">
-            Up next, a few options and recommendations to help you off to a smooth start.
-          </Callout>
-          <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right" className="mt-8">
-            Next
-          </Onboarding.PrimaryButton>
-        </Onboarding.Centered>
-      );
-    default:
-      return <h1>{step}</h1>;
   }
 };
 

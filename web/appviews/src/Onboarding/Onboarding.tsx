@@ -114,7 +114,6 @@ export const Onboarding: React.FC<Props> = ({
         <OnboardingPage
           step="allowFullDiskAccess_success"
           component={<Step.AllowFullDiskAccess step="allowFullDiskAccess_success" />}
-          confetti
         />
         <OnboardingPage
           step="allowFullDiskAccess_failed"
@@ -131,7 +130,6 @@ export const Onboarding: React.FC<Props> = ({
         <OnboardingPage
           step="allowScreenshots_success"
           component={<Step.AllowScreenshots step="allowScreenshots_success" />}
-          confetti
         />
         <OnboardingPage
           step="allowScreenshots_failed"
@@ -166,9 +164,10 @@ export const Onboarding: React.FC<Props> = ({
           component={<Step.InstallSysExt step="installSysExt_failed" />}
         />
         <OnboardingPage
-          step="installSysExt_success"
-          component={<Step.InstallSysExt step="installSysExt_success" />}
+          step="installSysExt_success_configPivot"
+          component={<Step.PermissionsComplete />}
           confetti
+          confettiDelay={600}
         />
         <OnboardingPage step="optOutOfFiltering" component={<Step.OptOutOfFiltering />} />
         <OnboardingPage step="configureDowntime" component={<Step.ConfigureDowntime />} />

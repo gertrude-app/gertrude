@@ -18,6 +18,7 @@ export { default as EncourageFilterSuspensions } from './EncourageFilterSuspensi
 export { default as AllowNotifications } from './AllowNotifications';
 export { default as AllowKeylogging } from './AllowKeylogging';
 export { default as InstallSysExt } from './InstallSysExt';
+export { default as PermissionsComplete } from './PermissionsComplete';
 export { default as ScreenTimeConflict } from './ScreenTimeConflict';
 export { default as ExemptUsers } from './ExemptUsers';
 export { default as LocateMenuBarIcon } from './LocateMenuBarIcon';
