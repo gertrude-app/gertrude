@@ -45,6 +45,8 @@ enum AdminTsCodegenRoute {
       GetUnidentifiedApps.self,
       GetIdentifiedAppsForAdmin.self,
       PromoteApp.self,
+      GetPairqlTelemetrySummary.self,
+      GetRecentPairqlErrors.self,
     ]
   }
 

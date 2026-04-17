@@ -32,6 +32,26 @@ export default class AdminClient extends Client<Auth> {
     );
   };
 
+  public getPairqlTelemetrySummary = (
+    input: P.GetPairqlTelemetrySummary.Input,
+  ): Promise<Result<P.GetPairqlTelemetrySummary.Output>> => {
+    return this.query<P.GetPairqlTelemetrySummary.Output>(
+      input,
+      `GetPairqlTelemetrySummary`,
+      `superAdmin`,
+    );
+  };
+
+  public getRecentPairqlErrors = (
+    input: P.GetRecentPairqlErrors.Input,
+  ): Promise<Result<P.GetRecentPairqlErrors.Output>> => {
+    return this.query<P.GetRecentPairqlErrors.Output>(
+      input,
+      `GetRecentPairqlErrors`,
+      `superAdmin`,
+    );
+  };
+
   public getUnidentifiedApps = (
     input: P.GetUnidentifiedApps.Input,
   ): Promise<Result<P.GetUnidentifiedApps.Output>> => {

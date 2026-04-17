@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
+  BellIcon,
   GertrudeLogo,
   HomeIcon,
   LogoutIcon,
@@ -34,6 +35,7 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
   const navLinks = [
     { to: `/`, label: `Home`, icon: HomeIcon },
     { to: `/parents`, label: `Parents`, icon: UsersIcon },
+    { to: `/pairql-telemetry`, label: `Telemetry`, icon: BellIcon },
   ];
 
   const isActive = (path: string): boolean => {

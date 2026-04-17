@@ -19,6 +19,8 @@ enum AuthedAdminRoute: PairRoute {
   case getUnidentifiedApps(GetUnidentifiedApps.Input)
   case getIdentifiedAppsForAdmin
   case promoteApp(PromoteApp.Input)
+  case getPairqlTelemetrySummary(GetPairqlTelemetrySummary.Input)
+  case getRecentPairqlErrors(GetRecentPairqlErrors.Input)
 
   nonisolated(unsafe) static let router = OneOf {
     Route(.case(Self.subscriptionsOverview)) {
@@ -83,6 +85,14 @@ enum AuthedAdminRoute: PairRoute {
       Operation(PromoteApp.self)
       Body(.input(PromoteApp.self))
     }
+    Route(.case(Self.getPairqlTelemetrySummary)) {
+      Operation(GetPairqlTelemetrySummary.self)
+      Body(.input(GetPairqlTelemetrySummary.self))
+    }
+    Route(.case(Self.getRecentPairqlErrors)) {
+      Operation(GetRecentPairqlErrors.self)
+      Body(.input(GetRecentPairqlErrors.self))
+    }
   }
 }
 
@@ -139,6 +149,12 @@ extension AuthedAdminRoute: RouteResponder {
       return try await self.respond(with: output)
     case .promoteApp(let input):
       let output = try await PromoteApp.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getPairqlTelemetrySummary(let input):
+      let output = try await GetPairqlTelemetrySummary.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getRecentPairqlErrors(let input):
+      let output = try await GetRecentPairqlErrors.resolve(with: input, in: context)
       return try await self.respond(with: output)
     }
   }

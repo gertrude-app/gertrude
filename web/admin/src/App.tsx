@@ -10,6 +10,7 @@ import IOSDeviceEvents from './pages/IOSDeviceEvents';
 import IOSDevicesList from './pages/IOSDevicesList';
 import IOSStats from './pages/IOSStats';
 import Login from './pages/Login';
+import PairqlTelemetry from './pages/PairqlTelemetry';
 import ParentDetail from './pages/ParentDetail';
 import ParentsList from './pages/ParentsList';
 import PodcastInstallDetail from './pages/PodcastInstallDetail';
@@ -63,6 +64,7 @@ const App: React.FC = () => {
         <Route path="/ratings/:app" element={<AppRatings />} />
         <Route path="/parents" element={<ParentsList />} />
         <Route path="/parents/:id" element={<ParentDetail />} />
+        <Route path="/pairql-telemetry" element={<PairqlTelemetry />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
