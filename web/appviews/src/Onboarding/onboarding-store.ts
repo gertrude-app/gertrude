@@ -46,8 +46,9 @@ export type OnboardingStep =
   | 'customKeychains'
   | 'exemptUsers'
   | 'locateMenuBarIcon'
-  | 'viewHealthCheck'
   | 'encourageFilterSuspensions'
+  | 'alwaysBlockedGroups'
+  | 'viewHealthCheck'
   | 'screenTimeConflict'
   | 'finish';
 
@@ -85,6 +86,18 @@ export interface PublicKeychain {
   brandColor?: string;
 }
 
+export interface AlwaysBlockedGroup {
+  id: UUID;
+  name: string;
+  description: string;
+  longDescription: string;
+}
+
+export interface AlwaysBlocked {
+  groups: AlwaysBlockedGroup[];
+  preselected: UUID[];
+}
+
 export interface PlainTime {
   hour: number;
   minute: number;
@@ -113,6 +126,7 @@ export interface AppState {
   exemptUserIds: number[];
   discoveredApps: DiscoveredApp[];
   publicKeychains: PublicKeychain[];
+  alwaysBlocked: AlwaysBlocked;
   customKeychainDomains: string[];
   createCustomKeychainRequest: RequestState;
   createAppKeysRequest: RequestState;
@@ -129,6 +143,7 @@ export type AppEvent =
     }
   | { case: 'blockedAppsSelected'; bundleIds: string[] }
   | { case: 'publicKeychainsSelected'; ids: UUID[] }
+  | { case: 'alwaysBlockedGroupsSelected'; ids: UUID[] }
   | { case: 'appKeysSelected'; bundleIds: string[] }
   | { case: 'connectChildSubmitted'; code: number }
   | { case: 'infoModalOpened'; step: OnboardingStep; detail?: string }
@@ -174,6 +189,7 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
       exemptUserIds: [],
       discoveredApps: [],
       publicKeychains: [],
+      alwaysBlocked: { groups: [], preselected: [] },
       customKeychainDomains: [],
       createCustomKeychainRequest: { case: `idle` },
       createAppKeysRequest: { case: `idle` },

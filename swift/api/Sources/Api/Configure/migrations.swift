@@ -85,6 +85,7 @@ extension Configure {
     app.migrations.add(ShortUrlsAndSmsSendFields())
     app.migrations.add(CreateAlwaysBlockedTables())
     app.migrations.add(AddKeychainBrandColor())
+    app.migrations.add(AddAlwaysBlockedGroupRecommended())
   }
 }
 

@@ -38,7 +38,8 @@ struct OnboardingFeature: Feature {
     var connectChildRequest: PayloadRequestState<String, String> = .idle
     var users: [MacUser] = []
     var discoveredApps: [DiscoveredApp] = []
-    var publicKeychains: [GetPublicKeychains.PublicKeychain] = []
+    var publicKeychains: [GetOnboardingConfig.PublicKeychain] = []
+    var alwaysBlocked: GetOnboardingConfig.AlwaysBlocked = .init(groups: [], preselected: [])
     var customKeychainDomains: [String] = []
     var createCustomKeychainRequest: RequestState<String> = .idle
     var createAppKeysRequest: RequestState<String> = .idle
@@ -75,6 +76,7 @@ struct OnboardingFeature: Feature {
       case postCreateSkipClicked
       case blockedAppsSelected(bundleIds: [String])
       case publicKeychainsSelected(ids: [UUID])
+      case alwaysBlockedGroupsSelected(ids: [UUID])
       case appKeysSelected(bundleIds: [String])
       case connectChildSubmitted(code: Int)
       case infoModalOpened(step: State.Step, detail: String?)
@@ -94,7 +96,7 @@ struct OnboardingFeature: Feature {
     case resume(Resume)
     case receivedDeviceData(currentUserId: uid_t, users: [MacOSUser])
     case receivedDiscoveredApps([DiscoveredApp])
-    case receivedPublicKeychains([GetPublicKeychains.PublicKeychain])
+    case receivedOnboardingConfig(GetOnboardingConfig.Output)
     case receivedFilterUsers(FilterUserTypes)
     case connectUser(TaskResult<UserData>)
     case createOnboardingBlockedAppsCompleted(success: Bool)
@@ -695,12 +697,16 @@ struct OnboardingFeature: Feature {
       case .webview(.primaryBtnClicked) where step == .installSysExt_success_configPivot:
         log(step, action, "78bded66")
         state.step = .optOutOfFiltering
-        return .none
+        return .exec { send in
+          await self.loadOnboardingConfig(send)
+        }
 
       case .webview(.secondaryBtnClicked) where step == .installSysExt_failed:
         log(step, action, "78bded66")
         state.step = .optOutOfFiltering
-        return .none
+        return .exec { send in
+          await self.loadOnboardingConfig(send)
+        }
 
       case .webview(.primaryBtnClicked) where step == .optOutOfFiltering:
         log(step, action, "21c26cb5")
@@ -739,9 +745,13 @@ struct OnboardingFeature: Feature {
         }
         return .none
 
-      case .receivedPublicKeychains(let keychains):
-        log("received public keychains: count=\(keychains.count)", "bb40d328")
-        state.publicKeychains = keychains
+      case .receivedOnboardingConfig(let config):
+        log(
+          "received onboarding config: publicKeychains=\(config.publicKeychains.count), alwaysBlockedGroups=\(config.alwaysBlocked.groups.count)",
+          "bb40d328",
+        )
+        state.publicKeychains = config.publicKeychains
+        state.alwaysBlocked = config.alwaysBlocked
         return .none
 
       case .webview(.primaryBtnClicked) where step == .appKeySelection_intro:
@@ -788,16 +798,7 @@ struct OnboardingFeature: Feature {
       case .webview(.primaryBtnClicked) where step == .aboutPermittingWebsites:
         log(step, action, "644b010a")
         state.step = .meetKeychains
-        return .exec { send in
-          let keychains: [GetPublicKeychains.PublicKeychain]
-          do {
-            keychains = try await self.api.getPublicKeychains()
-          } catch {
-            unexpectedError(id: "9953fc5a", error)
-            keychains = []
-          }
-          await send(.receivedPublicKeychains(keychains))
-        }
+        return .none
 
       case .webview(.primaryBtnClicked) where step == .meetKeychains:
         log(step, action, "0d275d8d")
@@ -886,7 +887,9 @@ struct OnboardingFeature: Feature {
 
       case .webview(.secondaryBtnClicked) where step == .screenTimeConflict:
         log(step, action, "6eab4506")
-        state.step = .finish
+        state.step = state.alwaysBlocked.groups.isEmpty
+          ? .viewHealthCheck
+          : .alwaysBlockedGroups
         return .none
 
       case .webview(.setUserExemption(userId: let userId, enabled: let enabled)):
@@ -907,23 +910,36 @@ struct OnboardingFeature: Feature {
 
       case .webview(.primaryBtnClicked) where step == .locateMenuBarIcon:
         log(step, action, "d0a159fd")
-        state.step = .viewHealthCheck
-        return .none
-
-      case .webview(.primaryBtnClicked) where step == .viewHealthCheck:
-        log(step, action, "5c73a171")
         state.step = .encourageFilterSuspensions
         return .none
 
       case .webview(.primaryBtnClicked) where step == .encourageFilterSuspensions:
         log(step, action, "363f2d44")
-        return .exec { send in
+        return .exec { [alwaysBlocked = state.alwaysBlocked] send in
           if await self.device.screenTimeWebFilterActive() {
             await send(.setStep(.screenTimeConflict))
+          } else if alwaysBlocked.groups.isEmpty {
+            await send(.setStep(.viewHealthCheck))
           } else {
-            await send(.setStep(.finish))
+            await send(.setStep(.alwaysBlockedGroups))
           }
         }
+
+      case .webview(.alwaysBlockedGroupsSelected(let ids)):
+        log("always blocked groups selected: \(ids.count)", "047be835")
+        state.step = .viewHealthCheck
+        return .exec { _ in
+          do {
+            try await self.api.selectAlwaysBlockedGroups(ids)
+          } catch {
+            unexpectedError(id: "b6e4ca64", error)
+          }
+        }
+
+      case .webview(.primaryBtnClicked) where step == .viewHealthCheck:
+        log(step, action, "5c73a171")
+        state.step = .finish
+        return .none
 
       case .webview(.primaryBtnClicked) where step == .finish,
            .closeWindow,
@@ -1037,6 +1053,16 @@ struct OnboardingFeature: Feature {
 
       log("sys ext already installed and running, skipping to opt out", "b0e6e683")
       await send(.setStep(.optOutOfFiltering))
+      await self.loadOnboardingConfig(send)
+    }
+
+    func loadOnboardingConfig(_ send: Send<Action>) async {
+      do {
+        let config = try await self.api.getOnboardingConfig()
+        await send(.receivedOnboardingConfig(config))
+      } catch {
+        unexpectedError(id: "9953fc5a", error)
+      }
     }
 
     func finishOnboardingConfig(_ send: Send<Action>) async {

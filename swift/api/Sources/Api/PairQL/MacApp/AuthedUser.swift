@@ -65,8 +65,14 @@ extension AuthedUserRoute: RouteResponder {
     case .createUnlockRequests_v3(let input):
       let output = try await CreateUnlockRequests_v3.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .getOnboardingConfig:
+      let output = try await GetOnboardingConfig.resolve(in: context)
+      return try await self.respond(with: output)
     case .reportBrowsers(let input):
       let output = try await ReportBrowsers.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .selectAlwaysBlockedGroups(let input):
+      let output = try await SelectAlwaysBlockedGroups.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .selectPublicKeychains(let input):
       let output = try await SelectPublicKeychains.resolve(with: input, in: context)

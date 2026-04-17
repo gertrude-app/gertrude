@@ -523,6 +523,7 @@ extension AlwaysBlockedGroup {
     case name
     case description
     case longDescription
+    case recommended
     case createdAt
     case updatedAt
   }

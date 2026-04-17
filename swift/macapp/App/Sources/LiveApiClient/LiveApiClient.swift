@@ -45,10 +45,16 @@ extension ApiClient: @retroactive DependencyKey {
         with: .disableFilterForChild,
       )
     },
-    getPublicKeychains: {
+    getOnboardingConfig: {
       try await output(
-        from: GetPublicKeychains.self,
-        withUnauthed: .getPublicKeychains,
+        from: GetOnboardingConfig.self,
+        with: .getOnboardingConfig,
+      )
+    },
+    selectAlwaysBlockedGroups: { input in
+      _ = try await output(
+        from: SelectAlwaysBlockedGroups.self,
+        with: .selectAlwaysBlockedGroups(input),
       )
     },
     selectPublicKeychains: { input in

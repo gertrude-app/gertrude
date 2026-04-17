@@ -10,7 +10,7 @@ const CHILDREN: { domain: string; label: string }[] = [
   { domain: `cdn.webfonts.net`, label: `and this for its fonts` },
 ];
 
-const STEP_DELAYS = [300, 3000, 1500, 1500, 1500, 3500];
+const STEP_DELAYS = [300, 3000, 1500, 1500, 1500, 3000];
 
 type Phase = `idle` | `fadingOut` | `running` | `done`;
 

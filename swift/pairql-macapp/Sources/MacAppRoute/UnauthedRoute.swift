@@ -2,7 +2,6 @@ import PairQL
 
 public enum UnauthedRoute: PairRoute {
   case connectUser(ConnectUser.Input)
-  case getPublicKeychains
   case logInterestingEvent(LogInterestingEvent.Input)
   case recentAppVersions
   case trustedTime
@@ -13,9 +12,6 @@ public extension UnauthedRoute {
     Route(.case(Self.connectUser)) {
       Operation(ConnectUser.self)
       Body(.json(ConnectUser.Input.self))
-    }
-    Route(.case(Self.getPublicKeychains)) {
-      Operation(GetPublicKeychains.self)
     }
     Route(.case(Self.logInterestingEvent)) {
       Operation(LogInterestingEvent.self)

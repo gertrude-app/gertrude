@@ -858,6 +858,7 @@ extension AlwaysBlockedGroup: Model {
     case .name: .string(self.name)
     case .description: .string(self.description)
     case .longDescription: .string(self.longDescription)
+    case .recommended: .bool(self.recommended)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -869,6 +870,7 @@ extension AlwaysBlockedGroup: Model {
       .name: .string(self.name),
       .description: .string(self.description),
       .longDescription: .string(self.longDescription),
+      .recommended: .bool(self.recommended),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

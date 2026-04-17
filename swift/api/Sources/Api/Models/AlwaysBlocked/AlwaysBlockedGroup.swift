@@ -5,14 +5,22 @@ struct AlwaysBlockedGroup: Codable, Sendable {
   var name: String
   var description: String
   var longDescription: String
+  var recommended: Bool
   var createdAt = Date()
   var updatedAt = Date()
 
-  init(id: Id = .init(), name: String, description: String, longDescription: String) {
+  init(
+    id: Id = .init(),
+    name: String,
+    description: String,
+    longDescription: String,
+    recommended: Bool = false,
+  ) {
     self.id = id
     self.name = name
     self.description = description
     self.longDescription = longDescription
+    self.recommended = recommended
   }
 }
 

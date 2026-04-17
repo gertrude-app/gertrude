@@ -28,6 +28,7 @@ export const Onboarding: React.FC<Props> = ({
   exemptUserIds,
   discoveredApps,
   publicKeychains,
+  alwaysBlocked,
   customKeychainDomains,
   createCustomKeychainRequest,
   blockedBundleIds,
@@ -230,11 +231,20 @@ export const Onboarding: React.FC<Props> = ({
           }
         />
         <OnboardingPage step="locateMenuBarIcon" component={<Step.LocateMenuBarIcon />} />
-        <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
         <OnboardingPage
           step="encourageFilterSuspensions"
           component={<Step.EncourageFilterSuspensions />}
         />
+        <OnboardingPage
+          step="alwaysBlockedGroups"
+          component={
+            <Step.AlwaysBlockedGroups
+              groups={alwaysBlocked.groups}
+              preselected={alwaysBlocked.preselected}
+            />
+          }
+        />
+        <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
         <OnboardingPage step="finish" component={<Step.Finish />} />
       </StepSwitcher>
     </OnboardingContext.Provider>

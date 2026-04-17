@@ -15,7 +15,7 @@ const PermissionsComplete: React.FC = () => {
         <>
           <h1
             className={cx(
-              `text-7xl mb-6 font-bold text-white transition-[transform,opacity] duration-1000`,
+              `text-6xl mb-4 font-bold text-white transition-[transform,opacity] duration-1000 delay-[1s]`,
               !fadeIn && `opacity-0 translate-y-6`,
             )}
           >
@@ -23,7 +23,7 @@ const PermissionsComplete: React.FC = () => {
           </h1>
           <p
             className={cx(
-              `text-3xl text-white max-w-3xl text-center transition-[transform,opacity] duration-1000 delay-[400ms] px-8`,
+              `text-2xl text-white/70 max-w-2xl text-center transition-[transform,opacity] duration-1000 delay-[1.3s]`,
               !fadeIn && `opacity-0 translate-y-6`,
             )}
           >
@@ -36,8 +36,8 @@ const PermissionsComplete: React.FC = () => {
               !fadeIn && `opacity-0 translate-y-6`,
             )}
           >
-            Don&rsquo;t worry&mdash;you can change any of these later from the Gertrude
-            parent’s website.
+            Don’t worry if you’re unsure about anything&mdash;you can always change them
+            later from the Gertrude parent’s website.
           </p>
           <div
             className={cx(

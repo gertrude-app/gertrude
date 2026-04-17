@@ -23,7 +23,8 @@ extension OnboardingFeature.State {
     var exemptableUserIds: [uid_t]
     var exemptUserIds: [uid_t]
     var discoveredApps: [DiscoveredApp]
-    var publicKeychains: [GetPublicKeychains.PublicKeychain]
+    var publicKeychains: [GetOnboardingConfig.PublicKeychain]
+    var alwaysBlocked: GetOnboardingConfig.AlwaysBlocked
     var customKeychainDomains: [String]
     var createCustomKeychainRequest: RequestState<String>
     var createAppKeysRequest: RequestState<String>
@@ -46,6 +47,7 @@ extension OnboardingFeature.State {
       self.exemptUserIds = state.onboarding.filterUsers?.exempt ?? []
       self.discoveredApps = state.onboarding.discoveredApps
       self.publicKeychains = state.onboarding.publicKeychains
+      self.alwaysBlocked = state.onboarding.alwaysBlocked
       self.customKeychainDomains = state.onboarding.customKeychainDomains
       self.createCustomKeychainRequest = state.onboarding.createCustomKeychainRequest
       self.createAppKeysRequest = state.onboarding.createAppKeysRequest

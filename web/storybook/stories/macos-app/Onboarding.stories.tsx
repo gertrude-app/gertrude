@@ -101,6 +101,7 @@ export const Welcome: Story = props({
   isUpgrade: false,
   discoveredApps: [],
   publicKeychains: [],
+  alwaysBlocked: { groups: [], preselected: [] },
   customKeychainDomains: [],
   createCustomKeychainRequest: { case: `idle` },
   blockedBundleIds: [],
@@ -647,6 +648,47 @@ export const ViewHealthCheck: Story = props({
 export const EasyMode: Story = props({
   ...Welcome.args,
   step: `encourageFilterSuspensions`,
+});
+
+const ADULT_CONTENT = `5eea4c3e-3910-4ca3-bcac-09af52a2f567`;
+const MESSAGES_GIF = `e8f90637-22d5-4525-abe1-cde1d3cbbd33`;
+const SOCIAL_MEDIA = `a032f240-00a7-467d-a27f-5987c714818a`;
+const SPOTLIGHT_SEARCH = `ce7c5aef-9754-44aa-af3b-e1f8900f0b25`;
+
+const ALWAYS_BLOCKED_GROUPS = [
+  {
+    id: SOCIAL_MEDIA,
+    name: `Social media`,
+    description: `Block the most prominent social media sites.`,
+    longDescription: `not real`,
+  },
+  {
+    id: MESSAGES_GIF,
+    name: `Messages GIF Search`,
+    description: `Block the #images GIF picker in Messages and common GIF providers.`,
+    longDescription: `not real`,
+  },
+  {
+    id: ADULT_CONTENT,
+    name: `Adult content`,
+    description: `Block the most-trafficked adult websites, plus adult-oriented TLDs.`,
+    longDescription: `not real`,
+  },
+  {
+    id: SPOTLIGHT_SEARCH,
+    name: `Spotlight search`,
+    description: `Block web results in macOS Spotlight search.`,
+    longDescription: `not real`,
+  },
+];
+
+export const AlwaysBlockedGroups: Story = props({
+  ...Welcome.args,
+  step: `alwaysBlockedGroups`,
+  alwaysBlocked: {
+    groups: ALWAYS_BLOCKED_GROUPS,
+    preselected: [ADULT_CONTENT, MESSAGES_GIF, SPOTLIGHT_SEARCH],
+  },
 });
 
 export const Finish: Story = props({

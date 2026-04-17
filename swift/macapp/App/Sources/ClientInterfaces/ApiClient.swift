@@ -13,7 +13,9 @@ public struct ApiClient: Sendable {
   public var createOnboardingKeychain: @Sendable (CreateOnboardingKeychain.Input)
     async throws -> Bool
   public var disableFilterForChild: @Sendable () async throws -> Void
-  public var getPublicKeychains: @Sendable () async throws -> GetPublicKeychains.Output
+  public var getOnboardingConfig: @Sendable () async throws -> GetOnboardingConfig.Output
+  public var selectAlwaysBlockedGroups: @Sendable (SelectAlwaysBlockedGroups.Input)
+    async throws -> Void
   public var selectPublicKeychains: @Sendable (SelectPublicKeychains.Input) async throws -> Void
   public var setDowntimeSchedule: @Sendable (SetDowntimeSchedule.Input) async throws -> Void
   public var createKeystrokeLines: @Sendable (CreateKeystrokeLines.Input) async throws -> Void
@@ -43,7 +45,9 @@ public struct ApiClient: Sendable {
     createOnboardingKeychain: @escaping @Sendable (CreateOnboardingKeychain.Input)
     async throws -> Bool,
     disableFilterForChild: @escaping @Sendable () async throws -> Void,
-    getPublicKeychains: @escaping @Sendable () async throws -> GetPublicKeychains.Output,
+    getOnboardingConfig: @escaping @Sendable () async throws -> GetOnboardingConfig.Output,
+    selectAlwaysBlockedGroups: @escaping @Sendable (SelectAlwaysBlockedGroups.Input)
+    async throws -> Void,
     selectPublicKeychains: @escaping @Sendable (SelectPublicKeychains.Input) async throws -> Void,
     setDowntimeSchedule: @escaping @Sendable (SetDowntimeSchedule.Input) async throws -> Void,
     createKeystrokeLines: @escaping @Sendable (CreateKeystrokeLines.Input) async throws -> Void,
@@ -70,7 +74,8 @@ public struct ApiClient: Sendable {
     self.createOnboardingBlockedApps = createOnboardingBlockedApps
     self.createOnboardingKeychain = createOnboardingKeychain
     self.disableFilterForChild = disableFilterForChild
-    self.getPublicKeychains = getPublicKeychains
+    self.getOnboardingConfig = getOnboardingConfig
+    self.selectAlwaysBlockedGroups = selectAlwaysBlockedGroups
     self.selectPublicKeychains = selectPublicKeychains
     self.setDowntimeSchedule = setDowntimeSchedule
     self.createKeystrokeLines = createKeystrokeLines
@@ -132,7 +137,8 @@ extension ApiClient: TestDependencyKey {
     createOnboardingBlockedApps: unimplemented("ApiClient.createOnboardingBlockedApps"),
     createOnboardingKeychain: unimplemented("ApiClient.createOnboardingKeychain"),
     disableFilterForChild: unimplemented("ApiClient.disableFilterForChild"),
-    getPublicKeychains: unimplemented("ApiClient.getPublicKeychains"),
+    getOnboardingConfig: unimplemented("ApiClient.getOnboardingConfig"),
+    selectAlwaysBlockedGroups: unimplemented("ApiClient.selectAlwaysBlockedGroups"),
     selectPublicKeychains: unimplemented("ApiClient.selectPublicKeychains"),
     setDowntimeSchedule: unimplemented("ApiClient.setDowntimeSchedule"),
     createKeystrokeLines: unimplemented("ApiClient.createKeystrokeLines"),
@@ -159,7 +165,11 @@ extension ApiClient: TestDependencyKey {
     createOnboardingBlockedApps: { _ in },
     createOnboardingKeychain: { _ in true },
     disableFilterForChild: {},
-    getPublicKeychains: { [] },
+    getOnboardingConfig: { .init(
+      publicKeychains: [],
+      alwaysBlocked: .init(groups: [], preselected: []),
+    ) },
+    selectAlwaysBlockedGroups: { _ in },
     selectPublicKeychains: { _ in },
     setDowntimeSchedule: { _ in },
     createKeystrokeLines: { _ in },

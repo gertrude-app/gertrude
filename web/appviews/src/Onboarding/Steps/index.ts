@@ -12,6 +12,7 @@ export { default as AboutPermittingWebsites } from './AboutPermittingWebsites';
 export { default as MeetKeychains } from './MeetKeychains';
 export { default as SelectPublicKeychains } from './SelectPublicKeychains';
 export { default as CustomKeychains } from './CustomKeychains';
+export { default as AlwaysBlockedGroups } from './AlwaysBlockedGroups';
 export { default as AllowScreenshots } from './AllowScreenshots';
 export { default as AllowFullDiskAccess } from './AllowFullDiskAccess';
 export { default as EncourageFilterSuspensions } from './EncourageFilterSuspensions';

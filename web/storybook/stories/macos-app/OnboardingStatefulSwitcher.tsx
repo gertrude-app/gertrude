@@ -86,6 +86,12 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`locateMenuBarIcon`);
             break;
           case `locateMenuBarIcon`:
+            setStep(`encourageFilterSuspensions`);
+            break;
+          case `encourageFilterSuspensions`:
+            setStep(`alwaysBlockedGroups`);
+            break;
+          case `alwaysBlockedGroups`:
             setStep(`viewHealthCheck`);
             break;
           case `viewHealthCheck`:
@@ -218,6 +224,14 @@ const OnboardingStatefulSwitcher: React.FC = () => {
           <OnboardingPage
             step="locateMenuBarIcon"
             component={<Step.LocateMenuBarIcon />}
+          />
+          <OnboardingPage
+            step="encourageFilterSuspensions"
+            component={<Step.EncourageFilterSuspensions />}
+          />
+          <OnboardingPage
+            step="alwaysBlockedGroups"
+            component={<Step.AlwaysBlockedGroups groups={[]} preselected={[]} />}
           />
           <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
           <OnboardingPage step="finish" component={<Step.Finish />} />

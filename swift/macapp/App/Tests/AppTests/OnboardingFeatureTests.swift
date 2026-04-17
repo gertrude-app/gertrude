@@ -96,16 +96,26 @@ final class OnboardingFeatureTests: XCTestCase {
     let setUserToken = spy(on: UUID.self, returning: ())
     store.deps.api.setUserToken = setUserToken.fn
 
-    // we fetch public keychains when they enter the meet keychains screen
-    let publicKeychain = GetPublicKeychains.PublicKeychain(
+    // we fetch onboarding config in the background after connect user succeeds
+    let publicKeychain = GetOnboardingConfig.PublicKeychain(
       id: UUID(),
       name: "HTC",
       description: "homeschool",
       warning: nil,
       brandColor: nil,
     )
-    let getPublicKeychains = mock(always: [publicKeychain])
-    store.deps.api.getPublicKeychains = getPublicKeychains.fn
+    let alwaysBlockedGroup = GetOnboardingConfig.AlwaysBlockedGroup(
+      id: UUID(),
+      name: "Adult content",
+      description: "short",
+      longDescription: "long",
+    )
+    let onboardingConfig = GetOnboardingConfig.Output(
+      publicKeychains: [publicKeychain],
+      alwaysBlocked: .init(groups: [alwaysBlockedGroup], preselected: [alwaysBlockedGroup.id]),
+    )
+    let getOnboardingConfig = mock(always: onboardingConfig)
+    store.deps.api.getOnboardingConfig = getOnboardingConfig.fn
 
     // they enter code `123456` and click submit...
     await store.send(.onboarding(.webview(.connectChildSubmitted(code: 123_456)))) {
@@ -368,6 +378,16 @@ final class OnboardingFeatureTests: XCTestCase {
       $0.onboarding.step = .optOutOfFiltering
     }
 
+    // onboarding config fetch fires in background as we enter config phase
+    await store.receive(.onboarding(.receivedOnboardingConfig(onboardingConfig))) {
+      $0.onboarding.publicKeychains = [publicKeychain]
+      $0.onboarding.alwaysBlocked = .init(
+        groups: [alwaysBlockedGroup],
+        preselected: [alwaysBlockedGroup.id],
+      )
+    }
+    await expect(getOnboardingConfig.calls.count).toEqual(1)
+
     // they choose to keep filtering enabled (primary button)
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
       $0.onboarding.step = .configureDowntime
@@ -413,12 +433,6 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
       $0.onboarding.step = .meetKeychains
     }
-
-    // ...and we fetch the public keychains for the next screen
-    await store.receive(.onboarding(.receivedPublicKeychains([publicKeychain]))) {
-      $0.onboarding.publicKeychains = [publicKeychain]
-    }
-    await expect(getPublicKeychains.calls.count).toEqual(1)
 
     // they click "Next" on the meet keychains screen
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
@@ -525,17 +539,25 @@ final class OnboardingFeatureTests: XCTestCase {
 
     // they click "Next" on the locate menu bar icon screen
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
-      $0.onboarding.step = .viewHealthCheck // ...and go to health check
-    }
-
-    // they click "Next" on the health check screen
-    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
-      $0.onboarding.step = .encourageFilterSuspensions // go to encourage FS
+      $0.onboarding.step = .encourageFilterSuspensions // ...and go to encourage FS
     }
 
     // they click "Next" on the encourage filter suspensions screen
     await store.send(.onboarding(.webview(.primaryBtnClicked)))
-    await store.receive(.onboarding(.setStep(.finish))) {
+    await store.receive(.onboarding(.setStep(.alwaysBlockedGroups))) {
+      $0.onboarding.step = .alwaysBlockedGroups // ...and go to always blocked
+    }
+
+    // they submit selected always-blocked group ids
+    let selectAlwaysBlockedGroups = spy(on: [UUID].self, returning: ())
+    store.deps.api.selectAlwaysBlockedGroups = selectAlwaysBlockedGroups.fn
+    await store.send(.onboarding(.webview(.alwaysBlockedGroupsSelected(ids: [])))) {
+      $0.onboarding.step = .viewHealthCheck // ...and go to health check
+    }
+    await expect(selectAlwaysBlockedGroups.calls).toEqual([[]])
+
+    // they click "Next" on the health check screen
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
       $0.onboarding.step = .finish // ...and go to finish
     }
 
@@ -584,6 +606,9 @@ final class OnboardingFeatureTests: XCTestCase {
         bundleId: "com.tinyspeck.slackmacgap",
         iconPath: "",
       )]
+    }
+    store.deps.api.getOnboardingConfig = {
+      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
     }
     await store.send(.webview(.primaryBtnClicked)) {
       $0.step = .optOutOfFiltering
@@ -1064,6 +1089,9 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.monitoring.screenRecordingPermissionGranted = { true }
     store.deps.monitoring.keystrokeRecordingPermissionGranted = { true }
     store.deps.filterExtension.state = { .installedAndRunning }
+    store.deps.api.getOnboardingConfig = {
+      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
+    }
 
     await store.send(.webview(.primaryBtnClicked)) { $0.step = .howToUseGifs }
     await store.send(.webview(.primaryBtnClicked))
@@ -1183,6 +1211,9 @@ final class OnboardingFeatureTests: XCTestCase {
   @MainActor
   func testClickingSkipSecondaryFromInstallSysExtFailed() async {
     let store = onboardingFeatureStore { $0.step = .installSysExt_failed }
+    store.deps.api.getOnboardingConfig = {
+      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
+    }
     await store.send(.webview(.secondaryBtnClicked)) {
       $0.step = .optOutOfFiltering
     }
@@ -1298,6 +1329,9 @@ final class OnboardingFeatureTests: XCTestCase {
   func testSkipAllowKeyloggingSysExtAlreadyInstalled() async {
     let store = onboardingFeatureStore { $0.step = .allowKeylogging_required }
     store.deps.filterExtension.state = { .installedAndRunning }
+    store.deps.api.getOnboardingConfig = {
+      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
+    }
     await store.send(.webview(.secondaryBtnClicked))
     await store.receive(.setStep(.optOutOfFiltering))
   }
@@ -1930,6 +1964,9 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.mainQueue = .immediate
     let timedOut = LockIsolated(false)
     store.deps.filterExtension.state = { .notInstalled }
+    store.deps.api.getOnboardingConfig = {
+      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
+    }
 
     // this is janky, but allows me to simulate timeout AFTER they proceeded
     store.deps.filterExtension.installOverridingTimeout = { seconds in
@@ -2021,8 +2058,15 @@ final class OnboardingFeatureTests: XCTestCase {
 
   @MainActor
   func testScreenTimeConflictShownWhenDetected() async {
+    let group = GetOnboardingConfig.AlwaysBlockedGroup(
+      id: UUID(),
+      name: "Adult content",
+      description: "short",
+      longDescription: "long",
+    )
     let store = onboardingFeatureStore {
       $0.step = .encourageFilterSuspensions
+      $0.alwaysBlocked = .init(groups: [group], preselected: [group.id])
     }
     store.deps.device.screenTimeWebFilterActive = { true }
     let openUrl = spy(on: URL.self, returning: ())
@@ -2038,8 +2082,53 @@ final class OnboardingFeatureTests: XCTestCase {
     ])
 
     await store.send(.webview(.secondaryBtnClicked)) {
-      $0.step = .finish
+      $0.step = .alwaysBlockedGroups
     }
+  }
+
+  @MainActor
+  func testEncourageFilterSuspensionsSkipsAlwaysBlockedWhenNoGroups() async {
+    let store = onboardingFeatureStore {
+      $0.step = .encourageFilterSuspensions
+      $0.alwaysBlocked = .init(groups: [], preselected: [])
+    }
+    store.deps.device.screenTimeWebFilterActive = { false }
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.setStep(.viewHealthCheck))
+  }
+
+  @MainActor
+  func testScreenTimeConflictSecondarySkipsAlwaysBlockedWhenNoGroups() async {
+    let store = onboardingFeatureStore {
+      $0.step = .screenTimeConflict
+      $0.alwaysBlocked = .init(groups: [], preselected: [])
+    }
+    await store.send(.webview(.secondaryBtnClicked)) {
+      $0.step = .viewHealthCheck
+    }
+  }
+
+  @MainActor
+  func testAlwaysBlockedGroupsSelectedAdvancesAndFiresApi() async {
+    let id = UUID()
+    let store = onboardingFeatureStore { $0.step = .alwaysBlockedGroups }
+    let selectAlwaysBlockedGroups = spy(on: [UUID].self, returning: ())
+    store.deps.api.selectAlwaysBlockedGroups = selectAlwaysBlockedGroups.fn
+    await store.send(.webview(.alwaysBlockedGroupsSelected(ids: [id]))) {
+      $0.step = .viewHealthCheck
+    }
+    await expect(selectAlwaysBlockedGroups.calls).toEqual([[id]])
+  }
+
+  @MainActor
+  func testAlwaysBlockedGroupsEmptySelectionStillFiresApi() async {
+    let store = onboardingFeatureStore { $0.step = .alwaysBlockedGroups }
+    let selectAlwaysBlockedGroups = spy(on: [UUID].self, returning: ())
+    store.deps.api.selectAlwaysBlockedGroups = selectAlwaysBlockedGroups.fn
+    await store.send(.webview(.alwaysBlockedGroupsSelected(ids: []))) {
+      $0.step = .viewHealthCheck
+    }
+    await expect(selectAlwaysBlockedGroups.calls).toEqual([[]])
   }
 
   @MainActor

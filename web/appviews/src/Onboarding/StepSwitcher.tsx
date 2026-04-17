@@ -194,8 +194,9 @@ function getProgress(currentStep: OnboardingStep): Progress {
     case `exemptUsers`:
       return { step: 6, totalSteps: CONFIGURATION_TOTAL };
     case `locateMenuBarIcon`:
-    case `viewHealthCheck`:
     case `encourageFilterSuspensions`:
+    case `alwaysBlockedGroups`:
+    case `viewHealthCheck`:
     case `screenTimeConflict`:
       return { step: 7, totalSteps: CONFIGURATION_TOTAL };
   }

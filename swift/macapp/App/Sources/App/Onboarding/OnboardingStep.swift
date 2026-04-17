@@ -70,8 +70,9 @@ extension OnboardingFeature.State {
     // wrap up
     case exemptUsers
     case locateMenuBarIcon
-    case viewHealthCheck
     case encourageFilterSuspensions
+    case alwaysBlockedGroups
+    case viewHealthCheck
     case screenTimeConflict
     case finish
   }
@@ -153,13 +154,15 @@ extension OnboardingFeature.State.Step {
     case .exemptUsers:
       .locateMenuBarIcon
     case .locateMenuBarIcon:
-      .viewHealthCheck
-    case .viewHealthCheck:
       .encourageFilterSuspensions
     case .encourageFilterSuspensions:
+      .alwaysBlockedGroups
+    case .alwaysBlockedGroups:
+      .viewHealthCheck
+    case .viewHealthCheck:
       .finish
     case .screenTimeConflict:
-      .finish
+      .alwaysBlockedGroups
     case .finish:
       .finish
     }
@@ -241,14 +244,16 @@ extension OnboardingFeature.State.Step {
       .installSysExt_explain
     case .locateMenuBarIcon:
       .installSysExt_explain
-    case .viewHealthCheck:
-      .locateMenuBarIcon
     case .encourageFilterSuspensions:
-      .viewHealthCheck
+      .locateMenuBarIcon
+    case .alwaysBlockedGroups:
+      .encourageFilterSuspensions
+    case .viewHealthCheck:
+      .alwaysBlockedGroups
     case .screenTimeConflict:
       .encourageFilterSuspensions
     case .finish:
-      .encourageFilterSuspensions
+      .viewHealthCheck
     }
   }
 }
@@ -297,9 +302,10 @@ extension OnboardingFeature.State.Step: Comparable {
     case .customKeychains: 318
     case .exemptUsers: 320
     case .locateMenuBarIcon: 330
-    case .viewHealthCheck: 340
-    case .encourageFilterSuspensions: 350
-    case .screenTimeConflict: 360
+    case .encourageFilterSuspensions: 340
+    case .alwaysBlockedGroups: 350
+    case .viewHealthCheck: 360
+    case .screenTimeConflict: 370
     case .finish: 380
     }
   }
