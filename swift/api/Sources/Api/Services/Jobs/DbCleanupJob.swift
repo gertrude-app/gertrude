@@ -105,6 +105,12 @@ struct CleanupJob: AsyncScheduledJob {
 
     logs.append("Deleted \(checkinEvents) iOS check-in events")
 
+    let deletedTelemetry = try await RouteTelemetry.query()
+      .where(.createdAt < 30.daysAgo)
+      .delete(in: self.db, force: true)
+
+    logs.append("Deleted \(deletedTelemetry) route telemetry rows")
+
     await self.db.notifyDeprecationComplete(
       if: "BlockRules(v1)",
       notLoggedWithinLast: .days(90),

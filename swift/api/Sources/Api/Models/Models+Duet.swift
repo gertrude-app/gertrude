@@ -588,6 +588,26 @@ extension MacAppToken {
   }
 }
 
+extension RouteTelemetry: Duet.Identifiable {
+  typealias Id = Tagged<RouteTelemetry, UUID>
+}
+
+extension RouteTelemetry {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case kind
+    case requestId
+    case domain
+    case operation
+    case durationMs
+    case result
+    case errorId
+    case errorType
+    case errorMessage
+    case createdAt
+  }
+}
+
 extension InterestingEvent: Duet.Identifiable {
   typealias Id = Tagged<InterestingEvent, UUID>
 }

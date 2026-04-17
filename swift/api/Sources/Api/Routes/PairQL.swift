@@ -81,48 +81,93 @@ enum PairQLRoute: Equatable, RouteResponder {
     }
   }
 
-  @Sendable static func handler(_ request: Request) async throws -> Response {
-    guard var requestData = URLRequestData(request: request),
+  @Sendable static func handler(_ req: Request) async throws -> Response {
+    guard var requestData = URLRequestData(request: req),
           requestData.path.removeFirst() == "pairql" else {
       throw Abort(.badRequest)
     }
 
-    let context = Context(
-      requestId: request.id,
-      dashboardUrl: request.dashboardUrl,
-      ipAddress: request.ipAddress,
+    let ctx = Context(
+      requestId: req.id,
+      dashboardUrl: req.dashboardUrl,
+      ipAddress: req.ipAddress,
     )
+
+    let start = Date()
     do {
       let route = try PairQLRoute.router.parse(requestData)
-      let start = Date()
-      let output = try await PairQLRoute.respond(to: route, in: context)
-      logOperation(route, request, Date().timeIntervalSince(start))
+      let output = try await PairQLRoute.respond(to: route, in: ctx)
+      let duration = Date().timeIntervalSince(start)
+      logOperation(route, req, duration)
+      recordTelemetry(req, ctx, domain(of: route), start, .ok)
       return output
     } catch {
+      let domain = req.parameters.get("domain") ?? ""
       if "\(type(of: error))" == "ParsingError" {
-        switch request.context.env.mode {
+        switch req.context.env.mode {
         case .prod:
-          await slackPairQLRouteNotFound(request, error)
+          await slackPairQLRouteNotFound(req, error)
         case .dev:
           print("PairQL parsing \(error)")
         case .staging, .test:
           break
         }
+        recordTelemetry(
+          req,
+          ctx,
+          domain,
+          start,
+          .notFound,
+          "0f5a25c9",
+          "\(type(of: error))",
+          "\(error)",
+        )
         return .init(PqlError(
           id: "0f5a25c9",
-          requestId: context.requestId,
+          requestId: ctx.requestId,
           type: .notFound,
-          debugMessage: request.context.env.mode == .dev
+          debugMessage: req.context.env.mode == .dev
             ? "PairQL routing \(error)"
             : "PairQL route not found",
           showContactSupport: true,
         ))
       } else if let pqlError = error as? PqlError {
+        recordTelemetry(
+          req,
+          ctx,
+          domain,
+          start,
+          .pqlError,
+          pqlError.id,
+          "PqlError",
+          pqlError.debugMessage,
+        )
         return .init(pqlError)
       } else if let convertible = error as? PqlErrorConvertible {
-        return .init(convertible.pqlError(in: context))
+        let pqlError = convertible.pqlError(in: ctx)
+        recordTelemetry(
+          req,
+          ctx,
+          domain,
+          start,
+          .convertibleError,
+          pqlError.id,
+          "\(type(of: error))",
+          pqlError.debugMessage,
+        )
+        return .init(pqlError)
       } else {
         print(type(of: error), error)
+        recordTelemetry(
+          req,
+          ctx,
+          domain,
+          start,
+          .unexpectedError,
+          nil,
+          "\(type(of: error))",
+          "\(error)",
+        )
         throw error
       }
     }
@@ -162,6 +207,54 @@ private func logOperation(_ route: PairQLRoute, _ request: Request, _ duration: 
   case .supervise:
     request.logger
       .notice("PairQL request: \("Supervise".magenta.bold) \(operation) \(elapsed)")
+  }
+}
+
+private func recordTelemetry(
+  _ request: Request,
+  _ context: Context,
+  _ domain: String,
+  _ start: Date,
+  _ result: RouteTelemetry.Result,
+  _ errorId: String? = nil,
+  _ errorType: String? = nil,
+  _ errorMessage: String? = nil,
+) {
+  let operation = request.parameters.get("operation") ?? ""
+  let durationMs = Int(Date().timeIntervalSince(start) * 1000)
+  let row = RouteTelemetry(
+    kind: "pairql",
+    requestId: context.requestId,
+    domain: domain,
+    operation: operation,
+    durationMs: durationMs,
+    result: result,
+    errorId: errorId,
+    errorType: errorType,
+    errorMessage: errorMessage.map(truncateErrorMessage),
+  )
+  Task {
+    do {
+      _ = try await context.db.create(row)
+    } catch {
+      print("route telemetry insert failed:", error)
+    }
+  }
+}
+
+private func truncateErrorMessage(_ s: String) -> String {
+  s.count <= 2000 ? s : String(s.prefix(2000)) + "…"
+}
+
+private func domain(of route: PairQLRoute) -> String {
+  switch route {
+  case .macApp: "macos-app"
+  case .iOS: "ios-app"
+  case .podcast: "gertrude-am"
+  case .dashboard: "dashboard"
+  case .superAdmin: "super-admin"
+  case .admin: "admin"
+  case .supervise: "supervise"
   }
 }
 

@@ -1019,6 +1019,44 @@ extension InterestingEvent: Model {
   }
 }
 
+extension RouteTelemetry: Model {
+  public static let schemaName = "system"
+  public static let tableName = "route_telemetry"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .kind: .string(self.kind)
+    case .requestId: .string(self.requestId)
+    case .domain: .string(self.domain)
+    case .operation: .string(self.operation)
+    case .durationMs: .int(self.durationMs)
+    case .result: .string(self.result.rawValue)
+    case .errorId: .varchar(self.errorId)
+    case .errorType: .string(self.errorType)
+    case .errorMessage: .string(self.errorMessage)
+    case .createdAt: .date(self.createdAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .kind: .string(self.kind),
+      .requestId: .string(self.requestId),
+      .domain: .string(self.domain),
+      .operation: .string(self.operation),
+      .durationMs: .int(self.durationMs),
+      .result: .string(self.result.rawValue),
+      .errorId: .varchar(self.errorId),
+      .errorType: .string(self.errorType),
+      .errorMessage: .string(self.errorMessage),
+      .createdAt: .currentTimestamp,
+    ]
+  }
+}
+
 extension StripeEvent: Model {
   public static let schemaName = "system"
   public static let tableName = "stripe_events"

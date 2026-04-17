@@ -3,6 +3,8 @@ export * from './shared';
 export * from './pairs/AppRatings';
 export * from './pairs/DeleteParent';
 export * from './pairs/GetIdentifiedAppsForAdmin';
+export * from './pairs/GetPairqlTelemetrySummary';
+export * from './pairs/GetRecentPairqlErrors';
 export * from './pairs/GetUnidentifiedApps';
 export * from './pairs/IOSDetailedStats';
 export * from './pairs/IOSDeviceEvents';
