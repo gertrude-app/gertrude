@@ -26,11 +26,26 @@ struct DiscoveredApp: Equatable, Sendable, Codable {
       continue
     }
 
-    let appItems = contents.filter { $0.hasSuffix(".app") }
-    os_log("[G•] APP discoverApps: %{public}s has %d .app items", appDir, appItems.count)
+    var appPaths: [(dir: String, item: String)] = []
+    for item in contents {
+      if item.hasSuffix(".app") {
+        appPaths.append((appDir, item))
+      } else {
+        let subdir = "\(appDir)/\(item)"
+        var isDir: ObjCBool = false
+        if fm.fileExists(atPath: subdir, isDirectory: &isDir), isDir.boolValue,
+           let subcontents = try? fm.contentsOfDirectory(atPath: subdir) {
+          for subitem in subcontents where subitem.hasSuffix(".app") {
+            appPaths.append((subdir, subitem))
+          }
+        }
+      }
+    }
 
-    for item in appItems {
-      let path = "\(appDir)/\(item)"
+    os_log("[G•] APP discoverApps: %{public}s has %d .app items", appDir, appPaths.count)
+
+    for (dir, item) in appPaths {
+      let path = "\(dir)/\(item)"
 
       guard let bundle = Bundle(path: path),
             let bundleId = bundle.bundleIdentifier else {

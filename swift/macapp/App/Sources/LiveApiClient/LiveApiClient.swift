@@ -33,6 +33,42 @@ extension ApiClient: @retroactive DependencyKey {
         with: .createOnboardingBlockedApps(input),
       )
     },
+    createOnboardingKeychain: { input in
+      try await output(
+        from: CreateOnboardingKeychain.self,
+        with: .createOnboardingKeychain(input),
+      ).success
+    },
+    disableFilterForChild: {
+      _ = try await output(
+        from: DisableFilterForChild.self,
+        with: .disableFilterForChild,
+      )
+    },
+    getOnboardingConfig: {
+      try await output(
+        from: GetOnboardingConfig.self,
+        with: .getOnboardingConfig,
+      )
+    },
+    selectAlwaysBlockedGroups: { input in
+      _ = try await output(
+        from: SelectAlwaysBlockedGroups.self,
+        with: .selectAlwaysBlockedGroups(input),
+      )
+    },
+    selectPublicKeychains: { input in
+      _ = try await output(
+        from: SelectPublicKeychains.self,
+        with: .selectPublicKeychains(input),
+      )
+    },
+    setDowntimeSchedule: { input in
+      _ = try await output(
+        from: SetDowntimeSchedule.self,
+        with: .setDowntimeSchedule(input),
+      )
+    },
     createKeystrokeLines: { input in
       guard await accountActive.value else { return }
       // always produces `.success` if it doesn't throw

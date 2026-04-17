@@ -48,20 +48,32 @@ extension OnboardingFeature.State {
     case installSysExt_trick
     case installSysExt_allow
     case installSysExt_failed
-    case installSysExt_success
+    case installSysExt_success_configPivot
+
+    // opt out of filtering
+    case optOutOfFiltering
+
+    // configure downtime
+    case configureDowntime
 
     // app key selection
     case appKeySelection_intro
     case appKeySelection_blockApps
     case appKeySelection_allowInternet
 
+    // keychains
+    case aboutPermittingWebsites
+    case meetKeychains
+    case selectPublicKeychains
+    case customKeychains
+
     // wrap up
     case exemptUsers
     case locateMenuBarIcon
-    case viewHealthCheck
     case encourageFilterSuspensions
+    case alwaysBlockedGroups
+    case viewHealthCheck
     case screenTimeConflict
-    case howToUseGertrude
     case finish
   }
 }
@@ -116,29 +128,41 @@ extension OnboardingFeature.State.Step {
     case .installSysExt_trick:
       .installSysExt_allow
     case .installSysExt_allow:
-      .installSysExt_success
+      .installSysExt_success_configPivot
     case .installSysExt_failed:
-      .installSysExt_success
-    case .installSysExt_success:
+      .installSysExt_success_configPivot
+    case .installSysExt_success_configPivot:
+      .optOutOfFiltering
+    case .optOutOfFiltering:
+      .configureDowntime
+    case .configureDowntime:
       .appKeySelection_intro
     case .appKeySelection_intro:
       .appKeySelection_blockApps
     case .appKeySelection_blockApps:
       .appKeySelection_allowInternet
     case .appKeySelection_allowInternet:
+      .aboutPermittingWebsites
+    case .aboutPermittingWebsites:
+      .meetKeychains
+    case .meetKeychains:
+      .selectPublicKeychains
+    case .selectPublicKeychains:
+      .customKeychains
+    case .customKeychains:
       .exemptUsers
     case .exemptUsers:
       .locateMenuBarIcon
     case .locateMenuBarIcon:
-      .viewHealthCheck
-    case .viewHealthCheck:
       .encourageFilterSuspensions
     case .encourageFilterSuspensions:
-      .howToUseGertrude
-    case .screenTimeConflict:
-      .howToUseGertrude
-    case .howToUseGertrude:
+      .alwaysBlockedGroups
+    case .alwaysBlockedGroups:
+      .viewHealthCheck
+    case .viewHealthCheck:
       .finish
+    case .screenTimeConflict:
+      .alwaysBlockedGroups
     case .finish:
       .finish
     }
@@ -196,28 +220,40 @@ extension OnboardingFeature.State.Step {
       .installSysExt_trick
     case .installSysExt_failed:
       .installSysExt_explain
-    case .installSysExt_success:
+    case .installSysExt_success_configPivot:
       .installSysExt_explain
+    case .optOutOfFiltering:
+      .installSysExt_success_configPivot
+    case .configureDowntime:
+      .optOutOfFiltering
     case .appKeySelection_intro:
-      .installSysExt_success
+      .configureDowntime
     case .appKeySelection_blockApps:
       .appKeySelection_intro
     case .appKeySelection_allowInternet:
       .appKeySelection_blockApps
+    case .aboutPermittingWebsites:
+      .appKeySelection_allowInternet
+    case .meetKeychains:
+      .aboutPermittingWebsites
+    case .selectPublicKeychains:
+      .meetKeychains
+    case .customKeychains:
+      .selectPublicKeychains
     case .exemptUsers:
       .installSysExt_explain
     case .locateMenuBarIcon:
       .installSysExt_explain
-    case .viewHealthCheck:
-      .locateMenuBarIcon
     case .encourageFilterSuspensions:
-      .viewHealthCheck
+      .locateMenuBarIcon
+    case .alwaysBlockedGroups:
+      .encourageFilterSuspensions
+    case .viewHealthCheck:
+      .alwaysBlockedGroups
     case .screenTimeConflict:
       .encourageFilterSuspensions
-    case .howToUseGertrude:
-      .encourageFilterSuspensions
     case .finish:
-      .howToUseGertrude
+      .viewHealthCheck
     }
   }
 }
@@ -229,42 +265,48 @@ extension OnboardingFeature.State.Step: Comparable {
 
   private var asInt: Int {
     switch self {
-    case .welcome: 0
-    case .wrongInstallDir: 3
-    case .confirmGertrudeAccount: 5
-    case .noGertrudeAccount: 10
-    case .macosUserAccountType: 15
-    case .getChildConnectionCode: 20
-    case .connectChild: 25
-    case .howToUseGifs: 28
-    case .allowNotifications_start: 30
-    case .allowNotifications_grant: 35
-    case .allowNotifications_failed: 40
-    case .allowFullDiskAccess_grantAndRestart: 42
-    case .allowFullDiskAccess_failed: 43
-    case .allowFullDiskAccess_success: 44
-    case .allowScreenshots_required: 45
-    case .allowScreenshots_grantAndRestart: 55
-    case .allowScreenshots_failed: 60
-    case .allowScreenshots_success: 65
-    case .allowKeylogging_required: 70
-    case .allowKeylogging_grant: 80
-    case .allowKeylogging_failed: 85
-    case .installSysExt_explain: 90
-    case .installSysExt_trick: 92
-    case .installSysExt_allow: 95
-    case .installSysExt_failed: 100
-    case .installSysExt_success: 105
-    case .appKeySelection_intro: 106
-    case .appKeySelection_blockApps: 107
-    case .appKeySelection_allowInternet: 108
-    case .exemptUsers: 110
-    case .locateMenuBarIcon: 112
-    case .viewHealthCheck: 115
-    case .encourageFilterSuspensions: 117
-    case .screenTimeConflict: 118
-    case .howToUseGertrude: 120
-    case .finish: 125
+    case .welcome: 10
+    case .wrongInstallDir: 20
+    case .confirmGertrudeAccount: 30
+    case .noGertrudeAccount: 40
+    case .macosUserAccountType: 50
+    case .getChildConnectionCode: 60
+    case .connectChild: 70
+    case .howToUseGifs: 80
+    case .allowNotifications_start: 90
+    case .allowNotifications_grant: 100
+    case .allowNotifications_failed: 110
+    case .allowFullDiskAccess_grantAndRestart: 120
+    case .allowFullDiskAccess_failed: 130
+    case .allowFullDiskAccess_success: 140
+    case .allowScreenshots_required: 150
+    case .allowScreenshots_grantAndRestart: 160
+    case .allowScreenshots_failed: 170
+    case .allowScreenshots_success: 180
+    case .allowKeylogging_required: 190
+    case .allowKeylogging_grant: 200
+    case .allowKeylogging_failed: 210
+    case .installSysExt_explain: 220
+    case .installSysExt_trick: 230
+    case .installSysExt_allow: 240
+    case .installSysExt_failed: 250
+    case .installSysExt_success_configPivot: 260
+    case .optOutOfFiltering: 270
+    case .configureDowntime: 280
+    case .appKeySelection_intro: 290
+    case .appKeySelection_blockApps: 300
+    case .appKeySelection_allowInternet: 310
+    case .aboutPermittingWebsites: 312
+    case .meetKeychains: 314
+    case .selectPublicKeychains: 316
+    case .customKeychains: 318
+    case .exemptUsers: 320
+    case .locateMenuBarIcon: 330
+    case .encourageFilterSuspensions: 340
+    case .alwaysBlockedGroups: 350
+    case .viewHealthCheck: 360
+    case .screenTimeConflict: 370
+    case .finish: 380
     }
   }
 }

@@ -27,6 +27,10 @@ export const Onboarding: React.FC<Props> = ({
   exemptableUserIds,
   exemptUserIds,
   discoveredApps,
+  publicKeychains,
+  alwaysBlocked,
+  customKeychainDomains,
+  createCustomKeychainRequest,
   blockedBundleIds,
   osVersion,
   isUpgrade,
@@ -111,7 +115,6 @@ export const Onboarding: React.FC<Props> = ({
         <OnboardingPage
           step="allowFullDiskAccess_success"
           component={<Step.AllowFullDiskAccess step="allowFullDiskAccess_success" />}
-          confetti
         />
         <OnboardingPage
           step="allowFullDiskAccess_failed"
@@ -128,7 +131,6 @@ export const Onboarding: React.FC<Props> = ({
         <OnboardingPage
           step="allowScreenshots_success"
           component={<Step.AllowScreenshots step="allowScreenshots_success" />}
-          confetti
         />
         <OnboardingPage
           step="allowScreenshots_failed"
@@ -163,10 +165,13 @@ export const Onboarding: React.FC<Props> = ({
           component={<Step.InstallSysExt step="installSysExt_failed" />}
         />
         <OnboardingPage
-          step="installSysExt_success"
-          component={<Step.InstallSysExt step="installSysExt_success" />}
+          step="installSysExt_success_configPivot"
+          component={<Step.PermissionsComplete />}
           confetti
+          confettiDelay={600}
         />
+        <OnboardingPage step="optOutOfFiltering" component={<Step.OptOutOfFiltering />} />
+        <OnboardingPage step="configureDowntime" component={<Step.ConfigureDowntime />} />
         <OnboardingPage
           step="appKeySelection_intro"
           component={<Step.AppKeySelectionIntro />}
@@ -174,7 +179,14 @@ export const Onboarding: React.FC<Props> = ({
         <OnboardingPage
           step="appKeySelection_blockApps"
           component={
-            <Step.BlockApps apps={discoveredApps} childName={currentUser?.name} />
+            <Step.BlockApps
+              apps={discoveredApps}
+              childName={
+                connectChildRequest.case === `succeeded`
+                  ? connectChildRequest.payload
+                  : undefined
+              }
+            />
           }
         />
         <OnboardingPage
@@ -184,6 +196,24 @@ export const Onboarding: React.FC<Props> = ({
               apps={discoveredApps.filter(
                 (app) => !blockedBundleIds.includes(app.bundleId),
               )}
+            />
+          }
+        />
+        <OnboardingPage
+          step="aboutPermittingWebsites"
+          component={<Step.AboutPermittingWebsites />}
+        />
+        <OnboardingPage step="meetKeychains" component={<Step.MeetKeychains />} />
+        <OnboardingPage
+          step="selectPublicKeychains"
+          component={<Step.SelectPublicKeychains keychains={publicKeychains} />}
+        />
+        <OnboardingPage
+          step="customKeychains"
+          component={
+            <Step.CustomKeychains
+              unlocked={customKeychainDomains}
+              request={createCustomKeychainRequest}
             />
           }
         />
@@ -201,12 +231,20 @@ export const Onboarding: React.FC<Props> = ({
           }
         />
         <OnboardingPage step="locateMenuBarIcon" component={<Step.LocateMenuBarIcon />} />
-        <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
         <OnboardingPage
           step="encourageFilterSuspensions"
           component={<Step.EncourageFilterSuspensions />}
         />
-        <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />
+        <OnboardingPage
+          step="alwaysBlockedGroups"
+          component={
+            <Step.AlwaysBlockedGroups
+              groups={alwaysBlocked.groups}
+              preselected={alwaysBlocked.preselected}
+            />
+          }
+        />
+        <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
         <OnboardingPage step="finish" component={<Step.Finish />} />
       </StepSwitcher>
     </OnboardingContext.Provider>

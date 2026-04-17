@@ -77,21 +77,24 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             setStep(`installSysExt_failed`);
             break;
           case `installSysExt_failed`:
-            setStep(`installSysExt_success`);
+            setStep(`installSysExt_success_configPivot`);
             break;
-          case `installSysExt_success`:
+          case `installSysExt_success_configPivot`:
             setStep(`exemptUsers`);
             break;
           case `exemptUsers`:
             setStep(`locateMenuBarIcon`);
             break;
           case `locateMenuBarIcon`:
+            setStep(`encourageFilterSuspensions`);
+            break;
+          case `encourageFilterSuspensions`:
+            setStep(`alwaysBlockedGroups`);
+            break;
+          case `alwaysBlockedGroups`:
             setStep(`viewHealthCheck`);
             break;
           case `viewHealthCheck`:
-            setStep(`howToUseGertrude`);
-            break;
-          case `howToUseGertrude`:
             setStep(`finish`);
             break;
           case `finish`:
@@ -209,9 +212,10 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             component={<Step.InstallSysExt step="installSysExt_failed" />}
           />
           <OnboardingPage
-            step="installSysExt_success"
-            component={<Step.InstallSysExt step="installSysExt_success" />}
+            step="installSysExt_success_configPivot"
+            component={<Step.PermissionsComplete />}
             confetti
+            confettiDelay={200}
           />
           <OnboardingPage
             step="exemptUsers"
@@ -221,8 +225,15 @@ const OnboardingStatefulSwitcher: React.FC = () => {
             step="locateMenuBarIcon"
             component={<Step.LocateMenuBarIcon />}
           />
+          <OnboardingPage
+            step="encourageFilterSuspensions"
+            component={<Step.EncourageFilterSuspensions />}
+          />
+          <OnboardingPage
+            step="alwaysBlockedGroups"
+            component={<Step.AlwaysBlockedGroups groups={[]} preselected={[]} />}
+          />
           <OnboardingPage step="viewHealthCheck" component={<Step.ViewHealthCheck />} />
-          <OnboardingPage step="howToUseGertrude" component={<Step.HowToUseGertrude />} />
           <OnboardingPage step="finish" component={<Step.Finish />} />
         </StepSwitcher>
       </OnboardingContext.Provider>

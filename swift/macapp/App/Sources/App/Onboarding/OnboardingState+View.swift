@@ -1,6 +1,7 @@
 import Core
 import Dependencies
 import Foundation
+import MacAppRoute
 
 extension OnboardingFeature.State {
   struct View: Equatable, Encodable, Sendable {
@@ -22,6 +23,10 @@ extension OnboardingFeature.State {
     var exemptableUserIds: [uid_t]
     var exemptUserIds: [uid_t]
     var discoveredApps: [DiscoveredApp]
+    var publicKeychains: [GetOnboardingConfig.PublicKeychain]
+    var alwaysBlocked: GetOnboardingConfig.AlwaysBlocked
+    var customKeychainDomains: [String]
+    var createCustomKeychainRequest: RequestState<String>
     var createAppKeysRequest: RequestState<String>
     var isUpgrade: Bool
 
@@ -41,6 +46,10 @@ extension OnboardingFeature.State {
       self.exemptableUserIds = state.onboarding.exemptableUsers.map(\.id)
       self.exemptUserIds = state.onboarding.filterUsers?.exempt ?? []
       self.discoveredApps = state.onboarding.discoveredApps
+      self.publicKeychains = state.onboarding.publicKeychains
+      self.alwaysBlocked = state.onboarding.alwaysBlocked
+      self.customKeychainDomains = state.onboarding.customKeychainDomains
+      self.createCustomKeychainRequest = state.onboarding.createCustomKeychainRequest
       self.createAppKeysRequest = state.onboarding.createAppKeysRequest
       self.isUpgrade = state.onboarding.upgrade
     }

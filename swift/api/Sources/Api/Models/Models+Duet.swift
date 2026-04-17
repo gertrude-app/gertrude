@@ -346,6 +346,7 @@ extension Keychain {
     case warning
     case isPublic
     case rootDomain
+    case brandColor
     case createdAt
     case updatedAt
   }
@@ -522,6 +523,7 @@ extension AlwaysBlockedGroup {
     case name
     case description
     case longDescription
+    case recommended
     case createdAt
     case updatedAt
   }

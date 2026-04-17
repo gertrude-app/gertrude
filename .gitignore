@@ -5,10 +5,7 @@
 Session.vim*
 
 # Environment files
-.env
-**/.env
-**/.env.local
-swift/api/.env*
+**/.env*
 
 # Dependencies
 node_modules/

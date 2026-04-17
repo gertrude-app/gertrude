@@ -3,6 +3,7 @@ import ComposableArchitecture
 import Core
 import Foundation
 import Gertie
+import MacAppRoute
 import TSCodable
 
 struct OnboardingFeature: Feature {
@@ -37,8 +38,13 @@ struct OnboardingFeature: Feature {
     var connectChildRequest: PayloadRequestState<String, String> = .idle
     var users: [MacUser] = []
     var discoveredApps: [DiscoveredApp] = []
+    var publicKeychains: [GetOnboardingConfig.PublicKeychain] = []
+    var alwaysBlocked: GetOnboardingConfig.AlwaysBlocked = .init(groups: [], preselected: [])
+    var customKeychainDomains: [String] = []
+    var createCustomKeychainRequest: RequestState<String> = .idle
     var createAppKeysRequest: RequestState<String> = .idle
     var filterUsers: FilterUserTypes?
+    var filteringDisabled = false
     var upgrade = false
   }
 
@@ -69,9 +75,13 @@ struct OnboardingFeature: Feature {
       case postCreateLogoutClicked
       case postCreateSkipClicked
       case blockedAppsSelected(bundleIds: [String])
+      case publicKeychainsSelected(ids: [UUID])
+      case alwaysBlockedGroupsSelected(ids: [UUID])
       case appKeysSelected(bundleIds: [String])
       case connectChildSubmitted(code: Int)
       case infoModalOpened(step: State.Step, detail: String?)
+      case setDowntimeSchedule(window: PlainTimeWindow)
+      case createOnboardingKeychain(domain: String)
       case setUserExemption(userId: uid_t, enabled: Bool)
     }
 
@@ -86,9 +96,11 @@ struct OnboardingFeature: Feature {
     case resume(Resume)
     case receivedDeviceData(currentUserId: uid_t, users: [MacOSUser])
     case receivedDiscoveredApps([DiscoveredApp])
+    case receivedOnboardingConfig(GetOnboardingConfig.Output)
     case receivedFilterUsers(FilterUserTypes)
     case connectUser(TaskResult<UserData>)
     case createOnboardingBlockedAppsCompleted(success: Bool)
+    case createOnboardingKeychainCompleted(domain: String, success: Bool)
     case createOnboardingAppKeysCompleted(success: Bool)
     case setStep(State.Step)
     case setRemediationStep(State.MacUser.RemediationStep?)
@@ -605,7 +617,7 @@ struct OnboardingFeature: Feature {
           log("sys ext install result=\(installResult)", "adbc0453")
           switch installResult {
           case .installedSuccessfully:
-            await send(.setStep(.installSysExt_success))
+            await send(.setStep(.installSysExt_success_configPivot))
             let apps = await self.device.discoverInstalledApps()
             await send(.receivedDiscoveredApps(apps))
             // NB: the two xpc calls below also implicitly establish the XPC connection
@@ -643,11 +655,11 @@ struct OnboardingFeature: Feature {
           case .errorLoadingConfig, .unknown:
             await send(.setStep(.installSysExt_failed))
           case .installedAndRunning:
-            await send(.setStep(.installSysExt_success))
+            await send(.setStep(.installSysExt_success_configPivot))
           case .installedButNotRunning:
             if await self.systemExtension.start() == .installedAndRunning {
               log("non-running sys ext started successfully", "d0021f5d")
-              await send(.setStep(.installSysExt_success))
+              await send(.setStep(.installSysExt_success_configPivot))
             } else {
               // TODO: should we try to replace once?
               await send(.setStep(.installSysExt_failed))
@@ -655,7 +667,8 @@ struct OnboardingFeature: Feature {
           }
         }
 
-      case .sysExtInstallTimedOut where step < .installSysExt_success && state.windowOpen:
+      case .sysExtInstallTimedOut
+        where step < .installSysExt_success_configPivot && state.windowOpen:
         log("sys ext install timed out, moving to fail", "83da9790")
         state.step = .installSysExt_failed
         return .none
@@ -670,7 +683,7 @@ struct OnboardingFeature: Feature {
           let state = await self.systemExtension.state()
           log("\(action) from .installSysExt_allow, state=\(state)", "b0e6e683")
           if state == .installedAndRunning {
-            await send(.setStep(.installSysExt_success))
+            await send(.setStep(.installSysExt_success_configPivot))
           } else {
             await send(.setStep(.installSysExt_failed))
           }
@@ -681,24 +694,64 @@ struct OnboardingFeature: Feature {
         state.step = .installSysExt_explain
         return .none
 
-      case .webview(.primaryBtnClicked) where step == .installSysExt_success:
+      case .webview(.primaryBtnClicked) where step == .installSysExt_success_configPivot:
         log(step, action, "78bded66")
+        state.step = .optOutOfFiltering
+        return .exec { send in
+          await self.loadOnboardingConfig(send)
+        }
+
+      case .webview(.secondaryBtnClicked) where step == .installSysExt_failed:
+        log(step, action, "78bded66")
+        state.step = .optOutOfFiltering
+        return .exec { send in
+          await self.loadOnboardingConfig(send)
+        }
+
+      case .webview(.primaryBtnClicked) where step == .optOutOfFiltering:
+        log(step, action, "21c26cb5")
+        state.step = .configureDowntime
+        return .none
+
+      case .webview(.secondaryBtnClicked) where step == .optOutOfFiltering:
+        log(step, action, "0a139c5b")
+        state.filteringDisabled = true
+        state.step = .configureDowntime
+        return .exec { _ in
+          try? await self.api.disableFilterForChild()
+        }
+
+      case .webview(.primaryBtnClicked) where step == .configureDowntime:
+        log(step, action, "5449cfc0")
         if state.discoveredApps.isEmpty {
           return .exec { send in
             await self.finishOnboardingConfig(send)
           }
         }
-        state.step = .appKeySelection_intro
+        state.step = state.filteringDisabled
+          ? .appKeySelection_blockApps
+          : .appKeySelection_intro
         return .none
 
-      case .webview(.secondaryBtnClicked) where step == .installSysExt_failed:
-        log(step, action, "78bded66")
-        return .exec { send in
-          await self.finishOnboardingConfig(send)
+      case .webview(.setDowntimeSchedule(let window)):
+        log("setDowntimeSchedule window=\(window)", "34921fbf")
+        return .exec { _ in
+          try? await self.api.setDowntimeSchedule(window)
         }
 
       case .receivedDiscoveredApps(let apps):
-        state.discoveredApps = apps
+        state.discoveredApps = apps.filter { app in
+          !ONBOARDING_HIDDEN_BUNDLE_IDS.contains { app.bundleId.contains($0) }
+        }
+        return .none
+
+      case .receivedOnboardingConfig(let config):
+        log(
+          "received onboarding config: publicKeychains=\(config.publicKeychains.count), alwaysBlockedGroups=\(config.alwaysBlocked.groups.count)",
+          "bb40d328",
+        )
+        state.publicKeychains = config.publicKeychains
+        state.alwaysBlocked = config.alwaysBlocked
         return .none
 
       case .webview(.primaryBtnClicked) where step == .appKeySelection_intro:
@@ -715,6 +768,11 @@ struct OnboardingFeature: Feature {
       case .webview(.blockedAppsSelected(let bundleIds)):
         log("blocked apps selected: \(bundleIds.count) apps", "f472f337")
         if bundleIds.isEmpty {
+          if state.filteringDisabled {
+            return .exec { send in
+              await self.finishOnboardingConfig(send)
+            }
+          }
           state.step = .appKeySelection_allowInternet
           return .none
         }
@@ -729,15 +787,73 @@ struct OnboardingFeature: Feature {
         }
 
       case .createOnboardingBlockedAppsCompleted:
+        if state.filteringDisabled {
+          return .exec { send in
+            await self.finishOnboardingConfig(send)
+          }
+        }
         state.step = .appKeySelection_allowInternet
+        return .none
+
+      case .webview(.primaryBtnClicked) where step == .aboutPermittingWebsites:
+        log(step, action, "644b010a")
+        state.step = .meetKeychains
+        return .none
+
+      case .webview(.primaryBtnClicked) where step == .meetKeychains:
+        log(step, action, "0d275d8d")
+        state.step = state.publicKeychains.isEmpty
+          ? .customKeychains
+          : .selectPublicKeychains
+        return .none
+
+      case .webview(.publicKeychainsSelected(let ids)):
+        log("public keychains selected: \(ids.count)", "5b09a4f1")
+        state.step = .customKeychains
+        if ids.isEmpty {
+          return .none
+        }
+        return .exec { _ in
+          do {
+            try await self.api.selectPublicKeychains(ids)
+          } catch {
+            unexpectedError(id: "7ff78381", detail: "select public keychains err: \(error)")
+          }
+        }
+
+      case .webview(.primaryBtnClicked) where step == .customKeychains:
+        log(step, action, "2d2d94c9")
+        return .exec { send in
+          await self.finishOnboardingConfig(send)
+        }
+
+      case .webview(.createOnboardingKeychain(let domain)):
+        log("createOnboardingKeychain domain=\(domain)", "b4f1aa60")
+        state.createCustomKeychainRequest = .ongoing
+        return .exec { send in
+          do {
+            let success = try await self.api.createOnboardingKeychain(domain)
+            await send(.createOnboardingKeychainCompleted(domain: domain, success: success))
+          } catch {
+            unexpectedError(id: "1820cb3b", detail: "create onboarding keychain err: \(error)")
+            await send(.createOnboardingKeychainCompleted(domain: domain, success: false))
+          }
+        }
+
+      case .createOnboardingKeychainCompleted(let domain, let success):
+        if success {
+          state.customKeychainDomains.append(domain)
+          state.createCustomKeychainRequest = .succeeded
+        } else {
+          state.createCustomKeychainRequest = .failed(error: domain)
+        }
         return .none
 
       case .webview(.appKeysSelected(let bundleIds)):
         log("app keys selected: \(bundleIds.count) apps", "b26dfa33")
         if bundleIds.isEmpty {
-          return .exec { send in
-            await self.finishOnboardingConfig(send)
-          }
+          state.step = .aboutPermittingWebsites
+          return .none
         }
         state.createAppKeysRequest = .ongoing
         return .exec { send in
@@ -753,15 +869,13 @@ struct OnboardingFeature: Feature {
       case .createOnboardingAppKeysCompleted(success: true):
         log("onboarding app keys created successfully", "51248d15")
         state.createAppKeysRequest = .succeeded
-        return .exec { send in
-          await self.finishOnboardingConfig(send)
-        }
+        state.step = .aboutPermittingWebsites
+        return .none
 
       case .createOnboardingAppKeysCompleted(success: false):
         state.createAppKeysRequest = .failed(error: "Failed to create keys")
-        return .exec { send in
-          await self.finishOnboardingConfig(send)
-        }
+        state.step = .aboutPermittingWebsites
+        return .none
 
       case .webview(.primaryBtnClicked) where step == .screenTimeConflict:
         log(step, action, "c2cfc834")
@@ -773,7 +887,9 @@ struct OnboardingFeature: Feature {
 
       case .webview(.secondaryBtnClicked) where step == .screenTimeConflict:
         log(step, action, "6eab4506")
-        state.step = .howToUseGertrude
+        state.step = state.alwaysBlocked.groups.isEmpty
+          ? .viewHealthCheck
+          : .alwaysBlockedGroups
         return .none
 
       case .webview(.setUserExemption(userId: let userId, enabled: let enabled)):
@@ -794,26 +910,34 @@ struct OnboardingFeature: Feature {
 
       case .webview(.primaryBtnClicked) where step == .locateMenuBarIcon:
         log(step, action, "d0a159fd")
-        state.step = .viewHealthCheck
-        return .none
-
-      case .webview(.primaryBtnClicked) where step == .viewHealthCheck:
-        log(step, action, "5c73a171")
         state.step = .encourageFilterSuspensions
         return .none
 
       case .webview(.primaryBtnClicked) where step == .encourageFilterSuspensions:
         log(step, action, "363f2d44")
-        return .exec { send in
+        return .exec { [alwaysBlocked = state.alwaysBlocked] send in
           if await self.device.screenTimeWebFilterActive() {
             await send(.setStep(.screenTimeConflict))
+          } else if alwaysBlocked.groups.isEmpty {
+            await send(.setStep(.viewHealthCheck))
           } else {
-            await send(.setStep(.howToUseGertrude))
+            await send(.setStep(.alwaysBlockedGroups))
           }
         }
 
-      case .webview(.primaryBtnClicked) where step == .howToUseGertrude:
-        log(step, action, "eb044990")
+      case .webview(.alwaysBlockedGroupsSelected(let ids)):
+        log("always blocked groups selected: \(ids.count)", "047be835")
+        state.step = .viewHealthCheck
+        return .exec { _ in
+          do {
+            try await self.api.selectAlwaysBlockedGroups(ids)
+          } catch {
+            unexpectedError(id: "b6e4ca64", error)
+          }
+        }
+
+      case .webview(.primaryBtnClicked) where step == .viewHealthCheck:
+        log(step, action, "5c73a171")
         state.step = .finish
         return .none
 
@@ -927,8 +1051,18 @@ struct OnboardingFeature: Feature {
         return await send(.setStep(.installSysExt_explain))
       }
 
-      log("sys ext already installed and running, skipping stage", "b0e6e683")
-      await self.finishOnboardingConfig(send)
+      log("sys ext already installed and running, skipping to opt out", "b0e6e683")
+      await send(.setStep(.optOutOfFiltering))
+      await self.loadOnboardingConfig(send)
+    }
+
+    func loadOnboardingConfig(_ send: Send<Action>) async {
+      do {
+        let config = try await self.api.getOnboardingConfig()
+        await send(.receivedOnboardingConfig(config))
+      } catch {
+        unexpectedError(id: "9953fc5a", error)
+      }
     }
 
     func finishOnboardingConfig(_ send: Send<Action>) async {
@@ -983,3 +1117,29 @@ extension OnboardingFeature.Reducer {
     self.log("received .\(shortAction) from step .\(step)", id)
   }
 }
+
+private let ONBOARDING_HIDDEN_BUNDLE_IDS = [
+  "com.netrivet.gertrude",
+  "com.apple.apps.launcher", // Launchpad (Tahoe+)
+  "com.apple.launchpad.launcher", // Launchpad (pre-Tahoe)
+  "com.apple.exposelauncher", // Mission Control
+  "com.apple.backup.launcher", // Time Machine
+  "com.apple.screenshot.launcher",
+  "com.apple.ActivityMonitor",
+  "com.apple.airport.airportutility",
+  "com.apple.audio.AudioMIDISetup",
+  "com.apple.BluetoothFileExchange",
+  "com.apple.bootcampassistant",
+  "com.apple.ColorSyncUtility",
+  "com.apple.Console",
+  "com.apple.DigitalColorMeter",
+  "com.apple.DiskUtility",
+  "com.apple.keychainaccess",
+  "com.apple.grapher",
+  "com.apple.Magnifier",
+  "com.apple.MigrateAssistant",
+  "com.apple.printcenter",
+  "com.apple.ScriptEditor2",
+  "com.apple.SystemProfiler", // System Information
+  "com.apple.VoiceOverUtility",
+]

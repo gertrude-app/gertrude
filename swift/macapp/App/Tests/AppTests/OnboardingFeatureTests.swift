@@ -96,6 +96,27 @@ final class OnboardingFeatureTests: XCTestCase {
     let setUserToken = spy(on: UUID.self, returning: ())
     store.deps.api.setUserToken = setUserToken.fn
 
+    // we fetch onboarding config in the background after connect user succeeds
+    let publicKeychain = GetOnboardingConfig.PublicKeychain(
+      id: UUID(),
+      name: "HTC",
+      description: "homeschool",
+      warning: nil,
+      brandColor: nil,
+    )
+    let alwaysBlockedGroup = GetOnboardingConfig.AlwaysBlockedGroup(
+      id: UUID(),
+      name: "Adult content",
+      description: "short",
+      longDescription: "long",
+    )
+    let onboardingConfig = GetOnboardingConfig.Output(
+      publicKeychains: [publicKeychain],
+      alwaysBlocked: .init(groups: [alwaysBlockedGroup], preselected: [alwaysBlockedGroup.id]),
+    )
+    let getOnboardingConfig = mock(always: onboardingConfig)
+    store.deps.api.getOnboardingConfig = getOnboardingConfig.fn
+
     // they enter code `123456` and click submit...
     await store.send(.onboarding(.webview(.connectChildSubmitted(code: 123_456)))) {
       $0.onboarding.step = .connectChild
@@ -316,6 +337,7 @@ final class OnboardingFeatureTests: XCTestCase {
     let fakeApps: [DiscoveredApp] = [
       .init(name: "Slack", bundleId: "com.tinyspeck.slackmacgap", iconPath: "", category: nil),
       .init(name: "Zoom", bundleId: "us.zoom.xos", iconPath: "", category: nil),
+      .init(name: "Launchpad", bundleId: "com.apple.apps.launcher", iconPath: "", category: nil),
     ]
     let discoverApps: Mock<[DiscoveredApp]> = mock(always: fakeApps)
     store.deps.device.discoverInstalledApps = discoverApps.fn
@@ -329,14 +351,18 @@ final class OnboardingFeatureTests: XCTestCase {
     await expect(installSysExt.calls.count).toEqual(1)
 
     // because filterExtension.install is mocked to return success, we go to success
-    await store.receive(.onboarding(.setStep(.installSysExt_success))) {
-      $0.onboarding.step = .installSysExt_success
+    await store.receive(.onboarding(.setStep(.installSysExt_success_configPivot))) {
+      $0.onboarding.step = .installSysExt_success_configPivot
     }
 
     // app discovery fires during sysext install success (preloaded)
     await expect(discoverApps.calls.count).toEqual(1)
+    let expectedApps: [DiscoveredApp] = [
+      .init(name: "Slack", bundleId: "com.tinyspeck.slackmacgap", iconPath: "", category: nil),
+      .init(name: "Zoom", bundleId: "us.zoom.xos", iconPath: "", category: nil),
+    ]
     await store.receive(.onboarding(.receivedDiscoveredApps(fakeApps))) {
-      $0.onboarding.discoveredApps = fakeApps
+      $0.onboarding.discoveredApps = expectedApps
     }
 
     // we clear the exempted state for the current user proactively as safeguard
@@ -348,6 +374,26 @@ final class OnboardingFeatureTests: XCTestCase {
     }
 
     // they click "Next" on the install sys ext success screen
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+      $0.onboarding.step = .optOutOfFiltering
+    }
+
+    // onboarding config fetch fires in background as we enter config phase
+    await store.receive(.onboarding(.receivedOnboardingConfig(onboardingConfig))) {
+      $0.onboarding.publicKeychains = [publicKeychain]
+      $0.onboarding.alwaysBlocked = .init(
+        groups: [alwaysBlockedGroup],
+        preselected: [alwaysBlockedGroup.id],
+      )
+    }
+    await expect(getOnboardingConfig.calls.count).toEqual(1)
+
+    // they choose to keep filtering enabled (primary button)
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+      $0.onboarding.step = .configureDowntime
+    }
+
+    // they skip configuring downtime
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
       $0.onboarding.step = .appKeySelection_intro
     }
@@ -368,9 +414,44 @@ final class OnboardingFeatureTests: XCTestCase {
       $0.onboarding.step = .appKeySelection_allowInternet
     }
 
+    // they choose to allow Slack internet access and click "Allow (1) app"
+    let createAppKeys = succeed(with: (), capturing: [String].self)
+    store.deps.api.createOnboardingAppKeys = createAppKeys.fn
+
+    await store
+      .send(.onboarding(.webview(.appKeysSelected(bundleIds: ["com.tinyspeck.slackmacgap"])))) {
+        $0.onboarding.createAppKeysRequest = .ongoing
+      }
+
+    await expect(createAppKeys.calls).toEqual([["com.tinyspeck.slackmacgap"]])
+    await store.receive(.onboarding(.createOnboardingAppKeysCompleted(success: true))) {
+      $0.onboarding.createAppKeysRequest = .succeeded
+      $0.onboarding.step = .aboutPermittingWebsites
+    }
+
+    // they click "Next" on the about permitting websites screen
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+      $0.onboarding.step = .meetKeychains
+    }
+
+    // they click "Next" on the meet keychains screen
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+      $0.onboarding.step = .selectPublicKeychains
+    }
+
+    // they pick the public keychain and click "Add (1) keychain"
+    let selectPublicKeychains = spy(on: [UUID].self, returning: ())
+    store.deps.api.selectPublicKeychains = selectPublicKeychains.fn
+
+    await store.send(.onboarding(.webview(.publicKeychainsSelected(ids: [publicKeychain.id])))) {
+      $0.onboarding.step = .customKeychains
+    }
+
+    await expect(selectPublicKeychains.calls).toEqual([[publicKeychain.id]])
+
     // 🔐 start protection actions
 
-    // finishOnboardingConfig is called after app keys are created, so set up deps first
+    // finishOnboardingConfig is called after customKeychains primary, so set up deps first
     let setAccountActive = spy(on: Bool.self, returning: ())
     store.deps.api.setAccountActive = setAccountActive.fn
     let checkInResult = CheckIn_v2.Output.empty {
@@ -394,19 +475,8 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.app.preventScreenCaptureNag = preventScreenCaptureNag.fn
     store.deps.device.screenTimeWebFilterActive = { false }
 
-    // they choose to allow Slack internet access and click "Allow (1) app"
-    let createAppKeys = succeed(with: (), capturing: [String].self)
-    store.deps.api.createOnboardingAppKeys = createAppKeys.fn
-
-    await store
-      .send(.onboarding(.webview(.appKeysSelected(bundleIds: ["com.tinyspeck.slackmacgap"])))) {
-        $0.onboarding.createAppKeysRequest = .ongoing
-      }
-
-    await expect(createAppKeys.calls).toEqual([["com.tinyspeck.slackmacgap"]])
-    await store.receive(.onboarding(.createOnboardingAppKeysCompleted(success: true))) {
-      $0.onboarding.createAppKeysRequest = .succeeded
-    }
+    // they click "Continue" on the custom keychains step
+    await store.send(.onboarding(.webview(.primaryBtnClicked)))
 
     // ✅ section: exempt users and wrap-up
 
@@ -469,21 +539,24 @@ final class OnboardingFeatureTests: XCTestCase {
 
     // they click "Next" on the locate menu bar icon screen
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
-      $0.onboarding.step = .viewHealthCheck // ...and go to health check
-    }
-
-    // they click "Next" on the health check screen
-    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
-      $0.onboarding.step = .encourageFilterSuspensions // go to encourage FS
+      $0.onboarding.step = .encourageFilterSuspensions // ...and go to encourage FS
     }
 
     // they click "Next" on the encourage filter suspensions screen
     await store.send(.onboarding(.webview(.primaryBtnClicked)))
-    await store.receive(.onboarding(.setStep(.howToUseGertrude))) {
-      $0.onboarding.step = .howToUseGertrude // ...and go to how to use
+    await store.receive(.onboarding(.setStep(.alwaysBlockedGroups))) {
+      $0.onboarding.step = .alwaysBlockedGroups // ...and go to always blocked
     }
 
-    // they click "Next" on the how to use screen
+    // they submit selected always-blocked group ids
+    let selectAlwaysBlockedGroups = spy(on: [UUID].self, returning: ())
+    store.deps.api.selectAlwaysBlockedGroups = selectAlwaysBlockedGroups.fn
+    await store.send(.onboarding(.webview(.alwaysBlockedGroupsSelected(ids: [])))) {
+      $0.onboarding.step = .viewHealthCheck // ...and go to health check
+    }
+    await expect(selectAlwaysBlockedGroups.calls).toEqual([[]])
+
+    // they click "Next" on the health check screen
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
       $0.onboarding.step = .finish // ...and go to finish
     }
@@ -525,29 +598,228 @@ final class OnboardingFeatureTests: XCTestCase {
   }
 
   @MainActor
-  func testEmptyDiscoveredAppsSkipsAppKeySelection() async {
-    let store = onboardingFeatureStore { $0.step = .installSysExt_success }
+  func testInstallSysExtSuccessGoesToOptOutOfFiltering() async {
+    let store = onboardingFeatureStore {
+      $0.step = .installSysExt_success_configPivot
+      $0.discoveredApps = [.init(
+        name: "Slack",
+        bundleId: "com.tinyspeck.slackmacgap",
+        iconPath: "",
+      )]
+    }
+    store.deps.api.getOnboardingConfig = {
+      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
+    }
+    await store.send(.webview(.primaryBtnClicked)) {
+      $0.step = .optOutOfFiltering
+    }
+  }
+
+  @MainActor
+  func testKeepFilteringEnabledGoesToConfigureDowntime() async {
+    let store = onboardingFeatureStore { $0.step = .optOutOfFiltering }
+    await store.send(.webview(.primaryBtnClicked)) {
+      $0.step = .configureDowntime
+    }
+  }
+
+  @MainActor
+  func testDisableFilteringGoesToConfigureDowntimeAndFiresApi() async {
+    let store = onboardingFeatureStore { $0.step = .optOutOfFiltering }
+    let disableFilter = mock(always: ())
+    store.deps.api.disableFilterForChild = disableFilter.fn
+    await store.send(.webview(.secondaryBtnClicked)) {
+      $0.filteringDisabled = true
+      $0.step = .configureDowntime
+    }
+    await expect(disableFilter.calls.count).toEqual(1)
+  }
+
+  @MainActor
+  func testConfigureDowntimePrimaryNoAppsFinishes() async {
+    let store = onboardingFeatureStore { $0.step = .configureDowntime }
     await store.send(.webview(.primaryBtnClicked))
     await store.receive(.setStep(.exemptUsers))
   }
 
   @MainActor
+  func testConfigureDowntimePrimaryWithAppsGoesToAppKeySelectionIntro() async {
+    let store = onboardingFeatureStore {
+      $0.step = .configureDowntime
+      $0.discoveredApps = [.init(
+        name: "Slack",
+        bundleId: "com.tinyspeck.slackmacgap",
+        iconPath: "",
+      )]
+    }
+    await store.send(.webview(.primaryBtnClicked)) {
+      $0.step = .appKeySelection_intro
+    }
+  }
+
+  @MainActor
+  func testConfigureDowntimePrimaryFilteringDisabledWithAppsSkipsIntro() async {
+    let store = onboardingFeatureStore {
+      $0.step = .configureDowntime
+      $0.filteringDisabled = true
+      $0.discoveredApps = [.init(
+        name: "Slack",
+        bundleId: "com.tinyspeck.slackmacgap",
+        iconPath: "",
+      )]
+    }
+    await store.send(.webview(.primaryBtnClicked)) {
+      $0.step = .appKeySelection_blockApps
+    }
+  }
+
+  @MainActor
+  func testSetDowntimeScheduleFiresApi() async {
+    let store = onboardingFeatureStore { $0.step = .configureDowntime }
+    let setDowntime = spy(on: PlainTimeWindow.self, returning: ())
+    store.deps.api.setDowntimeSchedule = setDowntime.fn
+    let window = PlainTimeWindow(
+      start: .init(hour: 21, minute: 0),
+      end: .init(hour: 7, minute: 30),
+    )
+    await store.send(.webview(.setDowntimeSchedule(window: window)))
+    await expect(setDowntime.calls).toEqual([window])
+  }
+
+  @MainActor
+  func testFilteringDisabledSkipsAllowInternetAfterBlockedApps() async {
+    let store = onboardingFeatureStore {
+      $0.step = .appKeySelection_blockApps
+      $0.filteringDisabled = true
+    }
+    await store.send(.webview(.blockedAppsSelected(bundleIds: [])))
+    await store.receive(.setStep(.exemptUsers))
+  }
+
+  @MainActor
+  func testFilteringDisabledSkipsAllowInternetAfterBlockedAppsCreated() async {
+    let store = onboardingFeatureStore {
+      $0.step = .appKeySelection_blockApps
+      $0.filteringDisabled = true
+    }
+    store.deps.api.createOnboardingBlockedApps = { _ in }
+    await store.send(.webview(.blockedAppsSelected(bundleIds: ["us.zoom.xos"])))
+    await store.receive(.createOnboardingBlockedAppsCompleted(success: true))
+    await store.receive(.setStep(.exemptUsers))
+  }
+
+  @MainActor
+  func testFilteringEnabledRoutesToAllowInternetAfterBlockedApps() async {
+    let store = onboardingFeatureStore {
+      $0.step = .appKeySelection_blockApps
+      $0.filteringDisabled = false
+    }
+    await store.send(.webview(.blockedAppsSelected(bundleIds: []))) {
+      $0.step = .appKeySelection_allowInternet
+    }
+  }
+
+  @MainActor
+  func testMeetKeychainsPrimaryWithEmptyPublicKeychainsSkipsToCustom() async {
+    let store = onboardingFeatureStore {
+      $0.step = .meetKeychains
+      $0.publicKeychains = []
+    }
+    await store.send(.webview(.primaryBtnClicked)) {
+      $0.step = .customKeychains
+    }
+  }
+
+  @MainActor
+  func testCreateOnboardingKeychainSuccessAppendsDomain() async {
+    let store = onboardingFeatureStore { $0.step = .customKeychains }
+    let createKeychain = spy(on: String.self, returning: true)
+    store.deps.api.createOnboardingKeychain = createKeychain.fn
+
+    await store.send(.webview(.createOnboardingKeychain(domain: "schoolportal.edu"))) {
+      $0.createCustomKeychainRequest = .ongoing
+    }
+    await store.receive(.createOnboardingKeychainCompleted(
+      domain: "schoolportal.edu",
+      success: true,
+    )) {
+      $0.customKeychainDomains = ["schoolportal.edu"]
+      $0.createCustomKeychainRequest = .succeeded
+    }
+    await expect(createKeychain.calls).toEqual(["schoolportal.edu"])
+  }
+
+  @MainActor
+  func testCreateOnboardingKeychainFailureStoresFailedDomain() async {
+    let store = onboardingFeatureStore { $0.step = .customKeychains }
+    let createKeychain = spy(on: String.self, returning: false)
+    store.deps.api.createOnboardingKeychain = createKeychain.fn
+
+    await store.send(.webview(.createOnboardingKeychain(domain: "not.real"))) {
+      $0.createCustomKeychainRequest = .ongoing
+    }
+    await store.receive(.createOnboardingKeychainCompleted(
+      domain: "not.real",
+      success: false,
+    )) {
+      $0.createCustomKeychainRequest = .failed(error: "not.real")
+    }
+    await expect(createKeychain.calls).toEqual(["not.real"])
+  }
+
+  @MainActor
+  func testFilteringDisabledSkipsKeychainStepEvenWhenKeychainsExist() async {
+    let store = onboardingFeatureStore {
+      $0.step = .appKeySelection_blockApps
+      $0.filteringDisabled = true
+      $0.publicKeychains = [
+        .init(id: UUID(), name: "HTC", description: nil, warning: nil, brandColor: nil),
+      ]
+    }
+    await store.send(.webview(.blockedAppsSelected(bundleIds: [])))
+    await store.receive(.setStep(.exemptUsers))
+  }
+
+  @MainActor
+  func testKeychainStepEmptySelectionAdvancesWithoutFiringApi() async {
+    let store = onboardingFeatureStore { $0.step = .selectPublicKeychains }
+    let selectKeychains = spy(on: [UUID].self, returning: ())
+    store.deps.api.selectPublicKeychains = selectKeychains.fn
+    await store.send(.webview(.publicKeychainsSelected(ids: []))) {
+      $0.step = .customKeychains
+    }
+    await expect(selectKeychains.calls.count).toEqual(0)
+  }
+
+  @MainActor
+  func testKeychainStepNonEmptySelectionFiresApiAndAdvances() async {
+    let id = UUID()
+    let store = onboardingFeatureStore { $0.step = .selectPublicKeychains }
+    let selectKeychains = spy(on: [UUID].self, returning: ())
+    store.deps.api.selectPublicKeychains = selectKeychains.fn
+    await store.send(.webview(.publicKeychainsSelected(ids: [id]))) {
+      $0.step = .customKeychains
+    }
+    await expect(selectKeychains.calls).toEqual([[id]])
+  }
+
+  @MainActor
   func testSingleUserOnlySkipsExemptUserScreen() async {
     let store = onboardingFeatureStore {
-      $0.step = .appKeySelection_allowInternet
+      $0.step = .customKeychains
       $0.filterUsers = .init(exempt: [], protected: [])
     }
     store.deps.device.currentUserId = { 501 }
     store.deps.device.listMacOSUsers = { [.init(id: 501, name: "Dad", type: .admin)] }
 
-    await store.send(.webview(.appKeysSelected(bundleIds: [])))
+    await store.send(.webview(.primaryBtnClicked))
     await store.receive(.setStep(.locateMenuBarIcon))
   }
 
   @MainActor
   func testDoesntSkipExemptScreenIfOtherUsers() async {
     let store = onboardingFeatureStore {
-      $0.step = .appKeySelection_allowInternet
+      $0.step = .customKeychains
       $0.filterUsers = .init(exempt: [], protected: [501]) // <-- Dad is protected
     }
     store.deps.device.currentUserId = { 502 }
@@ -556,7 +828,7 @@ final class OnboardingFeatureTests: XCTestCase {
       .init(id: 502, name: "Lil jimmy", type: .standard),
     ] }
 
-    await store.send(.webview(.appKeysSelected(bundleIds: [])))
+    await store.send(.webview(.primaryBtnClicked))
     await store.receive(.setStep(.exemptUsers)) // ... but we still show exempt screen
   }
 
@@ -817,12 +1089,15 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.monitoring.screenRecordingPermissionGranted = { true }
     store.deps.monitoring.keystrokeRecordingPermissionGranted = { true }
     store.deps.filterExtension.state = { .installedAndRunning }
+    store.deps.api.getOnboardingConfig = {
+      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
+    }
 
     await store.send(.webview(.primaryBtnClicked)) { $0.step = .howToUseGifs }
     await store.send(.webview(.primaryBtnClicked))
     await store.receive(.setStep(.allowKeylogging_required)) // we always stop here
     await store.send(.webview(.primaryBtnClicked))
-    await store.receive(.setStep(.exemptUsers))
+    await store.receive(.setStep(.optOutOfFiltering))
   }
 
   @MainActor
@@ -936,8 +1211,12 @@ final class OnboardingFeatureTests: XCTestCase {
   @MainActor
   func testClickingSkipSecondaryFromInstallSysExtFailed() async {
     let store = onboardingFeatureStore { $0.step = .installSysExt_failed }
-    await store.send(.webview(.secondaryBtnClicked))
-    await store.receive(.setStep(.exemptUsers))
+    store.deps.api.getOnboardingConfig = {
+      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
+    }
+    await store.send(.webview(.secondaryBtnClicked)) {
+      $0.step = .optOutOfFiltering
+    }
   }
 
   @MainActor
@@ -953,7 +1232,7 @@ final class OnboardingFeatureTests: XCTestCase {
     let store = onboardingFeatureStore { $0.step = .installSysExt_allow }
     store.deps.filterExtension.state = { .installedAndRunning } // <-- installed
     await store.send(.webview(.secondaryBtnClicked))
-    await store.receive(.setStep(.installSysExt_success)) // <-- goes to success
+    await store.receive(.setStep(.installSysExt_success_configPivot)) // <-- goes to success
   }
 
   // for most users, we will move them along automatically to
@@ -966,7 +1245,7 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.filterExtension.state = filterState.fn
 
     await store.send(.webview(.primaryBtnClicked))
-    await store.receive(.setStep(.installSysExt_success))
+    await store.receive(.setStep(.installSysExt_success_configPivot))
     await expect(filterState.calls.count).toEqual(1)
   }
 
@@ -1003,8 +1282,8 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.filterExtension.state = filterState.fn
 
     await store.send(.webview(.primaryBtnClicked))
-    await store.receive(.setStep(.installSysExt_success)) {
-      $0.step = .installSysExt_success
+    await store.receive(.setStep(.installSysExt_success_configPivot)) {
+      $0.step = .installSysExt_success_configPivot
     }
   }
 
@@ -1017,8 +1296,8 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.filterExtension.start = filterStart.fn
 
     await store.send(.webview(.primaryBtnClicked))
-    await store.receive(.setStep(.installSysExt_success)) {
-      $0.step = .installSysExt_success
+    await store.receive(.setStep(.installSysExt_success_configPivot)) {
+      $0.step = .installSysExt_success_configPivot
     }
 
     await expect(filterStart.calls.count).toEqual(1)
@@ -1050,8 +1329,11 @@ final class OnboardingFeatureTests: XCTestCase {
   func testSkipAllowKeyloggingSysExtAlreadyInstalled() async {
     let store = onboardingFeatureStore { $0.step = .allowKeylogging_required }
     store.deps.filterExtension.state = { .installedAndRunning }
+    store.deps.api.getOnboardingConfig = {
+      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
+    }
     await store.send(.webview(.secondaryBtnClicked))
-    await store.receive(.setStep(.exemptUsers))
+    await store.receive(.setStep(.optOutOfFiltering))
   }
 
   @MainActor
@@ -1682,6 +1964,9 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.mainQueue = .immediate
     let timedOut = LockIsolated(false)
     store.deps.filterExtension.state = { .notInstalled }
+    store.deps.api.getOnboardingConfig = {
+      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
+    }
 
     // this is janky, but allows me to simulate timeout AFTER they proceeded
     store.deps.filterExtension.installOverridingTimeout = { seconds in
@@ -1702,8 +1987,9 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.receive(.setStep(.installSysExt_failed))
 
     // they click to skip the install from the fail screen
-    await store.send(.webview(.secondaryBtnClicked))
-    await store.receive(.setStep(.exemptUsers))
+    await store.send(.webview(.secondaryBtnClicked)) {
+      $0.step = .optOutOfFiltering
+    }
 
     // and then, the install times out...
     timedOut.setValue(true)
@@ -1711,7 +1997,7 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.skipReceivedActions()
 
     store.assert {
-      $0.step = .exemptUsers // ...and they should NOT be brought back to fail
+      $0.step = .optOutOfFiltering // ...and they should NOT be brought back to fail
     }
   }
 
@@ -1772,8 +2058,15 @@ final class OnboardingFeatureTests: XCTestCase {
 
   @MainActor
   func testScreenTimeConflictShownWhenDetected() async {
+    let group = GetOnboardingConfig.AlwaysBlockedGroup(
+      id: UUID(),
+      name: "Adult content",
+      description: "short",
+      longDescription: "long",
+    )
     let store = onboardingFeatureStore {
       $0.step = .encourageFilterSuspensions
+      $0.alwaysBlocked = .init(groups: [group], preselected: [group.id])
     }
     store.deps.device.screenTimeWebFilterActive = { true }
     let openUrl = spy(on: URL.self, returning: ())
@@ -1789,8 +2082,53 @@ final class OnboardingFeatureTests: XCTestCase {
     ])
 
     await store.send(.webview(.secondaryBtnClicked)) {
-      $0.step = .howToUseGertrude
+      $0.step = .alwaysBlockedGroups
     }
+  }
+
+  @MainActor
+  func testEncourageFilterSuspensionsSkipsAlwaysBlockedWhenNoGroups() async {
+    let store = onboardingFeatureStore {
+      $0.step = .encourageFilterSuspensions
+      $0.alwaysBlocked = .init(groups: [], preselected: [])
+    }
+    store.deps.device.screenTimeWebFilterActive = { false }
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.setStep(.viewHealthCheck))
+  }
+
+  @MainActor
+  func testScreenTimeConflictSecondarySkipsAlwaysBlockedWhenNoGroups() async {
+    let store = onboardingFeatureStore {
+      $0.step = .screenTimeConflict
+      $0.alwaysBlocked = .init(groups: [], preselected: [])
+    }
+    await store.send(.webview(.secondaryBtnClicked)) {
+      $0.step = .viewHealthCheck
+    }
+  }
+
+  @MainActor
+  func testAlwaysBlockedGroupsSelectedAdvancesAndFiresApi() async {
+    let id = UUID()
+    let store = onboardingFeatureStore { $0.step = .alwaysBlockedGroups }
+    let selectAlwaysBlockedGroups = spy(on: [UUID].self, returning: ())
+    store.deps.api.selectAlwaysBlockedGroups = selectAlwaysBlockedGroups.fn
+    await store.send(.webview(.alwaysBlockedGroupsSelected(ids: [id]))) {
+      $0.step = .viewHealthCheck
+    }
+    await expect(selectAlwaysBlockedGroups.calls).toEqual([[id]])
+  }
+
+  @MainActor
+  func testAlwaysBlockedGroupsEmptySelectionStillFiresApi() async {
+    let store = onboardingFeatureStore { $0.step = .alwaysBlockedGroups }
+    let selectAlwaysBlockedGroups = spy(on: [UUID].self, returning: ())
+    store.deps.api.selectAlwaysBlockedGroups = selectAlwaysBlockedGroups.fn
+    await store.send(.webview(.alwaysBlockedGroupsSelected(ids: []))) {
+      $0.step = .viewHealthCheck
+    }
+    await expect(selectAlwaysBlockedGroups.calls).toEqual([[]])
   }
 
   @MainActor
@@ -1827,7 +2165,7 @@ final class OnboardingFeatureTests: XCTestCase {
     await store.skipReceivedActions()
 
     store.assert {
-      $0.onboarding.step = .exemptUsers
+      $0.onboarding.step = .optOutOfFiltering
     }
   }
 

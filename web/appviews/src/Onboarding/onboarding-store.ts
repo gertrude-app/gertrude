@@ -34,16 +34,22 @@ export type OnboardingStep =
   | 'installSysExt_trick'
   | 'installSysExt_allow'
   | 'installSysExt_failed'
-  | 'installSysExt_success'
+  | 'installSysExt_success_configPivot'
+  | 'optOutOfFiltering'
+  | 'configureDowntime'
   | 'appKeySelection_intro'
   | 'appKeySelection_blockApps'
   | 'appKeySelection_allowInternet'
+  | 'aboutPermittingWebsites'
+  | 'meetKeychains'
+  | 'selectPublicKeychains'
+  | 'customKeychains'
   | 'exemptUsers'
   | 'locateMenuBarIcon'
-  | 'viewHealthCheck'
   | 'encourageFilterSuspensions'
+  | 'alwaysBlockedGroups'
+  | 'viewHealthCheck'
   | 'screenTimeConflict'
-  | 'howToUseGertrude'
   | 'finish';
 
 export interface MacOSVersion {
@@ -72,6 +78,36 @@ export interface DiscoveredApp {
   category?: string;
 }
 
+export interface PublicKeychain {
+  id: UUID;
+  name: string;
+  description?: string;
+  warning?: string;
+  brandColor?: string;
+}
+
+export interface AlwaysBlockedGroup {
+  id: UUID;
+  name: string;
+  description: string;
+  longDescription: string;
+}
+
+export interface AlwaysBlocked {
+  groups: AlwaysBlockedGroup[];
+  preselected: UUID[];
+}
+
+export interface PlainTime {
+  hour: number;
+  minute: number;
+}
+
+export interface PlainTimeWindow {
+  start: PlainTime;
+  end: PlainTime;
+}
+
 export interface AppState {
   osVersion: {
     name: 'catalina' | 'bigSur' | 'monterey' | 'ventura' | 'sonoma' | 'sequoia' | 'tahoe';
@@ -89,6 +125,10 @@ export interface AppState {
   exemptableUserIds: number[];
   exemptUserIds: number[];
   discoveredApps: DiscoveredApp[];
+  publicKeychains: PublicKeychain[];
+  alwaysBlocked: AlwaysBlocked;
+  customKeychainDomains: string[];
+  createCustomKeychainRequest: RequestState;
   createAppKeysRequest: RequestState;
   isUpgrade: boolean;
 }
@@ -102,9 +142,13 @@ export type AppEvent =
       passwordHint?: string;
     }
   | { case: 'blockedAppsSelected'; bundleIds: string[] }
+  | { case: 'publicKeychainsSelected'; ids: UUID[] }
+  | { case: 'alwaysBlockedGroupsSelected'; ids: UUID[] }
   | { case: 'appKeysSelected'; bundleIds: string[] }
   | { case: 'connectChildSubmitted'; code: number }
   | { case: 'infoModalOpened'; step: OnboardingStep; detail?: string }
+  | { case: 'setDowntimeSchedule'; window: PlainTimeWindow }
+  | { case: 'createOnboardingKeychain'; domain: string }
   | { case: 'setUserExemption'; userId: number; enabled: boolean }
   | { case: 'closeWindow' }
   | { case: 'primaryBtnClicked' }
@@ -144,6 +188,10 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
       exemptableUserIds: [],
       exemptUserIds: [],
       discoveredApps: [],
+      publicKeychains: [],
+      alwaysBlocked: { groups: [], preselected: [] },
+      customKeychainDomains: [],
+      createCustomKeychainRequest: { case: `idle` },
       createAppKeysRequest: { case: `idle` },
       connectionCode: ``,
       receivedAppState: false,

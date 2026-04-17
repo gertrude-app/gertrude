@@ -29,7 +29,7 @@ export interface TileTheme {
   inactiveLabel: string;
 }
 
-const AppIcon: React.FC<{
+export const AppIcon: React.FC<{
   app: DiscoveredApp;
   className?: string;
 }> = ({ app, className }) =>
@@ -51,15 +51,17 @@ const AppIcon: React.FC<{
     </div>
   );
 
-export const AppTile: React.FC<{
-  app: DiscoveredApp;
+export const Tile: React.FC<{
+  id: string;
+  name: string;
+  icon: React.ReactNode;
   active: boolean;
   theme: TileTheme;
-  onToggle: (bundleId: string) => void;
-}> = ({ app, active, theme, onToggle }) => (
+  onToggle: (id: string) => void;
+}> = ({ id, name, icon, active, theme, onToggle }) => (
   <button
-    key={app.bundleId}
-    onClick={() => onToggle(app.bundleId)}
+    key={id}
+    onClick={() => onToggle(id)}
     tabIndex={-1}
     className={cx(
       `relative flex flex-row items-start gap-3 p-2.5 rounded-xl transition-all duration-150 cursor-pointer border-2`,
@@ -68,8 +70,13 @@ export const AppTile: React.FC<{
         : `border-slate-200/70 hover:border-slate-300`,
     )}
   >
-    <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
-      <AppIcon app={app} className={active ? theme.activeIconClass : undefined} />
+    <div
+      className={cx(
+        `w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 shadow-sm`,
+        active && theme.activeIconClass,
+      )}
+    >
+      {icon}
     </div>
     <div className="flex flex-col items-start min-w-0 mt-1">
       <span
@@ -78,7 +85,7 @@ export const AppTile: React.FC<{
           active ? theme.activeNameClass : `text-slate-700`,
         )}
       >
-        {app.name}
+        {name}
       </span>
       <span
         className={cx(

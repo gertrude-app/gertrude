@@ -4,8 +4,9 @@ import type { DiscoveredApp } from '../onboarding-store';
 import OnboardingContext from '../OnboardingContext';
 import * as Onboarding from '../UtilityComponents';
 import {
-  AppTile,
+  AppIcon,
   ScrollableAppGrid,
+  Tile,
   type TileTheme,
   useToggleSet,
 } from './AppGridShared';
@@ -65,9 +66,11 @@ const BlockApps: React.FC<Props> = ({ apps, childName }) => {
       </div>
       <ScrollableAppGrid>
         {apps.map((app) => (
-          <AppTile
+          <Tile
             key={app.bundleId}
-            app={app}
+            id={app.bundleId}
+            name={app.name}
+            icon={<AppIcon app={app} />}
             active={blockedIds.has(app.bundleId)}
             theme={theme}
             onToggle={toggle}

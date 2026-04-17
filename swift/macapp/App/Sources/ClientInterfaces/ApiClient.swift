@@ -10,6 +10,14 @@ public struct ApiClient: Sendable {
   public var createOnboardingAppKeys: @Sendable (CreateOnboardingAppKeys.Input) async throws -> Void
   public var createOnboardingBlockedApps: @Sendable (CreateOnboardingBlockedApps.Input)
     async throws -> Void
+  public var createOnboardingKeychain: @Sendable (CreateOnboardingKeychain.Input)
+    async throws -> Bool
+  public var disableFilterForChild: @Sendable () async throws -> Void
+  public var getOnboardingConfig: @Sendable () async throws -> GetOnboardingConfig.Output
+  public var selectAlwaysBlockedGroups: @Sendable (SelectAlwaysBlockedGroups.Input)
+    async throws -> Void
+  public var selectPublicKeychains: @Sendable (SelectPublicKeychains.Input) async throws -> Void
+  public var setDowntimeSchedule: @Sendable (SetDowntimeSchedule.Input) async throws -> Void
   public var createKeystrokeLines: @Sendable (CreateKeystrokeLines.Input) async throws -> Void
   public var createSuspendFilterRequest: @Sendable (CreateSuspendFilterRequest_v2.Input)
     async throws -> UUID
@@ -34,6 +42,14 @@ public struct ApiClient: Sendable {
     async throws -> Void,
     createOnboardingBlockedApps: @escaping @Sendable (CreateOnboardingBlockedApps.Input)
     async throws -> Void,
+    createOnboardingKeychain: @escaping @Sendable (CreateOnboardingKeychain.Input)
+    async throws -> Bool,
+    disableFilterForChild: @escaping @Sendable () async throws -> Void,
+    getOnboardingConfig: @escaping @Sendable () async throws -> GetOnboardingConfig.Output,
+    selectAlwaysBlockedGroups: @escaping @Sendable (SelectAlwaysBlockedGroups.Input)
+    async throws -> Void,
+    selectPublicKeychains: @escaping @Sendable (SelectPublicKeychains.Input) async throws -> Void,
+    setDowntimeSchedule: @escaping @Sendable (SetDowntimeSchedule.Input) async throws -> Void,
     createKeystrokeLines: @escaping @Sendable (CreateKeystrokeLines.Input) async throws -> Void,
     createSuspendFilterRequest: @escaping @Sendable (CreateSuspendFilterRequest_v2.Input)
     async throws -> UUID,
@@ -56,6 +72,12 @@ public struct ApiClient: Sendable {
     self.connectUser = connectUser
     self.createOnboardingAppKeys = createOnboardingAppKeys
     self.createOnboardingBlockedApps = createOnboardingBlockedApps
+    self.createOnboardingKeychain = createOnboardingKeychain
+    self.disableFilterForChild = disableFilterForChild
+    self.getOnboardingConfig = getOnboardingConfig
+    self.selectAlwaysBlockedGroups = selectAlwaysBlockedGroups
+    self.selectPublicKeychains = selectPublicKeychains
+    self.setDowntimeSchedule = setDowntimeSchedule
     self.createKeystrokeLines = createKeystrokeLines
     self.createSuspendFilterRequest = createSuspendFilterRequest
     self.createUnlockRequests = createUnlockRequests
@@ -113,6 +135,12 @@ extension ApiClient: TestDependencyKey {
     connectUser: unimplemented("ApiClient.connectUser"),
     createOnboardingAppKeys: unimplemented("ApiClient.createOnboardingAppKeys"),
     createOnboardingBlockedApps: unimplemented("ApiClient.createOnboardingBlockedApps"),
+    createOnboardingKeychain: unimplemented("ApiClient.createOnboardingKeychain"),
+    disableFilterForChild: unimplemented("ApiClient.disableFilterForChild"),
+    getOnboardingConfig: unimplemented("ApiClient.getOnboardingConfig"),
+    selectAlwaysBlockedGroups: unimplemented("ApiClient.selectAlwaysBlockedGroups"),
+    selectPublicKeychains: unimplemented("ApiClient.selectPublicKeychains"),
+    setDowntimeSchedule: unimplemented("ApiClient.setDowntimeSchedule"),
     createKeystrokeLines: unimplemented("ApiClient.createKeystrokeLines"),
     createSuspendFilterRequest: unimplemented("ApiClient.createSuspendFilterRequest"),
     createUnlockRequests: unimplemented("ApiClient.createUnlockRequests"),
@@ -135,6 +163,15 @@ extension ApiClient: TestDependencyKey {
     connectUser: { _ in throw Error.unexpectedError(statusCode: 888) },
     createOnboardingAppKeys: { _ in },
     createOnboardingBlockedApps: { _ in },
+    createOnboardingKeychain: { _ in true },
+    disableFilterForChild: {},
+    getOnboardingConfig: { .init(
+      publicKeychains: [],
+      alwaysBlocked: .init(groups: [], preselected: []),
+    ) },
+    selectAlwaysBlockedGroups: { _ in },
+    selectPublicKeychains: { _ in },
+    setDowntimeSchedule: { _ in },
     createKeystrokeLines: { _ in },
     createSuspendFilterRequest: { _ in .init() },
     createUnlockRequests: { _ in [] },

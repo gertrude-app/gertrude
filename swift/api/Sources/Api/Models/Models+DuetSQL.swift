@@ -544,6 +544,7 @@ extension Keychain: Model {
     case .warning: .string(self.warning)
     case .isPublic: .bool(self.isPublic)
     case .rootDomain: .string(self.rootDomain)
+    case .brandColor: .string(self.brandColor)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -558,6 +559,7 @@ extension Keychain: Model {
       .warning: .string(self.warning),
       .isPublic: .bool(self.isPublic),
       .rootDomain: .string(self.rootDomain),
+      .brandColor: .string(self.brandColor),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]
@@ -856,6 +858,7 @@ extension AlwaysBlockedGroup: Model {
     case .name: .string(self.name)
     case .description: .string(self.description)
     case .longDescription: .string(self.longDescription)
+    case .recommended: .bool(self.recommended)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -867,6 +870,7 @@ extension AlwaysBlockedGroup: Model {
       .name: .string(self.name),
       .description: .string(self.description),
       .longDescription: .string(self.longDescription),
+      .recommended: .bool(self.recommended),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

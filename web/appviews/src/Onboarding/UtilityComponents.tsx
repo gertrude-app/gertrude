@@ -9,12 +9,17 @@ interface ButtonProps {
   className?: string;
 }
 
-export const PrimaryButton: React.FC<ButtonProps> = ({ children, icon, className }) => {
+export const PrimaryButton: React.FC<ButtonProps & { renderAsSecondary?: boolean }> = ({
+  children,
+  icon,
+  className,
+  renderAsSecondary,
+}) => {
   const { emit } = useContext(OnboardingContext);
   return (
     <Button
       type="button"
-      color="primary"
+      color={renderAsSecondary ? `secondary` : `primary`}
       size="large"
       onClick={() => emit({ case: `primaryBtnClicked` })}
       className={className}

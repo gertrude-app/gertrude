@@ -1,4 +1,5 @@
 import Dependencies
+import Foundation
 import MacAppRoute
 import Vapor
 
@@ -31,6 +32,9 @@ extension AuthedUserRoute: RouteResponder {
     case .checkIn_v2(let input):
       let output = try await CheckIn_v2.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .disableFilterForChild:
+      let output = try await DisableFilterForChild.resolve(in: context)
+      return try await self.respond(with: output)
     case .createSignedScreenshotUpload(let input):
       let output = try await CreateSignedScreenshotUpload.resolve(with: input, in: context)
       return try await self.respond(with: output)
@@ -61,12 +65,50 @@ extension AuthedUserRoute: RouteResponder {
     case .createUnlockRequests_v3(let input):
       let output = try await CreateUnlockRequests_v3.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .getOnboardingConfig:
+      let output = try await GetOnboardingConfig.resolve(in: context)
+      return try await self.respond(with: output)
     case .reportBrowsers(let input):
       let output = try await ReportBrowsers.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .selectAlwaysBlockedGroups(let input):
+      let output = try await SelectAlwaysBlockedGroups.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .selectPublicKeychains(let input):
+      let output = try await SelectPublicKeychains.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .setDowntimeSchedule(let input):
+      let output = try await SetDowntimeSchedule.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .uploadAppIcon(let input):
       let output = try await UploadAppIcon.resolve(with: input, in: context)
       return try await self.respond(with: output)
     }
+  }
+}
+
+extension MacApp.ChildContext {
+  func verifyOnboardingToken(_ pairName: String, _ eventId: String) async throws {
+    @Dependency(\.date.now) var now
+    let tokenAge = now.timeIntervalSince(self.token.createdAt)
+    guard tokenAge > .minutes(90) else { return }
+    let parent = try await self.child.parent(in: self.db)
+    await get(dependency: \.slack).internal(
+      .info,
+      "Rejected \(pairName) for *\(self.child.name)* (\(parent.adminSiteLink(.slack))), token too old `\(eventId)`",
+    )
+    try await self.db.create(InterestingEvent(
+      eventId: eventId,
+      kind: "event",
+      context: "macapp",
+      computerUserId: self.computerUser().id,
+      parentId: parent.id,
+      detail: "suspicious \(pairName), token age: \(Int(tokenAge))s",
+    ))
+    throw self.error(
+      id: "e-\(eventId)",
+      type: .unauthorized,
+      debugMessage: "token too old for \(pairName)",
+    )
   }
 }

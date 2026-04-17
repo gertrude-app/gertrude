@@ -8,13 +8,18 @@ public enum AuthedUserRoute: PairRoute {
   case createOnboardingAppKeys(CreateOnboardingAppKeys.Input)
   case createOnboardingBlockedApps(CreateOnboardingBlockedApps.Input)
   case createOnboardingKeychain(CreateOnboardingKeychain.Input)
+  case disableFilterForChild
   case createSignedScreenshotUpload(CreateSignedScreenshotUpload.Input)
   case createSignedScreenshotUpload_v2(CreateSignedScreenshotUpload_v2.Input)
   case createSuspendFilterRequest_v2(CreateSuspendFilterRequest_v2.Input)
   case createUnlockRequests_v3(CreateUnlockRequests_v3.Input)
+  case getOnboardingConfig
   case logFilterEvents(LogFilterEvents.Input)
   case logSecurityEvent(LogSecurityEvent.Input)
   case reportBrowsers(ReportBrowsers.Input)
+  case selectAlwaysBlockedGroups(SelectAlwaysBlockedGroups.Input)
+  case selectPublicKeychains(SelectPublicKeychains.Input)
+  case setDowntimeSchedule(SetDowntimeSchedule.Input)
   case uploadAppIcon(UploadAppIcon.Input)
 }
 
@@ -44,6 +49,9 @@ public extension AuthedUserRoute {
       Operation(CreateOnboardingKeychain.self)
       Body(.json(CreateOnboardingKeychain.Input.self))
     }
+    Route(.case(Self.disableFilterForChild)) {
+      Operation(DisableFilterForChild.self)
+    }
     Route(.case(Self.createSignedScreenshotUpload)) {
       Operation(CreateSignedScreenshotUpload.self)
       Body(.json(CreateSignedScreenshotUpload.Input.self))
@@ -60,6 +68,9 @@ public extension AuthedUserRoute {
       Operation(CreateUnlockRequests_v3.self)
       Body(.json(CreateUnlockRequests_v3.Input.self))
     }
+    Route(.case(Self.getOnboardingConfig)) {
+      Operation(GetOnboardingConfig.self)
+    }
     Route(.case(Self.logFilterEvents)) {
       Operation(LogFilterEvents.self)
       Body(.json(LogFilterEvents.Input.self))
@@ -71,6 +82,18 @@ public extension AuthedUserRoute {
     Route(.case(Self.reportBrowsers)) {
       Operation(ReportBrowsers.self)
       Body(.json(ReportBrowsers.Input.self))
+    }
+    Route(.case(Self.selectAlwaysBlockedGroups)) {
+      Operation(SelectAlwaysBlockedGroups.self)
+      Body(.json(SelectAlwaysBlockedGroups.Input.self))
+    }
+    Route(.case(Self.selectPublicKeychains)) {
+      Operation(SelectPublicKeychains.self)
+      Body(.json(SelectPublicKeychains.Input.self))
+    }
+    Route(.case(Self.setDowntimeSchedule)) {
+      Operation(SetDowntimeSchedule.self)
+      Body(.json(SetDowntimeSchedule.Input.self))
     }
     Route(.case(Self.uploadAppIcon)) {
       Operation(UploadAppIcon.self)

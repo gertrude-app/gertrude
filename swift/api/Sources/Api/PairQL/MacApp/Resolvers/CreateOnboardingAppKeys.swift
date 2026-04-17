@@ -1,7 +1,4 @@
-import Dependencies
 import DuetSQL
-import Foundation
-import Gertie
 import MacAppRoute
 
 extension CreateOnboardingAppKeys: Resolver {
@@ -9,15 +6,7 @@ extension CreateOnboardingAppKeys: Resolver {
     with bundleIds: Input,
     in context: MacApp.ChildContext,
   ) async throws -> Output {
-    let now = get(dependency: \.date.now)
-    let tokenAge = now.timeIntervalSince(context.token.createdAt)
-    if tokenAge > 60 * 30 {
-      throw context.error(
-        id: "2d9623fc",
-        type: .unauthorized,
-        debugMessage: "token too old for onboarding key creation",
-      )
-    }
+    try await context.verifyOnboardingToken("CreateOnboardingAppKeys", "2d9623fc")
 
     let browsers = try await Browser.query().all(in: context.db)
     let browserBundleIds = Set(browsers.map(\.match).compactMap(\.bundleId))

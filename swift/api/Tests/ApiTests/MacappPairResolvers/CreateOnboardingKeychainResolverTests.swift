@@ -70,9 +70,10 @@ final class CreateOnboardingKeychainResolverTests: ApiTestCase, @unchecked Senda
       .all(in: self.db)
     expect(childKeychains).toHaveCount(1)
 
-    expect(self.sent.websocketMessages).toHaveCount(1)
+    expect(self.sent.websocketMessages).toHaveCount(2)
     expect(self.sent.websocketMessages[0].message).toEqual(.userUpdated)
     expect(self.sent.websocketMessages[0].matcher).toEqual(.user(child.id))
+    expect(self.sent.websocketMessages[1].message).toEqual(.userUpdated)
   }
 
   func testSkipsInvalidKeyTypes() async throws {
@@ -116,9 +117,9 @@ final class CreateOnboardingKeychainResolverTests: ApiTestCase, @unchecked Senda
     expect(keys[0].key).toEqual(Gertie.Key.anySubdomain(domain: "test.com", scope: .webBrowsers))
   }
 
-  func testDoesNotCreateDuplicateKeychainForSameDomain() async throws {
+  func testExistingKeychainNotLinkedToChildGetsLinked() async throws {
     let child = try await self.childWithComputer()
-    try await self.db.create(Keychain(
+    let preexisting = try await self.db.create(Keychain(
       parentId: child.parentId,
       name: "Khan Academy",
       isPublic: false,
@@ -148,10 +149,57 @@ final class CreateOnboardingKeychainResolverTests: ApiTestCase, @unchecked Senda
       .where(.rootDomain == "khanacademy.org")
       .all(in: self.db)
     expect(keychains).toHaveCount(1)
+
+    let childKeychains = try await ChildKeychain.query()
+      .where(.childId == child.id)
+      .where(.keychainId == preexisting.id)
+      .all(in: self.db)
+    expect(childKeychains).toHaveCount(1)
+
+    expect(self.sent.websocketMessages).toHaveCount(1)
+    expect(self.sent.websocketMessages[0].message).toEqual(.userUpdated)
+  }
+
+  func testExistingKeychainAlreadyLinkedToChildIsNoop() async throws {
+    let child = try await self.childWithComputer()
+    let preexisting = try await self.db.create(Keychain(
+      parentId: child.parentId,
+      name: "Khan Academy",
+      isPublic: false,
+      rootDomain: "khanacademy.org",
+    ))
+    try await self.db.create(ChildKeychain(
+      childId: child.id,
+      keychainId: preexisting.id,
+    ))
+
+    try await withDependencies {
+      $0.db = self.db
+      $0.env = .testValue
+      $0.logger = .null
+      $0.keychainCrawler.validateDomain = { _ in true }
+      $0.keychainCrawler.analyze = { _ in
+        XCTFail("analyze should not be called for duplicate domain")
+        throw CancellationError()
+      }
+      $0.websockets.sendEvent = { self.sent.websocketMessages.append($0) }
+    } operation: {
+      let output = try await CreateOnboardingKeychain.resolve(
+        with: "khanacademy.org",
+        in: child.context,
+      )
+      expect(output).toEqual(.success)
+    }
+
+    let childKeychains = try await ChildKeychain.query()
+      .where(.childId == child.id)
+      .where(.keychainId == preexisting.id)
+      .all(in: self.db)
+    expect(childKeychains).toHaveCount(1)
     expect(self.sent.websocketMessages).toHaveCount(0)
   }
 
-  func testCrawlerFailureDoesNotCrash() async throws {
+  func testCrawlerFailureCreatesFallbackKeychainWithRootDomainKey() async throws {
     let child = try await self.childWithComputer()
 
     try await withDependencies {
@@ -171,8 +219,27 @@ final class CreateOnboardingKeychainResolverTests: ApiTestCase, @unchecked Senda
 
     let keychains = try await Keychain.query()
       .where(.parentId == child.parentId)
+      .where(.rootDomain == "example.com")
       .all(in: self.db)
-    expect(keychains.filter { $0.name != "\(child.name)'s Keychain" }).toHaveCount(0)
-    expect(self.sent.websocketMessages).toHaveCount(0)
+    expect(keychains).toHaveCount(1)
+    let fallback = try XCTUnwrap(keychains.first)
+    expect(fallback.name).toEqual("example.com")
+    expect(fallback.isPublic).toEqual(false)
+
+    let keys = try await Api.Key.query()
+      .where(.keychainId == fallback.id)
+      .all(in: self.db)
+    expect(keys).toHaveCount(1)
+    expect(keys[0].key)
+      .toEqual(.anySubdomain(domain: .init("example.com")!, scope: .webBrowsers))
+
+    let childKeychains = try await ChildKeychain.query()
+      .where(.childId == child.id)
+      .where(.keychainId == fallback.id)
+      .all(in: self.db)
+    expect(childKeychains).toHaveCount(1)
+
+    expect(self.sent.websocketMessages).toHaveCount(1)
+    expect(self.sent.websocketMessages[0].message).toEqual(.userUpdated)
   }
 }

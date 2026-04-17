@@ -121,27 +121,29 @@ class FilterMigratorTests: XCTestCase {
   }
 }
 
-extension Persistent.State: Mocked {
-  public static var mock: Self {
-    .init(
-      userKeychains: [502: [.init(id: .deadbeef, schedule: nil, keys: [.mock])]],
-      appIdManifest: .empty,
-      exemptUsers: [501],
+#if DEBUG
+  extension Persistent.State: @retroactive Mocked {
+    public static var mock: Self {
+      .init(
+        userKeychains: [502: [.init(id: .deadbeef, schedule: nil, keys: [.mock])]],
+        appIdManifest: .empty,
+        exemptUsers: [501],
+      )
+    }
+
+    public static var empty: Self {
+      .init(userKeychains: [:], appIdManifest: .empty, exemptUsers: [])
+    }
+  }
+
+  extension RuleKey {
+    static let mock = RuleKey(
+      id: .init(),
+      key: .skeleton(scope: .bundleId("com.whitelisted.widget")),
     )
   }
 
-  public static var empty: Self {
-    .init(userKeychains: [:], appIdManifest: .empty, exemptUsers: [])
+  extension RuleKeychain {
+    static let mock = RuleKeychain(id: .init(), keys: [.mock])
   }
-}
-
-extension RuleKey {
-  static let mock = RuleKey(
-    id: .init(),
-    key: .skeleton(scope: .bundleId("com.whitelisted.widget")),
-  )
-}
-
-extension RuleKeychain {
-  static let mock = RuleKeychain(id: .init(), keys: [.mock])
-}
+#endif

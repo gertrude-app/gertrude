@@ -1,4 +1,6 @@
 import DuetSQL
+import Gertie
+import PairQL
 import XCTest
 import XExpect
 
@@ -156,6 +158,51 @@ final class ChildResolversTests: ApiTestCase, @unchecked Sendable {
       threw = true
     }
     expect(threw).toEqual(true)
+  }
+
+  func testRejectsInvalidDowntimeWindow() async throws {
+    let parent = try await self.parent()
+    let invalid: [PlainTimeWindow] = [
+      .init(start: .init(hour: 24, minute: 0), end: .init(hour: 7, minute: 0)),
+      .init(start: .init(hour: 21, minute: 0), end: .init(hour: 7, minute: 60)),
+      .init(start: .init(hour: 9, minute: 0), end: .init(hour: 9, minute: 0)),
+    ]
+    for window in invalid {
+      do {
+        _ = try await SaveUser.resolve(
+          with: .mock(with: { $0.downtime = window }),
+          in: parent.context,
+        )
+        XCTFail("expected error to be thrown for \(window)")
+      } catch let error as PqlError {
+        expect(error.type).toEqual(.badRequest)
+      }
+    }
+  }
+
+  func testRejectsInvalidKeychainScheduleWindow() async throws {
+    let child = try await self.child()
+    var keychain = Keychain.random
+    keychain.parentId = child.parent.id
+    try await self.db.create(keychain)
+
+    let input = SaveUser.Input(
+      from: child,
+      keychains: [.init(
+        id: keychain.id,
+        schedule: .init(
+          mode: .active,
+          days: .all,
+          window: .init(start: .init(hour: 25, minute: 0), end: .init(hour: 8, minute: 0)),
+        ),
+      )],
+    )
+    do {
+      _ = try await SaveUser.resolve(with: input, in: child.parent.context)
+      XCTFail("expected error to be thrown")
+    } catch let error as PqlError {
+      expect(error.type).toEqual(.badRequest)
+    }
   }
 
   func testSetsNewKeychainsFromEmpty() async throws {
