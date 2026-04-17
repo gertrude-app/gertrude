@@ -34,6 +34,9 @@ extension NtfyClient: DependencyKey {
       }
       if let click {
         request.setValue(click, forHTTPHeaderField: "Click")
+        if let actions = Self.actionsHeader(click: click) {
+          request.setValue(actions, forHTTPHeaderField: "Actions")
+        }
       }
       request.httpBody = message.data(using: .utf8)
 
@@ -66,6 +69,11 @@ extension NtfyClient {
   private static let topicAlphabet = Array(
     "23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ",
   )
+
+  static func actionsHeader(click: String?) -> String? {
+    guard let click, !click.isEmpty else { return nil }
+    return "view, Open, \(click)"
+  }
 
   static func generateTopic(randomLength: Int = 10) -> String {
     let random = String((0 ..< randomLength).map { _ in self.topicAlphabet.randomElement()! })
