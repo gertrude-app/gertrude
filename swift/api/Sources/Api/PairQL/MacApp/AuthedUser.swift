@@ -91,7 +91,7 @@ extension MacApp.ChildContext {
   func verifyOnboardingToken(_ pairName: String, _ eventId: String) async throws {
     @Dependency(\.date.now) var now
     let tokenAge = now.timeIntervalSince(self.token.createdAt)
-    guard tokenAge > .minutes(90) else { return }
+    guard tokenAge > .hours(24) else { return }
     let parent = try await self.child.parent(in: self.db)
     await get(dependency: \.slack).internal(
       .info,

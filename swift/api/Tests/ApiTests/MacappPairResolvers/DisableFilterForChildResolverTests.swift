@@ -62,7 +62,7 @@ final class DisableFilterForChildResolverTests: ApiTestCase, @unchecked Sendable
       $0.filteringDisabled = false
     }).withDevice()
 
-    let tooOld = child.token.createdAt.addingTimeInterval(91 * 60)
+    let tooOld = child.token.createdAt.addingTimeInterval(25 * 60 * 60)
     do {
       try await withDependencies {
         $0.date = .constant(tooOld)

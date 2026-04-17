@@ -122,7 +122,7 @@ final class SelectAlwaysBlockedGroupsResolverTests: ApiTestCase, @unchecked Send
       longDescription: "x",
     ))
 
-    let tooOld = child.token.createdAt.addingTimeInterval(91 * 60)
+    let tooOld = child.token.createdAt.addingTimeInterval(25 * 60 * 60)
     do {
       try await withDependencies {
         $0.date = .constant(tooOld)
