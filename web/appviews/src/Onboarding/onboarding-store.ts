@@ -51,7 +51,13 @@ export interface MacOSVersion {
   major: number;
 }
 
-export type UserRemediationStep = 'create' | 'switch' | 'demote' | 'choose';
+export type UserRemediationStep =
+  | 'create'
+  | 'switch'
+  | 'demote'
+  | 'choose'
+  | 'createForm'
+  | 'createSuccess';
 
 export interface MacOSUser {
   id: number;
@@ -74,6 +80,9 @@ export interface AppState {
   windowOpen: boolean;
   step: OnboardingStep;
   userRemediationStep?: UserRemediationStep;
+  logoutConfirmVisible: boolean;
+  createUserRequest: RequestState;
+  createdChildUser?: { fullName: string; username: string };
   currentUser?: MacOSUser;
   connectChildRequest: RequestState<string>;
   users: MacOSUser[];
@@ -85,6 +94,13 @@ export interface AppState {
 }
 
 export type AppEvent =
+  | {
+      case: 'createUserSubmitted';
+      fullName: string;
+      username: string;
+      password: string;
+      passwordHint?: string;
+    }
   | { case: 'blockedAppsSelected'; bundleIds: string[] }
   | { case: 'appKeysSelected'; bundleIds: string[] }
   | { case: 'connectChildSubmitted'; code: number }
@@ -95,7 +111,12 @@ export type AppEvent =
   | { case: 'secondaryBtnClicked' }
   | { case: 'chooseSwitchToNonAdminUserClicked' }
   | { case: 'chooseCreateNonAdminClicked' }
-  | { case: 'chooseDemoteAdminClicked' };
+  | { case: 'chooseDemoteAdminClicked' }
+  | { case: 'logoutConfirmClicked' }
+  | { case: 'logoutConfirmCanceled' }
+  | { case: 'createUserCanceled' }
+  | { case: 'postCreateLogoutClicked' }
+  | { case: 'postCreateSkipClicked' };
 // end codegen
 
 export type ViewState = {
@@ -115,8 +136,10 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
       windowOpen: false,
       osVersion: { name: `sequoia`, major: 15 },
       step: `welcome`,
+      logoutConfirmVisible: false,
+      createUserRequest: { case: `idle` },
       connectChildRequest: { case: `idle` },
-      currentUser: { id: 502, name: ``, isAdmin: false },
+      currentUser: undefined,
       users: [],
       exemptableUserIds: [],
       exemptUserIds: [],

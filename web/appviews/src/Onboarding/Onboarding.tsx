@@ -18,6 +18,9 @@ export const Onboarding: React.FC<Props> = ({
   connectChildRequest,
   currentUser,
   userRemediationStep,
+  logoutConfirmVisible,
+  createUserRequest,
+  createdChildUser,
   users,
   receivedAppState,
   didResume,
@@ -64,6 +67,9 @@ export const Onboarding: React.FC<Props> = ({
               current={currentUser}
               users={users}
               remediationStep={userRemediationStep}
+              logoutConfirmVisible={logoutConfirmVisible}
+              createUserRequest={createUserRequest}
+              createdChildUser={createdChildUser}
             />
           }
           confetti={didResume && currentUser?.isAdmin === false}

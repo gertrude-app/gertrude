@@ -1,4 +1,10 @@
 import { Onboarding } from '@macos/appviews';
+import {
+  CreateUserForm,
+  LogoutConfirmModal,
+  PostCreateConfirm,
+} from '@macos/appviews/src/Onboarding/Steps/MacosUserAccountType';
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { appWindow, props } from '../story-helpers';
 
@@ -80,6 +86,8 @@ export const Welcome: Story = props({
   screenRecordingPermissionGranted: false,
   keyloggingPermissionGranted: false,
   currentUser: { id: 502, name: `Suzy`, isAdmin: false },
+  logoutConfirmVisible: false,
+  createUserRequest: { case: `idle` },
   users: [
     { id: 503, name: `Little Jimmy`, isAdmin: false },
     { id: 501, name: `Bob McParent`, isAdmin: true },
@@ -113,50 +121,90 @@ export const NoGertrudeAcct: Story = props({
   step: `noGertrudeAccount`,
 });
 
-export const MacUserGood: Story = props({
-  ...Welcome.args,
-  step: `macosUserAccountType`,
-});
-
-export const MacUserGood2: Story = props({
-  ...Welcome.args,
-  step: `macosUserAccountType`,
-  users: [
-    { id: 501, name: `Bob McParent`, isAdmin: true },
-    { id: 504, name: `Betsy`, isAdmin: true },
-  ],
-});
-
-export const MacUserBad: Story = props({
+export const MacUserAdminWarn: Story = props({
   ...Welcome.args,
   step: `macosUserAccountType`,
   currentUser: { id: 501, name: `Bob McParent`, isAdmin: true },
   users: [{ id: 501, name: `Bob McParent`, isAdmin: true }],
 });
 
-export const MacUserChoose: Story = props({
-  ...MacUserBad.args,
+export const MacUserAdminChoose: Story = props({
+  ...MacUserAdminWarn.args,
   userRemediationStep: `choose`,
   users: [
     { id: 501, name: `Bob McParent`, isAdmin: true },
     { id: 502, name: `Sally McMom`, isAdmin: true },
-    { id: 502, name: `Little Jimmy`, isAdmin: false },
+    { id: 503, name: `Little Jimmy`, isAdmin: false },
   ],
 });
 
-export const MacUserTutorialCreate: Story = props({
-  ...MacUserBad.args,
-  userRemediationStep: `create`,
+export const MacUserAdminChooseNoDemote: Story = props({
+  ...MacUserAdminWarn.args,
+  userRemediationStep: `choose`,
+  users: [
+    { id: 501, name: `Bob McParent`, isAdmin: true },
+    { id: 503, name: `Little Jimmy`, isAdmin: false },
+  ],
 });
 
-export const MacUserTutorialSwitch: Story = props({
-  ...MacUserBad.args,
+export const MacUserAdminChooseNoSwitch: Story = props({
+  ...MacUserAdminWarn.args,
+  userRemediationStep: `choose`,
+  users: [
+    { id: 501, name: `Bob McParent`, isAdmin: true },
+    { id: 502, name: `Sally McMom`, isAdmin: true },
+  ],
+});
+
+export const MacUserSwitchFallbackTutorial: Story = props({
+  ...MacUserAdminWarn.args,
   userRemediationStep: `switch`,
 });
 
-export const MacUserTutorialDemote: Story = props({
-  ...MacUserBad.args,
+export const MacUserDemoteInstructions: Story = props({
+  ...MacUserAdminWarn.args,
   userRemediationStep: `demote`,
+});
+
+export const MacUserCreateFallbackTutorial: Story = props({
+  ...MacUserAdminWarn.args,
+  userRemediationStep: `create`,
+});
+
+export const MacUserLogoutConfirm: Story = {
+  ...props(Welcome.args!),
+  render: () => (
+    <div className="fixed inset-0 bg-slate-50">
+      <LogoutConfirmModal currentUserName="Bob McParent" />
+    </div>
+  ),
+};
+
+export const MacUserCreateForm: Story = {
+  ...props(Welcome.args!),
+  render: () => (
+    <div className="fixed inset-0 bg-slate-50">
+      <CreateUserForm />
+    </div>
+  ),
+};
+
+export const MacUserCreateSuccess: Story = {
+  ...props(Welcome.args!),
+  render: () => (
+    <div className="fixed inset-0 bg-slate-50">
+      <PostCreateConfirm
+        childName="Little Jimmy"
+        username="littlejimmy"
+        currentUserName="Bob McParent"
+      />
+    </div>
+  ),
+};
+
+export const MacUserHappyPath: Story = props({
+  ...Welcome.args,
+  step: `macosUserAccountType`,
 });
 
 export const GetConnectionCode: Story = props({

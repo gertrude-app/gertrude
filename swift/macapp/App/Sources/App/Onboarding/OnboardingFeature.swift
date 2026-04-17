@@ -17,12 +17,22 @@ struct OnboardingFeature: Feature {
         case `switch`
         case demote
         case choose
+        case createForm
+        case createSuccess
       }
+    }
+
+    struct CreatedChildUser: Equatable, Encodable, Sendable {
+      var fullName: String
+      var username: String
     }
 
     var windowOpen = false
     var step: Step = .welcome
     var userRemediationStep: MacUser.RemediationStep?
+    var logoutConfirmVisible = false
+    var createUserRequest: RequestState<String> = .idle
+    var createdChildUser: CreatedChildUser?
     var currentUser: MacUser?
     var connectChildRequest: PayloadRequestState<String, String> = .idle
     var users: [MacUser] = []
@@ -47,6 +57,17 @@ struct OnboardingFeature: Feature {
       case chooseSwitchToNonAdminUserClicked
       case chooseCreateNonAdminClicked
       case chooseDemoteAdminClicked
+      case logoutConfirmClicked
+      case logoutConfirmCanceled
+      case createUserSubmitted(
+        fullName: String,
+        username: String,
+        password: String,
+        passwordHint: String?,
+      )
+      case createUserCanceled
+      case postCreateLogoutClicked
+      case postCreateSkipClicked
       case blockedAppsSelected(bundleIds: [String])
       case appKeysSelected(bundleIds: [String])
       case connectChildSubmitted(code: Int)
@@ -70,6 +91,9 @@ struct OnboardingFeature: Feature {
     case createOnboardingBlockedAppsCompleted(success: Bool)
     case createOnboardingAppKeysCompleted(success: Bool)
     case setStep(State.Step)
+    case setRemediationStep(State.MacUser.RemediationStep?)
+    case createStandardUserCompleted(TaskResult<State.CreatedChildUser>)
+    case logOutCurrentUserDidNotTakeEffect
     case sysExtInstallTimedOut
     case closeWindow
   }
@@ -213,12 +237,101 @@ struct OnboardingFeature: Feature {
 
       case .webview(.chooseCreateNonAdminClicked):
         log(step, action, "c63bf016")
-        state.userRemediationStep = .create
-        return .none
+        return .exec { send in
+          let hasToken = await self.device.parentHasSecureToken()
+          log("choose create non-admin clicked, parentHasSecureToken=\(hasToken)", "93a7db88")
+          await send(.setRemediationStep(hasToken ? .createForm : .create))
+        }
 
       case .webview(.chooseSwitchToNonAdminUserClicked):
         log(step, action, "68fdb44a")
+        state.logoutConfirmVisible = true
+        return .none
+
+      case .webview(.logoutConfirmCanceled):
+        log(step, action, "029d7596")
+        state.logoutConfirmVisible = false
+        return .none
+
+      case .webview(.logoutConfirmClicked):
+        log("log out now attempted", "990b02de")
+        state.logoutConfirmVisible = false
+        return .exec { send in
+          do {
+            try await self.device.logOutCurrentUser()
+          } catch {
+            unexpectedError(id: "b2e0d6d4", error)
+            await send(.logOutCurrentUserDidNotTakeEffect)
+            return
+          }
+          try? await self.mainQueue.sleep(for: .seconds(5))
+          await send(.logOutCurrentUserDidNotTakeEffect)
+        }
+
+      case .logOutCurrentUserDidNotTakeEffect:
+        unexpectedError(id: "bff23317")
         state.userRemediationStep = .switch
+        return .none
+
+      case .webview(.createUserCanceled):
+        log(step, action, "d9f7500b")
+        state.userRemediationStep = .choose
+        state.createUserRequest = .idle
+        return .none
+
+      case .webview(.createUserSubmitted(let fullName, let username, let password, let hint)):
+        log("create user submitted, username=\(username)", "7cf8c5cb")
+        state.createUserRequest = .ongoing
+        return .exec { send in
+          await send(.createStandardUserCompleted(TaskResult {
+            try await self.device.createStandardUser(username, fullName, password, hint)
+            return .init(fullName: fullName, username: username)
+          }))
+        }
+
+      case .createStandardUserCompleted(.success(let user)):
+        log("create standard user completed", "b189b03a")
+        state.createdChildUser = user
+        state.createUserRequest = .succeeded
+        state.userRemediationStep = .createSuccess
+        return .none
+
+      case .createStandardUserCompleted(.failure(let error)):
+        let message: String
+        switch error as? CreateStandardUserError {
+        case .cancelledByAdminAuth:
+          log("create macos user cancelled", "cf4254a7")
+          message = "You cancelled the macOS admin password prompt. Try again to continue."
+        case .alreadyExists:
+          log("create macos user failed, name exists", "a79a5c0c")
+          message = "A user with that account name already exists. Pick a different name."
+        case .parentMissingSecureToken:
+          log("create macos user failed, missing token", "dd5db7a0")
+          message = "Your macOS user can’t create new accounts. We’ll show you another way."
+          state.userRemediationStep = .create
+        case .unknownFailure(let stderr):
+          unexpectedError(id: "ad693f7c", detail: "create macos user err: \(stderr)")
+          message = "Something went wrong creating the account. Please try again."
+        case .none:
+          unexpectedError(id: "60a8b504", error)
+          message = "Something went wrong creating the account. Please try again."
+        }
+        state.createUserRequest = .failed(error: message)
+        return .none
+
+      case .webview(.postCreateLogoutClicked):
+        log(step, action, "a1eafb0a")
+        state.logoutConfirmVisible = true
+        return .none
+
+      case .webview(.postCreateSkipClicked):
+        log(step, action, "024e9794")
+        state.userRemediationStep = nil
+        state.step = .getChildConnectionCode
+        return .none
+
+      case .setRemediationStep(let rem):
+        state.userRemediationStep = rem
         return .none
 
       case .webview(.primaryBtnClicked) where step == .getChildConnectionCode:

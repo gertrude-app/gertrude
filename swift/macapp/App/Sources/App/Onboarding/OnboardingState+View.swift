@@ -13,6 +13,9 @@ extension OnboardingFeature.State {
     var windowOpen: Bool
     var step: Step
     var userRemediationStep: MacUser.RemediationStep?
+    var logoutConfirmVisible: Bool
+    var createUserRequest: RequestState<String>
+    var createdChildUser: CreatedChildUser?
     var currentUser: MacUser?
     var connectChildRequest: PayloadRequestState<String, String>
     var users: [MacUser]
@@ -29,6 +32,9 @@ extension OnboardingFeature.State {
       self.windowOpen = state.onboarding.windowOpen
       self.step = state.onboarding.step
       self.userRemediationStep = state.onboarding.userRemediationStep
+      self.logoutConfirmVisible = state.onboarding.logoutConfirmVisible
+      self.createUserRequest = state.onboarding.createUserRequest
+      self.createdChildUser = state.onboarding.createdChildUser
       self.currentUser = state.onboarding.currentUser
       self.connectChildRequest = state.onboarding.connectChildRequest
       self.users = state.onboarding.users
