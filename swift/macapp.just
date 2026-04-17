@@ -82,6 +82,25 @@ vm os="tahoe":
   echo ""
   tart run --dir=build:"$APP_DIR" "$VM"
 
+# make changes to vm base images that persist for future clones
+vm-edit os="tahoe":
+  #!/usr/bin/env bash
+  set -euo pipefail
+  if [ "{{os}}" = "sequoia" ]; then IMAGE="gertrude-base"
+  elif [ "{{os}}" = "tahoe" ]; then IMAGE="gertrude-tahoe"
+  elif [ "{{os}}" = "sonoma" ]; then IMAGE="gertrude-sonoma"
+  elif [ "{{os}}" = "ventura" ]; then IMAGE="gertrude-ventura"
+  else echo "✗ unknown os: {{os}} (expected sequoia, tahoe, sonoma, or ventura)" >&2; exit 1
+  fi
+  if ! tart list 2>/dev/null | grep -q "$IMAGE"; then
+    echo "✗ $IMAGE does not exist" >&2; exit 1
+  fi
+  echo "→ editing golden image $IMAGE (changes persist)"
+  echo "  shut down cleanly from inside the VM (Apple menu → Shut Down)"
+  echo "  don't close the tart window or ctrl-c — that can corrupt the image"
+  echo ""
+  tart run "$IMAGE"
+
 # helpers
 
 [private]
