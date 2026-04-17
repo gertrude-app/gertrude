@@ -70,299 +70,6 @@ const STUB_APPS = [
   ...BASE_APPS.map((a) => ({ ...a, bundleId: `${a.bundleId}.3`, name: `${a.name} 3` })),
 ];
 
-const meta = {
-  title: 'MacOS App/Onboarding', // eslint-disable-line
-  component: Onboarding,
-  ...appWindow(900, 700),
-} satisfies Meta<typeof Onboarding>;
-
-type Story = StoryObj<typeof meta>;
-
-export const Welcome: Story = props({
-  windowOpen: true,
-  osVersion: { name: `tahoe`, major: 26 },
-  step: `welcome`,
-  connectChildRequest: { case: `idle` },
-  screenRecordingPermissionGranted: false,
-  keyloggingPermissionGranted: false,
-  currentUser: { id: 502, name: `Suzy`, isAdmin: false },
-  logoutConfirmVisible: false,
-  createUserRequest: { case: `idle` },
-  users: [
-    { id: 503, name: `Little Jimmy`, isAdmin: false },
-    { id: 501, name: `Bob McParent`, isAdmin: true },
-    { id: 502, name: `Suzy`, isAdmin: false },
-  ],
-  exemptableUserIds: [501, 503],
-  exemptUserIds: [501],
-  connectionCode: ``,
-  didResume: false,
-  receivedAppState: true,
-  isUpgrade: false,
-  discoveredApps: [],
-  publicKeychains: [],
-  alwaysBlocked: { groups: [], preselected: [] },
-  customKeychainDomains: [],
-  createCustomKeychainRequest: { case: `idle` },
-  blockedBundleIds: [],
-  createAppKeysRequest: { case: `idle` },
-  emit: () => {},
-  dispatch: () => {},
-});
-
-export const WrongInstallDir: Story = props({
-  ...Welcome.args,
-  step: `wrongInstallDir`,
-});
-
-export const ConfirmGertrudeAcct: Story = props({
-  ...Welcome.args,
-  step: `confirmGertrudeAccount`,
-});
-
-export const NoGertrudeAcct: Story = props({
-  ...Welcome.args,
-  step: `noGertrudeAccount`,
-});
-
-export const MacUserAdminWarn: Story = props({
-  ...Welcome.args,
-  step: `macosUserAccountType`,
-  currentUser: { id: 501, name: `Bob McParent`, isAdmin: true },
-  users: [{ id: 501, name: `Bob McParent`, isAdmin: true }],
-});
-
-export const MacUserAdminChoose: Story = props({
-  ...MacUserAdminWarn.args,
-  userRemediationStep: `choose`,
-  users: [
-    { id: 501, name: `Bob McParent`, isAdmin: true },
-    { id: 502, name: `Sally McMom`, isAdmin: true },
-    { id: 503, name: `Little Jimmy`, isAdmin: false },
-  ],
-});
-
-export const MacUserAdminChooseNoDemote: Story = props({
-  ...MacUserAdminWarn.args,
-  userRemediationStep: `choose`,
-  users: [
-    { id: 501, name: `Bob McParent`, isAdmin: true },
-    { id: 503, name: `Little Jimmy`, isAdmin: false },
-  ],
-});
-
-export const MacUserAdminChooseNoSwitch: Story = props({
-  ...MacUserAdminWarn.args,
-  userRemediationStep: `choose`,
-  users: [
-    { id: 501, name: `Bob McParent`, isAdmin: true },
-    { id: 502, name: `Sally McMom`, isAdmin: true },
-  ],
-});
-
-export const MacUserSwitchFallbackTutorial: Story = props({
-  ...MacUserAdminWarn.args,
-  userRemediationStep: `switch`,
-});
-
-export const MacUserDemoteInstructions: Story = props({
-  ...MacUserAdminWarn.args,
-  userRemediationStep: `demote`,
-});
-
-export const MacUserCreateFallbackTutorial: Story = props({
-  ...MacUserAdminWarn.args,
-  userRemediationStep: `create`,
-});
-
-export const MacUserLogoutConfirm: Story = {
-  ...props(Welcome.args!),
-  render: () => (
-    <div className="fixed inset-0 bg-slate-50">
-      <LogoutConfirmModal currentUserName="Bob McParent" />
-    </div>
-  ),
-};
-
-export const MacUserCreateForm: Story = {
-  ...props(Welcome.args!),
-  render: () => (
-    <div className="fixed inset-0 bg-slate-50">
-      <CreateUserForm />
-    </div>
-  ),
-};
-
-export const MacUserCreateSuccess: Story = {
-  ...props(Welcome.args!),
-  render: () => (
-    <div className="fixed inset-0 bg-slate-50">
-      <PostCreateConfirm
-        childName="Little Jimmy"
-        username="littlejimmy"
-        currentUserName="Bob McParent"
-      />
-    </div>
-  ),
-};
-
-export const MacUserHappyPath: Story = props({
-  ...Welcome.args,
-  step: `macosUserAccountType`,
-});
-
-export const GetConnectionCode: Story = props({
-  ...Welcome.args,
-  step: `getChildConnectionCode`,
-});
-
-export const ConnectChildIdle: Story = props({
-  ...Welcome.args,
-  step: `connectChild`,
-});
-
-export const ConnectChildOngoing: Story = props({
-  ...Welcome.args,
-  step: `connectChild`,
-  connectChildRequest: { case: `ongoing` },
-});
-
-export const ConnectChildFailed: Story = props({
-  ...Welcome.args,
-  step: `connectChild`,
-  connectChildRequest: { case: `failed` },
-});
-
-export const ConnectChildSuccess: Story = props({
-  ...Welcome.args,
-  step: `connectChild`,
-  connectChildRequest: { case: `succeeded`, payload: `Little Jimmy` },
-});
-
-export const HowToUseGifs: Story = props({
-  ...Welcome.args,
-  step: `howToUseGifs`,
-});
-
-export const AllowNotificationsStart: Story = props({
-  ...Welcome.args,
-  step: `allowNotifications_start`,
-});
-
-export const AllowNotificationsGrant: Story = props({
-  ...Welcome.args,
-  step: `allowNotifications_grant`,
-});
-
-export const AllowNotificationsFailed: Story = props({
-  ...Welcome.args,
-  step: `allowNotifications_failed`,
-});
-
-export const AllowDiskAccessGrant: Story = props({
-  ...Welcome.args,
-  step: `allowFullDiskAccess_grantAndRestart`,
-});
-
-export const AllowDiskAccessSuccess: Story = props({
-  ...Welcome.args,
-  step: `allowFullDiskAccess_success`,
-});
-
-export const AllowDiskAccessFailed: Story = props({
-  ...Welcome.args,
-  step: `allowFullDiskAccess_failed`,
-});
-
-export const AllowDiskAccessGrantUpgrade: Story = props({
-  ...Welcome.args,
-  step: `allowFullDiskAccess_grantAndRestart`,
-  isUpgrade: true,
-});
-
-export const AllowDiskAccessSuccessUpgrade: Story = props({
-  ...Welcome.args,
-  step: `allowFullDiskAccess_success`,
-  isUpgrade: true,
-});
-
-export const AllowScreenshotsRequired: Story = props({
-  ...Welcome.args,
-  step: `allowScreenshots_required`,
-});
-
-export const AllowScreenshotsGrant: Story = props({
-  ...Welcome.args,
-  step: `allowScreenshots_grantAndRestart`,
-});
-
-export const AllowScreenshotsSuccess: Story = props({
-  ...Welcome.args,
-  step: `allowScreenshots_success`,
-});
-
-export const AllowScreenshotsFailed: Story = props({
-  ...Welcome.args,
-  step: `allowScreenshots_failed`,
-});
-
-export const AllowKeyloggingRequired: Story = props({
-  ...Welcome.args,
-  step: `allowKeylogging_required`,
-});
-
-export const AllowKeyloggingGrant: Story = props({
-  ...Welcome.args,
-  step: `allowKeylogging_grant`,
-});
-
-export const AllowKeyloggingFailed: Story = props({
-  ...Welcome.args,
-  step: `allowKeylogging_failed`,
-});
-
-export const InstallSysExtExplain: Story = props({
-  ...Welcome.args,
-  step: `installSysExt_explain`,
-});
-
-export const InstallSysExtAllowTrick: Story = props({
-  ...Welcome.args,
-  step: `installSysExt_trick`,
-});
-
-export const InstallSysExtAllowInstall: Story = props({
-  ...Welcome.args,
-  step: `installSysExt_allow`,
-});
-
-export const InstallSysExtFail: Story = props({
-  ...Welcome.args,
-  step: `installSysExt_failed`,
-});
-
-export const PermissionsComplete: Story = props({
-  ...Welcome.args,
-  step: `installSysExt_success_configPivot`,
-});
-
-export const AppKeySelectionIntro: Story = props({
-  ...Welcome.args,
-  step: `appKeySelection_intro`,
-});
-
-export const BlockApps: Story = props({
-  ...Welcome.args,
-  step: `appKeySelection_blockApps`,
-  discoveredApps: STUB_APPS,
-});
-
-export const AllowInternetApps: Story = props({
-  ...Welcome.args,
-  step: `appKeySelection_allowInternet`,
-  discoveredApps: STUB_APPS,
-});
-
 const STUB_PUBLIC_KEYCHAINS = [
   { id: `e05c458e-f52b-492f-af9c-5aff7a77f743`, name: `Aceable Driver's Ed` },
   {
@@ -574,6 +281,341 @@ const STUB_PUBLIC_KEYCHAINS = [
   },
 ];
 
+const ADULT_CONTENT = `5eea4c3e-3910-4ca3-bcac-09af52a2f567`;
+const MESSAGES_GIF = `e8f90637-22d5-4525-abe1-cde1d3cbbd33`;
+const SOCIAL_MEDIA = `a032f240-00a7-467d-a27f-5987c714818a`;
+const SPOTLIGHT_SEARCH = `ce7c5aef-9754-44aa-af3b-e1f8900f0b25`;
+
+const ALWAYS_BLOCKED_GROUPS = [
+  {
+    id: SOCIAL_MEDIA,
+    name: `Social media`,
+    description: `Block the most prominent social media sites.`,
+    longDescription: `not real`,
+  },
+  {
+    id: MESSAGES_GIF,
+    name: `Messages GIF Search`,
+    description: `Block the #images GIF picker in Messages and common GIF providers.`,
+    longDescription: `not real`,
+  },
+  {
+    id: ADULT_CONTENT,
+    name: `Adult content`,
+    description: `Block the most-trafficked adult websites, plus adult-oriented TLDs.`,
+    longDescription: `not real`,
+  },
+  {
+    id: SPOTLIGHT_SEARCH,
+    name: `Spotlight search`,
+    description: `Block web results in macOS Spotlight search.`,
+    longDescription: `not real`,
+  },
+];
+
+const meta = {
+  title: 'MacOS App/Onboarding', // eslint-disable-line
+  component: Onboarding,
+  ...appWindow(900, 700),
+} satisfies Meta<typeof Onboarding>;
+
+type Story = StoryObj<typeof meta>;
+
+export const Welcome: Story = props({
+  windowOpen: true,
+  osVersion: { name: `tahoe`, major: 26 },
+  step: `welcome`,
+  connectChildRequest: { case: `idle` },
+  screenRecordingPermissionGranted: false,
+  keyloggingPermissionGranted: false,
+  currentUser: { id: 502, name: `Suzy`, isAdmin: false },
+  logoutConfirmVisible: false,
+  createUserRequest: { case: `idle` },
+  users: [
+    { id: 503, name: `Little Jimmy`, isAdmin: false },
+    { id: 501, name: `Bob McParent`, isAdmin: true },
+    { id: 502, name: `Suzy`, isAdmin: false },
+  ],
+  exemptableUserIds: [501, 503],
+  exemptUserIds: [501],
+  connectionCode: ``,
+  didResume: false,
+  receivedAppState: true,
+  isUpgrade: false,
+  discoveredApps: [],
+  publicKeychains: [],
+  alwaysBlocked: { groups: [], preselected: [] },
+  customKeychainDomains: [],
+  createCustomKeychainRequest: { case: `idle` },
+  blockedBundleIds: [],
+  createAppKeysRequest: { case: `idle` },
+  emit: () => {},
+  dispatch: () => {},
+});
+
+export const WrongInstallDir: Story = props({
+  ...Welcome.args,
+  step: `wrongInstallDir`,
+});
+
+export const MacUserAdminWarn: Story = props({
+  ...Welcome.args,
+  step: `macosUserAccountType`,
+  currentUser: { id: 501, name: `Bob McParent`, isAdmin: true },
+  users: [{ id: 501, name: `Bob McParent`, isAdmin: true }],
+});
+
+export const MacUserAdminChoose: Story = props({
+  ...MacUserAdminWarn.args,
+  userRemediationStep: `choose`,
+  users: [
+    { id: 501, name: `Bob McParent`, isAdmin: true },
+    { id: 502, name: `Sally McMom`, isAdmin: true },
+    { id: 503, name: `Little Jimmy`, isAdmin: false },
+  ],
+});
+
+export const MacUserAdminChooseNoDemote: Story = props({
+  ...MacUserAdminWarn.args,
+  userRemediationStep: `choose`,
+  users: [
+    { id: 501, name: `Bob McParent`, isAdmin: true },
+    { id: 503, name: `Little Jimmy`, isAdmin: false },
+  ],
+});
+
+export const MacUserAdminChooseNoSwitch: Story = props({
+  ...MacUserAdminWarn.args,
+  userRemediationStep: `choose`,
+  users: [
+    { id: 501, name: `Bob McParent`, isAdmin: true },
+    { id: 502, name: `Sally McMom`, isAdmin: true },
+  ],
+});
+
+export const MacUserSwitchFallbackTutorial: Story = props({
+  ...MacUserAdminWarn.args,
+  userRemediationStep: `switch`,
+});
+
+export const MacUserDemoteInstructions: Story = props({
+  ...MacUserAdminWarn.args,
+  userRemediationStep: `demote`,
+});
+
+export const MacUserCreateFallbackTutorial: Story = props({
+  ...MacUserAdminWarn.args,
+  userRemediationStep: `create`,
+});
+
+export const MacUserLogoutConfirm: Story = {
+  ...props(Welcome.args!),
+  render: () => (
+    <div className="fixed inset-0 bg-slate-50">
+      <LogoutConfirmModal currentUserName="Bob McParent" />
+    </div>
+  ),
+};
+
+export const MacUserCreateForm: Story = {
+  ...props(Welcome.args!),
+  render: () => (
+    <div className="fixed inset-0 bg-slate-50">
+      <CreateUserForm />
+    </div>
+  ),
+};
+
+export const MacUserCreateSuccess: Story = {
+  ...props(Welcome.args!),
+  render: () => (
+    <div className="fixed inset-0 bg-slate-50">
+      <PostCreateConfirm
+        childName="Little Jimmy"
+        username="littlejimmy"
+        currentUserName="Bob McParent"
+      />
+    </div>
+  ),
+};
+
+export const MacUserHappyPath: Story = props({
+  ...Welcome.args,
+  step: `macosUserAccountType`,
+});
+
+export const ConfirmGertrudeAcct: Story = props({
+  ...Welcome.args,
+  step: `confirmGertrudeAccount`,
+});
+
+export const NoGertrudeAcct: Story = props({
+  ...Welcome.args,
+  step: `noGertrudeAccount`,
+});
+
+export const GetConnectionCode: Story = props({
+  ...Welcome.args,
+  step: `getChildConnectionCode`,
+});
+
+export const ConnectChildIdle: Story = props({
+  ...Welcome.args,
+  step: `connectChild`,
+});
+
+export const ConnectChildOngoing: Story = props({
+  ...Welcome.args,
+  step: `connectChild`,
+  connectChildRequest: { case: `ongoing` },
+});
+
+export const ConnectChildFailed: Story = props({
+  ...Welcome.args,
+  step: `connectChild`,
+  connectChildRequest: { case: `failed` },
+});
+
+export const ConnectChildSuccess: Story = props({
+  ...Welcome.args,
+  step: `connectChild`,
+  connectChildRequest: { case: `succeeded`, payload: `Little Jimmy` },
+});
+
+export const HowToUseGifs: Story = props({
+  ...Welcome.args,
+  step: `howToUseGifs`,
+});
+
+export const AllowNotificationsStart: Story = props({
+  ...Welcome.args,
+  step: `allowNotifications_start`,
+});
+
+export const AllowNotificationsGrant: Story = props({
+  ...Welcome.args,
+  step: `allowNotifications_grant`,
+});
+
+export const AllowNotificationsFailed: Story = props({
+  ...Welcome.args,
+  step: `allowNotifications_failed`,
+});
+
+export const AllowDiskAccessGrant: Story = props({
+  ...Welcome.args,
+  step: `allowFullDiskAccess_grantAndRestart`,
+});
+
+export const AllowDiskAccessFailed: Story = props({
+  ...Welcome.args,
+  step: `allowFullDiskAccess_failed`,
+});
+
+export const AllowDiskAccessSuccess: Story = props({
+  ...Welcome.args,
+  step: `allowFullDiskAccess_success`,
+});
+
+export const AllowDiskAccessGrantUpgrade: Story = props({
+  ...Welcome.args,
+  step: `allowFullDiskAccess_grantAndRestart`,
+  isUpgrade: true,
+});
+
+export const AllowDiskAccessSuccessUpgrade: Story = props({
+  ...Welcome.args,
+  step: `allowFullDiskAccess_success`,
+  isUpgrade: true,
+});
+
+export const AllowScreenshotsRequired: Story = props({
+  ...Welcome.args,
+  step: `allowScreenshots_required`,
+});
+
+export const AllowScreenshotsGrant: Story = props({
+  ...Welcome.args,
+  step: `allowScreenshots_grantAndRestart`,
+});
+
+export const AllowScreenshotsFailed: Story = props({
+  ...Welcome.args,
+  step: `allowScreenshots_failed`,
+});
+
+export const AllowScreenshotsSuccess: Story = props({
+  ...Welcome.args,
+  step: `allowScreenshots_success`,
+});
+
+export const AllowKeyloggingRequired: Story = props({
+  ...Welcome.args,
+  step: `allowKeylogging_required`,
+});
+
+export const AllowKeyloggingGrant: Story = props({
+  ...Welcome.args,
+  step: `allowKeylogging_grant`,
+});
+
+export const AllowKeyloggingFailed: Story = props({
+  ...Welcome.args,
+  step: `allowKeylogging_failed`,
+});
+
+export const InstallSysExtExplain: Story = props({
+  ...Welcome.args,
+  step: `installSysExt_explain`,
+});
+
+export const InstallSysExtAllowTrick: Story = props({
+  ...Welcome.args,
+  step: `installSysExt_trick`,
+});
+
+export const InstallSysExtAllowInstall: Story = props({
+  ...Welcome.args,
+  step: `installSysExt_allow`,
+});
+
+export const InstallSysExtFail: Story = props({
+  ...Welcome.args,
+  step: `installSysExt_failed`,
+});
+
+export const PermissionsComplete: Story = props({
+  ...Welcome.args,
+  step: `installSysExt_success_configPivot`,
+});
+
+export const OptOutOfFiltering: Story = props({
+  ...Welcome.args,
+  step: `optOutOfFiltering`,
+});
+
+export const ConfigureDowntime: Story = props({
+  ...Welcome.args,
+  step: `configureDowntime`,
+});
+
+export const AppKeySelectionIntro: Story = props({
+  ...Welcome.args,
+  step: `appKeySelection_intro`,
+});
+
+export const BlockApps: Story = props({
+  ...Welcome.args,
+  step: `appKeySelection_blockApps`,
+  discoveredApps: STUB_APPS,
+});
+
+export const AllowInternetApps: Story = props({
+  ...Welcome.args,
+  step: `appKeySelection_allowInternet`,
+  discoveredApps: STUB_APPS,
+});
+
 export const AboutPermittingWebsites: Story = props({
   ...Welcome.args,
   step: `aboutPermittingWebsites`,
@@ -615,21 +657,6 @@ export const CustomKeychainsFailed: Story = props({
   createCustomKeychainRequest: { case: `failed`, error: `fake.typo` },
 });
 
-export const OptOutOfFiltering: Story = props({
-  ...Welcome.args,
-  step: `optOutOfFiltering`,
-});
-
-export const ConfigureDowntime: Story = props({
-  ...Welcome.args,
-  step: `configureDowntime`,
-});
-
-export const ScreenTimeConflict: Story = props({
-  ...Welcome.args,
-  step: `screenTimeConflict`,
-});
-
 export const ExemptUsers: Story = props({
   ...Welcome.args,
   step: `exemptUsers`,
@@ -640,47 +667,10 @@ export const LocateMenuBarIcon: Story = props({
   step: `locateMenuBarIcon`,
 });
 
-export const ViewHealthCheck: Story = props({
-  ...Welcome.args,
-  step: `viewHealthCheck`,
-});
-
 export const EasyMode: Story = props({
   ...Welcome.args,
   step: `encourageFilterSuspensions`,
 });
-
-const ADULT_CONTENT = `5eea4c3e-3910-4ca3-bcac-09af52a2f567`;
-const MESSAGES_GIF = `e8f90637-22d5-4525-abe1-cde1d3cbbd33`;
-const SOCIAL_MEDIA = `a032f240-00a7-467d-a27f-5987c714818a`;
-const SPOTLIGHT_SEARCH = `ce7c5aef-9754-44aa-af3b-e1f8900f0b25`;
-
-const ALWAYS_BLOCKED_GROUPS = [
-  {
-    id: SOCIAL_MEDIA,
-    name: `Social media`,
-    description: `Block the most prominent social media sites.`,
-    longDescription: `not real`,
-  },
-  {
-    id: MESSAGES_GIF,
-    name: `Messages GIF Search`,
-    description: `Block the #images GIF picker in Messages and common GIF providers.`,
-    longDescription: `not real`,
-  },
-  {
-    id: ADULT_CONTENT,
-    name: `Adult content`,
-    description: `Block the most-trafficked adult websites, plus adult-oriented TLDs.`,
-    longDescription: `not real`,
-  },
-  {
-    id: SPOTLIGHT_SEARCH,
-    name: `Spotlight search`,
-    description: `Block web results in macOS Spotlight search.`,
-    longDescription: `not real`,
-  },
-];
 
 export const AlwaysBlockedGroups: Story = props({
   ...Welcome.args,
@@ -689,6 +679,16 @@ export const AlwaysBlockedGroups: Story = props({
     groups: ALWAYS_BLOCKED_GROUPS,
     preselected: [ADULT_CONTENT, MESSAGES_GIF, SPOTLIGHT_SEARCH],
   },
+});
+
+export const ViewHealthCheck: Story = props({
+  ...Welcome.args,
+  step: `viewHealthCheck`,
+});
+
+export const ScreenTimeConflict: Story = props({
+  ...Welcome.args,
+  step: `screenTimeConflict`,
 });
 
 export const Finish: Story = props({

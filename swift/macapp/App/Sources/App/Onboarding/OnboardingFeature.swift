@@ -188,12 +188,23 @@ struct OnboardingFeature: Feature {
 
       case .webview(.primaryBtnClicked) where step == .welcome:
         log(step, action, "e712e261")
-        state.step = self.app.inCorrectLocation ? .confirmGertrudeAccount : .wrongInstallDir
+        if !self.app.inCorrectLocation {
+          state.step = .wrongInstallDir
+          return .none
+        }
         return .exec { send in
-          try await send(.receivedDeviceData(
-            currentUserId: self.device.currentUserId(),
-            users: self.device.listMacOSUsers(),
-          ))
+          let currentUserId = self.device.currentUserId()
+          let users: [MacOSUser]
+          do {
+            users = try await self.device.listMacOSUsers()
+          } catch {
+            unexpectedError(id: "786fe928", error)
+            users = []
+          }
+          await send(.receivedDeviceData(currentUserId: currentUserId, users: users))
+          let currentUser = users.first(where: { $0.id == currentUserId })
+          let isAdmin = currentUser?.type != .standard
+          await send(.setStep(isAdmin ? .macosUserAccountType : .confirmGertrudeAccount))
         }
 
       case .webview(.primaryBtnClicked) where step == .wrongInstallDir:
@@ -203,7 +214,7 @@ struct OnboardingFeature: Feature {
 
       case .webview(.primaryBtnClicked) where step == .confirmGertrudeAccount:
         log(step, action, "36a1852c")
-        state.step = userIsAdmin ? .macosUserAccountType : .getChildConnectionCode
+        state.step = .getChildConnectionCode
         return .none
 
       case .webview(.secondaryBtnClicked) where step == .confirmGertrudeAccount:
@@ -213,7 +224,7 @@ struct OnboardingFeature: Feature {
 
       case .webview(.primaryBtnClicked) where step == .noGertrudeAccount:
         log(step, action, "05820945")
-        state.step = userIsAdmin ? .macosUserAccountType : .getChildConnectionCode
+        state.step = .getChildConnectionCode
         return .none
 
       case .webview(.secondaryBtnClicked) where step == .noGertrudeAccount:
@@ -225,13 +236,13 @@ struct OnboardingFeature: Feature {
 
       case .webview(.primaryBtnClicked) where step == .macosUserAccountType && !userIsAdmin:
         log("macos account type correct next clicked", "0a29be72")
-        state.step = .getChildConnectionCode
+        state.step = .confirmGertrudeAccount
         return .none
 
       // they choose to ignore the warning about user type and proceed
       case .webview(.secondaryBtnClicked) where step == .macosUserAccountType && userIsAdmin:
         log("skip admin user account warning", "d044eb17")
-        state.step = .getChildConnectionCode
+        state.step = .confirmGertrudeAccount
         return .none
 
       // they click "show me how to fix" on the BAD mac os user landing page
@@ -339,7 +350,7 @@ struct OnboardingFeature: Feature {
       case .webview(.postCreateSkipClicked):
         log(step, action, "024e9794")
         state.userRemediationStep = nil
-        state.step = .getChildConnectionCode
+        state.step = .confirmGertrudeAccount
         return .none
 
       case .setRemediationStep(let rem):

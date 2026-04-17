@@ -55,10 +55,9 @@ final class OnboardingFeatureTests: XCTestCase {
     // ✅ section: account
 
     // they click next on the welcome screen...
-    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
-      $0.onboarding.step = .confirmGertrudeAccount // ... and go to confirm account
-    }
+    await store.send(.onboarding(.webview(.primaryBtnClicked)))
 
+    // we fetch device data to determine the macos user type...
     await store.receive(.onboarding(.receivedDeviceData(
       currentUserId: 502,
       users: [
@@ -71,6 +70,11 @@ final class OnboardingFeatureTests: XCTestCase {
         .init(id: 502, name: "liljimmy", isAdmin: false),
       ]
       $0.onboarding.currentUser = .init(id: 502, name: "liljimmy", isAdmin: false)
+    }
+
+    // ...and since they're NOT an admin user, we skip straight to confirm account
+    await store.receive(.onboarding(.setStep(.confirmGertrudeAccount))) {
+      $0.onboarding.step = .confirmGertrudeAccount
     }
 
     // ✅ section: child connection
@@ -945,7 +949,7 @@ final class OnboardingFeatureTests: XCTestCase {
     }
 
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
-      $0.onboarding.step = .getChildConnectionCode
+      $0.onboarding.step = .confirmGertrudeAccount
       // we need to make sure we initialize the user data when resuming
       $0.onboarding.currentUser = .init(id: 502, name: "franny", isAdmin: false)
       $0.onboarding.users = [
@@ -1111,7 +1115,7 @@ final class OnboardingFeatureTests: XCTestCase {
       $0.userRemediationStep = .create
     }
     await store.send(.webview(.secondaryBtnClicked)) {
-      $0.step = .getChildConnectionCode
+      $0.step = .confirmGertrudeAccount
     }
   }
 
@@ -1662,7 +1666,7 @@ final class OnboardingFeatureTests: XCTestCase {
   func testNoGertrudeAccountPrimary() async {
     let store = onboardingFeatureStore { $0.step = .noGertrudeAccount }
     await store.send(.webview(.primaryBtnClicked)) {
-      $0.step = .macosUserAccountType
+      $0.step = .getChildConnectionCode
     }
   }
 
@@ -1710,17 +1714,32 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.device.listMacOSUsers = { [.init(id: 501, name: "Dad", type: .admin)] }
     store.deps.device.notificationsSetting = { .none }
 
-    await store.send(.webview(.primaryBtnClicked)) {
+    // they click next on welcome, we fetch data, see they are admin,
+    // and go straight to the user type warning page
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.setStep(.macosUserAccountType)) {
+      $0.step = .macosUserAccountType
+    }
+
+    // admin ignores the warning and proceeds to confirm their account
+    await store.send(.webview(.secondaryBtnClicked)) {
       $0.step = .confirmGertrudeAccount
     }
+  }
 
-    await store.send(.webview(.primaryBtnClicked)) {
+  @MainActor
+  func testWelcomeAdvancesWhenListMacOSUsersThrows() async {
+    let store = onboardingFeatureStore()
+    store.deps.device.currentUserId = { 501 }
+    store.deps.device.listMacOSUsers = { throw TestErr("boom") }
+    store.deps.device.notificationsSetting = { .none }
+
+    // they click next on welcome, listMacOSUsers throws, but we don't
+    // strand them -- fall through to the admin warning path (safer default)
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.receivedDeviceData(currentUserId: 501, users: []))
+    await store.receive(.setStep(.macosUserAccountType)) {
       $0.step = .macosUserAccountType
-      $0.userRemediationStep = nil
-    }
-
-    await store.send(.webview(.secondaryBtnClicked)) {
-      $0.step = .getChildConnectionCode
     }
   }
 
@@ -1731,13 +1750,11 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.device.listMacOSUsers = { [.init(id: 501, name: "Dad", type: .admin)] }
     store.deps.device.notificationsSetting = { .none }
 
-    await store.send(.webview(.primaryBtnClicked)) {
-      $0.step = .confirmGertrudeAccount
-    }
-
-    // they click confirming they have a gertrude acct...
-    await store.send(.webview(.primaryBtnClicked)) {
-      $0.step = .macosUserAccountType // ...landing them on user type warning page
+    // they click next on welcome, we fetch data, see they are admin,
+    // and land them on the user type warning page
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.setStep(.macosUserAccountType)) {
+      $0.step = .macosUserAccountType
       $0.userRemediationStep = nil
     }
 
@@ -1761,13 +1778,11 @@ final class OnboardingFeatureTests: XCTestCase {
     ] }
     store.deps.device.notificationsSetting = { .none }
 
-    await store.send(.webview(.primaryBtnClicked)) {
-      $0.step = .confirmGertrudeAccount
-    }
-
-    // they click confirming they have a gertrude acct...
-    await store.send(.webview(.primaryBtnClicked)) {
-      $0.step = .macosUserAccountType // ...landing them on user type warning page
+    // they click next on welcome, we fetch data, see they are admin,
+    // and land them on the user type warning page
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.setStep(.macosUserAccountType)) {
+      $0.step = .macosUserAccountType
       $0.userRemediationStep = nil
     }
 
@@ -1993,7 +2008,7 @@ final class OnboardingFeatureTests: XCTestCase {
   }
 
   @MainActor
-  func testPostCreateSkipMovesToConnectChild() async {
+  func testPostCreateSkipMovesToConfirmAccount() async {
     let store = onboardingFeatureStore {
       $0.step = .macosUserAccountType
       $0.userRemediationStep = .createSuccess
@@ -2002,7 +2017,7 @@ final class OnboardingFeatureTests: XCTestCase {
 
     await store.send(.webview(.postCreateSkipClicked)) {
       $0.userRemediationStep = nil
-      $0.step = .getChildConnectionCode
+      $0.step = .confirmGertrudeAccount
     }
   }
 

@@ -6,12 +6,12 @@ extension OnboardingFeature.State {
     // wrong install dir
     case wrongInstallDir
 
+    // os user type
+    case macosUserAccountType
+
     // account
     case confirmGertrudeAccount
     case noGertrudeAccount
-
-    // os user type
-    case macosUserAccountType
 
     // connection
     case getChildConnectionCode
@@ -82,14 +82,14 @@ extension OnboardingFeature.State.Step {
   var primaryFallbackNextStep: Self {
     switch self {
     case .welcome:
-      .confirmGertrudeAccount
-    case .wrongInstallDir:
-      .confirmGertrudeAccount
-    case .confirmGertrudeAccount:
       .macosUserAccountType
-    case .noGertrudeAccount:
+    case .wrongInstallDir:
       .macosUserAccountType
     case .macosUserAccountType:
+      .confirmGertrudeAccount
+    case .confirmGertrudeAccount:
+      .getChildConnectionCode
+    case .noGertrudeAccount:
       .getChildConnectionCode
     case .getChildConnectionCode:
       .connectChild
@@ -174,14 +174,14 @@ extension OnboardingFeature.State.Step {
       .welcome
     case .wrongInstallDir:
       .welcome
-    case .confirmGertrudeAccount:
+    case .macosUserAccountType:
       .welcome
+    case .confirmGertrudeAccount:
+      .macosUserAccountType
     case .noGertrudeAccount:
       .confirmGertrudeAccount
-    case .macosUserAccountType:
-      .confirmGertrudeAccount
     case .getChildConnectionCode:
-      .macosUserAccountType
+      .confirmGertrudeAccount
     case .connectChild:
       .getChildConnectionCode
     case .howToUseGifs:
@@ -267,9 +267,9 @@ extension OnboardingFeature.State.Step: Comparable {
     switch self {
     case .welcome: 10
     case .wrongInstallDir: 20
-    case .confirmGertrudeAccount: 30
-    case .noGertrudeAccount: 40
-    case .macosUserAccountType: 50
+    case .macosUserAccountType: 30
+    case .confirmGertrudeAccount: 40
+    case .noGertrudeAccount: 50
     case .getChildConnectionCode: 60
     case .connectChild: 70
     case .howToUseGifs: 80
