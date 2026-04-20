@@ -28,6 +28,17 @@ struct OnboardingFeature: Feature {
       var username: String
     }
 
+    struct SendCodeSuccess: Equatable, Codable, Sendable {
+      var methodId: UUID
+      var phoneNumber: String
+    }
+
+    struct TextNotifications: Equatable, Encodable, Sendable {
+      var hasVerifiedMethod = false
+      var sendCodeRequest: PayloadRequestState<SendCodeSuccess, String> = .idle
+      var confirmCodeRequest: RequestState<String> = .idle
+    }
+
     var windowOpen = false
     var step: Step = .welcome
     var userRemediationStep: MacUser.RemediationStep?
@@ -43,6 +54,7 @@ struct OnboardingFeature: Feature {
     var customKeychainDomains: [String] = []
     var createCustomKeychainRequest: RequestState<String> = .idle
     var createAppKeysRequest: RequestState<String> = .idle
+    var textNotifications: TextNotifications = .init()
     var filterUsers: FilterUserTypes?
     var filteringDisabled = false
     var upgrade = false
@@ -81,6 +93,9 @@ struct OnboardingFeature: Feature {
       case connectChildSubmitted(code: Int)
       case infoModalOpened(step: State.Step, detail: String?)
       case setDowntimeSchedule(window: PlainTimeWindow)
+      case sendOnboardingNotificationCode(phoneNumber: String)
+      case confirmOnboardingNotificationCode(methodId: UUID, code: Int)
+      case changeOnboardingPhoneNumberClicked
       case createOnboardingKeychain(domain: String)
       case setUserExemption(userId: uid_t, enabled: Bool)
     }
@@ -102,6 +117,8 @@ struct OnboardingFeature: Feature {
     case createOnboardingBlockedAppsCompleted(success: Bool)
     case createOnboardingKeychainCompleted(domain: String, success: Bool)
     case createOnboardingAppKeysCompleted(success: Bool)
+    case sendOnboardingNotificationCodeCompleted(TaskResult<State.SendCodeSuccess>)
+    case confirmOnboardingNotificationCodeCompleted(TaskResult<Bool>)
     case setStep(State.Step)
     case setRemediationStep(State.MacUser.RemediationStep?)
     case createStandardUserCompleted(TaskResult<State.CreatedChildUser>)
@@ -757,12 +774,10 @@ struct OnboardingFeature: Feature {
         return .none
 
       case .receivedOnboardingConfig(let config):
-        log(
-          "received onboarding config: publicKeychains=\(config.publicKeychains.count), alwaysBlockedGroups=\(config.alwaysBlocked.groups.count)",
-          "bb40d328",
-        )
+        log("received onboarding config: \(config.logDesc)", "bb40d328")
         state.publicKeychains = config.publicKeychains
         state.alwaysBlocked = config.alwaysBlocked
+        state.textNotifications.hasVerifiedMethod = config.hasVerifiedTextNotificationMethod
         return .none
 
       case .webview(.primaryBtnClicked) where step == .appKeySelection_intro:
@@ -926,15 +941,80 @@ struct OnboardingFeature: Feature {
 
       case .webview(.primaryBtnClicked) where step == .encourageFilterSuspensions:
         log(step, action, "363f2d44")
-        return .exec { [alwaysBlocked = state.alwaysBlocked] send in
-          if await self.device.screenTimeWebFilterActive() {
-            await send(.setStep(.screenTimeConflict))
-          } else if alwaysBlocked.groups.isEmpty {
-            await send(.setStep(.viewHealthCheck))
+        return .exec { [
+          alwaysBlocked = state.alwaysBlocked,
+          hasVerified = state.textNotifications.hasVerifiedMethod,
+        ] send in
+          if hasVerified {
+            await self.nextStepAfterSetupNotifications(alwaysBlocked: alwaysBlocked, send)
           } else {
-            await send(.setStep(.alwaysBlockedGroups))
+            await send(.setStep(.setupNotifications_enterPhone))
           }
         }
+
+      case .webview(.primaryBtnClicked) where step == .setupNotifications_success,
+           .webview(.secondaryBtnClicked) where step == .setupNotifications_enterPhone,
+           .webview(.secondaryBtnClicked) where step == .setupNotifications_verifyCode:
+        log(step, action, "acdf436b")
+        return .exec { [alwaysBlocked = state.alwaysBlocked] send in
+          await self.nextStepAfterSetupNotifications(alwaysBlocked: alwaysBlocked, send)
+        }
+
+      case .webview(.sendOnboardingNotificationCode(let phoneNumber)):
+        log("send onboarding notification code", "4793e872")
+        state.textNotifications.sendCodeRequest = .ongoing
+        state.textNotifications.confirmCodeRequest = .idle
+        return .exec { [phoneNumber] send in
+          await send(.sendOnboardingNotificationCodeCompleted(TaskResult {
+            let output = try await self.api
+              .sendOnboardingNotificationCode(.init(phoneNumber: phoneNumber))
+            return .init(methodId: output.methodId, phoneNumber: phoneNumber)
+          }))
+        }
+
+      case .sendOnboardingNotificationCodeCompleted(.success(let success)):
+        log("send onboarding notification code success", "24fd6cd5")
+        state.textNotifications.sendCodeRequest = .succeeded(payload: success)
+        state.step = .setupNotifications_verifyCode
+        return .none
+
+      case .sendOnboardingNotificationCodeCompleted(.failure(let error)):
+        log("send onboarding notification code failed \(error)", "485fbee9")
+        state.textNotifications.sendCodeRequest = .failed(error: error.userMessage())
+        return .none
+
+      case .webview(.confirmOnboardingNotificationCode(let methodId, let code)):
+        log("confirm onboarding notification code", "73b956c7")
+        state.textNotifications.confirmCodeRequest = .ongoing
+        return .exec { send in
+          await send(.confirmOnboardingNotificationCodeCompleted(TaskResult {
+            try await self.api
+              .confirmOnboardingNotificationCode(.init(methodId: methodId, code: code))
+            return true
+          }))
+        }
+
+      case .confirmOnboardingNotificationCodeCompleted(.success):
+        log("confirm onboarding notification code success", "3230f663")
+        state.textNotifications.confirmCodeRequest = .succeeded
+        state.textNotifications.hasVerifiedMethod = true
+        state.step = .setupNotifications_success
+        return .none
+
+      case .confirmOnboardingNotificationCodeCompleted(.failure(let error)):
+        log("confirm onboarding notification code failed \(error)", "0a608ee4")
+        let incorrectCode = "Hmm, we couldn't find that code. Double-check and try again."
+        state.textNotifications.confirmCodeRequest = .failed(
+          error: error.userMessage([.incorrectConfirmationCode: incorrectCode]),
+        )
+        return .none
+
+      case .webview(.changeOnboardingPhoneNumberClicked):
+        log(step, action, "f11a5e3d")
+        state.step = .setupNotifications_enterPhone
+        state.textNotifications.sendCodeRequest = .idle
+        state.textNotifications.confirmCodeRequest = .idle
+        return .none
 
       case .webview(.alwaysBlockedGroupsSelected(let ids)):
         log("always blocked groups selected: \(ids.count)", "047be835")
@@ -1076,6 +1156,19 @@ struct OnboardingFeature: Feature {
       }
     }
 
+    func nextStepAfterSetupNotifications(
+      alwaysBlocked: GetOnboardingConfig.AlwaysBlocked,
+      _ send: Send<Action>,
+    ) async {
+      if await self.device.screenTimeWebFilterActive() {
+        await send(.setStep(.screenTimeConflict))
+      } else if alwaysBlocked.groups.isEmpty {
+        await send(.setStep(.viewHealthCheck))
+      } else {
+        await send(.setStep(.alwaysBlockedGroups))
+      }
+    }
+
     func finishOnboardingConfig(_ send: Send<Action>) async {
       let currentUserId = self.device.currentUserId()
       let users = await (try? self.device.listMacOSUsers()) ?? []
@@ -1154,3 +1247,9 @@ private let ONBOARDING_HIDDEN_BUNDLE_IDS = [
   "com.apple.SystemProfiler", // System Information
   "com.apple.VoiceOverUtility",
 ]
+
+extension GetOnboardingConfig.Output {
+  var logDesc: String {
+    "publicKeychains=\(self.publicKeychains.count), alwaysBlockedGroups=\(self.alwaysBlocked.groups.count), hasVerifiedTextNotificationMethod=\(self.hasVerifiedTextNotificationMethod)"
+  }
+}

@@ -71,6 +71,9 @@ extension OnboardingFeature.State {
     case exemptUsers
     case locateMenuBarIcon
     case encourageFilterSuspensions
+    case setupNotifications_enterPhone
+    case setupNotifications_verifyCode
+    case setupNotifications_success
     case alwaysBlockedGroups
     case viewHealthCheck
     case screenTimeConflict
@@ -156,6 +159,12 @@ extension OnboardingFeature.State.Step {
     case .locateMenuBarIcon:
       .encourageFilterSuspensions
     case .encourageFilterSuspensions:
+      .setupNotifications_enterPhone
+    case .setupNotifications_enterPhone:
+      .setupNotifications_verifyCode
+    case .setupNotifications_verifyCode:
+      .setupNotifications_success
+    case .setupNotifications_success:
       .alwaysBlockedGroups
     case .alwaysBlockedGroups:
       .viewHealthCheck
@@ -246,12 +255,18 @@ extension OnboardingFeature.State.Step {
       .installSysExt_explain
     case .encourageFilterSuspensions:
       .locateMenuBarIcon
-    case .alwaysBlockedGroups:
+    case .setupNotifications_enterPhone:
       .encourageFilterSuspensions
+    case .setupNotifications_verifyCode:
+      .setupNotifications_enterPhone
+    case .setupNotifications_success:
+      .setupNotifications_verifyCode
+    case .alwaysBlockedGroups:
+      .setupNotifications_enterPhone
     case .viewHealthCheck:
       .alwaysBlockedGroups
     case .screenTimeConflict:
-      .encourageFilterSuspensions
+      .setupNotifications_enterPhone
     case .finish:
       .viewHealthCheck
     }
@@ -303,6 +318,9 @@ extension OnboardingFeature.State.Step: Comparable {
     case .exemptUsers: 320
     case .locateMenuBarIcon: 330
     case .encourageFilterSuspensions: 340
+    case .setupNotifications_enterPhone: 343
+    case .setupNotifications_verifyCode: 344
+    case .setupNotifications_success: 345
     case .alwaysBlockedGroups: 350
     case .viewHealthCheck: 360
     case .screenTimeConflict: 370

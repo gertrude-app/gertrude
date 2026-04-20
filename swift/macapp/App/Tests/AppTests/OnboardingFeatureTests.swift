@@ -117,6 +117,7 @@ final class OnboardingFeatureTests: XCTestCase {
     let onboardingConfig = GetOnboardingConfig.Output(
       publicKeychains: [publicKeychain],
       alwaysBlocked: .init(groups: [alwaysBlockedGroup], preselected: [alwaysBlockedGroup.id]),
+      hasVerifiedTextNotificationMethod: false,
     )
     let getOnboardingConfig = mock(always: onboardingConfig)
     store.deps.api.getOnboardingConfig = getOnboardingConfig.fn
@@ -546,7 +547,61 @@ final class OnboardingFeatureTests: XCTestCase {
       $0.onboarding.step = .encourageFilterSuspensions // ...and go to encourage FS
     }
 
+    // ✅ section: setup notifications
+
     // they click "Next" on the encourage filter suspensions screen
+    await store.send(.onboarding(.webview(.primaryBtnClicked)))
+    await store.receive(.onboarding(.setStep(.setupNotifications_enterPhone))) {
+      $0.onboarding.step = .setupNotifications_enterPhone // ...and go to enter phone
+    }
+
+    // they enter their phone number and submit...
+    let methodId = UUID()
+    let sendCode = spy(
+      on: SendOnboardingNotificationCode.Input.self,
+      returning: SendOnboardingNotificationCode.Output(methodId: methodId),
+    )
+    store.deps.api.sendOnboardingNotificationCode = sendCode.fn
+
+    await store.send(.onboarding(.webview(.sendOnboardingNotificationCode(
+      phoneNumber: "+15551234567",
+    )))) {
+      $0.onboarding.textNotifications.sendCodeRequest = .ongoing
+      $0.onboarding.textNotifications.confirmCodeRequest = .idle
+    }
+
+    await expect(sendCode.calls).toEqual([.init(phoneNumber: "+15551234567")])
+
+    await store.receive(.onboarding(.sendOnboardingNotificationCodeCompleted(.success(
+      .init(methodId: methodId, phoneNumber: "+15551234567"),
+    )))) {
+      $0.onboarding.textNotifications.sendCodeRequest = .succeeded(payload: .init(
+        methodId: methodId,
+        phoneNumber: "+15551234567",
+      ))
+      $0.onboarding.step = .setupNotifications_verifyCode // ...auto-advance
+    }
+
+    // they enter the confirmation code they received by text...
+    let confirmCode = spy(on: ConfirmOnboardingNotificationCode.Input.self, returning: ())
+    store.deps.api.confirmOnboardingNotificationCode = confirmCode.fn
+
+    await store.send(.onboarding(.webview(.confirmOnboardingNotificationCode(
+      methodId: methodId,
+      code: 987_654,
+    )))) {
+      $0.onboarding.textNotifications.confirmCodeRequest = .ongoing
+    }
+
+    await expect(confirmCode.calls).toEqual([.init(methodId: methodId, code: 987_654)])
+
+    await store.receive(.onboarding(.confirmOnboardingNotificationCodeCompleted(.success(true)))) {
+      $0.onboarding.textNotifications.confirmCodeRequest = .succeeded
+      $0.onboarding.textNotifications.hasVerifiedMethod = true
+      $0.onboarding.step = .setupNotifications_success // ...auto-advance
+    }
+
+    // they click "Continue" on the notifications success screen
     await store.send(.onboarding(.webview(.primaryBtnClicked)))
     await store.receive(.onboarding(.setStep(.alwaysBlockedGroups))) {
       $0.onboarding.step = .alwaysBlockedGroups // ...and go to always blocked
@@ -611,9 +666,7 @@ final class OnboardingFeatureTests: XCTestCase {
         iconPath: "",
       )]
     }
-    store.deps.api.getOnboardingConfig = {
-      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
-    }
+    store.deps.api.getOnboardingConfig = { .empty }
     await store.send(.webview(.primaryBtnClicked)) {
       $0.step = .optOutOfFiltering
     }
@@ -1155,9 +1208,7 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.monitoring.screenRecordingPermissionGranted = { true }
     store.deps.monitoring.keystrokeRecordingPermissionGranted = { true }
     store.deps.filterExtension.state = { .installedAndRunning }
-    store.deps.api.getOnboardingConfig = {
-      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
-    }
+    store.deps.api.getOnboardingConfig = { .empty }
 
     await store.send(.webview(.primaryBtnClicked)) { $0.step = .howToUseGifs }
     await store.send(.webview(.primaryBtnClicked))
@@ -1277,9 +1328,7 @@ final class OnboardingFeatureTests: XCTestCase {
   @MainActor
   func testClickingSkipSecondaryFromInstallSysExtFailed() async {
     let store = onboardingFeatureStore { $0.step = .installSysExt_failed }
-    store.deps.api.getOnboardingConfig = {
-      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
-    }
+    store.deps.api.getOnboardingConfig = { .empty }
     await store.send(.webview(.secondaryBtnClicked)) {
       $0.step = .optOutOfFiltering
     }
@@ -1395,9 +1444,7 @@ final class OnboardingFeatureTests: XCTestCase {
   func testSkipAllowKeyloggingSysExtAlreadyInstalled() async {
     let store = onboardingFeatureStore { $0.step = .allowKeylogging_required }
     store.deps.filterExtension.state = { .installedAndRunning }
-    store.deps.api.getOnboardingConfig = {
-      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
-    }
+    store.deps.api.getOnboardingConfig = { .empty }
     await store.send(.webview(.secondaryBtnClicked))
     await store.receive(.setStep(.optOutOfFiltering))
   }
@@ -2041,9 +2088,7 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.mainQueue = .immediate
     let timedOut = LockIsolated(false)
     store.deps.filterExtension.state = { .notInstalled }
-    store.deps.api.getOnboardingConfig = {
-      .init(publicKeychains: [], alwaysBlocked: .init(groups: [], preselected: []))
-    }
+    store.deps.api.getOnboardingConfig = { .empty }
 
     // this is janky, but allows me to simulate timeout AFTER they proceeded
     store.deps.filterExtension.installOverridingTimeout = { seconds in
@@ -2144,6 +2189,7 @@ final class OnboardingFeatureTests: XCTestCase {
     let store = onboardingFeatureStore {
       $0.step = .encourageFilterSuspensions
       $0.alwaysBlocked = .init(groups: [group], preselected: [group.id])
+      $0.textNotifications.hasVerifiedMethod = true
     }
     store.deps.device.screenTimeWebFilterActive = { true }
     let openUrl = spy(on: URL.self, returning: ())
@@ -2168,6 +2214,7 @@ final class OnboardingFeatureTests: XCTestCase {
     let store = onboardingFeatureStore {
       $0.step = .encourageFilterSuspensions
       $0.alwaysBlocked = .init(groups: [], preselected: [])
+      $0.textNotifications.hasVerifiedMethod = true
     }
     store.deps.device.screenTimeWebFilterActive = { false }
     await store.send(.webview(.primaryBtnClicked))
@@ -2182,6 +2229,208 @@ final class OnboardingFeatureTests: XCTestCase {
     }
     await store.send(.webview(.secondaryBtnClicked)) {
       $0.step = .viewHealthCheck
+    }
+  }
+
+  @MainActor
+  func testEncourageFilterSuspensionsGoesToSetupNotificationsWhenUnverified() async {
+    let store = onboardingFeatureStore {
+      $0.step = .encourageFilterSuspensions
+      $0.textNotifications.hasVerifiedMethod = false
+    }
+    store.deps.device.screenTimeWebFilterActive = { false }
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.setStep(.setupNotifications_enterPhone)) {
+      $0.step = .setupNotifications_enterPhone
+    }
+  }
+
+  @MainActor
+  func testSetupNotificationsSuccessPrimaryGoesToAlwaysBlockedWhenGroups() async {
+    let group = GetOnboardingConfig.AlwaysBlockedGroup(
+      id: UUID(),
+      name: "Adult content",
+      description: "short",
+      longDescription: "long",
+    )
+    let store = onboardingFeatureStore {
+      $0.step = .setupNotifications_success
+      $0.alwaysBlocked = .init(groups: [group], preselected: [group.id])
+    }
+    store.deps.device.screenTimeWebFilterActive = { false }
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.setStep(.alwaysBlockedGroups)) {
+      $0.step = .alwaysBlockedGroups
+    }
+  }
+
+  @MainActor
+  func testSetupNotificationsEnterPhoneSecondarySkipsToAlwaysBlocked() async {
+    let group = GetOnboardingConfig.AlwaysBlockedGroup(
+      id: UUID(),
+      name: "Adult content",
+      description: "short",
+      longDescription: "long",
+    )
+    let store = onboardingFeatureStore {
+      $0.step = .setupNotifications_enterPhone
+      $0.alwaysBlocked = .init(groups: [group], preselected: [group.id])
+    }
+    store.deps.device.screenTimeWebFilterActive = { false }
+    await store.send(.webview(.secondaryBtnClicked))
+    await store.receive(.setStep(.alwaysBlockedGroups)) {
+      $0.step = .alwaysBlockedGroups
+    }
+  }
+
+  @MainActor
+  func testSetupNotificationsVerifyCodeSecondarySkipsToAlwaysBlocked() async {
+    let group = GetOnboardingConfig.AlwaysBlockedGroup(
+      id: UUID(),
+      name: "Adult content",
+      description: "short",
+      longDescription: "long",
+    )
+    let store = onboardingFeatureStore {
+      $0.step = .setupNotifications_verifyCode
+      $0.alwaysBlocked = .init(groups: [group], preselected: [group.id])
+    }
+    store.deps.device.screenTimeWebFilterActive = { false }
+    await store.send(.webview(.secondaryBtnClicked))
+    await store.receive(.setStep(.alwaysBlockedGroups)) {
+      $0.step = .alwaysBlockedGroups
+    }
+  }
+
+  @MainActor
+  func testSetupNotificationsSkipsToHealthCheckWhenNoGroups() async {
+    let store = onboardingFeatureStore {
+      $0.step = .setupNotifications_enterPhone
+      $0.alwaysBlocked = .init(groups: [], preselected: [])
+    }
+    store.deps.device.screenTimeWebFilterActive = { false }
+    await store.send(.webview(.secondaryBtnClicked))
+    await store.receive(.setStep(.viewHealthCheck)) {
+      $0.step = .viewHealthCheck
+    }
+  }
+
+  @MainActor
+  func testSetupNotificationsGoesToScreenTimeConflictWhenDetected() async {
+    let store = onboardingFeatureStore { $0.step = .setupNotifications_success }
+    store.deps.device.screenTimeWebFilterActive = { true }
+    await store.send(.webview(.primaryBtnClicked))
+    await store.receive(.setStep(.screenTimeConflict)) {
+      $0.step = .screenTimeConflict
+    }
+  }
+
+  @MainActor
+  func testSendOnboardingNotificationCodeSuccessAdvancesToVerifyCode() async {
+    let store = onboardingFeatureStore { $0.step = .setupNotifications_enterPhone }
+    let methodId = UUID()
+    let sendCode = spy(
+      on: SendOnboardingNotificationCode.Input.self,
+      returning: SendOnboardingNotificationCode.Output(methodId: methodId),
+    )
+    store.deps.api.sendOnboardingNotificationCode = sendCode.fn
+
+    await store.send(.webview(.sendOnboardingNotificationCode(phoneNumber: "+15551234567"))) {
+      $0.textNotifications.sendCodeRequest = .ongoing
+      $0.textNotifications.confirmCodeRequest = .idle
+    }
+
+    await expect(sendCode.calls).toEqual([.init(phoneNumber: "+15551234567")])
+
+    await store.receive(.sendOnboardingNotificationCodeCompleted(.success(
+      .init(methodId: methodId, phoneNumber: "+15551234567"),
+    ))) {
+      $0.textNotifications.sendCodeRequest = .succeeded(payload: .init(
+        methodId: methodId,
+        phoneNumber: "+15551234567",
+      ))
+      $0.step = .setupNotifications_verifyCode
+    }
+  }
+
+  @MainActor
+  func testSendOnboardingNotificationCodeFailure() async {
+    let store = onboardingFeatureStore { $0.step = .setupNotifications_enterPhone }
+    let error = TestErr("send failed")
+    store.deps.api.sendOnboardingNotificationCode = { _ in throw error }
+
+    await store.send(.webview(.sendOnboardingNotificationCode(phoneNumber: "+15551234567"))) {
+      $0.textNotifications.sendCodeRequest = .ongoing
+    }
+
+    await store.receive(.sendOnboardingNotificationCodeCompleted(.failure(error))) {
+      $0.textNotifications.sendCodeRequest = .failed(error: error.userMessage())
+    }
+  }
+
+  @MainActor
+  func testConfirmOnboardingNotificationCodeSuccessAdvancesAndSetsVerified() async {
+    let methodId = UUID()
+    let store = onboardingFeatureStore {
+      $0.step = .setupNotifications_verifyCode
+      $0.textNotifications.sendCodeRequest = .succeeded(payload: .init(
+        methodId: methodId,
+        phoneNumber: "+15551234567",
+      ))
+    }
+    let confirmCode = spy(on: ConfirmOnboardingNotificationCode.Input.self, returning: ())
+    store.deps.api.confirmOnboardingNotificationCode = confirmCode.fn
+
+    await store.send(.webview(.confirmOnboardingNotificationCode(
+      methodId: methodId,
+      code: 123_456,
+    ))) {
+      $0.textNotifications.confirmCodeRequest = .ongoing
+    }
+
+    await expect(confirmCode.calls).toEqual([.init(methodId: methodId, code: 123_456)])
+
+    await store.receive(.confirmOnboardingNotificationCodeCompleted(.success(true))) {
+      $0.textNotifications.confirmCodeRequest = .succeeded
+      $0.textNotifications.hasVerifiedMethod = true
+      $0.step = .setupNotifications_success
+    }
+  }
+
+  @MainActor
+  func testConfirmOnboardingNotificationCodeFailure() async {
+    let methodId = UUID()
+    let store = onboardingFeatureStore { $0.step = .setupNotifications_verifyCode }
+    let error = TestErr("wrong code")
+    store.deps.api.confirmOnboardingNotificationCode = { _ in throw error }
+
+    await store.send(.webview(.confirmOnboardingNotificationCode(
+      methodId: methodId,
+      code: 123_456,
+    ))) {
+      $0.textNotifications.confirmCodeRequest = .ongoing
+    }
+
+    await store.receive(.confirmOnboardingNotificationCodeCompleted(.failure(error))) {
+      $0.textNotifications.confirmCodeRequest = .failed(error: error.userMessage())
+    }
+  }
+
+  @MainActor
+  func testChangeOnboardingPhoneNumberResetsRequestsAndStepsBack() async {
+    let methodId = UUID()
+    let store = onboardingFeatureStore {
+      $0.step = .setupNotifications_verifyCode
+      $0.textNotifications.sendCodeRequest = .succeeded(payload: .init(
+        methodId: methodId,
+        phoneNumber: "+15551234567",
+      ))
+      $0.textNotifications.confirmCodeRequest = .failed(error: "bad code")
+    }
+    await store.send(.webview(.changeOnboardingPhoneNumberClicked)) {
+      $0.step = .setupNotifications_enterPhone
+      $0.textNotifications.sendCodeRequest = .idle
+      $0.textNotifications.confirmCodeRequest = .idle
     }
   }
 
@@ -2284,6 +2533,14 @@ final class OnboardingFeatureTests: XCTestCase {
 }
 
 // helpers
+
+extension GetOnboardingConfig.Output {
+  static let empty = Self(
+    publicKeychains: [],
+    alwaysBlocked: .init(groups: [], preselected: []),
+    hasVerifiedTextNotificationMethod: false,
+  )
+}
 
 func onboardingFeatureStore(
   mutateState: @escaping (inout OnboardingFeature.State) -> Void = { _ in },

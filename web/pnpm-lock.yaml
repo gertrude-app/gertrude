@@ -132,6 +132,9 @@ importers:
       '@shared/datetime':
         specifier: workspace:*
         version: link:../shared/datetime
+      '@shared/phone-numbers':
+        specifier: workspace:*
+        version: link:../shared/phone-numbers
       '@shared/string':
         specifier: workspace:*
         version: link:../shared/string
@@ -210,6 +213,9 @@ importers:
       '@shared/pairql':
         specifier: workspace:*
         version: link:../../shared/pairql
+      '@shared/phone-numbers':
+        specifier: workspace:*
+        version: link:../../shared/phone-numbers
       '@shared/string':
         specifier: workspace:*
         version: link:../../shared/string
@@ -334,6 +340,9 @@ importers:
       '@shared/components':
         specifier: workspace:*
         version: link:../../shared/components
+      '@shared/phone-numbers':
+        specifier: workspace:*
+        version: link:../../shared/phone-numbers
       '@shared/string':
         specifier: workspace:*
         version: link:../../shared/string
@@ -465,6 +474,8 @@ importers:
       x-exec:
         specifier: ^1.2.0
         version: 1.2.0
+
+  shared/phone-numbers: {}
 
   shared/string: {}
 

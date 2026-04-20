@@ -1,5 +1,5 @@
-import { prettyE164 } from '@dash/utils';
 import { Button, isScreenshotTest } from '@shared/components';
+import { prettyE164 } from '@shared/phone-numbers';
 import cx from 'classnames';
 import React from 'react';
 

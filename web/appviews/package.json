@@ -15,6 +15,7 @@
     "@headlessui/react": "2.2.9",
     "@shared/components": "workspace:*",
     "@shared/datetime": "workspace:*",
+    "@shared/phone-numbers": "workspace:*",
     "@shared/string": "workspace:*",
     "@shared/tailwind": "workspace:*",
     "@shared/ts-utils": "workspace:*",

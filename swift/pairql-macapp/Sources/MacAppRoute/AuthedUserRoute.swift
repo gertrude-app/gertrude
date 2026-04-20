@@ -8,6 +8,7 @@ public enum AuthedUserRoute: PairRoute {
   case createOnboardingAppKeys(CreateOnboardingAppKeys.Input)
   case createOnboardingBlockedApps(CreateOnboardingBlockedApps.Input)
   case createOnboardingKeychain(CreateOnboardingKeychain.Input)
+  case sendOnboardingNotificationCode(SendOnboardingNotificationCode.Input)
   case disableFilterForChild
   case createSignedScreenshotUpload(CreateSignedScreenshotUpload.Input)
   case createSignedScreenshotUpload_v2(CreateSignedScreenshotUpload_v2.Input)
@@ -17,6 +18,7 @@ public enum AuthedUserRoute: PairRoute {
   case logFilterEvents(LogFilterEvents.Input)
   case logSecurityEvent(LogSecurityEvent.Input)
   case reportBrowsers(ReportBrowsers.Input)
+  case confirmOnboardingNotificationCode(ConfirmOnboardingNotificationCode.Input)
   case selectAlwaysBlockedGroups(SelectAlwaysBlockedGroups.Input)
   case selectPublicKeychains(SelectPublicKeychains.Input)
   case setDowntimeSchedule(SetDowntimeSchedule.Input)
@@ -48,6 +50,10 @@ public extension AuthedUserRoute {
     Route(.case(Self.createOnboardingKeychain)) {
       Operation(CreateOnboardingKeychain.self)
       Body(.json(CreateOnboardingKeychain.Input.self))
+    }
+    Route(.case(Self.sendOnboardingNotificationCode)) {
+      Operation(SendOnboardingNotificationCode.self)
+      Body(.json(SendOnboardingNotificationCode.Input.self))
     }
     Route(.case(Self.disableFilterForChild)) {
       Operation(DisableFilterForChild.self)
@@ -82,6 +88,10 @@ public extension AuthedUserRoute {
     Route(.case(Self.reportBrowsers)) {
       Operation(ReportBrowsers.self)
       Body(.json(ReportBrowsers.Input.self))
+    }
+    Route(.case(Self.confirmOnboardingNotificationCode)) {
+      Operation(ConfirmOnboardingNotificationCode.self)
+      Body(.json(ConfirmOnboardingNotificationCode.Input.self))
     }
     Route(.case(Self.selectAlwaysBlockedGroups)) {
       Operation(SelectAlwaysBlockedGroups.self)

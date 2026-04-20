@@ -21,6 +21,7 @@
     "@heroicons/react": "2.0.17",
     "@shared/components": "workspace:*",
     "@shared/datetime": "workspace:*",
+    "@shared/phone-numbers": "workspace:*",
     "@shared/string": "workspace:*",
     "@shared/tailwind": "workspace:*",
     "@shared/ts-utils": "workspace:*",

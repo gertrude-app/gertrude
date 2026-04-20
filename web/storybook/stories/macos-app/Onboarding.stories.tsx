@@ -349,6 +349,11 @@ export const Welcome: Story = props({
   createCustomKeychainRequest: { case: `idle` },
   blockedBundleIds: [],
   createAppKeysRequest: { case: `idle` },
+  textNotifications: {
+    hasVerifiedMethod: false,
+    sendCodeRequest: { case: `idle` },
+    confirmCodeRequest: { case: `idle` },
+  },
   emit: () => {},
   dispatch: () => {},
 });
@@ -670,6 +675,95 @@ export const LocateMenuBarIcon: Story = props({
 export const EasyMode: Story = props({
   ...Welcome.args,
   step: `encourageFilterSuspensions`,
+});
+
+export const SetupNotifsEnterPhone: Story = props({
+  ...Welcome.args,
+  step: `setupNotifications_enterPhone`,
+});
+
+export const SetupNotifsEnterPhoneSending: Story = props({
+  ...Welcome.args,
+  step: `setupNotifications_enterPhone`,
+  textNotifications: {
+    hasVerifiedMethod: false,
+    sendCodeRequest: { case: `ongoing` },
+    confirmCodeRequest: { case: `idle` },
+  },
+});
+
+export const SetupNotifsEnterPhoneFailed: Story = props({
+  ...Welcome.args,
+  step: `setupNotifications_enterPhone`,
+  textNotifications: {
+    hasVerifiedMethod: false,
+    sendCodeRequest: {
+      case: `failed`,
+      error: `That phone number doesn't look right.`,
+    },
+    confirmCodeRequest: { case: `idle` },
+  },
+});
+
+export const SetupNotifsVerifyCode: Story = props({
+  ...Welcome.args,
+  step: `setupNotifications_verifyCode`,
+  textNotifications: {
+    hasVerifiedMethod: false,
+    sendCodeRequest: {
+      case: `succeeded`,
+      payload: {
+        methodId: `e05c458e-f52b-492f-af9c-5aff7a77f743`,
+        phoneNumber: `(555) 867-5309`,
+      },
+    },
+    confirmCodeRequest: { case: `idle` },
+  },
+});
+
+export const SetupNotifsVerifyCodeSaving: Story = props({
+  ...Welcome.args,
+  step: `setupNotifications_verifyCode`,
+  textNotifications: {
+    hasVerifiedMethod: false,
+    sendCodeRequest: {
+      case: `succeeded`,
+      payload: {
+        methodId: `e05c458e-f52b-492f-af9c-5aff7a77f743`,
+        phoneNumber: `(555) 867-5309`,
+      },
+    },
+    confirmCodeRequest: { case: `ongoing` },
+  },
+});
+
+export const SetupNotifsVerifyCodeFailed: Story = props({
+  ...Welcome.args,
+  step: `setupNotifications_verifyCode`,
+  textNotifications: {
+    hasVerifiedMethod: false,
+    sendCodeRequest: {
+      case: `succeeded`,
+      payload: {
+        methodId: `e05c458e-f52b-492f-af9c-5aff7a77f743`,
+        phoneNumber: `(555) 867-5309`,
+      },
+    },
+    confirmCodeRequest: {
+      case: `failed`,
+      error: `That code didn't match. Please try again.`,
+    },
+  },
+});
+
+export const SetupNotifsSuccess: Story = props({
+  ...Welcome.args,
+  step: `setupNotifications_success`,
+  textNotifications: {
+    hasVerifiedMethod: true,
+    sendCodeRequest: { case: `idle` },
+    confirmCodeRequest: { case: `succeeded`, payload: undefined },
+  },
 });
 
 export const AlwaysBlockedGroups: Story = props({

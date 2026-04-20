@@ -1,5 +1,5 @@
-import { prettyE164 } from '@dash/utils';
 import { Button, SelectMenu } from '@shared/components';
+import { prettyE164 } from '@shared/phone-numbers';
 import { capitalize } from '@shared/string';
 import cx from 'classnames';
 import React, { useEffect, useRef } from 'react';

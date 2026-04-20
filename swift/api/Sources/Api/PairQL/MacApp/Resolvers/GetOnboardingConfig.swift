@@ -16,6 +16,16 @@ extension GetOnboardingConfig: NoInputResolver {
       .filter(\.recommended)
       .map(\.id.rawValue)
 
+    let parent = try await context.child.parent(in: context.db)
+
+    let methods = try await Parent.NotificationMethod.query()
+      .where(.parentId == parent.id)
+      .all(in: context.db)
+
+    let hasVerifiedTextNotificationMethod = methods.contains { method in
+      if case .text = method.config { true } else { false }
+    }
+
     return Output(
       publicKeychains: keychains.map { keychain in
         PublicKeychain(
@@ -37,6 +47,7 @@ extension GetOnboardingConfig: NoInputResolver {
         },
         preselected: preselectedIds,
       ),
+      hasVerifiedTextNotificationMethod: hasVerifiedTextNotificationMethod,
     )
   }
 }

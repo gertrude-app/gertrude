@@ -11,9 +11,9 @@ export type RequestState<T = void, E = string> =
 export type OnboardingStep =
   | 'welcome'
   | 'wrongInstallDir'
+  | 'macosUserAccountType'
   | 'confirmGertrudeAccount'
   | 'noGertrudeAccount'
-  | 'macosUserAccountType'
   | 'getChildConnectionCode'
   | 'connectChild'
   | 'howToUseGifs'
@@ -47,6 +47,9 @@ export type OnboardingStep =
   | 'exemptUsers'
   | 'locateMenuBarIcon'
   | 'encourageFilterSuspensions'
+  | 'setupNotifications_enterPhone'
+  | 'setupNotifications_verifyCode'
+  | 'setupNotifications_success'
   | 'alwaysBlockedGroups'
   | 'viewHealthCheck'
   | 'screenTimeConflict'
@@ -69,6 +72,17 @@ export interface MacOSUser {
   id: number;
   name: string;
   isAdmin: boolean;
+}
+
+export interface SendCodeSuccess {
+  methodId: UUID;
+  phoneNumber: string;
+}
+
+export interface TextNotifications {
+  hasVerifiedMethod: boolean;
+  sendCodeRequest: RequestState<SendCodeSuccess>;
+  confirmCodeRequest: RequestState;
 }
 
 export interface DiscoveredApp {
@@ -130,6 +144,7 @@ export interface AppState {
   customKeychainDomains: string[];
   createCustomKeychainRequest: RequestState;
   createAppKeysRequest: RequestState;
+  textNotifications: TextNotifications;
   isUpgrade: boolean;
 }
 
@@ -148,6 +163,8 @@ export type AppEvent =
   | { case: 'connectChildSubmitted'; code: number }
   | { case: 'infoModalOpened'; step: OnboardingStep; detail?: string }
   | { case: 'setDowntimeSchedule'; window: PlainTimeWindow }
+  | { case: 'sendOnboardingNotificationCode'; phoneNumber: string }
+  | { case: 'confirmOnboardingNotificationCode'; methodId: UUID; code: number }
   | { case: 'createOnboardingKeychain'; domain: string }
   | { case: 'setUserExemption'; userId: number; enabled: boolean }
   | { case: 'closeWindow' }
@@ -160,7 +177,8 @@ export type AppEvent =
   | { case: 'logoutConfirmCanceled' }
   | { case: 'createUserCanceled' }
   | { case: 'postCreateLogoutClicked' }
-  | { case: 'postCreateSkipClicked' };
+  | { case: 'postCreateSkipClicked' }
+  | { case: 'changeOnboardingPhoneNumberClicked' };
 // end codegen
 
 export type ViewState = {
@@ -193,6 +211,11 @@ export class OnboardingStore extends Store<AppState, AppEvent, ViewState, ViewAc
       customKeychainDomains: [],
       createCustomKeychainRequest: { case: `idle` },
       createAppKeysRequest: { case: `idle` },
+      textNotifications: {
+        hasVerifiedMethod: false,
+        sendCodeRequest: { case: `idle` },
+        confirmCodeRequest: { case: `idle` },
+      },
       connectionCode: ``,
       receivedAppState: false,
       didResume: false,
