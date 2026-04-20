@@ -32,6 +32,11 @@ extension AdminNotifying {
       try await sendNtfy(topic: topic)
     }
   }
+
+  func shortUrl(for url: String) async -> String {
+    await (try? with(dependency: \.db)
+      .create(ShortUrl(target: url)).publicUrl) ?? url
+  }
 }
 
 // helpers and domain types
