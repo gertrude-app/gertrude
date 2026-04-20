@@ -944,21 +944,21 @@ struct OnboardingFeature: Feature {
       case .webview(.primaryBtnClicked) where step == .finish,
            .closeWindow,
            .webview(.closeWindow):
-        let childConnected = state.connectChildRequest.isSucceeded
-        log("bba204bc", "close from \(step), childConnected=\(childConnected)")
         state.windowOpen = false
-        guard childConnected else {
-          return .exec { _ in
-            let persisted = try await self.storage.loadPersistentState()
+        let inMemoryConnected = state.connectChildRequest.isSucceeded
+        return .exec { send in
+          let persisted: Persistent.State? = await (try? self.storage.loadPersistentState()) ?? nil
+          let childConnected = inMemoryConnected || persisted?.user != nil
+          log("bba204bc", "close from \(step), childConnected=\(childConnected)")
+          guard inMemoryConnected else {
             if persisted?.user == nil, step < .allowNotifications_start {
               // unexpected super early bail, so we need to delete all storage and quit
               // so that if they launch Gertrude again, they get the onboarding flow again
               await self.storage.deleteAll()
               await self.app.quit()
             }
+            return
           }
-        }
-        return .exec { send in
           if await self.app.isLaunchAtLoginEnabled() == false {
             await self.app.enableLaunchAtLogin()
           }
