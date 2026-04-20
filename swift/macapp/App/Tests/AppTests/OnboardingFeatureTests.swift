@@ -1043,6 +1043,68 @@ final class OnboardingFeatureTests: XCTestCase {
   }
 
   @MainActor
+  func testCloseHandlerLoadsPersistedStateEvenWhenInMemoryConnected() async {
+    let (store, _) = AppReducer.testStore {
+      $0.user = .init(data: .mock)
+      $0.onboarding.step = .allowNotifications_start
+      $0.onboarding.connectChildRequest = .succeeded(payload: "franny")
+    }
+
+    let loadState = mock(always: Persistent.State.mock)
+    store.deps.storage.loadPersistentState = loadState.fn
+
+    await store.send(.onboarding(.webview(.closeWindow)))
+    await store.skipReceivedActions()
+
+    // required so close-event telemetry can report accurate `childConnected`
+    await expect(loadState.calls.count).toEqual(1)
+  }
+
+  @MainActor
+  func testCloseHandlerStillStartsProtectionWhenStorageLoadThrows() async {
+    let (store, _) = AppReducer.testStore {
+      $0.user = .init(data: .mock { $0.name = "franny" })
+      $0.onboarding.step = .allowNotifications_start
+      $0.onboarding.connectChildRequest = .succeeded(payload: "franny")
+    }
+
+    store.deps.storage.loadPersistentState = { throw TestErr("storage unreadable") }
+
+    await store.send(.onboarding(.webview(.closeWindow)))
+    await store.receive(.startProtecting(user: .mock { $0.name = "franny" }))
+  }
+
+  @MainActor
+  func testClosingFromResumedUpgradeAtFDASuccessDoesNotQuit() async {
+    let (store, _) = AppReducer.testStore {
+      $0.user = .init(data: .mock)
+      $0.onboarding.step = .allowFullDiskAccess_success
+      $0.onboarding.upgrade = true
+      // `connectChildRequest` is `.idle` — not restored on upgrade-FDA resume
+    }
+
+    let loadState = mock(always: Persistent.State.mock)
+    store.deps.storage.loadPersistentState = loadState.fn
+    let deleteAll = mock(always: ())
+    store.deps.storage.deleteAll = deleteAll.fn
+    let quit = mock(always: ())
+    store.deps.app.quit = quit.fn
+    let enableLaunchAtLogin = mock(always: ())
+    store.deps.app.enableLaunchAtLogin = enableLaunchAtLogin.fn
+
+    await store.send(.onboarding(.webview(.closeWindow))) {
+      $0.onboarding.windowOpen = false
+    }
+
+    await expect(loadState.calls.count).toEqual(1)
+    // persisted user present -> no super-early-bail cleanup
+    await expect(deleteAll.calls.count).toEqual(0)
+    await expect(quit.calls.count).toEqual(0)
+    // flow gated on in-memory state -> no double-fire of protection startup
+    await expect(enableLaunchAtLogin.calls.count).toEqual(0)
+  }
+
+  @MainActor
   func testSkippingFromAdminUserRemediation() async {
     let store = onboardingFeatureStore {
       $0.step = .macosUserAccountType
