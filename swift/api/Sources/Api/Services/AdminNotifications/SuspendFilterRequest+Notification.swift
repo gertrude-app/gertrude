@@ -31,7 +31,8 @@ extension AdminEvent.SuspendFilterRequestSubmitted: AdminNotifying {
   func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult {
     let linkUrl = await (try? with(dependency: \.db)
       .create(ShortUrl(target: self.url)).publicUrl) ?? self.url
-    let message = "Gertrude: suspend filter request from \(self.childName).\n\n\(linkUrl)"
+    let name = self.childName.sanitizedForSms()
+    let message = "Gertrude: suspend filter request from \(name).\n\n\(linkUrl)"
     return try await with(dependency: \.twilio)
       .send(Text(to: .init(rawValue: phoneNumber), message: message))
   }
