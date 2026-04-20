@@ -293,7 +293,13 @@ final class CompletedFlowDecisionTests: XCTestCase {
     let filter = TestFilter.scenario()
     expect(flow.hostname).toBeNil()
 
-    _ = filter.completedDecision(&flow, bytes: "••••••••••parents.gertrude.app•••••")
+    _ = filter.completedFlowDecision(
+      &flow,
+      readBytes: Data(
+        "GET / HTTP/1.1\r\nHost: parents.gertrude.app\r\nConnection: keep-alive\r\n\r\n"
+          .utf8,
+      ),
+    )
 
     // the flow is inout because looking at the outbound bytes sets more
     // data on the flow, which is used to make the decision.
