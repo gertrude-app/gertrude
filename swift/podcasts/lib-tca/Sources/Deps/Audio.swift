@@ -83,8 +83,7 @@ private final class Player: Sendable {
 
   init() {
     let session = AVAudioSession.sharedInstance()
-    try? session.setCategory(.playback)
-    try? session.setMode(.spokenAudio)
+    try? session.setCategory(.playback, mode: .spokenAudio, policy: .longFormAudio)
     self.setupRemoteCommands()
     self.setupInterruptionObserver()
   }
