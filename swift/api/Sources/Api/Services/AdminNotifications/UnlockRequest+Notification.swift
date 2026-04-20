@@ -8,9 +8,10 @@ extension AdminEvent.UnlockRequestSubmitted: AdminNotifying {
     let request = requestIds.count > 1
       ? "\(requestIds.count) unlock requests"
       : "unlock request"
-    let message = "\(request.capitalized) from \(self.userName)\n\n\(self.url)"
+    let shortUrl = await self.shortUrl(for: self.url)
+    let message = "\(request.capitalized) from \(self.userName)\n\n\(shortUrl)"
     try await with(dependency: \.ntfy)
-      .send(topic, "Gertrude", message, self.url)
+      .send(topic, "Gertrude", message, shortUrl)
   }
 
   func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult {

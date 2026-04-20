@@ -43,15 +43,16 @@ extension AdminEvent.SecurityEventPayload: AdminNotifying {
 
   func sendNtfy(topic: String) async throws {
     let url = "https://parents.gertrude.app/security-events"
+    let shortUrl = await self.shortUrl(for: url)
     let message = """
     Security event \(self.context): \(self.desc).
 
     \(self.explanation)
 
-    \(url)
+    \(shortUrl)
     """
     try await with(dependency: \.ntfy)
-      .send(topic, "Gertrude security event", message, url)
+      .send(topic, "Gertrude security event", message, shortUrl)
   }
 
   func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult {

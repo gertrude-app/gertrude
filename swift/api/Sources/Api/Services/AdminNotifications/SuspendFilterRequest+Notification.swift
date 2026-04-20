@@ -22,9 +22,10 @@ extension AdminEvent.SuspendFilterRequestSubmitted: AdminNotifying {
   }
 
   func sendNtfy(topic: String) async throws {
-    let message = "Suspend filter request from \(self.childName)\n\n\(self.url)"
+    let shortUrl = await self.shortUrl(for: self.url)
+    let message = "Suspend filter request from \(self.childName)\n\n\(shortUrl)"
     try await with(dependency: \.ntfy)
-      .send(topic, "Gertrude", message, self.url)
+      .send(topic, "Gertrude", message, shortUrl)
   }
 
   func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult {
