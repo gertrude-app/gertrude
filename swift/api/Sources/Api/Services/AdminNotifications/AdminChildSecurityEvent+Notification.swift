@@ -58,7 +58,7 @@ extension AdminEvent.SecurityEventPayload: AdminNotifying {
   func sendText(to phoneNumber: String) async throws -> TwilioSmsClient.SendResult {
     let who = switch source {
     case .macApp(let childName, _):
-      "for \(childName)"
+      "for \(childName.sanitizedForSms())"
     case .dashboard:
       "in parent website"
     }

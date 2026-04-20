@@ -20,7 +20,8 @@ extension AdminEvent.UnlockRequestSubmitted: AdminNotifying {
       : "unlock request"
     let linkUrl = await (try? with(dependency: \.db)
       .create(ShortUrl(target: self.url)).publicUrl) ?? self.url
-    let message = "Gertrude: \(request) from \(self.userName).\n\n\(linkUrl)"
+    let name = self.userName.sanitizedForSms()
+    let message = "Gertrude: \(request) from \(name).\n\n\(linkUrl)"
     return try await with(dependency: \.twilio)
       .send(Text(to: .init(phoneNumber), message: message))
   }
