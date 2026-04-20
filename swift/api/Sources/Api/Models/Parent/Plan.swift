@@ -22,6 +22,7 @@ enum BillingStatus {
     enum TrialKind: Equatable, Sendable {
       case full
       case fromLight(stripeId: Subscription.StripeId)
+      case fromLapsedLight(stripeId: Subscription.StripeId)
     }
   }
 
@@ -92,7 +93,10 @@ extension Plan {
     case .full(let status):
       switch status {
       case .complimentary, .paid: true
-      case .trialing, .trialExpired, .overdue: false
+      case .trialing(.fromLight, _), .trialExpired(.fromLight): true
+      case .trialing(.full, _), .trialing(.fromLapsedLight, _): false
+      case .trialExpired(.full), .trialExpired(.fromLapsedLight): false
+      case .overdue: false
       }
     }
   }
@@ -123,15 +127,32 @@ extension Plan {
         fatalError("invariant 4c79e7b7, id: \(subscription.id)")
       case (_, .none, .some):
         fatalError("invariant 08cd4729, id: \(subscription.id)")
-      case (_, .some(let stripeId), .some(let trialStartedAt))
-        where trialStartedAt + Full.trialLengthDays > now:
+      case (.paid, .some(let stripeId), .some(let trialStartedAt))
+        where trialStartedAt + Full.trialLengthDays > now,
+           (.overdue, .some(let stripeId), .some(let trialStartedAt))
+             where trialStartedAt + Full.trialLengthDays > now:
         self = .full(status: .trialing(
           kind: .fromLight(stripeId: stripeId),
           until: trialStartedAt + Full.trialLengthDays,
         ))
-      case (_, .some(let stripeId), .some(let trialStartedAt))
-        where trialStartedAt + Full.trialLengthDays > now - Full.trialGraceDays:
+      case (.paid, .some(let stripeId), .some(let trialStartedAt))
+        where trialStartedAt + Full.trialLengthDays > now - Full.trialGraceDays,
+           (.overdue, .some(let stripeId), .some(let trialStartedAt))
+             where trialStartedAt + Full.trialLengthDays > now - Full.trialGraceDays:
         self = .full(status: .trialExpired(kind: .fromLight(stripeId: stripeId)))
+      case (.unpaid, .some(let stripeId), .some(let trialStartedAt))
+        where trialStartedAt + Full.trialLengthDays > now,
+           (.cancelled, .some(let stripeId), .some(let trialStartedAt))
+             where trialStartedAt + Full.trialLengthDays > now:
+        self = .full(status: .trialing(
+          kind: .fromLapsedLight(stripeId: stripeId),
+          until: trialStartedAt + Full.trialLengthDays,
+        ))
+      case (.unpaid, .some(let stripeId), .some(let trialStartedAt))
+        where trialStartedAt + Full.trialLengthDays > now - Full.trialGraceDays,
+           (.cancelled, .some(let stripeId), .some(let trialStartedAt))
+             where trialStartedAt + Full.trialLengthDays > now - Full.trialGraceDays:
+        self = .full(status: .trialExpired(kind: .fromLapsedLight(stripeId: stripeId)))
       case (.paid, .some(let stripeId), let trialStarted):
         self = .light(status: .paid(stripeId: stripeId, hasTrialedFull: trialStarted != nil))
       case (.overdue, .some(let stripeId), let trialStarted):

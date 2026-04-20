@@ -34,6 +34,8 @@ extension MacAppConnectionCode: Resolver {
       return .init(code: code, gate: nil)
     case .full(.trialExpired(kind: .fromLight)):
       return .init(code: code, gate: .planUpgradeRequired)
+    case .full(.trialExpired(kind: .fromLapsedLight)):
+      return .init(code: code, gate: .subscriptionFixRequired)
     case .full(.overdue), .full(.trialExpired):
       return .init(code: code, gate: .subscriptionFixRequired)
     case .light(.paid(_, hasTrialedFull: false)):
