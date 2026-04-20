@@ -172,12 +172,18 @@ export type Plan =
       status:
         | {
             case: 'trialing';
-            kind: { case: 'fromLight'; stripeId: string } | { case: 'full' };
+            kind:
+              | { case: 'fromLight'; stripeId: string }
+              | { case: 'fromLapsedLight'; stripeId: string }
+              | { case: 'full' };
             until: ISODateString;
           }
         | {
             case: 'trialExpired';
-            kind: { case: 'fromLight'; stripeId: string } | { case: 'full' };
+            kind:
+              | { case: 'fromLight'; stripeId: string }
+              | { case: 'fromLapsedLight'; stripeId: string }
+              | { case: 'full' };
           }
         | { case: 'paid'; stripeId: string; monthlyPriceInCents: number }
         | { case: 'overdue'; stripeId: string; monthlyPriceInCents: number }

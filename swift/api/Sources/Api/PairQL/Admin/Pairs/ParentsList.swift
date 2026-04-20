@@ -107,6 +107,8 @@ extension ParentsList: Resolver {
         ("full", "trialing")
       case .fromLight:
         ("light", "trialingFull")
+      case .fromLapsedLight:
+        ("light", "trialingFullLapsed")
       }
     case .full(.trialExpired(let kind)):
       switch kind {
@@ -114,6 +116,8 @@ extension ParentsList: Resolver {
         ("full", "trialExpired")
       case .fromLight:
         ("light", "trialExpired")
+      case .fromLapsedLight:
+        ("light", "trialExpiredLapsed")
       }
     case .full(.paid):
       ("full", "paid")

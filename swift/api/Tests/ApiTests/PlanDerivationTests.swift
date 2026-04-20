@@ -137,6 +137,89 @@ final class PlanDerivationTests: DependencyTestCase {
     let plan = Plan(subscription: subscription, now: .reference)
     expect(plan).toEqual(.full(status: .complimentary))
   }
+
+  func testAllowsSupervisionForLightPaidUserTrialingFull() {
+    let trialStarted = Date.reference
+    let subscription = Subscription(
+      parentId: .init(),
+      tier: .light,
+      billingStatus: .paid,
+      stripeId: .init("sub_test"),
+      trialStartedAt: trialStarted,
+      statusExpiresAt: .distantFuture,
+    )
+    let trialing = Plan(subscription: subscription, now: trialStarted + .days(10))
+    expect(trialing.allowsSupervision).toEqual(true)
+    let trialExpired = Plan(subscription: subscription, now: trialStarted + .days(25))
+    expect(trialExpired.allowsSupervision).toEqual(true)
+  }
+
+  func testDoesNotAllowSupervisionForFullTrialingFromScratch() {
+    let plan = Plan.full(status: .trialing(kind: .full, until: .distantFuture))
+    expect(plan.allowsSupervision).toEqual(false)
+  }
+
+  func testLapsedLightWithActiveTrialDerivesToFullTrialingFromLapsedLight() {
+    let trialStarted = Date.reference
+    let now = trialStarted + .days(10)
+    for status: BillingStatus.Db in [.unpaid, .cancelled] {
+      let subscription = Subscription(
+        parentId: .init(),
+        tier: .light,
+        billingStatus: status,
+        stripeId: .init("sub_test"),
+        trialStartedAt: trialStarted,
+        statusExpiresAt: .distantFuture,
+      )
+      let plan = Plan(subscription: subscription, now: now)
+      expect(plan).toEqual(.full(status: .trialing(
+        kind: .fromLapsedLight(stripeId: .init("sub_test")),
+        until: trialStarted + Plan.Full.trialLengthDays,
+      )))
+      expect(plan.allowsSupervision).toEqual(false)
+    }
+  }
+
+  func testLapsedLightInGracePeriodDerivesToTrialExpiredFromLapsedLight() {
+    let trialStarted = Date.reference
+    let now = trialStarted + .days(25)
+    for status: BillingStatus.Db in [.unpaid, .cancelled] {
+      let subscription = Subscription(
+        parentId: .init(),
+        tier: .light,
+        billingStatus: status,
+        stripeId: .init("sub_test"),
+        trialStartedAt: trialStarted,
+        statusExpiresAt: .distantFuture,
+      )
+      let plan = Plan(subscription: subscription, now: now)
+      expect(plan).toEqual(.full(status: .trialExpired(
+        kind: .fromLapsedLight(stripeId: .init("sub_test")),
+      )))
+      expect(plan.allowsSupervision).toEqual(false)
+    }
+  }
+
+  func testLapsedLightAfterGracePeriodReturnsToLapsedLight() {
+    let trialStarted = Date.reference
+    let now = trialStarted + .days(30)
+    for status: BillingStatus.Db in [.unpaid, .cancelled] {
+      let subscription = Subscription(
+        parentId: .init(),
+        tier: .light,
+        billingStatus: status,
+        stripeId: .init("sub_test"),
+        trialStartedAt: trialStarted,
+        statusExpiresAt: .distantFuture,
+      )
+      let plan = Plan(subscription: subscription, now: now)
+      expect(plan).toEqual(.free(kind: .lapsedLight(
+        stripeId: .init("sub_test"),
+        hasTrialedFull: true,
+      )))
+      expect(plan.allowsSupervision).toEqual(false)
+    }
+  }
 }
 
 extension TimeInterval {

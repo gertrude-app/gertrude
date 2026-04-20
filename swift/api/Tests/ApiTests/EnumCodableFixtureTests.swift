@@ -126,6 +126,7 @@ final class EnumCodableFixtureTests: XCTestCase {
     try self.assertRoundTrip(Plan.FreeKind.lapsedLight(stripeId: stripeId, hasTrialedFull: true))
     try self.assertRoundTrip(BillingStatus.Full.paid(stripeId: stripeId, monthlyPriceInCents: 1299))
     try self.assertRoundTrip(BillingStatus.Full.TrialKind.fromLight(stripeId: stripeId))
+    try self.assertRoundTrip(BillingStatus.Full.TrialKind.fromLapsedLight(stripeId: stripeId))
     try self.assertRoundTrip(BillingStatus.Light.paid(stripeId: stripeId, hasTrialedFull: false))
   }
 
