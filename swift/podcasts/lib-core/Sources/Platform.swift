@@ -88,7 +88,16 @@ import SwiftUI
       AVAudioSession()
     }
 
+    public enum RouteSharingPolicy {
+      case longFormAudio
+    }
+
     public func setCategory(_ category: Category) throws {}
+    public func setCategory(
+      _ category: Category,
+      mode: Mode,
+      policy: RouteSharingPolicy,
+    ) throws {}
     public func setMode(_ mode: Mode) throws {}
     public func setActive(_ active: Bool) throws {}
   }

@@ -567,6 +567,93 @@ import Testing
       #expect(pauseInvocations.value == 1)
     }
   }
+
+  @Test func `system play event resumes paused episode and seeds progress`() async throws {
+    let playInvocations = LockIsolated<[Episode.ID]>([])
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase {
+        try fixtures($0)
+        try NowPlayingModel.insert {
+          NowPlayingModel(episodeId: 3, isPlaying: false)
+        }.execute($0)
+      }
+      $0.audio.play = { ep, _ in playInvocations.withValue { $0.append(ep.id) } }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: NowPlayingFeature.init)
+
+      var nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.id == 3 && nowPlaying?.isPlaying == false)
+
+      await store.send(.system(.play(30)))
+
+      nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying.isPlaying(episodeId: 3) == true)
+      #expect(nowPlaying?.bufferedProgress == 30)
+      let (episode, _) = dep(\.db).episodeWithShow(3)!
+      #expect(episode.progress == 30)
+      #expect(playInvocations.value == [.init(3)])
+    }
+  }
+
+  @Test func `interruption ended with shouldResume rewinds 3s and resumes`() async throws {
+    let playInvocations = LockIsolated<[Episode.ID]>([])
+    let seekInvocations = LockIsolated<[Double]>([])
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase {
+        try fixtures($0)
+        try NowPlayingModel.insert {
+          NowPlayingModel(episodeId: 3, isPlaying: false)
+        }.execute($0)
+      }
+      $0.audio.play = { ep, _ in playInvocations.withValue { $0.append(ep.id) } }
+      $0.audio.seek = { time in seekInvocations.withValue { $0.append(time) } }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: NowPlayingFeature.init)
+
+      var nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.id == 3 && nowPlaying?.isPlaying == false)
+
+      await store.send(.system(.interruptionEnded(shouldResume: true, from: 60)))
+
+      nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying.isPlaying(episodeId: 3) == true)
+      #expect(nowPlaying?.bufferedProgress == 57)
+      #expect(seekInvocations.value == [57])
+      #expect(playInvocations.value == [.init(3)])
+    }
+  }
+
+  @Test func `interruption ended without shouldResume is a no-op`() async throws {
+    let playInvocations = LockIsolated<[Episode.ID]>([])
+    let seekInvocations = LockIsolated<[Double]>([])
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase {
+        try fixtures($0)
+        try NowPlayingModel.insert {
+          NowPlayingModel(episodeId: 3, isPlaying: false, progress: 60)
+        }.execute($0)
+      }
+      $0.audio.play = { ep, _ in playInvocations.withValue { $0.append(ep.id) } }
+      $0.audio.seek = { time in seekInvocations.withValue { $0.append(time) } }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: NowPlayingFeature.init)
+
+      var nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.id == 3 && nowPlaying?.isPlaying == false)
+      #expect(nowPlaying?.bufferedProgress == 60)
+
+      await store.send(.system(.interruptionEnded(shouldResume: false, from: 60)))
+
+      nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.id == 3 && nowPlaying?.isPlaying == false)
+      #expect(nowPlaying?.bufferedProgress == 60)
+      #expect(seekInvocations.value.isEmpty)
+      #expect(playInvocations.value.isEmpty)
+    }
+  }
 }
 
 func fixtures(_ db: Database) throws {

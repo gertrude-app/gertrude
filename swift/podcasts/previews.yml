@@ -1,4 +1,11 @@
 name: GertiePodcastsPreviews
+options:
+  deploymentTarget:
+    iOS: "18.0"
+
+configs:
+  Debug: debug
+
 targets:
   App:
     type: application
@@ -8,10 +15,14 @@ targets:
       - path: previews/sources
       - path: previews/Assets.xcassets
     settings:
-      GENERATE_INFOPLIST_FILE: YES
-      PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.am.previews"
-      DEVELOPMENT_TEAM: "WFN83LM943"
-      CODE_SIGN_STYLE: Automatic
+      base:
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_VERSION: "6.0"
+        PRODUCT_NAME: "GertiePodcastsPreviews"
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.am.previews"
+        DEVELOPMENT_TEAM: "WFN83LM943"
+        CODE_SIGN_STYLE: Automatic
 schemes:
   App:
     build:

@@ -83,9 +83,7 @@ private final class Player: Sendable {
 
   init() {
     let session = AVAudioSession.sharedInstance()
-    try? session.setCategory(.playback)
-    try? session.setMode(.spokenAudio)
-    try? session.setActive(true)
+    try? session.setCategory(.playback, mode: .spokenAudio, policy: .longFormAudio)
     self.setupRemoteCommands()
     self.setupInterruptionObserver()
   }
@@ -97,6 +95,7 @@ private final class Player: Sendable {
   }
 
   func play(_ episode: Episode, _ show: Show) throws {
+    try? AVAudioSession.sharedInstance().setActive(true)
     if self.episode.withLock({ $0?.id }) == episode.id {
       self.player.play()
     } else {
@@ -175,6 +174,7 @@ private final class Player: Sendable {
 
   private func setupRemotePlayCommand() {
     MPRemoteCommandCenter.shared().playCommand.addTarget { [weak self] _ in
+      try? AVAudioSession.sharedInstance().setActive(true)
       let position = self?.player.play()
       self?.applyStoredRate()
       self?.startTimeUpdates()
@@ -320,6 +320,9 @@ private final class Player: Sendable {
           shouldResume = options.contains(.shouldResume)
         } else {
           shouldResume = false
+        }
+        if shouldResume {
+          try? AVAudioSession.sharedInstance().setActive(true)
         }
         self?.emit(.interruptionEnded(
           shouldResume: shouldResume,
