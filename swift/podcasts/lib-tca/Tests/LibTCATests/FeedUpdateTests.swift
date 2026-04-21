@@ -296,7 +296,7 @@ import Testing
   }
 }
 
-@Test func `feed invalidation during download should not restore downloaded state`() async throws {
+@Test func `feed invalidation during download should not restore downloaded state`() async {
   let clock = TestClock()
   let episode = Episode.mock(1, showId: 1)
   let fetchedFeed = Feed(
@@ -304,16 +304,19 @@ import Testing
     episodes: [.mock(1, showId: 1) { $0.duration = 7200 }],
   )
   let releaseDownload = LockIsolated<CheckedContinuation<Void, Never>?>(nil)
+  let loggedEventIds = LockIsolated<[String]>([])
 
   try? FileManager.default.removeItem(at: episode.localAudioUrl.deletingLastPathComponent())
   defer {
     try? FileManager.default.removeItem(at: episode.localAudioUrl.deletingLastPathComponent())
   }
 
-  try await withDependencies {
+  await withDependencies {
     $0.continuousClock = clock
     $0.date = .constant(.reference)
-    $0.api.logEvent = { _, _, _, _ in }
+    $0.api.logEvent = { id, _, _, _ in
+      loggedEventIds.withValue { $0.append(id) }
+    }
     $0.fileSystem.removeItem = { try FileManager.default.removeItem(at: $0) }
     $0.fileSystem.fileExists = { FileManager.default.fileExists(atPath: $0.path) }
     $0.defaultDatabase = try! appDatabase {
@@ -361,9 +364,10 @@ import Testing
     let invalidatedMidFlight = dep(\.db).tryRead { db in
       try Episode.find(episode.id).fetchOne(db)
     }
-    #expect(invalidatedMidFlight?.downloadedAt == nil)
-    #expect(invalidatedMidFlight?.duration == 7200)
-    #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path) == false)
+    // active downloads should be protected from feed invalidation
+    #expect(invalidatedMidFlight?.downloadedAt == .distantFuture)
+    #expect(invalidatedMidFlight?.duration == 3600)
+    #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path))
 
     releaseDownload.withValue {
       $0?.resume()
@@ -377,11 +381,12 @@ import Testing
       try Episode.find(episode.id).fetchOne(db)
     }
 
-    // This is the production-plausible regression: feed invalidation already removed the
-    // file, so download completion should not be able to stamp the episode back to downloaded.
-    #expect(refreshed?.downloadedAt == nil)
-    #expect(refreshed?.duration == 7200)
-    #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path) == false)
+    // the download should complete cleanly and log the skipped invalidation
+    #expect(refreshed?.downloadedAt == .reference)
+    #expect(refreshed?.duration == 3600)
+    #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path))
+    #expect(loggedEventIds.value.contains("4ac9084e"))
+    #expect(loggedEventIds.value.contains("8c975d36") == false)
   }
 }
 

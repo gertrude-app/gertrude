@@ -8,7 +8,7 @@ import Testing
 @testable import LibTCA
 
 @MainActor struct ShowFeatureTests {
-  @Test func `archiving during download should not restore downloaded state`() async throws {
+  @Test func `archiving during download should not invalidate active download`() async throws {
     let clock = TestClock()
     let episode = Episode.mock(2, showId: 1)
     let releaseDownload = LockIsolated<CheckedContinuation<Void, Never>?>(nil)
@@ -64,15 +64,15 @@ import Testing
 
       #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path))
 
-      // Race the in-flight download with the real archive action, which deletes the file
-      // and clears downloadedAt immediately.
+      // race the in-flight download with the real archive action
       await store.send(.episodeView(episode.id, .toggleArchivedTapped))
 
       let archivedMidFlight = dep(\.db).tryRead { db in
         try Episode.find(episode.id).fetchOne(db)
       }
       #expect(archivedMidFlight?.isArchived == true)
-      #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path) == false)
+      #expect(archivedMidFlight?.downloadedAt == .distantFuture)
+      #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path))
 
       releaseDownload.withValue {
         $0?.resume()
@@ -86,12 +86,12 @@ import Testing
         try Episode.find(episode.id).fetchOne(db)
       }
 
-      // This is the regression: the archive path already won, so the download completion
-      // should not be able to stamp the episode back to "downloaded".
+      // the download should complete cleanly and log the skipped invalidation
       #expect(refreshed?.isArchived == true)
-      #expect(refreshed?.downloadedAt == nil)
-      #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path) == false)
-      #expect(loggedEventIds.value.contains("8c975d36"))
+      #expect(refreshed?.downloadedAt == .reference)
+      #expect(FileManager.default.fileExists(atPath: episode.localAudioUrl.path))
+      #expect(loggedEventIds.value.contains("4ac9084e"))
+      #expect(loggedEventIds.value.contains("8c975d36") == false)
     }
   }
 

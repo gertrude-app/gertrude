@@ -123,9 +123,10 @@ func ensureDownloaded(episode: Episode) async -> DownloadOutcome {
         .where { $0.id == currentEpisode.id }
         .execute(db)
     }
-    unexpected(
-      id: "459454b4",
-      downloadStateDetail(currentEpisode, fileSystem: fileSystem),
+    log(
+      .error("459454b4"),
+      "expected downloaded episode missing local file",
+      detail: downloadStateDetail(currentEpisode, fileSystem: fileSystem),
     )
   }
   if currentEpisode.downloading {
