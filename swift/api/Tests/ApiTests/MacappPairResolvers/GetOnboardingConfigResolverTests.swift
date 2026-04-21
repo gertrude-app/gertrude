@@ -81,6 +81,51 @@ final class GetOnboardingConfigResolverTests: ApiTestCase, @unchecked Sendable {
     expect(sorted[1].longDescription).toEqual("Misc long description")
   }
 
+  func testHasVerifiedTextMethodFalseWhenParentHasNoMethods() async throws {
+    try await Keychain.query().delete(in: self.db)
+    try await AlwaysBlockedGroup.query().delete(in: self.db)
+    let child = try await self.child().withDevice()
+
+    let output = try await GetOnboardingConfig.resolve(in: context(child))
+
+    expect(output.hasVerifiedTextNotificationMethod).toEqual(false)
+  }
+
+  func testHasVerifiedTextMethodTrueWhenParentHasVerifiedTextMethod() async throws {
+    try await Keychain.query().delete(in: self.db)
+    try await AlwaysBlockedGroup.query().delete(in: self.db)
+    let child = try await self.child().withDevice()
+
+    try await self.db.create(Parent.NotificationMethod(
+      parentId: child.parent.model.id,
+      config: .text(phoneNumber: "+15558675309"),
+    ))
+    try await self.db.create(Parent.NotificationMethod(
+      parentId: child.parent.model.id,
+      config: .email(email: "blob@blob.com"),
+    ))
+
+    let output = try await GetOnboardingConfig.resolve(in: context(child))
+
+    expect(output.hasVerifiedTextNotificationMethod).toEqual(true)
+  }
+
+  func testHasVerifiedTextMethodIgnoresOtherParentsMethods() async throws {
+    try await Keychain.query().delete(in: self.db)
+    try await AlwaysBlockedGroup.query().delete(in: self.db)
+    let child = try await self.child().withDevice()
+    let otherParent = try await self.parent()
+
+    try await self.db.create(Parent.NotificationMethod(
+      parentId: otherParent.model.id,
+      config: .text(phoneNumber: "+15558675309"),
+    ))
+
+    let output = try await GetOnboardingConfig.resolve(in: context(child))
+
+    expect(output.hasVerifiedTextNotificationMethod).toEqual(false)
+  }
+
   func testPreselectsOnlyRecommendedGroups() async throws {
     try await Keychain.query().delete(in: self.db)
     try await AlwaysBlockedGroup.query().delete(in: self.db)

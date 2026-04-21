@@ -28,6 +28,7 @@ extension OnboardingFeature.State {
     var customKeychainDomains: [String]
     var createCustomKeychainRequest: RequestState<String>
     var createAppKeysRequest: RequestState<String>
+    var textNotifications: TextNotifications
     var isUpgrade: Bool
 
     init(state: AppReducer.State) {
@@ -51,6 +52,7 @@ extension OnboardingFeature.State {
       self.customKeychainDomains = state.onboarding.customKeychainDomains
       self.createCustomKeychainRequest = state.onboarding.createCustomKeychainRequest
       self.createAppKeysRequest = state.onboarding.createAppKeysRequest
+      self.textNotifications = state.onboarding.textNotifications
       self.isUpgrade = state.onboarding.upgrade
     }
   }

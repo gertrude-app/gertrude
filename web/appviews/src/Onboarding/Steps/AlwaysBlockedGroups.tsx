@@ -60,7 +60,7 @@ const AlwaysBlockedGroups: React.FC<Props> = ({ groups, preselected }) => {
         <Onboarding.Text className="mt-5 max-w-xl" centered>
           Most parents want a few things to stay blocked <b>no matter what</b>&mdash;even
           {` `}
-          <em>during a filter suspension.</em> These are our recommendations, but you can
+          <b>during a filter suspension.</b> These are our recommendations, but you can
           customize or add custom blocks later from the parent website.
         </Onboarding.Text>
 

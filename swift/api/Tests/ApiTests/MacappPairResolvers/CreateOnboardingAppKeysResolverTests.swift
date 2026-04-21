@@ -154,7 +154,7 @@ final class CreateOnboardingAppKeysResolverTests: ApiTestCase, @unchecked Sendab
 
   func testRejectsRequestWhenTokenTooOld() async throws {
     var child = try await self.childWithComputer()
-    child.token.createdAt = Date.reference.addingTimeInterval(-60 * 91)
+    child.token.createdAt = Date.reference.addingTimeInterval(-60 * 60 * 25)
 
     try await expectErrorFrom {
       try await CreateOnboardingAppKeys.resolve(

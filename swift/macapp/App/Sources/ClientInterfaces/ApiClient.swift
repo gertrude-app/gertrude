@@ -6,6 +6,8 @@ import MacAppRoute
 public struct ApiClient: Sendable {
   public var checkIn: @Sendable (CheckIn_v2.Input) async throws -> CheckIn_v2.Output
   public var clearUserToken: @Sendable () async -> Void
+  public var confirmOnboardingNotificationCode: @Sendable (ConfirmOnboardingNotificationCode.Input)
+    async throws -> Void
   public var connectUser: @Sendable (ConnectUser.Input) async throws -> UserData
   public var createOnboardingAppKeys: @Sendable (CreateOnboardingAppKeys.Input) async throws -> Void
   public var createOnboardingBlockedApps: @Sendable (CreateOnboardingBlockedApps.Input)
@@ -17,6 +19,8 @@ public struct ApiClient: Sendable {
   public var selectAlwaysBlockedGroups: @Sendable (SelectAlwaysBlockedGroups.Input)
     async throws -> Void
   public var selectPublicKeychains: @Sendable (SelectPublicKeychains.Input) async throws -> Void
+  public var sendOnboardingNotificationCode: @Sendable (SendOnboardingNotificationCode.Input)
+    async throws -> SendOnboardingNotificationCode.Output
   public var setDowntimeSchedule: @Sendable (SetDowntimeSchedule.Input) async throws -> Void
   public var createKeystrokeLines: @Sendable (CreateKeystrokeLines.Input) async throws -> Void
   public var createSuspendFilterRequest: @Sendable (CreateSuspendFilterRequest_v2.Input)
@@ -37,6 +41,8 @@ public struct ApiClient: Sendable {
   public init(
     checkIn: @escaping @Sendable (CheckIn_v2.Input) async throws -> CheckIn_v2.Output,
     clearUserToken: @escaping @Sendable () async -> Void,
+    confirmOnboardingNotificationCode: @escaping @Sendable (ConfirmOnboardingNotificationCode.Input)
+    async throws -> Void,
     connectUser: @escaping @Sendable (ConnectUser.Input) async throws -> UserData,
     createOnboardingAppKeys: @escaping @Sendable (CreateOnboardingAppKeys.Input)
     async throws -> Void,
@@ -49,6 +55,8 @@ public struct ApiClient: Sendable {
     selectAlwaysBlockedGroups: @escaping @Sendable (SelectAlwaysBlockedGroups.Input)
     async throws -> Void,
     selectPublicKeychains: @escaping @Sendable (SelectPublicKeychains.Input) async throws -> Void,
+    sendOnboardingNotificationCode: @escaping @Sendable (SendOnboardingNotificationCode.Input)
+    async throws -> SendOnboardingNotificationCode.Output,
     setDowntimeSchedule: @escaping @Sendable (SetDowntimeSchedule.Input) async throws -> Void,
     createKeystrokeLines: @escaping @Sendable (CreateKeystrokeLines.Input) async throws -> Void,
     createSuspendFilterRequest: @escaping @Sendable (CreateSuspendFilterRequest_v2.Input)
@@ -69,6 +77,7 @@ public struct ApiClient: Sendable {
   ) {
     self.checkIn = checkIn
     self.clearUserToken = clearUserToken
+    self.confirmOnboardingNotificationCode = confirmOnboardingNotificationCode
     self.connectUser = connectUser
     self.createOnboardingAppKeys = createOnboardingAppKeys
     self.createOnboardingBlockedApps = createOnboardingBlockedApps
@@ -77,6 +86,7 @@ public struct ApiClient: Sendable {
     self.getOnboardingConfig = getOnboardingConfig
     self.selectAlwaysBlockedGroups = selectAlwaysBlockedGroups
     self.selectPublicKeychains = selectPublicKeychains
+    self.sendOnboardingNotificationCode = sendOnboardingNotificationCode
     self.setDowntimeSchedule = setDowntimeSchedule
     self.createKeystrokeLines = createKeystrokeLines
     self.createSuspendFilterRequest = createSuspendFilterRequest
@@ -132,6 +142,9 @@ extension ApiClient: TestDependencyKey {
   public static let testValue = Self(
     checkIn: unimplemented("ApiClient.checkIn"),
     clearUserToken: unimplemented("ApiClient.clearUserToken"),
+    confirmOnboardingNotificationCode: unimplemented(
+      "ApiClient.confirmOnboardingNotificationCode",
+    ),
     connectUser: unimplemented("ApiClient.connectUser"),
     createOnboardingAppKeys: unimplemented("ApiClient.createOnboardingAppKeys"),
     createOnboardingBlockedApps: unimplemented("ApiClient.createOnboardingBlockedApps"),
@@ -140,6 +153,7 @@ extension ApiClient: TestDependencyKey {
     getOnboardingConfig: unimplemented("ApiClient.getOnboardingConfig"),
     selectAlwaysBlockedGroups: unimplemented("ApiClient.selectAlwaysBlockedGroups"),
     selectPublicKeychains: unimplemented("ApiClient.selectPublicKeychains"),
+    sendOnboardingNotificationCode: unimplemented("ApiClient.sendOnboardingNotificationCode"),
     setDowntimeSchedule: unimplemented("ApiClient.setDowntimeSchedule"),
     createKeystrokeLines: unimplemented("ApiClient.createKeystrokeLines"),
     createSuspendFilterRequest: unimplemented("ApiClient.createSuspendFilterRequest"),
@@ -160,6 +174,7 @@ extension ApiClient: TestDependencyKey {
   public static let mock = Self(
     checkIn: { _ in throw Error.unexpectedError(statusCode: 999) },
     clearUserToken: {},
+    confirmOnboardingNotificationCode: { _ in },
     connectUser: { _ in throw Error.unexpectedError(statusCode: 888) },
     createOnboardingAppKeys: { _ in },
     createOnboardingBlockedApps: { _ in },
@@ -168,9 +183,11 @@ extension ApiClient: TestDependencyKey {
     getOnboardingConfig: { .init(
       publicKeychains: [],
       alwaysBlocked: .init(groups: [], preselected: []),
+      hasVerifiedTextNotificationMethod: false,
     ) },
     selectAlwaysBlockedGroups: { _ in },
     selectPublicKeychains: { _ in },
+    sendOnboardingNotificationCode: { _ in .init(methodId: .init()) },
     setDowntimeSchedule: { _ in },
     createKeystrokeLines: { _ in },
     createSuspendFilterRequest: { _ in .init() },

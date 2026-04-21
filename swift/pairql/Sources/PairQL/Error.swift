@@ -69,5 +69,6 @@ public extension PqlError {
     case userTokenNotFound
     case connectionCodeNotFound
     case iosDeviceTokenNotFound
+    case incorrectConfirmationCode
   }
 }

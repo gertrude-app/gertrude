@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { parseE164, prettyE164 } from '../phone-numbers';
+import { parseE164, prettyE164 } from '../index';
 
 describe(`parseE164()`, () => {
   const cases: Array<[string | undefined, string | null]> = [

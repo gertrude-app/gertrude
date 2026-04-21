@@ -15,6 +15,12 @@ extension ApiClient: @retroactive DependencyKey {
     clearUserToken: {
       await userToken.setValue(nil)
     },
+    confirmOnboardingNotificationCode: { input in
+      _ = try await output(
+        from: ConfirmOnboardingNotificationCode.self,
+        with: .confirmOnboardingNotificationCode(input),
+      )
+    },
     connectUser: { input in
       try await output(
         from: ConnectUser.self,
@@ -61,6 +67,12 @@ extension ApiClient: @retroactive DependencyKey {
       _ = try await output(
         from: SelectPublicKeychains.self,
         with: .selectPublicKeychains(input),
+      )
+    },
+    sendOnboardingNotificationCode: { input in
+      try await output(
+        from: SendOnboardingNotificationCode.self,
+        with: .sendOnboardingNotificationCode(input),
       )
     },
     setDowntimeSchedule: { input in

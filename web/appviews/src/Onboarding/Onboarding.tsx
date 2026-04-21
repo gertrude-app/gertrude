@@ -34,6 +34,7 @@ export const Onboarding: React.FC<Props> = ({
   blockedBundleIds,
   osVersion,
   isUpgrade,
+  textNotifications,
 }) => {
   // during testing, i was able to hear videos playing after
   // window was closed, showing that the dom was still in memory
@@ -234,6 +235,27 @@ export const Onboarding: React.FC<Props> = ({
         <OnboardingPage
           step="encourageFilterSuspensions"
           component={<Step.EncourageFilterSuspensions />}
+        />
+        <OnboardingPage
+          step="setupNotifications_enterPhone"
+          component={
+            <Step.SetupNotificationsEnterPhone
+              request={textNotifications.sendCodeRequest}
+            />
+          }
+        />
+        <OnboardingPage
+          step="setupNotifications_verifyCode"
+          component={
+            <Step.SetupNotificationsVerifyCode
+              sendRequest={textNotifications.sendCodeRequest}
+              confirmRequest={textNotifications.confirmCodeRequest}
+            />
+          }
+        />
+        <OnboardingPage
+          step="setupNotifications_success"
+          component={<Step.SetupNotificationsSuccess />}
         />
         <OnboardingPage
           step="alwaysBlockedGroups"

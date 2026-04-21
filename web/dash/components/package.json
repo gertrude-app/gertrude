@@ -16,6 +16,7 @@
     "@headlessui/react": "2.2.9",
     "@heroicons/react": "2.0.17",
     "@shared/components": "workspace:*",
+    "@shared/phone-numbers": "workspace:*",
     "@shared/string": "workspace:*",
     "@shared/ts-utils": "workspace:*",
     "@types/dash-ambient": "workspace:*",

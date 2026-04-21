@@ -6,12 +6,12 @@ extension OnboardingFeature.State {
     // wrong install dir
     case wrongInstallDir
 
+    // os user type
+    case macosUserAccountType
+
     // account
     case confirmGertrudeAccount
     case noGertrudeAccount
-
-    // os user type
-    case macosUserAccountType
 
     // connection
     case getChildConnectionCode
@@ -71,6 +71,9 @@ extension OnboardingFeature.State {
     case exemptUsers
     case locateMenuBarIcon
     case encourageFilterSuspensions
+    case setupNotifications_enterPhone
+    case setupNotifications_verifyCode
+    case setupNotifications_success
     case alwaysBlockedGroups
     case viewHealthCheck
     case screenTimeConflict
@@ -82,14 +85,14 @@ extension OnboardingFeature.State.Step {
   var primaryFallbackNextStep: Self {
     switch self {
     case .welcome:
-      .confirmGertrudeAccount
-    case .wrongInstallDir:
-      .confirmGertrudeAccount
-    case .confirmGertrudeAccount:
       .macosUserAccountType
-    case .noGertrudeAccount:
+    case .wrongInstallDir:
       .macosUserAccountType
     case .macosUserAccountType:
+      .confirmGertrudeAccount
+    case .confirmGertrudeAccount:
+      .getChildConnectionCode
+    case .noGertrudeAccount:
       .getChildConnectionCode
     case .getChildConnectionCode:
       .connectChild
@@ -156,6 +159,12 @@ extension OnboardingFeature.State.Step {
     case .locateMenuBarIcon:
       .encourageFilterSuspensions
     case .encourageFilterSuspensions:
+      .setupNotifications_enterPhone
+    case .setupNotifications_enterPhone:
+      .setupNotifications_verifyCode
+    case .setupNotifications_verifyCode:
+      .setupNotifications_success
+    case .setupNotifications_success:
       .alwaysBlockedGroups
     case .alwaysBlockedGroups:
       .viewHealthCheck
@@ -174,14 +183,14 @@ extension OnboardingFeature.State.Step {
       .welcome
     case .wrongInstallDir:
       .welcome
-    case .confirmGertrudeAccount:
+    case .macosUserAccountType:
       .welcome
+    case .confirmGertrudeAccount:
+      .macosUserAccountType
     case .noGertrudeAccount:
       .confirmGertrudeAccount
-    case .macosUserAccountType:
-      .confirmGertrudeAccount
     case .getChildConnectionCode:
-      .macosUserAccountType
+      .confirmGertrudeAccount
     case .connectChild:
       .getChildConnectionCode
     case .howToUseGifs:
@@ -246,12 +255,18 @@ extension OnboardingFeature.State.Step {
       .installSysExt_explain
     case .encourageFilterSuspensions:
       .locateMenuBarIcon
-    case .alwaysBlockedGroups:
+    case .setupNotifications_enterPhone:
       .encourageFilterSuspensions
+    case .setupNotifications_verifyCode:
+      .setupNotifications_enterPhone
+    case .setupNotifications_success:
+      .setupNotifications_verifyCode
+    case .alwaysBlockedGroups:
+      .setupNotifications_enterPhone
     case .viewHealthCheck:
       .alwaysBlockedGroups
     case .screenTimeConflict:
-      .encourageFilterSuspensions
+      .setupNotifications_enterPhone
     case .finish:
       .viewHealthCheck
     }
@@ -267,9 +282,9 @@ extension OnboardingFeature.State.Step: Comparable {
     switch self {
     case .welcome: 10
     case .wrongInstallDir: 20
-    case .confirmGertrudeAccount: 30
-    case .noGertrudeAccount: 40
-    case .macosUserAccountType: 50
+    case .macosUserAccountType: 30
+    case .confirmGertrudeAccount: 40
+    case .noGertrudeAccount: 50
     case .getChildConnectionCode: 60
     case .connectChild: 70
     case .howToUseGifs: 80
@@ -303,6 +318,9 @@ extension OnboardingFeature.State.Step: Comparable {
     case .exemptUsers: 320
     case .locateMenuBarIcon: 330
     case .encourageFilterSuspensions: 340
+    case .setupNotifications_enterPhone: 343
+    case .setupNotifications_verifyCode: 344
+    case .setupNotifications_success: 345
     case .alwaysBlockedGroups: 350
     case .viewHealthCheck: 360
     case .screenTimeConflict: 370

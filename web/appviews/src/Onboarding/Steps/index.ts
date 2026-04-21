@@ -16,6 +16,11 @@ export { default as AlwaysBlockedGroups } from './AlwaysBlockedGroups';
 export { default as AllowScreenshots } from './AllowScreenshots';
 export { default as AllowFullDiskAccess } from './AllowFullDiskAccess';
 export { default as EncourageFilterSuspensions } from './EncourageFilterSuspensions';
+export {
+  SetupNotificationsEnterPhone,
+  SetupNotificationsSuccess,
+  SetupNotificationsVerifyCode,
+} from './SetupNotifications';
 export { default as AllowNotifications } from './AllowNotifications';
 export { default as AllowKeylogging } from './AllowKeylogging';
 export { default as InstallSysExt } from './InstallSysExt';

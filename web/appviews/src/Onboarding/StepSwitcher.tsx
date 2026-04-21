@@ -195,6 +195,9 @@ function getProgress(currentStep: OnboardingStep): Progress {
       return { step: 6, totalSteps: CONFIGURATION_TOTAL };
     case `locateMenuBarIcon`:
     case `encourageFilterSuspensions`:
+    case `setupNotifications_enterPhone`:
+    case `setupNotifications_verifyCode`:
+    case `setupNotifications_success`:
     case `alwaysBlockedGroups`:
     case `viewHealthCheck`:
     case `screenTimeConflict`:

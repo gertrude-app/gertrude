@@ -59,6 +59,9 @@ extension AuthedUserRoute: RouteResponder {
     case .createOnboardingKeychain(let input):
       let output = try await CreateOnboardingKeychain.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .sendOnboardingNotificationCode(let input):
+      let output = try await SendOnboardingNotificationCode.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .createSuspendFilterRequest_v2(let input):
       let output = try await CreateSuspendFilterRequest_v2.resolve(with: input, in: context)
       return try await self.respond(with: output)
@@ -70,6 +73,9 @@ extension AuthedUserRoute: RouteResponder {
       return try await self.respond(with: output)
     case .reportBrowsers(let input):
       let output = try await ReportBrowsers.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .confirmOnboardingNotificationCode(let input):
+      let output = try await ConfirmOnboardingNotificationCode.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .selectAlwaysBlockedGroups(let input):
       let output = try await SelectAlwaysBlockedGroups.resolve(with: input, in: context)
@@ -91,7 +97,7 @@ extension MacApp.ChildContext {
   func verifyOnboardingToken(_ pairName: String, _ eventId: String) async throws {
     @Dependency(\.date.now) var now
     let tokenAge = now.timeIntervalSince(self.token.createdAt)
-    guard tokenAge > .minutes(90) else { return }
+    guard tokenAge > .hours(24) else { return }
     let parent = try await self.child.parent(in: self.db)
     await get(dependency: \.slack).internal(
       .info,

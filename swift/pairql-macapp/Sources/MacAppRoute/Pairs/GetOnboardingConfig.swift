@@ -53,10 +53,16 @@ public struct GetOnboardingConfig: Pair {
   public struct Output: PairOutput {
     public var publicKeychains: [PublicKeychain]
     public var alwaysBlocked: AlwaysBlocked
+    public var hasVerifiedTextNotificationMethod: Bool
 
-    public init(publicKeychains: [PublicKeychain], alwaysBlocked: AlwaysBlocked) {
+    public init(
+      publicKeychains: [PublicKeychain],
+      alwaysBlocked: AlwaysBlocked,
+      hasVerifiedTextNotificationMethod: Bool,
+    ) {
       self.publicKeychains = publicKeychains
       self.alwaysBlocked = alwaysBlocked
+      self.hasVerifiedTextNotificationMethod = hasVerifiedTextNotificationMethod
     }
   }
 }

@@ -1,5 +1,5 @@
-import { parseE164 } from '@dash/utils';
 import { Button, SelectMenu, TextInput } from '@shared/components';
+import { parseE164 } from '@shared/phone-numbers';
 import React, { useState } from 'react';
 import type {
   CreatePendingNotificationMethod,
