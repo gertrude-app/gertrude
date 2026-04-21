@@ -168,10 +168,22 @@ func _performFeedUpdates(_ updates: FeedUpdates) async -> [Episode] {
   @Dependency(\.db) var database
   @Dependency(\.podcasts) var podcasts
 
-  if !updates.deleteEpisodes.isEmpty {
+  let allInvalidatedEpisodeIds = updates.actions.compactMap {
+    if case .invalidateEpisodeAudio(let id) = $0 { id } else { nil }
+  }
+  let downloadingIds = activelyDownloadingEpisodeIds(
+    allInvalidatedEpisodeIds,
+    source: .feedRefreshAudioChanged,
+  )
+  // defer the whole episode update for active downloads and let the next refresh self-heal
+  let episodeUpdates = updates.episodeUpdates.filter { !downloadingIds.contains($0.id) }
+  let deleteEpisodes = updates.deleteEpisodes.filter { !downloadingIds.contains($0) }
+  let invalidatedEpisodeIds = allInvalidatedEpisodeIds.filter { !downloadingIds.contains($0) }
+
+  if !deleteEpisodes.isEmpty {
     let deleted = database.tryRead { db in
       try Episode
-        .where { $0.id.in(updates.deleteEpisodes) }
+        .where { $0.id.in(deleteEpisodes) }
         .fetchAll(db)
     }
     for episode in deleted {
@@ -179,13 +191,14 @@ func _performFeedUpdates(_ updates: FeedUpdates) async -> [Episode] {
     }
   }
 
-  for action in updates.actions {
-    if case .invalidateEpisodeAudio(let episodeId) = action {
-      database.tryRead { db in
-        if let episode = try Episode.find(episodeId).fetchOne(db) {
-          episode.removeLocalAudioFile()
-        }
-      }
+  if !invalidatedEpisodeIds.isEmpty {
+    let episodes = database.tryRead { db in
+      try Episode
+        .where { $0.id.in(invalidatedEpisodeIds) }
+        .fetchAll(db)
+    }
+    for episode in episodes {
+      episode.removeLocalAudioFile()
     }
   }
 
@@ -193,12 +206,12 @@ func _performFeedUpdates(_ updates: FeedUpdates) async -> [Episode] {
     if !updates.showUpdates.isEmpty {
       try Show.upsert { updates.showUpdates }.execute(db)
     }
-    if !updates.episodeUpdates.isEmpty {
-      try Episode.upsert { updates.episodeUpdates }.execute(db)
+    if !episodeUpdates.isEmpty {
+      try Episode.upsert { episodeUpdates }.execute(db)
     }
-    if !updates.deleteEpisodes.isEmpty {
+    if !deleteEpisodes.isEmpty {
       try Episode
-        .where { $0.id.in(updates.deleteEpisodes) }
+        .where { $0.id.in(deleteEpisodes) }
         .delete()
         .execute(db)
     }

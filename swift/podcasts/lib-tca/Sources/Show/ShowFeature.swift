@@ -60,13 +60,7 @@ struct ShowFeature {
           return .none
         case .removeDownloadTapped:
           return .run { _ in
-            episode.removeLocalAudioFile()
-            self.database.tryWrite { db in
-              try Episode
-                .update { $0.downloadedAt = nil }
-                .where { $0.id == episode.id }
-                .execute(db)
-            }
+            safelyDiscardEpisodeDownloads([episode.id], source: .manualRemove)
           }
         case .toggleCompletedTapped:
           return .run { _ in
@@ -87,14 +81,16 @@ struct ShowFeature {
           }
         case .toggleArchivedTapped:
           return .run { [state] _ in
-            if !episode.isArchived {
-              episode.removeLocalAudioFile()
-            }
+            let discardResult = !episode.isArchived
+              ? safelyDiscardEpisodeDownloads([episode.id], source: .archiveEpisode)
+              : .init()
             self.database.tryWrite { db in
               try Episode
                 .update {
                   $0.isArchived.toggle()
-                  $0.downloadedAt = nil
+                  if episode.isArchived || !discardResult.protectedEpisodeIds.contains(episode.id) {
+                    $0.downloadedAt = nil
+                  }
                   $0.progress = 0
                   $0.completedAt = nil
                 }

@@ -109,12 +109,15 @@ struct SettingsFeature {
         .fetchAll(db)
     }
     if episodes.isEmpty { return }
-    self.database.tryWrite { db in
-      try Episode
-        .update { $0.downloadedAt = nil }
-        .where { $0.id.in(episodes.map(\.id)) }
-        .execute(db)
-    }
-    episodes.forEach { $0.removeLocalAudioFile() }
+    let bytes = episodes.reduce(0) { $0 + $1.sizeInBytes }
+    let discardResult = safelyDiscardEpisodeDownloads(
+      episodes.map(\.id),
+      source: .reclaimStorage,
+    )
+    log(
+      .info("ad696f72"),
+      "reclaim storage",
+      detail: "requestedEpisodes:\(episodes.count) invalidatedEpisodes:\(discardResult.invalidatedEpisodes.count) protectedEpisodes:\(discardResult.protectedEpisodeIds.count) requestedBytes:\(bytes) invalidatedBytes:\(discardResult.invalidatedEpisodes.reduce(0) { $0 + $1.sizeInBytes })",
+    )
   }
 }

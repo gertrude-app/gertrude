@@ -2,6 +2,11 @@
 
 ## Releases
 
+- `1.5.0` (4/21/26)
+  - added an explicit airplay button to the player view
+  - moved playback speed control to bottom of player view
+  - fix app stealing audio from other apps before playback
+  - added safeguard against episode deletion race
 - `1.4.1` (4/7/2026)
   - fix episode website link (was pointing to show)
 - `1.4.0` (3/23/2026)

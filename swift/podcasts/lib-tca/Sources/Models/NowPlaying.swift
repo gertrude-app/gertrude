@@ -217,12 +217,7 @@ private func _play(episode: Episode, show: Show) async throws {
     try await dep(\.audio).play(episode: episode, show: show)
   } else {
     NowPlaying.updateSyncingProgress { $0.isPlaying = false }
-    dep(\.db).tryWrite { db in
-      try Episode
-        .update { $0.downloadedAt = nil }
-        .where { $0.id == episode.id }
-        .execute(db)
-    }
+    safelyDiscardEpisodeDownloads([episode.id], source: .playbackRecovery)
     let detail = missingPlaybackFileDetail(
       episode: episode,
       show: show,
@@ -243,7 +238,11 @@ private func _play(episode: Episode, show: Show) async throws {
         NowPlaying.delete()
       case .failure:
         NowPlaying.delete()
-        unexpected(id: "2e2c9e97", detail)
+        log(
+          .error("2e2c9e97"),
+          "episode play recovery failed after local file check",
+          detail: detail,
+        )
       }
     } else {
       NowPlaying.delete()
