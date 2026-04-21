@@ -8,6 +8,7 @@ import Callout from '@/components/articles/Callout';
 import ClickToReveal from '@/components/articles/ClickToReveal';
 import EmbeddedVideo from '@/components/articles/EmbeddedVideo';
 import Figure from '@/components/articles/Figure';
+import NewFeatureBadge from '@/components/articles/NewFeatureBadge';
 import { QuickLink, QuickLinks } from '@/components/articles/QuickLinks';
 
 export const config: Config = {
@@ -23,6 +24,7 @@ export const components = {
   CodeBlock: CodeBlock,
   EmbeddedVideo: EmbeddedVideo,
   Figure: Figure,
+  NewFeatureBadge: NewFeatureBadge,
   QuickLink: QuickLink,
   QuickLinks: QuickLinks,
 };

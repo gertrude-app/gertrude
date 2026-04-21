@@ -2,6 +2,12 @@
 
 ## Release notes
 
+- `2.9.1` (stable 4/21/26)
+  - always-blocked items, enforced even during filter suspensions
+  - real sni parsing for better non-safari support
+  - tons more onboarding config screens: text notifications, public keychains, custom
+    keychains, downtime, disable filtering, keychain explainer
+  - improve non-admin onboarding remediation w/ auto account creation
 - `2.9.0` (beta 4/8/26, new downloads, adding more onboarding screens)
   - new onboarding screen for app blocking
   - new onboarding screen for app keys
