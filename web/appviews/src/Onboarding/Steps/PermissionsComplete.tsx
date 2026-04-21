@@ -15,7 +15,7 @@ const PermissionsComplete: React.FC = () => {
         <>
           <h1
             className={cx(
-              `text-6xl mb-4 font-bold text-white transition-[transform,opacity] duration-1000 delay-[1s]`,
+              `text-6xl mb-4 font-bold text-white transition-[transform,opacity] duration-1000 delay-[700ms]`,
               !fadeIn && `opacity-0 translate-y-6`,
             )}
           >
@@ -23,7 +23,7 @@ const PermissionsComplete: React.FC = () => {
           </h1>
           <p
             className={cx(
-              `text-2xl text-white/70 max-w-2xl text-center transition-[transform,opacity] duration-1000 delay-[1.3s]`,
+              `text-2xl text-white/70 max-w-2xl text-center transition-[transform,opacity] duration-1000 delay-[900ms]`,
               !fadeIn && `opacity-0 translate-y-6`,
             )}
           >
@@ -32,7 +32,7 @@ const PermissionsComplete: React.FC = () => {
           </p>
           <p
             className={cx(
-              `text-xl text-white/60 max-w-2xl text-center mt-8 transition-[transform,opacity] duration-1000 delay-[700ms] px-8 italic`,
+              `text-xl text-white/60 max-w-2xl text-center mt-8 transition-[transform,opacity] duration-1000 delay-[1.1s] px-8 italic`,
               !fadeIn && `opacity-0 translate-y-6`,
             )}
           >
@@ -41,7 +41,7 @@ const PermissionsComplete: React.FC = () => {
           </p>
           <div
             className={cx(
-              `mt-12 transition-[opacity,transform] duration-1000 delay-[1s]`,
+              `mt-12 transition-[opacity,transform] duration-1000 delay-[1.3s]`,
               !fadeIn && `opacity-0 translate-y-6`,
             )}
           >
