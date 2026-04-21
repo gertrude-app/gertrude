@@ -40,7 +40,8 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
   }
 
   private var speedMenu: some View {
-    Menu {
+    let isDefaultRate = self.show.playbackRate == 1.0
+    return Menu {
       ForEach([0.7, 0.8, 0.9, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0], id: \.self) { rate in
         Button { self.emit(.speedButtonTapped(rate)) } label: {
           if self.show.playbackRate == rate {
@@ -53,10 +54,22 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
     } label: {
       Text(self.speedLabel(self.show.playbackRate))
         .font(.system(size: 13, weight: .semibold, design: .rounded))
-        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+        .foregroundStyle(
+          Color(
+            self.cs,
+            light: isDefaultRate ? .violet400 : .violet500,
+            dark: isDefaultRate ? .violet500 : .violet400,
+          ),
+        )
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(Capsule().fill(Color(self.cs, light: .violet200, dark: .violet800)))
+        .background(
+          Capsule().fill(
+            isDefaultRate
+              ? Color.clear
+              : Color(self.cs, light: .violet200, dark: .violet800),
+          ),
+        )
     }
   }
 
