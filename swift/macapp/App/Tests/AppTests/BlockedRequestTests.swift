@@ -65,4 +65,29 @@ final class BlockedRequestTests: XCTestCase {
     expect(br1.mergeable(with: br2)).toBeTrue()
     expect(br2.mergeable(with: br1)).toBeTrue()
   }
+
+  func testBundleIdLeadingDotDifferenceStillMergable() {
+    // bundle ids sometimes arrive with a leading dot, sometimes without.
+    // we treat that as the same app for matching elsewhere; same here.
+    let br1 = BlockedRequest(
+      app: .init(bundleId: "com.apple.amsengagementd"),
+      hostname: "apps.mzstatic.com",
+    )
+    let br2 = BlockedRequest(
+      app: .init(bundleId: ".com.apple.amsengagementd"),
+      hostname: "apps.mzstatic.com",
+    )
+    expect(br1.mergeable(with: br2)).toBeTrue()
+    expect(br2.mergeable(with: br1)).toBeTrue()
+  }
+
+  func testSameHostnameMergableEvenIfOnlyOneHasUrl() {
+    // chrome's https-first behavior: HTTPS attempt blocked, then HTTP fallback
+    // blocked. produces a TLS flow with hostname only, then an HTTP flow with
+    // hostname + url for the same site. should collapse to one displayed entry.
+    let tls = BlockedRequest(app: .mock, hostname: "weather.com")
+    let http = BlockedRequest(app: .mock, url: "http://weather.com/", hostname: "weather.com")
+    expect(tls.mergeable(with: http)).toBeTrue()
+    expect(http.mergeable(with: tls)).toBeTrue()
+  }
 }
