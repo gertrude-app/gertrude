@@ -353,7 +353,10 @@ func loadAlwaysBlockedRules(
     .where(.groupId |=| groupIds)
     .all(in: db)
 
-  return try await groupRules.map(\.rule) + customRules.map(\.rule)
+  let rules = try await groupRules.map(\.rule) + customRules.map(\.rule)
+  if rules.isEmpty { return [] }
+  // try to prevent sni obfuscation/hiding, which interferes with hostname detection
+  return rules + [.hostnameOrSubdomain(value: "cloudflare-ech.com")]
 }
 
 // TODO: this is major N+1 territory, write a custom query w/ join for perf

@@ -354,6 +354,36 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.adminAccountStatus).toEqual(.active)
   }
 
+  func testAlwaysBlocked_NilWhenChildHasNoRules() async throws {
+    let child = try await self.child().withDevice()
+
+    let output = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "1.0.0", filterVersion: nil),
+      in: child.context,
+    )
+
+    expect(output.alwaysBlocked).toBeNil()
+  }
+
+  func testAlwaysBlocked_AppendsCloudflareEchRuleWhenNonEmpty() async throws {
+    let child = try await self.child().withDevice()
+
+    try await self.db.create(ChildAlwaysBlockedRule(
+      childId: child.model.id,
+      rule: .hostnameEquals(value: "example.com"),
+    ))
+
+    let output = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "1.0.0", filterVersion: nil),
+      in: child.context,
+    )
+
+    expect(output.alwaysBlocked).toEqual([
+      .hostnameEquals(value: "example.com"),
+      .hostnameOrSubdomain(value: "cloudflare-ech.com"),
+    ])
+  }
+
   func testAdminAccountStatus_FullTrialExpired_IsNeedsAttention() async throws {
     let child = try await self.child().withDevice()
     try await self.db.create(Subscription(
