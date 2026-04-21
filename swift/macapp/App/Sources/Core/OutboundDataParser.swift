@@ -10,6 +10,38 @@ public enum OutboundDataParser {
     case malformed
   }
 
+  public static func containsEncryptedClientHello(_ data: Data) -> Bool {
+    guard let firstByte = data.first,
+          firstByte == 0x16,
+          data.count >= 5,
+          data[1] == 0x03
+    else {
+      return false
+    }
+
+    let recordLength = Int(data[3]) << 8 | Int(data[4])
+    let totalRecordLength = 5 + recordLength
+    guard data.count >= totalRecordLength else {
+      return false
+    }
+
+    let recordPayload = Data(data[5 ..< totalRecordLength])
+    guard recordPayload.count >= 4,
+          recordPayload.first == 0x01
+    else {
+      return false
+    }
+
+    let clientHelloLength = Int(recordPayload[1]) << 16 | Int(recordPayload[2]) << 8
+      | Int(recordPayload[3])
+    guard recordPayload.count >= 4 + clientHelloLength else {
+      return false
+    }
+
+    let clientHelloData = Data(recordPayload[4 ..< (4 + clientHelloLength)])
+    return self.clientHelloContainsEncryptedClientHello(clientHelloData)
+  }
+
   public static func parse(_ data: Data) -> Result {
     switch self.parseHTTP(data) {
     case .some(let result):
@@ -216,6 +248,46 @@ public enum OutboundDataParser {
     }
 
     return .tlsNoServerName
+  }
+
+  private static func clientHelloContainsEncryptedClientHello(_ data: Data) -> Bool {
+    var reader = ByteReader(data)
+
+    guard reader.readUInt16() != nil,
+          reader.readBytes(count: 32) != nil,
+          let sessionIdLength = reader.readUInt8(),
+          reader.readBytes(count: Int(sessionIdLength)) != nil,
+          let cipherSuitesLength = reader.readUInt16(),
+          cipherSuitesLength.isMultiple(of: 2),
+          reader.readBytes(count: Int(cipherSuitesLength)) != nil,
+          let compressionMethodsLength = reader.readUInt8(),
+          reader.readBytes(count: Int(compressionMethodsLength)) != nil
+    else {
+      return false
+    }
+
+    guard reader.remainingCount > 0,
+          let extensionsLength = reader.readUInt16(),
+          let extensions = reader.readBytes(count: Int(extensionsLength))
+    else {
+      return false
+    }
+
+    var extensionReader = ByteReader(extensions)
+    while extensionReader.remainingCount > 0 {
+      guard let type = extensionReader.readUInt16(),
+            let length = extensionReader.readUInt16(),
+            extensionReader.readBytes(count: Int(length)) != nil
+      else {
+        return false
+      }
+
+      if type == 0xFE0D {
+        return true
+      }
+    }
+
+    return false
   }
 
   private static func httpHeaderNeedMoreBytes(_ data: Data) -> Int? {

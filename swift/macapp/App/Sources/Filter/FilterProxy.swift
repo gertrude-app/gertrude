@@ -17,6 +17,7 @@ public class FilterProxy {
 
   static let initialOutboundPeekBytes = 2048
   static let maxOutboundRetryBytes = 16384
+  static let encryptedClientHelloSampleRate = 100
 
   #if !DEBUG
     let store: FilterStore
@@ -26,6 +27,7 @@ public class FilterProxy {
 
   var deferredOutboundFlows: [UUID: DeferredOutboundFlow] = [:]
   var cancellables: Set<AnyCancellable> = []
+  var encryptedClientHelloSamplingCounter = 0
 
   // give the FilterDataProvider a simple boolean it can
   // quickly check to decide if it needs to pass the decision
@@ -137,6 +139,9 @@ public class FilterProxy {
   ) -> NEFilterDataVerdict {
     let existingDeferred = self.deferredOutboundFlows[flow.identifier]
     let hasDeferredState = existingDeferred != nil
+    if !hasDeferredState {
+      self.store.log(event: .outboundDeferredStateMissing)
+    }
     var deferred = existingDeferred ?? .init(
       // Defensive fallback: outbound callbacks should normally have a deferred
       // entry already. On a miss, let downstream decisioning recover userId
@@ -146,16 +151,34 @@ public class FilterProxy {
       accumulatedReadBytes: .init(),
     )
 
-    let accumulatedReadBytes = mergeOutboundBytes(
+    let mergedOutboundBytes = mergeOutboundBytes(
       existing: deferred.accumulatedReadBytes,
       readBytesStartOffset: readBytesStartOffset,
       readBytes: readBytes,
     )
+    if mergedOutboundBytes.hadForwardGap {
+      self.store.log(event: .outboundBytesGapDetected)
+    }
+    let accumulatedReadBytes = mergedOutboundBytes.data
     var filterFlow = FilterFlow(flow, userId: deferred.userId)
     let parseResult = filterFlow.parseOutboundData(accumulatedReadBytes)
+    switch parseResult {
+    case .tls, .tlsNoServerName:
+      self.encryptedClientHelloSamplingCounter += 1
+      if self.encryptedClientHelloSamplingCounter
+        .isMultiple(of: Self.encryptedClientHelloSampleRate),
+        OutboundDataParser.containsEncryptedClientHello(accumulatedReadBytes) {
+        self.store.log(event: .sawEncryptedClientHello_x100)
+      }
+    case .http, .needMoreBytes, .unsupportedProtocol, .malformed:
+      break
+    }
 
     if case .needMoreBytes(let requestedTotal) = parseResult,
        deferred.round == 0 {
+      if requestedTotal > Self.maxOutboundRetryBytes {
+        self.store.log(event: .outboundRetryClampedToMax)
+      }
       let clampedTotal = min(
         max(requestedTotal, accumulatedReadBytes.count),
         Self.maxOutboundRetryBytes,
@@ -168,6 +191,10 @@ public class FilterProxy {
         self.deferredOutboundFlows[flow.identifier] = deferred
         return .init(passBytes: accumulatedReadBytes.count, peekBytes: additionalPeekBytes)
       }
+      self.store.log(event: .outboundRetryCapacityExhausted)
+    } else if case .needMoreBytes = parseResult,
+              deferred.round > 0 {
+      self.store.log(event: .outboundRetryStillInsufficient)
     }
 
     self.deferredOutboundFlows.removeValue(forKey: flow.identifier)
@@ -230,19 +257,24 @@ public class FilterProxy {
   }
 }
 
+private struct MergedOutboundBytes {
+  let data: Data
+  let hadForwardGap: Bool
+}
+
 private func mergeOutboundBytes(
   existing: Data,
   readBytesStartOffset: Int,
   readBytes: Data,
-) -> Data {
+) -> MergedOutboundBytes {
   guard !existing.isEmpty || readBytesStartOffset > 0 else {
-    return readBytes
+    return .init(data: readBytes, hadForwardGap: false)
   }
 
   if readBytesStartOffset > existing.count {
     // This should not happen for outbound peek callbacks, but if it does,
     // reset accumulation rather than fabricate bytes we never observed.
-    return readBytes
+    return .init(data: readBytes, hadForwardGap: true)
   }
 
   var merged = existing
@@ -258,7 +290,16 @@ private func mergeOutboundBytes(
   if overlapCount < readBytes.count {
     merged.append(readBytes.dropFirst(overlapCount))
   }
-  return merged
+  return .init(data: merged, hadForwardGap: false)
+}
+
+private extension FilterLogs.Event {
+  static let outboundBytesGapDetected = Self(id: "outboundBytesGapDetected")
+  static let outboundDeferredStateMissing = Self(id: "outboundDeferredStateMissing")
+  static let outboundRetryCapacityExhausted = Self(id: "outboundRetryCapacityExhausted")
+  static let outboundRetryStillInsufficient = Self(id: "outboundRetryStillInsufficient")
+  static let outboundRetryClampedToMax = Self(id: "outboundRetryClampedToMax")
+  static let sawEncryptedClientHello_x100 = Self(id: "sawEncryptedClientHello_x100")
 }
 
 public extension NEFilterFlow {
