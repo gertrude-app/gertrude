@@ -19,12 +19,19 @@ public extension NetworkFilter {
     readBytes: Data,
     auditToken: Data? = nil,
   ) -> FilterDecision.FromFlow {
+    if flow.url == nil {
+      _ = flow.parseOutboundData(readBytes)
+    }
+    return self.completedFlowDecision(&flow, auditToken: auditToken)
+  }
+
+  func completedFlowDecision(
+    _ flow: inout FilterFlow,
+    auditToken: Data? = nil,
+  ) -> FilterDecision.FromFlow {
     #if DEBUG
       if case .some(.some(let mock)) = self.__TEST_MOCK_FLOW_DECISION { return mock }
     #endif
-    if flow.url == nil {
-      flow.parseOutboundData(byteString: bytesToAscii(readBytes))
-    }
     return self.flowDecision(flow, auditToken: auditToken, canDefer: false) ??
       .block(.defaultNotAllowed)
   }
@@ -237,20 +244,4 @@ public extension NetworkFilter {
     }
     return suspension.scope.permits(app)
   }
-}
-
-public func bytesToAscii(_ bytes: Data) -> String {
-  var result = [UInt8]()
-  result.reserveCapacity(bytes.count * 3)
-  let dotBytes: [UInt8] = [0xE2, 0x80, 0xA2]
-  for byte in bytes {
-    switch byte {
-    // ascii characters possible in hostname
-    case 45 ... 57, 61, 63, 65 ... 90, 95, 97 ... 122:
-      result.append(byte)
-    default:
-      result.append(contentsOf: dotBytes)
-    }
-  }
-  return String(bytes: result, encoding: .utf8) ?? ""
 }

@@ -39,10 +39,14 @@ class FilterDataProvider: NEFilterDataProvider {
 
   override func handleOutboundData(
     from flow: NEFilterFlow,
-    readBytesStartOffset _: Int,
+    readBytesStartOffset: Int,
     readBytes: Data,
   ) -> NEFilterDataVerdict {
-    self.proxy.handleOutboundData(from: flow.dto, readBytes: readBytes)
+    self.proxy.handleOutboundData(
+      from: flow.dto,
+      readBytesStartOffset: readBytesStartOffset,
+      readBytes: readBytes,
+    )
   }
 
   deinit {

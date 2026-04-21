@@ -72,24 +72,16 @@ public struct FilterFlow: Equatable, Codable, Sendable {
     self.bundleId == ".com.apple.systemuiserver" && self.isPrivateNetwork
   }
 
-  public mutating func parseOutboundData(byteString: String) {
-    if let range = byteString.range(
-      of: #"^(GET|POST|PUT|PATCH|DELETE)•[^•]+•HTTP/[^•]+••Host••[^•]+"#,
-      options: .regularExpression,
-    ) {
-      let firstChunk = String(byteString[range])
-      let pieces = firstChunk.components(separatedBy: "•").filter { $0 != "" }
-      self.url = "http://" + pieces[4] + pieces[1]
-      self.hostname = pieces[4]
-      return
+  @discardableResult
+  public mutating func parseOutboundData(_ data: Data) -> OutboundDataParser.Result {
+    let result = OutboundDataParser.parse(data)
+    if let url = result.url {
+      self.url = url
     }
-
-    if let range = byteString.range(
-      of: #"[a-z0-9_-]{1,}(\.[a-z0-9_-]{1,}){0,5}\.[a-z0-9_-]{2,}"#,
-      options: .regularExpression,
-    ) {
-      self.hostname = String(byteString[range])
+    if let hostname = result.hostname {
+      self.hostname = hostname
     }
+    return result
   }
 
   public init(
@@ -168,4 +160,19 @@ public struct FilterFlow: Equatable, Codable, Sendable {
     .compactMap(\.self)
     .joined(separator: " ")
   }
+}
+
+public func bytesToAscii(_ bytes: Data) -> String {
+  var result = [UInt8]()
+  result.reserveCapacity(bytes.count * 3)
+  let dotBytes: [UInt8] = [0xE2, 0x80, 0xA2]
+  for byte in bytes {
+    switch byte {
+    case 45 ... 57, 61, 63, 65 ... 90, 95, 97 ... 122:
+      result.append(byte)
+    default:
+      result.append(contentsOf: dotBytes)
+    }
+  }
+  return String(bytes: result, encoding: .utf8) ?? ""
 }
