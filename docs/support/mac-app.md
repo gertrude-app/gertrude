@@ -61,11 +61,11 @@ the original flagship product, even though the iOS app now has a larger user bas
 
 ## Always Blocked
 
-- **Always Blocked** is a parallel layer of rules that *always deny* specific traffic,
+- **Always Blocked** is a parallel layer of rules that _always deny_ specific traffic,
   inverting the default allowlist model for a narrow set of cases.
-- Keys and keychains *allow*; Always Blocked rules *deny*. The two systems coexist and
-  deny takes priority: if an Always Blocked rule matches, the traffic is blocked even if
-  a key would otherwise allow it.
+- Keys and keychains _allow_; Always Blocked rules _deny_. The two systems coexist and
+  deny takes priority: if an Always Blocked rule matches, the traffic is blocked even if a
+  key would otherwise allow it.
 - Always Blocked rules override **filter suspensions**, **filtering-disabled** state, and
   **allow-keys**. They do not override downtime (downtime already blocks everything).
 - Always Blocked rules do **not** apply to exempt macOS users in v1. An exempt user
@@ -78,6 +78,19 @@ the original flagship product, even though the iOS app now has a larger user bas
   assignments silently.
 - The primary motivation is filter suspensions: many parents want certain categories
   (adult content, Messages GIF search, etc.) to stay blocked even during a suspension.
+
+## Filtering Disabled (Monitoring-Only)
+
+- **Filtering Disabled** is a first-class per-child option that turns off the network
+  filter while keeping screenshots, keylogging, security events, app blocking, and Always
+  Blocked rules fully in effect.
+- Intended for older teens and adult accountability arrangements where monitoring is
+  desired but internet access should not be restricted.
+- If screenshots or keylogging ever stop unexpectedly while filtering is disabled, the
+  filter automatically turns back on as a fail-safe.
+- Requires Mac app `v2.9.1` or later. The dashboard hides the toggle until the connected
+  Mac app can honor it.
+- Configured from the dashboard per child.
 
 ## How Parents Control It
 
@@ -125,8 +138,8 @@ the original flagship product, even though the iOS app now has a larger user bas
 - They are meant to highlight noteworthy changes or situations such as suspensions,
   protection changes, and other events that may matter for accountability or
   troubleshooting.
-- This is especially useful for parents who want a higher-level audit trail in addition
-  to raw activity monitoring.
+- This is especially useful for parents who want a higher-level audit trail in addition to
+  raw activity monitoring.
 
 ## Unlock Requests
 
@@ -166,11 +179,18 @@ the original flagship product, even though the iOS app now has a larger user bas
 
 ## Onboarding
 
-- First launch uses a long onboarding flow.
-- The onboarding guides the parent through macOS permissions and installing the network
-  filter system extension.
-- This is necessary because macOS requires several unintuitive permissions for filtering
-  and monitoring to work correctly.
+- First launch uses a two-phase onboarding flow:
+  - **Permissions phase:** guides the parent through macOS system permissions (screen
+    recording, full disk access, notifications) and installing the network filter system
+    extension. Required because macOS demands several unintuitive permissions for
+    filtering and monitoring to work.
+  - **Configuration phase:** walks the parent through commonly-needed setup decisions so a
+    newly-installed Mac is usable immediately, including which installed apps to block,
+    which apps should have unrestricted internet, downtime schedule, opting into
+    filtering-disabled mode, choosing Always Blocked groups, selecting public keychains,
+    creating custom keychains from website addresses, and setting up text notifications.
+- The configuration phase was added in `v2.9.1`. Prior versions only had the permissions
+  phase.
 - Once onboarding is complete, ongoing use is mostly through the menu bar and dashboard.
 
 ## Important Limitations And Gotchas
@@ -184,6 +204,10 @@ the original flagship product, even though the iOS app now has a larger user bas
   explicitly looks for that.
 - App blocking is useful, but it is secondary to internet filtering. Many apps are much
   less interesting to children if Gertrude is already denying their network access.
+- Historically, Gertrude's user experience was smoother in Safari than in Chrome, Firefox,
+  or other third-party browsers because Safari gave the filter richer per-request
+  information. As of `v2.9.1`, Gertrude extracts comparable data from raw socket flows,
+  largely closing that gap.
 
 ## Significant Recent Changes
 
@@ -197,6 +221,11 @@ the original flagship product, even though the iOS app now has a larger user bas
   full-disk/screen-capture related permission flows.
 - **January 2026:** `v2.8.0` added explicit detection and mitigation for conflicts with
   Apple's Screen Time web filter.
-- **April 2026:** `v2.9.1` added **Always Blocked** — a parallel deny layer that persists
-  through filter suspensions, covering Gertrude-authored bundles (Messages GIF search,
-  adult-content top list, social media) and per-child custom rules.
+- **April 2026:** `v2.9.1` was a large release. It added **Always Blocked** (parallel deny
+  layer that persists through filter suspensions, covering Gertrude-authored bundles and
+  per-child custom rules), a first-class **filtering-disabled / monitoring-only** mode for
+  older teens and accountability cases, **private-by-default screenshots** via short-lived
+  signed URLs, major **non-Safari browser identification** improvements via real SNI
+  parsing, and a substantially expanded **onboarding wizard** that now walks parents
+  through configuration (app blocking, keychains, downtime, Always Blocked, text
+  notifications) in addition to permissions.

@@ -74,6 +74,11 @@ const tags: Config[`tags`] = {
       href: { type: String },
     },
   },
+  'new-feature': {
+    selfClosing: true,
+    inline: true,
+    render: `NewFeatureBadge`,
+  },
 };
 
 export default tags;
