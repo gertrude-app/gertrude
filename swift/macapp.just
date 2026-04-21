@@ -33,7 +33,7 @@ vm-clean:
 vm-create-tahoe:
   #!/usr/bin/env bash
   set -euo pipefail
-  if tart list 2>/dev/null | grep -q "gertrude-tahoe"; then
+  if tart list 2>/dev/null | grep -q "gertrude-tahoe "; then
     echo "✗ gertrude-tahoe already exists — delete it first if you want to recreate"
     exit 1
   fi
@@ -110,6 +110,35 @@ vm-edit os="tahoe":
   echo ""
   tart run "$IMAGE"
 
+# clone gertrude-tahoe-sip and boot with display — no dev build installed.
+# install Gertrude beta/release inside the VM (download from gertrude.app).
+vm-tahoe-sip:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  if ! tart list 2>/dev/null | grep -q "gertrude-tahoe-sip"; then
+    echo "✗ gertrude-tahoe-sip doesn't exist — see VM notes at the bottom of macapp.just to build it" >&2
+    exit 1
+  fi
+  just macapp vm-clean
+  VM="gertrude-gui-$(date +%s)"
+  echo "→ cloning gertrude-tahoe-sip..."
+  tart clone gertrude-tahoe-sip "$VM"
+  echo "→ booting headless to get IP..."
+  tart run --no-graphics "$VM" >/dev/null 2>&1 &
+  TART_PID=$!
+  IP=$(just macapp vm-wait-for-ip "$VM")
+  echo "VM_IP=$IP" > .env.vm
+  echo "→ stopping headless VM..."
+  tart stop "$VM" 2>/dev/null || true
+  wait $TART_PID 2>/dev/null || true
+  sleep 5
+  echo "→ launching Tahoe SIP-enabled VM with display..."
+  echo "   ⚠ SIP is ENABLED — install Gertrude beta via download, not dev build"
+  echo "   connect: 'just swift macapp vm-connect'"
+  echo ""
+  tart run "$VM"
+
+
 # helpers
 
 [private]
@@ -168,3 +197,8 @@ vm-ssh ip +cmd:
 #   Franny user baked in (UID 502, pw: franny, auto-login)
 # - SIP must be off: system extensions require notarization with SIP enabled,
 #   and dev builds aren't notarized (production builds are, so customers are fine)
+# - gertrude-tahoe-sip (SIP ON, used for pre-release smoke testing of things
+#   like FDA onboarding which auto-succeeds w/ SIP off). to (re)build:
+#   `tart clone gertrude-tahoe gertrude-tahoe-sip && tart run --recovery
+#   gertrude-tahoe-sip`, then in recoveryOS: Utilities → Terminal → `csrutil
+#   enable`, Apple menu → Shut Down. install beta manually inside the VM.
