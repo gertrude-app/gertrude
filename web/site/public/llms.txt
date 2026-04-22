@@ -1,0 +1,75 @@
+# Gertrude
+
+> Gertrude is parental-control software for Apple devices, built by a Christian
+> homeschool dad to give families strict, reliable internet-safety tools. The
+> lineup covers Mac, iPhone/iPad, and a PIN-gated podcast app for kids.
+
+Gertrude was created by Jared Henderson to protect his own children before it
+became a product. The Mac app is the flagship: a deny-by-default internet
+filter paired with optional screenshot and keystroke monitoring, managed by
+parents from a web dashboard. The iPhone/iPad app is a focused tool that plugs
+holes in Apple's Screen Time — blocking `#images` GIF search in Messages,
+Spotlight image search, Maps business-listing images, and similar loopholes.
+Gertrude AM is a standalone podcast app that lets kids listen to parent-approved
+shows while gating the ability to add new podcasts behind a PIN.
+
+## Products
+
+- [Gertrude for Mac](https://gertrude.app/mac): Deny-by-default internet filter
+  with optional screenshot and keystroke monitoring, downtime schedules, app
+  blocking, and parent-approved unlock requests. $10/month covers the whole
+  family. 21-day free trial, no credit card required.
+- [Gertrude Blocker for iPhone & iPad](https://gertrude.app/iphone-and-ipad):
+  Free iOS content filter that closes known Screen Time gaps — Messages GIF
+  search, Spotlight internet image search, Apple Maps imagery, App Store
+  images, and similar surfaces. Optional parent-account connection lets you
+  change which categories are blocked remotely. Apple restricts iOS content
+  filtering to devices signed in to under-18 Apple Accounts by default; to
+  use the Blocker on an adult-owned device, Gertrude offers a free companion
+  supervision tool (Mac and Windows) that places a device into Apple
+  Supervised Mode. See the [Supervised Mode setup
+  guide](https://gertrude.app/blog/gertrude-ios-supervised-mode) for details.
+- [Gertrude AM](https://gertrude.app/#podcasts): A kid-friendly podcast app
+  where adding new shows requires a parent-set 6-digit PIN. $10/year after a
+  30-day free trial via Apple in-app purchase; one subscription covers an
+  Apple Family.
+
+## Documentation
+
+- [Documentation index](https://gertrude.app/docs): Product documentation and
+  support guides for Gertrude for Mac and the iOS Blocker app.
+- [iOS app privacy policy](https://gertrude.app/docs/iosapp-privacy): Privacy
+  policy for the Gertrude Blocker iOS app. Gertrude collects no personal data
+  from the iOS app — only anonymous error logs and install counts.
+
+## Blog & contact
+
+- [Gertrude blog](https://gertrude.app/blog): Long-form articles on internet
+  safety, parental controls, locking down iPhones and Macs, and product
+  updates.
+- [Contact Gertrude](https://gertrude.app/contact): Support, feedback, and
+  public-keychain requests.
+- [Download the Mac app](https://gertrude.app/download-mac-app): Direct DMG
+  download for the current Gertrude for Mac release.
+
+## Parent dashboard
+
+The parent dashboard is the web app at parents.gertrude.app where parents
+manage children, connect Macs and iOS devices, review screenshots and typed
+activity, approve unlock requests, and adjust monitoring settings. It is
+auth-gated and not useful to crawl directly.
+
+- [Sign up for a Gertrude account](https://parents.gertrude.app/signup): Create
+  a parent account to start a 21-day Mac app trial or connect an iOS device.
+- [Parent dashboard login](https://parents.gertrude.app/login): Sign in to an
+  existing Gertrude account.
+
+## About
+
+Gertrude is built by Jared Henderson — a Christian, a homeschool dad, and a
+computer programmer. The product is opinionated toward families who want
+stricter controls than mainstream parental-control apps typically provide,
+including Christian and homeschooling households. Gertrude for Mac uses an
+allowlist model (block everything except what a parent has explicitly unlocked
+via "keys" and "keychains") rather than the category-based blocklists most
+competitors use.
