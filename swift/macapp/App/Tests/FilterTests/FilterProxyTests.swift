@@ -240,12 +240,18 @@ final class FilterProxyTests: XCTestCase {
 
       let verdict = proxy.handleOutboundData(
         from: flow,
-        readBytesStartOffset: 0,
+        readBytesStartOffset: 17,
         readBytes: .init(),
       )
 
       expect(verdict.isDrop).toBeTrue()
-      expect(proxy.store.state.logs.events[.init(id: "outboundDeferredStateMissing")]).toEqual(1)
+      expect(proxy.store.state.logs.events[.init(
+        id: "outboundDeferredStateMissing",
+        detail: "bundleId=com.acme.app offset=17",
+      )]).toEqual(1)
+      // gap log is suppressed when deferred state was missing, as the
+      // "gap" is trivially true for any non-zero start offset in that case
+      expect(proxy.store.state.logs.events[.init(id: "outboundBytesGapDetected")]).toBeNil()
     }
   }
 
@@ -310,7 +316,10 @@ final class FilterProxyTests: XCTestCase {
       expect(proxy.deferredOutboundFlows[preservedId]?.round).toEqual(1)
       expect(proxy.deferredOutboundFlows[preservedId]?.accumulatedReadBytes).toEqual(preservedData)
       expect(proxy.deferredOutboundFlows[flow.identifier]).toBeNil()
-      expect(proxy.store.state.logs.events[.init(id: "outboundDeferredStateMissing")]).toEqual(1)
+      expect(proxy.store.state.logs.events[.init(
+        id: "outboundDeferredStateMissing",
+        detail: "bundleId=com.acme.app offset=0",
+      )]).toEqual(1)
       expect(proxy.store.state.logs.events[.init(id: "outboundRetryCapacityExhausted")]).toEqual(1)
     }
   }
@@ -385,7 +394,41 @@ final class FilterProxyTests: XCTestCase {
       )
 
       expect(verdict.isDrop).toBeFalse()
-      expect(proxy.store.state.logs.events[.init(id: "sawEncryptedClientHello_x100")]).toEqual(1)
+      expect(proxy.store.state.logs.events[.init(
+        id: "sawEncryptedClientHello_x100",
+        detail: "bundleId=com.acme.app outerSNI=www.google.com",
+      )]).toEqual(1)
+    }
+  }
+
+  func testLogsEncryptedClientHelloSampledX100WithoutOuterSNI() {
+    withDependencies {
+      $0.filterExtension.version = { "2.6.0" }
+    } operation: {
+      let proxy = FilterProxy(flowDecision: .allow(.permittedByKey(.init())))
+      proxy.encryptedClientHelloSamplingCounter = FilterProxy.encryptedClientHelloSampleRate - 1
+      let flow = NEFilterFlow.DTO.mock
+      let data = makeTLSClientHello(
+        serverName: nil,
+        extraExtensions: [(type: 0xFE0D, payload: Data([0x01]))],
+      )
+      proxy.deferredOutboundFlows[flow.identifier] = .init(
+        userId: 501,
+        round: 1,
+        accumulatedReadBytes: .init(),
+      )
+
+      let verdict = proxy.handleOutboundData(
+        from: flow,
+        readBytesStartOffset: 0,
+        readBytes: data,
+      )
+
+      expect(verdict.isDrop).toBeFalse()
+      expect(proxy.store.state.logs.events[.init(
+        id: "sawEncryptedClientHello_x100",
+        detail: "bundleId=com.acme.app outerSNI=nil",
+      )]).toEqual(1)
     }
   }
 
