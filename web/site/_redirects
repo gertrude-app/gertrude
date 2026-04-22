@@ -21,6 +21,17 @@
 /support /contact 301
 /lockdown /blog/definitive-guide-to-locking-down-an-iphone 302
 
+##########################
+# common-path agent hits #
+##########################
+/ios /iphone-and-ipad 301
+/iphone /iphone-and-ipad 301
+/ipad /iphone-and-ipad 301
+/am /#podcasts 301
+/podcasts /#podcasts 301
+/about / 301
+/privacy /docs/iosapp-privacy 301
+
 #################
 # parent rename #
 #################
