@@ -11,7 +11,8 @@ extension CheckIn_v2: Resolver {
     async let keychains = loadRuleKeychains(in: context)
     async let alwaysBlocked = loadAlwaysBlockedRules(for: context.child.id, in: context.db)
 
-    let computerUser = try await syncComputerUser(from: input, in: context)
+    let (computerUser, upgradedFrom) = try await syncComputerUser(from: input, in: context)
+    slackOnUpgrade(from: input, oldVersion: upgradedFrom, in: context)
 
     let computer = try await syncComputer(from: input, for: computerUser, in: context)
 
@@ -93,12 +94,16 @@ private extension CheckIn_v2 {
   static func syncComputerUser(
     from input: Input,
     in context: MacApp.ChildContext,
-  ) async throws -> ComputerUser {
+  ) async throws -> (computerUser: ComputerUser, oldAppVersion: String?) {
     var computerUser = try await context.computerUser()
+    let oldVersion: String?
 
     if !input.appVersion.isEmpty, input.appVersion != computerUser.appVersion {
+      oldVersion = computerUser.appVersion
       computerUser.appVersion = input.appVersion
       try await context.db.update(computerUser)
+    } else {
+      oldVersion = nil
     }
 
     if let userIsAdmin = input.userIsAdmin,
@@ -107,7 +112,29 @@ private extension CheckIn_v2 {
       try await context.db.update(computerUser)
     }
 
-    return computerUser
+    return (computerUser, oldVersion)
+  }
+
+  static func slackOnUpgrade(
+    from input: Input,
+    oldVersion: String?,
+    in context: MacApp.ChildContext,
+  ) {
+    guard let oldVersion, !input.appVersion.isEmpty else {
+      return
+    }
+
+    Task {
+      let parent = try await context.child.parent(in: context.db)
+      await get(dependency: \.slack).internal(
+        .info,
+        """
+        Mac app updated for child *\(context.child.name)*
+        Parent: \(parent.adminSiteLink(.slack))
+        Versions: `\(oldVersion)` -> `\(input.appVersion)`
+        """,
+      )
+    }
   }
 
   static func syncComputer(
