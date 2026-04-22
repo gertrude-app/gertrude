@@ -51,6 +51,7 @@ swift/podcasts/previews
 claude.task.md
 claude.ledger.*
 claude.plan.*
+**/scheduled_tasks.lock
 .gtask-slot
 .gtask-ports
 

@@ -2,6 +2,8 @@
 
 ## Release notes
 
+- `(next)` (in dev)
+  - refine filter logging for sni gap, ech sample
 - `2.9.1` (stable 4/21/26)
   - always-blocked items, enforced even during filter suspensions
   - real sni parsing for better non-safari support

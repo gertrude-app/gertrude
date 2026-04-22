@@ -139,9 +139,6 @@ public class FilterProxy {
   ) -> NEFilterDataVerdict {
     let existingDeferred = self.deferredOutboundFlows[flow.identifier]
     let hasDeferredState = existingDeferred != nil
-    if !hasDeferredState {
-      self.store.log(event: .outboundDeferredStateMissing)
-    }
     var deferred = existingDeferred ?? .init(
       // Defensive fallback: outbound callbacks should normally have a deferred
       // entry already. On a miss, let downstream decisioning recover userId
@@ -150,17 +147,24 @@ public class FilterProxy {
       round: 0,
       accumulatedReadBytes: .init(),
     )
+    var filterFlow = FilterFlow(flow, userId: deferred.userId)
+
+    if !hasDeferredState {
+      self.store.log(event: .outboundDeferredStateMissing(
+        bundleId: filterFlow.bundleId,
+        readBytesStartOffset: readBytesStartOffset,
+      ))
+    }
 
     let mergedOutboundBytes = mergeOutboundBytes(
       existing: deferred.accumulatedReadBytes,
       readBytesStartOffset: readBytesStartOffset,
       readBytes: readBytes,
     )
-    if mergedOutboundBytes.hadForwardGap {
+    if hasDeferredState, mergedOutboundBytes.hadForwardGap {
       self.store.log(event: .outboundBytesGapDetected)
     }
     let accumulatedReadBytes = mergedOutboundBytes.data
-    var filterFlow = FilterFlow(flow, userId: deferred.userId)
     let parseResult = filterFlow.parseOutboundData(accumulatedReadBytes)
     switch parseResult {
     case .tls, .tlsNoServerName:
@@ -168,7 +172,11 @@ public class FilterProxy {
       if self.encryptedClientHelloSamplingCounter
         .isMultiple(of: Self.encryptedClientHelloSampleRate),
         OutboundDataParser.containsEncryptedClientHello(accumulatedReadBytes) {
-        self.store.log(event: .sawEncryptedClientHello_x100)
+        let outerSNI: String? = if case .tls(let name) = parseResult { name } else { nil }
+        self.store.log(event: .sawEncryptedClientHello_x100(
+          bundleId: filterFlow.bundleId,
+          outerSNI: outerSNI,
+        ))
       }
     case .http, .needMoreBytes, .unsupportedProtocol, .malformed:
       break
@@ -295,11 +303,29 @@ private func mergeOutboundBytes(
 
 private extension FilterLogs.Event {
   static let outboundBytesGapDetected = Self(id: "outboundBytesGapDetected")
-  static let outboundDeferredStateMissing = Self(id: "outboundDeferredStateMissing")
   static let outboundRetryCapacityExhausted = Self(id: "outboundRetryCapacityExhausted")
   static let outboundRetryStillInsufficient = Self(id: "outboundRetryStillInsufficient")
   static let outboundRetryClampedToMax = Self(id: "outboundRetryClampedToMax")
-  static let sawEncryptedClientHello_x100 = Self(id: "sawEncryptedClientHello_x100")
+
+  static func outboundDeferredStateMissing(
+    bundleId: String?,
+    readBytesStartOffset: Int,
+  ) -> Self {
+    Self(
+      id: "outboundDeferredStateMissing",
+      detail: "bundleId=\(bundleId ?? "nil") offset=\(readBytesStartOffset)",
+    )
+  }
+
+  static func sawEncryptedClientHello_x100(
+    bundleId: String?,
+    outerSNI: String?,
+  ) -> Self {
+    Self(
+      id: "sawEncryptedClientHello_x100",
+      detail: "bundleId=\(bundleId ?? "nil") outerSNI=\(outerSNI ?? "nil")",
+    )
+  }
 }
 
 public extension NEFilterFlow {
