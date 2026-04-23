@@ -354,7 +354,7 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.adminAccountStatus).toEqual(.active)
   }
 
-  func testAlwaysBlocked_NilWhenChildHasNoRules() async throws {
+  func testAlwaysBlocked_IncludesCloudflareEchRuleWhenChildHasNoAbRules() async throws {
     let child = try await self.child().withDevice()
 
     let output = try await CheckIn_v2.resolve(
@@ -362,7 +362,9 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
       in: child.context,
     )
 
-    expect(output.alwaysBlocked).toBeNil()
+    expect(output.alwaysBlocked).toEqual([
+      .hostnameOrSubdomain(value: "cloudflare-ech.com"),
+    ])
   }
 
   func testAlwaysBlocked_AppendsCloudflareEchRuleWhenNonEmpty() async throws {
@@ -381,6 +383,39 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.alwaysBlocked).toEqual([
       .hostnameEquals(value: "example.com"),
       .hostnameOrSubdomain(value: "cloudflare-ech.com"),
+    ])
+  }
+
+  func testAlwaysBlocked_OmitsCloudflareEchRuleForFilteringDisabledChild() async throws {
+    let child = try await self.child(with: {
+      $0.filteringDisabled = true
+    }).withDevice()
+
+    let output = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "1.0.0", filterVersion: nil),
+      in: child.context,
+    )
+
+    expect(output.alwaysBlocked).toBeNil()
+  }
+
+  func testAlwaysBlocked_FilteringDisabledChildGetsAbRulesButNoCloudflareEch() async throws {
+    let child = try await self.child(with: {
+      $0.filteringDisabled = true
+    }).withDevice()
+
+    try await self.db.create(ChildAlwaysBlockedRule(
+      childId: child.model.id,
+      rule: .hostnameEquals(value: "example.com"),
+    ))
+
+    let output = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "1.0.0", filterVersion: nil),
+      in: child.context,
+    )
+
+    expect(output.alwaysBlocked).toEqual([
+      .hostnameEquals(value: "example.com"),
     ])
   }
 
