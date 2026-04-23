@@ -6,7 +6,16 @@ import PostgresKit
 extension LogFilterEvents: Resolver {
   static func resolve(with input: Input, in context: MacApp.ChildContext) async throws -> Output {
     let computerUser = try await context.computerUser()
-    let events = try await context.db.create(input.events.map { event, count in
+    let version = Semver(computerUser.appVersion) ?? .zero
+    let kept = input.events.filter { event, _ in
+      if droppedEventIds.contains(event.id) { return false }
+      if version < firstCleanedVersion, droppedPre292EventIds.contains(event.id) {
+        return false
+      }
+      return true
+    }
+
+    let events = try await context.db.create(kept.map { event, count in
       InterestingEvent(
         eventId: event.id,
         kind: "event",
@@ -95,6 +104,17 @@ struct IdentifiedBundleIds: CustomQueryable {
 
   var bundleId: String
 }
+
+private let firstCleanedVersion: Semver = "2.9.2"
+
+private let droppedEventIds: Set<String> = [
+  "outboundDeferredStateMissing",
+  "sawEncryptedClientHello_x100",
+]
+
+private let droppedPre292EventIds: Set<String> = [
+  "outboundBytesGapDetected",
+]
 
 private func logEventsToSlack(
   _ events: [InterestingEvent],
