@@ -1,7 +1,7 @@
 ---
 title: 'SOLVED: How Parents Can Block #images GIF Search in iOS 18'
 date: '2024-10-24T18:23:01.633Z'
-image: /og-images/gif-images.jpg
+image: /og-images/gif-images.png
 description:
   'A new, free iOS app called “Gertrude Blocker” gives parents what Apple has refused for
   over a year: the ability block inappropriate GIFs searchable by kids in the Messages

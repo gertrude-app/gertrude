@@ -1,7 +1,7 @@
 ---
 title: The Definitive Guide to Locking Down an iPhone (iOS 18)
 date: '2024-11-01T17:49:26.487Z'
-image: /og-images/lockdown.en.jpg
+image: /og-images/lockdown.en.png
 description:
   A step-by-step guide to completely locking down an iPhone or iPad for iOS 18, for
   parents who are serious about protecting their kids from the dangers of unrestricted

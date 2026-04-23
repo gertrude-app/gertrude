@@ -77,6 +77,9 @@ visual-test:
 visual-test-reset:
   @git restore --source=HEAD --staged --worktree -- storybook/visual-tests/screenshots/argos
 
+og-export:
+  @cd storybook/visual-tests && PUPPETEER_PRODUCT=chrome STORYBOOK_URL=http://localhost:${STORYBOOK_PORT:-6006} ../node_modules/.bin/ts-node --project tsconfig.json export-og-images.ts
+
 format:
   @pnpm prettier --config ../.prettierrc.json --ignore-path ../.prettierignore --log-level warn --write .
 
