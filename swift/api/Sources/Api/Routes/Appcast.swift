@@ -4,12 +4,18 @@ import Gertie
 import Vapor
 
 enum AppcastRoute {
+  static let suppressedReleases: [String: Set<String>] = [
+    "2.9.1": ["2.9.2"],
+  ]
+
   @Sendable static func handler(_ request: Request) async throws -> Response {
     let query = try request.query.decode(AppcastQuery.self)
+    let hidden = query.requestingAppVersion.flatMap { self.suppressedReleases[$0] } ?? []
     let releases = try await request.context.db.query(Release.self)
       .orderBy(.createdAt, .desc)
       .all(in: request.context.db)
       .filter { $0.channel.isAtLeastAsStable(as: query.channel ?? .stable) }
+      .filter { !hidden.contains($0.semver) }
 
     return Response(
       headers: ["Content-Type": "application/xml"],

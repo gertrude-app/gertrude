@@ -29,6 +29,45 @@ final class AppcastTests: ApiTestCase, @unchecked Sendable {
     })
   }
 
+  func testHidesReleasesFromSpecificRequestingVersion() async throws {
+    try await self.replaceAllReleases(with: [
+      Release("2.9.0", channel: .stable, pace: nil, createdAt: .epoch),
+      Release("2.9.1", channel: .stable, pace: nil, createdAt: .epoch.advanced(by: .days(10))),
+      Release("2.9.2", channel: .stable, pace: nil, createdAt: .epoch.advanced(by: .days(20))),
+    ])
+
+    try await app.test(
+      .GET,
+      "appcast.xml?requestingAppVersion=2.9.1",
+      afterResponse: { res in
+        await expect(self.filenames(from: res)).toEqual([
+          "Gertrude.2.9.1.zip",
+          "Gertrude.2.9.0.zip",
+        ])
+      },
+    )
+
+    try await app.test(
+      .GET,
+      "appcast.xml?requestingAppVersion=2.9.0",
+      afterResponse: { res in
+        await expect(self.filenames(from: res)).toEqual([
+          "Gertrude.2.9.2.zip",
+          "Gertrude.2.9.1.zip",
+          "Gertrude.2.9.0.zip",
+        ])
+      },
+    )
+
+    try await app.test(.GET, "appcast.xml", afterResponse: { res in
+      await expect(self.filenames(from: res)).toEqual([
+        "Gertrude.2.9.2.zip",
+        "Gertrude.2.9.1.zip",
+        "Gertrude.2.9.0.zip",
+      ])
+    })
+  }
+
   // NB: async just to force selection of async overload of `app.test()`
   func filenames(from response: XCTHTTPResponse) async -> [String] {
     response.body.string.split(separator: "\n")
