@@ -1,5 +1,5 @@
 import type { Meta } from '@storybook/react';
-import FiveThingsYouForgotOgImage from './og-images/FiveThingsYouForgotOgImage';
+import FiveThingsOgImage from './og-images/FiveThingsOgImage';
 import GifAppMessagesOgImage from './og-images/GifAppInMessagesOgImage';
 import LockdownGuideOgImage from './og-images/LockdownGuideOgImage';
 import SiteOgImage from './og-images/SiteOgImage';
@@ -27,6 +27,6 @@ export default {
 
 export const Site = () => <SiteOgImage />;
 export const LockdownGuide = () => <LockdownGuideOgImage />;
-export const FiveThingsYouForgot = () => <FiveThingsYouForgotOgImage />;
+export const FiveThings = () => <FiveThingsOgImage />;
 export const GifAppMessages = () => <GifAppMessagesOgImage />;
 export const WickedProject = () => <WickedProjectOgImage />;

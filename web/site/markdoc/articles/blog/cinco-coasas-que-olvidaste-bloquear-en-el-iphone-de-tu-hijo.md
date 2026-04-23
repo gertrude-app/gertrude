@@ -1,7 +1,7 @@
 ---
 title: Cinco Cosas que Olvidaste Bloquear en el iPhone de tu Hijo
 date: '2023-02-09T05:00:00.000Z'
-image: /og-images/five-things.jpg
+image: /og-images/five-things.png
 description:
   Las cinco cosas que probablemente olvidaste al asegurar el iPhone de tu hijo... y los
   pasos extrañamente poco intuitivos que se necesitan para solucionarlas.

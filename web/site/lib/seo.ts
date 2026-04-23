@@ -14,7 +14,7 @@ export function createMetadata(
       description,
       images: image
         ? [{ url: image, width: 1200, height: 630, alt: title }]
-        : [{ url: `/og-images/main.jpg`, width: 1200, height: 630, alt: title }],
+        : [{ url: `/og-images/main.png`, width: 1200, height: 630, alt: title }],
     },
   };
 }
