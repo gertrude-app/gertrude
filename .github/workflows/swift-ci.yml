@@ -382,22 +382,26 @@ jobs:
               - swift/gertie/**
               - swift/x-kit/**
               - swift/ts-interop/**
+              - swift/ts-codable-macro/**
             iosapp:
               - swift/iosapp/**
               - swift/pairql-iosapp/**
               - swift/pairql/**
               - swift/gertie/**
               - swift/x-kit/**
+              - swift/ts-codable-macro/**
             podcasts:
               - swift/podcasts/**
               - swift/pairql/**
               - swift/pairql-podcasts/**
               - swift/api/Sources/Api/PairQL/Podcast/**
+              - swift/ts-codable-macro/**
             libs:
               - swift/duet/**
               - swift/pairql/**
               - swift/pairql-macapp/**
               - swift/gertie/**
+              - swift/ts-codable-macro/**
               - swift/ts-interop/**
               - swift/x-expect/**
               - swift/x-http/**
@@ -422,6 +426,7 @@ jobs:
               - swift/x-slack/**
               - swift/x-stripe/**
               - swift/x-aws/**
+              - swift/ts-codable-macro/**
             swift:
               - swift/**
 
