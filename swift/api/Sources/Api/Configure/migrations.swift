@@ -87,6 +87,7 @@ extension Configure {
     app.migrations.add(AddKeychainBrandColor())
     app.migrations.add(AddAlwaysBlockedGroupRecommended())
     app.migrations.add(CreateRouteTelemetry())
+    app.migrations.add(CreateMarketingEmailSends())
   }
 }
 

@@ -608,6 +608,19 @@ extension RouteTelemetry {
   }
 }
 
+extension MarketingEmailSend: Duet.Identifiable {
+  typealias Id = Tagged<MarketingEmailSend, UUID>
+}
+
+extension MarketingEmailSend {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case parentId
+    case campaign
+    case createdAt
+  }
+}
+
 extension InterestingEvent: Duet.Identifiable {
   typealias Id = Tagged<InterestingEvent, UUID>
 }

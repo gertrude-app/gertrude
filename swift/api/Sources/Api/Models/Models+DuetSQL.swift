@@ -1019,6 +1019,30 @@ extension InterestingEvent: Model {
   }
 }
 
+extension MarketingEmailSend: Model {
+  public static let schemaName = "parent"
+  public static let tableName = "marketing_email_sends"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .parentId: .uuid(self.parentId)
+    case .campaign: .string(self.campaign)
+    case .createdAt: .date(self.createdAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .parentId: .uuid(self.parentId),
+      .campaign: .string(self.campaign),
+      .createdAt: .currentTimestamp,
+    ]
+  }
+}
+
 extension RouteTelemetry: Model {
   public static let schemaName = "system"
   public static let tableName = "route_telemetry"

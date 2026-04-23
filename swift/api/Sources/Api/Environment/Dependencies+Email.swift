@@ -70,12 +70,15 @@ extension PostmarkClient {
          .notifyUnlockRequest(let recipient, _),
          .notifySecurityEvent(let recipient, _),
          .verifyNotificationEmail(let recipient, _),
-         .screenTimeWarning(let recipient, _):
+         .screenTimeWarning(let recipient, _),
+         .iosOnlyMacTrial(let recipient, _):
       templateEmail.to = recipient
       templateEmail.templateModel["subjref"] = "".withEmailSubjectDisambiguator
       try await self._sendTemplateEmail(templateEmail)
         .loggingFailure(of: templateEmail.templateAlias, to: recipient)
-    case .v2_7_0_Announce(let recipients, _, let dryRun):
+    case .v2_7_0_Announce:
+      break
+    case .v2_9_1_Announce(let recipients, _, let dryRun):
       guard get(dependency: \.env).mode == .dev else {
         throw Abort(.forbidden)
       }
@@ -85,6 +88,52 @@ extension PostmarkClient {
         batchEmail.templateModel["subjref"] = dryRun ? "".withEmailSubjectDisambiguator : ""
         return batchEmail
       }))
+    }
+  }
+
+  func sendMarketingBatch(
+    templateAlias: String,
+    campaignSlug: String,
+    recipients: [(email: String, model: [String: String])],
+    from: String = "Gertrude App <noreply@gertrude.app>",
+    replyTo: String? = nil,
+  ) async -> [Result<Void, XPostmark.Client.BatchEmail.Error>] {
+    let env = get(dependency: \.env)
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy"
+    let currentYear = formatter.string(from: Date())
+    let effectiveReplyTo = replyTo ?? env.primarySupportEmail
+
+    let physicalAddress = env.get("MARKETING_PHYSICAL_ADDRESS")
+    let batch = recipients.map { recipient in
+      var model = recipient.model
+      model["currentYear"] = currentYear
+      model["subjref"] = ""
+      if let physicalAddress {
+        model["physicalAddress"] = physicalAddress
+      }
+      return XPostmark.TemplateEmail(
+        to: recipient.email,
+        from: from,
+        replyTo: effectiveReplyTo,
+        templateAlias: templateAlias,
+        templateModel: model,
+        messageStream: "broadcast",
+        tag: campaignSlug,
+      )
+    }
+
+    switch await self._sendTemplateEmailBatch(batch) {
+    case .failure(let err):
+      with(dependency: \.logger)
+        .error("Error sending marketing batch '\(campaignSlug)': \(err)")
+      await with(dependency: \.slack)
+        .error("Error sending marketing batch `\(campaignSlug)`: \(String(reflecting: err))")
+      return recipients.map { _ in
+        .failure(.init(errorCode: err.errorCode, message: err.message))
+      }
+    case .success(let results):
+      return results
     }
   }
 

@@ -89,6 +89,14 @@ footer .link-container {
   margin-top: 6px;
 }
 
+footer .physical-address {
+  color: #94a3b8;
+  font-size: 12px;
+  width: fit-content;
+  margin: 12px auto 0;
+  text-align: center;
+}
+
 .action-button {
   background-color: #8b5cf6;
   color: white;
@@ -139,6 +147,10 @@ footer .link-container {
   }
 
   footer a {
+    color: #64748b;
+  }
+
+  footer .physical-address {
     color: #64748b;
   }
 

@@ -24,6 +24,8 @@ import XHttp
       await self.syncTemplate(ReSignup.self)
       await self.syncTemplate(VerifyNotificationEmail.self)
       await self.syncTemplate(V2_7_0_Announce.self)
+      await self.syncTemplate(V2_9_1_Announce.self)
+      await self.syncTemplate(IosOnlyMacTrial.self)
       await self.syncTemplate(AccountLifecycle.TrialEndingSoon.self)
       await self.syncTemplate(AccountLifecycle.TrialExpired.self)
       await self.syncTemplate(AccountLifecycle.OverdueToUnpaid.self)
@@ -83,24 +85,27 @@ import XHttp
   extension EmailLayout {
     func pmTemplateInput() -> EditTemplate.Input {
       let layoutsDir = FileManager.default.currentDirectoryPath + "/Sources/Api/Email/Layouts"
-      let baseCss = try! String(contentsOfFile: layoutsDir + "/base.css", encoding: .utf8)
-      let layoutCss = self == .base ? "" :
-        (try? String(contentsOfFile: layoutsDir + "/\(self.slug).css", encoding: .utf8)) ?? ""
-      let baseHtml = try! String(contentsOfFile: layoutsDir + "/base.html", encoding: .utf8)
-        .replacingOccurrences(of: "/* CSS_HERE */", with: baseCss + layoutCss)
-
-      var layoutHtml = baseHtml
-      if self != .base {
-        layoutHtml = baseHtml.replacingOccurrences(
-          of: "{{{ @content }}}",
-          with: try! String(contentsOfFile: layoutsDir + "/\(self.slug).html", encoding: .utf8),
-        )
+      let html: String
+      switch self {
+      case .base:
+        let css = try! String(contentsOfFile: layoutsDir + "/base.css", encoding: .utf8)
+        html = try! String(contentsOfFile: layoutsDir + "/base.html", encoding: .utf8)
+          .replacingOccurrences(of: "/* CSS_HERE */", with: css)
+      case .topLogo:
+        let baseCss = try! String(contentsOfFile: layoutsDir + "/base.css", encoding: .utf8)
+        let layoutCss = try! String(contentsOfFile: layoutsDir + "/top-logo.css", encoding: .utf8)
+        let baseHtml = try! String(contentsOfFile: layoutsDir + "/base.html", encoding: .utf8)
+          .replacingOccurrences(of: "/* CSS_HERE */", with: baseCss + layoutCss)
+        let inner = try! String(contentsOfFile: layoutsDir + "/top-logo.html", encoding: .utf8)
+        html = baseHtml.replacingOccurrences(of: "{{{ @content }}}", with: inner)
+      case .personal:
+        html = try! String(contentsOfFile: layoutsDir + "/personal.html", encoding: .utf8)
       }
 
       return EditTemplate.Input(
         Name: self.name,
         Subject: "",
-        HtmlBody: layoutHtml,
+        HtmlBody: html,
         TextBody: "{{{ @content }}}",
         Alias: self.slug,
         LayoutTemplate: nil,

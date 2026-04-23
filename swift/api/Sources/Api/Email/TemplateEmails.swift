@@ -94,6 +94,21 @@ struct V2_7_0_Announce: TemplateEmailModel {
   static var subject: String { "Gertrude v2.7.0 is here!" }
 }
 
+struct V2_9_1_Announce: TemplateEmailModel {
+  static var layout: EmailLayout { .topLogo }
+  static var displayName: String { "v2.9.0 Announcement" }
+  static var subject: String { "Gertrude v2.9.0 is here!" }
+}
+
+struct IosOnlyMacTrial: TemplateEmailModel {
+  static var layout: EmailLayout { .personal }
+  static var displayName: String { "iOS-Only Mac Trial" }
+  static var subject: String { "The Mac app I built for my own kids" }
+
+  var deviceFragment: String
+  var templateModel: [String: String] { ["deviceFragment": self.deviceFragment] }
+}
+
 struct ScreenTimeWarning: TemplateEmailModel {
   static var subject: String {
     "Action needed: Gertrude may not be fully protecting {{childName}}’s computer"
