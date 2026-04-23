@@ -167,6 +167,9 @@ extension BlockedRequestsFeature.RootReducer {
       }
 
     case .xpc(.receivedExtensionMessage(.blockedRequest(let newReq))):
+      if newReq.hiddenFromParent {
+        return .none
+      }
       let recent = state.blockedRequests.requests.suffix(15)
       if !recent.contains(where: { existing in existing.mergeable(with: newReq) }) {
         state.blockedRequests.requests.append(newReq)

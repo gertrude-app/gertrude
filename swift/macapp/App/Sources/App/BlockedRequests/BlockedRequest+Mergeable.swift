@@ -1,6 +1,11 @@
 import Core
 
 extension BlockedRequest {
+  var hiddenFromParent: Bool {
+    guard let hostname else { return false }
+    return hostname == "cloudflare-ech.com" || hostname.hasSuffix(".cloudflare-ech.com")
+  }
+
   func mergeable(with newer: BlockedRequest) -> Bool {
     if self.app.bundleId.droppingDotPrefix != newer.app.bundleId.droppingDotPrefix {
       return false
