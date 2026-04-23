@@ -149,13 +149,6 @@ public class FilterProxy {
     )
     var filterFlow = FilterFlow(flow, userId: deferred.userId)
 
-    if !hasDeferredState {
-      self.store.log(event: .outboundDeferredStateMissing(
-        bundleId: filterFlow.bundleId,
-        readBytesStartOffset: readBytesStartOffset,
-      ))
-    }
-
     let mergedOutboundBytes = mergeOutboundBytes(
       existing: deferred.accumulatedReadBytes,
       readBytesStartOffset: readBytesStartOffset,
@@ -306,16 +299,6 @@ private extension FilterLogs.Event {
   static let outboundRetryCapacityExhausted = Self(id: "outboundRetryCapacityExhausted")
   static let outboundRetryStillInsufficient = Self(id: "outboundRetryStillInsufficient")
   static let outboundRetryClampedToMax = Self(id: "outboundRetryClampedToMax")
-
-  static func outboundDeferredStateMissing(
-    bundleId: String?,
-    readBytesStartOffset: Int,
-  ) -> Self {
-    Self(
-      id: "outboundDeferredStateMissing",
-      detail: "bundleId=\(bundleId ?? "nil") offset=\(readBytesStartOffset)",
-    )
-  }
 
   static func sawEncryptedClientHello_x100(
     bundleId: String?,
