@@ -19,6 +19,15 @@ struct SaveKey: Pair {
 
 extension SaveKey: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
+    if input.key.targetsCloudflareEch {
+      throw context.error(
+        id: "734da77b",
+        type: .badRequest,
+        debugMessage: "rejected key targeting cloudflare-ech.com",
+        userMessage: "Gertrude blocks cloudflare-ech.com automatically — no key needed.",
+        showContactSupport: false,
+      )
+    }
     let keychain = try await context.parent.keychain(input.keychainId, in: context.db)
     if input.isNew {
       let existingKeys = try await keychain.keys(in: context.db)
@@ -69,6 +78,16 @@ extension SaveKey: Resolver {
 }
 
 extension Gertie.Key {
+  var targetsCloudflareEch: Bool {
+    let hostname: String? = switch self {
+    case .domain(let domain, _), .anySubdomain(let domain, _): domain.string
+    case .path(let path, _): path.domain.string
+    case .domainRegex, .ipAddress, .skeleton: nil
+    }
+    guard let hostname else { return false }
+    return hostname == "cloudflare-ech.com" || hostname.hasSuffix(".cloudflare-ech.com")
+  }
+
   var simpleDescription: String {
     switch self {
     case .anySubdomain(let domain, let scope):

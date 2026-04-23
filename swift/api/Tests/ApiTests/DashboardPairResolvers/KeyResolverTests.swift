@@ -168,6 +168,20 @@ final class KeyResolverTests: ApiTestCase, @unchecked Sendable {
     expect(matching.first?.comment).toBeNil()
   }
 
+  func testRejectsCloudflareEchKey() async throws {
+    var (input, admin) = try await prepare()
+    input.key = .anySubdomain(domain: .init(string: "cloudflare-ech.com"), scope: .unrestricted)
+
+    try await expectErrorFrom {
+      try await SaveKey.resolve(with: input, in: admin.context)
+    }.toContain("cloudflare-ech.com")
+
+    input.key = .domain(domain: .init(string: "foo.cloudflare-ech.com"), scope: .unrestricted)
+    try await expectErrorFrom {
+      try await SaveKey.resolve(with: input, in: admin.context)
+    }.toContain("cloudflare-ech.com")
+  }
+
   func testUpdateKeyRecordWithExpiration() async throws {
     var (input, admin) = try await prepare()
     let key = try await self.db.create(Key(keychainId: admin.keychain.id, key: .mock))

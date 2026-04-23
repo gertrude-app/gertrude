@@ -17,7 +17,6 @@ public class FilterProxy {
 
   static let initialOutboundPeekBytes = 2048
   static let maxOutboundRetryBytes = 16384
-  static let encryptedClientHelloSampleRate = 100
 
   #if !DEBUG
     let store: FilterStore
@@ -27,7 +26,6 @@ public class FilterProxy {
 
   var deferredOutboundFlows: [UUID: DeferredOutboundFlow] = [:]
   var cancellables: Set<AnyCancellable> = []
-  var encryptedClientHelloSamplingCounter = 0
 
   // give the FilterDataProvider a simple boolean it can
   // quickly check to decide if it needs to pass the decision
@@ -149,13 +147,6 @@ public class FilterProxy {
     )
     var filterFlow = FilterFlow(flow, userId: deferred.userId)
 
-    if !hasDeferredState {
-      self.store.log(event: .outboundDeferredStateMissing(
-        bundleId: filterFlow.bundleId,
-        readBytesStartOffset: readBytesStartOffset,
-      ))
-    }
-
     let mergedOutboundBytes = mergeOutboundBytes(
       existing: deferred.accumulatedReadBytes,
       readBytesStartOffset: readBytesStartOffset,
@@ -166,21 +157,6 @@ public class FilterProxy {
     }
     let accumulatedReadBytes = mergedOutboundBytes.data
     let parseResult = filterFlow.parseOutboundData(accumulatedReadBytes)
-    switch parseResult {
-    case .tls, .tlsNoServerName:
-      self.encryptedClientHelloSamplingCounter += 1
-      if self.encryptedClientHelloSamplingCounter
-        .isMultiple(of: Self.encryptedClientHelloSampleRate),
-        OutboundDataParser.containsEncryptedClientHello(accumulatedReadBytes) {
-        let outerSNI: String? = if case .tls(let name) = parseResult { name } else { nil }
-        self.store.log(event: .sawEncryptedClientHello_x100(
-          bundleId: filterFlow.bundleId,
-          outerSNI: outerSNI,
-        ))
-      }
-    case .http, .needMoreBytes, .unsupportedProtocol, .malformed:
-      break
-    }
 
     if case .needMoreBytes(let requestedTotal) = parseResult,
        deferred.round == 0 {
@@ -306,26 +282,6 @@ private extension FilterLogs.Event {
   static let outboundRetryCapacityExhausted = Self(id: "outboundRetryCapacityExhausted")
   static let outboundRetryStillInsufficient = Self(id: "outboundRetryStillInsufficient")
   static let outboundRetryClampedToMax = Self(id: "outboundRetryClampedToMax")
-
-  static func outboundDeferredStateMissing(
-    bundleId: String?,
-    readBytesStartOffset: Int,
-  ) -> Self {
-    Self(
-      id: "outboundDeferredStateMissing",
-      detail: "bundleId=\(bundleId ?? "nil") offset=\(readBytesStartOffset)",
-    )
-  }
-
-  static func sawEncryptedClientHello_x100(
-    bundleId: String?,
-    outerSNI: String?,
-  ) -> Self {
-    Self(
-      id: "sawEncryptedClientHello_x100",
-      detail: "bundleId=\(bundleId ?? "nil") outerSNI=\(outerSNI ?? "nil")",
-    )
-  }
 }
 
 public extension NEFilterFlow {

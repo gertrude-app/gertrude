@@ -9,7 +9,7 @@ extension CheckIn_v2: Resolver {
     async let browsers = Browser.query().all(in: context.db)
     async let blockedApps = context.child.blockedApps(in: context.db)
     async let keychains = loadRuleKeychains(in: context)
-    async let alwaysBlocked = loadAlwaysBlockedRules(for: context.child.id, in: context.db)
+    async let alwaysBlocked = loadAlwaysBlockedRules(in: context)
 
     let (computerUser, upgradedFrom) = try await syncComputerUser(from: input, in: context)
     slackOnUpgrade(from: input, oldVersion: upgradedFrom, in: context)
@@ -365,23 +365,23 @@ private extension CheckIn_v2 {
 // helpers
 
 func loadAlwaysBlockedRules(
-  for childId: Child.Id,
-  in db: any DuetSQL.Client,
+  in context: MacApp.ChildContext,
 ) async throws -> [BlockRule] {
   async let childGroups = ChildAlwaysBlockedGroup.query()
-    .where(.childId == childId)
-    .all(in: db)
+    .where(.childId == context.child.id)
+    .all(in: context.db)
   async let customRules = ChildAlwaysBlockedRule.query()
-    .where(.childId == childId)
-    .all(in: db)
+    .where(.childId == context.child.id)
+    .all(in: context.db)
 
   let groupIds = try await childGroups.map(\.groupId)
   let groupRules = groupIds.isEmpty ? [] : try await AlwaysBlockedRule.query()
     .where(.groupId |=| groupIds)
-    .all(in: db)
+    .all(in: context.db)
 
   let rules = try await groupRules.map(\.rule) + customRules.map(\.rule)
-  if rules.isEmpty { return [] }
+  // filtering-disabled children opted into monitoring-only, so sni enforcement is moot
+  if context.child.filteringDisabled { return rules }
   // try to prevent sni obfuscation/hiding, which interferes with hostname detection
   return rules + [.hostnameOrSubdomain(value: "cloudflare-ech.com")]
 }

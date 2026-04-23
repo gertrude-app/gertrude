@@ -128,6 +128,22 @@ final class BlockedRequestsFeatureTests: XCTestCase {
   }
 
   @MainActor
+  func testCloudflareEchBlockedRequestHiddenFromParent() async {
+    let (store, _) = AppReducer.testStore()
+
+    let ech = BlockedRequest(app: .mock, hostname: "cloudflare-ech.com")
+    await store.send(.xpc(.receivedExtensionMessage(.blockedRequest(ech))))
+
+    let echSub = BlockedRequest(app: .mock, hostname: "foo.cloudflare-ech.com")
+    await store.send(.xpc(.receivedExtensionMessage(.blockedRequest(echSub))))
+
+    let other = BlockedRequest(app: .mock, hostname: "example.com")
+    await store.send(.xpc(.receivedExtensionMessage(.blockedRequest(other)))) {
+      $0.blockedRequests.requests = [other]
+    }
+  }
+
+  @MainActor
   func testSimpleActions() async {
     let req = BlockedRequest.mock
     let (store, _) = AppReducer.testStore {

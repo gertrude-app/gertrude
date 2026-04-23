@@ -231,30 +231,6 @@ final class FilterProxyTests: XCTestCase {
     expect(proxy.deferredOutboundFlows).toEqual([:])
   }
 
-  func testLogsMissingDeferredStateOnUnexpectedOutboundCallback() {
-    withDependencies {
-      $0.filterExtension.version = { "2.6.0" }
-    } operation: {
-      let proxy = FilterProxy(flowDecision: .block(.defaultNotAllowed))
-      let flow = NEFilterFlow.DTO.mock
-
-      let verdict = proxy.handleOutboundData(
-        from: flow,
-        readBytesStartOffset: 17,
-        readBytes: .init(),
-      )
-
-      expect(verdict.isDrop).toBeTrue()
-      expect(proxy.store.state.logs.events[.init(
-        id: "outboundDeferredStateMissing",
-        detail: "bundleId=com.acme.app offset=17",
-      )]).toEqual(1)
-      // gap log is suppressed when deferred state was missing, as the
-      // "gap" is trivially true for any non-zero start offset in that case
-      expect(proxy.store.state.logs.events[.init(id: "outboundBytesGapDetected")]).toBeNil()
-    }
-  }
-
   func testOutboundFlowStillNeedingMoreBytesAfterRetryFallsThroughToDecision() {
     withDependencies {
       $0.filterExtension.version = { "2.6.0" }
@@ -316,10 +292,6 @@ final class FilterProxyTests: XCTestCase {
       expect(proxy.deferredOutboundFlows[preservedId]?.round).toEqual(1)
       expect(proxy.deferredOutboundFlows[preservedId]?.accumulatedReadBytes).toEqual(preservedData)
       expect(proxy.deferredOutboundFlows[flow.identifier]).toBeNil()
-      expect(proxy.store.state.logs.events[.init(
-        id: "outboundDeferredStateMissing",
-        detail: "bundleId=com.acme.app offset=0",
-      )]).toEqual(1)
       expect(proxy.store.state.logs.events[.init(id: "outboundRetryCapacityExhausted")]).toEqual(1)
     }
   }
@@ -367,68 +339,6 @@ final class FilterProxyTests: XCTestCase {
 
       expect(verdict.isInspectMoreData).toBeTrue()
       expect(proxy.store.state.logs.events[.init(id: "outboundRetryClampedToMax")]).toEqual(1)
-    }
-  }
-
-  func testLogsEncryptedClientHelloSampledX100() {
-    withDependencies {
-      $0.filterExtension.version = { "2.6.0" }
-    } operation: {
-      let proxy = FilterProxy(flowDecision: .allow(.permittedByKey(.init())))
-      proxy.encryptedClientHelloSamplingCounter = FilterProxy.encryptedClientHelloSampleRate - 1
-      let flow = NEFilterFlow.DTO.mock
-      let data = makeTLSClientHello(
-        serverName: "www.google.com",
-        extraExtensions: [(type: 0xFE0D, payload: Data([0x01]))],
-      )
-      proxy.deferredOutboundFlows[flow.identifier] = .init(
-        userId: 501,
-        round: 1,
-        accumulatedReadBytes: .init(),
-      )
-
-      let verdict = proxy.handleOutboundData(
-        from: flow,
-        readBytesStartOffset: 0,
-        readBytes: data,
-      )
-
-      expect(verdict.isDrop).toBeFalse()
-      expect(proxy.store.state.logs.events[.init(
-        id: "sawEncryptedClientHello_x100",
-        detail: "bundleId=com.acme.app outerSNI=www.google.com",
-      )]).toEqual(1)
-    }
-  }
-
-  func testLogsEncryptedClientHelloSampledX100WithoutOuterSNI() {
-    withDependencies {
-      $0.filterExtension.version = { "2.6.0" }
-    } operation: {
-      let proxy = FilterProxy(flowDecision: .allow(.permittedByKey(.init())))
-      proxy.encryptedClientHelloSamplingCounter = FilterProxy.encryptedClientHelloSampleRate - 1
-      let flow = NEFilterFlow.DTO.mock
-      let data = makeTLSClientHello(
-        serverName: nil,
-        extraExtensions: [(type: 0xFE0D, payload: Data([0x01]))],
-      )
-      proxy.deferredOutboundFlows[flow.identifier] = .init(
-        userId: 501,
-        round: 1,
-        accumulatedReadBytes: .init(),
-      )
-
-      let verdict = proxy.handleOutboundData(
-        from: flow,
-        readBytesStartOffset: 0,
-        readBytes: data,
-      )
-
-      expect(verdict.isDrop).toBeFalse()
-      expect(proxy.store.state.logs.events[.init(
-        id: "sawEncryptedClientHello_x100",
-        detail: "bundleId=com.acme.app outerSNI=nil",
-      )]).toEqual(1)
     }
   }
 
@@ -565,10 +475,7 @@ extension NEFilterNewFlowVerdict {
   }
 }
 
-private func makeTLSClientHello(
-  serverName: String?,
-  extraExtensions: [(type: UInt16, payload: Data)] = [],
-) -> Data {
+private func makeTLSClientHello(serverName: String?) -> Data {
   var clientHello = Data()
   clientHello.append(contentsOf: [0x03, 0x03])
   clientHello.append(Data(repeating: 0x11, count: 32))
@@ -591,11 +498,6 @@ private func makeTLSClientHello(
     extensions.append(uint16Bytes(0x0000))
     extensions.append(uint16Bytes(UInt16(serverNameExtension.count)))
     extensions.append(serverNameExtension)
-  }
-  for extraExtension in extraExtensions {
-    extensions.append(uint16Bytes(extraExtension.type))
-    extensions.append(uint16Bytes(UInt16(extraExtension.payload.count)))
-    extensions.append(extraExtension.payload)
   }
 
   clientHello.append(uint16Bytes(UInt16(extensions.count)))
