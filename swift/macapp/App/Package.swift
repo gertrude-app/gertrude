@@ -19,6 +19,9 @@ let package = Package(
     .library(name: "TestSupport", targets: ["TestSupport"]),
   ],
   dependencies: [
+    // NB: we can only update TCA to 1.23.2, last version to support macOS 11 (Big Sur)
+    // because TCA raised their min deploy target in Feb 2026, may not be worth it
+    // as there would need to be some decent architecture changes, and we'd still be behind
     .github("pointfreeco/swift-composable-architecture", from: "1.2.0"),
     .github("pointfreeco/swift-dependencies", from: "1.0.0"),
     .github("pointfreeco/combine-schedulers", from: "1.0.0"),
