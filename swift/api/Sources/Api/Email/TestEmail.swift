@@ -113,6 +113,19 @@ import Vapor
           dryRun: true,
         ))
 
+      case "marketing-announcement-v2-9-1":
+        try await postmark.send(template: .v2_9_1_Announce(
+          to: [to],
+          model: .init(),
+          dryRun: true,
+        ))
+
+      case "marketing-ios-only-mac-trial":
+        try await postmark.send(template: .iosOnlyMacTrial(
+          to: to,
+          model: .init(deviceFragment: "Franny's iPhone"),
+        ))
+
       case "admin-trial-ending-soon":
         try await postmark
           .send(template: .trialEndingSoon(to: to, model: .init(length: 21, remaining: 3)))
@@ -165,6 +178,10 @@ import Vapor
         return write(template: NotifySecurityEvent.self)
       case "marketing-announcement":
         return write(template: V2_7_0_Announce.self)
+      case "marketing-announcement-v2-9-1":
+        return write(template: V2_9_1_Announce.self)
+      case "marketing-ios-only-mac-trial":
+        return write(template: IosOnlyMacTrial.self)
       case "admin-trial-ending-soon":
         return write(template: AccountLifecycle.TrialEndingSoon.self)
       case "admin-trial-expired":

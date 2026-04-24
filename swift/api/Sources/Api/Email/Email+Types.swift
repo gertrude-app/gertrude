@@ -12,6 +12,8 @@ enum TemplateEmail {
   case verifyNotificationEmail(to: String, model: VerifyNotificationEmail)
   case reSignup(to: String, model: ReSignup)
   case v2_7_0_Announce(to: [String], model: V2_7_0_Announce, dryRun: Bool)
+  case v2_9_1_Announce(to: [String], model: V2_9_1_Announce, dryRun: Bool)
+  case iosOnlyMacTrial(to: String, model: IosOnlyMacTrial)
   case trialEndingSoon(to: String, model: AccountLifecycle.TrialEndingSoon)
   case trialExpired(to: String, model: AccountLifecycle.TrialExpired)
   case overdueToUnpaid(to: String, model: AccountLifecycle.OverdueToUnpaid)
@@ -22,6 +24,7 @@ enum TemplateEmail {
 enum EmailLayout: String, CaseIterable {
   case base
   case topLogo
+  case personal
 }
 
 protocol TemplateEmailModel: Sendable {
@@ -66,6 +69,8 @@ extension TemplateEmail {
     case .initialSignup(_, let model): model
     case .reSignup(_, let model): model
     case .v2_7_0_Announce(_, let model, _): model
+    case .v2_9_1_Announce(_, let model, _): model
+    case .iosOnlyMacTrial(_, let model): model
     case .trialEndingSoon(_, let model): model
     case .trialExpired(_, let model): model
     case .overdueToUnpaid(_, let model): model

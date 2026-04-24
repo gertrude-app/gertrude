@@ -26,6 +26,11 @@ public extension Client {
     public struct Error: Swift.Error, Encodable {
       public var errorCode: Int
       public var message: String
+
+      public init(errorCode: Int, message: String) {
+        self.errorCode = errorCode
+        self.message = message
+      }
     }
   }
 

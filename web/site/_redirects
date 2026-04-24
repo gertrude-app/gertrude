@@ -113,3 +113,9 @@
 /iosapp-connect-help https://gertrude.app/docs/ios-account-connection-help 302
 /s/:code https://api.gertrude.app/claim-pending-supervision/:code 302
 /u/:shortid https://api.gertrude.app/short-url/:shortid 302
+
+
+#############
+# marketing #
+#############
+/try-mac https://api.gertrude.app/short-url/try-mac 302

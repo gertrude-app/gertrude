@@ -8,6 +8,7 @@ public struct TemplateEmail: Equatable, Sendable {
   public var templateAlias: String
   public var templateModel: [String: String] = [:]
   public var messageStream: String?
+  public var tag: String?
 
   public init(
     to: String,
@@ -16,6 +17,7 @@ public struct TemplateEmail: Equatable, Sendable {
     templateAlias: String,
     templateModel: [String: String] = [:],
     messageStream: String? = nil,
+    tag: String? = nil,
   ) {
     self.to = to
     self.from = from
@@ -23,6 +25,7 @@ public struct TemplateEmail: Equatable, Sendable {
     self.templateAlias = templateAlias
     self.templateModel = templateModel
     self.messageStream = messageStream
+    self.tag = tag
   }
 }
 
@@ -100,6 +103,7 @@ struct ApiTemplateEmail: Encodable {
   let TemplateAlias: String
   let TemplateModel: [String: String]
   let MessageStream: String?
+  let Tag: String?
 }
 
 extension ApiTemplateEmail {
@@ -110,5 +114,6 @@ extension ApiTemplateEmail {
     self.TemplateAlias = email.templateAlias
     self.TemplateModel = email.templateModel
     self.MessageStream = email.messageStream
+    self.Tag = email.tag
   }
 }
