@@ -208,16 +208,7 @@ func createDefaultKeychainIfNeeded(
 
   private func debugVMOsName(from osVersion: String?) -> String {
     guard let osVersion, let semver = Semver(osVersion) else { return "mac" }
-    switch semver.major {
-    case 10: return "catalina"
-    case 11: return "bigsur"
-    case 12: return "monterey"
-    case 13: return "ventura"
-    case 14: return "sonoma"
-    case 15: return "sequoia"
-    case 26: return "tahoe"
-    default: return "mac"
-    }
+    return MacOSName(major: semver.major, minor: semver.minor).rawValue.lowercased()
   }
 #endif
 

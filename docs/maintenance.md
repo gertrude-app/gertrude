@@ -39,13 +39,21 @@ The `files-changed` job defines:
 ```yaml
 files-changed:
   outputs:
-    appviews: ... # triggers appviews-comment job
+    admin: ...     # triggers admin job
+    appviews: ...  # triggers appviews-comment job
     dashboard: ... # triggers dashboard job
-    site: ... # triggers site job
+    site: ...      # triggers site job
     storybook: ... # triggers storybook job
 ```
 
-Note: The `check` job runs on all web changes without filtering.
+Note: The `check` job runs on all web changes without filtering — it covers lint,
+format-check, typecheck (via nx, across every package with a `typecheck` script), and
+vitest.
+
+**`web/supervise` is intentionally not in `files-changed`.** It has no build step
+(`main: "./src/index.ts"`, source-only) and is consumed by the external Tauri
+supervision tool, not built from this repo. The lint/format/typecheck coverage from
+`check` is sufficient. Don't add a filter unless supervise gains a real build step.
 
 ### Periodic Maintenance Steps
 
@@ -127,9 +135,92 @@ commands, and architecture to Claude Code. Drifts when:
 agent-facing source of truth for how the product works. Drift whenever features ship, are
 renamed, or are removed. Review after any significant feature launch.
 
-### `docs/*.md` — code-describing docs
+### Code-describing docs
 
-`codegen.md`, `templated-emails.md`, `ios-block-rule-analysis.md`, `ios-supervision.md`,
-`pairql.md` (in `swift/docs/`). These describe code and will rot if the code they describe
-is refactored. When touching any of the systems they describe, update the doc in the same
-PR.
+Docs that describe how specific code works. They rot silently if the code they describe
+is refactored. When touching any of the systems they describe, update the doc in the
+same PR.
+
+- `docs/codegen.md` — swift/ts interop codegen
+- `docs/templated-emails.md` — Postmark template system
+- `docs/ios-block-rule-analysis.md` — iOS filter log analysis workflow
+- `docs/ios-supervision.md` — iOS supervision process
+- `swift/docs/pairql.md` — PairQL architecture
+- `swift/docs/api-build.md` — Swift CI docker build + swift version bump procedure
+- `swift/podcasts/docs/localization.md` — `LocalizedStringKey` / `lstr()` pattern and
+  `.xcstrings` locations
+- `swift/dev-emails/README.md` — local SolidStart tool for iterating on email HTML/CSS
+
+### `web/site/docs/design.md` — marketing-site design system
+
+Comprehensive reference for the marketing site's colors, typography, breakpoints,
+spacing, buttons, cards, gradients, and animations. Referenced from `web/CLAUDE.md` as
+the go-to design doc. High drift surface because it hardcodes specific values
+(hex codes, class names, px values). Periodic checks:
+
+- Colors: verify hex codes in `## Color Palette` still match the actual values used —
+  currently Tailwind defaults for violet-500, fuchsia-500, slate-900, etc. If a brand
+  refresh changes any of them, the doc must be updated.
+- Breakpoints, spacing, animations: verify against `web/shared/tailwind/src/preset.js`
+  and `web/site/tailwind.config.js`.
+- Fonts: verify family names match the tailwind `fontFamily` extends.
+- Components (`FancyLink`, testimonial cards, etc.): after any refactor of shared or
+  site-local components, re-check the `## Components` section.
+
+## Hand-Mirrored Values
+
+Hard-coded values that must be kept in sync across multiple files. Nothing enforces these
+— changing one without the others creates silent drift.
+
+### Prettier version — CI vs `web/package.json`
+
+- `.github/workflows/swift-ci.yml` invokes `npx prettier@X.Y.Z` directly (twice, for the
+  format-check steps that run against `web/` and `web/appviews/`).
+- `web/package.json` pins `prettier` to the same version.
+- Must match — if CI pins a newer version than `package.json`, format-check can fail on
+  rules that weren't applied locally (or vice versa). Drifts whenever prettier is
+  bumped in either place.
+
+### `web/justfile` `check` recipe ↔ `web-ci.yml` build jobs
+
+- `web/justfile`'s `check:` recipe lists per-app builds as dependencies (`build-site`,
+  `build-storybook`, `build-admin`, etc.). Root `just check` and `just ci-local` both
+  delegate here, so this recipe is the local mirror of the per-app build jobs in
+  `.github/workflows/web-ci.yml`.
+- Whenever a new per-app build job is added to `web-ci.yml`, the matching `build-*`
+  recipe **must** be appended to `web/justfile:check` — otherwise `just ci-local` will
+  silently skip it and PRs can pass locally while failing in CI.
+- The `build-*` recipes should use `pnpm exec nx run <project>:build` (not
+  `pnpm --filter <project> build`) so they benefit from nx caching during the
+  frequently-run `just check` loop.
+
+### Podcast background task identifiers
+
+- `swift/podcasts/lib-tca/Sources/Services/RegisterBgTasks.swift` defines the `BgTaskId`
+  enum with the identifier strings (`com.netrivet.gertrude.am.refresh-feed`, etc.).
+- `swift/podcasts/project.yml` lists the same strings under
+  `BGTaskSchedulerPermittedIdentifiers`. Both files carry in-line "keep in sync"
+  comments but nothing automated. Drifts whenever a background task is added, removed,
+  or renamed.
+
+## Annual: New macOS Release
+
+Apple's cadence: the next macOS version name is announced at WWDC in early June, then
+ships mid-to-late September. Updates happen in two waves:
+
+**Wave 1 — after WWDC announcement (as early as June).** Safe to add the name as soon
+as it's known:
+
+- `swift/gertie/Sources/Gertie/MacOSName.swift` — add a new `case` to the enum and a
+  new `switch` arm in `init(major:minor:)`. This is the shared source of truth consumed
+  by the macapp (`DeviceClient+Os.swift`) and the api (`ConnectUser.debugVMOsName`).
+
+**Wave 2 — after public release (late September or later).** Deliberately deferred
+until the final release ships — don't record demo videos against buggy betas:
+
+- `web/site/_redirects` — add a new `/cu-*` `/du-*` `/su-*` suffix and YouTube URL for
+  the user-management video, and bump the `# CREATE MACOS USER (current: X.Y.Z+)`
+  marker comment (see the `_redirects` section above).
+- `web/site/app/(marketing)/download-mac-app/page.tsx` — add a `SupportedOSCard` for
+  the new version and import the matching `macos-{name}.png` image from
+  `web/site/public/supported-os/`.

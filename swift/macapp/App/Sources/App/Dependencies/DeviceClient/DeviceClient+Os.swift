@@ -2,15 +2,7 @@ import Foundation
 import Gertie
 
 struct MacOSVersion: Sendable {
-  enum Name: String, Codable {
-    case catalina
-    case bigSur
-    case monterey
-    case ventura
-    case sonoma
-    case sequoia
-    case tahoe
-  }
+  typealias Name = MacOSName
 
   let major: Int
   let minor: Int
@@ -21,16 +13,7 @@ struct MacOSVersion: Sendable {
   }
 
   var name: Name {
-    switch (self.major, self.minor) {
-    case (10, 15): .catalina
-    case (11, _): .bigSur
-    case (12, _): .monterey
-    case (13, _): .ventura
-    case (14, _): .sonoma
-    case (15, _): .sequoia
-    case (26, _): .tahoe
-    default: .tahoe
-    }
+    .init(major: self.major, minor: self.minor)
   }
 
   var description: String {

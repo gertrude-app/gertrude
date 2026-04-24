@@ -48,8 +48,6 @@ String catalogs are located at `Sources/Resources/Localizable.xcstrings` in each
 - `lib-views/Sources/Resources/Localizable.xcstrings`
 - `lib-tca/Sources/Resources/Localizable.xcstrings`
 
-Currently supported languages: English (en), Spanish (es)
-
 ## Sample Usage
 
 ```swift

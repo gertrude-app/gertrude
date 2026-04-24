@@ -5,6 +5,7 @@ import cx from 'classnames';
 import { MenuIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
+import { PARENTS_APP_URL } from '@/lib/urls';
 
 const MobileLoginDropdown: React.FC<{
   theme: `violet` | `white`;
@@ -31,10 +32,8 @@ const MobileLoginDropdown: React.FC<{
         <div className="px-4 py-2 text-xs font-medium uppercase tracking-wider text-slate-400">
           Mac App
         </div>
-        <DropdownLink href="https://parents.gertrude.app/signup?v=new_site">
-          Sign up
-        </DropdownLink>
-        <DropdownLink href="https://parents.gertrude.app">Log in</DropdownLink>
+        <DropdownLink href={`${PARENTS_APP_URL}/signup?v=new_site`}>Sign up</DropdownLink>
+        <DropdownLink href={PARENTS_APP_URL}>Log in</DropdownLink>
       </DropdownMenu.Content>
     </DropdownMenu.Portal>
   </DropdownMenu.Root>

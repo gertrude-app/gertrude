@@ -3,6 +3,7 @@ import { ArrowRightIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 import FancyLink from './FancyLink';
+import { PARENTS_APP_URL } from '@/lib/urls';
 
 interface Props {
   clickId: string;
@@ -22,7 +23,7 @@ const PageBottomCTA: React.FC<Props> = ({ clickId }) => (
     <FancyLink
       type="link"
       id={clickId}
-      href="https://parents.gertrude.app/signup"
+      href={`${PARENTS_APP_URL}/signup`}
       color="primary"
       inverted
       className="mt-8"

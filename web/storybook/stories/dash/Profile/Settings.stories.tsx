@@ -21,7 +21,7 @@ const notificationProps = {
   saveButtonDisabled: false,
 };
 
-const plans: Record<string, Plan> = {
+const plans = {
   fullPaid: {
     case: `full`,
     status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
@@ -64,7 +64,7 @@ const plans: Record<string, Plan> = {
     status: { case: `overdue`, stripeId: `sub_456`, hasTrialedFull: false },
   },
   free: { case: `free`, kind: { case: `standard` } },
-};
+} satisfies Record<string, Plan>;
 
 const baseArgs = {
   newMethodId: undefined,

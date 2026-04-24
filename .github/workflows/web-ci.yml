@@ -122,6 +122,7 @@ jobs:
   files-changed:
     runs-on: ubuntu-latest
     outputs:
+      admin: ${{ steps.changes.outputs.admin }}
       appviews: ${{ steps.changes.outputs.appviews }}
       dashboard: ${{ steps.changes.outputs.dashboard }}
       site: ${{ steps.changes.outputs.site }}
@@ -133,6 +134,9 @@ jobs:
         id: changes
         with:
           filters: |
+            admin:
+              - web/admin/**
+              - web/shared/**
             appviews:
               - web/appviews/**
             dashboard:
@@ -181,3 +185,22 @@ jobs:
         uses: extractions/setup-just@v2
       - name: build site
         run: cd web && just build-site
+
+  admin:
+    name: admin
+    needs: files-changed
+    if: github.event_name == 'pull_request' && needs.files-changed.outputs.admin == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VITE_API_ENDPOINT: /not-real
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install pnpm
+        uses: pnpm/action-setup@v4
+      - name: install deps
+        run: cd web && pnpm install
+      - name: setup just
+        uses: extractions/setup-just@v2
+      - name: build admin
+        run: cd web && just build-admin

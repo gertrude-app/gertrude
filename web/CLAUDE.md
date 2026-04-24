@@ -11,10 +11,10 @@ Next.js, Vite, Tailwind.
 ## Main Apps
 
 - **`site/`** — Marketing site + docs (Next.js, port varies)
-- **`dash/app/`** — Parent admin dashboard (Vite SPA, http://localhost:8081)
+- **`dash/app/`** — Parent admin dashboard (Vite SPA)
 - **`appviews/`** — Web views embedded in macOS app via webviews (Vite)
 - **`supervise/`** — Web UI only for external Tauri iOS device supervision tool
-- **`admin/`** — Internal reporting/admin backend (Next.js, port 4242)
+- **`admin/`** — Internal reporting/admin backend (Next.js)
 - **`storybook/`** — Component library/documentation
 
 ## Marketing Site
@@ -42,5 +42,4 @@ just typecheck     # Type check all packages (nx)
 # Build
 just build-dash    # Build dashboard
 just build-site    # Build marketing site
-just appviews      # Build & generate appviews code
 ```

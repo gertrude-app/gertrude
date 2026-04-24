@@ -15,6 +15,7 @@ const config: StorybookConfig = {
         ...config.resolve.alias,
         '@site': path.resolve(__dirname, `../../site`),
         '@/public': path.resolve(__dirname, `../../site/public`),
+        '@': path.resolve(__dirname, `../../site`),
       };
     }
     return config;

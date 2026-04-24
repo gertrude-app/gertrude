@@ -7,6 +7,7 @@ import type { StaticImageData } from 'next/image';
 import FancyLink from '@/components/FancyLink';
 import Computer from '@/components/super-scroller-illustration/Computer';
 import * as seo from '@/lib/seo';
+import { MACAPP_DMG_URL } from '@/lib/urls';
 
 import BigSur from '@/public/supported-os/macos-big-sur.png';
 import Monterey from '@/public/supported-os/macos-monterey.png';
@@ -42,7 +43,7 @@ const DownloadPage: NextPage = () => (
           size="lg"
           color="primary"
           type="link"
-          href="https://gertrude.nyc3.digitaloceanspaces.com/releases/Gertrude.dmg"
+          href={MACAPP_DMG_URL}
           Icon={DownloadIcon}
           className="mt-8 mb-12"
         >

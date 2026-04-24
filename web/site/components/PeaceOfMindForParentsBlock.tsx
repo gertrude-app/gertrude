@@ -6,6 +6,7 @@ import { useIntersectionObserver, useScrollY, useWindowDimensions } from '../lib
 import FancyLink from './FancyLink';
 import VideoModal from './VideoModal';
 import WebsiteGraphic from './WebsiteGraphic';
+import { PARENTS_APP_URL } from '@/lib/urls';
 
 const PeaceOfMindForParentsBlock: React.FC = () => {
   const { intersected, ref: illustration } = useIntersectionObserver({ threshold: 1 });
@@ -41,7 +42,7 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
           <FancyLink
             id="peace-of-mind-cta"
             type="link"
-            href="https://parents.gertrude.app/signup?v=new_site"
+            href={`${PARENTS_APP_URL}/signup?v=new_site`}
             Icon={RocketIcon}
             inverted
             color="primary"
