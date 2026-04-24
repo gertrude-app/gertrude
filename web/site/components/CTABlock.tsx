@@ -1,6 +1,7 @@
 import { RocketIcon, RouteIcon } from 'lucide-react';
 import React from 'react';
 import FancyLink from './FancyLink';
+import { PARENTS_APP_URL } from '@/lib/urls';
 
 const CTABlock: React.FC = () => (
   <section className="bg-gradient-to-b from-violet-500 to-violet-500 xl:p-8 relative">
@@ -15,7 +16,7 @@ const CTABlock: React.FC = () => (
         <FancyLink
           id="cta-signup"
           type="link"
-          href="https://parents.gertrude.app/signup?v=new_site"
+          href={`${PARENTS_APP_URL}/signup?v=new_site`}
           Icon={RocketIcon}
           color="primary"
           size="lg"

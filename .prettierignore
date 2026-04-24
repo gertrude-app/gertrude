@@ -8,5 +8,6 @@
 **/site/.next
 **/site/out
 **/appviews/dist
+**/admin/dist
 **/appviews/src/main.tsx
 **/next-env.d.ts

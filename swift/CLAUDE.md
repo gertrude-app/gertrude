@@ -67,7 +67,7 @@ swift/
 
 **Tech Stack:**
 
-- TCA (v1.2.0+) for state management
+- TCA for state management
 - Web views for UI, no SwiftUI
 - Network Extension Framework for filtering
 - XPC for inter-process communication
@@ -120,7 +120,7 @@ searches, and more
 
 **Tech Stack:**
 
-- TCA (v1.18.0+) for state management
+- TCA for state management
 - SwiftUI for UI
 - Network Extension Framework
 - PairQL for API communication
@@ -144,7 +144,7 @@ searches, and more
 
 **Tech Stack:**
 
-- Vapor 4 (v4.104.0)
+- Vapor 4
 - PostgreSQL 17
 - Duet + DuetSQL (custom ORM abstraction over Fluent)
 - PairQL for type-safe routing
@@ -243,8 +243,7 @@ just lint-fix # Fix formatting
 
 ### Testing
 
-**Framework:** XCTest + x-expect **Coverage:** 239 test files across monorepo **CI:**
-GitHub Actions (Linux + macOS + iOS)
+**Framework:** XCTest + x-expect **CI:** GitHub Actions (Linux + macOS + iOS)
 
 **Test Commands:**
 
@@ -257,7 +256,7 @@ cd iosapp/lib-ios && SWIFT_DETERMINISTIC_HASHING=1 swift test # iOS app tests
 
 ### Package Manager
 
-- **SPM** - Primary package manager (17 packages)
+- **SPM** - Primary package manager
 - **pnpm** (v10.12.1) - For npm dependencies (Nx, TypeScript)
 - **Nx** - Monorepo task caching
 

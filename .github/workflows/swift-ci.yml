@@ -381,6 +381,7 @@ jobs:
               - swift/pairql/**
               - swift/gertie/**
               - swift/x-kit/**
+              - swift/x-expect/**
               - swift/ts-interop/**
               - swift/ts-codable-macro/**
             iosapp:
@@ -389,6 +390,7 @@ jobs:
               - swift/pairql/**
               - swift/gertie/**
               - swift/x-kit/**
+              - swift/x-expect/**
               - swift/ts-codable-macro/**
             podcasts:
               - swift/podcasts/**
@@ -450,7 +452,6 @@ env:
   POSTMARK_SERVER_ID: 12345
   PRIMARY_SUPPORT_EMAIL: not-real
   SUPER_ADMIN_EMAIL: not-real
-  STRIPE_SUBSCRIPTION_PRICE_ID: not-real
   STRIPE_SECRET_KEY: not-real
   SWIFT_DETERMINISTIC_HASHING: 1
   TASK_MEGA_YIELD_COUNT: 250

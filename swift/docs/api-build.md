@@ -13,11 +13,11 @@ dependencies, to ensure that the deployed binary will run exactly the same in th
 production VM. Previous to this process, we had problems where the official swift docker
 images drifted out of sync with our Ubuntu version, and caused hard-to-debug crashes.
 
-The docker image is built from the `.github/workflows/docker-images.yml` workflow, which
-creates a the custom image `ghcr.io/gertrude-app/api-ci-build:latest`.
+The docker image is built from the `.github/workflows/swift-docker-images.yml` workflow,
+which creates a the custom image `ghcr.io/gertrude-app/api-ci-build:latest`.
 
-The current (as of Dec 2025) production VM is running Ubuntu 24.04, which is reflected in
-the build image. Should that ever change, we should update the base image.
+The production VM runs Ubuntu 24.04, matched by the base image in `api/Dockerfile.ci`.
+Should the VM ever change, update the base image.
 
 The production VM does not need to have swift installed, as we statically link the swift
 standard library. At the moment we do not do a FULLY static build, but we could explore

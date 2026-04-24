@@ -50,6 +50,9 @@ build-storybook:
 build-dash:
   @pnpm --filter @dash/app build
 
+build-admin:
+  @pnpm exec nx run admin:build
+
 # ci/test type things
 
 cy-open:
@@ -101,7 +104,7 @@ typecheck-watch:
 
 fix: format lint-fix
 
-check: lint format-check typecheck test build-storybook build-site
+check: lint format-check typecheck test build-storybook build-site build-admin
 
 sync-supervise-ui:
   #!/usr/bin/env bash

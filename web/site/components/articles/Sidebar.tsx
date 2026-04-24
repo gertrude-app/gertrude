@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import FancyLink from '@/components/FancyLink';
+import { PARENTS_APP_URL } from '@/lib/urls';
 
 interface Props {
   open: boolean;
@@ -58,7 +59,7 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
         </div>
         <FancyLink
           type="link"
-          href="https://parents.gertrude.app"
+          href={PARENTS_APP_URL}
           size="sm"
           className="flex-grow mb-4 mt-6"
         >
@@ -66,7 +67,7 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
         </FancyLink>
         <FancyLink
           type="link"
-          href="https://parents.gertrude.app/signup"
+          href={`${PARENTS_APP_URL}/signup`}
           size="sm"
           color="primary"
           className="flex-grow"

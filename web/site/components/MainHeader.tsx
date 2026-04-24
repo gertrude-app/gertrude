@@ -3,6 +3,7 @@ import cx from 'classnames';
 import React from 'react';
 import FancyLink from './FancyLink';
 import MobileLoginDropdown from './MobileLoginDropdown';
+import { PARENTS_APP_URL } from '@/lib/urls';
 
 const MainHeader: React.FC<{
   theme: `violet` | `white`;
@@ -35,7 +36,7 @@ const MainHeader: React.FC<{
       <div className={cx(`gap-4 transition-opacity duration-500 hidden sm:flex`)}>
         <FancyLink
           type="link"
-          href="https://parents.gertrude.app"
+          href={PARENTS_APP_URL}
           size="sm"
           color="secondary"
           inverted={theme === `violet`}
@@ -45,7 +46,7 @@ const MainHeader: React.FC<{
         </FancyLink>
         <FancyLink
           type="link"
-          href="https://parents.gertrude.app/signup?v=new_site"
+          href={`${PARENTS_APP_URL}/signup?v=new_site`}
           size="sm"
           color="primary"
           inverted={theme === `violet`}

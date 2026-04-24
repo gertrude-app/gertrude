@@ -2,6 +2,7 @@ import { Logo } from '@shared/components';
 import { GithubIcon, YoutubeIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
+import { PARENTS_APP_URL } from '@/lib/urls';
 
 const MainFooter: React.FC = () => (
   <footer className="px-8 sm:px-12 lg:px-20 pt-14 pb-8 gap-20 relative border-t border-violet-400 flex flex-col bg-violet-500">
@@ -28,10 +29,8 @@ const MainFooter: React.FC = () => (
             Mac App
           </h4>
           <ul className="flex flex-col items-center sm:items-start gap-1">
-            <FooterLink href="https://parents.gertrude.app/signup?v=new_site">
-              Sign up
-            </FooterLink>
-            <FooterLink href="https://parents.gertrude.app">Log in</FooterLink>
+            <FooterLink href={`${PARENTS_APP_URL}/signup?v=new_site`}>Sign up</FooterLink>
+            <FooterLink href={PARENTS_APP_URL}>Log in</FooterLink>
             <FooterLink href="/download-mac-app">Download</FooterLink>
             <FooterLink href="/docs/getting-started">Docs</FooterLink>
           </ul>

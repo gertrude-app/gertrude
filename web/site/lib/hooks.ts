@@ -162,6 +162,7 @@ export function useDelayedVisibility(delay: number): boolean {
       const timer = setTimeout(() => setIsVisible(true), delay);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [delay]);
 
   return isVisible;
