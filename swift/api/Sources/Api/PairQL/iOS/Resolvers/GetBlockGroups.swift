@@ -5,6 +5,7 @@ import IOSRoute
 extension GetBlockGroups: Resolver {
   static func resolve(with input: Input, in ctx: Context) async throws -> Output {
     let groups = try await IOSApp.BlockGroup.query()
+      .where(.optIn == false)
       .orderBy(.name, .asc)
       .all(in: ctx.db)
 

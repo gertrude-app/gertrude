@@ -31,7 +31,9 @@ extension ConnectDevice_v2: Resolver {
     }
     let token = try await ctx.db.create(IOSApp.Token(deviceId: device.id))
 
-    let groups = try await IOSApp.BlockGroup.query().all(in: ctx.db)
+    let groups = try await IOSApp.BlockGroup.query()
+      .where(.optIn == false)
+      .all(in: ctx.db)
     try await ctx.db.create(groups.map {
       IOSApp.DeviceBlockGroup(deviceId: device.id, blockGroupId: $0.id)
     })

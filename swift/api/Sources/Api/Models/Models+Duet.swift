@@ -707,6 +707,7 @@ extension IOSApp.BlockGroup {
     case description
     case longDescription
     case imageSlug
+    case optIn
     case createdAt
     case updatedAt
   }

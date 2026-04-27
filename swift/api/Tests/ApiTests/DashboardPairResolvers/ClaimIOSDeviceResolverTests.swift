@@ -53,7 +53,7 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     let deviceBlockGroups = try await IOSApp.DeviceBlockGroup.query()
       .where(.deviceId == device.id)
       .all(in: self.db)
-    expect(deviceBlockGroups.count).toEqual(9)
+    expect(deviceBlockGroups.count).toEqual(8)
 
     let events = try await IOSEvent.query()
       .where(.deviceId == device.id)

@@ -6,8 +6,11 @@ import IOSRoute
 
 extension BlockRules_v3: Resolver {
   static func resolve(with input: Input, in ctx: Context) async throws -> Output {
-    let disabledGroupIds = input.disabledGroups.map { Postgres.Data.uuid($0) }
+    var disabledGroupIds = input.disabledGroups.map { Postgres.Data.uuid($0) }
     let deviceId: IOSApp.Device.Id? = input.deviceId == .init(.zero) ? nil : .init(input.deviceId)
+    let (device, optInExclusions) = try await optInBlockGroupExclusions(deviceId, in: ctx.db)
+    disabledGroupIds.append(contentsOf: optInExclusions)
+
     let rules = try await IOSApp.BlockRule.query()
       .where(.or(
         .groupId != nil .&& .groupId |!=| disabledGroupIds,
@@ -22,13 +25,12 @@ extension BlockRules_v3: Resolver {
       "BlockRules_v3: device=\(input.deviceId), v=\(input.appVersion), rules=\(blockRules.count), hash=\(rulesHash)",
     )
 
-    if let deviceId,
-       let device = try? await ctx.db.find(deviceId) as IOSApp.Device {
+    if let device {
       _ = try? await ctx.db.create(IOSEvent(
         eventId: "06329f27",
         kind: .checkin,
         detail: "rules=\(blockRules.count), hash=\(rulesHash)",
-        deviceId: deviceId,
+        deviceId: device.id,
         modelIdentifier: device.modelIdentifier,
         iosVersion: device.iosVersion,
       ))
@@ -36,4 +38,28 @@ extension BlockRules_v3: Resolver {
 
     return blockRules
   }
+}
+
+// on 4/16 in response to a user reporting that whatsapp blocking blocked calls,
+// which i had also experienced personally, i weakened the rules. however,
+// more people complained about the weakened rules than the call blocking, and
+// the weakened rules were near useless, so on 4/27 we restored the stronger rules
+// but made them opt-in only for connected accounts, and hidden from non-connected
+// while contining to serve them to grandfathered devices, ref: a9712745
+func optInBlockGroupExclusions(
+  _ deviceId: IOSApp.Device.Id?,
+  in db: any DuetSQL.Client,
+) async throws -> (device: IOSApp.Device?, excludedGroupIds: [Postgres.Data]) {
+  let cutoff = ISO8601DateFormatter().date(from: "2026-04-27T12:41:29Z")!
+  let device: IOSApp.Device? = if let deviceId {
+    try? await db.find(deviceId) as IOSApp.Device
+  } else {
+    nil
+  }
+  let isNewDevice = (device?.createdAt ?? .now) >= cutoff
+  guard isNewDevice else { return (device, []) }
+  let optInGroups = try await IOSApp.BlockGroup.query()
+    .where(.optIn == true)
+    .all(in: db)
+  return (device, optInGroups.map { Postgres.Data.uuid($0.id.rawValue) })
 }
