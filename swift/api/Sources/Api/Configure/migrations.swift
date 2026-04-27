@@ -88,6 +88,7 @@ extension Configure {
     app.migrations.add(AddAlwaysBlockedGroupRecommended())
     app.migrations.add(CreateRouteTelemetry())
     app.migrations.add(CreateMarketingEmailSends())
+    app.migrations.add(AddIOSBlockGroupOptIn())
   }
 }
 

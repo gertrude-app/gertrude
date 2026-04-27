@@ -228,6 +228,143 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     expect(Set(rules)).toEqual([.urlContains("gif")])
   }
 
+  // MARK: opt-in grandfathering tests
+
+  func testBlockRulesV3_GrandfatheredDevice_ReceivesWhatsApp() async throws {
+    let vendorId = UUID()
+    try await self.seedGrandfatheringFixtures(
+      deviceVendorId: vendorId,
+      deviceCreatedAt: .reference,
+    )
+
+    let rules = try await BlockRules_v3.resolve(
+      with: .init(deviceId: vendorId, appVersion: "2.0.0", disabledGroups: []),
+      in: .mock,
+    )
+    expect(rules).toEqual([.urlContains(value: "whatsapp-rule")])
+  }
+
+  func testBlockRulesV3_GrandfatheredDevice_CanDisableWhatsApp() async throws {
+    let ids = CreateBlockGroups.GroupIds()
+    let vendorId = UUID()
+    try await self.seedGrandfatheringFixtures(
+      deviceVendorId: vendorId,
+      deviceCreatedAt: .reference,
+      extraRule: IOSApp.BlockRule(
+        rule: .urlContains(value: "non-opt-in"),
+        groupId: .init(ids.gifs),
+      ),
+    )
+
+    let rules = try await BlockRules_v3.resolve(
+      with: .init(deviceId: vendorId, appVersion: "2.0.0", disabledGroups: [ids.whatsAppFeatures]),
+      in: .mock,
+    )
+    expect(rules).toEqual([.urlContains(value: "non-opt-in")])
+  }
+
+  func testBlockRulesV3_NewDevice_ExcludesAllOptInGroups() async throws {
+    let vendorId = UUID()
+    try await self.seedGrandfatheringFixtures(
+      deviceVendorId: vendorId,
+      deviceCreatedAt: .distantFuture,
+      extraRule: IOSApp.BlockRule(
+        rule: .urlContains(value: "non-opt-in"),
+        groupId: .init(CreateBlockGroups.GroupIds().gifs),
+      ),
+    )
+
+    let rules = try await BlockRules_v3.resolve(
+      with: .init(deviceId: vendorId, appVersion: "2.0.0", disabledGroups: []),
+      in: .mock,
+    )
+    expect(rules).toEqual([.urlContains(value: "non-opt-in")])
+  }
+
+  func testBlockRulesV3_MissingDeviceRow_TreatedAsNew() async throws {
+    try await self.seedGrandfatheringFixtures(
+      deviceVendorId: nil,
+      extraRule: IOSApp.BlockRule(
+        rule: .urlContains(value: "non-opt-in"),
+        groupId: .init(CreateBlockGroups.GroupIds().gifs),
+      ),
+    )
+
+    let rules = try await BlockRules_v3.resolve(
+      with: .init(deviceId: UUID(), appVersion: "2.0.0", disabledGroups: []),
+      in: .mock,
+    )
+    expect(rules).toEqual([.urlContains(value: "non-opt-in")])
+  }
+
+  func testDefaultBlockRules_NewDevice_ExcludesOptInGroups() async throws {
+    let vendorId = UUID()
+    try await self.seedGrandfatheringFixtures(
+      deviceVendorId: vendorId,
+      deviceCreatedAt: .distantFuture,
+      extraRule: IOSApp.BlockRule(
+        rule: .urlContains(value: "non-opt-in"),
+        groupId: .init(CreateBlockGroups.GroupIds().gifs),
+      ),
+    )
+
+    let rules = try await DefaultBlockRules.resolve(
+      with: .init(vendorId: vendorId, version: "1.0"),
+      in: .mock,
+    )
+    expect(rules).toEqual([.urlContains("non-opt-in")])
+  }
+
+  func testDefaultBlockRules_GrandfatheredDevice_ReceivesWhatsApp() async throws {
+    let vendorId = UUID()
+    try await self.seedGrandfatheringFixtures(
+      deviceVendorId: vendorId,
+      deviceCreatedAt: .reference,
+      extraRule: IOSApp.BlockRule(
+        rule: .urlContains(value: "non-opt-in"),
+        groupId: .init(CreateBlockGroups.GroupIds().gifs),
+      ),
+    )
+
+    let rules = try await DefaultBlockRules.resolve(
+      with: .init(vendorId: vendorId, version: "1.0"),
+      in: .mock,
+    )
+    expect(Set(rules)).toEqual([.urlContains("whatsapp-rule"), .urlContains("non-opt-in")])
+  }
+
+  func testBlockRulesV2_GrandfatheredDevice_ReceivesWhatsApp() async throws {
+    let vendorId = UUID()
+    try await self.seedGrandfatheringFixtures(
+      deviceVendorId: vendorId,
+      deviceCreatedAt: .reference,
+    )
+
+    let rules = try await BlockRules_v2.resolve(
+      with: .init(disabledGroups: [], vendorId: vendorId, version: "1.5.0"),
+      in: .mock,
+    )
+    expect(rules.map(\.current)).toEqual([.urlContains(value: "whatsapp-rule")])
+  }
+
+  func testBlockRulesV2_GrandfatheredDevice_CanDisableWhatsApp() async throws {
+    let vendorId = UUID()
+    try await self.seedGrandfatheringFixtures(
+      deviceVendorId: vendorId,
+      deviceCreatedAt: .reference,
+      extraRule: IOSApp.BlockRule(
+        rule: .urlContains(value: "non-opt-in"),
+        groupId: .init(CreateBlockGroups.GroupIds().gifs),
+      ),
+    )
+
+    let rules = try await BlockRules_v2.resolve(
+      with: .init(disabledGroups: [.whatsAppFeatures], vendorId: vendorId, version: "1.5.0"),
+      in: .mock,
+    )
+    expect(rules.map(\.current)).toEqual([.urlContains(value: "non-opt-in")])
+  }
+
   // MARK: v1 legacy tests
 
   func testBlockRules_v1() async throws {
@@ -245,4 +382,38 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
       ),
     )).toEqual(true)
   }
+
+  // MARK: helpers
+
+  private func seedGrandfatheringFixtures(
+    deviceVendorId: UUID?,
+    deviceCreatedAt: Date? = nil,
+    extraRule: IOSApp.BlockRule? = nil,
+  ) async throws {
+    if let deviceVendorId, let deviceCreatedAt {
+      let parent = try await self.parent()
+      let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+      var device = try await self.db.create(IOSApp.Device(
+        id: .init(deviceVendorId),
+        childId: child.id,
+        modelIdentifier: "iPhone15,2",
+        appVersion: "2.0.0",
+        iosVersion: "18.0",
+      ))
+      try await device.modifyCreatedAt(.exact(deviceCreatedAt))
+    }
+
+    let ids = CreateBlockGroups.GroupIds()
+    try await self.db.delete(all: IOSApp.BlockRule.self)
+    var rules = [
+      IOSApp.BlockRule(
+        rule: .urlContains(value: "whatsapp-rule"),
+        groupId: .init(ids.whatsAppFeatures),
+      ),
+    ]
+    if let extraRule { rules.append(extraRule) }
+    try await self.db.create(rules)
+  }
 }
+
+extension IOSApp.Device: HasCreatedAt {}

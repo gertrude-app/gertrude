@@ -1225,6 +1225,7 @@ extension IOSApp.BlockGroup: Model {
     case .description: .string(self.description)
     case .longDescription: .string(self.longDescription)
     case .imageSlug: .string(self.imageSlug)
+    case .optIn: .bool(self.optIn)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -1237,6 +1238,7 @@ extension IOSApp.BlockGroup: Model {
       .description: .string(self.description),
       .longDescription: .string(self.longDescription),
       .imageSlug: .string(self.imageSlug),
+      .optIn: .bool(self.optIn),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

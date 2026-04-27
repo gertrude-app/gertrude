@@ -79,8 +79,10 @@ extension ClaimIOSDevice: Resolver {
     supervision.claimedAt = get(dependency: \.date.now)
     try await context.db.update(supervision)
 
-    // start with ALL block groups, parent controls from web ui
-    let groups = try await IOSApp.BlockGroup.query().all(in: context.db)
+    // start with ALL non-opt-in block groups, parent controls from web ui
+    let groups = try await IOSApp.BlockGroup.query()
+      .where(.optIn == false)
+      .all(in: context.db)
     try await context.db.create(groups.map {
       IOSApp.DeviceBlockGroup(deviceId: device.id, blockGroupId: $0.id)
     })

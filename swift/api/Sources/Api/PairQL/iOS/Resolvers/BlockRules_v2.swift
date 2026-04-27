@@ -12,8 +12,11 @@ extension BlockRules_v2: Resolver {
       disabledGroups.append(.spotifyImages)
     }
 
-    let disabledGroupIds = disabledGroups.map { Postgres.Data.uuid($0.blockGroupId) }
+    var disabledGroupIds = disabledGroups.map { Postgres.Data.uuid($0.blockGroupId) }
     let deviceId: IOSApp.Device.Id? = input.vendorId == .init(.zero) ? nil : .init(input.vendorId)
+    let (device, optInExclusions) = try await optInBlockGroupExclusions(deviceId, in: ctx.db)
+    disabledGroupIds.append(contentsOf: optInExclusions)
+
     let rules = try await IOSApp.BlockRule.query()
       .where(.or(
         .groupId != nil .&& .groupId |!=| disabledGroupIds,
@@ -30,13 +33,12 @@ extension BlockRules_v2: Resolver {
       "BlockRules_v2: vendor=\(vendorId), rules=\(legacyRules.count), hash=\(rulesHash)",
     )
 
-    if let deviceId,
-       let device = try? await ctx.db.find(deviceId) as IOSApp.Device {
+    if let device {
       _ = try? await ctx.db.create(IOSEvent(
         eventId: "b977cfdc",
         kind: .checkin,
         detail: "rules=\(legacyRules.count), hash=\(rulesHash)",
-        deviceId: deviceId,
+        deviceId: device.id,
         modelIdentifier: device.modelIdentifier,
         iosVersion: device.iosVersion,
       ))
