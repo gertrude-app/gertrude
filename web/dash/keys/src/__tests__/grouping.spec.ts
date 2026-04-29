@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import type { UnlockRequest } from '@dash/types';
 import {
+  expandSplitGroups,
   groupRequestsByKey,
   keyForUnlockRequest,
   keyIdentity,
@@ -289,5 +290,64 @@ describe(`naughtyInfo()`, () => {
       request({ id: `1`, domain: `googleads.g.doubleclick.net` }),
     ]);
     expect(naughtyInfo(groups[0]!)?.level).toBe(`deny`);
+  });
+});
+
+describe(`expandSplitGroups()`, () => {
+  test(`returns groups unchanged when no split ids`, () => {
+    const groups = groupRequestsByKey([
+      request({ id: `1`, domain: `images.foobar.com` }),
+      request({ id: `2`, domain: `cdn.foobar.com` }),
+    ]);
+    expect(groups).toHaveLength(1);
+    const expanded = expandSplitGroups(groups, new Set());
+    expect(expanded).toEqual(groups);
+  });
+
+  test(`fans out a merged group whose representative id is in splitIds`, () => {
+    const groups = groupRequestsByKey([
+      request({ id: `1`, domain: `images.foobar.com` }),
+      request({ id: `2`, domain: `cdn.foobar.com` }),
+    ]);
+    const repId = groups[0]!.representative.id;
+    const expanded = expandSplitGroups(groups, new Set([repId]));
+
+    expect(expanded).toHaveLength(2);
+    const ids = expanded.map((g) => g.representative.id).sort();
+    expect(ids).toEqual([`1`, `2`]);
+    for (const g of expanded) {
+      expect(g.allRequests).toHaveLength(1);
+      expect(g.duplicateIds).toHaveLength(0);
+    }
+  });
+
+  test(`leaves single-request groups untouched even if id is in splitIds`, () => {
+    const groups = groupRequestsByKey([request({ id: `1`, domain: `solo.com` })]);
+    const expanded = expandSplitGroups(groups, new Set([`1` as UUID]));
+    expect(expanded).toEqual(groups);
+  });
+
+  test(`only fans out groups whose ids are in splitIds`, () => {
+    const groups = groupRequestsByKey([
+      request({ id: `1`, domain: `a.foobar.com` }),
+      request({ id: `2`, domain: `b.foobar.com` }),
+      request({ id: `3`, domain: `a.other.com` }),
+      request({ id: `4`, domain: `b.other.com` }),
+    ]);
+    expect(groups).toHaveLength(2);
+    const splitId = groups[0]!.representative.id;
+    const expanded = expandSplitGroups(groups, new Set([splitId]));
+    expect(expanded).toHaveLength(3);
+  });
+
+  test(`expanded child groups have a single-request key derived from their request`, () => {
+    const groups = groupRequestsByKey([
+      request({ id: `1`, domain: `images.foobar.com` }),
+      request({ id: `2`, domain: `cdn.foobar.com` }),
+    ]);
+    const expanded = expandSplitGroups(groups, new Set([groups[0]!.representative.id]));
+    for (const g of expanded) {
+      expect(g.key).toMatchObject({ type: `anySubdomain`, domain: `foobar.com` });
+    }
   });
 });

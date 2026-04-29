@@ -3,6 +3,7 @@ import {
   type RequestGroup,
   adjustKeyAddressType,
   defaultAddressType,
+  expandSplitGroups,
   groupRequestsByKey,
   hasDomainScope,
   naughtyInfo,
@@ -44,7 +45,12 @@ const BatchUnlockRequests: React.FC<Props> = ({
   onSubmit,
   submitting,
 }) => {
-  const groups = useMemo(() => groupRequestsByKey(requests), [requests]);
+  const baseGroups = useMemo(() => groupRequestsByKey(requests), [requests]);
+  const [splitIds, setSplitIds] = useState<ReadonlySet<UUID>>(new Set());
+  const groups = useMemo(
+    () => expandSplitGroups(baseGroups, splitIds),
+    [baseGroups, splitIds],
+  );
 
   const bestKeychainId = keychains[0]?.id ?? ``;
   const [globalKeychainId, setGlobalKeychainId] = useState(bestKeychainId);
@@ -132,6 +138,52 @@ const BatchUnlockRequests: React.FC<Props> = ({
       const cur = prev[id];
       return cur ? { ...prev, [id]: { ...cur, ...update } } : prev;
     });
+  };
+
+  const splitGroup = (group: RequestGroup): void => {
+    setSplitIds((prev) => {
+      const next = new Set(prev);
+      next.add(group.representative.id);
+      return next;
+    });
+    setRows((prev) => {
+      const next = { ...prev };
+      const parentRow = next[group.representative.id];
+      if (parentRow) {
+        next[group.representative.id] = { ...parentRow, addressType: `strict` };
+      }
+      for (const request of group.allRequests) {
+        if (request.id === group.representative.id) continue;
+        const naughty = naughtyInfo(request);
+        const decision: Decision = naughty
+          ? naughty.level === `deny`
+            ? `reject`
+            : `undecided`
+          : (parentRow?.decision ?? `accept`);
+        next[request.id] = {
+          decision,
+          keychainId: parentRow?.keychainId ?? globalKeychainId,
+          keychainOverridden: parentRow?.keychainOverridden ?? false,
+          addressType: `strict`,
+          expiration: parentRow?.expiration,
+          comment: parentRow?.comment,
+        };
+      }
+      return next;
+    });
+    setExpandedEdit(group.representative.id);
+  };
+
+  const handlePanelUpdate = (group: RequestGroup, update: Partial<RowState>): void => {
+    if (
+      update.addressType === `strict` &&
+      group.allRequests.length > 1 &&
+      !splitIds.has(group.representative.id)
+    ) {
+      splitGroup(group);
+      return;
+    }
+    updateRow(group.representative.id, update);
   };
 
   const acceptCount = groups.filter(
@@ -334,7 +386,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
                     <EditPanel
                       keyRecord={group.key}
                       row={row}
-                      onUpdate={(update) => updateRow(request.id, update)}
+                      onUpdate={(update) => handlePanelUpdate(group, update)}
                     />
                   </div>
                 )}
@@ -505,7 +557,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
                           <EditPanel
                             keyRecord={group.key}
                             row={row}
-                            onUpdate={(update) => updateRow(request.id, update)}
+                            onUpdate={(update) => handlePanelUpdate(group, update)}
                           />
                         </td>
                       </tr>

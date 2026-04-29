@@ -66,6 +66,23 @@ export function originalHost(
   return null;
 }
 
+export function expandSplitGroups(
+  groups: RequestGroup[],
+  splitIds: ReadonlySet<UUID>,
+): RequestGroup[] {
+  return groups.flatMap((group) => {
+    if (group.allRequests.length <= 1 || !splitIds.has(group.representative.id)) {
+      return [group];
+    }
+    return group.allRequests.map((request) => ({
+      representative: request,
+      allRequests: [request],
+      duplicateIds: [],
+      key: keyForUnlockRequest(request),
+    }));
+  });
+}
+
 export function adjustKeyAddressType(
   baseKey: SharedKey,
   addressType: AddressType,
