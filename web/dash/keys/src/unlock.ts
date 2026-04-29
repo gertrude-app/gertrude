@@ -48,6 +48,41 @@ export type RequestGroup = {
   key: SharedKey;
 };
 
+export type AddressType = `standard` | `strict`;
+
+export function defaultAddressType(key: SharedKey): AddressType {
+  return key.type === `anySubdomain` ? `standard` : `strict`;
+}
+
+export function hasDomainScope(key: SharedKey): boolean {
+  return key.type === `domain` || key.type === `anySubdomain`;
+}
+
+export function originalHost(
+  request: UnlockRequestCreateKeyData | UnlockRequest,
+): string | null {
+  if (request.domain) return request.domain;
+  if (request.url) return request.url.split(`/`)[2] ?? null;
+  return null;
+}
+
+export function adjustKeyAddressType(
+  baseKey: SharedKey,
+  addressType: AddressType,
+  request: UnlockRequestCreateKeyData | UnlockRequest,
+): SharedKey {
+  if (!hasDomainScope(baseKey)) return baseKey;
+  if (addressType === defaultAddressType(baseKey)) return baseKey;
+  if (addressType === `strict` && baseKey.type === `anySubdomain`) {
+    const host = originalHost(request) ?? baseKey.domain;
+    return { ...baseKey, type: `domain`, domain: host };
+  }
+  if (addressType === `standard` && baseKey.type === `domain`) {
+    return { ...baseKey, type: `anySubdomain` };
+  }
+  return baseKey;
+}
+
 export function keyIdentity(key: SharedKey): string {
   const scope = scopeIdentity(key.scope);
   switch (key.type) {

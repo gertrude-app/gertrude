@@ -1,4 +1,12 @@
-import { type RequestGroup, groupRequestsByKey, naughtyInfo } from '@dash/keys';
+import {
+  type AddressType,
+  type RequestGroup,
+  adjustKeyAddressType,
+  defaultAddressType,
+  groupRequestsByKey,
+  hasDomainScope,
+  naughtyInfo,
+} from '@dash/keys';
 import {
   AdjustmentsHorizontalIcon,
   InformationCircleIcon,
@@ -9,8 +17,6 @@ import cx from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
 import type { HandleUnlockRequests, KeychainSummary, UnlockRequest } from '@dash/types';
 import PageHeading from '../PageHeading';
-
-type AddressType = `standard` | `strict`;
 
 type Decision = `accept` | `reject` | `undecided`;
 
@@ -30,14 +36,6 @@ type Props = {
   onSubmit?: (input: HandleUnlockRequests.Input, numUndecided: number) => void;
   submitting?: boolean;
 };
-
-function defaultAddressType(key: RequestGroup[`key`]): AddressType {
-  return key.type === `anySubdomain` ? `standard` : `strict`;
-}
-
-function hasDomainScope(key: RequestGroup[`key`]): boolean {
-  return key.type === `domain` || key.type === `anySubdomain`;
-}
 
 const BatchUnlockRequests: React.FC<Props> = ({
   childName,
@@ -164,15 +162,11 @@ const BatchUnlockRequests: React.FC<Props> = ({
         if (rs.decision === `undecided`) return null;
         allDuplicateIds.push(...group.duplicateIds);
         if (rs.decision === `accept`) {
-          const baseKey = group.key;
-          const key =
-            hasDomainScope(baseKey) && rs.addressType !== defaultAddressType(baseKey)
-              ? rs.addressType === `strict` && baseKey.type === `anySubdomain`
-                ? { ...baseKey, type: `domain` as const }
-                : rs.addressType === `standard` && baseKey.type === `domain`
-                  ? { ...baseKey, type: `anySubdomain` as const }
-                  : baseKey
-              : baseKey;
+          const key = adjustKeyAddressType(
+            group.key,
+            rs.addressType,
+            group.representative,
+          );
           return {
             unlockRequestId: request.id,
             status: `accepted` as const,
