@@ -132,4 +132,34 @@ describe(`adjustKeyAddressType()`, () => {
     expect(baseKey.type).toBe(`ipAddress`);
     expect(adjustKeyAddressType(baseKey, `strict`, request)).toBe(baseKey);
   });
+
+  test(`per-request strict fan-out yields distinct hosts for sibling subdomains`, () => {
+    const images = {
+      url: `https://images.foobar.com/cat.jpg`,
+      domain: `images.foobar.com`,
+      appCategories: [`browser`],
+      appBundleId: `.com.apple.Safari`,
+    };
+    const cdn = {
+      url: `https://cdn.foobar.com/lib.js`,
+      domain: `cdn.foobar.com`,
+      appCategories: [`browser`],
+      appBundleId: `.com.apple.Safari`,
+    };
+    const fanOut = [images, cdn].map((req) =>
+      adjustKeyAddressType(keyForUnlockRequest(req), `strict`, req),
+    );
+    expect(fanOut).toEqual([
+      {
+        type: `domain`,
+        domain: `images.foobar.com`,
+        scope: { type: `webBrowsers` },
+      },
+      {
+        type: `domain`,
+        domain: `cdn.foobar.com`,
+        scope: { type: `webBrowsers` },
+      },
+    ]);
+  });
 });

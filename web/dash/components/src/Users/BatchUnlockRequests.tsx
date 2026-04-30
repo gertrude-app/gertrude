@@ -5,6 +5,7 @@ import {
   defaultAddressType,
   groupRequestsByKey,
   hasDomainScope,
+  keyForUnlockRequest,
   naughtyInfo,
 } from '@dash/keys';
 import {
@@ -155,38 +156,54 @@ const BatchUnlockRequests: React.FC<Props> = ({
   const handleSubmit = (): void => {
     if (!onSubmit) return;
     const allDuplicateIds: UUID[] = [];
-    const decisions: HandleUnlockRequests.Input[`decisions`] = groups
-      .map((group) => {
-        const request = group.representative;
-        const rs = getRow(request.id);
-        if (rs.decision === `undecided`) return null;
+    type SubmitDecision = HandleUnlockRequests.Input[`decisions`][number];
+    const decisions: SubmitDecision[] = groups.flatMap<SubmitDecision>((group) => {
+      const request = group.representative;
+      const rs = getRow(request.id);
+      if (rs.decision === `undecided`) return [];
+      if (rs.decision === `reject`) {
         allDuplicateIds.push(...group.duplicateIds);
-        if (rs.decision === `accept`) {
-          const key = adjustKeyAddressType(
-            group.key,
-            rs.addressType,
-            group.representative,
-          );
-          return {
+        return [
+          {
             unlockRequestId: request.id,
-            status: `accepted` as const,
-            key: {
-              keychainId: rs.keychainId,
-              key,
-              comment: rs.comment,
-              expiration: rs.expiration
-                ? (`${rs.expiration}T00:00:00.000Z` as ISODateString)
-                : undefined,
-            },
-          };
-        }
-        return {
+            status: `rejected` as const,
+            responseComment: denyComment || undefined,
+          },
+        ];
+      }
+      const expiration = rs.expiration
+        ? (`${rs.expiration}T00:00:00.000Z` as ISODateString)
+        : undefined;
+      if (
+        rs.addressType === `strict` &&
+        group.key.type === `anySubdomain` &&
+        group.allRequests.length > 1
+      ) {
+        return group.allRequests.map((req) => ({
+          unlockRequestId: req.id,
+          status: `accepted` as const,
+          key: {
+            keychainId: rs.keychainId,
+            key: adjustKeyAddressType(keyForUnlockRequest(req), `strict`, req),
+            comment: rs.comment,
+            expiration,
+          },
+        }));
+      }
+      allDuplicateIds.push(...group.duplicateIds);
+      return [
+        {
           unlockRequestId: request.id,
-          status: `rejected` as const,
-          responseComment: denyComment || undefined,
-        };
-      })
-      .filter((d): d is NonNullable<typeof d> => d !== null);
+          status: `accepted` as const,
+          key: {
+            keychainId: rs.keychainId,
+            key: adjustKeyAddressType(group.key, rs.addressType, request),
+            comment: rs.comment,
+            expiration,
+          },
+        },
+      ];
+    });
     const numUndecided = groups.filter(
       (g) => getRow(g.representative.id).decision === `undecided`,
     ).length;
@@ -308,6 +325,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
                   </button>
                   {row.decision !== `reject` && (
                     <button
+                      data-test="row-edit-toggle"
                       onClick={() => {
                         setExpandedEdit(expandedEdit === request.id ? null : request.id);
                         if (infoExpanded) setExpandedInfo(null);
@@ -469,6 +487,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
                           </button>
                           {row.decision !== `reject` && (
                             <button
+                              data-test="row-edit-toggle"
                               onClick={() => {
                                 setExpandedEdit(editExpanded ? null : request.id);
                                 if (infoExpanded) setExpandedInfo(null);
@@ -659,6 +678,7 @@ const EditPanel: React.FC<{
           </label>
           <div className="flex items-center gap-2">
             <button
+              data-test="standard-button"
               onClick={() => onUpdate({ addressType: `standard` })}
               className={cx(
                 `px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors`,
@@ -670,6 +690,7 @@ const EditPanel: React.FC<{
               Standard
             </button>
             <button
+              data-test="strict-button"
               onClick={() => onUpdate({ addressType: `strict` })}
               className={cx(
                 `px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors`,
