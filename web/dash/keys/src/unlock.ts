@@ -7,7 +7,7 @@ export function keyForUnlockRequest(request: UnlockRequestCreateKeyData): Shared
   let value = ``;
 
   if (request.url && !request.domain) {
-    value = request.url.split(`/`)[2] ?? ``;
+    value = urlHostname(request.url) ?? ``;
   } else if (request.domain) {
     value = request.domain;
   } else if (request.ipAddress) {
@@ -62,8 +62,16 @@ export function originalHost(
   request: UnlockRequestCreateKeyData | UnlockRequest,
 ): string | null {
   if (request.domain) return request.domain;
-  if (request.url) return request.url.split(`/`)[2] ?? null;
+  if (request.url) return urlHostname(request.url);
   return null;
+}
+
+function urlHostname(url: string): string | null {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
 }
 
 export function adjustKeyAddressType(

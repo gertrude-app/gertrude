@@ -17,6 +17,19 @@ describe(`keyForUnlockRequest()`, () => {
     });
   });
 
+  test(`URL host with mixed case + port normalizes before grouping`, () => {
+    const key = keyForUnlockRequest({
+      url: `https://Images.Foo.com:8443/a`,
+      appCategories: [`browser`],
+      appBundleId: `.com.apple.Safari`,
+    });
+    expect(key).toMatchObject({
+      type: `anySubdomain`,
+      domain: `foo.com`,
+      scope: { type: `webBrowsers` },
+    });
+  });
+
   const cases: Array<[Parameters<typeof keyForUnlockRequest>[0], SharedKey]> = [
     [
       {

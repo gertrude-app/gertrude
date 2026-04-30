@@ -32,6 +32,26 @@ describe(`originalHost()`, () => {
       }),
     ).toBe(null);
   });
+
+  test(`URL host fallback lowercases and strips port`, () => {
+    expect(
+      originalHost({
+        url: `https://Images.Foo.com:8443/a`,
+        appCategories: [`browser`],
+        appBundleId: `.com.apple.Safari`,
+      }),
+    ).toBe(`images.foo.com`);
+  });
+
+  test(`returns null for malformed URL`, () => {
+    expect(
+      originalHost({
+        url: `not a url`,
+        appCategories: [`browser`],
+        appBundleId: `.com.apple.Safari`,
+      }),
+    ).toBe(null);
+  });
 });
 
 describe(`adjustKeyAddressType()`, () => {
