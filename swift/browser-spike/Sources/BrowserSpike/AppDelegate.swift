@@ -6,14 +6,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
   func applicationDidFinishLaunching(_ notification: Notification) {
     self.installMainMenu()
-    let controller = BrowserWindowController()
-    controller.showWindow(nil)
-    self.windowController = controller
+    self.ensureWindow()
     NSApp.activate(ignoringOtherApps: true)
   }
 
   func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
     true
+  }
+
+  func application(_ application: NSApplication, open urls: [URL]) {
+    print("[app] application(_:open:) urls=\(urls.map(\.absoluteString))")
+    self.ensureWindow()
+    if let url = urls.first {
+      self.windowController?.load(url: url)
+    }
+    NSApp.activate(ignoringOtherApps: true)
+  }
+
+  private func ensureWindow() {
+    if self.windowController == nil {
+      let controller = BrowserWindowController()
+      controller.showWindow(nil)
+      self.windowController = controller
+    }
   }
 
   private func installMainMenu() {

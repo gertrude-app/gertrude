@@ -7,30 +7,83 @@ browser. See `../../claude.task.md` for the full plan and per-phase findings.
 
 ```sh
 cd swift/browser-spike
+
+# Plain SPM run (single-process, in-process Allowlist)
 swift build
 .build/debug/BrowserSpike
+
+# Build as a real .app bundle (registers with LaunchServices)
+./scripts/bundle.sh
+open dist/BrowserSpike.app
+
+# Run with the IPC policy stub instead of in-process allowlist
+.build/debug/PolicyStub &
+SPIKE_USE_IPC=1 .build/debug/BrowserSpike
 ```
 
 Requires macOS 14+ and the Xcode command-line tools (Swift 6.0+ toolchain).
 
-The app launches without an `.app` bundle. Dock icon + menu bar work because we
-explicitly `setActivationPolicy(.regular)` and install a minimal `NSApp.mainMenu`.
-If we end up needing entitlements (e.g. for code-signed XPC, default-browser
-registration) we'll add an `.xcodeproj` in a later phase, but not until forced.
+`scripts/bundle.sh` produces `dist/BrowserSpike.app` — a self-contained bundle
+with `Info.plist` (declaring http/https URL types), an ad-hoc code signature,
+and `lsregister`-driven LaunchServices registration. Once registered, you can
+deliver URLs to it from any other app:
+
+```sh
+open -b com.gertrude.browser-spike https://news.ycombinator.com
+```
+
+…and `application(_:open:)` will fire in the running app. To make it the
+system default browser, set it manually in **System Settings → Default web
+browser** (macOS prompts for confirmation).
 
 ## Status by phase
 
 - [x] Phase 1 — single window, omnibar, back/forward/reload, Web Inspector enabled
 - [x] Phase 2 — `decidePolicyFor` allowlist + iframe blocking
 - [x] Phase 3 — `WKContentRuleList` for subresources
-- [ ] Phase 4 — minimum viable browser chrome
-- [ ] Phase 5 — IPC stub + default-browser registration
+- [ ] Phase 4 — minimum viable browser chrome (skipped intentionally)
+- [x] Phase 5 — IPC stub + default-browser registration
 
 ## Recommendation
 
-Too early — fill in after phase 5. Phase 2 confirms the core thesis is plausible:
-synchronous policy decisions on every top-frame and iframe navigation, including
-nested iframes, are reachable through `WKNavigationDelegate.decidePolicyFor`.
+**Proceed with WKWebView.** Every load-bearing question the spike was meant to
+answer landed on the favorable side:
+
+- The policy hooks in `WKNavigationDelegate.decidePolicyFor` are synchronous,
+  see every top-frame and subframe navigation including nested iframes, and
+  expose enough metadata (`navigationType`, `sourceFrame`, `targetFrame`) to
+  reason about the decision.
+- `WKContentRuleList` covers the subresource layer (scripts, images, fetches)
+  with `if-domain` / `unless-domain` / `resource-type` discrimination, and
+  recompiles fast enough (50k rules in ~200 ms) that policy changes don't need
+  to be batched.
+- A separate `.app` bundle with `CFBundleURLTypes` registers as a default-browser
+  candidate via `lsregister` alone — no Xcode project required for the spike.
+- IPC to a separate policy daemon adds ~5 ms RTT on localhost. Well below the
+  jank threshold. Failure of the daemon is recoverable (fail-closed with a
+  block page) rather than silent.
+
+What still needs to happen *before* this is a product, in rough order of
+importance:
+
+1. Browser chrome (tabs, JS dialogs, popups, downloads, find-in-page). This is
+   the long, unglamorous tail. Phase 4 of the plan sketched the surface area;
+   this spike skipped it intentionally.
+2. Real IPC channel: `NSXPCConnection` with code-signing-identity verification
+   on the daemon side, persistent channel rather than per-decision request.
+3. Production build pipeline: real Developer ID signing, notarization,
+   Sparkle (or whatever).
+4. Validation against the *real* Gertrude system network filter — confirm the
+   trust model ("filter trusts the browser process by team ID, browser
+   self-enforces internally") works in practice. Could not be tested in the
+   spike.
+5. Service-worker behavior. Not provoked during the spike; the risk of a
+   service worker bypassing our policy hooks remains an open question. If
+   that turns out to be a real problem, it's a CEF reason.
+
+The fallback to CEF is real but is now a clearly second-best option: we'd
+inherit a 4-week security treadmill and ~150 MB of binary weight in exchange
+for marginally more API surface, none of which was needed by the spike.
 
 ## Notes
 
@@ -47,6 +100,12 @@ nested iframes, are reachable through `WKNavigationDelegate.decidePolicyFor`.
   - `spike:rules` — fixture page that probes content-rule subresource blocking
   - `spike:recompile` — re-compiles the rule list at 100/1k/5k/25k/50k rules and
     prints timings
+- `SPIKE_USE_IPC=1` — route every navigation decision through the policy stub
+  HTTP server (default port `127.0.0.1:7717`). Without this, the in-process
+  hardcoded `Allowlist` is used.
+- `SPIKE_STUB_PORT=NNNN` (set on `PolicyStub`) — alternate listen port.
+- `SPIKE_STUB_DELAY_MS=N` (set on `PolicyStub`) — inject artificial latency on
+  every reply, to feel out how an IPC RTT translates to navigation jank.
 
 ## Sample policy logs
 
@@ -99,6 +158,19 @@ the same host is reachable via image but not via script. The wss row is
 from the page side. WebKit docs indicate `WKContentRuleList` does not see
 WebSocket traffic; if we need to enforce there, it has to be at the system
 network filter / `decidePolicyFor` for the upgrade request.
+
+## IPC stub round-trip
+
+```
+[ipc] decided in   5 ms allow=true                   # no-op stub on localhost
+[ipc] decided in 212 ms allow=true                   # SPIKE_STUB_DELAY_MS=200
+[nav] BLOCK-MAIN reason=daemon unreachable (fail-closed)   # stub not running
+```
+
+`PolicyStub` is a tiny `Network.framework` HTTP server. `IPCPolicyClient` is a
+`URLSession` actor with a 500 ms request timeout. Failure → fail-closed +
+"Gertrude daemon unreachable" block page. Production should swap this for
+`NSXPCConnection` (persistent channel, code-signing-identity-verified).
 
 ## Rule-list compile cost
 

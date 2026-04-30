@@ -9,5 +9,9 @@ let package = Package(
       name: "BrowserSpike",
       path: "Sources/BrowserSpike",
     ),
+    .executableTarget(
+      name: "PolicyStub",
+      path: "Sources/PolicyStub",
+    ),
   ],
 )

@@ -24,4 +24,8 @@ final class BrowserWindowController: NSWindowController {
 
   @available(*, unavailable)
   required init?(coder: NSCoder) { fatalError("init(coder:) not used") }
+
+  func load(url: URL) {
+    self.webViewController.load(urlString: url.absoluteString)
+  }
 }

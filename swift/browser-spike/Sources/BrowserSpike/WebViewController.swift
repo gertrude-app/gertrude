@@ -18,6 +18,8 @@ final class WebViewController: NSViewController, NSTextFieldDelegate, WKNavigati
   let omnibarField: NSTextField
   private let allowlist = Allowlist.hardcoded
   private var messageRouter: MessageRouter?
+  private let useIPC: Bool = ProcessInfo.processInfo.environment["SPIKE_USE_IPC"] == "1"
+  private let ipcClient = IPCPolicyClient()
   private let backButton: NSButton
   private let forwardButton: NSButton
   private let reloadButton: NSButton
@@ -182,6 +184,8 @@ final class WebViewController: NSViewController, NSTextFieldDelegate, WKNavigati
     decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void,
   ) {
     let url = action.request.url?.absoluteString ?? "<nil>"
+    let host = action.request.url?.host ?? ""
+    let scheme = action.request.url?.scheme ?? ""
     let kind = switch NavigationPolicy.frameKind(of: action) {
     case .mainFrame: "mainFrame"
     case .subframe: "subframe"
@@ -189,28 +193,90 @@ final class WebViewController: NSViewController, NSTextFieldDelegate, WKNavigati
     }
     let source = action.sourceFrame.request.url?.absoluteString ?? "<none>"
     let type = NavigationPolicy.describe(action.navigationType)
-    let decision = NavigationPolicy.decide(action: action, allowlist: self.allowlist)
+    let frameKind = NavigationPolicy.frameKind(of: action)
 
+    if scheme == "about" || scheme == "data" || scheme == "blob" || host.isEmpty {
+      print("[nav] ALLOW kind=\(kind) type=\(type) url=\(url) source=\(source) (local-fast-path)")
+      decisionHandler(.allow)
+      return
+    }
+
+    if !self.useIPC {
+      let decision = NavigationPolicy.decide(action: action, allowlist: self.allowlist)
+      self.applyDecision(
+        decision,
+        webView: webView,
+        url: url,
+        kind: kind,
+        type: type,
+        source: source,
+        decisionHandler: decisionHandler,
+      )
+      return
+    }
+
+    Task { @MainActor in
+      guard let (remote, elapsed) = await self.ipcClient.decide(host: host, kind: kind) else {
+        print(
+          "[nav] BLOCK-MAIN kind=\(kind) type=\(type) url=\(url) source=\(source) reason=daemon unreachable (fail-closed)",
+        )
+        decisionHandler(.cancel)
+        let html = NavigationPolicy.blockedPageHTML(
+          reason: "Gertrude daemon unreachable",
+          attemptedURL: url,
+        )
+        DispatchQueue.main.async { webView.loadHTMLString(html, baseURL: nil) }
+        return
+      }
+      print(
+        "[ipc] decided in \(String(format: "%.0f", elapsed * 1000))ms allow=\(remote.allow) reason=\(remote.reason)",
+      )
+      let decision: PolicyDecision = if remote.allow {
+        .allow
+      } else {
+        switch frameKind {
+        case .mainFrame: .blockMainFrame(reason: remote.reason)
+        case .subframe: .blockSubframe(reason: remote.reason)
+        case .unknownTarget: .blockUnknownTarget(reason: remote.reason)
+        }
+      }
+      self.applyDecision(
+        decision,
+        webView: webView,
+        url: url,
+        kind: kind,
+        type: type,
+        source: source,
+        decisionHandler: decisionHandler,
+      )
+    }
+  }
+
+  private func applyDecision(
+    _ decision: PolicyDecision,
+    webView: WKWebView,
+    url: String,
+    kind: String,
+    type: String,
+    source: String,
+    decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void,
+  ) {
     switch decision {
     case .allow:
       print("[nav] ALLOW kind=\(kind) type=\(type) url=\(url) source=\(source)")
       decisionHandler(.allow)
-
     case .blockMainFrame(let reason):
       print(
         "[nav] BLOCK-MAIN kind=\(kind) type=\(type) url=\(url) source=\(source) reason=\(reason)",
       )
       decisionHandler(.cancel)
       let html = NavigationPolicy.blockedPageHTML(reason: reason, attemptedURL: url)
-      let baseURL = URL(string: "about:blocked")
-      webView.loadHTMLString(html, baseURL: baseURL)
-
+      DispatchQueue.main.async { webView.loadHTMLString(html, baseURL: nil) }
     case .blockSubframe(let reason):
       print(
         "[nav] BLOCK-SUB kind=\(kind) type=\(type) url=\(url) source=\(source) reason=\(reason)",
       )
       decisionHandler(.cancel)
-
     case .blockUnknownTarget(let reason):
       print(
         "[nav] BLOCK-UNKNOWN kind=\(kind) type=\(type) url=\(url) source=\(source) reason=\(reason)",
