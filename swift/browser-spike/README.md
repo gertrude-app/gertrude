@@ -22,7 +22,7 @@ registration) we'll add an `.xcodeproj` in a later phase, but not until forced.
 
 - [x] Phase 1 — single window, omnibar, back/forward/reload, Web Inspector enabled
 - [x] Phase 2 — `decidePolicyFor` allowlist + iframe blocking
-- [ ] Phase 3 — `WKContentRuleList` for subresources
+- [x] Phase 3 — `WKContentRuleList` for subresources
 - [ ] Phase 4 — minimum viable browser chrome
 - [ ] Phase 5 — IPC stub + default-browser registration
 
@@ -44,6 +44,9 @@ nested iframes, are reachable through `WKNavigationDelegate.decidePolicyFor`.
 - `SPIKE_INITIAL_URL` env var picks the initial load. Useful values:
   - `spike:embeds` — fixture page with allowed/blocked iframes incl. nested
   - `spike:navtypes` — fixture page that fires every `WKNavigationType`
+  - `spike:rules` — fixture page that probes content-rule subresource blocking
+  - `spike:recompile` — re-compiles the rule list at 100/1k/5k/25k/50k rules and
+    prints timings
 
 ## Sample policy logs
 
@@ -76,3 +79,40 @@ Top-frame block (omnibar entry to `https://www.cnn.com`):
 | `location.href = ...`, `location.replace(...)`| `other`            |
 | back / forward                                | `backForward`      |
 | reload                                        | `reload`           |
+
+## Content-rule probe results
+
+From `spike:rules` (top-level `https://example.com/spike-rules`):
+
+| Probe              | Resource type | URL                                            | Outcome   |
+| ------------------ | ------------- | ---------------------------------------------- | --------- |
+| ga-tracker         | script        | `www.google-analytics.com/analytics.js`        | blocked   |
+| youtube-api        | script        | `www.youtube.com/iframe_api`                   | blocked   |
+| httpbin-script     | script        | `httpbin.org/anything?as=script`               | blocked   |
+| httpbin-image      | image         | `httpbin.org/image/png`                        | loaded    |
+| placeholder-ok     | image         | `placehold.co/40x40.png`                       | loaded    |
+| ws-attempt (fetch) | (websocket)   | `wss://www.google-analytics.com/socket`        | failed    |
+
+The httpbin pair confirms `resource-type: ["script"]` is the discriminator —
+the same host is reachable via image but not via script. The wss row is
+*inconclusive*: rule-blocked vs. server-rejected handshake can't be told apart
+from the page side. WebKit docs indicate `WKContentRuleList` does not see
+WebSocket traffic; if we need to enforce there, it has to be at the system
+network filter / `decidePolicyFor` for the upgrade request.
+
+## Rule-list compile cost
+
+```
+[rules] compiled baseline rules in 0.002s
+[rules] recompiled with 103   total rules in 0.003s
+[rules] recompiled with 1003  total rules in 0.094s
+[rules] recompiled with 5003  total rules in 0.021s
+[rules] recompiled with 25003 total rules in 0.095s
+[rules] recompiled with 50003 total rules in 0.190s
+```
+
+The 5003 outlier is suspicious — `WKContentRuleListStore` persists compiled
+lists by identifier across launches, and our `spike:recompile` per-run unique
+suffix may not be enough to defeat all caching. Order-of-magnitude conclusion:
+even 50k rules compile in well under a second; recompiling on policy change
+is cheap.

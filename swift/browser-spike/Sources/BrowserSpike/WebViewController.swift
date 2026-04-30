@@ -1,10 +1,23 @@
 import AppKit
 import WebKit
 
+final class MessageRouter: NSObject, WKScriptMessageHandler {
+  weak var owner: WebViewController?
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceive message: WKScriptMessage,
+  ) {
+    MainActor.assumeIsolated {
+      self.owner?.handle(message: message)
+    }
+  }
+}
+
 final class WebViewController: NSViewController, NSTextFieldDelegate, WKNavigationDelegate {
   let webView: WKWebView
   let omnibarField: NSTextField
   private let allowlist = Allowlist.hardcoded
+  private var messageRouter: MessageRouter?
   private let backButton: NSButton
   private let forwardButton: NSButton
   private let reloadButton: NSButton
@@ -17,6 +30,9 @@ final class WebViewController: NSViewController, NSTextFieldDelegate, WKNavigati
     let config = WKWebViewConfiguration()
     config.websiteDataStore = .nonPersistent()
     self.webView = WKWebView(frame: .zero, configuration: config)
+    let router = MessageRouter()
+    self.messageRouter = router
+    self.webView.configuration.userContentController.add(router, name: "spike")
     self.webView.translatesAutoresizingMaskIntoConstraints = false
     self.webView.allowsBackForwardNavigationGestures = true
     if #available(macOS 13.3, *) {
@@ -56,6 +72,7 @@ final class WebViewController: NSViewController, NSTextFieldDelegate, WKNavigati
 
     super.init(nibName: nil, bundle: nil)
 
+    router.owner = self
     self.omnibarField.target = self
     self.omnibarField.action = #selector(self.omnibarSubmitted(_:))
     self.omnibarField.delegate = self
@@ -135,9 +152,12 @@ final class WebViewController: NSViewController, NSTextFieldDelegate, WKNavigati
           self?.forwardButton.isEnabled = self?.webView.canGoForward ?? false
         }
       }
-    let initial = ProcessInfo.processInfo.environment["SPIKE_INITIAL_URL"]
-      ?? "https://example.com"
-    self.load(urlString: initial)
+    Task { @MainActor in
+      await self.installContentRules()
+      let initial = ProcessInfo.processInfo.environment["SPIKE_INITIAL_URL"]
+        ?? "https://example.com"
+      self.load(urlString: initial)
+    }
   }
 
   @objc private func omnibarSubmitted(_ sender: NSTextField) {
@@ -199,6 +219,40 @@ final class WebViewController: NSViewController, NSTextFieldDelegate, WKNavigati
     }
   }
 
+  func handle(message: WKScriptMessage) {
+    print("[probe] \(message.body)")
+  }
+
+  func installContentRules() async {
+    do {
+      let (elapsed, _) = try await ContentRules.compileAndAttach(
+        json: ContentRules.baselineJSON,
+        identifier: ContentRules.identifierBaseline,
+        to: self.webView.configuration.userContentController,
+      )
+      print("[rules] compiled baseline rules in \(String(format: "%.3f", elapsed))s")
+    } catch {
+      print("[rules] failed to compile baseline: \(error)")
+    }
+  }
+
+  func recompileRules(noiseRuleCount: Int, suffix: String = "") async {
+    let json = ContentRules.makeExpandedJSON(noiseRuleCount: noiseRuleCount)
+    let id = ContentRules.identifierExpanded + "-\(noiseRuleCount)-\(suffix)"
+    do {
+      let (elapsed, _) = try await ContentRules.compileAndAttach(
+        json: json,
+        identifier: id,
+        to: self.webView.configuration.userContentController,
+      )
+      print(
+        "[rules] recompiled with \(noiseRuleCount + 3) total rules in \(String(format: "%.3f", elapsed))s",
+      )
+    } catch {
+      print("[rules] failed to compile expanded(\(noiseRuleCount)): \(error)")
+    }
+  }
+
   func load(urlString raw: String) {
     let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !trimmed.isEmpty else { return }
@@ -208,6 +262,19 @@ final class WebViewController: NSViewController, NSTextFieldDelegate, WKNavigati
     }
     if trimmed == "spike:navtypes" {
       self.loadNavTypesFixture()
+      return
+    }
+    if trimmed == "spike:rules" {
+      self.loadRulesFixture()
+      return
+    }
+    if trimmed == "spike:recompile" {
+      Task { @MainActor in
+        let stamp = Int(Date().timeIntervalSince1970 * 1000)
+        for n in [100, 1000, 5000, 25000, 50000] {
+          await self.recompileRules(noiseRuleCount: n, suffix: "\(stamp)")
+        }
+      }
       return
     }
     let normalized: String
@@ -249,6 +316,56 @@ final class WebViewController: NSViewController, NSTextFieldDelegate, WKNavigati
     """
     print("[nav] load fixture spike:embeds")
     self.webView.loadHTMLString(html, baseURL: URL(string: "https://example.com/spike-embeds"))
+  }
+
+  private func loadRulesFixture() {
+    let html = """
+    <!doctype html>
+    <html>
+    <head><meta charset="utf-8"><title>Rules fixture</title></head>
+    <body style="font-family: system-ui; padding: 24px;">
+      <h1>Content rule list fixture</h1>
+      <p>Top-level: <code>example.com</code>. Each probe loads a subresource and reports the outcome.</p>
+      <ul id="results"></ul>
+      <script>
+        function post(name, status, kind, url) {
+          window.webkit.messageHandlers.spike.postMessage({ name, status, kind, url });
+          var li = document.createElement('li');
+          li.textContent = name + ' [' + kind + '] ' + status + ' ' + url;
+          document.getElementById('results').appendChild(li);
+        }
+        function probeImage(name, url) {
+          var img = new Image();
+          img.onload  = () => post(name, 'loaded', 'img', url);
+          img.onerror = () => post(name, 'blocked-or-error', 'img', url);
+          img.src = url;
+        }
+        function probeScript(name, url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.onload  = () => post(name, 'loaded', 'script', url);
+          s.onerror = () => post(name, 'blocked-or-error', 'script', url);
+          s.src = url;
+          document.head.appendChild(s);
+        }
+        function probeFetch(name, url) {
+          fetch(url, { mode: 'no-cors' })
+            .then(() => post(name, 'loaded', 'fetch', url))
+            .catch((e) => post(name, 'blocked-or-error', 'fetch', url + ' err=' + e.message));
+        }
+
+        probeScript('ga-tracker',     'https://www.google-analytics.com/analytics.js');
+        probeScript('youtube-api',    'https://www.youtube.com/iframe_api');
+        probeScript('httpbin-script', 'https://httpbin.org/anything?as=script');
+        probeImage('httpbin-image',   'https://httpbin.org/image/png');
+        probeImage('placeholder-ok',  'https://placehold.co/40x40.png');
+        probeFetch('ws-attempt',      'wss://www.google-analytics.com/socket');
+      </script>
+    </body>
+    </html>
+    """
+    print("[nav] load fixture spike:rules")
+    self.webView.loadHTMLString(html, baseURL: URL(string: "https://example.com/spike-rules"))
   }
 
   private func loadNavTypesFixture() {
