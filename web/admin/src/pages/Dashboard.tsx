@@ -174,14 +174,22 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
     (podcastData?.activePodcastUsers ?? 0);
   const freeCount =
     data.totalAccounts - data.fullPlanCount - data.lightPlanCount - data.trialingCount;
+  // monthly compensation from living room
+  const LIVING_ROOM_MONTHLY = 125;
   const stats = [
     {
       label: `Protected People`,
       value: protectedPeople.toLocaleString(),
       highlight: true,
     },
-    { label: `Annual Revenue`, value: `$${data.annualRevenue.toLocaleString()}` },
-    { label: `Monthly Revenue`, value: `$${data.monthlyRevenue.toLocaleString()}` },
+    {
+      label: `Annual Revenue`,
+      value: `$${(data.annualRevenue + LIVING_ROOM_MONTHLY * 12).toLocaleString()}`,
+    },
+    {
+      label: `Monthly Revenue`,
+      value: `$${(data.monthlyRevenue + LIVING_ROOM_MONTHLY).toLocaleString()}`,
+    },
     { label: `Full Plans`, value: data.fullPlanCount.toLocaleString() },
     { label: `Light Plans`, value: data.lightPlanCount.toLocaleString() },
     { label: `Total Accounts`, value: data.totalAccounts.toLocaleString() },
