@@ -168,6 +168,54 @@ describe(`batch unlock requests flow`, () => {
       });
   });
 
+  it(`fans out merged subdomain requests when toggled to strict`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [
+        makeRequest({
+          id: `req-images`,
+          domain: `images.foobar.com`,
+          url: `https://images.foobar.com/cat.jpg`,
+          createdAt: `2026-04-30T12:00:00.000Z`,
+        }),
+        makeRequest({
+          id: `req-cdn`,
+          domain: `cdn.foobar.com`,
+          url: `https://cdn.foobar.com/lib.js`,
+          createdAt: `2026-04-30T11:00:00.000Z`,
+        }),
+      ],
+      keychains: [keychain],
+    });
+    cy.visit(`/children/child-1/unlock-requests`);
+    cy.contains(`foobar.com`);
+    cy.testId(`row-edit-toggle`).filter(`:visible`).click();
+    cy.testId(`strict-button`).filter(`:visible`).click();
+    cy.contains(`Submit`).click();
+    cy.wait(`@HandleUnlockRequests`)
+      .its(`request.body`)
+      .should((body) => {
+        expect(body.duplicateRequestIds).to.deep.eq([]);
+        expect(body.decisions).to.have.length(2);
+        const byId: Record<string, any> = {};
+        for (const d of body.decisions) byId[d.unlockRequestId] = d;
+        expect(Object.keys(byId).sort()).to.deep.eq([`req-cdn`, `req-images`]);
+        expect(byId[`req-images`].status).to.eq(`accepted`);
+        expect(byId[`req-cdn`].status).to.eq(`accepted`);
+        expect(byId[`req-images`].key.key).to.deep.eq({
+          type: `domain`,
+          domain: `images.foobar.com`,
+          scope: { type: `webBrowsers` },
+        });
+        expect(byId[`req-cdn`].key.key).to.deep.eq({
+          type: `domain`,
+          domain: `cdn.foobar.com`,
+          scope: { type: `webBrowsers` },
+        });
+        expect(byId[`req-images`].key.keychainId).to.eq(byId[`req-cdn`].key.keychainId);
+        expect(byId[`req-images`].key.comment).to.eq(byId[`req-cdn`].key.comment);
+      });
+  });
+
   it(`handles API error on load`, () => {
     cy.forcePqlErr(`GetBatchUnlockRequestData`, { type: `serverError` });
     cy.visit(`/children/child-1/unlock-requests`);

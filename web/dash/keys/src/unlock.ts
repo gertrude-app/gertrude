@@ -7,7 +7,7 @@ export function keyForUnlockRequest(request: UnlockRequestCreateKeyData): Shared
   let value = ``;
 
   if (request.url && !request.domain) {
-    value = request.url.split(`/`)[2] ?? ``;
+    value = urlHostname(request.url) ?? ``;
   } else if (request.domain) {
     value = request.domain;
   } else if (request.ipAddress) {
@@ -47,6 +47,49 @@ export type RequestGroup = {
   allRequests: UnlockRequest[];
   key: SharedKey;
 };
+
+export type AddressType = `standard` | `strict`;
+
+export function defaultAddressType(key: SharedKey): AddressType {
+  return key.type === `anySubdomain` ? `standard` : `strict`;
+}
+
+export function hasDomainScope(key: SharedKey): boolean {
+  return key.type === `domain` || key.type === `anySubdomain`;
+}
+
+export function originalHost(
+  request: UnlockRequestCreateKeyData | UnlockRequest,
+): string | null {
+  if (request.domain) return request.domain;
+  if (request.url) return urlHostname(request.url);
+  return null;
+}
+
+function urlHostname(url: string): string | null {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+}
+
+export function adjustKeyAddressType(
+  baseKey: SharedKey,
+  addressType: AddressType,
+  request: UnlockRequestCreateKeyData | UnlockRequest,
+): SharedKey {
+  if (!hasDomainScope(baseKey)) return baseKey;
+  if (addressType === defaultAddressType(baseKey)) return baseKey;
+  if (addressType === `strict` && baseKey.type === `anySubdomain`) {
+    const host = originalHost(request) ?? baseKey.domain;
+    return { ...baseKey, type: `domain`, domain: host };
+  }
+  if (addressType === `standard` && baseKey.type === `domain`) {
+    return { ...baseKey, type: `anySubdomain` };
+  }
+  return baseKey;
+}
 
 export function keyIdentity(key: SharedKey): string {
   const scope = scopeIdentity(key.scope);
