@@ -1,9 +1,10 @@
 import AppKit
 import WebKit
 
-final class WebViewController: NSViewController, NSTextFieldDelegate {
+final class WebViewController: NSViewController, NSTextFieldDelegate, WKNavigationDelegate {
   let webView: WKWebView
   let omnibarField: NSTextField
+  private let allowlist = Allowlist.hardcoded
   private let backButton: NSButton
   private let forwardButton: NSButton
   private let reloadButton: NSButton
@@ -106,6 +107,7 @@ final class WebViewController: NSViewController, NSTextFieldDelegate {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    self.webView.navigationDelegate = self
     self.titleObservation = self.webView.observe(\.title, options: [.new]) { [weak self] _, _ in
       MainActor.assumeIsolated {
         if let title = self?.webView.title, !title.isEmpty {
@@ -133,7 +135,9 @@ final class WebViewController: NSViewController, NSTextFieldDelegate {
           self?.forwardButton.isEnabled = self?.webView.canGoForward ?? false
         }
       }
-    self.load(urlString: "https://example.com")
+    let initial = ProcessInfo.processInfo.environment["SPIKE_INITIAL_URL"]
+      ?? "https://example.com"
+    self.load(urlString: initial)
   }
 
   @objc private func omnibarSubmitted(_ sender: NSTextField) {
@@ -152,9 +156,60 @@ final class WebViewController: NSViewController, NSTextFieldDelegate {
     self.webView.reload()
   }
 
+  func webView(
+    _ webView: WKWebView,
+    decidePolicyFor action: WKNavigationAction,
+    decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void,
+  ) {
+    let url = action.request.url?.absoluteString ?? "<nil>"
+    let kind = switch NavigationPolicy.frameKind(of: action) {
+    case .mainFrame: "mainFrame"
+    case .subframe: "subframe"
+    case .unknownTarget: "unknownTarget"
+    }
+    let source = action.sourceFrame.request.url?.absoluteString ?? "<none>"
+    let type = NavigationPolicy.describe(action.navigationType)
+    let decision = NavigationPolicy.decide(action: action, allowlist: self.allowlist)
+
+    switch decision {
+    case .allow:
+      print("[nav] ALLOW kind=\(kind) type=\(type) url=\(url) source=\(source)")
+      decisionHandler(.allow)
+
+    case .blockMainFrame(let reason):
+      print(
+        "[nav] BLOCK-MAIN kind=\(kind) type=\(type) url=\(url) source=\(source) reason=\(reason)",
+      )
+      decisionHandler(.cancel)
+      let html = NavigationPolicy.blockedPageHTML(reason: reason, attemptedURL: url)
+      let baseURL = URL(string: "about:blocked")
+      webView.loadHTMLString(html, baseURL: baseURL)
+
+    case .blockSubframe(let reason):
+      print(
+        "[nav] BLOCK-SUB kind=\(kind) type=\(type) url=\(url) source=\(source) reason=\(reason)",
+      )
+      decisionHandler(.cancel)
+
+    case .blockUnknownTarget(let reason):
+      print(
+        "[nav] BLOCK-UNKNOWN kind=\(kind) type=\(type) url=\(url) source=\(source) reason=\(reason)",
+      )
+      decisionHandler(.cancel)
+    }
+  }
+
   func load(urlString raw: String) {
     let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !trimmed.isEmpty else { return }
+    if trimmed == "spike:embeds" {
+      self.loadEmbedsFixture()
+      return
+    }
+    if trimmed == "spike:navtypes" {
+      self.loadNavTypesFixture()
+      return
+    }
     let normalized: String
     if trimmed.contains("://") {
       normalized = trimmed
@@ -167,5 +222,60 @@ final class WebViewController: NSViewController, NSTextFieldDelegate {
     guard let url = URL(string: normalized) else { return }
     print("[nav] load url=\(url.absoluteString)")
     self.webView.load(URLRequest(url: url))
+  }
+
+  private func loadEmbedsFixture() {
+    let html = """
+    <!doctype html>
+    <html>
+    <head><meta charset="utf-8"><title>Embeds fixture</title></head>
+    <body style="font-family: system-ui; padding: 24px;">
+      <h1>Iframe policy fixture</h1>
+      <p>Top frame is example.com (allowlisted). Each iframe below targets a different host.</p>
+
+      <h2>Allowed: en.wikipedia.org (allowlisted)</h2>
+      <iframe src="https://en.wikipedia.org/wiki/HTTP" width="600" height="240"></iframe>
+
+      <h2>Blocked: youtube.com</h2>
+      <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" width="600" height="240"></iframe>
+
+      <h2>Blocked: facebook.com</h2>
+      <iframe src="https://www.facebook.com/plugins/like.php?href=https://example.com" width="600" height="120"></iframe>
+
+      <h2>Blocked: nested-iframe host (httpbin.org embedding youtube)</h2>
+      <iframe srcdoc='<iframe src=&quot;https://www.youtube.com/embed/dQw4w9WgXcQ&quot;></iframe>' width="600" height="240"></iframe>
+    </body>
+    </html>
+    """
+    print("[nav] load fixture spike:embeds")
+    self.webView.loadHTMLString(html, baseURL: URL(string: "https://example.com/spike-embeds"))
+  }
+
+  private func loadNavTypesFixture() {
+    let html = """
+    <!doctype html>
+    <html>
+    <head><meta charset="utf-8"><title>Nav types fixture</title></head>
+    <body style="font-family: system-ui; padding: 24px;">
+      <h1>Navigation types fixture</h1>
+      <p>All triggers below target blocked hosts so the page persists.</p>
+      <a id="badlink" href="https://reddit.com">link to reddit (blocked)</a>
+      <form id="form" action="https://twitter.com/search" method="get">
+        <input name="q" value="x">
+        <button type="submit">submit</button>
+      </form>
+      <script>
+        function step(label, fn, delay) { setTimeout(() => { fn() }, delay) }
+        step('bad-link-click', () => document.getElementById('badlink').click(), 500)
+        step('location-href-bad', () => { location.href = 'https://twitter.com/jack' }, 1500)
+        step('location-replace-bad', () => { location.replace('https://reddit.com/r/foo') }, 2500)
+        step('form-submit-bad', () => document.getElementById('form').submit(), 3500)
+        step('window-open-bad', () => { window.open('https://reddit.com/popup') }, 4500)
+      </script>
+    </body>
+    </html>
+    """
+    print("[nav] load fixture spike:navtypes")
+    self.webView.loadHTMLString(html, baseURL: URL(string: "https://example.com/spike-navtypes"))
   }
 }
