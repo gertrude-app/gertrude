@@ -81,10 +81,7 @@ extension SubscriptionsOverview: NoInputResolver {
       ))
     }
 
-    let podcastSubscriptions = try await context.db.count(
-      DistinctDeviceEventCount.self,
-      withBindings: [.string("a72104d7")],
-    )
+    let podcastSubscriptions = try await context.db.count(DistinctOriginalIDPaidCount.self)
     let podcastAnnualCents = podcastSubscriptions * 850
 
     let totalAnnualCents = fullPlanAnnualCents + lightPlanAnnualCents + podcastAnnualCents

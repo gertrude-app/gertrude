@@ -48,7 +48,12 @@ extension PodcastInstallDetail: Resolver {
     }
 
     let firstLaunch = events.first { $0.eventId == "27c4f26a" }
-    let isPaid = events.contains { $0.eventId == "a72104d7" }
+    let isPaid = events.contains { event in
+      guard isPaidEvent(event.eventId), let originalID = parseOriginalID(event.detail) else {
+        return false
+      }
+      return isProductionOriginalID(originalID)
+    }
     let modelIdentifier = firstLaunch?.modelIdentifier ?? events.first?.modelIdentifier ?? "Unknown"
     let deviceType = ModelIdentifier.deviceType(from: modelIdentifier)
     let iosVersion = firstLaunch?.iosVersion ?? events.first?.iosVersion ?? "Unknown"

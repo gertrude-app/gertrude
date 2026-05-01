@@ -120,7 +120,7 @@ private struct InstallSummaryQuery: CustomQueryable {
     LEFT JOIN (
       SELECT DISTINCT \(deviceId)
       FROM \(table: PodcastEvent.self)
-      WHERE \(eventId) = 'a72104d7'
+      WHERE \(paidProductionPodcastEventPredicateSQL)
     ) paid ON first_launch.device_id = paid.device_id
     ORDER BY first_launch.created_at DESC
     LIMIT\(" ")
