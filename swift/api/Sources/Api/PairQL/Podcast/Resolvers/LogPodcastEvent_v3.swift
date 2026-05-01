@@ -35,12 +35,14 @@ extension LogPodcastEvent_v3: Resolver {
         await slack.internal(.podcasts, message)
       }
 
-      if input.eventId == "a72104d7" {
-        let subscriptionCount = try await PodcastEvent.query()
-          .where(.deviceId == input.deviceId)
-          .where(.eventId == "a72104d7")
-          .count(in: context.db)
-        if subscriptionCount == 1 {
+      if isPaidEvent(input.eventId),
+         let originalID = parseOriginalID(input.detail),
+         isProductionOriginalID(originalID) {
+        let priorPaidEventCount = try await context.db.count(
+          PaidProductionEventCountForOriginalID.self,
+          withBindings: [.string(originalID)],
+        )
+        if priorPaidEventCount == 1 {
           await slack.internal(.info, "*FIRST Podcast Subscription* `\(input.modelName)`")
           await slack.internal(.podcasts, "*FIRST Podcast Subscription* `\(input.modelName)`")
           get(dependency: \.postmark).toSuperAdmin(
@@ -53,6 +55,62 @@ extension LogPodcastEvent_v3: Resolver {
 
     return .success
   }
+}
+
+let paidEventIds = ["af0a338f", "a72104d7"]
+
+func isPaidEvent(_ eventId: String) -> Bool {
+  paidEventIds.contains(eventId)
+}
+
+func isProductionOriginalID(_ originalID: String) -> Bool {
+  originalID.count <= 15
+}
+
+private let originalIdRegex = try! NSRegularExpression(pattern: #"originalID:\s*(\d+)"#)
+
+func parseOriginalID(_ detail: String?) -> String? {
+  guard let detail else { return nil }
+  let range = NSRange(detail.startIndex ..< detail.endIndex, in: detail)
+  guard let match = originalIdRegex.firstMatch(in: detail, options: [], range: range),
+        match.numberOfRanges >= 2,
+        let captureRange = Range(match.range(at: 1), in: detail) else {
+    return nil
+  }
+  return String(detail[captureRange])
+}
+
+let paidPodcastEventIdsSQL = "('af0a338f', 'a72104d7')"
+
+var podcastOriginalIDExprSQL: String {
+  "(regexp_match(\(PodcastEvent.columnName(.detail)), 'originalID:\\s*(\\d+)'))[1]"
+}
+
+var paidProductionPodcastEventPredicateSQL: String {
+  "\(PodcastEvent.columnName(.eventId)) IN \(paidPodcastEventIdsSQL)"
+    + " AND LENGTH(\(podcastOriginalIDExprSQL)) <= 15"
+}
+
+var paidSandboxPodcastEventPredicateSQL: String {
+  "\(PodcastEvent.columnName(.eventId)) IN \(paidPodcastEventIdsSQL)"
+    + " AND LENGTH(\(podcastOriginalIDExprSQL)) > 15"
+}
+
+struct PaidProductionEventCountForOriginalID: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    var stmt = SQL.Statement("""
+    SELECT COUNT(*) AS count
+    FROM \(table: PodcastEvent.self)
+    WHERE \(paidProductionPodcastEventPredicateSQL)
+      AND \(podcastOriginalIDExprSQL) =\(" ")
+    """)
+    if let originalID = bindings.first {
+      stmt.components.append(.binding(originalID))
+    }
+    return stmt
+  }
+
+  var count: Int
 }
 
 private let suppressedPodcastSlackEventIds: Set<String> = [

@@ -27,10 +27,7 @@ extension PodcastOverview: NoInputResolver {
       DistinctDeviceEventCount.self,
       withBindings: [.string("27c4f26a")],
     )
-    let subscriptionCount = try await context.db.count(
-      DistinctDeviceEventCount.self,
-      withBindings: [.string("a72104d7")],
-    )
+    let subscriptionCount = try await context.db.count(DistinctOriginalIDPaidCount.self)
     let pastTrialInstallCount = try await context.db.count(
       PastTrialInstallCount.self,
       withBindings: [.string("27c4f26a")],
@@ -87,18 +84,38 @@ struct DistinctDeviceEventCount: CustomCountable {
   var count: Int
 }
 
+struct DistinctOriginalIDPaidCount: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    SQL.Statement("""
+    SELECT COUNT(DISTINCT \(podcastOriginalIDExprSQL)) AS count
+    FROM \(table: PodcastEvent.self)
+    WHERE \(paidProductionPodcastEventPredicateSQL)
+    """)
+  }
+
+  var count: Int
+}
+
 private struct PastTrialInstallCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     var stmt = SQL.Statement("""
-    SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.deviceId))) AS count
-    FROM \(table: PodcastEvent.self)
+    SELECT COUNT(DISTINCT e.\(PodcastEvent.columnName(.deviceId))) AS count
+    FROM \(table: PodcastEvent.self) AS e
     WHERE
-      \(PodcastEvent.columnName(.createdAt)) < NOW() - INTERVAL '30 days'
-      AND \(PodcastEvent.columnName(.eventId)) =
+      e.\(PodcastEvent.columnName(.createdAt)) < NOW() - INTERVAL '30 days'
+      AND e.\(PodcastEvent.columnName(.eventId)) =\(" ")
     """)
     if let eventId = bindings.first {
       stmt.components.append(.binding(eventId))
     }
+    stmt.components.append(.sql("""
+
+      AND NOT EXISTS (
+        SELECT 1 FROM \(table: PodcastEvent.self)
+        WHERE \(PodcastEvent.columnName(.deviceId)) = e.\(PodcastEvent.columnName(.deviceId))
+          AND \(paidSandboxPodcastEventPredicateSQL)
+      )
+    """))
     return stmt
   }
 
@@ -146,7 +163,7 @@ private struct RecentInstallsQuery: CustomQueryable {
     LEFT JOIN (
       SELECT DISTINCT \(deviceId)
       FROM \(table: PodcastEvent.self)
-      WHERE \(eventId) = 'a72104d7'
+      WHERE \(paidProductionPodcastEventPredicateSQL)
     ) paid ON first_launch.\(deviceId) = paid.\(deviceId)
     ORDER BY first_launch.\(createdAt) DESC
     """)
@@ -167,7 +184,7 @@ private struct ActivePodcastUsersCount: CustomCountable {
     FROM \(table: PodcastEvent.self)
     WHERE (
         (\(eventId) = '27c4f26a' AND \(createdAt) >= NOW() - INTERVAL '30 days')
-        OR \(eventId) = 'a72104d7'
+        OR (\(paidProductionPodcastEventPredicateSQL))
       )
     """)
   }
