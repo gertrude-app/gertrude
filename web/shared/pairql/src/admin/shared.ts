@@ -6,6 +6,7 @@ export type ClientAuth = 'none' | 'child' | 'parent' | 'superAdmin';
 export type DeviceModelFamily =
   | 'macBook'
   | 'macBookAir'
+  | 'macBookNeo'
   | 'macBookPro'
   | 'mini'
   | 'iMac'

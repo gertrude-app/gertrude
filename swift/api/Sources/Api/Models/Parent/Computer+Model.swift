@@ -31,6 +31,7 @@ extension Computer.Model {
   enum Kind: String, Encodable, CaseIterable {
     case macBook = "MacBook"
     case macBookAir = "MacBook Air"
+    case macBookNeo = "MacBook Neo"
     case macBookPro = "MacBook Pro"
     case mini = "Mac mini"
     case iMac
@@ -65,6 +66,8 @@ extension Computer.Model {
       .macBook
     case .macBookAir:
       .macBookAir
+    case .macBookNeo:
+      .macBookNeo
     case .macBookPro:
       .macBookPro
     case .mini:
@@ -87,6 +90,7 @@ extension Computer.Model {
     case m3 = "M3"
     case m2 = "M2"
     case m1 = "M1"
+    case a18Pro = "A18 Pro"
     case intel = "Intel"
   }
 }
@@ -160,6 +164,15 @@ extension Computer.Model.ManufactureDate {
 extension Computer {
   var model: Model {
     switch modelIdentifier {
+    // MacBook Neo
+    case "Mac17,5":
+      .init(
+        type: .macBookNeo,
+        identifier: modelIdentifier,
+        chip: .a18Pro,
+        manufactureDates: [2026],
+        screenSizeInInches: 13.0,
+      )
     // MacBook Air @link https://support.apple.com/en-us/HT201862
     case "Mac16,13":
       .init(

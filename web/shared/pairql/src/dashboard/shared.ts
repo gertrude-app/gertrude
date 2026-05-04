@@ -114,6 +114,7 @@ export interface Device {
 export type DeviceModelFamily =
   | 'macBook'
   | 'macBookAir'
+  | 'macBookNeo'
   | 'macBookPro'
   | 'mini'
   | 'iMac'
