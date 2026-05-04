@@ -101,7 +101,14 @@ enum PairQLRoute: Equatable, RouteResponder {
       let output = try await PairQLRoute.respond(to: route, in: ctx)
       let duration = Date().timeIntervalSince(start)
       logOperation(route, req, duration)
-      recordTelemetry(req, ctx, domain(of: route), start, .ok, responseBytes: output.body.count)
+      recordTelemetry(
+        req,
+        ctx,
+        domain(of: route),
+        start,
+        .ok,
+        numResponseBytes: output.body.count,
+      )
       return output
     } catch {
       let domain = req.parameters.get("domain") ?? ""
@@ -221,7 +228,7 @@ private func recordTelemetry(
   _ errorId: String? = nil,
   _ errorType: String? = nil,
   _ errorMessage: String? = nil,
-  responseBytes: Int? = nil,
+  numResponseBytes: Int? = nil,
 ) {
   let operation = request.parameters.get("operation") ?? ""
   let durationMs = Int(Date().timeIntervalSince(start) * 1000)
@@ -238,8 +245,8 @@ private func recordTelemetry(
     parentId: context.telemetry.parentId,
     ipAddress: context.ipAddress,
     userAgent: request.headers.first(name: .userAgent).map(truncateUserAgent),
-    requestBytes: request.body.data?.readableBytes,
-    responseBytes: responseBytes,
+    numRequestBytes: request.body.data?.readableBytes,
+    numResponseBytes: numResponseBytes,
   )
   Task {
     do {

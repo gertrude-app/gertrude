@@ -1063,8 +1063,8 @@ extension RouteTelemetry: Model {
     case .parentId: .uuid(self.parentId)
     case .ipAddress: .string(self.ipAddress)
     case .userAgent: .string(self.userAgent)
-    case .requestBytes: .int(self.requestBytes)
-    case .responseBytes: .int(self.responseBytes)
+    case .numRequestBytes: .int(self.numRequestBytes)
+    case .numResponseBytes: .int(self.numResponseBytes)
     case .createdAt: .date(self.createdAt)
     }
   }
@@ -1084,8 +1084,8 @@ extension RouteTelemetry: Model {
       .parentId: .uuid(self.parentId),
       .ipAddress: .string(self.ipAddress),
       .userAgent: .string(self.userAgent),
-      .requestBytes: .int(self.requestBytes),
-      .responseBytes: .int(self.responseBytes),
+      .numRequestBytes: .int(self.numRequestBytes),
+      .numResponseBytes: .int(self.numResponseBytes),
       .createdAt: .currentTimestamp,
     ]
   }

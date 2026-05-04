@@ -8,8 +8,8 @@ struct EnrichRouteTelemetry: GertieMigration {
         ADD COLUMN parent_id uuid,
         ADD COLUMN ip_address text,
         ADD COLUMN user_agent text,
-        ADD COLUMN request_bytes integer,
-        ADD COLUMN response_bytes integer;
+        ADD COLUMN num_request_bytes integer,
+        ADD COLUMN num_response_bytes integer;
     """)
 
     try await sql.execute("""
@@ -28,8 +28,8 @@ struct EnrichRouteTelemetry: GertieMigration {
         DROP COLUMN IF EXISTS parent_id,
         DROP COLUMN IF EXISTS ip_address,
         DROP COLUMN IF EXISTS user_agent,
-        DROP COLUMN IF EXISTS request_bytes,
-        DROP COLUMN IF EXISTS response_bytes;
+        DROP COLUMN IF EXISTS num_request_bytes,
+        DROP COLUMN IF EXISTS num_response_bytes;
     """)
   }
 }

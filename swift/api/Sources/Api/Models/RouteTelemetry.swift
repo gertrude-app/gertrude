@@ -22,8 +22,8 @@ struct RouteTelemetry: Codable, Sendable {
   var parentId: Parent.Id?
   var ipAddress: String?
   var userAgent: String?
-  var requestBytes: Int?
-  var responseBytes: Int?
+  var numRequestBytes: Int?
+  var numResponseBytes: Int?
   var createdAt = Date()
 
   init(
@@ -40,8 +40,8 @@ struct RouteTelemetry: Codable, Sendable {
     parentId: Parent.Id? = nil,
     ipAddress: String? = nil,
     userAgent: String? = nil,
-    requestBytes: Int? = nil,
-    responseBytes: Int? = nil,
+    numRequestBytes: Int? = nil,
+    numResponseBytes: Int? = nil,
   ) {
     self.id = id
     self.kind = kind
@@ -56,7 +56,7 @@ struct RouteTelemetry: Codable, Sendable {
     self.parentId = parentId
     self.ipAddress = ipAddress
     self.userAgent = userAgent
-    self.requestBytes = requestBytes
-    self.responseBytes = responseBytes
+    self.numRequestBytes = numRequestBytes
+    self.numResponseBytes = numResponseBytes
   }
 }

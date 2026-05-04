@@ -607,8 +607,8 @@ extension RouteTelemetry {
     case parentId
     case ipAddress
     case userAgent
-    case requestBytes
-    case responseBytes
+    case numRequestBytes
+    case numResponseBytes
     case createdAt
   }
 }
