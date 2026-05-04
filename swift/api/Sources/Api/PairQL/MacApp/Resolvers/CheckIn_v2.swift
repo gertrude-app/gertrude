@@ -31,10 +31,13 @@ extension CheckIn_v2: Resolver {
 
     let adminAccountStatus = try await resolveAdminAccountStatus(for: parent, in: context)
 
+    var resolvedKeychains = try await keychains
+    filterLegacyIncompatibleRegexKeys(in: &resolvedKeychains, appVersion: input.appVersion)
+
     return try await Output(
       adminAccountStatus: adminAccountStatus,
       appManifest: appManifest,
-      keychains: keychains,
+      keychains: resolvedKeychains,
       latestRelease: latestRelease,
       updateReleaseChannel: channel,
       userData: .init(
@@ -62,12 +65,38 @@ extension CheckIn_v2: Resolver {
 }
 
 private extension CheckIn_v2 {
+  // @see ./docs/notes/001-regex-keys-macapp.md for context
+  static let lenientDecodeMacAppVersion: Semver = "2.9.3"
+
   static func loadRuleKeychains(
     in context: MacApp.ChildContext,
   ) async throws -> [RuleKeychain] {
     var keychains = try await ruleKeychains(for: context.child.id, in: context.db)
     try await self.appendAutoIncludedKeychain(to: &keychains, in: context)
     return keychains
+  }
+
+  static func filterLegacyIncompatibleRegexKeys(
+    in keychains: inout [RuleKeychain],
+    appVersion: String,
+  ) {
+    if let semver = Semver(appVersion), semver >= lenientDecodeMacAppVersion {
+      return
+    }
+    keychains = keychains.map { keychain in
+      let kept = keychain.keys.filter { entry in
+        guard case .domainRegex(let pattern, _) = entry.key else {
+          return true
+        }
+        return self.legacyDomainRegexCompatible(pattern.string)
+      }
+      return RuleKeychain(id: keychain.id, schedule: keychain.schedule, keys: kept)
+    }
+  }
+
+  static func legacyDomainRegexCompatible(_ pattern: String) -> Bool {
+    pattern.contains("*") &&
+      Gertie.Key.Domain(pattern.replacingOccurrences(of: "*", with: "a")) != nil
   }
 
   static func appendAutoIncludedKeychain(

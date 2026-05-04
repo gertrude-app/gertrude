@@ -48,10 +48,7 @@ public extension Key {
     case "domainRegex":
       let scope = try values.decode(AppScope.self, forKey: .scope)
       let patternString = try values.decode(String.self, forKey: .pattern)
-      guard let pattern = Key.DomainRegexPattern(patternString) else {
-        throw ModelDecodingError("invalid domain regex pattern string \(patternString) for Key")
-      }
-      self = .domainRegex(pattern: pattern, scope: scope)
+      self = .domainRegex(pattern: Key.DomainRegexPattern(patternString), scope: scope)
     case "path":
       let scope = try values.decode(AppScope.self, forKey: .scope)
       let pathString = try values.decode(String.self, forKey: .path)

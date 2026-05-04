@@ -28,6 +28,15 @@ extension SaveKey: Resolver {
         showContactSupport: false,
       )
     }
+    if let regexError = input.key.domainRegexValidationError {
+      throw context.error(
+        id: "1b74e25b",
+        type: .badRequest,
+        debugMessage: "domainRegex validation failed: \(regexError)",
+        userMessage: regexError,
+        showContactSupport: false,
+      )
+    }
     let keychain = try await context.parent.keychain(input.keychainId, in: context.db)
     if input.isNew {
       let existingKeys = try await keychain.keys(in: context.db)
@@ -78,6 +87,11 @@ extension SaveKey: Resolver {
 }
 
 extension Gertie.Key {
+  var domainRegexValidationError: String? {
+    guard case .domainRegex(let pattern, _) = self else { return nil }
+    return validateDomainRegexPattern(pattern.string)
+  }
+
   var targetsCloudflareEch: Bool {
     let hostname: String? = switch self {
     case .domain(let domain, _), .anySubdomain(let domain, _): domain.string
@@ -128,4 +142,63 @@ extension AppScope.Single {
       "slug=\(slug)"
     }
   }
+}
+
+private let MAX_DOMAIN_REGEX_PATTERN_LENGTH = 200
+private let DOMAIN_REGEX_CANARY_HOSTNAME = "nothing-to-do-with-anything.invalid"
+
+private func validateDomainRegexPattern(_ pattern: String) -> String? {
+  if pattern.count > MAX_DOMAIN_REGEX_PATTERN_LENGTH {
+    return "regex pattern too long: \(pattern.count) chars, max \(MAX_DOMAIN_REGEX_PATTERN_LENGTH)"
+  }
+  let regex: NSRegularExpression
+  do {
+    regex = try NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
+  } catch {
+    let msg = (error as NSError).localizedDescription
+    return "invalid regex pattern: \(msg)"
+  }
+  if regex.firstMatch(in: "", range: NSRange(location: 0, length: 0)) != nil {
+    return "regex pattern is too broad: matches the empty string"
+  }
+  let canary = DOMAIN_REGEX_CANARY_HOSTNAME
+  if regex.firstMatch(in: canary, range: NSRange(canary.startIndex..., in: canary)) != nil {
+    return "regex pattern is too broad: matches arbitrary hostnames"
+  }
+  if !patternHasLiteralAlphanumeric(pattern) {
+    return "regex pattern must contain at least one literal alphanumeric character"
+  }
+  return nil
+}
+
+private func patternHasLiteralAlphanumeric(_ pattern: String) -> Bool {
+  var i = pattern.startIndex
+  var inClass = false
+  while i < pattern.endIndex {
+    let c = pattern[i]
+    if c == "\\" {
+      let next = pattern.index(after: i)
+      if next < pattern.endIndex {
+        i = pattern.index(after: next)
+      } else {
+        i = next
+      }
+      continue
+    }
+    if c == "[" {
+      inClass = true
+      i = pattern.index(after: i)
+      continue
+    }
+    if c == "]" {
+      inClass = false
+      i = pattern.index(after: i)
+      continue
+    }
+    if !inClass, c.isLetter || c.isNumber {
+      return true
+    }
+    i = pattern.index(after: i)
+  }
+  return false
 }

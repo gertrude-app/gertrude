@@ -229,3 +229,6 @@ the original flagship product, even though the iOS app now has a larger user bas
   parsing, and a substantially expanded **onboarding wizard** that now walks parents
   through configuration (app blocking, keychains, downtime, Always Blocked, text
   notifications) in addition to permissions.
+- **May 2026:** `v2.9.3` (beta/new downloads only for now) updated the `domainRegex` key
+  type to be an actual regex matcher, instead of a limited glob-style dsl. This is an
+  advanced/power-user feature not likely to be used by many parents, but useful.

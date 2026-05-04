@@ -2,6 +2,8 @@
 
 ## Release notes
 
+- `2.9.3` (beta 5/4/26)
+  - real regex support for unlocking keys (see docs/notes/001)
 - `2.9.2` (stable 4/23/26)
   - don't show cloudflare ech domain in blocked reqs window
   - reduce filter logging noise for ech/outbound-gaps

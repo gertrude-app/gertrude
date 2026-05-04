@@ -22,6 +22,36 @@ const AddressTypeHint: React.FC<Props> = ({ unsanitizedAddress, type }) => {
     );
   }
 
+  if (type === `domainRegex`) {
+    const trimmed = unsanitizedAddress.trim();
+    const error = trimmed === `` ? null : validate.domainRegex(trimmed);
+    if (error !== null) {
+      return (
+        <div
+          data-test="invalid-regex-hint"
+          className="mt-4 text-right text-red-700 break-words"
+        >
+          <i className="fas opacity-60 fa-exclamation-triangle mr-2" />
+          {error}
+        </div>
+      );
+    }
+    return (
+      <div
+        data-test="domain-regex-hint"
+        className="mt-4 text-right text-sm text-slate-400 leading-snug"
+      >
+        Real regex, case-insensitive, matched against the hostname only (no protocol or
+        path). Anchor with <span className="font-mono text-slate-500">^</span> and{` `}
+        <span className="font-mono text-slate-500">$</span>—patterns are unanchored
+        otherwise (e.g. <span className="font-mono text-slate-500">{`\\.edu`}</span>
+        {` `}also matches{` `}
+        <span className="font-mono text-slate-500">edu.attacker.com</span>
+        ).
+      </div>
+    );
+  }
+
   if (![`strict`, `standard`].includes(type)) {
     return null;
   }

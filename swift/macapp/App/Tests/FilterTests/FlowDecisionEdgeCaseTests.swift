@@ -71,7 +71,7 @@ final class FlowDecisionEdgeCaseTests: XCTestCase {
     let domainKey = RuleKey(key: .domain(domain: "exact.com", scope: .unrestricted))
     let subdomainKey = RuleKey(key: .anySubdomain(domain: "wild.com", scope: .unrestricted))
     let regexKey = RuleKey(key: .domainRegex(
-      pattern: .init("cdn-*.assets.net")!,
+      pattern: .init(#"^cdn-.*\.assets\.net$"#),
       scope: .unrestricted,
     ))
     let ipKey = RuleKey(key: .ipAddress(ipAddress: .init("10.0.0.1")!, scope: .unrestricted))
@@ -258,7 +258,10 @@ final class FlowDecisionEdgeCaseTests: XCTestCase {
 
   func testNonDomainKeysInKeychainWithSchedule() {
     let subKey = RuleKey(key: .anySubdomain(domain: "wild.com", scope: .unrestricted))
-    let regexKey = RuleKey(key: .domainRegex(pattern: .init("cdn-*.net")!, scope: .unrestricted))
+    let regexKey = RuleKey(key: .domainRegex(
+      pattern: .init(#"^cdn-.*\.net$"#),
+      scope: .unrestricted,
+    ))
     let keychains = [
       RuleKeychain(
         schedule: .init(mode: .active, days: .all, window: "04:00-05:00"),
@@ -304,7 +307,10 @@ final class FlowDecisionEdgeCaseTests: XCTestCase {
     let user1Domain = RuleKey(key: .domain(domain: "one.com", scope: .unrestricted))
     let user1Sub = RuleKey(key: .anySubdomain(domain: "wild.com", scope: .unrestricted))
     let user2Domain = RuleKey(key: .domain(domain: "two.com", scope: .unrestricted))
-    let user2Regex = RuleKey(key: .domainRegex(pattern: .init("cdn-*.net")!, scope: .unrestricted))
+    let user2Regex = RuleKey(key: .domainRegex(
+      pattern: .init(#"^cdn-.*\.net$"#),
+      scope: .unrestricted,
+    ))
     let filter = TestFilter.scenario(userKeychains: [
       502: [RuleKeychain(keys: [user1Domain, user1Sub])],
       503: [RuleKeychain(keys: [user2Domain, user2Regex])],
@@ -390,7 +396,7 @@ final class FlowDecisionEdgeCaseTests: XCTestCase {
     }
     let regexKeys: [RuleKey] = (0 ..< 10).map { i in
       RuleKey(key: .domainRegex(
-        pattern: Key.DomainRegexPattern("r\(i)-*.org")!,
+        pattern: Key.DomainRegexPattern("^r\(i)-.*\\.org$"),
         scope: .unrestricted,
       ))
     }

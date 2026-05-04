@@ -65,6 +65,7 @@ const AddressStep: React.FC<Props> = ({
       value={address}
       setValue={(updated) => update({ type: `setAddress`, to: updated })}
       prefix="https://"
+      placeholder={addressType === `domainRegex` ? `^.*\\.edu$` : undefined}
       className="mb-7"
     />
     <div className="bg-slate-50 px-2 py-4 rounded-lg">

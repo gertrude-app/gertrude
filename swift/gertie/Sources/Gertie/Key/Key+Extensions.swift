@@ -2,6 +2,7 @@ import Foundation
 import XCore
 
 private let regexCache = RegexCache()
+private let domainRegexCache = DomainRegexCache()
 
 private final class RegexCache: @unchecked Sendable {
   private var cache: [String: NSRegularExpression] = [:]
@@ -17,10 +18,48 @@ private final class RegexCache: @unchecked Sendable {
   }
 }
 
+private final class DomainRegexCache: @unchecked Sendable {
+  struct Entry {
+    let regex: NSRegularExpression
+    let inert: Bool
+  }
+
+  private var cache: [String: Entry?] = [:]
+  private let lock = NSLock()
+
+  func entry(for pattern: String) -> Entry? {
+    self.lock.lock()
+    defer { self.lock.unlock() }
+    if let cached = self.cache[pattern] {
+      return cached
+    }
+    let entry: Entry?
+    if let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) {
+      let matchesEmpty = regex.firstMatch(
+        in: "",
+        range: NSRange(location: 0, length: 0),
+      ) != nil
+      entry = Entry(regex: regex, inert: matchesEmpty)
+    } else {
+      entry = nil
+    }
+    self.cache[pattern] = entry
+    return entry
+  }
+}
+
 public func matchesCompiledRegex(_ string: String, pattern: String) -> Bool {
   guard let regex = regexCache.compiled(pattern) else { return false }
   let range = NSRange(string.startIndex..., in: string)
   return regex.firstMatch(in: string, range: range) != nil
+}
+
+public func matchesDomainRegex(_ hostname: String, pattern: String) -> Bool {
+  guard let entry = domainRegexCache.entry(for: pattern), !entry.inert else {
+    return false
+  }
+  let range = NSRange(hostname.startIndex..., in: hostname)
+  return entry.regex.firstMatch(in: hostname, range: range) != nil
 }
 
 public extension Key.Domain {
@@ -88,16 +127,9 @@ public extension Key.Domain {
 }
 
 public extension Key.DomainRegexPattern {
-  init?(_ input: String) {
-    guard input.contains("*"),
-          Key.Domain(input.replacingOccurrences(of: "*", with: "a")) != nil else {
-      return nil
-    }
-
-    string = input.lowercased()
-    regex = string
-      .replacingOccurrences(of: ".", with: "\\.")
-      .replacingOccurrences(of: "*", with: ".*")
+  init(_ input: String) {
+    string = input
+    regex = input
   }
 }
 
@@ -168,7 +200,7 @@ public extension AppScope {
 
   extension Key.DomainRegexPattern: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
-      self = Key.DomainRegexPattern(value)!
+      self = Key.DomainRegexPattern(value)
     }
   }
 
