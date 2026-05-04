@@ -154,6 +154,8 @@ extension Computer.Model.ManufactureDate {
 }
 
 // derive the model from the identifier
+// NB: when adding a new entry, also add a matching PNG to
+// `web/dash/app/public/macs/<modelIdentifier>.png` — see that dir's readme.md
 
 extension Computer {
   var model: Model {
