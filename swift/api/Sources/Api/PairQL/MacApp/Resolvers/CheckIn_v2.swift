@@ -127,7 +127,7 @@ private extension CheckIn_v2 {
     Task {
       let parent = try await context.child.parent(in: context.db)
       await get(dependency: \.slack).internal(
-        .info,
+        .macosLogs,
         """
         Mac app updated for child *\(context.child.name)*
         Parent: \(parent.adminSiteLink(.slack))
