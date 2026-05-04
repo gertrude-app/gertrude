@@ -18,6 +18,7 @@ extension ConnectDevice_v2: Resolver {
     }
 
     let child = try await ctx.db.find(childId)
+    ctx.telemetry.parentId = child.parentId
     var device = try await IOSApp.Device.ensureExists(
       id: .init(input.vendorId),
       modelIdentifier: input.modelIdentifier,

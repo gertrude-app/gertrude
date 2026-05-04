@@ -11,7 +11,12 @@ final class PromoteAppResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.db.delete(all: UnidentifiedApp.self)
     try await self.db.create(UnidentifiedApp(bundleId: "com.foo", count: 42))
 
-    let context = Context(requestId: "test", dashboardUrl: "/", ipAddress: nil)
+    let context = Context(
+      requestId: "test",
+      dashboardUrl: "/",
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
 
     let output = try await PromoteApp.resolve(
       with: .init(
@@ -43,7 +48,12 @@ final class PromoteAppResolverTests: ApiTestCase, @unchecked Sendable {
       .create(IdentifiedApp(name: "Bar", slug: "bar", launchable: true))
     try await self.db.create(UnidentifiedApp(bundleId: "com.bar", count: 100))
 
-    let context = Context(requestId: "test", dashboardUrl: "/", ipAddress: nil)
+    let context = Context(
+      requestId: "test",
+      dashboardUrl: "/",
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
 
     let output = try await PromoteApp.resolve(
       with: .init(bundleId: "com.bar", newApp: nil, existingAppId: app.id),
@@ -62,7 +72,12 @@ final class PromoteAppResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.db.delete(all: IdentifiedApp.self)
     try await self.db.delete(all: UnidentifiedApp.self)
 
-    let context = Context(requestId: "test", dashboardUrl: "/", ipAddress: nil)
+    let context = Context(
+      requestId: "test",
+      dashboardUrl: "/",
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
 
     _ = try await PromoteApp.resolve(
       with: .init(
@@ -94,7 +109,12 @@ final class PromoteAppResolverTests: ApiTestCase, @unchecked Sendable {
       key: .skeleton(scope: .bundleId("com.foo.Bar")),
     ))
 
-    let context = Context(requestId: "test", dashboardUrl: "/", ipAddress: nil)
+    let context = Context(
+      requestId: "test",
+      dashboardUrl: "/",
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
     let output = try await PromoteApp.resolve(
       with: .init(
         bundleId: "com.foo.Bar",
@@ -126,7 +146,12 @@ final class PromoteAppResolverTests: ApiTestCase, @unchecked Sendable {
       key: .domain(domain: "example.com", scope: .single(.bundleId("com.foo.Bar"))),
     ))
 
-    let context = Context(requestId: "test", dashboardUrl: "/", ipAddress: nil)
+    let context = Context(
+      requestId: "test",
+      dashboardUrl: "/",
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
     let output = try await PromoteApp.resolve(
       with: .init(
         bundleId: "com.foo.Bar",
@@ -161,7 +186,12 @@ final class PromoteAppResolverTests: ApiTestCase, @unchecked Sendable {
       key: .skeleton(scope: .bundleId("com.browser.Foo")),
     ))
 
-    let context = Context(requestId: "test", dashboardUrl: "/", ipAddress: nil)
+    let context = Context(
+      requestId: "test",
+      dashboardUrl: "/",
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
     let app = try await self.db.create(IdentifiedApp(
       name: "Foo Browser",
       slug: "foo-browser",
@@ -198,7 +228,12 @@ final class PromoteAppResolverTests: ApiTestCase, @unchecked Sendable {
       key: .skeleton(scope: .bundleId("com.foo.Bar")),
     ))
 
-    let context = Context(requestId: "test", dashboardUrl: "/", ipAddress: nil)
+    let context = Context(
+      requestId: "test",
+      dashboardUrl: "/",
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
     let output = try await PromoteApp.resolve(
       with: .init(
         bundleId: "com.foo.Bar",
@@ -240,7 +275,12 @@ final class PromoteAppResolverTests: ApiTestCase, @unchecked Sendable {
       key: .skeleton(scope: .bundleId("com.foo.Bar")),
     ))
 
-    let context = Context(requestId: "test", dashboardUrl: "/", ipAddress: nil)
+    let context = Context(
+      requestId: "test",
+      dashboardUrl: "/",
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
     let output = try await PromoteApp.resolve(
       with: .init(
         bundleId: "com.foo.Bar",
@@ -269,7 +309,12 @@ final class PromoteAppResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.db.delete(all: IdentifiedApp.self)
     try await self.db.delete(all: UnidentifiedApp.self)
 
-    let context = Context(requestId: "test", dashboardUrl: "/", ipAddress: nil)
+    let context = Context(
+      requestId: "test",
+      dashboardUrl: "/",
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
     let output = try await PromoteApp.resolve(
       with: .init(
         bundleId: "com.foo.Bar",

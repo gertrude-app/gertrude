@@ -27,7 +27,13 @@ struct ChildWithComputerEntities {
   var parent: ParentEntities
 
   var context: MacApp.ChildContext {
-    .init(requestId: "mock-req-id", dashboardUrl: "/", child: self.model, token: self.token)
+    .init(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      child: self.model,
+      token: self.token,
+      telemetry: TelemetryBag(),
+    )
   }
 
   subscript<T>(dynamicMember keyPath: KeyPath<Child, T>) -> T {
@@ -43,7 +49,13 @@ struct ChildWithIOSDeviceEntities {
   var parent: ParentEntities
 
   var context: IOSApp.ChildContext {
-    .init(requestId: "", dashboardUrl: "", child: self.model, device: self.device)
+    .init(
+      requestId: "",
+      dashboardUrl: "",
+      child: self.model,
+      device: self.device,
+      telemetry: TelemetryBag(),
+    )
   }
 
   subscript<T>(dynamicMember keyPath: KeyPath<Child, T>) -> T {
@@ -57,7 +69,13 @@ struct ParentEntities {
   var token: Parent.DashToken
 
   var context: ParentContext {
-    .init(requestId: "mock-req-id", dashboardUrl: "/", parent: self.model, ipAddress: nil)
+    .init(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      parent: self.model,
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
   }
 
   subscript<T>(dynamicMember keyPath: KeyPath<Parent, T>) -> T {
@@ -73,7 +91,13 @@ struct ParentWithKeychainEntities {
   var key: Key
 
   var context: ParentContext {
-    .init(requestId: "mock-req-id", dashboardUrl: "/", parent: self.model, ipAddress: nil)
+    .init(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      parent: self.model,
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
   }
 
   subscript<T>(dynamicMember keyPath: KeyPath<Parent, T>) -> T {
@@ -90,7 +114,13 @@ struct ParentWithOnboardedChildEntities {
   var computer: Computer
 
   var context: ParentContext {
-    .init(requestId: "mock-req-id", dashboardUrl: "/", parent: self.model, ipAddress: nil)
+    .init(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      parent: self.model,
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
   }
 
   subscript<T>(dynamicMember keyPath: KeyPath<Parent, T>) -> T {

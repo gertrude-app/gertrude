@@ -604,6 +604,11 @@ extension RouteTelemetry {
     case errorId
     case errorType
     case errorMessage
+    case parentId
+    case ipAddress
+    case userAgent
+    case requestBytes
+    case responseBytes
     case createdAt
   }
 }

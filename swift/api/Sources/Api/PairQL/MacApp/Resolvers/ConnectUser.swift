@@ -27,6 +27,7 @@ extension ConnectUser: Resolver {
 
     let computerUser: ComputerUser
     let child = try await context.db.find(childId)
+    context.telemetry.parentId = child.parentId
 
     let parent = try await ParentWithSubscription.find(child.parentId, in: context.db)
     switch parent.plan {
@@ -185,6 +186,7 @@ func createDefaultKeychainIfNeeded(
       dashboardUrl: context.dashboardUrl,
       parent: parent,
       ipAddress: context.ipAddress,
+      telemetry: context.telemetry,
     )
     _ = try await SaveUser.resolve(
       with: .init(

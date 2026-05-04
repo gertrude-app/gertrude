@@ -35,11 +35,13 @@ extension DashboardRoute: RouteResponder {
         .where(.id == token.parentId)
         .first(in: context.db)
 
+      context.telemetry.parentId = parent.id
       let parentContext = ParentContext(
         requestId: context.requestId,
         dashboardUrl: context.dashboardUrl,
         parent: parent,
         ipAddress: context.ipAddress,
+        telemetry: context.telemetry,
       )
 
       return try await AuthedParentRoute.respond(to: parentRoute, in: parentContext)
