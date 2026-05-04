@@ -2,6 +2,7 @@ import Dependencies
 import DuetSQL
 import Foundation
 import PodcastRoute
+import XSlack
 
 extension LogPodcastEvent_v3: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
@@ -32,7 +33,9 @@ extension LogPodcastEvent_v3: Resolver {
         if suppressed > 0 {
           message += " _(+\(suppressed) suppressed)_"
         }
-        await slack.internal(.podcasts, message)
+        let channel: XSlack.Slack.Client.InternalChannel =
+          podcastsLogsEventIds.contains(input.eventId) ? .podcastsLogs : .podcasts
+        await slack.internal(channel, message)
       }
 
       if isPaidEvent(input.eventId),
@@ -118,6 +121,13 @@ private let suppressedPodcastSlackEventIds: Set<String> = [
   "45692a47",
   "ba664a9f",
   "4fa186eb",
+]
+
+private let podcastsLogsEventIds: Set<String> = [
+  "4ac9084e",
+  "d299b47a",
+  "2e2c9e97",
+  "8c975d36",
 ]
 
 private actor PodcastSlackLimiter {

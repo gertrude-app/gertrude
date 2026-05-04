@@ -49,6 +49,7 @@ export function familyToIcon(family: DeviceModelFamily): `laptop` | `desktop` {
     case `macBookAir`:
     case `macBookPro`:
     case `macBook`:
+    case `macBookNeo`:
     case `unknown`:
       return `laptop`;
   }
