@@ -139,10 +139,10 @@ enum ModelIdentifier {
     "iPhone8,4": "iPhone SE (1st gen)",
 
     // iPad Pro M5 (2025)
-    "iPad17,3": "iPad Pro 11-inch (M5)",
-    "iPad17,4": "iPad Pro 11-inch (M5)",
-    "iPad17,5": "iPad Pro 13-inch (M5)",
-    "iPad17,6": "iPad Pro 13-inch (M5)",
+    "iPad17,1": "iPad Pro 11-inch (M5)",
+    "iPad17,2": "iPad Pro 11-inch (M5)",
+    "iPad17,3": "iPad Pro 13-inch (M5)",
+    "iPad17,4": "iPad Pro 13-inch (M5)",
 
     // iPad Pro M4 (2024)
     "iPad16,3": "iPad Pro 11-inch (M4)",
