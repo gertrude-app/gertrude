@@ -2,6 +2,8 @@
 
 ## Releases
 
+- `1.5.1` (5/4/26)
+  - updates for correct yearly subscription
 - `1.5.0` (4/21/26)
   - added an explicit airplay button to the player view
   - moved playback speed control to bottom of player view

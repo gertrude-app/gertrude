@@ -41,6 +41,10 @@ shows while gating the ability to add new podcasts behind a PIN.
 - [iOS app privacy policy](https://gertrude.app/docs/iosapp-privacy): Privacy
   policy for the Gertrude Blocker iOS app. Gertrude collects no personal data
   from the iOS app — only anonymous error logs and install counts.
+- [Gertrude AM privacy policy](https://gertrude.app/docs/am-privacy): Privacy
+  policy for the Gertrude AM podcast app. The app sends a small amount of
+  anonymous usage and diagnostic data to operate subscriptions, understand usage
+  patterns, and fix bugs.
 
 ## Blog & contact
 

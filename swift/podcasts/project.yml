@@ -39,14 +39,16 @@ targets:
         DEVELOPMENT_TEAM: "WFN83LM943"
         CODE_SIGN_STYLE: Automatic
         INFOPLIST_FILE: app/Info.plist
-        MARKETING_VERSION: 1.5.0
-        CURRENT_PROJECT_VERSION: 23
+        MARKETING_VERSION: 1.5.1
+        CURRENT_PROJECT_VERSION: 24
+        ALWAYS_SEARCH_USER_PATHS: NO
       configs:
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.am"
           ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
           API_ENDPOINT: "https://api.gertrude.app"
         Debug:
+          ONLY_ACTIVE_ARCH: YES
           PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.am.dev"
           ASSETCATALOG_COMPILER_APPICON_NAME: AppIconDev
           API_ENDPOINT: "http://192.168.10.248:8080" # - run-api-ip
