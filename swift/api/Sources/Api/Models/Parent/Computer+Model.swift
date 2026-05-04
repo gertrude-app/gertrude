@@ -823,8 +823,8 @@ extension Computer {
         manufactureDates: [.late(2013)],
         newestCompatibleOS: .monterey,
       )
-    // Macbook @link https://support.apple.com/en-us/HT201608
-    case "Macbook10,1":
+    // MacBook @link https://support.apple.com/en-us/HT201608
+    case "MacBook10,1":
       .init(
         type: .macBook,
         identifier: modelIdentifier,
@@ -833,7 +833,7 @@ extension Computer {
         screenSizeInInches: 12.0,
         newestCompatibleOS: .sequoia,
       )
-    case "Macbook9,1":
+    case "MacBook9,1":
       .init(
         type: .macBook,
         identifier: modelIdentifier,
@@ -842,7 +842,7 @@ extension Computer {
         screenSizeInInches: 12.0,
         newestCompatibleOS: .monterey,
       )
-    case "Macbook8,1":
+    case "MacBook8,1":
       .init(
         type: .macBook,
         identifier: modelIdentifier,
