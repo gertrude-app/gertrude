@@ -21,6 +21,7 @@ extension XSlack.Slack.Client {
     case info
     case debug
     case podcasts
+    case podcastsLogs = "podcasts-logs"
   }
 
   func send(_ apiSlack: Api.Slack) async throws {
