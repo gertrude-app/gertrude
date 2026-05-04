@@ -87,7 +87,7 @@ public extension Key {
       case 3:
         .skeleton(scope: .random)
       case 4:
-        .domainRegex(pattern: .init("foo-*.com")!, scope: .random)
+        .domainRegex(pattern: .init("foo-*.com"), scope: .random)
       case 5:
         .path(path: .init("foo.com/bar")!, scope: .random)
       default:

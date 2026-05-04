@@ -218,17 +218,17 @@ final class CompletedFlowDecisionTests: XCTestCase {
 
   func testDomainRegexKeyAllowances() {
     let cases = [
-      ("a-*-b.foo.com", "a-3-b.foo.com"),
-      ("a-*-b.foo.com", "a-reallylongstuffhere-b.foo.com"),
-      ("*--preview.netlify.app", "foobar--preview.netlify.app"),
-      ("*--preview.netlify.app", "--preview.netlify.app"),
-      ("preview--*.netlify.app", "preview--33.netlify.app"),
-      ("preview--*.netlify.app", "preview--.netlify.app"),
-      ("deploy-preview-*--site.netlify.app", "deploy-preview-36--site.netlify.app"),
-      ("foo.lol.*", "foo.lol.biz"),
+      (#"^a-.*-b\.foo\.com$"#, "a-3-b.foo.com"),
+      (#"^a-.*-b\.foo\.com$"#, "a-reallylongstuffhere-b.foo.com"),
+      (#"^.*--preview\.netlify\.app$"#, "foobar--preview.netlify.app"),
+      (#"^.*--preview\.netlify\.app$"#, "--preview.netlify.app"),
+      (#"^preview--.*\.netlify\.app$"#, "preview--33.netlify.app"),
+      (#"^preview--.*\.netlify\.app$"#, "preview--.netlify.app"),
+      (#"^deploy-preview-.*--site\.netlify\.app$"#, "deploy-preview-36--site.netlify.app"),
+      (#"^foo\.lol\..*$"#, "foo.lol.biz"),
     ]
     for (patternStr, hostname) in cases {
-      let pattern = Key.DomainRegexPattern(patternStr)!
+      let pattern = Key.DomainRegexPattern(patternStr)
       // ALLOWS any matching hostname when scope = .unrestricted
       var key = RuleKey(key: .domainRegex(pattern: pattern, scope: .unrestricted))
       var flow = FilterFlow.test(hostname: hostname, bundleId: "com.\(UUID())")
@@ -263,21 +263,53 @@ final class CompletedFlowDecisionTests: XCTestCase {
 
   func testDomainRegexKeyNonMatches() {
     let cases = [
-      ("a-*-b.foo.com", "a-3-b.BAR.com"),
-      ("a-*-b.foo.com", "missingpreface-b.foo.com"),
-      ("*--preview.netlify.app", "foobar--production.netlify.app"),
-      ("*--preview.netlify.app", "--production.netlify.app"),
-      ("preview--*.netlify.app", "prod--33.netlify.app"),
-      ("preview--*.netlify.app", "prod--.netlify.app"),
-      ("deploy-preview-*--site.netlify.app", "deploy-preview-36--other.netlify.app"),
-      ("foo.lol.*", "bar.lol"),
+      (#"^a-.*-b\.foo\.com$"#, "a-3-b.BAR.com"),
+      (#"^a-.*-b\.foo\.com$"#, "missingpreface-b.foo.com"),
+      (#"^.*--preview\.netlify\.app$"#, "foobar--production.netlify.app"),
+      (#"^.*--preview\.netlify\.app$"#, "--production.netlify.app"),
+      (#"^preview--.*\.netlify\.app$"#, "prod--33.netlify.app"),
+      (#"^preview--.*\.netlify\.app$"#, "prod--.netlify.app"),
+      (#"^deploy-preview-.*--site\.netlify\.app$"#, "deploy-preview-36--other.netlify.app"),
+      (#"^foo\.lol\..*$"#, "bar.lol"),
     ]
     for (pattern, hostname) in cases {
-      let key = RuleKey(key: .domainRegex(pattern: .init(pattern)!, scope: .unrestricted))
+      let key = RuleKey(key: .domainRegex(pattern: .init(pattern), scope: .unrestricted))
       let filter = TestFilter.scenario(userKeychains: [502: key.into()])
       var flow = FilterFlow.test(hostname: hostname)
       let decision = filter.completedDecision(&flow)
       expect(decision).toEqual(.block(.defaultNotAllowed))
+    }
+  }
+
+  func testDomainRegexKeyRealRegexCapabilities() {
+    let cases: [(String, String, Bool)] = [
+      // alternation
+      (#"^(harvard|mit|stanford)\.edu$"#, "mit.edu", true),
+      (#"^(harvard|mit|stanford)\.edu$"#, "harvard.edu", true),
+      (#"^(harvard|mit|stanford)\.edu$"#, "yale.edu", false),
+      (#"^(harvard|mit|stanford)\.edu$"#, "mit.edu.attacker.com", false),
+      // optional www prefix
+      (#"^(www\.)?harvard\.edu$"#, "harvard.edu", true),
+      (#"^(www\.)?harvard\.edu$"#, "www.harvard.edu", true),
+      (#"^(www\.)?harvard\.edu$"#, "shop.harvard.edu", false),
+      // character class with quantifier range — two-letter US state code subdomain
+      (#"^[a-z]{2}\.gov$"#, "ca.gov", true),
+      (#"^[a-z]{2}\.gov$"#, "tx.gov", true),
+      (#"^[a-z]{2}\.gov$"#, "calif.gov", false),
+      (#"^[a-z]{2}\.gov$"#, "1a.gov", false),
+      // case-insensitive matching (matcher applies .caseInsensitive)
+      (#"^MIT\.EDU$"#, "mit.edu", true),
+      (#"^harvard\.edu$"#, "HARVARD.EDU", true),
+    ]
+    for (pattern, hostname, shouldAllow) in cases {
+      let key = RuleKey(key: .domainRegex(pattern: .init(pattern), scope: .unrestricted))
+      let filter = TestFilter.scenario(userKeychains: [502: key.into()])
+      var flow = FilterFlow.test(hostname: hostname, bundleId: "com.\(UUID())")
+      let decision = filter.completedDecision(&flow)
+      let expected: FilterDecision.FromFlow = shouldAllow
+        ? .allow(.permittedByKey(key.id))
+        : .block(.defaultNotAllowed)
+      expect(decision).toEqual(expected)
     }
   }
 

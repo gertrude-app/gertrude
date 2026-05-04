@@ -419,6 +419,91 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     ])
   }
 
+  func testCheckIn_OldAppVersion_FiltersLegacyIncompatibleRegexKeys() async throws {
+    let child = try await self.childWithComputer()
+    let parent = try await self.parent().withKeychain { _, key in
+      key.key = .domainRegex(pattern: .init("*.edu"), scope: .unrestricted)
+    }
+    try await self.db.create(ChildKeychain(childId: child.id, keychainId: parent.keychain.id))
+    let incompatible = try await self.db.create(Key(
+      keychainId: parent.keychain.id,
+      key: .domainRegex(pattern: .init("^(harvard|mit)\\.edu$"), scope: .unrestricted),
+    ))
+    let domainKey = try await self.db.create(Key(
+      keychainId: parent.keychain.id,
+      key: .domain(domain: .init("example.com")!, scope: .unrestricted),
+    ))
+
+    let oldOutput = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "2.9.2", filterVersion: nil),
+      in: child.context,
+    )
+    let oldKeyIds = Set(oldOutput.keys.map(\.id))
+    expect(oldKeyIds.contains(parent.key.id.rawValue)).toBeTrue()
+    expect(oldKeyIds.contains(domainKey.id.rawValue)).toBeTrue()
+    expect(oldKeyIds.contains(incompatible.id.rawValue)).toBeFalse()
+  }
+
+  func testCheckIn_NewAppVersion_PreservesAllRegexKeys() async throws {
+    let child = try await self.childWithComputer()
+    let parent = try await self.parent().withKeychain { _, key in
+      key.key = .domainRegex(pattern: .init("*.edu"), scope: .unrestricted)
+    }
+    try await self.db.create(ChildKeychain(childId: child.id, keychainId: parent.keychain.id))
+    let realRegex = try await self.db.create(Key(
+      keychainId: parent.keychain.id,
+      key: .domainRegex(pattern: .init("^(harvard|mit)\\.edu$"), scope: .unrestricted),
+    ))
+
+    let output = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "2.9.3", filterVersion: nil),
+      in: child.context,
+    )
+
+    let keyIds = Set(output.keys.map(\.id))
+    expect(keyIds.contains(parent.key.id.rawValue)).toBeTrue()
+    expect(keyIds.contains(realRegex.id.rawValue)).toBeTrue()
+  }
+
+  func testCheckIn_OldAppVersion_NeverFiltersNonRegexKeys() async throws {
+    let child = try await self.childWithComputer()
+    let parent = try await self.parent().withKeychain { _, key in
+      key.key = .domain(domain: .init("example.com")!, scope: .unrestricted)
+    }
+    try await self.db.create(ChildKeychain(childId: child.id, keychainId: parent.keychain.id))
+    let anySub = try await self.db.create(Key(
+      keychainId: parent.keychain.id,
+      key: .anySubdomain(domain: .init("example.org")!, scope: .unrestricted),
+    ))
+    let path = try await self.db.create(Key(
+      keychainId: parent.keychain.id,
+      key: .path(path: .init("foo.com/bar")!, scope: .unrestricted),
+    ))
+    let ip = try await self.db.create(Key(
+      keychainId: parent.keychain.id,
+      key: .ipAddress(ipAddress: .init("1.2.3.4")!, scope: .unrestricted),
+    ))
+    let skel = try await self.db.create(Key(
+      keychainId: parent.keychain.id,
+      key: .skeleton(scope: .bundleId("com.example")),
+    ))
+
+    let output = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "1.0.0", filterVersion: nil),
+      in: child.context,
+    )
+
+    let keyIds = Set(output.keys.map(\.id))
+    let expectedIds: Set<UUID> = [
+      parent.key.id.rawValue,
+      anySub.id.rawValue,
+      path.id.rawValue,
+      ip.id.rawValue,
+      skel.id.rawValue,
+    ]
+    expect(keyIds.isSuperset(of: expectedIds)).toBeTrue()
+  }
+
   func testAdminAccountStatus_FullTrialExpired_IsNeedsAttention() async throws {
     let child = try await self.child().withDevice()
     try await self.db.create(Subscription(

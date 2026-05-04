@@ -7,6 +7,7 @@ import type {
 } from '@dash/types';
 import * as domain from './domain';
 import * as EditKey from './edit';
+import * as validate from './validate';
 import { keyForUnlockRequest, newKeyState } from '.';
 
 export function unlockRequestToState(
@@ -125,10 +126,12 @@ function websiteKeyToKeyRecord(state: EditKey.State): Key | null {
       key = { type: `ipAddress`, ipAddress: domain.removePort(address), scope: tmpScope };
       break;
 
-    case `domainRegex`:
-      if (!domainValid(address) || !address.includes(`*`)) return null;
-      key = { type: `domainRegex`, pattern: address, scope: tmpScope };
+    case `domainRegex`: {
+      const pattern = state.address.trim();
+      if (validate.domainRegex(pattern) !== null) return null;
+      key = { type: `domainRegex`, pattern, scope: tmpScope };
       break;
+    }
   }
 
   const scope = appScope(state);

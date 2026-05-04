@@ -152,7 +152,7 @@ public extension NetworkFilter {
 
           case .domainRegex(pattern: let pattern, scope: let scope):
             if let hostname = lowercasedHostname,
-               matchesCompiledRegex(hostname, pattern: pattern.regex),
+               matchesDomainRegex(hostname, pattern: pattern.regex),
                scope.permits(app) {
               return .allow(.permittedByKey(ruleKey.id))
             }
@@ -204,7 +204,7 @@ public extension NetworkFilter {
 
           case .domainRegex(pattern: let pattern, scope: let scope):
             if let hostname = lowercasedHostname,
-               matchesCompiledRegex(hostname, pattern: pattern.regex),
+               matchesDomainRegex(hostname, pattern: pattern.regex),
                scope.permits(app) {
               return .allow(.permittedByKey(ruleKey.id))
             }

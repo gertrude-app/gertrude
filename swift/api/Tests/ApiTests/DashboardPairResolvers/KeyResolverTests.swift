@@ -200,4 +200,68 @@ final class KeyResolverTests: ApiTestCase, @unchecked Sendable {
     expect(updatedKey.key).toEqual(input.key)
     expect(updatedKey.deletedAt).not.toBeNil()
   }
+
+  func testRejectsUncompilableDomainRegex() async throws {
+    var (input, admin) = try await prepare()
+    input.key = .domainRegex(pattern: "(unbalanced", scope: .unrestricted)
+    try await expectErrorFrom {
+      try await SaveKey.resolve(with: input, in: admin.context)
+    }.toContain("invalid regex pattern")
+  }
+
+  func testRejectsTooLongDomainRegex() async throws {
+    var (input, admin) = try await prepare()
+    let pattern = "^" + String(repeating: "a", count: 200) + "\\.edu$"
+    input.key = .domainRegex(pattern: .init(pattern), scope: .unrestricted)
+    try await expectErrorFrom {
+      try await SaveKey.resolve(with: input, in: admin.context)
+    }.toContain("too long")
+  }
+
+  func testRejectsDomainRegexThatMatchesEmptyString() async throws {
+    var (input, admin) = try await prepare()
+    for broad in [".*", "^$", "()", ".?"] {
+      input.key = .domainRegex(pattern: .init(broad), scope: .unrestricted)
+      try await expectErrorFrom {
+        try await SaveKey.resolve(with: input, in: admin.context)
+      }.toContain("matches the empty string")
+    }
+  }
+
+  func testRejectsDomainRegexThatMatchesArbitraryHostnames() async throws {
+    var (input, admin) = try await prepare()
+    input.key = .domainRegex(pattern: ".+", scope: .unrestricted)
+    try await expectErrorFrom {
+      try await SaveKey.resolve(with: input, in: admin.context)
+    }.toContain("matches arbitrary hostnames")
+  }
+
+  func testRejectsDomainRegexWithNoLiteralAlphanumeric() async throws {
+    var (input, admin) = try await prepare()
+    input.key = .domainRegex(pattern: "\\.\\.", scope: .unrestricted)
+    try await expectErrorFrom {
+      try await SaveKey.resolve(with: input, in: admin.context)
+    }.toContain("literal alphanumeric")
+  }
+
+  func testAcceptsValidRealRegex() async throws {
+    var (input, admin) = try await prepare()
+    input.key = .domainRegex(pattern: "^harvard\\.edu$", scope: .unrestricted)
+    let output = try await SaveKey.resolve(with: input, in: admin.context)
+    expect(output).toEqual(.success)
+  }
+
+  func testAcceptsAlternationRegex() async throws {
+    var (input, admin) = try await prepare()
+    input.key = .domainRegex(pattern: "^(harvard|mit)\\.edu$", scope: .unrestricted)
+    let output = try await SaveKey.resolve(with: input, in: admin.context)
+    expect(output).toEqual(.success)
+  }
+
+  func testAcceptsAnchoredTldRegex() async throws {
+    var (input, admin) = try await prepare()
+    input.key = .domainRegex(pattern: "^.*\\.edu$", scope: .unrestricted)
+    let output = try await SaveKey.resolve(with: input, in: admin.context)
+    expect(output).toEqual(.success)
+  }
 }

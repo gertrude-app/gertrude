@@ -75,6 +75,12 @@ Supports all 3 apps, plus dashboard and admin websites
   current product understanding and feature semantics is important for the task, start
   with `./docs/support/product-overview.md` and then read the relevant sub-docs
 
+## Decision notes
+
+- `./docs/notes/` holds lightweight ADR-style notes capturing the _why_ behind notable
+  decisions (alternatives considered, constraints, rationales, etc). Don't load these by
+  default.
+
 ## Git operations
 
 - only make git commits when explicity instructed

@@ -28,17 +28,77 @@ final class KeyTests: XCTestCase {
     expect(Key.Domain("https://foo.com/").string).toEqual("foo.com")
   }
 
-  func testConstructingValidKeyDomainRegexPatterns() {
-    let validInputs = ["deploy--*--foo.com"]
-    for input in validInputs {
-      expect(Key.DomainRegexPattern(input)).not.toBeNil()
+  func testDomainRegexPatternStoresInputVerbatim() {
+    let inputs = [
+      // legacy glob shapes — kept verbatim, will be inert at match time
+      "*.edu",
+      "deploy--*--foo.com",
+      "*.*",
+      // real regex shapes
+      "^(harvard|mit)\\.edu$",
+      "^.*\\.edu$",
+      // even nonsense / uncompilable — init never fails, validation lives on write
+      "nope bad *",
+      "",
+    ]
+    for input in inputs {
+      let pattern = Key.DomainRegexPattern(input)
+      expect(pattern.string).toEqual(input)
+      expect(pattern.regex).toEqual(input)
     }
   }
 
-  func testConstructingInvalidKeyDomainRegexPatterns() {
-    let validInputs = ["deploy--33--foo.com", "nope bad *", "nope bad"]
-    for input in validInputs {
-      expect(Key.DomainRegexPattern(input)).toBeNil()
+  func testLegacyGlobPatternDecodesAndIsInertAtMatch() throws {
+    let json = #"""
+    {
+      "pattern": "*.edu",
+      "scope": { "type": "unrestricted" },
+      "type": "domainRegex"
+    }
+    """#
+    let decoded = try JSONDecoder().decode(Key.self, from: json.data(using: .utf8)!)
+    guard case .domainRegex(let pattern, _) = decoded else {
+      XCTFail("expected domainRegex case, got \(decoded)")
+      return
+    }
+    expect(pattern.string).toEqual("*.edu")
+    // legacy glob is invalid as raw regex → matcher silently returns false
+    expect(matchesDomainRegex("harvard.edu", pattern: pattern.regex)).toEqual(false)
+  }
+
+  func testRealRegexPatternDecodesAndMatches() throws {
+    let json = #"""
+    {
+      "pattern": "^(harvard|mit)\\.edu$",
+      "scope": { "type": "unrestricted" },
+      "type": "domainRegex"
+    }
+    """#
+    let decoded = try JSONDecoder().decode(Key.self, from: json.data(using: .utf8)!)
+    guard case .domainRegex(let pattern, _) = decoded else {
+      XCTFail("expected domainRegex case, got \(decoded)")
+      return
+    }
+    expect(matchesDomainRegex("harvard.edu", pattern: pattern.regex)).toEqual(true)
+    expect(matchesDomainRegex("mit.edu", pattern: pattern.regex)).toEqual(true)
+    expect(matchesDomainRegex("yale.edu", pattern: pattern.regex)).toEqual(false)
+    expect(matchesDomainRegex("harvard.edu.evil.com", pattern: pattern.regex)).toEqual(false)
+  }
+
+  func testDomainRegexMatchIsCaseInsensitive() {
+    // patterns authored in any case match lowercased hostnames
+    expect(matchesDomainRegex("mit.edu", pattern: #"^MIT\.EDU$"#)).toEqual(true)
+    expect(matchesDomainRegex("mit.edu", pattern: #"^[A-Z]+\.edu$"#)).toEqual(true)
+    expect(matchesDomainRegex("mit.edu", pattern: #"^(HARVARD|MIT)\.edu$"#)).toEqual(true)
+  }
+
+  func testDomainRegexInertOnEmptyOrAllMatchingPatterns() {
+    // patterns that match the empty string would otherwise allow-all.
+    // matcher must treat them as inert as a defense against bad/manual DB rows.
+    let dangerous = ["", " ", ".*", ".?", "()", "^$", "a?", "(foo)?"]
+    for pattern in dangerous {
+      expect(matchesDomainRegex("anything.com", pattern: pattern)).toEqual(false)
+      expect(matchesDomainRegex("harvard.edu", pattern: pattern)).toEqual(false)
     }
   }
 
