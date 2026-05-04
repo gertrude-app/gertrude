@@ -59,7 +59,7 @@ private func _trackedDownload(episode: Episode) async -> DownloadOutcome {
         log(
           .info("8c975d36"),
           "download success invalidated before commit",
-          detail: downloadStateDetail(episode, fileSystem: fileSystem),
+          detail: downloadStateDetail(downloadState ?? episode, fileSystem: fileSystem),
         )
       }
       try? fileSystem.removeItem(at: episode.localAudioUrl)
@@ -196,6 +196,10 @@ func testAssertCheckpoint(_ label: String) async {
 
 actor EpisodeDownloadCoordinator {
   private var inFlight: [Episode.ID: Task<DownloadOutcome, Never>] = [:]
+
+  func isInFlight(_ episodeId: Episode.ID) -> Bool {
+    self.inFlight[episodeId] != nil
+  }
 
   func run(
     episodeId: Episode.ID,

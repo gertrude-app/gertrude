@@ -216,14 +216,18 @@ private func _play(episode: Episode, show: Show) async throws {
   if fileExists, let size = fileSize, size > 0 {
     try await dep(\.audio).play(episode: episode, show: show)
   } else {
-    NowPlaying.updateSyncingProgress { $0.isPlaying = false }
-    safelyDiscardEpisodeDownloads([episode.id], source: .playbackRecovery)
+    let nowPlaying = dep(\.db).nowPlaying()
+    let downloadInFlight = await dep(\.downloadCoordinator).isInFlight(episode.id)
     let detail = missingPlaybackFileDetail(
       episode: episode,
       show: show,
       fileExists: fileExists,
       fileSize: fileSize,
+      nowPlaying: nowPlaying,
+      downloadInFlight: downloadInFlight,
     )
+    NowPlaying.updateSyncingProgress { $0.isPlaying = false }
+    safelyDiscardEpisodeDownloads([episode.id], source: .playbackRecovery)
     if dep(\.network).isConnected() {
       switch await trackedDownload(episode: episode) {
       case .success:
@@ -255,6 +259,8 @@ private func missingPlaybackFileDetail(
   show: Show,
   fileExists: Bool,
   fileSize: Int64?,
+  nowPlaying: NowPlaying.Data?,
+  downloadInFlight: Bool,
 ) -> String {
   let fileState = if fileExists {
     if let fileSize {
@@ -268,6 +274,16 @@ private func missingPlaybackFileDetail(
 
   let downloadedAt = episode.downloadedAt.map { "\($0)" } ?? "nil"
   let domain = URL(string: episode.audioUrl)?.host ?? "unknown"
+  let episodeState = if episode.downloaded {
+    "downloaded"
+  } else if episode.downloading {
+    "downloading"
+  } else {
+    "notDownloaded"
+  }
+  let nowPlayingState = nowPlaying.map {
+    "ep:\($0.episode.id),playing:\($0.isPlaying),nextDownloaded:\($0.nextDownloaded)"
+  } ?? "nil"
 
-  return "ep:\(episode.id) show:\(show.id) file:\(fileState) expected:\(episode.sizeInBytes)b downloadedAt:\(downloadedAt) domain:\(domain)"
+  return "ep:\(episode.id) show:\(show.id) state:\(episodeState) inFlight:\(downloadInFlight) file:\(fileState) expected:\(episode.sizeInBytes)b downloadedAt:\(downloadedAt) nowPlaying:\(nowPlayingState) domain:\(domain)"
 }
