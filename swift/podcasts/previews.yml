@@ -5,6 +5,11 @@ options:
 
 configs:
   Debug: debug
+  Release: debug
+
+settings:
+  base:
+    SWIFT_OPTIMIZATION_LEVEL: "-Onone"
 
 targets:
   App:
@@ -28,4 +33,7 @@ schemes:
     build:
       targets:
         App: all
-
+    profile:
+      config: Debug
+    archive:
+      config: Debug

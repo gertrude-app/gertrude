@@ -11,7 +11,7 @@ xcode:
   @just gen
   @open GertiePodcasts.xcodeproj
 
-previews:
+previews: gen-previews
   @open previews/GertiePodcastsPreviews.xcodeproj
 
 dev:
@@ -82,7 +82,6 @@ sim-fs-tree:
 
 regen-previews:
   @rm -rf previews
-  @just gen-previews
   @just previews
 
 gen-previews:
@@ -102,4 +101,3 @@ watch-sync-previews:
 
 
 sim-docs-dir := `ls -dt ~/Library/Developer/CoreSimulator/Devices/*/data/Containers/Data/Application/*/Documents | head -1`
-

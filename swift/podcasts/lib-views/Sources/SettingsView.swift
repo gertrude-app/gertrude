@@ -85,6 +85,39 @@ public struct SettingsView: View {
 
       VStack(spacing: 12) {
         HStack(spacing: 6) {
+          Image(systemName: "key")
+            .font(.subheadline)
+          Text(lstr(.settingsSecurityHeader))
+            .font(.subheadline)
+            .fontWeight(.medium)
+        }
+        .foregroundColor(Color(self.cs, light: .black.opacity(0.6), dark: .white.opacity(0.6)))
+        .frame(maxWidth: .infinity, alignment: .leading)
+
+        Button {
+          self.onEvent(.changePinTapped)
+        } label: {
+          HStack {
+            Text(lstr(.settingsChangePin))
+              .font(.headline)
+            Spacer()
+            Image(systemName: "chevron.right")
+              .font(.subheadline)
+              .foregroundColor(Color(
+                self.cs,
+                light: .black.opacity(0.4),
+                dark: .white.opacity(0.4),
+              ))
+          }
+          .padding(16)
+          .background(Color(self.cs, light: .violet100, dark: .violet900))
+          .cornerRadius(12)
+        }
+        .buttonStyle(.plain)
+      }
+
+      VStack(spacing: 12) {
+        HStack(spacing: 6) {
           Image(systemName: "creditcard")
             .font(.subheadline)
           Text(lstr(.settingsSubscriptionHeader))
@@ -223,6 +256,39 @@ public struct SettingsView: View {
               }
             }
 
+            if self.status != .active, self.status != .complimentary {
+              VStack(spacing: 8) {
+                Text(lstr(.settingsSubscriptionDisclosure))
+                  .font(.caption)
+                  .foregroundColor(Color(
+                    self.cs,
+                    light: .black.opacity(0.5),
+                    dark: .white.opacity(0.5),
+                  ))
+                  .multilineTextAlignment(.center)
+
+                HStack(spacing: 16) {
+                  Link(
+                    lstr(.settingsSubscriptionTerms),
+                    destination: URL(
+                      string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+                    )!,
+                  )
+                  Text("·")
+                    .foregroundColor(Color(
+                      self.cs,
+                      light: .black.opacity(0.4),
+                      dark: .white.opacity(0.4),
+                    ))
+                  Link(
+                    lstr(.settingsSubscriptionPrivacy),
+                    destination: URL(string: "https://gertrude.app/docs/am-privacy")!,
+                  )
+                }
+                .font(.caption)
+              }
+            }
+
             if self.status.isUnpaid {
               Text(lstr(.settingsSubscriptionUnpaidWarning))
                 .font(.subheadline)
@@ -231,39 +297,6 @@ public struct SettingsView: View {
             }
           }
         }
-      }
-
-      VStack(spacing: 12) {
-        HStack(spacing: 6) {
-          Image(systemName: "key")
-            .font(.subheadline)
-          Text(lstr(.settingsSecurityHeader))
-            .font(.subheadline)
-            .fontWeight(.medium)
-        }
-        .foregroundColor(Color(self.cs, light: .black.opacity(0.6), dark: .white.opacity(0.6)))
-        .frame(maxWidth: .infinity, alignment: .leading)
-
-        Button {
-          self.onEvent(.changePinTapped)
-        } label: {
-          HStack {
-            Text(lstr(.settingsChangePin))
-              .font(.headline)
-            Spacer()
-            Image(systemName: "chevron.right")
-              .font(.subheadline)
-              .foregroundColor(Color(
-                self.cs,
-                light: .black.opacity(0.4),
-                dark: .white.opacity(0.4),
-              ))
-          }
-          .padding(16)
-          .background(Color(self.cs, light: .violet100, dark: .violet900))
-          .cornerRadius(12)
-        }
-        .buttonStyle(.plain)
       }
 
       if let gb = self.reclaimableStorageGb {
