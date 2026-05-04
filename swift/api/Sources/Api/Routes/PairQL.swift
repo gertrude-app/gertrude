@@ -120,7 +120,7 @@ enum PairQLRoute: Equatable, RouteResponder {
           .notFound,
           "0f5a25c9",
           "\(type(of: error))",
-          "\(error)",
+          parsingErrorSummary(req),
         )
         return .init(PqlError(
           id: "0f5a25c9",
@@ -244,6 +244,12 @@ private func recordTelemetry(
 
 private func truncateErrorMessage(_ s: String) -> String {
   s.count <= 2000 ? s : String(s.prefix(2000)) + "…"
+}
+
+private func parsingErrorSummary(_ req: Request) -> String {
+  let domain = req.parameters.get("domain") ?? ""
+  let operation = req.parameters.get("operation") ?? ""
+  return "route not found: \(domain)/\(operation)"
 }
 
 private func domain(of route: PairQLRoute) -> String {
