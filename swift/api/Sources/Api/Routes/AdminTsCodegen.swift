@@ -47,6 +47,7 @@ enum AdminTsCodegenRoute {
       PromoteApp.self,
       GetPairqlTelemetrySummary.self,
       GetRecentPairqlErrors.self,
+      GetParentRecentTelemetry.self,
     ]
   }
 

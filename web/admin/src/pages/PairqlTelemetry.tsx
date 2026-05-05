@@ -42,11 +42,16 @@ const TOOLTIPS = {
   p99: `99th percentile: 99% of requests finished in under this time. Reflects the rare worst case (worst 1-in-100).`,
   max: `Slowest single request in the time window.`,
   requests: `Total requests in the time window.`,
+  avgRequestBytes: `Average request body size for this op. Useful for spotting heavy uploads.`,
+  avgResponseBytes: `Average response body size for this op. Useful for spotting payload bloat.`,
+  maxResponseBytes: `Largest single response body in the time window.`,
 };
 
 const PairqlTelemetry: React.FC = () => {
   const [range, setRange] = useState<Range>(DEFAULT_RANGE);
   const [errorFilter, setErrorFilter] = useState<string | undefined>(`unexpected_error`);
+  const [parentIdInput, setParentIdInput] = useState(``);
+  const [parentIdFilter, setParentIdFilter] = useState<string | undefined>(undefined);
   const [summary, setSummary] = useState<SummaryRow[] | null>(null);
   const [errors, setErrors] = useState<ErrorRow[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -64,6 +69,7 @@ const PairqlTelemetry: React.FC = () => {
           sinceHours: range.hours,
           limit: 100,
           resultFilter: errorFilter,
+          parentId: parentIdFilter,
         }),
       ]);
       if (cancelled) return;
@@ -85,7 +91,7 @@ const PairqlTelemetry: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [range, errorFilter]);
+  }, [range, errorFilter, parentIdFilter]);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -146,7 +152,7 @@ const PairqlTelemetry: React.FC = () => {
             </div>
           ) : (
             <Section title={`Recent Errors (${range.label})`}>
-              <div className="flex flex-wrap items-center gap-2 mb-4">
+              <div className="flex flex-wrap items-center gap-2 mb-3">
                 <span className="text-sm font-medium text-slate-600">Filter:</span>
                 {ERROR_FILTERS.map((f) => (
                   <button
@@ -162,6 +168,41 @@ const PairqlTelemetry: React.FC = () => {
                   </button>
                 ))}
               </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const trimmed = parentIdInput.trim();
+                  setParentIdFilter(trimmed === `` ? undefined : trimmed);
+                }}
+                className="flex flex-wrap items-center gap-2 mb-4"
+              >
+                <span className="text-sm font-medium text-slate-600">Parent:</span>
+                <input
+                  type="text"
+                  value={parentIdInput}
+                  onChange={(e) => setParentIdInput(e.target.value)}
+                  placeholder="parent UUID"
+                  className="px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-900 w-72"
+                />
+                <button
+                  type="submit"
+                  className="px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-slate-800"
+                >
+                  Apply
+                </button>
+                {parentIdFilter && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setParentIdInput(``);
+                      setParentIdFilter(undefined);
+                    }}
+                    className="px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  >
+                    Clear
+                  </button>
+                )}
+              </form>
               <ErrorsTable
                 rows={errors ?? []}
                 emptyHint={
@@ -278,7 +319,16 @@ const SummaryTable: React.FC<{ rows: SummaryRow[] }> = ({ rows }) => {
             <th className="py-2 px-3 text-right">PqlErr</th>
             <th className="py-2 px-3 text-right">ConvErr</th>
             <th className="py-2 px-3 text-right text-red-600">Unexpected</th>
-            <th className="py-2 pl-3 text-right">NotFound</th>
+            <th className="py-2 px-3 text-right">NotFound</th>
+            <th className="py-2 px-3 text-right">
+              <HeaderHint label="AvgReq" hint={TOOLTIPS.avgRequestBytes} />
+            </th>
+            <th className="py-2 px-3 text-right">
+              <HeaderHint label="AvgResp" hint={TOOLTIPS.avgResponseBytes} />
+            </th>
+            <th className="py-2 pl-3 text-right">
+              <HeaderHint label="MaxResp" hint={TOOLTIPS.maxResponseBytes} />
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -327,11 +377,20 @@ const SummaryTable: React.FC<{ rows: SummaryRow[] }> = ({ rows }) => {
                   {r.unexpectedErrorCount}
                 </td>
                 <td
-                  className={`py-2 pl-3 text-right ${
+                  className={`py-2 px-3 text-right ${
                     r.notFoundCount > 0 ? `text-slate-700` : `text-slate-300`
                   }`}
                 >
                   {r.notFoundCount}
+                </td>
+                <td className="py-2 px-3 text-right text-slate-500">
+                  {formatBytes(r.avgRequestBytes)}
+                </td>
+                <td className="py-2 px-3 text-right text-slate-500">
+                  {formatBytes(r.avgResponseBytes)}
+                </td>
+                <td className="py-2 pl-3 text-right text-slate-500">
+                  {formatBytes(r.maxResponseBytes)}
                 </td>
               </tr>
             );
@@ -390,10 +449,12 @@ const ErrorsTable: React.FC<{ rows: ErrorRow[]; emptyHint: string }> = ({
             <th className="py-2 px-3">Result</th>
             <th className="py-2 px-3">Domain</th>
             <th className="py-2 px-3">Operation</th>
+            <th className="py-2 px-3">Parent</th>
+            <th className="py-2 px-3">IP</th>
+            <th className="py-2 px-3">UA</th>
             <th className="py-2 px-3">Error Type</th>
             <th className="py-2 px-3">Error ID</th>
-            <th className="py-2 px-3 text-right">Duration</th>
-            <th className="py-2 pl-3">Request ID</th>
+            <th className="py-2 pl-3 pr-3 text-right">Duration</th>
           </tr>
         </thead>
         <tbody>
@@ -425,22 +486,41 @@ const ErrorsTable: React.FC<{ rows: ErrorRow[]; emptyHint: string }> = ({
                   </td>
                   <td className="py-2 px-3 text-slate-500">{r.domain}</td>
                   <td className="py-2 px-3 font-medium text-slate-900">{r.operation}</td>
+                  <td className="py-2 px-3 font-mono text-xs">
+                    {r.parentId ? (
+                      <Link
+                        to={`/parents/${r.parentId.toLowerCase()}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-indigo-600 hover:text-indigo-800 hover:underline"
+                      >
+                        {r.parentId.slice(0, 8).toLowerCase()}
+                      </Link>
+                    ) : (
+                      <span className="text-slate-300">—</span>
+                    )}
+                  </td>
+                  <td className="py-2 px-3 font-mono text-xs text-slate-500">
+                    {r.ipAddress ?? `—`}
+                  </td>
+                  <td
+                    className="py-2 px-3 text-xs text-slate-500 max-w-[180px] truncate"
+                    title={r.userAgent ?? ``}
+                  >
+                    {r.userAgent ?? `—`}
+                  </td>
                   <td className="py-2 px-3 text-slate-700">{r.errorType ?? `—`}</td>
                   <td className="py-2 px-3 font-mono text-xs text-slate-500">
                     {r.errorId ?? `—`}
                   </td>
-                  <td className="py-2 px-3 text-right text-slate-500">
+                  <td className="py-2 pl-3 pr-3 text-right text-slate-500">
                     {r.durationMs}ms
-                  </td>
-                  <td className="py-2 pl-3 font-mono text-xs text-slate-400">
-                    {r.requestId}
                   </td>
                 </tr>
                 {canExpand && isOpen && (
                   <tr className="border-b border-slate-100 bg-slate-50/60">
                     <td className="pb-3 pr-3" />
                     <td
-                      colSpan={8}
+                      colSpan={10}
                       className="pb-3 pl-3 pr-3 font-mono text-xs text-slate-700 whitespace-pre-wrap break-words leading-snug"
                     >
                       {r.errorMessage}
@@ -484,6 +564,13 @@ function resultColor(result: string): string {
     default:
       return `text-slate-700`;
   }
+}
+
+function formatBytes(n: number): string {
+  if (n <= 0) return `—`;
+  if (n < 1024) return `${n}B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)}K`;
+  return `${(n / (1024 * 1024)).toFixed(1)}M`;
 }
 
 function formatWhen(iso: string): string {

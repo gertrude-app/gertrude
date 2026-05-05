@@ -22,6 +22,13 @@ import LoadingState from '../components/LoadingState';
 import { formatDate, timeAgo, unCamelCase } from '../lib/format';
 
 type Plan = T.ParentDetail.Output[`plan`];
+type TelemetryRow = T.GetParentRecentTelemetry.Output[number];
+
+const TELEMETRY_RANGES: { label: string; hours: number }[] = [
+  { label: `24h`, hours: 24 },
+  { label: `7d`, hours: 24 * 7 },
+  { label: `30d`, hours: 24 * 30 },
+];
 
 const ParentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,6 +41,10 @@ const ParentDetail: React.FC = () => {
   const [deleteReason, setDeleteReason] = useState(``);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [telemetry, setTelemetry] = useState<TelemetryRow[] | null>(null);
+  const [telemetryError, setTelemetryError] = useState<string | null>(null);
+  const [telemetryHours, setTelemetryHours] = useState(24);
+  const [telemetryErrorsOnly, setTelemetryErrorsOnly] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -56,6 +67,30 @@ const ParentDetail: React.FC = () => {
 
     fetchData();
   }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    const fetchTelemetry = async (): Promise<void> => {
+      const result = await client.getParentRecentTelemetry({
+        parentId: id,
+        sinceHours: telemetryHours,
+        limit: 100,
+      });
+      if (cancelled) return;
+      if (result.isError) {
+        setTelemetry([]);
+        setTelemetryError(result.error?.debugMessage ?? `Failed to load telemetry`);
+      } else {
+        setTelemetry(result.value ?? []);
+        setTelemetryError(null);
+      }
+    };
+    fetchTelemetry();
+    return () => {
+      cancelled = true;
+    };
+  }, [id, telemetryHours]);
 
   if (loading) {
     return <LoadingState context="parent details" />;
@@ -411,6 +446,55 @@ const ParentDetail: React.FC = () => {
         </div>
       </section>
 
+      <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
+        <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-indigo-100 flex items-center justify-center">
+                <MonitorIcon className="w-5 h-5 text-indigo-600" />
+              </div>
+              <h2 className="font-display font-semibold text-slate-900 text-xl">
+                Recent API Activity
+                <span className="ml-2 text-sm font-normal text-slate-500">
+                  ({telemetry?.length ?? 0})
+                </span>
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              {TELEMETRY_RANGES.map((r) => (
+                <button
+                  key={r.label}
+                  onClick={() => setTelemetryHours(r.hours)}
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+                    r.hours === telemetryHours
+                      ? `bg-slate-900 text-white`
+                      : `bg-slate-100 text-slate-600 hover:bg-slate-200`
+                  }`}
+                >
+                  {r.label}
+                </button>
+              ))}
+              <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none ml-2">
+                <input
+                  type="checkbox"
+                  checked={telemetryErrorsOnly}
+                  onChange={(e) => setTelemetryErrorsOnly(e.target.checked)}
+                  className="rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                />
+                Errors only
+              </label>
+            </div>
+          </div>
+        </div>
+        <div className="p-4 sm:p-6">
+          {telemetryError ? (
+            <p className="text-sm text-red-600">{telemetryError}</p>
+          ) : (
+            <TelemetryTable rows={telemetry} errorsOnly={telemetryErrorsOnly} />
+          )}
+        </div>
+      </section>
+
       <section className="bg-white rounded-2xl border border-red-200 shadow-sm overflow-hidden">
         <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-red-100">
           <div className="flex items-center gap-3">
@@ -702,6 +786,95 @@ const SupervisionBadge: React.FC<{ status: string }> = ({ status }) => {
     </span>
   );
 };
+
+const TelemetryTable: React.FC<{
+  rows: TelemetryRow[] | null;
+  errorsOnly: boolean;
+}> = ({ rows, errorsOnly }) => {
+  if (rows === null) {
+    return <p className="text-sm text-slate-500">Loading…</p>;
+  }
+  const visible = errorsOnly ? rows.filter((r) => r.result !== `ok`) : rows;
+  if (visible.length === 0) {
+    return (
+      <p className="text-sm text-slate-500">
+        {errorsOnly ? `No errors in this range.` : `No API activity in this range.`}
+      </p>
+    );
+  }
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-slate-200 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+            <th className="py-2 pr-3">When</th>
+            <th className="py-2 px-3">Result</th>
+            <th className="py-2 px-3">Domain</th>
+            <th className="py-2 px-3">Operation</th>
+            <th className="py-2 px-3 text-right">Dur</th>
+            <th className="py-2 px-3 text-right">Req</th>
+            <th className="py-2 px-3 text-right">Resp</th>
+            <th className="py-2 px-3">Error</th>
+            <th className="py-2 pl-3">UA</th>
+          </tr>
+        </thead>
+        <tbody>
+          {visible.map((r) => (
+            <tr key={r.id} className="border-b border-slate-100">
+              <td className="py-2 pr-3 whitespace-nowrap text-slate-600">
+                {timeAgo(r.createdAt)}
+              </td>
+              <td className="py-2 px-3">
+                <span className={`text-xs font-medium ${telemetryResultColor(r.result)}`}>
+                  {r.result}
+                </span>
+              </td>
+              <td className="py-2 px-3 text-slate-500">{r.domain}</td>
+              <td className="py-2 px-3 font-medium text-slate-900">{r.operation}</td>
+              <td className="py-2 px-3 text-right text-slate-500">{r.durationMs}ms</td>
+              <td className="py-2 px-3 text-right text-slate-500">
+                {formatBytesShort(r.numRequestBytes)}
+              </td>
+              <td className="py-2 px-3 text-right text-slate-500">
+                {formatBytesShort(r.numResponseBytes)}
+              </td>
+              <td className="py-2 px-3 text-slate-700 text-xs">{r.errorType ?? `—`}</td>
+              <td
+                className="py-2 pl-3 text-xs text-slate-500 max-w-[180px] truncate"
+                title={r.userAgent ?? ``}
+              >
+                {r.userAgent ?? `—`}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+function telemetryResultColor(result: string): string {
+  switch (result) {
+    case `unexpected_error`:
+      return `text-red-600`;
+    case `pql_error`:
+    case `convertible_error`:
+      return `text-amber-600`;
+    case `not_found`:
+      return `text-slate-500`;
+    case `ok`:
+      return `text-emerald-600`;
+    default:
+      return `text-slate-700`;
+  }
+}
+
+function formatBytesShort(n: number | null | undefined): string {
+  if (n === null || n === undefined) return `—`;
+  if (n < 1024) return `${n}B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)}K`;
+  return `${(n / (1024 * 1024)).toFixed(1)}M`;
+}
 
 function iosStatus(
   children: T.ParentDetail.Output[`children`],

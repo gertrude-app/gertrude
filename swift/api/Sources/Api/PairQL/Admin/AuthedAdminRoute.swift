@@ -21,6 +21,7 @@ enum AuthedAdminRoute: PairRoute {
   case promoteApp(PromoteApp.Input)
   case getPairqlTelemetrySummary(GetPairqlTelemetrySummary.Input)
   case getRecentPairqlErrors(GetRecentPairqlErrors.Input)
+  case getParentRecentTelemetry(GetParentRecentTelemetry.Input)
 
   nonisolated(unsafe) static let router = OneOf {
     Route(.case(Self.subscriptionsOverview)) {
@@ -93,6 +94,10 @@ enum AuthedAdminRoute: PairRoute {
       Operation(GetRecentPairqlErrors.self)
       Body(.input(GetRecentPairqlErrors.self))
     }
+    Route(.case(Self.getParentRecentTelemetry)) {
+      Operation(GetParentRecentTelemetry.self)
+      Body(.input(GetParentRecentTelemetry.self))
+    }
   }
 }
 
@@ -155,6 +160,9 @@ extension AuthedAdminRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getRecentPairqlErrors(let input):
       let output = try await GetRecentPairqlErrors.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getParentRecentTelemetry(let input):
+      let output = try await GetParentRecentTelemetry.resolve(with: input, in: context)
       return try await self.respond(with: output)
     }
   }

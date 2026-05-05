@@ -21,6 +21,9 @@ struct GetPairqlTelemetrySummary: Pair {
     var convertibleErrorCount: Int
     var unexpectedErrorCount: Int
     var notFoundCount: Int
+    var avgRequestBytes: Int
+    var avgResponseBytes: Int
+    var maxResponseBytes: Int
   }
 
   typealias Output = [Row]
@@ -47,6 +50,9 @@ extension GetPairqlTelemetrySummary: Resolver {
         convertibleErrorCount: row.convertibleErrorCount,
         unexpectedErrorCount: row.unexpectedErrorCount,
         notFoundCount: row.notFoundCount,
+        avgRequestBytes: row.avgRequestBytes,
+        avgResponseBytes: row.avgResponseBytes,
+        maxResponseBytes: row.maxResponseBytes,
       )
     }
   }
@@ -62,6 +68,8 @@ private struct SummaryQuery: CustomQueryable {
     let durationMs = RouteTelemetry.columnName(.durationMs)
     let result = RouteTelemetry.columnName(.result)
     let createdAt = RouteTelemetry.columnName(.createdAt)
+    let numRequestBytes = RouteTelemetry.columnName(.numRequestBytes)
+    let numResponseBytes = RouteTelemetry.columnName(.numResponseBytes)
     var stmt = SQL.Statement("""
     SELECT
       \(domain) AS domain,
@@ -75,7 +83,10 @@ private struct SummaryQuery: CustomQueryable {
       COUNT(*) FILTER (WHERE \(result) = 'pql_error')::int AS pql_error_count,
       COUNT(*) FILTER (WHERE \(result) = 'convertible_error')::int AS convertible_error_count,
       COUNT(*) FILTER (WHERE \(result) = 'unexpected_error')::int AS unexpected_error_count,
-      COUNT(*) FILTER (WHERE \(result) = 'not_found')::int AS not_found_count
+      COUNT(*) FILTER (WHERE \(result) = 'not_found')::int AS not_found_count,
+      COALESCE(AVG(\(numRequestBytes)), 0)::int AS avg_request_bytes,
+      COALESCE(AVG(\(numResponseBytes)), 0)::int AS avg_response_bytes,
+      COALESCE(MAX(\(numResponseBytes)), 0)::int AS max_response_bytes
     FROM \(table: RouteTelemetry.self)
     WHERE \(createdAt) >=
     """)
@@ -99,4 +110,7 @@ private struct SummaryQuery: CustomQueryable {
   var convertibleErrorCount: Int
   var unexpectedErrorCount: Int
   var notFoundCount: Int
+  var avgRequestBytes: Int
+  var avgResponseBytes: Int
+  var maxResponseBytes: Int
 }

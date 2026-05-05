@@ -2,14 +2,13 @@ import DuetSQL
 import Foundation
 import PairQL
 
-struct GetRecentPairqlErrors: Pair {
+struct GetParentRecentTelemetry: Pair {
   static let auth: ClientAuth = .superAdmin
 
   struct Input: PairInput {
+    var parentId: Parent.Id
     var sinceHours: Int
     var limit: Int
-    var resultFilter: String?
-    var parentId: Parent.Id?
   }
 
   struct Row: PairOutput {
@@ -23,32 +22,26 @@ struct GetRecentPairqlErrors: Pair {
     var errorType: String?
     var errorMessage: String?
     var requestId: String
-    var parentId: Parent.Id?
     var ipAddress: String?
     var userAgent: String?
+    var numRequestBytes: Int?
+    var numResponseBytes: Int?
   }
 
   typealias Output = [Row]
 }
 
-extension GetRecentPairqlErrors: Resolver {
+extension GetParentRecentTelemetry: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let hours = max(1, input.sinceHours)
-    let limit = max(1, min(input.limit, 500))
-    let allowed: Set<String> = [
-      "pql_error", "convertible_error", "unexpected_error", "not_found",
-    ]
-    let filter = input.resultFilter.flatMap { allowed.contains($0) ? $0 : nil }
-
+    let limit = max(1, min(input.limit, 200))
     let bindings: [Postgres.Data] = [
-      .int(hours),
-      .string(filter),
       .uuid(input.parentId),
+      .int(hours),
       .int(limit),
     ]
-
     let rows = try await context.db.customQuery(
-      ErrorsQuery.self,
+      ParentTelemetryQuery.self,
       withBindings: bindings,
     )
     return rows.map {
@@ -63,17 +56,18 @@ extension GetRecentPairqlErrors: Resolver {
         errorType: $0.errorType,
         errorMessage: $0.errorMessage,
         requestId: $0.requestId,
-        parentId: $0.parentId.map(Parent.Id.init(rawValue:)),
         ipAddress: $0.ipAddress,
         userAgent: $0.userAgent,
+        numRequestBytes: $0.numRequestBytes,
+        numResponseBytes: $0.numResponseBytes,
       )
     }
   }
 }
 
-private struct ErrorsQuery: CustomQueryable {
+private struct ParentTelemetryQuery: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    guard bindings.count == 4 else {
+    guard bindings.count == 3 else {
       return SQL.Statement("SELECT NULL WHERE FALSE")
     }
     let id = RouteTelemetry.columnName(.id)
@@ -89,6 +83,8 @@ private struct ErrorsQuery: CustomQueryable {
     let parentId = RouteTelemetry.columnName(.parentId)
     let ipAddress = RouteTelemetry.columnName(.ipAddress)
     let userAgent = RouteTelemetry.columnName(.userAgent)
+    let numRequestBytes = RouteTelemetry.columnName(.numRequestBytes)
+    let numResponseBytes = RouteTelemetry.columnName(.numResponseBytes)
 
     var stmt = SQL.Statement("""
     SELECT
@@ -102,26 +98,19 @@ private struct ErrorsQuery: CustomQueryable {
       \(errorType) AS error_type,
       \(errorMessage) AS error_message,
       \(requestId) AS request_id,
-      \(parentId) AS parent_id,
       \(ipAddress) AS ip_address,
-      \(userAgent) AS user_agent
+      \(userAgent) AS user_agent,
+      \(numRequestBytes) AS num_request_bytes,
+      \(numResponseBytes) AS num_response_bytes
     FROM \(table: RouteTelemetry.self)
-    WHERE \(result) <> 'ok'
-      AND \(createdAt) >=
+    WHERE \(parentId) =
     """)
-    stmt.components.append(.sql(" now() - make_interval(hours => ("))
+    stmt.components.append(.sql(" "))
     stmt.components.append(.binding(bindings[0]))
-    stmt.components.append(.sql(")::int)"))
-    if case .string(.some) = bindings[1] {
-      stmt.components.append(.sql(" AND \(result) = "))
-      stmt.components.append(.binding(bindings[1]))
-    }
-    if case .uuid(.some) = bindings[2] {
-      stmt.components.append(.sql(" AND \(parentId) = "))
-      stmt.components.append(.binding(bindings[2]))
-    }
-    stmt.components.append(.sql(" ORDER BY \(createdAt) DESC LIMIT "))
-    stmt.components.append(.binding(bindings[3]))
+    stmt.components.append(.sql(" AND \(createdAt) >= now() - make_interval(hours => ("))
+    stmt.components.append(.binding(bindings[1]))
+    stmt.components.append(.sql(")::int) ORDER BY \(createdAt) DESC LIMIT "))
+    stmt.components.append(.binding(bindings[2]))
     return stmt
   }
 
@@ -135,7 +124,8 @@ private struct ErrorsQuery: CustomQueryable {
   var errorType: String?
   var errorMessage: String?
   var requestId: String
-  var parentId: UUID?
   var ipAddress: String?
   var userAgent: String?
+  var numRequestBytes: Int?
+  var numResponseBytes: Int?
 }

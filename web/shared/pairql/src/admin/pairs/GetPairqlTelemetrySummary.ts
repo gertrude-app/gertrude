@@ -17,5 +17,8 @@ export namespace GetPairqlTelemetrySummary {
     convertibleErrorCount: number;
     unexpectedErrorCount: number;
     notFoundCount: number;
+    avgRequestBytes: number;
+    avgResponseBytes: number;
+    maxResponseBytes: number;
   }>;
 }

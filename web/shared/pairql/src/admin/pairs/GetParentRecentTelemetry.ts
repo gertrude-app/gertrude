@@ -1,10 +1,9 @@
 // auto-generated, do not edit
-export namespace GetRecentPairqlErrors {
+export namespace GetParentRecentTelemetry {
   export interface Input {
+    parentId: UUID;
     sinceHours: number;
     limit: number;
-    resultFilter?: string;
-    parentId?: UUID;
   }
 
   export type Output = Array<{
@@ -18,8 +17,9 @@ export namespace GetRecentPairqlErrors {
     errorType?: string;
     errorMessage?: string;
     requestId: string;
-    parentId?: UUID;
     ipAddress?: string;
     userAgent?: string;
+    numRequestBytes?: number;
+    numResponseBytes?: number;
   }>;
 }

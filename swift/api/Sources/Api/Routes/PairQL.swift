@@ -88,6 +88,11 @@ enum PairQLRoute: Equatable, RouteResponder {
       throw Abort(.badRequest)
     }
 
+    if req.parameters.get("domain") == "super-admin",
+       req.parameters.get("operation") == "QueryAdmins" {
+      return Response(status: .notFound)
+    }
+
     let ctx = Context(
       requestId: req.id,
       dashboardUrl: req.dashboardUrl,
@@ -296,10 +301,6 @@ private func slackPairQLRouteNotFound(_ request: Request, _ error: Error) async 
     "CreateUnlockRequests_v2",
     "LatestAppVersion",
   ].contains(operation) {
-    return
-  }
-
-  if domain == "super-admin", operation == "QueryAdmins" {
     return
   }
 
