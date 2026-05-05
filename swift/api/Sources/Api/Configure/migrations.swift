@@ -89,6 +89,8 @@ extension Configure {
     app.migrations.add(CreateRouteTelemetry())
     app.migrations.add(CreateMarketingEmailSends())
     app.migrations.add(AddIOSBlockGroupOptIn())
+    app.migrations.add(AddPerfIndexes())
+    app.migrations.add(EnrichRouteTelemetry())
   }
 }
 

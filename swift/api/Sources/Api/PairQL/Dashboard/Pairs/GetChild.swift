@@ -165,8 +165,6 @@ extension GetChild: Resolver {
   }
 }
 
-// TODO: this is major N+1 territory, write a custom query w/ join for perf
-// @see also ruleKeychains(for:in:)
 func childKeychainSummaries(
   for childId: Child.Id,
   in db: any DuetSQL.Client,
@@ -174,22 +172,29 @@ func childKeychainSummaries(
   let childKeychains = try await ChildKeychain.query()
     .where(.childId == childId)
     .all(in: db)
-  let keychains = try await Keychain.query()
-    .where(.id |=| childKeychains.map(\.keychainId))
+  guard !childKeychains.isEmpty else { return [] }
+
+  let keychainIds = childKeychains.map(\.keychainId)
+  async let keychainsAsync = Keychain.query()
+    .where(.id |=| keychainIds)
     .all(in: db)
-  return try await keychains.concurrentMap { keychain in
-    let numKeys = try await db.count(
-      Key.self,
-      where: .keychainId == keychain.id,
-      withSoftDeleted: false,
-    )
-    return .init(
+  async let keysAsync = Key.query()
+    .where(.keychainId |=| keychainIds)
+    .all(in: db)
+
+  let keychains = try await keychainsAsync
+  let countsByKeychain = try await keysAsync
+    .reduce(into: [Keychain.Id: Int]()) { counts, key in
+      counts[key.keychainId, default: 0] += 1
+    }
+  return keychains.map { keychain in
+    .init(
       id: keychain.id,
       parentId: keychain.parentId,
       name: keychain.name,
       description: keychain.description,
       isPublic: keychain.isPublic,
-      numKeys: numKeys,
+      numKeys: countsByKeychain[keychain.id] ?? 0,
       schedule: childKeychains.first { $0.keychainId == keychain.id }?.schedule,
     )
   }

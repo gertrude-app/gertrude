@@ -8,6 +8,7 @@ extension IOSApp {
     let dashboardUrl: String
     let child: Child
     let device: IOSApp.Device
+    let telemetry: TelemetryBag
 
     @Dependency(\.db) var db
   }

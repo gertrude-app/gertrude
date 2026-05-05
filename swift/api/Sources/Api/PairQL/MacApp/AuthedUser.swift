@@ -9,6 +9,7 @@ extension MacApp {
     let dashboardUrl: String
     let child: Child
     let token: MacAppToken
+    let telemetry: TelemetryBag
 
     @Dependency(\.uuid) var uuid
     @Dependency(\.env) var env

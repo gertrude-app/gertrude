@@ -72,19 +72,43 @@ class ApiTestCase: XCTestCase, @unchecked Sendable {
   }
 
   func context(_ parent: Parent) -> ParentContext {
-    .init(requestId: "mock-req-id", dashboardUrl: "", parent: parent, ipAddress: nil)
+    .init(
+      requestId: "mock-req-id",
+      dashboardUrl: "",
+      parent: parent,
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
   }
 
   func context(_ parent: ParentEntities) -> ParentContext {
-    .init(requestId: "mock-req-id", dashboardUrl: "", parent: parent.model, ipAddress: nil)
+    .init(
+      requestId: "mock-req-id",
+      dashboardUrl: "",
+      parent: parent.model,
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
   }
 
   func context(_ parent: ParentWithKeychainEntities) -> ParentContext {
-    .init(requestId: "mock-req-id", dashboardUrl: "", parent: parent.model, ipAddress: nil)
+    .init(
+      requestId: "mock-req-id",
+      dashboardUrl: "",
+      parent: parent.model,
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
   }
 
   func context(_ child: ChildWithComputerEntities) async throws -> MacApp.ChildContext {
-    .init(requestId: "", dashboardUrl: "", child: child.model, token: child.token)
+    .init(
+      requestId: "",
+      dashboardUrl: "",
+      child: child.model,
+      token: child.token,
+      telemetry: TelemetryBag(),
+    )
   }
 
   @discardableResult

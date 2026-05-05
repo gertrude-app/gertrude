@@ -31,7 +31,7 @@ final class DasboardUnauthedResolverTests: ApiTestCase, @unchecked Sendable {
     let (token, output) = try await withUUID {
       try await RequestMagicLink.resolve(
         with: .init(email: parent.email.rawValue, redirect: nil),
-        in: .init(requestId: "", dashboardUrl: "/dash", ipAddress: nil),
+        in: .init(requestId: "", dashboardUrl: "/dash", ipAddress: nil, telemetry: TelemetryBag()),
       )
     }
 
@@ -47,7 +47,7 @@ final class DasboardUnauthedResolverTests: ApiTestCase, @unchecked Sendable {
     let (token, output) = try await withUUID {
       try await RequestMagicLink.resolve(
         with: .init(email: parent.email.rawValue, redirect: "/foo"),
-        in: .init(requestId: "", dashboardUrl: "/dash", ipAddress: nil),
+        in: .init(requestId: "", dashboardUrl: "/dash", ipAddress: nil, telemetry: TelemetryBag()),
       )
     }
 

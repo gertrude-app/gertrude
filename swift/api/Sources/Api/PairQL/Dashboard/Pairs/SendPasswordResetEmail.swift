@@ -24,6 +24,7 @@ extension SendPasswordResetEmail: Resolver {
     if let parent = try? await Parent.query()
       .where(.email == email)
       .first(in: context.db) {
+      context.telemetry.parentId = parent.id
       let token = await with(dependency: \.ephemeral)
         .createParentIdToken(parent.id)
       dashSecurityEvent(.passwordResetRequested, parent: parent.id, in: context)

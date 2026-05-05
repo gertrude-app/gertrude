@@ -69,11 +69,13 @@ extension IOSRoute: RouteResponder {
         )
       }
 
+      context.telemetry.parentId = child.parentId
       let childContext = IOSApp.ChildContext(
         requestId: context.requestId,
         dashboardUrl: context.dashboardUrl,
         child: child,
         device: device,
+        telemetry: context.telemetry,
       )
       return try await AuthedRoute.respond(to: authedRoute, in: childContext)
     }

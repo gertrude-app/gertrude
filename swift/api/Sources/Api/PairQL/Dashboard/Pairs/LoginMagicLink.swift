@@ -24,6 +24,7 @@ extension LoginMagicLink: Resolver {
         .magicLinkTokenNotFound,
       )
     }
+    context.telemetry.parentId = parentId
 
     dashSecurityEvent(.login, "using magic link", parent: parentId, in: context)
     let token = try await context.db.create(Parent.DashToken(parentId: parentId))

@@ -230,6 +230,6 @@ final class ConnectUserResolversTests: ApiTestCase, @unchecked Sendable {
   }
 
   var context: Context {
-    .init(requestId: "", dashboardUrl: "", ipAddress: nil)
+    .init(requestId: "", dashboardUrl: "", ipAddress: nil, telemetry: TelemetryBag())
   }
 }

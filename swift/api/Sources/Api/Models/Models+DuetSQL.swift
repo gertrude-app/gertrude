@@ -1060,6 +1060,11 @@ extension RouteTelemetry: Model {
     case .errorId: .varchar(self.errorId)
     case .errorType: .string(self.errorType)
     case .errorMessage: .string(self.errorMessage)
+    case .parentId: .uuid(self.parentId)
+    case .ipAddress: .string(self.ipAddress)
+    case .userAgent: .string(self.userAgent)
+    case .numRequestBytes: .int(self.numRequestBytes)
+    case .numResponseBytes: .int(self.numResponseBytes)
     case .createdAt: .date(self.createdAt)
     }
   }
@@ -1076,6 +1081,11 @@ extension RouteTelemetry: Model {
       .errorId: .varchar(self.errorId),
       .errorType: .string(self.errorType),
       .errorMessage: .string(self.errorMessage),
+      .parentId: .uuid(self.parentId),
+      .ipAddress: .string(self.ipAddress),
+      .userAgent: .string(self.userAgent),
+      .numRequestBytes: .int(self.numRequestBytes),
+      .numResponseBytes: .int(self.numResponseBytes),
       .createdAt: .currentTimestamp,
     ]
   }

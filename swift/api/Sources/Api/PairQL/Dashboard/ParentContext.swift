@@ -6,6 +6,7 @@ struct ParentContext: ResolverContext {
   let dashboardUrl: String
   let parent: Parent
   let ipAddress: String?
+  let telemetry: TelemetryBag
 
   @Dependency(\.db) var db
   @Dependency(\.env) var env

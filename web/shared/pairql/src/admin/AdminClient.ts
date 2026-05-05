@@ -42,6 +42,16 @@ export default class AdminClient extends Client<Auth> {
     );
   };
 
+  public getParentRecentTelemetry = (
+    input: P.GetParentRecentTelemetry.Input,
+  ): Promise<Result<P.GetParentRecentTelemetry.Output>> => {
+    return this.query<P.GetParentRecentTelemetry.Output>(
+      input,
+      `GetParentRecentTelemetry`,
+      `superAdmin`,
+    );
+  };
+
   public getRecentPairqlErrors = (
     input: P.GetRecentPairqlErrors.Input,
   ): Promise<Result<P.GetRecentPairqlErrors.Output>> => {

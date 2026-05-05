@@ -29,6 +29,7 @@ extension RequestMagicLink: Resolver {
       try await postmark.send(template: .magicLinkNoAccount(to: email, model: .init()))
       return .success
     }
+    context.telemetry.parentId = parent.id
 
     let token = await with(dependency: \.ephemeral)
       .createParentIdToken(parent.id)

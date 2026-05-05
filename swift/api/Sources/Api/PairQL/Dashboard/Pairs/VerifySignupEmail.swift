@@ -27,6 +27,7 @@ extension VerifySignupEmail: Resolver {
 
     // happy path: verification is successful
     case .notExpired(let parentId, let claimCode):
+      context.telemetry.parentId = parentId
       var parent = try await context.db.find(parentId)
       let token = try await context.db.create(Parent.DashToken(parentId: parent.id))
       if parent.emailVerified {
@@ -58,6 +59,7 @@ extension VerifySignupEmail: Resolver {
       throw Abort(.notFound)
 
     case .expired(let parentId):
+      context.telemetry.parentId = parentId
       let parent = try await context.db.find(parentId)
       if !parent.emailVerified {
         try await sendVerificationEmail(to: parent, in: context)
@@ -72,6 +74,7 @@ extension VerifySignupEmail: Resolver {
       }
 
     case .previouslyRetrieved(let parentId):
+      context.telemetry.parentId = parentId
       let parent = try await context.db.find(parentId)
       if !parent.emailVerified {
         try await sendVerificationEmail(to: parent, in: context)

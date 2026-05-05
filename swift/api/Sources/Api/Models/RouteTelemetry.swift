@@ -19,6 +19,11 @@ struct RouteTelemetry: Codable, Sendable {
   var errorId: String?
   var errorType: String?
   var errorMessage: String?
+  var parentId: Parent.Id?
+  var ipAddress: String?
+  var userAgent: String?
+  var numRequestBytes: Int?
+  var numResponseBytes: Int?
   var createdAt = Date()
 
   init(
@@ -32,6 +37,11 @@ struct RouteTelemetry: Codable, Sendable {
     errorId: String? = nil,
     errorType: String? = nil,
     errorMessage: String? = nil,
+    parentId: Parent.Id? = nil,
+    ipAddress: String? = nil,
+    userAgent: String? = nil,
+    numRequestBytes: Int? = nil,
+    numResponseBytes: Int? = nil,
   ) {
     self.id = id
     self.kind = kind
@@ -43,5 +53,10 @@ struct RouteTelemetry: Codable, Sendable {
     self.errorId = errorId
     self.errorType = errorType
     self.errorMessage = errorMessage
+    self.parentId = parentId
+    self.ipAddress = ipAddress
+    self.userAgent = userAgent
+    self.numRequestBytes = numRequestBytes
+    self.numResponseBytes = numResponseBytes
   }
 }

@@ -17,6 +17,7 @@ extension ResetPassword: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     if let parentId = await with(dependency: \.ephemeral)
       .unexpiredParentIdFromToken(input.token) {
+      context.telemetry.parentId = parentId
       var parent = try await context.db.find(parentId)
       parent.password = try Bcrypt.hash(input.password)
       try await context.db.update(parent)

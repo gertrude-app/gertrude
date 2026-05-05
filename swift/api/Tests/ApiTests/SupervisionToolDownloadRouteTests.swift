@@ -49,6 +49,7 @@ final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable 
 
     let events = try await IOSEvent.query()
       .where(.deviceId == device.id)
+      .orderBy(.createdAt, .asc)
       .all(in: self.db)
     expect(events.count).toEqual(2)
     expect(events[0].kind).toEqual(.supervision)

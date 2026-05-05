@@ -10,6 +10,7 @@ struct Context: ResolverContext {
   let requestId: String
   let dashboardUrl: String
   let ipAddress: String?
+  let telemetry: TelemetryBag
 
   @Dependency(\.db) var db
   @Dependency(\.env) var env
@@ -87,10 +88,16 @@ enum PairQLRoute: Equatable, RouteResponder {
       throw Abort(.badRequest)
     }
 
+    if req.parameters.get("domain") == "super-admin",
+       req.parameters.get("operation") == "QueryAdmins" {
+      return Response(status: .notFound)
+    }
+
     let ctx = Context(
       requestId: req.id,
       dashboardUrl: req.dashboardUrl,
       ipAddress: req.ipAddress,
+      telemetry: TelemetryBag(),
     )
 
     let start = Date()
@@ -99,7 +106,14 @@ enum PairQLRoute: Equatable, RouteResponder {
       let output = try await PairQLRoute.respond(to: route, in: ctx)
       let duration = Date().timeIntervalSince(start)
       logOperation(route, req, duration)
-      recordTelemetry(req, ctx, domain(of: route), start, .ok)
+      recordTelemetry(
+        req,
+        ctx,
+        domain(of: route),
+        start,
+        .ok,
+        numResponseBytes: output.body.count,
+      )
       return output
     } catch {
       let domain = req.parameters.get("domain") ?? ""
@@ -120,7 +134,7 @@ enum PairQLRoute: Equatable, RouteResponder {
           .notFound,
           "0f5a25c9",
           "\(type(of: error))",
-          "\(error)",
+          parsingErrorSummary(req),
         )
         return .init(PqlError(
           id: "0f5a25c9",
@@ -219,6 +233,7 @@ private func recordTelemetry(
   _ errorId: String? = nil,
   _ errorType: String? = nil,
   _ errorMessage: String? = nil,
+  numResponseBytes: Int? = nil,
 ) {
   let operation = request.parameters.get("operation") ?? ""
   let durationMs = Int(Date().timeIntervalSince(start) * 1000)
@@ -232,6 +247,11 @@ private func recordTelemetry(
     errorId: errorId,
     errorType: errorType,
     errorMessage: errorMessage.map(truncateErrorMessage),
+    parentId: context.telemetry.parentId,
+    ipAddress: context.ipAddress,
+    userAgent: request.headers.first(name: .userAgent).map(truncateUserAgent),
+    numRequestBytes: request.body.data?.readableBytes,
+    numResponseBytes: numResponseBytes,
   )
   Task {
     do {
@@ -242,8 +262,18 @@ private func recordTelemetry(
   }
 }
 
+private func truncateUserAgent(_ s: String) -> String {
+  s.count <= 256 ? s : String(s.prefix(256))
+}
+
 private func truncateErrorMessage(_ s: String) -> String {
   s.count <= 2000 ? s : String(s.prefix(2000)) + "…"
+}
+
+private func parsingErrorSummary(_ req: Request) -> String {
+  let domain = req.parameters.get("domain") ?? ""
+  let operation = req.parameters.get("operation") ?? ""
+  return "route not found: \(domain)/\(operation)"
 }
 
 private func domain(of route: PairQLRoute) -> String {
@@ -271,10 +301,6 @@ private func slackPairQLRouteNotFound(_ request: Request, _ error: Error) async 
     "CreateUnlockRequests_v2",
     "LatestAppVersion",
   ].contains(operation) {
-    return
-  }
-
-  if domain == "super-admin", operation == "QueryAdmins" {
     return
   }
 

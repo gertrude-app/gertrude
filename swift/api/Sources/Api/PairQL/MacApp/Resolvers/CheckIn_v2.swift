@@ -415,8 +415,6 @@ func loadAlwaysBlockedRules(
   return rules + [.hostnameOrSubdomain(value: "cloudflare-ech.com")]
 }
 
-// TODO: this is major N+1 territory, write a custom query w/ join for perf
-// @see also userKeychainSummaries(for:in:)
 func ruleKeychains(
   for childId: Child.Id,
   in db: any DuetSQL.Client,
@@ -424,15 +422,24 @@ func ruleKeychains(
   let childKeychains = try await ChildKeychain.query()
     .where(.childId == childId)
     .all(in: db)
-  let keychains = try await Keychain.query()
-    .where(.id |=| childKeychains.map(\.keychainId))
+  guard !childKeychains.isEmpty else { return [] }
+
+  let keychainIds = childKeychains.map(\.keychainId)
+  async let keychainsAsync = Keychain.query()
+    .where(.id |=| keychainIds)
     .all(in: db)
-  return try await keychains.concurrentMap { keychain in
-    let keys = try await keychain.keys(in: db)
-    return .init(
+  async let keysAsync = Key.query()
+    .where(.keychainId |=| keychainIds)
+    .all(in: db)
+
+  let keychains = try await keychainsAsync
+  let keysByKeychain = try await Dictionary(grouping: keysAsync, by: \.keychainId)
+  return keychains.map { keychain in
+    .init(
       id: keychain.id.rawValue,
       schedule: childKeychains.first { $0.keychainId == keychain.id }?.schedule,
-      keys: keys.map { .init(id: $0.id.rawValue, key: $0.key) },
+      keys: (keysByKeychain[keychain.id] ?? [])
+        .map { .init(id: $0.id.rawValue, key: $0.key) },
     )
   }
 }

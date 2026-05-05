@@ -25,6 +25,7 @@ extension Login: Resolver {
     let parent = try await Parent.query()
       .where(.email == .string(input.email.lowercased()))
       .first(in: context.db, orThrow: context |> loginError)
+    context.telemetry.parentId = parent.id
 
     if !parent.emailVerified {
       try await sendVerificationEmail(to: parent, in: context)
