@@ -76,6 +76,7 @@ enum StripeEventsRoute {
 
       if var subscription = try await parent.subscription(in: request.context.db) {
         if subscription.stripeId == nil {
+          await recordPaidAdConversion(parent: parent, db: request.context.db)
           notifyFirstPayment(parent: parent, tier: eventTier)
         } else if subscription.stripeId?.rawValue != eventSubscriptionId {
           unexpected(
@@ -97,6 +98,7 @@ enum StripeEventsRoute {
           stripeId: .init(eventSubscriptionId),
           statusExpiresAt: statusExpiration,
         ))
+        await recordPaidAdConversion(parent: parent, db: request.context.db)
         notifyFirstPayment(parent: parent, tier: eventTier)
       }
 
@@ -222,6 +224,22 @@ func verifyStripeSignature(
     }
     return result == 0
   }
+}
+
+func recordPaidAdConversion(parent: Parent, db: any DuetSQL.Client) async {
+  guard let gclid = parent.gclid else { return }
+  let alreadyRecorded = try? await InterestingEvent.query()
+    .where(.eventId == "g-ad-paid-conversion")
+    .where(.parentId == parent.id)
+    .exists(in: db)
+  guard alreadyRecorded == false else { return }
+  _ = try? await db.create(InterestingEvent(
+    eventId: "g-ad-paid-conversion",
+    kind: "event",
+    context: "reporting",
+    parentId: parent.id,
+    detail: "gclid=\(gclid)",
+  ))
 }
 
 func notifyFirstPayment(parent: Parent, tier: Subscription.Tier) {

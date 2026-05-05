@@ -193,6 +193,48 @@ final class ConnectUserResolversTests: ApiTestCase, @unchecked Sendable {
     expect(keychains[0].name).toEqual("Existing")
   }
 
+  func testConnectUser_recordsGoogleAdConversionEventOnce() async throws {
+    try await self.db.delete(all: Computer.self)
+    let child = try await self.child(withParent: { $0.gclid = "gclid-test-123" })
+    try await self.addFullPaidSubscription(for: child.parent.id)
+
+    let code1 = await with(dependency: \.ephemeral)
+      .createPendingAppConnection(child.id)
+    _ = try await ConnectUser.resolve(with: self.input(code1), in: self.context)
+
+    let afterFirst = try await InterestingEvent.query()
+      .where(.eventId == "g-ad-conversion")
+      .where(.parentId == child.parent.id)
+      .all(in: self.db)
+    expect(afterFirst.count).toEqual(1)
+    expect(afterFirst[0].detail).toEqual("gclid=gclid-test-123")
+
+    let code2 = await with(dependency: \.ephemeral)
+      .createPendingAppConnection(child.id)
+    _ = try await ConnectUser.resolve(with: self.input(code2), in: self.context)
+
+    let afterSecond = try await InterestingEvent.query()
+      .where(.eventId == "g-ad-conversion")
+      .where(.parentId == child.parent.id)
+      .all(in: self.db)
+    expect(afterSecond.count).toEqual(1)
+  }
+
+  func testConnectUser_doesNotRecordAdConversion_whenParentHasNoGclid() async throws {
+    try await self.db.delete(all: Computer.self)
+    let child = try await self.child()
+    try await self.addFullPaidSubscription(for: child.parent.id)
+    let code = await with(dependency: \.ephemeral)
+      .createPendingAppConnection(child.id)
+    _ = try await ConnectUser.resolve(with: self.input(code), in: self.context)
+
+    let events = try await InterestingEvent.query()
+      .where(.eventId == "g-ad-conversion")
+      .where(.parentId == child.parent.id)
+      .all(in: self.db)
+    expect(events.isEmpty).toBeTrue()
+  }
+
   func testConnectUser_FailsWhenParentPlanDoesNotPermit() async throws {
     let child = try await self.child()
     let code = await with(dependency: \.ephemeral)
