@@ -290,6 +290,42 @@ extension Subscription: Model {
   }
 }
 
+extension BillingIdentity: Model {
+  public typealias ColumnName = CodingKeys
+  public static let schemaName = "parent"
+  public static let tableName = "billing_identities"
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .parentId: .uuid(self.parentId)
+    case .stripeCustomerId: .string(self.stripeCustomerId?.rawValue)
+    case .fullTrialStartedAt: .date(self.fullTrialStartedAt)
+    case .lastStripeSubscriptionId: .string(self.lastStripeSubscriptionId?.rawValue)
+    case .lastPaidTier: .string(self.lastPaidTier?.rawValue)
+    case .trialEmailLifecycle: .string(self.trialEmailLifecycle.rawValue)
+    case .isComplimentary: .bool(self.isComplimentary)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .parentId: .uuid(self.parentId),
+      .stripeCustomerId: .string(self.stripeCustomerId?.rawValue),
+      .fullTrialStartedAt: .date(self.fullTrialStartedAt),
+      .lastStripeSubscriptionId: .string(self.lastStripeSubscriptionId?.rawValue),
+      .lastPaidTier: .string(self.lastPaidTier?.rawValue),
+      .trialEmailLifecycle: .string(self.trialEmailLifecycle.rawValue),
+      .isComplimentary: .bool(self.isComplimentary),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
 extension Parent.Notification: Model {
   public static let schemaName = "parent"
   public static let tableName = "notifications"

@@ -217,6 +217,25 @@ extension Subscription {
   }
 }
 
+extension BillingIdentity: Duet.Identifiable {
+  typealias Id = Tagged<BillingIdentity, UUID>
+}
+
+extension BillingIdentity {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case parentId
+    case stripeCustomerId
+    case fullTrialStartedAt
+    case lastStripeSubscriptionId
+    case lastPaidTier
+    case trialEmailLifecycle
+    case isComplimentary
+    case createdAt
+    case updatedAt
+  }
+}
+
 extension Parent.Notification: Duet.Identifiable {
   typealias Id = Tagged<Parent.Notification, UUID>
 }
