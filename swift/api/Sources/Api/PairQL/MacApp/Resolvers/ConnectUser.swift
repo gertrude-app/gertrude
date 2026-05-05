@@ -225,16 +225,17 @@ private func notifyAdConversion(child: Child, db: any DuetSQL.Client) async {
     .where(.parentId == parent.id)
     .exists(in: db)
 
-  if alreadyRecorded == true {
-    with(dependency: \.postmark).toSuperAdmin(
-      "google ad conversion",
-      "gclid: <code>\(gclid)</code><br/>time: <code>\(Date())</code>",
-    )
+  if alreadyRecorded == false {
     _ = try? await db.create(InterestingEvent(
       eventId: "g-ad-conversion",
       kind: "event",
       context: "reporting",
       parentId: parent.id,
+      detail: "gclid=\(gclid)",
     ))
+    with(dependency: \.postmark).toSuperAdmin(
+      "google ad conversion",
+      "gclid: <code>\(gclid)</code><br/>time: <code>\(Date())</code>",
+    )
   }
 }

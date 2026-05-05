@@ -79,7 +79,8 @@ Supports all 3 apps, plus dashboard and admin websites
 
 - `./docs/notes/` holds lightweight ADR-style notes capturing the _why_ behind notable
   decisions (alternatives considered, constraints, rationales, etc). Don't load these by
-  default.
+  default. Do not write these unless instructed, although you may suggest that one be
+  written if a substantial decision is being made.
 
 ## Git operations
 
