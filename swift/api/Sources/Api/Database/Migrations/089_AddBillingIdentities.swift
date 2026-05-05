@@ -14,7 +14,8 @@ struct AddBillingIdentities: GertieMigration {
 
     try await sql.execute("""
       CREATE TABLE parent.billing_identities (
-        parent_id UUID PRIMARY KEY
+        id UUID PRIMARY KEY,
+        parent_id UUID NOT NULL UNIQUE
           REFERENCES parent.parents(id) ON DELETE CASCADE,
         stripe_customer_id TEXT,
         full_trial_started_at TIMESTAMP WITH TIME ZONE,
@@ -32,6 +33,7 @@ struct AddBillingIdentities: GertieMigration {
 
     try await sql.execute("""
       INSERT INTO parent.billing_identities (
+        id,
         parent_id,
         stripe_customer_id,
         full_trial_started_at,
@@ -41,6 +43,7 @@ struct AddBillingIdentities: GertieMigration {
         is_complimentary
       )
       SELECT
+        gen_random_uuid(),
         parent_id,
         NULL,
         trial_started_at,
