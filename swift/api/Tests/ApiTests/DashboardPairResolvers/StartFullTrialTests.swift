@@ -56,4 +56,14 @@ final class StartFullTrialTests: ApiTestCase, @unchecked Sendable {
       try await StartFullTrial.resolve(in: parent.context)
     }.toContain("Trial already used")
   }
+
+  func testStandaloneTrialPanelShowsFullTrialNotFull() async throws {
+    let parent = try await self.parent()
+    _ = try await StartFullTrial.resolve(in: parent.context)
+
+    let panel = try await GetSubscriptionPanel.resolve(in: parent.context)
+    expect(panel.entitlement).toEqual(.fullTrial(until: .reference + .days(21)))
+    expect(panel.primary).toEqual(.startCheckout(tier: .full))
+    expect(panel.secondary).toEqual([.startCheckout(tier: .light)])
+  }
 }

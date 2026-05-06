@@ -89,6 +89,12 @@ extension HandleCheckoutSuccess: Resolver {
       if tier != .light { unexpected("d6db1ebc", context) }
     }
 
+    var identity = try await parent.ensureBillingIdentity(in: context.db)
+    identity.stripeCustomerId = .init(subscription.customer)
+    identity.lastStripeSubscriptionId = .init(subscriptionId)
+    identity.lastPaidTier = tier
+    try await context.db.update(identity)
+
     return .success
   }
 }

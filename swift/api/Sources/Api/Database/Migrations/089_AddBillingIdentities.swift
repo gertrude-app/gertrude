@@ -257,7 +257,7 @@ struct AddBillingIdentities: GertieMigration {
           WHERE last_stripe_subscription_id IS NOT NULL
             AND stripe_customer_id IS NULL
         ) THEN
-          RAISE EXCEPTION 'gap detected: identity rows with last_stripe_subscription_id but no stripe_customer_id — regenerate VALUES block (claude.report.plan.md §1.0) and redeploy';
+          RAISE EXCEPTION 'gap detected: identity rows with last_stripe_subscription_id but no stripe_customer_id — regenerate VALUES block (agent.report.plan.md §1.0) and redeploy';
         END IF;
       END $$;
     """)
