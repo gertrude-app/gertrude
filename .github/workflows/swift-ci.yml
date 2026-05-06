@@ -17,7 +17,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.libs == 'true'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.2.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.libs == 'true'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.2.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.libs == 'true'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.2.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -70,7 +70,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.libs == 'true'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.2.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -89,7 +89,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.api == 'true'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.2.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -191,7 +191,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.api == 'true'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.2.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
     env:
       DATABASE_HOST: postgres
       AUTO_INCLUDED_KEYCHAIN_ID: 77777777-7777-7777-7777-777777777777
@@ -337,7 +337,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.swift == 'true' && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.2.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
     steps:
       - name: checkout
         uses: actions/checkout@v4

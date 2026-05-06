@@ -3,7 +3,7 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "command": "cd x-expect && swift build"
+      "command": "cd x-expect && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
     },
     "test": {
       "command": "true"

@@ -5,10 +5,10 @@
   "targets": {
     "build": {
       "outputs": ["{projectRoot}/.build/debug/Run"],
-      "command": "cd api && swift build"
+      "command": "cd api && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
     },
     "test": {
-      "command": "cd api && SWIFT_DETERMINISTIC_HASHING=1 swift test"
+      "command": "cd api && SWIFT_DETERMINISTIC_HASHING=1 ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift test"
     },
     "start": {
       "executor": "nx:run-commands",

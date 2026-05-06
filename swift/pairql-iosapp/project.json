@@ -4,7 +4,7 @@
   "implicitDependencies": ["pairql"],
   "targets": {
     "build": {
-      "command": "cd pairql-iosapp && swift build"
+      "command": "cd pairql-iosapp && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
     }
   }
 }

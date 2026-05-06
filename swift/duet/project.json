@@ -4,10 +4,10 @@
   "implicitDependencies": ["x-kit"],
   "targets": {
     "build": {
-      "command": "cd duet && swift build"
+      "command": "cd duet && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
     },
     "test": {
-      "command": "cd duet && SWIFT_DETERMINISTIC_HASHING=1 swift test"
+      "command": "cd duet && SWIFT_DETERMINISTIC_HASHING=1 ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift test"
     }
   }
 }
